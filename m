@@ -2,108 +2,171 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127CAC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 01:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F98C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 01:44:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243376AbiAKBFi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 20:05:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243367AbiAKBFh (ORCPT
+        id S243813AbiAKBob (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 20:44:31 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:40184 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243837AbiAKBoa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 20:05:37 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9844EC061751
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Jan 2022 17:05:37 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo2860876pjb.2
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Jan 2022 17:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Q1R1PzpvGV/VojxQSiAa0bdqqqYycDMe3kAEirZNPdY=;
-        b=ZESbEMzMJBAVvuSkQjGbPSGJsUnccftXUOXcM0pM9sSRfKNKisoQEd8ypg8qvpwAVx
-         udQJ6ElRq7XD+djyuignDXBDWDBfpw5JxgNqVMSGwTzN4SOmjsxgs8wmqqZdeec+Zw5Y
-         RznC+ZJjeAkY5ovug5GZHwlHimGkOmqWIyQ5nTlIaijy/UgsfsjaZ85gaFR57xpwmSG0
-         0p7/wzE825snC5KenjZgDBdeCbcqYvSpWnBGX+JKXySINWmmChhu4jCARXHgOu+ZESBp
-         +2VNgIyBbWorDPRuSGXyDSMvvDOU8K8JPhfZJ+VXxtP8rj2n+pY23qcy56Ef1pI5a8ZY
-         V2NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Q1R1PzpvGV/VojxQSiAa0bdqqqYycDMe3kAEirZNPdY=;
-        b=vFBX4gyL67l3TT6dIpaOrif2V7ylhSuFXLuqr9mbZxw2QlLOy1HuaRkrkeD9PdpAf/
-         t2y4M+aEsVzR6siGZ7DozdVm3hmJlkbFN8hscEwgdJEnptkokibGugkQhBokb1KgR2ti
-         xrjRYPZ0xGjCCSzbFZNjRFdcyd+cuHrhwyjIs7fh0ZTv7dWE5leYSZ4AZwfiiGtOYKi/
-         z9bW/VjDLO+LDG7CSrSmwcGIwVzGJbn3i1clBVFhAcsk1DSRGniq+7Fe4+ySXP4qYj+k
-         Lhw4P6LP/FzD/WJ9z69oOij0DqrXQ2QKnsQKizUEoj+2c/8PofD2WhVPKKhObm2g88v8
-         Ghtw==
-X-Gm-Message-State: AOAM533+i2U5AivE1m1QdUHDt42m23JwObB0h3m5Fc0Q70SofnY3fWRt
-        DRplqbg4NadBmaqoi655I0ByCQ==
-X-Google-Smtp-Source: ABdhPJzY/pkjKcqkaTs3n6wVHySOuAdgQewvLGOp/V9vsTfqwjdPrPNXXaklaP1HFYEan64rPHMzvw==
-X-Received: by 2002:a17:902:b414:b0:149:61c7:d550 with SMTP id x20-20020a170902b41400b0014961c7d550mr2078379plr.129.1641863136914;
-        Mon, 10 Jan 2022 17:05:36 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z15sm8400964pfh.201.2022.01.10.17.05.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jan 2022 17:05:36 -0800 (PST)
-Date:   Tue, 11 Jan 2022 01:05:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shirong Hao <shirong@linux.alibaba.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.co, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, brijesh.singh@amd.com,
-        thomas.lendacky@amd.com, john.allen@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        srutherford@google.com, ashish.kalra@amd.com, natet@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, zhang.jia@linux.alibaba.com
-Subject: Re: [PATCH 1/3] KVM: X86: Introduce KVM_HC_VM_HANDLE hypercall
-Message-ID: <YdzX3AXqqbwYBRej@google.com>
-References: <20220110060445.549800-1-shirong@linux.alibaba.com>
- <20220110060445.549800-2-shirong@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220110060445.549800-2-shirong@linux.alibaba.com>
+        Mon, 10 Jan 2022 20:44:30 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8C4F7B81864;
+        Tue, 11 Jan 2022 01:44:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD7FC36AF2;
+        Tue, 11 Jan 2022 01:44:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641865468;
+        bh=U1cLTMcj9acjC/ZshBrjqYKqAR1pltmGCBlmvDFjgqY=;
+        h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+        b=cwotnZKz9AaxK8JJI0wgjpXGcgnc92Hk5F17MZ7HZSrmX9tVF1sInLTi79CAdT+3z
+         ithWHT49GprV+7Nev7MGVtP79seovvGATXcdQihjjlecaCOFtYdiVlNB9ttxcZ8fAr
+         vHntJ638UEzrkvGhjpt/mxxiFs+pdr7yn61LEqvIurGtiYiO6U83UItwmDzyvPUG7p
+         xdzpdbOKk8Yy5IrvBI7ETmwb43HPjSrO8zGzsyebobATQvg2CIbqICX4kvqTVBGwZ5
+         JczakWYaxAhvnAINmM77mnyvi6E/wKPFgvFnzzJrl/vpjpXJsyjIEKqaC17l+HxJxO
+         MpzMd4XyPTi/g==
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailauth.nyi.internal (Postfix) with ESMTP id AF1D027C0054;
+        Mon, 10 Jan 2022 20:44:25 -0500 (EST)
+Received: from imap48 ([10.202.2.98])
+  by compute5.internal (MEProxy); Mon, 10 Jan 2022 20:44:25 -0500
+X-ME-Sender: <xms:9-DcYXUj_HNvWvuZ2H3km8mjhfCDaMNzfXDoBpetKUybneDfbfJ9DA>
+    <xme:9-DcYflSCFimvOpG5DTqmQFuHYztzCtbui7VGz6RJHwj2p2pYzjWecGnZfK7lhAY2
+    -RAd_o3-4qW-nZnDbk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrudehvddgfeejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
+    ugihucfnuhhtohhmihhrshhkihdfuceolhhuthhosehkvghrnhgvlhdrohhrgheqnecugg
+    ftrfgrthhtvghrnhepuefgueefveekhedvtdffgfekleehgfekheevteegieekgeehiedv
+    fffgjeetudfhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhguhidomhgvshhmthhprghu
+    thhhphgvrhhsohhnrghlihhthidqudduiedukeehieefvddqvdeifeduieeitdekqdhluh
+    htoheppehkvghrnhgvlhdrohhrgheslhhinhhugidrlhhuthhordhush
+X-ME-Proxy: <xmx:9-DcYTZiA1l-QO3SAWO149AQs4GMVAuYlDiYYH1HU80R5QM75N6Z-A>
+    <xmx:9-DcYSXBWJPMcyQ87vIOK4kPm_Fan_IbQshArt5h_4wb1HGVmwpZtA>
+    <xmx:9-DcYRk_sdoAoHLJ0a38pG4IYo-T-vOteGqnMlVnI4VdZ_1r21UYYw>
+    <xmx:-eDcYVcXYLQJ-JWY66dZPJ4fPq58eRG4aC-GwAAIYc4t5USHGJumXKUTZ7T3vf9n>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 781C321E006E; Mon, 10 Jan 2022 20:44:23 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-4527-g032417b6d6-fm-20220109.002-g032417b6
+Mime-Version: 1.0
+Message-Id: <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
+In-Reply-To: <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+ <20211210014337.xmin2lu5rhhe3b3t@valinor>
+ <20220110132349.siplwka7yhe2tmwc@valinor>
+ <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+ <YdxCsI3atPILABYe@mit.edu>
+ <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
+ <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
+ <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+ <YdyNxJzdBmSSEtDC@mit.edu>
+ <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+Date:   Mon, 10 Jan 2022 17:44:03 -0800
+From:   "Andy Lutomirski" <luto@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Cc:     "Marcelo Henrique Cerri" <marcelo.cerri@canonical.com>,
+        "Simo Sorce" <simo@redhat.com>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Jeffrey Walton" <noloader@gmail.com>,
+        "Stephan Mueller" <smueller@chronox.de>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        "Willy Tarreau" <w@1wt.eu>, "Nicolai Stange" <nstange@suse.de>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        "Arnd Bergmann" <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Matthew Garrett" <mjg59@srcf.ucam.org>,
+        "Vito Caputo" <vcaputo@pengaru.com>,
+        "Andreas Dilger" <adilger.kernel@dilger.ca>,
+        "Jan Kara" <jack@suse.cz>, "Ray Strode" <rstrode@redhat.com>,
+        "William Jon McCann" <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        "Florian Weimer" <fweimer@redhat.com>,
+        "Lennart Poettering" <mzxreary@0pointer.de>,
+        "Peter Matthias" <matthias.peter@bsi.bund.de>,
+        "Neil Horman" <nhorman@redhat.com>,
+        "Randy Dunlap" <rdunlap@infradead.org>,
+        "Julia Lawall" <julia.lawall@inria.fr>,
+        "Dan Carpenter" <dan.carpenter@oracle.com>,
+        "Andy Lavr" <andy.lavr@gmail.com>,
+        "Petr Tesarik" <ptesarik@suse.cz>,
+        "John Haxby" <john.haxby@oracle.com>,
+        "Alexander Lobakin" <alobakin@mailbox.org>,
+        "Jirka Hladky" <jhladky@redhat.com>,
+        "Eric Biggers" <ebiggers@kernel.org>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 10, 2022, Shirong Hao wrote:
-> This hypercall is used by the SEV guest to get the firmware handle.
 
-This is completely insufficient to justify why KVM is providing host information
-to the guest, let alone why KVM is providing that information to guest _userspace_.
 
-> +static int sev_vm_handle(struct kvm *kvm)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +
-> +	if (!sev_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	return sev->handle;
-> +}
-> +
->  static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.name = "kvm_amd",
->  
+On Mon, Jan 10, 2022, at 2:19 PM, Jason A. Donenfeld wrote:
+> On Mon, Jan 10, 2022 at 9:18 PM Theodore Ts'o <tytso@mit.edu> wrote:
+>> In general, you need FIPS
+>> certification for some specific use cases / application.  For example,
+>> if you're going for PCI compliance, then you might only need FIPS
+>> compliance for your OpenSSL library.  What the FIPS certification lab
+>> might consider acceptable for its entropy for its DRBG is an
+>> interesting question.  For some, simply having the OpenSSL library use
+>> RDSEED or RDRAND might be sufficient.  Or it could talk to an actual
+>> physical RNG device.
+>>
+>> So disabling getrandom() is probably not necessary, just so long as
+>> you can demonstrate that the FIPS cryptographic module --- i.e., the
+>> OpenSSL library --- is getting its entropy from an acceptable source.
+>
+> I don't know exactly what these people think they want, but what you
+> say seems probably correct.
+>
+>> I suspect what's actually going on is that some enterprise customers
+>> have FIPS complaince on a check-off list, and they aren't actually
+>> getting a formal FIPS certification.  Or they only need something to
+>> wave under the noses of their PCI certification company, and so the
+>> question is what makes them happy.
+>
+> Right.
+>
+>> And this is why some FIPS certification have gotten by just *fine*
+>> with a pure userspace OpenSSL library as their FIPS cryptographic
+>> module.  Where you draw the line between a "blessed" entropy source
+>> and one that's just hand-waving is really at the discretion of the
+>> certification lab.
+>
+> Hah, probably correct.
+>
+> So, seen this way, and combined with the solution provided at [1] (or
+> similar) for people who think they need something there, it seems like
+> the FIPS people can likely get what they need without really needing
+> to involve the kernel anyway.
 
-...
+Hmm, cute, but I think we can do a bit better. After all, this hack invo=
+lves trusting a whole lot of code that is *not* intended for secrets to =
+avoid having side channels.
 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0cf1082455df..24acf0f2a539 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8906,7 +8906,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  		a3 &= 0xFFFFFFFF;
->  	}
->  
-> -	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
-> +	if (static_call(kvm_x86_get_cpl)(vcpu) != 0 && nr != KVM_HC_VM_HANDLE) {
->  		ret = -KVM_EPERM;
->  		goto out;
->  	}
+So let=E2=80=99s solve it for real.  Have a driver (in a module) that ex=
+poses a /dev/urandom compatible interface to the CryptoAPI DRBG.  We can=
+ do a really nice job of it, and maybe it=E2=80=99ll be 100 lines of cod=
+e.  People can do whatever they like with it in their container manager =
+or boot scripts. And if it has a problem (where it=E2=80=99s *less* secu=
+re than the real urandom), we can say =E2=80=9CI told you so=E2=80=9D.
+
+We can go one step farther: add an LSM hook to getrandom().  Then someon=
+e can hack up a fips_t policy for SELinux that turns off getrandom.
+
+>
+> Jason
+>
+> [1] https://lore.kernel.org/lkml/YdynXjhhuQfbYuSb@zx2c4.com/
