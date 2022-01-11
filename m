@@ -2,41 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F9BFC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 11:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF44AC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 11:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349657AbiAKLiG (ORCPT
+        id S1349593AbiAKLiC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 06:38:06 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:34626 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238542AbiAKLiA (ORCPT
+        Tue, 11 Jan 2022 06:38:02 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:33626 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349546AbiAKLh7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 06:38:00 -0500
+        Tue, 11 Jan 2022 06:37:59 -0500
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 87B8B21639;
-        Tue, 11 Jan 2022 11:37:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id 9ACCA1F3BE;
+        Tue, 11 Jan 2022 11:37:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1641901078; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1641901077; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Nnudm31TWLhKvg8iKBvA1bfNToyh2dvEbi+Aqj3JOf0=;
-        b=Fp+F/vKcFMIPQuUQo8UVNYTohpH+hIN5v1sf3mvXCWYdHNhkYzinY1elREcV4EAoB2XrU6
-        w2s4w4eM6vF23rHLly3Thnnn0hO/93uEQ4XB3IwNPW+WsrvbrFTAcuNCfdHfprvBEaNnhb
-        E9kPOPr5vwJdhr6w0HzffkSX82F0lPw=
+        bh=E5S+PDIMt0cv778Ug4dTHgOhwSV6I7mLY7fYsPSMbc8=;
+        b=cNTa4UdEI8NMT2ulyV45F/C/V13CVcxnHg2/esmZQ9mIhQ4wW8tFjineNtW9R8OYNjpyzQ
+        /zlZ9M4CizPX6Da//4DbLf1GFhpmIzRgQqK8WzvxT/I3jGEGk7/mfQepNvv2M1J7zCxtl2
+        fc3gS9gTAYfCRnrha03OmoNgg3j/HZY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1641901078;
+        s=susede2_ed25519; t=1641901077;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Nnudm31TWLhKvg8iKBvA1bfNToyh2dvEbi+Aqj3JOf0=;
-        b=fAw0JhWNwop5nDbpxOR5hDu1JdKpGwH7AXDTV128GOp5d8eA8ZaWvQxIzuH9ztG3pbiEh0
-        VT07iLtEGTaYHwAA==
+        bh=E5S+PDIMt0cv778Ug4dTHgOhwSV6I7mLY7fYsPSMbc8=;
+        b=Gx/naHnidUOgdbPPRqig0Wgs+UDBOAiZnhMMzrD37EGj9I3JOKbn2QGeVXTk7DLgO/rsjU
+        BxTzShMlokMLUABA==
 Received: from kitsune.suse.cz (kitsune.suse.cz [10.100.12.127])
-        by relay2.suse.de (Postfix) with ESMTP id 3A301A3B92;
-        Tue, 11 Jan 2022 11:37:58 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 5459AA3B8F;
+        Tue, 11 Jan 2022 11:37:57 +0000 (UTC)
 From:   Michal Suchanek <msuchanek@suse.de>
 To:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-integrity@vger.kernel.org
@@ -69,9 +69,9 @@ Cc:     Michal Suchanek <msuchanek@suse.de>, kexec@lists.infradead.org,
         Sven Schnelle <svens@linux.ibm.com>,
         Baoquan He <bhe@redhat.com>,
         linux-security-module@vger.kernel.org
-Subject: [PATCH v5 6/6] module: Move duplicate mod_check_sig users code to mod_parse_sig
-Date:   Tue, 11 Jan 2022 12:37:48 +0100
-Message-Id: <687db74a714d50b9c83d7ac024da4f7dec0d9a1d.1641900831.git.msuchanek@suse.de>
+Subject: [PATCH v5 3/6] kexec_file: Don't opencode appended signature verification.
+Date:   Tue, 11 Jan 2022 12:37:45 +0100
+Message-Id: <7834eb187ef67cd88fc67f10e831130e3717d776.1641900831.git.msuchanek@suse.de>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1641900831.git.msuchanek@suse.de>
 References: <cover.1641900831.git.msuchanek@suse.de>
@@ -81,218 +81,237 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Multiple users of mod_check_sig check for the marker, then call
-mod_check_sig, extract signature length, and remove the signature.
+Module verification already implements appeded signature verification.
 
-Put this code in one place together with mod_check_sig.
-
-This changes the error from ENOENT to ENODATA for ima_read_modsig in the
-case the signature marker is missing.
-
-This also changes the buffer length in ima_read_modsig from size_t to
-unsigned long. This reduces the possible value range on 32bit but the
-length refers to kernel in-memory buffer which cannot be longer than
-ULONG_MAX.
-
-Also change mod_check_sig to unsigned long while at it.
+Reuse it for kexec_file.
 
 Signed-off-by: Michal Suchanek <msuchanek@suse.de>
 ---
-v3: - Philipp Rudo <prudo@redhat.com>: Update the commit with note about
-      change of raturn value
-    - Preserve the EBADMSG error code while moving code araound
-v4: - remove unused variable ms in module_signing.c
-    - note about buffer length
-v5: - also change the functions in module_signature.c to unsigned long
+v3: - Philipp Rudo <prudo@redhat.com>: Update the dependency on
+      MODULE_SIG_FORMAT to MODULE_SIG
+    - Include linux/verification.h - previously added in earlier patch
+v4: - kernel test robot <lkp@intel.com>: Use unsigned long rather than size_t for data length
+    - Update the code in kernel/module_signing.c to use pointer rather
+      than memcpy as the kexec and IMA code does
 ---
- include/linux/module_signature.h    |  4 +-
- kernel/module_signature.c           | 58 ++++++++++++++++++++++++++++-
- kernel/module_signing.c             | 27 ++------------
- security/integrity/ima/ima_modsig.c | 22 ++---------
- 4 files changed, 66 insertions(+), 45 deletions(-)
+ arch/powerpc/Kconfig                  |  2 +-
+ arch/powerpc/kexec/elf_64.c           | 19 +++------------
+ arch/s390/Kconfig                     |  2 +-
+ arch/s390/kernel/machine_kexec_file.c | 18 ++------------
+ include/linux/verification.h          |  3 +++
+ kernel/module-internal.h              |  2 --
+ kernel/module.c                       |  4 +++-
+ kernel/module_signing.c               | 34 ++++++++++++++++-----------
+ 8 files changed, 33 insertions(+), 51 deletions(-)
 
-diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
-index 7eb4b00381ac..e5fb157c085c 100644
---- a/include/linux/module_signature.h
-+++ b/include/linux/module_signature.h
-@@ -40,7 +40,9 @@ struct module_signature {
- 	__be32	sig_len;	/* Length of signature data */
- };
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index 1cde9b6c5987..4092187474ff 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -562,7 +562,7 @@ config ARCH_HAS_KEXEC_PURGATORY
  
--int mod_check_sig(const struct module_signature *ms, size_t file_len,
-+int mod_check_sig(const struct module_signature *ms, unsigned long file_len,
-+		  const char *name);
-+int mod_parse_sig(const void *data, unsigned long *len, unsigned long *sig_len,
- 		  const char *name);
- 
- #endif /* _LINUX_MODULE_SIGNATURE_H */
-diff --git a/kernel/module_signature.c b/kernel/module_signature.c
-index 00132d12487c..4a36405ecd08 100644
---- a/kernel/module_signature.c
-+++ b/kernel/module_signature.c
-@@ -8,17 +8,39 @@
- 
- #include <linux/errno.h>
- #include <linux/printk.h>
-+#include <linux/string.h>
+ config KEXEC_SIG
+ 	bool "Verify kernel signature during kexec_file_load() syscall"
+-	depends on KEXEC_FILE && MODULE_SIG_FORMAT
++	depends on KEXEC_FILE && MODULE_SIG
+ 	help
+ 	  This option makes kernel signature verification mandatory for
+ 	  the kexec_file_load() syscall.
+diff --git a/arch/powerpc/kexec/elf_64.c b/arch/powerpc/kexec/elf_64.c
+index 98d1cb5135b4..64cd314cce0d 100644
+--- a/arch/powerpc/kexec/elf_64.c
++++ b/arch/powerpc/kexec/elf_64.c
+@@ -23,6 +23,7 @@
+ #include <linux/of_fdt.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
++#include <linux/verification.h>
  #include <linux/module_signature.h>
- #include <asm/byteorder.h>
  
-+/**
-+ * mod_check_sig_marker - check that the given data has signature marker at the end
-+ *
-+ * @data:	Data with appended signature
-+ * @len:	Length of data. Signature marker length is subtracted on success.
-+ */
-+static inline int mod_check_sig_marker(const void *data, unsigned long *len)
-+{
-+	const unsigned long markerlen = sizeof(MODULE_SIG_STRING) - 1;
-+
-+	if (markerlen > *len)
-+		return -ENODATA;
-+
-+	if (memcmp(data + *len - markerlen, MODULE_SIG_STRING,
-+		   markerlen))
-+		return -ENODATA;
-+
-+	*len -= markerlen;
-+	return 0;
-+}
-+
- /**
-  * mod_check_sig - check that the given signature is sane
-  *
-  * @ms:		Signature to check.
-- * @file_len:	Size of the file to which @ms is appended.
-+ * @file_len:	Size of the file to which @ms is appended (without the marker).
-  * @name:	What is being checked. Used for error messages.
-  */
--int mod_check_sig(const struct module_signature *ms, size_t file_len,
-+int mod_check_sig(const struct module_signature *ms, unsigned long file_len,
- 		  const char *name)
+ static void *elf64_load(struct kimage *image, char *kernel_buf,
+@@ -156,9 +157,6 @@ static void *elf64_load(struct kimage *image, char *kernel_buf,
+ int elf64_verify_sig(const char *kernel, unsigned long kernel_len)
  {
- 	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
-@@ -44,3 +66,35 @@ int mod_check_sig(const struct module_signature *ms, size_t file_len,
+ 	const unsigned long marker_len = sizeof(MODULE_SIG_STRING) - 1;
+-	struct module_signature *ms;
+-	unsigned long sig_len;
+-	int ret;
  
- 	return 0;
+ 	if (marker_len > kernel_len)
+ 		return -EKEYREJECTED;
+@@ -168,19 +166,8 @@ int elf64_verify_sig(const char *kernel, unsigned long kernel_len)
+ 		return -EKEYREJECTED;
+ 	kernel_len -= marker_len;
+ 
+-	ms = (void *)kernel + kernel_len - sizeof(*ms);
+-	ret = mod_check_sig(ms, kernel_len, "kexec");
+-	if (ret)
+-		return ret;
+-
+-	sig_len = be32_to_cpu(ms->sig_len);
+-	kernel_len -= sizeof(*ms) + sig_len;
+-
+-	return verify_pkcs7_signature(kernel, kernel_len,
+-				      kernel + kernel_len, sig_len,
+-				      VERIFY_USE_PLATFORM_KEYRING,
+-				      VERIFYING_MODULE_SIGNATURE,
+-				      NULL, NULL);
++	return verify_appended_signature(kernel, &kernel_len, VERIFY_USE_PLATFORM_KEYRING,
++					 "kexec_file");
  }
+ #endif /* CONFIG_KEXEC_SIG */
+ 
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index 2a5bb4f29cfe..cece7152ea35 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -544,7 +544,7 @@ config ARCH_HAS_KEXEC_PURGATORY
+ 
+ config KEXEC_SIG
+ 	bool "Verify kernel signature during kexec_file_load() syscall"
+-	depends on KEXEC_FILE && MODULE_SIG_FORMAT
++	depends on KEXEC_FILE && MODULE_SIG
+ 	help
+ 	  This option makes kernel signature verification mandatory for
+ 	  the kexec_file_load() syscall.
+diff --git a/arch/s390/kernel/machine_kexec_file.c b/arch/s390/kernel/machine_kexec_file.c
+index c944d71316c7..345f2eab6e04 100644
+--- a/arch/s390/kernel/machine_kexec_file.c
++++ b/arch/s390/kernel/machine_kexec_file.c
+@@ -29,9 +29,6 @@ const struct kexec_file_ops * const kexec_file_loaders[] = {
+ int s390_verify_sig(const char *kernel, unsigned long kernel_len)
+ {
+ 	const unsigned long marker_len = sizeof(MODULE_SIG_STRING) - 1;
+-	struct module_signature *ms;
+-	unsigned long sig_len;
+-	int ret;
+ 
+ 	/* Skip signature verification when not secure IPLed. */
+ 	if (!ipl_secure_flag)
+@@ -45,19 +42,8 @@ int s390_verify_sig(const char *kernel, unsigned long kernel_len)
+ 		return -EKEYREJECTED;
+ 	kernel_len -= marker_len;
+ 
+-	ms = (void *)kernel + kernel_len - sizeof(*ms);
+-	ret = mod_check_sig(ms, kernel_len, "kexec");
+-	if (ret)
+-		return ret;
+-
+-	sig_len = be32_to_cpu(ms->sig_len);
+-	kernel_len -= sizeof(*ms) + sig_len;
+-
+-	return verify_pkcs7_signature(kernel, kernel_len,
+-				      kernel + kernel_len, sig_len,
+-				      VERIFY_USE_PLATFORM_KEYRING,
+-				      VERIFYING_MODULE_SIGNATURE,
+-				      NULL, NULL);
++	return verify_appended_signature(kernel, &kernel_len, VERIFY_USE_PLATFORM_KEYRING,
++					"kexec_file");
+ }
+ #endif /* CONFIG_KEXEC_SIG */
+ 
+diff --git a/include/linux/verification.h b/include/linux/verification.h
+index a655923335ae..32db9287a7b0 100644
+--- a/include/linux/verification.h
++++ b/include/linux/verification.h
+@@ -60,5 +60,8 @@ extern int verify_pefile_signature(const void *pebuf, unsigned pelen,
+ 				   enum key_being_used_for usage);
+ #endif
+ 
++int verify_appended_signature(const void *data, unsigned long *len,
++			      struct key *trusted_keys, const char *what);
 +
-+/**
-+ * mod_parse_sig - check that the given signature is sane and determine signature length
-+ *
-+ * @data:	Data with appended signature.
-+ * @len:	Length of data. Signature and marker length is subtracted on success.
-+ * @sig_len:	Length of signature. Filled on success.
-+ * @name:	What is being checked. Used for error messages.
-+ */
-+int mod_parse_sig(const void *data, unsigned long *len, unsigned long *sig_len, const char *name)
-+{
-+	const struct module_signature *sig;
-+	int rc;
-+
-+	rc = mod_check_sig_marker(data, len);
-+	if (rc)
-+		return rc;
-+
-+	if (*len < sizeof(*sig))
-+		return -EBADMSG;
-+
-+	sig = data + (*len - sizeof(*sig));
-+
-+	rc = mod_check_sig(sig, *len, name);
-+	if (rc)
-+		return rc;
-+
-+	*sig_len = be32_to_cpu(sig->sig_len);
-+	*len -= *sig_len + sizeof(*sig);
-+
-+	return 0;
-+}
+ #endif /* CONFIG_SYSTEM_DATA_VERIFICATION */
+ #endif /* _LINUX_VERIFY_PEFILE_H */
+diff --git a/kernel/module-internal.h b/kernel/module-internal.h
+index 33783abc377b..80461e14bf29 100644
+--- a/kernel/module-internal.h
++++ b/kernel/module-internal.h
+@@ -27,5 +27,3 @@ struct load_info {
+ 		unsigned int sym, str, mod, vers, info, pcpu;
+ 	} index;
+ };
+-
+-extern int mod_verify_sig(const void *mod, struct load_info *info);
+diff --git a/kernel/module.c b/kernel/module.c
+index 84a9141a5e15..8481933dfa92 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -57,6 +57,7 @@
+ #include <linux/bsearch.h>
+ #include <linux/dynamic_debug.h>
+ #include <linux/audit.h>
++#include <linux/verification.h>
+ #include <uapi/linux/module.h>
+ #include "module-internal.h"
+ 
+@@ -2894,7 +2895,8 @@ static int module_sig_check(struct load_info *info, int flags)
+ 	    memcmp(mod + info->len - markerlen, MODULE_SIG_STRING, markerlen) == 0) {
+ 		/* We truncate the module to discard the signature */
+ 		info->len -= markerlen;
+-		err = mod_verify_sig(mod, info);
++		err = verify_appended_signature(mod, &info->len,
++						VERIFY_USE_SECONDARY_KEYRING, "module");
+ 		if (!err) {
+ 			info->sig_ok = true;
+ 			return 0;
 diff --git a/kernel/module_signing.c b/kernel/module_signing.c
-index 20857d2a15ca..1d4cb03cce21 100644
+index 8723ae70ea1f..30149969f21f 100644
 --- a/kernel/module_signing.c
 +++ b/kernel/module_signing.c
-@@ -25,35 +25,16 @@ int verify_appended_signature(const void *data, unsigned long *len,
- 			      struct key *trusted_keys,
- 			      enum key_being_used_for purpose)
+@@ -14,32 +14,38 @@
+ #include <crypto/public_key.h>
+ #include "module-internal.h"
+ 
+-/*
+- * Verify the signature on a module.
++/**
++ * verify_appended_signature - Verify the signature on a module with the
++ * signature marker stripped.
++ * @data: The data to be verified
++ * @len: Size of @data.
++ * @trusted_keys: Keyring to use for verification
++ * @what: Informational string for log messages
+  */
+-int mod_verify_sig(const void *mod, struct load_info *info)
++int verify_appended_signature(const void *data, unsigned long *len,
++			      struct key *trusted_keys, const char *what)
  {
--	const unsigned long markerlen = sizeof(MODULE_SIG_STRING) - 1;
--	struct module_signature *ms;
--	unsigned long sig_len, modlen = *len;
-+	unsigned long sig_len;
+-	struct module_signature ms;
+-	size_t sig_len, modlen = info->len;
++	struct module_signature *ms;
++	unsigned long sig_len, modlen = *len;
  	int ret;
  
--	pr_devel("==>%s %s(,%lu)\n", __func__, key_being_used_for[purpose], modlen);
-+	pr_devel("==>%s %s(,%lu)\n", __func__, key_being_used_for[purpose], *len);
+-	pr_devel("==>%s(,%zu)\n", __func__, modlen);
++	pr_devel("==>%s(,%lu)\n", __func__, modlen);
  
--	if (markerlen > modlen)
--		return -ENODATA;
--
--	if (memcmp(data + modlen - markerlen, MODULE_SIG_STRING,
--		   markerlen))
--		return -ENODATA;
--	modlen -= markerlen;
--
--	if (modlen <= sizeof(*ms))
--		return -EBADMSG;
--
--	ms = data + modlen - sizeof(*ms);
--
--	ret = mod_check_sig(ms, modlen, key_being_used_for[purpose]);
-+	ret = mod_parse_sig(data, len, &sig_len, key_being_used_for[purpose]);
+-	if (modlen <= sizeof(ms))
++	if (modlen <= sizeof(*ms))
+ 		return -EBADMSG;
+ 
+-	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
++	ms = data + modlen - sizeof(*ms);
+ 
+-	ret = mod_check_sig(&ms, modlen, "module");
++	ret = mod_check_sig(ms, modlen, what);
  	if (ret)
  		return ret;
  
--	sig_len = be32_to_cpu(ms->sig_len);
--	modlen -= sig_len + sizeof(*ms);
--	*len = modlen;
--
--	return verify_pkcs7_signature(data, modlen, data + modlen, sig_len,
-+	return verify_pkcs7_signature(data, *len, data + *len, sig_len,
- 				      trusted_keys,
- 				      purpose,
+-	sig_len = be32_to_cpu(ms.sig_len);
+-	modlen -= sig_len + sizeof(ms);
+-	info->len = modlen;
++	sig_len = be32_to_cpu(ms->sig_len);
++	modlen -= sig_len + sizeof(*ms);
++	*len = modlen;
+ 
+-	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
+-				      VERIFY_USE_SECONDARY_KEYRING,
++	return verify_pkcs7_signature(data, modlen, data + modlen, sig_len,
++				      trusted_keys,
+ 				      VERIFYING_MODULE_SIGNATURE,
  				      NULL, NULL);
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index fb25723c65bc..b40c8fdf6139 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -37,33 +37,17 @@ struct modsig {
-  *
-  * Return: 0 on success, error code otherwise.
-  */
--int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
-+int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t len,
- 		    struct modsig **modsig)
- {
--	const size_t marker_len = strlen(MODULE_SIG_STRING);
--	const struct module_signature *sig;
- 	struct modsig *hdr;
--	size_t sig_len;
--	const void *p;
-+	unsigned long sig_len, buf_len = len;
- 	int rc;
- 
--	if (buf_len <= marker_len + sizeof(*sig))
--		return -ENOENT;
--
--	p = buf + buf_len - marker_len;
--	if (memcmp(p, MODULE_SIG_STRING, marker_len))
--		return -ENOENT;
--
--	buf_len -= marker_len;
--	sig = (const struct module_signature *)(p - sizeof(*sig));
--
--	rc = mod_check_sig(sig, buf_len, func_tokens[func]);
-+	rc = mod_parse_sig(buf, &buf_len, &sig_len, func_tokens[func]);
- 	if (rc)
- 		return rc;
- 
--	sig_len = be32_to_cpu(sig->sig_len);
--	buf_len -= sig_len + sizeof(*sig);
--
- 	/* Allocate sig_len additional bytes to hold the raw PKCS#7 data. */
- 	hdr = kzalloc(sizeof(*hdr) + sig_len, GFP_KERNEL);
- 	if (!hdr)
+ }
 -- 
 2.31.1
 
