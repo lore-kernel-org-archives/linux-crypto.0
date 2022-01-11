@@ -2,66 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB68C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 16:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D16FC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 16:30:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242367AbiAKQVP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 11:21:15 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:45310 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239725AbiAKQVP (ORCPT
+        id S1350012AbiAKQai (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 11:30:38 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:9080 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1350015AbiAKQai (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 11:21:15 -0500
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BFEWpS001271;
-        Tue, 11 Jan 2022 16:20:38 GMT
+        Tue, 11 Jan 2022 11:30:38 -0500
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20BFEBXi015389;
+        Tue, 11 Jan 2022 16:30:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : references : content-type : in-reply-to :
  mime-version; s=corp-2021-07-09;
- bh=C2dJ7hWNAXv+iwFo2NcL1I039DaOAxdYeTITw7hPQek=;
- b=f9qBJESQo9jzAOuUHj4cnKzkQwlz7kHByCN6daRv93TFOAk5h3eKExJLplVNRJeHSNZX
- WeTgxDl3X6FpVFkY5lTjZEbGhTEcmYMfCjvH8RtylSBvsWRn9hGzUGsAS2ICQdIVaevw
- uPApHN6wE9Tnz8KccjGUczOHK18mot+pudS0LuRGYXWWJKjFl75vPz79tNR1BYRt3JIa
- M9r0vrG1ktU2ieXrnam7Uv3NXjLilp0lVqHHDpVe7/jrJ6bCvNemVfcuyixdtubPWOlL
- Hb9qXM5n70FammgBhYvkAUoaB7hXTfA5olbaRlIR/Ka/6d7SYyn+wISTA8NZx7E5r7jw QA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dgn74beu2-1
+ bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
+ b=Ssk4XEo5K8OYee6QgYEkOIj9GIXEUiJfSiS6quNjsHOdAylM1YdcOePqYSMrMRwRPi9D
+ vjBqjNXNPBENXCLQV8MS11YW+LAwNetB668pk1+uFA8p/FRz87i4oQIJukrPyyA4mdOI
+ /bqtY0cbCiSWROnGG48gH+BWspSNhw21bkFUcSCtNPh47akhIRyNAIififFKmSnhGg6q
+ 6rp3AHBUMeBGY0yyp4/foY8oShi07aDGDJ/XgQLACieH44GpVvY2npLhetw9x/nQ9Nch
+ JoIK5z/6l+OTy8lZRMLevbzG0JMJYz55tcfjwucwk3EIb0ciSP+d8+c+dVVhIqsOElSA 3A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3dgmk9bkee-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 16:20:37 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20BGAT5m126580;
-        Tue, 11 Jan 2022 16:20:35 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
-        by aserp3030.oracle.com with ESMTP id 3df0ne8ebm-1
+        Tue, 11 Jan 2022 16:30:01 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20BGTxqN019784;
+        Tue, 11 Jan 2022 16:30:01 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2172.outbound.protection.outlook.com [104.47.55.172])
+        by aserp3020.oracle.com with ESMTP id 3df2e50c5q-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 16:20:35 +0000
+        Tue, 11 Jan 2022 16:30:01 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ghr804mDU6IHbX2Zg4iTuPtJ9IudkRZ4w9iCA0bL/9rG9VL/XvYbst4sbH2CceaRLitlWGQxyc4WAXqWYj9IXkRvABdQ8TmPTDwPkPNRYT3XzDnMysJ9OYcWY9S23qINFrBvZLjWH0F7zwtux5sGlXazhdsmYhHgIwbOYgbdfQKtKDIQVLC0lKuEHKgoneY6KPVN8tFJTepO1kCguJgB6VW130wPLoQ6CQHA1vxDPd9ZJdqgGlbDlxVGL4KtNJy08opSruFd4KV0FwnFMB3b2YNhjYGxF2gMpNxmTvvBVh4v/EscHVHEr/URuX6dhn+mk7mO9Dh4q2dJuzGPo43C6g==
+ b=HRpiD1u9yNP6kSt2ElG1P8CU2lC/KO3d/1/RVTkqgRS+qHG48hefNFQTENm8QRnKSu3GKZR+ruiUVq6M6gydiyduKJ20fu5ZgyabJXb/Q4riJwrt4DqFMLUVi027h4APuizSl+tEjevwQAy2rQsHFlrHRxMRB1jjXUw+QJYmxrvg7djO4IWe9XXeN5INqssAmyxl1UBQDoiJFeyIB7S3dIGf4nJPradCdgtQIaKdsNmJERvu3HMzCOpKfDhdshIO09pAh7LNrRGEHPKys8EUAoJM9XXL4Od4iLH90qlS+U+vP+WkiMSuQgBDPSEOwmp33Ldf6MZwJ0JlP+Z+RmwA4Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C2dJ7hWNAXv+iwFo2NcL1I039DaOAxdYeTITw7hPQek=;
- b=QxKWJoJFMJ9oE79UpDM4LWogpALjZ2JynDEeZQKBuO81G/78PKrUpGOGc8PGE2E73vC4/hBVjyDJkaIoGzKJ6RecHONQJuG9z3dtdeNMtqVXRv4SO+ru4mN1GzDzOWP8XjFSa/cjU9y9TUU3xvV9WlHaocg4i3J6iKaMP669eka08amnKhFds00dmDQv82k1FZH3YOARt1x36zT4z/cjgOwlMCcS4WGDRXuwCGr/lACOyV+IxxAjHIIf4CJdhjoniBGxuuNAhkEE4Mqyj6t8BHCvwPqSphYhgeR7nDVTcOWAhuLeenWdDOGYi6WB5ECMT4aRlkLNLckASL9mNUclfA==
+ bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
+ b=NSRoR4CAcxPPC6ZJylknc2DbD0DoaNRmAGAp7wtopu2T5NMbB492svM59BtBU67i+tzyWYG7cHcKPnNORUCAPrLVeHoWLmYgQqbr0R9p82qRd5b/Hdlcs0DmNj+3kB0SKpq/X6j30mQzoron+zvk0pWnOao/JkfqfVRkKAtSN7GIk4+zZmy93iRXrng6+XYySTifn3Wr/aTkQ/rTQhhonAmWR7Tk4K8lmsS2DQiNfMRGzhQKTB5kCyT7hafauJgaRzXHb+vn/tRO08LrhFLdQkh/YURB75qac2ar2zRo3HlCv38im9G+WyXXSNhMungrCsncWiay7ojdo1xpJDhM+w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C2dJ7hWNAXv+iwFo2NcL1I039DaOAxdYeTITw7hPQek=;
- b=pNio/ZN1N2Ih2BcKm3jP/V7xIiRRgDtmm2MaCvKNpoHl3r5xqVq4+5W3tiUmSKlP7b5Ofv3t5xpD4oaw2m2XACJFW05rsbtOmmO8dXctnm7LPeX9j7HNiHyTm0vdfuToKZS6TFAuYbAdx1uVaqRFUuOzxcvk4i86tHUS/eMG1JY=
+ bh=b1fOsSfgdCSFjxRHLquKTszZclnk0q50qLe2nj0Z9/A=;
+ b=x+LG+xJkYEpyEwpbQ9ZP2abqtXQJ0G0jpU21gVKV2c5BgVvecvknGf4PBQpJ562EpH+qS8S/UvZHRXeq63PWk5zM0RqWsUzmW5mla/yvlnr8rGMWCV0uUR2giOzZarARpmJJY1bg2l/O0tmiAdYqGwtX3bTDNlSiCnSDzAVr5Oo=
 Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SN6PR10MB2863.namprd10.prod.outlook.com (2603:10b6:805:d0::32) with
+ by SA2PR10MB4732.namprd10.prod.outlook.com (2603:10b6:806:fa::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Tue, 11 Jan
- 2022 16:20:32 +0000
+ 2022 16:29:55 +0000
 Received: from SA1PR10MB5711.namprd10.prod.outlook.com
  ([fe80::9d38:21ba:a523:b34e]) by SA1PR10MB5711.namprd10.prod.outlook.com
  ([fe80::9d38:21ba:a523:b34e%8]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 16:20:32 +0000
-Date:   Tue, 11 Jan 2022 11:20:27 -0500
+ 16:29:55 +0000
+Date:   Tue, 11 Jan 2022 11:29:50 -0500
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+To:     Peter Zijlstra <peterz@infradead.org>
 Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -72,11 +73,11 @@ Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         Dietmar Eggemann <dietmar.eggemann@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Ingo Molnar <mingo@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Josh Triplett <josh@joshtriplett.org>,
         Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
         Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         Steve Sistare <steven.sistare@oracle.com>,
         Tejun Heo <tj@kernel.org>,
@@ -84,127 +85,179 @@ Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         Vincent Guittot <vincent.guittot@linaro.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 00/16] padata, vfio, sched: Multithreaded VFIO page pinning
-Message-ID: <20220111162027.3brb7ga3vgtvv6th@oracle.com>
+Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
+ bandwidth
+Message-ID: <20220111162950.jk3edkm3nh5apviq@oracle.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106011306.GY2328285@nvidia.com>
- <20220107030330.2kcpekbtxn7xmsth@oracle.com>
- <20220107171248.GU2328285@nvidia.com>
- <20220110222725.paug7n5oznicceck@oracle.com>
- <20220111001751.GI2328285@nvidia.com>
+ <20220106004656.126790-16-daniel.m.jordan@oracle.com>
+ <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220111001751.GI2328285@nvidia.com>
-X-ClientProxiedBy: MN2PR04CA0013.namprd04.prod.outlook.com
- (2603:10b6:208:d4::26) To SA1PR10MB5711.namprd10.prod.outlook.com
+In-Reply-To: <Yd1w/TxTcGk5Ht53@hirez.programming.kicks-ass.net>
+X-ClientProxiedBy: MN2PR16CA0064.namprd16.prod.outlook.com
+ (2603:10b6:208:234::33) To SA1PR10MB5711.namprd10.prod.outlook.com
  (2603:10b6:806:23e::20)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 22d31977-cf8c-4df1-3386-08d9d51e49ef
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2863:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR10MB2863624069B9560D15515025D9519@SN6PR10MB2863.namprd10.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: a87a95a8-92c0-49b0-7797-08d9d51f998a
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4732:EE_
+X-Microsoft-Antispam-PRVS: <SA2PR10MB473263BA09B8CCD0365CD900D9519@SA2PR10MB4732.namprd10.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zWmQ1TQ068yYWr6ckFVRSoar0NNB33zsnHkxL4prWSYZtvF8HP/VQSMWE7HnstysKZMv2Y+2+WDXT8EQh1/WQAUyaCyG1n/A3zNXvUb4F517qmHCQCyAwttTGYtuF8IMS7GEL1K8P0IzkwLDO082jYHnkq/6BTqjUcTEqx+8Z9AP+F7R8TT3gK7Mjy7iLWVvMyEJpg/P//dCuyeHL+R8oNzQkiOo7dIgrCcgJBASLEnL8nOXnnNifzhzy3DGKwca27Coiz/wmw5rCjjXSrwiBE+fZhfJQeg2aCVOhytmi5xVO4DJohBFr3dgk1wPGAELvpbhI1BhcF49COIxbQzgvfQrYcCXj5xxNfaCu1ena+5n+qyPPWk5Cakww3uixHNrwtc6uw/0SQOuzYigN97qF+Bszq/mte3ozteQSCZQyCer+gq+wmWgk+EQhmsVpDlBhT7fc+lIw+sqik+TDM8PdGkCxCifsj4wTbB1a8O86VdTwwtw5+tQIr9pwy7vxLzFe/etCzlWH3ppCKQLBqqhnnrqkZbuLVpPute1Wa8Xaq0e0XXKR7oWsEDfzBlv9K0Do1L0jx8NeNCN0whlWf/Cj4fY66T4KMPa4vTedkjENjAYNQzbysjdlzWxFsTTniKKln3b9VmNkc1cZfm8n328oppyVKR5+ezzCM0tVIUPhSLtU721xDAtxMkeRbz1+aZVIGe66aYhio2Bq0W7cLpLNA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(52116002)(83380400001)(316002)(1076003)(66556008)(26005)(6506007)(8936002)(6666004)(86362001)(36756003)(6916009)(6512007)(8676002)(38350700002)(2906002)(508600001)(5660300002)(54906003)(2616005)(38100700002)(66946007)(6486002)(7416002)(186003)(4326008)(66476007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Y6s1OEULsaweYKA7dgQw/C5ZCc1S1051xLNeCsiXMKMP8+PET7NEiym6AAPD5ylx+62U23OI0EyQOEUnP8CtWOkacbpkUEZmdaRk9JLa/kdPaeTy89lI+tv+4MP2UNRz7mtpm+aseTOMEEIzBAgoSmH+LZgpxRblOfjhxtQb1fOHzcLcEg3n9OT1tvbEfmUYvhwey3qpX8mMbHp5vChq9JBb4ykp4VF6rErfXDpibqLLv77TRQsbobxZGgcCFvruzaMb4U2UnQ7osO05wcgq+t4sQH/cmtL3Jhz3+xp9lHIi2ui6h/0tu/MHp1DeRU2kB5FdYO06MYJFHeTXUsfxRbMFOVmvecvS6Hbi6YpCeKzihc8btAAK/HEF8hHKhxH+b+l2L7BnIoAhAFT6h+QzdNC52f1gZi77bLklfkgzTwzc5fj4r6p86g87wndKBcSJWbSatU11WVbeUpafLwFO2PMo46QrwiT7bJGfkRDxTegM/e/1rDvDTjxW9RRlQskck76yBaCw/nlkCJfSacNZQNYYLXcnY81jyeJqKLSGJc5NH5lt0yNQqWvT/PsDn0aG830syI4Tluo6Q2k0+zSRDbwBTTpGLlRxmlV1+ieTodnNDsSgE/Lw2WnlAikSG2pEcA3mr8aXUG7zwnaC/K3ROzwccwuMja+1ICvtR8xJbXZG3i+63chNQhidgxfHf9PtAnAqbYH08BSHrXQUFmf1FQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(508600001)(8676002)(8936002)(6916009)(15650500001)(52116002)(316002)(86362001)(6512007)(26005)(186003)(54906003)(4326008)(2616005)(6486002)(7416002)(38100700002)(83380400001)(1076003)(6666004)(6506007)(5660300002)(2906002)(36756003)(66476007)(66556008)(38350700002)(66946007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VVcAljDuZ/7H7TiI6EpB0VnYKOBurzF4nZyO8W/3j9pEbt1dRqN3ZQ7kIV9J?=
- =?us-ascii?Q?NCq3L4Nr1QI86yzhD6GmleyFiwprZskCawsjpNZAXlCU6l+iE6yf/NPDQL8V?=
- =?us-ascii?Q?fn4x7Zxw9rL8iwjuelIEjT3rMfYBdJ7hPTkCGpssUCBP0zfJp8Rlp8QYA70z?=
- =?us-ascii?Q?uyYv40S7NnkJ3b7cV4yMHOWrlWvc8ldDM/JK7Okxug+f+Jw8HH4fo2t16bbp?=
- =?us-ascii?Q?CxK9/eSndLldQ1YrFduyGEOGWDwUSeZiaIlLLYxT0RgY7tbKyTtk4PR8HNwJ?=
- =?us-ascii?Q?rQCV+PqbHZYV8ZlfTJZ+ADSLPsTLdVlqLZtB/fGixb65U9G/mJ/se5qt+hSN?=
- =?us-ascii?Q?7XFfqfoBSTzHwh6g0qrXikDcD7v1GKwTd3j+ytJXcfdz/LIjPh5sPAr2Ndwz?=
- =?us-ascii?Q?uzESoy/2Gqft0dEASlyyBHk3i7rOkdqK8WxeGWgBVyDBHD8Bt0Oc7DWfOY62?=
- =?us-ascii?Q?jPaqAN4KhnNLOIq46eo22gmW7Lv93SKFFKQzGpv1/Fp8Aql4eFrw2J9i4pBo?=
- =?us-ascii?Q?5Vjg+65iphiYa6+ibeYHYTAg/Xn//vOJhJsg7BQVm5GDWlAKW1RIB/Yzdm88?=
- =?us-ascii?Q?CtLhEmKg3bx8WtC8vOZSaTMH8r4tH0bKcOQJqNXGWhscYKUJZ6VOZ4p9iDW1?=
- =?us-ascii?Q?LvV8OTxTy53OJH4b7gPVq+SXsCal9xcFXZIpAj7CIgm6AP/VsoTebXuzz65o?=
- =?us-ascii?Q?e4WoLy2KcJxdvQOkUfSY7w0gwRo7a5HsFO13WPmWLMdF/vXB5hiHOOj1lLsl?=
- =?us-ascii?Q?m5f3Zp/djWCAYJwPWKcbPZH7eIHcEAt4HWHQT92s/Hng21SbIS+UzW6Oxnu1?=
- =?us-ascii?Q?1+LpUnI4/I5NWOCOo4nMBWU0PWBD6cJEeUT6Xc8OznerRycOp5TreOwhYjT5?=
- =?us-ascii?Q?ljDOoHJeevVAdRJbQF7KCMykUYc47GuROvp7ItB6LJyqfKGqFS0LW/FauVks?=
- =?us-ascii?Q?RqAwbKwZ3I07/vnNtSgyejITRWMgFxdgD8mBpDeczQ/ZotjWFkrMf2xSBzQ0?=
- =?us-ascii?Q?83BL71FO8ss8h0/vDQqAOYI9h6+UAlqDLMdbTEJjPzq26+UDR9MH2UcR/+yF?=
- =?us-ascii?Q?wTxtP/l8Kc/HjpAURw2khMxe+AYKF6GdnCBaY53TL4oQhQyNubRoTfc3M8hI?=
- =?us-ascii?Q?3C9pWZjgylRtmyzKSlvJpshz0Ndh4U+wibTY9FckJSswS+BNyulVszvTOi1g?=
- =?us-ascii?Q?/gY+3jsmUvKac1X6JZsb72jM5MUNliFIdItCOQIRXRLmQfzkr8ucceT1dMaI?=
- =?us-ascii?Q?a9lErKwzsw/OPXFpH9Kpx+Ub1JhAjJMUPybK1D0N2522Yd286KXTn0TtMj0l?=
- =?us-ascii?Q?jxUJrUjR4+1Lxn6fDdWBNSTL6hwvx0fMRfO78QgLvZwlHMgpXLOHzgri8bxQ?=
- =?us-ascii?Q?1rmQQ2X/hxuZYaRB1OMfmP7RF/x+5/6Jd19es2wO3U0dxn06ZlLIyt8cmnyT?=
- =?us-ascii?Q?b97EhpLO9+3LHDTVPyvRR8tWjFmHGggU3ndwWzpWTlXOGXDv4FxMkgrAwp9p?=
- =?us-ascii?Q?/zqnYMtapAbsYtrFEIGToMeAGaepC+tdRi/nXcdVikDZFAWO0+2A3rR127G4?=
- =?us-ascii?Q?jFOLxA1G4TQXLSXTR/khzNiOjSur2QVGukdGIdWeFKr4PPmYoQRN80BqgrNM?=
- =?us-ascii?Q?pi0xlEX8cMEuY/PTVd6ioOLC+2y10IfGmuREQtYNyIWYOsP6O9b4aHawpiOi?=
- =?us-ascii?Q?ystb5g=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PgFv0If2uoDEVTPZjccrXRGvVnSYDZJGwoL/gxOn0ZbjhA+qJZjMLnSVXulp?=
+ =?us-ascii?Q?B654dbs9JiA3rg2n/9Ep76cFk/uM2+D86QGfh7lYZPNbciRO73eN3jCDpDfY?=
+ =?us-ascii?Q?BArXFNuM0JaJogW8ORMDjLHAyUaf0LzAx21rUM+zOLXZd8C5D5MJJnv7ppkC?=
+ =?us-ascii?Q?c5z74kTD1htHIP/LLplXfoi8PQSC3cXtj2WaSDRpsdpaCRDXQd9r2MAmyiR4?=
+ =?us-ascii?Q?MRo0++t/HOWLoPs+i5OofBr9BlTzZCmaDi/09h2+jDhsguioyNPH/6Dx3QRx?=
+ =?us-ascii?Q?zM9d1AH73qi4Js3HHNnOUjvX0pTpmw9ezG+Oy0CKKSSh3IyzOzBU7bxSqiYL?=
+ =?us-ascii?Q?/nyYUmkH7jlG6wPrc+qmAkFS+GcTAIAY7drjzjJ/ddCIjiEL81Lzrbz0UgFu?=
+ =?us-ascii?Q?jssfx94/Ixavh7hx8LwJSkLyCyqCS4eOyquhIg+VowI+SuKH0A5zcjl7I25C?=
+ =?us-ascii?Q?YMh85Of7Mar6IMi4ttoqK9kkjflBlfAXkEuaAjqbLIWMslhENFV6pql8//Q3?=
+ =?us-ascii?Q?VVFkWi9sO0zM9TO8ANiJ02VtA1KYh6Irz7XJ9zyW+0k/pKY57HBbSRpPcr0k?=
+ =?us-ascii?Q?t1zOy575UAK2bemHxbblSHT3jxHdgfw+6H0R3NxKSTx/LOS4+3gGEBwV6vXF?=
+ =?us-ascii?Q?XdsBVLlI+LXYCud4N6bdAJgRREodoNRd8vyG9vZ0Wx2TG4FXHORVYcywgpFp?=
+ =?us-ascii?Q?+rRDFXb2suWITe8KeRhCApmnFygrc/k7+zzMsGu93uiv2+JcRw7pn61l+PpP?=
+ =?us-ascii?Q?7GwZ/XXeo5Ha4r2DiSCOBIYFL29VB+9czP5fRYwspMpK8TdBHWY8DEYRN8Rn?=
+ =?us-ascii?Q?xRZ5TjBVphFA7+Oel2ynmf6BWnZuhTSmldhPUZqcvbuFCJ/p+p3TlakEkvpy?=
+ =?us-ascii?Q?TZEGMClKYnVY0wRdiszfnqaGfhVovUi2FZps3jvswZQjIojVCO9/dLDM8X0S?=
+ =?us-ascii?Q?WAkmdlVQsZfGKqRFyZ4JLLWNgbbhoHPMhiJWZxRKxCfaB5+s4oEymiX9E2Up?=
+ =?us-ascii?Q?Cobre7c5dTEJK6SUzgkE3e7vdg6UESwmo5+qF728WYFU8Gmjq18tQvtFSEYq?=
+ =?us-ascii?Q?Dlxx/jCn3WtAe03cEyIqPxPw449sI2adtzWh4jGG84VzpWAFuBYNisJEjU2h?=
+ =?us-ascii?Q?7cMmX4kzsYY7GVIaK7/24IiGO/xuTbM4hR0/qsjOgEto1bfJY+wNRPpyN4Ts?=
+ =?us-ascii?Q?dtrzdd69eGTC5eXmg66lOUchH8LAtmJyQKud5DWvbK/6Zz75jRpwV4Bqm383?=
+ =?us-ascii?Q?oWPkaP0CzB2dCw1iyFpQuQrSi7ayE0khYTBFMf9Cy7ssthVdEsHjlzH9DGHp?=
+ =?us-ascii?Q?ozuFdSR0IPn9xEAULRXsf6cUrSHWfbfZ0MawZrxoA4tMs0KPXPUcfTmmdY1q?=
+ =?us-ascii?Q?Ul8OG3g9IEtRwhqdAdAF6UFqFOyGXUfRjGb5mTQftCk6+TPkA7YR1SHyRhsv?=
+ =?us-ascii?Q?aAFXMZhgh30zN/7hv62rwJMy+eRMtKCPHaAdPOFKEsBzbpkqlJ24NkbUrqIZ?=
+ =?us-ascii?Q?t3PffysL0uXDiFoaO1o4Ojzd4w7G0PXCSDRCq2AaHy8PbLmxy2pzFQpQ+r/N?=
+ =?us-ascii?Q?AZZ9cQUYNAlmvLdKQfx1tpQZoz/Tdik55Lu/3LeH5NWey+5CMV4tJ0n/2nzj?=
+ =?us-ascii?Q?eco5piPDI38HPfivHL6ZJfa32AsOSP2Fkh0rwju0bkAnnUVQeLcBF7zcdz1b?=
+ =?us-ascii?Q?bOddpA=3D=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22d31977-cf8c-4df1-3386-08d9d51e49ef
+X-MS-Exchange-CrossTenant-Network-Message-Id: a87a95a8-92c0-49b0-7797-08d9d51f998a
 X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 16:20:31.8705
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 16:29:55.1169
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hRleLgZeRxDS4tnIhSEP1JFD2VSfS/6Iy+Wlt2Nc9t96IDDH3Km8WzJcsi3UUJVYwJQxektupS8Jsqgvx1gSZCJ510Dxr95kFO8wzkOKGfk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2863
+X-MS-Exchange-CrossTenant-UserPrincipalName: yyBeTP3s6O0jiJR7hZml76Y3IEhk+yS9UKQ94jzjfjQCJfSMO60Wpm3BHgaYGaxGFrBDkoRt3wVof6oyesINM6wD4y5w7kVWshOd+PD7Z3Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4732
 X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=751 bulkscore=0 spamscore=0
- phishscore=0 adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
+ suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201110092
-X-Proofpoint-ORIG-GUID: FkVyPF2kmNt8m4r5hHe53udYiG7CW0ap
-X-Proofpoint-GUID: FkVyPF2kmNt8m4r5hHe53udYiG7CW0ap
+ definitions=main-2201110093
+X-Proofpoint-GUID: M-3nsWlxTIWDDhRUE-hRN2BYyfXX-TqA
+X-Proofpoint-ORIG-GUID: M-3nsWlxTIWDDhRUE-hRN2BYyfXX-TqA
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 08:17:51PM -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 10, 2022 at 05:27:25PM -0500, Daniel Jordan wrote:
-> 
-> > > > Pinning itself, the only thing being optimized, improves 8.5x in that
-> > > > experiment, bringing the time from 1.8 seconds to .2 seconds.  That's a
-> > > > significant savings IMHO
-> > > 
-> > > And here is where I suspect we'd get similar results from folio's
-> > > based on the unpin performance uplift we already saw.
-> > > 
-> > > As long as PUP doesn't have to COW its work is largely proportional to
-> > > the number of struct pages it processes, so we should be expecting an
-> > > upper limit of 512x gains on the PUP alone with foliation.
-> > >
-> > > This is in line with what we saw with the prior unpin work.
+On Tue, Jan 11, 2022 at 12:58:53PM +0100, Peter Zijlstra wrote:
+> On Wed, Jan 05, 2022 at 07:46:55PM -0500, Daniel Jordan wrote:
+> > As before, helpers in multithreaded jobs don't honor the main thread's
+> > CFS bandwidth limits, which could lead to the group exceeding its quota.
 > > 
-> > "in line with what we saw"  Not following.  The unpin work had two
-> > optimizations, I think, 4.5x and 3.5x which together give 16x.  Why is
-> > that in line with the potential gains from pup?
+> > Fix it by having helpers remote charge their CPU time to the main
+> > thread's task group.  A helper calls a pair of new interfaces
+> > cpu_cgroup_remote_begin() and cpu_cgroup_remote_charge() (see function
+> > header comments) to achieve this.
+> > 
+> > This is just supposed to start a discussion, so it's pretty simple.
+> > Once a kthread has finished a remote charging period with
+> > cpu_cgroup_remote_charge(), its runtime is subtracted from the target
+> > task group's runtime (cfs_bandwidth::runtime) and any remainder is saved
+> > as debt (cfs_bandwidth::debt) to pay off in later periods.
+> > 
+> > Remote charging tasks aren't throttled when the group reaches its quota,
+> > and a task group doesn't run at all until its debt is completely paid,
+> > but these shortcomings can be addressed if the approach ends up being
+> > taken.
+> > 
 > 
-> It is the same basic issue, doing extra work, dirtying extra memory..
+> *groan*... and not a single word on why it wouldn't be much better to
+> simply move the task into the relevant cgroup..
 
-Ok, gotcha.
+Yes, the cover letter talks about that, I'll quote the relevant part
+here.
 
-> I don't know of other users that use such huge memory sizes this would
-> matter, besides a VMM..
+---
 
-Right, all the VMMs out there that use vfio.
+    15  sched/fair: Account kthread runtime debt for CFS bandwidth
+    16  sched/fair: Consider kthread debt in cputime
 
-> > My assumption going into this series was that multithreading VFIO page
-> > pinning in the kernel was a viable way forward given the positive
-> > feedback I got from the VFIO maintainer last time I posted this, which
-> > was admittedly a while ago, and I've since been focused on the other
-> > parts of this series rather than what's been happening in the mm lately.
-> > Anyway, your arguments are reasonable, so I'll go take a look at some of
-> > these optimizations and see where I get.
-> 
-> Well, it is not *unreasonable* it just doesn't seem compelling to me
-> yet.
-> 
-> Especially since we are not anywhere close to the limit of single
-> threaded performance. Aside from GUP, the whole way we transfer the
-> physical pages into the iommu is just begging for optimizations
-> eg Matthew's struct phyr needs to be an input and output at the iommu
-> layer to make this code really happy.
+A prototype for remote charging in CFS bandwidth and cpu.stat, described more
+in the next section.  It's debatable whether these last two are required for
+this series.  Patch 12 caps the number of helper threads started according to
+the max effective CPUs allowed by the quota and period of the main thread's
+task group.  In practice, I think this hits the sweet spot between complexity
+and respecting CFS bandwidth limits so that patch 15 might just be dropped.
+For instance, when running qemu with a vfio device, the restriction from patch
+12 was enough to avoid the helpers breaching CFS bandwidth limits.  That leaves
+patch 16, which on its own seems overkill for all the hunks it would require
+from patch 15, so it could be dropped too.
 
-/nods/  There are other ways forward.  As I say, I'll take a look.
+Patch 12 isn't airtight, though, since other tasks running in the task group
+alongside the main thread and helpers could still result in overage.  So,
+patches 15-16 give an idea of what absolutely correct accounting in the CPU
+controller might look like in case there are real situations that want it.
+
+
+Remote Charging in the CPU Controller
+-------------------------------------
+
+CPU-intensive kthreads aren't generally accounted in the CPU controller, so
+they escape settings such as weight and bandwidth when they do work on behalf
+of a task group.
+
+This problem arises with multithreaded jobs, but is also an issue in other
+places.  CPU activity from async memory reclaim (kswapd, cswapd?[5]) should be
+accounted to the cgroup that the memory belongs to, and similarly CPU activity
+from net rx should be accounted to the task groups that correspond to the
+packets being received.  There are also vague complaints from Android[6].
+
+Each use case has its own requirements[7].  In padata and reclaim, the task
+group to account to is known ahead of time, but net rx has to spend cycles
+processing a packet before its destination task group is known, so any solution
+should be able to work without knowing the task group in advance.  Furthermore,
+the CPU controller shouldn't throttle reclaim or net rx in real time since both
+are doing high priority work.  These make approaches that run kthreads directly
+in a task group, like cgroup-aware workqueues[8] or a kernel path for
+CLONE_INTO_CGROUP, infeasible.  Running kthreads directly in cgroups also has a
+downside for padata because helpers' MAX_NICE priority is "shadowed" by the
+priority of the group entities they're running under.
+
+The proposed solution of remote charging can accrue debt to a task group to be
+paid off or forgiven later, addressing all these issues.  A kthread calls the
+interface
+
+    void cpu_cgroup_remote_begin(struct task_struct *p,
+                                 struct cgroup_subsys_state *css);
+
+to begin remote charging to @css, causing @p's current sum_exec_runtime to be
+updated and saved.  The @css arg isn't required and can be removed later to
+facilitate the unknown cgroup case mentioned above.  Then the kthread calls
+another interface
+
+    void cpu_cgroup_remote_charge(struct task_struct *p,
+                                  struct cgroup_subsys_state *css);
+
+to account the sum_exec_runtime that @p has used since the first call.
+Internally, a new field cfs_bandwidth::debt is added to keep track of unpaid
+debt that's only used when the debt exceeds the quota in the current period.
+
+Weight-based control isn't implemented for now since padata helpers run at
+MAX_NICE and so always yield to anything higher priority, meaning they would
+rarely compete with other task groups.
+
+[ We have another use case to use remote charging for implementing
+  CFS bandwidth control across multiple machines.  This is an entirely
+  different topic that deserves its own thread. ]
+
