@@ -2,75 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA05C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 06:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E64DFC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 07:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234809AbiAKG0P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 01:26:15 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59322 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234767AbiAKG0O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 01:26:14 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n7Abj-0007jC-CO; Tue, 11 Jan 2022 17:26:12 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Jan 2022 17:26:11 +1100
-Date:   Tue, 11 Jan 2022 17:26:11 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: testmgr - Move crypto_simd_disabled_for_test out
-Message-ID: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
+        id S1348457AbiAKHSG (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 02:18:06 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.162]:34839 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233066AbiAKHSG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jan 2022 02:18:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1641885479;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=MRnjE9Z5ElkIORUL8grk4lSy5TJKyFtbbyPmKgxVLh0=;
+    b=KX2oeT+zLTI+BHWsH3nnudd/Leitysyu2MK+yEFozzR9c3txb3ozUKeLzrZI5bkSc/
+    OkvAaHiFedZHhFd4PG902KAf5xKviL7dmqqlO4Fa1Vu4yhDronoyItIaSXF6B7wPNxgG
+    HoNxxpydJQ6X6Tm2crrjiUxAx8GQkFBdIAhtBdX2lTIvktfOuRrcqM98s3UwE25yCl/7
+    Prdsa/mFEnb2fWNFj7vZllPexpZ5QiU5wLqTGY8brnE67T2CxFByZA+eQqEFxJfGl4Ka
+    RKZB8pA0arUjsF2cBcExS02fEiCJBPnJPsIexqtHn1WoxnjLo2gjhl4MHRx3zuRFNAAr
+    9oZA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIvSbY0c="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.37.6 DYNA|AUTH)
+    with ESMTPSA id t60e2cy0B7HwGZV
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Tue, 11 Jan 2022 08:17:58 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        Niolai Stange <nstange@suse.com>, Simo Sorce <simo@redhat.com>
+Subject: Re: [PATCH] crypto: HMAC - disallow keys < 112 bits in FIPS mode
+Date:   Tue, 11 Jan 2022 08:17:57 +0100
+Message-ID: <1979340.Ftzpt9979A@tauon.chronox.de>
+In-Reply-To: <2042139.9o76ZdvQCi@positron.chronox.de>
+References: <2075651.9o76ZdvQCi@positron.chronox.de> <YdjMn75GFEOLvoDr@sol.localdomain> <2042139.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As testmgr is part of cryptomgr which was designed to be unloadable
-as a module, it shouldn't export any symbols for other crypto
-modules to use as that would prevent it from being unloaded.  All
-its functionality is meant to be accessed through notifiers.
+Am Samstag, 8. Januar 2022, 07:39:27 CET schrieb Stephan M=FCller:
 
-The symbol crypto_simd_disabled_for_test was added to testmgr
-which caused it to be pinned as a module if its users were also
-loaded.  This patch moves it out of testmgr and into crypto/simd.c
-so cryptomgr can again be unloaded and replaced on demand.
+Hi,
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Am Samstag, 8. Januar 2022, 00:28:31 CET schrieb Eric Biggers:
+>=20
+> Hi Eric,
+>=20
+> > Hi Stephan,
+> >=20
+> > On Fri, Jan 07, 2022 at 08:25:24PM +0100, Stephan M=FCller wrote:
+> > > FIPS 140 requires a minimum security strength of 112 bits. This impli=
+es
+> > > that the HMAC key must not be smaller than 112 in FIPS mode.
+> > >=20
+> > > This restriction implies that the test vectors for HMAC that have a k=
+ey
+> > > that is smaller than 112 bits must be disabled when FIPS support is
+> > > compiled.
+> > >=20
+> > > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> >=20
+> > This could make sense, but the weird thing is that the HMAC code has be=
+en
+> > like this from the beginning, yet many companies have already gotten th=
+is
+> > exact same HMAC implementation FIPS-certified.  What changed?
+>=20
+> FIPS 140-3 (which is now mandatory) requires this based on SP800-131A.
 
-diff --git a/crypto/simd.c b/crypto/simd.c
-index edaa479a1ec5..2027d747b746 100644
---- a/crypto/simd.c
-+++ b/crypto/simd.c
-@@ -47,6 +47,11 @@ struct simd_skcipher_ctx {
- 	struct cryptd_skcipher *cryptd_tfm;
- };
- 
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
-+EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
-+#endif
-+
- static int simd_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 				unsigned int key_len)
- {
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 5831d4bbc64f..3a5a3e5cb77b 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -55,9 +55,6 @@ MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
- static unsigned int fuzz_iterations = 100;
- module_param(fuzz_iterations, uint, 0644);
- MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
--
--DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
--EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
- #endif
- 
- #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Here are a few more details:
+
+The requirement from FIPS 140-3 that the crypto module (aka kernel crypto A=
+PI)=20
+must provide an indicator whether the algorithm(s) in use are FIPS complian=
+t.
+
+If you look at various user space libraries, they make quite an effort thes=
+e=20
+days to add that "service indicator" as an API. Adding such an API to the=20
+crypto API is not helpful.
+
+Thus we revert to the notion of a "global service indicator" meaning that w=
+hen=20
+the kernel is booted with fips=3D1, all algorithms operate in FIPS mode. Th=
+is=20
+means that all non-approved algos must be technically disabled.
+
+There have been patches from me disabling RSA < 2k and others not too long=
+=20
+ago. In the future, I would expect additional patches disabling the use of =
+GCM=20
+when invoked without seqiv or disabling dh when not used with one of the up-
+and-coming FFDHE / MODP groups from Nicolai's patch set. All those patches=
+=20
+revolve around the same issue.
+
+Note, for some algorithms like XTS key check we already had such technical=
+=20
+enforcements. This was due to the fact that FIPS 140-2 required for some=20
+aspects technical enforcements but for some others, "procedural" coverage (=
+aka=20
+documentation) was sufficient.
+
+Ciao
+Stephan
+
+
