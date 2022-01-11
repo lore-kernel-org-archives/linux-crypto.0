@@ -2,129 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9B6C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 12:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753F7C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 13:06:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239374AbiAKMlW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 07:41:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59754 "EHLO
+        id S240140AbiAKNGk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 08:06:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236359AbiAKMlW (ORCPT
+        with ESMTP id S236102AbiAKNGk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 07:41:22 -0500
-Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431F9C06173F
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 04:41:22 -0800 (PST)
-Received: by mail-vk1-xa32.google.com with SMTP id n12so2623287vkc.12
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 04:41:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5nbctxTqSbKVLgxPcBh73m81LJiUTavZURj9y7UFZyU=;
-        b=b+ZZrNZT+jFsQ8CwSWNJJf9yClxOnhkLLIcvrblvHKiY9YBV4Dt4rA9IqJQtg5DyUe
-         sfKNlmw1VKydmZ0W51HFs7FW7hyQRyd2e38P6vyElDHlVtoZKDpf9jd9yNZrr9Gy/E64
-         5FfPIizaQNzFk/0nj8usX6ZooPwX6Sqh0mLKvyEPlrOWYg6hSwi8dsjmEN4U58MlPwEh
-         bRPt98Ymqhgx5woUkNZuoNK9oXrPg3VTa2oXZHuogeR/nP7IIvVftPhAnT4LUCjV3AbW
-         lM4DRfCQHC8ku4PaaVLjcwgYlPlmFQw578AU9gh9e92LZrhijgOd1iz/r4H8nzGuds67
-         4RNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5nbctxTqSbKVLgxPcBh73m81LJiUTavZURj9y7UFZyU=;
-        b=SK8rWawqjjyyep08iKRDOPs4xeHyI9czwHg1So2oEs7plTVx/ZVr4EEpsweK3Gg+/2
-         nDKHpXS/rMnIUA4sQ5q8pPR4uE8069bijDj/4oXSI8Hag8QieEa5bopbPsvqidaBqjBg
-         vhzjaLETKVXs/peghQf8qAcaDWlwyH4ZF7dG9MPPZyoekTKKpugBHWAbVQRlxnYgU1VK
-         ToFxRjTTYMhW/bm6wkHTqSaRrS/aIYmkly1IwEYLiAcMgQakxxBDBG7qZBBvyOBZA5Vo
-         bW7Rxin7Tf0QykHKRxvj3Y5N9p0S5KrNaqsNaSCDXVBc4X9nyfGlYC9PIiJ4p6bhOzxz
-         kOAA==
-X-Gm-Message-State: AOAM530OhlBz5P34Xj9EHDffAs33trDPPe6HTJehbVWwsQs6Y+1oPEUy
-        NIMZDwx6zJSp/SuHkSBeVlU=
-X-Google-Smtp-Source: ABdhPJw0l7jQhigpBdxR5YvSPwm6eLiNemW1z3CMhn4uFUp3/87K9nIC8mtBMcow8+bawPg2yzVH5g==
-X-Received: by 2002:a05:6122:200d:: with SMTP id l13mr2147658vkd.16.1641904881419;
-        Tue, 11 Jan 2022 04:41:21 -0800 (PST)
-Received: from localhost.localdomain ([2804:14c:485:504a:adc1:6d00:a8f1:3386])
-        by smtp.gmail.com with ESMTPSA id m62sm5734790uam.0.2022.01.11.04.41.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 04:41:21 -0800 (PST)
-From:   Fabio Estevam <festevam@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     horia.geanta@nxp.com, andrei.botila@nxp.com,
-        andrew.smirnov@gmail.com, fredrik.yhlen@endian.se, hs@denx.de,
-        linux-crypto@vger.kernel.org, Fabio Estevam <festevam@denx.de>
-Subject: [PATCH] crypto: caam - enable prediction resistance conditionally
-Date:   Tue, 11 Jan 2022 09:41:04 -0300
-Message-Id: <20220111124104.2379295-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 11 Jan 2022 08:06:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9326FC06173F;
+        Tue, 11 Jan 2022 05:06:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 40150B81AB4;
+        Tue, 11 Jan 2022 13:06:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54CEC36AF4;
+        Tue, 11 Jan 2022 13:06:36 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gJBCKMH1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1641906391;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YUgye/d6jt0DNu369eV2V7tQU7bwWVb+qYvWTJEDDUk=;
+        b=gJBCKMH165sQrZK91jVMvJlAjIAXskVGtOctYi/ddmqiXUPOqgVgJQ7dcNUDFw5IINbLhZ
+        S+3cTpwMqr6aE3go9Ru/ZgNWUWbVyo5P1L8dj4dO8mwJTtNDqXLRyuSAZ2ySH2JyEjcD98
+        zKtTLtXqh6MLAQHy0K/2PpMEj2nGDCI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f19b60fb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 11 Jan 2022 13:06:31 +0000 (UTC)
+Received: by mail-yb1-f175.google.com with SMTP id p187so4561848ybc.0;
+        Tue, 11 Jan 2022 05:06:31 -0800 (PST)
+X-Gm-Message-State: AOAM532KDojvsFvb8Rgb8Wd3OZKha31+f+Es4F9ssIMpBiUJ/eOjgCH3
+        Ia6NCre9pCC+H+/FMRUIE09mDmATctyhBK6aHqA=
+X-Google-Smtp-Source: ABdhPJzPQZrE87XNNZNA2ikIc68treEqUvOMcyKN25afy+XYYUuJt2NLhxrqhLB5H05NAfIMwF2i/KDvCg+JjDvOOrM=
+X-Received: by 2002:a25:f90d:: with SMTP id q13mr6045343ybe.32.1641906388088;
+ Tue, 11 Jan 2022 05:06:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
+ <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
+ <20211210014337.xmin2lu5rhhe3b3t@valinor> <20220110132349.siplwka7yhe2tmwc@valinor>
+ <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+ <YdxCsI3atPILABYe@mit.edu> <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
+ <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
+ <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+ <YdyNxJzdBmSSEtDC@mit.edu> <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+ <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
+In-Reply-To: <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 11 Jan 2022 14:06:17 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qw8hbbE2y56t7zygedofDDDLoPUxYWGZB_Kae0ipFARA@mail.gmail.com>
+Message-ID: <CAHmME9qw8hbbE2y56t7zygedofDDDLoPUxYWGZB_Kae0ipFARA@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Simo Sorce <simo@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Fabio Estevam <festevam@denx.de>
+Hi Andy,
 
-Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
-in HRWNG") the following CAAM errors can be seen on i.MX6:
+On Tue, Jan 11, 2022 at 2:44 AM Andy Lutomirski <luto@kernel.org> wrote:
+> So let=E2=80=99s solve it for real.  Have a driver (in a module) that
 
-caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-hwrng: no data available
-caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-hwrng: no data available
-caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-hwrng: no data available
-caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-hwrng: no data available
+Um, let's not. This really isn't something the kernel needs to solve
+here at all. There's a viable userspace solution. I see that the
+discussion of something finally slightly technical (as opposed to just
+compliance BS) has nerd sniped you a bit, but keep in mind what the
+actual overall picture is. This isn't something that needs to be done.
+My little CUSE thing (which I'm happy to develop out a bit more, even)
+has the intent of fulfilling a compliance checkbox and nothing more.
 
-OP_ALG_PR_ON is enabled unconditionally, which may cause the problem
-on i.MX devices.
-
-Fix the problem by only enabling OP_ALG_PR_ON on platforms that have
-Management Complex support.
-
-Fixes: 358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG")
-Signed-off-by: Fabio Estevam <festevam@denx.de>
----
- drivers/crypto/caam/caamrng.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 77d048dfe5d0..3514fe5de2a5 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -63,12 +63,19 @@ static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
- 	complete(jctx->done);
- }
- 
--static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma)
-+static u32 *caam_init_desc(struct device *jrdev, u32 *desc, dma_addr_t dst_dma)
- {
-+	struct caam_drv_private *priv = dev_get_drvdata(jrdev->parent);
-+
- 	init_job_desc(desc, 0);	/* + 1 cmd_sz */
- 	/* Generate random bytes: + 1 cmd_sz */
--	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
--			 OP_ALG_PR_ON);
-+
-+	if (priv->mc_en)
-+		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
-+				  OP_ALG_PR_ON);
-+	else
-+		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
-+
- 	/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
- 	append_fifo_store(desc, dst_dma,
- 			  CAAM_RNG_MAX_FIFO_STORE_SIZE, FIFOST_TYPE_RNGSTORE);
-@@ -101,7 +108,7 @@ static int caam_rng_read_one(struct device *jrdev,
- 
- 	init_completion(done);
- 	err = caam_jr_enqueue(jrdev,
--			      caam_init_desc(desc, dst_dma),
-+			      caam_init_desc(jrdev, desc, dst_dma),
- 			      caam_rng_done, &jctx);
- 	if (err == -EINPROGRESS) {
- 		wait_for_completion(done);
--- 
-2.25.1
-
+Jason
