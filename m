@@ -2,88 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AFFC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 17:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2552C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 18:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243138AbiAKRLB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 12:11:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243128AbiAKRLA (ORCPT
+        id S1345350AbiAKSEB (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 13:04:01 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4389 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345158AbiAKSDv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 12:11:00 -0500
-Received: from cavan.codon.org.uk (cavan.codon.org.uk [IPv6:2a00:1098:84:22e::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C05AC06173F;
-        Tue, 11 Jan 2022 09:11:00 -0800 (PST)
-Received: by cavan.codon.org.uk (Postfix, from userid 1000)
-        id 0C042424F9; Tue, 11 Jan 2022 17:10:59 +0000 (GMT)
-Date:   Tue, 11 Jan 2022 17:10:59 +0000
-From:   Matthew Garrett <mjg59@srcf.ucam.org>
-To:     "Alexander E. Patrakov" <patrakov@gmail.com>
-Cc:     Theodore Ts'o <tytso@mit.edu>, Andy Lutomirski <luto@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Simo Sorce <simo@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jeffrey Walton <noloader@gmail.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Peter Matthias <matthias.peter@bsi.bund.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Petr Tesarik <ptesarik@suse.cz>,
-        John Haxby <john.haxby@oracle.com>,
-        Alexander Lobakin <alobakin@mailbox.org>,
-        Jirka Hladky <jhladky@redhat.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-Message-ID: <20220111171059.GA10674@srcf.ucam.org>
-References: <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
- <Ydxu+KS5UkQ6hU9R@mit.edu>
- <Ydx7D3H0PS0Zs9/B@sol.localdomain>
- <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
- <YdyNxJzdBmSSEtDC@mit.edu>
- <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
- <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
- <Ydz1F/AqB1oO/qHF@mit.edu>
- <20220111041349.GA5542@srcf.ucam.org>
- <CAN_LGv0CTDi9k=t=TGHvaHZz5YVT+OUEBaRXjP=Xv=kousHY1w@mail.gmail.com>
+        Tue, 11 Jan 2022 13:03:51 -0500
+Received: from fraeml714-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JYJPq0CrVz67cQc;
+        Wed, 12 Jan 2022 02:00:15 +0800 (CST)
+Received: from roberto-ThinkStation-P620.huawei.com (10.204.63.22) by
+ fraeml714-chm.china.huawei.com (10.206.15.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 11 Jan 2022 19:03:47 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <linux-fscrypt@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <zohar@linux.ibm.com>,
+        <ebiggers@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [PATCH 01/14] mpi: Introduce mpi_key_length()
+Date:   Tue, 11 Jan 2022 19:03:05 +0100
+Message-ID: <20220111180318.591029-2-roberto.sassu@huawei.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220111180318.591029-1-roberto.sassu@huawei.com>
+References: <20220111180318.591029-1-roberto.sassu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAN_LGv0CTDi9k=t=TGHvaHZz5YVT+OUEBaRXjP=Xv=kousHY1w@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.204.63.22]
+X-ClientProxiedBy: lhreml754-chm.china.huawei.com (10.201.108.204) To
+ fraeml714-chm.china.huawei.com (10.206.15.33)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 02:57:54PM +0500, Alexander E. Patrakov wrote:
+Introduce the new function to get the number of bits and bytes from an MPI.
 
-> LD_PRELOAD is not a solution because of containers and statically-linked
-> binaries.
+Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
+---
+ include/linux/mpi.h |  2 ++
+ lib/mpi/mpicoder.c  | 33 ++++++++++++++++++++++++++-------
+ 2 files changed, 28 insertions(+), 7 deletions(-)
 
-No, it doesn't solve all problems, but the question is whether it needs 
-to. We're talking about the scenario where:
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index eb0d1c1db208..a7dd4c9d8120 100644
+--- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -90,6 +90,8 @@ enum gcry_mpi_format {
+ };
+ 
+ MPI mpi_read_raw_data(const void *xbuffer, size_t nbytes);
++int mpi_key_length(const void *xbuffer, unsigned int ret_nread,
++		   unsigned int *nbits_arg, unsigned int *nbytes_arg);
+ MPI mpi_read_from_buffer(const void *buffer, unsigned *ret_nread);
+ int mpi_fromstr(MPI val, const char *str);
+ MPI mpi_scanval(const char *string);
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 39c4c6731094..cd10ae9968b7 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -79,22 +79,41 @@ MPI mpi_read_raw_data(const void *xbuffer, size_t nbytes)
+ }
+ EXPORT_SYMBOL_GPL(mpi_read_raw_data);
+ 
+-MPI mpi_read_from_buffer(const void *xbuffer, unsigned *ret_nread)
++int mpi_key_length(const void *xbuffer, unsigned int ret_nread,
++		   unsigned int *nbits_arg, unsigned int *nbytes_arg)
+ {
+ 	const uint8_t *buffer = xbuffer;
+-	unsigned int nbits, nbytes;
+-	MPI val;
++	unsigned int nbits;
+ 
+-	if (*ret_nread < 2)
+-		return ERR_PTR(-EINVAL);
++	if (ret_nread < 2)
++		return -EINVAL;
+ 	nbits = buffer[0] << 8 | buffer[1];
+ 
+ 	if (nbits > MAX_EXTERN_MPI_BITS) {
+ 		pr_info("MPI: mpi too large (%u bits)\n", nbits);
+-		return ERR_PTR(-EINVAL);
++		return -EINVAL;
+ 	}
+ 
+-	nbytes = DIV_ROUND_UP(nbits, 8);
++	if (nbits_arg)
++		*nbits_arg = nbits;
++	if (nbytes_arg)
++		*nbytes_arg = DIV_ROUND_UP(nbits, 8);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(mpi_key_length);
++
++MPI mpi_read_from_buffer(const void *xbuffer, unsigned int *ret_nread)
++{
++	const uint8_t *buffer = xbuffer;
++	unsigned int nbytes;
++	MPI val;
++	int ret;
++
++	ret = mpi_key_length(xbuffer, *ret_nread, NULL, &nbytes);
++	if (ret < 0)
++		return ERR_PTR(ret);
++
+ 	if (nbytes + 2 > *ret_nread) {
+ 		pr_info("MPI: mpi larger than buffer nbytes=%u ret_nread=%u\n",
+ 				nbytes, *ret_nread);
+-- 
+2.32.0
 
-a) a customer requires FIPS compliance, and
-b) the customer has an app that calls getrandom() and doesn't fallback, 
-and
-c) they're doing so with statically linked binaries or container 
-infrastructure that doesn't allow injection of other libraries
-
-How common is this? Does the kernel need to solve this scenario?
