@@ -2,188 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 474E5C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 00:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127CAC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 01:05:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345852AbiAKARz (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 19:17:55 -0500
-Received: from mail-dm6nam11on2059.outbound.protection.outlook.com ([40.107.223.59]:29665
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1345849AbiAKARy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 19:17:54 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fYSzzcu9r2eYKNs2dAxsY9qeztOLE0akvsvdpuoxf5uVQ4NiIagAvjpSq1FUQNwA4LN9r+nndvyI0Y2gREK7D8dKeD5dgJjUgMWGnU5Hhmw1rvTtlBwIOCOH065xOfTJ6QCPNPr2fJ4nFx+jHfqBphOmuyidS+96Z14gXNUHRjHzR/0qZlpSBkq5ecRzK0sDZAc+JZMau1CliT8P50GYGH8j3FxpoKwG7CblM6vJsLP4/Fc7t3TeIgX8agDsTCI84/k4HVJxh5Kp71ah6C7Ymwkk1dPXYC4PtI430s1KpD2wUucaKAYskTpwihp5vqMeK250D+AqYrcDhqoX0LJtBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3MUCI11mOLwo/tYd0941ecqziC+8FoTVfhL59UDjUjE=;
- b=VUPODcHgaC+Ufxgw0RRclQ3BUk0XRE6TELj6Iehe6l7jsNRXr8YnyP2LX8BqWuR6aHSIGESU3NypdQ5Zklyk9dbvPjSvL+MzXmqD1QgES1sTd6X+97iSznBY8U2d7Yrs9gqBoW7jd6fVb7cXatDTzV9rQyJ0V9rU5XOCr/iicJxT+xPYeKRZribopX/THu033u7uuMaTy+KQeHu2lrv31aIkX1pMWIzZQNcZ3m1ONilqTKV91Sez3F6zOOOLsc2TNYle9htvC7smJf5LmvL27uoC7jXLYfiNyDkYfjCalgWhjNUaMcNaahzo5B3umdM4nCDVDcL+kNiuu/+ADOagcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3MUCI11mOLwo/tYd0941ecqziC+8FoTVfhL59UDjUjE=;
- b=MDAFOsrn8cAmgOfUMbmSboUL+ORZ2Ba8DKIdfwo9B5rNxW16UWDi3oywXdDO6FY8zu371iMtaDl6ND7VidguUI+FDFNV5dsQkk27Z8W89UnlCPA+dbklXEKiLi6biWBCwObdwTCUYbfjfQbUSbl65c+YQnT1pRtzSNwyIKApHgCP00qyoL530u0AERg5+MjAJZXMchXddtck548MlqCq7tuJZkvTAGbYYeVp0eJXt7TjfbbCW1wsO/qORq6/KCMqT6DRCgat+Mvdm6YNQuDBAe3Sc6CImCzJDqIqPA6e6EtC2v/W0YkhRV/1ffsFGILxda3pkBu4PB5dxWJYPgljpg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5253.namprd12.prod.outlook.com (2603:10b6:208:30b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Tue, 11 Jan
- 2022 00:17:52 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::464:eb3d:1fde:e6af%5]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 00:17:52 +0000
-Date:   Mon, 10 Jan 2022 20:17:51 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tejun Heo <tj@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 00/16] padata, vfio, sched: Multithreaded VFIO page pinning
-Message-ID: <20220111001751.GI2328285@nvidia.com>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106011306.GY2328285@nvidia.com>
- <20220107030330.2kcpekbtxn7xmsth@oracle.com>
- <20220107171248.GU2328285@nvidia.com>
- <20220110222725.paug7n5oznicceck@oracle.com>
+        id S243376AbiAKBFi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 10 Jan 2022 20:05:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40620 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243367AbiAKBFh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jan 2022 20:05:37 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9844EC061751
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Jan 2022 17:05:37 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo2860876pjb.2
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Jan 2022 17:05:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Q1R1PzpvGV/VojxQSiAa0bdqqqYycDMe3kAEirZNPdY=;
+        b=ZESbEMzMJBAVvuSkQjGbPSGJsUnccftXUOXcM0pM9sSRfKNKisoQEd8ypg8qvpwAVx
+         udQJ6ElRq7XD+djyuignDXBDWDBfpw5JxgNqVMSGwTzN4SOmjsxgs8wmqqZdeec+Zw5Y
+         RznC+ZJjeAkY5ovug5GZHwlHimGkOmqWIyQ5nTlIaijy/UgsfsjaZ85gaFR57xpwmSG0
+         0p7/wzE825snC5KenjZgDBdeCbcqYvSpWnBGX+JKXySINWmmChhu4jCARXHgOu+ZESBp
+         +2VNgIyBbWorDPRuSGXyDSMvvDOU8K8JPhfZJ+VXxtP8rj2n+pY23qcy56Ef1pI5a8ZY
+         V2NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q1R1PzpvGV/VojxQSiAa0bdqqqYycDMe3kAEirZNPdY=;
+        b=vFBX4gyL67l3TT6dIpaOrif2V7ylhSuFXLuqr9mbZxw2QlLOy1HuaRkrkeD9PdpAf/
+         t2y4M+aEsVzR6siGZ7DozdVm3hmJlkbFN8hscEwgdJEnptkokibGugkQhBokb1KgR2ti
+         xrjRYPZ0xGjCCSzbFZNjRFdcyd+cuHrhwyjIs7fh0ZTv7dWE5leYSZ4AZwfiiGtOYKi/
+         z9bW/VjDLO+LDG7CSrSmwcGIwVzGJbn3i1clBVFhAcsk1DSRGniq+7Fe4+ySXP4qYj+k
+         Lhw4P6LP/FzD/WJ9z69oOij0DqrXQ2QKnsQKizUEoj+2c/8PofD2WhVPKKhObm2g88v8
+         Ghtw==
+X-Gm-Message-State: AOAM533+i2U5AivE1m1QdUHDt42m23JwObB0h3m5Fc0Q70SofnY3fWRt
+        DRplqbg4NadBmaqoi655I0ByCQ==
+X-Google-Smtp-Source: ABdhPJzY/pkjKcqkaTs3n6wVHySOuAdgQewvLGOp/V9vsTfqwjdPrPNXXaklaP1HFYEan64rPHMzvw==
+X-Received: by 2002:a17:902:b414:b0:149:61c7:d550 with SMTP id x20-20020a170902b41400b0014961c7d550mr2078379plr.129.1641863136914;
+        Mon, 10 Jan 2022 17:05:36 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z15sm8400964pfh.201.2022.01.10.17.05.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 17:05:36 -0800 (PST)
+Date:   Tue, 11 Jan 2022 01:05:32 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Shirong Hao <shirong@linux.alibaba.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.co, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, brijesh.singh@amd.com,
+        thomas.lendacky@amd.com, john.allen@amd.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        srutherford@google.com, ashish.kalra@amd.com, natet@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, zhang.jia@linux.alibaba.com
+Subject: Re: [PATCH 1/3] KVM: X86: Introduce KVM_HC_VM_HANDLE hypercall
+Message-ID: <YdzX3AXqqbwYBRej@google.com>
+References: <20220110060445.549800-1-shirong@linux.alibaba.com>
+ <20220110060445.549800-2-shirong@linux.alibaba.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220110222725.paug7n5oznicceck@oracle.com>
-X-ClientProxiedBy: BL0PR0102CA0033.prod.exchangelabs.com
- (2603:10b6:207:18::46) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 103632ad-5eea-445e-f0ed-08d9d497ce92
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5253:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB52538D28AB11D68FA67DE1ECC2519@BL1PR12MB5253.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WkW8varw/EAnTjfDndElbk2K+ZxDKFXDWjgtMDniq8N49AMcltwitwglha/SkdYitu4kDY/SDi2mNY+oH4lgyeA+ZEanoME0U0xocRPKW7kqFZ6vlYt8AShpa2oeNb9BibElHD4Mdnj0c1WU1gdI6G6vm4HRKy4zR+BCGwvCgtinaatRbZul4+k8yekGpDaHO94vmnPAvBePIeEO/0BNSEt1ubKRVSOFArMU/nnRwfMfM+Oa3h4MzA9zcdvJuH0cAiguIVTs/MOAX7/AfNuiA2ilpKmD5mc49UCHf6DXTQCraGPryqX0n33WNfZbZ9sahHBpXBAA4jOV2pIADzDhhj0ufe1bXl+EJMDMXKXz05Sz2hlQU79xYZvLCR/GItdjZfTxt3hVvKgEiyErc0ttFr5M6scvdpGAt/vOTmR5GSDo9BPGQwBY2nYB4aFzIHkAWS1kTLyuXqp03ybm+mI4hZ1Jy8nSZATw3CY+CsoOsshZ3UVwBKCixa3SFSV64G6DzITcd2VkQ3vfBlJWu8dRl+nTn/lotn5RQPfgTFEAqgxB0NZySe9GwG4fl9G9fHT+0TK++aSdTuOzTGWgrmDdXzgIydISIGQM6tjWnDflh8a25UEoYLSN40FV2fGvrebTRBpjsbYHHh2PR77gS9KxQg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(36756003)(2616005)(6512007)(4326008)(83380400001)(54906003)(5660300002)(66946007)(6486002)(38100700002)(6916009)(6506007)(7416002)(66556008)(26005)(66476007)(33656002)(1076003)(8676002)(2906002)(8936002)(186003)(86362001)(508600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?L2kowSqlbhxAZkHbbWGM19fnUS33taYHCAdd6nSRHCqCsU4R1ym0PuVDW7ep?=
- =?us-ascii?Q?tSTJ3ihc6nYHn9usOOlBA8aTfD2nft5pmMRZdBYcsWtSGh/rVkiR/gNHsbe+?=
- =?us-ascii?Q?hLb/FPmLFRR0P7INRtauYkt6TtORfNdgBb/UCvXNCLHHDn5JBILhmIPEtJC/?=
- =?us-ascii?Q?psjfhnAdVJ5/NEVmR0pSiXRsKgTHbILz2itAjw+/j9hBEkTO9klzuh0faPlu?=
- =?us-ascii?Q?dk4hgCm/rLO4WUEnX4SqgQvgY8xgz/zxkdjkT3qb9cx+Og2OZCpgPfJiXaof?=
- =?us-ascii?Q?QdYtwA22xLT0MWsNWglcA1IXHOUsHlOOfS8nxg1bPk/oTK27/bcQmT+Ca57s?=
- =?us-ascii?Q?WRY6kp0x0BZcfE3450C96vfR5RdafSN6D0eedH9FEf0WB7FV5Ws8Rs7m5Qia?=
- =?us-ascii?Q?cEdKsS3WS36AGmuoJQzFXZQJ7D5zOAfhRZKm5L9hbAGk8HhKaZVtOajGx/Ur?=
- =?us-ascii?Q?75RIl4XSzjQLui/bmjBWp0pNOQI2jeDBXRQFHL7lJDgFEM9IarEnlVNfbxFA?=
- =?us-ascii?Q?Hsq6qHxHD7e2sh3qiaEjmybA6SQ0e03yJ0Xc75/nTiLFrMKwKjX32E0d7gCe?=
- =?us-ascii?Q?kYLyfHPGworuPtWiIuj/ISoYF/fkm2tiy7T/xg8LZbSgHRV2vHY5jzu74gfH?=
- =?us-ascii?Q?L4XBZwwBlpwULCt6OYJdU3CMWfdrKD7/PP+eTICjmHrrPvLkWZT/RkdJI9YY?=
- =?us-ascii?Q?THr/Z0YGBEbYbiOQeiQCQMrC6co1heR2f2ZOFwhkOJBhxxXsKkRCEEUUI/Al?=
- =?us-ascii?Q?HKhHmk75NiGWj0qVzajmNKXatYC+FUv2u5Rb9uE5QpIMVBXRyokPfpD44no8?=
- =?us-ascii?Q?cmXfKOlEv7UMBE5es5jAYgQ843HOpMubfVh7FXKdma22Cz5VLDonMkGIUQfA?=
- =?us-ascii?Q?pmynFDj53Vdk96k0afeVFbWBIl3kFl7b3zKOgiAkmV28Y66vcbL0JqCKrO8/?=
- =?us-ascii?Q?lZTnT5vnEeqEK2AA/U+EMUhJzheCe4+VDFzv23QStzJjIsOD5zJVC8hf7uz/?=
- =?us-ascii?Q?6VMaTR5XN8OeaOrL/VLqvALTmLzMY/VZbHW8cf//w8rynwpciJ4/MLnHuhxN?=
- =?us-ascii?Q?fXbGjLcXUrox9HqSw/NFt+yNx6Lb6rm2Auvnj+nkgQoi3cjGiCr/GLyMyBSi?=
- =?us-ascii?Q?b25uWPLHTtuF6aXgltHRXdwd6L9d01JfKwTu1TB6l7fAd8kfBmFqSHL5QRfL?=
- =?us-ascii?Q?WdH8LqSFGQQBeF5PmZbqRkR9c06X32Ib8CKEVYg2F/guRwAnirS60IvaBv02?=
- =?us-ascii?Q?DJZfAsHgqpn8QQhMoHGLzkpx71OcyNxinDWnWUWR5ijwIiwb+yzTly0HTgpN?=
- =?us-ascii?Q?x3JzF3xA4H1NcW3a8xXAfk0bb4TJ1eboaPk1zK1wmP2bUeYS7Qmd+/mnZ/UI?=
- =?us-ascii?Q?7F5pwmv1LvBv8DQPyH4t9/PQwn8lFaiO6N+Dt9At9H3KjJKVKCmrlF42qfR8?=
- =?us-ascii?Q?xVFIm8MAB2NZA4kzt4J9OtGXD9UyjpqaXCbYbiODxeM+ROjjExhBq11mxGuO?=
- =?us-ascii?Q?kMFW4BzDUr8Q0pTcFMdJNQuU3JhndAf5eR9NcvDL7h78IglbOsE9w+7aIrit?=
- =?us-ascii?Q?SQQ3IDvZ3BhyfQSU9fA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 103632ad-5eea-445e-f0ed-08d9d497ce92
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 00:17:52.2084
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 036OsMzFCHOHyNo+4uNyxhqFLNH2xjHDbxlglId9cGmHPcYslfLa2BuVD59lTXDZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5253
+In-Reply-To: <20220110060445.549800-2-shirong@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 10, 2022 at 05:27:25PM -0500, Daniel Jordan wrote:
+On Mon, Jan 10, 2022, Shirong Hao wrote:
+> This hypercall is used by the SEV guest to get the firmware handle.
 
-> > > Pinning itself, the only thing being optimized, improves 8.5x in that
-> > > experiment, bringing the time from 1.8 seconds to .2 seconds.  That's a
-> > > significant savings IMHO
-> > 
-> > And here is where I suspect we'd get similar results from folio's
-> > based on the unpin performance uplift we already saw.
-> > 
-> > As long as PUP doesn't have to COW its work is largely proportional to
-> > the number of struct pages it processes, so we should be expecting an
-> > upper limit of 512x gains on the PUP alone with foliation.
-> >
-> > This is in line with what we saw with the prior unpin work.
-> 
-> "in line with what we saw"  Not following.  The unpin work had two
-> optimizations, I think, 4.5x and 3.5x which together give 16x.  Why is
-> that in line with the potential gains from pup?
+This is completely insufficient to justify why KVM is providing host information
+to the guest, let alone why KVM is providing that information to guest _userspace_.
 
-It is the same basic issue, doing extra work, dirtying extra memory..
+> +static int sev_vm_handle(struct kvm *kvm)
+> +{
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	return sev->handle;
+> +}
+> +
+>  static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.name = "kvm_amd",
+>  
 
-> > and completely dwarfed by the populate overhead?
-> 
-> Well yes, but here we all are optimizing gup anyway :-)
+...
 
-Well, I assume because we can user thread the populate, so I'd user
-thread the gup too..
-
-> One of my assumptions was that doing this in the kernel would benefit
-> all vfio users, avoiding duplicating the same sort of multithreading
-> logic across applications, including ones that didn't prefault.
-
-I don't know of other users that use such huge memory sizes this would
-matter, besides a VMM..
-
-> My assumption going into this series was that multithreading VFIO page
-> pinning in the kernel was a viable way forward given the positive
-> feedback I got from the VFIO maintainer last time I posted this, which
-> was admittedly a while ago, and I've since been focused on the other
-> parts of this series rather than what's been happening in the mm lately.
-> Anyway, your arguments are reasonable, so I'll go take a look at some of
-> these optimizations and see where I get.
-
-Well, it is not *unreasonable* it just doesn't seem compelling to me
-yet.
-
-Especially since we are not anywhere close to the limit of single
-threaded performance. Aside from GUP, the whole way we transfer the
-physical pages into the iommu is just begging for optimizations
-eg Matthew's struct phyr needs to be an input and output at the iommu
-layer to make this code really happy.
-
-How much time do we burn messing around in redundant iommu layer
-locking because everything is page at a time?
-
-Jason
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0cf1082455df..24acf0f2a539 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8906,7 +8906,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>  		a3 &= 0xFFFFFFFF;
+>  	}
+>  
+> -	if (static_call(kvm_x86_get_cpl)(vcpu) != 0) {
+> +	if (static_call(kvm_x86_get_cpl)(vcpu) != 0 && nr != KVM_HC_VM_HANDLE) {
+>  		ret = -KVM_EPERM;
+>  		goto out;
+>  	}
