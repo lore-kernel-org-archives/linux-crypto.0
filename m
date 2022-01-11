@@ -2,208 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66B7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 22:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD03C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 22:12:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345686AbiAKWFd (ORCPT
+        id S1345951AbiAKWMu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 17:05:33 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:42248 "EHLO
+        Tue, 11 Jan 2022 17:12:50 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:45074 "EHLO
         ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345691AbiAKWFa (ORCPT
+        with ESMTP id S1345948AbiAKWMt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 17:05:30 -0500
+        Tue, 11 Jan 2022 17:12:49 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8DFE5B81D64;
-        Tue, 11 Jan 2022 22:05:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DED5C36AE9;
-        Tue, 11 Jan 2022 22:05:26 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4B988B81978;
+        Tue, 11 Jan 2022 22:12:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3495C36AEF;
+        Tue, 11 Jan 2022 22:12:46 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="S3NV3SjU"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IRNf5sZz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641938725;
+        t=1641939164;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=O7t1K3lQeoHUm9AoU+DjJ3MCcxGxvVz/RPJNEpctrWA=;
-        b=S3NV3SjUFiN9tMOjkT1zoy8sfMRJNBFcV7UX6nD1n4dBZ6JO9xrDB82HjlgbG84K3Q7Vu8
-        u1RMXjKSjc4lgKUNskhy8E6MWZx6l0ilzO5qQRGAJY7msoRVTlL/WFp6h8efFGTc+Mim1W
-        B8XGg830wMmjQvLWdeKXCAHSBjsZFX8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f9b0db15 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 11 Jan 2022 22:05:25 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org, geert@linux-m68k.org, tytso@mit.edu,
-        gregkh@linuxfoundation.org, jeanphilippe.aumasson@gmail.com,
-        ardb@kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH crypto v3 2/2] lib/crypto: sha1: re-roll loops to reduce code size
-Date:   Tue, 11 Jan 2022 23:05:06 +0100
-Message-Id: <20220111220506.742067-3-Jason@zx2c4.com>
-In-Reply-To: <20220111220506.742067-1-Jason@zx2c4.com>
-References: <20220111181037.632969-1-Jason@zx2c4.com>
- <20220111220506.742067-1-Jason@zx2c4.com>
+        bh=QilzNfGDRmDRCERQo32DMBDU3r8FZl3v461Jrz/2Jck=;
+        b=IRNf5sZzo2CMy2qSK6pcwaL569f55KkjgHR9zV4ZVsxjA+UNlSiYmOvyrSjuYPA2QSk7CK
+        NTFxLvPBKGV/WjnmmedcIqZJjFuQKrrtWoF6X9Y+W/NLxvx1LPkLmGTwG3zEvxD4OEhF36
+        tIMf59jB7A76raXRmEUliELGtY4mnMQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ade38ccb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 11 Jan 2022 22:12:44 +0000 (UTC)
+Received: by mail-yb1-f180.google.com with SMTP id c10so1089315ybb.2;
+        Tue, 11 Jan 2022 14:12:43 -0800 (PST)
+X-Gm-Message-State: AOAM531YBBi9PrNxgSzZPjjChw6ToSD1/kD3t5WoZucOUnMBbTKxAdJ9
+        nzniL/DtZXzdT1nUDOJs+b3j5RUYtoa7c/GuBeM=
+X-Google-Smtp-Source: ABdhPJxSIJYbHPUrE8FxmkUFXvSYrpz9YEklHrphkd5FreYmyM3Az1bFANppzBGeGTslgwQOyDDC3fS6Au5kVXxKQSY=
+X-Received: by 2002:a5b:10:: with SMTP id a16mr9213316ybp.115.1641939163116;
+ Tue, 11 Jan 2022 14:12:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220111195309.634965-1-jforbes@fedoraproject.org>
+In-Reply-To: <20220111195309.634965-1-jforbes@fedoraproject.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 11 Jan 2022 23:12:32 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pi1Y7urg1VQeCi7L6MxHRUk5g4wc6VKDywo4yPh9h_6w@mail.gmail.com>
+Message-ID: <CAHmME9pi1Y7urg1VQeCi7L6MxHRUk5g4wc6VKDywo4yPh9h_6w@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: add prompts back to crypto libraries
+To:     "Justin M. Forbes" <jforbes@fedoraproject.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, jmforbes@linuxtx.org,
+        David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With SHA-1 no longer being used for anything performance oriented, and
-also soon to be phased out entirely, we can make up for the space added
-by unrolled BLAKE2s by simply re-rolling SHA-1. Since SHA-1 is so much
-more complex, re-rolling it more or less takes care of the code size
-added by BLAKE2s. And eventually, hopefully we'll see SHA-1 removed
-entirely from most small kernel builds.
+Hi Justin,
 
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- lib/sha1.c | 95 ++++++++----------------------------------------------
- 1 file changed, 14 insertions(+), 81 deletions(-)
+These are library variables, which means they really have no sense in
+being user selectable. Internal things to the kernel depend on them,
+or they don't. They're always only dependencies.
 
-diff --git a/lib/sha1.c b/lib/sha1.c
-index 9bd1935a1472..0494766fc574 100644
---- a/lib/sha1.c
-+++ b/lib/sha1.c
-@@ -9,6 +9,7 @@
- #include <linux/kernel.h>
- #include <linux/export.h>
- #include <linux/bitops.h>
-+#include <linux/string.h>
- #include <crypto/sha1.h>
- #include <asm/unaligned.h>
- 
-@@ -55,7 +56,8 @@
- #define SHA_ROUND(t, input, fn, constant, A, B, C, D, E) do { \
- 	__u32 TEMP = input(t); setW(t, TEMP); \
- 	E += TEMP + rol32(A,5) + (fn) + (constant); \
--	B = ror32(B, 2); } while (0)
-+	B = ror32(B, 2); \
-+	TEMP = E; E = D; D = C; C = B; B = A; A = TEMP; } while (0)
- 
- #define T_0_15(t, A, B, C, D, E)  SHA_ROUND(t, SHA_SRC, (((C^D)&B)^D) , 0x5a827999, A, B, C, D, E )
- #define T_16_19(t, A, B, C, D, E) SHA_ROUND(t, SHA_MIX, (((C^D)&B)^D) , 0x5a827999, A, B, C, D, E )
-@@ -84,6 +86,7 @@
- void sha1_transform(__u32 *digest, const char *data, __u32 *array)
- {
- 	__u32 A, B, C, D, E;
-+	unsigned int i = 0;
- 
- 	A = digest[0];
- 	B = digest[1];
-@@ -92,94 +95,24 @@ void sha1_transform(__u32 *digest, const char *data, __u32 *array)
- 	E = digest[4];
- 
- 	/* Round 1 - iterations 0-16 take their input from 'data' */
--	T_0_15( 0, A, B, C, D, E);
--	T_0_15( 1, E, A, B, C, D);
--	T_0_15( 2, D, E, A, B, C);
--	T_0_15( 3, C, D, E, A, B);
--	T_0_15( 4, B, C, D, E, A);
--	T_0_15( 5, A, B, C, D, E);
--	T_0_15( 6, E, A, B, C, D);
--	T_0_15( 7, D, E, A, B, C);
--	T_0_15( 8, C, D, E, A, B);
--	T_0_15( 9, B, C, D, E, A);
--	T_0_15(10, A, B, C, D, E);
--	T_0_15(11, E, A, B, C, D);
--	T_0_15(12, D, E, A, B, C);
--	T_0_15(13, C, D, E, A, B);
--	T_0_15(14, B, C, D, E, A);
--	T_0_15(15, A, B, C, D, E);
-+	for (; i < 16; ++i)
-+		T_0_15(i, A, B, C, D, E);
- 
- 	/* Round 1 - tail. Input from 512-bit mixing array */
--	T_16_19(16, E, A, B, C, D);
--	T_16_19(17, D, E, A, B, C);
--	T_16_19(18, C, D, E, A, B);
--	T_16_19(19, B, C, D, E, A);
-+	for (; i < 20; ++i)
-+		T_16_19(i, A, B, C, D, E);
- 
- 	/* Round 2 */
--	T_20_39(20, A, B, C, D, E);
--	T_20_39(21, E, A, B, C, D);
--	T_20_39(22, D, E, A, B, C);
--	T_20_39(23, C, D, E, A, B);
--	T_20_39(24, B, C, D, E, A);
--	T_20_39(25, A, B, C, D, E);
--	T_20_39(26, E, A, B, C, D);
--	T_20_39(27, D, E, A, B, C);
--	T_20_39(28, C, D, E, A, B);
--	T_20_39(29, B, C, D, E, A);
--	T_20_39(30, A, B, C, D, E);
--	T_20_39(31, E, A, B, C, D);
--	T_20_39(32, D, E, A, B, C);
--	T_20_39(33, C, D, E, A, B);
--	T_20_39(34, B, C, D, E, A);
--	T_20_39(35, A, B, C, D, E);
--	T_20_39(36, E, A, B, C, D);
--	T_20_39(37, D, E, A, B, C);
--	T_20_39(38, C, D, E, A, B);
--	T_20_39(39, B, C, D, E, A);
-+	for (; i < 40; ++i)
-+		T_20_39(i, A, B, C, D, E);
- 
- 	/* Round 3 */
--	T_40_59(40, A, B, C, D, E);
--	T_40_59(41, E, A, B, C, D);
--	T_40_59(42, D, E, A, B, C);
--	T_40_59(43, C, D, E, A, B);
--	T_40_59(44, B, C, D, E, A);
--	T_40_59(45, A, B, C, D, E);
--	T_40_59(46, E, A, B, C, D);
--	T_40_59(47, D, E, A, B, C);
--	T_40_59(48, C, D, E, A, B);
--	T_40_59(49, B, C, D, E, A);
--	T_40_59(50, A, B, C, D, E);
--	T_40_59(51, E, A, B, C, D);
--	T_40_59(52, D, E, A, B, C);
--	T_40_59(53, C, D, E, A, B);
--	T_40_59(54, B, C, D, E, A);
--	T_40_59(55, A, B, C, D, E);
--	T_40_59(56, E, A, B, C, D);
--	T_40_59(57, D, E, A, B, C);
--	T_40_59(58, C, D, E, A, B);
--	T_40_59(59, B, C, D, E, A);
-+	for (; i < 60; ++i)
-+		T_40_59(i, A, B, C, D, E);
- 
- 	/* Round 4 */
--	T_60_79(60, A, B, C, D, E);
--	T_60_79(61, E, A, B, C, D);
--	T_60_79(62, D, E, A, B, C);
--	T_60_79(63, C, D, E, A, B);
--	T_60_79(64, B, C, D, E, A);
--	T_60_79(65, A, B, C, D, E);
--	T_60_79(66, E, A, B, C, D);
--	T_60_79(67, D, E, A, B, C);
--	T_60_79(68, C, D, E, A, B);
--	T_60_79(69, B, C, D, E, A);
--	T_60_79(70, A, B, C, D, E);
--	T_60_79(71, E, A, B, C, D);
--	T_60_79(72, D, E, A, B, C);
--	T_60_79(73, C, D, E, A, B);
--	T_60_79(74, B, C, D, E, A);
--	T_60_79(75, A, B, C, D, E);
--	T_60_79(76, E, A, B, C, D);
--	T_60_79(77, D, E, A, B, C);
--	T_60_79(78, C, D, E, A, B);
--	T_60_79(79, B, C, D, E, A);
-+	for (; i < 80; ++i)
-+		T_60_79(i, A, B, C, D, E);
- 
- 	digest[0] += A;
- 	digest[1] += B;
--- 
-2.34.1
+It sounds like CONFIG_BIG_KEYS might be declaring its dependencies
+wrong, and that's actually where the bug is? CC'ing David Howells just
+in case. Maybe things should be changed to:
 
+diff --git a/security/keys/Kconfig b/security/keys/Kconfig
+index 64b81abd087e..2f1624c9eed9 100644
+--- a/security/keys/Kconfig
++++ b/security/keys/Kconfig
+@@ -60,7 +60,7 @@ config BIG_KEYS
+  bool "Large payload keys"
+  depends on KEYS
+  depends on TMPFS
+- depends on CRYPTO_LIB_CHACHA20POLY1305 = y
++ select CRYPTO_LIB_CHACHA20POLY1305
+  help
+    This option provides support for holding large keys within the kernel
+    (for example Kerberos ticket caches).  The data may be stored out to
+
+
+Jason
