@@ -2,218 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFC7C43219
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 18:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4EBC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 18:21:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243694AbiAKSLF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 13:11:05 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:34576 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242957AbiAKSLE (ORCPT
+        id S1344682AbiAKSVS (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 13:21:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242284AbiAKSVS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 13:11:04 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CFA8B61618;
-        Tue, 11 Jan 2022 18:11:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53188C36AE9;
-        Tue, 11 Jan 2022 18:11:02 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dvzCGTvB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641924662;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y8yaQEJdWGKWQITH4vgPEpVGHGMGT1Gu/a6CeJDd8tQ=;
-        b=dvzCGTvB1Pg32mCHrz4E6Puayjl+0i4DqkMN4pZfMUNkE1XsZwpkTzbvp1fJ4gwTxW0Y6d
-        LgVIBkKoRzRNyoEJa6aL1HsauIIIWLRr/25GQo1GDBOvzlVdJytf4+gIJUkKuVElXDnFwn
-        kScQn3msxVxV8oT8h6AWUp//nGlev1Y=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 840ddccb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 11 Jan 2022 18:11:01 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-        bpf@vger.kernel.org, geert@linux-m68k.org, tytso@mit.edu,
-        gregkh@linuxfoundation.org, jeanphilippe.aumasson@gmail.com,
-        ardb@kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH crypto v2 2/2] lib/crypto: sha1: re-roll loops to reduce code size
-Date:   Tue, 11 Jan 2022 19:10:37 +0100
-Message-Id: <20220111181037.632969-3-Jason@zx2c4.com>
-In-Reply-To: <20220111181037.632969-1-Jason@zx2c4.com>
-References: <20220111134934.324663-1-Jason@zx2c4.com>
- <20220111181037.632969-1-Jason@zx2c4.com>
+        Tue, 11 Jan 2022 13:21:18 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E700C06173F
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 10:21:17 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id r28so6215473wrc.3
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 10:21:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JHS6dcWKDxkneDfxA3B42kjKmrAF9RySBg5ORe4N9K0=;
+        b=GGCQ3prfhAyywUTvw6DskdEMhphsMqE5/MK2wRrYIdg4GyQ0UvAe8rm7g/ZTxI6yim
+         P6A8tTtN6NipHCYPPP4MOpxZ94JfXPk3va4JpPEBkGcfz9zzeFeqjV0cGaPNikrVuiMr
+         uwMVZTW7lkTC4Z14R7DPmDtkV6+rCt41U9irzEgIL0XhBGMiCqkT8yuzywpuDo7kA6FZ
+         W8GR8TQ7uMZ0Y8idKyh10pV7yZcKhIEGDyafZ8YMaB+hJyHY179EEMyY/w9ZYquTkxS2
+         E/kIwzLVH3mEoYAhQbgR8zakwcV9eYsPfkI4xwq04Du+03TyttH+uJ58YT/P2OPGlZeW
+         9LwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JHS6dcWKDxkneDfxA3B42kjKmrAF9RySBg5ORe4N9K0=;
+        b=DJeJL2mNXgy6XIlvycXljHFi7Ju2vWVNO6Mj0ERWrd3Vk+pv5abIqA0slO3DR/Q8Qc
+         VKnX339wCJTOrw9EwKaLsJ5+TfF2Sl6PZ7x0X+FW0xeDi2Ed3igC4iU1To3aeFrL9oJL
+         9+caFgwJzRQLeg75cBcujVBlIJHDhxz7an97AbKXe+xpMd9AR816UwLYzIJfVZ3durIt
+         AEHF8ODQIcvXQpu6hjN9oUCQ7s22KSCHbbmY/Zc0lqV/oWMWsdQVBCL1FMlcrkKpPm14
+         tD+relpO7R2k6nPpHBqCOGxKluJUziD+2FyZLdTHvpN+SO++9GpdPpgabAEgvTlQ1SGw
+         tCTw==
+X-Gm-Message-State: AOAM5301rQ/X8a0VcO1xNYMX4i7u5hd+vM/oipO1KALJsypz2WhY0Axn
+        E5vZyDOXccVT/EOUXsicH11gsDEru+oRaDhXdedKh7SQ
+X-Google-Smtp-Source: ABdhPJzfI3JJ/NG40J3t0bLKLr9EkE8l4sOxkos9Es46SHuZHSmr+kSEpAuomk/k68IVq7OPzZ6bOgedNwJmR2jmhUU=
+X-Received: by 2002:a5d:42c3:: with SMTP id t3mr4974667wrr.301.1641925276105;
+ Tue, 11 Jan 2022 10:21:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220111124104.2379295-1-festevam@gmail.com>
+In-Reply-To: <20220111124104.2379295-1-festevam@gmail.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Tue, 11 Jan 2022 10:21:05 -0800
+Message-ID: <CAHQ1cqE1YO2A2mL9nDv7mjH=pBvNiOCqQwJYA6VOJpu5kRBUtA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: caam - enable prediction resistance conditionally
+To:     Fabio Estevam <festevam@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Andrei Botila <andrei.botila@nxp.com>, fredrik.yhlen@endian.se,
+        hs@denx.de,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Fabio Estevam <festevam@denx.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With SHA-1 no longer being used for anything performance oriented, and
-also soon to be phased out entirely, we can make up for the space added
-by unrolled BLAKE2s by simply re-rolling SHA-1. Since SHA-1 is so much
-more complex, re-rolling it more or less takes care of the code size
-added by BLAKE2s. And eventually, hopefully we'll see SHA-1 removed
-entirely from most small kernel builds.
+On Tue, Jan 11, 2022 at 4:41 AM Fabio Estevam <festevam@gmail.com> wrote:
+>
+> From: Fabio Estevam <festevam@denx.de>
+>
+> Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
+> in HRWNG") the following CAAM errors can be seen on i.MX6:
+>
+> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+> hwrng: no data available
+> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+> hwrng: no data available
+> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+> hwrng: no data available
+> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+> hwrng: no data available
+>
+> OP_ALG_PR_ON is enabled unconditionally, which may cause the problem
+> on i.MX devices.
 
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- lib/sha1.c | 117 ++++++++++++-----------------------------------------
- 1 file changed, 25 insertions(+), 92 deletions(-)
+Is this true for every i.MX device? I haven't worked with the
+i.MX6Q/i.MX8 hardware I was enabling this feature for in a while, so
+I'm not 100% up to date on all of the problems we've seen with those,
+but last time enabling prediction resistance didn't seem to cause any
+issues besides a noticeable slowdown of random data generation.
 
-diff --git a/lib/sha1.c b/lib/sha1.c
-index 9bd1935a1472..f2acfa294e64 100644
---- a/lib/sha1.c
-+++ b/lib/sha1.c
-@@ -9,6 +9,7 @@
- #include <linux/kernel.h>
- #include <linux/export.h>
- #include <linux/bitops.h>
-+#include <linux/string.h>
- #include <crypto/sha1.h>
- #include <asm/unaligned.h>
- 
-@@ -83,109 +84,41 @@
-  */
- void sha1_transform(__u32 *digest, const char *data, __u32 *array)
- {
--	__u32 A, B, C, D, E;
-+	u32 d[5];
-+	unsigned int i = 0;
- 
--	A = digest[0];
--	B = digest[1];
--	C = digest[2];
--	D = digest[3];
--	E = digest[4];
-+	memcpy(d, digest, sizeof(d));
- 
- 	/* Round 1 - iterations 0-16 take their input from 'data' */
--	T_0_15( 0, A, B, C, D, E);
--	T_0_15( 1, E, A, B, C, D);
--	T_0_15( 2, D, E, A, B, C);
--	T_0_15( 3, C, D, E, A, B);
--	T_0_15( 4, B, C, D, E, A);
--	T_0_15( 5, A, B, C, D, E);
--	T_0_15( 6, E, A, B, C, D);
--	T_0_15( 7, D, E, A, B, C);
--	T_0_15( 8, C, D, E, A, B);
--	T_0_15( 9, B, C, D, E, A);
--	T_0_15(10, A, B, C, D, E);
--	T_0_15(11, E, A, B, C, D);
--	T_0_15(12, D, E, A, B, C);
--	T_0_15(13, C, D, E, A, B);
--	T_0_15(14, B, C, D, E, A);
--	T_0_15(15, A, B, C, D, E);
-+	for (; i < 16; ++i)
-+		T_0_15(i, d[(-6 - i) % 5], d[(-5 - i) % 5],
-+		       d[(-4 - i) % 5], d[(-3 - i) % 5], d[(-2 - i) % 5]);
- 
- 	/* Round 1 - tail. Input from 512-bit mixing array */
--	T_16_19(16, E, A, B, C, D);
--	T_16_19(17, D, E, A, B, C);
--	T_16_19(18, C, D, E, A, B);
--	T_16_19(19, B, C, D, E, A);
-+	for (; i < 20; ++i)
-+		T_16_19(i, d[(-6 - i) % 5], d[(-5 - i) % 5],
-+			d[(-4 - i) % 5], d[(-3 - i) % 5], d[(-2 - i) % 5]);
- 
- 	/* Round 2 */
--	T_20_39(20, A, B, C, D, E);
--	T_20_39(21, E, A, B, C, D);
--	T_20_39(22, D, E, A, B, C);
--	T_20_39(23, C, D, E, A, B);
--	T_20_39(24, B, C, D, E, A);
--	T_20_39(25, A, B, C, D, E);
--	T_20_39(26, E, A, B, C, D);
--	T_20_39(27, D, E, A, B, C);
--	T_20_39(28, C, D, E, A, B);
--	T_20_39(29, B, C, D, E, A);
--	T_20_39(30, A, B, C, D, E);
--	T_20_39(31, E, A, B, C, D);
--	T_20_39(32, D, E, A, B, C);
--	T_20_39(33, C, D, E, A, B);
--	T_20_39(34, B, C, D, E, A);
--	T_20_39(35, A, B, C, D, E);
--	T_20_39(36, E, A, B, C, D);
--	T_20_39(37, D, E, A, B, C);
--	T_20_39(38, C, D, E, A, B);
--	T_20_39(39, B, C, D, E, A);
-+	for (; i < 40; ++i)
-+		T_20_39(i, d[(-6 - i) % 5], d[(-5 - i) % 5],
-+			d[(-4 - i) % 5], d[(-3 - i) % 5], d[(-2 - i) % 5]);
- 
- 	/* Round 3 */
--	T_40_59(40, A, B, C, D, E);
--	T_40_59(41, E, A, B, C, D);
--	T_40_59(42, D, E, A, B, C);
--	T_40_59(43, C, D, E, A, B);
--	T_40_59(44, B, C, D, E, A);
--	T_40_59(45, A, B, C, D, E);
--	T_40_59(46, E, A, B, C, D);
--	T_40_59(47, D, E, A, B, C);
--	T_40_59(48, C, D, E, A, B);
--	T_40_59(49, B, C, D, E, A);
--	T_40_59(50, A, B, C, D, E);
--	T_40_59(51, E, A, B, C, D);
--	T_40_59(52, D, E, A, B, C);
--	T_40_59(53, C, D, E, A, B);
--	T_40_59(54, B, C, D, E, A);
--	T_40_59(55, A, B, C, D, E);
--	T_40_59(56, E, A, B, C, D);
--	T_40_59(57, D, E, A, B, C);
--	T_40_59(58, C, D, E, A, B);
--	T_40_59(59, B, C, D, E, A);
-+	for (; i < 60; ++i)
-+		T_40_59(i, d[(-6 - i) % 5], d[(-5 - i) % 5],
-+			d[(-4 - i) % 5], d[(-3 - i) % 5], d[(-2 - i) % 5]);
- 
- 	/* Round 4 */
--	T_60_79(60, A, B, C, D, E);
--	T_60_79(61, E, A, B, C, D);
--	T_60_79(62, D, E, A, B, C);
--	T_60_79(63, C, D, E, A, B);
--	T_60_79(64, B, C, D, E, A);
--	T_60_79(65, A, B, C, D, E);
--	T_60_79(66, E, A, B, C, D);
--	T_60_79(67, D, E, A, B, C);
--	T_60_79(68, C, D, E, A, B);
--	T_60_79(69, B, C, D, E, A);
--	T_60_79(70, A, B, C, D, E);
--	T_60_79(71, E, A, B, C, D);
--	T_60_79(72, D, E, A, B, C);
--	T_60_79(73, C, D, E, A, B);
--	T_60_79(74, B, C, D, E, A);
--	T_60_79(75, A, B, C, D, E);
--	T_60_79(76, E, A, B, C, D);
--	T_60_79(77, D, E, A, B, C);
--	T_60_79(78, C, D, E, A, B);
--	T_60_79(79, B, C, D, E, A);
--
--	digest[0] += A;
--	digest[1] += B;
--	digest[2] += C;
--	digest[3] += D;
--	digest[4] += E;
-+	for (; i < 80; ++i)
-+		T_60_79(i, d[(-6 - i) % 5], d[(-5 - i) % 5],
-+			d[(-4 - i) % 5], d[(-3 - i) % 5], d[(-2 - i) % 5]);
-+
-+	digest[0] += d[0];
-+	digest[1] += d[1];
-+	digest[2] += d[2];
-+	digest[3] += d[3];
-+	digest[4] += d[4];
- }
- EXPORT_SYMBOL(sha1_transform);
- 
--- 
-2.34.1
+Can this be a Kconfig option or maybe a runtime flag so that it'd
+still be possible for some i.MX users to keep PR enabled?
 
+>
+> Fix the problem by only enabling OP_ALG_PR_ON on platforms that have
+> Management Complex support.
+>
+> Fixes: 358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG")
+> Signed-off-by: Fabio Estevam <festevam@denx.de>
+> ---
+>  drivers/crypto/caam/caamrng.c | 15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+> index 77d048dfe5d0..3514fe5de2a5 100644
+> --- a/drivers/crypto/caam/caamrng.c
+> +++ b/drivers/crypto/caam/caamrng.c
+> @@ -63,12 +63,19 @@ static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
+>         complete(jctx->done);
+>  }
+>
+> -static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma)
+> +static u32 *caam_init_desc(struct device *jrdev, u32 *desc, dma_addr_t dst_dma)
+>  {
+> +       struct caam_drv_private *priv = dev_get_drvdata(jrdev->parent);
+> +
+>         init_job_desc(desc, 0); /* + 1 cmd_sz */
+>         /* Generate random bytes: + 1 cmd_sz */
+> -       append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
+> -                        OP_ALG_PR_ON);
+> +
+> +       if (priv->mc_en)
+> +               append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
+> +                                 OP_ALG_PR_ON);
+> +       else
+> +               append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
+> +
+>         /* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
+>         append_fifo_store(desc, dst_dma,
+>                           CAAM_RNG_MAX_FIFO_STORE_SIZE, FIFOST_TYPE_RNGSTORE);
+> @@ -101,7 +108,7 @@ static int caam_rng_read_one(struct device *jrdev,
+>
+>         init_completion(done);
+>         err = caam_jr_enqueue(jrdev,
+> -                             caam_init_desc(desc, dst_dma),
+> +                             caam_init_desc(jrdev, desc, dst_dma),
+>                               caam_rng_done, &jctx);
+>         if (err == -EINPROGRESS) {
+>                 wait_for_completion(done);
+> --
+> 2.25.1
+>
