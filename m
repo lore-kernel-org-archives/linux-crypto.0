@@ -2,81 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B65BC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 12:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9B6C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 12:41:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239450AbiAKMGE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 07:06:04 -0500
-Received: from mga17.intel.com ([192.55.52.151]:45334 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239371AbiAKMGD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 07:06:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641902763; x=1673438763;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JRk9zfpEfh7TMLOwa1VQX7FshiH5JyCeZcz+h+6TOkE=;
-  b=Iuc0VqGVeZqdxB8XrbIQAo43GzGDrkPEKNMpkJ6+gMvoi55T5Jv+OpXH
-   H2zDZjPVBK/wvvC/D4xLprBWyn5dGwI0qBU+C2WcF0PMpWfUeiNWGqmVM
-   8b5ASFyhHaObZSx9M/z1m4VucHP2zq7qQ7duacT4rojALwNduOvEyDizd
-   cjnC7+YP2j9RcW6CBx16QGaEgXz2Z/qbjSIqkNfEk6A8ogo/L68kpeSrL
-   d5dcELp7ezO4VgvA+hhF0oAYt2abuyQqMrb3B1b2a1oS4vvTezhvcd/IH
-   mBR9NJYrdcJbyAxniaHboeb56lrPhIvo1qnYp76+BIxBKzqj6aeQuoLpM
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10223"; a="224166752"
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="224166752"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 04:06:00 -0800
-X-IronPort-AV: E=Sophos;i="5.88,279,1635231600"; 
-   d="scan'208";a="613197572"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2022 04:05:57 -0800
-Date:   Tue, 11 Jan 2022 12:05:51 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Tomasz Kowalik <tomaszx.kowalik@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Mateuszx Potrola <mateuszx.potrola@intel.com>,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - fix a signedness bug in
- get_service_enabled()
-Message-ID: <Yd1yn4FHaueG4Lv8@silpixa00400314>
-References: <20220111071806.GD11243@kili>
+        id S239374AbiAKMlW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 07:41:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236359AbiAKMlW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jan 2022 07:41:22 -0500
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431F9C06173F
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 04:41:22 -0800 (PST)
+Received: by mail-vk1-xa32.google.com with SMTP id n12so2623287vkc.12
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 04:41:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5nbctxTqSbKVLgxPcBh73m81LJiUTavZURj9y7UFZyU=;
+        b=b+ZZrNZT+jFsQ8CwSWNJJf9yClxOnhkLLIcvrblvHKiY9YBV4Dt4rA9IqJQtg5DyUe
+         sfKNlmw1VKydmZ0W51HFs7FW7hyQRyd2e38P6vyElDHlVtoZKDpf9jd9yNZrr9Gy/E64
+         5FfPIizaQNzFk/0nj8usX6ZooPwX6Sqh0mLKvyEPlrOWYg6hSwi8dsjmEN4U58MlPwEh
+         bRPt98Ymqhgx5woUkNZuoNK9oXrPg3VTa2oXZHuogeR/nP7IIvVftPhAnT4LUCjV3AbW
+         lM4DRfCQHC8ku4PaaVLjcwgYlPlmFQw578AU9gh9e92LZrhijgOd1iz/r4H8nzGuds67
+         4RNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5nbctxTqSbKVLgxPcBh73m81LJiUTavZURj9y7UFZyU=;
+        b=SK8rWawqjjyyep08iKRDOPs4xeHyI9czwHg1So2oEs7plTVx/ZVr4EEpsweK3Gg+/2
+         nDKHpXS/rMnIUA4sQ5q8pPR4uE8069bijDj/4oXSI8Hag8QieEa5bopbPsvqidaBqjBg
+         vhzjaLETKVXs/peghQf8qAcaDWlwyH4ZF7dG9MPPZyoekTKKpugBHWAbVQRlxnYgU1VK
+         ToFxRjTTYMhW/bm6wkHTqSaRrS/aIYmkly1IwEYLiAcMgQakxxBDBG7qZBBvyOBZA5Vo
+         bW7Rxin7Tf0QykHKRxvj3Y5N9p0S5KrNaqsNaSCDXVBc4X9nyfGlYC9PIiJ4p6bhOzxz
+         kOAA==
+X-Gm-Message-State: AOAM530OhlBz5P34Xj9EHDffAs33trDPPe6HTJehbVWwsQs6Y+1oPEUy
+        NIMZDwx6zJSp/SuHkSBeVlU=
+X-Google-Smtp-Source: ABdhPJw0l7jQhigpBdxR5YvSPwm6eLiNemW1z3CMhn4uFUp3/87K9nIC8mtBMcow8+bawPg2yzVH5g==
+X-Received: by 2002:a05:6122:200d:: with SMTP id l13mr2147658vkd.16.1641904881419;
+        Tue, 11 Jan 2022 04:41:21 -0800 (PST)
+Received: from localhost.localdomain ([2804:14c:485:504a:adc1:6d00:a8f1:3386])
+        by smtp.gmail.com with ESMTPSA id m62sm5734790uam.0.2022.01.11.04.41.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jan 2022 04:41:21 -0800 (PST)
+From:   Fabio Estevam <festevam@gmail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     horia.geanta@nxp.com, andrei.botila@nxp.com,
+        andrew.smirnov@gmail.com, fredrik.yhlen@endian.se, hs@denx.de,
+        linux-crypto@vger.kernel.org, Fabio Estevam <festevam@denx.de>
+Subject: [PATCH] crypto: caam - enable prediction resistance conditionally
+Date:   Tue, 11 Jan 2022 09:41:04 -0300
+Message-Id: <20220111124104.2379295-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220111071806.GD11243@kili>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 11, 2022 at 10:18:06AM +0300, Dan Carpenter wrote:
-> The "ret" variable needs to be signed or there is an error message which
-> will not be printed correctly.
-> 
-> Fixes: 0cec19c761e5 ("crypto: qat - add support for compression for 4xxx")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-Thanks Dan.
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Fabio Estevam <festevam@denx.de>
 
-@Herbert, there are 2 other (identical) patches in the list that fix the
-same issue:
-    https://patchwork.kernel.org/project/linux-crypto/patch/YdWZm6QJAYbYTKAR@debian-BULLSEYE-live-builder-AMD64/
-    https://patchwork.kernel.org/project/linux-crypto/patch/20220105152005.43305-1-jiapeng.chong@linux.alibaba.com/
+Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
+in HRWNG") the following CAAM errors can be seen on i.MX6:
 
-Since none of them made into the pull request for 5.17, I'm fine with
-taking this one as it is the only one which contains the Fixes tag.
+caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+hwrng: no data available
+caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+hwrng: no data available
+caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+hwrng: no data available
+caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
+hwrng: no data available
 
-Regards,
+OP_ALG_PR_ON is enabled unconditionally, which may cause the problem
+on i.MX devices.
 
+Fix the problem by only enabling OP_ALG_PR_ON on platforms that have
+Management Complex support.
+
+Fixes: 358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG")
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+ drivers/crypto/caam/caamrng.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 77d048dfe5d0..3514fe5de2a5 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -63,12 +63,19 @@ static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
+ 	complete(jctx->done);
+ }
+ 
+-static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma)
++static u32 *caam_init_desc(struct device *jrdev, u32 *desc, dma_addr_t dst_dma)
+ {
++	struct caam_drv_private *priv = dev_get_drvdata(jrdev->parent);
++
+ 	init_job_desc(desc, 0);	/* + 1 cmd_sz */
+ 	/* Generate random bytes: + 1 cmd_sz */
+-	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
+-			 OP_ALG_PR_ON);
++
++	if (priv->mc_en)
++		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
++				  OP_ALG_PR_ON);
++	else
++		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
++
+ 	/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
+ 	append_fifo_store(desc, dst_dma,
+ 			  CAAM_RNG_MAX_FIFO_STORE_SIZE, FIFOST_TYPE_RNGSTORE);
+@@ -101,7 +108,7 @@ static int caam_rng_read_one(struct device *jrdev,
+ 
+ 	init_completion(done);
+ 	err = caam_jr_enqueue(jrdev,
+-			      caam_init_desc(desc, dst_dma),
++			      caam_init_desc(jrdev, desc, dst_dma),
+ 			      caam_rng_done, &jctx);
+ 	if (err == -EINPROGRESS) {
+ 		wait_for_completion(done);
 -- 
-Giovanni
+2.25.1
+
