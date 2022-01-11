@@ -2,100 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7529AC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 09:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CA1C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 10:02:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237352AbiAKJxF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 04:53:05 -0500
-Received: from mx-out.tlen.pl ([193.222.135.140]:13300 "EHLO mx-out.tlen.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236654AbiAKJxE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 04:53:04 -0500
-X-Greylist: delayed 399 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Jan 2022 04:53:03 EST
-Received: (wp-smtpd smtp.tlen.pl 28822 invoked from network); 11 Jan 2022 10:46:21 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
-          t=1641894381; bh=5RuVDG4AcbB9esWeXvS3dywPZZKlW2PyCauHa1sMOVM=;
-          h=Subject:To:Cc:From;
-          b=ibOSzZsa1uhuwOueHVqTqsPcWr3gPHDx9JYiZKKn0+E1qLL8yhklF0sQHnWA/rXbf
-           5X6goUpFwio0XyJ3Fd8Hg9RCFX1M5qGB2J/xnHZmCXfw69vvsUzhlre6GzaVAWygxl
-           pKE8+vs1iZ2nZw/1f2oBKLnMsA5uuoQ/0OvH0r+g=
-Received: from aaen213.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.117.213])
-          (envelope-sender <mat.jonczyk@o2.pl>)
-          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <dan.carpenter@oracle.com>; 11 Jan 2022 10:46:21 +0100
-Message-ID: <95c58e38-1a04-9bb2-a196-b76948ccf1e3@o2.pl>
-Date:   Tue, 11 Jan 2022 10:46:08 +0100
+        id S237314AbiAKKCV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 05:02:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51646 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237046AbiAKKCU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jan 2022 05:02:20 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8438FC06173F;
+        Tue, 11 Jan 2022 02:02:19 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id w22so11101483iov.3;
+        Tue, 11 Jan 2022 02:02:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=YmlpQBVfySpCt/YYkAns1X1WN6EovAoYf8bIgONcDcg=;
+        b=UbBw4wf53T+Uo1yqOpzWKAyMUtWUAKi4Kw19l8W5Z/vlOUelClaC+MlKo+ZuWhb6ei
+         mqT6G9Xz5EMqcwEBnjT40s42YFdURzCnIth2t+ywuB8AvKV2XnFdc4EPTVmockGuJZiD
+         wDOdwAf/IuOocSMpM2Wvfpp7jpumg+G8oHf2fG3cQEfyrh/tDluNESdHlaFs9PJO+ZU1
+         /82wLNc50v9VRxZyr0alOiw6mGFte4/mV6N0f3rqOujXT5fiTsvcF9gKhBCXBb8m1Y3b
+         L+r/wq8AiXaktdqZbs8Cw+RTwQgqJiGDrDIcXYvSlZouqtGK81V4+VGojseKeBiW5DwQ
+         KPiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=YmlpQBVfySpCt/YYkAns1X1WN6EovAoYf8bIgONcDcg=;
+        b=sNDVC8vQcAcrBzdAHni+wPrHdAUMLR/3bjFbGAWwJehuKhsa6TU+rnETHVmbrvpcns
+         Fs8jBkf19NCHkXlQ6g6f3KLQR9r1A6QqPKmA7Q/gjnrCThLSkywDpeUKUlvdxswdGEs/
+         fppZmCZ7M5krdlfjL4xdyNdUhKwNrD3xDIJHnpsXeik7SBUjEKrukuAXuSL0i64W7uSi
+         mbwoRdZP0aKxX7twI7Awq9baeWq9etr4i2NT2wId9Ii6Yi0pYI+4lYum0TQdyOvGw2bi
+         bSoAWkY5L41Dh4usl00/3QmCxh/h2gqJR3jrjo64ON84a4olA54kmiuqqSjt6PU4REqI
+         A0UQ==
+X-Gm-Message-State: AOAM53264oepa6sTVF+DgEQWYoUuj0h5x9tel7j9XTgLQLNvpFcof7Sb
+        Bjs1nh3dg1YbSMhiRYwOHi2/v5BqLV5JkrHs+0M=
+X-Google-Smtp-Source: ABdhPJyPov8/v7hiYlAGc60n72Zio2+eWIijGDHfzGsLcCrojJoeESesdRdL+54CVKalEgzaE0uQTZ74cpxlyVPkLGY=
+X-Received: by 2002:a05:6638:251:: with SMTP id w17mr1836768jaq.315.1641895338977;
+ Tue, 11 Jan 2022 02:02:18 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH] rtc: mc146818-lib: fix signedness bug in
- mc146818_get_time()
-Content-Language: en-GB
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Fiona Trahe <fiona.trahe@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Tomasz Kowalik <tomaszx.kowalik@intel.com>,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-rtc@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20220111071922.GE11243@kili>
-From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
-In-Reply-To: <20220111071922.GE11243@kili>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: 7674f249d9188a7ba009e014e442405a
-X-WP-AV: skaner antywirusowy Poczty o2
-X-WP-SPAM: NO 000000B [8ZPk]                               
+References: <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+ <YdxCsI3atPILABYe@mit.edu> <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
+ <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
+ <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
+ <YdyNxJzdBmSSEtDC@mit.edu> <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
+ <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com> <Ydz1F/AqB1oO/qHF@mit.edu>
+ <20220111041349.GA5542@srcf.ucam.org>
+In-Reply-To: <20220111041349.GA5542@srcf.ucam.org>
+From:   "Alexander E. Patrakov" <patrakov@gmail.com>
+Date:   Tue, 11 Jan 2022 15:01:42 +0500
+Message-ID: <CAN_LGv3x==7Mt2J4gis1L8xoNqUhSus0Sue1f92bU=aJDKDn0Q@mail.gmail.com>
+Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
+To:     Matthew Garrett <mjg59@srcf.ucam.org>
+Cc:     "Theodore Ts'o" <tytso@mit.edu>, Andy Lutomirski <luto@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Simo Sorce <simo@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jeffrey Walton <noloader@gmail.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Willy Tarreau <w@1wt.eu>, Nicolai Stange <nstange@suse.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Peter Matthias <matthias.peter@bsi.bund.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Petr Tesarik <ptesarik@suse.cz>,
+        John Haxby <john.haxby@oracle.com>,
+        Alexander Lobakin <alobakin@mailbox.org>,
+        Jirka Hladky <jhladky@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-W dniu 11.01.2022 o 08:19, Dan Carpenter pisze:
-> The mc146818_get_time() function returns zero on success or negative
-> a error code on failure.  It needs to be type int.
->
-> Fixes: d35786b3a28d ("rtc: mc146818-lib: change return values of mc146818_get_time()")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+(resending without HTML this time, sorry for a possible duplicate)
+=D0=B2=D1=82, 11 =D1=8F=D0=BD=D0=B2. 2022 =D0=B3. =D0=B2 09:13, Matthew Gar=
+rett <mjg59@srcf.ucam.org>:
+> The goal is to identify a solution that avoids the enterprise kernels
+> needing to do their own thing. They're in a position to globally
+> LD_PRELOAD something to thunk getrandom() to improve compatibility if
+> they want to, and they're also able to define the expected level of
+> breakage if you enable FIPS mode. An approach that allows a single
+> kernel to provide different policies in different contexts (eg,
+> different namespaces could have different device nodes providing
+> /dev/random) makes it easier to configure that based on customer
+> requirements.
 
-Indeed, thanks for spotting this.
+LD_PRELOAD is not a solution because of containers (that need to be
+modified to make use of the preloadable library) and statically-linked
+binaries.
 
-Reviewed-by: Mateusz Jończyk <mat.jonczyk@o2.pl>
-
-> ---
->  include/linux/mc146818rtc.h                    | 2 +-
->  drivers/rtc/rtc-mc146818-lib.c                 | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/mc146818rtc.h b/include/linux/mc146818rtc.h
-> index 67fb0a12becc..808bb4cee230 100644
-> --- a/include/linux/mc146818rtc.h
-> +++ b/include/linux/mc146818rtc.h
-> @@ -124,7 +124,7 @@ struct cmos_rtc_board_info {
->  #endif /* ARCH_RTC_LOCATION */
->  
->  bool mc146818_does_rtc_work(void);
-> -unsigned int mc146818_get_time(struct rtc_time *time);
-> +int mc146818_get_time(struct rtc_time *time);
->  int mc146818_set_time(struct rtc_time *time);
->  
->  bool mc146818_avoid_UIP(void (*callback)(unsigned char seconds, void *param),
-> diff --git a/drivers/rtc/rtc-mc146818-lib.c b/drivers/rtc/rtc-mc146818-lib.c
-> index f62e658cbe23..7f689f1bafc5 100644
-> --- a/drivers/rtc/rtc-mc146818-lib.c
-> +++ b/drivers/rtc/rtc-mc146818-lib.c
-> @@ -130,7 +130,7 @@ static void mc146818_get_time_callback(unsigned char seconds, void *param_in)
->  	p->ctrl = CMOS_READ(RTC_CONTROL);
->  }
->  
-> -unsigned int mc146818_get_time(struct rtc_time *time)
-> +int mc146818_get_time(struct rtc_time *time)
->  {
->  	struct mc146818_get_time_callback_param p = {
->  		.time = time
-
-
+--=20
+Alexander E. Patrakov
