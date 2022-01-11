@@ -2,67 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 055FFC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jan 2022 22:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 474E5C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 00:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345403AbiAJW22 (ORCPT
+        id S1345852AbiAKARz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jan 2022 17:28:28 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:35124 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345394AbiAJW21 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jan 2022 17:28:27 -0500
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20AJlhbQ011416;
-        Mon, 10 Jan 2022 22:27:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
- b=Uj1nZP/UA+Lg96bwp1QRMqhnsqAklPyiP0+qPh6LaCm8klJL3yfAePQHAtXN2m7/uDEs
- 30xv1nYqCle9nT8V3hSVr3A0PYPpDUsQ11cUfFyAlfY3puUqQ7WkLAFLR16b5wY8ifnR
- Rj3M4+BqE9gwMsmlTwajYgR/sF4mMh/+fE8GKgV5WuA1jRy5whIzSosT6jPel3z+Ie9G
- ljwMhkDRsISoLdY0a00E+iPKPz3trN15E0fwgUII3GVmJNq5JPdMx50YkpOYIFOzg6vm
- Ul75lJxer3ZLbGo8vnxmJvnsCogbf4mrayYWes6vgRXmx84WW/PsNa1fMFKnQL7G8O4A 6g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dgjdbsv9y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Jan 2022 22:27:35 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20AMFvXF012826;
-        Mon, 10 Jan 2022 22:27:34 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2172.outbound.protection.outlook.com [104.47.56.172])
-        by aserp3020.oracle.com with ESMTP id 3df2e3wkx1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Jan 2022 22:27:33 +0000
+        Mon, 10 Jan 2022 19:17:55 -0500
+Received: from mail-dm6nam11on2059.outbound.protection.outlook.com ([40.107.223.59]:29665
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1345849AbiAKARy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jan 2022 19:17:54 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dz4sFvxlDCtqI87IvAj4pAH5YNr2KQhPmlZrYwW6tt2OpZk6dRDDR90JGyyYY/XAks4hOGDSrtr501KJ554e0/h4H5Mx8f2l6I5uE622eVDfc+RWPrJg6Soe+/7QUCpyXfxSN76FJassY9X6AxLVsBzCkbHRrnpNaixrN09EuM4K5MehZwCWS4tm8MxQxNHtRsWgoQHvs4t1KwoL5WCLz6NSDW8EuMZKfBZl6NkXQAdx2YgR94uxmkNGZHhLxq6dD9x7PekL1+OFfukxC9lRFxjNQzrw1oYDICOkJHr4aUUDJmtl6tCu9xDynTkbIdP0I9CYY53H2mNkH+bz4OY5Fw==
+ b=fYSzzcu9r2eYKNs2dAxsY9qeztOLE0akvsvdpuoxf5uVQ4NiIagAvjpSq1FUQNwA4LN9r+nndvyI0Y2gREK7D8dKeD5dgJjUgMWGnU5Hhmw1rvTtlBwIOCOH065xOfTJ6QCPNPr2fJ4nFx+jHfqBphOmuyidS+96Z14gXNUHRjHzR/0qZlpSBkq5ecRzK0sDZAc+JZMau1CliT8P50GYGH8j3FxpoKwG7CblM6vJsLP4/Fc7t3TeIgX8agDsTCI84/k4HVJxh5Kp71ah6C7Ymwkk1dPXYC4PtI430s1KpD2wUucaKAYskTpwihp5vqMeK250D+AqYrcDhqoX0LJtBg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
- b=DH8F+T+QvBl+eSAeC8+npckR+g93xJU/aaKfXWFcuvG5ZPtGrZzL3Oa+gX9bDK9dwASOTFz8oDPyA2yLju0+HBL9l/jQ4n2gE8DSNrTsUh3q/574ya9HMC59PoLlnHWk0EdS+C8yvIMEPr1br/kWKtWQbi9nyv2jbWc5QI0DwMEF44xDzHE+t3IXbWiOq9hzwXJ4CwvfG0u9DDdy5JVyMDf6dCPQYArIEGowN+H47dwpZ1aglSjA+M6pxpg10osoVRV3K50hLNYSbaAKlI9qSgSdxOmCuSoaF0V5WVqzIkkLWM462A7cL3PBWtWbkRUCO/2xprTdLTVF4Kfx3qQ0Nw==
+ bh=3MUCI11mOLwo/tYd0941ecqziC+8FoTVfhL59UDjUjE=;
+ b=VUPODcHgaC+Ufxgw0RRclQ3BUk0XRE6TELj6Iehe6l7jsNRXr8YnyP2LX8BqWuR6aHSIGESU3NypdQ5Zklyk9dbvPjSvL+MzXmqD1QgES1sTd6X+97iSznBY8U2d7Yrs9gqBoW7jd6fVb7cXatDTzV9rQyJ0V9rU5XOCr/iicJxT+xPYeKRZribopX/THu033u7uuMaTy+KQeHu2lrv31aIkX1pMWIzZQNcZ3m1ONilqTKV91Sez3F6zOOOLsc2TNYle9htvC7smJf5LmvL27uoC7jXLYfiNyDkYfjCalgWhjNUaMcNaahzo5B3umdM4nCDVDcL+kNiuu/+ADOagcw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1Aq7V2S90CCkiUtYjNrVeW7xB7JHgsccxssyxcxk7VE=;
- b=iofO7UGMs74sCLu5tAxNi/yd7BTjINnByDVCklKUIPvOMO65OFWmyHFtzGwPQDeBYIBHvQsAusnb+o0a5Id9xgq2ZfbhxPcufBOPlMQjIjO8Jy1DCW+SVol9NvGsgODhn72FN1JwO8e2+veB/RS2dHqIK1rUb4FgQvPUpuG4d/I=
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com (2603:10b6:806:23e::20)
- by SN6PR10MB2510.namprd10.prod.outlook.com (2603:10b6:805:3f::10) with
+ bh=3MUCI11mOLwo/tYd0941ecqziC+8FoTVfhL59UDjUjE=;
+ b=MDAFOsrn8cAmgOfUMbmSboUL+ORZ2Ba8DKIdfwo9B5rNxW16UWDi3oywXdDO6FY8zu371iMtaDl6ND7VidguUI+FDFNV5dsQkk27Z8W89UnlCPA+dbklXEKiLi6biWBCwObdwTCUYbfjfQbUSbl65c+YQnT1pRtzSNwyIKApHgCP00qyoL530u0AERg5+MjAJZXMchXddtck548MlqCq7tuJZkvTAGbYYeVp0eJXt7TjfbbCW1wsO/qORq6/KCMqT6DRCgat+Mvdm6YNQuDBAe3Sc6CImCzJDqIqPA6e6EtC2v/W0YkhRV/1ffsFGILxda3pkBu4PB5dxWJYPgljpg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5253.namprd12.prod.outlook.com (2603:10b6:208:30b::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Mon, 10 Jan
- 2022 22:27:31 +0000
-Received: from SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e]) by SA1PR10MB5711.namprd10.prod.outlook.com
- ([fe80::9d38:21ba:a523:b34e%8]) with mapi id 15.20.4867.012; Mon, 10 Jan 2022
- 22:27:30 +0000
-Date:   Mon, 10 Jan 2022 17:27:25 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Tue, 11 Jan
+ 2022 00:17:52 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::464:eb3d:1fde:e6af]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::464:eb3d:1fde:e6af%5]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
+ 00:17:52 +0000
+Date:   Mon, 10 Jan 2022 20:17:51 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
 Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -86,189 +65,125 @@ Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         linux-mm@kvack.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [RFC 00/16] padata, vfio, sched: Multithreaded VFIO page pinning
-Message-ID: <20220110222725.paug7n5oznicceck@oracle.com>
+Message-ID: <20220111001751.GI2328285@nvidia.com>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
  <20220106011306.GY2328285@nvidia.com>
  <20220107030330.2kcpekbtxn7xmsth@oracle.com>
  <20220107171248.GU2328285@nvidia.com>
+ <20220110222725.paug7n5oznicceck@oracle.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220107171248.GU2328285@nvidia.com>
-X-ClientProxiedBy: MN2PR05CA0051.namprd05.prod.outlook.com
- (2603:10b6:208:236::20) To SA1PR10MB5711.namprd10.prod.outlook.com
- (2603:10b6:806:23e::20)
+In-Reply-To: <20220110222725.paug7n5oznicceck@oracle.com>
+X-ClientProxiedBy: BL0PR0102CA0033.prod.exchangelabs.com
+ (2603:10b6:207:18::46) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c77b6065-a497-4eca-7372-08d9d48863cd
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2510:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR10MB25105E2D88056986DD60A35CD9509@SN6PR10MB2510.namprd10.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 103632ad-5eea-445e-f0ed-08d9d497ce92
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5253:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB52538D28AB11D68FA67DE1ECC2519@BL1PR12MB5253.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0e4WuPE3DvTfCt85FzK1QfH/ThiDv0s3rrwL5Y4XxlwgqK50AD6TSZpivGrZsVgl/Is9erLhq+l8pMJDhDLdTK/eBB17QTxjhHntVW10Qn9E/f6trNi6l0CklSFtwn30kgI4hQ8urZPCts0syIh7VZR6ZZarJZ9Bvx0TShsuPUC7QCq/w4R54Kqnbd5scb0nTSyV1XIrd32wdDNqPMhoTzMNSFVVHitq2rUTKYi00/MFyUrA90fLIl0rxScx//tD+QiEVSM2xBJkTCesP9cG+cWqQ11xhW09Ymv79cOqGlsodLNHg+UzGTI3pIS3qEf9FIU8zSi56eoYefygUUcPuRkzCounc01+zM638ybVuSpEE+LGCtDgvd7015JNdJBh+kQ+KmgdJHmdXKYQP2wVymgOTvHZuvotQlKEsIqh0t5hwZ3Wn2B1e1oPhzYhaMDNkfp9xYF3tYSXP4/zD/3ZgvMsZep4o+4LkgqH9Y0Yp8VqiXQSClm1Cn8uhtuiuaaWhNArKdmtO0tmyig/XXh0jA1FD9krGh55yfNthM+6HnzngNz6XU76adFFCdJ4xPYhk+VvergkKzwy2My4SyeKbtFPlfQXrnP6ilD3uRfgFHvilCtTWb4PU2QYAKT1oEpvaozRTo8qXhX6x6LXTq1tZXD4V0K9qr85NH93KwF7LM7k7MIu2QKbTPtkROxDk1tARUhReMw4XxtIR01uL8yUSA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB5711.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(7416002)(508600001)(54906003)(38350700002)(38100700002)(83380400001)(6506007)(316002)(36756003)(6916009)(2906002)(52116002)(2616005)(6666004)(66556008)(1076003)(66946007)(5660300002)(86362001)(6512007)(8676002)(66476007)(6486002)(4326008)(186003)(8936002)(26005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: WkW8varw/EAnTjfDndElbk2K+ZxDKFXDWjgtMDniq8N49AMcltwitwglha/SkdYitu4kDY/SDi2mNY+oH4lgyeA+ZEanoME0U0xocRPKW7kqFZ6vlYt8AShpa2oeNb9BibElHD4Mdnj0c1WU1gdI6G6vm4HRKy4zR+BCGwvCgtinaatRbZul4+k8yekGpDaHO94vmnPAvBePIeEO/0BNSEt1ubKRVSOFArMU/nnRwfMfM+Oa3h4MzA9zcdvJuH0cAiguIVTs/MOAX7/AfNuiA2ilpKmD5mc49UCHf6DXTQCraGPryqX0n33WNfZbZ9sahHBpXBAA4jOV2pIADzDhhj0ufe1bXl+EJMDMXKXz05Sz2hlQU79xYZvLCR/GItdjZfTxt3hVvKgEiyErc0ttFr5M6scvdpGAt/vOTmR5GSDo9BPGQwBY2nYB4aFzIHkAWS1kTLyuXqp03ybm+mI4hZ1Jy8nSZATw3CY+CsoOsshZ3UVwBKCixa3SFSV64G6DzITcd2VkQ3vfBlJWu8dRl+nTn/lotn5RQPfgTFEAqgxB0NZySe9GwG4fl9G9fHT+0TK++aSdTuOzTGWgrmDdXzgIydISIGQM6tjWnDflh8a25UEoYLSN40FV2fGvrebTRBpjsbYHHh2PR77gS9KxQg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(36756003)(2616005)(6512007)(4326008)(83380400001)(54906003)(5660300002)(66946007)(6486002)(38100700002)(6916009)(6506007)(7416002)(66556008)(26005)(66476007)(33656002)(1076003)(8676002)(2906002)(8936002)(186003)(86362001)(508600001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bhXKWfx/ue3loX72yMGWf5yw4xmvHx/hzoTOgd4iH0vdfThfIhCrujFEQqvg?=
- =?us-ascii?Q?hLDFpthbwyT7X8X3y8P5lEBkfWTWgtOuJ5Bak1S62riI7gXJNadZPXkClWMw?=
- =?us-ascii?Q?3O/bZlcZZqA1jVctkSLuZ5FEQA6VPwwzsWbagh9fUyRPXVC5snCiTbKfMb7E?=
- =?us-ascii?Q?kvP58ZL3ZmzLhRhrgrfEAWAD9mVqCRddtE0h7WJWEHwHVnaiem1iukSJeOPy?=
- =?us-ascii?Q?hYBvRyQMdtsQJXkUwDG2HFwVuNIbRWjnYiKqEr3Qt5ZqlNdkSKUdZozRWnSK?=
- =?us-ascii?Q?eFrhEeUT6DAETLKTfF0DLvV50JGjHOmi6QdSipafsR+lIGtInE03QyIEql6X?=
- =?us-ascii?Q?tMs41BZwwPThAUZMdKHRJ0USQjrQ+dkEQrmG5NYX3VDrJIHEdrIMYbSu3l7H?=
- =?us-ascii?Q?puhS9NdFpGctnJT+rnmezmwp41tkvtxHf++YOfdTYu6NeEv186uhLo5X2UJu?=
- =?us-ascii?Q?l2k/V2mNZnf55J4/CweO2CXy92+IeHKj++N8D2BQda/gL7bh6Yjx1JzAkFGW?=
- =?us-ascii?Q?7tr/rNGcWkiNyvTsn/15maQE136QZj+m4DsxIDG0k2iY474tPUkS9Ykkjvxk?=
- =?us-ascii?Q?V4thCaHe3FFkcGm32r2/eJHOIaC4tCw7uYQr4tEnx5eJDcjaKLzOnLF5PeTt?=
- =?us-ascii?Q?os6/RiKRyUL0gBRiGkp7S7wnC3ImOKeMjt47DrGy13rYOeTKEZjQKvnnlCyr?=
- =?us-ascii?Q?j/wOMZRBjiQM++J/9Hwp2hIev2utfUO7Xsc+TEZwkdRw7NaCcWHwzFiiK3EI?=
- =?us-ascii?Q?8iqEFNM3gZOiVHqoDJtL1duleIIQLj33PPkcV5X3Zhl/LTHuqW6anmTnlG9E?=
- =?us-ascii?Q?U4fIhy5OmxAJkeeOqg4NsbPrvB0m4Eo0ar0JEZ/YbjhvLVQV7lY6M484Phiy?=
- =?us-ascii?Q?hateiJG9OKK04Yu+K/Sc34Fgh+rCI4FIDbJ7XXgO3ahJb3+XjI1eNt+c3p+g?=
- =?us-ascii?Q?mdXErlbjhdc6+c3nHrBrfzMIY+tkR59H0uHvwLll+JDwcl7JTuMbuXq6KAS0?=
- =?us-ascii?Q?Eu4JZYRdyxzfT2nFQmbiIj1l3Cxv1lxY/rK2qaU5Z+dkTz5C+aUhlDoXtyDU?=
- =?us-ascii?Q?68pf/0yelCarp3/1qfP1E4avp/++3APXmI0yMwnEfTip8KnQiS7JoCYVLcMT?=
- =?us-ascii?Q?KS8Zgj9gag17uufIbdc+ctfXBFBYme9XPCKDtyAx4/uZgjVn3yVUGfmxTRZ3?=
- =?us-ascii?Q?MoBadj/MuAyE/n6+RR7krDqNEqcdk0faDJ19/fPasK9ON2G5jZmkcaObgpGR?=
- =?us-ascii?Q?FFnG/eaJBNk/dI6ojiEMkfGEFzLnZbzez/KQYskEupO1H17UUXPedrVf1cPC?=
- =?us-ascii?Q?76TiNkQRg9gBDQM218WiTVVsLJgQSfLs2vbxrmWtT2OIiwj+VMzJ2Hzcgc0u?=
- =?us-ascii?Q?Hpj40T2a7TjbUQdx8flhXJYBNWSV3PvGyZlc83ZbB20jZAQGiMtGNXAmXNYv?=
- =?us-ascii?Q?sLjRVQI7GI/M6vSpMhGOSj43CVDM9S85N/8cIvev28KCFvnP5CWzZDbetgBs?=
- =?us-ascii?Q?A8BKItBinPuyIq+tsmmyL5oa6hQhvzvKi+UGlr4OziCVkYwenYP3xOdAOFwe?=
- =?us-ascii?Q?7ebTKR8QkV+Cs410l3TyWi7stG25N8vBK+a7GLgBPMgW9K4UcAtmJ9Chwsh4?=
- =?us-ascii?Q?opfe5zYeBRkNL44GP5e9XJbsBCuclMCDHl6oJz6DAO1TcMlzxY7ZY5DlAbLF?=
- =?us-ascii?Q?GomU7w=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c77b6065-a497-4eca-7372-08d9d48863cd
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB5711.namprd10.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?L2kowSqlbhxAZkHbbWGM19fnUS33taYHCAdd6nSRHCqCsU4R1ym0PuVDW7ep?=
+ =?us-ascii?Q?tSTJ3ihc6nYHn9usOOlBA8aTfD2nft5pmMRZdBYcsWtSGh/rVkiR/gNHsbe+?=
+ =?us-ascii?Q?hLb/FPmLFRR0P7INRtauYkt6TtORfNdgBb/UCvXNCLHHDn5JBILhmIPEtJC/?=
+ =?us-ascii?Q?psjfhnAdVJ5/NEVmR0pSiXRsKgTHbILz2itAjw+/j9hBEkTO9klzuh0faPlu?=
+ =?us-ascii?Q?dk4hgCm/rLO4WUEnX4SqgQvgY8xgz/zxkdjkT3qb9cx+Og2OZCpgPfJiXaof?=
+ =?us-ascii?Q?QdYtwA22xLT0MWsNWglcA1IXHOUsHlOOfS8nxg1bPk/oTK27/bcQmT+Ca57s?=
+ =?us-ascii?Q?WRY6kp0x0BZcfE3450C96vfR5RdafSN6D0eedH9FEf0WB7FV5Ws8Rs7m5Qia?=
+ =?us-ascii?Q?cEdKsS3WS36AGmuoJQzFXZQJ7D5zOAfhRZKm5L9hbAGk8HhKaZVtOajGx/Ur?=
+ =?us-ascii?Q?75RIl4XSzjQLui/bmjBWp0pNOQI2jeDBXRQFHL7lJDgFEM9IarEnlVNfbxFA?=
+ =?us-ascii?Q?Hsq6qHxHD7e2sh3qiaEjmybA6SQ0e03yJ0Xc75/nTiLFrMKwKjX32E0d7gCe?=
+ =?us-ascii?Q?kYLyfHPGworuPtWiIuj/ISoYF/fkm2tiy7T/xg8LZbSgHRV2vHY5jzu74gfH?=
+ =?us-ascii?Q?L4XBZwwBlpwULCt6OYJdU3CMWfdrKD7/PP+eTICjmHrrPvLkWZT/RkdJI9YY?=
+ =?us-ascii?Q?THr/Z0YGBEbYbiOQeiQCQMrC6co1heR2f2ZOFwhkOJBhxxXsKkRCEEUUI/Al?=
+ =?us-ascii?Q?HKhHmk75NiGWj0qVzajmNKXatYC+FUv2u5Rb9uE5QpIMVBXRyokPfpD44no8?=
+ =?us-ascii?Q?cmXfKOlEv7UMBE5es5jAYgQ843HOpMubfVh7FXKdma22Cz5VLDonMkGIUQfA?=
+ =?us-ascii?Q?pmynFDj53Vdk96k0afeVFbWBIl3kFl7b3zKOgiAkmV28Y66vcbL0JqCKrO8/?=
+ =?us-ascii?Q?lZTnT5vnEeqEK2AA/U+EMUhJzheCe4+VDFzv23QStzJjIsOD5zJVC8hf7uz/?=
+ =?us-ascii?Q?6VMaTR5XN8OeaOrL/VLqvALTmLzMY/VZbHW8cf//w8rynwpciJ4/MLnHuhxN?=
+ =?us-ascii?Q?fXbGjLcXUrox9HqSw/NFt+yNx6Lb6rm2Auvnj+nkgQoi3cjGiCr/GLyMyBSi?=
+ =?us-ascii?Q?b25uWPLHTtuF6aXgltHRXdwd6L9d01JfKwTu1TB6l7fAd8kfBmFqSHL5QRfL?=
+ =?us-ascii?Q?WdH8LqSFGQQBeF5PmZbqRkR9c06X32Ib8CKEVYg2F/guRwAnirS60IvaBv02?=
+ =?us-ascii?Q?DJZfAsHgqpn8QQhMoHGLzkpx71OcyNxinDWnWUWR5ijwIiwb+yzTly0HTgpN?=
+ =?us-ascii?Q?x3JzF3xA4H1NcW3a8xXAfk0bb4TJ1eboaPk1zK1wmP2bUeYS7Qmd+/mnZ/UI?=
+ =?us-ascii?Q?7F5pwmv1LvBv8DQPyH4t9/PQwn8lFaiO6N+Dt9At9H3KjJKVKCmrlF42qfR8?=
+ =?us-ascii?Q?xVFIm8MAB2NZA4kzt4J9OtGXD9UyjpqaXCbYbiODxeM+ROjjExhBq11mxGuO?=
+ =?us-ascii?Q?kMFW4BzDUr8Q0pTcFMdJNQuU3JhndAf5eR9NcvDL7h78IglbOsE9w+7aIrit?=
+ =?us-ascii?Q?SQQ3IDvZ3BhyfQSU9fA=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 103632ad-5eea-445e-f0ed-08d9d497ce92
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2022 22:27:30.8903
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 00:17:52.2084
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Br3MiFv4/Xa41SmhZmQ0HO/PDsfNo0CpH0HqIc3dDCuu+NvB7VMXZmSV4JQvufKYpAczr4i86O34WDPOP2N29mO4Ik+W/6IcG6oTWdZe/z4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2510
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201100145
-X-Proofpoint-GUID: ZqhLWtfzeQI8DBuX-uyjY66UNSvH1Zbu
-X-Proofpoint-ORIG-GUID: ZqhLWtfzeQI8DBuX-uyjY66UNSvH1Zbu
+X-MS-Exchange-CrossTenant-UserPrincipalName: 036OsMzFCHOHyNo+4uNyxhqFLNH2xjHDbxlglId9cGmHPcYslfLa2BuVD59lTXDZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5253
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 07, 2022 at 01:12:48PM -0400, Jason Gunthorpe wrote:
-> > The cuts aren't arbitrary, padata controls where they happen.  
+On Mon, Jan 10, 2022 at 05:27:25PM -0500, Daniel Jordan wrote:
+
+> > > Pinning itself, the only thing being optimized, improves 8.5x in that
+> > > experiment, bringing the time from 1.8 seconds to .2 seconds.  That's a
+> > > significant savings IMHO
+> > 
+> > And here is where I suspect we'd get similar results from folio's
+> > based on the unpin performance uplift we already saw.
+> > 
+> > As long as PUP doesn't have to COW its work is largely proportional to
+> > the number of struct pages it processes, so we should be expecting an
+> > upper limit of 512x gains on the PUP alone with foliation.
+> >
+> > This is in line with what we saw with the prior unpin work.
 > 
-> Well, they are, you picked a PMD alignment if I recall.
+> "in line with what we saw"  Not following.  The unpin work had two
+> optimizations, I think, 4.5x and 3.5x which together give 16x.  Why is
+> that in line with the potential gains from pup?
+
+It is the same basic issue, doing extra work, dirtying extra memory..
+
+> > and completely dwarfed by the populate overhead?
 > 
-> If hugetlbfs is using PUD pages then this is the wrong alignment,
-> right?
-> 
-> I suppose it could compute the cuts differently to try to maximize
-> alignment at the cutpoints.. 
+> Well yes, but here we all are optimizing gup anyway :-)
 
-Yes, this is what I was suggesting, increase the alignment.
+Well, I assume because we can user thread the populate, so I'd user
+thread the gup too..
 
-> > size.  If cuts in per-thread ranges are an issue, I *think* userspace
-> > has the same problem?
-> 
-> Userspace should know what it has done, if it is using hugetlbfs it
-> knows how big the pages are.
+> One of my assumptions was that doing this in the kernel would benefit
+> all vfio users, avoiding duplicating the same sort of multithreading
+> logic across applications, including ones that didn't prefault.
 
-Right, what I mean is both user and kernel threads can end up splitting
-a physically contiguous range of pages, however large the page size.
+I don't know of other users that use such huge memory sizes this would
+matter, besides a VMM..
 
-> > Pinning itself, the only thing being optimized, improves 8.5x in that
-> > experiment, bringing the time from 1.8 seconds to .2 seconds.  That's a
-> > significant savings IMHO
-> 
-> And here is where I suspect we'd get similar results from folio's
-> based on the unpin performance uplift we already saw.
-> 
-> As long as PUP doesn't have to COW its work is largely proportional to
-> the number of struct pages it processes, so we should be expecting an
-> upper limit of 512x gains on the PUP alone with foliation.
->
-> This is in line with what we saw with the prior unpin work.
+> My assumption going into this series was that multithreading VFIO page
+> pinning in the kernel was a viable way forward given the positive
+> feedback I got from the VFIO maintainer last time I posted this, which
+> was admittedly a while ago, and I've since been focused on the other
+> parts of this series rather than what's been happening in the mm lately.
+> Anyway, your arguments are reasonable, so I'll go take a look at some of
+> these optimizations and see where I get.
 
-"in line with what we saw"  Not following.  The unpin work had two
-optimizations, I think, 4.5x and 3.5x which together give 16x.  Why is
-that in line with the potential gains from pup?
+Well, it is not *unreasonable* it just doesn't seem compelling to me
+yet.
 
-Overall I see what you're saying, just curious what you meant here.
+Especially since we are not anywhere close to the limit of single
+threaded performance. Aside from GUP, the whole way we transfer the
+physical pages into the iommu is just begging for optimizations
+eg Matthew's struct phyr needs to be an input and output at the iommu
+layer to make this code really happy.
 
-> The other optimization that would help a lot here is to use
-> pin_user_pages_fast(), something like:
-> 
->   if (current->mm != remote_mm)
->      mmap_lock()
->      pin_user_pages_remote(..)
->      mmap_unlock()
->   else
->      pin_user_pages_fast(..)
-> 
-> But you can't get that gain with kernel-size parallization, right?
-> 
-> (I haven't dug into if gup_fast relies on current due to IPIs or not,
-> maybe pin_user_pages_remote_fast can exist?)
+How much time do we burn messing around in redundant iommu layer
+locking because everything is page at a time?
 
-Yeah, not sure.  I'll have a look.
-
-> > But, I'm skeptical that singlethreaded optimization alone will remove
-> > the bottleneck with the enormous memory sizes we use.  
-> 
-> I think you can get the 1.2x at least.
-> 
-> > scaling up the times from the unpin results with both optimizations (the
-> > IB specific one too, which would need to be done for vfio), 
-> 
-> Oh, I did the IB one already in iommufd...
-
-Ahead of the curve!
-
-> > a 1T guest would still take almost 2 seconds to pin/unpin.
-> 
-> Single threaded?
-
-Yes.
-
-> Isn't that excellent
-
-Depends on who you ask, I guess.
-
-> and completely dwarfed by the populate overhead?
-
-Well yes, but here we all are optimizing gup anyway :-)
-
-> > If people feel strongly that we should try optimizing other ways first,
-> > ok, but I think these are complementary approaches.  I'm coming at this
-> > problem this way because this is fundamentally a memory-intensive
-> > operation where more bandwidth can help, and there are other kernel
-> > paths we and others want this infrastructure for.
-> 
-> At least here I would like to see an apples to apples at least before
-> we have this complexity. Full user threading vs kernel auto threading.
-> 
-> Saying multithreaded kernel gets 8x over single threaded userspace is
-> nice, but sort of irrelevant because we can have multithreaded
-> userspace, right?
-
-One of my assumptions was that doing this in the kernel would benefit
-all vfio users, avoiding duplicating the same sort of multithreading
-logic across applications, including ones that didn't prefault.  Calling
-it irrelevant seems a bit strong.  Parallelizing in either layer has its
-upsides and downsides.
-
-My assumption going into this series was that multithreading VFIO page
-pinning in the kernel was a viable way forward given the positive
-feedback I got from the VFIO maintainer last time I posted this, which
-was admittedly a while ago, and I've since been focused on the other
-parts of this series rather than what's been happening in the mm lately.
-Anyway, your arguments are reasonable, so I'll go take a look at some of
-these optimizations and see where I get.
-
-Daniel
+Jason
