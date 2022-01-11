@@ -2,65 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753F7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 13:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A0FC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 13:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240140AbiAKNGk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 08:06:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236102AbiAKNGk (ORCPT
+        id S240361AbiAKNQv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 08:16:51 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:59160 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231301AbiAKNQu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 08:06:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9326FC06173F;
-        Tue, 11 Jan 2022 05:06:39 -0800 (PST)
+        Tue, 11 Jan 2022 08:16:50 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 40150B81AB4;
-        Tue, 11 Jan 2022 13:06:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54CEC36AF4;
-        Tue, 11 Jan 2022 13:06:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 967DD61628;
+        Tue, 11 Jan 2022 13:16:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7909C36AE3;
+        Tue, 11 Jan 2022 13:16:49 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gJBCKMH1"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SqubP8RT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641906391;
+        t=1641907005;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YUgye/d6jt0DNu369eV2V7tQU7bwWVb+qYvWTJEDDUk=;
-        b=gJBCKMH165sQrZK91jVMvJlAjIAXskVGtOctYi/ddmqiXUPOqgVgJQ7dcNUDFw5IINbLhZ
-        S+3cTpwMqr6aE3go9Ru/ZgNWUWbVyo5P1L8dj4dO8mwJTtNDqXLRyuSAZ2ySH2JyEjcD98
-        zKtTLtXqh6MLAQHy0K/2PpMEj2nGDCI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f19b60fb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 11 Jan 2022 13:06:31 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id p187so4561848ybc.0;
-        Tue, 11 Jan 2022 05:06:31 -0800 (PST)
-X-Gm-Message-State: AOAM532KDojvsFvb8Rgb8Wd3OZKha31+f+Es4F9ssIMpBiUJ/eOjgCH3
-        Ia6NCre9pCC+H+/FMRUIE09mDmATctyhBK6aHqA=
-X-Google-Smtp-Source: ABdhPJzPQZrE87XNNZNA2ikIc68treEqUvOMcyKN25afy+XYYUuJt2NLhxrqhLB5H05NAfIMwF2i/KDvCg+JjDvOOrM=
-X-Received: by 2002:a25:f90d:: with SMTP id q13mr6045343ybe.32.1641906388088;
- Tue, 11 Jan 2022 05:06:28 -0800 (PST)
+        bh=YQeC7YctX/YVqYkAnzGKLgfZxfV+ytQelxLfYGqLnUc=;
+        b=SqubP8RTPOzXlEBQMp36lDr1ayPnfc/jhXUCmamqFS8JbyvknBtF/KetrOsETNwW+dMc/+
+        Xjai/hibANJ9trNSLSz1MOiFZmM2RuooRZ73xz2qeaaigDVBS2Im/1yS6/itPjyJqIXaCQ
+        sP3bisQvgrEFDz2HlaNG6Vg4m+JKDSc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b5f64864 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 11 Jan 2022 13:16:45 +0000 (UTC)
+Received: by mail-yb1-f175.google.com with SMTP id c6so45145410ybk.3;
+        Tue, 11 Jan 2022 05:16:44 -0800 (PST)
+X-Gm-Message-State: AOAM531fuK1Ew8eRhTyOsIGRMGBSstsaFldDKo7PDcViDbBwlSSM9/T9
+        4fnJSr1P3Bm7FvqFiTlzQ4MzMJQLS2+7zH2y1aA=
+X-Google-Smtp-Source: ABdhPJxBYHrKFKQwwlE52qAsHcsrMv7o0I8tu8BgRgRGkDchwQOZShIdmgvijLdWQcaOJmR2LudNbTFJfE0zYHl+z/w=
+X-Received: by 2002:a25:ae8d:: with SMTP id b13mr6700286ybj.255.1641907001570;
+ Tue, 11 Jan 2022 05:16:41 -0800 (PST)
 MIME-Version: 1.0
-References: <f4a4c9a6a06b6ab00dde24721715abaeca184a0d.camel@redhat.com>
- <CAHmME9qP9eYfPH+8eRvpx_tW8iAtDc-byVMvh4tFL_cABdsiOA@mail.gmail.com>
- <20211210014337.xmin2lu5rhhe3b3t@valinor> <20220110132349.siplwka7yhe2tmwc@valinor>
- <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
+References: <20220110132349.siplwka7yhe2tmwc@valinor> <CAHmME9oSK5sVVhMewm-oVvn=twP4yyYnLY0OVebYZ0sy1mQAyA@mail.gmail.com>
  <YdxCsI3atPILABYe@mit.edu> <CAHmME9oRdoc3c36gXAcmOwumwvUi_6oqCsLmFxRP_NDMz_MK1Q@mail.gmail.com>
  <Ydxu+KS5UkQ6hU9R@mit.edu> <Ydx7D3H0PS0Zs9/B@sol.localdomain>
  <CAHmME9pe-DxTcFcMtsNnLPcccoY+0gEysivZQszAusH1M8ThmA@mail.gmail.com>
  <YdyNxJzdBmSSEtDC@mit.edu> <CAHmME9rmWBA02SyeFiiGZ8=kydYJSJwcYPscBrTBzoXMEPH9sQ@mail.gmail.com>
- <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
-In-Reply-To: <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com>
+ <e6fac6ab-07eb-4d8c-9206-bacf6660a7cf@www.fastmail.com> <Ydz1F/AqB1oO/qHF@mit.edu>
+In-Reply-To: <Ydz1F/AqB1oO/qHF@mit.edu>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 11 Jan 2022 14:06:17 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qw8hbbE2y56t7zygedofDDDLoPUxYWGZB_Kae0ipFARA@mail.gmail.com>
-Message-ID: <CAHmME9qw8hbbE2y56t7zygedofDDDLoPUxYWGZB_Kae0ipFARA@mail.gmail.com>
+Date:   Tue, 11 Jan 2022 14:16:30 +0100
+X-Gmail-Original-Message-ID: <CAHmME9o8FFLC3vvTN0cNzdzoYvBFwJMUCTaxOhnXfTaEELbBeg@mail.gmail.com>
+Message-ID: <CAHmME9o8FFLC3vvTN0cNzdzoYvBFwJMUCTaxOhnXfTaEELbBeg@mail.gmail.com>
 Subject: Re: [PATCH v43 01/15] Linux Random Number Generator
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+To:     "Theodore Ts'o" <tytso@mit.edu>
+Cc:     Andy Lutomirski <luto@kernel.org>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Simo Sorce <simo@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -93,22 +86,61 @@ Cc:     "Theodore Ts'o" <tytso@mit.edu>,
         Jirka Hladky <jhladky@redhat.com>,
         Eric Biggers <ebiggers@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andy,
+Hi Ted,
 
-On Tue, Jan 11, 2022 at 2:44 AM Andy Lutomirski <luto@kernel.org> wrote:
-> So let=E2=80=99s solve it for real.  Have a driver (in a module) that
+On Tue, Jan 11, 2022 at 4:12 AM Theodore Ts'o <tytso@mit.edu> wrote:
+> These are both dangerous.  The first means creating a new device node
+> which effectively is /dev/drbg-random which could be bind mounted or
+> mknod'ed to be /dev/urandom.  But if the user boots a kernel that
+> doesn't support this new device node, it will mean opening
+> /dev/urandom will get ENODEV.
+>
+> Similarly, getrandom(2) never fails.  By allowing a SELinux policy to
+> force it to fail with ENOSYS, or some other error, it means exposing
+> userspace code to a failure path that may not be as well tested.
+> Sure, *sane* code might fall back to opening /dev/urandom; but the
+> whole point of getrandom(2) was that it was a dumb, stupid interface
+> interface that could be safely used by application programmers.  Not
+> paranoid OS crypto engineers that carefully check the error returns of
+> all system calls, with appropriate fallbacks and making sure that code
+> always "fails safe".
+>
+> Right now, the enterprise distros are doing their own thing, and quite
+> frankly, I don't see a problem with that.
 
-Um, let's not. This really isn't something the kernel needs to solve
-here at all. There's a viable userspace solution. I see that the
-discussion of something finally slightly technical (as opposed to just
-compliance BS) has nerd sniped you a bit, but keep in mind what the
-actual overall picture is. This isn't something that needs to be done.
-My little CUSE thing (which I'm happy to develop out a bit more, even)
-has the intent of fulfilling a compliance checkbox and nothing more.
+I agree with you. I think enterprise distros ought to keep doing their
+own thing here, and there's a clear solution that does this in
+userspace, and also a pretty non-invasive patch from Marcelo to patch
+the crap into the kernel need be.
+
+I spent some time reading about FIPS certification, compliance, and
+the requirements of various customers. One thing in particular leapt
+out at me, which I think you've been saying over and over in this
+thread but I didn't fully understand until this morning:
+
+The goal is generally to have particular pieces of software or
+particular solutions FIPS certified. And to do this, they start from
+the top of the stack and move onward down. Most OSS software out there
+today isn't really FIPS ready and oftentimes a full solution needs
+modifications in one place or another. Other times, it's enough to
+plug in the right userspace crypto libraries. And I noticed in looking
+at things that are FIPS certified that random number generation tends
+to go through a userspace abstraction layer. And, it looks like these
+abstraction layers all have FIPS-able RNG hooks. You mentioned OpenSSL
+earlier, and it looks like even libgcrypt and wolfSSL have an
+abstraction layer for this.
+
+In other words, it's not even so clear that people who need FIPS
+compliance really need /dev/urandom and such to be FIPS compliant as
+part of that. And the ones who think they do for whatever security
+theater nonsense can happily load up that CUSE thing I made, apply a
+deliberately-downstream patch, or whatever other clever solution.
+
+So indeed it really doesn't seem like this is something the kernel
+needs to be doing.
 
 Jason
