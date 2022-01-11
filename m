@@ -2,121 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1B4C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 19:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7371FC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jan 2022 20:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240254AbiAKTxP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jan 2022 14:53:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48824 "EHLO
+        id S233179AbiAKUxy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 11 Jan 2022 15:53:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240201AbiAKTxO (ORCPT
+        with ESMTP id S244632AbiAKUxK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jan 2022 14:53:14 -0500
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860BEC061748
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 11:53:14 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id s127so572370oig.2
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jan 2022 11:53:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxtx.org; s=google;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Tjcdg3Ey3f8JqyyzT+Cl24fjuGmW4SbKqOF/PBidjqw=;
-        b=hi83Xs0ac2F2+QsZ7+i2Hvbx/N2A5elBXFw59+QgJjNTybr6QyoaM6Zfx7JgdZslxu
-         rYjHABxNI2z+2nxJQBInxUuqgV+q+FJc+NPZMSPAL/qaCRlnwZfY1+iWE+hugdo0Q3+j
-         jfNOQIMppS9rJOWHEeQkr+4yXDt0DhCdAzvp0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=Tjcdg3Ey3f8JqyyzT+Cl24fjuGmW4SbKqOF/PBidjqw=;
-        b=lUsPsXhwJ+gIFZnZ+N5+46KPbB5mat40uzZGXhuidii430HZIQNuCQ501hxB49rR5S
-         wsjr+DeA5fA3goNT7woBtf9RBSmFV7khx5WGSEBkhYCwFLY9rKnraAbZsTNmGkJUfEvh
-         1pSdgpRTrXripGF/gnt2N99R8j+8Q/ORDECWGsjetsvJHfr+cLEJbHIxsuFqQDlzjo/I
-         xMGIfie5L2o57quApVygW4xO0gBDwbG3xxIaZDudYsnbaf6V8PQyIkwfiVs0QLX9z9kl
-         dISEfYFx6L5VsiUlPXA4sFUc289oEvKun1R1iXbCTdKo5J7LGtYc6aXvr8K4bPm4WfDX
-         kvzA==
-X-Gm-Message-State: AOAM5338A2ul+yVQv/QqjWhPCt76DRUPhBFb/9wuBRoxubM4xs8ZlNS+
-        TLKKgiSoHgyXVL+sFRLdeAgkNw==
-X-Google-Smtp-Source: ABdhPJx4/yEP3bceehG7/01WrYo9pOVIDHPGvoHXeK1GTaH4YVVWOuoHDy92ZZExzuMV5qgkl5CD0g==
-X-Received: by 2002:a05:6808:169f:: with SMTP id bb31mr3002278oib.87.1641930793777;
-        Tue, 11 Jan 2022 11:53:13 -0800 (PST)
-Received: from fedora64.linuxtx.org (104-189-158-32.lightspeed.rcsntx.sbcglobal.net. [104.189.158.32])
-        by smtp.gmail.com with ESMTPSA id bb20sm2178310oob.4.2022.01.11.11.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jan 2022 11:53:12 -0800 (PST)
-Sender: Justin Forbes <jmforbes@linuxtx.org>
-From:   "Justin M. Forbes" <jforbes@fedoraproject.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 11 Jan 2022 15:53:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E6F4C03400A;
+        Tue, 11 Jan 2022 12:53:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 812B5616B7;
+        Tue, 11 Jan 2022 20:53:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 548BCC36AEF;
+        Tue, 11 Jan 2022 20:53:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641934390;
+        bh=jxUZ606xjHrygy5OsIYobq3FoIFdtp2RDbu5bAsla3Q=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=D87y6895m5UlKBGi3p/oY9+BEo+9XDdwGOoeRv8aUTIo08rN3b3aagHZdY2ekU7tE
+         5QGiwhSthYtLuP9M+TokPvnzWy3kbH0jZnDr4j3CXT+3nu4OmMSnpXskOTbPJmmB3A
+         yepxsOrv1i0U+9oo1TTV6Cyy6vrHySxS7rdqWS+rbBMAihGhozBmnTlT5cN3U6eLE6
+         iE8daQ6tphrpjVCz3BxjBes9rO0HDzF8c5cCIzX4PO2WVirQEEWnJmvALmaJ560rpc
+         F5tTy28znACMcLO/zFitB5bbybnn9E6dy2fNKf4GRKlJFsoQvQRO6bdZzyIYdTbi9w
+         3xHvo9kuQMsTw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43D98F6078C;
+        Tue, 11 Jan 2022 20:53:10 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 5.17
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Ydzlo+UmL5bbDgUZ@gondor.apana.org.au>
+References: <20200803044024.GA6429@gondor.apana.org.au>
+ <20201012033249.GA25179@gondor.apana.org.au>
+ <20201214055515.GA14196@gondor.apana.org.au>
+ <20210215024721.GA20593@gondor.apana.org.au>
+ <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au>
+ <20210628110050.GA12162@gondor.apana.org.au>
+ <20210830082818.GA30921@gondor.apana.org.au>
+ <20211102035201.GA23331@gondor.apana.org.au> <Ydzlo+UmL5bbDgUZ@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Ydzlo+UmL5bbDgUZ@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 5f21d7d283dd82865bdb0123795b3accf0d42b67
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5c947d0dbae8038ec1c8b538891f6475350542ee
+Message-Id: <164193439027.11435.3994810490249594244.pr-tracker-bot@kernel.org>
+Date:   Tue, 11 Jan 2022 20:53:10 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     jmforbes@linuxtx.org,
-        "Justin M. Forbes" <jforbes@fedoraproject.org>
-Subject: [PATCH] lib/crypto: add prompts back to crypto libraries
-Date:   Tue, 11 Jan 2022 13:53:08 -0600
-Message-Id: <20220111195309.634965-1-jforbes@fedoraproject.org>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in") took
-away a number of prompt texts from other crypto libraries. This makes
-values flip from built-in to module when oldconfig runs, and causes
-problems when these crypto libs need to be built in for thingslike
-BIG_KEYS.
+The pull request you sent on Tue, 11 Jan 2022 13:04:19 +1100:
 
-Fixes: 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
-Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
----
- lib/crypto/Kconfig | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 8620f38e117c..a3e41b7a8054 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -40,7 +40,7 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 	  of CRYPTO_LIB_CHACHA.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5c947d0dbae8038ec1c8b538891f6475350542ee
 
- config CRYPTO_LIB_CHACHA
--	tristate
-+	tristate "ChaCha library interface"
- 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
- 	help
-@@ -65,7 +65,7 @@ config CRYPTO_LIB_CURVE25519_GENERIC
- 	  of CRYPTO_LIB_CURVE25519.
+Thank you!
 
- config CRYPTO_LIB_CURVE25519
--	tristate
-+	tristate "Curve25519 scalar multiplication library"
- 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
- 	help
-@@ -100,7 +100,7 @@ config CRYPTO_LIB_POLY1305_GENERIC
- 	  of CRYPTO_LIB_POLY1305.
-
- config CRYPTO_LIB_POLY1305
--	tristate
-+	tristate "Poly1305 library interface"
- 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
- 	help
-@@ -109,7 +109,7 @@ config CRYPTO_LIB_POLY1305
- 	  is available and enabled.
-
- config CRYPTO_LIB_CHACHA20POLY1305
--	tristate
-+	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
- 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_CHACHA
 -- 
-2.34.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
