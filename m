@@ -2,36 +2,36 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1534EC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 21:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B80C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 21:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230376AbiALVUj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 16:20:39 -0500
-Received: from mga03.intel.com ([134.134.136.65]:1419 "EHLO mga03.intel.com"
+        id S230236AbiALVUn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Jan 2022 16:20:43 -0500
+Received: from mga03.intel.com ([134.134.136.65]:1421 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230079AbiALVUi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 16:20:38 -0500
+        id S229491AbiALVUk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jan 2022 16:20:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642022438; x=1673558438;
+  t=1642022439; x=1673558439;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=Z3pTsdcyEg0Cysyg0rQo7WWdsgj62MRS390COBMyxXg=;
-  b=fkohOsODes00MtZzl37c159Bnh6KavbyVJ7KM61a61zSfXtGRfifJHs7
-   FRlQr10HMUaH9NVDhjrRNBoZNhW8wE4J2kCmn0YAUkQWUbWs7kSo4mMYm
-   uIIYvM9JwvEt+lQUUsMuCBHpY57yKwscTgzg1sMpc46vl7lmJE9fHxGLn
-   d0uv+2RsLNqQmSCeURnuZ+8TUek4AyOmuPK81H09ZqY+71za3JtVzzNCr
-   oKTVaEjaHcQ7KDTc9Fbs//pKfNNljPoHTckHK2dx1cJpOjVtkqMBkhVYM
-   uj6hWiSZJ3MLjwXubFtb2EpA4TgReUdMaKDueAhPFpo6xUKgzY6NcVFR6
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="243810785"
+  bh=uMdyd1hrRDyMtoQYh1kBM7Wy2V/+iZZTwUP9+ypguzw=;
+  b=ENZqBzDR2ng3TdNCO5NLUXe4oltU1ihT62RzJM/oZ8D8XBoriCJeoLyD
+   OTno4tU1AAJXbfkRStk2NI0Qf4EhupfDDXvMThKQPU87AChThyrmCuMXL
+   p9yf12VHvOGYPewRQEXkLE6SxvfRlJKyliLQOig18P6YX5LtvaaBTX3pb
+   hOpAAw3oNIudd9R72kpxmhxlDPoDmdmh+25w9sWRF/bIb4+6OjRu4tAqK
+   eULvHJPD1UFkQ5VQ+EpIfFw6o0nVyKd5sqFWBK4gSsw5Izci/8Ixpz+SC
+   ZoPwLHao1F+pQBI0cYJRfIr5euOAK6JAsUJ9ESlpHQDaQmr4sAt3ZynP6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="243810788"
 X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="243810785"
+   d="scan'208";a="243810788"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 13:20:38 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 13:20:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="529378229"
+   d="scan'208";a="529378239"
 Received: from chang-linux-3.sc.intel.com ([172.25.66.175])
   by orsmga008.jf.intel.com with ESMTP; 12 Jan 2022 13:20:38 -0800
 From:   "Chang S. Bae" <chang.seok.bae@intel.com>
@@ -42,9 +42,9 @@ To:     linux-crypto@vger.kernel.org, dm-devel@redhat.com,
 Cc:     linux-kernel@vger.kernel.org, dan.j.williams@intel.com,
         charishma1.gairuboyina@intel.com, kumar.n.dwarakanath@intel.com,
         ravi.v.shankar@intel.com, chang.seok.bae@intel.com
-Subject: [PATCH v5 02/12] x86/cpufeature: Enumerate Key Locker feature
-Date:   Wed, 12 Jan 2022 13:12:48 -0800
-Message-Id: <20220112211258.21115-3-chang.seok.bae@intel.com>
+Subject: [PATCH v5 04/12] x86/asm: Add a wrapper function for the LOADIWKEY instruction
+Date:   Wed, 12 Jan 2022 13:12:50 -0800
+Message-Id: <20220112211258.21115-5-chang.seok.bae@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220112211258.21115-1-chang.seok.bae@intel.com>
 References: <20220112211258.21115-1-chang.seok.bae@intel.com>
@@ -52,24 +52,16 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Key Locker is a CPU feature to minimize exposure of clear-text key
-material. An encoded form, called 'key handle', is referenced for data
-encryption or decryption instead of accessing the clear text key.
+Key Locker introduces a CPU-internal wrapping key to encode a user key to a
+key handle. Then a key handle is referenced instead of the plain text key.
 
-A wrapping key loaded in the CPU's software-inaccessible state is used to
-transform a user key into a key handle.
+The new instruction loads an internal wrapping key in the
+software-inaccessible CPU state. It operates only in kernel mode.
 
-It supports Advanced Encryption Standard (AES) cipher algorithm with new
-SIMD instruction set like its predecessor (AES-NI). So a new AES
-implementation will follow in the kernel's crypto library.
+Define struct iwkey to pass the key value.
 
-Here add it to enumerate the hardware capability, but it will not be
-shown in /proc/cpuinfo as userspace usage is not supported.
-
-Make the feature depend on XMM2 as it comes with AES SIMD instructions.
-
-Add X86_FEATURE_KEYLOCKER to the disabled features mask. It will be
-enabled under a new config option.
+The kernel will use this function to load a new key at boot time when the
+feature is enabled.
 
 Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
 Reviewed-by: Dan Williams <dan.j.williams@intel.com>
@@ -77,81 +69,100 @@ Cc: x86@kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
 Changes from RFC v2:
-* Do not publish the feature flag to userspace.
-* Update the changelog.
+* Separate out the code as a new patch.
+* Improve the usability with the new struct as an argument. (Dan
+Williams)
 
-Changes from RFC v1:
-* Updated the changelog.
+Note, Dan wondered if:
+  WARN_ON(!irq_fpu_usable());
+would be appropriate in the load_xmm_iwkey() function.
 ---
- arch/x86/include/asm/cpufeatures.h          | 1 +
- arch/x86/include/asm/disabled-features.h    | 8 +++++++-
- arch/x86/include/uapi/asm/processor-flags.h | 2 ++
- arch/x86/kernel/cpu/cpuid-deps.c            | 1 +
- 4 files changed, 11 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/keylocker.h     | 25 ++++++++++++++++++++++
+ arch/x86/include/asm/special_insns.h | 32 ++++++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
+ create mode 100644 arch/x86/include/asm/keylocker.h
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index d5b5f2ab87a0..e1964446bbe5 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -361,6 +361,7 @@
- #define X86_FEATURE_AVX512_VPOPCNTDQ	(16*32+14) /* POPCNT for vectors of DW/QW */
- #define X86_FEATURE_LA57		(16*32+16) /* 5-level page tables */
- #define X86_FEATURE_RDPID		(16*32+22) /* RDPID instruction */
-+#define X86_FEATURE_KEYLOCKER		(16*32+23) /* "" Key Locker */
- #define X86_FEATURE_BUS_LOCK_DETECT	(16*32+24) /* Bus Lock detect */
- #define X86_FEATURE_CLDEMOTE		(16*32+25) /* CLDEMOTE instruction */
- #define X86_FEATURE_MOVDIRI		(16*32+27) /* MOVDIRI instruction */
-diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
-index 8f28fafa98b3..75e1e87640d4 100644
---- a/arch/x86/include/asm/disabled-features.h
-+++ b/arch/x86/include/asm/disabled-features.h
-@@ -44,6 +44,12 @@
- # define DISABLE_OSPKE		(1<<(X86_FEATURE_OSPKE & 31))
- #endif /* CONFIG_X86_INTEL_MEMORY_PROTECTION_KEYS */
- 
-+#ifdef CONFIG_X86_KEYLOCKER
-+# define DISABLE_KEYLOCKER	0
-+#else
-+# define DISABLE_KEYLOCKER	(1<<(X86_FEATURE_KEYLOCKER & 31))
-+#endif /* CONFIG_X86_KEYLOCKER */
+diff --git a/arch/x86/include/asm/keylocker.h b/arch/x86/include/asm/keylocker.h
+new file mode 100644
+index 000000000000..df84c83228a1
+--- /dev/null
++++ b/arch/x86/include/asm/keylocker.h
+@@ -0,0 +1,25 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +
- #ifdef CONFIG_X86_5LEVEL
- # define DISABLE_LA57	0
- #else
-@@ -85,7 +91,7 @@
- #define DISABLED_MASK14	0
- #define DISABLED_MASK15	0
- #define DISABLED_MASK16	(DISABLE_PKU|DISABLE_OSPKE|DISABLE_LA57|DISABLE_UMIP| \
--			 DISABLE_ENQCMD)
-+			 DISABLE_ENQCMD|DISABLE_KEYLOCKER)
- #define DISABLED_MASK17	0
- #define DISABLED_MASK18	0
- #define DISABLED_MASK19	0
-diff --git a/arch/x86/include/uapi/asm/processor-flags.h b/arch/x86/include/uapi/asm/processor-flags.h
-index bcba3c643e63..b958a95a0908 100644
---- a/arch/x86/include/uapi/asm/processor-flags.h
-+++ b/arch/x86/include/uapi/asm/processor-flags.h
-@@ -124,6 +124,8 @@
- #define X86_CR4_PCIDE		_BITUL(X86_CR4_PCIDE_BIT)
- #define X86_CR4_OSXSAVE_BIT	18 /* enable xsave and xrestore */
- #define X86_CR4_OSXSAVE		_BITUL(X86_CR4_OSXSAVE_BIT)
-+#define X86_CR4_KEYLOCKER_BIT	19 /* enable Key Locker */
-+#define X86_CR4_KEYLOCKER	_BITUL(X86_CR4_KEYLOCKER_BIT)
- #define X86_CR4_SMEP_BIT	20 /* enable SMEP support */
- #define X86_CR4_SMEP		_BITUL(X86_CR4_SMEP_BIT)
- #define X86_CR4_SMAP_BIT	21 /* enable SMAP support */
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index c881bcafba7d..abe7e04b27d9 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -78,6 +78,7 @@ static const struct cpuid_dep cpuid_deps[] = {
- 	{ X86_FEATURE_XFD,			X86_FEATURE_XSAVES    },
- 	{ X86_FEATURE_XFD,			X86_FEATURE_XGETBV1   },
- 	{ X86_FEATURE_AMX_TILE,			X86_FEATURE_XFD       },
-+	{ X86_FEATURE_KEYLOCKER,		X86_FEATURE_XMM2      },
- 	{}
- };
++#ifndef _ASM_KEYLOCKER_H
++#define _ASM_KEYLOCKER_H
++
++#ifndef __ASSEMBLY__
++
++#include <asm/fpu/types.h>
++
++/**
++ * struct iwkey - A temporary internal wrapping key storage.
++ * @integrity_key:	A 128-bit key to check that key handles have not
++ *			been tampered with.
++ * @encryption_key:	A 256-bit encryption key used in
++ *			wrapping/unwrapping a clear text key.
++ *
++ * This storage should be flushed immediately after loaded.
++ */
++struct iwkey {
++	struct reg_128_bit integrity_key;
++	struct reg_128_bit encryption_key[2];
++};
++
++#endif /*__ASSEMBLY__ */
++#endif /* _ASM_KEYLOCKER_H */
+diff --git a/arch/x86/include/asm/special_insns.h b/arch/x86/include/asm/special_insns.h
+index 68c257a3de0d..3e50d8396ee1 100644
+--- a/arch/x86/include/asm/special_insns.h
++++ b/arch/x86/include/asm/special_insns.h
+@@ -9,6 +9,7 @@
+ #include <asm/processor-flags.h>
+ #include <linux/irqflags.h>
+ #include <linux/jump_label.h>
++#include <asm/keylocker.h>
  
+ /*
+  * The compiler should not reorder volatile asm statements with respect to each
+@@ -294,6 +295,37 @@ static inline int enqcmds(void __iomem *dst, const void *src)
+ 	return 0;
+ }
+ 
++/**
++ * load_xmm_iwkey - Load a CPU-internal wrapping key
++ * @key:	A struct iwkey pointer.
++ *
++ * Load @key to XMMs then do LOADIWKEY. After this, flush XMM
++ * registers. Caller is responsible for kernel_cpu_begin().
++ */
++static inline void load_xmm_iwkey(struct iwkey *key)
++{
++	struct reg_128_bit zeros = { 0 };
++
++	asm volatile ("movdqu %0, %%xmm0; movdqu %1, %%xmm1; movdqu %2, %%xmm2;"
++		      :: "m"(key->integrity_key), "m"(key->encryption_key[0]),
++			 "m"(key->encryption_key[1]));
++
++	/*
++	 * LOADIWKEY %xmm1,%xmm2
++	 *
++	 * EAX and XMM0 are implicit operands. Load a key value
++	 * from XMM0-2 to a software-invisible CPU state. With zero
++	 * in EAX, CPU does not do hardware randomization and the key
++	 * backup is allowed.
++	 *
++	 * This instruction is supported by binutils >= 2.36.
++	 */
++	asm volatile (".byte 0xf3,0x0f,0x38,0xdc,0xd1" :: "a"(0));
++
++	asm volatile ("movdqu %0, %%xmm0; movdqu %0, %%xmm1; movdqu %0, %%xmm2;"
++		      :: "m"(zeros));
++}
++
+ #endif /* __KERNEL__ */
+ 
+ #endif /* _ASM_X86_SPECIAL_INSNS_H */
 -- 
 2.17.1
 
