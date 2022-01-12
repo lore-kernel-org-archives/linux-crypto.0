@@ -2,75 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95063C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 14:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8102C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 14:06:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242790AbiALOFr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 09:05:47 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:43914 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353989AbiALOFj (ORCPT
+        id S233944AbiALOG4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Jan 2022 09:06:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42142 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242320AbiALOGy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 09:05:39 -0500
+        Wed, 12 Jan 2022 09:06:54 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AC8C06173F;
+        Wed, 12 Jan 2022 06:06:53 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3FBBE6123A;
-        Wed, 12 Jan 2022 14:05:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 664A4C36AEA;
-        Wed, 12 Jan 2022 14:05:38 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TTQd4tcr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1641996336;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=P2Onz98c+33+SDzjnajzIgrO/ZHgm9HXNCXoG5KboUk=;
-        b=TTQd4tcrhmezqnVhlpvOnr9kcn7P3fAVbx/pO0J0grvtGhYLUs3CbRXWujnCvnErbKMGW6
-        Wyq+NeuLONXq4wwfCFu9ZENOYDHJ94fI99lr5yBoOF2o7Hi7odDW8zOo3QN6Vt0Mfgm4OR
-        KDx3XmPgq7C/C1QuZ/bYwuCyhHmlf+0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id eceb28fd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 12 Jan 2022 14:05:36 +0000 (UTC)
-Received: by mail-yb1-f173.google.com with SMTP id c10so6714539ybb.2;
-        Wed, 12 Jan 2022 06:05:36 -0800 (PST)
-X-Gm-Message-State: AOAM531jf1Yu7CM21XcHwtT4y0wr65G4oCu48BrNEDU8l92k56+WFDU2
-        gsGgRxxpmeJgHWuOYZc2ij0+hblZb1vT87yHjkg=
-X-Google-Smtp-Source: ABdhPJzay9qb9mCewfSQngccVDC+2AePoYkiOhkebHRX2mcSgbGmPEXQ/2AeRLpPEHg/3ndaeZJqOgUmtAHqwJ+thmQ=
-X-Received: by 2002:a25:f90d:: with SMTP id q13mr13228018ybe.32.1641996334980;
- Wed, 12 Jan 2022 06:05:34 -0800 (PST)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A2F13B81ED1;
+        Wed, 12 Jan 2022 14:06:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B7BEC36AEC;
+        Wed, 12 Jan 2022 14:06:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641996411;
+        bh=XeWqqmHv7DaVDwvPm45183RGLYC5+G8jXC9gcgvklT0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=BmAMgoEyRHOMBJTdG81NR7h0+4zORv3xaXLPHSiMgWs06Yvemej245HrP16P2yi4A
+         HLEPclYkljVwx7IPGCLkE55OmonO0IixKxNqK9w+5hED+CQTx59OA21+2/4H7/4kBN
+         ZU5c5QRDuiq+S1+EQCYXiCm7jhi4fn61IP1XZ0Z2ZwBiDwnhE4PKSwOe+BplHXKcMq
+         w2oi2iUJ8y5P/JSwRhJVH5qNCfuJMjzKGWjuA80JZ6YD157Q6t7DVKPfPg9KZV65BJ
+         Yk5lsDhVw0itcq1t80uTK5XH2u4MY29UshSUBlt5jBCIbWJkeg/opxWijNnP2EKhbe
+         APYgRz8AGyYTQ==
+Received: by mail-wr1-f43.google.com with SMTP id o3so4419638wrh.10;
+        Wed, 12 Jan 2022 06:06:51 -0800 (PST)
+X-Gm-Message-State: AOAM5305HJw2289rNTx53FgyV44HhtCVUarkeNw7Z9PrvUEpn6MY+LGF
+        Adoh9W/tTTWgr0vnAX4rq6UtCPYcKmcHIxtWFa0=
+X-Google-Smtp-Source: ABdhPJzMg/dYqM+qFxN69BHU93/XPfoqB+ISoSFHB3s9PJqmRrnr2z4t/8deOXPBIuvvHkZdMLh837Tk+4TyZkCNtcU=
+X-Received: by 2002:a5d:4087:: with SMTP id o7mr8248312wrp.189.1641996409856;
+ Wed, 12 Jan 2022 06:06:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20220111195309.634965-1-jforbes@fedoraproject.org>
- <CAHmME9pi1Y7urg1VQeCi7L6MxHRUk5g4wc6VKDywo4yPh9h_6w@mail.gmail.com>
- <CAMj1kXH24ubv7yAqmbnzqe22cGh1L0-N8J6fiCT2NgU2HmeBJw@mail.gmail.com>
- <CAHmME9qXg3_HdnDwN-LOBJQhxz4acYCjgQhXRovQ6-9TWwHwWQ@mail.gmail.com>
- <CAMj1kXFybcnneHwpvKYNnK0F3t48kqDpV-RKLgR1A+w4QbUxTg@mail.gmail.com>
- <CAFxkdAoC_Ap7YWqE5PLXczfk9YivuWPk5K303DuTuj9B8keERg@mail.gmail.com> <CAHmME9o+J_xPWBXAmFPAubO08Un-7vhXf5uJn2Zj8hoYu9NyfQ@mail.gmail.com>
-In-Reply-To: <CAHmME9o+J_xPWBXAmFPAubO08Un-7vhXf5uJn2Zj8hoYu9NyfQ@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 12 Jan 2022 15:05:24 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rb-QNnEKnuw5ELtA_UuxmVar1UTuO6VJKTE=T-xqFTvw@mail.gmail.com>
-Message-ID: <CAHmME9rb-QNnEKnuw5ELtA_UuxmVar1UTuO6VJKTE=T-xqFTvw@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: add prompts back to crypto libraries
-To:     Justin Forbes <jmforbes@linuxtx.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
+References: <20220112140137.728162-1-jforbes@fedoraproject.org> <CAHmME9rJFVeWL=SFTkM8=+2te_GnH4n-THH+F3p5mnHfCkhZ4w@mail.gmail.com>
+In-Reply-To: <CAHmME9rJFVeWL=SFTkM8=+2te_GnH4n-THH+F3p5mnHfCkhZ4w@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 12 Jan 2022 15:06:38 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHubNk3gRTOmD1rOCifCUE4O6=TvNr_XhP1tNcCBuzfBQ@mail.gmail.com>
+Message-ID: <CAMj1kXHubNk3gRTOmD1rOCifCUE4O6=TvNr_XhP1tNcCBuzfBQ@mail.gmail.com>
+Subject: Re: [PATCH v2] lib/crypto: add prompts back to crypto libraries
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "Justin M. Forbes" <jforbes@fedoraproject.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
+        Justin Forbes <jmforbes@linuxtx.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 2:59 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Wed, 12 Jan 2022 at 15:05, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> I think I've actually got a patch for the root problem here. Testing
-> now and it should be out shortly.
+> This commit also needs this snippet:
+>
 
-Actually, scratch that, it's a lot harder than I anticipated. I just
-saw your v2. Let's roll with that. Sent you a note there for a v3.
+Why?
 
-Jason
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 94bfa32cc6a1..442765219c37 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1928,5 +1928,3 @@ source "crypto/asymmetric_keys/Kconfig"
+>  source "certs/Kconfig"
+>
+>  endif # if CRYPTO
+> -
+> -source "lib/crypto/Kconfig"
+> diff --git a/lib/Kconfig b/lib/Kconfig
+> index 655b0e43f260..c20b68ad2bc3 100644
+> --- a/lib/Kconfig
+> +++ b/lib/Kconfig
+> @@ -122,6 +122,8 @@ config INDIRECT_IOMEM_FALLBACK
+>     mmio accesses when the IO memory address is not a registered
+>     emulated region.
+>
+> +source "lib/crypto/Kconfig"
+> +
+>  config CRC_CCITT
+>   tristate "CRC-CCITT functions"
+>   help
