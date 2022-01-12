@@ -2,68 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 852EDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 15:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDE9C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 16:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244670AbiALPuY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 10:50:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354833AbiALPtw (ORCPT
+        id S1354913AbiALQFE (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Jan 2022 11:05:04 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:40809 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349654AbiALQFD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 10:49:52 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D65C06173F;
-        Wed, 12 Jan 2022 07:49:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C3CBAB81F71;
-        Wed, 12 Jan 2022 15:49:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24404C36AEC;
-        Wed, 12 Jan 2022 15:49:49 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QpBtYbI9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642002586;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pshnUO5xYpkkdXPtgf9tc4a2VXTQic0G5jxH023mrV0=;
-        b=QpBtYbI90gDkx694sKwf4xo7OSjyDeiyrChbl+ipUVkvWshdRDyxB1SB1U0KDpBIiIH0Y0
-        SFap77Q61vWVUHkea8rOWo5hqErKENXaqfcKhUROpCxPJAStailtvU1ypErepvgrmIyhnu
-        +8ZlOGzt1uOmdMFt1+fpoYGnUl4VrJs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 223ff93e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 12 Jan 2022 15:49:46 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id p5so7474998ybd.13;
-        Wed, 12 Jan 2022 07:49:45 -0800 (PST)
-X-Gm-Message-State: AOAM533/Ei4BTlJlJw5Rj25MgUYFAya+pR0ooHQ5YJEHtkS1tltQZERP
-        wDDYz+n/ti37qwhYd2cXMlD959HPCNwZwV+IUtI=
-X-Google-Smtp-Source: ABdhPJwVyAaXipSkjfhiFQhM7/wC2UupGS2Wv7UVpd1PBvAYip0LDwtp6/NNMx557OIKy+4x0swc/ZlfSyvEsLyEQ1E=
-X-Received: by 2002:a25:f90d:: with SMTP id q13mr397640ybe.32.1642002584806;
- Wed, 12 Jan 2022 07:49:44 -0800 (PST)
+        Wed, 12 Jan 2022 11:05:03 -0500
+Received: from mail-wr1-f51.google.com ([209.85.221.51]) by
+ mrelayeu.kundenserver.de (mreue012 [213.165.67.97]) with ESMTPSA (Nemesis) id
+ 1MUTxo-1mymAW3XSi-00QX2d; Wed, 12 Jan 2022 17:05:00 +0100
+Received: by mail-wr1-f51.google.com with SMTP id d19so5218282wrb.0;
+        Wed, 12 Jan 2022 08:05:00 -0800 (PST)
+X-Gm-Message-State: AOAM532fEFC7+q8fAs2J4GS8beF+63w22k222x57JixMLXUiFv5jaCFK
+        0FM5r9StM58LN6Pfdxq7JFi8DSFYuKHz4c6I/jo=
+X-Google-Smtp-Source: ABdhPJwxDiNjuYbWLVY7t/HnE/b6lwh+fnY5dRvYsPdOtZoOHc+AaageW7dUz2/7e+9onzGuGMB9DjgqyRi5twekUIc=
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr352566wrw.219.1642003500106;
+ Wed, 12 Jan 2022 08:05:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-3-Jason@zx2c4.com>
-In-Reply-To: <20220112131204.800307-3-Jason@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 12 Jan 2022 16:49:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9p1NXemJnpZ07fAzkMMa-nQ4cBoQYP_Y+FpNFao0S5t_A@mail.gmail.com>
-Message-ID: <CAHmME9p1NXemJnpZ07fAzkMMa-nQ4cBoQYP_Y+FpNFao0S5t_A@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
-To:     Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+References: <266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be>
+ <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
+In-Reply-To: <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 12 Jan 2022 17:04:43 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com>
+Message-ID: <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com>
+Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
+To:     Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Joseph Longever <jlongever@marvell.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:b5qf4fSrYaOSl0TY/67lJGFRyt7/kIn9f92D3rCPV0N+4k1YFSI
+ ctF3btkrrmxhGf1ZD/EiK1+MfXbjSeJlK3YKpBkxpX2nnma+YSe1/QOeGg1/jL9kYooxPse
+ oxZS20NSOOxw+J9Ku+3q7FUhbQ+H+DQE8Rgidt3V8NzKNfbrqTdZfEXYYYBRfwy+tEK4WN+
+ yziu4hm7pRzVTJ4NgWkGQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CK+vVeUYYN8=:uYVV6LTf5d6eyPfRqYdKfx
+ fLTpQ7Tpj0AzMYab02YykBYox8A2CDqoEQjlDLhc5iNhZkkJF5Z5BBDf5iRT/y1E1Hg0KCmMU
+ JVCav3x9+9eBMTlS1hK9pfSWlbYvU6UwfHG2kpZ3dimeMqu899umOOy14tezlFInENOl1U5Ab
+ iAU+G/X9lv9W7BvT1dAMvBuaTFLkIkZg3OUQraSPuVF2qdioK5KjKgnMXbA1FS5lbrCuovfrF
+ GZtE6FjHZyZEiaZ6kwEcjyAwi5IpG3sbxX9ZX8evw8CD/U4EUe6VkCJ1knwydwIAMWGTNm5e9
+ Bh6apuCCy2EbUjqfXtAj1SteBQq4aDOtYvJWehrjxhap5L6eGvwpENtKPUSRLB6UrQAeHs9x2
+ b/5sXEQ/uWGfrXa19CPwvcg3W8rcWU2HODHKRAqDmevwmXwVJnCuw5naSvq46dKRrPcuYvuBR
+ y4iip5733G9vFd/pKJGHzL6L5Rh9bp/RsVURhCIICiO39LZulxi/S32YVzQPr7PNvFvB8g3g3
+ 5H9tAniSagpDLfU7nnPwXDtMcQ7tyONc9gZxVHFAZ2a9bc8FT0ufEY0ZqCf2eNnRxWdF56qQt
+ vVSmBmh9N6ZWDFABbONDu1+S5Id9jtxx6cjlfB1IcQS4kJPZ/6/pBiibx/KTi4SuWHtbM/Azu
+ DE3+jL2bujdaWKeX3no1RxtHFQhkmiqKad6OoYC0q8tKE36djBajWHuzDtEKQY3LH8Y4=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For the record, I've been able to simplify this even more in my
-remove-sha1 branch: https://git.zx2c4.com/linux-dev/log/?h=remove-sha1
-. We no longer need the packed struct and we handle that secret a bit
-better too. If this patchset moves onto a non-RFC v2, that'll be part
-of it.
+On Wed, Jan 12, 2022 at 4:55 PM Sunil Kovvuri Goutham
+<sgoutham@marvell.com> wrote:
+>
+> >From: Geert Uytterhoeven <geert+renesas@glider.be>
+> >Sent: Wednesday, January 12, 2022 7:33 PM
+> >To: Herbert Xu <herbert@gondor.apana.org.au>; Sunil Kovvuri Goutham <sgoutham@marvell.com>; Bharat Bhushan <bbhushan2@marvell.com>; Joseph Longever <jlongever@marvell.com>
+> >Cc: Arnd Bergmann <arnd@arndb.de>; linux-crypto@vger.kernel.org <linux-crypto@vger.kernel.org>; linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>; Geert Uytterhoeven <geert+renesas@glider.be>
+> >Subject: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
+>
+> >The Marvell CN10K True Random Number generator is only present on
+> >Marvell CN10K SoCs, and not available as an independent PCIe endpoint.
+> >Hence add a dependency on ARCH_THUNDER, to prevent asking the user about
+> >this driver when configuring a kernel without Cavium Thunder (incl.
+> >Marvell CN10K) SoC support.
+> >
+> >Fixes: 38e9791a02090414 ("hwrng: cn10k - Add random number generator support")
+> >Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> >---
+> >drivers/char/hw_random/Kconfig | 2 +-
+> > 1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> >diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> >index c91cb48a1db168dd..b33c01e9935336f7 100644
+> >--- a/drivers/char/hw_random/Kconfig
+> >+++ b/drivers/char/hw_random/Kconfig
+> >@@ -540,7 +540,7 @@ config HW_RANDOM_ARM_SMCCC_TRNG
+> >
+> > config HW_RANDOM_CN10K
+> >        tristate "Marvell CN10K Random Number Generator support"
+> >-       depends on HW_RANDOM && PCI && ARM64
+> >+       depends on HW_RANDOM && PCI && ARCH_THUNDER
+> >        default HW_RANDOM
+> >        help
+> >          This driver provides support for the True Random Number
+>
+> Nack.
+> ARCH_THUNDER/THUNDER2 are old Cavium server class silicon series
+> which are not related to Marvell CN10K silicon.
+
+Can you tell me where you would draw the line? Based on a discussion we had on
+IRC, I was going to send a patch to rename ARCH_THUNDER to ARCH_OCTEON
+and clarify how it relates to the other families. Here is what I
+understood it should be:
+
+config ARCH_OCTEON
+        bool "Marvell OCTEON and ThunderX data processing units"
+        help
+          This enables support for Marvell (formerly Cavium) OCTEON
+          Family of DPUs and SoCs, including OCTEON 10, Octeon TX2
+          CN92xx/CN96xx/CN98xx, OcteonTX CN8xxx, ThunderX CN88xx, and
+          Octeon Fusion products.
+
+          Note: these are unrelated to the similarly named ThunderX2
+          CN99xx server processors, the Octeon TX2 91xx SoCs and the
+          Armada processors.
+
+config ARCH_THUNDER2
+        bool "Marvell/Cavium ThunderX2 Server Processors"
+        select GPIOLIB
+        help
+          This enables support for Marvell's discontinued ThunderX2
+          CN99XX family of server processors, originally sold by Cavium.
+
+          Note: these do not include the unrelated ThunderX CN88xx or
+          OCTEON TX2 processors, despite the similarities in naming.
+
+config ARCH_MVEBU
+        bool "Marvell EBU SoC Family"
+        help
+          This enables support for Marvell EBU familly, including:
+           - Armada 3700 SoC Family
+           - Armada 7K SoC Family
+           - Armada 8K SoC Family
+           - Octeon TX2 CN91xx Family
+
+If that's not the correct interpretation, does that mean that OCTEON 10
+and Octeon TX2 CN92xx/CN96xx/CN98xx are a different family from
+Octeon/TX CN8xxx and ThunderX CN88xx and should have a fourth
+symbol, or are they part of the Armada family?
+
+
+      Arnd
