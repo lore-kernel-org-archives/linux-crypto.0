@@ -2,98 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6040AC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 23:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97562C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 23:34:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235447AbiALXcA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 18:32:00 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:38234 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235421AbiALXb6 (ORCPT
+        id S235500AbiALXe6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Jan 2022 18:34:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235421AbiALXe5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 18:31:58 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C4165B82188;
-        Wed, 12 Jan 2022 23:31:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF377C36AF2;
-        Wed, 12 Jan 2022 23:31:54 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TfsWPvgX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642030311;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hstk73wuIKZWiikWlym2h0bIC3qGMXsXWymKJtQh5ys=;
-        b=TfsWPvgXekG/1IVjr0hbJSZ9+mLRmpbL5U4Eq5MjE6/kba79M6pIMbxIGKKGDgv+Fejvya
-        lfNJJqkjkmxJF2zUmC1gjt9u4ZNPb03bc2K4K3oMolN6Afn8kHPhERaS36Mo55OKhZaDbC
-        SVR4F0lYxwTH+iea5Wziem4LXnxE0Ag=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 98d0b2c9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 12 Jan 2022 23:31:51 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id g81so10029968ybg.10;
-        Wed, 12 Jan 2022 15:31:50 -0800 (PST)
-X-Gm-Message-State: AOAM530uzYfmi2peL82YFOSG8xY1Xco12LXAEhmpO+RXbxM3c4TrVSVX
-        xcSzhkr9wCVapmmnvKnos4oLPlpMxmXAUdRG7So=
-X-Google-Smtp-Source: ABdhPJxqG3O8kUM3OYzd+VIHfE/yG6UzHPq2cANRI+RCJfa44HWXEDoNmTxlpM0TKv/14nigRVPki5q61d4r/6RbYj0=
-X-Received: by 2002:a25:a0c4:: with SMTP id i4mr2845644ybm.457.1642030309048;
- Wed, 12 Jan 2022 15:31:49 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 12 Jan 2022
- 15:31:48 -0800 (PST)
-In-Reply-To: <87r19cftbr.fsf@toke.dk>
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-3-Jason@zx2c4.com>
- <87r19cftbr.fsf@toke.dk>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 13 Jan 2022 00:31:48 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
-Message-ID: <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
-To:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Wed, 12 Jan 2022 18:34:57 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10DB3C06173F;
+        Wed, 12 Jan 2022 15:34:57 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id k30so6987678wrd.9;
+        Wed, 12 Jan 2022 15:34:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3DEFgBCX906ok4X/wdH2dxwVHpxsjiS6oUvaGjRJjSc=;
+        b=e9IAmlaSjuYmaF9CmGYif8YYLo6UNV3nMGK3jnmOsCdkSHfSTMAEAv2Ra4qJjr0NE/
+         zahrF5w/PN6y+8Eb/frfktMb/xueFL+wxRRN2R/EKKmVeg6VJ7OwPGl7UyEbwGFE+R07
+         7wsLAOO8ebbFowfkS9p9MEzKjBQQ2wz4LoM0PvPAo6zKPj56ueOHHWNWsTQux55UEtUJ
+         bGzUoHAZo99kaLq6IajDlHYr6mpB64hNiLV2xqPeVP6O/BMFBPsJALc60mzqLlgIVnCf
+         j7EKQ/2Ko2XyM9AKKM2D1nhiqucm6fymtLaWuuI7uilmjtqmpqcJEoTg/Bc9j+R03j2M
+         iGsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3DEFgBCX906ok4X/wdH2dxwVHpxsjiS6oUvaGjRJjSc=;
+        b=Sx3cTmOLDx6THlFaGiVB7ratcPFosSeMAFTChy0Tss5xcat1+Y7M6238hjc/ylSJby
+         y91FzL7MuPYkT3roY1wsoET4RLEeN26HLvvqyRtAgv4AeGddvac2QD/xuI8M9FurjGkA
+         EEO1natKimoJmWIsLcv/650lfH7tjImIpqCaCn2ASLdsjztxf0JVGOafKQGVm7znebbM
+         2vTavCnZDTVYpGjFKq5IMlP866cZ1zEAQCPu7SrKpn2mpPLuJqonNCch9uEhd12SOp0x
+         eGWYCe3jGVlxUEhaKBzZdNq8pALePKcZJJ5elCd960DnLvAWlESFdE9+x8jtxRpX7QBh
+         jbew==
+X-Gm-Message-State: AOAM530w9K+jxDHNV6cg8Mfl6bgqJhUBPFD9KDHZDIKb/KkSQocMgFXO
+        FhETVrSBk4pJXR5vmLJbM5w=
+X-Google-Smtp-Source: ABdhPJxeMow1qP7JNTiHjKD4H5i8qsaxLomu8bgbsOMr814izohrtas13g4czBsvmKybVqg0ZNUM3A==
+X-Received: by 2002:a5d:5282:: with SMTP id c2mr1705884wrv.580.1642030495750;
+        Wed, 12 Jan 2022 15:34:55 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id x6sm1051652wrt.58.2022.01.12.15.34.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jan 2022 15:34:55 -0800 (PST)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        linux-crypto@vger.kernel.org, Erik Kline <ek@google.com>,
-        Fernando Gont <fgont@si6networks.com>,
-        Lorenzo Colitti <lorenzo@google.com>,
-        hideaki.yoshifuji@miraclelinux.com,
-        Hannes Frederic Sowa <hannes@stressinduktion.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "David S . Miller" <davem@davemloft.net>,
+        Nathan Chancellor <nathan@kernel.org>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: [PATCH] crypto: asymmetric_keys: remove redundant pointer secs
+Date:   Wed, 12 Jan 2022 23:34:54 +0000
+Message-Id: <20220112233454.1207944-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Toke,
+The pointer secs is assigned a value but it is never read. The
+pointer is redundant and can be removed. Cleans up clang scan
+warning:
 
-On 1/13/22, Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> wrote:
-> However, if we make this change, systems setting a stable_secret and
-> using addr_gen_mode 2 or 3 will come up with a completely different
-> address after a kernel upgrade. Which would be bad for any operator
-> expecting to be able to find their machine again after a reboot,
-> especially if it is accessed remotely.
->
-> I haven't ever used this feature myself, though, or seen it in use. So I
-> don't know if this is purely a theoretical concern, or if the
-> stable_address feature is actually used in this way in practice. If it
-> is, I guess the switch would have to be opt-in, which kinda defeats the
-> purpose, no (i.e., we'd have to keep the SHA1 code around
+crypto/asymmetric_keys/verify_pefile.c:113:14: warning: Although
+the value stored to 'secs' is used in the enclosing expression,
+the value is never actually read from 'secs' [deadcode.DeadStores]
 
-I'm not even so sure that's true. That was my worry at first, but
-actually, looking at this more closely, DAD means that the address can
-be changed anyway - a byte counter is hashed in - so there's no
-gurantee there.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-There's also the other aspect that open coding sha1_transform like
-this and prepending it with the secret (rather than a better
-construction) isn't so great... Take a look at the latest version of
-this in my branch to see a really nice simplification and security
-improvement:
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index 7553ab18db89..a660e4d68d50 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -28,7 +28,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	const struct pe32plus_opt_hdr *pe64;
+ 	const struct data_directory *ddir;
+ 	const struct data_dirent *dde;
+-	const struct section_header *secs, *sec;
++	const struct section_header *sec;
+ 	size_t cursor, datalen = pelen;
+ 
+ 	kenter("");
+@@ -110,7 +110,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	ctx->n_sections = pe->sections;
+ 	if (ctx->n_sections > (ctx->header_size - cursor) / sizeof(*sec))
+ 		return -ELIBBAD;
+-	ctx->secs = secs = pebuf + cursor;
++	ctx->secs = pebuf + cursor;
+ 
+ 	return 0;
+ }
+-- 
+2.33.1
 
-https://git.zx2c4.com/linux-dev/log/?h=3Dremove-sha1
-
-Jason
