@@ -2,99 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD62C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 18:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6405DC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 19:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344217AbiALS6N (ORCPT
+        id S1344929AbiALThN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 13:58:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241317AbiALS57 (ORCPT
+        Wed, 12 Jan 2022 14:37:13 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:42245 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356853AbiALTgk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 13:57:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A63C06173F;
-        Wed, 12 Jan 2022 10:57:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0D9BCB82061;
-        Wed, 12 Jan 2022 18:57:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B60C36AE5;
-        Wed, 12 Jan 2022 18:57:56 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LpIgVSvW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642013873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=z0nJw3qp+6ssaRAsQGf0Z8LxKHkMZcQjHMYTxWOuULA=;
-        b=LpIgVSvWy74mNyI6bUeyXhJwMku7ldAgzyUrx7wW4aEY9++YH0eOQBx3QnZoNRqfjblCKh
-        Bb2lzHp+gtos3MGpETNpDP8trNJfFOYbBCj3lPBt6jZ0FhGj+yRdlBw4RJNAZwhWZ+Uide
-        X3BGgUDsZx+fj/DKQvh7TCp4aPnnRbw=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c3e8b21a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 12 Jan 2022 18:57:52 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id p5so8199216ybd.13;
-        Wed, 12 Jan 2022 10:57:52 -0800 (PST)
-X-Gm-Message-State: AOAM530WRfZ7kkIsv2nINfejkSrSx649bLMtSHQd35lNAyGSR/Gr7nWz
-        hnTUwy/xDYgdvFh4ftA2t+aG7hL9IFkdGcyYMT8=
-X-Google-Smtp-Source: ABdhPJw8qYUs7e9KQe2N4L+rImERUn9kUTTZvgDksyPryzq/g72RYmNwS7QVnzejY1mgkrru1T5lLNiPN9ehAqKwuLk=
-X-Received: by 2002:a25:8c4:: with SMTP id 187mr1325248ybi.245.1642013871490;
- Wed, 12 Jan 2022 10:57:51 -0800 (PST)
+        Wed, 12 Jan 2022 14:36:40 -0500
+Received: from mail-wr1-f45.google.com ([209.85.221.45]) by
+ mrelayeu.kundenserver.de (mreue010 [213.165.67.97]) with ESMTPSA (Nemesis) id
+ 1MI5Dj-1nABbl2dF9-00FFhG; Wed, 12 Jan 2022 20:36:38 +0100
+Received: by mail-wr1-f45.google.com with SMTP id k30so6103563wrd.9;
+        Wed, 12 Jan 2022 11:36:38 -0800 (PST)
+X-Gm-Message-State: AOAM533UC8qhhTcs8GYDJ/+zKBpbNzYYByHcEZn/VBHiev3d1R4yabXf
+        +jc+Q9qsqLC/OMyhjE9SDAgwZZdHPpNU6vx368E=
+X-Google-Smtp-Source: ABdhPJxROagmxR5J8MlQaHRf+4tU5rG6aldq7qt4ZWTWnEwU5lUja8ML2hO9ZXqsHv5/gtcEfuFOzYdmiXAZiLGLabk=
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr1059496wrw.219.1642016198201;
+ Wed, 12 Jan 2022 11:36:38 -0800 (PST)
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112185004.GZ14046@twin.jikos.cz>
-In-Reply-To: <20220112185004.GZ14046@twin.jikos.cz>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 12 Jan 2022 19:57:40 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qcW_cPq+ZvpBnYwJXURNs_3mqbzOKsqeoDNUDH4qDWEg@mail.gmail.com>
-Message-ID: <CAHmME9qcW_cPq+ZvpBnYwJXURNs_3mqbzOKsqeoDNUDH4qDWEg@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 0/3] remove remaining users of SHA-1
-To:     David Sterba <dsterba@suse.cz>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
+References: <266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be>
+ <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
+ <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com> <BY3PR18MB4737E57C0DC616FFE73CC7AEC6529@BY3PR18MB4737.namprd18.prod.outlook.com>
+In-Reply-To: <BY3PR18MB4737E57C0DC616FFE73CC7AEC6529@BY3PR18MB4737.namprd18.prod.outlook.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 12 Jan 2022 20:36:22 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0Eeyt=rWG6CjYCKck-k5+uT5GkLuDG+S4GkQgD49-H1A@mail.gmail.com>
+Message-ID: <CAK8P3a0Eeyt=rWG6CjYCKck-k5+uT5GkLuDG+S4GkQgD49-H1A@mail.gmail.com>
+Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
+To:     Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Joseph Longever <jlongever@marvell.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:S4HTrNCoawQZl4FCTePxhGeG5TMVCh1mvjOnRdOK0xojB5LuV35
+ YDtQFyNVJwaScrDqzJUBhBiyFLrqYEK2GVizWFZ+C8WZWA5c3YYvCNng3NFGltGpNexZtaq
+ nifnYvhSTtekV29XeeBU7QGsIl4Ta0Cay/rYPnmlIu5J9N1MCQpwhjraBbgTK9vApumYbOk
+ liRZQ5gDBucO2kb6WpFpQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:J1D/eof8IkU=:yMx0htCF84rQDTNkpZdJUh
+ a+pUKseRnUCUDfaE8wZV7RzEsQ2lwdoD9w/cM93oVD4UxhWTa//joe9rCI/zC5jgotEEtsXIA
+ ffMURRQnTQF/uTffGpHKQB5qVb/J9oVpdBbkEhD1X0Af9iINKJlspCMGnwpCbDCvCYF4QPDcE
+ LNkYyUpT2y2vmWu9hIB+BMGBZU21yqU60Blo1EKLUxW1C/CNWxHa+lUNmqcK+kwJG1GddsW5j
+ 1CjWWUU/pkleHzJdWnk8JGyPHJ9qBgzmTL7JHXcup01BDzBwC5OWU9VsLevOIJFNXeKsM6gYM
+ YJT/U/s5jub6l1kikF5xYvw7VYnjv5uDVkGOs458AjnDuQ9owhuf4dY6LLvwHI7ba6viN/RmA
+ yF5hFgdi9B2yYUq/hhNBSNqE4DQ2LvyM4EpSPK55bTG0BMUzA4k6CiBzpwfVctcTCBLnxd8/j
+ dL1viJdhMIGaDOQY677fu0n3oTEB5fMznLpO+5gg22DrJBmm2h8epp6dW2z3Fnv1+hheoFJSA
+ MykmOeM6wXVqbAO8NvGL2dJfQryPpjY1WdpHc47xxMJcDv0XhmN5pYJuPSeTSuY+4v0SvDNyI
+ U4/0edQwGuYtENW+iF1O70qj6iEiyH9L+vvqCKsX4TvJIfl2U/bv93XkNLhJzT2QLGTZvqzMq
+ FxLjmd9aaUK8+sXamjWjBZ/2OJkxUWfgCtiWH4rzYXOgFRnvCxcBJsE9/3vgopobwFIs=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 7:50 PM David Sterba <dsterba@suse.cz> wrote:
->
-> On Wed, Jan 12, 2022 at 02:12:01PM +0100, Jason A. Donenfeld wrote:
-> > Hi,
+On Wed, Jan 12, 2022 at 5:34 PM Sunil Kovvuri Goutham
+<sgoutham@marvell.com> wrote:
+> >Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
+> >On Wed, Jan 12, 2022 at 4:55 PM Sunil Kovvuri Goutham <sgoutham@marvell.com> wrote:
+> >config ARCH_OCTEON
+> >        bool "Marvell OCTEON and ThunderX data processing units"
+> >       help
+> >          This enables support for Marvell (formerly Cavium) OCTEON
+> >          Family of DPUs and SoCs, including OCTEON 10, Octeon TX2
+> >          CN92xx/CN96xx/CN98xx, OcteonTX CN8xxx, ThunderX CN88xx, and
+> >          Octeon Fusion products.
 > >
-> > There are currently two remaining users of SHA-1 left in the kernel: bpf
-> > tag generation, and ipv6 address calculation. In an effort to reduce
-> > code size and rid ourselves of insecure primitives, this RFC patchset
-> > moves to using the more secure BLAKE2s function.
+> >          Note: these are unrelated to the similarly named ThunderX2
+> >         CN99xx server processors, the Octeon TX2 91xx SoCs and the
+> >          Armada processors.
+> >
+> >config ARCH_THUNDER2
+> >        bool "Marvell/Cavium ThunderX2 Server Processors"
+> >        select GPIOLIB
+> >        help
+> >          This enables support for Marvell's discontinued ThunderX2
+> >          CN99XX family of server processors, originally sold by Cavium.
+> >
+> >          Note: these do not include the unrelated ThunderX CN88xx or
+> >          OCTEON TX2 processors, despite the similarities in naming.
+> >
+> >config ARCH_MVEBU
+> >        bool "Marvell EBU SoC Family"
+> >        help
+> >          This enables support for Marvell EBU familly, including:
+> >           - Armada 3700 SoC Family
+> >           - Armada 7K SoC Family
+> >           - Armada 8K SoC Family
+> >           - Octeon TX2 CN91xx Family
+> >
+> >If that's not the correct interpretation, does that mean that OCTEON 10
+> >and Octeon TX2 CN92xx/CN96xx/CN98xx are a different family from
+> >Octeon/TX CN8xxx and ThunderX CN88xx and should have a fourth
+> >symbol, or are they part of the Armada family?
 >
-> What's the rationale to use 2s and not 2b? Everywhere I can find the 2s
-> version is said to be for 8bit up to 32bit machines and it's worse than
-> 2b in benchmarks (reading https://bench.cr.yp.to/results-hash.html).
->
-> I'd understand you go with 2s because you also chose it for wireguard
-> but I'd like know why 2s again even if it's not made for 64bit
-> architectures that are preferred nowadays.
+> OcteonTx (8xx) are derivatives of ThunderX.
 
-Fast for small inputs on all architectures, small code size. And it
-performs well on Intel - there are avx512 and ssse3 implementations.
-Even blake3 went with the 32-bit choice and abandoned 2b's thing.
-Plus, this makes it even more similar to the well trusted chacha
-permutation. As far as a general purpose high security library (keyed)
-hash function for internal kernel usages, it seems pretty ideal.
+Ok, and those are the same family as the earlier cnMIPS based OCTEON
+CN3xxx/CN5xxx/CN6xxx/CN7xxx/CNF7xxx and the later ARMv8.2
+Fusion CNF9xxx, right?
 
-Your choice for btrfs though is fine; don't let this patchset change
-your thinking on that.
+> Octeon 10 and OcteonTx2 (9x series) are different families and not related to
+> Armada as well.
 
-Anyway, I hope that's interesting to you, but I'm not so much
-interested in bikeshedding about blake variants as I am in learning
-from the net people on the feasibility of getting rid of sha1 in those
-two places. So I'd appreciate it if we can keep the discussion focused
-on that and not let this veer off into a tangential thread on blakes.
+I assume with '9x' you mean only the CN92xx/CN96xx/CN98xx/CN10x/DPU400
+family here, not the OcteonTx2 CN91xx that is clearly part of the Marvell
+Sheeva/Kirkwood/MVEBU/Armada family, and the CN99xx in the
+Netlogic/Broadcom family.
+
+Is there anything that you can say about this product line? It looked like it
+was derived from the cnMIPS/OcteonTX line, and it seems to share its
+mystery (presumably ThunderX1-derived rather than Cortex or Vulcan)
+ARMv8.2 core with the CNF9xxx.
+
+> But I am fine if ARCH_THUNDER is renamed to ARCH_OCTEON to include all.
+
+I'd really prefer to have sensible names, so if there are six unrelated Marvell
+SoC families (pxa/mmp, armada/mvebu/cn91xx, xlp/vulcan/thunderx2,
+berlin/synaptics, cavium/octeon/thunderx/fusion, and whatever turned into
+non-cavium cn92xx/cn96xx/cn98xx/cn10x/dpu400) instead of five, we should
+probably have six ARCH_* names for those. (Note: for some other
+manufacturers such as Broadcom or Mediatek, we do use just the company
+name as the CONFIG_ARCH_* symbol, but I feel that for Marvell or NXP,
+that ship has sailed long ago, based on the number of acquisitions and
+spinoffs).
+
+Any suggestions for the name? Were these acquired from some other
+company?
+
+        Arnd
