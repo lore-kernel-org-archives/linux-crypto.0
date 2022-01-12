@@ -2,143 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDE9C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 16:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849AFC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 18:32:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354913AbiALQFE (ORCPT
+        id S1356231AbiALScm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 11:05:04 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:40809 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349654AbiALQFD (ORCPT
+        Wed, 12 Jan 2022 13:32:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47558 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356295AbiALScJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 11:05:03 -0500
-Received: from mail-wr1-f51.google.com ([209.85.221.51]) by
- mrelayeu.kundenserver.de (mreue012 [213.165.67.97]) with ESMTPSA (Nemesis) id
- 1MUTxo-1mymAW3XSi-00QX2d; Wed, 12 Jan 2022 17:05:00 +0100
-Received: by mail-wr1-f51.google.com with SMTP id d19so5218282wrb.0;
-        Wed, 12 Jan 2022 08:05:00 -0800 (PST)
-X-Gm-Message-State: AOAM532fEFC7+q8fAs2J4GS8beF+63w22k222x57JixMLXUiFv5jaCFK
-        0FM5r9StM58LN6Pfdxq7JFi8DSFYuKHz4c6I/jo=
-X-Google-Smtp-Source: ABdhPJwxDiNjuYbWLVY7t/HnE/b6lwh+fnY5dRvYsPdOtZoOHc+AaageW7dUz2/7e+9onzGuGMB9DjgqyRi5twekUIc=
-X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr352566wrw.219.1642003500106;
- Wed, 12 Jan 2022 08:05:00 -0800 (PST)
+        Wed, 12 Jan 2022 13:32:09 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927C2C061759;
+        Wed, 12 Jan 2022 10:32:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 8C12CCE1E21;
+        Wed, 12 Jan 2022 18:32:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC72AC36AE5;
+        Wed, 12 Jan 2022 18:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642012319;
+        bh=SIOFpKrKnQowDOnmtxefi+bybl5zeZB6n3VbvATVFBY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=V4aeHa5QLi8d5BOg6sv0gr+x+PgLEzDphY5W9nRxsHjh6z4a/6EMHng9D75BAM6Ct
+         zNP0R2wv/Frb46fN9k47C2rGg5Z4eRDU45dl2liVB9tycOqrsJLcjnR1ET4JSX14sV
+         ANVlYcpU4KpPTW8Ymr0tMG7NqGErK0wEyelLvM92Qj10ktOFFrm8RAOAbdIoplI3mk
+         5SdR7b+RMwmWXQwkKn7vvl7Qib4xy9W29MrbwtCBeWkkLk+v/Vn32DaMTggmUi7aAw
+         1B5awF8+2fvKHU7F8hodfx9vInNNVpOFRAyWQMfoK0NaB6tdknpS3MpGI4/vknMPsV
+         aIgS2bSCn6J+Q==
+Date:   Wed, 12 Jan 2022 10:31:57 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org, geert@linux-m68k.org, tytso@mit.edu,
+        gregkh@linuxfoundation.org, jeanphilippe.aumasson@gmail.com,
+        ardb@kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH crypto 1/2] lib/crypto: blake2s-generic: reduce code size
+ on small systems
+Message-ID: <Yd8enQTocuCSQVkT@gmail.com>
+References: <CAHmME9qbnYmhvsuarButi6s=58=FPiti0Z-QnGMJ=OsMzy1eOg@mail.gmail.com>
+ <20220111134934.324663-1-Jason@zx2c4.com>
+ <20220111134934.324663-2-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be>
- <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
-In-Reply-To: <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 12 Jan 2022 17:04:43 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com>
-Message-ID: <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com>
-Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
-To:     Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        Joseph Longever <jlongever@marvell.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:b5qf4fSrYaOSl0TY/67lJGFRyt7/kIn9f92D3rCPV0N+4k1YFSI
- ctF3btkrrmxhGf1ZD/EiK1+MfXbjSeJlK3YKpBkxpX2nnma+YSe1/QOeGg1/jL9kYooxPse
- oxZS20NSOOxw+J9Ku+3q7FUhbQ+H+DQE8Rgidt3V8NzKNfbrqTdZfEXYYYBRfwy+tEK4WN+
- yziu4hm7pRzVTJ4NgWkGQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CK+vVeUYYN8=:uYVV6LTf5d6eyPfRqYdKfx
- fLTpQ7Tpj0AzMYab02YykBYox8A2CDqoEQjlDLhc5iNhZkkJF5Z5BBDf5iRT/y1E1Hg0KCmMU
- JVCav3x9+9eBMTlS1hK9pfSWlbYvU6UwfHG2kpZ3dimeMqu899umOOy14tezlFInENOl1U5Ab
- iAU+G/X9lv9W7BvT1dAMvBuaTFLkIkZg3OUQraSPuVF2qdioK5KjKgnMXbA1FS5lbrCuovfrF
- GZtE6FjHZyZEiaZ6kwEcjyAwi5IpG3sbxX9ZX8evw8CD/U4EUe6VkCJ1knwydwIAMWGTNm5e9
- Bh6apuCCy2EbUjqfXtAj1SteBQq4aDOtYvJWehrjxhap5L6eGvwpENtKPUSRLB6UrQAeHs9x2
- b/5sXEQ/uWGfrXa19CPwvcg3W8rcWU2HODHKRAqDmevwmXwVJnCuw5naSvq46dKRrPcuYvuBR
- y4iip5733G9vFd/pKJGHzL6L5Rh9bp/RsVURhCIICiO39LZulxi/S32YVzQPr7PNvFvB8g3g3
- 5H9tAniSagpDLfU7nnPwXDtMcQ7tyONc9gZxVHFAZ2a9bc8FT0ufEY0ZqCf2eNnRxWdF56qQt
- vVSmBmh9N6ZWDFABbONDu1+S5Id9jtxx6cjlfB1IcQS4kJPZ/6/pBiibx/KTi4SuWHtbM/Azu
- DE3+jL2bujdaWKeX3no1RxtHFQhkmiqKad6OoYC0q8tKE36djBajWHuzDtEKQY3LH8Y4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220111134934.324663-2-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 4:55 PM Sunil Kovvuri Goutham
-<sgoutham@marvell.com> wrote:
->
-> >From: Geert Uytterhoeven <geert+renesas@glider.be>
-> >Sent: Wednesday, January 12, 2022 7:33 PM
-> >To: Herbert Xu <herbert@gondor.apana.org.au>; Sunil Kovvuri Goutham <sgoutham@marvell.com>; Bharat Bhushan <bbhushan2@marvell.com>; Joseph Longever <jlongever@marvell.com>
-> >Cc: Arnd Bergmann <arnd@arndb.de>; linux-crypto@vger.kernel.org <linux-crypto@vger.kernel.org>; linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>; Geert Uytterhoeven <geert+renesas@glider.be>
-> >Subject: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
->
-> >The Marvell CN10K True Random Number generator is only present on
-> >Marvell CN10K SoCs, and not available as an independent PCIe endpoint.
-> >Hence add a dependency on ARCH_THUNDER, to prevent asking the user about
-> >this driver when configuring a kernel without Cavium Thunder (incl.
-> >Marvell CN10K) SoC support.
-> >
-> >Fixes: 38e9791a02090414 ("hwrng: cn10k - Add random number generator support")
-> >Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> >---
-> >drivers/char/hw_random/Kconfig | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> >diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> >index c91cb48a1db168dd..b33c01e9935336f7 100644
-> >--- a/drivers/char/hw_random/Kconfig
-> >+++ b/drivers/char/hw_random/Kconfig
-> >@@ -540,7 +540,7 @@ config HW_RANDOM_ARM_SMCCC_TRNG
-> >
-> > config HW_RANDOM_CN10K
-> >        tristate "Marvell CN10K Random Number Generator support"
-> >-       depends on HW_RANDOM && PCI && ARM64
-> >+       depends on HW_RANDOM && PCI && ARCH_THUNDER
-> >        default HW_RANDOM
-> >        help
-> >          This driver provides support for the True Random Number
->
-> Nack.
-> ARCH_THUNDER/THUNDER2 are old Cavium server class silicon series
-> which are not related to Marvell CN10K silicon.
+On Tue, Jan 11, 2022 at 02:49:33PM +0100, Jason A. Donenfeld wrote:
+> Re-wind the loops entirely on kernels optimized for code size. This is
+> really not good at all performance-wise. But on m68k, it shaves off 4k
+> of code size, which is apparently important.
+> 
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  lib/crypto/blake2s-generic.c | 30 ++++++++++++++++++------------
+>  1 file changed, 18 insertions(+), 12 deletions(-)
+> 
+> diff --git a/lib/crypto/blake2s-generic.c b/lib/crypto/blake2s-generic.c
+> index 75ccb3e633e6..990f000e22ee 100644
+> --- a/lib/crypto/blake2s-generic.c
+> +++ b/lib/crypto/blake2s-generic.c
+> @@ -46,7 +46,7 @@ void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+>  {
+>  	u32 m[16];
+>  	u32 v[16];
+> -	int i;
+> +	int i, j;
+>  
+>  	WARN_ON(IS_ENABLED(DEBUG) &&
+>  		(nblocks > 1 && inc != BLAKE2S_BLOCK_SIZE));
+> @@ -86,17 +86,23 @@ void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+>  	G(r, 6, v[2], v[ 7], v[ 8], v[13]); \
+>  	G(r, 7, v[3], v[ 4], v[ 9], v[14]); \
+>  } while (0)
+> -		ROUND(0);
+> -		ROUND(1);
+> -		ROUND(2);
+> -		ROUND(3);
+> -		ROUND(4);
+> -		ROUND(5);
+> -		ROUND(6);
+> -		ROUND(7);
+> -		ROUND(8);
+> -		ROUND(9);
+> -
+> +		if (IS_ENABLED(CONFIG_CC_OPTIMIZE_FOR_SIZE)) {
+> +			for (i = 0; i < 10; ++i) {
+> +				for (j = 0; j < 8; ++j)
+> +					G(i, j, v[j % 4], v[((j + (j / 4)) % 4) + 4], v[((j + 2 * (j / 4)) % 4) + 8], v[((j + 3 * (j / 4)) % 4) + 12]);
+> +			}
 
-Can you tell me where you would draw the line? Based on a discussion we had on
-IRC, I was going to send a patch to rename ARCH_THUNDER to ARCH_OCTEON
-and clarify how it relates to the other families. Here is what I
-understood it should be:
+How about unrolling the inner loop but not the outer one?  Wouldn't that give
+most of the benefit, without hurting performance as much?
 
-config ARCH_OCTEON
-        bool "Marvell OCTEON and ThunderX data processing units"
-        help
-          This enables support for Marvell (formerly Cavium) OCTEON
-          Family of DPUs and SoCs, including OCTEON 10, Octeon TX2
-          CN92xx/CN96xx/CN98xx, OcteonTX CN8xxx, ThunderX CN88xx, and
-          Octeon Fusion products.
+If you stay with this approach and don't unroll either loop, can you use 'r' and
+'i' instead of 'i' and 'j', to match the naming in G()?
 
-          Note: these are unrelated to the similarly named ThunderX2
-          CN99xx server processors, the Octeon TX2 91xx SoCs and the
-          Armada processors.
+Also, please wrap lines at 80 columns.
 
-config ARCH_THUNDER2
-        bool "Marvell/Cavium ThunderX2 Server Processors"
-        select GPIOLIB
-        help
-          This enables support for Marvell's discontinued ThunderX2
-          CN99XX family of server processors, originally sold by Cavium.
-
-          Note: these do not include the unrelated ThunderX CN88xx or
-          OCTEON TX2 processors, despite the similarities in naming.
-
-config ARCH_MVEBU
-        bool "Marvell EBU SoC Family"
-        help
-          This enables support for Marvell EBU familly, including:
-           - Armada 3700 SoC Family
-           - Armada 7K SoC Family
-           - Armada 8K SoC Family
-           - Octeon TX2 CN91xx Family
-
-If that's not the correct interpretation, does that mean that OCTEON 10
-and Octeon TX2 CN92xx/CN96xx/CN98xx are a different family from
-Octeon/TX CN8xxx and ThunderX CN88xx and should have a fourth
-symbol, or are they part of the Armada family?
-
-
-      Arnd
+- Eric
