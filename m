@@ -2,105 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00322C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 08:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8673C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 09:16:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351379AbiALIFw (ORCPT
+        id S1351974AbiALJQ0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 03:05:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44218 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237544AbiALIFv (ORCPT
+        Wed, 12 Jan 2022 04:16:26 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:4403 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238051AbiALJQ0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 03:05:51 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F135C06173F;
-        Wed, 12 Jan 2022 00:05:51 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id i8so2211116qtw.0;
-        Wed, 12 Jan 2022 00:05:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rN4LDWU6tXCEv6IijFOaaBHYyKxeOQv4sHOZiQzOxDY=;
-        b=glEfc8ex5j5UFU0BrZAfzsXYde3C6nO2oxsT/HraCurQ5eRiKUge5akxpiclI/Q7yp
-         bLmP7YSDIScWnaiBwrYZvhauKaWHeIv2TX9josJ7W9ERnYIBJ9GYM4a2DdTVg0v+uqja
-         W8s9nU3gn/3ZaLbjM4SHJfxV/GQ82DQ7XR6x4iWbax42TMwTJp4Bt88TEsLX7/2QGxSe
-         g2VbQ8c9y1g1V83nPL12/qhy/T8hPfyyICrGyEK2FmwvCJcFWmGV+FPtf02JhXq2wBwP
-         0v8xaVhbQT8uUueKJYqT1LQUfGjzzuKC5fJGNsZmQQbDvZeXKUwBR9CWAyMejBwNjktp
-         GI6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rN4LDWU6tXCEv6IijFOaaBHYyKxeOQv4sHOZiQzOxDY=;
-        b=R3BQa68wdTc9KqZb/hTlBaqUlYNMd0YBXpy7iYRxSE9zjiHL082ZLisBCQS1oeH/RU
-         7QB/kNN2p2RImedq5RH5sjnCUntYWXSoDAQVq7tZg4gP/k6e5cll/mOI1k51NOPLlfyv
-         /9VRNQpRHbl94C0tjgUD67wPcNl0LASyaDau7dwZn3OC+8jyrP/EUSyzR5+/pLJR6BqU
-         Y/F6Eea6CRsC/fina0o8Asv7fBWpLJiSMVZOzTp+XpY2D3qlu9qW/xMy6BPG0P0QEJl6
-         D/pSn1dJCThw0/XVW8qTIeglhqQODJx7crwr+0AB/G7Ns5TVOrgA0HqDtC3ACFnTZXgk
-         migw==
-X-Gm-Message-State: AOAM532jJ8KKZET3lHdG6qxk2BsZZ+XGl8an0R6IC0qO1jdL8YO48uJ5
-        X308oeymTdyDPSSmyQYj41s=
-X-Google-Smtp-Source: ABdhPJxtUsuMKdoZ1s+j2DVuPzfTAEkPkqjkHNG8ZD93Ft3f3I0kNAP3qj35sL+aCPN39YOSK1Iszw==
-X-Received: by 2002:ac8:7d08:: with SMTP id g8mr6723143qtb.573.1641974750657;
-        Wed, 12 Jan 2022 00:05:50 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id t123sm8071535qkb.135.2022.01.12.00.05.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 00:05:50 -0800 (PST)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: chi.minghao@zte.com.cn
-To:     thomas.lendacky@amd.com
-Cc:     john.allen@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Minghao Chi <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>, CGEL ZTE <cgel.zte@gmail.com>
-Subject: [PATCH] drivers/crypto/cpp: remove redundant ret variable
-Date:   Wed, 12 Jan 2022 08:05:44 +0000
-Message-Id: <20220112080544.667129-1-chi.minghao@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Wed, 12 Jan 2022 04:16:26 -0500
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JYhgg0J3Cz685HY;
+        Wed, 12 Jan 2022 17:13:35 +0800 (CST)
+Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 12 Jan 2022 10:16:23 +0100
+Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
+ fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.020;
+ Wed, 12 Jan 2022 10:16:23 +0100
+From:   Roberto Sassu <roberto.sassu@huawei.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+CC:     "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
+Thread-Topic: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
+Thread-Index: AQHYBxWUAJoIvMeqLk2UYoD6PZRMZ6xeNfyAgADgBLA=
+Date:   Wed, 12 Jan 2022 09:16:22 +0000
+Message-ID: <b37f9c0e9bf941f0b778c6949538835d@huawei.com>
+References: <20220111180318.591029-1-roberto.sassu@huawei.com>
+ <ab29dd6f-1301-e012-8898-9c739ca511a3@maciej.szmigiero.name>
+In-Reply-To: <ab29dd6f-1301-e012-8898-9c739ca511a3@maciej.szmigiero.name>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.204.63.33]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Minghao Chi <chi.minghao@zte.com.cn>
-
-Return value from ccp_crypto_enqueue_request() directly instead
-of taking this in another redundant variable.
-
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
-Signed-off-by: CGEL ZTE <cgel.zte@gmail.com>
----
- drivers/crypto/ccp/ccp-crypto-aes.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/ccp/ccp-crypto-aes.c b/drivers/crypto/ccp/ccp-crypto-aes.c
-index e6dcd8cedd53..bed331953ff9 100644
---- a/drivers/crypto/ccp/ccp-crypto-aes.c
-+++ b/drivers/crypto/ccp/ccp-crypto-aes.c
-@@ -69,7 +69,6 @@ static int ccp_aes_crypt(struct skcipher_request *req, bool encrypt)
- 	struct ccp_aes_req_ctx *rctx = skcipher_request_ctx(req);
- 	struct scatterlist *iv_sg = NULL;
- 	unsigned int iv_len = 0;
--	int ret;
- 
- 	if (!ctx->u.aes.key_len)
- 		return -EINVAL;
-@@ -104,9 +103,7 @@ static int ccp_aes_crypt(struct skcipher_request *req, bool encrypt)
- 	rctx->cmd.u.aes.src_len = req->cryptlen;
- 	rctx->cmd.u.aes.dst = req->dst;
- 
--	ret = ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
--
--	return ret;
-+	return ccp_crypto_enqueue_request(&req->base, &rctx->cmd);
- }
- 
- static int ccp_aes_encrypt(struct skcipher_request *req)
--- 
-2.25.1
-
+PiBGcm9tOiBNYWNpZWogUy4gU3ptaWdpZXJvIFttYWlsdG86bWFpbEBtYWNpZWouc3ptaWdpZXJv
+Lm5hbWVdDQo+IFNlbnQ6IFR1ZXNkYXksIEphbnVhcnkgMTEsIDIwMjIgOTozMyBQTQ0KPiBPbiAx
+MS4wMS4yMDIyIDE5OjAzLCBSb2JlcnRvIFNhc3N1IHdyb3RlOg0KPiA+IFN1cHBvcnQgZm9yIFBH
+UCBrZXlzIGFuZCBzaWduYXR1cmVzIHdhcyBwcm9wb3NlZCBieSBEYXZpZCBsb25nIHRpbWUgYWdv
+LA0KPiA+IGJlZm9yZSB0aGUgZGVjaXNpb24gb2YgdXNpbmcgUEtDUyM3IGZvciBrZXJuZWwgbW9k
+dWxlcyBzaWduYXR1cmVzDQo+ID4gdmVyaWZpY2F0aW9uIHdhcyBtYWRlLiBBZnRlciB0aGF0LCB0
+aGVyZSBoYXMgYmVlbiBub3QgZW5vdWdoIGludGVyZXN0IHRvDQo+ID4gc3VwcG9ydCBQR1AgdG9v
+Lg0KPiA+DQo+ID4gTGF0ZWx5LCB3aGVuIGRpc2N1c3NpbmcgYSBwcm9wb3NhbCBvZiBpbnRyb2R1
+Y2luZyBmc3Zlcml0eSBzaWduYXR1cmVzIGluDQo+ID4gRmVkb3JhIFsxXSwgZGV2ZWxvcGVycyBl
+eHByZXNzZWQgdGhlaXIgcHJlZmVyZW5jZSBvbiBub3QgaGF2aW5nIGEgc2VwYXJhdGUNCj4gPiBr
+ZXkgZm9yIHNpZ25pbmcsIHdoaWNoIHdvdWxkIGNvbXBsaWNhdGUgdGhlIG1hbmFnZW1lbnQgb2Yg
+dGhlIGRpc3RyaWJ1dGlvbi4NCj4gPiBUaGV5IHdvdWxkIGJlIG1vcmUgaW4gZmF2b3Igb2YgdXNp
+bmcgdGhlIHNhbWUgUEdQIGtleSwgY3VycmVudGx5IHVzZWQgZm9yDQo+ID4gc2lnbmluZyBSUE0g
+aGVhZGVycywgYWxzbyBmb3IgZmlsZS1iYXNlZCBzaWduYXR1cmVzIChub3Qgb25seSBmc3Zlcml0
+eSwgYnV0DQo+ID4gYWxzbyBJTUEgb25lcykuDQo+IA0KPiBBcmVuJ3QgUEdQIGtleXMgc2ltcGx5
+IFJTQSAvIEVDQyAvIEVkRFNBIGtleXMgd2l0aCBhZGRpdGlvbmFsIG1ldGFkYXRhPw0KPiBDYW4n
+dCB0aGV5IGJlIHVud3JhcHBlZCBmcm9tIHRoZWlyIChjb21wbGV4KSBQR1AgZm9ybWF0IGluIHVz
+ZXJzcGFjZSBhbmQNCj4gbG9hZGVkIHJhdyBpbnRvIHRoZSBrZXJuZWwsIGluIGEgc2ltaWxhciB3
+YXkgYXMgdGhleSBhcmUgc29tZXRpbWVzIHVzZWQNCj4gZm9yIFNTSCBhdXRoZW50aWNhdGlvbj8N
+Cg0KUHJvYmFibHksIHRoaXMgd291bGQgYmUgcG9zc2libGUgYnkgaW50cm9kdWNpbmcgYSBuZXcg
+YXN5bW1ldHJpYw0Ka2V5IHN1YnR5cGUgcGFyc2luZyBQR1Aga2V5cyBhbmQgc2lnbmF0dXJlcyBp
+biBhIG1vcmUgc2ltcGxlIGZvcm1hdCwNCmFmdGVyIGNvbnZlcnNpb24gYnkgdXNlciBzcGFjZS4g
+QnV0IHN0aWxsLCBhIHBhcnNlciB3b3VsZCBiZSByZXF1aXJlZC4NClRvIGJlIGhvbmVzdCwgSSB3
+b3VsZCBwcmVmZXIgdG8gaW1wbGVtZW50IChhY3R1YWxseSBEYXZpZCBkaWQpIGENCnBhcnNlciBm
+b2xsb3dpbmcgYW4gUkZDLCB0aGFuIGRldmVsb3BpbmcgYSBuZXcgb25lLg0KDQo+IFRoaXMgd2ls
+bCBzYXZlIHVzIGZyb20gaGF2aW5nIHRvIGFkZCBjb21wbGV4IHBhcnNlcnMgKGEgd2VsbC1rbm93
+biBzb3VyY2UNCj4gb2YgYnVncykgaW50byB0aGUga2VybmVsIC0gSSBndWVzcyB0aGVyZSBhcmVu
+J3QgYW55IHBsYW5zIHRvIGFkZCBhbg0KPiBpbi1rZXJuZWwgUEdQIFdlYiBvZiBUcnVzdCBpbXBs
+ZW1lbnRhdGlvbi4NCg0KSSBleHRlbnNpdmVseSB0ZXN0ZWQgdGhlIGltcGxlbWVudGF0aW9uIHdp
+dGggYW4gYWQtaG9jIGZhdWx0IGluamVjdG9yLA0KdG8gc2VlIGlmIHRoZSBjb2RlIGNhbiBjb3Jy
+ZWN0bHkgaGFuZGxlIGVycm9ycy4gSSBhbHNvIGRldmVsb3BlZCBhDQpmdXp6ZXIgdG8gY29ycnVw
+dCB0aGUgZGF0YSBiZWZvcmUgaXQgaXMgcmVhZCBieSB0aGUga2VybmVsLiBGaW5hbGx5LA0KSSBj
+aGVja2VkIHRoYXQgdGhlcmUgYXJlIG5vdCBtZW1vcnkgbGVha3MuIEJ1dCBJIGFncmVlLCB0aGVy
+ZSBjb3VsZA0Kc3RpbGwgYmUgYnVncy4NCg0KSWYgeW91IG1lYW4gdGhhdCBhIGtleSBjYW4gYmUg
+YWRkZWQgdG8gdGhlIGtlcm5lbCBpZiBpcyB2b3VjaGVkIGZvcg0KYnkgYW5vdGhlciBrZXkgaW4g
+dGhlIGJ1aWx0LWluIGtleXJpbmcsIEkgYWN0dWFsbHkgaW1wbGVtZW50ZWQgdGhpcw0KKHdhcyBt
+aXNzaW5nIGluIHRoZSBvcmlnaW5hbCBpbXBsZW1lbnRhdGlvbikuIFNvbWUga2V5cmluZ3MsIGUu
+Zy4gLmltYSwNCmhhdmUgdGhpcyByZXN0cmljdGlvbi4NCg0KVGhlIHdheSB0aGlzIHdvcmtzIGlz
+IHRoYXQsIHdoZW5ldmVyIHlvdSBhZGQgYSBQR1Aga2V5IHRvIHRoZQ0Ka2VybmVsLCB0aGUgcGFy
+c2VyIHRha2VzIG5vdCBvbmx5IHRoZSBwdWJsaWMga2V5IGFuZCB0aGUgdXNlciBJRCwNCmJ1dCBh
+bHNvIGl0cyBzaWduYXR1cmUgYnkgdGhlIHNhbWUgb3IgYW5vdGhlciBQR1Aga2V5Lg0KDQpUaGUg
+c2lnbmF0dXJlIGlzIHZlcmlmaWVkIHdoZW4gdGhlIGtleSBpcyBhZGRlZCB0byB0aGUga2V5cmlu
+Zw0Kd2l0aCB0aGF0IHJlc3RyaWN0aW9uLCBhbmQgb25seSBpZiB0aGUgdmVyaWZpY2F0aW9uIGlz
+IHN1Y2Nlc3NmdWwNCnRoZSBrZXkgY2FuIGJlIGFkZGVkLg0KDQpSb2JlcnRvDQoNCkhVQVdFSSBU
+RUNITk9MT0dJRVMgRHVlc3NlbGRvcmYgR21iSCwgSFJCIDU2MDYzDQpNYW5hZ2luZyBEaXJlY3Rv
+cjogTGkgUGVuZywgWmhvbmcgUm9uZ2h1YQ0KDQo+IFRoYW5rcywNCj4gTWFjaWVqDQo=
