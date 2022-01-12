@@ -2,137 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6405DC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 19:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D250DC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jan 2022 20:15:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344929AbiALThN (ORCPT
+        id S1357139AbiALUPy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 14:37:13 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:42245 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356853AbiALTgk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 14:36:40 -0500
-Received: from mail-wr1-f45.google.com ([209.85.221.45]) by
- mrelayeu.kundenserver.de (mreue010 [213.165.67.97]) with ESMTPSA (Nemesis) id
- 1MI5Dj-1nABbl2dF9-00FFhG; Wed, 12 Jan 2022 20:36:38 +0100
-Received: by mail-wr1-f45.google.com with SMTP id k30so6103563wrd.9;
-        Wed, 12 Jan 2022 11:36:38 -0800 (PST)
-X-Gm-Message-State: AOAM533UC8qhhTcs8GYDJ/+zKBpbNzYYByHcEZn/VBHiev3d1R4yabXf
-        +jc+Q9qsqLC/OMyhjE9SDAgwZZdHPpNU6vx368E=
-X-Google-Smtp-Source: ABdhPJxROagmxR5J8MlQaHRf+4tU5rG6aldq7qt4ZWTWnEwU5lUja8ML2hO9ZXqsHv5/gtcEfuFOzYdmiXAZiLGLabk=
-X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr1059496wrw.219.1642016198201;
- Wed, 12 Jan 2022 11:36:38 -0800 (PST)
+        Wed, 12 Jan 2022 15:15:54 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:55462 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350686AbiALUPy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jan 2022 15:15:54 -0500
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1n7k24-0005Dj-Rb; Wed, 12 Jan 2022 21:15:44 +0100
+Message-ID: <ab3d2bda-a704-f5d3-adee-e52b7d0a4641@maciej.szmigiero.name>
+Date:   Wed, 12 Jan 2022 21:15:38 +0100
 MIME-Version: 1.0
-References: <266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be>
- <BY3PR18MB47375336D4AC1FE79D493945C6529@BY3PR18MB4737.namprd18.prod.outlook.com>
- <CAK8P3a2jLgtcuJ6MD7LmJzagiRQSk85eL3tiHDmB33i_n3CZ2w@mail.gmail.com> <BY3PR18MB4737E57C0DC616FFE73CC7AEC6529@BY3PR18MB4737.namprd18.prod.outlook.com>
-In-Reply-To: <BY3PR18MB4737E57C0DC616FFE73CC7AEC6529@BY3PR18MB4737.namprd18.prod.outlook.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 12 Jan 2022 20:36:22 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a0Eeyt=rWG6CjYCKck-k5+uT5GkLuDG+S4GkQgD49-H1A@mail.gmail.com>
-Message-ID: <CAK8P3a0Eeyt=rWG6CjYCKck-k5+uT5GkLuDG+S4GkQgD49-H1A@mail.gmail.com>
-Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
-To:     Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        Joseph Longever <jlongever@marvell.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+To:     Roberto Sassu <roberto.sassu@huawei.com>
+Cc:     "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:S4HTrNCoawQZl4FCTePxhGeG5TMVCh1mvjOnRdOK0xojB5LuV35
- YDtQFyNVJwaScrDqzJUBhBiyFLrqYEK2GVizWFZ+C8WZWA5c3YYvCNng3NFGltGpNexZtaq
- nifnYvhSTtekV29XeeBU7QGsIl4Ta0Cay/rYPnmlIu5J9N1MCQpwhjraBbgTK9vApumYbOk
- liRZQ5gDBucO2kb6WpFpQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:J1D/eof8IkU=:yMx0htCF84rQDTNkpZdJUh
- a+pUKseRnUCUDfaE8wZV7RzEsQ2lwdoD9w/cM93oVD4UxhWTa//joe9rCI/zC5jgotEEtsXIA
- ffMURRQnTQF/uTffGpHKQB5qVb/J9oVpdBbkEhD1X0Af9iINKJlspCMGnwpCbDCvCYF4QPDcE
- LNkYyUpT2y2vmWu9hIB+BMGBZU21yqU60Blo1EKLUxW1C/CNWxHa+lUNmqcK+kwJG1GddsW5j
- 1CjWWUU/pkleHzJdWnk8JGyPHJ9qBgzmTL7JHXcup01BDzBwC5OWU9VsLevOIJFNXeKsM6gYM
- YJT/U/s5jub6l1kikF5xYvw7VYnjv5uDVkGOs458AjnDuQ9owhuf4dY6LLvwHI7ba6viN/RmA
- yF5hFgdi9B2yYUq/hhNBSNqE4DQ2LvyM4EpSPK55bTG0BMUzA4k6CiBzpwfVctcTCBLnxd8/j
- dL1viJdhMIGaDOQY677fu0n3oTEB5fMznLpO+5gg22DrJBmm2h8epp6dW2z3Fnv1+hheoFJSA
- MykmOeM6wXVqbAO8NvGL2dJfQryPpjY1WdpHc47xxMJcDv0XhmN5pYJuPSeTSuY+4v0SvDNyI
- U4/0edQwGuYtENW+iF1O70qj6iEiyH9L+vvqCKsX4TvJIfl2U/bv93XkNLhJzT2QLGTZvqzMq
- FxLjmd9aaUK8+sXamjWjBZ/2OJkxUWfgCtiWH4rzYXOgFRnvCxcBJsE9/3vgopobwFIs=
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <20220111180318.591029-1-roberto.sassu@huawei.com>
+ <ab29dd6f-1301-e012-8898-9c739ca511a3@maciej.szmigiero.name>
+ <b37f9c0e9bf941f0b778c6949538835d@huawei.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
+In-Reply-To: <b37f9c0e9bf941f0b778c6949538835d@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 5:34 PM Sunil Kovvuri Goutham
-<sgoutham@marvell.com> wrote:
-> >Subject: Re: [EXT] [PATCH] hwrng: cn10k - HW_RANDOM_CN10K should depend on ARCH_THUNDER
-> >On Wed, Jan 12, 2022 at 4:55 PM Sunil Kovvuri Goutham <sgoutham@marvell.com> wrote:
-> >config ARCH_OCTEON
-> >        bool "Marvell OCTEON and ThunderX data processing units"
-> >       help
-> >          This enables support for Marvell (formerly Cavium) OCTEON
-> >          Family of DPUs and SoCs, including OCTEON 10, Octeon TX2
-> >          CN92xx/CN96xx/CN98xx, OcteonTX CN8xxx, ThunderX CN88xx, and
-> >          Octeon Fusion products.
-> >
-> >          Note: these are unrelated to the similarly named ThunderX2
-> >         CN99xx server processors, the Octeon TX2 91xx SoCs and the
-> >          Armada processors.
-> >
-> >config ARCH_THUNDER2
-> >        bool "Marvell/Cavium ThunderX2 Server Processors"
-> >        select GPIOLIB
-> >        help
-> >          This enables support for Marvell's discontinued ThunderX2
-> >          CN99XX family of server processors, originally sold by Cavium.
-> >
-> >          Note: these do not include the unrelated ThunderX CN88xx or
-> >          OCTEON TX2 processors, despite the similarities in naming.
-> >
-> >config ARCH_MVEBU
-> >        bool "Marvell EBU SoC Family"
-> >        help
-> >          This enables support for Marvell EBU familly, including:
-> >           - Armada 3700 SoC Family
-> >           - Armada 7K SoC Family
-> >           - Armada 8K SoC Family
-> >           - Octeon TX2 CN91xx Family
-> >
-> >If that's not the correct interpretation, does that mean that OCTEON 10
-> >and Octeon TX2 CN92xx/CN96xx/CN98xx are a different family from
-> >Octeon/TX CN8xxx and ThunderX CN88xx and should have a fourth
-> >symbol, or are they part of the Armada family?
->
-> OcteonTx (8xx) are derivatives of ThunderX.
+On 12.01.2022 10:16, Roberto Sassu wrote:
+>> From: Maciej S. Szmigiero [mailto:mail@maciej.szmigiero.name]
+>> Sent: Tuesday, January 11, 2022 9:33 PM
+>> On 11.01.2022 19:03, Roberto Sassu wrote:
+>>> Support for PGP keys and signatures was proposed by David long time ago,
+>>> before the decision of using PKCS#7 for kernel modules signatures
+>>> verification was made. After that, there has been not enough interest to
+>>> support PGP too.
+>>>
+>>> Lately, when discussing a proposal of introducing fsverity signatures in
+>>> Fedora [1], developers expressed their preference on not having a separate
+>>> key for signing, which would complicate the management of the distribution.
+>>> They would be more in favor of using the same PGP key, currently used for
+>>> signing RPM headers, also for file-based signatures (not only fsverity, but
+>>> also IMA ones).
+>>
+>> Aren't PGP keys simply RSA / ECC / EdDSA keys with additional metadata?
+>> Can't they be unwrapped from their (complex) PGP format in userspace and
+>> loaded raw into the kernel, in a similar way as they are sometimes used
+>> for SSH authentication?
+> 
+> Probably, this would be possible by introducing a new asymmetric
+> key subtype parsing PGP keys and signatures in a more simple format,
+> after conversion by user space. But still, a parser would be required.
+> To be honest, I would prefer to implement (actually David did) a
+> parser following an RFC, than developing a new one.
 
-Ok, and those are the same family as the earlier cnMIPS based OCTEON
-CN3xxx/CN5xxx/CN6xxx/CN7xxx/CNF7xxx and the later ARMv8.2
-Fusion CNF9xxx, right?
+A parser in userspace is preferred to one in kernel since if there is
+a bug somewhere its consequences are much less severe.
+And experience shows that parsers are especially prone to bugs.
+A userspace implementation can also be tightly sandboxed for extra
+security.
 
-> Octeon 10 and OcteonTx2 (9x series) are different families and not related to
-> Armada as well.
+There are many existing OpenPGP parsing libraries to choose from.
 
-I assume with '9x' you mean only the CN92xx/CN96xx/CN98xx/CN10x/DPU400
-family here, not the OcteonTx2 CN91xx that is clearly part of the Marvell
-Sheeva/Kirkwood/MVEBU/Armada family, and the CN99xx in the
-Netlogic/Broadcom family.
+>> This will save us from having to add complex parsers (a well-known source
+>> of bugs) into the kernel - I guess there aren't any plans to add an
+>> in-kernel PGP Web of Trust implementation.
+> 
+> I extensively tested the implementation with an ad-hoc fault injector,
+> to see if the code can correctly handle errors. I also developed a
+> fuzzer to corrupt the data before it is read by the kernel. Finally,
+> I checked that there are not memory leaks. But I agree, there could
+> still be bugs.
+> 
+> If you mean that a key can be added to the kernel if is vouched for
+> by another key in the built-in keyring, I actually implemented this
+> (was missing in the original implementation). Some keyrings, e.g. .ima,
+> have this restriction.
+> 
+> The way this works is that, whenever you add a PGP key to the
+> kernel, the parser takes not only the public key and the user ID,
+> but also its signature by the same or another PGP key.
+> 
+> The signature is verified when the key is added to the keyring
+> with that restriction, and only if the verification is successful
+> the key can be added.
 
-Is there anything that you can say about this product line? It looked like it
-was derived from the cnMIPS/OcteonTX line, and it seems to share its
-mystery (presumably ThunderX1-derived rather than Cortex or Vulcan)
-ARMv8.2 core with the CNF9xxx.
+I understand but it would be great to make use as much as possible of
+the existing in-kernel signature verification mechanisms.
 
-> But I am fine if ARCH_THUNDER is renamed to ARCH_OCTEON to include all.
+> Roberto
 
-I'd really prefer to have sensible names, so if there are six unrelated Marvell
-SoC families (pxa/mmp, armada/mvebu/cn91xx, xlp/vulcan/thunderx2,
-berlin/synaptics, cavium/octeon/thunderx/fusion, and whatever turned into
-non-cavium cn92xx/cn96xx/cn98xx/cn10x/dpu400) instead of five, we should
-probably have six ARCH_* names for those. (Note: for some other
-manufacturers such as Broadcom or Mediatek, we do use just the company
-name as the CONFIG_ARCH_* symbol, but I feel that for Marvell or NXP,
-that ship has sailed long ago, based on the number of acquisitions and
-spinoffs).
+Thanks,
+Maciej
 
-Any suggestions for the name? Were these acquired from some other
-company?
-
-        Arnd
