@@ -2,98 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A9BC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 01:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 975D2C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 03:24:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231345AbiAMBd5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jan 2022 20:33:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58722 "EHLO
+        id S232017AbiAMDYZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 12 Jan 2022 22:24:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231324AbiAMBd4 (ORCPT
+        with ESMTP id S231983AbiAMDYY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jan 2022 20:33:56 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A9CCC06173F;
-        Wed, 12 Jan 2022 17:33:56 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id n11so5289152plf.4;
-        Wed, 12 Jan 2022 17:33:56 -0800 (PST)
+        Wed, 12 Jan 2022 22:24:24 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CC9EC06173F;
+        Wed, 12 Jan 2022 19:24:24 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id ay4-20020a05600c1e0400b0034a81a94607so1889752wmb.1;
+        Wed, 12 Jan 2022 19:24:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=m18no3eU9YHeOBJ70PLazPrqlrGWJoUY+UtRV0RJfnE=;
-        b=UmuUGXve9r7RpYvZiev379MA7uABBPIy9NIzLlVQhCGARCNeA/XjbLXQelwd22Mej0
-         h5Iz1VIfFDIDHao2yWLxgdxlqhcWkTX26NtLyVoTbJszoXGMfwcedOCg8vcf3ZbCKDbA
-         NYEOMU3JWY3nuGgrPhMOfyQs1k3NewqmLeKJtNJIsJsd91tUMyU4g9PsuIkNxSH6JmBC
-         NDrtMv69cUP9EDabJI/kJZF4z4oXMfqsKhiLVDPl2rjwBU9Jc9+wXx7vcvehSkYXqBeq
-         HDS5kFfAXxOTFj494Qi1piZ4QZ0/9cfRHutIueLlMtDLAg5jHot2s3D8b2hTsNDaYKpc
-         s3+Q==
+         :cc;
+        bh=JSMd2i1J9AcZD7Z3Rw6ULKwjTXX7SBdExO4O6TrXQeM=;
+        b=Nwx5hbt1nqbJLYEqQOrmek2+mHZHSkkaw2ys4lY0uxDxDe/urrP4UEXfjJhaRsaDas
+         GbeUqwGlKLASaZaSCBa7JO6rkMIowlCaAmEo8S0bk1MdguYwNRtcDrkcHrS6m67UA/Ny
+         RZ4AY69E254yQ7FtXIj8wJFDI/WNNTkHd1mgaSmCCipBs0I7XIEjZajBmemZE+BlPFUi
+         OJiVlWRySfQvEg+VNiYRcBNaKy/wHTs3qqqvVxoy1Pz7VomzpxJraiM7iIBawTxlu+UW
+         z5Hj1H5US9JFV+qVD/HpK4dfrM0CzF+lUgideijb+F8IAGcmqR3X8a+STShjikVc5Gp1
+         uKAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=m18no3eU9YHeOBJ70PLazPrqlrGWJoUY+UtRV0RJfnE=;
-        b=VVTEBGHRreeOmId70EU+TpmTEdR1lLZhHxcU8rZu4YwUDSNyRgtijiu+yXca7fO3yH
-         wnCFz9b3LF5NTtPaN+fUP+Pxt8iJsjd/OTgtbK4Wx6F+OKCohdF0Qkeoo2og/M5iNBoH
-         brUu2J77GsP79bN5mOIHqP8hNEl3EUV91jWo17SnqScVsnURrOQO/FqDsuCxXyrgh3/p
-         8xgTcPj3T+g3pAXfFRlP1YkonXC7IFcKegf3ExgtG2l5pSAX/4YjaIm5Mh14y5yidJNL
-         aUh7ejj9AoUzgFwytmxHzBIQ+EAbSMtCk3+bo+/+NZFuWQ7uW1F8080Kl1En5TGBDraU
-         aKDA==
-X-Gm-Message-State: AOAM5335Jm4Wnz5JU7TzJ7F4dWPVMO9dWnomlBMdzY1pDQeJr1kEd/TK
-        aKqVwuyk43mFKsq+Hfo1FXZ4lbVbNcoDAwefO1g=
-X-Google-Smtp-Source: ABdhPJz4qeYIqi1ZeoHta49vEZlTq7oCkXYJDmz+FrBq+qxv0Qi2VWJg4urS6VyhZlHFR5eZ9MN/iySryZKlDcCLMdE=
-X-Received: by 2002:a63:be49:: with SMTP id g9mr1967928pgo.375.1642037635993;
- Wed, 12 Jan 2022 17:33:55 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=JSMd2i1J9AcZD7Z3Rw6ULKwjTXX7SBdExO4O6TrXQeM=;
+        b=lYsXWlW2HV4ymDzqrNX3QKeaTp+jZRAiGamYLoft+n17q7HTLPUpz8V+Ro6tGxQS+X
+         isRCrXF/MLY6qC7S4FpXVqAA6FAZhN4Tr9J5SGQb1HHx3KJei4Kt61iXv0rhsZDEiVQ3
+         w8CiryFEosV6I46cL947FG5ZBEtJ9+dp9RQFvDejpJr1dosxXjcLnitAgEzRtOaNF27N
+         YVoWpGTIzjrEPa2QVUQT5FeTZSpUuY6rPwfc+2nqUS1A9MqXt1mb8NSCEPAYVA7Ub4Wv
+         QZYjbLHkT5zFw63vTyROfxXCXlVJFi10/HmSv5iCKQSaEd4cqRx+c30iytmeqVuEfFe9
+         AZuw==
+X-Gm-Message-State: AOAM5322IiApIGW6ZnDm3yCguIfK78VX28kBRswAnbDWCESxxaAQlzun
+        cEt0MlFgVuViB8KGOOdqpnWR0ISFTCXfOFgybf55/0JL
+X-Google-Smtp-Source: ABdhPJwTXGUKA7wZhgTc8YR5+JDazq/sLt8QMWaphJFMMz7CT5KV5ic+NPT04Hi1TDCOp0a7ipRt5he1vz1bXcp48xA=
+X-Received: by 2002:a1c:7316:: with SMTP id d22mr9220707wmb.5.1642044262824;
+ Wed, 12 Jan 2022 19:24:22 -0800 (PST)
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
- <87tue8ftrm.fsf@toke.dk>
-In-Reply-To: <87tue8ftrm.fsf@toke.dk>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Wed, 12 Jan 2022 17:33:44 -0800
-Message-ID: <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
-To:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+References: <20220112131204.800307-1-Jason@zx2c4.com>
+In-Reply-To: <20220112131204.800307-1-Jason@zx2c4.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Thu, 13 Jan 2022 11:24:10 +0800
+Message-ID: <CACXcFmkauHRkTdD1zkr9QRCwG-uD8=7q9=Wk0_VFueRy-Oy+Nw@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 0/3] remove remaining users of SHA-1
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Ard Biesheuvel <ardb@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>
+        "Ted Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 5:14 PM Toke H=C3=B8iland-J=C3=B8rgensen <toke@redh=
-at.com> wrote:
->
-> [ adding the bpf list - please make sure to include that when sending
->   BPF-related patches, not everyone in BPF land follows netdev ]
->
-> "Jason A. Donenfeld" <Jason@zx2c4.com> writes:
->
-> > BLAKE2s is faster and more secure. SHA-1 has been broken for a long tim=
-e
-> > now. This also removes quite a bit of code, and lets us potentially
-> > remove sha1 from lib, which would further reduce vmlinux size.
->
-> AFAIU, the BPF tag is just used as an opaque (i.e., arbitrary) unique
-> identifier for BPF programs, without any guarantees of stability. Which
-> means changing it should be fine; at most we'd confuse some operators
-> who have memorised the tags of their BPF programs :)
->
-> The only other concern I could see would be if it somehow locked us into
-> that particular algorithm for other future use cases for computing
-> hashes of BPF programs (say, signing if that ends up being the direction
-> we go in). But obviously SHA1 would not be a good fit for that anyway,
-> so the algorithm choice would have to be part of that discussion in any
-> case.
->
-> So all in all, I don't see any issues with making this change for BPF.
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-Nack.
-It's part of api. We cannot change it.
+> There are currently two remaining users of SHA-1 left in the kernel: bpf
+> tag generation, and ipv6 address calculation.
+
+I think there are three, since drivers/char/random.c also uses it.
+Moreover, there's some inefficiency there (or was last time I
+looked) since it produces a 160-bit hash then folds it in half
+to give an 80-bit output.
+
+A possible fix would be to use a more modern 512-bit hash.
+SHA3 would be the obvious one, but Blake2 would work,
+Blake3 might be faster & there are several other possibilities.
+Hash context size would then match ChaCha so you could
+update the whole CC context at once, maybe even use the
+same context for both.
+
+That approach has difficulties, Extracting 512 bits every
+time might drain the input pool too quickly & it is overkill
+for ChaCha which should be secure with smaller rekeyings.
+
+If you look at IPsec, SSL & other such protocols, many
+have now mostly replaced the hash-based HMAC
+constructions used in previous generations with things
+like Galois field calculations (e.g. AES-GCM) or other
+strange math (e,g. poly 1305). These have most of the
+desirable properties of hashes & are much faster. As
+far as I know, they all give 128-bit outputs.
+
+I think we should replace SHA-1 with GCM. Give
+ChaCha 128 bits somewhat more often than current
+code gives it 256.
