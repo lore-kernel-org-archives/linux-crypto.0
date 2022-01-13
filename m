@@ -2,87 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC98C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 22:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F072AC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 23:56:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238097AbiAMWps (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Jan 2022 17:45:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36006 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231467AbiAMWpr (ORCPT
+        id S235807AbiAMX4d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Jan 2022 18:56:33 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:50072 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238256AbiAMX4c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jan 2022 17:45:47 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD38FC061574;
-        Thu, 13 Jan 2022 14:45:47 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id g11-20020a17090a7d0b00b001b2c12c7273so6363411pjl.0;
-        Thu, 13 Jan 2022 14:45:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/4RRqBrmw4TBe6Qmao1QkNx5bovUudrxDbFnqUSc0p4=;
-        b=d+AMNGi3pmM56Gw2ANsf4dVZkxxu9gTZDnubAuMgpsTG1TYyOSubjwAIJj3gchZ4gI
-         0B77/wPoI6sJdx0dYzH9e+lPKGTrWqDi6uyscCT0NnwL12r9kMf7UvNqXJap9Ww9h00X
-         ++eNBUvCUuailZefL6xUS4zuY/+i3LJ2umXQPcvLL5HwHhiKShI/TzgHyVvAtT9o+ZSK
-         EV02hfsBZNw7tUb03GMWe5SwiQU5xrCuj5K+pvBnluwXB33LxlPrTMAfibhBsOZOmd2P
-         oGea+Ra0tvVuvCYZOfjqrRNi6jwwrixOt69WwOVKo/qnSAZsLEczPsUnUk+MGwTjlCJC
-         V5fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/4RRqBrmw4TBe6Qmao1QkNx5bovUudrxDbFnqUSc0p4=;
-        b=fFrph2ERd2e+6lFzehpoRYBhTLYqkgWHu+KU6hNW/GVTwMGeFv0eGh4xLPiaYInnGh
-         pqN6tkyXaeQZ7rr/cMKByISdBdS/JtNAqdEOuOtiuTN/uqM92IHlLf8OJjFY8kHKlVMv
-         waSfiRIT0Bo8xhOPiAaCbL/NSqgzhImjrNR67sXg/7XQCP/6VKiaCmCUY8MlpCONyzxC
-         2n3KNJxQigfhnhREfzZhhGEsfbofHNyCyrw8wnoXSBWLaaeGGpwYHEP55HDz0+LqdXbq
-         iTOw9VjGpdsztHWLjsR4Vue9M+WcxorfGVq1Gc3IRmvfeeq0ufYDNuNRlv4WZgVWh/ft
-         mGsA==
-X-Gm-Message-State: AOAM532B6ztdSeDHShCQMLXruKT2QUOR2of4si6pA8rMtvfG9d+IqC12
-        eaZgW7qGrLfU0WadGlnNhIwqdgnGoJcquF7uHyk=
-X-Google-Smtp-Source: ABdhPJyxLxthKpfUVIlwPxInPsYgz0dcn/oER61I63Kniua6f0bKm2UEhXy0QS1Rmwj+6QC6d9YSVxj1zeyLuLfEOK0=
-X-Received: by 2002:a17:90b:3a82:: with SMTP id om2mr7541963pjb.138.1642113947224;
- Thu, 13 Jan 2022 14:45:47 -0800 (PST)
+        Thu, 13 Jan 2022 18:56:32 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 70BDE61D0E;
+        Thu, 13 Jan 2022 23:56:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C32C36AF3;
+        Thu, 13 Jan 2022 23:56:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642118191;
+        bh=OYwT1/oic13UOKNCipi3UaLYBkRKybjJlJF3WtRhuG4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=RvWoRghf90qh2LA7WNHy1/8tcMzHX8zcw/Gmsa/qP/q8lePpPoEW9GtFkmjQW9bd5
+         JFAotM4xGK02KKcpmZAJ0fKSUm5hMcoAEvNtILJJbvljTSXpZ6yk1i0CZ3ctTiygpu
+         tP2mzFLJdsViO3WAQhkfl6bckXDCDLpM72JAa1EdwgBKX42bI4WznUgtSlcMUBzKa8
+         xtOh0FXxUQrp2KC0m2VfNWN5Nauo9v1U4fzanbtNrTQmuHfgHD5Fezy+tUAhu5ubFa
+         NuxucdotQX2gwrucH5fRRPepv27AY5ta6rRX18OYpb4ke5KGKRDUFuNX4F4/x/DW3F
+         7vuiOnsp1SN9A==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Denis Kenzior <denkenz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        James Morris <james.morris@microsoft.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 3/3] KEYS: asym_tpm: rename derive_pub_key()
+Date:   Thu, 13 Jan 2022 15:54:40 -0800
+Message-Id: <20220113235440.90439-4-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220113235440.90439-1-ebiggers@kernel.org>
+References: <20220113235440.90439-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
- <87tue8ftrm.fsf@toke.dk> <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
- <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
-In-Reply-To: <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Thu, 13 Jan 2022 14:45:36 -0800
-Message-ID: <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 4:27 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi Alexei,
->
-> On 1/13/22, Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
-> > Nack.
-> > It's part of api. We cannot change it.
->
-> This is an RFC patchset, so there's no chance that it'll actually be
-> applied as-is, and hence there's no need for the strong hammer nack.
-> The point of "request for comments" is comments. Specifically here,
-> I'm searching for information on the ins and outs of *why* it might be
-> hard to change. How does userspace use this? Why must this 64-bit
-> number be unchanged? Why did you do things this way originally? Etc.
-> If you could provide a bit of background, we might be able to shake
-> out a solution somewhere in there.
+From: Eric Biggers <ebiggers@google.com>
 
-There is no problem with the code and nothing to be fixed.
+derive_pub_key() doesn't actually derive a key; it just formats one.
+Rename it accordingly.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/asymmetric_keys/asym_tpm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
+index 2e365a221fbe..d2e0036d34a5 100644
+--- a/crypto/asymmetric_keys/asym_tpm.c
++++ b/crypto/asymmetric_keys/asym_tpm.c
+@@ -336,7 +336,7 @@ static inline uint8_t *encode_tag_length(uint8_t *buf, uint8_t tag,
+ 	return buf + 3;
+ }
+ 
+-static uint32_t derive_pub_key(const void *pub_key, uint32_t len, uint8_t *buf)
++static uint32_t format_pub_key(const void *pub_key, uint32_t len, uint8_t *buf)
+ {
+ 	uint8_t *cur = buf;
+ 	uint32_t n_len = definite_length(len) + 1 + len + 1;
+@@ -409,7 +409,7 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
+ 
+-	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
++	der_pub_key_len = format_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
+ 
+ 	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
+@@ -463,7 +463,7 @@ static int tpm_key_encrypt(struct tpm_key *tk,
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
+ 
+-	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
++	der_pub_key_len = format_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
+ 
+ 	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
+@@ -758,7 +758,7 @@ static int tpm_key_verify_signature(const struct key *key,
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
+ 
+-	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
++	der_pub_key_len = format_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
+ 
+ 	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
+-- 
+2.34.1
+
