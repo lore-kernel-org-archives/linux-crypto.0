@@ -2,42 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EFFC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 19:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A94E8C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 20:05:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234451AbiAMTfY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Jan 2022 14:35:24 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:37208 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230046AbiAMTfX (ORCPT
+        id S232526AbiAMUFN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Jan 2022 15:05:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231193AbiAMUFK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jan 2022 14:35:23 -0500
+        Thu, 13 Jan 2022 15:05:10 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0A4C061574;
+        Thu, 13 Jan 2022 12:05:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 48B5AB82346;
-        Thu, 13 Jan 2022 19:35:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4E5CC36AEB;
-        Thu, 13 Jan 2022 19:35:20 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 30C93B8232B;
+        Thu, 13 Jan 2022 20:05:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4AF4C36AE9;
+        Thu, 13 Jan 2022 20:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642102521;
-        bh=wYviKH9qH01/t9E4TtjTCCpdE0iv7ux6iBNVX8pYgIo=;
+        s=k20201202; t=1642104306;
+        bh=8Vf+iIeeZu4MFaBzEEPCVogN6kju/taexe/y383Lzqc=;
         h=From:To:Cc:Subject:Date:From;
-        b=N6REC3rp+dUrAXlbK8nIB/9a4BxlbPU+N0eHfxlmqRsVs9zr87tezylMIO4zkSCKU
-         iEVJ8PO2UzWtLIYvuwlrrhwfcDLijfUC/Jr0XglvM1mgpTeK+t0SXBu93ZU54ckiPj
-         FcfyHKmWr6vgi03ZzdNOma4GHBBPf81N8LUsJtiMggXiMxJrqr+YJPvRKq16ucNu5a
-         Vv8yyXfTL0X9rXTWJMwOpdUpjSxH8KYS9XoBTdsMt0VId2rWVzcpZloLoN8V3bssOB
-         b8fkwN31xwL6rR1n9W1/ZgsP5iwi4Vpg8+58Ot9jCGJhs3ZitVRRcjMjsjGCJs67my
-         blDKqJEJ7ZmEA==
+        b=ViDsrCDb0oYI5aEJ6DYiprjTzNy43HcOHkdbg30hDiw8i+LyLwQNCpe8FgSxxpGR7
+         pzy21WBZvl/1S5LhVn4nbUuFcdyd0aKNXy2mZq1v26qMLd4aMI37JOEL6hEv37d+f3
+         21lr7umz3KffdTdLvLeEukEWeJsMieNdNb/CPE2ubViocudiYbOHQfOoEMad9CLeQQ
+         EfIai0V8Tf9U+0P1C3ff+B3q3oFbRN83LxJ5/euhRKbiLlPxsO/5pEWmu9IwiJZZUh
+         Fjj2ZkYAsXJNrMmi67hkL+8kWBqpwwqjfh8qie0y6Fo/5LXNSNCJB9QRcYQrji0pCu
+         B1Z8PW+qPSAKg==
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Cc:     keyrings@vger.kernel.org,
-        Andrzej Zaborowski <andrew.zaborowski@intel.com>,
-        stable@vger.kernel.org
-Subject: [PATCH] crypto: rsa-pkcs1pad - only allow with rsa
-Date:   Thu, 13 Jan 2022 11:34:35 -0800
-Message-Id: <20220113193435.64281-1-ebiggers@kernel.org>
+To:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
+Subject: [PATCH] KEYS: fix length validation in keyctl_pkey_params_get_2()
+Date:   Thu, 13 Jan 2022 12:04:54 -0800
+Message-Id: <20220113200454.72609-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -47,33 +50,62 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The pkcs1pad template can be instantiated with an arbitrary akcipher
-algorithm, which doesn't make sense; it is specifically an RSA padding
-scheme.  Make it check that the underlying algorithm really is RSA.
+In many cases, keyctl_pkey_params_get_2() is validating the user buffer
+lengths against the wrong algorithm properties.  Fix it to check against
+the correct properties.
 
-Fixes: 3d5b1ecdea6f ("crypto: rsa - RSA padding algorithm")
-Cc: <stable@vger.kernel.org> # v4.5+
+Probably this wasn't noticed before because for all asymmetric keys of
+the "public_key" subtype, max_data_size == max_sig_size == max_enc_size
+== max_dec_size.  However, this isn't necessarily true for the
+"asym_tpm" subtype (it should be, but it's not strictly validated).  Of
+course, future key types could have different values as well.
+
+Fixes: 00d60fd3b932 ("KEYS: Provide keyctls to drive the new key type ops for asymmetric keys [ver #2]")
+Cc: <stable@vger.kernel.org> # v4.20+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/rsa-pkcs1pad.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ security/keys/keyctl_pkey.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 8ac3e73e8ea6..1b3545781425 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -621,6 +621,11 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+diff --git a/security/keys/keyctl_pkey.c b/security/keys/keyctl_pkey.c
+index 5de0d599a274..97bc27bbf079 100644
+--- a/security/keys/keyctl_pkey.c
++++ b/security/keys/keyctl_pkey.c
+@@ -135,15 +135,23 @@ static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_par
  
- 	rsa_alg = crypto_spawn_akcipher_alg(&ctx->spawn);
+ 	switch (op) {
+ 	case KEYCTL_PKEY_ENCRYPT:
++		if (uparams.in_len  > info.max_dec_size ||
++		    uparams.out_len > info.max_enc_size)
++			return -EINVAL;
++		break;
+ 	case KEYCTL_PKEY_DECRYPT:
+ 		if (uparams.in_len  > info.max_enc_size ||
+ 		    uparams.out_len > info.max_dec_size)
+ 			return -EINVAL;
+ 		break;
+ 	case KEYCTL_PKEY_SIGN:
++		if (uparams.in_len  > info.max_data_size ||
++		    uparams.out_len > info.max_sig_size)
++			return -EINVAL;
++		break;
+ 	case KEYCTL_PKEY_VERIFY:
+-		if (uparams.in_len  > info.max_sig_size ||
+-		    uparams.out_len > info.max_data_size)
++		if (uparams.in_len  > info.max_data_size ||
++		    uparams.in2_len > info.max_sig_size)
+ 			return -EINVAL;
+ 		break;
+ 	default:
+@@ -151,7 +159,7 @@ static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_par
+ 	}
  
-+	if (strcmp(rsa_alg->base.cra_name, "rsa") != 0) {
-+		err = -EINVAL;
-+		goto err_free_inst;
-+	}
-+
- 	err = -ENAMETOOLONG;
- 	hash_name = crypto_attr_alg_name(tb[2]);
- 	if (IS_ERR(hash_name)) {
+ 	params->in_len  = uparams.in_len;
+-	params->out_len = uparams.out_len;
++	params->out_len = uparams.out_len; /* Note: same as in2_len */
+ 	return 0;
+ }
+ 
 
 base-commit: feb7a43de5ef625ad74097d8fd3481d5dbc06a59
 -- 
