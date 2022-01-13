@@ -2,78 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B1DC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 17:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EFFC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jan 2022 19:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbiAMR3L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Jan 2022 12:29:11 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:53932 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231404AbiAMR3L (ORCPT
+        id S234451AbiAMTfY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 13 Jan 2022 14:35:24 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:37208 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230046AbiAMTfX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jan 2022 12:29:11 -0500
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 20DHSnc0019461
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Jan 2022 12:28:50 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 8D35415C40F6; Thu, 13 Jan 2022 12:28:49 -0500 (EST)
-Date:   Thu, 13 Jan 2022 12:28:49 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH RFC v1 0/3] remove remaining users of SHA-1
-Message-ID: <YeBhUTPkmAnLQSzm@mit.edu>
-References: <20220112131204.800307-1-Jason@zx2c4.com>
- <CACXcFmkauHRkTdD1zkr9QRCwG-uD8=7q9=Wk0_VFueRy-Oy+Nw@mail.gmail.com>
+        Thu, 13 Jan 2022 14:35:23 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 48B5AB82346;
+        Thu, 13 Jan 2022 19:35:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4E5CC36AEB;
+        Thu, 13 Jan 2022 19:35:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642102521;
+        bh=wYviKH9qH01/t9E4TtjTCCpdE0iv7ux6iBNVX8pYgIo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=N6REC3rp+dUrAXlbK8nIB/9a4BxlbPU+N0eHfxlmqRsVs9zr87tezylMIO4zkSCKU
+         iEVJ8PO2UzWtLIYvuwlrrhwfcDLijfUC/Jr0XglvM1mgpTeK+t0SXBu93ZU54ckiPj
+         FcfyHKmWr6vgi03ZzdNOma4GHBBPf81N8LUsJtiMggXiMxJrqr+YJPvRKq16ucNu5a
+         Vv8yyXfTL0X9rXTWJMwOpdUpjSxH8KYS9XoBTdsMt0VId2rWVzcpZloLoN8V3bssOB
+         b8fkwN31xwL6rR1n9W1/ZgsP5iwi4Vpg8+58Ot9jCGJhs3ZitVRRcjMjsjGCJs67my
+         blDKqJEJ7ZmEA==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     keyrings@vger.kernel.org,
+        Andrzej Zaborowski <andrew.zaborowski@intel.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] crypto: rsa-pkcs1pad - only allow with rsa
+Date:   Thu, 13 Jan 2022 11:34:35 -0800
+Message-Id: <20220113193435.64281-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACXcFmkauHRkTdD1zkr9QRCwG-uD8=7q9=Wk0_VFueRy-Oy+Nw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 11:24:10AM +0800, Sandy Harris wrote:
-> Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> 
-> > There are currently two remaining users of SHA-1 left in the kernel: bpf
-> > tag generation, and ipv6 address calculation.
-> 
-> I think there are three, since drivers/char/random.c also uses it.
+From: Eric Biggers <ebiggers@google.com>
 
-This was changed as of commit 9f9eff85a008 ("random: use BLAKE2s
-instead of SHA1 in extraction"), which just landed in Linus's tree.
+The pkcs1pad template can be instantiated with an arbitrary akcipher
+algorithm, which doesn't make sense; it is specifically an RSA padding
+scheme.  Make it check that the underlying algorithm really is RSA.
 
-> Moreover, there's some inefficiency there (or was last time I
-> looked) since it produces a 160-bit hash then folds it in half
-> to give an 80-bit output.
+Fixes: 3d5b1ecdea6f ("crypto: rsa - RSA padding algorithm")
+Cc: <stable@vger.kernel.org> # v4.5+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/rsa-pkcs1pad.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-This dates back to very early days of the /dev/random driver, back
-when all that was known about SHA-1 was that it was designed by the
-NSA using classified design principles, and it had not yet been as
-well studied outside of the halls of the NSA.  So folding the SHA-1
-hash in half was done deliberately, since at the time, performance was
-*not* the primary goal; security was.
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 8ac3e73e8ea6..1b3545781425 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -621,6 +621,11 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 
+ 	rsa_alg = crypto_spawn_akcipher_alg(&ctx->spawn);
+ 
++	if (strcmp(rsa_alg->base.cra_name, "rsa") != 0) {
++		err = -EINVAL;
++		goto err_free_inst;
++	}
++
+ 	err = -ENAMETOOLONG;
+ 	hash_name = crypto_attr_alg_name(tb[2]);
+ 	if (IS_ERR(hash_name)) {
 
-(This was also back in the days when encryption algorithms would run
-you into export control difficulties, since this is around the times
-when the source code of PGP was being published in an OCR font with a
-barcode containing the checksum of the content of every single page
-was being published by the MIT press, and we were publishing Kerberos
-with all of the *calls* to the crypto stripped out and calling it
-"Bones" since there were assertions that code that *called*
-cryptographic algoriothms might be subject to export control, even if
-it didn't have any crypto algorithms in the program themselves.  This
-is also why HMAC-based constructions were so popular.  People seem to
-forget how much things have changed since the late 1980's....)
+base-commit: feb7a43de5ef625ad74097d8fd3481d5dbc06a59
+-- 
+2.34.1
 
-       	   	       	    	    	  - Ted
