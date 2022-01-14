@@ -2,206 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463D9C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50590C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242634AbiANPnG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 10:43:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242861AbiANPnF (ORCPT
+        id S242177AbiANPrH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 10:47:07 -0500
+Received: from mail-ot1-f54.google.com ([209.85.210.54]:36710 "EHLO
+        mail-ot1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238763AbiANPrH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 10:43:05 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8224CC06173E;
-        Fri, 14 Jan 2022 07:43:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4A727B8295C;
-        Fri, 14 Jan 2022 15:43:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DE50C36AE5;
-        Fri, 14 Jan 2022 15:43:01 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Bx1zCEbT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642174980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4QKGyaXYXpvy5zPBWVUqE679iwU8otdMKrrQ6kY3yeE=;
-        b=Bx1zCEbTOglqnVNS696Y/Yjf6POB3FCwnrmdxhaYXEZuY30TPH82BPXGLyIsC3vHtX9aTR
-        g8zsFk4iBspDkS4XoLPSlmuDPMblrWWGH4jWzuPNEd8maA2xbg1+ELH2+Gk5cvohJtTDfv
-        qSpZfKLFnt/2trw15htwUm2s9Ggkqmk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9a0b01fd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 14 Jan 2022 15:43:00 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        geert@linux-m68k.org, herbert@gondor.apana.org.au
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH crypto v3 2/2] lib/crypto: sha1: re-roll loops to reduce code size
-Date:   Fri, 14 Jan 2022 16:42:47 +0100
-Message-Id: <20220114154247.99773-3-Jason@zx2c4.com>
-In-Reply-To: <20220114154247.99773-1-Jason@zx2c4.com>
-References: <20220114154247.99773-1-Jason@zx2c4.com>
+        Fri, 14 Jan 2022 10:47:07 -0500
+Received: by mail-ot1-f54.google.com with SMTP id s21-20020a05683004d500b0058f585672efso10501389otd.3;
+        Fri, 14 Jan 2022 07:47:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5dzA66i4ivAiYOjfo8oco9UtNpMipS0k8jsB20XDEr0=;
+        b=N+I3et3MOlnEZV8DM6er7cWyvhAel8u3zbYT4IdkjRbaYJ1wSy51YtefUMNptFLOF9
+         R6xIdZ4M9SlZ4vOLF3X/HdH49K7tpIjqZgyIwVKLdlJCiAe/4dNsIY4I29Kq+ngaFho2
+         zUHeARHYuMXf3du9MTcTBvvbEtSFP8NoGK0EmHvHDz4maAxgxXP8iAZGlQaBZt/9Ppd1
+         tJTCdhIeveNUM7W3Mfsl+yPKjEVLLTQ3YH7nAtG7YRdXmHOJ5pe4g/LzAxvNL7Xpxtec
+         iK8W2lbUY8SPfArE093Pny8QKnqEkBwl4mmWbWt4wEKhtBkSgwmYndMyj+lZDHpTU646
+         DfkQ==
+X-Gm-Message-State: AOAM533ohJCVk7mYO8P/MfJ/D6UtOExSyXgOQkXJH99w1zh82P6MW0NX
+        EQ7RiiDapyRHgDKlTKX0/fn1pMhaKkm3oxF5
+X-Google-Smtp-Source: ABdhPJzpq+bIHymNtfPPEI7X6nGEw7++j4Q0gG6AcAn3BffD6q8SLt066o/eRJwcRmhe0sqCKuwePQ==
+X-Received: by 2002:a9d:6c4f:: with SMTP id g15mr6987331otq.3.1642175226110;
+        Fri, 14 Jan 2022 07:47:06 -0800 (PST)
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com. [209.85.210.47])
+        by smtp.gmail.com with ESMTPSA id 17sm1311947oij.21.2022.01.14.07.47.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jan 2022 07:47:05 -0800 (PST)
+Received: by mail-ot1-f47.google.com with SMTP id z25-20020a0568301db900b005946f536d85so1467309oti.9;
+        Fri, 14 Jan 2022 07:47:05 -0800 (PST)
+X-Received: by 2002:ab0:4d42:: with SMTP id k2mr2650964uag.78.1642174814894;
+ Fri, 14 Jan 2022 07:40:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-4-conor.dooley@microchip.com>
+In-Reply-To: <20220114151727.2319915-4-conor.dooley@microchip.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 14 Jan 2022 16:40:03 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
+Message-ID: <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/15] mailbox: change mailbox-mpfs compatible string
+To:     Conor Dooley <conor.dooley@microchip.com>
+Cc:     Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Lewis Hanly <lewis.hanly@microchip.com>,
+        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
+        Atish Patra <atishp@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With SHA-1 no longer being used for anything performance oriented, and
-also soon to be phased out entirely, we can make up for the space added
-by unrolled BLAKE2s by simply re-rolling SHA-1. Since SHA-1 is so much
-more complex, re-rolling it more or less takes care of the code size
-added by BLAKE2s. And eventually, hopefully we'll see SHA-1 removed
-entirely from most small kernel builds.
+Hi Conor,
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- lib/sha1.c | 95 ++++++++----------------------------------------------
- 1 file changed, 14 insertions(+), 81 deletions(-)
+On Fri, Jan 14, 2022 at 4:16 PM <conor.dooley@microchip.com> wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+>
+> The Polarfire SoC is currently using two different compatible string
+> prefixes. Fix this by changing "polarfire-soc-*" strings to "mpfs-*" in
+> its system controller in order to match the compatible string used in
+> the soc binding and device tree.
+>
+> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 
-diff --git a/lib/sha1.c b/lib/sha1.c
-index 9bd1935a1472..0494766fc574 100644
---- a/lib/sha1.c
-+++ b/lib/sha1.c
-@@ -9,6 +9,7 @@
- #include <linux/kernel.h>
- #include <linux/export.h>
- #include <linux/bitops.h>
-+#include <linux/string.h>
- #include <crypto/sha1.h>
- #include <asm/unaligned.h>
- 
-@@ -55,7 +56,8 @@
- #define SHA_ROUND(t, input, fn, constant, A, B, C, D, E) do { \
- 	__u32 TEMP = input(t); setW(t, TEMP); \
- 	E += TEMP + rol32(A,5) + (fn) + (constant); \
--	B = ror32(B, 2); } while (0)
-+	B = ror32(B, 2); \
-+	TEMP = E; E = D; D = C; C = B; B = A; A = TEMP; } while (0)
- 
- #define T_0_15(t, A, B, C, D, E)  SHA_ROUND(t, SHA_SRC, (((C^D)&B)^D) , 0x5a827999, A, B, C, D, E )
- #define T_16_19(t, A, B, C, D, E) SHA_ROUND(t, SHA_MIX, (((C^D)&B)^D) , 0x5a827999, A, B, C, D, E )
-@@ -84,6 +86,7 @@
- void sha1_transform(__u32 *digest, const char *data, __u32 *array)
- {
- 	__u32 A, B, C, D, E;
-+	unsigned int i = 0;
- 
- 	A = digest[0];
- 	B = digest[1];
-@@ -92,94 +95,24 @@ void sha1_transform(__u32 *digest, const char *data, __u32 *array)
- 	E = digest[4];
- 
- 	/* Round 1 - iterations 0-16 take their input from 'data' */
--	T_0_15( 0, A, B, C, D, E);
--	T_0_15( 1, E, A, B, C, D);
--	T_0_15( 2, D, E, A, B, C);
--	T_0_15( 3, C, D, E, A, B);
--	T_0_15( 4, B, C, D, E, A);
--	T_0_15( 5, A, B, C, D, E);
--	T_0_15( 6, E, A, B, C, D);
--	T_0_15( 7, D, E, A, B, C);
--	T_0_15( 8, C, D, E, A, B);
--	T_0_15( 9, B, C, D, E, A);
--	T_0_15(10, A, B, C, D, E);
--	T_0_15(11, E, A, B, C, D);
--	T_0_15(12, D, E, A, B, C);
--	T_0_15(13, C, D, E, A, B);
--	T_0_15(14, B, C, D, E, A);
--	T_0_15(15, A, B, C, D, E);
-+	for (; i < 16; ++i)
-+		T_0_15(i, A, B, C, D, E);
- 
- 	/* Round 1 - tail. Input from 512-bit mixing array */
--	T_16_19(16, E, A, B, C, D);
--	T_16_19(17, D, E, A, B, C);
--	T_16_19(18, C, D, E, A, B);
--	T_16_19(19, B, C, D, E, A);
-+	for (; i < 20; ++i)
-+		T_16_19(i, A, B, C, D, E);
- 
- 	/* Round 2 */
--	T_20_39(20, A, B, C, D, E);
--	T_20_39(21, E, A, B, C, D);
--	T_20_39(22, D, E, A, B, C);
--	T_20_39(23, C, D, E, A, B);
--	T_20_39(24, B, C, D, E, A);
--	T_20_39(25, A, B, C, D, E);
--	T_20_39(26, E, A, B, C, D);
--	T_20_39(27, D, E, A, B, C);
--	T_20_39(28, C, D, E, A, B);
--	T_20_39(29, B, C, D, E, A);
--	T_20_39(30, A, B, C, D, E);
--	T_20_39(31, E, A, B, C, D);
--	T_20_39(32, D, E, A, B, C);
--	T_20_39(33, C, D, E, A, B);
--	T_20_39(34, B, C, D, E, A);
--	T_20_39(35, A, B, C, D, E);
--	T_20_39(36, E, A, B, C, D);
--	T_20_39(37, D, E, A, B, C);
--	T_20_39(38, C, D, E, A, B);
--	T_20_39(39, B, C, D, E, A);
-+	for (; i < 40; ++i)
-+		T_20_39(i, A, B, C, D, E);
- 
- 	/* Round 3 */
--	T_40_59(40, A, B, C, D, E);
--	T_40_59(41, E, A, B, C, D);
--	T_40_59(42, D, E, A, B, C);
--	T_40_59(43, C, D, E, A, B);
--	T_40_59(44, B, C, D, E, A);
--	T_40_59(45, A, B, C, D, E);
--	T_40_59(46, E, A, B, C, D);
--	T_40_59(47, D, E, A, B, C);
--	T_40_59(48, C, D, E, A, B);
--	T_40_59(49, B, C, D, E, A);
--	T_40_59(50, A, B, C, D, E);
--	T_40_59(51, E, A, B, C, D);
--	T_40_59(52, D, E, A, B, C);
--	T_40_59(53, C, D, E, A, B);
--	T_40_59(54, B, C, D, E, A);
--	T_40_59(55, A, B, C, D, E);
--	T_40_59(56, E, A, B, C, D);
--	T_40_59(57, D, E, A, B, C);
--	T_40_59(58, C, D, E, A, B);
--	T_40_59(59, B, C, D, E, A);
-+	for (; i < 60; ++i)
-+		T_40_59(i, A, B, C, D, E);
- 
- 	/* Round 4 */
--	T_60_79(60, A, B, C, D, E);
--	T_60_79(61, E, A, B, C, D);
--	T_60_79(62, D, E, A, B, C);
--	T_60_79(63, C, D, E, A, B);
--	T_60_79(64, B, C, D, E, A);
--	T_60_79(65, A, B, C, D, E);
--	T_60_79(66, E, A, B, C, D);
--	T_60_79(67, D, E, A, B, C);
--	T_60_79(68, C, D, E, A, B);
--	T_60_79(69, B, C, D, E, A);
--	T_60_79(70, A, B, C, D, E);
--	T_60_79(71, E, A, B, C, D);
--	T_60_79(72, D, E, A, B, C);
--	T_60_79(73, C, D, E, A, B);
--	T_60_79(74, B, C, D, E, A);
--	T_60_79(75, A, B, C, D, E);
--	T_60_79(76, E, A, B, C, D);
--	T_60_79(77, D, E, A, B, C);
--	T_60_79(78, C, D, E, A, B);
--	T_60_79(79, B, C, D, E, A);
-+	for (; i < 80; ++i)
-+		T_60_79(i, A, B, C, D, E);
- 
- 	digest[0] += A;
- 	digest[1] += B;
--- 
-2.34.1
+This is already upstream, commit f10b1fc0161cd99e ("mailbox: change
+mailbox-mpfs compatible string").
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
