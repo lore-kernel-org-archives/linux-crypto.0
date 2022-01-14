@@ -2,93 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBB1C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08219C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:08:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243054AbiANP7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 10:59:30 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.85.151]:40643 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232318AbiANP73 (ORCPT
+        id S243048AbiANQIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:08:16 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:53226 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235975AbiANQIP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 10:59:29 -0500
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-190-J5jrWq3oPyyS4GLy2VXbAQ-1; Fri, 14 Jan 2022 15:59:27 +0000
-X-MC-Unique: J5jrWq3oPyyS4GLy2VXbAQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.26; Fri, 14 Jan 2022 15:59:21 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.026; Fri, 14 Jan 2022 15:59:21 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-CC:     Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        =?utf-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        "Network Development" <netdev@vger.kernel.org>,
+        Fri, 14 Jan 2022 11:08:15 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2034AB8295B;
+        Fri, 14 Jan 2022 16:08:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85631C36AE5;
+        Fri, 14 Jan 2022 16:08:12 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hDSUo+JS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642176489;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XoNUXMlaRqSo24jNIM6x457GTTkIBsbsy3/xGdNoalA=;
+        b=hDSUo+JSm4fTUnqQuKoBzcj4s5AQotzneqf9qiUme6TdpQHHx1K5IUI6AMnHRsdYqtK0KI
+        nt9CEVmGTx5D2MKkx00+x++Wfzdo7EPVyP8PuskmZ1isyip1Tf1lMUU01+21X409M+8BJ/
+        2iwR//63+rOWaVYTVOwpcoe1hwOYVy4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e8d5275 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 14 Jan 2022 16:08:09 +0000 (UTC)
+Received: by mail-yb1-f177.google.com with SMTP id v186so25183225ybg.1;
+        Fri, 14 Jan 2022 08:08:08 -0800 (PST)
+X-Gm-Message-State: AOAM531ibQ2WEeWXeJ2tTjKwBN4xV2wJkzFCAI9GCRLc4jgVhu76zled
+        yXgY9U6tFoXanky2Pt5xofldSeoXZT/IGKLSp3k=
+X-Google-Smtp-Source: ABdhPJwGHZubbMwimiyTKVZS5c/4gn9gtnOaoqmNV1fWQS9PD37kKZRkuLqJFdbKfzhQARBKDrL8wWD0WBXScsUTNCs=
+X-Received: by 2002:a25:aae2:: with SMTP id t89mr13844397ybi.638.1642176487356;
+ Fri, 14 Jan 2022 08:08:07 -0800 (PST)
+MIME-Version: 1.0
+References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-3-Jason@zx2c4.com>
+ <87r19cftbr.fsf@toke.dk> <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
+ <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
+In-Reply-To: <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 14 Jan 2022 17:07:56 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+Message-ID: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
+To:     Hannes Frederic Sowa <hannes@stressinduktion.org>
+Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        Netdev <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>
-Subject: RE: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag
- calculation
-Thread-Topic: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag
- calculation
-Thread-Index: AQHYCVpULjtSZ105lEeo5rcLfvZFjaxiq4hw
-Date:   Fri, 14 Jan 2022 15:59:21 +0000
-Message-ID: <13d51088799746469d26a442fb3c6fd5@AcuMS.aculab.com>
-References: <20220112131204.800307-1-Jason@zx2c4.com>
- <20220112131204.800307-2-Jason@zx2c4.com> <87tue8ftrm.fsf@toke.dk>
- <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
- <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
- <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
- <CAHmME9oq36JdV8ap9sPZ=CDfNyaQd6mXd21ztAaZiL7pJh8RCw@mail.gmail.com>
- <CAMj1kXE3JtNjgF3FZjbL-GOQG41yODup4+XdEFP063F=-AWg8A@mail.gmail.com>
- <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
-In-Reply-To: <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+        Erik Kline <ek@google.com>,
+        Fernando Gont <fgont@si6networks.com>,
+        Lorenzo Colitti <lorenzo@google.com>,
+        YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDE0IEphbnVhcnkgMjAyMiAxNToyMQ0K
-PiANCj4gT24gRnJpLCBKYW4gMTQsIDIwMjIgYXQgNDowOCBQTSBBcmQgQmllc2hldXZlbCA8YXJk
-YkBrZXJuZWwub3JnPiB3cm90ZToNCj4gPiBZZWFoLCBzbyB0aGUgaXNzdWUgaXMgdGhhdCwgYXQg
-KnNvbWUqIHBvaW50LCBTSEEtMSBpcyBnb2luZyB0byBoYXZlIHRvDQo+ID4gZ28uIFNvIGl0IHdv
-dWxkIGJlIGhlbHBmdWwgaWYgQWxleGVpIGNvdWxkIGNsYXJpZnkgKndoeSogaGUgZG9lc24ndA0K
-PiA+IHNlZSB0aGlzIGFzIGEgcHJvYmxlbS4gVGhlIGZhY3QgdGhhdCBpdCBpcyBicm9rZW4gbWVh
-bnMgdGhhdCBpdCBpcyBubw0KPiA+IGxvbmdlciBpbnRyYWN0YWJsZSB0byBmb3JnZSBjb2xsaXNp
-b25zLCB3aGljaCBsaWtsZXkgbWVhbnMgdGhhdCBTSEEtMQ0KPiA+IG5vIGxvbmdlciBmdWxmaWxs
-cyB0aGUgdGFzayB0aGF0IHlvdSB3YW50ZWQgaXQgdG8gZG8gaW4gdGhlIGZpcnN0DQo+ID4gcGxh
-Y2UuDQo+IA0KPiBJIHRoaW5rIHRoZSByZWFzb24gdGhhdCBBbGV4ZWkgZG9lc24ndCB0aGluayB0
-aGF0IHRoZSBTSEEtMSBjaG9pY2UNCj4gcmVhbGx5IG1hdHRlcnMgaXMgYmVjYXVzZSB0aGUgcmVz
-dWx0IGlzIGJlaW5nIHRydW5jYXRlZCB0byA2NC1iaXRzLCBzbw0KPiBjb2xsaXNpb25zIGFyZSBl
-YXN5IGFueXdheS4uLg0KDQpXaGljaCBwcm9iYWJseSBtZWFucyB0aGF0IFNIQS0xIGlzIGNvbXBs
-ZXRlIG92ZXJraWxsIGFuZCBzb21ldGhpbmcNCm11Y2ggc2ltcGxlciBjb3VsZCBoYXZlIGJlZW4g
-dXNlZCBpbnN0ZWFkLg0KSXMgdGhlIGJ1ZmZlciBldmVuIGJpZyBlbm91Z2ggdG8gaGF2ZSBldmVy
-IHdhcnJhbnRlZCB0aGUgbWFzc2l2ZQ0KdW5yb2xsaW5nIG9mIHRoZSBzaGEtMSBmdW5jdGlvbi4N
-CihJIHN1c3BlY3QgdGhhdCBqdXN0IGRlc3Ryb3lzIHRoZSBJLWNhY2hlIG9uIG1vc3QgY3B1LikN
-Cg0KVGhlIElQdjYgYWRkcmVzcyBjYXNlIHNlZW1zIGV2ZW4gbW9yZSBpbnNhbmUgLSBob3cgbWFu
-eSBieXRlcw0KYXJlIGFjdHVhbGx5IGJlaW5nIGhhc2hlZC4NClRoZSB1bnJvbGxlZCBsb29wIGlz
-IG9ubHkgbGlrZWx5IHRvIGJlIHNhbmUgZm9yIGxhcmdlIChtZWdhYnl0ZSkNCmJ1ZmZlcnMuDQoN
-CglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwg
-TW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzog
-MTM5NzM4NiAoV2FsZXMpDQo=
+Hi Hannes,
 
+On Thu, Jan 13, 2022 at 12:15 PM Hannes Frederic Sowa
+<hannes@stressinduktion.org> wrote:
+> > I'm not even so sure that's true. That was my worry at first, but
+> > actually, looking at this more closely, DAD means that the address can
+> > be changed anyway - a byte counter is hashed in - so there's no
+> > guarantee there.
+>
+> The duplicate address detection counter is a way to merely provide basic
+> network connectivity in case of duplicate addresses on the network
+> (maybe some kind misconfiguration or L2 attack). Such detected addresses
+> would show up in the kernel log and an administrator should investigate
+> and clean up the situation.
+
+I don't mean to belabor a point where I'm likely wrong anyway, but
+this DAD business has kept me thinking...
+
+Attacker is hanging out on the network sending DAD responses, forcing
+those counters to increment, and thus making SHA1(stuff || counter)
+result in a different IPv6 address than usual. Outcomes:
+1) The administrator cannot handle this, did not understand the
+semantics of this address generation feature, and will now have a
+broken network;
+2) The administrator knows what he's doing, and will be able to handle
+a different IPv6 address coming up.
+
+Do we really care about case (1)? That sounds like emacs spacebar
+heating https://xkcd.com/1172/. And case (2) seems like something that
+would tolerate us changing the hash function.
+
+> Afterwards bringing the interface down and
+> up again should revert the interface to its initial (dad_counter == 0)
+> address.
+
+Except the attacker is still on the network, and the administrator
+can't figure it out because the mac addresses keep changing and it's
+arriving from seemingly random switches! Plot twist: the attack is
+being conducted from an implant in the switch firmware. There are a
+lot of creative different takes on the same basic scenario. The point
+is - the administrator really _can't_ rely on the address always being
+the same, because it's simply out of his control.
+
+Given that the admin already *must* be prepared for the address to
+change, doesn't that give us some leeway to change the algorithm used
+between kernels?
+
+Or to put it differently, are there _actually_ braindead deployments
+out there that truly rely on the address never ever changing, and
+should we be going out of our way to support what is arguably a
+misreading and misdeployment of the feature?
+
+(Feel free to smack this line of argumentation down if you disagree. I
+just thought it should be a bit more thoroughly explored.)
+
+Jason
