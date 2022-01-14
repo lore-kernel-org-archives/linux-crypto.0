@@ -2,93 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F739C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88B0C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:42:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238587AbiANPgf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 10:36:35 -0500
-Received: from mail-vk1-f178.google.com ([209.85.221.178]:47077 "EHLO
-        mail-vk1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230420AbiANPgf (ORCPT
+        id S229884AbiANPm7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 10:42:59 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:57268 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242634AbiANPm6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 10:36:35 -0500
-Received: by mail-vk1-f178.google.com with SMTP id bj47so6010278vkb.13;
-        Fri, 14 Jan 2022 07:36:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YJjdZDOE3o2kL7hMCs+KcBi0cfqKaf561XO1uO98LqA=;
-        b=jKv34m9Xik7cvyi1qWqtZFBtdMR88awmRcZkLEeA7XZVZba4y6gszFTE0s7E7Ab5Rq
-         5KbNZpjvdKNOxDg4xz9jgl7+OHQeR/PExvzxfv2nDvGrmNwPQrEIwHvkueMXgAWgPK4p
-         +xBfj9vHjMlB6DxV2djQmKxrjPKNY0LJoXOuf6lMbVz4K1CBIJAF1zUY4xMa2Y/jy0Zv
-         IQ1/WLMbUc/T96jbZeYyhO9Yery8eGN+P6av1B+bd+MeRxXboyU89eoHLd2wkokKC2xH
-         uhiy3uAmRmA//jXvOC9bhSWbnawimCdWsminunYrNO5F/AopKAzLAUbRrlA4GGmxtACY
-         cOIw==
-X-Gm-Message-State: AOAM531aYTh8dRH+GIFLosy6g05xKRC6fwSl3uzaz0ra1gAWe/qPt6GU
-        04MspgBmR/9UgUmktrhagk4g3OR+Zg6Xewrv
-X-Google-Smtp-Source: ABdhPJz9d1jGDGtXclbJT1JVstQJwp3ulw7+h2mXY52hq6cOelrhOpLJ+gL4rOiKf0M61CISDB/+Bg==
-X-Received: by 2002:ac5:c18f:: with SMTP id z15mr2784842vkb.24.1642174594644;
-        Fri, 14 Jan 2022 07:36:34 -0800 (PST)
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
-        by smtp.gmail.com with ESMTPSA id o12sm2172193uae.1.2022.01.14.07.36.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jan 2022 07:36:34 -0800 (PST)
-Received: by mail-ua1-f47.google.com with SMTP id p1so17529862uap.9;
-        Fri, 14 Jan 2022 07:36:34 -0800 (PST)
-X-Received: by 2002:a9f:3e01:: with SMTP id o1mr4495386uai.89.1642174593855;
- Fri, 14 Jan 2022 07:36:33 -0800 (PST)
+        Fri, 14 Jan 2022 10:42:58 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2124461F38;
+        Fri, 14 Jan 2022 15:42:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17B9FC36AEA;
+        Fri, 14 Jan 2022 15:42:57 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="J50NzVoQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642174976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=jHAjYaJLduk1oUVrq3t+bswqqI+Vo9Ud2UlUUNOhc3w=;
+        b=J50NzVoQ/cbnu7PvlAljPB2adxPxtTbcpV518xAwKtnnFVteirroyQHFH+QvrwXAmjdH6r
+        kcSh/aS4PEL2p/SQzdlILejpqte0HhIlABh9U3fcFBdV8kzZkpfMAXZ3rlH8MFDFUzuA1j
+        2qkerbMEh9m/2OaeYQxR6pbZBHXKuFM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 92ac44a4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 14 Jan 2022 15:42:55 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        geert@linux-m68k.org, herbert@gondor.apana.org.au
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH crypto v3 0/2] reduce code size from blake2s on m68k and other small platforms
+Date:   Fri, 14 Jan 2022 16:42:45 +0100
+Message-Id: <20220114154247.99773-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
- <87tue8ftrm.fsf@toke.dk> <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
- <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
- <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
- <CAHmME9oq36JdV8ap9sPZ=CDfNyaQd6mXd21ztAaZiL7pJh8RCw@mail.gmail.com>
- <CAMj1kXE3JtNjgF3FZjbL-GOQG41yODup4+XdEFP063F=-AWg8A@mail.gmail.com> <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
-In-Reply-To: <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 14 Jan 2022 16:36:22 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXDmwHaJuvNo8vkzudfhL0E3b=0b4mP_OqDCYFqm82J5Q@mail.gmail.com>
-Message-ID: <CAMuHMdXDmwHaJuvNo8vkzudfhL0E3b=0b4mP_OqDCYFqm82J5Q@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+[ Resending this v3, because the previous one was so deeply nested
+  inside other patchset threads that b4 was unable to extract it without
+  getting terribly confused. And if b4 was confused, probably human
+  readers were too. This new cover letter is a new root thread. ]
 
-On Fri, Jan 14, 2022 at 4:20 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> I think the reason that Alexei doesn't think that the SHA-1 choice
-> really matters is because the result is being truncated to 64-bits, so
-> collisions are easy anyway, regardless of which hash function is
-> chosen (birthday bound and all). But from Geert's perspective, that
-> SHA-1 is still taking up precious bytes in m68k builds. And from my
-> perspective, it's poor form and clutters vmlinux, and plus, now I'm
-> curious about why this isn't using a more appropriately sized tag in
-> the first place.
+Hi,
 
-Not just on m68k. Same on other architectures.
-Yes, people do make products with SoCs with 8 MiB of builtin SRAM,
-running Linux. They might stay away from BPF, though ;-)
+Geert emailed me this afternoon concerned about blake2s codesize on m68k
+and other small systems. We identified two effective ways of chopping
+down the size. One of them moves some wireguard-specific things into
+wireguard proper. The other one adds a slower codepath for small
+machines to blake2s. This worked, and was v1 of this patchset, but I
+wasn't so much of a fan. Then someone pointed out that the generic C
+SHA-1 implementation is still unrolled, which is a *lot* of extra code.
+Simply rerolling that saves about as much as v1 did. So, we instead do
+that in this patchset. SHA-1 is being phased out, and soon it won't
+be included at all (hopefully). And nothing performance-oriented has
+anything to do with it anyway.
 
-Gr{oetje,eeting}s,
+The result of these two patches mitigates Geert's feared code size
+increase for 5.17.
 
-                        Geert
+v3 improves on v2 by making the re-rolling of SHA-1 much simpler,
+resulting in even larger code size reduction and much better
+performance. The reason I'm sending yet a third version in such a short
+amount of time is because the trick here feels obvious and substantial
+enough that I'd hate for Geert to waste time measuring the impact of the
+previous commit.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Thanks,
+Jason
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Jason A. Donenfeld (2):
+  lib/crypto: blake2s: move hmac construction into wireguard
+  lib/crypto: sha1: re-roll loops to reduce code size
+
+ drivers/net/wireguard/noise.c | 45 ++++++++++++++---
+ include/crypto/blake2s.h      |  3 --
+ lib/crypto/blake2s-selftest.c | 31 ------------
+ lib/crypto/blake2s.c          | 37 --------------
+ lib/sha1.c                    | 95 ++++++-----------------------------
+ 5 files changed, 53 insertions(+), 158 deletions(-)
+
+-- 
+2.34.1
+
