@@ -2,113 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C0EC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A9BC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbiANQiM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 11:38:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53024 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235179AbiANQiM (ORCPT
+        id S239272AbiANQ5J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:57:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35948 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239261AbiANQ5J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 11:38:12 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75500C061574;
-        Fri, 14 Jan 2022 08:38:11 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id m21so3204980pfd.3;
-        Fri, 14 Jan 2022 08:38:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UdAhn1yP8utSK2rJWKDnZNaAaZ8ZXIqz54JjwpJvgpQ=;
-        b=FQVcQ0AcdShPy4qgO3i9uPzOtqze3SVxLhUjkznY3+NjqH5zxeeYYcdHlyORH7YzCJ
-         eaeps+kM4+knX1Tt+p6X+l2Z1osOl+3/oB4Asy3CDb+L/uQjrplvtjr6Or1cmFQ3oMZW
-         +mKI3MVFc3Y4lWRTRk+6hwx03WI4CGPgfjOsWGMMtmzJcFLixgCcJIwY9tIg9PgfhgKz
-         iCm4pDLp9JT59E3Vz1FUfKGDOaj2HF+NOVuIZUQaVBoVd4ZOn9YAowHCHFmw8k7eTZ72
-         WU/1o6ohDldo/9Dkzqpq2N6wnpSPDqxBWELYegHy6Sm3yvg234/ckkpMlNEfbF7RX66D
-         VC8A==
+        Fri, 14 Jan 2022 11:57:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642179428;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L/VcfrWN/CJufq+iaNTecIlHvJcTa9A4ZW2s07umBv8=;
+        b=hnbCtICQZ71K9yaHLeCN8eg5XcS4i2UaMJHxdsv+nI6vTU0IVc3UVbTSbwL4378zTpu3Ye
+        o2Ae/8Tqpbx8TMa2fZhS3xbRI/esCDn2VgBng5rQJxx5IZwcKbr8alKYC2aB5GUOQ6/f35
+        heITVnu4LJ35x3peFl9rk0VFloep/tw=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-324-VjbBE4DRNZ6i2Ay11SnSNA-1; Fri, 14 Jan 2022 11:57:07 -0500
+X-MC-Unique: VjbBE4DRNZ6i2Ay11SnSNA-1
+Received: by mail-ed1-f69.google.com with SMTP id l10-20020a056402124a00b0040186fbe40dso57088edw.7
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 08:57:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=UdAhn1yP8utSK2rJWKDnZNaAaZ8ZXIqz54JjwpJvgpQ=;
-        b=ndbtu2K/gkpWRkp7aXTOqJs+njwSq7Xjxm8NYVwXOLLrX+EJ0oA7fWfitFH0P70fqe
-         MJncsXL3w5NznOhzHYNL8Ov3strVfEfmsuk1BXOtnQGUn1u6XB/Inq9EGMFV6+q2atLj
-         LIaA8g5dxMsR0L5cYkXOL8Yd/lrwtAlwbVICr/Q/ahw4AKn3dJZMWnF/S+bPKzwQX9s4
-         mmvwtmQVv3OGTqP3Elw6shDCzB+eKpOuKBeCgZp5PbwG1SDeEX1zE0zub3ZOf8I1LPlF
-         ejpa3RZYTSE9PjMRiQ/LTw6lZxV+LiMkKED7ncuT83QFAib6+sIUn5b45BBLt8ltqjIg
-         B1Cg==
-X-Gm-Message-State: AOAM533jJSgUrwHybEjLW/uPCoNyY9PTQmGZBTVBOmlaPcdxTtrBc/2E
-        c7wo9gDGBBM1XiYqVRAUVJI=
-X-Google-Smtp-Source: ABdhPJxiT42ScAmY7IPzWzRpYUt/AJjQ0wnb6ujH//Zxut8aB5TCaMGGIE6mc38OJ9xD1Lo5a5NA2A==
-X-Received: by 2002:a65:6ab3:: with SMTP id x19mr8588083pgu.416.1642178290941;
-        Fri, 14 Jan 2022 08:38:10 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id w64sm636354pfd.0.2022.01.14.08.38.10
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=L/VcfrWN/CJufq+iaNTecIlHvJcTa9A4ZW2s07umBv8=;
+        b=l9OAfy1If1RVf/gUxmIP5CuLS0+baeALlBpZHySMOtA98PJUvd50vrqx+/qfosilrN
+         RZMvrk736w+kHqy5Kj+3eNYnlrQaXbQPMpjqTBXdtVYJbv25BY0Xok0CDD5zpr/Nts6x
+         r0eUGepvABiw7LvNffYdKJjIitfWBg2HBkJHRouAPlXeE1wmXYaBFT4vSibf46qo0LdN
+         RpMMX4kMgzorWwr4DPGHZ9P89FaVm7LmcECXVSRWaMdL/fr81IT3JGO2v5BphR4UgcIP
+         140C5pCdoiivONwQF4fBAofEepQKmrXj9rj4GLHp/KxK6l9V3rwJcaxiQxIcmQJQ93Dz
+         Sqeg==
+X-Gm-Message-State: AOAM532aZnbeE/59kM9uRr5oUdXbxUZDlBzA7V8EI8O3fhW2vjSgmww7
+        db+7HHWb/CWvJ2j6WX1E7UmM/VslAuEi6hjAWQVJxDf1rZNWDjS9zy6fYVAtrSJgRJbmpCmGhBg
+        Wc3Q5zuNcUZNuCKcD3ynGWX11
+X-Received: by 2002:a17:906:2f97:: with SMTP id w23mr7752013eji.739.1642179424888;
+        Fri, 14 Jan 2022 08:57:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwBdhdFvT9wrbNEej3LojZ9TVAbSXZcep4xdKG41AVlohi7vwp5TAfgT7v2q1eob/+dkfPZeg==
+X-Received: by 2002:a17:906:2f97:: with SMTP id w23mr7751960eji.739.1642179423950;
+        Fri, 14 Jan 2022 08:57:03 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id k16sm1994888ejk.172.2022.01.14.08.57.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 08:38:10 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 14 Jan 2022 06:38:09 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Fri, 14 Jan 2022 08:57:03 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+        id 17EA61806B4; Fri, 14 Jan 2022 17:57:00 +0100 (CET)
+From:   Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Hannes Frederic Sowa <hannes@stressinduktion.org>
+Cc:     Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
- bandwidth
-Message-ID: <YeGm8cbX6Krw+O3o@slm.duckdns.org>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106004656.126790-16-daniel.m.jordan@oracle.com>
- <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
- <YeFE9j4Qynp9sNXS@hirez.programming.kicks-ass.net>
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Erik Kline <ek@google.com>,
+        Fernando Gont <fgont@si6networks.com>,
+        Lorenzo Colitti <lorenzo@google.com>,
+        YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
+Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address
+ calculation
+In-Reply-To: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+References: <20220112131204.800307-1-Jason@zx2c4.com>
+ <20220112131204.800307-3-Jason@zx2c4.com> <87r19cftbr.fsf@toke.dk>
+ <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
+ <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
+ <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date:   Fri, 14 Jan 2022 17:57:00 +0100
+Message-ID: <875yqmdzmr.fsf@toke.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YeFE9j4Qynp9sNXS@hirez.programming.kicks-ass.net>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+"Jason A. Donenfeld" <Jason@zx2c4.com> writes:
 
-On Fri, Jan 14, 2022 at 10:40:06AM +0100, Peter Zijlstra wrote:
-> You could do a special case sched_move_task(), that takes a css argument
-> instead of using the current task_css. Then for cgroups it looks like
-> nothing changes, but the scheduler will DTRT and act like it is in the
-> target cgroup. Then at the end, simply move it back to task_css.
-> 
-> This obviously doesn't work for SoftIRQ accounting, but that is
-> 'special' anyway. Softirq stuff is not otherwise under scheduler
-> control and has preemption disabled.
+> Hi Hannes,
+>
+> On Thu, Jan 13, 2022 at 12:15 PM Hannes Frederic Sowa
+> <hannes@stressinduktion.org> wrote:
+>> > I'm not even so sure that's true. That was my worry at first, but
+>> > actually, looking at this more closely, DAD means that the address can
+>> > be changed anyway - a byte counter is hashed in - so there's no
+>> > guarantee there.
+>>
+>> The duplicate address detection counter is a way to merely provide basic
+>> network connectivity in case of duplicate addresses on the network
+>> (maybe some kind misconfiguration or L2 attack). Such detected addresses
+>> would show up in the kernel log and an administrator should investigate
+>> and clean up the situation.
+>
+> I don't mean to belabor a point where I'm likely wrong anyway, but
+> this DAD business has kept me thinking...
+>
+> Attacker is hanging out on the network sending DAD responses, forcing
+> those counters to increment, and thus making SHA1(stuff || counter)
+> result in a different IPv6 address than usual. Outcomes:
+> 1) The administrator cannot handle this, did not understand the
+> semantics of this address generation feature, and will now have a
+> broken network;
+> 2) The administrator knows what he's doing, and will be able to handle
+> a different IPv6 address coming up.
+>
+> Do we really care about case (1)? That sounds like emacs spacebar
+> heating https://xkcd.com/1172/. And case (2) seems like something that
+> would tolerate us changing the hash function.
 
-So, if this particular use case doesn't fit the backcharge model (I'm not
-sure yet). I'd much prefer it to maintain dynamic per-cgroup helper threads
-than move tasks around dynamically. Nothing else is using migration this way
-and we don't even need migration for seeding cgroups w/ CLONE_INTO_CGROUP.
-In the future, this should allow further optimizations and likely
-simplifications. It'd suck to have an odd exception usage.
+Privacy addresses mostly address identification outside of the local
+network (because on the local network you can see the MAC address), so I
+don't think it's unreasonable for someone to enable this and not have a
+procedure in place to deal with DAD causing the address to change. For
+instance, they could manage their network in a way that they won't
+happen (or just turn off DAD entirely on the affected boxes).
 
-Thanks.
+>> Afterwards bringing the interface down and
+>> up again should revert the interface to its initial (dad_counter == 0)
+>> address.
+>
+> Except the attacker is still on the network, and the administrator
+> can't figure it out because the mac addresses keep changing and it's
+> arriving from seemingly random switches! Plot twist: the attack is
+> being conducted from an implant in the switch firmware. There are a
+> lot of creative different takes on the same basic scenario. The point
+> is - the administrator really _can't_ rely on the address always being
+> the same, because it's simply out of his control.
+>
+> Given that the admin already *must* be prepared for the address to
+> change, doesn't that give us some leeway to change the algorithm used
+> between kernels?
+>
+> Or to put it differently, are there _actually_ braindead deployments
+> out there that truly rely on the address never ever changing, and
+> should we be going out of our way to support what is arguably a
+> misreading and misdeployment of the feature?
+>
+> (Feel free to smack this line of argumentation down if you disagree. I
+> just thought it should be a bit more thoroughly explored.)
 
--- 
-tejun
+I kinda get where you're coming from, but most systems are not actively
+under attack, and those will still "break" if this is just changed.
+Which is one of those "a kernel upgrade broke my system" type of events
+that we want to avoid because it makes people vary of upgrading, so
+they'll keep running old kernels way past their expiry dates.
+
+-Toke
+
