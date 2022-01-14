@@ -2,124 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08219C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 195B0C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243048AbiANQIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 11:08:16 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:53226 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235975AbiANQIP (ORCPT
+        id S243252AbiANQQO convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:16:14 -0500
+Received: from mail-0301.mail-europe.com ([188.165.51.139]:51270 "EHLO
+        mail-0301.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243217AbiANQQM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 11:08:15 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2034AB8295B;
-        Fri, 14 Jan 2022 16:08:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85631C36AE5;
-        Fri, 14 Jan 2022 16:08:12 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hDSUo+JS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642176489;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XoNUXMlaRqSo24jNIM6x457GTTkIBsbsy3/xGdNoalA=;
-        b=hDSUo+JSm4fTUnqQuKoBzcj4s5AQotzneqf9qiUme6TdpQHHx1K5IUI6AMnHRsdYqtK0KI
-        nt9CEVmGTx5D2MKkx00+x++Wfzdo7EPVyP8PuskmZ1isyip1Tf1lMUU01+21X409M+8BJ/
-        2iwR//63+rOWaVYTVOwpcoe1hwOYVy4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e8d5275 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 14 Jan 2022 16:08:09 +0000 (UTC)
-Received: by mail-yb1-f177.google.com with SMTP id v186so25183225ybg.1;
-        Fri, 14 Jan 2022 08:08:08 -0800 (PST)
-X-Gm-Message-State: AOAM531ibQ2WEeWXeJ2tTjKwBN4xV2wJkzFCAI9GCRLc4jgVhu76zled
-        yXgY9U6tFoXanky2Pt5xofldSeoXZT/IGKLSp3k=
-X-Google-Smtp-Source: ABdhPJwGHZubbMwimiyTKVZS5c/4gn9gtnOaoqmNV1fWQS9PD37kKZRkuLqJFdbKfzhQARBKDrL8wWD0WBXScsUTNCs=
-X-Received: by 2002:a25:aae2:: with SMTP id t89mr13844397ybi.638.1642176487356;
- Fri, 14 Jan 2022 08:08:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-3-Jason@zx2c4.com>
- <87r19cftbr.fsf@toke.dk> <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
- <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
-In-Reply-To: <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 14 Jan 2022 17:07:56 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
-Message-ID: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
-To:     Hannes Frederic Sowa <hannes@stressinduktion.org>
-Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Fri, 14 Jan 2022 11:16:12 -0500
+Date:   Fri, 14 Jan 2022 16:15:58 +0000
+Authentication-Results: mail-4018.proton.ch; dkim=none
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+From:   conor dooley <mail@conchuod.ie>
+Cc:     Conor Dooley <conor.dooley@microchip.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Mark Brown <broonie@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        =?utf-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        Lee Jones <lee.jones@linaro.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux I2C <linux-i2c@vger.kernel.org>,
+        Linux PWM List <linux-pwm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Erik Kline <ek@google.com>,
-        Fernando Gont <fgont@si6networks.com>,
-        Lorenzo Colitti <lorenzo@google.com>,
-        YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
-Content-Type: text/plain; charset="UTF-8"
+        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Bin Meng <bin.meng@windriver.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Lewis Hanly <lewis.hanly@microchip.com>,
+        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
+        Atish Patra <atishp@rivosinc.com>
+Reply-To: conor dooley <mail@conchuod.ie>
+Subject: Re: [PATCH v3 03/15] mailbox: change mailbox-mpfs compatible string
+Message-ID: <MzSOUvHzeH0svo7uoPc_rfCs1BVTByRKAZ_EftQ5Qk2sheETSbE_NFPRVzFd8YmKMQ_9uIggomOqyQUD9clIwabiKrVp4F2Gw4nOnJkXv2M=@conchuod.ie>
+In-Reply-To: <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
+References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-4-conor.dooley@microchip.com> <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Hannes,
-
-On Thu, Jan 13, 2022 at 12:15 PM Hannes Frederic Sowa
-<hannes@stressinduktion.org> wrote:
-> > I'm not even so sure that's true. That was my worry at first, but
-> > actually, looking at this more closely, DAD means that the address can
-> > be changed anyway - a byte counter is hashed in - so there's no
-> > guarantee there.
+> Hi Conor,
 >
-> The duplicate address detection counter is a way to merely provide basic
-> network connectivity in case of duplicate addresses on the network
-> (maybe some kind misconfiguration or L2 attack). Such detected addresses
-> would show up in the kernel log and an administrator should investigate
-> and clean up the situation.
+> On Fri, Jan 14, 2022 at 4:16 PM <conor.dooley@microchip.com> wrote:
+> > From: Conor Dooley <conor.dooley@microchip.com>
+> >
+> > The Polarfire SoC is currently using two different compatible string
+> > prefixes. Fix this by changing "polarfire-soc-*" strings to "mpfs-*" in
+> > its system controller in order to match the compatible string used in
+> > the soc binding and device tree.
+> >
+> > Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+>
+> This is already upstream, commit f10b1fc0161cd99e ("mailbox: change
+> mailbox-mpfs compatible string").
 
-I don't mean to belabor a point where I'm likely wrong anyway, but
-this DAD business has kept me thinking...
+I would say great, but that means the new string is now in the driver
+but the new dt-binding is not (and I just noticed contains an error).
+Conor.
 
-Attacker is hanging out on the network sending DAD responses, forcing
-those counters to increment, and thus making SHA1(stuff || counter)
-result in a different IPv6 address than usual. Outcomes:
-1) The administrator cannot handle this, did not understand the
-semantics of this address generation feature, and will now have a
-broken network;
-2) The administrator knows what he's doing, and will be able to handle
-a different IPv6 address coming up.
-
-Do we really care about case (1)? That sounds like emacs spacebar
-heating https://xkcd.com/1172/. And case (2) seems like something that
-would tolerate us changing the hash function.
-
-> Afterwards bringing the interface down and
-> up again should revert the interface to its initial (dad_counter == 0)
-> address.
-
-Except the attacker is still on the network, and the administrator
-can't figure it out because the mac addresses keep changing and it's
-arriving from seemingly random switches! Plot twist: the attack is
-being conducted from an implant in the switch firmware. There are a
-lot of creative different takes on the same basic scenario. The point
-is - the administrator really _can't_ rely on the address always being
-the same, because it's simply out of his control.
-
-Given that the admin already *must* be prepared for the address to
-change, doesn't that give us some leeway to change the algorithm used
-between kernels?
-
-Or to put it differently, are there _actually_ braindead deployments
-out there that truly rely on the address never ever changing, and
-should we be going out of our way to support what is arguably a
-misreading and misdeployment of the feature?
-
-(Feel free to smack this line of argumentation down if you disagree. I
-just thought it should be a bit more thoroughly explored.)
-
-Jason
+>
+> Gr{oetje,eeting}s,
+>
+>                         Geert
+>
+> --
+> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+>
+> In personal conversations with technical people, I call myself a hacker. But
+> when I'm talking to journalists I just say "programmer" or something like that.
+>                                 -- Linus Torvalds
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
