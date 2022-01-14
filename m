@@ -2,102 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3519C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AD1C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:19:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243249AbiANQSy convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 11:18:54 -0500
-Received: from mail-4018.proton.ch ([185.70.40.18]:50365 "EHLO
-        mail-4018.proton.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243243AbiANQSx (ORCPT
+        id S239075AbiANQTZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:19:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48572 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236320AbiANQTY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 11:18:53 -0500
-Date:   Fri, 14 Jan 2022 16:18:50 +0000
-Authentication-Results: mail-4018.proton.ch; dkim=none
-To:     conor.dooley@microchip.com
-From:   conor dooley <mail@conchuod.ie>
-Cc:     linus.walleij@linaro.org, bgolaszewski@baylibre.com,
-        robh+dt@kernel.org, jassisinghbrar@gmail.com,
-        paul.walmsley@sifive.com, palmer@dabbelt.com,
-        aou@eecs.berkeley.edu, a.zummo@towertech.it,
-        alexandre.belloni@bootlin.com, broonie@kernel.org,
-        gregkh@linuxfoundation.org, thierry.reding@gmail.com,
-        u.kleine-koenig@pengutronix.de, lee.jones@linaro.org,
-        linux-gpio@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-pwm@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-spi@vger.kernel.org, linux-usb@vger.kernel.org,
-        krzysztof.kozlowski@canonical.com, geert@linux-m68k.org,
-        bin.meng@windriver.com, heiko@sntech.de, lewis.hanly@microchip.com,
-        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
-        atishp@rivosinc.com
-Reply-To: conor dooley <mail@conchuod.ie>
-Subject: Re: [PATCH v3 01/15] dt-bindings: soc/microchip: update syscontroller compatibles
-Message-ID: <nK7Z7oZFnoE0yhMjColrEPJvSFc7SpHv54Ftu3PJzQjpLA0s1F0Rwa3P5qEQrcFhJVbcUvY3TOFppyaIAS9QX09qg5nPMiilhvOO_W0fmHQ=@conchuod.ie>
-In-Reply-To: <20220114151727.2319915-2-conor.dooley@microchip.com>
-References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-2-conor.dooley@microchip.com>
+        Fri, 14 Jan 2022 11:19:24 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8203DC061574;
+        Fri, 14 Jan 2022 08:19:24 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id x83so3153585pfc.0;
+        Fri, 14 Jan 2022 08:19:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7+XOS+yU1t+lk/sHk/LsTZqTmWmSghHZu/3OGRdz47g=;
+        b=drxOjeeoSjznU61kIKfsu032f1Gk8Zs444uZ5DUVkCUkjSZKwKkaLfuCSHTf0SbPC6
+         pFbx+qhh58QvXOE4m37VpgeVxeT9h1j7lm3OoFdRq6hz3rCFP+b2fFB8L1HEnYE3Xajq
+         tUkE9pouzRaNAEDXDlNmd/NiboXQGofTPXSnIR16a6g9V//KtR88Ckco2aPt+GQpmWtK
+         dZ7F3nEvqOL4d+qALt+HZT513QDgp2M30hfU8bNJbbQYWkniBJDtovhZPiR89SbeFBHu
+         LcLzpkifurEdffTm5aV5bRu3qSag+mAIoAjfrZtMGmHsdp2jPslCIdXCiL1tY0/FFiXh
+         dJ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7+XOS+yU1t+lk/sHk/LsTZqTmWmSghHZu/3OGRdz47g=;
+        b=J9aWyV147EPZQKtLCitk6gzVmtUhRMuvvhvBWkDchq5ertdCFvLqjdIWx5L8+4pp0L
+         VOWAS65PfuczL2KtZAaMjKwzstYx8Hs6XKjeOvSjud+vFbcgzc1Usoaz5X5u8uSTMg8/
+         LnXeQREVrvfY0WkBQ6AV9MWvWCegpwwVBbaMqd2bmBbGwimmgro+DV42fbdIBbpzfn5H
+         stw6zusnfD+nbsPgVvHK/uytXGnhpl8otduWPxmpBm9GBHPtwBw+ofGFhIZGfHKFdtUM
+         KuiEmBgKUEuRd/nrimUF2816setAFwAvlbn/3ai+99ykDUpRCVWhI3aWPp3tHYMO8cS7
+         0IoA==
+X-Gm-Message-State: AOAM530/3I06N6SjL7JHxhVNudzNJa7/MYhhXNCQFTHbOlGklIbf+JiA
+        AI0CSexQE1k5Gdmrw17TN7mtv7sGYUqHfJKBQs4=
+X-Google-Smtp-Source: ABdhPJzTvJtyVk8UXspHT1nQqMFqp1dXQyjp2xL0d7KspMxr89t/AxZe9dEGxZT2BGgXxtNmfFzZzkOIITNoEO1tVXg=
+X-Received: by 2002:a63:1ca:: with SMTP id 193mr8398425pgb.497.1642177163942;
+ Fri, 14 Jan 2022 08:19:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
+ <87tue8ftrm.fsf@toke.dk> <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
+ <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
+ <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
+ <CAHmME9oq36JdV8ap9sPZ=CDfNyaQd6mXd21ztAaZiL7pJh8RCw@mail.gmail.com> <CAMj1kXE3JtNjgF3FZjbL-GOQG41yODup4+XdEFP063F=-AWg8A@mail.gmail.com>
+In-Reply-To: <CAMj1kXE3JtNjgF3FZjbL-GOQG41yODup4+XdEFP063F=-AWg8A@mail.gmail.com>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Fri, 14 Jan 2022 08:19:12 -0800
+Message-ID: <CAADnVQKCSJi=U4gNv48vsS8Guu7_JP946yMuNqVAJ-D=rAme7w@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> From: Conor Dooley <conor.dooley@microchip.com>
+On Fri, Jan 14, 2022 at 7:08 AM Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> The Polarfire SoC is currently using two different compatible string
-> prefixes. Fix this by changing "polarfire-soc-*" strings to "mpfs-*" in
-> its system controller in order to match the compatible string used in
-> the soc binding and device tree
->
-> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  ...larfire-soc-mailbox.yaml => microchip,mpfs-mailbox.yaml} | 6 +++---
->  ...s-controller.yaml => microchip,mpfs-sys-controller.yaml} | 6 +++---
->  2 files changed, 6 insertions(+), 6 deletions(-)
->  rename Documentation/devicetree/bindings/mailbox/{microchip,polarfire-soc-mailbox.yaml => microchip,mpfs-mailbox.yaml} (82%)
->  rename Documentation/devicetree/bindings/soc/microchip/{microchip,polarfire-soc-sys-controller.yaml => microchip,mpfs-sys-controller.yaml} (75%)
->
-> diff --git a/Documentation/devicetree/bindings/mailbox/microchip,polarfire-soc-mailbox.yaml b/Documentation/devicetree/bindings/mailbox/microchip,mpfs-mailbox.yaml
-> similarity index 82%
-> rename from Documentation/devicetree/bindings/mailbox/microchip,polarfire-soc-mailbox.yaml
-> rename to Documentation/devicetree/bindings/mailbox/microchip,mpfs-mailbox.yaml
-> index bbb173ea483c..9251c2218c68 100644
-> --- a/Documentation/devicetree/bindings/mailbox/microchip,polarfire-soc-mailbox.yaml
-> +++ b/Documentation/devicetree/bindings/mailbox/microchip,mpfs-mailbox.yaml
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->  %YAML 1.2
->  ---
-> -$id: "http://devicetree.org/schemas/mailbox/microchip,polarfire-soc-mailbox.yaml#"
-> +$id: "http://devicetree.org/schemas/mailbox/microchip,mpfs-mailbox.yaml#"
->  $schema: "http://devicetree.org/meta-schemas/core.yaml#"
->
->  title: Microchip PolarFire SoC (MPFS) MSS (microprocessor subsystem) mailbox controller
-> @@ -11,7 +11,7 @@ maintainers:
->
->  properties:
->    compatible:
-> -    const: microchip,polarfire-soc-mailbox
-> +    const: microchip,mpfs-mailbox
->
->    reg:
->      items:
-> @@ -38,7 +38,7 @@ examples:
->        #address-cells = <2>;
->        #size-cells = <2>;
->        mbox: mailbox@37020000 {
-> -        compatible = "microchip,polarfire-soc-mailbox";
-> +        compatible = "mpfs-mailbox";
+> Yeah, so the issue is that, at *some* point, SHA-1 is going to have to
+> go.
 
-Example is wrong, should read "microchip,mpfs-mailbox".
-
-Will resubmit Monday.
-
->          reg = <0x0 0x37020000 0x0 0x1000>, <0x0 0x2000318c 0x0 0x40>;
->          interrupt-parent = <&L1>;
->          interrupts = <96>;
-
+sha1 cannot be removed from the kernel.
+See AF_ALG and iproute2 source for reference.
