@@ -2,114 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16574C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F51C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 16:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243350AbiANQai (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 11:30:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbiANQah (ORCPT
+        id S243360AbiANQdY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 11:33:24 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:36406 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230447AbiANQdX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 11:30:37 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90006C061574;
-        Fri, 14 Jan 2022 08:30:37 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id i8-20020a17090a138800b001b3936fb375so22555173pja.1;
-        Fri, 14 Jan 2022 08:30:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=McBFRt0xW8oYX4Ag1XsMER97DYFpCs3j7XG1ixU4FDo=;
-        b=a9EtpM5fZyStOorZ4XyDyPTTWIeWJp1m8rgkblkXI5QBqLyAlDS/obdGP5LXqJFSow
-         8jsE4B0lacFd6PDobxJQvYbHD4LbtZMs8mDWi8mUGjVis9URF6QoLBaDQt7qRfKmXDlO
-         y5li58aUPUzGbX+fndZEpo/2O5/QaD4bx9dTWoJFvua9UJp0UhNcjRjbSdG+sBkeRemN
-         jj+rCUF8G/zyfGHLNeYnZqAKzVvgx2YTM9Yow8dcg5y6LhH1dr9S7E+2EQQ5v9H9bcHh
-         bhCa+ZRyNhFuzP/4I4CFRWYZ7baOQtlV1HhUt+SRvfA1/CgwR38MDGkr3Bpr6hE7GKyK
-         GRIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=McBFRt0xW8oYX4Ag1XsMER97DYFpCs3j7XG1ixU4FDo=;
-        b=zkS1/+ISaEly+kBEEnygW9RTZjM5+EU4FyC4m5L9tkNZ7FZbiSuuNt9hvA0DLj+qds
-         KqYOX4mQFPd4Dc7+oelyDwybcjZEpAiKHyPh5opcfsjI0OKhbpzcIBiJMBY5fynN8KNa
-         BxAIiemog21tmsopzlY5Uo/eXHep9w8GNaYjDK8uhaSZAfxA9VAmjTmsrV5n3rkI5xMw
-         TiHo+5Ex26CPonZ4u/+LRugJ5M49YbuDYgY0mLkKsU36S1cnI/Lh1W/L8nnQa2eooJWr
-         3YFxmKGEbtjohXDPlw2QPpBMSytSiJPZlK0nAD5E9/7cTzvW3qlklPQpvM1f7wNpWjE8
-         oJtg==
-X-Gm-Message-State: AOAM530j4DiHRK7LUsLqbq9uZ5tkbhaNw6uHHFcIkRpkrdPYvs3OKbpI
-        UvLYCZ0Ff1HVLT+D1+e7Xgc=
-X-Google-Smtp-Source: ABdhPJxwZCKfDpKHDsHA7rXcy07S2mA0pBNMbPGORichSXE9GoyQYoxfKOZ7tLi1iPJ6nMjhSYNkpg==
-X-Received: by 2002:a17:90a:748:: with SMTP id s8mr334066pje.139.1642177836736;
-        Fri, 14 Jan 2022 08:30:36 -0800 (PST)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id z16sm5017479pgi.89.2022.01.14.08.30.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 08:30:36 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 14 Jan 2022 06:30:34 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Alexander Duyck <alexanderduyck@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ben Segall <bsegall@google.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Michal Hocko <mhocko@suse.com>, Nico Pache <npache@redhat.com>,
-        Pasha Tatashin <pasha.tatashin@soleen.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
- bandwidth
-Message-ID: <YeGlKpumqRxT9L7A@slm.duckdns.org>
-References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
- <20220106004656.126790-16-daniel.m.jordan@oracle.com>
- <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
+        Fri, 14 Jan 2022 11:33:23 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2B2EAB82963;
+        Fri, 14 Jan 2022 16:33:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E157C36AEF;
+        Fri, 14 Jan 2022 16:33:20 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="f8BE3bp8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642177997;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fjhRN0D79I8OqjnhotxNxDTJr6R4g/K22rp1JS1C5Eo=;
+        b=f8BE3bp888e2UKyRZigZlucXrl3EdxDbtL2HX5Uh6swbq0rLANuLtzjzONNVXsYEFDHnUn
+        wv5dGEQ278DvKOHOOv0FuHhDaAj0Avb7lqA83+1xY++L96XuPTypYbcYQgFdf14t0lTllp
+        Qmub2ddKHXu8E2fLwGtJgLDGOam56y0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3ee846df (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 14 Jan 2022 16:33:17 +0000 (UTC)
+Received: by mail-yb1-f169.google.com with SMTP id h14so25261919ybe.12;
+        Fri, 14 Jan 2022 08:33:17 -0800 (PST)
+X-Gm-Message-State: AOAM530kUVVuAQAdn4s+NCPDlRQNeZEEhFl57dlLIFzmxX9ei3a/7kH6
+        3qnpE1RNkhWfZnr36/fWNU3qd8Ba178JeYRF6mQ=
+X-Google-Smtp-Source: ABdhPJw+G76wCMtSJSIuOYt31tQHyRYk7zoC2KbYtKA7+I1KIxZdl0Ni/9vsDj9W+Rg1a6w300a7FLWP7S/v0KjtE5Y=
+X-Received: by 2002:a25:4109:: with SMTP id o9mr11071225yba.115.1642177996382;
+ Fri, 14 Jan 2022 08:33:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
+References: <20220114142015.87974-1-Jason@zx2c4.com> <20220114142015.87974-2-Jason@zx2c4.com>
+ <CAADnVQJ1qsGacgrsKNiMme--+nwPVG+bd1D8rF8t8bDCvTgbLw@mail.gmail.com>
+In-Reply-To: <CAADnVQJ1qsGacgrsKNiMme--+nwPVG+bd1D8rF8t8bDCvTgbLw@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 14 Jan 2022 17:33:05 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oV-KEU=3ZVHzN1APgUWP0vABt3T5FL4GX47KAUfp6ekw@mail.gmail.com>
+Message-ID: <CAHmME9oV-KEU=3ZVHzN1APgUWP0vABt3T5FL4GX47KAUfp6ekw@mail.gmail.com>
+Subject: Re: [PATCH RFC v2 1/3] bpf: move from sha1 to blake2s in tag calculation
+To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Andy Lutomirski <luto@amacapital.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Fri, Jan 14, 2022 at 5:20 PM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Fri, Jan 14, 2022 at 6:20 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > BLAKE2s is faster and more secure. SHA-1 has been broken for a long time
+> > now. This also removes quite a bit of code, and lets us potentially
+> > remove sha1 from lib, which would further reduce vmlinux size.
+>
+> Same NACK as before.
+> Stop this spam. Pls.
 
-On Fri, Jan 14, 2022 at 10:31:55AM +0100, Peter Zijlstra wrote:
-> So part of the problem I have with this is that these external things
-> can consume all the bandwidth and basically indefinitely starve the
-> group.
-> 
-> This is doulby so if you're going to account things like softirq network
-> processing.
+You can read the 0/3 for an explanation of why I sent this v2. I
+reject your characterization of this as "spam".
 
-So, anything which is accounted this way should slow down / stall the
-originator so that backcharges can't run away. In many cases, these
-connections are already there - e.g. if you keep charging socket rx buffers
-to a cgroup, the processes in the cgroup will slow down and the backpressure
-on the network socket will slow down the incoming packets. Sometimes, the
-backpressure propagation needs to be added explicitly - e.g. filesystem
-metadata writes can run away because something can keeping on issuing
-metadata updates without getting throttled neither on memory or io side. So,
-for situations like that, we need to add an explicit mechanism to throttle
-the originator asynchronously.
-
-Thanks.
-
--- 
-tejun
+Thanks,
+Jason
