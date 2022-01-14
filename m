@@ -2,109 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50590C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBBB1C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 15:59:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242177AbiANPrH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 10:47:07 -0500
-Received: from mail-ot1-f54.google.com ([209.85.210.54]:36710 "EHLO
-        mail-ot1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238763AbiANPrH (ORCPT
+        id S243054AbiANP7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 10:59:30 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.85.151]:40643 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232318AbiANP73 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 10:47:07 -0500
-Received: by mail-ot1-f54.google.com with SMTP id s21-20020a05683004d500b0058f585672efso10501389otd.3;
-        Fri, 14 Jan 2022 07:47:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5dzA66i4ivAiYOjfo8oco9UtNpMipS0k8jsB20XDEr0=;
-        b=N+I3et3MOlnEZV8DM6er7cWyvhAel8u3zbYT4IdkjRbaYJ1wSy51YtefUMNptFLOF9
-         R6xIdZ4M9SlZ4vOLF3X/HdH49K7tpIjqZgyIwVKLdlJCiAe/4dNsIY4I29Kq+ngaFho2
-         zUHeARHYuMXf3du9MTcTBvvbEtSFP8NoGK0EmHvHDz4maAxgxXP8iAZGlQaBZt/9Ppd1
-         tJTCdhIeveNUM7W3Mfsl+yPKjEVLLTQ3YH7nAtG7YRdXmHOJ5pe4g/LzAxvNL7Xpxtec
-         iK8W2lbUY8SPfArE093Pny8QKnqEkBwl4mmWbWt4wEKhtBkSgwmYndMyj+lZDHpTU646
-         DfkQ==
-X-Gm-Message-State: AOAM533ohJCVk7mYO8P/MfJ/D6UtOExSyXgOQkXJH99w1zh82P6MW0NX
-        EQ7RiiDapyRHgDKlTKX0/fn1pMhaKkm3oxF5
-X-Google-Smtp-Source: ABdhPJzpq+bIHymNtfPPEI7X6nGEw7++j4Q0gG6AcAn3BffD6q8SLt066o/eRJwcRmhe0sqCKuwePQ==
-X-Received: by 2002:a9d:6c4f:: with SMTP id g15mr6987331otq.3.1642175226110;
-        Fri, 14 Jan 2022 07:47:06 -0800 (PST)
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com. [209.85.210.47])
-        by smtp.gmail.com with ESMTPSA id 17sm1311947oij.21.2022.01.14.07.47.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jan 2022 07:47:05 -0800 (PST)
-Received: by mail-ot1-f47.google.com with SMTP id z25-20020a0568301db900b005946f536d85so1467309oti.9;
-        Fri, 14 Jan 2022 07:47:05 -0800 (PST)
-X-Received: by 2002:ab0:4d42:: with SMTP id k2mr2650964uag.78.1642174814894;
- Fri, 14 Jan 2022 07:40:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-4-conor.dooley@microchip.com>
-In-Reply-To: <20220114151727.2319915-4-conor.dooley@microchip.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 14 Jan 2022 16:40:03 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
-Message-ID: <CAMuHMdUXD8CHqoaygXzcC0YpsbRT_KAUni1hD4sMn=k=WD+DuQ@mail.gmail.com>
-Subject: Re: [PATCH v3 03/15] mailbox: change mailbox-mpfs compatible string
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
+        Fri, 14 Jan 2022 10:59:29 -0500
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-190-J5jrWq3oPyyS4GLy2VXbAQ-1; Fri, 14 Jan 2022 15:59:27 +0000
+X-MC-Unique: J5jrWq3oPyyS4GLy2VXbAQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.26; Fri, 14 Jan 2022 15:59:21 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.026; Fri, 14 Jan 2022 15:59:21 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+CC:     Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        =?utf-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        "Network Development" <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lewis Hanly <lewis.hanly@microchip.com>,
-        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
-        Atish Patra <atishp@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
+        bpf <bpf@vger.kernel.org>
+Subject: RE: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag
+ calculation
+Thread-Topic: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag
+ calculation
+Thread-Index: AQHYCVpULjtSZ105lEeo5rcLfvZFjaxiq4hw
+Date:   Fri, 14 Jan 2022 15:59:21 +0000
+Message-ID: <13d51088799746469d26a442fb3c6fd5@AcuMS.aculab.com>
+References: <20220112131204.800307-1-Jason@zx2c4.com>
+ <20220112131204.800307-2-Jason@zx2c4.com> <87tue8ftrm.fsf@toke.dk>
+ <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
+ <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com>
+ <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
+ <CAHmME9oq36JdV8ap9sPZ=CDfNyaQd6mXd21ztAaZiL7pJh8RCw@mail.gmail.com>
+ <CAMj1kXE3JtNjgF3FZjbL-GOQG41yODup4+XdEFP063F=-AWg8A@mail.gmail.com>
+ <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
+In-Reply-To: <CAHmME9oa8dAeRQfgj-U00gUtVOJ_CTGwtyBxUB4=8+XO_fFjNQ@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Conor,
+RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDE0IEphbnVhcnkgMjAyMiAxNToyMQ0K
+PiANCj4gT24gRnJpLCBKYW4gMTQsIDIwMjIgYXQgNDowOCBQTSBBcmQgQmllc2hldXZlbCA8YXJk
+YkBrZXJuZWwub3JnPiB3cm90ZToNCj4gPiBZZWFoLCBzbyB0aGUgaXNzdWUgaXMgdGhhdCwgYXQg
+KnNvbWUqIHBvaW50LCBTSEEtMSBpcyBnb2luZyB0byBoYXZlIHRvDQo+ID4gZ28uIFNvIGl0IHdv
+dWxkIGJlIGhlbHBmdWwgaWYgQWxleGVpIGNvdWxkIGNsYXJpZnkgKndoeSogaGUgZG9lc24ndA0K
+PiA+IHNlZSB0aGlzIGFzIGEgcHJvYmxlbS4gVGhlIGZhY3QgdGhhdCBpdCBpcyBicm9rZW4gbWVh
+bnMgdGhhdCBpdCBpcyBubw0KPiA+IGxvbmdlciBpbnRyYWN0YWJsZSB0byBmb3JnZSBjb2xsaXNp
+b25zLCB3aGljaCBsaWtsZXkgbWVhbnMgdGhhdCBTSEEtMQ0KPiA+IG5vIGxvbmdlciBmdWxmaWxs
+cyB0aGUgdGFzayB0aGF0IHlvdSB3YW50ZWQgaXQgdG8gZG8gaW4gdGhlIGZpcnN0DQo+ID4gcGxh
+Y2UuDQo+IA0KPiBJIHRoaW5rIHRoZSByZWFzb24gdGhhdCBBbGV4ZWkgZG9lc24ndCB0aGluayB0
+aGF0IHRoZSBTSEEtMSBjaG9pY2UNCj4gcmVhbGx5IG1hdHRlcnMgaXMgYmVjYXVzZSB0aGUgcmVz
+dWx0IGlzIGJlaW5nIHRydW5jYXRlZCB0byA2NC1iaXRzLCBzbw0KPiBjb2xsaXNpb25zIGFyZSBl
+YXN5IGFueXdheS4uLg0KDQpXaGljaCBwcm9iYWJseSBtZWFucyB0aGF0IFNIQS0xIGlzIGNvbXBs
+ZXRlIG92ZXJraWxsIGFuZCBzb21ldGhpbmcNCm11Y2ggc2ltcGxlciBjb3VsZCBoYXZlIGJlZW4g
+dXNlZCBpbnN0ZWFkLg0KSXMgdGhlIGJ1ZmZlciBldmVuIGJpZyBlbm91Z2ggdG8gaGF2ZSBldmVy
+IHdhcnJhbnRlZCB0aGUgbWFzc2l2ZQ0KdW5yb2xsaW5nIG9mIHRoZSBzaGEtMSBmdW5jdGlvbi4N
+CihJIHN1c3BlY3QgdGhhdCBqdXN0IGRlc3Ryb3lzIHRoZSBJLWNhY2hlIG9uIG1vc3QgY3B1LikN
+Cg0KVGhlIElQdjYgYWRkcmVzcyBjYXNlIHNlZW1zIGV2ZW4gbW9yZSBpbnNhbmUgLSBob3cgbWFu
+eSBieXRlcw0KYXJlIGFjdHVhbGx5IGJlaW5nIGhhc2hlZC4NClRoZSB1bnJvbGxlZCBsb29wIGlz
+IG9ubHkgbGlrZWx5IHRvIGJlIHNhbmUgZm9yIGxhcmdlIChtZWdhYnl0ZSkNCmJ1ZmZlcnMuDQoN
+CglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwg
+TW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzog
+MTM5NzM4NiAoV2FsZXMpDQo=
 
-On Fri, Jan 14, 2022 at 4:16 PM <conor.dooley@microchip.com> wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->
-> The Polarfire SoC is currently using two different compatible string
-> prefixes. Fix this by changing "polarfire-soc-*" strings to "mpfs-*" in
-> its system controller in order to match the compatible string used in
-> the soc binding and device tree.
->
-> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-
-This is already upstream, commit f10b1fc0161cd99e ("mailbox: change
-mailbox-mpfs compatible string").
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
