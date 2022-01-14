@@ -2,62 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3591DC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 08:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BD0C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 08:22:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239878AbiANIW3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 03:22:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
+        id S240228AbiANIWo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 03:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239883AbiANIVS (ORCPT
+        with ESMTP id S240269AbiANIV1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 03:21:18 -0500
+        Fri, 14 Jan 2022 03:21:27 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273CAC0617A6;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C11C5C0617A7;
         Fri, 14 Jan 2022 00:21:12 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BB04861E2E;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 61BB361E37;
+        Fri, 14 Jan 2022 08:21:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 971C7C36AE9;
         Fri, 14 Jan 2022 08:21:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E35DFC36AEC;
-        Fri, 14 Jan 2022 08:21:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1642148471;
-        bh=epCDida4a4Ou2Fod/Q+FP4fZKEQDmGyRp8ACSKP+uw8=;
-        h=From:To:Cc:Subject:Date:From;
-        b=dG6o01Y9ONAiRtJ+NuDHQNWJnacHL1Ah31z9hF5XnPLnSRuEkFt4A5/0krr8G5aZ1
-         1poED0aWds57+CvgVZX9IZ8frUZnHK+ne9vRG8MJJ7JTskcxeix8IZrCJ8YHlriON4
-         I2SIjWsU5e89sOUJgLX+nK6dnH8txev7Z7pL994E/zD/TjA2G4Nldno1SwwiSQY5k4
-         Y7Ur+8cC9vd0kNujBysvBBW+gN5Wg8j0D6jS302UXxDpHFZCWdZTqev8P1no1noqA+
-         BCbJ9YYSZ0/vEsXw+M9krHgS6fW2GD6y1EtrFR1FkGgNlblQIRi9dpIGMVS9RvKq8Z
-         omI83auNrwlOQ==
+        bh=42/E2d5qp+aGEb3LON47WXAM0iCKqIGuFaGn17hu4ts=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=JwEY2mD2KTqbOdCNrAF+34oRuR7ZeEHeS/ssxh6swbbl2GJscXxJezaxAQOpJbh9J
+         3x4uIyVb4YHrVnFeh8wkaKu5qE5MyUq0m90yTEp8pKnfr7d7kv+IV4ZwpLD8ZHnuPS
+         v+xhwlpjy/gshT8EQK6DqXqYmfFP5JS4dW+CP7da/TxARNnSU7t/dZoMyf8gshjlU2
+         wo+y2dnnQIbpTgv9TqgqAjxdgo+C55QOklM48homFpxz9JdKq7OuHK6QJRQEARV0kj
+         zwtlTnolTgK85pyq+x8MxKDvDr0ab8GQ1YZv2lw00hLX7iP5q82CtfMDbcLUzzBh2i
+         6PMtXfp96PW6w==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     keyrings@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>,
-        Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 0/3] crypto: more rsa-pkcs1pad fixes
-Date:   Fri, 14 Jan 2022 00:19:36 -0800
-Message-Id: <20220114081939.218416-1-ebiggers@kernel.org>
+        Denis Kenzior <denkenz@gmail.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        stable@vger.kernel.org
+Subject: [PATCH 2/3] crypto: rsa-pkcs1pad - fix buffer overread in pkcs1pad_verify_complete()
+Date:   Fri, 14 Jan 2022 00:19:38 -0800
+Message-Id: <20220114081939.218416-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220114081939.218416-1-ebiggers@kernel.org>
+References: <20220114081939.218416-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series fixes two more bugs in rsa-pkcs1pad.
+From: Eric Biggers <ebiggers@google.com>
 
-Eric Biggers (3):
-  crypto: rsa-pkcs1pad - correctly get hash from source scatterlist
-  crypto: rsa-pkcs1pad - fix buffer overread in
-    pkcs1pad_verify_complete()
-  crypto: rsa-pkcs1pad - use clearer variable names
+Before checking whether the expected digest_info is present, we need to
+check that there are enough bytes remaining.
 
- crypto/rsa-pkcs1pad.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+Fixes: a49de377e051 ("crypto: Add hash param to pkcs1pad")
+Cc: Tadeusz Struk <tadeusz.struk@linaro.org>
+Cc: <stable@vger.kernel.org> # v4.6+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/rsa-pkcs1pad.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 7b223adebabf..6cd24b4b9b9e 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -476,6 +476,8 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
+ 	pos++;
+ 
+ 	if (digest_info) {
++		if (digest_info->size > dst_len - pos)
++			goto done;
+ 		if (crypto_memneq(out_buf + pos, digest_info->data,
+ 				  digest_info->size))
+ 			goto done;
 -- 
 2.34.1
 
