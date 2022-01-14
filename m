@@ -2,75 +2,204 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A521BC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 17:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C68C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 17:44:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243828AbiANRRl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 12:17:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbiANRRk (ORCPT
+        id S234374AbiANRoM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 12:44:12 -0500
+Received: from new4-smtp.messagingengine.com ([66.111.4.230]:42241 "EHLO
+        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243918AbiANRoM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 12:17:40 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F205C061574
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 09:17:40 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id o6so36414522edc.4
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 09:17:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kXOG5wo/OKVwRxFyS9neGoQCZ8dRcTxFNJlCoH5deEM=;
-        b=JGjX57M0KdUP0XnwMX13D4a+6OkY1ldLR7RAitZhW3+10noOa8C/PO/tgwUozRkz90
-         qF6i7eVvTjO8Bpvf96atTWGLHUVAHPt0TD7yicALtLsd5anjLmomXFcFYag8n21lVx5Q
-         cmlw+trk9JpX7ncBTfe4W73uHKx86J6/X+7dEWBWbO1JidCvDRIwEn4C6H3JPMX+KgfV
-         X/cbwlMqJ39qWwFo3t9XSkcp/lbTsj/4pD8Jw8WSwNVJgBPezvC36mcZ6JKYLF5kURS6
-         adx3VjXAa1cjC+/38xfkJJAlxvo0M7NFYUJtBT24Rkzr3F0eHFD2FKrTDJzcXk2NZjNI
-         rZeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kXOG5wo/OKVwRxFyS9neGoQCZ8dRcTxFNJlCoH5deEM=;
-        b=r/3BbCiVaJbGb49WKAvk7Kb/hATZckO4afEwNqJANwywLp8X6QZ0MAnuoiX7kkF/yC
-         3RTLudd8hVth+iOWPM9e63R0bONz2z6eGkEVBF2czLmjY/S3IgHTu4SJWXC9Rtx9bv8Q
-         XhHWX9A9BJfF110BGXRhwXp6Kz67tdwaVDkBpaU5eC6c29kUXdG6KGRDR8ScwfeBiw/+
-         wFp+DyM6Q7FlUR6tNudN64DyY4am1sHhU8OLLELXt+LOELj6tOIsBfEpMwEvmoSG0lWi
-         mHaLQIvg8iC4Ek60Z3uyGYdfDv3TTXX2h5VM6I4m+EcRAFv37jVTK3FjAvH74w8bszzE
-         lncA==
-X-Gm-Message-State: AOAM533OOBBfl3Y20QkKDHiBwU82cCdA1cw3OuRsYO7q3KOqNNjNUfIO
-        CASNdke6mUd0/npw74CgWOampd/Ox3hejtaCXE9/cpyroPY=
-X-Google-Smtp-Source: ABdhPJyyraqqv2bDOlbFJ4paIGqELkqbKkT/w0q0Ihl/eK3Z2j33S/YMb9hRMRoR5rOVyGP7+uCs2YbXQRKemc8DXk4=
-X-Received: by 2002:a17:907:7601:: with SMTP id jx1mr7743571ejc.696.1642180658933;
- Fri, 14 Jan 2022 09:17:38 -0800 (PST)
-MIME-Version: 1.0
-References: <AM9PR04MB82114956521F134B09FF5D9CE8539@AM9PR04MB8211.eurprd04.prod.outlook.com>
-In-Reply-To: <AM9PR04MB82114956521F134B09FF5D9CE8539@AM9PR04MB8211.eurprd04.prod.outlook.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Fri, 14 Jan 2022 14:17:27 -0300
-Message-ID: <CAOMZO5DDvVo3Ziuq6_GM=NDm0TdygwBvQzAQ41H16E0rjVUWTQ@mail.gmail.com>
-Subject: Re:
-To:     Varun Sethi <V.Sethi@nxp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "andrew.smirnov@gmail.com" <andrew.smirnov@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 14 Jan 2022 12:44:12 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 2FEE5580183;
+        Fri, 14 Jan 2022 12:44:09 -0500 (EST)
+Received: from imap48 ([10.202.2.98])
+  by compute4.internal (MEProxy); Fri, 14 Jan 2022 12:44:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        stressinduktion.org; h=mime-version:message-id:in-reply-to
+        :references:date:from:to:cc:subject:content-type; s=fm2; bh=XC8x
+        7KXAcVBSo+8COeedpg7cEMYqOq1otu+UETusZEE=; b=JkO4dr9OnXIi2E5oBM5K
+        t66ge8M1MdOaiKC+cg+WCGTYPSOwvSHo58qUkzgvqULeHC1fZrOPnn3cvQ6Tf2vJ
+        lxuoYGE4+5Ec0LULpqmhcN2kcyeEzlo7N3cuBeWugdDNbK13fRUuNVqeM0rCBS9b
+        ddQIRMTYADY49oMEc1U0JRssBs8MX9sL49QHb196zqP8yHGD/7xEhyZhu+6QXv8A
+        cQ8KNKhfmiBKqDOibsRYi711kfuBvekag0zW6rYmT8bEAiG+iHctt5F8n1b0PEuj
+        U+mgmXBnQUnahqUky2UZczB84TlelCxsWyhg2kxr97EWeAqib+DNq+7QYnKEDYCn
+        2g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=XC8x7K
+        XAcVBSo+8COeedpg7cEMYqOq1otu+UETusZEE=; b=XxcYTeuCtnlGC7MarUYPyU
+        ddvAlD8qIyyumQtLdcNmyBqPSY6bdaBIdld6+Mgc0lD4ShzjMtBhh8AeP+30iO9G
+        rxqYC6i9zUuEd02xgX143G5o2jNxd3YwEDEhlLNCoUI20plomMgnylK5AsGt2NpB
+        N4nERzqjE6+bMxjDK8l3kkILv7mmwWc4qevzfVe2+fVDbxeYc66U3KxxsUcXAWwH
+        Zs92EJTLSbS/L6ZPkMj3fZUsNLGuq74mJR+xEllfbYqIUNrx1h3O4Agv0B/5jo61
+        pYMOQTXo0ACFFHhAtqR/WT6X2ziLjVzed/Cg0wLbebL4JCawb2QhdVTUGpdT2G0w
+        ==
+X-ME-Sender: <xms:Z7bhYawjmLXYGTgJAKyZ1FGbCylbfWwK1B1aQqIKvBHVTlf-zVILWg>
+    <xme:Z7bhYWTUWVR8aUIp1eK-sS1ALJZ0M7SDFoISDWpvpnpV1yYqr1PX0HK5yJ23j_MWs
+    HdQg1FIvemwLZzHEA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrtdehgddutdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdfjrghn
+    nhgvshcuhfhrvgguvghrihgtucfuohifrgdfuceohhgrnhhnvghssehsthhrvghsshhinh
+    guuhhkthhiohhnrdhorhhgqeenucggtffrrghtthgvrhhnpeehieeggeethedtgfdvtdek
+    ffduudegueevffekheefjeegvedugeetveffteetleenucffohhmrghinhepgihktggurd
+    gtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhep
+    hhgrnhhnvghssehsthhrvghsshhinhguuhhkthhiohhnrdhorhhg
+X-ME-Proxy: <xmx:Z7bhYcWeoRrx3NNL4AJ4L4l3e6fjFBT30oc09LqJ9b3p5GoqjvS0gA>
+    <xmx:Z7bhYQgE9QO-Zr2NhLl6GESvsvLlyiGDi-mgXrqLbIM48Yeeb90tCA>
+    <xmx:Z7bhYcCrlbSm9vbPNpS9oYGCuspUQKDONypysdZK9dFUxFmO1Gshmw>
+    <xmx:abbhYQ6uvmjAsuMFEM_JKvAwKKdZW48Ck8X5NcK9TwWNLoqyy1eV5A>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 7B93821E006E; Fri, 14 Jan 2022 12:44:07 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-4569-g891f756243-fm-20220111.001-g891f7562
+Mime-Version: 1.0
+Message-Id: <3db9c306-ea22-444f-b932-f66f800a7a28@www.fastmail.com>
+In-Reply-To: <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+References: <20220112131204.800307-1-Jason@zx2c4.com>
+ <20220112131204.800307-3-Jason@zx2c4.com> <87r19cftbr.fsf@toke.dk>
+ <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
+ <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
+ <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com>
+Date:   Fri, 14 Jan 2022 18:41:58 +0100
+From:   "Hannes Frederic Sowa" <hannes@stressinduktion.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Geert Uytterhoeven" <geert@linux-m68k.org>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Ard Biesheuvel" <ardb@kernel.org>,
+        "Jean-Philippe Aumasson" <jeanphilippe.aumasson@gmail.com>,
+        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
+        "Erik Kline" <ek@google.com>,
+        "Fernando Gont" <fgont@si6networks.com>,
+        "Lorenzo Colitti" <lorenzo@google.com>,
+        "Hideaki Yoshifuji" <hideaki.yoshifuji@miraclelinux.com>
+Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Varun,
+Hello,
 
-On Thu, Jan 13, 2022 at 2:53 PM Varun Sethi <V.Sethi@nxp.com> wrote:
+On Fri, Jan 14, 2022, at 17:07, Jason A. Donenfeld wrote:
+> On Thu, Jan 13, 2022 at 12:15 PM Hannes Frederic Sowa
+> <hannes@stressinduktion.org> wrote:
+>> > I'm not even so sure that's true. That was my worry at first, but
+>> > actually, looking at this more closely, DAD means that the address can
+>> > be changed anyway - a byte counter is hashed in - so there's no
+>> > guarantee there.
+>>
+>> The duplicate address detection counter is a way to merely provide basic
+>> network connectivity in case of duplicate addresses on the network
+>> (maybe some kind misconfiguration or L2 attack). Such detected addresses
+>> would show up in the kernel log and an administrator should investigate
+>> and clean up the situation.
 >
-> Hi Fabio, Andrey,
-> So far we have observed this issue on i.MX6 only. Disabling prediction resistance isn't the solution for the problem. We are working on identifying the proper fix for this issue and would post the patch for the same.
+> I don't mean to belabor a point where I'm likely wrong anyway, but
+> this DAD business has kept me thinking...
+>
+> Attacker is hanging out on the network sending DAD responses, forcing
+> those counters to increment, and thus making SHA1(stuff || counter)
+> result in a different IPv6 address than usual. Outcomes:
+> 1) The administrator cannot handle this, did not understand the
+> semantics of this address generation feature, and will now have a
+> broken network;
+> 2) The administrator knows what he's doing, and will be able to handle
+> a different IPv6 address coming up.
+>
+> Do we really care about case (1)? That sounds like emacs spacebar
+> heating https://xkcd.com/1172/. And case (2) seems like something that
+> would tolerate us changing the hash function.
 
-Please copy me when you submit a fix for this issue.
+Taking a step back, there is the base case where we don't have duplicate
+addresses on the network nor an attack is on-going. We would break those
+setups with that patch. And those are the ones that matter most. In
+particular those stable-random addresses are being used in router
+advertisements for announcing the next-hop/default gateway on the
+broadcast domain. During my time in IPv6 land I have seen lots of setups
+where those automatic advertisements got converted into static
+configuration for the sake of getting hands on a cool looking IPv6
+address on another host (I did that as well ;) ). In particular, in the
+last example, you might not only have one administrator at hand to
+handle the issue, but probably multiple roles are involved (host admin
+and network admin maybe from different organizations - how annoying -
+but that's a worst case scenario).
 
-Thanks!
+Furthermore most L2 attacks nowadays are stopped by smarter switches or
+wifi access points(?) anyway with per-port MAC learning and other
+hardening features. Obviously this only happens in more managed
+environments but probably already also at smaller home networks
+nowadays. Datacenters probably already limit access to the Layer 2 raw
+network in such a way that this attack is probably not possible either.
+Same for IoT stuff where you probably have a point-to-point IPv6
+connection anyway.
 
-Fabio Estevam
+The worst case scenario is someone upgrading their kernel during a
+trip away from home, rebooting, and losing access to their system. If we
+experience just one of those cases we have violated Linux strict uAPI
+rules (in my opinion). Thus, yes, we care about both, (1) and (2) cases.
+
+I don't think we can argue our way out of this by stating that there are
+no guarantees anyway, as much as I would like to change the hash
+function as well.
+
+As much as I know about the problems with SHA1 and would like to see it
+removed from the kernel as well, I fear that in this case it seems hard
+to do. I would propose putting sha1 into a compilation unit and
+overwrite the compiler flags to optimize the function optimized for size
+and maybe add another mode or knob to switch the hashing algorithm if
+necessary.
+
+>> Afterwards bringing the interface down and
+>> up again should revert the interface to its initial (dad_counter == 0)
+>> address.
+>
+> Except the attacker is still on the network, and the administrator
+> can't figure it out because the mac addresses keep changing and it's
+> arriving from seemingly random switches! Plot twist: the attack is
+> being conducted from an implant in the switch firmware. There are a
+> lot of creative different takes on the same basic scenario. The point
+> is - the administrator really _can't_ rely on the address always being
+> the same, because it's simply out of his control.
+
+This is a very pessimistic scenario bordering a nightmare. I hope the
+new hashing algorithm will protect them. ;)
+
+> Given that the admin already *must* be prepared for the address to
+> change, doesn't that give us some leeway to change the algorithm used
+> between kernels?
+>
+> Or to put it differently, are there _actually_ braindead deployments
+> out there that truly rely on the address never ever changing, and
+> should we be going out of our way to support what is arguably a
+> misreading and misdeployment of the feature?
+
+Given the example above, users might hardcode this generated IP address
+as a default gateway in their configs on other hosts. This is actually a
+very common thing to do.
+
+> (Feel free to smack this line of argumentation down if you disagree. I
+> just thought it should be a bit more thoroughly explored.)
+
+I haven't investigated recent research into breakage of SHA1, I mostly
+remember the chosen-image and collision attacks against it. Given the
+particular usage of SHA1 in this case, do you think switching the
+hashing function increases security? I am asking because of the desire
+to decrease the instruction size of the kernel, but adding a switch
+will actually increase the size in the foreseeable future (and I agree
+with Toke that offloading this decision to distributions is probably
+not fair).
+
+Maybe at some point the networking subsystem will adapt a generic knob
+like LD_ASSUME_KERNEL? ;)
+
+Bye,
+Hannes
