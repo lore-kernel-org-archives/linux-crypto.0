@@ -2,108 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEBEC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 17:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45930C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 21:57:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbiANR6a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 12:58:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43216 "EHLO
+        id S229959AbiANV5O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 16:57:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229775AbiANR63 (ORCPT
+        with ESMTP id S229931AbiANV5O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 12:58:29 -0500
+        Fri, 14 Jan 2022 16:57:14 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD42C061574;
-        Fri, 14 Jan 2022 09:58:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCAC6C061574
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 13:57:13 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 106FFB82475;
-        Fri, 14 Jan 2022 17:58:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 511E7C36AED;
-        Fri, 14 Jan 2022 17:58:25 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Jx12eIPE"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642183102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YHyEepeNh59ZLXwWnhnQQJ/e6lEcnUrxsutiHo3eOR4=;
-        b=Jx12eIPENreJzRSXmN0btIEaD8vfeFsBgbnq7bkmz8aBz9fidv26hr9Hn2sADN1F53qWRv
-        vL+Dro9NUsb2SuA/+oQewDEz3bYpkKrTkDoYZ2h8aF6MZSQVd4VvfaQYA2kYF5HWs5t8Z7
-        pHT7OoyEXHvdD61nHROxrBKJb0HepBc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 18a1a83b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 14 Jan 2022 17:58:22 +0000 (UTC)
-Received: by mail-yb1-f169.google.com with SMTP id z22so25453076ybi.11;
-        Fri, 14 Jan 2022 09:58:21 -0800 (PST)
-X-Gm-Message-State: AOAM530BtDi/0GZNrdW4myrs7OXQBAD0EB/fWF/5+vEucJRc17Q0AyGc
-        soiQ8Rps3Ydvt3km/t7vRlkXU0qiGTsRipDVmk8=
-X-Google-Smtp-Source: ABdhPJwxV9VOAFJPoenBfXtLga5hL8bzJYQgUTXqzUI6VsYxsbXZqCidxviLJmz76mwNLT48akKG1DOjcYTWkhknw0c=
-X-Received: by 2002:a25:f90d:: with SMTP id q13mr14306810ybe.32.1642183100170;
- Fri, 14 Jan 2022 09:58:20 -0800 (PST)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 894DCB825F5
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 21:57:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CD95C36AE9;
+        Fri, 14 Jan 2022 21:57:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642197431;
+        bh=yEo0mmMULFRXxQI8RUkCALnbTQ5TKNz4Ym4YOjTA2dQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=E7ANNwnqgb28CgGtd9O8RjaAAPLYuf+cTx1h6M79QVUYUCz9BdA2COQVkEZTEDdJq
+         +WoyqEliwMS1HBrIL4DKVK6laZeRs5oKhRthq8niAEDmvQ+xFlvQcEOPQXogdLvel6
+         pEESfgWBbGyFR6jWQWgrmCfRiEFPMFyXbs9behp3F3upxczuQ9D0wH9uTQ4cMndu4b
+         oxmcG+LTLETxZl+cdW4YMntw+TEvPmfF1RMQgTjhqec6h0xReDUffiW3YV1p+UBIox
+         G3+BHEPuRUQDblv3PYUpDpK5ksPcIlztuT4LhGPbV6NRJPU+iUNDqIZB1vogeJuVZL
+         S5ArxRovOEJvw==
+Date:   Fri, 14 Jan 2022 13:57:09 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH] crypto: testmgr - Move crypto_simd_disabled_for_test
+ out
+Message-ID: <YeHxta9jqIoQ4pIo@sol.localdomain>
+References: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
+ <Yd36HsgI+ya6P7RF@gmail.com>
+ <Yd4nmLgFr8XTxCo6@gondor.apana.org.au>
+ <YeEa3qCB7b4QzBH9@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-3-Jason@zx2c4.com>
- <87r19cftbr.fsf@toke.dk> <CAHmME9pieaBBhKc1uKABjTmeKAL_t-CZa_WjCVnUr_Y1_D7A0g@mail.gmail.com>
- <55d185a8-31ea-51d0-d9be-debd490cd204@stressinduktion.org>
- <CAHmME9pR+qTn72vyANq8Nxx0BtGy7a_+dRvZS_F7RCag8Rvxng@mail.gmail.com> <3db9c306-ea22-444f-b932-f66f800a7a28@www.fastmail.com>
-In-Reply-To: <3db9c306-ea22-444f-b932-f66f800a7a28@www.fastmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 14 Jan 2022 18:58:09 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qy4-qkBAD9fJ6jqHxw2DYtscerZdriMYXw1T4iPD6Y-A@mail.gmail.com>
-Message-ID: <CAHmME9qy4-qkBAD9fJ6jqHxw2DYtscerZdriMYXw1T4iPD6Y-A@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 2/3] ipv6: move from sha1 to blake2s in address calculation
-To:     Hannes Frederic Sowa <hannes@stressinduktion.org>
-Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Erik Kline <ek@google.com>,
-        Fernando Gont <fgont@si6networks.com>,
-        Lorenzo Colitti <lorenzo@google.com>,
-        Hideaki Yoshifuji <hideaki.yoshifuji@miraclelinux.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YeEa3qCB7b4QzBH9@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Hannes,
+On Fri, Jan 14, 2022 at 05:40:30PM +1100, Herbert Xu wrote:
+> On Wed, Jan 12, 2022 at 11:58:00AM +1100, Herbert Xu wrote:
+> > On Tue, Jan 11, 2022 at 01:43:58PM -0800, Eric Biggers wrote:
+> > >
+> > > Maybe CRYPTO_MANAGER_EXTRA_TESTS should select CRYPTO_SIMD?
+> > 
+> > You're right.  I was focusing only on the module dependencies
+> > but neglected to change the Kconfig dependencies.
+> > 
+> > I'll fix this in the next version.
+> 
+> ---8<---
+> As testmgr is part of cryptomgr which was designed to be unloadable
+> as a module, it shouldn't export any symbols for other crypto
+> modules to use as that would prevent it from being unloaded.  All
+> its functionality is meant to be accessed through notifiers.
+> 
+> The symbol crypto_simd_disabled_for_test was added to testmgr
+> which caused it to be pinned as a module if its users were also
+> loaded.  This patch moves it out of testmgr and into crypto/algapi.c
+> so cryptomgr can again be unloaded and replaced on demand.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
 
-On Fri, Jan 14, 2022 at 6:44 PM Hannes Frederic Sowa
-<hannes@stressinduktion.org> wrote:
-> I don't think we can argue our way out of this by stating that there are
-> no guarantees anyway, as much as I would like to change the hash
-> function as well.
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-Shucks. Alright then.
-
-> As much as I know about the problems with SHA1 and would like to see it
-> removed from the kernel as well, I fear that in this case it seems hard
-> to do. I would propose putting sha1 into a compilation unit and
-> overwrite the compiler flags to optimize the function optimized for size
-> and maybe add another mode or knob to switch the hashing algorithm if
-> necessary.
-
-Already on it! :)
-https://lore.kernel.org/linux-crypto/20220114154247.99773-3-Jason@zx2c4.com/
-
-> I haven't investigated recent research into breakage of SHA1, I mostly
-> remember the chosen-image and collision attacks against it. Given the
-> particular usage of SHA1 in this case, do you think switching the
-> hashing function increases security?
-
-Considering we're only using 64-bits of SHA-1 output, I don't think
-the SHA-1 collision attacks give you that much here. And it seems like
-there are other network-level security concerns with the whole scheme
-anyway. So it might not be the largest of matters. However...
-
-> I am asking because of the desire
-> to decrease the instruction size of the kernel
-
-Indeed this is what I was hoping for.
-
-Jason
+- Eric
