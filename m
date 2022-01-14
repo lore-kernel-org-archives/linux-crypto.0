@@ -2,163 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2389EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 08:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB31C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 08:33:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240004AbiANIW4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 03:22:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240208AbiANIVU (ORCPT
+        id S233950AbiANIdt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 03:33:49 -0500
+Received: from mail-ua1-f52.google.com ([209.85.222.52]:40820 "EHLO
+        mail-ua1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233622AbiANIdt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 03:21:20 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0D0C0617A9;
-        Fri, 14 Jan 2022 00:21:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D8F061E30;
-        Fri, 14 Jan 2022 08:21:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08F2C36AEA;
-        Fri, 14 Jan 2022 08:21:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642148472;
-        bh=Dk3kLypObH2mqW0ZKWU+/2CO0Ao8WaPUXgjLmFLpykk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TqZ7D66vF/3eCKKjWN6fxPaZq/PMrA1ZwxQTIUadcxOdeI/n5kYfPUTLHt67hSjgr
-         m1sDzCIYh/A0QHohL+S5tW9bOnRibwSePvphDF0oIwaWXKhEmXLy3/2Gvb4T/hyTSN
-         /0w/moE9pVdPBPcj1MMVCKAFR2J2oElmgX/RPge55OJj1lAkr/lixRRpu/IdWwa793
-         oexDBmEmKOdmhOSPaa49JKjJXXl8UEbrByZS0/+YKYvC7+YGf4jQVCn47jrmaI2Er1
-         Ki5k9bqIMdpecmjn2TZI2us51QlQid1MZNCvmmMEKC7KrYMr5aWiT4O9p3MRETsg+z
-         /3AKDtbUJXOdg==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     keyrings@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>,
-        Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 3/3] crypto: rsa-pkcs1pad - use clearer variable names
-Date:   Fri, 14 Jan 2022 00:19:39 -0800
-Message-Id: <20220114081939.218416-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220114081939.218416-1-ebiggers@kernel.org>
-References: <20220114081939.218416-1-ebiggers@kernel.org>
+        Fri, 14 Jan 2022 03:33:49 -0500
+Received: by mail-ua1-f52.google.com with SMTP id w21so6260022uan.7;
+        Fri, 14 Jan 2022 00:33:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Sy7lT+eK8ipvfv0Ofk1ldO/tYfoiahfm+fHSJgI7+Xs=;
+        b=CxrkKtDb0bQBRSg8bGzObzfkMdWdLj+QaLq822JccgbrkrtZJ9qsALhOtRkSxpnAlJ
+         +LztWhgqlj+q0gde1w9ZTIWrepAi+U+Zv54+5uM047NoVi43FkAVp28d2X20DwgfN+sO
+         OdVftcRsaD4JmuvNDHnlIsTIfczli/RvobUGFa+UzTxo4qIr0sEicHl1W9e41ZTaJWlg
+         baWu3JFEUz6l06Hh5IvRvCKwltDZo0ZP1vOKz3+V6GUzsrk+606t9HFPwbnAJAQeqHKc
+         U4FqQMa7ZQY9LVVMaqVodT7e8Gm1Pgfhlye+WYllSPsaDKLGQ+5oHP9q3dF5KK1lzSBJ
+         n31A==
+X-Gm-Message-State: AOAM5314EITKksdxyh/QwVSin2Bx9CxICv01OJ2vqGKTgu2fdt8fkAPo
+        BDGNPd/TrI4OPZRK/Mr6WchoYdt35/C8pA==
+X-Google-Smtp-Source: ABdhPJznBeXDe9YRtuIahv0G00H8XbqbgcbaGO0fg9iFPtOdW6MJAg7mNOptcVSx7GL9N5nXHk4bQA==
+X-Received: by 2002:a05:6102:807:: with SMTP id g7mr3435871vsb.65.1642149228403;
+        Fri, 14 Jan 2022 00:33:48 -0800 (PST)
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com. [209.85.222.46])
+        by smtp.gmail.com with ESMTPSA id c25sm2446948vsk.32.2022.01.14.00.33.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Jan 2022 00:33:47 -0800 (PST)
+Received: by mail-ua1-f46.google.com with SMTP id o1so15732561uap.4;
+        Fri, 14 Jan 2022 00:33:47 -0800 (PST)
+X-Received: by 2002:a67:e905:: with SMTP id c5mr3691251vso.68.1642149227718;
+ Fri, 14 Jan 2022 00:33:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
+ <87tue8ftrm.fsf@toke.dk> <CAADnVQJqoHy+EQ-G5fUtkPpeHaA6YnqsOjjhUY6UW0v7eKSTZw@mail.gmail.com>
+ <CAHmME9ork6wh-T=sRfX6X0B4j-Vb36GVO0v=Yda0Hac1hiN_KA@mail.gmail.com> <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
+In-Reply-To: <CAADnVQLF_tmNmNk+H+jP1Ubmw-MBhG1FevFmtZY6yw5xk2314g@mail.gmail.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 14 Jan 2022 09:33:36 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV_4HjvbpDsbhomxO3JSv-MOWDzb-8vc2=prc_KgTPA1g@mail.gmail.com>
+Message-ID: <CAMuHMdV_4HjvbpDsbhomxO3JSv-MOWDzb-8vc2=prc_KgTPA1g@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
+To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Alexei,
 
-The new convention for akcipher_alg::verify makes it unclear which
-values are the lengths of the signature and digest.  Add local variables
-to make it clearer what is going on.
+On Thu, Jan 13, 2022 at 11:45 PM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+> On Thu, Jan 13, 2022 at 4:27 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > On 1/13/22, Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
+> > > Nack.
+> > > It's part of api. We cannot change it.
+> >
+> > This is an RFC patchset, so there's no chance that it'll actually be
+> > applied as-is, and hence there's no need for the strong hammer nack.
+> > The point of "request for comments" is comments. Specifically here,
+> > I'm searching for information on the ins and outs of *why* it might be
+> > hard to change. How does userspace use this? Why must this 64-bit
+> > number be unchanged? Why did you do things this way originally? Etc.
+> > If you could provide a bit of background, we might be able to shake
+> > out a solution somewhere in there.
+>
+> There is no problem with the code and nothing to be fixed.
 
-Also rename the digest_size variable in pkcs1pad_sign(), as it is
-actually the digest *info* size, not the digest size which is different.
+"Your Jedi mind tricks don't work on me."
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/rsa-pkcs1pad.c | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+The "problem" is that this is one of the few last users of SHA-1 in
+the kernel.
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 6cd24b4b9b9e..8a3054a43735 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -385,15 +385,15 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 	struct pkcs1pad_inst_ctx *ictx = akcipher_instance_ctx(inst);
- 	const struct rsa_asn1_template *digest_info = ictx->digest_info;
- 	int err;
--	unsigned int ps_end, digest_size = 0;
-+	unsigned int ps_end, digest_info_size = 0;
- 
- 	if (!ctx->key_size)
- 		return -EINVAL;
- 
- 	if (digest_info)
--		digest_size = digest_info->size;
-+		digest_info_size = digest_info->size;
- 
--	if (req->src_len + digest_size > ctx->key_size - 11)
-+	if (req->src_len + digest_info_size > ctx->key_size - 11)
- 		return -EOVERFLOW;
- 
- 	if (req->dst_len < ctx->key_size) {
-@@ -406,7 +406,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 	if (!req_ctx->in_buf)
- 		return -ENOMEM;
- 
--	ps_end = ctx->key_size - digest_size - req->src_len - 2;
-+	ps_end = ctx->key_size - digest_info_size - req->src_len - 2;
- 	req_ctx->in_buf[0] = 0x01;
- 	memset(req_ctx->in_buf + 1, 0xff, ps_end - 1);
- 	req_ctx->in_buf[ps_end] = 0x00;
-@@ -441,6 +441,8 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
- 	struct akcipher_instance *inst = akcipher_alg_instance(tfm);
- 	struct pkcs1pad_inst_ctx *ictx = akcipher_instance_ctx(inst);
- 	const struct rsa_asn1_template *digest_info = ictx->digest_info;
-+	const unsigned int sig_size = req->src_len;
-+	const unsigned int digest_size = req->dst_len;
- 	unsigned int dst_len;
- 	unsigned int pos;
- 	u8 *out_buf;
-@@ -487,20 +489,19 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
- 
- 	err = 0;
- 
--	if (req->dst_len != dst_len - pos) {
-+	if (digest_size != dst_len - pos) {
- 		err = -EKEYREJECTED;
- 		req->dst_len = dst_len - pos;
- 		goto done;
- 	}
- 	/* Extract appended digest. */
- 	sg_pcopy_to_buffer(req->src,
--			   sg_nents_for_len(req->src,
--					    req->src_len + req->dst_len),
-+			   sg_nents_for_len(req->src, sig_size + digest_size),
- 			   req_ctx->out_buf + ctx->key_size,
--			   req->dst_len, req->src_len);
-+			   digest_size, sig_size);
- 	/* Do the actual verification step. */
- 	if (memcmp(req_ctx->out_buf + ctx->key_size, out_buf + pos,
--		   req->dst_len) != 0)
-+		   digest_size) != 0)
- 		err = -EKEYREJECTED;
- done:
- 	kfree_sensitive(req_ctx->out_buf);
-@@ -536,14 +537,15 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
- 	struct pkcs1pad_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct pkcs1pad_request *req_ctx = akcipher_request_ctx(req);
-+	const unsigned int sig_size = req->src_len;
-+	const unsigned int digest_size = req->dst_len;
- 	int err;
- 
--	if (WARN_ON(req->dst) ||
--	    WARN_ON(!req->dst_len) ||
--	    !ctx->key_size || req->src_len < ctx->key_size)
-+	if (WARN_ON(req->dst) || WARN_ON(!digest_size) ||
-+	    !ctx->key_size || sig_size < ctx->key_size)
- 		return -EINVAL;
- 
--	req_ctx->out_buf = kmalloc(ctx->key_size + req->dst_len, GFP_KERNEL);
-+	req_ctx->out_buf = kmalloc(ctx->key_size + digest_size, GFP_KERNEL);
- 	if (!req_ctx->out_buf)
- 		return -ENOMEM;
- 
-@@ -556,8 +558,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 
- 	/* Reuse input buffer, output to a new buffer */
- 	akcipher_request_set_crypt(&req_ctx->child_req, req->src,
--				   req_ctx->out_sg, req->src_len,
--				   ctx->key_size);
-+				   req_ctx->out_sg, sig_size, ctx->key_size);
- 
- 	err = crypto_akcipher_encrypt(&req_ctx->child_req);
- 	if (err != -EINPROGRESS && err != -EBUSY)
--- 
-2.34.1
+Can you please answer the questions above, so we can get a better
+understanding?
+Thanks!
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
