@@ -2,98 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB10C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 06:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DADC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 08:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234063AbiANGkd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 01:40:33 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59498 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232400AbiANGkd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 01:40:33 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1n8GGE-0006T6-M5; Fri, 14 Jan 2022 17:40:31 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Jan 2022 17:40:30 +1100
-Date:   Fri, 14 Jan 2022 17:40:30 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [v2 PATCH] crypto: testmgr - Move crypto_simd_disabled_for_test out
-Message-ID: <YeEa3qCB7b4QzBH9@gondor.apana.org.au>
-References: <Yd0jA4VOjysrdOu7@gondor.apana.org.au>
- <Yd36HsgI+ya6P7RF@gmail.com>
- <Yd4nmLgFr8XTxCo6@gondor.apana.org.au>
+        id S240477AbiANIWX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 03:22:23 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:60024 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239965AbiANIVM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Jan 2022 03:21:12 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0CC0D61E34;
+        Fri, 14 Jan 2022 08:21:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E28C36AED;
+        Fri, 14 Jan 2022 08:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642148471;
+        bh=Y8I8G02qtt+1LJcVr6kJCIIHChwaLeQ0Deg0+o4Caa8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mZ4JjzxTCh0Vi1sV81c40V13i0OhsdxV4lUsjAoo4dzwr+ZZA7AtFa/LjnOanKa0U
+         6Aw0v21mbmsg83jWnPNsntNj82bzqVDW2Nu7oKFUxfXi+iCBj7UpGyptUpkOIoQq7e
+         ZE3c49Gxn4G2mRak6E9pB3jC0FcWkM95wHw+BqJfsSLBRqpkdDY+wQLtV11i0hIoxZ
+         aGfFYAzD8sgaSOsAc5OhpPOA9/2tYRATEJf8l5IhWRykOr/w0oTL2Yn5FNuaEZnSMG
+         lWg+9nSn5tV5h4qGu4rwUwKSI2lq2oEKc2CzzFRl7C9jiKyasH6a8i6fgwVm+J0ro5
+         tha7V8d1vmSiw==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     keyrings@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>,
+        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
+Subject: [PATCH 1/3] crypto: rsa-pkcs1pad - correctly get hash from source scatterlist
+Date:   Fri, 14 Jan 2022 00:19:37 -0800
+Message-Id: <20220114081939.218416-2-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220114081939.218416-1-ebiggers@kernel.org>
+References: <20220114081939.218416-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yd4nmLgFr8XTxCo6@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 11:58:00AM +1100, Herbert Xu wrote:
-> On Tue, Jan 11, 2022 at 01:43:58PM -0800, Eric Biggers wrote:
-> >
-> > Maybe CRYPTO_MANAGER_EXTRA_TESTS should select CRYPTO_SIMD?
-> 
-> You're right.  I was focusing only on the module dependencies
-> but neglected to change the Kconfig dependencies.
-> 
-> I'll fix this in the next version.
+From: Eric Biggers <ebiggers@google.com>
 
----8<---
-As testmgr is part of cryptomgr which was designed to be unloadable
-as a module, it shouldn't export any symbols for other crypto
-modules to use as that would prevent it from being unloaded.  All
-its functionality is meant to be accessed through notifiers.
+Commit c7381b012872 ("crypto: akcipher - new verify API for public key
+algorithms") changed akcipher_alg::verify to take in both the signature
+and the actual hash and do the signature verification, rather than just
+return the hash expected by the signature as was the case before.  To do
+this, it implemented a hack where the signature and hash are
+concatenated with each other in one scatterlist.
 
-The symbol crypto_simd_disabled_for_test was added to testmgr
-which caused it to be pinned as a module if its users were also
-loaded.  This patch moves it out of testmgr and into crypto/algapi.c
-so cryptomgr can again be unloaded and replaced on demand.
+Obviously, for this to work correctly, akcipher_alg::verify needs to
+correctly extract the two items from the scatterlist it is given.
+Unfortunately, it doesn't correctly extract the hash in the case where
+the signature is longer than the RSA key size, as it assumes that the
+signature's length is equal to the RSA key size.  This causes a prefix
+of the hash, or even the entire hash, to be taken from the *signature*.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+It is unclear whether the resulting scheme has any useful security
+properties.
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index a366cb3e8aa1..9f15e11f5d73 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/simd.h>
- #include <linux/err.h>
- #include <linux/errno.h>
- #include <linux/fips.h>
-@@ -21,6 +22,11 @@
- 
- static LIST_HEAD(crypto_template_list);
- 
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
-+EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
-+#endif
-+
- static inline void crypto_check_module_sig(struct module *mod)
- {
- 	if (fips_enabled && mod && !module_sig_ok(mod))
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 5831d4bbc64f..3a5a3e5cb77b 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -55,9 +55,6 @@ MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
- static unsigned int fuzz_iterations = 100;
- module_param(fuzz_iterations, uint, 0644);
- MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
--
--DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
--EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
- #endif
- 
- #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+Fix this by correctly extracting the hash from the scatterlist.
+
+Fixes: c7381b012872 ("crypto: akcipher - new verify API for public key algorithms")
+Cc: <stable@vger.kernel.org> # v5.2+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/rsa-pkcs1pad.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 1b3545781425..7b223adebabf 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -495,7 +495,7 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
+ 			   sg_nents_for_len(req->src,
+ 					    req->src_len + req->dst_len),
+ 			   req_ctx->out_buf + ctx->key_size,
+-			   req->dst_len, ctx->key_size);
++			   req->dst_len, req->src_len);
+ 	/* Do the actual verification step. */
+ 	if (memcmp(req_ctx->out_buf + ctx->key_size, out_buf + pos,
+ 		   req->dst_len) != 0)
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
