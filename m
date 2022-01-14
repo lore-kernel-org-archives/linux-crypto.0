@@ -2,41 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467DBC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 09:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C18C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 09:40:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbiANJcq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 04:32:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39008 "EHLO
+        id S239803AbiANJkq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 04:40:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbiANJcq (ORCPT
+        with ESMTP id S229785AbiANJko (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 04:32:46 -0500
+        Fri, 14 Jan 2022 04:40:44 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25BBFC061574;
-        Fri, 14 Jan 2022 01:32:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96204C061574;
+        Fri, 14 Jan 2022 01:40:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rMcUu/K1sVGV/SWZES0Ey2qPe4iMY0WZ61fzFjW8Z3Q=; b=IDAmrVXzL/LxmcKSyBrPlQgbz6
-        6aaGrIfS399/ajMDcn64iRN6xaBwNuCgA00UiZuWdwgPxT0qtgE93Qk8sOAwzHK2ZoQk6bqOvXNxw
-        6zHptXyExgi2eEPvpB3Lp0bw7Bqnq6xMyjOoFr48etOfHS8IgVv2bPofPzZ2lo7s0FfQkEiv+ZB3l
-        tleIUV1QVRU+yGF657jrdb5Mfhk+CLthBju+LnBgHDIdL5yUwefiOCa3YNhWGAt+ITbOCgClk4J+U
-        c/sGgmAyUgd0saINUBOcO8/VScYvtRpIel/uJkEKE1jFzqYaUPNy/IqyaNigVqKr3ZIZQAOwpWFO2
-        uRCdApUA==;
+        bh=Qv7o7OYRZZ4rZLcvwJ7bYFuvssGmEGjJm6oL8qmozjM=; b=QnytaVkzeW+ITsuroNUZ4bA9aM
+        a1lP6RQproSsli+QqaxifOPYiXnJUNVwMn1ibHVXIQyXBunu1eXcPXVLwt/abd/QnDUvcv9kwBuFa
+        I6e0jlhjrzmRpX/ltQGAOj2ViNWC8bZKJONvoDhk4OBv1KOszfrX6LPx6GjiM2lfjSqNUjavjFwEJ
+        2TSDw0/xGQhSLgKrcxCOvHF1UfFgVT5ZzjKY/7M4MZOUmBLeg55598jodeD8D2+Gz/521Gtu8tRqx
+        2aWMic/+VOU2FcJnHNkB4nuaOSwM73elrE/xrL81GHPrAqggNvQUU/7PVzfMQJ+mtZbWkfZXrJZeZ
+        T6iMdkTw==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n8IwA-005gcN-Tb; Fri, 14 Jan 2022 09:31:59 +0000
+        id 1n8J43-005gxp-V2; Fri, 14 Jan 2022 09:40:08 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 41C903001C0;
-        Fri, 14 Jan 2022 10:31:55 +0100 (CET)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 360913002C1;
+        Fri, 14 Jan 2022 10:40:07 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 22952203C24E7; Fri, 14 Jan 2022 10:31:55 +0100 (CET)
-Date:   Fri, 14 Jan 2022 10:31:55 +0100
+        id E0993203C1C62; Fri, 14 Jan 2022 10:40:06 +0100 (CET)
+Date:   Fri, 14 Jan 2022 10:40:06 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Daniel Jordan <daniel.m.jordan@oracle.com>
 Cc:     Alexander Duyck <alexanderduyck@fb.com>,
@@ -63,114 +63,35 @@ Cc:     Alexander Duyck <alexanderduyck@fb.com>,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [RFC 15/16] sched/fair: Account kthread runtime debt for CFS
  bandwidth
-Message-ID: <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
+Message-ID: <YeFE9j4Qynp9sNXS@hirez.programming.kicks-ass.net>
 References: <20220106004656.126790-1-daniel.m.jordan@oracle.com>
  <20220106004656.126790-16-daniel.m.jordan@oracle.com>
+ <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220106004656.126790-16-daniel.m.jordan@oracle.com>
+In-Reply-To: <YeFDC0mV3yurUFbl@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 05, 2022 at 07:46:55PM -0500, Daniel Jordan wrote:
-> As before, helpers in multithreaded jobs don't honor the main thread's
-> CFS bandwidth limits, which could lead to the group exceeding its quota.
+On Fri, Jan 14, 2022 at 10:31:55AM +0100, Peter Zijlstra wrote:
+
+> Also, by virtue of this being a start-stop annotation interface, the
+> accrued time might be arbitrarily large and arbitrarily delayed. I'm not
+> sure that's sensible.
 > 
-> Fix it by having helpers remote charge their CPU time to the main
-> thread's task group.  A helper calls a pair of new interfaces
-> cpu_cgroup_remote_begin() and cpu_cgroup_remote_charge() (see function
-> header comments) to achieve this.
-> 
-> This is just supposed to start a discussion, so it's pretty simple.
-> Once a kthread has finished a remote charging period with
-> cpu_cgroup_remote_charge(), its runtime is subtracted from the target
-> task group's runtime (cfs_bandwidth::runtime) and any remainder is saved
-> as debt (cfs_bandwidth::debt) to pay off in later periods.
-> 
-> Remote charging tasks aren't throttled when the group reaches its quota,
-> and a task group doesn't run at all until its debt is completely paid,
-> but these shortcomings can be addressed if the approach ends up being
-> taken.
+> For tasks it might be better to mark the task and have the tick DTRT
+> instead of later trying to 'migrate' the time.
 
-> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-> index 44c452072a1b..3c2d7f245c68 100644
-> --- a/kernel/sched/fair.c
-> +++ b/kernel/sched/fair.c
-> @@ -4655,10 +4655,19 @@ static inline u64 sched_cfs_bandwidth_slice(void)
->   */
->  void __refill_cfs_bandwidth_runtime(struct cfs_bandwidth *cfs_b)
->  {
-> -	if (unlikely(cfs_b->quota == RUNTIME_INF))
-> +	u64 quota = cfs_b->quota;
-> +	u64 payment;
-> +
-> +	if (unlikely(quota == RUNTIME_INF))
->  		return;
->  
-> -	cfs_b->runtime += cfs_b->quota;
-> +	if (cfs_b->debt) {
-> +		payment = min(quota, cfs_b->debt);
-> +		cfs_b->debt -= payment;
-> +		quota -= payment;
-> +	}
-> +
-> +	cfs_b->runtime += quota;
->  	cfs_b->runtime = min(cfs_b->runtime, cfs_b->quota + cfs_b->burst);
->  }
+Which is then very close to simply sticking the task into the right
+cgroup for a limited duration.
 
-It might be easier to make cfs_bandwidth::runtime an s64 and make it go
-negative.
+You could do a special case sched_move_task(), that takes a css argument
+instead of using the current task_css. Then for cgroups it looks like
+nothing changes, but the scheduler will DTRT and act like it is in the
+target cgroup. Then at the end, simply move it back to task_css.
 
-> @@ -5406,6 +5415,32 @@ static void __maybe_unused unthrottle_offline_cfs_rqs(struct rq *rq)
->  	rcu_read_unlock();
->  }
->  
-> +static void incur_cfs_debt(struct rq *rq, struct sched_entity *se,
-> +			   struct task_group *tg, u64 debt)
-> +{
-> +	if (!cfs_bandwidth_used())
-> +		return;
-> +
-> +	while (tg != &root_task_group) {
-> +		struct cfs_rq *cfs_rq = tg->cfs_rq[cpu_of(rq)];
-> +
-> +		if (cfs_rq->runtime_enabled) {
-> +			struct cfs_bandwidth *cfs_b = &tg->cfs_bandwidth;
-> +			u64 payment;
-> +
-> +			raw_spin_lock(&cfs_b->lock);
-> +
-> +			payment = min(cfs_b->runtime, debt);
-> +			cfs_b->runtime -= payment;
-
-At this point it might hit 0 (or go negative if/when you do the above)
-and you'll need to throttle the group.
-
-> +			cfs_b->debt += debt - payment;
-> +
-> +			raw_spin_unlock(&cfs_b->lock);
-> +		}
-> +
-> +		tg = tg->parent;
-> +	}
-> +}
-
-So part of the problem I have with this is that these external things
-can consume all the bandwidth and basically indefinitely starve the
-group.
-
-This is doulby so if you're going to account things like softirq network
-processing.
-
-Also, why does the whole charging API have a task argument? It either is
-current or NULL in case of things like softirq, neither really make
-sense as an argument.
-
-Also, by virtue of this being a start-stop annotation interface, the
-accrued time might be arbitrarily large and arbitrarily delayed. I'm not
-sure that's sensible.
-
-For tasks it might be better to mark the task and have the tick DTRT
-instead of later trying to 'migrate' the time.
+This obviously doesn't work for SoftIRQ accounting, but that is
+'special' anyway. Softirq stuff is not otherwise under scheduler
+control and has preemption disabled.
