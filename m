@@ -2,111 +2,161 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0124DC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jan 2022 23:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FCFC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 00:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbiANXE1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jan 2022 18:04:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55494 "EHLO
+        id S231465AbiAOARr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 14 Jan 2022 19:17:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229646AbiANXE0 (ORCPT
+        with ESMTP id S229913AbiAOARr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jan 2022 18:04:26 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B672CC061574;
-        Fri, 14 Jan 2022 15:04:26 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id i65so4065901pfc.9;
-        Fri, 14 Jan 2022 15:04:26 -0800 (PST)
+        Fri, 14 Jan 2022 19:17:47 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56931C06161C
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 16:17:47 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id e18-20020a255012000000b00611b9fa7078so14461704ybb.4
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jan 2022 16:17:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc:content-transfer-encoding;
-        bh=J4+lZIDd6o5zmH05CFS7Chus/4ckzIXTgk91SRnxUls=;
-        b=FTpEGS7qAx/sQGZEcABd019S7Hymf9UHf4a+Z/FjMnKETvgcSNOuprT2LqLixPDeU4
-         my/DZmh4kvT5trb5uQ3kQHJzq/69VUUie5znya1InMaurhjnGjQeyR5fxccRqI+cmpbC
-         w/WhOjbKT3fzbrAceqOtVrj3g5BC76OA3C5KYveiiPrCq9ufFYuHPali89mMa01htUNJ
-         MBap2BbkvaqdkGLioyzQFVXTrBD500qzM+J3gJVNk7Vv1kOTv2zyGl4Qqi0Ar/IuZlT3
-         7w0e/9eoys1y57wiS2gXvQqcdoAwBLuPKp6AB4VU0xZfs8Md1OWiAoeqVo8CVK2ITK95
-         t+Og==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:cc;
+        bh=TEFOv4YS0Pv2L4ioEdK41WD5FaS6ABhUfwsLXh99f8U=;
+        b=sN3IkgdFVVNugkPBMVaX1NQErDxMw2JjTs7fEo2IZHsKKUM7LTSV9HHpFS166HaH3W
+         1smmvnBfC2u30IE5BLIk409N1YZOuqDC+aTiCGUwbpoHdcN4OqjXMxCsDTaFeS5P2VRq
+         SmBZHpg8uW1ouZ/j7p3S+qI/pSM5yUosczI2Nj3gMldT1HQfoC/iWUsehWtmsGMiln9/
+         RhEvTEGlrfQRvTK/FqSw7xhLyNl7Aq9RiFRjCvHxZr5sv0MlpTkooxxRhlsXEQfp/npd
+         ki3xenMHB3KDK07iMrpR5qm5ThgDpUmuK8M6KClCzYuOt6imy1PMm2w3D2hS04k8KW0L
+         NlbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc:content-transfer-encoding;
-        bh=J4+lZIDd6o5zmH05CFS7Chus/4ckzIXTgk91SRnxUls=;
-        b=foP2Z01vh5BnAH+Hp5OB+R4YIugPWpP6kob3kdKS/EsaUa6Kvdk5nGHJilvgeEYTKs
-         kFIFox3YIIx+W5ZkCqvaJPUn8h0I31RP0B7x4FfLvZMuIocMIS9JtFnDHN/t29l6bV65
-         ZJXRgBQOPLw8lCa8qiqBqQfHhZ3H/ejS0xg5FIGMWycKkVTUNeArsRhuIK31LKb16aXe
-         +A+BMXxByWB97z0cTSj087AuEiWnBf57i2woR1ngq1d9yYKrgyXcXkJ26mpmQpRHS0oA
-         HHvqLhWKGEokHafVpuAMUh2K/gN7iYTTeLLwEes5D9TqeDZWI3BFlw0HfmUh//I4xPD+
-         egyw==
-X-Gm-Message-State: AOAM533ie7LS/BP6JQfftXLXdSWXO3wCrTNWcjXSjTRWIWXewvXvREqn
-        Pc7xz6c/Fb4WNnXwec9zJgyIu4ebWIO9dFfdbng=
-X-Google-Smtp-Source: ABdhPJxiGyyevi/x/S48E/qQOg2S+H4ILpi11ez7OVZ6hwF0rP9lAfUr9XzA8Y1pOZL3sRiAWpW5jLpJ1QRsiRsHH4g=
-X-Received: by 2002:a63:a619:: with SMTP id t25mr9755116pge.235.1642201466182;
- Fri, 14 Jan 2022 15:04:26 -0800 (PST)
-MIME-Version: 1.0
-References: <20220112131204.800307-1-Jason@zx2c4.com> <20220112131204.800307-2-Jason@zx2c4.com>
- <87tue8ftrm.fsf@toke.dk>
-In-Reply-To: <87tue8ftrm.fsf@toke.dk>
-Reply-To: noloader@gmail.com
-From:   Jeffrey Walton <noloader@gmail.com>
-Date:   Fri, 14 Jan 2022 18:04:14 -0500
-Message-ID: <CAH8yC8=+7p1i6a+_zq3fL5MqHem34vMDGxY+KGcZbjOg1H9q1Q@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/3] bpf: move from sha1 to blake2s in tag calculation
-To:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:cc;
+        bh=TEFOv4YS0Pv2L4ioEdK41WD5FaS6ABhUfwsLXh99f8U=;
+        b=AoEEAKELudR8Ei8vcr4ct9rH4jcy0Apz5AqIpTprCr9K6zu4LaXCp7f5gFsuhg/z5b
+         b5z1sk60DVsWAkC2hvUn/cMeXpk+69mlJmM3Ru+zFjOeNIY+RwyC/o3A3o8D4VjpAIGM
+         P/RYhuOUSnRm5sCpCqydMUrUZD+a5cisdvhiZeegIsq0lbvZs29N/Kh0hVWx5ygcX+M1
+         zCXBQtWKs8PrUl/IMt2dyUMnlqpPYNwIj3pOuHXozda4QHZBOGWdGtGujklzEeIrRr4S
+         MCFClnEWcbLGTv/Errmgifj8gMzIsJCcD47q+/5LjzavTOwunFUQMCAlcxLi1OXmw2j4
+         YHHA==
+X-Gm-Message-State: AOAM5303enORgK7hWjZAwqyCS+Sxj0qMWU4wdRzxEKqBqPWA0ZOOpfsU
+        X3N8OYvzyD6GpYYU4KR96NV06uWLEA==
+X-Google-Smtp-Source: ABdhPJy8BbTFgHr7s6eDuLFYTIX87Wx1uQElAp//NDt5ogwcOGsWsYZHV8KXA3KKsn6Yu2DSgNTdK49S4w==
+X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
+ (user=nhuck job=sendgmr) by 2002:a5b:3c2:: with SMTP id t2mr16685965ybp.747.1642205866524;
+ Fri, 14 Jan 2022 16:17:46 -0800 (PST)
+Date:   Fri, 14 Jan 2022 18:17:19 -0600
+Message-Id: <20220115001719.1040897-1-nhuck@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.703.g22d0c6ccf7-goog
+Subject: [PATCH] crypto: x86 - Convert to SPDX identifier
+From:   Nathan Huckleberry <nhuck@google.com>
+Cc:     Nathan Huckleberry <nhuck@google.com>,
+        James Guilford <james.guilford@intel.com>,
+        Sean Gulley <sean.m.gulley@intel.com>,
+        Chandramouli Narayanan <mouli@linux.intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        bpf@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 12, 2022 at 8:13 PM Toke H=C3=B8iland-J=C3=B8rgensen <toke@redh=
-at.com> wrote:
->
-> [ adding the bpf list - please make sure to include that when sending
->   BPF-related patches, not everyone in BPF land follows netdev ]
->
-> "Jason A. Donenfeld" <Jason@zx2c4.com> writes:
->
-> > BLAKE2s is faster and more secure. SHA-1 has been broken for a long tim=
-e
-> > now. This also removes quite a bit of code, and lets us potentially
-> > remove sha1 from lib, which would further reduce vmlinux size.
->
-> AFAIU, the BPF tag is just used as an opaque (i.e., arbitrary) unique
-> identifier for BPF programs, without any guarantees of stability. Which
-> means changing it should be fine; at most we'd confuse some operators
-> who have memorised the tags of their BPF programs :)
->
-> The only other concern I could see would be if it somehow locked us into
-> that particular algorithm for other future use cases for computing
-> hashes of BPF programs (say, signing if that ends up being the direction
-> we go in). But obviously SHA1 would not be a good fit for that anyway,
-> so the algorithm choice would have to be part of that discussion in any
-> case.
->
-> So all in all, I don't see any issues with making this change for BPF.
+Use SPDX-License-Identifier instead of a verbose license text and
+update external link.
 
-Somewhat related, if BPF is going to move from SHA to something, then
-consider SipHash. Here are the numbers I regularly observe. They
-remain relative the same on 64-bit platforms:
+Cc: James Guilford <james.guilford@intel.com>
+Cc: Sean Gulley <sean.m.gulley@intel.com>
+Cc: Chandramouli Narayanan <mouli@linux.intel.com>
+Signed-off-by: Nathan Huckleberry <nhuck@google.com>
+---
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S | 63 ++++---------------------
+ 1 file changed, 10 insertions(+), 53 deletions(-)
 
-    * SHA-1: 4.31 cpb using SSE2
-    * BLAKE2s: 4.84 cpb using SSE4.1
-    * BLAKE2b: 3.49 cpb using SSE4.1
-    * SipHash 2-4: 1.54 cpb using C/C++
-    * SipHash 4-8: 2.55 cpb using C/C++
+diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+index c799838242a6..43852ba6e19c 100644
+--- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
++++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+@@ -1,65 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0-only OR BSD-3-Clause */
+ /*
+- *	Implement AES CTR mode by8 optimization with AVX instructions. (x86_64)
+- *
+- * This is AES128/192/256 CTR mode optimization implementation. It requires
+- * the support of Intel(R) AESNI and AVX instructions.
+- *
+- * This work was inspired by the AES CTR mode optimization published
+- * in Intel Optimized IPSEC Cryptograhpic library.
+- * Additional information on it can be found at:
+- *    http://downloadcenter.intel.com/Detail_Desc.aspx?agr=Y&DwnldID=22972
+- *
+- * This file is provided under a dual BSD/GPLv2 license.  When using or
+- * redistributing this file, you may do so under either license.
+- *
+- * GPL LICENSE SUMMARY
++ * AES CTR mode by8 optimization with AVX instructions. (x86_64)
+  *
+  * Copyright(c) 2014 Intel Corporation.
+  *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of version 2 of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License for more details.
+- *
+  * Contact Information:
+  * James Guilford <james.guilford@intel.com>
+  * Sean Gulley <sean.m.gulley@intel.com>
+  * Chandramouli Narayanan <mouli@linux.intel.com>
++ */
++/*
++ * This is AES128/192/256 CTR mode optimization implementation. It requires
++ * the support of Intel(R) AESNI and AVX instructions.
+  *
+- * BSD LICENSE
+- *
+- * Copyright(c) 2014 Intel Corporation.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- * Redistributions of source code must retain the above copyright
+- * notice, this list of conditions and the following disclaimer.
+- * Redistributions in binary form must reproduce the above copyright
+- * notice, this list of conditions and the following disclaimer in
+- * the documentation and/or other materials provided with the
+- * distribution.
+- * Neither the name of Intel Corporation nor the names of its
+- * contributors may be used to endorse or promote products derived
+- * from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
++ * This work was inspired by the AES CTR mode optimization published
++ * in Intel Optimized IPSEC Cryptographic library.
++ * Additional information on it can be found at:
++ *    https://github.com/intel/intel-ipsec-mb
+  */
+ 
+ #include <linux/linkage.h>
+-- 
+2.34.1.703.g22d0c6ccf7-goog
 
-If BPF is Ok with 64-bit tags, then SipHash 2-4 is probably what you
-want on the wish list.
-
-Jeff
