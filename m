@@ -2,94 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A80CC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 10:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33470C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 17:22:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231501AbiAOKHX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jan 2022 05:07:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58494 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231511AbiAOKHW (ORCPT
+        id S232419AbiAORWe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 15 Jan 2022 12:22:34 -0500
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:38465 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232342AbiAORWe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jan 2022 05:07:22 -0500
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E862C06161C
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Jan 2022 02:07:22 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id k5so1505545wmj.3
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Jan 2022 02:07:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xHzaO4ONACqKvhGwj0tPEmx27kwwu6unLDfjaw5odQk=;
-        b=QzXz5M+8FThc6YS7BTcBpaSjY2VQwMtyP2aWOFTgY6F3CG/wzIUPGc8S1rddf8lIwy
-         0NJaylsB4zEmFToWvVObjj9xVDt78e+wRf5RyYnTktWNqNZ7wpOjFkZJM6PhcDg8hj37
-         ZqbRy93uvxc1qxQ2m6dgFTzJFQ8z5tjm8ggH1Dw3eGtX+TiCptySjZ7dao8iEDCiKeZo
-         e5ITXODfM/mhjWWfIzzl7bVfpF42p0C82rXjLblhMHEHOhdObgZxRjpxhwxRzLrYVjSp
-         T6wCP6BwTvs26YzRPCk4M+b+MMnRJFUEpmNtM2HLfj/kI6QaSpImzW0dn/UPdgp2Dox7
-         Xz+w==
+        Sat, 15 Jan 2022 12:22:34 -0500
+Received: by mail-ot1-f47.google.com with SMTP id g1-20020a9d6481000000b00592d01f2b6eso10081139otl.5;
+        Sat, 15 Jan 2022 09:22:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xHzaO4ONACqKvhGwj0tPEmx27kwwu6unLDfjaw5odQk=;
-        b=Mz7i1jC+PFdJeATUUXaXfPOxzurGIf4hQQPBNB1WAigHjHiFPOqqUVD9OVBiueroUK
-         s7kDLXkO+Qnq/b0QPILCPfeuKX5esLAYAOakjcnFjel2wGRQURNZVSXeagsyKUfqQeYk
-         4ZxQpZRsMkKGFXC116y5EcNs7r4ilwJJQAtHiZN0kyH3KjWZRIvgT4bVI7JLC3bSjXYe
-         3JZyUgmzFbrYt2eX+1UnF/6/354gEx0N+BbQlFqsnPK80brLGgauWB3WUr1uirU67NZ0
-         jdJFdUz1YnnHSVFZVUAWsyYNC7iY7TmcaHBYI5EbHbSw026gZb2u8Yq/fcRava3SgWpN
-         ZPzA==
-X-Gm-Message-State: AOAM533PfBDI5eTKGvsfTMI+LmpZVcqzPH8NgrtwvixMxETkki/9pLzX
-        v1g0IFh25KhYwJdtDUKFDuYyrQ==
-X-Google-Smtp-Source: ABdhPJwT9PpLZzfgM3b2ggNB5zCbHPDcVO71Y4bAF4rcgpahWKkHJ1bm1VqNAJA0DccSNUH3AVHGEQ==
-X-Received: by 2002:a1c:7c13:: with SMTP id x19mr11934460wmc.78.1642241240658;
-        Sat, 15 Jan 2022 02:07:20 -0800 (PST)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id w17sm9009436wmc.14.2022.01.15.02.07.19
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
+         :message-id;
+        bh=QdKoM92XcOD+ied4LW2xvMvWizSFp19kwNEISaRgwYc=;
+        b=kItlONYdbLTzpuA2I46I8QjVckeB2oUGfGUJglsXnNBlLCep63qbOPQnwu+nSRHIvF
+         jxEv0UCpWg9k+mvQyz1TygPlnjy7+Z2oLkNUyXYkuWEQmdUOcZ96DySlP9t/hUKT2Ide
+         xqB6glfLUl3CNxTKGk8ATPWu617eBaZmvrv5q0kXodwr1+2E1yvQDmlGiVQfuguWt7z3
+         Yp8NpzE9WZkKGCyyT95D8HgI1l94v4SfZmbPOqtzyeb3BMd9Cchr3jOX1FNVEILWbIfj
+         kZ+vVgY6xbHnDozJOQkpAwulCQXCr+YBPyZkieN9meljk3UD2d4YuRXfF6TgGm90K8H8
+         CzUw==
+X-Gm-Message-State: AOAM531FRpD2FSIVYMhPE+ufMgE6vuMcMBbGhYIEsFo2Kss0iVsVO6sO
+        Tm+xUBf3+gShB6qxBkgEKA==
+X-Google-Smtp-Source: ABdhPJxckVmhHzYLxvrbRLfL2JZUy0scMzSr8ccJ+pUoumgkQ08Xp/dABKP9617iJawKNBRs9pQ3hg==
+X-Received: by 2002:a05:6830:2a0a:: with SMTP id y10mr10609256otu.248.1642267353083;
+        Sat, 15 Jan 2022 09:22:33 -0800 (PST)
+Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
+        by smtp.gmail.com with ESMTPSA id v18sm2766862otp.42.2022.01.15.09.22.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jan 2022 02:07:20 -0800 (PST)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        jernej.skrabec@gmail.com, mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] crypto: sun8i-ss: really disable hash on A80
-Date:   Sat, 15 Jan 2022 10:07:14 +0000
-Message-Id: <20220115100714.3016838-1-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sat, 15 Jan 2022 09:22:32 -0800 (PST)
+Received: (nullmailer pid 119879 invoked by uid 1000);
+        Sat, 15 Jan 2022 17:22:30 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     conor.dooley@microchip.com
+Cc:     robh+dt@kernel.org, bgolaszewski@baylibre.com,
+        jassisinghbrar@gmail.com, linus.walleij@linaro.org,
+        linux-i2c@vger.kernel.org, linux-gpio@vger.kernel.org,
+        paul.walmsley@sifive.com, linux-usb@vger.kernel.org,
+        lewis.hanly@microchip.com, lee.jones@linaro.org,
+        aou@eecs.berkeley.edu, daire.mcnamara@microchip.com,
+        thierry.reding@gmail.com, linux-riscv@lists.infradead.org,
+        broonie@kernel.org, linux-pwm@vger.kernel.org,
+        a.zummo@towertech.it, heiko@sntech.de,
+        u.kleine-koenig@pengutronix.de, atishp@rivosinc.com,
+        linux-spi@vger.kernel.org, alexandre.belloni@bootlin.com,
+        bin.meng@windriver.com, devicetree@vger.kernel.org,
+        geert@linux-m68k.org, palmer@dabbelt.com,
+        linux-kernel@vger.kernel.org, krzysztof.kozlowski@canonical.com,
+        gregkh@linuxfoundation.org, linux-rtc@vger.kernel.org,
+        ivan.griffin@microchip.com, linux-crypto@vger.kernel.org
+In-Reply-To: <20220114151727.2319915-2-conor.dooley@microchip.com>
+References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-2-conor.dooley@microchip.com>
+Subject: Re: [PATCH v3 01/15] dt-bindings: soc/microchip: update syscontroller compatibles
+Date:   Sat, 15 Jan 2022 11:22:30 -0600
+Message-Id: <1642267350.889231.119878.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When adding hashes support to sun8i-ss, I have added them only on A83T.
-But I forgot that 0 is a valid algorithm ID, so hashes are enabled on A80 but
-with an incorrect ID.
-Anyway, even with correct IDs, hashes do not work on A80 and I cannot
-find why.
-So let's disable all of them on A80.
+On Fri, 14 Jan 2022 15:17:13 +0000, conor.dooley@microchip.com wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+> 
+> The Polarfire SoC is currently using two different compatible string
+> prefixes. Fix this by changing "polarfire-soc-*" strings to "mpfs-*" in
+> its system controller in order to match the compatible string used in
+> the soc binding and device tree
+> 
+> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> ---
+>  ...larfire-soc-mailbox.yaml => microchip,mpfs-mailbox.yaml} | 6 +++---
+>  ...s-controller.yaml => microchip,mpfs-sys-controller.yaml} | 6 +++---
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+>  rename Documentation/devicetree/bindings/mailbox/{microchip,polarfire-soc-mailbox.yaml => microchip,mpfs-mailbox.yaml} (82%)
+>  rename Documentation/devicetree/bindings/soc/microchip/{microchip,polarfire-soc-sys-controller.yaml => microchip,mpfs-sys-controller.yaml} (75%)
+> 
 
-Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 2 ++
- 1 file changed, 2 insertions(+)
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index 80e89066dbd1..319fe3279a71 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -30,6 +30,8 @@
- static const struct ss_variant ss_a80_variant = {
- 	.alg_cipher = { SS_ALG_AES, SS_ALG_DES, SS_ALG_3DES,
- 	},
-+	.alg_hash = { SS_ID_NOTSUPP, SS_ID_NOTSUPP, SS_ID_NOTSUPP, SS_ID_NOTSUPP,
-+	},
- 	.op_mode = { SS_OP_ECB, SS_OP_CBC,
- 	},
- 	.ss_clks = {
--- 
-2.34.1
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+Documentation/devicetree/bindings/mailbox/microchip,mpfs-mailbox.example.dt.yaml:0:0: /example-0/soc/mailbox@37020000: failed to match any schema with compatible: ['mpfs-mailbox']
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/patch/1580091
+
+This check can fail if there are any dependencies. The base for a patch
+series is generally the most recent rc1.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit.
 
