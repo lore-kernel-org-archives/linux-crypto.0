@@ -2,127 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 541DEC433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 05:48:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A80CC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 10:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232527AbiAOFsE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jan 2022 00:48:04 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:35828 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231184AbiAOFsE (ORCPT
+        id S231501AbiAOKHX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 15 Jan 2022 05:07:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58494 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231511AbiAOKHW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jan 2022 00:48:04 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0D168B82668;
-        Sat, 15 Jan 2022 05:48:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E8AAC36AE3;
-        Sat, 15 Jan 2022 05:48:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642225681;
-        bh=s6YoHefLtqCOhAQXJ3KUCdfGdNsilqm6jK16QH0hGEI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=m9e55GKvgj1lE0KXjFK1lOAzEbpnb9zLwboWDq5BgjJr1xW+qy6iefLBwS6T6g/8E
-         KU8xnQouSqIB2PRAjVB6lf7AMm7qz4k0oYoTztNRB922VcKlrzy26C3KgRw9yW8cMe
-         uhzFQ64Fav6JfjZ9Jeqtq4nCRXgv47cW3g1wtFQnB1Zq8OjMR0GjA8XimALaKI18wM
-         ubwkvahXdfuO3rX927kXtpYEYx87F0OZJDB08RoX2djAXzoal2Ew8bsKs4cdUv7NYY
-         zp2cHh8e8vnfywabrq1DzaZK/dkQPunVihR/XyUTg2KkXlr+F4YgAyq0Dp6kWkTL6Z
-         uNgKV6iAYX+gg==
-Date:   Fri, 14 Jan 2022 21:47:59 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Vitaly Chikunov <vt@altlinux.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org, Denis Kenzior <denkenz@gmail.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] crypto: rsa-pkcs1pad - correctly get hash from
- source scatterlist
-Message-ID: <YeJgDzSsSepEio6P@sol.localdomain>
-References: <20220114081939.218416-1-ebiggers@kernel.org>
- <20220114081939.218416-2-ebiggers@kernel.org>
- <20220115050812.q7o5ij7c3jhloru7@altlinux.org>
+        Sat, 15 Jan 2022 05:07:22 -0500
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E862C06161C
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Jan 2022 02:07:22 -0800 (PST)
+Received: by mail-wm1-x332.google.com with SMTP id k5so1505545wmj.3
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Jan 2022 02:07:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xHzaO4ONACqKvhGwj0tPEmx27kwwu6unLDfjaw5odQk=;
+        b=QzXz5M+8FThc6YS7BTcBpaSjY2VQwMtyP2aWOFTgY6F3CG/wzIUPGc8S1rddf8lIwy
+         0NJaylsB4zEmFToWvVObjj9xVDt78e+wRf5RyYnTktWNqNZ7wpOjFkZJM6PhcDg8hj37
+         ZqbRy93uvxc1qxQ2m6dgFTzJFQ8z5tjm8ggH1Dw3eGtX+TiCptySjZ7dao8iEDCiKeZo
+         e5ITXODfM/mhjWWfIzzl7bVfpF42p0C82rXjLblhMHEHOhdObgZxRjpxhwxRzLrYVjSp
+         T6wCP6BwTvs26YzRPCk4M+b+MMnRJFUEpmNtM2HLfj/kI6QaSpImzW0dn/UPdgp2Dox7
+         Xz+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xHzaO4ONACqKvhGwj0tPEmx27kwwu6unLDfjaw5odQk=;
+        b=Mz7i1jC+PFdJeATUUXaXfPOxzurGIf4hQQPBNB1WAigHjHiFPOqqUVD9OVBiueroUK
+         s7kDLXkO+Qnq/b0QPILCPfeuKX5esLAYAOakjcnFjel2wGRQURNZVSXeagsyKUfqQeYk
+         4ZxQpZRsMkKGFXC116y5EcNs7r4ilwJJQAtHiZN0kyH3KjWZRIvgT4bVI7JLC3bSjXYe
+         3JZyUgmzFbrYt2eX+1UnF/6/354gEx0N+BbQlFqsnPK80brLGgauWB3WUr1uirU67NZ0
+         jdJFdUz1YnnHSVFZVUAWsyYNC7iY7TmcaHBYI5EbHbSw026gZb2u8Yq/fcRava3SgWpN
+         ZPzA==
+X-Gm-Message-State: AOAM533PfBDI5eTKGvsfTMI+LmpZVcqzPH8NgrtwvixMxETkki/9pLzX
+        v1g0IFh25KhYwJdtDUKFDuYyrQ==
+X-Google-Smtp-Source: ABdhPJwT9PpLZzfgM3b2ggNB5zCbHPDcVO71Y4bAF4rcgpahWKkHJ1bm1VqNAJA0DccSNUH3AVHGEQ==
+X-Received: by 2002:a1c:7c13:: with SMTP id x19mr11934460wmc.78.1642241240658;
+        Sat, 15 Jan 2022 02:07:20 -0800 (PST)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id w17sm9009436wmc.14.2022.01.15.02.07.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Jan 2022 02:07:20 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        jernej.skrabec@gmail.com, mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: sun8i-ss: really disable hash on A80
+Date:   Sat, 15 Jan 2022 10:07:14 +0000
+Message-Id: <20220115100714.3016838-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220115050812.q7o5ij7c3jhloru7@altlinux.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 15, 2022 at 08:08:12AM +0300, Vitaly Chikunov wrote:
-> Eric,
-> 
-> On Fri, Jan 14, 2022 at 12:19:37AM -0800, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > Commit c7381b012872 ("crypto: akcipher - new verify API for public key
-> > algorithms") changed akcipher_alg::verify to take in both the signature
-> > and the actual hash and do the signature verification, rather than just
-> > return the hash expected by the signature as was the case before.  To do
-> > this, it implemented a hack where the signature and hash are
-> > concatenated with each other in one scatterlist.
-> > 
-> > Obviously, for this to work correctly, akcipher_alg::verify needs to
-> > correctly extract the two items from the scatterlist it is given.
-> > Unfortunately, it doesn't correctly extract the hash in the case where
-> > the signature is longer than the RSA key size, as it assumes that the
-> > signature's length is equal to the RSA key size.  This causes a prefix
-> > of the hash, or even the entire hash, to be taken from the *signature*.
-> > 
-> > It is unclear whether the resulting scheme has any useful security
-> > properties.
-> > 
-> > Fix this by correctly extracting the hash from the scatterlist.
-> > 
-> > Fixes: c7381b012872 ("crypto: akcipher - new verify API for public key algorithms")
-> > Cc: <stable@vger.kernel.org> # v5.2+
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  crypto/rsa-pkcs1pad.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-> > index 1b3545781425..7b223adebabf 100644
-> > --- a/crypto/rsa-pkcs1pad.c
-> > +++ b/crypto/rsa-pkcs1pad.c
-> > @@ -495,7 +495,7 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
-> >  			   sg_nents_for_len(req->src,
-> >  					    req->src_len + req->dst_len),
-> >  			   req_ctx->out_buf + ctx->key_size,
-> > -			   req->dst_len, ctx->key_size);
-> > +			   req->dst_len, req->src_len);
-> 
-> Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
-> 
-> Reviewing this I noticed that while req->src_len is checked in
-> pkcs1pad_verify() to be not shorter than ctx->key_size it's never
-> checked to be not longer. Signatures longer than RSA modulus N (which is
-> ctx->key_size) are still invalid (RFC8017 8.2.2). (So, assumption they
-> are equal was in accord with the standard, but not with the current
-> codebase.)
-> 
-> I suggest to add this check too while we at it.
-> 
-> There was such check before, but it was removed in a49de377e051 ("crypto:
-> Add hash param to pkcs1pad") for an unknown reason:
-> 
->   -    if (!ctx->key_size || req->src_len != ctx->key_size)
->   +    if (!ctx->key_size || req->src_len < ctx->key_size)
->            return -EINVAL;
-> 
-> Thanks,
-> 
+When adding hashes support to sun8i-ss, I have added them only on A83T.
+But I forgot that 0 is a valid algorithm ID, so hashes are enabled on A80 but
+with an incorrect ID.
+Anyway, even with correct IDs, hashes do not work on A80 and I cannot
+find why.
+So let's disable all of them on A80.
 
-Yes, after sending this out I was looking at the PKCS#1 v1.5 encoding
-specification, and I had noticed that too:
+Fixes: d9b45418a917 ("crypto: sun8i-ss - support hash algorithms")
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-     "1.  Length checking: If the length of the signature S is not k
-          octets, output 'invalid signature' and stop."
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+index 80e89066dbd1..319fe3279a71 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+@@ -30,6 +30,8 @@
+ static const struct ss_variant ss_a80_variant = {
+ 	.alg_cipher = { SS_ALG_AES, SS_ALG_DES, SS_ALG_3DES,
+ 	},
++	.alg_hash = { SS_ID_NOTSUPP, SS_ID_NOTSUPP, SS_ID_NOTSUPP, SS_ID_NOTSUPP,
++	},
+ 	.op_mode = { SS_OP_ECB, SS_OP_CBC,
+ 	},
+ 	.ss_clks = {
+-- 
+2.34.1
 
-I agree that we should enforce that too, although it's curious that commit
-a49de377e051 removed that check.  Hopefully that was just a mistake and not
-something that someone was actually relying on.  I'll send a separate patch for
-that; I think it should be separate from this patch.
-
-- Eric
