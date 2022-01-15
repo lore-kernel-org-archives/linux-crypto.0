@@ -2,106 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D72C2C4707F
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 17:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782DEC4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 18:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233571AbiAORXD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jan 2022 12:23:03 -0500
-Received: from mail-oi1-f181.google.com ([209.85.167.181]:45848 "EHLO
-        mail-oi1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233380AbiAORWv (ORCPT
+        id S233143AbiAOSpS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 15 Jan 2022 13:45:18 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:46046 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230304AbiAOSpS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jan 2022 12:22:51 -0500
-Received: by mail-oi1-f181.google.com with SMTP id t9so16985486oie.12;
-        Sat, 15 Jan 2022 09:22:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
-         :message-id;
-        bh=/ryk+C/4VJdMzNIa1mhcDuVOv8zspRXPYMFSmvgLva4=;
-        b=dbo91IH1WOdoQRW4fMEg0oaOHonxPXwHE6RfWw3F3udvjzvslHT3HYZ9xYnevsIJ8T
-         iN/t8LZIAGD7ocsSWgpMnSHezn8vrd1ITZSSbBYATVaNrfryq6RvtnvJvib4t58NgEYz
-         3PUsTRcNptIwoAHd16fPEHjhQiZawVPlxmqXRx+UeTQf08l7GjT2ZO7zgduZICuux++9
-         nSuPIr9cTm0bqrgczhFrTpQrX3ldT2O1YpOXZNeEe1LYoftzrQe53Y67x0lLVQYzNw+N
-         i83wMC9zVAt1uoLgOopEaCISgY53qWtP/8GApMYHwM8nGYlWN1D+qaFWLCD+9E5GRplZ
-         2imQ==
-X-Gm-Message-State: AOAM530UF3Xyeerso0QM9mEwQzIP22rIRRdFlcuvIXhqL/B+yz1JWJxF
-        l2HmKcE9C5wjL08NNfmdNg==
-X-Google-Smtp-Source: ABdhPJy2cNm09rGkY81u/PixZAjMtw93C3BlQ4fLCmC6PwHgFMweTgS3Mvu40uVZQJK9kRcq6lbzCQ==
-X-Received: by 2002:a05:6808:11c8:: with SMTP id p8mr16749283oiv.72.1642267370379;
-        Sat, 15 Jan 2022 09:22:50 -0800 (PST)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id e69sm3266969ote.1.2022.01.15.09.22.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jan 2022 09:22:49 -0800 (PST)
-Received: (nullmailer pid 119882 invoked by uid 1000);
-        Sat, 15 Jan 2022 17:22:30 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     conor.dooley@microchip.com
-Cc:     atishp@rivosinc.com, bgolaszewski@baylibre.com, palmer@dabbelt.com,
-        linux-rtc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        thierry.reding@gmail.com, heiko@sntech.de, lee.jones@linaro.org,
-        paul.walmsley@sifive.com, broonie@kernel.org,
-        gregkh@linuxfoundation.org, geert@linux-m68k.org,
-        devicetree@vger.kernel.org, linus.walleij@linaro.org,
-        ivan.griffin@microchip.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-pwm@vger.kernel.org,
-        linux-spi@vger.kernel.org, u.kleine-koenig@pengutronix.de,
-        jassisinghbrar@gmail.com, aou@eecs.berkeley.edu,
-        alexandre.belloni@bootlin.com, linux-gpio@vger.kernel.org,
-        a.zummo@towertech.it, krzysztof.kozlowski@canonical.com,
-        daire.mcnamara@microchip.com, lewis.hanly@microchip.com,
-        bin.meng@windriver.com, robh+dt@kernel.org,
-        linux-usb@vger.kernel.org, linux-i2c@vger.kernel.org
-In-Reply-To: <20220114151727.2319915-5-conor.dooley@microchip.com>
-References: <20220114151727.2319915-1-conor.dooley@microchip.com> <20220114151727.2319915-5-conor.dooley@microchip.com>
-Subject: Re: [PATCH v3 04/15] dt-bindings: i2c: add bindings for microchip mpfs i2c
-Date:   Sat, 15 Jan 2022 11:22:30 -0600
-Message-Id: <1642267350.899241.119881.nullmailer@robh.at.kernel.org>
+        Sat, 15 Jan 2022 13:45:18 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8583B60EF4;
+        Sat, 15 Jan 2022 18:45:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 640B6C36AE7;
+        Sat, 15 Jan 2022 18:45:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642272316;
+        bh=S2o3F8q/v+ENUGMR7l2ss+PwZsM5dCBts1hel2Rnogw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=E5GrD3/mx6i2Y269G2eXryQNYRkEAfdPzCPtHvswYYbEe7S2dzHbdY/aj7EbJ3mFF
+         3qeDVf9rehpzDlCunRe4ouOFijTDT7R2UXkUYk93mFSwLltY4DfsGckq8J+aIembA8
+         4u53CCd3ejoKgnPKDw4zz05S1Lo77H0dI+/8A7oy8Tu84sBQCoga3HR49Ha41r5QjI
+         RrglfdMC//mqVBZ3AsBd5pEzRwwRVEIlonXm1tNhmeMq7Tj/RWNtMSgrF5Dv9dnNgB
+         gBbJL8y233k1HW8SoTpUvYHlr7athvqaIzEhr3f0o6LTL3Dc0wJwvlGNlW6A+XZ1Hx
+         muVv+pyGHaiPQ==
+Date:   Sat, 15 Jan 2022 20:45:03 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KEYS: fix length validation in keyctl_pkey_params_get_2()
+Message-ID: <YeMWLyceg4xcwShF@iki.fi>
+References: <20220113200454.72609-1-ebiggers@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220113200454.72609-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 14 Jan 2022 15:17:16 +0000, conor.dooley@microchip.com wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
+On Thu, Jan 13, 2022 at 12:04:54PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Add device tree bindings for the i2c controller on
-> the Microchip PolarFire SoC.
+> In many cases, keyctl_pkey_params_get_2() is validating the user buffer
+> lengths against the wrong algorithm properties.  Fix it to check against
+> the correct properties.
 > 
-> Signed-off-by: Daire McNamara <daire.mcnamara@microchip.com>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> Probably this wasn't noticed before because for all asymmetric keys of
+> the "public_key" subtype, max_data_size == max_sig_size == max_enc_size
+> == max_dec_size.  However, this isn't necessarily true for the
+> "asym_tpm" subtype (it should be, but it's not strictly validated).  Of
+> course, future key types could have different values as well.
+
+With a quick look, asym_tpm is TPM 1.x only, which only has 2048-bit RSA
+keys.
+
+> Fixes: 00d60fd3b932 ("KEYS: Provide keyctls to drive the new key type ops for asymmetric keys [ver #2]")
+> Cc: <stable@vger.kernel.org> # v4.20+
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  .../bindings/i2c/microchip,mpfs-i2c.yaml      | 55 +++++++++++++++++++
->  1 file changed, 55 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/i2c/microchip,mpfs-i2c.yaml
+>  security/keys/keyctl_pkey.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/security/keys/keyctl_pkey.c b/security/keys/keyctl_pkey.c
+> index 5de0d599a274..97bc27bbf079 100644
+> --- a/security/keys/keyctl_pkey.c
+> +++ b/security/keys/keyctl_pkey.c
+> @@ -135,15 +135,23 @@ static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_par
+>  
+>  	switch (op) {
+>  	case KEYCTL_PKEY_ENCRYPT:
+> +		if (uparams.in_len  > info.max_dec_size ||
+> +		    uparams.out_len > info.max_enc_size)
+> +			return -EINVAL;
+> +		break;
+>  	case KEYCTL_PKEY_DECRYPT:
+>  		if (uparams.in_len  > info.max_enc_size ||
+>  		    uparams.out_len > info.max_dec_size)
+>  			return -EINVAL;
+>  		break;
+>  	case KEYCTL_PKEY_SIGN:
+> +		if (uparams.in_len  > info.max_data_size ||
+> +		    uparams.out_len > info.max_sig_size)
+> +			return -EINVAL;
+> +		break;
+>  	case KEYCTL_PKEY_VERIFY:
+> -		if (uparams.in_len  > info.max_sig_size ||
+> -		    uparams.out_len > info.max_data_size)
+> +		if (uparams.in_len  > info.max_data_size ||
+> +		    uparams.in2_len > info.max_sig_size)
+>  			return -EINVAL;
+>  		break;
+>  	default:
+> @@ -151,7 +159,7 @@ static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_par
+>  	}
+>  
+>  	params->in_len  = uparams.in_len;
+> -	params->out_len = uparams.out_len;
+> +	params->out_len = uparams.out_len; /* Note: same as in2_len */
+>  	return 0;
+>  }
+>  
+> 
+> base-commit: feb7a43de5ef625ad74097d8fd3481d5dbc06a59
+> -- 
+> 2.34.1
 > 
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/i2c/microchip,mpfs-i2c.example.dts:19:18: fatal error: dt-bindings/clock/microchip,mpfs-clock.h: No such file or directory
-   19 |         #include <dt-bindings/clock/microchip,mpfs-clock.h>
-      |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make[1]: *** [scripts/Makefile.lib:373: Documentation/devicetree/bindings/i2c/microchip,mpfs-i2c.example.dt.yaml] Error 1
-make[1]: *** Waiting for unfinished jobs....
-make: *** [Makefile:1413: dt_binding_check] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/patch/1580106
-
-This check can fail if there are any dependencies. The base for a patch
-series is generally the most recent rc1.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit.
-
+/Jarkko
