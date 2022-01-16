@@ -2,69 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9905C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jan 2022 21:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A5FC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jan 2022 13:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233803AbiAOVm2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jan 2022 16:42:28 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:38372 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233774AbiAOVm2 (ORCPT
+        id S230028AbiAPNsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 16 Jan 2022 08:48:38 -0500
+Received: from mail-0201.mail-europe.com ([51.77.79.158]:60628 "EHLO
+        mail-0201.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229785AbiAPNsi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jan 2022 16:42:28 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id D412FCE0AE5;
-        Sat, 15 Jan 2022 21:42:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5635C36AE5;
-        Sat, 15 Jan 2022 21:42:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642282945;
-        bh=UCi6bl9WDlzd/MWB+FRVtRgWBjSR8OlEmFFmEb6dAi8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=B58kPCzqiyScd1n3Ah6Q3i0BWS5b4CYajs8TPWvhJMzvNaQtiUQ96G9ompxOOHe0h
-         IYdF1j6qqWHxz3cfkOkH/1qlpZLfyj+fgZLsw7dMxWOO2iSxNYj6TxvP9AzMey4Wdx
-         oeyPX/uD8qN2uKkkVK+AbTz2U91BPGK8kQ323X19XNxVX+tZoW+tVvsPj6wHxWVuYQ
-         UnNZbpXeJ3simSKa1nDpYjiWHqQCN3OXhsCnQ8j5NEiBH53zxZ5Ua5JxcVCaTLjUkK
-         8aDKi6L0Y7596H0IumHS1l17MqgPkUFVEFLHj99kiI9FATgSuesYkg46kJI4OuGASs
-         25dE1vOWbBeFQ==
-Date:   Sat, 15 Jan 2022 23:42:12 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Denis Kenzior <denkenz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        James Morris <james.morris@microsoft.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/3] KEYS: fixes for asym_tpm keys
-Message-ID: <YeM/tAuyjKVT0YS4@iki.fi>
-References: <20220113235440.90439-1-ebiggers@kernel.org>
+        Sun, 16 Jan 2022 08:48:38 -0500
+Date:   Sun, 16 Jan 2022 13:48:25 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail2; t=1642340915;
+        bh=bwU6pvleZwgGVAcnFlHXD7WXvOTQdAfgrmW5sho68S0=;
+        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:From:To:Cc;
+        b=cMTM5ffj7jf+s+7f9hZyDASuf3zOTHYMUMbyQMjVkYYG4kJxGMylBnHudVkfdRIEI
+         PDrMAKaQuJvJBa85bUhy6emrGMLfAjjNsp87bhg34jK551j4L2zlwA61e6wVApOVSq
+         Ug9an9AU1ZA80jWV+39vBd0mEsl7CiQrm6yRl2v3gdBpO+J8HoCM9edM0QHpDQ8gV8
+         1QGrBvcnc2zk3Uc62lckZnKx9V4XS07OZalNe3i1b9rPDjIsXdG1vNW9JaOmomARxx
+         Q3qRkhognFC+ZddmI7lLGolB3eRWKiGGXSeKVrr9dIU6LFtwKwjHrS0vDtXdj2VJEi
+         td4OgnYbfriSg==
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From:   Jari Ruusu <jariruusu@protonmail.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Reply-To: Jari Ruusu <jariruusu@protonmail.com>
+Subject: Announce loop-AES-v3.7w file/swap crypto package
+Message-ID: <8LUdOFjFwCBEYnY82H3a1lkMp0bcXSZs4UNYBpQP9lNigJqB7tnq6OUQR5LB4Lk1eus6P2XpWAlzbTBGc1RJNpkwD7dIED07P5E1N87YL80=@protonmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220113235440.90439-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 03:54:37PM -0800, Eric Biggers wrote:
-> This series fixes some bugs in asym_tpm.c.
-> 
-> Eric Biggers (3):
->   KEYS: asym_tpm: fix buffer overreads in extract_key_parameters()
->   KEYS: asym_tpm: fix incorrect comment
->   KEYS: asym_tpm: rename derive_pub_key()
-> 
->  crypto/asymmetric_keys/asym_tpm.c | 44 +++++++++++++++++++------------
->  1 file changed, 27 insertions(+), 17 deletions(-)
-> 
-> 
-> base-commit: feb7a43de5ef625ad74097d8fd3481d5dbc06a59
-> -- 
-> 2.34.1
-> 
+loop-AES changes since previous release:
+- Worked around kernel interface changes on 5.16 kernels.
+- Silenced switch-case fall through C-compiler warnings.
 
-I really appreciate your effort to go and fix this key type. Thank you.
+bzip2 compressed tarball is here:
 
-BR, Jarkko
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7w.tar.bz2
+    md5sum b0d091656ee091d7a8f74ef2a54c0520
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7w.tar.bz2.sign
+
+--
+Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
+80 8132 F189
+
