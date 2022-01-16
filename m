@@ -2,52 +2,169 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A5FC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jan 2022 13:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CBAC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jan 2022 16:58:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbiAPNsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jan 2022 08:48:38 -0500
-Received: from mail-0201.mail-europe.com ([51.77.79.158]:60628 "EHLO
-        mail-0201.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbiAPNsi (ORCPT
+        id S235697AbiAPQ6v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 16 Jan 2022 11:58:51 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:39886 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233168AbiAPQ6v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jan 2022 08:48:38 -0500
-Date:   Sun, 16 Jan 2022 13:48:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail2; t=1642340915;
-        bh=bwU6pvleZwgGVAcnFlHXD7WXvOTQdAfgrmW5sho68S0=;
-        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:From:To:Cc;
-        b=cMTM5ffj7jf+s+7f9hZyDASuf3zOTHYMUMbyQMjVkYYG4kJxGMylBnHudVkfdRIEI
-         PDrMAKaQuJvJBa85bUhy6emrGMLfAjjNsp87bhg34jK551j4L2zlwA61e6wVApOVSq
-         Ug9an9AU1ZA80jWV+39vBd0mEsl7CiQrm6yRl2v3gdBpO+J8HoCM9edM0QHpDQ8gV8
-         1QGrBvcnc2zk3Uc62lckZnKx9V4XS07OZalNe3i1b9rPDjIsXdG1vNW9JaOmomARxx
-         Q3qRkhognFC+ZddmI7lLGolB3eRWKiGGXSeKVrr9dIU6LFtwKwjHrS0vDtXdj2VJEi
-         td4OgnYbfriSg==
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From:   Jari Ruusu <jariruusu@protonmail.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Reply-To: Jari Ruusu <jariruusu@protonmail.com>
-Subject: Announce loop-AES-v3.7w file/swap crypto package
-Message-ID: <8LUdOFjFwCBEYnY82H3a1lkMp0bcXSZs4UNYBpQP9lNigJqB7tnq6OUQR5LB4Lk1eus6P2XpWAlzbTBGc1RJNpkwD7dIED07P5E1N87YL80=@protonmail.com>
+        Sun, 16 Jan 2022 11:58:51 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 56168B80D91;
+        Sun, 16 Jan 2022 16:58:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E04CC36AE7;
+        Sun, 16 Jan 2022 16:58:48 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="E8hnfPm5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642352326;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5LTQ7KGSpvvf2nHzefrXTHTtHeNlE7E15K8R89MR4QY=;
+        b=E8hnfPm5vMTeWX0zptSlwz7jL7zI/Xhg8Ba+Kgih8MtPCu3nu09QOmLjEDKakaiRcUuyfP
+        9OLUcW/gqB3gbm+PIuNaHXPwbhJ+qivICxZ8zBc60BYsQq1lnb2EGLPrzEjroltS/beb9M
+        OM+gSffulvaeHqodf0U0GQoNua8wQ0k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b816847a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 16 Jan 2022 16:58:46 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Justin M. Forbes" <jforbes@fedoraproject.org>
+Subject: [PATCH v4] lib/crypto: add prompts back to crypto libraries
+Date:   Sun, 16 Jan 2022 17:58:41 +0100
+Message-Id: <20220116165841.254196-1-Jason@zx2c4.com>
+In-Reply-To: <20220112145758.926796-1-Jason@zx2c4.com>
+References: <20220112145758.926796-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 5.16 kernels.
-- Silenced switch-case fall through C-compiler warnings.
+From: "Justin M. Forbes" <jforbes@fedoraproject.org>
 
-bzip2 compressed tarball is here:
+Commit 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in") took
+away a number of prompt texts from other crypto libraries. This makes
+values flip from built-in to module when oldconfig runs, and causes
+problems when these crypto libs need to be built in for thingslike
+BIG_KEYS.
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7w.tar.bz2
-    md5sum b0d091656ee091d7a8f74ef2a54c0520
+Fixes: 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
+[Jason: - moved menu into submenu of lib/ instead of root menu
+        - fixed chacha sub-dependencies for CONFIG_CRYPTO]
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ crypto/Kconfig     |  2 --
+ lib/Kconfig        |  2 ++
+ lib/crypto/Kconfig | 17 ++++++++++++-----
+ 3 files changed, 14 insertions(+), 7 deletions(-)
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7w.tar.bz2.sign
-
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 55718de56137..a346b6f74bb3 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1924,5 +1924,3 @@ source "crypto/asymmetric_keys/Kconfig"
+ source "certs/Kconfig"
+ 
+ endif	# if CRYPTO
+-
+-source "lib/crypto/Kconfig"
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 5e7165e6a346..9534698ce890 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -122,6 +122,8 @@ config INDIRECT_IOMEM_FALLBACK
+ 	  mmio accesses when the IO memory address is not a registered
+ 	  emulated region.
+ 
++source "lib/crypto/Kconfig"
++
+ config CRC_CCITT
+ 	tristate "CRC-CCITT functions"
+ 	help
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 8620f38e117c..e8e525650cf2 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -1,5 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
++menu "Crypto library routines"
++
+ config CRYPTO_LIB_AES
+ 	tristate
+ 
+@@ -31,7 +33,7 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 
+ config CRYPTO_LIB_CHACHA_GENERIC
+ 	tristate
+-	select CRYPTO_ALGAPI
++	select XOR_BLOCKS
+ 	help
+ 	  This symbol can be depended upon by arch implementations of the
+ 	  ChaCha library interface that require the generic code as a
+@@ -40,7 +42,8 @@ config CRYPTO_LIB_CHACHA_GENERIC
+ 	  of CRYPTO_LIB_CHACHA.
+ 
+ config CRYPTO_LIB_CHACHA
+-	tristate
++	tristate "ChaCha library interface"
++	depends on CRYPTO
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+ 	help
+@@ -65,7 +68,7 @@ config CRYPTO_LIB_CURVE25519_GENERIC
+ 	  of CRYPTO_LIB_CURVE25519.
+ 
+ config CRYPTO_LIB_CURVE25519
+-	tristate
++	tristate "Curve25519 scalar multiplication library"
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
+ 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+ 	help
+@@ -100,7 +103,7 @@ config CRYPTO_LIB_POLY1305_GENERIC
+ 	  of CRYPTO_LIB_POLY1305.
+ 
+ config CRYPTO_LIB_POLY1305
+-	tristate
++	tristate "Poly1305 library interface"
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+ 	help
+@@ -109,14 +112,18 @@ config CRYPTO_LIB_POLY1305
+ 	  is available and enabled.
+ 
+ config CRYPTO_LIB_CHACHA20POLY1305
+-	tristate
++	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
++	depends on CRYPTO
+ 	select CRYPTO_LIB_CHACHA
+ 	select CRYPTO_LIB_POLY1305
++	select CRYPTO_ALGAPI
+ 
+ config CRYPTO_LIB_SHA256
+ 	tristate
+ 
+ config CRYPTO_LIB_SM4
+ 	tristate
++
++endmenu
+-- 
+2.34.1
 
