@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01207C4167D
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jan 2022 11:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AC2C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jan 2022 11:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238873AbiAQLGz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:06:55 -0500
-Received: from esa.microchip.iphmx.com ([68.232.153.233]:25926 "EHLO
+        id S238985AbiAQLHC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:07:02 -0500
+Received: from esa.microchip.iphmx.com ([68.232.154.123]:32509 "EHLO
         esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238961AbiAQLGj (ORCPT
+        with ESMTP id S238988AbiAQLHA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jan 2022 06:06:39 -0500
+        Mon, 17 Jan 2022 06:07:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1642417600; x=1673953600;
+  t=1642417620; x=1673953620;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lpP0lJkn+kaM0L/dSWda42EaX0finN6iz9h/n2ezhV4=;
-  b=c2HbDpqPJN9BVnb6Yy71VM6reT2hYNSSAwFZh+ICtW9VVMRODnAxb0Zn
-   VzZRTW/fuN17+jWd6ybdG70n6dmabJK5k/EqX1lcxkSGjF4q2kkToenYe
-   voFvpM/7wdqTusF4+eoiojJbwxUBCCifpXzRtQNoDTsK5I4CTh6CQSdbK
-   4gJ00DflI2OS1sVVvmInmWTr26IkP/h87sVlKHMDkSeMHhdmTnXX/AySL
-   89vGPAocxzhNwTFGPy5Z2snNHxqVyKs7/U01VZKIYWiZeE4CEU9HC4KJq
-   PD6rT1j3W4h6jlZlEEMc//paDqBr7NBuPIoFkf7Ag92kB2oI1ysFqIdu4
-   Q==;
-IronPort-SDR: UPWG/TkFqAVmK/OQhSiZm2kwsVkz3r/aFWDzsMOvcYDCJvzIxkvWSPM//plH9+7tK/RX342ib3
- AA1/NHh505sTgfqittMM3Q4mimHDE4Z5DVIkpELQNiYaZWOGg46wSaaesadow1nqsWU0utgLJw
- JM/dNIrsPOyt6o9HIUnJO7xsgK5Sp7WT+UZh+phvyPu37TXyC1DezlM/bKl1RFvFGTYe1mOJZp
- K/f5YyY0FNrxt5gXF3sjQ+MICve3iEz4/9b8o0HzG+xMYwWn8LPHcbOulCcPbGzxglYEsRoxs8
- A0u3/0c2U95alEivP17ksrcR
+  bh=kM9r1xW/DHGqgb4EQRJlkwePmu9HkhIfNKIm9H/2uhU=;
+  b=gynnwEx86HClbEdJtS4gOcRV7W60mr5Gh7XlFYosnOFQ2zy8OrhzPP3t
+   fOSfjHSwVXOyFdX2ee/nE6kcQeStDGLpPIdR+FLGgaAG6UVMbpDHq0a46
+   tA5mgLcD9KSm3Cu66/GM0CvWv/gFccr0haUq4zpsDazXvJj4A/ivmXhtU
+   ToBCTXx+8enYzsjvxLtF+aGs/+6H+n2EVj5VEBrNDBSYXWlMNelhIJoS0
+   /qfRzyxuXcUsnnwQFFCCwam3iesRFv0blg2YmaXlcmmcya3//2Aj0BtxL
+   GhUI8pzcd6Z3BWxB+jhlxhnUn8IH5ePqo/rF75qIa26lm83dINWiAcn5d
+   g==;
+IronPort-SDR: rL7MqIuYxT/nV8q++65dJNBx1ujqOnv2+nEcs4KeIpuTq1aMXzh10f8x0jP/7NWtJ5X8e4Fwiv
+ qO47FFq5+lTGcJvd0xFFT+kvhJ2XNE04sSa3l8ELxufC5EYjMRbb310HC8bjndBau6CS6+8Pqd
+ 1cg3FZ41uy1+F5LM4OIJSYgj6pFE5uDjKp2x7idr2oybylDfktaj1O3JSoTdkN7Z2tqI3C2X7S
+ mK13tmQZ9WNHsPlMgNX9BA4uD0cTPi94aedNevmJAWAjgYydBur/iYryfm26YEGXEzUhyUvvCn
+ JIQQU0A6row2myBbV+x1OktE
 X-IronPort-AV: E=Sophos;i="5.88,295,1635231600"; 
-   d="scan'208";a="149870616"
+   d="scan'208";a="82713566"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 17 Jan 2022 04:06:39 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 17 Jan 2022 04:06:59 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Mon, 17 Jan 2022 04:06:29 -0700
+ 15.1.2375.17; Mon, 17 Jan 2022 04:06:58 -0700
 Received: from wendy.microchip.com (10.10.115.15) by chn-vm-ex02.mchp-main.com
  (10.10.85.144) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
- Transport; Mon, 17 Jan 2022 04:06:24 -0700
+ Transport; Mon, 17 Jan 2022 04:06:52 -0700
 From:   <conor.dooley@microchip.com>
 To:     <linus.walleij@linaro.org>, <bgolaszewski@baylibre.com>,
         <robh+dt@kernel.org>, <jassisinghbrar@gmail.com>,
@@ -59,9 +59,9 @@ CC:     <krzysztof.kozlowski@canonical.com>, <geert@linux-m68k.org>,
         <lewis.hanly@microchip.com>, <conor.dooley@microchip.com>,
         <daire.mcnamara@microchip.com>, <ivan.griffin@microchip.com>,
         <atishp@rivosinc.com>
-Subject: [PATCH v4 06/14] dt-bindings: spi: add bindings for microchip mpfs spi
-Date:   Mon, 17 Jan 2022 11:07:47 +0000
-Message-ID: <20220117110755.3433142-7-conor.dooley@microchip.com>
+Subject: [PATCH v4 10/14] riscv: dts: microchip: add fpga fabric section to icicle kit
+Date:   Mon, 17 Jan 2022 11:07:51 +0000
+Message-ID: <20220117110755.3433142-11-conor.dooley@microchip.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20220117110755.3433142-1-conor.dooley@microchip.com>
 References: <20220117110755.3433142-1-conor.dooley@microchip.com>
@@ -74,73 +74,84 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Conor Dooley <conor.dooley@microchip.com>
 
-Add device tree bindings for the {q,}spi controller on
-the Microchip PolarFire SoC.
+Split the device tree for the Microchip MPFS into two sections by adding
+microchip-mpfs-fabric.dtsi, which contains peripherals contained in the
+FPGA fabric.
 
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- .../bindings/spi/microchip,mpfs-spi.yaml      | 52 +++++++++++++++++++
- 1 file changed, 52 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
+ .../dts/microchip/microchip-mpfs-fabric.dtsi  | 25 +++++++++++++++++++
+ .../microchip/microchip-mpfs-icicle-kit.dts   |  8 ++++++
+ .../boot/dts/microchip/microchip-mpfs.dtsi    |  1 +
+ 3 files changed, 34 insertions(+)
+ create mode 100644 arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi
 
-diff --git a/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml b/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
+diff --git a/arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi b/arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi
 new file mode 100644
-index 000000000000..ece261b8e963
+index 000000000000..c1dcd56b0679
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/spi/microchip,mpfs-spi.yaml
-@@ -0,0 +1,52 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/spi/microchip,mpfs-spi.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
++++ b/arch/riscv/boot/dts/microchip/microchip-mpfs-fabric.dtsi
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: (GPL-2.0 OR MIT)
++/* Copyright (c) 2020-2021 Microchip Technology Inc */
 +
-+title: Microchip MPFS {Q,}SPI Controller Device Tree Bindings
++/ {
++	core_pwm0: pwm@41000000 {
++		compatible = "microchip,corepwm-rtl-v4";
++		reg = <0x0 0x41000000 0x0 0xF0>;
++		microchip,sync-update = /bits/ 16 <0>;
++		#pwm-cells = <2>;
++		clocks = <&clkcfg CLK_FIC3>;
++		status = "disabled";
++	};
 +
-+maintainers:
-+  - Conor Dooley <conor.dooley@microchip.com>
++	i2c2: i2c@44000000 {
++		compatible = "microchip,corei2c-rtl-v7";
++		reg = <0x0 0x44000000 0x0 0x1000>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++		clocks = <&clkcfg CLK_FIC3>;
++		interrupt-parent = <&plic>;
++		interrupts = <122>;
++		clock-frequency = <100000>;
++		status = "disabled";
++	};
++};
+diff --git a/arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dts b/arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dts
+index 6d19ba196f12..ab803f71626a 100644
+--- a/arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dts
++++ b/arch/riscv/boot/dts/microchip/microchip-mpfs-icicle-kit.dts
+@@ -68,6 +68,10 @@ &mmc {
+ 	sd-uhs-sdr104;
+ };
+ 
++&i2c2 {
++	status = "okay";
++};
 +
-+allOf:
-+  - $ref: spi-controller.yaml#
+ &emac0 {
+ 	phy-mode = "sgmii";
+ 	phy-handle = <&phy0>;
+@@ -86,3 +90,7 @@ phy1: ethernet-phy@9 {
+ 		ti,fifo-depth = <0x01>;
+ 	};
+ };
 +
-+properties:
-+  compatible:
-+    enum:
-+      - microchip,mpfs-spi
-+      - microchip,mpfs-qspi
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clock-names:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include "dt-bindings/clock/microchip,mpfs-clock.h"
-+    spi@20108000 {
-+        compatible = "microchip,mpfs-spi";
-+        reg = <0x20108000 0x1000>;
-+        clocks = <&clkcfg CLK_SPI0>;
-+        interrupt-parent = <&plic>;
-+        interrupts = <54>;
-+        spi-max-frequency = <25000000>;
-+    };
-+...
++&core_pwm0 {
++	status = "okay";
++};
+diff --git a/arch/riscv/boot/dts/microchip/microchip-mpfs.dtsi b/arch/riscv/boot/dts/microchip/microchip-mpfs.dtsi
+index 717e39b30a15..c7d73756c9b8 100644
+--- a/arch/riscv/boot/dts/microchip/microchip-mpfs.dtsi
++++ b/arch/riscv/boot/dts/microchip/microchip-mpfs.dtsi
+@@ -3,6 +3,7 @@
+ 
+ /dts-v1/;
+ #include "dt-bindings/clock/microchip,mpfs-clock.h"
++#include "microchip-mpfs-fabric.dtsi"
+ 
+ / {
+ 	#address-cells = <2>;
 -- 
 2.32.0
 
