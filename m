@@ -2,102 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8FDC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jan 2022 21:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BA8C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jan 2022 01:29:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243353AbiAQVyy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jan 2022 16:54:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54732 "EHLO
+        id S231288AbiARB3J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jan 2022 20:29:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233166AbiAQVyx (ORCPT
+        with ESMTP id S229705AbiARB3J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jan 2022 16:54:53 -0500
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5765FC06173E
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jan 2022 13:54:53 -0800 (PST)
-Received: by mail-qk1-x72a.google.com with SMTP id d24so8425520qkk.5
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jan 2022 13:54:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KmBygC3q5AQG8qkNJvnSnx+ggl7+9U+ombjnJKusFG4=;
-        b=BBYk7pWCxTpa4e9gEBi36zq0wZnDK1j8g3Khe3W2pLKftHSHr/CXDUEoyfqz3ooNbi
-         Glv8rYMWVGazEcND3kjnCvRMhHh/gu6xQWjwk8OJcUpOewIl+l/ejIwlhSRThY2N0OVs
-         mwTbFhmbf+K+mhRd0FmNjgwoVw20osV7MBe8U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KmBygC3q5AQG8qkNJvnSnx+ggl7+9U+ombjnJKusFG4=;
-        b=4XJw5EjUkfeFhG/FnlIu3F2zRkq6x04WS3uB7vym8d95kkjfk5KHxz7btgiXmT6LEx
-         tZKHZ7Drg1J9AEtmuNg/9BHdsfMrgq5+cbDXkNnazKcWnnFNT3QSXT/ZntnWlmvzFliN
-         lqxHMof48Bu2wptEzb4mSVNoFQoneTtjUXwHMbZPqDRO9pvKrhpbQ+KXi4BGR1ycZsKi
-         uDgkCffbHwjuHkwRg4wMcSJGxJ4fAnKYycsCbIdQpj8LUBfZItn88Ht7HASbleVuJqhj
-         uV+lGyC7AKxCs7/Pz4MAJjP/PWtsFZEyZjp3HCR8uHhJDOtAJNhcBAADQuKp/xThY5Q3
-         46Tg==
-X-Gm-Message-State: AOAM531qbshxnL4SgNrLCPf8S5bgZcfXA4SwAZveNcNfXRV+n+IJvnsw
-        bV1VeZRqbo3ppq16YnWzPmVMvQ==
-X-Google-Smtp-Source: ABdhPJxaMz1oYURs6e5lMt7vVVBbGEnFSB7TjiLRH+xlZuiq3V/0TG+DoST9VWbXv6HeYfW5osR6TA==
-X-Received: by 2002:a37:aad8:: with SMTP id t207mr15930861qke.216.1642456492290;
-        Mon, 17 Jan 2022 13:54:52 -0800 (PST)
-Received: from nitro.local (bras-base-mtrlpq5031w-grc-32-216-209-220-181.dsl.bell.ca. [216.209.220.181])
-        by smtp.gmail.com with ESMTPSA id f9sm9371606qkp.94.2022.01.17.13.54.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jan 2022 13:54:51 -0800 (PST)
-Date:   Mon, 17 Jan 2022 16:54:49 -0500
-From:   Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Roberto Sassu <roberto.sassu@huawei.com>, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zohar@linux.ibm.com, ebiggers@kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-Message-ID: <20220117215449.2qboqd3nmsky2g3w@nitro.local>
-References: <20220111180318.591029-1-roberto.sassu@huawei.com>
- <YeV+jkGg6mpQdRID@zx2c4.com>
- <20220117165933.l3762ppcbj5jxicc@meerkat.local>
- <392d28fa-7a2c-867a-5fbb-640064461eb7@maciej.szmigiero.name>
+        Mon, 17 Jan 2022 20:29:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0536C061574;
+        Mon, 17 Jan 2022 17:29:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 440506128D;
+        Tue, 18 Jan 2022 01:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F23C36AEC;
+        Tue, 18 Jan 2022 01:29:07 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="D2rBA9Ul"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642469345;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oWSz0e0wYGrdPKqE9vkcGgS4bap1xj88VlAUDVMYyPE=;
+        b=D2rBA9UlT0YtWLADa4YIXXwYyJrVUpaFcuGCDN3gQ+eZvdrpBVTAlBzZtJgdkHah56H2+u
+        uKrHjGQPqd/3vDsq1BMYfrLSLhNv5lcE0cEJ2liGl3ly9QBL3TNnFBKwcdSOV2di3UDzrR
+        0Tvu0jLGxaY6CSDbuq3rb6AT+qfxEbs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b21eac9b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 18 Jan 2022 01:29:05 +0000 (UTC)
+Received: by mail-yb1-f177.google.com with SMTP id c6so51063108ybk.3;
+        Mon, 17 Jan 2022 17:29:05 -0800 (PST)
+X-Gm-Message-State: AOAM532lZf75AL2C4EhPV4WkGPZX8Z1d4YMwbZMcyad/HcNfTPi5xFg3
+        IT9iBpY3MErJPYwGR2yiLNtZEqG3vzzY9y9sD7U=
+X-Google-Smtp-Source: ABdhPJzjEYqkqDsVOUUSIyHOV7YjjeXNiAqTVHpvQPpnwwFMYIEN0g+UDhQY8ZukdUCBIkY1cueDMa3CW7w2dpH/LnA=
+X-Received: by 2002:a05:6902:709:: with SMTP id k9mr6196333ybt.113.1642469343907;
+ Mon, 17 Jan 2022 17:29:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <392d28fa-7a2c-867a-5fbb-640064461eb7@maciej.szmigiero.name>
+Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Mon, 17 Jan 2022
+ 17:29:03 -0800 (PST)
+In-Reply-To: <20220117064248.102638-1-julianbraha@gmail.com>
+References: <20220117064248.102638-1-julianbraha@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 18 Jan 2022 02:29:03 +0100
+X-Gmail-Original-Message-ID: <CAHmME9p5Bg-QejSNqKnMJU8fYaErc01FLjGCOWMH22WHJh2jMQ@mail.gmail.com>
+Message-ID: <CAHmME9p5Bg-QejSNqKnMJU8fYaErc01FLjGCOWMH22WHJh2jMQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: fix unmet dependency on CRYPTO for CRYPTO_LIB_CHACHA_GENERIC
+To:     Julian Braha <julianbraha@gmail.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fazilyildiran@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 17, 2022 at 09:59:22PM +0100, Maciej S. Szmigiero wrote:
-> > I am concerned that ed25519 private key management is very rudimentary -- more
-> > often than not it is just kept somewhere on disk, often without any passphrase
-> > encryption.
-> > 
-> > With all its legacy warts, GnuPG at least has decent support for hardware
-> > off-load via OpenPGP smartcards or TPM integration in GnuPG 2.3, but the best
-> > we have with ed25519 is passhprase protection as implemented in minisign (and
-> 
-> I am not sure that I understood your point here correctly, but GnuPG
-> already supports ed25519 keys, including stored on a smartcard - for
-> example, on a YubiKey [1].
+A fix for this was submitted here already, I believe:
 
-Yes, I know, but you cannot use ed25519-capable OpenPGP smartcards to create
-non-PGP signatures. The discussion was about using ed25519 signatures
-directly (e.g. like signify/minisign do). Jason pointed out to me on IRC that
-it's possible to do it with YubiHSM, but it's an expensive device ($650 USD
-from Yubico).
-
-> While the current software support for ed25519 might be limited, there
-> is certainly progress being made, RFC 8410 allowed these algos for X.509
-> certificates.
-> Support for such certificates is already implemented in OpenSSL [2].
-> 
-> ECDSA, on the other hand, is very fragile with respect to random number
-> generation at signing time.
-> We know that people got burned here in the past.
-
-I think this is taking us far away from the main topic (which
-signing/verification standards to use in-kernel).
-
--K
+https://lore.kernel.org/linux-crypto/20220116165841.254196-1-Jason@zx2c4.com/
