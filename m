@@ -2,65 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BA8C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jan 2022 01:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9102FC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jan 2022 02:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231288AbiARB3J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jan 2022 20:29:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45042 "EHLO
+        id S245363AbiARCZS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 17 Jan 2022 21:25:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbiARB3J (ORCPT
+        with ESMTP id S245358AbiARCXk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jan 2022 20:29:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0536C061574;
-        Mon, 17 Jan 2022 17:29:08 -0800 (PST)
+        Mon, 17 Jan 2022 21:23:40 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6032C061763;
+        Mon, 17 Jan 2022 18:23:38 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 440506128D;
-        Tue, 18 Jan 2022 01:29:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F23C36AEC;
-        Tue, 18 Jan 2022 01:29:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="D2rBA9Ul"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642469345;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oWSz0e0wYGrdPKqE9vkcGgS4bap1xj88VlAUDVMYyPE=;
-        b=D2rBA9UlT0YtWLADa4YIXXwYyJrVUpaFcuGCDN3gQ+eZvdrpBVTAlBzZtJgdkHah56H2+u
-        uKrHjGQPqd/3vDsq1BMYfrLSLhNv5lcE0cEJ2liGl3ly9QBL3TNnFBKwcdSOV2di3UDzrR
-        0Tvu0jLGxaY6CSDbuq3rb6AT+qfxEbs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b21eac9b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 18 Jan 2022 01:29:05 +0000 (UTC)
-Received: by mail-yb1-f177.google.com with SMTP id c6so51063108ybk.3;
-        Mon, 17 Jan 2022 17:29:05 -0800 (PST)
-X-Gm-Message-State: AOAM532lZf75AL2C4EhPV4WkGPZX8Z1d4YMwbZMcyad/HcNfTPi5xFg3
-        IT9iBpY3MErJPYwGR2yiLNtZEqG3vzzY9y9sD7U=
-X-Google-Smtp-Source: ABdhPJzjEYqkqDsVOUUSIyHOV7YjjeXNiAqTVHpvQPpnwwFMYIEN0g+UDhQY8ZukdUCBIkY1cueDMa3CW7w2dpH/LnA=
-X-Received: by 2002:a05:6902:709:: with SMTP id k9mr6196333ybt.113.1642469343907;
- Mon, 17 Jan 2022 17:29:03 -0800 (PST)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8C94DB81239;
+        Tue, 18 Jan 2022 02:23:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D16BC36AF3;
+        Tue, 18 Jan 2022 02:23:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642472616;
+        bh=FtVstA5Qd9mauR9+4JEDWKdV8yzsC6t8OYr2IPene8k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KRr7XAQA1xvvenuC2QSp2Hfm0K3hGwI0hJeFFuzYEuLEWhtPeQyA8p//15xqEiEQd
+         nP7WAAO33wL0jWuHOnERooW9s0485k+PHSBFDTzyYVTZX1RuQyl7mMvgdhvfgK92sA
+         KkMCT5UdnfZImJk/adLMIjwYWRV+ancGpG47mQu019K9UXvM/05r3Kp193g84+g0Tm
+         +4axq6a4J6+Fq5MrtnZLgNM806BuY5Qx1VSc8E4ZlhZFjE0vzOSQU5TJIpqnZpIuCW
+         wtteHe5Inci3fwFu+n+jgERWFQTTJzFZql9dxY0bwegegUU2oZlp0zz9gLxCPlJ+g9
+         MC2YMBo1Aj8cw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 073/217] crypto: jitter - consider 32 LSB for APT
+Date:   Mon, 17 Jan 2022 21:17:16 -0500
+Message-Id: <20220118021940.1942199-73-sashal@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220118021940.1942199-1-sashal@kernel.org>
+References: <20220118021940.1942199-1-sashal@kernel.org>
 MIME-Version: 1.0
-Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Mon, 17 Jan 2022
- 17:29:03 -0800 (PST)
-In-Reply-To: <20220117064248.102638-1-julianbraha@gmail.com>
-References: <20220117064248.102638-1-julianbraha@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 18 Jan 2022 02:29:03 +0100
-X-Gmail-Original-Message-ID: <CAHmME9p5Bg-QejSNqKnMJU8fYaErc01FLjGCOWMH22WHJh2jMQ@mail.gmail.com>
-Message-ID: <CAHmME9p5Bg-QejSNqKnMJU8fYaErc01FLjGCOWMH22WHJh2jMQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: fix unmet dependency on CRYPTO for CRYPTO_LIB_CHACHA_GENERIC
-To:     Julian Braha <julianbraha@gmail.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fazilyildiran@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A fix for this was submitted here already, I believe:
+From: Stephan Müller <smueller@chronox.de>
 
-https://lore.kernel.org/linux-crypto/20220116165841.254196-1-Jason@zx2c4.com/
+[ Upstream commit 552d03a223eda3df84526ab2c1f4d82e15eaee7a ]
+
+The APT compares the current time stamp with a pre-set value. The
+current code only considered the 4 LSB only. Yet, after reviews by
+mathematicians of the user space Jitter RNG version >= 3.1.0, it was
+concluded that the APT can be calculated on the 32 LSB of the time
+delta. Thi change is applied to the kernel.
+
+This fixes a bug where an AMD EPYC fails this test as its RDTSC value
+contains zeros in the LSB. The most appropriate fix would have been to
+apply a GCD calculation and divide the time stamp by the GCD. Yet, this
+is a significant code change that will be considered for a future
+update. Note, tests showed that constantly the GCD always was 32 on
+these systems, i.e. the 5 LSB were always zero (thus failing the APT
+since it only considered the 4 LSB for its calculation).
+
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/jitterentropy.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 4dc2261cdeefb..788d90749715a 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -265,7 +265,6 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
+ {
+ 	__u64 delta2 = jent_delta(ec->last_delta, current_delta);
+ 	__u64 delta3 = jent_delta(ec->last_delta2, delta2);
+-	unsigned int delta_masked = current_delta & JENT_APT_WORD_MASK;
+ 
+ 	ec->last_delta = current_delta;
+ 	ec->last_delta2 = delta2;
+@@ -274,7 +273,7 @@ static int jent_stuck(struct rand_data *ec, __u64 current_delta)
+ 	 * Insert the result of the comparison of two back-to-back time
+ 	 * deltas.
+ 	 */
+-	jent_apt_insert(ec, delta_masked);
++	jent_apt_insert(ec, current_delta);
+ 
+ 	if (!current_delta || !delta2 || !delta3) {
+ 		/* RCT with a stuck bit */
+-- 
+2.34.1
+
