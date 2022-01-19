@@ -2,48 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13113C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 09:10:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA91EC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 09:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348489AbiASJKQ (ORCPT
+        id S1352899AbiASJOH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 04:10:16 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:40662 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352746AbiASJKP (ORCPT
+        Wed, 19 Jan 2022 04:14:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57074 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1352816AbiASJOG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 04:10:15 -0500
+        Wed, 19 Jan 2022 04:14:06 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF23C061574;
+        Wed, 19 Jan 2022 01:14:06 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7BA9614F1;
-        Wed, 19 Jan 2022 09:10:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC70C340E6;
-        Wed, 19 Jan 2022 09:10:14 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1DF5DB81911;
+        Wed, 19 Jan 2022 09:14:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E772FC340E7;
+        Wed, 19 Jan 2022 09:14:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642583414;
-        bh=WDNHgCq1Sifyl65SzNP7dhJXzUA+KcGSqB1STBpal/o=;
+        s=k20201202; t=1642583643;
+        bh=UT1ycB5MKQguCeHT4CqkfeYkeSTVnUZkbqsNKDB91DE=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ak4X7XB7uZSGxPLHzqT/QXn42qKgsLVbs8uG+kewTlvVrlDl92zFFe4y58KwWDLHT
-         f44qHyq5PPPHZeeUaP9l6bFhkZ0KYdEgrfaItVstIwMLINaFygpYqzP2EhtEHEOEwu
-         il87cFjjgMG738RjYKKmF8wFOk0h/rYUErjNFc6R71BKzZrrEJ0Ez6VusIKV+gGzA1
-         h0ePyVKLFxET5XWPSQDkiyK36hYZ6nktY37PR3iBWeRUkwIkN5n9CzsaLCNPCesZ7q
-         hHvpNi3va5mgodYDODW60+y0to9IqOGRGZaXgMNkTfAeJ/9pqwBJLXJf316Gd7U8Ss
-         1uEUJ/JwmByBQ==
-Received: by mail-wm1-f45.google.com with SMTP id l12-20020a7bc34c000000b003467c58cbdfso12791200wmj.2;
-        Wed, 19 Jan 2022 01:10:14 -0800 (PST)
-X-Gm-Message-State: AOAM530qmRy5d8UXCpFyn1Jc6XVWwz5wWS/bTTZtDOgZowGA8vhIwqBN
-        9dIN+wbJzBurx1Tj9CxZilnak0DaKsaRxvY2LfI=
-X-Google-Smtp-Source: ABdhPJwrsNn68dd2N/CGBv72C8COqRD7ZHZNGWiesAEQwpW2p4EomFBwRkEKZFhiJvyQFSzoSBrWBu8nXTs8AuHJmJo=
-X-Received: by 2002:a5d:4087:: with SMTP id o7mr27561730wrp.189.1642583412437;
- Wed, 19 Jan 2022 01:10:12 -0800 (PST)
+        b=HIVRMtGwk6qaE9ahJmgOL9zeB6VmNjL82sIDY0R9RcQykK5LYcrO9IZYpyqYXcy1o
+         EU8LBeG8WtEoW4g9+EXqtZGwEz+29+cw3caj84lZkBGMZOKZFYbbJ8NE+94HD6b5JE
+         VB5/dhCa6lv9lm2LJ4Gen5fRp+EDxT8534gp56tpKJ5C+Gn7H7x44+5lBJlyqyiLwk
+         uunPHQkLgNBMFxTblL7cDiJYVM5jiF6J7luwxLE8qz82Gr3Oua1tDpugHTtDhUky6o
+         8O4bMqjVQ/hwAIjSNDn9SL4SdKkdDiEXYndddjRXzxAk4EzBB+lU8hjzoYd8M5rj9C
+         IMUxzQCcVkbBw==
+Received: by mail-wm1-f49.google.com with SMTP id ay14-20020a05600c1e0e00b0034d7bef1b5dso6127998wmb.3;
+        Wed, 19 Jan 2022 01:14:03 -0800 (PST)
+X-Gm-Message-State: AOAM533TzqKYBYEHCOH3NgdRZdf9X84OK2kcvbF1ZpvYsKrSGHj4L6Lv
+        HSrqR95Xc50KPNSCVmJVq6C7AHXZAKKllIxSC8I=
+X-Google-Smtp-Source: ABdhPJwCrAQgxYS+mSM5rThnIjL7BrcKp/O0rhZ0fCrotJ58xV1UBxwc+zZAx8OHuLmlHLQeNbsXBBo+N7eqth/eSbQ=
+X-Received: by 2002:a5d:6210:: with SMTP id y16mr26324324wru.454.1642583642257;
+ Wed, 19 Jan 2022 01:14:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20220119082447.1675-1-miles.chen@mediatek.com> <CAHmME9pv4WWATjdqZgwrtHDmq3sX4ABfB9PoNT9Z4tSEduR2Lw@mail.gmail.com>
-In-Reply-To: <CAHmME9pv4WWATjdqZgwrtHDmq3sX4ABfB9PoNT9Z4tSEduR2Lw@mail.gmail.com>
+References: <20220119082447.1675-1-miles.chen@mediatek.com>
+ <CAHmME9pv4WWATjdqZgwrtHDmq3sX4ABfB9PoNT9Z4tSEduR2Lw@mail.gmail.com> <CAMj1kXEuWRUbCqDBnxiWRaERt6OGL8ufQ1Q7naAGHqKK1oQB1w@mail.gmail.com>
+In-Reply-To: <CAMj1kXEuWRUbCqDBnxiWRaERt6OGL8ufQ1Q7naAGHqKK1oQB1w@mail.gmail.com>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 19 Jan 2022 10:09:59 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEuWRUbCqDBnxiWRaERt6OGL8ufQ1Q7naAGHqKK1oQB1w@mail.gmail.com>
-Message-ID: <CAMj1kXEuWRUbCqDBnxiWRaERt6OGL8ufQ1Q7naAGHqKK1oQB1w@mail.gmail.com>
+Date:   Wed, 19 Jan 2022 10:13:51 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGUtg1BOauCjxB+S7yMTPArQrPnHf5jnfhOihL-FHrFZA@mail.gmail.com>
+Message-ID: <CAMj1kXGUtg1BOauCjxB+S7yMTPArQrPnHf5jnfhOihL-FHrFZA@mail.gmail.com>
 Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     =?UTF-8?B?TWlsZXMgQ2hlbiAo6Zmz5rCR5qi6KQ==?= 
@@ -63,47 +67,57 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(+ Sami, Eric)
-
-On Wed, 19 Jan 2022 at 10:00, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Wed, 19 Jan 2022 at 10:09, Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> Hi Miles,
+> (+ Sami, Eric)
 >
-> Thanks for the patch. Could you let me know which architecture and
-> compiler this was broken on? If I had to guess, I'd wager arm32, and
-> you hit this by enabling optimized blake2s?
+> On Wed, 19 Jan 2022 at 10:00, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > Hi Miles,
+> >
+> > Thanks for the patch. Could you let me know which architecture and
+> > compiler this was broken on? If I had to guess, I'd wager arm32, and
+> > you hit this by enabling optimized blake2s?
+> >
+> > If so, I'm not sure the problem is with weak symbols. Why should CFI
+> > break weak symbols? Rather, perhaps the issue is that the function is
+> > defined in blake2s-core.S? Are there some CFI macros we need for that
+> > definition?
+> >
 >
-> If so, I'm not sure the problem is with weak symbols. Why should CFI
-> break weak symbols? Rather, perhaps the issue is that the function is
-> defined in blake2s-core.S? Are there some CFI macros we need for that
-> definition?
+> We should try to understand why CFI thinks the prototypes of the two
+> symbols are different. There are still a number of issues with CFI, so
+> papering over them by reverting stuff that we want for good reasons is
+> not the way to go imo.
 >
+> In the short term, you can work around it by avoiding the indirect
+> call to blake2s_compress, e.g.,
+>
+> diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+> index 93f2ae051370..fef2ff678431 100644
+> --- a/lib/crypto/blake2s.c
+> +++ b/lib/crypto/blake2s.c
+> @@ -16,9 +16,15 @@
+>  #include <linux/init.h>
+>  #include <linux/bug.h>
+>
+> +static void __blake2s_compress(struct blake2s_state *state, const u8 *block,
+> +                              size_t nblocks, const u32 inc)
+> +{
+> +       return blake2s_compress(state, block, nblocks, inc);
+> +}
+> +
+>  void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
+>  {
+> -       __blake2s_update(state, in, inlen, blake2s_compress);
+> +       __blake2s_update(state, in, inlen, __blake2s_compress);
+>  }
+>  EXPORT_SYMBOL(blake2s_update);
 
-We should try to understand why CFI thinks the prototypes of the two
-symbols are different. There are still a number of issues with CFI, so
-papering over them by reverting stuff that we want for good reasons is
-not the way to go imo.
+Ehm, maybe not. As Jason points out, the typedef does not have quite
+the right type, so that is most likely the culprit, and this
+workaround would trigger CFI in exactly the same way.
 
-In the short term, you can work around it by avoiding the indirect
-call to blake2s_compress, e.g.,
-
-diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
-index 93f2ae051370..fef2ff678431 100644
---- a/lib/crypto/blake2s.c
-+++ b/lib/crypto/blake2s.c
-@@ -16,9 +16,15 @@
- #include <linux/init.h>
- #include <linux/bug.h>
-
-+static void __blake2s_compress(struct blake2s_state *state, const u8 *block,
-+                              size_t nblocks, const u32 inc)
-+{
-+       return blake2s_compress(state, block, nblocks, inc);
-+}
-+
- void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
- {
--       __blake2s_update(state, in, inlen, blake2s_compress);
-+       __blake2s_update(state, in, inlen, __blake2s_compress);
- }
- EXPORT_SYMBOL(blake2s_update);
+Interestingly, the compiler does not seem to mind, right? Or are you
+seeing any build time warnings on the reference to blake2s_compress in
+the call to __blake2s_update() ?
