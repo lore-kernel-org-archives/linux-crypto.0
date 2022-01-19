@@ -2,89 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA12C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 00:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9DFC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 00:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350417AbiASAW0 (ORCPT
+        id S1350555AbiASAzO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jan 2022 19:22:26 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:60896 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244782AbiASAWZ (ORCPT
+        Tue, 18 Jan 2022 19:55:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59014 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350544AbiASAzL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jan 2022 19:22:25 -0500
+        Tue, 18 Jan 2022 19:55:11 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5487CC061574;
+        Tue, 18 Jan 2022 16:55:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0619D614BB;
-        Wed, 19 Jan 2022 00:22:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32395C340E0;
-        Wed, 19 Jan 2022 00:22:24 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2051614DC;
+        Wed, 19 Jan 2022 00:55:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21430C340E0;
+        Wed, 19 Jan 2022 00:55:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642551744;
-        bh=b429HbqqH8lUXICzovtu5109bnCHzy+254BIOm8+Gz0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aXCOo7/IhVJnUEXuLzfd9NklLIMxWxcNE77iGSprLJGG3T31wMa4NekDkA17SDp7T
-         tcD0AeSA/OPu+DvIbFFYc3vL7KCQV96iedLiOMC8xSEelasSW1SZdZpkgniloijiCD
-         rsU0VhazHGqvGd3xCtNX7hqbjm9ywy7yAN+eIXD0DVqFn3UV32ixEXwAdO+gqITgVu
-         TAEVK2rlnvuktSDJIUFqVcY6t9a80dQmjM6XM7FDneWMqq37XkxhE7YQQU+rsMcKrh
-         X889hA2mIBa1nkVXDQmEoxHXVFTupITSRYSRYWX2ZK8ivS+95u8VfaRqyjO7wp6iwU
-         Hl6G8XdIkVKvw==
-Date:   Tue, 18 Jan 2022 16:22:22 -0800
+        s=k20201202; t=1642553710;
+        bh=NGkBY5pZL1xINxMqyx1wMnRtQ+uGBnKSSP3TCy+p67Q=;
+        h=From:To:Cc:Subject:Date:From;
+        b=DXC3OO8ayneOE2iP8tHftJuPV1NAPew7G3gpOTGI6o43NNzsEs9FtgBXzkJ4PTH1X
+         W4Udhhd/bZ0YCAGvkNGHmibhh0E9H4EZkVfjcvj9KgTM9862dcI54AsvjZ0pjvOalV
+         +P/mngFxyPOwqa9Mar7mB+f5UhCc/1R9HXUZAowU8vOCu+C2y0tNXnR7R/IkLKFknz
+         TKx9rV94pj9J/34/ZrEE8pgNci+OkKhxTIj/SK4f8S/HWm5FBi2+zLH2/dtbF2dpiW
+         KQuEp89CjrBZOcnooUbNK99Tnb4t1D48d4kGm1pQE4OaaX1GPGvGf6jeAEAIjkjE9u
+         OQpvsPa0B6uVQ==
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KEYS: fix length validation in keyctl_pkey_params_get_2()
-Message-ID: <YedZviVNB2X7yeTX@sol.localdomain>
-References: <20220113200454.72609-1-ebiggers@kernel.org>
- <YeMWLyceg4xcwShF@iki.fi>
- <YeMmPs+gf+q7XUv4@sol.localdomain>
- <YeM7+Nyi2p7Yv7+Q@iki.fi>
+To:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: [PATCH v2 0/4] KEYS: x509: various cleanups
+Date:   Tue, 18 Jan 2022 16:54:32 -0800
+Message-Id: <20220119005436.119072-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YeM7+Nyi2p7Yv7+Q@iki.fi>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 15, 2022 at 11:26:16PM +0200, Jarkko Sakkinen wrote:
-> On Sat, Jan 15, 2022 at 11:53:34AM -0800, Eric Biggers wrote:
-> > On Sat, Jan 15, 2022 at 08:45:03PM +0200, Jarkko Sakkinen wrote:
-> > > On Thu, Jan 13, 2022 at 12:04:54PM -0800, Eric Biggers wrote:
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > In many cases, keyctl_pkey_params_get_2() is validating the user buffer
-> > > > lengths against the wrong algorithm properties.  Fix it to check against
-> > > > the correct properties.
-> > > > 
-> > > > Probably this wasn't noticed before because for all asymmetric keys of
-> > > > the "public_key" subtype, max_data_size == max_sig_size == max_enc_size
-> > > > == max_dec_size.  However, this isn't necessarily true for the
-> > > > "asym_tpm" subtype (it should be, but it's not strictly validated).  Of
-> > > > course, future key types could have different values as well.
-> > > 
-> > > With a quick look, asym_tpm is TPM 1.x only, which only has 2048-bit RSA
-> > > keys.
-> > 
-> > The code allows other lengths, as well as the case where the "RSA key size"
-> > doesn't match the "public key size".  Probably both are bugs and they should
-> > both be 256 bytes (2048 bits) only.  Anyway, that would be a separate fix.
-> > 
-> > - Eric
-> 
-> I'm fine with the current commit message. E.g. I have no idea at this
-> point whether there should be in future separate asym_tpm2 or all bundled
-> to asym_tpm.
-> 
-> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> 
+This series cleans up a few things in the X.509 certificate parser.
 
-Okay, great.  Just to be clear, I'm expecting either you or David
-(maintainer:KEYS/KEYRINGS) to apply this patch.  Acked-by is usually given by a
-maintainer when someone else applies a patch.
+Changed v1 => v2:
+  - Renamed label in patch 3
+  - Added Acked-by's
 
-- Eric
+Eric Biggers (4):
+  KEYS: x509: clearly distinguish between key and signature algorithms
+  KEYS: x509: remove unused fields
+  KEYS: x509: remove never-set ->unsupported_key flag
+  KEYS: x509: remove dead code that set ->unsupported_sig
+
+ crypto/asymmetric_keys/pkcs7_verify.c     |  7 ++---
+ crypto/asymmetric_keys/x509.asn1          |  2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c | 34 ++++++++++++-----------
+ crypto/asymmetric_keys/x509_parser.h      |  1 -
+ crypto/asymmetric_keys/x509_public_key.c  | 18 ------------
+ 5 files changed, 21 insertions(+), 41 deletions(-)
+
+-- 
+2.34.1
+
