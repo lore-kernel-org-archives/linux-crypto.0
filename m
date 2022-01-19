@@ -2,82 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE0EC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 03:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0E6C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 06:58:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242118AbiASDOw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jan 2022 22:14:52 -0500
-Received: from mail-oi1-f169.google.com ([209.85.167.169]:40584 "EHLO
-        mail-oi1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240542AbiASDOw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jan 2022 22:14:52 -0500
-Received: by mail-oi1-f169.google.com with SMTP id bx18so2029230oib.7;
-        Tue, 18 Jan 2022 19:14:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=kn1Mk3z9xSx65+thbR2SSoC2E940smP9FzIPCUFVCdk=;
-        b=Eb+8EMWaTATAqIHPsApAaiOEN1LoYH2HhM6ItKzbFN9BE3wVqT+nWuYtNpiyN6VpNc
-         F5qYsCPnG+dzWDa4xl9GwXSDXIBeOfRVdP0zOSMlefWHuSQlpOpCNbmdhyC976KzUrbY
-         D9q4MLLTMqckJ24LvyQX8TvZYTuAwM3Fi/Tl7Lbzyrm8OTqPn4treKbQjjEMsiSoqL9V
-         rPW6jXHr4pl5nchRzL+LDZkzxp0Gdbjrit5Zf2EkgWuvxLqIga/Tw+s2pdKB3QVYYkSo
-         Wh0MlayqavqvGCAVDRXALhWTGcgBfDOymuGbuU/KW2XX7phzrkC1KxlDJYHX68lvvjjL
-         6FPg==
-X-Gm-Message-State: AOAM530TqkwLo78pGwhUMiL4Mjk4Kk3Oo3/AWZGzL7the5yjTDracjOv
-        tR1vnlwJeOYACukNrRg20g==
-X-Google-Smtp-Source: ABdhPJxU8xP3n7IbrfWS45xsMVH1tELwDYNmgo5+MUYtSBPkdpT750qno1pazIxCRTmuNbzkPgYBQA==
-X-Received: by 2002:aca:2b04:: with SMTP id i4mr1288407oik.69.1642562091272;
-        Tue, 18 Jan 2022 19:14:51 -0800 (PST)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id v12sm6067213otk.43.2022.01.18.19.14.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jan 2022 19:14:50 -0800 (PST)
-Received: (nullmailer pid 2571074 invoked by uid 1000);
-        Wed, 19 Jan 2022 03:14:49 -0000
-Date:   Tue, 18 Jan 2022 21:14:49 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     conor.dooley@microchip.com
-Cc:     linux-crypto@vger.kernel.org, linus.walleij@linaro.org,
-        linux-gpio@vger.kernel.org, bin.meng@windriver.com,
-        lee.jones@linaro.org, ivan.griffin@microchip.com,
-        robh+dt@kernel.org, paul.walmsley@sifive.com, atishp@rivosinc.com,
-        a.zummo@towertech.it, linux-rtc@vger.kernel.org,
-        aou@eecs.berkeley.edu, jassisinghbrar@gmail.com,
-        devicetree@vger.kernel.org, thierry.reding@gmail.com,
-        lewis.hanly@microchip.com, geert@linux-m68k.org,
-        linux-i2c@vger.kernel.org, broonie@kernel.org,
-        alexandre.belloni@bootlin.com, heiko@sntech.de,
-        daire.mcnamara@microchip.com, palmer@dabbelt.com,
-        bgolaszewski@baylibre.com, linux-kernel@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-pwm@vger.kernel.org,
-        linux-usb@vger.kernel.org, gregkh@linuxfoundation.org,
-        linux-spi@vger.kernel.org, krzysztof.kozlowski@canonical.com,
-        u.kleine-koenig@pengutronix.de
-Subject: Re: [PATCH v4 08/14] dt-bindings: pwm: add microchip corepwm binding
-Message-ID: <YeeCKQrdMmhmR0bg@robh.at.kernel.org>
-References: <20220117110755.3433142-1-conor.dooley@microchip.com>
- <20220117110755.3433142-9-conor.dooley@microchip.com>
+        id S1350228AbiASG6y (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 01:58:54 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:59680 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1345647AbiASG6x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jan 2022 01:58:53 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nA4vY-0008Th-0i; Wed, 19 Jan 2022 17:58:41 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Jan 2022 17:58:40 +1100
+Date:   Wed, 19 Jan 2022 17:58:40 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: authenc - Fix sleep in atomic context in decrypt_tail
+Message-ID: <Yee2oKxPSLaYY31N@gondor.apana.org.au>
+References: <Yd1SIHUNdLIvKhzz@Red>
+ <YeD4rt1OVnEMBr+A@gondor.apana.org.au>
+ <YeD6vt47+pAl0SxG@gondor.apana.org.au>
+ <YeEiWmkyNwfgQgmn@Red>
+ <YeZx1aVL0HnT9tCB@Red>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220117110755.3433142-9-conor.dooley@microchip.com>
+In-Reply-To: <YeZx1aVL0HnT9tCB@Red>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Jan 2022 11:07:49 +0000, conor.dooley@microchip.com wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
+On Tue, Jan 18, 2022 at 08:52:53AM +0100, Corentin Labbe wrote:
+>
+> With my patch, I got:
+> [   38.515668] BUG: sleeping function called from invalid context at crypto/skcipher.c:482
+> [   38.523708] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 84, name: 1c15000.crypto-
+> [   38.532176] preempt_count: 200, expected: 0
+> [   38.536381] CPU: 6 PID: 84 Comm: 1c15000.crypto- Not tainted 5.16.0-next-20220115-00124-g13473e8fac33-dirty #116
+> [   38.546551] Hardware name: Allwinner A83t board
+> [   38.551100]  unwind_backtrace from show_stack+0x10/0x14
+> [   38.556358]  show_stack from dump_stack_lvl+0x40/0x4c
+> [   38.561428]  dump_stack_lvl from __might_resched+0x118/0x154
+> [   38.567107]  __might_resched from skcipher_walk_virt+0xe8/0xec
+> [   38.572955]  skcipher_walk_virt from crypto_cbc_decrypt+0x2c/0x170
+> [   38.579147]  crypto_cbc_decrypt from crypto_skcipher_decrypt+0x38/0x5c
+> [   38.585680]  crypto_skcipher_decrypt from authenc_verify_ahash_done+0x18/0x34
+> [   38.592825]  authenc_verify_ahash_done from crypto_finalize_request+0x6c/0xe4
+> [   38.599974]  crypto_finalize_request from sun8i_ss_hash_run+0x73c/0xb98
+> [   38.606602]  sun8i_ss_hash_run from crypto_pump_work+0x1a8/0x330
+> [   38.612616]  crypto_pump_work from kthread_worker_fn+0xa8/0x1c4
+> [   38.618550]  kthread_worker_fn from kthread+0xf0/0x110
+> [   38.623701]  kthread from ret_from_fork+0x14/0x2c
+> [   38.628414] Exception stack(0xc2247fb0 to 0xc2247ff8)
+> [   38.633468] 7fa0:                                     00000000 00000000 00000000 00000000
+> [   38.641640] 7fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+> [   38.649809] 7fe0:i 00000000 00000000 00000000 00000000 00000013 00000000
 > 
-> Add device tree bindings for the Microchip fpga fabric based "core" PWM
-> controller.
+> This is when testing hmac(sha1) on my crypto driver sun8i-ss and crypto testing authenc(hmac-sha1-sun8i-ss,cbc(aes-generic)).
 > 
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> ---
->  .../bindings/pwm/microchip,corepwm.yaml       | 75 +++++++++++++++++++
->  1 file changed, 75 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/pwm/microchip,corepwm.yaml
-> 
+> Do you have any idea to better fix my issue ?
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+This backtrace is caused by a bug in authenc:
+
+---8<---
+The function crypto_authenc_decrypt_tail discards its flags
+argument and always relies on the flags from the original request
+when starting its sub-request.
+
+This is clearly wrong as it may cause the SLEEPABLE flag to be
+set when it shouldn't.
+
+Fixes: 92d95ba91772 ("crypto: authenc - Convert to new AEAD interface")
+Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 670bf1a01d00..17f674a7cdff 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -253,7 +253,7 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
+ 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
+ 
+ 	skcipher_request_set_tfm(skreq, ctx->enc);
+-	skcipher_request_set_callback(skreq, aead_request_flags(req),
++	skcipher_request_set_callback(skreq, flags,
+ 				      req->base.complete, req->base.data);
+ 	skcipher_request_set_crypt(skreq, src, dst,
+ 				   req->cryptlen - authsize, req->iv);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
