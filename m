@@ -2,119 +2,291 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE878C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 15:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3EEC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 15:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234259AbiASPDu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 10:03:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233897AbiASPDt (ORCPT
+        id S1355473AbiASPVp (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 10:21:45 -0500
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:35168 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1355310AbiASPVl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 10:03:49 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77552C061574;
-        Wed, 19 Jan 2022 07:03:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3EFB6B81A13;
-        Wed, 19 Jan 2022 15:03:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5908C340EA;
-        Wed, 19 Jan 2022 15:03:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hBQSpQfl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642604623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GCabguGiN7uT4MQN1kXder1vGuODWjOeHEelZ93JwRY=;
-        b=hBQSpQflXLHVazhaxkTthyTBxcaYO9N0NY0sU1Khwt6dMsxWHTbVyoowt90ivmRYdKDNuz
-        q3wwo702DCkg+uSBAoi6tibVPjTsX5gu/bvpvNeV6UknffvsRcM/mt1MH6Ejd+Z8QBmRT0
-        wqfhenwVX8YjZ+wFS27dPz1sx9fWwY8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bdfaf61d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 19 Jan 2022 15:03:43 +0000 (UTC)
-Received: by mail-yb1-f172.google.com with SMTP id o80so8276613yba.6;
-        Wed, 19 Jan 2022 07:03:42 -0800 (PST)
-X-Gm-Message-State: AOAM530vxNmXnXQvnL49Zh0unNFgnmma3ApqIsFuY+nUMIlZQl+lj5bq
-        EjdnNdlIsSsqIj789pJcVQsBdGDCxY3lWzTpMmU=
-X-Google-Smtp-Source: ABdhPJyPplsLL3VSpiK5D84dlkwlzW6DMV1FL5dXA8RsTT2mIPew8sKEZ8KIgnVmP6xFVtVk5brIoW5GPM78o5jqYZ0=
-X-Received: by 2002:a25:e90a:: with SMTP id n10mr14086571ybd.245.1642604620836;
- Wed, 19 Jan 2022 07:03:40 -0800 (PST)
-MIME-Version: 1.0
-References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
- <20220119100615.5059-1-miles.chen@mediatek.com> <CAHmME9pQcUxs87EwQwBZNDA4ZzqugTggH+uiNPh=mv5zjp3g3A@mail.gmail.com>
- <CAHmME9pPKjRLmR6zpYFZT7rOOfHsG2ESnDi+QQrDJuGLo1X4JQ@mail.gmail.com>
- <CAHmME9oGTPS-gVyHQ4o=AxvMJrGH44_tyQ2KPQcfAKgcqC2SnA@mail.gmail.com>
- <CAMj1kXEo8kQNeoCdwvBkkW0UeYFQEJwkZ_nj06qjsBDF2Qu2pQ@mail.gmail.com> <13f9d24879e34914b1135a4d2ae48d73@AcuMS.aculab.com>
-In-Reply-To: <13f9d24879e34914b1135a4d2ae48d73@AcuMS.aculab.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 19 Jan 2022 16:03:29 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oON=XwOoMNyO+Uu6pEC5j=JvvfK5g2u7mFcM=Y_LZ3uw@mail.gmail.com>
-Message-ID: <CAHmME9oON=XwOoMNyO+Uu6pEC5j=JvvfK5g2u7mFcM=Y_LZ3uw@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Miles Chen <miles.chen@mediatek.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wed, 19 Jan 2022 10:21:41 -0500
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20JCnbo7014959;
+        Wed, 19 Jan 2022 16:21:36 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=m/aWoxbwO4ww33sxaSzrOIlxUKriBNkq4+frD3/0F5Y=;
+ b=aUlpneYD1/Myb/Bi5Sf2uaY7bPgcTvI5O4fx5VCC7EhIC+iSqb+ce3LtpyCtgSKUgiUB
+ C8VdKQEXzQvGAZERCdTDVWKDG0MKpTeORJEbfNMS3LP95/TB3jU9UhuP+QV46DGbbsqR
+ E45Je0X5Rd5P67ppfhNt7Wog1Rv2AWHpyFGYl9gTGYnidnBMb/yLh83KZdRZvpafudXh
+ 254ZekIe3dgdgmu1NnXE0VkJAEJZa4JZZv4/Q3zXj0oyTQlpivYViygkK1/C52A91o8X
+ vW/VbK+o6cKSp09BWrKsVnnWEZPGfR+jufJ6BVL41J2lp5FAYTM1kgfRFg5rWI8vM4Qm 0w== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3dpf2vam04-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jan 2022 16:21:36 +0100
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 82DD510002A;
+        Wed, 19 Jan 2022 16:21:35 +0100 (CET)
+Received: from Webmail-eu.st.com (sfhdag2node1.st.com [10.75.127.4])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id E3E5921BF59;
+        Wed, 19 Jan 2022 16:21:34 +0100 (CET)
+Received: from lmecxl0889.lme.st.com (10.75.127.44) by SFHDAG2NODE1.st.com
+ (10.75.127.4) with Microsoft SMTP Server (TLS) id 15.0.1497.26; Wed, 19 Jan
+ 2022 16:21:32 +0100
+Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
+To:     Rob Herring <robh@kernel.org>, <devicetree@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Georgi Djakov <djakov@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kevin Hilman <khilman@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        <linux-ide@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <dmaengine@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <iommu@lists.linux-foundation.org>,
+        <linux-leds@vger.kernel.org>, <linux-media@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-can@vger.kernel.org>,
+        <linux-wireless@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-gpio@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+        <linux-remoteproc@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-usb@vger.kernel.org>
+References: <20220119015038.2433585-1-robh@kernel.org>
+From:   Arnaud POULIQUEN <arnaud.pouliquen@foss.st.com>
+Message-ID: <de35edd9-b85d-0ed7-98b6-7a41134c3ece@foss.st.com>
+Date:   Wed, 19 Jan 2022 16:21:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.75.127.44]
+X-ClientProxiedBy: SFHDAG2NODE2.st.com (10.75.127.5) To SFHDAG2NODE1.st.com
+ (10.75.127.4)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-19_08,2022-01-19_01,2021-12-02_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+Hello Rob,
 
-On Wed, Jan 19, 2022 at 3:41 PM David Laight <David.Laight@aculab.com> wrote:
->
-> From: Ard Biesheuvel
-> > Sent: 19 January 2022 12:19
-> ...
-> > -               (*compress)(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
-> > +               if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S))
-> > +                       (*compress)(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
-> > +               else
-> > +                       blake2s_compress_generic(state, in, nblocks - 1,
-> > +                                                BLAKE2S_BLOCK_SIZE);
->
-> Isn't that a candidate for a 'static call' ?
->
-> And, maybe all these inlined functions should be real functions?
-> No point having all the bloat on every call site.
-> Much better to call a real function and used the cached instructions.
+On 1/19/22 2:50 AM, Rob Herring wrote:
+> The 'phandle-array' type is a bit ambiguous. It can be either just an
+> array of phandles or an array of phandles plus args. Many schemas for
+> phandle-array properties aren't clear in the schema which case applies
+> though the description usually describes it.
+> 
+> The array of phandles case boils down to needing:
+> 
+> items:
+>   maxItems: 1
+> 
+> The phandle plus args cases should typically take this form:
+> 
+> items:
+>   - items:
+>       - description: A phandle
+>       - description: 1st arg cell
+>       - description: 2nd arg cell
+> 
+> With this change, some examples need updating so that the bracketing of
+> property values matches the schema.
+> 
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Chun-Kuang Hu <chunkuang.hu@kernel.org>
+> Cc: Philipp Zabel <p.zabel@pengutronix.de>
+> Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Cc: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: Georgi Djakov <djakov@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lee Jones <lee.jones@linaro.org>
+> Cc: Daniel Thompson <daniel.thompson@linaro.org>
+> Cc: Jingoo Han <jingoohan1@gmail.com>
+> Cc: Pavel Machek <pavel@ucw.cz>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Wolfgang Grandegger <wg@grandegger.com>
+> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Vivien Didelot <vivien.didelot@gmail.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Vladimir Oltean <olteanv@gmail.com>
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: Viresh Kumar <vireshk@kernel.org>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Kishon Vijay Abraham I <kishon@ti.com>
+> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Kevin Hilman <khilman@kernel.org>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Sebastian Reichel <sre@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Zhang Rui <rui.zhang@intel.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Thierry Reding <thierry.reding@gmail.com>
+> Cc: Jonathan Hunter <jonathanh@nvidia.com>
+> Cc: Sudeep Holla <sudeep.holla@arm.com>
+> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: linux-ide@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: dmaengine@vger.kernel.org
+> Cc: linux-pm@vger.kernel.org
+> Cc: iommu@lists.linux-foundation.org
+> Cc: linux-leds@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-can@vger.kernel.org
+> Cc: linux-wireless@vger.kernel.org
+> Cc: linux-phy@lists.infradead.org
+> Cc: linux-gpio@vger.kernel.org
+> Cc: linux-riscv@lists.infradead.org
+> Cc: linux-remoteproc@vger.kernel.org
+> Cc: alsa-devel@alsa-project.org
+> Cc: linux-usb@vger.kernel.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
 
-Not a good candidate for static call, as this doesn't actually need to
-change at runtime ever. It's using a function pointer here out of
-laziness to keep the same body of the function, like a compile-time
-template. You can sort of squint and imagine the C++. Unfortunately,
-CFI felt differently and still treats it as an indirect call.
+[...]
 
-https://lore.kernel.org/linux-crypto/20220119135450.564115-1-Jason@zx2c4.com/
-fixes it up to use a boolean instead, which will certainly be inlined
-away. So that's definitely an improvement on what's there now.
+>  .../bindings/remoteproc/st,stm32-rproc.yaml   | 33 ++++++--
 
-For 5.18, I think it's probable that all of this stuff goes away
-anyway, and we don't need the templated helpers at all. So perhaps my
-patch will serve as an okay stop gap. Alternatively, maybe the clang
-people will say, "oh no, our bug" and then fix it in their
-neighborhood. According to
-https://github.com/ClangBuiltLinux/linux/issues/1567 it looks like
-that could be the case.
+[...]
 
-> There are clearly optimisations for the top/bottom of the loop.
-> But they can be done to the generic C version.
+> diff --git a/Documentation/devicetree/bindings/remoteproc/st,stm32-rproc.yaml b/Documentation/devicetree/bindings/remoteproc/st,stm32-rproc.yaml
+> index b587c97c282b..be3d9b0e876b 100644
+> --- a/Documentation/devicetree/bindings/remoteproc/st,stm32-rproc.yaml
+> +++ b/Documentation/devicetree/bindings/remoteproc/st,stm32-rproc.yaml
+> @@ -29,17 +29,22 @@ properties:
+>  
+>    st,syscfg-holdboot:
+>      description: remote processor reset hold boot
+> -      - Phandle of syscon block.
+> -      - The offset of the hold boot setting register.
+> -      - The field mask of the hold boot.
+>      $ref: "/schemas/types.yaml#/definitions/phandle-array"
+> -    maxItems: 1
+> +    items:
+> +      - items:
+> +          - description: Phandle of syscon block
+> +          - description: The offset of the hold boot setting register
+> +          - description: The field mask of the hold boot
+>  
+>    st,syscfg-tz:
+>      description:
+>        Reference to the system configuration which holds the RCC trust zone mode
+>      $ref: "/schemas/types.yaml#/definitions/phandle-array"
+> -    maxItems: 1
+> +    items:
+> +      - items:
+> +          - description: Phandle of syscon block
+> +          - description: FIXME
+> +          - description: FIXME
 
-Optimizing the generic C version would be quite nice, as it'd help all
-platforms.
+         - description: The offset of the trust zone setting register
+         - description: The field mask of the trust zone state
 
-Jason
+>  
+>    interrupts:
+>      description: Should contain the WWDG1 watchdog reset interrupt
+> @@ -93,20 +98,32 @@ properties:
+>      $ref: "/schemas/types.yaml#/definitions/phandle-array"
+>      description: |
+>        Reference to the system configuration which holds the remote
+> -    maxItems: 1
+> +    items:
+> +      - items:
+> +          - description: Phandle of syscon block
+> +          - description: FIXME
+> +          - description: FIXME
+
+         - description: The offset of the power setting register
+         - description: The field mask of the PDDS selection
+
+>  
+>    st,syscfg-m4-state:
+>      $ref: "/schemas/types.yaml#/definitions/phandle-array"
+>      description: |
+>        Reference to the tamp register which exposes the Cortex-M4 state.
+> -    maxItems: 1
+> +    items:
+> +      - items:
+> +          - description: Phandle of syscon block with the tamp register
+> +          - description: FIXME
+> +          - description: FIXME
+
+         - description: The offset of the tamp register
+         - description: The field mask of the Cortex-M4 state
+
+>  
+>    st,syscfg-rsc-tbl:
+>      $ref: "/schemas/types.yaml#/definitions/phandle-array"
+>      description: |
+>        Reference to the tamp register which references the Cortex-M4
+>        resource table address.
+> -    maxItems: 1
+> +    items:
+> +      - items:
+> +          - description: Phandle of syscon block with the tamp register
+> +          - description: FIXME
+> +          - description: FIXME
+
+         - description: The offset of the tamp register
+         - description: The field mask of the Cortex-M4 resource table address
+
+Please tell me if you prefer that I fix this in a dedicated patch.
+
+Thanks,
+Arnaud
