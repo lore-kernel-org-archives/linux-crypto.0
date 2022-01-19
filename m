@@ -2,77 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3763DC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D60C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345776AbiASKRt (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 05:17:49 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:47343 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349426AbiASKRs (ORCPT
+        id S229919AbiASKU0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 05:20:26 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:38746 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240254AbiASKUZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:17:48 -0500
-Received: from mail-wm1-f54.google.com ([209.85.128.54]) by
- mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MEmpp-1n762b3UK3-00GFv6 for <linux-crypto@vger.kernel.org>; Wed, 19 Jan
- 2022 11:17:46 +0100
-Received: by mail-wm1-f54.google.com with SMTP id v123so4362876wme.2
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:17:46 -0800 (PST)
-X-Gm-Message-State: AOAM533VAa5kP0kc/zqj1+CXKows5y9Cao8iaDHp2XcrcoPp71Dhe68c
-        /pPStNco0feZ+qmWIykMytz4XhEBf7fsZB2FRSs=
-X-Google-Smtp-Source: ABdhPJxIlHNoUe8ZgY3HoUk1jhPEpLo1FY9cqBkT6/jqrN8ALkDEnDsPDJRrCgEVUJ2S8/GtQ3CasTZFhN5yQmQ02ro=
-X-Received: by 2002:a05:600c:4e4e:: with SMTP id e14mr2752715wmq.98.1642587466476;
- Wed, 19 Jan 2022 02:17:46 -0800 (PST)
+        Wed, 19 Jan 2022 05:20:25 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9C95DB81910;
+        Wed, 19 Jan 2022 10:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CD4C340E1;
+        Wed, 19 Jan 2022 10:20:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pzCb1EEQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642587621;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AB3FPF0PWILNkb7gaXOI95vEqUZ5994CRNrN/w78cI8=;
+        b=pzCb1EEQcFUzN9yRu8u5sT2Be6L9JiPSihgpKwRzMiqSjjCWSiEyfmKxTsVnURi1V+xo+L
+        YcSP0+/S+QLlbBJ/vaM1HactjenuvmSnS2VPJVx/uRGShzP9rIIqslr9C+dwbc0gYNnnIO
+        Za0l+EvdKKltVcjNRAPkmnz5FaUv/dg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 72bb5f91 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 19 Jan 2022 10:20:21 +0000 (UTC)
+Received: by mail-yb1-f182.google.com with SMTP id k31so4307339ybj.4;
+        Wed, 19 Jan 2022 02:20:21 -0800 (PST)
+X-Gm-Message-State: AOAM530SuiMDY+o7+zPmlgJSMs9uZUYtrXRobW5yGqgtQ9FxaYzlwxgm
+        /KmIcApSKG8npy9D0eeOSZ4InIeBovVMT7jzFac=
+X-Google-Smtp-Source: ABdhPJxkL+8NhfTkbWqgVwGhaqfAeaKm7FaIYTp91pt11kI9EDshoZkY5I8wsKGSuxuQlLcEkQvSDynZCQV+wge/lWk=
+X-Received: by 2002:a25:bc52:: with SMTP id d18mr9483510ybk.255.1642587619663;
+ Wed, 19 Jan 2022 02:20:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20220119093109.1567314-1-ardb@kernel.org>
-In-Reply-To: <20220119093109.1567314-1-ardb@kernel.org>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 19 Jan 2022 11:17:30 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3b+37jZBE_OSPg7zdrZeoton0X8cka6bxp5AGK3kD+yA@mail.gmail.com>
-Message-ID: <CAK8P3a3b+37jZBE_OSPg7zdrZeoton0X8cka6bxp5AGK3kD+yA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: memneq: avoid implicit unaligned accesses
+Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 19 Jan 2022
+ 02:20:19 -0800 (PST)
+In-Reply-To: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
+References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
+ <20220119100615.5059-1-miles.chen@mediatek.com> <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 19 Jan 2022 11:20:19 +0100
+X-Gmail-Original-Message-ID: <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
+Message-ID: <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
 To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+Cc:     Miles Chen <miles.chen@mediatek.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:U0DPhcBCCELwr+YvguSv6xB34JJBCkM+fL7YbbeohuYL1qMUVHA
- hrZBty0uWFLkTrpK9QEPI4pWEqqb6Qahgw8LCotuZsvThSwReciiOcaiAz5zdJbvj4lOQlk
- 1TO/rI+bhwWVGMbF34XXqzds95G+ExI6KzejPVqg9EMBElKGgIM/Oi/+Elih7Bq3UIc23za
- rC/27Do9/TnnG4H75XXIA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4kk5PKYH0Q8=:bCSZIaU9BIoZ7dZBdXWnD9
- 18IRee2nfXbbo3VmV6ScK9yMMeshlmuKfaXyGcg8z+mHwLxEEfck8n/UqLGIrGBfUarAkehj+
- c3z56HpDV9iV3whK2cZw39cp6Geijd9DjxeYBCVnVry5YHJckT1av3j/wbMFGRCWNsoh6jVry
- N7B+MF0Na7qb89OgFCYda0RNx+96UtWTGBk7uleJX66K86g/kqSZ8/IDka26DmiSQdiaPIxFN
- WvJYwr2y3MkHTmIVMLUzuDZnFC6BiAFYqB+9rXHUroDWxFusQwCwFm69ApW9+5Pf3L7Opdlqv
- 4zC5GGRZtGL/9G9a4lpm5E7WiHY/NQysHrP9XXLQAXPNlaBiweVD1GdSHQJmaRO3NLr6dQRSO
- EXYgsojQffKqzkl3HCGCELVkQbO51yj4ZiTXxl4uRwyT3TBNX8NPgaA6vM1rRsUqVzCkH6dbL
- EVOGgNr1oNRpo2EnEBHi+AObat7IMf0llhMCa6tEHptMQE6HydCAgZafkgnDQElStsUTD5+8k
- Gl+UMYlJegVACB9KMVZJgkVZqEgrlabk4YLATEcxsJ+RfqAHeWIUYetavyu1QLNnlVtZPngPf
- ENTO2zIjRiPspEtAteiZ4/ygLHG3AJ/FKasVnKPS0Mde5QW5Mb8a8bkI+qQUhHPCvZp4c9pJh
- TTZ/qWMYKOxmXVkhnDaL7c+OCdNvvjE+mDiRTj7rYAqYa0hTcOKP6K2mq8BOHA/J9ZxQ=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 19, 2022 at 10:31 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+On 1/19/22, Ard Biesheuvel <ardb@kernel.org> wrote:
+> On Wed, 19 Jan 2022 at 11:06, Miles Chen <miles.chen@mediatek.com> wrote:
+>>
+>> Hi,
+>>
+>> >Hi Miles,
+>> >
+>> >I'm actually not able to reproduce your oops. I'm using vanilla clang
+>> >13, cross compiling for arm64, with thin LTO enabled and CFI enabled.
+>> >Kernel seems to run fine.
+>> >
+>> >
+>> >Are there other settings that are needed to trigger this? Do you see
+>> >it in upstream clang or just the Android fork of clang?
+>> >
+>> I will try another clang (the previous version I use).
+>> I am using Android fork of clang and there is a clang upgrade in this
+>> merge.
+>>
 >
-> The C standard does not support dereferencing pointers that are not
-> aligned with respect to the pointed-to type, and doing so is technically
-> undefined behavior, even if the underlying hardware supports it.
+> One thing that could be worth a try is to make __blake2s_update() and
+> __blake2s_final() __always_inline rather than just inline, which by
+> itself does not appear to be sufficient for the code to get inlined.
+> (If it were, the indirect call should have disappeared as well)
 >
-> This means that conditionally dereferencing such pointers based on
-> whether CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS=y is not the right thing
-> to do, and actually results in alignment faults on ARM, which are fixed
-> up on a slow path. Instead, we should use the unaligned accessors in
-> such cases: on architectures that don't care about alignment, they will
-> result in identical codegen whereas, e.g., codegen on ARM will avoid
-> doubleword loads and stores but use ordinary ones, which are able to
-> tolerate misalignment.
+> Given that indirect calls suck on x86, we should probably apply that
+> change in any case, regardless of CFI.
 >
-> Link: https://lore.kernel.org/linux-crypto/CAHk-=wiKkdYLY0bv+nXrcJz3NH9mAqPAafX7PpW5EwVtxsEu7Q@mail.gmail.com/
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
+Had the same thought at first, but then looking at the original stack
+trace, it looks like the __ function is inlined:
+
+[    0.000000][    T0]  __cfi_slowpath_diag+0x354/0x4b0
+[    0.000000][    T0]  blake2s_update+0x14c/0x178
+[    0.000000][    T0]  _extract_entropy+0xf4/0x29c
+
+So that makes me think that the issue really does involve calling
+through the weak alias. But why should weak alias calling trigger CFI?
+Compiler bug? Some other subtlety we're missing?
+
+Jason
