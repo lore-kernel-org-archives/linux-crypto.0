@@ -2,109 +2,201 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D60C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD02BC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbiASKU0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 05:20:26 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:38746 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240254AbiASKUZ (ORCPT
+        id S1353824AbiASKcf (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 05:32:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353717AbiASKcZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:20:25 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9C95DB81910;
-        Wed, 19 Jan 2022 10:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05CD4C340E1;
-        Wed, 19 Jan 2022 10:20:22 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pzCb1EEQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642587621;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AB3FPF0PWILNkb7gaXOI95vEqUZ5994CRNrN/w78cI8=;
-        b=pzCb1EEQcFUzN9yRu8u5sT2Be6L9JiPSihgpKwRzMiqSjjCWSiEyfmKxTsVnURi1V+xo+L
-        YcSP0+/S+QLlbBJ/vaM1HactjenuvmSnS2VPJVx/uRGShzP9rIIqslr9C+dwbc0gYNnnIO
-        Za0l+EvdKKltVcjNRAPkmnz5FaUv/dg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 72bb5f91 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 19 Jan 2022 10:20:21 +0000 (UTC)
-Received: by mail-yb1-f182.google.com with SMTP id k31so4307339ybj.4;
-        Wed, 19 Jan 2022 02:20:21 -0800 (PST)
-X-Gm-Message-State: AOAM530SuiMDY+o7+zPmlgJSMs9uZUYtrXRobW5yGqgtQ9FxaYzlwxgm
-        /KmIcApSKG8npy9D0eeOSZ4InIeBovVMT7jzFac=
-X-Google-Smtp-Source: ABdhPJxkL+8NhfTkbWqgVwGhaqfAeaKm7FaIYTp91pt11kI9EDshoZkY5I8wsKGSuxuQlLcEkQvSDynZCQV+wge/lWk=
-X-Received: by 2002:a25:bc52:: with SMTP id d18mr9483510ybk.255.1642587619663;
- Wed, 19 Jan 2022 02:20:19 -0800 (PST)
+        Wed, 19 Jan 2022 05:32:25 -0500
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70426C061755
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:32:24 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id s30so7482199lfo.7
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:32:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Sr17yjVIJ3L6nqEXDMpIqK2xXImflLFzz6ALbEm9u68=;
+        b=Xp8s21ftcZ0WG13DDgbdH7NIUsuYX+ghvkD5zw1hiLod5qbV+yjC9/iw3BxedgypWz
+         j185xcOoN7LD6uCNH62mSJRvMAjwIi7qcbYCznd6Wd0VuvmCQ/sizMwR5aWhMScNA/rl
+         hmuEc+DbVv1NqMjk5IXcy/Hk3oFXKZ0haMWzOfivc06wvoxpEiX1vitoLqGmZuk04L2x
+         HC73i8VxJwVCI/4Mkmi2NET/E8BffuYg/4Zged81GUTCUySqRPVe2agczTV87+sP+2pN
+         pDJV7fJq03+xTsoQaVBtN6S+RGEn7oHeifzgS2DkyqcDDGnQ9aAHk1KN9hJBM2T+WaJf
+         EdtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Sr17yjVIJ3L6nqEXDMpIqK2xXImflLFzz6ALbEm9u68=;
+        b=H+jzBqOJ8bEfzJQw1A79wQ8WBoFxWB6bsuU99T5o0Vvljh5zq82bNh+PqrM4Q8yIZV
+         sw7UVOyTF6OfFvOnEPYPOJw3pBLl1VDTxdqwDBhDplh2en+3F6JuuGLWoWb49qdcRC3v
+         K8l6pgKz4BJP/8qKKTtiaMTj54AlHgDHaZcMJLxW+xLsdDdzrqz6dLD8bmftscLTzSlj
+         Xkbyur9B1dwMJx9u0Ezc4qE2Z/ApThzDA+dP88PR+5v6Yosk9sq2gTZdKr/u128UjuVm
+         BsaQ1NmLpQ7fYSMdxhPoowRSgze+aZSCe2BONJQH6BY+w36ZEE/LlM3dNsG3WuREODRT
+         tHCQ==
+X-Gm-Message-State: AOAM530T0an3sqWmEK10r+jugFbF6VeORBWd2p8Q5J6V1dbGcw5cRGRu
+        VZ5h0T/tcXOph6evBLTV/u0WXy7obi8sM5C6zU8O6Q==
+X-Google-Smtp-Source: ABdhPJz5t3UBuJxmMbI2E3pOLPGLQiV4ByMa0pgkUilXefnRDUK3bGbZ4bWfdB/wwOZVZ58x7DxfCbRQTc3tUAIioE8=
+X-Received: by 2002:a2e:a26d:: with SMTP id k13mr10012578ljm.300.1642588342599;
+ Wed, 19 Jan 2022 02:32:22 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 19 Jan 2022
- 02:20:19 -0800 (PST)
-In-Reply-To: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
-References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
- <20220119100615.5059-1-miles.chen@mediatek.com> <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 19 Jan 2022 11:20:19 +0100
-X-Gmail-Original-Message-ID: <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
-Message-ID: <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Miles Chen <miles.chen@mediatek.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+References: <20220119015038.2433585-1-robh@kernel.org>
+In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed, 19 Jan 2022 11:31:45 +0100
+Message-ID: <CAPDyKFr5uT3H8NaAvPyGajo2R6DriYC92y=RdAk=G4PMC4MxYw@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
+To:     Rob Herring <robh@kernel.org>
+Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Georgi Djakov <djakov@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kevin Hilman <khilman@kernel.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
+        linux-pm@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        netdev@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/19/22, Ard Biesheuvel <ardb@kernel.org> wrote:
-> On Wed, 19 Jan 2022 at 11:06, Miles Chen <miles.chen@mediatek.com> wrote:
->>
->> Hi,
->>
->> >Hi Miles,
->> >
->> >I'm actually not able to reproduce your oops. I'm using vanilla clang
->> >13, cross compiling for arm64, with thin LTO enabled and CFI enabled.
->> >Kernel seems to run fine.
->> >
->> >
->> >Are there other settings that are needed to trigger this? Do you see
->> >it in upstream clang or just the Android fork of clang?
->> >
->> I will try another clang (the previous version I use).
->> I am using Android fork of clang and there is a clang upgrade in this
->> merge.
->>
+On Wed, 19 Jan 2022 at 02:50, Rob Herring <robh@kernel.org> wrote:
 >
-> One thing that could be worth a try is to make __blake2s_update() and
-> __blake2s_final() __always_inline rather than just inline, which by
-> itself does not appear to be sufficient for the code to get inlined.
-> (If it were, the indirect call should have disappeared as well)
+> The 'phandle-array' type is a bit ambiguous. It can be either just an
+> array of phandles or an array of phandles plus args. Many schemas for
+> phandle-array properties aren't clear in the schema which case applies
+> though the description usually describes it.
 >
-> Given that indirect calls suck on x86, we should probably apply that
-> change in any case, regardless of CFI.
+> The array of phandles case boils down to needing:
 >
+> items:
+>   maxItems: 1
+>
+> The phandle plus args cases should typically take this form:
+>
+> items:
+>   - items:
+>       - description: A phandle
+>       - description: 1st arg cell
+>       - description: 2nd arg cell
+>
+> With this change, some examples need updating so that the bracketing of
+> property values matches the schema.
+>
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Chun-Kuang Hu <chunkuang.hu@kernel.org>
+> Cc: Philipp Zabel <p.zabel@pengutronix.de>
+> Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Cc: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+> Cc: Vinod Koul <vkoul@kernel.org>
+> Cc: Georgi Djakov <djakov@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Joerg Roedel <joro@8bytes.org>
+> Cc: Lee Jones <lee.jones@linaro.org>
+> Cc: Daniel Thompson <daniel.thompson@linaro.org>
+> Cc: Jingoo Han <jingoohan1@gmail.com>
+> Cc: Pavel Machek <pavel@ucw.cz>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Wolfgang Grandegger <wg@grandegger.com>
+> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Vivien Didelot <vivien.didelot@gmail.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Vladimir Oltean <olteanv@gmail.com>
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: Viresh Kumar <vireshk@kernel.org>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Kishon Vijay Abraham I <kishon@ti.com>
+> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
+> Cc: Kevin Hilman <khilman@kernel.org>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Sebastian Reichel <sre@kernel.org>
+> Cc: Mark Brown <broonie@kernel.org>
+> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Zhang Rui <rui.zhang@intel.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Thierry Reding <thierry.reding@gmail.com>
+> Cc: Jonathan Hunter <jonathanh@nvidia.com>
+> Cc: Sudeep Holla <sudeep.holla@arm.com>
+> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: linux-ide@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: dri-devel@lists.freedesktop.org
+> Cc: dmaengine@vger.kernel.org
+> Cc: linux-pm@vger.kernel.org
+> Cc: iommu@lists.linux-foundation.org
+> Cc: linux-leds@vger.kernel.org
+> Cc: linux-media@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-can@vger.kernel.org
+> Cc: linux-wireless@vger.kernel.org
+> Cc: linux-phy@lists.infradead.org
+> Cc: linux-gpio@vger.kernel.org
+> Cc: linux-riscv@lists.infradead.org
+> Cc: linux-remoteproc@vger.kernel.org
+> Cc: alsa-devel@alsa-project.org
+> Cc: linux-usb@vger.kernel.org
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> ---
 
-Had the same thought at first, but then looking at the original stack
-trace, it looks like the __ function is inlined:
+For CPUs and PM domains:
 
-[    0.000000][    T0]  __cfi_slowpath_diag+0x354/0x4b0
-[    0.000000][    T0]  blake2s_update+0x14c/0x178
-[    0.000000][    T0]  _extract_entropy+0xf4/0x29c
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-So that makes me think that the issue really does involve calling
-through the weak alias. But why should weak alias calling trigger CFI?
-Compiler bug? Some other subtlety we're missing?
-
-Jason
+Kind regards
+Uffe
