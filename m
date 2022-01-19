@@ -2,78 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F35C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3344CC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbiASKLe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 05:11:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        id S1353486AbiASKNw (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 05:13:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353440AbiASKLd (ORCPT
+        with ESMTP id S1353474AbiASKNv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:11:33 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE33C061574;
-        Wed, 19 Jan 2022 02:11:33 -0800 (PST)
+        Wed, 19 Jan 2022 05:13:51 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89CF9C061574;
+        Wed, 19 Jan 2022 02:13:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 594C461566;
-        Wed, 19 Jan 2022 10:11:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 764C0C340E7;
-        Wed, 19 Jan 2022 10:11:32 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mUQ+s6q9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1642587089;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rZmc8gDqgNsLlJyQwY9u8TazOCsbUcBCdP5ULRWI5FI=;
-        b=mUQ+s6q9VJYV9dD6t4jt5v4YG8mcJrGjjBluSq0ZI4jMahXa35imbu6npbY6pXmkButnVJ
-        NaEwiEdAgsTFXRJfJKvrWDepfEXri42HC5+rG3ESUqucZTrnuyDgbuIHlBHI+5R0BOLrhD
-        Lg8nqUX1IkVGNWwujIPwZYgcvuUUlz8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3f1b0a6e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 19 Jan 2022 10:11:29 +0000 (UTC)
-Received: by mail-yb1-f176.google.com with SMTP id c6so5874653ybk.3;
-        Wed, 19 Jan 2022 02:11:28 -0800 (PST)
-X-Gm-Message-State: AOAM5321XsQfS0l5nSZJ3C5IRoaa5wD+miIQ4pI0tdtfjpXURpJadxAr
-        Xu+pHAweKKQPVCSLRvvn26nPULnf8MXp8S2awGU=
-X-Google-Smtp-Source: ABdhPJzYRh6013NycZtQZQi8QTZFhJmw5Fmt733wofIXKSa0m6oYQxRC7J/azk1MKYt3b7DTFrEvpILYXH/l94r/js8=
-X-Received: by 2002:a25:ef08:: with SMTP id g8mr4332927ybd.115.1642587086828;
- Wed, 19 Jan 2022 02:11:26 -0800 (PST)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3006EB8191A;
+        Wed, 19 Jan 2022 10:13:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CE1C340E5;
+        Wed, 19 Jan 2022 10:13:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642587228;
+        bh=1yUmZ1gtr9CBj5pMoqsvEIB5CbXXsyQeM7ffKKbaC24=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=q81WFpPHkZ7JV6ZOKutx3YkmR40mCv+CdMEBEV/oDqtHeIMtAqjMsI+Lusl40hoF7
+         LqRAw540lQZlb3gDjcnAMs6IKjNXYoc2D3wKozp/5wCOq+M/JPlLElqw0l+bIvdk5T
+         nNv7bctlnKXGscv3xmuYtKXvaN5Bc1ceZ0tEX6AKAZ0PVl+hhouyzA5nvw2UKuP43W
+         K4UabxmcdfsYryv0uIJ47AByUPXCN2kmAb+qFjV8E+g1tS4xzUf3gHME+56cKih0h7
+         VgeCDujJ3Dskn7NfyrD+AkhDqXLCoQIzNEFQo8waUrvJgGVL2f4FqAmm8gjls6l9VM
+         YjvOnUbbsfGQg==
+Received: by mail-wm1-f46.google.com with SMTP id q9-20020a7bce89000000b00349e697f2fbso13319237wmj.0;
+        Wed, 19 Jan 2022 02:13:48 -0800 (PST)
+X-Gm-Message-State: AOAM533Mge5F1gr664RRxeaIwqRdOOYv9K2gUkwV6V5mIUul6TayJtzm
+        jRiR5XW+3jhkZWxrwbBnvml4C4gEfzvLuGWDkEA=
+X-Google-Smtp-Source: ABdhPJxqBXw77uQHArSK2VBrtoFpSbj05KpONweHZEWVRXOUUkrJGt/k3ZzOnZtzegeC/V1Mhu+oTLrNfHeOMfbtlwY=
+X-Received: by 2002:a05:600c:3c9c:: with SMTP id bg28mr2689276wmb.190.1642587227212;
+ Wed, 19 Jan 2022 02:13:47 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 19 Jan 2022
- 02:11:26 -0800 (PST)
-In-Reply-To: <20220119100615.5059-1-miles.chen@mediatek.com>
 References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
  <20220119100615.5059-1-miles.chen@mediatek.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 19 Jan 2022 11:11:26 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pQcUxs87EwQwBZNDA4ZzqugTggH+uiNPh=mv5zjp3g3A@mail.gmail.com>
-Message-ID: <CAHmME9pQcUxs87EwQwBZNDA4ZzqugTggH+uiNPh=mv5zjp3g3A@mail.gmail.com>
+In-Reply-To: <20220119100615.5059-1-miles.chen@mediatek.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 19 Jan 2022 11:13:35 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
+Message-ID: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
 Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
 To:     Miles Chen <miles.chen@mediatek.com>
-Cc:     ardb@kernel.org, davem@davemloft.net, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
-        nathan@kernel.org, ndesaulniers@google.com
+Cc:     "Jason A. Donenfeld" <jason@zx2c4.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Miles,
+On Wed, 19 Jan 2022 at 11:06, Miles Chen <miles.chen@mediatek.com> wrote:
+>
+> Hi,
+>
+> >Hi Miles,
+> >
+> >I'm actually not able to reproduce your oops. I'm using vanilla clang
+> >13, cross compiling for arm64, with thin LTO enabled and CFI enabled.
+> >Kernel seems to run fine.
+> >
+> >
+> >Are there other settings that are needed to trigger this? Do you see
+> >it in upstream clang or just the Android fork of clang?
+> >
+> I will try another clang (the previous version I use).
+> I am using Android fork of clang and there is a clang upgrade in this merge.
+>
 
-Okay. Keep me posted.
+One thing that could be worth a try is to make __blake2s_update() and
+__blake2s_final() __always_inline rather than just inline, which by
+itself does not appear to be sufficient for the code to get inlined.
+(If it were, the indirect call should have disappeared as well)
 
-Just FYI, as mentioned, I'm unable to reproduce this, and you haven't
-provided any further minimized guidance on how I might reproduce this,
-so it'll sit in the "not a bug" bin until I have another clue on how
-to reproduce. Alternatively, Nick and Nathan are now on this thread
-and they usually have good luck teasing out compiler issues and such,
-so maybe they'll have an idea. But I'm afraid with the information I
-currently have, I'm at a dead end.
-
-Jason
+Given that indirect calls suck on x86, we should probably apply that
+change in any case, regardless of CFI.
