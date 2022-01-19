@@ -2,126 +2,246 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0982FC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 12:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480B1C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 12:15:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347172AbiASMJV (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 07:09:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41276 "EHLO
+        id S244350AbiASMPF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 19 Jan 2022 07:15:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234677AbiASMJU (ORCPT
+        with ESMTP id S234677AbiASMPE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 07:09:20 -0500
+        Wed, 19 Jan 2022 07:15:04 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A51C061574;
-        Wed, 19 Jan 2022 04:09:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EED8C061574;
+        Wed, 19 Jan 2022 04:15:04 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C30661659;
-        Wed, 19 Jan 2022 12:09:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C899C004E1;
-        Wed, 19 Jan 2022 12:09:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642594158;
-        bh=jTL1kOllWwNpAyRghJtzBJcKTv5b3vqCwXM1meqTpw0=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=EAM3BRW+CbiGfMCjMaveMIE0YyZKBv4YGXrhRLSxa7sz3YBI0QQEuz2LrLupXBm6Y
-         R889FqqDBLJRbmysGVMQsKr1+BPa+yDJxTjvvCiMdGOmw3WRnNeHLu+nDQzZ0VrcIg
-         537D4y6llCDYE69wujlX8OZOzzDzuUv4TZj1s79d9eFb+RXQG9+f7bhJe+cQ9hqXOs
-         UzplFSvX38xneJW3n6U2ZW+ZGtGaC4rD9CUZ5eJbXp53b/2qOgmJO8dTGx52wnNROz
-         mMWxGEVBV5Zu24UiKq2KQXFZoJvf1AB0QizfrxdUr/IZ5hnV98uHFEwvu8cGlN1QiB
-         De5JfwgYpTzOg==
-Message-ID: <07adcd47-79c9-ae37-80c6-d1204c6cfea4@kernel.org>
-Date:   Wed, 19 Jan 2022 14:09:01 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF3F46165D;
+        Wed, 19 Jan 2022 12:15:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF2F3C340E5;
+        Wed, 19 Jan 2022 12:15:01 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LFmLzzaA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642594499;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oqPoURrh2OenrimngDds3Y6xfS7K9xZiRRRqbBfATI4=;
+        b=LFmLzzaAdc/rt2IRy8viOkLqh2GecxQEPEXLnK6AdmXlSy1esKW0GB9UGBa1FcAojm/nBX
+        B5ZmONTVZtoo0ubOWfeJET/rKUO2wWmLxvyScQ9RxbZMxLIsY0VWbe+EhnfsrHY6xmq47B
+        X+S4WwxjsmB6cWsiWf4CZLQ+QLf5pGQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8c9efe0b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 19 Jan 2022 12:14:58 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id m6so6736964ybc.9;
+        Wed, 19 Jan 2022 04:14:58 -0800 (PST)
+X-Gm-Message-State: AOAM533sQRrVc0ifJKRCpRRF1KeGMfkMVpKtIUr4n7vuBWZFwoHZDbsJ
+        470YFcSrLmh91+/tMbdVnsVVZtqdyBafWIAdAKs=
+X-Google-Smtp-Source: ABdhPJzSX7aBj/gbCxLFExin+AjAF4ZjBoaf4z8ErS7FBy0lDfDOYEgjMLfMQwkQbzAXzxuso0K6P0YMHa/eszMttCc=
+X-Received: by 2002:a25:e90a:: with SMTP id n10mr13207529ybd.245.1642594496777;
+ Wed, 19 Jan 2022 04:14:56 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
-Content-Language: en-US
-To:     Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Kalle Valo <kvalo@kernel.org>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kevin Hilman <khilman@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
-        linux-pm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-usb@vger.kernel.org
-References: <20220119015038.2433585-1-robh@kernel.org>
-From:   Georgi Djakov <djakov@kernel.org>
-In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 19 Jan 2022
+ 04:14:56 -0800 (PST)
+In-Reply-To: <CAHmME9pPKjRLmR6zpYFZT7rOOfHsG2ESnDi+QQrDJuGLo1X4JQ@mail.gmail.com>
+References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
+ <20220119100615.5059-1-miles.chen@mediatek.com> <CAHmME9pQcUxs87EwQwBZNDA4ZzqugTggH+uiNPh=mv5zjp3g3A@mail.gmail.com>
+ <CAHmME9pPKjRLmR6zpYFZT7rOOfHsG2ESnDi+QQrDJuGLo1X4JQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 19 Jan 2022 13:14:56 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oGTPS-gVyHQ4o=AxvMJrGH44_tyQ2KPQcfAKgcqC2SnA@mail.gmail.com>
+Message-ID: <CAHmME9oGTPS-gVyHQ4o=AxvMJrGH44_tyQ2KPQcfAKgcqC2SnA@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
+To:     Miles Chen <miles.chen@mediatek.com>
+Cc:     ardb@kernel.org, davem@davemloft.net, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
+        nathan@kernel.org, ndesaulniers@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The below kludge of a patch fixes the issue. Still unclear whether we
+should go with something like this or get clang fixed or what.
 
-On 19.01.22 3:50, Rob Herring wrote:
-> The 'phandle-array' type is a bit ambiguous. It can be either just an
-> array of phandles or an array of phandles plus args. Many schemas for
-> phandle-array properties aren't clear in the schema which case applies
-> though the description usually describes it.
-> 
-> The array of phandles case boils down to needing:
-> 
-> items:
->    maxItems: 1
-> 
-> The phandle plus args cases should typically take this form:
-> 
-> items:
->    - items:
->        - description: A phandle
->        - description: 1st arg cell
->        - description: 2nd arg cell
-> 
-> With this change, some examples need updating so that the bracketing of
-> property values matches the schema.
-> 
-[..]
->   .../bindings/interconnect/qcom,rpmh.yaml      |  2 +
+diff --git a/arch/arm/crypto/blake2s-shash.c b/arch/arm/crypto/blake2s-shash.c
+index 17c1c3bfe2f5..be8cde5f1719 100644
+--- a/arch/arm/crypto/blake2s-shash.c
++++ b/arch/arm/crypto/blake2s-shash.c
+@@ -13,12 +13,12 @@
+ static int crypto_blake2s_update_arm(struct shash_desc *desc,
+ 				     const u8 *in, unsigned int inlen)
+ {
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++	return crypto_blake2s_update(desc, in, inlen);
+ }
 
-Acked-by: Georgi Djakov <djakov@kernel.org>
+ static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
+ {
+-	return crypto_blake2s_final(desc, out, blake2s_compress);
++	return crypto_blake2s_final(desc, out);
+ }
+
+ #define BLAKE2S_ALG(name, driver_name, digest_size)			\
+diff --git a/arch/x86/crypto/blake2s-shash.c b/arch/x86/crypto/blake2s-shash.c
+index f9e2fecdb761..c81ffedb4865 100644
+--- a/arch/x86/crypto/blake2s-shash.c
++++ b/arch/x86/crypto/blake2s-shash.c
+@@ -18,12 +18,12 @@
+ static int crypto_blake2s_update_x86(struct shash_desc *desc,
+ 				     const u8 *in, unsigned int inlen)
+ {
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++	return crypto_blake2s_update(desc, in, inlen);
+ }
+
+ static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
+ {
+-	return crypto_blake2s_final(desc, out, blake2s_compress);
++	return crypto_blake2s_final(desc, out);
+ }
+
+ #define BLAKE2S_ALG(name, driver_name, digest_size)			\
+diff --git a/crypto/blake2s_generic.c b/crypto/blake2s_generic.c
+index 72fe480f9bd6..050874588a84 100644
+--- a/crypto/blake2s_generic.c
++++ b/crypto/blake2s_generic.c
+@@ -5,6 +5,7 @@
+  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All
+Rights Reserved.
+  */
+
++#define FORCE_BLAKE2S_GENERIC
+ #include <crypto/internal/blake2s.h>
+ #include <crypto/internal/hash.h>
+
+@@ -15,12 +16,12 @@
+ static int crypto_blake2s_update_generic(struct shash_desc *desc,
+ 					 const u8 *in, unsigned int inlen)
+ {
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_generic);
++	return crypto_blake2s_update(desc, in, inlen);
+ }
+
+ static int crypto_blake2s_final_generic(struct shash_desc *desc, u8 *out)
+ {
+-	return crypto_blake2s_final(desc, out, blake2s_compress_generic);
++	return crypto_blake2s_final(desc, out);
+ }
+
+ #define BLAKE2S_ALG(name, driver_name, digest_size)			\
+diff --git a/include/crypto/internal/blake2s.h
+b/include/crypto/internal/blake2s.h
+index d39cfa0d333e..fec7eead93fc 100644
+--- a/include/crypto/internal/blake2s.h
++++ b/include/crypto/internal/blake2s.h
+@@ -24,14 +24,14 @@ static inline void blake2s_set_lastblock(struct
+blake2s_state *state)
+ 	state->f[0] = -1;
+ }
+
+-typedef void (*blake2s_compress_t)(struct blake2s_state *state,
+-				   const u8 *block, size_t nblocks, u32 inc);
+-
+ /* Helper functions for BLAKE2s shared by the library and shash APIs */
+
++#ifdef FORCE_BLAKE2S_GENERIC
++#define blake2s_compress blake2s_compress_generic
++#endif
++
+ static inline void __blake2s_update(struct blake2s_state *state,
+-				    const u8 *in, size_t inlen,
+-				    blake2s_compress_t compress)
++				    const u8 *in, size_t inlen)
+ {
+ 	const size_t fill = BLAKE2S_BLOCK_SIZE - state->buflen;
+
+@@ -39,7 +39,7 @@ static inline void __blake2s_update(struct
+blake2s_state *state,
+ 		return;
+ 	if (inlen > fill) {
+ 		memcpy(state->buf + state->buflen, in, fill);
+-		(*compress)(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
++		blake2s_compress(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
+ 		state->buflen = 0;
+ 		in += fill;
+ 		inlen -= fill;
+@@ -47,7 +47,7 @@ static inline void __blake2s_update(struct
+blake2s_state *state,
+ 	if (inlen > BLAKE2S_BLOCK_SIZE) {
+ 		const size_t nblocks = DIV_ROUND_UP(inlen, BLAKE2S_BLOCK_SIZE);
+ 		/* Hash one less (full) block than strictly possible */
+-		(*compress)(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
++		blake2s_compress(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
+ 		in += BLAKE2S_BLOCK_SIZE * (nblocks - 1);
+ 		inlen -= BLAKE2S_BLOCK_SIZE * (nblocks - 1);
+ 	}
+@@ -55,13 +55,12 @@ static inline void __blake2s_update(struct
+blake2s_state *state,
+ 	state->buflen += inlen;
+ }
+
+-static inline void __blake2s_final(struct blake2s_state *state, u8 *out,
+-				   blake2s_compress_t compress)
++static inline void __blake2s_final(struct blake2s_state *state, u8 *out)
+ {
+ 	blake2s_set_lastblock(state);
+ 	memset(state->buf + state->buflen, 0,
+ 	       BLAKE2S_BLOCK_SIZE - state->buflen); /* Padding */
+-	(*compress)(state, state->buf, 1, state->buflen);
++	blake2s_compress(state, state->buf, 1, state->buflen);
+ 	cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
+ 	memcpy(out, state->h, state->outlen);
+ }
+@@ -98,21 +97,19 @@ static inline int crypto_blake2s_init(struct
+shash_desc *desc)
+ }
+
+ static inline int crypto_blake2s_update(struct shash_desc *desc,
+-					const u8 *in, unsigned int inlen,
+-					blake2s_compress_t compress)
++					const u8 *in, unsigned int inlen)
+ {
+ 	struct blake2s_state *state = shash_desc_ctx(desc);
+
+-	__blake2s_update(state, in, inlen, compress);
++	__blake2s_update(state, in, inlen);
+ 	return 0;
+ }
+
+-static inline int crypto_blake2s_final(struct shash_desc *desc, u8 *out,
+-				       blake2s_compress_t compress)
++static inline int crypto_blake2s_final(struct shash_desc *desc, u8 *out)
+ {
+ 	struct blake2s_state *state = shash_desc_ctx(desc);
+
+-	__blake2s_final(state, out, compress);
++	__blake2s_final(state, out);
+ 	return 0;
+ }
+
+diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+index 9364f79937b8..a13f01ff53a7 100644
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -18,14 +18,14 @@
+
+ void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
+ {
+-	__blake2s_update(state, in, inlen, blake2s_compress);
++	__blake2s_update(state, in, inlen);
+ }
+ EXPORT_SYMBOL(blake2s_update);
+
+ void blake2s_final(struct blake2s_state *state, u8 *out)
+ {
+ 	WARN_ON(IS_ENABLED(DEBUG) && !out);
+-	__blake2s_final(state, out, blake2s_compress);
++	__blake2s_final(state, out);
+ 	memzero_explicit(state, sizeof(*state));
+ }
+ EXPORT_SYMBOL(blake2s_final);
