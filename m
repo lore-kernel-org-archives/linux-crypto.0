@@ -2,99 +2,154 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E0E6C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 06:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD9FC4321E
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 07:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350228AbiASG6y (ORCPT
+        id S1352148AbiASHlG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 01:58:54 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59680 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1345647AbiASG6x (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 01:58:53 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nA4vY-0008Th-0i; Wed, 19 Jan 2022 17:58:41 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Jan 2022 17:58:40 +1100
-Date:   Wed, 19 Jan 2022 17:58:40 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     davem@davemloft.net, linux-arm-kernel@lists.infradead.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: authenc - Fix sleep in atomic context in decrypt_tail
-Message-ID: <Yee2oKxPSLaYY31N@gondor.apana.org.au>
-References: <Yd1SIHUNdLIvKhzz@Red>
- <YeD4rt1OVnEMBr+A@gondor.apana.org.au>
- <YeD6vt47+pAl0SxG@gondor.apana.org.au>
- <YeEiWmkyNwfgQgmn@Red>
- <YeZx1aVL0HnT9tCB@Red>
+        Wed, 19 Jan 2022 02:41:06 -0500
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:38128
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1352110AbiASHlF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Jan 2022 02:41:05 -0500
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com [209.85.167.70])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id BD7044005B
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 07:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1642578063;
+        bh=KOwrbfmVaaY4sfUgcL8mu/NpRfAwFGVtSAETT0kqBAg=;
+        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+         In-Reply-To:Content-Type;
+        b=bF6u0UizThWnJKp9pfXokpEjorghdPKIBCyYZVG592/0jQr6gphbDQQJQFsbgd+bq
+         XGlWkWs/0SNPm9ei8uLzJWg5pMRyNXlwewTO+ZuNLtnUA2bv8NeeZGWYJ4JHsQIejC
+         4N8z2TZLdxFXEjczxTWXhU58hEYyrKcrpxxrGk5kpzLRXdRmUeJTiPx/hP2fmMZ+Ky
+         k1ioqf0B79tAKqH/WzbiVpU9y3KqDHOTwlHBlWLt76Hp8tMv336XmOIY5xiJJbNQJH
+         W4kz/FTlebmC579eNQIULhud3PymyeOGSZU0dqvA1Ev9H+WtL726WVHjsI+hMbB0/b
+         vQIv95TBHjg9Q==
+Received: by mail-lf1-f70.google.com with SMTP id 7-20020ac24827000000b0042e731a7bc7so968378lft.18
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jan 2022 23:41:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=KOwrbfmVaaY4sfUgcL8mu/NpRfAwFGVtSAETT0kqBAg=;
+        b=qon2YysINO0YbIaKLNO/UFPUC0RUBBj2Z8E3KXNDacUyXjlKU+fhisQIrR7VmyItBn
+         tQDnBittIovMo8wyWXjEAvUTomVc8tbOv2/kpWs5CTU+4xyLwp39KqQgirtTsQcIOnVU
+         LiuKCvhW7G2WqMKk3WkbivHebZs8dH44AR/4IcyPtgWV59P9e3VQY0OejV0hvR+b6R+8
+         dUpJBra3bazRsB6RexhJ2URPtHy/DgPfRmePK6GlN7e02RutHjZ76CoCtW9BpBOQ50Z8
+         Mn89tWACtRazKShCY9CDf0jVAeuF4gVtW6PC0R+75fG1erICKiU5YfxNRi8Z4Wp/Snw7
+         RBUg==
+X-Gm-Message-State: AOAM533ykfSdD7PU8Nd+/UlGOj14LcEPS8JTx9rOMtlRhCKcDJD3Xtdf
+        tQiwS1jRtN9YVoUpdDTKxmf5wTGOEYuq/sjjrtv4o/NDJUifwMXbvTnhMftf6xR0UsoQ4EXInBh
+        UoDdKDtUT3ysaCcpn3ScELPkcTBi4rQARemRnDFf0bQ==
+X-Received: by 2002:a17:907:7ea6:: with SMTP id qb38mr23673598ejc.557.1642578052250;
+        Tue, 18 Jan 2022 23:40:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwcC/F4TT/k1wEFa2HsX2oDgdxrLKxkyNjrLq8ReErAXQsVWpB2ePW4VmJCVcsiAdC0JWuWGg==
+X-Received: by 2002:a17:907:7ea6:: with SMTP id qb38mr23673541ejc.557.1642578052033;
+        Tue, 18 Jan 2022 23:40:52 -0800 (PST)
+Received: from [192.168.0.42] (xdsl-188-155-168-84.adslplus.ch. [188.155.168.84])
+        by smtp.gmail.com with ESMTPSA id d2sm791994edy.86.2022.01.18.23.40.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Jan 2022 23:40:51 -0800 (PST)
+Message-ID: <21b72055-e158-6586-f48a-17695128b507@canonical.com>
+Date:   Wed, 19 Jan 2022 08:40:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YeZx1aVL0HnT9tCB@Red>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
+Content-Language: en-US
+To:     Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
+        Vinod Koul <vkoul@kernel.org>,
+        Georgi Djakov <djakov@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+        Lee Jones <lee.jones@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kevin Hilman <khilman@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Zhang Rui <rui.zhang@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
+        linux-pm@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        netdev@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-usb@vger.kernel.org
+References: <20220119015038.2433585-1-robh@kernel.org>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 08:52:53AM +0100, Corentin Labbe wrote:
->
-> With my patch, I got:
-> [   38.515668] BUG: sleeping function called from invalid context at crypto/skcipher.c:482
-> [   38.523708] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 84, name: 1c15000.crypto-
-> [   38.532176] preempt_count: 200, expected: 0
-> [   38.536381] CPU: 6 PID: 84 Comm: 1c15000.crypto- Not tainted 5.16.0-next-20220115-00124-g13473e8fac33-dirty #116
-> [   38.546551] Hardware name: Allwinner A83t board
-> [   38.551100]  unwind_backtrace from show_stack+0x10/0x14
-> [   38.556358]  show_stack from dump_stack_lvl+0x40/0x4c
-> [   38.561428]  dump_stack_lvl from __might_resched+0x118/0x154
-> [   38.567107]  __might_resched from skcipher_walk_virt+0xe8/0xec
-> [   38.572955]  skcipher_walk_virt from crypto_cbc_decrypt+0x2c/0x170
-> [   38.579147]  crypto_cbc_decrypt from crypto_skcipher_decrypt+0x38/0x5c
-> [   38.585680]  crypto_skcipher_decrypt from authenc_verify_ahash_done+0x18/0x34
-> [   38.592825]  authenc_verify_ahash_done from crypto_finalize_request+0x6c/0xe4
-> [   38.599974]  crypto_finalize_request from sun8i_ss_hash_run+0x73c/0xb98
-> [   38.606602]  sun8i_ss_hash_run from crypto_pump_work+0x1a8/0x330
-> [   38.612616]  crypto_pump_work from kthread_worker_fn+0xa8/0x1c4
-> [   38.618550]  kthread_worker_fn from kthread+0xf0/0x110
-> [   38.623701]  kthread from ret_from_fork+0x14/0x2c
-> [   38.628414] Exception stack(0xc2247fb0 to 0xc2247ff8)
-> [   38.633468] 7fa0:                                     00000000 00000000 00000000 00000000
-> [   38.641640] 7fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [   38.649809] 7fe0:i 00000000 00000000 00000000 00000000 00000013 00000000
+On 19/01/2022 02:50, Rob Herring wrote:
+> The 'phandle-array' type is a bit ambiguous. It can be either just an
+> array of phandles or an array of phandles plus args. Many schemas for
+> phandle-array properties aren't clear in the schema which case applies
+> though the description usually describes it.
 > 
-> This is when testing hmac(sha1) on my crypto driver sun8i-ss and crypto testing authenc(hmac-sha1-sun8i-ss,cbc(aes-generic)).
+> The array of phandles case boils down to needing:
 > 
-> Do you have any idea to better fix my issue ?
+> items:
+>   maxItems: 1
+> 
+> The phandle plus args cases should typically take this form:
+> 
+> items:
+>   - items:
+>       - description: A phandle
+>       - description: 1st arg cell
+>       - description: 2nd arg cell
+> 
+> With this change, some examples need updating so that the bracketing of
+> property values matches the schema.
+> 
 
-This backtrace is caused by a bug in authenc:
+Samsung and memory controller bits look good:
 
----8<---
-The function crypto_authenc_decrypt_tail discards its flags
-argument and always relies on the flags from the original request
-when starting its sub-request.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 
-This is clearly wrong as it may cause the SLEEPABLE flag to be
-set when it shouldn't.
 
-Fixes: 92d95ba91772 ("crypto: authenc - Convert to new AEAD interface")
-Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 670bf1a01d00..17f674a7cdff 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -253,7 +253,7 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
- 		dst = scatterwalk_ffwd(areq_ctx->dst, req->dst, req->assoclen);
- 
- 	skcipher_request_set_tfm(skreq, ctx->enc);
--	skcipher_request_set_callback(skreq, aead_request_flags(req),
-+	skcipher_request_set_callback(skreq, flags,
- 				      req->base.complete, req->base.data);
- 	skcipher_request_set_crypt(skreq, src, dst,
- 				   req->cryptlen - authsize, req->iv);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Krzysztof
