@@ -2,91 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9100CC4167E
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 00:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA12C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 00:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350354AbiASAPB (ORCPT
+        id S1350417AbiASAW0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jan 2022 19:15:01 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:47630 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347584AbiASAO6 (ORCPT
+        Tue, 18 Jan 2022 19:22:26 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:60896 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244782AbiASAWZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jan 2022 19:14:58 -0500
+        Tue, 18 Jan 2022 19:22:25 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7DC76B81835;
-        Wed, 19 Jan 2022 00:14:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02791C340E8;
-        Wed, 19 Jan 2022 00:14:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0619D614BB;
+        Wed, 19 Jan 2022 00:22:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32395C340E0;
+        Wed, 19 Jan 2022 00:22:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642551296;
-        bh=+cyvg79Yoc1+H+2u1HYQD/NiYmUvcj5Tf7vTlBCGeck=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ghM5M8Icx8UJsYh+afyAa1Wq0/G53gIa4CSA5ulAf7X45HJPLRUnEkxq0MvdD2f8/
-         3sTvGaauD5/6IowA1USStvJ3CujJ/Hvvf5MiKjYeQjsmw/ifitgEGDx+VImJUeSkWe
-         UwYg6Hj4KA61rH8Y1JTXTB8soRDxasihI4hratpnfaiQ+ZIa+NaPNx5+4/pl34iq75
-         3Ibvlt2Zm5UAYB99AOI5+XdPtEMIcx8SM9jH6qXiFjUycZ5pU6adHrghgoHCOy+bgn
-         ENYOUqDBCGdUcCKa40UqvEbbo8T2mIGiAM/j9pzkKRw4KNEuTZD5HJQVbyP66tiCxx
-         Wf+wdxKVa4RGg==
+        s=k20201202; t=1642551744;
+        bh=b429HbqqH8lUXICzovtu5109bnCHzy+254BIOm8+Gz0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aXCOo7/IhVJnUEXuLzfd9NklLIMxWxcNE77iGSprLJGG3T31wMa4NekDkA17SDp7T
+         tcD0AeSA/OPu+DvIbFFYc3vL7KCQV96iedLiOMC8xSEelasSW1SZdZpkgniloijiCD
+         rsU0VhazHGqvGd3xCtNX7hqbjm9ywy7yAN+eIXD0DVqFn3UV32ixEXwAdO+gqITgVu
+         TAEVK2rlnvuktSDJIUFqVcY6t9a80dQmjM6XM7FDneWMqq37XkxhE7YQQU+rsMcKrh
+         X889hA2mIBa1nkVXDQmEoxHXVFTupITSRYSRYWX2ZK8ivS+95u8VfaRqyjO7wp6iwU
+         Hl6G8XdIkVKvw==
+Date:   Tue, 18 Jan 2022 16:22:22 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     keyrings@vger.kernel.org, Vitaly Chikunov <vt@altlinux.org>,
-        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org,
-        Tadeusz Struk <tadeusz.struk@linaro.org>
-Subject: [PATCH v2 3/5] crypto: rsa-pkcs1pad - restore signature length check
-Date:   Tue, 18 Jan 2022 16:13:04 -0800
-Message-Id: <20220119001306.85355-4-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220119001306.85355-1-ebiggers@kernel.org>
-References: <20220119001306.85355-1-ebiggers@kernel.org>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KEYS: fix length validation in keyctl_pkey_params_get_2()
+Message-ID: <YedZviVNB2X7yeTX@sol.localdomain>
+References: <20220113200454.72609-1-ebiggers@kernel.org>
+ <YeMWLyceg4xcwShF@iki.fi>
+ <YeMmPs+gf+q7XUv4@sol.localdomain>
+ <YeM7+Nyi2p7Yv7+Q@iki.fi>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YeM7+Nyi2p7Yv7+Q@iki.fi>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, Jan 15, 2022 at 11:26:16PM +0200, Jarkko Sakkinen wrote:
+> On Sat, Jan 15, 2022 at 11:53:34AM -0800, Eric Biggers wrote:
+> > On Sat, Jan 15, 2022 at 08:45:03PM +0200, Jarkko Sakkinen wrote:
+> > > On Thu, Jan 13, 2022 at 12:04:54PM -0800, Eric Biggers wrote:
+> > > > From: Eric Biggers <ebiggers@google.com>
+> > > > 
+> > > > In many cases, keyctl_pkey_params_get_2() is validating the user buffer
+> > > > lengths against the wrong algorithm properties.  Fix it to check against
+> > > > the correct properties.
+> > > > 
+> > > > Probably this wasn't noticed before because for all asymmetric keys of
+> > > > the "public_key" subtype, max_data_size == max_sig_size == max_enc_size
+> > > > == max_dec_size.  However, this isn't necessarily true for the
+> > > > "asym_tpm" subtype (it should be, but it's not strictly validated).  Of
+> > > > course, future key types could have different values as well.
+> > > 
+> > > With a quick look, asym_tpm is TPM 1.x only, which only has 2048-bit RSA
+> > > keys.
+> > 
+> > The code allows other lengths, as well as the case where the "RSA key size"
+> > doesn't match the "public key size".  Probably both are bugs and they should
+> > both be 256 bytes (2048 bits) only.  Anyway, that would be a separate fix.
+> > 
+> > - Eric
+> 
+> I'm fine with the current commit message. E.g. I have no idea at this
+> point whether there should be in future separate asym_tpm2 or all bundled
+> to asym_tpm.
+> 
+> Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> 
 
-RSA PKCS#1 v1.5 signatures are required to be the same length as the RSA
-key size.  RFC8017 specifically requires the verifier to check this
-(https://datatracker.ietf.org/doc/html/rfc8017#section-8.2.2).
+Okay, great.  Just to be clear, I'm expecting either you or David
+(maintainer:KEYS/KEYRINGS) to apply this patch.  Acked-by is usually given by a
+maintainer when someone else applies a patch.
 
-Commit a49de377e051 ("crypto: Add hash param to pkcs1pad") changed the
-kernel to allow longer signatures, but didn't explain this part of the
-change; it seems to be unrelated to the rest of the commit.
-
-Revert this change, since it doesn't appear to be correct.
-
-We can be pretty sure that no one is relying on overly-long signatures
-(which would have to be front-padded with zeroes) being supported, given
-that they would have been broken since commit c7381b012872
-("crypto: akcipher - new verify API for public key algorithms").
-
-Fixes: a49de377e051 ("crypto: Add hash param to pkcs1pad")
-Cc: <stable@vger.kernel.org> # v4.6+
-Cc: Tadeusz Struk <tadeusz.struk@linaro.org>
-Suggested-by: Vitaly Chikunov <vt@altlinux.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/rsa-pkcs1pad.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 7b223adebabf6..6b556ddeb3a00 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -538,7 +538,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 
- 	if (WARN_ON(req->dst) ||
- 	    WARN_ON(!req->dst_len) ||
--	    !ctx->key_size || req->src_len < ctx->key_size)
-+	    !ctx->key_size || req->src_len != ctx->key_size)
- 		return -EINVAL;
- 
- 	req_ctx->out_buf = kmalloc(ctx->key_size + req->dst_len, GFP_KERNEL);
--- 
-2.34.1
-
+- Eric
