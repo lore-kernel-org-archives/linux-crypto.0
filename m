@@ -2,142 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 074ECC43217
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 13:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59837C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 13:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354709AbiASNZQ (ORCPT
+        id S1343765AbiASNer (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 08:25:16 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4432 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350184AbiASNZP (ORCPT
+        Wed, 19 Jan 2022 08:34:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238516AbiASNer (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 08:25:15 -0500
-Received: from fraeml712-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Jf5wV6qk1z67HKP;
-        Wed, 19 Jan 2022 21:24:58 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml712-chm.china.huawei.com (10.206.15.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 19 Jan 2022 14:25:12 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.021;
- Wed, 19 Jan 2022 14:25:12 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Antony Vennard <antony@vennard.ch>
-CC:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>
-Subject: RE: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-Thread-Topic: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-Thread-Index: AQHYBxWUAJoIvMeqLk2UYoD6PZRMZ6xnP9oAgAAHlwCAAfOkgIAAJTmAgAD7bXA=
-Date:   Wed, 19 Jan 2022 13:25:12 +0000
-Message-ID: <d71ea8ae51e1438c894b44b011f3efda@huawei.com>
-References: <20220111180318.591029-1-roberto.sassu@huawei.com>
- <YeV+jkGg6mpQdRID@zx2c4.com>
- <d92912bba61ee37e42d04b64073b9031604acc0f.camel@HansenPartnership.com>
- <079f10b9-060b-3a36-2224-fa1b483cbad5@vennard.ch>
- <YedHR93wPLS/JEsE@sol.localdomain>
-In-Reply-To: <YedHR93wPLS/JEsE@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.48.214.59]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 19 Jan 2022 08:34:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC01C061574;
+        Wed, 19 Jan 2022 05:34:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2F974B8189A;
+        Wed, 19 Jan 2022 13:34:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B128C340E9;
+        Wed, 19 Jan 2022 13:34:43 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lo/qsE3O"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642599280;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KZuC6TmXhJQVSeFuSv1mMMFPmjV47Ffvc9/epCoTyMw=;
+        b=lo/qsE3OdM57p2UPmTM4vhgsJTwEd33zm6WXgphvGllfKgyMDMYAL/ekg+CEXfP4YXyYY6
+        etdTZ/wfi5hqt1w9QzeK76g8zOqVnVlqs9ATDpWRgNPoTvm89wvC/T6qXWD6iOH6npuQGi
+        bjRJctbJQH6hIDE37t1E6Rfmu4qT9TE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d4afa98c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 19 Jan 2022 13:34:40 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id m1so7467250ybo.5;
+        Wed, 19 Jan 2022 05:34:40 -0800 (PST)
+X-Gm-Message-State: AOAM530FrciVPFIeptolOo40eZbvW2d9OWsxNCvGTVpcDTYc1Zi78lNP
+        cygai3szlc/ZVqnlJaUgwphmib81FCBXLRx0MSg=
+X-Google-Smtp-Source: ABdhPJwl2oYebyTcjJJzYEcQx1P0FnZ8TEkLTKOLecv3UE1gMShS+rFpjiSNu6UvcQ2d9xR0yhRTcFuoVyPulYXQV48=
+X-Received: by 2002:a05:6902:709:: with SMTP id k9mr15518165ybt.113.1642599277841;
+ Wed, 19 Jan 2022 05:34:37 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
+ <20220119100615.5059-1-miles.chen@mediatek.com> <CAHmME9pQcUxs87EwQwBZNDA4ZzqugTggH+uiNPh=mv5zjp3g3A@mail.gmail.com>
+ <CAHmME9pPKjRLmR6zpYFZT7rOOfHsG2ESnDi+QQrDJuGLo1X4JQ@mail.gmail.com>
+ <CAHmME9oGTPS-gVyHQ4o=AxvMJrGH44_tyQ2KPQcfAKgcqC2SnA@mail.gmail.com> <CAMj1kXEo8kQNeoCdwvBkkW0UeYFQEJwkZ_nj06qjsBDF2Qu2pQ@mail.gmail.com>
+In-Reply-To: <CAMj1kXEo8kQNeoCdwvBkkW0UeYFQEJwkZ_nj06qjsBDF2Qu2pQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 19 Jan 2022 14:34:27 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qVMomgb53rABKsucCoEhwsk+=KzDdEcGKtecOXuahTZw@mail.gmail.com>
+Message-ID: <CAHmME9qVMomgb53rABKsucCoEhwsk+=KzDdEcGKtecOXuahTZw@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Miles Chen <miles.chen@mediatek.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBGcm9tOiBFcmljIEJpZ2dlcnMgW21haWx0bzplYmlnZ2Vyc0BrZXJuZWwub3JnXQ0KPiBTZW50
-OiBXZWRuZXNkYXksIEphbnVhcnkgMTksIDIwMjIgMTI6MDQgQU0NCj4gT24gVHVlLCBKYW4gMTgs
-IDIwMjIgYXQgMDk6NTA6MjFQTSArMDEwMCwgQW50b255IFZlbm5hcmQgd3JvdGU6DQo+ID4NCj4g
-PiBIaSBBbGwsDQo+ID4NCj4gPiBPbiAxNy8wMS8yMDIyIDE2OjAyLCBKYW1lcyBCb3R0b21sZXkg
-d3JvdGU6DQo+ID4gPiBPbiBNb24sIDIwMjItMDEtMTcgYXQgMTU6MzQgKzAxMDAsIEphc29uIEEu
-IERvbmVuZmVsZCB3cm90ZToNCj4gPiA+ID4gSGksDQo+ID4gPiA+DQo+ID4gPiA+IFdoaWxlIGl0
-IGxvb2tzIGxpa2UgeW91IHB1dCBhIGxvdCBvZiB3b3JrIGludG8gdGhpcyBwYXRjaHNldCwgSSB0
-aGluaw0KPiA+ID4gPiB0aGUgZ2VuZXJhbCBpZGVhIG9mIGFkZGluZyBQR1AgKnRvIHRoZSBrZXJu
-ZWwqIGlzIGEgcHJldHR5IGRhdW50aW5nDQo+ID4gPiA+IHByb3Bvc2l0aW9uLiBUaGUgZ2VuZXJh
-bCBjb25zZW5zdXMgaW4gdGhlIGNyeXB0byBlbmdpbmVlcmluZyB3b3JsZCBpcw0KPiA+ID4gPiB0
-aGF0IFBHUCBvdWdodCB0byBiZSBvbiBpdHMgd2F5IG91dC4gV2UgZGVmaW5pdGVseSBkb24ndCB3
-YW50IHRvDQo+ID4gPiA+IHBlcnBldHVhdGUgdGhpcyBwcm9qZWN0LW9uLWxpZmUtc3VwcG9ydCBp
-bnRvIHRoZSBwZXJtYW5lbmNlIG9mIGtlcm5lbA0KPiA+ID4gPiBjb2RlLiBTb21lIHF1aWNrIEdv
-b2dsZSBzZWFyY2hlcyB3aWxsIHJldmVhbCBhIGxpdGFueSBvZiBibG9nIHBvc3RzDQo+ID4gPiA+
-IHRvIHRoZSB0dW5lIG9mLCAid2h5IG9oIHdoeSBhcmUgcGVvcGxlIHN0aWxsIHVzaW5nIHRoaXM/
-IiBIZXJlJ3Mgb25lDQo+ID4gPiA+IGZyb20gMjAxOToNCj4gPiA+ID4gaHR0cHM6Ly9sYXRhY29y
-YS5taWNyby5ibG9nLzIwMTkvMDcvMTYvdGhlLXBncC1wcm9ibGVtLmh0bWwgLiBJDQo+ID4gPiA+
-IHRoaW5rIHRoZXNlIGFyZSBhcmd1bWVudHMgdG8gdGFrZSBzZXJpb3VzbHkuIEFuZCBldmVuIGlm
-IHlvdSBkaXNhZ3JlZQ0KPiA+ID4gPiB3aXRoIHNvbWUgcGFydHMsIHlvdSBtYXkgd2FudCB0byBj
-b25zaWRlciB3aGV0aGVyIHRoZSByZW1haW5pbmcgcGFydHMNCj4gPiA+ID4gd2FycmFudCBhIGJp
-dCBvZiBwYXVzZSBiZWZvcmUgYWRkaW5nIHRoaXMgdG8gdGhlIGtlcm5lbCBhbmQNCj4gPiA+ID4g
-cGVycGV0dWF0aW5nIFBHUCdzIGRlc2lnbiBmdXJ0aGVyLg0KPiA+DQo+ID4gU28gd2hpbGUgSSB1
-bmRlcnN0YW5kIHdoeSB0aGlzIGlzIGJlaW5nIHByb3Bvc2VkIGFuZCBjbGVhcmx5IGVmZm9ydCBo
-YXMgZ29uZQ0KPiA+IGludG8gaXQsIEkgYWxzbyB0aGluayBpdCBpcyBub3QgdGhlIHJpZ2h0IGFw
-cHJvYWNoLiBJdCBzZWVtcyB0aGlzIHByb3Bvc2FsDQo+ID4gaXMgdG8gaW5jbHVkZSBhIGZ1bGwg
-UEdQIHBhY2tldCBwYXJzZXIgYW5kIHZlcmlmaWNhdGlvbiBsb2dpYyBpbiB0aGUga2VybmVsDQo+
-ID4gYXMgYW4gZXF1aXZhbGVudCB0byBhbGxvdyBQR1Agc2lnbmF0dXJlcyB0byBiZSBzdWJtaXR0
-ZWQgdmlhDQo+ID4gRlNfSU9DX0VOQUJMRV9WRVJJVFk6DQo+ID4NCj4gPiAiRlNfSU9DX0VOQUJM
-RV9WRVJJVFkgYWNjZXB0cyBhIHBvaW50ZXIgdG8gYSBQS0NTIzcgZm9ybWF0dGVkIGRldGFjaGVk
-DQo+ID4gc2lnbmF0dXJlIGluIERFUiBmb3JtYXQgb2YgdGhlIGZpbGXigJlzIGZzLXZlcml0eSBk
-aWdlc3QuIg0KPiA+DQo+IA0KPiBJdCdzIHdvcnRoIG5vdGluZyB0aGF0IGlmIGZzLXZlcml0eSBi
-dWlsdC1pbiBzaWduYXR1cmVzIGFyZSB1c2VkLCBhIHRydXN0ZWQNCj4gdXNlcnNwYWNlIHByb2dy
-YW0gaXMgc3RpbGwgcmVxdWlyZWQgdG8gZGV0ZXJtaW5lIGFuZCBlbmZvcmNlIHRoZSBwb2xpY3kg
-b2Ygd2hpY2gNCj4gZmlsZXMgYXJlIHJlcXVpcmVkIHRvIGJlIHNpZ25lZC4gIFRoZSBrZXJuZWwg
-b25seSBoYW5kbGVzIHRoZSBhY3R1YWwgc2lnbmF0dXJlDQo+IHZlcmlmaWNhdGlvbi4gIFRoaXMg
-d2FzIGJhc2ljYWxseSBhIHByb29mLW9mLWNvbmNlcHQgd2hpY2ggcmV1c2VkIHRoZSBrZXJuZWwn
-cw0KPiBtb2R1bGUgc2lnbmF0dXJlIHZlcmlmaWNhdGlvbiBjb2RlICh3aGljaCBoYXBwZW5zIHRv
-IHVzZSBQS0NTIzcpLg0KDQpKdXN0IHRvIHNob3cgaG93IHRoZSBmc3Zlcml0eSBjb2RlIHdpbGwg
-bG9vayBsaWtlIGFmdGVyIGFkZGluZyBzdXBwb3J0DQpmb3IgUEdQIHNpZ25hdHVyZXM6DQoNCisg
-ICAgICAgc3dpdGNoICh2aS0+dHlwZSkgew0KKyAgICAgICBjYXNlIFBLRVlfSURfUEtDUzc6DQor
-ICAgICAgICAgICAgICAgZXJyID0gdmVyaWZ5X3BrY3M3X3NpZ25hdHVyZShkLCBzaXplb2YoKmQp
-ICsgaGFzaF9hbGctPmRpZ2VzdF9zaXplLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgc2lnbmF0dXJlLCBzaWdfc2l6ZSwgZnN2ZXJpdHlfa2V5cmluZywNCisg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFZFUklGWUlOR19VTlNQ
-RUNJRklFRF9TSUdOQVRVUkUsDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBOVUxMLCBOVUxMKTsNCisgICAgICAgICAgICAgICBicmVhazsNCisgICAgICAgY2Fz
-ZSBQS0VZX0lEX1BHUDoNCisgICAgICAgICAgICAgICBlcnIgPSB2ZXJpZnlfcGdwX3NpZ25hdHVy
-ZShkLCBzaXplb2YoKmQpICsgaGFzaF9hbGctPmRpZ2VzdF9zaXplLA0KKyAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpZ25hdHVyZSwgc2lnX3NpemUsIGZzdmVyaXR5
-X2tleXJpbmcsDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVkVS
-SUZZSU5HX1VOU1BFQ0lGSUVEX1NJR05BVFVSRSwNCisgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBOVUxMLCBOVUxMKTsNCisgICAgICAgICAgICAgICBicmVhazsNCisg
-ICAgICAgZGVmYXVsdDoNCisgICAgICAgICAgICAgICBlcnIgPSAtRU9QTk9UU1VQUDsNCisgICAg
-ICAgfQ0KDQpBcyB5b3UgY2FuIHNlZSwgdGhlIGNoYW5nZSB3aWxsIGJlIHN0cmFpZ2h0Zm9yd2Fy
-ZC4NCg0KT24gdXNlciBzcGFjZSBzaWRlLCBJIHBsYW4gdG8gYWRkIHRoZSBjYXBhYmlsaXR5IHRv
-IGZzdmVyaXR5LXV0aWxzDQp0byBwcm9kdWNlIGEgUEdQIHNpZ25hdHVyZSB3aXRoIHRoZSBHUEcg
-a2V5IHBhc3NlZCBieSBycG1zaWduLg0KDQo+IEknZCBlbmNvdXJhZ2UgbmV3IHVzZXJzIHRvIGVp
-dGhlciBnbyBhbGwtaW4gb24gYSB1c2Vyc3BhY2Ugc29sdXRpb24sIHVzaW5nIGENCj4gdHJ1c3Rl
-ZCB1c2Vyc3BhY2UgcHJvZ3JhbSB0byB2ZXJpZnkgc2lnbmF0dXJlcyBvZiBmcy12ZXJpdHkgZmls
-ZSBkaWdlc3RzOw0KPiAqb3IqIGdvIGFsbC1pbiBvbiBhbiBpbi1rZXJuZWwgc29sdXRpb24sIHVz
-aW5nIHRoZSBJTUEgc3VwcG9ydCBmb3IgZnMtdmVyaXR5DQo+IHdoaWNoIE1pbWkgWm9oYXIgaXMg
-d29ya2luZyBvbi4gIEEgdXNlcnNwYWNlIHNvbHV0aW9uIGNvdWxkIHVzZSBhIHNpbXBsZQ0KDQpQ
-cm9iYWJseSwgdGhlcmUgaXMgYWxzbyB0aGUgdGhpcmQgb3B0aW9uIG9mIGFuIExTTSAoc3VjaCBh
-cyBJUEUpIHRoYXQgZ2V0cw0KZnJvbSBmc3Zlcml0eSB0aGUgaW5mb3JtYXRpb24gaWYgdGhlIHNp
-Z25hdHVyZSB3YXMgdmFsaWRhdGVkLCBhbmQgZGVjaWRlDQpkZXBlbmRpbmcgb24gYSBwb2xpY3ku
-IEkgd291bGQgYWxzbyBleHBvc2UgdGhlIGluZm9ybWF0aW9uIGFib3V0IHRoZQ0KcmVzdHJpY3Rp
-b24gaW1wb3NlZCBvbiB0aGUga2V5cmluZyBmcm9tIHdoaWNoIHRoZSBrZXkgdXNlZCB0byB2ZXJp
-ZnkNCnRoZSBzaWduYXR1cmUgd2FzIGZvdW5kLg0KDQpNYXliZSBJTUEgY291bGQgdXNlIHRoaXMg
-YXBwcm9hY2ggdG9vLCB3aGljaCB3b3VsZCBhdm9pZCB0aGUgbmVlZA0Kb2YgaW50cm9kdWNpbmcg
-YW5vdGhlciBzaWduYXR1cmUgZm9ybWF0LiBJZiB0aGF0IGlzIGRlc2lyZWQsIHlvdSBtaWdodA0K
-d2FudCB0byBjb29yZGluYXRlIHdpdGggdGhlIGF1dGhvcnMgb2YgYSBGZWRvcmEgZmVhdHVyZToN
-Cg0KaHR0cHM6Ly9mZWRvcmFwcm9qZWN0Lm9yZy93aWtpL0NoYW5nZXMvRnNWZXJpdHlSUE0NCg0K
-d2hpY2gsIGFzIGZhciBhcyBJIGtub3csIHBsYW4gdG8gdXNlIHRoZSBzaWduYXR1cmUgZm9ybWF0
-IGFscmVhZHkNCnVwc3RyZWFtZWQuDQoNClRoYW5rcw0KDQpSb2JlcnRvDQoNCkhVQVdFSSBURUNI
-Tk9MT0dJRVMgRHVlc3NlbGRvcmYgR21iSCwgSFJCIDU2MDYzDQpNYW5hZ2luZyBEaXJlY3Rvcjog
-TGkgUGVuZywgWmhvbmcgUm9uZ2h1YQ0KDQo+IHNpZ25hdHVyZSBmb3JtYXQsIHVzaW5nIGEgbW9k
-ZXJuIGFsZ29yaXRobSBzdWNoIGFzIEVkMjU1MTkuICBJTUEgdXNlcyBhIHNpbXBsZQ0KPiBzaWdu
-YXR1cmUgZm9ybWF0IHRvbywgdGhvdWdoIGl0IHVzZXMgYSBjb21wbGV4IGZvcm1hdCAoWC41MDkp
-IGZvciBwdWJsaWMga2V5cy4NCj4gDQo+IC0gRXJpYw0K
+On Wed, Jan 19, 2022 at 1:19 PM Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> I'd prefer it if we could avoid magic #define's like this.
+
+I'll send something that just replaces it with a simple bool.
