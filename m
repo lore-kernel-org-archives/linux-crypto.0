@@ -2,92 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3344CC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3763DC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:17:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353486AbiASKNw (ORCPT
+        id S1345776AbiASKRt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 05:13:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353474AbiASKNv (ORCPT
+        Wed, 19 Jan 2022 05:17:49 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:47343 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349426AbiASKRs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:13:51 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89CF9C061574;
-        Wed, 19 Jan 2022 02:13:51 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3006EB8191A;
-        Wed, 19 Jan 2022 10:13:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CE1C340E5;
-        Wed, 19 Jan 2022 10:13:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642587228;
-        bh=1yUmZ1gtr9CBj5pMoqsvEIB5CbXXsyQeM7ffKKbaC24=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=q81WFpPHkZ7JV6ZOKutx3YkmR40mCv+CdMEBEV/oDqtHeIMtAqjMsI+Lusl40hoF7
-         LqRAw540lQZlb3gDjcnAMs6IKjNXYoc2D3wKozp/5wCOq+M/JPlLElqw0l+bIvdk5T
-         nNv7bctlnKXGscv3xmuYtKXvaN5Bc1ceZ0tEX6AKAZ0PVl+hhouyzA5nvw2UKuP43W
-         K4UabxmcdfsYryv0uIJ47AByUPXCN2kmAb+qFjV8E+g1tS4xzUf3gHME+56cKih0h7
-         VgeCDujJ3Dskn7NfyrD+AkhDqXLCoQIzNEFQo8waUrvJgGVL2f4FqAmm8gjls6l9VM
-         YjvOnUbbsfGQg==
-Received: by mail-wm1-f46.google.com with SMTP id q9-20020a7bce89000000b00349e697f2fbso13319237wmj.0;
-        Wed, 19 Jan 2022 02:13:48 -0800 (PST)
-X-Gm-Message-State: AOAM533Mge5F1gr664RRxeaIwqRdOOYv9K2gUkwV6V5mIUul6TayJtzm
-        jRiR5XW+3jhkZWxrwbBnvml4C4gEfzvLuGWDkEA=
-X-Google-Smtp-Source: ABdhPJxqBXw77uQHArSK2VBrtoFpSbj05KpONweHZEWVRXOUUkrJGt/k3ZzOnZtzegeC/V1Mhu+oTLrNfHeOMfbtlwY=
-X-Received: by 2002:a05:600c:3c9c:: with SMTP id bg28mr2689276wmb.190.1642587227212;
- Wed, 19 Jan 2022 02:13:47 -0800 (PST)
+        Wed, 19 Jan 2022 05:17:48 -0500
+Received: from mail-wm1-f54.google.com ([209.85.128.54]) by
+ mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1MEmpp-1n762b3UK3-00GFv6 for <linux-crypto@vger.kernel.org>; Wed, 19 Jan
+ 2022 11:17:46 +0100
+Received: by mail-wm1-f54.google.com with SMTP id v123so4362876wme.2
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:17:46 -0800 (PST)
+X-Gm-Message-State: AOAM533VAa5kP0kc/zqj1+CXKows5y9Cao8iaDHp2XcrcoPp71Dhe68c
+        /pPStNco0feZ+qmWIykMytz4XhEBf7fsZB2FRSs=
+X-Google-Smtp-Source: ABdhPJxIlHNoUe8ZgY3HoUk1jhPEpLo1FY9cqBkT6/jqrN8ALkDEnDsPDJRrCgEVUJ2S8/GtQ3CasTZFhN5yQmQ02ro=
+X-Received: by 2002:a05:600c:4e4e:: with SMTP id e14mr2752715wmq.98.1642587466476;
+ Wed, 19 Jan 2022 02:17:46 -0800 (PST)
 MIME-Version: 1.0
-References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
- <20220119100615.5059-1-miles.chen@mediatek.com>
-In-Reply-To: <20220119100615.5059-1-miles.chen@mediatek.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 19 Jan 2022 11:13:35 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
-Message-ID: <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
-Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
-To:     Miles Chen <miles.chen@mediatek.com>
-Cc:     "Jason A. Donenfeld" <jason@zx2c4.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+References: <20220119093109.1567314-1-ardb@kernel.org>
+In-Reply-To: <20220119093109.1567314-1-ardb@kernel.org>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 19 Jan 2022 11:17:30 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a3b+37jZBE_OSPg7zdrZeoton0X8cka6bxp5AGK3kD+yA@mail.gmail.com>
+Message-ID: <CAK8P3a3b+37jZBE_OSPg7zdrZeoton0X8cka6bxp5AGK3kD+yA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: memneq: avoid implicit unaligned accesses
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
+        Arnd Bergmann <arnd@arndb.de>
 Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:U0DPhcBCCELwr+YvguSv6xB34JJBCkM+fL7YbbeohuYL1qMUVHA
+ hrZBty0uWFLkTrpK9QEPI4pWEqqb6Qahgw8LCotuZsvThSwReciiOcaiAz5zdJbvj4lOQlk
+ 1TO/rI+bhwWVGMbF34XXqzds95G+ExI6KzejPVqg9EMBElKGgIM/Oi/+Elih7Bq3UIc23za
+ rC/27Do9/TnnG4H75XXIA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4kk5PKYH0Q8=:bCSZIaU9BIoZ7dZBdXWnD9
+ 18IRee2nfXbbo3VmV6ScK9yMMeshlmuKfaXyGcg8z+mHwLxEEfck8n/UqLGIrGBfUarAkehj+
+ c3z56HpDV9iV3whK2cZw39cp6Geijd9DjxeYBCVnVry5YHJckT1av3j/wbMFGRCWNsoh6jVry
+ N7B+MF0Na7qb89OgFCYda0RNx+96UtWTGBk7uleJX66K86g/kqSZ8/IDka26DmiSQdiaPIxFN
+ WvJYwr2y3MkHTmIVMLUzuDZnFC6BiAFYqB+9rXHUroDWxFusQwCwFm69ApW9+5Pf3L7Opdlqv
+ 4zC5GGRZtGL/9G9a4lpm5E7WiHY/NQysHrP9XXLQAXPNlaBiweVD1GdSHQJmaRO3NLr6dQRSO
+ EXYgsojQffKqzkl3HCGCELVkQbO51yj4ZiTXxl4uRwyT3TBNX8NPgaA6vM1rRsUqVzCkH6dbL
+ EVOGgNr1oNRpo2EnEBHi+AObat7IMf0llhMCa6tEHptMQE6HydCAgZafkgnDQElStsUTD5+8k
+ Gl+UMYlJegVACB9KMVZJgkVZqEgrlabk4YLATEcxsJ+RfqAHeWIUYetavyu1QLNnlVtZPngPf
+ ENTO2zIjRiPspEtAteiZ4/ygLHG3AJ/FKasVnKPS0Mde5QW5Mb8a8bkI+qQUhHPCvZp4c9pJh
+ TTZ/qWMYKOxmXVkhnDaL7c+OCdNvvjE+mDiRTj7rYAqYa0hTcOKP6K2mq8BOHA/J9ZxQ=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 19 Jan 2022 at 11:06, Miles Chen <miles.chen@mediatek.com> wrote:
+On Wed, Jan 19, 2022 at 10:31 AM Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> Hi,
+> The C standard does not support dereferencing pointers that are not
+> aligned with respect to the pointed-to type, and doing so is technically
+> undefined behavior, even if the underlying hardware supports it.
 >
-> >Hi Miles,
-> >
-> >I'm actually not able to reproduce your oops. I'm using vanilla clang
-> >13, cross compiling for arm64, with thin LTO enabled and CFI enabled.
-> >Kernel seems to run fine.
-> >
-> >
-> >Are there other settings that are needed to trigger this? Do you see
-> >it in upstream clang or just the Android fork of clang?
-> >
-> I will try another clang (the previous version I use).
-> I am using Android fork of clang and there is a clang upgrade in this merge.
+> This means that conditionally dereferencing such pointers based on
+> whether CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS=y is not the right thing
+> to do, and actually results in alignment faults on ARM, which are fixed
+> up on a slow path. Instead, we should use the unaligned accessors in
+> such cases: on architectures that don't care about alignment, they will
+> result in identical codegen whereas, e.g., codegen on ARM will avoid
+> doubleword loads and stores but use ordinary ones, which are able to
+> tolerate misalignment.
 >
+> Link: https://lore.kernel.org/linux-crypto/CAHk-=wiKkdYLY0bv+nXrcJz3NH9mAqPAafX7PpW5EwVtxsEu7Q@mail.gmail.com/
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-One thing that could be worth a try is to make __blake2s_update() and
-__blake2s_final() __always_inline rather than just inline, which by
-itself does not appear to be sufficient for the code to get inlined.
-(If it were, the indirect call should have disappeared as well)
-
-Given that indirect calls suck on x86, we should probably apply that
-change in any case, regardless of CFI.
+Reviewed-by: Arnd Bergmann <arnd@arndb.de>
