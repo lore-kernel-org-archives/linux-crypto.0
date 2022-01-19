@@ -2,177 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE53C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 08:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 994ECC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 09:00:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348529AbiASIYy (ORCPT
+        id S1352767AbiASJAj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 03:24:54 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:42970 "EHLO
+        Wed, 19 Jan 2022 04:00:39 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:59532 "EHLO
         ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346595AbiASIYx (ORCPT
+        with ESMTP id S237437AbiASJAj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 03:24:53 -0500
+        Wed, 19 Jan 2022 04:00:39 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 579E5B81906;
-        Wed, 19 Jan 2022 08:24:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A35DAC004E1;
-        Wed, 19 Jan 2022 08:24:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1642580689;
-        bh=+aAjJqYgCB6wYsQ+TkHIz5BRkQQLBlav51rmak29+GE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cHtItM4mbfYOPuPhhPbkJhoJxiHZDumIyowKutBRkwdRAonHQ67rICg6LsPDCfHbA
-         QZbjt+9O/l+cvixjJDghPIFQOSzFWgJIJvP8UJlpTRsxxWB39t3m3AvKMSAFq8CBPt
-         bRA3U40sQfvuaUThRuNLKopLBDpeH18K4EpKopH4=
-Date:   Wed, 19 Jan 2022 09:24:45 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Rob Herring <robh@kernel.org>
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Georgi Djakov <djakov@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Kalle Valo <kvalo@kernel.org>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kevin Hilman <khilman@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
-        linux-pm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-usb@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
-Message-ID: <YefKzYIDUFC3NW7e@kroah.com>
-References: <20220119015038.2433585-1-robh@kernel.org>
+        by ams.source.kernel.org (Postfix) with ESMTPS id F2793B81910;
+        Wed, 19 Jan 2022 09:00:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62C44C340E6;
+        Wed, 19 Jan 2022 09:00:36 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="c3dQq4AT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642582833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=2dOFJ+UpcJtVObG5xI+XoGYifJptafHjJhs8HGfwX1w=;
+        b=c3dQq4ATbm3F/187EqTQn/DEc2+TVz5Z6Leei8F10Yf3ixE2Uu6PJW8ci1EnHZrfZM0tzK
+        HOkeqMqMuOacinhQ2L5LbbQObXWehm5LhxLXbvyOgx2P8gpomIxL5mz6xFs3X39Twpe18H
+        6UV6m97d9dMYHbb/v+7tKMp5de21ePo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 421036da (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 19 Jan 2022 09:00:32 +0000 (UTC)
+Received: by mail-yb1-f171.google.com with SMTP id h14so5248579ybe.12;
+        Wed, 19 Jan 2022 01:00:32 -0800 (PST)
+X-Gm-Message-State: AOAM530BhqfR3QltI3Z7G0ouie/zAHliCS+NY/St1793O9Xz0eMhzuTM
+        GtHe7NGb1D1BfdzgEVAsDpWx6R8yivZkteqdB/M=
+X-Google-Smtp-Source: ABdhPJx4RyuigxoTOZs8Or8CkU4hkibFalbgQMbYzSXkFlEEIcgX6zw0oBRh/W5vLkIRmue8eoXzbhHlni3UQuAdKpE=
+X-Received: by 2002:a25:e7c7:: with SMTP id e190mr12418681ybh.457.1642582830614;
+ Wed, 19 Jan 2022 01:00:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
+Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Wed, 19 Jan 2022
+ 01:00:30 -0800 (PST)
+In-Reply-To: <20220119082447.1675-1-miles.chen@mediatek.com>
+References: <20220119082447.1675-1-miles.chen@mediatek.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 19 Jan 2022 10:00:30 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pv4WWATjdqZgwrtHDmq3sX4ABfB9PoNT9Z4tSEduR2Lw@mail.gmail.com>
+Message-ID: <CAHmME9pv4WWATjdqZgwrtHDmq3sX4ABfB9PoNT9Z4tSEduR2Lw@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
+To:     miles.chen@mediatek.com
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 18, 2022 at 07:50:38PM -0600, Rob Herring wrote:
-> The 'phandle-array' type is a bit ambiguous. It can be either just an
-> array of phandles or an array of phandles plus args. Many schemas for
-> phandle-array properties aren't clear in the schema which case applies
-> though the description usually describes it.
-> 
-> The array of phandles case boils down to needing:
-> 
-> items:
->   maxItems: 1
-> 
-> The phandle plus args cases should typically take this form:
-> 
-> items:
->   - items:
->       - description: A phandle
->       - description: 1st arg cell
->       - description: 2nd arg cell
-> 
-> With this change, some examples need updating so that the bracketing of
-> property values matches the schema.
-> 
-> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Chun-Kuang Hu <chunkuang.hu@kernel.org>
-> Cc: Philipp Zabel <p.zabel@pengutronix.de>
-> Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> Cc: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: Georgi Djakov <djakov@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lee Jones <lee.jones@linaro.org>
-> Cc: Daniel Thompson <daniel.thompson@linaro.org>
-> Cc: Jingoo Han <jingoohan1@gmail.com>
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Wolfgang Grandegger <wg@grandegger.com>
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Vivien Didelot <vivien.didelot@gmail.com>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Vladimir Oltean <olteanv@gmail.com>
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: Viresh Kumar <vireshk@kernel.org>
-> Cc: Stephen Boyd <sboyd@kernel.org>
-> Cc: Kishon Vijay Abraham I <kishon@ti.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> Cc: Kevin Hilman <khilman@kernel.org>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Sebastian Reichel <sre@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Zhang Rui <rui.zhang@intel.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Thierry Reding <thierry.reding@gmail.com>
-> Cc: Jonathan Hunter <jonathanh@nvidia.com>
-> Cc: Sudeep Holla <sudeep.holla@arm.com>
-> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: linux-ide@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: dmaengine@vger.kernel.org
-> Cc: linux-pm@vger.kernel.org
-> Cc: iommu@lists.linux-foundation.org
-> Cc: linux-leds@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-can@vger.kernel.org
-> Cc: linux-wireless@vger.kernel.org
-> Cc: linux-phy@lists.infradead.org
-> Cc: linux-gpio@vger.kernel.org
-> Cc: linux-riscv@lists.infradead.org
-> Cc: linux-remoteproc@vger.kernel.org
-> Cc: alsa-devel@alsa-project.org
-> Cc: linux-usb@vger.kernel.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
+Hi Miles,
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Thanks for the patch. Could you let me know which architecture and
+compiler this was broken on? If I had to guess, I'd wager arm32, and
+you hit this by enabling optimized blake2s?
+
+If so, I'm not sure the problem is with weak symbols. Why should CFI
+break weak symbols? Rather, perhaps the issue is that the function is
+defined in blake2s-core.S? Are there some CFI macros we need for that
+definition?
+
+Jason
