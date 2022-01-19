@@ -2,201 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD02BC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C01FAC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 19 Jan 2022 10:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353824AbiASKcf (ORCPT
+        id S1348072AbiASKfs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Jan 2022 05:32:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
+        Wed, 19 Jan 2022 05:35:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353717AbiASKcZ (ORCPT
+        with ESMTP id S1343802AbiASKfr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Jan 2022 05:32:25 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70426C061755
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:32:24 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id s30so7482199lfo.7
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Jan 2022 02:32:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Sr17yjVIJ3L6nqEXDMpIqK2xXImflLFzz6ALbEm9u68=;
-        b=Xp8s21ftcZ0WG13DDgbdH7NIUsuYX+ghvkD5zw1hiLod5qbV+yjC9/iw3BxedgypWz
-         j185xcOoN7LD6uCNH62mSJRvMAjwIi7qcbYCznd6Wd0VuvmCQ/sizMwR5aWhMScNA/rl
-         hmuEc+DbVv1NqMjk5IXcy/Hk3oFXKZ0haMWzOfivc06wvoxpEiX1vitoLqGmZuk04L2x
-         HC73i8VxJwVCI/4Mkmi2NET/E8BffuYg/4Zged81GUTCUySqRPVe2agczTV87+sP+2pN
-         pDJV7fJq03+xTsoQaVBtN6S+RGEn7oHeifzgS2DkyqcDDGnQ9aAHk1KN9hJBM2T+WaJf
-         EdtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Sr17yjVIJ3L6nqEXDMpIqK2xXImflLFzz6ALbEm9u68=;
-        b=H+jzBqOJ8bEfzJQw1A79wQ8WBoFxWB6bsuU99T5o0Vvljh5zq82bNh+PqrM4Q8yIZV
-         sw7UVOyTF6OfFvOnEPYPOJw3pBLl1VDTxdqwDBhDplh2en+3F6JuuGLWoWb49qdcRC3v
-         K8l6pgKz4BJP/8qKKTtiaMTj54AlHgDHaZcMJLxW+xLsdDdzrqz6dLD8bmftscLTzSlj
-         Xkbyur9B1dwMJx9u0Ezc4qE2Z/ApThzDA+dP88PR+5v6Yosk9sq2gTZdKr/u128UjuVm
-         BsaQ1NmLpQ7fYSMdxhPoowRSgze+aZSCe2BONJQH6BY+w36ZEE/LlM3dNsG3WuREODRT
-         tHCQ==
-X-Gm-Message-State: AOAM530T0an3sqWmEK10r+jugFbF6VeORBWd2p8Q5J6V1dbGcw5cRGRu
-        VZ5h0T/tcXOph6evBLTV/u0WXy7obi8sM5C6zU8O6Q==
-X-Google-Smtp-Source: ABdhPJz5t3UBuJxmMbI2E3pOLPGLQiV4ByMa0pgkUilXefnRDUK3bGbZ4bWfdB/wwOZVZ58x7DxfCbRQTc3tUAIioE8=
-X-Received: by 2002:a2e:a26d:: with SMTP id k13mr10012578ljm.300.1642588342599;
- Wed, 19 Jan 2022 02:32:22 -0800 (PST)
+        Wed, 19 Jan 2022 05:35:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55BF4C061574;
+        Wed, 19 Jan 2022 02:35:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 210AAB81981;
+        Wed, 19 Jan 2022 10:35:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C6CC340EC;
+        Wed, 19 Jan 2022 10:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642588544;
+        bh=dLVBsjWsa3tGe7VI+gEjPAK21hcD2zsUppaxNspCidw=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=OY+FuNZsU4FCGv13S5pE17km9nFJ1sREVRgpDGQ3pF1hqIWYJj8cI5XCxXu372wy/
+         x8qRQrobeWclhryEaq/pzYK0MrdOCEu9NcYrJ29i4IpnUqbQXN5oZ/Ibd1wYTh7Icr
+         fIDmXjiYEcnQ4R5kQzKQWcrgUtdgL4TMU28ukJlmRMrmncy5mtPeWwlStAI7Z06KbW
+         tQJpb54LWKlSp0sliFIzFwuiS98/B9vCwQaZtKuYxBKehYH5lDeD2kdFGSgM2bLL+H
+         iYtuj0ZJhGM5vIlNeKiRPtvNK1JnwxlfhAVe7PRK4OZ9279oqgJmf5WHeBjEgVYksT
+         olvWSmwJx5vpg==
+Received: by mail-wm1-f43.google.com with SMTP id l12-20020a7bc34c000000b003467c58cbdfso13417779wmj.2;
+        Wed, 19 Jan 2022 02:35:44 -0800 (PST)
+X-Gm-Message-State: AOAM533KlsqsgcWikPieGJL2/nY1iuRJFxmdcWJBlFX3W58bSIP2WBtZ
+        ahm+KhqtcegR1kUDPpoUgKehHFjUFtOAWngRa7E=
+X-Google-Smtp-Source: ABdhPJxz62Vu1t8USPQKfzN9UxWCuXzIdAWIMYfTvzG08o48WSftiicOZMHsxR2P9Zuf5cNWB4skcW66Hpc+FiM5xGo=
+X-Received: by 2002:a05:600c:3c9c:: with SMTP id bg28mr2778170wmb.190.1642588543206;
+ Wed, 19 Jan 2022 02:35:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20220119015038.2433585-1-robh@kernel.org>
-In-Reply-To: <20220119015038.2433585-1-robh@kernel.org>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 19 Jan 2022 11:31:45 +0100
-Message-ID: <CAPDyKFr5uT3H8NaAvPyGajo2R6DriYC92y=RdAk=G4PMC4MxYw@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Improve phandle-array schemas
-To:     Rob Herring <robh@kernel.org>
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+References: <CAHmME9oX+4Ek81xy0nBOegqABH0xYqyONAqinsu7GZ7AaQaqYQ@mail.gmail.com>
+ <20220119100615.5059-1-miles.chen@mediatek.com> <CAMj1kXE_6WboUK0VPbTwzTbMNxv8b4XUp7USQUp=YqcCRMTZig@mail.gmail.com>
+ <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
+In-Reply-To: <CAHmME9o-=q6jT6mF3XsfoA17756YVEWdXGHukP=rxWS1gs5irg@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 19 Jan 2022 11:35:32 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFdgPj7Ky-361QNAOLccr1mq5m9LSsPfbgpwV58fLAxJw@mail.gmail.com>
+Message-ID: <CAMj1kXFdgPj7Ky-361QNAOLccr1mq5m9LSsPfbgpwV58fLAxJw@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: fix a CFI failure
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Miles Chen <miles.chen@mediatek.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Chun-Kuang Hu <chunkuang.hu@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-        Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>,
-        Vinod Koul <vkoul@kernel.org>,
-        Georgi Djakov <djakov@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
-        Lee Jones <lee.jones@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Jingoo Han <jingoohan1@gmail.com>, Pavel Machek <pavel@ucw.cz>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Vivien Didelot <vivien.didelot@gmail.com>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Kalle Valo <kvalo@kernel.org>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kevin Hilman <khilman@kernel.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Zhang Rui <rui.zhang@intel.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, dmaengine@vger.kernel.org,
-        linux-pm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        netdev@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-remoteproc@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-usb@vger.kernel.org
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 19 Jan 2022 at 02:50, Rob Herring <robh@kernel.org> wrote:
+On Wed, 19 Jan 2022 at 11:20, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> The 'phandle-array' type is a bit ambiguous. It can be either just an
-> array of phandles or an array of phandles plus args. Many schemas for
-> phandle-array properties aren't clear in the schema which case applies
-> though the description usually describes it.
+> On 1/19/22, Ard Biesheuvel <ardb@kernel.org> wrote:
+> > On Wed, 19 Jan 2022 at 11:06, Miles Chen <miles.chen@mediatek.com> wrote:
+> >>
+> >> Hi,
+> >>
+> >> >Hi Miles,
+> >> >
+> >> >I'm actually not able to reproduce your oops. I'm using vanilla clang
+> >> >13, cross compiling for arm64, with thin LTO enabled and CFI enabled.
+> >> >Kernel seems to run fine.
+> >> >
+> >> >
+> >> >Are there other settings that are needed to trigger this? Do you see
+> >> >it in upstream clang or just the Android fork of clang?
+> >> >
+> >> I will try another clang (the previous version I use).
+> >> I am using Android fork of clang and there is a clang upgrade in this
+> >> merge.
+> >>
+> >
+> > One thing that could be worth a try is to make __blake2s_update() and
+> > __blake2s_final() __always_inline rather than just inline, which by
+> > itself does not appear to be sufficient for the code to get inlined.
+> > (If it were, the indirect call should have disappeared as well)
+> >
+> > Given that indirect calls suck on x86, we should probably apply that
+> > change in any case, regardless of CFI.
+> >
 >
-> The array of phandles case boils down to needing:
+> Had the same thought at first, but then looking at the original stack
+> trace, it looks like the __ function is inlined:
 >
-> items:
->   maxItems: 1
+> [    0.000000][    T0]  __cfi_slowpath_diag+0x354/0x4b0
+> [    0.000000][    T0]  blake2s_update+0x14c/0x178
+> [    0.000000][    T0]  _extract_entropy+0xf4/0x29c
 >
-> The phandle plus args cases should typically take this form:
->
-> items:
->   - items:
->       - description: A phandle
->       - description: 1st arg cell
->       - description: 2nd arg cell
->
-> With this change, some examples need updating so that the bracketing of
-> property values matches the schema.
->
-> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Chun-Kuang Hu <chunkuang.hu@kernel.org>
-> Cc: Philipp Zabel <p.zabel@pengutronix.de>
-> Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> Cc: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: Georgi Djakov <djakov@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Joerg Roedel <joro@8bytes.org>
-> Cc: Lee Jones <lee.jones@linaro.org>
-> Cc: Daniel Thompson <daniel.thompson@linaro.org>
-> Cc: Jingoo Han <jingoohan1@gmail.com>
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Wolfgang Grandegger <wg@grandegger.com>
-> Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Vivien Didelot <vivien.didelot@gmail.com>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Vladimir Oltean <olteanv@gmail.com>
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: Viresh Kumar <vireshk@kernel.org>
-> Cc: Stephen Boyd <sboyd@kernel.org>
-> Cc: Kishon Vijay Abraham I <kishon@ti.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
-> Cc: "Rafael J. Wysocki" <rafael@kernel.org>
-> Cc: Kevin Hilman <khilman@kernel.org>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Sebastian Reichel <sre@kernel.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Mathieu Poirier <mathieu.poirier@linaro.org>
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Zhang Rui <rui.zhang@intel.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Thierry Reding <thierry.reding@gmail.com>
-> Cc: Jonathan Hunter <jonathanh@nvidia.com>
-> Cc: Sudeep Holla <sudeep.holla@arm.com>
-> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: linux-ide@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: dmaengine@vger.kernel.org
-> Cc: linux-pm@vger.kernel.org
-> Cc: iommu@lists.linux-foundation.org
-> Cc: linux-leds@vger.kernel.org
-> Cc: linux-media@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-can@vger.kernel.org
-> Cc: linux-wireless@vger.kernel.org
-> Cc: linux-phy@lists.infradead.org
-> Cc: linux-gpio@vger.kernel.org
-> Cc: linux-riscv@lists.infradead.org
-> Cc: linux-remoteproc@vger.kernel.org
-> Cc: alsa-devel@alsa-project.org
-> Cc: linux-usb@vger.kernel.org
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
 
-For CPUs and PM domains:
-
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
-
-Kind regards
-Uffe
+Indeed. How odd. I hope this doesn't happen with the x86 backend
+because that would be plain silly. On arm64, it doesn't actually
+matter in terms of performance, it just needs one additional callee
+save register to preserve the function pointer across calls.
