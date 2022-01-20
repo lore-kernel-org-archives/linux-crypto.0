@@ -2,149 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CABC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jan 2022 08:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A847CC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jan 2022 09:44:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236763AbiATIgZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Jan 2022 03:36:25 -0500
-Received: from mail-ua1-f43.google.com ([209.85.222.43]:44026 "EHLO
-        mail-ua1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234250AbiATIgZ (ORCPT
+        id S1359613AbiATJoJ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 20 Jan 2022 04:44:09 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:51762 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbiATJoI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jan 2022 03:36:25 -0500
-Received: by mail-ua1-f43.google.com with SMTP id 2so9420095uax.10;
-        Thu, 20 Jan 2022 00:36:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rjpWEc8ofW9Ln+ZzVM/iDZ8qr5vzNcJvKqxioEzCZGY=;
-        b=K8E1eXzycKiQIRWxj6qfUFajLTr2sy1dSiMuVac4Ojo2F6egeEaTWG9ZbEsgSkDSEw
-         qRqO5uQssP45mWIaWpG7nVB3Q97Z1Jr6E/38JLbdq15EI8lBonmLG/R6A0L2wQywHdjM
-         tlbG4o+STxkRss/G4WwK4qJM73GTuEXEIIUh6QnfAQP1F4VZPE5JUYse+fcFqMZoHYGf
-         ZafxGxjyuI5ZOlCI72DNOr278MsPXFnFRVZNTSTswiks1K2dV8F/xbDEQ2JSlTgfnhoE
-         hGKLjtKpj5enGPziEdb98hFXbm2BZ4uB/Zgol/rIMf2zdXs4p+1IuBSGQGYYFahsa+z3
-         ATDw==
-X-Gm-Message-State: AOAM5316YKeuEQHWPMSP3XHEStDeK+5+1EWFv3Cbk15N8tilVELLYVbW
-        GecERymnasaq70RxfNTmqifMrUS2CgMjdQ==
-X-Google-Smtp-Source: ABdhPJxGe1OsDYfyTFLeqMrnaPPS7g1NHd4Hi0o7FeKUu5n/kYgAXhvWwHI1mDzEE/HawGiFuMYvRg==
-X-Received: by 2002:a05:6102:3a68:: with SMTP id bf8mr13173693vsb.63.1642667783746;
-        Thu, 20 Jan 2022 00:36:23 -0800 (PST)
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
-        by smtp.gmail.com with ESMTPSA id bj23sm432855vkb.23.2022.01.20.00.36.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jan 2022 00:36:23 -0800 (PST)
-Received: by mail-ua1-f47.google.com with SMTP id r15so9486981uao.3;
-        Thu, 20 Jan 2022 00:36:23 -0800 (PST)
-X-Received: by 2002:a1f:a2d3:: with SMTP id l202mr4847687vke.7.1642667418540;
- Thu, 20 Jan 2022 00:30:18 -0800 (PST)
+        Thu, 20 Jan 2022 04:44:08 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4539A604EF;
+        Thu, 20 Jan 2022 09:44:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D7B8C340E7;
+        Thu, 20 Jan 2022 09:44:07 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fssD5vvD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1642671844;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=G1vhBKyxUeexYoEpFA7C2RgBVPR3wFJ965AiyzZ7d1Y=;
+        b=fssD5vvDonTjf+Ob+Bpl1G3vPKMhEseK8iREJoFAg6ynOzq+BSSo6lVquWfZvAcYlh6Lvu
+        bkC7lhUCYYe16qmc0QIe3GrcAbiqnG1eqnXBufblVHz5zhcqCzPLluqfWpy6rtBhSxckFH
+        s+P22Zx6skyLld3jyUnagQF/dm3ahQs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b2b4eba4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 20 Jan 2022 09:44:04 +0000 (UTC)
+Received: by mail-yb1-f171.google.com with SMTP id k31so14428811ybj.4;
+        Thu, 20 Jan 2022 01:44:03 -0800 (PST)
+X-Gm-Message-State: AOAM533MBGqBZGy49Epfeg2tbh5MtDXIxDtZPFOCerVwbIxk77sOKcT8
+        TGTxj8a5ejcoskN2pHOkdp2sWGj9qtz0Zd5lE3w=
+X-Google-Smtp-Source: ABdhPJzg1g/gym62qyvrV0DrQk1jKs3WkH/OEe7OV9zyQPzVSRgVDI0hITqpB3HjmG/WYqbbT3zIOQtxb62GLCP4W9k=
+X-Received: by 2002:a25:854f:: with SMTP id f15mr45690101ybn.121.1642671843070;
+ Thu, 20 Jan 2022 01:44:03 -0800 (PST)
 MIME-Version: 1.0
-References: <20220117110755.3433142-1-conor.dooley@microchip.com> <20220117110755.3433142-4-conor.dooley@microchip.com>
-In-Reply-To: <20220117110755.3433142-4-conor.dooley@microchip.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Thu, 20 Jan 2022 09:30:07 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXwe3_F8NeePnoFrLwyzKUwnHtmETC=ambgsC2N3w_h8A@mail.gmail.com>
-Message-ID: <CAMuHMdXwe3_F8NeePnoFrLwyzKUwnHtmETC=ambgsC2N3w_h8A@mail.gmail.com>
-Subject: Re: [PATCH v4 03/14] dt-bindings: i2c: add bindings for microchip
- mpfs i2c
-To:     Conor Dooley <conor.dooley@microchip.com>
-Cc:     Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Mark Brown <broonie@kernel.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>, Lee Jones <lee.jones@linaro.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux I2C <linux-i2c@vger.kernel.org>,
-        Linux PWM List <linux-pwm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
+Received: by 2002:a05:7110:209:b0:11c:1b85:d007 with HTTP; Thu, 20 Jan 2022
+ 01:44:02 -0800 (PST)
+In-Reply-To: <YeiPn8Mo1AM7X9Ud@archlinux-ax161>
+References: <CAHmME9qVMomgb53rABKsucCoEhwsk+=KzDdEcGKtecOXuahTZw@mail.gmail.com>
+ <20220119135450.564115-1-Jason@zx2c4.com> <YeiPn8Mo1AM7X9Ud@archlinux-ax161>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 20 Jan 2022 10:44:02 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rPy=T=0Ddbw+01bFycXNPfuxgMm+U80DzDSLy0Cdh_Gg@mail.gmail.com>
+Message-ID: <CAHmME9rPy=T=0Ddbw+01bFycXNPfuxgMm+U80DzDSLy0Cdh_Gg@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: avoid indirect calls to compression
+ function for Clang CFI
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     Miles Chen <miles.chen@mediatek.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-rtc@vger.kernel.org, linux-spi <linux-spi@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Lewis Hanly <lewis.hanly@microchip.com>,
-        daire.mcnamara@microchip.com, ivan.griffin@microchip.com,
-        Atish Patra <atishp@rivosinc.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Conor,
-
-On Mon, Jan 17, 2022 at 12:06 PM <conor.dooley@microchip.com> wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
+On 1/19/22, Nathan Chancellor <nathan@kernel.org> wrote:
+> On Wed, Jan 19, 2022 at 02:54:50PM +0100, Jason A. Donenfeld wrote:
+>> blake2s_compress_generic is weakly aliased to blake2s_generic. The
 >
-> Add device tree bindings for the i2c controller on
-> the Microchip PolarFire SoC.
->
-> Signed-off-by: Daire McNamara <daire.mcnamara@microchip.com>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> Isn't it the other way around?
 
-Thanks for your patch!
+Thanks. Changed that 'to' to a 'by'.
 
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/i2c/microchip,mpfs-i2c.yaml
-> @@ -0,0 +1,55 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/i2c/microchip,mpfs-i2c.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Microchip MPFS I2C Controller Device Tree Bindings
-> +
-> +maintainers:
-> +  - Daire McNamara <daire.mcnamara@microchip.com>
-> +
-> +allOf:
-> +  - $ref: /schemas/i2c/i2c-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - microchip,mpfs-i2c # Microchip PolarFire SoC compatible SoCs
-> +      - microchip,corei2c-rtl-v7 # Microchip Fabric based i2c IP core
-
-Wouldn't it be more logical to have:
-
-    items:
-      - const: microchip,mpfs-i2c # Microchip PolarFire SoC compatible SoCs
-      - const: microchip,corei2c-rtl-v7 # Microchip Fabric based i2c IP core
-
-?
-
-If the IP core is reused, it can become:
-
-    items:
-      - enum:
-          - microchip,mpfs-i2c # Microchip PolarFire SoC compatible SoCs
-          - microchip,<foo>-i2c # ...
-      - const: microchip,corei2c-rtl-v7 # Microchip Fabric based i2c IP core
-
-That way the driver can just match on the second (fallback) value,
-and no further driver changes will be needed (until v8 or later).
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Jason
