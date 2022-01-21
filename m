@@ -2,71 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DE6C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 06:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68891C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 08:30:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348774AbiAUGlX (ORCPT
+        id S1349629AbiAUIam (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jan 2022 01:41:23 -0500
-Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:41052 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1348882AbiAUGlX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jan 2022 01:41:23 -0500
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20L055gU015220;
-        Thu, 20 Jan 2022 22:41:04 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=8ooxZncd1pxU6VLDFOd0+ogSpakQFSxfdEJz9X266WA=;
- b=RGYBdRzxNajfK608PTgq4Vt69CABZVBErZF2JuEUrk8Cqn1dVby8U2DS+Y50BO8FWqHL
- VmZLQ3w2rksduahhd+n9G+Y7lD/9Ap0iXgZY0nAVPGUcA5nP+J1RxUfo9Wm0U9+qIIv5
- lErbN/P23A6uLFU6NniIPu3DUbJdJq4jGrvPQKguRJSUyijtdzHipf5TzZ+D/nkktck8
- HCAAhWQib4cq75He5kMY8EVyidJAwo/yzc6tlxRg5mNGPqtOepVnNgTnRzcQHZIyL0TI
- aMURX5TtShOFTNGj9jxVyeBoEY81jDJbyI5AVFWxuEryoDj5UYFmgEJvt3emRPgAtISE 9w== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3dqhyts03x-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 20 Jan 2022 22:41:03 -0800
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 20 Jan
- 2022 22:41:02 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Thu, 20 Jan 2022 22:41:02 -0800
-Received: from localhost.localdomain (unknown [10.28.34.29])
-        by maili.marvell.com (Postfix) with ESMTP id 76B553F7097;
-        Thu, 20 Jan 2022 22:40:58 -0800 (PST)
-From:   Shijith Thotton <sthotton@marvell.com>
-To:     <geert+renesas@glider.be>
-CC:     <arnd@arndb.de>, <arno@natisbad.org>, <bbrezillon@kernel.org>,
-        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <schalla@marvell.com>, <sthotton@marvell.com>,
-        <jerinj@marvell.com>, <sgoutham@marvell.com>
-Subject: Re: [PATCH] crypto: marvell - Fix platform dependency for CRYPTO_DEV_OCTEONTX2_CPT
-Date:   Fri, 21 Jan 2022 12:10:57 +0530
-Message-ID: <20220121064057.2387263-1-sthotton@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <7c89454656dd825b38b0364bbb2a849554e6f57d.1641995837.git.geert+renesas@glider.be>
-References: <7c89454656dd825b38b0364bbb2a849554e6f57d.1641995837.git.geert+renesas@glider.be>
+        Fri, 21 Jan 2022 03:30:42 -0500
+Received: from mga04.intel.com ([192.55.52.120]:49682 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1349535AbiAUIam (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Jan 2022 03:30:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642753842; x=1674289842;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mx3znovqbTqSHRCLPhWAXVsdrHy1wURwplgEYl4lCrs=;
+  b=dqf8bvX/mu8LAU+agxPKiHdEI+LJPDgXYJsd9yUQRmleydCLs6T8Xwbx
+   R7b4ORW/gGwBomYUqgPeF03USoYKD3lZrCAGj7CnymePj4Wxlaslbctp0
+   JSzT16XDtMHlyIx2tR+V+fYFBRqPf9Qx7NYA0ZjNwYMcQHuYgurETLGpk
+   9H01hPnJbrrDXjkiyxcfggRe3YN5M9Us9FLKSkHsGDxzWIZbj/bBNkzaP
+   +aq5Zard118Vtk0SDASf803UF0WO68obuSxxy+ZvBMIw3GuVOSBqLMLnB
+   iZ6LjFc/DVxLXH1VePpo91tmpjzEDMnss+KjnUEoToNz0glAfLmKmadHD
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10233"; a="244419821"
+X-IronPort-AV: E=Sophos;i="5.88,304,1635231600"; 
+   d="scan'208";a="244419821"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2022 00:30:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,304,1635231600"; 
+   d="scan'208";a="518982996"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 21 Jan 2022 00:30:39 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nApJe-000F73-N2; Fri, 21 Jan 2022 08:30:38 +0000
+Date:   Fri, 21 Jan 2022 16:29:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>, mst@redhat.com,
+        arei.gonglei@huawei.com
+Cc:     kbuild-all@lists.01.org, jasowang@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        helei.sig11@bytedance.com, zhenwei pi <pizhenwei@bytedance.com>
+Subject: [RFC PATCH] virtio-crypto: virtio_crypto_rsa_do_req() can be static
+Message-ID: <20220121082951.GA46247@b53fa9759326>
+References: <20220121022438.1042547-4-pizhenwei@bytedance.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 140yYAPDRS-P1qMvWGSoRDh0IqIiMIae
-X-Proofpoint-GUID: 140yYAPDRS-P1qMvWGSoRDh0IqIiMIae
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-01-21_02,2022-01-20_01,2021-12-02_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220121022438.1042547-4-pizhenwei@bytedance.com>
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-OcteonTX2 doesn't fall under ARCH_THUNDER and ARCH_THUNDER2. A better approach
-would be to define and use a new SOC type as Arnd mentioned at
-https://patchwork.kernel.org/project/linux-crypto/patch/266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be/
-Please wait for him to post that patch or use arm64 as dependency.
+drivers/crypto/virtio/virtio_crypto_akcipher_algo.c:276:5: warning: symbol 'virtio_crypto_rsa_do_req' was not declared. Should it be static?
 
-Thanks,
-Shijith
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
+---
+ virtio_crypto_akcipher_algo.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algo.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algo.c
+index eebccf71b2fab..2b3f8780b7551 100644
+--- a/drivers/crypto/virtio/virtio_crypto_akcipher_algo.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algo.c
+@@ -273,7 +273,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+ 	return -ENOMEM;
+ }
+ 
+-int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
++static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
+ {
+ 	struct akcipher_request *req = container_of(vreq, struct akcipher_request, base);
+ 	struct virtio_crypto_akcipher_request *vc_akcipher_req = akcipher_request_ctx(req);
