@@ -2,165 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CB3C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 16:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 699E8C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 17:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351226AbiAUQu5 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jan 2022 11:50:57 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:4440 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349221AbiAUQu5 (ORCPT
+        id S241855AbiAURoD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 21 Jan 2022 12:44:03 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:14372 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239311AbiAURoC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jan 2022 11:50:57 -0500
-Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4JgQKQ2tgTz67qjY;
-        Sat, 22 Jan 2022 00:47:38 +0800 (CST)
-Received: from fraeml714-chm.china.huawei.com (10.206.15.33) by
- fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 21 Jan 2022 17:50:52 +0100
-Received: from fraeml714-chm.china.huawei.com ([10.206.15.33]) by
- fraeml714-chm.china.huawei.com ([10.206.15.33]) with mapi id 15.01.2308.021;
- Fri, 21 Jan 2022 17:50:52 +0100
-From:   Roberto Sassu <roberto.sassu@huawei.com>
-To:     Roberto Sassu <roberto.sassu@huawei.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Antony Vennard <antony@vennard.ch>
-CC:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "dhowells@redhat.com" <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zohar@linux.ibm.com" <zohar@linux.ibm.com>
-Subject: RE: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-Thread-Topic: [PATCH 00/14] KEYS: Add support for PGP keys and signatures
-Thread-Index: AQHYBxWUAJoIvMeqLk2UYoD6PZRMZ6xnP9oAgAAHlwCAAfOkgIAAJTmAgAD7bXCAA18/UA==
-Date:   Fri, 21 Jan 2022 16:50:52 +0000
-Message-ID: <289f4694fc084f029187af7e8a3120cc@huawei.com>
-References: <20220111180318.591029-1-roberto.sassu@huawei.com>
- <YeV+jkGg6mpQdRID@zx2c4.com>
- <d92912bba61ee37e42d04b64073b9031604acc0f.camel@HansenPartnership.com>
- <079f10b9-060b-3a36-2224-fa1b483cbad5@vennard.ch>
- <YedHR93wPLS/JEsE@sol.localdomain>
- <d71ea8ae51e1438c894b44b011f3efda@huawei.com>
-In-Reply-To: <d71ea8ae51e1438c894b44b011f3efda@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.204.63.33]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Fri, 21 Jan 2022 12:44:02 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20LAHDBc029276;
+        Fri, 21 Jan 2022 09:43:49 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=Hnkix26dB7dgPESASXxF1i0pv7jnm1c9dtXBbWPYVcE=;
+ b=KLHovAyNE6av5OXWA6fal0yS0jBi4j+doUeXaSkgpUzFq6rPxyK34zRqIs+GTMxHMkkj
+ R59gNK0DwQaRN5rZNSSzuic2jh3ZuEWmImwiuofTUHZj/W+ugxSMTFS4/EhkqbYR3Zby
+ Dk5ekkjKIHpwwrUqkr/PzruEDYuXR1WJHefYqpgkY3hvcaMew2h3wrg+vuxdFvAR+N/L
+ r7W+xC2PMHKl3wi3qAUntgTKMA3iGBEWq4ZiVm9QLufjpVEX5Q6Zf1kaAfyaQzMcM4U8
+ H2Un1A1STe9L7FvvdKBg1JpurjA53H+HT02gQJ5ek+FYyGIXXVqU7HmHQmw2ZrV3KVIL Xw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3dqj05jw27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jan 2022 09:43:49 -0800
+Received: from m0045851.ppops.net (m0045851.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 20LHbGkC021851;
+        Fri, 21 Jan 2022 09:43:49 -0800
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3dqj05jw23-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 21 Jan 2022 09:43:48 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Fri, 21 Jan
+ 2022 09:43:46 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Fri, 21 Jan 2022 09:43:46 -0800
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 8EEA33F70A1;
+        Fri, 21 Jan 2022 09:43:42 -0800 (PST)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     Arnaud Ebalard <arno@natisbad.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Boris Brezillon <bbrezillon@kernel.org>
+CC:     Shijith Thotton <sthotton@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
+        <sgoutham@marvell.com>, Srujana Challa <schalla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        Ovidiu Panait <ovidiu.panait@windriver.com>,
+        "Suheil Chandran" <schandran@marvell.com>,
+        Lukasz Bartosik <lbartosik@marvell.com>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] crypto: octeontx2: fix NULL pointer dereference
+Date:   Fri, 21 Jan 2022 23:13:23 +0530
+Message-ID: <3ef09bf0c4adf7bc33f01f60cb8ce96e8f77b58c.1642786900.git.sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <3ff70ee925aad3afa1adc4ad1f4a7a494929d400.1642773756.git.sthotton@marvell.com>
+References: <3ff70ee925aad3afa1adc4ad1f4a7a494929d400.1642773756.git.sthotton@marvell.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Va0f9547P-r80JbcPiW8guMOVHxl2ZDU
+X-Proofpoint-ORIG-GUID: cbe3lamZNG3loXYPqGV06Tp3x0cDp6Yr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-21_09,2022-01-21_01,2021-12-02_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBGcm9tOiBSb2JlcnRvIFNhc3N1IFttYWlsdG86cm9iZXJ0by5zYXNzdUBodWF3ZWkuY29tXQ0K
-PiBTZW50OiBXZWRuZXNkYXksIEphbnVhcnkgMTksIDIwMjIgMjoyNSBQTQ0KPiA+IEZyb206IEVy
-aWMgQmlnZ2VycyBbbWFpbHRvOmViaWdnZXJzQGtlcm5lbC5vcmddDQo+ID4gU2VudDogV2VkbmVz
-ZGF5LCBKYW51YXJ5IDE5LCAyMDIyIDEyOjA0IEFNDQo+ID4gT24gVHVlLCBKYW4gMTgsIDIwMjIg
-YXQgMDk6NTA6MjFQTSArMDEwMCwgQW50b255IFZlbm5hcmQgd3JvdGU6DQo+ID4gPg0KPiA+ID4g
-SGkgQWxsLA0KPiA+ID4NCj4gPiA+IE9uIDE3LzAxLzIwMjIgMTY6MDIsIEphbWVzIEJvdHRvbWxl
-eSB3cm90ZToNCj4gPiA+ID4gT24gTW9uLCAyMDIyLTAxLTE3IGF0IDE1OjM0ICswMTAwLCBKYXNv
-biBBLiBEb25lbmZlbGQgd3JvdGU6DQo+ID4gPiA+ID4gSGksDQo+ID4gPiA+ID4NCj4gPiA+ID4g
-PiBXaGlsZSBpdCBsb29rcyBsaWtlIHlvdSBwdXQgYSBsb3Qgb2Ygd29yayBpbnRvIHRoaXMgcGF0
-Y2hzZXQsIEkgdGhpbmsNCj4gPiA+ID4gPiB0aGUgZ2VuZXJhbCBpZGVhIG9mIGFkZGluZyBQR1Ag
-KnRvIHRoZSBrZXJuZWwqIGlzIGEgcHJldHR5IGRhdW50aW5nDQo+ID4gPiA+ID4gcHJvcG9zaXRp
-b24uIFRoZSBnZW5lcmFsIGNvbnNlbnN1cyBpbiB0aGUgY3J5cHRvIGVuZ2luZWVyaW5nIHdvcmxk
-IGlzDQo+ID4gPiA+ID4gdGhhdCBQR1Agb3VnaHQgdG8gYmUgb24gaXRzIHdheSBvdXQuIFdlIGRl
-ZmluaXRlbHkgZG9uJ3Qgd2FudCB0bw0KPiA+ID4gPiA+IHBlcnBldHVhdGUgdGhpcyBwcm9qZWN0
-LW9uLWxpZmUtc3VwcG9ydCBpbnRvIHRoZSBwZXJtYW5lbmNlIG9mIGtlcm5lbA0KPiA+ID4gPiA+
-IGNvZGUuIFNvbWUgcXVpY2sgR29vZ2xlIHNlYXJjaGVzIHdpbGwgcmV2ZWFsIGEgbGl0YW55IG9m
-IGJsb2cgcG9zdHMNCj4gPiA+ID4gPiB0byB0aGUgdHVuZSBvZiwgIndoeSBvaCB3aHkgYXJlIHBl
-b3BsZSBzdGlsbCB1c2luZyB0aGlzPyIgSGVyZSdzIG9uZQ0KPiA+ID4gPiA+IGZyb20gMjAxOToN
-Cj4gPiA+ID4gPiBodHRwczovL2xhdGFjb3JhLm1pY3JvLmJsb2cvMjAxOS8wNy8xNi90aGUtcGdw
-LXByb2JsZW0uaHRtbCAuIEkNCj4gPiA+ID4gPiB0aGluayB0aGVzZSBhcmUgYXJndW1lbnRzIHRv
-IHRha2Ugc2VyaW91c2x5LiBBbmQgZXZlbiBpZiB5b3UgZGlzYWdyZWUNCj4gPiA+ID4gPiB3aXRo
-IHNvbWUgcGFydHMsIHlvdSBtYXkgd2FudCB0byBjb25zaWRlciB3aGV0aGVyIHRoZSByZW1haW5p
-bmcgcGFydHMNCj4gPiA+ID4gPiB3YXJyYW50IGEgYml0IG9mIHBhdXNlIGJlZm9yZSBhZGRpbmcg
-dGhpcyB0byB0aGUga2VybmVsIGFuZA0KPiA+ID4gPiA+IHBlcnBldHVhdGluZyBQR1AncyBkZXNp
-Z24gZnVydGhlci4NCj4gPiA+DQo+ID4gPiBTbyB3aGlsZSBJIHVuZGVyc3RhbmQgd2h5IHRoaXMg
-aXMgYmVpbmcgcHJvcG9zZWQgYW5kIGNsZWFybHkgZWZmb3J0IGhhcyBnb25lDQo+ID4gPiBpbnRv
-IGl0LCBJIGFsc28gdGhpbmsgaXQgaXMgbm90IHRoZSByaWdodCBhcHByb2FjaC4gSXQgc2VlbXMg
-dGhpcyBwcm9wb3NhbA0KPiA+ID4gaXMgdG8gaW5jbHVkZSBhIGZ1bGwgUEdQIHBhY2tldCBwYXJz
-ZXIgYW5kIHZlcmlmaWNhdGlvbiBsb2dpYyBpbiB0aGUga2VybmVsDQo+ID4gPiBhcyBhbiBlcXVp
-dmFsZW50IHRvIGFsbG93IFBHUCBzaWduYXR1cmVzIHRvIGJlIHN1Ym1pdHRlZCB2aWENCj4gPiA+
-IEZTX0lPQ19FTkFCTEVfVkVSSVRZOg0KPiA+ID4NCj4gPiA+ICJGU19JT0NfRU5BQkxFX1ZFUklU
-WSBhY2NlcHRzIGEgcG9pbnRlciB0byBhIFBLQ1MjNyBmb3JtYXR0ZWQgZGV0YWNoZWQNCj4gPiA+
-IHNpZ25hdHVyZSBpbiBERVIgZm9ybWF0IG9mIHRoZSBmaWxl4oCZcyBmcy12ZXJpdHkgZGlnZXN0
-LiINCj4gPiA+DQo+ID4NCj4gPiBJdCdzIHdvcnRoIG5vdGluZyB0aGF0IGlmIGZzLXZlcml0eSBi
-dWlsdC1pbiBzaWduYXR1cmVzIGFyZSB1c2VkLCBhIHRydXN0ZWQNCj4gPiB1c2Vyc3BhY2UgcHJv
-Z3JhbSBpcyBzdGlsbCByZXF1aXJlZCB0byBkZXRlcm1pbmUgYW5kIGVuZm9yY2UgdGhlIHBvbGlj
-eSBvZg0KPiB3aGljaA0KPiA+IGZpbGVzIGFyZSByZXF1aXJlZCB0byBiZSBzaWduZWQuICBUaGUg
-a2VybmVsIG9ubHkgaGFuZGxlcyB0aGUgYWN0dWFsIHNpZ25hdHVyZQ0KPiA+IHZlcmlmaWNhdGlv
-bi4gIFRoaXMgd2FzIGJhc2ljYWxseSBhIHByb29mLW9mLWNvbmNlcHQgd2hpY2ggcmV1c2VkIHRo
-ZSBrZXJuZWwncw0KPiA+IG1vZHVsZSBzaWduYXR1cmUgdmVyaWZpY2F0aW9uIGNvZGUgKHdoaWNo
-IGhhcHBlbnMgdG8gdXNlIFBLQ1MjNykuDQo+IA0KPiBKdXN0IHRvIHNob3cgaG93IHRoZSBmc3Zl
-cml0eSBjb2RlIHdpbGwgbG9vayBsaWtlIGFmdGVyIGFkZGluZyBzdXBwb3J0DQo+IGZvciBQR1Ag
-c2lnbmF0dXJlczoNCj4gDQo+ICsgICAgICAgc3dpdGNoICh2aS0+dHlwZSkgew0KPiArICAgICAg
-IGNhc2UgUEtFWV9JRF9QS0NTNzoNCj4gKyAgICAgICAgICAgICAgIGVyciA9IHZlcmlmeV9wa2Nz
-N19zaWduYXR1cmUoZCwgc2l6ZW9mKCpkKSArIGhhc2hfYWxnLT5kaWdlc3Rfc2l6ZSwNCj4gKyAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2lnbmF0dXJlLCBzaWdf
-c2l6ZSwgZnN2ZXJpdHlfa2V5cmluZywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgVkVSSUZZSU5HX1VOU1BFQ0lGSUVEX1NJR05BVFVSRSwNCj4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTlVMTCwgTlVMTCk7DQo+ICsg
-ICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICBjYXNlIFBLRVlfSURfUEdQOg0KPiArICAg
-ICAgICAgICAgICAgZXJyID0gdmVyaWZ5X3BncF9zaWduYXR1cmUoZCwgc2l6ZW9mKCpkKSArIGhh
-c2hfYWxnLT5kaWdlc3Rfc2l6ZSwNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIHNpZ25hdHVyZSwgc2lnX3NpemUsIGZzdmVyaXR5X2tleXJpbmcsDQo+ICsgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBWRVJJRllJTkdfVU5TUEVDSUZJ
-RURfU0lHTkFUVVJFLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgTlVMTCwgTlVMTCk7DQo+ICsgICAgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICBkZWZh
-dWx0Og0KPiArICAgICAgICAgICAgICAgZXJyID0gLUVPUE5PVFNVUFA7DQo+ICsgICAgICAgfQ0K
-PiANCj4gQXMgeW91IGNhbiBzZWUsIHRoZSBjaGFuZ2Ugd2lsbCBiZSBzdHJhaWdodGZvcndhcmQu
-DQo+IA0KPiBPbiB1c2VyIHNwYWNlIHNpZGUsIEkgcGxhbiB0byBhZGQgdGhlIGNhcGFiaWxpdHkg
-dG8gZnN2ZXJpdHktdXRpbHMNCj4gdG8gcHJvZHVjZSBhIFBHUCBzaWduYXR1cmUgd2l0aCB0aGUg
-R1BHIGtleSBwYXNzZWQgYnkgcnBtc2lnbi4NCg0KQXQgdGhlIGVuZCwgaXQgd2FzIG5vdCBuZWNl
-c3NhcnkuIFdpdGggdGhpcyBwYXRjaCBzZXQsIHJwbXNpZ24gaXMgYWJsZQ0KdG8gcHJvZHVjZSBh
-IFBHUCBzaWduYXR1cmUgd2l0aG91dCBtb2RpZmljYXRpb25zIHRvIGZzdmVyaXR5LXV0aWxzOg0K
-DQpodHRwczovL2dpdGh1Yi5jb20vcm9iZXJ0b3Nhc3N1L3JwbS9jb21taXRzL2ZzdmVyaXR5LWdw
-Zy12MQ0KDQpUaGUgbW9kaWZpY2F0aW9ucyBhcmUgdmVyeSBtaW5pbWFsLCBiYXNpY2FsbHkgY29u
-c2lzdCBpbiBpbnRyb2R1Y2luZw0KdGhlIG5ldyBmdW5jdGlvbiBycG1WZXJpdHlTaWduRmlsZUdQ
-RygpIHRoYXQgY3JlYXRlcyBhIGZpbGUgd2l0aA0KdGhlIGZzdmVyaXR5X2Zvcm1hdHRlZF9kaWdl
-c3Qgc3RydWN0dXJlLCBhbmQgc2lnbnMgaXQgd2l0aCB0aGUNCmV4cG9zZWQgZnVuY3Rpb24gbWFr
-ZUdQR1NpZ25hdHVyZUFyZ3MoKS4NCg0KVGhlIGZzdmVyaXR5IHJwbSBwbHVnaW4gd29ya3Mgd2l0
-aG91dCBtb2RpZmljYXRpb24sIGFuZCB0aGUNCmtlcm5lbCB0YWtlcyBjYXJlIG9mIHRoZSB2ZXJp
-ZmljYXRpb24gb2YgdGhlIFBHUCBzaWduYXR1cmVzIHdoZW4NCmEgcGFja2FnZSBpcyBpbnN0YWxs
-ZWQuDQoNCkkgd3JvdGUgYSBtb3JlIGRldGFpbGVkIHByb2NlZHVyZSB0byBzaWduIGFuZCBpbnN0
-YWxsIGEgcGFja2FnZQ0Kd2l0aCBmc3Zlcml0eSBzaWduYXR1cmVzIGluIHRoZSBQR1AgZm9ybWF0
-LiBJdCBjYW4gYmUgZm91bmQgaGVyZToNCg0KaHR0cHM6Ly93d3cuc3Bpbmljcy5uZXQvbGlzdHMv
-ZmVkb3JhLWRldmVsL21zZzI5NjU2Mi5odG1sDQoNClJvYmVydG8NCg0KSFVBV0VJIFRFQ0hOT0xP
-R0lFUyBEdWVzc2VsZG9yZiBHbWJILCBIUkIgNTYwNjMNCk1hbmFnaW5nIERpcmVjdG9yOiBMaSBQ
-ZW5nLCBaaG9uZyBSb25naHVhDQoNCj4gPiBJJ2QgZW5jb3VyYWdlIG5ldyB1c2VycyB0byBlaXRo
-ZXIgZ28gYWxsLWluIG9uIGEgdXNlcnNwYWNlIHNvbHV0aW9uLCB1c2luZyBhDQo+ID4gdHJ1c3Rl
-ZCB1c2Vyc3BhY2UgcHJvZ3JhbSB0byB2ZXJpZnkgc2lnbmF0dXJlcyBvZiBmcy12ZXJpdHkgZmls
-ZSBkaWdlc3RzOw0KPiA+ICpvciogZ28gYWxsLWluIG9uIGFuIGluLWtlcm5lbCBzb2x1dGlvbiwg
-dXNpbmcgdGhlIElNQSBzdXBwb3J0IGZvciBmcy12ZXJpdHkNCj4gPiB3aGljaCBNaW1pIFpvaGFy
-IGlzIHdvcmtpbmcgb24uICBBIHVzZXJzcGFjZSBzb2x1dGlvbiBjb3VsZCB1c2UgYSBzaW1wbGUN
-Cj4gDQo+IFByb2JhYmx5LCB0aGVyZSBpcyBhbHNvIHRoZSB0aGlyZCBvcHRpb24gb2YgYW4gTFNN
-IChzdWNoIGFzIElQRSkgdGhhdCBnZXRzDQo+IGZyb20gZnN2ZXJpdHkgdGhlIGluZm9ybWF0aW9u
-IGlmIHRoZSBzaWduYXR1cmUgd2FzIHZhbGlkYXRlZCwgYW5kIGRlY2lkZQ0KPiBkZXBlbmRpbmcg
-b24gYSBwb2xpY3kuIEkgd291bGQgYWxzbyBleHBvc2UgdGhlIGluZm9ybWF0aW9uIGFib3V0IHRo
-ZQ0KPiByZXN0cmljdGlvbiBpbXBvc2VkIG9uIHRoZSBrZXlyaW5nIGZyb20gd2hpY2ggdGhlIGtl
-eSB1c2VkIHRvIHZlcmlmeQ0KPiB0aGUgc2lnbmF0dXJlIHdhcyBmb3VuZC4NCj4gDQo+IE1heWJl
-IElNQSBjb3VsZCB1c2UgdGhpcyBhcHByb2FjaCB0b28sIHdoaWNoIHdvdWxkIGF2b2lkIHRoZSBu
-ZWVkDQo+IG9mIGludHJvZHVjaW5nIGFub3RoZXIgc2lnbmF0dXJlIGZvcm1hdC4gSWYgdGhhdCBp
-cyBkZXNpcmVkLCB5b3UgbWlnaHQNCj4gd2FudCB0byBjb29yZGluYXRlIHdpdGggdGhlIGF1dGhv
-cnMgb2YgYSBGZWRvcmEgZmVhdHVyZToNCj4gDQo+IGh0dHBzOi8vZmVkb3JhcHJvamVjdC5vcmcv
-d2lraS9DaGFuZ2VzL0ZzVmVyaXR5UlBNDQo+IA0KPiB3aGljaCwgYXMgZmFyIGFzIEkga25vdywg
-cGxhbiB0byB1c2UgdGhlIHNpZ25hdHVyZSBmb3JtYXQgYWxyZWFkeQ0KPiB1cHN0cmVhbWVkLg0K
-PiANCj4gVGhhbmtzDQo+IA0KPiBSb2JlcnRvDQo+IA0KPiBIVUFXRUkgVEVDSE5PTE9HSUVTIER1
-ZXNzZWxkb3JmIEdtYkgsIEhSQiA1NjA2Mw0KPiBNYW5hZ2luZyBEaXJlY3RvcjogTGkgUGVuZywg
-WmhvbmcgUm9uZ2h1YQ0KPiANCj4gPiBzaWduYXR1cmUgZm9ybWF0LCB1c2luZyBhIG1vZGVybiBh
-bGdvcml0aG0gc3VjaCBhcyBFZDI1NTE5LiAgSU1BIHVzZXMgYQ0KPiBzaW1wbGUNCj4gPiBzaWdu
-YXR1cmUgZm9ybWF0IHRvbywgdGhvdWdoIGl0IHVzZXMgYSBjb21wbGV4IGZvcm1hdCAoWC41MDkp
-IGZvciBwdWJsaWMga2V5cy4NCj4gPg0KPiA+IC0gRXJpYw0K
+CONFIG_DM_CRYPT is checked before registering ciphers, but not before
+unregister. This could lead to a NULL pointer dereference during driver
+release (in unregister) if CONFIG_DM_CRYPT is enabled.
+
+...
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+...
+Call trace:
+ crypto_unregister_alg+0x68/0xfc
+ crypto_unregister_skciphers+0x44/0x60
+ otx2_cpt_crypto_exit+0x100/0x1a0
+ otx2_cptvf_remove+0xf8/0x200
+ pci_device_remove+0x3c/0xd4
+ __device_release_driver+0x188/0x234
+ device_release_driver+0x2c/0x4c
+...
+
+Added a CONFIG_DM_CRYPT check, similar to register, in unregister to
+avoid this.
+
+Fixes: 6f03f0e8b6c8 ("crypto: octeontx2 - register with linux crypto framework")
+
+Signed-off-by: Shijith Thotton <sthotton@marvell.com>
+---
+v2:
+- Added fixes line to commit message.
+
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+index 2748a3327e39..620fa9b23e78 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+@@ -1650,7 +1650,7 @@ static inline int cpt_register_algs(void)
+ 
+ 	err = crypto_register_aeads(otx2_cpt_aeads,
+ 				    ARRAY_SIZE(otx2_cpt_aeads));
+-	if (err) {
++	if (err && !IS_ENABLED(CONFIG_DM_CRYPT)) {
+ 		crypto_unregister_skciphers(otx2_cpt_skciphers,
+ 					    ARRAY_SIZE(otx2_cpt_skciphers));
+ 		return err;
+@@ -1661,8 +1661,9 @@ static inline int cpt_register_algs(void)
+ 
+ static inline void cpt_unregister_algs(void)
+ {
+-	crypto_unregister_skciphers(otx2_cpt_skciphers,
+-				    ARRAY_SIZE(otx2_cpt_skciphers));
++	if (!IS_ENABLED(CONFIG_DM_CRYPT))
++		crypto_unregister_skciphers(otx2_cpt_skciphers,
++					    ARRAY_SIZE(otx2_cpt_skciphers));
+ 	crypto_unregister_aeads(otx2_cpt_aeads, ARRAY_SIZE(otx2_cpt_aeads));
+ }
+ 
+-- 
+2.25.1
+
