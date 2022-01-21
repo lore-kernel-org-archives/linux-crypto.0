@@ -2,145 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D19C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 06:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DE6C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Jan 2022 06:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378736AbiAUGhi (ORCPT
+        id S1348774AbiAUGlX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jan 2022 01:37:38 -0500
-Received: from mga03.intel.com ([134.134.136.65]:52154 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348774AbiAUGhi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jan 2022 01:37:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642747058; x=1674283058;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PrB7+txqACOqvxAdRJEN6Ri06z0Sf+hn/heR9Ndq8fo=;
-  b=dsm/XPkFuzKxhf5oocuMDuxQTJb2gHgjVKcEw032lDG0lS5v4xIAKOEv
-   zawatnrYfAkAuBLqnCtDMbAD24k9Ob4nhmDC9xwng+CcQlEZmvmRLQ6y8
-   exStfBflh7zl3nQe/KkxPnygLx6Jvj63iOWIh0h0e5lRc77PiQ+MaVBb+
-   z3kNt5q8Nl5UIdgx35egGcHSgNnlYukIzXEjbjiLoXlsGhuM/6kQPXMgQ
-   bzyMBeippg0iW+NVJ0UlNUjnOg2vpTk42+H0Iguu2IbVq2fDO/jjUB9vJ
-   U5VM8esYZWXnvPtlz01XOyQfTNA8d7YbHiobt5nsG+0435QHdtIuQxrmh
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10233"; a="245530561"
-X-IronPort-AV: E=Sophos;i="5.88,304,1635231600"; 
-   d="scan'208";a="245530561"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2022 22:37:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,304,1635231600"; 
-   d="scan'208";a="616400090"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 20 Jan 2022 22:37:35 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nAnYE-000F0y-Qp; Fri, 21 Jan 2022 06:37:34 +0000
-Date:   Fri, 21 Jan 2022 14:36:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>, mst@redhat.com,
-        arei.gonglei@huawei.com
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        helei.sig11@bytedance.com, zhenwei pi <pizhenwei@bytedance.com>
-Subject: Re: [PATCH 3/3] virtio-crypto: implement RSA algorithm
-Message-ID: <202201211427.TgczsUOo-lkp@intel.com>
-References: <20220121022438.1042547-4-pizhenwei@bytedance.com>
+        Fri, 21 Jan 2022 01:41:23 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:41052 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1348882AbiAUGlX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Jan 2022 01:41:23 -0500
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20L055gU015220;
+        Thu, 20 Jan 2022 22:41:04 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=8ooxZncd1pxU6VLDFOd0+ogSpakQFSxfdEJz9X266WA=;
+ b=RGYBdRzxNajfK608PTgq4Vt69CABZVBErZF2JuEUrk8Cqn1dVby8U2DS+Y50BO8FWqHL
+ VmZLQ3w2rksduahhd+n9G+Y7lD/9Ap0iXgZY0nAVPGUcA5nP+J1RxUfo9Wm0U9+qIIv5
+ lErbN/P23A6uLFU6NniIPu3DUbJdJq4jGrvPQKguRJSUyijtdzHipf5TzZ+D/nkktck8
+ HCAAhWQib4cq75He5kMY8EVyidJAwo/yzc6tlxRg5mNGPqtOepVnNgTnRzcQHZIyL0TI
+ aMURX5TtShOFTNGj9jxVyeBoEY81jDJbyI5AVFWxuEryoDj5UYFmgEJvt3emRPgAtISE 9w== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3dqhyts03x-5
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jan 2022 22:41:03 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 20 Jan
+ 2022 22:41:02 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Thu, 20 Jan 2022 22:41:02 -0800
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 76B553F7097;
+        Thu, 20 Jan 2022 22:40:58 -0800 (PST)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     <geert+renesas@glider.be>
+CC:     <arnd@arndb.de>, <arno@natisbad.org>, <bbrezillon@kernel.org>,
+        <davem@davemloft.net>, <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <schalla@marvell.com>, <sthotton@marvell.com>,
+        <jerinj@marvell.com>, <sgoutham@marvell.com>
+Subject: Re: [PATCH] crypto: marvell - Fix platform dependency for CRYPTO_DEV_OCTEONTX2_CPT
+Date:   Fri, 21 Jan 2022 12:10:57 +0530
+Message-ID: <20220121064057.2387263-1-sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <7c89454656dd825b38b0364bbb2a849554e6f57d.1641995837.git.geert+renesas@glider.be>
+References: <7c89454656dd825b38b0364bbb2a849554e6f57d.1641995837.git.geert+renesas@glider.be>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220121022438.1042547-4-pizhenwei@bytedance.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 140yYAPDRS-P1qMvWGSoRDh0IqIiMIae
+X-Proofpoint-GUID: 140yYAPDRS-P1qMvWGSoRDh0IqIiMIae
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-21_02,2022-01-20_01,2021-12-02_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi zhenwei,
+OcteonTX2 doesn't fall under ARCH_THUNDER and ARCH_THUNDER2. A better approach
+would be to define and use a new SOC type as Arnd mentioned at
+https://patchwork.kernel.org/project/linux-crypto/patch/266065918e47e8965bb6a0ab486da070278788e4.1641996057.git.geert+renesas@glider.be/
+Please wait for him to post that patch or use arm64 as dependency.
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linux/master linus/master v5.16 next-20220121]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/zhenwei-pi/Introduce-akcipher-service-for-virtio-crypto/20220121-102730
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: hexagon-randconfig-r026-20220120 (https://download.01.org/0day-ci/archive/20220121/202201211427.TgczsUOo-lkp@intel.com/config)
-compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project d4baf3b1322b84816aa623d8e8cb45a49cb68b84)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/fa1045d13dd16399ab0287c599719a977892cf05
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review zhenwei-pi/Introduce-akcipher-service-for-virtio-crypto/20220121-102730
-        git checkout fa1045d13dd16399ab0287c599719a977892cf05
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/crypto/virtio/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> drivers/crypto/virtio/virtio_crypto_akcipher_algo.c:276:5: warning: no previous prototype for function 'virtio_crypto_rsa_do_req' [-Wmissing-prototypes]
-   int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
-       ^
-   drivers/crypto/virtio/virtio_crypto_akcipher_algo.c:276:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
-   ^
-   static 
-   1 warning generated.
-
-
-vim +/virtio_crypto_rsa_do_req +276 drivers/crypto/virtio/virtio_crypto_akcipher_algo.c
-
-   275	
- > 276	int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
-   277	{
-   278		struct akcipher_request *req = container_of(vreq, struct akcipher_request, base);
-   279		struct virtio_crypto_akcipher_request *vc_akcipher_req = akcipher_request_ctx(req);
-   280		struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
-   281		struct virtio_crypto_akcipher_ctx *ctx = vc_akcipher_req->akcipher_ctx;
-   282		struct virtio_crypto *vcrypto = ctx->vcrypto;
-   283		struct data_queue *data_vq = vc_req->dataq;
-   284		struct virtio_crypto_op_header *header;
-   285		struct virtio_crypto_akcipher_data_req *akcipher_req;
-   286		int ret;
-   287	
-   288		vc_req->sgs = NULL;
-   289		vc_req->req_data = kzalloc_node(sizeof(*vc_req->req_data),
-   290			GFP_KERNEL, dev_to_node(&vcrypto->vdev->dev));
-   291		if (!vc_req->req_data)
-   292			return -ENOMEM;
-   293	
-   294		/* build request header */
-   295		header = &vc_req->req_data->header;
-   296		header->opcode = cpu_to_le32(vc_akcipher_req->opcode);
-   297		header->algo = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_RSA);
-   298		header->session_id = cpu_to_le64(ctx->session_id);
-   299	
-   300		/* build request akcipher data */
-   301		akcipher_req = &vc_req->req_data->u.akcipher_req;
-   302		akcipher_req->para.src_data_len = cpu_to_le32(req->src_len);
-   303		akcipher_req->para.dst_data_len = cpu_to_le32(req->dst_len);
-   304	
-   305		ret = __virtio_crypto_akcipher_do_req(vc_akcipher_req, req, data_vq);
-   306		if (ret < 0) {
-   307			kfree_sensitive(vc_req->req_data);
-   308			vc_req->req_data = NULL;
-   309			return ret;
-   310		}
-   311	
-   312		return 0;
-   313	}
-   314	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Thanks,
+Shijith
