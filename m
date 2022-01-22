@@ -2,95 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A63C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jan 2022 00:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6F5C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jan 2022 08:18:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbiAVAUM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Jan 2022 19:20:12 -0500
-Received: from mga09.intel.com ([134.134.136.24]:6801 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230077AbiAVAUK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jan 2022 19:20:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642810810; x=1674346810;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I0fDyxdfVfi2SI/BrQs2v6hQ87V3QCZvB7JxQD35k8k=;
-  b=Fli4O6k5tXNkB98n7VWRXG87k9ve9lvOrJgtUryNkoy9XGdDW1t4ngIg
-   UmUijdOLtV5o4PuZBPDAuEmehT27JKdYF/gj8gtpUswZorywwJ9gyuHnr
-   XUq7eUgQ7eWtmmCq/zNKYWQXfGPn1Z7B/40yYQDfReuWzOVovl/a88Gm0
-   lBcnhx8FAw5pGCLb6Lu36Dn5CHBpxx1Vm2CtWpFCObxViuQuX8A4z/O5C
-   LiUmIsMmR7EGoIWb8s5wcr/Ac9mqjSN5e0KIk6haR2idxGrwfLI/PqI+9
-   kyswrLg+NdELW8obDyqWfr6TfGp5b7hnImLlhKIWujyM7sq2nxWKcO85G
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10234"; a="245553996"
-X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="245553996"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2022 16:20:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="579771673"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Jan 2022 16:20:07 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nB48V-000Fnm-1A; Sat, 22 Jan 2022 00:20:07 +0000
-Date:   Sat, 22 Jan 2022 08:19:15 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>, mst@redhat.com,
-        arei.gonglei@huawei.com
-Cc:     kbuild-all@lists.01.org, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        helei.sig11@bytedance.com, zhenwei pi <pizhenwei@bytedance.com>
-Subject: Re: [PATCH 3/3] virtio-crypto: implement RSA algorithm
-Message-ID: <202201220847.wXhZvj4G-lkp@intel.com>
-References: <20220121022438.1042547-4-pizhenwei@bytedance.com>
+        id S230102AbiAVIS1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 22 Jan 2022 03:18:27 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:16730 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229790AbiAVISY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Jan 2022 03:18:24 -0500
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Jgptw6VbPzZf8Q;
+        Sat, 22 Jan 2022 16:14:32 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Sat, 22 Jan 2022 16:18:22 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.20; Sat, 22 Jan
+ 2022 16:18:21 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH v3 2/5] crypto: hisilicon/sec - add some comments for soft fallback
+Date:   Sat, 22 Jan 2022 16:13:09 +0800
+Message-ID: <20220122081312.29121-3-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20220122081312.29121-1-yekai13@huawei.com>
+References: <20220122081312.29121-1-yekai13@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220121022438.1042547-4-pizhenwei@bytedance.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi zhenwei,
+Modify the print of information that might lead to user misunderstanding.
+Currently only XTS mode need the fallback tfm when using 192bit key.
+Others algs not need soft fallback tfm. So others algs can return
+directly.
 
-Thank you for the patch! Yet something to improve:
-
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linux/master linus/master v5.16 next-20220121]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/zhenwei-pi/Introduce-akcipher-service-for-virtio-crypto/20220121-102730
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: mips-randconfig-r006-20220117 (https://download.01.org/0day-ci/archive/20220122/202201220847.wXhZvj4G-lkp@intel.com/config)
-compiler: mipsel-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/fa1045d13dd16399ab0287c599719a977892cf05
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review zhenwei-pi/Introduce-akcipher-service-for-virtio-crypto/20220121-102730
-        git checkout fa1045d13dd16399ab0287c599719a977892cf05
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=mips SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   mipsel-linux-ld: drivers/crypto/virtio/virtio_crypto_akcipher_algo.o: in function `virtio_crypto_rsa_set_key':
-   virtio_crypto_akcipher_algo.c:(.text+0x5d8): undefined reference to `rsa_parse_priv_key'
->> mipsel-linux-ld: virtio_crypto_akcipher_algo.c:(.text+0x61c): undefined reference to `rsa_parse_pub_key'
-
+Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index bf93c9847365..48abd3871c0e 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -641,13 +641,15 @@ static int sec_skcipher_fbtfm_init(struct crypto_skcipher *tfm)
+ 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
+ 
+ 	c_ctx->fallback = false;
++
++	/* Currently, only XTS mode need fallback tfm when using 192bit key */
+ 	if (likely(strncmp(alg, "xts", SEC_XTS_NAME_SZ)))
+ 		return 0;
+ 
+ 	c_ctx->fbtfm = crypto_alloc_sync_skcipher(alg, 0,
+ 						  CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(c_ctx->fbtfm)) {
+-		pr_err("failed to alloc fallback tfm!\n");
++		pr_err("failed to alloc xts mode fallback tfm!\n");
+ 		return PTR_ERR(c_ctx->fbtfm);
+ 	}
+ 
+@@ -808,7 +810,7 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	}
+ 
+ 	memcpy(c_ctx->c_key, key, keylen);
+-	if (c_ctx->fallback) {
++	if (c_ctx->fallback && c_ctx->fbtfm) {
+ 		ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
+ 		if (ret) {
+ 			dev_err(dev, "failed to set fallback skcipher key!\n");
+@@ -2032,13 +2034,12 @@ static int sec_skcipher_soft_crypto(struct sec_ctx *ctx,
+ 				    struct skcipher_request *sreq, bool encrypt)
+ {
+ 	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
++	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, c_ctx->fbtfm);
+ 	struct device *dev = ctx->dev;
+ 	int ret;
+ 
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, c_ctx->fbtfm);
+-
+ 	if (!c_ctx->fbtfm) {
+-		dev_err(dev, "failed to check fallback tfm\n");
++		dev_err_ratelimited(dev, "the soft tfm isn't supported in the current system.\n");
+ 		return -EINVAL;
+ 	}
+ 
+@@ -2256,7 +2257,6 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+ 	if (ctx->sec->qm.ver == QM_HW_V2) {
+ 		if (unlikely(!req->cryptlen || (!sreq->c_req.encrypt &&
+ 		    req->cryptlen <= authsize))) {
+-			dev_err(dev, "Kunpeng920 not support 0 length!\n");
+ 			ctx->a_ctx.fallback = true;
+ 			return -EINVAL;
+ 		}
+-- 
+2.33.0
+
