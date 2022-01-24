@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3AB5C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 12:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCF1C43217
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 12:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242650AbiAXMO7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 07:14:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32832 "EHLO
+        id S242671AbiAXMPA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jan 2022 07:15:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239296AbiAXMOF (ORCPT
+        with ESMTP id S239315AbiAXMOF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 24 Jan 2022 07:14:05 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58338C061765;
-        Mon, 24 Jan 2022 04:13:40 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id p12so56231206edq.9;
-        Mon, 24 Jan 2022 04:13:40 -0800 (PST)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B1FC061744;
+        Mon, 24 Jan 2022 04:13:48 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id m4so20852829ejb.9;
+        Mon, 24 Jan 2022 04:13:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=U2mXf2WXVZ5apcoUUDJSkauSWrTBrA2j8Gq8gmjJmeg=;
-        b=bWdNLPF4TA1eQYTMuRtBo+AEqLNxNqPbgt5q4jnHgoVoxhhpSVMolZ0RJhhmpewNe7
-         Xx2gcZirTm6TCdTCAdAV3gnRjTJXaLlumKiNhpbsOSVXgLC0kQy+rcK1ycwE5gflC1mF
-         vvxYKLvBcSb/JfA7kr7/U7EYDadCfHQSbKmAyBwzWf5o7VL/d3feamS/sFR0wATZYNzF
-         izxE+Pt8iCmgi+nfmY/DxgUl2649XZ+5qxbNbV7vwjeLMKuzn7dkh1ZIW/WD9gULw5Il
-         C+4ZO0DzsCj2jBl92O4ohYgWYrKHEb0gpokI/VwfRRBmfApvvEVksTAziFylMN8q7BHn
-         x1Ew==
+        bh=UA1qPOxtgQUi5FzfQC/XaqmXqutO3RUue1aeIf1v4vs=;
+        b=iOTz5oYUa7FvyTdIj2XXocN9knQzPg2NIKz5as9F3zqq3x4TF9kOE5v6ASJHs014QL
+         tAIz59Gt+I/w6vwz8VRr9n/34Uh1JqrBTsm+9E6WX5ubeL9lyTqmaDg30G6VG2Mww/DT
+         7kd+aacdyxnemvIBnTl7XooS+uqf6PVYieg+XLIGQHVT2HQ9Nox/DccVXhbgJfG0ytzB
+         nECD8S/3W3u8fKK75Kj9RmVDXhc1d06TiuqMnVQfzTYcHJBg2Nw86RFw37IFWvakjz+/
+         0RIk7wkCNJG/QtB/2o53W/2AHvjQq7I/FXxp00qjKaapFSwRgxhYeyvP6E69yAstTaz/
+         1IgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=U2mXf2WXVZ5apcoUUDJSkauSWrTBrA2j8Gq8gmjJmeg=;
-        b=TCD9g6Ta1EBWpC3JzaFeGwzIoQi4pNgU+4RNTfFC80E8NDrvlyk+NDtBe4ZLzDWCOD
-         MBGTzfdhPvThIjMgR9Ag8l1ugC1SuhJU3AlmDdFdgHTsDXPoamH9F7EL/f67PjUf/w9u
-         WYPvuBLgdlS4duWPF8zYWOgOuXAwB4lCFsFoxMLAmDE9o4jhjhDEVRogUORDHBjqR//E
-         mnt8gSQ1Q03ocCV5AXUfS5slwRlOiVsWvw6q4s+A846piLU7cBPvMoqRoKQNYyszqKMS
-         4zKjBY2LLTHuw4DrKzO7zjhAh4PN7m1sI++Kabqx2tFzo7YLMRwSXZUzGybQrWeQ+tA8
-         99+Q==
-X-Gm-Message-State: AOAM532hXhGvk9kUHd9Shv0MspzAp4kBJNUY1a3IouJ2G7L2ksdh/TyR
-        v0XKxsLvb0HP38R0KpEM91U=
-X-Google-Smtp-Source: ABdhPJwgV8l2/TF4uh8xjJ5HtzISrof0XakjK9m8PdjcCeDt+bTUyyjV9QCxz9EyCdm4hvj+GbpSaw==
-X-Received: by 2002:a05:6402:42d3:: with SMTP id i19mr13603965edc.52.1643026418779;
-        Mon, 24 Jan 2022 04:13:38 -0800 (PST)
+        bh=UA1qPOxtgQUi5FzfQC/XaqmXqutO3RUue1aeIf1v4vs=;
+        b=hRXwjanXuIgWNRUac+WJvRbCoBs/hytohLTRdgsib4AhwhpBf0T5fez+VPeUgg66QX
+         x19/vP+OBXFsOZ4PZSvYF6J2wknoIQ45Pr2ccAq8F7n+lFxaUDNTFK+LbTiydTO7YCSF
+         DT+DzkQzOVhi6zcDhwMnoqfl2H66ZqFLw8TrVRDW8qVbTf3YDgiYpcGXl686x34cl8yb
+         CwDmTxNWq1i9jzb6tly1as1/Tln5gGuu77+Ly0gg0Gc7lVJ1LqrM22PwV5YJNLeTl7b9
+         OSJFg5xeoMZM65Nt5ZCUHkdWQlu5ycHeZTLN7uBsYiMFckCellD3MR0bUlNAklTbTyan
+         MOug==
+X-Gm-Message-State: AOAM531WWVkaT8iRB+ol78c/8AjBZ5Zm8Yb1dJ3x9qN0PrLt85ZSMhOG
+        kA4atLPtrwRKpYowIPKRp/g=
+X-Google-Smtp-Source: ABdhPJxFc0yomBp7OGNVM6sk8OMYgzocQqB2YRSdT8k2deIyEKcKURbqPS9t0Wgn5wwBiYp5jVQ09w==
+X-Received: by 2002:a17:907:7f11:: with SMTP id qf17mr6294118ejc.76.1643026426832;
+        Mon, 24 Jan 2022 04:13:46 -0800 (PST)
 Received: from ponky.lan ([2a04:241e:502:a09c:a21f:7a9f:9158:4a40])
-        by smtp.gmail.com with ESMTPSA id b16sm4847517eja.211.2022.01.24.04.13.36
+        by smtp.gmail.com with ESMTPSA id b16sm4847517eja.211.2022.01.24.04.13.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jan 2022 04:13:38 -0800 (PST)
+        Mon, 24 Jan 2022 04:13:46 -0800 (PST)
 From:   Leonard Crestez <cdleonard@gmail.com>
 To:     David Ahern <dsahern@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
@@ -67,9 +67,9 @@ Cc:     Shuah Khan <shuah@kernel.org>,
         Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 10/20] tcp: authopt: Add support for signing skb-less replies
-Date:   Mon, 24 Jan 2022 14:12:56 +0200
-Message-Id: <f2f3917cdecd858457831d3817a96eeca5fd53a2.1643026076.git.cdleonard@gmail.com>
+Subject: [PATCH v5 14/20] tcp: authopt: Add NOSEND/NORECV flags
+Date:   Mon, 24 Jan 2022 14:13:00 +0200
+Message-Id: <191c35b404095ad2aaec5a97e8ed43c0e8540329.1643026076.git.cdleonard@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1643026076.git.cdleonard@gmail.com>
 References: <cover.1643026076.git.cdleonard@gmail.com>
@@ -79,209 +79,95 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is required because tcp ipv4 sometimes sends replies without
-allocating a full skb that can be signed by tcp authopt.
+Add flags to allow marking individual keys and invalid for send or recv.
+Making keys assymetric this way is not mentioned in RFC5925 but RFC8177
+requires that keys inside a keychain have independent "accept" and
+"send" lifetimes.
 
-Handle this with additional code in tcp authopt.
+Flag names are negative so that the default behavior is for keys to be
+valid for both send and recv.
+
+Setting both NOSEND and NORECV for a certain peer address can be used on
+a listen socket can be used to mean "TCP-AO is required from this peer
+but no keys are currently valid".
 
 Signed-off-by: Leonard Crestez <cdleonard@gmail.com>
 ---
- include/net/tcp_authopt.h |   7 ++
- net/ipv4/tcp_authopt.c    | 144 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 151 insertions(+)
+ include/uapi/linux/tcp.h | 4 ++++
+ net/ipv4/tcp_authopt.c   | 9 ++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/tcp_authopt.h b/include/net/tcp_authopt.h
-index 6e9b5ca22f62..9ee5165388b1 100644
---- a/include/net/tcp_authopt.h
-+++ b/include/net/tcp_authopt.h
-@@ -115,10 +115,17 @@ static inline struct tcp_authopt_key_info *tcp_authopt_select_key(
- int tcp_authopt_hash(
- 		char *hash_location,
- 		struct tcp_authopt_key_info *key,
- 		struct tcp_authopt_info *info,
- 		struct sock *sk, struct sk_buff *skb);
-+int tcp_v4_authopt_hash_reply(
-+		char *hash_location,
-+		struct tcp_authopt_info *info,
-+		struct tcp_authopt_key_info *key,
-+		__be32 saddr,
-+		__be32 daddr,
-+		struct tcphdr *th);
- int __tcp_authopt_openreq(struct sock *newsk, const struct sock *oldsk, struct request_sock *req);
- static inline int tcp_authopt_openreq(
- 		struct sock *newsk,
- 		const struct sock *oldsk,
- 		struct request_sock *req)
-diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
-index 3c05b6c55191..7a2e15dd80ba 100644
---- a/net/ipv4/tcp_authopt.c
-+++ b/net/ipv4/tcp_authopt.c
-@@ -933,10 +933,72 @@ static int tcp_authopt_get_traffic_key(struct sock *sk,
- out:
- 	tcp_authopt_put_kdf_pool(key, pool);
- 	return err;
- }
- 
-+struct tcp_v4_authopt_context_data {
-+	__be32 saddr;
-+	__be32 daddr;
-+	__be16 sport;
-+	__be16 dport;
-+	__be32 sisn;
-+	__be32 disn;
-+	__be16 digestbits;
-+} __packed;
-+
-+static int tcp_v4_authopt_get_traffic_key_noskb(struct tcp_authopt_key_info *key,
-+						__be32 saddr,
-+						__be32 daddr,
-+						__be16 sport,
-+						__be16 dport,
-+						__be32 sisn,
-+						__be32 disn,
-+						u8 *traffic_key)
-+{
-+	int err;
-+	struct tcp_authopt_alg_pool *pool;
-+	struct tcp_v4_authopt_context_data data;
-+
-+	BUILD_BUG_ON(sizeof(data) != 22);
-+
-+	pool = tcp_authopt_get_kdf_pool(key);
-+	if (IS_ERR(pool))
-+		return PTR_ERR(pool);
-+
-+	err = tcp_authopt_setkey(pool, key);
-+	if (err)
-+		goto out;
-+	err = crypto_ahash_init(pool->req);
-+	if (err)
-+		goto out;
-+
-+	// RFC5926 section 3.1.1.1
-+	// Separate to keep alignment semi-sane
-+	err = crypto_ahash_buf(pool->req, "\x01TCP-AO", 7);
-+	if (err)
-+		return err;
-+	data.saddr = saddr;
-+	data.daddr = daddr;
-+	data.sport = sport;
-+	data.dport = dport;
-+	data.sisn = sisn;
-+	data.disn = disn;
-+	data.digestbits = htons(crypto_ahash_digestsize(pool->tfm) * 8);
-+
-+	err = crypto_ahash_buf(pool->req, (u8 *)&data, sizeof(data));
-+	if (err)
-+		goto out;
-+	ahash_request_set_crypt(pool->req, NULL, traffic_key, 0);
-+	err = crypto_ahash_final(pool->req);
-+	if (err)
-+		goto out;
-+
-+out:
-+	tcp_authopt_put_kdf_pool(key, pool);
-+	return err;
-+}
-+
- static int crypto_ahash_buf_zero(struct ahash_request *req, int len)
- {
- 	u8 zeros[TCP_AUTHOPT_MACLEN] = {0};
- 	int buflen, err;
- 
-@@ -1203,10 +1265,92 @@ int tcp_authopt_hash(char *hash_location,
- 	return err;
- }
- EXPORT_SYMBOL(tcp_authopt_hash);
+diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+index a7f5f918ed5a..ed27feb93b0e 100644
+--- a/include/uapi/linux/tcp.h
++++ b/include/uapi/linux/tcp.h
+@@ -401,16 +401,20 @@ struct tcp_authopt {
+  *
+  * @TCP_AUTHOPT_KEY_DEL: Delete the key and ignore non-id fields
+  * @TCP_AUTHOPT_KEY_EXCLUDE_OPTS: Exclude TCP options from signature
+  * @TCP_AUTHOPT_KEY_ADDR_BIND: Key only valid for `tcp_authopt.addr`
+  * @TCP_AUTHOPT_KEY_IFINDEX: Key only valid for `tcp_authopt.ifindex`
++ * @TCP_AUTHOPT_KEY_NOSEND: Key invalid for send (expired)
++ * @TCP_AUTHOPT_KEY_NORECV: Key invalid for recv (expired)
+  */
+ enum tcp_authopt_key_flag {
+ 	TCP_AUTHOPT_KEY_DEL = (1 << 0),
+ 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS = (1 << 1),
+ 	TCP_AUTHOPT_KEY_ADDR_BIND = (1 << 2),
+ 	TCP_AUTHOPT_KEY_IFINDEX = (1 << 3),
++	TCP_AUTHOPT_KEY_NOSEND = (1 << 4),
++	TCP_AUTHOPT_KEY_NORECV = (1 << 5),
+ };
  
  /**
-+ * tcp_v4_authopt_hash_reply - Hash tcp+ipv4 header without SKB
-+ *
-+ * @hash_location: output buffer
-+ * @info: sending socket's tcp_authopt_info
-+ * @key: signing key, from tcp_authopt_select_key.
-+ * @saddr: source address
-+ * @daddr: destination address
-+ * @th: Pointer to TCP header and options
-+ */
-+int tcp_v4_authopt_hash_reply(char *hash_location,
-+			      struct tcp_authopt_info *info,
-+			      struct tcp_authopt_key_info *key,
-+			      __be32 saddr,
-+			      __be32 daddr,
-+			      struct tcphdr *th)
-+{
-+	struct tcp_authopt_alg_pool *pool;
-+	u8 macbuf[TCP_AUTHOPT_MAXMACBUF];
-+	u8 traffic_key[TCP_AUTHOPT_MAX_TRAFFIC_KEY_LEN];
-+	__be32 sne = 0;
-+	int err;
-+
-+	/* Call special code path for computing traffic key without skb
-+	 * This can be called from tcp_v4_reqsk_send_ack so caching would be
-+	 * difficult here.
-+	 */
-+	err = tcp_v4_authopt_get_traffic_key_noskb(key, saddr, daddr,
-+						   th->source, th->dest,
-+						   htonl(info->src_isn), htonl(info->dst_isn),
-+						   traffic_key);
-+	if (err)
-+		goto out_err_traffic_key;
-+
-+	/* Init mac shash */
-+	pool = tcp_authopt_get_mac_pool(key);
-+	if (IS_ERR(pool))
-+		return PTR_ERR(pool);
-+	err = crypto_ahash_setkey(pool->tfm, traffic_key, key->alg->traffic_key_len);
-+	if (err)
-+		goto out_err;
-+	err = crypto_ahash_init(pool->req);
-+	if (err)
-+		return err;
-+
-+	err = crypto_ahash_buf(pool->req, (u8 *)&sne, 4);
-+	if (err)
-+		return err;
-+
-+	err = tcp_authopt_hash_tcp4_pseudoheader(pool, saddr, daddr, th->doff * 4);
-+	if (err)
-+		return err;
-+
-+	// TCP header with checksum set to zero. Caller ensures this.
-+	if (WARN_ON_ONCE(th->check != 0))
-+		goto out_err;
-+	err = crypto_ahash_buf(pool->req, (u8 *)th, sizeof(*th));
-+	if (err)
-+		goto out_err;
-+
-+	// TCP options
-+	err = tcp_authopt_hash_opts(pool, th, (struct tcphdr_authopt *)(hash_location - 4),
-+				    !(key->flags & TCP_AUTHOPT_KEY_EXCLUDE_OPTS));
-+	if (err)
-+		goto out_err;
-+
-+	ahash_request_set_crypt(pool->req, NULL, macbuf, 0);
-+	err = crypto_ahash_final(pool->req);
-+	if (err)
-+		goto out_err;
-+	memcpy(hash_location, macbuf, TCP_AUTHOPT_MACLEN);
-+
-+	tcp_authopt_put_mac_pool(key, pool);
-+	return 0;
-+
-+out_err:
-+	tcp_authopt_put_mac_pool(key, pool);
-+out_err_traffic_key:
-+	memset(hash_location, 0, TCP_AUTHOPT_MACLEN);
-+	return err;
-+}
-+
-+/*
-  * tcp_authopt_lookup_recv - lookup key for receive
-  *
-  * @sk: Receive socket
-  * @skb: Packet, used to compare addr and iface
-  * @net: Per-namespace information containing keys
+  * enum tcp_authopt_alg - Algorithms for TCP Authentication Option
+  */
+diff --git a/net/ipv4/tcp_authopt.c b/net/ipv4/tcp_authopt.c
+index 3d2c4283923f..331bf3e8b66a 100644
+--- a/net/ipv4/tcp_authopt.c
++++ b/net/ipv4/tcp_authopt.c
+@@ -363,10 +363,12 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_send(struct netns_tcp_aut
+ 	int l3index = -1;
+ 
+ 	hlist_for_each_entry_rcu(key, &net->head, node, 0) {
+ 		if (send_id >= 0 && key->send_id != send_id)
+ 			continue;
++		if (key->flags & TCP_AUTHOPT_KEY_NOSEND)
++			continue;
+ 		if (key->flags & TCP_AUTHOPT_KEY_ADDR_BIND)
+ 			if (!tcp_authopt_key_match_sk_addr(key, addr_sk))
+ 				continue;
+ 		if (key->flags & TCP_AUTHOPT_KEY_IFINDEX) {
+ 			if (l3index < 0)
+@@ -612,11 +614,13 @@ int tcp_get_authopt_val(struct sock *sk, struct tcp_authopt *opt)
+ 
+ #define TCP_AUTHOPT_KEY_KNOWN_FLAGS ( \
+ 	TCP_AUTHOPT_KEY_DEL | \
+ 	TCP_AUTHOPT_KEY_EXCLUDE_OPTS | \
+ 	TCP_AUTHOPT_KEY_ADDR_BIND | \
+-	TCP_AUTHOPT_KEY_IFINDEX)
++	TCP_AUTHOPT_KEY_IFINDEX | \
++	TCP_AUTHOPT_KEY_NOSEND | \
++	TCP_AUTHOPT_KEY_NORECV)
+ 
+ int tcp_set_authopt_key(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ {
+ 	struct tcp_authopt_key opt;
+ 	struct tcp_authopt_info *info;
+@@ -1524,10 +1528,13 @@ static struct tcp_authopt_key_info *tcp_authopt_lookup_recv(struct sock *sk,
+ 
+ 			if (l3index != key->l3index)
+ 				continue;
+ 		}
+ 		*anykey = true;
++		// If only keys with norecv flag are present still consider that
++		if (key->flags & TCP_AUTHOPT_KEY_NORECV)
++			continue;
+ 		if (recv_id >= 0 && key->recv_id != recv_id)
+ 			continue;
+ 		if (better_key_match(result, key))
+ 			result = key;
+ 		else if (result)
 -- 
 2.25.1
 
