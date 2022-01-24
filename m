@@ -2,118 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7CDC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 19:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4018C4321E
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 19:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345805AbiAXT0s (ORCPT
+        id S1344751AbiAXTi2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 14:26:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50462 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346809AbiAXTXZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jan 2022 14:23:25 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D5AC061244;
-        Mon, 24 Jan 2022 11:10:22 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 00AD36121F;
-        Mon, 24 Jan 2022 19:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDCC4C340E5;
-        Mon, 24 Jan 2022 19:10:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1643051421;
-        bh=WO3Y96d8ujRmduRbZRHZ6fINYqgCWEHggCq4NSV+Gr0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=120WpT3DMAm5gwTtnDcLqpTrylMDnHHv2SCS5IVegT57QiGZUqCGGfY53BFDfEp+f
-         DhwVq9WwZ76FAx4GjwiWEssvIgWxGmZKszJ+y5cK0FE3/G2biqzSq4KeanhgYgNUSm
-         NYJ5ZLH8fZXy9B/oA9TuNUgf/M1J49/GUF41dq40=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Marek Vasut <marex@denx.de>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Fabien Dessenne <fabien.dessenne@st.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lionel Debieve <lionel.debieve@st.com>,
-        Nicolas Toromanoff <nicolas.toromanoff@st.com>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-Subject: [PATCH 4.14 157/186] crypto: stm32/crc32 - Fix kernel BUG triggered in probe()
-Date:   Mon, 24 Jan 2022 19:43:52 +0100
-Message-Id: <20220124183942.146431609@linuxfoundation.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124183937.101330125@linuxfoundation.org>
-References: <20220124183937.101330125@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Mon, 24 Jan 2022 14:38:28 -0500
+Received: from mga12.intel.com ([192.55.52.136]:30002 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1352963AbiAXTbU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Jan 2022 14:31:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643052679; x=1674588679;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fpwYfflWld0ugqz8Mb0rqGT+uGIpwsHIjPs+XSu2Ols=;
+  b=GtLK60/hwKK6QWAGWVyucVf94Ic/Oy985a6qILffR84E3Cq4HzgqUpCv
+   TJKQcWFITtmlLtfpZ0R36zx8iiOOOMGkue+2y3VK4C0V2FKzYqkflGt+W
+   H3nZbQ22oQenNZQHxaOV5HEw8YoxVdRMCg+MDFThVL4J5kiO98LD5kWfz
+   UsEaabJLfSWMEhteAA4APfRO8kq/T1OPnVWFVudCLofTZbjDSNbr2xTIu
+   qxDlZLSMF1bn0gwWlJRlUpv76tm25Q+UOo3U4Nanihr3WV4jYhUc2WC71
+   6MRdlqJfuHutebPy3m5xIEMi6KRx4CZ8Djc+aIE/aH0FaM6b6LYeaU4rA
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10237"; a="226108575"
+X-IronPort-AV: E=Sophos;i="5.88,311,1635231600"; 
+   d="scan'208";a="226108575"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2022 11:25:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,311,1635231600"; 
+   d="scan'208";a="532180520"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 24 Jan 2022 11:25:03 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nC4xa-000IoS-PV; Mon, 24 Jan 2022 19:25:02 +0000
+Date:   Tue, 25 Jan 2022 03:24:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Harsha <harsha.harsha@xilinx.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, michals@xilinx.com,
+        linux-arm-kernel@lists.infradead.org, robh+dt@kernel.org,
+        devicetree@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, saratcha@xilinx.com, harshj@xilinx.com
+Subject: Re: [PATCH 3/4] crypto: xilinx: Add Xilinx SHA3 driver
+Message-ID: <202201250209.WqpE2vMF-lkp@intel.com>
+References: <1642931227-20706-4-git-send-email-harsha.harsha@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1642931227-20706-4-git-send-email-harsha.harsha@xilinx.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Marek Vasut <marex@denx.de>
+Hi Harsha,
 
-commit 29009604ad4e3ef784fd9b9fef6f23610ddf633d upstream.
+Thank you for the patch! Perhaps something to improve:
 
-The include/linux/crypto.h struct crypto_alg field cra_driver_name description
-states "Unique name of the transformation provider. " ... " this contains the
-name of the chip or provider and the name of the transformation algorithm."
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master]
+[cannot apply to xilinx-xlnx/master v5.17-rc1 next-20220124]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-In case of the stm32-crc driver, field cra_driver_name is identical for all
-registered transformation providers and set to the name of the driver itself,
-which is incorrect. This patch fixes it by assigning a unique cra_driver_name
-to each registered transformation provider.
+url:    https://github.com/0day-ci/linux/commits/Harsha/crypto-Add-Xilinx-ZynqMP-SHA3-driver-support/20220123-175102
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20220125/202201250209.WqpE2vMF-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/fc7aea6e3118ca7210454fdb7c9c588c05c1f171
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Harsha/crypto-Add-Xilinx-ZynqMP-SHA3-driver-support/20220123-175102
+        git checkout fc7aea6e3118ca7210454fdb7c9c588c05c1f171
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=s390 SHELL=/bin/bash drivers/crypto/
 
-The kernel crash is triggered when the driver calls crypto_register_shashes()
-which calls crypto_register_shash(), which calls crypto_register_alg(), which
-calls __crypto_register_alg(), which returns -EEXIST, which is propagated
-back through this call chain. Upon -EEXIST from crypto_register_shash(), the
-crypto_register_shashes() starts unregistering the providers back, and calls
-crypto_unregister_shash(), which calls crypto_unregister_alg(), and this is
-where the BUG() triggers due to incorrect cra_refcnt.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
-Signed-off-by: Marek Vasut <marex@denx.de>
-Cc: <stable@vger.kernel.org> # 4.12+
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Fabien Dessenne <fabien.dessenne@st.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Lionel Debieve <lionel.debieve@st.com>
-Cc: Nicolas Toromanoff <nicolas.toromanoff@st.com>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-stm32@st-md-mailman.stormreply.com
-To: linux-crypto@vger.kernel.org
-Acked-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+All warnings (new ones prefixed by >>):
+
+   In file included from ./arch/s390/include/generated/asm/cacheflush.h:1,
+                    from drivers/crypto/xilinx/zynqmp-sha.c:6:
+>> include/asm-generic/cacheflush.h:53:46: warning: 'struct folio' declared inside parameter list will not be visible outside of this definition or declaration
+      53 | static inline void flush_dcache_folio(struct folio *folio) { }
+         |                                              ^~~~~
+
+
+vim +53 include/asm-generic/cacheflush.h
+
+08b0b0059bf1c2 Matthew Wilcox (Oracle  2020-12-16  52) 
+08b0b0059bf1c2 Matthew Wilcox (Oracle  2020-12-16 @53) static inline void flush_dcache_folio(struct folio *folio) { }
+76b3b58fac350c Christoph Hellwig       2020-06-07  54  #define ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE 0
+08b0b0059bf1c2 Matthew Wilcox (Oracle  2020-12-16  55) #define ARCH_IMPLEMENTS_FLUSH_DCACHE_FOLIO
+4f0bd808134d73 Mike Rapoport           2019-12-23  56  #endif
+c296d4dc13aefe Qian Cai                2019-07-16  57  
+
 ---
- drivers/crypto/stm32/stm32_crc32.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -206,7 +206,7 @@ static struct shash_alg algs[] = {
- 		.digestsize     = CHKSUM_DIGEST_SIZE,
- 		.base           = {
- 			.cra_name               = "crc32",
--			.cra_driver_name        = DRIVER_NAME,
-+			.cra_driver_name        = "stm32-crc32-crc32",
- 			.cra_priority           = 200,
- 			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
-@@ -228,7 +228,7 @@ static struct shash_alg algs[] = {
- 		.digestsize     = CHKSUM_DIGEST_SIZE,
- 		.base           = {
- 			.cra_name               = "crc32c",
--			.cra_driver_name        = DRIVER_NAME,
-+			.cra_driver_name        = "stm32-crc32-crc32c",
- 			.cra_priority           = 200,
- 			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
- 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
-
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
