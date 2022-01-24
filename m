@@ -2,69 +2,312 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49397C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 20:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75537C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 21:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234765AbiAXUm7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 15:42:59 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:46488 "EHLO
-        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385547AbiAXUde (ORCPT
+        id S1446699AbiAXVJO (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jan 2022 16:09:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1442661AbiAXUzE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jan 2022 15:33:34 -0500
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 380BF20140B;
-        Mon, 24 Jan 2022 20:33:30 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 145B680E5B; Mon, 24 Jan 2022 21:30:16 +0100 (CET)
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 4/6] hw_random: only set cur_rng_set_by_user if it is working
-Date:   Mon, 24 Jan 2022 21:29:49 +0100
-Message-Id: <20220124202951.28579-4-linux@dominikbrodowski.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124202951.28579-1-linux@dominikbrodowski.net>
-References: <20220124202951.28579-1-linux@dominikbrodowski.net>
+        Mon, 24 Jan 2022 15:55:04 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D713BC047CE7
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jan 2022 12:00:02 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id x23so5263646lfc.0
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jan 2022 12:00:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=X1fspDfOZTRESHgvCsTpy0M+wXpoDo9iEK0jnJXDU5Y=;
+        b=liPSw+oHKbLKt49NG7WwlravT+ecqQGWP3Y1Q8azHjQmV39vlahZekjyxHrUorHG/s
+         lgHi+ZN/pKPrXARZMuuyXAiagpmQ754zvGdFo3GwVY1mEUx8JkonDBNdCBKtOm/CsO0H
+         l57Gfv77T9qgQK8hck4Gu9uzAdq07iWfS/Nn0d18+937IolDJ4rDoR6RYdCIOAMkGGiT
+         o86l+PSF7Bih3oEb7/WysNBmRTnzCpUJ46UIpdYMj/oPP3A3W2RSItFoPKkWjpDdyRT2
+         pVIUwn2blEfUxS8k8l1bWErFN2xPD3V9KfxdKz0wOpdP13mwNeNWhey02A8C1wkng6w0
+         P6Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=X1fspDfOZTRESHgvCsTpy0M+wXpoDo9iEK0jnJXDU5Y=;
+        b=XGlRDgJUD2ENJ2TQ5rllRAwg70pD7Mc/p3ii/cGVLbyC0roR1jozJe1wyjfFWDr68d
+         oZOv++xVgC2jfNQrmRLYYXQ8Le2ySCzmSSy+dc37FjrHnwd4q8BBoieVlf4tAJ7HWVz4
+         eR5xZZd16HZKnyBZmUpLnzvYFxIKwAnZZHXDarboShcKxdK+LzBKNmhuW0eLxNqT/MKJ
+         1CjCaPM3DNP/Pt+17S0OF638GtfV52MRV8OuC7+qvHljftRhGwZxcYdE93P1nyLfm8XE
+         0A+LCceZm1EFP/iD3y3uBlnGKMdsEbOQT6wv1mOf1mqXC5ltnB4fUJ2vubEyeZcRp2iW
+         x0TQ==
+X-Gm-Message-State: AOAM533CqORswIbHcfFvnKlU1HJmwPLL0fu9kE6OkFhH6NhS73xEGRpc
+        BJbBhvHp+PZ4oBB/2gbcdFaffnf4wgXD1seYwpFsDA==
+X-Google-Smtp-Source: ABdhPJyR9U54DVM3ct2LPaeHjq5X1d2P4BRZ/v7s+ft4w68F9k24e6xs01fvMqO6kK5J5ovEHtn/qv7W3jzDWk3bGTA=
+X-Received: by 2002:a05:6512:308d:: with SMTP id z13mr13877780lfd.523.1643054401020;
+ Mon, 24 Jan 2022 12:00:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220119135450.564115-1-Jason@zx2c4.com> <20220124192849.14755-1-Jason@zx2c4.com>
+In-Reply-To: <20220124192849.14755-1-Jason@zx2c4.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 24 Jan 2022 11:59:48 -0800
+Message-ID: <CAKwvOd=hGx4WEFTNKFSwkk_VZgNd01a+OZR78TMmKfK5stpBbQ@mail.gmail.com>
+Subject: Re: [PATCH v2] lib/crypto: blake2s: avoid indirect calls to
+ compression function for Clang CFI
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        llvm@lists.linux.dev, Sami Tolvanen <samitolvanen@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Miles Chen <miles.chen@mediatek.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In case the user-specified rng device is not working, it is not used;
-therefore cur_rng_set_by_user must not be set to 1.
+On Mon, Jan 24, 2022 at 11:29 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> blake2s_compress_generic is weakly aliased by blake2s_generic. The
+> current harness for function selection uses a function pointer, which is
+> ordinarily inlined and resolved at compile time. But when Clang's CFI is
+> enabled, CFI still triggers when making an indirect call via a weak
+> symbol. This seems like a bug in Clang's CFI, as though it's bucketing
+> weak symbols and strong symbols differently. It also only seems to
+> trigger when "full LTO" mode is used, rather than "thin LTO".
+>
+> [    0.000000][    T0] Kernel panic - not syncing: CFI failure (target: blake2s_compress_generic+0x0/0x1444)
+> [    0.000000][    T0] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.16.0-mainline-06981-g076c855b846e #1
+> [    0.000000][    T0] Hardware name: MT6873 (DT)
+> [    0.000000][    T0] Call trace:
+> [    0.000000][    T0]  dump_backtrace+0xfc/0x1dc
+> [    0.000000][    T0]  dump_stack_lvl+0xa8/0x11c
+> [    0.000000][    T0]  panic+0x194/0x464
+> [    0.000000][    T0]  __cfi_check_fail+0x54/0x58
+> [    0.000000][    T0]  __cfi_slowpath_diag+0x354/0x4b0
+> [    0.000000][    T0]  blake2s_update+0x14c/0x178
+> [    0.000000][    T0]  _extract_entropy+0xf4/0x29c
+> [    0.000000][    T0]  crng_initialize_primary+0x24/0x94
+> [    0.000000][    T0]  rand_initialize+0x2c/0x6c
+> [    0.000000][    T0]  start_kernel+0x2f8/0x65c
+> [    0.000000][    T0]  __primary_switched+0xc4/0x7be4
+> [    0.000000][    T0] Rebooting in 5 seconds..
+>
+> Nonetheless, the function pointer method isn't so terrific anyway, so
+> this patch replaces it with a simple boolean, which also gets inlined
+> away. This successfully works around the Clang bug.
 
-Cc: Matt Mackall <mpm@selenic.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
----
- drivers/char/hw_random/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Acked-by: Nick Desaulniers <ndesaulniers@google.com>
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 89891ac87af0..9405fcdace38 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -335,8 +335,9 @@ static ssize_t rng_current_store(struct device *dev,
- 	} else {
- 		list_for_each_entry(rng, &rng_list, list) {
- 			if (sysfs_streq(rng->name, buf)) {
--				cur_rng_set_by_user = 1;
- 				err = set_current_rng(rng);
-+				if (!err)
-+					cur_rng_set_by_user = 1;
- 				break;
- 			}
- 		}
+Thanks for the report. Once we have a fix in hand for LLVM, we can
+revisit removing this and raising the required LLVM version for CFI.
+
+>
+> In general, I'm not too keen on all of the indirection involved here; it
+> clearly does more harm than good. Hopefully the whole thing can get
+> cleaned up down the road when lib/crypto is overhauled more
+> comprehensively. But for now, we go with a simple bandaid.
+>
+> Fixes: 6048fdcc5f26 ("lib/crypto: blake2s: include as built-in")
+> Reported-by: Miles Chen <miles.chen@mediatek.com>
+> Tested-by: Miles Chen <miles.chen@mediatek.com>
+> Tested-by: Nathan Chancellor <nathan@kernel.org>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/1567
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Sami Tolvanen <samitolvanen@google.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v1->v2:
+> - Wrapped columns at 80 for Eric.
+>
+>  arch/arm/crypto/blake2s-shash.c   |  4 ++--
+>  arch/x86/crypto/blake2s-shash.c   |  4 ++--
+>  crypto/blake2s_generic.c          |  4 ++--
+>  include/crypto/internal/blake2s.h | 40 +++++++++++++++++++------------
+>  lib/crypto/blake2s.c              |  4 ++--
+>  5 files changed, 33 insertions(+), 23 deletions(-)
+>
+> diff --git a/arch/arm/crypto/blake2s-shash.c b/arch/arm/crypto/blake2s-shash.c
+> index 17c1c3bfe2f5..763c73beea2d 100644
+> --- a/arch/arm/crypto/blake2s-shash.c
+> +++ b/arch/arm/crypto/blake2s-shash.c
+> @@ -13,12 +13,12 @@
+>  static int crypto_blake2s_update_arm(struct shash_desc *desc,
+>                                      const u8 *in, unsigned int inlen)
+>  {
+> -       return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
+> +       return crypto_blake2s_update(desc, in, inlen, false);
+>  }
+>
+>  static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
+>  {
+> -       return crypto_blake2s_final(desc, out, blake2s_compress);
+> +       return crypto_blake2s_final(desc, out, false);
+>  }
+>
+>  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
+> diff --git a/arch/x86/crypto/blake2s-shash.c b/arch/x86/crypto/blake2s-shash.c
+> index f9e2fecdb761..59ae28abe35c 100644
+> --- a/arch/x86/crypto/blake2s-shash.c
+> +++ b/arch/x86/crypto/blake2s-shash.c
+> @@ -18,12 +18,12 @@
+>  static int crypto_blake2s_update_x86(struct shash_desc *desc,
+>                                      const u8 *in, unsigned int inlen)
+>  {
+> -       return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
+> +       return crypto_blake2s_update(desc, in, inlen, false);
+>  }
+>
+>  static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
+>  {
+> -       return crypto_blake2s_final(desc, out, blake2s_compress);
+> +       return crypto_blake2s_final(desc, out, false);
+>  }
+>
+>  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
+> diff --git a/crypto/blake2s_generic.c b/crypto/blake2s_generic.c
+> index 72fe480f9bd6..5f96a21f8788 100644
+> --- a/crypto/blake2s_generic.c
+> +++ b/crypto/blake2s_generic.c
+> @@ -15,12 +15,12 @@
+>  static int crypto_blake2s_update_generic(struct shash_desc *desc,
+>                                          const u8 *in, unsigned int inlen)
+>  {
+> -       return crypto_blake2s_update(desc, in, inlen, blake2s_compress_generic);
+> +       return crypto_blake2s_update(desc, in, inlen, true);
+>  }
+>
+>  static int crypto_blake2s_final_generic(struct shash_desc *desc, u8 *out)
+>  {
+> -       return crypto_blake2s_final(desc, out, blake2s_compress_generic);
+> +       return crypto_blake2s_final(desc, out, true);
+>  }
+>
+>  #define BLAKE2S_ALG(name, driver_name, digest_size)                    \
+> diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
+> index d39cfa0d333e..52363eee2b20 100644
+> --- a/include/crypto/internal/blake2s.h
+> +++ b/include/crypto/internal/blake2s.h
+> @@ -24,14 +24,11 @@ static inline void blake2s_set_lastblock(struct blake2s_state *state)
+>         state->f[0] = -1;
+>  }
+>
+> -typedef void (*blake2s_compress_t)(struct blake2s_state *state,
+> -                                  const u8 *block, size_t nblocks, u32 inc);
+> -
+>  /* Helper functions for BLAKE2s shared by the library and shash APIs */
+>
+> -static inline void __blake2s_update(struct blake2s_state *state,
+> -                                   const u8 *in, size_t inlen,
+> -                                   blake2s_compress_t compress)
+> +static __always_inline void
+> +__blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen,
+> +                bool force_generic)
+>  {
+>         const size_t fill = BLAKE2S_BLOCK_SIZE - state->buflen;
+>
+> @@ -39,7 +36,12 @@ static inline void __blake2s_update(struct blake2s_state *state,
+>                 return;
+>         if (inlen > fill) {
+>                 memcpy(state->buf + state->buflen, in, fill);
+> -               (*compress)(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
+> +               if (force_generic)
+> +                       blake2s_compress_generic(state, state->buf, 1,
+> +                                                BLAKE2S_BLOCK_SIZE);
+> +               else
+> +                       blake2s_compress(state, state->buf, 1,
+> +                                        BLAKE2S_BLOCK_SIZE);
+>                 state->buflen = 0;
+>                 in += fill;
+>                 inlen -= fill;
+> @@ -47,7 +49,12 @@ static inline void __blake2s_update(struct blake2s_state *state,
+>         if (inlen > BLAKE2S_BLOCK_SIZE) {
+>                 const size_t nblocks = DIV_ROUND_UP(inlen, BLAKE2S_BLOCK_SIZE);
+>                 /* Hash one less (full) block than strictly possible */
+> -               (*compress)(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
+> +               if (force_generic)
+> +                       blake2s_compress_generic(state, in, nblocks - 1,
+> +                                                BLAKE2S_BLOCK_SIZE);
+> +               else
+> +                       blake2s_compress(state, in, nblocks - 1,
+> +                                        BLAKE2S_BLOCK_SIZE);
+>                 in += BLAKE2S_BLOCK_SIZE * (nblocks - 1);
+>                 inlen -= BLAKE2S_BLOCK_SIZE * (nblocks - 1);
+>         }
+> @@ -55,13 +62,16 @@ static inline void __blake2s_update(struct blake2s_state *state,
+>         state->buflen += inlen;
+>  }
+>
+> -static inline void __blake2s_final(struct blake2s_state *state, u8 *out,
+> -                                  blake2s_compress_t compress)
+> +static __always_inline void
+> +__blake2s_final(struct blake2s_state *state, u8 *out, bool force_generic)
+>  {
+>         blake2s_set_lastblock(state);
+>         memset(state->buf + state->buflen, 0,
+>                BLAKE2S_BLOCK_SIZE - state->buflen); /* Padding */
+> -       (*compress)(state, state->buf, 1, state->buflen);
+> +       if (force_generic)
+> +               blake2s_compress_generic(state, state->buf, 1, state->buflen);
+> +       else
+> +               blake2s_compress(state, state->buf, 1, state->buflen);
+>         cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
+>         memcpy(out, state->h, state->outlen);
+>  }
+> @@ -99,20 +109,20 @@ static inline int crypto_blake2s_init(struct shash_desc *desc)
+>
+>  static inline int crypto_blake2s_update(struct shash_desc *desc,
+>                                         const u8 *in, unsigned int inlen,
+> -                                       blake2s_compress_t compress)
+> +                                       bool force_generic)
+>  {
+>         struct blake2s_state *state = shash_desc_ctx(desc);
+>
+> -       __blake2s_update(state, in, inlen, compress);
+> +       __blake2s_update(state, in, inlen, force_generic);
+>         return 0;
+>  }
+>
+>  static inline int crypto_blake2s_final(struct shash_desc *desc, u8 *out,
+> -                                      blake2s_compress_t compress)
+> +                                      bool force_generic)
+>  {
+>         struct blake2s_state *state = shash_desc_ctx(desc);
+>
+> -       __blake2s_final(state, out, compress);
+> +       __blake2s_final(state, out, force_generic);
+>         return 0;
+>  }
+>
+> diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
+> index 9364f79937b8..c71c09621c09 100644
+> --- a/lib/crypto/blake2s.c
+> +++ b/lib/crypto/blake2s.c
+> @@ -18,14 +18,14 @@
+>
+>  void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
+>  {
+> -       __blake2s_update(state, in, inlen, blake2s_compress);
+> +       __blake2s_update(state, in, inlen, false);
+>  }
+>  EXPORT_SYMBOL(blake2s_update);
+>
+>  void blake2s_final(struct blake2s_state *state, u8 *out)
+>  {
+>         WARN_ON(IS_ENABLED(DEBUG) && !out);
+> -       __blake2s_final(state, out, blake2s_compress);
+> +       __blake2s_final(state, out, false);
+>         memzero_explicit(state, sizeof(*state));
+>  }
+>  EXPORT_SYMBOL(blake2s_final);
+> --
+> 2.34.1
+>
+
+
 -- 
-2.34.1
-
+Thanks,
+~Nick Desaulniers
