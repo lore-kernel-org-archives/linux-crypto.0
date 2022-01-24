@@ -2,15 +2,15 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC69AC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 20:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D515C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 20:43:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351933AbiAXUnI (ORCPT
+        id S1351914AbiAXUnJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 15:43:08 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:46484 "EHLO
+        Mon, 24 Jan 2022 15:43:09 -0500
+Received: from isilmar-4.linta.de ([136.243.71.142]:46478 "EHLO
         isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385544AbiAXUde (ORCPT
+        with ESMTP id S1385536AbiAXUde (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 24 Jan 2022 15:33:34 -0500
 X-isilmar-external: YES
@@ -19,61 +19,53 @@ X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 3ED3B20140C;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 35D0920140A;
         Mon, 24 Jan 2022 20:33:30 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id B809480E60; Mon, 24 Jan 2022 21:30:19 +0100 (CET)
+        id 3E81B809C2; Mon, 24 Jan 2022 21:30:02 +0100 (CET)
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 5/6] hw_random: break out of hwrng_fillfn if current rng is not trusted
-Date:   Mon, 24 Jan 2022 21:29:50 +0100
-Message-Id: <20220124202951.28579-5-linux@dominikbrodowski.net>
+Subject: [PATCH 1/6] hw_random: explicit ordering of initcalls
+Date:   Mon, 24 Jan 2022 21:29:46 +0100
+Message-Id: <20220124202951.28579-1-linux@dominikbrodowski.net>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124202951.28579-1-linux@dominikbrodowski.net>
-References: <20220124202951.28579-1-linux@dominikbrodowski.net>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For two reasons, current_quality may become zero within the rngd
-kernel thread: (1) The user lowers current_quality to 0 by writing
-to the sysfs module parameter file (note that increasing the quality
-from zero is without effect at the moment), or (2) there are two or
-more hwrng devices registered, and those which provide quality>0 are
-unregistered, but one with quality==0 remains.
-
-If current_quality is 0, the randomness is not trusted and cannot help
-to increase the entropy count. That will lead to continuous calls to
-the hwrngd thread and continuous stirring of the input pool with
-untrusted bits.
+hw-random device drivers depend on the hw-random core being
+initialized. Make this ordering explicit, also for the case
+these drivers are built-in. As the core itself depends on
+misc_register() which is set up at subsys_initcall time,
+advance the initialization of the core (only) to the
+fs_initcall() level.
 
 Cc: Matt Mackall <mpm@selenic.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 ---
- drivers/char/hw_random/core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/char/hw_random/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 9405fcdace38..bc9f95cbac92 100644
+index a3db27916256..e860e044b19e 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -429,6 +429,9 @@ static int hwrng_fillfn(void *unused)
- 	while (!kthread_should_stop()) {
- 		struct hwrng *rng;
+@@ -638,7 +638,7 @@ static void __exit hwrng_modexit(void)
+ 	unregister_miscdev();
+ }
  
-+		if (!current_quality)
-+			break;
-+
- 		rng = get_current_rng();
- 		if (IS_ERR(rng) || !rng)
- 			break;
+-module_init(hwrng_modinit);
++fs_initcall(hwrng_modinit); /* depends on misc_register() */
+ module_exit(hwrng_modexit);
+ 
+ MODULE_DESCRIPTION("H/W Random Number Generator (RNG) driver");
 -- 
 2.34.1
 
