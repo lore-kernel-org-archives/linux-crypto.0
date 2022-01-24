@@ -2,79 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 835D3C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 18:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7CDC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 19:26:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245282AbiAXSjm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 13:39:42 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:42898 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbiAXSjf (ORCPT
+        id S1345805AbiAXT0s (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jan 2022 14:26:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50462 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346809AbiAXTXZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jan 2022 13:39:35 -0500
+        Mon, 24 Jan 2022 14:23:25 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D5AC061244;
+        Mon, 24 Jan 2022 11:10:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AD7F861480;
-        Mon, 24 Jan 2022 18:39:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EF8DC340E5;
-        Mon, 24 Jan 2022 18:39:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643049574;
-        bh=wtnMK1/PnKkXRPibVwQq/p8YTvI52RSABlhYxeqqrnM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ESfn/4wPty1DGAuUQm6HHBtZ4Wfk6BDpfLDkL4XeKGGdCVLcyJxIEQjaItV5glwOV
-         AgnrCwhmhCHgJ30ic5SRCAAux7JRxF6jbjTT+wDW4JHvh1FvXVCAnPWJ99v8AnZOTF
-         sYG7WiGKoKLljU1koxaaYJX5/3MIwbHEWL0g4c6c+AANqPZzrbyuqT3n4aJyOFgRLN
-         euO0laQHumh9HDhizJwYzK6xIfudhIkaIwXkaNs9ptbpBWoeLsuQO2cpyGuYn8yP2w
-         6eMLsAVzGRFaKn07FB93xlR30flBz1icWl7L+XRWcTMwK2a4+hPEQOmpCJf6+2rFgQ
-         NLTlbEOpWTpWg==
-Date:   Mon, 24 Jan 2022 10:39:32 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Leonard Crestez <cdleonard@gmail.com>
-Cc:     David Ahern <dsahern@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Philip Paeps <philip@trouble.is>,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 00AD36121F;
+        Mon, 24 Jan 2022 19:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDCC4C340E5;
+        Mon, 24 Jan 2022 19:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1643051421;
+        bh=WO3Y96d8ujRmduRbZRHZ6fINYqgCWEHggCq4NSV+Gr0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=120WpT3DMAm5gwTtnDcLqpTrylMDnHHv2SCS5IVegT57QiGZUqCGGfY53BFDfEp+f
+         DhwVq9WwZ76FAx4GjwiWEssvIgWxGmZKszJ+y5cK0FE3/G2biqzSq4KeanhgYgNUSm
+         NYJ5ZLH8fZXy9B/oA9TuNUgf/M1J49/GUF41dq40=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Marek Vasut <marex@denx.de>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Yuchung Cheng <ycheng@google.com>,
-        Francesco Ruggeri <fruggeri@arista.com>,
-        Mat Martineau <mathew.j.martineau@linux.intel.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        Ivan Delalande <colona@arista.com>,
-        Priyaranjan Jha <priyarjha@google.com>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 00/20] tcp: Initial support for RFC5925 auth option
-Message-ID: <20220124103932.5d22fad2@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <cover.1643026076.git.cdleonard@gmail.com>
-References: <cover.1643026076.git.cdleonard@gmail.com>
+        Lionel Debieve <lionel.debieve@st.com>,
+        Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
+Subject: [PATCH 4.14 157/186] crypto: stm32/crc32 - Fix kernel BUG triggered in probe()
+Date:   Mon, 24 Jan 2022 19:43:52 +0100
+Message-Id: <20220124183942.146431609@linuxfoundation.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220124183937.101330125@linuxfoundation.org>
+References: <20220124183937.101330125@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 24 Jan 2022 14:12:46 +0200 Leonard Crestez wrote:
-> This is similar to TCP-MD5 in functionality but it's sufficiently
-> different that packet formats and interfaces are incompatible.
-> Compared to TCP-MD5 more algorithms are supported and multiple keys
-> can be used on the same connection but there is still no negotiation
-> mechanism.
-> 
-> [...]
+From: Marek Vasut <marex@denx.de>
 
-Could you make sure that each individual patch builds cleanly with W=1
-C=1? There is a bunch of missing "static" and unused function warnings 
-in the first few patches. I presume they are made moot by later patches
-but with kernel defaulting to Werror now it's a dangerous game to play,
-we don't want to break bisection.
+commit 29009604ad4e3ef784fd9b9fef6f23610ddf633d upstream.
 
-Also I spotted this:
+The include/linux/crypto.h struct crypto_alg field cra_driver_name description
+states "Unique name of the transformation provider. " ... " this contains the
+name of the chip or provider and the name of the transformation algorithm."
 
-include/net/tcp_authopt.h:59: warning: Function parameter or member 'prefixlen' not described in 'tcp_authopt_key_info'
+In case of the stm32-crc driver, field cra_driver_name is identical for all
+registered transformation providers and set to the name of the driver itself,
+which is incorrect. This patch fixes it by assigning a unique cra_driver_name
+to each registered transformation provider.
+
+The kernel crash is triggered when the driver calls crypto_register_shashes()
+which calls crypto_register_shash(), which calls crypto_register_alg(), which
+calls __crypto_register_alg(), which returns -EEXIST, which is propagated
+back through this call chain. Upon -EEXIST from crypto_register_shash(), the
+crypto_register_shashes() starts unregistering the providers back, and calls
+crypto_unregister_shash(), which calls crypto_unregister_alg(), and this is
+where the BUG() triggers due to incorrect cra_refcnt.
+
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+Signed-off-by: Marek Vasut <marex@denx.de>
+Cc: <stable@vger.kernel.org> # 4.12+
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Fabien Dessenne <fabien.dessenne@st.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Lionel Debieve <lionel.debieve@st.com>
+Cc: Nicolas Toromanoff <nicolas.toromanoff@st.com>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+To: linux-crypto@vger.kernel.org
+Acked-by: Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/crypto/stm32/stm32_crc32.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/drivers/crypto/stm32/stm32_crc32.c
++++ b/drivers/crypto/stm32/stm32_crc32.c
+@@ -206,7 +206,7 @@ static struct shash_alg algs[] = {
+ 		.digestsize     = CHKSUM_DIGEST_SIZE,
+ 		.base           = {
+ 			.cra_name               = "crc32",
+-			.cra_driver_name        = DRIVER_NAME,
++			.cra_driver_name        = "stm32-crc32-crc32",
+ 			.cra_priority           = 200,
+ 			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
+ 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
+@@ -228,7 +228,7 @@ static struct shash_alg algs[] = {
+ 		.digestsize     = CHKSUM_DIGEST_SIZE,
+ 		.base           = {
+ 			.cra_name               = "crc32c",
+-			.cra_driver_name        = DRIVER_NAME,
++			.cra_driver_name        = "stm32-crc32-crc32c",
+ 			.cra_priority           = 200,
+ 			.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
+ 			.cra_blocksize          = CHKSUM_BLOCK_SIZE,
+
+
