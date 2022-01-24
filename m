@@ -2,15 +2,15 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A486CC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 20:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC69AC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 20:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352157AbiAXUnF (ORCPT
+        id S1351933AbiAXUnI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 15:43:05 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:46512 "EHLO
+        Mon, 24 Jan 2022 15:43:08 -0500
+Received: from isilmar-4.linta.de ([136.243.71.142]:46484 "EHLO
         isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385545AbiAXUde (ORCPT
+        with ESMTP id S1385544AbiAXUde (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 24 Jan 2022 15:33:34 -0500
 X-isilmar-external: YES
@@ -19,18 +19,18 @@ X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 293712010EB;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 3ED3B20140C;
         Mon, 24 Jan 2022 20:33:30 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 2C38980A2B; Mon, 24 Jan 2022 21:30:07 +0100 (CET)
+        id B809480E60; Mon, 24 Jan 2022 21:30:19 +0100 (CET)
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 2/6] hw_random: read() callback must be called for size of 32 or more bytes
-Date:   Mon, 24 Jan 2022 21:29:47 +0100
-Message-Id: <20220124202951.28579-2-linux@dominikbrodowski.net>
+Subject: [PATCH 5/6] hw_random: break out of hwrng_fillfn if current rng is not trusted
+Date:   Mon, 24 Jan 2022 21:29:50 +0100
+Message-Id: <20220124202951.28579-5-linux@dominikbrodowski.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220124202951.28579-1-linux@dominikbrodowski.net>
 References: <20220124202951.28579-1-linux@dominikbrodowski.net>
@@ -40,35 +40,40 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-According to <linux/hw_random.h>, the @max parameter of the ->read
-callback "is a multiple of 4 and >= 32 bytes". That promise was not
-kept by add_early_randomness(), which only asked for 16 bytes. As
-rng_buffer_size() is at least 32, we can simply ask for 32 bytes.
+For two reasons, current_quality may become zero within the rngd
+kernel thread: (1) The user lowers current_quality to 0 by writing
+to the sysfs module parameter file (note that increasing the quality
+from zero is without effect at the moment), or (2) there are two or
+more hwrng devices registered, and those which provide quality>0 are
+unregistered, but one with quality==0 remains.
+
+If current_quality is 0, the randomness is not trusted and cannot help
+to increase the entropy count. That will lead to continuous calls to
+the hwrngd thread and continuous stirring of the input pool with
+untrusted bits.
 
 Cc: Matt Mackall <mpm@selenic.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 ---
- drivers/char/hw_random/core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/char/hw_random/core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index e860e044b19e..c2d260b5dd92 100644
+index 9405fcdace38..bc9f95cbac92 100644
 --- a/drivers/char/hw_random/core.c
 +++ b/drivers/char/hw_random/core.c
-@@ -64,10 +64,9 @@ static size_t rng_buffer_size(void)
- static void add_early_randomness(struct hwrng *rng)
- {
- 	int bytes_read;
--	size_t size = min_t(size_t, 16, rng_buffer_size());
+@@ -429,6 +429,9 @@ static int hwrng_fillfn(void *unused)
+ 	while (!kthread_should_stop()) {
+ 		struct hwrng *rng;
  
- 	mutex_lock(&reading_mutex);
--	bytes_read = rng_get_data(rng, rng_buffer, size, 0);
-+	bytes_read = rng_get_data(rng, rng_buffer, 32, 0);
- 	mutex_unlock(&reading_mutex);
- 	if (bytes_read > 0)
- 		add_device_randomness(rng_buffer, bytes_read);
++		if (!current_quality)
++			break;
++
+ 		rng = get_current_rng();
+ 		if (IS_ERR(rng) || !rng)
+ 			break;
 -- 
 2.34.1
 
