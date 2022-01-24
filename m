@@ -2,34 +2,33 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF7EEC4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jan 2022 22:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1EF9C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jan 2022 02:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381958AbiAXW62 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jan 2022 17:58:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34704 "EHLO
+        id S231446AbiAYCTY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 24 Jan 2022 21:19:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1581074AbiAXWLK (ORCPT
+        with ESMTP id S1359323AbiAXVDK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jan 2022 17:11:10 -0500
+        Mon, 24 Jan 2022 16:03:10 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B25C0DF2E4;
-        Mon, 24 Jan 2022 12:43:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A7BCC06B598;
+        Mon, 24 Jan 2022 12:03:19 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AB85760915;
-        Mon, 24 Jan 2022 20:43:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B936C340EA;
-        Mon, 24 Jan 2022 20:43:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 14F3761028;
+        Mon, 24 Jan 2022 20:03:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BE73C340E5;
+        Mon, 24 Jan 2022 20:03:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1643057004;
+        s=korg; t=1643054598;
         bh=8FTpx20CPyOOXFtNwPoa4MCozejgitLRpKaNV6dHwN8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XE9StQPOKSAmQolOvjBhyGMyuLh3kBLupU8aBF9Q3ISApTLeVPvRGO5mPC7n+0oji
-         JTJkO9ok965mtE4SaF+qx/HFyKR8ry5RwT1HzfL8dNHO4l778g2CGbJDKsJni/oLit
-         A3UpJkoFgh1NgZo3kUAV19pzGOi2/EqmT/E0Mx8s=
+        b=2uXhrS5LYE7aqHTgB7Vo5vnahaQrEHrsLMtXU2KdGbMqgq4rD71hOJax6vk6AgXd4
+         52KwkKF+wE5MsKD3bL+ok0xU+JaOVqgCfKdGMhZe2qD33XFh8jSUWjAkS/NvRT8+Md
+         DaGEaBsQ/McaZgTyxNDHqWgABllFAR6wpxgRbWSc=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -42,12 +41,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-arm-kernel@lists.infradead.org,
         linux-stm32@st-md-mailman.stormreply.com,
         Nicolas Toromanoff <nicolas.toromanoff@foss.st.com>
-Subject: [PATCH 5.15 670/846] crypto: stm32/crc32 - Fix kernel BUG triggered in probe()
-Date:   Mon, 24 Jan 2022 19:43:07 +0100
-Message-Id: <20220124184124.185205895@linuxfoundation.org>
+Subject: [PATCH 5.10 442/563] crypto: stm32/crc32 - Fix kernel BUG triggered in probe()
+Date:   Mon, 24 Jan 2022 19:43:27 +0100
+Message-Id: <20220124184039.729742844@linuxfoundation.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220124184100.867127425@linuxfoundation.org>
-References: <20220124184100.867127425@linuxfoundation.org>
+In-Reply-To: <20220124184024.407936072@linuxfoundation.org>
+References: <20220124184024.407936072@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
