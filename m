@@ -2,81 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E81DC2BA4C
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 14:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41409C28CF5
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 14:53:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241809AbiAZOXP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jan 2022 09:23:15 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:44662 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241653AbiAZOXP (ORCPT
+        id S242339AbiAZOxd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jan 2022 09:53:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235644AbiAZOxd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jan 2022 09:23:15 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BCB2D61748;
-        Wed, 26 Jan 2022 14:23:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA6E8C340E3;
-        Wed, 26 Jan 2022 14:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643206994;
-        bh=8DSYXalK5kSrxQ9s1eHHwRmM7s51ea7r7mvSXt3y89A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SOAoWeEJ3Sn4QHdSlaXJGXXCQ4kSaz1ykKHSTJMmfzwyS8iAdGFQXSD5PsawDRZ2g
-         FaKhpfJiQkXkgA00pvcMo1EOCT9GhG35Z+R/UInDc90IW24U0yqhybGOC1nDOFinjF
-         S520lHdw23iqwFLvClJQvli37GVrdAz2Dc79NfOZ5U1bH8dMQgfNLF4j5XZm5sOKfg
-         wvJOweV+A5FobZxBYaqBPDfYpd8TfIv1DHs5DXGnSMNZmRLy5n7dKa9R4mkIjjap0g
-         bOqNepPU3uW5ENI6N8oRmITFsirkLEo1ooj4IKdh2yDV+upiDzx/BiklqTQ5EZfPWy
-         SzRN9ik6ZLB5g==
-Date:   Wed, 26 Jan 2022 16:22:53 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Denis Kenzior <denkenz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        James Morris <james.morris@microsoft.com>,
-        linux-crypto@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KEYS: asym_tpm: fix buffer overreads in
- extract_key_parameters()
-Message-ID: <YfFZPbKkgYJGWu1Q@iki.fi>
-References: <20220113235440.90439-1-ebiggers@kernel.org>
- <20220113235440.90439-2-ebiggers@kernel.org>
- <YeM/YIUTEwL4jNf3@iki.fi>
- <Yedigyl+WNhB58MO@sol.localdomain>
- <YfFY/trrVl3vse5I@iki.fi>
+        Wed, 26 Jan 2022 09:53:33 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E297CC06161C
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 06:53:32 -0800 (PST)
+Received: from dude02.hi.pengutronix.de ([2001:67c:670:100:1d::28] helo=dude02.pengutronix.de.)
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <p.zabel@pengutronix.de>)
+        id 1nCjfv-0004Wa-B0; Wed, 26 Jan 2022 15:53:31 +0100
+From:   Philipp Zabel <p.zabel@pengutronix.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de
+Subject: [PATCH] crypto: algapi - Remove test larvals to fix error paths
+Date:   Wed, 26 Jan 2022 15:53:22 +0100
+Message-Id: <20220126145322.646723-1-p.zabel@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YfFY/trrVl3vse5I@iki.fi>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::28
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 04:21:53PM +0200, Jarkko Sakkinen wrote:
-> On Tue, Jan 18, 2022 at 04:59:47PM -0800, Eric Biggers wrote:
-> > On Sat, Jan 15, 2022 at 11:40:48PM +0200, Jarkko Sakkinen wrote:
-> > > > 
-> > > > - Avoid integer overflows when validating size fields; 'sz + 12' and
-> > > >   '4 + sz' overflowed if 'sz' is near U32_MAX.
-> > > 
-> > > So we have a struct tpm_header in include/linux/tpm.h. It would be way
-> > > more informative to use sizeof(struct tpm_header) than number 12, even
-> > > if the patch does not otherwise use the struct. It tells what it is, 12
-> > > does not.
-> > 
-> > I don't think that would be an improvement, given that the code is using
-> > hard-coded offsets.  If it's reading 4 bytes from cur + 8, it's much easier to
-> > understand that it needs 12 bytes than 'sizeof(struct tpm_header)' bytes.
-> > 
-> > I'd certainly encourage whoever is maintaining this code to change it to use
-> > structs instead, but that's not what this patch is meant to do.
-> 
-> I would consider dropping asym_tpm as it has no practical use cases
-> existing.
+If crypto_unregister_alg() is called with an algorithm that still has a
+pending test larval, the algorithm will have a reference count of 2 and
+crypto_unregister_alg() will trigger a BUG(). This can happen during
+cleanup if the error path is taken for a built-in algorithm, before
+crypto_algapi_init() was called.
 
-At least I have zero motivation to maintain it as it does not meet
-any quality standards and is based on insecure crypto algorithms.
-I neither have participated to its review process.
+Kill test larvals for untested algorithms during removal to fix the
+reference count.
 
-/Jarkko
+Fixes: adad556efcdd ("crypto: api - Fix built-in testing dependency failures")
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+---
+ crypto/algapi.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index a366cb3e8aa1..fc3b75e59d0e 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -458,6 +458,28 @@ void crypto_unregister_alg(struct crypto_alg *alg)
+ 	if (WARN(ret, "Algorithm %s is not registered", alg->cra_driver_name))
+ 		return;
+ 
++	/* If there is a test larval holding a reference, remove it */
++	if (!(alg->cra_flags & CRYPTO_ALG_TESTED)) {
++		struct crypto_alg *q, *n;
++
++		list_for_each_entry_safe(q, n, &crypto_alg_list, cra_list) {
++			struct crypto_larval *l;
++
++			if (!crypto_is_larval(q))
++				continue;
++
++			l = (void *)q;
++
++			if (!crypto_is_test_larval(l))
++				continue;
++
++			if (l->adult != alg)
++				continue;
++
++			crypto_larval_kill(q);
++		}
++	}
++
+ 	BUG_ON(refcount_read(&alg->cra_refcnt) != 1);
+ 	if (alg->cra_destroy)
+ 		alg->cra_destroy(alg);
+
+base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
+-- 
+2.30.2
+
