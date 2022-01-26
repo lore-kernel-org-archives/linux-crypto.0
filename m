@@ -2,63 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F95C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 22:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE1BC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 22:52:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230339AbiAZWtH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jan 2022 17:49:07 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:52902 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiAZWtH (ORCPT
+        id S231830AbiAZWwF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jan 2022 17:52:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232046AbiAZWwE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jan 2022 17:49:07 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3C3F4B82059
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 22:49:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D202EC340E3;
-        Wed, 26 Jan 2022 22:49:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643237345;
-        bh=QthA4VnJuuhg1vXytX6lpMOpUQ+6nIBK61JvSJIkk0Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e/zjxvE3L4HYT1/VT6aF0MCF9MdYTIaWd8tUmEc8hE1ecP5LDb7XXEj4r5UZYk76u
-         AkJufI4XSbLzPI1sjY9TbWZiU56KXx41dvFKMFjwxAM+NyarC02iQgoswTcJdCtV+Z
-         BqPkLfYC3v9oNWMRu4TaDTP9FWC5sPCz2yEjUB5ngOWf0uOXXynyrmUzf5LFvwG+HM
-         hFd1URYyC6pyGvctri2OwwozodLmE+NhulPzOhjfDfJtdC1pKH74C0Qbyo0klotyDk
-         XsJwvfGZtcDGLhhYY4nCwpJ87EHpBslkCWmBzg3cjtswNtj100dDy0SBvCCBYOaH0x
-         RhLORmgCSKmsg==
-Date:   Wed, 26 Jan 2022 14:49:03 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        simo@redhat.com, Nicolai Stange <nstange@suse.de>
-Subject: Re: [PATCH 0/7] Common entropy source and DRNG management
-Message-ID: <YfHP3xs6f68wR/Z/@sol.localdomain>
-References: <2486550.t9SDvczpPo@positron.chronox.de>
+        Wed, 26 Jan 2022 17:52:04 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AFA4C061748;
+        Wed, 26 Jan 2022 14:52:04 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id e8so955900ilm.13;
+        Wed, 26 Jan 2022 14:52:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SbX/CA9rx3VdoijI1jnik093tt/YSMZq2p12OY56GJE=;
+        b=FDvaV/SVpssUS1kX5dDZFCvk8MRpwyvPx0Z+IIgr78SYs83UY/9cNwv7wxVU1y71zf
+         YFn/8hqfrl1wpKm+qrMwLTtYLgFwIHRyIQvqaO8hmWCF3/DT0nR2VJbNPIhsV+2792di
+         Ndq/uKMuB8daKf19+dT1VHwKgYjzr9DN4aHQKfqjtxDYXvNa4EFjA5GxA22vTDUcn4JF
+         6jMRF8eZyCPe0ilfZBvCGqBHNsU8fABVwF6U63Hq6deKhB72TpkZyGtaZvdCyfVw8icq
+         cbAnBwyH1JDD81+4HRRQ5b+NL34bUnHL/pxfxb1FCI+VZh3/OMe0W+NyRVlJWZqseDyF
+         +ZYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SbX/CA9rx3VdoijI1jnik093tt/YSMZq2p12OY56GJE=;
+        b=MzHU2+FiqXoXktfOO9hrCVfkAEoFrTQCtLWWd3YAj3o9u2ZgPekMZSlvlqQi2J9C8t
+         Y4khvDno/bslm94o6kMw8XqmQTxDLDE4HpRTa49oRlMp6nLKxJP9tdTA3X4CDIw4nCe3
+         FZf7Xqc+IJePYU2mPPxski9+X1VnwpF8aO94zkXPy93qDQz4pOthW7Ucx4BHtKP4Ji3r
+         O8ZsOV/3AO+NiK0MNUAv4mU5+18wUaYwQxzjEW9bfIaDm4ZFCGZ5HHF345nQaWF+MFOt
+         llWbIyY90wy66nYOB7JwFUdXXXcuitarwWxh7EyPA6dyjk135JF2MaR9FzX+VQW0khYX
+         X/fg==
+X-Gm-Message-State: AOAM531ynjfs7XUBHx07MvqJyVa7b8DgE4PEmQ+sxJhwYtOH7mE3hLQY
+        FCYbgmcf527StMvN5AFRf4dKZjBoe2fJz/XewUs=
+X-Google-Smtp-Source: ABdhPJz7GBY/JMkN6SYLj8sxtQBg5EJtrS4PlUVpZ/JYCUtK5E7iqpZDgUjlCM2KZJxqGEF7BOK/ADklNvpBSQT7mZ4=
+X-Received: by 2002:a05:6e02:158a:: with SMTP id m10mr925657ilu.59.1643237523612;
+ Wed, 26 Jan 2022 14:52:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2486550.t9SDvczpPo@positron.chronox.de>
+References: <CAHmME9qVMomgb53rABKsucCoEhwsk+=KzDdEcGKtecOXuahTZw@mail.gmail.com>
+ <20220119135450.564115-1-Jason@zx2c4.com>
+In-Reply-To: <20220119135450.564115-1-Jason@zx2c4.com>
+From:   John Stultz <john.stultz@linaro.org>
+Date:   Wed, 26 Jan 2022 14:51:52 -0800
+Message-ID: <CANcMJZABKTdwU8455pLfBjMjgsDO7BNjNWTvwx0sP+3TcJw_XA@mail.gmail.com>
+Subject: Re: [PATCH] lib/crypto: blake2s: avoid indirect calls to compression
+ function for Clang CFI
+To:     "Jason A. Donenfeld" <jason@zx2c4.com>
+Cc:     Miles Chen <miles.chen@mediatek.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        YongQin Liu <yongqin.liu@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 26, 2022 at 08:02:54AM +0100, Stephan Müller wrote:
-> The current code base of the kernel crypto API random number support
-> leaves the task to seed and reseed the DRNG to either the caller or
-> the DRNG implementation. The code in crypto/drbg.c implements its own
-> seeding strategy. crypto/ansi_cprng.c does not contain any seeding
-> operation. The implementation in arch/s390/crypto/prng.c has yet
-> another approach for seeding. Albeit the crypto_rng_reset() contains
-> a seeding logic from get_random_bytes, there is no management of
-> the DRNG to ensure proper reseeding or control which entropy sources
-> are used for pulling data from.
+On Fri, Jan 21, 2022 at 11:17 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> blake2s_compress_generic is weakly aliased to blake2s_generic. The
+> current harness for function selection uses a function pointer, which is
+> ordinarily inlined and resolved at compile time. But when Clang's CFI is
+> enabled, CFI still triggers when making an indirect call via a weak
+> symbol. This seems like a bug in Clang's CFI, as though it's bucketing
+> weak symbols and strong symbols differently. It also only seems to
+> trigger when "full LTO" mode is used, rather than "thin LTO".
+>
+> [    0.000000][    T0] Kernel panic - not syncing: CFI failure (target: blake2s_compress_generic+0x0/0x1444)
+> [    0.000000][    T0] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.16.0-mainline-06981-g076c855b846e #1
+> [    0.000000][    T0] Hardware name: MT6873 (DT)
+> [    0.000000][    T0] Call trace:
+> [    0.000000][    T0]  dump_backtrace+0xfc/0x1dc
+> [    0.000000][    T0]  dump_stack_lvl+0xa8/0x11c
+> [    0.000000][    T0]  panic+0x194/0x464
+> [    0.000000][    T0]  __cfi_check_fail+0x54/0x58
+> [    0.000000][    T0]  __cfi_slowpath_diag+0x354/0x4b0
+> [    0.000000][    T0]  blake2s_update+0x14c/0x178
+> [    0.000000][    T0]  _extract_entropy+0xf4/0x29c
+> [    0.000000][    T0]  crng_initialize_primary+0x24/0x94
+> [    0.000000][    T0]  rand_initialize+0x2c/0x6c
+> [    0.000000][    T0]  start_kernel+0x2f8/0x65c
+> [    0.000000][    T0]  __primary_switched+0xc4/0x7be4
+> [    0.000000][    T0] Rebooting in 5 seconds..
 
-ansi_cprng looks like unused code that should be removed, as does the s390 prng.
+YongQin also reported hitting this issue(also, only in the LTO=full
+case) on the db845c dev board. Sami pointed me to this patch and I
+just wanted to confirm it gets things booting again.
 
-With that being the case, what is the purpose of this patchset?
+Reported-by: YongQin Liu <yongqin.liu@linaro.org>
+Tested-by: John Stultz <john.stultz@linaro.org>
 
-- Eric
+Thanks so much for the quick analysis and fix!
+-john
