@@ -2,88 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9229C28CF5
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 09:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB30C2BA4C
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 12:15:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231174AbiAZJB2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jan 2022 04:01:28 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:46263 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231326AbiAZJB1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jan 2022 04:01:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643187679;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=bEkghuCjX1cE+0Md8pTK57v3o8W2gb012RZrKU1aDPg=;
-    b=Al2PI6CbIhniAgVw8riXxxpW31+Zpj2mtAgbMKXt6XSrnhkqj9YPubRBr7iXQjRDxV
-    HwCdhir+Kv5ODvUwkBHMZw/EBduUzd1s0TuIxZH8CUtheMwBK5U/QlduBw6HjNGsyvct
-    Z9ZOtTkhS5skymFyI16P0vTiJ2zGlzZpzxIXy9nO15u913K0Bgmb83M1J4JEk4OJBiRV
-    p6Cx1NHV6/qelCKl726YyVezrWrO8qTFfUjf7lhFg56E7GVLrT13nAv1/0qL860o3jsf
-    0O3jjjv1XTAJ+HbzMQiDGIvz1loZ4GStVMasQD6B2L1BOs84nlhsNSYOorAvknTseoVF
-    EOIg==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJvScdWrN"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.38.0 DYNA|AUTH)
-    with ESMTPSA id v5f65ay0Q91IjYG
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Wed, 26 Jan 2022 10:01:18 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com,
-        Eric Biggers <ebiggers@kernel.org>, Petr Vorel <pvorel@suse.cz>
-Subject: Re: [v2 PATCH] crypto: api - Disallow sha1 in FIPS-mode while allowing hmac(sha1)
-Date:   Wed, 26 Jan 2022 10:01:17 +0100
-Message-ID: <3615781.PPvlf9ziaL@tauon.chronox.de>
-In-Reply-To: <YeFWnscvXtv73KBl@gondor.apana.org.au>
-References: <20211209090358.28231-1-nstange@suse.de> <87k0f2hefl.fsf@suse.de> <YeFWnscvXtv73KBl@gondor.apana.org.au>
+        id S241142AbiAZMP4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jan 2022 07:15:56 -0500
+Received: from mga12.intel.com ([192.55.52.136]:11081 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233973AbiAZMPz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Jan 2022 07:15:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643199355; x=1674735355;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=26ItzPYPQ3Duqca6mkSSB2OFe6OwHmU+4+XxL8bpWiQ=;
+  b=mqQfLqkdUtAtlE1spdlZrkfPpZdedYcoDH9FUIb5aAVd5gwWcKkBhAaB
+   4R9Nnv1Lx08phdLusb7yy+xttdt8kccgLu848RQ8x8UQNLpoFDDOvPBFZ
+   bg34X83a236Mokv9Sv16HI8n9yrHJTuMgJX2UjTG3QCVHhxtRbQowPauO
+   H/20x0UzOFNIcOInzCQ7OOwr/PG5EXicvxuTZoLQjN33XvCgPzsNhCgdJ
+   PmOStMvsZ7FZDV5dyaYz19Dhd2ScXCAh5ysAHwHWwtjpwaBTuz/szLS2/
+   FK4Spmr9o3wYp3+bQ1gmtwaOvm0AttkYhCmcWoTLT0TKcXE0ANw5R78fN
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10238"; a="226513794"
+X-IronPort-AV: E=Sophos;i="5.88,318,1635231600"; 
+   d="scan'208";a="226513794"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2022 04:15:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,318,1635231600"; 
+   d="scan'208";a="628288074"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 26 Jan 2022 04:15:53 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nChDM-000LAe-IV; Wed, 26 Jan 2022 12:15:52 +0000
+Date:   Wed, 26 Jan 2022 20:15:04 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        herbert@gondor.apana.org.au
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-crypto@vger.kernel.org, simo@redhat.com,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH 1/7] crypto: DRBG - remove internal reseeding operation
+Message-ID: <202201262050.xFgnR1Kx-lkp@intel.com>
+References: <2450379.h6RI2rZIcs@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2450379.h6RI2rZIcs@positron.chronox.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 14. Januar 2022, 11:55:26 CET schrieb Herbert Xu:
+Hi "Stephan,
 
-Hi Herbert,
+Thank you for the patch! Yet something to improve:
 
-> 
-> > This looks all good to me, but as !->fips_allowed tests aren't skipped
-> > over anymore now, it would perhaps make sense to make their failure
-> > non-fatal in FIPS mode. Because in FIPS mode a failure could mean a
-> > panic and some of the existing TVs might not pass because of e.g. some
-> > key length checks or so active only for fips_enabled...
-> 
-> You mean a buggy non-FIPS algorithm that fails when tested in
-> FIPS mode?  I guess we could skip the panic in that case if
-> everyone is happy with that.  Stephan?
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v5.17-rc1 next-20220125]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-As we consider FIPS 140-3, we can allow a "degrated mode of operation". A 
-degraded mode of operation disables only the algorithm that caused the 
-failure. With a failing self test and not having a panic(), the offending 
-algorithm implementation will not be available to the kernel crypto API and 
-thus to a user.
+url:    https://github.com/0day-ci/linux/commits/Stephan-M-ller/Common-entropy-source-and-DRNG-management/20220126-150911
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: hexagon-buildonly-randconfig-r003-20220124 (https://download.01.org/0day-ci/archive/20220126/202201262050.xFgnR1Kx-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 2a1b7aa016c0f4b5598806205bdfbab1ea2d92c4)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/14ec08bbd20e04299353eb31a9d43d4ac9af2b22
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Stephan-M-ller/Common-entropy-source-and-DRNG-management/20220126-150911
+        git checkout 14ec08bbd20e04299353eb31a9d43d4ac9af2b22
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash
 
-In this case, we can replace the panic with a graceful error.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-If that change is applied, I would like to mention to anybody that wants to 
-backport the change: this change is not appropriate for FIPS 140-2.
+All errors (new ones prefixed by >>):
 
-Ciao
-Stephan
+   crypto/drbg.c:204:30: warning: unused function 'drbg_sec_strength' [-Wunused-function]
+   static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
+                                ^
+>> crypto/drbg.c:1742:2: error: call to __compiletime_assert_223 declared with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(drbg_cores) != ARRAY_SIZE(drbg_algs)
+           BUILD_BUG_ON(ARRAY_SIZE(drbg_cores) != ARRAY_SIZE(drbg_algs));
+           ^
+   include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
+           BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+           ^
+   include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+   #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+                                       ^
+   include/linux/compiler_types.h:335:2: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ^
+   include/linux/compiler_types.h:323:2: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ^
+   include/linux/compiler_types.h:316:4: note: expanded from macro '__compiletime_assert'
+                           prefix ## suffix();                             \
+                           ^
+   <scratch space>:63:1: note: expanded from here
+   __compiletime_assert_223
+   ^
+   1 warning and 1 error generated.
 
 
+vim +/error +1742 crypto/drbg.c
+
+  1732	
+  1733	static int __init drbg_init(void)
+  1734	{
+  1735		unsigned int i;
+  1736		int ret;
+  1737	
+  1738		ret = drbg_healthcheck_sanity();
+  1739		if (ret)
+  1740			return ret;
+  1741	
+> 1742		BUILD_BUG_ON(ARRAY_SIZE(drbg_cores) != ARRAY_SIZE(drbg_algs));
+  1743	
+  1744		/*
+  1745		 * As the order of placing them into the drbg_algs array matters
+  1746		 * (the later DRBGs receive a higher cra_priority) we register the
+  1747		 * prediction resistance DRBGs first as the should not be too
+  1748		 * interesting.
+  1749		 */
+  1750		for (i = 0; i < ARRAY_SIZE(drbg_cores); i++)
+  1751			drbg_fill_array(&drbg_algs[i], &drbg_cores[i]);
+  1752		return crypto_register_rngs(drbg_algs, ARRAY_SIZE(drbg_cores));
+  1753	}
+  1754	
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
