@@ -2,78 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B00BFC3526D
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 13:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2628BC28CF5
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jan 2022 14:06:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235282AbiAZNoS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jan 2022 08:44:18 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:37349 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240968AbiAZNoR (ORCPT
+        id S241920AbiAZOGY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jan 2022 09:06:24 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:39776 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235083AbiAZOGY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jan 2022 08:44:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643204649;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=z6Z0P//1Nb/0zii1oKCv3nKwK9MpRH6b2WFxRnLAlcg=;
-    b=QIIUVSEaKZp60JLVB1dknIwI+i92LHRTndkIg+f94/VaQSGimmYk7Z74ZGg9/NK6lG
-    kq4SvGqKn0FjrOBSDCCe0CpX5TolDhrNTiJlwgzy6qGwn5amaRQdql4GjScLUcgmpBPW
-    lnYiyY9LFRRQNK8WGb5zPfMZ3eioPBtM7ZsFm18AsKV2gqz8wmhqKO3yj80Isq8FpDWI
-    tIj8e200dg7DKZUGykYbuolwictEl99nlvPbSueOqnqZGwGyGlr3K8H2Mh7CFRL4EQ1y
-    DtfsPZYvEMxUBBXK6T9gTF4xJTsPEiMIZpUBn6uw6LcJ2mV9ODo9fGXzOnUTqUGXjhZe
-    Q9iQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJvScdWrN"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.38.0 DYNA|AUTH)
-    with ESMTPSA id v5f65ay0QDi8lSM
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Wed, 26 Jan 2022 14:44:08 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     herbert@gondor.apana.org.au, kernel test robot <lkp@intel.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-crypto@vger.kernel.org, simo@redhat.com,
-        Nicolai Stange <nstange@suse.de>
-Subject: Re: [PATCH 1/7] crypto: DRBG - remove internal reseeding operation
-Date:   Wed, 26 Jan 2022 14:44:08 +0100
-Message-ID: <32397848.ByM7UNSnkf@tauon.chronox.de>
-In-Reply-To: <202201262050.xFgnR1Kx-lkp@intel.com>
-References: <2450379.h6RI2rZIcs@positron.chronox.de> <202201262050.xFgnR1Kx-lkp@intel.com>
+        Wed, 26 Jan 2022 09:06:24 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A9D85B81E18;
+        Wed, 26 Jan 2022 14:06:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED0AC340E3;
+        Wed, 26 Jan 2022 14:06:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643205981;
+        bh=fBo2lZFgwC79lVOAmFUYUrB+mT5nY4lcwlxA8CcRsbk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=E5JedRAuSt2BXKLv1ulUjQUsLn2JcJIdAl/jD7mmMZNI1fn+59RUDTae5Yjl3vorR
+         SVYzC97i4ru3pk11qodYEk+ISVvz75ZwEgtl8g6kik+ZtmH4962M974pikiExoUscu
+         mSjDb62Al1fyqRkrYkWlWWDJE1wY1jCerVE+6YnhV4Co7UQdVZdELCZ6uB+eH+LVGG
+         GSC1dIjaew/HdKYMuijnlyajrQvd8RDjacb+7dFzo4arFnsdE1V499X2ld4ULYQpBy
+         FCNJJkgPiehpqawBLn+8OD5l+w31poawlpoqWM8MttTBNLsAydmDOUNRInooxJFQiK
+         NosvKY9bJC4lQ==
+Date:   Wed, 26 Jan 2022 16:06:01 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] KEYS: fix length validation in keyctl_pkey_params_get_2()
+Message-ID: <YfFVSeWAFi8eqjpj@iki.fi>
+References: <20220113200454.72609-1-ebiggers@kernel.org>
+ <YeMWLyceg4xcwShF@iki.fi>
+ <YeMmPs+gf+q7XUv4@sol.localdomain>
+ <YeM7+Nyi2p7Yv7+Q@iki.fi>
+ <YedZviVNB2X7yeTX@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YedZviVNB2X7yeTX@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 26. Januar 2022, 13:15:04 CET schrieb kernel test robot:
-
-Hi,
-
->    crypto/drbg.c:204:30: warning: unused function 'drbg_sec_strength'
-> [-Wunused-function] static inline unsigned short
-> drbg_sec_strength(drbg_flag_t flags) ^
-
-It is interesting that Sparse did not complain about this. Anyhow, this 
-function is not needed and will be removed.
+On Tue, Jan 18, 2022 at 04:22:22PM -0800, Eric Biggers wrote:
+> On Sat, Jan 15, 2022 at 11:26:16PM +0200, Jarkko Sakkinen wrote:
+> > On Sat, Jan 15, 2022 at 11:53:34AM -0800, Eric Biggers wrote:
+> > > On Sat, Jan 15, 2022 at 08:45:03PM +0200, Jarkko Sakkinen wrote:
+> > > > On Thu, Jan 13, 2022 at 12:04:54PM -0800, Eric Biggers wrote:
+> > > > > From: Eric Biggers <ebiggers@google.com>
+> > > > > 
+> > > > > In many cases, keyctl_pkey_params_get_2() is validating the user buffer
+> > > > > lengths against the wrong algorithm properties.  Fix it to check against
+> > > > > the correct properties.
+> > > > > 
+> > > > > Probably this wasn't noticed before because for all asymmetric keys of
+> > > > > the "public_key" subtype, max_data_size == max_sig_size == max_enc_size
+> > > > > == max_dec_size.  However, this isn't necessarily true for the
+> > > > > "asym_tpm" subtype (it should be, but it's not strictly validated).  Of
+> > > > > course, future key types could have different values as well.
+> > > > 
+> > > > With a quick look, asym_tpm is TPM 1.x only, which only has 2048-bit RSA
+> > > > keys.
+> > > 
+> > > The code allows other lengths, as well as the case where the "RSA key size"
+> > > doesn't match the "public key size".  Probably both are bugs and they should
+> > > both be 256 bytes (2048 bits) only.  Anyway, that would be a separate fix.
+> > > 
+> > > - Eric
+> > 
+> > I'm fine with the current commit message. E.g. I have no idea at this
+> > point whether there should be in future separate asym_tpm2 or all bundled
+> > to asym_tpm.
+> > 
+> > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > 
 > 
-> >> crypto/drbg.c:1742:2: error: call to __compiletime_assert_223 declared
-> >> with 'error' attribute: BUILD_BUG_ON failed: ARRAY_SIZE(drbg_cores) !=
-> >> ARRAY_SIZE(drbg_algs)
->            BUILD_BUG_ON(ARRAY_SIZE(drbg_cores) != ARRAY_SIZE(drbg_algs));
+> Okay, great.  Just to be clear, I'm expecting either you or David
+> (maintainer:KEYS/KEYRINGS) to apply this patch.  Acked-by is usually given by a
+> maintainer when someone else applies a patch.
 
+I changed it to reviewed-by and applied.
 
-Correct, it should be > instead of != :-)
-
-This will be fixed in the new code base
-
-Thanks!
-
-Ciao
-Stephan
-
-
+BR, Jarkko
