@@ -2,93 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D51C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 06:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F48C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 08:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236921AbiA0Gll (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 01:41:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52836 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236915AbiA0Gle (ORCPT
+        id S229656AbiA0IEt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 03:04:49 -0500
+Received: from esa.microchip.iphmx.com ([68.232.154.123]:3645 "EHLO
+        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237602AbiA0IEs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 01:41:34 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05710C061714
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 22:41:34 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 940B261922
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 06:41:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4D04C340E4;
-        Thu, 27 Jan 2022 06:41:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643265693;
-        bh=lzDQMFtkVMDafmie07laIN0lN6oP7zl0X8fnYkvNQFY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=U6QNH45/yC6nbNc8SibffGI61BMM8w/QOXzTGQEi3QmSBHDted7mupgwtgVH60A/+
-         b9eh21zctwW4cpE7G4XIaNtY0W6IuvDzBHiYublj5I3UvO6LFPZI0irImcZ22rLKiM
-         9ArZfYKMJPsg/cV4x8PRmLm2JXRxcZqwx9VThVBGDcG0C5c64yxMPeUi5zrGPTfdpO
-         pUeEWZ1TiCajf8E+O1O0RLP2AwjQrwstN/1D3Nht67wNtF/v/8P03M6JZ8VUWyH+iZ
-         hMNuq4NL4EGZab9n7oTHgds94vYhpYJox3ns+o0ZjTMJ/8R6J8d38L87YOoh9P5ELf
-         f3cjTOQjSpJ0Q==
-Date:   Wed, 26 Jan 2022 22:41:31 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Nathan Huckleberry <nhuck@google.com>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [RFC PATCH 3/7] crypto: hctr2 - Add HCTR2 support
-Message-ID: <YfI+m9tqj/B4fEzj@sol.localdomain>
-References: <20220125014422.80552-1-nhuck@google.com>
- <20220125014422.80552-4-nhuck@google.com>
- <YfIo1pL69+GRsSzp@sol.localdomain>
- <YfIrr8MagPw9scLr@gondor.apana.org.au>
- <YfIvSXgnUMoPglCt@sol.localdomain>
- <YfIwQFAqSW68VQ62@gondor.apana.org.au>
- <YfIxUPc1KsSMTMLq@gondor.apana.org.au>
+        Thu, 27 Jan 2022 03:04:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1643270688; x=1674806688;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=YWLfVwtEW0AriDI6I/Te250BeiLS2TU4DY+DRwJFHks=;
+  b=BEWmouZ30hUnIS+zpAitd7OKx4lWkqshMMAs2782q4exEDd6x6dvlIQd
+   yKQzJw2nTO72JmSUPP0J1bizsNrl9hKROItQM1OvYCaaYYaTf4Tef4bU+
+   9kgyVGn+O3/uVpgQoX/XIkVeBKZhhwEM7lKTIVS+hBX5y10urGiDdKZND
+   Vn4ea+1SPWCXZafjLdNVM5LiDWNFR1Q3k3ioYD3aypPiX7mYt5X/vYrKD
+   BPChi5nLXEaBFTr61GkGoGwkC5oVApkwgmydg0ikXpoWUOaJxGrqz0PQp
+   wyJ7wZ7YnWrfn3WdnW9cWOWdgALXaxgkU55k35+xgS7DltieGUGLpd13Z
+   A==;
+IronPort-SDR: JSOzhSf5BRfTmZ4iMVuE+uJ+mY5S7DSTp3OG3gmA7908KbSHCvhwxC0ZBobm3nU2NQrdjarO6o
+ n4DmSUanG5wcq46EF9GanyNAg7s6FNzzUav6XWBx3eFaPrUPl5xMa5xrds5I5EY39uzL3TUB8c
+ 2gFxDBs5OlCrWLTy/ANsFCMsG74YrwMUU99SkknKkZQdln9d60ONhhsEbk6ECUsmULYmxd4Wgs
+ n0juJNj1ysd6E8NmBoWyQxv/h1dZ+0OYBe97k3sH2UHTcieCDRvR34KyAbgALmS4yxjSCo4Ii+
+ 2yR72ZfUd09C2J8hgS95r98O
+X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
+   d="scan'208";a="144049447"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 27 Jan 2022 01:04:47 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Thu, 27 Jan 2022 01:04:46 -0700
+Received: from kavya-HP-Compaq-6000-Pro-SFF-PC.microchip.com (10.10.115.15) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2375.17 via Frontend Transport; Thu, 27 Jan 2022 01:04:42 -0700
+From:   Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <ludovic.desroches@microchip.com>, <tudor.ambarus@microchip.com>
+CC:     <UNGLinuxDriver@microchip.com>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <Kavyasree.Kotagiri@microchip.com>
+Subject: [PATCH] crypto: atmel: add support for AES and SHA IPs available on lan966x SoC
+Date:   Thu, 27 Jan 2022 13:34:08 +0530
+Message-ID: <20220127080408.15791-1-kavyasree.kotagiri@microchip.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YfIxUPc1KsSMTMLq@gondor.apana.org.au>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 04:44:48PM +1100, Herbert Xu wrote:
-> On Thu, Jan 27, 2022 at 04:40:16PM +1100, Herbert Xu wrote:
-> >
-> > The question is is it performance-critical? Including it as a
-> > parameter would be worthwhile if it is.  But if its cost is dwarfed
-> > by that of the accompanying operations then it might not be worth
-> > the complexity.
-> 
-> It looks like this is similar to the situation in XTS where I chose
-> not to make it a full parameter during the skcipher conversion:
-> 
-> commit f1c131b45410a202eb45cc55980a7a9e4e4b4f40
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Tue Nov 22 20:08:19 2016 +0800
-> 
->     crypto: xts - Convert to skcipher
-> 
-> Cheers,
+This patch adds support for hardware version of AES and SHA IPs
+available on lan966x SoC.
 
-Sure, that makes sense.
+Tested-by: Vradha Panchal <vradha.panchal@microchip.com>
+Signed-off-by: Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
+---
+ drivers/crypto/atmel-aes.c | 2 ++
+ drivers/crypto/atmel-sha.c | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Note that if the meaning of the first parameter to the template will differ
-(blockcipher_name vs. xctr_name), the full syntax probably should be supported
-by a separate template called "hctr2_base" rather than by "hctr2", to avoid
-having the meaning of the first parameter be context-dependent.  This would be
-like gcm and gcm_base.  So we'd have e.g.:
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index fe0558403191..358f1092d890 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2509,6 +2509,8 @@ static void atmel_aes_get_cap(struct atmel_aes_dev *dd)
+ 
+ 	/* keep only major version number */
+ 	switch (dd->hw_version & 0xff0) {
++	case 0x700:
++		fallthrough;
+ 	case 0x500:
+ 		dd->caps.has_dualbuff = 1;
+ 		dd->caps.has_cfb64 = 1;
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 1b13f601fd95..6c7bb91c8cce 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2508,6 +2508,8 @@ static void atmel_sha_get_cap(struct atmel_sha_dev *dd)
+ 
+ 	/* keep only major version number */
+ 	switch (dd->hw_version & 0xff0) {
++	case 0x700:
++		fallthrough;
+ 	case 0x510:
+ 		dd->caps.has_dma = 1;
+ 		dd->caps.has_dualbuff = 1;
+-- 
+2.17.1
 
-	hctr2(aes)
-	hctr2_base(xctr-aes-aesni,polyval-pclmulqdqni)
-
-cra_name would be set to the former, while cra_driver_name would be set to the
-latter.
-
-- Eric
