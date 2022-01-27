@@ -2,48 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0429C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 09:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD28C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 09:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238558AbiA0J3u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 04:29:50 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:33542 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238542AbiA0J3t (ORCPT
+        id S238735AbiA0JnF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 04:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234732AbiA0JnF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 04:29:49 -0500
+        Thu, 27 Jan 2022 04:43:05 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5B68C061714
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 01:43:04 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1A37DB821BF
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 09:29:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50C86C340E6
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 09:29:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2D75561B5A
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 09:43:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E757C36AE2
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 09:43:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643275785;
-        bh=7feCmwJqck6uLnrAgpCxXAd4cMngaeqhUE+/An7UoiM=;
+        s=k20201202; t=1643276583;
+        bh=XffkYekYTPvLx7uojGZ4CZc4H4qD7J2xzonqeocsWXU=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=LsQPXmGTgUeonwqBYE8hfrHMdVZh4qMUiUlSYQuPvH0Xf7/NgDQ+iPJrnnMM+oZLs
-         SaquPvyVrHxN6l2r+8eq6aWOb8u2HXB6pRvYcWR4K32KaPAUKZv6UBaF4SETki88KQ
-         xxmDhOQKW1etEoGlI6E/TByOdsVOw6ebXZNKTBut6J/JW8vmZP3OS0UQz76eCEu/Nv
-         0+7MvDi4AOkfskynLZ1Q/yXPdn+LtQdYauV0klS78DI2mONR0U+FSft6w8UImO+OfT
-         rwFFRVy+HHPWgOaMOokym8Zt3SDpyeccAN7meYFQJ2A4vnd7HT/uu73+DT7eWeDdj2
-         XWdFWQiIGmqfQ==
-Received: by mail-wm1-f51.google.com with SMTP id l35-20020a05600c1d2300b0034d477271c1so1433198wms.3
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 01:29:45 -0800 (PST)
-X-Gm-Message-State: AOAM531991+znLSM4MZU1TkJAqRMNCkgjjISMELKAgTh7k9Oqx09RWY6
-        7SH4utUh1wNg+4BuozOy0uGcDdgcxpsrMju2mJM=
-X-Google-Smtp-Source: ABdhPJy2zNL7eEwu8G3AWxEqycEzx0C8fyiLweF5Ix3PNQzgQBZirS58efQldJYdZVi27twM10aR/YI2cTGVJHxxotE=
-X-Received: by 2002:a05:600c:a47:: with SMTP id c7mr2413725wmq.25.1643275783105;
- Thu, 27 Jan 2022 01:29:43 -0800 (PST)
+        b=oDJMYyj/5MkiwT7JUIqH28ETqvq6c6w683+mdn98CjfaGYDtzdaZgxLx7Rgp3DOQF
+         CkvFrGVPAsjqbhKTYc/4FRcgUAzZe3bNuDipHB0/pLFVjNtX/9Z9kKXllVQYTI7YJJ
+         HuacgiNhwSuRZv3pJAgMJEz3f9h8cuaHHc6ycQ24CO/PgII2Ps8n1c6OutC2fo7mdg
+         QB1pdbMH5y5XY4KvNhyr12dbs5DPeiUaFaPICrgwZM2wFdnfrY359O5EnB+qioz5pV
+         bwB9PD1156Ky6P45GzWE8f/EvQovPU3avfshVrFdCXkdjItArGCeyYVa4JpiNPlxm8
+         GsvqtXCcgu0wg==
+Received: by mail-wr1-f54.google.com with SMTP id a13so3592146wrh.9
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 01:43:03 -0800 (PST)
+X-Gm-Message-State: AOAM531ArlSmjz3R9D9siXixoNXp2VWgAlrRI6w5sUS0nPvcHlWYGJyt
+        T7oLzm8MqN6xam8HND74/O5U+cLtk8Ctvt5KobI=
+X-Google-Smtp-Source: ABdhPJzvbOFRXnjjHndVbAhMb94VtBsq1QnF2aCdYnSu5GGucE8QNy0HMilgphjyfveE+VjRlXX4T09+LYzp4TcJQyY=
+X-Received: by 2002:a05:6000:15ca:: with SMTP id y10mr2164266wry.417.1643276581258;
+ Thu, 27 Jan 2022 01:43:01 -0800 (PST)
 MIME-Version: 1.0
-References: <20220125014422.80552-1-nhuck@google.com> <20220125014422.80552-4-nhuck@google.com>
-In-Reply-To: <20220125014422.80552-4-nhuck@google.com>
+References: <20220125014422.80552-1-nhuck@google.com> <20220125014422.80552-2-nhuck@google.com>
+In-Reply-To: <20220125014422.80552-2-nhuck@google.com>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 27 Jan 2022 10:29:31 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXG5vQ6SmRPPYjd4gg4O7gtjQg_NCOtEjY_EZoCPohcf2w@mail.gmail.com>
-Message-ID: <CAMj1kXG5vQ6SmRPPYjd4gg4O7gtjQg_NCOtEjY_EZoCPohcf2w@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/7] crypto: hctr2 - Add HCTR2 support
+Date:   Thu, 27 Jan 2022 10:42:49 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHCXNZEuK7hY5MfiBE2xAHbTN=ZOtm4zKzd4=dfTErgDA@mail.gmail.com>
+Message-ID: <CAMj1kXHCXNZEuK7hY5MfiBE2xAHbTN=ZOtm4zKzd4=dfTErgDA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/7] crypto: xctr - Add XCTR support
 To:     Nathan Huckleberry <nhuck@google.com>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -53,1458 +56,891 @@ Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Eric Biggers <ebiggers@google.com>,
         Sami Tolvanen <samitolvanen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 25 Jan 2022 at 02:47, Nathan Huckleberry <nhuck@google.com> wrote:
+On Tue, 25 Jan 2022 at 02:46, Nathan Huckleberry <nhuck@google.com> wrote:
 >
-> Add support for HCTR2 as a template.  HCTR2 is a length-preserving
-> encryption mode that is efficient on processors with instructions to
-> accelerate AES and carryless multiplication, e.g. x86 processors with
-> AES-NI and CLMUL, and ARM processors with the ARMv8 Crypto Extensions.
+> Add a generic implementation of XCTR mode as a template.  XCTR is a
+> blockcipher mode similar to CTR mode.  XCTR uses XORs and little-endian
+> addition rather than big-endian arithmetic which makes it slightly
+> faster on little-endian CPUs.  It is used as a component to implement
+> HCTR2.
 >
-> As a length-preserving encryption mode, HCTR2 is suitable for
-> applications such as storage encryption where ciphertext expansion is
-> not possible, and thus authenticated encryption cannot be used.
-> Currently, such applications usually use XTS, or in some cases Adiantum.
-> XTS has the disadvantage that it is a narrow-block mode: a bitflip will
-> only change 16 bytes in the resulting ciphertext or plaintext.  This
-> reveals more information to an attacker than necessary.
->
-> HCTR2 is a wide-block mode, so it provides a stronger security property:
-> a bitflip will change the entire message.  HCTR2 is somewhat similar to
-> Adiantum, which is also a wide-block mode.  However, HCTR2 is designed
-> to take advantage of existing crypto instructions, while Adiantum
-> targets devices without such hardware support.  Adiantum is also
-> designed with longer messages in mind, while HCTR2 is designed to be
-> efficient even on short messages.
->
-> HCTR2 requires POLYVAL and XCTR as components.  More information on
-> HCTR2 can be found here: Length-preserving encryption with HCTR2:
+> More information on XCTR mode can be found in the HCTR2 paper:
 > https://eprint.iacr.org/2021/1441.pdf
 >
 > Signed-off-by: Nathan Huckleberry <nhuck@google.com>
 > ---
->  crypto/Kconfig   |  11 +
->  crypto/Makefile  |   1 +
->  crypto/hctr2.c   | 475 ++++++++++++++++++++++++++++
->  crypto/tcrypt.c  |   5 +
->  crypto/testmgr.c |   6 +
->  crypto/testmgr.h | 787 +++++++++++++++++++++++++++++++++++++++++++++++
->  6 files changed, 1285 insertions(+)
->  create mode 100644 crypto/hctr2.c
+>  crypto/Kconfig        |   9 +
+>  crypto/Makefile       |   1 +
+>  crypto/tcrypt.c       |   1 +
+>  crypto/testmgr.c      |   6 +
+>  crypto/testmgr.h      | 546 ++++++++++++++++++++++++++++++++++++++++++
+>  crypto/xctr.c         | 202 ++++++++++++++++
+>  include/crypto/xctr.h |  19 ++
+>  7 files changed, 784 insertions(+)
+>  create mode 100644 crypto/xctr.c
+>  create mode 100644 include/crypto/xctr.h
 >
 > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 051060cd5e21..3cdb6c351062 100644
+> index 94bfa32cc6a1..b00de5f22eaf 100644
 > --- a/crypto/Kconfig
 > +++ b/crypto/Kconfig
-> @@ -524,6 +524,17 @@ config CRYPTO_ADIANTUM
+> @@ -452,6 +452,15 @@ config CRYPTO_PCBC
+>           PCBC: Propagating Cipher Block Chaining mode
+>           This block cipher algorithm is required for RxRPC.
 >
->           If unsure, say N.
->
-> +config CRYPTO_HCTR2
-> +       tristate "HCTR2 support"
-> +       select CRYPTO_XCTR
-> +       select CRYPTO_POLYVAL
+> +config CRYPTO_XCTR
+> +       tristate
+> +       select CRYPTO_SKCIPHER
 > +       select CRYPTO_MANAGER
 > +       help
-> +         HCTR2 is a length-preserving encryption mode that is efficient =
-on
-> +         processors with instructions to accelerate AES and carryless
-> +         multiplication, e.g. x86 processors with AES-NI and CLMUL, and =
-ARM
-> +         processors with the ARMv8 crypto extensions.
+> +         XCTR: XOR Counter mode. This blockcipher mode is a variant of CTR mode
+> +         using XORs and little-endian addition rather than big-endian arithmetic.
+> +         XCTR mode is used to implement HCTR2.
 > +
->  config CRYPTO_ESSIV
->         tristate "ESSIV support for block encryption"
->         select CRYPTO_AUTHENC
+>  config CRYPTO_XTS
+>         tristate "XTS support"
+>         select CRYPTO_SKCIPHER
 > diff --git a/crypto/Makefile b/crypto/Makefile
-> index 561f901a91d4..2dca9dbdede6 100644
+> index d76bff8d0ffd..6b3fe3df1489 100644
 > --- a/crypto/Makefile
 > +++ b/crypto/Makefile
-> @@ -94,6 +94,7 @@ obj-$(CONFIG_CRYPTO_LRW) +=3D lrw.o
->  obj-$(CONFIG_CRYPTO_XTS) +=3D xts.o
->  obj-$(CONFIG_CRYPTO_CTR) +=3D ctr.o
->  obj-$(CONFIG_CRYPTO_XCTR) +=3D xctr.o
-> +obj-$(CONFIG_CRYPTO_HCTR2) +=3D hctr2.o
->  obj-$(CONFIG_CRYPTO_KEYWRAP) +=3D keywrap.o
->  obj-$(CONFIG_CRYPTO_ADIANTUM) +=3D adiantum.o
->  obj-$(CONFIG_CRYPTO_NHPOLY1305) +=3D nhpoly1305.o
-> diff --git a/crypto/hctr2.c b/crypto/hctr2.c
-> new file mode 100644
-> index 000000000000..af43f81b68f3
-> --- /dev/null
-> +++ b/crypto/hctr2.c
-> @@ -0,0 +1,475 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * HCTR2 length-preserving encryption mode
-> + *
-> + * Copyright 2021 Google LLC
-
-Off by one?
-
-> + */
-> +
-> +
-> +/*
-> + * HCTR2 is a length-preserving encryption mode that is efficient on
-> + * processors with instructions to accelerate aes and carryless
-> + * multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
-> + * processors with the ARMv8 crypto extensions.
-> + *
-> + * Length-preserving encryption with HCTR2
-> + *     (https://eprint.iacr.org/2021/1441.pdf)
-> + *
-> + *     HCTR2 has a strict set of requirements for the hash function. For=
- this
-> + *     purpose we only allow POLYVAL. To avoid misuse, XCTR is required =
-as
-> + *     specified in the HCTR2 paper, though theoretically there is a lar=
-ger class
-> + *     of algorithms that could be used.
-> + */
-> +
-> +#include <crypto/internal/cipher.h>
-> +#include <crypto/internal/hash.h>
-> +#include <crypto/internal/skcipher.h>
-> +#include <crypto/polyval.h>
-> +#include <crypto/scatterwalk.h>
-> +#include <linux/module.h>
-> +
-> +#define BLOCKCIPHER_BLOCK_SIZE         16
-> +
-> +/*
-> + * The specification allows variable-length tweaks, but Linux's crypto A=
-PI
-> + * currently only allows algorithms to support a single length.  The "na=
-tural"
-> + * tweak length for HCTR2 is 16, since that fits into one POLYVAL block =
-for
-> + * the best performance.  But longer tweaks are useful for fscrypt, to a=
-void
-> + * needing to derive per-file keys.  So instead we use two blocks, or 32=
- bytes.
-> + */
-> +#define TWEAK_SIZE             32
-> +
-> +struct hctr2_instance_ctx {
-> +       struct crypto_cipher_spawn blockcipher_spawn;
-> +       struct crypto_skcipher_spawn streamcipher_spawn;
-> +       struct crypto_shash_spawn hash_spawn;
-> +};
-> +
-> +struct hctr2_tfm_ctx {
-> +       struct crypto_cipher *blockcipher;
-> +       struct crypto_skcipher *streamcipher;
-> +       struct crypto_shash *hash;
-> +       u8 L[BLOCKCIPHER_BLOCK_SIZE];
-> +};
-> +
-> +struct hctr2_request_ctx {
-> +       u8 first_block[BLOCKCIPHER_BLOCK_SIZE];
-> +       struct scatterlist *bulk_part_dst;
-> +       struct scatterlist *bulk_part_src;
-> +       struct scatterlist sg_src[2];
-> +       struct scatterlist sg_dst[2];
-> +       /* Sub-requests, must be last */
-> +       union {
-> +               struct shash_desc hash_desc;
-> +               struct skcipher_request streamcipher_req;
-> +       } u;
-> +};
-> +
-> +static int hctr2_setkey(struct crypto_skcipher *tfm, const u8 *key,
-> +                       unsigned int keylen)
-> +{
-> +       struct hctr2_tfm_ctx *tctx =3D crypto_skcipher_ctx(tfm);
-> +       u8 hbar[BLOCKCIPHER_BLOCK_SIZE];
-> +       int err;
-> +
-> +       crypto_cipher_clear_flags(tctx->blockcipher, CRYPTO_TFM_REQ_MASK)=
-;
-> +       crypto_cipher_set_flags(tctx->blockcipher,
-> +                               crypto_skcipher_get_flags(tfm) &
-> +                               CRYPTO_TFM_REQ_MASK);
-> +       err =3D crypto_cipher_setkey(tctx->blockcipher, key, keylen);
-> +       if (err)
-> +               return err;
-> +
-> +       crypto_skcipher_clear_flags(tctx->streamcipher, CRYPTO_TFM_REQ_MA=
-SK);
-> +       crypto_skcipher_set_flags(tctx->streamcipher,
-> +                                 crypto_skcipher_get_flags(tfm) &
-> +                                 CRYPTO_TFM_REQ_MASK);
-> +       err =3D crypto_skcipher_setkey(tctx->streamcipher, key, keylen);
-> +       if (err)
-> +               return err;
-> +
-> +       memset(tctx->L, 0, sizeof(tctx->L));
-> +       memset(hbar, 0, sizeof(hbar));
-> +       tctx->L[0] =3D 0x01;
-> +       crypto_cipher_encrypt_one(tctx->blockcipher, tctx->L, tctx->L);
-> +       crypto_cipher_encrypt_one(tctx->blockcipher, hbar, hbar);
-> +
-> +       crypto_shash_clear_flags(tctx->hash, CRYPTO_TFM_REQ_MASK);
-> +       crypto_shash_set_flags(tctx->hash, crypto_skcipher_get_flags(tfm)=
- &
-> +                              CRYPTO_TFM_REQ_MASK);
-> +       err =3D crypto_shash_setkey(tctx->hash, hbar, BLOCKCIPHER_BLOCK_S=
-IZE);
-> +       return err;
-> +}
-> +
-> +static int hctr2_hash_tweak(struct skcipher_request *req, u8 *iv)
-> +{
-> +       u64 tweak_length_part[2];
-> +       struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(req);
-> +       const struct hctr2_tfm_ctx *tctx =3D crypto_skcipher_ctx(tfm);
-> +       struct hctr2_request_ctx *rctx =3D skcipher_request_ctx(req);
-> +       struct shash_desc *hash_desc =3D &rctx->u.hash_desc;
-> +       int err;
-> +
-> +       memset(tweak_length_part, 0, sizeof(tweak_length_part));
-> +       if (req->cryptlen % POLYVAL_BLOCK_SIZE =3D=3D 0)
-> +               tweak_length_part[0] =3D cpu_to_le64(TWEAK_SIZE * 8 * 2 +=
- 2);
-> +       else
-> +               tweak_length_part[0] =3D cpu_to_le64(TWEAK_SIZE * 8 * 2 +=
- 3);
-> +
-> +       hash_desc->tfm =3D tctx->hash;
-> +       err =3D crypto_shash_init(hash_desc);
-> +       if (err)
-> +               return err;
-> +
-> +       err =3D crypto_shash_update(hash_desc, (u8 *)tweak_length_part, s=
-izeof(tweak_length_part));
-> +       if (err)
-> +               return err;
-> +       err =3D crypto_shash_update(hash_desc, iv, TWEAK_SIZE);
-> +       return err;
-> +}
-> +
-> +static int hctr2_hash_message(struct skcipher_request *req,
-> +                             struct scatterlist *sgl,
-> +                             u8 digest[POLYVAL_DIGEST_SIZE])
-> +{
-> +       u8 padding[BLOCKCIPHER_BLOCK_SIZE];
-> +       struct hctr2_request_ctx *rctx =3D skcipher_request_ctx(req);
-> +       struct shash_desc *hash_desc =3D &rctx->u.hash_desc;
-> +       const unsigned int bulk_len =3D req->cryptlen - BLOCKCIPHER_BLOCK=
-_SIZE;
-> +       struct sg_mapping_iter miter;
-> +       unsigned int remainder =3D bulk_len % BLOCKCIPHER_BLOCK_SIZE;
-> +       int err;
-> +
-> +       sg_miter_start(&miter, sgl, sg_nents(sgl),
-> +                      SG_MITER_FROM_SG | SG_MITER_ATOMIC);
-
-Note to maintainers: this adds another use of kmap_atomic(), meaning
-that this executes with preemption disabled even on !HIGHMEM
-architectures.
-
-Is there a plan to address that? Should we add another SG_MITER flag
-that uses kmap_local() instead?
-
-> +       while (sg_miter_next(&miter)) {
-> +               err =3D crypto_shash_update(hash_desc, miter.addr, miter.=
-length);
-> +               if (err)
-> +                       break;
-> +       }
-> +       sg_miter_stop(&miter);
-> +       if (err)
-> +               return err;
-> +
-> +       if (remainder) {
-> +               memset(padding, 0, BLOCKCIPHER_BLOCK_SIZE);
-> +               padding[0] =3D 0x01;
-> +               err =3D crypto_shash_update(hash_desc, padding, BLOCKCIPH=
-ER_BLOCK_SIZE - remainder);
-> +               if (err)
-> +                       return err;
-> +       }
-> +       return crypto_shash_final(hash_desc, digest);
-> +}
-> +
-> +static int hctr2_finish(struct skcipher_request *req)
-> +{
-> +       struct hctr2_request_ctx *rctx =3D skcipher_request_ctx(req);
-> +       u8 digest[POLYVAL_DIGEST_SIZE];
-> +       int err;
-> +
-> +       err =3D hctr2_hash_tweak(req, req->iv);
-> +       if (err)
-> +               return err;
-> +       err =3D hctr2_hash_message(req, rctx->bulk_part_dst, digest);
-> +       if (err)
-> +               return err;
-> +       crypto_xor(rctx->first_block, digest, BLOCKCIPHER_BLOCK_SIZE);
-> +
-> +       scatterwalk_map_and_copy(rctx->first_block, req->dst,
-> +                                0, BLOCKCIPHER_BLOCK_SIZE, 1);
-> +       return 0;
-> +}
-> +
-> +static void hctr2_streamcipher_done(struct crypto_async_request *areq,
-> +                                   int err)
-> +{
-> +       struct skcipher_request *req =3D areq->data;
-> +
-> +       if (!err)
-> +               err =3D hctr2_finish(req);
-> +
-> +       skcipher_request_complete(req, err);
-> +}
-> +
-> +static int hctr2_crypt(struct skcipher_request *req, bool enc)
-> +{
-> +       struct crypto_skcipher *tfm =3D crypto_skcipher_reqtfm(req);
-> +       const struct hctr2_tfm_ctx *tctx =3D crypto_skcipher_ctx(tfm);
-> +       struct hctr2_request_ctx *rctx =3D skcipher_request_ctx(req);
-> +       u8 digest[POLYVAL_DIGEST_SIZE];
-> +       int bulk_len =3D req->cryptlen - BLOCKCIPHER_BLOCK_SIZE;
-> +       int err;
-> +
-> +       // Requests must be at least one block
-> +       if (req->cryptlen < BLOCKCIPHER_BLOCK_SIZE)
-> +               return -EINVAL;
-> +
-> +       scatterwalk_map_and_copy(rctx->first_block, req->src,
-> +                                0, BLOCKCIPHER_BLOCK_SIZE, 0);
-> +       rctx->bulk_part_src =3D scatterwalk_ffwd(rctx->sg_src, req->src, =
-BLOCKCIPHER_BLOCK_SIZE);
-> +       rctx->bulk_part_dst =3D scatterwalk_ffwd(rctx->sg_dst, req->dst, =
-BLOCKCIPHER_BLOCK_SIZE);
-> +
-> +       err =3D hctr2_hash_tweak(req, req->iv);
-> +       if (err)
-> +               return err;
-> +       err =3D hctr2_hash_message(req, rctx->bulk_part_src, digest);
-> +       if (err)
-> +               return err;
-> +       crypto_xor(digest, rctx->first_block, BLOCKCIPHER_BLOCK_SIZE);
-> +
-> +       if (enc)
-> +               crypto_cipher_encrypt_one(tctx->blockcipher, rctx->first_=
-block, digest);
-> +       else
-> +               crypto_cipher_decrypt_one(tctx->blockcipher, rctx->first_=
-block, digest);
-> +
-> +       crypto_xor(digest, rctx->first_block, BLOCKCIPHER_BLOCK_SIZE);
-> +       crypto_xor(digest, tctx->L, BLOCKCIPHER_BLOCK_SIZE);
-> +
-> +       skcipher_request_set_tfm(&rctx->u.streamcipher_req, tctx->streamc=
-ipher);
-> +       skcipher_request_set_crypt(&rctx->u.streamcipher_req, rctx->bulk_=
-part_src,
-> +                                  rctx->bulk_part_dst, bulk_len, digest)=
-;
-> +       skcipher_request_set_callback(&rctx->u.streamcipher_req,
-> +                                     req->base.flags,
-> +                                     hctr2_streamcipher_done, req);
-> +       return crypto_skcipher_encrypt(&rctx->u.streamcipher_req) ?:
-> +               hctr2_finish(req);
-> +}
-> +
-> +static int hctr2_encrypt(struct skcipher_request *req)
-> +{
-> +       return hctr2_crypt(req, true);
-> +}
-> +
-> +static int hctr2_decrypt(struct skcipher_request *req)
-> +{
-> +       return hctr2_crypt(req, false);
-> +}
-> +
-> +static int hctr2_init_tfm(struct crypto_skcipher *tfm)
-> +{
-> +       struct skcipher_instance *inst =3D skcipher_alg_instance(tfm);
-> +       struct hctr2_instance_ctx *ictx =3D skcipher_instance_ctx(inst);
-> +       struct hctr2_tfm_ctx *tctx =3D crypto_skcipher_ctx(tfm);
-> +       struct crypto_skcipher *streamcipher;
-> +       struct crypto_cipher *blockcipher;
-> +       struct crypto_shash *hash;
-> +       unsigned int subreq_size;
-> +       int err;
-> +
-> +       streamcipher =3D crypto_spawn_skcipher(&ictx->streamcipher_spawn)=
-;
-> +       if (IS_ERR(streamcipher))
-> +               return PTR_ERR(streamcipher);
-> +
-> +       blockcipher =3D crypto_spawn_cipher(&ictx->blockcipher_spawn);
-> +       if (IS_ERR(blockcipher)) {
-> +               err =3D PTR_ERR(blockcipher);
-> +               goto err_free_streamcipher;
-> +       }
-> +
-> +       hash =3D crypto_spawn_shash(&ictx->hash_spawn);
-> +       if (IS_ERR(hash)) {
-> +               err =3D PTR_ERR(hash);
-> +               goto err_free_blockcipher;
-> +       }
-> +
-> +       tctx->streamcipher =3D streamcipher;
-> +       tctx->blockcipher =3D blockcipher;
-> +       tctx->hash =3D hash;
-> +
-> +       BUILD_BUG_ON(offsetofend(struct hctr2_request_ctx, u) !=3D
-> +                                sizeof(struct hctr2_request_ctx));
-> +       subreq_size =3D max(sizeof_field(struct hctr2_request_ctx, u.hash=
-_desc) +
-> +                         crypto_shash_descsize(hash), sizeof_field(struc=
-t
-> +                         hctr2_request_ctx, u.streamcipher_req) +
-> +                         crypto_skcipher_reqsize(streamcipher));
-> +
-> +       crypto_skcipher_set_reqsize(tfm, offsetof(struct hctr2_request_ct=
-x, u) +
-> +                                   subreq_size);
-> +       return 0;
-> +
-> +err_free_blockcipher:
-> +       crypto_free_cipher(blockcipher);
-> +err_free_streamcipher:
-> +       crypto_free_skcipher(streamcipher);
-> +       return err;
-> +}
-> +
-> +static void hctr2_exit_tfm(struct crypto_skcipher *tfm)
-> +{
-> +       struct hctr2_tfm_ctx *tctx =3D crypto_skcipher_ctx(tfm);
-> +
-> +       crypto_free_cipher(tctx->blockcipher);
-> +       crypto_free_skcipher(tctx->streamcipher);
-> +       crypto_free_shash(tctx->hash);
-> +}
-> +
-> +static void hctr2_free_instance(struct skcipher_instance *inst)
-> +{
-> +       struct hctr2_instance_ctx *ictx =3D skcipher_instance_ctx(inst);
-> +
-> +       crypto_drop_cipher(&ictx->blockcipher_spawn);
-> +       crypto_drop_skcipher(&ictx->streamcipher_spawn);
-> +       crypto_drop_shash(&ictx->hash_spawn);
-> +       kfree(inst);
-> +}
-> +
-> +/*
-> + * Check for a supported set of inner algorithms.
-> + * See the comment at the beginning of this file.
-> + */
-> +static bool hctr2_supported_algorithms(struct skcipher_alg *streamcipher=
-_alg,
-> +                                      struct crypto_alg *blockcipher_alg=
-,
-> +                                      struct shash_alg *hash_alg)
-> +{
-> +       if (strncmp(streamcipher_alg->base.cra_name, "xctr(", 4) !=3D 0)
-> +               return false;
-> +
-> +       if (blockcipher_alg->cra_blocksize !=3D BLOCKCIPHER_BLOCK_SIZE)
-> +               return false;
-> +
-> +       if (strcmp(hash_alg->base.cra_name, "polyval") !=3D 0)
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
-> +static int hctr2_create_common(struct crypto_template *tmpl,
-> +                              struct rtattr **tb,
-> +                              const char *blockcipher_name,
-> +                              const char *streamcipher_name,
-> +                              const char *polyval_name)
-> +{
-> +       u32 mask;
-> +       struct skcipher_instance *inst;
-> +       struct hctr2_instance_ctx *ictx;
-> +       struct skcipher_alg *streamcipher_alg;
-> +       struct crypto_alg *blockcipher_alg;
-> +       struct shash_alg *hash_alg;
-> +       int err;
-> +
-> +       err =3D crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mas=
-k);
-> +       if (err)
-> +               return err;
-> +
-> +       inst =3D kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
-> +       if (!inst)
-> +               return -ENOMEM;
-> +       ictx =3D skcipher_instance_ctx(inst);
-> +
-> +       /* Stream cipher, xctr(block_cipher) */
-> +       err =3D crypto_grab_skcipher(&ictx->streamcipher_spawn,
-> +                                  skcipher_crypto_instance(inst),
-> +                                  streamcipher_name, 0, mask);
-> +       if (err)
-> +               goto err_free_inst;
-> +       streamcipher_alg =3D crypto_spawn_skcipher_alg(&ictx->streamciphe=
-r_spawn);
-> +
-> +       /* Block cipher, e.g. "aes" */
-> +       err =3D crypto_grab_cipher(&ictx->blockcipher_spawn,
-> +                                skcipher_crypto_instance(inst),
-> +                                blockcipher_name, 0, mask);
-> +       if (err)
-> +               goto err_free_inst;
-> +       blockcipher_alg =3D crypto_spawn_cipher_alg(&ictx->blockcipher_sp=
-awn);
-> +
-> +       /* Polyval =CE=B5-=E2=88=86U hash function */
-> +       err =3D crypto_grab_shash(&ictx->hash_spawn,
-> +                               skcipher_crypto_instance(inst),
-> +                               polyval_name, 0, mask);
-> +       if (err)
-> +               goto err_free_inst;
-> +       hash_alg =3D crypto_spawn_shash_alg(&ictx->hash_spawn);
-> +
-> +       /* Check the set of algorithms */
-> +       if (!hctr2_supported_algorithms(streamcipher_alg, blockcipher_alg=
-,
-> +                                       hash_alg)) {
-> +               pr_warn("Unsupported HCTR2 instantiation: (%s,%s,%s)\n",
-> +                       streamcipher_alg->base.cra_name,
-> +                       blockcipher_alg->cra_name, hash_alg->base.cra_nam=
-e);
-> +               err =3D -EINVAL;
-> +               goto err_free_inst;
-> +       }
-> +
-> +       /* Instance fields */
-> +
-> +       err =3D -ENAMETOOLONG;
-> +       if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-> +                                "hctr2(%s)", blockcipher_alg->cra_name) =
->=3D CRYPTO_MAX_ALG_NAME)
-> +               goto err_free_inst;
-> +       if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-> +                    "hctr2(%s,%s,%s)",
-> +                    blockcipher_alg->cra_driver_name,
-> +                    streamcipher_alg->base.cra_driver_name,
-> +                    hash_alg->base.cra_driver_name) >=3D CRYPTO_MAX_ALG_=
-NAME)
-> +               goto err_free_inst;
-> +
-> +       inst->alg.base.cra_blocksize =3D BLOCKCIPHER_BLOCK_SIZE;
-> +       inst->alg.base.cra_ctxsize =3D sizeof(struct hctr2_tfm_ctx);
-> +       inst->alg.base.cra_alignmask =3D streamcipher_alg->base.cra_align=
-mask |
-> +                                      hash_alg->base.cra_alignmask;
-> +       /*
-> +        * The hash function is called twice, so it is weighted higher th=
-an the
-> +        * streamcipher and blockcipher.
-> +        */
-> +       inst->alg.base.cra_priority =3D (2 * streamcipher_alg->base.cra_p=
-riority +
-> +                                      4 * hash_alg->base.cra_priority +
-> +                                      blockcipher_alg->cra_priority) / 7=
-;
-> +
-> +       inst->alg.setkey =3D hctr2_setkey;
-> +       inst->alg.encrypt =3D hctr2_encrypt;
-> +       inst->alg.decrypt =3D hctr2_decrypt;
-> +       inst->alg.init =3D hctr2_init_tfm;
-> +       inst->alg.exit =3D hctr2_exit_tfm;
-> +       inst->alg.min_keysize =3D crypto_skcipher_alg_min_keysize(streamc=
-ipher_alg);
-> +       inst->alg.max_keysize =3D crypto_skcipher_alg_max_keysize(streamc=
-ipher_alg);
-> +       inst->alg.ivsize =3D TWEAK_SIZE;
-> +
-> +       inst->free =3D hctr2_free_instance;
-> +
-> +       err =3D skcipher_register_instance(tmpl, inst);
-> +       if (err) {
-> +err_free_inst:
-> +               hctr2_free_instance(inst);
-> +       }
-> +       return err;
-> +}
-> +
-> +static int hctr2_create(struct crypto_template *tmpl, struct rtattr **tb=
-)
-> +{
-> +       const char *blockcipher_name;
-> +       char streamcipher_name[CRYPTO_MAX_ALG_NAME];
-> +
-> +       blockcipher_name =3D crypto_attr_alg_name(tb[1]);
-> +       if (IS_ERR(blockcipher_name))
-> +               return PTR_ERR(blockcipher_name);
-> +
-> +       if (snprintf(streamcipher_name, CRYPTO_MAX_ALG_NAME, "xctr(%s)",
-> +                   blockcipher_name) >=3D CRYPTO_MAX_ALG_NAME)
-> +               return -ENAMETOOLONG;
-> +       return hctr2_create_common(tmpl, tb, blockcipher_name, streamciph=
-er_name, "polyval");
-> +}
-> +
-> +/* hctr2(blockcipher_name [, xctr(blockcipher_name)] [, polyval_name]) *=
-/
-> +static struct crypto_template hctr2_tmpl =3D {
-> +       .name =3D "hctr2",
-> +       .create =3D hctr2_create,
-> +       .module =3D THIS_MODULE,
-> +};
-> +
-> +static int __init hctr2_module_init(void)
-> +{
-> +       return crypto_register_template(&hctr2_tmpl);
-> +}
-> +
-> +static void __exit hctr2_module_exit(void)
-> +{
-> +       crypto_unregister_template(&hctr2_tmpl);
-> +}
-> +
-> +subsys_initcall(hctr2_module_init);
-> +module_exit(hctr2_module_exit);
-> +
-> +MODULE_DESCRIPTION("HCTR2 length-preserving encryption mode");
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_ALIAS_CRYPTO("hctr2");
-> +MODULE_IMPORT_NS(CRYPTO_INTERNAL);
+> @@ -93,6 +93,7 @@ obj-$(CONFIG_CRYPTO_CTS) += cts.o
+>  obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+>  obj-$(CONFIG_CRYPTO_XTS) += xts.o
+>  obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+> +obj-$(CONFIG_CRYPTO_XCTR) += xctr.o
+>  obj-$(CONFIG_CRYPTO_KEYWRAP) += keywrap.o
+>  obj-$(CONFIG_CRYPTO_ADIANTUM) += adiantum.o
+>  obj-$(CONFIG_CRYPTO_NHPOLY1305) += nhpoly1305.o
 > diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-> index b358a5141218..5af2e859830a 100644
+> index 00149657a4bc..da7848f84d12 100644
 > --- a/crypto/tcrypt.c
 > +++ b/crypto/tcrypt.c
-> @@ -2385,6 +2385,11 @@ static int do_test(const char *alg, u32 type, u32 =
-mask, int m, u32 num_mb)
->                                    16, 16, aead_speed_template_19, num_mb=
-);
+> @@ -1750,6 +1750,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+>                 ret += tcrypt_test("rfc3686(ctr(aes))");
+>                 ret += tcrypt_test("ofb(aes)");
+>                 ret += tcrypt_test("cfb(aes)");
+> +               ret += tcrypt_test("xctr(aes)");
 >                 break;
 >
-> +       case 226:
-> +               test_cipher_speed("hctr2(aes)", ENCRYPT, sec, NULL,
-> +                                 0, speed_template_32);
-> +               break;
-> +
->         case 300:
->                 if (alg) {
->                         test_hash_speed(alg, sec, generic_hash_speed_temp=
-late);
+>         case 11:
 > diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index a3a24aa07492..fa8f33210358 100644
+> index 5831d4bbc64f..5acf92354543 100644
 > --- a/crypto/testmgr.c
 > +++ b/crypto/testmgr.c
-> @@ -4994,6 +4994,12 @@ static const struct alg_test_desc alg_test_descs[]=
- =3D {
->                 .suite =3D {
->                         .hash =3D __VECS(ghash_tv_template)
->                 }
+> @@ -5454,6 +5454,12 @@ static const struct alg_test_desc alg_test_descs[] = {
+>                 .suite = {
+>                         .cipher = __VECS(xchacha20_tv_template)
+>                 },
 > +       }, {
-> +               .alg =3D "hctr2(aes)",
-> +               .test =3D alg_test_skcipher,
-> +               .suite =3D {
-> +                       .cipher =3D __VECS(aes_hctr2_tv_template)
+> +               .alg = "xctr(aes)",
+> +               .test = alg_test_skcipher,
+> +               .suite = {
+> +                       .cipher = __VECS(aes_xctr_tv_template)
 > +               }
 >         }, {
->                 .alg =3D "hmac(md5)",
->                 .test =3D alg_test_hash,
+>                 .alg = "xts(aes)",
+>                 .generic_driver = "xts(ecb(aes-generic))",
 > diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index da3736e51982..87e4df6f8ea9 100644
+> index a253d66ba1c1..e1ebbb3c4d4c 100644
 > --- a/crypto/testmgr.h
 > +++ b/crypto/testmgr.h
-> @@ -33630,4 +33630,791 @@ static const struct hash_testvec polyval_tv_tem=
-plate[] =3D {
->         },
->  };
+> @@ -32800,4 +32800,550 @@ static const struct hash_testvec blakes2s_256_tv_template[] = {{
+>                           0xd5, 0x06, 0xb5, 0x3a, 0x7c, 0x7a, 0x65, 0x1d, },
+>  }};
 >
 > +/*
 > + * Test vectors generated using https://github.com/google/hctr2
 > + */
-> +static const struct cipher_testvec aes_hctr2_tv_template[] =3D {
+> +static const struct cipher_testvec aes_xctr_tv_template[] = {
 > +       {
-> +               .key    =3D "\xe1\x15\x66\x3c\x8d\xc6\x3a\xff"
-> +                         "\xef\x41\xd7\x47\xa2\xcc\x8a\xba",
-> +               .iv     =3D "\xc3\xbe\x2a\xcb\xb5\x39\x86\xf1"
-> +                         "\x91\xad\x6c\xf4\xde\x74\x45\x63"
-> +                         "\x5c\x7a\xd5\xcc\x8b\x76\xef\x0e"
-> +                         "\xcf\x2c\x60\x69\x37\xfd\x07\x96",
-> +               .ptext  =3D "\x65\x75\xae\xd3\xe2\xbc\x43\x5c"
-> +                         "\xb3\x1a\xd8\x05\xc3\xd0\x56\x29",
-> +               .ctext  =3D "\x11\x91\xea\x74\x58\xcc\xd5\xa2"
-> +                         "\xd0\x55\x9e\x3d\xfe\x7f\xc8\xfe",
-> +               .klen   =3D 16,
-> +               .len    =3D 16,
+> +               .key    = "\x06\x20\x5d\xba\x50\xb5\x12\x8e"
+> +                         "\xee\x65\x3c\x59\x80\xa1\xfe\xb1",
+> +               .iv     = "\x16\x52\x22\x0d\x1c\x76\x94\x9f"
+> +                         "\x74\xba\x41\x0c\xc4\xc4\xaf\xb9",
+> +               .ptext  = "\x02\x62\x54\x87\x28\x8f\xa1\xd3"
+> +                         "\x8f\xd8\xc6\xab\x08\xef\xea\x83"
+> +                         "\xa3\xbd\xf4\x85\x47\x66\x74\x11"
+> +                         "\xf1\x58\x9f\x9f\xe8\xb9\x95\xc9",
+> +               .ctext  = "\x11\xfe\xef\xb4\x9e\xed\x5b\xe5"
+> +                         "\x92\x9b\x03\xa7\x6d\x8e\xf9\x7a"
+> +                         "\xaa\xfa\x33\x4a\xf7\xd9\xb2\xeb"
+> +                         "\x73\xa1\x85\xbc\x45\xbc\x42\x70",
+> +               .klen   = 16,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\x50\xcc\x28\x5c\xaf\x62\xa2\x4e"
-> +                         "\x02\xf0\xc0\x5e\xc1\x29\x80\xca",
-> +               .iv     =3D "\x64\xa5\xd5\xf9\xf4\x68\x26\xea"
-> +                         "\xce\xbb\x6c\xdd\xa5\xef\x39\xb5"
-> +                         "\x5c\x93\xdf\x1b\x93\x21\xbe\x49"
-> +                         "\xff\x9e\x86\x4f\x7c\x4d\x51\x15",
-> +               .ptext  =3D "\x34\xc1\x08\x3e\x9c\x28\x0a\xcf"
-> +                         "\x33\xdb\x3f\x0d\x05\x27\xa4\xed",
-> +               .ctext  =3D "\x7c\xae\xbb\x37\x4a\x55\x94\x5b"
-> +                         "\xc6\x6f\x8f\x9f\x68\x5f\xc7\x62",
-> +               .klen   =3D 16,
-> +               .len    =3D 16,
+> +               .key    = "\x19\x0e\xea\x30\x59\x8e\x39\x35"
+> +                         "\x93\x63\xcc\x8b\x5f\x98\x4f\x43",
+> +               .iv     = "\x4b\x9f\xf4\xd8\xaa\xcf\x99\xdc"
+> +                         "\xc5\x07\xe0\xde\xb2\x6d\x85\x12",
+> +               .ptext  = "\x23\x2d\x48\x15\x89\x34\x54\xf9"
+> +                         "\x2b\x38\xd1\x62\x06\x98\x21\x59"
+> +                         "\xd4\x3a\x45\x6f\x12\x27\x08\xa9"
+> +                         "\x3e\x0f\x21\x3d\xda\x80\x92\x3f",
+> +               .ctext  = "\x01\xa7\xe5\x9e\xf8\x49\xbb\x36"
+> +                         "\x49\xb8\x59\x7a\x77\x3f\x5a\x10"
+> +                         "\x2e\x8f\xe7\xc9\xc4\xb8\xdb\x86"
+> +                         "\xe4\xc0\x6b\x60\x2f\x79\xa0\x91",
+> +               .klen   = 16,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\xda\xce\x30\x85\xe7\x06\xe6\x02"
-> +                         "\x8f\x02\xbf\x9a\x82\x6e\x54\xde",
-> +               .iv     =3D "\xf6\x7a\x28\xce\xfb\x6c\xb3\xc5"
-> +                         "\x47\x81\x58\x69\x07\xe5\x22\xdb"
-> +                         "\x66\x93\xd7\xe9\xbd\x5c\x7f\xf0"
-> +                         "\x8a\x0b\x07\x09\xbb\xf1\x48\xc4",
-> +               .ptext  =3D "\x01\xcd\xa4\x47\x8e\x4e\xbc\x7d"
-> +                         "\xfd\xd8\xe9\xaa\xc7\x37\x25\x3d"
-> +                         "\x56",
-> +               .ctext  =3D "\xf3\xb2\x9e\xde\x96\x5d\xf0\xf6"
-> +                         "\xb6\x43\x57\xc5\x53\xe8\xf9\x05"
-> +                         "\x87",
-> +               .klen   =3D 16,
-> +               .len    =3D 17,
+> +               .key    = "\x17\xa6\x01\x3d\x5d\xd6\xef\x2d"
+> +                         "\x69\x8f\x4c\x54\x5b\xae\x43\xf0",
+> +               .iv     = "\xa9\x1b\x47\x60\x26\x82\xf7\x1c"
+> +                         "\x80\xf8\x88\xdd\xfb\x44\xd9\xda",
+> +               .ptext  = "\xf7\x67\xcd\xa6\x04\x65\x53\x99"
+> +                         "\x90\x5c\xa2\x56\x74\xd7\x9d\xf2"
+> +                         "\x0b\x03\x7f\x4e\xa7\x84\x72\x2b"
+> +                         "\xf0\xa5\xbf\xe6\x9a\x62\x3a\xfe"
+> +                         "\x69\x5c\x93\x79\x23\x86\x64\x85"
+> +                         "\xeb\x13\xb1\x5a\xd5\x48\x39\xa0"
+> +                         "\x70\xfb\x06\x9a\xd7\x12\x5a\xb9"
+> +                         "\xbe\xed\x2c\x81\x64\xf7\xcf\x80"
+> +                         "\xee\xe6\x28\x32\x2d\x37\x4c\x32"
+> +                         "\xf4\x1f\x23\x21\xe9\xc8\xc9\xbf"
+> +                         "\x54\xbc\xcf\xb4\xc2\x65\x39\xdf"
+> +                         "\xa5\xfb\x14\x11\xed\x62\x38\xcf"
+> +                         "\x9b\x58\x11\xdd\xe9\xbd\x37\x57"
+> +                         "\x75\x4c\x9e\xd5\x67\x0a\x48\xc6"
+> +                         "\x0d\x05\x4e\xb1\x06\xd7\xec\x2e"
+> +                         "\x9e\x59\xde\x4f\xab\x38\xbb\xe5"
+> +                         "\x87\x04\x5a\x2c\x2a\xa2\x8f\x3c"
+> +                         "\xe7\xe1\x46\xa9\x49\x9f\x24\xad"
+> +                         "\x2d\xb0\x55\x40\x64\xd5\xda\x7e"
+> +                         "\x1e\x77\xb8\x29\x72\x73\xc3\x84"
+> +                         "\xcd\xf3\x94\x90\x58\x76\xc9\x2c"
+> +                         "\x2a\xad\x56\xde\x33\x18\xb6\x3b"
+> +                         "\x10\xe9\xe9\x8d\xf0\xa9\x7f\x05"
+> +                         "\xf7\xb5\x8c\x13\x7e\x11\x3d\x1e"
+> +                         "\x02\xbb\x5b\xea\x69\xff\x85\xcf"
+> +                         "\x6a\x18\x97\x45\xe3\x96\xba\x4d"
+> +                         "\x2d\x7a\x70\x78\x15\x2c\xe9\xdc"
+> +                         "\x4e\x09\x92\x57\x04\xd8\x0b\xa6"
+> +                         "\x20\x71\x76\x47\x76\x96\x89\xa0"
+> +                         "\xd9\x29\xa2\x5a\x06\xdb\x56\x39"
+> +                         "\x60\x33\x59\x04\x95\x89\xf6\x18"
+> +                         "\x1d\x70\x75\x85\x3a\xb7\x6e",
+> +               .ctext  = "\xe1\xe7\x3f\xd3\x6a\xb9\x2f\x64"
+> +                         "\x37\xc5\xa4\xe9\xca\x0a\xa1\xd6"
+> +                         "\xea\x7d\x39\xe5\xe6\xcc\x80\x54"
+> +                         "\x74\x31\x2a\x04\x33\x79\x8c\x8e"
+> +                         "\x4d\x47\x84\x28\x27\x9b\x3c\x58"
+> +                         "\x54\x58\x20\x4f\x70\x01\x52\x5b"
+> +                         "\xac\x95\x61\x49\x5f\xef\xba\xce"
+> +                         "\xd7\x74\x56\xe7\xbb\xe0\x3c\xd0"
+> +                         "\x7f\xa9\x23\x57\x33\x2a\xf6\xcb"
+> +                         "\xbe\x42\x14\x95\xa8\xf9\x7a\x7e"
+> +                         "\x12\x53\x3a\xe2\x13\xfe\x2d\x89"
+> +                         "\xeb\xac\xd7\xa8\xa5\xf8\x27\xf3"
+> +                         "\x74\x9a\x65\x63\xd1\x98\x3a\x7e"
+> +                         "\x27\x7b\xc0\x20\x00\x4d\xf4\xe5"
+> +                         "\x7b\x69\xa6\xa8\x06\x50\x85\xb6"
+> +                         "\x7f\xac\x7f\xda\x1f\xf5\x37\x56"
+> +                         "\x9b\x2f\xd3\x86\x6b\x70\xbd\x0e"
+> +                         "\x55\x9a\x9d\x4b\x08\xb5\x5b\x7b"
+> +                         "\xd4\x7c\xb4\x71\x49\x92\x4a\x1e"
+> +                         "\xed\x6d\x11\x09\x47\x72\x32\x6a"
+> +                         "\x97\x53\x36\xaf\xf3\x06\x06\x2c"
+> +                         "\x69\xf1\x59\x00\x36\x95\x28\x2a"
+> +                         "\xb6\xcd\x10\x21\x84\x73\x5c\x96"
+> +                         "\x86\x14\x2c\x3d\x02\xdb\x53\x9a"
+> +                         "\x61\xde\xea\x99\x84\x7a\x27\xf6"
+> +                         "\xf7\xc8\x49\x73\x4b\xb8\xeb\xd3"
+> +                         "\x41\x33\xdd\x09\x68\xe2\x64\xb8"
+> +                         "\x5f\x75\x74\x97\x91\x54\xda\xc2"
+> +                         "\x73\x2c\x1e\x5a\x84\x48\x01\x1a"
+> +                         "\x0d\x8b\x0a\xdf\x07\x2e\xee\x77"
+> +                         "\x1d\x17\x41\x7a\xc9\x33\x63\xfa"
+> +                         "\x9f\xc3\x74\x57\x5f\x03\x4c",
+> +               .klen   = 16,
+> +               .len    = 255,
 > +       },
 > +       {
-> +               .key    =3D "\xe1\x22\xee\x5b\x3c\x92\x0e\x52"
-> +                         "\xd7\x95\x88\xa3\x79\x6c\xf8\xd9",
-> +               .iv     =3D "\xb8\xd1\xe7\x32\x36\x96\xd6\x44"
-> +                         "\x9c\x36\xad\x31\x5c\xaa\xf0\x17"
-> +                         "\x33\x2f\x29\x04\x31\xf5\x46\xc1"
-> +                         "\x2f\x1b\xfa\xa1\xbd\x86\xc4\xd3",
-> +               .ptext  =3D "\x87\xd7\xb8\x2d\x12\x62\xed\x41"
-> +                         "\x30\x7e\xd4\x0c\xfd\xb9\x6d\x8e"
-> +                         "\x30",
-> +               .ctext  =3D "\xb6\x6a\x0c\x71\x96\x22\xb9\x40"
-> +                         "\xa2\x04\x56\x14\x22\xae\xaa\x94"
-> +                         "\x26",
-> +               .klen   =3D 16,
-> +               .len    =3D 17,
+> +               .key    = "\xd1\x87\xd3\xa1\x97\x6a\x4b\xf9"
+> +                         "\x5d\xcb\x6c\x07\x6e\x2d\x48\xad",
+> +               .iv     = "\xe9\x8c\x88\x40\xa9\x52\xe0\xbc"
+> +                         "\x8a\x47\x3a\x09\x5d\x60\xdd\xb2",
+> +               .ptext  = "\x67\x80\x86\x46\x18\xc6\xed\xd2"
+> +                         "\x99\x0f\x7a\xc3\xa5\x0b\x80\xcb"
+> +                         "\x8d\xe4\x0b\x4c\x1e\x4c\x98\x46"
+> +                         "\x87\x8a\x8c\x76\x75\xce\x2c\x27"
+> +                         "\x74\x88\xdc\x37\xaa\x77\x53\x14"
+> +                         "\xd3\x01\xcf\xb5\xcb\xdd\xb4\x8e"
+> +                         "\x6b\x54\x68\x01\xc3\xdf\xbc\xdd"
+> +                         "\x1a\x08\x4c\x11\xab\x25\x4b\x69"
+> +                         "\x25\x21\x78\xb1\x91\x1b\x75\xfa"
+> +                         "\xd0\x10\xf3\x8a\x65\xd3\x8d\x2e"
+> +                         "\xf8\xb6\xce\x29\xf9\x1e\x45\x5f"
+> +                         "\x4e\x41\x63\x6f\xf9\xca\x59\xd7"
+> +                         "\xc8\x9c\x97\xda\xff\xab\x42\x47"
+> +                         "\xfb\x2b\xca\xed\xda\x6c\x96\xe4"
+> +                         "\x59\x0d\xc6\x4a\x26\xde\xa8\x50"
+> +                         "\xc5\xbb\x13\xf8\xd1\xb9\x6b\xf4"
+> +                         "\x19\x30\xfb\xc0\x4f\x6b\x96\xc4"
+> +                         "\x88\x0b\x57\xb3\x43\xbd\xdd\xe2"
+> +                         "\x06\xae\x88\x44\x41\xdf\xa4\x29"
+> +                         "\x31\xd3\x38\xeb\xe9\xf8\xa2\xe4"
+> +                         "\x6a\x55\x2f\x56\x58\x19\xeb\xf7"
+> +                         "\x5f\x4b\x15\x52\xe4\xaa\xdc\x31"
+> +                         "\x4a\x32\xc9\x31\x96\x68\x3b\x80"
+> +                         "\x20\x4f\xe5\x8f\x87\xc9\x37\x58"
+> +                         "\x79\xfd\xc9\xc1\x9a\x83\xe3\x8b"
+> +                         "\x6b\x57\x07\xef\x28\x8d\x55\xcb"
+> +                         "\x4e\xb6\xa2\xb6\xd3\x4f\x8b\x10"
+> +                         "\x70\x10\x02\xf6\x74\x71\x20\x5a"
+> +                         "\xe2\x2f\xb6\x46\xc5\x22\xa3\x29"
+> +                         "\xf5\xc1\x25\xb0\x4d\xda\xaf\x04"
+> +                         "\xca\x83\xe6\x3f\x66\x6e\x3b\xa4"
+> +                         "\x09\x40\x22\xd7\x97\x12\x1e",
+> +               .ctext  = "\xd4\x6d\xfa\xc8\x6e\x54\x31\x69"
+> +                         "\x47\x51\x0f\xb8\xfa\x03\xa2\xe1"
+> +                         "\x57\xa8\x4f\x2d\xc5\x4e\x8d\xcd"
+> +                         "\x92\x0f\x71\x08\xdd\xa4\x5b\xc7"
+> +                         "\x69\x3a\x3d\x93\x29\x1d\x87\x2c"
+> +                         "\xfa\x96\xd2\x4d\x72\x61\xb0\x9e"
+> +                         "\xa7\xf5\xd5\x09\x3d\x43\x32\x82"
+> +                         "\xd2\x9a\x58\xe3\x4c\x84\xc2\xad"
+> +                         "\x33\x77\x9c\x5d\x37\xc1\x4f\x95"
+> +                         "\x56\x55\xc6\x76\x62\x27\x6a\xc7"
+> +                         "\x45\x80\x9e\x7c\x48\xc8\x14\xbb"
+> +                         "\x32\xbf\x4a\xbb\x8d\xb4\x2c\x7c"
+> +                         "\x01\xfa\xc8\xde\x10\x55\xa0\xae"
+> +                         "\x29\xed\xe2\x3d\xd6\x26\xfa\x3c"
+> +                         "\x7a\x81\xae\xfd\xc3\x2f\xe5\x3a"
+> +                         "\x00\xa3\xf0\x66\x0f\x3a\xd2\xa3"
+> +                         "\xaf\x0e\x75\xbb\x79\xad\xcc\xe0"
+> +                         "\x98\x10\xfb\xf1\xc0\x0c\xb9\x03"
+> +                         "\x07\xee\x46\x6a\xc0\xf6\x17\x8f"
+> +                         "\x7f\xc9\xad\x16\x58\x54\xb0\xd5"
+> +                         "\x67\x73\x9f\xce\xea\x4b\x60\x57"
+> +                         "\x1d\x62\x72\xec\xab\xe3\xd8\x32"
+> +                         "\x29\x48\x37\x1b\x5c\xd6\xd0\xb7"
+> +                         "\xc3\x39\xef\xf6\x1b\x18\xf6\xd1"
+> +                         "\x2d\x76\x7c\x68\x50\x37\xfa\x8f"
+> +                         "\x16\x87\x5e\xf8\xb1\x79\x82\x52"
+> +                         "\xc7\x3e\x0e\xa3\x61\xb9\x00\xe0"
+> +                         "\x2e\x03\x80\x6e\xc0\xbf\x63\x78"
+> +                         "\xdf\xab\xc2\x3b\xf0\x4c\xb0\xcb"
+> +                         "\x91\x6a\x26\xe6\x3a\x86\xef\x1a"
+> +                         "\x4e\x4d\x23\x2d\x59\x3a\x02\x3a"
+> +                         "\xf3\xda\xd1\x9d\x68\xf6\xef",
+> +               .klen   = 16,
+> +               .len    = 255,
 > +       },
 > +       {
-> +               .key    =3D "\xf6\x2b\xab\xec\x04\x4a\x47\xa6"
-> +                         "\x37\xf0\x50\x3d\x56\xe5\x61\xac",
-> +               .iv     =3D "\xb7\x6d\x55\x7d\xe2\xf0\x10\x93"
-> +                         "\x07\x1e\x5a\x9d\xc3\x59\x6f\x98"
-> +                         "\x11\xde\xdb\x3a\x03\xf4\x0e\xcc"
-> +                         "\x15\xa4\x1c\xdf\x3c\x55\x89\x27",
-> +               .ptext  =3D "\xbe\xc6\x74\x4b\xb9\xa1\x43\x86"
-> +                         "\xc2\x4a\x65\x00\xbf\x43\xe4\x84"
-> +                         "\x6d\xae\x0a\x3c\xec\x6b\x3d\x43"
-> +                         "\xcf\x49\x36\x88\x14\x3d\x3c\xfc"
-> +                         "\xfb\xc1\x58\x1f\x39\x81\x88\xeb"
-> +                         "\x4e\xa1\xe2\x59\xad\x47\xa3\x61",
-> +               .ctext  =3D "\x80\x25\x8e\x11\xed\x58\x21\x6f"
-> +                         "\x34\xe3\xa1\xb8\xc0\x99\x6a\x50"
-> +                         "\xe0\x18\x23\x4f\x1b\x00\x68\x39"
-> +                         "\x75\x34\x95\xfb\x9e\xb4\x18\x89"
-> +                         "\x53\x12\x2c\xe2\xee\x59\x32\xa6"
-> +                         "\xc5\x3f\xd1\x37\xbc\x12\x40\xbd",
-> +               .klen   =3D 16,
-> +               .len    =3D 48,
+> +               .key    = "\x17\xe6\xb1\x85\x40\x24\xbe\x80"
+> +                         "\x99\xc7\xa1\x0c\x0f\x72\x31\xb8"
+> +                         "\x10\xb5\x11\x21\x3a\x99\x9e\xc8",
+> +               .iv     = "\x6b\x5f\xe1\x6a\xe1\x21\xfc\x62"
+> +                         "\xd9\x85\x2e\x0b\xbd\x58\x79\xd1",
+> +               .ptext  = "\xea\x3c\xad\x9d\x92\x05\x50\xa4"
+> +                         "\x68\x56\x6b\x33\x95\xa8\x24\x6c"
+> +                         "\xa0\x9d\x91\x15\x3a\x26\xb7\xeb"
+> +                         "\xb4\x5d\xf7\x0c\xec\x91\xbe\x11",
+> +               .ctext  = "\x6a\xac\xfc\x24\x64\x98\x28\x33"
+> +                         "\xa4\x39\xfd\x72\x46\x56\x7e\xf7"
+> +                         "\xd0\x7f\xee\x95\xd8\x68\x44\x67"
+> +                         "\x70\x80\xd4\x69\x7a\xf5\x8d\xad",
+> +               .klen   = 24,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\x39\x4e\x4d\x5c\xd6\x63\xaf\x4b"
-> +                         "\xcf\xc3\x2c\x53\x8e\x3d\x7b\x3d",
-> +               .iv     =3D "\x1d\x4a\x01\xa0\x88\xac\xdf\x2c"
-> +                         "\x34\x88\x13\xef\xa4\xe7\xe5\x2e"
-> +                         "\x44\xf8\xdc\xff\x74\xd4\x8a\x81"
-> +                         "\x26\xfe\x50\x57\xca\x0b\x93\x54",
-> +               .ptext  =3D "\x55\x76\x17\x29\xc6\xd2\xbd\x9c"
-> +                         "\xf4\xde\x9b\x8e\x71\xf7\xe4\xfd"
-> +                         "\x60\xc0\xca\xbc\x8a\x70\x31\x9b"
-> +                         "\x2d\xfd\x92\x51\x31\x4d\x3e\x1b"
-> +                         "\xdf\x66\x46\xba\x28\x1f\x08\xc1"
-> +                         "\x1b\xd0\x8a\x5c\x8e\xe1\xcf\x79",
-> +               .ctext  =3D "\x34\x1f\x14\x61\x16\xd8\xf0\x73"
-> +                         "\x38\xe7\x5f\xc8\x64\x70\x28\x93"
-> +                         "\x9b\xb3\x1c\xfe\x62\xbf\x8e\x3c"
-> +                         "\xf5\x17\x2d\xfc\x0d\x3b\x61\xf7"
-> +                         "\x30\x25\x4d\x5b\x0c\x84\x5f\x86"
-> +                         "\x94\xa1\xbe\xa5\x6d\xa9\x10\x78",
-> +               .klen   =3D 16,
-> +               .len    =3D 48,
+> +               .key    = "\x02\x81\x0e\xb1\x97\xe0\x20\x0c"
+> +                         "\x46\x8c\x7b\xde\xac\xe6\xe0\xb5"
+> +                         "\x2e\xb3\xc0\x40\x0e\xb7\x3d\xd3",
+> +               .iv     = "\x37\x15\x1c\x61\xab\x95\x8f\xf3"
+> +                         "\x11\x3a\x79\xe2\xf7\x33\x96\xb3",
+> +               .ptext  = "\x05\xd9\x7a\xc7\x08\x79\xba\xd8"
+> +                         "\x4a\x63\x54\xf7\x4e\x0c\x98\x8a"
+> +                         "\x5d\x40\x05\xe4\x7a\x7a\x14\x0c"
+> +                         "\xa8\xa7\x53\xf4\x3e\x66\x81\x38",
+> +               .ctext  = "\x43\x66\x70\x51\xd9\x7c\x6f\x80"
+> +                         "\x82\x8e\x34\xda\x5d\x3c\x47\xd1"
+> +                         "\xe0\x67\x76\xb5\x78\x98\x47\x26"
+> +                         "\x41\x31\xfa\x97\xc9\x79\xeb\x15",
+> +               .klen   = 24,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\x3e\x08\x5d\x64\x6c\x98\xec\xec"
-> +                         "\x70\x0e\x0d\xa1\x41\x20\x99\x82",
-> +               .iv     =3D "\x11\xb7\x77\x91\x0d\x99\xd9\x8d"
-> +                         "\x35\x3a\xf7\x14\x6b\x09\x37\xe5"
-> +                         "\xad\x51\xf6\xc3\x96\x4b\x64\x56"
-> +                         "\xa8\xbd\x81\xcc\xbe\x94\xaf\xe4",
-> +               .ptext  =3D "\xff\x8d\xb9\xc0\xe3\x69\xb3\xb2"
-> +                         "\x8b\x11\x26\xb3\x11\xec\xfb\xb9"
-> +                         "\x9c\xc1\x71\xd6\xe3\x26\x0e\xe0"
-> +                         "\x68\x40\x60\xb9\x3a\x63\x56\x8a"
-> +                         "\x9e\xc1\xf0\x10\xb1\x64\x32\x70"
-> +                         "\xf8\xcd\xc6\xc4\x49\x4c\xe1\xce"
-> +                         "\xf3\xe1\x03\xf8\x35\xae\xe0\x5e"
-> +                         "\xef\x5f\xbc\x41\x75\x26\x13\xcc"
-> +                         "\x37\x85\xdf\xc0\x5d\xa6\x47\x98"
-> +                         "\xf1\x97\x52\x58\x04\xe6\xb5\x01"
-> +                         "\xc0\xb8\x17\x6d\x74\xbd\x9a\xdf"
-> +                         "\xa4\x37\x94\x86\xb0\x13\x83\x28"
-> +                         "\xc9\xa2\x07\x3f\xb5\xb2\x72\x40"
-> +                         "\x0e\x60\xdf\x57\x07\xb7\x2c\x66"
-> +                         "\x10\x3f\x8d\xdd\x30\x0a\x47\xd5"
-> +                         "\xe8\x9d\xfb\xa1\xaf\x53\xd7\x05"
-> +                         "\xc7\xd2\xba\xe7\x2c\xa0\xbf\xb8"
-> +                         "\xd1\x93\xe7\x41\x82\xa3\x41\x3a"
-> +                         "\xaf\x12\xd6\xf8\x34\xda\x92\x46"
-> +                         "\xad\xa2\x2f\xf6\x7e\x46\x96\xd8"
-> +                         "\x03\xf3\x49\x64\xde\xd8\x06\x8b"
-> +                         "\xa0\xbc\x63\x35\x38\xb6\x6b\xda"
-> +                         "\x5b\x50\x3f\x13\xa5\x84\x1b\x1b"
-> +                         "\x66\x89\x95\xb7\xc2\x16\x3c\xe9"
-> +                         "\x24\xb0\x8c\x6f\x49\xef\xf7\x28"
-> +                         "\x6a\x24\xfd\xbe\x25\xe2\xb4\x90"
-> +                         "\x77\x44\x08\xb8\xda\xd2\xde\x2c"
-> +                         "\xa0\x57\x45\x57\x29\x47\x6b\x89"
-> +                         "\x4a\xf6\xa7\x2a\xc3\x9e\x7b\xc8"
-> +                         "\xfd\x9f\x89\xab\xee\x6d\xa3\xb4"
-> +                         "\x23\x90\x7a\xe9\x89\xa0\xc7\xb3"
-> +                         "\x17\x41\x87\x91\xfc\x97\x42",
-> +               .ctext  =3D "\xfc\x9b\x96\x66\xc4\x82\x2a\x4a"
-> +                         "\xb1\x24\xba\xc7\x78\x5f\x79\xc1"
-> +                         "\x57\x2e\x47\x29\x4d\x7b\xd2\x9a"
-> +                         "\xbd\xc6\xc1\x26\x7b\x8e\x3f\x5d"
-> +                         "\xd4\xb4\x9f\x6a\x02\x24\x4a\xad"
-> +                         "\x0c\x00\x1b\xdf\x92\xc5\x8a\xe1"
-> +                         "\x77\x79\xcc\xd5\x20\xbf\x83\xf4"
-> +                         "\x4b\xad\x11\xbf\xdb\x47\x65\x70"
-> +                         "\x43\xf3\x65\xdf\xb7\xdc\xb2\xb9"
-> +                         "\xaa\x3f\xb3\xdf\x79\x69\x0d\xa0"
-> +                         "\x86\x1c\xba\x48\x0b\x01\xc1\x88"
-> +                         "\xdf\x03\xb1\x06\x3c\x1d\x56\xa1"
-> +                         "\x8e\x98\xc1\xa6\x95\xa2\x5b\x72"
-> +                         "\x76\x59\xd2\x26\x25\xcd\xef\x7c"
-> +                         "\xc9\x60\xea\x43\xd1\x12\x8a\x8a"
-> +                         "\x63\x12\x78\xcb\x2f\x88\x1e\x88"
-> +                         "\x78\x59\xde\xba\x4d\x2c\x78\x61"
-> +                         "\x75\x37\x54\xfd\x80\xc7\x5e\x98"
-> +                         "\xcf\x14\x62\x8e\xfb\x72\xee\x4d"
-> +                         "\x9f\xaf\x8b\x09\xe5\x21\x0a\x91"
-> +                         "\x8f\x88\x87\xd5\xb1\x84\xab\x18"
-> +                         "\x08\x57\xed\x72\x35\xa6\x0e\xc6"
-> +                         "\xff\xcb\xfe\x2c\x48\x39\x14\x44"
-> +                         "\xba\x59\x32\x3a\x2d\xc4\x5f\xcb"
-> +                         "\xbe\x68\x8e\x7b\xee\x21\xa4\x32"
-> +                         "\x11\xa0\x99\xfd\x90\xde\x59\x43"
-> +                         "\xeb\xed\xd5\x87\x68\x46\xc6\xde"
-> +                         "\x0b\x07\x17\x59\x6a\xab\xca\x15"
-> +                         "\x65\x02\x01\xb6\x71\x8c\x3b\xaa"
-> +                         "\x18\x3b\x30\xae\x38\x5b\x2c\x74"
-> +                         "\xd4\xee\x4a\xfc\xf7\x1b\x09\xd4"
-> +                         "\xda\x8b\x1d\x5d\x6f\x21\x6c",
-> +               .klen   =3D 16,
-> +               .len    =3D 255,
+> +               .key    = "\x9a\xef\x58\x01\x4c\x1e\xa2\x33"
+> +                         "\xce\x1f\x32\xae\xc8\x69\x1f\xf5"
+> +                         "\x82\x1b\x74\xf4\x8b\x1b\xce\x30",
+> +               .iv     = "\xb1\x72\x52\xa8\xc4\x8f\xb5\xec"
+> +                         "\x95\x12\x14\x5f\xd2\x29\x14\x0f",
+> +               .ptext  = "\x8a\xbc\x20\xbd\x67\x76\x8d\xd8"
+> +                         "\xa6\x70\xf0\x74\x8c\x8d\x9c\x00"
+> +                         "\xdd\xaf\xef\x28\x5d\x8d\xfa\x87"
+> +                         "\x81\x39\x8c\xb1\x6e\x0a\xcf\x3c"
+> +                         "\xe8\x3b\xc0\xff\x6e\xe7\xd1\xc6"
+> +                         "\x70\xb8\xdf\x27\x62\x72\x8e\xb7"
+> +                         "\x6b\xa7\xb2\x74\xdd\xc6\xb4\xc9"
+> +                         "\x4c\xd8\x4f\x2c\x09\x75\x6e\xb7"
+> +                         "\x41\xb3\x8f\x96\x09\x0d\x40\x8e"
+> +                         "\x0f\x49\xc2\xad\xc4\xf7\x71\x0a"
+> +                         "\x76\xfb\x45\x97\x29\x7a\xaa\x98"
+> +                         "\x22\x55\x4f\x9c\x26\x01\xc8\xb9"
+> +                         "\x41\x42\x51\x9d\x00\x5c\x7f\x02"
+> +                         "\x9b\x00\xaa\xbd\x69\x47\x9c\x26"
+> +                         "\x5b\xcb\x08\xf3\x46\x33\xf9\xeb"
+> +                         "\x79\xdd\xfe\x38\x08\x84\x8c\x81"
+> +                         "\xb8\x51\xbd\xcd\x72\x00\xdb\xbd"
+> +                         "\xf5\xd6\xb4\x80\xf7\xd3\x49\xac"
+> +                         "\x9e\xf9\xea\xd5\xad\xd4\xaa\x8f"
+> +                         "\x97\x60\xce\x60\xa7\xdd\xc0\xb2"
+> +                         "\x51\x80\x9b\xae\xab\x0d\x62\xab"
+> +                         "\x78\x1a\xeb\x8c\x03\x6f\x30\xbf"
+> +                         "\xe0\xe1\x20\x65\x74\x65\x54\x43"
+> +                         "\x92\x57\xd2\x73\x8a\xeb\x99\x38"
+> +                         "\xca\x78\xc8\x11\xd7\x92\x1a\x05"
+> +                         "\x55\xb8\xfa\xa0\x82\xb7\xd6\x16"
+> +                         "\x84\x4d\x25\xc4\xd5\xe4\x55\xf3"
+> +                         "\x6c\xb3\xe4\x6e\x66\x31\x5c\x41"
+> +                         "\x98\x46\x28\xd8\x71\x05\xf2\x3b"
+> +                         "\xd1\x3e\x0f\x79\x7f\xf3\x30\x3f"
+> +                         "\xbe\x36\xf4\x50\xbd\x0c\x89\xd5"
+> +                         "\xcb\x53\x9f\xeb\x56\xf4\x3f",
+> +               .ctext  = "\xee\x90\xe1\x45\xf5\xab\x04\x23"
+> +                         "\x70\x0a\x54\x49\xac\x34\xb8\x69"
+> +                         "\x3f\xa8\xce\xef\x6e\x63\xc1\x20"
+> +                         "\x7a\x41\x43\x5d\xa2\x29\x71\x1d"
+> +                         "\xd2\xbb\xb1\xca\xb4\x3a\x5a\xf3"
+> +                         "\x0a\x68\x0b\x9d\x6f\x68\x60\x9e"
+> +                         "\x9d\xb9\x23\x68\xbb\xdd\x12\x31"
+> +                         "\xc6\xd6\xf9\xb3\x80\xe8\xb5\xab"
+> +                         "\x84\x2a\x8e\x7b\xb2\x4f\xee\x31"
+> +                         "\x83\xc4\x1c\x80\x89\xe4\xe7\xd2"
+> +                         "\x00\x65\x98\xd1\x57\xcc\xf6\x87"
+> +                         "\x14\xf1\x23\x22\x78\x61\xc7\xb6"
+> +                         "\xf5\x90\x97\xdd\xcd\x90\x98\xd8"
+> +                         "\xbb\x02\xfa\x2c\xf0\x89\xfc\x7e"
+> +                         "\xe7\xcd\xee\x41\x3f\x73\x4a\x08"
+> +                         "\xf8\x8f\xf3\xbf\x3a\xd5\xce\xb7"
+> +                         "\x7a\xf4\x49\xcd\x3f\xc7\x1f\x77"
+> +                         "\x98\xd0\x9d\x82\x20\x8a\x04\x5d"
+> +                         "\x9f\x77\xcb\xf4\x38\x92\x47\xce"
+> +                         "\x6d\xc3\x51\xc1\xd9\xf4\x2f\x65"
+> +                         "\x67\x01\xf4\x46\x3b\xd2\x90\x5d"
+> +                         "\x2a\xcb\xc5\x39\x1c\x72\xa5\xba"
+> +                         "\xaf\x80\x9b\x87\x01\x85\xa1\x02"
+> +                         "\xdf\x79\x4c\x27\x77\x3e\xfc\xb3"
+> +                         "\x96\xbc\x42\xad\xdf\xa4\x16\x1e"
+> +                         "\x77\xe7\x39\xcc\x78\x2c\xc1\x00"
+> +                         "\xe5\xa6\xb5\x9b\x0c\x12\x19\xc5"
+> +                         "\x8b\xbe\xae\x4b\xc3\xa3\x91\x8f"
+> +                         "\x5b\x82\x0f\x20\x30\x35\x45\x26"
+> +                         "\x29\x84\x2e\xc8\x2d\xce\xae\xac"
+> +                         "\xbe\x93\x50\x7a\x6a\x01\x08\x38"
+> +                         "\xf5\x49\x4d\x8b\x7e\x96\x70",
+> +               .klen   = 24,
+> +               .len    = 255,
 > +       },
 > +       {
-> +               .key    =3D "\x9f\xd3\xd5\x1a\x0e\xba\x32\x0a"
-> +                         "\x1d\xa5\xd1\x14\x16\x58\xcd\xdd",
-> +               .iv     =3D "\x10\x52\x8d\x53\x3f\x54\x11\x01"
-> +                         "\x19\x3b\xd8\xa5\xe8\x38\x77\x3e"
-> +                         "\xd4\x58\xff\x0a\x13\xd2\x09\xe4"
-> +                         "\x77\x38\x28\x46\xf9\x16\xd3\xfc",
-> +               .ptext  =3D "\x5d\x3f\x4a\xa1\x16\x9a\x3c\xdf"
-> +                         "\xd8\x21\x51\xdc\xb7\x3c\x12\xda"
-> +                         "\xd1\xe1\xba\x38\xf1\xc1\x9c\x84"
-> +                         "\xc7\x48\xe1\xd5\xed\x84\x3b\xcd"
-> +                         "\xc7\x1b\xe1\x5d\x1b\xa5\x79\x3c"
-> +                         "\xe3\x7e\xab\xf7\xac\x71\x49\x1d"
-> +                         "\x25\x2b\x8f\x40\xe8\x89\x45\x67"
-> +                         "\x39\x33\xd3\x27\xd5\xff\x16\xb5"
-> +                         "\x46\x0f\x37\x05\x14\x87\xa7\xc2"
-> +                         "\x35\x7f\x66\x98\x48\x5c\x1a\x05"
-> +                         "\x6c\x0a\xd8\xe4\x28\x1e\x99\x6e"
-> +                         "\x84\x6c\x13\x07\xc8\x23\xcd\x22"
-> +                         "\x80\xb8\xc7\x9e\xbe\xcb\xed\x0b"
-> +                         "\xfa\x9d\xf5\x4b\x4f\x0c\x6e\x4e"
-> +                         "\x1b\xec\x8c\xb1\x9b\x64\xaa\x65"
-> +                         "\x5e\x91\x45\xda\x87\x14\x89\x43"
-> +                         "\x61\xb8\xc7\x68\xc6\xe0\x53\x0a"
-> +                         "\x71\xef\xac\xc2\xb2\x41\xd9\x4e"
-> +                         "\x41\xf8\xb3\xee\x2f\x59\xff\x05"
-> +                         "\x91\x77\x34\xe1\xb2\x1c\x46\x95"
-> +                         "\xf2\xea\x2a\x15\x70\x97\xa3\x7f"
-> +                         "\xc3\x68\x23\x73\xd4\x86\xf7\xe0"
-> +                         "\xc6\x6a\xbd\x70\x63\x0a\x5e\xe2"
-> +                         "\xba\xe6\x7c\x18\x71\xc4\x1d\x07"
-> +                         "\x40\xb0\x18\xd7\x52\xc1\x9e\x4e"
-> +                         "\x8a\x3a\x75\xc3\xf5\xf1\xf9\x8e"
-> +                         "\x00\x0e\x4f\x7f\x17\x16\x38\x73"
-> +                         "\xf6\x91\x29\x2a\xcb\xf8\xee\x1a"
-> +                         "\xf8\x09\x75\x0a\xaf\xb1\x47\x7c"
-> +                         "\xcf\xca\xd3\xbd\x28\x8b\xa6\xe5"
-> +                         "\x33\xd1\x63\xea\x89\x1d\xa3\x63"
-> +                         "\x9d\x1f\xb2\xc6\x02\x50\x1b",
-> +               .ctext  =3D "\xd3\x8c\xee\xa6\x45\x11\xaf\x8a"
-> +                         "\x21\x75\x1f\x84\x1d\x6f\x3f\xbe"
-> +                         "\xc6\x07\xdd\x64\x6c\x99\x9b\x8b"
-> +                         "\xfa\xef\x41\xf2\xe1\x04\xe2\x0a"
-> +                         "\x12\x88\x96\x98\x74\xd4\x6c\x5d"
-> +                         "\x6b\xf4\x8b\xfc\x87\x5f\x4b\x70"
-> +                         "\x29\x07\x13\x49\xad\x52\x3e\xa7"
-> +                         "\x88\x20\x8a\xdd\x5d\xe9\x2d\x86"
-> +                         "\x5c\x1e\x33\x82\x07\xe9\x04\xa4"
-> +                         "\x72\xbd\xa8\xb3\x67\x2e\xc0\x80"
-> +                         "\xea\x9d\x44\x55\x36\xca\xb6\xb4"
-> +                         "\x0d\x5e\xaf\x87\x63\x45\x65\xd8"
-> +                         "\x90\x58\xc3\xec\x27\x5a\x7f\x25"
-> +                         "\x1b\x14\x08\x2b\xed\x14\xe2\x80"
-> +                         "\x53\xc2\xed\xbf\x88\xf3\x74\x8d"
-> +                         "\x79\x99\x9e\x7f\x18\x2b\x1f\x70"
-> +                         "\x09\x46\x88\x41\x1b\xce\xc5\x69"
-> +                         "\xd8\xc8\x83\xfa\x32\xd8\xb7\xab"
-> +                         "\x87\xae\xda\x36\xc1\x75\xba\xf5"
-> +                         "\xd3\x22\xcc\x0a\x20\x62\x37\xfd"
-> +                         "\xc1\xe1\x6c\xc6\xac\x4b\x1e\x34"
-> +                         "\x4f\xbe\x09\xea\xb1\xd3\x30\xa6"
-> +                         "\xf1\xd8\x51\x0f\x83\xf7\x36\x83"
-> +                         "\x17\x23\x25\x6c\xb4\x5f\x4f\x76"
-> +                         "\xde\x0a\x09\x54\xf3\xd2\xca\x52"
-> +                         "\xc2\xec\x6a\x9c\x0a\xa0\x59\x8e"
-> +                         "\xbe\x09\x02\x83\xcf\x4e\xe3\x59"
-> +                         "\x6d\xff\x45\x49\x1f\xa7\x32\x67"
-> +                         "\x1d\xb4\xdf\x60\xb9\x30\xd4\x64"
-> +                         "\xfc\x47\xf7\xe7\xfa\x94\x23\x60"
-> +                         "\xd5\x47\xe4\x4e\x61\x45\x7e\x48"
-> +                         "\xd3\xad\xad\x97\x61\x1c\x32",
-> +               .klen   =3D 16,
-> +               .len    =3D 255,
+> +               .key    = "\x2c\x3c\x6c\x78\xaa\x83\xed\x14"
+> +                         "\x4e\xe5\xe2\x3e\x1e\x89\xcb\x2f"
+> +                         "\x19\x5a\x70\x50\x09\x81\x43\x75",
+> +               .iv     = "\xa5\x57\x8e\x3c\xba\x52\x87\x4f"
+> +                         "\xb7\x45\x26\xab\x31\xb9\x58\xfa",
+> +               .ptext  = "\x43\x29\x69\x02\xf0\xc0\x64\xf3"
+> +                         "\xe1\x85\x75\x25\x11\x5d\x18\xf8"
+> +                         "\xdc\x96\x82\x1b\xee\x4d\x01\xd2"
+> +                         "\x28\x83\xbb\xfe\xe1\x72\x14\x3c"
+> +                         "\xe9\xe5\x9f\x8c\x40\xb5\x0a\xaa"
+> +                         "\x9f\xb8\xc5\xf1\x01\x05\x65\x79"
+> +                         "\x90\x05\xeb\xac\xa8\x52\x35\xc4"
+> +                         "\x2d\x56\x0d\xe1\x37\x09\xb8\xec"
+> +                         "\x51\xd8\x79\x13\x5b\x85\x8c\x14"
+> +                         "\x77\xe3\x64\xea\x89\xb1\x04\x9d"
+> +                         "\x6c\x58\x1b\x51\x54\x1f\xc7\x2f"
+> +                         "\xc8\x3d\xa6\x93\x39\xce\x77\x3a"
+> +                         "\x93\xc2\xaa\x88\xcc\x09\xfa\xc4"
+> +                         "\x5e\x92\x3b\x46\xd2\xd6\xd4\x5d"
+> +                         "\x31\x58\xc5\xc6\x30\xb8\x7f\x77"
+> +                         "\x0f\x1b\xf8\x9a\x7d\x3f\x56\x90"
+> +                         "\x61\x8f\x08\x8f\x61\x64\x8e\xf4"
+> +                         "\xaa\x7c\xf8\x4c\x0b\xab\x47\x2a"
+> +                         "\x0d\xa7\x24\x36\x59\xfe\x94\xfc"
+> +                         "\x38\x38\x32\xdf\x73\x1b\x75\xb1"
+> +                         "\x6f\xa2\xd8\x0b\xa1\xd4\x31\x58"
+> +                         "\xaa\x24\x11\x22\xc9\xf7\x83\x3c"
+> +                         "\x6e\xee\x75\xc0\xdd\x3b\x21\x99"
+> +                         "\x9f\xde\x81\x9c\x2a\x70\xc4\xb8"
+> +                         "\xc6\x27\x4e\x5d\x9a\x4a\xe1\x75"
+> +                         "\x01\x95\x47\x87\x3f\x9a\x69\x20"
+> +                         "\xb4\x66\x70\x1a\xe2\xb3\x6c\xfa"
+> +                         "\x1f\x6e\xf9\xc3\x8a\x1f\x0b\x0b"
+> +                         "\xc5\x92\xba\xd9\xf8\x27\x6b\x97"
+> +                         "\x01\xe2\x38\x01\x7f\x06\xde\x54"
+> +                         "\xb7\x78\xbc\x7d\x6a\xa1\xf2\x6f"
+> +                         "\x62\x42\x30\xbf\xb1\x6d\xc7",
+> +               .ctext  = "\x53\xc0\xb3\x13\x8f\xbf\x88\x1a"
+> +                         "\x6f\xda\xad\x0b\x33\x8b\x82\x9d"
+> +                         "\xca\x17\x32\x65\xaa\x72\x24\x1b"
+> +                         "\x95\x33\xcc\x5b\x58\x5d\x08\x58"
+> +                         "\xe5\x52\xc0\xb7\xc6\x97\x77\x66"
+> +                         "\xbd\xf4\x50\xde\xe1\xf0\x70\x61"
+> +                         "\xc2\x05\xce\xe0\x90\x2f\x7f\xb3"
+> +                         "\x04\x7a\xee\xbe\xb3\xb7\xaf\xda"
+> +                         "\x3c\xb8\x95\xb4\x20\xba\x66\x0b"
+> +                         "\x97\xcc\x07\x3f\x22\x07\x0e\xea"
+> +                         "\x76\xd8\x32\xf9\x34\x47\xcb\xaa"
+> +                         "\xb3\x5a\x06\x68\xac\x94\x10\x39"
+> +                         "\xf2\x70\xe1\x7b\x98\x5c\x0c\xcb"
+> +                         "\x8f\xd8\x48\xfa\x2e\x15\xa1\xf1"
+> +                         "\x2f\x85\x55\x39\xd8\x24\xe6\xc1"
+> +                         "\x6f\xd7\x52\x97\x42\x7a\x2e\x14"
+> +                         "\x39\x74\x16\xf3\x8b\xbd\x38\xb9"
+> +                         "\x54\x20\xc6\x31\x1b\x4c\xb7\x26"
+> +                         "\xd4\x71\x63\x97\xaa\xbf\xf5\xb7"
+> +                         "\x17\x5e\xee\x14\x67\x38\x14\x11"
+> +                         "\xf6\x98\x3c\x70\x4a\x89\xf4\x27"
+> +                         "\xb4\x72\x7a\xc0\x5d\x58\x3d\x8b"
+> +                         "\xf6\xf7\x80\x7b\xa9\xa7\x4d\xf8"
+> +                         "\x1a\xbe\x07\x0c\x06\x97\x25\xc8"
+> +                         "\x5a\x18\xae\x21\xa6\xe4\x77\x13"
+> +                         "\x5a\xe5\xf5\xe0\xd5\x48\x73\x22"
+> +                         "\x68\xde\x70\x05\xc4\xdf\xd5\x7c"
+> +                         "\xa0\x2b\x99\x9c\xa8\x21\xd7\x6c"
+> +                         "\x55\x97\x09\xd6\xb0\x62\x93\x90"
+> +                         "\x14\xb1\xd1\x83\x5a\xb3\x17\xb9"
+> +                         "\xc7\xcc\x6b\x51\x23\x44\x4b\xef"
+> +                         "\x48\x0f\x0f\xf0\x0e\xa1\x8f",
+> +               .klen   = 24,
+> +               .len    = 255,
 > +       },
 > +       {
-> +               .key    =3D "\xea\x2f\x51\x6f\x31\xe9\x2f\x7b"
-> +                         "\x68\xc8\x1a\xd5\xfa\x9c\xe1\x40"
-> +                         "\x95\xe9\x47\xcb\xa1\x9a\xf7\xee",
-> +               .iv     =3D "\xe6\x77\x52\x55\x9c\xa7\xc1\x91"
-> +                         "\x02\xa7\x32\x87\x76\x91\x72\x2e"
-> +                         "\xf3\xa4\x84\x33\xe8\xa5\xa3\x57"
-> +                         "\x42\x5d\xd5\x6c\xaa\xf1\xfd\x53",
-> +               .ptext  =3D "\x22\xd0\xff\xba\xad\x43\xaf\x63"
-> +                         "\x0e\xb1\x0c\x60\x0f\x64\x92\x5a",
-> +               .ctext  =3D "\x21\x85\xb9\xb8\xdf\x5e\x8b\x70"
-> +                         "\xfe\x79\xc0\x5d\x9d\x89\x30\xdc",
-> +               .klen   =3D 24,
-> +               .len    =3D 16,
+> +               .key    = "\xed\xd1\xcf\x81\x1c\xf8\x9d\x56"
+> +                         "\xd4\x3b\x86\x4b\x65\x96\xfe\xe8"
+> +                         "\x8a\xd4\x3b\xd7\x76\x07\xab\xf4"
+> +                         "\xe9\xae\xd1\x4d\x50\x9b\x94\x1c",
+> +               .iv     = "\x09\x90\xf3\x7c\x15\x99\x7d\x94"
+> +                         "\x88\xf4\x99\x19\xd1\x62\xc4\x65",
+> +               .ptext  = "\xa2\x06\x41\x55\x60\x2c\xe3\x76"
+> +                         "\xa9\xaf\xf9\xe1\xd7\x0d\x65\x49"
+> +                         "\xda\x27\x0d\xf8\xec\xdc\x09\x2b"
+> +                         "\x06\x24\xe4\xd5\x15\x29\x6b\x5f",
+> +               .ctext  = "\xad\x5c\xd0\xc1\x03\x45\xba\x9d"
+> +                         "\xab\x6d\x82\xae\xf7\x8e\x2b\x8b"
+> +                         "\xd8\x61\xe6\x96\x5c\x5c\xe2\x70"
+> +                         "\xe5\x19\x0a\x04\x60\xca\x45\xfc",
+> +               .klen   = 32,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\x44\x18\xc4\xb2\x25\xe5\xa6\x90"
-> +                         "\x7a\x12\x8c\x35\x6a\x98\x44\x3c"
-> +                         "\x4b\x67\x18\x24\x34\xce\x30\x7e",
-> +               .iv     =3D "\x8e\xf9\x6d\xf5\x52\x06\xb5\x07"
-> +                         "\xd1\x13\xfe\x36\x87\xee\x6e\x13"
-> +                         "\xea\xde\x54\xaf\x49\xc6\x4f\xce"
-> +                         "\xe1\x86\x8e\xcd\x22\x12\xde\x39",
-> +               .ptext  =3D "\x34\x14\x8d\x92\xa6\x83\xd5\x87"
-> +                         "\x89\xfd\xf7\xb1\x8f\x93\x0b\x1c",
-> +               .ctext  =3D "\x4f\xdd\xc7\x22\x85\x33\x9d\x34"
-> +                         "\xc8\x9b\x88\xfd\x8f\x40\xab\x42",
-> +               .klen   =3D 24,
-> +               .len    =3D 16,
+> +               .key    = "\xf8\x75\xa6\xba\x7b\x00\xf0\x71"
+> +                         "\x24\x5d\xdf\x93\x8b\xa3\x7d\x6d"
+> +                         "\x8e\x0f\x65\xf4\xe2\xbe\x2b\xaa"
+> +                         "\x2a\x0d\x9e\x00\x6a\x94\x80\xa1",
+> +               .iv     = "\xb9\xb7\x55\x26\x5f\x96\x16\x68"
+> +                         "\x5c\x5f\x58\xbb\x4e\x5a\xe1\x3b",
+> +               .ptext  = "\x2f\xd9\x2c\xc2\x98\x1e\x81\x5e"
+> +                         "\x89\xc8\xec\x1f\x56\x3e\xd9\xa4"
+> +                         "\x92\x48\xec\xfc\x5d\xeb\x7f\xad"
+> +                         "\x7a\x47\xe6\xda\x71\x1b\x2e\xfa",
+> +               .ctext  = "\x25\x5e\x38\x20\xcf\xbe\x4c\x6c"
+> +                         "\xe6\xce\xfc\xe2\xca\x6a\xa1\x62"
+> +                         "\x3a\xb7\xdf\x21\x3e\x49\xa6\xb8"
+> +                         "\x22\xd2\xc8\x37\xa4\x55\x09\xe6",
+> +               .klen   = 32,
+> +               .len    = 32,
 > +       },
 > +       {
-> +               .key    =3D "\x24\xf6\xe1\x62\xe5\xaf\x99\xda"
-> +                         "\x84\xec\x41\xb0\xa3\x0b\xd5\xa8"
-> +                         "\xa0\x3e\x7b\xa6\xdd\x6c\x8f\xa8",
-> +               .iv     =3D "\x7f\x80\x24\x62\x32\xdd\xab\x66"
-> +                         "\xf2\x87\x29\x24\xec\xd2\x4b\x9f"
-> +                         "\x0c\x33\x52\xd9\xe0\xcc\x6e\xe4"
-> +                         "\x90\x85\x43\x97\xc4\x62\x14\x33",
-> +               .ptext  =3D "\xef\x58\xe7\x7f\xa9\xd9\xb8\xd7"
-> +                         "\xa2\x91\x97\x07\x27\x9e\xba\xe8"
-> +                         "\xaa",
-> +               .ctext  =3D "\xd7\xc3\x81\x91\xf2\x40\x17\x73"
-> +                         "\x3e\x3b\x1c\x2a\x8e\x11\x9c\x17"
-> +                         "\xf1",
-> +               .klen   =3D 24,
-> +               .len    =3D 17,
+> +               .key    = "\x32\x37\x2b\x8f\x7b\xb1\x23\x79"
+> +                         "\x05\x52\xde\x05\xf1\x68\x3f\x6c"
+> +                         "\xa4\xae\xbc\x21\xc2\xc6\xf0\xbd"
+> +                         "\x0f\x20\xb7\xa4\xc5\x05\x7b\x64",
+> +               .iv     = "\xff\x26\x4e\x67\x48\xdd\xcf\xfe"
+> +                         "\x42\x09\x04\x98\x5f\x1e\xfa\x80",
+> +               .ptext  = "\x99\xdc\x3b\x19\x41\xf9\xff\x6e"
+> +                         "\x76\xb5\x03\xfa\x61\xed\xf8\x44"
+> +                         "\x70\xb9\xf0\x83\x80\x6e\x31\x77"
+> +                         "\x77\xe4\xc7\xb4\x77\x02\xab\x91"
+> +                         "\x82\xc6\xf8\x7c\x46\x61\x03\x69"
+> +                         "\x09\xa0\xf7\x12\xb7\x81\x6c\xa9"
+> +                         "\x10\x5c\xbb\x55\xb3\x44\xed\xb5"
+> +                         "\xa2\x52\x48\x71\x90\x5d\xda\x40"
+> +                         "\x0b\x7f\x4a\x11\x6d\xa7\x3d\x8e"
+> +                         "\x1b\xcd\x9d\x4e\x75\x8b\x7d\x87"
+> +                         "\xe5\x39\x34\x32\x1e\xe6\x8d\x51"
+> +                         "\xd4\x1f\xe3\x1d\x50\xa0\x22\x37"
+> +                         "\x7c\xb0\xd9\xfb\xb6\xb2\x16\xf6"
+> +                         "\x6d\x26\xa0\x4e\x8c\x6a\xe6\xb6"
+> +                         "\xbe\x4c\x7c\xe3\x88\x10\x18\x90"
+> +                         "\x11\x50\x19\x90\xe7\x19\x3f\xd0"
+> +                         "\x31\x15\x0f\x06\x96\xfe\xa7\x7b"
+> +                         "\xc3\x32\x88\x69\xa4\x12\xe3\x64"
+> +                         "\x02\x30\x17\x74\x6c\x88\x7c\x9b"
+> +                         "\xd6\x6d\x75\xdf\x11\x86\x70\x79"
+> +                         "\x48\x7d\x34\x3e\x33\x58\x07\x8b"
+> +                         "\xd2\x50\xac\x35\x15\x45\x05\xb4"
+> +                         "\x4d\x31\x97\x19\x87\x23\x4b\x87"
+> +                         "\x53\xdc\xa9\x19\x78\xf1\xbf\x35"
+> +                         "\x30\x04\x14\xd4\xcf\xb2\x8c\x87"
+> +                         "\x7d\xdb\x69\xc9\xcd\xfe\x40\x3e"
+> +                         "\x8d\x66\x5b\x61\xe5\xf0\x2d\x87"
+> +                         "\x93\x3a\x0c\x2b\x04\x98\x05\xc2"
+> +                         "\x56\x4d\xc4\x6c\xcd\x7a\x98\x7e"
+> +                         "\xe2\x2d\x79\x07\x91\x9f\xdf\x2f"
+> +                         "\x72\xc9\x8f\xcb\x0b\x87\x1b\xb7"
+> +                         "\x04\x86\xcb\x47\xfa\x5d\x03",
+> +               .ctext  = "\x0b\x00\xf7\xf2\xc8\x6a\xba\x9a"
+> +                         "\x0a\x97\x18\x7a\x00\xa0\xdb\xf4"
+> +                         "\x5e\x8e\x4a\xb7\xe0\x51\xf1\x75"
+> +                         "\x17\x8b\xb4\xf1\x56\x11\x05\x9f"
+> +                         "\x2f\x2e\xba\x67\x04\xe1\xb4\xa5"
+> +                         "\xfc\x7c\x8c\xad\xc6\xb9\xd1\x64"
+> +                         "\xca\xbd\x5d\xaf\xdb\x65\x48\x4f"
+> +                         "\x1b\xb3\x94\x5c\x0b\xd0\xee\xcd"
+> +                         "\xb5\x7f\x43\x8a\xd8\x8b\x66\xde"
+> +                         "\xd2\x9c\x13\x65\xa4\x47\xa7\x03"
+> +                         "\xc5\xa1\x46\x8f\x2f\x84\xbc\xef"
+> +                         "\x48\x9d\x9d\xb5\xbd\x43\xff\xd2"
+> +                         "\xd2\x7a\x5a\x13\xbf\xb4\xf6\x05"
+> +                         "\x17\xcd\x01\x12\xf0\x35\x27\x96"
+> +                         "\xf4\xc1\x65\xf7\x69\xef\x64\x1b"
+> +                         "\x6e\x4a\xe8\x77\xce\x83\x01\xb7"
+> +                         "\x60\xe6\x45\x2a\xcd\x41\x4a\xb5"
+> +                         "\x8e\xcc\x45\x93\xf1\xd6\x64\x5f"
+> +                         "\x32\x60\xe4\x29\x4a\x82\x6c\x86"
+> +                         "\x16\xe4\xcc\xdb\x5f\xc8\x11\xa6"
+> +                         "\xfe\x88\xd6\xc3\xe5\x5c\xbb\x67"
+> +                         "\xec\xa5\x7b\xf5\xa8\x4f\x77\x25"
+> +                         "\x5d\x0c\x2a\x99\xf9\xb9\xd1\xae"
+> +                         "\x3c\x83\x2a\x93\x9b\x66\xec\x68"
+> +                         "\x2c\x93\x02\x8a\x8a\x1e\x2f\x50"
+> +                         "\x09\x37\x19\x5c\x2a\x3a\xc2\xcb"
+> +                         "\xcb\x89\x82\x81\xb7\xbb\xef\x73"
+> +                         "\x8b\xc9\xae\x42\x96\xef\x70\xc0"
+> +                         "\x89\xc7\x3e\x6a\x26\xc3\xe4\x39"
+> +                         "\x53\xa9\xcf\x63\x7d\x05\xf3\xff"
+> +                         "\x52\x04\xf6\x7f\x23\x96\xe9\xf7"
+> +                         "\xff\xd6\x50\xa3\x0e\x20\x71",
+> +               .klen   = 32,
+> +               .len    = 255,
 > +       },
 > +       {
-> +               .key    =3D "\xa6\xc2\x58\x49\x28\x50\x8c\x88"
-> +                         "\x84\x9c\xb1\x70\x18\x99\x9c\x0d"
-> +                         "\x08\x60\x4f\xb1\xcf\x90\x66\x72",
-> +               .iv     =3D "\x80\x14\x7f\x97\x64\x17\x55\xef"
-> +                         "\x4b\x1b\xce\x2b\x09\x20\x5a\xed"
-> +                         "\x96\xdc\xa6\x6e\xb0\x59\x54\x00"
-> +                         "\x1d\x26\x3d\x96\xc2\x3e\x73\x05",
-> +               .ptext  =3D "\x49\x8b\x90\x34\x41\x63\xc6\x9a"
-> +                         "\x07\xe0\x9d\x86\x77\x54\x63\x6d"
-> +                         "\x6a",
-> +               .ctext  =3D "\xcb\x94\xfa\xc3\xeb\xf8\x37\xfe"
-> +                         "\x15\x76\x03\xd9\x67\xe4\x90\x28"
-> +                         "\x0c",
-> +               .klen   =3D 24,
-> +               .len    =3D 17,
+> +               .key    = "\x49\x85\x84\x69\xd4\x5f\xf9\xdb"
+> +                         "\xf2\xc4\x1c\x62\x20\x88\xea\x8a"
+> +                         "\x5b\x69\xe6\x3b\xe2\x5c\xfe\xce"
+> +                         "\xe1\x7a\x27\x7b\x1c\xc9\xb4\x43",
+> +               .iv     = "\xae\x98\xdb\xef\x5c\x6b\xe9\x27"
+> +                         "\x1a\x2f\x51\x17\x97\x7d\x4f\x10",
+> +               .ptext  = "\xbe\xf2\x8f\x8a\x51\x9e\x3d\xff"
+> +                         "\xd7\x68\x0f\xd2\xf2\x5b\xe3\xa5"
+> +                         "\x59\x3e\xcd\xab\x46\xc6\xe9\x24"
+> +                         "\x43\xbc\xb8\x37\x1f\x55\x7f\xb5"
+> +                         "\xc0\xa6\x68\xdf\xbf\x21\x1e\xed"
+> +                         "\x67\x73\xb7\x06\x47\xff\x67\x07"
+> +                         "\x5b\x94\xab\xef\x43\x95\x52\xce"
+> +                         "\xe7\x71\xbd\x72\x5b\x3a\x25\x01"
+> +                         "\xed\x7d\x02\x2d\x72\xd6\xc4\x3d"
+> +                         "\xd2\xf5\xe5\xb3\xf2\xd7\xa1\x8d"
+> +                         "\x12\x0d\x3b\x4a\x58\xf4\x1b\xfd"
+> +                         "\xcd\x2c\x13\x05\x07\x3d\x30\x8a"
+> +                         "\x1f\xc6\xed\xfc\x7c\x3c\xa6\x1c"
+> +                         "\x64\x2c\x36\xa8\x5d\xe2\xfa\x12"
+> +                         "\xd7\x17\xa9\x39\x43\x63\xbf\x44"
+> +                         "\xd0\xcb\x4c\xf0\xab\xe6\x75\xd6"
+> +                         "\x60\xd1\x64\x9e\x01\x2b\x97\x52"
+> +                         "\x97\x24\x32\xb0\xfa\x22\xf4\x04"
+> +                         "\xe6\x98\x6a\xbc\xba\xe8\x65\xad"
+> +                         "\x60\x08\xfc\xd7\x40\xf8\x2a\xf2"
+> +                         "\x5e\x32\x32\x82\x24\x12\xda\xbc"
+> +                         "\x8f\x1c\xd4\x06\x81\x08\x80\x35"
+> +                         "\x20\xa5\xa8\x3a\x6e\x3e\x2f\x78"
+> +                         "\xe4\x7d\x9e\x81\x43\xb8\xfe\xa7"
+> +                         "\x3b\xa9\x9b\x1a\xe7\xce\xd2\x3d"
+> +                         "\xc1\x27\x26\x22\x35\x12\xa2\xc6"
+> +                         "\x59\x51\x22\x31\x7b\xc8\xca\xa6"
+> +                         "\xa9\xf3\x16\x57\x72\x3d\xfa\x24"
+> +                         "\x66\x56\x5d\x21\x29\x9e\xf2\xff"
+> +                         "\xae\x0c\x71\xcf\xc5\xf0\x98\xe5"
+> +                         "\xa1\x05\x96\x94\x3e\x36\xed\x97"
+> +                         "\xc7\xee\xcd\xc2\x54\x35\x5c",
+> +               .ctext  = "\xde\x7f\x5e\xac\x6f\xec\xed\x2a"
+> +                         "\x3a\x3b\xb3\x36\x19\x46\x26\x27"
+> +                         "\x09\x7b\x49\x47\x1b\x88\x43\xb7"
+> +                         "\x65\x67\xef\x0b\xe4\xde\x0a\x97"
+> +                         "\x7f\xab\x32\x7c\xa2\xde\x4e\xba"
+> +                         "\x11\x9b\x19\x12\x7d\x03\x01\x15"
+> +                         "\xa3\x90\x9f\x52\x9d\x29\x3d\x5c"
+> +                         "\xc6\x71\x59\x2c\x44\x8f\xb7\x8c"
+> +                         "\x0d\x75\x81\x76\xe2\x11\x96\x41"
+> +                         "\xae\x48\x27\x0e\xbc\xaf\x1d\xf5"
+> +                         "\x51\x68\x5a\x34\xe5\x6d\xdf\x60"
+> +                         "\xc7\x9d\x4e\x1a\xaa\xb5\x1a\x57"
+> +                         "\x58\x6a\xa4\x79\x0a\xa9\x50\x8d"
+> +                         "\x93\x59\xef\x5b\x23\xdb\xc8\xb3"
+> +                         "\x38\x96\x8c\xdf\x7d\x6a\x3d\x53"
+> +                         "\x84\x9d\xb0\xf0\x07\x5f\xff\x67"
+> +                         "\xff\x5b\x3c\x8b\x1f\xa2\x3b\xcf"
+> +                         "\xf5\x86\x7c\xbc\x98\x38\x7a\xe5"
+> +                         "\x96\x56\xba\x44\x85\x29\x4f\x3a"
+> +                         "\x64\xde\xec\xc6\x53\xf0\x30\xca"
+> +                         "\xa4\x90\x4f\x9c\x2e\x0e\xec\x2d"
+> +                         "\x8c\x38\x1c\x93\x9a\x5d\x5d\x98"
+> +                         "\xf9\x2c\xf7\x27\x71\x3c\x69\xa9"
+> +                         "\x0b\xec\xd9\x9c\x6c\x69\x09\x47"
+> +                         "\xd9\xc2\x84\x6e\x3e\x2d\x9f\x1f"
+> +                         "\xb6\x13\x62\x4c\xf3\x33\x44\x13"
+> +                         "\x6c\x43\x0a\xae\x8e\x89\xd6\x27"
+> +                         "\xdd\xc3\x5b\x37\x62\x09\x47\x94"
+> +                         "\xe3\xea\x7d\x08\x14\x70\xb1\x8e"
+> +                         "\x83\x4a\xcb\xc0\xa9\xf2\xa3\x02"
+> +                         "\xe9\xa0\x44\xfe\xcf\x5a\x15\x50"
+> +                         "\xc4\x5a\x6f\xc8\xd6\xf1\x83",
+> +               .klen   = 32,
+> +               .len    = 255,
 > +       },
-> +       {
-> +               .key    =3D "\xbf\xaf\xd7\x67\x8c\x47\xcf\x21"
-> +                         "\x8a\xa5\xdd\x32\x25\x47\xbe\x4f"
-> +                         "\xf1\x3a\x0b\xa6\xaa\x2d\xcf\x09",
-> +               .iv     =3D "\xd9\xe8\xf0\x92\x4e\xfc\x1d\xf2"
-> +                         "\x81\x37\x7c\x8f\xf1\x59\x09\x20"
-> +                         "\xf4\x46\x51\x86\x4f\x54\x8b\x32"
-> +                         "\x58\xd1\x99\x8b\x8c\x03\xeb\x5d",
-> +               .ptext  =3D "\xcd\x64\x90\xf9\x7c\xe5\x0e\x5a"
-> +                         "\x75\xe7\x8e\x39\x86\xec\x20\x43"
-> +                         "\x8a\x49\x09\x15\x47\xf4\x3c\x89"
-> +                         "\x21\xeb\xcf\x4e\xcf\x91\xb5\x40"
-> +                         "\xcd\xe5\x4d\x5c\x6f\xf2\xd2\x80"
-> +                         "\xfa\xab\xb3\x76\x9f\x7f\x84\x0a",
-> +               .ctext  =3D "\x44\x98\x64\x15\xb7\x0b\x80\xa3"
-> +                         "\xb9\xca\x23\xff\x3b\x0b\x68\x74"
-> +                         "\xbb\x3e\x20\x19\x9f\x28\x71\x2a"
-> +                         "\x48\x3c\x7c\xe2\xef\xb5\x10\xac"
-> +                         "\x82\x9f\xcd\x08\x8f\x6b\x16\x6f"
-> +                         "\xc3\xbb\x07\xfb\x3c\xb0\x1b\x27",
-> +               .klen   =3D 24,
-> +               .len    =3D 48,
-> +       },
-> +       {
-> +               .key    =3D "\xbe\xbb\x77\x46\x06\x9c\xf4\x4d"
-> +                         "\x37\x9a\xe6\x3f\x27\xa7\x3b\x6e"
-> +                         "\x7a\x36\xb8\xb3\xff\xba\x51\xcc",
-> +               .iv     =3D "\x06\xbc\x8f\x66\x6a\xbe\xed\x5e"
-> +                         "\x51\xf2\x72\x11\x3a\x56\x85\x21"
-> +                         "\x44\xfe\xec\x47\x2b\x09\xb8\x6f"
-> +                         "\x08\x85\x2a\x93\xa3\xc3\xab\x5e",
-> +               .ptext  =3D "\xc7\x74\x42\xf1\xea\xc5\x37\x2d"
-> +                         "\xc2\xa0\xf6\xd5\x5a\x9a\xbb\xa0"
-> +                         "\xb2\xfd\x54\x8e\x98\xa0\xea\xc7"
-> +                         "\x79\x09\x65\x63\xa0\x2e\x82\x4e"
-> +                         "\x49\x9c\x39\x67\xd0\x0d\x80\x3e"
-> +                         "\x1a\x86\x84\x2b\x20\x23\xdf\xa7",
-> +               .ctext  =3D "\x5f\xa3\x11\xca\x93\xfa\x24\x3a"
-> +                         "\x24\xb6\xcf\x1e\x76\xbc\xab\xc4"
-> +                         "\xf3\x24\xa0\x27\xac\x90\xec\xe9"
-> +                         "\x73\x28\x7d\x35\x67\xfe\x2e\xa8"
-> +                         "\x89\x77\xac\xeb\xc3\x68\x36\xf4"
-> +                         "\x8f\x80\x2c\xf1\x80\xef\x49\x49",
-> +               .klen   =3D 24,
-> +               .len    =3D 48,
-> +       },
-> +       {
-> +               .key    =3D "\x76\xe4\x8f\xf0\x60\x7b\xe4\x0d"
-> +                         "\xb9\x06\xfa\x90\x38\x55\x0a\x98"
-> +                         "\xaa\x7d\x97\xfe\x8d\x77\x39\x9f",
-> +               .iv     =3D "\xf7\x2c\x39\x70\xa4\x28\x66\x45"
-> +                         "\xea\x62\x1b\xdd\xb0\xfa\x6c\x50"
-> +                         "\xcf\xf7\x4a\x57\xdf\x1e\xa4\xf0"
-> +                         "\x0f\xf6\x8a\x71\x15\xcf\xa0\x29",
-> +               .ptext  =3D "\x9c\x15\x7c\xc0\x70\x49\x65\xac"
-> +                         "\x95\x67\x37\x40\x8b\x0e\x9d\xa9"
-> +                         "\x66\x0a\x5e\x32\x58\xa1\x40\x8d"
-> +                         "\x46\xa2\xbd\x4f\x5a\xb1\x5f\xd5"
-> +                         "\x9d\x8e\x55\x18\x7e\x43\x43\xa9"
-> +                         "\x55\x1a\x3f\x50\x51\x7a\xc9\x1b"
-> +                         "\x2f\xd8\x36\x35\x41\xf3\x3d\x42"
-> +                         "\x7e\x3e\xd5\x94\x6b\xa7\xa0\xc6"
-> +                         "\x02\x35\xba\x59\x7a\xc3\xda\xca"
-> +                         "\xa3\x73\x18\x6a\x57\x2f\xbd\xe8"
-> +                         "\xc8\x3a\x6c\x07\x0e\xea\x6c\x17"
-> +                         "\x4f\x3a\xcc\xc3\x70\x89\x99\x23"
-> +                         "\x78\x38\xd7\x60\x51\x5a\xe5\xec"
-> +                         "\x19\x98\x5b\x78\x9f\xb8\xb9\x00"
-> +                         "\x7c\xf8\xab\x23\x59\xf0\x71\xcf"
-> +                         "\x7f\x06\x11\x55\x85\x94\xe5\x50"
-> +                         "\x0d\x01\x93\xcb\xde\x58\x90\x00"
-> +                         "\xc5\x34\x7e\xda\x26\xbf\x58\x15"
-> +                         "\x80\x33\x34\x56\x86\xaa\xc8\x6e"
-> +                         "\x2b\x47\x98\xb6\xc9\x1c\xa4\xb6"
-> +                         "\xac\xf1\x76\xfe\x33\x57\x2d\xad"
-> +                         "\x42\x15\x34\xba\x71\x96\xfe\x0e"
-> +                         "\xba\xee\x68\x36\x3a\xe0\xe7\xc7"
-> +                         "\x3e\x6d\x54\xda\x77\x04\x26\x2c"
-> +                         "\xc1\x45\x16\xd9\xdd\x89\xd3\xf1"
-> +                         "\xcc\xfc\x19\x44\x6c\x99\xb2\x44"
-> +                         "\x1f\x89\x34\x21\xb1\x8d\x02\x5c"
-> +                         "\x76\x1e\x27\x84\xf9\xd4\xa3\x03"
-> +                         "\x1d\x26\xc1\x39\xb6\x67\x6c\xad"
-> +                         "\xb5\x69\x6b\x54\x65\xf6\x9c\xcf"
-> +                         "\xaf\x00\x12\x87\x21\x2f\x68\xcb"
-> +                         "\xd2\x76\xc1\x43\xce\x24\xc2",
-> +               .ctext  =3D "\x40\xff\x83\x8e\xef\x98\xa1\xcb"
-> +                         "\x57\x3f\xb6\xf3\x26\x99\x96\xe2"
-> +                         "\xd0\x68\x80\x32\x2c\x58\x9a\xd6"
-> +                         "\x24\xd0\x21\x17\xc0\x6e\x44\xb6"
-> +                         "\xa7\xa0\xdd\xde\xce\x18\x5a\x17"
-> +                         "\xf2\xc1\x98\xab\x61\xcd\x70\x0a"
-> +                         "\x4d\xef\x9f\xa6\x9d\x8b\x45\x81"
-> +                         "\x23\x90\x65\xe0\x45\x2c\x74\xc5"
-> +                         "\x7d\xe8\x43\xec\x5a\xfa\x54\x64"
-> +                         "\x6f\xfc\x4b\x6c\x83\xec\x1d\xbc"
-> +                         "\x39\x19\x2f\xa7\xe6\x46\x5a\x4e"
-> +                         "\x17\x6d\x0b\xf2\x7a\x14\x0c\x50"
-> +                         "\x8e\x83\x00\xb7\xbb\x65\x77\xfd"
-> +                         "\x72\xb3\xea\xe4\xde\x54\xd6\xc0"
-> +                         "\x8c\x02\xb2\xdb\xc3\xe6\x46\xd5"
-> +                         "\xfb\xb4\x03\x29\xdc\xa4\x64\xe3"
-> +                         "\xe8\x20\xb5\x4d\x81\x44\x20\xc8"
-> +                         "\x29\x41\xce\x05\x3a\xd6\xe3\x0e"
-> +                         "\x0b\xea\xdf\x50\xea\x91\xaa\x9b"
-> +                         "\xc4\x9c\x09\x4a\x42\xfa\xef\x38"
-> +                         "\x3b\xdf\xfb\x5b\x95\xa2\x9a\xbd"
-> +                         "\x10\x55\x61\x4a\xee\x8b\xda\x1f"
-> +                         "\x23\x69\xce\x6e\x92\x64\x3e\x32"
-> +                         "\x4d\x80\x23\xf1\x43\xd7\x01\x54"
-> +                         "\x6f\x18\x4c\x53\x91\xd5\xaa\xeb"
-> +                         "\x17\x73\x92\x7f\x10\x7b\x57\x02"
-> +                         "\x8e\x6f\xce\x63\x83\x6b\x12\xba"
-> +                         "\xbc\x23\xcb\x95\x3a\x1f\x16\xe5"
-> +                         "\x21\xf7\x52\x17\x43\x28\x52\xaf"
-> +                         "\x2e\x6f\x7f\x36\xe6\x0c\x31\x90"
-> +                         "\x57\xf7\x5f\x7c\x06\x3e\x47\x5f"
-> +                         "\xb8\xc4\x2a\xeb\xd7\x91\xf1",
-> +               .klen   =3D 24,
-> +               .len    =3D 255,
-> +       },
-> +       {
-> +               .key    =3D "\x87\x2b\xdd\x36\x2a\x76\x60\xce"
-> +                         "\xfb\x54\xa7\x5a\x3f\x40\xcd\x10"
-> +                         "\xc8\x88\x0e\xd8\x83\x31\xd5\x5e",
-> +               .iv     =3D "\x3b\x6c\x32\xde\x9c\x02\xb6\xa1"
-> +                         "\x13\xfe\x8d\x4a\x8d\xf8\x15\x8d"
-> +                         "\x0b\x2c\x14\x1c\x44\xd4\x1f\x7e"
-> +                         "\xcc\x33\xf0\x03\xa3\x41\x3e\x6d",
-> +               .ptext  =3D "\x6a\x0c\x6b\x8b\x44\x75\x77\x0b"
-> +                         "\x7d\x9f\xca\x35\x27\x36\xbf\xe3"
-> +                         "\xc2\x09\x3e\x6e\x42\xd4\x81\xc2"
-> +                         "\x4a\xd5\xa3\x00\x5d\x2b\x97\x0a"
-> +                         "\xe0\xd9\x8b\x10\x79\x74\xf4\x5f"
-> +                         "\xef\xf0\xc7\x3b\xbc\xbe\x69\xe4"
-> +                         "\x0f\xb8\xa2\x39\x15\x70\x3a\xa6"
-> +                         "\x20\x86\x8b\x3c\x6e\xca\xfc\x36"
-> +                         "\xea\x32\x5f\xa6\x17\x2b\xd3\x24"
-> +                         "\x65\x69\x9c\x13\x5c\x56\xb6\x14"
-> +                         "\x3a\x8f\x21\x40\xde\x23\x6f\x8b"
-> +                         "\x2f\xa8\xa4\x81\x91\xb6\xbe\x7c"
-> +                         "\x12\x25\x7c\x87\xb8\x74\x6a\xa7"
-> +                         "\x8d\xa5\xb9\x8c\xb4\xa9\xd2\x6a"
-> +                         "\xb2\xb3\x6e\x8b\x40\x9f\xf2\x38"
-> +                         "\xd8\x26\xf1\xfa\x6f\xb9\x29\xfe"
-> +                         "\x0f\xc1\x4d\x90\xf8\x49\xe1\x72"
-> +                         "\x70\x63\x35\xdc\xfe\xb4\x72\x06"
-> +                         "\xae\x7e\xbe\x36\x23\xa2\x4a\x03"
-> +                         "\x6c\xa8\xa0\x7a\x5c\x44\x60\xc4"
-> +                         "\x2b\x50\xa1\x19\xa4\x35\xfc\x00"
-> +                         "\xd1\x0a\x8f\x9c\x54\x5b\xdc\x53"
-> +                         "\x68\x7b\x7b\x1e\xd0\x8e\xd0\x93"
-> +                         "\x8f\xaf\xf5\xa2\x40\xe1\x15\x33"
-> +                         "\x49\x41\xaa\x57\xf3\x13\x1b\xa5"
-> +                         "\x8a\xab\x01\x2b\x28\xec\x63\x81"
-> +                         "\x34\x77\xf1\x3f\xc2\x47\x09\x31"
-> +                         "\xc2\x80\x1c\xa9\x16\x6b\xa5\x0a"
-> +                         "\x1c\xbe\x23\x0c\x41\x63\xd6\x92"
-> +                         "\x7f\x3a\x74\x71\x86\x5e\x30\xc1"
-> +                         "\xc5\xee\x5b\x41\x9a\xed\x43\xab"
-> +                         "\x10\x40\xc4\xe6\xf3\xaa\xc2",
-> +               .ctext  =3D "\x45\x61\x53\x5c\x56\x08\xc2\x78"
-> +                         "\x01\x23\x8d\x9d\x8e\xeb\xca\xcd"
-> +                         "\xf5\x1f\x01\x3f\xba\x9d\xea\x87"
-> +                         "\xca\x23\xc5\xa8\xb2\x92\x87\x0d"
-> +                         "\x62\x8c\x72\x9c\xe8\xa5\x3f\x75"
-> +                         "\xda\xa4\xd5\x92\x6f\xae\x4e\xeb"
-> +                         "\xfd\x21\xe6\xa9\x7e\xbf\xed\x85"
-> +                         "\xbd\x8c\x88\x18\xa8\x79\xd0\x09"
-> +                         "\x5b\x6b\x96\x32\x63\x1a\x6e\x27"
-> +                         "\x72\xa3\x7a\xc4\x48\xf3\xed\x04"
-> +                         "\x5d\xc7\x01\x23\x7c\x36\x57\x57"
-> +                         "\xf4\x45\xf6\xf6\xc7\x9a\xb2\x2f"
-> +                         "\x88\x79\xac\xaf\xfd\x52\xa7\x96"
-> +                         "\x83\x65\x5d\x6b\xa2\x3b\x2b\x17"
-> +                         "\x6c\xa7\xe3\x03\x2e\x6b\xa5\x80"
-> +                         "\x32\x0b\x7c\x86\x38\x64\x24\x64"
-> +                         "\x51\x61\xca\xa8\xdc\x67\x6a\x17"
-> +                         "\x96\xc8\xbd\xd0\x0f\x99\x78\x75"
-> +                         "\xbb\x81\xc8\x35\xc1\x5c\x48\x66"
-> +                         "\x75\x8a\xed\x44\x57\x10\xc9\xd8"
-> +                         "\x85\x91\xaf\x2b\xdd\xc0\xfc\x7f"
-> +                         "\x19\x9d\x22\x8f\x94\xe7\xb0\x86"
-> +                         "\x34\x17\xd3\xe1\x10\x2a\x30\x3a"
-> +                         "\x4d\x5b\xab\x99\xf5\xf8\x21\x78"
-> +                         "\x9d\x1b\xba\x1f\xb9\x18\x20\xfa"
-> +                         "\x12\x09\x65\xb0\x2c\xf0\x0c\x11"
-> +                         "\x4d\x91\xb0\xa0\x24\xb0\xf8\x61"
-> +                         "\xe0\x65\xc1\x21\x72\x98\xbc\x29"
-> +                         "\x92\x85\x2c\xfc\xa1\x0c\xa0\x04"
-> +                         "\x6d\x21\x3d\x40\x62\xda\x55\x71"
-> +                         "\xee\xa1\x1e\x5e\xc3\x42\x0b\xa0"
-> +                         "\x4b\xe5\xbd\x95\xa9\xdf\x70",
-> +               .klen   =3D 24,
-> +               .len    =3D 255,
-> +       },
-> +       {
-> +               .key    =3D "\x9e\xeb\xb2\x49\x3c\x1c\xf5\xf4"
-> +                         "\x6a\x99\xc2\xc4\xdf\xb1\xf4\xdd"
-> +                         "\x75\x20\x57\xea\x2c\x4f\xcd\xb2"
-> +                         "\xa5\x3d\x7b\x49\x1e\xab\xfd\x0f",
-> +               .iv     =3D "\xdf\x63\xd4\xab\xd2\x49\xf3\xd8"
-> +                         "\x33\x81\x37\x60\x7d\xfa\x73\x08"
-> +                         "\xd8\x49\x6d\x80\xe8\x2f\x62\x54"
-> +                         "\xeb\x0e\xa9\x39\x5b\x45\x7f\x8a",
-> +               .ptext  =3D "\x67\xc9\xf2\x30\x84\x41\x8e\x43"
-> +                         "\xfb\xf3\xb3\x3e\x79\x36\x7f\xe8",
-> +               .ctext  =3D "\x27\x38\x78\x47\x16\xd9\x71\x35"
-> +                         "\x2e\x7e\xdd\x7e\x43\x3c\xb8\x40",
-> +               .klen   =3D 32,
-> +               .len    =3D 16,
-> +       },
-> +       {
-> +               .key    =3D "\x50\x4a\xc8\x94\x01\x13\xd3\x0c"
-> +                         "\xd9\xaa\xf3\x4c\xf8\x3f\x2c\x39"
-> +                         "\x9e\xec\xc6\xa8\x97\xf2\x8e\x73"
-> +                         "\x94\xb8\x4c\x40\x03\x28\xaf\xc2",
-> +               .iv     =3D "\x9e\xaa\x0b\x7f\x12\x2a\xe3\xdf"
-> +                         "\x05\x03\x93\x1b\xda\xc8\xd7\x98"
-> +                         "\x8a\xf9\xdf\x63\xb1\xcd\x15\xaa"
-> +                         "\x02\x8e\x41\xa0\x75\x1d\x17\x0e",
-> +               .ptext  =3D "\xe2\x8a\x35\xa7\x10\x0d\x65\x6e"
-> +                         "\xad\x77\xce\x07\xbb\x67\x83\x03",
-> +               .ctext  =3D "\x81\xc1\x1c\x06\x73\xcb\xc1\xe6"
-> +                         "\xed\x1f\x5b\xf0\x7d\x8b\x12\xf8",
-> +               .klen   =3D 32,
-> +               .len    =3D 16,
-> +       },
-> +       {
-> +               .key    =3D "\x93\xfa\x7e\xe2\x0e\x67\xc4\x39"
-> +                         "\xe7\xca\x47\x95\x68\x9d\x5e\x5a"
-> +                         "\x7c\x26\x19\xab\xc6\xca\x6a\x4c"
-> +                         "\x45\xa6\x96\x42\xae\x6c\xff\xe7",
-> +               .iv     =3D "\xea\x82\x47\x95\x3b\x22\xa1\x3a"
-> +                         "\x6a\xca\x24\x4c\x50\x7e\x23\xcd"
-> +                         "\x0e\x50\xe5\x41\xb6\x65\x29\xd8"
-> +                         "\x30\x23\x00\xd2\x54\xa7\xd6\x56",
-> +               .ptext  =3D "\xdb\x1f\x1f\xec\xad\x83\x6e\x5d"
-> +                         "\x19\xa5\xf6\x3b\xb4\x93\x5a\x57"
-> +                         "\x6f",
-> +               .ctext  =3D "\xf1\x46\x6e\x9d\xb3\x01\xf0\x6b"
-> +                         "\xc2\xac\x57\x88\x48\x6d\x40\x72"
-> +                         "\x68",
-> +               .klen   =3D 32,
-> +               .len    =3D 17,
-> +       },
-> +       {
-> +               .key    =3D "\xbe\xa5\x63\xe5\x3d\xa6\xdd\x83"
-> +                         "\x12\x4e\x52\x3e\xb7\x47\x13\xc0"
-> +                         "\x98\x57\x14\x8c\xe9\xbe\x0d\xb4"
-> +                         "\xa7\x82\x0e\x99\x82\x94\x0f\x60",
-> +               .iv     =3D "\x36\xdf\x56\x4d\xcf\x6a\xd2\xf4"
-> +                         "\x35\x92\x3d\xd2\x31\x24\xf8\xa6"
-> +                         "\x27\x27\xe4\x55\xe2\xe0\xc3\xb5"
-> +                         "\xe7\x40\x31\xae\x98\xab\xab\x93",
-> +               .ptext  =3D "\xf4\x54\x01\xb5\x11\xe3\xed\x8d"
-> +                         "\xa4\xf0\xf7\x3f\xc8\x4b\xac\x7a"
-> +                         "\xb9",
-> +               .ctext  =3D "\xa7\xb5\xa4\xaa\x6b\x56\xdb\x79"
-> +                         "\x30\xa1\x6e\xfe\xa2\x60\xcb\xb3"
-> +                         "\x10",
-> +               .klen   =3D 32,
-> +               .len    =3D 17,
-> +       },
-> +       {
-> +               .key    =3D "\x03\x65\x03\x6e\x4d\xe6\xe8\x4e"
-> +                         "\x8b\xbe\x22\x19\x48\x31\xee\xd9"
-> +                         "\xa0\x91\x21\xbe\x62\x89\xde\x78"
-> +                         "\xd9\xb0\x36\xa3\x3c\xce\x43\xd5",
-> +               .iv     =3D "\xa9\xc3\x4b\xe7\x0f\xfc\x6d\xbf"
-> +                         "\x56\x27\x21\x1c\xfc\xd6\x04\x10"
-> +                         "\x5f\x43\xe2\x30\x35\x29\x6c\x10"
-> +                         "\x90\xf1\xbf\x61\xed\x0f\x8a\x91",
-> +               .ptext  =3D "\x07\xaa\x02\x26\xb4\x98\x11\x5e"
-> +                         "\x33\x41\x21\x51\x51\x63\x2c\x72"
-> +                         "\x00\xab\x32\xa7\x1c\xc8\x3c\x9c"
-> +                         "\x25\x0e\x8b\x9a\xdf\x85\xed\x2d"
-> +                         "\xf4\xf2\xbc\x55\xca\x92\x6d\x22"
-> +                         "\xfd\x22\x3b\x42\x4c\x0b\x74\xec",
-> +               .ctext  =3D "\x7b\xb1\x43\x6d\xd8\x72\x6c\xf6"
-> +                         "\x67\x6a\x00\xc4\xf1\xf0\xf5\xa4"
-> +                         "\xfc\x60\x91\xab\x46\x0b\x15\xfc"
-> +                         "\xd7\xc1\x28\x15\xa1\xfc\xf7\x68"
-> +                         "\x8e\xcc\x27\x62\x00\x64\x56\x72"
-> +                         "\xa6\x17\xd7\x3f\x67\x80\x10\x58",
-> +               .klen   =3D 32,
-> +               .len    =3D 48,
-> +       },
-> +       {
-> +               .key    =3D "\x93\x14\x30\x98\x95\xda\xad\xeb"
-> +                         "\xb8\x22\xb5\x98\x57\x7c\xfa\x14"
-> +                         "\x88\x8a\x70\x76\x09\x7d\x03\xb7"
-> +                         "\xf9\x1d\x5d\x30\x1f\x24\xb2\xce",
-> +               .iv     =3D "\x47\xb7\x08\xb9\xc1\xf5\x12\x57"
-> +                         "\x68\x4d\x74\x71\xc3\x0b\x05\xc5"
-> +                         "\x8d\x00\x48\x9d\x3a\xfc\x85\x05"
-> +                         "\x49\x82\x96\x95\x09\x1a\x17\x27",
-> +               .ptext  =3D "\x3f\xf5\x2c\x26\x53\x6c\xdc\x88"
-> +                         "\x5e\xf3\x2e\x0d\x22\xe4\xef\x4e"
-> +                         "\xad\xaf\xe5\xf7\x5c\xd3\x84\x0e"
-> +                         "\xe1\xbb\x19\x0a\xcf\x1e\xb6\xf3"
-> +                         "\x53\xf3\x25\xa2\x66\x7a\xd2\x97"
-> +                         "\x58\x39\x7a\xd6\x4b\x7f\x31\x76",
-> +               .ctext  =3D "\x75\x16\xb1\x9a\xa9\x9d\x12\x78"
-> +                         "\x5a\xd1\x36\xc5\x11\x4c\x1a\xc5"
-> +                         "\x9b\x21\x12\x0b\xef\x13\xbc\xd0"
-> +                         "\x31\x03\xcc\xd9\xf5\x59\x23\xb6"
-> +                         "\x70\xaf\xc2\x84\x57\x5c\xad\xc7"
-> +                         "\x89\x6a\xf4\x39\x14\x7e\x0d\x0d",
-> +               .klen   =3D 32,
-> +               .len    =3D 48,
-> +       },
-> +       {
-> +               .key    =3D "\x36\x45\x11\xa2\x98\x5f\x96\x7c"
-> +                         "\xc6\xb4\x94\x31\x0a\x67\x09\x32"
-> +                         "\x6c\x6f\x6f\x00\xf0\x17\xcb\xac"
-> +                         "\xa5\xa9\x47\x9e\x2e\x85\x2f\xfa",
-> +               .iv     =3D "\x28\x88\xaa\x9b\x59\x3b\x1e\x97"
-> +                         "\x82\xe5\x5c\x9e\x6d\x14\x11\x19"
-> +                         "\x6e\x38\x8f\xd5\x40\x2b\xca\xf9"
-> +                         "\x7b\x4c\xe4\xa3\xd0\xd2\x8a\x13",
-> +               .ptext  =3D "\x95\xd2\xf7\x71\x1b\xca\xa5\x86"
-> +                         "\xd9\x48\x01\x93\x2f\x79\x55\x29"
-> +                         "\x71\x13\x15\x0e\xe6\x12\xbc\x4d"
-> +                         "\x8a\x31\xe3\x40\x2a\xc6\x5e\x0d"
-> +                         "\x68\xbb\x4a\x62\x8d\xc7\x45\x77"
-> +                         "\xd2\xb8\xc7\x1d\xf1\xd2\x5d\x97"
-> +                         "\xcf\xac\x52\xe5\x32\x77\xb6\xda"
-> +                         "\x30\x85\xcf\x2b\x98\xe9\xaa\x34"
-> +                         "\x62\xb5\x23\x9e\xb7\xa6\xd4\xe0"
-> +                         "\xb4\x58\x18\x8c\x4d\xde\x4d\x01"
-> +                         "\x83\x89\x24\xca\xfb\x11\xd4\x82"
-> +                         "\x30\x7a\x81\x35\xa0\xb4\xd4\xb6"
-> +                         "\x84\xea\x47\x91\x8c\x19\x86\x25"
-> +                         "\xa6\x06\x8d\x78\xe6\xed\x87\xeb"
-> +                         "\xda\xea\x73\x7c\xbf\x66\xb8\x72"
-> +                         "\xe3\x0a\xb8\x0c\xcb\x1a\x73\xf1"
-> +                         "\xa7\xca\x0a\xde\x57\x2b\xbd\x2b"
-> +                         "\xeb\x8b\x24\x38\x22\xd3\x0e\x1f"
-> +                         "\x17\xa0\x84\x98\x31\x77\xfd\x34"
-> +                         "\x6a\x4e\x3d\x84\x4c\x0e\xfb\xed"
-> +                         "\xc8\x2a\x51\xfa\xd8\x73\x21\x8a"
-> +                         "\xdb\xb5\xfe\x1f\xee\xc4\xe8\x65"
-> +                         "\x54\x84\xdd\x96\x6d\xfd\xd3\x31"
-> +                         "\x77\x36\x52\x6b\x80\x4f\x9e\xb4"
-> +                         "\xa2\x55\xbf\x66\x41\x49\x4e\x87"
-> +                         "\xa7\x0c\xca\xe7\xa5\xc5\xf6\x6f"
-> +                         "\x27\x56\xe2\x48\x22\xdd\x5f\x59"
-> +                         "\x3c\xf1\x9f\x83\xe5\x2d\xfb\x71"
-> +                         "\xad\xd1\xae\x1b\x20\x5c\x47\xb7"
-> +                         "\x3b\xd3\x14\xce\x81\x42\xb1\x0a"
-> +                         "\xf0\x49\xfa\xc2\xe7\x86\xbf\xcd"
-> +                         "\xb0\x95\x9f\x8f\x79\x41\x54",
-> +               .ctext  =3D "\xf6\x57\x51\xc4\x25\x61\x2d\xfa"
-> +                         "\xd6\xd9\x3f\x9a\x81\x51\xdd\x8e"
-> +                         "\x3d\xe7\xaa\x2d\xb1\xda\xc8\xa6"
-> +                         "\x9d\xaa\x3c\xab\x62\xf2\x80\xc3"
-> +                         "\x2c\xe7\x58\x72\x1d\x44\xc5\x28"
-> +                         "\x7f\xb4\xf9\xbc\x9c\xb2\xab\x8e"
-> +                         "\xfa\xd1\x4d\x72\xd9\x79\xf5\xa0"
-> +                         "\x24\x3e\x90\x25\x31\x14\x38\x45"
-> +                         "\x59\xc8\xf6\xe2\xc6\xf6\xc1\xa7"
-> +                         "\xb2\xf8\xa7\xa9\x2b\x6f\x12\x3a"
-> +                         "\xb0\x81\xa4\x08\x57\x59\xb1\x56"
-> +                         "\x4c\x8f\x18\x55\x33\x5f\xd6\x6a"
-> +                         "\xc6\xa0\x4b\xd6\x6b\x64\x3e\x9e"
-> +                         "\xfd\x66\x16\xe2\xdb\xeb\x5f\xb3"
-> +                         "\x50\x50\x3e\xde\x8d\x72\x76\x01"
-> +                         "\xbe\xcc\xc9\x52\x09\x2d\x8d\xe7"
-> +                         "\xd6\xc3\x66\xdb\x36\x08\xd1\x77"
-> +                         "\xc8\x73\x46\x26\x24\x29\xbf\x68"
-> +                         "\x2d\x2a\x99\x43\x56\x55\xe4\x93"
-> +                         "\xaf\xae\x4d\xe7\x55\x4a\xc0\x45"
-> +                         "\x26\xeb\x3b\x12\x90\x7c\xdc\xd1"
-> +                         "\xd5\x6f\x0a\xd0\xa9\xd7\x4b\x89"
-> +                         "\x0b\x07\xd8\x86\xad\xa1\xc4\x69"
-> +                         "\x1f\x5e\x8b\xc4\x9e\x91\x41\x25"
-> +                         "\x56\x98\x69\x78\x3a\x9e\xae\x91"
-> +                         "\xd8\xd9\xfa\xfb\xff\x81\x25\x09"
-> +                         "\xfc\xed\x2d\x87\xbc\x04\x62\x97"
-> +                         "\x35\xe1\x26\xc2\x46\x1c\xcf\xd7"
-> +                         "\x14\xed\x02\x09\xa5\xb2\xb6\xaa"
-> +                         "\x27\x4e\x61\xb3\x71\x6b\x47\x16"
-> +                         "\xb7\xe8\xd4\xaf\x52\xeb\x6a\x6b"
-> +                         "\xdb\x4c\x65\x21\x9e\x1c\x36",
-> +               .klen   =3D 32,
-> +               .len    =3D 255,
-> +       },
-> +       {
-> +               .key    =3D "\x56\x33\x37\x21\xc4\xea\x8b\x88"
-> +                         "\x67\x5e\xee\xb8\x0b\x6c\x04\x43"
-> +                         "\x17\xc5\x2b\x8a\x37\x17\x8b\x37"
-> +                         "\x60\x57\x3f\xa7\x82\xcd\xb9\x09",
-> +               .iv     =3D "\x88\xee\x9b\x35\x21\x2d\x41\xa1"
-> +                         "\x16\x0d\x7f\xdf\x57\xc9\xb9\xc3"
-> +                         "\xf6\x30\x53\xbf\x89\x46\xe6\x87"
-> +                         "\x60\xc8\x5e\x59\xdd\x8a\x7b\xfe",
-> +               .ptext  =3D "\x49\xe2\x0a\x4f\x7a\x60\x75\x9b"
-> +                         "\x95\x98\x2c\xe7\x4f\xb4\x58\xb9"
-> +                         "\x24\x54\x46\x34\xdf\x58\x31\xe7"
-> +                         "\x23\xc6\xa2\x60\x4a\xd2\x59\xb6"
-> +                         "\xeb\x3e\xc2\xf8\xe5\x14\x3c\x6d"
-> +                         "\x4b\x72\xcb\x5f\xcb\xa7\x47\xb9"
-> +                         "\x7a\x49\xfc\xf1\xad\x92\x76\x55"
-> +                         "\xac\x59\xdc\x3a\xc6\x8b\x7c\xdb"
-> +                         "\x06\xcd\xea\x6a\x34\x51\xb7\xb2"
-> +                         "\xe5\x39\x3c\x87\x00\x90\xc2\xbb"
-> +                         "\xb2\xa5\x2c\x58\xc2\x9b\xe3\x77"
-> +                         "\x95\x82\x50\xcb\x23\xdc\x18\xd8"
-> +                         "\x4e\xbb\x13\x5d\x35\x3d\x9a\xda"
-> +                         "\xe4\x75\xa1\x75\x17\x59\x8c\x6a"
-> +                         "\xb2\x76\x7e\xd4\x45\x31\x0a\x45"
-> +                         "\x2e\x60\x83\x3d\xdc\x8d\x43\x20"
-> +                         "\x58\x24\xb2\x9d\xd5\x59\x64\x32"
-> +                         "\x4e\x6f\xb9\x9c\xde\x77\x4d\x65"
-> +                         "\xdf\xc0\x7a\xeb\x40\x80\xe8\xe5"
-> +                         "\xc7\xc1\x77\x3b\xae\x2b\x85\xce"
-> +                         "\x56\xfa\x43\x41\x96\x23\x8e\xab"
-> +                         "\xd3\xc8\x65\xef\x0b\xfe\x42\x4c"
-> +                         "\x3a\x8a\x54\x55\xab\xa3\xf9\x62"
-> +                         "\x9f\x8e\xbe\x33\x9a\xfe\x6b\x52"
-> +                         "\xd4\x4c\x93\x84\x7c\x7e\xb1\x5e"
-> +                         "\x32\xaf\x6e\x21\x44\xd2\x6b\x56"
-> +                         "\xcd\x2c\x9d\x03\x3b\x50\x1f\x0a"
-> +                         "\xc3\x98\xff\x3a\x1d\x36\x7e\x6d"
-> +                         "\xcf\xbc\xe7\xe8\xfc\x24\x55\xfd"
-> +                         "\x72\x3d\xa7\x3f\x09\xa7\x38\xe6"
-> +                         "\x57\x8d\xc4\x74\x7f\xd3\x26\x75"
-> +                         "\xda\xfa\x29\x35\xc1\x31\x82",
-> +               .ctext  =3D "\x02\x23\x74\x02\x56\xf4\x7b\xc8"
-> +                         "\x55\x61\xa0\x6b\x68\xff\xde\x87"
-> +                         "\x9d\x66\x77\x86\x98\x63\xab\xd5"
-> +                         "\xd6\xf4\x7e\x3b\xf4\xae\x97\x13"
-> +                         "\x79\xc0\x96\x75\x87\x33\x2a\x0e"
-> +                         "\xc2\x1a\x13\x90\x5f\x6e\x93\xed"
-> +                         "\x54\xfe\xee\x05\x48\xae\x20\x2d"
-> +                         "\xa9\x2b\x98\xa3\xc8\xaf\x17\x6b"
-> +                         "\x82\x4a\x9a\x7f\xf0\xce\xd9\x26"
-> +                         "\x16\x28\xeb\xf4\x4b\xab\x7d\x6e"
-> +                         "\x96\x27\xd2\x90\xbb\x8d\x98\xdc"
-> +                         "\xb8\x6f\x7a\x98\x67\xef\x1c\xfb"
-> +                         "\xd0\x23\x1a\x2f\xc9\x58\x4e\xc6"
-> +                         "\x38\x03\x53\x61\x8e\xff\x55\x46"
-> +                         "\x47\xe8\x1f\x9d\x66\x95\x9b\x7f"
-> +                         "\x26\xac\xf2\x61\xa4\x05\x15\xcb"
-> +                         "\x62\xb6\x6b\x7c\x57\x95\x9d\x25"
-> +                         "\x9e\x83\xb1\x88\x50\x39\xb5\x34"
-> +                         "\x8a\x04\x2b\x76\x1b\xb8\x8c\x57"
-> +                         "\x26\x21\x99\x2e\x93\xc8\x9b\xb2"
-> +                         "\x31\xe1\xe3\x27\xde\xc8\xf2\xc5"
-> +                         "\x01\x7a\x45\x38\x6f\xe7\xa0\x9d"
-> +                         "\x8c\x41\x99\xec\x3d\xb6\xaf\x66"
-> +                         "\x76\xac\xc8\x78\xb0\xdf\xcf\xce"
-> +                         "\xa1\x29\x46\x6f\xe3\x35\x4a\x67"
-> +                         "\x59\x27\x14\xcc\x04\xdb\xb3\x03"
-> +                         "\xb7\x2d\x8d\xf9\x75\x9e\x59\x42"
-> +                         "\xe3\xa4\xf8\xf4\x82\x27\xa3\xa9"
-> +                         "\x79\xac\x6b\x8a\xd8\xdb\x29\x73"
-> +                         "\x02\xbb\x6f\x85\x00\x92\xea\x59"
-> +                         "\x30\x1b\x19\xf3\xab\x6e\x99\x9a"
-> +                         "\xf2\x23\x27\xc6\x59\x5a\x9c",
-> +               .klen   =3D 32,
-> +               .len    =3D 255,
-> +       },
-> +
 > +};
 > +
 >  #endif /* _CRYPTO_TESTMGR_H */
+> diff --git a/crypto/xctr.c b/crypto/xctr.c
+> new file mode 100644
+> index 000000000000..dfb44c092cc4
+> --- /dev/null
+> +++ b/crypto/xctr.c
+> @@ -0,0 +1,202 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * XCTR: XOR Counter mode - Adapted from ctr.c
+> + *
+> + * (C) Copyright IBM Corp. 2007 - Joy Latten <latten@us.ibm.com>
+> + * Copyright 2021 Google LLC
+> + */
+> +
+> +/*
+> + * XCTR mode is a blockcipher mode of operation used to implement HCTR2. XCTR is
+> + * closely related to the CTR mode of operation; the main difference is that CTR
+> + * generates the keystream using E(CTR + IV) whereas XCTR generates the
+> + * keystream using E(CTR ^ IV).
+> + *
+> + * See the HCTR2 paper for more details:
+> + *     Length-preserving encryption with HCTR2
+> + *      (https://eprint.iacr.org/2021/1441.pdf)
+> + */
+> +
+> +#include <crypto/algapi.h>
+> +#include <crypto/xctr.h>
+> +#include <crypto/internal/cipher.h>
+> +#include <crypto/internal/skcipher.h>
+> +#include <linux/err.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +
+> +static void crypto_xctr_crypt_final(struct skcipher_walk *walk,
+> +                                  struct crypto_cipher *tfm, u32 byte_ctr)
+> +{
+> +       unsigned int bsize = crypto_cipher_blocksize(tfm);
+> +       unsigned long alignmask = crypto_cipher_alignmask(tfm);
+> +       u8 ctr[MAX_CIPHER_BLOCKSIZE];
+> +       u8 ctrblk[MAX_CIPHER_BLOCKSIZE];
+> +       u8 tmp[MAX_CIPHER_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+> +       u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+> +       u8 *src = walk->src.virt.addr;
+> +       u8 *dst = walk->dst.virt.addr;
+> +       unsigned int nbytes = walk->nbytes;
+> +       u32 ctr32 = byte_ctr / bsize + 1;
+> +
+> +       u32_to_le_block(ctr, ctr32, bsize);
+> +       crypto_xor_cpy(ctrblk, ctr, walk->iv, bsize);
+> +       crypto_cipher_encrypt_one(tfm, keystream, ctrblk);
+> +       crypto_xor_cpy(dst, keystream, src, nbytes);
+> +}
+> +
+> +static int crypto_xctr_crypt_segment(struct skcipher_walk *walk,
+> +                                   struct crypto_cipher *tfm, u32 byte_ctr)
+> +{
+> +       void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+> +                  crypto_cipher_alg(tfm)->cia_encrypt;
+> +       unsigned int bsize = crypto_cipher_blocksize(tfm);
+> +       u8 ctr[MAX_CIPHER_BLOCKSIZE];
+> +       u8 ctrblk[MAX_CIPHER_BLOCKSIZE];
+> +       u8 *src = walk->src.virt.addr;
+> +       u8 *dst = walk->dst.virt.addr;
+> +       unsigned int nbytes = walk->nbytes;
+> +       u32 ctr32 = byte_ctr / bsize + 1;
+> +
+> +       do {
+> +               /* create keystream */
+> +               u32_to_le_block(ctr, ctr32, bsize);
+> +               crypto_xor_cpy(ctrblk, ctr, walk->iv, bsize);
+> +               fn(crypto_cipher_tfm(tfm), dst, ctrblk);
+> +               crypto_xor(dst, src, bsize);
+> +
+> +               ctr32++;
+> +
+> +               src += bsize;
+> +               dst += bsize;
+> +       } while ((nbytes -= bsize) >= bsize);
+> +
+> +       return nbytes;
+> +}
+> +
+> +static int crypto_xctr_crypt_inplace(struct skcipher_walk *walk,
+> +                                   struct crypto_cipher *tfm, u32 byte_ctr)
+> +{
+> +       void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
+> +                  crypto_cipher_alg(tfm)->cia_encrypt;
+> +       unsigned int bsize = crypto_cipher_blocksize(tfm);
+> +       unsigned long alignmask = crypto_cipher_alignmask(tfm);
+> +       unsigned int nbytes = walk->nbytes;
+> +       u8 ctr[MAX_CIPHER_BLOCKSIZE];
+> +       u8 ctrblk[MAX_CIPHER_BLOCKSIZE];
+> +       u8 *src = walk->src.virt.addr;
+> +       u8 tmp[MAX_CIPHER_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+> +       u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+> +       u32 ctr32 = byte_ctr / bsize + 1;
+> +
+> +       u32_to_le_block(ctr, ctr32, bsize);
+> +       do {
+> +               /* create keystream */
+> +               u32_to_le_block(ctr, ctr32, bsize);
+> +               crypto_xor_cpy(ctrblk, ctr, walk->iv, bsize);
+> +               fn(crypto_cipher_tfm(tfm), keystream, ctrblk);
+> +               crypto_xor(src, keystream, bsize);
+> +
+> +               ctr32++;
+> +
+> +               src += bsize;
+> +       } while ((nbytes -= bsize) >= bsize);
+> +
+> +       return nbytes;
+> +}
+> +
+> +static int crypto_xctr_crypt(struct skcipher_request *req)
+> +{
+> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +       struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
+> +       const unsigned int bsize = crypto_cipher_blocksize(cipher);
+> +       struct skcipher_walk walk;
+> +       unsigned int nbytes;
+> +       int err;
+> +       u32 byte_ctr = 0;
+> +
+> +       err = skcipher_walk_virt(&walk, req, false);
+> +
+> +       while (walk.nbytes >= bsize) {
+> +               if (walk.src.virt.addr == walk.dst.virt.addr)
+> +                       nbytes = crypto_xctr_crypt_inplace(&walk, cipher, byte_ctr);
+> +               else
+> +                       nbytes = crypto_xctr_crypt_segment(&walk, cipher, byte_ctr);
+> +
+> +               byte_ctr += walk.nbytes - nbytes;
+> +               err = skcipher_walk_done(&walk, nbytes);
+> +       }
+> +
+> +       if (walk.nbytes) {
+> +               crypto_xctr_crypt_final(&walk, cipher, byte_ctr);
+> +               err = skcipher_walk_done(&walk, 0);
+> +       }
+> +
+> +       return err;
+> +}
+> +
+> +static int crypto_xctr_create(struct crypto_template *tmpl, struct rtattr **tb)
+> +{
+> +       struct skcipher_instance *inst;
+> +       struct crypto_alg *alg;
+> +       int err;
+> +
+> +       inst = skcipher_alloc_instance_simple(tmpl, tb);
+> +       if (IS_ERR(inst))
+> +               return PTR_ERR(inst);
+> +
+> +       alg = skcipher_ialg_simple(inst);
+> +
+> +       /* Block size must be >= 4 bytes. */
+> +       err = -EINVAL;
+> +       if (alg->cra_blocksize < 4)
+> +               goto out_free_inst;
+> +
+> +       /* XCTR mode is a stream cipher. */
+> +       inst->alg.base.cra_blocksize = 1;
+> +
+> +       /*
+> +        * To simplify the implementation, configure the skcipher walk to only
+> +        * give a partial block at the very end, never earlier.
+> +        */
+> +       inst->alg.chunksize = alg->cra_blocksize;
+> +
+> +       inst->alg.encrypt = crypto_xctr_crypt;
+> +       inst->alg.decrypt = crypto_xctr_crypt;
+> +
+> +       err = skcipher_register_instance(tmpl, inst);
+> +       if (err) {
+> +out_free_inst:
+> +               inst->free(inst);
+> +       }
+> +
+> +       return err;
+> +}
+> +
+> +static struct crypto_template crypto_xctr_tmpl[] = {
+> +       {
+> +               .name = "xctr",
+> +               .create = crypto_xctr_create,
+> +               .module = THIS_MODULE,
+> +       }
+> +};
+> +
+> +static int __init crypto_xctr_module_init(void)
+> +{
+> +       return crypto_register_template(crypto_xctr_tmpl);
+> +}
+> +
+> +static void __exit crypto_xctr_module_exit(void)
+> +{
+> +       crypto_unregister_template(crypto_xctr_tmpl);
+> +}
+> +
+> +subsys_initcall(crypto_xctr_module_init);
+> +module_exit(crypto_xctr_module_exit);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("XCTR block cipher mode of operation");
+> +MODULE_ALIAS_CRYPTO("xctr");
+> +MODULE_IMPORT_NS(CRYPTO_INTERNAL);
+> diff --git a/include/crypto/xctr.h b/include/crypto/xctr.h
+> new file mode 100644
+> index 000000000000..0d025e08ca26
+> --- /dev/null
+> +++ b/include/crypto/xctr.h
+> @@ -0,0 +1,19 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * XCTR: XOR Counter mode
+> + *
+> + * Copyright 2021 Google LLC
+> + */
+> +
+> +#include <asm/unaligned.h>
+> +
+> +#ifndef _CRYPTO_XCTR_H
+> +#define _CRYPTO_XCTR_H
+> +
+> +static inline void u32_to_le_block(u8 *a, u32 x, unsigned int size)
+> +{
+> +       memset(a, 0, size);
+> +       put_unaligned(cpu_to_le32(x), (u32 *)a);
+
+Please use put_unaligned_le32() here.
+
+And casting 'a' to (u32 *) is invalid C, so just pass 'a' directly.
+Otherwise, the compiler might infer that 'a' is guaranteed to be
+aligned after all, and use an aligned access instead.
+
+
+> +}
+> +
+> +#endif  /* _CRYPTO_XCTR_H */
 > --
 > 2.35.0.rc0.227.g00780c9af4-goog
 >
