@@ -2,94 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 317A4C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 10:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68784C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 11:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239487AbiA0K3Q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 05:29:16 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:53749 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239472AbiA0K3O (ORCPT
+        id S235870AbiA0Lf5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 06:35:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36870 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231325AbiA0Lf5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 05:29:14 -0500
-Received: (Authenticated sender: alexandre.belloni@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id B5EA8200007;
-        Thu, 27 Jan 2022 10:29:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1643279353;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rHeKMXAaLg6IuvGDnn0shLvzStT/hC8/1M7xoIXIxrI=;
-        b=lzX/2ah9KiYW8ZzpNYXXE68QxFOx/BqCp/q9phw6VTvFjy1Z+CMRmnar/w4+3uL/1/02n6
-        wlf+kTebg2zFVgPNmTWKW5WHy7rL+ZiOVEsTWaaTQvv2LbjVeNdu4Kihrv1fMZm4nC08BF
-        ZgEzKg55761a9qoaWrxuVOxJGP1mqXYd+rx+b9hWZ5vw10W6Rfo7F0MYUf4b7Epxoww2Kd
-        2qummBx7wXUKvEG11KWgcm4jGzbi+DFagpeHmR9DHSkX50GkzgmniBAlkwHUgjdQI1gjmr
-        FIQ3RF1pbbk0X7+0MteEuJJ0xUN09ikmbp2z9FvsyQryydmfr4cmVJMmNSKd0w==
-Date:   Thu, 27 Jan 2022 11:29:11 +0100
-From:   Alexandre Belloni <alexandre.belloni@bootlin.com>
-To:     Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        nicolas.ferre@microchip.com, ludovic.desroches@microchip.com,
-        tudor.ambarus@microchip.com, UNGLinuxDriver@microchip.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: atmel: add support for AES and SHA IPs available
- on lan966x SoC
-Message-ID: <YfJz91kchrcX9Xqe@piout.net>
-References: <20220127080408.15791-1-kavyasree.kotagiri@microchip.com>
+        Thu, 27 Jan 2022 06:35:57 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BCA4C061714
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 03:35:57 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D4D76186B
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 11:35:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A405C340E4;
+        Thu, 27 Jan 2022 11:35:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643283356;
+        bh=NuvZnz3CW/nBcxm/gE2l5SFlfboUY1WnGEzTxNUzBrA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=HbqNDdbBr/iqGOUR7EhJYqK0QAwqd0pvihS8PmBIUeWawmDj71sYJzotvsat0liu1
+         Shw/zS7htEfMx/8bQzn8JuWrBQS2rCdRR9ks6ehqjQJT5YY9CvVue91+QRP7YnrzvA
+         o2mZJDZApKU7S6zUcUwRj4Kv8HD4ICOnwVL2SSoyn8/h/7ZtHM05hfmece1wvhJgVz
+         huLrjaA4kfttfiU04aJ5UdNVeluYbQ0y5ul00/q9I2xHWVy9qwmEM+tDgMVvjZM+i6
+         0P07Q78kJH80ObONoZYvQWqwabQuH+z7jyQy8fh04YLX3an8PZW/CLzAf3UVlJ1vei
+         agq8481IGsB2w==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 0/3] crypto: arm - simplify bit sliced AES 
+Date:   Thu, 27 Jan 2022 12:35:42 +0100
+Message-Id: <20220127113545.7821-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220127080408.15791-1-kavyasree.kotagiri@microchip.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=708; h=from:subject; bh=NuvZnz3CW/nBcxm/gE2l5SFlfboUY1WnGEzTxNUzBrA=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh8oOPP03D1WWSXJjskYwDwopSgrJF95LUKJAND639 gO4UV0GJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfKDjwAKCRDDTyI5ktmPJCmQC/ oD8nQb6dkgu0ZS+w/zs2c4T31wY614UHaIJlQYLMm4istE9iM815OCQotT70elWaXzhrm4wHZXafpG 9rSnIj8DlnbxJOtN6E4U7j6mLhpp43YJjcD/3hEsbSgKD5KXtc6PPOb4GWQsbhQCtKnsgx2HTMzUjb GBig5fjckcZfBpAYI83cUqIH/59ZvFvJUTgqfy/WNBI1pki/NEZ6LZiyD9Ysb1OfF1IrhrQxxzSezB VC5oQ/iTuP/ylM49/5FhUJYqKasQuKl0wQRa01mhYd/595ILlc4yfrE50mDOIsmcUE+E1bq5wB6oCS +QeIRDT40WoFiDK2M8fGwxivOZyPyvsUwaYq2+7COY9+4ee8HxlMKZtNxnq3d3lqruIiHNbN6q2mgL 6u6pBxJJbOsjGvElYtl2lgvVsA/VqkCXINmB/21ov86VuqGf6a+wtu1MMHoDXKPyhfQOZyBKg3muYG iRz1KdGILj2I4hMF7UEZe3lOxwNfMpxV4ehJwxkoPufJA=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 27/01/2022 13:34:08+0530, Kavyasree Kotagiri wrote:
-> This patch adds support for hardware version of AES and SHA IPs
-> available on lan966x SoC.
-> 
-> Tested-by: Vradha Panchal <vradha.panchal@microchip.com>
-> Signed-off-by: Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
-> ---
->  drivers/crypto/atmel-aes.c | 2 ++
->  drivers/crypto/atmel-sha.c | 2 ++
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-> index fe0558403191..358f1092d890 100644
-> --- a/drivers/crypto/atmel-aes.c
-> +++ b/drivers/crypto/atmel-aes.c
-> @@ -2509,6 +2509,8 @@ static void atmel_aes_get_cap(struct atmel_aes_dev *dd)
->  
->  	/* keep only major version number */
->  	switch (dd->hw_version & 0xff0) {
-> +	case 0x700:
-> +		fallthrough;
+This contains a couple of improvements/simplifications for the bit
+sliced AES driver implemented on ARM and arm64.
 
-I don't think fallthrough is needed in that case.
->  	case 0x500:
->  		dd->caps.has_dualbuff = 1;
->  		dd->caps.has_cfb64 = 1;
-> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-> index 1b13f601fd95..6c7bb91c8cce 100644
-> --- a/drivers/crypto/atmel-sha.c
-> +++ b/drivers/crypto/atmel-sha.c
-> @@ -2508,6 +2508,8 @@ static void atmel_sha_get_cap(struct atmel_sha_dev *dd)
->  
->  	/* keep only major version number */
->  	switch (dd->hw_version & 0xff0) {
-> +	case 0x700:
-> +		fallthrough;
->  	case 0x510:
->  		dd->caps.has_dma = 1;
->  		dd->caps.has_dualbuff = 1;
-> -- 
-> 2.17.1
-> 
+Ard Biesheuvel (3):
+  crypto: arm/aes-neonbs-ctr - deal with non-multiples of AES block size
+  crypto: arm64/aes-neonbs-ctr - fallback to plain NEON for final chunk
+  crypto: arm64/aes-neonbs-xts - use plain NEON for non-power-of-2 input
+    sizes
+
+ arch/arm/crypto/aes-neonbs-core.S   | 105 ++++----
+ arch/arm/crypto/aes-neonbs-glue.c   |  35 ++-
+ arch/arm64/crypto/aes-glue.c        |   1 +
+ arch/arm64/crypto/aes-neonbs-core.S | 264 +++++---------------
+ arch/arm64/crypto/aes-neonbs-glue.c |  97 ++++---
+ 5 files changed, 189 insertions(+), 313 deletions(-)
 
 -- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.30.2
+
