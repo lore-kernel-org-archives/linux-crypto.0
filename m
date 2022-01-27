@@ -2,118 +2,261 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FECFC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 00:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BFBC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 04:17:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbiA0AgK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jan 2022 19:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbiA0AgK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jan 2022 19:36:10 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E80FC06161C
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 16:36:10 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id o12so2030695eju.13
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 16:36:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=X0Usarwu6KVRkGvtR6V1/OIm5/VM3r1k//rGHvbz25Y=;
-        b=R5Qj0O+sETCdnxm9hPW2uISZBZlRVg37XJ3qtcaQVwhe/6CcL/1aRcasnfVO+p6deZ
-         Jh/jInMG9hsw/Bl9ythl1icc9Q4Qg70+Xw4LUsuq/NFieC5tqp1ICcaVpu47fiJZWAPU
-         qc/z0f4nyIiHnKe0uaEQgn9A6U+zvJLcP9F1gI/ttLspnJkhahqHDAJyZj1H5UxvFOLX
-         bZw+v0kUK2/qffMrKOJx++RmGI/CpMyv7TOB6B2MVpMu9JikmIPDte/7p3z704gZDjAM
-         /htQVoh1xDfu1MkYLgl2/UusDIy4oOc2EYACbp5Z6Av0j0FOuZJMtp94SJD17CLcLT7n
-         4rpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=X0Usarwu6KVRkGvtR6V1/OIm5/VM3r1k//rGHvbz25Y=;
-        b=dz2zt7IJ8+OrnNgDxzM6Q+Dn7Q7xnxd2dC1XCltRcYih9QkYjy58LDGIcgToaOvTzT
-         KiiFV6mxYwyqfd8kOrfazyt2t7siNEqmcFtP+5gIB+KwitVXZd/deXJsh9m6i/Tn6o2U
-         Tg0ZE6Ymgt9S+yv3e5T5GC5iJgXaGTnIsVaN1ZnDQ728cBdl+YnFHMEMb7IusAkuamZk
-         pGAkxzXfzYGE1+gYzZmQhOIa4bhoZkOZTyQm3u8dOuH+sSZuW5CTXUckdTZsVpOqdlqq
-         OjWuh7NT2JhLhXgRZ/qXNfk3feyTq2Cve+Z03dt+t4wNFinHG44Iwq4DCD5YL29n8T0p
-         9ZBw==
-X-Gm-Message-State: AOAM531fS4RLTnXzYovHJBbjN+86dTHmtZrYhdcbHaZ4FPrPen7ISJ0L
-        /QLBFUG3CBxcdq+IEMMIjZfGRrIDtnAFci8orxnadxexFaU=
-X-Google-Smtp-Source: ABdhPJwQg1iJFohWR4PJndZBqiTXGBQPwpRdMrjPWQDgb9e0afm80x+zObQcU97WfshMPc7Q82bN/SIzpu4IBmHxIds=
-X-Received: by 2002:a17:907:1c19:: with SMTP id nc25mr1090294ejc.354.1643243768550;
- Wed, 26 Jan 2022 16:36:08 -0800 (PST)
+        id S230492AbiA0ERr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 26 Jan 2022 23:17:47 -0500
+Received: from mga04.intel.com ([192.55.52.120]:39099 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229846AbiA0ERr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Jan 2022 23:17:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1643257067; x=1674793067;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Azjd8x6g9/a16YpaGEdSzffzRXf3wRzqIxBh/or1f/I=;
+  b=brmFHkGCiiwXkV+DNh+vOX3SxzvrB8GPQFmmYWMPORxDTEFenP2/xIUA
+   VtZeenKDLeVr/2Cwpk3Qpbk8KxbujaF1X9L1S43/C+egTpvSZeBajoKTu
+   wjHvC4yNRB41YHwhKoBMyGSoGeg8+AHW91R9YQ+Aw9ZKO90cUUtRUPW1h
+   SyYiyvrXFJybFETwBhoaUmLMCiCBKUNW0G3htpM6XgJPIHiwFWsD4qN1A
+   B4bgZNDE+Epv7kXLFY3khIgwDb3URrGRIgAN/Z/IbUTGU3Tik4ZftGDkG
+   dN34XjQsn8FIE9tm59wjD8jNmtwiVf5UnrPn5RUNWAInkp+t2MAfA5o7/
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10239"; a="245582595"
+X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
+   d="scan'208";a="245582595"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2022 20:17:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
+   d="scan'208";a="581338482"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Jan 2022 20:17:40 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nCwE7-000M5q-Vw; Thu, 27 Jan 2022 04:17:39 +0000
+Date:   Thu, 27 Jan 2022 12:17:24 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
+        mripard@kernel.org, wens@csie.org
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        linux-sunxi@googlegroups.com
+Subject: Re: [PATCH 1/8] crypto: sun8i-ce: do not allocate memory when
+ handling requests
+Message-ID: <202201271243.hLjdr8IB-lkp@intel.com>
+References: <20220126210441.3661782-2-clabbe@baylibre.com>
 MIME-Version: 1.0
-References: <CALFqKjSnOWyFjp7NQZKMXQ+TfzXMCBS=y8xnv5GE56SHVr5tCg@mail.gmail.com>
- <CACXcFmnRAkrj0Q3uFjyLu7RaWQh0VPbmErkj+cUaxZMb=YiGCw@mail.gmail.com>
- <CACXcFmmW+tCUf8JS=a=wJEnBY2JojP8VwEGLncYcGLZqiU+5Jw@mail.gmail.com>
- <CACXcFmmosvNMxwjOFZ9SDadqJE11w6Vva+i9AV1zYQxbwoB9sA@mail.gmail.com> <YRp1YbpFdNG0IJMI@mit.edu>
-In-Reply-To: <YRp1YbpFdNG0IJMI@mit.edu>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 27 Jan 2022 08:35:54 +0800
-Message-ID: <CACXcFmmSBZ3zzpPOCtQ7Sp7y3cAcwi54kZP894PGR8DzHny_UQ@mail.gmail.com>
-Subject: Re: Lockless /dev/random - Performance/Security/Stability improvement
-To:     "Theodore Ts'o" <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>,
-        John Denker <jsd@av8n.com>, m@ib.tc
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220126210441.3661782-2-clabbe@baylibre.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 16, 2021 at 10:25 PM Theodore Ts'o <tytso@mit.edu> wrote:
+Hi Corentin,
 
-> On Mon, Aug 16, 2021 at 06:59:50PM +0800, Sandy Harris wrote:
+I love your patch! Perhaps something to improve:
 
-> > I am by no means convinced that Mike's idea of a lockless driver is a
-> > good one. Without some locks, if two or more parts of the code write
-> > to the same data structure, then there's a danger one will overwrite
-> > the other's contribution & we'll lose entropy.
-> >
-> > However, I cannot see why any data structure should be locked when it
-> > is only being read. There's no reason to care if others read it as
-> > well. If someone writes to it, then the result of reading becomes
-> > indeterminate. In most applications, that would be a very Bad Thing.
-> > In this contact, though, it is at worst harmless & possibly a Good
-> > Thing because it would make some attacks harder.
-> >
-> > For example, looking at the 5.8.9 kernel Ubuntu gives me, I find this
-> > in xtract_buf()
-> >
-> > /* Generate a hash across the pool, 16 words (512 bits) at a time */
-> >     spin_lock_irqsave(&r->lock, flags);
-> >     for (i = 0; i < r->poolinfo->poolwords; i += 16)
-> >         sha1_transform(hash.w, (__u8 *)(r->pool + i), workspace);
-> >
-> >     /*
-> >      * We mix the hash back into the pool ...
-> >      */
-> >     __mix_pool_bytes(r, hash.w, sizeof(hash.w));
-> >     spin_unlock_irqrestore(&r->lock, flags);
-> >
-> > The lock is held throughout the fairly expensive hash operation & I
-> > see no reason why it should be.
->
-> The reason why this is there is because otherwise, there can be two
-> processes both trying to extract entry from the pool, and getting the
-> same result, and returning the identical "randomness" to two different
-> userspace processes.  Which would be sad....  (unless you are a
-> nation-state attacker, I suppose :-)
+[auto build test WARNING on sunxi/sunxi/for-next]
+[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master v5.17-rc1 next-20220125]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-So lock the chacha context, the data structure it writes, instead.
-Since the write back to the pool is inside that lock, two threads
-extracting entropy will get different results. Call mix_pool_bytes()
-instead of __mix_pool_bytes() and it will do the necessary
-locking when the input pool is written.
+url:    https://github.com/0day-ci/linux/commits/Corentin-Labbe/crypto-allwinner-various-improvments/20220127-050556
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/sunxi/linux.git sunxi/for-next
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20220127/202201271243.hLjdr8IB-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 2a1b7aa016c0f4b5598806205bdfbab1ea2d92c4)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/0day-ci/linux/commit/d0b880af8c99abcd0f36463b82c92d71024408de
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Corentin-Labbe/crypto-allwinner-various-improvments/20220127-050556
+        git checkout d0b880af8c99abcd0f36463b82c92d71024408de
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/crypto/allwinner/sun8i-ce/
 
-I think this deals with Mike's main objection:
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-" It is highly unusual that /dev/random is allowed to degrade the
-" performance of all other subsystems - and even bring the
-" system to a halt when it runs dry.
+All warnings (new ones prefixed by >>):
 
-At any rate, it reduces the chance of other code that
-writes to the input pool being blocked by random(4).
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c:258:1: warning: unused label 'theend_key' [-Wunused-label]
+   theend_key:
+   ^~~~~~~~~~~
+   1 warning generated.
+
+
+vim +/theend_key +258 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+
+06f751b613296cc Corentin Labbe 2019-10-23  108  
+06f751b613296cc Corentin Labbe 2019-10-23  109  	flow = rctx->flow;
+06f751b613296cc Corentin Labbe 2019-10-23  110  
+06f751b613296cc Corentin Labbe 2019-10-23  111  	chan = &ce->chanlist[flow];
+06f751b613296cc Corentin Labbe 2019-10-23  112  
+06f751b613296cc Corentin Labbe 2019-10-23  113  	cet = chan->tl;
+06f751b613296cc Corentin Labbe 2019-10-23  114  	memset(cet, 0, sizeof(struct ce_task));
+06f751b613296cc Corentin Labbe 2019-10-23  115  
+93c7f4d357de68f Corentin Labbe 2019-11-17  116  	cet->t_id = cpu_to_le32(flow);
+93c7f4d357de68f Corentin Labbe 2019-11-17  117  	common = ce->variant->alg_cipher[algt->ce_algo_id];
+93c7f4d357de68f Corentin Labbe 2019-11-17  118  	common |= rctx->op_dir | CE_COMM_INT;
+93c7f4d357de68f Corentin Labbe 2019-11-17  119  	cet->t_common_ctl = cpu_to_le32(common);
+06f751b613296cc Corentin Labbe 2019-10-23  120  	/* CTS and recent CE (H6) need length in bytes, in word otherwise */
+6b4f76c2cd9e6c3 Corentin Labbe 2020-09-18  121  	if (ce->variant->cipher_t_dlen_in_bytes)
+93c7f4d357de68f Corentin Labbe 2019-11-17  122  		cet->t_dlen = cpu_to_le32(areq->cryptlen);
+93c7f4d357de68f Corentin Labbe 2019-11-17  123  	else
+93c7f4d357de68f Corentin Labbe 2019-11-17  124  		cet->t_dlen = cpu_to_le32(areq->cryptlen / 4);
+06f751b613296cc Corentin Labbe 2019-10-23  125  
+93c7f4d357de68f Corentin Labbe 2019-11-17  126  	sym = ce->variant->op_mode[algt->ce_blockmode];
+06f751b613296cc Corentin Labbe 2019-10-23  127  	len = op->keylen;
+06f751b613296cc Corentin Labbe 2019-10-23  128  	switch (len) {
+06f751b613296cc Corentin Labbe 2019-10-23  129  	case 128 / 8:
+93c7f4d357de68f Corentin Labbe 2019-11-17  130  		sym |= CE_AES_128BITS;
+06f751b613296cc Corentin Labbe 2019-10-23  131  		break;
+06f751b613296cc Corentin Labbe 2019-10-23  132  	case 192 / 8:
+93c7f4d357de68f Corentin Labbe 2019-11-17  133  		sym |= CE_AES_192BITS;
+06f751b613296cc Corentin Labbe 2019-10-23  134  		break;
+06f751b613296cc Corentin Labbe 2019-10-23  135  	case 256 / 8:
+93c7f4d357de68f Corentin Labbe 2019-11-17  136  		sym |= CE_AES_256BITS;
+06f751b613296cc Corentin Labbe 2019-10-23  137  		break;
+06f751b613296cc Corentin Labbe 2019-10-23  138  	}
+06f751b613296cc Corentin Labbe 2019-10-23  139  
+93c7f4d357de68f Corentin Labbe 2019-11-17  140  	cet->t_sym_ctl = cpu_to_le32(sym);
+06f751b613296cc Corentin Labbe 2019-10-23  141  	cet->t_asym_ctl = 0;
+06f751b613296cc Corentin Labbe 2019-10-23  142  
+0605fa0f78266cc Corentin Labbe 2020-09-18  143  	rctx->addr_key = dma_map_single(ce->dev, op->key, op->keylen, DMA_TO_DEVICE);
+0605fa0f78266cc Corentin Labbe 2020-09-18  144  	if (dma_mapping_error(ce->dev, rctx->addr_key)) {
+06f751b613296cc Corentin Labbe 2019-10-23  145  		dev_err(ce->dev, "Cannot DMA MAP KEY\n");
+06f751b613296cc Corentin Labbe 2019-10-23  146  		err = -EFAULT;
+06f751b613296cc Corentin Labbe 2019-10-23  147  		goto theend;
+06f751b613296cc Corentin Labbe 2019-10-23  148  	}
+0605fa0f78266cc Corentin Labbe 2020-09-18  149  	cet->t_key = cpu_to_le32(rctx->addr_key);
+06f751b613296cc Corentin Labbe 2019-10-23  150  
+06f751b613296cc Corentin Labbe 2019-10-23  151  	ivsize = crypto_skcipher_ivsize(tfm);
+06f751b613296cc Corentin Labbe 2019-10-23  152  	if (areq->iv && crypto_skcipher_ivsize(tfm) > 0) {
+a216f8d540cf132 Corentin Labbe 2020-09-18  153  		rctx->ivlen = ivsize;
+06f751b613296cc Corentin Labbe 2019-10-23  154  		if (rctx->op_dir & CE_DECRYPTION) {
+06f751b613296cc Corentin Labbe 2019-10-23  155  			offset = areq->cryptlen - ivsize;
+d0b880af8c99abc Corentin Labbe 2022-01-26  156  			scatterwalk_map_and_copy(chan->backup_iv, areq->src,
+a216f8d540cf132 Corentin Labbe 2020-09-18  157  						 offset, ivsize, 0);
+06f751b613296cc Corentin Labbe 2019-10-23  158  		}
+d0b880af8c99abc Corentin Labbe 2022-01-26  159  		memcpy(chan->bounce_iv, areq->iv, ivsize);
+d0b880af8c99abc Corentin Labbe 2022-01-26  160  		rctx->addr_iv = dma_map_single(ce->dev, chan->bounce_iv, rctx->ivlen,
+93c7f4d357de68f Corentin Labbe 2019-11-17  161  					       DMA_TO_DEVICE);
+0605fa0f78266cc Corentin Labbe 2020-09-18  162  		if (dma_mapping_error(ce->dev, rctx->addr_iv)) {
+06f751b613296cc Corentin Labbe 2019-10-23  163  			dev_err(ce->dev, "Cannot DMA MAP IV\n");
+06f751b613296cc Corentin Labbe 2019-10-23  164  			err = -ENOMEM;
+06f751b613296cc Corentin Labbe 2019-10-23  165  			goto theend_iv;
+06f751b613296cc Corentin Labbe 2019-10-23  166  		}
+0605fa0f78266cc Corentin Labbe 2020-09-18  167  		cet->t_iv = cpu_to_le32(rctx->addr_iv);
+06f751b613296cc Corentin Labbe 2019-10-23  168  	}
+06f751b613296cc Corentin Labbe 2019-10-23  169  
+06f751b613296cc Corentin Labbe 2019-10-23  170  	if (areq->src == areq->dst) {
+06f751b613296cc Corentin Labbe 2019-10-23  171  		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+06f751b613296cc Corentin Labbe 2019-10-23  172  				    DMA_BIDIRECTIONAL);
+06f751b613296cc Corentin Labbe 2019-10-23  173  		if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+06f751b613296cc Corentin Labbe 2019-10-23  174  			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+06f751b613296cc Corentin Labbe 2019-10-23  175  			err = -EINVAL;
+06f751b613296cc Corentin Labbe 2019-10-23  176  			goto theend_iv;
+06f751b613296cc Corentin Labbe 2019-10-23  177  		}
+06f751b613296cc Corentin Labbe 2019-10-23  178  		nr_sgd = nr_sgs;
+06f751b613296cc Corentin Labbe 2019-10-23  179  	} else {
+06f751b613296cc Corentin Labbe 2019-10-23  180  		nr_sgs = dma_map_sg(ce->dev, areq->src, sg_nents(areq->src),
+06f751b613296cc Corentin Labbe 2019-10-23  181  				    DMA_TO_DEVICE);
+06f751b613296cc Corentin Labbe 2019-10-23  182  		if (nr_sgs <= 0 || nr_sgs > MAX_SG) {
+06f751b613296cc Corentin Labbe 2019-10-23  183  			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgs);
+06f751b613296cc Corentin Labbe 2019-10-23  184  			err = -EINVAL;
+06f751b613296cc Corentin Labbe 2019-10-23  185  			goto theend_iv;
+06f751b613296cc Corentin Labbe 2019-10-23  186  		}
+06f751b613296cc Corentin Labbe 2019-10-23  187  		nr_sgd = dma_map_sg(ce->dev, areq->dst, sg_nents(areq->dst),
+06f751b613296cc Corentin Labbe 2019-10-23  188  				    DMA_FROM_DEVICE);
+06f751b613296cc Corentin Labbe 2019-10-23  189  		if (nr_sgd <= 0 || nr_sgd > MAX_SG) {
+06f751b613296cc Corentin Labbe 2019-10-23  190  			dev_err(ce->dev, "Invalid sg number %d\n", nr_sgd);
+06f751b613296cc Corentin Labbe 2019-10-23  191  			err = -EINVAL;
+06f751b613296cc Corentin Labbe 2019-10-23  192  			goto theend_sgs;
+06f751b613296cc Corentin Labbe 2019-10-23  193  		}
+06f751b613296cc Corentin Labbe 2019-10-23  194  	}
+06f751b613296cc Corentin Labbe 2019-10-23  195  
+06f751b613296cc Corentin Labbe 2019-10-23  196  	len = areq->cryptlen;
+06f751b613296cc Corentin Labbe 2019-10-23  197  	for_each_sg(areq->src, sg, nr_sgs, i) {
+93c7f4d357de68f Corentin Labbe 2019-11-17  198  		cet->t_src[i].addr = cpu_to_le32(sg_dma_address(sg));
+06f751b613296cc Corentin Labbe 2019-10-23  199  		todo = min(len, sg_dma_len(sg));
+93c7f4d357de68f Corentin Labbe 2019-11-17  200  		cet->t_src[i].len = cpu_to_le32(todo / 4);
+06f751b613296cc Corentin Labbe 2019-10-23  201  		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
+06f751b613296cc Corentin Labbe 2019-10-23  202  			areq->cryptlen, i, cet->t_src[i].len, sg->offset, todo);
+06f751b613296cc Corentin Labbe 2019-10-23  203  		len -= todo;
+06f751b613296cc Corentin Labbe 2019-10-23  204  	}
+06f751b613296cc Corentin Labbe 2019-10-23  205  	if (len > 0) {
+06f751b613296cc Corentin Labbe 2019-10-23  206  		dev_err(ce->dev, "remaining len %d\n", len);
+06f751b613296cc Corentin Labbe 2019-10-23  207  		err = -EINVAL;
+06f751b613296cc Corentin Labbe 2019-10-23  208  		goto theend_sgs;
+06f751b613296cc Corentin Labbe 2019-10-23  209  	}
+06f751b613296cc Corentin Labbe 2019-10-23  210  
+06f751b613296cc Corentin Labbe 2019-10-23  211  	len = areq->cryptlen;
+06f751b613296cc Corentin Labbe 2019-10-23  212  	for_each_sg(areq->dst, sg, nr_sgd, i) {
+93c7f4d357de68f Corentin Labbe 2019-11-17  213  		cet->t_dst[i].addr = cpu_to_le32(sg_dma_address(sg));
+06f751b613296cc Corentin Labbe 2019-10-23  214  		todo = min(len, sg_dma_len(sg));
+93c7f4d357de68f Corentin Labbe 2019-11-17  215  		cet->t_dst[i].len = cpu_to_le32(todo / 4);
+06f751b613296cc Corentin Labbe 2019-10-23  216  		dev_dbg(ce->dev, "%s total=%u SG(%d %u off=%d) todo=%u\n", __func__,
+06f751b613296cc Corentin Labbe 2019-10-23  217  			areq->cryptlen, i, cet->t_dst[i].len, sg->offset, todo);
+06f751b613296cc Corentin Labbe 2019-10-23  218  		len -= todo;
+06f751b613296cc Corentin Labbe 2019-10-23  219  	}
+06f751b613296cc Corentin Labbe 2019-10-23  220  	if (len > 0) {
+06f751b613296cc Corentin Labbe 2019-10-23  221  		dev_err(ce->dev, "remaining len %d\n", len);
+06f751b613296cc Corentin Labbe 2019-10-23  222  		err = -EINVAL;
+06f751b613296cc Corentin Labbe 2019-10-23  223  		goto theend_sgs;
+06f751b613296cc Corentin Labbe 2019-10-23  224  	}
+06f751b613296cc Corentin Labbe 2019-10-23  225  
+06f751b613296cc Corentin Labbe 2019-10-23  226  	chan->timeout = areq->cryptlen;
+0605fa0f78266cc Corentin Labbe 2020-09-18  227  	rctx->nr_sgs = nr_sgs;
+0605fa0f78266cc Corentin Labbe 2020-09-18  228  	rctx->nr_sgd = nr_sgd;
+0605fa0f78266cc Corentin Labbe 2020-09-18  229  	return 0;
+06f751b613296cc Corentin Labbe 2019-10-23  230  
+06f751b613296cc Corentin Labbe 2019-10-23  231  theend_sgs:
+06f751b613296cc Corentin Labbe 2019-10-23  232  	if (areq->src == areq->dst) {
+884b93c51025026 Xiang Chen     2021-03-16  233  		dma_unmap_sg(ce->dev, areq->src, sg_nents(areq->src),
+884b93c51025026 Xiang Chen     2021-03-16  234  			     DMA_BIDIRECTIONAL);
+06f751b613296cc Corentin Labbe 2019-10-23  235  	} else {
+06f751b613296cc Corentin Labbe 2019-10-23  236  		if (nr_sgs > 0)
+884b93c51025026 Xiang Chen     2021-03-16  237  			dma_unmap_sg(ce->dev, areq->src, sg_nents(areq->src),
+884b93c51025026 Xiang Chen     2021-03-16  238  				     DMA_TO_DEVICE);
+884b93c51025026 Xiang Chen     2021-03-16  239  		dma_unmap_sg(ce->dev, areq->dst, sg_nents(areq->dst),
+884b93c51025026 Xiang Chen     2021-03-16  240  			     DMA_FROM_DEVICE);
+06f751b613296cc Corentin Labbe 2019-10-23  241  	}
+06f751b613296cc Corentin Labbe 2019-10-23  242  
+06f751b613296cc Corentin Labbe 2019-10-23  243  theend_iv:
+06f751b613296cc Corentin Labbe 2019-10-23  244  	if (areq->iv && ivsize > 0) {
+0605fa0f78266cc Corentin Labbe 2020-09-18  245  		if (rctx->addr_iv)
+0605fa0f78266cc Corentin Labbe 2020-09-18  246  			dma_unmap_single(ce->dev, rctx->addr_iv, rctx->ivlen, DMA_TO_DEVICE);
+06f751b613296cc Corentin Labbe 2019-10-23  247  		offset = areq->cryptlen - ivsize;
+06f751b613296cc Corentin Labbe 2019-10-23  248  		if (rctx->op_dir & CE_DECRYPTION) {
+d0b880af8c99abc Corentin Labbe 2022-01-26  249  			memcpy(areq->iv, chan->backup_iv, ivsize);
+d0b880af8c99abc Corentin Labbe 2022-01-26  250  			memzero_explicit(chan->backup_iv, ivsize);
+06f751b613296cc Corentin Labbe 2019-10-23  251  		} else {
+06f751b613296cc Corentin Labbe 2019-10-23  252  			scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
+06f751b613296cc Corentin Labbe 2019-10-23  253  						 ivsize, 0);
+06f751b613296cc Corentin Labbe 2019-10-23  254  		}
+d0b880af8c99abc Corentin Labbe 2022-01-26  255  		memzero_explicit(chan->bounce_iv, ivsize);
+06f751b613296cc Corentin Labbe 2019-10-23  256  	}
+06f751b613296cc Corentin Labbe 2019-10-23  257  
+06f751b613296cc Corentin Labbe 2019-10-23 @258  theend_key:
+0605fa0f78266cc Corentin Labbe 2020-09-18  259  	dma_unmap_single(ce->dev, rctx->addr_key, op->keylen, DMA_TO_DEVICE);
+06f751b613296cc Corentin Labbe 2019-10-23  260  
+06f751b613296cc Corentin Labbe 2019-10-23  261  theend:
+06f751b613296cc Corentin Labbe 2019-10-23  262  	return err;
+06f751b613296cc Corentin Labbe 2019-10-23  263  }
+06f751b613296cc Corentin Labbe 2019-10-23  264  
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
