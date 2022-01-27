@@ -2,114 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A27C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 05:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949ABC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 05:21:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235811AbiA0FTb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 00:19:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231364AbiA0FTa (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 00:19:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4A7C06161C
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jan 2022 21:19:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 19411615BD
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 05:19:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C67C340E4;
-        Thu, 27 Jan 2022 05:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643260769;
-        bh=vWfaLq/qC52SFr+J0SFQONIJabGEv3kLS5rXjzoTqk4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pgXGaXr0i/TZHK9Vy0eERjKknMvG6VwAHr/WXP3oNCX3RpNwpaKWFcxUdI8ERFzWs
-         9DQtngLi74fJyIGndlQ/SRQCXY0VPfqbo+AS5OoXWsy3mAalCjrfPCVCUZkXOwuvlX
-         j3V1AnQc8MpVdNhJ710K3Evx/7oADXihmKXs1Plb0zZF8xMFRPxyYa+BP23u9PGLs8
-         F+6Ev4NmSvaBqx6fjf+iCj3TtFmGsw+acfQkJx/UhNKq0tc3Rg2znVeCNEDelkAIAR
-         B381fRajRZGb5fnykD94tkRU02uO9whHqJAaMuxF8A8S+FJYvzXxnjzWnL3wxPR8bq
-         E3JQfFtnYqrFw==
-Date:   Wed, 26 Jan 2022 21:19:27 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        id S236107AbiA0FVH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 00:21:07 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60510 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231364AbiA0FVH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jan 2022 00:21:07 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nCxDE-0008DU-49; Thu, 27 Jan 2022 16:20:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Jan 2022 16:20:48 +1100
+Date:   Thu, 27 Jan 2022 16:20:47 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Nathan Huckleberry <nhuck@google.com>,
+        linux-crypto@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         linux-arm-kernel@lists.infradead.org,
         Paul Crowley <paulcrowley@google.com>,
         Sami Tolvanen <samitolvanen@google.com>
-Subject: Re: [RFC PATCH 2/7] crypto: polyval - Add POLYVAL support
-Message-ID: <YfIrXzoKsX5TjAGY@sol.localdomain>
+Subject: Re: [RFC PATCH 3/7] crypto: hctr2 - Add HCTR2 support
+Message-ID: <YfIrr8MagPw9scLr@gondor.apana.org.au>
 References: <20220125014422.80552-1-nhuck@google.com>
- <20220125014422.80552-3-nhuck@google.com>
+ <20220125014422.80552-4-nhuck@google.com>
+ <YfIo1pL69+GRsSzp@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220125014422.80552-3-nhuck@google.com>
+In-Reply-To: <YfIo1pL69+GRsSzp@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 24, 2022 at 07:44:17PM -0600, Nathan Huckleberry wrote:
-> Add support for POLYVAL, an ε-universal hash function similar to GHASH.
-
-I think you mean ε-∆U (i.e. ε-∆-universal), as appears elsewhere in this
-patchset?
-
-> POLYVAL is used as a component to implement HCTR2 mode.
+On Wed, Jan 26, 2022 at 09:08:38PM -0800, Eric Biggers wrote:
+>
+> The optional parameters mentioned in the comment above don't appear to be
+> implemented.  Also, the syntax described is ambiguous.  I think you meant for
+> there to be only one set of square brackets?
 > 
-> POLYVAL is implemented as an shash algorithm.  The implementation is
-> modified from ghash-generic.c.
+> xctr(blockcipher_name) should be xctr_name, since it would have to be a driver /
+> implementation name, and those don't necessarily include parentheses like the
+> algorithm names do.
 > 
-> More information on POLYVAL can be found in the HCTR2 paper:
-> https://eprint.iacr.org/2021/1441.pdf
+> Did you consider not allowing the single block cipher implementation to be
+> overridden?  The single block cipher is a minor part compared to xctr.  This
+> would simplify the "full" syntax slighty, as then it would be
+> "hctr2(xctr_name, polyval_name)" instead of
+> "hctr2(blockcipher_name, xctr_name, polyval_name)".
 > 
-> Signed-off-by: Nathan Huckleberry <nhuck@google.com>
+> I suppose it does make sense to take the single block cipher parameter, given
+> that it is used.  But you'll need to make sure to make hctr2_create() enforce
+> that the same block cipher is used in both parameters.
 
-This commit message could use a brief mention of why POLYVAL is used instead of
-GHASH, and where POLYVAL is originally from.  It is in the paper, but it's worth
-emphasizing.
+For the single block cipher parameter, another option is to derive
+it from the xctr_name.  That is, once you have the skcipher for
+xctr_name, you extract its cra_name, assuming that it must be of
+the form xctr(%s) then you just strip away the xctr() and get the
+single block cipher name that way.
 
-> diff --git a/crypto/polyval-generic.c b/crypto/polyval-generic.c
-> new file mode 100644
-> index 000000000000..63e908697ea0
-> --- /dev/null
-> +++ b/crypto/polyval-generic.c
-> @@ -0,0 +1,183 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * POLYVAL: hash function for HCTR2.
-> + *
-> + * Copyright (c) 2007 Nokia Siemens Networks - Mikko Herranen <mh1@iki.fi>
-> + * Copyright (c) 2009 Intel Corp.
-> + *   Author: Huang Ying <ying.huang@intel.com>
-> + * Copyright 2021 Google LLC
-> + */
-> +
-> +/*
-> + * Code based on crypto/ghash-generic.c
-> + *
-> + * POLYVAL is a keyed hash function similar to GHASH. POLYVAL uses a
-> + * different modulus for finite field multiplication which makes hardware
-> + * accelerated implementations on little-endian machines faster.
-> + *
-> + * Like GHASH, POLYVAL is not a cryptographic hash function and should
-> + * not be used outside of crypto modes explicitly designed to use POLYVAL.
-> + *
-> + */
+The purpose of having the parameter explicitly is so that the
+instantiatied algorithm is automatically torn down when the
+underlying algorithm is replaced with a better version.
 
-This comment could use some more explanation about the implementation.  The code
-is using the implementation trick where the multiplication is actually done
-using the GHASH field, but it is not explained.  Also, it should be explained
-why this implementation was chosen.  The reason that the GHASH trick is used
-instead of doing a POLYVAL native implementation is because in practice, one of
-the accelerated implementations will/should be used instead, right?  So this one
-didn't matter much -- there just had to be a generic implementation.
+This is in general unnecessary if you're simply using the
+single block cipher to generate setup material.
 
-There should also be a warning that this implementation isn't constant-time.
-
-- Eric 
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
