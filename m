@@ -2,97 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F48C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 08:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04588C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 08:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229656AbiA0IEt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 03:04:49 -0500
-Received: from esa.microchip.iphmx.com ([68.232.154.123]:3645 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237602AbiA0IEs (ORCPT
+        id S237681AbiA0IMi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 03:12:38 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:51056 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229752AbiA0IMh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 03:04:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1643270688; x=1674806688;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=YWLfVwtEW0AriDI6I/Te250BeiLS2TU4DY+DRwJFHks=;
-  b=BEWmouZ30hUnIS+zpAitd7OKx4lWkqshMMAs2782q4exEDd6x6dvlIQd
-   yKQzJw2nTO72JmSUPP0J1bizsNrl9hKROItQM1OvYCaaYYaTf4Tef4bU+
-   9kgyVGn+O3/uVpgQoX/XIkVeBKZhhwEM7lKTIVS+hBX5y10urGiDdKZND
-   Vn4ea+1SPWCXZafjLdNVM5LiDWNFR1Q3k3ioYD3aypPiX7mYt5X/vYrKD
-   BPChi5nLXEaBFTr61GkGoGwkC5oVApkwgmydg0ikXpoWUOaJxGrqz0PQp
-   wyJ7wZ7YnWrfn3WdnW9cWOWdgALXaxgkU55k35+xgS7DltieGUGLpd13Z
-   A==;
-IronPort-SDR: JSOzhSf5BRfTmZ4iMVuE+uJ+mY5S7DSTp3OG3gmA7908KbSHCvhwxC0ZBobm3nU2NQrdjarO6o
- n4DmSUanG5wcq46EF9GanyNAg7s6FNzzUav6XWBx3eFaPrUPl5xMa5xrds5I5EY39uzL3TUB8c
- 2gFxDBs5OlCrWLTy/ANsFCMsG74YrwMUU99SkknKkZQdln9d60ONhhsEbk6ECUsmULYmxd4Wgs
- n0juJNj1ysd6E8NmBoWyQxv/h1dZ+0OYBe97k3sH2UHTcieCDRvR34KyAbgALmS4yxjSCo4Ii+
- 2yR72ZfUd09C2J8hgS95r98O
-X-IronPort-AV: E=Sophos;i="5.88,320,1635231600"; 
-   d="scan'208";a="144049447"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 27 Jan 2022 01:04:47 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Thu, 27 Jan 2022 01:04:46 -0700
-Received: from kavya-HP-Compaq-6000-Pro-SFF-PC.microchip.com (10.10.115.15) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Thu, 27 Jan 2022 01:04:42 -0700
-From:   Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
-        <ludovic.desroches@microchip.com>, <tudor.ambarus@microchip.com>
-CC:     <UNGLinuxDriver@microchip.com>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <Kavyasree.Kotagiri@microchip.com>
-Subject: [PATCH] crypto: atmel: add support for AES and SHA IPs available on lan966x SoC
-Date:   Thu, 27 Jan 2022 13:34:08 +0530
-Message-ID: <20220127080408.15791-1-kavyasree.kotagiri@microchip.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 27 Jan 2022 03:12:37 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A070361A66
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jan 2022 08:12:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AC9CC340E4;
+        Thu, 27 Jan 2022 08:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643271157;
+        bh=TCpC1uwXd4b31Hg0OSChdp6NRwRet+vBcX4sFew1KUo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Z3SfFu33IR5y3xvHofqTLHsJ+HYHdR/l6kL2CYIOfvTNpCf0pYp9zjgo/8fY1POPr
+         +8ZLivNybBbLkWxXLm9omt3D0z0YLKLYX2pykWaFZwI+6tx13HInUFMa4oWznR+2ye
+         A772xGCXlvHt1Hj/vlpdmuCW79WJZ/Sh+ffzUtfVce+hdYPJ7H1XsBLE1fxnEvj+/h
+         3QI1hjBr/d8cp5xliSyGViHa6crF1L5rBJ2qCLUMVtoUtlrKCGWyBU/HJrLdy3Ytun
+         10LzHZh0pTnYCy0pscFLOo2nAGee+i5ku2MTShQHJcNsvfL37Cxor4aHHcq9ivfYQ3
+         X84/bJMAY8EAQ==
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH 0/2] xor: enable auto-vectorization in Clang
+Date:   Thu, 27 Jan 2022 09:12:25 +0100
+Message-Id: <20220127081227.2430-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1726; h=from:subject; bh=TCpC1uwXd4b31Hg0OSChdp6NRwRet+vBcX4sFew1KUo=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh8lPoEizNNL11wHsIQgWm+NL0aDOm5Fz5RYkW2Yeo n4JgScWJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfJT6AAKCRDDTyI5ktmPJLFKC/ 4/EG49TDcqPZdwg4Nc7TGUZtJIqxueKGowE181xsBxTESpvXUZ0KpuLaWKavs7vT3txeguwYAFhZYM ++YS00+is1BObYSNJYJCqJrJxt9xEuV3gHYgn7XUHOJZNUDlYyHYk38er6KEA4BxXmKIEQuKJTkwfw oEe9XwoUYqKNDv0uD6nnobfT5zy4hOp+VHi2rgR3tsyQq4I9CJgyHPyNEe9hfdaA5TKCUW/FKZJgnD KZNI92UQU/3pTHALe7ajq3cx3dxZy0PucnilrriCz6y01CocgFJlqJPL6BGaYLfLqt8Fg0uaYBT/q2 JuFoVcPZHu7MfyaxHX+V+OHUeKv7HMnBLQJXFTQv7wzfy50Nyxi2GYF4PVcLec7+zUqSbxHnIWd2yt MadhzgzdUSFMla5Hjm+lbLrHlF1o6ThvFra6UVxbMbyvjfHgtRJQS4hZj/0hIa0ynYVciyLFauk5bb gyT6zuKmqUBPggKRsh2prjooD/FnN+jNAHapmUe/jXUmU=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds support for hardware version of AES and SHA IPs
-available on lan966x SoC.
+Update the xor_blocks() prototypes so that the compiler understands that
+the inputs always refer to distinct regions of memory. This is implied
+by the existing implementations, as they use different granularities for
+the load/xor/store loops.
 
-Tested-by: Vradha Panchal <vradha.panchal@microchip.com>
-Signed-off-by: Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>
----
- drivers/crypto/atmel-aes.c | 2 ++
- drivers/crypto/atmel-sha.c | 2 ++
- 2 files changed, 4 insertions(+)
+With that, we can fix the ARM/Clang version, which refuses to SIMD
+vectorize otherwise, and throws a spurious warning related to the GCC
+version being incompatible.
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index fe0558403191..358f1092d890 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2509,6 +2509,8 @@ static void atmel_aes_get_cap(struct atmel_aes_dev *dd)
- 
- 	/* keep only major version number */
- 	switch (dd->hw_version & 0xff0) {
-+	case 0x700:
-+		fallthrough;
- 	case 0x500:
- 		dd->caps.has_dualbuff = 1;
- 		dd->caps.has_cfb64 = 1;
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 1b13f601fd95..6c7bb91c8cce 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -2508,6 +2508,8 @@ static void atmel_sha_get_cap(struct atmel_sha_dev *dd)
- 
- 	/* keep only major version number */
- 	switch (dd->hw_version & 0xff0) {
-+	case 0x700:
-+		fallthrough;
- 	case 0x510:
- 		dd->caps.has_dma = 1;
- 		dd->caps.has_dualbuff = 1;
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nathan Chancellor <nathan@kernel.org>
+
+Ard Biesheuvel (2):
+  lib/xor: make xor prototypes more friendely to compiler vectorization
+  crypto: arm/xor - make vectorized C code Clang-friendly
+
+ arch/alpha/include/asm/xor.h           | 53 ++++++++----
+ arch/arm/include/asm/xor.h             | 42 ++++++----
+ arch/arm/lib/xor-neon.c                | 12 +--
+ arch/arm64/include/asm/xor.h           | 21 +++--
+ arch/arm64/lib/xor-neon.c              | 23 +++---
+ arch/ia64/include/asm/xor.h            | 21 +++--
+ arch/powerpc/include/asm/xor_altivec.h | 25 +++---
+ arch/powerpc/lib/xor_vmx.h             | 27 ++++---
+ arch/powerpc/lib/xor_vmx_glue.c        | 32 ++++----
+ arch/s390/lib/xor.c                    | 21 +++--
+ arch/sparc/include/asm/xor_32.h        | 21 +++--
+ arch/sparc/include/asm/xor_64.h        | 42 ++++++----
+ arch/x86/include/asm/xor.h             | 42 ++++++----
+ arch/x86/include/asm/xor_32.h          | 42 ++++++----
+ arch/x86/include/asm/xor_avx.h         | 21 +++--
+ include/asm-generic/xor.h              | 84 +++++++++++++-------
+ include/linux/raid/xor.h               | 21 +++--
+ 17 files changed, 351 insertions(+), 199 deletions(-)
+
+
+base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
 -- 
-2.17.1
+2.30.2
 
