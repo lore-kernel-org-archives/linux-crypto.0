@@ -2,143 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C09F1C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 17:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E001C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jan 2022 17:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232526AbiA0RXT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 12:23:19 -0500
-Received: from mail-eopbgr140131.outbound.protection.outlook.com ([40.107.14.131]:8580
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        id S240239AbiA0RcF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 12:32:05 -0500
+Received: from mail-eopbgr40080.outbound.protection.outlook.com ([40.107.4.80]:11680
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232024AbiA0RXS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 12:23:18 -0500
+        id S244622AbiA0RcD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jan 2022 12:32:03 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DmJo1bcLJSqCn9/nY0R30nm9488K/mNvNSRTwuMfMkivAWR+pC9IIWNIONsuKx0TppMtw5P3K793QHKGJfuS9/LKaOyl72pulxae4LJGBa5gogMUy2qx5y4h9kYC0lJVNjXsmHtr4PLEizSeZdXglx5C6TaD9a5AsStKm0hTsMEUlANcOuUdY5hFalku+GUMHAbG/f95+7r+L3KNho3ryII+KkHjH7Yd5vTFytKJUO8i9csPuqWYfbgYn/26L2A2w8+GhtNbvrlIvhLU/ZU3U3As29lO51ytNUMiggeFsirE5T6bEGe4fX/Xzsqma8MqMvAhJ031smlbqqN75KZkfQ==
+ b=EpWQMml9L5CIUO91pYgQXCw2qDrv938qt/H7G+f7rF1emwvZd1NECcDaZVy+UEdAvR2vfTZVNQFK9EaArkrdY6AuIimdqq8HvOHo4F97l3GAmIZ1GPmWJdGeht4Na+JG103QLrw6Izyoi3p6YDIxxAEKxH4d0HG41Ii0qKMLR2IpRSQNFe20kbgAXX18JY35hRHmU9HT1AQqN+wSP+NqHWI48OYraCCKMpCKjwUbZPLYdpSnq0pP7VwK+NovOraYN79GAxLIi/vjQ/b2KK2TsulC2vE/QmQu0/iEM1g1xfYtKGyihDMvb+gEaA9x4DvdZctdE8cL5pEGwo8Ifw5/6g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9FzclXlid2G0/YBctwdLiXbaJOmtENI2vVBw04OZi4Q=;
- b=KurZwEwp8Rn6GYPk7Zl0V6Zkdt44g0RQDJdRLa0GjAj8XnlrSewIyJ67F14IyozhYaTDCvQS3YRoAU/Bw0uiKk3yr8IU1Gq07TAqLXLMfwFMmF4KPTag9fk6TUpZOwpiKr5OihsA4KrIJkrjIwJh6fFCSdJhKfBGg9aqDkf2eam6BlgJ96UQguu7iHEpljYp+ZuAxIPbB4l1M81fdWnppTLUOV+lboweDJFRlH2Hx5CSyEuIEgYF2Qh5o26ROsBhxOWKpuoUeY+qzB3nGX9awF3Zs/dCmWBXCGG+2Ig5gPH6HhstRRqRPsSemucj8vIuKJdYXIvtX0zcs/k/rF11HQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.66) smtp.rcpttodomain=nxp.com smtp.mailfrom=arri.de; dmarc=none
- action=none header.from=arri.de; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=arrigroup.onmicrosoft.com; s=selector1-arrigroup-onmicrosoft-com;
+ bh=9dk8gGogatYy1mjGzBFi8T8Of9bqqyRz/nlmM5kA8Ew=;
+ b=YlITjbRgFfbgAY4sF11Rk+QkiBSFzd/dra06LUbeKrb0h4BJ8M3tvwrwSVc/Qn9DN14ANvEQ9tfcZC79CO4dC2MmFAffcPaaqPMweGAmn12HTB0jFYjHLruegvcpbTPO09KURhqiVA44pZIXSXNd+lsi2sU86gbzrOvO7ROfHecGPldTzoSxP1/6GUcGZA4v3PXwt9NFOn4nBcQnxp/HhzHWxaf5V9q+zjVunxrOmCkCB4AdVoBpSgMIIf+LgU/IngJ1jSd00F+nhcMS4BTNtVFXtpFY08NlElFrnFqObqkGWvlusBPEWKAnzknrT6Yp7pxLKruR2yeHcw0HpWskQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9FzclXlid2G0/YBctwdLiXbaJOmtENI2vVBw04OZi4Q=;
- b=MaPGrhy4C7rhwJD9XBATINN+zCzG5FJYCohODc6cQJDa354sq0AmVhbl7UY0zghEd4N0pv8Fcrh5U74lSIS4Qg5QRKfWI9HJhIHXMuTIuBu7Z3OALqhGR5+8SY8gdjZse8iEo/5sqhXULmDvULGNTCSVZGTfk04jpegCAlZsPdU=
-Received: from SV0P279CA0007.NORP279.PROD.OUTLOOK.COM (2603:10a6:f10:11::12)
- by DB6PR07MB3111.eurprd07.prod.outlook.com (2603:10a6:6:1f::30) with
+ bh=9dk8gGogatYy1mjGzBFi8T8Of9bqqyRz/nlmM5kA8Ew=;
+ b=HxisrEMmeqZ4gsulm5qmkHXxnMVw1WAOSFe5vx67hZkwdm/EYjgfvn2Q5DGSPBfTunQMiuw/HL9EuR+CvqtVAeO8qt13qq2QKBu576N7OcWROx+Im37m33/mgxwoCeKJ6x2LvdtxIwfwvIafN7AfHLw0puzAiqFADmbhbLpKWHcc4YH7CdKNDv4jMYjxBLDGsutfjN3nWcEkEtgv32uOp7KcLN3/xOZXRn9wYf6mQiiRqgE3Qx+8ImvDs6KJB7gEHEWHDBZdE5qZQ1xcrstC4KpMCFEYXq0lTP7WEuaxEULx6zAfFaWl06xOjLEyBc8NIeoIDqsT45VFlWzqPONoAA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=seco.com;
+Received: from DB7PR03MB4523.eurprd03.prod.outlook.com (2603:10a6:10:19::27)
+ by AM0PR03MB5953.eurprd03.prod.outlook.com (2603:10a6:208:15c::26) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.5; Thu, 27 Jan
- 2022 17:23:16 +0000
-Received: from HE1EUR02FT008.eop-EUR02.prod.protection.outlook.com
- (2603:10a6:f10:11:cafe::c9) by SV0P279CA0007.outlook.office365.com
- (2603:10a6:f10:11::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.15 via Frontend
- Transport; Thu, 27 Jan 2022 17:23:15 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.66)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.66 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.66; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.66) by
- HE1EUR02FT008.mail.protection.outlook.com (10.152.10.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4930.15 via Frontend Transport; Thu, 27 Jan 2022 17:23:15 +0000
-Received: from localhost.localdomain (192.168.54.252) by mta.arri.de
- (192.168.100.104) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 27 Jan
- 2022 18:23:14 +0100
-From:   Christian Eggers <ceggers@arri.de>
-To:     Sean Anderson <sean.anderson@seco.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Thu, 27 Jan
+ 2022 17:31:53 +0000
+Received: from DB7PR03MB4523.eurprd03.prod.outlook.com
+ ([fe80::2d1f:654e:f946:1a95]) by DB7PR03MB4523.eurprd03.prod.outlook.com
+ ([fe80::2d1f:654e:f946:1a95%6]) with mapi id 15.20.4930.015; Thu, 27 Jan 2022
+ 17:31:53 +0000
+Subject: Re: PROBLEM: encryption test failures since "crypto: mxs-dcp - Use
+ sg_mapping_iter to copy data"
+To:     Christian Eggers <ceggers@arri.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-CC:     Shawn Guo <shawnguo@kernel.org>,
+Cc:     Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
         Pengutronix Kernel Team <kernel@pengutronix.de>,
         Fabio Estevam <festevam@gmail.com>,
         NXP Linux Team <linux-imx@nxp.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <ceggers@arri.de>
-Subject: PROBLEM: encryption test failures since "crypto: mxs-dcp - Use sg_mapping_iter to copy data"
-Date:   Thu, 27 Jan 2022 18:23:13 +0100
-Message-ID: <2126453.Icojqenx9y@localhost.localdomain>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <2126453.Icojqenx9y@localhost.localdomain>
+From:   Sean Anderson <sean.anderson@seco.com>
+Message-ID: <414858de-f279-c5ce-83ca-5c28d6c847b1@seco.com>
+Date:   Thu, 27 Jan 2022 12:31:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <2126453.Icojqenx9y@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR22CA0018.namprd22.prod.outlook.com
+ (2603:10b6:208:238::23) To DB7PR03MB4523.eurprd03.prod.outlook.com
+ (2603:10a6:10:19::27)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Originating-IP: [192.168.54.252]
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 52795983-62cd-41f2-aa70-08d9e1b9b411
-X-MS-TrafficTypeDiagnostic: DB6PR07MB3111:EE_
-X-Microsoft-Antispam-PRVS: <DB6PR07MB31112B5E45756CCE694B6FFDBF219@DB6PR07MB3111.eurprd07.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:534;
+X-MS-Office365-Filtering-Correlation-Id: b3b52554-d3e2-4ecd-62af-08d9e1bae8ad
+X-MS-TrafficTypeDiagnostic: AM0PR03MB5953:EE_
+X-Microsoft-Antispam-PRVS: <AM0PR03MB595365FF15C8CAB2DD0A33DA96219@AM0PR03MB5953.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:272;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XYL/OIWrR9q9IuwY17H6ZTD416CUpRdMPdNfydZjs2DYZ4ErfCe207UpNjvDXz5Z7nZQM2J/Lvi+5WM34oMoA1WuAOPudeqyTbTQ/5li6F4IJKPtvbMO/lm8lslClVmeqnREE2gHTsE8x62cjMeVKvxKBNpFPFgD41fqlamvSc4t+o+pbsUwDPk4l4xpcGuc8j/vNpim/XIAw4r8n5Mi4zD9qOjAnuVfeQx+Z5LWPVVQYqnpEc5BE6ZjFIitqkgNBg4PqvXniAKlUnoHRbk7lo8RVP6vUoeBME8CAEfmaOSUeUPIU/9Wr/dF+kv7o3j7f6FGqsbSEugexmNDjfGPqQZ4HixaaJkLMF6nNEGbb/GtWab4QHeJY+Rc+0uQPOogXbd3v557S8pKH7jtYb8HehMALa+iLys51Hq4+D1i1DX4kJ+cn3fEp0KIOaL9+YV78hCIJ+U/DXXl0YeuS7ZkHDpLj+ZLJhQq/tJw5KGXvjHuQsLrkcYNc15x3aE97fl25gQ8reJH5M3X5+DLozO9h83SVYXDMQ+NmMHZqWF3bxGqOjbxmRcD7jLEIx4hQhBR4+z8ynDp70EA36UYsG8gpDPV9j7avBE/CZNvIS0C9wAbPNP7R11MQnsycW/Ausbjbhry51S2jYNv3NyXTshIZ1ZBRxRQX2ZLqsa4rzcCeDXfz+/rHDzAycW5QEOPktEf7esjD5FtZKCPiXMETEGKCZKBF+fnCPZqE9wEJ6XTlAQQm2a0d4XiOIGHiDC54DkgaJU/nnX6pGMYtIWyI2+WQkZEwfKr8zWrglTauQgfFe0=
-X-Forefront-Antispam-Report: CIP:217.111.95.66;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(36840700001)(46966006)(336012)(426003)(5660300002)(107886003)(83380400001)(8936002)(4326008)(70586007)(8676002)(36860700001)(70206006)(356005)(16526019)(186003)(26005)(55016003)(82310400004)(316002)(47076005)(110136005)(508600001)(54906003)(2906002)(81166007)(40460700003)(36916002)(9686003)(86362001)(7696005)(39026012)(36900700001)(20210929001);DIR:OUT;SFP:1102;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2022 17:23:15.3079
+X-Microsoft-Antispam-Message-Info: 7vDtf1hJPY2gDbSe+2Ra5elDlgjMTBtEWSSnPF0x60yTD8VjKa4LONbD0NpDFWBNKdnpOWHPTdELrdD/6YSG0Hh5r64ksGxEHa8kmQmGlohwMAlEUsv9DYmPmrq+lWP9CPUsY5Zf+KW+yyGBbU24lSiBYgklyUIPPaU/KO8rOLFgOmjstkarLrU0oUlY1fXnUw8aWgYNvllUyZnMXYQgyeG7vGBGDscXoylTXwYoL9qo6AcD85MSOJDaQEoJQiMcn8FfkJ5INi6nnqVMYYEd7ciET371361gZUc1nW7B3uP08rjWJWBwLyjs6dOWzuZBiFPzOe6k+Yjo38BXaYoK1tLrw6csYGYs2phuQWskP2Mtk1SBJbt19WhyffO6lJlJ6gJrrjy75P2OiwiXPhS5Fc9E02odOlMO5DAdUYuN0fMQXWYYhQ/R8I5BkjDsHpu/hVwsnCojihB4NCcA1Yjjwy9DmPrsPBXEYaJvzCosDFiU3LTFLBzhQovBcAp2UqtqvnSsvt1wNo/N5Y6AzNLB1XlthA/xOvtOZJ8GBy1YTUY8KHSpQ+d7ebxr1u1MIzXloODDdk8mRRZ6wjgt/xYIucfgt/BcoVcK7wSAVa9j3/9GkjkDkbiAbOF+Guyp+rjeHgNCO6ID1w/cwdRq77VeUZHhOwxixzpbpw6A18t6fuYauTe6kiSN8uG9UHpFxVFCArG57EXYsDD1qxDoXyeoXp4RTFvmcW9CN8vJ8bQt+RM81as5jjkvGZrFHmQ3/K929p+aat9+be/anexJdFTL85245kiBoVs9L3/7J9zwH3BSneDd0SvKOvkSuWDp/8QVpM5viFhF4RopV2PVCxrI01c6N1n84uI5vU370ItbVUE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR03MB4523.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(54906003)(8936002)(66946007)(36756003)(8676002)(5660300002)(66476007)(66556008)(110136005)(7416002)(4744005)(38350700002)(38100700002)(31696002)(316002)(4326008)(86362001)(508600001)(2616005)(26005)(186003)(966005)(6486002)(44832011)(52116002)(6512007)(31686004)(53546011)(6506007)(2906002)(6666004)(83380400001)(45980500001)(43740500002)(20210929001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bmVtVXQxQkE1TXlESWZYVUwyZDdzWnlYeXQ4WmhjSXFuSTQxWW1rUktPeDFa?=
+ =?utf-8?B?a1k2L3dRZi80L3JOaGZXNU9NUEJlWVp5SkZzaHorOTJ2eWlCU1BJVmxyNmdZ?=
+ =?utf-8?B?TjliUjUzV0dUZzhUb08zSDdnUEFJd0hoR3lEN01PSU9YS1UwYXFwaG9mV1pt?=
+ =?utf-8?B?ZDd0MnhqR0JEVXFrRWRyazhTTnAxekRRRnhhai9DVDJGam1sQjRDaDVmcTZi?=
+ =?utf-8?B?bElNcVV0U1ArZVJMWTN1a3FwVlRvbkc5VTJJUzV3dVVWSXYrZFhwNTRwZVli?=
+ =?utf-8?B?dStsSDlMLzRENC8rY2tsTmRQNWpHNnFEUXhKYjZsNUFDQzZmSGlwUGhzN1JK?=
+ =?utf-8?B?d3psazlDMzdhQ2dWK29lc0JZM2F3cmRpZ1RHcE81TlNtWFE1UnI4M0lpUlNk?=
+ =?utf-8?B?KzU0ek9xU0lVUnl0VHRrVmowTUdtdG12UUtqMHNOaGhQSVdrY3orRlZ1dlVO?=
+ =?utf-8?B?NzRJMnZOYXVXdVA4MFNiRi91T3BkaWJ3UHVEQWJzZlBVTXVvamNCdTVOTjFW?=
+ =?utf-8?B?Z0w3TmVpN3hZeERFeVJQK0txOTg5TWI4UXRvOWlWSWhVZlB4Q1E4RnczMDJ1?=
+ =?utf-8?B?VzFEd2pRR1ZiYkNWOUZxQUt2Njl1eFVSTTZxcm1LTE05dmZTMVVNTVFsTGcw?=
+ =?utf-8?B?M3VVaXRlNFBWMnpGT0lGbDh0VzdERjMxSkJJTmc1eHlTZjdEQlhwY3pndEs4?=
+ =?utf-8?B?UzdQcWhuZTJPZmNUMzI4YllYM1h3K3JEYllwL3lRQU1PaDJiQ1czTGFMOTRo?=
+ =?utf-8?B?S2xzRHk2VVBRbnBVN1hteXdFRTExOUVRcFU5SCs4SWE2SlhSSHhDWGViZXpR?=
+ =?utf-8?B?bi85Tm9kK3o2cXYvM3J0cUhZOCtJNTJWbzlNS3RydTkrRS9aQzJlS2I4aVNx?=
+ =?utf-8?B?Tm5ZT2gvVFQvc2xlbXBQenhaeXErSHlWSVZqcnBzNlpWT3doVGh0OWkvQnlm?=
+ =?utf-8?B?ejRQWkJMWFVtMk8vZC94eTZPY1RBdldtUU5VNUhBbzlpZkwzTlh6YVpFNXNl?=
+ =?utf-8?B?bUhENllmSlZjMVBQTzhLdHVvb1Y5b2ErSTZNL0ZXMThGbmg2OWpWeTN6dDc1?=
+ =?utf-8?B?LzRwVlZtSnI3SHBzRWJldDBEaExpZnRUc2ozRzJVMjhwc1BkNFA3UWZIcjhF?=
+ =?utf-8?B?dEZhMHNzN0hUOVVDVTlnMU9lcFRQNDJUYVN2MGp1aEhUNXBvQnJCK2JrQkQw?=
+ =?utf-8?B?VklxS0ZyYzNXR1VSbjBvSnp1bHVza2x4YXN2WXVFRXl4ZytGNVh2bkkxRnVH?=
+ =?utf-8?B?R2ZEbmYzeDYrUEQ5U0hMZklzWW84SEVqNmZZTG8rUXRRb2swT2VyWFRoS2ZK?=
+ =?utf-8?B?MUxBUlp3cDJmeXhOaDN0dXFVYXFvL0Jvdk9CeHRKYnBXZk1icFY2V09kSEht?=
+ =?utf-8?B?WDVSSjE4dWkxRVZ6ODRZa0VsamtHS0R6TjhGZUw0WEVITTNYR1o2ZGdjTE45?=
+ =?utf-8?B?TXA2M2s1cC9HS211WU9qYjFEVTgzVGR2aFlWSUR6U0hXSVZHTVNzbnE2WHRV?=
+ =?utf-8?B?R2Z6dWdidXZpZ0laSXRBeERUdlowWSsrZjJWT1VYdVF4VzNaRDVvTnpSRU1i?=
+ =?utf-8?B?T1N6VDlzc1orNkxjb1FDSEplS204bVpSb2JFVVdnSjdNKzZVTForekxldEs0?=
+ =?utf-8?B?YTg0YmxXZmxqcWxRb1NhMUpISGtHalo4NlFjWHpFVXI4S2phZm95c3VLTWxr?=
+ =?utf-8?B?VjFacmtkckdXN3NBQ1M1KyszOEk5MGNxdGl5T29yc1BUK2l6dzdaZ3UrSzlm?=
+ =?utf-8?B?TUp1ZkZ0T3l4alQrYlpJU0VWcGtGTGlMZGt1MzJSK1dKK2dXRVh1Uk5kNDBE?=
+ =?utf-8?B?RnJaRTFpTkhweVNNbTIzYlExRFg1aG9NcXNXbWVrVDVSd3dMSkliTUNSZW83?=
+ =?utf-8?B?Zm5mOHV2SkJnV0ExTGZibVJVa0xZNHE0L0JpSWlYRVE3bVhGaGZhU1MzbVNy?=
+ =?utf-8?B?NG5jUVVNT01oMEtzRjRZUUNvdENUa3ZKYlozRy96cnB1Y1ZnT2VtK3BScXF2?=
+ =?utf-8?B?bUdzV3A5MUhUYXpyVmEweEhBRENpajNpMVdocUs5Zm5URm1MTDdrYU05SUd1?=
+ =?utf-8?B?M3VCUjJsMnA0MHVGSFY2Wjl3WlRvOS8wOTY0SG5MT3dFdDlEbStXdS9rOEo0?=
+ =?utf-8?B?UE45OFN4ODZranJIMG8rY0M5THBFWk9rTndXTTJDUXBKV3RkdGhWbEtwV0ho?=
+ =?utf-8?Q?/O2O3Lx5DDdpHgO+BMt/Lu0=3D?=
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3b52554-d3e2-4ecd-62af-08d9e1bae8ad
+X-MS-Exchange-CrossTenant-AuthSource: DB7PR03MB4523.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2022 17:31:53.5042
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52795983-62cd-41f2-aa70-08d9e1b9b411
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.66];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource: HE1EUR02FT008.eop-EUR02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR07MB3111
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6etF7MPITHgle9BQJHiNJXx5qT3aroDlLXslbmG9z54kNVfrvC4dOkckEasSzLsoxdVldsLc+6W/h3//f8PurA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR03MB5953
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SoC: i.MX6ULL
+Hi Christian,
 
-After upgrading from v5.10.65-rt53 to v5.10.73-rt54 I get two additional messages on boot:
+On 1/27/22 12:23 PM, Christian Eggers wrote:
+> SoC: i.MX6ULL
+> 
+> After upgrading from v5.10.65-rt53 to v5.10.73-rt54 I get two additional messages on boot:
+> 
+> ...
+> [ 3.786333] alg: skcipher: ecb-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
+> [ 3.789020] alg: skcipher: cbc-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
+> [ 3.793741] mxs-dcp 2280000.crypto: mxs_dcp: initialized
+> ..
+> 
+> After reverting the commit
+> 
+> 2e6d793e1bf0 ("crypto: mxs-dcp - Use sg_mapping_iter to copy data")
+> 
+> the error messages above disappear again.
 
-...
-[    3.786333] alg: skcipher: ecb-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
-[    3.789020] alg: skcipher: cbc-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
-[    3.793741] mxs-dcp 2280000.crypto: mxs_dcp: initialized
-..
+Can you try applying the patch in [1] on top of your revert?
 
-After reverting the commit
+--Sean
 
-2e6d793e1bf0 ("crypto: mxs-dcp - Use sg_mapping_iter to copy data")
-
-the error messages above disappear again.
-
-regards
-Christian
-
-[3.] Keywords: mxc-dcp, crypto manager self tests
-[4.] Kernel information
-[4.1.] Kernel version (from /proc/version):
-Linux version 5.10.73-rt54+ (eggers@localhost.localdomain) (arm-poky-linux-gnueabi-gcc (GCC) 10.2.0, GNU ld (GNU Binutils) 2.35.1) #19 PREEMPT_RT Thu Jan 27 17:56:20 CET 2022
-
-[4.2.] Kernel .config file:
-[5.] Most recent kernel version which did not have the bug: 5.10.65-rt53
-[8.] Environment
-[8.1.] Software (add the output of the ver_linux script here)
-n/a (embedded system, kernel cross compiled)
-
-[8.2.] Processor information (from /proc/cpuinfo):
-processor       : 0
-model name      : ARMv7 Processor rev 5 (v7l)
-BogoMIPS        : 16.00
-Features        : half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm 
-CPU implementer : 0x41
-CPU architecture: 7
-CPU variant     : 0x0
-CPU part        : 0xc07
-CPU revision    : 5
-
-Hardware        : Freescale i.MX6 Ultralite (Device Tree)
-Revision        : 0000
-Serial          : 0000000000000000
-
-
-
+[1] https://lore.kernel.org/linux-arm-kernel/20210701185638.3437487-1-sean.anderson@seco.com/
