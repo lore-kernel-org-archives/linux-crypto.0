@@ -2,49 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB65C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C187C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346492AbiA1G15 (ORCPT
+        id S1346481AbiA1G26 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 01:27:57 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60624 "EHLO fornost.hmeau.com"
+        Fri, 28 Jan 2022 01:28:58 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60626 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346489AbiA1G14 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 01:27:56 -0500
+        id S237265AbiA1G2z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jan 2022 01:28:55 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nDKjh-0001GM-Os; Fri, 28 Jan 2022 17:27:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 17:27:53 +1100
-Date:   Fri, 28 Jan 2022 17:27:53 +1100
+        id 1nDKkc-0001It-K9; Fri, 28 Jan 2022 17:28:51 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 17:28:50 +1100
+Date:   Fri, 28 Jan 2022 17:28:50 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kai Ye <yekai13@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH v2] crypto: hisilicon/qm - cleanup warning in
- qm_vf_read_qos
-Message-ID: <YfOM6VBbXKBhFRy4@gondor.apana.org.au>
-References: <20220122093042.40131-1-yekai13@huawei.com>
+To:     Tomas Paukrt <tomaspaukrt@email.cz>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: mxs-dcp - Fix scatterlist processing
+Message-ID: <YfONIv8D7qs/leId@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220122093042.40131-1-yekai13@huawei.com>
+In-Reply-To: <T0R.ZXsl.2soFymqM66b.1Xx3df@seznam.cz>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 22, 2022 at 05:30:42PM +0800, Kai Ye wrote:
-> The kernel test rebot report this warning: Uninitialized variable: ret.
-> The code flow may return value of ret directly. This value is an
-> uninitialized variable, here is fix it.
+Tomas Paukrt <tomaspaukrt@email.cz> wrote:
+> This patch fixes a bug in scatterlist processing that may cause incorrect AES block encryption/decryption.
 > 
-> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> Fixes: 2e6d793e1bf0 ("crypto: mxs-dcp - Use sg_mapping_iter to copy data")
+> Signed-off-by: Tomas Paukrt <tomaspaukrt@email.cz>
 > ---
-> changes v1->v2:
-> 	modfiy the comments.
-> 
->  drivers/crypto/hisilicon/qm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/crypto/mxs-dcp.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
