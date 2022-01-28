@@ -2,173 +2,287 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A62A9C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 07:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8EE8C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 08:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345859AbiA1HoW (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 02:44:22 -0500
-Received: from mail-eopbgr70055.outbound.protection.outlook.com ([40.107.7.55]:47844
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1346790AbiA1HoN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 02:44:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QeYiMizfE1hCvFKp5DrK/7EciKkgkyL7i5CIGz0JZOrLTW67fKGjWvUEy30aKvO4NgwqWB+eTPiIoh3XK6WxaE/jnnvgBWMwDWeFm3zHfvhsCIN5sLBOu1f8r6Bhf6K2tV6jzvLqoEXi4BbtQaffNEHTFj5JaU5c8wWvUmk6qomnQMrJkrqv0BhfNDPdd9n/GL/0WPxSLzGdS1h4jZTX/s9kEnwXr1+6SQZO1J2+S9l7RJcav8ydODN4rsS91qgEGQpRp2g7KslmMxr4clyVjJVTV3DZRG/HwzP1+JWJ2Pw+NlDcMtiMxUiZVBXaqDXHewEyL5BmDQaMqTox0XM3lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zmyFl2hAT+w81tD1eRjEdZwiqIJPkSusheowJuea7JA=;
- b=IDg69TRumpRDrbL7e03CnqwPdJiET/kzhovAe4pokovDwLOuFVnI7PI+P00o/v1QQCrfY9hg8hRrHEgAonC/scbqnRBQUCZsHLRnA9LBYj6Pul671CcEmXGx9PEtYjgWqr4s23NX1B9FmASOD2l+KRKfLFvlGueQ9/OBqJAvdnGm/TL9eDiSYHaAJwbPTF7zfUQ/CINJzOBFW9Ybou9/MsdAvh7drBnXncOqWqT9gpsiU9Lm7fpd8JkItygXpcLNUEaR0Z//D9NQueUpQBuxaCYQz2W0KgqUI+nE7rbpsTNc5HnU9eZPZntDAe5+at3kkTo62QyQmQ5qCwxMiSRYZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zmyFl2hAT+w81tD1eRjEdZwiqIJPkSusheowJuea7JA=;
- b=W+wRLmNT1fdFRt/cgkUPrRMGtv/6Hvq6OGUnxOUZbwl97RJgOwrFsfZAQyNDgyGlJYs5txXdEHNjzxqri8K+W7rRVSQ/NE6f09AWrcHX5kJIIfZ4OG739cs8YzxDYCqxpBNkXxGHKcPAwfxZkr5zPwlgd+5qlwZvl2jbm+Klql0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com (2603:10a6:803:4d::29)
- by AM6PR04MB4487.eurprd04.prod.outlook.com (2603:10a6:20b:23::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4930.17; Fri, 28 Jan
- 2022 07:44:11 +0000
-Received: from VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4de2:963a:1528:b086]) by VI1PR04MB4046.eurprd04.prod.outlook.com
- ([fe80::4de2:963a:1528:b086%4]) with mapi id 15.20.4930.017; Fri, 28 Jan 2022
- 07:44:11 +0000
-Message-ID: <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
-Date:   Fri, 28 Jan 2022 09:44:09 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH] crypto: caam - enable prediction resistance conditionally
-Content-Language: en-US
+        id S231296AbiA1Iim (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 03:38:42 -0500
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:46228 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231660AbiA1Iik (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jan 2022 03:38:40 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0V31junr_1643359118;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V31junr_1643359118)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 28 Jan 2022 16:38:38 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Fabio Estevam <festevam@gmail.com>
-Cc:     Andrei Botila <andrei.botila@nxp.com>,
-        "andrew.smirnov@gmail.com" <andrew.smirnov@gmail.com>,
-        "fredrik.yhlen@endian.se" <fredrik.yhlen@endian.se>,
-        "hs@denx.de" <hs@denx.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>
-References: <20220111124104.2379295-1-festevam@gmail.com>
- <YfOL3Yxvb5srGKp4@gondor.apana.org.au>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-In-Reply-To: <YfOL3Yxvb5srGKp4@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0202CA0004.eurprd02.prod.outlook.com
- (2603:10a6:200:89::14) To VI1PR04MB4046.eurprd04.prod.outlook.com
- (2603:10a6:803:4d::29)
+        "David S. Miller" <davem@davemloft.net>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH] crypto: tcrypt - remove all multibuffer ahash tests
+Date:   Fri, 28 Jan 2022 16:38:35 +0800
+Message-Id: <20220128083835.13890-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fecd3f29-c753-4244-5d74-08d9e231f91b
-X-MS-TrafficTypeDiagnostic: AM6PR04MB4487:EE_
-X-Microsoft-Antispam-PRVS: <AM6PR04MB44871A232F9994894BF7B0BF98229@AM6PR04MB4487.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7nsmMXJ9WTVCLCZzROfS3aA7Wy9aXvoqIJqNtwpFPpqsd56vxHZy6A7u+VeFl1vhdVHoOsUG/5nmSyms47rbkBXgpnrlNsti3sSsj8fY9aP4P20mocGjxT8BoXrPovsWzRgiRJ+nS7mhK8+Kvul8e+FVHzKJwSBQvNQRaAa6UhJS26xqkohcfC5FMhn7+EnoXr9vOnSqwZZVdxszYdz5wdL7yLm676JYUma0zipDk01PM67Sh3j76VWPzZKEtyVOWODtUQEy2QSJkMETef/E24l4exdz7pcj/fBCCI978JfDlf7teRIs/ZhH/wtIm1nFG4fG6r0k4H2XFxgJRENI2lCVgZw3pmZWDBhqdpCuyIxW/ruAVXC15OxPyZvRJghmVa2mfr+tLCxiXxMXtdA3OKNxwFxLAbsgYGo6PhrPccj6qKax8uqb25Ba1X1TQWn1wS1defbAFl05bLThC1skZGk7EnZXpJ4XSCQFjxgXRPg6fS3py0RKii3hACAJGraZqvQOZn3RKIzOaeeJ4/syjNgzDGfLBLlTeuUy0Qfe1n6IMFvbQIsOiOHm5ESPyWeIF+zsuNhzFWnPlfMsDt3A39G4B1/0umj2REQ+OPYEiaNuts/p3klae8umX71X7rQ4CSqOqiGPu1D7oRZtz/GlUt+ZdyROYC2N6AkKOBGipQWuIKo4vWVPJ2LrFi80L59WfDsX/xWtmNC7sZZQt0hZQWekiaR7g2ylmipwEBi/fsrHl5sF63jlKeQtAehQcRjb8RZOusowSBybVYHqVzBD1g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB4046.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(316002)(83380400001)(508600001)(54906003)(110136005)(53546011)(6512007)(6506007)(52116002)(86362001)(6486002)(26005)(186003)(31696002)(2616005)(38350700002)(5660300002)(36756003)(31686004)(2906002)(38100700002)(66946007)(4326008)(8936002)(66476007)(66556008)(8676002)(43740500002)(45980500001)(20210929001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WTNNaUVzQzRPOWxjRzBicEtFaXA5TnRMa1RhVVlqVWwweHRXaVBYYnJseVoy?=
- =?utf-8?B?V3BkblhteVJOR1ZsVDNvcmdVbWs2NmdYZEFlSlhUaVk0SGRJUnpvS2RzNWho?=
- =?utf-8?B?ZklJeHZ3VzhHTWdnVWx4ZGZKV0NrZGxMR0Z4bWUwUnFrY2xKeTAxTWFoREdh?=
- =?utf-8?B?dWFkYVIreG5YdTNoNXZQb0FXcE5Db25LZ3RrWmwvUHpnZFNvRWZXWFhKckht?=
- =?utf-8?B?TGQrVC84OU5oZFJhdDVhNU01b21ra1VtSUo3YjJNQUFZWU91R3ZnMGNJM2ll?=
- =?utf-8?B?OGJmWitMR2NaR0lqL0lIZ3VrOFNLaHhKaVhXQzdQOTdqSktIRmwvUnBVa0ZM?=
- =?utf-8?B?eGloL29pc0UvamV4M1VNY1BiUS9CeVFyUURaZE1SUTZMaURScTZldllEVWtP?=
- =?utf-8?B?MzNVOTlaZFJ2VE5QOWRCc250T1NCRnh4aDBBMkFXc0VXamlsNDBtZ3ZmL2s2?=
- =?utf-8?B?Y1pHdWJHQzZLMHZkSjh1STVJUCtEbjFvbE03ZFZDVW4rdjJXL2hHdmNMQ1RM?=
- =?utf-8?B?b0RQRHFaS0FqUDBMcEFqbHVKNktPcy9DMTJnN2VuT2VrN2YzcDB4S2JzR0p1?=
- =?utf-8?B?NC9rL2pSSlV3TDk2ZWJNTC9Db1dYaTFSMTRIeWN6T0hWa2hSQ3l6RzNNTGto?=
- =?utf-8?B?VjdIQnRzVnFhMGZzS0RVQTV6cWkvQk5WeGYyMmdPK1ZwTTExbUNzTFJNaHBO?=
- =?utf-8?B?WDdTNUs0SFJHUk9SMDZuRmNDQVY2cGZZSDVWNnIxQ01RWlFiQmlFRVZKL2VI?=
- =?utf-8?B?SHRITElCVlROMk5WT2RyRlNWeDFldytQK3RidDFIWmNWSVBsTC95UVM2eWJW?=
- =?utf-8?B?aE1KeWhHNzc5Nzh6QUx0bFpmNkk1YnlMQTNFMjkyQlhOZ29pVnowd0IwbFVk?=
- =?utf-8?B?RDBpaE5ZeWdiV0Z2Z0l0NGhOUFRVWHljd25Ya0REVXNSSXhaVC9nZUw4emFX?=
- =?utf-8?B?cERld1FTanE5Vkt1T2lQNS9QTVVzRnZpZDQvQ3hOZHVwdElpVFNwMFY2ajRD?=
- =?utf-8?B?cnZEeVBIYksycmdTd1E5T3p1Zm5lUW5hSTY5bmdHaW15YzJYMTg4RDVKZTBp?=
- =?utf-8?B?WlE0d0gwczZid09DYU5abEhPZ1RrZ1M0bXJNTGx2ZHY4MEIyUFNDRTRoZzVT?=
- =?utf-8?B?ZTNrREpRMFJ2Y0FCeEsrTXFFbXhZZmk0RE4zdGtQUTAyTWp4Y213d1FXbHk5?=
- =?utf-8?B?bk9XNC9vOW55TWp1aTE4TENIS2w2MExWMlpIcXJ1YS9OSEFUdW45M1ZtSUhl?=
- =?utf-8?B?UXhJR1FIVjVjMTM1NWE5YXdtS1YwSUY3N29ML0pYemZBNlh4NUhTQ3JYTlVa?=
- =?utf-8?B?Y2xYdk5NWXNubFRDa21udEh5czZBM0tWdTU4WDdpMksydWZJVThtMWlic0ZT?=
- =?utf-8?B?U3RkSzlZYnRMMGljVDBXaStiZlhtWmNuYzdRK2ZGMUZoZkcyaHM2Wjg2SGZQ?=
- =?utf-8?B?d0M0SmRWLzVieTBmcGlMMjNyR0RGaURVNUpISUtoTloxOVlYTUlRMjBlMTJm?=
- =?utf-8?B?ZEdWK2NmK2FKcmx5ZzJ1aUUzaE9DRCtHaWNWbEpXTEFyelF2Qk1mTThXd0Va?=
- =?utf-8?B?Y3pRanFRNXpDYlhSK2c4djdXYmJlQ29VWTlzbXBacExKSVRuQ3daNVViVlJ4?=
- =?utf-8?B?cW11UkdGM0FOUnFHQlJxekFxZVNiM2RBTXdWei8xMkhHWUJSM1BmRndXRCtw?=
- =?utf-8?B?eFhKNkNHOWJDTFN6VHhTZi9JTmpGd1NKdGlGOGVGc04wM2xLZlNkbkVPVUNw?=
- =?utf-8?B?bHdibmdpMlZUTllRRDJGMVU2aGNJWXR2VUN2MTRyOXd2dm5TcG9Yd2ZGVk55?=
- =?utf-8?B?L3U1WitTL2VsbkxzTFlQWUhiN25jQ0lLemJDaDE5TXhtYjdJV2xmQUcyREZu?=
- =?utf-8?B?VnZVcDJ1UkdjTWEwZ245SkQ4TnNrMXZ4d0FpTG90Y2Jna1ZPWXZFMFNMR0t0?=
- =?utf-8?B?M0Q3anRtQmxZVEY0RWlJdkFHcG01TVp3dU9YMGlQa1k3Q1k1WFFzRlhJWk50?=
- =?utf-8?B?a2NPa1VnbEx1ZzAzb2dTYnhiWHFiam1DTzA5UlFzS3hoK0pHUE1OeU9yZFh3?=
- =?utf-8?B?L3ZiRWEzWFozdHdRd29NN2FCa2k5WTFlcVpDVWoxQk5yREp5bnFjZTR2TG9v?=
- =?utf-8?B?Q01QSlhPVWlBMmVFOGdCd3dDKzk0VDJpa0hXb3dEV29wVlJGVjdhVkZQS0hP?=
- =?utf-8?Q?PRsclVS7D36kTUyR9BEPQpc=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fecd3f29-c753-4244-5d74-08d9e231f91b
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB4046.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2022 07:44:11.1637
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bWRY2ikJFrJOPvUGlnAg/cTuO3vLsGsqC3CeXsrj6JDvj0j14zv0joxK7ACmTE3RfV+2wnl/fgl6TReATaNCQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB4487
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/28/2022 8:23 AM, Herbert Xu wrote:
-> On Tue, Jan 11, 2022 at 09:41:04AM -0300, Fabio Estevam wrote:
->> From: Fabio Estevam <festevam@denx.de>
->>
->> Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
->> in HRWNG") the following CAAM errors can be seen on i.MX6:
->>
->> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
->> hwrng: no data available
->> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
->> hwrng: no data available
->> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
->> hwrng: no data available
->> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
->> hwrng: no data available
->>
->> OP_ALG_PR_ON is enabled unconditionally, which may cause the problem
->> on i.MX devices.
->>
-What parts exactly?
-Anything besides i.MX6 SX, S/DL?
+The multibuffer algorithms was removed already in 2018, so it is
+necessary to clear the test code left by tcrypt.
 
->> Fix the problem by only enabling OP_ALG_PR_ON on platforms that have
->> Management Complex support.
->>
-This limitation doesn't make any sense, it's too general.
-Only a handful of Layerscape devices have MC, so all i.MX devices and
-most LS devices will no longer have prediction resistance enabled.
+Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/tcrypt.c | 224 ------------------------------------------------
+ 1 file changed, 224 deletions(-)
 
->> Fixes: 358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG")
->> Signed-off-by: Fabio Estevam <festevam@denx.de>
->> ---
->>  drivers/crypto/caam/caamrng.c | 15 +++++++++++----
->>  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> Patch applied.  Thanks.
-We've been in contact with Fabio and we're working on a solution.
-Now I realize the list hasn't been Cc-ed - sorry for the confusion
-and for not providing an explicit Nack.
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index 82b5eef2246a..2a808e843de5 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -724,200 +724,6 @@ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
+ 	return crypto_wait_req(ret, wait);
+ }
+ 
+-struct test_mb_ahash_data {
+-	struct scatterlist sg[XBUFSIZE];
+-	char result[64];
+-	struct ahash_request *req;
+-	struct crypto_wait wait;
+-	char *xbuf[XBUFSIZE];
+-};
+-
+-static inline int do_mult_ahash_op(struct test_mb_ahash_data *data, u32 num_mb,
+-				   int *rc)
+-{
+-	int i, err = 0;
+-
+-	/* Fire up a bunch of concurrent requests */
+-	for (i = 0; i < num_mb; i++)
+-		rc[i] = crypto_ahash_digest(data[i].req);
+-
+-	/* Wait for all requests to finish */
+-	for (i = 0; i < num_mb; i++) {
+-		rc[i] = crypto_wait_req(rc[i], &data[i].wait);
+-
+-		if (rc[i]) {
+-			pr_info("concurrent request %d error %d\n", i, rc[i]);
+-			err = rc[i];
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+-				 int secs, u32 num_mb)
+-{
+-	unsigned long start, end;
+-	int bcount;
+-	int ret = 0;
+-	int *rc;
+-
+-	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+-	if (!rc)
+-		return -ENOMEM;
+-
+-	for (start = jiffies, end = start + secs * HZ, bcount = 0;
+-	     time_before(jiffies, end); bcount++) {
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	pr_cont("%d operations in %d seconds (%llu bytes)\n",
+-		bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+-
+-out:
+-	kfree(rc);
+-	return ret;
+-}
+-
+-static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
+-				u32 num_mb)
+-{
+-	unsigned long cycles = 0;
+-	int ret = 0;
+-	int i;
+-	int *rc;
+-
+-	rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+-	if (!rc)
+-		return -ENOMEM;
+-
+-	/* Warm-up run. */
+-	for (i = 0; i < 4; i++) {
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		if (ret)
+-			goto out;
+-	}
+-
+-	/* The real thing. */
+-	for (i = 0; i < 8; i++) {
+-		cycles_t start, end;
+-
+-		start = get_cycles();
+-		ret = do_mult_ahash_op(data, num_mb, rc);
+-		end = get_cycles();
+-
+-		if (ret)
+-			goto out;
+-
+-		cycles += end - start;
+-	}
+-
+-	pr_cont("1 operation in %lu cycles (%d bytes)\n",
+-		(cycles + 4) / (8 * num_mb), blen);
+-
+-out:
+-	kfree(rc);
+-	return ret;
+-}
+-
+-static void test_mb_ahash_speed(const char *algo, unsigned int secs,
+-				struct hash_speed *speed, u32 num_mb)
+-{
+-	struct test_mb_ahash_data *data;
+-	struct crypto_ahash *tfm;
+-	unsigned int i, j, k;
+-	int ret;
+-
+-	data = kcalloc(num_mb, sizeof(*data), GFP_KERNEL);
+-	if (!data)
+-		return;
+-
+-	tfm = crypto_alloc_ahash(algo, 0, 0);
+-	if (IS_ERR(tfm)) {
+-		pr_err("failed to load transform for %s: %ld\n",
+-			algo, PTR_ERR(tfm));
+-		goto free_data;
+-	}
+-
+-	for (i = 0; i < num_mb; ++i) {
+-		if (testmgr_alloc_buf(data[i].xbuf))
+-			goto out;
+-
+-		crypto_init_wait(&data[i].wait);
+-
+-		data[i].req = ahash_request_alloc(tfm, GFP_KERNEL);
+-		if (!data[i].req) {
+-			pr_err("alg: hash: Failed to allocate request for %s\n",
+-			       algo);
+-			goto out;
+-		}
+-
+-		ahash_request_set_callback(data[i].req, 0, crypto_req_done,
+-					   &data[i].wait);
+-
+-		sg_init_table(data[i].sg, XBUFSIZE);
+-		for (j = 0; j < XBUFSIZE; j++) {
+-			sg_set_buf(data[i].sg + j, data[i].xbuf[j], PAGE_SIZE);
+-			memset(data[i].xbuf[j], 0xff, PAGE_SIZE);
+-		}
+-	}
+-
+-	pr_info("\ntesting speed of multibuffer %s (%s)\n", algo,
+-		get_driver_name(crypto_ahash, tfm));
+-
+-	for (i = 0; speed[i].blen != 0; i++) {
+-		/* For some reason this only tests digests. */
+-		if (speed[i].blen != speed[i].plen)
+-			continue;
+-
+-		if (speed[i].blen > XBUFSIZE * PAGE_SIZE) {
+-			pr_err("template (%u) too big for tvmem (%lu)\n",
+-			       speed[i].blen, XBUFSIZE * PAGE_SIZE);
+-			goto out;
+-		}
+-
+-		if (klen)
+-			crypto_ahash_setkey(tfm, tvmem[0], klen);
+-
+-		for (k = 0; k < num_mb; k++)
+-			ahash_request_set_crypt(data[k].req, data[k].sg,
+-						data[k].result, speed[i].blen);
+-
+-		pr_info("test%3u "
+-			"(%5u byte blocks,%5u bytes per update,%4u updates): ",
+-			i, speed[i].blen, speed[i].plen,
+-			speed[i].blen / speed[i].plen);
+-
+-		if (secs) {
+-			ret = test_mb_ahash_jiffies(data, speed[i].blen, secs,
+-						    num_mb);
+-			cond_resched();
+-		} else {
+-			ret = test_mb_ahash_cycles(data, speed[i].blen, num_mb);
+-		}
+-
+-
+-		if (ret) {
+-			pr_err("At least one hashing failed ret=%d\n", ret);
+-			break;
+-		}
+-	}
+-
+-out:
+-	for (k = 0; k < num_mb; ++k)
+-		ahash_request_free(data[k].req);
+-
+-	for (k = 0; k < num_mb; ++k)
+-		testmgr_free_buf(data[k].xbuf);
+-
+-	crypto_free_ahash(tfm);
+-
+-free_data:
+-	kfree(data);
+-}
+-
+ static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
+ 				     char *out, int secs)
+ {
+@@ -2574,36 +2380,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		test_ahash_speed("sm3", sec, generic_hash_speed_template);
+ 		if (mode > 400 && mode < 500) break;
+ 		fallthrough;
+-	case 450:
+-		test_mb_ahash_speed("sha1", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 451:
+-		test_mb_ahash_speed("sha256", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 452:
+-		test_mb_ahash_speed("sha512", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 453:
+-		test_mb_ahash_speed("sm3", sec, generic_hash_speed_template,
+-				    num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 454:
+-		test_mb_ahash_speed("streebog256", sec,
+-				    generic_hash_speed_template, num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+-	case 455:
+-		test_mb_ahash_speed("streebog512", sec,
+-				    generic_hash_speed_template, num_mb);
+-		if (mode > 400 && mode < 500) break;
+-		fallthrough;
+ 	case 499:
+ 		break;
+ 
+-- 
+2.34.1
 
-Herbert, could you please revert this patch?
-
-It's doing more harm than good, since it's making the internal CAAM RNG
-work like a DRBG / PRNG (instead of TRNG) while the driver registers
-to hwrng as an entropy source.
-
-Thanks,
-Horia
