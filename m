@@ -2,68 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF99DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 02:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCAA0C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 04:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbiA1C7g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 21:59:36 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60572 "EHLO fornost.hmeau.com"
+        id S237463AbiA1Enp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 23:43:45 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60582 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231668AbiA1C7f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 21:59:35 -0500
+        id S237235AbiA1Enp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jan 2022 23:43:45 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nDHTR-0006y2-9A; Fri, 28 Jan 2022 13:58:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 13:58:53 +1100
-Date:   Fri, 28 Jan 2022 13:58:53 +1100
+        id 1nDJ5r-00084p-2z; Fri, 28 Jan 2022 15:42:40 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 15:42:38 +1100
+Date:   Fri, 28 Jan 2022 15:42:38 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Sean Anderson <sean.anderson@seco.com>
-Cc:     Christian Eggers <ceggers@arri.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-Subject: Re: PROBLEM: encryption test failures since "crypto: mxs-dcp - Use
- sg_mapping_iter to copy data"
-Message-ID: <YfNb7WMXWv1flCvM@gondor.apana.org.au>
-References: <2126453.Icojqenx9y@localhost.localdomain>
- <414858de-f279-c5ce-83ca-5c28d6c847b1@seco.com>
+Subject: Re: [PATCH v4 6/6] crypto: tcrypt - add asynchronous speed test for
+ SM3
+Message-ID: <YfN0PsCAXYo0Hx9T@gondor.apana.org.au>
+References: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
+ <20220107120700.730-7-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <414858de-f279-c5ce-83ca-5c28d6c847b1@seco.com>
+In-Reply-To: <20220107120700.730-7-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 27, 2022 at 12:31:48PM -0500, Sean Anderson wrote:
-> Hi Christian,
+On Fri, Jan 07, 2022 at 08:07:00PM +0800, Tianjia Zhang wrote:
+> tcrypt supports testing of SM3 hash algorithms that use AVX
+> instruction acceleration.
 > 
-> On 1/27/22 12:23 PM, Christian Eggers wrote:
-> > SoC: i.MX6ULL
-> > 
-> > After upgrading from v5.10.65-rt53 to v5.10.73-rt54 I get two additional messages on boot:
-> > 
-> > ...
-> > [ 3.786333] alg: skcipher: ecb-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
-> > [ 3.789020] alg: skcipher: cbc-aes-dcp encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
-> > [ 3.793741] mxs-dcp 2280000.crypto: mxs_dcp: initialized
-> > ..
-> > 
-> > After reverting the commit
-> > 
-> > 2e6d793e1bf0 ("crypto: mxs-dcp - Use sg_mapping_iter to copy data")
-> > 
-> > the error messages above disappear again.
+> In order to add the sm3 asynchronous test to the appropriate
+> position, shift the testcase sequence number of the multi buffer
+> backward and start from 450.
 > 
-> Can you try applying the patch in [1] on top of your revert?
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  crypto/tcrypt.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 
-Please resubmit your patch with a proper Subject, otherwise it'll
-be automatically discarded by patchwork.
+This is not an issue with your patch but we should delete all
+the mb hash tests as the mb hash algorithm tself was removed
+in 2018.
 
 Thanks,
 -- 
