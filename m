@@ -2,55 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3313C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 247ADC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:36:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234147AbiA1GaM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 01:30:12 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60628 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231443AbiA1GaJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 01:30:09 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nDKkx-0001Jr-1S; Fri, 28 Jan 2022 17:29:12 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 17:29:10 +1100
-Date:   Fri, 28 Jan 2022 17:29:10 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     yury.norov@gmail.com, andriy.shevchenko@linux.intel.com,
-        linux@rasmusvillemoes.dk, akpm@linux-foundation.org,
-        mirq-linux@rere.qmqm.pl, gregkh@linuxfoundation.org,
-        peterz@infradead.org, David.Laight@aculab.com, joe@perches.com,
-        dennis@kernel.org, kernel@esmil.dk, npiggin@gmail.com,
-        matti.vaittinen@fi.rohmeurope.com, aklimov@redhat.com,
-        linux-kernel@vger.kernel.org, steffen.klassert@secunet.com,
-        daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 21/54] kernel: replace cpumask_weight with cpumask_empty
- in padata.c
-Message-ID: <YfONNmDkwcKK+Ik2@gondor.apana.org.au>
+        id S238167AbiA1GgZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 01:36:25 -0500
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:48804 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S242635AbiA1GgY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jan 2022 01:36:24 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0V31BaWY_1643351778;
+Received: from 30.240.99.245(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V31BaWY_1643351778)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 28 Jan 2022 14:36:21 +0800
+Message-ID: <948c7ddc-1a2d-aa38-1841-576ab85e63a4@linux.alibaba.com>
+Date:   Fri, 28 Jan 2022 14:36:17 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220123183925.1052919-22-yury.norov@gmail.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.0
+Subject: Re: [PATCH v4 6/6] crypto: tcrypt - add asynchronous speed test for
+ SM3
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
+ <20220107120700.730-7-tianjia.zhang@linux.alibaba.com>
+ <YfN0PsCAXYo0Hx9T@gondor.apana.org.au>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <YfN0PsCAXYo0Hx9T@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Yury Norov <yury.norov@gmail.com> wrote:
-> padata_do_parallel() calls cpumask_weight() to check if any bit of a
-> given cpumask is set. We can do it more efficiently with cpumask_empty()
-> because cpumask_empty() stops traversing the cpumask as soon as it finds
-> first set bit, while cpumask_weight() counts all bits unconditionally.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> ---
-> kernel/padata.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Herbert,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 1/28/22 12:42 PM, Herbert Xu wrote:
+> On Fri, Jan 07, 2022 at 08:07:00PM +0800, Tianjia Zhang wrote:
+>> tcrypt supports testing of SM3 hash algorithms that use AVX
+>> instruction acceleration.
+>>
+>> In order to add the sm3 asynchronous test to the appropriate
+>> position, shift the testcase sequence number of the multi buffer
+>> backward and start from 450.
+>>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   crypto/tcrypt.c | 14 +++++++++-----
+>>   1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> This is not an issue with your patch but we should delete all
+> the mb hash tests as the mb hash algorithm tself was removed
+> in 2018.
+> 
+> Thanks,
+
+Thanks for the reminder, I will add an extra patch to remove the mb hash 
+tests.
+
+Happy New Year.
+
+
+Tianjia
