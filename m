@@ -2,101 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3C7C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:23:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C1BC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 06:23:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237923AbiA1GXM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 01:23:12 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60592 "EHLO fornost.hmeau.com"
+        id S1346401AbiA1GXP (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 01:23:15 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60594 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346401AbiA1GXK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 01:23:10 -0500
+        id S1346397AbiA1GXN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jan 2022 01:23:13 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nDKeL-0000t1-Us; Fri, 28 Jan 2022 17:22:23 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 17:22:21 +1100
-Date:   Fri, 28 Jan 2022 17:22:21 +1100
+        id 1nDKf4-0000v2-9h; Fri, 28 Jan 2022 17:23:07 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 17:23:06 +1100
+Date:   Fri, 28 Jan 2022 17:23:06 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/6] Introduce x86 assembly accelerated implementation
- for SM3 algorithm
-Message-ID: <YfOLnacTQffp3tO9@gondor.apana.org.au>
-References: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tomasz Kowalik <tomaszx.kowalik@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Mateuszx Potrola <mateuszx.potrola@intel.com>,
+        qat-linux@intel.com, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: qat - fix a signedness bug in
+ get_service_enabled()
+Message-ID: <YfOLyuKzFc8h0j/e@gondor.apana.org.au>
+References: <20220111071806.GD11243@kili>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20220111071806.GD11243@kili>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 07, 2022 at 08:06:54PM +0800, Tianjia Zhang wrote:
-> This series of patches creates an stand-alone library for SM3 hash
-> algorithm in the lib/crypto directory, and makes the implementations
-> that originally depended on sm3-generic depend on the stand-alone SM3
-> library, which also includes sm3-generic itself.
+On Tue, Jan 11, 2022 at 10:18:06AM +0300, Dan Carpenter wrote:
+> The "ret" variable needs to be signed or there is an error message which
+> will not be printed correctly.
 > 
-> On this basis, the AVX assembly acceleration implementation of SM3
-> algorithm is introduced, the main algorithm implementation based on
-> SM3 AES/BMI2 accelerated work by libgcrypt at:
-> https://gnupg.org/software/libgcrypt/index.html
-> 
-> >From the performance benchmark data, the performance improvement of
-> SM3 algorithm after AVX optimization can reach up to 38%.
-> 
+> Fixes: 0cec19c761e5 ("crypto: qat - add support for compression for 4xxx")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
-> v4 changes:
->  - Rebase on latest cryptodev-2.6/master
->  - Fix the compilation error of arm64/sm3
-> 
-> v3 changes:
->  - update git commit message for patch 01
-> 
-> v2 changes:
->  - x86/sm3: Change K macros to signed decimal and use LEA and 32-bit offset
-> 
-> Tianjia Zhang (6):
->   crypto: sm3 - create SM3 stand-alone library
->   crypto: arm64/sm3-ce - make dependent on sm3 library
->   crypto: sm2 - make dependent on sm3 library
->   crypto: sm3 - make dependent on sm3 library
->   crypto: x86/sm3 - add AVX assembly implementation
->   crypto: tcrypt - add asynchronous speed test for SM3
-> 
->  arch/arm64/crypto/Kconfig        |   2 +-
->  arch/arm64/crypto/sm3-ce-glue.c  |  28 +-
->  arch/x86/crypto/Makefile         |   3 +
->  arch/x86/crypto/sm3-avx-asm_64.S | 517 +++++++++++++++++++++++++++++++
->  arch/x86/crypto/sm3_avx_glue.c   | 134 ++++++++
->  crypto/Kconfig                   |  16 +-
->  crypto/sm2.c                     |  38 +--
->  crypto/sm3_generic.c             | 142 +--------
->  crypto/tcrypt.c                  |  14 +-
->  include/crypto/sm3.h             |  34 +-
->  lib/crypto/Kconfig               |   3 +
->  lib/crypto/Makefile              |   3 +
->  lib/crypto/sm3.c                 | 246 +++++++++++++++
->  13 files changed, 1013 insertions(+), 167 deletions(-)
->  create mode 100644 arch/x86/crypto/sm3-avx-asm_64.S
->  create mode 100644 arch/x86/crypto/sm3_avx_glue.c
->  create mode 100644 lib/crypto/sm3.c
+>  drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
