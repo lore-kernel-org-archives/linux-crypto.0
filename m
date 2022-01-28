@@ -2,92 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23E7C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 11:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9963C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 13:58:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233715AbiA1Lfy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 06:35:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbiA1Lfx (ORCPT
+        id S233372AbiA1N6d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 08:58:33 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:43218 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231741AbiA1N6c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 06:35:53 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554B7C061714
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Jan 2022 03:35:53 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id w25so8420278edt.7
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Jan 2022 03:35:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vZoYuOKN8ZxRwApGpCT8Q4WFjzDm6PlyuG25G9djrBU=;
-        b=nyZVAvbTCGoike0rl6LA5yxyB9QSgYDc8ra0suCmcnuZlwIuJAk5yu/XlLnLSBj800
-         e5bOECrE9HhgRAdFxbyD6cyU+aDY7vdl2XlQTgXuUkXbrQibBbnH4+EIS7KdcbhPeRgI
-         IqUHCNb6Q3Id2nRHM374WrtFinZcdlAXsYDOmds7IzladstPSdPiAuu2oo1ZWib6/oy5
-         R3qrgLplsOMDO4lRgH3IB+UaOIKy5I9hySIviIoxtDuKQ4Kb+qIfKe+9OAcowvbYRX6x
-         yfLet3IReiYEpzKrGiUaAYwAFloKVCMBxb5lZDoWJAuZywfZfJJ001G6+PgbZTwYebTk
-         Bdjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vZoYuOKN8ZxRwApGpCT8Q4WFjzDm6PlyuG25G9djrBU=;
-        b=qk+Hng5seHDVlwvgnpVC4vCGGxeDSVRm9cowP/Y9PoqOQEa+tqK9kOoUQ4+6NtLzjv
-         A5W3Ne8MpkjRFBr3KdKyHzg2d8/UZgUrAc9dynHPFxx1F+4n4rx60ddEhe+6Zd1AhP6y
-         h1Qt9pc5YIkCzxJunVVtfnrzMkAxPfE6lc0jD5/S5RJwd1TLvxwDEQGdwMmIgjt2md5L
-         z3r+SNhcjzKn9dgThzSidZQQ0NDf8aqAVUTgi482/hC9VIDb0pe9iwSEAeUEqp18LLvC
-         LepP938TAJsBHzARrjPvMSfXptjK+7kvaOKfyorRxcThiVDsQRG7PIA6S7L5k9MLq4BB
-         y6dQ==
-X-Gm-Message-State: AOAM530kO9npE829Qh5qu0nqgR033t73f3eyWOapyWF17qsuOdr63Qmw
-        m4WUtR0nQqaBZ9TObNx+qkaX4AzJ2BWOfD2IK6XDdKFMqjoAiA==
-X-Google-Smtp-Source: ABdhPJzpoccbHi3xmfV4Saf0vidQMK8Uv5w6RL1cMXepvdJC0KAovDgXz+s6LG1KZLPYJtwmGuKSA9gp6Bh60APuiHI=
-X-Received: by 2002:a05:6402:518e:: with SMTP id q14mr7645353edd.155.1643369751666;
- Fri, 28 Jan 2022 03:35:51 -0800 (PST)
+        Fri, 28 Jan 2022 08:58:32 -0500
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 20SB53ff008036;
+        Fri, 28 Jan 2022 05:58:23 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=dpHLngKpzeSUefPC+0h4EN3iJnANrfkMo9Dxfn4BYrI=;
+ b=kr85X4gV9SaMMjyF0ZVhjgslFHntjRqIf3ATl1JygFuOc95vZDUdtnlNYpKHPAYnVHPC
+ F0QSP6J7gFVAI3M+sw/62X/y9h5el5CtwR4DYKT3gJ72asoHsa8ZnqJ08gdweswj6V0X
+ Y6GfA3pfVocAbr4Tj2yyll80NvVfSbQC8zSfQvD3LkiMnSssFEdXpD9a7oySRJKGdazr
+ XfxAJNHJQ+0TytXWQx7HBRdMd0uH4hmGgxwrqKd+Jb4xjbDWNMA4OxunsGjdb0Tf7KYv
+ 5odonp0Emo2FDYtrqnZNS+ixRpXUtKO1fzsXbjoUzF3U2f9WE1x8PBHBV8xf+bY+df1p 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3dusebmugt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jan 2022 05:58:23 -0800
+Received: from m0045851.ppops.net (m0045851.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 20SDqAnB004714;
+        Fri, 28 Jan 2022 05:58:22 -0800
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3dusebmugn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 28 Jan 2022 05:58:22 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 28 Jan
+ 2022 05:58:20 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Fri, 28 Jan 2022 05:58:20 -0800
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 724323F706F;
+        Fri, 28 Jan 2022 05:58:15 -0800 (PST)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     Arnaud Ebalard <arno@natisbad.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Boris Brezillon <bbrezillon@kernel.org>
+CC:     Shijith Thotton <sthotton@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
+        <sgoutham@marvell.com>, <anoobj@marvell.com>,
+        "Srujana Challa" <schalla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Ovidiu Panait" <ovidiu.panait@windriver.com>,
+        chiminghao <chi.minghao@zte.com.cn>,
+        Suheil Chandran <schandran@marvell.com>,
+        Lukasz Bartosik <lbartosik@marvell.com>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3] crypto: octeontx2: remove CONFIG_DM_CRYPT check
+Date:   Fri, 28 Jan 2022 19:27:42 +0530
+Message-ID: <2ea465e8bde7f4d03757ae398d38f62a350dd28c.1643378034.git.sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <3ef09bf0c4adf7bc33f01f60cb8ce96e8f77b58c.1642786900.git.sthotton@marvell.com>
+References: <3ef09bf0c4adf7bc33f01f60cb8ce96e8f77b58c.1642786900.git.sthotton@marvell.com>
 MIME-Version: 1.0
-References: <20220111124104.2379295-1-festevam@gmail.com> <YfOL3Yxvb5srGKp4@gondor.apana.org.au>
- <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
-In-Reply-To: <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Fri, 28 Jan 2022 08:35:40 -0300
-Message-ID: <CAOMZO5Cdz7Q89UoEJ=97+QD9BVkFrTpd0e=j_kpjQCDRX64=vQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: caam - enable prediction resistance conditionally
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        "andrew.smirnov@gmail.com" <andrew.smirnov@gmail.com>,
-        "fredrik.yhlen@endian.se" <fredrik.yhlen@endian.se>,
-        "hs@denx.de" <hs@denx.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: uu0_W5SP2KJD5K_e5La4MF_ZAQtB5Kx_
+X-Proofpoint-GUID: m9vOcveRtMH810eaaRkxxo3sKUaOzXZS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-28_04,2022-01-27_01,2021-12-02_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia,
+No issues were found while using the driver with dm-crypt enabled. So
+CONFIG_DM_CRYPT check in the driver can be removed.
 
-On Fri, Jan 28, 2022 at 4:44 AM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
-ote:
+This also fixes the NULL pointer dereference in driver release if
+CONFIG_DM_CRYPT is enabled.
 
-> What parts exactly?
-> Anything besides i.MX6 SX, S/DL?
+...
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008
+...
+Call trace:
+ crypto_unregister_alg+0x68/0xfc
+ crypto_unregister_skciphers+0x44/0x60
+ otx2_cpt_crypto_exit+0x100/0x1a0
+ otx2_cptvf_remove+0xf8/0x200
+ pci_device_remove+0x3c/0xd4
+ __device_release_driver+0x188/0x234
+ device_release_driver+0x2c/0x4c
+...
 
-I see it on i.MX6SX, but in this report, it is mentioned i.MX6D:
-https://www.spinics.net/lists/linux-crypto/msg52319.html
+Fixes: 6f03f0e8b6c8 ("crypto: octeontx2 - register with linux crypto framework")
+Signed-off-by: Shijith Thotton <sthotton@marvell.com>
+---
+ .../crypto/marvell/octeontx2/otx2_cptvf_algs.c  | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-Lucas always saw it on i.MX6D:
-https://linuxlists.cc/l/4/linux-crypto/t/3843436/caam_rng_trouble
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+index 2748a3327e39..f8f8542ce3e4 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+@@ -1634,16 +1634,13 @@ static inline int cpt_register_algs(void)
+ {
+ 	int i, err = 0;
+ 
+-	if (!IS_ENABLED(CONFIG_DM_CRYPT)) {
+-		for (i = 0; i < ARRAY_SIZE(otx2_cpt_skciphers); i++)
+-			otx2_cpt_skciphers[i].base.cra_flags &=
+-							~CRYPTO_ALG_DEAD;
+-
+-		err = crypto_register_skciphers(otx2_cpt_skciphers,
+-						ARRAY_SIZE(otx2_cpt_skciphers));
+-		if (err)
+-			return err;
+-	}
++	for (i = 0; i < ARRAY_SIZE(otx2_cpt_skciphers); i++)
++		otx2_cpt_skciphers[i].base.cra_flags &= ~CRYPTO_ALG_DEAD;
++
++	err = crypto_register_skciphers(otx2_cpt_skciphers,
++					ARRAY_SIZE(otx2_cpt_skciphers));
++	if (err)
++		return err;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(otx2_cpt_aeads); i++)
+ 		otx2_cpt_aeads[i].base.cra_flags &= ~CRYPTO_ALG_DEAD;
+-- 
+2.25.1
 
-> We've been in contact with Fabio and we're working on a solution.
-> Now I realize the list hasn't been Cc-ed - sorry for the confusion
-> and for not providing an explicit Nack.
-
-Varun on Cc said he would work on a proper solution as he was able to
-reproduce it.
-
-Any progress, Varun?
-
-Thanks
