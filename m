@@ -2,146 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B9B1C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 14:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84F3C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 15:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348874AbiA1OOm (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 09:14:42 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:53126 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348069AbiA1OOl (ORCPT
+        id S231994AbiA1Phd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 10:37:33 -0500
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.20]:38357 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231320AbiA1Phd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 09:14:41 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8E2311F385;
-        Fri, 28 Jan 2022 14:14:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643379280; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CTHAmo7gQBUFA1fTDySimisIz/TBMzybVfp9a9saT4Q=;
-        b=Br58rQV4TYwrowQa6637A4b+moWJk+s72s31wv5NA85IbeRSj2FH0MJoj6ejEVBC8WKOxK
-        YFl6EuzrttQAvXfuNiI2OJI3i/IYCeKxgS0J++ahGWUoJ+NAJY70Li/l0N0tql1POs55fe
-        nVAbj08A5zimTJHy/wwAVEeG/gEVSfI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643379280;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CTHAmo7gQBUFA1fTDySimisIz/TBMzybVfp9a9saT4Q=;
-        b=DCEBqbOv/dHXxtGmJWmsYD0iyk/HhW/q4LaDm9GwQF8zHLkLDu9gfb77CmRkuLk49cyx8w
-        +LuhKOEwUzJ/ilCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 07B3813487;
-        Fri, 28 Jan 2022 14:14:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 8zpKAFD682FLHAAAMHmgww
-        (envelope-from <nstange@suse.de>); Fri, 28 Jan 2022 14:14:40 +0000
-From:   Nicolai Stange <nstange@suse.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Nicolai Stange <nstange@suse.de>,
-        Stephan Mueller <smueller@chronox.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com,
-        Eric Biggers <ebiggers@kernel.org>, Petr Vorel <pvorel@suse.cz>
-Subject: Re: [v2 PATCH] crypto: api - Disallow sha1 in FIPS-mode while allowing hmac(sha1)
-References: <20211209090358.28231-1-nstange@suse.de> <87r1a7thy0.fsf@suse.de>
-        <YcvEkfS4cONDXXB9@gondor.apana.org.au>
-        <2468270.qO8rWLYou6@tauon.chronox.de>
-        <YdepEhTI/LB9wdJr@gondor.apana.org.au>
-        <Yd0gInht+V+Kcsw2@gondor.apana.org.au> <871r1eyamd.fsf@suse.de>
-        <Yd1dK//76455cHdz@gondor.apana.org.au>
-        <YeEVSaMEVJb3cQkq@gondor.apana.org.au> <87k0f2hefl.fsf@suse.de>
-        <YeFWnscvXtv73KBl@gondor.apana.org.au>
-Date:   Fri, 28 Jan 2022 15:14:39 +0100
-In-Reply-To: <YeFWnscvXtv73KBl@gondor.apana.org.au> (Herbert Xu's message of
-        "Fri, 14 Jan 2022 21:55:26 +1100")
-Message-ID: <87v8y4dk1c.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+        Fri, 28 Jan 2022 10:37:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643384248;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=z9B9LbV9dvuua4pywx57DeccaLvxUyezmmR5QCPxp/A=;
+    b=bOIw1VNoGbCnVSm+OKxfCtRNLlQkD5a86xlmCb4k01JJTl5d1IREsEBkZZQzHr7J7y
+    gGO/CPwJClQV0DpkDtjynL0W55BVKyweCntmK4CO1I3VayNYvzT4ibRtJl7Qzcsm1DOs
+    HI5/q5lo5uEwu08scEdbpHTQI+UZEscU59PUaaGmt3uJSjFHrgrdQhLqvtN4NuoKAjrg
+    w0zH7xNkta733zvnsvtuOn+GI1+zMPBGkX58EmOHpGFeuOft53RzwPmnqLMuMmjSvI1R
+    yVUyqFw9QOPdxEyIkm+8PnlurDYp8sl5aCxqcdgg6Ceb9X3ZXWPew63fMz/RGx+2VNvJ
+    +zuA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvSOeuZzLM="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.38.0 DYNA|AUTH)
+    with ESMTPSA id v5f65ay0SFbRwv4
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Fri, 28 Jan 2022 16:37:27 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        simo@redhat.com, Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH 0/7] Common entropy source and DRNG management
+Date:   Fri, 28 Jan 2022 16:37:26 +0100
+Message-ID: <9785493.cvP5XnM2Xn@tauon.chronox.de>
+In-Reply-To: <YfHP3xs6f68wR/Z/@sol.localdomain>
+References: <2486550.t9SDvczpPo@positron.chronox.de> <YfHP3xs6f68wR/Z/@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
+Am Mittwoch, 26. Januar 2022, 23:49:03 CET schrieb Eric Biggers:
 
-> On Fri, Jan 14, 2022 at 10:09:02AM +0100, Nicolai Stange wrote:
->
->> This looks all good to me, but as !->fips_allowed tests aren't skipped
->> over anymore now, it would perhaps make sense to make their failure
->> non-fatal in FIPS mode. Because in FIPS mode a failure could mean a
->> panic and some of the existing TVs might not pass because of e.g. some
->> key length checks or so active only for fips_enabled...
->
-> You mean a buggy non-FIPS algorithm that fails when tested in
-> FIPS mode?  I guess we could skip the panic in that case if
-> everyone is happy with that.  Stephan?
+Hi Eric,
 
-One more thing I just realized: dracut's fips module ([1]) modprobes
-tcrypt (*) and failure is considered fatal, i.e. the system would not
-boot up.
+> On Wed, Jan 26, 2022 at 08:02:54AM +0100, Stephan M=FCller wrote:
+> > The current code base of the kernel crypto API random number support
+> > leaves the task to seed and reseed the DRNG to either the caller or
+> > the DRNG implementation. The code in crypto/drbg.c implements its own
+> > seeding strategy. crypto/ansi_cprng.c does not contain any seeding
+> > operation. The implementation in arch/s390/crypto/prng.c has yet
+> > another approach for seeding. Albeit the crypto_rng_reset() contains
+> > a seeding logic from get_random_bytes, there is no management of
+> > the DRNG to ensure proper reseeding or control which entropy sources
+> > are used for pulling data from.
+>=20
+> ansi_cprng looks like unused code that should be removed, as does the s390
+> prng.
+>=20
+> With that being the case, what is the purpose of this patchset?
 
-First of all this would mean that tcrypt_test() needs to ignore
--ECANCELED return values from alg_test() in FIPS mode, in addition to
-the -EINVAL it is already prepared for.
+I would agree that ansi_csprng could be eliminated at this stage. However, =
+the=20
+S390 DRBG code base provides access to the CPACF DRBG implemented in the IB=
+M Z=20
+processors. That implementation must be seeded from software. See the funct=
+ion=20
+invocation of cpacf_klmd or cpacf_kmc in the prng.c file.
 
-However, chances are that some of the !fips_allowed algorithms looped
-over by tcrypt are not available (i.e. not enabled at build time) and as
-this change here makes alg_test() to unconditionally attempt a test
-execution now, this would fail with -ENOENT AFAICS.
+The extraction of the entropy source and DRNG management into its own=20
+component separates out the security sensitive implementation currently fou=
+nd=20
+in multiple locations following the strategy found in the crypto API where=
+=20
+each moving part is separated and encapsulated.
 
-One way to work around this is to make tcrypt_test() to ignore -ENOENT
-in addition to -EINVAL and -ECANCELED.
+The current implementation of the ESDM allows an easy addition of new entro=
+py=20
+sources which are properly encapsulated in self-contained code allowing sel=
+f-
+contained entropy analyses to be performed for each. These entropy sources=
+=20
+would provide their seed data completely separate from other entropy source=
+s=20
+to the DRNG preventing any mutual entanglement and thus challenges in the=20
+entropy assessment. I have additional entropy sources already available tha=
+t I=20
+would like to contribute at a later stage. These entropy sources can be=20
+enabled, disabled or its entropy rate set as needed by vendors depending on=
+=20
+their entropy source analysis. Proper default values would be used for the=
+=20
+common case where a vendor does not want to perform its own analysis or a=20
+distro which want to provide a common kernel binary for many users.
 
-It might be undesirable though that the test executions triggered from
-tcrypt would still instantiate/load a ton of !fips_allowed algorithms at
-boot, most of which will effectively be inaccessible (because they're
-not used as FIPS_INTERNAL arguments to fips_allowed =3D=3D 1 template
-instances).
+The conditioning hash that is available to the entropy sources is currently=
+=20
+fixed to a SHA-256 software implementation. To support conveying more entro=
+py=20
+through the conditioning hash, I would like to contribute an extension that=
+=20
+allows the use of the kernel crypto API's set of message digest=20
+implementations to be used. This would not only allow using larger message=
+=20
+digests, but also hashes other than SHA.
 
-So how about making alg_test() to skip the !fips_allowed tests in FIPS
-mode as before, but to return -ECANCELED and eventually set
-FIPS_INTERNAL as implemented with this patch here.
+Depending on use cases, it is possible that different initial seeding=20
+strategies are required to be considered for the DRNG. The initial patch se=
+t=20
+provides the oversampling of entropy sources and of the initial seed string=
+ in=20
+addition to the conventional approach of providing at least as much entropy=
+ as=20
+the security strength of the DRNG. There is a different seeding strategy in=
+=20
+the pipeline that is considered by other cryptographers for which I would l=
+ike=20
+to contribute the respective patch.
 
-This would imply that FIPS_INTERNAL algorithms by themselves remain
-untested, but I think this might be Ok as they would be usable only as
-template arguments in fips_allowed instantiations. That is, they will
-still receive some form of testing when the larger construction they're
-part of gets tested.
+NUMA-awareness is another aspect that should be considered. The DRNG manage=
+r=20
+is prepared to instantiate one DRNG per node. The respective handler code,=
+=20
+however, is not part of the initial code drop.
 
-For example, going with the "dh" example, where "dh" and "ffdhe3072(dh)"
-would have fips_allowed unset and set respecively, ffdhe3072(dh) as
-a whole would get tested, but not the "dh" argument individually.
+In addition to the different DRNG implementations discussed before, there i=
+s=20
+the possibility to add an implementation to support atomic operations. The=
+=20
+current DRBG does not guarantee to be suitable for such use cases.
 
-Stephan, would this approach work from a FIPS 140-3 perspective?
+Ciao
+Stephan
 
-Thanks!
 
-Nicolai
-
-[1] https://git.kernel.org/pub/scm/boot/dracut/dracut.git/tree/modules.d/01=
-fips/fips.sh#n106
-(*) I'm not sure why this is being done, but it is what it is.
-
---=20
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, G=
-ermany
-(HRB 36809, AG N=C3=BCrnberg), GF: Ivo Totev
