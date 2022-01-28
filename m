@@ -2,142 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA539C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 15:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C077EC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 18:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237947AbiA1PuD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 10:50:03 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:34941 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbiA1PuC (ORCPT
+        id S1350652AbiA1SvD (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 13:51:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47486 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229888AbiA1SvD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 10:50:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643384996;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=FbbK5BCqwc+LVSOODivmoMY7VA5yrwUnCl/SUOH2vUk=;
-    b=FYm+mIGjvMuxIoWGb4E8SJnLihAlEBBxtcdxXp55elBwEY4A6sAolUt+rDPK9UxlCo
-    ZI11nop0nQwfkl5DlPVitY6M/5DeCYyItwF6OO95XAHZto1BAhWqdstwYaUjTaJ3Vn+C
-    QEF2k3EEC6S8iPAFs2J4vwosklPuPQr/4EpfEneRBxDI3VEDqNXIa8xvWON4rCzNUN+I
-    vtDQ45hu2wc4zeLpdHFdfShijxwvmRw16WKBifpC8St7Xg6/cmxumj0pV4vOP3J4Tu3x
-    uzCgMCZLaMYaaQn+w2hs1QgjcnpHWOcw/99WZ478v+JUNe06qEsvOgTBP7cudrgaapgg
-    hBXA==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvSOeuZzLM="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.38.0 DYNA|AUTH)
-    with ESMTPSA id v5f65ay0SFntwxY
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Fri, 28 Jan 2022 16:49:55 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Nicolai Stange <nstange@suse.de>
-Cc:     Nicolai Stange <nstange@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com,
-        Eric Biggers <ebiggers@kernel.org>, Petr Vorel <pvorel@suse.cz>
-Subject: Re: [v2 PATCH] crypto: api - Disallow sha1 in FIPS-mode while allowing hmac(sha1)
-Date:   Fri, 28 Jan 2022 16:49:54 +0100
-Message-ID: <1738803.My4pmAdfGn@tauon.chronox.de>
-In-Reply-To: <87v8y4dk1c.fsf@suse.de>
-References: <20211209090358.28231-1-nstange@suse.de> <YeFWnscvXtv73KBl@gondor.apana.org.au> <87v8y4dk1c.fsf@suse.de>
+        Fri, 28 Jan 2022 13:51:03 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355A4C061714
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Jan 2022 10:51:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C983F61D27
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Jan 2022 18:51:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F8CAC36AE5;
+        Fri, 28 Jan 2022 18:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643395862;
+        bh=X6TkSrh9zEQcBfvshKL78wGojaGYRDYazpy2mCqa8a8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jtHLZuyKZ2fPs69Bv6pq02Eg9UctQ5c6Bh+01hwTFgO3OMOWJnkzUz2iH1g/Hqnah
+         t5bYTtX/y/zVQeLFIEGV+WkXGDOYxS+oSw+oy2aFGzX7/EOavADBfTqdXSsn/Q4zp2
+         +DctMQCpjQdW+nU4QYj/Sn3T6dEFbLl6G/GiS4+9eNZ2CYaSMaoo1tkjbKgyIy3FF7
+         Z4wFa/6SBdGBfKGQiJYf/BpAYZKyyoQmQ2UPi9l4kLFtGbLJ01no8fKaeAPmT4Uq4t
+         kc2gcei8FjLFsIJk281bBDB/D/D6WGT4OkFqFlxYrVYl2kjl4aLVBA5GWzhC//1/Wo
+         AG7EXZRLqdBVA==
+Date:   Fri, 28 Jan 2022 10:51:00 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        simo@redhat.com, Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH 0/7] Common entropy source and DRNG management
+Message-ID: <YfQ7FDJqb2zhVcfp@sol.localdomain>
+References: <2486550.t9SDvczpPo@positron.chronox.de>
+ <YfHP3xs6f68wR/Z/@sol.localdomain>
+ <9785493.cvP5XnM2Xn@tauon.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9785493.cvP5XnM2Xn@tauon.chronox.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 28. Januar 2022, 15:14:39 CET schrieb Nicolai Stange:
-
-Hi Nicolai,
-
-> Herbert Xu <herbert@gondor.apana.org.au> writes:
-> > On Fri, Jan 14, 2022 at 10:09:02AM +0100, Nicolai Stange wrote:
-> >> This looks all good to me, but as !->fips_allowed tests aren't skipped
-> >> over anymore now, it would perhaps make sense to make their failure
-> >> non-fatal in FIPS mode. Because in FIPS mode a failure could mean a
-> >> panic and some of the existing TVs might not pass because of e.g. some
-> >> key length checks or so active only for fips_enabled...
+On Fri, Jan 28, 2022 at 04:37:26PM +0100, Stephan Mueller wrote:
+> Am Mittwoch, 26. Januar 2022, 23:49:03 CET schrieb Eric Biggers:
+> 
+> Hi Eric,
+> 
+> > On Wed, Jan 26, 2022 at 08:02:54AM +0100, Stephan Müller wrote:
+> > > The current code base of the kernel crypto API random number support
+> > > leaves the task to seed and reseed the DRNG to either the caller or
+> > > the DRNG implementation. The code in crypto/drbg.c implements its own
+> > > seeding strategy. crypto/ansi_cprng.c does not contain any seeding
+> > > operation. The implementation in arch/s390/crypto/prng.c has yet
+> > > another approach for seeding. Albeit the crypto_rng_reset() contains
+> > > a seeding logic from get_random_bytes, there is no management of
+> > > the DRNG to ensure proper reseeding or control which entropy sources
+> > > are used for pulling data from.
 > > 
-> > You mean a buggy non-FIPS algorithm that fails when tested in
-> > FIPS mode?  I guess we could skip the panic in that case if
-> > everyone is happy with that.  Stephan?
+> > ansi_cprng looks like unused code that should be removed, as does the s390
+> > prng.
+> > 
+> > With that being the case, what is the purpose of this patchset?
 > 
-> One more thing I just realized: dracut's fips module ([1]) modprobes
-> tcrypt (*) and failure is considered fatal, i.e. the system would not
-> boot up.
-> 
-> First of all this would mean that tcrypt_test() needs to ignore
-> -ECANCELED return values from alg_test() in FIPS mode, in addition to
-> the -EINVAL it is already prepared for.
-> 
-> However, chances are that some of the !fips_allowed algorithms looped
-> over by tcrypt are not available (i.e. not enabled at build time) and as
-> this change here makes alg_test() to unconditionally attempt a test
-> execution now, this would fail with -ENOENT AFAICS.
-> 
-> One way to work around this is to make tcrypt_test() to ignore -ENOENT
-> in addition to -EINVAL and -ECANCELED.
-> 
-> It might be undesirable though that the test executions triggered from
-> tcrypt would still instantiate/load a ton of !fips_allowed algorithms at
-> boot, most of which will effectively be inaccessible (because they're
-> not used as FIPS_INTERNAL arguments to fips_allowed == 1 template
-> instances).
-> 
-> So how about making alg_test() to skip the !fips_allowed tests in FIPS
-> mode as before, but to return -ECANCELED and eventually set
-> FIPS_INTERNAL as implemented with this patch here.
-> 
-> This would imply that FIPS_INTERNAL algorithms by themselves remain
-> untested, but I think this might be Ok as they would be usable only as
-> template arguments in fips_allowed instantiations. That is, they will
-> still receive some form of testing when the larger construction they're
-> part of gets tested.
-> 
-> For example, going with the "dh" example, where "dh" and "ffdhe3072(dh)"
-> would have fips_allowed unset and set respecively, ffdhe3072(dh) as
-> a whole would get tested, but not the "dh" argument individually.
-> 
-> Stephan, would this approach work from a FIPS 140-3 perspective?
+> I would agree that ansi_csprng could be eliminated at this stage. However, the 
+> S390 DRBG code base provides access to the CPACF DRBG implemented in the IBM Z 
+> processors. That implementation must be seeded from software. See the function 
+> invocation of cpacf_klmd or cpacf_kmc in the prng.c file.
 
-Are we sure that we always will have power-up tests of the compound algorithms 
-when we disable the lower-level algorithm testing?
+We should still just get rid of that, since equivalent functionality is
+available in software, is better tested, and isn't performance-critical.
 
-For example, consider the DH work you are preparing: we currently have a self 
-test for dh - which then will be marked as FIPS_INTERNAL and not executed. 
-Would we now have self tests for modpXXX(dh) or ffdheXXX(dh)? If not, how 
-would it be guaranteed that DH is tested?
+> The extraction of the entropy source and DRNG management into its own 
+> component separates out the security sensitive implementation currently found 
+> in multiple locations following the strategy found in the crypto API where 
+> each moving part is separated and encapsulated.
+> 
+> The current implementation of the ESDM allows an easy addition of new entropy 
+> sources which are properly encapsulated in self-contained code allowing self-
+> contained entropy analyses to be performed for each. These entropy sources 
+> would provide their seed data completely separate from other entropy sources 
+> to the DRNG preventing any mutual entanglement and thus challenges in the 
+> entropy assessment. I have additional entropy sources already available that I 
+> would like to contribute at a later stage. These entropy sources can be 
+> enabled, disabled or its entropy rate set as needed by vendors depending on 
+> their entropy source analysis. Proper default values would be used for the 
+> common case where a vendor does not want to perform its own analysis or a 
+> distro which want to provide a common kernel binary for many users.
 
-The important part is that the algorithm testing is guaranteed. I see a number 
-of alg_test_null in testmgr.c. I see the potential that some algorithms do not 
-get tested at all when we skip FIPS_INTERNAL algorithms.
-
-From a FIPS perspective it is permissible that compound algo power up tests 
-are claimed to cover respective lower-level algos.
+What is the actual point of this?  The NIST DRBGs are already seeded from
+random.c, which is sufficient by itself but doesn't play well with
+certifications, and from Jitterentropy which the certification side is happy
+with.  And the NIST DRBGs are only present for certification purposes anyway;
+all real users use random.c instead.  So what problem still needs to be solved?
 
 > 
-> Thanks!
-> 
-> Nicolai
-> 
-> [1]
-> https://git.kernel.org/pub/scm/boot/dracut/dracut.git/tree/modules.d/01fips
-> /fips.sh#n106 (*) I'm not sure why this is being done, but it is what it is.
+> The conditioning hash that is available to the entropy sources is currently 
+> fixed to a SHA-256 software implementation. To support conveying more entropy 
+> through the conditioning hash, I would like to contribute an extension that 
+> allows the use of the kernel crypto API's set of message digest 
+> implementations to be used. This would not only allow using larger message 
+> digests, but also hashes other than SHA.
 
+This doesn't need to be configurable, and shouldn't be; just choose an
+appropriate hash.
 
-Ciao
-Stephan
+> Depending on use cases, it is possible that different initial seeding 
+> strategies are required to be considered for the DRNG. The initial patch set 
+> provides the oversampling of entropy sources and of the initial seed string in 
+> addition to the conventional approach of providing at least as much entropy as 
+> the security strength of the DRNG. There is a different seeding strategy in 
+> the pipeline that is considered by other cryptographers for which I would like 
+> to contribute the respective patch.
 
+It would be better to standardize on one way of doing it so that people can't
+choose the wrong way.
 
+> NUMA-awareness is another aspect that should be considered. The DRNG manager 
+> is prepared to instantiate one DRNG per node. The respective handler code, 
+> however, is not part of the initial code drop.
+
+random.c is already NUMA-optimized.
+
+> In addition to the different DRNG implementations discussed before, there is 
+> the possibility to add an implementation to support atomic operations. The 
+> current DRBG does not guarantee to be suitable for such use cases.
+
+random.c already supports atomic operations.
+
+- Eric
