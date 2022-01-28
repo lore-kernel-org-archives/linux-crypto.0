@@ -2,66 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCAA0C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 04:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E542C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 04:46:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237463AbiA1Enp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jan 2022 23:43:45 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60582 "EHLO fornost.hmeau.com"
+        id S1346075AbiA1EqZ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 27 Jan 2022 23:46:25 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60584 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237235AbiA1Enp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jan 2022 23:43:45 -0500
+        id S237235AbiA1EqY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jan 2022 23:46:24 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nDJ5r-00084p-2z; Fri, 28 Jan 2022 15:42:40 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 15:42:38 +1100
-Date:   Fri, 28 Jan 2022 15:42:38 +1100
+        id 1nDJ9Q-00086J-Iy; Fri, 28 Jan 2022 15:46:21 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jan 2022 15:46:20 +1100
+Date:   Fri, 28 Jan 2022 15:46:20 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 6/6] crypto: tcrypt - add asynchronous speed test for
- SM3
-Message-ID: <YfN0PsCAXYo0Hx9T@gondor.apana.org.au>
-References: <20220107120700.730-1-tianjia.zhang@linux.alibaba.com>
- <20220107120700.730-7-tianjia.zhang@linux.alibaba.com>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org, Niolai Stange <nstange@suse.com>,
+        Simo Sorce <simo@redhat.com>
+Subject: Re: [PATCH] crypto: HMAC - disallow keys < 112 bits in FIPS mode
+Message-ID: <YfN1HKqL9GT9R25Z@gondor.apana.org.au>
+References: <2075651.9o76ZdvQCi@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220107120700.730-7-tianjia.zhang@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2075651.9o76ZdvQCi@positron.chronox.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 07, 2022 at 08:07:00PM +0800, Tianjia Zhang wrote:
-> tcrypt supports testing of SM3 hash algorithms that use AVX
-> instruction acceleration.
-> 
-> In order to add the sm3 asynchronous test to the appropriate
-> position, shift the testcase sequence number of the multi buffer
-> backward and start from 450.
-> 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->  crypto/tcrypt.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+On Fri, Jan 07, 2022 at 08:25:24PM +0100, Stephan Müller wrote:
+>
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index a253d66ba1c1..1c39d294b9ba 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -5706,6 +5706,7 @@ static const struct hash_testvec hmac_sha1_tv_template[] = {
+>  		.digest	= "\xb6\x17\x31\x86\x55\x05\x72\x64"
+>  			  "\xe2\x8b\xc0\xb6\xfb\x37\x8c\x8e\xf1"
+>  			  "\x46\xbe",
+> +#ifndef CONFIG_CRYPTO_FIPS
+>  	}, {
+>  		.key	= "Jefe",
+>  		.ksize	= 4,
 
-This is not an issue with your patch but we should delete all
-the mb hash tests as the mb hash algorithm tself was removed
-in 2018.
+Please don't use ifdefs, you can instead add a fips_skip setting
+just like we do for cipher test vectors.
 
 Thanks,
 -- 
