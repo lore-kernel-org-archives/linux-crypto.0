@@ -2,63 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF178C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 15:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA539C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jan 2022 15:50:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbiA1Pie (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jan 2022 10:38:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59112 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbiA1Pie (ORCPT
+        id S237947AbiA1PuD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 28 Jan 2022 10:50:03 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:34941 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232033AbiA1PuC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jan 2022 10:38:34 -0500
-X-Greylist: delayed 327 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 28 Jan 2022 07:38:33 PST
-Received: from mail.pqgruber.com (mail.pqgruber.com [IPv6:2a05:d014:575:f70b:4f2c:8f1d:40c4:b13e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8100C061714
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Jan 2022 07:38:33 -0800 (PST)
-Received: from workstation (213-47-165-233.cable.dynamic.surfer.at [213.47.165.233])
-        by mail.pqgruber.com (Postfix) with ESMTPSA id 7FE7CC2FBA4;
-        Fri, 28 Jan 2022 16:33:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pqgruber.com;
-        s=mail; t=1643383984;
-        bh=OITQFSeLoNTaXoQED/aKEaT2kE+25ScYSreXKHuTHfA=;
-        h=Date:From:To:Cc:Subject:From;
-        b=NbBf9e9rpPTm5HzXRBIwqfgxKRXpJXS3lroGug11DjQGS+/0o1GYLaP/+TwLDn9cd
-         UueeXefUgAJHk1RhWYmbF6B9HpZ159DcyG5H5YCgS11nY29AGMTWGhqfnq80omiudv
-         KP9B0c2DBPLS635qUi/LWIGxwZ+6qxZmRD3x/MwI=
-Date:   Fri, 28 Jan 2022 16:33:00 +0100
-From:   Clemens Gruber <clemens.gruber@pqgruber.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        linux-imx@nxp.com
-Subject: caam: Possible caam-rng regression since enabling prediction
- resistance
-Message-ID: <YfQMrBtwKd2Wa+AY@workstation>
+        Fri, 28 Jan 2022 10:50:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643384996;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=FbbK5BCqwc+LVSOODivmoMY7VA5yrwUnCl/SUOH2vUk=;
+    b=FYm+mIGjvMuxIoWGb4E8SJnLihAlEBBxtcdxXp55elBwEY4A6sAolUt+rDPK9UxlCo
+    ZI11nop0nQwfkl5DlPVitY6M/5DeCYyItwF6OO95XAHZto1BAhWqdstwYaUjTaJ3Vn+C
+    QEF2k3EEC6S8iPAFs2J4vwosklPuPQr/4EpfEneRBxDI3VEDqNXIa8xvWON4rCzNUN+I
+    vtDQ45hu2wc4zeLpdHFdfShijxwvmRw16WKBifpC8St7Xg6/cmxumj0pV4vOP3J4Tu3x
+    uzCgMCZLaMYaaQn+w2hs1QgjcnpHWOcw/99WZ478v+JUNe06qEsvOgTBP7cudrgaapgg
+    hBXA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvSOeuZzLM="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.38.0 DYNA|AUTH)
+    with ESMTPSA id v5f65ay0SFntwxY
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Fri, 28 Jan 2022 16:49:55 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Nicolai Stange <nstange@suse.de>
+Cc:     Nicolai Stange <nstange@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, keyrings@vger.kernel.org, simo@redhat.com,
+        Eric Biggers <ebiggers@kernel.org>, Petr Vorel <pvorel@suse.cz>
+Subject: Re: [v2 PATCH] crypto: api - Disallow sha1 in FIPS-mode while allowing hmac(sha1)
+Date:   Fri, 28 Jan 2022 16:49:54 +0100
+Message-ID: <1738803.My4pmAdfGn@tauon.chronox.de>
+In-Reply-To: <87v8y4dk1c.fsf@suse.de>
+References: <20211209090358.28231-1-nstange@suse.de> <YeFWnscvXtv73KBl@gondor.apana.org.au> <87v8y4dk1c.fsf@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Am Freitag, 28. Januar 2022, 15:14:39 CET schrieb Nicolai Stange:
 
-I noticed that /dev/hwrng blocks indefinitely on our i.MX6Q (rev1.6)
-boards in recent kernel versions.
-As it did work before, I ran git bisect and found that reverting the
-following commit fixes the issue:
-358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG")
+Hi Nicolai,
 
-cat /dev/hwrng | rngtest looks good on Linux 5.15 with aforementioned
-commit reverted.
-U-Boot version is 2021.07 and the RNG is not instantiated there.
+> Herbert Xu <herbert@gondor.apana.org.au> writes:
+> > On Fri, Jan 14, 2022 at 10:09:02AM +0100, Nicolai Stange wrote:
+> >> This looks all good to me, but as !->fips_allowed tests aren't skipped
+> >> over anymore now, it would perhaps make sense to make their failure
+> >> non-fatal in FIPS mode. Because in FIPS mode a failure could mean a
+> >> panic and some of the existing TVs might not pass because of e.g. some
+> >> key length checks or so active only for fips_enabled...
+> > 
+> > You mean a buggy non-FIPS algorithm that fails when tested in
+> > FIPS mode?  I guess we could skip the panic in that case if
+> > everyone is happy with that.  Stephan?
+> 
+> One more thing I just realized: dracut's fips module ([1]) modprobes
+> tcrypt (*) and failure is considered fatal, i.e. the system would not
+> boot up.
+> 
+> First of all this would mean that tcrypt_test() needs to ignore
+> -ECANCELED return values from alg_test() in FIPS mode, in addition to
+> the -EINVAL it is already prepared for.
+> 
+> However, chances are that some of the !fips_allowed algorithms looped
+> over by tcrypt are not available (i.e. not enabled at build time) and as
+> this change here makes alg_test() to unconditionally attempt a test
+> execution now, this would fail with -ENOENT AFAICS.
+> 
+> One way to work around this is to make tcrypt_test() to ignore -ENOENT
+> in addition to -EINVAL and -ECANCELED.
+> 
+> It might be undesirable though that the test executions triggered from
+> tcrypt would still instantiate/load a ton of !fips_allowed algorithms at
+> boot, most of which will effectively be inaccessible (because they're
+> not used as FIPS_INTERNAL arguments to fips_allowed == 1 template
+> instances).
+> 
+> So how about making alg_test() to skip the !fips_allowed tests in FIPS
+> mode as before, but to return -ECANCELED and eventually set
+> FIPS_INTERNAL as implemented with this patch here.
+> 
+> This would imply that FIPS_INTERNAL algorithms by themselves remain
+> untested, but I think this might be Ok as they would be usable only as
+> template arguments in fips_allowed instantiations. That is, they will
+> still receive some form of testing when the larger construction they're
+> part of gets tested.
+> 
+> For example, going with the "dh" example, where "dh" and "ffdhe3072(dh)"
+> would have fips_allowed unset and set respecively, ffdhe3072(dh) as
+> a whole would get tested, but not the "dh" argument individually.
+> 
+> Stephan, would this approach work from a FIPS 140-3 perspective?
 
-Any ideas what the problem could be with that commit and did you test
-the changes on i.MX6 devices?
+Are we sure that we always will have power-up tests of the compound algorithms 
+when we disable the lower-level algorithm testing?
 
-Let me know if you need more information / debug output / etc.
+For example, consider the DH work you are preparing: we currently have a self 
+test for dh - which then will be marked as FIPS_INTERNAL and not executed. 
+Would we now have self tests for modpXXX(dh) or ffdheXXX(dh)? If not, how 
+would it be guaranteed that DH is tested?
 
-Best regards,
-Clemens
+The important part is that the algorithm testing is guaranteed. I see a number 
+of alg_test_null in testmgr.c. I see the potential that some algorithms do not 
+get tested at all when we skip FIPS_INTERNAL algorithms.
+
+From a FIPS perspective it is permissible that compound algo power up tests 
+are claimed to cover respective lower-level algos.
+
+> 
+> Thanks!
+> 
+> Nicolai
+> 
+> [1]
+> https://git.kernel.org/pub/scm/boot/dracut/dracut.git/tree/modules.d/01fips
+> /fips.sh#n106 (*) I'm not sure why this is being done, but it is what it is.
+
+
+Ciao
+Stephan
+
+
