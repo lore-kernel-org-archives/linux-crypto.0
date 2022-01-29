@@ -2,94 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F61C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jan 2022 22:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68044C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jan 2022 22:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353380AbiA2Wpk (ORCPT
+        id S1353392AbiA2Wpq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Jan 2022 17:45:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48414 "EHLO
+        Sat, 29 Jan 2022 17:45:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353379AbiA2Wpk (ORCPT
+        with ESMTP id S1353381AbiA2Wpo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Jan 2022 17:45:40 -0500
+        Sat, 29 Jan 2022 17:45:44 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11117C061714
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jan 2022 14:45:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C7BC061714
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jan 2022 14:45:44 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E2F8660DF1
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Jan 2022 22:45:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE76C340E5;
-        Sat, 29 Jan 2022 22:45:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4694A60DFF
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jan 2022 22:45:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17619C340EB;
+        Sat, 29 Jan 2022 22:45:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643496338;
-        bh=ir7JITqypjuYMlQS0f577krwRMvFJWUahO/MS1SkLaU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=RKSpVnRDQmvtMKU0y8Zx+Vs4fk+zE8ib1712DW2KUFvFJwvV//K+//BV8vrfx38Mg
-         NfagKIlB3TKYC0uWso1dLCl79RG7uQXhQi1I7H/JWTfgpNMjN+ncErdBIJ9lL5DpJb
-         WPZQLhBj4GUH/C5Si+/Rr2mMnd6BzTQ81WYme7bWeL54JyeB4jLn+Iaq572kIfObV9
-         7APHkyK2DKiX+0Q7iI9WbIwC6pLH6HgqV126YwsTOSKgJM9RCu2mpyvBAeTcXnMYaa
-         akpV6c/NTqyQFt3m1qwuN7wiprLKNc63MMQKXp67Aanx/hDdys9iNIBJOW9ZRncEF1
-         V/95d2gZwqO/Q==
+        s=k20201202; t=1643496343;
+        bh=UVJykemlpoHDqykVn2Whh0E9TSYL5jrYB1Yq24Y6vZ8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DjqoUJ1RIEhWFRBIKKLwX224fllM8HF4isunjHCw8+GJD3hAbqH7qt/r6jQCdnZmO
+         Pl3is6Tcmt7+RD+je+N637oK40Kkxo55vHi7vpj+c5u9XRnRrAH3GyWenpc2l/cbjm
+         OOarj9JoCW9eXJnd/psKqlZHAq+HFrre9SuaQeQqCjKHe8zYEBCBVoob35puvYGg11
+         Rtgc7lx1gvg9ObamU+ljI58cLj5+Tg1XwStW/C/o5gn+0mUw9tSZ71JGEbKKYNv6iP
+         ygl/tGKaHk66hzeNQY4+fnOw5qafBct1f8zqJyvZWLEHuffmZonIkG+bTEgSF920hY
+         OLVSRQaDPFSUA==
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
         Nick Desaulniers <ndesaulniers@google.com>,
         Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH v2 0/2] xor: enable auto-vectorization in Clang
-Date:   Sat, 29 Jan 2022 23:45:27 +0100
-Message-Id: <20220129224529.76887-1-ardb@kernel.org>
+Subject: [PATCH v2 2/2] crypto: arm/xor - make vectorized C code Clang-friendly
+Date:   Sat, 29 Jan 2022 23:45:29 +0100
+Message-Id: <20220129224529.76887-3-ardb@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220129224529.76887-1-ardb@kernel.org>
+References: <20220129224529.76887-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1787; h=from:subject; bh=ir7JITqypjuYMlQS0f577krwRMvFJWUahO/MS1SkLaU=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh9cOH6X+ayHMDlL29NrlC4k/aPSV8AmrHjy8qoauk OA8295mJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfXDhwAKCRDDTyI5ktmPJJ5MC/ 99lmrLufWmIL0DMI5Wq3GxDNuaiEhhIUC17TTDkovWqS9Aze92PAqIBwqJZBgFW17vq3ZX+BZ7ONNW 3JmhDamvrkGxeMEc8I/Ho/tS8IxmcqZm3RguAq8vq4pvFD7b28AUmnRZe1pWDcrXRLs8H6FOgMFUaN FYeXWQn7E7M+/6417F24+5nLvK6s5EP+XpaHcUfMitgBU43pFncT0rJdX6p1v5M/xh9y6eBxUGzbf3 XMiN20RLaKeEG0PvtSkxA2jK8DKBkKJUzUTmfejEpfpkC4miOjhzrx72R1cAHAUUwn88wccHRwvxbE EGONdhpJ8/Le1m8R02fjciMF5q7u77cmVsKrsQHW2L6itfk1EuIku/eI1M60mm8rn8crhja+dXunFx Gcx+X0qJW67MaYDQCi6VwcVxGYJ9pFd5CGZk1ahkGgiZrtD5Ea6UM21kqUfARhA1lSfvs+JAfv6Y8o 5QfParpmGYTkZ8uDgU2+2t0VkpynvoDQuKPU/QSmMVVfU=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1954; h=from:subject; bh=UVJykemlpoHDqykVn2Whh0E9TSYL5jrYB1Yq24Y6vZ8=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh9cOIZq+c1+DqFDwO940fhmui0wv0U3MpykwvLE9g Dg30ugSJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfXDiAAKCRDDTyI5ktmPJD2fDA CC5l2QiNjCLrbndf+o6UAL7eSXhxNmqZ85mXu1Hh2qD1x1H28i59n2dn7DNEwnLeTsZY0lID41wyVh JOjDKP6ETjFVcvKL1siPB8mddZ4V07eickpGFa+gTB5Py/i9rh+9Bc0FuJafJ4/q8qLj/9bG507CcW 40RI/R4aY2vkpmQnRcSP3Q3zscNxXRJ32eVlsaeb47tslCW4WKB2mL8KfpsU8e46OXLTRpYjrwemhV Bl0injUQVuAWl/bNgO6c3mK/OqulSQdXjbxREvZXMmGN1o4ElcuLxEg6P4PDh324wywBsHq9ISV3kz qu3iAbqSML7jnR3TvVE9KH/P0cYBiaIFhE976O9XTkhTcnLctbTBd2kPclxnBplnK7n/dBBNO4yI3a s7w2v2Z/Ho2e9pe1hoqU211mDEf1NYErTlCpgyTOkGUUkC1mFyexitQc7Je58GksdY8Ocr+MCn5RU8 KVktu5rcByVi+5QGUD9mTvev2qipspsP6CocbmcGdoZ/c=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update the xor_blocks() prototypes so that the compiler understands that
-the inputs always refer to distinct regions of memory. This is implied
-by the existing implementations, as they use different granularities for
-the load/xor/store loops.
+The ARM version of the accelerated XOR routines are simply the 8-way C
+routines passed through the auto-vectorizer with SIMD codegen enabled.
+This used to require GCC version 4.6 at least, but given that 5.1 is now
+the baseline, this check is no longer necessary, and actually
+misidentifies Clang as GCC < 4.6 as Clang defines the GCC major/minor as
+well, but makes no attempt at doing this in a way that conveys feature
+parity with a certain version of GCC (which would not be a great idea in
+the first place).
 
-With that, we can fix the ARM/Clang version, which refuses to SIMD
-vectorize otherwise, and throws a spurious warning related to the GCC
-version being incompatible.
+So let's drop the version check, and make the auto-vectorize pragma
+(which is based on a GCC-specific command line option) GCC-only. Since
+Clang performs SIMD auto-vectorization by default at -O2, no pragma is
+necessary here.
 
-Changes since v1:
-- fix PPC build
-- add Nathan's Tested-by
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm/lib/xor-neon.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Cc: Nathan Chancellor <nathan@kernel.org>
-
-Ard Biesheuvel (2):
-  lib/xor: make xor prototypes more friendely to compiler vectorization
-  crypto: arm/xor - make vectorized C code Clang-friendly
-
- arch/alpha/include/asm/xor.h           | 53 ++++++++----
- arch/arm/include/asm/xor.h             | 42 ++++++----
- arch/arm/lib/xor-neon.c                | 12 +--
- arch/arm64/include/asm/xor.h           | 21 +++--
- arch/arm64/lib/xor-neon.c              | 23 +++---
- arch/ia64/include/asm/xor.h            | 21 +++--
- arch/powerpc/include/asm/xor_altivec.h | 25 +++---
- arch/powerpc/lib/xor_vmx.c             | 28 ++++---
- arch/powerpc/lib/xor_vmx.h             | 27 ++++---
- arch/powerpc/lib/xor_vmx_glue.c        | 32 ++++----
- arch/s390/lib/xor.c                    | 21 +++--
- arch/sparc/include/asm/xor_32.h        | 21 +++--
- arch/sparc/include/asm/xor_64.h        | 42 ++++++----
- arch/x86/include/asm/xor.h             | 42 ++++++----
- arch/x86/include/asm/xor_32.h          | 42 ++++++----
- arch/x86/include/asm/xor_avx.h         | 21 +++--
- include/asm-generic/xor.h              | 84 +++++++++++++-------
- include/linux/raid/xor.h               | 21 +++--
- 18 files changed, 369 insertions(+), 209 deletions(-)
-
+diff --git a/arch/arm/lib/xor-neon.c b/arch/arm/lib/xor-neon.c
+index b99dd8e1c93f..522510baed49 100644
+--- a/arch/arm/lib/xor-neon.c
++++ b/arch/arm/lib/xor-neon.c
+@@ -17,17 +17,11 @@ MODULE_LICENSE("GPL");
+ /*
+  * Pull in the reference implementations while instructing GCC (through
+  * -ftree-vectorize) to attempt to exploit implicit parallelism and emit
+- * NEON instructions.
++ * NEON instructions. Clang does this by default at O2 so no pragma is
++ * needed.
+  */
+-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
++#ifdef CONFIG_CC_IS_GCC
+ #pragma GCC optimize "tree-vectorize"
+-#else
+-/*
+- * While older versions of GCC do not generate incorrect code, they fail to
+- * recognize the parallel nature of these functions, and emit plain ARM code,
+- * which is known to be slower than the optimized ARM code in asm-arm/xor.h.
+- */
+-#warning This code requires at least version 4.6 of GCC
+ #endif
+ 
+ #pragma GCC diagnostic ignored "-Wunused-variable"
 -- 
 2.30.2
 
