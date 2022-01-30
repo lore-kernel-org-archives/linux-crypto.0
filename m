@@ -2,64 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6249BC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 10:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDF5C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 14:47:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232338AbiA3Kjw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jan 2022 05:39:52 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:54344 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231549AbiA3Kjt (ORCPT
+        id S1355143AbiA3Or2 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 30 Jan 2022 09:47:28 -0500
+Received: from esa.microchip.iphmx.com ([68.232.154.123]:10913 "EHLO
+        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1355139AbiA3Or1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jan 2022 05:39:49 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 83EDDCE0E62
-        for <linux-crypto@vger.kernel.org>; Sun, 30 Jan 2022 10:39:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DEBDC340E4
-        for <linux-crypto@vger.kernel.org>; Sun, 30 Jan 2022 10:39:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="T+AJSmvJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1643539184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IBBlmrtLujuxkBxLliAIOBo7+gFNh7QPxyD/toTeTD4=;
-        b=T+AJSmvJmXnzw1cda2rV74QSwOXfwPhm7QltVBETvVjzb+a0WALh2D5sel4/vGho8hGYuT
-        ZbiOkrxxWlr4vvxIX1lCtdKvg7XsWrQ7OIuueFq2vyzWUR770HHlQxNeD+ftB46415hYVJ
-        Oop5xgqqtlrejjVWTkILKlyQsCc1d3A=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 269ae25d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Sun, 30 Jan 2022 10:39:43 +0000 (UTC)
-Received: by mail-yb1-f182.google.com with SMTP id i10so31745425ybt.10
-        for <linux-crypto@vger.kernel.org>; Sun, 30 Jan 2022 02:39:43 -0800 (PST)
-X-Gm-Message-State: AOAM530Z462bO+zOZccFNXgu4OeGQsbNAGF5s28Rcp8wS2XHLkTKSPR1
-        U9/V9d3rTbs030AXkO9W/64lzFZYPOtld/2Gn1c=
-X-Google-Smtp-Source: ABdhPJydlue2nQJPR7fvFoHkCX3yXB9Y206Qcx988Jug3QVjvLMdKcCmrohZlYH/Ed+AwhReKaqu1cOr2GHrJ+5QB6c=
-X-Received: by 2002:a25:c70f:: with SMTP id w15mr24346759ybe.32.1643539182721;
- Sun, 30 Jan 2022 02:39:42 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:6254:b0:129:4164:158b with HTTP; Sun, 30 Jan 2022
- 02:39:42 -0800 (PST)
-In-Reply-To: <CACXcFmnPumpkfLLzzjqkBmxwtpMa0izNj3LOtf2ycTugAKAUwQ@mail.gmail.com>
-References: <CACXcFmnPumpkfLLzzjqkBmxwtpMa0izNj3LOtf2ycTugAKAUwQ@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sun, 30 Jan 2022 11:39:42 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pUW1o_QPfs45Q0JWucA5Qu1jhgMV7x2PycxosYV2wV7A@mail.gmail.com>
-Message-ID: <CAHmME9pUW1o_QPfs45Q0JWucA5Qu1jhgMV7x2PycxosYV2wV7A@mail.gmail.com>
-Subject: Re: [PATCH] random.c Remove locking in extract_buf()
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Ted Ts'o" <tytso@mit.edu>, m@ib.tc,
+        Sun, 30 Jan 2022 09:47:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1643554047; x=1675090047;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UhHNiXx69gpQDiVL4ThrTpVjnBHgjFuy06EgsxtjySA=;
+  b=l0ZbBdgnOHU92wQza1c19YVhq7EnbqPGKNs7IvWkcbtyGATAvF/YS+06
+   Awrh7jk6euyr69k9Mn9qlwKleObBeLddcdHhevn3Eo3aYglGHkMH/tz8X
+   7ewcN2FDdYsI+n/CdDFq1iGXvvxVH5sLydkzUSlFPmMoObY99g8q4Qt29
+   eu1/X/G9viERd42I2ckSzDwEvvA4LZvSmJVCwAfDRwWv5YSIeHk2d9lJr
+   5cEKbKgqN+mU6KoDYL6q77QSdmiqJpP+Y3t54Iitco6cbCyCRHsYRkL+Z
+   jvk/p7n/FYkta52nzxcRrVjitwFtnYBin7ePFA+TjWzcfo1prCSAImXpN
+   g==;
+IronPort-SDR: YhRO6tvz9JO1zCj2s1DRMZIEAsNKisA3cAGuDZFgoLrAvrLO/TVjUySzRPEOeYB2ZwVBTsSpsh
+ 3nH6Gr9Ock3wLICS4riSk4OaveNgSu4WVPWSHebuw81GuQQJ9z9IIU28jv01Ks/PHxksKLCMCw
+ g29rG9qsrrkXmJ18OyrhCnN8Rh9JJqL0tFLgN7ZZkj1n/2g5UfldaxwbqBV9WyLcqOoUk9Mp+s
+ U+Hl/48aBfwDb/5nV/67XpnMx3sLBMJKLjST8iTXDX+cMxm1xa0vPBmXfjIlCkslNJ3V7Yio99
+ hDvHYKYmaUNWCsqxPcbSiDkN
+X-IronPort-AV: E=Sophos;i="5.88,328,1635231600"; 
+   d="scan'208";a="147058656"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Jan 2022 07:47:27 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Sun, 30 Jan 2022 07:47:26 -0700
+Received: from ness.home (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
+ Transport; Sun, 30 Jan 2022 07:47:24 -0700
+From:   <nicolas.ferre@microchip.com>
+To:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <devicetree@vger.kernel.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>
+Subject: [PATCH] dt-bindings: rng: atmel,at91-trng: update maintainers entry
+Date:   Sun, 30 Jan 2022 15:47:08 +0100
+Message-ID: <d84760e0b81c338e01f7856e1ce3c5b600b08f23.1643553619.git.nicolas.ferre@microchip.com>
+X-Mailer: git-send-email 2.32.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch is missing a S-o-b line.
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
 
-Either way, I don't think this is safe to do. We want the feed forward
-there to totally separate generations of seeds.
+Update according to new MAINTAINERS entry.
+
+Signed-off-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+---
+Hi,
+
+Patch for new MAINTAINERS entry is here:
+https://lore.kernel.org/linux-arm-kernel/23819d8baa635815d0893955197561fe4f044d5e.1643553501.git.nicolas.ferre@microchip.com/
+
+Regards,
+  Nicolas
+
+ Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+index c1527637eb74..3ce45456d867 100644
+--- a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
++++ b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
+@@ -9,7 +9,7 @@ title: Atmel AT91 True Random Number Generator
+ maintainers:
+   - Nicolas Ferre <nicolas.ferre@microchip.com>
+   - Alexandre Belloni <alexandre.belloni@bootlin.com>
+-  - Ludovic Desroches <ludovic.desroches@microchip.com>
++  - Claudiu Beznea <claudiu.beznea@microchip.com>
+ 
+ properties:
+   compatible:
+-- 
+2.32.0
+
