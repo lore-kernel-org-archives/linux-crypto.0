@@ -2,63 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E46C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 22:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901D7C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 23:05:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233869AbiA3Wxa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jan 2022 17:53:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52880 "EHLO
+        id S233823AbiA3XFU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 30 Jan 2022 18:05:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233867AbiA3Wx3 (ORCPT
+        with ESMTP id S233819AbiA3XFS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jan 2022 17:53:29 -0500
+        Sun, 30 Jan 2022 18:05:18 -0500
 Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F3AC061714;
-        Sun, 30 Jan 2022 14:53:28 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id v13so21851749wrv.10;
-        Sun, 30 Jan 2022 14:53:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A74C061714;
+        Sun, 30 Jan 2022 15:05:18 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id k18so21937262wrg.11;
+        Sun, 30 Jan 2022 15:05:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=8aLABlGloUKCDwPwzOQyc5Kb5Zd5UVP0O5ptdkGtV0Y=;
-        b=fLJhJBlrf80wFZRS/lZpT0NjeDn9aIQf6BOzNeAOf4t87swGk6aBTZLrQFp+ku+3dF
-         y3+lZnge20tDGOXVS+SCkKSpUnvSgGgSUDGkN9eJaNa22QcoEYGXwIY7M20xzSAv3XDV
-         jcLuUgzQrpBWjaFlN7lH2Q4aNp7dho9s17pwYycbrrXRKOwEaFGG40KVtZDTxaGtyjwQ
-         T/16G2E46/ImoMjCEi16HGrbzVZq0kbpMJKSXejvbcv1CYhJ4bTX9bcs7WlLvkN68gUA
-         QgaqOXy46QplO386eImI4BN0tshNWpEahGJGtOtmxQW/+CCSiZ34wUJuy72zkjOB7Dgj
-         v4ag==
+        bh=KLIKePOeCome+/jrAOdUWZSwyKBM/SDtl/LP3yhDNYM=;
+        b=e+clUAX4p9oBLGf9A96fySwmIAjAATRP3Dk8p8FHCvwn5kEVpadYL06GhUQQWY80aP
+         4aMUnP1kuLXcH+z2S9ADV51gj/e5k4LxtC2X7g1GZldbToIcPZ+CqPVtZyS3VK0rXZBM
+         k5FR3elkLENDFbp/Y0maydNFfjQK2k+DjUXvYhbz7Js2WHoAHiid7WnEw02r+YgDYEPc
+         aam8aJkHEo2+YuyOtVy6NAiZmXpmq3rAuSAmjdsdGVdu6zuQiL7l9SbBIa5aMdDIPIq+
+         HV2+wj6HCY58eaM27F6J9b13tGQ7Bn5Wyj64rFZH6f9Zo2VELoZS+ffV9QCC6iLqnCXN
+         WOAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=8aLABlGloUKCDwPwzOQyc5Kb5Zd5UVP0O5ptdkGtV0Y=;
-        b=JiNFpHNkI9OgnO1A9dK6XeclI34MKQd+zBgXx0+WlphrJem/eaMNshRmcZ6XzU6Wsg
-         TEX1tQ1w0nweD+UfaW1g9zZhsd6Xw2bnFAyHQdTtkznyP+OB3gg1DLjT72dklEuMIcDx
-         mu3+3zRN8uIHUFe8Z31AF+Hd4GStNEOQgM8T972W2t6/VOmOG22TX38DIs8dxVFtF0tN
-         xGI4ZYtt6R3Z1TaW4u0iUhfOm7DxtX1oIna3sODicoxVi7pN1V4HZUwW+QGjsuBM2LPF
-         +0v9q154xBdZJiuIA9H3LLFnT+37h/zcVfLsj75CqEEHyge1EDhGdZvfvXvrBoZn1BBH
-         hW2Q==
-X-Gm-Message-State: AOAM532ldVsCeGhkq8QrlstwvNkh3O5sVpFe2zzzxP09BsMDck0BuCa0
-        GdpDUZAPxBxAIPZVd0aDR4A=
-X-Google-Smtp-Source: ABdhPJyEE686mcajaIAdlANBP8O5MwuccLcQUECwyMHovcRKagxwN1SFR7awbrL9sD0Q66NQe/7NIQ==
-X-Received: by 2002:a5d:6da2:: with SMTP id u2mr14622853wrs.704.1643583207002;
-        Sun, 30 Jan 2022 14:53:27 -0800 (PST)
+        bh=KLIKePOeCome+/jrAOdUWZSwyKBM/SDtl/LP3yhDNYM=;
+        b=6geeyGu3basraW1lyk/YBxeWfWVzs/h29HXjOqhBJ/oKQXnK5BpYxAQSEXnMqNuZvp
+         OfsxT/JbhYbfUC//E2JOhbE2vGr2tDg6r+ADOpoSqO78FlHrkDR+uDnH2c4P2gry3TlS
+         NMpM7YIQNLuKYq23UkcUk08MrvG61JB+mSbzM2+jNUgi18o9KVsrciCVmLDYbg7KMCzN
+         sdACRKA+Rr6yuBsiQJeS/bnJUU9Je+1A68MwgaYSgYUjtDZG9zbLUuTMSIRT09VNsQ2m
+         BveKYGeMBuldcgiwB61YwKvx5Rp+aq2MJw6ETOvXk3VL0RZxDJ0GWAjxUYs+fALx7xpt
+         rteg==
+X-Gm-Message-State: AOAM532LFGZ7My9VVOWpZfekTODtIhm1n1ofO2VO7R2EmOQWGcuWX0u8
+        ZVFJMJdSrUyaJ43Zi08xj00=
+X-Google-Smtp-Source: ABdhPJzb62H0qxffVALn0pUgTOkkID2z8NicfA9VV7LoeIrQoDnLlzgP80EsDJmq7VA5ZU7+b3EBog==
+X-Received: by 2002:adf:e8ce:: with SMTP id k14mr6185249wrn.284.1643583916962;
+        Sun, 30 Jan 2022 15:05:16 -0800 (PST)
 Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id k32sm8820214wms.14.2022.01.30.14.53.26
+        by smtp.gmail.com with ESMTPSA id r2sm14226210wrz.99.2022.01.30.15.05.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Jan 2022 14:53:26 -0800 (PST)
+        Sun, 30 Jan 2022 15:05:16 -0800 (PST)
 From:   Colin Ian King <colin.i.king@gmail.com>
-To:     Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
+To:     Corentin Labbe <clabbe@baylibre.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: marvell/octeontx: remove redundant initialization of variable c_size
-Date:   Sun, 30 Jan 2022 22:53:25 +0000
-Message-Id: <20220130225325.7819-1-colin.i.king@gmail.com>
+Subject: [PATCH] crypto: sl3516: remove redundant initializations of pointers in_sg and out_sg
+Date:   Sun, 30 Jan 2022 23:05:15 +0000
+Message-Id: <20220130230515.8338-1-colin.i.king@gmail.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -67,27 +67,31 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Variable c_size is being initialized with a value that is never read, it
-is being re-assigned with a different value later on. The initialization
-is redundant and can be removed.
+Pointers in_sg and out_sg are being initialized with values that are
+never read, they are being re-assigned the same values later on. The
+initializations are redundant, remove them in preference to the later
+assignments that are closer to when the pointers are being used.
 
 Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- drivers/crypto/marvell/octeontx/otx_cptvf_main.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/crypto/gemini/sl3516-ce-cipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-index b681bd2dc6ad..36d72e35ebeb 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-@@ -204,7 +204,6 @@ static int alloc_command_queues(struct otx_cptvf *cptvf,
+diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
+index c1c2b1d86663..53e3fefb81de 100644
+--- a/drivers/crypto/gemini/sl3516-ce-cipher.c
++++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
+@@ -23,8 +23,8 @@ static bool sl3516_ce_need_fallback(struct skcipher_request *areq)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+ 	struct sl3516_ce_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sl3516_ce_dev *ce = op->ce;
+-	struct scatterlist *in_sg = areq->src;
+-	struct scatterlist *out_sg = areq->dst;
++	struct scatterlist *in_sg;
++	struct scatterlist *out_sg;
+ 	struct scatterlist *sg;
  
- 	/* per queue initialization */
- 	for (i = 0; i < cptvf->num_queues; i++) {
--		c_size = 0;
- 		rem_q_size = q_size;
- 		first = NULL;
- 		last = NULL;
+ 	if (areq->cryptlen == 0 || areq->cryptlen % 16) {
 -- 
 2.34.1
 
