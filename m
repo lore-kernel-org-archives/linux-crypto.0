@@ -2,97 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDF5C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 14:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90190C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jan 2022 21:04:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355143AbiA3Or2 (ORCPT
+        id S1347539AbiA3VEl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jan 2022 09:47:28 -0500
-Received: from esa.microchip.iphmx.com ([68.232.154.123]:10913 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355139AbiA3Or1 (ORCPT
+        Sun, 30 Jan 2022 16:04:41 -0500
+Received: from isilmar-4.linta.de ([136.243.71.142]:51610 "EHLO
+        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232616AbiA3VEl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jan 2022 09:47:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1643554047; x=1675090047;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UhHNiXx69gpQDiVL4ThrTpVjnBHgjFuy06EgsxtjySA=;
-  b=l0ZbBdgnOHU92wQza1c19YVhq7EnbqPGKNs7IvWkcbtyGATAvF/YS+06
-   Awrh7jk6euyr69k9Mn9qlwKleObBeLddcdHhevn3Eo3aYglGHkMH/tz8X
-   7ewcN2FDdYsI+n/CdDFq1iGXvvxVH5sLydkzUSlFPmMoObY99g8q4Qt29
-   eu1/X/G9viERd42I2ckSzDwEvvA4LZvSmJVCwAfDRwWv5YSIeHk2d9lJr
-   5cEKbKgqN+mU6KoDYL6q77QSdmiqJpP+Y3t54Iitco6cbCyCRHsYRkL+Z
-   jvk/p7n/FYkta52nzxcRrVjitwFtnYBin7ePFA+TjWzcfo1prCSAImXpN
-   g==;
-IronPort-SDR: YhRO6tvz9JO1zCj2s1DRMZIEAsNKisA3cAGuDZFgoLrAvrLO/TVjUySzRPEOeYB2ZwVBTsSpsh
- 3nH6Gr9Ock3wLICS4riSk4OaveNgSu4WVPWSHebuw81GuQQJ9z9IIU28jv01Ks/PHxksKLCMCw
- g29rG9qsrrkXmJ18OyrhCnN8Rh9JJqL0tFLgN7ZZkj1n/2g5UfldaxwbqBV9WyLcqOoUk9Mp+s
- U+Hl/48aBfwDb/5nV/67XpnMx3sLBMJKLjST8iTXDX+cMxm1xa0vPBmXfjIlCkslNJ3V7Yio99
- hDvHYKYmaUNWCsqxPcbSiDkN
-X-IronPort-AV: E=Sophos;i="5.88,328,1635231600"; 
-   d="scan'208";a="147058656"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 30 Jan 2022 07:47:27 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Sun, 30 Jan 2022 07:47:26 -0700
-Received: from ness.home (10.10.115.15) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
- Transport; Sun, 30 Jan 2022 07:47:24 -0700
-From:   <nicolas.ferre@microchip.com>
-To:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Ludovic Desroches <ludovic.desroches@microchip.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <devicetree@vger.kernel.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>
-Subject: [PATCH] dt-bindings: rng: atmel,at91-trng: update maintainers entry
-Date:   Sun, 30 Jan 2022 15:47:08 +0100
-Message-ID: <d84760e0b81c338e01f7856e1ce3c5b600b08f23.1643553619.git.nicolas.ferre@microchip.com>
-X-Mailer: git-send-email 2.32.0
+        Sun, 30 Jan 2022 16:04:41 -0500
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 1FF21201400;
+        Sun, 30 Jan 2022 21:04:40 +0000 (UTC)
+Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
+        id 6AEA88073B; Sun, 30 Jan 2022 22:03:21 +0100 (CET)
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     tytso@mit.edu, Jason@zx2c4.com
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH 1/2] random: access primary_pool directly rather than through pointer
+Date:   Sun, 30 Jan 2022 22:03:19 +0100
+Message-Id: <20220130210320.3997-1-linux@dominikbrodowski.net>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Both crng_initialize_primary() and crng_init_try_arch_early() are
+only called for the primary_pool. Accessing it directly instead of
+through a function parameter simplifies the code.
 
-Update according to new MAINTAINERS entry.
-
-Signed-off-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 ---
-Hi,
+ drivers/char/random.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Patch for new MAINTAINERS entry is here:
-https://lore.kernel.org/linux-arm-kernel/23819d8baa635815d0893955197561fe4f044d5e.1643553501.git.nicolas.ferre@microchip.com/
-
-Regards,
-  Nicolas
-
- Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
-index c1527637eb74..3ce45456d867 100644
---- a/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
-+++ b/Documentation/devicetree/bindings/rng/atmel,at91-trng.yaml
-@@ -9,7 +9,7 @@ title: Atmel AT91 True Random Number Generator
- maintainers:
-   - Nicolas Ferre <nicolas.ferre@microchip.com>
-   - Alexandre Belloni <alexandre.belloni@bootlin.com>
--  - Ludovic Desroches <ludovic.desroches@microchip.com>
-+  - Claudiu Beznea <claudiu.beznea@microchip.com>
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 68613f0b6887..d332054bbbb6 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -762,7 +762,7 @@ static bool crng_init_try_arch(struct crng_state *crng)
+ 	return arch_init;
+ }
  
- properties:
-   compatible:
+-static bool __init crng_init_try_arch_early(struct crng_state *crng)
++static bool __init crng_init_try_arch_early(void)
+ {
+ 	int i;
+ 	bool arch_init = true;
+@@ -774,7 +774,7 @@ static bool __init crng_init_try_arch_early(struct crng_state *crng)
+ 			rv = random_get_entropy();
+ 			arch_init = false;
+ 		}
+-		crng->state[i] ^= rv;
++		primary_crng.state[i] ^= rv;
+ 	}
+ 
+ 	return arch_init;
+@@ -788,16 +788,16 @@ static void crng_initialize_secondary(struct crng_state *crng)
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+ }
+ 
+-static void __init crng_initialize_primary(struct crng_state *crng)
++static void __init crng_initialize_primary(void)
+ {
+-	_extract_entropy(&crng->state[4], sizeof(u32) * 12);
+-	if (crng_init_try_arch_early(crng) && trust_cpu && crng_init < 2) {
++	_extract_entropy(&primary_crng.state[4], sizeof(u32) * 12);
++	if (crng_init_try_arch_early() && trust_cpu && crng_init < 2) {
+ 		invalidate_batched_entropy();
+ 		numa_crng_init();
+ 		crng_init = 2;
+ 		pr_notice("crng init done (trusting CPU's manufacturer)\n");
+ 	}
+-	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
++	primary_crng.init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+ }
+ 
+ static void crng_finalize_init(struct crng_state *crng)
+@@ -1698,7 +1698,7 @@ int __init rand_initialize(void)
+ 	init_std_data();
+ 	if (crng_need_final_init)
+ 		crng_finalize_init(&primary_crng);
+-	crng_initialize_primary(&primary_crng);
++	crng_initialize_primary();
+ 	crng_global_init_time = jiffies;
+ 	if (ratelimit_disable) {
+ 		urandom_warning.interval = 0;
 -- 
-2.32.0
+2.35.1
 
