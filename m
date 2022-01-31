@@ -2,55 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91537C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jan 2022 18:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 134F1C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 31 Jan 2022 18:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239574AbiAaSQi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jan 2022 13:16:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33108 "EHLO
+        id S234205AbiAaSSE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jan 2022 13:18:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236914AbiAaSQi (ORCPT
+        with ESMTP id S1343914AbiAaSSC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jan 2022 13:16:38 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CEE5C061714
-        for <linux-crypto@vger.kernel.org>; Mon, 31 Jan 2022 10:16:38 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id z20so20585442ljo.6
-        for <linux-crypto@vger.kernel.org>; Mon, 31 Jan 2022 10:16:38 -0800 (PST)
+        Mon, 31 Jan 2022 13:18:02 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37069C06173D
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Jan 2022 10:18:02 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id u14so28574735lfo.11
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Jan 2022 10:18:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gyEQrK489u7hChy2E+c7sGCUR0+nczU4u5IQ7M/S6eI=;
-        b=IeLNj0bcyA05XSywkBjL/WClby7sJbn4LuVShqHglERWo7vx2pnu9yahaxWMYX+Ea+
-         mg91pJC+aCBulku1EXIUZzA2+Mt5z1daB5WuYdGyFTXavP3zchbwpt04h9Jspd5jkb/I
-         Q1IcwHxjSH3dIamV0OSOa4uHZxlcPBDUSD0F4MMa1Ay+iXTuTzvyYt99YQjagOE8OEw7
-         Zt6daGwzAPE/xk/vvcKdEwtjixoTAy+UDP4CcFkSIdodQNUMC0TSJWwAfgaXzrQRdTXv
-         zPKrjthznH1nY82Z5h8sxWJiiAk72taUfmP/GKfWoaHioaHgYjuOLZaFjci/uyzQmfAY
-         +u4w==
+        bh=ghH8jtplUqlqoTmkawJXMXbuH6NA7Ot3MZ8fNYa4sIs=;
+        b=Y9U+b93Fixwmnt670FvcAf1nnjmkuxjYkp7xKkkknflknGCJbrUVfNnL/GDIIoWs13
+         IxtBwK3FPUm1loJe3nb8E5KMK59s+IdSQt/B4b1zEVaLDbejh/mTlu4zJNydyiZy+d0q
+         AtMrZxNtlNLlS+yjS4QJaCRA9P4ppaWeLVy6r5mAXkdYibmV7Z3/ZzfoWpwu4Q2W6R1M
+         eWIJF9QX71E9MKKe/s1z9fozi5jmZF2vNe4QDSdTQMRcpUPN9+v3SaKo+ltvWLitgI54
+         pClB0zbp46Ok82dyO2514A+WfixCWQAhbsVk2eGTerNfGKVmlu80drqykbJwXE2HbObq
+         3KRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gyEQrK489u7hChy2E+c7sGCUR0+nczU4u5IQ7M/S6eI=;
-        b=EVR+rYcQOQw34SngF++8GUyDRfn58f/Ly4ufw22x3uYsoXP3JCM4yM1b83FbASw6JG
-         HlYvNn1ixpUcxSQm9Ne7bcAwdHIYfUFXSv6J8UsMiOr9EpLMWu9/0GrxaX3oRYumnIGJ
-         HKKGTVUvb+vj265SlthdbABg4+KQu7FNyaDGqsV5XaUBsl/wxz0KeH/5w7uopY419u98
-         2GHtTJeqJayza5KLxjPB1mzIhMn04AlqOWAwsGF06WO3fCCvVr8L18/4/ye0hYgYFLxv
-         QqdPqhuszOGDxInI2e1H9GwpAATq4ny0KAAM2wrioF1mHNkyNR+0UIvayHkXXxOY37+3
-         is6Q==
-X-Gm-Message-State: AOAM531xJAmCi+SdLtHZTPiCLdJbRzAGAMcfarF+gH3cHYNf2uJr5u34
-        aDI7F4Ztwl6252s4z9mB3I4s2EllGSH1rvKK12w5sQ==
-X-Google-Smtp-Source: ABdhPJzH84MwpkHA2HN+vOIOoHnhFkHIWI0RceFo+cQkKMT/mab9EGYET9WgOo96gb1d5ZvHau481t8aKxNvOI5syAo=
-X-Received: by 2002:a2e:b6d0:: with SMTP id m16mr6852861ljo.128.1643652996400;
- Mon, 31 Jan 2022 10:16:36 -0800 (PST)
+        bh=ghH8jtplUqlqoTmkawJXMXbuH6NA7Ot3MZ8fNYa4sIs=;
+        b=zbeisCNEhs3R6tb5kS3deY6bUA5Fbb29u/diOlu6q491WyV1jXUNIxaoDAGdewxhrO
+         IZg+QoI5e15QJTBePkamYa6+6sOTZJBTYwNjCxxHYDqkRk2tQLFxkFlJHMykcLzBmcDp
+         +lz1XTMAQpjtRjchIqAhj4UubvsRQM8aXC9YM2WXHIQIIY/0UysADzZx3edW2VHISIqf
+         dQ3xXeCNr7aL3gF9q0spaZ/Qj7yDz98PusRs9HnkTQe/agYIg5lL9CwnHlyXO+Te5Ys0
+         81pxeRDsphnSIZt3qxcpJ7kGngl5bVkoIpc3hNJHH16O0ADluqUuCNl/d4u7QUMiHqDZ
+         nUGA==
+X-Gm-Message-State: AOAM532+BzPF4jZ8oLbB8WTulX/cCwlaSdlXBlv/D5yd9/esZEA9TAzS
+        ms/XovWllwhYzhcriUHv/+Oy3kyUve2u6SSm1m7hHA==
+X-Google-Smtp-Source: ABdhPJzOsII3rKHTFo22BGXW9GwCpgQGtKfVocjvPXZjMenHSnd71485hT0X2Oa+C80Zf6WziPjJ1GYr2hKVuM4uh+Q=
+X-Received: by 2002:a05:6512:e87:: with SMTP id bi7mr16874064lfb.550.1643653080398;
+ Mon, 31 Jan 2022 10:18:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20220129224529.76887-1-ardb@kernel.org> <20220129224529.76887-3-ardb@kernel.org>
-In-Reply-To: <20220129224529.76887-3-ardb@kernel.org>
+References: <20220129224529.76887-1-ardb@kernel.org> <20220129224529.76887-2-ardb@kernel.org>
+ <CAKwvOdmW6cxMT_X9T+O98x55MY_b0zCaJWArU4OfTay6Ceyovg@mail.gmail.com>
+In-Reply-To: <CAKwvOdmW6cxMT_X9T+O98x55MY_b0zCaJWArU4OfTay6Ceyovg@mail.gmail.com>
 From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 31 Jan 2022 10:16:24 -0800
-Message-ID: <CAKwvOdmX1_qBUS-PnWFHrAU3usTTeYsMnfv5cfpp42Hmwmkzmg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] crypto: arm/xor - make vectorized C code Clang-friendly
+Date:   Mon, 31 Jan 2022 10:17:49 -0800
+Message-ID: <CAKwvOdkvAs95g0G4d=X7ZEB3-7d0gaHdsJ7Jjue6BWykWiwEWg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] lib/xor: make xor prototypes more friendely to
+ compiler vectorization
 To:     Ard Biesheuvel <ardb@kernel.org>
 Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         Nathan Chancellor <nathan@kernel.org>
@@ -59,64 +61,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 29, 2022 at 2:45 PM Ard Biesheuvel <ardb@kernel.org> wrote:
+On Mon, Jan 31, 2022 at 10:13 AM Nick Desaulniers
+<ndesaulniers@google.com> wrote:
 >
-> The ARM version of the accelerated XOR routines are simply the 8-way C
-> routines passed through the auto-vectorizer with SIMD codegen enabled.
-> This used to require GCC version 4.6 at least, but given that 5.1 is now
-> the baseline, this check is no longer necessary, and actually
-> misidentifies Clang as GCC < 4.6 as Clang defines the GCC major/minor as
-> well, but makes no attempt at doing this in a way that conveys feature
-> parity with a certain version of GCC (which would not be a great idea in
-> the first place).
+> On Sat, Jan 29, 2022 at 2:45 PM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > Modern compilers are perfectly capable of extracting parallelism from
+> > the XOR routines, provided that the prototypes reflect the nature of the
+> > input accurately, in particular, the fact that the input vectors are
+> > expected not to overlap. This is not documented explicitly, but is
+> > implied by the interchangeability of the various C routines, some of
+> > which use temporary variables while others don't: this means that these
+> > routines only behave identically for non-overlapping inputs.
+> >
+> > So let's decorate these input vectors with the __restrict modifier,
+> > which informs the compiler that there is no overlap. While at it, make
+> > the input-only vectors pointer-to-const as well.
+> >
+> > Tested-by: Nathan Chancellor <nathan@kernel.org>
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 >
-> So let's drop the version check, and make the auto-vectorize pragma
-> (which is based on a GCC-specific command line option) GCC-only. Since
-> Clang performs SIMD auto-vectorization by default at -O2, no pragma is
-> necessary here.
+> Thanks for the patch!
+> Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 >
-> Tested-by: Nathan Chancellor <nathan@kernel.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> I like how you renamed the parameters in
+> arch/powerpc/include/asm/xor_altivec.h, arch/powerpc/lib/xor_vmx.h,
+> and arch/powerpc/lib/xor_vmx_glue.c.  It's not befitting for the
+> suffix _in to be used when the first param is technically more of an
+> "inout" param.  Though, you might also want to update the parameter
+> names in arch/powerpc/lib/xor_vmx.c.
 
-Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Link: https://github.com/ClangBuiltLinux/linux/issues/496
-Link: https://github.com/ClangBuiltLinux/linux/issues/503
+Also, this patch fixes an instance of -Wframe-larger-than we observed with ppc:
 
-> ---
->  arch/arm/lib/xor-neon.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/arm/lib/xor-neon.c b/arch/arm/lib/xor-neon.c
-> index b99dd8e1c93f..522510baed49 100644
-> --- a/arch/arm/lib/xor-neon.c
-> +++ b/arch/arm/lib/xor-neon.c
-> @@ -17,17 +17,11 @@ MODULE_LICENSE("GPL");
->  /*
->   * Pull in the reference implementations while instructing GCC (through
->   * -ftree-vectorize) to attempt to exploit implicit parallelism and emit
-> - * NEON instructions.
-> + * NEON instructions. Clang does this by default at O2 so no pragma is
-> + * needed.
->   */
-> -#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
-> +#ifdef CONFIG_CC_IS_GCC
->  #pragma GCC optimize "tree-vectorize"
-> -#else
-> -/*
-> - * While older versions of GCC do not generate incorrect code, they fail to
-> - * recognize the parallel nature of these functions, and emit plain ARM code,
-> - * which is known to be slower than the optimized ARM code in asm-arm/xor.h.
-> - */
-> -#warning This code requires at least version 4.6 of GCC
->  #endif
->
->  #pragma GCC diagnostic ignored "-Wunused-variable"
-> --
-> 2.30.2
->
-
-
+Link: https://github.com/ClangBuiltLinux/linux/issues/563
 -- 
 Thanks,
 ~Nick Desaulniers
