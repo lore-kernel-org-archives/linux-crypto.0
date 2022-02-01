@@ -2,167 +2,316 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 248B5C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 08:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E94C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 09:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235571AbiBAImP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Feb 2022 03:42:15 -0500
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.24]:40445 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234940AbiBAImO (ORCPT
+        id S235854AbiBAJNR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Feb 2022 04:13:17 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:53592 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235822AbiBAJNR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Feb 2022 03:42:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643704925;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=umL7/7M8PKPS10nEN4wTl9xQHWEq8qbSqviM0UlZA8c=;
-    b=rC73LZRq9nJmajhz5BTzdqch25MLgFVH/io6Q9wu/58BACxykm2mHGYIYcT2s3SiZn
-    kn96GdgjGcwrfFsnot78qSa+TUG2XPLLCfawjxZ7Kn9ZPlJwnZ1ydE6WlVq8B3N+PAvF
-    yvi6m26rEL4DdDYQeTI3oR1c5puXUnUbppGM8If0FgX+KB/LZ/GQiZdY3J1bmJecg7Wa
-    uTC9VzHaoiI/EUcQL4nLiLzFRRyYHUl8S1mC6i1YJ/zTG1caMFJbzpY1PJiiplKzYlg4
-    1NRBIaFWOA+bDVVv2ODTzaq70R0S2lcAJXF2T2WBzshwL9QXC57hSYdWBluGs3frEQ0B
-    tSbg==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zW8BKRp5UFiyGZZ4jof7Xg=="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-    by smtp.strato.de (RZmta 47.39.0 AUTH)
-    with ESMTPSA id z28df7y118g43Jo
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Tue, 1 Feb 2022 09:42:04 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, Niolai Stange <nstange@suse.com>,
-        Simo Sorce <simo@redhat.com>
-Subject: [PATCH v2 2/2] crypto: HMAC - disallow keys < 112 bits in FIPS mode
-Date:   Tue, 01 Feb 2022 09:41:32 +0100
-Message-ID: <25394269.1r3eYUQgxm@positron.chronox.de>
-In-Reply-To: <4609802.vXUDI8C0e8@positron.chronox.de>
-References: <2075651.9o76ZdvQCi@positron.chronox.de> <YfN1HKqL9GT9R25Z@gondor.apana.org.au> <4609802.vXUDI8C0e8@positron.chronox.de>
+        Tue, 1 Feb 2022 04:13:17 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0C930B82D1B;
+        Tue,  1 Feb 2022 09:13:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 936A2C340F0;
+        Tue,  1 Feb 2022 09:13:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643706794;
+        bh=M8/HA0NeuoGfTEoeqpsD3EiTu6HWy96swixvLfGHc94=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=KukHZXBdVLS/V0ATUIap770b3fP2ezWKjiSHPz1btAiz/ouDtLbzrVU7eB7aYoCiw
+         BfWFrtgPZbM0zrkbY/jqeQ7GthPpz0levw190wxbZmGsdN5aJOm9HyhmDp21XS9oUG
+         8BFXQuzs9NwRaSEl/6vpXZTKvFTImr99GxVi52v4pVa55TBJrRgPG9DwVMVihRf/V+
+         WbOydewXUhVayKNNNexA/FLHu5OZmwfkVLEEmyYanywG/5BaiqHZXzfJdmuUtlc/7R
+         pH6NGQJDx2QIuEdfPuNSAk/1PmdaLe4hiwj0hZKzLu+qwcH2xGCh4T/RkadD47QaOE
+         IX6/3AVifpSDA==
+Received: by mail-wr1-f47.google.com with SMTP id s18so30577291wrv.7;
+        Tue, 01 Feb 2022 01:13:14 -0800 (PST)
+X-Gm-Message-State: AOAM533cKRXa0yyiUAaidchTUhOFxe1siMgQFYtyOhPGlvQZsFGMQgle
+        QxD705JkvmEyBgDiqoeMw69IVRhAJgkzXvnNipQ=
+X-Google-Smtp-Source: ABdhPJwpWMlnABXWM6hZCahA4qT1K08exblSso3TDSBHM/OzFWW2l+kkNoPQAMqs6Oxl1UlEvnbYg4Bv7/9acQJ0MbM=
+X-Received: by 2002:a05:6000:1c9:: with SMTP id t9mr21035776wrx.550.1643706792825;
+ Tue, 01 Feb 2022 01:13:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20220128083835.13890-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20220128083835.13890-1-tianjia.zhang@linux.alibaba.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 1 Feb 2022 10:13:00 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEfNCdyWQ-=OXEzoqduob-MWscxGt2xBcjF08Dh30NxyA@mail.gmail.com>
+Message-ID: <CAMj1kXEfNCdyWQ-=OXEzoqduob-MWscxGt2xBcjF08Dh30NxyA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: tcrypt - remove all multibuffer ahash tests
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-FIPS 140 requires a minimum security strength of 112 bits. This implies
-that the HMAC key must not be smaller than 112 in FIPS mode.
+On Fri, 28 Jan 2022 at 09:38, Tianjia Zhang
+<tianjia.zhang@linux.alibaba.com> wrote:
+>
+> The multibuffer algorithms was removed already in 2018, so it is
+> necessary to clear the test code left by tcrypt.
+>
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 
-This restriction implies that the test vectors for HMAC that have a key
-that is smaller than 112 bits must be disabled when FIPS support is
-compiled.
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/hmac.c    | 4 ++++
- crypto/testmgr.h | 9 +++++++++
- 2 files changed, 13 insertions(+)
-
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 25856aa7ccbf..3610ff0b6739 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -15,6 +15,7 @@
- #include <crypto/internal/hash.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
-+#include <linux/fips.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
-@@ -51,6 +52,9 @@ static int hmac_setkey(struct crypto_shash *parent,
- 	SHASH_DESC_ON_STACK(shash, hash);
- 	unsigned int i;
- 
-+	if (fips_enabled && (keylen < 112 / 8))
-+		return -EINVAL;
-+
- 	shash->tfm = hash;
- 
- 	if (keylen > bs) {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 17b37525f289..85ccf811f5e7 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -5715,6 +5715,7 @@ static const struct hash_testvec hmac_sha1_tv_template[] = {
- 		.psize	= 28,
- 		.digest	= "\xef\xfc\xdf\x6a\xe5\xeb\x2f\xa2\xd2\x74"
- 			  "\x16\xd5\xf1\x84\xdf\x9c\x25\x9a\x7c\x79",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa",
- 		.ksize	= 20,
-@@ -5804,6 +5805,7 @@ static const struct hash_testvec hmac_sha224_tv_template[] = {
- 			"\x45\x69\x0f\x3a\x7e\x9e\x6d\x0f"
- 			"\x8b\xbe\xa2\xa3\x9e\x61\x48\x00"
- 			"\x8f\xd0\x5e\x44",
-+		.fips_skip = 1,
- 	}, {
- 		.key    = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -5947,6 +5949,7 @@ static const struct hash_testvec hmac_sha256_tv_template[] = {
- 			  "\x6a\x04\x24\x26\x08\x95\x75\xc7"
- 			  "\x5a\x00\x3f\x08\x9d\x27\x39\x83"
- 			  "\x9d\xec\x58\xb9\x64\xec\x38\x43",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			"\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6445,6 +6448,7 @@ static const struct hash_testvec hmac_sha384_tv_template[] = {
- 			  "\xe4\x2e\xc3\x73\x63\x22\x44\x5e"
- 			  "\x8e\x22\x40\xca\x5e\x69\xe2\xc7"
- 			  "\x8b\x32\x39\xec\xfa\xb2\x16\x49",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6545,6 +6549,7 @@ static const struct hash_testvec hmac_sha512_tv_template[] = {
- 			  "\x6d\x03\x4f\x65\xf8\xf0\xe6\xfd"
- 			  "\xca\xea\xb1\xa3\x4d\x4a\x6b\x4b"
- 			  "\x63\x6e\x07\x0a\x38\xbc\xe7\x37",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6640,6 +6645,7 @@ static const struct hash_testvec hmac_sha3_224_tv_template[] = {
- 			  "\x1b\x79\x86\x34\xad\x38\x68\x11"
- 			  "\xc2\xcf\xc8\x5b\xfa\xf5\xd5\x2b"
- 			  "\xba\xce\x5e\x66",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6727,6 +6733,7 @@ static const struct hash_testvec hmac_sha3_256_tv_template[] = {
- 			  "\x35\x96\xbb\xb0\xda\x73\xb8\x87"
- 			  "\xc9\x17\x1f\x93\x09\x5b\x29\x4a"
- 			  "\xe8\x57\xfb\xe2\x64\x5e\x1b\xa5",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6818,6 +6825,7 @@ static const struct hash_testvec hmac_sha3_384_tv_template[] = {
- 			  "\x3c\xa1\x35\x08\xa9\x32\x43\xce"
- 			  "\x48\xc0\x45\xdc\x00\x7f\x26\xa2"
- 			  "\x1b\x3f\x5e\x0e\x9d\xf4\xc2\x0a",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
-@@ -6917,6 +6925,7 @@ static const struct hash_testvec hmac_sha3_512_tv_template[] = {
- 			  "\xee\x7a\x0c\x31\xd0\x22\xa9\x5e"
- 			  "\x1f\xc9\x2b\xa9\xd7\x7d\xf8\x83"
- 			  "\x96\x02\x75\xbe\xb4\xe6\x20\x24",
-+		.fips_skip = 1,
- 	}, {
- 		.key	= "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
- 			  "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa"
--- 
-2.33.1
-
-
-
-
+> ---
+>  crypto/tcrypt.c | 224 ------------------------------------------------
+>  1 file changed, 224 deletions(-)
+>
+> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+> index 82b5eef2246a..2a808e843de5 100644
+> --- a/crypto/tcrypt.c
+> +++ b/crypto/tcrypt.c
+> @@ -724,200 +724,6 @@ static inline int do_one_ahash_op(struct ahash_request *req, int ret)
+>         return crypto_wait_req(ret, wait);
+>  }
+>
+> -struct test_mb_ahash_data {
+> -       struct scatterlist sg[XBUFSIZE];
+> -       char result[64];
+> -       struct ahash_request *req;
+> -       struct crypto_wait wait;
+> -       char *xbuf[XBUFSIZE];
+> -};
+> -
+> -static inline int do_mult_ahash_op(struct test_mb_ahash_data *data, u32 num_mb,
+> -                                  int *rc)
+> -{
+> -       int i, err = 0;
+> -
+> -       /* Fire up a bunch of concurrent requests */
+> -       for (i = 0; i < num_mb; i++)
+> -               rc[i] = crypto_ahash_digest(data[i].req);
+> -
+> -       /* Wait for all requests to finish */
+> -       for (i = 0; i < num_mb; i++) {
+> -               rc[i] = crypto_wait_req(rc[i], &data[i].wait);
+> -
+> -               if (rc[i]) {
+> -                       pr_info("concurrent request %d error %d\n", i, rc[i]);
+> -                       err = rc[i];
+> -               }
+> -       }
+> -
+> -       return err;
+> -}
+> -
+> -static int test_mb_ahash_jiffies(struct test_mb_ahash_data *data, int blen,
+> -                                int secs, u32 num_mb)
+> -{
+> -       unsigned long start, end;
+> -       int bcount;
+> -       int ret = 0;
+> -       int *rc;
+> -
+> -       rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+> -       if (!rc)
+> -               return -ENOMEM;
+> -
+> -       for (start = jiffies, end = start + secs * HZ, bcount = 0;
+> -            time_before(jiffies, end); bcount++) {
+> -               ret = do_mult_ahash_op(data, num_mb, rc);
+> -               if (ret)
+> -                       goto out;
+> -       }
+> -
+> -       pr_cont("%d operations in %d seconds (%llu bytes)\n",
+> -               bcount * num_mb, secs, (u64)bcount * blen * num_mb);
+> -
+> -out:
+> -       kfree(rc);
+> -       return ret;
+> -}
+> -
+> -static int test_mb_ahash_cycles(struct test_mb_ahash_data *data, int blen,
+> -                               u32 num_mb)
+> -{
+> -       unsigned long cycles = 0;
+> -       int ret = 0;
+> -       int i;
+> -       int *rc;
+> -
+> -       rc = kcalloc(num_mb, sizeof(*rc), GFP_KERNEL);
+> -       if (!rc)
+> -               return -ENOMEM;
+> -
+> -       /* Warm-up run. */
+> -       for (i = 0; i < 4; i++) {
+> -               ret = do_mult_ahash_op(data, num_mb, rc);
+> -               if (ret)
+> -                       goto out;
+> -       }
+> -
+> -       /* The real thing. */
+> -       for (i = 0; i < 8; i++) {
+> -               cycles_t start, end;
+> -
+> -               start = get_cycles();
+> -               ret = do_mult_ahash_op(data, num_mb, rc);
+> -               end = get_cycles();
+> -
+> -               if (ret)
+> -                       goto out;
+> -
+> -               cycles += end - start;
+> -       }
+> -
+> -       pr_cont("1 operation in %lu cycles (%d bytes)\n",
+> -               (cycles + 4) / (8 * num_mb), blen);
+> -
+> -out:
+> -       kfree(rc);
+> -       return ret;
+> -}
+> -
+> -static void test_mb_ahash_speed(const char *algo, unsigned int secs,
+> -                               struct hash_speed *speed, u32 num_mb)
+> -{
+> -       struct test_mb_ahash_data *data;
+> -       struct crypto_ahash *tfm;
+> -       unsigned int i, j, k;
+> -       int ret;
+> -
+> -       data = kcalloc(num_mb, sizeof(*data), GFP_KERNEL);
+> -       if (!data)
+> -               return;
+> -
+> -       tfm = crypto_alloc_ahash(algo, 0, 0);
+> -       if (IS_ERR(tfm)) {
+> -               pr_err("failed to load transform for %s: %ld\n",
+> -                       algo, PTR_ERR(tfm));
+> -               goto free_data;
+> -       }
+> -
+> -       for (i = 0; i < num_mb; ++i) {
+> -               if (testmgr_alloc_buf(data[i].xbuf))
+> -                       goto out;
+> -
+> -               crypto_init_wait(&data[i].wait);
+> -
+> -               data[i].req = ahash_request_alloc(tfm, GFP_KERNEL);
+> -               if (!data[i].req) {
+> -                       pr_err("alg: hash: Failed to allocate request for %s\n",
+> -                              algo);
+> -                       goto out;
+> -               }
+> -
+> -               ahash_request_set_callback(data[i].req, 0, crypto_req_done,
+> -                                          &data[i].wait);
+> -
+> -               sg_init_table(data[i].sg, XBUFSIZE);
+> -               for (j = 0; j < XBUFSIZE; j++) {
+> -                       sg_set_buf(data[i].sg + j, data[i].xbuf[j], PAGE_SIZE);
+> -                       memset(data[i].xbuf[j], 0xff, PAGE_SIZE);
+> -               }
+> -       }
+> -
+> -       pr_info("\ntesting speed of multibuffer %s (%s)\n", algo,
+> -               get_driver_name(crypto_ahash, tfm));
+> -
+> -       for (i = 0; speed[i].blen != 0; i++) {
+> -               /* For some reason this only tests digests. */
+> -               if (speed[i].blen != speed[i].plen)
+> -                       continue;
+> -
+> -               if (speed[i].blen > XBUFSIZE * PAGE_SIZE) {
+> -                       pr_err("template (%u) too big for tvmem (%lu)\n",
+> -                              speed[i].blen, XBUFSIZE * PAGE_SIZE);
+> -                       goto out;
+> -               }
+> -
+> -               if (klen)
+> -                       crypto_ahash_setkey(tfm, tvmem[0], klen);
+> -
+> -               for (k = 0; k < num_mb; k++)
+> -                       ahash_request_set_crypt(data[k].req, data[k].sg,
+> -                                               data[k].result, speed[i].blen);
+> -
+> -               pr_info("test%3u "
+> -                       "(%5u byte blocks,%5u bytes per update,%4u updates): ",
+> -                       i, speed[i].blen, speed[i].plen,
+> -                       speed[i].blen / speed[i].plen);
+> -
+> -               if (secs) {
+> -                       ret = test_mb_ahash_jiffies(data, speed[i].blen, secs,
+> -                                                   num_mb);
+> -                       cond_resched();
+> -               } else {
+> -                       ret = test_mb_ahash_cycles(data, speed[i].blen, num_mb);
+> -               }
+> -
+> -
+> -               if (ret) {
+> -                       pr_err("At least one hashing failed ret=%d\n", ret);
+> -                       break;
+> -               }
+> -       }
+> -
+> -out:
+> -       for (k = 0; k < num_mb; ++k)
+> -               ahash_request_free(data[k].req);
+> -
+> -       for (k = 0; k < num_mb; ++k)
+> -               testmgr_free_buf(data[k].xbuf);
+> -
+> -       crypto_free_ahash(tfm);
+> -
+> -free_data:
+> -       kfree(data);
+> -}
+> -
+>  static int test_ahash_jiffies_digest(struct ahash_request *req, int blen,
+>                                      char *out, int secs)
+>  {
+> @@ -2574,36 +2380,6 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+>                 test_ahash_speed("sm3", sec, generic_hash_speed_template);
+>                 if (mode > 400 && mode < 500) break;
+>                 fallthrough;
+> -       case 450:
+> -               test_mb_ahash_speed("sha1", sec, generic_hash_speed_template,
+> -                                   num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+> -       case 451:
+> -               test_mb_ahash_speed("sha256", sec, generic_hash_speed_template,
+> -                                   num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+> -       case 452:
+> -               test_mb_ahash_speed("sha512", sec, generic_hash_speed_template,
+> -                                   num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+> -       case 453:
+> -               test_mb_ahash_speed("sm3", sec, generic_hash_speed_template,
+> -                                   num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+> -       case 454:
+> -               test_mb_ahash_speed("streebog256", sec,
+> -                                   generic_hash_speed_template, num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+> -       case 455:
+> -               test_mb_ahash_speed("streebog512", sec,
+> -                                   generic_hash_speed_template, num_mb);
+> -               if (mode > 400 && mode < 500) break;
+> -               fallthrough;
+>         case 499:
+>                 break;
+>
+> --
+> 2.34.1
+>
