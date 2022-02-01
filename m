@@ -2,147 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFABFC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 00:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE6CC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 02:38:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230513AbiBAAfA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 31 Jan 2022 19:35:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230510AbiBAAe6 (ORCPT
+        id S232499AbiBACiT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 31 Jan 2022 21:38:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43634 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232321AbiBACiS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 31 Jan 2022 19:34:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C848C06173B;
-        Mon, 31 Jan 2022 16:34:58 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1C323B82CD0;
-        Tue,  1 Feb 2022 00:34:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76EBCC340F2;
-        Tue,  1 Feb 2022 00:34:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1643675695;
-        bh=Nh61dm4uORI3BdjRZX34AcWvRnvxLfYMB2NLPUBnTjI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OEbZLtn+T/drz3k9MGa/Cz5dU/ZiDmNWU0zdxAq7mOejEeIVxpyeTRDXtydWEGJBL
-         G3PyzOoe/OY7FvzLgl9fSkgFlH5MmOE5K1+rdh1NsA86qJcPLnqYSMmc/l+fn0SWXr
-         PHgAgNrfmOoHVXfeXvD5vgpeI3+Ta76bxO5pv/NhWswxKyEbBv+3zG909k4PFSYqja
-         9kqgX/b67uVxgH79gDXjrtf4LtqkLRfoJLuX3Y64FeAwFDPIWfa6MnHFAHN8gG3TDJ
-         x62H5LYGKeY5+DKm6468FfS5/mnmXGNbwpXEa+cOM0ZB5oJRNnClZztChXzbiXDhbd
-         nKEWiz70Efvjg==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
+        Mon, 31 Jan 2022 21:38:18 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2112Vn2p029687;
+        Tue, 1 Feb 2022 02:38:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=xvpN2y2THhIqK++StzkIAxtch5lSAOLB+RUdPTRHiAM=;
+ b=Qda/1dlrxIVb+pBlj0kBHNDxI4yNCD3OsH+KOjbDdR3+orspAVflNyvgMo7vlNwZFGR6
+ En8hgesRYFlxPWM8s4EVY8grO4PnbnQyLZFTdbi1bwPWW+Ue3QLoPWrm+gQHivsFLeFR
+ Kq/78OmGPvlWTrUWtSYgQo28MdEeDJJ0WvAD+xqw+D001WRb9Kq/UKh3cvVEQnWSVr8j
+ yl89rk0tHeh0gdewiUyARETIDlNc5WtjT7gCjnKFBKld8wJ8mzaQdNgIwekPi/DHjpJY
+ 6rimiE8HypPvtfNR9A2HRZ4W6gdR5jTiuHlUKojpSO/Ege73Yywn9IonGsfrXx8USc7K Cw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dxv5j03je-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Feb 2022 02:38:13 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2112Yc7F007472;
+        Tue, 1 Feb 2022 02:38:13 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3dxv5j03j6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Feb 2022 02:38:13 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2112ITGt011215;
+        Tue, 1 Feb 2022 02:38:12 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01dal.us.ibm.com with ESMTP id 3dvw7b21ng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 01 Feb 2022 02:38:12 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2112cBqr41353718
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 1 Feb 2022 02:38:11 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5572FAC05E;
+        Tue,  1 Feb 2022 02:38:11 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14AE8AC059;
+        Tue,  1 Feb 2022 02:38:11 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  1 Feb 2022 02:38:11 +0000 (GMT)
+Message-ID: <26f513aa-abb6-ec9e-d388-b6ce32e36396@linux.ibm.com>
+Date:   Mon, 31 Jan 2022 21:38:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 0/2] Fix bugs in public_key_verify_signature()
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>, keyrings@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>,
         David Howells <dhowells@redhat.com>
 Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
         Vitaly Chikunov <vt@altlinux.org>,
-        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
-Subject: [PATCH 1/2] KEYS: asymmetric: enforce that sig algo matches key algo
-Date:   Mon, 31 Jan 2022 16:34:13 -0800
-Message-Id: <20220201003414.55380-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220201003414.55380-1-ebiggers@kernel.org>
+        Mimi Zohar <zohar@linux.ibm.com>
 References: <20220201003414.55380-1-ebiggers@kernel.org>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <20220201003414.55380-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TB1G90OoUEYTbZuec5i6tWAIMA4OVFgM
+X-Proofpoint-ORIG-GUID: AIhNOBL5bNBd8OwMV8pDqZnSbcT8f_zR
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-01-31_07,2022-01-31_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ mlxscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999 priorityscore=1501
+ phishscore=0 malwarescore=0 adultscore=0 spamscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
+ definitions=main-2202010014
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
 
-Most callers of public_key_verify_signature(), including most indirect
-callers via verify_signature() as well as pkcs7_verify_sig_chain(),
-don't check that public_key_signature::pkey_algo matches
-public_key::pkey_algo.  These should always match.  However, a malicious
-signature could intentionally declare an unintended algorithm.  It is
-essential that such signatures be rejected outright, or that the
-algorithm of the *key* be used -- not the algorithm of the signature as
-that would allow attackers to choose the algorithm used.
+On 1/31/22 19:34, Eric Biggers wrote:
+> This patchset fixes some bugs in public_key_verify_signature() where it
+> could be tricked into using the wrong algorithm, as was discussed at
+> https://lore.kernel.org/linux-integrity/20211202215507.298415-1-zohar@linux.ibm.com/T/#t
+>
+> I'd appreciate it if the people who care about each of the supported
+> public key algorithms (RSA, ECDSA, ECRDSA, and SM2) would test this
+> patchset to make sure it still works for their use case(s).  I've tested
+> that X.509 and PKCS#7 with RSA still work.
 
-Currently, public_key_verify_signature() correctly uses the key's
-algorithm when deciding which akcipher to allocate.  That's good.
-However, it uses the signature's algorithm when deciding whether to do
-the first step of SM2, which is incorrect.  Also, v4.19 and older
-kernels used the signature's algorithm for the entire process.
+I have tested that self-ECDSA-signed x.509 certs can still be loaded and 
+ECDSA-signed files are still verified by IMA. It works for NIST P256 and 
+P384.
 
-Prevent such errors by making public_key_verify_signature() enforce that
-the signature's algorithm matches the key's algorithm.
+Tested-by: Stefan Berger <stefanb@linux.ibm.com>
 
-Also remove two checks of this done by callers, which are now redundant.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/asymmetric_keys/pkcs7_verify.c    |  6 ------
- crypto/asymmetric_keys/public_key.c      | 15 +++++++++++++++
- crypto/asymmetric_keys/x509_public_key.c |  6 ------
- 3 files changed, 15 insertions(+), 12 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 0b4d07aa88111..f94a1d1ad3a6c 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -174,12 +174,6 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
- 		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
- 			 sinfo->index, certix);
- 
--		if (strcmp(x509->pub->pkey_algo, sinfo->sig->pkey_algo) != 0) {
--			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
--				sinfo->index);
--			continue;
--		}
--
- 		sinfo->signer = x509;
- 		return 0;
- 	}
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 4fefb219bfdc8..aba7113d86c76 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -325,6 +325,21 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	BUG_ON(!sig);
- 	BUG_ON(!sig->s);
- 
-+	/*
-+	 * The signature's claimed public key algorithm *must* match the key's
-+	 * actual public key algorithm.
-+	 *
-+	 * Small exception: ECDSA signatures don't specify the curve, but ECDSA
-+	 * keys do.  So the strings can mismatch slightly in that case:
-+	 * "ecdsa-nist-*" for the key, but "ecdsa" for the signature.
-+	 */
-+	if (!sig->pkey_algo)
-+		return -EINVAL;
-+	if (strcmp(pkey->pkey_algo, sig->pkey_algo) != 0 &&
-+	    (strncmp(pkey->pkey_algo, "ecdsa-", 6) != 0 ||
-+	     strcmp(sig->pkey_algo, "ecdsa") != 0))
-+		return -EKEYREJECTED;
-+
- 	ret = software_key_determine_akcipher(sig->encoding,
- 					      sig->hash_algo,
- 					      pkey, alg_name);
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index fe14cae115b51..71cc1738fbfd2 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -128,12 +128,6 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
- 			goto out;
- 	}
- 
--	ret = -EKEYREJECTED;
--	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo) != 0 &&
--	    (strncmp(cert->pub->pkey_algo, "ecdsa-", 6) != 0 ||
--	     strcmp(cert->sig->pkey_algo, "ecdsa") != 0))
--		goto out;
--
- 	ret = public_key_verify_signature(cert->pub, cert->sig);
- 	if (ret < 0) {
- 		if (ret == -ENOPKG) {
--- 
-2.35.1
-
+>
+> Note, I have *not* included a fix for SM2 being implemented incorrectly.
+> That is another bug that I pointed out in the above thread.  I think
+> that bug is for the people who actually care about SM2.
+>
+> This applies to v5.17-rc2.
+>
+> Eric Biggers (2):
+>    KEYS: asymmetric: enforce that sig algo matches key algo
+>    KEYS: asymmetric: properly validate hash_algo and encoding
+>
+>   crypto/asymmetric_keys/pkcs7_verify.c    |   6 --
+>   crypto/asymmetric_keys/public_key.c      | 126 ++++++++++++++++-------
+>   crypto/asymmetric_keys/x509_public_key.c |   6 --
+>   3 files changed, 91 insertions(+), 47 deletions(-)
+>
+>
+> base-commit: 26291c54e111ff6ba87a164d85d4a4e134b7315c
