@@ -2,90 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEEAC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 16:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61445C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Feb 2022 17:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241175AbiBAQmc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Feb 2022 11:42:32 -0500
-Received: from mga18.intel.com ([134.134.136.126]:45775 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241161AbiBAQmb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Feb 2022 11:42:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643733751; x=1675269751;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Betlh+msQmMcjNP0dLelGhVQE76lOFcTrYR3ayu3hAk=;
-  b=Lf0NzKZ+xCtdC3hVsxtsEPIiZ2a7nV1PbdcyDoYyAh8uKsIHLedbnBB5
-   poiB/GphxUES9bKngEMt/YdfR7bXzlRn5bM6tLGptrXKCn33wPjDBQ01k
-   6I6Urhxs3oPcPHwzkAE8IPViqFWwLC4WpndMn93baRvBpASOCuvJb78bi
-   WD13vPDtb21j4qTft8/94zmd/G0NfYjlY4MFfxoPxACrNXuHbkhINdCPZ
-   K4IwfyCs4f6dx+HZFgw0E21E92EyTGC+Z6sX7EIq8S65dWtKF4dZuJz3M
-   d65xu1gL+I05+y/5eV5c2ROyhpPBQ2c45DfC6tf2tTJmdoHYuyV3acx2E
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10245"; a="231302401"
-X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
-   d="scan'208";a="231302401"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2022 08:42:11 -0800
-X-IronPort-AV: E=Sophos;i="5.88,334,1635231600"; 
-   d="scan'208";a="565645614"
-Received: from sebough-mobl.amr.corp.intel.com (HELO [10.212.35.72]) ([10.212.35.72])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2022 08:42:10 -0800
-Message-ID: <f932019c-f83c-3847-b70b-fa7eb57662de@intel.com>
-Date:   Tue, 1 Feb 2022 08:42:10 -0800
+        id S241743AbiBARsu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Feb 2022 12:48:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241749AbiBARsu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Feb 2022 12:48:50 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240A8C061714;
+        Tue,  1 Feb 2022 09:48:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BFFFA61348;
+        Tue,  1 Feb 2022 17:48:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4242C340EB;
+        Tue,  1 Feb 2022 17:48:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1643737729;
+        bh=JZhxyRQoCgK0/5LTcb6njVZu9njKhd60rjF5St5t79c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=D46ZSZGjaoiX062AM1aeB13pjMaJRvi9+R/zlD1ieL2is5lZWPEk1J5XMc3cMgmeC
+         xC5nikkgN0Eko2IKo+zP755wzoYenKTRt9Q+LIf4tYl+64C9kSxNceZLZgd2N4rxVd
+         E1ZOj/T4WTMz3xrSpEqeVzre+OsMPWJ9jm/C8fvs=
+Date:   Tue, 1 Feb 2022 18:48:46 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: Re: [PATCH] random: use computational hash for entropy extraction
+Message-ID: <Yflyfk8BbGQvN3os@kroah.com>
+References: <20220201161342.154666-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [RFC V2 0/5] Introduce AVX512 optimized crypto algorithms
-Content-Language: en-US
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     Tony Luck <tony.luck@intel.com>,
-        Asit K Mallick <asit.k.mallick@intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Ravi V. Shankar" <ravi.v.shankar@intel.com>,
-        "Chen, Tim C" <tim.c.chen@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>, greg.b.tucker@intel.com,
-        "Kasten, Robert A" <robert.a.kasten@intel.com>,
-        rajendrakumar.chinnaiyan@intel.com, tomasz.kantecki@intel.com,
-        ryan.d.saffores@intel.com, ilya.albrekht@intel.com,
-        Kyung Min Park <kyung.min.park@intel.com>,
-        Weiny Ira <ira.weiny@intel.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>, X86 ML <x86@kernel.org>
-References: <1611386920-28579-1-git-send-email-megha.dey@intel.com>
- <CALCETrU06cuvUF5NDSm8--dy3dOkxYQ88cGWaakOQUE4Vkz88w@mail.gmail.com>
- <3878af8d-ac1e-522a-7c9f-fda4a1f5b967@intel.com>
- <CALCETrUWgLwp6yfu9ODY1UYufHeAgsnOOCOAwXZQK6FJk_YdUA@mail.gmail.com>
- <e8ce1146-3952-6977-1d0e-a22758e58914@intel.com>
- <0a10e16b-df77-9a7f-6964-8dc3e114b30b@intel.com>
-From:   "Dey, Megha" <megha.dey@intel.com>
-In-Reply-To: <0a10e16b-df77-9a7f-6964-8dc3e114b30b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201161342.154666-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dave,
+On Tue, Feb 01, 2022 at 05:13:42PM +0100, Jason A. Donenfeld wrote:
+> The current 4096-bit LFSR used for entropy collection had a few
+> desirable attributes for the context in which it was created. For
+> example, the state was huge, which meant that /dev/random would be able
+> to output quite a bit of accumulated entropy before blocking. It was
+> also, in its time, quite fast at accumulating entropy byte-by-byte,
+> which matters given the varying contexts in which mix_pool_bytes() is
+> called. And its diffusion was relatively high, which meant that changes
+> would ripple across several words of state rather quickly.
+> 
+> However, it also suffers from a few security vulnerabilities. In
+> particular, inputs learned by an attacker can be undone, but more over,
+> if the state of the pool leaks, its contents can be controlled and
+> entirely zeroed out. I've demonstrated this attack with this SMT2
+> script, <https://xn--4db.cc/5o9xO8pb>, which Boolector/CaDiCal solves in
+> a matter of seconds on a single core of my laptop, resulting in little
+> proof of concept C demonstrators such as <https://xn--4db.cc/jCkvvIaH/c>.
+> 
+> For basically all recent formal models of RNGs, these attacks represent
+> a significant cryptographic flaw. But how does this manifest
+> practically? If an attacker has access to the system to such a degree
+> that he can learn the internal state of the RNG, arguably there are
+> other lower hanging vulnerabilities -- side-channel, infoleak, or
+> otherwise -- that might have higher priority. On the other hand, seed
+> files are frequently used on systems that have a hard time generating
+> much entropy on their own, and these seed files, being files, often leak
+> or are duplicated and distributed accidentally, or are even seeded over
+> the Internet intentionally, where their contents might be recorded or
+> tampered with. Seen this way, an otherwise quasi-implausible
+> vulnerability is a bit more practical than initially thought.
+> 
+> Another aspect of the current mix_pool_bytes() function is that, while
+> its performance was arguably competitive for the time in which it was
+> created, it's no longer considered so. This patch improves performance
+> significantly: on a high-end CPU, an i7-11850H, it improves performance
+> of mix_pool_bytes() by 225%, and on a low-end CPU, a Cortex-A7, it
+> improves performance by 103%.
+> 
+> This commit replaces the LFSR of mix_pool_bytes() with a straight-
+> forward cryptographic hash function, BLAKE2s, which is already in use
+> for pool extraction. Universal hashing with a secret seed was considered
+> too, something along the lines of <https://eprint.iacr.org/2013/338>,
+> but the requirement for a secret seed makes for a chicken & egg problem.
+> Instead we go with a formally proven scheme using a computational hash
+> function, described in section B.1.8 of <https://eprint.iacr.org/2019/198>.
+> 
+> BLAKE2s outputs 256 bits, which should give us an appropriate amount of
+> min-entropy accumulation, and a wide enough margin of collision
+> resistance against active attacks. mix_pool_bytes() becomes a simple
+> call to blake2s_update(), for accumulation, while the extraction step
+> becomes a blake2s_final() to generate a seed, with which we can then do
+> a HKDF-like or BLAKE2X-like expansion, the first part of which we fold
+> back as an init key for subsequent blake2s_update()s, and the rest we
+> produce to the caller. This then is provided to our CRNG like usual. In
+> that expansion step, we make opportunistic use of 32 bytes of RDRAND
+> output, just as before. We also always reseed the crng with 32 bytes,
+> unconditionally, or not at all, rather than sometimes with 16 as before,
+> as we don't win anything by limiting beyond the 16 byte threshold.
+> 
+> Going for a hash function as an entropy collector is a conservative,
+> proven approach. The result of all this is a much simpler and much less
+> bespoke construction than what's there now, which not only plugs a
+> vulnerability but also improves performance considerably.
+> 
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Reviewed-by: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  drivers/char/random.c | 232 ++++++++++--------------------------------
+>  1 file changed, 55 insertions(+), 177 deletions(-)
 
-On 1/31/2022 11:18 AM, Dave Hansen wrote:
-> On 1/31/22 10:43, Dey, Megha wrote:
->> With this implementation, we see a 1.5X improvement on ICX/ICL for 16KB
->> buffers compared to the existing kernel AES-GCM implementation that
->> works on 128-bit XMM registers.
-> What is your best guess about how future-proof this implementation is?
->
-> Will this be an ICL/ICX one-off?  Or, will implementations using 256-bit
-> YMM registers continue to enjoy a frequency advantage over the 512-bit
-> implementations for a long time?
-This is not planned as ICL/ICX one-off.AVX512VL code using YMM registers 
-is expected to have the same power license properties as AVX2 code which 
-implies it would have a frequency advantage over the current AVX512 
-implementation until we have new implementations of AVX512 instructions 
-which do not have the frequency drop issue.
+Very nice work!
+
+From a "this looks sane by reading the code" type of review here's my:
+
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
