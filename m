@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 743D1C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 10:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D44C4167D
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 10:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245726AbiBBKlq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 05:41:46 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:41914 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343506AbiBBKlk (ORCPT
+        id S244618AbiBBKlr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Feb 2022 05:41:47 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:36770 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245001AbiBBKlh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 05:41:40 -0500
+        Wed, 2 Feb 2022 05:41:37 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A4D132113D;
-        Wed,  2 Feb 2022 10:41:39 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id EED9A1F387;
+        Wed,  2 Feb 2022 10:41:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643798499; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1643798495; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JEwAZF4E7B6LWyjJtkgWALneLiAI/2/54TvfrrmtvSE=;
-        b=j9jUfQGM57ya77WGZA0JVwgHXhGvNyaoTe0pbM5ec/KOVTIn5pod9EeKD+KmcnfX9f6YTH
-        MQynpqZubn2CXn3yGcDopNlFZcr5g2qJzlB2ktbNp/4gP4NJPs7hkKiF97xEGKy2f6jHUf
-        G8gRr/iKq4853tufFH+C3gHrHzHSR4w=
+        bh=yVrOdXP55KwyevEnk2bjml5wRX2UHp0zngksfaywLa0=;
+        b=oB+T6B5TMUwwSyvfA7CVbLRFP4cZWUyCJsYzLHRHyM2ijtgtQ1UDyPUS8sMTOY21wKqB0K
+        SF7MuNvbJgfwHP2PauCAO1YD4LJw0e+AWPTdM4Ocd7bKVzmMQ/qC88umt/iUsF3Bxq84O2
+        fV2dFoCJmlH4sX5ULgrACkmeZnHioOo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643798499;
+        s=susede2_ed25519; t=1643798495;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JEwAZF4E7B6LWyjJtkgWALneLiAI/2/54TvfrrmtvSE=;
-        b=uwIcRIAClbtgj1jLJE7LsIL5REekvgaJPKjFkXBJRmM/32pXJB+jkIBH3cyFCwstLHN5eW
-        dqWQtSgWfV6yetDg==
+        bh=yVrOdXP55KwyevEnk2bjml5wRX2UHp0zngksfaywLa0=;
+        b=UHhTqTQ4aylwxHnJd4QH9hr96l6YlZTWfmTKIkv2s58Vue1VpobLRLnr5ME0t32EyD/hYT
+        PXX8HqpTX/4juBBQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8F64B13E02;
-        Wed,  2 Feb 2022 10:41:39 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D9D0513E02;
+        Wed,  2 Feb 2022 10:41:35 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id unx6IeNf+mGEbAAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 02 Feb 2022 10:41:39 +0000
+        id I8qUM99f+mF0bAAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 02 Feb 2022 10:41:35 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -55,9 +55,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         keyrings@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v3 09/15] crypto: dh - implement private key generation primitive for ffdheXYZ(dh)
-Date:   Wed,  2 Feb 2022 11:40:06 +0100
-Message-Id: <20220202104012.4193-10-nstange@suse.de>
+Subject: [PATCH v3 06/15] crypto: dh - introduce common code for built-in safe-prime group support
+Date:   Wed,  2 Feb 2022 11:40:03 +0100
+Message-Id: <20220202104012.4193-7-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20220202104012.4193-1-nstange@suse.de>
 References: <20220202104012.4193-1-nstange@suse.de>
@@ -67,238 +67,318 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The support for NVME in-band authentication currently in the works ([1])
-needs to generate ephemeral DH keys for use with the RFC 7919 safe-prime
-FFDHE groups.
+Recent work on NVME in-band authentication support ([1]) needs to invoke
+the "dh" KPP with the FFDHE safe-prime group parameters as specified in
+RFC 7919 and generate ephemeral keys suitable for the respective group. By
+coincidence, the requirements from NIST SP800-56Arev3,
+sec. 5.5.2 ("Assurance of Domain-Parameter Validity") basically boil down
+to disallowing any group parameters not among the approved safe-prime
+groups specified in either RFC 7919 or RFC 3526 in FIPS mode. Furthermore,
+SP800-56Arev3 specifies the respective security strength for each of the
+approved safe-prime groups, which has a direct impact on the minimum key
+lengths.
 
-In analogy to ECDH and its ecc_gen_privkey(), implement a
-dh_safe_prime_gen_privkey() and invoke it from the ffdheXYZ(dh) templates'
-common ->set_secret(), i.e. dh_safe_prime_set_secret(), in case the input
-->key_size is zero.
+In this light, it's desirable to introduce built-in support for the
+RFC 7919 safe-prime groups to the kernel's DH implementation, provide a
+SP800-56Arev3 conforming key generation primitive for those and render
+non-approved group parameters unusable in FIPS mode on the way.
 
-As the RFC 7919 FFDHE groups are classified as approved safe-prime groups
-by SP800-56Arev3, it's worthwhile to make the new
-dh_safe_prime_gen_privkey() to follow the approach specified in
-SP800-56Arev3, sec. 5.6.1.1.3 ("Key-Pair Generation Using Extra Random
-Bits") in order to achieve conformance.
+As suggested ([2]) in the course of discussion to previous iterations of
+this patchset, the built-in support for ffdhe groups would be best made
+available in the form of templates wrapping the existing "dh"
+implementation, one for each group specified by RFC 7919: ffdhe2048(dh),
+ffdhe3072(dh), ffdhe4096(dh), ffdhe6144(dh) and ffdhe8192(dh). As these
+templates differ only in the safe-prime constants they'd configure the
+inner "dh" transforms with, they can share almost all of their
+"dh"-wrapping template implementation code.
 
-SP800-56Arev3 specifies a lower as well as an upper bound on the generated
-key's length:
-- it must be >= two times the maximum supported security strength of
-  the group in question and
-- it must be <= the length of the domain parameter Q.
+Introduce this common code to dh_generic. The actual dump of the RFC 7919
+safe-prime constants will be deferred to the next patch in order to
+facilitate review. The ephemeral key generation primitive mentioned above
+likewise deserves a patch on its own, as does the mechanism by which
+unapproved groups are rendered unusable in FIPS mode.
 
-For any safe-prime group Q = (P - 1)/2 by definition and the individual
-maximum supported security strengths as specified by SP800-56Arev3 have
-been made available as part of the FFDHE dh_safe_prime definitions
-introduced with a previous patch. Make dh_safe_prime_gen_privkey() pick
-twice the maximum supported strength rounded up to the next power of two
-for the output key size. This choice respects both, the lower and upper
-bounds given by SP800-90Arev3 for any of the approved safe-prime groups and
-is also in line with the NVME base spec 2.0, which requires the key size to
-be >= 256bits.
+Define a struct dh_safe_prime container for specifying the individual
+templates' associated safe-prime group constants. All ffdheXYZ(dh) template
+instances will store a pointer to such a dh_safe_prime in their context
+areas each. Implement the common __dh_safe_prime_create() template
+instantiation helper. The intention is that the individual ffdheXYZ(dh)
+crypto_templates' ->create() implementations will simply forward any calls
+to __dh_safe_prime_create(), passing a suitable dh_safe_prime in addition
+to the received ->create() arguments. __dh_safe_prime_create() would then
+create and register a kpp_instance as appropriate, storing the given
+dh_safe_prime pointer alongside a crypto_kpp_spawn for the inner "dh"
+kpp_alg in the context area.
+
+As the ffdheXYZ(dh) kpp_instances are supposed to act as proxies to the
+inner "dh" kpp_alg, make each of their associated crypto_kpp transforms to
+in turn own an inner "dh" transform, a pointer to which gets stored in the
+context area. Setup and teardown are getting handled from the outer
+->init_tfm() and ->exit_tfm() respectively.
+
+In order to achieve the overall goal and let the ffdheXYZ(dh) kpp_instances
+configure the inner "dh" transforms with the respective group parameters,
+make their common ->set_secret(), the new dh_safe_prime_set_secret(), fill
+in the P and G values before forwarding the call to the inner "dh"'s
+->set_secret(). Note that the outer ->set_secret() can obtain the P value
+associated with the given ffdheXYZ(dh) kpp_instance by means of the
+dh_safe_prime referenced from the latter's context. The value of G OTOH
+always equals constant 2 for the safe-prime groups.
+
+Finally, make the remaining two kpp_alg primitives both operating on
+kpp_requests, i.e. ->generate_public_key() and ->compute_shared_secret(),
+to merely forward any request to the inner "dh" implementation. However, a
+kpp_request instance received from the outside cannot get simply passed
+on as-is, because its associated transform (crypto_kpp_reqtfm()) will have
+been set to the outer ffdheXYZ(dh) one. In order to handle this, reserve
+some space in the outer ffdheXYZ(dh) kpp_requests' context areas for in
+turn storing an inner kpp_request suitable for "dh" each. Make the outer
+->generate_public_key() and ->compute_shared_secret() respectively to setup
+this inner kpp_request by means of the new dh_safe_prime_prepare_dh_req()
+helper before handing it over to the "dh" implementation for further
+processing. dh_safe_prime_prepare_dh_req() basically copies the outer
+kpp_request received from the outside over to the inner one, but installs
+the inner transform and its own ->complete() proxy callback therein. This
+completion callback, the new dh_safe_prime_complete_req(), doesn't do
+anything beyond completing the outer request. Note that there exist some
+examples in crypto/, which would simply install the completion handler
+from the outer request at the inner one in similar setups, e.g. seqiv.
+However, this would mean that the user-provided completion handler won't
+get called with the address of the outer kpp_request initially submitted
+and the handler might not be prepared for this. Users could certainly work
+around this by setting the callback ->data properly, but IMO it's cleaner
+this way. Furthermore, it might make sense to extend
+dh_safe_prime_complete_req() in the future and move e.g. those
+post-computation FIPS checks from the generic "dh" implementation to the
+ffdheXYZ(dh) templates.
 
 [1] https://lore.kernel.org/r/20211202152358.60116-1-hare@suse.de
+[2] https://lore.kernel.org/r/20211217055227.GA20698@gondor.apana.org.au
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- crypto/Kconfig |   1 +
- crypto/dh.c    | 140 +++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 138 insertions(+), 3 deletions(-)
+ crypto/dh.c | 208 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 208 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e041cabe93da..c47fe5da1440 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -235,6 +235,7 @@ config CRYPTO_DH_RFC7919_GROUPS
- 	bool "Support for RFC 7919 FFDHE group parameters"
- 	default n
- 	depends on CRYPTO_DH
-+	select CRYPTO_RNG_DEFAULT
- 	help
- 	  Provide support for RFC 7919 FFDHE group parameters. If unsure, say N.
- 
 diff --git a/crypto/dh.c b/crypto/dh.c
-index d0adb1705fe7..869a0476e5e2 100644
+index abc2a72c8271..08fb7610fe2a 100644
 --- a/crypto/dh.c
 +++ b/crypto/dh.c
-@@ -10,6 +10,7 @@
- #include <crypto/internal/kpp.h>
- #include <crypto/kpp.h>
- #include <crypto/dh.h>
-+#include <crypto/rng.h>
- #include <linux/mpi.h>
+@@ -257,6 +257,214 @@ static struct kpp_alg dh = {
+ 	},
+ };
  
- struct dh_ctx {
-@@ -315,6 +316,128 @@ static void dh_safe_prime_exit_tfm(struct crypto_kpp *tfm)
- 	crypto_free_kpp(tfm_ctx->dh_tfm);
- }
- 
-+static u64 __add_u64_to_be(__be64 *dst, unsigned int n, u64 val)
++
++struct dh_safe_prime {
++	unsigned int max_strength;
++	unsigned int p_size;
++	const char *p;
++};
++
++static const char safe_prime_g[]  = { 2 };
++
++struct dh_safe_prime_instance_ctx {
++	struct crypto_kpp_spawn dh_spawn;
++	const struct dh_safe_prime *safe_prime;
++};
++
++struct dh_safe_prime_tfm_ctx {
++	struct crypto_kpp *dh_tfm;
++};
++
++static void dh_safe_prime_free_instance(struct kpp_instance *inst)
 +{
-+	unsigned int i;
++	struct dh_safe_prime_instance_ctx *ctx = kpp_instance_ctx(inst);
 +
-+	for (i = n; val && i > 0; --i) {
-+		u64 tmp = be64_to_cpu(dst[i - 1]);
-+
-+		tmp += val;
-+		val = tmp >= val ? 0 : 1;
-+		dst[i - 1] = cpu_to_be64(tmp);
-+	}
-+
-+	return val;
++	crypto_drop_kpp(&ctx->dh_spawn);
++	kfree(inst);
 +}
 +
-+static void *dh_safe_prime_gen_privkey(const struct dh_safe_prime *safe_prime,
-+				       unsigned int *key_size)
++static inline struct dh_safe_prime_instance_ctx *dh_safe_prime_instance_ctx(
++	struct crypto_kpp *tfm)
 +{
-+	unsigned int n, oversampling_size;
-+	__be64 *key;
++	return kpp_instance_ctx(kpp_alg_instance(tfm));
++}
++
++static inline struct kpp_alg *dh_safe_prime_dh_alg(
++	struct dh_safe_prime_tfm_ctx *ctx)
++{
++	return crypto_kpp_alg(ctx->dh_tfm);
++}
++
++static int dh_safe_prime_init_tfm(struct crypto_kpp *tfm)
++{
++	struct dh_safe_prime_instance_ctx *inst_ctx =
++		dh_safe_prime_instance_ctx(tfm);
++	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
++
++	tfm_ctx->dh_tfm = crypto_spawn_kpp(&inst_ctx->dh_spawn);
++	if (IS_ERR(tfm_ctx->dh_tfm))
++		return PTR_ERR(tfm_ctx->dh_tfm);
++
++	return 0;
++}
++
++static void dh_safe_prime_exit_tfm(struct crypto_kpp *tfm)
++{
++	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
++
++	crypto_free_kpp(tfm_ctx->dh_tfm);
++}
++
++static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
++				    unsigned int len)
++{
++	struct dh_safe_prime_instance_ctx *inst_ctx =
++		dh_safe_prime_instance_ctx(tfm);
++	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
++	struct dh params;
++	void *buf;
++	unsigned int buf_size;
 +	int err;
-+	u64 h, o;
 +
-+	/*
-+	 * Generate a private key following NIST SP800-56Ar3,
-+	 * sec. 5.6.1.1.1 and 5.6.1.1.3 resp..
-+	 *
-+	 * 5.6.1.1.1: choose key length N such that
-+	 * 2 * ->max_strength <= N <= log2(q) + 1 = ->p_size * 8 - 1
-+	 * with q = (p - 1) / 2 for the safe-prime groups.
-+	 * Choose the lower bound's next power of two for N in order to
-+	 * avoid excessively large private keys while still
-+	 * maintaining some extra reserve beyond the bare minimum in
-+	 * most cases. Note that for each entry in safe_prime_groups[],
-+	 * the following holds for such N:
-+	 * - N >= 256, in particular it is a multiple of 2^6 = 64
-+	 *   bits and
-+	 * - N < log2(q) + 1, i.e. N respects the upper bound.
-+	 */
-+	n = roundup_pow_of_two(2 * safe_prime->max_strength);
-+	WARN_ON_ONCE(n & ((1u << 6) - 1));
-+	n >>= 6; /* Convert N into units of u64. */
-+
-+	/*
-+	 * Reserve one extra u64 to hold the extra random bits
-+	 * required as per 5.6.1.1.3.
-+	 */
-+	oversampling_size = (n + 1) * sizeof(__be64);
-+	key = kmalloc(oversampling_size, GFP_KERNEL);
-+	if (!key)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/*
-+	 * 5.6.1.1.3, step 3 (and implicitly step 4): obtain N + 64
-+	 * random bits and interpret them as a big endian integer.
-+	 */
-+	err = -EFAULT;
-+	if (crypto_get_default_rng())
-+		goto out_err;
-+
-+	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)key,
-+				   oversampling_size);
-+	crypto_put_default_rng();
++	err = __crypto_dh_decode_key(buffer, len, &params);
 +	if (err)
-+		goto out_err;
++		return err;
 +
-+	/*
-+	 * 5.6.1.1.3, step 5 is implicit: 2^N < q and thus,
-+	 * M = min(2^N, q) = 2^N.
-+	 *
-+	 * For step 6, calculate
-+	 * key = (key[] mod (M - 1)) + 1 = (key[] mod (2^N - 1)) + 1.
-+	 *
-+	 * In order to avoid expensive divisions, note that
-+	 * 2^N mod (2^N - 1) = 1 and thus, for any integer h,
-+	 * 2^N * h mod (2^N - 1) = h mod (2^N - 1) always holds.
-+	 * The big endian integer key[] composed of n + 1 64bit words
-+	 * may be written as key[] = h * 2^N + l, with h = key[0]
-+	 * representing the 64 most significant bits and l
-+	 * corresponding to the remaining 2^N bits. With the remark
-+	 * from above,
-+	 * h * 2^N + l mod (2^N - 1) = l + h mod (2^N - 1).
-+	 * As both, l and h are less than 2^N, their sum after
-+	 * this first reduction is guaranteed to be <= 2^(N + 1) - 2.
-+	 * Or equivalently, that their sum can again be written as
-+	 * h' * 2^N + l' with h' now either zero or one and if one,
-+	 * then l' <= 2^N - 2. Thus, all bits at positions >= N will
-+	 * be zero after a second reduction:
-+	 * h' * 2^N + l' mod (2^N - 1) = l' + h' mod (2^N - 1).
-+	 * At this point, it is still possible that
-+	 * l' + h' = 2^N - 1, i.e. that l' + h' mod (2^N - 1)
-+	 * is zero. This condition will be detected below by means of
-+	 * the final increment overflowing in this case.
-+	 */
-+	h = be64_to_cpu(key[0]);
-+	h = __add_u64_to_be(key + 1, n, h);
-+	h = __add_u64_to_be(key + 1, n, h);
-+	WARN_ON_ONCE(h);
++	if (params.p_size || params.g_size)
++		return -EINVAL;
 +
-+	/* Increment to obtain the final result. */
-+	o = __add_u64_to_be(key + 1, n, 1);
-+	/*
-+	 * The overflow bit o from the increment is either zero or
-+	 * one. If zero, key[1:n] holds the final result in big-endian
-+	 * order. If one, key[1:n] is zero now, but needs to be set to
-+	 * one, c.f. above.
-+	 */
-+	if (o)
-+		key[n] = cpu_to_be64(1);
++	params.p = inst_ctx->safe_prime->p;
++	params.p_size = inst_ctx->safe_prime->p_size;
++	params.g = safe_prime_g;
++	params.g_size = sizeof(safe_prime_g);
 +
-+	/* n is in units of u64, convert to bytes. */
-+	*key_size = n << 3;
-+	/* Strip the leading extra __be64, which is (virtually) zero by now. */
-+	memmove(key, &key[1], *key_size);
++	buf_size = crypto_dh_key_len(&params);
++	buf = kmalloc(buf_size, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
 +
-+	return key;
++	err = crypto_dh_encode_key(buf, buf_size, &params);
++	if (err)
++		goto out;
 +
-+out_err:
-+	kfree_sensitive(key);
-+	return ERR_PTR(err);
++	err = crypto_kpp_set_secret(tfm_ctx->dh_tfm, buf, buf_size);
++out:
++	kfree_sensitive(buf);
++	return err;
 +}
 +
- static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
- 				    unsigned int len)
- {
-@@ -322,7 +445,7 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
- 		dh_safe_prime_instance_ctx(tfm);
- 	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
- 	struct dh params;
--	void *buf;
-+	void *buf = NULL, *key = NULL;
- 	unsigned int buf_size;
- 	int err;
- 
-@@ -338,10 +461,20 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
- 	params.g = safe_prime_g;
- 	params.g_size = sizeof(safe_prime_g);
- 
-+	if (!params.key_size) {
-+		key = dh_safe_prime_gen_privkey(inst_ctx->safe_prime,
-+						&params.key_size);
-+		if (IS_ERR(key))
-+			return PTR_ERR(key);
-+		params.key = key;
-+	}
++static void dh_safe_prime_complete_req(struct crypto_async_request *dh_req,
++				       int err)
++{
++	struct kpp_request *req = dh_req->data;
 +
- 	buf_size = crypto_dh_key_len(&params);
- 	buf = kmalloc(buf_size, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
-+	if (!buf) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
- 
- 	err = crypto_dh_encode_key(buf, buf_size, &params);
- 	if (err)
-@@ -350,6 +483,7 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
- 	err = crypto_kpp_set_secret(tfm_ctx->dh_tfm, buf, buf_size);
- out:
- 	kfree_sensitive(buf);
-+	kfree_sensitive(key);
- 	return err;
- }
- 
++	kpp_request_complete(req, err);
++}
++
++static struct kpp_request *dh_safe_prime_prepare_dh_req(struct kpp_request *req)
++{
++	struct dh_safe_prime_tfm_ctx *tfm_ctx =
++		kpp_tfm_ctx(crypto_kpp_reqtfm(req));
++	struct kpp_request *dh_req = kpp_request_ctx(req);
++
++	kpp_request_set_tfm(dh_req, tfm_ctx->dh_tfm);
++	kpp_request_set_callback(dh_req, req->base.flags,
++				 dh_safe_prime_complete_req, req);
++
++	kpp_request_set_input(dh_req, req->src, req->src_len);
++	kpp_request_set_output(dh_req, req->dst, req->dst_len);
++
++	return dh_req;
++}
++
++static int dh_safe_prime_generate_public_key(struct kpp_request *req)
++{
++	struct kpp_request *dh_req = dh_safe_prime_prepare_dh_req(req);
++
++	return crypto_kpp_generate_public_key(dh_req);
++}
++
++static int dh_safe_prime_compute_shared_secret(struct kpp_request *req)
++{
++	struct kpp_request *dh_req = dh_safe_prime_prepare_dh_req(req);
++
++	return crypto_kpp_compute_shared_secret(dh_req);
++}
++
++static unsigned int dh_safe_prime_max_size(struct crypto_kpp *tfm)
++{
++	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
++
++	return crypto_kpp_maxsize(tfm_ctx->dh_tfm);
++}
++
++static int __maybe_unused __dh_safe_prime_create(
++	struct crypto_template *tmpl, struct rtattr **tb,
++	const struct dh_safe_prime *safe_prime)
++{
++	struct kpp_instance *inst;
++	struct dh_safe_prime_instance_ctx *ctx;
++	const char *dh_name;
++	struct kpp_alg *dh_alg;
++	u32 mask;
++	int err;
++
++	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_KPP, &mask);
++	if (err)
++		return err;
++
++	dh_name = crypto_attr_alg_name(tb[1]);
++	if (IS_ERR(dh_name))
++		return PTR_ERR(dh_name);
++
++	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
++	if (!inst)
++		return -ENOMEM;
++
++	ctx = kpp_instance_ctx(inst);
++
++	err = crypto_grab_kpp(&ctx->dh_spawn, kpp_crypto_instance(inst),
++			      dh_name, 0, mask);
++	if (err)
++		goto err_free_inst;
++
++	err = -EINVAL;
++	dh_alg = crypto_spawn_kpp_alg(&ctx->dh_spawn);
++	if (strcmp(dh_alg->base.cra_name, "dh"))
++		goto err_free_inst;
++
++	ctx->safe_prime = safe_prime;
++
++	err = crypto_inst_setname(kpp_crypto_instance(inst),
++				  tmpl->name, &dh_alg->base);
++	if (err)
++		goto err_free_inst;
++
++	inst->alg.set_secret = dh_safe_prime_set_secret;
++	inst->alg.generate_public_key = dh_safe_prime_generate_public_key;
++	inst->alg.compute_shared_secret = dh_safe_prime_compute_shared_secret;
++	inst->alg.max_size = dh_safe_prime_max_size;
++	inst->alg.init = dh_safe_prime_init_tfm;
++	inst->alg.exit = dh_safe_prime_exit_tfm;
++	inst->alg.reqsize = sizeof(struct kpp_request) + dh_alg->reqsize;
++	inst->alg.base.cra_priority = dh_alg->base.cra_priority;
++	inst->alg.base.cra_module = THIS_MODULE;
++	inst->alg.base.cra_ctxsize = sizeof(struct dh_safe_prime_tfm_ctx);
++
++	inst->free = dh_safe_prime_free_instance;
++
++	err = kpp_register_instance(tmpl, inst);
++	if (err)
++		goto err_free_inst;
++
++	return 0;
++
++err_free_inst:
++	dh_safe_prime_free_instance(inst);
++
++	return err;
++}
++
+ static int dh_init(void)
+ {
+ 	return crypto_register_kpp(&dh);
 -- 
 2.26.2
 
