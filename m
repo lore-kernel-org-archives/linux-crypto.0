@@ -2,178 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E8AC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 13:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB50C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 13:36:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344277AbiBBNOx (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 08:14:53 -0500
-Received: from mail-mw2nam12on2089.outbound.protection.outlook.com ([40.107.244.89]:2017
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229563AbiBBNOw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 08:14:52 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MOfERpf3wDj0lKHWtglukQ+O1rZ2cqJYGh2cOjjWVxZyCBrSBMDyPo+cwzb1wSYtNt2xawjLI8lCtt/kfFczkRffTyDYyqFSPUGZ3kKXLkO6Q0cSKMhDIRHPV61PQm5VHAgUMynprBKKFAmtmKrQMIdmopoatCgSqtFcfa/ZtQKEvrlwL0r1X8idsxGcAZb64T4u1TB2wXMg+vKAtMYFnxgjkpfuSmUN/xJLj8ycmr+ao/I78KJQYBq0/q1Mq8LZHaYC4/kg/gUapKMsJFKHlAxsuKnCG4bYnUyqL9AHaQG5bQFf7A5h3rJb6H4ScQGXIpvGzeagHn5wZ48tCsQJLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XDZ61WY7Q7kXIvhJmC0cIuAPO12SO4i3kW9NkqlDSpI=;
- b=W99lTzWPoseJrnAHrtd0ZLNFEh9Gt5lXhyj343sWwVKs3uzdRcGJUm5/C+cJyaqLj6584tTAGfAQ7s2x1ouK31ppSp685eQgozeRVvRfqDyz3arA91qcc8zin1IMCwGHDIJUQNCpXkFQX/piYHiG17Lxtxt+c9bGrfauCujecn43vvYbbca8U648CYOr/uS+LKsqJEF6iX3h9zhtu3fkVJeaiwe6x7ITs2dJqERJPjXNTzz08k1EI0eHJUjMgh+WmVwHH9mdgKwzCpLuMFs5cpC9WciFjJs7gxtrwLaseJHFY9GgGJmW+MuKsuyJVj5F0S0cn4gcvo5MvwQ0ey8xtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XDZ61WY7Q7kXIvhJmC0cIuAPO12SO4i3kW9NkqlDSpI=;
- b=VvJ03PpUE88cdfbV/W/12LaIjnc3AInXOyojdjEQuqBdgwRcUYG/ewRl310QnUxup+5Pz8OVAitXWTMMUEFUwV2nt2gHwZu/JEkbAwXInIz5d+/rYSqlmqK1RFmLXb75ct2Jg1MHvvOc4SZi6ZqTiN7vY21MFx8aP0lOB888S7eqxYRFwgbrNIuJZ4uGyoAuNGQnZHN4qYeo0KOLocDvdNsVgyGukqKA+oksOLf7wUExXZliE4uW0YoSXab+5GEUCK1S0+cLxg79Qz5ZMLQm1YHsI747E/sZ6mLVNtJzNBS2euHu1SmB8bd68ZXUsEzAmpyC0KR9MC5agkrYdPF+hA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by MWHPR12MB1854.namprd12.prod.outlook.com (2603:10b6:300:114::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Wed, 2 Feb
- 2022 13:14:50 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4951.012; Wed, 2 Feb 2022
- 13:14:49 +0000
-Date:   Wed, 2 Feb 2022 09:14:48 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, alex.williamson@redhat.com,
-        mgurtovoy@nvidia.com, linuxarm@huawei.com, liulongfang@huawei.com,
-        prime.zeng@hisilicon.com, yuzenghui@huawei.com,
-        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com
-Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
-Message-ID: <20220202131448.GA2538420@nvidia.com>
-References: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210702095849.1610-1-shameerali.kolothum.thodi@huawei.com>
-X-ClientProxiedBy: BL1PR13CA0177.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::32) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        id S232191AbiBBNgK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Feb 2022 08:36:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31321 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229552AbiBBNgJ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Feb 2022 08:36:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1643808969;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Y/tCcKryHNXOhXcpKvt9O1GxoDARflPECbDyG7zIOM=;
+        b=Dse7gU8ebueedVq2h1lRJ7XZ2KEda75P28AaU7FVMJUhAsRuQIdy+9pYkmVp8I6MIzfD0i
+        RMFevDSjRVlQ2NwL/2M0dh/8IB0GZ2bfeNkQtF84Yc3t95ZF7op/JNnHWVX7rFFnwPnMLl
+        5k3D6j7+x3rJrPJdSQastCqnXECP2zs=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-637-1ctkUoUhOI-9EYjXVZVfYg-1; Wed, 02 Feb 2022 08:36:08 -0500
+X-MC-Unique: 1ctkUoUhOI-9EYjXVZVfYg-1
+Received: by mail-qt1-f197.google.com with SMTP id c20-20020ac84e14000000b002d198444921so15433083qtw.23
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Feb 2022 05:36:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=6Y/tCcKryHNXOhXcpKvt9O1GxoDARflPECbDyG7zIOM=;
+        b=mSthlDqRnTB71J+TMvT8RHa+TdIwVRv6yZivmvDJmrFU9gBE/ANXT88k6C2LdSXiu2
+         H1jp2/RUR+QKfBr7jZJgvXkrLZnVac++O0vQADGDXiD2gwbfpQyqqsoDNC0eyz2T6gC6
+         fHwo0qq/Wu9rJxqTk/xNZ1fIOsUzFWI+CWenMzWODjPh3P2fYemP9qHZM4X5MSZ6tNDb
+         viqfj3ppJw8NhtN8p//b1JtGToKFPOhCxou89fhhxNMg3Zk65XpXgKXzByOj9aDswViX
+         I1bMUrWP9LssOBObJdr5LgPYNzimol/+rutlDLwfmSatn4CpZ0ZT5un/wgjKo6bfNuBw
+         1jjQ==
+X-Gm-Message-State: AOAM5324fhlt81sfBh5/InT26oWnMbCmXvZrvAGqRLTlwJzgSmAO/pHz
+        09LKCYR+r6pQAyKKkjrmyKF1U+2moY2CScSfH8BFBHmA48SQZf3p4UGGnLCv7jWxnMlgf/EYuGn
+        3g6Qs5qG02s8JoGgSSDewJLwT
+X-Received: by 2002:a05:6214:e63:: with SMTP id jz3mr26635019qvb.24.1643808967718;
+        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwiCnyRwi2H6w6JFHC4Wf9S8I+4E+HaEq5bvxXpGLRZuECjF5NxRRPczuDeTGlK9ad1s6vNFA==
+X-Received: by 2002:a05:6214:e63:: with SMTP id jz3mr26635004qvb.24.1643808967488;
+        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
+Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
+        by smtp.gmail.com with ESMTPSA id s1sm4802575qkp.102.2022.02.02.05.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
+Message-ID: <daffe6272525376d955a4eaa73263a7f08634ac1.camel@redhat.com>
+Subject: Re: [PATCH] random: use computational hash for entropy extraction
+From:   Simo Sorce <simo@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Stephan Mueller <smueller@chronox.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Date:   Wed, 02 Feb 2022 08:36:06 -0500
+In-Reply-To: <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
+References: <20220201161342.154666-1-Jason@zx2c4.com>
+         <1920812.EuvsCRJjSr@tauon.chronox.de>
+         <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f427b0e2-8f75-43e0-4f88-08d9e64dfda2
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1854:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR12MB185445D554E08DCE44EC768EC2279@MWHPR12MB1854.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5JjgVb2sJsme39CUmCC25q5Pv0u6pM/bg/rIPS2wxZW/58QE+WLmX5cI6g8xurxk2epdAGoU1QVr84wIjVcLpWENxS1vtbSdGyoPHqrwvHSRP7RjX9T1jOATb3h9fJFjhZZlO8lt8o6YFqEiBO6pnpUBOahFa5PRACSnwYFeBWCUapSsC5tg9BPlmH+91eurL46X6xNyMerQksYX/52wfnBaRAoLrwwIPdZxiyvk+VWMqohgnP7An6xJTLUeU13FlgYjiq8umVqAwmc3XC7thcSdIs8hNfWs0EEZ9IwhLSdJ1wdQpp86aGV8HT6ZuZXGc/N7dmwwZz0opTIw1/hTGE1M955unOlFPFM8b1z26mUvLRZkFuOExuik1YtT7MnLq68Djyk+sibYbh/8VO9HHNelRN+SJa8JvdRGCu8MQeiw68yMRK9TBmYvG2xDGkH/hV8PlTOGSk52TbLGbgxCwU0g507m9UPNSrN0BczyaIYPHFa9b5wyjLkY90t7Unplx9m1mHOyGdzZNHcLUv+h7Zwr905/GAmJbQE4pmRSPSuqtJCLeV/P+mKFdQXy7auMZucshVnSxkzdJ4bcnq5MJ5t4b1gC9Js3oQbTLDosBdEgXcmPh4Fg9LXpJ5Qlf+KWTOQ8QPGQQG9eUnJoQcViHsWCu5jghX3sX+67ZrJ4dnRd4iUSQ+suA/bA3kNZH5zqX3RKsUGQlYpKwAicp7ridQXqXyeAT0X/tX9yGDd1k7E=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(4326008)(8936002)(8676002)(316002)(2906002)(6916009)(186003)(966005)(33656002)(66476007)(508600001)(6486002)(26005)(66946007)(6512007)(7416002)(5660300002)(66556008)(6506007)(83380400001)(86362001)(2616005)(1076003)(38100700002)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rDb3Mmj/WLBs3716Af7LSgbSCwpAFCJC24J41/kf+ozMPoIZignxn7Ikykgp?=
- =?us-ascii?Q?DpNKHmhJCiYKTH7PNLUT1j/0gK/X9Pe/0HXRbPLyL87bH4F+CI+b4QRLScRE?=
- =?us-ascii?Q?zRZWyATh/MMcq/kg5ieobHVDrJNmGxAAGdUdae0cmqZ1WZf8EfqGe6MHDzRJ?=
- =?us-ascii?Q?QAS0OafxQM2mXJPXv8J1vkDjOYnCmW1tbE0ZQWj12uRHoRHMf0mFCQLPHxbc?=
- =?us-ascii?Q?7LZ95uL7UQwnml6RQIxmN7E5Z+wU2NwsnCHv4K01mMH5f3w19nz/MS3o+BPP?=
- =?us-ascii?Q?30f2nWjksCZCIU+9z9lfRrMZ0CePXEhvqgQCEBGS87dNoi2V3ko8Q2UHJgHl?=
- =?us-ascii?Q?2R88pCzTC666+GvpdvpL2n/COBb+koGJuD8NCtb9WnyCvsrlzWH49k+Nrttq?=
- =?us-ascii?Q?kRbkqbRjw3qGBqwWqkn/uN8T5qGVSm83r7S5KxAr+1HHmjBgfkyF9TWwrrv7?=
- =?us-ascii?Q?LdWzMzvRP4aLdSPTmcLZTfaoVVpXJnfSQkCjXlO9PqFPL+ttKWIevvWXpP4L?=
- =?us-ascii?Q?bXMYD5FRcmS2iZGqX98NsUciIiTEr7H4c6oUv4qgxPz0PoKXUFmY6Gz4w8d5?=
- =?us-ascii?Q?SQxaExWHu7BocYCUvIsGcPxPtqfWIym4eCAUPPBdIXlJR4RxuYfZ10haEmPr?=
- =?us-ascii?Q?gEYylezmmQ2mhrKF/n63skg5uah5r8YGkmlZ6aaq7SZ0HNISsxvSAGQ6nnUI?=
- =?us-ascii?Q?ri0MgZvbc95XA4BiFPP6NCK/BQLmUmYWaSh1knNeqySmUZH9/HdDMyfXru5O?=
- =?us-ascii?Q?GV6Njyi3KEYIaFvuI9tZjHld4/oAbO+f3Qdpa+pqvrY3swtr5fab+e/oQ++8?=
- =?us-ascii?Q?mHikJ50YXpXcrdSqegKh15fnDgA0KDeNjJoZ5+885hZwZ9ObNYfdgzEPktNg?=
- =?us-ascii?Q?PVl0tFYrehRCM9ZjA3WLJH3qbKlhxTDC0Gm3Ow4OKvjCyaky4Pa8NgAsQjm3?=
- =?us-ascii?Q?yhdQ0bB2nydEBK7Jf1ZWW6goVpscCm9IU5oSN20T0czlJIuRk5hCWNlC3fBh?=
- =?us-ascii?Q?YfaOOHUToLCWq54Q7NGnuAuBQD0ko3h9JR+Jk4WqQ1/37cBJDvdVKtORQTpA?=
- =?us-ascii?Q?zXpoNY59c88v9wDaY15Cgnr1dToCm6WmDPmWkWQRIqDdhkH++n1x/wHkSllo?=
- =?us-ascii?Q?xaHjYOsX0xLE2sV6n6S159Zu49SoKQOHLCThkFqWQfP9IouFMb0ex4oUZr0C?=
- =?us-ascii?Q?AZbkAG37jsDnST+X5jiqJ4WlAMqR26aIBykAPegvTiztbO6Gdel4oKpi2G/I?=
- =?us-ascii?Q?xz2klWMG6kF7grUgJo/sc6t9pUGS50NxDCbzxrnKwPyjITCwTBVv9RvAq1C5?=
- =?us-ascii?Q?F57Mthbr7mpi24NCNpzH1+cFkMvXjiSMvFfDLgAdg9YQtEPeaFNHueC6wCem?=
- =?us-ascii?Q?ATe7wr3HWDlM07Ol9llE3TyuJA5pL87u1JB9+kYTaUAPBFlbyXkUJavHvWId?=
- =?us-ascii?Q?Gsl3GWmJFV1RXPgDWVw11UOGYaEy3P+KwC27FLWT8OMpzLJA/lQqPi6VjZsi?=
- =?us-ascii?Q?xLkOazh03yCZ9lUxq3eGEgaFJF5lc3OtgheEUWaknWOaFSr9xgzYjWL9KANN?=
- =?us-ascii?Q?Z7whSOOJe/V7lzhXbDE=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f427b0e2-8f75-43e0-4f88-08d9e64dfda2
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2022 13:14:49.4278
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RIPOzEHZ1D9C3nMi0ztgDsLEbaXDRig2jlChRkK/qL/SvZ3TtxlSxXtijB+FY8Vp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1854
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 02, 2021 at 10:58:45AM +0100, Shameer Kolothum wrote:
-> This series attempts to add vfio live migration support for
-> HiSilicon ACC VF devices. HiSilicon ACC VF device MMIO space
-> includes both the functional register space and migration 
-> control register space. As discussed in RFCv1[0], this may create
-> security issues as these regions get shared between the Guest
-> driver and the migration driver. Based on the feedback, we tried
-> to address those concerns in this version. 
-> 
-> This is now based on the new vfio-pci-core framework proposal[1].
-> Understand that the framework proposal is still under discussion,
-> but really appreciate any feedback on the approach taken here
-> to mitigate the security risks.
+Jason,
+if the current code is mistakenly stretching the entropy, perhaps the
+correct curse of action is to correct that mistake first, before
+introducing a new conditioning function.
+As it is, these patches cannot be say to just perform conditioning if
+they are stretching the entropy, the risk is compounding errors and
+voiding any reasonable analysis of the entropy carried through the RNG.
 
-Hi, can you look at the v6 proposal for the mlx5 implementation of the
-migration API and see if it meets hisilicon acc's needs as well?
-
-https://lore.kernel.org/all/20220130160826.32449-1-yishaih@nvidia.com/
-
-There are few topics to consider:
- - Which of the three feature sets (STOP_COPY, P2P and PRECOPY) make
-   sense for this driver?
-
-   I see pf_qm_state_pre_save() but didn't understand why it wanted to
-   send the first 32 bytes in the PRECOPY mode? It is fine, but it
-   will add some complexity to continue to do this.
-
- - I think we discussed the P2P implementation and decided it would
-   work for this device? Can you re-read and confirm?
-
- - Are the arcs we defined going to work here as well? The current
-   implementation in hisi_acc_vf_set_device_state() is very far away
-   from what the v1 protocol is, so I'm having a hard time guessing,
-   but..
-
-      RESUMING -> STOP
-        Probably vf_qm_state_resume()
-
-      RUNNING -> STOP
-        vf_qm_fun_restart() - that is oddly named..
-
-      STOP -> RESUMING
-        Seems to be a nop (likely a bug)
-
-      STOP -> RUNNING
-         Not implemented currenty? (also a bug)
-
-      STOP -> STOP_COPY
-         pf_qm_state_pre_save / vf_qm_state_save
-
-      STOP_COPY -> STOP
-         NOP
-
-   And the modification for the P2P/NO DMA is presumably just
-   fun_restart too since stopping the device and stopping DMA are
-   going to be the same thing here?
-
-The mlx5 implementation linked above is a full example you can cut and
-paste from for how to implement the state function and the how to do
-the data transfer. The f_ops read/write implementation for acc looks
-trivial as it only streams the fixed size and pre-allocated 'struct
-acc_vf_data'
-
-It looks like it would be a short path to implement our v2 proposal
-and remove a lot of driver code, as we saw in mlx5.
+It would also be nice to have an explanation (in the patch or at least
+the commit message) about how entropy is preserved and why a specific
+function is cryptographically adequate. Note that there is no study
+about using internal states of hash functions, it would be better to
+base these decisions on solid ground by citing relevant research or
+standards.
 
 Thanks,
-Jason
+Simo.
+
+On Wed, 2022-02-02 at 13:23 +0100, Jason A. Donenfeld wrote:
+> Hi Stephan,
+> 
+> It's like this for a few reasons:
+> 
+> - Primarily, we want to feed 32 bytes back in after finalization (in
+> this case as a PRF key), just as the code does before this patch, and
+> return 32 bytes to the caller, and we don't want those to be relatable
+> to each other after the seed is erased from the stack.
+> - Actually, your statement isn't correct: _extract_entropy is called
+> for 48 bytes at ~boot time, with the extra 16 bytes affecting the
+> block and nonce positions of the chacha state. I'm not sure this is
+> very sensible to do -- it really is not adding anything -- but I'd
+> like to avoid changing multiple things at once, when these are better
+> discussed and done separately. (I have a separate patch for something
+> along those lines.)
+> - Similarly, I'd like to avoid changing the general idea of what
+> _extract_entropy does (the underscore version has never accounted for
+> entropy counts), deferring anything like that, should it become
+> necessary, to an additional patch, where again it can be discussed
+> separately.
+> - By deferring the RDRAND addition to the second phase, we avoid a
+> potential compression call while the input pool lock is held, reducing
+> our critical section.
+> - HKDF-like constructions are well studied and understood in the model
+> we're working in, so it forms a natural and somewhat boring fit for
+> doing what we want to do.
+> 
+> Regards,
+> Jason
+> 
+
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
