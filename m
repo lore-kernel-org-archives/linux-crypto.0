@@ -2,50 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05B5DC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 10:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D9EC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 10:41:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232721AbiBBKlw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 05:41:52 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:41990 "EHLO
+        id S1343574AbiBBKlz (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Feb 2022 05:41:55 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:41958 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244174AbiBBKls (ORCPT
+        with ESMTP id S1343591AbiBBKlp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 05:41:48 -0500
+        Wed, 2 Feb 2022 05:41:45 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E002D21135;
-        Wed,  2 Feb 2022 10:41:46 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7B18521102;
+        Wed,  2 Feb 2022 10:41:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1643798506; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1643798504; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F2A3VejHfy1pwgtKHo9p3Kst3JXAr0emkFaSCeEGE/0=;
-        b=JZDZpdbjFKh+YY3KxsmmD/ZBGuoQr4nBI5vhM80mBrOU8PQhY3T7KKzqVBbVDGnTKEJ8XK
-        ZlB/Nl8+pQkNgveH0sSMiab2MPO/LHSWwxhYX4r4QDkY5SOSEGMbkqf6WvqAogOlzwYsq4
-        oxPwcE7Em2lQeWHybzAnvGPjdyP3sXg=
+        bh=T7D42mbyFyOr0nXM0heUBfey/sShYlFuQidjL1PwPws=;
+        b=JRdmCgQMqpIAixFVXed1TwP7hhDatpy79vxH+LFy1aEE+dLSFUZdqU91PxCdxymplgiZLJ
+        aE3+50xEMLFn7I6cnkAqtEYXmBOyZAm5VmbX5hk5cvHLj3EqMWi9G2iwYInUAA6jytSUkM
+        V5fke7kWOcmsK713YR9FcDEb2dWz8+s=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1643798506;
+        s=susede2_ed25519; t=1643798504;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F2A3VejHfy1pwgtKHo9p3Kst3JXAr0emkFaSCeEGE/0=;
-        b=bqfvYoU4KwaDU4wiQiHKZyRqpKWn458SLcfSzj8kCpSV+0FlumTnm91TkEshVYyx5F34BL
-        mJAcWUMQ4TT+BVAA==
+        bh=T7D42mbyFyOr0nXM0heUBfey/sShYlFuQidjL1PwPws=;
+        b=CbO5UVopFWD11nP1eY2rQkVA9XjbsoLZHUadK/0Sq493GAblSTquuEXam9Zhe6AlfNo38Y
+        CxQPcjU7AidtnMDw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CBFF013E02;
-        Wed,  2 Feb 2022 10:41:46 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 65E7113E02;
+        Wed,  2 Feb 2022 10:41:44 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id odWLMOpf+mGhbAAAMHmgww
-        (envelope-from <nstange@suse.de>); Wed, 02 Feb 2022 10:41:46 +0000
+        id AeqwFuhf+mGWbAAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 02 Feb 2022 10:41:44 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -55,9 +56,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         keyrings@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v3 15/15] crypto: dh - calculate Q from P for the full public key verification
-Date:   Wed,  2 Feb 2022 11:40:12 +0100
-Message-Id: <20220202104012.4193-16-nstange@suse.de>
+Subject: [PATCH v3 13/15] crypto: dh - disallow plain "dh" usage in FIPS mode
+Date:   Wed,  2 Feb 2022 11:40:10 +0100
+Message-Id: <20220202104012.4193-14-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20220202104012.4193-1-nstange@suse.de>
 References: <20220202104012.4193-1-nstange@suse.de>
@@ -67,107 +68,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As the ->q in struct dh_ctx gets never set anywhere, the code in
-dh_is_pubkey_valid() for doing the full public key validation in accordance
-to SP800-56Arev3 is effectively dead.
+SP800-56Arev3, sec. 5.5.2 ("Assurance of Domain-Parameter Validity")
+asserts that an implementation needs to verify domain paramtere validity,
+which boils down to either
+- the domain parameters corresponding to some known safe-prime group
+  explicitly listed to be approved in the document or
+- for parameters conforming to a "FIPS 186-type parameter-size set",
+  that the implementation needs to perform an explicit domain parameter
+  verification, which would require access to the "seed" and "counter"
+  values used in their generation.
 
-However, for safe-prime groups Q = (P - 1)/2 by definition and
-as the safe-prime groups are the only possible groups in FIPS mode (via
-those ffdheXYZ() templates), this enables dh_is_pubkey_valid() to calculate
-Q on the fly for these.
-Implement this.
+The latter is not easily feasible and moreover, SP800-56Arev3 states that
+safe-prime groups are preferred and that FIPS 186-type parameter sets
+should only be supported for backward compatibility, if it all.
 
-With this change, the last code accessing struct dh_ctx's ->q is now gone.
-Remove this member from struct dh_ctx.
+Mark "dh" as not fips_allowed in testmgr. Note that the safe-prime
+ffdheXYZ(dh) wrappers are not affected by this change: as these enforce
+some approved safe-prime group each, their usage is still allowed in FIPS
+mode.
+
+This change will effectively render the keyctl(KEYCTL_DH_COMPUTE) syscall
+unusable in FIPS mode, but it has been brought up that this might even be
+a good thing ([1]).
+
+[1] https://lore.kernel.org/r/20211217055227.GA20698@gondor.apana.org.au
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- crypto/dh.c | 40 +++++++++++++++++++++++++++++-----------
- 1 file changed, 29 insertions(+), 11 deletions(-)
+ crypto/testmgr.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index d0d24f615b2d..cca289477485 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -15,7 +15,6 @@
- 
- struct dh_ctx {
- 	MPI p;	/* Value is guaranteed to be set. */
--	MPI q;	/* Value is optional. */
- 	MPI g;	/* Value is guaranteed to be set. */
- 	MPI xa;	/* Value is guaranteed to be set. */
- };
-@@ -23,7 +22,6 @@ struct dh_ctx {
- static void dh_clear_ctx(struct dh_ctx *ctx)
- {
- 	mpi_free(ctx->p);
--	mpi_free(ctx->q);
- 	mpi_free(ctx->g);
- 	mpi_free(ctx->xa);
- 	memset(ctx, 0, sizeof(*ctx));
-@@ -99,11 +97,12 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
- /*
-  * SP800-56A public key verification:
-  *
-- * * If Q is provided as part of the domain paramenters, a full validation
-- *   according to SP800-56A section 5.6.2.3.1 is performed.
-+ * * For the safe-prime groups in FIPS mode, Q can be computed
-+ *   trivially from P and a full validation according to SP800-56A
-+ *   section 5.6.2.3.1 is performed.
-  *
-- * * If Q is not provided, a partial validation according to SP800-56A section
-- *   5.6.2.3.2 is performed.
-+ * * For all other sets of group parameters, only a partial validation
-+ *   according to SP800-56A section 5.6.2.3.2 is performed.
-  */
- static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- {
-@@ -114,21 +113,40 @@ static int dh_is_pubkey_valid(struct dh_ctx *ctx, MPI y)
- 	 * Step 1: Verify that 2 <= y <= p - 2.
- 	 *
- 	 * The upper limit check is actually y < p instead of y < p - 1
--	 * as the mpi_sub_ui function is yet missing.
-+	 * in order to save one mpi_sub_ui() invocation here. Note that
-+	 * p - 1 is the non-trivial element of the subgroup of order 2 and
-+	 * thus, the check on y^q below would fail if y == p - 1.
- 	 */
- 	if (mpi_cmp_ui(y, 1) < 1 || mpi_cmp(y, ctx->p) >= 0)
- 		return -EINVAL;
- 
--	/* Step 2: Verify that 1 = y^q mod p */
--	if (ctx->q) {
--		MPI val = mpi_alloc(0);
-+	/*
-+	 * Step 2: Verify that 1 = y^q mod p
-+	 *
-+	 * For the safe-prime groups q = (p - 1)/2.
-+	 */
-+	if (fips_enabled) {
-+		MPI val, q;
- 		int ret;
- 
-+		val = mpi_alloc(0);
- 		if (!val)
- 			return -ENOMEM;
- 
--		ret = mpi_powm(val, y, ctx->q, ctx->p);
-+		q = mpi_alloc(mpi_get_nlimbs(ctx->p));
-+		if (!q) {
-+			mpi_free(val);
-+			return -ENOMEM;
-+		}
- 
-+		/*
-+		 * ->p is odd, so no need to explicitly subtract one
-+		 * from it before shifting to the right.
-+		 */
-+		mpi_rshift(q, ctx->p, 1);
-+
-+		ret = mpi_powm(val, y, q, ctx->p);
-+		mpi_free(q);
- 		if (ret) {
- 			mpi_free(val);
- 			return ret;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index d715ddc22c6b..b7973a47c6f4 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4647,7 +4647,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ 		.alg = "dh",
+ 		.test = alg_test_kpp,
+-		.fips_allowed = 1,
+ 		.suite = {
+ 			.kpp = __VECS(dh_tv_template)
+ 		}
 -- 
 2.26.2
 
