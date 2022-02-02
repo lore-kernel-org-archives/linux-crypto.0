@@ -2,90 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C426C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 12:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B2BAC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 12:55:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344122AbiBBMXj (ORCPT
+        id S1344018AbiBBMzu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 07:23:39 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:37182 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245587AbiBBMXj (ORCPT
+        Wed, 2 Feb 2022 07:55:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35310 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231500AbiBBMzu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 07:23:39 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1C898B830B2;
-        Wed,  2 Feb 2022 12:23:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A3AC004E1;
-        Wed,  2 Feb 2022 12:23:36 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="l8b6PN2Y"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1643804613;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TGEzqHTDCMG8mI3TmhK6JduZrlIkNoEeX3AHXuvfN00=;
-        b=l8b6PN2YTOt5a6ONR2PcsjguyoljXFj8sF/NfE9DiuT/S9/WNEFzPQs+EIcDCnMkhG6Q7X
-        bgKdPug0C85/4dubUin9/YA9GfW9n1jbfcHsyMs/Zc3E/MMmqQkKm4RrSKqdlKk5WgRmjo
-        SZEG31O0LpahrNXjSfOOUOjBuXGYbHs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 92887216 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Feb 2022 12:23:33 +0000 (UTC)
-Received: by mail-yb1-f173.google.com with SMTP id i62so60328290ybg.5;
-        Wed, 02 Feb 2022 04:23:33 -0800 (PST)
-X-Gm-Message-State: AOAM530M2e5oAt0vMZSQxlGOzhu9z1KCQlbHFuOAH9u0dxY5/KnuPSZv
-        RxPrZlIkRtRQ5jbdRVptrPUov1PbsReUL6RveU0=
-X-Google-Smtp-Source: ABdhPJy3DoJDwZfwHAMG8lESNaJ7LhGJU3bDGnZiU3LXFymHywyLCT8c3UU4mtIKpEgG5Fd3wUiRYvU/+kHHT8Eq2Nw=
-X-Received: by 2002:a05:6902:726:: with SMTP id l6mr3477287ybt.115.1643804611659;
- Wed, 02 Feb 2022 04:23:31 -0800 (PST)
+        Wed, 2 Feb 2022 07:55:50 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 212AekuH015286;
+        Wed, 2 Feb 2022 12:55:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zeswlkAxStLCD9AUMlaDRFijspzLCsEycfEF1UtQJuU=;
+ b=Bi91+InWGHvs8TcgtwsHaIRwxJiB2MNV0i6IOKvZcKjuCWzo9DjSHc8nCo5Mnm7UwZ1x
+ jc5pBgDeInyHLYujULcZDEhrsA66JvTdOnP1G0/w1n16wlTcXMeyDAizsjVBsi+n5MbS
+ 5MhFm5wNAMh/jauPYjFQDbLGDG/b5G2Pnap0zi95Ws6YUe80ssZtU0dadpp9iwjUuzhZ
+ uPao6uNSy6QRcIg7Oob04pDnayvdG1n8BrjwYMAimBc2Zm3CZ1r0iUPHwf36LCG6d0j3
+ cGGEoNdVdCFXIvL7O6Tox/WjbF6aoVfXok9rUivTITFYMvBxOtWY3AsHZU848b7Nydrs 0g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dym3gf8pf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Feb 2022 12:55:46 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 212Cdrrc021978;
+        Wed, 2 Feb 2022 12:55:45 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3dym3gf8p8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Feb 2022 12:55:45 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 212CmdP6020595;
+        Wed, 2 Feb 2022 12:55:44 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma02dal.us.ibm.com with ESMTP id 3dvw7bdhc5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Feb 2022 12:55:44 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 212CthED42861006
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Feb 2022 12:55:43 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 997EBAE05F;
+        Wed,  2 Feb 2022 12:55:43 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C097AE064;
+        Wed,  2 Feb 2022 12:55:43 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Feb 2022 12:55:43 +0000 (GMT)
+Message-ID: <5bb23626-afe1-9e05-566b-8830882904f6@linux.ibm.com>
+Date:   Wed, 2 Feb 2022 07:55:43 -0500
 MIME-Version: 1.0
-References: <20220201161342.154666-1-Jason@zx2c4.com> <1920812.EuvsCRJjSr@tauon.chronox.de>
-In-Reply-To: <1920812.EuvsCRJjSr@tauon.chronox.de>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 2 Feb 2022 13:23:21 +0100
-X-Gmail-Original-Message-ID: <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
-Message-ID: <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
-Subject: Re: [PATCH] random: use computational hash for entropy extraction
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH] KEYS: Double max_size to make keyctl pkey_verify work
+Content-Language: en-US
+To:     Vitaly Chikunov <vt@altlinux.org>, keyrings@vger.kernel.org,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>
+Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        Eric Biggers <ebiggers@kernel.org>
+References: <20220202065906.2598366-1-vt@altlinux.org>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <20220202065906.2598366-1-vt@altlinux.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: UJG6tWGYH90PXu3y_n590Xc3XPIe-SW5
+X-Proofpoint-GUID: p5qSS0QwBzqR_LRhObcAjxcm6MWyq742
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2022-02-02_06,2022-02-01_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 impostorscore=0 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1015 mlxlogscore=999
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2201110000 definitions=main-2202020068
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Stephan,
 
-It's like this for a few reasons:
+On 2/2/22 01:59, Vitaly Chikunov wrote:
+> Rarely used `keyctl pkey_verify' can verify raw signatures, but was
+> failing, because ECDSA/EC-RDSA signature sizes are twice key sizes which
+> does not pass in/out sizes check in keyctl_pkey_params_get_2.
+> This in turn because these values cannot be distinguished by a single
+> `max_size' callback return value.
+> Also, `keyctl pkey_query` displays incorrect `max_sig_size' about these
+> algorithms.
+>
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 
-- Primarily, we want to feed 32 bytes back in after finalization (in
-this case as a PRF key), just as the code does before this patch, and
-return 32 bytes to the caller, and we don't want those to be relatable
-to each other after the seed is erased from the stack.
-- Actually, your statement isn't correct: _extract_entropy is called
-for 48 bytes at ~boot time, with the extra 16 bytes affecting the
-block and nonce positions of the chacha state. I'm not sure this is
-very sensible to do -- it really is not adding anything -- but I'd
-like to avoid changing multiple things at once, when these are better
-discussed and done separately. (I have a separate patch for something
-along those lines.)
-- Similarly, I'd like to avoid changing the general idea of what
-_extract_entropy does (the underscore version has never accounted for
-entropy counts), deferring anything like that, should it become
-necessary, to an additional patch, where again it can be discussed
-separately.
-- By deferring the RDRAND addition to the second phase, we avoid a
-potential compression call while the input pool lock is held, reducing
-our critical section.
-- HKDF-like constructions are well studied and understood in the model
-we're working in, so it forms a natural and somewhat boring fit for
-doing what we want to do.
+How do you use pkey_query?
 
-Regards,
-Jason
+$ keyctl padd asymmetric testkey %keyring:test < cert.der
+385037223
+$ keyctl pkey_query 385037223 ''
+Password passing is not yet supported
+$ keyctl pkey_query 385037223
+Format:
+   keyctl --version
+   keyctl add <type> <desc> <data> <keyring>
+[...]
+
+$ keyctl unlink 385037223
+1 links removed
+
+
