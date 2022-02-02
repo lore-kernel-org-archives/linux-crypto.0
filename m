@@ -2,137 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB50C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 13:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1A7C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 14:11:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232191AbiBBNgK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 08:36:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31321 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229552AbiBBNgJ (ORCPT
+        id S1344773AbiBBOLP (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Feb 2022 09:11:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37578 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231950AbiBBOLO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 08:36:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643808969;
+        Wed, 2 Feb 2022 09:11:14 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F101C061714;
+        Wed,  2 Feb 2022 06:11:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1DCAE61852;
+        Wed,  2 Feb 2022 14:11:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0B5C340F1;
+        Wed,  2 Feb 2022 14:11:13 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="nec8bwHU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1643811070;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6Y/tCcKryHNXOhXcpKvt9O1GxoDARflPECbDyG7zIOM=;
-        b=Dse7gU8ebueedVq2h1lRJ7XZ2KEda75P28AaU7FVMJUhAsRuQIdy+9pYkmVp8I6MIzfD0i
-        RMFevDSjRVlQ2NwL/2M0dh/8IB0GZ2bfeNkQtF84Yc3t95ZF7op/JNnHWVX7rFFnwPnMLl
-        5k3D6j7+x3rJrPJdSQastCqnXECP2zs=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-637-1ctkUoUhOI-9EYjXVZVfYg-1; Wed, 02 Feb 2022 08:36:08 -0500
-X-MC-Unique: 1ctkUoUhOI-9EYjXVZVfYg-1
-Received: by mail-qt1-f197.google.com with SMTP id c20-20020ac84e14000000b002d198444921so15433083qtw.23
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Feb 2022 05:36:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=6Y/tCcKryHNXOhXcpKvt9O1GxoDARflPECbDyG7zIOM=;
-        b=mSthlDqRnTB71J+TMvT8RHa+TdIwVRv6yZivmvDJmrFU9gBE/ANXT88k6C2LdSXiu2
-         H1jp2/RUR+QKfBr7jZJgvXkrLZnVac++O0vQADGDXiD2gwbfpQyqqsoDNC0eyz2T6gC6
-         fHwo0qq/Wu9rJxqTk/xNZ1fIOsUzFWI+CWenMzWODjPh3P2fYemP9qHZM4X5MSZ6tNDb
-         viqfj3ppJw8NhtN8p//b1JtGToKFPOhCxou89fhhxNMg3Zk65XpXgKXzByOj9aDswViX
-         I1bMUrWP9LssOBObJdr5LgPYNzimol/+rutlDLwfmSatn4CpZ0ZT5un/wgjKo6bfNuBw
-         1jjQ==
-X-Gm-Message-State: AOAM5324fhlt81sfBh5/InT26oWnMbCmXvZrvAGqRLTlwJzgSmAO/pHz
-        09LKCYR+r6pQAyKKkjrmyKF1U+2moY2CScSfH8BFBHmA48SQZf3p4UGGnLCv7jWxnMlgf/EYuGn
-        3g6Qs5qG02s8JoGgSSDewJLwT
-X-Received: by 2002:a05:6214:e63:: with SMTP id jz3mr26635019qvb.24.1643808967718;
-        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwiCnyRwi2H6w6JFHC4Wf9S8I+4E+HaEq5bvxXpGLRZuECjF5NxRRPczuDeTGlK9ad1s6vNFA==
-X-Received: by 2002:a05:6214:e63:: with SMTP id jz3mr26635004qvb.24.1643808967488;
-        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
-Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
-        by smtp.gmail.com with ESMTPSA id s1sm4802575qkp.102.2022.02.02.05.36.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Feb 2022 05:36:07 -0800 (PST)
-Message-ID: <daffe6272525376d955a4eaa73263a7f08634ac1.camel@redhat.com>
+        bh=c5JjIYoKEKHglVHkMzu3VOgQtecCefZTnqMsNwFtP0k=;
+        b=nec8bwHUWMgNyJGomQASFqfhaMOd8zL2rG9/gjzbj/dJ262XY9q27kuD/WX8CoOId2mA3A
+        IjUOuUtFq2JuO7Z0vpcnVL3N9rCIe1sCbOeRRiV7uMY/Ae7uwNFnhfRpWBC+fvC9rw1PRz
+        AlWwUAv75NJW4TvbbV0WKd1U+lTxglg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 29e0e4f8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 2 Feb 2022 14:11:09 +0000 (UTC)
+Received: by mail-yb1-f179.google.com with SMTP id w81so39108891ybg.12;
+        Wed, 02 Feb 2022 06:11:09 -0800 (PST)
+X-Gm-Message-State: AOAM533snHGRzaGhO7pViYV86RP1gZb8q7jJbvgUeceYsmBiNJ0AdgXg
+        11iClzC+uQm2BmmeXIjWRoCmOcxWzKBweErJGW0=
+X-Google-Smtp-Source: ABdhPJx+QdZ/n8pLp7rKbfmJ1K0BLHYaT7l24mXD1xR3rwzzbyNRi3RHuX0fD0BKjc8AZQQnh5M2nSVFbp4GmF0U7Rs=
+X-Received: by 2002:a25:c006:: with SMTP id c6mr41866622ybf.457.1643811068149;
+ Wed, 02 Feb 2022 06:11:08 -0800 (PST)
+MIME-Version: 1.0
+References: <20220201161342.154666-1-Jason@zx2c4.com> <1920812.EuvsCRJjSr@tauon.chronox.de>
+ <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com> <daffe6272525376d955a4eaa73263a7f08634ac1.camel@redhat.com>
+In-Reply-To: <daffe6272525376d955a4eaa73263a7f08634ac1.camel@redhat.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 2 Feb 2022 15:10:57 +0100
+X-Gmail-Original-Message-ID: <CAHmME9ohMLtfBgF752XCq-EOk5SRGcNkf-vf1oawXEkz9iOTtw@mail.gmail.com>
+Message-ID: <CAHmME9ohMLtfBgF752XCq-EOk5SRGcNkf-vf1oawXEkz9iOTtw@mail.gmail.com>
 Subject: Re: [PATCH] random: use computational hash for entropy extraction
-From:   Simo Sorce <simo@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Stephan Mueller <smueller@chronox.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+To:     Simo Sorce <simo@redhat.com>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Date:   Wed, 02 Feb 2022 08:36:06 -0500
-In-Reply-To: <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
-References: <20220201161342.154666-1-Jason@zx2c4.com>
-         <1920812.EuvsCRJjSr@tauon.chronox.de>
-         <CAHmME9ouMHtTQxB1WHq3H+nfbg27OFaJtw78E5epCJsiHt3sHg@mail.gmail.com>
-Organization: Red Hat
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason,
-if the current code is mistakenly stretching the entropy, perhaps the
-correct curse of action is to correct that mistake first, before
-introducing a new conditioning function.
-As it is, these patches cannot be say to just perform conditioning if
-they are stretching the entropy, the risk is compounding errors and
-voiding any reasonable analysis of the entropy carried through the RNG.
+Hi Simo,
 
-It would also be nice to have an explanation (in the patch or at least
-the commit message) about how entropy is preserved and why a specific
-function is cryptographically adequate. Note that there is no study
-about using internal states of hash functions, it would be better to
-base these decisions on solid ground by citing relevant research or
-standards.
+Your message makes no sense to me.
+
+> Note that there is no study
+> about using internal states of hash functions, it would be better to
+
+Ignoring your probably wrong mention about "no study", we're not
+making any use of "internal states". We're using the hash function off
+the shelf without modifications. There's no whacky bespoke crypto
+going on, no use of "internal states", nothing that matches your
+description.
+
+> if the current code is mistakenly stretching the entropy, perhaps the
+> correct curse of action
+
+Except it's not. The non-underscore version calls into account(), and
+returns false when it's not sufficiently full. I'm also not sure it
+matters in the way you think it does; perhaps you could clarify what
+you mean by "mistakenly stretching the entropy" and what you think
+this enables.
+
+> they are stretching the entropy, the risk is compounding errors and
+
+Compounding errors? This doesn't make any sense.
+
+> It would also be nice to have an explanation (in the patch or at least
+> the commit message) about how entropy is preserved
+
+That iterative hashing serves as a good entropy accumulator is
+rigorously shown in the paper that the commit message references.
+
+And either way, we never reseed the crng with more than 32 bytes, so
+what's happening here is rather boring.
 
 Thanks,
-Simo.
-
-On Wed, 2022-02-02 at 13:23 +0100, Jason A. Donenfeld wrote:
-> Hi Stephan,
-> 
-> It's like this for a few reasons:
-> 
-> - Primarily, we want to feed 32 bytes back in after finalization (in
-> this case as a PRF key), just as the code does before this patch, and
-> return 32 bytes to the caller, and we don't want those to be relatable
-> to each other after the seed is erased from the stack.
-> - Actually, your statement isn't correct: _extract_entropy is called
-> for 48 bytes at ~boot time, with the extra 16 bytes affecting the
-> block and nonce positions of the chacha state. I'm not sure this is
-> very sensible to do -- it really is not adding anything -- but I'd
-> like to avoid changing multiple things at once, when these are better
-> discussed and done separately. (I have a separate patch for something
-> along those lines.)
-> - Similarly, I'd like to avoid changing the general idea of what
-> _extract_entropy does (the underscore version has never accounted for
-> entropy counts), deferring anything like that, should it become
-> necessary, to an additional patch, where again it can be discussed
-> separately.
-> - By deferring the RDRAND addition to the second phase, we avoid a
-> potential compression call while the input pool lock is held, reducing
-> our critical section.
-> - HKDF-like constructions are well studied and understood in the model
-> we're working in, so it forms a natural and somewhat boring fit for
-> doing what we want to do.
-> 
-> Regards,
-> Jason
-> 
-
--- 
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
-
+Jason
