@@ -2,25 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69291C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 07:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DBFC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Feb 2022 07:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236750AbiBBH3j (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Feb 2022 02:29:39 -0500
+        id S236798AbiBBH3k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Feb 2022 02:29:40 -0500
 Received: from helcar.hmeau.com ([216.24.177.18]:60834 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237462AbiBBH3i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Feb 2022 02:29:38 -0500
+        id S237745AbiBBH3k (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Feb 2022 02:29:40 -0500
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nF9Pl-0005rZ-0d; Wed, 02 Feb 2022 17:46:50 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Feb 2022 17:46:48 +1100
-Date:   Wed, 2 Feb 2022 17:46:48 +1100
+        id 1nF90a-0005je-4L; Wed, 02 Feb 2022 17:20:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 02 Feb 2022 17:20:48 +1100
+Date:   Wed, 2 Feb 2022 17:20:48 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Jan Beulich <jbeulich@suse.com>
 Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: api - Move cryptomgr soft dependency into algapi
-Message-ID: <Yfoo2L0vUibufXiL@gondor.apana.org.au>
+Subject: Re: your patch "crypto: api - Fix built-in testing dependency
+ failures"
+Message-ID: <YfoiwBx8WCpICKBD@gondor.apana.org.au>
 References: <83208d0b-cbe0-8ca9-195c-ee1673f08573@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -48,36 +49,9 @@ On Mon, Jan 31, 2022 at 04:30:06PM +0100, Jan Beulich wrote:
 > Can this be addressed in some way, i.e. is there a way to re-work your
 > change to remove the dependency again?
 
-Does this patch help?
+Can you send me your .config file please?
 
----8<---
-The soft dependency on cryptomgr is only needed in algapi because
-if algapi isn't present then no algorithms can be loaded.  This
-also fixes the case where api is built-in but algapi is built as
-a module as the soft dependency would otherwise get lost.
-
-Fixes: 8ab23d547f65 ("crypto: api - Add softdep on cryptomgr")
-Reported-by: Jan Beulich <jbeulich@suse.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 9f15e11f5d73..79db3e461543 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -1330,3 +1330,4 @@ module_exit(crypto_algapi_exit);
- 
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Cryptographic algorithms API");
-+MODULE_SOFTDEP("pre: cryptomgr");
-diff --git a/crypto/api.c b/crypto/api.c
-index cf0869dd130b..7ddfe946dd56 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -643,4 +643,3 @@ EXPORT_SYMBOL_GPL(crypto_req_done);
- 
- MODULE_DESCRIPTION("Cryptographic core API");
- MODULE_LICENSE("GPL");
--MODULE_SOFTDEP("pre: cryptomgr");
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
