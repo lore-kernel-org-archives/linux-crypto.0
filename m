@@ -2,166 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3426CC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Feb 2022 06:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 088EAC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Feb 2022 10:49:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242238AbiBCGpQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Feb 2022 01:45:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242665AbiBCGpQ (ORCPT
+        id S233621AbiBCKtc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Feb 2022 05:49:32 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:40092 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230016AbiBCKtb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Feb 2022 01:45:16 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50569C06173B;
-        Wed,  2 Feb 2022 22:45:15 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id me13so5303439ejb.12;
-        Wed, 02 Feb 2022 22:45:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NPWLqDuz3PhBYJuuaYmjOiGioBreRdhsii5ouL0ExTw=;
-        b=fwHd0knwgMA5NM6XgplWstxJ4RU77bIq26BXf9amkhyOFPAP1E9JTo77O/SS2V3TWP
-         2Y/I2kJHp4i3VNiFHDYtKxdwftMj1K+9rxLgAEF0vdrnuHpV4/oEcbGlQQf6D/8oP042
-         rvjwsu8FvW9g4WnvuvpqPq2u4BTwkFQrVOkYApL3s5SkRM3IPZ+jKkK5lbzJW4bydBQM
-         6pVLVGJFRjgl9Dx0G9XbVpD0zdjfZ1ukOqm0Mi4y+vJTJHVJgiZt4U4igqqKzdeQKlGP
-         oTuL4X4TYJ4adI8UNS/S5QO/NpaL9jUU5MGszhanftP9LyVoXJ0Nv1tcOheQIGj6RE5R
-         i2FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NPWLqDuz3PhBYJuuaYmjOiGioBreRdhsii5ouL0ExTw=;
-        b=nP8Q2VWU5WQGhO0Vyd0qkxgZbfYqSdPFb2YwdVg5eEHauBrbguuqDN3Jk04EZu/ZKl
-         vANtITYw1P/CToQ1I8lGM+h+rQS1cCmmw56SA0/04m0x2Quk2/n097I7UmKrU6sv+hSN
-         XVyuzlapfRsIGhZ99F0uQAGKvBoKWdnH3zZRdck8oJ9PmvvXPsR/YM4Mkf70zhgJILQp
-         7MTy0TVmgIQlTnxoyLBHUQRls/Q1smcHfiwoclm3tqmJ8d8SPOTmoKyjScm5ZfMj2TEL
-         tYdQdR8r7OCLQ05XM4IcdfBH7oLY3e7cFb7qpXehufqRxOmO2nzAL2aGWjbwq/o5GTo8
-         WxEw==
-X-Gm-Message-State: AOAM5315c+40PMr3hUZbpLrOq6QFxLNLl6rLDFESPj5JoEn/HoT8B4qg
-        jgHVkj5vqP0IyY6LJORI5/K6cV2XbGk1uB1Qslg=
-X-Google-Smtp-Source: ABdhPJwtyQCwJhSQJkPu1a1GpN+5bxqo2ihPqbJhHyk4PTyhdzQqbXqxq7t85YpYwX0+lCpGKVrdwmtPIeOpvKFDq4o=
-X-Received: by 2002:a17:907:7ba3:: with SMTP id ne35mr19546460ejc.128.1643870713812;
- Wed, 02 Feb 2022 22:45:13 -0800 (PST)
+        Thu, 3 Feb 2022 05:49:31 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 831C61F399;
+        Thu,  3 Feb 2022 10:49:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1643885369; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a6gXtaxF4sUpqNbpvqW3e+eeQ67Q3V181j1MpX5xCXw=;
+        b=HaY3A8a7CHu+p6SkQfzXFxoRVgaixyso1zTY8l10onfr+4M1WM6Keh9Ypvjdw1ey18+Cq8
+        Pz48XGKgBpP8Ki2zWHuhHY1Gy46s/PE0MAZ4LbmxhJWmPuIQIKdMYbozDUo4+Q7MCpXRpB
+        UgCTlfrM191QhW6/Am1jz3JKp4une/4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1643885369;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a6gXtaxF4sUpqNbpvqW3e+eeQ67Q3V181j1MpX5xCXw=;
+        b=4EJKGBft4bAsvWMXkRCyg9VCRvMq2sAKI0INSYlhae42A7n/QFT0juKBfObRurO+3478Iw
+        wdlekzqTUvDT8pBQ==
+Received: from kunlun.suse.cz (unknown [10.100.128.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 7AACFA3B85;
+        Thu,  3 Feb 2022 10:49:27 +0000 (UTC)
+Date:   Thu, 3 Feb 2022 11:49:26 +0100
+From:   Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        kexec@lists.infradead.org, Philipp Rudo <prudo@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
+        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Frank van der Linden <fllinden@amazon.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Baoquan He <bhe@redhat.com>,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v5 3/6] kexec_file: Don't opencode appended signature
+ verification.
+Message-ID: <20220203104926.GA3113@kunlun.suse.cz>
+References: <cover.1641900831.git.msuchanek@suse.de>
+ <7834eb187ef67cd88fc67f10e831130e3717d776.1641900831.git.msuchanek@suse.de>
+ <YfBafIXgnLzf0QMb@bombadil.infradead.org>
 MIME-Version: 1.0
-References: <20220201161342.154666-1-Jason@zx2c4.com> <Yflyfk8BbGQvN3os@kroah.com>
-In-Reply-To: <Yflyfk8BbGQvN3os@kroah.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 3 Feb 2022 14:45:00 +0800
-Message-ID: <CACXcFmkWBKCHLoqHZXk3_aVY+U8Ct8ZfOCe2T0FS0SrFSeFsjw@mail.gmail.com>
-Subject: Re: [PATCH] random: use computational hash for entropy extraction
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YfBafIXgnLzf0QMb@bombadil.infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
+Hello,
 
-> > Another aspect of the current mix_pool_bytes() function is that, while
-> > its performance was arguably competitive for the time in which it was
-> > created, it's no longer considered so. This patch improves performance
-> > significantly: ...
-...
-> From a "this looks sane by reading the code" type of review here's my:
->
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+thanks for the review.
 
-I agree, it looks sane. & worthwhile.
+On Tue, Jan 25, 2022 at 12:15:56PM -0800, Luis Chamberlain wrote:
+> On Tue, Jan 11, 2022 at 12:37:45PM +0100, Michal Suchanek wrote:
+> > diff --git a/include/linux/verification.h b/include/linux/verification.h
+> > index a655923335ae..32db9287a7b0 100644
+> > --- a/include/linux/verification.h
+> > +++ b/include/linux/verification.h
+> > @@ -60,5 +60,8 @@ extern int verify_pefile_signature(const void *pebuf, unsigned pelen,
+> >  				   enum key_being_used_for usage);
+> >  #endif
+> >  
+> > +int verify_appended_signature(const void *data, unsigned long *len,
+> > +			      struct key *trusted_keys, const char *what);
+> > +
+> 
+> Looks very non-module specific.
 
-Should we be concerned about relying too much on one piece of crypto,
-though? Blake was derived from Chacha, which we already use in the
-crng & we already use Blake in extract_buf().
+Which it is now that the same signature format is used for kernels.
 
-Also, the Blake people now have Blake3 which they say is faster.
-https://github.com/BLAKE3-team/BLAKE3
-Why are we sticking with Blake2?
+> 
+> > diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+> > index 8723ae70ea1f..30149969f21f 100644
+> > --- a/kernel/module_signing.c
+> > +++ b/kernel/module_signing.c
+> > @@ -14,32 +14,38 @@
+> >  #include <crypto/public_key.h>
+> >  #include "module-internal.h"
+> >  
+> > -/*
+> > - * Verify the signature on a module.
+> > +/**
+> > + * verify_appended_signature - Verify the signature on a module with the
+> > + * signature marker stripped.
+> > + * @data: The data to be verified
+> > + * @len: Size of @data.
+> > + * @trusted_keys: Keyring to use for verification
+> > + * @what: Informational string for log messages
+> >   */
+> > -int mod_verify_sig(const void *mod, struct load_info *info)
+> > +int verify_appended_signature(const void *data, unsigned long *len,
+> > +			      struct key *trusted_keys, const char *what)
+> >  {
+> > -	struct module_signature ms;
+> > -	size_t sig_len, modlen = info->len;
+> > +	struct module_signature *ms;
+> 
+> There goes the abstraction, so why not make this clear where we re-use
+> the struct module_signature for various things and call it as it is,
+> verify_mod_appended_signature() or some such?
 
-If overhead was the only objection to the current mixer, we
-could probably speed it up some by eliminating indirection
-as in my code below:
+It sounds like the abstraction is actually improved by callers no longer
+dealing with struct module_signature when verifying signature on a
+kernel. That is the structure is misnamed but it is now hidden behind
+an abstraction.
 
-/***********************************************************
- * main function for mixing into input pool
- *
- * modified version of
- * mix_pool_bytes(struct entropy_store *r, const void *in, int nbytes)
- * from drivers/char/random.c
- *
- * always mix to input pool
- * (as do most or all calls in current driver)
- * so struct entropy_store *r is not needed
- * my version is
- * mix_to_input(const void *in, int nbytes)
- *
- * make things constants or globals wherever possible
- * instead of struct components
-***********************************************************/
+Or am I missing something?
 
-static u32 const twist_table[8] = {
-    0x00000000, 0x3b6e20c8, 0x76dc4190, 0x4db26158,
-    0xedb88320, 0xd6d6a3e8, 0x9b64c2b0, 0xa00ae278 };
+Thanks
 
-#define tap1    104
-#define tap2     76
-#define tap3     51
-#define tap4     25
-#define tap5      1
-
-#define wordmask    (INPUT_POOL_WORDS - 1)
-
-/*
- * I see no initialisation of these in random.c
- * but initialise here anyway
- */
-static int input_rotate = 1 ;
-static int add_ptr = 3 ;
-
-static void mix_to_input(const void *in, int nbytes)
-{
-        int i ;
-        u32 w ;                    // __u32 in random.c
-        const char *bytes = in;
-        u32 *pool = input_pool.data ;
-
-        spin_lock( &input_pool.lock ) ;
-
-    i = add_ptr;
-
-    /* mix one byte at a time to simplify size handling and churn faster */
-    while (nbytes--) {
-        w = rol32(*bytes, input_rotate);
-                bytes++ ;
-
-        i = (i - 1) & wordmask;
-
-        /* XOR in the various taps */
-        w ^= pool[i];
-        w ^= pool[(i + tap1) & wordmask];
-        w ^= pool[(i + tap2) & wordmask];
-        w ^= pool[(i + tap3) & wordmask];
-        w ^= pool[(i + tap4) & wordmask];
-        w ^= pool[(i + tap5) & wordmask];
-
-        /* Mix the result back in with a twist */
-        pool[i] = (w >> 3) ^ twist_table[w & 7];
-
-        /*
-         * Normally, we add 7 bits of rotation to the pool.
-         * At the beginning of the pool, add an extra 7 bits
-         * rotation, so that successive passes spread the
-         * input bits across the pool evenly.
-         */
-        input_rotate = (input_rotate + (i ? 7 : 14)) & 31;
-    }
-    add_ptr = i;
-
-        spin_unlock( &input_pool.lock ) ;
-}
+Michal
