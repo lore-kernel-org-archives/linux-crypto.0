@@ -2,113 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D05C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Feb 2022 17:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E617BC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Feb 2022 08:46:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234676AbiBCRMB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Feb 2022 12:12:01 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:39199 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234879AbiBCRL7 (ORCPT
+        id S1357172AbiBDIqI (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Feb 2022 03:46:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52340 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243792AbiBDIqH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Feb 2022 12:11:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1643908315;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=in3ANS4p1/EJ1Vk8fAo3enQEiM4qdqkOrQ7NVZWdrM0=;
-    b=g43WW+klKEcQR1r6HM6JPA2vjUlwLzEaEEnxW/6JKB4llxJzBhans5dXOIxpgSEtAn
-    wZJFOOwTRwvty9UnrL9uTsIV54zWKO/4x21z9kk9OAictzIeZMNeT3kW9NLIUNzhCnnA
-    naRiTC0XbuMUoeJuJxoHCSE62589gRJs2QF6ImUIBqLe/Cbndn4rGu4XYGO4t3JssvZ5
-    cZQQh8oGjrosgrv61nXxlKKDfs+uDjMkIpqdW/vdwx/yzJMps4sQAeVrrHcDAxTpTnMy
-    16Wo0pMxJ6R+4GouMHQSo87JowHowitTTVIEpQnzD7I+vbUH4pZm/43s18q6TBjhRuvr
-    5K9A==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zW8BKRp5UFiyGZZ4jof7Xg=="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-    by smtp.strato.de (RZmta 47.39.0 AUTH)
-    with ESMTPSA id z28df7y13HBsGQ7
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Thu, 3 Feb 2022 18:11:54 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolai Stange <nstange@suse.de>
-Cc:     Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: Re: [PATCH v3 00/15] crypto: dh - infrastructure for NVM in-band auth and FIPS conformance
-Date:   Thu, 03 Feb 2022 18:11:53 +0100
-Message-ID: <8937519.l8FpVtv5Hg@tauon.chronox.de>
-In-Reply-To: <20220202104012.4193-1-nstange@suse.de>
-References: <20220202104012.4193-1-nstange@suse.de>
+        Fri, 4 Feb 2022 03:46:07 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BC7C061714;
+        Fri,  4 Feb 2022 00:46:07 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id B480DCE1B31;
+        Fri,  4 Feb 2022 08:46:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7DE7C004E1;
+        Fri,  4 Feb 2022 08:46:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643964364;
+        bh=MgwsHUz8xUyNw1Cn8QlvOpQEkb+oPhC2D2TUQ9ZUu9M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gs7vVk+FBgSttLm7iIFwTypf16VeMuFVKGjnYoTz+3i215Qtuzm86BHhD9Sek1PN2
+         wAwAUmjDmsMle/+DPYecxADPFmw1jGL4xN6PsnoUBOUn12Dqte5inUAQwzDafE/rtn
+         E0QgSgx8NOJeqxX8+mZdF3Xb44yG0DJbejWxFZkNIOhch3rdym4s1NsCxRI6PY43o5
+         2prJ9AAvLf4fPb7YSz4SWw9yG07XWFBLqanbpq1zyxJaFcNnDfNe6BV/CASe2dMopk
+         wvkimeHadneyF/Grg4Igwt4OCz0BUixZn6eRhdSqM9y9+7rDOxemm+pmwxbDKFBj5C
+         g9hyl5yh6sozg==
+Date:   Fri, 4 Feb 2022 00:46:01 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: Re: [PATCH] random: use computational hash for entropy extraction
+Message-ID: <YfznyWaVCz3Yl1ma@sol.localdomain>
+References: <20220201161342.154666-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220201161342.154666-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 2. Februar 2022, 11:39:57 CET schrieb Nicolai Stange:
+Hi Jason,
 
-Hi Nicolai,
+On Tue, Feb 01, 2022 at 05:13:42PM +0100, Jason A. Donenfeld wrote:
+> This commit replaces the LFSR of mix_pool_bytes() with a straight-
+> forward cryptographic hash function, BLAKE2s, which is already in use
+> for pool extraction. Universal hashing with a secret seed was considered
+> too, something along the lines of <https://eprint.iacr.org/2013/338>,
+> but the requirement for a secret seed makes for a chicken & egg problem.
+> Instead we go with a formally proven scheme using a computational hash
+> function, described in section B.1.8 of <https://eprint.iacr.org/2019/198>.
 
-> Hi all,
-> 
-> first of all, to the people primarily interested in security/keys/, there's
-> a rather trivial change to security/keys/dh.c in patch 4/15. It would be
-> great to get ACKs for that...
-> 
-> This is a complete rework of the v2 patchset to be found at [1]. Most
-> notably, the ffdheXYZ groups are now made accessible by means of templates
-> wrapping the generic dh: ffdhe2048(dh) ffdhe3072(dh), etc, rather than by
-> that fixed enum dh_group_id as before. For your reference, this change has
-> been suggested at [2].
-> 
-> Plain "dh" usage will be disallowed in FIPS mode now, which will break
-> keyctl(KEYCTL_DH_COMPUTE) functionality in FIPS mode. As per the
-> discussion from [2], this is acceptable or perhaps even desirable.
-> 
-> The only motivation to include the RFC 3526 MODP groups in the previous v2
-> had been to keep keyctl(KEYCTL_DH_COMPUTE) somewhat workable in FIPS mode.
-> These groups have been dropped accordingly now and this patchset only
-> introduces support for the RFC 7919 FFDHE groups, which is what is needed
-> by NVM in-band authentication.
-> 
-> In order to be able to restrict plain "dh" usage in FIPS mode while
-> still allowing the usage of those new ffdheXYZ(dh) instantiations, I
-> incorporated a modified version of the patch posted by Herbert at
-> [3] ("crypto: api - Disallow sha1 in FIPS-mode while allowing hmac(sha1)")
-> into this series here as [12/15] ("crypto: api - allow algs only in
-> specific constructions in FIPS mode"). There had been two changes worth
-> mentioning:
-> - An attempt to make it more generic by having crypto_grab_spawn()
->   to include FIPS_INTERNAL in the lookup and also, to let
->   crypto_register_instance() to propagate this flag from the
->   child spawns into the instance to be registered.
-> - To skip the actual self-test executions for !->fips_allowed algorithms,
->   just as before. The rationale for this can be found in the discussion to
->   [3].
-> With these changes, all breakage is to blame on me and thus, I assumed
-> authorship of this patch. I reflected the fact that this is heavily based
-> on Herbert's work by means of an Originally-by tag and sincerely hope this
-> is an appropriate way of recording the patch's history.
-> 
-> This series has been tested on x86_64 and s390x (big endian) with FIPS mode
-> both enabled and disabled each.
+What this patch does makes sense, but I'm having a hard time seeing how it maps
+to the paper cited above.  Your code seems to be treating BLAKE2s as an
+arbitrary-length PRF, but "Construction 8" in section B.1 of the paper is
+working with the raw compression function of a hash function.  Can you clarify?
 
-Using the NIST ACVP reference implementation, shared secret computation and 
-key generation was successfully tested.
+> -/*
+> - * Originally, we used a primitive polynomial of degree .poolwords
+> - * over GF(2).  The taps for various sizes are defined below.  They
+> - * were chosen to be evenly spaced except for the last tap, which is 1
+> - * to get the twisting happening as fast as possible.
+> - *
 
-Tested-by: Stephan Mueller <smueller@chronox.de>
+The "Theory of operation" comment at the top of the file needs to be updated
+too.
 
+> +static void _extract_entropy(void *buf, size_t nbytes)
+>  {
+> -	struct blake2s_state state __aligned(__alignof__(unsigned long));
+> -	u8 hash[BLAKE2S_HASH_SIZE];
+> -	unsigned long *salt;
+>  	unsigned long flags;
+> -
+> -	blake2s_init(&state, sizeof(hash));
+> -
+> -	/*
+> -	 * If we have an architectural hardware random number
+> -	 * generator, use it for BLAKE2's salt & personal fields.
+> -	 */
+> -	for (salt = (unsigned long *)&state.h[4];
+> -	     salt < (unsigned long *)&state.h[8]; ++salt) {
+> -		unsigned long v;
+> -		if (!arch_get_random_long(&v))
+> -			break;
+> -		*salt ^= v;
+> +	u8 seed[BLAKE2S_HASH_SIZE], next_key[BLAKE2S_HASH_SIZE];
+> +	struct {
+> +		unsigned long rdrand[32 / sizeof(long)];
+> +		size_t counter;
+> +	} block;
+> +	size_t i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(block.rdrand); ++i) {
+> +		if (!arch_get_random_long(&block.rdrand[i]))
+> +			block.rdrand[i] = random_get_entropy();
+>  	}
+>  
+> -	/* Generate a hash across the pool */
+>  	spin_lock_irqsave(&input_pool.lock, flags);
+> -	blake2s_update(&state, (const u8 *)input_pool_data, POOL_BYTES);
+> -	blake2s_final(&state, hash); /* final zeros out state */
+>  
+> -	/*
+> -	 * We mix the hash back into the pool to prevent backtracking
+> -	 * attacks (where the attacker knows the state of the pool
+> -	 * plus the current outputs, and attempts to find previous
+> -	 * outputs), unless the hash function can be inverted. By
+> -	 * mixing at least a hash worth of hash data back, we make
+> -	 * brute-forcing the feedback as hard as brute-forcing the
+> -	 * hash.
+> -	 */
+> -	__mix_pool_bytes(hash, sizeof(hash));
+> -	spin_unlock_irqrestore(&input_pool.lock, flags);
+> +	/* seed = HASHPRF(last_key, entropy_input) */
+> +	blake2s_final(&input_pool.hash, seed);
+>  
+> -	/* Note that EXTRACT_SIZE is half of hash size here, because above
+> -	 * we've dumped the full length back into mixer. By reducing the
+> -	 * amount that we emit, we retain a level of forward secrecy.
+> -	 */
+> -	memcpy(out, hash, EXTRACT_SIZE);
+> -	memzero_explicit(hash, sizeof(hash));
+> -}
+> +	/* next_key = HASHPRF(key, RDRAND || 0) */
 
-Ciao
-Stephan
+In the above comment, 'key' should be 'seed'.
 
+>  	while (nbytes) {
+> -		extract_buf(tmp);
+> -		i = min_t(int, nbytes, EXTRACT_SIZE);
+> -		memcpy(buf, tmp, i);
+> +		i = min_t(size_t, nbytes, BLAKE2S_HASH_SIZE);
+> +		/* output = HASHPRF(key, RDRAND || ++counter) */
 
+Likewise above.
+
+- Eric
