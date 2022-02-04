@@ -2,231 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CA1C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Feb 2022 12:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9C9C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Feb 2022 13:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237649AbiBDMqa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Feb 2022 07:46:30 -0500
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:14256 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230130AbiBDMq3 (ORCPT
+        id S1356841AbiBDNY0 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Feb 2022 08:24:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60140 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235551AbiBDNYZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Feb 2022 07:46:29 -0500
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 214BYanm017612;
-        Fri, 4 Feb 2022 04:46:16 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=p6ma0eZM7jxGSZcLR0gmGhKIQUqy3RS1CPHPviff0f0=;
- b=DIy54at4yHem3yL9kqzvefrkbFaaVZlSaxtocw6R41GA88N9NtOipJ77DoAB9/+sEFI7
- xpV9mY6yh6WUKE+Ria/k83W9b6RTZTYym47MWjmdz/51m6Jac6nVC5yZPYi3LtV4Sc+5
- kNDRKI9c+5pycM5BTHyBPSsdkRTsRo7zdEjBnLbNOhbgoHsYmotVsvHfz9SgDrBeTeRe
- nFgGiZlKukMKLM/pTp2UGt8z7UfPPzvZFLaNtY+sAlmEnGV6GiPBcDyEKJWIuZq0guOg
- 41QATX55wOFyZR0e4H4fn1zgzWRatvbg4aEfvhATQvHvA1hyXxPipKFPYPpS+8+HMW2N 2w== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3e0jvrkmd8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Fri, 04 Feb 2022 04:46:15 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 4 Feb
- 2022 04:46:13 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Fri, 4 Feb 2022 04:46:13 -0800
-Received: from cavium-ThM82.marvell.com (unknown [10.28.34.21])
-        by maili.marvell.com (Postfix) with ESMTP id 6FDFB3F706C;
-        Fri,  4 Feb 2022 04:46:11 -0800 (PST)
-From:   Harman Kalra <hkalra@marvell.com>
-To:     Arnaud Ebalard <arno@natisbad.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Srujana Challa <schalla@marvell.com>
-CC:     <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
-        <sgoutham@marvell.com>, Harman Kalra <hkalra@marvell.com>
-Subject: [PATCH] crypto: octeontx2 - add synchronization between mailbox accesses
-Date:   Fri, 4 Feb 2022 18:16:01 +0530
-Message-ID: <20220204124601.3617217-1-hkalra@marvell.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 4 Feb 2022 08:24:25 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0A1C061714;
+        Fri,  4 Feb 2022 05:24:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1560DB83705;
+        Fri,  4 Feb 2022 13:24:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7805CC340E9;
+        Fri,  4 Feb 2022 13:24:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CSA8JdcH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1643981060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=18izhwgSNhCPvyg6R5IhffaHNCE+hzAno0/hb73Eee0=;
+        b=CSA8JdcH18KNJb9DKxFgcBmsgXJ4ANNwgxcWk9ZHymdk46lnsGnOdfKE0XJ2Cr7uUJ2/uM
+        UTDmVN63zEqN3YUcAowvmnfFIKJr45EYZRF39jxaP+NPjqVwz4iYH3iYnBjTvcS4Fdqp0Q
+        S1+wwH+WYNsqaw1CYuFVtOVS5Z0iL2I=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 69ff4d38 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Feb 2022 13:24:20 +0000 (UTC)
+Received: by mail-yb1-f176.google.com with SMTP id w81so18525262ybg.12;
+        Fri, 04 Feb 2022 05:24:19 -0800 (PST)
+X-Gm-Message-State: AOAM530BwA7aH9TSkzqFW7Otzd96C0rqfjGPwUqm9QZXzQr4EeF9OG//
+        ZnL/0PqG+EzNG7RVah27lfxXmxFXUMb60CZwzyQ=
+X-Google-Smtp-Source: ABdhPJyIf87wBrPj2nnbx3qf/Yj71uWjDvePfiO222pOACGb+CApXxPfXVbzRX3d8i5ggYasfZSglR1RKR0BYd10HTQ=
+X-Received: by 2002:a05:6902:726:: with SMTP id l6mr2859746ybt.115.1643981058597;
+ Fri, 04 Feb 2022 05:24:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: yPYa0FIIqsTRYux4bUjzV1AFG5THuG4S
-X-Proofpoint-ORIG-GUID: yPYa0FIIqsTRYux4bUjzV1AFG5THuG4S
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-04_04,2022-02-03_01,2021-12-02_01
+References: <20220201161342.154666-1-Jason@zx2c4.com> <YfznyWaVCz3Yl1ma@sol.localdomain>
+In-Reply-To: <YfznyWaVCz3Yl1ma@sol.localdomain>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 4 Feb 2022 14:24:07 +0100
+X-Gmail-Original-Message-ID: <CAHmME9ppY5QY7QCXK1HapEUY9nOn3VSJgvddypmMj_CVfycPeQ@mail.gmail.com>
+Message-ID: <CAHmME9ppY5QY7QCXK1HapEUY9nOn3VSJgvddypmMj_CVfycPeQ@mail.gmail.com>
+Subject: Re: [PATCH] random: use computational hash for entropy extraction
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since there are two workqueues implemented in CPTPF driver - one
-for handling mailbox requests from VFs and another for handling FLR.
-In both cases PF driver will forward the request to AF driver by
-writing to mailbox memory. A race condition may arise if two
-simultaneous requests are written to mailbox memory. Introducing
-locking mechanism to maintain synchronization between multiple
-mailbox accesses.
+Hi Eric,
 
-Signed-off-by: Harman Kalra <hkalra@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |  1 +
- .../marvell/octeontx2/otx2_cpt_mbox_common.c  | 14 +++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptpf.h |  1 +
- .../marvell/octeontx2/otx2_cptpf_main.c       | 21 ++++++++++-------
- .../marvell/octeontx2/otx2_cptpf_mbox.c       | 23 ++++++++++++++-----
- 5 files changed, 46 insertions(+), 14 deletions(-)
+Thanks for your comments.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index fb56824cb0a6..5012b7e669f0 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -157,5 +157,6 @@ struct otx2_cptlfs_info;
- int otx2_cpt_attach_rscrs_msg(struct otx2_cptlfs_info *lfs);
- int otx2_cpt_detach_rsrcs_msg(struct otx2_cptlfs_info *lfs);
- int otx2_cpt_msix_offset_msg(struct otx2_cptlfs_info *lfs);
-+int otx2_cpt_sync_mbox_msg(struct otx2_mbox *mbox);
- 
- #endif /* __OTX2_CPT_COMMON_H */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-index 9074876d38e5..a317319696ef 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-@@ -202,3 +202,17 @@ int otx2_cpt_msix_offset_msg(struct otx2_cptlfs_info *lfs)
- 	}
- 	return ret;
- }
-+
-+int otx2_cpt_sync_mbox_msg(struct otx2_mbox *mbox)
-+{
-+	int err;
-+
-+	if (!otx2_mbox_nonempty(mbox, 0))
-+		return 0;
-+	otx2_mbox_msg_send(mbox, 0);
-+	err = otx2_mbox_wait_for_rsp(mbox, 0);
-+	if (err)
-+		return err;
-+
-+	return otx2_mbox_check_rsp_msgs(mbox, 0);
-+}
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-index 05b2d9c650e1..936174b012e8 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf.h
-@@ -46,6 +46,7 @@ struct otx2_cptpf_dev {
- 
- 	struct workqueue_struct	*flr_wq;
- 	struct cptpf_flr_work   *flr_work;
-+	struct mutex            lock;   /* serialize mailbox access */
- 
- 	unsigned long cap_flag;
- 	u8 pf_id;               /* RVU PF number */
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 1720a5bb7016..17a9dd20c8c3 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -140,6 +140,7 @@ static void cptpf_flr_wq_handler(struct work_struct *work)
- 
- 	vf = flr_work - pf->flr_work;
- 
-+	mutex_lock(&pf->lock);
- 	req = otx2_mbox_alloc_msg_rsp(mbox, 0, sizeof(*req),
- 				      sizeof(struct msg_rsp));
- 	if (!req)
-@@ -151,16 +152,19 @@ static void cptpf_flr_wq_handler(struct work_struct *work)
- 	req->pcifunc |= (vf + 1) & RVU_PFVF_FUNC_MASK;
- 
- 	otx2_cpt_send_mbox_msg(mbox, pf->pdev);
-+	if (!otx2_cpt_sync_mbox_msg(&pf->afpf_mbox)) {
- 
--	if (vf >= 64) {
--		reg = 1;
--		vf = vf - 64;
-+		if (vf >= 64) {
-+			reg = 1;
-+			vf = vf - 64;
-+		}
-+		/* Clear transaction pending register */
-+		otx2_cpt_write64(pf->reg_base, BLKADDR_RVUM, 0,
-+				 RVU_PF_VFTRPENDX(reg), BIT_ULL(vf));
-+		otx2_cpt_write64(pf->reg_base, BLKADDR_RVUM, 0,
-+				 RVU_PF_VFFLR_INT_ENA_W1SX(reg), BIT_ULL(vf));
- 	}
--	/* Clear transaction pending register */
--	otx2_cpt_write64(pf->reg_base, BLKADDR_RVUM, 0,
--			 RVU_PF_VFTRPENDX(reg), BIT_ULL(vf));
--	otx2_cpt_write64(pf->reg_base, BLKADDR_RVUM, 0,
--			 RVU_PF_VFFLR_INT_ENA_W1SX(reg), BIT_ULL(vf));
-+	mutex_unlock(&pf->lock);
- }
- 
- static irqreturn_t cptpf_vf_flr_intr(int __always_unused irq, void *arg)
-@@ -468,6 +472,7 @@ static int cptpf_afpf_mbox_init(struct otx2_cptpf_dev *cptpf)
- 		goto error;
- 
- 	INIT_WORK(&cptpf->afpf_mbox_work, otx2_cptpf_afpf_mbox_handler);
-+	mutex_init(&cptpf->lock);
- 	return 0;
- 
- error:
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index 186f1c1190c1..fee758b86d29 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -18,6 +18,7 @@ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
- 	struct mbox_msghdr *msg;
- 	int ret;
- 
-+	mutex_lock(&cptpf->lock);
- 	msg = otx2_mbox_alloc_msg(&cptpf->afpf_mbox, 0, size);
- 	if (msg == NULL)
- 		return -ENOMEM;
-@@ -29,15 +30,19 @@ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
- 	msg->sig = req->sig;
- 	msg->ver = req->ver;
- 
--	otx2_mbox_msg_send(&cptpf->afpf_mbox, 0);
--	ret = otx2_mbox_wait_for_rsp(&cptpf->afpf_mbox, 0);
-+	ret = otx2_cpt_sync_mbox_msg(&cptpf->afpf_mbox);
-+	/* Error code -EIO indicate there is a communication failure
-+	 * to the AF. Rest of the error codes indicate that AF processed
-+	 * VF messages and set the error codes in response messages
-+	 * (if any) so simply forward responses to VF.
-+	 */
- 	if (ret == -EIO) {
--		dev_err(&cptpf->pdev->dev, "RVU MBOX timeout.\n");
-+		dev_warn(&cptpf->pdev->dev,
-+			 "AF not responding to VF%d messages\n", vf->vf_id);
-+		mutex_unlock(&cptpf->lock);
- 		return ret;
--	} else if (ret) {
--		dev_err(&cptpf->pdev->dev, "RVU MBOX error: %d.\n", ret);
--		return -EFAULT;
- 	}
-+	mutex_unlock(&cptpf->lock);
- 	return 0;
- }
- 
-@@ -204,6 +209,10 @@ void otx2_cptpf_vfpf_mbox_handler(struct work_struct *work)
- 		if (err == -ENOMEM || err == -EIO)
- 			break;
- 		offset = msg->next_msgoff;
-+		/* Write barrier required for VF responses which are handled by
-+		 * PF driver and not forwarded to AF.
-+		 */
-+		smp_wmb();
- 	}
- 	/* Send mbox responses to VF */
- 	if (mdev->num_msgs)
-@@ -350,6 +359,8 @@ void otx2_cptpf_afpf_mbox_handler(struct work_struct *work)
- 			process_afpf_mbox_msg(cptpf, msg);
- 
- 		offset = msg->next_msgoff;
-+		/* Sync VF response ready to be sent */
-+		smp_wmb();
- 		mdev->msgs_acked++;
- 	}
- 	otx2_mbox_reset(afpf_mbox, 0);
--- 
-2.25.1
+On Fri, Feb 4, 2022 at 9:46 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> What this patch does makes sense, but I'm having a hard time seeing how it maps
+> to the paper cited above.  Your code seems to be treating BLAKE2s as an
+> arbitrary-length PRF, but "Construction 8" in section B.1 of the paper is
+> working with the raw compression function of a hash function.  Can you clarify?
 
+When academics say "based on Merkle-Damgard", they just mean iterative
+hashing. In this case, we have:
+
+    refresh_F(s, x) = F(s, x), where s is the hash state, and x is a new input.
+
+Every time new inputs are refreshed into it, they're compressed
+together with the prior. In other words, "what a hash function does"
+that broadly uses the Merkle-Damgard model, which BLAKE2s does. Modern
+real hash functions also have a bit of extra book keeping - things
+like finalization to prevent length extension and such - but these are
+still considered MD-based hash functions. We're not going to excavate
+the raw BLAKE2s compression function. In particular, I like that we
+don't need to do anything funky and can just use something off the
+shelf
+
+Actually, though, I should have cited sections 5.1 and 6.4 (fixed now
+for v2), which show a model of a next function for a full PRNG rather
+than just a finalize for an extractor, which might pique your
+interest, as it shows the instantiation of the new state (with F(s,
+0)).
+
+With regards to PRF vs a key-less hash function: for BLAKE2s, the
+former reduces to the latter, in the sense that keyed BLAKE2s is the
+same as ordinary BLAKE2s, except the first thing hashed in is the key
+followed by 32 zero bytes (and the IV has a single bit change for
+domain separation). We would be totally fine omitting those zeros --
+from an entropy perspective they're obviously not adding anything --
+but the fact that BLAKE2s is specified like this I think will make the
+modeling a bit cleaner and easier. Practically speaking, it doesn't
+really matter at all. About the most you could say is that we could
+probably be *less* careful and do slightly *less* hashing and still
+have a very good construction, but that I'd like to do a bit more.
+
+>
+> > -/*
+> > - * Originally, we used a primitive polynomial of degree .poolwords
+> > - * over GF(2).  The taps for various sizes are defined below.  They
+> > - * were chosen to be evenly spaced except for the last tap, which is 1
+> > - * to get the twisting happening as fast as possible.
+> > - *
+>
+> The "Theory of operation" comment at the top of the file needs to be updated
+> too.
+
+Thanks, I just got rid of that quite outdated section and other things
+that reference the old LFSR approach for v2.
+
+There are so many other issues with the documentation comments in
+random.c too, that I think I'll also work on a general documentation
+cleanup patch at some point down the road. It still documents the old
+/dev/random behavior, suggests that RDRAND is faster than ChaCha20,
+forgets about getrandom(), and so on and so forth.
+
+> In the above comment, 'key' should be 'seed'.
+> Likewise above.
+
+Caught this too right after sending. Fixed now for v2.
+
+Regards,
+Jason
