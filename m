@@ -2,82 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC119C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Feb 2022 13:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66587C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Feb 2022 13:53:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240359AbiBDNfa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Feb 2022 08:35:30 -0500
-Received: from esa.microchip.iphmx.com ([68.232.153.233]:25737 "EHLO
-        esa.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbiBDNf3 (ORCPT
+        id S241116AbiBDNxq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Feb 2022 08:53:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239939AbiBDNxq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Feb 2022 08:35:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1643981729; x=1675517729;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=IoStn4DVmu98unEojJq/9FbPgC7txAU64kKBw7DDTL0=;
-  b=Vf2C/a3Ko0SXRZcj3BEDN+y1zeCTq5K0/rGOntr/96M67czDDdaepKhU
-   /EXgwj3pRJW+dH1UKfE2vT9LzDnObn9ZNV87VZl9ab+23zvaeCHxjMUBJ
-   OjtfHZKYtZ44fGSlzzbR4ghHJ5oHtHKQ6jV5TGZgX+bGSzWCvD7jiQrp9
-   SJEz3BkrcJ1cbmY5/ItI6eC8/uBz+z1FAv5qHYABJift1gyMLHLDUSP72
-   HtbC0q1ASizYs2ymcwfb6cxrBceWiygzkaYjxFBxRw8cdX9NltLawR/Q8
-   DNG0J7D81GwEQqKo9HSHPQ/P1I6a5foR4pc2U6j62oXWZK9uVAhHd196U
-   g==;
-IronPort-SDR: bQiJFDJTWGJ+vJW5Om2VIWR+4ssi1NDmVcD6CoXPejWtOuqEzDC6AL1qOuvKg7ghwhKn+rzGbn
- Ppm5v0ZWtq/2FS5+vzvJb3dWzoRlQ1X8cNc6rhIcnatpj+63qx9kD3DSfKJjy+oRZn3dm8AC40
- DvVN8ypkB8BXiQqi6iYkAghFLBbFqZdUbbSctl71I23E/gdTFdswBBsTzpHINffIwtZPi38kh0
- 4BTz6dsekaUgBYapiImGavrrzmp3z5t+ZThLXW4PIMq2Bn8W8RB6W4KSLqINzHYl4eAYqmBsZh
- qdu1u8tMgPZVLoy7DXD3Www7
-X-IronPort-AV: E=Sophos;i="5.88,342,1635231600"; 
-   d="scan'208";a="161111958"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 04 Feb 2022 06:35:28 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Fri, 4 Feb 2022 06:35:28 -0700
-Received: from ROB-ULT-M18064N.mchp-main.com (10.10.115.15) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Fri, 4 Feb 2022 06:35:24 -0700
-From:   Tudor Ambarus <tudor.ambarus@microchip.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <nicolas.ferre@microchip.com>, <claudiu.beznea@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kavyasree.kotagiri@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: [PATCH] crypto: atmel-tdes: Add support for the TDES IP available on sama7g5 SoC
-Date:   Fri, 4 Feb 2022 15:35:22 +0200
-Message-ID: <20220204133522.498387-1-tudor.ambarus@microchip.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 4 Feb 2022 08:53:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACA10C061714;
+        Fri,  4 Feb 2022 05:53:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7A36BB83065;
+        Fri,  4 Feb 2022 13:53:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 099B0C340EF;
+        Fri,  4 Feb 2022 13:53:42 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hyWNwQeE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1643982821;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=p0jZ15a9ixlBtDx4q/qzBaarnd5vvme9cOUwD7BaOEo=;
+        b=hyWNwQeEjLIqaUpaZDBj8O2NBGV4cKMZ3cT1//DbHOzS0qEpu7kn5M1vF4Tx5ii+C9hbqz
+        dsROASHysdc7f9m8wbdxEl0OJ6qG23CSevsABEqnqqtGr4gpmFL3A7EDUMRwqXiIatB04K
+        BX9UKkPXGxEfLeKkodwQBjkB98qQaMk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e9daf5cb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Feb 2022 13:53:40 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v2 0/4] random: use computational hash for entropy extraction, and related fixes
+Date:   Fri,  4 Feb 2022 14:53:21 +0100
+Message-Id: <20220204135325.8327-1-Jason@zx2c4.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for the TDES IP found on sama7g5.
+The bulk of the motivation for this and description of crypto
+vulnerabilities is in the first patch of this series. The following two
+patches then fix up entropy accounting for the new model. The last patch
+fixes a minor code safety issue.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
----
- drivers/crypto/atmel-tdes.c | 1 +
- 1 file changed, 1 insertion(+)
+This v2 improves some documentation comments and unifies these patches
+into one patchset.
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index e30786ec9f2d..9fd7b8e439d2 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -1130,6 +1130,7 @@ static void atmel_tdes_get_cap(struct atmel_tdes_dev *dd)
- 
- 	/* keep only major version number */
- 	switch (dd->hw_version & 0xf00) {
-+	case 0x800:
- 	case 0x700:
- 		dd->caps.has_dma = 1;
- 		dd->caps.has_cfb_3keys = 1;
+Jason A. Donenfeld (4):
+  random: use computational hash for entropy extraction
+  random: simplify entropy debiting
+  random: use linear min-entropy accumulation crediting
+  random: make credit_entropy_bits() always safe
+
+ drivers/char/random.c         | 490 ++++++----------------------------
+ include/trace/events/random.h |  30 +--
+ 2 files changed, 87 insertions(+), 433 deletions(-)
+
 -- 
-2.25.1
+2.35.0
 
