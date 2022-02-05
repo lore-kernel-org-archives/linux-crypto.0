@@ -2,14 +2,14 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B590BC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F5FC433FE
 	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 08:23:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237265AbiBEIXi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S238919AbiBEIXi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 5 Feb 2022 03:23:38 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:49406 "EHLO
+Received: from isilmar-4.linta.de ([136.243.71.142]:49408 "EHLO
         isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233889AbiBEIXh (ORCPT
+        with ESMTP id S231367AbiBEIXh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 5 Feb 2022 03:23:37 -0500
 X-isilmar-external: YES
@@ -17,59 +17,90 @@ X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
+X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id B00022013AF;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 19CE0201405;
         Sat,  5 Feb 2022 08:23:34 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id D016580719; Sat,  5 Feb 2022 08:18:30 +0100 (CET)
-Date:   Sat, 5 Feb 2022 08:18:30 +0100
+        id 718F181241; Sat,  5 Feb 2022 09:23:21 +0100 (CET)
+Date:   Sat, 5 Feb 2022 09:23:21 +0100
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Theodore Ts'o <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v2 2/4] random: simplify entropy debiting
-Message-ID: <Yf4kxrXKcRLxOo+E@owl.dominikbrodowski.net>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: Re: [PATCH v2 1/4] random: use computational hash for entropy
+ extraction
+Message-ID: <Yf4z+Rc+69siZ0/N@owl.dominikbrodowski.net>
 References: <20220204135325.8327-1-Jason@zx2c4.com>
- <20220204135325.8327-3-Jason@zx2c4.com>
+ <20220204135325.8327-2-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220204135325.8327-3-Jason@zx2c4.com>
+In-Reply-To: <20220204135325.8327-2-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Fri, Feb 04, 2022 at 02:53:23PM +0100 schrieb Jason A. Donenfeld:
-> Our pool is 256 bits, and we only ever use all of it or don't use it at
-> all, which is decided by whether or not it has 128 bits in it. So we can
+Am Fri, Feb 04, 2022 at 02:53:22PM +0100 schrieb Jason A. Donenfeld:
+> The current 4096-bit LFSR used for entropy collection had a few
+> desirable attributes for the context in which it was created. For
+> example, the state was huge, which meant that /dev/random would be able
+> to output quite a bit of accumulated entropy before blocking. It was
+> also, in its time, quite fast at accumulating entropy byte-by-byte,
+> which matters given the varying contexts in which mix_pool_bytes() is
+> called. And its diffusion was relatively high, which meant that changes
+> would ripple across several words of state rather quickly.
+> 
+> However, it also suffers from a few security vulnerabilities. In
+> particular, inputs learned by an attacker can be undone, but more over,
+> if the state of the pool leaks, its contents can be controlled and
+> entirely zeroed out. I've demonstrated this attack with this SMT2
+> script, <https://xn--4db.cc/5o9xO8pb>, which Boolector/CaDiCal solves in
+> a matter of seconds on a single core of my laptop, resulting in little
+> proof of concept C demonstrators such as <https://xn--4db.cc/jCkvvIaH/c>.
+> 
+> For basically all recent formal models of RNGs, these attacks represent
+> a significant cryptographic flaw. But how does this manifest
+> practically? If an attacker has access to the system to such a degree
+> that he can learn the internal state of the RNG, arguably there are
+> other lower hanging vulnerabilities -- side-channel, infoleak, or
+> otherwise -- that might have higher priority. On the other hand, seed
+> files are frequently used on systems that have a hard time generating
+> much entropy on their own, and these seed files, being files, often leak
+> or are duplicated and distributed accidentally, or are even seeded over
+> the Internet intentionally, where their contents might be recorded or
+> tampered with. Seen this way, an otherwise quasi-implausible
+> vulnerability is a bit more practical than initially thought.
+> 
+> Another aspect of the current mix_pool_bytes() function is that, while
+> its performance was arguably competitive for the time in which it was
+> created, it's no longer considered so. This patch improves performance
+> significantly: on a high-end CPU, an i7-11850H, it improves performance
+> of mix_pool_bytes() by 225%, and on a low-end CPU, a Cortex-A7, it
+> improves performance by 103%.
+> 
+> This commit replaces the LFSR of mix_pool_bytes() with a straight-
+> forward cryptographic hash function, BLAKE2s, which is already in use
+> for pool extraction. Universal hashing with a secret seed was considered
+> too, something along the lines of <https://eprint.iacr.org/2013/338>,
+> but the requirement for a secret seed makes for a chicken & egg problem.
+> Instead we go with a formally proven scheme using a computational hash
+> function, described in sections 5.1, 6.4, and B.1.8 of
+> <https://eprint.iacr.org/2019/198>.
+> 
+> BLAKE2s outputs 256 bits, which should give us an appropriate amount of
+> min-entropy accumulation, and a wide enough margin of collision
+> resistance against active attacks. mix_pool_bytes() becomes a simple
+> call to blake2s_update(), for accumulation, while the extraction step
+> becomes a blake2s_final() to generate a seed, with which we can then do
+> a HKDF-like or BLAKE2X-like expansion, the first part of which we fold
+> back as an init key for subsequent blake2s_update()s, and the rest we
+> produce to the caller. This then is provided to our CRNG like usual. In
+> that expansion step, we make opportunistic use of 32 bytes of RDRAND
 
-	"has at least"
-
-> drastically simplify the accounting and cmpxchg loop to do exactly this.
-> While we're at it, we move the minimum bit size into a constant so it
-> can be shared between the two places where it matters.
-> 
-> The reason we want any of this is for the case in which an attacker has
-> compromised the current state, and then bruteforces small amounts of
-> entropy added to it. By demanding a particular minimum amount of entropy
-> be present before reseeding, we make that bruteforcing difficult.
-> 
-> Note that this rationale no longer includes anything about /dev/random
-> blocking at the right moment, since /dev/random no longer blocks (except
-> for at ~boot), but rather uses the crng. In a former life, /dev/random
-> was different and therefore required a more nuanced account(), but this
-> is no longer.
-> 
-> Behaviorally, nothing changes here. This is just a simplification of
-> the code.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-
-Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Why are we only using RDRAND here, and not RDSEED?
 
 Thanks,
 	Dominik
