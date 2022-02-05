@@ -2,51 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1475C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 08:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4703DC43217
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 08:23:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240494AbiBEIXj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S241301AbiBEIXj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 5 Feb 2022 03:23:39 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:49412 "EHLO
+Received: from isilmar-4.linta.de ([136.243.71.142]:49414 "EHLO
         isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237075AbiBEIXh (ORCPT
+        with ESMTP id S235206AbiBEIXh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 5 Feb 2022 03:23:37 -0500
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
+X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 6A80620139F;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 6CB1020141E;
         Sat,  5 Feb 2022 08:23:35 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id A4FC0811AC; Sat,  5 Feb 2022 08:21:09 +0100 (CET)
-Date:   Sat, 5 Feb 2022 08:21:09 +0100
+        id 4E64B81211; Sat,  5 Feb 2022 08:22:50 +0100 (CET)
+Date:   Sat, 5 Feb 2022 08:22:50 +0100
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: Re: [PATCH v2 4/4] random: make credit_entropy_bits() always safe
-Message-ID: <Yf4lZU7mAArZ6xCi@owl.dominikbrodowski.net>
-References: <20220204135325.8327-1-Jason@zx2c4.com>
- <20220204135325.8327-5-Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] random: remove use_input_pool parameter from
+ crng_reseed()
+Message-ID: <Yf4lyqaPOxGoG8/q@owl.dominikbrodowski.net>
+References: <20220204221733.39411-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220204135325.8327-5-Jason@zx2c4.com>
+In-Reply-To: <20220204221733.39411-1-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Fri, Feb 04, 2022 at 02:53:25PM +0100 schrieb Jason A. Donenfeld:
-> This is called from various hwgenerator drivers, so rather than having
-> one "safe" version for userspace and one "unsafe" version for the
-> kernel, just make everything safe; the checks are cheap and sensible to
-> have anyway.
+Am Fri, Feb 04, 2022 at 02:17:33PM -0800 schrieb Eric Biggers:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Reported-by: Sultan Alsawaf <sultan@kerneltoast.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> The primary_crng is always reseeded from the input_pool, while the NUMA
+> crngs are always reseeded from the primary_crng.  Remove the redundant
+> 'use_input_pool' parameter from crng_reseed() and just directly check
+> whether the crng is the primary_crng.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 	Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
