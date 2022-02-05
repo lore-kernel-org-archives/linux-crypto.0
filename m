@@ -2,54 +2,114 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC7EC4332F
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 04:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B613EC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 07:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379418AbiBEEel (ORCPT
+        id S1379551AbiBEHAi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Feb 2022 23:34:41 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:34050 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1379416AbiBEEek (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Feb 2022 23:34:40 -0500
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nGCmK-0002CH-S2; Sat, 05 Feb 2022 15:34:30 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Feb 2022 15:34:28 +1100
-Date:   Sat, 5 Feb 2022 15:34:28 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Corentin Labbe <clabbe@baylibre.com>,
-        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sl3516: remove redundant initializations of
- pointers in_sg and out_sg
-Message-ID: <Yf3+VF9P6TW97qOO@gondor.apana.org.au>
-References: <20220130230515.8338-1-colin.i.king@gmail.com>
+        Sat, 5 Feb 2022 02:00:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49686 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1379537AbiBEHAh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 5 Feb 2022 02:00:37 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDC6C061346;
+        Fri,  4 Feb 2022 23:00:36 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B4795B83974;
+        Sat,  5 Feb 2022 07:00:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DA3CC340EC;
+        Sat,  5 Feb 2022 07:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644044432;
+        bh=KV8QhN6XRu/XHDt8nX6cgJHkSVC1Kxqfken2oBekNfQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CAYODqXTNEsrvV8A+PZfYGiKkYPvIq2S/upi3qW1VnxAEiHhDQfDkyYREfLYYt6Ak
+         Imm6zCdstdyrbX9Ay0HLzivfW/4C4B/Mi8sJmdAKbE0fKVNrj+f8ooN+4+7v/wEyx5
+         sJilbOYUhxNVwxP2ECaUVgLfI8SE+dimjwM7eJfD2OaEZF8yyslgE5ikuPZfczSKy0
+         fqjFzwagNoBPaTkp8yzvaduoi/ys89TRnhizy51Jn1LTpAadDhHAo+SqHbPw+/KCeL
+         KXrNLxzviJ1ZiWJnTHB9JawA/l683OfIL/IHdIDPfWqQ8unTA/VEl7Q4BvisYK6Zi/
+         K+x3rUAUtmOug==
+Date:   Fri, 4 Feb 2022 23:00:30 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: Re: [PATCH v2 3/4] random: use linear min-entropy accumulation
+ crediting
+Message-ID: <Yf4gjpiGmKzZCnwi@sol.localdomain>
+References: <20220204135325.8327-1-Jason@zx2c4.com>
+ <20220204135325.8327-4-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220130230515.8338-1-colin.i.king@gmail.com>
+In-Reply-To: <20220204135325.8327-4-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jan 30, 2022 at 11:05:15PM +0000, Colin Ian King wrote:
-> Pointers in_sg and out_sg are being initialized with values that are
-> never read, they are being re-assigned the same values later on. The
-> initializations are redundant, remove them in preference to the later
-> assignments that are closer to when the pointers are being used.
-> 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/crypto/gemini/sl3516-ce-cipher.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Feb 04, 2022 at 02:53:24PM +0100, Jason A. Donenfeld wrote:
+> What if we're wrong and the above is nonsense? It's not, but let's
+> assume we don't want the actual _behavior_ of the code to change much.
+> Currently that behavior is not extracting from the input pool until it
+> has 128 bits of entropy in it. With the old algorithm, we'd hit that
+> magic 128 number after roughly 256 calls to credit_entropy_bits(1). So,
+> we can retain more or less the old behavior by waiting to extract from
+> the input pool until it hits 256 bits of entropy using the new code. For
+> people concerned about this change, it means that there's not that much
+> practical behavioral change. And for folks actually trying to model
+> the behavior rigorously, it means that we have an even higher margin
+> against attacks.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I tested this, and it actually was 205 calls prior to patch 1 in this series,
+and 267 calls after patch 1.  That's in contrast to 256 calls after this patch.
+Not a big difference, but this is going to result in ~25% more single-bit calls
+being needed compared to the old version.  It's unclear whether you're arguing
+that's basically the same, or whether you thought it was a smaller difference.
+
+> +enum {
+>  	POOL_BITS = BLAKE2S_HASH_SIZE * 8,
+> -	POOL_BITSHIFT = ilog2(POOL_BITS),
+> -	POOL_MIN_BITS = POOL_BITS / 2,
+> -
+> -	/* To allow fractional bits to be tracked, the entropy_count field is
+> -	 * denominated in units of 1/8th bits. */
+> -	POOL_ENTROPY_SHIFT = 3,
+> -#define POOL_ENTROPY_BITS() (input_pool.entropy_count >> POOL_ENTROPY_SHIFT)
+> -	POOL_FRACBITS = POOL_BITS << POOL_ENTROPY_SHIFT,
+> -	POOL_MIN_FRACBITS = POOL_MIN_BITS << POOL_ENTROPY_SHIFT
+> +	POOL_MIN_BITS = POOL_BITS /* No point in settling for less. */
+>  };
+
+Doesn't the default value of random_write_wakeup_bits need to be increased to
+this value?  Otherwise, the pool can get stuck with entropy_count greater than
+or equal to random_write_wakeup_bits (192) but less than POOL_MIN_BITS (256).
+
+In fact, the only correct value of random_write_wakeup_bits will be 256, i.e.
+the entire pool.  Perhaps it should no longer be configurable via /proc/sys?
+Note that there's also an off-by one bug that will need to be fixed:
+add_hwgenerator_randomness() checks entropy_count <= random_write_wakeup_bits
+rather than entropy_count < random_write_wakeup_bits as random_poll() does.
+
+Also: given all these considerations, perhaps the increase in POOL_MIN_BITS is
+best done in a separate patch?
+
+> +	do {
+> +		entropy_count = orig = READ_ONCE(input_pool.entropy_count);
+> +		entropy_count = min(POOL_BITS, entropy_count + nbits);
+> +	} while (cmpxchg(&input_pool.entropy_count, orig, entropy_count) != orig);
+
+This can be simplified slightly:
+
+	do {
+		orig = READ_ONCE(input_pool.entropy_count);
+		entropy_count = min(POOL_BITS, orig + nbits);
+	} while (cmpxchg(&input_pool.entropy_count, orig, entropy_count) != orig);
+
+- Eric
