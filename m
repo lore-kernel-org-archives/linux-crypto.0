@@ -2,55 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4703DC43217
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 08:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E82AC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 10:35:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241301AbiBEIXj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Feb 2022 03:23:39 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:49414 "EHLO
+        id S233088AbiBEKfM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Feb 2022 05:35:12 -0500
+Received: from isilmar-4.linta.de ([136.243.71.142]:58130 "EHLO
         isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235206AbiBEIXh (ORCPT
+        with ESMTP id S233028AbiBEKfL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Feb 2022 03:23:37 -0500
-X-isilmar-external: YES
+        Sat, 5 Feb 2022 05:35:11 -0500
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 6CB1020141E;
-        Sat,  5 Feb 2022 08:23:35 +0000 (UTC)
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 84A57200C43;
+        Sat,  5 Feb 2022 10:35:10 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 4E64B81211; Sat,  5 Feb 2022 08:22:50 +0100 (CET)
-Date:   Sat, 5 Feb 2022 08:22:50 +0100
+        id A7574811AC; Sat,  5 Feb 2022 11:35:06 +0100 (CET)
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] random: remove use_input_pool parameter from
- crng_reseed()
-Message-ID: <Yf4lyqaPOxGoG8/q@owl.dominikbrodowski.net>
-References: <20220204221733.39411-1-ebiggers@kernel.org>
+To:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 1/2] random: fix locking in crng_fast_load()
+Date:   Sat,  5 Feb 2022 11:34:57 +0100
+Message-Id: <20220205103458.133386-2-linux@dominikbrodowski.net>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220205103458.133386-1-linux@dominikbrodowski.net>
+References: <20220205103458.133386-1-linux@dominikbrodowski.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220204221733.39411-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Fri, Feb 04, 2022 at 02:17:33PM -0800 schrieb Eric Biggers:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The primary_crng is always reseeded from the input_pool, while the NUMA
-> crngs are always reseeded from the primary_crng.  Remove the redundant
-> 'use_input_pool' parameter from crng_reseed() and just directly check
-> whether the crng is the primary_crng.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+crng_init is protected by primary_crng->lock, so keep holding that lock
+when incrementing crng_init from 0 to 1 in crng_fast_load(). The call to
+pr_notice() can wait until the lock is released; this code path cannot
+be reached twice, as crng_fast_load() aborts early if crng_init > 0.
 
-	Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+---
+ drivers/char/random.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-	Dominik
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 5d7d6e01bbc4..2df08d05e850 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -653,12 +653,13 @@ static size_t crng_fast_load(const u8 *cp, size_t len)
+ 		p[crng_init_cnt % CHACHA_KEY_SIZE] ^= *cp;
+ 		cp++; crng_init_cnt++; len--; ret++;
+ 	}
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
+ 	if (crng_init_cnt >= CRNG_INIT_CNT_THRESH) {
+ 		invalidate_batched_entropy();
+ 		crng_init = 1;
+-		pr_notice("fast init done\n");
+ 	}
++	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	if (crng_init == 1)
++		pr_notice("fast init done\n");
+ 	return ret;
+ }
+ 
+-- 
+2.35.1
+
