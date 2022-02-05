@@ -2,58 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F1DC433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 18:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08053C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 21:10:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237831AbiBESAu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Feb 2022 13:00:50 -0500
-Received: from isilmar-4.linta.de ([136.243.71.142]:58540 "EHLO
-        isilmar-4.linta.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233036AbiBESAu (ORCPT
+        id S1346581AbiBEVK2 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Feb 2022 16:10:28 -0500
+Received: from [194.99.46.237] ([194.99.46.237]:50384 "EHLO
+        slot0.bluewaterleisure.com" rhost-flags-FAIL-FAIL-OK-OK)
+        by vger.kernel.org with ESMTP id S233073AbiBEVK1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Feb 2022 13:00:50 -0500
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 02D3D20135E;
-        Sat,  5 Feb 2022 18:00:47 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 2CD38802AE; Sat,  5 Feb 2022 19:00:30 +0100 (CET)
-Date:   Sat, 5 Feb 2022 19:00:30 +0100
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Eric Biggers <ebiggers@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v3 4/5] random: always wake up entropy writers after
- extraction
-Message-ID: <Yf67Ppx5yDothW6d@owl.dominikbrodowski.net>
-References: <20220205160118.252698-1-Jason@zx2c4.com>
- <20220205160118.252698-5-Jason@zx2c4.com>
+        Sat, 5 Feb 2022 16:10:27 -0500
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=dkim; d=bluewaterleisure.com;
+ h=Reply-To:From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding; i=ker.mon@bluewaterleisure.com;
+ bh=3sN8Qw0E6svXBwQV6FnSKye9Vjw=;
+ b=N96+paOqej18kBStzTZnbdvuNiT384QFu5mzYGAnCvk5j5Kq8pKXm+ixLkQAlmIj99E6vhMD5FwL
+   vl46o35LqNdGwxLFhTJoTG+UMeNzLckbRUD+DwtumzdTl7dzBK6Sl/BKvzd4u5EtKB1LtT+eKh+0
+   zsfWTHtoxtAZgXnZAFxNkNYY4fSQeA0W47/SineI6znfCiXL+pTDhozAyF5X6O+/oWKVnnEceTwr
+   1F40hgq8G3kgUtfY4eo3EBtWCBX5uBDL6anauDcxnUiRsSfuoJSNLeyR3tR4Lq1hrWxP2COvPHS8
+   tqgmG7PfEECBq/h8eP9gq7neZW1OO7rwMygF5w==
+DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=dkim; d=bluewaterleisure.com;
+ b=KKQToBAkfApGolnPAD54MKevgp2xAQnW3sYCNeQVkl+t2Lq1T6zOj0WGh5anb3pAgalZH0NNJ39c
+   sJb6qdpUokNfHM/+AoUCGJ4ku3DvLvKwh2zQZ+zMGMt8UI4L0DArVo1UW7z4Cb9g74F/a3cGsNwa
+   DQ/IxAfa3mRIVhkzu9xm7QJFxl2/XzJg7I3uRYHHjHWlhAWyh0pHa2idOIl4TFsS2DUzPxQqi+gX
+   FP4A1vStGUlx7gggT4CsEBctOZHcYOOh9IAwlX6ZVleiHtk8IjdZ1P39fKC0piY2Bu7ADSrb204B
+   Kqjbq5HpWbKJY3NudDid4llFvIPnj1HKhPOtTA==;
+Reply-To: tomander231@gmail.com
+From:   "Barrister Mustafa" <ker.mon@bluewaterleisure.com>
+To:     linux-crypto@vger.kernel.org
+Subject: Aufmerksamkeit:
+Date:   5 Feb 2022 22:04:20 +0100
+Message-ID: <20220205220420.C0FA74F99C2C713D@bluewaterleisure.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220205160118.252698-5-Jason@zx2c4.com>
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Sat, Feb 05, 2022 at 05:01:17PM +0100 schrieb Jason A. Donenfeld:
-> Now that POOL_BITS == POOL_MIN_BITS, we must unconditionally wake up
-> entropy writers after every extraction. Therefore there's no point of
-> write_wakeup_threshold, so we can move it to the dustbin of unused
-> compatibility sysctls. While we're at it, we can fix a small comparison
-> where we were waking up after <= min rather than < min.
-> 
-> Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Lieb linux-crypto,
 
-	Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Ich bin Barrister Mustafa Ayvaz, hoffe, diese E-Mail findet Sie=20
+gut. Ich bin Anwalt des verstorbenen Herrn Robert, der aufgrund=20
+des Coronavirus sein Leben verlor, kontaktierte er w=C3=A4hrend seiner=20
+Gesch=C3=A4ftsreise in China. Ich kontaktiere Sie, um mit mir=20
+zusammenzuarbeiten, um die =C3=9Cberweisung eines Fonds von vier=20
+Millionen vierhundertzwanzigtausend Dollar zu sichern, verlie=C3=9F=20
+er.
 
-Thanks,
-	Dominik
+Ich habe nach dem n=C3=A4chsten Angeh=C3=B6rigen meines verstorbenen Kunden=
+=20
+gesucht, ohne Erfolg, da ich seinen aktuellen Wohnsitz und seine=20
+Kontaktdaten nicht habe. Als ich suchte, stie=C3=9F ich auf Ihr Profil=20
+mit dem gleichen Nachnamen und am selben Ort mit den N=C3=A4chsten=20
+Angeh=C3=B6rigen. Ich beschloss, dich zu kontaktieren und dich als=20
+Bonafide Next Of Kin zu benutzen.
+
+Ich bitte Sie um Ihre Zustimmung, Sie als Next Of Kin meines=20
+verstorbenen Kunden zu pr=C3=A4sentieren, da Sie beide den gleichen=20
+Nachnamen tragen. Die Gelder werden dann an Sie als Beg=C3=BCnstigten=20
+in Ihrem Land =C3=BCberwiesen und im Verh=C3=A4ltnis 60:40 geteilt, das=20
+sind 60% f=C3=BCr mich und 40% f=C3=BCr Sie. F=C3=BCr weitere Details=20
+kontaktieren Sie mich bitte sofort f=C3=BCr weitere Informationen =C3=BCber=
+=20
+diese meine E-Mail. 
+
+Danach sende ich Ihnen die Details, wie die Transaktion beginnen=20
+wird
+
+Gr=C3=BC=C3=9Fe
+Mustafa Ayvaz
