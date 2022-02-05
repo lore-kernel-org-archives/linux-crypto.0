@@ -2,111 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04585C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 12:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D81C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 13:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347445AbiBEMyo (ORCPT
+        id S1379957AbiBENRc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Feb 2022 07:54:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233550AbiBEMyn (ORCPT
+        Sat, 5 Feb 2022 08:17:32 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:58860 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1379954AbiBENRb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Feb 2022 07:54:43 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FECCC061346;
-        Sat,  5 Feb 2022 04:54:43 -0800 (PST)
+        Sat, 5 Feb 2022 08:17:31 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E0A1260EA0;
-        Sat,  5 Feb 2022 12:54:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B26DC340E9;
-        Sat,  5 Feb 2022 12:54:41 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9BB69B808BB;
+        Sat,  5 Feb 2022 13:17:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03EF8C340EF;
+        Sat,  5 Feb 2022 13:17:28 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fBMt8MkO"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OvVBurtP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644065680;
+        t=1644067047;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lxvX5L3uebQRJi9muYLkWs3p/S74XVkjHw+TQ02IQhw=;
-        b=fBMt8MkOHV/jBUbCy/ueudSB8Ohyyam/Ko7yhXfaTainCcfkpRyVXZXFC08Pqz/kUHqrBB
-        QLMg9nSy+m50BmrEaZsTDNIkg3RjAPxymlUvmOUDmGZHLgs36kY92ouKoKnI7ezTtcX+Zf
-        QxKN1ji4qWDwwC+47wU8QNZV8NrSiZ4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d28bcb66 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 5 Feb 2022 12:54:39 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id j2so26928319ybu.0;
-        Sat, 05 Feb 2022 04:54:39 -0800 (PST)
-X-Gm-Message-State: AOAM532/FoO4AL2Fz/MhuJrM1MdTCU+J0cxnKqriL+TkvqS2Vm127gIj
-        Ie7P5NV+3p2aHYXkmM61t+uuxqmnSTVkm7/+gjI=
-X-Google-Smtp-Source: ABdhPJwTA9fjpQmFTocuh8IkN+PZ+iAsyDSS3URHhGpue9nve73s5FofncBIcOIW674PjgmQAlvUSDkxq+R1PW/jwIc=
-X-Received: by 2002:a81:c40d:: with SMTP id j13mr928525ywi.499.1644065678239;
- Sat, 05 Feb 2022 04:54:38 -0800 (PST)
+        bh=vxOIS5kX5iDZVwGwgniinnXsxnK0a00u8oGEMpWVZK4=;
+        b=OvVBurtP0SjIsrQfCUdgLq8Oq5xWiSFrGIo7g4MBJ38YhoFf3NgNxqHUkgLl+aP6zct+oe
+        3FnBU4sfK3OIYSHut3JyzzVsee8ZDJLEZQKJAliKkDIp3bUB+qUIYfK5Z112wfvUGeP5Nf
+        n8FfI/IwAOZ1fm3odvTSgT4M6OfFb6A=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 138ddda6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 5 Feb 2022 13:17:27 +0000 (UTC)
+Received: by mail-yb1-f180.google.com with SMTP id v47so1873358ybi.4;
+        Sat, 05 Feb 2022 05:17:26 -0800 (PST)
+X-Gm-Message-State: AOAM533A1XHqw6X92Oungt/Opd3nJqv+6efEzB8xOG6U25ugx7EnuPJD
+        Iavzvej0Nqo+x5x+059cQ40sQNJDFgMMKh5Fmns=
+X-Google-Smtp-Source: ABdhPJxLE2UUZ+xJLEuCI+8R/QFuVT/T9l9JXO4lk42BPaYTq8udZQS2ipCphutbg+yPLaB9gcV4eMcSFFdsn13Iuv0=
+X-Received: by 2002:a25:ba49:: with SMTP id z9mr3403522ybj.32.1644067045981;
+ Sat, 05 Feb 2022 05:17:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20220204135325.8327-1-Jason@zx2c4.com> <20220204135325.8327-4-Jason@zx2c4.com>
- <Yf4gjpiGmKzZCnwi@sol.localdomain>
-In-Reply-To: <Yf4gjpiGmKzZCnwi@sol.localdomain>
+References: <20220205103458.133386-1-linux@dominikbrodowski.net> <20220205103458.133386-2-linux@dominikbrodowski.net>
+In-Reply-To: <20220205103458.133386-2-linux@dominikbrodowski.net>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 5 Feb 2022 13:54:27 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pT9e_3yEoKZvTG8atc3MNtmeXVLqkP-4NmKO7XVPL7Zg@mail.gmail.com>
-Message-ID: <CAHmME9pT9e_3yEoKZvTG8atc3MNtmeXVLqkP-4NmKO7XVPL7Zg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] random: use linear min-entropy accumulation crediting
-To:     Eric Biggers <ebiggers@kernel.org>
+Date:   Sat, 5 Feb 2022 14:17:15 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rsDkn=qRacYbZFjni5FF6G2dn+KOELr-agPhmH7ved0g@mail.gmail.com>
+Message-ID: <CAHmME9rsDkn=qRacYbZFjni5FF6G2dn+KOELr-agPhmH7ved0g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] random: fix locking in crng_fast_load()
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+        "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+Hi Dominik,
 
-On Sat, Feb 5, 2022 at 8:00 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> I tested this, and it actually was 205 calls prior to patch 1 in this series,
-> and 267 calls after patch 1.  That's in contrast to 256 calls after this patch.
-> Not a big difference, but this is going to result in ~25% more single-bit calls
-> being needed compared to the old version.  It's unclear whether you're arguing
-> that's basically the same, or whether you thought it was a smaller difference.
+Does this introduce a lock nesting inversion situation?
 
-My argument is that we're not _decreasing_ the security in any
-substantive way with this change.
+With your patch, crng_fast_load() now does:
 
-> Doesn't the default value of random_write_wakeup_bits need to be increased to
-> this value?  Otherwise, the pool can get stuck with entropy_count greater than
-> or equal to random_write_wakeup_bits (192) but less than POOL_MIN_BITS (256).
+    lock(primary_crng)
+    invalidate_batched_entropy()
+        lock(batch_lock)
+        unlock(batch_lock)
+    unlock(primary_crng)
 
-Good catch, thanks.
+While get_random_{u32,u64}() does:
 
-> In fact, the only correct value of random_write_wakeup_bits will be 256, i.e.
-> the entire pool.  Perhaps it should no longer be configurable via /proc/sys?
+    lock(batch_lock)
+    extract_crng()
+       lock(primary_crng)
+       unlock(primary_crng)
+    unlock(batch_lock)
 
-I think so, yea. I'll change up in an add-on commit.
+Is this correct? If so, we might have to defer this patch until after
+<https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/commit/?id=2dfab1b1>
+or something like it lands, which attempts to get rid of the batched
+entropy lock.
 
-> Note that there's also an off-by one bug that will need to be fixed:
-> add_hwgenerator_randomness() checks entropy_count <= random_write_wakeup_bits
-> rather than entropy_count < random_write_wakeup_bits as random_poll() does.
-
-Thanks.
-
-> > +     do {
-> > +             entropy_count = orig = READ_ONCE(input_pool.entropy_count);
-> > +             entropy_count = min(POOL_BITS, entropy_count + nbits);
-> > +     } while (cmpxchg(&input_pool.entropy_count, orig, entropy_count) != orig);
->
-> This can be simplified slightly:
->
->         do {
->                 orig = READ_ONCE(input_pool.entropy_count);
->                 entropy_count = min(POOL_BITS, orig + nbits);
->         } while (cmpxchg(&input_pool.entropy_count, orig, entropy_count) != orig);
-
-That looks nicer indeed. Will do.
-
-Thanks for your comments.
+If that analysis seems right to you, I could pull this patch into that
+development branch for poking and prodding.
 
 Jason
