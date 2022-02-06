@@ -2,71 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8C8C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Feb 2022 22:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99897C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Feb 2022 16:08:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbiBEWi1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Feb 2022 17:38:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42508 "EHLO
+        id S236254AbiBFQIa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 6 Feb 2022 11:08:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380757AbiBEWi0 (ORCPT
+        with ESMTP id S231915AbiBFQIa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Feb 2022 17:38:26 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B18D0C061355;
-        Sat,  5 Feb 2022 14:38:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 62E30B80D43;
-        Sat,  5 Feb 2022 22:38:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39BBC36AE2;
-        Sat,  5 Feb 2022 22:38:22 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i5LLWrqO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644100700;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bzY8Nwc/+2V+ULsyIZcCyprC3FbpDgujoAEhHHckf3Q=;
-        b=i5LLWrqOpjPfQ1upFuLJqnqL8jZw+8/aUlLu+/XQJvW8SgDXG4QJqoaIVqD+oWqFw/r1O7
-        tuO976KSR8bucDHfpQDXpRxnrBq2OK7L8uLbIECag2yvzPiYjVU35xfi6ngRD6u/mb9D0L
-        w81CQgxboB92V4AOBuSK0SwLB0HVoPM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f17e16fc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 5 Feb 2022 22:38:19 +0000 (UTC)
-Received: by mail-yb1-f182.google.com with SMTP id g14so29485667ybs.8;
-        Sat, 05 Feb 2022 14:38:19 -0800 (PST)
-X-Gm-Message-State: AOAM531ZM5yefPWvVq6IfCqZelq/HZTYX/2LqjhxOO6b0UjlboJK1jh9
-        HOSzQFZJvjhDQ5ixkC0FQvjZGsBiQHGX4CeK+1c=
-X-Google-Smtp-Source: ABdhPJzAsbjDxImKWzG3dS8Yzfuhard6qYC9z+kyENMCiea3oS6nifoP1lHARrTw6CWVsXuhTJ7svZUS1KhXouTqdBI=
-X-Received: by 2002:a25:5c3:: with SMTP id 186mr90138ybf.255.1644100698170;
- Sat, 05 Feb 2022 14:38:18 -0800 (PST)
+        Sun, 6 Feb 2022 11:08:30 -0500
+X-Greylist: delayed 178 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Feb 2022 08:08:28 PST
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1476C06173B
+        for <linux-crypto@vger.kernel.org>; Sun,  6 Feb 2022 08:08:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1644163343;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=ajoLvXOqNUsQDqmDZKsWT4JQr84dpEvj/4vqEVhVNZQ=;
+    b=FFwpIsca12VqssxpQD5wcww02Xywkw82X+hgU1cY+IvKW9QgfDtvD0UJqYUN7RoD0s
+    Db5vozmgtt9diDru2HA4LqUdCGDTbtElqKxR+mT4pWlsiPULAcAl+vRrbJPf3Y7AN3Re
+    UYAFfLgNpQp0rALhgaqq352iUYMhCo5ZV+S6Vr4EsmAKxptfKFuW9RAjPZyHlhp78fUl
+    qB6HoBigNqCyhdYdgmyv4x72Slvy7nOJo+KDCebYMO+C/WBUj4ZhGQ5JhmlghCGy+XxQ
+    0g5Xvg2jNrVrXr6Y3gdMSTxaILHioKilwd1LE2ctFprQ/sqCgl5Us64glgKYhzYLbH5p
+    oFbA==
+Authentication-Results: strato.com;
+    dkim=none
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXvcOeibdLc="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+    by smtp.strato.de (RZmta 47.39.0 DYNA|AUTH)
+    with ESMTPSA id z28df7y16G2MNjO
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+    Sun, 6 Feb 2022 17:02:22 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, simo@redhat.com,
+        Nicolai Stange <nstange@suse.de>
+Subject: Re: [PATCH 0/7] Common entropy source and DRNG management
+Date:   Sun, 06 Feb 2022 17:02:21 +0100
+Message-ID: <2092435.IRzVExRRsL@tauon.chronox.de>
+In-Reply-To: <Yf30GEJi/61RNq8A@gondor.apana.org.au>
+References: <2486550.t9SDvczpPo@positron.chronox.de> <YfQ7FDJqb2zhVcfp@sol.localdomain> <Yf30GEJi/61RNq8A@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <20220205160118.252698-1-Jason@zx2c4.com> <20220205160118.252698-5-Jason@zx2c4.com>
-In-Reply-To: <20220205160118.252698-5-Jason@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 5 Feb 2022 23:38:07 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rNtcZfj5CmRarX3-MKBYVG0tTzu80Jmm=2peWp0zy2UA@mail.gmail.com>
-Message-ID: <CAHmME9rNtcZfj5CmRarX3-MKBYVG0tTzu80Jmm=2peWp0zy2UA@mail.gmail.com>
-Subject: Re: [PATCH v3 4/5] random: always wake up entropy writers after extraction
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A small correction in this:
+Am Samstag, 5. Februar 2022, 04:50:48 CET schrieb Herbert Xu:
 
-On Sat, Feb 5, 2022 at 5:02 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> -               .mode           = 0644,
-> +               .mode           = 0444,
+Hi Herbert,
 
-We actually need to keep this at 644, so as not to break things that
-rely on it. It will still do nothing, which is the same choice made
-with "urandom_min_reseed_secs" - it's there but doesn't control
-anything. So the above snippet is gone.
+> On Fri, Jan 28, 2022 at 10:51:00AM -0800, Eric Biggers wrote:
+> > > The extraction of the entropy source and DRNG management into its own
+> > > component separates out the security sensitive implementation currently
+> > > found in multiple locations following the strategy found in the crypto
+> > > API where each moving part is separated and encapsulated.
+> > > 
+> > > The current implementation of the ESDM allows an easy addition of new
+> > > entropy sources which are properly encapsulated in self-contained code
+> > > allowing self- contained entropy analyses to be performed for each.
+> > > These entropy sources would provide their seed data completely separate
+> > > from other entropy sources to the DRNG preventing any mutual
+> > > entanglement and thus challenges in the entropy assessment. I have
+> > > additional entropy sources already available that I would like to
+> > > contribute at a later stage. These entropy sources can be enabled,
+> > > disabled or its entropy rate set as needed by vendors depending on
+> > > their entropy source analysis. Proper default values would be used for
+> > > the common case where a vendor does not want to perform its own
+> > > analysis or a distro which want to provide a common kernel binary for
+> > > many users.> 
+> > What is the actual point of this?  The NIST DRBGs are already seeded from
+> > random.c, which is sufficient by itself but doesn't play well with
+> > certifications, and from Jitterentropy which the certification side is
+> > happy with.  And the NIST DRBGs are only present for certification
+> > purposes anyway; all real users use random.c instead.  So what problem
+> > still needs to be solved?
+> Indeed.  Stephan, could you please explain exactly what additional
+> seeding sources are needed over the current jitter+/dev/random sources
+> (and why).  Or even better, add those seeding sources that we must have
+> in your patch series so that they can be evaluated together.
+> 
+> As it stands this patch series seems to be adding a lot of code without
+> any uses.
+
+Thank you for the clarification. I will provide that information.
+> 
+> Thanks,
+
+
+Ciao
+Stephan
+
+
