@@ -2,90 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F91C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 13:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC79C41535
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 14:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358867AbiBGNAC (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Feb 2022 08:00:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54696 "EHLO
+        id S234894AbiBGOsv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Feb 2022 09:48:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388333AbiBGLnd (ORCPT
+        with ESMTP id S1392210AbiBGOYb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Feb 2022 06:43:33 -0500
-Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1427C043181;
-        Mon,  7 Feb 2022 03:43:31 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0V3r3syy_1644234208;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V3r3syy_1644234208)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 07 Feb 2022 19:43:28 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Eric Biggers <ebiggers@google.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "Gilad Ben-Yossef" <gilad@benyossef.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH] KEYS: asymmetric: enforce SM2 signature use pkey algo
-Date:   Mon,  7 Feb 2022 19:43:27 +0800
-Message-Id: <20220207114327.7929-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220201003414.55380-1-ebiggers@kernel.org>
-References: <20220201003414.55380-1-ebiggers@kernel.org>
+        Mon, 7 Feb 2022 09:24:31 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE0BC0401C2;
+        Mon,  7 Feb 2022 06:24:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B3C17B8136F;
+        Mon,  7 Feb 2022 14:24:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5159CC340F2;
+        Mon,  7 Feb 2022 14:24:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EJptf/Rh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644243865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Sat8E1tiLvvQuV2M3dRQ4694vndy92NxnxVuIgUTXSc=;
+        b=EJptf/RhjGMCdfLndkTh9BWEo1yaVHQLl1dbMCOOrXfx3iHwPorpgBFQ9oiHhtRf9wQw7Z
+        XLj+Nk2l0fsdTK6ybx1+pnzksfgnkNO37yWTdB/pfY0/jngXKOgrghme08PCmw22+L5nF4
+        ixQhsy5m5zEhNl7MSwTMd6EHnaejtRM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f3059567 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 7 Feb 2022 14:24:24 +0000 (UTC)
+Received: by mail-yb1-f176.google.com with SMTP id c6so40468845ybk.3;
+        Mon, 07 Feb 2022 06:24:24 -0800 (PST)
+X-Gm-Message-State: AOAM5326qtY9y41DMqlHX/wquVfTbxTF3opwO6t2OqjFjrq1s4VeX6p5
+        GIaxVHNx8EuqDIISRapI5xitD5hdlFdgv5y8tG0=
+X-Google-Smtp-Source: ABdhPJxAjn/rrKuByy78SS8kJGQwbNV9PXyg238aFeegpeUk+TR0DXSdKE+I6jzCEEx8VFLKmMWCbH7vhOMa2/KS16U=
+X-Received: by 2002:a81:c646:: with SMTP id q6mr5732607ywj.485.1644243863259;
+ Mon, 07 Feb 2022 06:24:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220204135325.8327-1-Jason@zx2c4.com> <20220204135325.8327-2-Jason@zx2c4.com>
+ <Yf4z+Rc+69siZ0/N@owl.dominikbrodowski.net> <CAHmME9pTDCUb7pAMeCMnU=jiAQd=ctrWN4K7s=8DqCtiOqbkrg@mail.gmail.com>
+ <CAHmME9q-hfSRegD0azEX0Z+5uNGCyS3N4VhMPqp206zP+WjZtg@mail.gmail.com>
+In-Reply-To: <CAHmME9q-hfSRegD0azEX0Z+5uNGCyS3N4VhMPqp206zP+WjZtg@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 7 Feb 2022 15:24:11 +0100
+X-Gmail-Original-Message-ID: <CAHmME9po1ybEsM6G7=2o73cVV5ESdrwcNO6QW+CdOSmorbQq_Q@mail.gmail.com>
+Message-ID: <CAHmME9po1ybEsM6G7=2o73cVV5ESdrwcNO6QW+CdOSmorbQq_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] random: use computational hash for entropy extraction
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The signature verification of SM2 needs to add the Za value and
-recalculate sig->digest, which requires the detection of the pkey_algo
-in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
-field in sig is attacker-controlled and should be use pkey->pkey_algo
-instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
-will also cause signature verification failure.
+Hey Dominik,
 
-The software_key_determine_akcipher() already forces the algorithms
-are matched, so the SM3 algorithm is enforced in the SM2 signature,
-although this has been checked, we still avoid using any algorithm
-information in the signature as input.
+I just noticed that we use RDSEED in crng_reseed(). I would think we
+could remove that and stick to having RDSEED used in extract entropy
+as you suggested. I'm now pretty sure the older decision boiled down
+to the 10 bytes vs 5 minutes thing, as discussed before. So please
+feel free to send a patch doing just this.
 
-Reported-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
- crypto/asymmetric_keys/public_key.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index a603ee8afdb8..ea9a5501f87e 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
- 	if (ret)
- 		return ret;
- 
--	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
-+	/* SM2 signatures always use the SM3 hash algorithm */
-+	tfm = crypto_alloc_shash("sm3", 0, 0);
- 	if (IS_ERR(tfm))
- 		return PTR_ERR(tfm);
- 
-@@ -414,8 +415,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (ret)
- 		goto error_free_key;
- 
--	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
--	    sig->data_size) {
-+	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
- 		ret = cert_sig_digest_update(sig, tfm);
- 		if (ret)
- 			goto error_free_key;
--- 
-2.34.1
-
+Jason
