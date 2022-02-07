@@ -2,73 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC79C41535
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 14:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 024B9C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 16:08:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234894AbiBGOsv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Feb 2022 09:48:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        id S231192AbiBGQGj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Feb 2022 11:06:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1392210AbiBGOYb (ORCPT
+        with ESMTP id S1391852AbiBGQEN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Feb 2022 09:24:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE0BC0401C2;
-        Mon,  7 Feb 2022 06:24:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 7 Feb 2022 11:04:13 -0500
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584DAC0401DB
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 08:04:08 -0800 (PST)
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B3C17B8136F;
-        Mon,  7 Feb 2022 14:24:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5159CC340F2;
-        Mon,  7 Feb 2022 14:24:28 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EJptf/Rh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644243865;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sat8E1tiLvvQuV2M3dRQ4694vndy92NxnxVuIgUTXSc=;
-        b=EJptf/RhjGMCdfLndkTh9BWEo1yaVHQLl1dbMCOOrXfx3iHwPorpgBFQ9oiHhtRf9wQw7Z
-        XLj+Nk2l0fsdTK6ybx1+pnzksfgnkNO37yWTdB/pfY0/jngXKOgrghme08PCmw22+L5nF4
-        ixQhsy5m5zEhNl7MSwTMd6EHnaejtRM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f3059567 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 7 Feb 2022 14:24:24 +0000 (UTC)
-Received: by mail-yb1-f176.google.com with SMTP id c6so40468845ybk.3;
-        Mon, 07 Feb 2022 06:24:24 -0800 (PST)
-X-Gm-Message-State: AOAM5326qtY9y41DMqlHX/wquVfTbxTF3opwO6t2OqjFjrq1s4VeX6p5
-        GIaxVHNx8EuqDIISRapI5xitD5hdlFdgv5y8tG0=
-X-Google-Smtp-Source: ABdhPJxAjn/rrKuByy78SS8kJGQwbNV9PXyg238aFeegpeUk+TR0DXSdKE+I6jzCEEx8VFLKmMWCbH7vhOMa2/KS16U=
-X-Received: by 2002:a81:c646:: with SMTP id q6mr5732607ywj.485.1644243863259;
- Mon, 07 Feb 2022 06:24:23 -0800 (PST)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 187F63F203
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 16:04:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1644249847;
+        bh=wWFN/kYmy9qogqxR7Mh7jeBKCVIaVeKo6j328DRFO5U=;
+        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+         In-Reply-To:Content-Type;
+        b=rhTkA/xBwPaz9wH/5KTJdDAmdUSp8XMvNoMNzIL62XYoWeINEtHNTjLNdfqr5jEpP
+         Pls4VsjFLC0iIG44HcwfegBgvioj5DM02xAxMiWMujTU6TYsM40N4FO9retiDd4Ba4
+         PqYwXYAmojvTGo8AatZMPKNqjmPjeQa96RraNJ11ppEXrOLe0m8Hb1Ei/q6fsO5os1
+         NQTBhUb5dX/Fy6D8xliAjPNSGRBOAGfSXRFhIAEkO2Va/K68KIMt7amNpSUoVcJLY6
+         229eBiZRkc4LqEVJT5wW2DGY6y9hj19ossY87yylGeRhst1dnrLbq8oxDLp3ED3cQN
+         D6vuMm/Nie2KQ==
+Received: by mail-ej1-f69.google.com with SMTP id la22-20020a170907781600b006a7884de505so4500613ejc.7
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Feb 2022 08:04:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=wWFN/kYmy9qogqxR7Mh7jeBKCVIaVeKo6j328DRFO5U=;
+        b=qJHdNNFQ+ADs1ExDaWTAZGAr0SpYlUSKrKhhw8ulVhDUAbIR4OrzM6j7L53jzw7k8g
+         v+7HIBw1p2XwLZj8r0/UfEwIO8Oaov44Mo7tJn8ZBdEOqSSkkqG11ze063Q/bfPVqIP4
+         fOkqajoffzRENjOt6FYz0P7PNtSz2+OGmFDPOoD7+/glUl20JVfI2ODZ9BjevW/nP6d5
+         cT60oD6AIIDIPjRNhd2QUWz/JZ0X9/O293xAxzuSdIm6F53oJD64VwE9omwJP/NHzH4R
+         YAO6U4uYWlHTo7ZEr2Fa/7r+dMHJq7juo+7xOx07S+XGATt7BS6TmTZkJ5l7tuASNfI6
+         +KrQ==
+X-Gm-Message-State: AOAM5337h0B3ACCQLeJUwbe1EUV1PxG1ZQEYM5Q7ym3NoY0ydfGH79rB
+        vGXi7tWyijXgJYa/EPCpx7knQMtnTS2WThPx4flJyrrHrg3JESIxzYAwwp/+Y9dw+Gc60ACR8+v
+        HA6FKk/R920ie5wvXOftO8eKIITmYQbRlyjQvLOg8oQ==
+X-Received: by 2002:a17:907:7b85:: with SMTP id ne5mr329324ejc.572.1644249846680;
+        Mon, 07 Feb 2022 08:04:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzBm6rX0lrrq+gqVsXaiIiWLV1F3mitDpLqrcgHMbY6Jqelej9PiIrbQrRZpHU2vQlcmagUOw==
+X-Received: by 2002:a17:907:7b85:: with SMTP id ne5mr329281ejc.572.1644249846145;
+        Mon, 07 Feb 2022 08:04:06 -0800 (PST)
+Received: from [192.168.0.90] (xdsl-188-155-168-84.adslplus.ch. [188.155.168.84])
+        by smtp.gmail.com with ESMTPSA id i1sm1602107ejv.183.2022.02.07.08.04.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Feb 2022 08:04:05 -0800 (PST)
+Message-ID: <c7e160b0-16fb-79ca-c291-05571bbe8341@canonical.com>
+Date:   Mon, 7 Feb 2022 17:04:04 +0100
 MIME-Version: 1.0
-References: <20220204135325.8327-1-Jason@zx2c4.com> <20220204135325.8327-2-Jason@zx2c4.com>
- <Yf4z+Rc+69siZ0/N@owl.dominikbrodowski.net> <CAHmME9pTDCUb7pAMeCMnU=jiAQd=ctrWN4K7s=8DqCtiOqbkrg@mail.gmail.com>
- <CAHmME9q-hfSRegD0azEX0Z+5uNGCyS3N4VhMPqp206zP+WjZtg@mail.gmail.com>
-In-Reply-To: <CAHmME9q-hfSRegD0azEX0Z+5uNGCyS3N4VhMPqp206zP+WjZtg@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 7 Feb 2022 15:24:11 +0100
-X-Gmail-Original-Message-ID: <CAHmME9po1ybEsM6G7=2o73cVV5ESdrwcNO6QW+CdOSmorbQq_Q@mail.gmail.com>
-Message-ID: <CAHmME9po1ybEsM6G7=2o73cVV5ESdrwcNO6QW+CdOSmorbQq_Q@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] random: use computational hash for entropy extraction
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 2/3] dt-bindings: crypto: Convert Atmel TDES to yaml
+Content-Language: en-US
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>,
+        herbert@gondor.apana.org.au, robh+dt@kernel.org
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        claudiu.beznea@microchip.com, alexandre.belloni@bootlin.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20220207032405.70733-1-tudor.ambarus@microchip.com>
+ <20220207032405.70733-3-tudor.ambarus@microchip.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+In-Reply-To: <20220207032405.70733-3-tudor.ambarus@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Dominik,
+On 07/02/2022 04:24, Tudor Ambarus wrote:
+> Convert Atmel TDES documentation to yaml format. With the conversion the
+> clock and clock-names properties are made mandatory. The driver returns
+> -EINVAL if "tdes_clk" is not found, reflect that in the bindings and make
+> the clock and clock-names properties mandatory. Update the example to
+> better describe how one should define the dt node.
+> 
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+> ---
+>  .../bindings/crypto/atmel,tdes.yaml           | 63 +++++++++++++++++++
+>  .../bindings/crypto/atmel-crypto.txt          | 23 -------
+>  2 files changed, 63 insertions(+), 23 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml b/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
+> new file mode 100644
+> index 000000000000..7efa5e4acaa1
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
+> @@ -0,0 +1,63 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/atmel,tdes.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Atmel Triple Data Encryption Standard (TDES) HW cryptographic accelerator
+> +
+> +maintainers:
+> +  - Tudor Ambarus <tudor.ambarus@microchip.com>
+> +
+> +properties:
+> +  compatible:
+> +    const: atmel,at91sam9g46-tdes
+> +
 
-I just noticed that we use RDSEED in crng_reseed(). I would think we
-could remove that and stick to having RDSEED used in extract entropy
-as you suggested. I'm now pretty sure the older decision boiled down
-to the 10 bytes vs 5 minutes thing, as discussed before. So please
-feel free to send a patch doing just this.
+Same comments as for patch 1 plus one new (also applying to previous
+one). You named the file quite generic "atmel,tdes" or "atmel,aes", but
+what if something newer comes for at91? Maybe name it instead
+"atmel,at91sam9-aes"?
 
-Jason
+
+Best regards,
+Krzysztof
