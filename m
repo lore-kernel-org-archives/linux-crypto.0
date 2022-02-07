@@ -2,49 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C41C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD000C43219
 	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 06:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233475AbiBGGC2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Feb 2022 01:02:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60004 "EHLO
+        id S232199AbiBGGC3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Feb 2022 01:02:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243620AbiBGDZQ (ORCPT
+        with ESMTP id S1350177AbiBGDZW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Feb 2022 22:25:16 -0500
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Feb 2022 19:25:13 PST
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8992BC061A73;
-        Sun,  6 Feb 2022 19:25:13 -0800 (PST)
+        Sun, 6 Feb 2022 22:25:22 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0509DC061A73;
+        Sun,  6 Feb 2022 19:25:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1644204313; x=1675740313;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GreEbN9bxCgqwDOJq88wEmj1GZLM/Ik6W+xfBQPRD0Y=;
-  b=j99kwDuJo2eom7bdaUJzHgTqxG7zfvLrahitlArtSiP4DoXKsvVQkCO3
-   3uFTIoTOSu3kxbA/KcDMsHOdikCh0lBA8OivwM9hgZqTBGQ2u5uI0YL+M
-   KouFAKqFXONAg740kHbRrSbkC0LiM4Y9QBdABrTAh+HGcGp4Ii+meGzM0
-   WOD0lCbIbn7eEOoR3C2eGJA+lPZFZDspHPWaa9bQEzGu+1vDvOlB/Psv2
-   Xf6OTrsLHq/nf+ewqjNmxqmyqZWlpHbQTKmH4nSIGTkvTWXbGtk0Fk8bm
-   lFJZ9CsPrtqwMwL79XxhRD2dmb9u4LCWDOhcESuGFFDe6X5Mb9PETq0vV
-   w==;
-IronPort-SDR: UFH1WsWImFsqwwLj1WuLG3LnumHPkLeqP1aAbx3l2Q+vT74Qb28uaamQIJTD7yn17w+FAzwzZG
- wixrkeYuu+lgURWUXCvL3rk8GUGjFEuaYHHBrOE5Xc9U58XNJ0shF5+baU7fyPJaBJx/ZQL4nP
- ORZis4eYaXpt5QRQuOsm3yB43AhiI61o6HqIDYnCrcPBah1C8Sx/NV6qCVfDhqqwbZgpj+oTTI
- akDcqPA5lrP3gXVEJVjFlfYGO4VNt7wWxx1A4SGlyZZX7wM5zaRVaSVRxae7ngKjt2mL4AL8uo
- 3jrMHGKLdUEoklfLrOOKe9Ph
+  t=1644204322; x=1675740322;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6WoxkUkguy8rx/vdMwuFD/M1zus/du+BiEWUk2id+LM=;
+  b=PYpvX7GSAelpIBSQ1JVOL412h/zkyijpHVO/YV2qcRZhwkGni02Kel4N
+   CVtv0l2tWZFIh6+1pLVeTVSDLGI7/45D7FuRvwG8dIIL60ahwCBjpjxPj
+   oTa0Fy2UlXusgdkrE3R5WuAyEModTerYktgRi7p+UoLa/QJ1YTWxTTXs3
+   2ufNpW6nMpSV+YVAK7BEsZAmow6/VUWfqk6HOHk8N5ex+/weCNHDLPgF1
+   Ehv0RfYnOOkJM6tPZbVVBK64REQFngoPpwjFEmKtH/c3eCojePNMJbBpk
+   WD2AxXLHqVqOjM+PiHiUDLpaxaqbtpkqrw8P5Cm7yRNRYLFt7rPAEtRqQ
+   A==;
+IronPort-SDR: kZCMQKK8MQiDSTQxgzF25qDB32EjuHAbxIFHT/exe1J7tlWvHsomMzaGbkX1rrVlKeJPSZij32
+ AeTpkdNPWYAJ1bn1cok7H5ELU5HquaxbqrCKfhTerocT1DBrwnlQ0m5+aIhoe7ZZuBdNgVlSp6
+ yQ6n8kNRJOTg7WbPfO56j2esbG0fYy88f9CF/udrsfybp/95/ZMbEzFkYJWOTKMsoYrRPeX5RY
+ OoMzRfMOwBa18HHV0u5OL+ajfC4GfZVPvDiFmJ+x0kZdOLUtKHZecI1w9cjO/tErFBkq2rLOCs
+ 54ZefkRcDURwnacr3A61SX/m
 X-IronPort-AV: E=Sophos;i="5.88,348,1635231600"; 
-   d="scan'208";a="152654138"
+   d="scan'208";a="147803329"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 06 Feb 2022 20:24:10 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 06 Feb 2022 20:24:19 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Sun, 6 Feb 2022 20:24:10 -0700
+ 15.1.2375.17; Sun, 6 Feb 2022 20:24:18 -0700
 Received: from ROB-ULT-M18064N.mchp-main.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Sun, 6 Feb 2022 20:24:07 -0700
+ 15.1.2375.17 via Frontend Transport; Sun, 6 Feb 2022 20:24:16 -0700
 From:   Tudor Ambarus <tudor.ambarus@microchip.com>
 To:     <herbert@gondor.apana.org.au>, <robh+dt@kernel.org>
 CC:     <davem@davemloft.net>, <nicolas.ferre@microchip.com>,
@@ -53,10 +52,12 @@ CC:     <davem@davemloft.net>, <nicolas.ferre@microchip.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         "Tudor Ambarus" <tudor.ambarus@microchip.com>
-Subject: [PATCH 0/3] dt-bindings: crypto: Convert atmel-{aes,tdes,sha} to YAML
-Date:   Mon, 7 Feb 2022 05:24:02 +0200
-Message-ID: <20220207032405.70733-1-tudor.ambarus@microchip.com>
+Subject: [PATCH 3/3] dt-bindings: crypto: Convert Atmel SHA to yaml
+Date:   Mon, 7 Feb 2022 05:24:05 +0200
+Message-ID: <20220207032405.70733-4-tudor.ambarus@microchip.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220207032405.70733-1-tudor.ambarus@microchip.com>
+References: <20220207032405.70733-1-tudor.ambarus@microchip.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -64,28 +65,116 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert Atmel AES, TDES and SHA documentation to yaml format. There is one
-binding defined per file. Keeping all bindings under the same yaml does
-not make sense, as these are individual IPs. With the conversion the clock
-and clock-names properties are made mandatory, to reflect how the drivers
-treat them: when these properties are not provided, the drivers return
-error.
+Convert Atmel SHA documentation to yaml format. With the conversion the
+clock and clock-names properties are made mandatory. The driver returns
+-EINVAL if "sha_clk" is not found, reflect that in the bindings and make
+the clock and clock-names properties mandatory. Update the example to
+better describe how one should define the dt node.
 
-Tudor Ambarus (3):
-  dt-bindings: crypto: Convert Atmel AES to yaml
-  dt-bindings: crypto: Convert Atmel TDES to yaml
-  dt-bindings: crypto: Convert Atmel SHA to yaml
-
- .../devicetree/bindings/crypto/atmel,aes.yaml | 65 ++++++++++++++++++
- .../devicetree/bindings/crypto/atmel,sha.yaml | 59 ++++++++++++++++
- .../bindings/crypto/atmel,tdes.yaml           | 63 +++++++++++++++++
- .../bindings/crypto/atmel-crypto.txt          | 68 -------------------
- 4 files changed, 187 insertions(+), 68 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/atmel,aes.yaml
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+ .../devicetree/bindings/crypto/atmel,sha.yaml | 59 +++++++++++++++++++
+ .../bindings/crypto/atmel-crypto.txt          | 25 --------
+ 2 files changed, 59 insertions(+), 25 deletions(-)
  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,sha.yaml
- create mode 100644 Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
  delete mode 100644 Documentation/devicetree/bindings/crypto/atmel-crypto.txt
 
+diff --git a/Documentation/devicetree/bindings/crypto/atmel,sha.yaml b/Documentation/devicetree/bindings/crypto/atmel,sha.yaml
+new file mode 100644
+index 000000000000..ccba6d36ee68
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/atmel,sha.yaml
+@@ -0,0 +1,59 @@
++# SPDX-License-Identifier: GPL-2.0-only
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/atmel,sha.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Atmel Secure Hash Algorithm (SHA) HW cryptographic accelerator
++
++maintainers:
++  - Tudor Ambarus <tudor.ambarus@microchip.com>
++
++properties:
++  compatible:
++    const: atmel,at91sam9g46-sha
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    const: sha_clk
++
++  dmas:
++    maxItems: 1
++    description: TX DMA Channel
++
++  dma-names:
++    const: tx
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/irq.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/clock/at91.h>
++    #include <dt-bindings/dma/at91.h>
++    sha: sha@e1814000 {
++      compatible = "atmel,at91sam9g46-sha";
++      reg = <0xe1814000 0x100>;
++      interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
++      clocks = <&pmc PMC_TYPE_PERIPHERAL 83>;
++      clock-names = "sha_clk";
++      dmas = <&dma0 AT91_XDMAC_DT_PERID(48)>;
++      dma-names = "tx";
++      status = "okay";
++    };
+diff --git a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
+deleted file mode 100644
+index 5c6541cfcc4a..000000000000
+--- a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
++++ /dev/null
+@@ -1,25 +0,0 @@
+-* Atmel HW cryptographic accelerators
+-
+-These are the HW cryptographic accelerators found on some Atmel products.
+-
+-* Secure Hash Algorithm (SHA)
+-
+-Required properties:
+-- compatible : Should be "atmel,at91sam9g46-sha".
+-- reg: Should contain SHA registers location and length.
+-- interrupts: Should contain the IRQ line for the SHA.
+-
+-Optional properties:
+-- dmas: One DMA specifiers as described in
+-        atmel-dma.txt and dma.txt files.
+-- dma-names: Contains one identifier string for each DMA specifier
+-             in the dmas property. Only one "tx" string needed.
+-
+-Example:
+-sha@f8034000 {
+-	compatible = "atmel,at91sam9g46-sha";
+-	reg = <0xf8034000 0x100>;
+-	interrupts = <42 4 0>;
+-	dmas = <&dma1 2 17>;
+-	dma-names = "tx";
+-};
 -- 
 2.25.1
 
