@@ -2,68 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024B9C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 16:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12239C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Feb 2022 16:08:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231192AbiBGQGj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Feb 2022 11:06:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43862 "EHLO
+        id S241682AbiBGQHY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Feb 2022 11:07:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1391852AbiBGQEN (ORCPT
+        with ESMTP id S1377838AbiBGP5A (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Feb 2022 11:04:13 -0500
+        Mon, 7 Feb 2022 10:57:00 -0500
 Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584DAC0401DB
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 08:04:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE553C0401CC
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 07:56:59 -0800 (PST)
 Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 187F63F203
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 16:04:07 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A370A4003B
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Feb 2022 15:56:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1644249847;
-        bh=wWFN/kYmy9qogqxR7Mh7jeBKCVIaVeKo6j328DRFO5U=;
+        s=20210705; t=1644249418;
+        bh=3KCJtIIAHid1u1Ypwj6pcJ1BKiFWLA7ETi2tEpWd/KM=;
         h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
          In-Reply-To:Content-Type;
-        b=rhTkA/xBwPaz9wH/5KTJdDAmdUSp8XMvNoMNzIL62XYoWeINEtHNTjLNdfqr5jEpP
-         Pls4VsjFLC0iIG44HcwfegBgvioj5DM02xAxMiWMujTU6TYsM40N4FO9retiDd4Ba4
-         PqYwXYAmojvTGo8AatZMPKNqjmPjeQa96RraNJ11ppEXrOLe0m8Hb1Ei/q6fsO5os1
-         NQTBhUb5dX/Fy6D8xliAjPNSGRBOAGfSXRFhIAEkO2Va/K68KIMt7amNpSUoVcJLY6
-         229eBiZRkc4LqEVJT5wW2DGY6y9hj19ossY87yylGeRhst1dnrLbq8oxDLp3ED3cQN
-         D6vuMm/Nie2KQ==
-Received: by mail-ej1-f69.google.com with SMTP id la22-20020a170907781600b006a7884de505so4500613ejc.7
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Feb 2022 08:04:07 -0800 (PST)
+        b=d3zYrg8/QwD5CAPs29nqw1oSk42TU4EDHDXDvbIJfOkP3OHO0KGY5Ay4x3iBxtmhR
+         bo0lvQiVA1GRvjqzCWdEk5l5ggl53NysepRAOzq60aEQJ4h4k8QmE9XsvYz/zNlprS
+         alcWO5kK9g+EJ67kQvqcffhUV6djdDrCveI5+4F7qLGqx5y0mEUFxqap3rhajbuuRK
+         Q/7hp5dwu7dPnL8NbT2mMCYj8UgAOk6pbeI9vluwK0geu2zGIlDNyr6vHBiSCPC8dI
+         fchcJ8zu5gC2jXXv7U67H5/qq9CGhQuoelrVJ07dEFL/Qzx8YDk86O9mx5gMnDY+XS
+         RYsNGfgCHR8/A==
+Received: by mail-ej1-f69.google.com with SMTP id l18-20020a1709063d3200b006a93f7d4941so4510075ejf.1
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Feb 2022 07:56:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=wWFN/kYmy9qogqxR7Mh7jeBKCVIaVeKo6j328DRFO5U=;
-        b=qJHdNNFQ+ADs1ExDaWTAZGAr0SpYlUSKrKhhw8ulVhDUAbIR4OrzM6j7L53jzw7k8g
-         v+7HIBw1p2XwLZj8r0/UfEwIO8Oaov44Mo7tJn8ZBdEOqSSkkqG11ze063Q/bfPVqIP4
-         fOkqajoffzRENjOt6FYz0P7PNtSz2+OGmFDPOoD7+/glUl20JVfI2ODZ9BjevW/nP6d5
-         cT60oD6AIIDIPjRNhd2QUWz/JZ0X9/O293xAxzuSdIm6F53oJD64VwE9omwJP/NHzH4R
-         YAO6U4uYWlHTo7ZEr2Fa/7r+dMHJq7juo+7xOx07S+XGATt7BS6TmTZkJ5l7tuASNfI6
-         +KrQ==
-X-Gm-Message-State: AOAM5337h0B3ACCQLeJUwbe1EUV1PxG1ZQEYM5Q7ym3NoY0ydfGH79rB
-        vGXi7tWyijXgJYa/EPCpx7knQMtnTS2WThPx4flJyrrHrg3JESIxzYAwwp/+Y9dw+Gc60ACR8+v
-        HA6FKk/R920ie5wvXOftO8eKIITmYQbRlyjQvLOg8oQ==
-X-Received: by 2002:a17:907:7b85:: with SMTP id ne5mr329324ejc.572.1644249846680;
-        Mon, 07 Feb 2022 08:04:06 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzBm6rX0lrrq+gqVsXaiIiWLV1F3mitDpLqrcgHMbY6Jqelej9PiIrbQrRZpHU2vQlcmagUOw==
-X-Received: by 2002:a17:907:7b85:: with SMTP id ne5mr329281ejc.572.1644249846145;
-        Mon, 07 Feb 2022 08:04:06 -0800 (PST)
+        bh=3KCJtIIAHid1u1Ypwj6pcJ1BKiFWLA7ETi2tEpWd/KM=;
+        b=Hg2eZ2TiOcxL2yUvIurFh6RAvF4pu8nM6gN8VdxVgqmlvcMsHVM+AaUzV5UZG/dEcS
+         BtnlwJ1J5FzalNSGfpoVkyllPqYijOeuRAoTYFNNKyZgp1qkUW19h0Ydu2IeuJbkapfB
+         DmGCI87zSOG55SK0IWw3Te1hn9QIqe6X0ZqVV6x83KOY3WcO3eCXUbn5g77dUtxUUiuE
+         +dsmotxIoBD1dTW+LjZ4DZi6kANAhGouGjH+JohBNtoE4cW8hCd4YznOrG5FHfZ/0eHP
+         EHk3MV1bP38BXc6pLIMRqW9Z5uhVni/aad/J0nkecehvP7hGB5KW6l3L43Uze5S1grAd
+         kp6w==
+X-Gm-Message-State: AOAM5328IvFQd5oTRA4epxfvDkhUNzSllscQ2Veghy+8YIw58EIMUMu+
+        qiWYu6JaRXK54j6kNVA5l6ABdBHhwwt5H+lQpB/CuOd8bpJOzXXY8vsPpj/QsAGyNoLiydyHx5D
+        Y9jL5ikKBdaBuOfnZV07KDfvToQ/3OQnVCXfzGeL7Jw==
+X-Received: by 2002:a17:907:ca6:: with SMTP id gi38mr290862ejc.353.1644249418353;
+        Mon, 07 Feb 2022 07:56:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxNtGmRyRii7O51uydqBLa9NhyKzrDOTW8Z28l8gq9kBDum2SUHT7YCiJHTkDya3nBusEaO7g==
+X-Received: by 2002:a17:907:ca6:: with SMTP id gi38mr290850ejc.353.1644249418176;
+        Mon, 07 Feb 2022 07:56:58 -0800 (PST)
 Received: from [192.168.0.90] (xdsl-188-155-168-84.adslplus.ch. [188.155.168.84])
-        by smtp.gmail.com with ESMTPSA id i1sm1602107ejv.183.2022.02.07.08.04.05
+        by smtp.gmail.com with ESMTPSA id v19sm3356879edw.39.2022.02.07.07.56.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Feb 2022 08:04:05 -0800 (PST)
-Message-ID: <c7e160b0-16fb-79ca-c291-05571bbe8341@canonical.com>
-Date:   Mon, 7 Feb 2022 17:04:04 +0100
+        Mon, 07 Feb 2022 07:56:57 -0800 (PST)
+Message-ID: <f8387f12-24f9-4a39-e9b8-3b83f1de078d@canonical.com>
+Date:   Mon, 7 Feb 2022 16:56:56 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH 2/3] dt-bindings: crypto: Convert Atmel TDES to yaml
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
 Content-Language: en-US
 To:     Tudor Ambarus <tudor.ambarus@microchip.com>,
         herbert@gondor.apana.org.au, robh+dt@kernel.org
@@ -72,9 +72,9 @@ Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20220207032405.70733-1-tudor.ambarus@microchip.com>
- <20220207032405.70733-3-tudor.ambarus@microchip.com>
+ <20220207032405.70733-2-tudor.ambarus@microchip.com>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-In-Reply-To: <20220207032405.70733-3-tudor.ambarus@microchip.com>
+In-Reply-To: <20220207032405.70733-2-tudor.ambarus@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -82,46 +82,98 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 07/02/2022 04:24, Tudor Ambarus wrote:
-> Convert Atmel TDES documentation to yaml format. With the conversion the
+> Convert Atmel AES documentation to yaml format. With the conversion the
 > clock and clock-names properties are made mandatory. The driver returns
-> -EINVAL if "tdes_clk" is not found, reflect that in the bindings and make
+> -EINVAL if "aes_clk" is not found, reflect that in the bindings and make
 > the clock and clock-names properties mandatory. Update the example to
 > better describe how one should define the dt node.
 > 
 > Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 > ---
->  .../bindings/crypto/atmel,tdes.yaml           | 63 +++++++++++++++++++
->  .../bindings/crypto/atmel-crypto.txt          | 23 -------
->  2 files changed, 63 insertions(+), 23 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
+>  .../devicetree/bindings/crypto/atmel,aes.yaml | 65 +++++++++++++++++++
+>  .../bindings/crypto/atmel-crypto.txt          | 20 ------
+>  2 files changed, 65 insertions(+), 20 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,aes.yaml
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml b/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
+> diff --git a/Documentation/devicetree/bindings/crypto/atmel,aes.yaml b/Documentation/devicetree/bindings/crypto/atmel,aes.yaml
 > new file mode 100644
-> index 000000000000..7efa5e4acaa1
+> index 000000000000..f77ec04dbabe
 > --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/atmel,tdes.yaml
-> @@ -0,0 +1,63 @@
+> +++ b/Documentation/devicetree/bindings/crypto/atmel,aes.yaml
+> @@ -0,0 +1,65 @@
 > +# SPDX-License-Identifier: GPL-2.0-only
 > +%YAML 1.2
 > +---
-> +$id: http://devicetree.org/schemas/crypto/atmel,tdes.yaml#
+> +$id: http://devicetree.org/schemas/crypto/atmel,aes.yaml#
 > +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > +
-> +title: Atmel Triple Data Encryption Standard (TDES) HW cryptographic accelerator
+> +title: Atmel Advanced Encryption Standard (AES) HW cryptographic accelerator
 > +
 > +maintainers:
 > +  - Tudor Ambarus <tudor.ambarus@microchip.com>
 > +
 > +properties:
 > +  compatible:
-> +    const: atmel,at91sam9g46-tdes
+> +    const: atmel,at91sam9g46-aes
 > +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    const: aes_clk
+> +
+> +  dmas:
+> +    items:
+> +      - description: TX DMA Channel
+> +      - description: RX DMA Channel
+> +
+> +  dma-names:
+> +    items:
+> +      - const: tx
+> +      - const: rx
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +  - dmas
+> +  - dma-names
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    #include <dt-bindings/clock/at91.h>
+> +    #include <dt-bindings/dma/at91.h>
 
-Same comments as for patch 1 plus one new (also applying to previous
-one). You named the file quite generic "atmel,tdes" or "atmel,aes", but
-what if something newer comes for at91? Maybe name it instead
-"atmel,at91sam9-aes"?
+One empty line for readability.
 
+> +    aes: aes@f8038000 {
+
+Generic node name, so "crypto".
+
+> +      compatible = "atmel,at91sam9g46-aes";
+> +      reg = <0xe1810000 0x100>;
+> +      interrupts = <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
+> +      clocks = <&pmc PMC_TYPE_PERIPHERAL 27>;
+> +      clock-names = "aes_clk";
+> +      dmas = <&dma0 AT91_XDMAC_DT_PERID(1)>,
+> +             <&dma0 AT91_XDMAC_DT_PERID(2)>;
+> +      dma-names = "tx", "rx";
+> +      status= "okay";
+> +    };
+
+Drop the status property.
 
 Best regards,
 Krzysztof
