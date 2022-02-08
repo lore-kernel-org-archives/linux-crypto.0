@@ -2,149 +2,164 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEEFC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 15:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4412CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 16:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382411AbiBHP72 (ORCPT
+        id S1379231AbiBHQBQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 10:59:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38898 "EHLO
+        Tue, 8 Feb 2022 11:01:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381200AbiBHP71 (ORCPT
+        with ESMTP id S239908AbiBHQBP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 10:59:27 -0500
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F0FC06174F
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Feb 2022 07:59:24 -0800 (PST)
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id D4CD53F1CD
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Feb 2022 15:59:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1644335962;
-        bh=GCejdhR+a/xBJu0EdDNmDz0h5nAc0bdug5YEZYD9D0o=;
-        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-         In-Reply-To:Content-Type;
-        b=d6dKpMYQ7SqpS6VioALkwrSX/7lH0jVSalazDnvVWhF4ZpEoixxyrA/mbodWQNFxw
-         bC16r3FexJ8wqrnnr7hd/yqQv1FS1G5ml4nZOeexf7hMGRwuhW2HWF567xxuJBmiPJ
-         dqbWBkpONGPWH24tHGJ8QMD6O9jtdUJcXzcBQ6rZAAEdelmY5sr+Bg0HYH3WRIMkKn
-         1otuQiX0zGw/LpPHHQblBqr50OAzBoTYmhlrjrA8Uf8kZs/1CcRruSVU1B7N4q5eFi
-         pbXWebr1t5dj9SoW08IVipWBoiUKeFEU8Kg4I2kY5ckW/zAoshtvBAcugabtWceZrZ
-         WX3wjj22etH/A==
-Received: by mail-ej1-f70.google.com with SMTP id o7-20020a170906860700b006cbe6deec1bso2256613ejx.22
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Feb 2022 07:59:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=GCejdhR+a/xBJu0EdDNmDz0h5nAc0bdug5YEZYD9D0o=;
-        b=1l2987+vzRPs5heEvJpESIkLr6Z+eOOWpfdiYv6vdAHoMK1Ra3gImHL8pDr+EI+nwt
-         p0Y269jcC2SLPUBgV6iWbFRCBPvCQJ+HSFSPynMpFGGUg4eLHxH8b7wkeSeIfznJDril
-         YFg67S+Uynx/9ysKEGlyAvDKnq/fnzvJNv+OhAX2QA7cIM0dSKI74P0fc9uP6CKdQbQI
-         0twRcoT+ctv7dLlZZZCCR0gfrF7BF56tN0zl9P6k0qS03JgV+T4QnCCH/msuQD9nSGf1
-         4IQ8rNybeVPMI+g+nVIxSDENzrR+ZzfoI7rdQ19BvYjYIHksuzKcmEYstW/M9Nts6s4F
-         qblA==
-X-Gm-Message-State: AOAM532QIqkfCFlNU7b+UlEUrp3zexKq1rxFNlVlksmCMuoe6T9u9zjU
-        XhqKr5eZHMqLRxXjbQOKvONZygJk9a3GlohTSNytwZPVzL+1eUAZ9cG56shug4wYe7jCjIsIqfO
-        ebgfXLK+iCxgJaVqNTOmah6pgtzd+omQvdaG+IxG2lg==
-X-Received: by 2002:a17:907:60d0:: with SMTP id hv16mr4209712ejc.668.1644335962376;
-        Tue, 08 Feb 2022 07:59:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzzMWiC01ysSyAaBuDoWTE5s3bHip+jTOUASLhVK6NUfNE19TNoA/lCw7TRiHSeEzA5hH0AUg==
-X-Received: by 2002:a17:907:60d0:: with SMTP id hv16mr4209691ejc.668.1644335962134;
-        Tue, 08 Feb 2022 07:59:22 -0800 (PST)
-Received: from [192.168.0.94] (xdsl-188-155-168-84.adslplus.ch. [188.155.168.84])
-        by smtp.gmail.com with ESMTPSA id q4sm4956884ejb.109.2022.02.08.07.59.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Feb 2022 07:59:21 -0800 (PST)
-Message-ID: <fea9a9b3-5e15-e177-a0ee-ac08fa2b91ab@canonical.com>
-Date:   Tue, 8 Feb 2022 16:59:20 +0100
+        Tue, 8 Feb 2022 11:01:15 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D64C061576;
+        Tue,  8 Feb 2022 08:01:14 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MLnOzn1YycEwt+nPEuuBV/DK0nZhITievp41qVOeWloiLVxpnrhqoqWJtj062b7od2p+GnGfU60Ib15cJ0TRRAEKwPF05SP7ohI9T6yWeQcIyIatXvC2uYE4mG5guHBqnHc92Lxnjfz09X2Aqi+Mo4sfmGspNnaUKNEZ6NfK6Hb9yNmZ9tdIP2fI0n3QsrcvdUut0OWp/KPahmazxQQFF4hHeRZ9Xlq59FuHtXta/OoaatupRagJmF3Juu83OAPcgRXxmNR2UGZ+oiSAXD/MyeLVcVns9hSzhhztCIW9WLpJpMJEGR412SqJEIzCwjIMMKvH7pw9b0cOOHCEgOR/+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q4ik90iqd43IQUHuIsqs12xHo7EzzWxkshmR2Mp8llg=;
+ b=cFwWSmXxyVtnmSnFhGaFrOWjzHTfllCWio+nE+SiOgrdV4JaDTohp/mdrFJBhgw8miOBDtwHYxQa892mJwahUih/WfiGcRZmvp8gqLhSZVNm/IA2SeU1efpxhq17XDtBGiwUY1Mqu36fv+JS7l/UcPTcAatQesPxqqR9LB2JptLeLw75msjbEEQvAS8itSEP0j3uwKJ9Ivd8ij3cBPvRco7zlCgePpA8Vk1JPQ+RxoW5weB993agDHPllYfets3bkz1S3581GZGIfJE703eptRjJmUl2q1cefQxk8ElYVaHQ9w9hDxNlN4GB7omjbg4kAnm2sVDFx/uOl/CjcbllEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q4ik90iqd43IQUHuIsqs12xHo7EzzWxkshmR2Mp8llg=;
+ b=kCAAK4EATx+73b9Z81/C7L1q2H157lfRGUyxnQvSenRvHTRFD5MMb/CgmPH/G6pioV9t4JsRxCkDGmX6nwkdBw2eTFdPnGZsSesqtv7H0a4kbfEfBFAMwzbYveluPEeR0b0Tk58imXuGT2i8T/bKZ2ymWBDreB5784d7iBcjjtfAQxK6ZcUH89KBY/CpSyB7MFWFxtEHxML0A3uNGZpmW0VofpQtlFLc3iGMxvtJGYTh/yb7pDPfA57P8XlS2CKTsvLXWNBcd/s1lZO8tVW8veyRV66D/bQHWmkNdhHuegpTMrryweB8Yx/osYgHhZJ6uoclcdKsqFWvtDN+Y4KUHA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN7PR12MB2833.namprd12.prod.outlook.com (2603:10b6:408:27::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.11; Tue, 8 Feb
+ 2022 16:01:13 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.011; Tue, 8 Feb 2022
+ 16:01:13 +0000
+Date:   Tue, 8 Feb 2022 12:01:12 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v4 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220208160112.GG4160@nvidia.com>
+References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
+ <20220208133425.1096-8-shameerali.kolothum.thodi@huawei.com>
+ <20220208152226.GF4160@nvidia.com>
+ <bd69bdb6e0664667be868ff799e8629e@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bd69bdb6e0664667be868ff799e8629e@huawei.com>
+X-ClientProxiedBy: BLAPR03CA0046.namprd03.prod.outlook.com
+ (2603:10b6:208:32d::21) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v2 3/3] dt-bindings: crypto: Convert Atmel SHA to yaml
-Content-Language: en-US
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>,
-        herbert@gondor.apana.org.au
-Cc:     nicolas.ferre@microchip.com, claudiu.beznea@microchip.com,
-        alexandre.belloni@bootlin.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org
-References: <20220208104918.226156-1-tudor.ambarus@microchip.com>
- <20220208104918.226156-4-tudor.ambarus@microchip.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-In-Reply-To: <20220208104918.226156-4-tudor.ambarus@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: df152086-afb1-4b41-43d1-08d9eb1c3b2c
+X-MS-TrafficTypeDiagnostic: BN7PR12MB2833:EE_
+X-Microsoft-Antispam-PRVS: <BN7PR12MB2833177A65EA944C06BEEFA1C22D9@BN7PR12MB2833.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YC6odzYlHq+W5O+RlvWiGGXYBbMq5By15CzULExIZk4HuBLXYUywm/TJuJUeqdROJnzfy1Z3LsjScw7poad78ww5kmd6yVD583qnkJhArzoObmdEuMilOPv2RhmM3ulRPsHta9VvVBR16QAGb5nRguBqDX/1l50d8VZQggTqmFt/ObMO4LtC6MdyXcqtm6ZblUJXARfId7uK2XYPLbrVUBYuANZboubYRtb7bUy/bcuLQEvUp8E0LpL1sDrZnqqQq/APJQ2Q4Wr6YRHInW3t06CwFtZjRLEpuzCbum37PdmZhJPy0CtzJlQ/199xpcxXgdbqQ6D/6/8vz9R8flSkI4kU2d7PX5ygec7kpFE3fUu4d/DIpqWys/nrpS+8spvfGsxz2hQ3x4aba8waEf6zC8N0jbmNrRtbn7NHvys90YLXqnCxP/Tmd2kaljDPYF2sqrVAueH6NX06l6R8sgYjFz4lBSGjv0UaY5h/aLQrhaNG7pHonMcqWEtvvYjUzuCr9U6L9P1CwsUlcOe01tgu2G1MNkQQSo9f2naeWV1xBreUAMEAsMK0BOt9eUIkiXAXZAEGKr4Z2PEtAIkmvLDuDtoRMgIvfUJKLCD6W+Ikqh2vWCTl88TuCPk/ffIETHcdnED75flYNSyIMvj5C38sJQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(508600001)(6506007)(38100700002)(6512007)(6486002)(26005)(4326008)(6916009)(8936002)(8676002)(66946007)(1076003)(186003)(2906002)(33656002)(83380400001)(7416002)(5660300002)(2616005)(66556008)(66476007)(316002)(54906003)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tK2LY2rW25hzC7LszYEOFebCpUdsMaSYiphED/ner8a5YG2hDD/1ahffsaIh?=
+ =?us-ascii?Q?oH62f19yYEVwT+89fiZR0qHlcEsu7VD2wZlJxCmgvRqzMM90ilmDu7iUzbM1?=
+ =?us-ascii?Q?OkEbVdKizWonnK0zTCOS041t+hmYSQgsLlNK7ZQPpRpGQmlDnuEfcJ1LZfHK?=
+ =?us-ascii?Q?wxKkumEH1IL44e9Dd4f29X99Qxj9wGQOnYWYBNHeNffKlS6uHGGgP5TGteYA?=
+ =?us-ascii?Q?nE4qt43yGZQx18etVNYwLb2NLu/PoWxbfwWPTm3+PJgUHiqb68fh4EXQFzRA?=
+ =?us-ascii?Q?FFAinYiWM5KPyAy6PuFic0wfnkPMxSegaomcDxjT5F787OETtdSI/b72+m6m?=
+ =?us-ascii?Q?zfVxgEAOFTfetll0utpveRR2Cb4iuGw3BOalHgKFRvi4XRhwQR13y84lP3IH?=
+ =?us-ascii?Q?YxCINnknmnpmKCsfSX7hZXbDrAxvlzeO/NKgwJ5W1ZNbe1rOtSl25UXIO8QV?=
+ =?us-ascii?Q?LHFvMJe0Mw0q/BOCdE+hAWTzy3Xb3cfg8+GIaKih9UGD/9UVJ5hcwXLqaosT?=
+ =?us-ascii?Q?MASg3SiUsZvnNNRoUUreFLdtN+yabHhjs/Nh5CKgCNVXlIA0sUekS8zBzk2Y?=
+ =?us-ascii?Q?qlUeU+egfaj+++ZhHCESbIhWvRgKCMWsdZ9qH3EAduO0yhTM/R2CdTW1PCzM?=
+ =?us-ascii?Q?twNwnre6vYdMhaD7bBzjVlHk87vhteHoLJQM7t1/PVpjUNxuojiPSWe8xgb9?=
+ =?us-ascii?Q?TdKB4cbXopipEAOws58MbNK8XHnwI0IoZHUmWjqggJtaS3bJ89yH2pNSG3OY?=
+ =?us-ascii?Q?q8KzrquaudVLcTmNaidQJuZiF1CC2BOjuuDiF47r+/BGgbiPOxpbM1ahROEo?=
+ =?us-ascii?Q?sxIHWiFOQEBePnQd9VmsTTkyfdFAg33UDR7jjsWAWbJWL/2X+FPrqXo7rVXC?=
+ =?us-ascii?Q?50mjNS0aoD3H1gLaE1CmX/xv2d/1EUGzZVSJw4SowE3VIR4xjMydUPaqifPv?=
+ =?us-ascii?Q?sEGrBZ9RSgOupaAhE4gE3HuDARnxwWutM2BuKKOBxAJrJXB06FUXzcaadoUd?=
+ =?us-ascii?Q?w7BDWJvorREFej79AV142wABflXu3Zc9PkiPXQFhKvsjPC5r+Xfrd6mfx+l2?=
+ =?us-ascii?Q?s5rWAOy6ZbCndlDz3rSCVhKf+bz/rf1/C3evxr8YfejAI9+cspNeVXycm7KJ?=
+ =?us-ascii?Q?iVQNXbB4u2pG5dyIWbAHu44HMEZ8VdmlGokFACAfbAT4fR7Rt7fUQ0WiC6+V?=
+ =?us-ascii?Q?mlbozaNhxGuPxvavAekJE3xqp7DufwvqrmubIAIbsppr/HTNc2jgCkwN0/3Y?=
+ =?us-ascii?Q?CYcA/7mY/u1KZgqUJgeBlG4RDQL4RyctBuHWi4oQeuerHXZGa78eZ+9vnFAE?=
+ =?us-ascii?Q?bnFY4yPmem7vGKYnUwSf7SUHVlDk1wGufDy+8eEgn7mhGO50Nj4vTZmbxXxo?=
+ =?us-ascii?Q?7fk91l0D/Bd6WmWstGCzghTKCRxiW/WJErOd+EFmm5ZG6RhkdrWxD5gUQdro?=
+ =?us-ascii?Q?+t0+GDklQ+Ezpbed8yrcQ4byxxHpF+pvyjdJ+JIvV4YH2zXDgWvZJBUnkJ11?=
+ =?us-ascii?Q?w5F2nd8HbJ/mGkVRVzBTZiO4Pb/B6SME6Gr/EHa8cFh4pb+QMIh7BuNQyLlM?=
+ =?us-ascii?Q?ntX4VV5/OeTx2WvqCto=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: df152086-afb1-4b41-43d1-08d9eb1c3b2c
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2022 16:01:13.4941
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NzlO5Dz2ee+lAPzXu2Wdhi3WfA0941YRvhda2lWjdXpRL+VGI8bF9gBrCkWI2AWL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR12MB2833
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/02/2022 11:49, Tudor Ambarus wrote:
-> Convert Atmel SHA documentation to yaml format. With the conversion the
-> clock and clock-names properties are made mandatory. The driver returns
-> -EINVAL if "sha_clk" is not found, reflect that in the bindings and make
-> the clock and clock-names properties mandatory. Update the example to
-> better describe how one should define the dt node.
+On Tue, Feb 08, 2022 at 03:48:16PM +0000, Shameerali Kolothum Thodi wrote:
+
+> > > +static int hisi_acc_vfio_pci_init(struct hisi_acc_vf_core_device
+> > *hisi_acc_vdev)
+> > > +{
+> > > +	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+> > > +	struct pci_dev *vf_dev = vdev->pdev;
+> > > +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> > > +
+> > > +	/*
+> > > +	 * ACC VF dev BAR2 region consists of both functional register space
+> > > +	 * and migration control register space. For migration to work, we
+> > > +	 * need access to both. Hence, we map the entire BAR2 region here.
+> > > +	 * But from a security point of view, we restrict access to the
+> > > +	 * migration control space from Guest(Please see mmap/ioctl/read/write
+> > > +	 * override functions).
+> > > +	 *
+> > > +	 * Also the HiSilicon ACC VF devices supported by this driver on
+> > > +	 * HiSilicon hardware platforms are integrated end point devices
+> > > +	 * and has no capability to perform PCIe P2P.
+> > > +	 */
+> > > +	vf_qm->io_base =
+> > > +		ioremap(pci_resource_start(vf_dev, VFIO_PCI_BAR2_REGION_INDEX),
+> > > +			pci_resource_len(vf_dev, VFIO_PCI_BAR2_REGION_INDEX));
+> > > +	if (!vf_qm->io_base)
+> > > +		return -EIO;
+> > > +
+> > > +	vf_qm->fun_type = QM_HW_VF;
+> > > +	vf_qm->pdev = vf_dev;
+> > > +	mutex_init(&vf_qm->mailbox_lock);
+> > 
+> > mailbox_lock seems unused
 > 
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-> ---
->  .../crypto/atmel,at91sam9g46-sha.yaml         | 59 +++++++++++++++++++
->  .../bindings/crypto/atmel-crypto.txt          | 25 --------
->  2 files changed, 59 insertions(+), 25 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
-> new file mode 100644
-> index 000000000000..e454f4468dc5
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
-> @@ -0,0 +1,59 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/atmel,at91sam9g46-sha.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Atmel Secure Hash Algorithm (SHA) HW cryptographic accelerator
-> +
-> +maintainers:
-> +  - Tudor Ambarus <tudor.ambarus@microchip.com>
-> +
-> +properties:
-> +  compatible:
-> +    const: atmel,at91sam9g46-sha
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  clock-names:
-> +    const: sha_clk
-> +
-> +  dmas:
-> +    maxItems: 1
-> +    description: TX DMA Channel
-> +
+> I think we need that as that will be used in the QM driver APIs. I will add a
+> comment here.
 
-One-item-description should work as well, so if you are going to resend:
+Perhaps you need some 'init hisi_qm' function to make this more clear
+instead of opening coding initing so other module's structure?
 
-+  dmas:
-+    items:
-+      - description: TX DMA Channel
-
-but the code looks equivalent, so:
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-
-
-Best regards,
-Krzysztof
+Jason
