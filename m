@@ -2,146 +2,193 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7D5C4321E
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 08:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75576C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 08:59:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241423AbiBHI6d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 03:58:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49316 "EHLO
+        id S1352694AbiBHI7d (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 03:59:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352625AbiBHI6c (ORCPT
+        with ESMTP id S1351081AbiBHI7b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 03:58:32 -0500
-X-Greylist: delayed 471 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Feb 2022 00:58:30 PST
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA3B7C03FEC1;
-        Tue,  8 Feb 2022 00:58:30 -0800 (PST)
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 1436A72C905;
-        Tue,  8 Feb 2022 11:50:38 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id E823E4A46EA;
-        Tue,  8 Feb 2022 11:50:37 +0300 (MSK)
-Date:   Tue, 8 Feb 2022 11:50:37 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KEYS: asymmetric: enforce that sig algo matches
- key algo
-Message-ID: <20220208085037.lo53hi6ohjusr7pv@altlinux.org>
-References: <20220208052448.409152-1-ebiggers@kernel.org>
- <20220208052448.409152-2-ebiggers@kernel.org>
+        Tue, 8 Feb 2022 03:59:31 -0500
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA011C03FEC3
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Feb 2022 00:59:30 -0800 (PST)
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 53E833F203
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Feb 2022 08:59:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1644310769;
+        bh=5BAaisfFdzHM2Ej8w1LBO0wtundXTJbEqkB562uWwIw=;
+        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+         In-Reply-To:Content-Type;
+        b=Ruj09oubI9PdoxK62S8stjtYXrbwr3yAnoduQfxAucJFuXyNnQrFelSf41sOInSxQ
+         BMZ3GJ4+yJm5emW5N3TOwF9vd2sGCHMyzdixklQOhsOQ3sLMFAjI5dHup2rNheQ3UB
+         iZsVzSXd9o/NXKB+gOS6TxzviYe01LPXlxQbj3+enWLXGyggRCZ5QRMy7eRqp/IUgE
+         5ppKTVRJJKMVC6YQD9V6mGDn7fX6tJ3ZAelivAydyUT6FL+UI9cAd9fgqYNjoMPtGG
+         wQzWuOu4gbqo59LQBhSWiO49JSvZD4kD7OxGaYsJUwLzOpckU0SVEpcQI/d5j40eLh
+         2WbyZAoqp4BIg==
+Received: by mail-ed1-f71.google.com with SMTP id l14-20020aa7cace000000b003f7f8e1cbbdso9319844edt.20
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Feb 2022 00:59:29 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5BAaisfFdzHM2Ej8w1LBO0wtundXTJbEqkB562uWwIw=;
+        b=lrfmW8+TbLyKPCo76oiijN2CIjKN9HdRfGVpLvqwH+7GkiXqfy4SEENbvcFQBTgypX
+         pa581lG+YyAWyuMgqRGcc4NVTNawCzxadc/doHtFzt1VqxcnWfpWnfTY7o3TozOI1h84
+         5hJ1t90piVYRMuS9dI2QhU8L1KUO9/W9JabT9jM7+XsfJX2YSZ5LGpJAQrKaGR/yi0aG
+         p9V38eCvLpk8asY9hjE0EU9grEkAAdlPn80ZOQ4VkGKQvfMPkaSoLlscTNf5vjgmwXxU
+         wWgd+v1GUnM0r08V1j4rfqMHCDln3Zxo6ijvYh1zKICD/fqmxPRIpg5QW1x7KN7S9xta
+         xavA==
+X-Gm-Message-State: AOAM532zrZEQP6i79qhK4VaaNMbeTCF9F/gQaBGT99CIrBE4fXmk8vG3
+        XtUE9ojtK2cFqhx4vZbVJKMgqhjpPSFCNyZtdk2GiH63H4NUg+OM34RwGnuirk3xdHOmP4lQIPf
+        2FwMS9GDM9nYwi/GRvkz/dgKbznrIPrY1dtl5mzaFqw==
+X-Received: by 2002:a17:907:724c:: with SMTP id ds12mr2794448ejc.203.1644310768630;
+        Tue, 08 Feb 2022 00:59:28 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw8tPROloPqm9ioypm8COf+zuHFCcc0iwDjz584JUVDhpmreWZwcurlewohl71zVfFFpTKOZg==
+X-Received: by 2002:a17:907:724c:: with SMTP id ds12mr2794429ejc.203.1644310768388;
+        Tue, 08 Feb 2022 00:59:28 -0800 (PST)
+Received: from [192.168.0.92] (xdsl-188-155-168-84.adslplus.ch. [188.155.168.84])
+        by smtp.gmail.com with ESMTPSA id k14sm2187785ejg.78.2022.02.08.00.59.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Feb 2022 00:59:27 -0800 (PST)
+Message-ID: <7b787aee-ceea-d035-38b1-02ba0bcd3f21@canonical.com>
+Date:   Tue, 8 Feb 2022 09:59:27 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20220208052448.409152-2-ebiggers@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Content-Language: en-US
+To:     Tudor.Ambarus@microchip.com, herbert@gondor.apana.org.au,
+        robh+dt@kernel.org
+Cc:     davem@davemloft.net, Nicolas.Ferre@microchip.com,
+        Claudiu.Beznea@microchip.com, alexandre.belloni@bootlin.com,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20220207032405.70733-1-tudor.ambarus@microchip.com>
+ <20220207032405.70733-2-tudor.ambarus@microchip.com>
+ <f8387f12-24f9-4a39-e9b8-3b83f1de078d@canonical.com>
+ <ec358f0f-e3e2-a97b-e09a-d397edc65c72@microchip.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+In-Reply-To: <ec358f0f-e3e2-a97b-e09a-d397edc65c72@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 07, 2022 at 09:24:47PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On 08/02/2022 05:10, Tudor.Ambarus@microchip.com wrote:
+> Hi, Krzysztof,
 > 
-> Most callers of public_key_verify_signature(), including most indirect
-> callers via verify_signature() as well as pkcs7_verify_sig_chain(),
-> don't check that public_key_signature::pkey_algo matches
-> public_key::pkey_algo.  These should always match.  However, a malicious
-> signature could intentionally declare an unintended algorithm.  It is
-> essential that such signatures be rejected outright, or that the
-> algorithm of the *key* be used -- not the algorithm of the signature as
-> that would allow attackers to choose the algorithm used.
+> On 2/7/22 17:56, Krzysztof Kozlowski wrote:
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+>>
+>> On 07/02/2022 04:24, Tudor Ambarus wrote:
+>>> Convert Atmel AES documentation to yaml format. With the conversion the
+>>> clock and clock-names properties are made mandatory. The driver returns
+>>> -EINVAL if "aes_clk" is not found, reflect that in the bindings and make
+>>> the clock and clock-names properties mandatory. Update the example to
+>>> better describe how one should define the dt node.
+>>>
+>>> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+>>> ---
+>>>  .../devicetree/bindings/crypto/atmel,aes.yaml | 65 +++++++++++++++++++
+>>>  .../bindings/crypto/atmel-crypto.txt          | 20 ------
+>>>  2 files changed, 65 insertions(+), 20 deletions(-)
+>>>  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,aes.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/crypto/atmel,aes.yaml b/Documentation/devicetree/bindings/crypto/atmel,aes.yaml
+>>> new file mode 100644
+>>> index 000000000000..f77ec04dbabe
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/crypto/atmel,aes.yaml
+>>> @@ -0,0 +1,65 @@
+>>> +# SPDX-License-Identifier: GPL-2.0-only
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/crypto/atmel,aes.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Atmel Advanced Encryption Standard (AES) HW cryptographic accelerator
+>>> +
+>>> +maintainers:
+>>> +  - Tudor Ambarus <tudor.ambarus@microchip.com>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    const: atmel,at91sam9g46-aes
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  interrupts:
+>>> +    maxItems: 1
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +
+>>> +  clock-names:
+>>> +    const: aes_clk
+>>> +
+>>> +  dmas:
+>>> +    items:
+>>> +      - description: TX DMA Channel
+>>> +      - description: RX DMA Channel
+>>> +
+>>> +  dma-names:
+>>> +    items:
+>>> +      - const: tx
+>>> +      - const: rx
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +  - interrupts
+>>> +  - clocks
+>>> +  - clock-names
+>>> +  - dmas
+>>> +  - dma-names
+>>> +
+>>> +additionalProperties: false
+>>> +
+>>> +examples:
+>>> +  - |
+>>> +    #include <dt-bindings/interrupt-controller/irq.h>
+>>> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+>>> +    #include <dt-bindings/clock/at91.h>
+>>> +    #include <dt-bindings/dma/at91.h>
+>>
+>> One empty line for readability.
 > 
-> Currently, public_key_verify_signature() correctly uses the key's
-> algorithm when deciding which akcipher to allocate.  That's good.
-> However, it uses the signature's algorithm when deciding whether to do
-> the first step of SM2, which is incorrect.  Also, v4.19 and older
-> kernels used the signature's algorithm for the entire process.
+> Ok.
 > 
-> Prevent such errors by making public_key_verify_signature() enforce that
-> the signature's algorithm (if given) matches the key's algorithm.
+>>
+>>> +    aes: aes@f8038000 {
+>>
+>> Generic node name, so "crypto".
 > 
-> Also remove two checks of this done by callers, which are now redundant.
+> Hm, I'm not convinced why, would you please give more details about this
+> requirement? This IP is capable of doing just AES operations, I find it
+> generic enough. We use the "aes" name on all our SoCs that have a version
+> of this IP, that would be quite a change. So I would prefer to keep the
+> "aes" name if possible.
 > 
-> Cc: stable@vger.kernel.org
-> Tested-by: Stefan Berger <stefanb@linux.ibm.com>
-> Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+The requirement comes from DT specification.
+"The name of a node should be somewhat generic, reflecting the function
+of the device and not its precise programming
+ model. If appropriate, the name should be one of the following choice"
+AES is not generic. AES is specific crypto operation. The spec gives
+example - "crypto", so use this one just like others are using. Atmel is
+not special in that matter.
 
-Thanks,
 
-> ---
->  crypto/asymmetric_keys/pkcs7_verify.c    |  6 ------
->  crypto/asymmetric_keys/public_key.c      | 15 +++++++++++++++
->  crypto/asymmetric_keys/x509_public_key.c |  6 ------
->  3 files changed, 15 insertions(+), 12 deletions(-)
-> 
-> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-> index 0b4d07aa8811..f94a1d1ad3a6 100644
-> --- a/crypto/asymmetric_keys/pkcs7_verify.c
-> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
-> @@ -174,12 +174,6 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
->  		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
->  			 sinfo->index, certix);
->  
-> -		if (strcmp(x509->pub->pkey_algo, sinfo->sig->pkey_algo) != 0) {
-> -			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
-> -				sinfo->index);
-> -			continue;
-> -		}
-> -
->  		sinfo->signer = x509;
->  		return 0;
->  	}
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index 4fefb219bfdc..e36213945686 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -325,6 +325,21 @@ int public_key_verify_signature(const struct public_key *pkey,
->  	BUG_ON(!sig);
->  	BUG_ON(!sig->s);
->  
-> +	/*
-> +	 * If the signature specifies a public key algorithm, it *must* match
-> +	 * the key's actual public key algorithm.
-> +	 *
-> +	 * Small exception: ECDSA signatures don't specify the curve, but ECDSA
-> +	 * keys do.  So the strings can mismatch slightly in that case:
-> +	 * "ecdsa-nist-*" for the key, but "ecdsa" for the signature.
-> +	 */
-> +	if (sig->pkey_algo) {
-> +		if (strcmp(pkey->pkey_algo, sig->pkey_algo) != 0 &&
-> +		    (strncmp(pkey->pkey_algo, "ecdsa-", 6) != 0 ||
-> +		     strcmp(sig->pkey_algo, "ecdsa") != 0))
-> +			return -EKEYREJECTED;
-> +	}
-> +
->  	ret = software_key_determine_akcipher(sig->encoding,
->  					      sig->hash_algo,
->  					      pkey, alg_name);
-> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-> index fe14cae115b5..71cc1738fbfd 100644
-> --- a/crypto/asymmetric_keys/x509_public_key.c
-> +++ b/crypto/asymmetric_keys/x509_public_key.c
-> @@ -128,12 +128,6 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
->  			goto out;
->  	}
->  
-> -	ret = -EKEYREJECTED;
-> -	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo) != 0 &&
-> -	    (strncmp(cert->pub->pkey_algo, "ecdsa-", 6) != 0 ||
-> -	     strcmp(cert->sig->pkey_algo, "ecdsa") != 0))
-> -		goto out;
-> -
->  	ret = public_key_verify_signature(cert->pub, cert->sig);
->  	if (ret < 0) {
->  		if (ret == -ENOPKG) {
-> -- 
-> 2.35.1
+Best regards,
+Krzysztof
