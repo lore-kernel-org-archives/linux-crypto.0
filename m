@@ -2,75 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 016F4C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 06:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7D5C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 08:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236745AbiBHGsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 01:48:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43910 "EHLO
+        id S241423AbiBHI6d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 03:58:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347792AbiBHGsi (ORCPT
+        with ESMTP id S1352625AbiBHI6c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 01:48:38 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00E4C0401F2;
-        Mon,  7 Feb 2022 22:48:37 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6DD1B61605;
-        Tue,  8 Feb 2022 06:48:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AA8C004E1;
-        Tue,  8 Feb 2022 06:48:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644302916;
-        bh=dqtHfl1ZlQ/aqoV7BiXslJfNRbt2e+V2Yl0qeT7NtOM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SGulEKnyIsffiHFhbNnmjUaC1uCHs1YCXWqZK5OKECUr4pFRLFrn+cgZgM255v9aQ
-         LyWgspTr/kg9HxCIRJ+jTa77jHyEILJL7N3j9ncm0auVMX8KAcsLBsoc9532Bukjoo
-         ve/MfkoPUgRin8P0ut/w0bh3k9INnWQn5uZ6fT4KQ7r8ij8ygiJLZDX5fwY5yRH1Ir
-         A0S1m9+nog8J5mAesuf9aTiYlXKSe64L+YFVca313xMRN4gao6oDmbeokzG2zxjWgS
-         zsTK2+wN7cLWwZSTxE4Igl2/GC6T4tNdnStxc8f4Stm7jpLEKIT5otpvVv9/0ZvL9k
-         w9sBKpLvfytPQ==
-Date:   Mon, 7 Feb 2022 22:48:35 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] random: use computational hash for entropy
- extraction, and related fixes
-Message-ID: <YgISQ3RXJ7DpAMqA@sol.localdomain>
-References: <20220205160118.252698-1-Jason@zx2c4.com>
+        Tue, 8 Feb 2022 03:58:32 -0500
+X-Greylist: delayed 471 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Feb 2022 00:58:30 PST
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA3B7C03FEC1;
+        Tue,  8 Feb 2022 00:58:30 -0800 (PST)
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 1436A72C905;
+        Tue,  8 Feb 2022 11:50:38 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id E823E4A46EA;
+        Tue,  8 Feb 2022 11:50:37 +0300 (MSK)
+Date:   Tue, 8 Feb 2022 11:50:37 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org, Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KEYS: asymmetric: enforce that sig algo matches
+ key algo
+Message-ID: <20220208085037.lo53hi6ohjusr7pv@altlinux.org>
+References: <20220208052448.409152-1-ebiggers@kernel.org>
+ <20220208052448.409152-2-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <20220205160118.252698-1-Jason@zx2c4.com>
+In-Reply-To: <20220208052448.409152-2-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 05, 2022 at 05:01:13PM +0100, Jason A. Donenfeld wrote:
-> The bulk of the motivation for this and description of crypto
-> vulnerabilities is in the first patch of this series. The following
-> three patches then fix up entropy accounting for the new model. The last
-> patch fixes a minor code safety issue.
+On Mon, Feb 07, 2022 at 09:24:47PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> This v3 fixes comments and commit message wording, simplifies a bit of
-> code in a cmpxchg loop, and adjusts semantics around the poll write
-> wakeup threshold.
+> Most callers of public_key_verify_signature(), including most indirect
+> callers via verify_signature() as well as pkcs7_verify_sig_chain(),
+> don't check that public_key_signature::pkey_algo matches
+> public_key::pkey_algo.  These should always match.  However, a malicious
+> signature could intentionally declare an unintended algorithm.  It is
+> essential that such signatures be rejected outright, or that the
+> algorithm of the *key* be used -- not the algorithm of the signature as
+> that would allow attackers to choose the algorithm used.
 > 
-> Jason A. Donenfeld (5):
->   random: use computational hash for entropy extraction
->   random: simplify entropy debiting
->   random: use linear min-entropy accumulation crediting
->   random: always wake up entropy writers after extraction
->   random: make credit_entropy_bits() always safe
+> Currently, public_key_verify_signature() correctly uses the key's
+> algorithm when deciding which akcipher to allocate.  That's good.
+> However, it uses the signature's algorithm when deciding whether to do
+> the first step of SM2, which is incorrect.  Also, v4.19 and older
+> kernels used the signature's algorithm for the entire process.
 > 
->  drivers/char/random.c         | 501 ++++++----------------------------
->  include/trace/events/random.h |  30 +-
->  2 files changed, 87 insertions(+), 444 deletions(-)
+> Prevent such errors by making public_key_verify_signature() enforce that
+> the signature's algorithm (if given) matches the key's algorithm.
+> 
+> Also remove two checks of this done by callers, which are now redundant.
+> 
+> Cc: stable@vger.kernel.org
+> Tested-by: Stefan Berger <stefanb@linux.ibm.com>
+> Tested-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Looks good, thanks!  You can add for the series:
+Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Thanks,
 
-- Eric
+> ---
+>  crypto/asymmetric_keys/pkcs7_verify.c    |  6 ------
+>  crypto/asymmetric_keys/public_key.c      | 15 +++++++++++++++
+>  crypto/asymmetric_keys/x509_public_key.c |  6 ------
+>  3 files changed, 15 insertions(+), 12 deletions(-)
+> 
+> diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
+> index 0b4d07aa8811..f94a1d1ad3a6 100644
+> --- a/crypto/asymmetric_keys/pkcs7_verify.c
+> +++ b/crypto/asymmetric_keys/pkcs7_verify.c
+> @@ -174,12 +174,6 @@ static int pkcs7_find_key(struct pkcs7_message *pkcs7,
+>  		pr_devel("Sig %u: Found cert serial match X.509[%u]\n",
+>  			 sinfo->index, certix);
+>  
+> -		if (strcmp(x509->pub->pkey_algo, sinfo->sig->pkey_algo) != 0) {
+> -			pr_warn("Sig %u: X.509 algo and PKCS#7 sig algo don't match\n",
+> -				sinfo->index);
+> -			continue;
+> -		}
+> -
+>  		sinfo->signer = x509;
+>  		return 0;
+>  	}
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 4fefb219bfdc..e36213945686 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -325,6 +325,21 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  	BUG_ON(!sig);
+>  	BUG_ON(!sig->s);
+>  
+> +	/*
+> +	 * If the signature specifies a public key algorithm, it *must* match
+> +	 * the key's actual public key algorithm.
+> +	 *
+> +	 * Small exception: ECDSA signatures don't specify the curve, but ECDSA
+> +	 * keys do.  So the strings can mismatch slightly in that case:
+> +	 * "ecdsa-nist-*" for the key, but "ecdsa" for the signature.
+> +	 */
+> +	if (sig->pkey_algo) {
+> +		if (strcmp(pkey->pkey_algo, sig->pkey_algo) != 0 &&
+> +		    (strncmp(pkey->pkey_algo, "ecdsa-", 6) != 0 ||
+> +		     strcmp(sig->pkey_algo, "ecdsa") != 0))
+> +			return -EKEYREJECTED;
+> +	}
+> +
+>  	ret = software_key_determine_akcipher(sig->encoding,
+>  					      sig->hash_algo,
+>  					      pkey, alg_name);
+> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+> index fe14cae115b5..71cc1738fbfd 100644
+> --- a/crypto/asymmetric_keys/x509_public_key.c
+> +++ b/crypto/asymmetric_keys/x509_public_key.c
+> @@ -128,12 +128,6 @@ int x509_check_for_self_signed(struct x509_certificate *cert)
+>  			goto out;
+>  	}
+>  
+> -	ret = -EKEYREJECTED;
+> -	if (strcmp(cert->pub->pkey_algo, cert->sig->pkey_algo) != 0 &&
+> -	    (strncmp(cert->pub->pkey_algo, "ecdsa-", 6) != 0 ||
+> -	     strcmp(cert->sig->pkey_algo, "ecdsa") != 0))
+> -		goto out;
+> -
+>  	ret = public_key_verify_signature(cert->pub, cert->sig);
+>  	if (ret < 0) {
+>  		if (ret == -ENOPKG) {
+> -- 
+> 2.35.1
