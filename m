@@ -2,94 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AFAC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 09:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 507AFC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 09:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231997AbiBHJ1g (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 04:27:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
+        id S1354735AbiBHJaL (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 04:30:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237653AbiBHJ1f (ORCPT
+        with ESMTP id S1354765AbiBHJaI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 04:27:35 -0500
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A31C03FEC0;
-        Tue,  8 Feb 2022 01:27:32 -0800 (PST)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0V3vbhCo_1644312448;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V3vbhCo_1644312448)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 08 Feb 2022 17:27:28 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     Eric Biggers <ebiggers@google.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "Gilad Ben-Yossef" <gilad@benyossef.com>,
+        Tue, 8 Feb 2022 04:30:08 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52758C03FEC1;
+        Tue,  8 Feb 2022 01:30:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0E062B81904;
+        Tue,  8 Feb 2022 09:30:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DBD5C004E1;
+        Tue,  8 Feb 2022 09:29:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644312601;
+        bh=sJbnbAI3ywBQ7hx30HFqlVdAKbjSjmRv7VYOn/IssGk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=K0l/w9CHwNMnI6/9cwaN+5LXE0+L7wKw1mduHWwFts752hr/etqzO3avLRsZ+4UtW
+         gMYnKot+uHjOiNtu3b5CgP9SPfMHblTTrG8vsUxbQM9vHd3m+h5M+pjrkmfAOjoTFM
+         VQ1uUXPn+zNWJA2p9xgqx2p1l2DkIZoFYKXEVqNmh15Fr1jmLRCvEEnELPzJOK43Rt
+         +8kPLyV/LkaDUPGHLvBlS59w7/pDoZsrpjFAliOazqXRIaCasJYg9bEE9W3F07r65N
+         XOHaqyWGNnYo53MspwRti3haAZ+ejLKjFBerHS9rsFRU+pcMA3oUUtgMaenOHeuJyI
+         1k90G1sRylq8Q==
+Date:   Tue, 8 Feb 2022 10:30:27 +0100
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org, Denis Kenzior <denkenz@gmail.com>,
         David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Subject: [PATCH v2] KEYS: asymmetric: enforce SM2 signature use pkey algo
-Date:   Tue,  8 Feb 2022 17:27:27 +0800
-Message-Id: <20220208092727.20092-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220208052448.409152-1-ebiggers@kernel.org>
-References: <20220208052448.409152-1-ebiggers@kernel.org>
+        Marcel Holtmann <marcel@holtmann.org>,
+        James Morris <james.morris@microsoft.com>,
+        linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KEYS: asym_tpm: fix buffer overreads in
+ extract_key_parameters()
+Message-ID: <YgI4M88wvxcY41RK@iki.fi>
+References: <20220113235440.90439-1-ebiggers@kernel.org>
+ <20220113235440.90439-2-ebiggers@kernel.org>
+ <YeM/YIUTEwL4jNf3@iki.fi>
+ <Yedigyl+WNhB58MO@sol.localdomain>
+ <YfFY/trrVl3vse5I@iki.fi>
+ <YfFZPbKkgYJGWu1Q@iki.fi>
+ <YfQ9PEp9zi+xWvQk@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YfQ9PEp9zi+xWvQk@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The signature verification of SM2 needs to add the Za value and
-recalculate sig->digest, which requires the detection of the pkey_algo
-in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
-field in sig is attacker-controlled and should be use pkey->pkey_algo
-instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
-will also cause signature verification failure.
+On Fri, Jan 28, 2022 at 11:00:12AM -0800, Eric Biggers wrote:
+> On Wed, Jan 26, 2022 at 04:22:53PM +0200, Jarkko Sakkinen wrote:
+> > On Wed, Jan 26, 2022 at 04:21:53PM +0200, Jarkko Sakkinen wrote:
+> > > On Tue, Jan 18, 2022 at 04:59:47PM -0800, Eric Biggers wrote:
+> > > > On Sat, Jan 15, 2022 at 11:40:48PM +0200, Jarkko Sakkinen wrote:
+> > > > > > 
+> > > > > > - Avoid integer overflows when validating size fields; 'sz + 12' and
+> > > > > >   '4 + sz' overflowed if 'sz' is near U32_MAX.
+> > > > > 
+> > > > > So we have a struct tpm_header in include/linux/tpm.h. It would be way
+> > > > > more informative to use sizeof(struct tpm_header) than number 12, even
+> > > > > if the patch does not otherwise use the struct. It tells what it is, 12
+> > > > > does not.
+> > > > 
+> > > > I don't think that would be an improvement, given that the code is using
+> > > > hard-coded offsets.  If it's reading 4 bytes from cur + 8, it's much easier to
+> > > > understand that it needs 12 bytes than 'sizeof(struct tpm_header)' bytes.
+> > > > 
+> > > > I'd certainly encourage whoever is maintaining this code to change it to use
+> > > > structs instead, but that's not what this patch is meant to do.
+> > > 
+> > > I would consider dropping asym_tpm as it has no practical use cases
+> > > existing.
+> > 
+> > At least I have zero motivation to maintain it as it does not meet
+> > any quality standards and is based on insecure crypto algorithms.
+> > I neither have participated to its review process.
+> 
+> Fair enough, I'll send a patch to remove it then.
 
-The software_key_determine_akcipher() already forces the algorithms
-are matched, so the SM3 algorithm is enforced in the SM2 signature,
-although this has been checked, we still avoid using any algorithm
-information in the signature as input.
+It is IMHO. I mean having this advertising insecure ways to to do crypto.
 
-Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
-Reported-by: Eric Biggers <ebiggers@google.com>
-Cc: stable@vger.kernel.org # v5.10+
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
----
-v2:
-  - add Fixes tag to commit message
+Thank you.
 
- crypto/asymmetric_keys/public_key.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+PS. My latency is because I've been moving to a new job. It is temporary.
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index a603ee8afdb8..ea9a5501f87e 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
- 	if (ret)
- 		return ret;
- 
--	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
-+	/* SM2 signatures always use the SM3 hash algorithm */
-+	tfm = crypto_alloc_shash("sm3", 0, 0);
- 	if (IS_ERR(tfm))
- 		return PTR_ERR(tfm);
- 
-@@ -414,8 +415,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (ret)
- 		goto error_free_key;
- 
--	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
--	    sig->data_size) {
-+	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
- 		ret = cert_sig_digest_update(sig, tfm);
- 		if (ret)
- 			goto error_free_key;
--- 
-2.34.1
-
+/Jarkko
