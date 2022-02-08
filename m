@@ -2,116 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB959C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 17:34:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F845C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 23:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239079AbiBHRe2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 12:34:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        id S234377AbiBHXHa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 18:07:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352792AbiBHRe1 (ORCPT
+        with ESMTP id S231215AbiBHXH3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 12:34:27 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C6EC061578;
-        Tue,  8 Feb 2022 09:34:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644341666; x=1675877666;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KkloPP/K7N4qIwGXeUPEt/qTLkJBInnSrpG7Dur3z3U=;
-  b=E2EdfGQ3se5jnHRG+oXbu04U5a4eEyRVbaId3E4N5npiTusXKNIUiSXv
-   6uhW3cXEIFk5CQzsyzCsf96AysGzsBOlELWeDgwWIEFLz6LmZr7WHLIka
-   xL4K3hASe3OSDPNpLOJA5+YNOc5frdgMd8wjnMzJblOcVKyPZ9Ftot8ZX
-   pfkUbUW2Aye3q29TVgsdGb/nddWd6jxx301cy/ML0jwsfb7tRw6i25x46
-   Pc+ORuw44Xn9Pz9KyH/Ud1MB8CTcMV5cWmw75U5c6ifXqr+6PHMgJ8lYX
-   HFa2RDJDnp6U6bDSpARVIcE4sX+BQ4m4GAKaTXQMXduYiKmJlqBhfgx4V
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="335409074"
-X-IronPort-AV: E=Sophos;i="5.88,353,1635231600"; 
-   d="scan'208";a="335409074"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2022 09:34:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,353,1635231600"; 
-   d="scan'208";a="499641130"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 08 Feb 2022 09:33:59 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nHUNL-0000W8-8d; Tue, 08 Feb 2022 17:33:59 +0000
-Date:   Wed, 9 Feb 2022 01:33:33 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        herbert@gondor.apana.org.au
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Marcinx Malinowski <marcinx.malinowski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>
-Subject: Re: [PATCH 3/3] crypto: qat - enable power management for QAT GEN4
-Message-ID: <202202090111.cyDiSbN4-lkp@intel.com>
-References: <20220203135434.584967-4-wojciech.ziemba@intel.com>
+        Tue, 8 Feb 2022 18:07:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B6EC061576;
+        Tue,  8 Feb 2022 15:07:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AB26BB81D15;
+        Tue,  8 Feb 2022 23:07:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425C2C340ED;
+        Tue,  8 Feb 2022 23:07:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644361645;
+        bh=L4k/srAhw9AuTrpWegTohSDP66SMe5MK538ECj9wpYA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jl+kudIu+dYHRMx4t2Sn/sg0eij0lkiu9ywDCP6ZNX0F2MfKn1ljhD9MzmZO6zRG/
+         i4YbWAFceFyncEtHV2NrbYwCQnuYS48QLaD84XlnAaVPhZqLDjjw9x/4/nmSt1Glwd
+         v1UNaDtPvH7xZ7bBJG/gizvKcePFDny5hO2pzrqZatN83X8UBiZoM2B8XSSGkgNTYf
+         0yYS19JccU8HNVEHhXEiFXbnIDuh20TOShCO8eJyeDANyUr7D4h+gBraxTb/HcFjqR
+         uP36lHUQqQQzOIyW+CHd1gESCwOyHzxGM6tmyYSVQARlYWM/BCMrBAvqu3H7O8a/9I
+         nOMmFFNASygDw==
+Date:   Tue, 8 Feb 2022 15:07:12 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH v1 1/7] random: use RDSEED instead of RDRAND in entropy
+ extraction
+Message-ID: <YgL3oCXDPB8dEUlU@sol.localdomain>
+References: <20220208155335.378318-1-Jason@zx2c4.com>
+ <20220208155335.378318-2-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220203135434.584967-4-wojciech.ziemba@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20220208155335.378318-2-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Wojciech,
+On Tue, Feb 08, 2022 at 04:53:29PM +0100, Jason A. Donenfeld wrote:
+> When /dev/random was directly connected with entropy extraction, without
+> any expansion stage, extract_buf() was called for every 10 bytes of data
+> read from /dev/random. For that reason, RDRAND was used rather than
+> RDSEED. At the same time, crng_reseed() was still only called every 5
+> minutes, so there RDSEED made sense.
+> 
+> Those olden days were also a time when the entropy collector did not use
+> a cryptographic hash function, which meant most bets were off in terms
+> of real preimage resistance. For that reason too it didn't matter
+> _that_ much whether RDSEED was mixed in before or after entropy
+> extraction; both choices were sort of bad.
+> 
+> But now we have a cryptographic hash function at work, and with that we
+> get real preimage resistance. We also now only call extract_entropy()
+> every 5 minutes, rather than every 10 bytes. This allows us to do two
+> important things.
+> 
+> First, we can switch to using RDSEED in extract_entropy(), as Dominik
+> suggested. Second, we can ensure that RDSEED input always goes into the
+> cryptographic hash function with other things before being used
+> directly. This eliminates a category of attacks in which the CPU knows
+> the current state of the crng and knows that we're going to xor RDSEED
+> into it, and so it computes a malicious RDSEED. By going through our
+> hash function, it would require the CPU to compute a preimage on the
+> fly, which isn't going to happen.
+> 
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Suggested-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  drivers/char/random.c | 22 +++++++++-------------
+>  1 file changed, 9 insertions(+), 13 deletions(-)
 
-Thank you for the patch! Yet something to improve:
+Looks good,
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linux/master linus/master v5.17-rc3 next-20220208]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-url:    https://github.com/0day-ci/linux/commits/Wojciech-Ziemba/Introduce-support-for-QAT-Dynamic-Power-Management/20220203-221431
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20220209/202202090111.cyDiSbN4-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project e8bff9ae54a55b4dbfeb6ba55f723abbd81bf494)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/00718c83e19e0fbffe30e7eb8cd58eaf4d52af34
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Wojciech-Ziemba/Introduce-support-for-QAT-Dynamic-Power-Management/20220203-221431
-        git checkout 00718c83e19e0fbffe30e7eb8cd58eaf4d52af34
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/crypto/qat/qat_common/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
->> drivers/crypto/qat/qat_common/adf_isr.c:148:6: error: implicit declaration of function 'adf_handle_pm_int' [-Werror,-Wimplicit-function-declaration]
-           if (adf_handle_pm_int(accel_dev))
-               ^
-   1 error generated.
-
-
-vim +/adf_handle_pm_int +148 drivers/crypto/qat/qat_common/adf_isr.c
-
-   147	
- > 148		if (adf_handle_pm_int(accel_dev))
-   149			return IRQ_HANDLED;
-   150	
-   151		dev_dbg(&GET_DEV(accel_dev), "qat_dev%d spurious AE interrupt\n",
-   152			accel_dev->accel_id);
-   153	
-   154		return IRQ_NONE;
-   155	}
-   156	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+- Eric
