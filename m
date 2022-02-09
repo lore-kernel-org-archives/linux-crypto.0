@@ -2,90 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E74EFC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 08:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318B7C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 08:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237039AbiBIIhB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 03:37:01 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34756 "EHLO
+        id S242084AbiBIIhE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 03:37:04 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242020AbiBIIg7 (ORCPT
+        with ESMTP id S242067AbiBIIhA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 03:36:59 -0500
+        Wed, 9 Feb 2022 03:37:00 -0500
 Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE23AC050CE1;
-        Wed,  9 Feb 2022 00:36:56 -0800 (PST)
-X-isilmar-external: YES
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9733C050CDF;
+        Wed,  9 Feb 2022 00:36:57 -0800 (PST)
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id CD2E220142C;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id D323A20142D;
         Wed,  9 Feb 2022 08:31:15 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id A0AEC808FB; Wed,  9 Feb 2022 09:30:16 +0100 (CET)
-Date:   Wed, 9 Feb 2022 09:30:16 +0100
+        id 05B9A802CB; Wed,  9 Feb 2022 09:22:27 +0100 (CET)
+Date:   Wed, 9 Feb 2022 09:22:26 +0100
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tytso@mit.edu, ebiggers@kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v2 7/9] random: use simpler fast key erasure flow on
- per-cpu keys
-Message-ID: <YgN7mOTtQ03etVJX@owl.dominikbrodowski.net>
+        tytso@mit.edu, ebiggers@kernel.org
+Subject: Re: [PATCH v2 2/9] random: get rid of secondary crngs
+Message-ID: <YgN5wp58XHYd7/WA@owl.dominikbrodowski.net>
 References: <20220209011919.493762-1-Jason@zx2c4.com>
- <20220209011919.493762-8-Jason@zx2c4.com>
+ <20220209011919.493762-3-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220209011919.493762-8-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-3-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Nice work, just a few minor queries:
+Just one question (which was already present in the past, but...):
 
-> -static void extract_crng(u8 out[CHACHA_BLOCK_SIZE])
-> +/*
-> + * The general form here is based on a "fast key erasure RNG" from
-> + * <https://blog.cr.yp.to/20170723-random.html>. It generates a ChaCha
-> + * block using the provided key, and then immediately overwites that
-> + * key with half the block. It returns the resultant ChaCha state to the
-> + * user, along with the second half of the block containing 32 bytes of
-> + * random data that may be used; random_data_len may not be greater than
-> + * 32.
-> + */
-> +static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
-> +				  u32 chacha_state[CHACHA_STATE_WORDS],
-> +				  u8 *random_data, size_t random_data_len)
->  {
-> -	unsigned long flags, init_time;
-> +	u8 first_block[CHACHA_BLOCK_SIZE];
+> -	WRITE_ONCE(crng->init_time, jiffies);
+> -	spin_unlock_irqrestore(&crng->lock, flags);
+> -	if (crng == &primary_crng && crng_init < 2)
+> -		crng_finalize_init();
+> +	WRITE_ONCE(primary_crng.init_time, jiffies);
+> +	spin_unlock_irqrestore(&primary_crng.lock, flags);
+> +	if (crng_init < 2) {
+> +		invalidate_batched_entropy();
+> +		crng_init = 2;
 
-Do we need a BUG_ON(random_data_len > 32) here?
-
->  
-> -	if (crng_ready()) {
-> -		init_time = READ_ONCE(primary_crng.init_time);
-> -		if (time_after(jiffies, init_time + CRNG_RESEED_INTERVAL))
-> -			crng_reseed();
-> -	}
-> -	spin_lock_irqsave(&primary_crng.lock, flags);
-> -	chacha20_block(&primary_crng.state[0], out);
-> -	if (primary_crng.state[12] == 0)
-> -		primary_crng.state[13]++;
-> -	spin_unlock_irqrestore(&primary_crng.lock, flags);
-> +	chacha_init_consts(chacha_state);
-> +	memcpy(&chacha_state[4], key, CHACHA_KEY_SIZE);
-> +	memset(&chacha_state[12], 0, sizeof(u32) * 4);
-
-No IV, no generation counter here? As you already have a generation counter
-in use for other purposes, why not use it here as well as some non-zero
-starting point?
-
-Otherwise, it looks really nice.
+Might this branch be taken twice if crng_reseed() is called concurrently
+twice? If so, we'd need to increment crng_init while holding the lock,
+such as I suggested in my patch "random: fix locking for crng_init in
+crng_reseed()". But that can be deferred to an additional patch.
 
 Thanks,
 	Dominik
