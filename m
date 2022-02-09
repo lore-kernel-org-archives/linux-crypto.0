@@ -2,20 +2,19 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFDBC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 08:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 284D8C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 08:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241997AbiBIIg6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 03:36:58 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34568 "EHLO
+        id S242064AbiBIIhA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 03:37:00 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231430AbiBIIg4 (ORCPT
+        with ESMTP id S241994AbiBIIg5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 03:36:56 -0500
-X-Greylist: delayed 352 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 09 Feb 2022 00:36:54 PST
+        Wed, 9 Feb 2022 03:36:57 -0500
 Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8187C03649A;
-        Wed,  9 Feb 2022 00:36:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F89C0364A2;
+        Wed,  9 Feb 2022 00:36:55 -0800 (PST)
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
@@ -23,60 +22,37 @@ X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id D5DEB20142F;
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id C9FA120142A;
         Wed,  9 Feb 2022 08:31:15 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id BA0348033A; Wed,  9 Feb 2022 07:18:42 +0100 (CET)
-Date:   Wed, 9 Feb 2022 07:18:42 +0100
+        id C16588046A; Wed,  9 Feb 2022 09:22:39 +0100 (CET)
+Date:   Wed, 9 Feb 2022 09:22:39 +0100
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         tytso@mit.edu, ebiggers@kernel.org,
         Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 1/9] random: use RDSEED instead of RDRAND in entropy
- extraction
-Message-ID: <YgNcwjH/XG7o4z6Y@owl.dominikbrodowski.net>
+Subject: Re: [PATCH v2 3/9] random: inline leaves of rand_initialize()
+Message-ID: <YgN5z/XqkYV/gxOv@owl.dominikbrodowski.net>
 References: <20220209011919.493762-1-Jason@zx2c4.com>
- <20220209011919.493762-2-Jason@zx2c4.com>
+ <20220209011919.493762-4-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220209011919.493762-2-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-4-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Wed, Feb 09, 2022 at 02:19:11AM +0100 schrieb Jason A. Donenfeld:
-> When /dev/random was directly connected with entropy extraction, without
-> any expansion stage, extract_buf() was called for every 10 bytes of data
-> read from /dev/random. For that reason, RDRAND was used rather than
-> RDSEED. At the same time, crng_reseed() was still only called every 5
-> minutes, so there RDSEED made sense.
-> 
-> Those olden days were also a time when the entropy collector did not use
-> a cryptographic hash function, which meant most bets were off in terms
-> of real preimage resistance. For that reason too it didn't matter
-> _that_ much whether RDSEED was mixed in before or after entropy
-> extraction; both choices were sort of bad.
-> 
-> But now we have a cryptographic hash function at work, and with that we
-> get real preimage resistance. We also now only call extract_entropy()
-> every 5 minutes, rather than every 10 bytes. This allows us to do two
-> important things.
-> 
-> First, we can switch to using RDSEED in extract_entropy(), as Dominik
-> suggested. Second, we can ensure that RDSEED input always goes into the
-> cryptographic hash function with other things before being used
-> directly. This eliminates a category of attacks in which the CPU knows
-> the current state of the crng and knows that we're going to xor RDSEED
-> into it, and so it computes a malicious RDSEED. By going through our
-> hash function, it would require the CPU to compute a preimage on the
-> fly, which isn't going to happen.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Reviewed-by: Eric Biggers <ebiggers@google.com>
-> Suggested-by: Dominik Brodowski <linux@dominikbrodowski.net>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Am Wed, Feb 09, 2022 at 02:19:13AM +0100 schrieb Jason A. Donenfeld:
+> This is a preparatory commit for the following one. We simply inline the
+> various functions that rand_initialize() calls that have no other
+> callers. The compiler was doing this anyway before. Doing this will
+> allow us to reorganize this after.
+
+You also move some other code around (parse_trust_cpu() etc.), so please
+mention that in the commit message or leave these parts where they are.
+Other than that, feel free to add my
 
 	Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
