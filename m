@@ -2,259 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9E6C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Feb 2022 23:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5E7C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 00:22:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237479AbiBHXjW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 18:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47430 "EHLO
+        id S235343AbiBIAWB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 19:22:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231418AbiBHXjV (ORCPT
+        with ESMTP id S232503AbiBIAWA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 18:39:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDDEC061576;
-        Tue,  8 Feb 2022 15:39:20 -0800 (PST)
+        Tue, 8 Feb 2022 19:22:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B244C06173B;
+        Tue,  8 Feb 2022 16:21:59 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 568E5B81DA9;
-        Tue,  8 Feb 2022 23:39:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D40BDC340E9;
-        Tue,  8 Feb 2022 23:39:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644363558;
-        bh=yMY3ujgnw8WZsA6PCk5QbPpvUzsJpDtHkDlAD+YNtSU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Jw1V4XGmGLZPKaBNrlcMeYT+RbChYEdU3iioIDMSBdIahgjSNL2sBaJ6fAQvc/qEg
-         SUH0DV2A+KTjF5SF5RE00QpqntZZ2ChikZ4PwnZBb3r3F7WrPMwmtfJ6oRhsEmyvj7
-         QEi/3fNAmt3AiTUXLKaB32hc3gHPY9a3N/5VU3MF3tQis3gccGu3kiTTvCY7M5eW0e
-         q6yGo51KxMVU0jnSrIJJhtUZNLiGpTQf5zVnYi3UoLDdcSBynXmnsN/xeDM69oApz1
-         omDxU3RktKNwNujLqtSgIiDIFEt1K3c9pBvL0o725OhnQvVNam/krVGx/giv8/2fQV
-         WyCpY4yqUO+8g==
-Date:   Tue, 8 Feb 2022 15:39:16 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 32F3CB81DE5;
+        Wed,  9 Feb 2022 00:21:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98217C340E9;
+        Wed,  9 Feb 2022 00:21:56 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="p/hetZUs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644366114;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yQ6XCjuca0gHb7IBipxgluRZP1vfq7sfS5zZ7CqHC/s=;
+        b=p/hetZUsL9e76SV3kMlSI2VpzN0erhuP92iqR9yXPnrvx2x0RG7JrIX1Rs6gkbcYJiqlAM
+        8gF0fjyMmI7+c6CGSB/l808Kgo41F4GiIQAfI9gGf7dkIxBEJTxb5CSxFluv2TvnA7Sur9
+        IMevYjvhDYjl48EYIglQlny2LDnRlGE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 18372bd8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 00:21:54 +0000 (UTC)
+Received: by mail-yb1-f175.google.com with SMTP id 192so1294115ybd.10;
+        Tue, 08 Feb 2022 16:21:53 -0800 (PST)
+X-Gm-Message-State: AOAM5324ggbddFFZa8irGOdWmMyZRZgRYWmR4/yY2revh6uBSYq0YHHz
+        ztkw9ItN0OEUmo9CD0V8nDw22rTdfyRAYBvFA9o=
+X-Google-Smtp-Source: ABdhPJzraCsmgLP4WkQbzGDkTSOQxlGEk2SgcBEXq47jtgUlBENHIhD13qTDRNWnUM4VrzVTpg4amIwIRIGnyJoPcFU=
+X-Received: by 2002:a25:42:: with SMTP id 63mr5594754yba.245.1644366112938;
+ Tue, 08 Feb 2022 16:21:52 -0800 (PST)
+MIME-Version: 1.0
+References: <20220208155335.378318-1-Jason@zx2c4.com> <20220208155335.378318-7-Jason@zx2c4.com>
+ <YgL/JN+ObjfhEedk@sol.localdomain>
+In-Reply-To: <YgL/JN+ObjfhEedk@sol.localdomain>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 9 Feb 2022 01:21:42 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qd0WPqyOqwcsRX+bZzimMj1ZvCGKskGca7Z_Fi9QCYow@mail.gmail.com>
+Message-ID: <CAHmME9qd0WPqyOqwcsRX+bZzimMj1ZvCGKskGca7Z_Fi9QCYow@mail.gmail.com>
 Subject: Re: [PATCH v1 6/7] random: use simpler fast key erasure flow on
  per-cpu keys
-Message-ID: <YgL/JN+ObjfhEedk@sol.localdomain>
-References: <20220208155335.378318-1-Jason@zx2c4.com>
- <20220208155335.378318-7-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220208155335.378318-7-Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+Hey Eric,
 
-On Tue, Feb 08, 2022 at 04:53:34PM +0100, Jason A. Donenfeld wrote:
-> Rather than the clunky NUMA full ChaCha state system we had prior, this
-> commit is closer to the original "fast key erasure RNG" proposal from
-> <https://blog.cr.yp.to/20170723-random.html>, by simply treating ChaCha
-> keys on a per-cpu basis.
-> 
-> All entropy is extracted to a base crng key of 32 bytes. This base crng
-> has a birthdate and a generation counter. When we go to take bytes from
-> the crng, we first check if the birthdate is too old; if it is, we
-> reseed per usual. Then we start working on a per-cpu crng.
-> 
-> This per-cpu crng makes sure that it has the same generation counter as
-> the base crng. If it doesn't, it does fast key erasure with the base
-> crng key and uses the output as its new per-cpu key, and then updates
-> its local generation counter. Then, using this per-cpu state, we do
-> ordinary fast key erasure. Half of this first block is used to overwrite
-> the per-cpu crng key for the next call -- this is the fast key erasure
-> RNG idea -- and the other half, along with the ChaCha state, is returned
-> to the caller. If the caller desires more than this remaining half, it
-> can generate more ChaCha blocks, unlocked, using the now detached ChaCha
-> state that was just returned. Crypto-wise, this is more or less what we
-> were doing before, but this simply makes it more explicit and ensures
-> that we always have backtrack protection by not playing games with a
-> shared block counter.
-> 
-> The flow looks like this:
-> 
-> ──extract()──► base_crng.key ◄──memcpy()───┐
->                    │                       │
->                    └──chacha()──────┬─► new_base_key
->                                     └─► crngs[n].key ◄──memcpy()───┐
->                                               │                    │
->                                               └──chacha()───┬─► new_key
->                                                             └─► random_bytes
->                                                                       │
->                                                                       └────►
-> 
-> There are a few hairy details around early init. Just as was done
-> before, prior to having gathered enough entropy, crng_fast_load() and
-> crng_slow_load() dump bytes directly into the base crng, and when we go
-> to take bytes from the crng, in that case, we're doing fast key erasure
-> with the base crng rather than the fast unlocked per-cpu crngs. This is
-> fine as that's only the state of affairs during very early boot; once
-> the crng initializes we never use these paths again.
-> 
-> In the process of all this, the APIs into the crng become a bit simpler:
-> we have get_random_bytes(buf, len) and get_random_bytes_user(buf, len),
-> which both do what you'd expect. All of the details of fast key erasure
-> and per-cpu selection happen only in a very short critical section of
-> crng_make_state(), which selects the right per-cpu key, does the fast
-> key erasure, and returns a local state to the caller's stack. So, we no
-> longer have a need for a separate backtrack function, as this happens
-> all at once here. The API then allows us to extend backtrack protection
-> to batched entropy without really having to do much at all.
-> 
-> The result is a bit simpler than before and has fewer foot guns. The
-> init time state machine also gets a lot simpler as we don't need to wait
-> for workqueues to come online and do deferred work. And the multi-core
-> performance should be increased significantly, by virtue of having hardly
-> any locking on the fast path.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 278 +++++++++++++++++++++++++-----------------
->  1 file changed, 169 insertions(+), 109 deletions(-)
+Thanks a bunch for the review.
 
-This looks like a big improvement, thanks.  A few comments below.
+On Wed, Feb 9, 2022 at 12:39 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> Previously, the extracted entropy was being XOR'ed into the ChaCha key.  Now the
+> key is just being overwritten.  This is the approach we should be aiming for,
+> but I'm concerned about the fact that add_interrupt_randomness() still sometimes
+> adds entropy to the ChaCha key directly without mixing it into the entropy pool.
+> That happens via crng_fast_load() when crng_init == 0.  This new approach will
+> destroy any entropy that was present in the key only.
+>
+> The right fix, IMO, would be to always send entropy through the entropy pool.
+> Until that is done, though, I'm not sure it's a good idea to overwrite the key
+> like this.
 
->  static void crng_reseed(void)
->  {
->  	unsigned long flags;
-> -	int i, entropy_count;
-> -	union {
-> -		u8 block[CHACHA_BLOCK_SIZE];
-> -		u32 key[8];
-> -	} buf;
-> +	int entropy_count;
-> +	unsigned long next_gen;
-> +	u8 key[CHACHA_KEY_SIZE];
->  
->  	do {
->  		entropy_count = READ_ONCE(input_pool.entropy_count);
->  		if (entropy_count < POOL_MIN_BITS)
->  			return;
->  	} while (cmpxchg(&input_pool.entropy_count, entropy_count, 0) != entropy_count);
-> -	extract_entropy(buf.key, sizeof(buf.key));
-> +	extract_entropy(key, sizeof(key));
->  	wake_up_interruptible(&random_write_wait);
->  	kill_fasync(&fasync, SIGIO, POLL_OUT);
->  
-> -	spin_lock_irqsave(&primary_crng.lock, flags);
-> -	for (i = 0; i < 8; i++)
-> -		primary_crng.state[i + 4] ^= buf.key[i];
-> -	memzero_explicit(&buf, sizeof(buf));
-> -	WRITE_ONCE(primary_crng.init_time, jiffies);
-> -	spin_unlock_irqrestore(&primary_crng.lock, flags);
-> +	spin_lock_irqsave(&base_crng.lock, flags);
-> +	memcpy(base_crng.key, key, sizeof(base_crng.key));
-> +	next_gen = base_crng.generation + 1;
-> +	if (next_gen == ULONG_MAX)
-> +		++next_gen;
-> +	WRITE_ONCE(base_crng.generation, next_gen);
-> +	base_crng.birth = jiffies;
-> +	spin_unlock_irqrestore(&base_crng.lock, flags);
-> +	memzero_explicit(key, sizeof(key));
+I agree with this in principle, and I've been trying to think of a
+good way to do it, but it's a bit hard to do, because of the workqueue
+deferred dumping. I'll try to see if I can figure out something there.
+In practice, it's not _such_ a big deal, as it's "only" 64 credit-bits
+of entropy we're talking about. A sort of hacky but maybe a
+satisfactory solution would be to hash the base_crng key into the
+pool, once, just at the transition point. I'll think a bit more on it.
 
-Previously, the extracted entropy was being XOR'ed into the ChaCha key.  Now the
-key is just being overwritten.  This is the approach we should be aiming for,
-but I'm concerned about the fact that add_interrupt_randomness() still sometimes
-adds entropy to the ChaCha key directly without mixing it into the entropy pool.
-That happens via crng_fast_load() when crng_init == 0.  This new approach will
-destroy any entropy that was present in the key only.
+>
+> Unrelated: this function could use some comments that explain what is going on.
 
-The right fix, IMO, would be to always send entropy through the entropy pool.
-Until that is done, though, I'm not sure it's a good idea to overwrite the key
-like this.
+Will do.
 
-Unrelated: this function could use some comments that explain what is going on.
+>
+> > +/*
+> > + * The general form here is based on a "fast key erasure RNG" from:
+> > + * https://blog.cr.yp.to/20170723-random.html
+> > + */
+> > +static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
+> > +                               u32 chacha_state[CHACHA_STATE_WORDS],
+> > +                               u8 random_data[32], size_t random_data_len)
+>
+> Given that random_data is variable-length it should be a 'u8 *'.
 
-> +/*
-> + * The general form here is based on a "fast key erasure RNG" from:
-> + * https://blog.cr.yp.to/20170723-random.html
-> + */
-> +static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
-> +				  u32 chacha_state[CHACHA_STATE_WORDS],
-> +				  u8 random_data[32], size_t random_data_len)
+I'll do that and mention the size aspect in the comment on top.
 
-Given that random_data is variable-length it should be a 'u8 *'.
+>
+> Also, the above comment could use some more explanation.  I.e. what does this
+> function actually *do*.  (I understand it, but a comment will really help any
+> future readers...)
 
-Also, the above comment could use some more explanation.  I.e. what does this
-function actually *do*.  (I understand it, but a comment will really help any
-future readers...)
+Will do.
 
-> + /*
-> + * This function returns a ChaCha block that you may use for generating
+>
+> > + /*
+> > + * This function returns a ChaCha block that you may use for generating
+>
+> ChaCha state, not ChaCha block.
 
-ChaCha state, not ChaCha block.
+Thanks.
 
-> + * random data. It also returns up to 32 bytes on its own of random data
-> + * that may be used.
-> +*/
-> +static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
-> +			    u8 random_data[32], size_t random_data_len)
+>
+> > + * random data. It also returns up to 32 bytes on its own of random data
+> > + * that may be used.
+> > +*/
+> > +static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
+> > +                         u8 random_data[32], size_t random_data_len)
+>
+> Likewise, it's weird having random_data be declared as length 32 when it's
+> actually variable-length.
 
-Likewise, it's weird having random_data be declared as length 32 when it's
-actually variable-length.
+Will fix.
 
->  {
->  	unsigned long flags;
-> -	u32 *s, *d;
-> -	int i;
-> +	struct crng *crng;
-> +
-> +	/* For the fast path, we check this unlocked first. */
-> +	if (unlikely(!crng_ready())) {
-> +		bool not_ready;
-> +
-> +		spin_lock_irqsave(&base_crng.lock, flags);
-> +		/* Now that we're locked, re-check. */
-> +		not_ready = !crng_ready();
-> +		if (not_ready)
-> +			crng_fast_key_erasure(base_crng.key, chacha_state,
-> +					      random_data, random_data_len);
-> +		spin_unlock_irqrestore(&base_crng.lock, flags);
-> +		if (!not_ready)
-> +			return;
-> +	}
+> > +     /* For the fast path, we check this unlocked first. */
+> > +     if (unlikely(!crng_ready())) {
+> > +             bool not_ready;
+> > +
+> > +             spin_lock_irqsave(&base_crng.lock, flags);
+> > +             /* Now that we're locked, re-check. */
+> > +             not_ready = !crng_ready();
+> > +             if (not_ready)
+> > +                     crng_fast_key_erasure(base_crng.key, chacha_state,
+> > +                                           random_data, random_data_len);
+> > +             spin_unlock_irqrestore(&base_crng.lock, flags);
+> > +             if (!not_ready)
+> > +                     return;
+> > +     }
+>
+> Isn't the '!not_ready' check above backwards?  And in case case, doubly-inverted
+> logic like that should be avoided.
 
-Isn't the '!not_ready' check above backwards?  And in case case, doubly-inverted
-logic like that should be avoided.
+You're right; it's all screwed up. I'll call it "ready" like it should
+be and fix the logic on that last if statement. Thank you for pointing
+this one out.
 
-And again, a few more comments please :-)
+>
+> And again, a few more comments please :-)
 
->  struct batched_entropy {
->  	union {
-> -		u64 entropy_u64[CHACHA_BLOCK_SIZE / sizeof(u64)];
-> -		u32 entropy_u32[CHACHA_BLOCK_SIZE / sizeof(u32)];
-> +		u64 entropy_u64[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
-> +		u32 entropy_u32[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
->  	};
+I'll pepper it up.
 
-The above numbers could use an explanation.
+>
+> >  struct batched_entropy {
+> >       union {
+> > -             u64 entropy_u64[CHACHA_BLOCK_SIZE / sizeof(u64)];
+> > -             u32 entropy_u32[CHACHA_BLOCK_SIZE / sizeof(u32)];
+> > +             u64 entropy_u64[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
+> > +             u32 entropy_u32[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
+> >       };
+>
+> The above numbers could use an explanation.
 
->  /*
->   * Get a random word for internal kernel use only. The quality of the random
-> - * number is good as /dev/urandom, but there is no backtrack protection, with
-> - * the goal of being quite fast and not depleting entropy. In order to ensure
-> - * that the randomness provided by this function is okay, the function
-> - * wait_for_random_bytes() should be called and return 0 at least once at any
-> - * point prior.
-> + * number is good as /dev/urandom. In order to ensure that the randomness
-> + * provided by this function is okay, the function wait_for_random_bytes()
-> + * should be called and return 0 at least once at any point prior.
->   */
+It's 32 bytes from fast key erasure + one full chacha block. I'll
+leave a big comment there explaining this.
 
-There's also a comment at the top of the file that still claims that
-get_random_int() et al. don't implement backtracking protection.  That needs to
-be updated.
+> There's also a comment at the top of the file that still claims that
+> get_random_int() et al. don't implement backtracking protection.  That needs to
+> be updated.
 
-- Eric
+Will do. Saw this too after submitting.
+
+Thanks again for your review!
+
+Jason
