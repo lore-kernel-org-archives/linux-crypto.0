@@ -2,150 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D9DC43217
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21496C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235563AbiBICkj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S243579AbiBICkj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 8 Feb 2022 21:40:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52414 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242676AbiBIBT6 (ORCPT
+        with ESMTP id S234389AbiBIBTz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 20:19:58 -0500
+        Tue, 8 Feb 2022 20:19:55 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F672C061576;
-        Tue,  8 Feb 2022 17:19:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9885EC061576;
+        Tue,  8 Feb 2022 17:19:54 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4F9B4B81E2E;
-        Wed,  9 Feb 2022 01:19:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63807C340EB;
-        Wed,  9 Feb 2022 01:19:54 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 59A80B81E2D;
+        Wed,  9 Feb 2022 01:19:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FC40C340EB;
+        Wed,  9 Feb 2022 01:19:51 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="flziGrYH"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O0ZcQX9E"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644369593;
+        t=1644369590;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=awLAlfu0dEawTGo7j7bialpwVA3+UDTfPgufirjHqnI=;
-        b=flziGrYHxi9FMOZQDeOPRS1Ww+nzdVXJmFKRqJkRKtFe6iGSxTYeGXs7uiw1kmD6d8wn36
-        E8JAAnH/vQgL3tpLP4r+HXawGrSLn1pjKQFdyI44Ofdh7j2HyBV8AEUlC4P4Y2egGZ/rLc
-        dTokiqRSYonn2nt8otyF/nfBsVhqzZE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 14f224b6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 01:19:52 +0000 (UTC)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=muXktWPwK3DXgvGz5zZKW5xbimKtTXaNSyPW53UCMxA=;
+        b=O0ZcQX9E98Ro83oI3AJua90Th0b6eTHZF8OPO6r+M38IeIA4iud6w0IeKwBG3jLWocZu4W
+        z8uvvcj05qxGS/sn2fPdztXPfPrx50I5qeIt6wlgRyJzZqHyLdIIJ1FUEBVmibohgPwbXr
+        X9WG9CLE/d2rec9DknY+ZB7MPq/JjBU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fca0fc21 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 01:19:49 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     tytso@mit.edu, linux@dominikbrodowski.net, ebiggers@kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH v2 1/9] random: use RDSEED instead of RDRAND in entropy extraction
-Date:   Wed,  9 Feb 2022 02:19:11 +0100
-Message-Id: <20220209011919.493762-2-Jason@zx2c4.com>
-In-Reply-To: <20220209011919.493762-1-Jason@zx2c4.com>
-References: <20220209011919.493762-1-Jason@zx2c4.com>
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v2 0/9] random: cleanups around per-cpu crng & rdrand
+Date:   Wed,  9 Feb 2022 02:19:10 +0100
+Message-Id: <20220209011919.493762-1-Jason@zx2c4.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When /dev/random was directly connected with entropy extraction, without
-any expansion stage, extract_buf() was called for every 10 bytes of data
-read from /dev/random. For that reason, RDRAND was used rather than
-RDSEED. At the same time, crng_reseed() was still only called every 5
-minutes, so there RDSEED made sense.
+This series tackles a few issues that are intermingled with each other:
 
-Those olden days were also a time when the entropy collector did not use
-a cryptographic hash function, which meant most bets were off in terms
-of real preimage resistance. For that reason too it didn't matter
-_that_ much whether RDSEED was mixed in before or after entropy
-extraction; both choices were sort of bad.
+- Using RDSEED when we can rather than using RDRAND.
 
-But now we have a cryptographic hash function at work, and with that we
-get real preimage resistance. We also now only call extract_entropy()
-every 5 minutes, rather than every 10 bytes. This allows us to do two
-important things.
+- Making sure RDRAND/RDSEED input always goes through the mixer rather
+  than being xor'd into our state directly, in part in order to prevent
+  ridiculous hypothetical cpu backdoors, and in part because it makes it
+  easier to model RDRAND/RDSEED as just another entropy input.
 
-First, we can switch to using RDSEED in extract_entropy(), as Dominik
-suggested. Second, we can ensure that RDSEED input always goes into the
-cryptographic hash function with other things before being used
-directly. This eliminates a category of attacks in which the CPU knows
-the current state of the crng and knows that we're going to xor RDSEED
-into it, and so it computes a malicious RDSEED. By going through our
-hash function, it would require the CPU to compute a preimage on the
-fly, which isn't going to happen.
+- Untangling the never ending headache that is kmalloc'd NUMA secondary
+  CRNGs, and replacing these with leaner per-cpu ChaCha keys that don't
+  have all the state troubles. There are other patches pending my review
+  that take the current NUMA initialization code to yet another layer of
+  complexity, sort of driving home the point to me that the current code
+  is a can of worms. This patchset attempts a different direction there.
 
-Cc: Theodore Ts'o <tytso@mit.edu>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-Suggested-by: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+- Enforcing "fast key erasure" expansion always, and not relying on
+  having a shared block counter that is bound to lead to troubles sooner
+  or later.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 22d12213d548..ce3c019e5f5f 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -722,13 +722,8 @@ static void crng_reseed(struct crng_state *crng)
- 					CHACHA_KEY_SIZE);
- 	}
- 	spin_lock_irqsave(&crng->lock, flags);
--	for (i = 0; i < 8; i++) {
--		unsigned long rv;
--		if (!arch_get_random_seed_long(&rv) &&
--		    !arch_get_random_long(&rv))
--			rv = random_get_entropy();
--		crng->state[i + 4] ^= buf.key[i] ^ rv;
--	}
-+	for (i = 0; i < 8; i++)
-+		crng->state[i + 4] ^= buf.key[i];
- 	memzero_explicit(&buf, sizeof(buf));
- 	WRITE_ONCE(crng->init_time, jiffies);
- 	spin_unlock_irqrestore(&crng->lock, flags);
-@@ -1064,16 +1059,17 @@ static void extract_entropy(void *buf, size_t nbytes)
- 	unsigned long flags;
- 	u8 seed[BLAKE2S_HASH_SIZE], next_key[BLAKE2S_HASH_SIZE];
- 	struct {
--		unsigned long rdrand[32 / sizeof(long)];
-+		unsigned long rdseed[32 / sizeof(long)];
- 		size_t counter;
- 	} block;
- 	size_t i;
- 
- 	trace_extract_entropy(nbytes, input_pool.entropy_count);
- 
--	for (i = 0; i < ARRAY_SIZE(block.rdrand); ++i) {
--		if (!arch_get_random_long(&block.rdrand[i]))
--			block.rdrand[i] = random_get_entropy();
-+	for (i = 0; i < ARRAY_SIZE(block.rdseed); ++i) {
-+		if (!arch_get_random_seed_long(&block.rdseed[i]) &&
-+		    !arch_get_random_long(&block.rdseed[i]))
-+			block.rdseed[i] = random_get_entropy();
- 	}
- 
- 	spin_lock_irqsave(&input_pool.lock, flags);
-@@ -1081,7 +1077,7 @@ static void extract_entropy(void *buf, size_t nbytes)
- 	/* seed = HASHPRF(last_key, entropy_input) */
- 	blake2s_final(&input_pool.hash, seed);
- 
--	/* next_key = HASHPRF(seed, RDRAND || 0) */
-+	/* next_key = HASHPRF(seed, RDSEED || 0) */
- 	block.counter = 0;
- 	blake2s(next_key, (u8 *)&block, seed, sizeof(next_key), sizeof(block), sizeof(seed));
- 	blake2s_init_key(&input_pool.hash, BLAKE2S_HASH_SIZE, next_key, sizeof(next_key));
-@@ -1091,7 +1087,7 @@ static void extract_entropy(void *buf, size_t nbytes)
- 
- 	while (nbytes) {
- 		i = min_t(size_t, nbytes, BLAKE2S_HASH_SIZE);
--		/* output = HASHPRF(seed, RDRAND || ++counter) */
-+		/* output = HASHPRF(seed, RDSEED || ++counter) */
- 		++block.counter;
- 		blake2s(buf, (u8 *)&block, seed, i, sizeof(block), sizeof(seed));
- 		nbytes -= i;
+- Nearly eliminating lock contention when several processes use the rng
+  at the same time. WireGuard, for example, processes packets in
+  parallel on all threads, and this packet processing requires frequent
+  calls to get_random_bytes().
+
+- Making sure we're never throwing away entropy from the irq handler,
+  since fast key erasure means we're overwriting keys.
+
+Because one design choice in here affects others, these issues are
+tackled by this same patchset. It's roughly divided into "things with
+RDSEED" and "things with struct crng", with the ordering of commits
+being important.
+
+Finally the series ends with a one-off patch removing an obsolete limit
+on /dev/urandom, and making crng_slow_load() more robust.
+
+v2 improves on v1 by adding the crng_{fast,slow}_load() improvements,
+adding a lot of comments regarding fast key erasure, correcting other
+comments, fixing the function signatures of two functions that return an
+array, and fixing some basic logic flow in checking crng_ready().
+
+Jason A. Donenfeld (9):
+  random: use RDSEED instead of RDRAND in entropy extraction
+  random: get rid of secondary crngs
+  random: inline leaves of rand_initialize()
+  random: ensure early RDSEED goes through mixer on init
+  random: do not xor RDRAND when writing into /dev/random
+  random: absorb fast pool into input pool after fast load
+  random: use simpler fast key erasure flow on per-cpu keys
+  random: use hash function for crng_slow_load()
+  random: remove outdated INT_MAX >> 6 check in urandom_read()
+
+ drivers/char/random.c | 699 ++++++++++++++++++------------------------
+ 1 file changed, 291 insertions(+), 408 deletions(-)
+
 -- 
 2.35.0
-
