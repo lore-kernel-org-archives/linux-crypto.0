@@ -2,160 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F698C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 17:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07918C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 18:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238390AbiBIRpQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 12:45:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44028 "EHLO
+        id S238565AbiBISAu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 13:00:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238274AbiBIRpO (ORCPT
+        with ESMTP id S233629AbiBISAt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:45:14 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 414EFC0613C9
-        for <linux-crypto@vger.kernel.org>; Wed,  9 Feb 2022 09:45:17 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id p5so8049780ybd.13
-        for <linux-crypto@vger.kernel.org>; Wed, 09 Feb 2022 09:45:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gD6+6fOZDI/HKXGfRSG82dKdDnf9SIUtKqDdAI9gUIY=;
-        b=5lCpYrPIU7RZnscmLJHgtAwaKl6chvIGm424aJUynPVeclGP+X7CTEO5xfJdL2ed/+
-         lsduYsGVrA9JQ69qNHm6d6Dc0UlzrxJdaByG6arKRazN70mzeiLnuRV+JHY6Junh7rXM
-         vOGTnfKUrto/Q7uMa+pdr/Qktrmmgs0bvFsCA9txj7ieTXnf3E2bPw1JFG/z4aiqa4sl
-         BWAA2KTLn52QUMqxjJ74bnF9uISADnywZZa6Cp9n2g0fBEltj5yoOCASVgJnvdfER8+1
-         joueBc7rxx7q1Lq5V1+ZjK5O+m+MaMOoOE0Dbwts8qfscbsjLJD46G4nKBe+k7BgYIlu
-         HwJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gD6+6fOZDI/HKXGfRSG82dKdDnf9SIUtKqDdAI9gUIY=;
-        b=thuiwCfmnXIY/7YpiEl5S9iAZ2aqNnSIcWCA9uZZnxo94xugi9i8Hu0jYh0ga6AQW6
-         fkoeUHUffR0odnq+qgAAxIAgaCxZ8NRpkonvZdz5rcPCC7VqInmP99dwoM+CYRm4yfPG
-         NRT5jQ1WR69xEtYdojXT0Gc9o8krM4fJRNiD3Xp3rmK/fvDYhqm+hcqMgvRqT4OFqaas
-         gnupf9QOElmm66Q2EyNZWvoes3eJk6Q6+EVx3kthpKj0tQF1PCkZr6AprrgnS5+QcOnC
-         4lrEdsGIPReZIc+CD3K1qKHxvmD+qak5EUBH0CAVNmZqg8V5WrMCjS12g5/lhMZfmZ83
-         5BAA==
-X-Gm-Message-State: AOAM533I+rqdV/w4HCKSx16LlXjDcKV7WUqpEA/KwCNO4tZCGrKM0TRb
-        0MzXuJF/mHyaxwf4lT6KZ1JcTpeQnkNh6nCqSry63s50vJs=
-X-Google-Smtp-Source: ABdhPJwhWpq0ee53uKYyflTZnACOXuDwbm7I2k+8UIDQIGyms9s0qKMFUnRE+b3kh7biYCO/JElnJcqiAilE3/yI5Gg=
-X-Received: by 2002:a25:35c5:: with SMTP id c188mr3252557yba.700.1644428716428;
- Wed, 09 Feb 2022 09:45:16 -0800 (PST)
+        Wed, 9 Feb 2022 13:00:49 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CD1C05CB82;
+        Wed,  9 Feb 2022 10:00:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644429652; x=1675965652;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z2zWrH2HkZBNXsLzdL6i8wAQzbfQXjTz9qslPV+fO6Q=;
+  b=hUN6KsgqIQf/JR9uK6MPeieyS2B+5Vra7dwR2fD4J3Dfu1lfWHkak5u9
+   fsDYLgvTRXQAqIEAAHQDdxz1O+FJSsI/LTRf/f+yiLEudeNtxUtHmGgm5
+   ovnrQFbTTDIGxblCX0AZQXmoJy2zdyWoISSlVcBmawgzXiq3mnw7EC2Ga
+   U1fFLvC08of/61t5dRbrXSDcCZ1JPWlazP2KJyTFMg1QBB/vVsRlKpSP2
+   VJvGvLmv2eAi26aCIfIZDubS+AO0RlFJnAV5e0k7NTEB3oTtoeBwIJdQS
+   W+u3ShaqqJKkyyv6gkF3oU4Kwi+K3bIH1Gx3Z6eLoQkX/XbFNkzrzQr4w
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="246865443"
+X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
+   d="scan'208";a="246865443"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 10:00:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
+   d="scan'208";a="585657289"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga008.fm.intel.com with ESMTP; 09 Feb 2022 10:00:34 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 7576E107; Wed,  9 Feb 2022 20:00:49 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Jack Xu <jack.xu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Zhehui Xiang <zhehui.xiang@intel.com>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 1/1] crypto: qat - don't cast parameter in bit operations
+Date:   Wed,  9 Feb 2022 20:00:47 +0200
+Message-Id: <20220209180047.54829-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <YgOQBNIdf0UnSH+M@Red>
-In-Reply-To: <YgOQBNIdf0UnSH+M@Red>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 9 Feb 2022 19:45:12 +0200
-Message-ID: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
-Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
- authsize =0
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+While in this particular case it would not be a (critical) issue,
+the pattern itself is bad and error prone in case the location
+of the parameter is changed.
 
-On Wed, Feb 9, 2022 at 11:57 AM Corentin Labbe
-<clabbe.montjoie@gmail.com> wrote:
->
-> Hello
->
-> Booting a salvator X with CRYPTO_MANAGER_EXTRA_TESTS lead to:
-> [   37.510039] ------------[ cut here ]------------
-> [   37.514712] WARNING: CPU: 7 PID: 616 at /home/clabbe/linux-next/kernel=
-/dma/mapping.c:200 __dma_map_sg_attrs+0xb8/0x108
-> [   37.525444] Modules linked in: des_generic ofb snd_soc_hdmi_codec dw_h=
-dmi_cec dw_hdmi_i2s_audio rcar_du_drm rcar_lvds crct10dif_ce snd_soc_audio_=
-graph_card simple_bridge snd_soc_simple_card_utils rcar_dw_hdmi dw_hdmi drm=
-_cma_helper cec rcar_csi2 rcar_fdp1 v4l2_mem2mem vsp1 rcar_cmm videobuf2_vm=
-alloc rcar_fcp renesas_usb3 snd_soc_rcar rcar_vin v4l2_fwnode v4l2_async vi=
-deobuf2_dma_contig videobuf2_memops videobuf2_v4l2 videobuf2_common videode=
-v pwm_rcar mc snd_soc_ak4613 max9611 ccree(+) renesas_usbhs phy_rcar_gen3_u=
-sb3 libdes usb_dmac gpio_bd9571mwv at24 display_connector drm_kms_helper pw=
-m_bl drm ecb xts cts essiv cmac xcbc ccm
-> [   37.581446] CPU: 7 PID: 616 Comm: cryptomgr_test Tainted: G        W  =
-       5.17.0-rc3-next-20220207-00110-g41bd5fbfc1e4 #5
-> [   37.592672] Hardware name: Renesas Salvator-X board based on r8a77950 =
-(DT)
-> [   37.599555] pstate: 00000005 (nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYP=
-E=3D--)
-> [   37.606526] pc : __dma_map_sg_attrs+0xb8/0x108
-> [   37.610978] lr : __dma_map_sg_attrs+0x48/0x108
-> [   37.615430] sp : ffff80000c1632a0
-> [   37.618749] x29: ffff80000c1632a0 x28: ffff0004c2997c00 x27: ffff0004c=
-2997e20
-> [   37.625909] x26: 0000000000000000 x25: 0000000000000008 x24: 000000000=
-0000000
-> [   37.633068] x23: 0000000000000000 x22: ffff0004cc777840 x21: 000000000=
-0000000
-> [   37.640226] x20: 0000000000000000 x19: ffff0004c164c010 x18: ffff80000=
-b3a72f0
-> [   37.647385] x17: 0000000000000000 x16: 0000000000000072 x15: 000000000=
-0000010
-> [   37.654544] x14: 001fffffffffffff x13: 000000006894887f x12: 818235788=
-794af1b
-> [   37.661703] x11: 00000000000ef000 x10: ffff0004c164c518 x9 : ffff80000=
-9aa6a38
-> [   37.668862] x8 : ffff80000b2759d8 x7 : ffff80000c1633a0 x6 : 000000000=
-0000000
-> [   37.676021] x5 : ffff800009aa6a38 x4 : 0000000000000000 x3 : 000000000=
-0000000
-> [   37.683179] x2 : 74374306a1f1c500 x1 : 0000000000000000 x0 : 000000000=
-0000000
-> [   37.690338] Call trace:
-> [   37.692789]  __dma_map_sg_attrs+0xb8/0x108
-> [   37.696894]  dma_map_sg_attrs+0x10/0x28
-> [   37.700739]  cc_map_sg+0x64/0xf8 [ccree]
-> [   37.704711]  cc_map_aead_request+0x158/0x920 [ccree]
-> [   37.709703]  cc_proc_aead+0x148/0xeb8 [ccree]
-> [   37.714087]  cc_aead_encrypt+0x44/0x68 [ccree]
-> [   37.718557]  crypto_aead_encrypt+0x44/0x78
-> [   37.722669]  test_aead_vec_cfg+0x244/0x900
-> [   37.726779]  test_aead_vec+0x8c/0x190
-> [   37.730450]  test_aead+0x78/0xe0
-> [   37.733687]  alg_test_aead+0xa4/0x3e0
-> [   37.737358]  alg_test.part.29+0xb4/0x398
-> [   37.741289]  alg_test+0x48/0x78
-> [   37.744439]  cryptomgr_test+0x48/0x50
-> [   37.748109]  kthread+0x11c/0x128
-> [   37.751347]  ret_from_fork+0x10/0x20
-> [   37.754939] irq event stamp: 119412
-> [   37.758431] hardirqs last  enabled at (119411): [<ffff800009188a54>] _=
-raw_spin_unlock_irqrestore+0x8c/0x90
-> [   37.768105] hardirqs last disabled at (119412): [<ffff800009179e20>] e=
-l1_dbg+0x28/0x90
-> [   37.776040] softirqs last  enabled at (119376): [<ffff80000125ac20>] c=
-c_send_request+0xa0/0x208 [ccree]
-> [   37.785462] softirqs last disabled at (119374): [<ffff80000125abf4>] c=
-c_send_request+0x74/0x208 [ccree]
-> [   37.794883] ---[ end trace 0000000000000000 ]---#
->
-> When cryptlen and authsize are both 0, the driver try to map a 0 size buf=
-fer which display this warning.
+Don't cast parameter to unsigned long pointer in the bit operations.
+Instead copy to a local variable on stack of a proper type and use.
 
-Thank you very much, Corentin!
+Fixes: b4b7e67c917f ("crypto: qat - Intel(R) QAT ucode part of fw loader")
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_uclo.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-I thought we squashed all these corner case size bugs but it seems
-this is not the case...
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 2026cc6be8f0..6356402a2c9e 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -387,7 +387,9 @@ static int qat_uclo_init_ustore(struct icp_qat_fw_loader_handle *handle,
+ 	page = image->page;
+ 
+ 	for_each_set_bit(ae, &ae_mask, handle->hal_handle->ae_max_num) {
+-		if (!test_bit(ae, (unsigned long *)&uof_image->ae_assigned))
++		unsigned long ae_assigned = uof_image->ae_assigned;
++
++		if (!test_bit(ae, &ae_assigned))
+ 			continue;
+ 
+ 		if (!test_bit(ae, &cfg_ae_mask))
+@@ -664,8 +666,9 @@ static int qat_uclo_map_ae(struct icp_qat_fw_loader_handle *handle, int max_ae)
+ 			continue;
+ 
+ 		for (i = 0; i < obj_handle->uimage_num; i++) {
+-			if (!test_bit(ae, (unsigned long *)
+-			&obj_handle->ae_uimage[i].img_ptr->ae_assigned))
++			unsigned long ae_assigned = obj_handle->ae_uimage[i].img_ptr->ae_assigned;
++
++			if (!test_bit(ae, &ae_assigned))
+ 				continue;
+ 			mflag = 1;
+ 			if (qat_uclo_init_ae_data(obj_handle, ae, i))
+-- 
+2.34.1
 
-I am away from my test equipment right now for covid related reasons
-but will dig into this (and your other patch), hopefully early next
-week.
-
-Thanks,
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
