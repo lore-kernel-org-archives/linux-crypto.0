@@ -2,47 +2,47 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F340EC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBCBC43219
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233050AbiBICka (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 21:40:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
+        id S243065AbiBICkb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 21:40:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242735AbiBIBUR (ORCPT
+        with ESMTP id S242728AbiBIBUR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 8 Feb 2022 20:20:17 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C79C061576;
-        Tue,  8 Feb 2022 17:20:17 -0800 (PST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52844C06157B;
+        Tue,  8 Feb 2022 17:20:16 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 144E0617E7;
-        Wed,  9 Feb 2022 01:20:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02137C004E1;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 14FF9B81E2E;
         Wed,  9 Feb 2022 01:20:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38821C004E1;
+        Wed,  9 Feb 2022 01:20:13 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="f3g58zfE"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TjGdN/d1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644369615;
+        t=1644369612;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Epo8j6f82VaiElGEK+cLsKCLLv1wK/ngSXClGzK93nI=;
-        b=f3g58zfEZIQTrFf4x5mRH7JVgKrccFTPWeYFBA2Oo8yebDy+QRlHo3Z3cFQ4scSdGamyhL
-        wHR6p5y9eYFELn9MDC7NHtM8SePk1HrqavpcAZ/ZCNbNJIAKzYDZ6o9zYBU2d5WGyQzNKG
-        wsqMinQevWdxzvwP0PoKuvhVg6baThk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4f5ce73 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 01:20:14 +0000 (UTC)
+        bh=6+BvSffpxoiCV4pJMnMVT9UMKRkfrW0iMmasZO/6IK4=;
+        b=TjGdN/d1NrTmRtPAHIDSrh2UIFpYoDBE9olAx1F4ZdPPbnEx6XIzMNCH5/ezgvl+mdSwbl
+        WtQodnFebLyBO7+we1KpoH44j3zeI/fdjVuG2D0oLMrDaJQaN7Vo8PX4WnJiKh5Rs/gt6K
+        7s6Q7Z1fjMiCmNWmQ1NUiif6B3iQqxo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d63d5d5a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 01:20:12 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     tytso@mit.edu, linux@dominikbrodowski.net, ebiggers@kernel.org,
         "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2 9/9] random: remove outdated INT_MAX >> 6 check in urandom_read()
-Date:   Wed,  9 Feb 2022 02:19:19 +0100
-Message-Id: <20220209011919.493762-10-Jason@zx2c4.com>
+Subject: [PATCH v2 8/9] random: use hash function for crng_slow_load()
+Date:   Wed,  9 Feb 2022 02:19:18 +0100
+Message-Id: <20220209011919.493762-9-Jason@zx2c4.com>
 In-Reply-To: <20220209011919.493762-1-Jason@zx2c4.com>
 References: <20220209011919.493762-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -51,41 +51,82 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In 79a8468747c5 ("random: check for increase of entropy_count because of
-signed conversion"), a number of checks were added around what values
-were passed to account(), because account() was doing fancy fixed point
-fractional arithmetic, and a user had some ability to pass large values
-directly into it. One of things in that commit was limiting those values
-to INT_MAX >> 6.
-
-However, for several years now, urandom reads no longer touch entropy
-accounting, and so this check serves no purpose. The current flow is:
-
-urandom_read_nowarn()-->get_random_bytes_user()-->chacha20_block()
-
-We arrive at urandom_read_nowarn() in the first place either via
-ordinary fops, which limits reads to MAX_RW_COUNT, or via getrandom()
-which limits reads to INT_MAX.
+Since we have a hash function that's really fast, and the goal of
+crng_slow_load() is reportedly to "touch all of the crng's state", we
+can just hash the old state together with the new state and call it a
+day. This way we dont need to reason about another LFSR or worry about
+various attacks there. This code is only ever used at early boot and
+then never again.
 
 Cc: Theodore Ts'o <tytso@mit.edu>
 Cc: Dominik Brodowski <linux@dominikbrodowski.net>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/char/random.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/char/random.c | 42 +++++++++++++++---------------------------
+ 1 file changed, 15 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
-index f7f9cbfe13f7..e09874c511d0 100644
+index 359fd2501c45..f7f9cbfe13f7 100644
 --- a/drivers/char/random.c
 +++ b/drivers/char/random.c
-@@ -1305,7 +1305,6 @@ static ssize_t urandom_read_nowarn(struct file *file, char __user *buf,
+@@ -470,42 +470,30 @@ static size_t crng_fast_load(const u8 *cp, size_t len)
+  * all), and (2) it doesn't have the performance constraints of
+  * crng_fast_load().
+  *
+- * So we do something more comprehensive which is guaranteed to touch
+- * all of the primary_crng's state, and which uses a LFSR with a
+- * period of 255 as part of the mixing algorithm.  Finally, we do
+- * *not* advance crng_init_cnt since buffer we may get may be something
+- * like a fixed DMI table (for example), which might very well be
+- * unique to the machine, but is otherwise unvarying.
++ * So, we simply hash the contents in with the current key. Finally,
++ * we do *not* advance crng_init_cnt since buffer we may get may be
++ * something like a fixed DMI table (for example), which might very
++ * well be unique to the machine, but is otherwise unvarying.
+  */
+-static int crng_slow_load(const u8 *cp, size_t len)
++static void crng_slow_load(const u8 *cp, size_t len)
  {
- 	int ret;
+ 	unsigned long flags;
+-	static u8 lfsr = 1;
+-	u8 tmp;
+-	unsigned int i, max = sizeof(base_crng.key);
+-	const u8 *src_buf = cp;
+-	u8 *dest_buf = base_crng.key;
++	struct blake2s_state hash;
++
++	blake2s_init(&hash, sizeof(base_crng.key));
  
--	nbytes = min_t(size_t, nbytes, INT_MAX >> 6);
- 	ret = get_random_bytes_user(buf, nbytes);
- 	trace_urandom_read(8 * nbytes, 0, input_pool.entropy_count);
- 	return ret;
+ 	if (!spin_trylock_irqsave(&base_crng.lock, flags))
+-		return 0;
++		return;
+ 	if (crng_init != 0) {
+ 		spin_unlock_irqrestore(&base_crng.lock, flags);
+-		return 0;
+-	}
+-	if (len > max)
+-		max = len;
+-
+-	for (i = 0; i < max; i++) {
+-		tmp = lfsr;
+-		lfsr >>= 1;
+-		if (tmp & 1)
+-			lfsr ^= 0xE1;
+-		tmp = dest_buf[i % sizeof(base_crng.key)];
+-		dest_buf[i % sizeof(base_crng.key)] ^= src_buf[i % len] ^ lfsr;
+-		lfsr += (tmp << 3) | (tmp >> 5);
++		return;
+ 	}
++
++	blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
++	blake2s_update(&hash, cp, len);
++	blake2s_final(&hash, base_crng.key);
++
+ 	spin_unlock_irqrestore(&base_crng.lock, flags);
+-	return 1;
+ }
+ 
+ static void crng_reseed(void)
 -- 
 2.35.0
 
