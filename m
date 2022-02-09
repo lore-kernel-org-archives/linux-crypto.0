@@ -2,76 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E25C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 20:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FE9C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 21:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232286AbiBIUrs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 15:47:48 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:45988 "EHLO
+        id S233664AbiBIVjd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 16:39:33 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:49286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232243AbiBIUrq (ORCPT
+        with ESMTP id S229653AbiBIVjc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 15:47:46 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725CBC03E953;
-        Wed,  9 Feb 2022 12:47:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644439669; x=1675975669;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xILz1dK9rB40StPz2WiguItjJtnKtaNQWzhC2fRZekg=;
-  b=HOAIcuzftPTd47+kZb5NxBrsEE7hrtlWGUJefrge4qee59jIygKZCV0k
-   xdZXtQmEmFucTjRuo0a0NkOEHVZMprBZz0h5sNiW/UN/5hfaxLE5YB5Pi
-   Qu9yB9G2KJ2uBrnlftiBqkTLzluUO9vrdNoGXNssnexiftD4++KKfN4Pi
-   RPJ+a/8vGaB9A77f0HuF+vjUWamUONDMpcwBHAMSMRTuXyAxFpmiw+TdD
-   BIIxnnUo4M8RfgUolmN2BcHhzoXn5K30GwOICo0KUy4Bcd6JFXaWSXy/N
-   +4W0n2+L2ASU1BrNsMjWmlAPqC+b696rGzVE8C8J4mZwKGhfiqe/r9YyV
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="236733919"
-X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
-   d="scan'208";a="236733919"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 12:47:49 -0800
-X-IronPort-AV: E=Sophos;i="5.88,356,1635231600"; 
-   d="scan'208";a="485408727"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2022 12:47:47 -0800
-Date:   Wed, 9 Feb 2022 20:47:39 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc:     Jack Xu <jack.xu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Zhehui Xiang <zhehui.xiang@intel.com>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v1 1/1] crypto: qat - don't cast parameter in bit
- operations
-Message-ID: <YgQoa/8OXXFl4qUo@silpixa00400314>
-References: <20220209180047.54829-1-andriy.shevchenko@linux.intel.com>
+        Wed, 9 Feb 2022 16:39:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BF04C1DF8C4;
+        Wed,  9 Feb 2022 13:39:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F145EB823A2;
+        Wed,  9 Feb 2022 21:39:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FEDDC340ED;
+        Wed,  9 Feb 2022 21:39:31 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Rw6D/06l"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644442769;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0CxAPMeO8W1EkYiDAD5FkzwJpGqwBR1FprYjOgnHVSw=;
+        b=Rw6D/06ln51zysFIPtzLutX8VWm88MsyTzJqYyt7eYokCyqBq4IvqfnT6F+YW5675xbtGN
+        eNvvToTNo43xE9Kzot2mqOa4gTBzxiAEByCPy2L+TRk9WVknLq6QS9vowxGKblZgy7/Rye
+        77fczXXVpYkufwy2jNnhqSK09rnhzDo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 29ea8eec (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 21:39:29 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id v186so9970038ybg.1;
+        Wed, 09 Feb 2022 13:39:29 -0800 (PST)
+X-Gm-Message-State: AOAM530ZDgznSTmVXVBsrXL01rFCXJD8neK2dM75y3S7bFpCUQYa9iXt
+        eQNjk44b4F7+5b8o/Vvk4zXGY6SOee07hyrc2+g=
+X-Google-Smtp-Source: ABdhPJzRRM3/Zy6xFhij8dwCbMpngnwC8y8pqIcCoQwKtGCP/JAWgwp/jsQLCFTsY+/FmEQR2nyuA3DPklkKtQ7KLu8=
+X-Received: by 2002:a81:1b54:: with SMTP id b81mr4535363ywb.404.1644442768567;
+ Wed, 09 Feb 2022 13:39:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220209180047.54829-1-andriy.shevchenko@linux.intel.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+References: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net>
+In-Reply-To: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 9 Feb 2022 22:39:17 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pZB1fWf2nZNwTHw07hrnxZYYymA0_Dy=jauDt9TbF69A@mail.gmail.com>
+Message-ID: <CAHmME9pZB1fWf2nZNwTHw07hrnxZYYymA0_Dy=jauDt9TbF69A@mail.gmail.com>
+Subject: Re: [PATCH] random: fix locking for crng_init in crng_reseed()
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks Andy.
+Hi Dominik,
 
-On Wed, Feb 09, 2022 at 08:00:47PM +0200, Andy Shevchenko wrote:
-> While in this particular case it would not be a (critical) issue,
-> the pattern itself is bad and error prone in case the location
-> of the parameter is changed.
-> 
-> Don't cast parameter to unsigned long pointer in the bit operations.
-> Instead copy to a local variable on stack of a proper type and use.
-> 
-> Fixes: b4b7e67c917f ("crypto: qat - Intel(R) QAT ucode part of fw loader")
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Thanks, applied. I changed complete_init to finalize_init, to match
+our naming scheme from earlier, and I moved
+invalidate_batched_entropy() to outside the lock and after
+crng_init=2, since now it uses atomics, and it should probably be
+ordered after crng_init = 2, so the new batch gets the new entropy.
 
--- 
-Giovanni
+Actually, though, come to think of it: shouldn't we always call
+invalidate_batched_entropy() after reseeding? More generally, we can
+instead probably tie the entropy generation counter to the base_crng
+counter, and have this all done automatically. That might be something
+interesting to do in the future.
+
+Jason
