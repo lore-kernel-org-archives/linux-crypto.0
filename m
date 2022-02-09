@@ -2,107 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21496C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D5FC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 03:09:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243579AbiBICkj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 21:40:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
+        id S245362AbiBIDJ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 22:09:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234389AbiBIBTz (ORCPT
+        with ESMTP id S245242AbiBIDIx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 20:19:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9885EC061576;
-        Tue,  8 Feb 2022 17:19:54 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 59A80B81E2D;
-        Wed,  9 Feb 2022 01:19:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FC40C340EB;
-        Wed,  9 Feb 2022 01:19:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O0ZcQX9E"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644369590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=muXktWPwK3DXgvGz5zZKW5xbimKtTXaNSyPW53UCMxA=;
-        b=O0ZcQX9E98Ro83oI3AJua90Th0b6eTHZF8OPO6r+M38IeIA4iud6w0IeKwBG3jLWocZu4W
-        z8uvvcj05qxGS/sn2fPdztXPfPrx50I5qeIt6wlgRyJzZqHyLdIIJ1FUEBVmibohgPwbXr
-        X9WG9CLE/d2rec9DknY+ZB7MPq/JjBU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fca0fc21 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 01:19:49 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     tytso@mit.edu, linux@dominikbrodowski.net, ebiggers@kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2 0/9] random: cleanups around per-cpu crng & rdrand
-Date:   Wed,  9 Feb 2022 02:19:10 +0100
-Message-Id: <20220209011919.493762-1-Jason@zx2c4.com>
+        Tue, 8 Feb 2022 22:08:53 -0500
+X-Greylist: delayed 1561 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Feb 2022 18:59:39 PST
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99091C0613CC;
+        Tue,  8 Feb 2022 18:59:39 -0800 (PST)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nHcnT-0001us-3l; Wed, 09 Feb 2022 13:33:32 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Feb 2022 13:33:31 +1100
+Date:   Wed, 9 Feb 2022 13:33:31 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.17
+Message-ID: <YgMn+1qQPQId50hO@gondor.apana.org.au>
+References: <20200830223304.GA16882@gondor.apana.org.au>
+ <20201026011159.GA2428@gondor.apana.org.au>
+ <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series tackles a few issues that are intermingled with each other:
+Hi Linus:
 
-- Using RDSEED when we can rather than using RDRAND.
+This push fixes two regressions:
 
-- Making sure RDRAND/RDSEED input always goes through the mixer rather
-  than being xor'd into our state directly, in part in order to prevent
-  ridiculous hypothetical cpu backdoors, and in part because it makes it
-  easier to model RDRAND/RDSEED as just another entropy input.
+- Potential boot failure due to missing cryptomgr on initramfs.
+- Stack overflow in octeontx2.
 
-- Untangling the never ending headache that is kmalloc'd NUMA secondary
-  CRNGs, and replacing these with leaner per-cpu ChaCha keys that don't
-  have all the state troubles. There are other patches pending my review
-  that take the current NUMA initialization code to yet another layer of
-  complexity, sort of driving home the point to me that the current code
-  is a can of worms. This patchset attempts a different direction there.
+The following changes since commit e783362eb54cd99b2cac8b3a9aeac942e6f6ac07:
 
-- Enforcing "fast key erasure" expansion always, and not relying on
-  having a shared block counter that is bound to lead to troubles sooner
-  or later.
+  Linux 5.17-rc1 (2022-01-23 10:12:53 +0200)
 
-- Nearly eliminating lock contention when several processes use the rng
-  at the same time. WireGuard, for example, processes packets in
-  parallel on all threads, and this packet processing requires frequent
-  calls to get_random_bytes().
+are available in the Git repository at:
 
-- Making sure we're never throwing away entropy from the irq handler,
-  since fast key erasure means we're overwriting keys.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
 
-Because one design choice in here affects others, these issues are
-tackled by this same patchset. It's roughly divided into "things with
-RDSEED" and "things with struct crng", with the ordering of commits
-being important.
+for you to fetch changes up to c6ce9c5831cae515d375a01b97ae1778689acf19:
 
-Finally the series ends with a one-off patch removing an obsolete limit
-on /dev/urandom, and making crng_slow_load() more robust.
+  crypto: api - Move cryptomgr soft dependency into algapi (2022-02-05 15:10:07 +1100)
 
-v2 improves on v1 by adding the crng_{fast,slow}_load() improvements,
-adding a lot of comments regarding fast key erasure, correcting other
-comments, fixing the function signatures of two functions that return an
-array, and fixing some basic logic flow in checking crng_ready().
+----------------------------------------------------------------
+Herbert Xu (1):
+      crypto: api - Move cryptomgr soft dependency into algapi
 
-Jason A. Donenfeld (9):
-  random: use RDSEED instead of RDRAND in entropy extraction
-  random: get rid of secondary crngs
-  random: inline leaves of rand_initialize()
-  random: ensure early RDSEED goes through mixer on init
-  random: do not xor RDRAND when writing into /dev/random
-  random: absorb fast pool into input pool after fast load
-  random: use simpler fast key erasure flow on per-cpu keys
-  random: use hash function for crng_slow_load()
-  random: remove outdated INT_MAX >> 6 check in urandom_read()
+Kees Cook (1):
+      crypto: octeontx2 - Avoid stack variable overflow
 
- drivers/char/random.c | 699 ++++++++++++++++++------------------------
- 1 file changed, 291 insertions(+), 408 deletions(-)
+ crypto/algapi.c                                     | 1 +
+ crypto/api.c                                        | 1 -
+ drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 3 ++-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
+Thanks,
 -- 
-2.35.0
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
