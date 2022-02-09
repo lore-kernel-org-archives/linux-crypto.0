@@ -2,83 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D5FC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 03:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E12C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 05:16:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245362AbiBIDJ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 22:09:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35024 "EHLO
+        id S230243AbiBIFOg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 00:14:36 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:43416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245242AbiBIDIx (ORCPT
+        with ESMTP id S230197AbiBIEqF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 22:08:53 -0500
-X-Greylist: delayed 1561 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Feb 2022 18:59:39 PST
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99091C0613CC;
-        Tue,  8 Feb 2022 18:59:39 -0800 (PST)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nHcnT-0001us-3l; Wed, 09 Feb 2022 13:33:32 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 09 Feb 2022 13:33:31 +1100
-Date:   Wed, 9 Feb 2022 13:33:31 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Tue, 8 Feb 2022 23:46:05 -0500
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DBB3C061578;
+        Tue,  8 Feb 2022 20:46:09 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JtnQ60Fbjz4xNq;
+        Wed,  9 Feb 2022 15:46:06 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1644381966;
+        bh=4LBu3b4sqV42JJCmT2RvLfUf47/jOabbpGeO17DWNxg=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=VpsRKjTOAuTL4YVFAXqLwlQNTVN2PnFaRNMaDdmekioS+Axih9wqxwuuZXvgF38GV
+         BtlQrTRz2IAQ9QmpujmvPxeEPJBOCKQODVTttnlXUqTA3LNbZRxgAs7FMDYFW7UAzp
+         hNZMjJnJRRBuEQsm/scDVGFl3F1CnxD/UQBFK7HXqfl2FNQM9xzVfhzm6vaSQz1Oui
+         eoQoylhJFl+fMdpPBEWkx0gW9z1nkkfG9Ee4wjyAlpTXz2FASBp3lrsVq34UIp87iV
+         WiyxUBkfMXtIWN/O5RXzGc5uFFcCQQWtagfWwXYs+Xzz/Ci/ixvZSY69tgrW3wLzm6
+         VxO4WOGIITJUw==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Michal Suchanek <msuchanek@suse.de>,
+        David Howells <dhowells@redhat.com>,
+        Aaron Tomlin <atomlin@redhat.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, kexec@lists.infradead.org,
+        Philipp Rudo <prudo@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
+        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Hari Bathini <hbathini@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org,
+        Frank van der Linden <fllinden@amazon.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.17
-Message-ID: <YgMn+1qQPQId50hO@gondor.apana.org.au>
-References: <20200830223304.GA16882@gondor.apana.org.au>
- <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Baoquan He <bhe@redhat.com>,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v5 0/6] KEXEC_SIG with appended signature
+In-Reply-To: <YfBd/EDGUx9UIHcb@bombadil.infradead.org>
+References: <cover.1641900831.git.msuchanek@suse.de>
+ <YfBd/EDGUx9UIHcb@bombadil.infradead.org>
+Date:   Wed, 09 Feb 2022 15:46:05 +1100
+Message-ID: <87pmnwlkaa.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+Luis Chamberlain <mcgrof@kernel.org> writes:
+> On Tue, Jan 11, 2022 at 12:37:42PM +0100, Michal Suchanek wrote:
+>> Hello,
+>> 
+>> This is a refresh of the KEXEC_SIG series.
+>> 
+>> This adds KEXEC_SIG support on powerpc and deduplicates the code dealing
+>> with appended signatures in the kernel.
+>> 
+>> powerpc supports IMA_KEXEC but that's an exception rather than the norm.
+>> On the other hand, KEXEC_SIG is portable across platforms.
+>> 
+>> For distributions to have uniform security features across platforms one
+>> option should be used on all platforms.
+>> 
+>> Thanks
+>> 
+>> Michal
+>> 
+>> Previous revision: https://lore.kernel.org/linuxppc-dev/cover.1637862358.git.msuchanek@suse.de/
+>> Patched kernel tree: https://github.com/hramrach/kernel/tree/kexec_sig
+>> 
+>> Michal Suchanek (6):
+>>   s390/kexec_file: Don't opencode appended signature check.
+>>   powerpc/kexec_file: Add KEXEC_SIG support.
+>>   kexec_file: Don't opencode appended signature verification.
+>>   module: strip the signature marker in the verification function.
+>>   module: Use key_being_used_for for log messages in
+>>     verify_appended_signature
+>>   module: Move duplicate mod_check_sig users code to mod_parse_sig
+>
+> What tree should this go through? I'd prefer if over through modules
+> tree as it can give a chance for Aaron Tomlin to work with this for his
+> code refactoring of kernel/module*.c to kernel/module/
 
-This push fixes two regressions:
+Yeah that's fine by me, the arch changes are pretty minimal and unlikely
+to conflict much.
 
-- Potential boot failure due to missing cryptomgr on initramfs.
-- Stack overflow in octeontx2.
-
-The following changes since commit e783362eb54cd99b2cac8b3a9aeac942e6f6ac07:
-
-  Linux 5.17-rc1 (2022-01-23 10:12:53 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
-
-for you to fetch changes up to c6ce9c5831cae515d375a01b97ae1778689acf19:
-
-  crypto: api - Move cryptomgr soft dependency into algapi (2022-02-05 15:10:07 +1100)
-
-----------------------------------------------------------------
-Herbert Xu (1):
-      crypto: api - Move cryptomgr soft dependency into algapi
-
-Kees Cook (1):
-      crypto: octeontx2 - Avoid stack variable overflow
-
- crypto/algapi.c                                     | 1 +
- crypto/api.c                                        | 1 -
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c | 3 ++-
- 3 files changed, 3 insertions(+), 2 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+cheers
