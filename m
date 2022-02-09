@@ -2,77 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 224CFC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 10:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C66CDC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:23:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbiBIKmy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 05:42:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
+        id S230196AbiBILXN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 06:23:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiBIKmx (ORCPT
+        with ESMTP id S229560AbiBILXN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 05:42:53 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 347EAE09EA5C;
-        Wed,  9 Feb 2022 02:28:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 63497B81878;
-        Wed,  9 Feb 2022 10:28:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E24C2C340E7;
-        Wed,  9 Feb 2022 10:27:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="K4XKSBwt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644402478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=k3NnMzVYILfu4qmxKBnwiknhBgeg952L7E+Eso3InzA=;
-        b=K4XKSBwtgS5Zc+l/F1X6ytfrRQi4Rm9kMu2unN4SZ9HRzsdNON5tfVU1T6YC5OyiFHtpec
-        Pv6232JC+okTYNsY+/PQjVGgSsmwH/YkvjF6zruey3aiOBK5pWQBBJFPyoqqA3TBjHLZZ9
-        OubW7uLvMC4bj5D+BhMtKkPei2tftpg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 83310290 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 10:27:58 +0000 (UTC)
-Received: by mail-yb1-f173.google.com with SMTP id m6so4466875ybc.9;
-        Wed, 09 Feb 2022 02:27:58 -0800 (PST)
-X-Gm-Message-State: AOAM531bx6nG4slIEGHCU3/whwDg7lSvlwxs1azEiEvC9n92yXz7DSB/
-        755ej+RVbdINtYmLN57HBv+rSUmRsHVX7U1gKoE=
-X-Google-Smtp-Source: ABdhPJy6leqE3RrEOZ6Ff6kOA1CA9LjcupmA3FH/19S9uFOcOfyI/JUGPBKMalPf0oHEcxZfhk3ZbnPVge06OLGwiH4=
-X-Received: by 2002:a25:c006:: with SMTP id c6mr1325215ybf.457.1644402477501;
- Wed, 09 Feb 2022 02:27:57 -0800 (PST)
+        Wed, 9 Feb 2022 06:23:13 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BA5E08FBD2
+        for <linux-crypto@vger.kernel.org>; Wed,  9 Feb 2022 02:17:30 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id o24so472384wro.3
+        for <linux-crypto@vger.kernel.org>; Wed, 09 Feb 2022 02:17:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vfAV7F+Ro4DbSdjhHkusaJBb3PiMNKM76wOprs+NcNM=;
+        b=ny9ULsL/xMEXFfNXPt20i+xiJxpkX2dV9SayL9TBFHnQZRFvyPp0T00z/YJrWXCNrL
+         B0x8FxZfCdLVm3CW4kS/+7tgqqUiYKSPATkRb6BF9/tnoNqwZv/b11y/6rIZgRXHpArU
+         5ZrEiJM4nHjULj3695Qcc3hqXjmarVseMpa3GxX8WqLmB15DbGwufz+iUoU/ghEJguzj
+         cDquRy5IkmwC/jRm7sFTgzlmYvH8aZgZCKq5YnuHF+UFWVn4BrRSvA0mziIkSLydOE98
+         sZ68twH4yfcSEuLLynk+EdDdPxZhn45IYbtbIpmC1lWwSRqQk7Bx4jLyBW1ImXROWCFw
+         mW8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vfAV7F+Ro4DbSdjhHkusaJBb3PiMNKM76wOprs+NcNM=;
+        b=J1NbdfK+ihGMZWr+0KS4tQiQ8C8RDERbsMhXmKFtHOfg4wJ2qDUoTk2acGEE+KPoHJ
+         HYd0NDoOLRKo3VdxzB/JznM2CvpWC/0z8BSimICQuOXg7nNslG9aC8qLkF1AfU4x/g9x
+         NMwoD1bAFIasX50qI18ugNaudQdwqF7dOXn04ysTb8G7CdFHxRSwC4zAFJy+/D+XnrYm
+         Uta/wquj0gpwyDVOW+t+nbM1d89LLhqN7CuIzHM7vwO83XdHe45+P4LDOtAevEXGaZCR
+         GpSt6lIASnZTu1watZau6c4Dw8QLc1HApxDozFU/YnGUcmhlqUZgjzEKXs+j1RYhb7FB
+         H6JQ==
+X-Gm-Message-State: AOAM532KsriK48XpQOcI0XCJ5G5dRQyxWwD6+tcwGzXKxlzxcU5LFvaZ
+        sQCWbSUKyK4ZsCaa12ECfbXDsg==
+X-Google-Smtp-Source: ABdhPJy0UdpjCxyiilvCKFqjSjmlR/q7Psi0zrmsidgeyfsV9G3fsYdDsqE4HZdrlSWv1cvyhkKIIg==
+X-Received: by 2002:a5d:6d05:: with SMTP id e5mr1504960wrq.214.1644401848828;
+        Wed, 09 Feb 2022 02:17:28 -0800 (PST)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id e13sm17740929wrq.35.2022.02.09.02.17.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Feb 2022 02:17:28 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski@canonical.com, robh+dt@kernel.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] dt-bindings: crypto: rockchip: fix a typo on crypto-controller
+Date:   Wed,  9 Feb 2022 10:17:21 +0000
+Message-Id: <20220209101721.1659574-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220209011919.493762-1-Jason@zx2c4.com> <20220209011919.493762-4-Jason@zx2c4.com>
- <YgN5z/XqkYV/gxOv@owl.dominikbrodowski.net>
-In-Reply-To: <YgN5z/XqkYV/gxOv@owl.dominikbrodowski.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 9 Feb 2022 11:27:46 +0100
-X-Gmail-Original-Message-ID: <CAHmME9o-xG7-o=eqO-Yy4c+1=Vx5XCf9nfZE+dT4mo49D+O59A@mail.gmail.com>
-Message-ID: <CAHmME9o-xG7-o=eqO-Yy4c+1=Vx5XCf9nfZE+dT4mo49D+O59A@mail.gmail.com>
-Subject: Re: [PATCH v2 3/9] random: inline leaves of rand_initialize()
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 9, 2022 at 9:31 AM Dominik Brodowski
-<linux@dominikbrodowski.net> wrote:
->
-> Am Wed, Feb 09, 2022 at 02:19:13AM +0100 schrieb Jason A. Donenfeld:
-> > This is a preparatory commit for the following one. We simply inline the
-> > various functions that rand_initialize() calls that have no other
-> > callers. The compiler was doing this anyway before. Doing this will
-> > allow us to reorganize this after.
->
-> You also move some other code around (parse_trust_cpu() etc.), so please
-> mention that in the commit message or leave these parts where they are.
-> Other than that, feel free to add my
+crypto-controller had a typo, fix it.
 
-Will do.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ Documentation/devicetree/bindings/crypto/rockchip-crypto.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+index 5e2ba385b8c9..53e39d5f94e7 100644
+--- a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
++++ b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+@@ -16,7 +16,7 @@ Required properties:
+ 
+ Examples:
+ 
+-	crypto: cypto-controller@ff8a0000 {
++	crypto: crypto-controller@ff8a0000 {
+ 		compatible = "rockchip,rk3288-crypto";
+ 		reg = <0xff8a0000 0x4000>;
+ 		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+-- 
+2.34.1
+
