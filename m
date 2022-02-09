@@ -2,55 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C94C1C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8EDC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230520AbiBILtm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 06:49:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50622 "EHLO
+        id S231186AbiBILzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 06:55:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiBILtl (ORCPT
+        with ESMTP id S229452AbiBILzH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 06:49:41 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075ADE02F561;
-        Wed,  9 Feb 2022 02:40:29 -0800 (PST)
+        Wed, 9 Feb 2022 06:55:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1010BE036C06;
+        Wed,  9 Feb 2022 02:45:35 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B92E3B81FFC;
-        Wed,  9 Feb 2022 10:40:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46CE2C340E7;
-        Wed,  9 Feb 2022 10:40:26 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CA29AB81FDF;
+        Wed,  9 Feb 2022 10:45:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24B6CC340F0;
+        Wed,  9 Feb 2022 10:45:32 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TqiZKN/E"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="e/Pf7Ive"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644403224;
+        t=1644403530;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zh5HpvjKWOfnveAnt+GML5+YDo8XUouZTQHIes+rbNs=;
-        b=TqiZKN/EQoQ7X90ygxp2u7YhkBGRfTTJER1FxG8wEnjP1Du853iJEIQ2sBfuxiW21eNhzD
-        9nG/wj6QbQHQ5IKbtXlRB9jYWibjFOu0al2lggrVDQ/2fwvFSlEPVA1ZQLIjSuOwE7oGsh
-        eRMn5WXnE3kOuanMQ5h7lTtgUD2TdB4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0aab5556 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 10:40:24 +0000 (UTC)
-Received: by mail-yb1-f169.google.com with SMTP id m6so4543942ybc.9;
-        Wed, 09 Feb 2022 02:40:23 -0800 (PST)
-X-Gm-Message-State: AOAM5308qwPVKp7oR9blfDanbJ448xzQWxAj/frowEAD3uxBB3RVPBQu
-        h0++nSu7TUJGe1qUi8WwfPpEu5OEDU6PDsWMmek=
-X-Google-Smtp-Source: ABdhPJzGiryrzES33UPJu6XIQhFG6lg5JyIl+5a1pqI90VUc7HNl3tTdbtmDEiR+5ntmatn5L2oGOoZw90B1NDpWoRQ=
-X-Received: by 2002:a25:ba49:: with SMTP id z9mr1432385ybj.32.1644403222965;
- Wed, 09 Feb 2022 02:40:22 -0800 (PST)
+        bh=UnV7UrhgQr21PthLX8Pn4FBnaM1gdWwfkrGLWJxwOk8=;
+        b=e/Pf7IveD0TcWViwwV6va+EUgF16LNdycAHWCqKseMhDXVn4URn9RZGvL6n7T8xgB9Ao80
+        cQeLvSsFaNQ2aqZLdFGLpkwv3r23F5dk1dtsdp77ph0VHG/+zmjbV0V+x8VpKSzLn5Nf2m
+        t3HtH0OZvJvOHO5gpxn77+h9FUJ0chQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a106e8c0 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 10:45:30 +0000 (UTC)
+Received: by mail-yb1-f174.google.com with SMTP id v47so4667782ybi.4;
+        Wed, 09 Feb 2022 02:45:30 -0800 (PST)
+X-Gm-Message-State: AOAM530h9koEOSpNGaLzRorYs6ySJqOeP+khhRSxpnu8XG3/UgpAFy2Q
+        25kIDPn9KpyBB4teOdFupJCiBWbMq8/IaMPuw1I=
+X-Google-Smtp-Source: ABdhPJyFIHbgEiHJaxfexbZoIL2JTJqU4IXZN6GR5vdFmMhJfpC+2SqDzSxGldox0imKQ8bFRw7girU0y7NkaYEx4I8=
+X-Received: by 2002:a25:c006:: with SMTP id c6mr1366885ybf.457.1644403528916;
+ Wed, 09 Feb 2022 02:45:28 -0800 (PST)
 MIME-Version: 1.0
-References: <20220209011919.493762-1-Jason@zx2c4.com> <20220209011919.493762-6-Jason@zx2c4.com>
- <YgN7OKSJRNZNxuGm@owl.dominikbrodowski.net>
-In-Reply-To: <YgN7OKSJRNZNxuGm@owl.dominikbrodowski.net>
+References: <20220209011919.493762-1-Jason@zx2c4.com> <20220209011919.493762-7-Jason@zx2c4.com>
+ <YgN7TvD5rs/5i1dQ@owl.dominikbrodowski.net>
+In-Reply-To: <YgN7TvD5rs/5i1dQ@owl.dominikbrodowski.net>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 9 Feb 2022 11:40:12 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oZ2xLT-vX=7H0U8uBO4Z=pcMcu-CY-B=TpTdGWHp0pJA@mail.gmail.com>
-Message-ID: <CAHmME9oZ2xLT-vX=7H0U8uBO4Z=pcMcu-CY-B=TpTdGWHp0pJA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/9] random: do not xor RDRAND when writing into /dev/random
+Date:   Wed, 9 Feb 2022 11:45:18 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
+Message-ID: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
+Subject: Re: [PATCH v2 6/9] random: absorb fast pool into input pool after
+ fast load
 To:     Dominik Brodowski <linux@dominikbrodowski.net>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -64,15 +65,33 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Feb 9, 2022 at 9:31 AM Dominik Brodowski
 <linux@dominikbrodowski.net> wrote:
-> Looks good generally, just one unrelated change slipped in:
 >
-> >               bytes = min(count, sizeof(buf));
-> > -             if (copy_from_user(&buf, p, bytes))
-> > +             if (copy_from_user(buf, p, bytes))
-> >                       return -EFAULT;
+> Am Wed, Feb 09, 2022 at 02:19:16AM +0100 schrieb Jason A. Donenfeld:
+> > During crng_init == 0, we never credit entropy in add_interrupt_
+> > randomness(), but instead dump it directly into the base_crng. That's
+> > fine, except for the fact that we then wind up throwing away that
+> > entropy later when we switch to extracting from the input pool and
+> > overwriting the base_crng key. The two other early init sites --
+> > add_hwgenerator_randomness()'s use crng_fast_load() and add_device_
+> > randomness()'s use of crng_slow_load() -- always additionally give their
+> > inputs to the input pool. But not add_interrupt_randomness().
+>
+> Hm, up to this patch there is no base_crng key. So maybe change the ordering
+> of the patches?
 
-I'll often fix up very minor adjacent code style things. In this case,
-`buf` is an array, so the code is equivalent, but I prefer the latter,
-which is mostly what's used throughout the driver.
+I'll fix the commit message, actually. Eric wrote in his review of v1
+that he thinks this problem needs to be fixed before we move to
+overwriting keys in the subsequent patch and I agreed. Hence, this
+patch comes first.
+
+> > +
+> > +                     /* Technically this call means that we're using a spinlock_t
+> > +                      * in the IRQ handler, which isn't terrific for PREEMPT_RT.
+> > +                      * However, this only happens during very early boot, and then
+>
+> Whether it's only during "very early" boot depends on how fast we progress
+> to crng_init = 2. So maybe just "during boot"?
+
+Will do.
 
 Jason
