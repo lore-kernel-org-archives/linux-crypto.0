@@ -2,62 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E8EDC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1340C43217
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:56:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231186AbiBILzI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 06:55:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56898 "EHLO
+        id S231381AbiBIL4R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 06:56:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiBILzH (ORCPT
+        with ESMTP id S231614AbiBILz0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 06:55:07 -0500
+        Wed, 9 Feb 2022 06:55:26 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1010BE036C06;
-        Wed,  9 Feb 2022 02:45:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCCDC1DC15D;
+        Wed,  9 Feb 2022 02:54:27 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CA29AB81FDF;
-        Wed,  9 Feb 2022 10:45:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24B6CC340F0;
-        Wed,  9 Feb 2022 10:45:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E369EB81ED4;
+        Wed,  9 Feb 2022 10:54:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64930C340EE;
+        Wed,  9 Feb 2022 10:54:24 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="e/Pf7Ive"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ni01i6IV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644403530;
+        t=1644404062;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UnV7UrhgQr21PthLX8Pn4FBnaM1gdWwfkrGLWJxwOk8=;
-        b=e/Pf7IveD0TcWViwwV6va+EUgF16LNdycAHWCqKseMhDXVn4URn9RZGvL6n7T8xgB9Ao80
-        cQeLvSsFaNQ2aqZLdFGLpkwv3r23F5dk1dtsdp77ph0VHG/+zmjbV0V+x8VpKSzLn5Nf2m
-        t3HtH0OZvJvOHO5gpxn77+h9FUJ0chQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a106e8c0 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 10:45:30 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id v47so4667782ybi.4;
-        Wed, 09 Feb 2022 02:45:30 -0800 (PST)
-X-Gm-Message-State: AOAM530h9koEOSpNGaLzRorYs6ySJqOeP+khhRSxpnu8XG3/UgpAFy2Q
-        25kIDPn9KpyBB4teOdFupJCiBWbMq8/IaMPuw1I=
-X-Google-Smtp-Source: ABdhPJyFIHbgEiHJaxfexbZoIL2JTJqU4IXZN6GR5vdFmMhJfpC+2SqDzSxGldox0imKQ8bFRw7girU0y7NkaYEx4I8=
-X-Received: by 2002:a25:c006:: with SMTP id c6mr1366885ybf.457.1644403528916;
- Wed, 09 Feb 2022 02:45:28 -0800 (PST)
+        bh=aRdcgCtgYDraTbGYY/oTsQAtvoCi9zdr7hZIMT0rVQA=;
+        b=ni01i6IVybxjYFaa2OfDtFqEmv1gYUMXv1FVJLH20lOK8zc7343BumzW4i9Fs+jjYWwRLq
+        xupESrQHIL08L2QE2ul6ZzjWIJuKPOBZc1OAwycdFgZqfaav1SvCUp/3HrDxQCi6jjQXji
+        8UNjHiP3rTi61VkG/c0t2gnoIFktVRg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e0ca9df3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 10:54:22 +0000 (UTC)
+Received: by mail-yb1-f177.google.com with SMTP id x136so2921488ybe.11;
+        Wed, 09 Feb 2022 02:54:22 -0800 (PST)
+X-Gm-Message-State: AOAM5337/PxkZ1U88/eqFcXm5vS9Sf5xzbuNo9sQYOlvm0oBcxJ27nEI
+        5y4dR8+GJKRg5xwmhnBgOeyQLGlE13K5pCe3t+0=
+X-Google-Smtp-Source: ABdhPJwDHTynxX02xYXwDkdY5sCnwAq1Kr0Cmr4kv6M+XT6xBg88tirCRbBOdldTL6HY+3RRxC9cf2TTxekNdbckb5U=
+X-Received: by 2002:a05:6902:14d:: with SMTP id p13mr1452254ybh.638.1644404061495;
+ Wed, 09 Feb 2022 02:54:21 -0800 (PST)
 MIME-Version: 1.0
-References: <20220209011919.493762-1-Jason@zx2c4.com> <20220209011919.493762-7-Jason@zx2c4.com>
- <YgN7TvD5rs/5i1dQ@owl.dominikbrodowski.net>
-In-Reply-To: <YgN7TvD5rs/5i1dQ@owl.dominikbrodowski.net>
+References: <20220209011919.493762-1-Jason@zx2c4.com> <20220209011919.493762-8-Jason@zx2c4.com>
+ <YgN7mOTtQ03etVJX@owl.dominikbrodowski.net>
+In-Reply-To: <YgN7mOTtQ03etVJX@owl.dominikbrodowski.net>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 9 Feb 2022 11:45:18 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
-Message-ID: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
-Subject: Re: [PATCH v2 6/9] random: absorb fast pool into input pool after
- fast load
+Date:   Wed, 9 Feb 2022 11:54:10 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qUv+FTShqpYn0GJjUwHgkWCpE8T7rDNg+2byWpCHANig@mail.gmail.com>
+Message-ID: <CAHmME9qUv+FTShqpYn0GJjUwHgkWCpE8T7rDNg+2byWpCHANig@mail.gmail.com>
+Subject: Re: [PATCH v2 7/9] random: use simpler fast key erasure flow on
+ per-cpu keys
 To:     Dominik Brodowski <linux@dominikbrodowski.net>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         "Theodore Ts'o" <tytso@mit.edu>,
         Eric Biggers <ebiggers@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -65,33 +65,31 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Wed, Feb 9, 2022 at 9:31 AM Dominik Brodowski
 <linux@dominikbrodowski.net> wrote:
->
-> Am Wed, Feb 09, 2022 at 02:19:16AM +0100 schrieb Jason A. Donenfeld:
-> > During crng_init == 0, we never credit entropy in add_interrupt_
-> > randomness(), but instead dump it directly into the base_crng. That's
-> > fine, except for the fact that we then wind up throwing away that
-> > entropy later when we switch to extracting from the input pool and
-> > overwriting the base_crng key. The two other early init sites --
-> > add_hwgenerator_randomness()'s use crng_fast_load() and add_device_
-> > randomness()'s use of crng_slow_load() -- always additionally give their
-> > inputs to the input pool. But not add_interrupt_randomness().
->
-> Hm, up to this patch there is no base_crng key. So maybe change the ordering
-> of the patches?
+> Do we need a BUG_ON(random_data_len > 32) here?
 
-I'll fix the commit message, actually. Eric wrote in his review of v1
-that he thinks this problem needs to be fixed before we move to
-overwriting keys in the subsequent patch and I agreed. Hence, this
-patch comes first.
+I suppose we do. I'll add it. I didn't have this originally because
+there are really only same-file callers which are careful, and the
+compiler can't optimize it out. But maybe that carefulness won't be
+there in the future, so seems like a good idea to add it.
 
-> > +
-> > +                     /* Technically this call means that we're using a spinlock_t
-> > +                      * in the IRQ handler, which isn't terrific for PREEMPT_RT.
-> > +                      * However, this only happens during very early boot, and then
+> > +     memset(&chacha_state[12], 0, sizeof(u32) * 4);
 >
-> Whether it's only during "very early" boot depends on how fast we progress
-> to crng_init = 2. So maybe just "during boot"?
+> No IV, no generation counter here? As you already have a generation counter
+> in use for other purposes, why not use it here as well as some non-zero
+> starting point?
 
-Will do.
+No. The "fast key erasure" proposal sets the nonce to zero and sets
+the counter from zero, so I'd like to do the same, and leave the nonce
+field available for some other interesting use in the future. For
+example, setting the nonce to smp_processor_id() if we do future
+interesting things with lockfree algorithms. For now we have already a
+256-bit key which is more than sufficient.
+
+By the way, if https://blog.cr.yp.to/20170723-random.html (the
+original fast key erasure rng description) is a wall of text that's
+not too appealing, you can read Dan's implementation of it in
+supercop, which is remarkably simple:
+https://github.com/jedisct1/supercop/blob/master/crypto_rng/chacha20/ref/rng.c
+. You'll notice the new code in this commit isn't too far from there.
 
 Jason
