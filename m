@@ -2,183 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5E7C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 00:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F340EC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235343AbiBIAWB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Feb 2022 19:22:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
+        id S233050AbiBICka (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Feb 2022 21:40:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbiBIAWA (ORCPT
+        with ESMTP id S242735AbiBIBUR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Feb 2022 19:22:00 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B244C06173B;
-        Tue,  8 Feb 2022 16:21:59 -0800 (PST)
+        Tue, 8 Feb 2022 20:20:17 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C79C061576;
+        Tue,  8 Feb 2022 17:20:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 32F3CB81DE5;
-        Wed,  9 Feb 2022 00:21:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98217C340E9;
-        Wed,  9 Feb 2022 00:21:56 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 144E0617E7;
+        Wed,  9 Feb 2022 01:20:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02137C004E1;
+        Wed,  9 Feb 2022 01:20:15 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="p/hetZUs"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="f3g58zfE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644366114;
+        t=1644369615;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yQ6XCjuca0gHb7IBipxgluRZP1vfq7sfS5zZ7CqHC/s=;
-        b=p/hetZUsL9e76SV3kMlSI2VpzN0erhuP92iqR9yXPnrvx2x0RG7JrIX1Rs6gkbcYJiqlAM
-        8gF0fjyMmI7+c6CGSB/l808Kgo41F4GiIQAfI9gGf7dkIxBEJTxb5CSxFluv2TvnA7Sur9
-        IMevYjvhDYjl48EYIglQlny2LDnRlGE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 18372bd8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Feb 2022 00:21:54 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id 192so1294115ybd.10;
-        Tue, 08 Feb 2022 16:21:53 -0800 (PST)
-X-Gm-Message-State: AOAM5324ggbddFFZa8irGOdWmMyZRZgRYWmR4/yY2revh6uBSYq0YHHz
-        ztkw9ItN0OEUmo9CD0V8nDw22rTdfyRAYBvFA9o=
-X-Google-Smtp-Source: ABdhPJzraCsmgLP4WkQbzGDkTSOQxlGEk2SgcBEXq47jtgUlBENHIhD13qTDRNWnUM4VrzVTpg4amIwIRIGnyJoPcFU=
-X-Received: by 2002:a25:42:: with SMTP id 63mr5594754yba.245.1644366112938;
- Tue, 08 Feb 2022 16:21:52 -0800 (PST)
-MIME-Version: 1.0
-References: <20220208155335.378318-1-Jason@zx2c4.com> <20220208155335.378318-7-Jason@zx2c4.com>
- <YgL/JN+ObjfhEedk@sol.localdomain>
-In-Reply-To: <YgL/JN+ObjfhEedk@sol.localdomain>
+        bh=Epo8j6f82VaiElGEK+cLsKCLLv1wK/ngSXClGzK93nI=;
+        b=f3g58zfEZIQTrFf4x5mRH7JVgKrccFTPWeYFBA2Oo8yebDy+QRlHo3Z3cFQ4scSdGamyhL
+        wHR6p5y9eYFELn9MDC7NHtM8SePk1HrqavpcAZ/ZCNbNJIAKzYDZ6o9zYBU2d5WGyQzNKG
+        wsqMinQevWdxzvwP0PoKuvhVg6baThk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4f5ce73 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Feb 2022 01:20:14 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 9 Feb 2022 01:21:42 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qd0WPqyOqwcsRX+bZzimMj1ZvCGKskGca7Z_Fi9QCYow@mail.gmail.com>
-Message-ID: <CAHmME9qd0WPqyOqwcsRX+bZzimMj1ZvCGKskGca7Z_Fi9QCYow@mail.gmail.com>
-Subject: Re: [PATCH v1 6/7] random: use simpler fast key erasure flow on
- per-cpu keys
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     tytso@mit.edu, linux@dominikbrodowski.net, ebiggers@kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v2 9/9] random: remove outdated INT_MAX >> 6 check in urandom_read()
+Date:   Wed,  9 Feb 2022 02:19:19 +0100
+Message-Id: <20220209011919.493762-10-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-1-Jason@zx2c4.com>
+References: <20220209011919.493762-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Eric,
+In 79a8468747c5 ("random: check for increase of entropy_count because of
+signed conversion"), a number of checks were added around what values
+were passed to account(), because account() was doing fancy fixed point
+fractional arithmetic, and a user had some ability to pass large values
+directly into it. One of things in that commit was limiting those values
+to INT_MAX >> 6.
 
-Thanks a bunch for the review.
+However, for several years now, urandom reads no longer touch entropy
+accounting, and so this check serves no purpose. The current flow is:
 
-On Wed, Feb 9, 2022 at 12:39 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> Previously, the extracted entropy was being XOR'ed into the ChaCha key.  Now the
-> key is just being overwritten.  This is the approach we should be aiming for,
-> but I'm concerned about the fact that add_interrupt_randomness() still sometimes
-> adds entropy to the ChaCha key directly without mixing it into the entropy pool.
-> That happens via crng_fast_load() when crng_init == 0.  This new approach will
-> destroy any entropy that was present in the key only.
->
-> The right fix, IMO, would be to always send entropy through the entropy pool.
-> Until that is done, though, I'm not sure it's a good idea to overwrite the key
-> like this.
+urandom_read_nowarn()-->get_random_bytes_user()-->chacha20_block()
 
-I agree with this in principle, and I've been trying to think of a
-good way to do it, but it's a bit hard to do, because of the workqueue
-deferred dumping. I'll try to see if I can figure out something there.
-In practice, it's not _such_ a big deal, as it's "only" 64 credit-bits
-of entropy we're talking about. A sort of hacky but maybe a
-satisfactory solution would be to hash the base_crng key into the
-pool, once, just at the transition point. I'll think a bit more on it.
+We arrive at urandom_read_nowarn() in the first place either via
+ordinary fops, which limits reads to MAX_RW_COUNT, or via getrandom()
+which limits reads to INT_MAX.
 
->
-> Unrelated: this function could use some comments that explain what is going on.
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Will do.
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index f7f9cbfe13f7..e09874c511d0 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1305,7 +1305,6 @@ static ssize_t urandom_read_nowarn(struct file *file, char __user *buf,
+ {
+ 	int ret;
+ 
+-	nbytes = min_t(size_t, nbytes, INT_MAX >> 6);
+ 	ret = get_random_bytes_user(buf, nbytes);
+ 	trace_urandom_read(8 * nbytes, 0, input_pool.entropy_count);
+ 	return ret;
+-- 
+2.35.0
 
->
-> > +/*
-> > + * The general form here is based on a "fast key erasure RNG" from:
-> > + * https://blog.cr.yp.to/20170723-random.html
-> > + */
-> > +static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
-> > +                               u32 chacha_state[CHACHA_STATE_WORDS],
-> > +                               u8 random_data[32], size_t random_data_len)
->
-> Given that random_data is variable-length it should be a 'u8 *'.
-
-I'll do that and mention the size aspect in the comment on top.
-
->
-> Also, the above comment could use some more explanation.  I.e. what does this
-> function actually *do*.  (I understand it, but a comment will really help any
-> future readers...)
-
-Will do.
-
->
-> > + /*
-> > + * This function returns a ChaCha block that you may use for generating
->
-> ChaCha state, not ChaCha block.
-
-Thanks.
-
->
-> > + * random data. It also returns up to 32 bytes on its own of random data
-> > + * that may be used.
-> > +*/
-> > +static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
-> > +                         u8 random_data[32], size_t random_data_len)
->
-> Likewise, it's weird having random_data be declared as length 32 when it's
-> actually variable-length.
-
-Will fix.
-
-> > +     /* For the fast path, we check this unlocked first. */
-> > +     if (unlikely(!crng_ready())) {
-> > +             bool not_ready;
-> > +
-> > +             spin_lock_irqsave(&base_crng.lock, flags);
-> > +             /* Now that we're locked, re-check. */
-> > +             not_ready = !crng_ready();
-> > +             if (not_ready)
-> > +                     crng_fast_key_erasure(base_crng.key, chacha_state,
-> > +                                           random_data, random_data_len);
-> > +             spin_unlock_irqrestore(&base_crng.lock, flags);
-> > +             if (!not_ready)
-> > +                     return;
-> > +     }
->
-> Isn't the '!not_ready' check above backwards?  And in case case, doubly-inverted
-> logic like that should be avoided.
-
-You're right; it's all screwed up. I'll call it "ready" like it should
-be and fix the logic on that last if statement. Thank you for pointing
-this one out.
-
->
-> And again, a few more comments please :-)
-
-I'll pepper it up.
-
->
-> >  struct batched_entropy {
-> >       union {
-> > -             u64 entropy_u64[CHACHA_BLOCK_SIZE / sizeof(u64)];
-> > -             u32 entropy_u32[CHACHA_BLOCK_SIZE / sizeof(u32)];
-> > +             u64 entropy_u64[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
-> > +             u32 entropy_u32[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
-> >       };
->
-> The above numbers could use an explanation.
-
-It's 32 bytes from fast key erasure + one full chacha block. I'll
-leave a big comment there explaining this.
-
-> There's also a comment at the top of the file that still claims that
-> get_random_int() et al. don't implement backtracking protection.  That needs to
-> be updated.
-
-Will do. Saw this too after submitting.
-
-Thanks again for your review!
-
-Jason
