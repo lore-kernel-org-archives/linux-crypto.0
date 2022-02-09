@@ -2,53 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A72CC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 11:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC826C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Feb 2022 12:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231696AbiBIL5m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 06:57:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
+        id S232420AbiBIMHQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Feb 2022 07:07:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231811AbiBIL4G (ORCPT
+        with ESMTP id S232834AbiBIMGP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 06:56:06 -0500
+        Wed, 9 Feb 2022 07:06:15 -0500
 Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C67E00FA48;
-        Wed,  9 Feb 2022 02:56:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9255C07684B;
+        Wed,  9 Feb 2022 03:16:32 -0800 (PST)
+X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 X-isilmar-external: YES
 Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 74C4F201432;
-        Wed,  9 Feb 2022 08:31:16 +0000 (UTC)
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id B5DD820140A;
+        Wed,  9 Feb 2022 08:30:59 +0000 (UTC)
 Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id 5EBE180F74; Wed,  9 Feb 2022 09:30:22 +0100 (CET)
-Date:   Wed, 9 Feb 2022 09:30:22 +0100
+        id 12E7780554; Wed,  9 Feb 2022 09:23:09 +0100 (CET)
+Date:   Wed, 9 Feb 2022 09:23:09 +0100
 From:   Dominik Brodowski <linux@dominikbrodowski.net>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tytso@mit.edu, ebiggers@kernel.org
-Subject: Re: [PATCH v2 8/9] random: use hash function for crng_slow_load()
-Message-ID: <YgN7nmv9A0+Zi5L8@owl.dominikbrodowski.net>
+        tytso@mit.edu, ebiggers@kernel.org,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v2 4/9] random: ensure early RDSEED goes through mixer on
+ init
+Message-ID: <YgN57QP5xH9ebrH/@owl.dominikbrodowski.net>
 References: <20220209011919.493762-1-Jason@zx2c4.com>
- <20220209011919.493762-9-Jason@zx2c4.com>
+ <20220209011919.493762-5-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220209011919.493762-9-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-5-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Wed, Feb 09, 2022 at 02:19:18AM +0100 schrieb Jason A. Donenfeld:
-> Since we have a hash function that's really fast, and the goal of
-> crng_slow_load() is reportedly to "touch all of the crng's state", we
-> can just hash the old state together with the new state and call it a
-> day. This way we dont need to reason about another LFSR or worry about
-> various attacks there. This code is only ever used at early boot and
-> then never again.
+Am Wed, Feb 09, 2022 at 02:19:14AM +0100 schrieb Jason A. Donenfeld:
+> Continuing the reasoning of "random: use RDSEED instead of RDRAND in
+> entropy extraction" from this series, at init time we also don't want to
+> be xoring RDSEED directly into the crng. Instead it's safer to put it
+> into our entropy collector and then re-extract it, so that it goes
+> through a hash function with preimage resistance.
+
+Any reason why you re-order
+
+> +	mix_pool_bytes(utsname(), sizeof(*(utsname())));
+>  	mix_pool_bytes(&now, sizeof(now));
+
+? It shouldn't matter, but it's an additional change I see no rationale for.
+
+Also, AFAICS, we now only call rdseed 8 times (to mix into the input pool
+directly and to update the primary pool indirectly) instead of 8 times (for
+the input pool) and 12 times (for initializing the primary pool). That's
+still 64 bytes, and we use that to seed 48 bytes, we're still on the safe
+side. So feel free to add my
 
 	Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
