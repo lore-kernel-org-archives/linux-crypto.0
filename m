@@ -2,58 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36171C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84769C43217
 	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 23:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345649AbiBJX2u (ORCPT
+        id S1345654AbiBJX2x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 18:28:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41358 "EHLO
+        Thu, 10 Feb 2022 18:28:53 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345661AbiBJX2t (ORCPT
+        with ESMTP id S1345659AbiBJX2s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 18:28:49 -0500
-Received: from mail-vs1-xe49.google.com (mail-vs1-xe49.google.com [IPv6:2607:f8b0:4864:20::e49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9E35F6B
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 15:28:48 -0800 (PST)
-Received: by mail-vs1-xe49.google.com with SMTP id b12-20020a67fe8c000000b0031a490e8b9dso644536vsr.15
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 15:28:48 -0800 (PST)
+        Thu, 10 Feb 2022 18:28:48 -0500
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88F3B5F67
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 15:28:46 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id w14-20020a0cfc4e000000b0042c1ac91249so5129204qvp.4
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 15:28:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=aI+ZZN/XgFx9qNVpwESSjNwjrEMAlNEJZKE9wM7Vg8M=;
-        b=szJN+mEd6nLTGyWwqNr7fYO0/2rktvhHXQztqi/tX90V+UH1y5L56DnLAVXvuM+dZj
-         KZ6aBrbekNOSCcuB1MNM/4UXyLMoVCAw5jnWNZiXlpmrpCn2K00MUoT5nJ6k/BdBQ+1B
-         4tU4JvSvK2ie5atiyYMBkZY2iIxFQQzy7gH6OSY0toUs9PDHSIrr1susNs1Te5EXhJwN
-         EgB6sVHg8+YTEoi2lzbS563wEaReTAkyWSF4zBxnEPhjKHqE4bU0uDPNWEutBEBHyvkq
-         +Q9pmtChWIia2FBJ8PltcLBnY2ZSWjwBk40Wqx3OokYV0FZ7RwBL30C5YbZbBZFvjRPw
-         pj8Q==
+        bh=uvOO8ZNH1ZfcGkGuvFcfNS7K5FAXvaqzIa8ApkAjUlk=;
+        b=KWviO3Q6aZAotjrk9w73/Dg+Jm3U5xwpsluhcSQmxk2NmT7heyhGNqgkvAeD3xVMR2
+         ku0pyHpq3/LitKCgEa2Cvyp/VzY7FZD4YM/PMIDnhivFg7yXDtZv79d1dG2WeCaKz3qg
+         /pei6XJb2fQvMwF3wytez6tTklLcIRvAa+9a4Gsy5rEaNjVWc5yNq17tduHJuqOxsP3T
+         q8+YiybRbvYupGxCALTsdWG8o1FY+nQ75sRXbhFPWVr3Ont3Xu8KXSmtbjwZn53n6S64
+         FXyd+mj4TIHs+Bi2KrKoFWcapOzquagxgmwJ+4LQy1+l4e2+EIsU+QJhZfFrohHUDgQX
+         ezhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=aI+ZZN/XgFx9qNVpwESSjNwjrEMAlNEJZKE9wM7Vg8M=;
-        b=mBBw44sTzlPI7K6bXXlMh+/Vj+yjhXaRTS6aM6sEgOscZf9i74uVlm6wtx8SivHV8K
-         uSfaCsEa3IIABHCCy2aA8fLKn5fbmMnonTMpqpf3uEFDzzLN7w/D2rNyQc+NAR7ZkRc2
-         HkT+6hEqF3SNbLaqUs8ndGOFV3+AZgU1l/q3sGAgV23gUvqfP2Bli7vlU+kEBog2oNH4
-         8jGaECglvChfQLlXfTEPf9Tuc80cBa5z43ORvsFFdrM4ZjyHyOQ4Iy9DeJHjx/3cWCoR
-         ZWykfidF8GJ8rzhlDPXbq1jTiBL3itKER63jsaZEWH8fG9ZAgh4+gvQ+L33FJWljwJG1
-         goKg==
-X-Gm-Message-State: AOAM533/KnetsFWDmePZmHj5UeNINiA/uI6a2RRZGUQirT/DCjTKk+k3
-        Ya1TY8JpvnR80LG11Du6Wh7CmGyKbPYk4bfNbLmQ3eDNEjnjTG0fuwtfMSN8bFG5MZ//a7i8d2X
-        gGRx0hU3TVsCA3JkeLRHNGwtEdKOTW8NYtqZ/YlLmM3os6cAPybN95J00fR5/4rfRBQE=
-X-Google-Smtp-Source: ABdhPJzCBY0mrmEviuzKIse40qgMrfXkf3Pj774y8cx6D6m7AiAAbw5HhZBEYCXE4J1+fE0/KjzeZZYC5w==
+        bh=uvOO8ZNH1ZfcGkGuvFcfNS7K5FAXvaqzIa8ApkAjUlk=;
+        b=8OvxNcOCUp0YxAljl2D9MLkRKI/Hdpu2VTNPp8vnkwqfWfUen8z+O+yabjANOtq44Y
+         al5gbkg8ZxxNNET+b8HVZYSY3fyajfZOUfKePi0LdfIaJJOf9/uUMeYE8AwNFQTBe/Lr
+         D9d/RXY/9pCc51lUauOhb77uWdiszw/eg4Bg3ZHKOSCDLoh3P3TLRUbsrXHl4111HDwZ
+         +ovmJXs1YzcLEYWrkNfM3DFxrlvvLJ5GSYMetST3BAUZY3Uz099HesrVBYd3hwr0XYoZ
+         JgsIRKOhayyBdDVTd6YfsYxrYtGiZpnoeuEu5l2PxpGaLKZWQIDI6aHIo5yGj8/9j3jV
+         jLjg==
+X-Gm-Message-State: AOAM533ZxJC69E8cP//tzUC1kE04Ma/mIUW/0QmPNRLnb+dGuFJGLOGq
+        pfLRzj36TNc53iKcTC0IQd9Ia9/K00RWf3ym1P1bHxb6rq9i8TjO8FR1VIqPEKiirec6/GoTGK4
+        as7teppoLGjoygEcXblyFkpD/TXFWED1FG3iRhYyE11OfwX9hMdI5Bp9Hvov2CANOmFA=
+X-Google-Smtp-Source: ABdhPJy1qb2FgD/k24haM+CpfYV7QoTJ0Jaa1kUdux1WeSG+locnVGiQL977gmiAc1sO4farcpPRsVEjZg==
 X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
- (user=nhuck job=sendgmr) by 2002:a67:fb0b:: with SMTP id d11mr2991237vsr.35.1644535727137;
- Thu, 10 Feb 2022 15:28:47 -0800 (PST)
-Date:   Thu, 10 Feb 2022 23:28:12 +0000
+ (user=nhuck job=sendgmr) by 2002:a05:6214:20ca:: with SMTP id
+ 10mr6898460qve.96.1644535725641; Thu, 10 Feb 2022 15:28:45 -0800 (PST)
+Date:   Thu, 10 Feb 2022 23:28:11 +0000
 In-Reply-To: <20220210232812.798387-1-nhuck@google.com>
-Message-Id: <20220210232812.798387-8-nhuck@google.com>
+Message-Id: <20220210232812.798387-7-nhuck@google.com>
 Mime-Version: 1.0
 References: <20220210232812.798387-1-nhuck@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [RFC PATCH v2 7/7] crypto: arm64/polyval: Add PMULL accelerated
+Subject: [RFC PATCH v2 6/7] crypto: x86/polyval: Add PCLMULQDQ accelerated
  implementation of POLYVAL
 From:   Nathan Huckleberry <nhuck@google.com>
 To:     linux-crypto@vger.kernel.org
@@ -70,74 +70,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add hardware accelerated version of POLYVAL for ARM64 CPUs with
-Crypto Extension support.
+Add hardware accelerated version of POLYVAL for x86-64 CPUs with
+PCLMULQDQ support.
 
-This implementation is accelerated using PMULL instructions to perform
-the finite field computations.  For added efficiency, 8 blocks of the
-message are processed simultaneously by precomputing the first 8
-powers of the key.
+This implementation is accelerated using PCLMULQDQ instructions to
+perform the finite field computations.  For added efficiency, 8 blocks
+of the message are processed simultaneously by precomputing the first
+8 powers of the key.
 
-Karatsuba multiplication is used instead of Schoolbook multiplication
-because it was found to be slightly faster on ARM64 CPUs.  Montgomery
-reduction must be used instead of Barrett reduction due to the
-difference in modulus between POLYVAL's field and other finite fields.
+Schoolbook multiplication is used instead of Karatsuba multiplication
+because it was found to be slightly faster on x86-64 machines.
+Montgomery reduction must be used instead of Barrett reduction due to
+the difference in modulus between POLYVAL's field and other finite
+fields.
+
+More information on POLYVAL can be found in the HCTR2 paper:
+Length-preserving encryption with HCTR2:
+https://eprint.iacr.org/2021/1441.pdf
 
 Signed-off-by: Nathan Huckleberry <nhuck@google.com>
 ---
 
 Changes since v1:
- * Rename C, D, E to LO, MI, HI
+ * Rename C, D, EF to LO, MI, HI
  * Add comments explaining POLYVAL
  * Fix bug in handling of non-block-multiple messages
  * Wrap shash in ahash (as done in ghash)
 
- arch/arm64/crypto/Kconfig           |   7 +
- arch/arm64/crypto/Makefile          |   3 +
- arch/arm64/crypto/polyval-ce-core.S | 405 ++++++++++++++++++++++++++++
- arch/arm64/crypto/polyval-ce-glue.c | 365 +++++++++++++++++++++++++
- 4 files changed, 780 insertions(+)
- create mode 100644 arch/arm64/crypto/polyval-ce-core.S
- create mode 100644 arch/arm64/crypto/polyval-ce-glue.c
+ arch/x86/crypto/Makefile               |   3 +
+ arch/x86/crypto/polyval-clmulni_asm.S  | 414 +++++++++++++++++++++++++
+ arch/x86/crypto/polyval-clmulni_glue.c | 365 ++++++++++++++++++++++
+ crypto/Kconfig                         |  10 +
+ 4 files changed, 792 insertions(+)
+ create mode 100644 arch/x86/crypto/polyval-clmulni_asm.S
+ create mode 100644 arch/x86/crypto/polyval-clmulni_glue.c
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 897f9a4b5b67..f7fbe8637e5c 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -60,6 +60,13 @@ config CRYPTO_GHASH_ARM64_CE
- 	select CRYPTO_GF128MUL
- 	select CRYPTO_LIB_AES
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index ee2df489b0d9..c0f13801afba 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -69,6 +69,9 @@ libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
  
-+config CRYPTO_POLYVAL_ARM64_CE
-+	tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
-+	depends on KERNEL_MODE_NEON
-+	select CRYPTO_CRYPTD
-+	select CRYPTO_HASH
-+	select CRYPTO_POLYVAL
++obj-$(CONFIG_CRYPTO_POLYVAL_CLMUL_NI) += polyval-clmulni.o
++polyval-clmulni-y := polyval-clmulni_asm.o polyval-clmulni_glue.o
 +
- config CRYPTO_CRCT10DIF_ARM64_CE
- 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
- 	depends on KERNEL_MODE_NEON && CRC_T10DIF
-diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
-index 09a805cc32d7..53f9af962b86 100644
---- a/arch/arm64/crypto/Makefile
-+++ b/arch/arm64/crypto/Makefile
-@@ -26,6 +26,9 @@ sm4-ce-y := sm4-ce-glue.o sm4-ce-core.o
- obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
- ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
- 
-+obj-$(CONFIG_CRYPTO_POLYVAL_ARM64_CE) += polyval-ce.o
-+polyval-ce-y := polyval-ce-glue.o polyval-ce-core.o
-+
- obj-$(CONFIG_CRYPTO_CRCT10DIF_ARM64_CE) += crct10dif-ce.o
- crct10dif-ce-y := crct10dif-ce-core.o crct10dif-ce-glue.o
- 
-diff --git a/arch/arm64/crypto/polyval-ce-core.S b/arch/arm64/crypto/polyval-ce-core.S
+ obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
+ crc32c-intel-y := crc32c-intel_glue.o
+ crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
+diff --git a/arch/x86/crypto/polyval-clmulni_asm.S b/arch/x86/crypto/polyval-clmulni_asm.S
 new file mode 100644
-index 000000000000..3b2a5adf8987
+index 000000000000..bec1a2046b18
 --- /dev/null
-+++ b/arch/arm64/crypto/polyval-ce-core.S
-@@ -0,0 +1,405 @@
++++ b/arch/x86/crypto/polyval-clmulni_asm.S
+@@ -0,0 +1,414 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright 2021 Google LLC
@@ -147,7 +134,7 @@ index 000000000000..3b2a5adf8987
 + * https://opensource.org/licenses/MIT.
 + */
 +/*
-+ * This is an efficient implementation of POLYVAL using ARMv8 Crypto Extension
++ * This is an efficient implementation of POLYVAL using intel PCLMULQDQ-NI
 + * instructions. It works on 8 blocks at a time, by precomputing the first 8
 + * keys powers h^8, ..., h^1 in the POLYVAL finite field. This precomputation
 + * allows us to split finite field multiplication into two steps.
@@ -167,106 +154,117 @@ index 000000000000..3b2a5adf8987
 + */
 +
 +#include <linux/linkage.h>
++#include <asm/frame.h>
++
 +#define NUM_PRECOMPUTE_POWERS 8
 +
-+BLOCKS_LEFT	.req	x2
-+OP1	.req	x9
-+KEY_START	.req	x10
-+EXTRA_BYTES	.req	x11
-+IND	.req	x12
-+TMP	.req	x13
-+PARTIAL_LEFT	.req	x14
++#define GSTAR %xmm7
++#define PL %xmm8
++#define PH %xmm9
++#define T %xmm10
++#define V %xmm11
++#define LO %xmm12
++#define HI %xmm13
++#define MI %xmm14
++#define SUM %xmm15
 +
-+M0	.req	v0
-+M1	.req	v1
-+M2	.req	v2
-+M3	.req	v3
-+M4	.req	v4
-+M5	.req	v5
-+M6	.req	v6
-+M7	.req	v7
-+KEY8	.req	v8
-+KEY7	.req	v9
-+KEY6	.req	v10
-+KEY5	.req	v11
-+KEY4	.req	v12
-+KEY3	.req	v13
-+KEY2	.req	v14
-+KEY1	.req	v15
-+PL	.req	v16
-+PH	.req	v17
-+T	.req	v18
-+V	.req	v19
-+LO	.req	v20
-+MI	.req	v21
-+HI	.req	v22
-+SUM	.req	v23
-+GSTAR	.req	v24
++#define BLOCKS_LEFT %rdx
++#define OP1 %rdi
++#define OP2 %r10
++#define IDX %r11
++#define TMP %rax
 +
-+	.text
-+	.align	4
++.section    .rodata.cst16.gstar, "aM", @progbits, 16
++.align 16
 +
-+	.arch	armv8-a+crypto
-+	.align	4
++Lgstar:
++	.quad 0xc200000000000000, 0xc200000000000000
 +
-+.Lgstar:
-+	.quad	0xc200000000000000, 0xc200000000000000
++.text
 +
 +/*
-+ * Computes the product of two 128-bit polynomials in X and Y and XORs the
-+ * components of the 256-bit product into LO, MI, HI.
++ * Performs schoolbook1_iteration on two lists of 128-bit polynomials of length
++ * b pointed to by OP1 and OP2.
++ */
++.macro schoolbook1 b
++	.set by, \b
++	.set i, 0
++	.rept (by)
++		schoolbook1_iteration i 0
++		.set i, (i +1)
++	.endr
++.endm
++
++/*
++ * Computes the product of two 128-bit polynomials at the memory locations
++ * specified by (OP1 + 16*i) and (OP2 + 16*i) and XORs the components of the
++ * 256-bit product into LO, MI, HI.
 + *
 + * The multiplication produces four parts:
-+ *   LOW: The polynomial given by performing carryless multiplication of X_L and
-+ *   Y_L
-+ *   MID: The polynomial given by performing carryless multiplication of (X_L ^
-+ *   X_H) and (Y_L ^ Y_H)
-+ *   HIGH: The polynomial given by performing carryless multiplication of X_H
-+ *   and Y_H
++ *   LOW: The polynomial given by performing carryless multiplication of the
++ *   bottom 64-bits of each polynomial
++ *   MID1: The polynomial given by performing carryless multiplication of the
++ *   bottom 64-bits of the first polynomial and the top 64-bits of the second
++ *   MID2: The polynomial given by performing carryless multiplication of the
++ *   bottom 64-bits of the second polynomial and the top 64-bits of the first
++ *   HIGH: The polynomial given by performing carryless multiplication of the
++ *   top 64-bits of each polynomial
 + *
 + * We compute:
 + *  LO ^= LOW
-+ *  MI ^= MID
-+ *  HI ^= HIGH
++ *  Mi ^= MID1 ^ MID2
++ *  Hi ^= HIGH
 + *
 + * Later, the 256-bit result can be extracted as:
-+ *   [HI_H : HI_L ^ HI_H ^ MI_H ^ LO_H :: LO_H ^ HI_L ^ MI_L ^ LO_L : LO_L]
++ *   [HI_H : HI_L ^ MI_H : LO_H ^ MI_L : LO_L]
 + * This step is done when computing the polynomial reduction for efficiency
 + * reasons.
++ *
++ * If xor_sum == 1 then XOR the value of SUM into m_0.
++ * This avoids an extra multication of SUM and h^N.
 + */
-+.macro karatsuba1 X Y
-+	X .req \X
-+	Y .req \Y
-+	ext	v25.16b, X.16b, Y.16b, #8
-+	eor	v25.16b, v25.16b, X.16b
-+	ext	v26.16b, Y.16b, Y.16b, #8
-+	eor	v26.16b, v26.16b, Y.16b
-+	pmull	v26.1q, v25.1d, v26.1d
-+	pmull2	v25.1q, X.2d, Y.2d
-+	pmull	X.1q, X.1d, Y.1d
-+	eor	HI.16b, HI.16b, v26.16b
-+	eor	LO.16b, LO.16b, v25.16b
-+	eor	MI.16b, MI.16b, X.16b
-+	.unreq X
-+	.unreq Y
++.macro schoolbook1_iteration i xor_sum
++	.set i, \i
++	.set xor_sum, \xor_sum
++	movups (16*i)(OP1), %xmm0
++	.if(i == 0 && xor_sum == 1)
++		pxor SUM, %xmm0
++	.endif
++	vpclmulqdq $0x01, (16*i)(OP2), %xmm0, %xmm1
++	vpxor %xmm1, MI, MI
++	vpclmulqdq $0x00, (16*i)(OP2), %xmm0, %xmm2
++	vpxor %xmm2, LO, LO
++	vpclmulqdq $0x11, (16*i)(OP2), %xmm0, %xmm3
++	vpxor %xmm3, HI, HI
++	vpclmulqdq $0x10, (16*i)(OP2), %xmm0, %xmm4
++	vpxor %xmm4, MI, MI
++.endm
++
++/*
++ * Performs the same computation as schoolbook1_iteration, except we expect the
++ * arguments to already be loaded into xmm0 and xmm1.
++ */
++.macro schoolbook1_noload
++	vpclmulqdq $0x01, %xmm0, %xmm1, %xmm2
++	vpxor %xmm2, MI, MI
++	vpclmulqdq $0x00, %xmm0, %xmm1, %xmm3
++	vpxor %xmm3, LO, LO
++	vpclmulqdq $0x11, %xmm0, %xmm1, %xmm4
++	vpxor %xmm4, HI, HI
++	vpclmulqdq $0x10, %xmm0, %xmm1, %xmm5
++	vpxor %xmm5, MI, MI
 +.endm
 +
 +/*
 + * Computes the 256-bit polynomial represented by LO, HI, MI. Stores
 + * the result in PL, PH.
-+ *   [PH :: PL] = [HI_H : HI_L ^ HI_H ^ MI_H ^ LO_H :: LO_H ^ HI_L ^ MI_L ^ LO_L
-+ *   : LO_L]
++ *   [PH :: PL] = [HI_H : HI_L ^ MI_H :: LO_H ^ MI_L : LO_L]
 + */
-+.macro karatsuba2
-+	ext	v4.16b, MI.16b, LO.16b, #8
-+	eor	HI.16b, HI.16b, v4.16b //[HI1 ^ LO0 : HI0 ^ MI1]
-+	eor	v4.16b, LO.16b, MI.16b //[LO1 ^ MI1 : LO0 ^ MI0]
-+	//[LO0 ^ LO1 ^ MI1 ^ HI1 : MI1 ^ LO0 ^ MI0 ^ HI0]
-+	eor	v4.16b, HI.16b, v4.16b
-+	ext	LO.16b, LO.16b, LO.16b, #8 // [LO0 : LO1]
-+	ext	MI.16b, MI.16b, MI.16b, #8 // [MI0 : MI1]
-+	ext	PH.16b, v4.16b, LO.16b, #8 //[LO1 : LO1 ^ MI1 ^ HI1 ^ LO0]
-+	ext	PL.16b, MI.16b, v4.16b, #8 //[MI1 ^ LO0 ^ MI0 ^ HI0 : MI0]
++.macro schoolbook2
++	vpslldq $8, MI, PL
++	vpsrldq $8, MI, PH
++	pxor LO, PL
++	pxor HI, PH
 +.endm
 +
 +/*
@@ -337,145 +335,142 @@ index 000000000000..3b2a5adf8987
 + *   p(x) / x^{128} mod g(x) = [P_3 ^ P_1 ^ V_1 ^ T_0 : P_2 ^ P_0 ^ V_0 ^ T_1]
 + */
 +.macro montgomery_reduction
-+	pmull	T.1q, GSTAR.1d, PL.1d
-+	ext	T.16b, T.16b, T.16b, #8
-+	eor	PL.16b, PL.16b, T.16b
-+	pmull2	V.1q, GSTAR.2d, PL.2d
-+	eor	V.16b, PL.16b, V.16b
-+	eor	PH.16b, PH.16b, V.16b
++	movdqa PL, T
++	pclmulqdq $0x00, GSTAR, T # T = [P_0 * g*(x)]
++	pshufd $0b01001110, T, V # V = [T_0 : T_1]
++	pxor V, PL # PL = [P_1 ^ T_0 : P_0 ^ T_1]
++	pxor PL, PH # PH = [P_1 ^ T_0 ^ P_3 : P_0 ^ T_1 ^ P_2]
++	pclmulqdq $0x11, GSTAR, PL # PL = [(P_1 ^ T_0) * g*(x)]
++	pxor PL, PH
 +.endm
 +
 +/*
-+ * Compute Polyval on 8 blocks.
++ * Compute schoolbook multiplication for 8 blocks
++ * M_0h^8 + ... + M_7h^1 (no constant term)
 + *
-+ * If reduce is set, performs interleaved montgomery reduction
-+ * on the last full_stride iteration's PL, PH.
++ * If reduce is set, computes the montgomery reduction of the
++ * previous full_stride call and XORs with the first message block.
++ * (M_0 + REDUCE(PL, PH))h^8 + ... + M_7h^1 (no constant term)
 + *
-+ * Sets PL, PH.
++ * Sets PL, PH
++ * Clobbers LO, HI, MI
++ *
 + */
 +.macro full_stride reduce
 +	.set reduce, \reduce
-+	eor		LO.16b, LO.16b, LO.16b
-+	eor		MI.16b, MI.16b, MI.16b
-+	eor		HI.16b, HI.16b, HI.16b
++	mov %rsi, OP2
++	pxor LO, LO
++	pxor HI, HI
++	pxor MI, MI
 +
-+	ld1		{M0.16b, M1.16b, M2.16b, M3.16b}, [x0], #64
-+	ld1		{M4.16b, M5.16b, M6.16b, M7.16b}, [x0], #64
-+
-+	karatsuba1 M7 KEY1
++	schoolbook1_iteration 7 0
 +	.if(reduce)
-+	pmull	T.1q, GSTAR.1d, PL.1d
++		movdqa PL, T
 +	.endif
 +
-+	karatsuba1 M6 KEY2
++	schoolbook1_iteration 6 0
 +	.if(reduce)
-+	ext	T.16b, T.16b, T.16b, #8
++		pclmulqdq $0x00, GSTAR, T # T = [X0 * g*(x)]
 +	.endif
 +
-+	karatsuba1 M5 KEY3
++	schoolbook1_iteration 5 0
 +	.if(reduce)
-+	eor	PL.16b, PL.16b, T.16b
++		pshufd $0b01001110, T, V # V = [T0 : T1]
 +	.endif
 +
-+	karatsuba1 M4 KEY4
++	schoolbook1_iteration 4 0
 +	.if(reduce)
-+	pmull2	V.1q, GSTAR.2d, PL.2d
++		pxor V, PL # PL = [X1 ^ T0 : X0 ^ T1]
 +	.endif
 +
-+	karatsuba1 M3 KEY5
++	schoolbook1_iteration 3 0
 +	.if(reduce)
-+	eor	V.16b, PL.16b, V.16b
++		pxor PL, PH # PH = [X1 ^ T0 ^ X3 : X0 ^ T1 ^ X2]
 +	.endif
 +
-+	karatsuba1 M2 KEY6
++	schoolbook1_iteration 2 0
 +	.if(reduce)
-+	eor	PH.16b, PH.16b, V.16b
++		pclmulqdq $0x11, GSTAR, PL # PL = [X1 ^ T0 * g*(x)]
 +	.endif
 +
-+	karatsuba1 M1 KEY7
++	schoolbook1_iteration 1 0
 +	.if(reduce)
-+	mov	SUM.16b, PH.16b
++		pxor PL, PH
++		movdqa PH, SUM
 +	.endif
-+	eor	M0.16b, M0.16b, SUM.16b
 +
-+	karatsuba1 M0 KEY8
++	schoolbook1_iteration 0 1
 +
-+	karatsuba2
++	addq $(8*16), OP1
++	addq $(8*16), OP2
++	schoolbook2
 +.endm
 +
 +/*
-+ * Handle any extra blocks before
-+ * full_stride loop.
++ * Compute poly on window size of %rdx blocks
++ * 0 < %rdx < NUM_PRECOMPUTE_POWERS
 + */
 +.macro partial_stride
-+	eor		LO.16b, LO.16b, LO.16b
-+	eor		MI.16b, MI.16b, MI.16b
-+	eor		HI.16b, HI.16b, HI.16b
-+	add		KEY_START, x1, #(NUM_PRECOMPUTE_POWERS << 4)
-+	sub		KEY_START, KEY_START, PARTIAL_LEFT, lsl #4
-+	ld1		{v0.16b}, [KEY_START]
-+	mov		v1.16b, SUM.16b
-+	karatsuba1 v0 v1
-+	karatsuba2
++	pxor LO, LO
++	pxor HI, HI
++	pxor MI, MI
++	mov BLOCKS_LEFT, TMP
++	shlq $4, TMP
++	mov %rsi, OP2
++	addq $(16*NUM_PRECOMPUTE_POWERS), OP2
++	subq TMP, OP2
++	# Multiply sum by h^N
++	movups (OP2), %xmm0
++	movdqa SUM, %xmm1
++	schoolbook1_noload
++	schoolbook2
 +	montgomery_reduction
-+	mov		SUM.16b, PH.16b
-+	eor		LO.16b, LO.16b, LO.16b
-+	eor		MI.16b, MI.16b, MI.16b
-+	eor		HI.16b, HI.16b, HI.16b
-+	mov		IND, XZR
++	movdqa PH, SUM
++	pxor LO, LO
++	pxor HI, HI
++	pxor MI, MI
++	xor IDX, IDX
 +.LloopPartial:
-+	cmp		IND, PARTIAL_LEFT
-+	bge		.LloopExitPartial
++	cmpq BLOCKS_LEFT, IDX # IDX < rdx
++	jae .LloopExitPartial
 +
-+	sub		TMP, IND, PARTIAL_LEFT
++	movq BLOCKS_LEFT, TMP
++	subq IDX, TMP # TMP = rdx - IDX
 +
-+	cmp		TMP, #-4
-+	bgt		.Lgt4Partial
-+	ld1		{M0.16b, M1.16b,  M2.16b, M3.16b}, [x0], #64
-+	// Clobber key registers
-+	ld1		{KEY8.16b, KEY7.16b, KEY6.16b,  KEY5.16b}, [KEY_START], #64
-+	karatsuba1 M0 KEY8
-+	karatsuba1 M1 KEY7
-+	karatsuba1 M2 KEY6
-+	karatsuba1 M3 KEY5
-+	add		IND, IND, #4
-+	b		.LoutPartial
-+
-+.Lgt4Partial:
-+	cmp		TMP, #-3
-+	bgt		.Lgt3Partial
-+	ld1		{M0.16b, M1.16b, M2.16b}, [x0], #48
-+	// Clobber key registers
-+	ld1		{KEY8.16b, KEY7.16b, KEY6.16b}, [KEY_START], #48
-+	karatsuba1 M0 KEY8
-+	karatsuba1 M1 KEY7
-+	karatsuba1 M2 KEY6
-+	add		IND, IND, #3
-+	b		.LoutPartial
-+
-+.Lgt3Partial:
-+	cmp		TMP, #-2
-+	bgt		.Lgt2Partial
-+	ld1		{M0.16b, M1.16b}, [x0], #32
-+	// Clobber key registers
-+	ld1		{KEY8.16b, KEY7.16b}, [KEY_START], #32
-+	karatsuba1 M0 KEY8
-+	karatsuba1 M1 KEY7
-+	add		IND, IND, #2
-+	b		.LoutPartial
-+
-+.Lgt2Partial:
-+	ld1		{M0.16b}, [x0], #16
-+	// Clobber key registers
-+	ld1		{KEY8.16b}, [KEY_START], #16
-+	karatsuba1 M0 KEY8
-+	add		IND, IND, #1
++	cmp $4, TMP # TMP < 4 ?
++	jl .Llt4Partial
++	schoolbook1 4
++	addq $4, IDX
++	addq $(4*16), OP1
++	addq $(4*16), OP2
++	jmp .LoutPartial
++.Llt4Partial:
++	cmp $3, TMP # TMP < 3 ?
++	jl .Llt3Partial
++	schoolbook1 3
++	addq $3, IDX
++	addq $(3*16), OP1
++	addq $(3*16), OP2
++	jmp .LoutPartial
++.Llt3Partial:
++	cmp $2, TMP # TMP < 2 ?
++	jl .Llt2Partial
++	schoolbook1 2
++	addq $2, IDX
++	addq $(2*16), OP1
++	addq $(2*16), OP2
++	jmp .LoutPartial
++.Llt2Partial:
++	schoolbook1 1 # TMP < 1 ?
++	addq $1, IDX
++	addq $(1*16), OP1
++	addq $(1*16), OP2
 +.LoutPartial:
-+	b .LloopPartial
++	jmp .LloopPartial
 +.LloopExitPartial:
-+	karatsuba2
++	schoolbook2
 +	montgomery_reduction
-+	eor		SUM.16b, SUM.16b, PH.16b
++	pxor PH, SUM
 +.endm
 +
 +/*
@@ -485,22 +480,23 @@ index 000000000000..3b2a5adf8987
 + * If op1, op2 are in montgomery form,  this computes the montgomery
 + * form of op1*op2.
 + *
-+ * void pmull_polyval_mul(u8 *op1, const u8 *op2);
++ * void clmul_polyval_mul(u8 *op1, const u8 *op2);
 + */
-+SYM_FUNC_START(pmull_polyval_mul)
-+	adr		TMP, .Lgstar
-+	ld1		{GSTAR.2d}, [TMP]
-+	eor		LO.16b, LO.16b, LO.16b
-+	eor		MI.16b, MI.16b, MI.16b
-+	eor		HI.16b, HI.16b, HI.16b
-+	ld1		{v0.16b}, [x0]
-+	ld1		{v1.16b}, [x1]
-+	karatsuba1 v0 v1
-+	karatsuba2
++SYM_FUNC_START(clmul_polyval_mul)
++	FRAME_BEGIN
++	vmovdqa Lgstar(%rip), GSTAR
++	pxor LO, LO
++	pxor HI, HI
++	pxor MI, MI
++	movups (%rdi), %xmm0
++	movups (%rsi), %xmm1
++	schoolbook1_noload
++	schoolbook2
 +	montgomery_reduction
-+	st1		{PH.16b}, [x0]
++	movups PH, (%rdi)
++	FRAME_END
 +	ret
-+SYM_FUNC_END(pmull_polyval_mul)
++SYM_FUNC_END(clmul_polyval_mul)
 +
 +/*
 + * Perform polynomial evaluation as specified by POLYVAL. If nblocks = k, this
@@ -509,49 +505,49 @@ index 000000000000..3b2a5adf8987
 + *
 + * Computes h^k * accumulator + h^kM_0 + ... + h^1M_{k-1} (No constant term)
 + *
-+ * x0 (OP1) - pointer to message blocks
-+ * x1 - pointer to precomputed key struct
-+ * x2 - number of blocks to hash
-+ * x3 - location to XOR with evaluated polynomial
++ * rdi (OP1) - pointer to message blocks
++ * rsi - pointer to precomputed key struct
++ * rdx - number of blocks to hash
++ * rcx - location to XOR with evaluated polynomial
 + *
-+ * void pmull_polyval_update(const u8 *in, const struct polyval_ctx *ctx,
-+ *			     size_t nblocks, u8 *accumulator);
++ * void clmul_polyval_update(const u8 *in, const struct polyhash_ctx* ctx,
++ *			     size_t nblocks, u8* accumulator);
 + */
-+SYM_FUNC_START(pmull_polyval_update)
-+	adr		TMP, .Lgstar
-+	ld1		{GSTAR.2d}, [TMP]
-+	ld1		{SUM.16b}, [x3]
-+	ands		PARTIAL_LEFT, BLOCKS_LEFT, #7
-+	beq		.LskipPartial
-+	partial_stride
-+.LskipPartial:
-+	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-+	blt		.LstrideLoopExit
-+	ld1		{KEY8.16b, KEY7.16b, KEY6.16b, KEY5.16b}, [x1], #64
-+	ld1		{KEY4.16b, KEY3.16b, KEY2.16b, KEY1.16b}, [x1], #64
++SYM_FUNC_START(clmul_polyval_update)
++	FRAME_BEGIN
++	vmovdqa Lgstar(%rip), GSTAR
++	movups (%rcx), SUM
++	cmpq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
++	jb .LstrideLoopExit
 +	full_stride 0
-+	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-+	blt		.LstrideLoopExitReduce
++	subq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
 +.LstrideLoop:
++	cmpq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
++	jb .LstrideLoopExitReduce
 +	full_stride 1
-+	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-+	bge		.LstrideLoop
++	subq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
++	jmp .LstrideLoop
 +.LstrideLoopExitReduce:
 +	montgomery_reduction
-+	mov		SUM.16b, PH.16b
++	movdqa PH, SUM
 +.LstrideLoopExit:
-+	st1		{SUM.16b}, [x3]
++	test BLOCKS_LEFT, BLOCKS_LEFT
++	je .LskipPartial
++	partial_stride
++.LskipPartial:
++	movups SUM, (%rcx)
++	FRAME_END
 +	ret
-+SYM_FUNC_END(pmull_polyval_update)
-diff --git a/arch/arm64/crypto/polyval-ce-glue.c b/arch/arm64/crypto/polyval-ce-glue.c
++SYM_FUNC_END(clmul_polyval_update)
+diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
 new file mode 100644
-index 000000000000..ca92e027b4ec
+index 000000000000..78cbb19658ac
 --- /dev/null
-+++ b/arch/arm64/crypto/polyval-ce-glue.c
++++ b/arch/x86/crypto/polyval-clmulni_glue.c
 @@ -0,0 +1,365 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Accelerated POLYVAL implementation with ARMv8 Crypto Extension
++ * Accelerated POLYVAL implementation with Intel PCLMULQDQ-NI
 + * instructions. This file contains glue code.
 + *
 + * Copyright (c) 2007 Nokia Siemens Networks - Mikko Herranen <mh1@iki.fi>
@@ -562,8 +558,9 @@ index 000000000000..ca92e027b4ec
 +/*
 + * Glue code based on ghash-clmulni-intel_glue.c.
 + *
-+ * This implementation of POLYVAL uses montgomery multiplication accelerated by
-+ * ARMv8 Crypto Extension instructions to implement the finite field operations.
++ * This implementation of POLYVAL uses montgomery multiplication
++ * accelerated by PCLMULQDQ-NI to implement the finite field
++ * operations.
 + *
 + */
 +
@@ -576,10 +573,8 @@ index 000000000000..ca92e027b4ec
 +#include <linux/init.h>
 +#include <linux/kernel.h>
 +#include <linux/module.h>
-+#include <linux/cpufeature.h>
-+#include <asm/neon.h>
++#include <asm/cpu_device_id.h>
 +#include <asm/simd.h>
-+#include <asm/unaligned.h>
 +
 +#define POLYVAL_BLOCK_SIZE	16
 +#define POLYVAL_DIGEST_SIZE	16
@@ -590,7 +585,10 @@ index 000000000000..ca92e027b4ec
 +};
 +
 +struct polyval_ctx {
-+	be128 key_powers[NUM_PRECOMPUTE_POWERS];
++	/*
++	 * These powers must be in the order h^8, ..., h^1.
++	 */
++	u128 key_powers[NUM_PRECOMPUTE_POWERS];
 +};
 +
 +struct polyval_desc_ctx {
@@ -598,9 +596,9 @@ index 000000000000..ca92e027b4ec
 +	u32 bytes;
 +};
 +
-+asmlinkage void pmull_polyval_update(const u8 *in, const struct polyval_ctx
-+				     *ctx, size_t nblocks, u8 *accumulator);
-+asmlinkage void pmull_polyval_mul(u8 *op1, const u8 *op2);
++asmlinkage void clmul_polyval_update(const u8 *in, struct polyval_ctx *keys,
++				     size_t nblocks, u8 *accumulator);
++asmlinkage void clmul_polyval_mul(u8 *op1, const u8 *op2);
 +
 +static int polyval_init(struct shash_desc *desc)
 +{
@@ -622,15 +620,15 @@ index 000000000000..ca92e027b4ec
 +
 +	BUILD_BUG_ON(sizeof(u128) != POLYVAL_BLOCK_SIZE);
 +
-+	memcpy(&ctx->key_powers[NUM_PRECOMPUTE_POWERS-1], key, sizeof(be128));
++	memcpy(&ctx->key_powers[NUM_PRECOMPUTE_POWERS-1], key, sizeof(u128));
 +
-+	kernel_neon_begin();
++	kernel_fpu_begin();
 +	for (i = NUM_PRECOMPUTE_POWERS-2; i >= 0; i--) {
-+		memcpy(&ctx->key_powers[i], key, sizeof(be128));
-+		pmull_polyval_mul((u8 *)&ctx->key_powers[i],
++		memcpy(&ctx->key_powers[i], key, sizeof(u128));
++		clmul_polyval_mul((u8 *)&ctx->key_powers[i],
 +				  (u8 *)&ctx->key_powers[i+1]);
 +	}
-+	kernel_neon_end();
++	kernel_fpu_end();
 +
 +	return 0;
 +}
@@ -643,9 +641,9 @@ index 000000000000..ca92e027b4ec
 +	u8 *dst = dctx->buffer;
 +	u8 *pos;
 +	unsigned int nblocks;
-+	unsigned int n;
++	int n;
 +
-+	kernel_neon_begin();
++	kernel_fpu_begin();
 +	if (dctx->bytes) {
 +		n = min(srclen, dctx->bytes);
 +		pos = dst + POLYVAL_BLOCK_SIZE - dctx->bytes;
@@ -657,14 +655,14 @@ index 000000000000..ca92e027b4ec
 +			*pos++ ^= *src++;
 +
 +		if (!dctx->bytes)
-+			pmull_polyval_mul(dst,
++			clmul_polyval_mul(dst,
 +				(u8 *)&ctx->key_powers[NUM_PRECOMPUTE_POWERS-1]);
 +	}
 +
 +	nblocks = srclen/POLYVAL_BLOCK_SIZE;
-+	pmull_polyval_update(src, ctx, nblocks, dst);
++	clmul_polyval_update(src, ctx, nblocks, dst);
 +	srclen -= nblocks*POLYVAL_BLOCK_SIZE;
-+	kernel_neon_end();
++	kernel_fpu_end();
 +
 +	if (srclen) {
 +		dctx->bytes = POLYVAL_BLOCK_SIZE - srclen;
@@ -684,10 +682,10 @@ index 000000000000..ca92e027b4ec
 +	u8 *buf = dctx->buffer;
 +
 +	if (dctx->bytes) {
-+		kernel_neon_begin();
-+		pmull_polyval_mul(buf,
++		kernel_fpu_begin();
++		clmul_polyval_mul((u8 *)buf,
 +			(u8 *)&ctx->key_powers[NUM_PRECOMPUTE_POWERS-1]);
-+		kernel_neon_end();
++		kernel_fpu_end();
 +	}
 +
 +	dctx->bytes = 0;
@@ -705,7 +703,7 @@ index 000000000000..ca92e027b4ec
 +	.descsize	= sizeof(struct polyval_desc_ctx),
 +	.base		= {
 +		.cra_name		= "__polyval",
-+		.cra_driver_name	= "__polyval-ce",
++		.cra_driver_name	= "__polyval-pclmulqdqni",
 +		.cra_priority		= 0,
 +		.cra_flags		= CRYPTO_ALG_INTERNAL,
 +		.cra_blocksize		= POLYVAL_BLOCK_SIZE,
@@ -827,7 +825,7 @@ index 000000000000..ca92e027b4ec
 +	struct cryptd_ahash *cryptd_tfm;
 +	struct polyval_async_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+	cryptd_tfm = cryptd_alloc_ahash("__polyval-ce",
++	cryptd_tfm = cryptd_alloc_ahash("__polyval-pclmulqdqni",
 +					CRYPTO_ALG_INTERNAL,
 +					CRYPTO_ALG_INTERNAL);
 +	if (IS_ERR(cryptd_tfm))
@@ -872,14 +870,17 @@ index 000000000000..ca92e027b4ec
 +	},
 +};
 +
-+static int __init polyval_ce_mod_init(void)
++static const struct x86_cpu_id pcmul_cpu_id[] = {
++	X86_MATCH_FEATURE(X86_FEATURE_PCLMULQDQ, NULL), /* Pickle-Mickle-Duck */
++	{}
++};
++MODULE_DEVICE_TABLE(x86cpu, pcmul_cpu_id);
++
++static int __init polyval_pclmulqdqni_mod_init(void)
 +{
 +	int err;
 +
-+	if (!cpu_have_named_feature(ASIMD))
-+		return -ENODEV;
-+
-+	if (!cpu_have_named_feature(PMULL))
++	if (!x86_match_cpu(pcmul_cpu_id))
 +		return -ENODEV;
 +
 +	err = crypto_register_shash(&polyval_alg);
@@ -897,23 +898,45 @@ index 000000000000..ca92e027b4ec
 +	return err;
 +}
 +
-+static void __exit polyval_ce_mod_exit(void)
++static void __exit polyval_pclmulqdqni_mod_exit(void)
 +{
 +	crypto_unregister_ahash(&polyval_async_alg);
 +	crypto_unregister_shash(&polyval_alg);
 +}
 +
-+static const struct cpu_feature polyval_cpu_feature[] = {
-+	{ cpu_feature(PMULL) }, { }
-+};
-+MODULE_DEVICE_TABLE(cpu, polyval_cpu_feature);
-+
-+module_init(polyval_ce_mod_init);
-+module_exit(polyval_ce_mod_exit);
++module_init(polyval_pclmulqdqni_mod_init);
++module_exit(polyval_pclmulqdqni_mod_exit);
 +
 +MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("POLYVAL hash function accelerated by ARMv8 Crypto Extension");
++MODULE_DESCRIPTION("POLYVAL hash function accelerated by PCLMULQDQ-NI");
 +MODULE_ALIAS_CRYPTO("polyval");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 2a9029f51caf..b539a5bdc45e 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -773,12 +773,22 @@ config CRYPTO_GHASH
+ 
+ config CRYPTO_POLYVAL
+ 	tristate
++	select CRYPTO_CRYPTD
+ 	select CRYPTO_GF128MUL
+ 	select CRYPTO_HASH
+ 	help
+ 	  POLYVAL is the hash function used in HCTR2.  It is not a general-purpose
+ 	  cryptographic hash function.
+ 
++config CRYPTO_POLYVAL_CLMUL_NI
++	tristate "POLYVAL hash function (CLMUL-NI accelerated)"
++	depends on X86 && 64BIT
++	select CRYPTO_POLYVAL
++	help
++	  This is the x86_64 CLMUL-NI accelerated implementation of POLYVAL. It is
++	  used to efficiently implement HCTR2 on x86-64 processors that support
++	  carry-less multiplication instructions.
++
+ config CRYPTO_POLY1305
+ 	tristate "Poly1305 authenticator algorithm"
+ 	select CRYPTO_HASH
 -- 
 2.35.1.265.g69c8d7142f-goog
 
