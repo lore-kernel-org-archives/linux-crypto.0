@@ -2,111 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFA6C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 16:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15666C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 18:04:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244646AbiBJQpT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 11:45:19 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58382 "EHLO
+        id S245482AbiBJSEY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 13:04:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244633AbiBJQpS (ORCPT
+        with ESMTP id S245472AbiBJSEX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 11:45:18 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06F613B
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 08:45:18 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id l67-20020a1c2546000000b00353951c3f62so4359270wml.5
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 08:45:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=yjDhqf592V3qt8wWnx7Xe2xWw8Y2UB9NWdwLTiczK1o=;
-        b=5TiOMJ8Mlb50qXyWCZxwL5pAfIOmsQI/kinuGONPUTIEg0Szrjxp1VmltFKf/RGzoy
-         tJJCDStGrt7koz6rkvJ2pE08unxcEkVEMaJOJ7qf2OF2JsuPVRUo8YQi8cpo/cHtEBBh
-         JoyDWNohkzUHovRFWv5Gb9N0Y0mYf/B5ZDzxuW4ZrD4QBlWy+lg1JxpU7PP+XC/J5DkZ
-         6TVoQcBVjEJWG6G6FgN9q1DmuMjc3Zp4tcNhK/dfz9/IJz7etW8HuC5W+sKw7Z4hTJ8g
-         D+BrYu9wDbOh8eatRoUaYM3FtdzJ4E+S3+b8p1MQhvKbDOyr20N6nIogcEAIyCtCNXdY
-         YoIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=yjDhqf592V3qt8wWnx7Xe2xWw8Y2UB9NWdwLTiczK1o=;
-        b=KasjUjzjfjfN4dp4aNGr9bn2LY8oU7enqXoFiL3vZnWR+lJJMJdIZRaVmH5k74odHY
-         xOXo0yN3okRNKa3sEU4Y4em/5Jq+K4Cm0Xnjjq7/jAacXHSA0GceqM6areI5q+bvZ1p7
-         KUrJl0RP4Nty6dy4CaQMtP+cQLNl/LFoyNkVvmc5/UnXnf/rhe+114jyt78m7UqCj6o7
-         yiCYxPXlDoBV4rRauFWL8+WU4XESGuL1H3WELKgSVcxJWKKqFip2W7Iy3GR2TA1azym7
-         YFThelmGJZ26UjgudoDAV3rFklR9/4lH85K+ByAB7FR+ZQhbgrri4EH/6t+JxrOZeeV6
-         T72A==
-X-Gm-Message-State: AOAM532qie/oKyxAeauLrnWp83RKkUovgoiYAUE8Tir4lsQF1bN8NoAu
-        ZmheFqIWxpzGW44/eTjTaCqosg==
-X-Google-Smtp-Source: ABdhPJyc2/8ZJ4hxIbLPFVcCV1rZ1Bg0TV7Oh4Mt69EeuvSrocHuFZNrVs7yoFvWEICUdpXlSZYVqg==
-X-Received: by 2002:a7b:cb90:: with SMTP id m16mr2868273wmi.3.1644511517233;
-        Thu, 10 Feb 2022 08:45:17 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id d14sm2743881wrv.50.2022.02.10.08.45.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 08:45:16 -0800 (PST)
-Date:   Thu, 10 Feb 2022 17:45:14 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Cc:     davem@davemloft.net, heiko@sntech.de, herbert@gondor.apana.org.au,
-        robh+dt@kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v2] dt-bindings: crypto: convert rockchip-crypto to yaml
-Message-ID: <YgVBGvTBuMd17sm8@Red>
-References: <20220210161403.2966196-1-clabbe@baylibre.com>
- <7acb44da-5833-f638-9348-0cbcc21cfc13@canonical.com>
+        Thu, 10 Feb 2022 13:04:23 -0500
+X-Greylist: delayed 5975 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Feb 2022 10:04:23 PST
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E022B100A;
+        Thu, 10 Feb 2022 10:04:23 -0800 (PST)
+Date:   Thu, 10 Feb 2022 19:04:20 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644516261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=m0wxMDmMyxL17wjeOYSooOciALzgNfAa7MCixAamkeY=;
+        b=gW3bCZksqzrMGBN/ii6E2YX/6r1rur56DYJ1OaolYQmSYFVubsnWW0erBMmQ+laUJFLUmr
+        IHMwmsZr90TzVeLOeA2qmNR2U2xSD2X2g6djKsZCUwEPSjzT9tqnyaOhlRdjpBR2MijmTk
+        izz147aOtCisMFxfltjdWaIG++xnQho55ZqxjhmOGkxve5biE3R8gXJEn5kd/cPQ+ri5GH
+        Ki3KwMca69jhGRdi/S0Iq1OwJYzi7S9WDcLB/4WP8yD7a/YQfgPgcLl2KNBsMlObXoOI2B
+        qwgj+KodTcPEOCbRgcTrM2Xj34Hlb6laIAK7CYpzbCegwMacK8XvtYgvyvXQ7g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644516261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=m0wxMDmMyxL17wjeOYSooOciALzgNfAa7MCixAamkeY=;
+        b=fRNC9ew52gchYcanfTNu8VeReTjwndEhYEEpxOAIhZKBttTBDpguYvpl1hjFdMGRp+PmqJ
+        P1+jUjCfKDJU8uDQ==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
+Message-ID: <YgVTpI/sYLecyWa3@linutronix.de>
+References: <20220209125644.533876-1-Jason@zx2c4.com>
+ <20220209125644.533876-3-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7acb44da-5833-f638-9348-0cbcc21cfc13@canonical.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220209125644.533876-3-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Thu, Feb 10, 2022 at 05:19:50PM +0100, Krzysztof Kozlowski a écrit :
-> On 10/02/2022 17:14, Corentin Labbe wrote:
-> > Convert rockchip-crypto to yaml
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> > Change since v1:
-> > - fixed example
-> > - renamed to a new name
-> > - fixed some maxItems
-> > 
-> >  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
-> >  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
-> >  2 files changed, 66 insertions(+), 28 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> > 
-> > diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > new file mode 100644
-> > index 000000000000..44f415597e32
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > @@ -0,0 +1,66 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Rockchip Electronics And Security Accelerator
-> > +
-> > +maintainers:
-> > +  - Corentin Labbe <clabbe@baylibre.com>
-> 
-> You removed Heiko. It's fine for me, just is it expected?
-> 
+On 2022-02-09 13:56:44 [+0100], Jason A. Donenfeld wrote:
+> +static void mix_interrupt_randomness(struct work_struct *work)
+> +{
+> +	struct fast_pool *fast_pool =3D container_of(work, struct fast_pool, mi=
+x);
+> +	u8 pool[sizeof(fast_pool->pool)];
 
-This is an error I fixed manualy in v1 file and forgot to change and commit...
+So.
+- CPU1 schedules a worker
+- CPU1 goes offline before the gets on the CPU.
+- The worker runs CPU2
+- CPU2 is back online
+- and now
+   CPU1						CPU2
+   new_count =3D ++fast_pool->count;
+    reg =3D fast_pool->count (FAST_POOL_MIX_INFLIGHT | 64)
+    incl reg (FAST_POOL_MIX_INFLIGHT | 65)
+    						WRITE_ONCE(fast_pool->count, 0);
+    fast_pool->count =3D reg ((FAST_POOL_MIX_INFLIGHT | 65)
 
-Sorry
-I will resend a new version later
+So we lost the WRITE_ONCE(, 0), FAST_POOL_MIX_INFLIGHT is still set and
+worker is not scheduled. Not easy to trigger, not by an ordinary user.
+Just wanted to mention=E2=80=A6
+
+=E2=80=A6
+> @@ -999,9 +1016,10 @@ void add_interrupt_randomness(int irq)
+> =20
+>  	fast_mix(fast_pool);
+>  	add_interrupt_bench(cycles);
+> +	new_count =3D ++fast_pool->count;
+> =20
+>  	if (unlikely(crng_init =3D=3D 0)) {
+> -		if ((fast_pool->count >=3D 64) &&
+> +		if (new_count >=3D 64 &&
+>  		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0=
+) {
+
+crng_fast_load() does spin_trylock_irqsave() in hardirq context. It does
+not produce any warning on RT but is still wrong IMHO:
+- lockdep will see a random task and I remember in the past it produced
+  strange lock chains based on this.
+
+- Should another task attempt to acquire this lock then it will PI-boost the
+  wrong task.
+
+If we just could move this, too.
+
+I don't know how timing critical this is but the first backtrace from
+crng_fast_load() came (to my surprise) from hwrng_fillfn() (a kthread)
+and added 64bytes in one go.
+
+I did move that crng_fast_load() into the worker and did made some
+numbers:
+           <idle>-0       [000] d..h1..     2.069924: add_interrupt_randomn=
+ess: Tick
+
+first interrupt
+=E2=80=A6
+        swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomn=
+ess: work
+
+the 64th interrupt, scheduling the worker.
+
+        swapper/0-1       [000] d..h.11     2.345937: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h111     2.349938: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h.11     2.353939: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h.11     2.357940: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h111     2.361939: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h111     2.365939: add_interrupt_randomn=
+ess: Tick
+        swapper/0-1       [000] d..h.11     2.369941: add_interrupt_randomn=
+ess: Tick
+     kworker/0:0H-6       [000] .......     2.384714: mix_interrupt_randomn=
+ess: load
+     kworker/0:0H-6       [000] .......     2.384715: crng_fast_load: 16
+           <idle>-0       [001] dn.h1..     3.205766: add_interrupt_randomn=
+ess: Tick
+           <idle>-0       [019] dn.h1..     6.771047: add_interrupt_randomn=
+ess: Tick
+
+7 interrupts got lost before the worker could run & load first 16 bytes.
+The workqueue core gets initialized at that point and spawns first
+worker. After that the interrupts took a break.
+And then the work-to-load delay was quite low:
+
+           <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomn=
+ess: Tick
+           <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomn=
+ess: work
+    kworker/19:0H-175     [019] .......     7.586504: mix_interrupt_randomn=
+ess: load
+    kworker/19:0H-175     [019] .......     7.586507: crng_fast_load: 16
+           <idle>-0       [020] dn.h1..     7.614649: add_interrupt_randomn=
+ess: Tick
+           <idle>-0       [020] dn.h1..     7.614651: add_interrupt_randomn=
+ess: work
+           <idle>-0       [020] dn.h1..     7.614736: add_interrupt_randomn=
+ess: Tick
+    kworker/20:0H-183     [020] dn.h...     7.614859: add_interrupt_randomn=
+ess: Tick
+    kworker/20:0H-183     [020] .......     7.614871: mix_interrupt_randomn=
+ess: load
+    kworker/20:0H-183     [020] .......     7.614872: crng_fast_load: 16
+           <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomn=
+ess: Tick
+           <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomn=
+ess: work
+    kworker/18:0H-167     [018] dn.h1..     8.352438: add_interrupt_randomn=
+ess: Tick
+    kworker/18:0H-167     [018] dn.h1..     8.352448: add_interrupt_randomn=
+ess: Tick
+    kworker/18:0H-167     [018] dn.h1..     8.352459: add_interrupt_randomn=
+ess: Tick
+    kworker/18:0H-167     [018] dn.h1..     8.352491: add_interrupt_randomn=
+ess: Tick
+    kworker/18:0H-167     [018] .......     8.352505: mix_interrupt_randomn=
+ess: load
+    kworker/18:0H-167     [018] .......     8.352506: crng_fast_load: 16
+
+In total we lost 13 ticks.
+I did the same test on PREEMPT_VOLUNTARY and lost 2 ticks only.
+
+Sebastian
