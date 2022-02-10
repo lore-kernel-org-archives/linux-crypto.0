@@ -2,191 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15666C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 18:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7B0C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 20:28:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245482AbiBJSEY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 13:04:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33102 "EHLO
+        id S1344218AbiBJU2P (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 15:28:15 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245472AbiBJSEX (ORCPT
+        with ESMTP id S1344211AbiBJU2P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 13:04:23 -0500
-X-Greylist: delayed 5975 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Feb 2022 10:04:23 PST
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E022B100A;
-        Thu, 10 Feb 2022 10:04:23 -0800 (PST)
-Date:   Thu, 10 Feb 2022 19:04:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644516261;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=m0wxMDmMyxL17wjeOYSooOciALzgNfAa7MCixAamkeY=;
-        b=gW3bCZksqzrMGBN/ii6E2YX/6r1rur56DYJ1OaolYQmSYFVubsnWW0erBMmQ+laUJFLUmr
-        IHMwmsZr90TzVeLOeA2qmNR2U2xSD2X2g6djKsZCUwEPSjzT9tqnyaOhlRdjpBR2MijmTk
-        izz147aOtCisMFxfltjdWaIG++xnQho55ZqxjhmOGkxve5biE3R8gXJEn5kd/cPQ+ri5GH
-        Ki3KwMca69jhGRdi/S0Iq1OwJYzi7S9WDcLB/4WP8yD7a/YQfgPgcLl2KNBsMlObXoOI2B
-        qwgj+KodTcPEOCbRgcTrM2Xj34Hlb6laIAK7CYpzbCegwMacK8XvtYgvyvXQ7g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644516261;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=m0wxMDmMyxL17wjeOYSooOciALzgNfAa7MCixAamkeY=;
-        b=fRNC9ew52gchYcanfTNu8VeReTjwndEhYEEpxOAIhZKBttTBDpguYvpl1hjFdMGRp+PmqJ
-        P1+jUjCfKDJU8uDQ==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
-Message-ID: <YgVTpI/sYLecyWa3@linutronix.de>
-References: <20220209125644.533876-1-Jason@zx2c4.com>
- <20220209125644.533876-3-Jason@zx2c4.com>
+        Thu, 10 Feb 2022 15:28:15 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911C4B84;
+        Thu, 10 Feb 2022 12:28:15 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id bx31so9752321ljb.0;
+        Thu, 10 Feb 2022 12:28:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vml5uigID9wwvx/PlQfGPRSbZZVlYDUpEbRuwhp0E2s=;
+        b=lQxJpuZRKbrjYRk+AyXay/cRjKN560M2OahoDpjCzzb2OGujUrlPndTElEa8/M3seS
+         zhgS77DEtiBCseBEetgdEXFMW5dz8FGSsjH3KqwBk4N2RB5L6gsVX4WzWUYoonZ0sf/G
+         A1W2cKPLVlroJJ9/3S4cmVoKOg6QT1+werAp9+E4SopOP1iOyP7oq/X7De4OtQXj68RG
+         taGCRLCihFoa9nsNfCdFCv9jZ643U8FwlaSCXMTQG410eSS+QfOi1zNzK/Arv7Nkp/LK
+         FBDA3SFdvkgGrHSWbrYxayF4AIVehEyQfxFK2cZwBKN8pAWmIWZW6jYy9Du+YFtvlQf6
+         3yFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vml5uigID9wwvx/PlQfGPRSbZZVlYDUpEbRuwhp0E2s=;
+        b=yPBNiRXwA4BbDBNoXJcFchM8TRi0GabzR08r+bDE38qKLHZFNnF73pHFkiA9B1Uu24
+         kXOhsrGnYdptP34cD3cW9pU3falcEGlZEbs1G3D4famFySqIO4b/BmZx4nHy+NAjuyWQ
+         7OME7yh/k6b+SQTxjXJY80LZHpZmAP3+yuBTIAKCzrF/2ydA/52ehi3NPvW3qcrGoRiQ
+         54eCGa4Xo//IwYyrjO4+oA5THy5l+oUe315GGE8fj5qy3OXNx2RXHn9CQdgLVzXKzgwK
+         3zxMnkCSgfWG2OqjLLP+aUwC6wsywZkaJIUNqEFNqrhSgX6X4Q3/J9gIQHRUmlCgdaBJ
+         k5Aw==
+X-Gm-Message-State: AOAM532lWvLgBQa4XsTi1524dSec+VecVstfEM4flzDJWB+OfmT3yiuZ
+        VRlkDazcC1dGozP5i0nSf0M=
+X-Google-Smtp-Source: ABdhPJxlaU4AbDMA3tdAJCj8pQ7P7mO2f3iSg8/6pS8JrpcHZh+5pVcOdX/Ay+jQV0U47LM1JTZ0tg==
+X-Received: by 2002:a2e:b05a:: with SMTP id d26mr6005006ljl.425.1644524893738;
+        Thu, 10 Feb 2022 12:28:13 -0800 (PST)
+Received: from localhost.localdomain (h-155-4-221-129.NA.cust.bahnhof.se. [155.4.221.129])
+        by smtp.gmail.com with ESMTPSA id d19sm1223881lfg.108.2022.02.10.12.28.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 12:28:13 -0800 (PST)
+From:   Rikard Falkeborn <rikard.falkeborn@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>
+Cc:     linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org,
+        Rikard Falkeborn <rikard.falkeborn@gmail.com>
+Subject: [PATCH 0/3] drivers/crypto: Constify static attribute_group
+Date:   Thu, 10 Feb 2022 21:28:02 +0100
+Message-Id: <20220210202805.7750-1-rikard.falkeborn@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220209125644.533876-3-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-09 13:56:44 [+0100], Jason A. Donenfeld wrote:
-> +static void mix_interrupt_randomness(struct work_struct *work)
-> +{
-> +	struct fast_pool *fast_pool =3D container_of(work, struct fast_pool, mi=
-x);
-> +	u8 pool[sizeof(fast_pool->pool)];
+This series constifies a couple of static attribute_group structs that
+are not modified. This allows the compiler to put them in read-only
+memory. The patches are independent and can be applied in any order (and
+go through different trees if needed).
 
-So.
-- CPU1 schedules a worker
-- CPU1 goes offline before the gets on the CPU.
-- The worker runs CPU2
-- CPU2 is back online
-- and now
-   CPU1						CPU2
-   new_count =3D ++fast_pool->count;
-    reg =3D fast_pool->count (FAST_POOL_MIX_INFLIGHT | 64)
-    incl reg (FAST_POOL_MIX_INFLIGHT | 65)
-    						WRITE_ONCE(fast_pool->count, 0);
-    fast_pool->count =3D reg ((FAST_POOL_MIX_INFLIGHT | 65)
+Rikard Falkeborn (3):
+  crypto: omap-aes - Constify static attribute_group
+  crypto: omap-sham - Constify static attribute_group
+  crypto/nx: Constify static attribute_group structs
 
-So we lost the WRITE_ONCE(, 0), FAST_POOL_MIX_INFLIGHT is still set and
-worker is not scheduled. Not easy to trigger, not by an ordinary user.
-Just wanted to mention=E2=80=A6
+ drivers/crypto/nx/nx-common-pseries.c | 4 ++--
+ drivers/crypto/omap-aes.c             | 2 +-
+ drivers/crypto/omap-sham.c            | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-=E2=80=A6
-> @@ -999,9 +1016,10 @@ void add_interrupt_randomness(int irq)
-> =20
->  	fast_mix(fast_pool);
->  	add_interrupt_bench(cycles);
-> +	new_count =3D ++fast_pool->count;
-> =20
->  	if (unlikely(crng_init =3D=3D 0)) {
-> -		if ((fast_pool->count >=3D 64) &&
-> +		if (new_count >=3D 64 &&
->  		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0=
-) {
+-- 
+2.35.1
 
-crng_fast_load() does spin_trylock_irqsave() in hardirq context. It does
-not produce any warning on RT but is still wrong IMHO:
-- lockdep will see a random task and I remember in the past it produced
-  strange lock chains based on this.
-
-- Should another task attempt to acquire this lock then it will PI-boost the
-  wrong task.
-
-If we just could move this, too.
-
-I don't know how timing critical this is but the first backtrace from
-crng_fast_load() came (to my surprise) from hwrng_fillfn() (a kthread)
-and added 64bytes in one go.
-
-I did move that crng_fast_load() into the worker and did made some
-numbers:
-           <idle>-0       [000] d..h1..     2.069924: add_interrupt_randomn=
-ess: Tick
-
-first interrupt
-=E2=80=A6
-        swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomn=
-ess: work
-
-the 64th interrupt, scheduling the worker.
-
-        swapper/0-1       [000] d..h.11     2.345937: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h111     2.349938: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h.11     2.353939: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h.11     2.357940: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h111     2.361939: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h111     2.365939: add_interrupt_randomn=
-ess: Tick
-        swapper/0-1       [000] d..h.11     2.369941: add_interrupt_randomn=
-ess: Tick
-     kworker/0:0H-6       [000] .......     2.384714: mix_interrupt_randomn=
-ess: load
-     kworker/0:0H-6       [000] .......     2.384715: crng_fast_load: 16
-           <idle>-0       [001] dn.h1..     3.205766: add_interrupt_randomn=
-ess: Tick
-           <idle>-0       [019] dn.h1..     6.771047: add_interrupt_randomn=
-ess: Tick
-
-7 interrupts got lost before the worker could run & load first 16 bytes.
-The workqueue core gets initialized at that point and spawns first
-worker. After that the interrupts took a break.
-And then the work-to-load delay was quite low:
-
-           <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomn=
-ess: Tick
-           <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomn=
-ess: work
-    kworker/19:0H-175     [019] .......     7.586504: mix_interrupt_randomn=
-ess: load
-    kworker/19:0H-175     [019] .......     7.586507: crng_fast_load: 16
-           <idle>-0       [020] dn.h1..     7.614649: add_interrupt_randomn=
-ess: Tick
-           <idle>-0       [020] dn.h1..     7.614651: add_interrupt_randomn=
-ess: work
-           <idle>-0       [020] dn.h1..     7.614736: add_interrupt_randomn=
-ess: Tick
-    kworker/20:0H-183     [020] dn.h...     7.614859: add_interrupt_randomn=
-ess: Tick
-    kworker/20:0H-183     [020] .......     7.614871: mix_interrupt_randomn=
-ess: load
-    kworker/20:0H-183     [020] .......     7.614872: crng_fast_load: 16
-           <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomn=
-ess: Tick
-           <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomn=
-ess: work
-    kworker/18:0H-167     [018] dn.h1..     8.352438: add_interrupt_randomn=
-ess: Tick
-    kworker/18:0H-167     [018] dn.h1..     8.352448: add_interrupt_randomn=
-ess: Tick
-    kworker/18:0H-167     [018] dn.h1..     8.352459: add_interrupt_randomn=
-ess: Tick
-    kworker/18:0H-167     [018] dn.h1..     8.352491: add_interrupt_randomn=
-ess: Tick
-    kworker/18:0H-167     [018] .......     8.352505: mix_interrupt_randomn=
-ess: load
-    kworker/18:0H-167     [018] .......     8.352506: crng_fast_load: 16
-
-In total we lost 13 ticks.
-I did the same test on PREEMPT_VOLUNTARY and lost 2 ticks only.
-
-Sebastian
