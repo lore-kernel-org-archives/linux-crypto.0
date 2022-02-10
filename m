@@ -2,127 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF98EC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 08:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91325C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 09:21:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237289AbiBJIU6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 03:20:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55878 "EHLO
+        id S238411AbiBJJVQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 04:21:16 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233615AbiBJIU5 (ORCPT
+        with ESMTP id S238408AbiBJJVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 03:20:57 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E465ADA9
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 00:20:58 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id l19so3127047pfu.2
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 00:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Krb0rzTOGW2eoN3LEJWPKbRX68tZZeijjPHmNpJEiuw=;
-        b=X4RptU//lXEDz6B2GaWL43her2cGYbE8ScvsaqQ3JDFxx7ikqIOgZzJmDbrBWJYIH5
-         qFWOEB6GALcHvoB9kXYuJR5deJQVuDVhdvONH8VdK58lVe8RJJ2CzniSMQ1IT643zYW3
-         PN6gZCJ+G6BNsA4cbPKAjvuqSwBnwSOnQBKnoHWK9neRlFGmQHS9sscwrzLpDjmqa+P5
-         FUlmw9/4CLC4p9yw8X3lg4aFSRFRPZ4EbOESz6GaPBadEFPM+5bEuIrlN0ioqc3YgVm4
-         1Klc4wADjbs44eiQkPkkcIcqBJ7+CDOGUnPiLqXW+ynjBDI23rBhQQPAaQd3wWK2OTkO
-         QWng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Krb0rzTOGW2eoN3LEJWPKbRX68tZZeijjPHmNpJEiuw=;
-        b=j5Djr643wkgoQa0EvGc3kmKhEZd83yrVk8YF9W51wvhKG+eKHni5EIKGCxSDrP3v7n
-         8BniMaEYfu2ugoXOfKaE7KUujPdeAQkuI/7ikTqk2UahtIiBl7jr0tk/7VYQniW4LcE+
-         wC1G4DKMT+LUOE9PV451xDstH5tdcTLhIUDQPGjd5bHAg1UjPvAGhfEyn69K4onufCIH
-         DPCl5p89DSBsauVVKDteCfu5L74YSlSkcduRXLeLP2/t5PtGWLB5UwVpN0hn7LSMC+47
-         +l7tLTsFOB23vjrLB5LrYcQnV7qD/iPd1fhH+lGDG29gZy/aXH/RfuHIS1e+nCSHvpfH
-         k03w==
-X-Gm-Message-State: AOAM533oVaHrRdaqB6iGjhGN+rzxd5LN0fhPmaG8KA07Fmjin3JExFm6
-        oLg5b3t0rLNfiMTtdeM/XrUqGQ==
-X-Google-Smtp-Source: ABdhPJyK+1a3UQV6u+LP1EI1H/P04vpG2Owo6ZPLmkdSsqC12revmFlKMy2HiNOC46200H7wPK8xIg==
-X-Received: by 2002:a63:81c8:: with SMTP id t191mr5242468pgd.321.1644481258472;
-        Thu, 10 Feb 2022 00:20:58 -0800 (PST)
-Received: from [10.76.15.169] ([61.120.150.76])
-        by smtp.gmail.com with ESMTPSA id p4sm21374590pfw.133.2022.02.10.00.20.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Feb 2022 00:20:57 -0800 (PST)
-Subject: Re: RE: [PATCH 2/3] virtio-crypto: introduce akcipher service
-To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        Thu, 10 Feb 2022 04:21:15 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED5AEB4;
+        Thu, 10 Feb 2022 01:21:15 -0800 (PST)
+Received: from dggeme761-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JvWRK3nKBz9sZY;
+        Thu, 10 Feb 2022 17:19:41 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ dggeme761-chm.china.huawei.com (10.3.19.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Thu, 10 Feb 2022 17:21:13 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2308.021;
+ Thu, 10 Feb 2022 17:21:13 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>
+CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
         "virtualization@lists.linux-foundation.org" 
         <virtualization@lists.linux-foundation.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
         "mst@redhat.com" <mst@redhat.com>
+Subject: RE: RE: [PATCH 2/3] virtio-crypto: introduce akcipher service
+Thread-Topic: RE: [PATCH 2/3] virtio-crypto: introduce akcipher service
+Thread-Index: AQHYDm47poB50P1RmUal7n5E+2vGlKyMgQ2Q//+Jc4CAAJcu4A==
+Date:   Thu, 10 Feb 2022 09:21:13 +0000
+Message-ID: <34ba8701eb86414e826824892e2f0892@huawei.com>
 References: <20220121022438.1042547-1-pizhenwei@bytedance.com>
  <20220121022438.1042547-3-pizhenwei@bytedance.com>
  <15e960491a684b649e5d0179a32848a2@huawei.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <540f29e4-12ef-3786-bd54-9a94ba6ee7ab@bytedance.com>
-Date:   Thu, 10 Feb 2022 16:18:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ <540f29e4-12ef-3786-bd54-9a94ba6ee7ab@bytedance.com>
+In-Reply-To: <540f29e4-12ef-3786-bd54-9a94ba6ee7ab@bytedance.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <15e960491a684b649e5d0179a32848a2@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
->>   /* The accelerator hardware is ready */  #define
->> VIRTIO_CRYPTO_S_HW_READY  (1 << 0) @@ -442,6 +520,7 @@ struct
->> virtio_crypto_config {
->>   	__le32 reserve;
->>   	/* Maximum size of each crypto request's content */
->>   	__le64 max_size;
->> +	__le32 akcipher_algo;
->>   };
->>
-> You can use the reserve attribute. Keeping 64-bit aligned.
-> 
->>   struct virtio_crypto_inhdr {
->> --
->> 2.25.1
-> 
-
-Can I use the "__le32 reserve;" field directly?
-
-struct virtio_crypto_config {
-         /* See VIRTIO_CRYPTO_OP_* above */
-         __le32  status;
-
-         /*
-          * Maximum number of data queue
-          */
-         __le32  max_dataqueues;
-
-         /*
-          * Specifies the services mask which the device support,
-          * see VIRTIO_CRYPTO_SERVICE_* above
-          */
-         __le32 crypto_services;
-
-         /* Detailed algorithms mask */
-         __le32 cipher_algo_l;
-         __le32 cipher_algo_h;
-         __le32 hash_algo;
-         __le32 mac_algo_l;
-         __le32 mac_algo_h;
-         __le32 aead_algo;
-         /* Maximum length of cipher key */
-         __le32 max_cipher_key_len;
-         /* Maximum length of authenticated key */
-         __le32 max_auth_key_len;
-         __le32 reserve;            -->    __le32 akcipher_algo;
-         /* Maximum size of each crypto request's content */
-         __le64 max_size;
-};
-
--- 
-zhenwei pi
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogemhlbndlaSBwaSBbbWFp
+bHRvOnBpemhlbndlaUBieXRlZGFuY2UuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgRmVicnVhcnkg
+MTAsIDIwMjIgNDoxOCBQTQ0KPiBUbzogR29uZ2xlaSAoQXJlaSkgPGFyZWkuZ29uZ2xlaUBodWF3
+ZWkuY29tPg0KPiBDYzogamFzb3dhbmdAcmVkaGF0LmNvbTsgdmlydHVhbGl6YXRpb25AbGlzdHMu
+bGludXgtZm91bmRhdGlvbi5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IGxp
+bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGhlbGVpLnNpZzExQGJ5dGVkYW5jZS5jb207
+IG1zdEByZWRoYXQuY29tDQo+IFN1YmplY3Q6IFJlOiBSRTogW1BBVENIIDIvM10gdmlydGlvLWNy
+eXB0bzogaW50cm9kdWNlIGFrY2lwaGVyIHNlcnZpY2UNCj4gDQo+ID4+ICAgLyogVGhlIGFjY2Vs
+ZXJhdG9yIGhhcmR3YXJlIGlzIHJlYWR5ICovICAjZGVmaW5lDQo+ID4+IFZJUlRJT19DUllQVE9f
+U19IV19SRUFEWSAgKDEgPDwgMCkgQEAgLTQ0Miw2ICs1MjAsNyBAQCBzdHJ1Y3QNCj4gPj4gdmly
+dGlvX2NyeXB0b19jb25maWcgew0KPiA+PiAgIAlfX2xlMzIgcmVzZXJ2ZTsNCj4gPj4gICAJLyog
+TWF4aW11bSBzaXplIG9mIGVhY2ggY3J5cHRvIHJlcXVlc3QncyBjb250ZW50ICovDQo+ID4+ICAg
+CV9fbGU2NCBtYXhfc2l6ZTsNCj4gPj4gKwlfX2xlMzIgYWtjaXBoZXJfYWxnbzsNCj4gPj4gICB9
+Ow0KPiA+Pg0KPiA+IFlvdSBjYW4gdXNlIHRoZSByZXNlcnZlIGF0dHJpYnV0ZS4gS2VlcGluZyA2
+NC1iaXQgYWxpZ25lZC4NCj4gPg0KPiA+PiAgIHN0cnVjdCB2aXJ0aW9fY3J5cHRvX2luaGRyIHsN
+Cj4gPj4gLS0NCj4gPj4gMi4yNS4xDQo+ID4NCj4gDQo+IENhbiBJIHVzZSB0aGUgIl9fbGUzMiBy
+ZXNlcnZlOyIgZmllbGQgZGlyZWN0bHk/DQo+IA0KPiBzdHJ1Y3QgdmlydGlvX2NyeXB0b19jb25m
+aWcgew0KPiAgICAgICAgICAvKiBTZWUgVklSVElPX0NSWVBUT19PUF8qIGFib3ZlICovDQo+ICAg
+ICAgICAgIF9fbGUzMiAgc3RhdHVzOw0KPiANCj4gICAgICAgICAgLyoNCj4gICAgICAgICAgICog
+TWF4aW11bSBudW1iZXIgb2YgZGF0YSBxdWV1ZQ0KPiAgICAgICAgICAgKi8NCj4gICAgICAgICAg
+X19sZTMyICBtYXhfZGF0YXF1ZXVlczsNCj4gDQo+ICAgICAgICAgIC8qDQo+ICAgICAgICAgICAq
+IFNwZWNpZmllcyB0aGUgc2VydmljZXMgbWFzayB3aGljaCB0aGUgZGV2aWNlIHN1cHBvcnQsDQo+
+ICAgICAgICAgICAqIHNlZSBWSVJUSU9fQ1JZUFRPX1NFUlZJQ0VfKiBhYm92ZQ0KPiAgICAgICAg
+ICAgKi8NCj4gICAgICAgICAgX19sZTMyIGNyeXB0b19zZXJ2aWNlczsNCj4gDQo+ICAgICAgICAg
+IC8qIERldGFpbGVkIGFsZ29yaXRobXMgbWFzayAqLw0KPiAgICAgICAgICBfX2xlMzIgY2lwaGVy
+X2FsZ29fbDsNCj4gICAgICAgICAgX19sZTMyIGNpcGhlcl9hbGdvX2g7DQo+ICAgICAgICAgIF9f
+bGUzMiBoYXNoX2FsZ287DQo+ICAgICAgICAgIF9fbGUzMiBtYWNfYWxnb19sOw0KPiAgICAgICAg
+ICBfX2xlMzIgbWFjX2FsZ29faDsNCj4gICAgICAgICAgX19sZTMyIGFlYWRfYWxnbzsNCj4gICAg
+ICAgICAgLyogTWF4aW11bSBsZW5ndGggb2YgY2lwaGVyIGtleSAqLw0KPiAgICAgICAgICBfX2xl
+MzIgbWF4X2NpcGhlcl9rZXlfbGVuOw0KPiAgICAgICAgICAvKiBNYXhpbXVtIGxlbmd0aCBvZiBh
+dXRoZW50aWNhdGVkIGtleSAqLw0KPiAgICAgICAgICBfX2xlMzIgbWF4X2F1dGhfa2V5X2xlbjsN
+Cj4gICAgICAgICAgX19sZTMyIHJlc2VydmU7ICAgICAgICAgICAgLS0+ICAgIF9fbGUzMiBha2Np
+cGhlcl9hbGdvOw0KPiAgICAgICAgICAvKiBNYXhpbXVtIHNpemUgb2YgZWFjaCBjcnlwdG8gcmVx
+dWVzdCdzIGNvbnRlbnQgKi8NCj4gICAgICAgICAgX19sZTY0IG1heF9zaXplOw0KPiB9Ow0KPiAN
+Cg0KDQpZZXMsIEkgdGhpbmsgc28uIE90aGVyd2lzZSB5b3Ugd2lsbCBhZGQgb3RoZXIgcmVzZXJ2
+ZWQgZmllbGQgOigNCg0KUmVnYXJkcywNCi1Hb25nbGVpDQo=
