@@ -2,62 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D340AC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 02:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC17C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 06:04:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbiBJCbQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Feb 2022 21:31:16 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45262 "EHLO
+        id S234987AbiBJGEs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 01:04:48 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiBJCbP (ORCPT
+        with ESMTP id S233149AbiBJGEr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Feb 2022 21:31:15 -0500
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A1B8237C6
-        for <linux-crypto@vger.kernel.org>; Wed,  9 Feb 2022 18:31:16 -0800 (PST)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nHzEn-0006gZ-SA; Thu, 10 Feb 2022 13:31:15 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Feb 2022 13:31:13 +1100
-Date:   Thu, 10 Feb 2022 13:31:13 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: lrw - Add dependency on ecb
-Message-ID: <YgR48fFF6LGzkLRe@gondor.apana.org.au>
+        Thu, 10 Feb 2022 01:04:47 -0500
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E991C5;
+        Wed,  9 Feb 2022 22:04:47 -0800 (PST)
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 2627D201421;
+        Thu, 10 Feb 2022 06:04:46 +0000 (UTC)
+Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
+        id 8EB9D804B3; Thu, 10 Feb 2022 06:43:42 +0100 (CET)
+Date:   Thu, 10 Feb 2022 06:43:42 +0100
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Theodore Ts'o <tytso@mit.edu>, LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] random: fix locking for crng_init in crng_reseed()
+Message-ID: <YgSmDtA2hlrDBmrH@owl.dominikbrodowski.net>
+References: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net>
+ <CAHmME9pZB1fWf2nZNwTHw07hrnxZYYymA0_Dy=jauDt9TbF69A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CAHmME9pZB1fWf2nZNwTHw07hrnxZYYymA0_Dy=jauDt9TbF69A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The lrw template relies on ecb to work.  So we need to declare
-a Kconfig dependency as well as a module softdep on it.
+Hi Jason,
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Am Wed, Feb 09, 2022 at 10:39:17PM +0100 schrieb Jason A. Donenfeld:
+> Thanks, applied. I changed complete_init to finalize_init, to match
+> our naming scheme from earlier, and I moved
+> invalidate_batched_entropy() to outside the lock and after
+> crng_init=2, since now it uses atomics, and it should probably be
+> ordered after crng_init = 2, so the new batch gets the new entropy.
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e63d9ad55cb5..1bc4150850b7 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -428,6 +428,7 @@ config CRYPTO_LRW
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_MANAGER
- 	select CRYPTO_GF128MUL
-+	select CRYPTO_ECB
- 	help
- 	  LRW: Liskov Rivest Wagner, a tweakable, non malleable, non movable
- 	  narrow block cipher mode for dm-crypt.  Use it with cipher
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index bcf09fbc750a..8d59a66b6525 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -428,3 +428,4 @@ module_exit(lrw_module_exit);
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LRW block cipher mode");
- MODULE_ALIAS_CRYPTO("lrw");
-+MODULE_SOFTDEP("pre: ecb");
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Doesn't that mean that there is a small window where crng_init == 2, but
+get_random_u64/get_random_u32 still returns old data, with potentially
+insufficient entropy (as obtained at a time when crng_init was still < 2)?
+That's why I moved invalidate_batched_entropy() under the lock.
+
+But with your subsequent patch, it doesn't matter any more.
+
+Thanks,
+	Dominik
