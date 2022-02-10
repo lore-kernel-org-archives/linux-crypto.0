@@ -2,500 +2,220 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C08EC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 13:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D34EBC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 14:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242549AbiBJN6V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 08:58:21 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54034 "EHLO
+        id S242902AbiBJO0d (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 09:26:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242531AbiBJN6U (ORCPT
+        with ESMTP id S241502AbiBJO0c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 08:58:20 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7C51FB;
-        Thu, 10 Feb 2022 05:58:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644501497; x=1676037497;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GIMXsjo5Rz5y9XksESQO9vKyRV7LbZRa9G+AATve0eA=;
-  b=Tld7BxnEIS4j0WnAjf3gBF/ylvdvpT/OZfhoSQXF7T93jv7x5nWH59aE
-   yzdmylU5bfls7HlI+pP0jOaPR72FvLYrOVv9O9LJWq65wnjLiWxfJYKMn
-   U8HojHQykJxgoyN5SmzevGJAB7WfiweBFP4l9wXqp9it0mUjBlZhA5b6G
-   d5aPgydyrrjzpVig5AjiAELbbeG8hmwGnpEreF2ow1EF472t7/6Ndqfn3
-   bQT8Cb2zQtlRARn1WSadSmjLaEwpHoARGicZHEnywl0dhZWk3hPPhNdob
-   4PphGVjGgkiFbdEO18q/d9go8MEfe8fiCUKxMZfwmPtCTjhiF6zfP/hJe
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="335910176"
+        Thu, 10 Feb 2022 09:26:32 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A62FD2C5;
+        Thu, 10 Feb 2022 06:26:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1644503192; x=1676039192;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=zLzpZkBhECMKvyvopqhnIeqMhY5el8R7MJnwZoXCne4=;
+  b=W6/BWdLKtO4byzUnqrTvUYMluidt78MxwWFDr3DKWyQmvHVXJbwGH4iy
+   qjIqRSNEGNPnIeF3z3jSf1lkxWJlB4B7yqSmKVrZ5ZrNHCwH1Ll/KBzWD
+   t+h0d4cC0d5AKwAZ7uAX8i8N7Y+B2zusIdUcA5PlXO0hWcJG5Fyff3m5f
+   fqm1eLdypxGYmAz2dwS7+araZ4r2/hGG7WqiV9LJR2YF4i3fNchHhQMfT
+   sUBu9VHDcAvmElDG2/ymVfcSW8RxOhzluIsfvnIxbaI6EZPwPpyUe/9lM
+   GCu/Zkhbu1Zc8JXl3rkZrveg0D2rGidkEsQypKsU/HISNpENHiAEFY4Fd
+   Q==;
+IronPort-SDR: rUNAxX8D9CFUocBbZIvybG4znZTsIDD1jKUM8dNY06SgCja98Nj9dwKQmo+3ZrwoDMFP9vdJA/
+ h/6nzIqDIW8NpcxBDnD+PYOGIBw55ATN5ffqz0MaE7XPj6ITgDqIzB8eDwME9ceIXz2wiiGSF6
+ Xu7TPQe9m96AsX1FE2MNpGxoVd0p4uE7R4dxh/1bM1veLCiRYUH7QCD2hGYE/8FTp7ZrJZR+2I
+ ZrOfuUYChLFmBY0YSKJ7uIYORgXxj7H3jr5iuEe0Dqh8GaB5GUQpYdOv6M3lvUWhAS2xSgXCjP
+ jOhvgkfmfuJY/0M3aQpcZayg
 X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
-   d="scan'208";a="335910176"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 05:58:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
-   d="scan'208";a="526487245"
-Received: from silpixa00400294.ir.intel.com ([10.237.222.100])
-  by orsmga007.jf.intel.com with ESMTP; 10 Feb 2022 05:58:14 -0800
-From:   Wojciech Ziemba <wojciech.ziemba@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Marcinx Malinowski <marcinx.malinowski@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Marco Chiappero <marco.chiappero@intel.com>
-Subject: [PATCH v2 3/3] crypto: qat - enable power management for QAT GEN4
-Date:   Thu, 10 Feb 2022 13:38:27 +0000
-Message-Id: <20220210133827.2366901-4-wojciech.ziemba@intel.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20220210133827.2366901-1-wojciech.ziemba@intel.com>
-References: <20220210133827.2366901-1-wojciech.ziemba@intel.com>
+   d="scan'208";a="145538559"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 10 Feb 2022 07:26:31 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Thu, 10 Feb 2022 07:26:31 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.72) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17 via Frontend
+ Transport; Thu, 10 Feb 2022 07:26:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B2cvKMNmPR+IGZoJXX1oRLIJrMrNij/Wsg7287QtBGkeLJXJ+PIxpj7nGeEMr1/UXOj2XfW/38A8+YV47ve/EgHy/YUmoEAWzwnFcFJ3HjSgMlIpjXTJWBIOD8rSf+lqN6zBVE9heO28rCAvsT3o1t7RL1yOmCX3cnPUxILaYJyKO3T760fovb/pg9rD8Q9WEWG9T3rImIki2+0I8M1Q7YasLW/q5dKQhc2RseB9eEv110GAnWQ3NV6+CTO/hfrt5va1RnivKJpixJYqIWGvpFu/N9Sh2UxG6qtAURuBjzi1xxESXZwMZZCzsOhnV17SgFfEW076xsI0MzugpG7b5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zLzpZkBhECMKvyvopqhnIeqMhY5el8R7MJnwZoXCne4=;
+ b=IMOoq8peCTYfgGoWB6iO4sm6Y+DurIPkqzTEQBHke6sMzHkkv4WQvpFjIJAWPM9ZXKfHoSaSzfXYa5d68kH6ZeEpkZC/9MAj4vf/Mg8KAD07rJsDvNGbbAzOqX6qO504RqSaWQyHsb6KIuNj4oC7sKIK3BFAxRT5+foZucALkgA9Yr78HWqo6iQQSNm0TkxHixeN8lFcAHvV+EPfmyaE16cYAemri+tREPSe4UlwQWw+ZZSnXgx0/TNVbvc+1ogTsqwYQyLQzzKCtvCVGHAD7u7/wWsPyWQEb2QTQXV7gdzfxCZJuaZstMq1OFZIQNJEJoSgpxgZbCLm61dNzQpGLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zLzpZkBhECMKvyvopqhnIeqMhY5el8R7MJnwZoXCne4=;
+ b=hBVBNn75U+DxLLkSNh5vLL6x8J7TmDJNpEGgUW/ORS7r6fs0bdWd/Us2fFDT4123HLM22yvvNvb2KiVfNt469strIZNwKlMl0QErx64CXJc033I31a5nbjMU8O6UfArI7eqlW5mkTLgAqMH9i6krV9g6+qiTKtRfbtsarSK//XI=
+Received: from SA2PR11MB4874.namprd11.prod.outlook.com (2603:10b6:806:f9::23)
+ by SA2PR11MB5034.namprd11.prod.outlook.com (2603:10b6:806:f8::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Thu, 10 Feb
+ 2022 14:26:26 +0000
+Received: from SA2PR11MB4874.namprd11.prod.outlook.com
+ ([fe80::49cd:dd25:384:e918]) by SA2PR11MB4874.namprd11.prod.outlook.com
+ ([fe80::49cd:dd25:384:e918%5]) with mapi id 15.20.4975.011; Thu, 10 Feb 2022
+ 14:26:26 +0000
+From:   <Tudor.Ambarus@microchip.com>
+To:     <krzysztof.kozlowski@canonical.com>, <herbert@gondor.apana.org.au>
+CC:     <Nicolas.Ferre@microchip.com>, <Claudiu.Beznea@microchip.com>,
+        <alexandre.belloni@bootlin.com>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <Kavyasree.Kotagiri@microchip.com>,
+        <devicetree@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Thread-Topic: [PATCH v2 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Thread-Index: AQHYHPnDVT4dxUSni0qjnycASWeRy6yM2mqA
+Date:   Thu, 10 Feb 2022 14:26:26 +0000
+Message-ID: <05549bdb-9b51-47d5-88d0-0e8559d676cb@microchip.com>
+References: <20220208104918.226156-1-tudor.ambarus@microchip.com>
+ <20220208104918.226156-2-tudor.ambarus@microchip.com>
+ <f5563605-7b61-c23e-68ec-6e315efb268d@canonical.com>
+ <d72a96a9-f99c-5204-00d0-00f78ea96772@microchip.com>
+ <bca78043-d552-a7e4-149b-087c6226d8bf@canonical.com>
+ <2703df0f-a47c-f7cd-4d79-954b797cb57a@microchip.com>
+In-Reply-To: <2703df0f-a47c-f7cd-4d79-954b797cb57a@microchip.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5519cb1d-2ee9-4429-33d2-08d9eca15241
+x-ms-traffictypediagnostic: SA2PR11MB5034:EE_
+x-microsoft-antispam-prvs: <SA2PR11MB503467DFA7340AAB25F8754CF02F9@SA2PR11MB5034.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: IFQ6xG2l9uWW/KB43W7SMFf9Q1ZcB0AdGxS4EBBPfkSJJk1Mwtw61chLz0Z7HqeRUzunTC9Y/f5EgQEtmUZz0Tyj7WbrHhPKKRYXejjLRyiYmF6Sa646kq6CJ/RMcs7T/2Hd6o7jaXWsCjUUwXg1S3Q+fDqd+PXJjA243SxQyTLMs7bBEkbGshA0fj88vIVtQeEN4ifBLKTx+KYI0wgKhbiEsQHWRIlX1OX/vn/AA3mmjmgSF6nBNLoHo/2yfBlvAFtJxBWjRgOft6sD/FWR+3oOTC/N7xwKibzdB3VpTvaebb8stjfTY4FDJyUqtEiDmDpxSAxLmd2CcfHXG6Nf64VdGgRDhb+7DEVK9dzmh0xTrDDgiMjFGL4OopNChXfrimT9D6AtnXZZ4TIdTgQs1N3tt0vxutGF85gQ5T8RVx3wq57AOZPiPqzWmRvb8rnvg3HCkJ15ib9KjZi9DGhXXfujLBs2SrxABMFPzXUVP7ei50QwS2VpdSnAE8hnHA2bkV7DeVp1X+eNxebwAOKN8gqvVeTZy5iF0iVEQEl2vFD3j2tp+Aae0z2pS35pxQRxJI7nNHZ5vbdW9a7Nk5WLbUn+Tr/oFaMi+1jKeslYbridG8V27MLQ7p1eDv0cNVhaLe4B07bjxb4r56xnHZtseHamzlRHpYSEt13IW5y6pTQc+C/5XgW0XDpJQaAmPROWV4kqVztWKLVCyScE3MbGEH5Sxy/ty03Q41QtMwnGe2vu1w9l7lzTmawp4/lWirEtaup4rVbAqKFIVBRpvo3RyA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR11MB4874.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(36756003)(186003)(31686004)(2616005)(31696002)(508600001)(53546011)(26005)(6512007)(6506007)(83380400001)(66476007)(2906002)(66556008)(91956017)(54906003)(316002)(110136005)(38100700002)(71200400001)(122000001)(86362001)(5660300002)(76116006)(66946007)(6486002)(38070700005)(8936002)(64756008)(4326008)(8676002)(66446008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bXdvTHR3VGV2SnIxbnNybDNjbllZb21pNGdqSnBQMCtkUGRlazE5UWk1cGdK?=
+ =?utf-8?B?OGE0LzNOMGQvb3dRclE2Q0ZxQlZOODBXVDVFZGI1QThHKzhIaW1aZ0ZITlM4?=
+ =?utf-8?B?SXp0dmtZUHE3T1podFpYTlZ4U3ZpQTZCNFNiNUpmdG9hMUozN0pTbmMydWNw?=
+ =?utf-8?B?U3FFcDgzOEZvUkt6Vm0wZWlnbk1RTXNYcGVhaFFQbFJXck1jMVhhUVdYdGJo?=
+ =?utf-8?B?N0Q5dFMwczBzWHl2d3pyR2hFb0hneFN0djNsZkRxNDJ6VUV2Z2ZaYjQ3Tm9Y?=
+ =?utf-8?B?L1drMEg2MmhsMGdPMFUrRUdGaEgxZUwxWjFnMk0vbzgwQXhBbndNVHNJYmNr?=
+ =?utf-8?B?SnpaallIclZnRHlkdDRIVWFoVTRwYmpLOVJqR0tBTVJVMk80YXFIb04rR0ZF?=
+ =?utf-8?B?ZlBlL1Y1YUMwRWFpRWZoNTRDalhYZ3hCRjlVQ1k5M2o1clpubE92NUFreW9z?=
+ =?utf-8?B?WW1jaUJnVTNZbWlCLzFRWnR6S3BkVHZCa3JXZ0xLWHBHTDZEWXF3MjF1NktF?=
+ =?utf-8?B?dXdpUzM5Q3c1WjlmMHhMTVVsdS92cFdPTzl5MzNxdGMzOWxncDBJZXN3U3VP?=
+ =?utf-8?B?dFFkTmk3YytIcUJPWlQxa0p4djI0ZEw4THI3alZaMk1kU1dEcGUyMVZjbEY5?=
+ =?utf-8?B?amQ3elJiTlJJVVhjblBVVTZLM0REbWdLMkIzbVBoaUhtZlQvMjVlbWNDQVZh?=
+ =?utf-8?B?NG5kSklneGYwc2paMHRDamlIYm9kak8wSmp3bDZIUy9CTGtRTmVaY2RNVDhk?=
+ =?utf-8?B?Q09qZHIxdzR0QnA5R2k2cGRvai9zK3RCYk9TMnFFNW9oQjJoUnJ5WkhRS1lz?=
+ =?utf-8?B?ZWVYWm9nUldTRjFnL09sZEpDQ1BUM3EyUS9MdlNGREMwaVFuUkIzdnBsYjgv?=
+ =?utf-8?B?azhHeEZpSVcwLzFiMGxTSEdQSEIxTm9zQWZ1K2hBbnc0OG02VkpkTVdsZCtN?=
+ =?utf-8?B?T0xDa2N3YWN5eDM5d1d1Y1dCTjFyTU1QVjdNQXI0azZ2VEJ1ZkdFelp1OXJG?=
+ =?utf-8?B?MWJPcmx5Tm96cldrR2pGNEY1M3pBYVhscjRVRk5zWlJiSWYzY242a0o4VFBW?=
+ =?utf-8?B?UXVPMjA4YnlGWTBsTmhsL0JXTVo4T3BXOU5pLzV4MlBOc3BPVzN3ekUzUkxU?=
+ =?utf-8?B?R29KNlFSQXdZOU1vSXVzb3EvbkFXalArZVhrOURmTFYzdDY4VjFha2VObHlX?=
+ =?utf-8?B?WWtmbVVEeXdRdTFGamcxU3F2N2FlbHlZaWVwOE9zdWNSYmRVNlhQb01aZndu?=
+ =?utf-8?B?UFdjT2tSbHVLb2JvWW8yY2ZtRnZnQzlBb3lSWk9OaVVkWUVqZTlUQXl6NVZq?=
+ =?utf-8?B?THF0S3JrWWFrcTdoVFY4R3FNc055TlJGN2swMWQxeUg0eVhoaUdKdElIZG1x?=
+ =?utf-8?B?alFOdDdsZXhpZnAxRFJzcVowTTIyZWlqcFQyT0dSUmZmalZjWEQyL1VoQjky?=
+ =?utf-8?B?dWwvRU9PazJwWHhYUHBTRDFPT0FFS3QrOW0vKzhwQmtZLy81dnc4ODNkSlQw?=
+ =?utf-8?B?bWJ2OWQ0cFUrS0V1Ry9Ma1Z1K2N1VTNTdjFPekNEVWZ5RVgyVmt2by9VWDlm?=
+ =?utf-8?B?eWVnbjU2eEVpaWgydFVsaDBwTU5jM2lNL253TDBwNHZmREpxZWhnVjlFbXd3?=
+ =?utf-8?B?MkxVZndpTXV1ZHhqOGxieFNSY0VsdFRSNWpFUjk0MUpRUXI0ZE5mcHhveXJ2?=
+ =?utf-8?B?YklyWVB4dUZpKzNxdHVTNmJTUlBsTDVmdHNTN0ltdGM0QjBmdmZTOUhreG5N?=
+ =?utf-8?B?Z2hJMk85clZYdWk4ZHFqM1M1NGZYNFFxUW43ZldvWTJXMzhOS1ExZWIvVFB4?=
+ =?utf-8?B?aHBidjN2Z1VHYTRCUXY0SHRXWEZVNGtzNndMYkJxSjlaWXlUZGFsajBJYUdm?=
+ =?utf-8?B?MXp5dnJaY1ZHYkJTYk1QSlVRcXVzVHFuN2ZUQUFKdFptYUwxeFl6Nkt4cy9y?=
+ =?utf-8?B?dXg4VUNVekdXK1ZZdXdpZ1AyK1VDalB3S3QyQ0Y1RmhBZ0lLWEVmbHdPT3Z5?=
+ =?utf-8?B?TVh5alNKK1llR1RpdUh4UVIxcEMxRVhsTXN2aFFLWW0wd0lXaHBqSEowejN1?=
+ =?utf-8?B?NkNwdlBNVHYrWG1Xb2pXb0V4MWZRdHdldUI1OWU3Zy9oT3RzbG5hL1I0ME9n?=
+ =?utf-8?B?UnhqUGRxcC9jU1RSY3lDck5UalZkTUlyekl4cHZOY3pJbVlPMnRVMERCQ0c0?=
+ =?utf-8?B?a3lzbTJwV3BwODRCMWhKM0FYTmd1NTI3RTNOUXIweFVEd1dHZEQyVUs0cmRR?=
+ =?utf-8?B?dis5dEIwOEF6bWZ3THBUSnRaTTBnPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A70C1969DEF6C64E997338D04DAA1846@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR11MB4874.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5519cb1d-2ee9-4429-33d2-08d9eca15241
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Feb 2022 14:26:26.2436
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 67K/JZLQz9Nl7Gsp/l1pzg8SYCNqSaOIMN1uNeLRc8tJXd5dyKHfPYYtzkoOyavXXxaFYx+MNZNT7/eTlI/Qc6cXdn05ZcI0/rGRtra+MdM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5034
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support for HW QAT Power Management (PM) feature.
-This feature is enabled at init time (1) by sending an admin message to
-the firmware, targeting the admin AE, that sets the idle time before
-the device changes state and (2) by unmasking the PM source of interrupt
-in ERRMSK2.
-
-The interrupt handler is extended to handle a PM interrupt which
-is triggered by HW when a PM transition occurs. In this case, the
-driver responds acknowledging the transaction using the HOST_MSG
-mailbox.
-
-Signed-off-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-Co-developed-by: Marcinx Malinowski <marcinx.malinowski@intel.com>
-Signed-off-by: Marcinx Malinowski <marcinx.malinowski@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
----
- .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |  15 +-
- .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    |  10 --
- drivers/crypto/qat/qat_common/Makefile        |   1 +
- .../crypto/qat/qat_common/adf_accel_devices.h |   2 +
- drivers/crypto/qat/qat_common/adf_admin.c     |  37 +++++
- .../crypto/qat/qat_common/adf_common_drv.h    |   1 +
- drivers/crypto/qat/qat_common/adf_gen4_pm.c   | 137 ++++++++++++++++++
- drivers/crypto/qat/qat_common/adf_gen4_pm.h   |  44 ++++++
- drivers/crypto/qat/qat_common/adf_init.c      |   6 +
- drivers/crypto/qat/qat_common/adf_isr.c       |  14 ++
- .../qat/qat_common/icp_qat_fw_init_admin.h    |   1 +
- 11 files changed, 252 insertions(+), 16 deletions(-)
- create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.c
- create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.h
-
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 69fb271c85dd..fb5970a68484 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -6,6 +6,7 @@
- #include <adf_common_drv.h>
- #include <adf_gen4_hw_data.h>
- #include <adf_gen4_pfvf.h>
-+#include <adf_gen4_pm.h>
- #include "adf_4xxx_hw_data.h"
- #include "icp_qat_hw.h"
- 
-@@ -257,18 +258,18 @@ static int adf_init_device(struct adf_accel_dev *accel_dev)
- 
- 	/* Temporarily mask PM interrupt */
- 	csr = ADF_CSR_RD(addr, ADF_GEN4_ERRMSK2);
--	csr |= ADF_4XXX_PM_SOU;
-+	csr |= ADF_GEN4_PM_SOU;
- 	ADF_CSR_WR(addr, ADF_GEN4_ERRMSK2, csr);
- 
- 	/* Set DRV_ACTIVE bit to power up the device */
--	ADF_CSR_WR(addr, ADF_4XXX_PM_INTERRUPT, ADF_4XXX_PM_DRV_ACTIVE);
-+	ADF_CSR_WR(addr, ADF_GEN4_PM_INTERRUPT, ADF_GEN4_PM_DRV_ACTIVE);
- 
- 	/* Poll status register to make sure the device is powered up */
- 	ret = read_poll_timeout(ADF_CSR_RD, status,
--				status & ADF_4XXX_PM_INIT_STATE,
--				ADF_4XXX_PM_POLL_DELAY_US,
--				ADF_4XXX_PM_POLL_TIMEOUT_US, true, addr,
--				ADF_4XXX_PM_STATUS);
-+				status & ADF_GEN4_PM_INIT_STATE,
-+				ADF_GEN4_PM_POLL_DELAY_US,
-+				ADF_GEN4_PM_POLL_TIMEOUT_US, true, addr,
-+				ADF_GEN4_PM_STATUS);
- 	if (ret)
- 		dev_err(&GET_DEV(accel_dev), "Failed to power up the device\n");
- 
-@@ -354,6 +355,8 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->set_ssm_wdtimer = adf_gen4_set_ssm_wdtimer;
- 	hw_data->disable_iov = adf_disable_sriov;
- 	hw_data->ring_pair_reset = adf_gen4_ring_pair_reset;
-+	hw_data->enable_pm = adf_gen4_enable_pm;
-+	hw_data->handle_pm_interrupt = adf_gen4_handle_pm_interrupt;
- 
- 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
- 	adf_gen4_init_pf_pfvf_ops(&hw_data->pfvf_ops);
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-index 857b93a3c032..1034752845ca 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-+++ b/drivers/crypto/qat/qat_4xxx/adf_4xxx_hw_data.h
-@@ -49,16 +49,6 @@
- #define ADF_4XXX_ADMINMSGLR_OFFSET	(0x500578)
- #define ADF_4XXX_MAILBOX_BASE_OFFSET	(0x600970)
- 
--/* Power management */
--#define ADF_4XXX_PM_POLL_DELAY_US	20
--#define ADF_4XXX_PM_POLL_TIMEOUT_US	USEC_PER_SEC
--#define ADF_4XXX_PM_STATUS		(0x50A00C)
--#define ADF_4XXX_PM_INTERRUPT		(0x50A028)
--#define ADF_4XXX_PM_DRV_ACTIVE		BIT(20)
--#define ADF_4XXX_PM_INIT_STATE		BIT(21)
--/* Power management source in ERRSOU2 and ERRMSK2 */
--#define ADF_4XXX_PM_SOU			BIT(18)
--
- /* Firmware Binaries */
- #define ADF_4XXX_FW		"qat_4xxx.bin"
- #define ADF_4XXX_MMP		"qat_4xxx_mmp.bin"
-diff --git a/drivers/crypto/qat/qat_common/Makefile b/drivers/crypto/qat/qat_common/Makefile
-index 7e191a42a5c7..f25a6c8edfc7 100644
---- a/drivers/crypto/qat/qat_common/Makefile
-+++ b/drivers/crypto/qat/qat_common/Makefile
-@@ -12,6 +12,7 @@ intel_qat-objs := adf_cfg.o \
- 	adf_hw_arbiter.o \
- 	adf_gen2_hw_data.o \
- 	adf_gen4_hw_data.o \
-+	adf_gen4_pm.o \
- 	qat_crypto.o \
- 	qat_algs.o \
- 	qat_asym_algs.o \
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index 2d4cd7c7cf33..a03c6cf72331 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -184,6 +184,8 @@ struct adf_hw_device_data {
- 	void (*exit_arb)(struct adf_accel_dev *accel_dev);
- 	const u32 *(*get_arb_mapping)(void);
- 	int (*init_device)(struct adf_accel_dev *accel_dev);
-+	int (*enable_pm)(struct adf_accel_dev *accel_dev);
-+	bool (*handle_pm_interrupt)(struct adf_accel_dev *accel_dev);
- 	void (*disable_iov)(struct adf_accel_dev *accel_dev);
- 	void (*configure_iov_threads)(struct adf_accel_dev *accel_dev,
- 				      bool enable);
-diff --git a/drivers/crypto/qat/qat_common/adf_admin.c b/drivers/crypto/qat/qat_common/adf_admin.c
-index 498eb6f690e3..3b6184c35081 100644
---- a/drivers/crypto/qat/qat_common/adf_admin.c
-+++ b/drivers/crypto/qat/qat_common/adf_admin.c
-@@ -251,6 +251,43 @@ int adf_send_admin_init(struct adf_accel_dev *accel_dev)
- }
- EXPORT_SYMBOL_GPL(adf_send_admin_init);
- 
-+/**
-+ * adf_init_admin_pm() - Function sends PM init message to FW
-+ * @accel_dev: Pointer to acceleration device.
-+ * @idle_delay: QAT HW idle time before power gating is initiated.
-+ *		000 - 64us
-+ *		001 - 128us
-+ *		010 - 256us
-+ *		011 - 512us
-+ *		100 - 1ms
-+ *		101 - 2ms
-+ *		110 - 4ms
-+ *		111 - 8ms
-+ *
-+ * Function sends to the FW the admin init message for the PM state
-+ * configuration.
-+ *
-+ * Return: 0 on success, error code otherwise.
-+ */
-+int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+	struct icp_qat_fw_init_admin_resp resp = {0};
-+	struct icp_qat_fw_init_admin_req req = {0};
-+	u32 ae_mask = hw_data->admin_ae_mask;
-+
-+	if (!accel_dev->admin) {
-+		dev_err(&GET_DEV(accel_dev), "adf_admin is not available\n");
-+		return -EFAULT;
-+	}
-+
-+	req.cmd_id = ICP_QAT_FW_PM_STATE_CONFIG;
-+	req.idle_filter = idle_delay;
-+
-+	return adf_send_admin(accel_dev, &req, &resp, ae_mask);
-+}
-+EXPORT_SYMBOL_GPL(adf_init_admin_pm);
-+
- int adf_init_admin_comms(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_admin_comms *admin;
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 077549176879..e8c9b77c0d66 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -102,6 +102,7 @@ void adf_exit_aer(void);
- int adf_init_admin_comms(struct adf_accel_dev *accel_dev);
- void adf_exit_admin_comms(struct adf_accel_dev *accel_dev);
- int adf_send_admin_init(struct adf_accel_dev *accel_dev);
-+int adf_init_admin_pm(struct adf_accel_dev *accel_dev, u32 idle_delay);
- int adf_init_arb(struct adf_accel_dev *accel_dev);
- void adf_exit_arb(struct adf_accel_dev *accel_dev);
- void adf_update_ring_arb(struct adf_etr_ring_data *ring);
-diff --git a/drivers/crypto/qat/qat_common/adf_gen4_pm.c b/drivers/crypto/qat/qat_common/adf_gen4_pm.c
-new file mode 100644
-index 000000000000..7037c0892a8a
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_gen4_pm.c
-@@ -0,0 +1,137 @@
-+// SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
-+/* Copyright(c) 2022 Intel Corporation */
-+#include <linux/bitfield.h>
-+#include <linux/iopoll.h>
-+#include "adf_accel_devices.h"
-+#include "adf_common_drv.h"
-+#include "adf_gen4_pm.h"
-+#include "adf_cfg_strings.h"
-+#include "icp_qat_fw_init_admin.h"
-+#include "adf_gen4_hw_data.h"
-+#include "adf_cfg.h"
-+
-+enum qat_pm_host_msg {
-+	PM_NO_CHANGE = 0,
-+	PM_SET_MIN,
-+};
-+
-+struct adf_gen4_pm_data {
-+	struct work_struct pm_irq_work;
-+	struct adf_accel_dev *accel_dev;
-+	u32 pm_int_sts;
-+};
-+
-+static int send_host_msg(struct adf_accel_dev *accel_dev)
-+{
-+	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	u32 msg;
-+
-+	msg = ADF_CSR_RD(pmisc, ADF_GEN4_PM_HOST_MSG);
-+	if (msg & ADF_GEN4_PM_MSG_PENDING)
-+		return -EBUSY;
-+
-+	/* Send HOST_MSG */
-+	msg = FIELD_PREP(ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK, PM_SET_MIN);
-+	msg |= ADF_GEN4_PM_MSG_PENDING;
-+	ADF_CSR_WR(pmisc, ADF_GEN4_PM_HOST_MSG, msg);
-+
-+	/* Poll status register to make sure the HOST_MSG has been processed */
-+	return read_poll_timeout(ADF_CSR_RD, msg,
-+				!(msg & ADF_GEN4_PM_MSG_PENDING),
-+				ADF_GEN4_PM_MSG_POLL_DELAY_US,
-+				ADF_GEN4_PM_POLL_TIMEOUT_US, true, pmisc,
-+				ADF_GEN4_PM_HOST_MSG);
-+}
-+
-+static void pm_bh_handler(struct work_struct *work)
-+{
-+	struct adf_gen4_pm_data *pm_data =
-+		container_of(work, struct adf_gen4_pm_data, pm_irq_work);
-+	struct adf_accel_dev *accel_dev = pm_data->accel_dev;
-+	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	u32 pm_int_sts = pm_data->pm_int_sts;
-+	u32 val;
-+
-+	/* PM Idle interrupt */
-+	if (pm_int_sts & ADF_GEN4_PM_IDLE_STS) {
-+		/* Issue host message to FW */
-+		if (send_host_msg(accel_dev))
-+			dev_warn_ratelimited(&GET_DEV(accel_dev),
-+					     "Failed to send host msg to FW\n");
-+	}
-+
-+	/* Clear interrupt status */
-+	ADF_CSR_WR(pmisc, ADF_GEN4_PM_INTERRUPT, pm_int_sts);
-+
-+	/* Reenable PM interrupt */
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_ERRMSK2);
-+	val &= ~ADF_GEN4_PM_SOU;
-+	ADF_CSR_WR(pmisc, ADF_GEN4_ERRMSK2, val);
-+
-+	kfree(pm_data);
-+}
-+
-+bool adf_gen4_handle_pm_interrupt(struct adf_accel_dev *accel_dev)
-+{
-+	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	struct adf_gen4_pm_data *pm_data = NULL;
-+	u32 errsou2;
-+	u32 errmsk2;
-+	u32 val;
-+
-+	/* Only handle the interrupt triggered by PM */
-+	errmsk2 = ADF_CSR_RD(pmisc, ADF_GEN4_ERRMSK2);
-+	if (errmsk2 & ADF_GEN4_PM_SOU)
-+		return false;
-+
-+	errsou2 = ADF_CSR_RD(pmisc, ADF_GEN4_ERRSOU2);
-+	if (!(errsou2 & ADF_GEN4_PM_SOU))
-+		return false;
-+
-+	/* Disable interrupt */
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_ERRMSK2);
-+	val |= ADF_GEN4_PM_SOU;
-+	ADF_CSR_WR(pmisc, ADF_GEN4_ERRMSK2, val);
-+
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_PM_INTERRUPT);
-+
-+	pm_data = kzalloc(sizeof(*pm_data), GFP_ATOMIC);
-+	if (!pm_data)
-+		return false;
-+
-+	pm_data->pm_int_sts = val;
-+	pm_data->accel_dev = accel_dev;
-+
-+	INIT_WORK(&pm_data->pm_irq_work, pm_bh_handler);
-+	adf_misc_wq_queue_work(&pm_data->pm_irq_work);
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_handle_pm_interrupt);
-+
-+int adf_gen4_enable_pm(struct adf_accel_dev *accel_dev)
-+{
-+	void __iomem *pmisc = adf_get_pmisc_base(accel_dev);
-+	int ret;
-+	u32 val;
-+
-+	ret = adf_init_admin_pm(accel_dev, ADF_GEN4_PM_DEFAULT_IDLE_FILTER);
-+	if (ret)
-+		return ret;
-+
-+	/* Enable default PM interrupts: IDLE, THROTTLE */
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_PM_INTERRUPT);
-+	val |= ADF_GEN4_PM_INT_EN_DEFAULT;
-+
-+	/* Clear interrupt status */
-+	val |= ADF_GEN4_PM_INT_STS_MASK;
-+	ADF_CSR_WR(pmisc, ADF_GEN4_PM_INTERRUPT, val);
-+
-+	/* Unmask PM Interrupt */
-+	val = ADF_CSR_RD(pmisc, ADF_GEN4_ERRMSK2);
-+	val &= ~ADF_GEN4_PM_SOU;
-+	ADF_CSR_WR(pmisc, ADF_GEN4_ERRMSK2, val);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(adf_gen4_enable_pm);
-diff --git a/drivers/crypto/qat/qat_common/adf_gen4_pm.h b/drivers/crypto/qat/qat_common/adf_gen4_pm.h
-new file mode 100644
-index 000000000000..f8f8a9ee29e5
---- /dev/null
-+++ b/drivers/crypto/qat/qat_common/adf_gen4_pm.h
-@@ -0,0 +1,44 @@
-+/* SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only) */
-+/* Copyright(c) 2022 Intel Corporation */
-+#ifndef ADF_GEN4_PM_H
-+#define ADF_GEN4_PM_H
-+
-+#include "adf_accel_devices.h"
-+
-+/* Power management registers */
-+#define ADF_GEN4_PM_HOST_MSG (0x50A01C)
-+
-+/* Power management */
-+#define ADF_GEN4_PM_POLL_DELAY_US	20
-+#define ADF_GEN4_PM_POLL_TIMEOUT_US	USEC_PER_SEC
-+#define ADF_GEN4_PM_MSG_POLL_DELAY_US	(10 * USEC_PER_MSEC)
-+#define ADF_GEN4_PM_STATUS		(0x50A00C)
-+#define ADF_GEN4_PM_INTERRUPT		(0x50A028)
-+
-+/* Power management source in ERRSOU2 and ERRMSK2 */
-+#define ADF_GEN4_PM_SOU			BIT(18)
-+
-+#define ADF_GEN4_PM_IDLE_INT_EN		BIT(18)
-+#define ADF_GEN4_PM_THROTTLE_INT_EN	BIT(19)
-+#define ADF_GEN4_PM_DRV_ACTIVE		BIT(20)
-+#define ADF_GEN4_PM_INIT_STATE		BIT(21)
-+#define ADF_GEN4_PM_INT_EN_DEFAULT	(ADF_GEN4_PM_IDLE_INT_EN | \
-+					ADF_GEN4_PM_THROTTLE_INT_EN)
-+
-+#define ADF_GEN4_PM_THR_STS	BIT(0)
-+#define ADF_GEN4_PM_IDLE_STS	BIT(1)
-+#define ADF_GEN4_PM_FW_INT_STS	BIT(2)
-+#define ADF_GEN4_PM_INT_STS_MASK (ADF_GEN4_PM_THR_STS | \
-+				 ADF_GEN4_PM_IDLE_STS | \
-+				 ADF_GEN4_PM_FW_INT_STS)
-+
-+#define ADF_GEN4_PM_MSG_PENDING			BIT(0)
-+#define ADF_GEN4_PM_MSG_PAYLOAD_BIT_MASK	GENMASK(28, 1)
-+
-+#define ADF_GEN4_PM_DEFAULT_IDLE_FILTER		(0x0)
-+#define ADF_GEN4_PM_MAX_IDLE_FILTER		(0x7)
-+
-+int adf_gen4_enable_pm(struct adf_accel_dev *accel_dev);
-+bool adf_gen4_handle_pm_interrupt(struct adf_accel_dev *accel_dev);
-+
-+#endif
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index 2edc63c6b6ca..c2c718f1b489 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -181,6 +181,12 @@ int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	if (hw_data->set_ssm_wdtimer)
- 		hw_data->set_ssm_wdtimer(accel_dev);
- 
-+	/* Enable Power Management */
-+	if (hw_data->enable_pm && hw_data->enable_pm(accel_dev)) {
-+		dev_err(&GET_DEV(accel_dev), "Failed to configure Power Management\n");
-+		return -EFAULT;
-+	}
-+
- 	list_for_each(list_itr, &service_table) {
- 		service = list_entry(list_itr, struct service_hndl, list);
- 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
-diff --git a/drivers/crypto/qat/qat_common/adf_isr.c b/drivers/crypto/qat/qat_common/adf_isr.c
-index 803b89ba9670..a35149f8bf1e 100644
---- a/drivers/crypto/qat/qat_common/adf_isr.c
-+++ b/drivers/crypto/qat/qat_common/adf_isr.c
-@@ -124,6 +124,17 @@ static bool adf_handle_vf2pf_int(struct adf_accel_dev *accel_dev)
- }
- #endif /* CONFIG_PCI_IOV */
- 
-+static bool adf_handle_pm_int(struct adf_accel_dev *accel_dev)
-+{
-+	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
-+
-+	if (hw_data->handle_pm_interrupt &&
-+	    hw_data->handle_pm_interrupt(accel_dev))
-+		return true;
-+
-+	return false;
-+}
-+
- static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- {
- 	struct adf_accel_dev *accel_dev = dev_ptr;
-@@ -134,6 +145,9 @@ static irqreturn_t adf_msix_isr_ae(int irq, void *dev_ptr)
- 		return IRQ_HANDLED;
- #endif /* CONFIG_PCI_IOV */
- 
-+	if (adf_handle_pm_int(accel_dev))
-+		return IRQ_HANDLED;
-+
- 	dev_dbg(&GET_DEV(accel_dev), "qat_dev%d spurious AE interrupt\n",
- 		accel_dev->accel_id);
- 
-diff --git a/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
-index afe59a7684ac..56cb827f93ea 100644
---- a/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
-+++ b/drivers/crypto/qat/qat_common/icp_qat_fw_init_admin.h
-@@ -16,6 +16,7 @@ enum icp_qat_fw_init_admin_cmd_id {
- 	ICP_QAT_FW_HEARTBEAT_SYNC = 7,
- 	ICP_QAT_FW_HEARTBEAT_GET = 8,
- 	ICP_QAT_FW_COMP_CAPABILITY_GET = 9,
-+	ICP_QAT_FW_PM_STATE_CONFIG = 128,
- };
- 
- enum icp_qat_fw_init_admin_resp_status {
--- 
-2.29.2
-
+T24gMi84LzIyIDE3OjI3LCBUdWRvci5BbWJhcnVzQG1pY3JvY2hpcC5jb20gd3JvdGU6DQo+IEVY
+VEVSTkFMIEVNQUlMOiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxl
+c3MgeW91IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQ0KPiANCj4gT24gMi84LzIyIDE2OjU1LCBL
+cnp5c3p0b2YgS296bG93c2tpIHdyb3RlOg0KPj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGlj
+ayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBp
+cyBzYWZlDQo+Pg0KPj4gT24gMDgvMDIvMjAyMiAxNTo0MCwgVHVkb3IuQW1iYXJ1c0BtaWNyb2No
+aXAuY29tIHdyb3RlOg0KPj4+IE9uIDIvOC8yMiAxMzo1OCwgS3J6eXN6dG9mIEtvemxvd3NraSB3
+cm90ZToNCj4+Pj4gRVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0
+dGFjaG1lbnRzIHVubGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+Pj4+DQo+Pj4+
+IE9uIDA4LzAyLzIwMjIgMTE6NDksIFR1ZG9yIEFtYmFydXMgd3JvdGU6DQo+Pj4+PiBDb252ZXJ0
+IEF0bWVsIEFFUyBkb2N1bWVudGF0aW9uIHRvIHlhbWwgZm9ybWF0LiBXaXRoIHRoZSBjb252ZXJz
+aW9uIHRoZQ0KPj4+Pj4gY2xvY2sgYW5kIGNsb2NrLW5hbWVzIHByb3BlcnRpZXMgYXJlIG1hZGUg
+bWFuZGF0b3J5LiBUaGUgZHJpdmVyIHJldHVybnMNCj4+Pj4+IC1FSU5WQUwgaWYgImFlc19jbGsi
+IGlzIG5vdCBmb3VuZCwgcmVmbGVjdCB0aGF0IGluIHRoZSBiaW5kaW5ncyBhbmQgbWFrZQ0KPj4+
+Pj4gdGhlIGNsb2NrIGFuZCBjbG9jay1uYW1lcyBwcm9wZXJ0aWVzIG1hbmRhdG9yeS4gVXBkYXRl
+IHRoZSBleGFtcGxlIHRvDQo+Pj4+PiBiZXR0ZXIgZGVzY3JpYmUgaG93IG9uZSBzaG91bGQgZGVm
+aW5lIHRoZSBkdCBub2RlLg0KPj4+Pj4NCj4+Pj4+IFNpZ25lZC1vZmYtYnk6IFR1ZG9yIEFtYmFy
+dXMgPHR1ZG9yLmFtYmFydXNAbWljcm9jaGlwLmNvbT4NCj4+Pj4+IC0tLQ0KPj4+Pj4gIC4uLi9j
+cnlwdG8vYXRtZWwsYXQ5MXNhbTlnNDYtYWVzLnlhbWwgICAgICAgICB8IDY1ICsrKysrKysrKysr
+KysrKysrKysNCj4+Pj4+ICAuLi4vYmluZGluZ3MvY3J5cHRvL2F0bWVsLWNyeXB0by50eHQgICAg
+ICAgICAgfCAyMCAtLS0tLS0NCj4+Pj4+ICAyIGZpbGVzIGNoYW5nZWQsIDY1IGluc2VydGlvbnMo
+KyksIDIwIGRlbGV0aW9ucygtKQ0KPj4+Pj4gIGNyZWF0ZSBtb2RlIDEwMDY0NCBEb2N1bWVudGF0
+aW9uL2RldmljZXRyZWUvYmluZGluZ3MvY3J5cHRvL2F0bWVsLGF0OTFzYW05ZzQ2LWFlcy55YW1s
+DQo+Pj4+Pg0KPj4+Pg0KPj4+PiBJIHVuZGVyc3RhbmQgdGhhdCB5b3Uga2VlcCB0aGUgbGljZW5z
+ZSBHUEwtMi4wIChub3QgcmVjb21tZW5kZWQgbWl4KQ0KPj4+PiBiZWNhdXNlIG9mIGV4YW1wbGUg
+Y29taW5nIGZyb20gcHJldmlvdXMgYmluZGluZ3Mgb3IgZnJvbSBEVFMgKGJvdGggR1BMLTIuMCk/
+DQo+Pj4+DQo+Pj4NCj4+PiBUaGUgcHJldmlvdXMgYmluZGluZ3MgZGlkIG5vdCBoYXZlIGEgbGlj
+ZW5zZSBzcGVjaWZpZWQuIFdlIGhhdmUgRFRTIGZpbGVzIHdpdGgNCj4+PiB0aGVzZSBub2RlcyB0
+aGF0IGFyZSBlaXRoZXIgKEdQTC0yLjArIE9SIE1JVCkgb3IgR1BMLTIuMC1vci1sYXRlci4gVGhl
+IGRyaXZlcnMNCj4+PiBhcmUgR1BMLTIuMC4gSSB0aG91Z2h0IHRvIGZvbGxvdyB0aGUgZHJpdmVy
+cy4gSSBzZWUgdGhlIGV4YW1wbGUgaW4gWzFdIHVzZXMNCj4+PiAoR1BMLTIuMC1vbmx5IE9SIEJT
+RC0yLUNsYXVzZSkuIEkgc2VlIHRoZSBjcnlwdG8gYmluZGluZ3MgdGhhdCBhcmUgY29udmVydGVk
+DQo+Pj4gdG8geWFtbCBhcmUgZWl0aGVyIChHUEwtMi4wLW9ubHkgT1IgQlNELTItQ2xhdXNlKSBv
+ciBHUEwtMi4wLW9ubHkuIElzIHRoZXJlDQo+Pj4gYW5vdGhlciBndWlkZWxpbmUgdGhhdCBJIG1p
+c3M/DQo+Pj4NCj4+DQo+PiBZZXMsIHRoZXJlIGlzLiBSdW4gY2hlY2twYXRjaCAoeW91ciBxdWVz
+dGlvbiBraW5kcyBvZiBwb2ludCB0byB0aGUgZmFjdA0KPj4gdGhhdCB5b3UgZGlkIG5vdCBydW4g
+aXQuLi4pOg0KPj4gV0FSTklORzogRFQgYmluZGluZyBkb2N1bWVudHMgc2hvdWxkIGJlIGxpY2Vu
+c2VkIChHUEwtMi4wLW9ubHkgT1INCj4+IEJTRC0yLUNsYXVzZSkNCj4gDQo+IFJpZ2h0LiBJIHVz
+dWFsbHkgcnVuIGNoZWNrcGF0Y2ggLS1zdHJpY3QsIGJ1dCB0aGlzIHdhcm5pbmcgc2xpcHBlZCBz
+b21laG93Lg0KPiBNYXliZSBiZWNhdXNlIG9mIHRoZSB0d28gb3RoZXIgZmFsc2UgcG9zaXRpdmVz
+LCB0b28gbXVjaCBub2lzZS4NCj4+DQo+Pg0KPj4gSWYgeW91ciBuZXcgYmluZGluZ3MgdXNlIGNv
+cGllZC9kZXJpdmF0aXZlIGRlc2NyaXB0aW9uIG9yIERUUyBjb2RlIHdoaWNoDQo+PiBpcyBsaWNl
+bnNlZCBhcyBvbmx5IEdQTC0yLjAsIHRoZSBiaW5kaW5ncyBpdHNlbGYgYXMgZGVyaXZhdGl2ZSB3
+b3JrDQo+PiBtaWdodCBuZWVkIHRvIHN0YXkgYXMgR1BMLTIuMCBhcyB3ZWxsLiBVbmxlc3MgY29w
+eXJpZ2h0IGhvbGRlcnMgYWdyZWUgdG8NCj4+IHJlLWxpY2Vuc2UgdGhpcyBhcyBHUEwyLU9SLUJT
+RC4gQXMgcmVwcmVzZW50aW5nIGNvbXBhbnksIHlvdXIgcGF0Y2gNCj4+IG1pZ2h0IGJlIGVub3Vn
+aCB0byByZS1saWNlbnNlLCBidXQgbWF5YmUgb3RoZXIgcGVvcGxlIGNvbnRyaWJ1dGVkLiBJDQo+
+PiBkb24ndCBrbm93Lg0KPj4NCj4+IEkganVzdCB3YW50ZWQgdG8gYmUgc3VyZSB0aGF0IHlvdSB1
+c2UgR1BMLTIuMCBpbiBwdXJwb3NlLCBiZWNhdXNlDQo+PiBHUEwyLU9SLUJTRCBjYW5ub3QgYmUg
+dXNlZC4NCj4gDQo+IE9rLCB0aGFua3MgZm9yIHRoZSBleHBsYW5hdGlvbi4gSSBoYXZlIHRvIGFk
+bWl0IEknbSBub3QgdG9vIGZhbWlsaWFyIHdpdGgNCj4gdGhlIGNvbnRlbnRzIG9mIGVhY2ggbGlj
+ZW5zZS4gV2lsbCByZWFkIHRoZW0gYW5kIGNvbWUgYmFjayB3aXRoIGEgZm9sbG93IHVwLg0KPiAN
+Cg0KRGlkIHNvbWUgZG9jdW1lbnRhdGlvbiB3b3JrLCBhbmQgeWVzLCB3ZSBjYW4gdXNlIHRoZSBy
+ZWNvbW1lbmRlZCBiaW5kaW5ncw0KbGljZW5zZTogKEdQTC0yLjAtb25seSBPUiBCU0QtMi1DbGF1
+c2UpLiBXaWxsIHJlc3VibWl0LiBUaGFua3MsIEtyenlzenRvZiENCg0KdGENCg0KDQo=
