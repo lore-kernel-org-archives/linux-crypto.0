@@ -2,67 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC2CC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 13:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE05C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 13:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233456AbiBJNIL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 08:08:11 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43898 "EHLO
+        id S242470AbiBJN6J (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 08:58:09 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241981AbiBJNIJ (ORCPT
+        with ESMTP id S235060AbiBJN6J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 08:08:09 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D0E100C;
-        Thu, 10 Feb 2022 05:08:10 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 85D7EB8253B;
-        Thu, 10 Feb 2022 13:08:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B86A5C004E1;
-        Thu, 10 Feb 2022 13:08:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RJoxP0PP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644498486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bkaw0l3Ywep/OB57H4YCme/aIlYJcfsB7nVqGUEOgiI=;
-        b=RJoxP0PPmm/m6DG9yiZhyP4Eh/6pb7XuA3ktb2pXp/H4g8+Ln/YydrLApT1dZtxrv3hUp6
-        AouOjIVrFITLCpVqdB0oEV0duBs5UFAln3QjHRkIhuP9CwER4bl6aBAVB4n9/e8YONoUj5
-        4QV1lI+ua/X0SdgDM5CHdJrMiKXpdmo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 510bfb41 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 10 Feb 2022 13:08:06 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id 192so15104497ybd.10;
-        Thu, 10 Feb 2022 05:08:06 -0800 (PST)
-X-Gm-Message-State: AOAM533DY8pobG6cVvIAvSFnIkuEZ7onu21W63diWPEgok/QxFKTscJ9
-        JE2lQRJ5xPQgJcAqkLVsDdhBgNRnIYFTLqsjjsg=
-X-Google-Smtp-Source: ABdhPJz4Ks7mDkABlaZrmo/gd+Wnl8zGCt7KD+1b6opcrWmfO2dRwHCdTmFrL4oxjQGz+IU6NT9sDv3EAZphGY6MBh4=
-X-Received: by 2002:a81:c646:: with SMTP id q6mr6959997ywj.485.1644498485708;
- Thu, 10 Feb 2022 05:08:05 -0800 (PST)
+        Thu, 10 Feb 2022 08:58:09 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F0B9A;
+        Thu, 10 Feb 2022 05:58:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644501490; x=1676037490;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wHeKyQCVnyauIWBqHolq/Aeqe75EVRZohHRCGcosvUQ=;
+  b=T3Vf8AWRRcNfqPdFPql/dEV4d3AGuOnQHXvBjjWs0BXu9woK/ucMM3xM
+   tlj4jG3v8GVoLVgKgwDsia+mKHlsFHJ31ORunTQ1PRo4scz7JaoDVYHzV
+   FOFWgywEWvMaECJ0LtFELg6vzF7a2Gagp9q2h/ggtouFQXV5fPHZMM3Zh
+   o9QO0KPCjhhM12StC6vVQ42ycIpgMBWJ3Dk/j+ID3YvG9/wRyBOY7Jd7U
+   pnUBexKGYOrxQqZs0JhgrF4HCr6DlR3rpkAPqkzk/0UCXrZ44NVTzV1wt
+   CwwM68scG0057m4xEjTuH2czMNNjIZXLQs8R7scbjGCgE6YtuIBKi7YIv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10253"; a="335910153"
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="335910153"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 05:58:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,358,1635231600"; 
+   d="scan'208";a="526487206"
+Received: from silpixa00400294.ir.intel.com ([10.237.222.100])
+  by orsmga007.jf.intel.com with ESMTP; 10 Feb 2022 05:58:08 -0800
+From:   Wojciech Ziemba <wojciech.ziemba@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com, Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: [PATCH v2 0/3] Introduce support for QAT Dynamic Power Management
+Date:   Thu, 10 Feb 2022 13:38:24 +0000
+Message-Id: <20220210133827.2366901-1-wojciech.ziemba@intel.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-References: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net> <CAHmME9pZB1fWf2nZNwTHw07hrnxZYYymA0_Dy=jauDt9TbF69A@mail.gmail.com>
- <YgSmDtA2hlrDBmrH@owl.dominikbrodowski.net>
-In-Reply-To: <YgSmDtA2hlrDBmrH@owl.dominikbrodowski.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 10 Feb 2022 14:07:54 +0100
-X-Gmail-Original-Message-ID: <CAHmME9q-BAsOwfTKH4bqvnrJww_L-Y_owZP7-yzDcxGt9zEd5Q@mail.gmail.com>
-Message-ID: <CAHmME9q-BAsOwfTKH4bqvnrJww_L-Y_owZP7-yzDcxGt9zEd5Q@mail.gmail.com>
-Subject: Re: [PATCH] random: fix locking for crng_init in crng_reseed()
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     "Theodore Ts'o" <tytso@mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dominik,
+This patch set consist of following updates:
+1. Add misc workqueue for general purpose usage.
+2. Move error source related CSRs from 4xxx to the wider GEN4 header
+file.
+3. Add support for HW QAT Power Management (PM) feature.
+        This feature is enabled at init time (1) by sending an admin
+message to
+        the firmware, targeting the admin AE, that sets the idle time
+before
+        the device changes state and (2) by unmasking the PM source of
+        interrupt in ERRMSK2.
 
-Thanks, I see your point. I'll do it the way you suggested (which as
-you pointed out goes away anyway right after).
+        The interrupt handler is extended to handle a PM interrupt which
+        is triggered by HW when a PM transition occurs. In this case,
+the
+        driver responds acknowledging the transaction using the HOST_MSG
+        mailbox.
 
-Jason
+Changes since v1:
+- Moved unmasking PM interrupts after PM interrupt source enable to
+  avoid a spurious interrupt
+- Fixed kbuild bot issue by moving adf_handle_pm_int() out of
+  CONFIG_PCI_IOV scope
+- Rename [..]_init_pm() functions to [..]_enable_pm() as the function
+  needs to be called inside adf_start()
+
+
+Wojciech Ziemba (3):
+  crypto: qat - add misc workqueue
+  crypto: qat - move and rename GEN4 error register definitions
+  crypto: qat - enable power management for QAT GEN4
+
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |  21 +--
+ .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    |  24 ---
+ drivers/crypto/qat/qat_common/Makefile        |   1 +
+ .../crypto/qat/qat_common/adf_accel_devices.h |   2 +
+ drivers/crypto/qat/qat_common/adf_admin.c     |  37 +++++
+ .../crypto/qat/qat_common/adf_common_drv.h    |   4 +
+ drivers/crypto/qat/qat_common/adf_ctl_drv.c   |   6 +
+ .../crypto/qat/qat_common/adf_gen4_hw_data.h  |  14 ++
+ drivers/crypto/qat/qat_common/adf_gen4_pm.c   | 137 ++++++++++++++++++
+ drivers/crypto/qat/qat_common/adf_gen4_pm.h   |  44 ++++++
+ drivers/crypto/qat/qat_common/adf_init.c      |   6 +
+ drivers/crypto/qat/qat_common/adf_isr.c       |  42 ++++++
+ .../qat/qat_common/icp_qat_fw_init_admin.h    |   1 +
+ 13 files changed, 306 insertions(+), 33 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.c
+ create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.h
+
+-- 
+2.29.2
+
