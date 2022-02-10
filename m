@@ -2,88 +2,268 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CCCC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 14:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF00C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 15:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240998AbiBJO51 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 09:57:27 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42578 "EHLO
+        id S243314AbiBJPBz convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 10:01:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243290AbiBJO51 (ORCPT
+        with ESMTP id S243267AbiBJPBw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 09:57:27 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326EFC4C
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 06:57:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DD61BB8255A
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 14:57:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E84B3C004E1;
-        Thu, 10 Feb 2022 14:57:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1644505045;
-        bh=g5OVObHyNbVOVMOpI+RbP9Dm6TmTnDorPAxu51sTyK0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HeMXFDvTS4lkAD49E/arEOU0+C2gy8ccxs7evDVnJ/h4qK/R0+z9BFHuMdjJer6Qo
-         AzO6gPYEXiuyETNnSzwScIizvOIOTVKJomiCpPTGfuCo2J5FgdXmgy4gZdQyo/bFej
-         RzWSIeZv7ZImGyyXobnQQmnyfKxVM1wMjipwuzNY=
-Date:   Thu, 10 Feb 2022 15:57:22 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ted Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 0/4] random: change usage of arch_get_random_long()
-Message-ID: <YgUn0uqwJXskzEzG@kroah.com>
-References: <CACXcFmkC=6DsDiTbtnu=LMSsg00Lxz7jvcWNV=yDibz8suoVgw@mail.gmail.com>
+        Thu, 10 Feb 2022 10:01:52 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812A4C15;
+        Thu, 10 Feb 2022 07:01:53 -0800 (PST)
+Received: from fraeml710-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Jvg210ZX8z67lNg;
+        Thu, 10 Feb 2022 23:01:45 +0800 (CST)
+Received: from lhreml714-chm.china.huawei.com (10.201.108.65) by
+ fraeml710-chm.china.huawei.com (10.206.15.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Feb 2022 16:01:51 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml714-chm.china.huawei.com (10.201.108.65) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 10 Feb 2022 15:01:50 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Thu, 10 Feb 2022 15:01:50 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [RFC v4 5/8] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Topic: [RFC v4 5/8] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Index: AQHYHPDoOQ+DzroH5UW9kocWNKHJr6yLwb+AgAEM7WA=
+Date:   Thu, 10 Feb 2022 15:01:50 +0000
+Message-ID: <5269a28bf55f4a44b23e6f59d0d5b86b@huawei.com>
+References: <20220208133425.1096-1-shameerali.kolothum.thodi@huawei.com>
+        <20220208133425.1096-6-shameerali.kolothum.thodi@huawei.com>
+ <20220209144137.3770d914.alex.williamson@redhat.com>
+In-Reply-To: <20220209144137.3770d914.alex.williamson@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.92.146]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACXcFmkC=6DsDiTbtnu=LMSsg00Lxz7jvcWNV=yDibz8suoVgw@mail.gmail.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 10, 2022 at 10:28:26PM +0800, Sandy Harris wrote:
-> This series of patches is not strictly necessary, but it is a
-> significant improvement.
-> 
-> The current code has a sequence in several places that calls one or
-> more of arch_get_random_long() or related functions, checks the return
-> value(s) and on failure falls back to random_get_entropy(). These
-> patches provide get_source_long(), which is intended to replace all
-> such sequences.
-> 
-> This is better in several ways. It never wastes effort by calling
-> arch_get_random_long() et al. when the relevant config variables are
-> not set. If config variables for a hardware rng or the latent entropy
-> plugin are set, then it uses those instead. It does not deliver raw
-> output from any of these sources, but masks it by mixing with stored
-> random data. In the fallback case it gives much more random output
-> 
-> In the cases where a good source is available, this adds a little
-> overhead, but not much. It also saves some by not trying
-> arch_get-random_long() unnecessarily.
-> 
-> If no better source is available, get_source_long() falls back to
-> get_xtea_long(), an internal-use-only pseudorandom generator based on
-> the xtea block cipher. In general, that is considerably more expensive
-> than random_get_entropy(), but also provably much stronger.
-> 
-> With no good source, there is still a problem at boot; xtea cannot
-> become secure until it is properly keyed. It does become safe
-> eventually, and in the meanwhile it is certainly no worse than
-> random_get_entropy().
 
-This patch series is not actually threaded at all, and is totally
-whitespace damaged.
 
-How did you send it?  Try using 'git send-email' next time to correctly
-thread them and not corrupt them so that they are unusable :(
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: 09 February 2022 21:42
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; jgg@nvidia.com; cohuck@redhat.com;
+> mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: Re: [RFC v4 5/8] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+> migration region
+> 
+> On Tue, 8 Feb 2022 13:34:22 +0000
+> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> 
+> > HiSilicon ACC VF device BAR2 region consists of both functional
+> > register space and migration control register space. From a
+> > security point of view, it's not advisable to export the migration
+> > control region to Guest.
+> >
+> > Hence, override the ioctl/read/write/mmap methods to hide the
+> > migration region and limit the access only to the functional register
+> > space.
+> >
+> > Signed-off-by: Shameer Kolothum
+> <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  drivers/vfio/pci/hisi_acc_vfio_pci.c | 122 ++++++++++++++++++++++++++-
+> >  1 file changed, 118 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> b/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> > index 8b59e628110e..563ed2cc861f 100644
+> > --- a/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> > +++ b/drivers/vfio/pci/hisi_acc_vfio_pci.c
+> > @@ -13,6 +13,120 @@
+> >  #include <linux/vfio.h>
+> >  #include <linux/vfio_pci_core.h>
+> >
+> > +static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
+> > +					size_t count, loff_t *ppos,
+> > +					size_t *new_count)
+> > +{
+> > +	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+> > +	struct vfio_pci_core_device *vdev =
+> > +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> > +
+> > +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> > +		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> > +		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> 
+> Be careful here, there are nested assignment use cases.  This can only
+> survive one level of assignment before we've restricted more than we
+> intended.  If migration support is dependent on PF access, can we use
+> that to determine when to when to expose only half the BAR and when to
+> expose the full BAR?
 
-thanks,
+Ok. I will add a check here.
 
-greg k-h
+> We should also follow the mlx5 lead to use a vendor sub-directory below
+> drivers/vfio/pci/
+
+Sure.
+
+Thanks,
+Shameer
+
+> 
+> Alex
+> 
+> > +
+> > +		/* Check if access is for migration control region */
+> > +		if (pos >= end)
+> > +			return -EINVAL;
+> > +
+> > +		*new_count = min(count, (size_t)(end - pos));
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
+> > +				  struct vm_area_struct *vma)
+> > +{
+> > +	struct vfio_pci_core_device *vdev =
+> > +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> > +	unsigned int index;
+> > +
+> > +	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> > +	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
+> > +		u64 req_len, pgoff, req_start;
+> > +		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
+> > +
+> > +		req_len = vma->vm_end - vma->vm_start;
+> > +		pgoff = vma->vm_pgoff &
+> > +			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
+> > +		req_start = pgoff << PAGE_SHIFT;
+> > +
+> > +		if (req_start + req_len > end)
+> > +			return -EINVAL;
+> > +	}
+> > +
+> > +	return vfio_pci_core_mmap(core_vdev, vma);
+> > +}
+> > +
+> > +static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
+> > +				       const char __user *buf, size_t count,
+> > +				       loff_t *ppos)
+> > +{
+> > +	size_t new_count = count;
+> > +	int ret;
+> > +
+> > +	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos,
+> &new_count);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return vfio_pci_core_write(core_vdev, buf, new_count, ppos);
+> > +}
+> > +
+> > +static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
+> > +				      char __user *buf, size_t count,
+> > +				      loff_t *ppos)
+> > +{
+> > +	size_t new_count = count;
+> > +	int ret;
+> > +
+> > +	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos,
+> &new_count);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return vfio_pci_core_read(core_vdev, buf, new_count, ppos);
+> > +}
+> > +
+> > +static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned
+> int cmd,
+> > +				    unsigned long arg)
+> > +{
+> > +	struct vfio_pci_core_device *vdev =
+> > +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> > +
+> > +	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
+> > +		struct pci_dev *pdev = vdev->pdev;
+> > +		struct vfio_region_info info;
+> > +		unsigned long minsz;
+> > +
+> > +		minsz = offsetofend(struct vfio_region_info, offset);
+> > +
+> > +		if (copy_from_user(&info, (void __user *)arg, minsz))
+> > +			return -EFAULT;
+> > +
+> > +		if (info.argsz < minsz)
+> > +			return -EINVAL;
+> > +
+> > +		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
+> > +			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
+> > +
+> > +			/*
+> > +			 * ACC VF dev BAR2 region consists of both functional
+> > +			 * register space and migration control register space.
+> > +			 * Report only the functional region to Guest.
+> > +			 */
+> > +			info.size = pci_resource_len(pdev, info.index) / 2;
+> > +
+> > +			info.flags = VFIO_REGION_INFO_FLAG_READ |
+> > +					VFIO_REGION_INFO_FLAG_WRITE |
+> > +					VFIO_REGION_INFO_FLAG_MMAP;
+> > +
+> > +			return copy_to_user((void __user *)arg, &info, minsz) ?
+> > +					    -EFAULT : 0;
+> > +		}
+> > +	}
+> > +	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
+> > +}
+> > +
+> >  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+> >  {
+> >  	struct vfio_pci_core_device *vdev =
+> > @@ -32,10 +146,10 @@ static const struct vfio_device_ops
+> hisi_acc_vfio_pci_ops = {
+> >  	.name = "hisi-acc-vfio-pci",
+> >  	.open_device = hisi_acc_vfio_pci_open_device,
+> >  	.close_device = vfio_pci_core_close_device,
+> > -	.ioctl = vfio_pci_core_ioctl,
+> > -	.read = vfio_pci_core_read,
+> > -	.write = vfio_pci_core_write,
+> > -	.mmap = vfio_pci_core_mmap,
+> > +	.ioctl = hisi_acc_vfio_pci_ioctl,
+> > +	.read = hisi_acc_vfio_pci_read,
+> > +	.write = hisi_acc_vfio_pci_write,
+> > +	.mmap = hisi_acc_vfio_pci_mmap,
+> >  	.request = vfio_pci_core_request,
+> >  	.match = vfio_pci_core_match,
+> >  };
+
