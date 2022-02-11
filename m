@@ -2,114 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF79C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 16:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C86F4C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:00:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345503AbiBKQ7B (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 11:59:01 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55878 "EHLO
+        id S240642AbiBKRAj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 12:00:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245403AbiBKQ7B (ORCPT
+        with ESMTP id S231731AbiBKRAi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 11:59:01 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BAB31A1;
-        Fri, 11 Feb 2022 08:59:00 -0800 (PST)
-Date:   Fri, 11 Feb 2022 17:58:57 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644598738;
+        Fri, 11 Feb 2022 12:00:38 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01CEBD6;
+        Fri, 11 Feb 2022 09:00:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4B153618F8;
+        Fri, 11 Feb 2022 17:00:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EEBBC340E9;
+        Fri, 11 Feb 2022 17:00:36 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="h2SpPH1n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644598834;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UesU5GH5Yz6aViOyhXXlMKKRjVJ5Zol7Vf+S5MIZhdg=;
-        b=h7+6vVtC+rCubRqvyxsZqX+UV7J4+h6vefmYCFhmwZhsRqIgZLgJZjcUE9cB+k/VEQW4zF
-        1UWVk6F2jqjW0rrHfax6Pct76kGdDir+fKYVX258lK8LbKtW5TjazFUnEn3bFGf9BLDjaX
-        RYsQx4GJ01ORF+ymQXFrqCSbtWArWmwRoIgQ7urnosDuRMJuLMwTVFTP0GKsewkceONQjP
-        sy/0Cjd+ai1rgBJf6NCozK4nKEAbm2tx66JLDcimB9hugPWqHPYTfDlyDh+K72QGc2kGtb
-        lGbTVgkFS5eQVQJ/7r+j/iJPXG6MXFmSyR9eNfr9kbdFvX/Ji2/PLEIBSx6TSQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644598738;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UesU5GH5Yz6aViOyhXXlMKKRjVJ5Zol7Vf+S5MIZhdg=;
-        b=crlyBxVS6w6gAA/ibqmhLECZ6xtqocwr0dBCenRSA3wCqatkViBoToEqQtKrWZ1IxCYT5B
-        rrd6zzbLmyiIM3Cg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        bh=C9IVZkbdA8oN9E2Z4/YFEIlHEsl8hy8tO1E3qKdfEdg=;
+        b=h2SpPH1nJSREKLO/2BP72RdjuKuixvCIpBAWy51gR2BuxR6CI1bry9aEb6XH58bT+l3tyX
+        MHufFaSfI97iAlF6YAgnwzYI45L3sf0bvnNFJTOWOZKbDYOQdWCkDH2NhpVrhj07YLFvDj
+        Cj3FRWEgJo8Cj1noNRUQFj00dON6sKI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9ef0b82b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 11 Feb 2022 17:00:34 +0000 (UTC)
+Received: by mail-yb1-f170.google.com with SMTP id v47so26710690ybi.4;
+        Fri, 11 Feb 2022 09:00:33 -0800 (PST)
+X-Gm-Message-State: AOAM530bX53FjK0ui+Yv/oc7lDRjGFe5nRULLj4VbdmlcM6dc0czyEe2
+        PkExutpxmpq105iQeyoJfdOUON4gYkT7XEPLzdI=
+X-Google-Smtp-Source: ABdhPJzRmZbwROoTGWk4Ik9cqBCwTOHkOSdZChh4VdhcxipEcaWO0yDyMIzQIrCRijtuPo76xBfeBIvrjhSqZV1Z1ZQ=
+X-Received: by 2002:a25:ba49:: with SMTP id z9mr2268190ybj.32.1644598832549;
+ Fri, 11 Feb 2022 09:00:32 -0800 (PST)
+MIME-Version: 1.0
+References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de> <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de>
+In-Reply-To: <YgaV0UZO1KfmtLLh@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 11 Feb 2022 18:00:21 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
+Message-ID: <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-Message-ID: <YgaV0UZO1KfmtLLh@linutronix.de>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de>
- <20220211162515.554867-1-Jason@zx2c4.com>
- <YgaSYlVEBOxfJbSD@linutronix.de>
- <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-11 17:50:34 [+0100], Jason A. Donenfeld wrote:
-> Hi Sebastian,
-Hi Jason,
+Hi Sebastian,
 
-> > I *think* we could drop that "fast_pool !=
-> > this_cpu_ptr(&irq_randomness)" check at the top since that cmpxchg will
-> > save us and redo the loop. But if I remember correctly you worried about
-> > fast_pool->pool being modified (which is only a corner case if we are on
-> > the other CPU while the orig CPU is back again). Either way, it would be
-> > random and we would not consume more entropy.
-> 
-> No, we cannot, and "it's all random anyway so who cares if we corrupt
-> things!" is not rigorous, as entropy may actually be thrown away as
-> it's moved between words on each mix. If we're not running on the same
-> CPU, one CPU can corrupt the other's view of fast pool before updating
-> count. We must keep this.
+On Fri, Feb 11, 2022 at 5:59 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> > Okay, I'll do that then, and then in the process get rid of the
+> > cmpxchg loop since it's no longer required.
+>
+> So the only reason why we have that atomic_t is for rare case where run
+> on the remote CPU and need to remove the upper bit in the counter?
 
-Okay, I assumed something like that.
+Yes. That's the only remaining reason. Annoying, but whatareyagonnado?
 
-> > So if we have to keep this then please swap that migrate_disable() with
-> > local_irq_disable(). Otherwise PeterZ will yell at me.
-> 
-> Okay, I'll do that then, and then in the process get rid of the
-> cmpxchg loop since it's no longer required.
-
-So the only reason why we have that atomic_t is for rare case where run
-on the remote CPU and need to remove the upper bit in the counter?
-
-> > >       if (unlikely(crng_init == 0)) {
-> > > -             if (fast_pool->count >= 64 &&
-> > > +             if (new_count >= 64 &&
-> > >                   crng_fast_load(fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
-> > > -                     fast_pool->count = 0;
-> > > +                     atomic_set(&fast_pool->count, 0);
-> > >                       fast_pool->last = now;
-> >
-> > I'm fine if we keep this as is for now.
-> > What do we do here vs RT? I suggested this
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/commit/?id=a2d2d54409481aa23a3e11ab9559a843e36a79ec
-> >
-> > Is this doable?
-> 
-> It might be, but last time I checked it seemed problematic. As I
-> mentioned in an earlier thread, I'll take a look again at that next
-> week after this patch here settles. Haven't forgotten.
-
-Ah, cheers.
-
-> v+1 coming up with irqs disabled.
-> 
-> Jason
-
-Sebastian
+Jason
