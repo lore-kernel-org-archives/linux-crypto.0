@@ -2,158 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF92DC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 16:44:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8FDC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 16:50:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349565AbiBKQoX (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 11:44:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45344 "EHLO
+        id S230029AbiBKQu4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 11:50:56 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234654AbiBKQoW (ORCPT
+        with ESMTP id S229479AbiBKQu4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 11:44:22 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977C3102;
-        Fri, 11 Feb 2022 08:44:21 -0800 (PST)
-Date:   Fri, 11 Feb 2022 17:44:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644597860;
+        Fri, 11 Feb 2022 11:50:56 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A688D;
+        Fri, 11 Feb 2022 08:50:54 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EECEFB82ADF;
+        Fri, 11 Feb 2022 16:50:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 368EEC340EF;
+        Fri, 11 Feb 2022 16:50:51 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KJ2fvHFm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644598247;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0A1YAzfFVguyJP3Z4agEv2LMfFbEvYq8NP31pPvmRuM=;
-        b=Y205eAYN6GtUImSDfmTa9eAMD3AjxSfoik2fzsehBPIyb5lUHYPcy+9Xo1CyrUZi5gjrnf
-        K4mMBahzDzyztjLKz2gcGNKvOZPNg6nk/3mTHeyv1Y2Z3QoWH4WYAfyETK5GfRaMtjCbnX
-        QyTsy/Vb+7fO2lu4+IXUx52MW+g/TnEudqfzUykR/iM208tGX8SCjgZp3mxMw8iDhkOnwU
-        JYan1ocAZCnbnwy+yXuJDLG+v4aGv9oMkD9d/qS/n5MCJvRRxyuqZv6XHXoxt5b/oNiSlW
-        DuYIw2T3uF4YPNSx4TqRYtRaWGtJ/Oz7Mrl9dT4T7ENoiwHADq09r1WiIDYdCw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644597860;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0A1YAzfFVguyJP3Z4agEv2LMfFbEvYq8NP31pPvmRuM=;
-        b=/GiC4jLw0zWz3Pg2Jd+PX0zj+hJXLwZhxY0zFwZX5VtkbzBHLnwWdHLX/vKEo/QYpjAGLh
-        fbB5mqNQtIzTtUDw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bh=VRUkqAEiizSu43BjAMCLBt08gHzXkwUfIwopzZR9DWk=;
+        b=KJ2fvHFmvAueMObxSInqANaPBgh+1o082OX5TfXNcenXTveHp2z2lac/0duvRACKAF0tgn
+        F7VoDdr7EBSEw4nRNjaHZesIrN5eWqNton7cjILhvJrpNJXR5+nm89sb2Ul7Z8pNdzZppj
+        RtzVLxKVn4xT2gmlywVyAE+cO3W1yGU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c9db0223 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 11 Feb 2022 16:50:47 +0000 (UTC)
+Received: by mail-yb1-f178.google.com with SMTP id c6so26682348ybk.3;
+        Fri, 11 Feb 2022 08:50:46 -0800 (PST)
+X-Gm-Message-State: AOAM532BH+10LdoBS/4s0Fml7IP+IsAvrrxATJet6MJJL+/a9E2HohAo
+        EVKSQb7cMeI+Gp6mfoJKUfQ7Do3NMcj9sL67F9A=
+X-Google-Smtp-Source: ABdhPJwsxBoz8X10lIX0T70GJP92VKKL38BL7O56lyySq+NtpTS6jqgAhPDxLDLt0kjs5/lJNM3Cut/X0Lboor0uMpM=
+X-Received: by 2002:a25:c006:: with SMTP id c6mr2119755ybf.457.1644598245946;
+ Fri, 11 Feb 2022 08:50:45 -0800 (PST)
+MIME-Version: 1.0
+References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de>
+In-Reply-To: <YgaSYlVEBOxfJbSD@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 11 Feb 2022 17:50:34 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+Message-ID: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-Message-ID: <YgaSYlVEBOxfJbSD@linutronix.de>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de>
- <20220211162515.554867-1-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220211162515.554867-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-11 17:25:15 [+0100], Jason A. Donenfeld wrote:
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index c42c07a7eb56..20b11a4b6559 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -1214,12 +1215,59 @@ static u32 get_reg(struct fast_pool *f, struct pt=
-_regs *regs)
->  	return *ptr;
->  }
-> =20
-> +static void mix_interrupt_randomness(struct work_struct *work)
-> +{
-> +	struct fast_pool *fast_pool =3D container_of(work, struct fast_pool, mi=
-x);
-> +	unsigned long pool[ARRAY_SIZE(fast_pool->pool)];
-> +	int count;
-> +
-> +	/* Check to see if we're running on the wrong CPU due to hotplug. */
-> +	migrate_disable();
-> +	if (fast_pool !=3D this_cpu_ptr(&irq_randomness)) {
-> +		migrate_enable();
-> +		/*
-> +		 * If we are unlucky enough to have been moved to another CPU,
+Hi Sebastian,
 
-+ "during CPU hotplug while the CPU was shutdown". It should not look
-like the worker can be migrated on system without CPU-hotplug involved.
+On Fri, Feb 11, 2022 at 5:44 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> > +
+> > +     /* Check to see if we're running on the wrong CPU due to hotplug. */
+> > +     migrate_disable();
+> > +     if (fast_pool != this_cpu_ptr(&irq_randomness)) {
+> > +             migrate_enable();
+> > +             /*
+> > +              * If we are unlucky enough to have been moved to another CPU,
+>
+> + "during CPU hotplug while the CPU was shutdown". It should not look
+> like the worker can be migrated on system without CPU-hotplug involved.
 
-> +		 * then we set our count to zero atomically so that when the
-> +		 * CPU comes back online, it can enqueue work again. The
-> +		 * _release here pairs with the atomic_inc_return_acquire in
-> +		 * add_interrupt_randomness().
-> +		 */
-> +		atomic_set_release(&fast_pool->count, 0);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * Copy the pool to the stack so that the mixer always has a
-> +	 * consistent view. It's extremely unlikely but possible that
-> +	 * this 2 or 4 word read is interrupted by an irq, but in case
-> +	 * it is, we double check that count stays the same.
-> +	 *
-> +	 * We set the count to 0 so that irqs can immediately begin to
-> +	 * accumulate again after. Since any possible interruptions
-> +	 * at this stage are guaranteed to be on the same CPU, we can
-> +	 * use cmpxchg_relaxed.
-> +	 */
-> +	count =3D atomic_read(&fast_pool->count);
-> +	do {
-> +		memcpy(pool, fast_pool->pool, sizeof(pool));
-> +	} while (atomic_try_cmpxchg_relaxed(&fast_pool->count, &count, 0));
+Will adjust comment.
 
-I *think* we could drop that "fast_pool !=3D
-this_cpu_ptr(&irq_randomness)" check at the top since that cmpxchg will
-save us and redo the loop. But if I remember correctly you worried about
-fast_pool->pool being modified (which is only a corner case if we are on
-the other CPU while the orig CPU is back again). Either way, it would be
-random and we would not consume more entropy.
+> I *think* we could drop that "fast_pool !=
+> this_cpu_ptr(&irq_randomness)" check at the top since that cmpxchg will
+> save us and redo the loop. But if I remember correctly you worried about
+> fast_pool->pool being modified (which is only a corner case if we are on
+> the other CPU while the orig CPU is back again). Either way, it would be
+> random and we would not consume more entropy.
 
-So if we have to keep this then please swap that migrate_disable() with
-local_irq_disable(). Otherwise PeterZ will yell at me.
+No, we cannot, and "it's all random anyway so who cares if we corrupt
+things!" is not rigorous, as entropy may actually be thrown away as
+it's moved between words on each mix. If we're not running on the same
+CPU, one CPU can corrupt the other's view of fast pool before updating
+count. We must keep this.
 
-> +	fast_pool->last =3D jiffies;
-> +	migrate_enable();
-> +
-> +	mix_pool_bytes(pool, sizeof(pool));
-> +	credit_entropy_bits(1);
-> +	memzero_explicit(pool, sizeof(pool));
-> +}
-> +
-=E2=80=A6
-> @@ -1235,12 +1283,13 @@ void add_interrupt_randomness(int irq)
->  	}
-> =20
->  	fast_mix((u32 *)fast_pool->pool);
-> -	++fast_pool->count;
-> +	/* The _acquire here pairs with the atomic_set_release in mix_interrupt=
-_randomness(). */
-> +	new_count =3D (unsigned int)atomic_inc_return_acquire(&fast_pool->count=
-);
-> =20
->  	if (unlikely(crng_init =3D=3D 0)) {
-> -		if (fast_pool->count >=3D 64 &&
-> +		if (new_count >=3D 64 &&
->  		    crng_fast_load(fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
-> -			fast_pool->count =3D 0;
-> +			atomic_set(&fast_pool->count, 0);
->  			fast_pool->last =3D now;
+> So if we have to keep this then please swap that migrate_disable() with
+> local_irq_disable(). Otherwise PeterZ will yell at me.
 
-I'm fine if we keep this as is for now.
-What do we do here vs RT? I suggested this
-  https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/com=
-mit/?id=3Da2d2d54409481aa23a3e11ab9559a843e36a79ec
+Okay, I'll do that then, and then in the process get rid of the
+cmpxchg loop since it's no longer required.
 
-Is this doable?
+> >       if (unlikely(crng_init == 0)) {
+> > -             if (fast_pool->count >= 64 &&
+> > +             if (new_count >= 64 &&
+> >                   crng_fast_load(fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
+> > -                     fast_pool->count = 0;
+> > +                     atomic_set(&fast_pool->count, 0);
+> >                       fast_pool->last = now;
+>
+> I'm fine if we keep this as is for now.
+> What do we do here vs RT? I suggested this
+>   https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/commit/?id=a2d2d54409481aa23a3e11ab9559a843e36a79ec
+>
+> Is this doable?
 
-Sebastian
+It might be, but last time I checked it seemed problematic. As I
+mentioned in an earlier thread, I'll take a look again at that next
+week after this patch here settles. Haven't forgotten.
+
+v+1 coming up with irqs disabled.
+
+Jason
