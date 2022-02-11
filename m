@@ -2,182 +2,168 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA06C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 08:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7ECC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 08:25:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244536AbiBKIVi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 03:21:38 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53494 "EHLO
+        id S230075AbiBKIZu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 03:25:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348038AbiBKIVg (ORCPT
+        with ESMTP id S229631AbiBKIZt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 03:21:36 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE26E67;
-        Fri, 11 Feb 2022 00:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1644567695; x=1676103695;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Vc01hpWMLj0MX7Suyo/gaNp3ZTgeddpPoZAPTjJV1OQ=;
-  b=kIqT3gGAPfJFOAeO3gZHcha8PtevYZ7JYXcqP4B7bB7ucb+WQHFFljAH
-   GYrlRVHVPrIgcNmrTOJREtkdQ+QQHkZauZJos17Kogz2r3cU+KwSD3w7F
-   OqpuVi0pH0dBvbJBG2vpGZeyO2+NGrwJafn4Cm/4gcGZYlFTDzMzxSsAN
-   +Z4ukNp+iP1Va6ALZfx7xUrxPMTk1y4WMEc88yiRr6VXDZW7nFaixFrEK
-   M8f87rlWQ1mPmgYhfQ3GLY4aIlceWbnlBUxiIfQd77CrqpJc/MlasFCy8
-   W5X91H6kh+amrO4grsYgv9DKrqBJQcIfSeE5BL76eiDaSsGlD7LuL8rNS
-   A==;
-IronPort-SDR: AoD7tbC++ffsEs145iwyzrlg7UQKfwt8ILlU73zaagyrnbfog0jfxkyJEVH04wszS5l60I6Z1V
- x+DfEzgN+JXC7Ioy/SfqYaLyVONM6YeiTP6EVcd7aPiR8Fv2rqV48y/w1g4s1YqCgPBRGe8Mv+
- oTPXZVKWQWwilnoGq9Zj2HpAmQkJrgCPDqxY3JvLVbmZf/qe8olJeKDsRgNIlNTKdHoqPEhqB3
- nU8khnli+k/JCD9TveS6AIjC+gqb5qPb56hxJlWUwKWmvREPizNKMr6ar2XMV4OXXlnWHFgEqo
- jL0cfjNkK5aBdzw3IZYC3VHz
-X-IronPort-AV: E=Sophos;i="5.88,360,1635231600"; 
-   d="scan'208";a="153253186"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 11 Feb 2022 01:21:34 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Fri, 11 Feb 2022 01:21:30 -0700
-Received: from ROB-ULT-M18064N.mchp-main.com (10.10.115.15) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Fri, 11 Feb 2022 01:21:26 -0700
-From:   Tudor Ambarus <tudor.ambarus@microchip.com>
-To:     <herbert@gondor.apana.org.au>, <krzysztof.kozlowski@canonical.com>,
-        <robh+dt@kernel.org>
-CC:     <nicolas.ferre@microchip.com>, <claudiu.beznea@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kavyasree.kotagiri@microchip.com>,
-        <devicetree@vger.kernel.org>,
-        "Tudor Ambarus" <tudor.ambarus@microchip.com>
-Subject: [PACTH v3 3/3] dt-bindings: crypto: Convert Atmel SHA to yaml
-Date:   Fri, 11 Feb 2022 10:21:14 +0200
-Message-ID: <20220211082114.452911-4-tudor.ambarus@microchip.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220211082114.452911-1-tudor.ambarus@microchip.com>
-References: <20220211082114.452911-1-tudor.ambarus@microchip.com>
+        Fri, 11 Feb 2022 03:25:49 -0500
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7224E48;
+        Fri, 11 Feb 2022 00:25:48 -0800 (PST)
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id D58F920141A;
+        Fri, 11 Feb 2022 08:25:45 +0000 (UTC)
+Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
+        id DBBE38052E; Fri, 11 Feb 2022 09:25:00 +0100 (CET)
+Date:   Fri, 11 Feb 2022 09:25:00 +0100
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?iso-8859-1?Q?Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
+Message-ID: <YgYdXLg4bo6E7Bit@owl.dominikbrodowski.net>
+References: <20220209125644.533876-1-Jason@zx2c4.com>
+ <20220209125644.533876-3-Jason@zx2c4.com>
+ <YgVTpI/sYLecyWa3@linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+In-Reply-To: <YgVTpI/sYLecyWa3@linutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert Atmel SHA documentation to yaml format. With the conversion the
-clock and clock-names properties are made mandatory. The driver returns
--EINVAL if "sha_clk" is not found, reflect that in the bindings and make
-the clock and clock-names properties mandatory. Update the example to
-better describe how one should define the dt node.
+Am Thu, Feb 10, 2022 at 07:04:20PM +0100 schrieb Sebastian Andrzej Siewior:
+> > @@ -999,9 +1016,10 @@ void add_interrupt_randomness(int irq)
+> >  
+> >  	fast_mix(fast_pool);
+> >  	add_interrupt_bench(cycles);
+> > +	new_count = ++fast_pool->count;
+> >  
+> >  	if (unlikely(crng_init == 0)) {
+> > -		if ((fast_pool->count >= 64) &&
+> > +		if (new_count >= 64 &&
+> >  		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
+> 
+> crng_fast_load() does spin_trylock_irqsave() in hardirq context. It does
+> not produce any warning on RT but is still wrong IMHO:
+> - lockdep will see a random task and I remember in the past it produced
+>   strange lock chains based on this.
+> 
+> - Should another task attempt to acquire this lock then it will PI-boost the
+>   wrong task.
+> 
+> If we just could move this, too.
+> 
+> I don't know how timing critical this is but the first backtrace from
+> crng_fast_load() came (to my surprise) from hwrng_fillfn() (a kthread)
+> and added 64bytes in one go.
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
----
- .../crypto/atmel,at91sam9g46-sha.yaml         | 60 +++++++++++++++++++
- .../bindings/crypto/atmel-crypto.txt          | 25 --------
- 2 files changed, 60 insertions(+), 25 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
- delete mode 100644 Documentation/devicetree/bindings/crypto/atmel-crypto.txt
+That's a hw rng (such as a tpm chip or the virtio-rng driver) providing some
+entropy; if it's 64 bytes of input, crng_init progresses to 1, and
+crng_fast_load() should never be called again.[*] I'm a bit suprised that the
+hw_rng input occurred so early (it's only at device_initcall() level), and
+earlier than 64 interrupts. But that may differ from system to system.
 
-diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
-new file mode 100644
-index 000000000000..5163c51b4547
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-sha.yaml
-@@ -0,0 +1,60 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+# Copyright (C) 2022 Microchip Technology, Inc. and its subsidiaries
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/atmel,at91sam9g46-sha.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Atmel Secure Hash Algorithm (SHA) HW cryptographic accelerator
-+
-+maintainers:
-+  - Tudor Ambarus <tudor.ambarus@microchip.com>
-+
-+properties:
-+  compatible:
-+    const: atmel,at91sam9g46-sha
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  clock-names:
-+    const: sha_clk
-+
-+  dmas:
-+    maxItems: 1
-+    description: TX DMA Channel
-+
-+  dma-names:
-+    const: tx
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/at91.h>
-+    #include <dt-bindings/dma/at91.h>
-+
-+    sha: crypto@e1814000 {
-+      compatible = "atmel,at91sam9g46-sha";
-+      reg = <0xe1814000 0x100>;
-+      interrupts = <GIC_SPI 83 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&pmc PMC_TYPE_PERIPHERAL 83>;
-+      clock-names = "sha_clk";
-+      dmas = <&dma0 AT91_XDMAC_DT_PERID(48)>;
-+      dma-names = "tx";
-+    };
-diff --git a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-deleted file mode 100644
-index 5c6541cfcc4a..000000000000
---- a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-+++ /dev/null
-@@ -1,25 +0,0 @@
--* Atmel HW cryptographic accelerators
--
--These are the HW cryptographic accelerators found on some Atmel products.
--
--* Secure Hash Algorithm (SHA)
--
--Required properties:
--- compatible : Should be "atmel,at91sam9g46-sha".
--- reg: Should contain SHA registers location and length.
--- interrupts: Should contain the IRQ line for the SHA.
--
--Optional properties:
--- dmas: One DMA specifiers as described in
--        atmel-dma.txt and dma.txt files.
--- dma-names: Contains one identifier string for each DMA specifier
--             in the dmas property. Only one "tx" string needed.
--
--Example:
--sha@f8034000 {
--	compatible = "atmel,at91sam9g46-sha";
--	reg = <0xf8034000 0x100>;
--	interrupts = <42 4 0>;
--	dmas = <&dma1 2 17>;
--	dma-names = "tx";
--};
--- 
-2.25.1
+Note that crng_fast_load() will also never be called from
+add_interrupt_randomness() if
 
+	EFI, DT or kexec provides bootloader entropy of at least 64 bytes,
+	and CONFIG_RANDOM_TRUST_BOOTLOADER is set
+
+and/or	CONFIG_RANDOM_TRUST_CPU is set and the RDRAND/RDSEED instructions do
+	not fail.
+
+If neither of these three conditions (hw_rng is run early, bootloader or CPU
+randomness) are met, the initial and early seeding of the base_crng depends
+on add_interrupt_randomness(), and should happen rather quickly.
+
+> I did move that crng_fast_load() into the worker and did made some
+> numbers:
+>            <idle>-0       [000] d..h1..     2.069924: add_interrupt_randomness: Tick
+> 
+> first interrupt
+> …
+>         swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h.11     2.341938: add_interrupt_randomness: work
+> 
+> the 64th interrupt, scheduling the worker.
+> 
+>         swapper/0-1       [000] d..h.11     2.345937: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h111     2.349938: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h.11     2.353939: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h.11     2.357940: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h111     2.361939: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h111     2.365939: add_interrupt_randomness: Tick
+>         swapper/0-1       [000] d..h.11     2.369941: add_interrupt_randomness: Tick
+>      kworker/0:0H-6       [000] .......     2.384714: mix_interrupt_randomness: load
+>      kworker/0:0H-6       [000] .......     2.384715: crng_fast_load: 16
+>            <idle>-0       [001] dn.h1..     3.205766: add_interrupt_randomness: Tick
+>            <idle>-0       [019] dn.h1..     6.771047: add_interrupt_randomness: Tick
+> 
+> 7 interrupts got lost before the worker could run & load first 16 bytes.
+> The workqueue core gets initialized at that point and spawns first
+> worker.
+
+So the reason for the longer delay here is that the workqueue core had not
+been initialized beforehand?
+
+> After that the interrupts took a break.
+> And then the work-to-load delay was quite low:
+> 
+>            <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomness: Tick
+>            <idle>-0       [019] dn.h1..     7.586234: add_interrupt_randomness: work
+>     kworker/19:0H-175     [019] .......     7.586504: mix_interrupt_randomness: load
+>     kworker/19:0H-175     [019] .......     7.586507: crng_fast_load: 16
+>            <idle>-0       [020] dn.h1..     7.614649: add_interrupt_randomness: Tick
+>            <idle>-0       [020] dn.h1..     7.614651: add_interrupt_randomness: work
+>            <idle>-0       [020] dn.h1..     7.614736: add_interrupt_randomness: Tick
+>     kworker/20:0H-183     [020] dn.h...     7.614859: add_interrupt_randomness: Tick
+>     kworker/20:0H-183     [020] .......     7.614871: mix_interrupt_randomness: load
+>     kworker/20:0H-183     [020] .......     7.614872: crng_fast_load: 16
+>            <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomness: Tick
+>            <idle>-0       [018] dn.h1..     8.352423: add_interrupt_randomness: work
+>     kworker/18:0H-167     [018] dn.h1..     8.352438: add_interrupt_randomness: Tick
+>     kworker/18:0H-167     [018] dn.h1..     8.352448: add_interrupt_randomness: Tick
+>     kworker/18:0H-167     [018] dn.h1..     8.352459: add_interrupt_randomness: Tick
+>     kworker/18:0H-167     [018] dn.h1..     8.352491: add_interrupt_randomness: Tick
+>     kworker/18:0H-167     [018] .......     8.352505: mix_interrupt_randomness: load
+>     kworker/18:0H-167     [018] .......     8.352506: crng_fast_load: 16
+> 
+> In total we lost 13 ticks.
+
+Was this still way before the initramfs was up and running?
+
+> I did the same test on PREEMPT_VOLUNTARY and lost 2 ticks only.
+
+Thanks,
+	Dominik
+
+[*] Actually, there's some contradiciton going on: If we do not trust the
+hw_rng device (that is, its quality setting is 0), crng_fast_load() will be
+called nonetheless, and the hw_rng-provided input will be used to increment
+crng_init to 1. If !CONFIG_RANDOM_TRUST_BOOTLOADER, only crng_slow_load() is
+called, and crng_init will remain at 0. Similar for
+!CONFIG_RANDOM_TRUST_CPU.
