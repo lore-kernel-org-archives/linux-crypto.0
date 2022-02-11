@@ -2,116 +2,153 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0784EC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 06:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB43C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 07:09:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242476AbiBKG1Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 01:27:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33112 "EHLO
+        id S237727AbiBKHJY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 02:09:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237282AbiBKG1X (ORCPT
+        with ESMTP id S233247AbiBKHJX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 01:27:23 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06A3FC5
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 22:27:22 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id k60-20020a17090a4cc200b001b932781f3eso3536666pjh.0
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Feb 2022 22:27:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=axtens.net; s=google;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=JhnvwkrC36+ZtBCSmsX8E71vUbd01PT5UHf/8Lx3bYI=;
-        b=PhKG9VFn/JmTyURd15Sm5JvSvvHeDltFHCnOaYECW9yQEcKi7QXtGCXEjjcrWiaM+V
-         St3/XiNEFe8yGswKO4+6+jemFpF28TMNolHqtVhi/zNuu1HMKrZUkbpdXnRIkd9LotAY
-         OGj5EppaCiBgFVN+OJdqIxuwLEsVNYY4dsgu0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=JhnvwkrC36+ZtBCSmsX8E71vUbd01PT5UHf/8Lx3bYI=;
-        b=ECSDLqnYSGV2S8o+76A/NXQT0Soqynu6TT+Awy3xdzQAzu8nLGUoQfJjiWttk49Y8j
-         j5FdokSgL91NGaK0e7BMZazVZ75mW7mCRdPnEhRVNA1TtJh/s8eNzCTXsVHX6i87ops9
-         u2mGnaMcwaGJMcIOFqZLSGsuBWkrv8NqxVS4k8MN0t5esYb2Z4s+lOgfYEBeBpTFv7gw
-         WsAtkQyFE3YQI0Il6vUvp669C3wvNmBWH+zj+04QQ7nnWXIi9fptvWRymuzalifvR3/Q
-         ZTBjfMAgZS8Zc0Jk90/z3AwIBNvy/hqqzdYS8eqUKAlPfAFQ750yICc2xUSBKzoYMgfo
-         jdvw==
-X-Gm-Message-State: AOAM5339HfFYsDWfQT2F3VO4nL7fm3QF4mkQDYfGRaId7rBlvt8VpPpt
-        GWBQOwagEikfMi7wvVfN/N5LqA==
-X-Google-Smtp-Source: ABdhPJz5ANcTe3+INLtHZyy5LDDfipqUtY9os4gw6Lm8N3C26gsFfqTBRgoChXV9aGU8ErX1TizrTQ==
-X-Received: by 2002:a17:90b:380f:: with SMTP id mq15mr300828pjb.84.1644560842505;
-        Thu, 10 Feb 2022 22:27:22 -0800 (PST)
-Received: from localhost ([2001:4479:e300:600:d3de:3045:38b4:5296])
-        by smtp.gmail.com with ESMTPSA id u33sm25826267pfg.195.2022.02.10.22.27.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 22:27:22 -0800 (PST)
-From:   Daniel Axtens <dja@axtens.net>
-To:     Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] crypto/nx: Constify static attribute_group structs
-In-Reply-To: <20220210202805.7750-4-rikard.falkeborn@gmail.com>
-References: <20220210202805.7750-1-rikard.falkeborn@gmail.com>
- <20220210202805.7750-4-rikard.falkeborn@gmail.com>
-Date:   Fri, 11 Feb 2022 17:27:19 +1100
-Message-ID: <87tud5rk8o.fsf@dja-thinkpad.axtens.net>
+        Fri, 11 Feb 2022 02:09:23 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB0B1095;
+        Thu, 10 Feb 2022 23:09:22 -0800 (PST)
+Date:   Fri, 11 Feb 2022 08:09:18 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644563359;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xlM7+juu/GPPkJUBXHqWhJvR/J9vUiLmk2//gpgjumg=;
+        b=NSoxX5tBnaniA9VTW+4GqLfOd3Qm6w1/OSJQgVMaaSXrHzQSh7Act3O8eiIjlUFDUKWw0s
+        gssCKO4wfsALbNePhGN0SD4fg6JBLY/wETNzRKd3Ia8VX/hzVPqO2cACjU06kWFl3f0eM3
+        YmJnVHg48ng6BumHeJUrQdQzoBCtLQp5of8GOHtdMmbq19rXoZQp+fd9fRk1r64LUQPw1r
+        qvkOUJKMUwISTWsdvMxd3tdImmbWnLa4T8yrSqZFdOtMCJwSjYNXDt9cBPfRWE1kTkPixs
+        8gYJIJYy7ocXdoDHsu9Wad9aHlxm+G927YZGAKC6KuutlBocdvgFVA08uEq22w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644563359;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xlM7+juu/GPPkJUBXHqWhJvR/J9vUiLmk2//gpgjumg=;
+        b=ktp/FWSay7sm+Cfw4oHTRNST6Bmt22D8wC5MQwAdpn4e8DjKzSosGdjluYz2ghEGKuAEYP
+        fQMUcY3Zv3AAIHAA==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
+Message-ID: <YgYLnspXs5bwfOiD@linutronix.de>
+References: <20220209125644.533876-1-Jason@zx2c4.com>
+ <20220209125644.533876-3-Jason@zx2c4.com>
+ <YgVTpI/sYLecyWa3@linutronix.de>
+ <CAHmME9pGwyZKu=9yCben-V30hR+zEjb9iZGWr5_RAE-uXt_Ofw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHmME9pGwyZKu=9yCben-V30hR+zEjb9iZGWr5_RAE-uXt_Ofw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rikard,
+On 2022-02-11 01:42:56 [+0100], Jason A. Donenfeld wrote:
+> Hi Sebastian,
+Hi Jason,
 
-> The only usage of these is to pass their address to
-> sysfs_{create,remove}_group(), which takes pointers to const struct
-> attribute_group. Make them const to allow the compiler to put them in
-> read-only memory.
+> Thanks for pointing this out. I'll actually fix this using atomics,
+> and fix another minor issue at the same time the same way, and move to
+> making sure the worker is running on the right CPU like we originally
+> discussed. I'm going to send that as an additional patch so that we
+> can narrow in on the issue there. It's a little bit involved but not
+> too bad. I'll have that for you shortly.
 
-I checked the file. Indeed, those structs are only used in
-sysfs_{create,remove}_group. So I agree that they can be constified.
+oki.
 
-They also pass all the automated tests:
-https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20220210202805.7750-4-rikard.falkeborn@gmail.com/
+> > crng_fast_load() does spin_trylock_irqsave() in hardirq context. It does
+> > not produce any warning on RT but is still wrong IMHO:
+> > If we just could move this, too.
+> > I don't know how timing critical this is but the first backtrace from
+> > crng_fast_load() came (to my surprise) from hwrng_fillfn() (a kthread)
+> > and added 64bytes in one go.
+> 
+> I'll look into seeing if I can do it. On my first pass a few days ago,
+> it seemed a bit too tricky, but I'll revisit after this part here
+> settles. Thanks for your benchmarks, by the way. That's useful.
 
-Reviewed-by: Daniel Axtens <dja@axtens.net>
+If you want me to do it again or another machines, just let me know.
+That was from a bigger x86 machine. I added that series and the patch at
+the bottom to my RT queue.
 
-Kind regards,
-Daniel
+-------->8--------
 
->
-> Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
-> ---
->  drivers/crypto/nx/nx-common-pseries.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-> index 4e304f6081e4..7584a34ba88c 100644
-> --- a/drivers/crypto/nx/nx-common-pseries.c
-> +++ b/drivers/crypto/nx/nx-common-pseries.c
-> @@ -962,7 +962,7 @@ static struct attribute *nx842_sysfs_entries[] = {
->  	NULL,
->  };
->  
-> -static struct attribute_group nx842_attribute_group = {
-> +static const struct attribute_group nx842_attribute_group = {
->  	.name = NULL,		/* put in device directory */
->  	.attrs = nx842_sysfs_entries,
->  };
-> @@ -992,7 +992,7 @@ static struct attribute *nxcop_caps_sysfs_entries[] = {
->  	NULL,
->  };
->  
-> -static struct attribute_group nxcop_caps_attr_group = {
-> +static const struct attribute_group nxcop_caps_attr_group = {
->  	.name	=	"nx_gzip_caps",
->  	.attrs	=	nxcop_caps_sysfs_entries,
->  };
-> -- 
-> 2.35.1
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date: Thu, 10 Feb 2022 18:22:05 +0100
+Subject: [PATCH] random: Move crng_fast_load() to the worker.
+
+crng_fast_load() is invoked from hard IRQ context and acquires a
+spinlock_t via a trylock. If the lock is locked in hard IRQ context then
+the following locking attempt (on another CPU) will PI-boost the wrong
+task.
+
+Move the crng_fast_load() invocation into the worker.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ drivers/char/random.c |   27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
+
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1047,6 +1047,17 @@ static void mix_interrupt_randomness(str
+ 	struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
+ 	u8 pool[sizeof(fast_pool->pool)];
+ 
++	if (unlikely(crng_init == 0)) {
++		size_t ret;
++
++		ret = crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool));
++		if (ret) {
++			WRITE_ONCE(fast_pool->count, 0);
++			fast_pool->last = jiffies;
++			return;
++		}
++	}
++
+ 	/*
+ 	 * Since this is the result of a trip through the scheduler, xor in
+ 	 * a cycle counter. It can't hurt, and might help.
+@@ -1089,11 +1100,17 @@ void add_interrupt_randomness(int irq)
+ 	new_count = ++fast_pool->count;
+ 
+ 	if (unlikely(crng_init == 0)) {
+-		if (new_count >= 64 &&
+-		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
+-			fast_pool->count = 0;
+-			fast_pool->last = now;
+-		}
++		if (new_count & FAST_POOL_MIX_INFLIGHT)
++			return;
++
++		if (new_count < 64)
++			return;
++
++		fast_pool->count |= FAST_POOL_MIX_INFLIGHT;
++		if (unlikely(!fast_pool->mix.func))
++			INIT_WORK(&fast_pool->mix, mix_interrupt_randomness);
++		queue_work_on(raw_smp_processor_id(), system_highpri_wq,
++			      &fast_pool->mix);
+ 		return;
+ 	}
+ 
+
+> Jason
+
+Sebastian
