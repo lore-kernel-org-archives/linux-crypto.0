@@ -2,116 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AA4C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Feb 2022 23:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EFC9C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 00:43:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244914AbiBJXae (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Feb 2022 18:30:34 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42398 "EHLO
+        id S1346490AbiBKAnP (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Feb 2022 19:43:15 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345643AbiBJXad (ORCPT
+        with ESMTP id S244965AbiBKAnO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Feb 2022 18:30:33 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 399925F4E;
-        Thu, 10 Feb 2022 15:30:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VDWZ1wyLkqnqT/23Ht0M/a/jxjSGdpdjwIwIjoTRRRI=; b=2qwKcjjD3mCCh/1mVgk1hdA+xC
-        o2mTeS3P/3a/J49I96p9n7gshQPUYwIog5WvpAFPL31pFS8p2fRNxgmU8mEX5RoaNTgPuZnXMDfLZ
-        JWZ1ZbigBEZevMhTDtYwDT28JH8nWX3HftkxCd5K7OmQ/7bRzk06Mhs+kn2Xh5QGjm6JwLn8Ik+Nn
-        z4536VqIxXodC18gOtdY4kjUl8LClWDdhQxHTG+8VLLoqNd7ENE89lRlK/bMSBVTPJwoy+TnOd1Iq
-        71uF/rfluUzxshhkFlCJzD8kq9rzIK5fF7MRS32xDLlMRMmy474AtN1n1zA+pqAb6gpeyqrHVfGv2
-        iKoIQMYg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nIItQ-005Awh-D2; Thu, 10 Feb 2022 23:30:28 +0000
-Date:   Thu, 10 Feb 2022 15:30:28 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Michal Suchanek <msuchanek@suse.de>,
-        David Howells <dhowells@redhat.com>,
-        Aaron Tomlin <atomlin@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        kexec@lists.infradead.org, Philipp Rudo <prudo@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v5 0/6] KEXEC_SIG with appended signature
-Message-ID: <YgWgFMRdpLvBiht7@bombadil.infradead.org>
-References: <cover.1641900831.git.msuchanek@suse.de>
- <YfBd/EDGUx9UIHcb@bombadil.infradead.org>
- <87pmnwlkaa.fsf@mpe.ellerman.id.au>
+        Thu, 10 Feb 2022 19:43:14 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A3CE6C;
+        Thu, 10 Feb 2022 16:43:15 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B4B29B826B4;
+        Fri, 11 Feb 2022 00:43:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0550FC340EE;
+        Fri, 11 Feb 2022 00:43:11 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hNeMakxO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644540189;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x0vKcGurM+seOaod8eYMcPboMMWynI7lYU57RwZ9U9w=;
+        b=hNeMakxO3qh+47cF2Lt1mr8EFmSRDNSzovhavybEyrc2JnC4Ot1MbLjakT3U80Lqzg+siX
+        smsBhRhrqBemk8QIIA4DI3qoC/qXYbsIIH3BtQOzaapg2WVXiAuVKB9gA6m+P7GqZx/mlf
+        FnUruW7OH71CxCfklgQYKLG4XH0uNuo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 60a78fe7 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 11 Feb 2022 00:43:08 +0000 (UTC)
+Received: by mail-yb1-f175.google.com with SMTP id c6so20424965ybk.3;
+        Thu, 10 Feb 2022 16:43:08 -0800 (PST)
+X-Gm-Message-State: AOAM533q6bFD1PK5M8COLCaWrN/mm/2HR67LEPSftHCjoqvDTh/tiqNK
+        bbdl/flaZa8HvFRo15IOF+Sh4VFZ1sBdwgiI4Dc=
+X-Google-Smtp-Source: ABdhPJy+q+S9ihMnQbr0OcXt7j1ox96Pf685juOhgcRrRAcDLlxCLjLCTTi4D7406d/jjL8Vj3n0zzCRhJquE2YYWnE=
+X-Received: by 2002:a0d:f244:: with SMTP id b65mr9919257ywf.2.1644540187689;
+ Thu, 10 Feb 2022 16:43:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87pmnwlkaa.fsf@mpe.ellerman.id.au>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <20220209125644.533876-1-Jason@zx2c4.com> <20220209125644.533876-3-Jason@zx2c4.com>
+ <YgVTpI/sYLecyWa3@linutronix.de>
+In-Reply-To: <YgVTpI/sYLecyWa3@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 11 Feb 2022 01:42:56 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pGwyZKu=9yCben-V30hR+zEjb9iZGWr5_RAE-uXt_Ofw@mail.gmail.com>
+Message-ID: <CAHmME9pGwyZKu=9yCben-V30hR+zEjb9iZGWr5_RAE-uXt_Ofw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 09, 2022 at 03:46:05PM +1100, Michael Ellerman wrote:
-> Luis Chamberlain <mcgrof@kernel.org> writes:
-> > On Tue, Jan 11, 2022 at 12:37:42PM +0100, Michal Suchanek wrote:
-> >> Hello,
-> >> 
-> >> This is a refresh of the KEXEC_SIG series.
-> >> 
-> >> This adds KEXEC_SIG support on powerpc and deduplicates the code dealing
-> >> with appended signatures in the kernel.
-> >> 
-> >> powerpc supports IMA_KEXEC but that's an exception rather than the norm.
-> >> On the other hand, KEXEC_SIG is portable across platforms.
-> >> 
-> >> For distributions to have uniform security features across platforms one
-> >> option should be used on all platforms.
-> >> 
-> >> Thanks
-> >> 
-> >> Michal
-> >> 
-> >> Previous revision: https://lore.kernel.org/linuxppc-dev/cover.1637862358.git.msuchanek@suse.de/
-> >> Patched kernel tree: https://github.com/hramrach/kernel/tree/kexec_sig
-> >> 
-> >> Michal Suchanek (6):
-> >>   s390/kexec_file: Don't opencode appended signature check.
-> >>   powerpc/kexec_file: Add KEXEC_SIG support.
-> >>   kexec_file: Don't opencode appended signature verification.
-> >>   module: strip the signature marker in the verification function.
-> >>   module: Use key_being_used_for for log messages in
-> >>     verify_appended_signature
-> >>   module: Move duplicate mod_check_sig users code to mod_parse_sig
-> >
-> > What tree should this go through? I'd prefer if over through modules
-> > tree as it can give a chance for Aaron Tomlin to work with this for his
-> > code refactoring of kernel/module*.c to kernel/module/
-> 
-> Yeah that's fine by me, the arch changes are pretty minimal and unlikely
-> to conflict much.
+Hi Sebastian,
 
-Ok sounds good thanks.
+On Thu, Feb 10, 2022 at 7:04 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> So.
+> - CPU1 schedules a worker
+> - CPU1 goes offline before the gets on the CPU.
+> - The worker runs CPU2
+> - CPU2 is back online
+> - and now
+>    CPU1                                         CPU2
+>    new_count =3D ++fast_pool->count;
+>     reg =3D fast_pool->count (FAST_POOL_MIX_INFLIGHT | 64)
+>     incl reg (FAST_POOL_MIX_INFLIGHT | 65)
+>                                                 WRITE_ONCE(fast_pool->cou=
+nt, 0);
+>     fast_pool->count =3D reg ((FAST_POOL_MIX_INFLIGHT | 65)
+>
+> So we lost the WRITE_ONCE(, 0), FAST_POOL_MIX_INFLIGHT is still set and
+> worker is not scheduled. Not easy to trigger, not by an ordinary user.
+> Just wanted to mention=E2=80=A6
 
-  Luis
+Thanks for pointing this out. I'll actually fix this using atomics,
+and fix another minor issue at the same time the same way, and move to
+making sure the worker is running on the right CPU like we originally
+discussed. I'm going to send that as an additional patch so that we
+can narrow in on the issue there. It's a little bit involved but not
+too bad. I'll have that for you shortly.
+
+> crng_fast_load() does spin_trylock_irqsave() in hardirq context. It does
+> not produce any warning on RT but is still wrong IMHO:
+> If we just could move this, too.
+> I don't know how timing critical this is but the first backtrace from
+> crng_fast_load() came (to my surprise) from hwrng_fillfn() (a kthread)
+> and added 64bytes in one go.
+
+I'll look into seeing if I can do it. On my first pass a few days ago,
+it seemed a bit too tricky, but I'll revisit after this part here
+settles. Thanks for your benchmarks, by the way. That's useful.
+
+Jason
