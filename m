@@ -2,80 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE304C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453B4C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242047AbiBKRU5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 12:20:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41634 "EHLO
+        id S1343729AbiBKRYX (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 12:24:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236787AbiBKRU4 (ORCPT
+        with ESMTP id S232559AbiBKRYW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 12:20:56 -0500
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF70795;
-        Fri, 11 Feb 2022 09:20:54 -0800 (PST)
-Received: by mail-pf1-f175.google.com with SMTP id i30so17390892pfk.8;
-        Fri, 11 Feb 2022 09:20:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ekIUW5hDwj0MHo/3bOZ5o2l8gislJv8Zv7n+lArEyNc=;
-        b=Q7tVdQ9FuKQnIDcl28OTxfgthpF6H5rX7Q8sVLts7lhmugtacz7SLoidxg/e6ERTqV
-         P9GP6DB44TMDGxO2sCtrN69NYPIhfHs/X55pUJ6a1F2fu6eT28T1gousRKCJjmGKCm4j
-         +IN/PV77NjQ++c7tYjrS/KA52raOi8IUHhbXRWkCjiD9vDR52oGogy07r1shzHERmbv5
-         yCCkn6O9uXq5Lz3GVKBXBuauTA0jo/sfU6LAwv99NvUrFjzFn1vkWdQdkNcsscQ8b39p
-         f1h59XSlyb1j9bYyrZ6xBWoBXvrCTWdLOmufvKgB4LzCsLSmgPZy4jrlZP6nj6jjb0n2
-         H1jQ==
-X-Gm-Message-State: AOAM530joyrTiv2GZBsGQ6fG4oaTsQG/uLlHO3HXKR0XKaL8lv4og6p5
-        Bz4T6Fvho2fdkcJVnCHxe7RFnNheF5A=
-X-Google-Smtp-Source: ABdhPJzJjDohOvhP47JcBas1jDYfHanFwNj76TRXfNhwZQ/9c0i3NfbK2KSe/tIKGaDrfdGDvQkNQw==
-X-Received: by 2002:a63:4b4a:: with SMTP id k10mr2171880pgl.488.1644600054301;
-        Fri, 11 Feb 2022 09:20:54 -0800 (PST)
-Received: from sultan-box.localdomain ([204.152.215.246])
-        by smtp.gmail.com with ESMTPSA id t7sm27183808pfj.138.2022.02.11.09.20.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 09:20:53 -0800 (PST)
-Date:   Fri, 11 Feb 2022 09:20:51 -0800
-From:   Sultan Alsawaf <sultan@kerneltoast.com>
+        Fri, 11 Feb 2022 12:24:22 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE8DCDB;
+        Fri, 11 Feb 2022 09:24:21 -0800 (PST)
+Date:   Fri, 11 Feb 2022 18:24:18 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644600259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xby/277p0PYtQwCatM3qedV1BJVm17l7RSVzLWxr3g8=;
+        b=iUZhNCrzxIYmmcZx0K8FjSwwbpoZejai6BCLy/2SpOPTMwa94R3LPaWhLnFcupF7VJ/9Gm
+        YWRNXFytUMDy6PbAe/KxmzmIC3wP2DkO9qMXOWd0k4nT9gWGDBbkvxQyBcv5qvI50zuZJP
+        2A+UF3bADn3/W1xw8B2Iz6lKYAtxuSFGp1YqRg6apu4i81LddDV2CHraQbIPoqQCokk5PW
+        RSHAz0lJChS75qpyuqjb67BlgUyWkV1EtYw2+HajIPTGJC1M4TsXKOB/504ddWOLWeEZH1
+        7KwCN/p0kZuvN7yUnSdnUIkj5kxBVo6Gg0hB6zvKkQI7GxLLyd4ADGO3A8VxVQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644600259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xby/277p0PYtQwCatM3qedV1BJVm17l7RSVzLWxr3g8=;
+        b=8RccvtE7jG31F556KgNWkhuPwsfJrW1ooMTxsxJeo7LTGuhNSbTebFq8SCXVj40mN6Th+L
+        NB4p9sT3h7fl72Cg==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Theodore Ts'o <tytso@mit.edu>,
-        Jonathan =?iso-8859-1?Q?Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
 Subject: Re: [PATCH v7] random: defer fast pool mixing to worker
-Message-ID: <Ygaa89GFi1VAQmsk@sultan-box.localdomain>
+Message-ID: <YgabwjHlVnKBLpwV@linutronix.de>
 References: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
  <20220211170732.571775-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 In-Reply-To: <20220211170732.571775-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 11, 2022 at 06:07:32PM +0100, Jason A. Donenfeld wrote:
+On 2022-02-11 18:07:32 [+0100], Jason A. Donenfeld wrote:
 > On PREEMPT_RT, it's problematic to take spinlocks from hard irq
 > handlers. We can fix this by deferring to a workqueue the dumping of
 > the fast pool into the input pool.
-> 
+>=20
 > We accomplish this with some careful rules on fast_pool->count:
-> 
->   - When it's incremented to >= 64, we schedule the work.
->   - If the top bit is set, we never schedule the work, even if >= 64.
+>=20
+>   - When it's incremented to >=3D 64, we schedule the work.
+>   - If the top bit is set, we never schedule the work, even if >=3D 64.
 >   - The worker is responsible for setting it back to 0 when it's done.
-> 
+>=20
 > There are two small issues around using workqueues for this purpose that
 > we work around.
-> 
+>=20
 > The first issue is that mix_interrupt_randomness() might be migrated to
 > another CPU during CPU hotplug. This issue is rectified by checking that
 > it hasn't been migrated (after disabling irqs). If it has been migrated,
@@ -83,28 +82,29 @@ On Fri, Feb 11, 2022 at 06:07:32PM +0100, Jason A. Donenfeld wrote:
 > it can requeue the work. As part of this, we switch to using an
 > atomic_t, so that the increment in the irq handler doesn't wipe out the
 > zeroing if the CPU comes back online while this worker is running.
-> 
+>=20
 > The second issue is that, though relatively minor in effect, we probably
 > want to make sure we get a consistent view of the pool onto the stack,
 > in case it's interrupted by an irq while reading. To do this, we don't
 > reenable irqs until after the copy. There are only 18 instructions
 > between the cli and sti, so this is a pretty tiny window.
-> 
+>=20
 > Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 > Cc: Thomas Gleixner <tglx@linutronix.de>
 > Cc: Peter Zijlstra <peterz@infradead.org>
 > Cc: Theodore Ts'o <tytso@mit.edu>
 > Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-> Cc: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> Cc: Jonathan Neusch=C3=A4fer <j.neuschaefer@gmx.net>
 > Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
 > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+
+Acked-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+
 > ---
 > Sebastian - as requested, we now disable irqs for a very short 18
 > instructions rather than fishing into migrate_disable() and upsetting
 > PeterZ. Might this be the lucky patch? -Jason
 
-I think this might be the lucky patch.
+I think we good. I'm not going to comment on the 90 char wide comment :)
 
-Reviewed-by: Sultan Alsawaf <sultan@kerneltoast.com>
-
-Sultan
+Sebastian
