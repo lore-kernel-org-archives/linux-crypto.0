@@ -2,83 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BC5C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62219C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbiBKRPm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 12:15:42 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38072 "EHLO
+        id S1346887AbiBKRST (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 12:18:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235254AbiBKRPl (ORCPT
+        with ESMTP id S1347328AbiBKRSQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 12:15:41 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCEF102;
-        Fri, 11 Feb 2022 09:15:40 -0800 (PST)
-Date:   Fri, 11 Feb 2022 18:15:37 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644599738;
+        Fri, 11 Feb 2022 12:18:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 756532E8;
+        Fri, 11 Feb 2022 09:18:15 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 115BFB82B0C;
+        Fri, 11 Feb 2022 17:18:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80120C340F0;
+        Fri, 11 Feb 2022 17:18:12 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NyZ4HM6k"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644599890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PJyDYqDoqp3BOO8EG/GCK9HSjsIr9kXicPv+GzkWx1A=;
-        b=ebryZ/ovTvyftldBlOHY/pFQryX7LYnwAp4COiGEEXAX7bZl2X1U4ggtgMm4IPwogJ8toy
-        GSUNkza8AaP8Yn/i6tGZT2ymAVH5ZuvHGdB9K4qxneXQX6fRAwgS8AeduKqqxWwSmvw8bk
-        v/O4GBNF0aO5TjJjeTSk5cm2/RNzdVmmkeUUKRy0/SwB3+ok20thXVpcwPBNTuVxG1Odlm
-        c7u1rFkpksOSdHqFFBPhcxQhLLeZ+iBK2hF67Gvm8oHlUSO+CGIKz6QIm0xKZ7+tyExyom
-        9tBj7VUN+q9bf9D/8el8jUwESzTm13y2/Jq8vNQnGeVtzvPKjvy2YAAGs8QCJw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644599738;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PJyDYqDoqp3BOO8EG/GCK9HSjsIr9kXicPv+GzkWx1A=;
-        b=0CWjWOEnQbWaB3Z4tTafewf+JVbcOzU/wcNrqdku2B6LXM7m5MNTlF6sBPbTCy0zz/9/xV
-        YQ9T13Gvj2NipCBw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        bh=SfYGvN9zxLfDorcByl2QkN876mXdSCG/iqqiHsime+4=;
+        b=NyZ4HM6kc0VT1Z0pePq62d2Fp1CRFOuxfcb8kdupm1OzZ1niCqmH2IowAsE7ZDU/I3Fhpl
+        +r6eRqM0zvks+50T7YFBlgw9AIp4442AJelwhT9I43gVGllMDeJ2CHg4X2UrgVjqNBjq9l
+        Tm+WDP2SBv6PY6a2a/uzA/sVG1ls1m8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 01119a3a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 11 Feb 2022 17:18:10 +0000 (UTC)
+Received: by mail-yb1-f179.google.com with SMTP id j2so27068802ybu.0;
+        Fri, 11 Feb 2022 09:18:09 -0800 (PST)
+X-Gm-Message-State: AOAM533qKG63XEnyA3F9y9uPyTxpUj+lZzqYC6N9zoAie4G2fHJmRKNS
+        mS2IhhHMPF6h9rr+h6IDufWBrAY3b5fqFkXll84=
+X-Google-Smtp-Source: ABdhPJyFny8fOHQkFCX9/JxzGdjmEUL+mbbdca++Pmet/pPykT+Mb94KinsOgGgHaOXiHrYeUGBypcfon47wKg71TmI=
+X-Received: by 2002:a25:ba49:: with SMTP id z9mr2361602ybj.32.1644599888151;
+ Fri, 11 Feb 2022 09:18:08 -0800 (PST)
+MIME-Version: 1.0
+References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de> <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de> <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
+ <YgaZuShru2HQiFXg@linutronix.de>
+In-Reply-To: <YgaZuShru2HQiFXg@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 11 Feb 2022 18:17:57 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oZMFN80M98Mt6JysPSMTJoXfKTjHuxG6BQSsC=+0z5fg@mail.gmail.com>
+Message-ID: <CAHmME9oZMFN80M98Mt6JysPSMTJoXfKTjHuxG6BQSsC=+0z5fg@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-Message-ID: <YgaZuShru2HQiFXg@linutronix.de>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de>
- <20220211162515.554867-1-Jason@zx2c4.com>
- <YgaSYlVEBOxfJbSD@linutronix.de>
- <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
- <YgaV0UZO1KfmtLLh@linutronix.de>
- <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-11 18:00:21 [+0100], Jason A. Donenfeld wrote:
-> Hi Sebastian,
-Hi Jason,
+On Fri, Feb 11, 2022 at 6:15 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> A CPU hotplug notifier which removes unconditionally that bit when the
+> CPU goes down or sets it to 0.
+> We can keep it as it. Just an idea for later maybe ;)
 
-> On Fri, Feb 11, 2022 at 5:59 PM Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> wrote:
-> > > Okay, I'll do that then, and then in the process get rid of the
-> > > cmpxchg loop since it's no longer required.
-> >
-> > So the only reason why we have that atomic_t is for rare case where run
-> > on the remote CPU and need to remove the upper bit in the counter?
-> 
-> Yes. That's the only remaining reason. Annoying, but whatareyagonnado?
+I looked into it and it seemed like the plumbing was kind of miserable
+for that. If you want to take a stab, though, that might be an okay
+followup patch, and then we can assess atomics vs notifier. I think
+notifier will wind up being a lot clunkier, though.
 
-A CPU hotplug notifier which removes unconditionally that bit when the
-CPU goes down or sets it to 0.
-We can keep it as it. Just an idea for later maybe ;)
+Sounds like we should be all set for the v7 I sent out?
 
-> Jason
-
-Sebastian
+Jason
