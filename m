@@ -2,189 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6B8C43217
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 09:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2870EC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 09:43:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348718AbiBKJjk (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 04:39:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57380 "EHLO
+        id S239185AbiBKJno (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 04:43:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348707AbiBKJjh (ORCPT
+        with ESMTP id S237727AbiBKJno (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 04:39:37 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F58109C;
-        Fri, 11 Feb 2022 01:39:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1644572375; x=1676108375;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OL6gLT7wev9O0q2qvKg+zBDZoeZnw93JsYQDAe9Nous=;
-  b=Na/SvJWZVdJonzXRFC5ED/4o3Itgvfp1r0rTXAo71gxbJopkvmEbjlxT
-   U08yGGGUThSXVHqvVXRv9CdMFt4igjZnxa7jkOY75SUG2nz2xtjoA0s6G
-   8YShFQLnuVZhfINm1CaAlR0tPrOByl5V19X66iSHR6BUUItHyNpG0ax/J
-   Y6U3guxSiX1zRm4YyjUQhBMp3PASV7TSdFSbKthff3T9Y7mfI18b68Val
-   q47jUh3wDa759tMMcHpaUm/+39eluNRA6CPCs2/BtkEGKxorzGwDUHljL
-   pA4r84jMI5E0ntde5r9fa+PLlF5PGzJKPtjAwhz1WjaAL58OUrbcLxhZi
+        Fri, 11 Feb 2022 04:43:44 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64119BAA;
+        Fri, 11 Feb 2022 01:43:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644572623; x=1676108623;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Eh9Z93+yZv5XOHb7IgsvkTr/sEayd5z0XxqtOJiX+Zs=;
+  b=Qg0ciy6tfvNAox27F16h4kAxRaCJqg7Yeqh/R+gooXswh63KpKOJyV3z
+   lmJxOWP0sT+Ewe0omWQltAZQbfkPyfUrM6COPqns1mwTdECRZSB3HKRWR
+   T/B+5IZGNR0eAKA5dKqAxVye8V0lWuUoFysEc4+gz6BxmDmtPYfehQGxU
+   rnf0TcmHd3dBltJhxmv9liBJNV/bosns2b1/c1gCCLBl5xewv1bNyJNN2
+   QcyPkpXMt1P5DCDsaL7SIE0SVGoAb502K8W5U2kdkZujyu4JxzuBGq1Wz
+   0FJor//O7ybgqP4E9EQz+kfPZbooMRx0CLJgo2NSaEhdQlOktANcK6nqa
    Q==;
-IronPort-SDR: 7TcHMiKncXPs2xpOxyWAk8mAwo1Fa8oQyKybgl5KZLwrfWQXYNjU000HNFSjDr6r9gE7xYPlL7
- BtSR6Nhw7bDHzO/+ZyvrARP2H2HAze1yFHUXr2vAplvpDx/DlZwq9FDttvWJjta1ByRCBOdoh4
- kf+x0s6ggTX5rak71bn2L6KYRMgclIxRt0UexINNKQ9Dg3mvU0MTl9CL0DsKpmjhafrMmbzFsT
- Tz7p3TRVJjGSdlqXMgGCek3vqL+YH5aKWxYourb7tHc2W76b7kwTe6eQLNs/GC123KMXkEGcXi
- aNVD7Q1gqQeW4425Z2AIeljc
+X-IronPort-AV: E=McAfee;i="6200,9189,10254"; a="274257827"
 X-IronPort-AV: E=Sophos;i="5.88,360,1635231600"; 
-   d="scan'208";a="153263793"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 11 Feb 2022 02:39:34 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Fri, 11 Feb 2022 02:39:34 -0700
-Received: from ROB-ULT-M18064N.mchp-main.com (10.10.115.15) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Fri, 11 Feb 2022 02:39:31 -0700
-From:   Tudor Ambarus <tudor.ambarus@microchip.com>
-To:     <herbert@gondor.apana.org.au>, <krzysztof.kozlowski@canonical.com>,
-        <robh+dt@kernel.org>
-CC:     <nicolas.ferre@microchip.com>, <claudiu.beznea@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kavyasree.kotagiri@microchip.com>,
-        <devicetree@vger.kernel.org>,
-        "Tudor Ambarus" <tudor.ambarus@microchip.com>
-Subject: [PACTH v4 2/3] dt-bindings: crypto: Convert Atmel TDES to yaml
-Date:   Fri, 11 Feb 2022 11:39:21 +0200
-Message-ID: <20220211093922.456634-3-tudor.ambarus@microchip.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220211093922.456634-1-tudor.ambarus@microchip.com>
-References: <20220211093922.456634-1-tudor.ambarus@microchip.com>
+   d="scan'208";a="274257827"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 01:43:42 -0800
+X-IronPort-AV: E=Sophos;i="5.88,360,1635231600"; 
+   d="scan'208";a="542023981"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2022 01:43:40 -0800
+Date:   Fri, 11 Feb 2022 09:43:32 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com
+Subject: Re: [PATCH 0/3] Introduce support for QAT Dynamic Power Management
+Message-ID: <YgYvxEwX7k5MOsqm@silpixa00400314>
+References: <20220203135434.584967-1-wojciech.ziemba@intel.com>
+ <YgYt5tFt+0CD/0V3@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YgYt5tFt+0CD/0V3@gondor.apana.org.au>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert Atmel TDES documentation to yaml format. With the conversion the
-clock and clock-names properties are made mandatory. The driver returns
--EINVAL if "tdes_clk" is not found, reflect that in the bindings and make
-the clock and clock-names properties mandatory. Update the example to
-better describe how one should define the dt node.
+Hi Herbert,
 
-Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
----
- .../crypto/atmel,at91sam9g46-tdes.yaml        | 64 +++++++++++++++++++
- .../bindings/crypto/atmel-crypto.txt          | 23 -------
- 2 files changed, 64 insertions(+), 23 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
+On Fri, Feb 11, 2022 at 08:35:34PM +1100, Herbert Xu wrote:
+> On Thu, Feb 03, 2022 at 01:54:31PM +0000, Wojciech Ziemba wrote:
+> > This patch set consist of following updates:
+> > 1. Add misc workqueue for general purpose usage.
+> > 2. Move error source related CSRs from 4xxx to the wider GEN4 header
+> > file.
+> > 3. Add support for HW QAT Power Management (PM) feature.
+> > 	This feature is enabled at init time (1) by sending an admin
+> > message to
+> > 	the firmware, targeting the admin AE, that sets the idle time
+> > before
+> > 	the device changes state and (2) by unmasking the PM source of
+> > 	interrupt in ERRMSK2.
+> > 
+> > 	The interrupt handler is extended to handle a PM interrupt which
+> > 	is triggered by HW when a PM transition occurs. In this case,
+> > the
+> > 	driver responds acknowledging the transaction using the HOST_MSG
+> > 	mailbox.
+> > 
+> > 
+> > Wojciech Ziemba (3):
+> >   crypto: qat - add misc workqueue
+> >   crypto: qat - move and rename GEN4 error register definitions
+> >   crypto: qat - enable power management for QAT GEN4
+> > 
+> >  .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.c    |  21 +--
+> >  .../crypto/qat/qat_4xxx/adf_4xxx_hw_data.h    |  24 ---
+> >  drivers/crypto/qat/qat_common/Makefile        |   1 +
+> >  .../crypto/qat/qat_common/adf_accel_devices.h |   2 +
+> >  drivers/crypto/qat/qat_common/adf_admin.c     |  37 +++++
+> >  .../crypto/qat/qat_common/adf_common_drv.h    |   4 +
+> >  drivers/crypto/qat/qat_common/adf_ctl_drv.c   |   6 +
+> >  .../crypto/qat/qat_common/adf_gen4_hw_data.h  |  14 ++
+> >  drivers/crypto/qat/qat_common/adf_gen4_pm.c   | 137 ++++++++++++++++++
+> >  drivers/crypto/qat/qat_common/adf_gen4_pm.h   |  44 ++++++
+> >  drivers/crypto/qat/qat_common/adf_init.c      |   6 +
+> >  drivers/crypto/qat/qat_common/adf_isr.c       |  42 ++++++
+> >  .../qat/qat_common/icp_qat_fw_init_admin.h    |   1 +
+> >  13 files changed, 306 insertions(+), 33 deletions(-)
+> >  create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.c
+> >  create mode 100644 drivers/crypto/qat/qat_common/adf_gen4_pm.h
+> 
+> All applied.  Thanks.
+I think this set needs to be reverted. Wojciech provided a v2 that fixed
+a few regressions.
 
-diff --git a/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-new file mode 100644
-index 000000000000..fcc5adf03cad
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
-@@ -0,0 +1,64 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+# Copyright (C) 2022 Microchip Technology, Inc. and its subsidiaries
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/atmel,at91sam9g46-tdes.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Atmel Triple Data Encryption Standard (TDES) HW cryptographic accelerator
-+
-+maintainers:
-+  - Tudor Ambarus <tudor.ambarus@microchip.com>
-+
-+properties:
-+  compatible:
-+    const: atmel,at91sam9g46-tdes
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  clock-names:
-+    const: tdes_clk
-+
-+  dmas:
-+    items:
-+      - description: TX DMA Channel
-+      - description: RX DMA Channel
-+
-+  dma-names:
-+    items:
-+      - const: tx
-+      - const: rx
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/at91.h>
-+    #include <dt-bindings/dma/at91.h>
-+
-+    tdes: crypto@e2014000 {
-+      compatible = "atmel,at91sam9g46-tdes";
-+      reg = <0xe2014000 0x100>;
-+      interrupts = <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&pmc PMC_TYPE_PERIPHERAL 96>;
-+      clock-names = "tdes_clk";
-+      dmas = <&dma0 AT91_XDMAC_DT_PERID(54)>,
-+             <&dma0 AT91_XDMAC_DT_PERID(53)>;
-+      dma-names = "tx", "rx";
-+    };
-diff --git a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-index 1353ebd0dcaa..5c6541cfcc4a 100644
---- a/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-+++ b/Documentation/devicetree/bindings/crypto/atmel-crypto.txt
-@@ -2,29 +2,6 @@
- 
- These are the HW cryptographic accelerators found on some Atmel products.
- 
--* Triple Data Encryption Standard (Triple DES)
--
--Required properties:
--- compatible : Should be "atmel,at91sam9g46-tdes".
--- reg: Should contain TDES registers location and length.
--- interrupts: Should contain the IRQ line for the TDES.
--
--Optional properties:
--- dmas: List of two DMA specifiers as described in
--        atmel-dma.txt and dma.txt files.
--- dma-names: Contains one identifier string for each DMA specifier
--             in the dmas property.
--
--Example:
--tdes@f803c000 {
--	compatible = "atmel,at91sam9g46-tdes";
--	reg = <0xf803c000 0x100>;
--	interrupts = <44 4 0>;
--	dmas = <&dma1 2 20>,
--	       <&dma1 2 21>;
--	dma-names = "tx", "rx";
--};
--
- * Secure Hash Algorithm (SHA)
- 
- Required properties:
+Thanks,
+
 -- 
-2.25.1
-
+Giovanni
