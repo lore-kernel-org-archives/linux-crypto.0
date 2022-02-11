@@ -2,956 +2,233 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3405AC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 08:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43246C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 08:55:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348105AbiBKIp2 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 03:45:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37054 "EHLO
+        id S233829AbiBKIzr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 03:55:47 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348097AbiBKIpW (ORCPT
+        with ESMTP id S237442AbiBKIzq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 03:45:22 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F887E67
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Feb 2022 00:45:20 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id u12so4099571plf.13
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Feb 2022 00:45:20 -0800 (PST)
+        Fri, 11 Feb 2022 03:55:46 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8B8E80;
+        Fri, 11 Feb 2022 00:55:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1644569744; x=1676105744;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=BUKF08UW2t0SFt1rfjN5OWWRafTWLIFiwFoS44g0hxY=;
+  b=P1/L7vPqMg5iCOqeNMlvTYQAqUVV0/hGQVznfcFoyL3Lc4t06+uDqM2t
+   wNs0l5G5GOt5I1fDZcCxoX/iOGFD7X+YaUPb5LR74toRywwfs1Qq0nj83
+   dEanw7uamAVaaDdAZdcbXdx52WXiuofa8YxBVFXIMGEXJGXIiRm0uko2o
+   t93MRY9aV0IKbLP0zAEAkO1lIjwJ9ohe2/mBZlhgudbY+pelXkt/5KkrU
+   Ix9f6xzT4XYBwd9sqcmFkGNBElGBxuydPKruu+W3qMhyzV9Y7CeW4pLfe
+   8+oq786IEsAheDtq9PwbdEt8kL/d191didX1XElV1oPsQJRSk2AOyqwpS
+   A==;
+IronPort-SDR: Sw7tLHaKsPhUNvSva5zTgGpyYaY6a3HozNsxAMCZbNL+emK7T2u0CT4xaVQNwULC6dP28fH2W+
+ ineHSRQM/LkZ7CLA/J5QUkTujaxFuo9pdcjNFTPUIQXvCxEX/6icXi2Hl+JFMCb8/icOrYLSfy
+ ZdnmV8wYHTsVjX3xcDaxDwz/yhPjmQjrhdML+KxYnEmjGn815L5JJ3anwT1GYXno5dvj+zR0Yo
+ yJQn4dw/v0xaFVoK3c5WrB1oDIl/5vIhRtRaa/RwHwiqXsA0K2yHMt2DgG/TFhUe6Z57g5qVVS
+ cmL0PMfOhd1o7f1v3U3zQjYT
+X-IronPort-AV: E=Sophos;i="5.88,360,1635231600"; 
+   d="scan'208";a="161903771"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 11 Feb 2022 01:55:43 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Fri, 11 Feb 2022 01:55:43 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17 via Frontend
+ Transport; Fri, 11 Feb 2022 01:55:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wqx/mlAmOyE3crm7FSQ2AEQtTGUnEVxKYNErG5eS58+n2lhgmKhdXZDbDLjF8m3Pk0v4zmf5dcw+jP83E9LFZfdxd9gWExPhB1U6M/aXbvD9wVwSstASIDW0shm+n2f4WLVvUfXKwXr8Msdkk6nX00dyo2hxp7Aiqrd/s53Rw1OwwrQHr7qls4AdUsSOwD9UhSmqcSt04+dkQT3vHUns38qnx6oRC+z1zTXtjMWxubS7KXeRLnDcdnB6AlpyxesMqWzLxfpdkR8dFc9dAcsolpMn8+HA0V89LkRkfB6zEDCyArZqD/vYTxVjCvq2/F6Nj/oe4WC/oiBghgXqlvMqUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BUKF08UW2t0SFt1rfjN5OWWRafTWLIFiwFoS44g0hxY=;
+ b=mseiwhzQlw0yG5jPAdL9VnF89NZB8xhW588loYul51dxg9bcdOtqCILTQg6BpbjoWhgEN66jmoiPgo9AdgxRVp5QJ1G5j0a6/6SXxOn6CQOKKMndTg4NQSZaJDrGSp9x8gKlPtQmW7dDuPVM+tNirEPKuMbvBFJdLELrdUs0XAFo0z+Y+gyVhomz9e8gJ334s8PrSMlUXi1hN0i5ztUxIwqcW69pVDv9gMkG2Mbm+FraaVkNzaeUL8nxTPXEdpRprox5IOw/7GnwMVhLPiaeSmS3gIUvaZjHjwnXJGX6tnXT2fa4ZKMO1KdEowSl6xJyMktJctEz9nR6/q1q0axsdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Rjy+Pjzbq+dYQIq1AR+HH/d8mACzYFtTZeGtK7gFiqQ=;
-        b=DkN8kj+iU+Ul++cenRVYtYJgawC+n/UkNBb924tTkDzWS2HPyVMZ3mn09WTiyvq78s
-         TM4XNqBPdg6/hkswpxEGKAm0HFkvJeq1An/Kxtp/9OmVBtivx8oFZqgqBppaww5FcH4Y
-         k/8lNUVyFlS3yZTX+M7hgYTO/q6gfIl94Vr8nflz8PG4WJewOLT+0H5SflNmKzpr3JzC
-         GbFWuRsXRvUnWrw66e2GXnCI9fRR+QoUJAjAu7XC4yIdc4qjpYHsSuMjD+UKgiANVJSr
-         cgkPQI8X6HWzxfLZ8w9qiDNJw/eFeIPaDona8JuhK2OCLvBhYEJ4DtxfYTiRDk9gCfFz
-         xFzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Rjy+Pjzbq+dYQIq1AR+HH/d8mACzYFtTZeGtK7gFiqQ=;
-        b=q9tIPvIHQN3IZ8VG3YEz12x+eNfPbHkQ0SDI0K1S5GgWhSr8VhxMgRaLof33pq/DWT
-         LntMhWFbepg3/Na3900K3HU0fZ5/pGGpHrkYPXCTR0H+mYsmspF+EfOaQ/gdh9IAGgRY
-         /Rm0+TBtDvYhEInoH9lM3dBti4rygk4LPUmapGPrAjz/++j482Cj6tx0r/qIVkvo4k9f
-         f9fY4ZIy/tmdB0RQPenzc9SeXIB3QWE6ymNuEDg2u/hwyOPOlBRn+7CsPL4Bv6HnskqO
-         fgEPURzikI0+q22sL1N9gqMPmMEaFiDYBeKbvcOitv3PsqWUwTxrqeXiFt/+MGkaYL4e
-         hohA==
-X-Gm-Message-State: AOAM530jrd7p2Wt3SVaO0aFWdkD/0hPaL0Fs4TTGwgvFmABNKZmIPTWu
-        H24ApF1HbJiniPyX1l2g6f/79w==
-X-Google-Smtp-Source: ABdhPJwL9NaT+InzK6v4M5Q4Lgp6b9PNWhBUrVgQTXB+GSK6etiyOUudwqhaxJVR6iv0pYq1yLBSEw==
-X-Received: by 2002:a17:90b:1a90:: with SMTP id ng16mr1563838pjb.72.1644569119810;
-        Fri, 11 Feb 2022 00:45:19 -0800 (PST)
-Received: from libai.bytedance.net ([61.120.150.72])
-        by smtp.gmail.com with ESMTPSA id u7sm3832686pgc.93.2022.02.11.00.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 00:45:18 -0800 (PST)
-From:   zhenwei pi <pizhenwei@bytedance.com>
-To:     arei.gonglei@huawei.com, mst@redhat.com
-Cc:     jasowang@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, qemu-devel@nongnu.org,
-        helei.sig11@bytedance.com, herbert@gondor.apana.org.au,
-        zhenwei pi <pizhenwei@bytedance.com>
-Subject: [PATCH v2 3/3] crypto: Introduce RSA algorithm
-Date:   Fri, 11 Feb 2022 16:43:35 +0800
-Message-Id: <20220211084335.1254281-4-pizhenwei@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220211084335.1254281-1-pizhenwei@bytedance.com>
-References: <20220211084335.1254281-1-pizhenwei@bytedance.com>
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BUKF08UW2t0SFt1rfjN5OWWRafTWLIFiwFoS44g0hxY=;
+ b=GuNHhVm+VAd2XiDtgBHKZWF25y4VYTH3tb/KfVKsz8QlDRpeZ7oX6iVNf2dtGNnzo97lRi517RfWQ4DOQIpFkxncBYimMJzm9arSkZYnqMVs3dvG1mp6nVuAnbHGb2XvsZDSwbU2IJTLlQN28KmlEH90xKh0l1jSI5Nv8BfNzqY=
+Received: from CO1PR11MB4769.namprd11.prod.outlook.com (2603:10b6:303:91::21)
+ by DM6PR11MB4611.namprd11.prod.outlook.com (2603:10b6:5:2a5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.11; Fri, 11 Feb
+ 2022 08:55:33 +0000
+Received: from CO1PR11MB4769.namprd11.prod.outlook.com
+ ([fe80::5cae:e802:4a48:bd0f]) by CO1PR11MB4769.namprd11.prod.outlook.com
+ ([fe80::5cae:e802:4a48:bd0f%5]) with mapi id 15.20.4975.015; Fri, 11 Feb 2022
+ 08:55:33 +0000
+From:   <Claudiu.Beznea@microchip.com>
+To:     <Tudor.Ambarus@microchip.com>, <herbert@gondor.apana.org.au>,
+        <krzysztof.kozlowski@canonical.com>, <robh+dt@kernel.org>
+CC:     <Nicolas.Ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <Kavyasree.Kotagiri@microchip.com>,
+        <devicetree@vger.kernel.org>
+Subject: Re: [PACTH v3 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Thread-Topic: [PACTH v3 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Thread-Index: AQHYHyUg1kMHhfwweUa3eaqVUXYKRA==
+Date:   Fri, 11 Feb 2022 08:55:33 +0000
+Message-ID: <edf01cb9-c887-83db-fe2c-4e4198ec93f9@microchip.com>
+References: <20220211082114.452911-1-tudor.ambarus@microchip.com>
+ <20220211082114.452911-2-tudor.ambarus@microchip.com>
+In-Reply-To: <20220211082114.452911-2-tudor.ambarus@microchip.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 19c2a3dd-7307-417a-094a-08d9ed3c4360
+x-ms-traffictypediagnostic: DM6PR11MB4611:EE_
+x-microsoft-antispam-prvs: <DM6PR11MB46110F1C6DB9D8D85403F1C187309@DM6PR11MB4611.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uOUlQNQ/19ZSvU0TWJzY9IgIlMwLqHSz9chdr5vWqG5yR0hnxlE/vlbA7YluIGPTTypoUXBgc4CmOqP/2qQEklyh+aRXJg2GjYmrunTVuyUp3fSWEuAME0v7hIuGoht5GUwAo0OU1tZ5sv/ImXiDuSqCbrj1rdazbsekZgQrIRn0N4zorMlUfU5esJx94xWqYBdZ7zvcGGUA4yoAZYxoimojNjy9YKpDFn2w5TtI2riU5GzSm1s2e2MWdOeYMP2gqLpjaz3lagbIzuwWZS9b1qd8MfpSlHaOS2XvRqFi2ZBD+bouutCK/b/BOxiDz++fOEdhHebdEoL/fWfJ0rVjSHOHDoNJXd5xvRydF7XkmUGUiYYmxwWOz9t8FpT15f1mw1bioHeaLGykZHd5Anx9Pfd1Z7enVoda4aceioTGpO3tCA6TQugqEt4qlDq86fDlT1OhLxPkNTK4LZyzLOaHxwvJzw9XZ3wosd3pummD4CETDtHgrgQc/qPioRMLN4GxDxs/qumMPufNrdr9DKWZBa+hjiGQnW0im0Kdpk/mVamyRTMdTsWXUEETbKrt2dxqY8ZT5nwo7gQaCMBNgMRZ5+oobVMXoy3l2fzpgqHGm219uQW09rFeeNBSYUMOnB57iA/AyBciUqLPiLyqp4AQ8dhJx7P/lSw9xr/B+c3l9FsntEu9RfnZs3Ljt4zTBJPBS4eC5jtRD4hYlQ1fVtLkqT6hVOst76Vt0ALYTRI2tP4FHlbbNlQ131y1DxHJvJi2437+02rrfG93XhtScDrxgDERxDYslX+m3M2n682qoX8v89A0U4NK0lA9NFc6lQtMASsRHCXXISFOMRUFu9oa3/edd9yEzmm3fLTgW3JYZwLTm4CDBdFjcPwvDRvC5tyAkAEBQ+0DvQvRRXW8dfH1Zg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4769.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(86362001)(31696002)(38100700002)(38070700005)(122000001)(71200400001)(8936002)(5660300002)(508600001)(66946007)(91956017)(2616005)(53546011)(110136005)(54906003)(316002)(966005)(4326008)(36756003)(66446008)(66476007)(66556008)(8676002)(6512007)(76116006)(64756008)(6486002)(26005)(83380400001)(31686004)(6506007)(2906002)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UllGZlF6bnNJcFNtZk1PQXZmZlJYNDl5aTk0YklZSjY0SFdiNXFRbzdkQUpV?=
+ =?utf-8?B?dmZod0IxSkp0V0JjRU5xR25BZ21Bb2JIdHNFeno2eXJLTU9DaDRsOU11MDk4?=
+ =?utf-8?B?TWhDek13VTRmMzZpVWlVY2Jua2VHMXlyeW1jT051bVZyOEgyeTVjaXJ6aEFw?=
+ =?utf-8?B?cEVaaGttd0o1V0cvZzRoQTZ3Tmh3ejZWb2NLZnZpcVlrRkVCbXd4QTZiT2hn?=
+ =?utf-8?B?bi9kaFpOcXBpYVZGaGo4VWlKSmN4aXNmTlNLaHJsc0YvMTZ5TmRxMzdkYnA5?=
+ =?utf-8?B?U2tpenkyVXA1dnZaZmpUN292SS9NWm5WaHhITElKRkR3c2x4UXhDVS92ZkFi?=
+ =?utf-8?B?ZjJRanZZU3hwZDA1d2VJS1BZTHNjTkN3Q1RSYVNrbW1OS3BKM3ZWMW96dzhT?=
+ =?utf-8?B?aGlhZ2M1K2JYOEVaWEtmSDFTTWI4cWMxUCtHZ1hVb1V1QVBKUlFvN2puaDU0?=
+ =?utf-8?B?QVRKbFMreUtQZFJQcWdIa25sNTFXY1BXZFc1REJ6Q3dPREpwc3JkVTZ2a3Ru?=
+ =?utf-8?B?YktYNk9pQmdRQzRRNXY5dmFFV3BQNzYzcStmN0E3anBuUFMrMXpjd0dxWjV5?=
+ =?utf-8?B?UjQ1WVZuVnhFQW1WWmFYN2Vmc3F6Q01iZm1xVWdseHZWQmVpdzB6ZlNNY0Rq?=
+ =?utf-8?B?RTkvWVZPU3gwTUdJY0xHRG1ZaVRxZzM2d2tXU0JWcHlDdTIrc0x1NTlmWU05?=
+ =?utf-8?B?TS9wUDN0N29SR2xib2c0UmJQVFNBbDdQTDVDb013SFd3dTAzbkN0RVZlY1Na?=
+ =?utf-8?B?N21MRVZZNU9oM2kvMVV4QjlZV2FHZkVtcDhYbktWYThYckgrSEVNQnFEVlVI?=
+ =?utf-8?B?bldYeElGZmRIdUJYaE5BOTdhZ29NNEx3bWg3RVltNCtJdFdvRDhJbTR4Z3h4?=
+ =?utf-8?B?bU4rTUxBOE5jYUNPTlA4WTRJaWx6K0tGMytoU3hiZXM5UzBuMzF2QmRKd1Vr?=
+ =?utf-8?B?WnptMkY4SENzYWkvQm1TZ21nZk5zdnYzbDBFcEJCcFFDUWZaVmhUc2FpRkdy?=
+ =?utf-8?B?RW5sSkhaOTZocWxqc2ZFaGJyVWFFRkI3UjZ5dVp0SE44eGVVMEhzekU2amg3?=
+ =?utf-8?B?Y3hLS2w1SzBURUxvaHE4aUlpSTM2UGNYcE9GWHZKKzdtUTVXQ2lMU1c1aEgz?=
+ =?utf-8?B?QldlaVVzdG5MOXUrMndQalB6M0VRbWc1Z3ZYZlVraGp3YjM5MHZYSlJvbU1w?=
+ =?utf-8?B?NWxPUC82MTNveTFIVGxtN0FKY1RGMkZ2N3VPSGo1aGxrUHVMUGpqU2ZwWFdk?=
+ =?utf-8?B?Qk5HT2dkMjNKL1pZTTRzb1EzNkExVzBndjFCUzg3U1IwRkpZdkh2U05VRHc2?=
+ =?utf-8?B?c0hma0RGTmM4eEl3cW8zSkZkeFcvTkNVcWNrLys4SUdOSE15Smg2TFZLd010?=
+ =?utf-8?B?WmtUZ2xrR0VEWUFJRXVNWmhPU0c0TmdKR0NheWY2V1JmUlRydjh4UGFYOTky?=
+ =?utf-8?B?YXAwQ0JsV1FjeWpEaDNpZm5QOFd4TjJBSFg1MWRHeEtyRjBJUm5IR05OK050?=
+ =?utf-8?B?STlYNGl2UjRuaHN0d0l2MG52K29aK2kxL0R6TVhSQjlkRThQRUZXWkE4ZXFz?=
+ =?utf-8?B?eXVMbFdqN05BTjRvTzB2bmVlaGtzZzQ0WjZZendEM2FBaXBUR2p0cWgxZnU0?=
+ =?utf-8?B?bGFXWVV6MlRUK08xNE83VE94V3A0RVgvNTFnT2RnTWdQcmVPU1RwS0YydEpu?=
+ =?utf-8?B?VDlmaEpjamlWbkp5bGhablZ0R0hqaHBvbmpGVVkvclIvLzZkaDZQRjgyWldY?=
+ =?utf-8?B?Y1RSMWlmZkJyU0JheXY5TlZkNWVTYUltZ1RYZzNkS1VLUEtRalBrREVsNHF1?=
+ =?utf-8?B?L05MaFcyYkpQUkxWeEc1LzRSUEp4MVYvQWZsQ1p4VjJUQXRrWG53aFMzOTZ5?=
+ =?utf-8?B?UkFEZEx0WktSS3c1dlUyRWN2ZHkrZ3cwRkRNckMwVmV3UXM2Ynh0L0VXMzN3?=
+ =?utf-8?B?UDZraWt3c3VXU1Bra294Y0NtUFRZalBCUEkxZ3I1OEZORXRteUF0L2VLODBO?=
+ =?utf-8?B?bHFHTnlDM1FDdG5tTktOWkRNbkxqcUZ4d3lMZ1RsaS9FM3k3bGpOMG5qV1Ro?=
+ =?utf-8?B?V1piVmF5QWxaQzlTWXdyNTJ2S1JHVmV2TnVUeUx4UGFzNTJsRFFzRFBncTl2?=
+ =?utf-8?B?QVJ6cTkvWjZUbmF2cHUrL3gvbjJnOW9XL2VvVUFmSWIyWDU0L1NpWG5LekJR?=
+ =?utf-8?B?c0draFhMWkhQOUhzWDI3SG5CQUl3ckh6NkdpTEpKQzJPKzJKM2oxeW92S1U0?=
+ =?utf-8?B?R1drVzRNLzR4SERaS2pPVDkya213PT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D4901D8949554242922F2BC06F6B77C8@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4769.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19c2a3dd-7307-417a-094a-08d9ed3c4360
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2022 08:55:33.2886
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BPg9RKIFZEzP0npZ86GcggXD6xFculEnyEM4YjocbmM7qVHFQ0hzWwKeDo+EDzPjXkLa2SWujMSCIs86QR0m8FGbhR3qrcK5Twi4VbUJKak=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4611
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Lei He <helei.sig11@bytedance.com>
-
-Implement RSA algorithm by nettle hogweed, and apply it for
-virtio-crypto akcipher backend.
-
-1, The self-test framework of crypto layer works fine in guest kernel
-2, Test with Linux guest(with asym support), the following script
-test(note that pkey_XXX is supported only in a newer version of keyutils):
-  - both public key & private key
-  - create/close session
-  - encrypt/decrypt/sign/verify basic driver operation
-  - also test with kernel crypto layer(pkey add/query)
-
-All the cases work fine.
-
-rm -rf *.der *.pem *.pfx
-modprobe pkcs8_key_parser # if CONFIG_PKCS8_PRIVATE_KEY_PARSER=m
-rm -rf /tmp/data
-dd if=/dev/random of=/tmp/data count=1 bs=226
-
-openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -subj "/C=CN/ST=BJ/L=HD/O=qemu/OU=dev/CN=qemu/emailAddress=qemu@qemu.org"
-openssl pkcs8 -in key.pem -topk8 -nocrypt -outform DER -out key.der
-openssl x509 -in cert.pem -inform PEM -outform DER -out cert.der
-
-PRIV_KEY_ID=`cat key.der | keyctl padd asymmetric test_priv_key @s`
-echo "priv key id = "$PRIV_KEY_ID
-PUB_KEY_ID=`cat cert.der | keyctl padd asymmetric test_pub_key @s`
-echo "pub key id = "$PUB_KEY_ID
-
-keyctl pkey_query $PRIV_KEY_ID 0
-keyctl pkey_query $PUB_KEY_ID 0
-
-echo "Enc with priv key..."
-keyctl pkey_encrypt $PRIV_KEY_ID 0 /tmp/data enc=pkcs1 >/tmp/enc.priv
-echo "Dec with pub key..."
-keyctl pkey_decrypt $PRIV_KEY_ID 0 /tmp/enc.priv enc=pkcs1 >/tmp/dec
-cmp /tmp/data /tmp/dec
-
-echo "Sign with priv key..."
-keyctl pkey_sign $PRIV_KEY_ID 0 /tmp/data enc=pkcs1 hash=sha1 > /tmp/sig
-echo "Verify with pub key..."
-keyctl pkey_verify $PRIV_KEY_ID 0 /tmp/data /tmp/sig enc=pkcs1 hash=sha1
-
-echo "Enc with pub key..."
-keyctl pkey_encrypt $PUB_KEY_ID 0 /tmp/data enc=pkcs1 >/tmp/enc.pub
-echo "Dec with priv key..."
-keyctl pkey_decrypt $PRIV_KEY_ID 0 /tmp/enc.pub enc=pkcs1 >/tmp/dec
-cmp /tmp/data /tmp/dec
-
-echo "Verify with pub key..."
-keyctl pkey_verify $PUB_KEY_ID 0 /tmp/data /tmp/sig enc=pkcs1 hash=sha1
-
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-Signed-off-by: lei he <helei.sig11@bytedance.com>
----
- crypto/akcipher-nettle.c | 486 +++++++++++++++++++++++++++++++++++++++
- crypto/akcipher.c        |  13 ++
- crypto/asn1_decoder.c    | 185 +++++++++++++++
- crypto/asn1_decoder.h    |  42 ++++
- crypto/meson.build       |   3 +
- meson.build              |  11 +
- 6 files changed, 740 insertions(+)
- create mode 100644 crypto/akcipher-nettle.c
- create mode 100644 crypto/asn1_decoder.c
- create mode 100644 crypto/asn1_decoder.h
-
-diff --git a/crypto/akcipher-nettle.c b/crypto/akcipher-nettle.c
-new file mode 100644
-index 0000000000..6ac39e7abc
---- /dev/null
-+++ b/crypto/akcipher-nettle.c
-@@ -0,0 +1,486 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+
-+#include <nettle/rsa.h>
-+
-+#include "asn1_decoder.h"
-+#include "crypto/akcipher.h"
-+#include "crypto/random.h"
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "sysemu/cryptodev.h"
-+#include "standard-headers/linux/virtio_crypto.h"
-+
-+typedef struct QCryptoNettleRsa {
-+    QCryptoAkcipher akcipher;
-+    struct rsa_public_key pub;
-+    struct rsa_private_key priv;
-+    int padding_algo;
-+    int hash_algo;
-+} QCryptoNettleRsa;
-+
-+struct asn1_parse_ctx {
-+    const uint8_t *data;
-+    size_t dlen;
-+};
-+
-+static int extract_value(void *p, const uint8_t *data, size_t dlen)
-+{
-+    struct asn1_parse_ctx *ctx = (struct asn1_parse_ctx *)p;
-+    ctx->data = (uint8_t *)data;
-+    ctx->dlen = dlen;
-+
-+    return 0;
-+}
-+
-+static int extract_mpi(void *p, const uint8_t *data, size_t dlen)
-+{
-+    mpz_t *target = (mpz_t *)p;
-+    nettle_mpz_set_str_256_u(*target, dlen, data);
-+
-+    return 0;
-+}
-+
-+static QCryptoNettleRsa *qcrypto_nettle_rsa_malloc(void);
-+
-+static void qcrypto_nettle_rsa_destroy(void *ptr)
-+{
-+    QCryptoNettleRsa *rsa = (QCryptoNettleRsa *)ptr;
-+    if (!rsa) {
-+        return;
-+    }
-+
-+    rsa_public_key_clear(&rsa->pub);
-+    rsa_private_key_clear(&rsa->priv);
-+    g_free(rsa);
-+}
-+
-+static QCryptoAkcipher *qcrypto_nettle_new_rsa(bool private, const uint8_t *key,
-+                                               size_t keylen, void *para,
-+                                               int index,  Error **errp);
-+
-+QCryptoAkcipher *qcrypto_akcipher_nettle_new(uint32_t alg, bool private,
-+                                             const uint8_t *key,
-+                                             size_t keylen, void *para,
-+                                             int index, Error **errp);
-+
-+QCryptoAkcipher *qcrypto_akcipher_nettle_new(uint32_t alg, bool private,
-+                                             const uint8_t *key,
-+                                             size_t keylen, void *para,
-+                                             int index, Error **errp)
-+{
-+    switch (alg) {
-+    case VIRTIO_CRYPTO_AKCIPHER_RSA:
-+        return qcrypto_nettle_new_rsa(private, key, keylen, para, index, errp);
-+    default:
-+        error_setg(errp, "Unsupported algorithm: %u", alg);
-+        return NULL;
-+    }
-+
-+    return NULL;
-+}
-+
-+/*
-+ * Parse ber encoded rsa private key, asn1 schema:
-+ *        RsaPrivKey ::= SEQUENCE {
-+ *             version     INTEGER
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *             d           INTEGER
-+ *             p           INTEGER
-+ *             q           INTEGER
-+ *             e1          INTEGER
-+ *             e2          INTEGER
-+ *             u           INTEGER
-+ *         }
-+ */
-+static int parse_rsa_private_key(QCryptoNettleRsa *rsa,
-+                                 const uint8_t *key, size_t keylen)
-+{
-+    struct asn1_parse_ctx ctx;
-+
-+    if (ber_decode_seq(&key, &keylen, extract_value, &ctx) != 0 ||
-+        keylen != 0) {
-+        return -1;
-+    }
-+
-+    if (ber_decode_int(&ctx.data, &ctx.dlen, NULL, NULL) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->pub.n) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->pub.e) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.d) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.p) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.q) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.a) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.b) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->priv.c) != 0 ||
-+        ctx.dlen != 0) {
-+        return -1;
-+    }
-+
-+    if (!rsa_public_key_prepare(&rsa->pub)) {
-+        return -1;
-+    }
-+
-+    /*
-+     * Since in the kernel's unit test, the p, q, a, b, c of some
-+     * private keys is 0, only the simplest length check is done here
-+     */
-+    rsa->priv.size = rsa->pub.size;
-+
-+    return 0;
-+}
-+
-+/*
-+ * Parse ber encoded rsa pubkey, asn1 schema:
-+ *        RsaPrivKey ::= SEQUENCE {
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *         }
-+ */
-+static int parse_rsa_public_key(QCryptoNettleRsa *rsa,
-+                                const uint8_t *key,
-+                                size_t keylen)
-+{
-+    struct asn1_parse_ctx ctx;
-+
-+    if (ber_decode_seq(&key, &keylen, extract_value, &ctx) != 0 ||
-+        keylen != 0) {
-+        return -1;
-+    }
-+
-+    if (ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->pub.n) != 0 ||
-+        ber_decode_int(&ctx.data, &ctx.dlen, extract_mpi, &rsa->pub.e) != 0 ||
-+        ctx.dlen != 0) {
-+        return -1;
-+    }
-+
-+    if (!rsa_public_key_prepare(&rsa->pub)) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static QCryptoAkcipher *qcrypto_nettle_new_rsa(bool private, const uint8_t *key,
-+                                               size_t keylen, void *para,
-+                                               int index, Error **errp)
-+{
-+    QCryptoNettleRsa *rsa = qcrypto_nettle_rsa_malloc();
-+    CryptoDevBackendRsaPara *p = (CryptoDevBackendRsaPara *)para;
-+    rsa->padding_algo = p->padding_algo;
-+    rsa->hash_algo = p->hash_algo;
-+
-+    if (private && parse_rsa_private_key(rsa, key, keylen) == 0) {
-+        return (QCryptoAkcipher *)rsa;
-+    } else if (!private && parse_rsa_public_key(rsa, key, keylen) == 0) {
-+        return (QCryptoAkcipher *)rsa;
-+    }
-+
-+    qcrypto_nettle_rsa_destroy(rsa);
-+    error_setg(errp, "Failed to parse %s key", private ? "private" : "public");
-+
-+    return NULL;
-+}
-+
-+
-+/*
-+ * nettle does not provide RSA interfaces without padding,
-+ * here we implemented rsa algorithm with nettle/mpz.
-+ */
-+static int _rsa_enc_raw(QCryptoNettleRsa *rsa, const void *data,
-+                        size_t data_len, void *enc,
-+                        size_t enc_len, Error **errp)
-+{
-+    mpz_t m;
-+
-+    nettle_mpz_init_set_str_256_u(m, data_len, data);
-+    /* (1) Validate 0 <= m < n */
-+    if (mpz_cmp_ui(m, 0) < 0 || mpz_cmp(m, rsa->pub.n) >= 0) {
-+        error_setg(errp, "Failed to validate input data");
-+        return -VIRTIO_CRYPTO_BADMSG;
-+    }
-+
-+    /* (2) c = m ^ e mod n */
-+    mpz_powm(m, m, rsa->pub.e, rsa->pub.n);
-+    nettle_mpz_get_str_256(enc_len, (uint8_t *)enc, m);
-+
-+    mpz_clear(m);
-+
-+    return 0;
-+}
-+
-+static int _rsa_dec_raw(QCryptoNettleRsa *rsa,
-+                        const void *enc,
-+                        size_t enc_len,
-+                        void *data,
-+                        size_t data_len,
-+                        Error **errp)
-+{
-+    mpz_t c;
-+    nettle_mpz_init_set_str_256_u(c, enc_len, enc);
-+
-+    /* (1) Validate 0 <= c < n */
-+    if (mpz_cmp_ui(c, 0) < 0 || mpz_cmp(c, rsa->pub.n) >= 0) {
-+        error_setg(errp, "Failed to validate input data");
-+        return -VIRTIO_CRYPTO_BADMSG;
-+    }
-+
-+    /* (2) m = c ^ d mod n */
-+    mpz_powm(c, c, rsa->priv.d, rsa->pub.n);
-+    nettle_mpz_get_str_256(data_len, (uint8_t *)data, c);
-+    mpz_clear(c);
-+
-+    return 0;
-+}
-+
-+static void wrap_nettle_random_func(void *ctx, size_t len, uint8_t *out)
-+{
-+    /* TODO: check result */
-+    qcrypto_random_bytes(out, len, NULL);
-+}
-+
-+static int qcrypto_nettle_rsa_encrypt(QCryptoAkcipher *akcipher_driver,
-+                                      const void *data, size_t data_len,
-+                                      void *enc, size_t enc_len,
-+                                      Error **errp)
-+{
-+
-+    QCryptoNettleRsa *rsa =
-+        container_of(akcipher_driver, QCryptoNettleRsa, akcipher);
-+    mpz_t c;
-+    int enc_ret;
-+
-+    if (data_len > rsa->pub.size || enc_len < rsa->pub.size) {
-+        error_setg(errp, "Invalid buffer size");
-+        return -VIRTIO_CRYPTO_BADMSG;
-+    }
-+
-+    switch (rsa->padding_algo) {
-+    case VIRTIO_CRYPTO_RSA_RAW_PADDING:
-+        return _rsa_enc_raw(rsa, data, data_len, enc, enc_len, errp);
-+
-+    case VIRTIO_CRYPTO_RSA_PKCS1_PADDING:
-+        mpz_init(c);
-+        enc_ret = rsa_encrypt(&rsa->pub, NULL, wrap_nettle_random_func,
-+                              data_len, (uint8_t *)data, c);
-+        if (enc_ret != 1) {
-+            error_setg(errp, "Failed to encrypt");
-+        } else {
-+            nettle_mpz_get_str_256(enc_len, (uint8_t *)enc, c);
-+        }
-+        mpz_clear(c);
-+        return enc_ret == 1 ? 0 : -1;
-+
-+    default:
-+        error_setg(errp, "Unknown padding");
-+        return -VIRTIO_CRYPTO_NOTSUPP;
-+    }
-+
-+    return -1;
-+}
-+
-+static int qcrypto_nettle_rsa_decrypt(QCryptoAkcipher *akcipher,
-+                                      const void *enc, size_t enc_len,
-+                                      void *data, size_t data_len,
-+                                      Error **errp)
-+{
-+    QCryptoNettleRsa *rsa = container_of(akcipher, QCryptoNettleRsa, akcipher);
-+    mpz_t m;
-+    int dec_ret;
-+
-+    if (enc_len > rsa->priv.size || data_len < rsa->priv.size) {
-+        error_setg(errp, "Invalid buffer size");
-+        return -VIRTIO_CRYPTO_BADMSG;
-+    }
-+
-+    switch (rsa->padding_algo) {
-+    case VIRTIO_CRYPTO_RSA_RAW_PADDING:
-+        return _rsa_dec_raw(rsa, enc, enc_len, data, data_len, errp);
-+
-+    case VIRTIO_CRYPTO_RSA_PKCS1_PADDING:
-+        mpz_init(m);
-+        dec_ret = rsa_encrypt(&rsa->pub, NULL, wrap_nettle_random_func,
-+                              data_len, (uint8_t *)data, m);
-+        if (dec_ret != 1) {
-+            error_setg(errp, "Failed to encrypt");
-+        } else {
-+            nettle_mpz_get_str_256(data_len, (uint8_t *)data_len, m);
-+        }
-+        mpz_clear(m);
-+        return dec_ret == 1 ? 0 : -1;
-+
-+    default:
-+        error_setg(errp, "Unknown padding");
-+        return -VIRTIO_CRYPTO_NOTSUPP;
-+    }
-+
-+    return -1;
-+}
-+
-+
-+static int qcrypto_nettle_rsa_sign(QCryptoAkcipher *akcipher,
-+                                   const void *data, size_t data_len,
-+                                   void *sig, size_t sig_len, Error **errp)
-+{
-+    QCryptoNettleRsa *rsa = container_of(akcipher, QCryptoNettleRsa, akcipher);
-+    int ret;
-+    mpz_t s;
-+
-+    /*
-+     * The RSA algorithm cannot be used for signature/verification
-+     * without padding.
-+     */
-+    if (rsa->padding_algo == VIRTIO_CRYPTO_RSA_RAW_PADDING) {
-+        error_setg(errp, "Try to make signature without padding");
-+        return -VIRTIO_CRYPTO_NOTSUPP;
-+    }
-+
-+    if (data_len > rsa->priv.size || sig_len < rsa->priv.size) {
-+        error_setg(errp, "Invalid buffer size");
-+        return -VIRTIO_CRYPTO_BADMSG;
-+    }
-+
-+    mpz_init(s);
-+    switch (rsa->hash_algo) {
-+    case VIRTIO_CRYPTO_RSA_MD5:
-+        ret = rsa_md5_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA1:
-+        ret = rsa_sha1_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA256:
-+        ret = rsa_sha256_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA512:
-+        ret = rsa_sha512_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unknown hash algorithm");
-+        ret = -VIRTIO_CRYPTO_NOTSUPP;
-+        goto clear;
-+    }
-+
-+    if (ret != 1) {
-+        error_setg(errp, "Failed to make signature");
-+        ret = -VIRTIO_CRYPTO_BADMSG;
-+        goto clear;
-+    }
-+    nettle_mpz_get_str_256(sig_len, (uint8_t *)sig, s);
-+    ret = 0;
-+
-+clear:
-+    mpz_clear(s);
-+
-+    return ret;
-+}
-+
-+static int qcrypto_nettle_rsa_verify(QCryptoAkcipher *akcipher,
-+                                     const void *sig, size_t sig_len,
-+                                     const void *data, size_t data_len,
-+                                     Error **errp)
-+{
-+    QCryptoNettleRsa *rsa = container_of(akcipher, QCryptoNettleRsa, akcipher);
-+
-+    int ret;
-+    mpz_t s;
-+
-+    /*
-+     * The RSA algorithm cannot be used for signature/verification
-+     * without padding.
-+     */
-+    if (rsa->padding_algo == VIRTIO_CRYPTO_RSA_RAW_PADDING) {
-+        error_setg(errp, "Operation not supported");
-+        return -1;
-+    }
-+    if (data_len > rsa->pub.size || sig_len < rsa->pub.size) {
-+        error_setg(errp, "Invalid buffer size");
-+        return -1;
-+    }
-+
-+    nettle_mpz_init_set_str_256_u(s, sig_len, sig);
-+    switch (rsa->hash_algo) {
-+    case VIRTIO_CRYPTO_RSA_MD5:
-+        ret = rsa_md5_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA1:
-+        ret = rsa_sha1_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA256:
-+        ret = rsa_sha256_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case VIRTIO_CRYPTO_RSA_SHA512:
-+        ret = rsa_sha512_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unknown hash algorithm");
-+        ret = -VIRTIO_CRYPTO_NOTSUPP;
-+        goto clear;
-+    }
-+
-+    if (ret != 1) {
-+        error_setg(errp, "Failed to verify");
-+        ret = -VIRTIO_CRYPTO_KEY_REJECTED;
-+        goto clear;
-+    }
-+    ret = 0;
-+
-+clear:
-+    mpz_clear(s);
-+
-+    return ret;
-+}
-+
-+static int qcrypto_nettle_rsa_free(struct QCryptoAkcipher *akcipher,
-+                                   Error **errp)
-+{
-+    qcrypto_nettle_rsa_destroy(akcipher);
-+
-+    return 0;
-+}
-+
-+QCryptoAkcipherDriver nettle_rsa = {
-+    .encrypt = qcrypto_nettle_rsa_encrypt,
-+    .decrypt = qcrypto_nettle_rsa_decrypt,
-+    .sign = qcrypto_nettle_rsa_sign,
-+    .verify = qcrypto_nettle_rsa_verify,
-+    .free = qcrypto_nettle_rsa_free,
-+};
-+
-+static QCryptoNettleRsa *qcrypto_nettle_rsa_malloc(void)
-+{
-+    QCryptoNettleRsa *rsa = g_malloc0(sizeof(QCryptoNettleRsa));
-+    memset(rsa, 0, sizeof(QCryptoNettleRsa));
-+    rsa->akcipher.driver = &nettle_rsa;
-+    rsa_public_key_init(&rsa->pub);
-+    rsa_private_key_init(&rsa->priv);
-+
-+    return rsa;
-+}
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index ac8d1c9bf1..f5bdc35e18 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -24,6 +24,12 @@
- #include "qapi/error.h"
- #include "crypto/akcipher.h"
- 
-+QCryptoAkcipher *qcrypto_akcipher_nettle_new(uint32_t alg, bool private,
-+                                             const uint8_t *key,
-+                                             size_t keylen,
-+                                             void *para,
-+                                             int index, Error **errp);
-+
- QCryptoAkcipher *qcrypto_akcipher_new(uint32_t alg, bool private,
-                                       const uint8_t *key, size_t keylen,
-                                       void *para,
-@@ -31,6 +37,13 @@ QCryptoAkcipher *qcrypto_akcipher_new(uint32_t alg, bool private,
- {
-     QCryptoAkcipher *akcipher = NULL;
- 
-+#ifdef CONFIG_HOGWEED
-+    akcipher = qcrypto_akcipher_nettle_new(alg, private, key, keylen,
-+                                           para, index, errp);
-+#else
-+    error_setg(errp, "qcrypto akcipher has no nettle/hogweed support");
-+#endif
-+
-     return akcipher;
- }
- 
-diff --git a/crypto/asn1_decoder.c b/crypto/asn1_decoder.c
-new file mode 100644
-index 0000000000..bfb145e84e
---- /dev/null
-+++ b/crypto/asn1_decoder.c
-@@ -0,0 +1,185 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <stdint.h>
-+#include <stddef.h>
-+
-+#include "crypto/asn1_decoder.h"
-+
-+enum ber_type_tag {
-+    ber_type_tag_bool = 0x1,
-+    ber_type_tag_int = 0x2,
-+    ber_type_tag_bit_str = 0x3,
-+    ber_type_tag_oct_str = 0x4,
-+    ber_type_tag_oct_null = 0x5,
-+    ber_type_tag_oct_oid = 0x6,
-+    ber_type_tag_seq = 0x10,
-+    ber_type_tag_set = 0x11,
-+};
-+
-+#define BER_CONSTRUCTED_MASK 0x20
-+#define BER_SHORT_LEN_MASK 0x80
-+
-+static uint8_t ber_peek_byte(const uint8_t **data, size_t *dlen)
-+{
-+    return **data;
-+}
-+
-+static int invoke_callback(BerDecodeCb cb, void *ctx,
-+                           const uint8_t *value, size_t vlen)
-+{
-+    if (!cb) {
-+        return 0;
-+    }
-+
-+    return cb(ctx, value, vlen);
-+}
-+
-+static void ber_cut_nbytes(const uint8_t **data, size_t *dlen,
-+                           size_t nbytes)
-+{
-+    *data += nbytes;
-+    *dlen -= nbytes;
-+}
-+
-+static uint8_t ber_cut_byte(const uint8_t **data, size_t *dlen)
-+{
-+    uint8_t val = ber_peek_byte(data, dlen);
-+
-+    ber_cut_nbytes(data, dlen, 1);
-+
-+    return val;
-+}
-+
-+static int ber_extract_definite_data(const uint8_t **data, size_t *dlen,
-+                                     BerDecodeCb cb, void *ctx)
-+{
-+    const uint8_t *value;
-+    size_t vlen = 0;
-+    uint8_t byte_count = ber_cut_byte(data, dlen);
-+
-+    /* short format of definite-length */
-+    if (!(byte_count & BER_SHORT_LEN_MASK)) {
-+        if (byte_count > *dlen) {
-+            return -1;
-+        }
-+
-+        value = *data;
-+        vlen = byte_count;
-+        ber_cut_nbytes(data, dlen, vlen);
-+
-+        return invoke_callback(cb, ctx, value, vlen);
-+    }
-+
-+    /* Ignore highest bit */
-+    byte_count &= ~BER_SHORT_LEN_MASK;
-+
-+    /*
-+     * size_t is enough to express the length, although the ber encoding
-+     * standard supports larger length.
-+     */
-+    if (byte_count > sizeof(size_t)) {
-+        return -1;
-+    }
-+
-+    while (byte_count--) {
-+        vlen <<= 8;
-+        vlen += ber_cut_byte(data, dlen);
-+    }
-+
-+    if (vlen > *dlen) {
-+        return -1;
-+    }
-+
-+    value = *data;
-+    ber_cut_nbytes(data, dlen, vlen);
-+
-+    return invoke_callback(cb, ctx, value, vlen);
-+}
-+
-+static int ber_extract_undefinite_data(const uint8_t **data, size_t *dlen,
-+                                       BerDecodeCb cb, void *ctx)
-+{
-+    size_t vlen = 0;
-+    const uint8_t *value;
-+
-+    if (*dlen < 3) {
-+        return -1;
-+    }
-+
-+    /* skip undefinite-length-mask 0x80 */
-+    ber_cut_nbytes(data, dlen, 1);
-+
-+    value = *data;
-+    while (vlen < *dlen) {
-+        if ((*data)[vlen] != 0) {
-+            vlen++;
-+            continue;
-+        }
-+
-+        if (vlen + 1 < *dlen && (*data[vlen + 1] == 0)) {
-+            ber_cut_nbytes(data, dlen, vlen + 2);
-+            return invoke_callback(cb, ctx, value, vlen);
-+        }
-+
-+        vlen += 2;
-+    }
-+
-+    return -1;
-+}
-+
-+static int ber_extract_data(const uint8_t **data, size_t *dlen,
-+                            BerDecodeCb cb, void *ctx)
-+{
-+    uint8_t val = ber_peek_byte(data, dlen);
-+
-+    if (val == BER_SHORT_LEN_MASK) {
-+        return ber_extract_undefinite_data(data, dlen, cb, ctx);
-+    }
-+
-+    return ber_extract_definite_data(data, dlen, cb, ctx);
-+}
-+
-+int ber_decode_int(const uint8_t **data, size_t *dlen,
-+                   BerDecodeCb cb, void *ctx)
-+{
-+    uint8_t tag = ber_cut_byte(data, dlen);
-+
-+    /* INTEGER must encoded in primitive-form */
-+    if (tag != ber_type_tag_int) {
-+        return -1;
-+    }
-+
-+    return ber_extract_data(data, dlen, cb, ctx);
-+}
-+
-+int ber_decode_seq(const uint8_t **data, size_t *dlen,
-+                   BerDecodeCb cb, void *ctx)
-+{
-+    uint8_t val = ber_cut_byte(data, dlen);
-+
-+    /* SEQUENCE must use constructed form */
-+    if (val != (ber_type_tag_seq | BER_CONSTRUCTED_MASK)) {
-+        return -1;
-+    }
-+
-+    return ber_extract_data(data, dlen, cb, ctx);
-+}
-diff --git a/crypto/asn1_decoder.h b/crypto/asn1_decoder.h
-new file mode 100644
-index 0000000000..d33a7c81c4
---- /dev/null
-+++ b/crypto/asn1_decoder.h
-@@ -0,0 +1,42 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef QCRYPTO_ASN1_DECODER_H
-+#define QCRYPTO_ASN1_DECODER_H
-+
-+/*
-+ *  ctx: user content.
-+ *  value: the starting address of |value| part of 'Tag-Length-Value' pattern.
-+ *  vlen: length of the |value|.
-+ */
-+typedef int (*BerDecodeCb) (void *ctx, const uint8_t *value, size_t vlen);
-+
-+int ber_decode_int(const uint8_t **data,
-+                   size_t *dlen,
-+                   BerDecodeCb cb,
-+                   void *ctx);
-+
-+int ber_decode_seq(const uint8_t **data,
-+                   size_t *dlen,
-+                   BerDecodeCb cb,
-+                   void *ctx);
-+
-+#endif  /* QCRYPTO_ASN1_DECODER_H */
-diff --git a/crypto/meson.build b/crypto/meson.build
-index 72b36f450a..28d14cb153 100644
---- a/crypto/meson.build
-+++ b/crypto/meson.build
-@@ -27,6 +27,9 @@ if nettle.found()
-   if xts == 'private'
-     crypto_ss.add(files('xts.c'))
-   endif
-+  if hogweed.found()
-+    crypto_ss.add(gmp, hogweed, files('akcipher-nettle.c', 'asn1_decoder.c'))
-+  endif
- elif gcrypt.found()
-   crypto_ss.add(gcrypt, files('hash-gcrypt.c', 'hmac-gcrypt.c', 'pbkdf-gcrypt.c'))
- elif gnutls_crypto.found()
-diff --git a/meson.build b/meson.build
-index 5f43355071..fdc7ffabef 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1027,6 +1027,7 @@ endif
- # gcrypt over nettle for performance reasons.
- gcrypt = not_found
- nettle = not_found
-+hogweed = not_found
- xts = 'none'
- 
- if get_option('nettle').enabled() and get_option('gcrypt').enabled()
-@@ -1064,6 +1065,14 @@ if not gnutls_crypto.found()
-   endif
- endif
- 
-+gmp = dependency('gmp', required: false, method: 'pkg-config', kwargs: static_kwargs)
-+if nettle.found() and gmp.found()
-+  hogweed = dependency('hogweed', version: '>=3.4',
-+                       method: 'pkg-config',
-+                       required: get_option('nettle'),
-+                       kwargs: static_kwargs)
-+endif
-+
- gtk = not_found
- gtkx11 = not_found
- vte = not_found
-@@ -1516,6 +1525,7 @@ config_host_data.set('CONFIG_GNUTLS', gnutls.found())
- config_host_data.set('CONFIG_GNUTLS_CRYPTO', gnutls_crypto.found())
- config_host_data.set('CONFIG_GCRYPT', gcrypt.found())
- config_host_data.set('CONFIG_NETTLE', nettle.found())
-+config_host_data.set('CONFIG_HOGWEED', hogweed.found())
- config_host_data.set('CONFIG_QEMU_PRIVATE_XTS', xts == 'private')
- config_host_data.set('CONFIG_MALLOC_TRIM', has_malloc_trim)
- config_host_data.set('CONFIG_STATX', has_statx)
-@@ -3413,6 +3423,7 @@ summary_info += {'libgcrypt':         gcrypt}
- summary_info += {'nettle':            nettle}
- if nettle.found()
-    summary_info += {'  XTS':             xts != 'private'}
-+   summary_info += {'  hogweed':         hogweed.found()}
- endif
- summary_info += {'crypto afalg':      config_host.has_key('CONFIG_AF_ALG')}
- summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
--- 
-2.20.1
-
+SGkgVHVkb3IsDQoNCk9uIDExLjAyLjIwMjIgMTA6MjEsIFR1ZG9yIEFtYmFydXMgd3JvdGU6DQo+
+IENvbnZlcnQgQXRtZWwgQUVTIGRvY3VtZW50YXRpb24gdG8geWFtbCBmb3JtYXQuIFdpdGggdGhl
+IGNvbnZlcnNpb24gdGhlDQo+IGNsb2NrIGFuZCBjbG9jay1uYW1lcyBwcm9wZXJ0aWVzIGFyZSBt
+YWRlIG1hbmRhdG9yeS4gVGhlIGRyaXZlciByZXR1cm5zDQo+IC1FSU5WQUwgaWYgImFlc19jbGsi
+IGlzIG5vdCBmb3VuZCwgcmVmbGVjdCB0aGF0IGluIHRoZSBiaW5kaW5ncyBhbmQgbWFrZQ0KPiB0
+aGUgY2xvY2sgYW5kIGNsb2NrLW5hbWVzIHByb3BlcnRpZXMgbWFuZGF0b3J5LiBVcGRhdGUgdGhl
+IGV4YW1wbGUgdG8NCj4gYmV0dGVyIGRlc2NyaWJlIGhvdyBvbmUgc2hvdWxkIGRlZmluZSB0aGUg
+ZHQgbm9kZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFR1ZG9yIEFtYmFydXMgPHR1ZG9yLmFtYmFy
+dXNAbWljcm9jaGlwLmNvbT4NCj4gLS0tDQo+ICAuLi4vY3J5cHRvL2F0bWVsLGF0OTFzYW05ZzQ2
+LWFlcy55YW1sICAgICAgICAgfCA2NiArKysrKysrKysrKysrKysrKysrDQo+ICAuLi4vYmluZGlu
+Z3MvY3J5cHRvL2F0bWVsLWNyeXB0by50eHQgICAgICAgICAgfCAyMCAtLS0tLS0NCj4gIDIgZmls
+ZXMgY2hhbmdlZCwgNjYgaW5zZXJ0aW9ucygrKSwgMjAgZGVsZXRpb25zKC0pDQo+ICBjcmVhdGUg
+bW9kZSAxMDA2NDQgRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL2NyeXB0by9hdG1l
+bCxhdDkxc2FtOWc0Ni1hZXMueWFtbA0KPiANCj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24v
+ZGV2aWNldHJlZS9iaW5kaW5ncy9jcnlwdG8vYXRtZWwsYXQ5MXNhbTlnNDYtYWVzLnlhbWwgYi9E
+b2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvY3J5cHRvL2F0bWVsLGF0OTFzYW05ZzQ2
+LWFlcy55YW1sDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4u
+ZmU1OWFkMzBiMTcxDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvRG9jdW1lbnRhdGlvbi9kZXZp
+Y2V0cmVlL2JpbmRpbmdzL2NyeXB0by9hdG1lbCxhdDkxc2FtOWc0Ni1hZXMueWFtbA0KPiBAQCAt
+MCwwICsxLDY2IEBADQo+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiAoR1BMLTIuMC1vbmx5
+IE9SIEJTRC0yLUNsYXVzZSkNCj4gKyMgQ29weXJpZ2h0IChDKSAyMDIyIE1pY3JvY2hpcCBUZWNo
+bm9sb2d5LCBJbmMuIGFuZCBpdHMgc3Vic2lkaWFyaWVzDQo+ICslWUFNTCAxLjINCj4gKy0tLQ0K
+PiArJGlkOiBodHRwOi8vZGV2aWNldHJlZS5vcmcvc2NoZW1hcy9jcnlwdG8vYXRtZWwsYXQ5MXNh
+bTlnNDYtYWVzLnlhbWwjDQo+ICskc2NoZW1hOiBodHRwOi8vZGV2aWNldHJlZS5vcmcvbWV0YS1z
+Y2hlbWFzL2NvcmUueWFtbCMNCj4gKw0KPiArdGl0bGU6IEF0bWVsIEFkdmFuY2VkIEVuY3J5cHRp
+b24gU3RhbmRhcmQgKEFFUykgSFcgY3J5cHRvZ3JhcGhpYyBhY2NlbGVyYXRvcg0KPiArDQo+ICtt
+YWludGFpbmVyczoNCj4gKyAgLSBUdWRvciBBbWJhcnVzIDx0dWRvci5hbWJhcnVzQG1pY3JvY2hp
+cC5jb20+DQo+ICsNCj4gK3Byb3BlcnRpZXM6DQo+ICsgIGNvbXBhdGlibGU6DQo+ICsgICAgY29u
+c3Q6IGF0bWVsLGF0OTFzYW05ZzQ2LWFlcw0KPiArDQo+ICsgIHJlZzoNCj4gKyAgICBtYXhJdGVt
+czogMQ0KPiArDQo+ICsgIGludGVycnVwdHM6DQo+ICsgICAgbWF4SXRlbXM6IDENCj4gKw0KPiAr
+ICBjbG9ja3M6DQo+ICsgICAgbWF4SXRlbXM6IDENCj4gKw0KPiArICBjbG9jay1uYW1lczoNCj4g
+KyAgICBjb25zdDogYWVzX2Nsaw0KPiArDQo+ICsgIGRtYXM6DQo+ICsgICAgaXRlbXM6DQo+ICsg
+ICAgICAtIGRlc2NyaXB0aW9uOiBUWCBETUEgQ2hhbm5lbA0KPiArICAgICAgLSBkZXNjcmlwdGlv
+bjogUlggRE1BIENoYW5uZWwNCj4gKw0KPiArICBkbWEtbmFtZXM6DQo+ICsgICAgaXRlbXM6DQo+
+ICsgICAgICAtIGNvbnN0OiB0eA0KPiArICAgICAgLSBjb25zdDogcngNCj4gKw0KPiArcmVxdWly
+ZWQ6DQo+ICsgIC0gY29tcGF0aWJsZQ0KPiArICAtIHJlZw0KPiArICAtIGludGVycnVwdHMNCj4g
+KyAgLSBjbG9ja3MNCj4gKyAgLSBjbG9jay1uYW1lcw0KPiArICAtIGRtYXMNCj4gKyAgLSBkbWEt
+bmFtZXMNCj4gKw0KPiArYWRkaXRpb25hbFByb3BlcnRpZXM6IGZhbHNlDQo+ICsNCj4gK2V4YW1w
+bGVzOg0KPiArICAtIHwNCj4gKyAgICAjaW5jbHVkZSA8ZHQtYmluZGluZ3MvaW50ZXJydXB0LWNv
+bnRyb2xsZXIvaXJxLmg+DQo+ICsgICAgI2luY2x1ZGUgPGR0LWJpbmRpbmdzL2ludGVycnVwdC1j
+b250cm9sbGVyL2FybS1naWMuaD4NCj4gKyAgICAjaW5jbHVkZSA8ZHQtYmluZGluZ3MvY2xvY2sv
+YXQ5MS5oPg0KPiArICAgICNpbmNsdWRlIDxkdC1iaW5kaW5ncy9kbWEvYXQ5MS5oPg0KPiArDQo+
+ICsgICAgYWVzOiBjcnlwdG9AZjgwMzgwMDAgew0KDQpBZGRyZXNzIGhlcmUgICAgICAgIF4NCg0K
+PiArICAgICAgY29tcGF0aWJsZSA9ICJhdG1lbCxhdDkxc2FtOWc0Ni1hZXMiOw0KPiArICAgICAg
+cmVnID0gPDB4ZTE4MTAwMDAgMHgxMDA+Ow0KDQphbmQgaGVyZSAgICAgICAgICAgIF4gIGRvbid0
+IG1hdGNoLg0KDQo+ICsgICAgICBpbnRlcnJ1cHRzID0gPEdJQ19TUEkgMjcgSVJRX1RZUEVfTEVW
+RUxfSElHSD47DQo+ICsgICAgICBjbG9ja3MgPSA8JnBtYyBQTUNfVFlQRV9QRVJJUEhFUkFMIDI3
+PjsNCj4gKyAgICAgIGNsb2NrLW5hbWVzID0gImFlc19jbGsiOw0KPiArICAgICAgZG1hcyA9IDwm
+ZG1hMCBBVDkxX1hETUFDX0RUX1BFUklEKDEpPiwNCj4gKyAgICAgICAgICAgICA8JmRtYTAgQVQ5
+MV9YRE1BQ19EVF9QRVJJRCgyKT47DQo+ICsgICAgICBkbWEtbmFtZXMgPSAidHgiLCAicngiOw0K
+PiArICAgIH07DQo+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGlu
+Z3MvY3J5cHRvL2F0bWVsLWNyeXB0by50eHQgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmlu
+ZGluZ3MvY3J5cHRvL2F0bWVsLWNyeXB0by50eHQNCj4gaW5kZXggZjJhYWIzZGMyYjUyLi4xMzUz
+ZWJkMGRjYWEgMTAwNjQ0DQo+IC0tLSBhL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5n
+cy9jcnlwdG8vYXRtZWwtY3J5cHRvLnR4dA0KPiArKysgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRy
+ZWUvYmluZGluZ3MvY3J5cHRvL2F0bWVsLWNyeXB0by50eHQNCj4gQEAgLTIsMjYgKzIsNiBAQA0K
+PiAgDQo+ICBUaGVzZSBhcmUgdGhlIEhXIGNyeXB0b2dyYXBoaWMgYWNjZWxlcmF0b3JzIGZvdW5k
+IG9uIHNvbWUgQXRtZWwgcHJvZHVjdHMuDQo+ICANCj4gLSogQWR2YW5jZWQgRW5jcnlwdGlvbiBT
+dGFuZGFyZCAoQUVTKQ0KPiAtDQo+IC1SZXF1aXJlZCBwcm9wZXJ0aWVzOg0KPiAtLSBjb21wYXRp
+YmxlIDogU2hvdWxkIGJlICJhdG1lbCxhdDkxc2FtOWc0Ni1hZXMiLg0KPiAtLSByZWc6IFNob3Vs
+ZCBjb250YWluIEFFUyByZWdpc3RlcnMgbG9jYXRpb24gYW5kIGxlbmd0aC4NCj4gLS0gaW50ZXJy
+dXB0czogU2hvdWxkIGNvbnRhaW4gdGhlIElSUSBsaW5lIGZvciB0aGUgQUVTLg0KPiAtLSBkbWFz
+OiBMaXN0IG9mIHR3byBETUEgc3BlY2lmaWVycyBhcyBkZXNjcmliZWQgaW4NCj4gLSAgICAgICAg
+YXRtZWwtZG1hLnR4dCBhbmQgZG1hLnR4dCBmaWxlcy4NCj4gLS0gZG1hLW5hbWVzOiBDb250YWlu
+cyBvbmUgaWRlbnRpZmllciBzdHJpbmcgZm9yIGVhY2ggRE1BIHNwZWNpZmllcg0KPiAtICAgICAg
+ICAgICAgIGluIHRoZSBkbWFzIHByb3BlcnR5Lg0KPiAtDQo+IC1FeGFtcGxlOg0KPiAtYWVzQGY4
+MDM4MDAwIHsNCj4gLQljb21wYXRpYmxlID0gImF0bWVsLGF0OTFzYW05ZzQ2LWFlcyI7DQo+IC0J
+cmVnID0gPDB4ZjgwMzgwMDAgMHgxMDA+Ow0KPiAtCWludGVycnVwdHMgPSA8NDMgNCAwPjsNCj4g
+LQlkbWFzID0gPCZkbWExIDIgMTg+LA0KPiAtCSAgICAgICA8JmRtYTEgMiAxOT47DQo+IC0JZG1h
+LW5hbWVzID0gInR4IiwgInJ4IjsNCj4gLQ0KPiAgKiBUcmlwbGUgRGF0YSBFbmNyeXB0aW9uIFN0
+YW5kYXJkIChUcmlwbGUgREVTKQ0KPiAgDQo+ICBSZXF1aXJlZCBwcm9wZXJ0aWVzOg0KDQo=
