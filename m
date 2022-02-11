@@ -2,210 +2,217 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0006C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 13:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E37CC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 14:18:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350463AbiBKNNH (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 08:13:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45604 "EHLO
+        id S236302AbiBKOS0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 09:18:26 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350485AbiBKNNG (ORCPT
+        with ESMTP id S229781AbiBKOSZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 08:13:06 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA03E9A;
-        Fri, 11 Feb 2022 05:13:03 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id p15so22816805ejc.7;
-        Fri, 11 Feb 2022 05:13:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=5K0CikJXBqops03xFbHcLxJj6g75cZR54I23Dc+2jY0=;
-        b=l8s74E1JJ3QZ6OYNOUN3fl/zyCp+rXEY5LJqIBBwUe/PCJs4g4aONzuIsljlm9HKRU
-         nBbK9Nj/d0E+UoZTXZnSwJtKATSbLtnjlstFIlNsPBvWucyC/x/t7q2ERfCkOH5RcXl6
-         QuN8WIS5n7EAyXV1JNdHQ5RHy0TEQK3QtunwPHjxIyyvlh1qAprfdnInacIh0uTdUegR
-         QyacjWSvJZUFQ8qP5NnwP+KykSQvjo04F9xg9LSgKBy4u9uQFXa/D+jGtBkAwakUvuEI
-         hY7nNZFmG7VfhUG2S2YUkIrakopXGJIyDvW1PEGPHJ/6IgBTuhjmwy8cKD0Ja0NcIFiG
-         xC8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5K0CikJXBqops03xFbHcLxJj6g75cZR54I23Dc+2jY0=;
-        b=xuM0We3zhcUjTn6omWqd8533fxkprFri1xWtgOhqf6kZv9NRQHHCWre4CSzlH1Ml9V
-         jbPVXovhowWtfmq9WYYl0IUSGSMFizwSbNROcHna35NE7i/eq5rqjBoxup4FIaxP0ueE
-         JGFdzKF4ul0hm+Vnt7me/sxeO2r2Fycry62f9ZVSJ5pfqZiaeSo36KL0XtH6wiDtufKB
-         Yq8wJoncDXbXmjfPz7pqX5mzOauZscRsinmSkdgS65whw8eT9Z6lNxoHUmfURQFdVgEw
-         bxIEzIbbwWD66y0tv0V5FSrbMMi+8FA4okkZZxgKO9dYlugU+Lhns60124DSn0mi20bq
-         Lf9A==
-X-Gm-Message-State: AOAM533bxCYUaz+xxJTuDjk2893HdNvKg2DfglwUu+XXC1gEWuWAsk7/
-        JYuBh+8ERKOWust1qPZCxdw=
-X-Google-Smtp-Source: ABdhPJx2LUop1nYKtP4tB1ZVYUG0AibVEEV+9xZq++OZ26qZlReGU5qNcffLxXyYbNm/B/IcNi4RRw==
-X-Received: by 2002:a17:907:6e91:: with SMTP id sh17mr1363464ejc.534.1644585181608;
-        Fri, 11 Feb 2022 05:13:01 -0800 (PST)
-Received: from [192.168.2.1] (81-204-249-205.fixed.kpn.net. [81.204.249.205])
-        by smtp.gmail.com with ESMTPSA id gt10sm4483811ejb.38.2022.02.11.05.13.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Feb 2022 05:13:01 -0800 (PST)
-Message-ID: <dba5684a-1e5f-a4d4-604b-651751636cf3@gmail.com>
-Date:   Fri, 11 Feb 2022 14:13:00 +0100
+        Fri, 11 Feb 2022 09:18:25 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD14188;
+        Fri, 11 Feb 2022 06:18:24 -0800 (PST)
+Date:   Fri, 11 Feb 2022 15:18:20 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644589101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0cpXkqDGW3JQTmb6djLKzXDglKrwfkZ8bupjlc3z/TQ=;
+        b=ax7fuI2IZlUWXX6X3GQhGkOp5AxIei3vjDU5l0iw7Uu1jSRR0GsX7YmTOyDZ8mxqDsRtx6
+        AAuwiBpkrtZZuD7olqj5XclYVqaiHCE6qevf3ZRKkgYjK6BrS2o1ml6Dlu8BiSW8YFbd1Y
+        ipXOFQF+SYBThdoRMXtVgawRX1Owh6R3wtE2R9AcPnRcX3oATLqPfu6jQyHBSr/B+/vU8k
+        j7MBrTP/9Ps8ZOfNOhVG/sOxi9wVpokUUtYtyrKpLnYMY6BEuXVkSX/Ssz+AztkuSVZXNU
+        OzrQZVPe/kIwGujtz7WqcPrWm8ykg7LmkLO8Gt95uPztSaonebKOCrT2aJE0xg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644589101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0cpXkqDGW3JQTmb6djLKzXDglKrwfkZ8bupjlc3z/TQ=;
+        b=09CLKclCQ9Q++DBefs4Ff4baJZD3lSRtcn+qkPYoogjtnnn5ljfzZU8BcL9NT7mQ+/VWNl
+        A3ivc2XZK8CoTNAA==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v4 2/2] random: defer fast pool mixing to worker
+Message-ID: <YgZwLM9hhcUHYT0P@linutronix.de>
+References: <20220209125644.533876-1-Jason@zx2c4.com>
+ <20220209125644.533876-3-Jason@zx2c4.com>
+ <YgVTpI/sYLecyWa3@linutronix.de>
+ <YgYdXLg4bo6E7Bit@owl.dominikbrodowski.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3] dt-bindings: crypto: convert rockchip-crypto to yaml
-Content-Language: en-US
-To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
-        heiko@sntech.de, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski@canonical.com, robh+dt@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-References: <20220211115925.3382735-1-clabbe@baylibre.com>
-From:   Johan Jonker <jbx6244@gmail.com>
-In-Reply-To: <20220211115925.3382735-1-clabbe@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YgYdXLg4bo6E7Bit@owl.dominikbrodowski.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 2022-02-11 09:25:00 [+0100], Dominik Brodowski wrote:
+> That's a hw rng (such as a tpm chip or the virtio-rng driver) providing s=
+ome
+> entropy; if it's 64 bytes of input, crng_init progresses to 1, and
+> crng_fast_load() should never be called again.[*] I'm a bit suprised that=
+ the
+> hw_rng input occurred so early (it's only at device_initcall() level), and
+> earlier than 64 interrupts. But that may differ from system to system.
+>=20
+> Note that crng_fast_load() will also never be called from
+> add_interrupt_randomness() if
+>=20
+> 	EFI, DT or kexec provides bootloader entropy of at least 64 bytes,
+> 	and CONFIG_RANDOM_TRUST_BOOTLOADER is set
+>=20
+> and/or	CONFIG_RANDOM_TRUST_CPU is set and the RDRAND/RDSEED instructions =
+do
+> 	not fail.
+>=20
+> If neither of these three conditions (hw_rng is run early, bootloader or =
+CPU
+> randomness) are met, the initial and early seeding of the base_crng depen=
+ds
+> on add_interrupt_randomness(), and should happen rather quickly.
 
+Right.
 
-On 2/11/22 12:59, Corentin Labbe wrote:
-> Convert rockchip-crypto to yaml
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
-> Changes since v1:
-> - fixed example
-> - renamed to a new name
-> - fixed some maxItems
-> 
-> Change since v2:
-> - Fixed maintainers section
-> 
->  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
->  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
->  2 files changed, 66 insertions(+), 28 deletions(-)
+> > I did move that crng_fast_load() into the worker and did made some
+> > numbers:
+> >            <idle>-0       [000] d..h1..     2.069924: add_interrupt_ran=
+domness: Tick
+> >=20
+> > first interrupt
+> > =E2=80=A6
+> >         swapper/0-1       [000] d..h.11     2.341938: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h.11     2.341938: add_interrupt_ran=
+domness: work
+> >=20
+> > the 64th interrupt, scheduling the worker.
+> >=20
+> >         swapper/0-1       [000] d..h.11     2.345937: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h111     2.349938: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h.11     2.353939: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h.11     2.357940: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h111     2.361939: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h111     2.365939: add_interrupt_ran=
+domness: Tick
+> >         swapper/0-1       [000] d..h.11     2.369941: add_interrupt_ran=
+domness: Tick
+> >      kworker/0:0H-6       [000] .......     2.384714: mix_interrupt_ran=
+domness: load
+> >      kworker/0:0H-6       [000] .......     2.384715: crng_fast_load: 16
+> >            <idle>-0       [001] dn.h1..     3.205766: add_interrupt_ran=
+domness: Tick
+> >            <idle>-0       [019] dn.h1..     6.771047: add_interrupt_ran=
+domness: Tick
+> >=20
+> > 7 interrupts got lost before the worker could run & load first 16 bytes.
+> > The workqueue core gets initialized at that point and spawns first
+> > worker.
+>=20
+> So the reason for the longer delay here is that the workqueue core had not
+> been initialized beforehand?
 
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+Kind of, yes. workqueue_init_early() happens quite early so we don't
+have to worry about NULL pointer for system_highpri_wq. The worker
+started after workqueue_init() populated the worker pools.
 
-There's more possible to this document:
+> > After that the interrupts took a break.
+> > And then the work-to-load delay was quite low:
+> >=20
+> >            <idle>-0       [019] dn.h1..     7.586234: add_interrupt_ran=
+domness: Tick
+> >            <idle>-0       [019] dn.h1..     7.586234: add_interrupt_ran=
+domness: work
+> >     kworker/19:0H-175     [019] .......     7.586504: mix_interrupt_ran=
+domness: load
+> >     kworker/19:0H-175     [019] .......     7.586507: crng_fast_load: 16
+> >            <idle>-0       [020] dn.h1..     7.614649: add_interrupt_ran=
+domness: Tick
+> >            <idle>-0       [020] dn.h1..     7.614651: add_interrupt_ran=
+domness: work
+> >            <idle>-0       [020] dn.h1..     7.614736: add_interrupt_ran=
+domness: Tick
+> >     kworker/20:0H-183     [020] dn.h...     7.614859: add_interrupt_ran=
+domness: Tick
+> >     kworker/20:0H-183     [020] .......     7.614871: mix_interrupt_ran=
+domness: load
+> >     kworker/20:0H-183     [020] .......     7.614872: crng_fast_load: 16
+> >            <idle>-0       [018] dn.h1..     8.352423: add_interrupt_ran=
+domness: Tick
+> >            <idle>-0       [018] dn.h1..     8.352423: add_interrupt_ran=
+domness: work
+> >     kworker/18:0H-167     [018] dn.h1..     8.352438: add_interrupt_ran=
+domness: Tick
+> >     kworker/18:0H-167     [018] dn.h1..     8.352448: add_interrupt_ran=
+domness: Tick
+> >     kworker/18:0H-167     [018] dn.h1..     8.352459: add_interrupt_ran=
+domness: Tick
+> >     kworker/18:0H-167     [018] dn.h1..     8.352491: add_interrupt_ran=
+domness: Tick
+> >     kworker/18:0H-167     [018] .......     8.352505: mix_interrupt_ran=
+domness: load
+> >     kworker/18:0H-167     [018] .......     8.352506: crng_fast_load: 16
+> >=20
+> > In total we lost 13 ticks.
+>=20
+> Was this still way before the initramfs was up and running?
 
-dt-bindings: crypto: rockchip: add support for px30
-https://github.com/rockchip-linux/kernel/commit/3655df1bc6114bda2a6417f39772a3cb008084ea
+After unpacked initramfs. From current boot:
 
-crypto: rockchip - add px30 crypto aes/des support
-https://github.com/rockchip-linux/kernel/commit/ee082ae4f609f3b48f768420b31d8600448bd35a
+| [    5.901462] Unpacking initramfs...
+| [    6.758747] sd 1:0:0:0: [sda] Attached SCSI disk
+| [    7.886651] Freeing initrd memory: 9532K
+| [    7.893753] Freeing unused kernel image (initmem) memory: 2184K
+| [    7.963519] Write protecting the kernel read-only data: 20480k
+| [    7.971465] Freeing unused kernel image (text/rodata gap) memory: 2032K
+| [    7.979711] Freeing unused kernel image (rodata/data gap) memory: 1980K
+| [    7.987132] Run /init as init process
+| Loading, please wait...
+|=20
+| Starting version 250.3-2
+| [    8.157529] igb 0000:07:00.0 eno0: renamed from eth0
+| [    8.203836] igb 0000:07:00.1 enp7s0f1: renamed from eth1
+| [    8.219489] random: fast init done
+| Begin: Loading essential drivers ... done.
+| Begin: Running /scripts/init-premount ... done.
+| Begin: Mounting root file system ... Begin: Running /scripts/local-top ..=
+=2E done.
+| Begin: Running /scripts/local-premount ... done.
+| Warning: fsck not present, so skipping root file[    8.337554] XFS (sda2)=
+: Mounting V5 Filesystem
+| [    8.392151] XFS (sda2): Ending clean mount
+| done.
+| Begin: Running /scripts/local-bottom ... done.
+| Begin: Running /scripts/init-bottom ... done.
+| [    8.540708] systemd[1]: systemd 250.3-2 running in system mode =E2=80=
+=A6
+| [   12.207227] random: crng init done
 
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> new file mode 100644
-> index 000000000000..2e1e9fa711c4
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> @@ -0,0 +1,66 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Rockchip Electronics And Security Accelerator
-> +
-> +maintainers:
-> +  - Heiko Stuebner <heiko@sntech.de>
-> +
-> +properties:
-> +  compatible:
-> +    const: rockchip,rk3288-crypto
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: clock data
-> +      - description: clock data
-> +      - description: clock crypto accelerator
-> +      - description: clock dma
-> +
-> +  clock-names:
-> +    items:
-> +      - const: aclk
-> +      - const: hclk
-> +      - const: sclk
-> +      - const: apb_pclk
-> +
-> +  resets:
-> +    maxItems: 1
-> +
-> +  reset-names:
-> +    const: crypto-rst
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - clocks
-> +  - clock-names
-> +  - resets
-> +  - reset-names
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/clock/rk3288-cru.h>
-> +    crypto@ff8a0000 {
-> +      compatible = "rockchip,rk3288-crypto";
-> +      reg = <0xff8a0000 0x4000>;
-> +      interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-> +      clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
-> +               <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
-> +      clock-names = "aclk", "hclk", "sclk", "apb_pclk";
-> +      resets = <&cru SRST_CRYPTO>;
-> +      reset-names = "crypto-rst";
-> +    };
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> deleted file mode 100644
-> index 5e2ba385b8c9..000000000000
-> --- a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> +++ /dev/null
-> @@ -1,28 +0,0 @@
-> -Rockchip Electronics And Security Accelerator
-> -
-> -Required properties:
-> -- compatible: Should be "rockchip,rk3288-crypto"
-> -- reg: Base physical address of the engine and length of memory mapped
-> -       region
-> -- interrupts: Interrupt number
-> -- clocks: Reference to the clocks about crypto
-> -- clock-names: "aclk" used to clock data
-> -	       "hclk" used to clock data
-> -	       "sclk" used to clock crypto accelerator
-> -	       "apb_pclk" used to clock dma
-> -- resets: Must contain an entry for each entry in reset-names.
-> -	  See ../reset/reset.txt for details.
-> -- reset-names: Must include the name "crypto-rst".
-> -
-> -Examples:
-> -
-> -	crypto: cypto-controller@ff8a0000 {
-> -		compatible = "rockchip,rk3288-crypto";
-> -		reg = <0xff8a0000 0x4000>;
-> -		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
-> -		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
-> -			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
-> -		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
-> -		resets = <&cru SRST_CRYPTO>;
-> -		reset-names = "crypto-rst";
-> -	};
+I have to note that on this system there is a initramfs but all drivers
+are built-in (you see sd, net _after_ "Unpacking initramfs" but there
+are not drivers to load).
+
+> Thanks,
+> 	Dominik
+
+Sebastian
