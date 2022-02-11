@@ -2,217 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0104EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BC5C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Feb 2022 17:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351723AbiBKRHw (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 12:07:52 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60994 "EHLO
+        id S229628AbiBKRPm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Feb 2022 12:15:42 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349563AbiBKRHv (ORCPT
+        with ESMTP id S235254AbiBKRPl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 12:07:51 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82141A1;
-        Fri, 11 Feb 2022 09:07:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 78AFCB82B0E;
-        Fri, 11 Feb 2022 17:07:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B764C340E9;
-        Fri, 11 Feb 2022 17:07:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AXorID3v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644599264;
+        Fri, 11 Feb 2022 12:15:41 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCEF102;
+        Fri, 11 Feb 2022 09:15:40 -0800 (PST)
+Date:   Fri, 11 Feb 2022 18:15:37 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644599738;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zpXzgarNdJ23uBBIht05tW/OI4PnzIC+kLi4noUJ2Pw=;
-        b=AXorID3vG/TzNwYO8lIBU764x+UKP7ldvzbR7aOHYtSJo+A8TjUTkLl3UUuh4GBxkz7fHk
-        mapijzwAdCW1rqcclo9Sb3Uuh+XaIaexED1wIUulvHK/iGRvvoTTDO9Nxmvu/I+EC35SuS
-        ywMRD0nc0mftENqaUcj60G2pmt7wP6k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8346177c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 11 Feb 2022 17:07:44 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        bh=PJyDYqDoqp3BOO8EG/GCK9HSjsIr9kXicPv+GzkWx1A=;
+        b=ebryZ/ovTvyftldBlOHY/pFQryX7LYnwAp4COiGEEXAX7bZl2X1U4ggtgMm4IPwogJ8toy
+        GSUNkza8AaP8Yn/i6tGZT2ymAVH5ZuvHGdB9K4qxneXQX6fRAwgS8AeduKqqxWwSmvw8bk
+        v/O4GBNF0aO5TjJjeTSk5cm2/RNzdVmmkeUUKRy0/SwB3+ok20thXVpcwPBNTuVxG1Odlm
+        c7u1rFkpksOSdHqFFBPhcxQhLLeZ+iBK2hF67Gvm8oHlUSO+CGIKz6QIm0xKZ7+tyExyom
+        9tBj7VUN+q9bf9D/8el8jUwESzTm13y2/Jq8vNQnGeVtzvPKjvy2YAAGs8QCJw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644599738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PJyDYqDoqp3BOO8EG/GCK9HSjsIr9kXicPv+GzkWx1A=;
+        b=0CWjWOEnQbWaB3Z4tTafewf+JVbcOzU/wcNrqdku2B6LXM7m5MNTlF6sBPbTCy0zz/9/xV
+        YQ9T13Gvj2NipCBw==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Theodore Ts'o <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        =?UTF-8?q?Jonathan=20Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: [PATCH v7] random: defer fast pool mixing to worker
-Date:   Fri, 11 Feb 2022 18:07:32 +0100
-Message-Id: <20220211170732.571775-1-Jason@zx2c4.com>
-In-Reply-To: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
-References: <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+Message-ID: <YgaZuShru2HQiFXg@linutronix.de>
+References: <YgZ6IEbiDgz5X1ON@linutronix.de>
+ <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de>
+ <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de>
+ <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On PREEMPT_RT, it's problematic to take spinlocks from hard irq
-handlers. We can fix this by deferring to a workqueue the dumping of
-the fast pool into the input pool.
+On 2022-02-11 18:00:21 [+0100], Jason A. Donenfeld wrote:
+> Hi Sebastian,
+Hi Jason,
 
-We accomplish this with some careful rules on fast_pool->count:
+> On Fri, Feb 11, 2022 at 5:59 PM Sebastian Andrzej Siewior
+> <bigeasy@linutronix.de> wrote:
+> > > Okay, I'll do that then, and then in the process get rid of the
+> > > cmpxchg loop since it's no longer required.
+> >
+> > So the only reason why we have that atomic_t is for rare case where run
+> > on the remote CPU and need to remove the upper bit in the counter?
+> 
+> Yes. That's the only remaining reason. Annoying, but whatareyagonnado?
 
-  - When it's incremented to >= 64, we schedule the work.
-  - If the top bit is set, we never schedule the work, even if >= 64.
-  - The worker is responsible for setting it back to 0 when it's done.
+A CPU hotplug notifier which removes unconditionally that bit when the
+CPU goes down or sets it to 0.
+We can keep it as it. Just an idea for later maybe ;)
 
-There are two small issues around using workqueues for this purpose that
-we work around.
+> Jason
 
-The first issue is that mix_interrupt_randomness() might be migrated to
-another CPU during CPU hotplug. This issue is rectified by checking that
-it hasn't been migrated (after disabling irqs). If it has been migrated,
-then we set the count to zero, so that when the CPU comes online again,
-it can requeue the work. As part of this, we switch to using an
-atomic_t, so that the increment in the irq handler doesn't wipe out the
-zeroing if the CPU comes back online while this worker is running.
-
-The second issue is that, though relatively minor in effect, we probably
-want to make sure we get a consistent view of the pool onto the stack,
-in case it's interrupted by an irq while reading. To do this, we don't
-reenable irqs until after the copy. There are only 18 instructions
-between the cli and sti, so this is a pretty tiny window.
-
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
-Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
-Sebastian - as requested, we now disable irqs for a very short 18
-instructions rather than fishing into migrate_disable() and upsetting
-PeterZ. Might this be the lucky patch? -Jason
-
- drivers/char/random.c | 63 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 49 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 1dbf21c02b40..b921127ea693 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1162,9 +1162,10 @@ EXPORT_SYMBOL_GPL(add_bootloader_randomness);
- 
- struct fast_pool {
- 	unsigned long pool[16 / sizeof(long)];
-+	struct work_struct mix;
- 	unsigned long last;
-+	atomic_t count;
- 	u16 reg_idx;
--	u8 count;
- };
- 
- /*
-@@ -1214,12 +1215,49 @@ static u32 get_reg(struct fast_pool *f, struct pt_regs *regs)
- 	return *ptr;
- }
- 
-+static void mix_interrupt_randomness(struct work_struct *work)
-+{
-+	struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
-+	unsigned long pool[ARRAY_SIZE(fast_pool->pool)];
-+
-+	/* Check to see if we're running on the wrong CPU due to hotplug. */
-+	local_irq_disable();
-+	if (fast_pool != this_cpu_ptr(&irq_randomness)) {
-+		local_irq_enable();
-+		/*
-+		 * If we are unlucky enough to have been moved to another CPU,
-+		 * during CPU hotplug while the CPU was shutdown then we set
-+		 * our count to zero atomically so that when the CPU comes
-+		 * back online, it can enqueue work again. The _release here
-+		 * pairs with the atomic_inc_return_acquire in
-+		 * add_interrupt_randomness().
-+		 */
-+		atomic_set_release(&fast_pool->count, 0);
-+		return;
-+	}
-+
-+	/*
-+	 * Copy the pool to the stack so that the mixer always has a
-+	 * consistent view, before we reenable irqs again.
-+	 */
-+	memcpy(pool, fast_pool->pool, sizeof(pool));
-+	atomic_set(&fast_pool->count, 0);
-+	fast_pool->last = jiffies;
-+	local_irq_enable();
-+
-+	mix_pool_bytes(pool, sizeof(pool));
-+	credit_entropy_bits(1);
-+	memzero_explicit(pool, sizeof(pool));
-+}
-+
- void add_interrupt_randomness(int irq)
- {
-+	enum { MIX_INFLIGHT = 1U << 31 };
- 	struct fast_pool *fast_pool = this_cpu_ptr(&irq_randomness);
- 	struct pt_regs *regs = get_irq_regs();
- 	unsigned long now = jiffies;
- 	cycles_t cycles = random_get_entropy();
-+	unsigned int new_count;
- 
- 	if (cycles == 0)
- 		cycles = get_reg(fast_pool, regs);
-@@ -1235,12 +1273,13 @@ void add_interrupt_randomness(int irq)
- 	}
- 
- 	fast_mix((u32 *)fast_pool->pool);
--	++fast_pool->count;
-+	/* The _acquire here pairs with the atomic_set_release in mix_interrupt_randomness(). */
-+	new_count = (unsigned int)atomic_inc_return_acquire(&fast_pool->count);
- 
- 	if (unlikely(crng_init == 0)) {
--		if (fast_pool->count >= 64 &&
-+		if (new_count >= 64 &&
- 		    crng_fast_load(fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
--			fast_pool->count = 0;
-+			atomic_set(&fast_pool->count, 0);
- 			fast_pool->last = now;
- 
- 			/*
-@@ -1254,20 +1293,16 @@ void add_interrupt_randomness(int irq)
- 		return;
- 	}
- 
--	if ((fast_pool->count < 64) && !time_after(now, fast_pool->last + HZ))
-+	if (new_count & MIX_INFLIGHT)
- 		return;
- 
--	if (!spin_trylock(&input_pool.lock))
-+	if (new_count < 64 && !time_after(now, fast_pool->last + HZ))
- 		return;
- 
--	fast_pool->last = now;
--	_mix_pool_bytes(&fast_pool->pool, sizeof(fast_pool->pool));
--	spin_unlock(&input_pool.lock);
--
--	fast_pool->count = 0;
--
--	/* Award one bit for the contents of the fast pool. */
--	credit_entropy_bits(1);
-+	if (unlikely(!fast_pool->mix.func))
-+		INIT_WORK(&fast_pool->mix, mix_interrupt_randomness);
-+	atomic_or(MIX_INFLIGHT, &fast_pool->count);
-+	queue_work_on(raw_smp_processor_id(), system_highpri_wq, &fast_pool->mix);
- }
- EXPORT_SYMBOL_GPL(add_interrupt_randomness);
- 
--- 
-2.35.0
-
+Sebastian
