@@ -2,82 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA27C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Feb 2022 00:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DC9C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Feb 2022 10:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354321AbiBLAUN (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Feb 2022 19:20:13 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56210 "EHLO
+        id S233290AbiBLKId (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 12 Feb 2022 05:08:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242447AbiBLAUN (ORCPT
+        with ESMTP id S233065AbiBLKIc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Feb 2022 19:20:13 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF49D77;
-        Fri, 11 Feb 2022 16:20:11 -0800 (PST)
+        Sat, 12 Feb 2022 05:08:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8825326110
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Feb 2022 02:08:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CB11461C65;
-        Sat, 12 Feb 2022 00:20:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E48FC340EB;
-        Sat, 12 Feb 2022 00:20:10 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3B497B80011
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Feb 2022 10:08:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E935FC340E7
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Feb 2022 10:08:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644625210;
-        bh=0zIZnmg6cx0oOGvsLFwIZcbJ3GzQws/5gbITP1ynZxE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tqAQVvhvpFhnlB/uIOph5mZq3c5vOEOHwkETa7oGTI6aouf7MhFfm95BvE3TwEcYK
-         rsl2FGF7Sayyn0kfvfFT5fbb4L4UxUkI+f6Fn8Xd64nH3ld/qz8ucxOTbCYvBEdjie
-         HkPK3VTza3Im7akOiPU74OZkW6PiX4MXdsfPUq8F0FRilCFmOlHYV8hQ7elzHzRcaN
-         IdnXI9pPm8thVlM5st8fzcCe3l1OjE2Tt/XG64mHhjYWfKcWkEOLUuH6MdPDnfCuud
-         tm13iz21ysklrmpqFeHXWwc2C7n1Ws1gnQSjrNjjAFRzAp2wN8/jGxH04rx8iggaAG
-         kxUXGY6LwrVMQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 13B25E5D09D;
-        Sat, 12 Feb 2022 00:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1644660506;
+        bh=uwvHwvTce5f8VcNRgtGyM1W8Vj+7as84ydlj6IEdMl0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=oqgq/yLjHleytQn0/V0dZY+n4hjrm57I1h5BBgQQD+aOB/o6bav41hItoAAE+FERM
+         LokVy4VVmPx9JLCkKXDdyaJRBe8+rjQONu05Ho5q/8UHeslPW7UpvyNjJnKcJf1L7c
+         pSeA4uIh1QD3DXkiH5mIzZv68ooJHVnbVMWtX49QB35GDLjYAR9s/LmGwXvWkqjjon
+         NJMkJdFVCFnUjwFGEf7CyL1uZNFKY1M09yLAMEv9Zul0dOaaOr4aEcpHjv7ZYASuWJ
+         3BpArrU4LlS+XOqBtBv7DBSzrP8N/AfpwxOPNKBVn/jjduKlyEnYRUdXbXmAdsAF3m
+         CedzW7kZLefxw==
+Received: by mail-wr1-f44.google.com with SMTP id s10so5472705wrb.1
+        for <linux-crypto@vger.kernel.org>; Sat, 12 Feb 2022 02:08:26 -0800 (PST)
+X-Gm-Message-State: AOAM530EFYqprRPduNO4Bxehny7eZSFqZ4rtTVn+xltW/IPVMmr4smsh
+        SFIeFNbFivj69nBIlmvvA9Mp5NLA5OEUf9dEYr8=
+X-Google-Smtp-Source: ABdhPJy2+OZC0dyTdP42zPfwkEYRBuIJFzF90SoJPF1ZYsqaQIQI4+frOMGHcHSpWdkAMAhRcGTc3fdgeHm8243G2lo=
+X-Received: by 2002:a05:6000:1b88:: with SMTP id r8mr4540819wru.447.1644660505301;
+ Sat, 12 Feb 2022 02:08:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/9] use GFP_KERNEL
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164462521007.28025.17507178732984421339.git-patchwork-notify@kernel.org>
-Date:   Sat, 12 Feb 2022 00:20:10 +0000
-References: <20220210204223.104181-1-Julia.Lawall@inria.fr>
-In-Reply-To: <20220210204223.104181-1-Julia.Lawall@inria.fr>
-To:     Julia Lawall <julia.lawall@inria.fr>
-Cc:     linux-scsi@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        MPT-FusionLinux.pdl@broadcom.com, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, alsa-devel@alsa-project.org,
-        s.shtylyov@omp.ru, linux-ide@vger.kernel.org,
-        linux-mtd@lists.infradead.org
+References: <20220210232812.798387-1-nhuck@google.com> <20220210232812.798387-6-nhuck@google.com>
+ <CAMj1kXEJRBcLBsO6HVQJNmGkxmY+aXY+BnyApn6s_MCtXo0eng@mail.gmail.com> <CAJkfWY7bet2V-w7NwMxqAsiwUqF5q7-FmFsgKJaMOBYSuY9M2g@mail.gmail.com>
+In-Reply-To: <CAJkfWY7bet2V-w7NwMxqAsiwUqF5q7-FmFsgKJaMOBYSuY9M2g@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sat, 12 Feb 2022 11:08:14 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHtkxNkdpX46EmT94+ZkFyEkgXzZHOhpzb+DUu15r=7gQ@mail.gmail.com>
+Message-ID: <CAMj1kXHtkxNkdpX46EmT94+ZkFyEkgXzZHOhpzb+DUu15r=7gQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 5/7] crypto: arm64/aes-xctr: Add accelerated
+ implementation of XCTR
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello:
+On Fri, 11 Feb 2022 at 21:30, Nathan Huckleberry <nhuck@google.com> wrote:
+>
+> On Fri, Feb 11, 2022 at 5:48 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> >
+> > On Fri, 11 Feb 2022 at 00:28, Nathan Huckleberry <nhuck@google.com> wrote:
+> > >
+> > > Add hardware accelerated version of XCTR for ARM64 CPUs with ARMv8
+> > > Crypto Extension support.  This XCTR implementation is based on the CTR
+> > > implementation in aes-modes.S.
+> > >
+> > > More information on XCTR can be found in
+> > > the HCTR2 paper: Length-preserving encryption with HCTR2:
+> > > https://eprint.iacr.org/2021/1441.pdf
+> > >
+> > > Signed-off-by: Nathan Huckleberry <nhuck@google.com>
+> > > ---
+> > >
+> > > Changes since v1:
+> > >  * Added STRIDE back to aes-glue.c
+> > >
+> >
+> > NAK. Feel free to respond to my comments/questions against v1 if you
+> > want to discuss this.
+>
+>  Oops, I misunderstood the tail block behavior of the CTR implementation and
+>  thought it wouldn't work with XCTR mode.  I have XCTR mirroring the tail
+>  behavior of CTR now. I'll submit it with the v3.
 
-This patch was applied to netdev/net-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 10 Feb 2022 21:42:14 +0100 you wrote:
-> Platform_driver and pci_driver probe functions aren't called with
-> locks held and thus don't need GFP_ATOMIC. Use GFP_KERNEL instead.
-> 
-> All changes have been compile-tested.
-> 
-> ---
-> 
-> [...]
-
-Here is the summary with links:
-  - [1/9] net: moxa: use GFP_KERNEL
-    https://git.kernel.org/netdev/net-next/c/c9ac080b25d9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yes, here's my version for reference:
+https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/commit/?h=hctr2&id=5bb01649223080b7cde5740f441eb5e758ec357f
