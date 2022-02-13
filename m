@@ -2,156 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A0AC4332F
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Feb 2022 18:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DD2C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Feb 2022 19:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237876AbiBMSyJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Feb 2022 13:54:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54102 "EHLO
+        id S237913AbiBMTGU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Feb 2022 14:06:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234170AbiBMSyI (ORCPT
+        with ESMTP id S235146AbiBMTGT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Feb 2022 13:54:08 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCDE57B3C;
-        Sun, 13 Feb 2022 10:54:02 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21DERCRA022928;
-        Sun, 13 Feb 2022 18:53:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=qaAeCPOZUy2ppj9eQ9LciX548NVsceilaYGuwL+jin8=;
- b=TehU/bd6f+foQE4i0zJu2tuVe1smpIp+zKNOoIyCcZ5Y5cHLPkDG0ny3xQd4qApNcak/
- 37QNTv1LQCeL2qtf0su+i67T5c9TsuM0g+0u5tfo9wGnndGzNNPSrje8SVhysNA16unW
- 49Fvxy9GblokmK9NoU3PTrp11UPUZvUIaJuKXVg1uMfp4F9azP1aJq3vbRyN0haRe/4a
- g9B3Omb0bFRu611bvzjCkxS7OiAQFAWrXc2Eol1JoKcThFyPZblm8fUh1TrK9lBbEWIE
- vFQ3mOfNUWIp/Uqbl6mWdRKnziavEgru9a8Dt845KdDC4pBqzZBtCF58Ly37Hd8eIkWD zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6ycq6krj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Feb 2022 18:53:25 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21DIrOlH024517;
-        Sun, 13 Feb 2022 18:53:24 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3e6ycq6kr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Feb 2022 18:53:24 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21DIlQCA002034;
-        Sun, 13 Feb 2022 18:53:22 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3e64h9f00g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 13 Feb 2022 18:53:22 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21DIrHH218874852
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 13 Feb 2022 18:53:17 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 262A211C04A;
-        Sun, 13 Feb 2022 18:53:17 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2E7D611C04C;
-        Sun, 13 Feb 2022 18:53:13 +0000 (GMT)
-Received: from sig-9-65-82-84.ibm.com (unknown [9.65.82.84])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun, 13 Feb 2022 18:53:13 +0000 (GMT)
-Message-ID: <0278ab6a2891effd9b1eb8c0221769e332ec6082.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 0/6] KEXEC_SIG with appended signature
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Michal Suchanek <msuchanek@suse.de>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Cc:     kexec@lists.infradead.org, Philipp Rudo <prudo@redhat.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sun, 13 Feb 2022 14:06:19 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4024D583BC;
+        Sun, 13 Feb 2022 11:06:13 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id p10so4908140pfo.12;
+        Sun, 13 Feb 2022 11:06:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ju4vVtu45RWP83gU9vonrmnI1ObnSxSxWN+cCJKH5Sg=;
+        b=d1uI8/GralqlyxemI2HOwJpRya0QXqUcwWvSfYZ9e6a1eFkFsOajf0rvWLI9Vo8iFH
+         ftN4pfukip1/nsa5t6fYzCIDy40zEpKTyyuBCA1h2FYKaj96zOIbPyk1WT242sxkx6Ta
+         0s0qRgCnsu93qrWVxZA3O7VOx4vqF75AvcYr4e0yyHUf3ml+01luwqSBJfd0peKu3vnE
+         a3zdQctQwO0Wf6SWjx84h6Goiqmx4VkIY2FfABNSQ/E1p+nhw/FZD6L4WFI+5FTsB00j
+         hYJmhh0YcyAe9rUwbDEPJCWGfQ+sBB2MzXfmix/LpjS6XPJLqMBbMFbIK8H0l0MuqIN2
+         DCkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ju4vVtu45RWP83gU9vonrmnI1ObnSxSxWN+cCJKH5Sg=;
+        b=ueyXpRkk1MF6DAToRmWdMcWLo7AJv+yOILQBDCgG5RIjubpzuBjFb3GOvIgee7Xr+S
+         nv+LsYwHw3MPHM1jlHSZzAe5Fwdl1+hAnaKsrCQTr1fly6Hkid7Bzk1J/BW0RgXjPzXS
+         4wH6uaYs+vSUzu8YAjj+uVUy1ryhKq3h3sCVig1vaBZw57JTih7pEV+z0NGAzNLLjy4a
+         bIy8zCn5mLkE6xTFikgKQBjiGM7GPKDhhhs+8mtLoPX6XVrLG1z7Ny4BERNzYbncKu7L
+         a7RvC6OfgdaDWEMZF60UQUQZVw5prtffkB8TK1ts2U60FQY05TVK2Jf4pkVV9L2UDkY3
+         bFLg==
+X-Gm-Message-State: AOAM5310V/ik2bIofFikV5Swylvt4E94kPvlvoFh4u9ImX5iw/lzILmT
+        GghVNR1XBltI52gCn5Y8TQEqCHDDpl0=
+X-Google-Smtp-Source: ABdhPJzTMzPu2k7yIcWXqE+i7bh7Dagy1n7+oOV/Geed8Fp0XSbJTTxXEoGd2dTafo0Eg5UbMAmFTA==
+X-Received: by 2002:a05:6a00:1ac9:: with SMTP id f9mr11057233pfv.65.1644779172490;
+        Sun, 13 Feb 2022 11:06:12 -0800 (PST)
+Received: from edumazet1.svl.corp.google.com ([2620:15c:2c4:201:7e68:a272:168b:5cac])
+        by smtp.gmail.com with ESMTPSA id k12sm35516493pfc.107.2022.02.13.11.06.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Feb 2022 11:06:11 -0800 (PST)
+From:   Eric Dumazet <eric.dumazet@gmail.com>
+To:     "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     netdev <netdev@vger.kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>,
-        linux-security-module@vger.kernel.org
-Date:   Sun, 13 Feb 2022 13:53:12 -0500
-In-Reply-To: <cover.1641900831.git.msuchanek@suse.de>
-References: <cover.1641900831.git.msuchanek@suse.de>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C6hLMjRWDkCM-Tl6EZHiGa_ffG0JsPsH
-X-Proofpoint-GUID: QRUpvJ3TBHI6yR0Yy9QvEHXIPHskisIP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-13_07,2022-02-11_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=983 bulkscore=0
- adultscore=0 spamscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- impostorscore=0 malwarescore=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202130126
+        linux crypto <linux-crypto@vger.kernel.org>,
+        Eric Dumazet <eric.dumazet@gmail.com>,
+        Wei Wang <weiwan@google.com>,
+        syzbot <syzkaller@googlegroups.com>
+Subject: [PATCH] crypto: af_alg - get rid of alg_memory_allocated
+Date:   Sun, 13 Feb 2022 11:06:07 -0800
+Message-Id: <20220213190607.183394-1-eric.dumazet@gmail.com>
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michal,
+From: Eric Dumazet <edumazet@google.com>
 
-On Tue, 2022-01-11 at 12:37 +0100, Michal Suchanek wrote:
-> Hello,
-> 
-> This is a refresh of the KEXEC_SIG series.
+alg_memory_allocated does not seem to be really used.
 
-> This adds KEXEC_SIG support on powerpc and deduplicates the code dealing
-> with appended signatures in the kernel.
-> 
-> powerpc supports IMA_KEXEC but that's an exception rather than the norm.
-> On the other hand, KEXEC_SIG is portable across platforms.
+alg_proto does have a .memory_allocated field, but no
+corresponding .sysctl_mem.
 
-This Kconfig carries the IMA measurement list across kexec.  This has
-nothing to do with appended signatures.
+This means sk_has_account() returns true, but all sk_prot_mem_limits()
+users will trigger a NULL dereference [1].
 
-config IMA_KEXEC
-        bool "Enable carrying the IMA measurement list across a soft
-boot"
-        depends on IMA && TCG_TPM && HAVE_IMA_KEXEC
+THis was not a problem until SO_RESERVE_MEM addition.
 
-In addition to powerpc, arm64 sets HAVE_IMA_KEXEC.
+general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 1 PID: 3591 Comm: syz-executor153 Not tainted 5.17.0-rc3-syzkaller-00316-gb81b1829e7e3 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:sk_prot_mem_limits include/net/sock.h:1523 [inline]
+RIP: 0010:sock_reserve_memory+0x1d7/0x330 net/core/sock.c:1000
+Code: 08 00 74 08 48 89 ef e8 27 20 bb f9 4c 03 7c 24 10 48 8b 6d 00 48 83 c5 08 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 ef e8 fb 1f bb f9 48 8b 6d 00 4c 89 ff 48
+RSP: 0018:ffffc90001f1fb68 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: ffff88814aabc000 RCX: dffffc0000000000
+RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffffff90e18120
+RBP: 0000000000000008 R08: dffffc0000000000 R09: fffffbfff21c3025
+R10: fffffbfff21c3025 R11: 0000000000000000 R12: ffffffff8d109840
+R13: 0000000000001002 R14: 0000000000000001 R15: 0000000000000001
+FS:  0000555556e08300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc74416f130 CR3: 0000000073d9e000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ sock_setsockopt+0x14a9/0x3a30 net/core/sock.c:1446
+ __sys_setsockopt+0x5af/0x980 net/socket.c:2176
+ __do_sys_setsockopt net/socket.c:2191 [inline]
+ __se_sys_setsockopt net/socket.c:2188 [inline]
+ __x64_sys_setsockopt+0xb1/0xc0 net/socket.c:2188
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fc7440fddc9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe98f07968 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fc7440fddc9
+RDX: 0000000000000049 RSI: 0000000000000001 RDI: 0000000000000004
+RBP: 0000000000000000 R08: 0000000000000004 R09: 00007ffe98f07990
+R10: 0000000020000000 R11: 0000000000000246 R12: 00007ffe98f0798c
+R13: 00007ffe98f079a0 R14: 00007ffe98f079e0 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:sk_prot_mem_limits include/net/sock.h:1523 [inline]
+RIP: 0010:sock_reserve_memory+0x1d7/0x330 net/core/sock.c:1000
+Code: 08 00 74 08 48 89 ef e8 27 20 bb f9 4c 03 7c 24 10 48 8b 6d 00 48 83 c5 08 48 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 48 89 ef e8 fb 1f bb f9 48 8b 6d 00 4c 89 ff 48
+RSP: 0018:ffffc90001f1fb68 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: ffff88814aabc000 RCX: dffffc0000000000
+RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffffff90e18120
+RBP: 0000000000000008 R08: dffffc0000000000 R09: fffffbfff21c3025
+R10: fffffbfff21c3025 R11: 0000000000000000 R12: ffffffff8d109840
+R13: 0000000000001002 R14: 0000000000000001 R15: 0000000000000001
+FS:  0000555556e08300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc74416f130 CR3: 0000000073d9e000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 
-Even prior to the kexec appended signature support, like all other
-files, the kexec kernel image signature could be stored in
-security.ima.
+Fixes: 2bb2f5fb21b0 ("net: add new socket option SO_RESERVE_MEM")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Wei Wang <weiwan@google.com>
+Reported-by: syzbot <syzkaller@googlegroups.com>
+---
+ crypto/af_alg.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-> 
-> For distributions to have uniform security features across platforms one
-> option should be used on all platforms.
-
-The kexec kernel image measurement will not be included in the BIOS
-event log.  Even if the measurement is included in the IMA measurement
-list, without the IMA_KEXEC Kconfig the measurement list will not be
-carried across kexec.  For those not interested in "trusted boot" or
-those who do not need it for compliance, the simplification should be
-fine.
-
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index e1ea18536a5f085c816c88bb28da029a5f3a1d3e..c8289b7a85baaa0a83fefcfc0928ea67d522f98c 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -25,12 +25,9 @@ struct alg_type_list {
+ 	struct list_head list;
+ };
+ 
+-static atomic_long_t alg_memory_allocated;
+-
+ static struct proto alg_proto = {
+ 	.name			= "ALG",
+ 	.owner			= THIS_MODULE,
+-	.memory_allocated	= &alg_memory_allocated,
+ 	.obj_size		= sizeof(struct alg_sock),
+ };
+ 
 -- 
-thanks,
-
-Mimi
+2.35.1.265.g69c8d7142f-goog
 
