@@ -2,153 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF3DC4321E
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Feb 2022 20:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFFAC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Feb 2022 21:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238286AbiBMUuY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Feb 2022 15:50:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55672 "EHLO
+        id S238344AbiBMVEk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Feb 2022 16:04:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238209AbiBMUuX (ORCPT
+        with ESMTP id S231825AbiBMVEk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Feb 2022 15:50:23 -0500
-Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1680353715;
-        Sun, 13 Feb 2022 12:50:16 -0800 (PST)
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 58AB9201335;
-        Sun, 13 Feb 2022 20:50:15 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id E59A5809A1; Sun, 13 Feb 2022 21:48:33 +0100 (CET)
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 3/4] hw_random: use per-rng quality value instead of global setting
-Date:   Sun, 13 Feb 2022 21:46:30 +0100
-Message-Id: <20220213204631.354247-4-linux@dominikbrodowski.net>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220213204631.354247-1-linux@dominikbrodowski.net>
-References: <20220213204631.354247-1-linux@dominikbrodowski.net>
+        Sun, 13 Feb 2022 16:04:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0596653726;
+        Sun, 13 Feb 2022 13:04:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2743D612CF;
+        Sun, 13 Feb 2022 21:04:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F76C340EF;
+        Sun, 13 Feb 2022 21:04:32 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="J5OBEqZn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644786269;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=A9tdtfUCLfjmaoUMS4eWY1oxo6gPOsu05zgNWrIceOE=;
+        b=J5OBEqZnNlsAjnzrcslIJD/yqGExK2xPIXXMw+gHDmhhY16JghsNG+mhrhNdEq9qDc0MZ6
+        ErHWyt8PM75w+61EsDhRZSLgYZNKNeMYHgIyQKxvIcikNcjNgeqsrqpVJOlud6DAYmO0vX
+        dhzLAwiyqyJ3RlgVVVVBkvSGWJ2eKZ0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bf34a3ea (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 13 Feb 2022 21:04:29 +0000 (UTC)
+Received: by mail-yb1-f174.google.com with SMTP id l125so7483250ybl.4;
+        Sun, 13 Feb 2022 13:04:28 -0800 (PST)
+X-Gm-Message-State: AOAM533vCCMSJWHfKZJdgwuQmHIH0/1SrRPQb0tbLWmVe6tLz/RWo7ew
+        IU2+qglVBJ+43lA0bvhlC1CQ+SenXlWsOmbPGg4=
+X-Google-Smtp-Source: ABdhPJxfaSBOjrWt50+mSLSx9Kpq26jILyJbDRt2LbvscNrZfb0aVkEnsc9DzuUEKABhO8iA4gNgOgdUc4VnK89CuXY=
+X-Received: by 2002:a25:dc14:: with SMTP id y20mr6542430ybe.115.1644786267702;
+ Sun, 13 Feb 2022 13:04:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de> <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de> <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
+ <YgaZuShru2HQiFXg@linutronix.de> <CAHmME9oZMFN80M98Mt6JysPSMTJoXfKTjHuxG6BQSsC=+0z5fg@mail.gmail.com>
+ <YgacTN2zHeBhWw5d@linutronix.de>
+In-Reply-To: <YgacTN2zHeBhWw5d@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Sun, 13 Feb 2022 22:04:17 +0100
+X-Gmail-Original-Message-ID: <CAHmME9okFEVqTM9c9fQY02UiiNBkpaZMLSYMhzHs8FqtpV1F1g@mail.gmail.com>
+Message-ID: <CAHmME9okFEVqTM9c9fQY02UiiNBkpaZMLSYMhzHs8FqtpV1F1g@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The current_quality variable exposed as a module parameter is
-fundamentally broken: If it is set at boot time, it is overwritten once
-the first hw rng device is loaded; if it is set at runtime, it is
-without effect if the hw rng device had its quality value set to 0 (and
-no default_quality was set); and if a new rng is selected, it gets
-overwritten. Therefore, mark it as obsolete, and replace it by the
-per-rng quality setting.
+Hey Sebastian,
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
----
- drivers/char/hw_random/core.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+On Fri, Feb 11, 2022 at 6:26 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> Sure. I can do the CPU-HP notifier later one once we are done with
+> everything. I acked the v7, don't see a road block.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 29febf55b0d4..8df102b39b35 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -44,14 +44,14 @@ static unsigned short default_quality; /* = 0; default to "off" */
- 
- module_param(current_quality, ushort, 0644);
- MODULE_PARM_DESC(current_quality,
--		 "current hwrng entropy estimation per 1024 bits of input");
-+		 "current hwrng entropy estimation per 1024 bits of input -- obsolete");
- module_param(default_quality, ushort, 0644);
- MODULE_PARM_DESC(default_quality,
- 		 "default entropy content of hwrng per 1024 bits of input");
- 
- static void drop_current_rng(void);
- static int hwrng_init(struct hwrng *rng);
--static void hwrng_manage_rngd(void);
-+static void hwrng_manage_rngd(struct hwrng *rng);
- 
- static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
- 			       int wait);
-@@ -160,11 +160,13 @@ static int hwrng_init(struct hwrng *rng)
- 	reinit_completion(&rng->cleanup_done);
- 
- skip_init:
--	current_quality = rng->quality ? : default_quality;
--	if (current_quality > 1024)
--		current_quality = 1024;
-+	if (!rng->quality)
-+		rng->quality = default_quality;
-+	if (rng->quality > 1024)
-+		rng->quality = 1024;
-+	current_quality = rng->quality; /* obsolete */
- 
--	hwrng_manage_rngd();
-+	hwrng_manage_rngd(rng);
- 
- 	return 0;
- }
-@@ -429,19 +431,24 @@ static int hwrng_fillfn(void *unused)
- 	long rc;
- 
- 	while (!kthread_should_stop()) {
-+		unsigned short quality;
- 		struct hwrng *rng;
- 
--		if (!current_quality)
--			break;
--
- 		rng = get_current_rng();
- 		if (IS_ERR(rng) || !rng)
- 			break;
- 		mutex_lock(&reading_mutex);
- 		rc = rng_get_data(rng, rng_fillbuf,
- 				  rng_buffer_size(), 1);
-+		if (current_quality != rng->quality)
-+			rng->quality = current_quality; /* obsolete */
-+		quality = rng->quality;
- 		mutex_unlock(&reading_mutex);
- 		put_rng(rng);
-+
-+		if (!quality)
-+			break;
-+
- 		if (rc <= 0) {
- 			pr_warn("hwrng: no data available\n");
- 			msleep_interruptible(10000);
-@@ -451,7 +458,7 @@ static int hwrng_fillfn(void *unused)
- 		/* If we cannot credit at least one bit of entropy,
- 		 * keep track of the remainder for the next iteration
- 		 */
--		entropy = rc * current_quality * 8 + entropy_credit;
-+		entropy = rc * quality * 8 + entropy_credit;
- 		if ((entropy >> 10) == 0)
- 			entropy_credit = entropy;
- 
-@@ -463,14 +470,14 @@ static int hwrng_fillfn(void *unused)
- 	return 0;
- }
- 
--static void hwrng_manage_rngd(void)
-+static void hwrng_manage_rngd(struct hwrng *rng)
- {
- 	if (WARN_ON(!mutex_is_locked(&rng_mutex)))
- 		return;
- 
--	if (current_quality == 0 && hwrng_fill)
-+	if (rng->quality == 0 && hwrng_fill)
- 		kthread_stop(hwrng_fill);
--	if (current_quality > 0 && !hwrng_fill) {
-+	if (rng->quality > 0 && !hwrng_fill) {
- 		hwrng_fill = kthread_run(hwrng_fillfn, NULL, "hwrng");
- 		if (IS_ERR(hwrng_fill)) {
- 			pr_err("hwrng_fill thread creation failed\n");
--- 
-2.35.1
+I've been running this over the weekend and performance is generally okay.
 
+# perf top --symbols $(objdump -t
+/usr/src/linux/drivers/char/random.o|fgrep 'F .text'|awk '{print
+$6}'|tr '\n' ,) -F max -g
+
+One thing I noticed though was that add_interrupt_randomness spends
+most of its time on:
+
+    lock   xadd   %eax,0x38(%rbp)
+
+So, as expected, those atomics really need to go. Indeed we might be
+best off with the CPU hotplug notifier for setting the count back to
+zero.
+
+Do you want to prepare a patch for this? Or should I take a stab at it?
+
+Jason
