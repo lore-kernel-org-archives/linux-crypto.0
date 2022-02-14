@@ -2,275 +2,720 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5485CC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 17:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B57AC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 18:47:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356942AbiBNRKt (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 12:10:49 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43988 "EHLO
+        id S232818AbiBNSrl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Feb 2022 13:47:41 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:49826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232397AbiBNRKo (ORCPT
+        with ESMTP id S229677AbiBNSrk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 12:10:44 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A0E6517E;
-        Mon, 14 Feb 2022 09:10:36 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21EGuNxd012523;
-        Mon, 14 Feb 2022 17:09:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=l1qY/KEWmdOMqmt+7QpJnh4JMsoqsWK/gOpMsLH3vhU=;
- b=iOBmuVvF67xHukzHUkqyir7qEu/gzPLzycgcWIzc7esx1oZwqXQy2lYJocb/8IOyCzNJ
- JfmQDr2/AzpfN4sxXg8FoHY1ry1JGbDUMSTQv3uC+1yOt6/VHNKnGReTXRn1YeGynbm6
- YpeFn5+LCzDu0HeXDL+RrFWsmTk/3mH9r0Lgd7X7wROxKnRTXtTnkya3r5P+uDQG+lsn
- vkSHj+xkBczZq6SzMwqxlyUflVXyYuGm98NMk3ZNiDOxC8hs9uw3RZ15Mt+KHBYnp7R/
- keCirXfZuEcoG0F5/Nrh28QOFpukDJjzIKpmMxIl7F/ccChLhk6MkDzGkSdh4OXRGjnM iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4e4aus-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 17:09:56 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21EH8s3K012602;
-        Mon, 14 Feb 2022 17:09:56 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3e7c4e4ate-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 17:09:56 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21EH3ptd006254;
-        Mon, 14 Feb 2022 17:09:53 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3e64h9qj1q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Feb 2022 17:09:53 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21EH9itQ48103784
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Feb 2022 17:09:44 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6B5DBA4059;
-        Mon, 14 Feb 2022 17:09:44 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B65BA404D;
-        Mon, 14 Feb 2022 17:09:39 +0000 (GMT)
-Received: from sig-9-65-94-151.ibm.com (unknown [9.65.94.151])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Feb 2022 17:09:39 +0000 (GMT)
-Message-ID: <f324d8e04e4576d01325a4cfcad939abef29821b.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 2/6] powerpc/kexec_file: Add KEXEC_SIG support.
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Michal =?ISO-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, kexec@lists.infradead.org,
-        Philipp Rudo <prudo@redhat.com>,
-        Nayna <nayna@linux.vnet.ibm.com>, Rob Herring <robh@kernel.org>,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jessica Yu <jeyu@kernel.org>, linux-kernel@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Hari Bathini <hbathini@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Frank van der Linden <fllinden@amazon.com>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        Daniel Axtens <dja@axtens.net>, buendgen@de.ibm.com,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Baoquan He <bhe@redhat.com>,
-        linux-security-module@vger.kernel.org
-Date:   Mon, 14 Feb 2022 12:09:39 -0500
-In-Reply-To: <20220214155524.GN3113@kunlun.suse.cz>
-References: <cover.1641900831.git.msuchanek@suse.de>
-         <d95f7c6865bcad5ee37dcbec240e79aa742f5e1d.1641900831.git.msuchanek@suse.de>
-         <cff97dbe262919ff709a5ad2c4af6a702cc72a95.camel@linux.ibm.com>
-         <a8d717a44e5e919676e9b1e197cac781db46da87.camel@linux.ibm.com>
-         <20220214155524.GN3113@kunlun.suse.cz>
-Content-Type: text/plain; charset="ISO-8859-15"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
+        Mon, 14 Feb 2022 13:47:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCCBC710CC;
+        Mon, 14 Feb 2022 10:47:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF9E160C78;
+        Mon, 14 Feb 2022 18:46:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D179C340E9;
+        Mon, 14 Feb 2022 18:46:47 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kwTijHBb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644864405;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ceYGzqkWKWm+Cki/aYzB5/dGrJNVg8iOz0hYK/y5f0s=;
+        b=kwTijHBb3h2DXQdBtaKmnDltt8hlTR+MZTu0xwDuh+RrDtSNgIZ1LN9bIpO837bZLQM1jr
+        cZ7AMyJxFaxnbvbbz0h9icU3W0BqsPbdsMyVQr7V4gL69jlc9AmPrx8mLDbD6/WbusEI/j
+        nc3gUZNl8I5C/V8WukrDeKk9RUAH2HE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a121fadf (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 14 Feb 2022 18:46:45 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     ebiggers@kernel.org, linux@dominikbrodowski.net, tytso@mit.edu,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH v3] random: use simpler fast key erasure flow on per-cpu keys
+Date:   Mon, 14 Feb 2022 19:46:27 +0100
+Message-Id: <20220214184627.3048-1-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-8-Jason@zx2c4.com>
+References: <20220209011919.493762-8-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: U1aZDtPbNOEZaiWcjzBgyJkPBcT_272k
-X-Proofpoint-ORIG-GUID: EsCqYyegF9IoZXPxKwIORY0TvjlMSVhJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-14_07,2022-02-14_03,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- adultscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
- suspectscore=0 mlxlogscore=916 priorityscore=1501 mlxscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140102
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-02-14 at 16:55 +0100, Michal Such�nek wrote:
-> Hello,
-> 
-> On Mon, Feb 14, 2022 at 10:14:16AM -0500, Mimi Zohar wrote:
-> > Hi Michal,
-> > 
-> > On Sun, 2022-02-13 at 21:59 -0500, Mimi Zohar wrote:
-> > 
-> > > 
-> > > On Tue, 2022-01-11 at 12:37 +0100, Michal Suchanek wrote:
-> > > > diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-> > > > index dea74d7717c0..1cde9b6c5987 100644
-> > > > --- a/arch/powerpc/Kconfig
-> > > > +++ b/arch/powerpc/Kconfig
-> > > > @@ -560,6 +560,22 @@ config KEXEC_FILE
-> > > >  config ARCH_HAS_KEXEC_PURGATORY
-> > > >         def_bool KEXEC_FILE
-> > > >  
-> > > > +config KEXEC_SIG
-> > > > +       bool "Verify kernel signature during kexec_file_load() syscall"
-> > > > +       depends on KEXEC_FILE && MODULE_SIG_FORMAT
-> > > > +       help
-> > > > +         This option makes kernel signature verification mandatory for
-> 
-> This is actually wrong. KEXEC_SIG makes it mandatory that any signature
-> that is appended is valid and made by a key that is part of the platform
-> keyiring (which is also wrong, built-in keys should be also accepted).
-> KEXEC_SIG_FORCE or an IMA policy makes it mandatory that the signature
-> is present.
+Rather than the clunky NUMA full ChaCha state system we had prior, this
+commit is closer to the original "fast key erasure RNG" proposal from
+<https://blog.cr.yp.to/20170723-random.html>, by simply treating ChaCha
+keys on a per-cpu basis.
 
-I'm aware of MODULE_SIG_FORCE, which isn't normally enabled by distros,
-but enabling MODULE_SIG allows MODULE_SIG_FORCE to be enabled on the
-boot command line.  In the IMA arch policies, if MODULE_SIG is enabled,
-it is then enforced, otherwise an IMA "appraise" policy rule is
-defined.  This rule would prevent the module_load syscall.
+All entropy is extracted to a base crng key of 32 bytes. This base crng
+has a birthdate and a generation counter. When we go to take bytes from
+the crng, we first check if the birthdate is too old; if it is, we
+reseed per usual. Then we start working on a per-cpu crng.
 
-I'm not aware of KEXEC_SIG_FORCE.  If there is such a Kconfig, then I
-assume it could work similarly.
+This per-cpu crng makes sure that it has the same generation counter as
+the base crng. If it doesn't, it does fast key erasure with the base
+crng key and uses the output as its new per-cpu key, and then updates
+its local generation counter. Then, using this per-cpu state, we do
+ordinary fast key erasure. Half of this first block is used to overwrite
+the per-cpu crng key for the next call -- this is the fast key erasure
+RNG idea -- and the other half, along with the ChaCha state, is returned
+to the caller. If the caller desires more than this remaining half, it
+can generate more ChaCha blocks, unlocked, using the now detached ChaCha
+state that was just returned. Crypto-wise, this is more or less what we
+were doing before, but this simply makes it more explicit and ensures
+that we always have backtrack protection by not playing games with a
+shared block counter.
 
-> 
-> > > > +         the kexec_file_load() syscall.
-> > > 
-> > > When KEXEC_SIG is enabled on other architectures, IMA does not define a
-> > > kexec 'appraise' policy rule.  Refer to the policy rules in
-> > > security/ima/ima_efi.c.  Similarly the kexec 'appraise' policy rule in
-> 
-> I suppose you mean security/integrity/ima/ima_efi.c
+The flow looks like this:
 
-Yes
+──extract()──► base_crng.key ◄──memcpy()───┐
+                   │                       │
+                   └──chacha()──────┬─► new_base_key
+                                    └─► crngs[n].key ◄──memcpy()───┐
+                                              │                    │
+                                              └──chacha()───┬─► new_key
+                                                            └─► random_bytes
+                                                                      │
+                                                                      └────►
 
-> 
-> I also think it's misguided because KEXEC_SIG in itself does not enforce
-> the signature. KEXEC_SIG_FORCE does.
+There are a few hairy details around early init. Just as was done
+before, prior to having gathered enough entropy, crng_fast_load() and
+crng_slow_load() dump bytes directly into the base crng, and when we go
+to take bytes from the crng, in that case, we're doing fast key erasure
+with the base crng rather than the fast unlocked per-cpu crngs. This is
+fine as that's only the state of affairs during very early boot; once
+the crng initializes we never use these paths again.
 
-Right, which is why the IMA efi policy calls set_module_sig_enforced().
+In the process of all this, the APIs into the crng become a bit simpler:
+we have get_random_bytes(buf, len) and get_random_bytes_user(buf, len),
+which both do what you'd expect. All of the details of fast key erasure
+and per-cpu selection happen only in a very short critical section of
+crng_make_state(), which selects the right per-cpu key, does the fast
+key erasure, and returns a local state to the caller's stack. So, we no
+longer have a need for a separate backtrack function, as this happens
+all at once here. The API then allows us to extend backtrack protection
+to batched entropy without really having to do much at all.
 
-> 
-> > > arch/powerpc/kernel/ima_policy.c should not be defined.
-> 
-> I suppose you mean arch/powerpc/kernel/ima_arch.c - see above.
+The result is a bit simpler than before and has fewer foot guns. The
+init time state machine also gets a lot simpler as we don't need to wait
+for workqueues to come online and do deferred work. And the multi-core
+performance should be increased significantly, by virtue of having hardly
+any locking on the fast path.
 
-Sorry, yes.  
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+v3 makes some trivial cleanups around integer handling, but is otherwise
+the same algorithm as v2. With the batch size no longer a power of two,
+the modulo operation in the batching is removed.
 
-> 
-> 
-> Thanks for taking the time to reseach and summarize the differences.
-> 
-> > The discussion shouldn't only be about IMA vs. KEXEC_SIG kernel image
-> > signature verification.  Let's try and reframe the problem a bit.
-> > 
-> > 1. Unify and simply the existing kexec signature verification so
-> > verifying the KEXEC kernel image signature works irrespective of
-> > signature type - PE, appended signature.
-> > 
-> > solution: enable KEXEC_SIG  (This patch set, with the above powerpc IMA
-> > policy changes.)
-> > 
-> > 2. Measure and include the kexec kernel image in a log for attestation,
-> > if desired.
-> > 
-> > solution: enable IMA_ARCH_POLICY 
-> > - Powerpc: requires trusted boot to be enabled.
-> > - EFI:   requires  secure boot to be enabled.  The IMA efi policy
-> > doesn't differentiate between secure and trusted boot.
-> > 
-> > 3. Carry the kexec kernel image measurement across kexec, if desired
-> > and supported on the architecture.
-> > 
-> > solution: enable IMA_KEXEC
-> > 
-> > Comparison: 
-> > - Are there any differences between IMA vs. KEXEC_SIG measuring the
-> > kexec kernel image?
-> > 
-> > One of the main differences is "what" is included in the measurement
-> > list differs.  In both cases, the 'd-ng' field of the IMA measurement
-> > list template (e.g. ima-ng, ima-sig, ima-modsig) is the full file hash
-> > including the appended signature.  With IMA and the 'ima-modsig'
-> > template, an additional hash without the appended signature is defined,
-> > as well as including the appended signature in the 'sig' field.
-> > 
-> > Including the file hash and appended signature in the measurement list
-> > allows an attestation server, for example, to verify the appended
-> > signature without having to know the file hash without the signature.
-> 
-> I don't understand this part. Isn't the hash *with* signature always
-> included, and the distinguishing part about IMA is the hash *without*
-> signature which is the same irrespective of signature type (PE, appended
-> xattr) and irrespective of the keyt used for signoing?
+ drivers/char/random.c | 388 ++++++++++++++++++++++++------------------
+ 1 file changed, 222 insertions(+), 166 deletions(-)
 
-Roberto Sassu added support for IMA templates.  These are the
-definitions of 'ima-sig' and 'ima-modsig'.
-
-{.name = "ima-sig", .fmt = "d-ng|n-ng|sig"},
-{.name = "ima-modsig", .fmt = "d-ng|n-ng|sig|d-modsig|modsig"}
-
-d-ng: is the file hash.  With the proposed IMA support for fs-verity
-digests, the 'd-ng' field may also include the fsverity digest, based
-on policy.
-
-n-ng: is the file pathname.
-sig: is the file signature stored as a 'security.ima' xattr (may be
-NULL).
-d-modsig: is the file hash without the appended signature (may be
-NULL).
-
-FYI, changing from "module signature" to "appended signature", might
-impact the template field and name.  :)
-
-modsig: is the appended signature (May be NULL).
-
-I really haven't looked at PE signatures, so I can't comment on them.
-
-> 
-> > Other differences are already included in the Kconfig KEXEC_SIG "Notes"
-> > section.
-> 
-> Which besides what is already described above would be blacklisting
-> specific binaries, which is much more effective if you have hashes of
-> binaries without signature.
-
-Thanks, Nayna will be happy to hear you approve.
-
-FYI, IMA calculates the file hash once, which is then added to the IMA
-measurement list, extended into the TPM (when available), used to
-verify signatures, and included in the audit log.
-
-With the KEXEC_SIG support, assuming the IMA arch policy is enabled,
-the file hash would be calculated twice - once for verifying the file
-signature and again for the measurement.
-
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index f3179c67010b..b2e01de4db39 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -67,63 +67,19 @@
+  * Exported interfaces ---- kernel output
+  * --------------------------------------
+  *
+- * The primary kernel interface is
++ * The primary kernel interfaces are:
+  *
+  *	void get_random_bytes(void *buf, int nbytes);
+- *
+- * This interface will return the requested number of random bytes,
+- * and place it in the requested buffer.  This is equivalent to a
+- * read from /dev/urandom.
+- *
+- * For less critical applications, there are the functions:
+- *
+  *	u32 get_random_u32()
+  *	u64 get_random_u64()
+  *	unsigned int get_random_int()
+  *	unsigned long get_random_long()
+  *
+- * These are produced by a cryptographic RNG seeded from get_random_bytes,
+- * and so do not deplete the entropy pool as much.  These are recommended
+- * for most in-kernel operations *if the result is going to be stored in
+- * the kernel*.
+- *
+- * Specifically, the get_random_int() family do not attempt to do
+- * "anti-backtracking".  If you capture the state of the kernel (e.g.
+- * by snapshotting the VM), you can figure out previous get_random_int()
+- * return values.  But if the value is stored in the kernel anyway,
+- * this is not a problem.
+- *
+- * It *is* safe to expose get_random_int() output to attackers (e.g. as
+- * network cookies); given outputs 1..n, it's not feasible to predict
+- * outputs 0 or n+1.  The only concern is an attacker who breaks into
+- * the kernel later; the get_random_int() engine is not reseeded as
+- * often as the get_random_bytes() one.
+- *
+- * get_random_bytes() is needed for keys that need to stay secret after
+- * they are erased from the kernel.  For example, any key that will
+- * be wrapped and stored encrypted.  And session encryption keys: we'd
+- * like to know that after the session is closed and the keys erased,
+- * the plaintext is unrecoverable to someone who recorded the ciphertext.
+- *
+- * But for network ports/cookies, stack canaries, PRNG seeds, address
+- * space layout randomization, session *authentication* keys, or other
+- * applications where the sensitive data is stored in the kernel in
+- * plaintext for as long as it's sensitive, the get_random_int() family
+- * is just fine.
+- *
+- * Consider ASLR.  We want to keep the address space secret from an
+- * outside attacker while the process is running, but once the address
+- * space is torn down, it's of no use to an attacker any more.  And it's
+- * stored in kernel data structures as long as it's alive, so worrying
+- * about an attacker's ability to extrapolate it from the get_random_int()
+- * CRNG is silly.
+- *
+- * Even some cryptographic keys are safe to generate with get_random_int().
+- * In particular, keys for SipHash are generally fine.  Here, knowledge
+- * of the key authorizes you to do something to a kernel object (inject
+- * packets to a network connection, or flood a hash table), and the
+- * key is stored with the object being protected.  Once it goes away,
+- * we no longer care if anyone knows the key.
++ * These interfaces will return the requested number of random bytes
++ * into the given buffer or as a return value. This is equivalent to a
++ * read from /dev/urandom. The get_random_{u32,u64,int,long}() family
++ * of functions may be higher performance for one-off random integers,
++ * because they do a bit of buffering.
+  *
+  * prandom_u32()
+  * -------------
+@@ -300,20 +256,6 @@ static struct fasync_struct *fasync;
+ static DEFINE_SPINLOCK(random_ready_list_lock);
+ static LIST_HEAD(random_ready_list);
+ 
+-struct crng_state {
+-	u32 state[16];
+-	unsigned long init_time;
+-	spinlock_t lock;
+-};
+-
+-static struct crng_state primary_crng = {
+-	.lock = __SPIN_LOCK_UNLOCKED(primary_crng.lock),
+-	.state[0] = CHACHA_CONSTANT_EXPA,
+-	.state[1] = CHACHA_CONSTANT_ND_3,
+-	.state[2] = CHACHA_CONSTANT_2_BY,
+-	.state[3] = CHACHA_CONSTANT_TE_K,
+-};
+-
+ /*
+  * crng_init =  0 --> Uninitialized
+  *		1 --> Initialized
+@@ -325,9 +267,6 @@ static struct crng_state primary_crng = {
+ static int crng_init = 0;
+ #define crng_ready() (likely(crng_init > 1))
+ static int crng_init_cnt = 0;
+-#define CRNG_INIT_CNT_THRESH (2 * CHACHA_KEY_SIZE)
+-static void extract_crng(u8 out[CHACHA_BLOCK_SIZE]);
+-static void crng_backtrack_protect(u8 tmp[CHACHA_BLOCK_SIZE], int used);
+ static void process_random_ready_list(void);
+ static void _get_random_bytes(void *buf, int nbytes);
+ 
+@@ -470,7 +409,30 @@ static void credit_entropy_bits(int nbits)
+  *
+  *********************************************************************/
+ 
+-#define CRNG_RESEED_INTERVAL (300 * HZ)
++enum {
++	CRNG_RESEED_INTERVAL = 300 * HZ,
++	CRNG_INIT_CNT_THRESH = 2 * CHACHA_KEY_SIZE
++};
++
++static struct {
++	u8 key[CHACHA_KEY_SIZE] __aligned(__alignof__(long));
++	unsigned long birth;
++	unsigned long generation;
++	spinlock_t lock;
++} base_crng = {
++	.lock = __SPIN_LOCK_UNLOCKED(base_crng.lock)
++};
++
++struct crng {
++	u8 key[CHACHA_KEY_SIZE];
++	unsigned long generation;
++	local_lock_t lock;
++};
++
++static DEFINE_PER_CPU(struct crng, crngs) = {
++	.generation = ULONG_MAX,
++	.lock = INIT_LOCAL_LOCK(crngs.lock),
++};
+ 
+ static DECLARE_WAIT_QUEUE_HEAD(crng_init_wait);
+ 
+@@ -487,22 +449,22 @@ static size_t crng_fast_load(const u8 *cp, size_t len)
+ 	u8 *p;
+ 	size_t ret = 0;
+ 
+-	if (!spin_trylock_irqsave(&primary_crng.lock, flags))
++	if (!spin_trylock_irqsave(&base_crng.lock, flags))
+ 		return 0;
+ 	if (crng_init != 0) {
+-		spin_unlock_irqrestore(&primary_crng.lock, flags);
++		spin_unlock_irqrestore(&base_crng.lock, flags);
+ 		return 0;
+ 	}
+-	p = (u8 *)&primary_crng.state[4];
++	p = base_crng.key;
+ 	while (len > 0 && crng_init_cnt < CRNG_INIT_CNT_THRESH) {
+-		p[crng_init_cnt % CHACHA_KEY_SIZE] ^= *cp;
++		p[crng_init_cnt % sizeof(base_crng.key)] ^= *cp;
+ 		cp++; crng_init_cnt++; len--; ret++;
+ 	}
+ 	if (crng_init_cnt >= CRNG_INIT_CNT_THRESH) {
+ 		invalidate_batched_entropy();
+ 		crng_init = 1;
+ 	}
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	spin_unlock_irqrestore(&base_crng.lock, flags);
+ 	if (crng_init == 1)
+ 		pr_notice("fast init done\n");
+ 	return ret;
+@@ -527,14 +489,14 @@ static int crng_slow_load(const u8 *cp, size_t len)
+ 	unsigned long flags;
+ 	static u8 lfsr = 1;
+ 	u8 tmp;
+-	unsigned int i, max = CHACHA_KEY_SIZE;
++	unsigned int i, max = sizeof(base_crng.key);
+ 	const u8 *src_buf = cp;
+-	u8 *dest_buf = (u8 *)&primary_crng.state[4];
++	u8 *dest_buf = base_crng.key;
+ 
+-	if (!spin_trylock_irqsave(&primary_crng.lock, flags))
++	if (!spin_trylock_irqsave(&base_crng.lock, flags))
+ 		return 0;
+ 	if (crng_init != 0) {
+-		spin_unlock_irqrestore(&primary_crng.lock, flags);
++		spin_unlock_irqrestore(&base_crng.lock, flags);
+ 		return 0;
+ 	}
+ 	if (len > max)
+@@ -545,38 +507,48 @@ static int crng_slow_load(const u8 *cp, size_t len)
+ 		lfsr >>= 1;
+ 		if (tmp & 1)
+ 			lfsr ^= 0xE1;
+-		tmp = dest_buf[i % CHACHA_KEY_SIZE];
+-		dest_buf[i % CHACHA_KEY_SIZE] ^= src_buf[i % len] ^ lfsr;
++		tmp = dest_buf[i % sizeof(base_crng.key)];
++		dest_buf[i % sizeof(base_crng.key)] ^= src_buf[i % len] ^ lfsr;
+ 		lfsr += (tmp << 3) | (tmp >> 5);
+ 	}
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	spin_unlock_irqrestore(&base_crng.lock, flags);
+ 	return 1;
+ }
+ 
+ static void crng_reseed(void)
+ {
+ 	unsigned long flags;
+-	int i, entropy_count;
+-	union {
+-		u8 block[CHACHA_BLOCK_SIZE];
+-		u32 key[8];
+-	} buf;
++	int entropy_count;
++	unsigned long next_gen;
++	u8 key[CHACHA_KEY_SIZE];
+ 
++	/* First we make sure we have POOL_MIN_BITS of entropy in the pool,
++	 * and then we drain all of it. Only then can we extract a new key.
++	 */
+ 	do {
+ 		entropy_count = READ_ONCE(input_pool.entropy_count);
+ 		if (entropy_count < POOL_MIN_BITS)
+ 			return;
+ 	} while (cmpxchg(&input_pool.entropy_count, entropy_count, 0) != entropy_count);
+-	extract_entropy(buf.key, sizeof(buf.key));
++	extract_entropy(key, sizeof(key));
+ 	wake_up_interruptible(&random_write_wait);
+ 	kill_fasync(&fasync, SIGIO, POLL_OUT);
+ 
+-	spin_lock_irqsave(&primary_crng.lock, flags);
+-	for (i = 0; i < 8; i++)
+-		primary_crng.state[i + 4] ^= buf.key[i];
+-	memzero_explicit(&buf, sizeof(buf));
+-	WRITE_ONCE(primary_crng.init_time, jiffies);
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	/* We copy the new key into the base_crng, overwriting the old one,
++	 * and update the generation counter. We avoid hitting ULONG_MAX,
++	 * because the per-cpu crngs are initialized to ULONG_MAX, so this
++	 * forces new CPUs that come online to always initialize.
++	 */
++	spin_lock_irqsave(&base_crng.lock, flags);
++	memcpy(base_crng.key, key, sizeof(base_crng.key));
++	next_gen = base_crng.generation + 1;
++	if (next_gen == ULONG_MAX)
++		++next_gen;
++	WRITE_ONCE(base_crng.generation, next_gen);
++	base_crng.birth = jiffies;
++	spin_unlock_irqrestore(&base_crng.lock, flags);
++	memzero_explicit(key, sizeof(key));
++
+ 	if (crng_init < 2) {
+ 		invalidate_batched_entropy();
+ 		crng_init = 2;
+@@ -597,77 +569,139 @@ static void crng_reseed(void)
+ 	}
+ }
+ 
+-static void extract_crng(u8 out[CHACHA_BLOCK_SIZE])
++/*
++ * The general form here is based on a "fast key erasure RNG" from
++ * <https://blog.cr.yp.to/20170723-random.html>. It generates a ChaCha
++ * block using the provided key, and then immediately overwites that
++ * key with half the block. It returns the resultant ChaCha state to the
++ * user, along with the second half of the block containing 32 bytes of
++ * random data that may be used; random_data_len may not be greater than
++ * 32.
++ */
++static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
++				  u32 chacha_state[CHACHA_STATE_WORDS],
++				  u8 *random_data, size_t random_data_len)
+ {
+-	unsigned long flags, init_time;
++	u8 first_block[CHACHA_BLOCK_SIZE];
+ 
+-	if (crng_ready()) {
+-		init_time = READ_ONCE(primary_crng.init_time);
+-		if (time_after(jiffies, init_time + CRNG_RESEED_INTERVAL))
+-			crng_reseed();
+-	}
+-	spin_lock_irqsave(&primary_crng.lock, flags);
+-	chacha20_block(&primary_crng.state[0], out);
+-	if (primary_crng.state[12] == 0)
+-		primary_crng.state[13]++;
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++	BUG_ON(random_data_len > 32);
++
++	chacha_init_consts(chacha_state);
++	memcpy(&chacha_state[4], key, CHACHA_KEY_SIZE);
++	memset(&chacha_state[12], 0, sizeof(u32) * 4);
++	chacha20_block(chacha_state, first_block);
++
++	memcpy(key, first_block, CHACHA_KEY_SIZE);
++	memcpy(random_data, first_block + CHACHA_KEY_SIZE, random_data_len);
++	memzero_explicit(first_block, sizeof(first_block));
+ }
+ 
+ /*
+- * Use the leftover bytes from the CRNG block output (if there is
+- * enough) to mutate the CRNG key to provide backtracking protection.
++ * This function returns a ChaCha state that you may use for generating
++ * random data. It also returns up to 32 bytes on its own of random data
++ * that may be used; random_data_len may not be greater than 32.
+  */
+-static void crng_backtrack_protect(u8 tmp[CHACHA_BLOCK_SIZE], int used)
++static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
++			    u8 *random_data, size_t random_data_len)
+ {
+ 	unsigned long flags;
+-	u32 *s, *d;
+-	int i;
++	struct crng *crng;
++
++	BUG_ON(random_data_len > 32);
+ 
+-	used = round_up(used, sizeof(u32));
+-	if (used + CHACHA_KEY_SIZE > CHACHA_BLOCK_SIZE) {
+-		extract_crng(tmp);
+-		used = 0;
++	/* For the fast path, we check whether we're ready, unlocked first, and
++	 * then re-check once locked later. In the case where we're really not
++	 * ready, we do fast key erasure with the base_crng directly, because
++	 * this is what crng_{fast,slow}_load mutate during early init.
++	 */
++	if (unlikely(!crng_ready())) {
++		bool ready;
++
++		spin_lock_irqsave(&base_crng.lock, flags);
++		ready = crng_ready();
++		if (!ready)
++			crng_fast_key_erasure(base_crng.key, chacha_state,
++					      random_data, random_data_len);
++		spin_unlock_irqrestore(&base_crng.lock, flags);
++		if (!ready)
++			return;
+ 	}
+-	spin_lock_irqsave(&primary_crng.lock, flags);
+-	s = (u32 *)&tmp[used];
+-	d = &primary_crng.state[4];
+-	for (i = 0; i < 8; i++)
+-		*d++ ^= *s++;
+-	spin_unlock_irqrestore(&primary_crng.lock, flags);
++
++	/* If the base_crng is more than 5 minutes old, we reseed, which
++	 * in turn bumps the generation counter that we check below.
++	 */
++	if (unlikely(time_after(jiffies, READ_ONCE(base_crng.birth) + CRNG_RESEED_INTERVAL)))
++		crng_reseed();
++
++	local_lock_irqsave(&crngs.lock, flags);
++	crng = raw_cpu_ptr(&crngs);
++
++	/* If our per-cpu crng is older than the base_crng, then it means
++	 * somebody reseeded the base_crng. In that case, we do fast key
++	 * erasure on the base_crng, and use its output as the new key
++	 * for our per-cpu crng. This brings us up to date with base_crng.
++	 */
++	if (unlikely(crng->generation != READ_ONCE(base_crng.generation))) {
++		spin_lock(&base_crng.lock);
++		crng_fast_key_erasure(base_crng.key, chacha_state,
++				      crng->key, sizeof(crng->key));
++		crng->generation = base_crng.generation;
++		spin_unlock(&base_crng.lock);
++	}
++
++	/* Finally, when we've made it this far, our per-cpu crng has an up
++	 * to date key, and we can do fast key erasure with it to produce
++	 * some random data and a ChaCha state for the caller. All other
++	 * branches of this function are "unlikely", so most of the time we
++	 * should wind up here immediately.
++	 */
++	crng_fast_key_erasure(crng->key, chacha_state, random_data, random_data_len);
++	local_unlock_irqrestore(&crngs.lock, flags);
+ }
+ 
+-static ssize_t extract_crng_user(void __user *buf, size_t nbytes)
++static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
+ {
+-	ssize_t ret = 0, i = CHACHA_BLOCK_SIZE;
+-	u8 tmp[CHACHA_BLOCK_SIZE] __aligned(4);
+-	int large_request = (nbytes > 256);
++	bool large_request = nbytes > 256;
++	ssize_t ret = 0, len;
++	u32 chacha_state[CHACHA_STATE_WORDS];
++	u8 output[CHACHA_BLOCK_SIZE];
++
++	if (!nbytes)
++		return 0;
++
++	len = min_t(ssize_t, 32, nbytes);
++	crng_make_state(chacha_state, output, len);
++
++	if (copy_to_user(buf, output, len))
++		return -EFAULT;
++	nbytes -= len;
++	buf += len;
++	ret += len;
+ 
+ 	while (nbytes) {
+ 		if (large_request && need_resched()) {
+-			if (signal_pending(current)) {
+-				if (ret == 0)
+-					ret = -ERESTARTSYS;
++			if (signal_pending(current))
+ 				break;
+-			}
+ 			schedule();
+ 		}
+ 
+-		extract_crng(tmp);
+-		i = min_t(int, nbytes, CHACHA_BLOCK_SIZE);
+-		if (copy_to_user(buf, tmp, i)) {
++		chacha20_block(chacha_state, output);
++		if (unlikely(chacha_state[12] == 0))
++			++chacha_state[13];
++
++		len = min_t(ssize_t, nbytes, CHACHA_BLOCK_SIZE);
++		if (copy_to_user(buf, output, len)) {
+ 			ret = -EFAULT;
+ 			break;
+ 		}
+ 
+-		nbytes -= i;
+-		buf += i;
+-		ret += i;
++		nbytes -= len;
++		buf += len;
++		ret += len;
+ 	}
+-	crng_backtrack_protect(tmp, i);
+-
+-	/* Wipe data just written to memory */
+-	memzero_explicit(tmp, sizeof(tmp));
+ 
++	memzero_explicit(chacha_state, sizeof(chacha_state));
++	memzero_explicit(output, sizeof(output));
+ 	return ret;
+ }
+ 
+@@ -976,23 +1010,36 @@ static void _warn_unseeded_randomness(const char *func_name, void *caller, void
+  */
+ static void _get_random_bytes(void *buf, int nbytes)
+ {
+-	u8 tmp[CHACHA_BLOCK_SIZE] __aligned(4);
++	u32 chacha_state[CHACHA_STATE_WORDS];
++	u8 tmp[CHACHA_BLOCK_SIZE];
++	ssize_t len;
+ 
+ 	trace_get_random_bytes(nbytes, _RET_IP_);
+ 
+-	while (nbytes >= CHACHA_BLOCK_SIZE) {
+-		extract_crng(buf);
+-		buf += CHACHA_BLOCK_SIZE;
++	if (!nbytes)
++		return;
++
++	len = min_t(ssize_t, 32, nbytes);
++	crng_make_state(chacha_state, buf, len);
++	nbytes -= len;
++	buf += len;
++
++	while (nbytes) {
++		if (nbytes < CHACHA_BLOCK_SIZE) {
++			chacha20_block(chacha_state, tmp);
++			memcpy(buf, tmp, nbytes);
++			memzero_explicit(tmp, sizeof(tmp));
++			break;
++		}
++
++		chacha20_block(chacha_state, buf);
++		if (unlikely(chacha_state[12] == 0))
++			++chacha_state[13];
+ 		nbytes -= CHACHA_BLOCK_SIZE;
++		buf += CHACHA_BLOCK_SIZE;
+ 	}
+ 
+-	if (nbytes > 0) {
+-		extract_crng(tmp);
+-		memcpy(buf, tmp, nbytes);
+-		crng_backtrack_protect(tmp, nbytes);
+-	} else
+-		crng_backtrack_protect(tmp, CHACHA_BLOCK_SIZE);
+-	memzero_explicit(tmp, sizeof(tmp));
++	memzero_explicit(chacha_state, sizeof(chacha_state));
+ }
+ 
+ void get_random_bytes(void *buf, int nbytes)
+@@ -1223,13 +1270,12 @@ int __init rand_initialize(void)
+ 	mix_pool_bytes(&now, sizeof(now));
+ 	mix_pool_bytes(utsname(), sizeof(*(utsname())));
+ 
+-	extract_entropy(&primary_crng.state[4], sizeof(u32) * 12);
++	extract_entropy(base_crng.key, sizeof(base_crng.key));
+ 	if (arch_init && trust_cpu && crng_init < 2) {
+ 		invalidate_batched_entropy();
+ 		crng_init = 2;
+ 		pr_notice("crng init done (trusting CPU's manufacturer)\n");
+ 	}
+-	primary_crng.init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+ 
+ 	if (ratelimit_disable) {
+ 		urandom_warning.interval = 0;
+@@ -1261,7 +1307,7 @@ static ssize_t urandom_read_nowarn(struct file *file, char __user *buf,
+ 	int ret;
+ 
+ 	nbytes = min_t(size_t, nbytes, INT_MAX >> 6);
+-	ret = extract_crng_user(buf, nbytes);
++	ret = get_random_bytes_user(buf, nbytes);
+ 	trace_urandom_read(8 * nbytes, 0, input_pool.entropy_count);
+ 	return ret;
+ }
+@@ -1577,8 +1623,14 @@ static atomic_t batch_generation = ATOMIC_INIT(0);
+ 
+ struct batched_entropy {
+ 	union {
+-		u64 entropy_u64[CHACHA_BLOCK_SIZE / sizeof(u64)];
+-		u32 entropy_u32[CHACHA_BLOCK_SIZE / sizeof(u32)];
++		/* We make this 1.5x a ChaCha block, so that we get the
++		 * remaining 32 bytes from fast key erasure, plus one full
++		 * block from the detached ChaCha state. We can increase
++		 * the size of this later if needed so long as we keep the
++		 * formula of (integer_blocks + 0.5) * CHACHA_BLOCK_SIZE.
++		 */
++		u64 entropy_u64[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u64))];
++		u32 entropy_u32[CHACHA_BLOCK_SIZE * 3 / (2 * sizeof(u32))];
+ 	};
+ 	local_lock_t lock;
+ 	unsigned int position;
+@@ -1587,14 +1639,13 @@ struct batched_entropy {
+ 
+ /*
+  * Get a random word for internal kernel use only. The quality of the random
+- * number is good as /dev/urandom, but there is no backtrack protection, with
+- * the goal of being quite fast and not depleting entropy. In order to ensure
+- * that the randomness provided by this function is okay, the function
+- * wait_for_random_bytes() should be called and return 0 at least once at any
+- * point prior.
++ * number is good as /dev/urandom. In order to ensure that the randomness
++ * provided by this function is okay, the function wait_for_random_bytes()
++ * should be called and return 0 at least once at any point prior.
+  */
+ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u64) = {
+-	.lock = INIT_LOCAL_LOCK(batched_entropy_u64.lock)
++	.lock = INIT_LOCAL_LOCK(batched_entropy_u64.lock),
++	.position = UINT_MAX
+ };
+ 
+ u64 get_random_u64(void)
+@@ -1611,21 +1662,24 @@ u64 get_random_u64(void)
+ 	batch = raw_cpu_ptr(&batched_entropy_u64);
+ 
+ 	next_gen = atomic_read(&batch_generation);
+-	if (batch->position % ARRAY_SIZE(batch->entropy_u64) == 0 ||
++	if (batch->position >= ARRAY_SIZE(batch->entropy_u64) ||
+ 	    next_gen != batch->generation) {
+-		extract_crng((u8 *)batch->entropy_u64);
++		_get_random_bytes(batch->entropy_u64, sizeof(batch->entropy_u64));
+ 		batch->position = 0;
+ 		batch->generation = next_gen;
+ 	}
+ 
+-	ret = batch->entropy_u64[batch->position++];
++	ret = batch->entropy_u64[batch->position];
++	batch->entropy_u64[batch->position] = 0;
++	++batch->position;
+ 	local_unlock_irqrestore(&batched_entropy_u64.lock, flags);
+ 	return ret;
+ }
+ EXPORT_SYMBOL(get_random_u64);
+ 
+ static DEFINE_PER_CPU(struct batched_entropy, batched_entropy_u32) = {
+-	.lock = INIT_LOCAL_LOCK(batched_entropy_u32.lock)
++	.lock = INIT_LOCAL_LOCK(batched_entropy_u32.lock),
++	.position = UINT_MAX
+ };
+ 
+ u32 get_random_u32(void)
+@@ -1642,14 +1696,16 @@ u32 get_random_u32(void)
+ 	batch = raw_cpu_ptr(&batched_entropy_u32);
+ 
+ 	next_gen = atomic_read(&batch_generation);
+-	if (batch->position % ARRAY_SIZE(batch->entropy_u32) == 0 ||
++	if (batch->position >= ARRAY_SIZE(batch->entropy_u32) ||
+ 	    next_gen != batch->generation) {
+-		extract_crng((u8 *)batch->entropy_u32);
++		_get_random_bytes(batch->entropy_u32, sizeof(batch->entropy_u32));
+ 		batch->position = 0;
+ 		batch->generation = next_gen;
+ 	}
+ 
+-	ret = batch->entropy_u32[batch->position++];
++	ret = batch->entropy_u32[batch->position];
++	batch->entropy_u32[batch->position] = 0;
++	++batch->position;
+ 	local_unlock_irqrestore(&batched_entropy_u32.lock, flags);
+ 	return ret;
+ }
 -- 
-thanks,
-
-Mimi
+2.35.0
 
