@@ -2,124 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AECF4C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 19:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1083C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 22:53:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbiBNTB7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 14:01:59 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:36260 "EHLO
+        id S232008AbiBNWxR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Feb 2022 17:53:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiBNTB2 (ORCPT
+        with ESMTP id S232000AbiBNWxQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 14:01:28 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B8FD227A;
-        Mon, 14 Feb 2022 11:01:12 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 2193E1F383;
-        Mon, 14 Feb 2022 18:56:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1644865003; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=f+iOC1OijgKnwOeDeGI5sZj1eeXHvVIuPR8OLLmfj1Y=;
-        b=m7JcsLVnh6+9B+5w+vU+hjxLzDc88ZdY3A6A5r+0TmhioRAkB6QK1DKwKAmg8S5I/Ffx5Y
-        nn9196foRWWRGpADWdJbFO2KTy76nsRsBRHRjiVz4hsa4MHkMDJsKYt08KT+Kfao/eHiv+
-        A9vUDkJ3kuXFQQ3umRpXycoRsAHLR/s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1644865003;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=f+iOC1OijgKnwOeDeGI5sZj1eeXHvVIuPR8OLLmfj1Y=;
-        b=0UzndL++7JY+Au/wZw9aK83EG62p/EFrmvKqFMHQpFZAg/Bj99Q5Pc96t2pY8yH3x9+SBG
-        fXxVAPBTuyCxI7Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D700813B55;
-        Mon, 14 Feb 2022 18:56:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id JWxzMuqlCmKLSwAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Mon, 14 Feb 2022 18:56:42 +0000
-From:   Petr Vorel <pvorel@suse.cz>
-To:     linux-crypto@vger.kernel.org
-Cc:     Petr Vorel <pvorel@suse.cz>, Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        linux-kbuild@vger.kernel.org
-Subject: [PATCH 1/1] crypto: vmx: Fix missing dependencies during boot
-Date:   Mon, 14 Feb 2022 19:56:38 +0100
-Message-Id: <20220214185638.1457-1-pvorel@suse.cz>
-X-Mailer: git-send-email 2.35.1
+        Mon, 14 Feb 2022 17:53:16 -0500
+Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACCC171870;
+        Mon, 14 Feb 2022 14:53:07 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailnew.nyi.internal (Postfix) with ESMTP id AF0BF580632;
+        Mon, 14 Feb 2022 17:53:04 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Mon, 14 Feb 2022 17:53:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=e2LfV2BcYFTZ6ZIg8
+        FOTVm2MpIs9idDpZ8R+EsQHXrs=; b=SJdNeO/8jyTfLiWOckcAG2OHGKCIILKot
+        CoUd+ViU7KAYtLt39PVDcb/IGuv6zV7lLNGGyCe8EGuQ5DurWAtyc+59koNFynFb
+        Vax9tANM2zkhCcUoof6TNS/nhOKqyPS+Hw3tsgsfWgJvrvYRq/oTiaPhFIsCZ3gq
+        572A76x7uTT/SQOWr2a+qXWcnzfFPlN8I/AlTAP67o6ZCB+w+xPm/B5psHno61aJ
+        DCH/hrkY5RKmleyp5ih42WMsScPaotRe9Unr3WD7ZeSnt0m2dNzPfz999KUbozwI
+        V020ATKE/pSE4MZC8o1aHNCuKDsllmkkIJSgA7ad0fRyvnrt2DTiw==
+X-ME-Sender: <xms:T90KYtUsU1i8H8oKgKHJ6zYGcswaPP0J8WgFAclau0XetWuIQzG0mw>
+    <xme:T90KYtmQA6gxwJzCjpgsGZ91IZLbkRkK9l-KZyxb5ryxN91ZuejBSqStpdrtODbHF
+    GifMxA7HMTM-t1YzjE>
+X-ME-Received: <xmr:T90KYpb6E2tmhE99twMc1QbFpCxPqjw62-HdwNAwXMsB5Z1t4aNo3u9CZxAFYhuTPi2ZXSZxw3FS5jdDrwiRWsSOAlcaid0NeVA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrjeefgddtfecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvufgjkfhfgggtsehttdertddttddvnecuhfhrohhmpefhihhnnhcuvfhh
+    rghinhcuoehfthhhrghinheslhhinhhugidqmheikehkrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeffudfhgeefvdeitedugfelueegheekkeefveffhfeiveetledvhfdtveffteeu
+    udenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehfth
+    hhrghinheslhhinhhugidqmheikehkrdhorhhg
+X-ME-Proxy: <xmx:T90KYgXiz-V4ond-i7eX1uAvA0i9WOmsdnB3aAw0H2uwKsVWoxeXRw>
+    <xmx:T90KYnl-c428-0I3-b8b87OVnAgj1cO8HsHp8BhvVhhh6vh8QeegDA>
+    <xmx:T90KYtcrQAQMyH87a2CMfgA9HSwqEFEk9lDpm9-zJ546bLNuMFdolw>
+    <xmx:UN0KYnHmkgdFIoGzRmz69Z6jzOvFrkcKI8C9eYQOxPNBA0jBhzy_3Q>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Feb 2022 17:53:00 -0500 (EST)
+Date:   Tue, 15 Feb 2022 09:53:11 +1100 (AEDT)
+From:   Finn Thain <fthain@linux-m68k.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     Joshua Kinard <kumba@gentoo.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH RFC v0] random: block in /dev/urandom
+In-Reply-To: <CAHmME9ooEbgiv3DRk87ei+rUoVNMJthY7UuG_xCgm=kfMZAajw@mail.gmail.com>
+Message-ID: <b43cc58-5ace-11e1-1a11-6cca42f65e7@linux-m68k.org>
+References: <20220211210757.612595-1-Jason@zx2c4.com> <fcab986b-d0bd-c798-de17-266abcdc7da2@gentoo.org> <CAHmME9ooEbgiv3DRk87ei+rUoVNMJthY7UuG_xCgm=kfMZAajw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-if CRYPTO_DEV_VMX_ENCRYPT=y && !CRYPTO_MANAGER_DISABLE_TESTS
-and either of CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or CRYPTO_XTS is built
-as module or disabled, alg_test() from crypto/testmgr.c complains during
-boot about failing to allocate the generic fallback implementations
-(2 == ENOENT):
+On Mon, 14 Feb 2022, Jason A. Donenfeld wrote:
 
-[    0.540953] Failed to allocate xts(aes) fallback: -2
-[    0.541014] alg: skcipher: failed to allocate transform for p8_aes_xts: -2
-[    0.541120] alg: self-tests for p8_aes_xts (xts(aes)) failed (rc=-2)
-[    0.544440] Failed to allocate ctr(aes) fallback: -2
-[    0.544497] alg: skcipher: failed to allocate transform for p8_aes_ctr: -2
-[    0.544603] alg: self-tests for p8_aes_ctr (ctr(aes)) failed (rc=-2)
-[    0.547992] Failed to allocate cbc(aes) fallback: -2
-[    0.548052] alg: skcipher: failed to allocate transform for p8_aes_cbc: -2
-[    0.548156] alg: self-tests for p8_aes_cbc (cbc(aes)) failed (rc=-2)
-[    0.550745] Failed to allocate transformation for 'aes': -2
-[    0.550801] alg: cipher: Failed to load transform for p8_aes: -2
-[    0.550892] alg: self-tests for p8_aes (aes) failed (rc=-2)
+> 
+> So the only systems we're actually talking about without a good cycle 
+> counter are non-Amiga m68k? If so, that'd be a pretty terrific finding. 
+> It'd mean that this idea can move forward, and we only need to worry 
+> about some m68k museum pieces with misconfigured userspaces...
+> 
 
-Check for these dependencies if crypto tests enabled.
+A processor cycle counter is helpful when mounting a timing attack but my 
+museum pieces don't suffer from that problem.
 
-NOTE: this requires all these dependencies to be builtin if
-!CRYPTO_MANAGER_DISABLE_TESTS, which is too strict on
-CRYPTO_DEV_VMX_ENCRYPT=m.
+Also, they are and always were immune from spectre, meltdown etc.
 
-Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
-Fixes: d2e3ae6f3aba ("crypto: vmx - Enabling VMX module for PPC64")
+You misrepresent those secure hardware designs as being problematic, just 
+because of some bad advice on some random blogs about RNG API usage.
 
-Link: https://bugzilla.suse.com/show_bug.cgi?id=1195768
+Do you have a phone that no longer gets updates from its vendor? Have you 
+tried patching it?
 
-Suggested-by: Nicolai Stange <nstange@suse.de>
-Signed-off-by: Petr Vorel <pvorel@suse.cz>
----
-Hi,
-
-what am I missing to allow e.g. CRYPTO_AES=m when
-CRYPTO_DEV_VMX_ENCRYPT=m?
-
-Kind regards,
-Petr
-
- drivers/crypto/vmx/Kconfig | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/crypto/vmx/Kconfig b/drivers/crypto/vmx/Kconfig
-index c85fab7ef0bd..d692802fad9e 100644
---- a/drivers/crypto/vmx/Kconfig
-+++ b/drivers/crypto/vmx/Kconfig
-@@ -2,6 +2,10 @@
- config CRYPTO_DEV_VMX_ENCRYPT
- 	tristate "Encryption acceleration support on P8 CPU"
- 	depends on CRYPTO_DEV_VMX
-+	depends on CRYPTO_MANAGER_DISABLE_TESTS && CRYPTO_AES || CRYPTO_AES=y
-+	depends on CRYPTO_MANAGER_DISABLE_TESTS && CRYPTO_CBC || CRYPTO_CBC=y
-+	depends on CRYPTO_MANAGER_DISABLE_TESTS && CRYPTO_CTR || CRYPTO_CTR=y
-+	depends on CRYPTO_MANAGER_DISABLE_TESTS && CRYPTO_XTS || CRYPTO_XTS=y
- 	select CRYPTO_GHASH
- 	default m
- 	help
--- 
-2.35.1
-
+Your insecure museum pieces are the real problem, not my secure ones.
