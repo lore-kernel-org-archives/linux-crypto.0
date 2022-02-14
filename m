@@ -2,97 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C02A5C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 09:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EADFDC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 09:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242644AbiBNJA6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 04:00:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54330 "EHLO
+        id S242746AbiBNJRF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Feb 2022 04:17:05 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242635AbiBNJA5 (ORCPT
+        with ESMTP id S242726AbiBNJRE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 04:00:57 -0500
-X-Greylist: delayed 414 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Feb 2022 01:00:48 PST
-Received: from gardel.0pointer.net (gardel.0pointer.net [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C8725FF0B;
-        Mon, 14 Feb 2022 01:00:48 -0800 (PST)
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-        by gardel.0pointer.net (Postfix) with ESMTP id 20549E80485;
-        Mon, 14 Feb 2022 09:53:50 +0100 (CET)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-        id 72E3916010E; Mon, 14 Feb 2022 09:53:49 +0100 (CET)
-Date:   Mon, 14 Feb 2022 09:53:49 +0100
-From:   Lennart Poettering <mzxreary@0pointer.de>
+        Mon, 14 Feb 2022 04:17:04 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0D1606DD;
+        Mon, 14 Feb 2022 01:16:57 -0800 (PST)
+Date:   Mon, 14 Feb 2022 10:16:53 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644830214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L3eaGmR/p10lNmvfPVXQTySENGIIG80ziw3LWG/fQX4=;
+        b=OAdtLvBhRo2BefKiDpb8nAEA2nw1OY6OAueRIunVcfc4Bfd+j9uhT+Fz7VetFeZV/a4h/c
+        YQmmpXVheGbodePbgAlyufltAUel5xcpKwg6mkfK69WDm5HXqcfLXlk5Gg6Lt6Dx9fBWDM
+        8XgrRPL4D0spgToNjPLjSBjBHTJT3Oz0FWo4tdWnjiFa2t7PQQaAKnqOLBPEm816P3mNeg
+        6nYxnw85KQ5SSS/eewQUhE7aph51tOH78yRTDLO0VlnJH9UmQWyFRSP8lZEcXbznbBbieN
+        lMeGR1hzoscRqux19kjznAjZCK+R5YNrCtKgOm/s+IpuMgFNvg11EdH85Xqi7w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644830214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L3eaGmR/p10lNmvfPVXQTySENGIIG80ziw3LWG/fQX4=;
+        b=qCmVxrA2ydrllWOdk7Z9xnvT2LcUi6uCCZInfyxF+zXccowR0dWs2vWBvo1UOiGaCLaqcI
+        5Hl5X+5nA3LcFmAg==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-riscv@lists.infradead.org,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-m68k@lists.linux-m68k.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-mips@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH RFC v0] random: block in /dev/urandom
-Message-ID: <YgoYnX97imub7KEB@gardel-login>
-References: <20220211210757.612595-1-Jason@zx2c4.com>
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+Message-ID: <YgoeBYJ5nwc8BTG3@linutronix.de>
+References: <YgZ6IEbiDgz5X1ON@linutronix.de>
+ <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de>
+ <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de>
+ <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220211210757.612595-1-Jason@zx2c4.com>
+In-Reply-To: <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fr, 11.02.22 22:07, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
+On 2022-02-13 18:37:33 [+0100], Jason A. Donenfeld wrote:
+> I started looking at this and came up with this draft with questions:
+> https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/commit/?h=jd/no-irq-trylocks
 
-> So, given that the kernel has grown this mechanism for seeding itself
-> from nothing, and that this procedure happens pretty fast, maybe there's
-> no point any longer in having /dev/urandom give insecure bytes. In the
-> past we didn't want the boot process to deadlock, which was
-> understandable. But now, in the worst case, a second goes by, and the
-> problem is resolved. It seems like maybe we're finally at a point when
-> we can get rid of the infamous "urandom read hole".
+to
+| - Does anything anywhere call get_random_xx() before the worker has a
+|   chance to run?
 
-So, systemd uses (potentially half-initialized) /dev/urandom for
-seeding its hash tables. For that its kinda OK if the random values
-have low entropy initially, as we'll automatically reseed when too
-many hash collisions happen, and then use a newer (and thus hopefully
-better) seed, again acquired through /dev/urandom. i.e. if the seeds
-are initially not good enough to thwart hash collision attacks, once
-the hash table are actually attacked we'll replace the seeds with
-someting better. For that all we need is that the random pool
-eventually gets better, that's all.
+Once you queue a work item I don't think that the scheduler needs to put
+it on the CPU right away. It may have already have other tasks waiting
+including some with a RT priority.
+Also, the lock is irqsave() so they can be users in an interrupt
+handler. I remember the original reason why I made it irqsave is because
+something did kmalloc() and SLUB somehow asked for random bits.
 
-So for that usecase /dev/urandom behaving the way it so far does is
-kinda nice. We need lots of hash tables, from earliest initialization
-on, hence the ability to get some seed there reasonably fast is really
-good, even if its entropy is initially not as high as we'd want. It's
-a good middle ground for us to be able to boot up quickly and not
-having to block until the entropy pool is fully initialized, but still
-thwart hash table collision attacks.
+> Some research remains...
+> 
+> Jason
 
-If you make /dev/urandom block for initialization then this would mean
-systemd and its components would start waiting for initialization
-(simply because we need hash tables all over the place), i.e you'd
-effectively add a second to the boot process of each affected system.
-
-What about AT_RANDOM and /proc/sys/kernel/random/uuid btw, do you
-intend to block for that too? If you block for the former it doesn't
-really matter what systemd does I guess, given that you already have
-to delay invoking PID 1 until you get a good AT_RANDOM.
-
-Lennart
-
---
-Lennart Poettering, Berlin
+Sebastian
