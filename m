@@ -2,97 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 859F5C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 14:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B494C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 14:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354875AbiBNOFc (ORCPT
+        id S1354915AbiBNOHK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 09:05:32 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44262 "EHLO
+        Mon, 14 Feb 2022 09:07:10 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232274AbiBNOFb (ORCPT
+        with ESMTP id S1354935AbiBNOHH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 09:05:31 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7263EB66;
-        Mon, 14 Feb 2022 06:05:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0CDF260F89;
-        Mon, 14 Feb 2022 14:05:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12E44C340F2;
-        Mon, 14 Feb 2022 14:05:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bUqw6ue4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644847519;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QLgXSQB9b7XXmln9u8fQm/jVMLmkRr2wWxHA9OmWt1Q=;
-        b=bUqw6ue42avgTupnGw+h3faOhezXLsRWTERXCZkTjiWU3EWGaqVZsPu+EWoU5dYsEG+yLv
-        +R8ELL3RtI+O5xzed/w6dCHENmSJY17DIsFCz4wh50dQ8yEejNWROH1hC18dE+D/kbmxlB
-        0GQjkMV/rWNUQPZtVmTX+sAiVbwU9yg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 578f523a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 14 Feb 2022 14:05:19 +0000 (UTC)
-Received: by mail-yb1-f170.google.com with SMTP id p19so46358915ybc.6;
-        Mon, 14 Feb 2022 06:05:18 -0800 (PST)
-X-Gm-Message-State: AOAM532F4gfGjOq0Z0C7uMF+EaCAGDjZwE7npd1i7rNqJHyOKCrro5MX
-        V7OL+97gtZ82qD92WNwnonghT/03r99Yb0W7B+c=
-X-Google-Smtp-Source: ABdhPJx1rAQYW+BsQ/vOucuTQJhI9pVZ01yF0DPyTFL1e5L2Bmfiie7EtWck0pGXAqYbtpOZPqa2kzjO14vEvrtdV/A=
-X-Received: by 2002:a25:4144:: with SMTP id o65mr12095580yba.113.1644847514782;
- Mon, 14 Feb 2022 06:05:14 -0800 (PST)
+        Mon, 14 Feb 2022 09:07:07 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2059.outbound.protection.outlook.com [40.107.237.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C4F4A903;
+        Mon, 14 Feb 2022 06:06:52 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iF/vwQwXEcvWgEGD1WDPdwlb/bg1Lk3BikMV/XmPR8J6v97Cw7YdQaB+zfx1vtYoc5Pppj62eqIP4qhCfqo8KL6pphelwReQKWuSjDnbrhAjNihyV2/xTgEzkjCq4Jrw4qox+/FdgsIWB1/8WAMXrhfW6A+UnKGzM0mOp7LuvD55kN6bpWGRgr+uZi4kvQrVSmglF9NNX0PATZ63thuXilFjRWwP5U4DJVRvu3mBW88XkJvgzVETEmHcaIpox5oE5nJczm/TbWikPz4Or7Hey8NLX1+ZBlPpBqi4PGBCgtaJlWUZE/V/wqqpA4NSSTu9HboUDgXJWdO8S9icqDEtHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ML0KmvW2m5/xHUs2C77q7muIhD11k1seF9IStJBtAJY=;
+ b=mbswfdZO4jO89pdmNwWHTwcNrOaolZdxqOGeWtc7iemgP+hrtLD8nJxBxzVg3pKtdPTpfhGsHFmtJVudgRrageX2q8e3zUHfbxR6/DaeCtJXiLo+uURcPeiAPvswhhHAg1KwHnthjdm8yRyJ28Z2b0hsBDuJZ3esCNXQAp2uIFTZxTRHXpSFNMEG9NkIySVovRb4J1OXZjmOOJg2S8YM/pR3usthqzc3U8rCOZ2qUDc7wgx21YkLRtEth7DrEyIsV4GRoMp1d9eiUX/Ypw4oLM9YTGTMdg9mWTJ02ur3/fyHByITm/8UDGMinAF+f4e2Yz0vMRmyrkXlQAC3s0HUAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ML0KmvW2m5/xHUs2C77q7muIhD11k1seF9IStJBtAJY=;
+ b=HvVhFwK7ZZj/0yXqVmjuXRJ4Zdk4G/AISFXUO+LWxTzwI5oWtcVC3Jr9Kdk+OBeQEH452pdBv3hdxFM5c6Ikkzwi7y6F6KHtOsdeSkIa3mn/Cg2252q9GV+VeWe0oJnf+mGY1XpUGWTlL/UxU1GJ8G264rbvxjPDqu4vkgylPJXNxpFhfG5r9FAwJCZ/sazNLL1IKgr88WZt/2xj/wagosmRDSEveUcGrOhQ7B5UWm6XPnU5ROiquQEtwCwhH79qyJvRitU+SekZX7rxgeInp5xdwsM3J/aXRistndswQBEeJMQWBZZ7qt2w1zDS9ISlvDJMOl/UfvXTh6Z05pWq8w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DM6PR12MB4828.namprd12.prod.outlook.com (2603:10b6:5:1f8::26) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.15; Mon, 14 Feb
+ 2022 14:06:50 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.4975.019; Mon, 14 Feb 2022
+ 14:06:50 +0000
+Date:   Mon, 14 Feb 2022 10:06:49 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        yuzenghui <yuzenghui@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
+Message-ID: <20220214140649.GC4160@nvidia.com>
+References: <20220202170329.GV1786498@nvidia.com>
+ <c6c3007e-3a2e-a376-67a0-b28801bf93aa@oracle.com>
+ <20220203151856.GD1786498@nvidia.com>
+ <e67654ce-5646-8fe7-1230-00bd7ee66ff3@oracle.com>
+ <20220204230750.GR1786498@nvidia.com>
+ <0cd1d33a-39b1-9104-a4f8-ff2338699a41@oracle.com>
+ <20220211174933.GQ4160@nvidia.com>
+ <34ac016b-000f-d6d6-acf1-f39ca1ca9c54@oracle.com>
+ <20220212000117.GS4160@nvidia.com>
+ <8338fe24-04ab-130a-1324-ab8f8e14816d@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8338fe24-04ab-130a-1324-ab8f8e14816d@oracle.com>
+X-ClientProxiedBy: BL1PR13CA0341.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::16) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-References: <20220211210757.612595-1-Jason@zx2c4.com> <fcab986b-d0bd-c798-de17-266abcdc7da2@gentoo.org>
-In-Reply-To: <fcab986b-d0bd-c798-de17-266abcdc7da2@gentoo.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 14 Feb 2022 15:05:03 +0100
-X-Gmail-Original-Message-ID: <CAHmME9ooEbgiv3DRk87ei+rUoVNMJthY7UuG_xCgm=kfMZAajw@mail.gmail.com>
-Message-ID: <CAHmME9ooEbgiv3DRk87ei+rUoVNMJthY7UuG_xCgm=kfMZAajw@mail.gmail.com>
-Subject: Re: [PATCH RFC v0] random: block in /dev/urandom
-To:     Joshua Kinard <kumba@gentoo.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 770765b3-bd54-4f95-f043-08d9efc33efa
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4828:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB482802EA0B14646DF5126612C2339@DM6PR12MB4828.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wTRjD4iB5OwbPqVMtbxucZu13xNT030Vhw+9436ip7QyaKRE4ZRuq/tjo2dKA5CON4BtXWF4hbj2hGZDSt84rMk72xpUKkmWp7ng47yajxAaWEJYGljJRYGSoOdWOa+ULRCI2JbCuQq6DNVkLXA/nUSs7/7kG8oj096v45zl62u2ZwSe6abnc1lY35HFbKH9in8ZuT05sNEmtyXroDO8vFC7qvQWvJdEh83JwY5UxzLtbdaA9yTJCo682gQr/lWtklst1T802CASJUD+v99/h+FddNWFsR/wGGNNQ3iipCHxW+o/u0zvzfVQUuMSAXM01Vk9r5LCVdgrss4yMgQJfWHYD3cwSSoiP8RWtfiflW+ceg3u9+USx4WkQkDMfo/Pz5w2BMvcJgLSRUJGhdIQXuRQk/a3p2erbXuqcfH+6y3dD0j1Sb4Z1NpHZ0rc5nb11DCzeya4gdNzcQse45qPU7w9Fk0lXlzlkmeiz5HYRGAY6C583iNCxMIe6vGDkGLs7l+RBgHqKUtz9M0Ty2KuPXpwvr4nVji43lakQtz/XpTeNrYogPYztwNuRk1rup0YMf7QOLQZJZTBlT0raKvRz3SrAAj9HuVq6RqjqEImL+zX6Q31xPlp0Zr/bvsm2b/S3NMMmbJxFU1i1EtWQlKxWQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(1076003)(6512007)(6916009)(54906003)(26005)(186003)(316002)(6506007)(2616005)(6486002)(83380400001)(86362001)(2906002)(7416002)(5660300002)(8936002)(33656002)(508600001)(38100700002)(66556008)(66946007)(66476007)(8676002)(4326008)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nRPJCV3TqviaTIkAdOsr6+XFrUSJ2XLMKzhybOd2bRCFkwPd/SM6ZVFh8NY3?=
+ =?us-ascii?Q?6omNL7VVWAqlxxSo91aDf4AlhqSXc86E9VyPuloIjGKwXDedUL9BHc95QWFh?=
+ =?us-ascii?Q?0AVMfyrxYYE/qkfsJMcoU71McJkN4AgWehfpFbSua9kjGN0si7dHIYROVcC2?=
+ =?us-ascii?Q?15Q0lTzl7RVA1B9Se7ijWukyIvo63WrYKZdEu50NaNEg+jRho/QoPwkcrELj?=
+ =?us-ascii?Q?wMJqt3j2wb1B7H2H5lg+7AiyMwVBl/6GLa+X93kK4HUALv41/yN+ewjWMlMV?=
+ =?us-ascii?Q?bGr7YuwcBn+1+e7RyT4DAHJ0/y7VF6hKbD8NzFU+5BarPUMH7yqaSp8Ek+/n?=
+ =?us-ascii?Q?8jbNI3RGv5pf8iTGnzJ4sKWn2R7hBaphRy8xONTrN25uNKz7K6Tlz02f9rzc?=
+ =?us-ascii?Q?L91CoKilSTzTtZyNOXvHhqde6F2lkdthd4W5iSt7hQAa7iz+rCOldr/H/Lgq?=
+ =?us-ascii?Q?9NyadBy59ysJ2+iv4CVYEm7q/EkJrwI0doIfIIHzutkBJMvTjKpXLXnIs2e2?=
+ =?us-ascii?Q?jULLvF8i367K9IsFfsq+jJaIkleVOK2iGBcqvGOu16qCLjXf7OuAMc70Chia?=
+ =?us-ascii?Q?SSQvF5LOVnlN7383GBfev2TIaloiUFtCivZZZXJF9d3Pf6/RGhcT9qsH9ab9?=
+ =?us-ascii?Q?u0K4mBUUlRQE+jiWxZUfOPreB61ZbudiUZhPlI/sfY2YmunS5LAKWWRj/ZBk?=
+ =?us-ascii?Q?jfTd3CsxRRygTgKjTLA6DoBIplsRA+0E0fGfNB2IcDWWr9muPyfTJYrT2fOU?=
+ =?us-ascii?Q?8A17unQgC58yP7LsvKIndyTBjJAPtz554pVIQFgSSGSuyb/cAcG+NM+O0wJC?=
+ =?us-ascii?Q?Zmh8odpXL9OpxdyD8p7fumZ4EMIN59KQ/xN5wTZMPyYML5vcQb2sr2Fu+vwM?=
+ =?us-ascii?Q?MeppLZFs0yJ2eZUeStQ4qdy3oPwkSmh6TQ1yoZDJnFGND1Vzm/WqTo+pRQEQ?=
+ =?us-ascii?Q?t59K/cpfkkZY8Vo21HmrOb/q9SciMS+C8U+kXd3QY3CbyH4o7h7eXMEiPMEa?=
+ =?us-ascii?Q?KMFDgpECwBNs4rMYumPvT2rJNm/D1l5taBDQyCsOKg6I6OCub3EmDDj9CInI?=
+ =?us-ascii?Q?dikAE6deWagF44mBeH44FD2mcvyKbtwiDZWfrMzlwhGwLla/+ALvtH+nyxzg?=
+ =?us-ascii?Q?HxYhSmCcXidNIFT44yvYAtxXUL1rcwVCuCgkXKdppE09u3k41n6VXj+dD6Vn?=
+ =?us-ascii?Q?+uL0YDSMwwby6epzEsYPMOpIMk7pdJK9Ie9TiU4J574lrALkChPLvUHSxXH2?=
+ =?us-ascii?Q?OYQVDrC9Oo1wEjwjdQndzq++9lKlacELHtYV0lezABsYJfOlizCCjl+x8yJq?=
+ =?us-ascii?Q?p0ID0HhKrpfogouGjc0y0da172TiNLwOuWuluRe3pPZT4wqb/hrviIGmenyB?=
+ =?us-ascii?Q?bEsNrbZxHD7/xPj2GXbL5I6FzpQvEbhOuXLf2fx2KaNs9F+CdCCSx/NV/boo?=
+ =?us-ascii?Q?nCA0bhzqbOZo5Gh7eIWXQETwb+6AueflZ05t75BmJ7VNNsQO3IVspQ3XQi5p?=
+ =?us-ascii?Q?2pV4EN4oRpk5fOuTgXx8+aM/D+uRlg+Ut+7Lv1Fzj2Hv/iRiTg/dh9/EfPPB?=
+ =?us-ascii?Q?JskIGU8PKPGuTbxyEgs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 770765b3-bd54-4f95-f043-08d9efc33efa
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Feb 2022 14:06:50.5023
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ChxyaZyk7kNcuZJHfpH9/U1JttM+a4AX8SrmKUpTRZJtSfl1YmkQeY7w5kMbypgg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4828
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Joshua,
+On Mon, Feb 14, 2022 at 01:34:15PM +0000, Joao Martins wrote:
 
-Thanks a lot for the historical background.
+> [*] apparently we need to write an invalid entry first, invalidate the {IO}TLB
+> and then write the new valid entry. Not sure I understood correctly that this
+> is the 'break-before-make' thingie.
 
-On Sun, Feb 13, 2022 at 12:06 AM Joshua Kinard <kumba@gentoo.org> wrote:
-> The R6000/R6000A CPU only ever existed in systems in the late 1980's that
-> were fairly large, and I don't think there is a complete, working unit out
-> there that can actually boot up, let alone boot a Linux kernel.
+Doesn't that explode if the invalid entry is DMA'd to?
 
-So from what you've written, it sounds like MIPS is actually not a problem here.
+> When a non-default page size is used , software must OR the Dirty bits in
+> all of the replicated host PTEs used to map the page. The IOMMU does not
+> guarantee the Dirty bits are set in all of the replicated PTEs. Any portion
+> of the page may have been written even if the Dirty bit is set in only one
+> of the replicated PTEs.
 
-So the only systems we're actually talking about without a good cycle
-counter are non-Amiga m68k? If so, that'd be a pretty terrific
-finding. It'd mean that this idea can move forward, and we only need
-to worry about some m68k museum pieces with misconfigured
-userspaces...
+I suspect that is talking about something else
+
+> >> I wonder if we could start progressing the dirty tracking as a first initial series and
+> >> then have the split + collapse handling as a second part? That would be quite
+> >> nice to get me going! :D
+> > 
+> > I think so, and I think we should. It is such a big problem space, it
+> > needs to get broken up.
+> 
+> OK, cool! I'll stick with the same (slimmed down) IOMMU+VFIO interface as proposed in the
+> past except with the x86 support only[*]. And we poke holes there I guess.
+> 
+> [*] I might include Intel too, albeit emulated only.
+
+Like I said, I'd prefer we not build more on the VFIO type 1 code
+until we have a conclusion for iommufd..
+
+While returning the dirty data looks straight forward, it is hard to
+see an obvious path to enabling and controlling the system iommu the
+way vfio is now.
 
 Jason
