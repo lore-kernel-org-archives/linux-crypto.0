@@ -2,100 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66727C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 10:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7246BC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 11:32:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245448AbiBNKyd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 05:54:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43078 "EHLO
+        id S1351570AbiBNLcU (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Feb 2022 06:32:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349339AbiBNKyF (ORCPT
+        with ESMTP id S1352597AbiBNLbf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 05:54:05 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3A789CEB;
-        Mon, 14 Feb 2022 02:19:29 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AC3ECB80DFE;
-        Mon, 14 Feb 2022 10:19:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C731C340F4;
-        Mon, 14 Feb 2022 10:19:26 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KPM49c59"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644833963;
+        Mon, 14 Feb 2022 06:31:35 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D280C6516D;
+        Mon, 14 Feb 2022 03:16:35 -0800 (PST)
+Date:   Mon, 14 Feb 2022 12:16:33 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1644837394;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=uXyOZa2DqzfFgsJ7rFwjQ8rxXT43Pi8c1Wt/XancfYs=;
-        b=KPM49c599dfFLb0/tVyRbdwBPfufgAjgcs9YCxTY6pJ4Ua0ixL/I4y01cB0wB3WfVhU/oj
-        em8TdVNok5zbKoLwNCTwhlAB3tx7OpBXFKvrnl+/3YdKNllGVsfznHNRMiT1oe5MU7Gth1
-        ZXVFNaVpRprBSRB1Thge6sQsOZym4ag=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c0d3dcc9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 14 Feb 2022 10:19:22 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id l125so11414997ybl.4;
-        Mon, 14 Feb 2022 02:19:22 -0800 (PST)
-X-Gm-Message-State: AOAM530YS/qgD6i4/lONCkiiqESAxzt3KvZJDquiSlWiF+lVknsGCK8k
-        J674sDjFn60H6/saugGk3ZFQerFnAHxb5rFrMf8=
-X-Google-Smtp-Source: ABdhPJw3gFWatSo1Y6jV4gB75V0xWxyOFOmjPvNd5QIFQn+mMGqoFG7fKgRXKN3l3QNdXQ8DqfrausXl2kVpFlIhrHM=
-X-Received: by 2002:a25:dc14:: with SMTP id y20mr8337357ybe.115.1644833961454;
- Mon, 14 Feb 2022 02:19:21 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:88a:b0:15e:9450:8ed4 with HTTP; Mon, 14 Feb 2022
- 02:19:20 -0800 (PST)
-In-Reply-To: <CAHmME9okFEVqTM9c9fQY02UiiNBkpaZMLSYMhzHs8FqtpV1F1g@mail.gmail.com>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
- <YgaSYlVEBOxfJbSD@linutronix.de> <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
- <YgaV0UZO1KfmtLLh@linutronix.de> <CAHmME9qR02XCX48D+AoT1rOFyNo_GXubyHPzoX01BYkJDX7p1A@mail.gmail.com>
- <YgaZuShru2HQiFXg@linutronix.de> <CAHmME9oZMFN80M98Mt6JysPSMTJoXfKTjHuxG6BQSsC=+0z5fg@mail.gmail.com>
- <YgacTN2zHeBhWw5d@linutronix.de> <CAHmME9okFEVqTM9c9fQY02UiiNBkpaZMLSYMhzHs8FqtpV1F1g@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 14 Feb 2022 11:19:20 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pDcL6vaoHGqiK+eGeS10f+kW3xRft=ZJFk-Dnxh8+eMg@mail.gmail.com>
-Message-ID: <CAHmME9pDcL6vaoHGqiK+eGeS10f+kW3xRft=ZJFk-Dnxh8+eMg@mail.gmail.com>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        bh=mGouKSJGIoDr3ZG9aOBrrLpVT+0XirfwXSklJD4/Fu0=;
+        b=ucDpzAP8wWhsZkbVAW32g4NjJ3XxIrk28gOGl9Z92Qxd7xp+L2gJ/CGT0SoExSdsJa+i8V
+        38anv/Ip2e8CO0o9vH/fmTybr+07iTSo+lrQyCemMR1bgB3HAlIa2uujK8WeDHrBorr+RF
+        6QyhcqL4gHolpGrpcjbwxZhFAR9AiXh+z/61f8KWpewgKa/Nq8isFLuqesOK16xlZJOPui
+        SI+pP1i6Lm4br7IM5fB830EaAUW6Ps/F4STArrl4nZSOHGFuOHFVS0RsA/8kvcN91kwnj4
+        3pSMcpsUhJnKm8ryUjro8ESym4adLdBi7yVZWzPL7vhxEf7imLMvftBpPQUIXQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1644837394;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mGouKSJGIoDr3ZG9aOBrrLpVT+0XirfwXSklJD4/Fu0=;
+        b=z3XXlTp0Uq1z/SpwR/LLay3zWfXJd04XJi9ufCRb/w5oh0KDNXSBejRwWGYP0DFk6gLQ59
+        Yq0KklMc55vcRMCQ==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+Message-ID: <Ygo6EX1YVgTrtjVT@linutronix.de>
+References: <YgZ6IEbiDgz5X1ON@linutronix.de>
+ <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de>
+ <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de>
+ <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
+ <YgoeBYJ5nwc8BTG3@linutronix.de>
+ <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/13/22, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Hey Sebastian,
->
-> On Fri, Feb 11, 2022 at 6:26 PM Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> wrote:
->> Sure. I can do the CPU-HP notifier later one once we are done with
->> everything. I acked the v7, don't see a road block.
->
-> I've been running this over the weekend and performance is generally okay.
->
-> # perf top --symbols $(objdump -t
-> /usr/src/linux/drivers/char/random.o|fgrep 'F .text'|awk '{print
-> $6}'|tr '\n' ,) -F max -g
->
-> One thing I noticed though was that add_interrupt_randomness spends
-> most of its time on:
->
->     lock   xadd   %eax,0x38(%rbp)
->
-> So, as expected, those atomics really need to go. Indeed we might be
-> best off with the CPU hotplug notifier for setting the count back to
-> zero.
->
-> Do you want to prepare a patch for this? Or should I take a stab at it?
+On 2022-02-14 11:17:20 [+0100], Jason A. Donenfeld wrote:
+> On 2/14/22, Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+> > to
+> > | - Does anything anywhere call get_random_xx() before the worker has a
+> > |   chance to run?
+> >
+> > Once you queue a work item I don't think that the scheduler needs to put
+> > it on the CPU right away. It may have already have other tasks waiting
+> > including some with a RT priority.
+> > Also, the lock is irqsave() so they can be users in an interrupt
+> > handler. I remember the original reason why I made it irqsave is because
+> > something did kmalloc() and SLUB somehow asked for random bits.
+> 
+> Right. So there are two sides of the questions: 1) how bad is this
+> actual race, and are there any drivers that do regularly get bit by
+> this? 2) There's a largeish window between workqueue_init_early()
+> setting up the system highprio workqueue, and workqueue_init()
+> enabling queued workers to actually run. Interrupts also get enabled
+> in the interim. Does anything get bit by that window?
 
-FYI, I was overwhelmed with a compulsion to try doing it myself and
-posted that here
-https://lore.kernel.org/lkml/20220213215343.11652-1-Jason@zx2c4.com/
-which is now pending your review.
+This is only important during boot-up, right? Otherwise it just extracts
+entropy from the pool.
+I posted numbers earlier on where the work go scheduled and the three or
+four interrupts came in before the work-item was scheduled. I could send
+you the diff if you want to up it on some machines.
+ 
+> Jason
+
+Sebastian
