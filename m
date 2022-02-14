@@ -2,82 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EADFDC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 09:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2CBC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 10:53:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242746AbiBNJRF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 04:17:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34506 "EHLO
+        id S1349228AbiBNKxO (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Feb 2022 05:53:14 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242726AbiBNJRE (ORCPT
+        with ESMTP id S1349230AbiBNKwZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 04:17:04 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0D1606DD;
-        Mon, 14 Feb 2022 01:16:57 -0800 (PST)
-Date:   Mon, 14 Feb 2022 10:16:53 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644830214;
+        Mon, 14 Feb 2022 05:52:25 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C49B6D4F3;
+        Mon, 14 Feb 2022 02:17:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F0BE7B80CE1;
+        Mon, 14 Feb 2022 10:17:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 294DFC340E9;
+        Mon, 14 Feb 2022 10:17:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GMTy9/EB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644833843;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=L3eaGmR/p10lNmvfPVXQTySENGIIG80ziw3LWG/fQX4=;
-        b=OAdtLvBhRo2BefKiDpb8nAEA2nw1OY6OAueRIunVcfc4Bfd+j9uhT+Fz7VetFeZV/a4h/c
-        YQmmpXVheGbodePbgAlyufltAUel5xcpKwg6mkfK69WDm5HXqcfLXlk5Gg6Lt6Dx9fBWDM
-        8XgrRPL4D0spgToNjPLjSBjBHTJT3Oz0FWo4tdWnjiFa2t7PQQaAKnqOLBPEm816P3mNeg
-        6nYxnw85KQ5SSS/eewQUhE7aph51tOH78yRTDLO0VlnJH9UmQWyFRSP8lZEcXbznbBbieN
-        lMeGR1hzoscRqux19kjznAjZCK+R5YNrCtKgOm/s+IpuMgFNvg11EdH85Xqi7w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644830214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L3eaGmR/p10lNmvfPVXQTySENGIIG80ziw3LWG/fQX4=;
-        b=qCmVxrA2ydrllWOdk7Z9xnvT2LcUi6uCCZInfyxF+zXccowR0dWs2vWBvo1UOiGaCLaqcI
-        5Hl5X+5nA3LcFmAg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        bh=Jw405377p5pf78FxoLUva1syQCUGCgspeYSlO0IejV4=;
+        b=GMTy9/EB5tvbuSzl4i1XKCjQG22qMWmmiWB8Q58w0XqR+nii/eKMIhotStFOmv4KY2OBN6
+        EquKXuFi7KfMaCw8qrdT86DvNbBT06mgQrXpHtXOV+vO8wZxyHfoEMXrtr/F9xNqQLE//8
+        V22IUBtaU+ur+GAOhx8pMm3Cx/tk0lI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cbe58d8c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 14 Feb 2022 10:17:23 +0000 (UTC)
+Received: by mail-yb1-f175.google.com with SMTP id y129so44506406ybe.7;
+        Mon, 14 Feb 2022 02:17:22 -0800 (PST)
+X-Gm-Message-State: AOAM531Zj1WK4Jf1vUTLCheS+MTrUDHffZ+aNaeNfGl+M9nc1kfEXHN5
+        YX5u0Ggcg4LZZQjDXfhJ5aGQ1X2a5P7xySPiweY=
+X-Google-Smtp-Source: ABdhPJypKR734I9ZoaN1nIvZPaPH70+bSE5lKqUpay4t8mJCk+EWO5LpYh+k6Jm4Xufe+s0nfpAKcWEa/qD1EiRVksw=
+X-Received: by 2002:a25:c006:: with SMTP id c6mr11165505ybf.457.1644833841790;
+ Mon, 14 Feb 2022 02:17:21 -0800 (PST)
+MIME-Version: 1.0
+Received: by 2002:a05:7110:88a:b0:15e:9450:8ed4 with HTTP; Mon, 14 Feb 2022
+ 02:17:20 -0800 (PST)
+In-Reply-To: <YgoeBYJ5nwc8BTG3@linutronix.de>
+References: <YgZ6IEbiDgz5X1ON@linutronix.de> <20220211162515.554867-1-Jason@zx2c4.com>
+ <YgaSYlVEBOxfJbSD@linutronix.de> <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
+ <YgaV0UZO1KfmtLLh@linutronix.de> <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
+ <YgoeBYJ5nwc8BTG3@linutronix.de>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 14 Feb 2022 11:17:20 +0100
+X-Gmail-Original-Message-ID: <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
+Message-ID: <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
+Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-Message-ID: <YgoeBYJ5nwc8BTG3@linutronix.de>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de>
- <20220211162515.554867-1-Jason@zx2c4.com>
- <YgaSYlVEBOxfJbSD@linutronix.de>
- <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
- <YgaV0UZO1KfmtLLh@linutronix.de>
- <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-13 18:37:33 [+0100], Jason A. Donenfeld wrote:
-> I started looking at this and came up with this draft with questions:
-> https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/commit/?h=jd/no-irq-trylocks
+On 2/14/22, Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
+> to
+> | - Does anything anywhere call get_random_xx() before the worker has a
+> |   chance to run?
+>
+> Once you queue a work item I don't think that the scheduler needs to put
+> it on the CPU right away. It may have already have other tasks waiting
+> including some with a RT priority.
+> Also, the lock is irqsave() so they can be users in an interrupt
+> handler. I remember the original reason why I made it irqsave is because
+> something did kmalloc() and SLUB somehow asked for random bits.
 
-to
-| - Does anything anywhere call get_random_xx() before the worker has a
-|   chance to run?
+Right. So there are two sides of the questions: 1) how bad is this
+actual race, and are there any drivers that do regularly get bit by
+this? 2) There's a largeish window between workqueue_init_early()
+setting up the system highprio workqueue, and workqueue_init()
+enabling queued workers to actually run. Interrupts also get enabled
+in the interim. Does anything get bit by that window?
 
-Once you queue a work item I don't think that the scheduler needs to put
-it on the CPU right away. It may have already have other tasks waiting
-including some with a RT priority.
-Also, the lock is irqsave() so they can be users in an interrupt
-handler. I remember the original reason why I made it irqsave is because
-something did kmalloc() and SLUB somehow asked for random bits.
-
-> Some research remains...
-> 
-> Jason
-
-Sebastian
+Jason
