@@ -2,94 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7246BC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 11:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF3AC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Feb 2022 11:46:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351570AbiBNLcU (ORCPT
+        id S1353017AbiBNLqV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Feb 2022 06:32:20 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34962 "EHLO
+        Mon, 14 Feb 2022 06:46:21 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352597AbiBNLbf (ORCPT
+        with ESMTP id S1353100AbiBNLpz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Feb 2022 06:31:35 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D280C6516D;
-        Mon, 14 Feb 2022 03:16:35 -0800 (PST)
-Date:   Mon, 14 Feb 2022 12:16:33 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1644837394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mGouKSJGIoDr3ZG9aOBrrLpVT+0XirfwXSklJD4/Fu0=;
-        b=ucDpzAP8wWhsZkbVAW32g4NjJ3XxIrk28gOGl9Z92Qxd7xp+L2gJ/CGT0SoExSdsJa+i8V
-        38anv/Ip2e8CO0o9vH/fmTybr+07iTSo+lrQyCemMR1bgB3HAlIa2uujK8WeDHrBorr+RF
-        6QyhcqL4gHolpGrpcjbwxZhFAR9AiXh+z/61f8KWpewgKa/Nq8isFLuqesOK16xlZJOPui
-        SI+pP1i6Lm4br7IM5fB830EaAUW6Ps/F4STArrl4nZSOHGFuOHFVS0RsA/8kvcN91kwnj4
-        3pSMcpsUhJnKm8ryUjro8ESym4adLdBi7yVZWzPL7vhxEf7imLMvftBpPQUIXQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1644837394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mGouKSJGIoDr3ZG9aOBrrLpVT+0XirfwXSklJD4/Fu0=;
-        b=z3XXlTp0Uq1z/SpwR/LLay3zWfXJd04XJi9ufCRb/w5oh0KDNXSBejRwWGYP0DFk6gLQ59
-        Yq0KklMc55vcRMCQ==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        Mon, 14 Feb 2022 06:45:55 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00567DF6F;
+        Mon, 14 Feb 2022 03:43:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9180E6124B;
+        Mon, 14 Feb 2022 11:43:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68181C340E9;
+        Mon, 14 Feb 2022 11:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644839033;
+        bh=ePn6S92XlFEF6di5Me3xAX//sSbXPKpKaKEHPPaXZWk=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=cNMvD73Xbp90mIhg2CQOiwf+eUYEzgTQZ9d/TN+PBjh99bWMGWeJwLa7rCFHDM9sg
+         LL21ihZ8eSUfcbnX6ipKU13X+mG0QX0eZzkbC57gYjN+p5YzqyLm+KlgLGaPZSVWM8
+         60FPyQi5e8fhCzCRubypqNNx6MHKjMGsXGIG3VX2nr7f2QJP6l5n72rwox5th/QASn
+         MsV9VyZTPrsJr7yJRXtXaOvWo7/w4JoqN+TTIBw+8+5fD0mt4rq9HCxjlPZvGKL+xA
+         moNi5woaFJR8jm4MbwfauVqeV0NkUJlfOsUQk5lC/ARqnrP5VUgJ7OgNQqcfCGqgX4
+         PrQJwA3MaQZAw==
+From:   Kalle Valo <kvalo@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Jonathan =?utf-8?Q?Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: defer fast pool mixing to worker
-Message-ID: <Ygo6EX1YVgTrtjVT@linutronix.de>
-References: <YgZ6IEbiDgz5X1ON@linutronix.de>
- <20220211162515.554867-1-Jason@zx2c4.com>
- <YgaSYlVEBOxfJbSD@linutronix.de>
- <CAHmME9rC_q4LGq2JaAAeGbtRA2cibTe9bnvhMLng+QnzAy2DVg@mail.gmail.com>
- <YgaV0UZO1KfmtLLh@linutronix.de>
- <CAHmME9rsOWuprpYqo9G9eUboQwUxRgWqYRYgyHG7cNOG16c5EA@mail.gmail.com>
- <YgoeBYJ5nwc8BTG3@linutronix.de>
- <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux@dominikbrodowski.net,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>, ath9k-devel@qca.qualcomm.com,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random: pull add_hwgenerator_randomness() declaration into random.h
+References: <20220213152522.816777-1-Jason@zx2c4.com>
+Date:   Mon, 14 Feb 2022 13:43:46 +0200
+In-Reply-To: <20220213152522.816777-1-Jason@zx2c4.com> (Jason A. Donenfeld's
+        message of "Sun, 13 Feb 2022 16:25:22 +0100")
+Message-ID: <8735klbrm5.fsf@tynnyri.adurom.net>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9otmV1QCX29D_DXsHB-41puTKurWtyZ39huPZtD4mt5ng@mail.gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-14 11:17:20 [+0100], Jason A. Donenfeld wrote:
-> On 2/14/22, Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
-> > to
-> > | - Does anything anywhere call get_random_xx() before the worker has a
-> > |   chance to run?
-> >
-> > Once you queue a work item I don't think that the scheduler needs to put
-> > it on the CPU right away. It may have already have other tasks waiting
-> > including some with a RT priority.
-> > Also, the lock is irqsave() so they can be users in an interrupt
-> > handler. I remember the original reason why I made it irqsave is because
-> > something did kmalloc() and SLUB somehow asked for random bits.
-> 
-> Right. So there are two sides of the questions: 1) how bad is this
-> actual race, and are there any drivers that do regularly get bit by
-> this? 2) There's a largeish window between workqueue_init_early()
-> setting up the system highprio workqueue, and workqueue_init()
-> enabling queued workers to actually run. Interrupts also get enabled
-> in the interim. Does anything get bit by that window?
+"Jason A. Donenfeld" <Jason@zx2c4.com> writes:
 
-This is only important during boot-up, right? Otherwise it just extracts
-entropy from the pool.
-I posted numbers earlier on where the work go scheduled and the three or
-four interrupts came in before the work-item was scheduled. I could send
-you the diff if you want to up it on some machines.
- 
-> Jason
+> add_hwgenerator_randomness() is a function implemented and documented
+> inside of random.c. It is the way that hardware RNGs push data into it.
+> Therefore, it should be declared in random.h. Otherwise sparse complains
+> with:
+>
+> random.c:1137:6: warning: symbol 'add_hwgenerator_randomness' was not declared. Should it be static?
+>
+> The alternative would be to include hw_random.h into random.c, but that
+> wouldn't really be good for anything except slowing down compile time.
+>
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Cc: Matt Mackall <mpm@selenic.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: ath9k-devel@qca.qualcomm.com
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  drivers/char/hw_random/core.c        | 1 +
+>  drivers/net/wireless/ath/ath9k/rng.c | 1 +
 
-Sebastian
+For ath9k:
+
+Acked-by: Kalle Valo <kvalo@kernel.org>
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
