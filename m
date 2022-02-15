@@ -2,194 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33866C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 16:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD04C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 17:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235369AbiBOQ26 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Feb 2022 11:28:58 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41584 "EHLO
+        id S229863AbiBORCO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Feb 2022 12:02:14 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231887AbiBOQ26 (ORCPT
+        with ESMTP id S242080AbiBORCO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Feb 2022 11:28:58 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51F677090D;
-        Tue, 15 Feb 2022 08:28:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EC3776181D;
-        Tue, 15 Feb 2022 16:28:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B90BC340EB;
-        Tue, 15 Feb 2022 16:28:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Jbh1/sC3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1644942523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o3Ex2y2ELI7nEV0J59rjOlWmWPabW9O5Loaxgl/Yv3E=;
-        b=Jbh1/sC3FCtx0yDMtWLi5jsXL/5ERvlGM1sDJ1QrgCv+1RqkqedRZ7ySMvfJZ8JbKS5xFk
-        BUxirU90d/HSwivk+QPU2dcYF240boXb9SZwBzjGhid0uSRf0WeHcKvDY5qCGEQ4uIpL/X
-        FpxxfEEnUaJvO2QcB1dsgvYPHjRK37M=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fd01509d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 15 Feb 2022 16:28:42 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     miaoqing@codeaurora.org, "Jason Cooper" <jason@lakedaemon.net>,
-        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "Kalle Valo" <kvalo@kernel.org>,
-        =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] ath9k: use hw_random API instead of directly dumping into random.c
-Date:   Tue, 15 Feb 2022 17:28:12 +0100
-Message-Id: <20220215162812.195716-1-Jason@zx2c4.com>
-In-Reply-To: <CAHmME9r4+ENUhZ6u26rAbq0iCWoKqTPYA7=_LWbGG98KvaCE6g@mail.gmail.com>
-References: <CAHmME9r4+ENUhZ6u26rAbq0iCWoKqTPYA7=_LWbGG98KvaCE6g@mail.gmail.com>
+        Tue, 15 Feb 2022 12:02:14 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5DA119F3C
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Feb 2022 09:02:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1644944523; x=1676480523;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Z13Y5lNt52SwgdcOjACeM02u4yxevlg0/5f+qMCZWEA=;
+  b=T6e9CSbeOn/MQXH9hgZMCZINDucfgY4fQNSxpkpgk+eptPfd0d4+bUul
+   iPLCdPXuZAuVwohyVYIRjdQ9FrGdbIf+LzXKGc777qLdnojPGrYxMoODu
+   Wfv3sA80MTlRkif3pUb7hMko6yS5Dc3AnmonwdDx9YeztikxMyidcoUhR
+   t5A/kJ8GL4ne3HU7+c7nXDotPpWo0Ma5g7qzNlziC3TidUMe5u8+B4J7/
+   vjvo3GKrQwwzXo8oW4LgaOoqT/UDaxDFab24XUCyhNCw3QdLiAo5suzZw
+   IU26GuifTFsRZKTj7lOaRV9LMmvYhM8NeI1spvHbTWbsGJPpQmjco7wgp
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="233938337"
+X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
+   d="scan'208";a="233938337"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 09:02:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
+   d="scan'208";a="528961528"
+Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 15 Feb 2022 09:02:01 -0800
+Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nK1DE-0009sG-AQ; Tue, 15 Feb 2022 17:02:00 +0000
+Date:   Wed, 16 Feb 2022 01:01:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, herbert@gondor.apana.org.au,
+        ebiggers@kernel.org, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH] crypto: crypto_xor - use helpers for unaligned accesses
+Message-ID: <202202160048.w2jucJCP-lkp@intel.com>
+References: <20220215105717.184572-1-ardb@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220215105717.184572-1-ardb@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hardware random number generators are supposed to use the hw_random
-framework. This commit turns ath9k's kthread-based design into a proper
-hw_random driver.
+Hi Ard,
 
-This compiles, but I have no hardware or other ability to determine
-whether it works. I'll leave further development up to the ath9k
-and hw_random maintainers.
+I love your patch! Perhaps something to improve:
 
-Cc: Toke Høiland-Jørgensen <toke@redhat.com>
-Cc: Kalle Valo <kvalo@kernel.org>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+[auto build test WARNING on herbert-cryptodev-2.6/master]
+[also build test WARNING on herbert-crypto-2.6/master v5.17-rc4 next-20220215]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Ard-Biesheuvel/crypto-crypto_xor-use-helpers-for-unaligned-accesses/20220215-185741
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20220216/202202160048.w2jucJCP-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/0day-ci/linux/commit/6ca2d09816a67230ab30f3c7e7d87815e833d0af
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Ard-Biesheuvel/crypto-crypto_xor-use-helpers-for-unaligned-accesses/20220215-185741
+        git checkout 6ca2d09816a67230ab30f3c7e7d87815e833d0af
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/kernel/ drivers/md/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   In file included from ./arch/x86/include/generated/asm/unaligned.h:1,
+                    from drivers/md/dm-crypt.c:30:
+   drivers/md/dm-crypt.c: In function 'crypt_iv_tcw_whitening':
+>> include/asm-generic/unaligned.h:14:8: warning: 'buf.x' is used uninitialized in this function [-Wuninitialized]
+      14 |  __pptr->x;        \
+         |        ^~
+>> include/asm-generic/unaligned.h:14:8: warning: '*((void *)&buf+4).x' is used uninitialized in this function [-Wuninitialized]
+   include/asm-generic/unaligned.h:14:8: warning: '*((void *)&buf+8).x' is used uninitialized in this function [-Wuninitialized]
+   include/asm-generic/unaligned.h:14:8: warning: '*((void *)&buf+12).x' is used uninitialized in this function [-Wuninitialized]
+
+
+vim +14 include/asm-generic/unaligned.h
+
+aafe4dbed0bf6c Arnd Bergmann 2009-05-13  11  
+803f4e1eab7a89 Arnd Bergmann 2021-05-08  12  #define __get_unaligned_t(type, ptr) ({						\
+803f4e1eab7a89 Arnd Bergmann 2021-05-08  13  	const struct { type x; } __packed *__pptr = (typeof(__pptr))(ptr);	\
+803f4e1eab7a89 Arnd Bergmann 2021-05-08 @14  	__pptr->x;								\
+803f4e1eab7a89 Arnd Bergmann 2021-05-08  15  })
+803f4e1eab7a89 Arnd Bergmann 2021-05-08  16  
+
 ---
- drivers/net/wireless/ath/ath9k/ath9k.h |  2 +-
- drivers/net/wireless/ath/ath9k/rng.c   | 62 +++++++++-----------------
- 2 files changed, 23 insertions(+), 41 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath9k/ath9k.h b/drivers/net/wireless/ath/ath9k/ath9k.h
-index ef6f5ea06c1f..142f472903dc 100644
---- a/drivers/net/wireless/ath/ath9k/ath9k.h
-+++ b/drivers/net/wireless/ath/ath9k/ath9k.h
-@@ -1072,7 +1072,7 @@ struct ath_softc {
- 
- #ifdef CONFIG_ATH9K_HWRNG
- 	u32 rng_last;
--	struct task_struct *rng_task;
-+	struct hwrng rng_ops;
- #endif
- };
- 
-diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
-index aae2bd3cac69..369b222908ba 100644
---- a/drivers/net/wireless/ath/ath9k/rng.c
-+++ b/drivers/net/wireless/ath/ath9k/rng.c
-@@ -22,9 +22,6 @@
- #include "hw.h"
- #include "ar9003_phy.h"
- 
--#define ATH9K_RNG_BUF_SIZE	320
--#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 10) >> 5) /* quality: 10/32 */
--
- static DECLARE_WAIT_QUEUE_HEAD(rng_queue);
- 
- static int ath9k_rng_data_read(struct ath_softc *sc, u32 *buf, u32 buf_size)
-@@ -72,61 +69,46 @@ static u32 ath9k_rng_delay_get(u32 fail_stats)
- 	return delay;
- }
- 
--static int ath9k_rng_kthread(void *data)
-+static int ath9k_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- {
-+	struct ath_softc *sc = container_of(rng, struct ath_softc, rng_ops);
- 	int bytes_read;
--	struct ath_softc *sc = data;
--	u32 *rng_buf;
--	u32 delay, fail_stats = 0;
--
--	rng_buf = kmalloc_array(ATH9K_RNG_BUF_SIZE, sizeof(u32), GFP_KERNEL);
--	if (!rng_buf)
--		goto out;
--
--	while (!kthread_should_stop()) {
--		bytes_read = ath9k_rng_data_read(sc, rng_buf,
--						 ATH9K_RNG_BUF_SIZE);
--		if (unlikely(!bytes_read)) {
--			delay = ath9k_rng_delay_get(++fail_stats);
--			wait_event_interruptible_timeout(rng_queue,
--							 kthread_should_stop(),
--							 msecs_to_jiffies(delay));
--			continue;
--		}
--
--		fail_stats = 0;
--
--		/* sleep until entropy bits under write_wakeup_threshold */
--		add_hwgenerator_randomness((void *)rng_buf, bytes_read,
--					   ATH9K_RNG_ENTROPY(bytes_read));
--	}
-+	u32 fail_stats = 0;
- 
--	kfree(rng_buf);
--out:
--	sc->rng_task = NULL;
-+retry:
-+	bytes_read = ath9k_rng_data_read(sc, buf, max);
-+	if (unlikely(!bytes_read) && wait) {
-+		msleep(ath9k_rng_delay_get(++fail_stats));
-+		goto retry;
-+	}
- 
--	return 0;
-+	return bytes_read;
- }
- 
- void ath9k_rng_start(struct ath_softc *sc)
- {
- 	struct ath_hw *ah = sc->sc_ah;
-+	int ret;
- 
--	if (sc->rng_task)
-+	if (sc->rng_ops.read)
- 		return;
- 
- 	if (!AR_SREV_9300_20_OR_LATER(ah))
- 		return;
- 
--	sc->rng_task = kthread_run(ath9k_rng_kthread, sc, "ath9k-hwrng");
--	if (IS_ERR(sc->rng_task))
--		sc->rng_task = NULL;
-+	sc->rng_ops.name = "ath9k";
-+	sc->rng_ops.read = ath9k_rng_read;
-+	sc->rng_ops.quality = 320;
-+
-+	ret = devm_hwrng_register(sc->dev, &sc->rng_ops);
-+	if (ret)
-+		sc->rng_ops.read = NULL;
- }
- 
- void ath9k_rng_stop(struct ath_softc *sc)
- {
--	if (sc->rng_task) {
--		kthread_stop(sc->rng_task);
--		sc->rng_task = NULL;
-+	if (sc->rng_ops.read) {
-+		devm_hwrng_unregister(sc->dev, &sc->rng_ops);
-+		sc->rng_ops.read = NULL;
- 	}
- }
--- 
-2.35.0
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
