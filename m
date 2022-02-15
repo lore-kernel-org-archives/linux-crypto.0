@@ -2,79 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97024C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 14:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2300DC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 15:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238792AbiBOOk2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Feb 2022 09:40:28 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48700 "EHLO
+        id S240327AbiBOPo6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Feb 2022 10:44:58 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238775AbiBOOkX (ORCPT
+        with ESMTP id S240323AbiBOPov (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Feb 2022 09:40:23 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9195B102438;
-        Tue, 15 Feb 2022 06:40:13 -0800 (PST)
+        Tue, 15 Feb 2022 10:44:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04374108BF1;
+        Tue, 15 Feb 2022 07:39:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2AC22B81A63;
-        Tue, 15 Feb 2022 14:40:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DBD14C340F2;
-        Tue, 15 Feb 2022 14:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644936010;
-        bh=vMbrYYO0+ci8RMWm8C3NGaZ1G9KEdLy0vSHN463Z5qI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=t0SQTqVYw/Futkl1LGPObQdL308pzaSktsgXLpVGh1JR8+t6Hj5q1+opZTBKTeqhL
-         jYXWfwraiBIeccje1ZXzY9Jh7s2ju4M5zeM8b0ht2KlPyVlww6ecqgd4SoloCmpms/
-         +GGTHbxfgAJK5CED09RCF48cbRXnjifdBxRKmk57BwNEKdh+yfCg7qv6P8vCPWIFd/
-         cIkdxXZfYrEYr6i65Gq0Eulven88zn5fi+LxHc+6oDP6Y1oOwDXZJEtQP5bq6BgF2j
-         QvqnMu1CLr4olpnXB05nmVQ1UOpS2PvX6g9oMwAAzm0BQhT5zvemLxNkKcuZc76i9b
-         w92ZTbAVO3TQw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7E49E74CC2;
-        Tue, 15 Feb 2022 14:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4FCF461719;
+        Tue, 15 Feb 2022 15:39:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC15C340ED;
+        Tue, 15 Feb 2022 15:39:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fKlwMQmG"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644939546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MR8uETDJg9Xeaqk+LtV2lrW0K+3vcdxP9bkf45PeWiI=;
+        b=fKlwMQmGGl+XsuXaJRJANlEQmKW31rbgKKnwOwuHDVYuAgsiz75OzV6KyNYigUqakpATd+
+        lrKV0EL0geEgSp2Iq13ZZFv3iyCO+axNLOZtKL6VfJRlHJOthZNR0OUCsth1F82w/glyFa
+        VGZJ6UBhjWAcHfat12nc6HCCT987kgg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 840e6152 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 15 Feb 2022 15:39:06 +0000 (UTC)
+Received: by mail-yb1-f171.google.com with SMTP id c6so57273205ybk.3;
+        Tue, 15 Feb 2022 07:39:05 -0800 (PST)
+X-Gm-Message-State: AOAM53206orcEkIrcBafJxYIYkg6F8QbOvOpOjloJcQjqERCVqQsFlvL
+        qUCJJc3dnR6GcGnJDiNlLvQI2yX7a1G5iKiBab4=
+X-Google-Smtp-Source: ABdhPJx6EkevGOE04tDjGHfHD2+6REo3QOFWHcWoX1VRu7eS0/CeK2AEid1T7UKuH9ZZD7sSfy+PGSjfiEvFPJW00fQ=
+X-Received: by 2002:a25:ba49:: with SMTP id z9mr4233199ybj.32.1644939544595;
+ Tue, 15 Feb 2022 07:39:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] crypto: af_alg - get rid of alg_memory_allocated
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164493601081.31968.16251483649939634719.git-patchwork-notify@kernel.org>
-Date:   Tue, 15 Feb 2022 14:40:10 +0000
-References: <20220213190607.183394-1-eric.dumazet@gmail.com>
-In-Reply-To: <20220213190607.183394-1-eric.dumazet@gmail.com>
-To:     Eric Dumazet <eric.dumazet@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
-        edumazet@google.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, weiwan@google.com,
-        syzkaller@googlegroups.com
+References: <CAHmME9rkTP7bJBDvnejQ6BGPu13qpHKbtnjt3h33NEaTnYLirg@mail.gmail.com>
+In-Reply-To: <CAHmME9rkTP7bJBDvnejQ6BGPu13qpHKbtnjt3h33NEaTnYLirg@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 15 Feb 2022 16:38:53 +0100
+X-Gmail-Original-Message-ID: <CAHmME9r4+ENUhZ6u26rAbq0iCWoKqTPYA7=_LWbGG98KvaCE6g@mail.gmail.com>
+Message-ID: <CAHmME9r4+ENUhZ6u26rAbq0iCWoKqTPYA7=_LWbGG98KvaCE6g@mail.gmail.com>
+Subject: ath9k should perhaps use hw_random api?
+To:     miaoqing@codeaurora.org, Jason Cooper <jason@lakedaemon.net>,
+        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
+        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        Kalle Valo <kvalo@kernel.org>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello:
+Hi Ath9k Maintainers,
 
-This patch was applied to netdev/net.git (master)
-by David S. Miller <davem@davemloft.net>:
+I'm emailing you because I've noticed that ath9k's rng.c is the *only*
+driver in the whole of the tree that calls
+add_hwgenerator_randomness() directly, rather than going through
+Herbert's hw_random API, as every single other hardware RNG does.
 
-On Sun, 13 Feb 2022 11:06:07 -0800 you wrote:
-> From: Eric Dumazet <edumazet@google.com>
-> 
-> alg_memory_allocated does not seem to be really used.
-> 
-> alg_proto does have a .memory_allocated field, but no
-> corresponding .sysctl_mem.
-> 
-> [...]
+I'm wondering if you'd consider converting your driver into something
+suitable for the hw_random API (in drivers/char/hw_random/), rather
+than adhoc rolling your own ath9k rng kthread. Is this something
+you're actively maintaining and would be interested in doing?
 
-Here is the summary with links:
-  - crypto: af_alg - get rid of alg_memory_allocated
-    https://git.kernel.org/netdev/net/c/25206111512d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards,
+Jason
