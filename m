@@ -2,169 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EA9C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 19:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 791E1C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 19:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231887AbiBOTEW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Feb 2022 14:04:22 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34326 "EHLO
+        id S241812AbiBOTNu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Feb 2022 14:13:50 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243348AbiBOTEV (ORCPT
+        with ESMTP id S229844AbiBOTNs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Feb 2022 14:04:21 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD034F9541;
-        Tue, 15 Feb 2022 11:04:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644951850; x=1676487850;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OY5rlKrPl7iXMWmlVQVIRd4Ut3dm2c9g9Y247Vf0NLE=;
-  b=mbdBiv2fguhDFcdzPUSaiodaaHimArqz8k9ixMGfhPX9dT8hiNSK9A35
-   +D8SW8JTkQ3BCs8KCrxbY7zv4QU2Dr+pVST/v+VH5Kih8AsG8pkYFmTmX
-   09HuXPHkk+SopwueXtvIEKS7OvrVuS0173Ut0MPkKchIn35ari4iFcLoE
-   EUkZiZRh/U9qx8YzKvG9jUOJgnKXulYK6AMo5ZNsvB+eulvipqEpyQBrL
-   N3Ei+C5goajidTGNdVUT2gwapSShOk4qEHTfotu1os7bpGVFsbaxOjmrH
-   G/JE4UnKpTH4nduMeb6ZEQCVYpAaMployKG1VKtFWn1ZMExFttJNHNkz5
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="233974166"
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="233974166"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 11:04:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="497393288"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 15 Feb 2022 11:04:08 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nK37K-0009ww-M0; Tue, 15 Feb 2022 19:04:02 +0000
-Date:   Wed, 16 Feb 2022 03:03:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 1/1] crypto: cavium/nitrox - don't cast parameter in
- bit operations
-Message-ID: <202202160202.jG0FQRzi-lkp@intel.com>
-References: <20220215160641.51683-1-andriy.shevchenko@linux.intel.com>
+        Tue, 15 Feb 2022 14:13:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F9F107A91;
+        Tue, 15 Feb 2022 11:13:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1449BB81C63;
+        Tue, 15 Feb 2022 19:13:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA149C340EB;
+        Tue, 15 Feb 2022 19:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644952415;
+        bh=aWKfLj+OcuQ7ORm2NzKcSLdWPXwTMvCyCCSlhItZJdc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Pb9b+lIl3czsbILZx4JGaHKfxai5nhmkbafSdXIePkm1+42+PtZWRvtnxsIxieHjT
+         9ekyHuwvisvcr9fVX07+lClUNa2p0vhktIvKZSAjwuXs2gg0KwuzJxVI1eJwsCEsx9
+         QAqj6xuEKLMkpaRxHB9Jbh5UZNn3lhP/U/32rVpI9FJi1e5LJ0Z2HLVW0p7KctTIZB
+         uH0ohVDX/Qm561zC5FzYDM+alYJWObfXnSGwWXg348TFcT9AqtFzE3U54RAksJmBj5
+         t03G17WjapCI9e95mge26r6O7cubp0cNepLCQdTnroGWEV76h8vqtZwzBmUYMX3S66
+         UcWCeciahTo0A==
+Date:   Tue, 15 Feb 2022 13:21:10 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     GR-QLogic-Storage-Upstream@marvell.com,
+        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-xtensa@linux-xtensa.org,
+        linux-crypto@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+        linux-staging@lists.linux.dev,
+        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-ext4@vger.kernel.org, linux-acpi@vger.kernel.org,
+        devel@acpica.org, linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
+ flexible-array members
+Message-ID: <20220215192110.GA883653@embeddedor>
+References: <20220215174743.GA878920@embeddedor>
+ <202202151016.C0471D6E@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220215160641.51683-1-andriy.shevchenko@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <202202151016.C0471D6E@keescook>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andy,
+On Tue, Feb 15, 2022 at 10:17:40AM -0800, Kees Cook wrote:
+> On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
+> > There is a regular need in the kernel to provide a way to declare
+> > having a dynamically sized set of trailing elements in a structure.
+> > Kernel code should always use “flexible array members”[1] for these
+> > cases. The older style of one-element or zero-length arrays should
+> > no longer be used[2].
+> > 
+> > This code was transformed with the help of Coccinelle:
+> > (next-20220214$ spatch --jobs $(getconf _NPROCESSORS_ONLN) --sp-file script.cocci --include-headers --dir . > output.patch)
+> > 
+> > @@
+> > identifier S, member, array;
+> > type T1, T2;
+> > @@
+> > 
+> > struct S {
+> >   ...
+> >   T1 member;
+> >   T2 array[
+> > - 0
+> >   ];
+> > };
+> 
+> These all look trivially correct to me. Only two didn't have the end of
+> the struct visible in the patch, and checking those showed them to be
+> trailing members as well, so:
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
 
-I love your patch! Perhaps something to improve:
+I'll add this to my -next tree.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linux/master linus/master v5.17-rc4 next-20220215]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Andy-Shevchenko/crypto-cavium-nitrox-don-t-cast-parameter-in-bit-operations/20220216-000941
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20220216/202202160202.jG0FQRzi-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/51e27f6f33d377023ec5e097d18acb18f992f551
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Andy-Shevchenko/crypto-cavium-nitrox-don-t-cast-parameter-in-bit-operations/20220216-000941
-        git checkout 51e27f6f33d377023ec5e097d18acb18f992f551
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=alpha SHELL=/bin/bash drivers/crypto/cavium/nitrox/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c: In function 'nitrox_pf2vf_mbox_handler':
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:9: error: implicit declaration of function 'DEFINE_BITMAP'; did you mean 'DEFINE_IDA'? [-Werror=implicit-function-declaration]
-     126 |         DEFINE_BITMAP(csr, 64);
-         |         ^~~~~~~~~~~~~
-         |         DEFINE_IDA
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:23: error: 'csr' undeclared (first use in this function)
-     126 |         DEFINE_BITMAP(csr, 64);
-         |                       ^~~
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:23: note: each undeclared identifier is reported only once for each function it appears in
->> drivers/crypto/cavium/nitrox/nitrox_mbx.c:127:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-     127 |         u64 value, reg_addr;
-         |         ^~~
-   cc1: some warnings being treated as errors
-
-
-vim +127 drivers/crypto/cavium/nitrox/nitrox_mbx.c
-
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  121  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  122  void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  123  {
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  124  	struct nitrox_vfdev *vfdev;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  125  	struct pf2vf_work *pfwork;
-51e27f6f33d377 Andy Shevchenko   2022-02-15  126  	DEFINE_BITMAP(csr, 64);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04 @127  	u64 value, reg_addr;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  128  	u32 i;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  129  	int vfno;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  130  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  131  	/* loop for VF(0..63) */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  132  	reg_addr = NPS_PKT_MBOX_INT_LO;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  133  	value = nitrox_read_csr(ndev, reg_addr);
-51e27f6f33d377 Andy Shevchenko   2022-02-15  134  	bitmap_from_u64(csr, value);
-51e27f6f33d377 Andy Shevchenko   2022-02-15  135  	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  136  		/* get the vfno from ring */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  137  		vfno = RING_TO_VFNO(i, ndev->iov.max_vf_queues);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  138  		vfdev = ndev->iov.vfdev + vfno;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  139  		vfdev->ring = i;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  140  		/* fill the vf mailbox data */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  141  		vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  142  		pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  143  		if (!pfwork)
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  144  			continue;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  145  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  146  		pfwork->vfdev = vfdev;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  147  		pfwork->ndev = ndev;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  148  		INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  149  		queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  150  		/* clear the corresponding vf bit */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  151  		nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  152  	}
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  153  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  154  	/* loop for VF(64..127) */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  155  	reg_addr = NPS_PKT_MBOX_INT_HI;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  156  	value = nitrox_read_csr(ndev, reg_addr);
-51e27f6f33d377 Andy Shevchenko   2022-02-15  157  	bitmap_from_u64(csr, value);
-51e27f6f33d377 Andy Shevchenko   2022-02-15  158  	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  159  		/* get the vfno from ring */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  160  		vfno = RING_TO_VFNO(i + 64, ndev->iov.max_vf_queues);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  161  		vfdev = ndev->iov.vfdev + vfno;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  162  		vfdev->ring = (i + 64);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  163  		/* fill the vf mailbox data */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  164  		vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  165  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  166  		pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  167  		if (!pfwork)
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  168  			continue;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  169  
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  170  		pfwork->vfdev = vfdev;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  171  		pfwork->ndev = ndev;
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  172  		INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  173  		queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  174  		/* clear the corresponding vf bit */
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  175  		nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  176  	}
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  177  }
-cf718eaa8f9b2c Srikanth, Jampala 2018-12-04  178  
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Thanks!
+--
+Gustavo
