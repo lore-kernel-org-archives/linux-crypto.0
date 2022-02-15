@@ -2,168 +2,102 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E06C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 20:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F45C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 21:13:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236290AbiBOUgY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Feb 2022 15:36:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53788 "EHLO
+        id S240904AbiBOVOC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Feb 2022 16:14:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244104AbiBOUgX (ORCPT
+        with ESMTP id S240516AbiBOVOB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Feb 2022 15:36:23 -0500
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01752D76E7;
-        Tue, 15 Feb 2022 12:36:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644957372; x=1676493372;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BRsO1OXc58Y4YpX42/iVa8NoeQ33hVpixGdTGcSifYA=;
-  b=bw6gKlZqH8V1gSEOxV+Hh7vVu9osWm+xggC9h3X3DDbCluKky2s1F39w
-   491wd/UTPsno2ReHtGBHripCR7rhARGXBoFHvR8TDcOH/CtMeeDncIg4X
-   O9O+BKnAU61Mfx/V0ND8zsNzNQ5r95jpdTulE7FU+PSCNRn5ITABwEu/6
-   pWl3n4/Hc2eo4D3hsa/x6A/QiQCjKw8OdskUJxQiRVWfZg/r6IH+VB6Z6
-   D0p7BvVUbJln+jY3czLFfuNFB4l6n2T9UVJ8YOsFHLMUf63FzTUzSl0DC
-   m0MWoH20wED1IzvgigrPGkuVNQDvsxOCPszZHpRjibzj6Zx6PawIRE9pA
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="311189333"
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="311189333"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 12:36:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="497465016"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 15 Feb 2022 12:36:05 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nK4YO-000A0L-Cq; Tue, 15 Feb 2022 20:36:04 +0000
-Date:   Wed, 16 Feb 2022 04:35:27 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 1/1] crypto: cavium/nitrox - don't cast parameter in
- bit operations
-Message-ID: <202202160443.hqpSAgbP-lkp@intel.com>
-References: <20220215160641.51683-1-andriy.shevchenko@linux.intel.com>
+        Tue, 15 Feb 2022 16:14:01 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C306371C97;
+        Tue, 15 Feb 2022 13:13:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5FEC8618FA;
+        Tue, 15 Feb 2022 21:13:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38E1EC340EB;
+        Tue, 15 Feb 2022 21:13:49 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IgL/2/E1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1644959627;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kp7eWj533NNXB9m2ob0Q6FbMxEEdkB1SZsAocpyT3WI=;
+        b=IgL/2/E1e1E7zCYvhET5dX678TGPh3WQ9Dx3D2r2DuwZb/dXyQfElTGoySAuZbdUNtyQi9
+        bmDP8eQZVd38ZBtYLXDl6Z6QU56IDPwKCtEKUnRiVNeiDrsqXpP21hwil5o8HswG7jWDHc
+        ml+m0C7a8CwyxK/wT/cqDQaDnY9zGyU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6df90ad4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 15 Feb 2022 21:13:47 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>
+Subject: [PATCH v3] random: absorb fast pool into input pool after fast load
+Date:   Tue, 15 Feb 2022 22:13:33 +0100
+Message-Id: <20220215211333.244383-1-Jason@zx2c4.com>
+In-Reply-To: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
+References: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220215160641.51683-1-andriy.shevchenko@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andy,
+During crng_init == 0, we never credit entropy in add_interrupt_
+randomness(), but instead dump it directly into the primary_crng. That's
+fine, except for the fact that we then wind up throwing away that
+entropy later when we switch to extracting from the input pool and
+overwriting the primary_crng key. The two other early init sites --
+add_hwgenerator_randomness()'s use crng_fast_load() and add_device_
+randomness()'s use of crng_slow_load() -- always additionally give their
+inputs to the input pool. But not add_interrupt_randomness().
 
-I love your patch! Yet something to improve:
+This commit fixes that shortcoming by calling mix_pool_bytes() after
+crng_fast_load() in add_interrupt_randomness(). That's partially
+verboten on PREEMPT_RT, where it implies taking spinlock_t from an IRQ
+handler. But this also only happens during early boot and then never
+again after that. Plus it's a trylock so it has the same considerations
+as calling crng_fast_load(), which we're already using.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linux/master linus/master v5.17-rc4 next-20220215]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Andy-Shevchenko/crypto-cavium-nitrox-don-t-cast-parameter-in-bit-operations/20220216-000941
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20220216/202202160443.hqpSAgbP-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/0day-ci/linux/commit/51e27f6f33d377023ec5e097d18acb18f992f551
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Andy-Shevchenko/crypto-cavium-nitrox-don-t-cast-parameter-in-bit-operations/20220216-000941
-        git checkout 51e27f6f33d377023ec5e097d18acb18f992f551
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/crypto/cavium/nitrox/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c: In function 'nitrox_pf2vf_mbox_handler':
->> drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:2: error: implicit declaration of function 'DEFINE_BITMAP'; did you mean 'DEFINE_TIMER'? [-Werror=implicit-function-declaration]
-     126 |  DEFINE_BITMAP(csr, 64);
-         |  ^~~~~~~~~~~~~
-         |  DEFINE_TIMER
->> drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:16: error: 'csr' undeclared (first use in this function); did you mean 'msr'?
-     126 |  DEFINE_BITMAP(csr, 64);
-         |                ^~~
-         |                msr
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c:126:16: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/crypto/cavium/nitrox/nitrox_mbx.c:127:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-     127 |  u64 value, reg_addr;
-         |  ^~~
-   cc1: some warnings being treated as errors
-
-
-vim +126 drivers/crypto/cavium/nitrox/nitrox_mbx.c
-
-   121	
-   122	void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
-   123	{
-   124		struct nitrox_vfdev *vfdev;
-   125		struct pf2vf_work *pfwork;
- > 126		DEFINE_BITMAP(csr, 64);
-   127		u64 value, reg_addr;
-   128		u32 i;
-   129		int vfno;
-   130	
-   131		/* loop for VF(0..63) */
-   132		reg_addr = NPS_PKT_MBOX_INT_LO;
-   133		value = nitrox_read_csr(ndev, reg_addr);
-   134		bitmap_from_u64(csr, value);
-   135		for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-   136			/* get the vfno from ring */
-   137			vfno = RING_TO_VFNO(i, ndev->iov.max_vf_queues);
-   138			vfdev = ndev->iov.vfdev + vfno;
-   139			vfdev->ring = i;
-   140			/* fill the vf mailbox data */
-   141			vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
-   142			pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
-   143			if (!pfwork)
-   144				continue;
-   145	
-   146			pfwork->vfdev = vfdev;
-   147			pfwork->ndev = ndev;
-   148			INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
-   149			queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-   150			/* clear the corresponding vf bit */
-   151			nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
-   152		}
-   153	
-   154		/* loop for VF(64..127) */
-   155		reg_addr = NPS_PKT_MBOX_INT_HI;
-   156		value = nitrox_read_csr(ndev, reg_addr);
-   157		bitmap_from_u64(csr, value);
-   158		for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
-   159			/* get the vfno from ring */
-   160			vfno = RING_TO_VFNO(i + 64, ndev->iov.max_vf_queues);
-   161			vfdev = ndev->iov.vfdev + vfno;
-   162			vfdev->ring = (i + 64);
-   163			/* fill the vf mailbox data */
-   164			vfdev->msg.value = pf2vf_read_mbox(ndev, vfdev->ring);
-   165	
-   166			pfwork = kzalloc(sizeof(*pfwork), GFP_ATOMIC);
-   167			if (!pfwork)
-   168				continue;
-   169	
-   170			pfwork->vfdev = vfdev;
-   171			pfwork->ndev = ndev;
-   172			INIT_WORK(&pfwork->pf2vf_resp, pf2vf_resp_handler);
-   173			queue_work(ndev->iov.pf2vf_wq, &pfwork->pf2vf_resp);
-   174			/* clear the corresponding vf bit */
-   175			nitrox_write_csr(ndev, reg_addr, BIT_ULL(i));
-   176		}
-   177	}
-   178	
-
+Cc: Theodore Ts'o <tytso@mit.edu>
+Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Suggested-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+v3 uses a trylock instead of a spinlock, just like all the other locks
+taken in hard irq. (Incidentally, we're now talking about moving this
+into the deferred stage, so that at can be a spinlock, but at least with
+what we have here, this really must be a trylock.)
+
+ drivers/char/random.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index d31b0b3afe2e..f3179c67010b 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -850,6 +850,10 @@ void add_interrupt_randomness(int irq)
+ 		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
+ 			fast_pool->count = 0;
+ 			fast_pool->last = now;
++			if (spin_trylock(&input_pool.lock)) {
++				_mix_pool_bytes(&fast_pool->pool, sizeof(fast_pool->pool));
++				spin_unlock(&input_pool.lock);
++			}
+ 		}
+ 		return;
+ 	}
+-- 
+2.35.0
+
