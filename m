@@ -2,211 +2,351 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10615C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 13:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA72EC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Feb 2022 14:08:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237759AbiBONsF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Feb 2022 08:48:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44658 "EHLO
+        id S238522AbiBOOIM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Feb 2022 09:08:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238418AbiBONsD (ORCPT
+        with ESMTP id S238521AbiBOOIK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Feb 2022 08:48:03 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9640DFE3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Feb 2022 05:47:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644932872; x=1676468872;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2UAUvyzwxNEYemBY9ZEdKEkeTMqJuAaln8vIyIpz+Eg=;
-  b=YANGPNoXw7XHWRKTtkwglJrFZCLBDqgFoWEPWCT74Oiy4sSMfcQDY4S0
-   NqtJTangtGPxbl3nALS9em+bpUuWF456dZ34p+3qm1RtK0UbAChDVWtc+
-   7kEHd2dc8LilJjsrSS7rLDkTtNryL2/Pi1kQit27XPRb76LyAkpgbDOci
-   p4AgQirFrs0mdwOKVIZwcCyiRzj4E/Lt6q4RxcnCSveFBT1+XKQPFMbjl
-   9zmTTvSswxdxgq19UqUf3Fe/SgXYbPVBpWyIUlEB9xcHQWtqY17i8VGkR
-   CrCEhQvjN3aR0i5FQbf72x6m8FMthum1/H7v/23UOUjDTEyboxg4TML3t
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="313627392"
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="313627392"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 05:47:52 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="497138677"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 15 Feb 2022 05:47:50 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nJyBK-0009ho-6l; Tue, 15 Feb 2022 13:47:50 +0000
-Date:   Tue, 15 Feb 2022 21:47:00 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH] crypto: crypto_xor - use helpers for unaligned accesses
-Message-ID: <202202152134.HZ9sQwkL-lkp@intel.com>
-References: <20220215105717.184572-1-ardb@kernel.org>
+        Tue, 15 Feb 2022 09:08:10 -0500
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D602B183;
+        Tue, 15 Feb 2022 06:08:00 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id p9so21609129ejd.6;
+        Tue, 15 Feb 2022 06:08:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=zmquzx9EapngFWMHIp0jkJJUKf49k1ySJIytgsbiDMo=;
+        b=q5hOnTKxHz2Lgke9Dh6gQ8k+XtsQYjpJLbfMyIXCNNiQjgcWspm2ivLfaFoQboKCmL
+         kIFtAxdWV0zlTViMZaevkU8BFMpxMAT/gmtuwAEhy5ximXIrPYmL0cvDROYJu2YZ0h8B
+         84PcNlGN4iaLbuXfc2MnYp+9C0V6XTOAD9QDF9vPcTLKH8Ja+vwMzMeo2/A24BgLCQ65
+         FWwjkA70roE2cVt+Svkdcin0OAAr5QZVjV/ktJtQmrcpbwyxvmGQZYgmnCGFrPt7rqDG
+         jTGU39gAhK4b/dDfk23gdzLtxzL9fDCTG0jf9tns3+T88n4cluXP1ePH5444Q6kO4bvU
+         OThw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=zmquzx9EapngFWMHIp0jkJJUKf49k1ySJIytgsbiDMo=;
+        b=SHba1F4nSmkztivo/2WpNJjjhd0Zc35ezRXeNWm35ubQmbMFD4DriYvjgDHgQRrW4d
+         ZleJFrXdVNbJJseeHSuaOIdMl/DyR4YF2WKjcJAnwzsIGtNGMcXiGpfmxiFm5IVXKIS6
+         FnXw+d2XUFeeJgNK+OvaJPdhEZYVs14U+cKp7Fjjsj0slFvZszNZXIoc+g/3N0wlT9vj
+         jH+XZet0komnuEL0j9dQv/NHKsL0ydwri2BYmZTCFFkn09anK7OIGC9ouhWxqpaoq5Do
+         pqmsDopzdXHXeswjlWkavPdMRgONL7NDfniz6Y+CqGPOUkNdq5BVWfohertoEGBauIYX
+         cHvg==
+X-Gm-Message-State: AOAM5331WLQsaNksPNzeSnk1VHJRsjVgBwrR5bHvIpHgaRAH56JGaWrL
+        K1DWBPxiy79VqChAxEtpQDc=
+X-Google-Smtp-Source: ABdhPJzckbVd+co0pA67kLhgpBPhf0j7lFh/fc87+g4chr5B1zfWnh5zkP9ShOS5kWyeS9wJCkv+Cg==
+X-Received: by 2002:a17:907:869e:: with SMTP id qa30mr3057627ejc.483.1644934078691;
+        Tue, 15 Feb 2022 06:07:58 -0800 (PST)
+Received: from [192.168.2.1] (81-204-249-205.fixed.kpn.net. [81.204.249.205])
+        by smtp.gmail.com with ESMTPSA id z8sm11665580ejc.151.2022.02.15.06.07.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Feb 2022 06:07:58 -0800 (PST)
+Message-ID: <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com>
+Date:   Tue, 15 Feb 2022 15:07:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220215105717.184572-1-ardb@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3] dt-bindings: crypto: convert rockchip-crypto to yaml
+Content-Language: en-US
+To:     heiko@sntech.de, Corentin Labbe <clabbe@baylibre.com>
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, robh+dt@kernel.org,
+        krzysztof.kozlowski@canonical.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+References: <20220211115925.3382735-1-clabbe@baylibre.com>
+From:   Johan Jonker <jbx6244@gmail.com>
+In-Reply-To: <20220211115925.3382735-1-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+Hi Heiko,
 
-I love your patch! Perhaps something to improve:
+On 2/11/22 12:59, Corentin Labbe wrote:
+> Convert rockchip-crypto to yaml
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+> Changes since v1:
+> - fixed example
+> - renamed to a new name
+> - fixed some maxItems
+> 
+> Change since v2:
+> - Fixed maintainers section
+> 
+>  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
+>  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
+>  2 files changed, 66 insertions(+), 28 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master v5.17-rc4 next-20220215]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+rockchip,crypto.yaml
 
-url:    https://github.com/0day-ci/linux/commits/Ard-Biesheuvel/crypto-crypto_xor-use-helpers-for-unaligned-accesses/20220215-185741
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20220215/202202152134.HZ9sQwkL-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/6ca2d09816a67230ab30f3c7e7d87815e833d0af
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Ard-Biesheuvel/crypto-crypto_xor-use-helpers-for-unaligned-accesses/20220215-185741
-        git checkout 6ca2d09816a67230ab30f3c7e7d87815e833d0af
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arc SHELL=/bin/bash drivers/md/
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+> new file mode 100644
+> index 000000000000..2e1e9fa711c4
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+> @@ -0,0 +1,66 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+rockchip,crypto.yaml
 
-All warnings (new ones prefixed by >>):
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Rockchip Electronics And Security Accelerator
+> +
+> +maintainers:
+> +  - Heiko Stuebner <heiko@sntech.de>
+> +
+> +properties:
+> +  compatible:
 
-   In file included from arch/arc/include/asm/unaligned.h:11,
-                    from arch/arc/include/asm/io.h:12,
-                    from include/linux/io.h:13,
-                    from include/linux/irq.h:20,
-                    from include/asm-generic/hardirq.h:17,
-                    from ./arch/arc/include/generated/asm/hardirq.h:1,
-                    from include/linux/hardirq.h:11,
-                    from include/linux/highmem.h:11,
-                    from include/linux/bvec.h:10,
-                    from include/linux/blk_types.h:10,
-                    from include/linux/bio.h:10,
-                    from drivers/md/dm-crypt.c:16:
-   In function 'crypto_xor_cpy',
-       inlined from 'crypt_iv_tcw_whitening.isra' at drivers/md/dm-crypt.c:645:2:
->> include/asm-generic/unaligned.h:14:15: warning: '*(const struct <anonymous> *)(&buf[0]).x' is used uninitialized [-Wuninitialized]
-      14 |         __pptr->x;                                                              \
-         |         ~~~~~~^~~
-   include/asm-generic/unaligned.h:22:33: note: in expansion of macro '__get_unaligned_t'
-      22 | #define get_unaligned(ptr)      __get_unaligned_t(typeof(*(ptr)), (ptr))
-         |                                 ^~~~~~~~~~~~~~~~~
-   include/crypto/algapi.h:183:29: note: in expansion of macro 'get_unaligned'
-     183 |                         l = get_unaligned(d) ^ get_unaligned(s1++)
-         |                             ^~~~~~~~~~~~~
-   drivers/md/dm-crypt.c: In function 'crypt_iv_tcw_whitening.isra':
-   drivers/md/dm-crypt.c:640:12: note: 'buf' declared here
-     640 |         u8 buf[TCW_WHITENING_SIZE];
-         |            ^~~
-   In file included from arch/arc/include/asm/unaligned.h:11,
-                    from arch/arc/include/asm/io.h:12,
-                    from include/linux/io.h:13,
-                    from include/linux/irq.h:20,
-                    from include/asm-generic/hardirq.h:17,
-                    from ./arch/arc/include/generated/asm/hardirq.h:1,
-                    from include/linux/hardirq.h:11,
-                    from include/linux/highmem.h:11,
-                    from include/linux/bvec.h:10,
-                    from include/linux/blk_types.h:10,
-                    from include/linux/bio.h:10,
-                    from drivers/md/dm-crypt.c:16:
-   In function 'crypto_xor_cpy',
-       inlined from 'crypt_iv_tcw_whitening.isra' at drivers/md/dm-crypt.c:645:2:
-   include/asm-generic/unaligned.h:14:15: warning: '*(const struct <anonymous> *)(&buf[4]).x' is used uninitialized [-Wuninitialized]
-      14 |         __pptr->x;                                                              \
-         |         ~~~~~~^~~
-   include/asm-generic/unaligned.h:22:33: note: in expansion of macro '__get_unaligned_t'
-      22 | #define get_unaligned(ptr)      __get_unaligned_t(typeof(*(ptr)), (ptr))
-         |                                 ^~~~~~~~~~~~~~~~~
-   include/crypto/algapi.h:183:29: note: in expansion of macro 'get_unaligned'
-     183 |                         l = get_unaligned(d) ^ get_unaligned(s1++)
-         |                             ^~~~~~~~~~~~~
-   drivers/md/dm-crypt.c: In function 'crypt_iv_tcw_whitening.isra':
-   drivers/md/dm-crypt.c:640:12: note: 'buf' declared here
-     640 |         u8 buf[TCW_WHITENING_SIZE];
-         |            ^~~
-   In file included from arch/arc/include/asm/unaligned.h:11,
-                    from arch/arc/include/asm/io.h:12,
-                    from include/linux/io.h:13,
-                    from include/linux/irq.h:20,
-                    from include/asm-generic/hardirq.h:17,
-                    from ./arch/arc/include/generated/asm/hardirq.h:1,
-                    from include/linux/hardirq.h:11,
-                    from include/linux/highmem.h:11,
-                    from include/linux/bvec.h:10,
-                    from include/linux/blk_types.h:10,
-                    from include/linux/bio.h:10,
-                    from drivers/md/dm-crypt.c:16:
-   In function 'crypto_xor_cpy',
-       inlined from 'crypt_iv_tcw_whitening.isra' at drivers/md/dm-crypt.c:646:2:
-   include/asm-generic/unaligned.h:14:15: warning: '*(const struct <anonymous> *)(&buf[8]).x' is used uninitialized [-Wuninitialized]
-      14 |         __pptr->x;                                                              \
-         |         ~~~~~~^~~
-   include/asm-generic/unaligned.h:22:33: note: in expansion of macro '__get_unaligned_t'
-      22 | #define get_unaligned(ptr)      __get_unaligned_t(typeof(*(ptr)), (ptr))
-         |                                 ^~~~~~~~~~~~~~~~~
-   include/crypto/algapi.h:183:29: note: in expansion of macro 'get_unaligned'
-     183 |                         l = get_unaligned(d) ^ get_unaligned(s1++)
-         |                             ^~~~~~~~~~~~~
-   drivers/md/dm-crypt.c: In function 'crypt_iv_tcw_whitening.isra':
-   drivers/md/dm-crypt.c:640:12: note: 'buf' declared here
-     640 |         u8 buf[TCW_WHITENING_SIZE];
-         |            ^~~
-   In file included from arch/arc/include/asm/unaligned.h:11,
-                    from arch/arc/include/asm/io.h:12,
-                    from include/linux/io.h:13,
-                    from include/linux/irq.h:20,
-                    from include/asm-generic/hardirq.h:17,
-                    from ./arch/arc/include/generated/asm/hardirq.h:1,
-                    from include/linux/hardirq.h:11,
-                    from include/linux/highmem.h:11,
-                    from include/linux/bvec.h:10,
-                    from include/linux/blk_types.h:10,
-                    from include/linux/bio.h:10,
-                    from drivers/md/dm-crypt.c:16:
-   In function 'crypto_xor_cpy',
-       inlined from 'crypt_iv_tcw_whitening.isra' at drivers/md/dm-crypt.c:646:2:
-   include/asm-generic/unaligned.h:14:15: warning: '*(const struct <anonymous> *)(&buf[12]).x' is used uninitialized [-Wuninitialized]
-      14 |         __pptr->x;                                                              \
-         |         ~~~~~~^~~
-   include/asm-generic/unaligned.h:22:33: note: in expansion of macro '__get_unaligned_t'
-      22 | #define get_unaligned(ptr)      __get_unaligned_t(typeof(*(ptr)), (ptr))
-         |                                 ^~~~~~~~~~~~~~~~~
-   include/crypto/algapi.h:183:29: note: in expansion of macro 'get_unaligned'
-     183 |                         l = get_unaligned(d) ^ get_unaligned(s1++)
-         |                             ^~~~~~~~~~~~~
-   drivers/md/dm-crypt.c: In function 'crypt_iv_tcw_whitening.isra':
-   drivers/md/dm-crypt.c:640:12: note: 'buf' declared here
-     640 |         u8 buf[TCW_WHITENING_SIZE];
-         |            ^~~
+    oneOf:
+      - const: rockchip,rk3288-crypto
+      - items:
+          - enum:
+              - rockchip,rk3228-crypto
+              - rockchip,rk3328-crypto
+              - rockchip,rk3368-crypto
+              - rockchip,rk3399-crypto
+          - const: rockchip,rk3288-crypto
+
+rk3288 was the first in line that had support, so we use that as fall
+back string.
+
+> +    const: rockchip,rk3288-crypto
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: clock data
+> +      - description: clock data
+> +      - description: clock crypto accelerator
+
+> +      - description: clock dma
+
+remove ???
+
+> +
+> +  clock-names:
+> +    items:
+> +      - const: aclk
+> +      - const: hclk
+> +      - const: sclk
+
+> +      - const: apb_pclk
+
+remove ???
+
+Similar to the rk3568 pclk_xpcs discussion ACLK_DMAC1 belongs to the
+dmac_bus_s node and should have been enabled by the DMA driver I think.
+Could you advise if this is correct or should we remove parsing/enabling
+ACLK_DMAC1 in rk3288_crypto.c in order to it easier
+porting/adding/syncing nodes for other SoC types?
+
+Johan
+
+===
+
+From rk3288.dtsi:
+
+	dmac_bus_s: dma-controller@ffb20000 {
+		compatible = "arm,pl330", "arm,primecell";
+		reg = <0x0 0xffb20000 0x0 0x4000>;
+		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>,
+			     <GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>;
+		#dma-cells = <1>;
+		arm,pl330-broken-no-flushp;
+		arm,pl330-periph-burst;
+
+		clocks = <&cru ACLK_DMAC1>;
+
+		clock-names = "apb_pclk";
+	};
+
+	crypto: cypto@ff8a0000 {
+		compatible = "rockchip,rk3288-crypto";
+		reg = <0x0 0xff8a0000 0x0 0x4000>;
+		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+
+			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+
+		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+
+		resets = <&cru SRST_CRYPTO>;
+		reset-names = "crypto-rst";
+	};
+===
+
+https://github.com/rockchip-linux/u-boot/blob/next-dev/drivers/crypto/rockchip/crypto_v1.c
+
+U-boot currently only looks for a SCLK_CRYPTO array and sets the
+SCLK_CRYPTO frequency.
+
+TODO:
+Make it work/portable for all Rockchip SoC types in both Linux and
+U-boot with variable number of clocks and resets.
 
 
-vim +14 include/asm-generic/unaligned.h
+rk322x.dtsi:
 
-aafe4dbed0bf6c Arnd Bergmann 2009-05-13  11  
-803f4e1eab7a89 Arnd Bergmann 2021-05-08  12  #define __get_unaligned_t(type, ptr) ({						\
-803f4e1eab7a89 Arnd Bergmann 2021-05-08  13  	const struct { type x; } __packed *__pptr = (typeof(__pptr))(ptr);	\
-803f4e1eab7a89 Arnd Bergmann 2021-05-08 @14  	__pptr->x;								\
-803f4e1eab7a89 Arnd Bergmann 2021-05-08  15  })
-803f4e1eab7a89 Arnd Bergmann 2021-05-08  16  
+	crypto: crypto@100a0000 {
+		compatible = "rockchip,rk3228-crypto", "rockchip,rk3288-crypto";
+		reg = <0x100a0000 0x10000>;
+		clocks = <&cru SCLK_CRYPTO>;
+		clock-names = "sclk_crypto";
+	};
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+
+#define SRST_CRYPTO		53
+#define HCLK_M_CRYPTO		476
+#define HCLK_S_CRYPTO		477
+
+#define SRST_CRYPTO		53
+
+===
+rk3328.dtsi:
+
+	crypto: crypto@ff060000 {
+		compatible = "rockchip,rk3328-crypto", "rockchip,rk3288-crypto";
+		reg = <0x0 0xff060000 0x0 0x10000>;
+		clocks = <&cru SCLK_CRYPTO>;
+		clock-names = "sclk_crypto";
+	};
+
+#define SRST_CRYPTO		68
+#define HCLK_CRYPTO_MST		336
+#define HCLK_CRYPTO_SLV		337
+
+#define SRST_CRYPTO		68
+
+===
+rk3368.dtsi:
+
+	crypto: crypto@ff8a0000 {
+		compatible = "rockchip,rk3368-crypto", "rockchip,rk3288-crypto";
+		reg = <0x0 0xff8a0000 0x0 0x10000>;
+		clocks = <&cru SCLK_CRYPTO>;
+		clock-names = "sclk_crypto";
+	};
+
+#define SCLK_CRYPTO		130  ??? missing in rk3368-cru.h
+#define MCLK_CRYPTO		191
+#define HCLK_CRYPTO		461
+
+#define SRST_CRYPTO		174
+
+===
+rk3399.dtsi:
+
+	crypto: crypto@ff8b0000 {
+		compatible = "rockchip,rk3399-crypto", "rockchip,rk3288-crypto";
+		reg = <0x0 0xff8b0000 0x0 0x10000>;
+		clocks = <&cru SCLK_CRYPTO0>, <&cru SCLK_CRYPTO1>;
+		clock-names = "sclk_crypto0", "sclk_crypto1";
+	};
+
+
+#define SCLK_CRYPTO0			133
+#define SCLK_CRYPTO1			134
+#define HCLK_M_CRYPTO0			464
+#define HCLK_M_CRYPTO1			465
+#define HCLK_S_CRYPTO0			466
+#define HCLK_S_CRYPTO1			467
+
+#define SRST_CRYPTO_S			174
+#define SRST_CRYPTO_M			175
+#define SRST_CRYPTO			181
+#define SRST_CRYPTO1_S			184
+#define SRST_CRYPTO1_M			185
+#define SRST_CRYPTO1			186
+
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +  reset-names:
+> +    const: crypto-rst
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +  - resets
+> +  - reset-names
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +    #include <dt-bindings/clock/rk3288-cru.h>
+> +    crypto@ff8a0000 {
+> +      compatible = "rockchip,rk3288-crypto";
+> +      reg = <0xff8a0000 0x4000>;
+> +      interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> +      clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+> +               <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+> +      clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+> +      resets = <&cru SRST_CRYPTO>;
+> +      reset-names = "crypto-rst";
+> +    };
+> diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> deleted file mode 100644
+> index 5e2ba385b8c9..000000000000
+> --- a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> +++ /dev/null
+> @@ -1,28 +0,0 @@
+> -Rockchip Electronics And Security Accelerator
+> -
+> -Required properties:
+> -- compatible: Should be "rockchip,rk3288-crypto"
+> -- reg: Base physical address of the engine and length of memory mapped
+> -       region
+> -- interrupts: Interrupt number
+> -- clocks: Reference to the clocks about crypto
+> -- clock-names: "aclk" used to clock data
+> -	       "hclk" used to clock data
+> -	       "sclk" used to clock crypto accelerator
+> -	       "apb_pclk" used to clock dma
+> -- resets: Must contain an entry for each entry in reset-names.
+> -	  See ../reset/reset.txt for details.
+> -- reset-names: Must include the name "crypto-rst".
+> -
+> -Examples:
+> -
+> -	crypto: cypto-controller@ff8a0000 {
+> -		compatible = "rockchip,rk3288-crypto";
+> -		reg = <0xff8a0000 0x4000>;
+> -		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+> -		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+> -			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+> -		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+> -		resets = <&cru SRST_CRYPTO>;
+> -		reset-names = "crypto-rst";
+> -	};
