@@ -2,84 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FC7C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 10:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57AAC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 10:43:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232641AbiBPKCN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Feb 2022 05:02:13 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:56110 "EHLO
+        id S229644AbiBPKnh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Feb 2022 05:43:37 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232637AbiBPKCN (ORCPT
+        with ESMTP id S229455AbiBPKng (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Feb 2022 05:02:13 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842439BF70;
-        Wed, 16 Feb 2022 02:02:00 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 16 Feb 2022 05:43:36 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7177326835F;
+        Wed, 16 Feb 2022 02:43:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 437A31F37D;
-        Wed, 16 Feb 2022 10:01:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1645005719;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        by ams.source.kernel.org (Postfix) with ESMTPS id 204F1B81E74;
+        Wed, 16 Feb 2022 10:43:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BEEEC004E1;
+        Wed, 16 Feb 2022 10:43:21 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LN+U314q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645008198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VdVQOy+sPvfsqUg3D3Kt7VC/vYBeiMYJP+Nr1pAL6C8=;
-        b=RpMDLxm2DyHTo2IGX3scsEDsfOp0N/EWj04ADtUqQ3S6F8E+F2NnaNtFWYYfWsq23blUmz
-        PU7KJeOauwnJex1ZW7T9phOlLsbaIeXvmubu8oBfNI4yuDr13rMPk+qdy/bWxRkf4+QUpA
-        LCHJ+lqPucID808yQ7lG+RcXnO4NMCg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1645005719;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VdVQOy+sPvfsqUg3D3Kt7VC/vYBeiMYJP+Nr1pAL6C8=;
-        b=PXDUbz8PtUHVLzXWRgvX3mKns1tmElrGsi+O1s67OEHrSSzbmn6Np7NeJ2Em+n+9dJ4nc1
-        t+blfLrvWmgDFHDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E349113A9F;
-        Wed, 16 Feb 2022 10:01:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id CFaNNZbLDGIjAgAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Wed, 16 Feb 2022 10:01:58 +0000
-Date:   Wed, 16 Feb 2022 11:01:57 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Nicolai Stange <nstange@suse.de>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, leitao@debian.org,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] crypto: vmx: Turn CRYPTO_DEV_VMX_ENCRYPT into
- tristate
-Message-ID: <YgzLlZRAk21HwCzV@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20220215185936.15576-1-pvorel@suse.cz>
- <20220215185936.15576-2-pvorel@suse.cz>
- <87tuczf96a.fsf@suse.de>
+        bh=FLVrjfhT3W8aNO8W4YUK8UwxqHmr1OB3Xs9XyYu/LAw=;
+        b=LN+U314qz5ae0xe+2oW32YGWXiptKFKcPzAFi//V42h1bKx4w3Od+Qez3w4SHdbajhEqg7
+        fA7pD6+VRD3CLJ1QoFxpQMIONiUORBqmEbZIIllpkqbQGU48FJSVea36EGYCk4QXxqEdbR
+        GBtBGG+qjJP5+m3myWISxpoIHMpXJIs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9bc629c6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 16 Feb 2022 10:43:17 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id v63so4661542ybv.10;
+        Wed, 16 Feb 2022 02:43:16 -0800 (PST)
+X-Gm-Message-State: AOAM530v+4nRHutthXlLu56kXv2kKOek5/ZWfQl28GDX84GSd8bU4Bd8
+        PLmZ+U7/cb0NzoRZr1zj+vgRURyVPpX1mkwN3vw=
+X-Google-Smtp-Source: ABdhPJxiaSHJ3i2RRcIsj07+mvucZb540gljBceIzpbXww7fLhg+Lg6D8LmDRmq5NyIV/ooc3fooNxW+9sq/0Bf+KkU=
+X-Received: by 2002:a81:7d04:0:b0:2d0:d0e2:126f with SMTP id
+ y4-20020a817d04000000b002d0d0e2126fmr1714487ywc.485.1645008195447; Wed, 16
+ Feb 2022 02:43:15 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tuczf96a.fsf@suse.de>
+References: <CAHmME9pZaYW-p=zU4v96TjeSijm-g03cNpvUJcNvhOqh5v+Lwg@mail.gmail.com>
+ <20220216000230.22625-1-Jason@zx2c4.com> <5c23585b-7865-54fb-3835-12e58a7aee46@gmail.com>
+In-Reply-To: <5c23585b-7865-54fb-3835-12e58a7aee46@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 16 Feb 2022 11:43:04 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rkDXbeNbe1uehoVONioy=pa8oBtJEW22Afbp=86A9SUQ@mail.gmail.com>
+Message-ID: <CAHmME9rkDXbeNbe1uehoVONioy=pa8oBtJEW22Afbp=86A9SUQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ath9k: use hw_random API instead of directly dumping
+ into random.c
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     miaoqing@codeaurora.org, Rui Salvaterra <rsalvaterra@gmail.com>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>,
+        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
+        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        Kalle Valo <kvalo@kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Hi Florian,
 
-side notes about the subject (following private notes from Nicolai):
+On Wed, Feb 16, 2022 at 4:13 AM Florian Fainelli <f.fainelli@gmail.com> wrote:
+> You will have to give this instance an unique name because there can be
+> multiple ath9k adapters registered in a given system (like Wi-Fi
+> routers), and one of the first thing hwrng_register() does is ensure
+> that there is not an existing rng with the same name.
+>
+> Maybe using a combination of ath9k + dev_name() ought to be unique enough?
 
-I dared to use "crypto: vmx: " in subject, next version I'll use "crypto: vmx - "
-as it's used in crypto.
+Good point. Will do. dev_name() probably won't cut it because of
+namespaces, but I can always just attach a counter. Will do that for
+v3.
 
-Also continue the subject line into the rest of the commit message isn't
-probably wanted.
-
-Kind regards,
-Petr
+Jason
