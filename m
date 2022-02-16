@@ -2,95 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74265C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 13:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 053A6C4167B
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 19:06:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234210AbiBPN2H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Feb 2022 08:28:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40098 "EHLO
+        id S237996AbiBPTGM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Feb 2022 14:06:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234152AbiBPN2G (ORCPT
+        with ESMTP id S235595AbiBPTGL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Feb 2022 08:28:06 -0500
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6F7151D3E;
-        Wed, 16 Feb 2022 05:27:54 -0800 (PST)
-Received: by mail-vs1-xe36.google.com with SMTP id p7so2451142vsg.2;
-        Wed, 16 Feb 2022 05:27:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=W4NWQ4O/W36pB+bOALZ9wlT2YlOr6PG7OHv6tykJwH0=;
-        b=lAHHTLBXwuKLLUHWaLseZjIP5cTvJsu69Q9thecmcZ3q0ffGHTCcOfDZJgQ+BsaU7X
-         VJaGthSGbyLDnlUhzTNOirmBB5F7Qt2EEk+RrmOT7+T5WuR8cdDnJMknl0tWouNlGuVh
-         9mhATRhNi19QIAqUZHBI9t2YXVYTD5EUoVudmzAEgZdEoVQTZuF+8xlDPDcIFRRwOn8g
-         aUi/maLv8i6RYOy6i+1AX3tkKmgBfUDfKVKAYtOhjVYzCjYnN86wGxGPqUL7SqtqgDe1
-         SUnNRDnQa+P+Bx++qp0oDSbhsRilT2mpDr7NtF0lcnwKAsJa1C4D94jqqd9Cy1g/0u0G
-         Sy+g==
+        Wed, 16 Feb 2022 14:06:11 -0500
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3523C27019F;
+        Wed, 16 Feb 2022 11:05:59 -0800 (PST)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-2d641c31776so9255867b3.12;
+        Wed, 16 Feb 2022 11:05:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=W4NWQ4O/W36pB+bOALZ9wlT2YlOr6PG7OHv6tykJwH0=;
-        b=V2sejGUzsw+owRORLV0RcJtv+W8tZmQP0luzIB7ny4catcJ5jZgLqKjNXO0zosbK8Z
-         K9hz4BZsoreztivnSTFi4YhG/x4c1v8caRdZnfqhVjsGDhWhAzmlCd6yyNrJBnIDbwkR
-         Imoty/50X/c4hwfA0K1O9H/kMDCFCOkpV9DE0dik+zrT34d6Y2NGlsf6KtyW+E6F+uPW
-         W6GF/AWvtnDxYgwOQmpdLhXuskmifoOEz29o+M0tO/nYXBSp7v9hFsIRKmR1d4QK9VGk
-         L566R+wTVlfyXGayKgf7PDWb5WS99xR2sxWPmB7kYoFr5AuO1ZSdiCDwTntwzCYPw+Sm
-         Q3Rw==
-X-Gm-Message-State: AOAM533xgAr5V0CWj2R4dQOnW2i3tVFTg4nRvA+kG13wwux6+KwMFHJj
-        qQytLTX6qLDlU+GCoyVOcQPzAZ2QFLAj8YMy6A==
-X-Google-Smtp-Source: ABdhPJzJi19YNpCvzYwvosnnahkfB/aXCpYLA6aGj448BMw2ojTugtbCg0yk1f4Aj5s3nazDJ7Aob0vZmEcsqQKZVb8=
-X-Received: by 2002:a05:6102:2912:b0:31a:5ab3:f44b with SMTP id
- cz18-20020a056102291200b0031a5ab3f44bmr1066907vsb.53.1645018073916; Wed, 16
- Feb 2022 05:27:53 -0800 (PST)
+        bh=yLrFIsE9bo3p9BnVIL7Uc7sprqnSKm0YOW7fBIQdERM=;
+        b=RuPu7SzNkaJd1WR9+wnB7RuMLb2/6JyYiKaOmBtWGY+4dQhlRrtGvZ6OCmGpbsWMoE
+         P6HWXArbpHHQ7o31q4rHYkzBeYrTVeQSPrCkdBec5F3RuJYRVM//BwT9telG3bmZAcoB
+         FxtlU7vncA/7M5kWQwcqyBdpk27zG/p5D5rGZq0nsDf1j034j4N9NruAlDbyjIIBOzmu
+         KbHBVnw1SI5P4hqVE2AIEQGFaF2ieMYBNUQvgI02g+e1RAX1uy1xzU6XISp25w56c5dM
+         rQeGODqdry9lEgQwF/Hg6FiJO1SoO7gDJ8o3BoJD78lW8gTuVok5Fl/klWvtUyspycM7
+         AmqA==
+X-Gm-Message-State: AOAM532jcwakILeJ+RRfPI4QyknirUMpZKArmVbmtERBQUf3YEr8M+pB
+        AOGbopeO05mizhBNkS7JDbWQ5dPD2ZUb11wOmK0=
+X-Google-Smtp-Source: ABdhPJyFOmiGOmRDkw8czUhuWEAUWZI3b6hfKAcdDSxdtm3oSTgs7z2noREt7vOvPl7JarLhxJEUxltkCz2WrL99cSU=
+X-Received: by 2002:a0d:c244:0:b0:2d1:1fbb:180d with SMTP id
+ e65-20020a0dc244000000b002d11fbb180dmr3902361ywd.196.1645038358332; Wed, 16
+ Feb 2022 11:05:58 -0800 (PST)
 MIME-Version: 1.0
-References: <CAHmME9rkDXbeNbe1uehoVONioy=pa8oBtJEW22Afbp=86A9SUQ@mail.gmail.com>
- <20220216113323.53332-1-Jason@zx2c4.com>
-In-Reply-To: <20220216113323.53332-1-Jason@zx2c4.com>
-From:   Rui Salvaterra <rsalvaterra@gmail.com>
-Date:   Wed, 16 Feb 2022 13:27:42 +0000
-Message-ID: <CALjTZvbS8OuDkAZ+3M9dwTzRd6Rd77dnd4nUdMhUA9BJgYWYEA@mail.gmail.com>
-Subject: Re: [PATCH v3] ath9k: use hw_random API instead of directly dumping
- into random.c
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     miaoqing@codeaurora.org,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>,
-        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        Kalle Valo <kvalo@kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
+References: <20220215174743.GA878920@embeddedor> <202202151016.C0471D6E@keescook>
+ <20220215192110.GA883653@embeddedor> <Ygv8wY75hNqS7zO6@unreal> <20220215193221.GA884407@embeddedor>
+In-Reply-To: <20220215193221.GA884407@embeddedor>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Wed, 16 Feb 2022 20:05:47 +0100
+Message-ID: <CAJZ5v0jpAnQk+Hub6ue6t712RW+W0YBjb_gAcZZbUeuYMGv7mg@mail.gmail.com>
+Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
+ flexible-array members
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        GR-QLogic-Storage-Upstream@marvell.com,
+        linux-alpha@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
+        Linux-sh list <linux-sh@vger.kernel.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-xtensa@linux-xtensa.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
-        Florian Fainelli <f.fainelli@gmail.com>
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        nouveau <nouveau@lists.freedesktop.org>,
+        coresight@lists.linaro.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
+        netdev <netdev@vger.kernel.org>,
+        Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+        "open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
+        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+        linux-staging@lists.linux.dev,
+        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        "open list:ACPI COMPONENT ARCHITECTURE (ACPICA)" <devel@acpica.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
+        linux-rdma@vger.kernel.org,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
+        <alsa-devel@alsa-project.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>, linux-perf-users@vger.kernel.org,
+        linux-hardening@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi again, Jason,
+On Tue, Feb 15, 2022 at 8:24 PM Gustavo A. R. Silva
+<gustavoars@kernel.org> wrote:
+>
+> On Tue, Feb 15, 2022 at 09:19:29PM +0200, Leon Romanovsky wrote:
+> > On Tue, Feb 15, 2022 at 01:21:10PM -0600, Gustavo A. R. Silva wrote:
+> > > On Tue, Feb 15, 2022 at 10:17:40AM -0800, Kees Cook wrote:
+> > > > On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
+> > > >
+> > > > These all look trivially correct to me. Only two didn't have the end of
+> > > > the struct visible in the patch, and checking those showed them to be
+> > > > trailing members as well, so:
+> > > >
+> > > > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > >
+> > > I'll add this to my -next tree.
+> >
+> > I would like to ask you to send mlx5 patch separately to netdev. We are working
+> > to delete that file completely and prefer to avoid from unnecessary merge conflicts.
+>
+> Oh OK. Sure thing; I will do so.
 
-On Wed, 16 Feb 2022 at 11:33, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+Can you also send the ACPI patch separately, please?
 
-[snipped]
-
-> Changes v2->v3:
-> - Use msleep_interruptable like other hwrng drivers.
-> - Give up after 110 tries.
-> - Return -EIO after giving up like other hwrng drivers.
-> - Use for loop for style nits.
-> - Append serial number for driver in case of multiple cards.
-
-[snipped]
-
-Everything working as expected here, so this patch (v3) is also
-
-Tested-by: Rui Salvaterra <rsalvaterra@gmail.com>
-
-Thanks,
-Rui
+We would like to route it through the upstream ACPICA code base.
