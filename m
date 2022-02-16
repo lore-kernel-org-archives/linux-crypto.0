@@ -2,80 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95130C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 07:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B224AC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 07:32:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbiBPHY0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Feb 2022 02:24:26 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:47224 "EHLO
+        id S229824AbiBPHce (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Feb 2022 02:32:34 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230015AbiBPHYZ (ORCPT
+        with ESMTP id S229959AbiBPHce (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Feb 2022 02:24:25 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C466582;
-        Tue, 15 Feb 2022 23:24:13 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 4BE8C1F394;
-        Wed, 16 Feb 2022 07:24:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1644996252;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=la8fDbA4HBZPVTzs7Wcc9oHvRT54XHsJ9QqMVM2Jakc=;
-        b=HO/7fI/grnwOWqYoytwQQ/sFmi3x0moVenbF3WGz48XIQppqkTVLpiPx410htdFwdOrMEH
-        ci6boG/plfdx6bhpPzEJJ+CQVEdaTxG2ea591NcjMy5V2Wkr0+KCbdUnyJXnlkYBLm2nO0
-        a0EWAKJdjnRZ1J305s2MXTpvJT2MUBU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1644996252;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=la8fDbA4HBZPVTzs7Wcc9oHvRT54XHsJ9QqMVM2Jakc=;
-        b=3+A2CUAqfFdVU/OoVtETQN0OVol/XTCJr5PCuSbGnXHmpxUevuVYL1360IQGb2nfIWt3bJ
-        QByslklFYeTLkxBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D01FB13A3E;
-        Wed, 16 Feb 2022 07:24:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id TqQ8KpumDGKBNAAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Wed, 16 Feb 2022 07:24:11 +0000
-Date:   Wed, 16 Feb 2022 08:24:10 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     linux-crypto@vger.kernel.org
-Cc:     Nicolai Stange <nstange@suse.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, leitao@debian.org,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] crypto: vmx: Turn CRYPTO_DEV_VMX_ENCRYPT into
- tristate
-Message-ID: <YgymmnfKZpMzAMro@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20220215185936.15576-1-pvorel@suse.cz>
- <20220215185936.15576-2-pvorel@suse.cz>
+        Wed, 16 Feb 2022 02:32:34 -0500
+X-Greylist: delayed 596 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Feb 2022 23:32:21 PST
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B1012D907;
+        Tue, 15 Feb 2022 23:32:20 -0800 (PST)
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id E0BC5201402;
+        Wed, 16 Feb 2022 07:15:43 +0000 (UTC)
+Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
+        id 6786F806D0; Wed, 16 Feb 2022 08:11:05 +0100 (CET)
+Date:   Wed, 16 Feb 2022 08:11:05 +0100
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+        miaoqing@codeaurora.org, rsalvaterra@gmail.com,
+        Jason Cooper <jason@lakedaemon.net>,
+        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
+        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        Kalle Valo <kvalo@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH] ath9k: use hw_random API instead of directly dumping
+ into random.c
+Message-ID: <Ygyjib2FKY87S7/H@owl.dominikbrodowski.net>
+References: <CAHmME9r4+ENUhZ6u26rAbq0iCWoKqTPYA7=_LWbGG98KvaCE6g@mail.gmail.com>
+ <20220215162812.195716-1-Jason@zx2c4.com>
+ <87o8374sx3.fsf@toke.dk>
+ <CAHmME9pZaYW-p=zU4v96TjeSijm-g03cNpvUJcNvhOqh5v+Lwg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220215185936.15576-2-pvorel@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHmME9pZaYW-p=zU4v96TjeSijm-g03cNpvUJcNvhOqh5v+Lwg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Am Wed, Feb 16, 2022 at 12:52:15AM +0100 schrieb Jason A. Donenfeld:
+> On 2/16/22, Toke Høiland-Jørgensen <toke@toke.dk> wrote:
+> >> @@ -22,9 +22,6 @@
+> >>  #include "hw.h"
+> >>  #include "ar9003_phy.h"
+> >>
+> >> -#define ATH9K_RNG_BUF_SIZE	320
+> >> -#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 10) >> 5) /* quality: 10/32 */
+> >
+> > So this comment says "quality: 10/32" but below you're setting "quality"
+> > as 320. No idea what the units are supposed to be, but is this right?
+> 
+> I think the unit is supposed to be how many entropic bits there are
+> out of 1024 bits? These types of estimates are always BS, so keeping
+> it on the lower end as before seemed right. Herbert can jump in here
+> if he has a better idea; that's his jig.
 
-I kept CRYPTO_DEV_VMX_ENCRYPT in drivers/crypto/vmx/Kconfig,
-but maybe I should have moved it into drivers/crypto/Kconfig.
+10/32 = 320/1024, so that change is correct.
 
-It's not clear what is preferred.
-
-Kind regards,
-Petr
+	Dominik
