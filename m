@@ -2,72 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DE7C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 11:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74265C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 13:27:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232176AbiBPLqG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Feb 2022 06:46:06 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37916 "EHLO
+        id S234210AbiBPN2H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Feb 2022 08:28:07 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232222AbiBPLqG (ORCPT
+        with ESMTP id S234152AbiBPN2G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Feb 2022 06:46:06 -0500
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B8ED205D;
-        Wed, 16 Feb 2022 03:45:54 -0800 (PST)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4JzGKP1qvcz8wZP;
-        Wed, 16 Feb 2022 19:42:33 +0800 (CST)
-Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
- (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 16 Feb
- 2022 19:45:52 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-        <colin.king@intel.com>, <yuehaibing@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] crypto: x86/des3 - Remove unused inline function des3_ede_enc_blk_3way()
-Date:   Wed, 16 Feb 2022 19:45:21 +0800
-Message-ID: <20220216114521.20092-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Wed, 16 Feb 2022 08:28:06 -0500
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6F7151D3E;
+        Wed, 16 Feb 2022 05:27:54 -0800 (PST)
+Received: by mail-vs1-xe36.google.com with SMTP id p7so2451142vsg.2;
+        Wed, 16 Feb 2022 05:27:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=W4NWQ4O/W36pB+bOALZ9wlT2YlOr6PG7OHv6tykJwH0=;
+        b=lAHHTLBXwuKLLUHWaLseZjIP5cTvJsu69Q9thecmcZ3q0ffGHTCcOfDZJgQ+BsaU7X
+         VJaGthSGbyLDnlUhzTNOirmBB5F7Qt2EEk+RrmOT7+T5WuR8cdDnJMknl0tWouNlGuVh
+         9mhATRhNi19QIAqUZHBI9t2YXVYTD5EUoVudmzAEgZdEoVQTZuF+8xlDPDcIFRRwOn8g
+         aUi/maLv8i6RYOy6i+1AX3tkKmgBfUDfKVKAYtOhjVYzCjYnN86wGxGPqUL7SqtqgDe1
+         SUnNRDnQa+P+Bx++qp0oDSbhsRilT2mpDr7NtF0lcnwKAsJa1C4D94jqqd9Cy1g/0u0G
+         Sy+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=W4NWQ4O/W36pB+bOALZ9wlT2YlOr6PG7OHv6tykJwH0=;
+        b=V2sejGUzsw+owRORLV0RcJtv+W8tZmQP0luzIB7ny4catcJ5jZgLqKjNXO0zosbK8Z
+         K9hz4BZsoreztivnSTFi4YhG/x4c1v8caRdZnfqhVjsGDhWhAzmlCd6yyNrJBnIDbwkR
+         Imoty/50X/c4hwfA0K1O9H/kMDCFCOkpV9DE0dik+zrT34d6Y2NGlsf6KtyW+E6F+uPW
+         W6GF/AWvtnDxYgwOQmpdLhXuskmifoOEz29o+M0tO/nYXBSp7v9hFsIRKmR1d4QK9VGk
+         L566R+wTVlfyXGayKgf7PDWb5WS99xR2sxWPmB7kYoFr5AuO1ZSdiCDwTntwzCYPw+Sm
+         Q3Rw==
+X-Gm-Message-State: AOAM533xgAr5V0CWj2R4dQOnW2i3tVFTg4nRvA+kG13wwux6+KwMFHJj
+        qQytLTX6qLDlU+GCoyVOcQPzAZ2QFLAj8YMy6A==
+X-Google-Smtp-Source: ABdhPJzJi19YNpCvzYwvosnnahkfB/aXCpYLA6aGj448BMw2ojTugtbCg0yk1f4Aj5s3nazDJ7Aob0vZmEcsqQKZVb8=
+X-Received: by 2002:a05:6102:2912:b0:31a:5ab3:f44b with SMTP id
+ cz18-20020a056102291200b0031a5ab3f44bmr1066907vsb.53.1645018073916; Wed, 16
+ Feb 2022 05:27:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
+References: <CAHmME9rkDXbeNbe1uehoVONioy=pa8oBtJEW22Afbp=86A9SUQ@mail.gmail.com>
+ <20220216113323.53332-1-Jason@zx2c4.com>
+In-Reply-To: <20220216113323.53332-1-Jason@zx2c4.com>
+From:   Rui Salvaterra <rsalvaterra@gmail.com>
+Date:   Wed, 16 Feb 2022 13:27:42 +0000
+Message-ID: <CALjTZvbS8OuDkAZ+3M9dwTzRd6Rd77dnd4nUdMhUA9BJgYWYEA@mail.gmail.com>
+Subject: Re: [PATCH v3] ath9k: use hw_random API instead of directly dumping
+ into random.c
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     miaoqing@codeaurora.org,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>,
+        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
+        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        Kalle Valo <kvalo@kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+        Florian Fainelli <f.fainelli@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is unused after commit 768db5fee3bb ("crypto: x86/des - drop CTR mode implementation")
+Hi again, Jason,
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- arch/x86/crypto/des3_ede_glue.c | 8 --------
- 1 file changed, 8 deletions(-)
+On Wed, 16 Feb 2022 at 11:33, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index 787c234d2469..abb8b1fe123b 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -45,14 +45,6 @@ static inline void des3_ede_dec_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 	des3_ede_x86_64_crypt_blk(dec_ctx, dst, src);
- }
- 
--static inline void des3_ede_enc_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
--					 const u8 *src)
--{
--	u32 *enc_ctx = ctx->enc.expkey;
--
--	des3_ede_x86_64_crypt_blk_3way(enc_ctx, dst, src);
--}
--
- static inline void des3_ede_dec_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 					 const u8 *src)
- {
--- 
-2.17.1
+[snipped]
 
+> Changes v2->v3:
+> - Use msleep_interruptable like other hwrng drivers.
+> - Give up after 110 tries.
+> - Return -EIO after giving up like other hwrng drivers.
+> - Use for loop for style nits.
+> - Append serial number for driver in case of multiple cards.
+
+[snipped]
+
+Everything working as expected here, so this patch (v3) is also
+
+Tested-by: Rui Salvaterra <rsalvaterra@gmail.com>
+
+Thanks,
+Rui
