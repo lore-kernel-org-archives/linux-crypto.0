@@ -2,166 +2,246 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A13C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 07:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3132C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Feb 2022 09:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230114AbiBPHcf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Feb 2022 02:32:35 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52350 "EHLO
+        id S232279AbiBPJdQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Feb 2022 04:33:16 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:57310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230074AbiBPHcf (ORCPT
+        with ESMTP id S232273AbiBPJdP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Feb 2022 02:32:35 -0500
-Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777BF12E16A;
-        Tue, 15 Feb 2022 23:32:21 -0800 (PST)
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id DD8062013FE;
-        Wed, 16 Feb 2022 07:15:43 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id D322A807CC; Wed, 16 Feb 2022 08:15:25 +0100 (CET)
-Date:   Wed, 16 Feb 2022 08:15:25 +0100
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     miaoqing@codeaurora.org, rsalvaterra@gmail.com,
-        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
-        "Sepehrdad, Pouyan" <pouyans@qti.qualcomm.com>,
-        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        Kalle Valo <kvalo@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Subject: Re: [PATCH v2] ath9k: use hw_random API instead of directly dumping
- into random.c
-Message-ID: <YgykjbhgdqeYyiY5@owl.dominikbrodowski.net>
-References: <CAHmME9pZaYW-p=zU4v96TjeSijm-g03cNpvUJcNvhOqh5v+Lwg@mail.gmail.com>
- <20220216000230.22625-1-Jason@zx2c4.com>
+        Wed, 16 Feb 2022 04:33:15 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281C09BBAC;
+        Wed, 16 Feb 2022 01:33:04 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D50A81F383;
+        Wed, 16 Feb 2022 09:33:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1645003982; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cm5AQQp0a7+cF9FKJnrJKZk4PS3iUbRyEAyckm/X4TI=;
+        b=vhPVK/gvcTeqGBs9PnYXK4vPKKb2z+G7rOsc8UTYubnPh7KXtGvAREA4Tg+qSeGmQmTnuu
+        n681xPpLBFJGu/757/412/e9Bgfxj8MBl2kipf6SWGvmcarr1xKuc4x5UVRVwCQzDozurC
+        v0o0znmF/Wsg6OUSFtIANGT127H4YCU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1645003982;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cm5AQQp0a7+cF9FKJnrJKZk4PS3iUbRyEAyckm/X4TI=;
+        b=LXM33yEiPiyv6aaYrqzs/Q92dsp+Cvlz2r3wOQM0Jl5hTEzJjWNCwgkuOC+1Wnh8qfM1F3
+        ysWjjVIVMn01PkCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7737213A9F;
+        Wed, 16 Feb 2022 09:33:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ldw7G87EDGJTcQAAMHmgww
+        (envelope-from <nstange@suse.de>); Wed, 16 Feb 2022 09:33:02 +0000
+From:   Nicolai Stange <nstange@suse.de>
+To:     Petr Vorel <pvorel@suse.cz>
+Cc:     linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, leitao@debian.org,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] crypto: vmx: Turn CRYPTO_DEV_VMX_ENCRYPT into tristate
+References: <20220215185936.15576-1-pvorel@suse.cz>
+        <20220215185936.15576-2-pvorel@suse.cz>
+Date:   Wed, 16 Feb 2022 10:33:01 +0100
+In-Reply-To: <20220215185936.15576-2-pvorel@suse.cz> (Petr Vorel's message of
+        "Tue, 15 Feb 2022 19:59:35 +0100")
+Message-ID: <87tuczf96a.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220216000230.22625-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Wed, Feb 16, 2022 at 01:02:30AM +0100 schrieb Jason A. Donenfeld:
-> Hardware random number generators are supposed to use the hw_random
-> framework. This commit turns ath9k's kthread-based design into a proper
-> hw_random driver.
-> 
-> This compiles, but I have no hardware or other ability to determine
-> whether it works. I'll leave further development up to the ath9k
-> and hw_random maintainers.
-> 
-> Cc: Toke Høiland-Jørgensen <toke@redhat.com>
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> v2 operates on whole words when possible.
-> 
->  drivers/net/wireless/ath/ath9k/ath9k.h |  2 +-
->  drivers/net/wireless/ath/ath9k/rng.c   | 72 +++++++++++---------------
->  2 files changed, 30 insertions(+), 44 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/ath/ath9k/ath9k.h b/drivers/net/wireless/ath/ath9k/ath9k.h
-> index ef6f5ea06c1f..142f472903dc 100644
-> --- a/drivers/net/wireless/ath/ath9k/ath9k.h
-> +++ b/drivers/net/wireless/ath/ath9k/ath9k.h
-> @@ -1072,7 +1072,7 @@ struct ath_softc {
->  
->  #ifdef CONFIG_ATH9K_HWRNG
->  	u32 rng_last;
-> -	struct task_struct *rng_task;
-> +	struct hwrng rng_ops;
->  #endif
->  };
->  
-> diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
-> index aae2bd3cac69..a0a58f8e08d3 100644
-> --- a/drivers/net/wireless/ath/ath9k/rng.c
-> +++ b/drivers/net/wireless/ath/ath9k/rng.c
-> @@ -22,11 +22,6 @@
->  #include "hw.h"
->  #include "ar9003_phy.h"
->  
-> -#define ATH9K_RNG_BUF_SIZE	320
-> -#define ATH9K_RNG_ENTROPY(x)	(((x) * 8 * 10) >> 5) /* quality: 10/32 */
-> -
-> -static DECLARE_WAIT_QUEUE_HEAD(rng_queue);
-> -
->  static int ath9k_rng_data_read(struct ath_softc *sc, u32 *buf, u32 buf_size)
->  {
->  	int i, j;
-> @@ -72,61 +67,52 @@ static u32 ath9k_rng_delay_get(u32 fail_stats)
->  	return delay;
->  }
->  
-> -static int ath9k_rng_kthread(void *data)
-> +static int ath9k_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
->  {
-> -	int bytes_read;
-> -	struct ath_softc *sc = data;
-> -	u32 *rng_buf;
-> -	u32 delay, fail_stats = 0;
-> -
-> -	rng_buf = kmalloc_array(ATH9K_RNG_BUF_SIZE, sizeof(u32), GFP_KERNEL);
-> -	if (!rng_buf)
-> -		goto out;
-> -
-> -	while (!kthread_should_stop()) {
-> -		bytes_read = ath9k_rng_data_read(sc, rng_buf,
-> -						 ATH9K_RNG_BUF_SIZE);
-> -		if (unlikely(!bytes_read)) {
-> -			delay = ath9k_rng_delay_get(++fail_stats);
-> -			wait_event_interruptible_timeout(rng_queue,
-> -							 kthread_should_stop(),
-> -							 msecs_to_jiffies(delay));
-> -			continue;
-> -		}
-> -
-> -		fail_stats = 0;
-> -
-> -		/* sleep until entropy bits under write_wakeup_threshold */
-> -		add_hwgenerator_randomness((void *)rng_buf, bytes_read,
-> -					   ATH9K_RNG_ENTROPY(bytes_read));
-> +	struct ath_softc *sc = container_of(rng, struct ath_softc, rng_ops);
-> +	int bytes_read = 0;
-> +	u32 fail_stats = 0, word;
-> +
-> +retry:
-> +	if (max & ~3UL)
-> +		bytes_read = ath9k_rng_data_read(sc, buf, max >> 2);
-> +	if ((max & 3UL) && ath9k_rng_data_read(sc, &word, 1)) {
-> +		memcpy(buf + bytes_read, &word, max & 3);
-> +		bytes_read += max & 3;
-> +		memzero_explicit(&word, sizeof(word));
-> +	}
-> +	if (max && unlikely(!bytes_read) && wait) {
-> +		msleep(ath9k_rng_delay_get(++fail_stats));
-> +		goto retry;
->  	}
+Hi Petr,
 
-Potentially, this waits forever, if wait is set and no data is returned.
-Instead, it should return to the main kthread loop every once in a while.
+Petr Vorel <pvorel@suse.cz> writes:
+
+> and remove CRYPTO_DEV_VMX, which looked redundant when only
+> CRYPTO_DEV_VMX_ENCRYPT used it. Also it forces CRYPTO_GHASH to be
+> builtin even CRYPTO_DEV_VMX_ENCRYPT was configured as module.
+
+I'm confused by the description. CRYPTO_DEV_VMX_ENCRYPT has been a
+tristate since ever? And thus, with CRYPTO_DEV_VMX_ENCRYPT=3Dm,
+CRYPTO_GHASH=3Dm would be possible as far as vmx is concerned?
+
+What this patch really does is to merge CRYPTO_DEV_VMX into
+CRYPTO_DEV_VMX_ENCRYPT AFAICS.
+
+These two seem indeed redundant to me, but for consistency with the
+other crypto drivers (e.g. bcm, ccree, ...), I'd rather keep
+CRYPTO_DEV_VMX and merge CRYPTO_DEV_VMX_ENCRYPT into it.
+
+
+> Update powerpc defconfigs and description in MAINTAINERS.
+
+The change to MAINTAINERS is completely unrelated? If anything, it had
+to come with a separate patch then.
+
+
+>
+> Signed-off-by: Petr Vorel <pvorel@suse.cz>
+> ---
+> new in v2
+>
+> This might be a bit aggressive, but IMHO CRYPTO_DEV_VMX only complicated
+> things for nothing.
+
+I agree on the redundancy, but as said, CRYPTO_DEV_VMX_ENCRYPT should
+probably the one to get dropped in favor of CRYPTO_DEV_VMX.
+
+
+> But if you do *not* agree with removing it, I just add
+> select to drivers/crypto/vmx/Kconfig (which forces dependencies to be
+> always modules.)
+>
+> If it's ok for you to remove, please also check whether the description
+> is ok. get_maintainer.pl script has size limitation:
+>
+> $ ./scripts/get_maintainer.pl drivers/crypto/vmx/Kconfig
+> ...
+> linux-crypto@vger.kernel.org (open list:IBM Power VMX Cryptographic Accel=
+eration Instru...)
+>
+> maybe the name should be shorter.
+>
+> Kind regards,
+> Petr
+>
+>  MAINTAINERS                            | 2 +-
+>  arch/powerpc/configs/powernv_defconfig | 2 +-
+>  arch/powerpc/configs/ppc64_defconfig   | 2 +-
+>  arch/powerpc/configs/pseries_defconfig | 2 +-
+>  drivers/crypto/Kconfig                 | 6 ------
+>  drivers/crypto/vmx/Kconfig             | 4 ++--
+>  6 files changed, 6 insertions(+), 12 deletions(-)
+
+If you were to drop CONFIG_CRYPTO_DEV_VMX (like it's implemented in this
+patch), then something had to be done about
+
+  obj-$(CONFIG_CRYPTO_DEV_VMX) +=3D vmx/
+
+in drivers/crypto/Makefile as well.
+
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ea3e6c914384..80e562579180 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -9207,7 +9207,7 @@ L:	target-devel@vger.kernel.org
+>  S:	Supported
+>  F:	drivers/scsi/ibmvscsi_tgt/
+>=20=20
+> -IBM Power VMX Cryptographic instructions
+> +IBM Power VMX Cryptographic Acceleration Instructions Driver
+>  M:	Breno Leit=C3=A3o <leitao@debian.org>
+>  M:	Nayna Jain <nayna@linux.ibm.com>
+>  M:	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+> diff --git a/arch/powerpc/configs/powernv_defconfig b/arch/powerpc/config=
+s/powernv_defconfig
+> index 49f49c263935..4b250d05dcdf 100644
+> --- a/arch/powerpc/configs/powernv_defconfig
+> +++ b/arch/powerpc/configs/powernv_defconfig
+> @@ -337,7 +337,7 @@ CONFIG_CRYPTO_TEA=3Dm
+>  CONFIG_CRYPTO_TWOFISH=3Dm
+>  CONFIG_CRYPTO_LZO=3Dm
+>  CONFIG_CRYPTO_DEV_NX=3Dy
+> -CONFIG_CRYPTO_DEV_VMX=3Dy
+> +CONFIG_CRYPTO_DEV_VMX_ENCRYPT=3Dm
+>  CONFIG_VIRTUALIZATION=3Dy
+>  CONFIG_KVM_BOOK3S_64=3Dm
+>  CONFIG_KVM_BOOK3S_64_HV=3Dm
+> diff --git a/arch/powerpc/configs/ppc64_defconfig b/arch/powerpc/configs/=
+ppc64_defconfig
+> index c8b0e80d613b..ebd33b94debb 100644
+> --- a/arch/powerpc/configs/ppc64_defconfig
+> +++ b/arch/powerpc/configs/ppc64_defconfig
+> @@ -355,7 +355,7 @@ CONFIG_CRYPTO_TWOFISH=3Dm
+>  CONFIG_CRYPTO_LZO=3Dm
+>  CONFIG_CRYPTO_DEV_NX=3Dy
+>  CONFIG_CRYPTO_DEV_NX_ENCRYPT=3Dm
+> -CONFIG_CRYPTO_DEV_VMX=3Dy
+> +CONFIG_CRYPTO_DEV_VMX_ENCRYPT=3Dm
+>  CONFIG_PRINTK_TIME=3Dy
+>  CONFIG_PRINTK_CALLER=3Dy
+>  CONFIG_MAGIC_SYSRQ=3Dy
+> diff --git a/arch/powerpc/configs/pseries_defconfig b/arch/powerpc/config=
+s/pseries_defconfig
+> index b571d084c148..304673817ef1 100644
+> --- a/arch/powerpc/configs/pseries_defconfig
+> +++ b/arch/powerpc/configs/pseries_defconfig
+> @@ -315,7 +315,7 @@ CONFIG_CRYPTO_TWOFISH=3Dm
+>  CONFIG_CRYPTO_LZO=3Dm
+>  CONFIG_CRYPTO_DEV_NX=3Dy
+>  CONFIG_CRYPTO_DEV_NX_ENCRYPT=3Dm
+> -CONFIG_CRYPTO_DEV_VMX=3Dy
+> +CONFIG_CRYPTO_DEV_VMX_ENCRYPT=3Dm
+>  CONFIG_VIRTUALIZATION=3Dy
+>  CONFIG_KVM_BOOK3S_64=3Dm
+>  CONFIG_KVM_BOOK3S_64_HV=3Dm
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 4f705674f94f..956f956607a5 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -761,12 +761,6 @@ config CRYPTO_DEV_QCOM_RNG
+>  	  To compile this driver as a module, choose M here. The
+>  	  module will be called qcom-rng. If unsure, say N.
+>=20=20
+> -config CRYPTO_DEV_VMX
+> -	bool "Support for VMX cryptographic acceleration instructions"
+> -	depends on PPC64 && VSX
+> -	help
+> -	  Support for VMX cryptographic acceleration instructions.
+> -
+
+As said, I'd keep this one (while moving the GHASH dependency here) ...
+
+
+>  source "drivers/crypto/vmx/Kconfig"
+
+... and drop this one.
 
 Thanks,
-	Dominik
+
+Nicolai
+
+
+>=20=20
+>  config CRYPTO_DEV_IMGTEC_HASH
+> diff --git a/drivers/crypto/vmx/Kconfig b/drivers/crypto/vmx/Kconfig
+> index c85fab7ef0bd..1a3808b719f3 100644
+> --- a/drivers/crypto/vmx/Kconfig
+> +++ b/drivers/crypto/vmx/Kconfig
+> @@ -1,7 +1,7 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  config CRYPTO_DEV_VMX_ENCRYPT
+> -	tristate "Encryption acceleration support on P8 CPU"
+> -	depends on CRYPTO_DEV_VMX
+> +	tristate "Power VMX cryptographic acceleration instructions driver"
+> +	depends on PPC64 && VSX
+>  	select CRYPTO_GHASH
+>  	default m
+>  	help
+
+--=20
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, G=
+ermany
+(HRB 36809, AG N=C3=BCrnberg), GF: Ivo Totev
