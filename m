@@ -2,278 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C584C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 18:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B6BC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 19:14:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbiBQSEm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Feb 2022 13:04:42 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53572 "EHLO
+        id S245040AbiBQTO7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Feb 2022 14:14:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230435AbiBQSEk (ORCPT
+        with ESMTP id S245035AbiBQTO6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Feb 2022 13:04:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7FC19E724;
-        Thu, 17 Feb 2022 10:04:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BED1FB823BC;
-        Thu, 17 Feb 2022 18:04:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC4FC340E8;
-        Thu, 17 Feb 2022 18:04:21 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ekrv+7Po"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645121059;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3sdSMpRluECl8F3M66Ei85zNDZpALsnQKpJdjXWjujY=;
-        b=ekrv+7PoL7vxDneeC2Mupod818mRGqWYdALDoKn2+rfNvYdBUNFzEa3RaUBxZBlbjx9QBo
-        35J55E1VJ4algD8Ds7sKK7klLxwWrgyjTj8FuHVcUZkjYgqApSqeL4zs5yfjvUFxK2UDLD
-        0wEiN/HrBji29kx5X4c4LUdy9K2UjcM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c9b1b92e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 17 Feb 2022 18:04:18 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     bigeasy@linutronix.de, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: [PATCH v6] random: clear fast pool, crng, and batches in cpuhp bring up
-Date:   Thu, 17 Feb 2022 19:04:09 +0100
-Message-Id: <20220217180409.13151-1-Jason@zx2c4.com>
-In-Reply-To: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
-References: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
+        Thu, 17 Feb 2022 14:14:58 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2052.outbound.protection.outlook.com [40.107.236.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDEB8D697;
+        Thu, 17 Feb 2022 11:14:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iX9/+C5CDscWcxlpGzrFFSHmPZomLuOoV5bWLzwPa+Nx/T2Pop4VpnyefFyMCr8ejiACTZaBge2TCzmb602RtS2paIdXF+mWpS0gYbkkKvMMK6XerVQpwljMDcuSRDi+9Jb4b2a8DnElaD+Tkzx/LWcR5xyYtlajMj0Coyi0RDoeZx1Sv0yyIUJKwfnLZ6vasKhGvO/rTJf0HoweOyJEn5Xb0WooztZMlzrRx+MKhvQn+r60htq48EeV9A6mAu0b4a2RSEXn1NtZ0/cKO6on7Wz/ps5iAUkK03/Udtck8J31Mttv0gLpdN3FsUiL+7avFQggE+B1yVfqiCMHzi/2mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gU76c8YXqyjJqYId7CBqPxg7Qp74rkLTsrT6kIdQTbE=;
+ b=N9rLwE9QaQ3KR6fxlejAwp5+l2X3lUiBtThjauSv+XKBpqSaHj1QIwREzG5hTXTEkExeH9hjrlG9bSQS5uY9K6qO25cACjEl7yO6ndz6mS46SIZn0C7CSK8XsmUdDoN7Bahcgz+kbD34JXXBzRRQc0uKD+h2YZ3EewfxCD5hg5zOtoKepzyMQM06izBxSFIMWrZBmOWyknTJqlO/tS/hLKd26yWwMYsgBqI515R4cBoBMMzUGGeHq9M55w6+bYh2wwwak0UDt/c6aP7Fb8VWbkAeacZQHm4XCvpvvuvCAqLpd/toLdTkimbPJUVhuCHRVlTnpBbR3tG9NodILxnCtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.62.198) smtp.rcpttodomain=gondor.apana.org.au
+ smtp.mailfrom=xilinx.com; dmarc=pass (p=none sp=none pct=100) action=none
+ header.from=xilinx.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gU76c8YXqyjJqYId7CBqPxg7Qp74rkLTsrT6kIdQTbE=;
+ b=bcdsiM7xvdv9wQ/zFdRg5k/t9/VqhyXX7LbInIbJNql5VGVq/ZVpBlGfJnlCS5na3t57BK7TsXePcpKHYEGXICDFNouZLlKZsMSENRETXrZ/BllbABPYinSmu4PMcBw08LkMrOE0NbvBPDpzoEO43Oi31AIxutcr1NkOa5kad10=
+Received: from BN6PR22CA0066.namprd22.prod.outlook.com (2603:10b6:404:ca::28)
+ by CH0PR02MB8117.namprd02.prod.outlook.com (2603:10b6:610:10a::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.15; Thu, 17 Feb
+ 2022 19:14:36 +0000
+Received: from BN1NAM02FT010.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:404:ca:cafe::23) by BN6PR22CA0066.outlook.office365.com
+ (2603:10b6:404:ca::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.13 via Frontend
+ Transport; Thu, 17 Feb 2022 19:14:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.62.198)
+ smtp.mailfrom=xilinx.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.62.198 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.62.198; helo=xsj-pvapexch01.xlnx.xilinx.com;
+Received: from xsj-pvapexch01.xlnx.xilinx.com (149.199.62.198) by
+ BN1NAM02FT010.mail.protection.outlook.com (10.13.2.128) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4975.11 via Frontend Transport; Thu, 17 Feb 2022 19:14:35 +0000
+Received: from xsj-pvapexch02.xlnx.xilinx.com (172.19.86.41) by
+ xsj-pvapexch01.xlnx.xilinx.com (172.19.86.40) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.14; Thu, 17 Feb 2022 11:14:32 -0800
+Received: from smtp.xilinx.com (172.19.127.96) by
+ xsj-pvapexch02.xlnx.xilinx.com (172.19.86.41) with Microsoft SMTP Server id
+ 15.1.2176.14 via Frontend Transport; Thu, 17 Feb 2022 11:14:32 -0800
+Envelope-to: git@xilinx.com,
+ herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+Received: from [10.140.6.15] (port=57270 helo=xhdharshah40.xilinx.com)
+        by smtp.xilinx.com with esmtp (Exim 4.90)
+        (envelope-from <harsha.harsha@xilinx.com>)
+        id 1nKmEZ-0002nF-I8; Thu, 17 Feb 2022 11:14:31 -0800
+From:   Harsha <harsha.harsha@xilinx.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <michals@xilinx.com>
+CC:     <saratcha@xilinx.com>, <harshj@xilinx.com>, <git@xilinx.com>,
+        Harsha <harsha.harsha@xilinx.com>
+Subject: [PATCH V2 1/4] drivers: crypto: Updated Makefile for xilinx subdirectory
+Date:   Fri, 18 Feb 2022 00:44:21 +0530
+Message-ID: <1645125264-11033-2-git-send-email-harsha.harsha@xilinx.com>
+X-Mailer: git-send-email 1.8.2.1
+In-Reply-To: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
+References: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fd4a9820-6119-4305-1e21-08d9f249bc4e
+X-MS-TrafficTypeDiagnostic: CH0PR02MB8117:EE_
+X-Microsoft-Antispam-PRVS: <CH0PR02MB811764963AB432CFF9D08929DE369@CH0PR02MB8117.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VBQeMarPRjAk4QFEL2MyNnXfYB/MJQTGRkIIagWWXSOxuYcOYtDt80UvOJ+nwh4AbPAcTX7LHUB7frDEDmS7hjW0r4HoIf2BcnC1d3vWDFCWciHcbZn0e2TQmUguJu1UBKaSaFLkI6M/c6/D8YPAz8H2N55xW2IxGC12Uuk1lRjHjIYmdi1zTd7HuKbLNSkgx43VPz7mjVT6UEmswo9e24ywg0ANi0SRH1LVomvNd89ptLYfDcn+2OrugZ12YXOlgVSv/66Csu0gCkiUbIsIkCfyF6w5rsggrJ52LzgN7eRa1HssPsUBT874/1SEiRaYC8tzv1BkiQLE4jv5swgRZBWndmyuRPss3VvxtwnLaYdNmfWXq6Fc3NM7SspPl+Q0GtvQgVOJtQgGnSW9AMmPGwVN9eilKntXr/7fF0jd4Lz1xu7hcMr0JRHCovKiWiiQXwTJHOdHH5KHyfKX95IaTBI/1cnUK7px7iEyER+a6+ThNoNyKtfx2GiU0IJTWLT/tsrcMVTySt5JMpKghphtaZj3ilLKjjuNr2DonZg7aJZlGQQhTRfIs0gWtROv87wYgIUPpAJwIuxa3rvzpC3Z8A6Z132pLk1+60gfzGv7fnDKfO8VReMFQkB7sGQzBd9jT6TWXtH/IZtbGBPOjlPrFClaIwUlF+54Lh5OKr1RU63xUFZIQSvyX3JllgBE7FtRlrU8Xg+9Th6W4bxORs5O6vlhIahfGB8SVLVfqyNfqDQ=
+X-Forefront-Antispam-Report: CIP:149.199.62.198;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:xsj-pvapexch01.xlnx.xilinx.com;PTR:unknown-62-198.xilinx.com;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(2616005)(26005)(336012)(426003)(6636002)(186003)(107886003)(47076005)(7696005)(83380400001)(6666004)(9786002)(82310400004)(7636003)(356005)(15650500001)(36756003)(54906003)(4326008)(8676002)(70206006)(5660300002)(4744005)(8936002)(110136005)(40460700003)(70586007)(316002)(508600001)(36860700001)(2906002)(102446001)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 19:14:35.4000
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd4a9820-6119-4305-1e21-08d9f249bc4e
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.62.198];Helo=[xsj-pvapexch01.xlnx.xilinx.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN1NAM02FT010.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR02MB8117
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For the irq randomness fast pool, rather than having to use expensive
-atomics, which were visibly the most expensive thing in the entire irq
-handler, simply take care of the extreme edge case of resetting count to
-zero in the cpuhp online handler, just after workqueues have been
-reenabled. This simplifies the code a bit and lets us use vanilla
-variables rather than atomics, and performance should be improved.
+This patch updates the Makefile for xilinx subdirectory.
+CONFIG_CRYPTO_DEV_ZYNQMP_AES protects zynqmp-aes-gcm.o and it is used
+twice (in drivers/crypto/Makefile and drivers/crypto/xilinx/Makefile)
+and it is enough to use it once.
 
-As well, very early on when the CPU comes up, while interrupts are still
-disabled, we clear out the per-cpu crng and its batches, so that it
-always starts with fresh randomness.
-
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Harsha <harsha.harsha@xilinx.com>
+Reviewed-by: Michal Simek <michal.simek@xilinx.com>
 ---
-v6 improves the comments around each of the cpuhp functions, as
-requested.
+ drivers/crypto/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/char/random.c      | 62 +++++++++++++++++++++++++++++---------
- include/linux/cpuhotplug.h |  2 ++
- include/linux/random.h     |  5 +++
- kernel/cpu.c               | 11 +++++++
- 4 files changed, 65 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 8d5abeefcc4f..caa276cfbc76 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -697,6 +697,25 @@ u32 get_random_u32(void)
- }
- EXPORT_SYMBOL(get_random_u32);
- 
-+#ifdef CONFIG_SMP
-+/*
-+ * This function is called when the CPU is coming up, with entry
-+ * CPUHP_RANDOM_PREPARE, which comes before CPUHP_WORKQUEUE_PREP.
-+ */
-+int random_prepare_cpu(unsigned int cpu)
-+{
-+	/*
-+	 * When the cpu comes back online, immediately invalidate both
-+	 * the per-cpu crng and all batches, so that we serve fresh
-+	 * randomness.
-+	 */
-+	per_cpu_ptr(&crngs, cpu)->generation = ULONG_MAX;
-+	per_cpu_ptr(&batched_entropy_u32, cpu)->position = UINT_MAX;
-+	per_cpu_ptr(&batched_entropy_u64, cpu)->position = UINT_MAX;
-+	return 0;
-+}
-+#endif
-+
- /**
-  * randomize_page - Generate a random, page aligned address
-  * @start:	The smallest acceptable address the caller will take.
-@@ -1182,7 +1201,7 @@ struct fast_pool {
- 	};
- 	struct work_struct mix;
- 	unsigned long last;
--	atomic_t count;
-+	unsigned int count;
- 	u16 reg_idx;
- };
- 
-@@ -1218,6 +1237,29 @@ static void fast_mix(u32 pool[4])
- 
- static DEFINE_PER_CPU(struct fast_pool, irq_randomness);
- 
-+#ifdef CONFIG_SMP
-+/*
-+ * This function is called when the CPU has just come online, with
-+ * entry CPUHP_AP_RANDOM_ONLINE, just after CPUHP_AP_WORKQUEUE_ONLINE.
-+ */
-+int random_online_cpu(unsigned int cpu)
-+{
-+	/*
-+	 * During CPU shutdown and before CPU onlining, add_interrupt_
-+	 * randomness() may schedule mix_interrupt_randomness(), and
-+	 * set the MIX_INFLIGHT flag. However, because the worker can
-+	 * be scheduled on a different CPU during this period, that
-+	 * flag will never be cleared. For that reason, we zero out
-+	 * the flag here, which runs just after workqueues are onlined
-+	 * for the CPU again. This also has the effect of setting the
-+	 * irq randomness count to zero so that new accumulated irqs
-+	 * are fresh.
-+	 */
-+	per_cpu_ptr(&irq_randomness, cpu)->count = 0;
-+	return 0;
-+}
-+#endif
-+
- static u32 get_reg(struct fast_pool *f, struct pt_regs *regs)
- {
- 	u32 *ptr = (u32 *)regs;
-@@ -1242,15 +1284,6 @@ static void mix_interrupt_randomness(struct work_struct *work)
- 	local_irq_disable();
- 	if (fast_pool != this_cpu_ptr(&irq_randomness)) {
- 		local_irq_enable();
--		/*
--		 * If we are unlucky enough to have been moved to another CPU,
--		 * during CPU hotplug while the CPU was shutdown then we set
--		 * our count to zero atomically so that when the CPU comes
--		 * back online, it can enqueue work again. The _release here
--		 * pairs with the atomic_inc_return_acquire in
--		 * add_interrupt_randomness().
--		 */
--		atomic_set_release(&fast_pool->count, 0);
- 		return;
- 	}
- 
-@@ -1259,7 +1292,7 @@ static void mix_interrupt_randomness(struct work_struct *work)
- 	 * consistent view, before we reenable irqs again.
- 	 */
- 	memcpy(pool, fast_pool->pool32, sizeof(pool));
--	atomic_set(&fast_pool->count, 0);
-+	fast_pool->count = 0;
- 	fast_pool->last = jiffies;
- 	local_irq_enable();
- 
-@@ -1295,14 +1328,13 @@ void add_interrupt_randomness(int irq)
- 	}
- 
- 	fast_mix(fast_pool->pool32);
--	/* The _acquire here pairs with the atomic_set_release in mix_interrupt_randomness(). */
--	new_count = (unsigned int)atomic_inc_return_acquire(&fast_pool->count);
-+	new_count = ++fast_pool->count;
- 
- 	if (unlikely(crng_init == 0)) {
- 		if (new_count >= 64 &&
- 		    crng_pre_init_inject(fast_pool->pool32, sizeof(fast_pool->pool32),
- 					 true, true) > 0) {
--			atomic_set(&fast_pool->count, 0);
-+			fast_pool->count = 0;
- 			fast_pool->last = now;
- 			if (spin_trylock(&input_pool.lock)) {
- 				_mix_pool_bytes(&fast_pool->pool32, sizeof(fast_pool->pool32));
-@@ -1320,7 +1352,7 @@ void add_interrupt_randomness(int irq)
- 
- 	if (unlikely(!fast_pool->mix.func))
- 		INIT_WORK(&fast_pool->mix, mix_interrupt_randomness);
--	atomic_or(MIX_INFLIGHT, &fast_pool->count);
-+	fast_pool->count |= MIX_INFLIGHT;
- 	queue_work_on(raw_smp_processor_id(), system_highpri_wq, &fast_pool->mix);
- }
- EXPORT_SYMBOL_GPL(add_interrupt_randomness);
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 411a428ace4d..481e565cc5c4 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -100,6 +100,7 @@ enum cpuhp_state {
- 	CPUHP_AP_ARM_CACHE_B15_RAC_DEAD,
- 	CPUHP_PADATA_DEAD,
- 	CPUHP_AP_DTPM_CPU_DEAD,
-+	CPUHP_RANDOM_PREPARE,
- 	CPUHP_WORKQUEUE_PREP,
- 	CPUHP_POWER_NUMA_PREPARE,
- 	CPUHP_HRTIMERS_PREPARE,
-@@ -240,6 +241,7 @@ enum cpuhp_state {
- 	CPUHP_AP_PERF_CSKY_ONLINE,
- 	CPUHP_AP_WATCHDOG_ONLINE,
- 	CPUHP_AP_WORKQUEUE_ONLINE,
-+	CPUHP_AP_RANDOM_ONLINE,
- 	CPUHP_AP_RCUTREE_ONLINE,
- 	CPUHP_AP_BASE_CACHEINFO_ONLINE,
- 	CPUHP_AP_ONLINE_DYN,
-diff --git a/include/linux/random.h b/include/linux/random.h
-index d7354de9351e..6148b8d1ccf3 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -156,4 +156,9 @@ static inline bool __init arch_get_random_long_early(unsigned long *v)
- }
- #endif
- 
-+#ifdef CONFIG_SMP
-+extern int random_prepare_cpu(unsigned int cpu);
-+extern int random_online_cpu(unsigned int cpu);
-+#endif
-+
- #endif /* _LINUX_RANDOM_H */
-diff --git a/kernel/cpu.c b/kernel/cpu.c
-index 407a2568f35e..238cba15449f 100644
---- a/kernel/cpu.c
-+++ b/kernel/cpu.c
-@@ -34,6 +34,7 @@
- #include <linux/scs.h>
- #include <linux/percpu-rwsem.h>
- #include <linux/cpuset.h>
-+#include <linux/random.h>
- 
- #include <trace/events/power.h>
- #define CREATE_TRACE_POINTS
-@@ -1659,6 +1660,11 @@ static struct cpuhp_step cpuhp_hp_states[] = {
- 		.startup.single		= perf_event_init_cpu,
- 		.teardown.single	= perf_event_exit_cpu,
- 	},
-+	[CPUHP_RANDOM_PREPARE] = {
-+		.name			= "random:prepare",
-+		.startup.single		= random_prepare_cpu,
-+		.teardown.single	= NULL,
-+	},
- 	[CPUHP_WORKQUEUE_PREP] = {
- 		.name			= "workqueue:prepare",
- 		.startup.single		= workqueue_prepare_cpu,
-@@ -1782,6 +1788,11 @@ static struct cpuhp_step cpuhp_hp_states[] = {
- 		.startup.single		= workqueue_online_cpu,
- 		.teardown.single	= workqueue_offline_cpu,
- 	},
-+	[CPUHP_AP_RANDOM_ONLINE] = {
-+		.name			= "random:online",
-+		.startup.single		= random_online_cpu,
-+		.teardown.single	= NULL,
-+	},
- 	[CPUHP_AP_RCUTREE_ONLINE] = {
- 		.name			= "RCU/tree:online",
- 		.startup.single		= rcutree_online_cpu,
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 1fe5120..0a4fff2 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -47,7 +47,7 @@ obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+ obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+-obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += xilinx/
++obj-y += xilinx/
+ obj-y += hisilicon/
+ obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
+ obj-y += keembay/
 -- 
-2.35.0
+1.8.2.1
 
