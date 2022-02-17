@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 130CDC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 19:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F109C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 19:14:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245062AbiBQTPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S245057AbiBQTPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 17 Feb 2022 14:15:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35348 "EHLO
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245035AbiBQTPA (ORCPT
+        with ESMTP id S245052AbiBQTPC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Feb 2022 14:15:00 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2074.outbound.protection.outlook.com [40.107.96.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFA349025A;
-        Thu, 17 Feb 2022 11:14:42 -0800 (PST)
+        Thu, 17 Feb 2022 14:15:02 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2076.outbound.protection.outlook.com [40.107.223.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F234F90265;
+        Thu, 17 Feb 2022 11:14:47 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZB6JnkT5RvdxaMWuu+RsAAvetMe/KqwSaJY+le8Pe+VAIql+8jQSzN+O9Cq3tooUwNilEFNqSi69YYM+nW+/efgKIwJx6SqALeD1mlHeOAAGOH85XEWwOqMJFsw+ThIklRrEIZ+qSn48r1k1c7+nl/3x9/5tBRwMXaU48G1eKaWRCnFTsvqZJ2eFq0S7WSgny3ezwv6cyBz9OTT+OtDYk5rGYPclcgseHYajAYb9hVmcfakaCWEPiJDVp+BpRhS3GtmoXSUmkYZh9CJQY7GtbhDmauoHHW+9t/b2W6ghlbvKHHXxdyThKEWmU3P6Z7YCooxPq6Vt+4xmZ9KsQfoglQ==
+ b=nxgVq/qWQt5HMdLdcHq04K1PGvWJLL07iRxJwyfdbA1sOv2t19VFtpSK0FvMPOTOubYXnmRDaV/88Z4uDjif/Y3umkXq3xmnUmHAdUEUD6XwyhSXsa7ybTMF2yY3tsrfYJ7S20dHQ0jggDohJH6D9o3ijRCYLpMQ5SZqnUZBcHFcdbI7SSMC9iqZvZHmgVzRuomQHheIT2PVQLclSW/8DWpaABE7Ql4ypTiaUzKFyWE5T4xR2eFwY+6L8oT35jvDuppf6ccTS7iwMOOg6tmmNz5l/o/2K6rDE9ZLOJ6hL8LUsGFcBhEWtBD1P+G3ofYKo3lrN9HMEpaMsNWU+FPnvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QKtS+m2X/zvvqkzobqHAxRy6RQYhGRx+qxgr6ASLPqc=;
- b=E2FAmZGQfl09lMxzfeCMUCEHgtzaQ72FG4MIftITgtt1PlK77yOjOHfSvkoQef5BNVybrycIOq4hdtNzUkV9hSULP63iYaBBiynL2+hodPjbt3x1rxQhIhht4O0RpCT/KPlEWPmEcyVtw2UANXk16QHG2oWD4Z8XdgfEF3CLUnu4o0FTUYEsQ8TOfmkFHfAPp+gIQgnq+HAB9qjIWg7QjSgIaAUfjBYOPI5//SRFgxPv1uDuT2Y17F44Zpp3fEng4H/q2OauUiRHYhliY7RwjxxhvI/cGCHxDYjOzYMSXixb5pmN+obw/fwsUhWVnrANa8NArCczHxkdc2Q306F9zA==
+ bh=CuT+Fxx/s+iFZhmctPLI+eHNZRpiHpVzj6HCIZt7iNQ=;
+ b=ir4iWs+3lskrU3HmDVoTwo6V8Jj7R1p+YbO2NeSG0M/PMn7O4UeHlyvFySK6ErAs+mmFT6hNUuujfpSw46n6l9UFCrWssUfNpgltFVGl/7nGGmigb/haAyQFCYYtvcNwBfARM5cNuZ+D7iyRD3LAKg98BUr4k+84L9Y6dsFp6vRfYzCW1V339Jc9LDzNODnGhAZBKp5VpLGDIfIFLz5i1NuRyQVmFPL0DR64M88iwj0Y9DPsxxdJkSUVrA/0Zbpa0a4abMH9tzfM7ZVGNds7QkQ+wsxFHKRLvJf26RSyXnUQOBHfp2fVXltgx2Nn6cam8JoTgc0ONlJkSr/uZIMLVA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.62.198) smtp.rcpttodomain=gondor.apana.org.au
  smtp.mailfrom=xilinx.com; dmarc=pass (p=none sp=none pct=100) action=none
@@ -29,35 +29,35 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QKtS+m2X/zvvqkzobqHAxRy6RQYhGRx+qxgr6ASLPqc=;
- b=PnJkKpgkC6XXUfB8vnasswpFLtdy7M67b8NTixiv1LPYPIe5zkitKazzN3d2CzqqFpbkNRxhBAW0WHYnHjW8x8m3Nl5oM4qml7BKd8vgruu2OFzG6BqjDadubFy40b+FClqOM0tkDPO86d8PlJgzeQb7EoZNACQVnNI9sd8Qdoo=
-Received: from BN6PR22CA0065.namprd22.prod.outlook.com (2603:10b6:404:ca::27)
- by CY4PR02MB2279.namprd02.prod.outlook.com (2603:10b6:903:a::20) with
+ bh=CuT+Fxx/s+iFZhmctPLI+eHNZRpiHpVzj6HCIZt7iNQ=;
+ b=sFpMXoDa4jRaGUTKrlhuBXr6YPpypZAFrNCXoBzzhcWKU8yIET+2MI+j77xUD24AudHQp1errAjuKKplvW8Atapubyj4r6gxnMp8BbPeCpAGUbk0rwzFPxPkz5jqb/LcQr0GxR3U2926Rq6J0V+7nSMVJvXICZ+iyQjDE4hU6+U=
+Received: from SA9P221CA0020.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::25)
+ by CY4PR02MB3253.namprd02.prod.outlook.com (2603:10b6:910:80::37) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.17; Thu, 17 Feb
- 2022 19:14:41 +0000
-Received: from BN1NAM02FT010.eop-nam02.prod.protection.outlook.com
- (2603:10b6:404:ca:cafe::af) by BN6PR22CA0065.outlook.office365.com
- (2603:10b6:404:ca::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.20 via Frontend
- Transport; Thu, 17 Feb 2022 19:14:40 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.17; Thu, 17 Feb
+ 2022 19:14:45 +0000
+Received: from SN1NAM02FT0003.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:806:25:cafe::18) by SA9P221CA0020.outlook.office365.com
+ (2603:10b6:806:25::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16 via Frontend
+ Transport; Thu, 17 Feb 2022 19:14:45 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.62.198)
  smtp.mailfrom=xilinx.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=xilinx.com;
 Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.62.198 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.62.198; helo=xsj-pvapexch01.xlnx.xilinx.com;
-Received: from xsj-pvapexch01.xlnx.xilinx.com (149.199.62.198) by
- BN1NAM02FT010.mail.protection.outlook.com (10.13.2.128) with Microsoft SMTP
+ client-ip=149.199.62.198; helo=xsj-pvapexch02.xlnx.xilinx.com;
+Received: from xsj-pvapexch02.xlnx.xilinx.com (149.199.62.198) by
+ SN1NAM02FT0003.mail.protection.outlook.com (10.97.4.80) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4975.11 via Frontend Transport; Thu, 17 Feb 2022 19:14:40 +0000
+ 15.20.4975.11 via Frontend Transport; Thu, 17 Feb 2022 19:14:44 +0000
 Received: from xsj-pvapexch02.xlnx.xilinx.com (172.19.86.41) by
- xsj-pvapexch01.xlnx.xilinx.com (172.19.86.40) with Microsoft SMTP Server
+ xsj-pvapexch02.xlnx.xilinx.com (172.19.86.41) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Thu, 17 Feb 2022 11:14:35 -0800
+ 15.1.2176.14; Thu, 17 Feb 2022 11:14:29 -0800
 Received: from smtp.xilinx.com (172.19.127.96) by
  xsj-pvapexch02.xlnx.xilinx.com (172.19.86.41) with Microsoft SMTP Server id
- 15.1.2176.14 via Frontend Transport; Thu, 17 Feb 2022 11:14:35 -0800
+ 15.1.2176.14 via Frontend Transport; Thu, 17 Feb 2022 11:14:29 -0800
 Envelope-to: git@xilinx.com,
  herbert@gondor.apana.org.au,
  davem@davemloft.net,
@@ -67,127 +67,87 @@ Envelope-to: git@xilinx.com,
 Received: from [10.140.6.15] (port=57270 helo=xhdharshah40.xilinx.com)
         by smtp.xilinx.com with esmtp (Exim 4.90)
         (envelope-from <harsha.harsha@xilinx.com>)
-        id 1nKmEc-0002nF-G6; Thu, 17 Feb 2022 11:14:34 -0800
+        id 1nKmEW-0002nF-K3; Thu, 17 Feb 2022 11:14:29 -0800
 From:   Harsha <harsha.harsha@xilinx.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>, <michals@xilinx.com>
 CC:     <saratcha@xilinx.com>, <harshj@xilinx.com>, <git@xilinx.com>,
         Harsha <harsha.harsha@xilinx.com>
-Subject: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3 functionality
-Date:   Fri, 18 Feb 2022 00:44:22 +0530
-Message-ID: <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
+Subject: [PATCH V2 0/4] crypto: Add Xilinx ZynqMP SHA3 driver support
+Date:   Fri, 18 Feb 2022 00:44:20 +0530
+Message-ID: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
 X-Mailer: git-send-email 1.8.2.1
-In-Reply-To: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
-References: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f666f652-1130-4e1c-bfd0-08d9f249bf2e
-X-MS-TrafficTypeDiagnostic: CY4PR02MB2279:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR02MB22796308AF77D81288E777FADE369@CY4PR02MB2279.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 54292213-ebd0-496a-c962-08d9f249c16b
+X-MS-TrafficTypeDiagnostic: CY4PR02MB3253:EE_
+X-Microsoft-Antispam-PRVS: <CY4PR02MB3253AB6A73585C652CB3B730DE369@CY4PR02MB3253.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ng83sYTzIs/O33QKL91t8jYI8NwIuRKrxyKr357v4EfN8Ch1FqWvXtf4Bl6TIw7E5ky1StrQ4zPFHqXjsCN0qIpsB0U9N3IsJWC524J4GUuOfkd6aJVZuO5fptjnfWmCsyk7QZYwFNZPbFo9+po7jfkS/LIIm/gdg2Hor8ceEbPHXqPEyx72ibdciSAkdSQ4Y0AV8G4nOlwDa/HjVA8qGIm45DrJBlXeBPUoMRuUP3+gWlaWEPprk0Dy9IyC37Zt6sZ9FsL+VD4wuEqOGkWc+Za/7viohN4KgW7Oe0o5yzWm3xueWIa3szfeQGf9aBJeAsJW8f7CaWqG9Jkywg2UCiJDSW0oUk8X6oUkJd9/CGHSLH7WNozK9i8UGtiEVr6IxdcXxrNRHPK5VfUa+fxGqGT9x5hUW5jKtHubAJQ4aB50opxoU4jmfjqaDFjKfhY9fGlIRwWgHbeulV++CLq8gr4uYdHiroylXadXKC2n7cHgDVaq3TotaSoe65I7hIR7iWILPU1Uo7pcY9PpT0kIirdacLD5G2AAMYsqNdv08sWLGDWQf46Egep//N+/hYHTSskOcYXuzP5ft+xs3WWoTEnzScvc7SEa8FAD9qgY0LT4GMWUdfxr3zYhbesXdO8ZHGOyMEiew+NkK0SmPF34je39oCTPaLkEgkQOjvH6PDuU08DS0Vyskabh1Bl/D5tFD6Cxh6BKyX/xO5yHYYlSCEpXGQ4XVXOJnNdx4OtqAws=
-X-Forefront-Antispam-Report: CIP:149.199.62.198;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:xsj-pvapexch01.xlnx.xilinx.com;PTR:unknown-62-198.xilinx.com;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(8936002)(83380400001)(36756003)(70206006)(4326008)(6636002)(8676002)(54906003)(7696005)(5660300002)(70586007)(40460700003)(316002)(7636003)(6666004)(9786002)(356005)(36860700001)(2906002)(107886003)(2616005)(82310400004)(47076005)(186003)(26005)(508600001)(426003)(336012)(110136005)(102446001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 81TqV9NdDqrumSoeyAzoi7O7McW0D070C+Aoi4j7+/15h7quAi+qLxwi+dT5prq9H3eyPZzeCVfKk08SFepaPYI9qGTdx2v7QSUMVCqlvln3lVRqmlpWCSUIjnecr8+ajtHgeLx0SOrT0rrPP10EUvcrjyIlo4M8yGzSX80owNg3gw8uzPGW/4XYkT4qYmGuY5oBJ1C+eTvDd7BySv+KiakwM8mzOTKDNFUfLuY2ozKZlw/Q7H6bxzrr6BqRryKbMnKz8MHIdjEyN9up6w6B+z7mqCbn65qQaVQcOKHskmTuQLpHwPx9FnlHHtF5JxWaLxEvHvmLGcSaFiBDWiEBTWLyU/WWpHiskTI3u2Mlfv91RFRkwxPn24cx72LsqquUzwpXPPGQCxcQORJAtsZ0CHsuv6utW5lpF15M2tJ/Gq4m68snvpPyoWDv+EDIUGyxClVD2ysZUNoiBMc34ovJrJo6490Rzu8RMxSWM3exdsyrzjlJoIJd8xzHT9ijVRTBiyRcgFhlSTtPNCd6whPVqSDPD/zruoZbRtBSpez/VXGj6juAEoXI2h7AE5mVdSJPztYew+kN9SmEUUvtkfOj+rpron+WxnjMHD3LU23qi9kwIpYOCnQKjmUcF6EIH+bHZWzqYzhiIZlJjQaDUxmjzraDwDCW9zLohpOCXIal6DBFdS2ebnASk1ysxqhZQZmQBIPHGbzTgKpwyZdIzAyfQPP8oUMVloMKdQ14ayms++E=
+X-Forefront-Antispam-Report: CIP:149.199.62.198;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:xsj-pvapexch02.xlnx.xilinx.com;PTR:unknown-62-198.xilinx.com;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(336012)(40460700003)(508600001)(26005)(2616005)(186003)(7696005)(426003)(82310400004)(6666004)(107886003)(83380400001)(7636003)(356005)(2906002)(36756003)(47076005)(36860700001)(110136005)(54906003)(8676002)(5660300002)(4326008)(8936002)(6636002)(9786002)(70586007)(70206006)(316002)(102446001)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 19:14:40.2119
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Feb 2022 19:14:44.0455
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f666f652-1130-4e1c-bfd0-08d9f249bf2e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54292213-ebd0-496a-c962-08d9f249c16b
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.62.198];Helo=[xsj-pvapexch01.xlnx.xilinx.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN1NAM02FT010.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.62.198];Helo=[xsj-pvapexch02.xlnx.xilinx.com]
+X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT0003.eop-nam02.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2279
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB3253
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds zynqmp_pm_sha_hash API in the ZynqMP firmware to compute
-SHA3 hash of given data.
+This patch set does the following:
+  - Updates the Makefile for xilinx subdirectory
+  - Adds communication layer support for sha_hash in zynqmp.c
+  - Adds Xilinx ZynqMP driver for SHA3 Algorithm
+  - Updates the list of MAINTAINERS
 
-Signed-off-by: Harsha <harsha.harsha@xilinx.com>
-Acked-by: Michal Simek <michal.simek@xilinx.com>
----
- drivers/firmware/xilinx/zynqmp.c     | 26 ++++++++++++++++++++++++++
- include/linux/firmware/xlnx-zynqmp.h |  8 ++++++++
- 2 files changed, 34 insertions(+)
+V2 changes:
+- Removed dependency on COMPILE_TEST in 3/4
+- Rebased this patchset on latest Cryptodev-2.6 tree which fixed
+below kernel robot warning
+   In file included from ./arch/s390/include/generated/asm/cacheflush.h:1,
+                    from drivers/crypto/xilinx/zynqmp-sha.c:6:
+include/asm-generic/cacheflush.h:53:46: warning: 'struct folio' declared
+inside parameter list will not be visible outside of this definition
+or declaration
+      53 | static inline void flush_dcache_folio(struct folio *folio) { }
+         |
+- Included linux/cacheflush.h instead of asm/cacheflush.h in 3/4
+ 
 
-diff --git a/drivers/firmware/xilinx/zynqmp.c b/drivers/firmware/xilinx/zynqmp.c
-index 450c5f6..5e5b0bb 100644
---- a/drivers/firmware/xilinx/zynqmp.c
-+++ b/drivers/firmware/xilinx/zynqmp.c
-@@ -1121,6 +1121,32 @@ int zynqmp_pm_aes_engine(const u64 address, u32 *out)
- EXPORT_SYMBOL_GPL(zynqmp_pm_aes_engine);
- 
- /**
-+ * zynqmp_pm_sha_hash - Access the SHA engine to calculate the hash
-+ * @address:	Address of the data/ Address of output buffer where
-+ *		hash should be stored.
-+ * @size:	Size of the data.
-+ * @flags:
-+ *	BIT(0) - for initializing csudma driver and SHA3(Here address
-+ *		 and size inputs can be NULL).
-+ *	BIT(1) - to call Sha3_Update API which can be called multiple
-+ *		 times when data is not contiguous.
-+ *	BIT(2) - to get final hash of the whole updated data.
-+ *		 Hash will be overwritten at provided address with
-+ *		 48 bytes.
-+ *
-+ * Return:	Returns status, either success or error code.
-+ */
-+int zynqmp_pm_sha_hash(const u64 address, const u32 size, const u32 flags)
-+{
-+	u32 lower_addr = lower_32_bits(address);
-+	u32 upper_addr = upper_32_bits(address);
-+
-+	return zynqmp_pm_invoke_fn(PM_SECURE_SHA, upper_addr, lower_addr,
-+				   size, flags, NULL);
-+}
-+EXPORT_SYMBOL_GPL(zynqmp_pm_sha_hash);
-+
-+/**
-  * zynqmp_pm_register_notifier() - PM API for register a subsystem
-  *                                to be notified about specific
-  *                                event/error.
-diff --git a/include/linux/firmware/xlnx-zynqmp.h b/include/linux/firmware/xlnx-zynqmp.h
-index 907cb01..f6783f5 100644
---- a/include/linux/firmware/xlnx-zynqmp.h
-+++ b/include/linux/firmware/xlnx-zynqmp.h
-@@ -93,6 +93,7 @@ enum pm_api_id {
- 	PM_FPGA_LOAD = 22,
- 	PM_FPGA_GET_STATUS = 23,
- 	PM_GET_CHIPID = 24,
-+	PM_SECURE_SHA = 26,
- 	PM_PINCTRL_REQUEST = 28,
- 	PM_PINCTRL_RELEASE = 29,
- 	PM_PINCTRL_GET_FUNCTION = 30,
-@@ -427,6 +428,7 @@ int zynqmp_pm_set_requirement(const u32 node, const u32 capabilities,
- 			      const u32 qos,
- 			      const enum zynqmp_pm_request_ack ack);
- int zynqmp_pm_aes_engine(const u64 address, u32 *out);
-+int zynqmp_pm_sha_hash(const u64 address, const u32 size, const u32 flags);
- int zynqmp_pm_fpga_load(const u64 address, const u32 size, const u32 flags);
- int zynqmp_pm_fpga_get_status(u32 *value);
- int zynqmp_pm_write_ggs(u32 index, u32 value);
-@@ -601,6 +603,12 @@ static inline int zynqmp_pm_aes_engine(const u64 address, u32 *out)
- 	return -ENODEV;
- }
- 
-+static inline int zynqmp_pm_sha_hash(const u64 address, const u32 size,
-+				     const u32 flags)
-+{
-+	return -ENODEV;
-+}
-+
- static inline int zynqmp_pm_fpga_load(const u64 address, const u32 size,
- 				      const u32 flags)
- {
+V1 changes:
+- Converted RFC patch to PATCH
+- Updated zynqmp-sha driver so that it can be self discovered 
+- Removed patch 3/6 and 4/6 as they added support for device tree
+- Substituted hw with hardware in drivers/crypto/Kconfig
+
+Harsha (4):
+  drivers: crypto: Updated Makefile for xilinx subdirectory
+  firmware: xilinx: Add ZynqMP SHA API for SHA3 functionality
+  crypto: xilinx: Add Xilinx SHA3 driver
+  MAINTAINERS: Add maintainer for Xilinx ZynqMP SHA3 driver
+
+ MAINTAINERS                          |   5 +
+ drivers/crypto/Kconfig               |  10 ++
+ drivers/crypto/Makefile              |   2 +-
+ drivers/crypto/xilinx/Makefile       |   1 +
+ drivers/crypto/xilinx/zynqmp-sha.c   | 285 +++++++++++++++++++++++++++++++++++
+ drivers/firmware/xilinx/zynqmp.c     |  26 ++++
+ include/linux/firmware/xlnx-zynqmp.h |   8 +
+ 7 files changed, 336 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/crypto/xilinx/zynqmp-sha.c
+
 -- 
 1.8.2.1
 
