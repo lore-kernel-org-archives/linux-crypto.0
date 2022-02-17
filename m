@@ -2,85 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C24AEC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 19:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7779C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 19:27:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236695AbiBQTSZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Feb 2022 14:18:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44242 "EHLO
+        id S241293AbiBQT1y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Feb 2022 14:27:54 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236437AbiBQTSZ (ORCPT
+        with ESMTP id S232139AbiBQT1x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Feb 2022 14:18:25 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851EDC2E4B;
-        Thu, 17 Feb 2022 11:18:10 -0800 (PST)
-Date:   Thu, 17 Feb 2022 20:18:07 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1645125489;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sCin5ygrpBsE7zD6si65r+YVbvKS66A/QsQ3ZrIRoDs=;
-        b=wj84dHxGq//td/JnJiGIo4OlkBeb1iUsbSKmW6uLZttVdxPQe03if76JU8kfvO3y4YKnMU
-        SBwOiqJ5AdoTADdWJKTKHXtmJ/1PMk5zTindMBUitjAb3X7u3vsqtax8/Qw9U0VLrM90ya
-        wb41+lNNARsWwB2EytlOEUEj7/etV1vCl/WQlHItTO20FyN51z+Yw9qVC/4sdbcp1ULA8c
-        DRRxHTK1ZntmebTgQFCPbI/KskIskO/zP961yfdpK13fGOG95DUdrNMuPF1MTUSYInhDSl
-        C+uYvto6wBR7OwcZ6+mIf+2aKHpsvps+XMjaWxtdHPprFBLxEQYmEZ6Xij9Olg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1645125489;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sCin5ygrpBsE7zD6si65r+YVbvKS66A/QsQ3ZrIRoDs=;
-        b=Q3jXS0qCLOJg66uNIW2rqKiNczEgml33xjYY4HpHu57a/nPliLYmEYuHR0vXv7kxumTseQ
-        EcPkbmZ/+m4ikoAA==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: clear fast pool, crng, and batches in cpuhp
- bring up
-Message-ID: <Yg6fbwtNghu76z2V@linutronix.de>
-References: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
- <20220217180409.13151-1-Jason@zx2c4.com>
+        Thu, 17 Feb 2022 14:27:53 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 03C0710459A;
+        Thu, 17 Feb 2022 11:27:38 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90D5F113E;
+        Thu, 17 Feb 2022 11:27:38 -0800 (PST)
+Received: from e122247.arm.com (E122209.Arm.com [10.50.65.148])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B4B863F70D;
+        Thu, 17 Feb 2022 11:27:36 -0800 (PST)
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ofir Drang <ofir.drang@arm.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: ccree: don't attempt 0 len DMA mappings
+Date:   Thu, 17 Feb 2022 21:27:26 +0200
+Message-Id: <20220217192726.612328-1-gilad@benyossef.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220217180409.13151-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-17 19:04:09 [+0100], Jason A. Donenfeld wrote:
-> For the irq randomness fast pool, rather than having to use expensive
-> atomics, which were visibly the most expensive thing in the entire irq
-> handler, simply take care of the extreme edge case of resetting count to
-> zero in the cpuhp online handler, just after workqueues have been
-> reenabled. This simplifies the code a bit and lets us use vanilla
-> variables rather than atomics, and performance should be improved.
-> 
-> As well, very early on when the CPU comes up, while interrupts are still
-> disabled, we clear out the per-cpu crng and its batches, so that it
-> always starts with fresh randomness.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> v6 improves the comments around each of the cpuhp functions, as
-> requested.
+Refuse to try mapping zero bytes as this may cause a fault
+on some configurations / platforms and it seems the prev.
+attempt is not enough and we need to be more explicit.
 
-Perfect thank you.
-Did you miss my question regarding cross-CPU init in
-random_prepare_cpu()?
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Fixes: ce0fc6db38de ("crypto: ccree - protect against empty or NULL
+scatterlists")
+---
+ drivers/crypto/ccree/cc_buffer_mgr.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Sebastian
+diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
+index a5e041d9d2cf..11e0278c8631 100644
+--- a/drivers/crypto/ccree/cc_buffer_mgr.c
++++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+@@ -258,6 +258,13 @@ static int cc_map_sg(struct device *dev, struct scatterlist *sg,
+ {
+ 	int ret = 0;
+ 
++	if (!nbytes) {
++		*mapped_nents = 0;
++		*lbytes = 0;
++		*nents = 0;
++		return 0;
++	}
++
+ 	*nents = cc_get_sgl_nents(dev, sg, nbytes, lbytes);
+ 	if (*nents > max_sg_nents) {
+ 		*nents = 0;
+-- 
+2.25.1
+
