@@ -2,83 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23376C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 21:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52594C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 23:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245073AbiBQV0X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Feb 2022 16:26:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36202 "EHLO
+        id S229477AbiBQXpD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Feb 2022 18:45:03 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:39042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239342AbiBQV0W (ORCPT
+        with ESMTP id S229515AbiBQXpC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Feb 2022 16:26:22 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C488D80234;
-        Thu, 17 Feb 2022 13:26:07 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4E97561353;
-        Thu, 17 Feb 2022 21:26:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA85C340EC;
-        Thu, 17 Feb 2022 21:26:06 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="geSpcPba"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645133163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pDt/1zff5PrpvG09nzyrh7Dd+LUHe32c1AnCH3rTZCw=;
-        b=geSpcPbasn9GYff9ulOtNHs6sTsPBC88K4fSr+xgzqStnivBDKiIpzlZQbPyKJXcRZ45lx
-        MIYmahTkTzIyJGUM+CNxOL4ZyRfMkpMNQZmvejtlZPWBsHdYL5j13SYBImhirLx6EvPLaH
-        2wToSRfWFgBSBqWSSzPv8/bL1zrecW8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fba0ad9e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 17 Feb 2022 21:26:03 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id p5so15579739ybd.13;
-        Thu, 17 Feb 2022 13:26:03 -0800 (PST)
-X-Gm-Message-State: AOAM5339L5Os7xWvbJSu0oPHPnPyLBz+E9Suz4xKjALEw+nZ64nn2IRs
-        B7jToiSmy5cxJ5H6HQ0wrr7I+QUdoHMWXWIKQP4=
-X-Google-Smtp-Source: ABdhPJxwSjDman9ef6QcevzXe3EiZBcaksQ4ae+AOZCETekzaV2QN7JT0646k78d4nWhkwpDuGhLCQqF0Bve0A6+7D0=
-X-Received: by 2002:a25:e204:0:b0:610:cb53:b753 with SMTP id
- h4-20020a25e204000000b00610cb53b753mr4405496ybe.267.1645133161340; Thu, 17
- Feb 2022 13:26:01 -0800 (PST)
+        Thu, 17 Feb 2022 18:45:02 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E660240E4D;
+        Thu, 17 Feb 2022 15:43:30 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id q8so5665805iod.2;
+        Thu, 17 Feb 2022 15:43:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7FBp4Uo9WR66JeSaowaJzLczvvMhuR66KyZhuYXKE5g=;
+        b=kNBxCn6iyWb4LJCWPf7HxKXHOy0/HJxO32RrnCFmm3nMSqH1/3mJ+H/sMUvbkNrQxr
+         F56psP3nh62SK6qGZpVg8yLCYGrWkSFwSAKxDs5WdY+4Bjwfp5iYv753IDJQ7wr+wDmd
+         0wX2z/fOb1EbAVJTAcWfFz3RWWJ2kgvuLeBFd60kcw2xjrhhV/yL7BLTnl4ASruoq7xu
+         FygoBN/6Fk0MW/8vWLfK65j0vqHRRgqf5L6794PMC8G6ypzEA7L1HcGp4Cik2JKKMTCf
+         mRc3JZrRn8DHs6+jyS+Cv/0q33UpfRbIMxUYvPz0BCyswDhnBflBZ+IgpOwut+8jUH6U
+         ZH/w==
+X-Gm-Message-State: AOAM532Rpu5JrGzDLNYk6MOG6zGN4lq+CWpQJIimYGXBMN/vZuexuB/X
+        rmGPfziM/GFxfVnJB81NR3dg+b2v5g==
+X-Google-Smtp-Source: ABdhPJzzoMYuRcsqQZNfeNmCERtRhjk2WYSpOj6vT0HjTShBxZ1MSOEkhohwfF7Bob1fHv7v9fvEQg==
+X-Received: by 2002:a6b:8d4b:0:b0:63e:baed:9c69 with SMTP id p72-20020a6b8d4b000000b0063ebaed9c69mr3418316iod.55.1645140515943;
+        Thu, 17 Feb 2022 15:28:35 -0800 (PST)
+Received: from robh.at.kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id y16sm2360429iox.46.2022.02.17.15.28.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 15:28:35 -0800 (PST)
+Received: (nullmailer pid 3970803 invoked by uid 1000);
+        Thu, 17 Feb 2022 23:28:33 -0000
+Date:   Thu, 17 Feb 2022 17:28:33 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc:     linux-kernel@vger.kernel.org, krzysztof.kozlowski@canonical.com,
+        kavyasree.kotagiri@microchip.com, herbert@gondor.apana.org.au,
+        alexandre.belloni@bootlin.com, devicetree@vger.kernel.org,
+        claudiu.beznea@microchip.com, linux-crypto@vger.kernel.org,
+        nicolas.ferre@microchip.com, robh+dt@kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PACTH v4 1/3] dt-bindings: crypto: Convert Atmel AES to yaml
+Message-ID: <Yg7aIXP2QjOiFlIK@robh.at.kernel.org>
+References: <20220211093922.456634-1-tudor.ambarus@microchip.com>
+ <20220211093922.456634-2-tudor.ambarus@microchip.com>
 MIME-Version: 1.0
-References: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
- <20220217180409.13151-1-Jason@zx2c4.com> <Yg6fbwtNghu76z2V@linutronix.de>
-In-Reply-To: <Yg6fbwtNghu76z2V@linutronix.de>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 17 Feb 2022 22:25:50 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qD_8pZ9wTut+KgFAYW5O6GxNAa8gg6JT8H7hGwTwCMzQ@mail.gmail.com>
-Message-ID: <CAHmME9qD_8pZ9wTut+KgFAYW5O6GxNAa8gg6JT8H7hGwTwCMzQ@mail.gmail.com>
-Subject: Re: [PATCH v6] random: clear fast pool, crng, and batches in cpuhp
- bring up
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220211093922.456634-2-tudor.ambarus@microchip.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sebstian,
+On Fri, 11 Feb 2022 11:39:20 +0200, Tudor Ambarus wrote:
+> Convert Atmel AES documentation to yaml format. With the conversion the
+> clock and clock-names properties are made mandatory. The driver returns
+> -EINVAL if "aes_clk" is not found, reflect that in the bindings and make
+> the clock and clock-names properties mandatory. Update the example to
+> better describe how one should define the dt node.
+> 
+> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+> ---
+>  .../crypto/atmel,at91sam9g46-aes.yaml         | 66 +++++++++++++++++++
+>  .../bindings/crypto/atmel-crypto.txt          | 20 ------
+>  2 files changed, 66 insertions(+), 20 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-aes.yaml
+> 
 
-On Thu, Feb 17, 2022 at 8:18 PM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
-> Perfect thank you.
-> Did you miss my question regarding cross-CPU init in
-> random_prepare_cpu()?
-
-I saw your suggestion to do cross-CPU init and rejected the proposal
-for not actually solving a problem. My email about that was here:
-https://lore.kernel.org/lkml/CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com/
-
-Do you think you could ack this v6?
-
-Thanks,
-Jason
+Applied, thanks!
