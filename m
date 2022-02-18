@@ -2,50 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BCCC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 05:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 892B5C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 07:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229894AbiBRFiz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 00:38:55 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38806 "EHLO
+        id S229862AbiBRHjD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 02:39:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbiBRFik (ORCPT
+        with ESMTP id S229750AbiBRHjC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 00:38:40 -0500
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353CB1A9350;
-        Thu, 17 Feb 2022 21:38:23 -0800 (PST)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nKvyH-0005He-7k; Fri, 18 Feb 2022 16:38:22 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Feb 2022 16:38:21 +1100
-Date:   Fri, 18 Feb 2022 16:38:21 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kai Ye <yekai13@huawei.com>
+        Fri, 18 Feb 2022 02:39:02 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539872B2C5B;
+        Thu, 17 Feb 2022 23:38:46 -0800 (PST)
+Date:   Fri, 18 Feb 2022 08:38:42 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1645169923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9vLL2m3HI9nPzA+OvepNCcas7d36InHLA2n1nT9lC6c=;
+        b=X4iVsGPezN3GA0VLjne2VktzWAd+Y9TKvWtTygjQsYbUBZ9o/Idl8UjH7GBuSf+aip3U4T
+        UidMqk95mzNO7E483usdprEppoODIHm5tHwaL92p1qdSgLHhUGFWuAiP9yLvVU479qTM0H
+        Z32kqZbGmDB6Uf9bPZ7dj8YVR3QurTsmoKvpSpeRU5cSCjCdiin7I8+I8FZ+8YztEM0bzm
+        iMuV1yteuMRratB//EFAq55ReeVcWj0STquiAjAqYmO3azZVsWTe0u/VvR1RXAxuoV9c1j
+        7ZOL7s3GBAuD8kiJIQ/wOmbvN74UFJhJU9/7fD0EDMMGR1HOFJuQJlK9E2KqiA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1645169923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9vLL2m3HI9nPzA+OvepNCcas7d36InHLA2n1nT9lC6c=;
+        b=iwCpA+mVcJaWHXdyvcB3zZQfHD9d7FOWfVgnnLWwnGFQYK7WesV8Om0P9SLFs1s1xZl/Uu
+        Ls6CuDgPklGCYjAw==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH] crypto: hisilicon/sec - not need to enable sm4 extra
- mode at HW V3
-Message-ID: <Yg8wzeNaal3/7IDs@gondor.apana.org.au>
-References: <20220211090818.55398-1-yekai13@huawei.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: [PATCH v6] random: clear fast pool, crng, and batches in cpuhp
+ bring up
+Message-ID: <Yg9NAgq57ImXF/2T@linutronix.de>
+References: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
+ <20220217180409.13151-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220211090818.55398-1-yekai13@huawei.com>
+In-Reply-To: <20220217180409.13151-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 11, 2022 at 05:08:18PM +0800, Kai Ye wrote:
-> It is not need to enable sm4 extra mode in at HW V3. Here is fix it.
+On 2022-02-17 19:04:09 [+0100], Jason A. Donenfeld wrote:
+> For the irq randomness fast pool, rather than having to use expensive
+> atomics, which were visibly the most expensive thing in the entire irq
+> handler, simply take care of the extreme edge case of resetting count to
+> zero in the cpuhp online handler, just after workqueues have been
+> reenabled. This simplifies the code a bit and lets us use vanilla
+> variables rather than atomics, and performance should be improved.
 > 
-> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> As well, very early on when the CPU comes up, while interrupts are still
+> disabled, we clear out the per-cpu crng and its batches, so that it
+> always starts with fresh randomness.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
->  drivers/crypto/hisilicon/sec2/sec_main.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> v6 improves the comments around each of the cpuhp functions, as
+> requested.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+
+Now that I noticed that the previous email had some more comments, sorry
+for that. So lets get that in and worry about the other bits later on.
+
+Sebastian
