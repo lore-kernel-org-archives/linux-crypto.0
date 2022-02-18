@@ -2,78 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B71C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Feb 2022 23:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBE9C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 03:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiBQX45 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Feb 2022 18:56:57 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50156 "EHLO
+        id S232025AbiBRDQ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Feb 2022 22:16:28 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:59024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiBQX44 (ORCPT
+        with ESMTP id S231966AbiBRDQD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Feb 2022 18:56:56 -0500
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2146F45ADA;
-        Thu, 17 Feb 2022 15:56:41 -0800 (PST)
-Received: by mail-il1-f177.google.com with SMTP id t9so948955ilf.13;
-        Thu, 17 Feb 2022 15:56:41 -0800 (PST)
+        Thu, 17 Feb 2022 22:16:03 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC491BBF72
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Feb 2022 19:15:42 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id x18so1283818pfh.5
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Feb 2022 19:15:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Cvti9DbyWYs8dMjlWXIsVfLl8mOEd5qxZxKU5ZS8qhM=;
+        b=EnqUrDW/nfup+NhWajLnkDWhSOvmFoQK+dIo4ycSZlbsaVZJQ3toa0sV/8PDtLpVtc
+         Ua0hdYljmfKvlJdq+WpMj2cGgilXh8rXHSlRESdUebGxMXfw/A205qgyBOIEVWv+4brN
+         NG9GiLi0ZFqeHR/zxleMZYNtBDRe15bxJfg3g6yujkyJ6YLRflwF2dEv+AXmhyQvEDPx
+         iaqI9kaMr1J66C769SPr6XBkLO0cER66YfEcxLJ/YbkQLScKp1HiLAfpbDFm2hc6/00x
+         Iij4aCq5PBkd0bXF/fU869XzGKcQR0BoA78b38hn4VifEuBUufctF3qushtC1R+qGyZk
+         9N+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vADKNGJMZ3WvnhwsSTViLOVm49gkP1dC5MYlKD5ocGA=;
-        b=ESwvWLJT5/ZJyoaPpmZPnCRrgQtpBgkX1IM9/WLI/ZmLk4WYxsC4lqsS3Xru1RlHK+
-         ht0wxrq83Tvj0Uj7FZY/Ar3zQ0OYlgM0Ak70mEvmxcpXTl3B1DYEczWnmDw0vEyspM5T
-         NG1qm4BUcdxe/DbC1V22jO8CQlucIQ7GXYzA9MYyON874n3oEMVk7u1WwiZePH4gY8YE
-         p590CNc3Ri5YCr2urLzQY/bs+hCkGTzf2+FK+LxQkwYSk7RpnLxG7QSFqPafeGPjEZue
-         FCevUJwU88IhWQn3ExLP6j77AnVr9/d+/8ue22kPeAPSbRWNuXjwC5Sq/GHJ7QAXII1s
-         8ofw==
-X-Gm-Message-State: AOAM532CLiT/Vc0KKuUhbsh4tYsIvAcsx5MKjvAbtWB3OYU3qFZu0FBK
-        q0sVjX+ayp8lzykYCW3r+k9Nm4MZzQ==
-X-Google-Smtp-Source: ABdhPJz2uhw/0396q6HkbPxCRaaVXMhQ3cEVjBUY6URBMOBH2FQe7OFi+g7J2NVfqN4QAfxCKdbozQ==
-X-Received: by 2002:a05:6602:1541:b0:614:d42b:2c86 with SMTP id h1-20020a056602154100b00614d42b2c86mr3567242iow.145.1645140529859;
-        Thu, 17 Feb 2022 15:28:49 -0800 (PST)
-Received: from robh.at.kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id g9sm2804683ile.41.2022.02.17.15.28.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 15:28:49 -0800 (PST)
-Received: (nullmailer pid 3971311 invoked by uid 1000);
-        Thu, 17 Feb 2022 23:28:47 -0000
-Date:   Thu, 17 Feb 2022 17:28:47 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     kavyasree.kotagiri@microchip.com, nicolas.ferre@microchip.com,
-        claudiu.beznea@microchip.com, devicetree@vger.kernel.org,
-        alexandre.belloni@bootlin.com, robh+dt@kernel.org,
-        linux-kernel@vger.kernel.org, herbert@gondor.apana.org.au,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        krzysztof.kozlowski@canonical.com
-Subject: Re: [PACTH v4 2/3] dt-bindings: crypto: Convert Atmel TDES to yaml
-Message-ID: <Yg7aL+0RjEi+bdMl@robh.at.kernel.org>
-References: <20220211093922.456634-1-tudor.ambarus@microchip.com>
- <20220211093922.456634-3-tudor.ambarus@microchip.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Cvti9DbyWYs8dMjlWXIsVfLl8mOEd5qxZxKU5ZS8qhM=;
+        b=VA+AONCM++QxrjsgAVY+SXuBZQIpFM+AOwU5Hd4GTzSYhuHWdrxhDR7YbrCtKbnzRG
+         qVPAX3g8JfQ6/Mbb/2K75RypY8r1pHPj4AK6soBEFWuKBQ2p0mIhxqtpxnrexEPP8Q3q
+         ofPF1xRMFztl8F+gi8jdzQwSHUOBZwQNvcRSpRTtXJ3BBSIF9AxWuDi0kUZUqJG9F4v8
+         1ihAU1kh1rueDy7wOZvy/rCND2IJ6gWfspfDTNe4cTmiGJNdcGNfKdG/ybfFBsaRsfYL
+         zlAKSXYclkHr9Bkg8tYCVhl4OOX+5zKB6oCp0vfHqZWCfByQqfMMePIRWDfC8XXH66xK
+         qyAw==
+X-Gm-Message-State: AOAM533yFd7bKa0U/BG55kNXI885o7cWM0kWXX7Q5TcuCs0bd+l0Lvdl
+        5gk8c3Yuky/7NBGX6ZgHxh1zLw==
+X-Google-Smtp-Source: ABdhPJxR3+NulIemLCe52Otg1HdG7AnjP7K5Epp9CJhpKw23x3HRAJOPywscd3ggEHJRYfc4lVgE9Q==
+X-Received: by 2002:a63:f90e:0:b0:373:da89:c0bd with SMTP id h14-20020a63f90e000000b00373da89c0bdmr462001pgi.135.1645154142317;
+        Thu, 17 Feb 2022 19:15:42 -0800 (PST)
+Received: from [10.76.15.169] ([61.120.150.76])
+        by smtp.gmail.com with ESMTPSA id m19sm929643pfk.215.2022.02.17.19.15.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Feb 2022 19:15:41 -0800 (PST)
+Subject: Re: RE: [PATCH v2 3/3] virtio-crypto: implement RSA algorithm
+To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        kernel test robot <lkp@intel.com>
+References: <20220211084108.1254218-1-pizhenwei@bytedance.com>
+ <20220211084108.1254218-4-pizhenwei@bytedance.com>
+ <c9144b0d82e34566a960f210ddc32696@huawei.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+Message-ID: <8ef2f660-bd84-de70-1539-402c73795dfe@bytedance.com>
+Date:   Fri, 18 Feb 2022 11:12:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220211093922.456634-3-tudor.ambarus@microchip.com>
+In-Reply-To: <c9144b0d82e34566a960f210ddc32696@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 11 Feb 2022 11:39:21 +0200, Tudor Ambarus wrote:
-> Convert Atmel TDES documentation to yaml format. With the conversion the
-> clock and clock-names properties are made mandatory. The driver returns
-> -EINVAL if "tdes_clk" is not found, reflect that in the bindings and make
-> the clock and clock-names properties mandatory. Update the example to
-> better describe how one should define the dt node.
+>> +void virtio_crypto_akcipher_algs_unregister(struct virtio_crypto
+>> +*vcrypto) {
+>> +	int i = 0;
+>> +
+>> +	mutex_lock(&algs_lock);
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(virtio_crypto_akcipher_algs); i++) {
+>> +		uint32_t service = virtio_crypto_akcipher_algs[i].service;
+>> +		uint32_t algonum = virtio_crypto_akcipher_algs[i].algonum;
+>> +
+>> +		if (virtio_crypto_akcipher_algs[i].active_devs == 0 ||
+>> +		    !virtcrypto_algo_is_supported(vcrypto, service, algonum))
+>> +			continue;
+>> +
+>> +		if (virtio_crypto_akcipher_algs[i].active_devs == 1)
+>> +
+>> 	crypto_unregister_akcipher(&virtio_crypto_akcipher_algs[i].algo);
+>> +
+>> +		virtio_crypto_akcipher_algs[i].active_devs--;
+>> +	}
+>> +
+>> +	mutex_unlock(&algs_lock);
+>> +}
 > 
-> Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-> ---
->  .../crypto/atmel,at91sam9g46-tdes.yaml        | 64 +++++++++++++++++++
->  .../bindings/crypto/atmel-crypto.txt          | 23 -------
->  2 files changed, 64 insertions(+), 23 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/atmel,at91sam9g46-tdes.yaml
+> Why don't you reuse the virtio_crypto_algs_register/unregister functions?
+> The current code is too repetitive. Maybe we don't need create the new file virtio_crypto_akcipher_algo.c
+> because we had virtio_crypto_algs.c which includes all algorithms.
 > 
 
-Applied, thanks!
+Yes, this looks similar to virtio_crypto_algs_register/unregister.
+
+Let's look at the difference:
+struct virtio_crypto_akcipher_algo {
+         uint32_t algonum;
+         uint32_t service;
+         unsigned int active_devs;
+         struct akcipher_alg algo;
+};
+
+struct virtio_crypto_algo {
+         uint32_t algonum;
+         uint32_t service; 
+
+         unsigned int active_devs;
+         struct skcipher_alg algo; /* akcipher_alg VS skcipher_alg */
+};
+
+If reusing virtio_crypto_algs_register/unregister, we need to modify the 
+data structure like this:
+struct virtio_crypto_akcipher_algo {
+         uint32_t algonum;
+         uint32_t service;	/* use service to distinguish 
+akcipher/skcipher */
+         unsigned int active_devs;
+	union {
+		struct skcipher_alg skcipher;
+	        struct akcipher_alg akcipher;
+	} alg;
+};
+
+int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto)
+{
+	...
+         for (i = 0; i < ARRAY_SIZE(virtio_crypto_akcipher_algs); i++) {
+                 uint32_t service = virtio_crypto_akcipher_algs[i].service;
+		...
+		/* test service type then call 
+crypto_register_akcipher/crypto_register_skcipher */
+                 if (service == VIRTIO_CRYPTO_SERVICE_AKCIPHER)
+			crypto_register_akcipher(&virtio_crypto_akcipher_algs[i].algo.akcipher);
+		else
+			crypto_register_skcipher(&virtio_crypto_skcipher_algs[i].algo.skcipher);
+		...
+         }
+	...
+}
+
+Also test service type and call 
+crypto_unregister_skcipher/crypto_unregister_akcipher.
+
+This gets unclear from current v2 version.
+
+On the other hand, the kernel side prefers to separate skcipher and 
+akcipher(separated header files and implementations).
+
+-- 
+zhenwei pi
