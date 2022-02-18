@@ -2,192 +2,286 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7ABC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 11:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0607C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 12:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234349AbiBRLCf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 06:02:35 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57040 "EHLO
+        id S232329AbiBRMNP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 07:13:15 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234327AbiBRLC1 (ORCPT
+        with ESMTP id S235024AbiBRMNP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 06:02:27 -0500
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A243243120
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Feb 2022 03:01:59 -0800 (PST)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21IArLRG025648;
-        Fri, 18 Feb 2022 03:01:46 -0800
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2174.outbound.protection.outlook.com [104.47.58.174])
-        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3e9kktwjje-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 18 Feb 2022 03:01:46 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V5GliwoUcpEdZ8JPjtTsgp2enFJ5FU0fL697ZV/mQjN3/1VUSWH5ZqehxgVwWPsa/RsfoPnXvcCBQdYQwKaUqRui77VTbAgAh5nZOkTd6cF70aik0OOb7Suaa+uFYHvNyA/r7ll4IYVv8fsuaxFhjplF/SBrYkTKC0Wuq12Bg/94wt+6mqLMogyd3aiPs6FT5H+dyWfJZWr23H908qrGDK9qr9sRa2vGqrZztN3rJ3XwO0EYpO7VYSRZrrgKAWXUIB9PKOfJseHuqd0XH4FzIrCw4eg3LxMcQm3WVOFV342QePzuADVjNEn2ouYKrDPsBFJfUDShZ2jZTvIXt2hErA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pTj/XpohBbCEuaPfWmnp79ZWHrgph/1hdQuXgjFVJxc=;
- b=eG/Zl4pYhnlR7dSH+kZAPw5hvajRb2ZsV7RwPK4Ya6YRCYSLtwOgIERKbaHo7DBeaoGlpvrf8hCvbyNk6sW04OHQqRLybcYrPyJ1zTmJc0xAqnGoAl9gfdaOgAiMLykbLEmjHmmbpIOUOCbSqVov6pYGmJFwV3ERWLJRz7hMKvwFvWCS3J/JUXExfC/4o5N3JoQgeK3s/FgUn5Bl6AsAp/9Yk4ybz1EbyIw2MCCSYozyILF6yodYgxMAbfMKYondFsTVS6oRL42rJVqUvajvuj8lGSV8W8AqTTN1xFMI7Crc/KhW5ktlNk6s9+3BELs1HQSq87f8a7BIdnZMVhGvJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pTj/XpohBbCEuaPfWmnp79ZWHrgph/1hdQuXgjFVJxc=;
- b=LBUUnTZysL6iF2efJ91qmPBMQn20N5NKgX7KIwxmIVn4OxWisq+sdG9fVwb4SSKPBkQTR/fqPNMMvjzTouB2aXpSQAlC5EGVfOthp+yhwDeeVB1kHu+UovnF4B8zhSZDONa1FYrMcMHvRYMkEQPfopiGkie+RgKBfKPo+K7SGec=
-Received: from BN9PR18MB4204.namprd18.prod.outlook.com (2603:10b6:408:119::18)
- by MW3PR18MB3594.namprd18.prod.outlook.com (2603:10b6:303:5f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.24; Fri, 18 Feb
- 2022 11:01:43 +0000
-Received: from BN9PR18MB4204.namprd18.prod.outlook.com
- ([fe80::6d2a:bb34:c87c:3516]) by BN9PR18MB4204.namprd18.prod.outlook.com
- ([fe80::6d2a:bb34:c87c:3516%5]) with mapi id 15.20.4995.017; Fri, 18 Feb 2022
- 11:01:43 +0000
-From:   Harman Kalra <hkalra@marvell.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Arnaud Ebalard <arno@natisbad.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        Srujana Challa <schalla@marvell.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Jerin Jacob Kollanukkaran <jerinj@marvell.com>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Subject: RE: [EXT] Re: [PATCH] crypto: octeontx2 - add synchronization between
- mailbox accesses
-Thread-Topic: [EXT] Re: [PATCH] crypto: octeontx2 - add synchronization
- between mailbox accesses
-Thread-Index: AQHYGcU0g5aCzPrOA0q6AvS+X1eACqyOHTgAgAsVj2A=
-Date:   Fri, 18 Feb 2022 11:01:43 +0000
-Message-ID: <BN9PR18MB4204CD02272F9961E7C534F1C5379@BN9PR18MB4204.namprd18.prod.outlook.com>
-References: <20220204124601.3617217-1-hkalra@marvell.com>
- <YgYp+mHwwEiLHhCk@gondor.apana.org.au>
-In-Reply-To: <YgYp+mHwwEiLHhCk@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 900d7911-b1d1-4c3e-2a57-08d9f2ce0c50
-x-ms-traffictypediagnostic: MW3PR18MB3594:EE_
-x-microsoft-antispam-prvs: <MW3PR18MB35946F89D95A2390444CB4EFC5379@MW3PR18MB3594.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1775;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: FzWt6MDUl1+V3p3DwAlp2GimUHLQEo62lXW3RYh3XrfQv/TIGoyLZDmObHq/NXyuZzrdXdNno3jMpaa4V6u1t2yWklRIqVeZ53jLhW3/lQMv8hALPXWRoqKQl45Ob5HWvTb4NYVvwAlaWgJ6pI11uYaxgmb0qLn1cDJ5PAzmaetFY+Zk3ghbBWdoH8/w2YpLf8ehsEHcsok+LE3UrxTdYHkTIcI5LJCxNBMGI7kwNFw2oAR+ZCxMhwjTqTNBBQ3ShXkUROCSDyYWIkIXYXSxnKoM1zTXqIJmCgSassPs4hQRbDP0MUKuL/07iGR7EIfuPzYflZLthWjf4eYUZaDcZDzlzvE0bkoBmMa3nH6Uu2wDET16BTRkNi6byfbfdYaJL9eznS/O4ycEyrAd9PjybVhuJtx/39n7sVChh9+xDMkdxDxjLPu1v2a+NQLNqrCrBOzbVzOul9P7c8UqVASgi1BcjBf9OEAekOUAdGkVIWIa8y1uqlNxg0DutKaI3OxVCplmhNpSAmEKYa8I5TIHdXwNZuKbl21w9VDsR0OGuzGaLwBvVGwDMAcHB9zbwxRTu64an5QQsfiSiskl/ri5AsWQ+S7Qr5PcRoLMWlbESF1++bMuqIAn6Q0RsC1XcUI7truHJFiE2NkDnU80evjzpkTEqJZOpSf20MdxL5y7gAoPK7pWVBSuHpCeHiPNYLm5EyadA0fp5NOXhWxZsI6/DAkeLWwtCBah03uvRXLW/hGF4K2D/AQos/wOTmev4fIUIMcrqT4bdrAK6QFZ4Q3VpQuIhlklZRxCRUmynLS6hMEMoLhqku+OlMCXnxbY7pJAZO8dqWXlKnU9HudPgglZmQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR18MB4204.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8676002)(15650500001)(52536014)(55236004)(53546011)(5660300002)(2906002)(66556008)(66476007)(66446008)(7696005)(6506007)(64756008)(66946007)(107886003)(8936002)(4326008)(33656002)(86362001)(76116006)(55016003)(26005)(9686003)(316002)(38070700005)(966005)(19627235002)(122000001)(38100700002)(508600001)(71200400001)(83380400001)(186003)(54906003)(6916009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?J1YVSBCVwSWFYPor101RybpcXlsIT5uGE+Sag/Japxy29vPdWsNOz+kNyTig?=
- =?us-ascii?Q?1nP4oiBB1USaq+uK3BISkjOD37Rp0vQelOK+jnA06xe1MM3jao1HrlwwegCJ?=
- =?us-ascii?Q?FwBSpnLFmQuTtRLz+6kZylKnIzcIrS49Pq/0Vt6k169gcUJfp/c/+H0sI0Vk?=
- =?us-ascii?Q?5kAqW197hq+sXZE/T5B9wjxvMIaPLiNJ/JYi5nP+Athr/Gc2qN+bmjQI8eFn?=
- =?us-ascii?Q?+eIeHNUyQ/qMF0k65LuVtlU2BjrmkthCOxg8HYwMamQs+pOJSY+/p5XKrOj5?=
- =?us-ascii?Q?i7k7t8Ci53qqSLskryr0czbnemK8sffC6qfX/xOYIsxWVI5nBdR+DZaai3px?=
- =?us-ascii?Q?7tPrBJ/hZ981y9SHfAUe+7QTZLC7AuYgvQKYDsLa16VeZ9dNkYNYMbLzg/Bq?=
- =?us-ascii?Q?6ybs/mTbk219xcjyr9ptIushQs2yV0MYm3ffiG0Kxfj0d6YocW7LGWFDYaqT?=
- =?us-ascii?Q?+j/lOEzaoAGUf33VtbY+GBpfecTXknv+ZCyQEIJnXx1McykiCHJMJ0byfcR2?=
- =?us-ascii?Q?aI5uJzKi/voe1dsZiWEJXerpxNiGbWFTMc8XSdiJWkpREuiQU59dEjaEBEyt?=
- =?us-ascii?Q?w+U5xnkIFz+8QuzxKk6hSdOP8fNI5KDMBfG+FNcDDB4Ys0h6DlwX/QF+jiJM?=
- =?us-ascii?Q?Bhg+GriDUUGWYgc8xb90IkV4iQAzjcB5nd93tbbCwTDHxS+MiL+of7bXKoKU?=
- =?us-ascii?Q?3ABF9bug2SOthncjko67v+wJQvRm6/QzT3L7m/yJK6b+l6ANZGNAL6e5cOIk?=
- =?us-ascii?Q?yBRXivfFJbJmNe///UTMg2HKQj+nh6dV9vlfs0b2K2u/GBdlYpEZO7Y41MEM?=
- =?us-ascii?Q?16QgaF9SQRYvr7yvhPGdJqDsdRKggxp2TUWuvNZ5lThJ7bL4ewjga10hhnxU?=
- =?us-ascii?Q?XLFY8Tpj/ok2tJc2rAiWRIj8omsEdgEbxVyO6Y4VTHD+6Ckdh1t+FCWaUEcW?=
- =?us-ascii?Q?gFpvScqnCLT4dvNRpLWy/TqcvaFROOr0C95sEKNPFcqI2/Rg72wdxOD+SAzm?=
- =?us-ascii?Q?aiTO6iFXry9KjLTsoOPGHzx5pCHsmaqexVd0f4H3MdW6jecXVzHphIqkyETB?=
- =?us-ascii?Q?UWK8uPN8ZhnlOKptpsDW65WHirEJvP19hdD4kqZhhOjshNEdl5wlRCsY0VBp?=
- =?us-ascii?Q?6JKLUDCeTgZFi5Xa6ebdWsfYQPE6aVrwjAIqt5QF4IronRNwX0QM1iYE0dDJ?=
- =?us-ascii?Q?ffweehl71d2aTuplPEkBpobcsmmdQnFXKP7xGy7MQ1Pci+bxJ4hi/F3+4sS+?=
- =?us-ascii?Q?SojoL8rjk02jOyczQabNGPOAsh4juYC0vjEUndFmUG/yZ1Tlp0JoX5OQfl5Z?=
- =?us-ascii?Q?6IyyLtTB2AAmS2j/cgY99jAzMBUBnliRB+zkpRUMFh4zsdQxP3/C7AxwvUyq?=
- =?us-ascii?Q?fy2vUyYWlcBvXiDCQe7UsU+d6bfHTXRgeS6MqO5J0U2ZEza/+vDUt3iXp3zC?=
- =?us-ascii?Q?iN9ousFPIry5auI7q+aw2CY3kfCNFRUorU5l7N+q/4FTEy4B1R4LdctdC0Fh?=
- =?us-ascii?Q?7meMqU/fyJd/hmgJ1fKKYAND/VduLRn8p4ArJpRs3iBs90dTngxUwLH8mxwJ?=
- =?us-ascii?Q?Jwkq+UNM6uJ/VZDWGaq6bPM92iP56OFniHjGv+Z/VXR93yc9Jex0ozeQk08l?=
- =?us-ascii?Q?QE/XYLCHxmg8ZZDx2qqpeGs=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 18 Feb 2022 07:13:15 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D8325B6D1;
+        Fri, 18 Feb 2022 04:12:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 00D6A61EE2;
+        Fri, 18 Feb 2022 12:12:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED4EC340EB;
+        Fri, 18 Feb 2022 12:12:56 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hEdMlxBw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645186374;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KzYFEmiN4EBDBbb24szISASrsjtNHwj+t1rOcmQjGdI=;
+        b=hEdMlxBwYlN/UCnkxWvsu+jZ6mNLrxdzvpOwEga9xJdcZEwfxu5NSiW0wbaNO/ad/fvYFA
+        q9kGZ7hjzjIFQRoc1E+WgGohf9d9R1WQjb9pzdJFbtJnxvF2EDmAG1mkxW26anHHCraEYp
+        Q4wVwvvuRqrvCXW0Eorn933gE6tT1dg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 39d714fb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 18 Feb 2022 12:12:54 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH] random: use max-period linear interrupt extractor
+Date:   Fri, 18 Feb 2022 13:10:54 +0100
+Message-Id: <20220218121054.45304-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR18MB4204.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 900d7911-b1d1-4c3e-2a57-08d9f2ce0c50
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Feb 2022 11:01:43.2463
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LzMDJKqvhJwqjx6NwY6uW6rLHC0QnSgB/YyoYGXRaQ2xTb9WtX+3W2jS6uE0ryQvAlI/GN/S8WxAfo57yuP6Cg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR18MB3594
-X-Proofpoint-ORIG-GUID: NVmj9VWK1L-DBN9l9Fku2_b2_SqOgGfr
-X-Proofpoint-GUID: NVmj9VWK1L-DBN9l9Fku2_b2_SqOgGfr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-18_04,2022-02-18_01,2021-12-02_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert
+The current fast_mix() function is a piece of classic mailing list
+crypto, where it just sort of sprung up without a lot of real analysis
+of what precisely it was accomplishing. As an ARX permutation of only
+two rounds, there are some easily searchable differential trails in it,
+and as a means of preventing malicious interrupts, it completely fails,
+since it xors new data into the entire state every time. It can't really
+be analyzed as a random permutation, because it clearly isn't, and it
+can't be analyzed as an interesting linear algebraic structure either,
+because it's also not that. There really is very little one can say
+about it in terms of entropy accumulation. It might diffuse bits, some
+of the time, maybe, we hope, I guess. But for the most part, it fails to
+accomplish anything concrete.
 
-Please see inline.
+As a reminder, the simple goal of add_interrupt_randomness() is to
+simply accumulate entropy until ~64 interrupts have elapsed, and then
+dump it into the main input pool, which uses a cryptographic hash.
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Friday, February 11, 2022 2:49 PM
-> To: Harman Kalra <hkalra@marvell.com>
-> Cc: Arnaud Ebalard <arno@natisbad.org>; Boris Brezillon
-> <bbrezillon@kernel.org>; Srujana Challa <schalla@marvell.com>; linux-
-> crypto@vger.kernel.org; Jerin Jacob Kollanukkaran <jerinj@marvell.com>;
-> Sunil Kovvuri Goutham <sgoutham@marvell.com>
-> Subject: [EXT] Re: [PATCH] crypto: octeontx2 - add synchronization betwee=
-n
-> mailbox accesses
->=20
-> External Email
->=20
-> ----------------------------------------------------------------------
-> On Fri, Feb 04, 2022 at 06:16:01PM +0530, Harman Kalra wrote:
-> >
-> >  		offset =3D msg->next_msgoff;
-> > +		/* Write barrier required for VF responses which are handled
-> by
-> > +		 * PF driver and not forwarded to AF.
-> > +		 */
-> > +		smp_wmb();
->=20
-> Who is the reader in this case? Is it also part of the kernel?
+It would be nice to have something cryptographically strong in the
+interrupt handler itself, in case a malicious interrupt compromises a
+per-cpu fast pool within the 64 interrupts / 1 second window, and then
+inside of that same window somehow can control its return address and
+cycle counter, even if that's a bit far fetched. However, with a very
+CPU-limited budget, actually doing that remains an active research
+project (and perhaps there'll be something useful for Linux to come out
+of it). And while the abundance of caution would be nice, this isn't
+*currently* the security model, and we don't yet have a fast enough
+solution to make it our security model.  Plus there's not exactly a
+pressing need to do that. (And for the avoidance of doubt, the actual
+cluster of 64 accumulated interrupts still gets dumped into our
+cryptographically secure input pool.)
 
-This shared region is accessed by VF driver which is a DPDK driver.
+So, for now we are going to stick with the existing interrupt security
+model, which assumes that each cluster of 64 interrupt data samples is
+mostly non-malicious and not colluding with an infoleaker. With this as
+our goal, we can then endeavor to simply accumulate entropy linearly,
+discarding the least amount of it, and make sure that accumulation is
+sound, unlike the case with the current fast_mix().
 
-> Because if a device is involved then smp_wmb is not appropriate.
+It turns out that this security model is also the trade off that other
+operating systems have taken. The NT kernel, for example, uses something
+very simple to accumulate entropy in interrupts, `s = ror32(s, 5) ^ x`.
+Dodis et al. analyzed this in <https://eprint.iacr.org/2021/523>, and
+found that rotation by 7 would have been better than 5, but that
+otherwise, simple linear constructions like this can be used as an
+entropy collector for 2-monotone distributions.
 
-This is the same driver which is handling multiple platforms. In older plat=
-forms this
-region was normal DRAM region and was mapped in DPDK driver but in recent
-platforms it is device memory.
+However, when considering this for our four-word accumulation, versus
+NT's one-word, we run into potential problems because the words don't
+contribute to each other, and some may well be fixed, which means we'd
+need something to schedule on top. And more importantly, our
+distribution is not 2-monotone like NT's, because in addition to the
+cycle counter, we also include in those 4 words a register value, a
+return address, and an inverted jiffies. (Whether capturing anything
+beyond the cycle counter in the interrupt handler is even adding much of
+value is a question for a different time.)
 
-Thanks
-Harman
+So since we have 4 words, and not all of them are 2-monotone, we instead
+look for a proven linear extractor that works for more complex
+distributions. It turns out that a max-period linear feedback shift
+register fits this bill quite well, easily extending to the larger state
+size and to the fact that we're mixing in more than just the cycle
+counter. By picking a linear function with no non-trivial invariant
+subspace, unlike NT's rotate-xor, we benefit from the analysis of
+<https://eprint.iacr.org/2021/1002>.  This paper proves that those types
+of linear functions, used in the form `s = f(s) ^ x`, make very good
+entropy extractors for the type of complex distributions that we have.
 
+This commit implements one such very fast and high diffusion max-period
+linear function in a Feistel-like fashion, which pipelines quite well.
+On an i7-11850H, this takes 34 cycles, versus the original's 65 cycles.
+(Though, as a note for posterity: if later this is replaced with some
+sort of cryptographic hash function, I'll still be keeping 65 cycles as
+my target 😋.) This Magma script, <https://א.cc/TiMyEpmr>, proves that
+this construction does indeed yield a linear function of order 2^128-1
+whose minimal polynomial is primitive, fitting exactly what we need.
 
+I mention "high diffusion" above, because that apparently was the single
+discernible design goal of the original fast_mix(), even though that
+didn't wind up helping anything with it. Nonetheless, we take care to
+choose a function with pretty high diffusion, even higher than the
+original fast_mix(). In other words, we probably don't regress at all
+from a perspective of diffusion, even if it's not really the goal here
+anyway.
 
->=20
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
-> https://urldefense.proofpoint.com/v2/url?u=3Dhttp-
-> 3A__gondor.apana.org.au_-
-> 7Eherbert_&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D5ESHPj7V-
-> 7JdkxT_Z_SU6RrS37ys4UXudBQ_rrS5LRo&m=3Dho3Yrv-lqiH2g1-
-> aPC__mENJQ5Sl-8ZiYhq1B9w7q4JIznCaE51-
-> HsGGwyoybXo1&s=3Dl3Jk2Ay8mVeXEZN8mEYcUduOUgAnBZkLP2bpGEKtwL4&
-> e=3D
-> PGP Key: https://urldefense.proofpoint.com/v2/url?u=3Dhttp-
-> 3A__gondor.apana.org.au_-
-> 7Eherbert_pubkey.txt&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3D5ESHPj
-> 7V-7JdkxT_Z_SU6RrS37ys4UXudBQ_rrS5LRo&m=3Dho3Yrv-lqiH2g1-
-> aPC__mENJQ5Sl-8ZiYhq1B9w7q4JIznCaE51-HsGGwyoybXo1&s=3D-
-> jOywGz3R15pI-vdtiom908wdVHFZVmBn7ktoqtVkYE&e=3D
+In sum, the security model of this is unchanged from before, yet its
+implementation now matches that model much more rigorously. And the
+performance is better, which perhaps matters in interrupt context. I
+would like to emphasize, again, that the purpose of this commit is to
+improve the existing design, by making it analyzable, without changing
+anything fundamental to the existing design. There may well be value
+down the road in changing up the existing design, using something
+cryptographic, or simply using a ring buffer of samples rather than
+having a fast_mix() at all , or changing which and how much data we
+collect each interrupt, or a variety of other ideas. This commit does
+not invalidate the potential for those in the future.
+
+As a final note, the previous fast_mix() was contributed on the mailing
+list by an anonymous author, which violates the kernel project's "real
+name" policy and has ruffled the feathers of legally-minded people.
+Replacing this function should clear up those concerns.
+
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 69 +++++++++++++++++++------------------------
+ 1 file changed, 31 insertions(+), 38 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index caa276cfbc76..4dc751ad3854 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1195,44 +1195,33 @@ void add_bootloader_randomness(const void *buf, size_t size)
+ EXPORT_SYMBOL_GPL(add_bootloader_randomness);
+ 
+ struct fast_pool {
+-	union {
+-		u32 pool32[4];
+-		u64 pool64[2];
+-	};
+ 	struct work_struct mix;
+ 	unsigned long last;
+ 	unsigned int count;
++	u32 pool[4];
+ 	u16 reg_idx;
+ };
+ 
+ /*
+- * This is a fast mixing routine used by the interrupt randomness
+- * collector. It's hardcoded for an 128 bit pool and assumes that any
+- * locks that might be needed are taken by the caller.
++ * This is a max-period LFSR, mixing 128 bits into the 128-bit pool.
++ * It assumes that its inputs are non-malicious. It is designed to
++ * be much faster than computing a cryptographic hash function, yet
++ * still accumulate entropy, though it has no security on its own.
+  */
+-static void fast_mix(u32 pool[4])
++static void fast_mix(u32 h[4], const u32 v[4])
+ {
+-	u32 a = pool[0],	b = pool[1];
+-	u32 c = pool[2],	d = pool[3];
+-
+-	a += b;			c += d;
+-	b = rol32(b, 6);	d = rol32(d, 27);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 16);	d = rol32(d, 14);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 6);	d = rol32(d, 27);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 16);	d = rol32(d, 14);
+-	d ^= a;			b ^= c;
++	size_t i;
+ 
+-	pool[0] = a;  pool[1] = b;
+-	pool[2] = c;  pool[3] = d;
++	for (i = 0; i < 4; ++i) {
++		u32 w = h[0] ^ h[1] ^ v[i] ^ h[3];
++		w ^= w << 17;
++		w ^= w >> 6;
++		w ^= w >> 9;
++		h[0] = h[1];
++		h[1] = h[2];
++		h[2] = h[3];
++		h[3] = w;
++	}
+ }
+ 
+ static DEFINE_PER_CPU(struct fast_pool, irq_randomness);
+@@ -1291,7 +1280,7 @@ static void mix_interrupt_randomness(struct work_struct *work)
+ 	 * Copy the pool to the stack so that the mixer always has a
+ 	 * consistent view, before we reenable irqs again.
+ 	 */
+-	memcpy(pool, fast_pool->pool32, sizeof(pool));
++	memcpy(pool, fast_pool->pool, sizeof(pool));
+ 	fast_pool->count = 0;
+ 	fast_pool->last = jiffies;
+ 	local_irq_enable();
+@@ -1309,35 +1298,39 @@ void add_interrupt_randomness(int irq)
+ 	unsigned long now = jiffies;
+ 	cycles_t cycles = random_get_entropy();
+ 	unsigned int new_count;
++	union {
++		u32 u32[4];
++		u64 u64[2];
++	} irq_data;
+ 
+ 	if (cycles == 0)
+ 		cycles = get_reg(fast_pool, regs);
+ 
+ 	if (sizeof(cycles) == 8)
+-		fast_pool->pool64[0] ^= cycles ^ rol64(now, 32) ^ irq;
++		irq_data.u64[0] = cycles ^ rol64(now, 32) ^ irq;
+ 	else {
+-		fast_pool->pool32[0] ^= cycles ^ irq;
+-		fast_pool->pool32[1] ^= now;
++		irq_data.u32[0] = cycles ^ irq;
++		irq_data.u32[1] = now;
+ 	}
+ 
+ 	if (sizeof(unsigned long) == 8)
+-		fast_pool->pool64[1] ^= regs ? instruction_pointer(regs) : _RET_IP_;
++		irq_data.u64[1] = regs ? instruction_pointer(regs) : _RET_IP_;
+ 	else {
+-		fast_pool->pool32[2] ^= regs ? instruction_pointer(regs) : _RET_IP_;
+-		fast_pool->pool32[3] ^= get_reg(fast_pool, regs);
++		irq_data.u32[2] = regs ? instruction_pointer(regs) : _RET_IP_;
++		irq_data.u32[3] = get_reg(fast_pool, regs);
+ 	}
+ 
+-	fast_mix(fast_pool->pool32);
++	fast_mix(fast_pool->pool, irq_data.u32);
+ 	new_count = ++fast_pool->count;
+ 
+ 	if (unlikely(crng_init == 0)) {
+ 		if (new_count >= 64 &&
+-		    crng_pre_init_inject(fast_pool->pool32, sizeof(fast_pool->pool32),
++		    crng_pre_init_inject(fast_pool->pool, sizeof(fast_pool->pool),
+ 					 true, true) > 0) {
+ 			fast_pool->count = 0;
+ 			fast_pool->last = now;
+ 			if (spin_trylock(&input_pool.lock)) {
+-				_mix_pool_bytes(&fast_pool->pool32, sizeof(fast_pool->pool32));
++				_mix_pool_bytes(&fast_pool->pool, sizeof(fast_pool->pool));
+ 				spin_unlock(&input_pool.lock);
+ 			}
+ 		}
+-- 
+2.35.0
+
