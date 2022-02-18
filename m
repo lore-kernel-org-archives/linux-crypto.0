@@ -2,88 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D465C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 09:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 335CAC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 10:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232994AbiBRJnn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 04:43:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50838 "EHLO
+        id S233969AbiBRKQ1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 05:16:27 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbiBRJnn (ORCPT
+        with ESMTP id S232891AbiBRKQ0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 04:43:43 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4006E23BCF;
-        Fri, 18 Feb 2022 01:43:27 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id k1so13526659wrd.8;
-        Fri, 18 Feb 2022 01:43:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=mS4LgDgn7RWAOaBoEfxml6SAyAPFqdzmOTJ3SaSVOeg=;
-        b=PhqWKMWWgeeQJMoOwP2sGYFnaiME8Py4XuKv/FNLg+oxrBvgIDzFl40h94ciw66Zaz
-         pf285sm3W9ykpH0bXPqgasO0fz01ELbf9U3MObUpmvhS8H1Sp8JNVrIGkJwfFrVCJb17
-         lysDexqtrpQuwQop8Irtmxa+frUY3lWXvzdZAuqUEnQRL3hMfYWRFg/zWE05Gjs3x81C
-         so+6NCG9GFbQuNclXgd5MO0n/mWkyusTQ0vwKm+N7i4iUM8UU+ao4zwbxBDm7xSHP0zX
-         1pX1gs8WXB9y0DZTIbhfmMxJ7eLx7h71Df/uTvwos3woFRVaYzbjvSd9Trin+Hm4gzl4
-         uKEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=mS4LgDgn7RWAOaBoEfxml6SAyAPFqdzmOTJ3SaSVOeg=;
-        b=DBQ/L6EDz73Vck1VSJ3+JuFZFSgFi+q8RSV7gq9VwrnfNkw8hnDBLYVf+bK/Fyw0G0
-         SAnKaZ+q5N2KjJw9+txrlehz/vwhvccZjkK0ajKEa3/N0ch/c+B+xMMxoDptfHKBNko5
-         B0h6spB/q7TnkFNHJ+IMEcBvJgBFEf92lZ9/XA9zVTuNnxPsFgXeOdTZYH3TYvQ9Z+5p
-         m9l3UupcMfYJdPce+k39FQZ2pg/siNj5ZFLmHzhaP1z0RotiFUlYsFHclij32rUWKonk
-         tynB+9UEZF8j9+nBV44YNidiScluaDTSPUfxayBwZtsSSqhzh2WgV0FPrXE+wjNu676o
-         pQjA==
-X-Gm-Message-State: AOAM5304JCca+ByB+0tZxzqVuBn5u4+FPwOZ+PwEbM/DVPpIeTjSU9L0
-        5iVf3HTAAKJfT+QHGMFEnjcV36G8jLs=
-X-Google-Smtp-Source: ABdhPJw0vAAQkT0x994IAxnaYkD6Qnca5fJ5t1ZmQuM0sNSlBj6amqw5jRZoC1o5/oKHQSt0hgqjwQ==
-X-Received: by 2002:a5d:59a6:0:b0:1e8:580f:9f5b with SMTP id p6-20020a5d59a6000000b001e8580f9f5bmr5345961wrr.64.1645177405752;
-        Fri, 18 Feb 2022 01:43:25 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id c9sm20846026wrn.51.2022.02.18.01.43.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 01:43:25 -0800 (PST)
-Date:   Fri, 18 Feb 2022 10:43:22 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Harsha <harsha.harsha@xilinx.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, michals@xilinx.com,
-        saratcha@xilinx.com, harshj@xilinx.com, git@xilinx.com
-Subject: Re: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3
- functionality
-Message-ID: <Yg9qOrjJuttVSetN@Red>
-References: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
- <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
+        Fri, 18 Feb 2022 05:16:26 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C41B2AEDA6;
+        Fri, 18 Feb 2022 02:16:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1645179370; x=1676715370;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=bqtRma4i+aDRPSPwCrS3g3crpowmv6qvyEHjsN3/F0U=;
+  b=yJAV02lK2Vhh7mjjy/gW5NR0OknWC/ud4GPBDGyrJi86hUHx1/mhBX7+
+   0WsvpxuE/sziWptxb5NQ6OJEhbEsBUci8qlZ5e4+//rcw9GJHppKVzatA
+   uLXmSua7m3qnAaankw0viUDQv/lrXN3DBYU1ilvFv5RR2MQRdblp+xke9
+   EtQ0cSQZVI5fhgzVQJjWrIp8/ogDALE+JyxKBu3FNDzxzhzidvxAO4qHE
+   Fo5HE3VEzoEu10+PzDq7cTwQzK2GIVq5qw4CEOeQmXJI3Q8CxCJO6JprB
+   i3meUACvJ9WgwAt7g2VwqEgrQn0TIk+v7NqmfWPxDNfyZ4ocol9BuOWiy
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
+   d="scan'208";a="149200659"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 18 Feb 2022 03:16:09 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Fri, 18 Feb 2022 03:16:09 -0700
+Received: from localhost.localdomain (10.10.115.15) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2375.17 via Frontend Transport; Fri, 18 Feb 2022 03:16:06 -0700
+From:   Claudiu Beznea <claudiu.beznea@microchip.com>
+To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>
+Subject: [PATCH 1/7] hwrng: atmel - add wait for ready support on read
+Date:   Fri, 18 Feb 2022 12:17:06 +0200
+Message-ID: <20220218101712.530576-2-claudiu.beznea@microchip.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20220218101712.530576-1-claudiu.beznea@microchip.com>
+References: <20220218101712.530576-1-claudiu.beznea@microchip.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Fri, Feb 18, 2022 at 12:44:22AM +0530, Harsha a écrit :
-> This patch adds zynqmp_pm_sha_hash API in the ZynqMP firmware to compute
-> SHA3 hash of given data.
-> 
-> Signed-off-by: Harsha <harsha.harsha@xilinx.com>
-> Acked-by: Michal Simek <michal.simek@xilinx.com>
-> ---
+Add wait for ready support on read.
 
-Hello
+Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
+---
+ drivers/char/hw_random/atmel-rng.c | 43 +++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 13 deletions(-)
 
-Your signed-off should contain your real name.
-Furthermore why did you drop copyright from previous poster ?
-See https://patchwork.kernel.org/project/linux-crypto/cover/1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com/ for reference.
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index ecb71c4317a5..1a4874668c04 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -13,6 +13,7 @@
+ #include <linux/err.h>
+ #include <linux/clk.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/hw_random.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
+@@ -20,6 +21,7 @@
+ #define TRNG_CR		0x00
+ #define TRNG_MR		0x04
+ #define TRNG_ISR	0x1c
++#define TRNG_ISR_DATRDY	BIT(0)
+ #define TRNG_ODATA	0x50
+ 
+ #define TRNG_KEY	0x524e4700 /* RNG */
+@@ -36,25 +38,40 @@ struct atmel_trng {
+ 	struct hwrng rng;
+ };
+ 
++static bool atmel_trng_wait_ready(struct atmel_trng *trng, bool wait)
++{
++	int ready;
++
++	ready = readl(trng->base + TRNG_ISR) & TRNG_ISR_DATRDY;
++	if (!ready && wait)
++		readl_poll_timeout(trng->base + TRNG_ISR, ready,
++				   ready & TRNG_ISR_DATRDY, 1000, 20000);
++
++	return !!ready;
++}
++
+ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 			   bool wait)
+ {
+ 	struct atmel_trng *trng = container_of(rng, struct atmel_trng, rng);
+ 	u32 *data = buf;
++	int ret;
++
++	ret = atmel_trng_wait_ready(trng, wait);
++	if (!ret)
++		goto out;
+ 
+-	/* data ready? */
+-	if (readl(trng->base + TRNG_ISR) & 1) {
+-		*data = readl(trng->base + TRNG_ODATA);
+-		/*
+-		  ensure data ready is only set again AFTER the next data
+-		  word is ready in case it got set between checking ISR
+-		  and reading ODATA, so we don't risk re-reading the
+-		  same word
+-		*/
+-		readl(trng->base + TRNG_ISR);
+-		return 4;
+-	} else
+-		return 0;
++	*data = readl(trng->base + TRNG_ODATA);
++	/*
++	 * ensure data ready is only set again AFTER the next data word is ready
++	 * in case it got set between checking ISR and reading ODATA, so we
++	 * don't risk re-reading the same word
++	 */
++	readl(trng->base + TRNG_ISR);
++	ret = 4;
++
++out:
++	return ret;
+ }
+ 
+ static void atmel_trng_enable(struct atmel_trng *trng)
+-- 
+2.32.0
 
-Furthermore, the previous poster didnt answered my questions about parallel processing and tests.
-
-Regards
