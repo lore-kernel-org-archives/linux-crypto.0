@@ -2,43 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACDCC4321E
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 10:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD19BC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 10:16:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234006AbiBRKQk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 05:16:40 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52054 "EHLO
+        id S234015AbiBRKQm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 05:16:42 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233989AbiBRKQi (ORCPT
+        with ESMTP id S233992AbiBRKQj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 05:16:38 -0500
+        Fri, 18 Feb 2022 05:16:39 -0500
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2B62AFE9D;
-        Fri, 18 Feb 2022 02:16:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25A272AF3D1;
+        Fri, 18 Feb 2022 02:16:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1645179377; x=1676715377;
+  t=1645179384; x=1676715384;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iRwy/l1gN6TA2D/EeDe1EPLIvg3mQHpedoZHLk08KpA=;
-  b=XhZGEELKhN+Sa5Y7aGSVkk8zAS5zwzKTP4yvDKxwZ9KriKaMNhyfd/ZQ
-   NBy1KsgFGflm+lSa/DvKszMLi806xLzdZ09KpbgeXYoiiRD5xCR17Ssyp
-   E6VS+eET4tOacb/dpJ3bkbZ4W2TDrgh6IAylxfQidF0cd/8wp7KvzzC1k
-   3wB0AHwafGewL6u9cx+UGmaoN1wFwMw+zx6eP7uCpJDFyXRi9fMdb1vk+
-   RTkfI5dkmxEDk4wdaJxObY1hi4v9GBZMu4Mx+cTy5dmwq2pM277LTj1+v
-   cRiJhcmlR5zArV9KYiALFadCC+nsj9c75SYj1pL0jSSVjLEED9BLwW5Bu
+  bh=hXm0Jtwri1nLMNu8938lMqvk/Ro4GDt9J9rutPzfAFk=;
+  b=FVDbL+Q0BBjQ0mPLjUM+ObYMk0/GSi1lREDuhr6Wud3T/6EILPTcfgIY
+   wBaxVJJjk+QDDqdYzLJd+F/uo4ExNZYYHFFZTBHmUWBG1vqOlauarPxHG
+   L6nJKepl2eW4Es549/zOrHl1gdfX0hcLzwhRG4PBho6o3aAs4qdcgCVSY
+   +nD64gr6n6exGK1Jt5EiXSZ4tPZMFZ4lqpLo6KiawxVw9D+3IlULfIv5j
+   Ql74C1AHkjKqfusVyFyWTobElXpGg20azWec+dLrlpkLeukSPH9XQv6Z8
+   ap+4VN75suk/1gH1WkpQpvNMiFjrjCFSUKe1dYgwME6ogktOCGZIAv8xd
    w==;
 X-IronPort-AV: E=Sophos;i="5.88,378,1635231600"; 
-   d="scan'208";a="149200684"
+   d="scan'208";a="146491146"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 18 Feb 2022 03:16:17 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 18 Feb 2022 03:16:23 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Fri, 18 Feb 2022 03:16:17 -0700
+ 15.1.2375.17; Fri, 18 Feb 2022 03:16:22 -0700
 Received: from localhost.localdomain (10.10.115.15) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Fri, 18 Feb 2022 03:16:15 -0700
+ 15.1.2375.17 via Frontend Transport; Fri, 18 Feb 2022 03:16:20 -0700
 From:   Claudiu Beznea <claudiu.beznea@microchip.com>
 To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
         <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
@@ -46,9 +46,9 @@ To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
 CC:     <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Claudiu Beznea <claudiu.beznea@microchip.com>
-Subject: [PATCH 4/7] hwrng: atmel - move set of TRNG_HALFR in atmel_trng_init()
-Date:   Fri, 18 Feb 2022 12:17:09 +0200
-Message-ID: <20220218101712.530576-5-claudiu.beznea@microchip.com>
+Subject: [PATCH 6/7] hwrnd: atmel - add runtime pm support
+Date:   Fri, 18 Feb 2022 12:17:11 +0200
+Message-ID: <20220218101712.530576-7-claudiu.beznea@microchip.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20220218101712.530576-1-claudiu.beznea@microchip.com>
 References: <20220218101712.530576-1-claudiu.beznea@microchip.com>
@@ -59,131 +59,121 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move set of TRNG_HALFR in atmel_trng_init() as this function is
-also called on resume path. In case of SAMA7G5 (where backup and
-self-refresh PM mode is available) most of the SoC parts are
-powered of (including TRNG) when entering suspend. In that case
-on resuming path TRNG_HALFR should also be re-configured.
+Add runtime PM support.
 
 Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
 ---
- drivers/char/hw_random/atmel-rng.c | 49 +++++++++++++++---------------
- 1 file changed, 25 insertions(+), 24 deletions(-)
+ drivers/char/hw_random/atmel-rng.c | 44 ++++++++++++++++++++++--------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index 17f02049c112..ef49dbe681cf 100644
+index 0fff74808472..b662d44a09a6 100644
 --- a/drivers/char/hw_random/atmel-rng.c
 +++ b/drivers/char/hw_random/atmel-rng.c
-@@ -36,6 +36,7 @@ struct atmel_trng {
- 	struct clk *clk;
- 	void __iomem *base;
- 	struct hwrng rng;
-+	bool has_half_rate;
- };
+@@ -17,6 +17,7 @@
+ #include <linux/hw_random.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
++#include <linux/pm_runtime.h>
  
- static bool atmel_trng_wait_ready(struct atmel_trng *trng, bool wait)
-@@ -74,14 +75,32 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
- 	return ret;
- }
+ #define TRNG_CR		0x00
+ #define TRNG_MR		0x04
+@@ -58,6 +59,12 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 	u32 *data = buf;
+ 	int ret;
  
--static void atmel_trng_init(struct atmel_trng *trng)
-+static int atmel_trng_init(struct atmel_trng *trng)
- {
-+	unsigned long rate;
-+	int ret;
-+
-+	ret = clk_prepare_enable(trng->clk);
-+	if (ret)
++	ret = pm_runtime_get_sync((struct device *)trng->rng.priv);
++	if (ret < 0) {
++		pm_runtime_put_sync((struct device *)trng->rng.priv);
 +		return ret;
-+
-+	if (trng->has_half_rate) {
-+		rate = clk_get_rate(trng->clk);
-+
-+		/* if peripheral clk is above 100MHz, set HALFR */
-+		if (rate > 100000000)
-+			writel(TRNG_HALFR, trng->base + TRNG_MR);
 +	}
 +
- 	writel(TRNG_KEY | 1, trng->base + TRNG_CR);
-+
-+	return 0;
- }
+ 	ret = atmel_trng_wait_ready(trng, wait);
+ 	if (!ret)
+ 		goto out;
+@@ -72,6 +79,8 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 	ret = 4;
  
- static void atmel_trng_cleanup(struct atmel_trng *trng)
- {
- 	writel(TRNG_KEY, trng->base + TRNG_CR);
-+	clk_disable_unprepare(trng->clk);
- }
- 
- static int atmel_trng_probe(struct platform_device *pdev)
-@@ -105,22 +124,14 @@ static int atmel_trng_probe(struct platform_device *pdev)
- 	if (!data)
- 		return -ENODEV;
- 
--	if (data->has_half_rate) {
--		unsigned long rate = clk_get_rate(trng->clk);
--
--		/* if peripheral clk is above 100MHz, set HALFR */
--		if (rate > 100000000)
--			writel(TRNG_HALFR, trng->base + TRNG_MR);
--	}
-+	trng->has_half_rate = data->has_half_rate;
-+	trng->rng.name = pdev->name;
-+	trng->rng.read = atmel_trng_read;
- 
--	ret = clk_prepare_enable(trng->clk);
-+	ret = atmel_trng_init(trng);
- 	if (ret)
- 		return ret;
- 
--	atmel_trng_init(trng);
--	trng->rng.name = pdev->name;
--	trng->rng.read = atmel_trng_read;
--
- 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
- 	if (ret)
- 		goto err_register;
-@@ -130,7 +141,6 @@ static int atmel_trng_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_register:
--	clk_disable_unprepare(trng->clk);
- 	atmel_trng_cleanup(trng);
+ out:
++	pm_runtime_mark_last_busy((struct device *)trng->rng.priv);
++	pm_runtime_put_sync_autosuspend((struct device *)trng->rng.priv);
  	return ret;
  }
-@@ -141,7 +151,6 @@ static int atmel_trng_remove(struct platform_device *pdev)
+ 
+@@ -127,21 +136,28 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	trng->has_half_rate = data->has_half_rate;
+ 	trng->rng.name = pdev->name;
+ 	trng->rng.read = atmel_trng_read;
++	trng->rng.priv = (unsigned long)&pdev->dev;
++	platform_set_drvdata(pdev, trng);
+ 
++#ifndef CONFIG_PM
+ 	ret = atmel_trng_init(trng);
+ 	if (ret)
+ 		return ret;
++#endif
+ 
+-	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+-	if (ret)
+-		goto err_register;
+-
+-	platform_set_drvdata(pdev, trng);
++	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
++	pm_runtime_use_autosuspend(&pdev->dev);
++	pm_runtime_enable(&pdev->dev);
+ 
+-	return 0;
++	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
++	if (ret) {
++		pm_runtime_disable(&pdev->dev);
++		pm_runtime_set_suspended(&pdev->dev);
++#ifndef CONFIG_PM
++		atmel_trng_cleanup(trng);
++#endif
++	}
+ 
+-err_register:
+-	atmel_trng_cleanup(trng);
+ 	return ret;
+ }
+ 
+@@ -151,11 +167,13 @@ static int atmel_trng_remove(struct platform_device *pdev)
  
  
  	atmel_trng_cleanup(trng);
--	clk_disable_unprepare(trng->clk);
++	pm_runtime_disable(&pdev->dev);
++	pm_runtime_set_suspended(&pdev->dev);
  
  	return 0;
  }
-@@ -152,7 +161,6 @@ static int atmel_trng_suspend(struct device *dev)
- 	struct atmel_trng *trng = dev_get_drvdata(dev);
  
- 	atmel_trng_cleanup(trng);
--	clk_disable_unprepare(trng->clk);
- 
- 	return 0;
- }
-@@ -160,15 +168,8 @@ static int atmel_trng_suspend(struct device *dev)
- static int atmel_trng_resume(struct device *dev)
+-static int __maybe_unused atmel_trng_suspend(struct device *dev)
++static int __maybe_unused atmel_trng_runtime_suspend(struct device *dev)
  {
  	struct atmel_trng *trng = dev_get_drvdata(dev);
--	int ret;
  
--	ret = clk_prepare_enable(trng->clk);
--	if (ret)
--		return ret;
--
--	atmel_trng_init(trng);
--
--	return 0;
-+	return atmel_trng_init(trng);
+@@ -164,7 +182,7 @@ static int __maybe_unused atmel_trng_suspend(struct device *dev)
+ 	return 0;
  }
  
- static const struct dev_pm_ops atmel_trng_pm_ops = {
+-static int __maybe_unused atmel_trng_resume(struct device *dev)
++static int __maybe_unused atmel_trng_runtime_resume(struct device *dev)
+ {
+ 	struct atmel_trng *trng = dev_get_drvdata(dev);
+ 
+@@ -172,8 +190,10 @@ static int __maybe_unused atmel_trng_resume(struct device *dev)
+ }
+ 
+ static const struct dev_pm_ops __maybe_unused atmel_trng_pm_ops = {
+-	.suspend	= atmel_trng_suspend,
+-	.resume		= atmel_trng_resume,
++	SET_RUNTIME_PM_OPS(atmel_trng_runtime_suspend,
++			   atmel_trng_runtime_resume, NULL)
++	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
++				pm_runtime_force_resume)
+ };
+ 
+ static const struct atmel_trng_data at91sam9g45_config = {
 -- 
 2.32.0
 
