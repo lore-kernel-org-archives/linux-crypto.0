@@ -2,86 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 892B5C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 07:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D465C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Feb 2022 09:43:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiBRHjD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 02:39:03 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36492 "EHLO
+        id S232994AbiBRJnn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 04:43:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiBRHjC (ORCPT
+        with ESMTP id S231655AbiBRJnn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 02:39:02 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539872B2C5B;
-        Thu, 17 Feb 2022 23:38:46 -0800 (PST)
-Date:   Fri, 18 Feb 2022 08:38:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1645169923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9vLL2m3HI9nPzA+OvepNCcas7d36InHLA2n1nT9lC6c=;
-        b=X4iVsGPezN3GA0VLjne2VktzWAd+Y9TKvWtTygjQsYbUBZ9o/Idl8UjH7GBuSf+aip3U4T
-        UidMqk95mzNO7E483usdprEppoODIHm5tHwaL92p1qdSgLHhUGFWuAiP9yLvVU479qTM0H
-        Z32kqZbGmDB6Uf9bPZ7dj8YVR3QurTsmoKvpSpeRU5cSCjCdiin7I8+I8FZ+8YztEM0bzm
-        iMuV1yteuMRratB//EFAq55ReeVcWj0STquiAjAqYmO3azZVsWTe0u/VvR1RXAxuoV9c1j
-        7ZOL7s3GBAuD8kiJIQ/wOmbvN74UFJhJU9/7fD0EDMMGR1HOFJuQJlK9E2KqiA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1645169923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9vLL2m3HI9nPzA+OvepNCcas7d36InHLA2n1nT9lC6c=;
-        b=iwCpA+mVcJaWHXdyvcB3zZQfHD9d7FOWfVgnnLWwnGFQYK7WesV8Om0P9SLFs1s1xZl/Uu
-        Ls6CuDgPklGCYjAw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v6] random: clear fast pool, crng, and batches in cpuhp
- bring up
-Message-ID: <Yg9NAgq57ImXF/2T@linutronix.de>
-References: <CAHmME9prO9dop7iBRwN54=GMtLH7amS3m_VqGUzL44G1h=R+2A@mail.gmail.com>
- <20220217180409.13151-1-Jason@zx2c4.com>
+        Fri, 18 Feb 2022 04:43:43 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4006E23BCF;
+        Fri, 18 Feb 2022 01:43:27 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id k1so13526659wrd.8;
+        Fri, 18 Feb 2022 01:43:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=mS4LgDgn7RWAOaBoEfxml6SAyAPFqdzmOTJ3SaSVOeg=;
+        b=PhqWKMWWgeeQJMoOwP2sGYFnaiME8Py4XuKv/FNLg+oxrBvgIDzFl40h94ciw66Zaz
+         pf285sm3W9ykpH0bXPqgasO0fz01ELbf9U3MObUpmvhS8H1Sp8JNVrIGkJwfFrVCJb17
+         lysDexqtrpQuwQop8Irtmxa+frUY3lWXvzdZAuqUEnQRL3hMfYWRFg/zWE05Gjs3x81C
+         so+6NCG9GFbQuNclXgd5MO0n/mWkyusTQ0vwKm+N7i4iUM8UU+ao4zwbxBDm7xSHP0zX
+         1pX1gs8WXB9y0DZTIbhfmMxJ7eLx7h71Df/uTvwos3woFRVaYzbjvSd9Trin+Hm4gzl4
+         uKEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mS4LgDgn7RWAOaBoEfxml6SAyAPFqdzmOTJ3SaSVOeg=;
+        b=DBQ/L6EDz73Vck1VSJ3+JuFZFSgFi+q8RSV7gq9VwrnfNkw8hnDBLYVf+bK/Fyw0G0
+         SAnKaZ+q5N2KjJw9+txrlehz/vwhvccZjkK0ajKEa3/N0ch/c+B+xMMxoDptfHKBNko5
+         B0h6spB/q7TnkFNHJ+IMEcBvJgBFEf92lZ9/XA9zVTuNnxPsFgXeOdTZYH3TYvQ9Z+5p
+         m9l3UupcMfYJdPce+k39FQZ2pg/siNj5ZFLmHzhaP1z0RotiFUlYsFHclij32rUWKonk
+         tynB+9UEZF8j9+nBV44YNidiScluaDTSPUfxayBwZtsSSqhzh2WgV0FPrXE+wjNu676o
+         pQjA==
+X-Gm-Message-State: AOAM5304JCca+ByB+0tZxzqVuBn5u4+FPwOZ+PwEbM/DVPpIeTjSU9L0
+        5iVf3HTAAKJfT+QHGMFEnjcV36G8jLs=
+X-Google-Smtp-Source: ABdhPJw0vAAQkT0x994IAxnaYkD6Qnca5fJ5t1ZmQuM0sNSlBj6amqw5jRZoC1o5/oKHQSt0hgqjwQ==
+X-Received: by 2002:a5d:59a6:0:b0:1e8:580f:9f5b with SMTP id p6-20020a5d59a6000000b001e8580f9f5bmr5345961wrr.64.1645177405752;
+        Fri, 18 Feb 2022 01:43:25 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id c9sm20846026wrn.51.2022.02.18.01.43.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Feb 2022 01:43:25 -0800 (PST)
+Date:   Fri, 18 Feb 2022 10:43:22 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Harsha <harsha.harsha@xilinx.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, michals@xilinx.com,
+        saratcha@xilinx.com, harshj@xilinx.com, git@xilinx.com
+Subject: Re: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3
+ functionality
+Message-ID: <Yg9qOrjJuttVSetN@Red>
+References: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
+ <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220217180409.13151-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-17 19:04:09 [+0100], Jason A. Donenfeld wrote:
-> For the irq randomness fast pool, rather than having to use expensive
-> atomics, which were visibly the most expensive thing in the entire irq
-> handler, simply take care of the extreme edge case of resetting count to
-> zero in the cpuhp online handler, just after workqueues have been
-> reenabled. This simplifies the code a bit and lets us use vanilla
-> variables rather than atomics, and performance should be improved.
+Le Fri, Feb 18, 2022 at 12:44:22AM +0530, Harsha a écrit :
+> This patch adds zynqmp_pm_sha_hash API in the ZynqMP firmware to compute
+> SHA3 hash of given data.
 > 
-> As well, very early on when the CPU comes up, while interrupts are still
-> disabled, we clear out the per-cpu crng and its batches, so that it
-> always starts with fresh randomness.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Signed-off-by: Harsha <harsha.harsha@xilinx.com>
+> Acked-by: Michal Simek <michal.simek@xilinx.com>
 > ---
-> v6 improves the comments around each of the cpuhp functions, as
-> requested.
 
-Acked-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Hello
 
-Now that I noticed that the previous email had some more comments, sorry
-for that. So lets get that in and worry about the other bits later on.
+Your signed-off should contain your real name.
+Furthermore why did you drop copyright from previous poster ?
+See https://patchwork.kernel.org/project/linux-crypto/cover/1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com/ for reference.
 
-Sebastian
+Furthermore, the previous poster didnt answered my questions about parallel processing and tests.
+
+Regards
