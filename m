@@ -2,103 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04925C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 11:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA153C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 11:42:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235977AbiBSLSv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Feb 2022 06:18:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42174 "EHLO
+        id S239523AbiBSLmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Feb 2022 06:42:21 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230080AbiBSLSu (ORCPT
+        with ESMTP id S232300AbiBSLmV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Feb 2022 06:18:50 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280CB1405E5;
-        Sat, 19 Feb 2022 03:18:32 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id h125so10045052pgc.3;
-        Sat, 19 Feb 2022 03:18:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=T9wL2HNOoTgBZyR7LnzekNWG1kIrAc5CB3FyMF90in4=;
-        b=AKr/HZtB3nquxX/MtfbxTPxV12bTXOYvn238/PxnW0MXFPvwUMuvQm4pSP2ByR4afp
-         7CRauKL6AyW537CotJWum8uw+2DBwxh4qfpI3VJiasOdQ5vQkfjRksY1TdFYiT2Y8GIK
-         rFRwatWTqK3t/5sVFaAFX5oQNyf0CNvBXAsN9kSosKZaUkl0a5nNH8t2UvnT84Y8xQGm
-         v6eaNilBb2nDcNkPir3151J48dq4KTWHlCWpy2pWtzQU2A8HR+ALSLt5NbaD7Ol2vhBp
-         UWTjX1b64stJNYWfl3sYgLdfsymPU3IIPFIkdfDtdPyi4+6CT10rN0Ov+HrZ1Bsg5w9U
-         om4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=T9wL2HNOoTgBZyR7LnzekNWG1kIrAc5CB3FyMF90in4=;
-        b=GmUXQht2qqYNXUaGam/P7LaUTd2ZoXKiCBVRqStkNLgSJV2GbpDWQXYFZL/oRlK+zM
-         FM68gYpzO3/rG2lL+po9bIO7HE8ETQufO1xwFldiO/zRz+Y0ZmarhpdRXjAEYCMoonYH
-         k7CIflbTP4edt0X52poNy9/nbwPlqa5s1htxeaSbYlZZFbji7Bq+2WelYu6odBVZXWT8
-         RQDQqUnioPckUe/VQWMtcMOyP1xcwvExYsyYQe/cOVjmAId3myw9zx9I8qW8mjQRVCE8
-         W7swQ/jYzHYCDI5I4dBPUwPeUPy1NQ7TJE5zR1VbfFa7m+F925Ww04RHVirfWTjtnwRp
-         jalg==
-X-Gm-Message-State: AOAM530uo2sumkBYD+/Sh6ivh6VuSarWBCcM9vB///NVloU1h/KnNR8C
-        LXd/DBgXgxMzRE+Xm+ORLdY=
-X-Google-Smtp-Source: ABdhPJzJHg6MUMNmql+V4RRtwfXePN6ptFHUaPpMP1plEFbEbnlYUEQw7bbCjNbrsib/NZlMXZNZZA==
-X-Received: by 2002:a05:6a00:1995:b0:4e1:a7dd:96d6 with SMTP id d21-20020a056a00199500b004e1a7dd96d6mr11666406pfl.16.1645269511646;
-        Sat, 19 Feb 2022 03:18:31 -0800 (PST)
-Received: from ip-172-31-19-208.ap-northeast-1.compute.internal (ec2-18-181-137-102.ap-northeast-1.compute.amazonaws.com. [18.181.137.102])
-        by smtp.gmail.com with ESMTPSA id y191sm6523542pfb.78.2022.02.19.03.18.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Feb 2022 03:18:31 -0800 (PST)
-Date:   Sat, 19 Feb 2022 11:18:24 +0000
-From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Baoquan He <bhe@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, akpm@linux-foundation.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
-        vbabka@suse.cz, David.Laight@aculab.com, david@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        netdev@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
-        linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: Re: [PATCH 22/22] mtd: rawnand: Use dma_alloc_noncoherent() for dma
- buffer
-Message-ID: <YhDSAJG+LksZSnLP@ip-172-31-19-208.ap-northeast-1.compute.internal>
-References: <20220219005221.634-1-bhe@redhat.com>
- <20220219005221.634-23-bhe@redhat.com>
- <20220219071900.GH26711@lst.de>
+        Sat, 19 Feb 2022 06:42:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92AAB32078;
+        Sat, 19 Feb 2022 03:42:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4650CB8013C;
+        Sat, 19 Feb 2022 11:42:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D30C340EB;
+        Sat, 19 Feb 2022 11:41:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645270919;
+        bh=42N0kSNDN/I0l7uNeWq1bWt0szwT7gCbE5fdpr8yCWs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=O3O2Mbkpy5TFqAygEu87Dvm9J87aB8FAFvYPSkE9DLHzRQlZXkAlWApSkQQZaFgEB
+         L7jszgblHHH1L7JJkforHcFZ1JF0KCGZZifWtslRWx0DiUcBvShfihcgZI4qViffbd
+         lFcKrpPkZ4X6Tv3yILibtkxjXDNyudmM44Q0NRt40XQFBugcE3Zk8Wx8flsPYcquN9
+         btlLaJmoCSDzGgbHEnOj4/SZJVMq5rGGoc7oKv2UtbLINzm3E2uYd0qHeD5NPhMdoL
+         n4gyWmC6Wk1UZMXw3VAsPWZ7eZIWvFMLnLllPTyk+FcpqyUZA8plxckNOLRlTnifdr
+         3XFtUZubEZoYg==
+Date:   Sat, 19 Feb 2022 12:42:30 +0100
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH v8 0/5] Enable root to update the blacklist keyring
+Message-ID: <YhDXpq8YDhxg0RLW@iki.fi>
+References: <20210712170313.884724-1-mic@digikod.net>
+ <7e8d27da-b5d4-e42c-af01-5c03a7f36a6b@digikod.net>
+ <YcGVZitNa23PCSFV@iki.fi>
+ <5030a9ff-a1d1-a9bd-902a-77c3d1d87446@digikod.net>
+ <Ydc/E3S2vmtDOnpw@iki.fi>
+ <YddADJJNLDlQAYRW@iki.fi>
+ <86c5010e-a926-023a-8915-d6605cfc4f0a@digikod.net>
+ <e4707df2-ecc2-0471-87fc-c54e774fe315@digikod.net>
+ <Yg6o/ARtOIwuBFsW@iki.fi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220219071900.GH26711@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Yg6o/ARtOIwuBFsW@iki.fi>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 19, 2022 at 08:19:00AM +0100, Christoph Hellwig wrote:
-> On Sat, Feb 19, 2022 at 08:52:21AM +0800, Baoquan He wrote:
-> > Use dma_alloc_noncoherent() instead of directly allocating buffer
-> > from kmalloc with GFP_DMA. DMA API will try to allocate buffer
-> > depending on devices addressing limitation.
+On Thu, Feb 17, 2022 at 08:58:57PM +0100, Jarkko Sakkinen wrote:
+> On Mon, Jan 31, 2022 at 12:33:51PM +0100, Mickaël Salaün wrote:
+> > 
+> > On 07/01/2022 13:14, Mickaël Salaün wrote:
+> > > 
+> > > On 06/01/2022 20:16, Jarkko Sakkinen wrote:
+> > > > On Thu, Jan 06, 2022 at 09:12:22PM +0200, Jarkko Sakkinen wrote:
+> > > > > On Tue, Jan 04, 2022 at 04:56:36PM +0100, Mickaël Salaün wrote:
+> > > > > > 
+> > > > > > On 21/12/2021 09:50, Jarkko Sakkinen wrote:
+> > > > > > > On Mon, Dec 13, 2021 at 04:30:29PM +0100, Mickaël Salaün wrote:
+> > > > > > > > Hi Jarkko,
+> > > > > > > > 
+> > > > > > > > Since everyone seems OK with this and had plenty of
+> > > > > > > > time to complain, could
+> > > > > > > > you please take this patch series in your tree? It still applies on
+> > > > > > > > v5.16-rc5 and it is really important to us. Please
+> > > > > > > > let me know if you need
+> > > > > > > > something more.
+> > > > > > > > 
+> > > > > > > > Regards,
+> > > > > > > >    Mickaël
+> > > > > > > 
+> > > > > > > I'm off-work up until end of the year, i.e. I will
+> > > > > > > address only important
+> > > > > > > bug fixes and v5.16 up until that.
+> > > > > > > 
+> > > > > > > If any of the patches is yet missing my ack, feel free to
+> > > > > > > 
+> > > > > > > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > 
+> > > > > > Thanks Jarkko. Can you please take it into your tree?
+> > > > > 
+> > > > > I can yes, as I need to anyway do a revised PR for v5.17, as one commit
+> > > > > in my first trial had a truncated fixes tag.
+> > > > 
+> > > > Please check:
+> > > > 
+> > > > git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
+> > > > 
+> > > > /Jarkko
+> > > 
+> > > Great, thanks!
+> > 
+> > Hi Jarkko,
+> > 
+> > I noticed your commits https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/commit/?id=3ec9c3a0531ac868422be3b12fc17310ed8c07dc
+> > are no more referenced in your tree. Is there an issue?
 > 
-> I think it would be better to still allocate the buffer at allocation
-> time and then just transfer ownership using dma_sync_single* in the I/O
-> path to avoid the GFP_ATOMIC allocation.
+> This must be some sort of mistake I've made. I'll re-apply the patches.
+> Sorry about this.
 
-This driver allocates the buffer at initialization step and maps the buffer
-for DMA_TO_DEVICE and DMA_FROM_DEVICE when processing IO.
+OK now the patches are in and will be included to the next PR. I fixed
+merge conflicts caused by 5cca36069d4c ("certs: refactor file cleaning")
+in "certs: Check that builtin blacklist hashes are valid" so please
+sanity check that it is good.
 
-But after making this driver to use dma_alloc_noncoherent(), remapping
-dma_alloc_noncoherent()-ed buffer is strange So I just made it to allocate
-the buffer in IO path.
-
-At this point I thought we need an API that allocates based on
-address bit mask (like dma_alloc_noncoherent()), which does not maps buffer
-into dma address. __get_free_pages/kmalloc(GFP_DMA) has been so confusing..
-
-Hmm.. for this specific case, What about allocating two buffers
-for DMA_TO_DEVICE and DMA_FROM_DEVICE at initialization time?
-
-Thanks,
-Hyeonggon
-
+BR, Jarkko
