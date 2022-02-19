@@ -2,160 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93926C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 07:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF95DC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 08:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237340AbiBSHr5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Feb 2022 02:47:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52512 "EHLO
+        id S239972AbiBSINn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Feb 2022 03:13:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbiBSHr5 (ORCPT
+        with ESMTP id S234840AbiBSINm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Feb 2022 02:47:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F40A135706;
-        Fri, 18 Feb 2022 23:47:37 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5A72CB8009F;
-        Sat, 19 Feb 2022 07:47:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6956DC004E1;
-        Sat, 19 Feb 2022 07:47:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1645256855;
-        bh=qCGduI+nbQPpild24XqAbJmYlbB6XDbmDsT34SRckpA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XJSt8o98FqXXUcQYQw+t2D/HTPHyEQMWQQCws5AhC3nZXKXz4Fe5+H+EzDkHt+w7X
-         xmZclle+WSpyO5H1u26EiVoDgRpwAse4aIxYci2SXOR+w0VUnnCw2zxYrdsS/IW+6f
-         3SymdfNl9+z+r8dooIA8nNHZZ98T4YAWlXSPkWd4=
-Date:   Sat, 19 Feb 2022 08:47:28 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: use max-period linear interrupt extractor
-Message-ID: <YhCgkL7ZMzyIumFf@kroah.com>
-References: <20220218121054.45304-1-Jason@zx2c4.com>
+        Sat, 19 Feb 2022 03:13:42 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2D2229E41;
+        Sat, 19 Feb 2022 00:13:23 -0800 (PST)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K11RW3z59z1FCw6;
+        Sat, 19 Feb 2022 16:08:55 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 19 Feb 2022 16:13:20 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Sat, 19 Feb
+ 2022 16:13:20 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH] crypto: hisilicon/sec - fix the aead software fallback for engine
+Date:   Sat, 19 Feb 2022 16:08:08 +0800
+Message-ID: <20220219080808.12212-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220218121054.45304-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 18, 2022 at 01:10:54PM +0100, Jason A. Donenfeld wrote:
-> The current fast_mix() function is a piece of classic mailing list
-> crypto, where it just sort of sprung up without a lot of real analysis
-> of what precisely it was accomplishing. As an ARX permutation of only
-> two rounds, there are some easily searchable differential trails in it,
-> and as a means of preventing malicious interrupts, it completely fails,
-> since it xors new data into the entire state every time. It can't really
-> be analyzed as a random permutation, because it clearly isn't, and it
-> can't be analyzed as an interesting linear algebraic structure either,
-> because it's also not that. There really is very little one can say
-> about it in terms of entropy accumulation. It might diffuse bits, some
-> of the time, maybe, we hope, I guess. But for the most part, it fails to
-> accomplish anything concrete.
-> 
-> As a reminder, the simple goal of add_interrupt_randomness() is to
-> simply accumulate entropy until ~64 interrupts have elapsed, and then
-> dump it into the main input pool, which uses a cryptographic hash.
-> 
-> It would be nice to have something cryptographically strong in the
-> interrupt handler itself, in case a malicious interrupt compromises a
-> per-cpu fast pool within the 64 interrupts / 1 second window, and then
-> inside of that same window somehow can control its return address and
-> cycle counter, even if that's a bit far fetched. However, with a very
-> CPU-limited budget, actually doing that remains an active research
-> project (and perhaps there'll be something useful for Linux to come out
-> of it). And while the abundance of caution would be nice, this isn't
-> *currently* the security model, and we don't yet have a fast enough
-> solution to make it our security model.  Plus there's not exactly a
-> pressing need to do that. (And for the avoidance of doubt, the actual
-> cluster of 64 accumulated interrupts still gets dumped into our
-> cryptographically secure input pool.)
-> 
-> So, for now we are going to stick with the existing interrupt security
-> model, which assumes that each cluster of 64 interrupt data samples is
-> mostly non-malicious and not colluding with an infoleaker. With this as
-> our goal, we can then endeavor to simply accumulate entropy linearly,
-> discarding the least amount of it, and make sure that accumulation is
-> sound, unlike the case with the current fast_mix().
-> 
-> It turns out that this security model is also the trade off that other
-> operating systems have taken. The NT kernel, for example, uses something
-> very simple to accumulate entropy in interrupts, `s = ror32(s, 5) ^ x`.
-> Dodis et al. analyzed this in <https://eprint.iacr.org/2021/523>, and
-> found that rotation by 7 would have been better than 5, but that
-> otherwise, simple linear constructions like this can be used as an
-> entropy collector for 2-monotone distributions.
-> 
-> However, when considering this for our four-word accumulation, versus
-> NT's one-word, we run into potential problems because the words don't
-> contribute to each other, and some may well be fixed, which means we'd
-> need something to schedule on top. And more importantly, our
-> distribution is not 2-monotone like NT's, because in addition to the
-> cycle counter, we also include in those 4 words a register value, a
-> return address, and an inverted jiffies. (Whether capturing anything
-> beyond the cycle counter in the interrupt handler is even adding much of
-> value is a question for a different time.)
-> 
-> So since we have 4 words, and not all of them are 2-monotone, we instead
-> look for a proven linear extractor that works for more complex
-> distributions. It turns out that a max-period linear feedback shift
-> register fits this bill quite well, easily extending to the larger state
-> size and to the fact that we're mixing in more than just the cycle
-> counter. By picking a linear function with no non-trivial invariant
-> subspace, unlike NT's rotate-xor, we benefit from the analysis of
-> <https://eprint.iacr.org/2021/1002>.  This paper proves that those types
-> of linear functions, used in the form `s = f(s) ^ x`, make very good
-> entropy extractors for the type of complex distributions that we have.
-> 
-> This commit implements one such very fast and high diffusion max-period
-> linear function in a Feistel-like fashion, which pipelines quite well.
-> On an i7-11850H, this takes 34 cycles, versus the original's 65 cycles.
-> (Though, as a note for posterity: if later this is replaced with some
-> sort of cryptographic hash function, I'll still be keeping 65 cycles as
-> my target 😋.) This Magma script, <https://א.cc/TiMyEpmr>, proves that
-> this construction does indeed yield a linear function of order 2^128-1
-> whose minimal polynomial is primitive, fitting exactly what we need.
-> 
-> I mention "high diffusion" above, because that apparently was the single
-> discernible design goal of the original fast_mix(), even though that
-> didn't wind up helping anything with it. Nonetheless, we take care to
-> choose a function with pretty high diffusion, even higher than the
-> original fast_mix(). In other words, we probably don't regress at all
-> from a perspective of diffusion, even if it's not really the goal here
-> anyway.
-> 
-> In sum, the security model of this is unchanged from before, yet its
-> implementation now matches that model much more rigorously. And the
-> performance is better, which perhaps matters in interrupt context. I
-> would like to emphasize, again, that the purpose of this commit is to
-> improve the existing design, by making it analyzable, without changing
-> anything fundamental to the existing design. There may well be value
-> down the road in changing up the existing design, using something
-> cryptographic, or simply using a ring buffer of samples rather than
-> having a fast_mix() at all , or changing which and how much data we
-> collect each interrupt, or a variety of other ideas. This commit does
-> not invalidate the potential for those in the future.
-> 
-> As a final note, the previous fast_mix() was contributed on the mailing
-> list by an anonymous author, which violates the kernel project's "real
-> name" policy and has ruffled the feathers of legally-minded people.
-> Replacing this function should clear up those concerns.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 69 +++++++++++++++++++------------------------
->  1 file changed, 31 insertions(+), 38 deletions(-)
+Due to the subreq pointer misuse the private context memory. The aead
+soft crypto occasionally casues the OS panic as setting the 64K page.
+Here is fix it.
 
-Very nice summary, thanks for all of that.  And the patch seems
-straightforward as well, nice work:
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 8caba9fd1f19..a91635c348b5 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -2295,9 +2295,10 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
+ 				struct aead_request *aead_req,
+ 				bool encrypt)
+ {
+-	struct aead_request *subreq = aead_request_ctx(aead_req);
+ 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
+ 	struct device *dev = ctx->dev;
++	struct aead_request *subreq;
++	int ret;
+ 
+ 	/* Kunpeng920 aead mode not support input 0 size */
+ 	if (!a_ctx->fallback_aead_tfm) {
+@@ -2305,6 +2306,10 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
+ 		return -EINVAL;
+ 	}
+ 
++	subreq = aead_request_alloc(a_ctx->fallback_aead_tfm, GFP_KERNEL);
++	if (!subreq)
++		return -ENOMEM;
++
+ 	aead_request_set_tfm(subreq, a_ctx->fallback_aead_tfm);
+ 	aead_request_set_callback(subreq, aead_req->base.flags,
+ 				  aead_req->base.complete, aead_req->base.data);
+@@ -2312,8 +2317,13 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
+ 			       aead_req->cryptlen, aead_req->iv);
+ 	aead_request_set_ad(subreq, aead_req->assoclen);
+ 
+-	return encrypt ? crypto_aead_encrypt(subreq) :
+-		   crypto_aead_decrypt(subreq);
++	if (encrypt)
++		ret = crypto_aead_encrypt(subreq);
++	else
++		ret = crypto_aead_decrypt(subreq);
++	aead_request_free(subreq);
++
++	return ret;
+ }
+ 
+ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
+-- 
+2.33.0
+
