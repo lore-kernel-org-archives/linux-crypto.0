@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7789C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 07:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFE6C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 07:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241582AbiBSHPC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Feb 2022 02:15:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39984 "EHLO
+        id S240497AbiBSHRx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Feb 2022 02:17:53 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiBSHPB (ORCPT
+        with ESMTP id S229737AbiBSHRw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Feb 2022 02:15:01 -0500
+        Sat, 19 Feb 2022 02:17:52 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A19E580D9;
-        Fri, 18 Feb 2022 23:14:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01861580CA;
+        Fri, 18 Feb 2022 23:17:35 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 73DC068BEB; Sat, 19 Feb 2022 08:14:40 +0100 (CET)
-Date:   Sat, 19 Feb 2022 08:14:40 +0100
+        id 5EEC368BEB; Sat, 19 Feb 2022 08:17:30 +0100 (CET)
+Date:   Sat, 19 Feb 2022 08:17:30 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Baoquan He <bhe@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -30,19 +30,27 @@ Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
         svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
         linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: Re: [PATCH 20/22] HID: intel-ish-hid: Use dma_alloc_noncoherent()
- for dma buffer
-Message-ID: <20220219071440.GF26711@lst.de>
-References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-21-bhe@redhat.com>
+Subject: Re: [PATCH 21/22] mmc: wbsd: Use dma_alloc_noncoherent() for dma
+ buffer
+Message-ID: <20220219071730.GG26711@lst.de>
+References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-22-bhe@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220219005221.634-21-bhe@redhat.com>
+In-Reply-To: <20220219005221.634-22-bhe@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Looks good,
+On Sat, Feb 19, 2022 at 08:52:20AM +0800, Baoquan He wrote:
+>  	if (request_dma(dma, DRIVER_NAME))
+>  		goto err;
+>  
+> +	dma_set_mask_and_coherent(mmc_dev(host->mmc), DMA_BIT_MASK(24));
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This also sets the streaming mask, but the driver doesn't seem to make
+use of that.  Please document it in the commit log.
+
+Also setting smaller than 32 bit masks can fail, so this should have
+error handling.
