@@ -2,128 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA153C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 11:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2CAC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 21:32:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239523AbiBSLmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Feb 2022 06:42:21 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36624 "EHLO
+        id S230371AbiBSVdA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Feb 2022 16:33:00 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232300AbiBSLmV (ORCPT
+        with ESMTP id S229516AbiBSVc7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Feb 2022 06:42:21 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92AAB32078;
-        Sat, 19 Feb 2022 03:42:01 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4650CB8013C;
-        Sat, 19 Feb 2022 11:42:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D30C340EB;
-        Sat, 19 Feb 2022 11:41:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645270919;
-        bh=42N0kSNDN/I0l7uNeWq1bWt0szwT7gCbE5fdpr8yCWs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=O3O2Mbkpy5TFqAygEu87Dvm9J87aB8FAFvYPSkE9DLHzRQlZXkAlWApSkQQZaFgEB
-         L7jszgblHHH1L7JJkforHcFZ1JF0KCGZZifWtslRWx0DiUcBvShfihcgZI4qViffbd
-         lFcKrpPkZ4X6Tv3yILibtkxjXDNyudmM44Q0NRt40XQFBugcE3Zk8Wx8flsPYcquN9
-         btlLaJmoCSDzGgbHEnOj4/SZJVMq5rGGoc7oKv2UtbLINzm3E2uYd0qHeD5NPhMdoL
-         n4gyWmC6Wk1UZMXw3VAsPWZ7eZIWvFMLnLllPTyk+FcpqyUZA8plxckNOLRlTnifdr
-         3XFtUZubEZoYg==
-Date:   Sat, 19 Feb 2022 12:42:30 +0100
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Andreas Rammhold <andreas@rammhold.de>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH v8 0/5] Enable root to update the blacklist keyring
-Message-ID: <YhDXpq8YDhxg0RLW@iki.fi>
-References: <20210712170313.884724-1-mic@digikod.net>
- <7e8d27da-b5d4-e42c-af01-5c03a7f36a6b@digikod.net>
- <YcGVZitNa23PCSFV@iki.fi>
- <5030a9ff-a1d1-a9bd-902a-77c3d1d87446@digikod.net>
- <Ydc/E3S2vmtDOnpw@iki.fi>
- <YddADJJNLDlQAYRW@iki.fi>
- <86c5010e-a926-023a-8915-d6605cfc4f0a@digikod.net>
- <e4707df2-ecc2-0471-87fc-c54e774fe315@digikod.net>
- <Yg6o/ARtOIwuBFsW@iki.fi>
+        Sat, 19 Feb 2022 16:32:59 -0500
+X-Greylist: delayed 1720 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 19 Feb 2022 13:32:40 PST
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07DBDE88
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Feb 2022 13:32:39 -0800 (PST)
+Received: from dread.disaster.area (pa49-186-17-0.pa.vic.optusnet.com.au [49.186.17.0])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id C654052F78C;
+        Sun, 20 Feb 2022 08:03:55 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1nLWtW-00E1z1-7i; Sun, 20 Feb 2022 08:03:54 +1100
+Date:   Sun, 20 Feb 2022 08:03:54 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Kyle Sanderson <kyle.leet@gmail.com>
+Cc:     qat-linux@intel.com, giovanni.cabiddu@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dm-devel@redhat.com, Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <20220219210354.GF59715@dread.disaster.area>
+References: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yg6o/ARtOIwuBFsW@iki.fi>
+In-Reply-To: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=VuxAv86n c=1 sm=1 tr=0 ts=62115b3d
+        a=+dVDrTVfsjPpH/ci3UuFng==:117 a=+dVDrTVfsjPpH/ci3UuFng==:17
+        a=kj9zAlcOel0A:10 a=oGFeUVbbRNcA:10 a=nt1UNTH2AAAA:8 a=7-415B0cAAAA:8
+        a=tiecrrFWBOFT3706sEAA:9 a=CjuIK1q_8ugA:10 a=1jnEqRSf4vEA:10
+        a=7AW3Uk2BEroXwU7YnAE8:22 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 08:58:57PM +0100, Jarkko Sakkinen wrote:
-> On Mon, Jan 31, 2022 at 12:33:51PM +0100, Mickaël Salaün wrote:
-> > 
-> > On 07/01/2022 13:14, Mickaël Salaün wrote:
-> > > 
-> > > On 06/01/2022 20:16, Jarkko Sakkinen wrote:
-> > > > On Thu, Jan 06, 2022 at 09:12:22PM +0200, Jarkko Sakkinen wrote:
-> > > > > On Tue, Jan 04, 2022 at 04:56:36PM +0100, Mickaël Salaün wrote:
-> > > > > > 
-> > > > > > On 21/12/2021 09:50, Jarkko Sakkinen wrote:
-> > > > > > > On Mon, Dec 13, 2021 at 04:30:29PM +0100, Mickaël Salaün wrote:
-> > > > > > > > Hi Jarkko,
-> > > > > > > > 
-> > > > > > > > Since everyone seems OK with this and had plenty of
-> > > > > > > > time to complain, could
-> > > > > > > > you please take this patch series in your tree? It still applies on
-> > > > > > > > v5.16-rc5 and it is really important to us. Please
-> > > > > > > > let me know if you need
-> > > > > > > > something more.
-> > > > > > > > 
-> > > > > > > > Regards,
-> > > > > > > >    Mickaël
-> > > > > > > 
-> > > > > > > I'm off-work up until end of the year, i.e. I will
-> > > > > > > address only important
-> > > > > > > bug fixes and v5.16 up until that.
-> > > > > > > 
-> > > > > > > If any of the patches is yet missing my ack, feel free to
-> > > > > > > 
-> > > > > > > Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > > > > > 
-> > > > > > Thanks Jarkko. Can you please take it into your tree?
-> > > > > 
-> > > > > I can yes, as I need to anyway do a revised PR for v5.17, as one commit
-> > > > > in my first trial had a truncated fixes tag.
-> > > > 
-> > > > Please check:
-> > > > 
-> > > > git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
-> > > > 
-> > > > /Jarkko
-> > > 
-> > > Great, thanks!
-> > 
-> > Hi Jarkko,
-> > 
-> > I noticed your commits https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/commit/?id=3ec9c3a0531ac868422be3b12fc17310ed8c07dc
-> > are no more referenced in your tree. Is there an issue?
-> 
-> This must be some sort of mistake I've made. I'll re-apply the patches.
-> Sorry about this.
+On Fri, Feb 18, 2022 at 09:02:28PM -0800, Kyle Sanderson wrote:
+> A2SDi-8C-HLN4F has IQAT enabled by default, when this device is
+> attempted to be used by xfs (through dm-crypt) the entire kernel
+> thread stalls forever. Multiple users have hit this over the years
+> (through sporadic reporting) - I ended up trying ZFS and encryption
+> wasn't an issue there at all because I guess they don't use this
+> device. Returning to sanity (xfs), I was able to provision a dm-crypt
+> volume no problem on the disk, however when running mkfs.xfs on the
+> volume is what triggers the cascading failure (each request kills a
+> kthread).
 
-OK now the patches are in and will be included to the next PR. I fixed
-merge conflicts caused by 5cca36069d4c ("certs: refactor file cleaning")
-in "certs: Check that builtin blacklist hashes are valid" so please
-sanity check that it is good.
+Can you provide the full stack traces for these errors so we can see
+exactly what this cascading failure looks like, please? In reality,
+the stall messages some time after this are not interesting - it's
+the first errors that cause the stall that need to be investigated.
 
-BR, Jarkko
+A good idea would be to provide the full storage stack decription
+and hardware in use, as per:
+
+https://xfs.org/index.php/XFS_FAQ#Q:_What_information_should_I_include_when_reporting_a_problem.3F
+
+> Disabling IQAT on the south bridge results in a working
+> system, however this is not the default configuration for the
+> distribution of choice (Ubuntu 20.04.3 LTS), nor the motherboard. I'm
+> convinced this never worked properly based on the lack of popularity
+> for kernel encryption (crypto), and the embedded nature that
+> SuperMicro has integrated this device in collaboration with intel as
+> it looks like the primary usage is through external accelerator cards.
+
+This really sounds like broken hardware, not a kernel problem.
+
+> Kernels tried were from RHEL8 over a year ago, and this impacts the
+> entirety of the 5.4 series on Ubuntu.
+> Please CC me on replies as I'm not subscribed to all lists. CPU is C3758.
+
+[snip stalled kcryptd worker threads]
+
+This implies a dmcrypt level problem - XFS can't make progress is
+dmcrypt is not completing IOs.
+
+Where are the XFS corruption reports that the subject implies is
+occurring?
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
