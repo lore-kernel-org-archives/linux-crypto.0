@@ -2,180 +2,166 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6095BC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 00:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD1F0C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 01:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235627AbiBSA7u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 19:59:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40018 "EHLO
+        id S240864AbiBSBVj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 20:21:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241011AbiBSA6k (ORCPT
+        with ESMTP id S240701AbiBSBVi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 19:58:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ED76427FBA4
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Feb 2022 16:57:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645232255;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=VzXzJB2PJKullCIvRUJRQ/3FG4DX8V+bJRm6qvn5FmA=;
-        b=QQaLSNbH1SsuKasjrtZqJCNqN+Di0U3z2a672H27kUdCe7qDR7AwLLrp+dT+89m6mzgImM
-        0fxroyzlA0JXcDz4RKo0ZFHvM+/ngmB/ZHkOw3pB0U8W6OZ5j6ANCUtZNl3XS2VP6GjdOE
-        qauSPI/9qadgtlX87IsKNHhDZK+A4dA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-218-DtD3djaMMzmALzLGQE-47g-1; Fri, 18 Feb 2022 19:57:31 -0500
-X-MC-Unique: DtD3djaMMzmALzLGQE-47g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 18 Feb 2022 20:21:38 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B8618406E
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Feb 2022 17:21:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 943B21006AA0;
-        Sat, 19 Feb 2022 00:57:28 +0000 (UTC)
-Received: from MiWiFi-R3L-srv.redhat.com (ovpn-12-39.pek2.redhat.com [10.72.12.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E930262D4E;
-        Sat, 19 Feb 2022 00:57:18 +0000 (UTC)
-From:   Baoquan He <bhe@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, akpm@linux-foundation.org, hch@lst.de,
-        cl@linux.com, 42.hyeyoo@gmail.com, penberg@kernel.org,
-        rientjes@google.com, iamjoonsoo.kim@lge.com, vbabka@suse.cz,
-        David.Laight@ACULAB.COM, david@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        netdev@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
-        linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: [PATCH 22/22] mtd: rawnand: Use dma_alloc_noncoherent() for dma buffer
-Date:   Sat, 19 Feb 2022 08:52:21 +0800
-Message-Id: <20220219005221.634-23-bhe@redhat.com>
-In-Reply-To: <20220219005221.634-1-bhe@redhat.com>
-References: <20220219005221.634-1-bhe@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 466F762018
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Feb 2022 01:21:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D7AC340E9;
+        Sat, 19 Feb 2022 01:21:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645233679;
+        bh=0yZROx1zfBGesuvOmp4yoXRqrpLpABCEUu2sb63C8RY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=INOT5CJig3IlpxmWZiE9M616AaKXVeyseAlLvygBfVKSHaFWNHylh8R3YCwV5EyZf
+         tH1/UAKQ0QIa6agDDQ8osx75LCDGvBVlrd/CE1TfNLnH2QPxUFFDsbfOmIYyEbfD9K
+         1y3uCorvlsG3kzN4B5bd9felDv4VBJt1JZFAB31uQFY6HH551jPFCrIgsreebAXTpx
+         Ogxhg3AAf3pvnBFxJoQs3jpvPAVoBRhQngF6WTga+Roj+Jm86pcU1lk3gNKGvRZuMr
+         fh+gIDv0QZfPk4HLcsKjYdm9LxXczaCnZ6ovlFbFGAdQ8r4yorj4AeznvMawauSX6D
+         i+e6144L5FlmQ==
+Date:   Fri, 18 Feb 2022 17:21:17 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [RFC PATCH v2 7/7] crypto: arm64/polyval: Add PMULL accelerated
+ implementation of POLYVAL
+Message-ID: <YhBGDbNOs2crcmzd@sol.localdomain>
+References: <20220210232812.798387-1-nhuck@google.com>
+ <20220210232812.798387-8-nhuck@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220210232812.798387-8-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use dma_alloc_noncoherent() instead of directly allocating buffer
-from kmalloc with GFP_DMA. DMA API will try to allocate buffer
-depending on devices addressing limitation.
+A lot of the comments I made on the x86_64 version apply to the arm64 version,
+but a few more comments below:
 
-[ 42.hyeyoo@gmail.com: Use dma_alloc_noncoherent() instead of
-  __get_free_page() and update changelog.
+On Thu, Feb 10, 2022 at 11:28:12PM +0000, Nathan Huckleberry wrote:
+> Add hardware accelerated version of POLYVAL for ARM64 CPUs with
+> Crypto Extension support.
 
-  As it does not allocate high order buffers, allocate buffer
-  when needed and free after DMA. ]
+Nit: It's "Crypto Extensions", not "Crypto Extension".
 
-Signed-off-by: Baoquan He <bhe@redhat.com>
-Signed-off-by: Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Sumit Semwal <sumit.semwal@linaro.org>
-Cc: christian.koenig@amd.com
-Cc: linux-mtd@lists.infradead.org
+> +config CRYPTO_POLYVAL_ARM64_CE
+> +	tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
+> +	depends on KERNEL_MODE_NEON
+> +	select CRYPTO_CRYPTD
+> +	select CRYPTO_HASH
+> +	select CRYPTO_POLYVAL
 
----
- drivers/mtd/nand/raw/marvell_nand.c | 55 ++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 21 deletions(-)
+CRYPTO_POLYVAL selects CRYPTO_HASH already, so there's no need to select it
+here.
 
-diff --git a/drivers/mtd/nand/raw/marvell_nand.c b/drivers/mtd/nand/raw/marvell_nand.c
-index 2455a581fd70..c0b64a7e50af 100644
---- a/drivers/mtd/nand/raw/marvell_nand.c
-+++ b/drivers/mtd/nand/raw/marvell_nand.c
-@@ -860,26 +860,45 @@ static int marvell_nfc_xfer_data_dma(struct marvell_nfc *nfc,
- 	struct dma_async_tx_descriptor *tx;
- 	struct scatterlist sg;
- 	dma_cookie_t cookie;
--	int ret;
-+	dma_addr_t dma_handle;
-+	int ret = 0;
- 
- 	marvell_nfc_enable_dma(nfc);
-+
-+	/*
-+	 * DMA must act on length multiple of 32 and this length may be
-+	 * bigger than the destination buffer. Use this buffer instead
-+	 * for DMA transfers and then copy the desired amount of data to
-+	 * the provided buffer.
-+	 */
-+	nfc->dma_buf = dma_alloc_noncoherent(nfc->dev, MAX_CHUNK_SIZE,
-+						&dma_handle,
-+						direction,
-+						GFP_ATOMIC);
-+	if (!nfc->dma_buf) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+
- 	/* Prepare the DMA transfer */
--	sg_init_one(&sg, nfc->dma_buf, dma_len);
--	dma_map_sg(nfc->dma_chan->device->dev, &sg, 1, direction);
--	tx = dmaengine_prep_slave_sg(nfc->dma_chan, &sg, 1,
-+	tx = dmaengine_prep_slave_single(nfc->dma_chan, dma_handle, dma_len,
- 				     direction == DMA_FROM_DEVICE ?
- 				     DMA_DEV_TO_MEM : DMA_MEM_TO_DEV,
- 				     DMA_PREP_INTERRUPT);
- 	if (!tx) {
- 		dev_err(nfc->dev, "Could not prepare DMA S/G list\n");
--		return -ENXIO;
-+		ret = -ENXIO;
-+		goto free;
- 	}
- 
- 	/* Do the task and wait for it to finish */
- 	cookie = dmaengine_submit(tx);
- 	ret = dma_submit_error(cookie);
--	if (ret)
--		return -EIO;
-+	if (ret) {
-+		ret = -EIO;
-+		goto free;
-+	}
- 
- 	dma_async_issue_pending(nfc->dma_chan);
- 	ret = marvell_nfc_wait_cmdd(nfc->selected_chip);
-@@ -889,10 +908,16 @@ static int marvell_nfc_xfer_data_dma(struct marvell_nfc *nfc,
- 		dev_err(nfc->dev, "Timeout waiting for DMA (status: %d)\n",
- 			dmaengine_tx_status(nfc->dma_chan, cookie, NULL));
- 		dmaengine_terminate_all(nfc->dma_chan);
--		return -ETIMEDOUT;
-+		ret = -ETIMEDOUT;
-+		goto free;
- 	}
- 
--	return 0;
-+free:
-+	dma_free_noncoherent(nfc->dev, MAX_CHUNK_SIZE, nfc->dma_buf,
-+			     dma_handle, direction);
-+
-+out:
-+	return ret;
- }
- 
- static int marvell_nfc_xfer_data_in_pio(struct marvell_nfc *nfc, u8 *in,
-@@ -2814,18 +2839,6 @@ static int marvell_nfc_init_dma(struct marvell_nfc *nfc)
- 		goto release_channel;
- 	}
- 
--	/*
--	 * DMA must act on length multiple of 32 and this length may be
--	 * bigger than the destination buffer. Use this buffer instead
--	 * for DMA transfers and then copy the desired amount of data to
--	 * the provided buffer.
--	 */
--	nfc->dma_buf = kmalloc(MAX_CHUNK_SIZE, GFP_KERNEL | GFP_DMA);
--	if (!nfc->dma_buf) {
--		ret = -ENOMEM;
--		goto release_channel;
--	}
--
- 	nfc->use_dma = true;
- 
- 	return 0;
--- 
-2.17.2
+> /*
+>  * Handle any extra blocks before
+>  * full_stride loop.
+>  */
+> .macro partial_stride
+> 	eor		LO.16b, LO.16b, LO.16b
+> 	eor		MI.16b, MI.16b, MI.16b
+> 	eor		HI.16b, HI.16b, HI.16b
+> 	add		KEY_START, x1, #(NUM_PRECOMPUTE_POWERS << 4)
+> 	sub		KEY_START, KEY_START, PARTIAL_LEFT, lsl #4
+> 	ld1		{v0.16b}, [KEY_START]
+> 	mov		v1.16b, SUM.16b
+> 	karatsuba1 v0 v1
+> 	karatsuba2
+> 	montgomery_reduction
+> 	mov		SUM.16b, PH.16b
+> 	eor		LO.16b, LO.16b, LO.16b
+> 	eor		MI.16b, MI.16b, MI.16b
+> 	eor		HI.16b, HI.16b, HI.16b
+> 	mov		IND, XZR
+> .LloopPartial:
+> 	cmp		IND, PARTIAL_LEFT
+> 	bge		.LloopExitPartial
+> 
+> 	sub		TMP, IND, PARTIAL_LEFT
+> 
+> 	cmp		TMP, #-4
+> 	bgt		.Lgt4Partial
+> 	ld1		{M0.16b, M1.16b,  M2.16b, M3.16b}, [x0], #64
+> 	// Clobber key registers
+> 	ld1		{KEY8.16b, KEY7.16b, KEY6.16b,  KEY5.16b}, [KEY_START], #64
+> 	karatsuba1 M0 KEY8
+> 	karatsuba1 M1 KEY7
+> 	karatsuba1 M2 KEY6
+> 	karatsuba1 M3 KEY5
+> 	add		IND, IND, #4
+> 	b		.LoutPartial
+> 
+> .Lgt4Partial:
+> 	cmp		TMP, #-3
+> 	bgt		.Lgt3Partial
+> 	ld1		{M0.16b, M1.16b, M2.16b}, [x0], #48
+> 	// Clobber key registers
+> 	ld1		{KEY8.16b, KEY7.16b, KEY6.16b}, [KEY_START], #48
+> 	karatsuba1 M0 KEY8
+> 	karatsuba1 M1 KEY7
+> 	karatsuba1 M2 KEY6
+> 	add		IND, IND, #3
+> 	b		.LoutPartial
+> 
+> .Lgt3Partial:
+> 	cmp		TMP, #-2
+> 	bgt		.Lgt2Partial
+> 	ld1		{M0.16b, M1.16b}, [x0], #32
+> 	// Clobber key registers
+> 	ld1		{KEY8.16b, KEY7.16b}, [KEY_START], #32
+> 	karatsuba1 M0 KEY8
+> 	karatsuba1 M1 KEY7
+> 	add		IND, IND, #2
+> 	b		.LoutPartial
+> 
+> .Lgt2Partial:
+> 	ld1		{M0.16b}, [x0], #16
+> 	// Clobber key registers
+> 	ld1		{KEY8.16b}, [KEY_START], #16
+> 	karatsuba1 M0 KEY8
+> 	add		IND, IND, #1
+> .LoutPartial:
+> 	b .LloopPartial
+> .LloopExitPartial:
+> 	karatsuba2
+> 	montgomery_reduction
+> 	eor		SUM.16b, SUM.16b, PH.16b
+> .endm
 
+This sort of logic for handling different message lengths is necessary, but it's
+partly why I think that testing different message lengths is so important --
+there could be bugs that are specific to particular message lengths.
+
+With CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, we do get test coverage from the fuzz
+tests that compare implementations to the corresponding generic implementation.
+But, it's preferable to not rely on that and have good default test vectors too.
+
+It looks like you already do a relatively good job with the message lengths in
+the polyval test vectors.  But it might be worth adding a test vector where the
+length mod 128 is 112, so that the case where partial_stride processes 7 blocks
+is tested.  Also one where the message length is greater than 128 (or even 256)
+bytes but isn't a multiple of 128, so that the case where *both* partial_stride
+and full_stride are executed is tested.
+
+- Eric
