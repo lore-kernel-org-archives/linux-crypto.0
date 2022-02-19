@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B8AC4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 07:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70770C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 07:09:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234627AbiBSHJX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Feb 2022 02:09:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47338 "EHLO
+        id S241447AbiBSHJc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 19 Feb 2022 02:09:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241440AbiBSHJP (ORCPT
+        with ESMTP id S241443AbiBSHJb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Feb 2022 02:09:15 -0500
+        Sat, 19 Feb 2022 02:09:31 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E6525A332;
-        Fri, 18 Feb 2022 23:08:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C996225A32F;
+        Fri, 18 Feb 2022 23:09:08 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id E4F9468D05; Sat, 19 Feb 2022 08:08:53 +0100 (CET)
-Date:   Sat, 19 Feb 2022 08:08:53 +0100
+        id 1363768D05; Sat, 19 Feb 2022 08:09:06 +0100 (CET)
+Date:   Sat, 19 Feb 2022 08:09:05 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Baoquan He <bhe@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -30,20 +30,20 @@ Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
         svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
         linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: Re: [PATCH 07/22] fbdev: mx3fb: Don't use GFP_DMA when calling
- dma_alloc_wc()
-Message-ID: <20220219070853.GG26505@lst.de>
-References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-8-bhe@redhat.com>
+Subject: Re: [PATCH 08/22] usb: gadget: lpc32xx_udc: Don't use GFP_DMA when
+ calling dma_alloc_coherent()
+Message-ID: <20220219070905.GH26505@lst.de>
+References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-9-bhe@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220219005221.634-8-bhe@redhat.com>
+In-Reply-To: <20220219005221.634-9-bhe@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 19, 2022 at 08:52:06AM +0800, Baoquan He wrote:
+On Sat, Feb 19, 2022 at 08:52:07AM +0800, Baoquan He wrote:
 > dma_alloc_coherent() allocates dma buffer with device's addressing
 > limitation in mind. It's redundent to specify GFP_DMA when calling
 > dma_alloc_coherent().
