@@ -2,87 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC5FC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 00:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CD3C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 19 Feb 2022 00:54:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240633AbiBSAyd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Feb 2022 19:54:33 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35984 "EHLO
+        id S240592AbiBSAyo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Feb 2022 19:54:44 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235966AbiBSAyb (ORCPT
+        with ESMTP id S240641AbiBSAye (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Feb 2022 19:54:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56676279939
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Feb 2022 16:54:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645232051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=dwAXIJjvyzyC68EvehXD0rSk/MDUU+JZL7WQ4Cml0BM=;
-        b=CvZS4ALBMj+Wz71dE11JkMcgEOrX9Gr2S4iDYjNaXLYqbX9L5j8sotcw+VFuuZBdr5Ynf8
-        cjArdrjLSa/s6EFcJv+Ey+5/uXpHwvQBcCOsiy6fPAhroGrWbtx1VlhbfvIZWExnC5nIl7
-        yfLMkebvxJiwqUG1RsaxDHBlhdRndi0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-612-g-toJ0TtPDO6mczC3xLlzA-1; Fri, 18 Feb 2022 19:54:05 -0500
-X-MC-Unique: g-toJ0TtPDO6mczC3xLlzA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 18 Feb 2022 19:54:34 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB7F27792B
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Feb 2022 16:54:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14A4A1091DA2;
-        Sat, 19 Feb 2022 00:54:03 +0000 (UTC)
-Received: from MiWiFi-R3L-srv.redhat.com (ovpn-12-39.pek2.redhat.com [10.72.12.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 98F9262D4E;
-        Sat, 19 Feb 2022 00:53:54 +0000 (UTC)
-From:   Baoquan He <bhe@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-mm@kvack.org, akpm@linux-foundation.org, hch@lst.de,
-        cl@linux.com, 42.hyeyoo@gmail.com, penberg@kernel.org,
-        rientjes@google.com, iamjoonsoo.kim@lge.com, vbabka@suse.cz,
-        David.Laight@ACULAB.COM, david@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        netdev@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
-        linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: [PATCH 07/22] fbdev: mx3fb: Don't use GFP_DMA when calling dma_alloc_wc()
-Date:   Sat, 19 Feb 2022 08:52:06 +0800
-Message-Id: <20220219005221.634-8-bhe@redhat.com>
-In-Reply-To: <20220219005221.634-1-bhe@redhat.com>
-References: <20220219005221.634-1-bhe@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        by ams.source.kernel.org (Postfix) with ESMTPS id AF4B8B82764
+        for <linux-crypto@vger.kernel.org>; Sat, 19 Feb 2022 00:54:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 178BAC340ED;
+        Sat, 19 Feb 2022 00:54:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645232054;
+        bh=o4V+SgoVVVDHAsLHw06x53cm5Mf2URwbscepLNprQm8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hchYl3a7A04OP3TCtC0kUYAvSNFTvVycRXIzFOsPhXEfc6Ab9rODywKnXQrF55Dm+
+         ziV4s7gPesway+6g0dDiZmkFME2pXcAsZaX8A1Ef8vUF7bA2FSXxLuQ1QFUk/ftR3p
+         hEEReo/TmmU8Exysgt6nGdn8FQ+yldOTLoon/5CjQHC3ulItzDrp2vBvF64Vz/X9lv
+         x1D956MEkpBQpeXlcMGhScauh/Q+jO8Lh8B1EhVrTWT8rUYagwwR0cEweqL3XWGN91
+         K/gVVBRQcpNFYuM0VwJ2P+cdkJNJp+vAEvKM9BGXsznTLLu02k6EuTqhHrukVWg0VK
+         4uBv2TJlY5UAw==
+Date:   Fri, 18 Feb 2022 16:54:12 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [RFC PATCH v2 6/7] crypto: x86/polyval: Add PCLMULQDQ
+ accelerated implementation of POLYVAL
+Message-ID: <YhA/tAaDi/3e35Q1@sol.localdomain>
+References: <20220210232812.798387-1-nhuck@google.com>
+ <20220210232812.798387-7-nhuck@google.com>
+ <YhA7Ej8UfyCwkTNa@sol.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YhA7Ej8UfyCwkTNa@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-dma_alloc_coherent() allocates dma buffer with device's addressing
-limitation in mind. It's redundent to specify GFP_DMA when calling
-dma_alloc_coherent().
+On Fri, Feb 18, 2022 at 04:34:28PM -0800, Eric Biggers wrote:
+> > +.macro schoolbook1_iteration i xor_sum
+> > +	.set i, \i
+> > +	.set xor_sum, \xor_sum
+> > +	movups (16*i)(OP1), %xmm0
+> > +	.if(i == 0 && xor_sum == 1)
+> > +		pxor SUM, %xmm0
+> > +	.endif
+> > +	vpclmulqdq $0x01, (16*i)(OP2), %xmm0, %xmm1
+> > +	vpxor %xmm1, MI, MI
+> > +	vpclmulqdq $0x00, (16*i)(OP2), %xmm0, %xmm2
+> > +	vpxor %xmm2, LO, LO
+> > +	vpclmulqdq $0x11, (16*i)(OP2), %xmm0, %xmm3
+> > +	vpxor %xmm3, HI, HI
+> > +	vpclmulqdq $0x10, (16*i)(OP2), %xmm0, %xmm4
+> > +	vpxor %xmm4, MI, MI
+> 
+> Perhaps the above multiplications and XORs should be reordered slightly so that
+> each XOR doesn't depend on the previous instruction?  A good ordering might be:
+> 
+> 	vpclmulqdq $0x01, (16*\i)(OP2), %xmm0, %xmm1
+> 	vpclmulqdq $0x10, (16*\i)(OP2), %xmm0, %xmm2
+> 	vpclmulqdq $0x00, (16*\i)(OP2), %xmm0, %xmm3
+> 	vpclmulqdq $0x11, (16*\i)(OP2), %xmm0, %xmm4
+> 	vpxor %xmm1, MI, MI
+> 	vpxor %xmm3, LO, LO
+> 	vpxor %xmm4, HI, HI
+> 	vpxor %xmm2, MI, MI
+> 
+> With that, no instruction would depend on either of the previous two
+> instructions.
+> 
+> This might be more important in the ARM64 version than the x86_64 version, as
+> x86_64 CPUs are pretty aggressive about internally reordering instructions.  But
+> it's something to consider in both versions.
+> 
+> Likewise in schoolbook1_noload.
 
-[ 42.hyeyoo@gmail.com: Update changelog ]
+Or slightly better:
 
-Signed-off-by: Baoquan He <bhe@redhat.com>
-Acked-by: Hyeonggon Yoo <42.hyeyoo@gmail.com>
----
- drivers/video/fbdev/mx3fb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+        vpclmulqdq $0x01, (16*\i)(OP2), %xmm0, %xmm2
+        vpclmulqdq $0x00, (16*\i)(OP2), %xmm0, %xmm1
+        vpclmulqdq $0x10, (16*\i)(OP2), %xmm0, %xmm3
+        vpclmulqdq $0x11, (16*\i)(OP2), %xmm0, %xmm4
+        vpxor %xmm2, MI, MI
+        vpxor %xmm1, LO, LO
+        vpxor %xmm4, HI, HI
+        vpxor %xmm3, MI, MI
 
-diff --git a/drivers/video/fbdev/mx3fb.c b/drivers/video/fbdev/mx3fb.c
-index fabb271337ed..dc0b13d9e8b7 100644
---- a/drivers/video/fbdev/mx3fb.c
-+++ b/drivers/video/fbdev/mx3fb.c
-@@ -1335,7 +1335,7 @@ static int mx3fb_map_video_memory(struct fb_info *fbi, unsigned int mem_len,
- 	dma_addr_t addr;
- 
- 	fbi->screen_base = dma_alloc_wc(fbi->device, mem_len, &addr,
--					GFP_DMA | GFP_KERNEL);
-+					GFP_KERNEL);
- 
- 	if (!fbi->screen_base) {
- 		dev_err(fbi->device, "Cannot allocate %u bytes framebuffer memory\n",
--- 
-2.17.2
-
+- Eric
