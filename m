@@ -2,131 +2,207 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE4DC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Feb 2022 19:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43904C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Feb 2022 23:22:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241895AbiBTT05 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 14:26:57 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50484 "EHLO
+        id S245258AbiBTXXB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 18:23:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236189AbiBTT04 (ORCPT
+        with ESMTP id S236754AbiBTXXA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 14:26:56 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A68F09;
-        Sun, 20 Feb 2022 11:26:34 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id x5so18651010wrg.13;
-        Sun, 20 Feb 2022 11:26:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=LWm5zdqv8O8Xcr8Kowr4BNABtqELiYBN0AVoYt4UafA=;
-        b=LlalxNhXyqFcmQ5R61au2Y4lhsstuBzakGzWUN17uOPYGVQ8/Mu8FKB+iDQ2uhG/Yv
-         ycplkYECdRdI86zotWf/xRkoVyAjSO5G3uCFycbrJ+etX19xFOheKMRro/IncoAGxfFG
-         uh/wdkP27uCwTfxX013GC1c4VsbFnM/FH/PmBy81WSvP/2tUuMJFiIR3571ABWGvdPcj
-         ymveYjSLE6/KrQLt6KkpPPuWmnFYrxYppYjMVTCBJ9MVrrtmiFlcp4hXzK/UHLbgmpNi
-         TB1kpr1u80j7+0l2LpNVw2LhdaM8azo9F5aeN7eInZam3FqHifgRVMJ8oP0+jSob1nUt
-         dYjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LWm5zdqv8O8Xcr8Kowr4BNABtqELiYBN0AVoYt4UafA=;
-        b=eI0K/rzfi1x2XMoWNfmKOs4SbqO1QMff1I2frCmBSerR3mzAcWWsnpQijHb0a3pU2c
-         5yOspHahRdyWzIF7U5R2MXdfeRDgdrY5Uyu3RaaysjY299cBbKI8Nh6P+/NH0/6rcO0p
-         2JtlQbFybj+PoRuQ6ZciBO9KimuNc+nh5sWpYN1V9M6poMR5Z0O67oFxAvaMcwpROIV8
-         /crXYooPSScfMzzOxJpVaEU2lrPp+zCfngnKD1VRy7W1+374awBaQRvYAporRQo4S+qn
-         WNJDNUGRYbp+qR3eTWHnkwbiDfhqPevjXNbTbWqzB1SYc6HVyE4SNdHCRG62nYK6u091
-         /5ew==
-X-Gm-Message-State: AOAM532HsnRSyzjb1XygEUmaowkqJWXR0LuIk8M6EVF71B+6eegxQnm1
-        JFIU9eGWgQV5w1eHCOWSRDE=
-X-Google-Smtp-Source: ABdhPJwMOVuvQ8z/+4ZmEfqQy6za0nykUsMgsj4Sz2Tggw/rAZrFm/q2KL7k17rHt2+1FHGidReF0w==
-X-Received: by 2002:a5d:5045:0:b0:1e3:20ed:4386 with SMTP id h5-20020a5d5045000000b001e320ed4386mr13185334wrt.262.1645385193397;
-        Sun, 20 Feb 2022 11:26:33 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id a17-20020a05600c069100b0037ddbe6da71sm5301378wmn.20.2022.02.20.11.26.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Feb 2022 11:26:33 -0800 (PST)
-Date:   Sun, 20 Feb 2022 20:26:31 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen
- = authsize =0
-Message-ID: <YhKV55t90HWm6bhv@Red>
-References: <YgOQBNIdf0UnSH+M@Red>
- <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
- <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
+        Sun, 20 Feb 2022 18:23:00 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054D239A;
+        Sun, 20 Feb 2022 15:22:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 86C8E60FA7;
+        Sun, 20 Feb 2022 23:22:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 186BFC340E8;
+        Sun, 20 Feb 2022 23:22:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645399357;
+        bh=3z3X8nPJCphhYNhLkKRt8j/6BnWu10ouKJ/lOj8V9dw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Vzr4UtPq3g/zuq5Yx0UWTzFk5C47Z5UT1uYcxWnjNNIUKM4Rwaov+Doduz+HHTGg/
+         r48VnDUm6JeGrW+vYEOaG/DGYLEUxUJNqJ3NM8i1xeoxhiJIA3ISyzENb8ahvNT8p8
+         DFZPbBGibzvZtng+NnRASrEbwYxuUpmNL6UOO13vYzWA0QLQcFFyOfaNbfUWDqqu75
+         HvAcnLXtj7HYnWMBXi6uGLrR7KgeJ+UapgZaViXuKjbWXTQtuOcTFpIWx2dEHdB5kV
+         VZhEb5nlHneoOaJR2qerCZ6uQd/ArXmEp+dDX6xl2gFmSg6mwHEip8qPu04H+GxkoV
+         DOpvHDOM+qGxQ==
+Date:   Mon, 21 Feb 2022 00:23:15 +0100
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        zohar@linux.ibm.com, dhowells@redhat.com, dwmw2@infradead.org,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+        torvalds@linux-foundation.org, weiyongjun1@huawei.com,
+        nayna@linux.ibm.com, ebiggers@google.com, ardb@kernel.org,
+        nramas@linux.microsoft.com, lszubowi@redhat.com, jason@zx2c4.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-security-module@vger.kernel.org,
+        James.Bottomley@hansenpartnership.com, pjones@redhat.com,
+        konrad.wilk@oracle.com
+Subject: Re: [PATCH v8 00/17] Enroll kernel keys thru MOK
+Message-ID: <YhLNYxBTbKW62vtC@iki.fi>
+References: <20211124044124.998170-1-eric.snowberg@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
+In-Reply-To: <20211124044124.998170-1-eric.snowberg@oracle.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Thu, Feb 17, 2022 at 09:38:10PM +0200, Gilad Ben-Yossef a écrit :
-> So, I still do not have access to my Salvator-X board but I attempted
-> a fix nevertheless and it does not seem to trigger new failures on the
-> boards I do have so please give it a shot and let me know.
+On Tue, Nov 23, 2021 at 11:41:07PM -0500, Eric Snowberg wrote:
+> Back in 2013 Linus requested a feature to allow end-users to have the 
+> ability "to add their own keys and sign modules they trust". This was
+> his *second* order outlined here [1]. There have been many attempts 
+> over the years to solve this problem, all have been rejected.  Many 
+> of the failed attempts loaded all preboot firmware keys into the kernel,
+> including the Secure Boot keys. Many distributions carry one of these 
+> rejected attempts [2], [3], [4]. This series tries to solve this problem 
+> with a solution that takes into account all the problems brought up in 
+> the previous attempts.
 > 
-> And thanks again for taking the time to report this!
+> On UEFI based systems, this series introduces a new Linux kernel keyring 
+> containing the Machine Owner Keys (MOK) called machine. It also defines
+> a new MOK variable in shim. This variable allows the end-user to decide 
+> if they want to load MOK keys into the machine keyring. Mimi has suggested 
+> that only CA keys contained within the MOK be loaded into the machine 
+> keyring. All other certs will load into the platform keyring instead.
 > 
-> Cheers,
-> Gilad
+> By default, nothing changes; MOK keys are not loaded into the machine
+> keyring.  They are only loaded after the end-user makes the decision 
+> themselves.  The end-user would set this through mokutil using a new 
+> --trust-mok option [5]. This would work similar to how the kernel uses 
+> MOK variables to enable/disable signature validation as well as use/ignore 
+> the db. Any kernel operation that uses either the builtin or secondary 
+> trusted keys as a trust source shall also reference the new machine 
+> keyring as a trust source.
+> 
+> Secure Boot keys will never be loaded into the machine keyring.  They
+> will always be loaded into the platform keyring.  If an end-user wanted 
+> to load one, they would need to enroll it into the MOK.
+> 
+> Steps required by the end user:
+> 
+> Sign kernel module with user created key:
+> $ /usr/src/kernels/$(uname -r)/scripts/sign-file sha512 \
+>    machine_signing_key.priv machine_signing_key.x509 my_module.ko
+> 
+> Import the key into the MOK
+> $ mokutil --import machine_signing_key.x509
+> 
+> Setup the kernel to load MOK keys into the .machine keyring
+> $ mokutil --trust-mok
+> 
+> Then reboot, the MokManager will load and ask if you want to trust the
+> MOK key and enroll the MOK into the MOKList.  Afterwards the signed kernel
+> module will load.
+> 
+> I have included  a link to the mokutil [5] changes I have made to support 
+> this new functionality.  The shim changes have now been accepted
+> upstream [6].
+> 
+> Upstream shim is located here [7], the build instructions are here [8].
+> TLDR:
+> 
+> $ git clone --recurse-submodules https://github.com/rhboot/shim
+> $ cd shim
+> $ make
+> 
+> After building shim, move shimx64.efi and mmx64.efi to the vendor or 
+> distribution specific directory on your EFI System Partition (assuming
+> you are building on x86). The instructions above are the minimal
+> steps needed to build shim to test this feature. It is assumed
+> Secure Boot shall not be enabled for this testing. To do testing
+> with Secure Boot enabled, all steps in the build instructions [8]
+> must be followed.
+> 
+> Instructions for building mokutil (including the new changes):
+> 
+> $ git clone -b mokvars-v3 https://github.com/esnowberg/mokutil.git
+> $ cd mokutil/
+> $ ./autogen.sh
+> $ make
+> 
+> [1] https://marc.info/?l=linux-kernel&m=136185386310140&w=2
+> [2] https://lore.kernel.org/lkml/1479737095.2487.34.camel@linux.vnet.ibm.com/
+> [3] https://lore.kernel.org/lkml/1556221605.24945.3.camel@HansenPartnership.com/
+> [4] https://lore.kernel.org/linux-integrity/1e41f22b1f11784f1e943f32bf62034d4e054cdb.camel@HansenPartnership.com/
+> [5] https://github.com/esnowberg/mokutil/tree/mokvars-v3
+> [6] https://github.com/rhboot/shim/commit/4e513405b4f1641710115780d19dcec130c5208f
+> [7] https://github.com/rhboot/shim
+> [8] https://github.com/rhboot/shim/blob/main/BUILDING
+> 
+> 
+> Eric Snowberg (17):
+>   KEYS: Create static version of public_key_verify_signature
+>   integrity: Fix warning about missing prototypes
+>   integrity: Introduce a Linux keyring called machine
+>   integrity: Do not allow machine keyring updates following init
+>   X.509: Parse Basic Constraints for CA
+>   KEYS: CA link restriction
+>   integrity: restrict INTEGRITY_KEYRING_MACHINE to restrict_link_by_ca
+>   integrity: add new keyring handler for mok keys
+>   KEYS: Rename get_builtin_and_secondary_restriction
+>   KEYS: add a reference to machine keyring
+>   KEYS: Introduce link restriction for machine keys
+>   KEYS: integrity: change link restriction to trust the machine keyring
+>   integrity: store reference to machine keyring
+>   KEYS: link machine trusted keys to secondary_trusted_keys
+>   efi/mokvar: move up init order
+>   integrity: Trust MOK keys if MokListTrustedRT found
+>   integrity: Only use machine keyring when uefi_check_trust_mok_keys is
+>     true
+> 
+>  certs/system_keyring.c                        | 48 +++++++++++-
+>  crypto/asymmetric_keys/restrict.c             | 43 +++++++++++
+>  crypto/asymmetric_keys/x509_cert_parser.c     |  9 +++
+>  drivers/firmware/efi/mokvar-table.c           |  2 +-
+>  include/crypto/public_key.h                   | 25 ++++++
+>  include/keys/system_keyring.h                 | 14 ++++
+>  security/integrity/Kconfig                    | 12 +++
+>  security/integrity/Makefile                   |  1 +
+>  security/integrity/digsig.c                   | 23 +++++-
+>  security/integrity/integrity.h                | 17 +++-
+>  .../platform_certs/keyring_handler.c          | 18 ++++-
+>  .../platform_certs/keyring_handler.h          |  5 ++
+>  security/integrity/platform_certs/load_uefi.c |  4 +-
+>  .../platform_certs/machine_keyring.c          | 77 +++++++++++++++++++
+>  14 files changed, 287 insertions(+), 11 deletions(-)
+>  create mode 100644 security/integrity/platform_certs/machine_keyring.c
+> 
+> 
+> base-commit: 136057256686de39cc3a07c2e39ef6bc43003ff6
+> -- 
+> 2.18.4
+> 
 
-Hello
+When I try to apply this:
 
-While testing your patch for this problem, I saw another warning (unrelated with your patch):
-[   34.061953] ------------[ cut here ]------------
-[   34.066656] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
-[   34.076555] WARNING: CPU: 3 PID: 475 at /home/clabbe/linux-next/kernel/dma/debug.c:571 add_dma_entry+0x1d0/0x288
-[   34.086748] Modules linked in:
-[   34.089809] CPU: 3 PID: 475 Comm: cryptomgr_test Tainted: G        W         5.17.0-rc3-next-20220210-00115-g1ca9f29d9780-dirty #25
-[   34.101635] Hardware name: Renesas Salvator-X board based on r8a77950 (DT)
-[   34.108508] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   34.115471] pc : add_dma_entry+0x1d0/0x288
-[   34.119569] lr : add_dma_entry+0x1d0/0x288
-[   34.123664] sp : ffff80000e3236f0
-[   34.126976] x29: ffff80000e3236f0 x28: 0000000000000000 x27: 0000000000000000
-[   34.134122] x26: 0000000000000000 x25: ffff80000b3c76c0 x24: ffff80000b3c7000
-[   34.141267] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000a8c1000
-[   34.148410] x20: ffff0004c0b93f80 x19: ffff80000b320000 x18: ffffffffffffffff
-[   34.155554] x17: 6c7265766f202c54 x16: 534958454520676e x15: 00000000000001fa
-[   34.162697] x14: ffff80000e3233f0 x13: 00000000ffffffea x12: ffff80000b3bdda0
-[   34.169840] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000b3a5db8
-[   34.176984] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000b3a5d60
-[   34.184126] x5 : 0000000000057fa8 x4 : 0000000000000000 x3 : 00000000ffffefff
-[   34.191269] x2 : ffff80000b34db38 x1 : 371dfc0f85526100 x0 : 0000000000000000
-[   34.198411] Call trace:
-[   34.200856]  add_dma_entry+0x1d0/0x288
-[   34.204604]  debug_dma_map_sg+0x150/0x398
-[   34.208615]  __dma_map_sg_attrs+0x9c/0x108
-[   34.212717]  dma_map_sg_attrs+0x10/0x28
-[   34.216554]  cc_map_sg+0x80/0x100
-[   34.219875]  cc_map_cipher_request+0x170/0x3c8
-[   34.224319]  cc_cipher_process+0x210/0xb58
-[   34.228415]  cc_cipher_encrypt+0x2c/0x38
-[   34.232338]  crypto_skcipher_encrypt+0x44/0x78
-[   34.236786]  drbg_kcapi_sym_ctr+0xdc/0x1f8
-[   34.240887]  drbg_ctr_generate+0x5c/0x98
-[   34.244812]  drbg_kcapi_random+0xb4/0x260
-[   34.248823]  alg_test_stdrng+0xf8/0x2b0
-[   34.252661]  alg_test.part.29+0xb4/0x398
-[   34.256583]  alg_test+0x48/0x78
-[   34.259724]  cryptomgr_test+0x48/0x50
-[   34.263386]  kthread+0x11c/0x128
-[   34.266619]  ret_from_fork+0x10/0x20
-[   34.270198] irq event stamp: 318
-[   34.273424] hardirqs last  enabled at (317): [<ffff8000081300e0>] __up_console_sem+0x60/0x98
-[   34.281869] hardirqs last disabled at (318): [<ffff800009bfbb18>] el1_dbg+0x28/0x90
-[   34.289531] softirqs last  enabled at (314): [<ffff800008010550>] __do_softirq+0x4a8/0x5ec
-[   34.297796] softirqs last disabled at (305): [<ffff8000080ab644>] irq_exit_rcu+0x18c/0x1b0
-[   34.306061] ---[ end trace 0000000000000000 ]---
+$ b4  am 20211124044124.998170-8-eric.snowberg@oracle.com
+Looking up https://lore.kernel.org/r/20211124044124.998170-8-eric.snowberg%40oracle.com
+Analyzing 40 messages in the thread
+Checking attestation on all messages, may take a moment...
+# ...
+$ git am -3 v8_20211123_eric_snowberg_enroll_kernel_keys_thru_mok.mbx
+Applying: KEYS: Create static version of public_key_verify_signature
+Applying: integrity: Fix warning about missing prototypes
+Applying: integrity: Introduce a Linux keyring called machine
+Applying: integrity: Do not allow machine keyring updates following init
+Applying: X.509: Parse Basic Constraints for CA
+Applying: KEYS: CA link restriction
+error: sha1 information is lacking or useless (include/crypto/public_key.h).
+error: could not build fake ancestor
+Patch failed at 0006 KEYS: CA link restriction
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
 
-Regards
+BR, Jarkko
