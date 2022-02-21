@@ -2,105 +2,207 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A10EC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 20:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA74C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 22:31:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbiBUURs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 15:17:48 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40876 "EHLO
+        id S235573AbiBUWbz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Feb 2022 17:31:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiBUURr (ORCPT
+        with ESMTP id S235569AbiBUWbz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 15:17:47 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A64DB7;
-        Mon, 21 Feb 2022 12:17:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D6A2CB81785;
-        Mon, 21 Feb 2022 20:17:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7598C340E9;
-        Mon, 21 Feb 2022 20:17:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645474641;
-        bh=dnQuGiR73ixyr/qHaebR8rI5KYcoq4B8BGxdgy9X28E=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VTYgeONiBwaeAdUXLj1vds23ScSw99LVpQSxql7Ttzu9t4M2T7uUc+F1dO3+Z9DjX
-         5GHTH+FF+9LZ1hQ8r2vAt/vGc2qQKUxAEsZPHFqEdYeUR/zjx4o422SIzgBDz/ivZk
-         WoaJ6mKpWpfQqyXznd9ne8Yq30EkWDGmu3j6LmdXVBdDJ0IjstEGxYUDi0y9v/6NtF
-         DEPWwzHf+1Zj0LG3fu68cH534J56Z+PXsAzvmJumUP3GduemvYYGI3twyXH8cNqQ5Q
-         vmcmvS19YQK+eFYSIQlJEM51T1zQ3Qv11j79nZA5ExjuWuplmZVo77guhK/fNEBFv7
-         8LiKYyZ3YnsTA==
-Date:   Mon, 21 Feb 2022 21:17:57 +0100
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH] KEYS: asymmetric: enforce SM2 signature use pkey algo
-Message-ID: <YhPzdTPFLd77f2p6@iki.fi>
-References: <20220201003414.55380-1-ebiggers@kernel.org>
- <20220207114327.7929-1-tianjia.zhang@linux.alibaba.com>
- <YhLvtVT89tAjGnqw@kernel.org>
- <17d1a498-6b27-c61b-787d-667abbbb955b@linux.alibaba.com>
+        Mon, 21 Feb 2022 17:31:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D69E240B0
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 14:31:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645482689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TBA7vY6vDXXAWUvnPH4B+bcK6pUKZu1J6emvYjOF0V0=;
+        b=Ay0gq/A3sjdF6OTJE49ZJs6uqITX0raiLVIcd/lINLdOQHKnmQ4z/kqTibVPKuoynwEXz/
+        ODza9cMEed7TLYAVbHFqjGZawaVS9x+0DjbOsx2PVBc+xmFt+PLD3wUKORtHBBtSQBku9q
+        xiLG+jpWpk14f6Cffg1NvCyyvUR1OpI=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-641-p1z8z2GSNkOXd2JWVA7ZVg-1; Mon, 21 Feb 2022 17:31:28 -0500
+X-MC-Unique: p1z8z2GSNkOXd2JWVA7ZVg-1
+Received: by mail-qv1-f69.google.com with SMTP id kc30-20020a056214411e00b0042cb92fe8bbso18692545qvb.8
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 14:31:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TBA7vY6vDXXAWUvnPH4B+bcK6pUKZu1J6emvYjOF0V0=;
+        b=pG0ioltSXjKVqrZqs6mykl46L833ZMwtrdys05bG0y14WjkpnLv6H/PkZOG7jIFz11
+         zk7sgCxNywnCkE0aminvn6azsr4A0y/CYm8uOcCqBgYgT6gFr6bMeB5QL+7JyrEDZB99
+         TCjwxJdbFJgf2tim3wkPyWUilegsD9Hq2wZUdiymm2A+8hZ2ASwuDl9NkrVHUf6rnL4s
+         oQFPrRCKpRI+f8MMOe/dtkiQX6bsoKpGccOnoIVuQt9y0VTCjUIxBnpYgt2oo4xFGtYJ
+         4dxwPdBQMZHdZmWNgRa/OAuiEIKRIhiOE55s2LFuameb9qq5xu1NC5w9+asik7XH+LFT
+         h0mw==
+X-Gm-Message-State: AOAM532Is+yNlAJo4vVH+yqgU0ayY6qQrlq5yMcj+KNal5ocYgqCuVzP
+        jcNFWXFj8MuUuu9stXm/LlWBc+O9ZNL9JDWTVl3KCJ8TyXHkYhV9rarstnOwgGK3NyYIQjxgJU5
+        XVUC7rtwDR0egwUy9KUh4p0hi
+X-Received: by 2002:a05:620a:2a11:b0:649:77d:3966 with SMTP id o17-20020a05620a2a1100b00649077d3966mr2036456qkp.310.1645482687068;
+        Mon, 21 Feb 2022 14:31:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxbOF/hRKICFGwoBEi81hiBc/WVlGAa7Z9POxkJz1fy0DNgvUj85VvCRTzll+yqZ3kc1Dysww==
+X-Received: by 2002:a05:620a:2a11:b0:649:77d:3966 with SMTP id o17-20020a05620a2a1100b00649077d3966mr2036442qkp.310.1645482686811;
+        Mon, 21 Feb 2022 14:31:26 -0800 (PST)
+Received: from localhost.localdomain.com (024-205-208-113.res.spectrum.com. [24.205.208.113])
+        by smtp.gmail.com with ESMTPSA id t23sm9721884qtp.67.2022.02.21.14.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 14:31:26 -0800 (PST)
+From:   trix@redhat.com
+To:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, dan.j.williams@intel.com, song@kernel.org,
+        xni@redhat.com
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Tom Rix <trix@redhat.com>
+Subject: [PATCH] crypto: cleanup comments
+Date:   Mon, 21 Feb 2022 14:31:18 -0800
+Message-Id: <20220221223118.3744238-1-trix@redhat.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <17d1a498-6b27-c61b-787d-667abbbb955b@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 10:43:39AM +0800, Tianjia Zhang wrote:
-> Hi Jarkko,
-> 
-> On 2/21/22 9:49 AM, Jarkko Sakkinen wrote:
-> > On Mon, Feb 07, 2022 at 07:43:27PM +0800, Tianjia Zhang wrote:
-> > > The signature verification of SM2 needs to add the Za value and
-> > > recalculate sig->digest, which requires the detection of the pkey_algo
-> > > in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
-> > > field in sig is attacker-controlled and should be use pkey->pkey_algo
-> > > instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
-> > > will also cause signature verification failure.
-> > > 
-> > > The software_key_determine_akcipher() already forces the algorithms
-> > > are matched, so the SM3 algorithm is enforced in the SM2 signature,
-> > > although this has been checked, we still avoid using any algorithm
-> > > information in the signature as input.
-> > > 
-> > > Reported-by: Eric Biggers <ebiggers@google.com>
-> > > Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> > > ---
-> > >   crypto/asymmetric_keys/public_key.c | 6 +++---
-> > >   1 file changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> > > index a603ee8afdb8..ea9a5501f87e 100644
-> > > --- a/crypto/asymmetric_keys/public_key.c
-> > > +++ b/crypto/asymmetric_keys/public_key.c
-> > > @@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
-> > >   	if (ret)
-> > >   		return ret;
-> > > -	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
-> > > +	/* SM2 signatures always use the SM3 hash algorithm */
-> > > +	tfm = crypto_alloc_shash("sm3", 0, 0);
-> > 
-> > Why not simply fail when sig->hash_algo != "sm3"?
-> > 
-> > BR, Jarkko
-> 
-> This series of Eric's patch 2/2 has done this check.
-> 
-> Best regards,
-> Tianjia
+From: Tom Rix <trix@redhat.com>
 
-Hmm... So how does that make this legit?
+For spdx
+/* */ for *.h, // for *.c
+Space before spdx tag
 
-BR, Jarkko
+Replacements
+paramenters to parameters
+aymmetric to asymmetric
+sigature to signature
+boudary to boundary
+compliled to compiled
+eninges to engines
+explicity to explicitly
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ crypto/asymmetric_keys/signature.c   | 2 +-
+ crypto/asymmetric_keys/x509_parser.h | 2 +-
+ crypto/async_tx/async_xor.c          | 8 ++++----
+ crypto/async_tx/raid6test.c          | 4 ++--
+ crypto/cfb.c                         | 2 +-
+ crypto/dh.c                          | 2 +-
+ crypto/sm2.c                         | 2 +-
+ 7 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
+index 4aff3eebec17..2deff81f8af5 100644
+--- a/crypto/asymmetric_keys/signature.c
++++ b/crypto/asymmetric_keys/signature.c
+@@ -35,7 +35,7 @@ void public_key_signature_free(struct public_key_signature *sig)
+ EXPORT_SYMBOL_GPL(public_key_signature_free);
+ 
+ /**
+- * query_asymmetric_key - Get information about an aymmetric key.
++ * query_asymmetric_key - Get information about an asymmetric key.
+  * @params: Various parameters.
+  * @info: Where to put the information.
+  */
+diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
+index c233f136fb35..668f5c9f0b54 100644
+--- a/crypto/asymmetric_keys/x509_parser.h
++++ b/crypto/asymmetric_keys/x509_parser.h
+@@ -22,7 +22,7 @@ struct x509_certificate {
+ 	time64_t	valid_to;
+ 	const void	*tbs;			/* Signed data */
+ 	unsigned	tbs_size;		/* Size of signed data */
+-	unsigned	raw_sig_size;		/* Size of sigature */
++	unsigned	raw_sig_size;		/* Size of signature */
+ 	const void	*raw_sig;		/* Signature data */
+ 	const void	*raw_serial;		/* Raw serial number in ASN.1 */
+ 	unsigned	raw_serial_size;
+diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
+index d8a91521144e..1a3855284091 100644
+--- a/crypto/async_tx/async_xor.c
++++ b/crypto/async_tx/async_xor.c
+@@ -170,8 +170,8 @@ dma_xor_aligned_offsets(struct dma_device *device, unsigned int offset,
+  *
+  * xor_blocks always uses the dest as a source so the
+  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+- * the calculation.  The assumption with dma eninges is that they only
+- * use the destination buffer as a source when it is explicity specified
++ * the calculation.  The assumption with dma engines is that they only
++ * use the destination buffer as a source when it is explicitly specified
+  * in the source list.
+  *
+  * src_list note: if the dest is also a source it must be at index zero.
+@@ -261,8 +261,8 @@ EXPORT_SYMBOL_GPL(async_xor_offs);
+  *
+  * xor_blocks always uses the dest as a source so the
+  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
+- * the calculation.  The assumption with dma eninges is that they only
+- * use the destination buffer as a source when it is explicity specified
++ * the calculation.  The assumption with dma engines is that they only
++ * use the destination buffer as a source when it is explicitly specified
+  * in the source list.
+  *
+  * src_list note: if the dest is also a source it must be at index zero.
+diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
+index 66db82e5a3b1..c9d218e53bcb 100644
+--- a/crypto/async_tx/raid6test.c
++++ b/crypto/async_tx/raid6test.c
+@@ -217,7 +217,7 @@ static int raid6_test(void)
+ 		err += test(12, &tests);
+ 	}
+ 
+-	/* the 24 disk case is special for ioatdma as it is the boudary point
++	/* the 24 disk case is special for ioatdma as it is the boundary point
+ 	 * at which it needs to switch from 8-source ops to 16-source
+ 	 * ops for continuation (assumes DMA_HAS_PQ_CONTINUE is not set)
+ 	 */
+@@ -241,7 +241,7 @@ static void raid6_test_exit(void)
+ }
+ 
+ /* when compiled-in wait for drivers to load first (assumes dma drivers
+- * are also compliled-in)
++ * are also compiled-in)
+  */
+ late_initcall(raid6_test);
+ module_exit(raid6_test_exit);
+diff --git a/crypto/cfb.c b/crypto/cfb.c
+index 0d664dfb47bc..5c36b7b65e2a 100644
+--- a/crypto/cfb.c
++++ b/crypto/cfb.c
+@@ -1,4 +1,4 @@
+-//SPDX-License-Identifier: GPL-2.0
++// SPDX-License-Identifier: GPL-2.0
+ /*
+  * CFB: Cipher FeedBack mode
+  *
+diff --git a/crypto/dh.c b/crypto/dh.c
+index 27e62a2a8027..be3138636726 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -104,7 +104,7 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ /*
+  * SP800-56A public key verification:
+  *
+- * * If Q is provided as part of the domain paramenters, a full validation
++ * * If Q is provided as part of the domain parameters, a full validation
+  *   according to SP800-56A section 5.6.2.3.1 is performed.
+  *
+  * * If Q is not provided, a partial validation according to SP800-56A section
+diff --git a/crypto/sm2.c b/crypto/sm2.c
+index ae3f77a66070..f3e1592965c0 100644
+--- a/crypto/sm2.c
++++ b/crypto/sm2.c
+@@ -1,4 +1,4 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * SM2 asymmetric public-key algorithm
+  * as specified by OSCCA GM/T 0003.1-2012 -- 0003.5-2012 SM2 and
+-- 
+2.26.3
+
