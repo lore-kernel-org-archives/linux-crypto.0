@@ -2,82 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94687C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 05:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9787C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 07:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344779AbiBUFxX (ORCPT
+        id S1346619AbiBUH6v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 00:53:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59066 "EHLO
+        Mon, 21 Feb 2022 02:58:51 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244634AbiBUFxW (ORCPT
+        with ESMTP id S1346646AbiBUH6s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 00:53:22 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550B13C4B1;
-        Sun, 20 Feb 2022 21:53:00 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E5BB9B80E6F;
-        Mon, 21 Feb 2022 05:52:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2841DC340E9;
-        Mon, 21 Feb 2022 05:52:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645422777;
-        bh=9DAhotHuTATnhlZOyU50VKNph9zSNNPYqAEZ3QWaBso=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WFPwymL/DqSNXTnpjzADKdvrIZaFy8GIyd+4uhucvrVT24j4T5ZSZ+QgpKPsrvxir
-         lxhUlCB/XgHSUeG06OYwgOvGBsVsxSjnu5q3LsZ+BlisDidFeyoc3p3uK26a/YTfD9
-         KfkhkTHo7gd4M9UkjrWstGM1lmdQ6J0KKGnyDWjw2yGcgKBjADJYUly6VF3Iij6ud3
-         lQ3pdkQBkK8on5lC/4nCyi7/ihaAKgdhoZ3Rr57Hl40mZQrWkysYPCLB7nkfQ2KzUc
-         c9bFtnDkcj7MJqtZaG//Rf8dg5UMsqFuLEZRJ5H+No2zgmDVgpKu52YK31R/s29wWG
-         2Vthe0wAgQuNA==
-Date:   Sun, 20 Feb 2022 21:52:55 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux@dominikbrodowski.net,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>, Kalle Valo <kvalo@kernel.org>,
-        ath9k-devel@qca.qualcomm.com, Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: pull add_hwgenerator_randomness() declaration
- into random.h
-Message-ID: <YhMot77If2Txl+cL@sol.localdomain>
-References: <20220213152522.816777-1-Jason@zx2c4.com>
+        Mon, 21 Feb 2022 02:58:48 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1262182B;
+        Sun, 20 Feb 2022 23:58:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1645430305; x=1676966305;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=bqtRma4i+aDRPSPwCrS3g3crpowmv6qvyEHjsN3/F0U=;
+  b=t7kIxk8UyyEDmS2+H1u/S+SSLGjurHYFKn7CPX8eYCkyHzQQx3sT5hFq
+   h4ZmJHSoQhMkSqwdfcEuycLpTTcLDp80OS/4DkevypJiN0EsMFGh64/ak
+   i7dHgF7JapodbIuuzGGJDDNBiISMV6e2JfoaoPbgjxiXOa/os3XxwbjA6
+   vNY1Sxs6pmlsKW0p+gYxZXghWzkr6nsodUrKAR2zd3NuKma2cCN0lLg3l
+   Gy8xrwq0v1NMrXmlhBJT5HK6e/dOAf8w8o7qkIf7Lh+63lRBfQJDH9V4R
+   /zCZWKMfQH9jr6SFAi6Z/Cj23+lYXTQnw2uq6yCgvOZvDJe/tMk/gjryU
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
+   d="scan'208";a="86422606"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Feb 2022 00:58:24 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Mon, 21 Feb 2022 00:58:24 -0700
+Received: from localhost.localdomain (10.10.115.15) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2375.17 via Frontend Transport; Mon, 21 Feb 2022 00:58:22 -0700
+From:   Claudiu Beznea <claudiu.beznea@microchip.com>
+To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>
+CC:     <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>
+Subject: [PATCH v2 1/7] hwrng: atmel - add wait for ready support on read
+Date:   Mon, 21 Feb 2022 09:59:22 +0200
+Message-ID: <20220221075928.563806-2-claudiu.beznea@microchip.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20220221075928.563806-1-claudiu.beznea@microchip.com>
+References: <20220221075928.563806-1-claudiu.beznea@microchip.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220213152522.816777-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 13, 2022 at 04:25:22PM +0100, Jason A. Donenfeld wrote:
-> add_hwgenerator_randomness() is a function implemented and documented
-> inside of random.c. It is the way that hardware RNGs push data into it.
-> Therefore, it should be declared in random.h. Otherwise sparse complains
-> with:
-> 
-> random.c:1137:6: warning: symbol 'add_hwgenerator_randomness' was not declared. Should it be static?
-> 
-> The alternative would be to include hw_random.h into random.c, but that
-> wouldn't really be good for anything except slowing down compile time.
-> 
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Matt Mackall <mpm@selenic.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Kalle Valo <kvalo@kernel.org>
-> Cc: ath9k-devel@qca.qualcomm.com
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/hw_random/core.c        | 1 +
->  drivers/net/wireless/ath/ath9k/rng.c | 1 +
->  include/linux/hw_random.h            | 2 --
->  include/linux/random.h               | 2 ++
->  4 files changed, 4 insertions(+), 2 deletions(-)
+Add wait for ready support on read.
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
+---
+ drivers/char/hw_random/atmel-rng.c | 43 +++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 13 deletions(-)
 
-- Eric
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index ecb71c4317a5..1a4874668c04 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -13,6 +13,7 @@
+ #include <linux/err.h>
+ #include <linux/clk.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/hw_random.h>
+ #include <linux/of_device.h>
+ #include <linux/platform_device.h>
+@@ -20,6 +21,7 @@
+ #define TRNG_CR		0x00
+ #define TRNG_MR		0x04
+ #define TRNG_ISR	0x1c
++#define TRNG_ISR_DATRDY	BIT(0)
+ #define TRNG_ODATA	0x50
+ 
+ #define TRNG_KEY	0x524e4700 /* RNG */
+@@ -36,25 +38,40 @@ struct atmel_trng {
+ 	struct hwrng rng;
+ };
+ 
++static bool atmel_trng_wait_ready(struct atmel_trng *trng, bool wait)
++{
++	int ready;
++
++	ready = readl(trng->base + TRNG_ISR) & TRNG_ISR_DATRDY;
++	if (!ready && wait)
++		readl_poll_timeout(trng->base + TRNG_ISR, ready,
++				   ready & TRNG_ISR_DATRDY, 1000, 20000);
++
++	return !!ready;
++}
++
+ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
+ 			   bool wait)
+ {
+ 	struct atmel_trng *trng = container_of(rng, struct atmel_trng, rng);
+ 	u32 *data = buf;
++	int ret;
++
++	ret = atmel_trng_wait_ready(trng, wait);
++	if (!ret)
++		goto out;
+ 
+-	/* data ready? */
+-	if (readl(trng->base + TRNG_ISR) & 1) {
+-		*data = readl(trng->base + TRNG_ODATA);
+-		/*
+-		  ensure data ready is only set again AFTER the next data
+-		  word is ready in case it got set between checking ISR
+-		  and reading ODATA, so we don't risk re-reading the
+-		  same word
+-		*/
+-		readl(trng->base + TRNG_ISR);
+-		return 4;
+-	} else
+-		return 0;
++	*data = readl(trng->base + TRNG_ODATA);
++	/*
++	 * ensure data ready is only set again AFTER the next data word is ready
++	 * in case it got set between checking ISR and reading ODATA, so we
++	 * don't risk re-reading the same word
++	 */
++	readl(trng->base + TRNG_ISR);
++	ret = 4;
++
++out:
++	return ret;
+ }
+ 
+ static void atmel_trng_enable(struct atmel_trng *trng)
+-- 
+2.32.0
+
