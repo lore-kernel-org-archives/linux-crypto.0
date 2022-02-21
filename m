@@ -2,68 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58450C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 04:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94687C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 05:53:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245609AbiBUEGF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 23:06:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33920 "EHLO
+        id S1344779AbiBUFxX (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Feb 2022 00:53:23 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245607AbiBUEGD (ORCPT
+        with ESMTP id S244634AbiBUFxW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 23:06:03 -0500
+        Mon, 21 Feb 2022 00:53:22 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC8A151E7A;
-        Sun, 20 Feb 2022 20:05:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 550B13C4B1;
+        Sun, 20 Feb 2022 21:53:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7090AB80DAD;
-        Mon, 21 Feb 2022 04:05:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7351C340E9;
-        Mon, 21 Feb 2022 04:05:37 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E5BB9B80E6F;
+        Mon, 21 Feb 2022 05:52:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2841DC340E9;
+        Mon, 21 Feb 2022 05:52:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645416338;
-        bh=6niB/2nKNpNVfodR8zq5hulu8kbqso984fegXzx/+iY=;
+        s=k20201202; t=1645422777;
+        bh=9DAhotHuTATnhlZOyU50VKNph9zSNNPYqAEZ3QWaBso=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eYF1/Q5FOS7uR5DMwhmkUYMoNiAvCHNC8O7BzlvSird1BKqKQ/YRQAnL+E4yXyqr2
-         s9Y/cgZ1eBhpu4RSfN61dlGtK68uWtcJ+nFZws4K5IlT8tqK+THvd2wVBxUR9R5cIQ
-         UUbU5Pq+Z9O/W/LwIElJzIdaYOoqhmPTIOTRDz8VIPvRmknbraxYJR44mSyXNImqLj
-         e5Erf3Gd8owW544AN5aAH43t59UHGFZT1lrLl0CoWJHR3+CiW3kxLmRwxGptfc1T1F
-         ZNNwGDgAqQVaI85sz7ysP87nKWrOaXdqEF9quk2q/sQ2cAHoY4yWZKrZoxjxTkRLRh
-         MyF3yMpPc4Yww==
-Date:   Sun, 20 Feb 2022 20:05:36 -0800
+        b=WFPwymL/DqSNXTnpjzADKdvrIZaFy8GIyd+4uhucvrVT24j4T5ZSZ+QgpKPsrvxir
+         lxhUlCB/XgHSUeG06OYwgOvGBsVsxSjnu5q3LsZ+BlisDidFeyoc3p3uK26a/YTfD9
+         KfkhkTHo7gd4M9UkjrWstGM1lmdQ6J0KKGnyDWjw2yGcgKBjADJYUly6VF3Iij6ud3
+         lQ3pdkQBkK8on5lC/4nCyi7/ihaAKgdhoZ3Rr57Hl40mZQrWkysYPCLB7nkfQ2KzUc
+         c9bFtnDkcj7MJqtZaG//Rf8dg5UMsqFuLEZRJ5H+No2zgmDVgpKu52YK31R/s29wWG
+         2Vthe0wAgQuNA==
+Date:   Sun, 20 Feb 2022 21:52:55 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>, tytso@mit.edu,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] random: fix locking for crng_init in crng_reseed()
-Message-ID: <YhMPkPdzOZr/fT5/@sol.localdomain>
-References: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux@dominikbrodowski.net,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>, Kalle Valo <kvalo@kernel.org>,
+        ath9k-devel@qca.qualcomm.com, Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random: pull add_hwgenerator_randomness() declaration
+ into random.h
+Message-ID: <YhMot77If2Txl+cL@sol.localdomain>
+References: <20220213152522.816777-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YgQOgqWr0nwqZCh6@owl.dominikbrodowski.net>
+In-Reply-To: <20220213152522.816777-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 09, 2022 at 07:57:06PM +0100, Dominik Brodowski wrote:
-> crng_init is protected by primary_crng->lock. Therefore, we need
-> to hold this lock when increasing crng_init to 2. As we shouldn't
-> hold this lock for too long, only hold it for those parts which
-> require protection.
+On Sun, Feb 13, 2022 at 04:25:22PM +0100, Jason A. Donenfeld wrote:
+> add_hwgenerator_randomness() is a function implemented and documented
+> inside of random.c. It is the way that hardware RNGs push data into it.
+> Therefore, it should be declared in random.h. Otherwise sparse complains
+> with:
 > 
-> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> random.c:1137:6: warning: symbol 'add_hwgenerator_randomness' was not declared. Should it be static?
+> 
+> The alternative would be to include hw_random.h into random.c, but that
+> wouldn't really be good for anything except slowing down compile time.
+> 
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Cc: Matt Mackall <mpm@selenic.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: ath9k-devel@qca.qualcomm.com
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
->  drivers/char/random.c |    9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
+>  drivers/char/hw_random/core.c        | 1 +
+>  drivers/net/wireless/ath/ath9k/rng.c | 1 +
+>  include/linux/hw_random.h            | 2 --
+>  include/linux/random.h               | 2 ++
+>  4 files changed, 4 insertions(+), 2 deletions(-)
 
 Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-Though to bikeshed on the variable name, I think that 'became_ready' would be
-more self-explanatory than 'complete_init' (this patch) and 'finalize_init'
-(the version committed).
 
 - Eric
