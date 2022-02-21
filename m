@@ -2,117 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E545EC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 02:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A086CC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 02:30:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343543AbiBUCWD (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 21:22:03 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40780 "EHLO
+        id S245449AbiBUCbJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 21:31:09 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343540AbiBUCWC (ORCPT
+        with ESMTP id S245416AbiBUCbI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 21:22:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A14B7658B;
-        Sun, 20 Feb 2022 18:21:39 -0800 (PST)
+        Sun, 20 Feb 2022 21:31:08 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671B0443D9;
+        Sun, 20 Feb 2022 18:30:46 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 28B2561055;
-        Mon, 21 Feb 2022 02:21:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 357A5C340E8;
-        Mon, 21 Feb 2022 02:21:38 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 30D99B80DAA;
+        Mon, 21 Feb 2022 02:30:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B475C340E8;
+        Mon, 21 Feb 2022 02:30:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645410098;
-        bh=kGIeWEaq/5UzKoe9nNUsyzDA3N0lfQIYAcHCE2Et33Y=;
+        s=k20201202; t=1645410643;
+        bh=2uZ8sUorAwc5X3MugMskJmqF4rEOcD2jddBSqZuXQ94=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Qkme+nn2X2Y4RINHEWEoRSLt9y7wLpMTzVJejfvOaJsNfUcZy6SNfwy+gVGdLvM3C
-         k0Tv6KaOkEJhYoNHIqHJAar6Otdb+52kzKIp5Brx55DVYYbuT2bQgl/wF6ZQU7ByHW
-         DEJUAYQnrzoKofyw6fZcU6K0tGQDOaiEv2/DB5xMvZjV0pD2s2Yi5ih8SlLP56dug6
-         mH/yWxyaFALXHOxOEr5z/EkZdoB2vFa4nRcaEkPTMJXyqKzaI9I1a3Rzybv0KejXC5
-         tTSAe7GUpzZT4q1y8BgjNl9T4AZ7U+3+jvA/mEIBBFfojlVS9z6CgWbjUj04SBwsMR
-         gZTmVTuv7YUuw==
-Date:   Sun, 20 Feb 2022 18:21:36 -0800
+        b=a4p4Olw7vCl4s6q6MSZpDlvKV/OoTwTavJHkHfDKou9FFFeX4dwMnS68tB/2h0TPM
+         eQLy4baewlJdqhFvQxmmpRnVqrIFSLlOG7ap4E+wwlGs9IXSkWAy0j7LUDApSP61k4
+         qB7BzfIPtLdWa7QqnKuTEeFTyVmRtKfLJ+jzOq6Vx3xX+v33aShYjsQP42Q2IlR6/s
+         JRCe3aKugs6BxFTzdyzKkxfe/sNK1qVoo2jnrlMpSskaZhMG5hJi5bhnSHxKgzJEJ/
+         rXgwpbDNJ6JgM0dlKfNayyGmJcg5krpGZyr4OCzcgrHSqHyg2yzwC134TX2aAtXw1w
+         YM31HHbU1No9A==
+Date:   Sun, 20 Feb 2022 18:30:42 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] KEYS: asymmetric: properly validate hash_algo and
- encoding
-Message-ID: <YhL3MGQcwMujSxCr@sol.localdomain>
-References: <20220201003414.55380-1-ebiggers@kernel.org>
- <20220201003414.55380-3-ebiggers@kernel.org>
- <YhLu8gZtdpphy5mB@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Sultan Alsawaf <sultan@kerneltoast.com>,
+        Jonathan =?iso-8859-1?Q?Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+        Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH v4 1/2] random: remove batched entropy locking
+Message-ID: <YhL5Ur59uC+HQOY+@sol.localdomain>
+References: <20220209125644.533876-1-Jason@zx2c4.com>
+ <20220209125644.533876-2-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YhLu8gZtdpphy5mB@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220209125644.533876-2-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 02:46:26AM +0100, Jarkko Sakkinen wrote:
-> On Mon, Jan 31, 2022 at 04:34:14PM -0800, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > It is insecure to allow arbitrary hash algorithms and signature
-> > encodings to be used with arbitrary signature algorithms.  Notably,
-> > ECDSA, ECRDSA, and SM2 all sign/verify raw hash values and don't
-> > disambiguate between different hash algorithms like RSA PKCS#1 v1.5
-> > padding does.  Therefore, they need to be restricted to certain sets of
-> > hash algorithms (ideally just one, but in practice small sets are used).
-> > Additionally, the encoding is an integral part of modern signature
-> > algorithms, and is not supposed to vary.
-> > 
-> > Therefore, tighten the checks of hash_algo and encoding done by
-> > software_key_determine_akcipher().
-> > 
-> > Also rearrange the parameters to software_key_determine_akcipher() to
-> > put the public_key first, as this is the most important parameter and it
-> > often determines everything else.
-> > 
-> > Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA keys")
-> > Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
-> > Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  crypto/asymmetric_keys/public_key.c | 111 +++++++++++++++++++---------
-> >  1 file changed, 76 insertions(+), 35 deletions(-)
-> > 
-> > diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> > index aba7113d86c76..a603ee8afdb8d 100644
-> > --- a/crypto/asymmetric_keys/public_key.c
-> > +++ b/crypto/asymmetric_keys/public_key.c
-> > @@ -60,39 +60,83 @@ static void public_key_destroy(void *payload0, void *payload3)
-> >  }
-> >  
-> >  /*
-> > - * Determine the crypto algorithm name.
-> > + * Given a public_key, and an encoding and hash_algo to be used for signing
-> > + * and/or verification with that key, determine the name of the corresponding
-> > + * akcipher algorithm.  Also check that encoding and hash_algo are allowed.
-> >   */
-> > -static
-> > -int software_key_determine_akcipher(const char *encoding,
-> > -				    const char *hash_algo,
-> > -				    const struct public_key *pkey,
-> > -				    char alg_name[CRYPTO_MAX_ALG_NAME])
-> > +static int
-> > +software_key_determine_akcipher(const struct public_key *pkey,
-> > +				const char *encoding, const char *hash_algo,
-> > +				char alg_name[CRYPTO_MAX_ALG_NAME])
+On Wed, Feb 09, 2022 at 01:56:43PM +0100, Jason A. Donenfeld wrote:
+> Rather than use spinlocks to protect batched entropy, we can instead
+> disable interrupts locally, since we're dealing with per-cpu data, and
+> manage resets with a basic generation counter. At the same time, we
+> can't quite do this on PREEMPT_RT, where we still want spinlocks-as-
+> mutexes semantics. So we use a local_lock_t, which provides the right
+> behavior for each. Because this is a per-cpu lock, that generation
+> counter is still doing the necessary CPU-to-CPU communication.
 > 
-> Why is changing parameter order necessary?
+> This should improve performance a bit. It will also fix the linked splat
+> that Jonathan received with a PROVE_RAW_LOCK_NESTING=y.
 > 
+> Suggested-by: Andy Lutomirski <luto@kernel.org>
+> Reported-by: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> Tested-by: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> Link: https://lore.kernel.org/lkml/YfMa0QgsjCVdRAvJ@latitude/
+> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  drivers/char/random.c | 55 ++++++++++++++++++++++---------------------
+>  1 file changed, 28 insertions(+), 27 deletions(-)
 
-It's mentioned in the commit message.  It's obviously not necessary but this way
-makes much more sense IMO.
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
 - Eric
