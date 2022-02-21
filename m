@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4DAC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 12:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D95DC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 12:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357372AbiBUMJK (ORCPT
+        id S1357422AbiBUMJe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 07:09:10 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41054 "EHLO
+        Mon, 21 Feb 2022 07:09:34 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357360AbiBUMJG (ORCPT
+        with ESMTP id S1357332AbiBUMJI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 07:09:06 -0500
+        Mon, 21 Feb 2022 07:09:08 -0500
 Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC68201B6
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 04:08:43 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id d3so11041240wrf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 04:08:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B99C201B9
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 04:08:45 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id d27so26702993wrc.6
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 04:08:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=tbukRrC7Ov9F7pBcIG9IeTY2nydApA5tOh+cl5c9cGc=;
-        b=SdKLSu27cu2/hHwLhVv7Jo5NLGz2GrSxYcsgEyyOgzdrRUyITQbKY4U4C1U7WkLqFC
-         qe6XvaUjxo8J+U50MFASy3E1yA0PwR15dPQnsDWRTVAC+ricUxOKvuthq3wG3aDjC6tK
-         dKTfpKygLdl7yWXFNyH0r0r2OoqY6poyYz2Q1LAoIjmPuaK9OFuJBAJ79aGvmHNnaO7V
-         KCLzl7lZC1NEBrYXotzVKPVaYafTQB2+4MY96hhBOrR6G4EXfebubkZlfg7Vz5DTDxCV
-         PdxZovQ+CBNr264//qDUeHDh8VLnbSD7TSMK1D9etdED/q6eWCNJ04f6eI6/N5DmSQvQ
-         Jb6Q==
+        bh=eRwXQ22zhUvx1o2PZ7ENLpRDM+5TmK2L3Q+xebz6RZg=;
+        b=qmw5zddLshVBKDNx9LmeyGeFD06unJdxUalh9qYp20aANFXunS0qfedH7kKreKAi1B
+         TuZ66MDF1UKDbxZfJtTct+TBv4WAKrXribxlOnzuChMAnS3sDdKtTRU18+ju9/hFQSxs
+         EhLx/h9ZR4eCkZxp1ViV4aDidIOXtwLywqNfVkjll1JeohtBMUWIZN98n1+RDri/GkOj
+         vLCnqS9rwSkHDW6XYSZV9Oe834ro/eJCV+XoXF40hYLL4DMMubP/riKiaLy7jIuAEmp7
+         wi+n0NwOGdXFC6avheY2YvwGHhX3elgBsAo6php6McGHit+QF9Qq9ovwKve12Rs6xaT7
+         cVNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=tbukRrC7Ov9F7pBcIG9IeTY2nydApA5tOh+cl5c9cGc=;
-        b=Z87CHhPAbQAg+cfcjDPmDaa6n+TcmwoLsRzJyuwa94+g6OeWBwrII1ER/O4jhODrGA
-         2mJgI5kfVhzW6AInKe4YsWMLE3cI/0yRoh55VksgSXhBWV84JUcthlSwpP4akaUTfS1s
-         g1khdRElBvLOfB345YI2DS8y8Xp5R5nJJxK2b3e+8/XZLToHTanaXBLXXWBm65mp0HLh
-         F8wbjjJMcgNFzz4WxDfZ3MU98HZ9gWAybXygKyUbl9I9fI/4EgGB3jRlyLYyT1Vf7r+Y
-         5DOLJxVHrvmVbKgWh3Nq2lh1kpAtnbA+vlB2Iryb+sJQZh4urzmB4sF4mdJxhj2OBxdb
-         W9zA==
-X-Gm-Message-State: AOAM532OxpoXeCIEMiPxLHRPTJDJASwQtCK5iemWGNvO0x4jZNRhDO6z
-        BMWN09L5/3tqR+A3g0nzRzWoKg==
-X-Google-Smtp-Source: ABdhPJy/cSnpe98uh3pMY3LAxU5hDt1WIksiv02kviAW0TkeCF3/8ErsTgLm6Koq7SSLTrdT4sgkuw==
-X-Received: by 2002:adf:f312:0:b0:1e8:f4bb:5a5c with SMTP id i18-20020adff312000000b001e8f4bb5a5cmr14695631wro.668.1645445321994;
-        Mon, 21 Feb 2022 04:08:41 -0800 (PST)
+        bh=eRwXQ22zhUvx1o2PZ7ENLpRDM+5TmK2L3Q+xebz6RZg=;
+        b=DkqN9wfyg+D7E+m2XpRkBHhSifUuMfHibvb6L8FjjM267HE0LkX/DfOhEuqdbK3rQr
+         oQwOH1OCSakuFn+fweJNWaZiUiVMw1dsZ32YRlny5DRPtNepEDeW9ZtST2eOUetj/sVG
+         BUgLrEbumCPUzN4PQFLXGA3FLSaVgujWkN94KCL/AVY78JmG/yY8sEH3tM2Xw9hvwV9b
+         SqNFvcwUkU1tQxPEq/AAYSi3Mi3zq/2k3upK+OHsxpf10WsDgGs84d5n9U8+184PQoSm
+         8+BMdHhYBndj4Z/qO9LKusPalNvdmOFC2Hav5qRI1ikAyZGFZagUVemATX1cYbwRD4LE
+         cjHw==
+X-Gm-Message-State: AOAM5327ZCvFvJN4o5W+ElQMqUr2uwr4lRpKdQ7E0/dp48wkrm9ol00l
+        Tz3EKbMRoqYasf3RPNDmvfjoHQ==
+X-Google-Smtp-Source: ABdhPJy6vbpLlKF2o118HSZXUs4RfBWx6RmuHRbHpvyirVgJKBWwM1e3MmCtrMzPWWHPKMXOLsmeIQ==
+X-Received: by 2002:a05:6000:154e:b0:1ea:7622:64ec with SMTP id 14-20020a056000154e00b001ea762264ecmr676608wry.600.1645445323857;
+        Mon, 21 Feb 2022 04:08:43 -0800 (PST)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id a8sm11821546wra.0.2022.02.21.04.08.41
+        by smtp.googlemail.com with ESMTPSA id a8sm11821546wra.0.2022.02.21.04.08.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Feb 2022 04:08:41 -0800 (PST)
+        Mon, 21 Feb 2022 04:08:43 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
         linus.walleij@linaro.org, narmstrong@baylibre.com,
@@ -57,9 +57,9 @@ Cc:     linux-amlogic@lists.infradead.org,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 2/5] crypto: sun8i-ce: call finalize with bh disabled
-Date:   Mon, 21 Feb 2022 12:08:30 +0000
-Message-Id: <20220221120833.2618733-3-clabbe@baylibre.com>
+Subject: [PATCH 4/5] crypto: gemini: call finalize with bh disabled
+Date:   Mon, 21 Feb 2022 12:08:32 +0000
+Message-Id: <20220221120833.2618733-5-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220221120833.2618733-1-clabbe@baylibre.com>
 References: <20220221120833.2618733-1-clabbe@baylibre.com>
@@ -72,54 +72,24 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 Doing ipsec produces a spinlock recursion warning.
 This is due to not disabling BH during crypto completion function.
 
-Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
+Fixes: 46c5338db7bd45b2 ("crypto: sl3516 - Add sl3516 crypto engine")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 3 +++
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 +++
- 2 files changed, 6 insertions(+)
+ drivers/crypto/gemini/sl3516-ce-cipher.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index 7cc496c03084..0b1ce58bdeb9 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -11,6 +11,7 @@
-  * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
+diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
+index 53e3fefb81de..14d0d83d388d 100644
+--- a/drivers/crypto/gemini/sl3516-ce-cipher.c
++++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
+@@ -264,7 +264,9 @@ static int sl3516_ce_handle_cipher_request(struct crypto_engine *engine, void *a
+ 	struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
  
-+#include <linux/bottom_half.h>
- #include <linux/crypto.h>
- #include <linux/dma-mapping.h>
- #include <linux/io.h>
-@@ -272,7 +273,9 @@ static int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
- 
- 	flow = rctx->flow;
- 	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(breq->base.tfm));
+ 	err = sl3516_ce_cipher(breq);
 +	local_bh_disable();
  	crypto_finalize_skcipher_request(engine, breq, err);
 +	local_bh_enable();
- 	return 0;
- }
  
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-index fd7f1db863d9..5b6c51b78dde 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
-@@ -9,6 +9,7 @@
-  *
-  * You could find the datasheet in Documentation/arm/sunxi.rst
-  */
-+#include <linux/bottom_half.h>
- #include <linux/dma-mapping.h>
- #include <linux/pm_runtime.h>
- #include <linux/scatterlist.h>
-@@ -472,6 +473,8 @@ int sun8i_ce_hash_run(struct crypto_engine *engine, void *breq)
- theend:
- 	kfree(buf);
- 	kfree(result);
-+	local_bh_disable();
- 	crypto_finalize_hash_request(engine, breq, err);
-+	local_bh_enable();
  	return 0;
  }
 -- 
