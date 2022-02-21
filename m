@@ -2,78 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F35D6C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 14:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CB1C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 14:57:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378164AbiBUOnP (ORCPT
+        id S1356786AbiBUO5z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 09:43:15 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56016 "EHLO
+        Mon, 21 Feb 2022 09:57:55 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344379AbiBUOnO (ORCPT
+        with ESMTP id S1378589AbiBUO5x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 09:43:14 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DAE113E06;
-        Mon, 21 Feb 2022 06:42:51 -0800 (PST)
+        Mon, 21 Feb 2022 09:57:53 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B65CE9E;
+        Mon, 21 Feb 2022 06:57:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E105261052;
-        Mon, 21 Feb 2022 14:42:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0676EC340E9;
-        Mon, 21 Feb 2022 14:42:49 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BA3D7B811BB;
+        Mon, 21 Feb 2022 14:57:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39FAAC340E9;
+        Mon, 21 Feb 2022 14:57:26 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QnJLh0k9"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lSIETL2b"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645454567;
+        t=1645455444;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+WQhj2bKXmrHAlboGodRiAor51NQtRBFZD94x6/+vb4=;
-        b=QnJLh0k9n13zUM7Ht6ApQC16QTwAEj6ueaTWi4ayNv0y3JFTnhaW78p3HIWpQXmooYRYTv
-        HYGlNjzdv2l4Snh0O1cIPWq0PQ2IztNHs/Pn6u+iYvvjkNNxej+3TNPu42h2lMnYCJWDi9
-        L7DZepzuYtvyBsyZW32EfKEH3vIr1SQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8e046bba (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 21 Feb 2022 14:42:47 +0000 (UTC)
-Received: by mail-yb1-f169.google.com with SMTP id p19so34795873ybc.6;
-        Mon, 21 Feb 2022 06:42:46 -0800 (PST)
-X-Gm-Message-State: AOAM5327W52pTSTHApq/cO/AjI52DFAu3mIYwhUEd6Oda7wJGc+pszg8
-        Ig0/LwzwpDfWEO1Gvubs1aRgEZFxZ5rla+ebN+4=
-X-Google-Smtp-Source: ABdhPJwkU2f1EUQ8qcxRDppbN7rT/bIQ0Pert0HuvvnxBX0Zhhd7mmYS3O4mQe2fKjogzQCWvxx+Hbjsu+dUF8HlbjQ=
-X-Received: by 2002:a25:238d:0:b0:619:3e19:b06b with SMTP id
- j135-20020a25238d000000b006193e19b06bmr18492362ybj.382.1645454565770; Mon, 21
- Feb 2022 06:42:45 -0800 (PST)
+        bh=w1dYxGGlAk7oSg4VWIgvCkMkLUjlbhh57JEWSqOr12E=;
+        b=lSIETL2bQn3QNaiOHaact6B7Gr93MDQ+R7sLPeBKKpFVBbk9Y4K3mWWVVpQHG/KpWZdPMe
+        dC///8VIylVNmiLeF68Oij/6+LpxxM1bCb7zaLNrcWpk6MdVwlGAufPqoVWbPlk6chsCz/
+        WS9/YqKe2fcCTPcWwqxBT37F+gtCxaU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2e60c24e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 21 Feb 2022 14:57:24 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id b35so7136532ybi.13;
+        Mon, 21 Feb 2022 06:57:23 -0800 (PST)
+X-Gm-Message-State: AOAM532bCsfh7RhWzoWY1iBsT3U8C7NLsAsXdyWEdO7erCkJpArxHlvK
+        fjkay0R085j3fg6EnX2jqrWUiIZ7y96GPaW0gI4=
+X-Google-Smtp-Source: ABdhPJyedvueidxl7Ut4gzsMJfO+JuBbjpJ5//8X8pqsmwDdVK+Rq6mCXO5pVXOwvh7K5E5BB34xOlKzEUkdQSgyApY=
+X-Received: by 2002:a5b:d11:0:b0:623:fbda:40f4 with SMTP id
+ y17-20020a5b0d11000000b00623fbda40f4mr19309542ybp.398.1645455443231; Mon, 21
+ Feb 2022 06:57:23 -0800 (PST)
 MIME-Version: 1.0
-References: <20220214184627.3048-1-Jason@zx2c4.com> <20220216232142.193220-1-Jason@zx2c4.com>
- <YhMJAsiHsjCJU1A4@sol.localdomain>
-In-Reply-To: <YhMJAsiHsjCJU1A4@sol.localdomain>
+References: <CAHmME9qMRO0YFwQRUZfuUjTy2=C0QYkNLZSK5YgVD0xpcP2qbQ@mail.gmail.com>
+ <20220215211333.244383-1-Jason@zx2c4.com> <YhL9QNsMSHZvuR0u@sol.localdomain>
+In-Reply-To: <YhL9QNsMSHZvuR0u@sol.localdomain>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 21 Feb 2022 15:42:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qptoGM=Xc+qJKN87OC6-RdnbJNSx3GCfLUz4p7qQwzuw@mail.gmail.com>
-Message-ID: <CAHmME9qptoGM=Xc+qJKN87OC6-RdnbJNSx3GCfLUz4p7qQwzuw@mail.gmail.com>
-Subject: Re: [PATCH v4] random: use simpler fast key erasure flow on per-cpu keys
+Date:   Mon, 21 Feb 2022 15:57:11 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pCGHuhZW-HQD==2h0=YRk=Man0KU6+RAGiT0QD-PCNpg@mail.gmail.com>
+Message-ID: <CAHmME9pCGHuhZW-HQD==2h0=YRk=Man0KU6+RAGiT0QD-PCNpg@mail.gmail.com>
+Subject: Re: [PATCH v3] random: absorb fast pool into input pool after fast load
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
         "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Jann Horn <jannh@google.com>
+        Dominik Brodowski <linux@dominikbrodowski.net>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 4:37 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> The only oddity I noticed is that some new comments use the net coding style for
-> multi-line comments, and get reformatted to the standard style later in a later
-> patch.  It would be preferable to use the standard style from the beginning.
+On Mon, Feb 21, 2022 at 3:47 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> This looks fine, though it's unfortunate that it has to be a trylock so this
+> isn't guaranteed.  Also, the commit message is a bit misleading because it talks
+> about "overwriting" the primary_crng key, but at this point in the series the
+> extracted entropy is still being XOR'd with the primary_crng key.  It's not
+> until the next patch that the key is simply overwritten.
 
-You can tell where I've been spending my time... :)
-
-I'll fix this up.
-
-Thanks a lot for your review on this patch and the couple dozen of others too.
-
-Jason
+I'll fix up the commit message.
