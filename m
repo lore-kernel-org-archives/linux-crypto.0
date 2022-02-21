@@ -2,70 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C43C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 02:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F6EC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 02:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236764AbiBUCij (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 21:38:39 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56096 "EHLO
+        id S1344033AbiBUCoI (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 21:44:08 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235152AbiBUCii (ORCPT
+        with ESMTP id S1344030AbiBUCoH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 21:38:38 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A683E1EED3;
-        Sun, 20 Feb 2022 18:38:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 47B0461124;
-        Mon, 21 Feb 2022 02:38:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8081BC340E8;
-        Mon, 21 Feb 2022 02:38:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645411095;
-        bh=dR9SzToMmoFqkyh1Vj1H8HzO4u+iPA3s8xWivFtFm3Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fJodiHhaUOQMMaZWp/ydZMJjun0OLrJEdbTYmfSW7Eso3aerQdP0x8gV5JgJfEXkb
-         5HdccqbBXa0zbVfshLUwE+oxauzEFLqPyi7LFld9rf3Mm43TtQlHGTXqsG3PJ35teT
-         UEZq+9XC+2/2q2bjILMT9ftoNtXKpYffD+mUhXQxK6T++c22eMFbba27B55U5nNt79
-         uGxA5TiknqeHX7ar5/93cYJcXkW2fEs5soxKjT0//ydecr6uZFoAuzBsTdnp93JCN4
-         /8rkfJbyf9zNEdBxNTay06+kkCsb8vGzoITUXy4aNJ+HiRpR0SeMume5ZVwVmhPRrR
-         9rsm/L+ivbxYQ==
-Date:   Sun, 20 Feb 2022 18:38:14 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tytso@mit.edu, linux@dominikbrodowski.net
-Subject: Re: [PATCH v2 2/9] random: get rid of secondary crngs
-Message-ID: <YhL7FoLE6w3eMjoy@sol.localdomain>
-References: <20220209011919.493762-1-Jason@zx2c4.com>
- <20220209011919.493762-3-Jason@zx2c4.com>
+        Sun, 20 Feb 2022 21:44:07 -0500
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED59D25EA0;
+        Sun, 20 Feb 2022 18:43:43 -0800 (PST)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0V5-OM3N_1645411419;
+Received: from 30.240.98.212(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V5-OM3N_1645411419)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 21 Feb 2022 10:43:40 +0800
+Message-ID: <17d1a498-6b27-c61b-787d-667abbbb955b@linux.alibaba.com>
+Date:   Mon, 21 Feb 2022 10:43:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220209011919.493762-3-Jason@zx2c4.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH] KEYS: asymmetric: enforce SM2 signature use pkey algo
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
+References: <20220201003414.55380-1-ebiggers@kernel.org>
+ <20220207114327.7929-1-tianjia.zhang@linux.alibaba.com>
+ <YhLvtVT89tAjGnqw@kernel.org>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <YhLvtVT89tAjGnqw@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 09, 2022 at 02:19:12AM +0100, Jason A. Donenfeld wrote:
-> As the comment said, this is indeed a "hack". Since it was introduced,
-> it's been a constant state machine nightmare, with lots of subtle early
-> boot issues and a wildly complex set of machinery to keep everything in
-> sync. Rather than continuing to play whack-a-mole with this approach,
-> this commit simply removes it entirely. This commit is preparation for
-> "random: use simpler fast key erasure flow on per-cpu keys" in this
-> series, which introduces a simpler (and faster) mechanism to accomplish
-> the same thing.
+Hi Jarkko,
+
+On 2/21/22 9:49 AM, Jarkko Sakkinen wrote:
+> On Mon, Feb 07, 2022 at 07:43:27PM +0800, Tianjia Zhang wrote:
+>> The signature verification of SM2 needs to add the Za value and
+>> recalculate sig->digest, which requires the detection of the pkey_algo
+>> in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
+>> field in sig is attacker-controlled and should be use pkey->pkey_algo
+>> instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
+>> will also cause signature verification failure.
+>>
+>> The software_key_determine_akcipher() already forces the algorithms
+>> are matched, so the SM3 algorithm is enforced in the SM2 signature,
+>> although this has been checked, we still avoid using any algorithm
+>> information in the signature as input.
+>>
+>> Reported-by: Eric Biggers <ebiggers@google.com>
+>> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+>> ---
+>>   crypto/asymmetric_keys/public_key.c | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+>> index a603ee8afdb8..ea9a5501f87e 100644
+>> --- a/crypto/asymmetric_keys/public_key.c
+>> +++ b/crypto/asymmetric_keys/public_key.c
+>> @@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
+>>   	if (ret)
+>>   		return ret;
+>>   
+>> -	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
+>> +	/* SM2 signatures always use the SM3 hash algorithm */
+>> +	tfm = crypto_alloc_shash("sm3", 0, 0);
 > 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 225 ++++++++++--------------------------------
->  1 file changed, 53 insertions(+), 172 deletions(-)
+> Why not simply fail when sig->hash_algo != "sm3"?
+> 
+> BR, Jarkko
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+This series of Eric's patch 2/2 has done this check.
 
-- Eric
+Best regards,
+Tianjia
