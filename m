@@ -2,44 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF0BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 12:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B523C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 13:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357969AbiBUMTm (ORCPT
+        id S1358577AbiBUNI2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 07:19:42 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52834 "EHLO
+        Mon, 21 Feb 2022 08:08:28 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357840AbiBUMTf (ORCPT
+        with ESMTP id S1358551AbiBUNI2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 07:19:35 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2079.outbound.protection.outlook.com [40.107.96.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2831A81D;
-        Mon, 21 Feb 2022 04:17:06 -0800 (PST)
+        Mon, 21 Feb 2022 08:08:28 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2057.outbound.protection.outlook.com [40.107.220.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 210771EC4F;
+        Mon, 21 Feb 2022 05:08:05 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QufdramQXl2HKXiM3B7Dyv1V0oQ+4gg2ECMlG3WP0DRW2xYKNsHoZLMwntGLVGqLggo6X1BPqHO0aK7LAbkX1J2GaaB1aChrC3CtsPCQD+Lho7k5qtiB0yxYxI1hNPiOMVJe+PhYsHgs0Ari7C51EimAE6k0xF1IeACUqJMrfxwwH+7uRhq7oQl6tUDekXhbxMqqslVNLERNEPG1B80ST+coHl+hkI+G11sHppEh4cnnGDAJgrkny825uWrZ6xjL8lgAyUP1zr+YqZBf9jHScb23CJrECHU4uO44LkzBu0/yCIGh7l00syo4JDDWRajdB0l7H78CzU92uqBiSqxHGQ==
+ b=ByU3Htn1oNYIcJOjJxB4xiVCBrJmWGHWhHIcs20/ph2Znt8Dvkk2Qo/KR8089oBQLem8jYswti1G+NBAogloOUDDsn69yaAYdKj0kLZbigZKOxChwNm85yHJGfzGAOqE7pz8cYjOjVTfv7M61PZF3BH9AYgLi4TQz6NiA9XIcqDRdtGutANnk5m3ZdujcbHXbY49HKLPOo7DCEWEbzI7WyY3prl6vGBfATRcXsrmttpiH6VMqyqoB87tyrUhjByzQUlOlhKxEQcFmL/fWAqHk/EftpG+fsH+DkoaN9twCW9VDKLYRum3SNEucBIaIGFPi2EoPpF1F/t6MKY3ErYNQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tKrvxpORAMdXIEaAw72CafZuv1/+GUIIPR5c85RDcIY=;
- b=Kcc7A6Gn9IowKl4tvlC0Ne3PiddkzYsOf8jZNhqN72sOCB88BYKDwNMMpU4COmvIP0YUURWihhs1v2Z/dXUAvUHqZAhupR0TDvuKOCOdsiMBQ5KUdfdVY0T8lLl9225AarVPvWmEuAnQQo7xc4ilHnJ5Y7yeDHZMfwwYYZQYunbQx8Y1uVUfSEy4SD9X/Nd1ivKo08HBC3OneIHA6H56O8yZsnUZLOge75cNylewEQ93G9oEzqYJiXfN7OSB2EMf78ej0jpJa3o6mohJHE3s2FEMOsAfamDuMgPL6JxVdJXUieuY0W3cg935PfUL0+q+CEEDY3zLVUTk1WOL1NmW8w==
+ bh=UOUNC/ti0OOdjdfxbe3dzRn/yo29ytQRuBZEVFuGLqY=;
+ b=EwSMjG4WIP3npzz0Ol2YIllPvssTL1x5rpDaYd//9f27jka6RmglO3vZioZXEBOFGSyFTEKhQ+J57k85YeTeMmFSa8c6dGW81fzdgVGtIxt3dEqJvDVMsjnZlun/ugW6jPCQnMT/89ih9q9Ut3rQReTEgu2w/9wDbqHYX0FwkoqaYf4P2H8MfI9gjjrqExDTqi2Wa1vinVfWo8If7GgI+PTBcTX9ywQ41D4ptHgX3s1Ct5NsENIzB/sGD/MWbVhuB3fZFI1vIjL56Y7ox5BGoK1lOnTObZPUtsmE1b0n0ImxbRKDaOsNucMEAcMYnenmrzJ+tp+F2y43sRqoewYRsg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
  dkim=pass header.d=xilinx.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tKrvxpORAMdXIEaAw72CafZuv1/+GUIIPR5c85RDcIY=;
- b=GXvV+nmcRmeY8WUQdRdYeZg+P1KFip6qezPvCGarhS7FQl8y6IuHwXtBIdm0fyh2H7jh0x/lQ+K8dHypwlB0ZH5imV3Cp4SQ9UEWp6jFuWh9BJYwjISDoFsO5AUN4ReW+fR2Mo/0EAxYmCKfGvzGGEJrZNm5XtEjCRUnXzFT2D8=
+ bh=UOUNC/ti0OOdjdfxbe3dzRn/yo29ytQRuBZEVFuGLqY=;
+ b=VWaJPOqHCEoEqwwlw+y8bIm9cw5A9swDQzH/aim3txK39yW+uyvmS13l/jMqqfnB4V5ChCxXGNbXg8wJ1BLkZbxTDO2IcrYTSoU53w3vJMkH+LdRR8P/nTh+QXgH9IvzBaKnN4X+y9Vh/TUbVwcoKm47jm63pza/bK9QGqOvDFI=
 Received: from SJ0PR02MB7279.namprd02.prod.outlook.com (2603:10b6:a03:2a1::9)
- by SN6PR02MB5342.namprd02.prod.outlook.com (2603:10b6:805:74::29) with
+ by SA1PR02MB8461.namprd02.prod.outlook.com (2603:10b6:806:1f5::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.24; Mon, 21 Feb
- 2022 12:17:03 +0000
+ 2022 13:08:01 +0000
 Received: from SJ0PR02MB7279.namprd02.prod.outlook.com
  ([fe80::a159:fdbf:b4d0:c180]) by SJ0PR02MB7279.namprd02.prod.outlook.com
  ([fe80::a159:fdbf:b4d0:c180%8]) with mapi id 15.20.4995.027; Mon, 21 Feb 2022
- 12:17:03 +0000
+ 13:08:01 +0000
 From:   Harsha Harsha <harshah@xilinx.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>
 CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
@@ -55,13 +55,14 @@ Subject: RE: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3
  functionality
 Thread-Topic: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3
  functionality
-Thread-Index: AQHYJDLEV7muFowk2EOLQ1JY4Y7bbqyZD4kAgATePfA=
-Date:   Mon, 21 Feb 2022 12:17:02 +0000
-Message-ID: <SJ0PR02MB7279894629DCA2758355A9D2DE3A9@SJ0PR02MB7279.namprd02.prod.outlook.com>
+Thread-Index: AQHYJDLEV7muFowk2EOLQ1JY4Y7bbqyZD4kAgATePfCAABFkIA==
+Date:   Mon, 21 Feb 2022 13:08:01 +0000
+Message-ID: <SJ0PR02MB7279D291580A2F1583836F79DE3A9@SJ0PR02MB7279.namprd02.prod.outlook.com>
 References: <1645125264-11033-1-git-send-email-harsha.harsha@xilinx.com>
  <1645125264-11033-3-git-send-email-harsha.harsha@xilinx.com>
  <Yg9qOrjJuttVSetN@Red>
-In-Reply-To: <Yg9qOrjJuttVSetN@Red>
+ <SJ0PR02MB7279894629DCA2758355A9D2DE3A9@SJ0PR02MB7279.namprd02.prod.outlook.com>
+In-Reply-To: <SJ0PR02MB7279894629DCA2758355A9D2DE3A9@SJ0PR02MB7279.namprd02.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -70,44 +71,44 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=xilinx.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a3d4d9d4-2983-4e42-e116-08d9f5341180
-x-ms-traffictypediagnostic: SN6PR02MB5342:EE_
+x-ms-office365-filtering-correlation-id: 827696e6-4529-4d72-27bb-08d9f53b30a3
+x-ms-traffictypediagnostic: SA1PR02MB8461:EE_
 x-ld-processed: 657af505-d5df-48d0-8300-c31994686c5c,ExtAddr
-x-microsoft-antispam-prvs: <SN6PR02MB53428277AB554BCC09D5E8F4DE3A9@SN6PR02MB5342.namprd02.prod.outlook.com>
+x-microsoft-antispam-prvs: <SA1PR02MB84613038A1A97F7DB35A1C8ADE3A9@SA1PR02MB8461.namprd02.prod.outlook.com>
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qRicbAG2jBHe6MT2SJGFxlv1iGztZjLljxmRbZqBDvH4JGjz/tyNCw92ABbc5idbdkvHwNQGn0e0VM7tgxvBaMt8MSFnWsV1c1mJ/bucFY4TduJXcQ8aChuDOpa3KSQkhrjOeObs1O5uBZWtBreZNS0hi01ASElCfDqvCQMV9kd3HErTn1pKD54lqQI57yYpPHt28F/WyT1w6tHeZ06oiLA2NZkRRSBXwAvFhI9W8XwRtLXz3fySBF4O/tpcm6HMbCOn6utRIwqBXi9ezc1vqR0OIpldTdtOnuDf7MwIh5GMBaTuIG3EdMTFsDzVeLpf0sK/T8L9NEwbM1xKWAT9xD5l8rLbNhK0+IEimyjKGouN09N2aJzLw9A1KpRn0Ju8LVBzscjw5MKY1SnZEzE5b2lD0VYMCcYUAen/X1KEPWMLEJqj1BmWwhTz8R2oavIU5CY9R2ZX+hbeBQQHVF9/iZMqB3BqHO3ww21lwE3YuynrpF9R1TzFHoal9lHXEIiwIMebQITlgcgkkeInFUmOebijErof/cRZ5T7TKrEG16vG+9cB3vNmnsdMP7iqIprHVce18jGUaLEmX6WZhZ9+z+8E8tgMQ5wXFOPN2lRZ4943OR6HqRjEzcJq5loa3+8pQOVR349pN6DMc/uFthZvDdRA0nZFgzWdbrg8VTqYB8C58vjL+hlzCsbPuu2cHIaF5Bdah0MyfIvLMki0JZPZWviLczO4NTOjAx6GQoV+AsjzkPRu4/6mdWGdnqVkVKXbh95bsLBl/n5mjyU5TQE+2RhssmTxoIPlVHvHpkdmgfY=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR02MB7279.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7696005)(508600001)(66556008)(76116006)(5660300002)(4326008)(107886003)(6506007)(66946007)(66476007)(66446008)(64756008)(9686003)(966005)(83380400001)(26005)(186003)(66574015)(71200400001)(33656002)(316002)(52536014)(8676002)(8936002)(55016003)(38100700002)(2906002)(6916009)(122000001)(53546011)(54906003)(38070700005)(86362001);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info: 0jp8bJd1vQyGqatJVzVmBvzEUsF+HQ5iNC8rCzuGCTh/PhDVUt0akVMI09aPOnP7Z7AwqjY3EbLRR56jJArz+rAmhm+HnZ4gZb6BWxX1IqEXwHJroO1eeDzRF/3J82VA+EzxSEowG7HRfGTQGoA/JvpoScM20ezJtd+sGOxSi/nAtJKKZpTAWw/0SkhF9PW6JRe7rJrYWOq/wrE+PNAVYBB2QFVU7Hk3Q50HQ/Tr55dhrCfDKv63RqbLD69Qpgi4fxUp2KgGFqbn2EDRLLiLYtI7XdZXNSkaHd/9oRv2+pzDQNDZNIcKfYQZduotXfdM/ebbJwAEs+VpoSf2gefIRELuye3sdXdH6fUWnsoC5tEjiDaXAgPg6jz+UYV1fmmBkSFIU92aTN8YYX/bc9fzLBxItD2kRSGKtDnExq6t8vnfOnZinK0UI3X9RDq0LePUyQOJ/fVPFBgWD6lLAKZhJL4dFzf1l90vngNlcriomeRK1zULQPyVPbotTwS6fxxSD3oFS4+51lGe5w2bAHxSFbY5nrEgH5e6tQoOPPjCmn0TzTEjOAl0OanwRTTEvLL2ApIOCn4RtdlKmj/9cH3S8WIqEadufH0hr+zLqQKtRor242WScFhaCLGv2IKOYTgeGyF0Q1nkSRbegPzShRB91WIpwTniwmugrN4LM3KlQRROkpj0xVBx7dENT2JuovkklRv/BiSUroHtiJnoYMpV53GyuKIlGSL2rlojIL85qlCbXiAtrcDdc7IiTh1QCtcyBuHR8Kpq+zJ+b8/t4j5DvgtiONxu68TiThLwopin28c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR02MB7279.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(76116006)(316002)(55016003)(71200400001)(6916009)(54906003)(38070700005)(508600001)(8936002)(52536014)(53546011)(107886003)(6506007)(966005)(7696005)(33656002)(9686003)(2940100002)(8676002)(4326008)(86362001)(66446008)(66574015)(66476007)(66946007)(66556008)(186003)(26005)(64756008)(83380400001)(122000001)(5660300002)(38100700002)(2906002);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?HX1XwnYoe/ZIQV0+UDhQbJEs1gUvdlgCIsOvWRNYWYn644S7OaazahBfnV?=
- =?iso-8859-1?Q?o7ipg7wgvDc4DplWLH+eNBwkhk3JgkV2JwamqvBE7A2rDB7Q6rRptYH1dD?=
- =?iso-8859-1?Q?9WSyas0lGkjQ8uguZWHfOLi+o49Z2mp1NjxVMXZ88MqUwOMj2zrVmmTXCB?=
- =?iso-8859-1?Q?TeY+ac9E2GH507yDSUJs4/OzU2wmaGaqWV0vqQH0heDdiQpY5c5cBFnGLf?=
- =?iso-8859-1?Q?JOEgI6JWk7ZJnXAgdFFGL6iucO+MLxY1qmVPMzQVh0HHU7OIR/Wx7Nj4JU?=
- =?iso-8859-1?Q?5wNFJomvIG2CENz8oGHKpFjEry6ITuGq63Pr7Xdzik/WXx1reuuH6+F02Z?=
- =?iso-8859-1?Q?FLjNO89S2XiGWQusYYHAO54Dybliziuyu1XJusairlB9B1XavopuAi0Sao?=
- =?iso-8859-1?Q?kq9sIcT3e72mgVyvJlvKjtTBj5g1JPKZVIaD3JJHpaOvH5QdmsehtkSghT?=
- =?iso-8859-1?Q?nkwP9VvkC2Mt1heaTlNySotzG3+a9xO3m4UqJpcn5Pl7hIxIlOj6LhlSK4?=
- =?iso-8859-1?Q?nVtdRRtquREWnUcGnVaJHBRWOSecJZOHKTwmcgk2aiJiB01YM1gf4Cksv6?=
- =?iso-8859-1?Q?/c8Lf1s13cS0MG9iAAd3j3VmvipX5/x+3lw7y1RXnDVR6rZrKFGyH+ERpS?=
- =?iso-8859-1?Q?KEj4+Bta2kYM4NC33/8XEPlt8IzBnXKGExpLy0/s2FGtYSMDZBEcmOQTzO?=
- =?iso-8859-1?Q?X+SkWjNup9ItnK6DoSiuQlf2GTol4SoaKKnCbYSpwb9sXxvEWEiDXB176Y?=
- =?iso-8859-1?Q?/sySDD+pYdr8jjdPLL3guboeZwBt0V8XLmOLHqzyFGUGd6pehqLmUiraqu?=
- =?iso-8859-1?Q?CYYneAqPN0t3rgbU1J6++fcBSRORah9aTeGdOx0iyI3vUp3Ozv9tS+Fyq2?=
- =?iso-8859-1?Q?iQgXy0aFQfrlGYI1pPn7gcLIBVd1ob/7OWPvmQ+Wgo5rhtyiLvWQZWx7hA?=
- =?iso-8859-1?Q?k743lM8E/sYSs0/boZEm9BWgXII/TQ+M39JhvWfdT2dc4/GjGZsnGyIeZj?=
- =?iso-8859-1?Q?mW6rHHZ1AilrFE37t3zqzfp9yzE8uXWmNB6DtZfa8bfGNpHcp6tewf2DHX?=
- =?iso-8859-1?Q?VDlgVqOQ2Ax/XGow75BIpV5xgHKH1r0K8DIZkifvJP4KO7IKseOkbRQEQZ?=
- =?iso-8859-1?Q?NhmKg9a4ydGJTBzAdpbHNiqNMFF2Upy3TYqi8q3t727TqnINACPeHvuAhD?=
- =?iso-8859-1?Q?bRQKM8i/Ez6QVtG1kfpHtceCWNUYGG9amLwsyrjLe0d5LafTd7Im0RB07Q?=
- =?iso-8859-1?Q?7mVmUDVwcY/DWz+6qA5Pe6icrD0nWFA7fJ6Q4nUVWKDj7dPVdJSjYyjZJt?=
- =?iso-8859-1?Q?J0rDuq16ejQxUavkrwXkTspUh/3YW6wNpdc41G+oFxPr4653U8saVHSBfR?=
- =?iso-8859-1?Q?4o2khr8wXluZmswg/5l54onBjJjcacz6HyYEAjdAFVPzMm6kYyWcEukINX?=
- =?iso-8859-1?Q?hidelrFaje853UoZ3WkueozF92VtC6p+J8sOWfNQ9KLfJulqw2rC/+F8wq?=
- =?iso-8859-1?Q?H9oCaHgNcWXyZyAs10IgGTCg85/C9vSVIMBrk/wBw+W8j3Fo5KA2aC4mZy?=
- =?iso-8859-1?Q?3OhaV+eUhfKLN9caf9PpS8BDXg82hHrdAsaSXBzyuwmxoeWdiTmThXI4RS?=
- =?iso-8859-1?Q?6pXRGddx4sS5/4R1uNRyC62IqnrxetQeWf8nC0apt8pnzjC9st5EJQUg?=
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?KSBbKsIiRtRXDLaAYgCH3DzrgDKvPhcBRYQBdUWRGAolzV1ptYTW1EJGil?=
+ =?iso-8859-1?Q?hRPbnORnfWHcLst+fukXsLERZPTOeBMzuwsLCz1aeu/LUmXUFLo+m0PxE9?=
+ =?iso-8859-1?Q?vFWlBU7Z/FasssrZO4o89msZkTVqs+2hDmBmxEQgNCJWQyYGhWRN9HF7Y3?=
+ =?iso-8859-1?Q?NTI/aLOwzMJKT6z+WlNuPwc9CILrp2P9dqaH0OQNbdly7TZY0xfkubItUY?=
+ =?iso-8859-1?Q?tZ77OIeiWWUbosqx+Joahc7B1hUe49ZPbHh6Jg4vVuxxPYVSqJXD/so1/D?=
+ =?iso-8859-1?Q?PA7f5cPuuFBo8/a/ld04dlkl1rpqRKuGhJipFadz756liyHgKcQcz97E00?=
+ =?iso-8859-1?Q?1F24i6S5o6tro5ZT6KbZlgkYtZvHy1M+7m7+fTKZZ9lVB+/hkN9iYAhFP0?=
+ =?iso-8859-1?Q?lrN4Ky4BCdsaPrzgwGD4LMiq5HUeFPDe9kgGwfrLKz9DgMnSI3AD2pjgM5?=
+ =?iso-8859-1?Q?M5EZeNU95VP+QX1HGhM4WERvuANf1ggHhRymjF4f8FjwctLcmIgzbZzHT9?=
+ =?iso-8859-1?Q?uKAkwqRklUmHEGUXOZzEz5V1mn/SQRmRfGnTlqetuVDGsgMLAMa7qcJqkI?=
+ =?iso-8859-1?Q?wZ8dWhsRSd8PjrUNTpJXetdIexLNq9QQ0aoGLfV5LpvvTe9/ZgWm78ABYd?=
+ =?iso-8859-1?Q?JxG3PsrGj5AuQj+BSZ4Ib4qZLowCOPYa2LcxYYmIJhLunAL3Ca913qLQvu?=
+ =?iso-8859-1?Q?V24m5V7Kz6kzY5hjyAv6iOJc5gyhVMFF4nuUMF6pq1LqYtEBPBf5uwSbMN?=
+ =?iso-8859-1?Q?UyAXK/eDjx/zFtZYNOuT6iAtMoIvjc7uE0fTGbxciWbvdbTE6usMT2d8yF?=
+ =?iso-8859-1?Q?LC5pXgH3S1/dBKuMuwKyaW4DaQUOaijj9GA5BWnJnvmZ89m0SYLD5gF0hX?=
+ =?iso-8859-1?Q?lKTgbQ85blJttA5w6j/HPEl9C3Km5OwHQORWd8FXVQJW0w5BfWuGPWfTFk?=
+ =?iso-8859-1?Q?OClIq+MvzDWJ7xQMSCVl1l4gBQnaBOBVK+m7wbhCQwgA8awvDU4/oqpyVa?=
+ =?iso-8859-1?Q?TECnvgIqVK33IvmcoqjKxRrgKwXllD1j0PS6sGn+oFcmITaVNFDIYTOW8e?=
+ =?iso-8859-1?Q?3/iBeFbyrwg7g9DGYKKFnuukexk7ziqmf83hfFcrsg4OY+lkqg2E/Hy+8r?=
+ =?iso-8859-1?Q?ehr18JyG7wgY7yKI7CebFF+WCGZbLKE2FRx6e8u5qH4SWBCD+KHeaI67Hk?=
+ =?iso-8859-1?Q?SJgxuT2jmCHoWAY4nN0eZxi2FVhgrDTr//X3hV3CNQ2hG1ntGsJlKZCojB?=
+ =?iso-8859-1?Q?/OLG2/XZuLhC/5KoQkBte9JuJMydW5TNYVN24on4anx8wxI1Wd45UekYMX?=
+ =?iso-8859-1?Q?rKFl4ZheuwhPdljC8mGHd6IDIU0FW0a0vedX5sLIkiaoYgvbPrLDQcYFMk?=
+ =?iso-8859-1?Q?6XX7DSLRLm2dnJa0CtvCvi5yWvGRQ60LEXmyCCPaeGp667wf1l22eSJgRT?=
+ =?iso-8859-1?Q?gH/n1PoObL7mEFNxmHni1NchiI35hyL6ZIaMb4+Tjh7I5V4UkyxTILVZ8w?=
+ =?iso-8859-1?Q?N7wTRb0t5U3XT+fZsCfFWlt7a3Qt4u50KTEEUj0LFtf5PjVuUgQHjUEfAt?=
+ =?iso-8859-1?Q?+0Xgq8OHTpNo4r80zVjlsOMGBc7b3scRGq2u+NFmsyH4MkNcX/qrBcOuYY?=
+ =?iso-8859-1?Q?Bx/P6ecF5qGbXYekTZDc8HTzxc/60NWSXxwldH6a4aGwfSBIxQt1pmeg?=
  =?iso-8859-1?Q?=3D=3D?=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
@@ -115,14 +116,14 @@ MIME-Version: 1.0
 X-OriginatorOrg: xilinx.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SJ0PR02MB7279.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3d4d9d4-2983-4e42-e116-08d9f5341180
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2022 12:17:02.8750
+X-MS-Exchange-CrossTenant-Network-Message-Id: 827696e6-4529-4d72-27bb-08d9f53b30a3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2022 13:08:01.6404
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dUWKdGwXFSVHxnUQIQCXQIdyHe3wBDMk/F4eEY8XKgJ0nj9ALJPRXUnaN1s9AuhLq7Bp7hY2Rmm7RwMxN1GEwg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR02MB5342
+X-MS-Exchange-CrossTenant-userprincipalname: 5zj/hnycB9ayDukHRyNvyVFIJT3xobvHSLon7zo2WvExY2t+8vreqvHUf1F+1/KZ0d0K+tY3EoUE1fxTqK5vpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR02MB8461
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -130,64 +131,85 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 > -----Original Message-----
-> From: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Sent: Friday, February 18, 2022 3:13 PM
-> To: Harsha Harsha <harshah@xilinx.com>
+> From: Harsha Harsha
+> Sent: Monday, February 21, 2022 5:47 PM
+> To: Corentin Labbe <clabbe.montjoie@gmail.com>
 > Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-crypto@vger.k=
 ernel.org; linux-kernel@vger.kernel.org; linux-arm-
 > kernel@lists.infradead.org; Michal Simek <michals@xilinx.com>; Sarat Chan=
 d Savitala <saratcha@xilinx.com>; Harsh Jain
 > <harshj@xilinx.com>; git <git@xilinx.com>
-> Subject: Re: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3=
+> Subject: RE: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SHA3=
  functionality
 >=20
-> Le Fri, Feb 18, 2022 at 12:44:22AM +0530, Harsha a =E9crit :
-> > This patch adds zynqmp_pm_sha_hash API in the ZynqMP firmware to comput=
-e
-> > SHA3 hash of given data.
+>=20
+>=20
+> > -----Original Message-----
+> > From: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > Sent: Friday, February 18, 2022 3:13 PM
+> > To: Harsha Harsha <harshah@xilinx.com>
+> > Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-crypto@vger=
+.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
+> > kernel@lists.infradead.org; Michal Simek <michals@xilinx.com>; Sarat Ch=
+and Savitala <saratcha@xilinx.com>; Harsh Jain
+> > <harshj@xilinx.com>; git <git@xilinx.com>
+> > Subject: Re: [PATCH V2 2/4] firmware: xilinx: Add ZynqMP SHA API for SH=
+A3 functionality
 > >
-> > Signed-off-by: Harsha <harsha.harsha@xilinx.com>
-> > Acked-by: Michal Simek <michal.simek@xilinx.com>
-> > ---
+> > Le Fri, Feb 18, 2022 at 12:44:22AM +0530, Harsha a =E9crit :
+> > > This patch adds zynqmp_pm_sha_hash API in the ZynqMP firmware to comp=
+ute
+> > > SHA3 hash of given data.
+> > >
+> > > Signed-off-by: Harsha <harsha.harsha@xilinx.com>
+> > > Acked-by: Michal Simek <michal.simek@xilinx.com>
+> > > ---
+> >
+> > Hello
+> >
+> > Your signed-off should contain your real name.
 >=20
-> Hello
->=20
-> Your signed-off should contain your real name.
+> My complete name is Harsha which I have mentioned in the signed-off secti=
+on.
 
-My complete name is Harsha which I have mentioned in the signed-off section=
-.
-
-> Furthermore why did you drop copyright from previous poster ?
-> See https://patchwork.kernel.org/project/linux-crypto/cover/1556793282-17=
-346-1-git-send-email-kalyani.akula@xilinx.com/ for
-> reference.
-
-I did not understand the comment. Do you want me to add Kalyani's name also=
- in the Signed of section?
-
->=20
-> Furthermore, the previous poster didnt answered my questions about parall=
-el processing and tests.
-
-Since SHA3 HW engine in ZynqMPSoC does not support parallel processing of 2=
- hash requests, so we have changed our approach.=20
-Now  to support parallel processing of 2 hash requests, software fallback i=
-s being used for init, update, final, export and import in the ZynqMP SHA d=
-river.
-For digest, the calculation of SHA3 hash is done by the hardened SHA3 accel=
-erator in Xilinx ZynqMP SoC.
-
-Following tests have been done for the driver:
-- Enabled kernel self tests and extra run-time crypto self tests
-- Tested SHA hash computation for different sizes of data using userspace a=
-pplication
-- Tested SHA hash computation using multiple updates of data using userspac=
-e application
-- Tested parallel hash computation
-- Tested using the tcrypt module
+I shall update SOB as Signed-off-by: Harsha Harsha <harsha.harsha@xilinx.co=
+m> in the next version of patch.
 
 >=20
-> Regards
+> > Furthermore why did you drop copyright from previous poster ?
+> > See https://patchwork.kernel.org/project/linux-crypto/cover/1556793282-=
+17346-1-git-send-email-kalyani.akula@xilinx.com/ for
+> > reference.
+>=20
+> I did not understand the comment. Do you want me to add Kalyani's name al=
+so in the Signed of section?
 
-Regards,
-Harsha
+I will retain Kalyani as the author in next version of patch.
+
+>=20
+> >
+> > Furthermore, the previous poster didnt answered my questions about para=
+llel processing and tests.
+>=20
+> Since SHA3 HW engine in ZynqMPSoC does not support parallel processing of=
+ 2 hash requests, so we have changed our approach.
+> Now  to support parallel processing of 2 hash requests, software fallback=
+ is being used for init, update, final, export and import in the
+> ZynqMP SHA driver.
+> For digest, the calculation of SHA3 hash is done by the hardened SHA3 acc=
+elerator in Xilinx ZynqMP SoC.
+>=20
+> Following tests have been done for the driver:
+> - Enabled kernel self tests and extra run-time crypto self tests
+> - Tested SHA hash computation for different sizes of data using userspace=
+ application
+> - Tested SHA hash computation using multiple updates of data using usersp=
+ace application
+> - Tested parallel hash computation
+> - Tested using the tcrypt module
+>=20
+> >
+> > Regards
+>=20
+> Regards,
+> Harsha
