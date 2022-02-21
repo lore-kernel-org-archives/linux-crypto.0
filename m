@@ -2,82 +2,186 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FACC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 07:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FB0C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 10:46:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346661AbiBUH7R (ORCPT
+        id S1355458AbiBUKrN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 02:59:17 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50116 "EHLO
+        Mon, 21 Feb 2022 05:47:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346692AbiBUH7D (ORCPT
+        with ESMTP id S1355428AbiBUKrD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 02:59:03 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5E217AAE;
-        Sun, 20 Feb 2022 23:58:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1645430320; x=1676966320;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S+uT64mp+Afl3y2BOOq/0yNH7TCGPfhkbQO12u0O5o8=;
-  b=W6YhCDossGJiPoV2CdpM5i5vLn5AfO0kyNb949mhWoh4SE6HI0tumhrl
-   78a3jm8RB2psbChpwjf3rWi3hoaBiJcPxjuFbg10tIAFZ6GeQoONy1+6N
-   KesibKxCvTWHI0jFtq0RyUpiEAHgp/jrs2kA+NSOM3/6IcJGncmb5EL+Z
-   Z/ZHdLnyUtyW0hrxs6MbqULOYbSovwQcHP+at7RiGcbYycK02a4JSmN1m
-   h3KAtL8SKWcCHmTm2ud7kl9t4+d4RSa5DutVCpCl7NP2DsONIKtvqZ+R1
-   euLvg6HbtGu18QfyZdjbWVGhb6vJ2vG0my4x6w7OK0rsXSZhEdD2qBTX7
-   A==;
-X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="86422687"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Feb 2022 00:58:39 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Mon, 21 Feb 2022 00:58:39 -0700
-Received: from localhost.localdomain (10.10.115.15) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Mon, 21 Feb 2022 00:58:37 -0700
-From:   Claudiu Beznea <claudiu.beznea@microchip.com>
-To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
-        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>
-CC:     <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>
-Subject: [PATCH v2 7/7] hwrng: atmel - remove extra line
-Date:   Mon, 21 Feb 2022 09:59:28 +0200
-Message-ID: <20220221075928.563806-8-claudiu.beznea@microchip.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20220221075928.563806-1-claudiu.beznea@microchip.com>
-References: <20220221075928.563806-1-claudiu.beznea@microchip.com>
+        Mon, 21 Feb 2022 05:47:03 -0500
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD7A53B69
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 02:08:14 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-2d07ae0b1bfso131936597b3.6
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 02:08:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=NcBfBvIGN108GW6jqQkaKU5JgXcj88Gw87NnerqCbbk=;
+        b=U5GQR6zl+wEC+s4zqGuQ4Z/opVNdqTCgBCpxJTCXnyqOyuqKQzveaubSuCxrl+2A3i
+         RxAO0Qa8+vn7ok7GQ02CVdScymbqa0/BCZ8POoqrSXbGg8MC3qls8kS+PmtccZ2nche5
+         v8PRQ7U5t7qzrqYVDgG7uzboch8pq2uHY9w8xsdxwSNK0gO3BpboqOvbEDYx8Vtg+RFl
+         az7pOvlBzLVs9z3Aevx2tpPKz8MHJOhrPS2CZKmFqUJdUP+7UtFS4GpmqokaDG0IQrrC
+         7ROWUUNfCw7MMAmpAAzOJBGMYsAXt/zeqmKh8Q6P+lmk4YT22Msg7kOLGXauwmbypvWg
+         Ip8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=NcBfBvIGN108GW6jqQkaKU5JgXcj88Gw87NnerqCbbk=;
+        b=pxdDQEzWZIbAjSkQFqUDiq3pB7r+A5pSGOzbtQw9oLOuDf3vxjhjYivpKVt6dV7Ky8
+         e+gAVIyJALgTKVfedPMTkC9JCxwRBsSNz7T0VWKKWu0UCNTiJe8Eo/ISSQAoSmfzsR/o
+         5qOXWahSwdNPeqEaCvH1FVyz5V+kbW5ALlYvVmBdhwXLyX/JUqpG9PelvCprDBiTa1K7
+         IBQ+DDXZllbf1754olN+39l38VEZf4HeP6VBw+86pMf87NCOMXO/u0/jWBK3xnLfabV5
+         IjeIDyn/8kd63stQzQUR+EHpnLLCe6VNHjDBmIkv8PFRG7ZDe6EDaiq7eiWh0JUfJJn1
+         ilMA==
+X-Gm-Message-State: AOAM533Aj4AieZQKcoi7OqoWdnohjzT8yvtiSq3DH4vUI9XxX5xqNL2/
+        U+WXZCyKQw3pUKwxMp55h2JSQlGsM6ZKIjznaAmF+w==
+X-Google-Smtp-Source: ABdhPJwdtcLu9gibtfI044NAYjaGOHp5guIPKv5hfofKWIRcvH+UIjW/NYbFwolbYrIKJ1epDz+PvsCRtAOqs+ZNjwc=
+X-Received: by 2002:a81:a97:0:b0:2d0:b672:5bd4 with SMTP id
+ 145-20020a810a97000000b002d0b6725bd4mr18539822ywk.90.1645438093649; Mon, 21
+ Feb 2022 02:08:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <YgOQBNIdf0UnSH+M@Red> <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
+ <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com> <YhKV55t90HWm6bhv@Red>
+In-Reply-To: <YhKV55t90HWm6bhv@Red>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Mon, 21 Feb 2022 12:08:12 +0200
+Message-ID: <CAOtvUMdRU4wnRCXsC+U5XBDp+b+u8w7W7JCUKW2+ohuJz3PVhQ@mail.gmail.com>
+Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
+ authsize =0
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove extra line.
+Hi,
 
-Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
----
- drivers/char/hw_random/atmel-rng.c | 1 -
- 1 file changed, 1 deletion(-)
+On Sun, Feb 20, 2022 at 9:26 PM Corentin Labbe
+<clabbe.montjoie@gmail.com> wrote:
+>
+...
+>
+> Hello
+>
+> While testing your patch for this problem, I saw another warning (unrelat=
+ed with your patch):
 
-diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index b662d44a09a6..b8effe77d80f 100644
---- a/drivers/char/hw_random/atmel-rng.c
-+++ b/drivers/char/hw_random/atmel-rng.c
-@@ -165,7 +165,6 @@ static int atmel_trng_remove(struct platform_device *pdev)
- {
- 	struct atmel_trng *trng = platform_get_drvdata(pdev);
- 
--
- 	atmel_trng_cleanup(trng);
- 	pm_runtime_disable(&pdev->dev);
- 	pm_runtime_set_suspended(&pdev->dev);
--- 
-2.32.0
+Dear Corentin, you are a treasure trove of bug reports. I love it.
+Thank you! :-)
 
+> [   34.061953] ------------[ cut here ]------------
+> [   34.066656] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST,=
+ overlapping mappings aren't supported
+> [   34.076555] WARNING: CPU: 3 PID: 475 at /home/clabbe/linux-next/kernel=
+/dma/debug.c:571 add_dma_entry+0x1d0/0x288
+> [   34.086748] Modules linked in:
+> [   34.089809] CPU: 3 PID: 475 Comm: cryptomgr_test Tainted: G        W  =
+       5.17.0-rc3-next-20220210-00115-g1ca9f29d9780-dirty #25
+> [   34.101635] Hardware name: Renesas Salvator-X board based on r8a77950 =
+(DT)
+> [   34.108508] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYP=
+E=3D--)
+> [   34.115471] pc : add_dma_entry+0x1d0/0x288
+> [   34.119569] lr : add_dma_entry+0x1d0/0x288
+> [   34.123664] sp : ffff80000e3236f0
+> [   34.126976] x29: ffff80000e3236f0 x28: 0000000000000000 x27: 000000000=
+0000000
+> [   34.134122] x26: 0000000000000000 x25: ffff80000b3c76c0 x24: ffff80000=
+b3c7000
+> [   34.141267] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000=
+a8c1000
+> [   34.148410] x20: ffff0004c0b93f80 x19: ffff80000b320000 x18: fffffffff=
+fffffff
+> [   34.155554] x17: 6c7265766f202c54 x16: 534958454520676e x15: 000000000=
+00001fa
+> [   34.162697] x14: ffff80000e3233f0 x13: 00000000ffffffea x12: ffff80000=
+b3bdda0
+> [   34.169840] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000=
+b3a5db8
+> [   34.176984] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000=
+b3a5d60
+> [   34.184126] x5 : 0000000000057fa8 x4 : 0000000000000000 x3 : 00000000f=
+fffefff
+> [   34.191269] x2 : ffff80000b34db38 x1 : 371dfc0f85526100 x0 : 000000000=
+0000000
+> [   34.198411] Call trace:
+> [   34.200856]  add_dma_entry+0x1d0/0x288
+> [   34.204604]  debug_dma_map_sg+0x150/0x398
+> [   34.208615]  __dma_map_sg_attrs+0x9c/0x108
+> [   34.212717]  dma_map_sg_attrs+0x10/0x28
+> [   34.216554]  cc_map_sg+0x80/0x100
+> [   34.219875]  cc_map_cipher_request+0x170/0x3c8
+> [   34.224319]  cc_cipher_process+0x210/0xb58
+> [   34.228415]  cc_cipher_encrypt+0x2c/0x38
+> [   34.232338]  crypto_skcipher_encrypt+0x44/0x78
+> [   34.236786]  drbg_kcapi_sym_ctr+0xdc/0x1f8
+> [   34.240887]  drbg_ctr_generate+0x5c/0x98
+> [   34.244812]  drbg_kcapi_random+0xb4/0x260
+> [   34.248823]  alg_test_stdrng+0xf8/0x2b0
+> [   34.252661]  alg_test.part.29+0xb4/0x398
+> [   34.256583]  alg_test+0x48/0x78
+> [   34.259724]  cryptomgr_test+0x48/0x50
+> [   34.263386]  kthread+0x11c/0x128
+> [   34.266619]  ret_from_fork+0x10/0x20
+> [   34.270198] irq event stamp: 318
+> [   34.273424] hardirqs last  enabled at (317): [<ffff8000081300e0>] __up=
+_console_sem+0x60/0x98
+> [   34.281869] hardirqs last disabled at (318): [<ffff800009bfbb18>] el1_=
+dbg+0x28/0x90
+> [   34.289531] softirqs last  enabled at (314): [<ffff800008010550>] __do=
+_softirq+0x4a8/0x5ec
+> [   34.297796] softirqs last disabled at (305): [<ffff8000080ab644>] irq_=
+exit_rcu+0x18c/0x1b0
+> [   34.306061] ---[ end trace 0000000000000000 ]---
+>
+
+So, this is an interesting one.
+What I *think* is happening is that the drbg implementation is
+actually doing something naughty: it is passing the same exact memory
+buffer, both as source and destination to an encryption operation to
+the crypto skcipher API, BUT via two different scatter gather lists.
+
+I'm not sure but I believe this is not a legitimate use of the API,
+but before we even go into this, let's see if this little fix helps at
+all and this is indeed the root cause.
+
+Can you test this small change for me, please?
+
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 177983b6ae38..13824fd27627 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1851,7 +1851,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg=
+,
+                /* Use scratchpad for in-place operation */
+                inlen =3D scratchpad_use;
+                memset(drbg->outscratchpad, 0, scratchpad_use);
+-               sg_set_buf(sg_in, drbg->outscratchpad, scratchpad_use);
++               sg_in =3D sg_out;
+        }
+
+        while (outlen) {
+
+
+Thanks!
+Gilad
+
+
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
