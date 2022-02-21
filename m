@@ -2,100 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC291C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 19:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903F5C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 20:16:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232628AbiBUTIr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 14:08:47 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47920 "EHLO
+        id S233539AbiBUUQj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Feb 2022 15:16:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232674AbiBUTIq (ORCPT
+        with ESMTP id S229893AbiBUUQh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 14:08:46 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545BF1A815;
-        Mon, 21 Feb 2022 11:08:21 -0800 (PST)
+        Mon, 21 Feb 2022 15:16:37 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD91812ABE;
+        Mon, 21 Feb 2022 12:16:13 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BA40160AFA;
-        Mon, 21 Feb 2022 19:08:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0627BC340E9;
-        Mon, 21 Feb 2022 19:08:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 50F9B60FF6;
+        Mon, 21 Feb 2022 20:16:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F458C340E9;
+        Mon, 21 Feb 2022 20:16:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645470500;
-        bh=uJ1xctqupYgShdlN9JXCmYcgnXakV3u7jjYy+e4wd+k=;
+        s=k20201202; t=1645474572;
+        bh=46m+hKe2FxMP2Hp56rRFNSZ0rdlWQD3u26aizbEBFaI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hre/vsXPfTZ8xdaa95piF3pIp0LNpldzkBh2GKZ7ftRIza5cMQ/rdZ+UiqhYCcHzx
-         XUBJ7XWEJ2ZG8VqeeRU0/avSuyZPUPploQKbqOi2vKFkM/CRJR1m1a4rKI1t7qW3yC
-         F3NOagO8mYy+KO0R0+uriC+QDBYZKdCqb9I/3rou+keA2HIi7vKFTdmh1L2FfapEb4
-         H+JdJKci+SIgOkjgcvnwlF/mulyci5NvP5C5wECaVj5oZD5SFgfl3TS9bkXVUeggy8
-         cgomnWhCpLR+EURWs1RT3pyv44VBLGUS2ZJQ1LTC/9Uro7PLeVyAna1YOqc04bdnYz
-         EFHeIFdLX2y0A==
-Date:   Mon, 21 Feb 2022 11:08:18 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v4] random: absorb fast pool into input pool after fast
- load
-Message-ID: <YhPjIripJMsLynXn@sol.localdomain>
-References: <CAHmME9pCGHuhZW-HQD==2h0=YRk=Man0KU6+RAGiT0QD-PCNpg@mail.gmail.com>
- <20220221145816.2278732-1-Jason@zx2c4.com>
+        b=HTJwlypT7i1Uc8kYuY+QrrRXqaA/kO64DCOFx2BqCOgnDB6YrqCbINz0sVK6oNPX6
+         tSVaWduDmvROXW+gyLo5srJ0TofAdqK4HjOuuwqT6MxaLyybV07Z5fDuW9tuKt1JrJ
+         ytfDU8DeGEd/vtIR2UITwzYtoIK6S5/Fhz72FsR3Iuoz1T45lDNNv+TmTduIhunJcE
+         hz4/4NNmNcH2kSJfs4Gon2erKAvR7ULfM+7Zfk/RB4Zhspn2AYOYQR44iqkJzlO27z
+         bilHDbxd4tX3e58/sKbmSYFaMQYHenJkAYhFCaRGC3XOPhl5SWlpPZeQYyOqaEN4GO
+         mdBnEum1+oJHQ==
+Date:   Mon, 21 Feb 2022 21:16:47 +0100
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] KEYS: asymmetric: properly validate hash_algo and
+ encoding
+Message-ID: <YhPzL3v9b9L76I9w@iki.fi>
+References: <20220201003414.55380-1-ebiggers@kernel.org>
+ <20220201003414.55380-3-ebiggers@kernel.org>
+ <YhLu8gZtdpphy5mB@kernel.org>
+ <YhL3MGQcwMujSxCr@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220221145816.2278732-1-Jason@zx2c4.com>
+In-Reply-To: <YhL3MGQcwMujSxCr@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 03:58:16PM +0100, Jason A. Donenfeld wrote:
-> During crng_init == 0, we never credit entropy in add_interrupt_
-> randomness(), but instead dump it directly into the primary_crng. That's
-> fine, except for the fact that we then wind up throwing away that
-> entropy later when we switch to extracting from the input pool and
-> xoring into (and later in this series overwriting) the primary_crng key.
-> The two other early init sites -- add_hwgenerator_randomness()'s use
-> crng_fast_load() and add_device_ randomness()'s use of crng_slow_load()
-> -- always additionally give their inputs to the input pool. But not
-> add_interrupt_randomness().
+On Sun, Feb 20, 2022 at 06:21:36PM -0800, Eric Biggers wrote:
+> On Mon, Feb 21, 2022 at 02:46:26AM +0100, Jarkko Sakkinen wrote:
+> > On Mon, Jan 31, 2022 at 04:34:14PM -0800, Eric Biggers wrote:
+> > > From: Eric Biggers <ebiggers@google.com>
+> > > 
+> > > It is insecure to allow arbitrary hash algorithms and signature
+> > > encodings to be used with arbitrary signature algorithms.  Notably,
+> > > ECDSA, ECRDSA, and SM2 all sign/verify raw hash values and don't
+> > > disambiguate between different hash algorithms like RSA PKCS#1 v1.5
+> > > padding does.  Therefore, they need to be restricted to certain sets of
+> > > hash algorithms (ideally just one, but in practice small sets are used).
+> > > Additionally, the encoding is an integral part of modern signature
+> > > algorithms, and is not supposed to vary.
+> > > 
+> > > Therefore, tighten the checks of hash_algo and encoding done by
+> > > software_key_determine_akcipher().
+> > > 
+> > > Also rearrange the parameters to software_key_determine_akcipher() to
+> > > put the public_key first, as this is the most important parameter and it
+> > > often determines everything else.
+> > > 
+> > > Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA keys")
+> > > Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+> > > Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > > ---
+> > >  crypto/asymmetric_keys/public_key.c | 111 +++++++++++++++++++---------
+> > >  1 file changed, 76 insertions(+), 35 deletions(-)
+> > > 
+> > > diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> > > index aba7113d86c76..a603ee8afdb8d 100644
+> > > --- a/crypto/asymmetric_keys/public_key.c
+> > > +++ b/crypto/asymmetric_keys/public_key.c
+> > > @@ -60,39 +60,83 @@ static void public_key_destroy(void *payload0, void *payload3)
+> > >  }
+> > >  
+> > >  /*
+> > > - * Determine the crypto algorithm name.
+> > > + * Given a public_key, and an encoding and hash_algo to be used for signing
+> > > + * and/or verification with that key, determine the name of the corresponding
+> > > + * akcipher algorithm.  Also check that encoding and hash_algo are allowed.
+> > >   */
+> > > -static
+> > > -int software_key_determine_akcipher(const char *encoding,
+> > > -				    const char *hash_algo,
+> > > -				    const struct public_key *pkey,
+> > > -				    char alg_name[CRYPTO_MAX_ALG_NAME])
+> > > +static int
+> > > +software_key_determine_akcipher(const struct public_key *pkey,
+> > > +				const char *encoding, const char *hash_algo,
+> > > +				char alg_name[CRYPTO_MAX_ALG_NAME])
+> > 
+> > Why is changing parameter order necessary?
+> > 
 > 
-> This commit fixes that shortcoming by calling mix_pool_bytes() after
-> crng_fast_load() in add_interrupt_randomness(). That's partially
-> verboten on PREEMPT_RT, where it implies taking spinlock_t from an IRQ
-> handler. But this also only happens during early boot and then never
-> again after that. Plus it's a trylock so it has the same considerations
-> as calling crng_fast_load(), which we're already using.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
-> Suggested-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> v4 has no changes except for a commit message nit, per Eric's request.
-> 
->  drivers/char/random.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index d31b0b3afe2e..f3179c67010b 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -850,6 +850,10 @@ void add_interrupt_randomness(int irq)
->  		    crng_fast_load((u8 *)fast_pool->pool, sizeof(fast_pool->pool)) > 0) {
->  			fast_pool->count = 0;
->  			fast_pool->last = now;
-> +			if (spin_trylock(&input_pool.lock)) {
-> +				_mix_pool_bytes(&fast_pool->pool, sizeof(fast_pool->pool));
-> +				spin_unlock(&input_pool.lock);
-> +			}
->  		}
->  		return;
->  	}
-> -- 
+> It's mentioned in the commit message.  It's obviously not necessary but this way
+> makes much more sense IMO.
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Ah, so it is.
 
-- Eric
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+
+BR, Jarkko
