@@ -2,192 +2,231 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1BCC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 11:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE6EC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 11:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356707AbiBULs3 (ORCPT
+        id S1356971AbiBULzM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 06:48:29 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44216 "EHLO
+        Mon, 21 Feb 2022 06:55:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242753AbiBULs2 (ORCPT
+        with ESMTP id S231919AbiBULzC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 06:48:28 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D1B1EEE6;
-        Mon, 21 Feb 2022 03:48:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645444085; x=1676980085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=d2nxSyxlFXj9Y46HQxQTGJPE6uNfiwCTcyQito04juU=;
-  b=QUP9c7FgSwFWB3m3foNATrhxlm4uPApRpjjSwzLS+Vu9ixzbnVkW616j
-   GLAz7Y1f5QmRNECLSAg6E7QOhQXns0Jgg+BsRDVVbbSSWH/9f+5qiRYY5
-   iaEd3O0HgVQNjYZO5b2Itveq33xbTN2vRt1xxraWRdPbb9RuAm2e1pC71
-   gzlYpgzoWlTv2jLt2RgbQ78obi/9YRIwmafzQLriBod8Z0Zsh6p9GVNXo
-   sVWjvynrV3XqMPWtn70EaW//pX1m5XjzMlJn5TSuIG+pSoaqWG4ak6Sjn
-   RMHPrSDXjKDYWTbiGUs98Svmo4PeDG329E8ZTdab1u4avDLr8ALuXz2r4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10264"; a="231463399"
-X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="231463399"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 03:48:05 -0800
-X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="547305643"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Feb 2022 03:48:02 -0800
-Date:   Mon, 21 Feb 2022 11:47:55 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Kyle Sanderson <kyle.leet@gmail.com>, herbert@gondor.apana.org.au
-Cc:     Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-xfs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dm-devel@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
- dm-crypt + xfs
-Message-ID: <YhN76/ONC9qgIKQc@silpixa00400314>
-References: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
- <20220219210354.GF59715@dread.disaster.area>
- <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
+        Mon, 21 Feb 2022 06:55:02 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673FB201B7
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 03:54:00 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id e3so26686830wra.0
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Feb 2022 03:54:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c1lGEjQZO5Ck7pZjx7sWrafG9PHsL7fLHKREbwRpPTU=;
+        b=PHob5dcx3qGf9rtPkzufLzJiQAAzeNVba1OpI9VGNOjQFA2T+4SHT2s//2viN8s5AW
+         c5pPqsCeDnvQZO6smxl+n6Kblhx21dz0HNUspX1JQ05KLKMLR6H5xyg3CKknDxsteNBN
+         6vB7pnKOVlE8I5MBA/HeV/ATktnRv2TErEnSJE51/EmzWsMJ85MTJpNh3msIeawaJJZm
+         aX8t7UQ3wsD0ST9EkXc2ASCrg2mc3b9fTz83xL0CLfQi7E1Xh9BaOwYqLdby0x/vKaBB
+         c5SC7HpcYSmpbJOCvZCSadS/kpJuD2qS++WeSuYVbpJh3OzSAHh1Uz7q6VZP975Q+QTX
+         IyRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c1lGEjQZO5Ck7pZjx7sWrafG9PHsL7fLHKREbwRpPTU=;
+        b=QD8TM3+qAwl0Z5F6+/eMSgb94GW7EYXPgUEl1rxHdEjHMfeePvG+vQkYsAcXT2LDer
+         7cLVK8c58WSWiMMuTCL2Zw2dIimNQQHLPlQM2H/goz4uKHUb2aveHyqATTq73YHMU7wg
+         rlN0/OgM6iBC//j0kTNaN9MxgrArOjIisolur8TIcXB6TVjT3GeVQUcmNiAavphh1ENF
+         P97TuORFBe9zIydeIXX4RC69A+PO03Kftg/AaK/qCqD7yv4pim+4mM6x5pk1fWh0z6hJ
+         tdYN8BmhaLdfzl6hrhO187a/Xn5bkzAVkmM3GLS4vKrY/7g8687abwh052D4V9JRxY06
+         KdoQ==
+X-Gm-Message-State: AOAM533qddfVyVHTmSELNvOSz3VqHvmTV695VoImyskpUm6BqgLKUGey
+        J6h+2tjrpj4FIv5fWMAt+J/hqw==
+X-Google-Smtp-Source: ABdhPJxMgn4HOwiP0wCV2QrDZ4jST0qN+s/LnZugswmRGPq6cmDfbz+HneX2bUyrki+Qp5xkgOO1gg==
+X-Received: by 2002:adf:ce88:0:b0:1e3:1340:52f1 with SMTP id r8-20020adfce88000000b001e3134052f1mr14725050wrn.489.1645444438984;
+        Mon, 21 Feb 2022 03:53:58 -0800 (PST)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id k4-20020a05600c0b4400b0034a0cb4332csm7324345wmr.10.2022.02.21.03.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 03:53:58 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        jglauber@cavium.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: cavium: zip: register algorithm only if hardware is present
+Date:   Mon, 21 Feb 2022 11:52:34 +0000
+Message-Id: <20220221115234.2544665-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Kyle,
+On my renesas salavator-X, I saw some cavium driver failing crypto
+self-tests.
+But salvator does not have such hardware.
+This is due to cavium/zip driver registering algorithms even if hardware
+is not present.
+The solution is to move algorithm registration in the probe function.
+This permits also to simplify module init/exit by using
+module_pci_driver.
 
-The issue is that the implementations of aead and skcipher in the QAT
-driver are not properly supporting requests with the
-CRYPTO_TFM_REQ_MAY_BACKLOG flag set.
-If the HW queue is full, the driver returns -EBUSY [1] but does not
-enqueues the request as dm-crypt expects [2]. Dm-crypt ends up waiting
-indefinitely for a completion to a request that was never submitted,
-therefore the stall.
-This is not related to QATE-7495 'An incorrectly formatted request to
-QAT can hang the entire QAT endpoint' [3], which occurs when a malformed
-request is sent to the device.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
 
-I'm working at patch that resolves this problem. In the meanwhile a
-workaround is to blacklist the qat_c3xxx.ko driver.
+WARNING: this is boot tested only on salvator-X to be sure that the
+cavium/zip driver no longer registers algorithms.
+I do not have any cavium hardware unfortunatly.
 
-Regarding avoiding this issue on stable kernels. The usage of QAT with
-dm-crypt was already disabled in kernel 5.10 for a different issue
-(the driver allocates memory in the datapath).
-The following patches implement the change:
-    7bcb2c99f8ed crypto: algapi - use common mechanism for inheriting flags
-    2eb27c11937e crypto: algapi - add NEED_FALLBACK to INHERITED_FLAGS
-    fbb6cda44190 crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
-    b8aa7dc5c753 crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
-    cd74693870fb dm crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
-An option would be to send the patches above to stable, another is to wait
-for a patch that fixes the problems in the QAT driver and send that to
-stable.
-@Herbert, what is the preferred approach here?
+ drivers/crypto/cavium/zip/zip_main.c | 83 ++++++++++++----------------
+ 1 file changed, 35 insertions(+), 48 deletions(-)
 
-Thanks,
-
-[1] https://elixir.bootlin.com/linux/latest/source/drivers/crypto/qat/qat_common/qat_algs.c#L1022
-[2] https://elixir.bootlin.com/linux/latest/source/drivers/md/dm-crypt.c#L1584
-[3] https://01.org/sites/default/files/downloads//336211qatsoftwareforlinux-rn-hwversion1.7021.pdf - page 25
-
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+index 812b4ac9afd6..dc5b7bf7e1fd 100644
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -55,6 +55,11 @@ static const struct pci_device_id zip_id_table[] = {
+ 	{ 0, }
+ };
+ 
++static void zip_debugfs_init(void);
++static void zip_debugfs_exit(void);
++static int zip_register_compression_device(void);
++static void zip_unregister_compression_device(void);
++
+ void zip_reg_write(u64 val, u64 __iomem *addr)
+ {
+ 	writeq(val, addr);
+@@ -235,6 +240,15 @@ static int zip_init_hw(struct zip_device *zip)
+ 	return 0;
+ }
+ 
++static void zip_reset(struct zip_device *zip)
++{
++	union zip_cmd_ctl cmd_ctl;
++
++	cmd_ctl.u_reg64 = 0x0ull;
++	cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
++	zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
++}
++
+ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -282,8 +296,21 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (err)
+ 		goto err_release_regions;
+ 
++	/* Register with the Kernel Crypto Interface */
++	err = zip_register_compression_device();
++	if (err < 0) {
++		zip_err("ZIP: Kernel Crypto Registration failed\n");
++		goto err_register;
++	}
++
++	/* comp-decomp statistics are handled with debugfs interface */
++	zip_debugfs_init();
++
+ 	return 0;
+ 
++err_register:
++	zip_reset(zip);
++
+ err_release_regions:
+ 	if (zip->reg_base)
+ 		iounmap(zip->reg_base);
+@@ -305,16 +332,17 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ static void zip_remove(struct pci_dev *pdev)
+ {
+ 	struct zip_device *zip = pci_get_drvdata(pdev);
+-	union zip_cmd_ctl cmd_ctl;
+ 	int q = 0;
+ 
+ 	if (!zip)
+ 		return;
+ 
++	zip_debugfs_exit();
++
++	zip_unregister_compression_device();
++
+ 	if (zip->reg_base) {
+-		cmd_ctl.u_reg64 = 0x0ull;
+-		cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
+-		zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
++		zip_reset(zip);
+ 		iounmap(zip->reg_base);
+ 	}
+ 
+@@ -585,7 +613,7 @@ DEFINE_SHOW_ATTRIBUTE(zip_regs);
+ /* Root directory for thunderx_zip debugfs entry */
+ static struct dentry *zip_debugfs_root;
+ 
+-static void __init zip_debugfs_init(void)
++static void zip_debugfs_init(void)
+ {
+ 	if (!debugfs_initialized())
+ 		return;
+@@ -604,7 +632,7 @@ static void __init zip_debugfs_init(void)
+ 
+ }
+ 
+-static void __exit zip_debugfs_exit(void)
++static void zip_debugfs_exit(void)
+ {
+ 	debugfs_remove_recursive(zip_debugfs_root);
+ }
+@@ -615,48 +643,7 @@ static void __exit zip_debugfs_exit(void) { }
+ #endif
+ /* debugfs - end */
+ 
+-static int __init zip_init_module(void)
+-{
+-	int ret;
+-
+-	zip_msg("%s\n", DRV_NAME);
+-
+-	ret = pci_register_driver(&zip_driver);
+-	if (ret < 0) {
+-		zip_err("ZIP: pci_register_driver() failed\n");
+-		return ret;
+-	}
+-
+-	/* Register with the Kernel Crypto Interface */
+-	ret = zip_register_compression_device();
+-	if (ret < 0) {
+-		zip_err("ZIP: Kernel Crypto Registration failed\n");
+-		goto err_pci_unregister;
+-	}
+-
+-	/* comp-decomp statistics are handled with debugfs interface */
+-	zip_debugfs_init();
+-
+-	return ret;
+-
+-err_pci_unregister:
+-	pci_unregister_driver(&zip_driver);
+-	return ret;
+-}
+-
+-static void __exit zip_cleanup_module(void)
+-{
+-	zip_debugfs_exit();
+-
+-	/* Unregister from the kernel crypto interface */
+-	zip_unregister_compression_device();
+-
+-	/* Unregister this driver for pci zip devices */
+-	pci_unregister_driver(&zip_driver);
+-}
+-
+-module_init(zip_init_module);
+-module_exit(zip_cleanup_module);
++module_pci_driver(zip_driver);
+ 
+ MODULE_AUTHOR("Cavium Inc");
+ MODULE_DESCRIPTION("Cavium Inc ThunderX ZIP Driver");
 -- 
-Giovanni
+2.34.1
 
-
-On Sat, Feb 19, 2022 at 03:00:51PM -0800, Kyle Sanderson wrote:
-> hi Dave,
-> 
-> > This really sounds like broken hardware, not a kernel problem.
-> 
-> It is indeed a hardware issue, specifically the intel qat crypto
-> driver that's in-tree - the hardware is fine (see below). The IQAT
-> eratta documentation states that if a request is not submitted
-> properly it can stall the entire device. The remediation guidance from
-> 2020 was "don't do that" and "don't allow unprivileged users access to
-> the device". The in-tree driver is not implemented properly either for
-> this SoC or board - I'm thinking it's related to QATE-7495.
-> 
-> https://01.org/sites/default/files/downloads//336211qatsoftwareforlinux-rn-hwversion1.7021.pdf
-> 
-> > This implies a dmcrypt level problem - XFS can't make progress is dmcrypt is not completing IOs.
-> 
-> That's the weird part about it. Some bio's are completing, others are
-> completely dropped, with some stalling forever. I had to use
-> xfs_repair to get the volumes operational again. I lost a good deal of
-> files and had to recover from backup after toggling the device back on
-> on a production system (silly, I know).
-> 
-> > Where are the XFS corruption reports that the subject implies is occurring?
-> 
-> I think you're right, it's dm-crypt that's broken here, with
-> ultimately the crypto driver causing this corruption. XFS being the
-> edge to the end-user is taking the brunt of it. There's reports going
-> back to late 2017 of significant issues with this mainlined stable
-> driver.
-> 
-> https://bugzilla.redhat.com/show_bug.cgi?id=1522962
-> https://serverfault.com/questions/1010108/luks-hangs-on-centos-running-on-atom-c3758-cpu
-> https://www.phoronix.com/forums/forum/software/distributions/1172231-fedora-33-s-enterprise-linux-next-effort-approved-testbed-for-raising-cpu-requirements-etc?p=1174560#post1174560
-> 
-> Any guidance would be appreciated.
-> Kyle.
-> On Sat, Feb 19, 2022 at 1:03 PM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Fri, Feb 18, 2022 at 09:02:28PM -0800, Kyle Sanderson wrote:
-> > > A2SDi-8C-HLN4F has IQAT enabled by default, when this device is
-> > > attempted to be used by xfs (through dm-crypt) the entire kernel
-> > > thread stalls forever. Multiple users have hit this over the years
-> > > (through sporadic reporting) - I ended up trying ZFS and encryption
-> > > wasn't an issue there at all because I guess they don't use this
-> > > device. Returning to sanity (xfs), I was able to provision a dm-crypt
-> > > volume no problem on the disk, however when running mkfs.xfs on the
-> > > volume is what triggers the cascading failure (each request kills a
-> > > kthread).
-> >
-> > Can you provide the full stack traces for these errors so we can see
-> > exactly what this cascading failure looks like, please? In reality,
-> > the stall messages some time after this are not interesting - it's
-> > the first errors that cause the stall that need to be investigated.
-> >
-> > A good idea would be to provide the full storage stack decription
-> > and hardware in use, as per:
-> >
-> > https://xfs.org/index.php/XFS_FAQ#Q:_What_information_should_I_include_when_reporting_a_problem.3F
-> >
-> > > Disabling IQAT on the south bridge results in a working
-> > > system, however this is not the default configuration for the
-> > > distribution of choice (Ubuntu 20.04.3 LTS), nor the motherboard. I'm
-> > > convinced this never worked properly based on the lack of popularity
-> > > for kernel encryption (crypto), and the embedded nature that
-> > > SuperMicro has integrated this device in collaboration with intel as
-> > > it looks like the primary usage is through external accelerator cards.
-> >
-> > This really sounds like broken hardware, not a kernel problem.
-> >
-> > > Kernels tried were from RHEL8 over a year ago, and this impacts the
-> > > entirety of the 5.4 series on Ubuntu.
-> > > Please CC me on replies as I'm not subscribed to all lists. CPU is C3758.
-> >
-> > [snip stalled kcryptd worker threads]
-> >
-> > This implies a dmcrypt level problem - XFS can't make progress is
-> > dmcrypt is not completing IOs.
-> >
-> > Where are the XFS corruption reports that the subject implies is
-> > occurring?
-> >
-> > Cheers,
-> >
-> > Dave.
-> > --
-> > Dave Chinner
-> > david@fromorbit.com
