@@ -2,91 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D29C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 01:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E545EC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 02:21:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245496AbiBUBt1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 20:49:27 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57222 "EHLO
+        id S1343543AbiBUCWD (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 21:22:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245495AbiBUBt0 (ORCPT
+        with ESMTP id S1343540AbiBUCWC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 20:49:26 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4D0517D0;
-        Sun, 20 Feb 2022 17:49:04 -0800 (PST)
+        Sun, 20 Feb 2022 21:22:02 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A14B7658B;
+        Sun, 20 Feb 2022 18:21:39 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7CFABB80E3A;
-        Mon, 21 Feb 2022 01:49:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B1AC340E8;
-        Mon, 21 Feb 2022 01:49:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 28B2561055;
+        Mon, 21 Feb 2022 02:21:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 357A5C340E8;
+        Mon, 21 Feb 2022 02:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645408142;
-        bh=HI8NVCMsfUlolaSoMOjtjL/nBpAaZNebOImBZ6Z/x+M=;
+        s=k20201202; t=1645410098;
+        bh=kGIeWEaq/5UzKoe9nNUsyzDA3N0lfQIYAcHCE2Et33Y=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=i8bOsZ7z2/9hNP2dixd0AchqiaV/IHsV0ZEvA0lcp4lStTEKDeSp++UCFu5Ra8oFV
-         R8sZnFes4j0ripdQcghiaXGUhzLJjKffOr+AGNAU1XTkd8O+dohR3ScXfcfIn+pELg
-         PxYJkzRykkHCObD8N6odV/nJOMpcue0g5ctk/wFjLtFoI/rudwpJ9paZiye/4EliYQ
-         KoafkiKLP5+FLZP0bLMDsUgbZIqbxyiwtMQE+s9GyJXfbKLC+zBPehU/qMii9MaBiv
-         IVNkbX0rwu9HfLmDdPRSFqh6zr1FzlGRjXHdmHp/4r3bLKNAS5mvoC730NRNwQyCig
-         ox/iRUxYjoygg==
-Date:   Mon, 21 Feb 2022 02:49:41 +0100
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
+        b=Qkme+nn2X2Y4RINHEWEoRSLt9y7wLpMTzVJejfvOaJsNfUcZy6SNfwy+gVGdLvM3C
+         k0Tv6KaOkEJhYoNHIqHJAar6Otdb+52kzKIp5Brx55DVYYbuT2bQgl/wF6ZQU7ByHW
+         DEJUAYQnrzoKofyw6fZcU6K0tGQDOaiEv2/DB5xMvZjV0pD2s2Yi5ih8SlLP56dug6
+         mH/yWxyaFALXHOxOEr5z/EkZdoB2vFa4nRcaEkPTMJXyqKzaI9I1a3Rzybv0KejXC5
+         tTSAe7GUpzZT4q1y8BgjNl9T4AZ7U+3+jvA/mEIBBFfojlVS9z6CgWbjUj04SBwsMR
+         gZTmVTuv7YUuw==
+Date:   Sun, 20 Feb 2022 18:21:36 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
         Stefan Berger <stefanb@linux.ibm.com>,
         Gilad Ben-Yossef <gilad@benyossef.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org
-Subject: Re: [PATCH] KEYS: asymmetric: enforce SM2 signature use pkey algo
-Message-ID: <YhLvtVT89tAjGnqw@kernel.org>
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] KEYS: asymmetric: properly validate hash_algo and
+ encoding
+Message-ID: <YhL3MGQcwMujSxCr@sol.localdomain>
 References: <20220201003414.55380-1-ebiggers@kernel.org>
- <20220207114327.7929-1-tianjia.zhang@linux.alibaba.com>
+ <20220201003414.55380-3-ebiggers@kernel.org>
+ <YhLu8gZtdpphy5mB@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220207114327.7929-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <YhLu8gZtdpphy5mB@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 07, 2022 at 07:43:27PM +0800, Tianjia Zhang wrote:
-> The signature verification of SM2 needs to add the Za value and
-> recalculate sig->digest, which requires the detection of the pkey_algo
-> in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
-> field in sig is attacker-controlled and should be use pkey->pkey_algo
-> instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
-> will also cause signature verification failure.
+On Mon, Feb 21, 2022 at 02:46:26AM +0100, Jarkko Sakkinen wrote:
+> On Mon, Jan 31, 2022 at 04:34:14PM -0800, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > It is insecure to allow arbitrary hash algorithms and signature
+> > encodings to be used with arbitrary signature algorithms.  Notably,
+> > ECDSA, ECRDSA, and SM2 all sign/verify raw hash values and don't
+> > disambiguate between different hash algorithms like RSA PKCS#1 v1.5
+> > padding does.  Therefore, they need to be restricted to certain sets of
+> > hash algorithms (ideally just one, but in practice small sets are used).
+> > Additionally, the encoding is an integral part of modern signature
+> > algorithms, and is not supposed to vary.
+> > 
+> > Therefore, tighten the checks of hash_algo and encoding done by
+> > software_key_determine_akcipher().
+> > 
+> > Also rearrange the parameters to software_key_determine_akcipher() to
+> > put the public_key first, as this is the most important parameter and it
+> > often determines everything else.
+> > 
+> > Fixes: 299f561a6693 ("x509: Add support for parsing x509 certs with ECDSA keys")
+> > Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+> > Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >  crypto/asymmetric_keys/public_key.c | 111 +++++++++++++++++++---------
+> >  1 file changed, 76 insertions(+), 35 deletions(-)
+> > 
+> > diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> > index aba7113d86c76..a603ee8afdb8d 100644
+> > --- a/crypto/asymmetric_keys/public_key.c
+> > +++ b/crypto/asymmetric_keys/public_key.c
+> > @@ -60,39 +60,83 @@ static void public_key_destroy(void *payload0, void *payload3)
+> >  }
+> >  
+> >  /*
+> > - * Determine the crypto algorithm name.
+> > + * Given a public_key, and an encoding and hash_algo to be used for signing
+> > + * and/or verification with that key, determine the name of the corresponding
+> > + * akcipher algorithm.  Also check that encoding and hash_algo are allowed.
+> >   */
+> > -static
+> > -int software_key_determine_akcipher(const char *encoding,
+> > -				    const char *hash_algo,
+> > -				    const struct public_key *pkey,
+> > -				    char alg_name[CRYPTO_MAX_ALG_NAME])
+> > +static int
+> > +software_key_determine_akcipher(const struct public_key *pkey,
+> > +				const char *encoding, const char *hash_algo,
+> > +				char alg_name[CRYPTO_MAX_ALG_NAME])
 > 
-> The software_key_determine_akcipher() already forces the algorithms
-> are matched, so the SM3 algorithm is enforced in the SM2 signature,
-> although this has been checked, we still avoid using any algorithm
-> information in the signature as input.
+> Why is changing parameter order necessary?
 > 
-> Reported-by: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->  crypto/asymmetric_keys/public_key.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index a603ee8afdb8..ea9a5501f87e 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
->  	if (ret)
->  		return ret;
->  
-> -	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
-> +	/* SM2 signatures always use the SM3 hash algorithm */
-> +	tfm = crypto_alloc_shash("sm3", 0, 0);
 
-Why not simply fail when sig->hash_algo != "sm3"?
+It's mentioned in the commit message.  It's obviously not necessary but this way
+makes much more sense IMO.
 
-BR, Jarkko
+- Eric
