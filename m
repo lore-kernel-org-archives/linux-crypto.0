@@ -2,54 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF74C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 12:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9488C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 12:16:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357454AbiBUMP3 (ORCPT
+        id S1346714AbiBUMRN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 07:15:29 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51406 "EHLO
+        Mon, 21 Feb 2022 07:17:13 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:42282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235902AbiBUMOP (ORCPT
+        with ESMTP id S1357699AbiBUMOb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 07:14:15 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5856F2458D;
-        Mon, 21 Feb 2022 04:11:23 -0800 (PST)
+        Mon, 21 Feb 2022 07:14:31 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD623245B9;
+        Mon, 21 Feb 2022 04:11:25 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 03E4F1F38E;
-        Mon, 21 Feb 2022 12:11:22 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7FFBD2114D;
+        Mon, 21 Feb 2022 12:11:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1645445482; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1645445484; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KJZf4Rc46hSdkj6zRydP32U/yN137CtztKZ1vEPspqs=;
-        b=FBClqISJcHWAX7rkLOBYKWWuC5yUwLA1suH9vSVcig2smXlLEkTYKrABP5LT1Abz3FCOiq
-        4gR5uUj/0SEjLVkH15xlOQS1ikJi6NL5ugK5fvh2pm/RE/2JObz6M55zKMJBcFZVfbTnVn
-        lJBI+pUjpJvEdXgsFnKTmNpms84UE9s=
+        bh=th62TgbZ/bLuSEztHEYo0jICkQPu6WC+Fjf/hqpJt6Y=;
+        b=HuLyY/AgDAFHs7bbN9jy39cezH5lZfpPgnH3Fk6maF/JahiIvpq00HTn44E5pVfkXFcJ9K
+        rMwH4LqWIEMOs/p4yD5dJ/6elirPOIPUrlv17g9eW9s/4phzL2t2e0fdjqSLh5VYXxjiQH
+        IJkSgnSse3JZpHrSUNH+j7Ilm3nQ9JU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1645445482;
+        s=susede2_ed25519; t=1645445484;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KJZf4Rc46hSdkj6zRydP32U/yN137CtztKZ1vEPspqs=;
-        b=mM9HhBQGDv/MuwW0/phyHmghaemNWXMfkRHI+C30SrY1YUkkGDpHQyNIlgePkJ3dY9Ho+2
-        Zz1Ce2q8bCa0e3DA==
+        bh=th62TgbZ/bLuSEztHEYo0jICkQPu6WC+Fjf/hqpJt6Y=;
+        b=hK8ektQkRXoUVWY/1wFY0IWY+dyjWGpMEHU8626/Zs/PRTZCm4M5cM5sexQF0nXW1OiCqG
+        Qmyvqx9XqaMwuWDQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E15E013A94;
-        Mon, 21 Feb 2022 12:11:21 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6C2AA13A94;
+        Mon, 21 Feb 2022 12:11:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id 677BNWmBE2KCWwAAMHmgww
-        (envelope-from <nstange@suse.de>); Mon, 21 Feb 2022 12:11:21 +0000
+        id JnD+GGyBE2KMWwAAMHmgww
+        (envelope-from <nstange@suse.de>); Mon, 21 Feb 2022 12:11:24 +0000
 From:   Nicolai Stange <nstange@suse.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -59,9 +59,9 @@ Cc:     =?UTF-8?q?Stephan=20M=C3=BCller?= <smueller@chronox.de>,
         Jarkko Sakkinen <jarkko@kernel.org>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         keyrings@vger.kernel.org, Nicolai Stange <nstange@suse.de>
-Subject: [PATCH v4 07/15] crypto: dh - implement ffdheXYZ(dh) templates
-Date:   Mon, 21 Feb 2022 13:10:53 +0100
-Message-Id: <20220221121101.1615-8-nstange@suse.de>
+Subject: [PATCH v4 09/15] crypto: dh - implement private key generation primitive for ffdheXYZ(dh)
+Date:   Mon, 21 Feb 2022 13:10:55 +0100
+Message-Id: <20220221121101.1615-10-nstange@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20220221121101.1615-1-nstange@suse.de>
 References: <20220221121101.1615-1-nstange@suse.de>
@@ -71,366 +71,236 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Current work on NVME in-band authentication support ([1]) needs to invoke
-DH with the FFDHE safe-prime group parameters specified in RFC 7919.
+The support for NVME in-band authentication currently in the works ([1])
+needs to generate ephemeral DH keys for use with the RFC 7919 safe-prime
+FFDHE groups.
 
-Introduce a new CRYPTO_DH_RFC7919_GROUPS Kconfig option. If enabled, make
-dh_generic register a couple of ffdheXYZ(dh) templates, one for each group:
-ffdhe2048(dh), ffdhe3072(dh), ffdhe4096(dh), ffdhe6144(dh) and
-ffdhe8192(dh). Their respective ->set_secret() expects a (serialized)
-struct dh, just like the underlying "dh" implementation does, but with the
-P and G values unset so that the safe-prime constants for the given group
-can be filled in by the wrapping template.
+In analogy to ECDH and its ecc_gen_privkey(), implement a
+dh_safe_prime_gen_privkey() and invoke it from the ffdheXYZ(dh) templates'
+common ->set_secret(), i.e. dh_safe_prime_set_secret(), in case the input
+->key_size is zero.
 
-Internally, a struct dh_safe_prime instance is being defined for each of
-the ffdheXYZ(dh) templates as appropriate. In order to prepare for future
-key generation, fill in the maximum security strength values as specified
-by SP800-56Arev3 on the go, even though they're not needed at this point
-yet.
+As the RFC 7919 FFDHE groups are classified as approved safe-prime groups
+by SP800-56Arev3, it's worthwhile to make the new
+dh_safe_prime_gen_privkey() to follow the approach specified in
+SP800-56Arev3, sec. 5.6.1.1.3 ("Key-Pair Generation Using Extra Random
+Bits") in order to achieve conformance.
 
-Implement the respective ffdheXYZ(dh) crypto_template's ->create() by
-simply forwarding any calls to the __dh_safe_prime_create() helper
-introduced with the previous commit, passing the associated dh_safe_prime
-in addition to the received ->create() arguments.
+SP800-56Arev3 specifies a lower as well as an upper bound on the generated
+key's length:
+- it must be >= two times the maximum supported security strength of
+  the group in question and
+- it must be <= the length of the domain parameter Q.
+
+For any safe-prime group Q = (P - 1)/2 by definition and the individual
+maximum supported security strengths as specified by SP800-56Arev3 have
+been made available as part of the FFDHE dh_safe_prime definitions
+introduced with a previous patch. Make dh_safe_prime_gen_privkey() pick
+twice the maximum supported strength rounded up to the next power of two
+for the output key size. This choice respects both, the lower and upper
+bounds given by SP800-90Arev3 for any of the approved safe-prime groups and
+is also in line with the NVME base spec 2.0, which requires the key size to
+be >= 256bits.
 
 [1] https://lore.kernel.org/r/20211202152358.60116-1-hare@suse.de
 
 Signed-off-by: Nicolai Stange <nstange@suse.de>
 ---
- crypto/Kconfig |   6 +
- crypto/dh.c    | 298 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 303 insertions(+), 1 deletion(-)
+ crypto/Kconfig |   1 +
+ crypto/dh.c    | 140 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 138 insertions(+), 3 deletions(-)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index d9573b3f081f..ba9434ad06ef 100644
+index ba9434ad06ef..d6d7e84bb7f8 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -231,6 +231,12 @@ config CRYPTO_DH
+@@ -234,6 +234,7 @@ config CRYPTO_DH
+ config CRYPTO_DH_RFC7919_GROUPS
+ 	bool "Support for RFC 7919 FFDHE group parameters"
+ 	depends on CRYPTO_DH
++	select CRYPTO_RNG_DEFAULT
  	help
- 	  Generic implementation of the Diffie-Hellman algorithm.
+ 	  Provide support for RFC 7919 FFDHE group parameters. If unsure, say N.
  
-+config CRYPTO_DH_RFC7919_GROUPS
-+	bool "Support for RFC 7919 FFDHE group parameters"
-+	depends on CRYPTO_DH
-+	help
-+	  Provide support for RFC 7919 FFDHE group parameters. If unsure, say N.
-+
- config CRYPTO_ECC
- 	tristate
- 	select CRYPTO_RNG_DEFAULT
 diff --git a/crypto/dh.c b/crypto/dh.c
-index 08fb7610fe2a..d0adb1705fe7 100644
+index d0adb1705fe7..869a0476e5e2 100644
 --- a/crypto/dh.c
 +++ b/crypto/dh.c
-@@ -465,13 +465,309 @@ static int __maybe_unused __dh_safe_prime_create(
- 	return err;
+@@ -10,6 +10,7 @@
+ #include <crypto/internal/kpp.h>
+ #include <crypto/kpp.h>
+ #include <crypto/dh.h>
++#include <crypto/rng.h>
+ #include <linux/mpi.h>
+ 
+ struct dh_ctx {
+@@ -315,6 +316,128 @@ static void dh_safe_prime_exit_tfm(struct crypto_kpp *tfm)
+ 	crypto_free_kpp(tfm_ctx->dh_tfm);
  }
  
-+#ifdef CONFIG_CRYPTO_DH_RFC7919_GROUPS
-+
-+static const struct dh_safe_prime ffdhe2048_prime = {
-+	.max_strength = 112,
-+	.p_size = 256,
-+	.p =
-+	"\xff\xff\xff\xff\xff\xff\xff\xff\xad\xf8\x54\x58\xa2\xbb\x4a\x9a"
-+	"\xaf\xdc\x56\x20\x27\x3d\x3c\xf1\xd8\xb9\xc5\x83\xce\x2d\x36\x95"
-+	"\xa9\xe1\x36\x41\x14\x64\x33\xfb\xcc\x93\x9d\xce\x24\x9b\x3e\xf9"
-+	"\x7d\x2f\xe3\x63\x63\x0c\x75\xd8\xf6\x81\xb2\x02\xae\xc4\x61\x7a"
-+	"\xd3\xdf\x1e\xd5\xd5\xfd\x65\x61\x24\x33\xf5\x1f\x5f\x06\x6e\xd0"
-+	"\x85\x63\x65\x55\x3d\xed\x1a\xf3\xb5\x57\x13\x5e\x7f\x57\xc9\x35"
-+	"\x98\x4f\x0c\x70\xe0\xe6\x8b\x77\xe2\xa6\x89\xda\xf3\xef\xe8\x72"
-+	"\x1d\xf1\x58\xa1\x36\xad\xe7\x35\x30\xac\xca\x4f\x48\x3a\x79\x7a"
-+	"\xbc\x0a\xb1\x82\xb3\x24\xfb\x61\xd1\x08\xa9\x4b\xb2\xc8\xe3\xfb"
-+	"\xb9\x6a\xda\xb7\x60\xd7\xf4\x68\x1d\x4f\x42\xa3\xde\x39\x4d\xf4"
-+	"\xae\x56\xed\xe7\x63\x72\xbb\x19\x0b\x07\xa7\xc8\xee\x0a\x6d\x70"
-+	"\x9e\x02\xfc\xe1\xcd\xf7\xe2\xec\xc0\x34\x04\xcd\x28\x34\x2f\x61"
-+	"\x91\x72\xfe\x9c\xe9\x85\x83\xff\x8e\x4f\x12\x32\xee\xf2\x81\x83"
-+	"\xc3\xfe\x3b\x1b\x4c\x6f\xad\x73\x3b\xb5\xfc\xbc\x2e\xc2\x20\x05"
-+	"\xc5\x8e\xf1\x83\x7d\x16\x83\xb2\xc6\xf3\x4a\x26\xc1\xb2\xef\xfa"
-+	"\x88\x6b\x42\x38\x61\x28\x5c\x97\xff\xff\xff\xff\xff\xff\xff\xff",
-+};
-+
-+static const struct dh_safe_prime ffdhe3072_prime = {
-+	.max_strength = 128,
-+	.p_size = 384,
-+	.p =
-+	"\xff\xff\xff\xff\xff\xff\xff\xff\xad\xf8\x54\x58\xa2\xbb\x4a\x9a"
-+	"\xaf\xdc\x56\x20\x27\x3d\x3c\xf1\xd8\xb9\xc5\x83\xce\x2d\x36\x95"
-+	"\xa9\xe1\x36\x41\x14\x64\x33\xfb\xcc\x93\x9d\xce\x24\x9b\x3e\xf9"
-+	"\x7d\x2f\xe3\x63\x63\x0c\x75\xd8\xf6\x81\xb2\x02\xae\xc4\x61\x7a"
-+	"\xd3\xdf\x1e\xd5\xd5\xfd\x65\x61\x24\x33\xf5\x1f\x5f\x06\x6e\xd0"
-+	"\x85\x63\x65\x55\x3d\xed\x1a\xf3\xb5\x57\x13\x5e\x7f\x57\xc9\x35"
-+	"\x98\x4f\x0c\x70\xe0\xe6\x8b\x77\xe2\xa6\x89\xda\xf3\xef\xe8\x72"
-+	"\x1d\xf1\x58\xa1\x36\xad\xe7\x35\x30\xac\xca\x4f\x48\x3a\x79\x7a"
-+	"\xbc\x0a\xb1\x82\xb3\x24\xfb\x61\xd1\x08\xa9\x4b\xb2\xc8\xe3\xfb"
-+	"\xb9\x6a\xda\xb7\x60\xd7\xf4\x68\x1d\x4f\x42\xa3\xde\x39\x4d\xf4"
-+	"\xae\x56\xed\xe7\x63\x72\xbb\x19\x0b\x07\xa7\xc8\xee\x0a\x6d\x70"
-+	"\x9e\x02\xfc\xe1\xcd\xf7\xe2\xec\xc0\x34\x04\xcd\x28\x34\x2f\x61"
-+	"\x91\x72\xfe\x9c\xe9\x85\x83\xff\x8e\x4f\x12\x32\xee\xf2\x81\x83"
-+	"\xc3\xfe\x3b\x1b\x4c\x6f\xad\x73\x3b\xb5\xfc\xbc\x2e\xc2\x20\x05"
-+	"\xc5\x8e\xf1\x83\x7d\x16\x83\xb2\xc6\xf3\x4a\x26\xc1\xb2\xef\xfa"
-+	"\x88\x6b\x42\x38\x61\x1f\xcf\xdc\xde\x35\x5b\x3b\x65\x19\x03\x5b"
-+	"\xbc\x34\xf4\xde\xf9\x9c\x02\x38\x61\xb4\x6f\xc9\xd6\xe6\xc9\x07"
-+	"\x7a\xd9\x1d\x26\x91\xf7\xf7\xee\x59\x8c\xb0\xfa\xc1\x86\xd9\x1c"
-+	"\xae\xfe\x13\x09\x85\x13\x92\x70\xb4\x13\x0c\x93\xbc\x43\x79\x44"
-+	"\xf4\xfd\x44\x52\xe2\xd7\x4d\xd3\x64\xf2\xe2\x1e\x71\xf5\x4b\xff"
-+	"\x5c\xae\x82\xab\x9c\x9d\xf6\x9e\xe8\x6d\x2b\xc5\x22\x36\x3a\x0d"
-+	"\xab\xc5\x21\x97\x9b\x0d\xea\xda\x1d\xbf\x9a\x42\xd5\xc4\x48\x4e"
-+	"\x0a\xbc\xd0\x6b\xfa\x53\xdd\xef\x3c\x1b\x20\xee\x3f\xd5\x9d\x7c"
-+	"\x25\xe4\x1d\x2b\x66\xc6\x2e\x37\xff\xff\xff\xff\xff\xff\xff\xff",
-+};
-+
-+static const struct dh_safe_prime ffdhe4096_prime = {
-+	.max_strength = 152,
-+	.p_size = 512,
-+	.p =
-+	"\xff\xff\xff\xff\xff\xff\xff\xff\xad\xf8\x54\x58\xa2\xbb\x4a\x9a"
-+	"\xaf\xdc\x56\x20\x27\x3d\x3c\xf1\xd8\xb9\xc5\x83\xce\x2d\x36\x95"
-+	"\xa9\xe1\x36\x41\x14\x64\x33\xfb\xcc\x93\x9d\xce\x24\x9b\x3e\xf9"
-+	"\x7d\x2f\xe3\x63\x63\x0c\x75\xd8\xf6\x81\xb2\x02\xae\xc4\x61\x7a"
-+	"\xd3\xdf\x1e\xd5\xd5\xfd\x65\x61\x24\x33\xf5\x1f\x5f\x06\x6e\xd0"
-+	"\x85\x63\x65\x55\x3d\xed\x1a\xf3\xb5\x57\x13\x5e\x7f\x57\xc9\x35"
-+	"\x98\x4f\x0c\x70\xe0\xe6\x8b\x77\xe2\xa6\x89\xda\xf3\xef\xe8\x72"
-+	"\x1d\xf1\x58\xa1\x36\xad\xe7\x35\x30\xac\xca\x4f\x48\x3a\x79\x7a"
-+	"\xbc\x0a\xb1\x82\xb3\x24\xfb\x61\xd1\x08\xa9\x4b\xb2\xc8\xe3\xfb"
-+	"\xb9\x6a\xda\xb7\x60\xd7\xf4\x68\x1d\x4f\x42\xa3\xde\x39\x4d\xf4"
-+	"\xae\x56\xed\xe7\x63\x72\xbb\x19\x0b\x07\xa7\xc8\xee\x0a\x6d\x70"
-+	"\x9e\x02\xfc\xe1\xcd\xf7\xe2\xec\xc0\x34\x04\xcd\x28\x34\x2f\x61"
-+	"\x91\x72\xfe\x9c\xe9\x85\x83\xff\x8e\x4f\x12\x32\xee\xf2\x81\x83"
-+	"\xc3\xfe\x3b\x1b\x4c\x6f\xad\x73\x3b\xb5\xfc\xbc\x2e\xc2\x20\x05"
-+	"\xc5\x8e\xf1\x83\x7d\x16\x83\xb2\xc6\xf3\x4a\x26\xc1\xb2\xef\xfa"
-+	"\x88\x6b\x42\x38\x61\x1f\xcf\xdc\xde\x35\x5b\x3b\x65\x19\x03\x5b"
-+	"\xbc\x34\xf4\xde\xf9\x9c\x02\x38\x61\xb4\x6f\xc9\xd6\xe6\xc9\x07"
-+	"\x7a\xd9\x1d\x26\x91\xf7\xf7\xee\x59\x8c\xb0\xfa\xc1\x86\xd9\x1c"
-+	"\xae\xfe\x13\x09\x85\x13\x92\x70\xb4\x13\x0c\x93\xbc\x43\x79\x44"
-+	"\xf4\xfd\x44\x52\xe2\xd7\x4d\xd3\x64\xf2\xe2\x1e\x71\xf5\x4b\xff"
-+	"\x5c\xae\x82\xab\x9c\x9d\xf6\x9e\xe8\x6d\x2b\xc5\x22\x36\x3a\x0d"
-+	"\xab\xc5\x21\x97\x9b\x0d\xea\xda\x1d\xbf\x9a\x42\xd5\xc4\x48\x4e"
-+	"\x0a\xbc\xd0\x6b\xfa\x53\xdd\xef\x3c\x1b\x20\xee\x3f\xd5\x9d\x7c"
-+	"\x25\xe4\x1d\x2b\x66\x9e\x1e\xf1\x6e\x6f\x52\xc3\x16\x4d\xf4\xfb"
-+	"\x79\x30\xe9\xe4\xe5\x88\x57\xb6\xac\x7d\x5f\x42\xd6\x9f\x6d\x18"
-+	"\x77\x63\xcf\x1d\x55\x03\x40\x04\x87\xf5\x5b\xa5\x7e\x31\xcc\x7a"
-+	"\x71\x35\xc8\x86\xef\xb4\x31\x8a\xed\x6a\x1e\x01\x2d\x9e\x68\x32"
-+	"\xa9\x07\x60\x0a\x91\x81\x30\xc4\x6d\xc7\x78\xf9\x71\xad\x00\x38"
-+	"\x09\x29\x99\xa3\x33\xcb\x8b\x7a\x1a\x1d\xb9\x3d\x71\x40\x00\x3c"
-+	"\x2a\x4e\xce\xa9\xf9\x8d\x0a\xcc\x0a\x82\x91\xcd\xce\xc9\x7d\xcf"
-+	"\x8e\xc9\xb5\x5a\x7f\x88\xa4\x6b\x4d\xb5\xa8\x51\xf4\x41\x82\xe1"
-+	"\xc6\x8a\x00\x7e\x5e\x65\x5f\x6a\xff\xff\xff\xff\xff\xff\xff\xff",
-+};
-+
-+static const struct dh_safe_prime ffdhe6144_prime = {
-+	.max_strength = 176,
-+	.p_size = 768,
-+	.p =
-+	"\xff\xff\xff\xff\xff\xff\xff\xff\xad\xf8\x54\x58\xa2\xbb\x4a\x9a"
-+	"\xaf\xdc\x56\x20\x27\x3d\x3c\xf1\xd8\xb9\xc5\x83\xce\x2d\x36\x95"
-+	"\xa9\xe1\x36\x41\x14\x64\x33\xfb\xcc\x93\x9d\xce\x24\x9b\x3e\xf9"
-+	"\x7d\x2f\xe3\x63\x63\x0c\x75\xd8\xf6\x81\xb2\x02\xae\xc4\x61\x7a"
-+	"\xd3\xdf\x1e\xd5\xd5\xfd\x65\x61\x24\x33\xf5\x1f\x5f\x06\x6e\xd0"
-+	"\x85\x63\x65\x55\x3d\xed\x1a\xf3\xb5\x57\x13\x5e\x7f\x57\xc9\x35"
-+	"\x98\x4f\x0c\x70\xe0\xe6\x8b\x77\xe2\xa6\x89\xda\xf3\xef\xe8\x72"
-+	"\x1d\xf1\x58\xa1\x36\xad\xe7\x35\x30\xac\xca\x4f\x48\x3a\x79\x7a"
-+	"\xbc\x0a\xb1\x82\xb3\x24\xfb\x61\xd1\x08\xa9\x4b\xb2\xc8\xe3\xfb"
-+	"\xb9\x6a\xda\xb7\x60\xd7\xf4\x68\x1d\x4f\x42\xa3\xde\x39\x4d\xf4"
-+	"\xae\x56\xed\xe7\x63\x72\xbb\x19\x0b\x07\xa7\xc8\xee\x0a\x6d\x70"
-+	"\x9e\x02\xfc\xe1\xcd\xf7\xe2\xec\xc0\x34\x04\xcd\x28\x34\x2f\x61"
-+	"\x91\x72\xfe\x9c\xe9\x85\x83\xff\x8e\x4f\x12\x32\xee\xf2\x81\x83"
-+	"\xc3\xfe\x3b\x1b\x4c\x6f\xad\x73\x3b\xb5\xfc\xbc\x2e\xc2\x20\x05"
-+	"\xc5\x8e\xf1\x83\x7d\x16\x83\xb2\xc6\xf3\x4a\x26\xc1\xb2\xef\xfa"
-+	"\x88\x6b\x42\x38\x61\x1f\xcf\xdc\xde\x35\x5b\x3b\x65\x19\x03\x5b"
-+	"\xbc\x34\xf4\xde\xf9\x9c\x02\x38\x61\xb4\x6f\xc9\xd6\xe6\xc9\x07"
-+	"\x7a\xd9\x1d\x26\x91\xf7\xf7\xee\x59\x8c\xb0\xfa\xc1\x86\xd9\x1c"
-+	"\xae\xfe\x13\x09\x85\x13\x92\x70\xb4\x13\x0c\x93\xbc\x43\x79\x44"
-+	"\xf4\xfd\x44\x52\xe2\xd7\x4d\xd3\x64\xf2\xe2\x1e\x71\xf5\x4b\xff"
-+	"\x5c\xae\x82\xab\x9c\x9d\xf6\x9e\xe8\x6d\x2b\xc5\x22\x36\x3a\x0d"
-+	"\xab\xc5\x21\x97\x9b\x0d\xea\xda\x1d\xbf\x9a\x42\xd5\xc4\x48\x4e"
-+	"\x0a\xbc\xd0\x6b\xfa\x53\xdd\xef\x3c\x1b\x20\xee\x3f\xd5\x9d\x7c"
-+	"\x25\xe4\x1d\x2b\x66\x9e\x1e\xf1\x6e\x6f\x52\xc3\x16\x4d\xf4\xfb"
-+	"\x79\x30\xe9\xe4\xe5\x88\x57\xb6\xac\x7d\x5f\x42\xd6\x9f\x6d\x18"
-+	"\x77\x63\xcf\x1d\x55\x03\x40\x04\x87\xf5\x5b\xa5\x7e\x31\xcc\x7a"
-+	"\x71\x35\xc8\x86\xef\xb4\x31\x8a\xed\x6a\x1e\x01\x2d\x9e\x68\x32"
-+	"\xa9\x07\x60\x0a\x91\x81\x30\xc4\x6d\xc7\x78\xf9\x71\xad\x00\x38"
-+	"\x09\x29\x99\xa3\x33\xcb\x8b\x7a\x1a\x1d\xb9\x3d\x71\x40\x00\x3c"
-+	"\x2a\x4e\xce\xa9\xf9\x8d\x0a\xcc\x0a\x82\x91\xcd\xce\xc9\x7d\xcf"
-+	"\x8e\xc9\xb5\x5a\x7f\x88\xa4\x6b\x4d\xb5\xa8\x51\xf4\x41\x82\xe1"
-+	"\xc6\x8a\x00\x7e\x5e\x0d\xd9\x02\x0b\xfd\x64\xb6\x45\x03\x6c\x7a"
-+	"\x4e\x67\x7d\x2c\x38\x53\x2a\x3a\x23\xba\x44\x42\xca\xf5\x3e\xa6"
-+	"\x3b\xb4\x54\x32\x9b\x76\x24\xc8\x91\x7b\xdd\x64\xb1\xc0\xfd\x4c"
-+	"\xb3\x8e\x8c\x33\x4c\x70\x1c\x3a\xcd\xad\x06\x57\xfc\xcf\xec\x71"
-+	"\x9b\x1f\x5c\x3e\x4e\x46\x04\x1f\x38\x81\x47\xfb\x4c\xfd\xb4\x77"
-+	"\xa5\x24\x71\xf7\xa9\xa9\x69\x10\xb8\x55\x32\x2e\xdb\x63\x40\xd8"
-+	"\xa0\x0e\xf0\x92\x35\x05\x11\xe3\x0a\xbe\xc1\xff\xf9\xe3\xa2\x6e"
-+	"\x7f\xb2\x9f\x8c\x18\x30\x23\xc3\x58\x7e\x38\xda\x00\x77\xd9\xb4"
-+	"\x76\x3e\x4e\x4b\x94\xb2\xbb\xc1\x94\xc6\x65\x1e\x77\xca\xf9\x92"
-+	"\xee\xaa\xc0\x23\x2a\x28\x1b\xf6\xb3\xa7\x39\xc1\x22\x61\x16\x82"
-+	"\x0a\xe8\xdb\x58\x47\xa6\x7c\xbe\xf9\xc9\x09\x1b\x46\x2d\x53\x8c"
-+	"\xd7\x2b\x03\x74\x6a\xe7\x7f\x5e\x62\x29\x2c\x31\x15\x62\xa8\x46"
-+	"\x50\x5d\xc8\x2d\xb8\x54\x33\x8a\xe4\x9f\x52\x35\xc9\x5b\x91\x17"
-+	"\x8c\xcf\x2d\xd5\xca\xce\xf4\x03\xec\x9d\x18\x10\xc6\x27\x2b\x04"
-+	"\x5b\x3b\x71\xf9\xdc\x6b\x80\xd6\x3f\xdd\x4a\x8e\x9a\xdb\x1e\x69"
-+	"\x62\xa6\x95\x26\xd4\x31\x61\xc1\xa4\x1d\x57\x0d\x79\x38\xda\xd4"
-+	"\xa4\x0e\x32\x9c\xd0\xe4\x0e\x65\xff\xff\xff\xff\xff\xff\xff\xff",
-+};
-+
-+static const struct dh_safe_prime ffdhe8192_prime = {
-+	.max_strength = 200,
-+	.p_size = 1024,
-+	.p =
-+	"\xff\xff\xff\xff\xff\xff\xff\xff\xad\xf8\x54\x58\xa2\xbb\x4a\x9a"
-+	"\xaf\xdc\x56\x20\x27\x3d\x3c\xf1\xd8\xb9\xc5\x83\xce\x2d\x36\x95"
-+	"\xa9\xe1\x36\x41\x14\x64\x33\xfb\xcc\x93\x9d\xce\x24\x9b\x3e\xf9"
-+	"\x7d\x2f\xe3\x63\x63\x0c\x75\xd8\xf6\x81\xb2\x02\xae\xc4\x61\x7a"
-+	"\xd3\xdf\x1e\xd5\xd5\xfd\x65\x61\x24\x33\xf5\x1f\x5f\x06\x6e\xd0"
-+	"\x85\x63\x65\x55\x3d\xed\x1a\xf3\xb5\x57\x13\x5e\x7f\x57\xc9\x35"
-+	"\x98\x4f\x0c\x70\xe0\xe6\x8b\x77\xe2\xa6\x89\xda\xf3\xef\xe8\x72"
-+	"\x1d\xf1\x58\xa1\x36\xad\xe7\x35\x30\xac\xca\x4f\x48\x3a\x79\x7a"
-+	"\xbc\x0a\xb1\x82\xb3\x24\xfb\x61\xd1\x08\xa9\x4b\xb2\xc8\xe3\xfb"
-+	"\xb9\x6a\xda\xb7\x60\xd7\xf4\x68\x1d\x4f\x42\xa3\xde\x39\x4d\xf4"
-+	"\xae\x56\xed\xe7\x63\x72\xbb\x19\x0b\x07\xa7\xc8\xee\x0a\x6d\x70"
-+	"\x9e\x02\xfc\xe1\xcd\xf7\xe2\xec\xc0\x34\x04\xcd\x28\x34\x2f\x61"
-+	"\x91\x72\xfe\x9c\xe9\x85\x83\xff\x8e\x4f\x12\x32\xee\xf2\x81\x83"
-+	"\xc3\xfe\x3b\x1b\x4c\x6f\xad\x73\x3b\xb5\xfc\xbc\x2e\xc2\x20\x05"
-+	"\xc5\x8e\xf1\x83\x7d\x16\x83\xb2\xc6\xf3\x4a\x26\xc1\xb2\xef\xfa"
-+	"\x88\x6b\x42\x38\x61\x1f\xcf\xdc\xde\x35\x5b\x3b\x65\x19\x03\x5b"
-+	"\xbc\x34\xf4\xde\xf9\x9c\x02\x38\x61\xb4\x6f\xc9\xd6\xe6\xc9\x07"
-+	"\x7a\xd9\x1d\x26\x91\xf7\xf7\xee\x59\x8c\xb0\xfa\xc1\x86\xd9\x1c"
-+	"\xae\xfe\x13\x09\x85\x13\x92\x70\xb4\x13\x0c\x93\xbc\x43\x79\x44"
-+	"\xf4\xfd\x44\x52\xe2\xd7\x4d\xd3\x64\xf2\xe2\x1e\x71\xf5\x4b\xff"
-+	"\x5c\xae\x82\xab\x9c\x9d\xf6\x9e\xe8\x6d\x2b\xc5\x22\x36\x3a\x0d"
-+	"\xab\xc5\x21\x97\x9b\x0d\xea\xda\x1d\xbf\x9a\x42\xd5\xc4\x48\x4e"
-+	"\x0a\xbc\xd0\x6b\xfa\x53\xdd\xef\x3c\x1b\x20\xee\x3f\xd5\x9d\x7c"
-+	"\x25\xe4\x1d\x2b\x66\x9e\x1e\xf1\x6e\x6f\x52\xc3\x16\x4d\xf4\xfb"
-+	"\x79\x30\xe9\xe4\xe5\x88\x57\xb6\xac\x7d\x5f\x42\xd6\x9f\x6d\x18"
-+	"\x77\x63\xcf\x1d\x55\x03\x40\x04\x87\xf5\x5b\xa5\x7e\x31\xcc\x7a"
-+	"\x71\x35\xc8\x86\xef\xb4\x31\x8a\xed\x6a\x1e\x01\x2d\x9e\x68\x32"
-+	"\xa9\x07\x60\x0a\x91\x81\x30\xc4\x6d\xc7\x78\xf9\x71\xad\x00\x38"
-+	"\x09\x29\x99\xa3\x33\xcb\x8b\x7a\x1a\x1d\xb9\x3d\x71\x40\x00\x3c"
-+	"\x2a\x4e\xce\xa9\xf9\x8d\x0a\xcc\x0a\x82\x91\xcd\xce\xc9\x7d\xcf"
-+	"\x8e\xc9\xb5\x5a\x7f\x88\xa4\x6b\x4d\xb5\xa8\x51\xf4\x41\x82\xe1"
-+	"\xc6\x8a\x00\x7e\x5e\x0d\xd9\x02\x0b\xfd\x64\xb6\x45\x03\x6c\x7a"
-+	"\x4e\x67\x7d\x2c\x38\x53\x2a\x3a\x23\xba\x44\x42\xca\xf5\x3e\xa6"
-+	"\x3b\xb4\x54\x32\x9b\x76\x24\xc8\x91\x7b\xdd\x64\xb1\xc0\xfd\x4c"
-+	"\xb3\x8e\x8c\x33\x4c\x70\x1c\x3a\xcd\xad\x06\x57\xfc\xcf\xec\x71"
-+	"\x9b\x1f\x5c\x3e\x4e\x46\x04\x1f\x38\x81\x47\xfb\x4c\xfd\xb4\x77"
-+	"\xa5\x24\x71\xf7\xa9\xa9\x69\x10\xb8\x55\x32\x2e\xdb\x63\x40\xd8"
-+	"\xa0\x0e\xf0\x92\x35\x05\x11\xe3\x0a\xbe\xc1\xff\xf9\xe3\xa2\x6e"
-+	"\x7f\xb2\x9f\x8c\x18\x30\x23\xc3\x58\x7e\x38\xda\x00\x77\xd9\xb4"
-+	"\x76\x3e\x4e\x4b\x94\xb2\xbb\xc1\x94\xc6\x65\x1e\x77\xca\xf9\x92"
-+	"\xee\xaa\xc0\x23\x2a\x28\x1b\xf6\xb3\xa7\x39\xc1\x22\x61\x16\x82"
-+	"\x0a\xe8\xdb\x58\x47\xa6\x7c\xbe\xf9\xc9\x09\x1b\x46\x2d\x53\x8c"
-+	"\xd7\x2b\x03\x74\x6a\xe7\x7f\x5e\x62\x29\x2c\x31\x15\x62\xa8\x46"
-+	"\x50\x5d\xc8\x2d\xb8\x54\x33\x8a\xe4\x9f\x52\x35\xc9\x5b\x91\x17"
-+	"\x8c\xcf\x2d\xd5\xca\xce\xf4\x03\xec\x9d\x18\x10\xc6\x27\x2b\x04"
-+	"\x5b\x3b\x71\xf9\xdc\x6b\x80\xd6\x3f\xdd\x4a\x8e\x9a\xdb\x1e\x69"
-+	"\x62\xa6\x95\x26\xd4\x31\x61\xc1\xa4\x1d\x57\x0d\x79\x38\xda\xd4"
-+	"\xa4\x0e\x32\x9c\xcf\xf4\x6a\xaa\x36\xad\x00\x4c\xf6\x00\xc8\x38"
-+	"\x1e\x42\x5a\x31\xd9\x51\xae\x64\xfd\xb2\x3f\xce\xc9\x50\x9d\x43"
-+	"\x68\x7f\xeb\x69\xed\xd1\xcc\x5e\x0b\x8c\xc3\xbd\xf6\x4b\x10\xef"
-+	"\x86\xb6\x31\x42\xa3\xab\x88\x29\x55\x5b\x2f\x74\x7c\x93\x26\x65"
-+	"\xcb\x2c\x0f\x1c\xc0\x1b\xd7\x02\x29\x38\x88\x39\xd2\xaf\x05\xe4"
-+	"\x54\x50\x4a\xc7\x8b\x75\x82\x82\x28\x46\xc0\xba\x35\xc3\x5f\x5c"
-+	"\x59\x16\x0c\xc0\x46\xfd\x82\x51\x54\x1f\xc6\x8c\x9c\x86\xb0\x22"
-+	"\xbb\x70\x99\x87\x6a\x46\x0e\x74\x51\xa8\xa9\x31\x09\x70\x3f\xee"
-+	"\x1c\x21\x7e\x6c\x38\x26\xe5\x2c\x51\xaa\x69\x1e\x0e\x42\x3c\xfc"
-+	"\x99\xe9\xe3\x16\x50\xc1\x21\x7b\x62\x48\x16\xcd\xad\x9a\x95\xf9"
-+	"\xd5\xb8\x01\x94\x88\xd9\xc0\xa0\xa1\xfe\x30\x75\xa5\x77\xe2\x31"
-+	"\x83\xf8\x1d\x4a\x3f\x2f\xa4\x57\x1e\xfc\x8c\xe0\xba\x8a\x4f\xe8"
-+	"\xb6\x85\x5d\xfe\x72\xb0\xa6\x6e\xde\xd2\xfb\xab\xfb\xe5\x8a\x30"
-+	"\xfa\xfa\xbe\x1c\x5d\x71\xa8\x7e\x2f\x74\x1e\xf8\xc1\xfe\x86\xfe"
-+	"\xa6\xbb\xfd\xe5\x30\x67\x7f\x0d\x97\xd1\x1d\x49\xf7\xa8\x44\x3d"
-+	"\x08\x22\xe5\x06\xa9\xf4\x61\x4e\x01\x1e\x2a\x94\x83\x8f\xf8\x8c"
-+	"\xd6\x8c\x8b\xb7\xc5\xc6\x42\x4c\xff\xff\xff\xff\xff\xff\xff\xff",
-+};
-+
-+static int dh_ffdhe2048_create(struct crypto_template *tmpl,
-+			       struct rtattr **tb)
++static u64 __add_u64_to_be(__be64 *dst, unsigned int n, u64 val)
 +{
-+	return  __dh_safe_prime_create(tmpl, tb, &ffdhe2048_prime);
-+}
++	unsigned int i;
 +
-+static int dh_ffdhe3072_create(struct crypto_template *tmpl,
-+			       struct rtattr **tb)
-+{
-+	return  __dh_safe_prime_create(tmpl, tb, &ffdhe3072_prime);
-+}
++	for (i = n; val && i > 0; --i) {
++		u64 tmp = be64_to_cpu(dst[i - 1]);
 +
-+static int dh_ffdhe4096_create(struct crypto_template *tmpl,
-+			       struct rtattr **tb)
-+{
-+	return  __dh_safe_prime_create(tmpl, tb, &ffdhe4096_prime);
-+}
-+
-+static int dh_ffdhe6144_create(struct crypto_template *tmpl,
-+			       struct rtattr **tb)
-+{
-+	return  __dh_safe_prime_create(tmpl, tb, &ffdhe6144_prime);
-+}
-+
-+static int dh_ffdhe8192_create(struct crypto_template *tmpl,
-+			       struct rtattr **tb)
-+{
-+	return  __dh_safe_prime_create(tmpl, tb, &ffdhe8192_prime);
-+}
-+
-+static struct crypto_template crypto_ffdhe_templates[] = {
-+	{
-+		.name = "ffdhe2048",
-+		.create = dh_ffdhe2048_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "ffdhe3072",
-+		.create = dh_ffdhe3072_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "ffdhe4096",
-+		.create = dh_ffdhe4096_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "ffdhe6144",
-+		.create = dh_ffdhe6144_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "ffdhe8192",
-+		.create = dh_ffdhe8192_create,
-+		.module = THIS_MODULE,
-+	},
-+};
-+
-+#else /* ! CONFIG_CRYPTO_DH_RFC7919_GROUPS */
-+
-+static struct crypto_template crypto_ffdhe_templates[] = {};
-+
-+#endif /* CONFIG_CRYPTO_DH_RFC7919_GROUPS */
-+
-+
- static int dh_init(void)
- {
--	return crypto_register_kpp(&dh);
-+	int err;
-+
-+	err = crypto_register_kpp(&dh);
-+	if (err)
-+		return err;
-+
-+	err = crypto_register_templates(crypto_ffdhe_templates,
-+					ARRAY_SIZE(crypto_ffdhe_templates));
-+	if (err) {
-+		crypto_unregister_kpp(&dh);
-+		return err;
++		tmp += val;
++		val = tmp >= val ? 0 : 1;
++		dst[i - 1] = cpu_to_be64(tmp);
 +	}
 +
-+	return 0;
- }
- 
- static void dh_exit(void)
++	return val;
++}
++
++static void *dh_safe_prime_gen_privkey(const struct dh_safe_prime *safe_prime,
++				       unsigned int *key_size)
++{
++	unsigned int n, oversampling_size;
++	__be64 *key;
++	int err;
++	u64 h, o;
++
++	/*
++	 * Generate a private key following NIST SP800-56Ar3,
++	 * sec. 5.6.1.1.1 and 5.6.1.1.3 resp..
++	 *
++	 * 5.6.1.1.1: choose key length N such that
++	 * 2 * ->max_strength <= N <= log2(q) + 1 = ->p_size * 8 - 1
++	 * with q = (p - 1) / 2 for the safe-prime groups.
++	 * Choose the lower bound's next power of two for N in order to
++	 * avoid excessively large private keys while still
++	 * maintaining some extra reserve beyond the bare minimum in
++	 * most cases. Note that for each entry in safe_prime_groups[],
++	 * the following holds for such N:
++	 * - N >= 256, in particular it is a multiple of 2^6 = 64
++	 *   bits and
++	 * - N < log2(q) + 1, i.e. N respects the upper bound.
++	 */
++	n = roundup_pow_of_two(2 * safe_prime->max_strength);
++	WARN_ON_ONCE(n & ((1u << 6) - 1));
++	n >>= 6; /* Convert N into units of u64. */
++
++	/*
++	 * Reserve one extra u64 to hold the extra random bits
++	 * required as per 5.6.1.1.3.
++	 */
++	oversampling_size = (n + 1) * sizeof(__be64);
++	key = kmalloc(oversampling_size, GFP_KERNEL);
++	if (!key)
++		return ERR_PTR(-ENOMEM);
++
++	/*
++	 * 5.6.1.1.3, step 3 (and implicitly step 4): obtain N + 64
++	 * random bits and interpret them as a big endian integer.
++	 */
++	err = -EFAULT;
++	if (crypto_get_default_rng())
++		goto out_err;
++
++	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)key,
++				   oversampling_size);
++	crypto_put_default_rng();
++	if (err)
++		goto out_err;
++
++	/*
++	 * 5.6.1.1.3, step 5 is implicit: 2^N < q and thus,
++	 * M = min(2^N, q) = 2^N.
++	 *
++	 * For step 6, calculate
++	 * key = (key[] mod (M - 1)) + 1 = (key[] mod (2^N - 1)) + 1.
++	 *
++	 * In order to avoid expensive divisions, note that
++	 * 2^N mod (2^N - 1) = 1 and thus, for any integer h,
++	 * 2^N * h mod (2^N - 1) = h mod (2^N - 1) always holds.
++	 * The big endian integer key[] composed of n + 1 64bit words
++	 * may be written as key[] = h * 2^N + l, with h = key[0]
++	 * representing the 64 most significant bits and l
++	 * corresponding to the remaining 2^N bits. With the remark
++	 * from above,
++	 * h * 2^N + l mod (2^N - 1) = l + h mod (2^N - 1).
++	 * As both, l and h are less than 2^N, their sum after
++	 * this first reduction is guaranteed to be <= 2^(N + 1) - 2.
++	 * Or equivalently, that their sum can again be written as
++	 * h' * 2^N + l' with h' now either zero or one and if one,
++	 * then l' <= 2^N - 2. Thus, all bits at positions >= N will
++	 * be zero after a second reduction:
++	 * h' * 2^N + l' mod (2^N - 1) = l' + h' mod (2^N - 1).
++	 * At this point, it is still possible that
++	 * l' + h' = 2^N - 1, i.e. that l' + h' mod (2^N - 1)
++	 * is zero. This condition will be detected below by means of
++	 * the final increment overflowing in this case.
++	 */
++	h = be64_to_cpu(key[0]);
++	h = __add_u64_to_be(key + 1, n, h);
++	h = __add_u64_to_be(key + 1, n, h);
++	WARN_ON_ONCE(h);
++
++	/* Increment to obtain the final result. */
++	o = __add_u64_to_be(key + 1, n, 1);
++	/*
++	 * The overflow bit o from the increment is either zero or
++	 * one. If zero, key[1:n] holds the final result in big-endian
++	 * order. If one, key[1:n] is zero now, but needs to be set to
++	 * one, c.f. above.
++	 */
++	if (o)
++		key[n] = cpu_to_be64(1);
++
++	/* n is in units of u64, convert to bytes. */
++	*key_size = n << 3;
++	/* Strip the leading extra __be64, which is (virtually) zero by now. */
++	memmove(key, &key[1], *key_size);
++
++	return key;
++
++out_err:
++	kfree_sensitive(key);
++	return ERR_PTR(err);
++}
++
+ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
+ 				    unsigned int len)
  {
-+	crypto_unregister_templates(crypto_ffdhe_templates,
-+				    ARRAY_SIZE(crypto_ffdhe_templates));
- 	crypto_unregister_kpp(&dh);
+@@ -322,7 +445,7 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
+ 		dh_safe_prime_instance_ctx(tfm);
+ 	struct dh_safe_prime_tfm_ctx *tfm_ctx = kpp_tfm_ctx(tfm);
+ 	struct dh params;
+-	void *buf;
++	void *buf = NULL, *key = NULL;
+ 	unsigned int buf_size;
+ 	int err;
+ 
+@@ -338,10 +461,20 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
+ 	params.g = safe_prime_g;
+ 	params.g_size = sizeof(safe_prime_g);
+ 
++	if (!params.key_size) {
++		key = dh_safe_prime_gen_privkey(inst_ctx->safe_prime,
++						&params.key_size);
++		if (IS_ERR(key))
++			return PTR_ERR(key);
++		params.key = key;
++	}
++
+ 	buf_size = crypto_dh_key_len(&params);
+ 	buf = kmalloc(buf_size, GFP_KERNEL);
+-	if (!buf)
+-		return -ENOMEM;
++	if (!buf) {
++		err = -ENOMEM;
++		goto out;
++	}
+ 
+ 	err = crypto_dh_encode_key(buf, buf_size, &params);
+ 	if (err)
+@@ -350,6 +483,7 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
+ 	err = crypto_kpp_set_secret(tfm_ctx->dh_tfm, buf, buf_size);
+ out:
+ 	kfree_sensitive(buf);
++	kfree_sensitive(key);
+ 	return err;
  }
  
 -- 
