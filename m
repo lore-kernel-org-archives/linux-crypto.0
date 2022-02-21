@@ -2,139 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C9BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 03:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C4FC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 03:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344285AbiBUDiD (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 22:38:03 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59910 "EHLO
+        id S244728AbiBUDkp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 22:40:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344284AbiBUDiD (ORCPT
+        with ESMTP id S229667AbiBUDkn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 22:38:03 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15560419A4;
-        Sun, 20 Feb 2022 19:37:41 -0800 (PST)
+        Sun, 20 Feb 2022 22:40:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BF151331;
+        Sun, 20 Feb 2022 19:40:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A859E61156;
-        Mon, 21 Feb 2022 03:37:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB875C340E9;
-        Mon, 21 Feb 2022 03:37:39 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AC65AB80DCD;
+        Mon, 21 Feb 2022 03:40:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F633C340E9;
+        Mon, 21 Feb 2022 03:40:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645414660;
-        bh=OWg64DVzBIqge941wLJ6kgmKUPvgBl5qCIc6LR6NoLM=;
+        s=k20201202; t=1645414819;
+        bh=mOvCX6u+abSiUuhsoaVypqdnne4NQ17bIT2BYtNcIcw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=W1twAl2gu9b9BuwpfO4dJfm8/f1DtRDYVDyHUXQNz1hGhzi1UtmtfU2jVIMbj95dx
-         USA1WFZWKQUS3n5CJ6bgSpVxs1HBKkqfBWcMgfYSpHnr3JlpAPpGULfe5/9AtYErXJ
-         fF7p+gfTTHFGAjwb3ByXlLv/cg29frBGLJ2l7EhlqALF6rsaFLj7tud4eY1ieCAyEY
-         h8FOwt7NjPLokGt3Jeu1WLH+kBLxw4LlkSjkCjlJAXkjDLsZaxa8sV2gqQpZJKPKby
-         Fwf4v3zoaarAoqxj83XRoTvXmp5pqOi1EnHUbgyNZqFlskQDYvAy8spKCRxXhX8pel
-         lbaYm6lEaze4w==
-Date:   Sun, 20 Feb 2022 19:37:38 -0800
+        b=mmEib9tLjEKL1jLwoEJX0pIWeCdntkr7n9x3segpilyuR8R/PidvhHEopoAC0ghvO
+         pbnde5MzWkegGtyw17cYdyBfrWQ6QHiFtRiTlOyRwAPfGQMETVk+vzVJKhVMw3xWQ4
+         k4d//5nHt/wJaY/BAAcZYrUs6lYgG5NDLaZXBEvZZTUCGtEi+8KiCG3LmOE7aOX96s
+         FNoEDmtK5zhVNdZPVSusj6bUX4CDTpEzWYjNap9z6axsdRBjwG4jtzuQQopNs/lEfR
+         0ZLQc2RqG4E+SdtJkD7lSbcT/AdZjefrsEvaA3x1X9YHfEvvTC30PzQOHMAizhyiOr
+         A0J3fEGYufKrw==
+Date:   Sun, 20 Feb 2022 19:40:17 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Jann Horn <jannh@google.com>
-Subject: Re: [PATCH v4] random: use simpler fast key erasure flow on per-cpu
- keys
-Message-ID: <YhMJAsiHsjCJU1A4@sol.localdomain>
-References: <20220214184627.3048-1-Jason@zx2c4.com>
- <20220216232142.193220-1-Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tytso@mit.edu, linux@dominikbrodowski.net
+Subject: Re: [PATCH v2 8/9] random: use hash function for crng_slow_load()
+Message-ID: <YhMJoYykeNTVpz7w@sol.localdomain>
+References: <20220209011919.493762-1-Jason@zx2c4.com>
+ <20220209011919.493762-9-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220216232142.193220-1-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-9-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 12:21:42AM +0100, Jason A. Donenfeld wrote:
-> Rather than the clunky NUMA full ChaCha state system we had prior, this
-> commit is closer to the original "fast key erasure RNG" proposal from
-> <https://blog.cr.yp.to/20170723-random.html>, by simply treating ChaCha
-> keys on a per-cpu basis.
-> 
-> All entropy is extracted to a base crng key of 32 bytes. This base crng
-> has a birthdate and a generation counter. When we go to take bytes from
-> the crng, we first check if the birthdate is too old; if it is, we
-> reseed per usual. Then we start working on a per-cpu crng.
-> 
-> This per-cpu crng makes sure that it has the same generation counter as
-> the base crng. If it doesn't, it does fast key erasure with the base
-> crng key and uses the output as its new per-cpu key, and then updates
-> its local generation counter. Then, using this per-cpu state, we do
-> ordinary fast key erasure. Half of this first block is used to overwrite
-> the per-cpu crng key for the next call -- this is the fast key erasure
-> RNG idea -- and the other half, along with the ChaCha state, is returned
-> to the caller. If the caller desires more than this remaining half, it
-> can generate more ChaCha blocks, unlocked, using the now detached ChaCha
-> state that was just returned. Crypto-wise, this is more or less what we
-> were doing before, but this simply makes it more explicit and ensures
-> that we always have backtrack protection by not playing games with a
-> shared block counter.
-> 
-> The flow looks like this:
-> 
-> ──extract()──► base_crng.key ◄──memcpy()───┐
->                    │                       │
->                    └──chacha()──────┬─► new_base_key
->                                     └─► crngs[n].key ◄──memcpy()───┐
->                                               │                    │
->                                               └──chacha()───┬─► new_key
->                                                             └─► random_bytes
->                                                                       │
->                                                                       └────►
-> 
-> There are a few hairy details around early init. Just as was done
-> before, prior to having gathered enough entropy, crng_fast_load() and
-> crng_slow_load() dump bytes directly into the base crng, and when we go
-> to take bytes from the crng, in that case, we're doing fast key erasure
-> with the base crng rather than the fast unlocked per-cpu crngs. This is
-> fine as that's only the state of affairs during very early boot; once
-> the crng initializes we never use these paths again.
-> 
-> In the process of all this, the APIs into the crng become a bit simpler:
-> we have get_random_bytes(buf, len) and get_random_bytes_user(buf, len),
-> which both do what you'd expect. All of the details of fast key erasure
-> and per-cpu selection happen only in a very short critical section of
-> crng_make_state(), which selects the right per-cpu key, does the fast
-> key erasure, and returns a local state to the caller's stack. So, we no
-> longer have a need for a separate backtrack function, as this happens
-> all at once here. The API then allows us to extend backtrack protection
-> to batched entropy without really having to do much at all.
-> 
-> The result is a bit simpler than before and has fewer foot guns. The
-> init time state machine also gets a lot simpler as we don't need to wait
-> for workqueues to come online and do deferred work. And the multi-core
-> performance should be increased significantly, by virtue of having hardly
-> any locking on the fast path.
+On Wed, Feb 09, 2022 at 02:19:18AM +0100, Jason A. Donenfeld wrote:
+> Since we have a hash function that's really fast, and the goal of
+> crng_slow_load() is reportedly to "touch all of the crng's state", we
+> can just hash the old state together with the new state and call it a
+> day. This way we dont need to reason about another LFSR or worry about
+> various attacks there. This code is only ever used at early boot and
+> then never again.
 > 
 > Cc: Theodore Ts'o <tytso@mit.edu>
 > Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Reviewed-by: Jann Horn <jannh@google.com>
 > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
-> Changes v3->v4:
-> - Following Jann's review, base_crng.birth is now written to with
->   WRITE_ONCE.
-> 
->  drivers/char/random.c | 388 ++++++++++++++++++++++++------------------
->  1 file changed, 222 insertions(+), 166 deletions(-)
-
-Looks good,
+>  drivers/char/random.c | 42 +++++++++++++++---------------------------
+>  1 file changed, 15 insertions(+), 27 deletions(-)
 
 Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-The only oddity I noticed is that some new comments use the net coding style for
-multi-line comments, and get reformatted to the standard style later in a later
-patch.  It would be preferable to use the standard style from the beginning.
 
 - Eric
