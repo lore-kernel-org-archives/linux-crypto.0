@@ -2,152 +2,163 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74082C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 13:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87EBC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 14:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377156AbiBUN6b (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 08:58:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58400 "EHLO
+        id S234818AbiBUOFf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Feb 2022 09:05:35 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377152AbiBUN63 (ORCPT
+        with ESMTP id S234778AbiBUOFf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 08:58:29 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E06A1A39E;
-        Mon, 21 Feb 2022 05:58:06 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21LCGupa011881;
-        Mon, 21 Feb 2022 13:57:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=+/Sdd0T0flOre6aAE7sMaRWQ0Fp35SADwUsJ5fcZNfE=;
- b=Dk6XpWhx6EDl25pL078QHKV10PPC/kJvmENS+c+Lmv8981SNaDYzn3j1GB99C5vaQwqY
- j3iUDuyg1yTrMF/VaV5tNh8hheFEqcvxA8weXpjYAmbLewlkxm72jyjgPJSCPp4mj+8v
- ouFDPOrWPSQqAMVvNfdrg0pFWUcnYFiadn3/iBXuAVYfD71bdbjNCKJEm2NaRISETrg7
- iz96N84V7TMFWj0tzYN5GKg0jNNXpdeP7M0uqpb8Aec+T6ZNBLw09Ygp8qA9uwchlPf+
- ICpuP/5/ZlDKEbG6lut3pptBEzxxeaNRKK2ZzadQF6tCVpduayVZVuX7mF3GsIYn4CUU 6w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eby66xtce-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:57:46 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21LDLQ85022605;
-        Mon, 21 Feb 2022 13:57:46 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eby66xtbr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:57:46 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21LDusB5029508;
-        Mon, 21 Feb 2022 13:57:44 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3eaqthu024-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 21 Feb 2022 13:57:44 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21LDvbvC45089050
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 21 Feb 2022 13:57:37 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC10DAE053;
-        Mon, 21 Feb 2022 13:57:36 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB904AE051;
-        Mon, 21 Feb 2022 13:57:35 +0000 (GMT)
-Received: from osiris (unknown [9.145.149.197])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 21 Feb 2022 13:57:35 +0000 (GMT)
-Date:   Mon, 21 Feb 2022 14:57:34 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Baoquan He <bhe@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org, hch@lst.de, cl@linux.com,
-        42.hyeyoo@gmail.com, penberg@kernel.org, rientjes@google.com,
-        iamjoonsoo.kim@lge.com, vbabka@suse.cz, David.Laight@aculab.com,
-        david@redhat.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        netdev@vger.kernel.org, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        linux-s390@vger.kernel.org, michael@walle.cc,
-        linux-i2c@vger.kernel.org, wsa@kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Subject: Re: [PATCH 00/22] Don't use kmalloc() with GFP_DMA
-Message-ID: <YhOaTsWUKO0SWsh7@osiris>
-References: <20220219005221.634-1-bhe@redhat.com>
+        Mon, 21 Feb 2022 09:05:35 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C241AF05;
+        Mon, 21 Feb 2022 06:05:11 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id f17so2404378wrh.7;
+        Mon, 21 Feb 2022 06:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=XUxcEn3H/QIKWoe8zGetU+JshLykgc6V1hwBTKo452I=;
+        b=qN8k8HohDbYPnd6+WZ+RVI5vHilVflRaOiDVw7kiFguwZnPxHFvD2AMGHrmAHjUAIm
+         kVxgfCyVLFG6AgSbisa1SXmgErJazigkX/SyrPnKVgGY7dHIFSLV9rcTRoDvjjjc4+mi
+         tUY0YvmGmcKbf9sIJnTW4T1t7T2tZACcynaStjABxjxJg1QMCGGI280C/HLapDpEkQgZ
+         KqGiUTR092HoB3dLw8DCBqWBfJDFfAu9oIw+YjVP+TaiKYGvC6O+OvsxbwmTryvDisIh
+         Z7iqKZA3wbQ7M7bCBZhd+jCYRhGcj7h9MYKvVYPn6aSx5+qhPR7EX7Gb67R3W5EA5qq3
+         2wJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=XUxcEn3H/QIKWoe8zGetU+JshLykgc6V1hwBTKo452I=;
+        b=TZirTMoIzesdVP62z2JzAyQ7ik5Q8OSP0eHoWiBug38pPaqlMmtwqXmVx4fiG0f0sY
+         aKJowCGSNhB45dByWKDpqIXR+tJoTs3Lz8C2P4hz3A4LrZivJ4dvBMP1gI4uDEqsFgcQ
+         yhABpEyWDOgBSakH3vbje6sDfjzMSuJdgzZRYMYHLH9m6hHOsuyjucKSdxgYr3ybxK6E
+         gYDrfAqmRdNVvhPd3gWDH6wiB2xocW4gAclInLj7lLY6NMslsJR0WRaSSM6iB0gqeRsr
+         cLNwCvyU/DQUvcDhniRd7RvcLorYbg0KAxa4LkmuXNwKFGWkVl6KtZi3NwUF5/ubUdJc
+         MamQ==
+X-Gm-Message-State: AOAM531u1M1Ll09Z3wE08PnA+Z3wXPgdXv6wP8JkyNRqpCN/RBP3A3X4
+        dgHQpTT+CHvH6aGoKaHVbm8=
+X-Google-Smtp-Source: ABdhPJwS8j1SUpFwH2bwHg6tnObRt0u3r2lqqVsckqw6MctCQIfac24TY6Z3KtJoIe7rf9JH2zQqzg==
+X-Received: by 2002:a5d:5904:0:b0:1e3:3238:889 with SMTP id v4-20020a5d5904000000b001e332380889mr15373392wrd.289.1645452309951;
+        Mon, 21 Feb 2022 06:05:09 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id j12sm758968wrs.1.2022.02.21.06.05.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Feb 2022 06:05:09 -0800 (PST)
+Date:   Mon, 21 Feb 2022 15:05:05 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen
+ = authsize =0
+Message-ID: <YhOcEQEjIKBrbMIZ@Red>
+References: <YgOQBNIdf0UnSH+M@Red>
+ <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
+ <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
+ <YhKV55t90HWm6bhv@Red>
+ <CAOtvUMdRU4wnRCXsC+U5XBDp+b+u8w7W7JCUKW2+ohuJz3PVhQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220219005221.634-1-bhe@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: -8maixwFZeKZ75OrdKXYZsYgiobSGLaQ
-X-Proofpoint-GUID: qIEy-it3kkux3FMToUJumyRqQgXniOfv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2022-02-21_07,2022-02-21_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- mlxlogscore=999 priorityscore=1501 bulkscore=0 mlxscore=0 adultscore=0
- suspectscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202210081
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOtvUMdRU4wnRCXsC+U5XBDp+b+u8w7W7JCUKW2+ohuJz3PVhQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 19, 2022 at 08:51:59AM +0800, Baoquan He wrote:
-> Let's replace it with other ways. This is the first step towards
-> removing dma-kmalloc support in kernel (Means that if everyting
-> is going well, we can't use kmalloc(GFP_DMA) to allocate buffer in the
-> future).
-...
+Le Mon, Feb 21, 2022 at 12:08:12PM +0200, Gilad Ben-Yossef a écrit :
+> Hi,
 > 
-> Next, plan to investigate how we should handle places as below. We
-> firstly need figure out whether they really need buffer from ZONE_DMA.
-> If yes, how to change them with other ways. This need help from
-> maintainers, experts from sub-components and code contributors or anyone
-> knowing them well. E.g s390 and crypyto, we need guidance and help.
+> On Sun, Feb 20, 2022 at 9:26 PM Corentin Labbe
+> <clabbe.montjoie@gmail.com> wrote:
+> >
+> ...
+> >
+> > Hello
+> >
+> > While testing your patch for this problem, I saw another warning (unrelated with your patch):
 > 
-> 1) Kmalloc(GFP_DMA) in s390 platform, under arch/s390 and drivers/s390;
-
-So, s390 partially requires GFP_DMA allocations for memory areas which
-are required by the hardware to be below 2GB. There is not necessarily
-a device associated when this is required. E.g. some legacy "diagnose"
-calls require buffers to be below 2GB.
-
-How should something like this be handled? I'd guess that the
-dma_alloc API is not the right thing to use in such cases. Of course
-we could say, let's waste memory and use full pages instead, however
-I'm not sure this is a good idea.
-
-s390 drivers could probably converted to dma_alloc API, even though
-that would cause quite some code churn.
-
-> For this first patch series, thanks to Hyeonggon for helping
-> reviewing and great suggestions on patch improving. We will work
-> together to continue the next steps of work.
+> Dear Corentin, you are a treasure trove of bug reports. I love it.
+> Thank you! :-)
 > 
-> Any comment, thought, or suggestoin is welcome and appreciated,
-> including but not limited to:
-> 1) whether we should remove dma-kmalloc support in kernel();
+> > [   34.061953] ------------[ cut here ]------------
+> > [   34.066656] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
+> > [   34.076555] WARNING: CPU: 3 PID: 475 at /home/clabbe/linux-next/kernel/dma/debug.c:571 add_dma_entry+0x1d0/0x288
+> > [   34.086748] Modules linked in:
+> > [   34.089809] CPU: 3 PID: 475 Comm: cryptomgr_test Tainted: G        W         5.17.0-rc3-next-20220210-00115-g1ca9f29d9780-dirty #25
+> > [   34.101635] Hardware name: Renesas Salvator-X board based on r8a77950 (DT)
+> > [   34.108508] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > [   34.115471] pc : add_dma_entry+0x1d0/0x288
+> > [   34.119569] lr : add_dma_entry+0x1d0/0x288
+> > [   34.123664] sp : ffff80000e3236f0
+> > [   34.126976] x29: ffff80000e3236f0 x28: 0000000000000000 x27: 0000000000000000
+> > [   34.134122] x26: 0000000000000000 x25: ffff80000b3c76c0 x24: ffff80000b3c7000
+> > [   34.141267] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000a8c1000
+> > [   34.148410] x20: ffff0004c0b93f80 x19: ffff80000b320000 x18: ffffffffffffffff
+> > [   34.155554] x17: 6c7265766f202c54 x16: 534958454520676e x15: 00000000000001fa
+> > [   34.162697] x14: ffff80000e3233f0 x13: 00000000ffffffea x12: ffff80000b3bdda0
+> > [   34.169840] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000b3a5db8
+> > [   34.176984] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000b3a5d60
+> > [   34.184126] x5 : 0000000000057fa8 x4 : 0000000000000000 x3 : 00000000ffffefff
+> > [   34.191269] x2 : ffff80000b34db38 x1 : 371dfc0f85526100 x0 : 0000000000000000
+> > [   34.198411] Call trace:
+> > [   34.200856]  add_dma_entry+0x1d0/0x288
+> > [   34.204604]  debug_dma_map_sg+0x150/0x398
+> > [   34.208615]  __dma_map_sg_attrs+0x9c/0x108
+> > [   34.212717]  dma_map_sg_attrs+0x10/0x28
+> > [   34.216554]  cc_map_sg+0x80/0x100
+> > [   34.219875]  cc_map_cipher_request+0x170/0x3c8
+> > [   34.224319]  cc_cipher_process+0x210/0xb58
+> > [   34.228415]  cc_cipher_encrypt+0x2c/0x38
+> > [   34.232338]  crypto_skcipher_encrypt+0x44/0x78
+> > [   34.236786]  drbg_kcapi_sym_ctr+0xdc/0x1f8
+> > [   34.240887]  drbg_ctr_generate+0x5c/0x98
+> > [   34.244812]  drbg_kcapi_random+0xb4/0x260
+> > [   34.248823]  alg_test_stdrng+0xf8/0x2b0
+> > [   34.252661]  alg_test.part.29+0xb4/0x398
+> > [   34.256583]  alg_test+0x48/0x78
+> > [   34.259724]  cryptomgr_test+0x48/0x50
+> > [   34.263386]  kthread+0x11c/0x128
+> > [   34.266619]  ret_from_fork+0x10/0x20
+> > [   34.270198] irq event stamp: 318
+> > [   34.273424] hardirqs last  enabled at (317): [<ffff8000081300e0>] __up_console_sem+0x60/0x98
+> > [   34.281869] hardirqs last disabled at (318): [<ffff800009bfbb18>] el1_dbg+0x28/0x90
+> > [   34.289531] softirqs last  enabled at (314): [<ffff800008010550>] __do_softirq+0x4a8/0x5ec
+> > [   34.297796] softirqs last disabled at (305): [<ffff8000080ab644>] irq_exit_rcu+0x18c/0x1b0
+> > [   34.306061] ---[ end trace 0000000000000000 ]---
+> >
+> 
+> So, this is an interesting one.
+> What I *think* is happening is that the drbg implementation is
+> actually doing something naughty: it is passing the same exact memory
+> buffer, both as source and destination to an encryption operation to
+> the crypto skcipher API, BUT via two different scatter gather lists.
+> 
+> I'm not sure but I believe this is not a legitimate use of the API,
+> but before we even go into this, let's see if this little fix helps at
+> all and this is indeed the root cause.
+> 
+> Can you test this small change for me, please?
+> 
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 177983b6ae38..13824fd27627 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -1851,7 +1851,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+>                 /* Use scratchpad for in-place operation */
+>                 inlen = scratchpad_use;
+>                 memset(drbg->outscratchpad, 0, scratchpad_use);
+> -               sg_set_buf(sg_in, drbg->outscratchpad, scratchpad_use);
+> +               sg_in = sg_out;
+>         }
+> 
+>         while (outlen) {
+> 
 
-The question is: what would this buy us? As stated above I'd assume
-this comes with quite some code churn, so there should be a good
-reason to do this.
-
-From this cover letter I only get that there was a problem with kdump
-on x86, and this has been fixed. So why this extra effort?
-
->     3) Drop support for allocating DMA memory from slab allocator
->     (as Christoph Hellwig said) and convert them to use DMA32
->     and see what happens
-
-Can you please clarify what "convert to DMA32" means? I would assume
-this does _not_ mean that passing GFP_DMA32 to slab allocator would
-work then?
-
-btw. there are actually two kmalloc allocations which pass GFP_DMA32;
-I guess this is broken(?):
-
-drivers/hid/intel-ish-hid/ishtp-fw-loader.c:    dma_buf = kmalloc(payload_max_size, GFP_KERNEL | GFP_DMA32);
-drivers/media/test-drivers/vivid/vivid-osd.c:   dev->video_vbase = kzalloc(dev->video_buffer_size, GFP_KERNEL | GFP_DMA32);
+No more stacktrace !
