@@ -2,56 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9787C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 07:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 353A6C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 07:58:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346619AbiBUH6v (ORCPT
+        id S1346620AbiBUH6v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 21 Feb 2022 02:58:51 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47206 "EHLO
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346646AbiBUH6s (ORCPT
+        with ESMTP id S1346643AbiBUH6r (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 02:58:48 -0500
+        Mon, 21 Feb 2022 02:58:47 -0500
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD1262182B;
-        Sun, 20 Feb 2022 23:58:25 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE1C1E02B;
+        Sun, 20 Feb 2022 23:58:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1645430305; x=1676966305;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bqtRma4i+aDRPSPwCrS3g3crpowmv6qvyEHjsN3/F0U=;
-  b=t7kIxk8UyyEDmS2+H1u/S+SSLGjurHYFKn7CPX8eYCkyHzQQx3sT5hFq
-   h4ZmJHSoQhMkSqwdfcEuycLpTTcLDp80OS/4DkevypJiN0EsMFGh64/ak
-   i7dHgF7JapodbIuuzGGJDDNBiISMV6e2JfoaoPbgjxiXOa/os3XxwbjA6
-   vNY1Sxs6pmlsKW0p+gYxZXghWzkr6nsodUrKAR2zd3NuKma2cCN0lLg3l
-   Gy8xrwq0v1NMrXmlhBJT5HK6e/dOAf8w8o7qkIf7Lh+63lRBfQJDH9V4R
-   /zCZWKMfQH9jr6SFAi6Z/Cj23+lYXTQnw2uq6yCgvOZvDJe/tMk/gjryU
-   Q==;
+  t=1645430304; x=1676966304;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kJdv8te93/QoLLMBt8iaiim4AkEZeLxx62y6s6+oHG8=;
+  b=fJMOdZ0A6jXptbSgaUkeY4QViJiXGapgLvED19EdDUjXDysjzYWJF+LM
+   NS2EjnmMrLvhMq66mft1iyqVYH4xETQGp8AC3C97GVF7NUZzyN0mTFOGI
+   RCkHGGyVtPfa7Jbf/Oc+Nv5NvwkT62j1pxXn1Z4AlzKzjc5mtsPJvYOsV
+   af+x0ZIT0EQpXPtO/tSiMXu9+Ry/9gnxROYohbi6+gzVhjqufOv04UFfV
+   TMmgBN0h63m9lN12AthDsz5olmfsXQ+XSEnyxsxMsxnBDFmAOfFAJl8iQ
+   XjLKqz6jzHwMkc0+5jkMj4KT70Zu7eRqxLFAkmr9A0k6xOTfSmZ0CeLB0
+   g==;
 X-IronPort-AV: E=Sophos;i="5.88,385,1635231600"; 
-   d="scan'208";a="86422606"
+   d="scan'208";a="86422597"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Feb 2022 00:58:24 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Feb 2022 00:58:22 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Mon, 21 Feb 2022 00:58:24 -0700
+ 15.1.2375.17; Mon, 21 Feb 2022 00:58:21 -0700
 Received: from localhost.localdomain (10.10.115.15) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2375.17 via Frontend Transport; Mon, 21 Feb 2022 00:58:22 -0700
+ 15.1.2375.17 via Frontend Transport; Mon, 21 Feb 2022 00:58:19 -0700
 From:   Claudiu Beznea <claudiu.beznea@microchip.com>
 To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
         <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>
 CC:     <linux-arm-kernel@lists.infradead.org>,
         <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         Claudiu Beznea <claudiu.beznea@microchip.com>
-Subject: [PATCH v2 1/7] hwrng: atmel - add wait for ready support on read
-Date:   Mon, 21 Feb 2022 09:59:22 +0200
-Message-ID: <20220221075928.563806-2-claudiu.beznea@microchip.com>
+Subject: [PATCH v2 0/7] hwrng: atmel - add runtime pm support
+Date:   Mon, 21 Feb 2022 09:59:21 +0200
+Message-ID: <20220221075928.563806-1-claudiu.beznea@microchip.com>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20220221075928.563806-1-claudiu.beznea@microchip.com>
-References: <20220221075928.563806-1-claudiu.beznea@microchip.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -59,87 +57,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add wait for ready support on read.
+Hi,
 
-Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
----
- drivers/char/hw_random/atmel-rng.c | 43 +++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 13 deletions(-)
+This series adds runtime PM support for atmel-rng driver. Along with
+this some cleanup and fixes patches were added to the series.
 
-diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
-index ecb71c4317a5..1a4874668c04 100644
---- a/drivers/char/hw_random/atmel-rng.c
-+++ b/drivers/char/hw_random/atmel-rng.c
-@@ -13,6 +13,7 @@
- #include <linux/err.h>
- #include <linux/clk.h>
- #include <linux/io.h>
-+#include <linux/iopoll.h>
- #include <linux/hw_random.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
-@@ -20,6 +21,7 @@
- #define TRNG_CR		0x00
- #define TRNG_MR		0x04
- #define TRNG_ISR	0x1c
-+#define TRNG_ISR_DATRDY	BIT(0)
- #define TRNG_ODATA	0x50
- 
- #define TRNG_KEY	0x524e4700 /* RNG */
-@@ -36,25 +38,40 @@ struct atmel_trng {
- 	struct hwrng rng;
- };
- 
-+static bool atmel_trng_wait_ready(struct atmel_trng *trng, bool wait)
-+{
-+	int ready;
-+
-+	ready = readl(trng->base + TRNG_ISR) & TRNG_ISR_DATRDY;
-+	if (!ready && wait)
-+		readl_poll_timeout(trng->base + TRNG_ISR, ready,
-+				   ready & TRNG_ISR_DATRDY, 1000, 20000);
-+
-+	return !!ready;
-+}
-+
- static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
- 			   bool wait)
- {
- 	struct atmel_trng *trng = container_of(rng, struct atmel_trng, rng);
- 	u32 *data = buf;
-+	int ret;
-+
-+	ret = atmel_trng_wait_ready(trng, wait);
-+	if (!ret)
-+		goto out;
- 
--	/* data ready? */
--	if (readl(trng->base + TRNG_ISR) & 1) {
--		*data = readl(trng->base + TRNG_ODATA);
--		/*
--		  ensure data ready is only set again AFTER the next data
--		  word is ready in case it got set between checking ISR
--		  and reading ODATA, so we don't risk re-reading the
--		  same word
--		*/
--		readl(trng->base + TRNG_ISR);
--		return 4;
--	} else
--		return 0;
-+	*data = readl(trng->base + TRNG_ODATA);
-+	/*
-+	 * ensure data ready is only set again AFTER the next data word is ready
-+	 * in case it got set between checking ISR and reading ODATA, so we
-+	 * don't risk re-reading the same word
-+	 */
-+	readl(trng->base + TRNG_ISR);
-+	ret = 4;
-+
-+out:
-+	return ret;
- }
- 
- static void atmel_trng_enable(struct atmel_trng *trng)
+Thank you,
+Claudiu Beznea
+
+Claudiu Beznea (7):
+  hwrng: atmel - add wait for ready support on read
+  hwrng: atmel - disable trng on failure path
+  hwrng: atmel - rename enable/disable functions to init/cleanup
+  hwrng: atmel - move set of TRNG_HALFR in atmel_trng_init()
+  hwrng: atmel - use __maybe_unused and pm_ptr() for pm ops
+  hwrng: atmel - add runtime pm support
+  hwrng: atmel - remove extra line
+
+ drivers/char/hw_random/atmel-rng.c | 148 ++++++++++++++++++-----------
+ 1 file changed, 91 insertions(+), 57 deletions(-)
+
 -- 
 2.32.0
 
