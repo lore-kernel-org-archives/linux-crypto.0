@@ -2,67 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C4FC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 03:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07FBFC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 03:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244728AbiBUDkp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Feb 2022 22:40:45 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:38638 "EHLO
+        id S239189AbiBUD4q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Feb 2022 22:56:46 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbiBUDkn (ORCPT
+        with ESMTP id S238715AbiBUD4q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Feb 2022 22:40:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03BF151331;
-        Sun, 20 Feb 2022 19:40:22 -0800 (PST)
+        Sun, 20 Feb 2022 22:56:46 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A4EA51E66;
+        Sun, 20 Feb 2022 19:56:24 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AC65AB80DCD;
-        Mon, 21 Feb 2022 03:40:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F633C340E9;
-        Mon, 21 Feb 2022 03:40:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF84B6117F;
+        Mon, 21 Feb 2022 03:56:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED799C340E9;
+        Mon, 21 Feb 2022 03:56:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645414819;
-        bh=mOvCX6u+abSiUuhsoaVypqdnne4NQ17bIT2BYtNcIcw=;
+        s=k20201202; t=1645415783;
+        bh=69/a0arvmu8TKi1770aEyZ5ngS/fYz1wpW23AVdSecw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mmEib9tLjEKL1jLwoEJX0pIWeCdntkr7n9x3segpilyuR8R/PidvhHEopoAC0ghvO
-         pbnde5MzWkegGtyw17cYdyBfrWQ6QHiFtRiTlOyRwAPfGQMETVk+vzVJKhVMw3xWQ4
-         k4d//5nHt/wJaY/BAAcZYrUs6lYgG5NDLaZXBEvZZTUCGtEi+8KiCG3LmOE7aOX96s
-         FNoEDmtK5zhVNdZPVSusj6bUX4CDTpEzWYjNap9z6axsdRBjwG4jtzuQQopNs/lEfR
-         0ZLQc2RqG4E+SdtJkD7lSbcT/AdZjefrsEvaA3x1X9YHfEvvTC30PzQOHMAizhyiOr
-         A0J3fEGYufKrw==
-Date:   Sun, 20 Feb 2022 19:40:17 -0800
+        b=AHHSmGH8kOAa4m6eN/UJ78oLYO5GeqBDDsbB/xESWWs5UeLq9FLKO+vkBF4Z+PBLj
+         k3y02EOvU/Cg9ehVC9g/V0u0etlGRT2UkQhIvuB3rEOmS/eUXf24odU+djHJqA29Qw
+         j8x8rWZMUma91Hw3LLlr8dWSintXniJnPChuui/AArfsxFfwpjKEAILaVvf3kNo7ZQ
+         juXlhJmA5IXDXpU4FLfvR/l1MZ/f08ASYB3vXU6qoTArRojxMecF0P2iImX+/0KPs/
+         i2k0Pwk3t/+IRsRFvsC22UqBMrSCcbCQkx0G1tz6aojw0zqQaKYo6OcSXqQxf1xWhA
+         7vomD7kAVRR8Q==
+Date:   Sun, 20 Feb 2022 19:56:21 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         tytso@mit.edu, linux@dominikbrodowski.net
-Subject: Re: [PATCH v2 8/9] random: use hash function for crng_slow_load()
-Message-ID: <YhMJoYykeNTVpz7w@sol.localdomain>
+Subject: Re: [PATCH v2 9/9] random: remove outdated INT_MAX >> 6 check in
+ urandom_read()
+Message-ID: <YhMNZQb6S+qV+NR6@sol.localdomain>
 References: <20220209011919.493762-1-Jason@zx2c4.com>
- <20220209011919.493762-9-Jason@zx2c4.com>
+ <20220209011919.493762-10-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220209011919.493762-9-Jason@zx2c4.com>
+In-Reply-To: <20220209011919.493762-10-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 09, 2022 at 02:19:18AM +0100, Jason A. Donenfeld wrote:
-> Since we have a hash function that's really fast, and the goal of
-> crng_slow_load() is reportedly to "touch all of the crng's state", we
-> can just hash the old state together with the new state and call it a
-> day. This way we dont need to reason about another LFSR or worry about
-> various attacks there. This code is only ever used at early boot and
-> then never again.
+On Wed, Feb 09, 2022 at 02:19:19AM +0100, Jason A. Donenfeld wrote:
+> In 79a8468747c5 ("random: check for increase of entropy_count because of
+> signed conversion"), a number of checks were added around what values
+> were passed to account(), because account() was doing fancy fixed point
+> fractional arithmetic, and a user had some ability to pass large values
+> directly into it. One of things in that commit was limiting those values
+> to INT_MAX >> 6.
+> 
+> However, for several years now, urandom reads no longer touch entropy
+> accounting, and so this check serves no purpose. The current flow is:
+> 
+> urandom_read_nowarn()-->get_random_bytes_user()-->chacha20_block()
+> 
+> We arrive at urandom_read_nowarn() in the first place either via
+> ordinary fops, which limits reads to MAX_RW_COUNT, or via getrandom()
+> which limits reads to INT_MAX.
 > 
 > Cc: Theodore Ts'o <tytso@mit.edu>
 > Cc: Dominik Brodowski <linux@dominikbrodowski.net>
 > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
->  drivers/char/random.c | 42 +++++++++++++++---------------------------
->  1 file changed, 15 insertions(+), 27 deletions(-)
+>  drivers/char/random.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
 
 Reviewed-by: Eric Biggers <ebiggers@google.com>
 
