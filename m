@@ -2,208 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D6DC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Feb 2022 23:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DCCC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 00:49:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236244AbiBUXXb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Feb 2022 18:23:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39046 "EHLO
+        id S237928AbiBVAuM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Feb 2022 19:50:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236240AbiBUXX1 (ORCPT
+        with ESMTP id S234068AbiBVAuL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Feb 2022 18:23:27 -0500
-X-Greylist: delayed 572 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 21 Feb 2022 15:23:02 PST
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E5C224BF0;
-        Mon, 21 Feb 2022 15:23:02 -0800 (PST)
-Received: from localhost (85-76-106-199-nat.elisa-mobile.fi [85.76.106.199])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: sakkinen)
-        by meesny.iki.fi (Postfix) with ESMTPSA id AB10420194;
-        Tue, 22 Feb 2022 01:13:26 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1645485207;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hE5cFqTXfOhA8LxujfvbIZTUsBs4n3EjQ6ZwLzEttuQ=;
-        b=YH5U7O4Xv6JdQP64skUJchHFZKbi2mKxoCj2LR7ni7Ubi4jdpfLEJRWhhwA9qD1nGR0MeM
-        ehdiYroKkaHgn4aJb9SBF8/AQApN+g7nx/YBxs/woUUyGuH+a8KGIHA7fIVJfGIvohQqRi
-        eVbyVnSyGOinvzzqrK00nG8IWk7UrBQ=
-Date:   Tue, 22 Feb 2022 00:14:05 +0100
-From:   Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
-To:     trix@redhat.com
-Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, dan.j.williams@intel.com, song@kernel.org,
-        xni@redhat.com, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: cleanup comments
-Message-ID: <YhQcvQl/9MUKzXxO@iki.fi>
-References: <20220221223118.3744238-1-trix@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Mon, 21 Feb 2022 19:50:11 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam07on2077.outbound.protection.outlook.com [40.107.95.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBB524083;
+        Mon, 21 Feb 2022 16:49:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KJTplUxeUk/xG1G5OkI8gsKtnIU4CjMvP93NxB16YS8NwuU4Ptg9SzsWRqva5UIBTXB5F+ijoTYKqyXcEhARhz+dYbwUgCNYB6cjvy/61oD6mJRctFm59AAZtEW2m+b78o8WTvXUImpMHYgjK/TK4/yR+EecCQ8SXvBkGYse40pLPeUm77ng1+waO1vNo2daqZELB4UolqnuyIu09un+DPERvLC+GnJDPfu/zPOLin3Iy/kk6AKYbvdNt8xXiQtoUxS27UEtWeIymbFC3fwA8Hjv6gJTKC7XhZwzyHrYQS5jF0t+N6PVff0Sk6c6Be5/tELa1FOGpEhxT8Yxrd0z0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SvbpmsNA66BqnUQngsIbXAmciYL0u+tx4Q69GuqOcIA=;
+ b=FyqWpnk+Zp4BouoE0O+xKW5qPTUXw8JMbDhVmLuxetzVbd4YIhPRTQo4Sw1AafJUJhcGtG4VB6iU88jxHrZnYqwlursC0r5Ce1IJoykAd5UpLmdplLGvHh8oUT/bxgAQa6o5d3sFle4VdZasgbHmbxqa8ox7rqa87qPtxipPeb/n6+V68U4XOr5ZuswO0+cKdwCN925Dkn9dj2uIVFCP3wisVqRljKrLdXwV+OMM+ShZJvJbcfPykb6W92NQjrkcp9hEgGpDibeTdpN8VOb2Fd60lPawjWnINFn9HZq1t+JBcd+rj3zyxDemTwdZsIZd2IqOyOWWXHwz/hzzaaPLYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SvbpmsNA66BqnUQngsIbXAmciYL0u+tx4Q69GuqOcIA=;
+ b=s6bO3dRb7shY+VW17xMDTOEtfjXsZICUd0gneKKLCg7hpLpeMJvVn0IVun/SpoqrL+N/zj256Vt7EnuKaHTHLt4E7JNn/XmA4boPu95WYaaPYgxbM17plBAAoVyvgKLWYKBMzcubhyfBfJ/GMMeSomZ7XG9CsVvp2ikoqyjWm2n9aVl2BGv5+Oy7ZY4OIcwp471RvUJe6cjQWH/6qJPNazFy0ypXqv44xhElUUBYB/KbBMLFGDlUv3q4Ba4fWWhODSArcd8KdgwR99oJJKPPv75n/FV849cgsNQ8EhPgCYPSpk335SJaaaUinhaktI6Ed0EFJBxcQEazUAgC8JShqA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BN6PR1201MB2496.namprd12.prod.outlook.com (2603:10b6:404:a7::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4995.16; Tue, 22 Feb
+ 2022 00:49:45 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::e8f4:9793:da37:1bd3%5]) with mapi id 15.20.4995.027; Tue, 22 Feb 2022
+ 00:49:44 +0000
+Date:   Mon, 21 Feb 2022 20:49:43 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, mgurtovoy@nvidia.com, yishaih@nvidia.com,
+        linuxarm@huawei.com, liulongfang@huawei.com,
+        prime.zeng@hisilicon.com, jonathan.cameron@huawei.com,
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH v5 0/8] vfio/hisilicon: add ACC live migration driver
+Message-ID: <20220222004943.GF193956@nvidia.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220221223118.3744238-1-trix@redhat.com>
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=sakkinen smtp.mailfrom=jarkko.sakkinen@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1645485207; a=rsa-sha256; cv=none;
-        b=GeH0PBHQGrtAlqGnTqD3Ol7Z1cKhqKdj4ei1FjEV+CxzItDgcyIReP/Vsd4wGJSrhpDN4V
-        FOKckSdpVH8mDqaQgfkUGaG5W6440b+nhgyjhiIHg5Bz6B1AtLXMWgAygLMIa3QPdBTQQL
-        MPcz7unfmfq81PfaNsyor7tzD1KVtE4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1645485207;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hE5cFqTXfOhA8LxujfvbIZTUsBs4n3EjQ6ZwLzEttuQ=;
-        b=tpUg1/j4r93UTGv/iUMo+Zwtg76MoLnjbsGNMHAruUFs+ZZeMH2kK7+V+0hMCHvjIuBb7H
-        szDJJAVXhFYc1tUpErCVpsAqaaNJQHIHishe3sGWkalj4sMGS7u/QiV7J9d2sKV6/zK/eR
-        hTPvhXZByqtO29+7LJoy0Zc7QKj50XY=
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+X-ClientProxiedBy: BLAP220CA0020.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::25) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 51347dab-9b6d-49e2-06c7-08d9f59d37f1
+X-MS-TrafficTypeDiagnostic: BN6PR1201MB2496:EE_
+X-Microsoft-Antispam-PRVS: <BN6PR1201MB24963F0FCA37D6AE645B381BC23B9@BN6PR1201MB2496.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kARGrXewJhoN5aNe3s8KO5zUZZ+RZD4sTPFFzRuOdYeZLaieAQBL21LdiQ9mCjN6pfT0nUq4JXv6tzQ9ZWu+2fp8ujqprqfuspqwEk5MtdHRhr1HP7dK7gnHN7mujHiM5Ir/J5ZbtjnDRcwen8I40eJu2KTjhbfbJWVyoPc6VJ3p3qkHenVgPL5gaI+7UQ2wjP3/1eyumJ/wJPDifOLJgJKq+V57yRSIUAi8pH6e7eeVR0n1kagmGr0NY7P858nWP41HGtGLz1nLNvp/MZt47bCpZe+84rBkAuZzryAszUfTFRWO3NMxs7ZZjWZwTRc4w2VGloySX7nAHSQ4k/vgWxk33giC8bZKcR03r4FZq43+PvMXKAKnhKa/fpXFC48Szq/LwbF8IiwhA258VUUYlhpc+DqbS/uQwfvWvxlOSuVaW4gE2okBPro2Ld2UM2YIgImgArZQFxpy6f9rZ0yt8rHn2Z1VYHSQfe5FM+kROxXF7TpqoBxvtabxhXHalEqpLW68SxbTNUEHsX3Gsfr/dT2Dtx6t1vqifyuYVbt5BL5LXN7A+qBt4Lcj4X8OKc1Gt7a8C2S31bagGPhQSt/rvGnZ48Rza32PN6+Nxc1SDynGBpS6n0351dWoZ56nAX7WqnajjnXUlcYtNUodhUJxE+u5qy9xPixO1eIdBe9nXigb2NMCCqZJ93jtLIkzBTK6wHmFls+NLbtEdvvarj4+G8SnX9dbqVceTpgY8OuZeOwhI0hu5RUWEI3ob8m2voysx9D7a2z8O0ejothnlMLqL5sQA0DRO7Pxwi+jbjckxGNTmj0/XbPZuahZ9hdr5m+N
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(8936002)(508600001)(6506007)(38100700002)(26005)(186003)(6486002)(966005)(33656002)(7416002)(5660300002)(86362001)(2616005)(1076003)(66946007)(66556008)(66476007)(8676002)(4326008)(2906002)(6916009)(83380400001)(6512007)(316002)(36756003)(27376004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q1FyNE5VRi9uRmQzUGpmbWk1UU9BeVcxZDE0cTZhMXVGV2p5Tzg4RXB3RnMr?=
+ =?utf-8?B?RTJWUXhUMk95czVMd2JFUURBd2l4OFZZaFdCT3ZjN1NlRU1MYlljRURFSk5T?=
+ =?utf-8?B?cmV5SDY1c0pJU3F2VWtEci9haXkraFUxNHdhOXVXRkZqZUZEamJKTXBvZUFN?=
+ =?utf-8?B?RVhxMjJnY0tSM1Rsb0ZGS3U1VFI4a1prV0xESUdJOFJWT09KTjRKdEtXZUNR?=
+ =?utf-8?B?Vld5UGNCU1E4RDFGL2RtVTFlNVBwTklJdXNCczVnMlVCQkowbWVQQlRocXRs?=
+ =?utf-8?B?aHFubGErSUx5bVJmMytQMXlCYTlqUWRPaHVlZlJyalMzNTlqd0FqN0FkSU5K?=
+ =?utf-8?B?ZE8rSkxlRkpXR1NrRGJYNU5UNjQydlluRUZtd0R2TWh1WmNObEluWDRMa21j?=
+ =?utf-8?B?bCtBUG1icmNSN0NwSk5hYTMwZTE2Vko4QXZJSFlQK1ROT1BKMExvK001WTNj?=
+ =?utf-8?B?VmhwbEd5ZGhUQ1hwelB1eDQ1R3R6YmZ4OFJXRlNrdGlRZXpvWXpIak9aSHdG?=
+ =?utf-8?B?U29IYm1Od1RQTVZWdGVOYmZNQi94WmlxVkpVT1VoRGZEdEJ4aVNVaFZNZGMr?=
+ =?utf-8?B?RGwwR0JyMU9FSmp0cUdZeEFxR2Zuci9ody9uNzdRVXJkQUZPa3p1VFVRM0N3?=
+ =?utf-8?B?bU8yWHZRNFZadXl5R1RzclAwTGVyQUFpSlJRd20zY2E2Zzg5ZVhSWVBxVU0z?=
+ =?utf-8?B?NTZ5TkkvMTJ4M3VRTExvaWFzVnBxSGZSOC8xdFBMU29tTWxxR1hLL2QxZHh3?=
+ =?utf-8?B?bUYvZWpiRjVrMkJnWUVFQnowa2hxQm5ocFA2RzFXd3FmMlZFZjF4TW00ZzNu?=
+ =?utf-8?B?aVlXbXJqVUdwVE1ZZjZEandkOStuVzZXM2FKb28zVExFQU5mZ2dqR3dBdzlt?=
+ =?utf-8?B?TUxJSnoxNkorTGZjL1ZaR1lpNk1VU2pnUVZndWRVU2V3bVJMQlp5cDZnQndv?=
+ =?utf-8?B?b3Q5VTZ3M0dONGxtSkk3N1FvL3NyOFZXd0VjZFMvcWd0ZVhVUmtQbmhQQy82?=
+ =?utf-8?B?OVBUais5c0VTTlNXVW5EOFdXOUJ4WkxMYjA5VjVjVldWR2x1aXBid2pVLzhs?=
+ =?utf-8?B?SFJLQ3FtcUxmMWEyYVF2STZ0RkYyQU9XYzU5K2J6YjJiVk91cU9mL3FVM2dZ?=
+ =?utf-8?B?LysxM0YxNzJUNEx2L1MvVzdtNHRMQ1EwS1BpRGw2L2NpNWRhemxWQUp6SW05?=
+ =?utf-8?B?SjFYT2RtSXBVc29lQWQwOXFpcnFocU9RNC93VVlIQnEweW5nQWlDNm56VWFT?=
+ =?utf-8?B?OXNpQzZ2MWlaUnZHazNzMFdkRjNIRjlGRklmaSs0ZzJhdXA3UVRYZmZBamZP?=
+ =?utf-8?B?SDE5Q0llY1Qxc3lLRERXMTBsWEpyUDhRVkUxc2Z2RDU2L0FkdG45d2FkUDdr?=
+ =?utf-8?B?dEVKQk0vWGxKV09jL2xYenI5eHRTbmh1bTJ5MDBSMVRRd0tUaEdCVUY4ck91?=
+ =?utf-8?B?YnFVNVdEQ0tPMnVlWDlkRXpDd09HbkpNU3VGV1IwaDU5OEM0ZXFaOGtzc1hU?=
+ =?utf-8?B?U3R3VXpEc2tEZ1lhc0NKRnRpcWlBZmd2em9RWjdNUUZVdGlNbnlDQk14WDh5?=
+ =?utf-8?B?YW4zSU9FSFg2Q3BWMTRnU01sY0VWNm5nU3RTbzhYYU1RVnBHNUdQMk1mQTE0?=
+ =?utf-8?B?RmY1YXVTbHlFdWhyK3I5Y0tFdHBaeWZPYzNBKzNlbWIzRk9sZmtLaW9FQmpo?=
+ =?utf-8?B?UkZIQTVLRmp6aGlZdVBTYnltczNpN01KQzhHd05QZkJISHY1ejhPOVZrUlpw?=
+ =?utf-8?B?RzNJR2JGelBSWnAzTzhYSXhJQzNTNjZwSjk0MmZNMDdrOHA0dG5tVnB2YzBI?=
+ =?utf-8?B?RUVJMVVWMk1lays3MVVSTlBtM0grd1ZNTmhpaTJ1SHkzbUJXM0VNSTB0T3c0?=
+ =?utf-8?B?emlRUFlaWlFjQWd4RW85djR3aTdlSzFsQnFGQksvZnZFNkpua1RZa2pOUjZG?=
+ =?utf-8?B?b0FGWVZyczM4aktrMFRXLzlHS25XdlpVSFluT0h2WTVQWVNWbTRyQVl1RVBx?=
+ =?utf-8?B?aHZLM2tOdUNmUGVtQkVKMldieFVnQWFNNDJ4aFJWdEUrT0gzS2tOVG9NYzEr?=
+ =?utf-8?B?YXB6U1VnT3F0SDdTOUhFYWt2NmF6TjZLYXRLWk0rNlppeGZ6V0ZQQlBVWkFt?=
+ =?utf-8?Q?ZxTI=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51347dab-9b6d-49e2-06c7-08d9f59d37f1
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2022 00:49:44.8411
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: stf7ngBP+Qczp+BPBTDYfgGHFMDuG8iEINae/mg3pacHNU7uyvEyaKXZbGGUib5h
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR1201MB2496
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 02:31:18PM -0800, trix@redhat.com wrote:
-> From: Tom Rix <trix@redhat.com>
+On Mon, Feb 21, 2022 at 11:40:35AM +0000, Shameer Kolothum wrote:
 > 
-> For spdx
-> /* */ for *.h, // for *.c
-> Space before spdx tag
+> Hi,
 > 
-> Replacements
-> paramenters to parameters
-> aymmetric to asymmetric
-> sigature to signature
-> boudary to boundary
-> compliled to compiled
-> eninges to engines
-> explicity to explicitly
+> This series attempts to add vfio live migration support for
+> HiSilicon ACC VF devices based on the new v2 migration protocol
+> definition and mlx5 v8 series discussed here[0].
 > 
-> Signed-off-by: Tom Rix <trix@redhat.com>
-> ---
->  crypto/asymmetric_keys/signature.c   | 2 +-
->  crypto/asymmetric_keys/x509_parser.h | 2 +-
->  crypto/async_tx/async_xor.c          | 8 ++++----
->  crypto/async_tx/raid6test.c          | 4 ++--
->  crypto/cfb.c                         | 2 +-
->  crypto/dh.c                          | 2 +-
->  crypto/sm2.c                         | 2 +-
->  7 files changed, 11 insertions(+), 11 deletions(-)
+> RFCv4 --> v5
+>   - Dropped RFC tag as v2 migration APIs are more stable now.
+>   - Addressed review comments from Jason and Alex (Thanks!).
 > 
-> diff --git a/crypto/asymmetric_keys/signature.c b/crypto/asymmetric_keys/signature.c
-> index 4aff3eebec17..2deff81f8af5 100644
-> --- a/crypto/asymmetric_keys/signature.c
-> +++ b/crypto/asymmetric_keys/signature.c
-> @@ -35,7 +35,7 @@ void public_key_signature_free(struct public_key_signature *sig)
->  EXPORT_SYMBOL_GPL(public_key_signature_free);
->  
->  /**
-> - * query_asymmetric_key - Get information about an aymmetric key.
-> + * query_asymmetric_key - Get information about an asymmetric key.
->   * @params: Various parameters.
->   * @info: Where to put the information.
->   */
-> diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-> index c233f136fb35..668f5c9f0b54 100644
-> --- a/crypto/asymmetric_keys/x509_parser.h
-> +++ b/crypto/asymmetric_keys/x509_parser.h
-> @@ -22,7 +22,7 @@ struct x509_certificate {
->  	time64_t	valid_to;
->  	const void	*tbs;			/* Signed data */
->  	unsigned	tbs_size;		/* Size of signed data */
-> -	unsigned	raw_sig_size;		/* Size of sigature */
-> +	unsigned	raw_sig_size;		/* Size of signature */
->  	const void	*raw_sig;		/* Signature data */
->  	const void	*raw_serial;		/* Raw serial number in ASN.1 */
->  	unsigned	raw_serial_size;
-> diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-> index d8a91521144e..1a3855284091 100644
-> --- a/crypto/async_tx/async_xor.c
-> +++ b/crypto/async_tx/async_xor.c
-> @@ -170,8 +170,8 @@ dma_xor_aligned_offsets(struct dma_device *device, unsigned int offset,
->   *
->   * xor_blocks always uses the dest as a source so the
->   * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
-> - * the calculation.  The assumption with dma eninges is that they only
-> - * use the destination buffer as a source when it is explicity specified
-> + * the calculation.  The assumption with dma engines is that they only
-> + * use the destination buffer as a source when it is explicitly specified
->   * in the source list.
->   *
->   * src_list note: if the dest is also a source it must be at index zero.
-> @@ -261,8 +261,8 @@ EXPORT_SYMBOL_GPL(async_xor_offs);
->   *
->   * xor_blocks always uses the dest as a source so the
->   * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
-> - * the calculation.  The assumption with dma eninges is that they only
-> - * use the destination buffer as a source when it is explicity specified
-> + * the calculation.  The assumption with dma engines is that they only
-> + * use the destination buffer as a source when it is explicitly specified
->   * in the source list.
->   *
->   * src_list note: if the dest is also a source it must be at index zero.
-> diff --git a/crypto/async_tx/raid6test.c b/crypto/async_tx/raid6test.c
-> index 66db82e5a3b1..c9d218e53bcb 100644
-> --- a/crypto/async_tx/raid6test.c
-> +++ b/crypto/async_tx/raid6test.c
-> @@ -217,7 +217,7 @@ static int raid6_test(void)
->  		err += test(12, &tests);
->  	}
->  
-> -	/* the 24 disk case is special for ioatdma as it is the boudary point
-> +	/* the 24 disk case is special for ioatdma as it is the boundary point
->  	 * at which it needs to switch from 8-source ops to 16-source
->  	 * ops for continuation (assumes DMA_HAS_PQ_CONTINUE is not set)
->  	 */
-> @@ -241,7 +241,7 @@ static void raid6_test_exit(void)
->  }
->  
->  /* when compiled-in wait for drivers to load first (assumes dma drivers
-> - * are also compliled-in)
-> + * are also compiled-in)
->   */
->  late_initcall(raid6_test);
->  module_exit(raid6_test_exit);
-> diff --git a/crypto/cfb.c b/crypto/cfb.c
-> index 0d664dfb47bc..5c36b7b65e2a 100644
-> --- a/crypto/cfb.c
-> +++ b/crypto/cfb.c
-> @@ -1,4 +1,4 @@
-> -//SPDX-License-Identifier: GPL-2.0
-> +// SPDX-License-Identifier: GPL-2.0
->  /*
->   * CFB: Cipher FeedBack mode
->   *
-> diff --git a/crypto/dh.c b/crypto/dh.c
-> index 27e62a2a8027..be3138636726 100644
-> --- a/crypto/dh.c
-> +++ b/crypto/dh.c
-> @@ -104,7 +104,7 @@ static int dh_set_secret(struct crypto_kpp *tfm, const void *buf,
->  /*
->   * SP800-56A public key verification:
->   *
-> - * * If Q is provided as part of the domain paramenters, a full validation
-> + * * If Q is provided as part of the domain parameters, a full validation
->   *   according to SP800-56A section 5.6.2.3.1 is performed.
->   *
->   * * If Q is not provided, a partial validation according to SP800-56A section
-> diff --git a/crypto/sm2.c b/crypto/sm2.c
-> index ae3f77a66070..f3e1592965c0 100644
-> --- a/crypto/sm2.c
-> +++ b/crypto/sm2.c
-> @@ -1,4 +1,4 @@
-> -/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * SM2 asymmetric public-key algorithm
->   * as specified by OSCCA GM/T 0003.1-2012 -- 0003.5-2012 SM2 and
-> -- 
-> 2.26.3
+> This is sanity tested on a HiSilicon platform using the Qemu branch
+> provided here[1].
 > 
+> Please take a look and let me know your feedback.
+> 
+> Thanks,
+> Shameer
+> [0] https://lore.kernel.org/kvm/20220220095716.153757-1-yishaih@nvidia.com/
+> [1] https://github.com/jgunthorpe/qemu/commits/vfio_migration_v2
+> 
+> 
+> v3 --> RFCv4
+> -Based on migration v2 protocol and mlx5 v7 series.
+> -Added RFC tag again as migration v2 protocol is still under discussion.
+> -Added new patch #6 to retrieve the PF QM data.
+> -PRE_COPY compatibility check is now done after the migration data
+>  transfer. This is not ideal and needs discussion.
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Alex, do you want to keep the PRE_COPY in just for acc for now? Or do
+you think this is not a good temporary use for it?
 
-BR, Jarkko
+We have some work toward doing the compatability more generally, but I
+think it will be a while before that is all settled.
+
+Jason
