@@ -2,62 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4F4C4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 08:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D869C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 08:46:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbiBVIqA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Feb 2022 03:46:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
+        id S229842AbiBVIrV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Feb 2022 03:47:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbiBVIp7 (ORCPT
+        with ESMTP id S229718AbiBVIrU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Feb 2022 03:45:59 -0500
+        Tue, 22 Feb 2022 03:47:20 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E95159298;
-        Tue, 22 Feb 2022 00:45:34 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9504CD53;
+        Tue, 22 Feb 2022 00:46:55 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id BE08D68B05; Tue, 22 Feb 2022 09:45:30 +0100 (CET)
-Date:   Tue, 22 Feb 2022 09:45:30 +0100
+        id B8BE368AA6; Tue, 22 Feb 2022 09:46:52 +0100 (CET)
+Date:   Tue, 22 Feb 2022 09:46:52 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Baoquan He <bhe@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, akpm@linux-foundation.org, cl@linux.com,
-        42.hyeyoo@gmail.com, penberg@kernel.org, rientjes@google.com,
-        iamjoonsoo.kim@lge.com, vbabka@suse.cz, David.Laight@aculab.com,
-        david@redhat.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Baoquan He <bhe@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, iamjoonsoo.kim@lge.com, vbabka@suse.cz,
+        David.Laight@aculab.com, david@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
         netdev@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
         agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
         svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
         linux-i2c@vger.kernel.org, wsa@kernel.org
-Subject: Re: [PATCH 21/22] mmc: wbsd: Use dma_alloc_noncoherent() for dma
- buffer
-Message-ID: <20220222084530.GA6210@lst.de>
-References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-22-bhe@redhat.com> <20220219071730.GG26711@lst.de> <20220220084044.GC93179@MiWiFi-R3L-srv>
+Subject: Re: [PATCH 22/22] mtd: rawnand: Use dma_alloc_noncoherent() for
+ dma buffer
+Message-ID: <20220222084652.GB6210@lst.de>
+References: <20220219005221.634-1-bhe@redhat.com> <20220219005221.634-23-bhe@redhat.com> <20220219071900.GH26711@lst.de> <YhDSAJG+LksZSnLP@ip-172-31-19-208.ap-northeast-1.compute.internal>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220220084044.GC93179@MiWiFi-R3L-srv>
+In-Reply-To: <YhDSAJG+LksZSnLP@ip-172-31-19-208.ap-northeast-1.compute.internal>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 20, 2022 at 04:40:44PM +0800, Baoquan He wrote:
-> On 02/19/22 at 08:17am, Christoph Hellwig wrote:
-> > On Sat, Feb 19, 2022 at 08:52:20AM +0800, Baoquan He wrote:
-> > >  	if (request_dma(dma, DRIVER_NAME))
-> > >  		goto err;
-> > >  
-> > > +	dma_set_mask_and_coherent(mmc_dev(host->mmc), DMA_BIT_MASK(24));
-> > 
-> > This also sets the streaming mask, but the driver doesn't seem to make
-> > use of that.  Please document it in the commit log.
+On Sat, Feb 19, 2022 at 11:18:24AM +0000, Hyeonggon Yoo wrote:
+> > I think it would be better to still allocate the buffer at allocation
+> > time and then just transfer ownership using dma_sync_single* in the I/O
+> > path to avoid the GFP_ATOMIC allocation.
 > 
-> Thanks for reviewing. I will change it to dma_set_mask(), and describe
-> this change in patch log.
+> This driver allocates the buffer at initialization step and maps the buffer
+> for DMA_TO_DEVICE and DMA_FROM_DEVICE when processing IO.
+> 
+> But after making this driver to use dma_alloc_noncoherent(), remapping
+> dma_alloc_noncoherent()-ed buffer is strange So I just made it to allocate
+> the buffer in IO path.
 
-No, if you change it, it should be dma_set_coherent_mask only as it is
-not using streaming mappings.  I suspect dma_set_mask_and_coherent is
-the right thing if the driver ever wants to use streaming mapping,
-it would just need to be documented in the commit message.
+You should not remap it.  Just use dma_sync_single* to transfer ownership.
+
+> Hmm.. for this specific case, What about allocating two buffers
+> for DMA_TO_DEVICE and DMA_FROM_DEVICE at initialization time?
+
+That will work, but I don't see the benefit as you'd still need to call
+dma_sync_single* before and after each data transfer.
