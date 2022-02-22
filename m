@@ -2,105 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1982AC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 20:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E0BC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 20:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235401AbiBVUHL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Feb 2022 15:07:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55420 "EHLO
+        id S235398AbiBVUJi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Feb 2022 15:09:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235396AbiBVUHK (ORCPT
+        with ESMTP id S235138AbiBVUJh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Feb 2022 15:07:10 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA58A41BD;
-        Tue, 22 Feb 2022 12:06:44 -0800 (PST)
+        Tue, 22 Feb 2022 15:09:37 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441DCBECE2;
+        Tue, 22 Feb 2022 12:09:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0499DB81C5F;
-        Tue, 22 Feb 2022 20:06:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56812C340E8;
-        Tue, 22 Feb 2022 20:06:41 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D5739616A5;
+        Tue, 22 Feb 2022 20:09:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88B59C340E8;
+        Tue, 22 Feb 2022 20:09:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645560401;
-        bh=uI0Fg70JQsRjF8A280UxeWyrTx+BSIhEvWBXFTuCqvc=;
+        s=k20201202; t=1645560550;
+        bh=1RpeK2ezkeXvyqdfTt2Tyf6eIBlrvYVjmKs7rO0ojdo=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oV94Lm4dBzwnapWO4YqkF1+FiDKUOgNPNsAaPRtqEp7aUERF9fx5An9GvUGCIbjdO
-         ml75/8hKPJIpMkKR/BBixoM9MlWszX9BQJEKLvkbdOzd5Y/MFnIaVoZs8X+7cHzmIR
-         KVog4RCIGsRxnnU5t+0SXRfTXag3ZmA4C7G2mVIhYTQtQpmD8Fi2lnPAPAjGORG1/H
-         NXOsNZ6yLBw/2p5WTdH9a/+NLBV7UFhzavqHlsVPAk3ftgHAe79bNPhSvhWaqizg+P
-         i+q/0tgKBideH8K1N+4kBi0MLYEDFCy0cUuJC5JX6ZbkLDR4FOp4iDlw0bKrCJ4VBZ
-         EIzYowpTp8JVA==
-Date:   Tue, 22 Feb 2022 12:06:39 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     David Laight <David.Laight@aculab.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "colyli@suse.de" <colyli@suse.de>
-Subject: Re: [PATCHv3 10/10] x86/crypto: add pclmul acceleration for crc64
-Message-ID: <YhVCTzUOUHZnze4x@sol.localdomain>
+        b=kX1+BSiIzoCC7MPwCqygUVYJjYjCGP8r0uNbfIvHrEUClkW1piWFY0f6WZWt/CKnC
+         JMhyXgFkSIr4Wqa/2F+eN6U1ZhpPp8qhzTr4/djfi8ayJprxTYDMxvyXHbj37008Sp
+         CCiY+w24npvSlnH9uitpVrv76+EUJbJgG130TtVndHZCfTHUOQSMesvAH2Ipw5qw1z
+         wq3MxQKizauoTcEZtY0Q9ZhCOAkjDy/Wfd4XhtkRQH7yVPT6D/Qc0UnlFcsYpokyFW
+         ESFioc5kDB+DFV9dR1MblY51KCMUdRQ+vUUPzTu0Wi5TViO/O6bZ/mpLm1PlS5bkuq
+         yXu4fBMHR5igQ==
+Date:   Tue, 22 Feb 2022 12:09:07 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        martin.petersen@oracle.com, colyli@suse.de
+Subject: Re: [PATCHv3 06/10] crypto: add rocksoft 64b crc framework
+Message-ID: <20220222200907.GA1782741@dhcp-10-100-145-180.wdc.com>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
- <20220222163144.1782447-11-kbusch@kernel.org>
- <a7e806ed3c074534a24b74f827bcc914@AcuMS.aculab.com>
- <20220222171405.GA1782521@dhcp-10-100-145-180.wdc.com>
+ <20220222163144.1782447-7-kbusch@kernel.org>
+ <YhU+kuMhueXVQvxe@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220222171405.GA1782521@dhcp-10-100-145-180.wdc.com>
+In-Reply-To: <YhU+kuMhueXVQvxe@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 09:14:05AM -0800, Keith Busch wrote:
-> On Tue, Feb 22, 2022 at 05:02:16PM +0000, David Laight wrote:
-> > From: Keith Busch
-> > > Sent: 22 February 2022 16:32
-> > > 
-> > > The crc64 table lookup method is inefficient, using a significant number
-> > > of CPU cycles in the block stack per IO. If available on x86, use a
-> > > PCLMULQDQ implementation to accelerate the calculation.
-> > > 
-> > > The assembly from this patch was mostly generated by gcc from a C
-> > > program using library functions provided by x86 intrinsics, and measures
-> > > ~20x faster than the table lookup.
-> > 
-> > I think I'd like to see the C code and compiler options used to
-> > generate the assembler as comments in the committed source file.
-> > Either that or reasonable comments in the assembler.
+On Tue, Feb 22, 2022 at 11:50:42AM -0800, Eric Biggers wrote:
+> On Tue, Feb 22, 2022 at 08:31:40AM -0800, Keith Busch wrote:
+> > +config CRYPTO_CRC64_ROCKSOFT
+> > +	tristate "Rocksoft Model CRC64 algorithm"
+> > +	depends on CRC64
+> > +	select CRYPTO_HASH
+> > +	help
+> > +	  Rocksoft Model CRC64 computation is being cast as a crypto
+> > +	  transform. This allows for faster crc64 transforms to be used
+> > +	  if they are available.
 > 
-> The C code, compiled as "gcc -O3 -msse4 -mpclmul -S", was adapted from
-> this found on the internet:
-> 
->   https://github.com/rawrunprotected/crc/blob/master/crc64.c
-> 
-> I just ported it to linux, changed the poly parameters and removed the
-> unnecessary stuff. 
->  
-> I'm okay with dropping this patch from the series for now since I don't
-> think I'm qualified to write it. :) I just needed something to test the
-> crytpo module registration.
+> The first sentence of this help text doesn't make sense.
 
-Is the license of that code compatible with the kernel's license?
-
-In any case, adding uncommented generated assembly isn't acceptable.  The most
-common convention for Linux kernel crypto is to use hand-written assembly that
-is properly commented.
-
-There is some precedent for using compiler intrinsics instead, e.g.
-crypto/aegis128-neon-inner.c.  (I'm not sure why they aren't used more often.)
-
-There are also some files where a Perl script generates the assembly code.
-(This is a bit ugly IMO, but it's what the author of much of OpenSSL's crypto
-assembly code does, and it was desired to reuse that code.)
-
-Anyway, those are the available options.  Checking in some uncommented generated
-assembly isn't one of them.
-
-- Eric
+Much of the this patch is a copy from the equivalent T10DIF option,
+which says the same as above. I meant to revist these help texts because
+they don't make sense to me either. I'll be sure to do that for the next
+version.
