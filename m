@@ -2,75 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C729C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 16:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AB0C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Feb 2022 16:56:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234384AbiBVQy3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Feb 2022 11:54:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
+        id S233941AbiBVQ4o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Feb 2022 11:56:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232223AbiBVQy3 (ORCPT
+        with ESMTP id S230519AbiBVQ4n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Feb 2022 11:54:29 -0500
-X-Greylist: delayed 485 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Feb 2022 08:54:03 PST
-Received: from relay4.hostedemail.com (relay4.hostedemail.com [64.99.140.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A565370D
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Feb 2022 08:54:03 -0800 (PST)
-Received: from omf18.hostedemail.com (a10.router.float.18 [10.200.18.1])
-        by unirelay10.hostedemail.com (Postfix) with ESMTP id 784C8A5A;
-        Tue, 22 Feb 2022 16:45:56 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf18.hostedemail.com (Postfix) with ESMTPA id 396B643;
-        Tue, 22 Feb 2022 16:45:34 +0000 (UTC)
-Message-ID: <66a0c8210cf9e7dfcc3fa2d247de1eebd5a8acb7.camel@perches.com>
-Subject: Re: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
-From:   Joe Perches <joe@perches.com>
-To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
+        Tue, 22 Feb 2022 11:56:43 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D66616BF8C;
+        Tue, 22 Feb 2022 08:56:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2A187B81B7C;
+        Tue, 22 Feb 2022 16:56:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AEC3C340F1;
+        Tue, 22 Feb 2022 16:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645548975;
+        bh=XMbNZ4Yp3pB5CJy39MFuU7DbDGAoq3fnEia6T+9MnuE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hHZa6HWm+aag/twDn8vXkbA3dW4OCEZh7yQ/XwHoIWj/Srx/UQcevPHhwAukvOxDJ
+         mBlnC2442ILKmdamqHIfIUyU6/oW+K2HWJKOYtUQpUe7ZDiCtMODNt+o6LspCMxnbU
+         Jm5N0YkFuFoVEu+u5A4IEETNv7F2AxIg4sXnkGuPpywcKZewYHf9r6mrGJLfhrKgzq
+         UuE9+yCTjGM2RbRReFJLQ9mu9qyBC9c0N77xeb06xg4ezId+2Hk+CPehprGB678O31
+         4/Lv+MkxKo9pEpgdGult5zkQj3XAQnXoGmSVaEdz9x2wzp0shXBRalF66xuy5qb7Wv
+         kZlbQ8b5DsEYQ==
+Date:   Tue, 22 Feb 2022 08:56:13 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Joe Perches <joe@perches.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        colyli@suse.de, Bart Van Assche <bvanassche@acm.org>
-Date:   Tue, 22 Feb 2022 08:45:53 -0800
-In-Reply-To: <20220222163144.1782447-5-kbusch@kernel.org>
+        x86@kernel.org, linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, colyli@suse.de,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCHv3 04/10] linux/kernel: introduce lower_48_bits macro
+Message-ID: <20220222165613.GB1497257@dhcp-10-100-145-180.wdc.com>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
-         <20220222163144.1782447-5-kbusch@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+ <20220222163144.1782447-5-kbusch@kernel.org>
+ <66a0c8210cf9e7dfcc3fa2d247de1eebd5a8acb7.camel@perches.com>
+ <20220222165045.GA14168@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Server: rspamout08
-X-Rspamd-Queue-Id: 396B643
-X-Stat-Signature: yzf67mxeguumtukwkfw7sqsufuzga6du
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1+NisYWVxViQyJRvI3jjilg5uVaEbHyZ28=
-X-HE-Tag: 1645548334-553202
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220222165045.GA14168@lst.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2022-02-22 at 08:31 -0800, Keith Busch wrote:
-> Recent data integrity field enhancements allow 48-bit reference tags.
-> Introduce a helper macro since this will be a repeated operation.
-[]
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-[]
-> @@ -63,6 +63,12 @@
->  }					\
->  )
->  
-> +/**
-> + * lower_48_bits - return bits 0-47 of a number
-> + * @n: the number we're accessing
-> + */
-> +#define lower_48_bits(n) ((u64)((n) & 0xffffffffffffull))
+On Tue, Feb 22, 2022 at 05:50:45PM +0100, Christoph Hellwig wrote:
+> On Tue, Feb 22, 2022 at 08:45:53AM -0800, Joe Perches wrote:
+> > On Tue, 2022-02-22 at 08:31 -0800, Keith Busch wrote:
+> > > +/**
+> > > + * lower_48_bits - return bits 0-47 of a number
+> > > + * @n: the number we're accessing
+> > > + */
+> > > +#define lower_48_bits(n) ((u64)((n) & 0xffffffffffffull))
+> > 
+> > why not make this a static inline function?
+> 
+> Agreed.
 
-why not make this a static inline function?
-And visually, it's difficult to quickly count a repeated character to 12.
-
-Perhaps:
-
-static inline u64 lower_48_bits(u64 val)
-{
-	return val & GENMASK_ULL(47, 0);
-}
-
-
+Sure, that sounds good to me. I only did it this way to match the
+existing local convention, but I personally prefer the inline function
+too. 
