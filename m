@@ -2,263 +2,172 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE435C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 13:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD1CC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 13:15:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240797AbiBWNNf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 08:13:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35996 "EHLO
+        id S240803AbiBWNP0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 08:15:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240779AbiBWNNe (ORCPT
+        with ESMTP id S240811AbiBWNPZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 08:13:34 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D5AA9A61;
-        Wed, 23 Feb 2022 05:13:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 23 Feb 2022 08:15:25 -0500
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC79A9E3C
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 05:14:56 -0800 (PST)
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C63FAB81FA1;
-        Wed, 23 Feb 2022 13:13:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8155C340E7;
-        Wed, 23 Feb 2022 13:12:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kP/TNLRo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645621979;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lgLtq+lfYFesl4+M3nDQfreFYpTzpLlZU30SsFv1B9I=;
-        b=kP/TNLRoQCYE16+kAQxyXUKZW27z79tNX+j9khdmnW/pHUrLp5TsQg+Sst5dY0RUvma5Mv
-        bQflcE8AP3p/qcnEe0Ytn5tTaN6qKbYLfiX7li7x4NV/wK5zU/k/H2vnZMaPw50Tc8hoNc
-        F6CVnKlFZJXSeHIRZPpAohvSylF0vbk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 25ac14b1 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 23 Feb 2022 13:12:58 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, adrian@parity.io
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, dwmw@amazon.co.uk,
-        acatan@amazon.com, graf@amazon.com, colmmacc@amazon.com,
-        sblbir@amazon.com, raduweis@amazon.com, jannh@google.com,
-        gregkh@linuxfoundation.org, tytso@mit.edu
-Subject: [PATCH RFC v1 2/2] drivers/virt: add vmgenid driver for reinitializing RNG
-Date:   Wed, 23 Feb 2022 14:12:31 +0100
-Message-Id: <20220223131231.403386-3-Jason@zx2c4.com>
-In-Reply-To: <20220223131231.403386-1-Jason@zx2c4.com>
-References: <20220223131231.403386-1-Jason@zx2c4.com>
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 2AE14405D7
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 13:14:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1645622095;
+        bh=luA2pGmBUiuoHCIdDEpQqIZrDzzhrlzhl8j+UonA2Ac=;
+        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+         In-Reply-To:Content-Type;
+        b=mW66cIedSAsuDjnUgGaNyqbdPCSTZuJdByBbh9V/bzHVbU0KWAJq/FqywIBT3gLBA
+         A+waDQZWEO8OWvlVWm6cKTm7DX/2BeArZAf9hsDdzAS10qJ7qwcAUsfNp8gwduwE9x
+         9qT75kNsh/1LAbv9fVgf/NjX1/KKiA5h7EWvyRO0Fw8sQl7Kj8/k3Duy2PcqAHZW7C
+         SO5QWEprYJo5Ixl2XAhk/bHZcMwRqVhvG4WuWBKbBUf0i8THRtk9ZHafIElimJz3I+
+         MObd4AGfRhTyCMBp8nHGIYwsFj2SFeOG3eX6/5UZB69R5pONa8Oqhpo1IiSgPjHwTP
+         PsM1mmtM/Wp2w==
+Received: by mail-ej1-f71.google.com with SMTP id i20-20020a17090671d400b006d0ed9c68c1so3816757ejk.14
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 05:14:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=luA2pGmBUiuoHCIdDEpQqIZrDzzhrlzhl8j+UonA2Ac=;
+        b=QkV/ZapXTAozNlpqF0DbWONPmn6ObYuZKTlvw6walvAyGdUX82tD19ZAyJBXokJNee
+         P4q1LBuu0+ppaEiB8xfti/nCFeQiftrq4x7zYhmyJAQkY32Q99Shm2Jla3HFVDE2Yk81
+         y+B/5Rv40662O/JeRUPS8XYUE0yJ8rtcpKwXIHPGOac+4MYNPdE8JthilIyHvnywEvzv
+         buehT1rUVj7Vs355on/Y/URn5+5zRwVSRd9He+Ze8LiMzS6O1p8sWVAxi2BBjEuQCh4W
+         Fya0UbWoCK+b/66pxxvCLNgD0QNPATactBubGcWQ9yhYF7G1Y/Xz3D0+K3+K3GvrEHHG
+         aFhQ==
+X-Gm-Message-State: AOAM532yG5WqCXIhLx6eCbsRXQw1mROY8KxX4MTa1f/N8AuxQoHEZrEU
+        zvR8abtP55IKK9UUG7KLBoT/Qf2nxbK4H1efuW8AJizDyhvDEeS2KYN3z1qGCE5zJNYP656crwe
+        UPXZsoZx8+/qeQ9IyO745Qu0FBcM6kOqhPHAFHcnp9g==
+X-Received: by 2002:a17:906:af79:b0:6ce:61d3:7e9b with SMTP id os25-20020a170906af7900b006ce61d37e9bmr23250133ejb.191.1645622094743;
+        Wed, 23 Feb 2022 05:14:54 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzPXOdScuO9l5oh+CHacL1L0JeFIZjGDBcMotv+/pc0BsZ6IXhLfsZQvcbVqSbjklwZ5f51Fg==
+X-Received: by 2002:a17:906:af79:b0:6ce:61d3:7e9b with SMTP id os25-20020a170906af7900b006ce61d37e9bmr23249825ejb.191.1645622089612;
+        Wed, 23 Feb 2022 05:14:49 -0800 (PST)
+Received: from [192.168.0.125] (xdsl-188-155-181-108.adslplus.ch. [188.155.181.108])
+        by smtp.gmail.com with ESMTPSA id z13sm603406edb.54.2022.02.23.05.14.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Feb 2022 05:14:49 -0800 (PST)
+Message-ID: <99c673e7-09ea-ce0f-f8b7-b03ca35e8740@canonical.com>
+Date:   Wed, 23 Feb 2022 14:14:48 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v3] dt-bindings: crypto: convert rockchip-crypto to yaml
+Content-Language: en-US
+To:     LABBE Corentin <clabbe@baylibre.com>,
+        Johan Jonker <jbx6244@gmail.com>
+Cc:     heiko@sntech.de, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        robh+dt@kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net
+References: <20220211115925.3382735-1-clabbe@baylibre.com>
+ <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com> <YhYxLmBYa+DMCnuz@Red>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+In-Reply-To: <YhYxLmBYa+DMCnuz@Red>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-VM Generation ID is a feature from Microsoft, described at
-<https://go.microsoft.com/fwlink/?LinkId=260709>, and supported by
-Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
-<https://aka.ms/win10rng>, as:
+On 23/02/2022 14:05, LABBE Corentin wrote:
+> Le Tue, Feb 15, 2022 at 03:07:56PM +0100, Johan Jonker a écrit :
+>> Hi Heiko,
+>>
+>> On 2/11/22 12:59, Corentin Labbe wrote:
+>>> Convert rockchip-crypto to yaml
+>>>
+>>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+>>> ---
+>>> Changes since v1:
+>>> - fixed example
+>>> - renamed to a new name
+>>> - fixed some maxItems
+>>>
+>>> Change since v2:
+>>> - Fixed maintainers section
+>>>
+>>>  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
+>>>  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
+>>>  2 files changed, 66 insertions(+), 28 deletions(-)
+>>>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+>>
+>> rockchip,crypto.yaml
+> 
+> 
+> Hello
+> 
+> DT maintainer asked for rockchip,rk3288-crypto, so I will keep it.
 
-    If the OS is running in a VM, there is a problem that most
-    hypervisors can snapshot the state of the machine and later rewind
-    the VM state to the saved state. This results in the machine running
-    a second time with the exact same RNG state, which leads to serious
-    security problems.  To reduce the window of vulnerability, Windows
-    10 on a Hyper-V VM will detect when the VM state is reset, retrieve
-    a unique (not random) value from the hypervisor, and reseed the root
-    RNG with that unique value.  This does not eliminate the
-    vulnerability, but it greatly reduces the time during which the RNG
-    system will produce the same outputs as it did during a previous
-    instantiation of the same VM state.
+I don't insist on keeping rk32880crypto name. It depends whether the
+bindings are for a family of devices or rather specific one or few
+devices. Based on comments here, it is quite possible that all Rockchip
+crypto blocks will fit into this bindings, so the name could be generic.
 
-Linux has the same issue, and given that vmgenid is supported already by
-multiple hypervisors, we can implement more or less the same solution.
-So this commit wires up the vmgenid ACPI notification to the RNG's newly
-added add_vmfork_randomness() function.
+Having a specific name, even if it contains multiple devices, is also fine.
 
-This driver builds on prior work from Adrian Catangiu at Amazon, and it
-is my hope that that team can resume maintenance of this driver.
+What I would prefer to avoid is to have a generic name
+"rockchip,crypto.yaml" and then in two months one more generic
+"rockchip,crypto2.yaml", and then add third...
 
-Cc: Adrian Catangiu <adrian@parity.io>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/virt/Kconfig   |   8 +++
- drivers/virt/Makefile  |   1 +
- drivers/virt/vmgenid.c | 133 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 142 insertions(+)
- create mode 100644 drivers/virt/vmgenid.c
+> 
+>>
+>>>  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+>>> new file mode 100644
+>>> index 000000000000..2e1e9fa711c4
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+>>> @@ -0,0 +1,66 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
+>>
+>> rockchip,crypto.yaml
+>>
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Rockchip Electronics And Security Accelerator
+>>> +
+>>> +maintainers:
+>>> +  - Heiko Stuebner <heiko@sntech.de>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>
+>>     oneOf:
+>>       - const: rockchip,rk3288-crypto
+>>       - items:
+>>           - enum:
+>>               - rockchip,rk3228-crypto
+>>               - rockchip,rk3328-crypto
+>>               - rockchip,rk3368-crypto
+>>               - rockchip,rk3399-crypto
+>>           - const: rockchip,rk3288-crypto
+>>
+>> rk3288 was the first in line that had support, so we use that as fall
+>> back string.
+> 
+> I will dont add compatible which are not handled by the driver unless DT maintainer said I should.
 
-diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
-index 8061e8ef449f..e7f9c1bca02b 100644
---- a/drivers/virt/Kconfig
-+++ b/drivers/virt/Kconfig
-@@ -13,6 +13,14 @@ menuconfig VIRT_DRIVERS
- 
- if VIRT_DRIVERS
- 
-+config VMGENID
-+	bool "Virtual Machine Generation ID driver"
-+	default y
-+	depends on ACPI
-+	help
-+	  Say Y here to use the hypervisor provided Virtual Machine Generation ID
-+	  to reseed the RNG when the VM is cloned.
-+
- config FSL_HV_MANAGER
- 	tristate "Freescale hypervisor management driver"
- 	depends on FSL_SOC
-diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
-index 3e272ea60cd9..108d0ffcc9aa 100644
---- a/drivers/virt/Makefile
-+++ b/drivers/virt/Makefile
-@@ -4,6 +4,7 @@
- #
- 
- obj-$(CONFIG_FSL_HV_MANAGER)	+= fsl_hypervisor.o
-+obj-$(CONFIG_VMGENID)		+= vmgenid.o
- obj-y				+= vboxguest/
- 
- obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
-diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-new file mode 100644
-index 000000000000..11ed7f668bb1
---- /dev/null
-+++ b/drivers/virt/vmgenid.c
-@@ -0,0 +1,133 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Virtual Machine Generation ID driver
-+ *
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ * Copyright (C) 2020 Amazon. All rights reserved.
-+ * Copyright (C) 2018 Red Hat Inc. All rights reserved.
-+ */
-+
-+#define pr_fmt(fmt) "vmgenid: " fmt
-+
-+#include <linux/acpi.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/random.h>
-+#include <linux/uuid.h>
-+
-+#define DEV_NAME "vmgenid"
-+ACPI_MODULE_NAME(DEV_NAME);
-+
-+static struct {
-+	uuid_t uuid;
-+	void *uuid_iomap;
-+} vmgenid_data;
-+
-+static int vmgenid_acpi_map(acpi_handle handle)
-+{
-+	phys_addr_t phys_addr = 0;
-+	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
-+	acpi_status status;
-+	union acpi_object *pss;
-+	union acpi_object *element;
-+	int i;
-+
-+	status = acpi_evaluate_object(handle, "ADDR", NULL, &buffer);
-+	if (ACPI_FAILURE(status)) {
-+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating ADDR"));
-+		return -ENODEV;
-+	}
-+	pss = buffer.pointer;
-+	if (!pss || pss->type != ACPI_TYPE_PACKAGE || pss->package.count != 2)
-+		return -EINVAL;
-+
-+	for (i = 0; i < pss->package.count; ++i) {
-+		element = &pss->package.elements[i];
-+		if (element->type != ACPI_TYPE_INTEGER)
-+			return -EINVAL;
-+		phys_addr |= element->integer.value << i * 32;
-+	}
-+
-+	vmgenid_data.uuid_iomap = acpi_os_map_memory(phys_addr, sizeof(vmgenid_data.uuid));
-+	if (!vmgenid_data.uuid_iomap) {
-+		pr_err("failed to map memory at %pa, size %zu\n",
-+			&phys_addr, sizeof(vmgenid_data.uuid));
-+		return -ENOMEM;
-+	}
-+
-+	memcpy_fromio(&vmgenid_data.uuid, vmgenid_data.uuid_iomap, sizeof(vmgenid_data.uuid));
-+
-+	return 0;
-+}
-+
-+static int vmgenid_acpi_add(struct acpi_device *device)
-+{
-+	int ret;
-+
-+	if (!device)
-+		return -EINVAL;
-+	ret = vmgenid_acpi_map(device->handle);
-+	if (ret < 0) {
-+		pr_err("failed to map acpi device: %d\n", ret);
-+		return ret;
-+	}
-+	device->driver_data = &vmgenid_data;
-+	add_device_randomness(&vmgenid_data.uuid, sizeof(vmgenid_data.uuid));
-+	return 0;
-+}
-+
-+static int vmgenid_acpi_remove(struct acpi_device *device)
-+{
-+	if (!device || acpi_driver_data(device) != &vmgenid_data)
-+		return -EINVAL;
-+	device->driver_data = NULL;
-+	if (vmgenid_data.uuid_iomap)
-+		acpi_os_unmap_memory(vmgenid_data.uuid_iomap, sizeof(vmgenid_data.uuid));
-+	vmgenid_data.uuid_iomap = NULL;
-+	return 0;
-+}
-+
-+static void vmgenid_acpi_notify(struct acpi_device *device, u32 event)
-+{
-+	uuid_t old_uuid = vmgenid_data.uuid;
-+
-+	if (!device || acpi_driver_data(device) != &vmgenid_data)
-+		return;
-+	memcpy_fromio(&vmgenid_data.uuid, vmgenid_data.uuid_iomap, sizeof(vmgenid_data.uuid));
-+	if (!memcmp(&old_uuid, &vmgenid_data.uuid, sizeof(vmgenid_data.uuid)))
-+		return;
-+	add_vmfork_randomness(&vmgenid_data.uuid, sizeof(vmgenid_data.uuid));
-+}
-+
-+static const struct acpi_device_id vmgenid_ids[] = {
-+	{"VMGENID", 0},
-+	{"QEMUVGID", 0},
-+	{"", 0},
-+};
-+
-+static struct acpi_driver acpi_vmgenid_driver = {
-+	.name = "vm_generation_id",
-+	.ids = vmgenid_ids,
-+	.owner = THIS_MODULE,
-+	.ops = {
-+		.add = vmgenid_acpi_add,
-+		.remove = vmgenid_acpi_remove,
-+		.notify = vmgenid_acpi_notify,
-+	}
-+};
-+
-+static int __init vmgenid_init(void)
-+{
-+	return acpi_bus_register_driver(&acpi_vmgenid_driver);
-+}
-+
-+static void __exit vmgenid_exit(void)
-+{
-+	acpi_bus_unregister_driver(&acpi_vmgenid_driver);
-+}
-+
-+module_init(vmgenid_init);
-+module_exit(vmgenid_exit);
-+
-+MODULE_DESCRIPTION("Virtual Machine Generation ID");
-+MODULE_LICENSE("GPL");
--- 
-2.35.1
+They could be added for completeness because bindings describe rather
+hardware, not Linux driver state, but there is no such must. It can also
+be added later by another contributor.
 
+
+Best regards,
+Krzysztof
