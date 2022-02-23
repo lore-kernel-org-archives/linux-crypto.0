@@ -2,114 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D95C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 16:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E9AC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 16:38:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235928AbiBWQhQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 11:37:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48458 "EHLO
+        id S231926AbiBWQi7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 11:38:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239792AbiBWQhO (ORCPT
+        with ESMTP id S242969AbiBWQiy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 11:37:14 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1603D48B;
-        Wed, 23 Feb 2022 08:36:46 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1168AB81EB0;
-        Wed, 23 Feb 2022 16:36:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D506C340F0;
-        Wed, 23 Feb 2022 16:36:43 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dBbUnj8Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645634199;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bHA9wsYJ+CM1DPnmNfQ6U6t4ARYsrAUZwd944SZ1sxQ=;
-        b=dBbUnj8Ql1rn7FAM9tUx7QOeccnJ0Z+J90QA2NRMB22oXGOrYQ4THPe1b9gNNNzuDc2Rbg
-        WFKaEvpmre/V326ePYzLARj899oTaO940Lp4D0jow0owG2+cfPO43/K8JgfsXjhbfX6w3C
-        pTSz8qk0fkkwt5cQUp8mR9mxmGFUdSM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 12a21bdc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 23 Feb 2022 16:36:39 +0000 (UTC)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2d07ae0b1c4so217495627b3.11;
-        Wed, 23 Feb 2022 08:36:36 -0800 (PST)
-X-Gm-Message-State: AOAM531ZzDp8T9MDua0yyllGNbHUpN0ZeGck1o7sIP1h4pYFj2M9G5Mx
-        sWaLNfG8d1sE/I1Oz64kjt2fk4WE/OsZ6f/VtJQ=
-X-Google-Smtp-Source: ABdhPJxStncU0YhKj17fIfB92poX/i/hhH2go/+XupHLqAIG9vQtznWxOa4DHx+xY4+pyQBawqCM+CsOCCrLmtJDEw8=
-X-Received: by 2002:a81:184c:0:b0:2d7:607f:4b00 with SMTP id
- 73-20020a81184c000000b002d7607f4b00mr423650ywy.499.1645634196037; Wed, 23 Feb
- 2022 08:36:36 -0800 (PST)
+        Wed, 23 Feb 2022 11:38:54 -0500
+Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB00C7E9C;
+        Wed, 23 Feb 2022 08:38:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1645634297; x=1677170297;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=z+NrxgTDITMoT3Rx2AO5jzVTn98+WKENiTVzqhfsXOE=;
+  b=jQ9ZMLm9WSLdJa5fLHuebMD088v0uK6zlKQQ+m5f0ES4Nhe3kQlYPlkB
+   hhLfRvcTNb/wsUNlBxN7vtMJw6tnk5HcNEbu4xLUXt2llrm4nIzuR//nI
+   Zkq8JSZTbuZ4z3PyGNP2xfczSlNppiObRQ96a7Jp15zPttFH1i5xD5FGS
+   vGwfR5/VOLGwvHcfKeCtzhHlsyMOYZPC1KvyuFvIGSD1TFs/4TxyiITB5
+   Js6zdfco94PeaE56hIwgFGuV9lKlnrnPtm3kj+B7LPLBcVInq6gyymy7t
+   q/fHjRvV7sul0o7gLFcjt1xma70l1gctYh/3hguLmv+20V18sPHOh7r50
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="312730696"
+X-IronPort-AV: E=Sophos;i="5.88,391,1635231600"; 
+   d="scan'208";a="312730696"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 08:26:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,391,1635231600"; 
+   d="scan'208";a="607109146"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga004.fm.intel.com with ESMTP; 23 Feb 2022 08:26:04 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 9BD343BC; Wed, 23 Feb 2022 18:26:21 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH v2 1/1] crypto: cavium/nitrox - don't cast parameter in bit operations
+Date:   Wed, 23 Feb 2022 18:26:20 +0200
+Message-Id: <20220223162620.44307-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20220223131231.403386-1-Jason@zx2c4.com> <20220223131231.403386-3-Jason@zx2c4.com>
-In-Reply-To: <20220223131231.403386-3-Jason@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Feb 2022 17:36:25 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oWUJr3fYKFOy=aRdd0uE8H8ke9o+KXde0zAnAwnWUPMA@mail.gmail.com>
-Message-ID: <CAHmME9oWUJr3fYKFOy=aRdd0uE8H8ke9o+KXde0zAnAwnWUPMA@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 2/2] drivers/virt: add vmgenid driver for
- reinitializing RNG
-To:     "K . Y . Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        linux-hyperv@vger.kernel.org
-Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>,
-        "Catangiu, Adrian Costin" <acatan@amazon.com>, graf@amazon.com,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Singh, Balbir" <sblbir@amazon.com>,
-        "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
-        KVM list <kvm@vger.kernel.org>, adrian@parity.io,
-        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        lersek@redhat.com, linux-s390@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adding the Hyper-V people to this:
+While in this particular case it would not be a (critical) issue,
+the pattern itself is bad and error prone in case the location
+of the parameter is changed.
 
-On Wed, Feb 23, 2022 at 2:13 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> VM Generation ID is a feature from Microsoft, described at
-> <https://go.microsoft.com/fwlink/?LinkId=260709>, and supported by
-> Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
-> <https://aka.ms/win10rng>, as:
->
->     If the OS is running in a VM, there is a problem that most
->     hypervisors can snapshot the state of the machine and later rewind
->     the VM state to the saved state. This results in the machine running
->     a second time with the exact same RNG state, which leads to serious
->     security problems.  To reduce the window of vulnerability, Windows
->     10 on a Hyper-V VM will detect when the VM state is reset, retrieve
->     a unique (not random) value from the hypervisor, and reseed the root
->     RNG with that unique value.  This does not eliminate the
->     vulnerability, but it greatly reduces the time during which the RNG
->     system will produce the same outputs as it did during a previous
->     instantiation of the same VM state.
->
-> Linux has the same issue, and given that vmgenid is supported already by
-> multiple hypervisors, we can implement more or less the same solution.
-> So this commit wires up the vmgenid ACPI notification to the RNG's newly
-> added add_vmfork_randomness() function.
->
-> This driver builds on prior work from Adrian Catangiu at Amazon, and it
-> is my hope that that team can resume maintenance of this driver.
+Don't cast parameter to unsigned long pointer in the bit operations.
+Instead copy to a local variable on stack of a proper type and use.
 
-If any of you have some experience with the Hyper-V side of this
-protocol, could you take a look at this and see if it matches the way
-this is supposed to work? It appears to work fine with QEMU's
-behavior, at least, but I know Hyper-V has a lot of additional
-complexities.
+Fixes: cf718eaa8f9b ("crypto: cavium/nitrox - Enabled Mailbox support")
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+v2: fixed typo (LKP, Herbert)
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Thanks,
-Jason
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
+index 2e9c0d214363..9e7308e39b30 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
+@@ -1,4 +1,5 @@
+ // SPDX-License-Identifier: GPL-2.0
++#include <linux/bitmap.h>
+ #include <linux/workqueue.h>
+ 
+ #include "nitrox_csr.h"
+@@ -120,6 +121,7 @@ static void pf2vf_resp_handler(struct work_struct *work)
+ 
+ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
+ {
++	DECLARE_BITMAP(csr, BITS_PER_TYPE(u64));
+ 	struct nitrox_vfdev *vfdev;
+ 	struct pf2vf_work *pfwork;
+ 	u64 value, reg_addr;
+@@ -129,7 +131,8 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
+ 	/* loop for VF(0..63) */
+ 	reg_addr = NPS_PKT_MBOX_INT_LO;
+ 	value = nitrox_read_csr(ndev, reg_addr);
+-	for_each_set_bit(i, (const unsigned long *)&value, BITS_PER_LONG) {
++	bitmap_from_u64(csr, value);
++	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
+ 		/* get the vfno from ring */
+ 		vfno = RING_TO_VFNO(i, ndev->iov.max_vf_queues);
+ 		vfdev = ndev->iov.vfdev + vfno;
+@@ -151,7 +154,8 @@ void nitrox_pf2vf_mbox_handler(struct nitrox_device *ndev)
+ 	/* loop for VF(64..127) */
+ 	reg_addr = NPS_PKT_MBOX_INT_HI;
+ 	value = nitrox_read_csr(ndev, reg_addr);
+-	for_each_set_bit(i, (const unsigned long *)&value, BITS_PER_LONG) {
++	bitmap_from_u64(csr, value);
++	for_each_set_bit(i, csr, BITS_PER_TYPE(csr)) {
+ 		/* get the vfno from ring */
+ 		vfno = RING_TO_VFNO(i + 64, ndev->iov.max_vf_queues);
+ 		vfdev = ndev->iov.vfdev + vfno;
+-- 
+2.34.1
+
