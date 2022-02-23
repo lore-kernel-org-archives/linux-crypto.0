@@ -2,155 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36686C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 19:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E1BC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 22:05:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241326AbiBWTTO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 14:19:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38032 "EHLO
+        id S243111AbiBWWFp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 17:05:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235662AbiBWTTN (ORCPT
+        with ESMTP id S234750AbiBWWFo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 14:19:13 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2028045ADC;
-        Wed, 23 Feb 2022 11:18:45 -0800 (PST)
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NJ9PeK008330;
-        Wed, 23 Feb 2022 19:18:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=4M7keEVwA9K+g1bmFw59BD8lXOkD/TAviruIu4QgsWM=;
- b=A4jSVxJ8psUNkRPXXpGO2BUHOR470CByPj2dqKa2gE03i47W5Lkubta7w3kR4ptQZGaJ
- IL6YR8QcCmQZgAuFHL8CuVBRP2445uiyVpcW+MZS2tZ1cuRxr2Qoqfz7AV1+0funeIVc
- e0xgHF3MbH7ApK9ic0xp7UIKWogRZUj08EMyqamPM3beFX8B2VWVZ0xT6PjGoishFo1f
- 9NuQO9QK39RGceWeiBQpkNYh3YcP/4wZ25ihoJXrhu9/kfzCj2lEJnpdu6LbPfI6k704
- fQ5x38+brQOPcMMQVOvIdD/jp6LSNWmOy2oSW6XdpJtOlfctVyhTTUTtxKLCQhiKIfbO 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6t1mvs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 19:18:18 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NJHVXY015629;
-        Wed, 23 Feb 2022 19:18:17 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6t1muq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 19:18:17 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NJBlaT029428;
-        Wed, 23 Feb 2022 19:18:14 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ear69c9cr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 23 Feb 2022 19:18:14 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NJIB4t26018054
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 23 Feb 2022 19:18:11 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 42DA3AE04D;
-        Wed, 23 Feb 2022 19:18:11 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47C52AE051;
-        Wed, 23 Feb 2022 19:18:10 +0000 (GMT)
-Received: from osiris (unknown [9.145.31.42])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 23 Feb 2022 19:18:10 +0000 (GMT)
-Date:   Wed, 23 Feb 2022 20:18:08 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Baoquan He <bhe@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, akpm@linux-foundation.org, cl@linux.com,
-        42.hyeyoo@gmail.com, penberg@kernel.org, rientjes@google.com,
-        iamjoonsoo.kim@lge.com, vbabka@suse.cz, David.Laight@aculab.com,
-        david@redhat.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
-        netdev@vger.kernel.org, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com,
-        linux-s390@vger.kernel.org, michael@walle.cc,
-        linux-i2c@vger.kernel.org, wsa@kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Subject: Re: [PATCH 00/22] Don't use kmalloc() with GFP_DMA
-Message-ID: <YhaIcPmc8qi1zmnj@osiris>
-References: <20220219005221.634-1-bhe@redhat.com>
- <YhOaTsWUKO0SWsh7@osiris>
- <20220222084422.GA6139@lst.de>
+        Wed, 23 Feb 2022 17:05:44 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8114DF53;
+        Wed, 23 Feb 2022 14:05:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F0A64B81EB2;
+        Wed, 23 Feb 2022 22:05:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42EFEC340E7;
+        Wed, 23 Feb 2022 22:05:11 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="p3Fz+yby"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645653908;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5pBvrnim267Drxy2tBvWhv9EQxny44tgDJv9yglZOzw=;
+        b=p3Fz+ybysAbMGdmdB0sXZ+aF5mGEdageCUkh7PocknvKbNnTB5XjnKEJVZu7hQtIXjUCRV
+        +iVQK8XXcFoQulzKc8N8w6u3b5+p0WWAQadYInqvn1YWF84YakUvyrd09f56rG73+9IfzQ
+        qfOkaGtHcrR+Y1Y1rmLdap7kDWjWwR4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c269c5a0 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 23 Feb 2022 22:05:08 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, adrian@parity.io,
+        dwmw@amazon.co.uk, graf@amazon.com, colmmacc@amazon.com,
+        raduweis@amazon.com, imammedo@redhat.com, ehabkost@redhat.com,
+        ben@skyportsystems.com, mst@redhat.com, kys@microsoft.com,
+        haiyangz@microsoft.com, sthemmin@microsoft.com, wei.liu@kernel.org,
+        decui@microsoft.com, linux@dominikbrodowski.net, ardb@kernel.org,
+        jannh@google.com, gregkh@linuxfoundation.org, tytso@mit.edu
+Subject: [PATCH v2 0/2] VM fork detection for RNG
+Date:   Wed, 23 Feb 2022 23:04:54 +0100
+Message-Id: <20220223220456.666193-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220222084422.GA6139@lst.de>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TJSaBEB9Lulpk4sdWf3aymM3sOHqNnmS
-X-Proofpoint-ORIG-GUID: RQrgHuEksbIzwLY-XstVcce5JZQWh0wb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-23_09,2022-02-23_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 phishscore=0 impostorscore=0 mlxlogscore=632
- clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0 suspectscore=0
- spamscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2201110000 definitions=main-2202230108
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 09:44:22AM +0100, Christoph Hellwig wrote:
-> On Mon, Feb 21, 2022 at 02:57:34PM +0100, Heiko Carstens wrote:
-> > > 1) Kmalloc(GFP_DMA) in s390 platform, under arch/s390 and drivers/s390;
-> > 
-> > So, s390 partially requires GFP_DMA allocations for memory areas which
-> > are required by the hardware to be below 2GB. There is not necessarily
-> > a device associated when this is required. E.g. some legacy "diagnose"
-> > calls require buffers to be below 2GB.
-> > 
-> > How should something like this be handled? I'd guess that the
-> > dma_alloc API is not the right thing to use in such cases. Of course
-> > we could say, let's waste memory and use full pages instead, however
-> > I'm not sure this is a good idea.
-> 
-> Yeah, I don't think the DMA API is the right thing for that.  This
-> is one of the very rare cases where a raw allocation makes sense.
-> 
-> That being said being able to drop kmalloc support for GFP_DMA would
-> be really useful. How much memory would we waste if switching to the
-> page allocator?
+This small series picks up work from Amazon that seems to have stalled
+out last year around this time: listening for the vmgenid ACPI
+notification, and using it to "do something." Last year, folks proposed
+a complicated userspace mmap chardev, which was frought with
+difficulty and evidently abandoned. This year, instead, I have something
+much simpler in mind: simply using those ACPI notifications to tell the
+RNG to reinitialize safely, so we don't repeat random numbers in cloned,
+forked, or rolled-back VM instances.
 
-At a first glance this would not waste much memory, since most callers
-seem to allocate such memory pieces only temporarily.
+This series consists of two patches. The first one adds the right hooks
+into the actual RNG, and the second is a driver for the ACPI
+notification.
 
-> > The question is: what would this buy us? As stated above I'd assume
-> > this comes with quite some code churn, so there should be a good
-> > reason to do this.
-> 
-> There is two steps here.  One is to remove GFP_DMA support from
-> kmalloc, which would help to cleanup the slab allocator(s) very nicely,
-> as at that point it can stop to be zone aware entirely.
+I had posted an RFC v1 earlier today, thinking I really needed to
+request comments, lacking much experience with ACPI drivers. But having
+spent all day reworking this driver, and then testing and debugging it
+in a variety of circumstances, I feel fairly confident that it works
+well, so this is now the real thing. Please review! Here's a little
+screencast showing it in action: https://data.zx2c4.com/vmgenid-appears-to-work.gif
 
-Well, looking at slub.c it looks like there is only a very minimal
-maintenance burden for GPF_DMA/GFP_DMA32 support.
+As a side note, this series intentionally does _not_ focus on
+notification of these events to userspace or to other kernel consumers.
+Since these VM fork detection events first need to hit the RNG, we can
+later talk about what sorts of notifications or mmap'd counters the RNG
+should be making accessible to elsewhere. But that's a different sort of
+project and ties into a lot of more complicated concerns beyond this
+more basic patchset. So hopefully we can keep the discussion rather
+focused here to this ACPI business.
 
-> The long term goal is to remove ZONE_DMA entirely at least for
-> architectures that only use the small 16MB ISA-style one.  It can
-> then be replaced with for example a CMA area and fall into a movable
-> zone.  I'd have to prototype this first and see how it applies to the
-> s390 case.  It might not be worth it and maybe we should replace
-> ZONE_DMA and ZONE_DMA32 with a ZONE_LIMITED for those use cases as
-> the amount covered tends to not be totally out of line for what we
-> built the zone infrastructure.
+Changes v1->v2:
+- [Ard] Correct value of MODULE_LICENSE().
+- [Ard] Use ordinary memory accesses instead of memcpy_fromio.
+- [Ard] Make module a tristate and set MODULE_DEVICE_TABLE().
+- [Ard] Free buffer after using.
+- Use { } instead of { "", 0 }.
+- Clean up interface into RNG.
+- Minimize ACPI driver a bit.
 
-So probably I'm missing something; but for small systems where we
-would only have ZONE_DMA, how would a CMA area within this zone
-improve things?
+In addition to the usual suspects, I'm CCing the original team from
+Amazon who proposed this last year and the QEMU developers who added it
+there, as well as the kernel Hyper-V maintainers, since this is
+technically a Microsoft-proposed thing, though QEMU now implements it.
 
-If I'm not mistaken then the page allocator will not fallback to any
-CMA area for GFP_KERNEL allocations. That is: we would somehow need to
-find "the right size" for the CMA area, depending on memory size. This
-looks like a new problem class which currently does not exist.
+Cc: adrian@parity.io
+Cc: dwmw@amazon.co.uk
+Cc: graf@amazon.com
+Cc: colmmacc@amazon.com
+Cc: raduweis@amazon.com
+Cc: imammedo@redhat.com
+Cc: ehabkost@redhat.com
+Cc: ben@skyportsystems.com
+Cc: mst@redhat.com
+Cc: kys@microsoft.com
+Cc: haiyangz@microsoft.com
+Cc: sthemmin@microsoft.com
+Cc: wei.liu@kernel.org
+Cc: decui@microsoft.com
+Cc: linux@dominikbrodowski.net
+Cc: ardb@kernel.org
+Cc: jannh@google.com
+Cc: gregkh@linuxfoundation.org
+Cc: tytso@mit.edu
 
-Besides that we would also not have all the debugging options provided
-by the slab allocator anymore.
+Jason A. Donenfeld (2):
+  random: add mechanism for VM forks to reinitialize crng
+  virt: vmgenid: introduce driver for reinitializing RNG on VM fork
 
-Anyway, maybe it would make more sense if you would send your patch
-and then we can see where we would end up.
+ drivers/char/random.c  |  53 ++++++++++++++++++
+ drivers/virt/Kconfig   |   9 ++++
+ drivers/virt/Makefile  |   1 +
+ drivers/virt/vmgenid.c | 120 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/random.h |   1 +
+ 5 files changed, 184 insertions(+)
+ create mode 100644 drivers/virt/vmgenid.c
+
+-- 
+2.35.1
+
