@@ -2,136 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DAF3C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 23:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E606AC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 23:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244761AbiBWXQp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 18:16:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34612 "EHLO
+        id S244847AbiBWXhi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 18:37:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244770AbiBWXQo (ORCPT
+        with ESMTP id S243015AbiBWXhh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 18:16:44 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D8858E54;
-        Wed, 23 Feb 2022 15:16:14 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 22F6EB82249;
-        Wed, 23 Feb 2022 23:16:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA67C340E7;
-        Wed, 23 Feb 2022 23:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645658171;
-        bh=dKUEp8Ja5zuNdUtklDNOmkRUIMIrk0tU73atuFZaF1A=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NZYN4igKqV7hfvfXieNsnoEnfNnyOiaPzX5FHj5YExv/OqHhuVQ1pJdApX/wV/eLM
-         Ps+w12Su2eSEWxTt0pVq8o34Yc7zylU4GZvsj+vL4CiJYxEiUeUXG57/ZS86+tHrzJ
-         wvod45GXJZyAj6CwQTdFqQ71m/SnJTvuHiw3XVHiZV8RXOgKnV7vEp02s2ThNBFCpy
-         p6TMyWu7+jWIi0y/UHwFA92zpUaY9PRazUlBSq3vc7NueUHSEjAueCtP/knNIq+LaW
-         cYK6e6uFDz1qHUEueYgRiv6nfR5qvZMXgpUlqjbWxAuTRltYERxcmAtlJfyTiqqAyk
-         SemuTINnMhS3w==
-Date:   Wed, 23 Feb 2022 15:16:09 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, adrian@parity.io, dwmw@amazon.co.uk,
-        acatan@amazon.com, graf@amazon.com, colmmacc@amazon.com,
-        sblbir@amazon.com, raduweis@amazon.com, jannh@google.com,
-        gregkh@linuxfoundation.org, tytso@mit.edu
-Subject: Re: [PATCH RFC v1 1/2] random: add mechanism for VM forks to
- reinitialize crng
-Message-ID: <YhbAOW/KbFW1CFkQ@sol.localdomain>
-References: <20220223131231.403386-1-Jason@zx2c4.com>
- <20220223131231.403386-2-Jason@zx2c4.com>
+        Wed, 23 Feb 2022 18:37:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9BD5D5A09B
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645659427;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T4uZUFplVlE5Y8frdrAqmVb5e+dpaoHXAN39OVRnAh4=;
+        b=HfvT7Km9xEzosgW97guxKGspVDkjt76JZH5i66eL0dZz+5SAiA89HX/SFfSMixfdbkUm9/
+        R7JL5Qr89KYMQccOueAEwl2IQj2VVwk1PkhhUBlSmq4bS+8bM/H7kC18jbKblhgpge/qDb
+        9aWlteAKioJ7b1PZ3bjUdTgWo2Q00V0=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-148-wNXS-AERPTygATocEsD7Rg-1; Wed, 23 Feb 2022 18:37:06 -0500
+X-MC-Unique: wNXS-AERPTygATocEsD7Rg-1
+Received: by mail-ot1-f71.google.com with SMTP id j12-20020a056830270c00b005af74a640abso143783otu.9
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:37:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=T4uZUFplVlE5Y8frdrAqmVb5e+dpaoHXAN39OVRnAh4=;
+        b=sBEYIU9/oqd+Hh0gCWZNS6tE4sBMmDx6ZdSl0FfhpLqTrkflUADS/vI82swKZjf9qX
+         u4LMP9a9y/z0/URzaTCCj4ZUpdpvxi+XPHHM93G1FUrlwZ3u06mMDJae1XPkhufsUmO6
+         N7oDzhTEjJXJSP3T/jB19W1OBEqLzMZItHEfA6Cw2uBeOKKIGDgGYAtCro7ySOQUSJWP
+         qcRbMVgbtUpxFPiurHVQoX/EtCWOYKz3/FNu61dyZViAAdSUZd93u5gErg4z32ofa9LI
+         KbtxMDlLSSVNUX7ppRtQeH9KipRbMj2ern4alJUERV4ZzjdDczjbQ+rYuawdWX3D3ZRz
+         rcjw==
+X-Gm-Message-State: AOAM531HweVXQDNg9VLxvMh97LXkq/x0ifYk/ItOJvvs+895QKh2rDl2
+        sIhuM18pLpYsHHNDL77V9GflD8LzdsEkZ2Yie9+C2EXErOuVkUuPiu4qOtQ8uglit2hkeYBCv9G
+        jRjE/pLVFL/Vsj+GpagRDfxeh
+X-Received: by 2002:a9d:7016:0:b0:5af:157b:685 with SMTP id k22-20020a9d7016000000b005af157b0685mr10037otj.16.1645659425852;
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxofdQSoSC1/kDx6fUUcLtOCsSdUzQ0Bk8PapztMnNq1yES+yHaSrNxhft1rMXuy1CFcMCgtg==
+X-Received: by 2002:a9d:7016:0:b0:5af:157b:685 with SMTP id k22-20020a9d7016000000b005af157b0685mr10026otj.16.1645659425637;
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q73sm422469ooq.33.2022.02.23.15.37.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 15:37:05 -0800 (PST)
+Date:   Wed, 23 Feb 2022 16:37:03 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v5 5/8] hisi_acc_vfio_pci: Restrict access to VF dev
+ BAR2 migration region
+Message-ID: <20220223163703.20690b29.alex.williamson@redhat.com>
+In-Reply-To: <20220221114043.2030-6-shameerali.kolothum.thodi@huawei.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+        <20220221114043.2030-6-shameerali.kolothum.thodi@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220223131231.403386-2-Jason@zx2c4.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 02:12:30PM +0100, Jason A. Donenfeld wrote:
-> When a VM forks, we must immediately mix in additional information to
-> the stream of random output so that two forks or a rollback don't
-> produce the same stream of random numbers, which could have catastrophic
-> cryptographic consequences. This commit adds a simple API, add_vmfork_
-> randomness(), for that.
-> 
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Jann Horn <jannh@google.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c  | 58 ++++++++++++++++++++++++++++++++++++++++++
->  include/linux/random.h |  1 +
->  2 files changed, 59 insertions(+)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 536237a0f073..29d6ce484d15 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -344,6 +344,46 @@ static void crng_reseed(void)
->  	}
->  }
+On Mon, 21 Feb 2022 11:40:40 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 >  
-> +/*
-> + * This mixes unique_vm_id directly into the base_crng key as soon as
-> + * possible, similarly to crng_pre_init_inject(), even if the crng is
-> + * already running, in order to immediately branch streams from prior
-> + * VM instances.
-> + */
-> +static void crng_vm_fork_inject(const void *unique_vm_id, size_t len)
-> +{
-> +	unsigned long flags, next_gen;
-> +	struct blake2s_state hash;
-> +
-> +	/*
-> +	 * Unlike crng_reseed(), we take the lock as early as possible,
-> +	 * since we don't want the RNG to be used until it's updated.
-> +	 */
-> +	spin_lock_irqsave(&base_crng.lock, flags);
-> +
-> +	/*
-> +	 * Also update the generation, while locked, as early as
-> +	 * possible. This will mean unlocked reads of the generation
-> +	 * will cause a reseeding of per-cpu crngs, and those will
-> +	 * spin on the base_crng lock waiting for the rest of this
-> +	 * operation to complete, which achieves the goal of blocking
-> +	 * the production of new output until this is done.
-> +	 */
-> +	next_gen = base_crng.generation + 1;
-> +	if (next_gen == ULONG_MAX)
-> +		++next_gen;
-> +	WRITE_ONCE(base_crng.generation, next_gen);
-> +	WRITE_ONCE(base_crng.birth, jiffies);
-> +
-> +	/* This is the same formulation used by crng_pre_init_inject(). */
-> +	blake2s_init(&hash, sizeof(base_crng.key));
-> +	blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
-> +	blake2s_update(&hash, unique_vm_id, len);
-> +	blake2s_final(&hash, base_crng.key);
-> +
-> +	spin_unlock_irqrestore(&base_crng.lock, flags);
-> +}
-[...]
-> +/*
-> + * Handle a new unique VM ID, which is unique, not secret, so we
-> + * don't credit it, but we do mix it into the entropy pool and
-> + * inject it into the crng.
-> + */
-> +void add_vmfork_randomness(const void *unique_vm_id, size_t size)
-> +{
-> +	add_device_randomness(unique_vm_id, size);
-> +	crng_vm_fork_inject(unique_vm_id, size);
-> +}
-> +EXPORT_SYMBOL_GPL(add_vmfork_randomness);
+> +static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+> +	.name = "hisi-acc-vfio-pci",
 
-I think we should be removing cases where the base_crng key is changed directly
-besides extraction from the input_pool, not adding new ones.  Why not implement
-this as add_device_randomness() followed by crng_reseed(force=true), where the
-'force' argument forces a reseed to occur even if the entropy_count is too low?
+Use a different name from the ops below?  Thanks,
 
-- Eric
+Alex
+
+> +	.open_device = hisi_acc_vfio_pci_open_device,
+> +	.close_device = vfio_pci_core_close_device,
+> +	.ioctl = hisi_acc_vfio_pci_ioctl,
+> +	.device_feature = vfio_pci_core_ioctl_feature,
+> +	.read = hisi_acc_vfio_pci_read,
+> +	.write = hisi_acc_vfio_pci_write,
+> +	.mmap = hisi_acc_vfio_pci_mmap,
+> +	.request = vfio_pci_core_request,
+> +	.match = vfio_pci_core_match,
+> +};
+> +
+>  static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>  	.name = "hisi-acc-vfio-pci",
+>  	.open_device = hisi_acc_vfio_pci_open_device,
+
