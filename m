@@ -2,57 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4F0C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 03:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97519C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 03:31:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237889AbiBWDaN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Feb 2022 22:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
+        id S233182AbiBWDcO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Feb 2022 22:32:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237892AbiBWDaM (ORCPT
+        with ESMTP id S235270AbiBWDcO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Feb 2022 22:30:12 -0500
+        Tue, 22 Feb 2022 22:32:14 -0500
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE3E39141;
-        Tue, 22 Feb 2022 19:29:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A132D2DA80
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Feb 2022 19:31:47 -0800 (PST)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nMhqf-0006CX-PL; Wed, 23 Feb 2022 13:57:50 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Feb 2022 14:57:49 +1200
-Date:   Wed, 23 Feb 2022 14:57:49 +1200
+        id 1nMiNQ-0006vK-8K; Wed, 23 Feb 2022 14:31:41 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Feb 2022 15:31:40 +1200
+Date:   Wed, 23 Feb 2022 15:31:40 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Petr Vorel <pvorel@suse.cz>
-Cc:     linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
-        leitao@debian.org, Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] crypto: vmx - merge CRYPTO_DEV_VMX_ENCRYPT into
- CRYPTO_DEV_VMX
-Message-ID: <YhWirRLlQNs3jha/@gondor.apana.org.au>
-References: <20220217105751.6330-1-pvorel@suse.cz>
- <20220217105751.6330-2-pvorel@suse.cz>
+To:     Harman Kalra <hkalra@marvell.com>
+Cc:     Arnaud Ebalard <arno@natisbad.org>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Srujana Challa <schalla@marvell.com>,
+        linux-crypto@vger.kernel.org, jerinj@marvell.com,
+        sgoutham@marvell.com
+Subject: Re: [PATCH] crypto: octeontx2 - add synchronization between mailbox
+ accesses
+Message-ID: <YhWqnBOO5eHOusqs@gondor.apana.org.au>
+References: <20220204124601.3617217-1-hkalra@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220217105751.6330-2-pvorel@suse.cz>
+In-Reply-To: <20220204124601.3617217-1-hkalra@marvell.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 11:57:50AM +0100, Petr Vorel wrote:
-> CRYPTO_DEV_VMX_ENCRYPT is redundant with CRYPTO_DEV_VMX.
+On Fri, Feb 04, 2022 at 06:16:01PM +0530, Harman Kalra wrote:
+> Since there are two workqueues implemented in CPTPF driver - one
+> for handling mailbox requests from VFs and another for handling FLR.
+> In both cases PF driver will forward the request to AF driver by
+> writing to mailbox memory. A race condition may arise if two
+> simultaneous requests are written to mailbox memory. Introducing
+> locking mechanism to maintain synchronization between multiple
+> mailbox accesses.
 > 
-> And it also forces CRYPTO_GHASH to be builtin even
-> CRYPTO_DEV_VMX_ENCRYPT was configured as module.
+> Signed-off-by: Harman Kalra <hkalra@marvell.com>
+> ---
+>  .../marvell/octeontx2/otx2_cpt_common.h       |  1 +
+>  .../marvell/octeontx2/otx2_cpt_mbox_common.c  | 14 +++++++++++
+>  drivers/crypto/marvell/octeontx2/otx2_cptpf.h |  1 +
+>  .../marvell/octeontx2/otx2_cptpf_main.c       | 21 ++++++++++-------
+>  .../marvell/octeontx2/otx2_cptpf_mbox.c       | 23 ++++++++++++++-----
+>  5 files changed, 46 insertions(+), 14 deletions(-)
 
-Just because a tristate sits under a bool, it does not force
-the options that it selects to y/n.  The select still operates
-on the basis of the tristate.
-
-So I don't see the point to this code churn unless the powerpc
-folks want to move in this direction.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
