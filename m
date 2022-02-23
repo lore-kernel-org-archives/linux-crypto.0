@@ -2,60 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 009FDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 23:37:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1F2C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 23:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244866AbiBWXhp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 18:37:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58030 "EHLO
+        id S244925AbiBWXig (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 18:38:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244879AbiBWXhp (ORCPT
+        with ESMTP id S244916AbiBWXie (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 18:37:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4B9235A5B8
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:37:16 -0800 (PST)
+        Wed, 23 Feb 2022 18:38:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 245BA5A580
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:38:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645659435;
+        s=mimecast20190719; t=1645659485;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8aSBb/VoBYcQvKUpDDSg+cPg7cKg8nOk6XOiSIXQhhk=;
-        b=b06AXcNdZZEfzKhWRc+jf79T/mDj9jFtRd8B1vIrjhvkG2EMbr+l6PRI36U+RzVjGPtOxC
-        bhybJUn6zxTbOrM+1041i3AnP35Kq6IGKcWtGUr5XMa6r5fwz1XFeBylpuXJaOgcBq5qbT
-        SJdqIbtdL0NrJ44pOSFO1NS51XEzVkA=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TQseIfHyNHbxRxCOXDDjbxsPCfu7bqnMBIdUTwy6mvg=;
+        b=M0EjJ+aZoVau9eCd5yPlEPOBTF+Fola8l2gwVMsKjbIRk2goaVuJFxZk6mo1MvZThODJfv
+        FdfvaxAtY5nQ+1gvXGNuRegi2n1pkj171Hhvtws3Frv7iIrrxBlcVX7Xqx5tucgMOzsCRt
+        Sw4kmdQAIfD32yHb4xvg7D2u2ydMMdE=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-451-Es1WNrD7O3WIwqOcjMWoTA-1; Wed, 23 Feb 2022 18:37:14 -0500
-X-MC-Unique: Es1WNrD7O3WIwqOcjMWoTA-1
-Received: by mail-oo1-f70.google.com with SMTP id k10-20020a4ad98a000000b003185c75574dso333428oou.1
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:37:14 -0800 (PST)
+ us-mta-622-u9ZnBrgMNvKCvg9Ta1gWNA-1; Wed, 23 Feb 2022 18:38:04 -0500
+X-MC-Unique: u9ZnBrgMNvKCvg9Ta1gWNA-1
+Received: by mail-ot1-f70.google.com with SMTP id k6-20020a056830168600b005ad4ee444easo122902otr.20
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 15:38:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=8aSBb/VoBYcQvKUpDDSg+cPg7cKg8nOk6XOiSIXQhhk=;
-        b=wCRBSumLbiqQKG/ZCEj5nbVzA8/GPScafz0b+I/OwEgQsFziHe/0Qsmp9BNvieWIL5
-         OyiR486vEgUU9ICRS7V8pUv2Phpo7NOCBAQt6yS2xqXE4taS6cZs/Cz5td9+0tRBj3ia
-         w3Z3S0vaWtkUHwB8d/DJk/x6/gR1HYujUWuV7F17WePSXlSfOS3i1HoLVPDNFRrQ4Xcl
-         cg6xjKTCOHLaJSooKyLBB8qPiDpsbKO1WA+E2TZCmybvtubz/vULr8fKnphGyjFYZKD2
-         aMht66vyy0ZEJGsLGeJBGwVI4lJSgmqux3iG4bstmvMYkK5Y9J9gGOhogQZ+G//FDSO6
-         1cTQ==
-X-Gm-Message-State: AOAM5319Ft/n8jW76S/n/m6PD3qhGpxSi2Z55ZbWnBx+Q+uWHGPESI3s
-        qOxo5UXWKS2SFvmj+LTU4s2fiJdt6MtyYZXotNZ0Hzr5mLQwZJhm/67xUwUHhkeyZ4DoNnElK5Y
-        RZMP+AfPwlEESMYZn2NnK/qhF
-X-Received: by 2002:a05:6808:1406:b0:2d4:f822:578e with SMTP id w6-20020a056808140600b002d4f822578emr3873oiv.338.1645659433457;
-        Wed, 23 Feb 2022 15:37:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJznNClK9/UStphScNTKJaAAaGciiCfDkCBkb4WaYTlVNDrZwr4pfhqYR+GafH5TyVRk/JPZCw==
-X-Received: by 2002:a05:6808:1406:b0:2d4:f822:578e with SMTP id w6-20020a056808140600b002d4f822578emr3863oiv.338.1645659433265;
-        Wed, 23 Feb 2022 15:37:13 -0800 (PST)
+        bh=TQseIfHyNHbxRxCOXDDjbxsPCfu7bqnMBIdUTwy6mvg=;
+        b=OlD68jenum30JYdufhQmTj9cXWHt37X/O6Y+n9lSNJLCJhOj61I0OygUjGV5jY+vnG
+         A8eZsJrxfLBN/G6njGTWwcwPHWEtO8vd2pAqygT+MA2o2qguYzkPG94trG8xmXJvJynG
+         QoT2aqodXM6FEu6Ta1TAs5qGQZKkAyi4h764GTamh3CzQWEMaJ8zIdFLvXnuhc+may/i
+         fQ46m71HRKNsY2C3wdTLID45frik9PYUAaKs3dMz+Ae0tP7kzy/2jkAutCCdmZTCAqYS
+         isxtgdK5kTC+SlDoFegK6vM7HbBuVg7y792o5hapC4J2bsamN+K15ZLSwPJouPZEiBQS
+         m8Ag==
+X-Gm-Message-State: AOAM531obXA7ooRKnTMAORW+oSfswv8f5AsA3oFN63j4G9kzNQJ2ggNE
+        Nw43JdnLDpdW5x2ga5P0bEx78WtZlrQE5sLd00kDnYkm8Awu4Dp+M4XP3fE8+SibVsR/DRxicXt
+        MkhZHl8c7TFTLWjRDfTnH7Zra
+X-Received: by 2002:a05:6808:1597:b0:2d4:c9fd:b11c with SMTP id t23-20020a056808159700b002d4c9fdb11cmr1090218oiw.319.1645659483398;
+        Wed, 23 Feb 2022 15:38:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyTOMQrxcWbrjZEEnIVd77niRF3IebauKAnN/LNVNCDSL2buHj2AtUPxw2dFUF8pky3GMpDWg==
+X-Received: by 2002:a05:6808:1597:b0:2d4:c9fd:b11c with SMTP id t23-20020a056808159700b002d4c9fdb11cmr1090208oiw.319.1645659483191;
+        Wed, 23 Feb 2022 15:38:03 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id 5sm481997otf.30.2022.02.23.15.37.12
+        by smtp.gmail.com with ESMTPSA id y17sm475713otk.70.2022.02.23.15.38.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 15:37:12 -0800 (PST)
-Date:   Wed, 23 Feb 2022 16:37:11 -0700
+        Wed, 23 Feb 2022 15:38:02 -0800 (PST)
+Date:   Wed, 23 Feb 2022 16:38:01 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
@@ -64,12 +64,12 @@ Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v5 6/8] hisi_acc_vfio_pci: Add helper to retrieve the PF
- qm data
-Message-ID: <20220223163711.42c5d928.alex.williamson@redhat.com>
-In-Reply-To: <20220221114043.2030-7-shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220223163801.10f32e99.alex.williamson@redhat.com>
+In-Reply-To: <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
 References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
-        <20220221114043.2030-7-shameerali.kolothum.thodi@huawei.com>
+        <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -78,40 +78,133 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 21 Feb 2022 11:40:41 +0000
+On Mon, 21 Feb 2022 11:40:42 +0000
 Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> @@ -159,23 +1110,46 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int
+>  
+>  static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+>  {
+> -	struct vfio_pci_core_device *vdev =
+> -		container_of(core_vdev, struct vfio_pci_core_device, vdev);
+> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
+> +			struct hisi_acc_vf_core_device, core_device.vdev);
+> +	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+>  	int ret;
+>  
+>  	ret = vfio_pci_core_enable(vdev);
+>  	if (ret)
+>  		return ret;
+>  
+> -	vfio_pci_core_finish_enable(vdev);
+> +	if (core_vdev->migration_flags != VFIO_MIGRATION_STOP_COPY) {
 
-> Provides a helper function to retrieve the PF QM data associated
-> with a ACC VF dev. This makes use of the  pci_iov_get_pf_drvdata()
-> to get PF drvdata safely. Introduces helpers to retrieve the ACC
-> PF dev struct pci_driver pointers as this is an input into the
-> pci_iov_get_pf_drvdata().
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c     |  6 ++++
->  drivers/crypto/hisilicon/sec2/sec_main.c      |  6 ++++
->  drivers/crypto/hisilicon/zip/zip_main.c       |  6 ++++
->  drivers/vfio/pci/hisilicon/Kconfig            |  7 +++++
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 30 +++++++++++++++++++
->  include/linux/hisi_acc_qm.h                   |  5 ++++
->  6 files changed, 60 insertions(+)
-> 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> index ba4043447e53..80fb9ef8c571 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> @@ -1189,6 +1189,12 @@ static struct pci_driver hpre_pci_driver = {
->  	.driver.pm		= &hpre_pm_ops,
+This looks like a minor synchronization issue with
+hisi_acc_vfio_pci_migrn_init(), I think it might be cleaner to test
+core_vdev->ops against the migration enabled set.
+
+> +		vfio_pci_core_finish_enable(vdev);
+> +		return 0;
+> +	}
+> +
+> +	ret = hisi_acc_vf_qm_init(hisi_acc_vdev);
+> +	if (ret) {
+> +		vfio_pci_core_disable(vdev);
+> +		return ret;
+> +	}
+>  
+> +	hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
+
+Change the polarity of the if() above and encompass this all within
+that branch scope so we can use the finish/return below for both cases?
+
+> +
+> +	vfio_pci_core_finish_enable(vdev);
+>  	return 0;
+>  }
+>  
+> +static void hisi_acc_vfio_pci_close_device(struct vfio_device *core_vdev)
+> +{
+> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(core_vdev,
+> +			struct hisi_acc_vf_core_device, core_device.vdev);
+> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
+> +
+> +	iounmap(vf_qm->io_base);
+> +	vfio_pci_core_close_device(core_vdev);
+> +}
+> +
+>  static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+>  	.name = "hisi-acc-vfio-pci",
+>  	.open_device = hisi_acc_vfio_pci_open_device,
+> -	.close_device = vfio_pci_core_close_device,
+> +	.close_device = hisi_acc_vfio_pci_close_device,
+>  	.ioctl = hisi_acc_vfio_pci_ioctl,
+>  	.device_feature = vfio_pci_core_ioctl_feature,
+>  	.read = hisi_acc_vfio_pci_read,
+> @@ -183,6 +1157,8 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
+>  	.mmap = hisi_acc_vfio_pci_mmap,
+>  	.request = vfio_pci_core_request,
+>  	.match = vfio_pci_core_match,
+> +	.migration_set_state = hisi_acc_vfio_pci_set_device_state,
+> +	.migration_get_state = hisi_acc_vfio_pci_get_device_state,
 >  };
 >  
-> +struct pci_driver *hisi_hpre_get_pf_driver(void)
+>  static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+> @@ -198,38 +1174,71 @@ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+>  	.match = vfio_pci_core_match,
+>  };
+>  
+> +static int
+> +hisi_acc_vfio_pci_migrn_init(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+> +			     struct pci_dev *pdev, struct hisi_qm *pf_qm)
 > +{
-> +	return &hpre_pci_driver;
+> +	int vf_id;
+> +
+> +	vf_id = pci_iov_vf_id(pdev);
+> +	if (vf_id < 0)
+> +		return vf_id;
+> +
+> +	hisi_acc_vdev->vf_id = vf_id + 1;
+> +	hisi_acc_vdev->core_device.vdev.migration_flags =
+> +					VFIO_MIGRATION_STOP_COPY;
+> +	hisi_acc_vdev->pf_qm = pf_qm;
+> +	hisi_acc_vdev->vf_dev = pdev;
+> +	mutex_init(&hisi_acc_vdev->state_mutex);
+> +
+> +	return 0;
 > +}
-> +EXPORT_SYMBOL(hisi_hpre_get_pf_driver);
+> +
+>  static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+> -	struct vfio_pci_core_device *vdev;
+> +	struct hisi_acc_vf_core_device *hisi_acc_vdev;
+> +	struct hisi_qm *pf_qm;
+>  	int ret;
+>  
+> -	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
+> -	if (!vdev)
+> +	hisi_acc_vdev = kzalloc(sizeof(*hisi_acc_vdev), GFP_KERNEL);
+> +	if (!hisi_acc_vdev)
+>  		return -ENOMEM;
+>  
+> -	vfio_pci_core_init_device(vdev, pdev, &hisi_acc_vfio_pci_ops);
+> +	pf_qm = hisi_acc_get_pf_qm(pdev);
+> +	if (pf_qm && pf_qm->ver >= QM_HW_V3) {
+> +		ret = hisi_acc_vfio_pci_migrn_init(hisi_acc_vdev, pdev, pf_qm);
+> +		if (ret < 0) {
+> +			kfree(hisi_acc_vdev);
+> +			return ret;
+> +		}
 
-Curious why none of these are _GPL symbols.  Thanks,
+This error path can only occur if the VF ID lookup fails, but should we
+fall through to the non-migration ops, maybe with a dev_warn()?  Thanks,
 
 Alex
+
+> +
+> +		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
+> +					  &hisi_acc_vfio_pci_migrn_ops);
+> +	} else {
+> +		vfio_pci_core_init_device(&hisi_acc_vdev->core_device, pdev,
+> +					  &hisi_acc_vfio_pci_ops);
+> +	}
 
