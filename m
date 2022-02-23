@@ -2,49 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454D9C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 03:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84F4C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 03:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235270AbiBWDcr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Feb 2022 22:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        id S237525AbiBWDcu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Feb 2022 22:32:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231708AbiBWDcr (ORCPT
+        with ESMTP id S231708AbiBWDct (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Feb 2022 22:32:47 -0500
+        Tue, 22 Feb 2022 22:32:49 -0500
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC682286F0;
-        Tue, 22 Feb 2022 19:32:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C584AE27;
+        Tue, 22 Feb 2022 19:32:22 -0800 (PST)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nMiNa-0006vU-JD; Wed, 23 Feb 2022 14:31:51 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Feb 2022 15:31:50 +1200
-Date:   Wed, 23 Feb 2022 15:31:50 +1200
+        id 1nMiNy-0006wK-Uo; Wed, 23 Feb 2022 14:32:16 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 23 Feb 2022 15:32:14 +1200
+Date:   Wed, 23 Feb 2022 15:32:14 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: x86/blowfish - Remove unused inline
- functions
-Message-ID: <YhWqpsFRoiFHgzUL@gondor.apana.org.au>
-References: <20220216114406.22108-1-yuehaibing@huawei.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccree: don't attempt 0 len DMA mappings
+Message-ID: <YhWqvg47iQXWveOr@gondor.apana.org.au>
+References: <20220217192726.612328-1-gilad@benyossef.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220216114406.22108-1-yuehaibing@huawei.com>
+In-Reply-To: <20220217192726.612328-1-gilad@benyossef.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 16, 2022 at 07:44:06PM +0800, YueHaibing wrote:
-> This is unused after commit c0a64926c53e ("crypto: x86/blowfish - drop CTR mode implementation")
+On Thu, Feb 17, 2022 at 09:27:26PM +0200, Gilad Ben-Yossef wrote:
+> Refuse to try mapping zero bytes as this may cause a fault
+> on some configurations / platforms and it seems the prev.
+> attempt is not enough and we need to be more explicit.
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Fixes: ce0fc6db38de ("crypto: ccree - protect against empty or NULL
+> scatterlists")
 > ---
->  arch/x86/crypto/blowfish_glue.c | 12 ------------
->  1 file changed, 12 deletions(-)
+>  drivers/crypto/ccree/cc_buffer_mgr.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
 Patch applied.  Thanks.
 -- 
