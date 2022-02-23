@@ -2,79 +2,57 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4E1C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 08:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191E1C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 08:59:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238865AbiBWIEj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 03:04:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44272 "EHLO
+        id S239065AbiBWI7n (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 03:59:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233116AbiBWIEi (ORCPT
+        with ESMTP id S239123AbiBWI7m (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 03:04:38 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1BF467A99C;
-        Wed, 23 Feb 2022 00:04:12 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B412BED1;
-        Wed, 23 Feb 2022 00:04:11 -0800 (PST)
-Received: from e122247.kfn.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A356B3F5A1;
-        Wed, 23 Feb 2022 00:04:09 -0800 (PST)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: drbg: fix crypto api abuse
-Date:   Wed, 23 Feb 2022 10:04:00 +0200
-Message-Id: <20220223080400.139367-1-gilad@benyossef.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 23 Feb 2022 03:59:42 -0500
+X-Greylist: delayed 857 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Feb 2022 00:59:15 PST
+Received: from mail.olerise.pl (mail.olerise.pl [46.183.184.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFAE37C79E
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 00:59:15 -0800 (PST)
+Received: by mail.olerise.pl (Postfix, from userid 1001)
+        id A229243D55; Wed, 23 Feb 2022 09:41:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=olerise.pl; s=mail;
+        t=1645605807; bh=ZNYiuZLXlxCdAPtstEG/gwJieB5RBwA/cHj1SZ3Mpl0=;
+        h=Date:From:To:Subject:From;
+        b=scMYh72buq21rN8VML3AdfQwWPsPmTm/Y196B6lDMyUqgHjXESbJqCIGrvUscoIMu
+         t1DQPc5G+LPG+10XyW/DkDYqDD0+9iAFM+IwL6odiuWJSemgAZdtkK+9D7HLgHswnV
+         PfPbtmJMF779es/AQLmsOom+Ryp0ihdaoL40TOLFXVAtPT7vLTMzLni4Dttc/L+sT2
+         JFbezcJzwc0aC0Hm1/sUuWkdmpV+v2U/PnG+a2UjbQq2LZZaMZAE90dKJckCCEImnr
+         Ul0Jb0X5SlgxXDuBHzlku83z4ECWo3b7kNjRyJltf6pACQItD8qQcp50Xyj8xpMhaI
+         VcXZSHmAkJc3w==
+Received: by mail.olerise.pl for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 08:40:28 GMT
+Message-ID: <20220223084500-0.1.1x.fikl.0.lcdbf1gpl0@olerise.pl>
+Date:   Wed, 23 Feb 2022 08:40:28 GMT
+From:   =?UTF-8?Q? "Miko=C5=82aj_Rudzik" ?= <mikolaj.rudzik@olerise.pl>
+To:     <linux-crypto@vger.kernel.org>
+Subject: =?UTF-8?Q?Nap=C5=82yw_Klient=C3=B3w_ze_strony?=
+X-Mailer: mail.olerise.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-the drbg code was binding the same buffer to two different
-scatter gather lists and submitting those as source and
-destination to a crypto api operation, thus potentially
-causing HW crypto drivers to perform overlapping DMA
-mappings which are not aware it is the same buffer.
+Dzie=C5=84 dobry,
 
-This can have serious consequences of data corruption of
-internal DRBG buffers and wrong RNG output.
+chcia=C5=82bym poinformowa=C4=87 Pa=C5=84stwa o mo=C5=BCliwo=C5=9Bci pozy=
+skania nowych zlece=C5=84 ze strony www.
 
-Fix this by reusing the same scatter gatther list for both
-src and dst.
+Widzimy zainteresowanie potencjalnych Klient=C3=B3w Pa=C5=84stwa firm=C4=85=
+, dlatego ch=C4=99tnie pomo=C5=BCemy Pa=C5=84stwu dotrze=C4=87 z ofert=C4=
+=85 do wi=C4=99kszego grona odbiorc=C3=B3w poprzez efektywne metody pozyc=
+jonowania strony w Google.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-on: r8a7795-salvator-x
-Tested-on: xilinx-zc706
-Fixes: 43490e8046b5d ("crypto: drbg - in-place cipher operation for CTR")
-Cc: stable@vger.kernel.org
----
- crypto/drbg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Czy m=C3=B3g=C5=82bym liczy=C4=87 na kontakt zwrotny?
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 177983b6ae38..13824fd27627 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1851,7 +1851,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
- 		/* Use scratchpad for in-place operation */
- 		inlen = scratchpad_use;
- 		memset(drbg->outscratchpad, 0, scratchpad_use);
--		sg_set_buf(sg_in, drbg->outscratchpad, scratchpad_use);
-+		sg_in = sg_out;
- 	}
- 
- 	while (outlen) {
--- 
-2.25.1
 
+Pozdrawiam
+Miko=C5=82aj Rudzik
