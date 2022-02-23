@@ -2,210 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F57FC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 18:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36686C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 19:18:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239987AbiBWSzz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 13:55:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40982 "EHLO
+        id S241326AbiBWTTO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 14:19:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233132AbiBWSzz (ORCPT
+        with ESMTP id S235662AbiBWTTN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 13:55:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0453EF00;
-        Wed, 23 Feb 2022 10:55:27 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B94C0B8218D;
-        Wed, 23 Feb 2022 18:55:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94E10C340E7;
-        Wed, 23 Feb 2022 18:55:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QkOuubY0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645642521;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=cwY0EDD6eopPWtPCL3v37+kjOKqJXSVA7WTKzKBMdiU=;
-        b=QkOuubY0JZAuCOGq4M7e4/QFDp9EvBWpOOFuim35X9plkeushAGzJT967j8qZV1YLiHotT
-        uoDVEZw8YT1I1JdZVYHAlqUfTh+Mz/+fw/vXYuFJqiiGqZRFjOoTRZGmtoSNcKUolk6vGw
-        vhaOlpSlh1oP0edkfAuYTOu1rEJaFkc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e60620e8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 23 Feb 2022 18:55:20 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        bigeasy@linutronix.de
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH] random: do crng pre-init loading in worker rather than irq
-Date:   Wed, 23 Feb 2022 19:55:11 +0100
-Message-Id: <20220223185511.628452-1-Jason@zx2c4.com>
+        Wed, 23 Feb 2022 14:19:13 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2028045ADC;
+        Wed, 23 Feb 2022 11:18:45 -0800 (PST)
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21NJ9PeK008330;
+        Wed, 23 Feb 2022 19:18:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=4M7keEVwA9K+g1bmFw59BD8lXOkD/TAviruIu4QgsWM=;
+ b=A4jSVxJ8psUNkRPXXpGO2BUHOR470CByPj2dqKa2gE03i47W5Lkubta7w3kR4ptQZGaJ
+ IL6YR8QcCmQZgAuFHL8CuVBRP2445uiyVpcW+MZS2tZ1cuRxr2Qoqfz7AV1+0funeIVc
+ e0xgHF3MbH7ApK9ic0xp7UIKWogRZUj08EMyqamPM3beFX8B2VWVZ0xT6PjGoishFo1f
+ 9NuQO9QK39RGceWeiBQpkNYh3YcP/4wZ25ihoJXrhu9/kfzCj2lEJnpdu6LbPfI6k704
+ fQ5x38+brQOPcMMQVOvIdD/jp6LSNWmOy2oSW6XdpJtOlfctVyhTTUTtxKLCQhiKIfbO 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6t1mvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 19:18:18 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21NJHVXY015629;
+        Wed, 23 Feb 2022 19:18:17 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ede6t1muq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 19:18:17 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21NJBlaT029428;
+        Wed, 23 Feb 2022 19:18:14 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ear69c9cr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Feb 2022 19:18:14 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21NJIB4t26018054
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 23 Feb 2022 19:18:11 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42DA3AE04D;
+        Wed, 23 Feb 2022 19:18:11 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47C52AE051;
+        Wed, 23 Feb 2022 19:18:10 +0000 (GMT)
+Received: from osiris (unknown [9.145.31.42])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 23 Feb 2022 19:18:10 +0000 (GMT)
+Date:   Wed, 23 Feb 2022 20:18:08 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Baoquan He <bhe@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, akpm@linux-foundation.org, cl@linux.com,
+        42.hyeyoo@gmail.com, penberg@kernel.org, rientjes@google.com,
+        iamjoonsoo.kim@lge.com, vbabka@suse.cz, David.Laight@aculab.com,
+        david@redhat.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
+        netdev@vger.kernel.org, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        linux-s390@vger.kernel.org, michael@walle.cc,
+        linux-i2c@vger.kernel.org, wsa@kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>
+Subject: Re: [PATCH 00/22] Don't use kmalloc() with GFP_DMA
+Message-ID: <YhaIcPmc8qi1zmnj@osiris>
+References: <20220219005221.634-1-bhe@redhat.com>
+ <YhOaTsWUKO0SWsh7@osiris>
+ <20220222084422.GA6139@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220222084422.GA6139@lst.de>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TJSaBEB9Lulpk4sdWf3aymM3sOHqNnmS
+X-Proofpoint-ORIG-GUID: RQrgHuEksbIzwLY-XstVcce5JZQWh0wb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-23_09,2022-02-23_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 mlxlogscore=632
+ clxscore=1015 mlxscore=0 malwarescore=0 adultscore=0 suspectscore=0
+ spamscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2201110000 definitions=main-2202230108
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Taking spinlocks from IRQ context is problematic for PREEMPT_RT. That
-is, in part, why we take trylocks instead. But apparently this still
-trips up various lock dependency analyzers. That seems like a bug in the
-analyzers that should be fixed, rather than having to change things
-here.
+On Tue, Feb 22, 2022 at 09:44:22AM +0100, Christoph Hellwig wrote:
+> On Mon, Feb 21, 2022 at 02:57:34PM +0100, Heiko Carstens wrote:
+> > > 1) Kmalloc(GFP_DMA) in s390 platform, under arch/s390 and drivers/s390;
+> > 
+> > So, s390 partially requires GFP_DMA allocations for memory areas which
+> > are required by the hardware to be below 2GB. There is not necessarily
+> > a device associated when this is required. E.g. some legacy "diagnose"
+> > calls require buffers to be below 2GB.
+> > 
+> > How should something like this be handled? I'd guess that the
+> > dma_alloc API is not the right thing to use in such cases. Of course
+> > we could say, let's waste memory and use full pages instead, however
+> > I'm not sure this is a good idea.
+> 
+> Yeah, I don't think the DMA API is the right thing for that.  This
+> is one of the very rare cases where a raw allocation makes sense.
+> 
+> That being said being able to drop kmalloc support for GFP_DMA would
+> be really useful. How much memory would we waste if switching to the
+> page allocator?
 
-But maybe there's another reason to change things up: by deferring the
-crng pre-init loading to the worker, we can use the cryptographic hash
-function rather than xor, which is perhaps a meaningful difference when
-considering this data has only been through the relatively weak
-fast_mix() function.
+At a first glance this would not waste much memory, since most callers
+seem to allocate such memory pieces only temporarily.
 
-The biggest downside of this approach is that the pre-init loading is
-now deferred until later, which means things that need random numbers
-after interrupts are enabled, but before workqueues are running -- or
-before this particular worker manages to run -- are going to get into
-trouble. Hopefully in the real world, this window is rather small,
-especially since this code won't run until 64 interrupts had occurred.
+> > The question is: what would this buy us? As stated above I'd assume
+> > this comes with quite some code churn, so there should be a good
+> > reason to do this.
+> 
+> There is two steps here.  One is to remove GFP_DMA support from
+> kmalloc, which would help to cleanup the slab allocator(s) very nicely,
+> as at that point it can stop to be zone aware entirely.
 
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 62 ++++++++++++-------------------------------
- 1 file changed, 17 insertions(+), 45 deletions(-)
+Well, looking at slub.c it looks like there is only a very minimal
+maintenance burden for GPF_DMA/GFP_DMA32 support.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 536237a0f073..9fb06fc298d3 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -443,10 +443,6 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
-  * boot time when it's better to have something there rather than
-  * nothing.
-  *
-- * There are two paths, a slow one and a fast one. The slow one
-- * hashes the input along with the current key. The fast one simply
-- * xors it in, and should only be used from interrupt context.
-- *
-  * If account is set, then the crng_init_cnt counter is incremented.
-  * This shouldn't be set by functions like add_device_randomness(),
-  * where we can't trust the buffer passed to it is guaranteed to be
-@@ -455,19 +451,15 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
-  * Returns the number of bytes processed from input, which is bounded
-  * by CRNG_INIT_CNT_THRESH if account is true.
-  */
--static size_t crng_pre_init_inject(const void *input, size_t len,
--				   bool fast, bool account)
-+static size_t crng_pre_init_inject(const void *input, size_t len, bool account)
- {
- 	static int crng_init_cnt = 0;
-+	struct blake2s_state hash;
- 	unsigned long flags;
- 
--	if (fast) {
--		if (!spin_trylock_irqsave(&base_crng.lock, flags))
--			return 0;
--	} else {
--		spin_lock_irqsave(&base_crng.lock, flags);
--	}
-+	blake2s_init(&hash, sizeof(base_crng.key));
- 
-+	spin_lock_irqsave(&base_crng.lock, flags);
- 	if (crng_init != 0) {
- 		spin_unlock_irqrestore(&base_crng.lock, flags);
- 		return 0;
-@@ -476,21 +468,9 @@ static size_t crng_pre_init_inject(const void *input, size_t len,
- 	if (account)
- 		len = min_t(size_t, len, CRNG_INIT_CNT_THRESH - crng_init_cnt);
- 
--	if (fast) {
--		const u8 *src = input;
--		size_t i;
--
--		for (i = 0; i < len; ++i)
--			base_crng.key[(crng_init_cnt + i) %
--				      sizeof(base_crng.key)] ^= src[i];
--	} else {
--		struct blake2s_state hash;
--
--		blake2s_init(&hash, sizeof(base_crng.key));
--		blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
--		blake2s_update(&hash, input, len);
--		blake2s_final(&hash, base_crng.key);
--	}
-+	blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
-+	blake2s_update(&hash, input, len);
-+	blake2s_final(&hash, base_crng.key);
- 
- 	if (account) {
- 		crng_init_cnt += len;
-@@ -1040,7 +1020,7 @@ void add_device_randomness(const void *buf, size_t size)
- 	unsigned long flags;
- 
- 	if (crng_init == 0 && size)
--		crng_pre_init_inject(buf, size, false, false);
-+		crng_pre_init_inject(buf, size, false);
- 
- 	spin_lock_irqsave(&input_pool.lock, flags);
- 	_mix_pool_bytes(buf, size);
-@@ -1157,7 +1137,7 @@ void add_hwgenerator_randomness(const void *buffer, size_t count,
- 				size_t entropy)
- {
- 	if (unlikely(crng_init == 0)) {
--		size_t ret = crng_pre_init_inject(buffer, count, false, true);
-+		size_t ret = crng_pre_init_inject(buffer, count, true);
- 		mix_pool_bytes(buffer, ret);
- 		count -= ret;
- 		buffer += ret;
-@@ -1298,7 +1278,12 @@ static void mix_interrupt_randomness(struct work_struct *work)
- 	local_irq_enable();
- 
- 	mix_pool_bytes(pool, sizeof(pool));
--	credit_entropy_bits(1);
-+
-+	if (unlikely(crng_init == 0))
-+		crng_pre_init_inject(pool, sizeof(pool), true);
-+	else
-+		credit_entropy_bits(1);
-+
- 	memzero_explicit(pool, sizeof(pool));
- }
- 
-@@ -1331,24 +1316,11 @@ void add_interrupt_randomness(int irq)
- 	fast_mix(fast_pool->pool32);
- 	new_count = ++fast_pool->count;
- 
--	if (unlikely(crng_init == 0)) {
--		if (new_count >= 64 &&
--		    crng_pre_init_inject(fast_pool->pool32, sizeof(fast_pool->pool32),
--					 true, true) > 0) {
--			fast_pool->count = 0;
--			fast_pool->last = now;
--			if (spin_trylock(&input_pool.lock)) {
--				_mix_pool_bytes(&fast_pool->pool32, sizeof(fast_pool->pool32));
--				spin_unlock(&input_pool.lock);
--			}
--		}
--		return;
--	}
--
- 	if (new_count & MIX_INFLIGHT)
- 		return;
- 
--	if (new_count < 64 && !time_after(now, fast_pool->last + HZ))
-+	if (new_count < 64 && (!time_after(now, fast_pool->last + HZ) ||
-+			       unlikely(crng_init == 0)))
- 		return;
- 
- 	if (unlikely(!fast_pool->mix.func))
--- 
-2.35.1
+> The long term goal is to remove ZONE_DMA entirely at least for
+> architectures that only use the small 16MB ISA-style one.  It can
+> then be replaced with for example a CMA area and fall into a movable
+> zone.  I'd have to prototype this first and see how it applies to the
+> s390 case.  It might not be worth it and maybe we should replace
+> ZONE_DMA and ZONE_DMA32 with a ZONE_LIMITED for those use cases as
+> the amount covered tends to not be totally out of line for what we
+> built the zone infrastructure.
 
+So probably I'm missing something; but for small systems where we
+would only have ZONE_DMA, how would a CMA area within this zone
+improve things?
+
+If I'm not mistaken then the page allocator will not fallback to any
+CMA area for GFP_KERNEL allocations. That is: we would somehow need to
+find "the right size" for the CMA area, depending on memory size. This
+looks like a new problem class which currently does not exist.
+
+Besides that we would also not have all the debugging options provided
+by the slab allocator anymore.
+
+Anyway, maybe it would make more sense if you would send your patch
+and then we can see where we would end up.
