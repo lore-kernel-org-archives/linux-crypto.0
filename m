@@ -2,182 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C7CC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 13:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9C8C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 13:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240715AbiBWNGX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 08:06:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59450 "EHLO
+        id S240727AbiBWNNX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 08:13:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240712AbiBWNGW (ORCPT
+        with ESMTP id S238766AbiBWNNX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 08:06:22 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4021F985B2
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 05:05:54 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id d14-20020a05600c34ce00b0037bf4d14dc7so4295387wmq.3
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 05:05:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=6Iisim3PKzqx+0SuQ2EiWiTngQbIiBBSQFYW4bmZFG4=;
-        b=xL6fA/11WclCJM2MxlSqzWBaUxk7fA+4OI+SITJI3HuBC6aQNHwmvUdRbzI1PWCJjl
-         nouFQQhqbAdlbueFM4m4nechphstnnVXOLaT+TT5I1cZyq1ZPuPhF4HtYie6PMauU2Xm
-         O5y8ACzbRTCySsiNoG6ClSYFzXpaVUE25zrItpI4eg7w2gdceTjzAoMqekdca/mwhw2A
-         0X4OPqCP0xw5cQdDChXDAKGE2Ptt3GNilnfvPJ8MJzcV8cI1QihpzAVp+jpbSy84uxJA
-         kpLQ+TDO5gjA0kM/GLr8jOWm0+Gk3p8/LGu0A7nCV+J5YODK8d8N5fL0XBhB1Yox5U0G
-         ArZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=6Iisim3PKzqx+0SuQ2EiWiTngQbIiBBSQFYW4bmZFG4=;
-        b=WzCsj/etvIcmrcK2UG2HrMF7jpJdzRNinnfqHT3LmDMmfNqXq1sVfLc3pYZxEgG+ec
-         0tsklGxymM8PNRSI8xdmigKrAI9ZgRYE0ruGQ8mrlSF6ywjtbqAeBaMhXibDuBUM0yNQ
-         DRz7EJqaGqn2eU01cTgp4Klh8sUd3WyYeR3G3nmQHNyFGdqOUbvOQ58O3E6ietxo0Vae
-         Rh25SmCDn+KEg89CFCdny7uyNnsoOyeWUpA5CVp6YZqMiLZn/ir2dJqg4k4qYR8bwQ07
-         +9cXNTlyTbE8C3JgV8ThGG54wpJc4X0YEjMIxV2NM+6+ehTQmMl/Qb1jBnA9wKwZujwN
-         je2w==
-X-Gm-Message-State: AOAM532bVYbtWbes7R+cyhPgFa4LF99Rca5qePzBOx0KOFwqXAw7mAYU
-        coXTbXo+yfKISbs2OADUGCKpoA==
-X-Google-Smtp-Source: ABdhPJxjlMvrB5Zg7n5QG4YhSseGskPdLA0ieLEpVQkkvGr/YjdvxZNHAECAhketBqw3EMUC5LVe9w==
-X-Received: by 2002:a05:600c:4f93:b0:37b:c4c1:e806 with SMTP id n19-20020a05600c4f9300b0037bc4c1e806mr7711932wmq.104.1645621552724;
-        Wed, 23 Feb 2022 05:05:52 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id s2sm5334745wmc.45.2022.02.23.05.05.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Feb 2022 05:05:52 -0800 (PST)
-Date:   Wed, 23 Feb 2022 14:05:50 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Johan Jonker <jbx6244@gmail.com>
-Cc:     heiko@sntech.de, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        robh+dt@kernel.org, krzysztof.kozlowski@canonical.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH v3] dt-bindings: crypto: convert rockchip-crypto to yaml
-Message-ID: <YhYxLmBYa+DMCnuz@Red>
-References: <20220211115925.3382735-1-clabbe@baylibre.com>
- <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com>
+        Wed, 23 Feb 2022 08:13:23 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8DA5FF17;
+        Wed, 23 Feb 2022 05:12:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6478B6117F;
+        Wed, 23 Feb 2022 13:12:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 533DEC340F0;
+        Wed, 23 Feb 2022 13:12:53 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="p2uLwLyr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645621971;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yDH6L5SfKXyei5pTTzcAk9yjz7NgT/Zl7Px1eWnwpqQ=;
+        b=p2uLwLyrNMQ8HTaqGPewS3XX209s7oJqJ9miRcoY1DtAZT8hviF4SxAj5On0Im2pbnBr3p
+        qozPAZOFG4amHtvVOWAclMD5HdWA5Oi9z78mYqPXXrH2JsBBaqdcZS4CZ649Pcqn51y//z
+        udUOOwgOLtSyOIgtQw8+TrDExV8xsig=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 57f5dfd0 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 23 Feb 2022 13:12:50 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, adrian@parity.io
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, dwmw@amazon.co.uk,
+        acatan@amazon.com, graf@amazon.com, colmmacc@amazon.com,
+        sblbir@amazon.com, raduweis@amazon.com, jannh@google.com,
+        gregkh@linuxfoundation.org, tytso@mit.edu
+Subject: [PATCH RFC v1 0/2] VM fork detection for RNG
+Date:   Wed, 23 Feb 2022 14:12:29 +0100
+Message-Id: <20220223131231.403386-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Feb 15, 2022 at 03:07:56PM +0100, Johan Jonker a écrit :
-> Hi Heiko,
-> 
-> On 2/11/22 12:59, Corentin Labbe wrote:
-> > Convert rockchip-crypto to yaml
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> > Changes since v1:
-> > - fixed example
-> > - renamed to a new name
-> > - fixed some maxItems
-> > 
-> > Change since v2:
-> > - Fixed maintainers section
-> > 
-> >  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
-> >  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
-> >  2 files changed, 66 insertions(+), 28 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> 
-> rockchip,crypto.yaml
+This small series picks up work from Amazon that seems to have stalled
+out later year around this time: listening for the vmgenid ACPI
+notification, and using it to "do something." Last year, that something
+involved a complicated userspace mmap chardev, which seems frought with
+difficulty. This year, I have something much simpler in mind: simply
+using those ACPI notifications to tell the RNG to reinitialize safely,
+so we don't repeat random numbers in cloned, forked, or rolled-back VM
+instances.
 
+This series consists of two patches. The first is a rather
+straightforward addition to random.c, which I feel fine about. The
+second patch is the reason this is just an RFC: it's a cleanup of the
+ACPI driver from last year, and I don't really have much experience
+writing, testing, debugging, or maintaining these types of drivers.
+Ideally this thread would yield somebody saying, "I see the intent of
+this; I'm happy to take over ownership of this part." That way, I can
+focus on the RNG part, and whoever steps up for the paravirt ACPI part
+can focus on that.
 
-Hello
+As a final note, this series intentionally does _not_ focus on
+notification of these events to userspace or to other kernel consumers.
+Since these VM fork detection events first need to hit the RNG, we can
+later talk about what sorts of notifications or mmap'd counters the RNG
+should be making accessible to elsewhere. But that's a different sort of
+project and ties into a lot of more complicated concerns beyond this
+more basic patchset. So hopefully we can keep the discussion rather
+focused here to this ACPI business.
 
-DT maintainer asked for rockchip,rk3288-crypto, so I will keep it.
+Cc: dwmw@amazon.co.uk
+Cc: acatan@amazon.com
+Cc: graf@amazon.com
+Cc: colmmacc@amazon.com
+Cc: sblbir@amazon.com
+Cc: raduweis@amazon.com
+Cc: jannh@google.com
+Cc: gregkh@linuxfoundation.org
+Cc: tytso@mit.edu
 
-> 
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> > 
-> > diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > new file mode 100644
-> > index 000000000000..2e1e9fa711c4
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > @@ -0,0 +1,66 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> 
-> rockchip,crypto.yaml
-> 
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Rockchip Electronics And Security Accelerator
-> > +
-> > +maintainers:
-> > +  - Heiko Stuebner <heiko@sntech.de>
-> > +
-> > +properties:
-> > +  compatible:
-> 
->     oneOf:
->       - const: rockchip,rk3288-crypto
->       - items:
->           - enum:
->               - rockchip,rk3228-crypto
->               - rockchip,rk3328-crypto
->               - rockchip,rk3368-crypto
->               - rockchip,rk3399-crypto
->           - const: rockchip,rk3288-crypto
-> 
-> rk3288 was the first in line that had support, so we use that as fall
-> back string.
+Jason A. Donenfeld (2):
+  random: add mechanism for VM forks to reinitialize crng
+  drivers/virt: add vmgenid driver for reinitializing RNG
 
-I will dont add compatible which are not handled by the driver unless DT maintainer said I should.
+ drivers/char/random.c  |  58 ++++++++++++++++++
+ drivers/virt/Kconfig   |   8 +++
+ drivers/virt/Makefile  |   1 +
+ drivers/virt/vmgenid.c | 133 +++++++++++++++++++++++++++++++++++++++++
+ include/linux/random.h |   1 +
+ 5 files changed, 201 insertions(+)
+ create mode 100644 drivers/virt/vmgenid.c
 
-> 
-> > +    const: rockchip,rk3288-crypto
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: clock data
-> > +      - description: clock data
-> > +      - description: clock crypto accelerator
-> 
-> > +      - description: clock dma
-> 
-> remove ???
-> 
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: aclk
-> > +      - const: hclk
-> > +      - const: sclk
-> 
-> > +      - const: apb_pclk
-> 
-> remove ???
-> 
-> Similar to the rk3568 pclk_xpcs discussion ACLK_DMAC1 belongs to the
-> dmac_bus_s node and should have been enabled by the DMA driver I think.
-> Could you advise if this is correct or should we remove parsing/enabling
-> ACLK_DMAC1 in rk3288_crypto.c in order to it easier
-> porting/adding/syncing nodes for other SoC types?
-> 
-> Johan
+-- 
+2.35.1
 
-I tested on my rk3328-rock64 and I confirm apb_pclk is unnessecary.
-I will issue patch for fixing this.
-
-Regards
