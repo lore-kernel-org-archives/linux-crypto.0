@@ -2,138 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F94C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 16:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D24C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 16:34:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240218AbiBWQXv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 11:23:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35030 "EHLO
+        id S231128AbiBWQfQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 11:35:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235059AbiBWQXu (ORCPT
+        with ESMTP id S242667AbiBWQfP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 11:23:50 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3902FC5D9B
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 08:23:23 -0800 (PST)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1nMuPy-00008w-Vg; Wed, 23 Feb 2022 17:23:06 +0100
-Message-ID: <994a4d49-b1d3-a7ab-d7b3-33405b13c125@pengutronix.de>
-Date:   Wed, 23 Feb 2022 17:23:06 +0100
+        Wed, 23 Feb 2022 11:35:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 180E350E0F
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 08:34:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645634087;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nQ3OobjVOllFjF//341g+8FVMNuOOL65pOBy6n0VyaU=;
+        b=Ejj2iU4cZ/2qtJPBUiHrCiWJ7Qm1ARp14iPAWckKRRG7uYyZ1RsXc6U3UlHe5mVi0wsEkm
+        HmoivDhmm5y8UcYHjfUi/sS6Po1SYvd3KFL82ZaOx2ibrYGsYld9k6nvNhpHuQkRe6FPk9
+        agdZKBpV80/o9Oohwkz8DCssXw99BQo=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-178-zmg8bS27N5yPPHufbecXOA-1; Wed, 23 Feb 2022 11:34:46 -0500
+X-MC-Unique: zmg8bS27N5yPPHufbecXOA-1
+Received: by mail-ot1-f72.google.com with SMTP id l23-20020a056830239700b005ad40210ca2so10612907ots.3
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 08:34:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=nQ3OobjVOllFjF//341g+8FVMNuOOL65pOBy6n0VyaU=;
+        b=rfkKyHA6BzbAf0W6MHTs4pl4WR92jqvKyTbTBWhCEoAqFzDNDwLNTI+ugBRRL3kRkl
+         WND1cBN+tXYzEImBQyijuQyWnPfkieWMmcvpX3Xu4It5v7eSgYV+mL5bdPXB2tm6IYRJ
+         G1iZ8Xy81vbCr+RHsoGLgED3wuD95/+1Eyyls0S0mYVLtEBRuxC1a8lmOgCQlZwhZPes
+         HqzfWhZ6HYQdd3eLUXg0FFITmb7Dqc2j/2Vojr9lPa2b6QGOYyaTp4+7bBvtL6S0nEfD
+         4SVOlWils0Qla05RW6eqdazQhALao5RVG/P3zPvNwfwcWnRp/OLv3ou/8zahw6Kf/2CE
+         B6Og==
+X-Gm-Message-State: AOAM530u7R3nBvJCl7YjYPY5Ls/DhbssfyFPHGTJsnAG0b0dxroPlpPH
+        IrQx6CFiNJQwTElvXIcWVrSwMqvIA8+rftj6vrEqCYyoCagyrH/3/ib4aDwT2OMqZnSkmGahV8x
+        XEVJryPGg+Quc8UvIwiBqNob0
+X-Received: by 2002:a54:4085:0:b0:2d4:6f0b:f3b7 with SMTP id i5-20020a544085000000b002d46f0bf3b7mr258687oii.148.1645634085370;
+        Wed, 23 Feb 2022 08:34:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxaP/1ZvmMsLm7zZq6HfYZWjNtio48LTCUjFpR9oZZdGxGMhkpLSdC41ujeIjXVdKBnwi0P6A==
+X-Received: by 2002:a54:4085:0:b0:2d4:6f0b:f3b7 with SMTP id i5-20020a544085000000b002d46f0bf3b7mr258680oii.148.1645634085157;
+        Wed, 23 Feb 2022 08:34:45 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id s9sm55235otg.6.2022.02.23.08.34.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Feb 2022 08:34:44 -0800 (PST)
+Date:   Wed, 23 Feb 2022 09:34:43 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, cohuck@redhat.com,
+        mgurtovoy@nvidia.com, yishaih@nvidia.com, linuxarm@huawei.com,
+        liulongfang@huawei.com, prime.zeng@hisilicon.com,
+        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH v5 7/8] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220223093443.367ee531.alex.williamson@redhat.com>
+In-Reply-To: <20220223005251.GJ10061@nvidia.com>
+References: <20220221114043.2030-1-shameerali.kolothum.thodi@huawei.com>
+        <20220221114043.2030-8-shameerali.kolothum.thodi@huawei.com>
+        <20220223005251.GJ10061@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v5 3/5] KEYS: trusted: allow trust sources to use kernel
- RNG for key material
-Content-Language: en-US
-To:     James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     kernel@pengutronix.de, Sumit Garg <sumit.garg@linaro.org>,
-        David Gstir <david@sigma-star.at>,
-        Tim Harvey <tharvey@gateworks.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20220222195819.2313913-1-a.fatoum@pengutronix.de>
- <20220222195819.2313913-4-a.fatoum@pengutronix.de>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20220222195819.2313913-4-a.fatoum@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22.02.22 20:58, Ahmad Fatoum wrote:
-> The two existing trusted key sources don't make use of the kernel RNG,
-> but instead let the hardware that does the sealing/unsealing also
-> generate the random key material. While a previous change offers users
-> the choice to use the kernel RNG instead for both, new trust sources
-> may want to unconditionally use the kernel RNG for generating key
-> material, like it's done elsewhere in the kernel.
+On Tue, 22 Feb 2022 20:52:51 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Mon, Feb 21, 2022 at 11:40:42AM +0000, Shameer Kolothum wrote:
 > 
-> This is especially prudent for hardware that has proven-in-production
-> HWRNG drivers implemented, as otherwise code would have to be duplicated
-> only to arrive at a possibly worse result.
+> > +	/*
+> > +	 * ACC VF dev BAR2 region consists of both functional register space
+> > +	 * and migration control register space. For migration to work, we
+> > +	 * need access to both. Hence, we map the entire BAR2 region here.
+> > +	 * But from a security point of view, we restrict access to the
+> > +	 * migration control space from Guest(Please see mmap/ioctl/read/write
+> > +	 * override functions).
+> > +	 *
+> > +	 * Also the HiSilicon ACC VF devices supported by this driver on
+> > +	 * HiSilicon hardware platforms are integrated end point devices
+> > +	 * and has no capability to perform PCIe P2P.  
 > 
-> Make this possible by turning struct trusted_key_ops::get_random
-> into an optional member. If a driver leaves it NULL, kernel RNG
-> will be used instead.
-
-The rebase on the change in scope of the previous commit made this
-one here quite small. I would squash it into the previous commit
-for v6, unless there are objections.
-
-
+> If that is the case why not implement the RUNNING_P2P as well as a
+> NOP?
 > 
-> Acked-by: Sumit Garg <sumit.garg@linaro.org>
-> Reviewed-by: David Gstir <david@sigma-star.at>
-> Tested-By: Tim Harvey <tharvey@gateworks.com>
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
-> To: James Bottomley <jejb@linux.ibm.com>
-> To: Jarkko Sakkinen <jarkko@kernel.org>
-> To: Mimi Zohar <zohar@linux.ibm.com>
-> To: David Howells <dhowells@redhat.com>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> Cc: "Horia Geantă" <horia.geanta@nxp.com>
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-> Cc: David Gstir <david@sigma-star.at>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-> Cc: Sumit Garg <sumit.garg@linaro.org>
-> Cc: Tim Harvey <tharvey@gateworks.com>
-> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Cc: keyrings@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-integrity@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-security-module@vger.kernel.org
-> ---
->  include/keys/trusted-type.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/keys/trusted-type.h b/include/keys/trusted-type.h
-> index d89fa2579ac0..4eb64548a74f 100644
-> --- a/include/keys/trusted-type.h
-> +++ b/include/keys/trusted-type.h
-> @@ -64,7 +64,7 @@ struct trusted_key_ops {
->  	/* Unseal a key. */
->  	int (*unseal)(struct trusted_key_payload *p, char *datablob);
->  
-> -	/* Get a randomized key. */
-> +	/* Optional: Get a randomized key. */
->  	int (*get_random)(unsigned char *key, size_t key_len);
->  
->  	/* Exit key interface. */
+> Alex expressed concerned about proliferation of non-P2P devices as it
+> complicates qemu to support mixes
 
+I read the above as more of a statement about isolation, ie. grouping.
+Given that all DMA from the device is translated by the IOMMU, how is
+it possible that a device can entirely lack p2p support, or even know
+that the target address post-translation is to a peer device rather
+than system memory.  If this is the case, it sounds like a restriction
+of the SMMU not supporting translations that reflect back to the I/O
+bus rather than a feature of the device itself.  Thanks,
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Alex
+
