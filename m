@@ -2,92 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDF9C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 15:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F4EC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Feb 2022 15:11:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234562AbiBWPKW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 10:10:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44464 "EHLO
+        id S233411AbiBWPLz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 10:11:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233411AbiBWPKV (ORCPT
+        with ESMTP id S235370AbiBWPLy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 10:10:21 -0500
+        Wed, 23 Feb 2022 10:11:54 -0500
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB56B54F1;
-        Wed, 23 Feb 2022 07:09:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65172B82D8
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Feb 2022 07:11:26 -0800 (PST)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 41C27212B8;
-        Wed, 23 Feb 2022 15:09:52 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2333121118;
+        Wed, 23 Feb 2022 15:11:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1645628992;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+bG53Wp6Gl3zxi+iDVlP2+hLh3hp86ZbjZHuT6T3H4c=;
-        b=xS7aTKWI8XT6G562T77CJH92o9fzp6NYMX790K0voS6SNKVFj5iAdczmeOdVLIiYNDLP70
-        VoCtdAGAIaTilxlnT2pFdK2eknkRndK/LPY2z+NpatJ7jeR1VGtTmOubyMnlZDCKTGRz1+
-        Ar7FNLNr9kWvEDB2sXkPsr0OuY7k52Q=
+        t=1645629085; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jj0VDg4qe/7XaGf26u5BBLCjUikPfXJEstOrdhAHq5o=;
+        b=XTiuNDBLnj1EBWvVPNkDPsI97AYYGuj5VMtzWtk/IMFDpHoghUscQGE2NRJu+5NS0bmZoY
+        b1IoVhT5J3vevvf06xqbk/25NvlcokM7Gi8D2iA5DGbNTqx/nEVMHX9sQYwPARuphpAWaV
+        q33tJ1092s6RlX+bUf0h4uFg0ai9A+I=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1645628992;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+bG53Wp6Gl3zxi+iDVlP2+hLh3hp86ZbjZHuT6T3H4c=;
-        b=sxQAYgK9otm3HSE0AEpEYEywkD0OFra5TTgWQTx83lUUmg9KFW+TiHb4MaQCtioGW3pf9E
-        0YrDKER4+2oa62Aw==
+        s=susede2_ed25519; t=1645629085;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=jj0VDg4qe/7XaGf26u5BBLCjUikPfXJEstOrdhAHq5o=;
+        b=yJi4molU16v9vZb52yXmAAovhuMr+6nRTNCZ78p4hA0stZ1LqbyZQQ0kbwLYHynW9ww3NE
+        GcbMctX47xGJPPBA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id BF94913D80;
-        Wed, 23 Feb 2022 15:09:51 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 99F8113D80;
+        Wed, 23 Feb 2022 15:11:24 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Zo4FLT9OFmIiYAAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Wed, 23 Feb 2022 15:09:51 +0000
-Date:   Wed, 23 Feb 2022 16:09:50 +0100
+        id dCO+IpxOFmISYQAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Wed, 23 Feb 2022 15:11:24 +0000
 From:   Petr Vorel <pvorel@suse.cz>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
-        leitao@debian.org, Nayna Jain <nayna@linux.ibm.com>,
+To:     linux-crypto@vger.kernel.org
+Cc:     Petr Vorel <pvorel@suse.cz>, Nicolai Stange <nstange@suse.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>, leitao@debian.org,
+        Nayna Jain <nayna@linux.ibm.com>,
         Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] crypto: vmx - merge CRYPTO_DEV_VMX_ENCRYPT into
- CRYPTO_DEV_VMX
-Message-ID: <YhZOPvXEe1avs5uu@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20220217105751.6330-1-pvorel@suse.cz>
- <20220217105751.6330-2-pvorel@suse.cz>
- <YhWirRLlQNs3jha/@gondor.apana.org.au>
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v4 1/1] crypto: vmx - add missing dependencies
+Date:   Wed, 23 Feb 2022 16:11:15 +0100
+Message-Id: <20220223151115.28536-1-pvorel@suse.cz>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YhWirRLlQNs3jha/@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> On Thu, Feb 17, 2022 at 11:57:50AM +0100, Petr Vorel wrote:
-> > CRYPTO_DEV_VMX_ENCRYPT is redundant with CRYPTO_DEV_VMX.
+vmx-crypto module depends on CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or
+CRYPTO_XTS, thus add them.
 
-> > And it also forces CRYPTO_GHASH to be builtin even
-> > CRYPTO_DEV_VMX_ENCRYPT was configured as module.
+These dependencies are likely to be enabled, but if
+CRYPTO_DEV_VMX=y && !CRYPTO_MANAGER_DISABLE_TESTS
+and either of CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or CRYPTO_XTS is built
+as module or disabled, alg_test() from crypto/testmgr.c complains during
+boot about failing to allocate the generic fallback implementations
+(2 == ENOENT):
 
-> Just because a tristate sits under a bool, it does not force
-> the options that it selects to y/n.  The select still operates
-> on the basis of the tristate.
-I'm sorry, not sure what I did wrong before. Now it really behaves as expected.
+[    0.540953] Failed to allocate xts(aes) fallback: -2
+[    0.541014] alg: skcipher: failed to allocate transform for p8_aes_xts: -2
+[    0.541120] alg: self-tests for p8_aes_xts (xts(aes)) failed (rc=-2)
+[    0.544440] Failed to allocate ctr(aes) fallback: -2
+[    0.544497] alg: skcipher: failed to allocate transform for p8_aes_ctr: -2
+[    0.544603] alg: self-tests for p8_aes_ctr (ctr(aes)) failed (rc=-2)
+[    0.547992] Failed to allocate cbc(aes) fallback: -2
+[    0.548052] alg: skcipher: failed to allocate transform for p8_aes_cbc: -2
+[    0.548156] alg: self-tests for p8_aes_cbc (cbc(aes)) failed (rc=-2)
+[    0.550745] Failed to allocate transformation for 'aes': -2
+[    0.550801] alg: cipher: Failed to load transform for p8_aes: -2
+[    0.550892] alg: self-tests for p8_aes (aes) failed (rc=-2)
 
-> So I don't see the point to this code churn unless the powerpc
-> folks want to move in this direction.
-Sure (sending now just second commit as requested.
+Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
+Fixes: d2e3ae6f3aba ("crypto: vmx - Enabling VMX module for PPC64")
 
-Thank for your review.
+Suggested-by: Nicolai Stange <nstange@suse.de>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
+---
+Changes v3->v4:
+* Drop commit which merged CRYPTO_DEV_VMX and CRYPTO_DEV_VMX_ENCRYPT
+  (Herbert)
 
-Kind regards,
-Petr
+ drivers/crypto/vmx/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> Thanks,
+diff --git a/drivers/crypto/vmx/Kconfig b/drivers/crypto/vmx/Kconfig
+index c85fab7ef0bd..b2c28b87f14b 100644
+--- a/drivers/crypto/vmx/Kconfig
++++ b/drivers/crypto/vmx/Kconfig
+@@ -2,7 +2,11 @@
+ config CRYPTO_DEV_VMX_ENCRYPT
+ 	tristate "Encryption acceleration support on P8 CPU"
+ 	depends on CRYPTO_DEV_VMX
++	select CRYPTO_AES
++	select CRYPTO_CBC
++	select CRYPTO_CTR
+ 	select CRYPTO_GHASH
++	select CRYPTO_XTS
+ 	default m
+ 	help
+ 	  Support for VMX cryptographic acceleration instructions on Power8 CPU.
+-- 
+2.35.1
+
