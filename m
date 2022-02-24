@@ -2,82 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A52D0C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 01:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F03C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 01:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbiBXBhF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Feb 2022 20:37:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50508 "EHLO
+        id S229775AbiBXBsA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Feb 2022 20:48:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiBXBhE (ORCPT
+        with ESMTP id S229875AbiBXBr5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Feb 2022 20:37:04 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4FCB1D;
-        Wed, 23 Feb 2022 17:36:33 -0800 (PST)
+        Wed, 23 Feb 2022 20:47:57 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 301851A3A9;
+        Wed, 23 Feb 2022 17:47:28 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F28B560FBE;
-        Thu, 24 Feb 2022 01:27:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E42EFC340E7;
-        Thu, 24 Feb 2022 01:27:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DDAD2B82355;
+        Thu, 24 Feb 2022 01:47:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC8BC340E7;
+        Thu, 24 Feb 2022 01:47:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645666063;
-        bh=GaCSlaHuoL4PTPpbJsCAbmTac306bb0289J4Jyt/cCk=;
+        s=k20201202; t=1645667245;
+        bh=sCX7LzdLIdSqvaigD4FToB9/z+1YgqNv/qwnaTVAbHI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uTcgqSuvreJcrt+GI6FBVbHvqWaCYHfJMDVKh298DN/yG74ijBRZPbgCEPe1SSnv/
-         OWNZlqtpLMmtebO+jSPT2tI79bq0YuNY7TCpcI7JVvUMWiHVkyw4QJyvs554PKS8Y9
-         yeoFqkpu8MIeywz1nC153jIcoBKg6MXsMzAJ7xfWz40z9BIrTiWEfyXzLNkkTmH71d
-         VxV/se8WZF+3WlgLYOMUMoHBb8hqKl+jGYfrM0Apzfdb6Xs36lYJNKbnGn2Y0EWJ5g
-         SkQ2b3jZVI8c5Be1KZMj0x+5uwbjyWJc1KApfl5lz867/+dPA75kgtSOxLR7uH/Cu6
-         b7PtrA5RYslfw==
-Date:   Wed, 23 Feb 2022 17:27:41 -0800
+        b=Ur7EyzAH9ZcNYgRVcmNTzBDaXF5XSMZ0PuMiWeSmdccrs2mrnd/enBEJLSDLaq+zB
+         6ZpJxBIWbnsRADPgWRUR5snmpdCNpCbR4avXXvIqd4GNWTxqLEDH0AmK/Gzn8fmsXP
+         /gCfMavgBiJ45ajtxHpJrPNQrthzejKzSE4YhEsPDpvw8LmbMX+rkMuuV0P86tZmvc
+         qMG+w0LFVuIkHVvEUqB7bTIfUf+G5O0UXw+rvkGY4YThRdstdRlWsLaHLOrtxVwoQh
+         JZMg1xolqUI74KINDObCAmqOBlDZmKazxkkWZaORpwK1UfmisPEqX0Ner9dIcf3elh
+         pxXH+wSLIqmfg==
+Date:   Wed, 23 Feb 2022 17:47:23 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, adrian@parity.io, dwmw@amazon.co.uk,
-        acatan@amazon.com, graf@amazon.com, colmmacc@amazon.com,
-        sblbir@amazon.com, raduweis@amazon.com, jannh@google.com,
-        gregkh@linuxfoundation.org, tytso@mit.edu
-Subject: Re: [PATCH RFC v1 1/2] random: add mechanism for VM forks to
- reinitialize crng
-Message-ID: <YhbfDQ2ernjrRNRX@sol.localdomain>
-References: <20220223131231.403386-1-Jason@zx2c4.com>
- <20220223131231.403386-2-Jason@zx2c4.com>
- <YhbAOW/KbFW1CFkQ@sol.localdomain>
- <CAHmME9oa_wE8_n8e5b=iM5v-s5dgyibm4vXMhwzc8zGd6VWZMQ@mail.gmail.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: drbg: fix crypto api abuse
+Message-ID: <Yhbjq3cVsMVUQLio@sol.localdomain>
+References: <20220223080400.139367-1-gilad@benyossef.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9oa_wE8_n8e5b=iM5v-s5dgyibm4vXMhwzc8zGd6VWZMQ@mail.gmail.com>
+In-Reply-To: <20220223080400.139367-1-gilad@benyossef.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 01:54:54AM +0100, Jason A. Donenfeld wrote:
-> On 2/24/22, Eric Biggers <ebiggers@kernel.org> wrote:
-> > I think we should be removing cases where the base_crng key is changed
-> > directly
-> > besides extraction from the input_pool, not adding new ones.  Why not
-> > implement
-> > this as add_device_randomness() followed by crng_reseed(force=true), where
-> > the
-> > 'force' argument forces a reseed to occur even if the entropy_count is too
-> > low?
+On Wed, Feb 23, 2022 at 10:04:00AM +0200, Gilad Ben-Yossef wrote:
+> the drbg code was binding the same buffer to two different
+> scatter gather lists and submitting those as source and
+> destination to a crypto api operation, thus potentially
+> causing HW crypto drivers to perform overlapping DMA
+> mappings which are not aware it is the same buffer.
 > 
-> Because that induces a "premature next" condition which can let that
-> entropy, potentially newly acquired by a storm of IRQs at power-on, be
-> bruteforced by unprivileged userspace. I actually had it exactly the
-> way you describe at first, but decided that this here is the lesser of
-> evils and doesn't really complicate things the way an intentional
-> premature next would. The only thing we care about here is branching
-> the crng stream, and so this does explicitly that, without having to
-> interfere with how we collect entropy. Of course we *also* add it as
-> non-credited "device randomness" so that it's part of the next
-> reseeding, whenever that might occur.
+> This can have serious consequences of data corruption of
+> internal DRBG buffers and wrong RNG output.
+> 
+> Fix this by reusing the same scatter gatther list for both
+> src and dst.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Tested-on: r8a7795-salvator-x
+> Tested-on: xilinx-zc706
+> Fixes: 43490e8046b5d ("crypto: drbg - in-place cipher operation for CTR")
+> Cc: stable@vger.kernel.org
 
-Can you make sure to properly explain this in the code?
+Where is it documented and tested that the API doesn't allow this?
+I wasn't aware of this case; it sounds perfectly allowed to me.
+There might be a lot of other users who do this, not just drbg.c.
 
 - Eric
