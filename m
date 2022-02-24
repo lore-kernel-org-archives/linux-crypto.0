@@ -2,276 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0194EC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 13:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51045C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 14:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbiBXNkN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Feb 2022 08:40:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S235336AbiBXOL7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Feb 2022 09:11:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235164AbiBXNkM (ORCPT
+        with ESMTP id S231775AbiBXOL7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Feb 2022 08:40:12 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF6537B597;
-        Thu, 24 Feb 2022 05:39:35 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8534861A97;
-        Thu, 24 Feb 2022 13:39:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 719BFC340E9;
-        Thu, 24 Feb 2022 13:39:32 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="F16u3hqk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645709971;
+        Thu, 24 Feb 2022 09:11:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3CCC2294FC2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Feb 2022 06:11:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645711888;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lYbQlfYwy3SS5X0HOdFFYvoNBz5G3sVCk/xavGBSEMs=;
-        b=F16u3hqk6rgXMYjXwJovbqFW0rcAe8BXY7ibheND+y5a4f7/AF4I7irMImUvxyjZqPC0IN
-        GR1vGcuyrut6eAtUpPu1USrzJkmRdM3C1fvKGp4uILAXOuEgOTO2ZLig7mWvztBV6P+e0s
-        RSp5TuonuY11VJe8LCEC49BtAbpOszA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 09e92e51 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 13:39:31 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, adrian@parity.io,
-        dwmw@amazon.co.uk, graf@amazon.com, colmmacc@amazon.com,
-        raduweis@amazon.com, berrange@redhat.com, lersek@redhat.com,
-        imammedo@redhat.com, ehabkost@redhat.com, ben@skyportsystems.com,
-        mst@redhat.com, kys@microsoft.com, haiyangz@microsoft.com,
-        sthemmin@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-        linux@dominikbrodowski.net, ebiggers@kernel.org, ardb@kernel.org,
-        jannh@google.com, gregkh@linuxfoundation.org, tytso@mit.edu
-Subject: [PATCH v3 2/2] virt: vmgenid: introduce driver for reinitializing RNG on VM fork
-Date:   Thu, 24 Feb 2022 14:39:06 +0100
-Message-Id: <20220224133906.751587-3-Jason@zx2c4.com>
-In-Reply-To: <20220224133906.751587-1-Jason@zx2c4.com>
-References: <20220224133906.751587-1-Jason@zx2c4.com>
+        bh=QcE0EVUjCg6X/xa4J/ZeUVoMtNaV/sF9sKuaRTVThoM=;
+        b=EoC+W1rEMWdkpZhEU2yHU8dL8eRo+WrhZT6aSlseLlxOJNDVxKS3ZpYmvTKHrC2ozxhtHS
+        sGtKpacVENI6XFd1JE+cf4gtMGdnDxNxrUg4/OcIrJQ5jRdjlifCgLJRqJTPCIom63IZq8
+        oIvhaD7eHETZhNt6fhUTe2RdaG/3g4w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-446-1e0tpTSFOiWgY-PtsWJlVw-1; Thu, 24 Feb 2022 09:11:27 -0500
+X-MC-Unique: 1e0tpTSFOiWgY-PtsWJlVw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C8FB1006AA7;
+        Thu, 24 Feb 2022 14:11:22 +0000 (UTC)
+Received: from localhost (ovpn-13-73.pek2.redhat.com [10.72.13.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FC2684008;
+        Thu, 24 Feb 2022 14:11:19 +0000 (UTC)
+Date:   Thu, 24 Feb 2022 22:11:17 +0800
+From:   Baoquan He <bhe@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org, cl@linux.com, 42.hyeyoo@gmail.com,
+        penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com,
+        vbabka@suse.cz, David.Laight@aculab.com, david@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, steffen.klassert@secunet.com,
+        netdev@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, linux-s390@vger.kernel.org, michael@walle.cc,
+        linux-i2c@vger.kernel.org, wsa@kernel.org
+Subject: Re: [PATCH 1/2] dma-mapping: check dma_mask for streaming mapping
+ allocs
+Message-ID: <YheSBTJY216m6izG@MiWiFi-R3L-srv>
+References: <20220219005221.634-22-bhe@redhat.com>
+ <20220219071730.GG26711@lst.de>
+ <20220220084044.GC93179@MiWiFi-R3L-srv>
+ <20220222084530.GA6210@lst.de>
+ <YhSpaGfiQV8Nmxr+@MiWiFi-R3L-srv>
+ <20220222131120.GB10093@lst.de>
+ <YhToFzlSufrliUsi@MiWiFi-R3L-srv>
+ <20220222155904.GA13323@lst.de>
+ <YhV/nabDa5zdNL/4@MiWiFi-R3L-srv>
+ <20220223142555.GA5986@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220223142555.GA5986@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-VM Generation ID is a feature from Microsoft, described at
-<https://go.microsoft.com/fwlink/?LinkId=260709>, and supported by
-Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
-<https://aka.ms/win10rng>, as:
+On 02/23/22 at 03:25pm, Christoph Hellwig wrote:
+> On Wed, Feb 23, 2022 at 08:28:13AM +0800, Baoquan He wrote:
+> > Could you tell more why this is wrong? According to
+> > Documentation/core-api/dma-api.rst and DMA code, __dma_alloc_pages() is
+> > the core function of dma_alloc_pages()/dma_alloc_noncoherent() which are
+> > obviously streaming mapping,
+> 
+> Why are they "obviously" streaming mappings?
 
-    If the OS is running in a VM, there is a problem that most
-    hypervisors can snapshot the state of the machine and later rewind
-    the VM state to the saved state. This results in the machine running
-    a second time with the exact same RNG state, which leads to serious
-    security problems.  To reduce the window of vulnerability, Windows
-    10 on a Hyper-V VM will detect when the VM state is reset, retrieve
-    a unique (not random) value from the hypervisor, and reseed the root
-    RNG with that unique value.  This does not eliminate the
-    vulnerability, but it greatly reduces the time during which the RNG
-    system will produce the same outputs as it did during a previous
-    instantiation of the same VM state.
+Because they are obviously not coherent mapping?
 
-Linux has the same issue, and given that vmgenid is supported already by
-multiple hypervisors, we can implement more or less the same solution.
-So this commit wires up the vmgenid ACPI notification to the RNG's newly
-added add_vmfork_randomness() function.
+With my understanding, there are two kinds of DMA mapping, coherent
+mapping (which is also persistent mapping), and streaming mapping. The
+coherent mapping will be handled during driver init, and released during
+driver de-init. While streaming mapping will be done when needed at any
+time, and released after usage.
 
-It can be used from qemu via the `-device vmgenid,guid=auto` parameter.
-After setting that, use `savevm` in the monitor to save the VM state,
-then quit QEMU, start it again, and use `loadvm`. That will trigger this
-driver's notify function, which hands the new UUID to the RNG. This is
-described in <https://git.qemu.org/?p=qemu.git;a=blob;f=docs/specs/vmgenid.txt>.
-And there are hooks for this in libvirt as well, described in
-<https://libvirt.org/formatdomain.html#general-metadata>.
+Are we going to add another kind of mapping? It's not streaming mapping,
+but use dev->coherent_dma_mask, just because it uses dma_alloc_xxx()
+api.
 
-Note, however, that the treatment of this as a UUID is considered to be
-an accidental QEMU nuance, per
-<https://github.com/libguestfs/virt-v2v/blob/master/docs/vm-generation-id-across-hypervisors.txt>,
-so this driver simply treats these bytes as an opaque 128-bit binary
-blob, as per the spec. This doesn't really make a difference anyway,
-considering that's how it ends up when handed to the RNG in the end.
+> 
+> > why do we need to check
+> > dev->coherent_dma_mask here? Because dev->coherent_dma_mask is the subset
+> > of dev->dma_mask, it's safer to use dev->coherent_dma_mask in these
+> > places? This is confusing, I talked to Hyeonggon in private mail, he has
+> > the same feeling.
+> 
+> Think of th coherent_dma_mask as dma_alloc_mask.  It is the mask for the
+> DMA memory allocator.  dma_mask is the mask for the dma_map_* routines.
 
-This driver builds on prior work from Adrian Catangiu at Amazon, and it
-is my hope that that team can resume maintenance of this driver.
+I will check code further. While this may need be noted in doc, e.g
+dma_api.rst or dma-api-howto.rst.
 
-Cc: Adrian Catangiu <adrian@parity.io>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Daniel P. Berrangé <berrange@redhat.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/virt/Kconfig   |   9 +++
- drivers/virt/Makefile  |   1 +
- drivers/virt/vmgenid.c | 121 +++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 131 insertions(+)
- create mode 100644 drivers/virt/vmgenid.c
-
-diff --git a/drivers/virt/Kconfig b/drivers/virt/Kconfig
-index 8061e8ef449f..d3276dc2095c 100644
---- a/drivers/virt/Kconfig
-+++ b/drivers/virt/Kconfig
-@@ -13,6 +13,15 @@ menuconfig VIRT_DRIVERS
- 
- if VIRT_DRIVERS
- 
-+config VMGENID
-+	tristate "Virtual Machine Generation ID driver"
-+	default y
-+	depends on ACPI
-+	help
-+	  Say Y here to use the hypervisor-provided Virtual Machine Generation ID
-+	  to reseed the RNG when the VM is cloned. This is highly recommended if
-+	  you intend to do any rollback / cloning / snapshotting of VMs.
-+
- config FSL_HV_MANAGER
- 	tristate "Freescale hypervisor management driver"
- 	depends on FSL_SOC
-diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
-index 3e272ea60cd9..108d0ffcc9aa 100644
---- a/drivers/virt/Makefile
-+++ b/drivers/virt/Makefile
-@@ -4,6 +4,7 @@
- #
- 
- obj-$(CONFIG_FSL_HV_MANAGER)	+= fsl_hypervisor.o
-+obj-$(CONFIG_VMGENID)		+= vmgenid.o
- obj-y				+= vboxguest/
- 
- obj-$(CONFIG_NITRO_ENCLAVES)	+= nitro_enclaves/
-diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-new file mode 100644
-index 000000000000..5da4dc8f25e3
---- /dev/null
-+++ b/drivers/virt/vmgenid.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Virtual Machine Generation ID driver
-+ *
-+ * Copyright (C) 2022 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ * Copyright (C) 2020 Amazon. All rights reserved.
-+ * Copyright (C) 2018 Red Hat Inc. All rights reserved.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/acpi.h>
-+#include <linux/random.h>
-+
-+ACPI_MODULE_NAME("vmgenid");
-+
-+enum { VMGENID_SIZE = 16 };
-+
-+static struct {
-+	u8 this_id[VMGENID_SIZE];
-+	u8 *next_id;
-+} state;
-+
-+static int vmgenid_acpi_add(struct acpi_device *device)
-+{
-+	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER };
-+	union acpi_object *pss;
-+	phys_addr_t phys_addr;
-+	acpi_status status;
-+	int ret = 0;
-+
-+	if (!device)
-+		return -EINVAL;
-+
-+	status = acpi_evaluate_object(device->handle, "ADDR", NULL, &buffer);
-+	if (ACPI_FAILURE(status)) {
-+		ACPI_EXCEPTION((AE_INFO, status, "Evaluating ADDR"));
-+		return -ENODEV;
-+	}
-+	pss = buffer.pointer;
-+	if (!pss || pss->type != ACPI_TYPE_PACKAGE || pss->package.count != 2 ||
-+	    pss->package.elements[0].type != ACPI_TYPE_INTEGER ||
-+	    pss->package.elements[1].type != ACPI_TYPE_INTEGER) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	phys_addr = (pss->package.elements[0].integer.value << 0) |
-+		    (pss->package.elements[1].integer.value << 32);
-+	state.next_id = acpi_os_map_memory(phys_addr, VMGENID_SIZE);
-+	if (!state.next_id) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+	device->driver_data = &state;
-+
-+	memcpy(state.this_id, state.next_id, sizeof(state.this_id));
-+	add_device_randomness(state.this_id, sizeof(state.this_id));
-+
-+out:
-+	ACPI_FREE(buffer.pointer);
-+	return ret;
-+}
-+
-+static int vmgenid_acpi_remove(struct acpi_device *device)
-+{
-+	if (!device || acpi_driver_data(device) != &state)
-+		return -EINVAL;
-+	device->driver_data = NULL;
-+	if (state.next_id)
-+		acpi_os_unmap_memory(state.next_id, VMGENID_SIZE);
-+	state.next_id = NULL;
-+	return 0;
-+}
-+
-+static void vmgenid_acpi_notify(struct acpi_device *device, u32 event)
-+{
-+	u8 old_id[VMGENID_SIZE];
-+
-+	if (!device || acpi_driver_data(device) != &state)
-+		return;
-+	memcpy(old_id, state.this_id, sizeof(old_id));
-+	memcpy(state.this_id, state.next_id, sizeof(state.this_id));
-+	if (!memcmp(old_id, state.this_id, sizeof(old_id)))
-+		return;
-+	add_vmfork_randomness(state.this_id, sizeof(state.this_id));
-+}
-+
-+static const struct acpi_device_id vmgenid_ids[] = {
-+	{"VMGENID", 0},
-+	{"QEMUVGID", 0},
-+	{ },
-+};
-+
-+static struct acpi_driver acpi_driver = {
-+	.name = "vm_generation_id",
-+	.ids = vmgenid_ids,
-+	.owner = THIS_MODULE,
-+	.ops = {
-+		.add = vmgenid_acpi_add,
-+		.remove = vmgenid_acpi_remove,
-+		.notify = vmgenid_acpi_notify,
-+	}
-+};
-+
-+static int __init vmgenid_init(void)
-+{
-+	return acpi_bus_register_driver(&acpi_driver);
-+}
-+
-+static void __exit vmgenid_exit(void)
-+{
-+	acpi_bus_unregister_driver(&acpi_driver);
-+}
-+
-+module_init(vmgenid_init);
-+module_exit(vmgenid_exit);
-+
-+MODULE_DEVICE_TABLE(acpi, vmgenid_ids);
-+MODULE_DESCRIPTION("Virtual Machine Generation ID");
-+MODULE_LICENSE("GPL v2");
--- 
-2.35.1
+If you have guide, I can try to add some words to make clear this. Or
+leave this to people who knows this clearly. I believe it will be very
+helpful to understand DMA api.
 
