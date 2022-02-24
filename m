@@ -2,122 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 645C1C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 09:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A306DC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 10:43:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231700AbiBXJtu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Feb 2022 04:49:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43288 "EHLO
+        id S233559AbiBXKoM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Feb 2022 05:44:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231683AbiBXJtt (ORCPT
+        with ESMTP id S233521AbiBXKoK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Feb 2022 04:49:49 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA926674C4;
-        Thu, 24 Feb 2022 01:49:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8109BB824F1;
-        Thu, 24 Feb 2022 09:49:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC94EC340E9;
-        Thu, 24 Feb 2022 09:49:16 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Do5PhtlR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645696154;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Thu, 24 Feb 2022 05:44:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 643FA1A39E8
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Feb 2022 02:43:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645699420;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fIXunQ0/AtwBaCePwIXP2qD27GW0DhIB45r4lJ1eLME=;
-        b=Do5PhtlRKqEQujks44fyPi9kMT+LVGhcBDYS7nMxm0pWM2YKsy3UctvgLTxSBAs94u154k
-        zj4iVzAyit10EWasQ5hm37bXPFfgA9aCTQb/WQezWlw8sIeBg13M2C4TgC0Rg1dVsVEYYf
-        32kCAjFYJOtPYj1lA7e2Z8egCOsqnTM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 053d5ec8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 09:49:14 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id p19so2671697ybc.6;
-        Thu, 24 Feb 2022 01:49:13 -0800 (PST)
-X-Gm-Message-State: AOAM530J6pHZtn/TBfVROKhHC8op4Ge+TDiXexc9guSuQmQ8oayZJAPu
-        TeoMlog/sgCwF2sA3WIsuBlf95UAF6Q5psqMM38=
-X-Google-Smtp-Source: ABdhPJyOvLl5VmvQLFSBbWpUhA9AfJiUCFRoxcqCFbKEt2prfsXWWeXkViO9oqn3jcGnknwdnNFU+t+5KOTTYanL6dc=
-X-Received: by 2002:a25:238d:0:b0:619:3e19:b06b with SMTP id
- j135-20020a25238d000000b006193e19b06bmr1621006ybj.382.1645696152959; Thu, 24
- Feb 2022 01:49:12 -0800 (PST)
+        bh=PMrO1wHK+f0i5l49rTbD4HIL+P3tUpsU4mhMhEe7j9I=;
+        b=AM57WqUAZx65eQmP0VntBtMC27z46a/5PCcAvfM0Fp5VQX9pXk9qzWQmcycCaiV5h9Y5wk
+        yosuT9hI73BmzCGciGRn2tesBmjnC/TDAE180dqegRXgxmHjqbrUNnDX4mIzOxJQYGoYHK
+        3fY8Oj/4cbIHauQ434/mN9VzhlkTZMw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-279--UbWN4hpN0-INrWLYK-Htg-1; Thu, 24 Feb 2022 05:43:35 -0500
+X-MC-Unique: -UbWN4hpN0-INrWLYK-Htg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 831FE5123;
+        Thu, 24 Feb 2022 10:43:32 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.97])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DCE9E83197;
+        Thu, 24 Feb 2022 10:43:28 +0000 (UTC)
+Date:   Thu, 24 Feb 2022 10:43:26 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, adrian@parity.io, dwmw@amazon.co.uk,
+        acatan@amazon.com, colmmacc@amazon.com, sblbir@amazon.com,
+        raduweis@amazon.com, jannh@google.com, gregkh@linuxfoundation.org,
+        tytso@mit.edu
+Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
+Message-ID: <YhdhTlhnj46gqhk+@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220223131231.403386-1-Jason@zx2c4.com>
+ <234d7952-0379-e3d9-5e02-5eba171024a0@amazon.com>
 MIME-Version: 1.0
-Received: by 2002:a05:7110:71a8:b0:167:24f9:2d40 with HTTP; Thu, 24 Feb 2022
- 01:49:12 -0800 (PST)
-In-Reply-To: <Yhc4LwK3biZFIqwQ@owl.dominikbrodowski.net>
-References: <20220223185511.628452-1-Jason@zx2c4.com> <Yhc4LwK3biZFIqwQ@owl.dominikbrodowski.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 24 Feb 2022 10:49:12 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oesPzz4ofe-wo_ZViM=uahL6WQo8-5ov7xjJN8ui1rsg@mail.gmail.com>
-Message-ID: <CAHmME9oesPzz4ofe-wo_ZViM=uahL6WQo8-5ov7xjJN8ui1rsg@mail.gmail.com>
-Subject: Re: [PATCH] random: do crng pre-init loading in worker rather than irq
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        bigeasy@linutronix.de, Sultan Alsawaf <sultan@kerneltoast.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <234d7952-0379-e3d9-5e02-5eba171024a0@amazon.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/24/22, Dominik Brodowski <linux@dominikbrodowski.net> wrote:
-> Am Wed, Feb 23, 2022 at 07:55:11PM +0100 schrieb Jason A. Donenfeld:
->> Taking spinlocks from IRQ context is problematic for PREEMPT_RT. That
->> is, in part, why we take trylocks instead. But apparently this still
->> trips up various lock dependency analyzers. That seems like a bug in the
->> analyzers that should be fixed, rather than having to change things
->> here.
->>
->> But maybe there's another reason to change things up: by deferring the
->> crng pre-init loading to the worker, we can use the cryptographic hash
->> function rather than xor, which is perhaps a meaningful difference when
->> considering this data has only been through the relatively weak
->> fast_mix() function.
->>
->> The biggest downside of this approach is that the pre-init loading is
->> now deferred until later, which means things that need random numbers
->> after interrupts are enabled, but before workqueues are running -- or
->> before this particular worker manages to run -- are going to get into
->> trouble. Hopefully in the real world, this window is rather small,
->> especially since this code won't run until 64 interrupts had occurred.
->>
->> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
->> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
->> Cc: Thomas Gleixner <tglx@linutronix.de>
->> Cc: Peter Zijlstra <peterz@infradead.org>
->> Cc: Theodore Ts'o <tytso@mit.edu>
->> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->> ---
->>  drivers/char/random.c | 62 ++++++++++++-------------------------------
->>  1 file changed, 17 insertions(+), 45 deletions(-)
->>
->> diff --git a/drivers/char/random.c b/drivers/char/random.c
->> index 536237a0f073..9fb06fc298d3 100644
->> --- a/drivers/char/random.c
->> +++ b/drivers/char/random.c
->> @@ -1298,7 +1278,12 @@ static void mix_interrupt_randomness(struct
->> work_struct *work)
->>  	local_irq_enable();
->>
->>  	mix_pool_bytes(pool, sizeof(pool));
->> -	credit_entropy_bits(1);
->> +
->> +	if (unlikely(crng_init == 0))
->> +		crng_pre_init_inject(pool, sizeof(pool), true);
->> +	else
->> +		credit_entropy_bits(1);
->> +
->>  	memzero_explicit(pool, sizeof(pool));
->>  }
->
-> Might it make sense to call crng_pre_init_inject() before mix_pool_bytes?
+On Thu, Feb 24, 2022 at 09:53:59AM +0100, Alexander Graf wrote:
+> Hey Jason,
+> 
+> On 23.02.22 14:12, Jason A. Donenfeld wrote:
+> > This small series picks up work from Amazon that seems to have stalled
+> > out later year around this time: listening for the vmgenid ACPI
+> > notification, and using it to "do something." Last year, that something
+> > involved a complicated userspace mmap chardev, which seems frought with
+> > difficulty. This year, I have something much simpler in mind: simply
+> > using those ACPI notifications to tell the RNG to reinitialize safely,
+> > so we don't repeat random numbers in cloned, forked, or rolled-back VM
+> > instances.
+> > 
+> > This series consists of two patches. The first is a rather
+> > straightforward addition to random.c, which I feel fine about. The
+> > second patch is the reason this is just an RFC: it's a cleanup of the
+> > ACPI driver from last year, and I don't really have much experience
+> > writing, testing, debugging, or maintaining these types of drivers.
+> > Ideally this thread would yield somebody saying, "I see the intent of
+> > this; I'm happy to take over ownership of this part." That way, I can
+> > focus on the RNG part, and whoever steps up for the paravirt ACPI part
+> > can focus on that.
+> > 
+> > As a final note, this series intentionally does _not_ focus on
+> > notification of these events to userspace or to other kernel consumers.
+> > Since these VM fork detection events first need to hit the RNG, we can
+> > later talk about what sorts of notifications or mmap'd counters the RNG
+> > should be making accessible to elsewhere. But that's a different sort of
+> > project and ties into a lot of more complicated concerns beyond this
+> > more basic patchset. So hopefully we can keep the discussion rather
+> > focused here to this ACPI business.
+> 
+> 
+> The main problem with VMGenID is that it is inherently racy. There will
+> always be a (short) amount of time where the ACPI notification is not
+> processed, but the VM could use its RNG to for example establish TLS
+> connections.
+> 
+> Hence we as the next step proposed a multi-stage quiesce/resume mechanism
+> where the system is aware that it is going into suspend - can block network
+> connections for example - and only returns to a fully functional state after
+> an unquiesce phase:
+> 
+>   https://github.com/systemd/systemd/issues/20222
 
-What exactly is the difference you see mattering in the order? I keep
-chasing my tail trying to think about it.
+The downside of course is precisely that the guest now needs to be aware
+and involved every single time a snapshot is taken.
 
-Jason
+Currently with virt the act of taking a snapshot can often remain invisible
+to the VM with no functional effect on the guest OS or its workload, and
+the host OS knows it can complete a snapshot in a specific timeframe. That
+said, this transparency to the VM is precisely the cause of the race
+condition described.
+
+With guest involvement to quiesce the bulk of activity for time period,
+there is more likely to be a negative impact on the guest workload. The
+guest admin likely needs to be more explicit about exactly when in time
+it is reasonable to take a snapshot to mitigate the impact.
+
+The host OS snapshot operations are also now dependant on co-operation
+of a guest OS that has to be considered to be potentially malicious, or
+at least crashed/non-responsive. The guest OS also needs a way to receive
+the triggers for snapshot capture and restore, most likely via an extension
+to something like the QEMU guest agent or an equivalent for othuer
+hypervisors.
+
+
+Despite the above, I'm not against the idea of co-operative involvement
+of the guest OS in the acts of taking & restoring snapshots. I can't
+see any other proposals so far that can reliably eliminate the races
+in the general case, from the kernel right upto user applications.
+So I think it is neccessary to have guest cooperative snapshotting.
+
+> What exact use case do you have in mind for the RNG/VMGenID update? Can you
+> think of situations where the race is not an actual concern?
+
+Lets assume we do take the approach described in that systemd bug and
+have a co-operative snapshot process. If the hypervisor does the right
+thing and guest owners install the right things, they'll have a race
+free solution that works well in normal operation. That's good.
+
+
+Realistically though, it is never going to be universally and reliably
+put into practice. So what is our attitude to cases where the preferred
+solution isn't availble and/or operative ?
+
+
+There are going to be users who continue to build their guest disk images
+without the QEMU guest agent (or equivalent for whatever hypervisor they
+run on) installed because they don't know any better. Or where the guest
+agent is mis-configured or fails to starts or some other scenario that
+prevents the quiesce working as desired. The host mgmt could refuse to
+take a snapshot in these cases. More likely is that they are just
+going to go ahead and do a snapshot anyway because lack of guest agent
+is a very common scenario today and users want their snapshots.
+
+
+There are going to be virt management apps / hypervisors that don't
+support talking to any guest agent across their snapshot operation
+in the first place, so systemd gets no way to trigger the required
+quiesce dance on snapshot, but they likely have VMGenID support
+implemented already.
+
+
+IOW, I could view VMGenID triggered fork detection integrated with
+the kernel RNG as providing a backup line of defence that is going
+to "just work", albeit with the known race. It isn't as good as the
+guest co-operative snapshot approach, because it only tries to solve
+the one specific targetted problem of updating the kernel RNG.
+
+Is it still better than doing nothing at all though, for the scenario
+where guest co-operative snapshot is unavailable ?
+
+If it is better than nothing, is it then compelling enough to justify
+the maint cost of the code added to the kernel ?
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
