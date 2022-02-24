@@ -2,230 +2,188 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B8DC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 11:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB741C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 11:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbiBXLcM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Feb 2022 06:32:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
+        id S229891AbiBXLg4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Feb 2022 06:36:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbiBXLcL (ORCPT
+        with ESMTP id S229541AbiBXLgw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Feb 2022 06:32:11 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E46B411C2F;
-        Thu, 24 Feb 2022 03:31:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 73A2061812;
-        Thu, 24 Feb 2022 11:31:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71FD5C340F3;
-        Thu, 24 Feb 2022 11:31:38 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LnJmC6vN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645702294;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lQ8C2UM5kyWPBT9HlFb+4NHlK8JKwzfCB1RyzbTjjEs=;
-        b=LnJmC6vNb8R5x+ZmM5D3IE/Iwe8kv9fly4feTqFCFCIvVMQD7zOguBS0OmuD9ph/jthpzx
-        81YwpTkDc+EipkqVnexkOk7BUu4jtBxj0yvQmaNNc0fWQNzugDviAia0YUh391rhpmDerK
-        OxQ3DuwhJiUnJwBAJ85/OqYDp4y0ufc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e870f476 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 11:31:34 +0000 (UTC)
-Received: by mail-yb1-f172.google.com with SMTP id j12so3132243ybh.8;
-        Thu, 24 Feb 2022 03:31:34 -0800 (PST)
-X-Gm-Message-State: AOAM530Ej2Y31QfkQccclbSpVFhRjn3vwgJgSzIv64684FlBmmLhqzn6
-        U98m6ngJ7Ci2jK5EZb23mdZeQ6N3mM9tR+fHnyg=
-X-Google-Smtp-Source: ABdhPJwkEZ4g3wejsfvSMRKpHrjCpRBmssQHgsE9ab4R1a+vjI7JS5xtzIyvKnzwLO/7RYhFCS/tVMH+tXZ70c50tzQ=
-X-Received: by 2002:a25:b905:0:b0:61e:23e4:949f with SMTP id
- x5-20020a25b905000000b0061e23e4949fmr1983476ybj.373.1645702292830; Thu, 24
- Feb 2022 03:31:32 -0800 (PST)
+        Thu, 24 Feb 2022 06:36:52 -0500
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA9829A542;
+        Thu, 24 Feb 2022 03:36:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1645702582; x=1677238582;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=C/p2KYGcxZmJ0eyN5UPnDwwVdVBiuLBc+EN/TQCHmIE=;
+  b=n0DeJS4L1QT6eIEEViY3Bx3Hs0UlTXghUdvCAHIbLCF2bMrwgtaNylmF
+   p1P0tUzTeI5L3uYBd1EXPF0+J6QAFR+cPbi6muD1xypvCn1ASMO1ya1KH
+   50bcUDwgiMNqQlVwS/kQslkCkWkULvv6xZ30aC6hvydR9ZoLi4Inn+tRX
+   o=;
+X-IronPort-AV: E=Sophos;i="5.88,393,1635206400"; 
+   d="scan'208";a="180859573"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-b69ea591.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 24 Feb 2022 11:36:09 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1e-b69ea591.us-east-1.amazon.com (Postfix) with ESMTPS id 37E89C08FB;
+        Thu, 24 Feb 2022 11:36:05 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.28; Thu, 24 Feb 2022 11:36:05 +0000
+Received: from [0.0.0.0] (10.43.162.144) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Thu, 24 Feb
+ 2022 11:36:01 +0000
+Message-ID: <f468b9b2-8c55-5ca6-de75-9ec421fda557@amazon.com>
+Date:   Thu, 24 Feb 2022 12:35:59 +0100
 MIME-Version: 1.0
-References: <20220223185511.628452-1-Jason@zx2c4.com>
-In-Reply-To: <20220223185511.628452-1-Jason@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 24 Feb 2022 12:31:22 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pMUx_dgo-1SFkD6x4ua4Lgf+d_59v0F6VXGK=UXuD=mA@mail.gmail.com>
-Message-ID: <CAHmME9pMUx_dgo-1SFkD6x4ua4Lgf+d_59v0F6VXGK=UXuD=mA@mail.gmail.com>
-Subject: Re: [PATCH] random: do crng pre-init loading in worker rather than irq
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Sebastian Siewior <bigeasy@linutronix.de>
-Cc:     Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+CC:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, <adrian@parity.io>,
+        <dwmw@amazon.co.uk>, <acatan@amazon.com>, <colmmacc@amazon.com>,
+        <sblbir@amazon.com>, <raduweis@amazon.com>, <jannh@google.com>,
+        <gregkh@linuxfoundation.org>, <tytso@mit.edu>
+References: <20220223131231.403386-1-Jason@zx2c4.com>
+ <234d7952-0379-e3d9-5e02-5eba171024a0@amazon.com>
+ <YhdhTlhnj46gqhk+@redhat.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <YhdhTlhnj46gqhk+@redhat.com>
+X-Originating-IP: [10.43.162.144]
+X-ClientProxiedBy: EX13P01UWB004.ant.amazon.com (10.43.161.213) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CC +Eric
+Ck9uIDI0LjAyLjIyIDExOjQzLCBEYW5pZWwgUC4gQmVycmFuZ8OpIHdyb3RlOgo+IE9uIFRodSwg
+RmViIDI0LCAyMDIyIGF0IDA5OjUzOjU5QU0gKzAxMDAsIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+
+PiBIZXkgSmFzb24sCj4+Cj4+IE9uIDIzLjAyLjIyIDE0OjEyLCBKYXNvbiBBLiBEb25lbmZlbGQg
+d3JvdGU6Cj4+PiBUaGlzIHNtYWxsIHNlcmllcyBwaWNrcyB1cCB3b3JrIGZyb20gQW1hem9uIHRo
+YXQgc2VlbXMgdG8gaGF2ZSBzdGFsbGVkCj4+PiBvdXQgbGF0ZXIgeWVhciBhcm91bmQgdGhpcyB0
+aW1lOiBsaXN0ZW5pbmcgZm9yIHRoZSB2bWdlbmlkIEFDUEkKPj4+IG5vdGlmaWNhdGlvbiwgYW5k
+IHVzaW5nIGl0IHRvICJkbyBzb21ldGhpbmcuIiBMYXN0IHllYXIsIHRoYXQgc29tZXRoaW5nCj4+
+PiBpbnZvbHZlZCBhIGNvbXBsaWNhdGVkIHVzZXJzcGFjZSBtbWFwIGNoYXJkZXYsIHdoaWNoIHNl
+ZW1zIGZyb3VnaHQgd2l0aAo+Pj4gZGlmZmljdWx0eS4gVGhpcyB5ZWFyLCBJIGhhdmUgc29tZXRo
+aW5nIG11Y2ggc2ltcGxlciBpbiBtaW5kOiBzaW1wbHkKPj4+IHVzaW5nIHRob3NlIEFDUEkgbm90
+aWZpY2F0aW9ucyB0byB0ZWxsIHRoZSBSTkcgdG8gcmVpbml0aWFsaXplIHNhZmVseSwKPj4+IHNv
+IHdlIGRvbid0IHJlcGVhdCByYW5kb20gbnVtYmVycyBpbiBjbG9uZWQsIGZvcmtlZCwgb3Igcm9s
+bGVkLWJhY2sgVk0KPj4+IGluc3RhbmNlcy4KPj4+Cj4+PiBUaGlzIHNlcmllcyBjb25zaXN0cyBv
+ZiB0d28gcGF0Y2hlcy4gVGhlIGZpcnN0IGlzIGEgcmF0aGVyCj4+PiBzdHJhaWdodGZvcndhcmQg
+YWRkaXRpb24gdG8gcmFuZG9tLmMsIHdoaWNoIEkgZmVlbCBmaW5lIGFib3V0LiBUaGUKPj4+IHNl
+Y29uZCBwYXRjaCBpcyB0aGUgcmVhc29uIHRoaXMgaXMganVzdCBhbiBSRkM6IGl0J3MgYSBjbGVh
+bnVwIG9mIHRoZQo+Pj4gQUNQSSBkcml2ZXIgZnJvbSBsYXN0IHllYXIsIGFuZCBJIGRvbid0IHJl
+YWxseSBoYXZlIG11Y2ggZXhwZXJpZW5jZQo+Pj4gd3JpdGluZywgdGVzdGluZywgZGVidWdnaW5n
+LCBvciBtYWludGFpbmluZyB0aGVzZSB0eXBlcyBvZiBkcml2ZXJzLgo+Pj4gSWRlYWxseSB0aGlz
+IHRocmVhZCB3b3VsZCB5aWVsZCBzb21lYm9keSBzYXlpbmcsICJJIHNlZSB0aGUgaW50ZW50IG9m
+Cj4+PiB0aGlzOyBJJ20gaGFwcHkgdG8gdGFrZSBvdmVyIG93bmVyc2hpcCBvZiB0aGlzIHBhcnQu
+IiBUaGF0IHdheSwgSSBjYW4KPj4+IGZvY3VzIG9uIHRoZSBSTkcgcGFydCwgYW5kIHdob2V2ZXIg
+c3RlcHMgdXAgZm9yIHRoZSBwYXJhdmlydCBBQ1BJIHBhcnQKPj4+IGNhbiBmb2N1cyBvbiB0aGF0
+Lgo+Pj4KPj4+IEFzIGEgZmluYWwgbm90ZSwgdGhpcyBzZXJpZXMgaW50ZW50aW9uYWxseSBkb2Vz
+IF9ub3RfIGZvY3VzIG9uCj4+PiBub3RpZmljYXRpb24gb2YgdGhlc2UgZXZlbnRzIHRvIHVzZXJz
+cGFjZSBvciB0byBvdGhlciBrZXJuZWwgY29uc3VtZXJzLgo+Pj4gU2luY2UgdGhlc2UgVk0gZm9y
+ayBkZXRlY3Rpb24gZXZlbnRzIGZpcnN0IG5lZWQgdG8gaGl0IHRoZSBSTkcsIHdlIGNhbgo+Pj4g
+bGF0ZXIgdGFsayBhYm91dCB3aGF0IHNvcnRzIG9mIG5vdGlmaWNhdGlvbnMgb3IgbW1hcCdkIGNv
+dW50ZXJzIHRoZSBSTkcKPj4+IHNob3VsZCBiZSBtYWtpbmcgYWNjZXNzaWJsZSB0byBlbHNld2hl
+cmUuIEJ1dCB0aGF0J3MgYSBkaWZmZXJlbnQgc29ydCBvZgo+Pj4gcHJvamVjdCBhbmQgdGllcyBp
+bnRvIGEgbG90IG9mIG1vcmUgY29tcGxpY2F0ZWQgY29uY2VybnMgYmV5b25kIHRoaXMKPj4+IG1v
+cmUgYmFzaWMgcGF0Y2hzZXQuIFNvIGhvcGVmdWxseSB3ZSBjYW4ga2VlcCB0aGUgZGlzY3Vzc2lv
+biByYXRoZXIKPj4+IGZvY3VzZWQgaGVyZSB0byB0aGlzIEFDUEkgYnVzaW5lc3MuCj4+Cj4+IFRo
+ZSBtYWluIHByb2JsZW0gd2l0aCBWTUdlbklEIGlzIHRoYXQgaXQgaXMgaW5oZXJlbnRseSByYWN5
+LiBUaGVyZSB3aWxsCj4+IGFsd2F5cyBiZSBhIChzaG9ydCkgYW1vdW50IG9mIHRpbWUgd2hlcmUg
+dGhlIEFDUEkgbm90aWZpY2F0aW9uIGlzIG5vdAo+PiBwcm9jZXNzZWQsIGJ1dCB0aGUgVk0gY291
+bGQgdXNlIGl0cyBSTkcgdG8gZm9yIGV4YW1wbGUgZXN0YWJsaXNoIFRMUwo+PiBjb25uZWN0aW9u
+cy4KPj4KPj4gSGVuY2Ugd2UgYXMgdGhlIG5leHQgc3RlcCBwcm9wb3NlZCBhIG11bHRpLXN0YWdl
+IHF1aWVzY2UvcmVzdW1lIG1lY2hhbmlzbQo+PiB3aGVyZSB0aGUgc3lzdGVtIGlzIGF3YXJlIHRo
+YXQgaXQgaXMgZ29pbmcgaW50byBzdXNwZW5kIC0gY2FuIGJsb2NrIG5ldHdvcmsKPj4gY29ubmVj
+dGlvbnMgZm9yIGV4YW1wbGUgLSBhbmQgb25seSByZXR1cm5zIHRvIGEgZnVsbHkgZnVuY3Rpb25h
+bCBzdGF0ZSBhZnRlcgo+PiBhbiB1bnF1aWVzY2UgcGhhc2U6Cj4+Cj4+ICAgIGh0dHBzOi8vZ2l0
+aHViLmNvbS9zeXN0ZW1kL3N5c3RlbWQvaXNzdWVzLzIwMjIyCj4gVGhlIGRvd25zaWRlIG9mIGNv
+dXJzZSBpcyBwcmVjaXNlbHkgdGhhdCB0aGUgZ3Vlc3Qgbm93IG5lZWRzIHRvIGJlIGF3YXJlCj4g
+YW5kIGludm9sdmVkIGV2ZXJ5IHNpbmdsZSB0aW1lIGEgc25hcHNob3QgaXMgdGFrZW4uCj4KPiBD
+dXJyZW50bHkgd2l0aCB2aXJ0IHRoZSBhY3Qgb2YgdGFraW5nIGEgc25hcHNob3QgY2FuIG9mdGVu
+IHJlbWFpbiBpbnZpc2libGUKPiB0byB0aGUgVk0gd2l0aCBubyBmdW5jdGlvbmFsIGVmZmVjdCBv
+biB0aGUgZ3Vlc3QgT1Mgb3IgaXRzIHdvcmtsb2FkLCBhbmQKPiB0aGUgaG9zdCBPUyBrbm93cyBp
+dCBjYW4gY29tcGxldGUgYSBzbmFwc2hvdCBpbiBhIHNwZWNpZmljIHRpbWVmcmFtZS4gVGhhdAo+
+IHNhaWQsIHRoaXMgdHJhbnNwYXJlbmN5IHRvIHRoZSBWTSBpcyBwcmVjaXNlbHkgdGhlIGNhdXNl
+IG9mIHRoZSByYWNlCj4gY29uZGl0aW9uIGRlc2NyaWJlZC4KPgo+IFdpdGggZ3Vlc3QgaW52b2x2
+ZW1lbnQgdG8gcXVpZXNjZSB0aGUgYnVsayBvZiBhY3Rpdml0eSBmb3IgdGltZSBwZXJpb2QsCj4g
+dGhlcmUgaXMgbW9yZSBsaWtlbHkgdG8gYmUgYSBuZWdhdGl2ZSBpbXBhY3Qgb24gdGhlIGd1ZXN0
+IHdvcmtsb2FkLiBUaGUKPiBndWVzdCBhZG1pbiBsaWtlbHkgbmVlZHMgdG8gYmUgbW9yZSBleHBs
+aWNpdCBhYm91dCBleGFjdGx5IHdoZW4gaW4gdGltZQo+IGl0IGlzIHJlYXNvbmFibGUgdG8gdGFr
+ZSBhIHNuYXBzaG90IHRvIG1pdGlnYXRlIHRoZSBpbXBhY3QuCj4KPiBUaGUgaG9zdCBPUyBzbmFw
+c2hvdCBvcGVyYXRpb25zIGFyZSBhbHNvIG5vdyBkZXBlbmRhbnQgb24gY28tb3BlcmF0aW9uCj4g
+b2YgYSBndWVzdCBPUyB0aGF0IGhhcyB0byBiZSBjb25zaWRlcmVkIHRvIGJlIHBvdGVudGlhbGx5
+IG1hbGljaW91cywgb3IKPiBhdCBsZWFzdCBjcmFzaGVkL25vbi1yZXNwb25zaXZlLiBUaGUgZ3Vl
+c3QgT1MgYWxzbyBuZWVkcyBhIHdheSB0byByZWNlaXZlCj4gdGhlIHRyaWdnZXJzIGZvciBzbmFw
+c2hvdCBjYXB0dXJlIGFuZCByZXN0b3JlLCBtb3N0IGxpa2VseSB2aWEgYW4gZXh0ZW5zaW9uCj4g
+dG8gc29tZXRoaW5nIGxpa2UgdGhlIFFFTVUgZ3Vlc3QgYWdlbnQgb3IgYW4gZXF1aXZhbGVudCBm
+b3Igb3RodWVyCj4gaHlwZXJ2aXNvcnMuCgoKV2hhdCB5b3UgZGVzY3JpYmUgc291bmRzIGFsbW9z
+dCBleGFjdGx5IGxpa2UgcHJlc3NpbmcgYSBwb3dlciBidXR0b24gb24gCm1vZGVybiBzeXN0ZW1z
+LiBZb3UgZG9uJ3QganVzdCBraWxsIHRoZSBwb3dlciBsaW5lLCB5b3UgcHJlc3MgYSBidXR0b24g
+CmFuZCB3YWl0IGZvciB0aGUgZ3Vlc3QgdG8gYWNrbm93bGVkZ2UgdGhhdCBpdCdzIHJlYWR5LgoK
+TWF5YmUgdGhlIHJlYWwgYW5zd2VyIHRvIGFsbCBvZiB0aGlzIGlzIFMzOiBTdXNwZW5kIHRvIFJB
+TS4gWW91IHByZXNzIAp0aGUgc3VzcGVuZCBidXR0b24sIHRoZSBndWVzdCBjYW4gcHJlcGFyZSBm
+b3Igc2xlZXAgKHF1aWVzY2UhKSBhbmQgdGhlIApuZXh0IHRpbWUgeW91IHJ1biwgaXQgY2FuIGNo
+ZWNrIHdoZXRoZXIgVk1HZW5JRCBjaGFuZ2VkIGFuZCBhY3QgYWNjb3JkaW5nbHkuCgoKPiBEZXNw
+aXRlIHRoZSBhYm92ZSwgSSdtIG5vdCBhZ2FpbnN0IHRoZSBpZGVhIG9mIGNvLW9wZXJhdGl2ZSBp
+bnZvbHZlbWVudAo+IG9mIHRoZSBndWVzdCBPUyBpbiB0aGUgYWN0cyBvZiB0YWtpbmcgJiByZXN0
+b3Jpbmcgc25hcHNob3RzLiBJIGNhbid0Cj4gc2VlIGFueSBvdGhlciBwcm9wb3NhbHMgc28gZmFy
+IHRoYXQgY2FuIHJlbGlhYmx5IGVsaW1pbmF0ZSB0aGUgcmFjZXMKPiBpbiB0aGUgZ2VuZXJhbCBj
+YXNlLCBmcm9tIHRoZSBrZXJuZWwgcmlnaHQgdXB0byB1c2VyIGFwcGxpY2F0aW9ucy4KPiBTbyBJ
+IHRoaW5rIGl0IGlzIG5lY2Nlc3NhcnkgdG8gaGF2ZSBndWVzdCBjb29wZXJhdGl2ZSBzbmFwc2hv
+dHRpbmcuCj4KPj4gV2hhdCBleGFjdCB1c2UgY2FzZSBkbyB5b3UgaGF2ZSBpbiBtaW5kIGZvciB0
+aGUgUk5HL1ZNR2VuSUQgdXBkYXRlPyBDYW4geW91Cj4+IHRoaW5rIG9mIHNpdHVhdGlvbnMgd2hl
+cmUgdGhlIHJhY2UgaXMgbm90IGFuIGFjdHVhbCBjb25jZXJuPwo+IExldHMgYXNzdW1lIHdlIGRv
+IHRha2UgdGhlIGFwcHJvYWNoIGRlc2NyaWJlZCBpbiB0aGF0IHN5c3RlbWQgYnVnIGFuZAo+IGhh
+dmUgYSBjby1vcGVyYXRpdmUgc25hcHNob3QgcHJvY2Vzcy4gSWYgdGhlIGh5cGVydmlzb3IgZG9l
+cyB0aGUgcmlnaHQKPiB0aGluZyBhbmQgZ3Vlc3Qgb3duZXJzIGluc3RhbGwgdGhlIHJpZ2h0IHRo
+aW5ncywgdGhleSdsbCBoYXZlIGEgcmFjZQo+IGZyZWUgc29sdXRpb24gdGhhdCB3b3JrcyB3ZWxs
+IGluIG5vcm1hbCBvcGVyYXRpb24uIFRoYXQncyBnb29kLgo+Cj4KPiBSZWFsaXN0aWNhbGx5IHRo
+b3VnaCwgaXQgaXMgbmV2ZXIgZ29pbmcgdG8gYmUgdW5pdmVyc2FsbHkgYW5kIHJlbGlhYmx5Cj4g
+cHV0IGludG8gcHJhY3RpY2UuIFNvIHdoYXQgaXMgb3VyIGF0dGl0dWRlIHRvIGNhc2VzIHdoZXJl
+IHRoZSBwcmVmZXJyZWQKPiBzb2x1dGlvbiBpc24ndCBhdmFpbGJsZSBhbmQvb3Igb3BlcmF0aXZl
+ID8KPgo+Cj4gVGhlcmUgYXJlIGdvaW5nIHRvIGJlIHVzZXJzIHdobyBjb250aW51ZSB0byBidWls
+ZCB0aGVpciBndWVzdCBkaXNrIGltYWdlcwo+IHdpdGhvdXQgdGhlIFFFTVUgZ3Vlc3QgYWdlbnQg
+KG9yIGVxdWl2YWxlbnQgZm9yIHdoYXRldmVyIGh5cGVydmlzb3IgdGhleQo+IHJ1biBvbikgaW5z
+dGFsbGVkIGJlY2F1c2UgdGhleSBkb24ndCBrbm93IGFueSBiZXR0ZXIuIE9yIHdoZXJlIHRoZSBn
+dWVzdAo+IGFnZW50IGlzIG1pcy1jb25maWd1cmVkIG9yIGZhaWxzIHRvIHN0YXJ0cyBvciBzb21l
+IG90aGVyIHNjZW5hcmlvIHRoYXQKPiBwcmV2ZW50cyB0aGUgcXVpZXNjZSB3b3JraW5nIGFzIGRl
+c2lyZWQuIFRoZSBob3N0IG1nbXQgY291bGQgcmVmdXNlIHRvCj4gdGFrZSBhIHNuYXBzaG90IGlu
+IHRoZXNlIGNhc2VzLiBNb3JlIGxpa2VseSBpcyB0aGF0IHRoZXkgYXJlIGp1c3QKPiBnb2luZyB0
+byBnbyBhaGVhZCBhbmQgZG8gYSBzbmFwc2hvdCBhbnl3YXkgYmVjYXVzZSBsYWNrIG9mIGd1ZXN0
+IGFnZW50Cj4gaXMgYSB2ZXJ5IGNvbW1vbiBzY2VuYXJpbyB0b2RheSBhbmQgdXNlcnMgd2FudCB0
+aGVpciBzbmFwc2hvdHMuCj4KPgo+IFRoZXJlIGFyZSBnb2luZyB0byBiZSB2aXJ0IG1hbmFnZW1l
+bnQgYXBwcyAvIGh5cGVydmlzb3JzIHRoYXQgZG9uJ3QKPiBzdXBwb3J0IHRhbGtpbmcgdG8gYW55
+IGd1ZXN0IGFnZW50IGFjcm9zcyB0aGVpciBzbmFwc2hvdCBvcGVyYXRpb24KPiBpbiB0aGUgZmly
+c3QgcGxhY2UsIHNvIHN5c3RlbWQgZ2V0cyBubyB3YXkgdG8gdHJpZ2dlciB0aGUgcmVxdWlyZWQK
+PiBxdWllc2NlIGRhbmNlIG9uIHNuYXBzaG90LCBidXQgdGhleSBsaWtlbHkgaGF2ZSBWTUdlbklE
+IHN1cHBvcnQKPiBpbXBsZW1lbnRlZCBhbHJlYWR5Lgo+Cj4KPiBJT1csIEkgY291bGQgdmlldyBW
+TUdlbklEIHRyaWdnZXJlZCBmb3JrIGRldGVjdGlvbiBpbnRlZ3JhdGVkIHdpdGgKPiB0aGUga2Vy
+bmVsIFJORyBhcyBwcm92aWRpbmcgYSBiYWNrdXAgbGluZSBvZiBkZWZlbmNlIHRoYXQgaXMgZ29p
+bmcKPiB0byAianVzdCB3b3JrIiwgYWxiZWl0IHdpdGggdGhlIGtub3duIHJhY2UuIEl0IGlzbid0
+IGFzIGdvb2QgYXMgdGhlCj4gZ3Vlc3QgY28tb3BlcmF0aXZlIHNuYXBzaG90IGFwcHJvYWNoLCBi
+ZWNhdXNlIGl0IG9ubHkgdHJpZXMgdG8gc29sdmUKPiB0aGUgb25lIHNwZWNpZmljIHRhcmdldHRl
+ZCBwcm9ibGVtIG9mIHVwZGF0aW5nIHRoZSBrZXJuZWwgUk5HLgo+Cj4gSXMgaXQgc3RpbGwgYmV0
+dGVyIHRoYW4gZG9pbmcgbm90aGluZyBhdCBhbGwgdGhvdWdoLCBmb3IgdGhlIHNjZW5hcmlvCj4g
+d2hlcmUgZ3Vlc3QgY28tb3BlcmF0aXZlIHNuYXBzaG90IGlzIHVuYXZhaWxhYmxlID8KPgo+IElm
+IGl0IGlzIGJldHRlciB0aGFuIG5vdGhpbmcsIGlzIGl0IHRoZW4gY29tcGVsbGluZyBlbm91Z2gg
+dG8ganVzdGlmeQo+IHRoZSBtYWludCBjb3N0IG9mIHRoZSBjb2RlIGFkZGVkIHRvIHRoZSBrZXJu
+ZWwgPwoKCkknbSB0ZW1wdGVkIHRvIHNheSAiSWYgaXQgYWxzbyBleHBvc2VzIHRoZSBWTUdlbklE
+IHZpYSBzeXNmcyBzbyB0aGF0IHlvdSAKY2FuIGFjdHVhbGx5IGNoZWNrIHdoZXRoZXIgeW91IHdl
+cmUgY2xvbmVkLCBwcm9iYWJseSB5ZXMuIgoKCkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQg
+Q2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0
+c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdl
+biBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejog
+QmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
-On Wed, Feb 23, 2022 at 7:55 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Taking spinlocks from IRQ context is problematic for PREEMPT_RT. That
-> is, in part, why we take trylocks instead. But apparently this still
-> trips up various lock dependency analyzers. That seems like a bug in the
-> analyzers that should be fixed, rather than having to change things
-> here.
->
-> But maybe there's another reason to change things up: by deferring the
-> crng pre-init loading to the worker, we can use the cryptographic hash
-> function rather than xor, which is perhaps a meaningful difference when
-> considering this data has only been through the relatively weak
-> fast_mix() function.
->
-> The biggest downside of this approach is that the pre-init loading is
-> now deferred until later, which means things that need random numbers
-> after interrupts are enabled, but before workqueues are running -- or
-> before this particular worker manages to run -- are going to get into
-> trouble. Hopefully in the real world, this window is rather small,
-> especially since this code won't run until 64 interrupts had occurred.
->
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  drivers/char/random.c | 62 ++++++++++++-------------------------------
->  1 file changed, 17 insertions(+), 45 deletions(-)
->
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 536237a0f073..9fb06fc298d3 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -443,10 +443,6 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
->   * boot time when it's better to have something there rather than
->   * nothing.
->   *
-> - * There are two paths, a slow one and a fast one. The slow one
-> - * hashes the input along with the current key. The fast one simply
-> - * xors it in, and should only be used from interrupt context.
-> - *
->   * If account is set, then the crng_init_cnt counter is incremented.
->   * This shouldn't be set by functions like add_device_randomness(),
->   * where we can't trust the buffer passed to it is guaranteed to be
-> @@ -455,19 +451,15 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
->   * Returns the number of bytes processed from input, which is bounded
->   * by CRNG_INIT_CNT_THRESH if account is true.
->   */
-> -static size_t crng_pre_init_inject(const void *input, size_t len,
-> -                                  bool fast, bool account)
-> +static size_t crng_pre_init_inject(const void *input, size_t len, bool account)
->  {
->         static int crng_init_cnt = 0;
-> +       struct blake2s_state hash;
->         unsigned long flags;
->
-> -       if (fast) {
-> -               if (!spin_trylock_irqsave(&base_crng.lock, flags))
-> -                       return 0;
-> -       } else {
-> -               spin_lock_irqsave(&base_crng.lock, flags);
-> -       }
-> +       blake2s_init(&hash, sizeof(base_crng.key));
->
-> +       spin_lock_irqsave(&base_crng.lock, flags);
->         if (crng_init != 0) {
->                 spin_unlock_irqrestore(&base_crng.lock, flags);
->                 return 0;
-> @@ -476,21 +468,9 @@ static size_t crng_pre_init_inject(const void *input, size_t len,
->         if (account)
->                 len = min_t(size_t, len, CRNG_INIT_CNT_THRESH - crng_init_cnt);
->
-> -       if (fast) {
-> -               const u8 *src = input;
-> -               size_t i;
-> -
-> -               for (i = 0; i < len; ++i)
-> -                       base_crng.key[(crng_init_cnt + i) %
-> -                                     sizeof(base_crng.key)] ^= src[i];
-> -       } else {
-> -               struct blake2s_state hash;
-> -
-> -               blake2s_init(&hash, sizeof(base_crng.key));
-> -               blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
-> -               blake2s_update(&hash, input, len);
-> -               blake2s_final(&hash, base_crng.key);
-> -       }
-> +       blake2s_update(&hash, base_crng.key, sizeof(base_crng.key));
-> +       blake2s_update(&hash, input, len);
-> +       blake2s_final(&hash, base_crng.key);
->
->         if (account) {
->                 crng_init_cnt += len;
-> @@ -1040,7 +1020,7 @@ void add_device_randomness(const void *buf, size_t size)
->         unsigned long flags;
->
->         if (crng_init == 0 && size)
-> -               crng_pre_init_inject(buf, size, false, false);
-> +               crng_pre_init_inject(buf, size, false);
->
->         spin_lock_irqsave(&input_pool.lock, flags);
->         _mix_pool_bytes(buf, size);
-> @@ -1157,7 +1137,7 @@ void add_hwgenerator_randomness(const void *buffer, size_t count,
->                                 size_t entropy)
->  {
->         if (unlikely(crng_init == 0)) {
-> -               size_t ret = crng_pre_init_inject(buffer, count, false, true);
-> +               size_t ret = crng_pre_init_inject(buffer, count, true);
->                 mix_pool_bytes(buffer, ret);
->                 count -= ret;
->                 buffer += ret;
-> @@ -1298,7 +1278,12 @@ static void mix_interrupt_randomness(struct work_struct *work)
->         local_irq_enable();
->
->         mix_pool_bytes(pool, sizeof(pool));
-> -       credit_entropy_bits(1);
-> +
-> +       if (unlikely(crng_init == 0))
-> +               crng_pre_init_inject(pool, sizeof(pool), true);
-> +       else
-> +               credit_entropy_bits(1);
-> +
->         memzero_explicit(pool, sizeof(pool));
->  }
->
-> @@ -1331,24 +1316,11 @@ void add_interrupt_randomness(int irq)
->         fast_mix(fast_pool->pool32);
->         new_count = ++fast_pool->count;
->
-> -       if (unlikely(crng_init == 0)) {
-> -               if (new_count >= 64 &&
-> -                   crng_pre_init_inject(fast_pool->pool32, sizeof(fast_pool->pool32),
-> -                                        true, true) > 0) {
-> -                       fast_pool->count = 0;
-> -                       fast_pool->last = now;
-> -                       if (spin_trylock(&input_pool.lock)) {
-> -                               _mix_pool_bytes(&fast_pool->pool32, sizeof(fast_pool->pool32));
-> -                               spin_unlock(&input_pool.lock);
-> -                       }
-> -               }
-> -               return;
-> -       }
-> -
->         if (new_count & MIX_INFLIGHT)
->                 return;
->
-> -       if (new_count < 64 && !time_after(now, fast_pool->last + HZ))
-> +       if (new_count < 64 && (!time_after(now, fast_pool->last + HZ) ||
-> +                              unlikely(crng_init == 0)))
->                 return;
->
->         if (unlikely(!fast_pool->mix.func))
-> --
-> 2.35.1
->
-
-FYI, I think you were concerned about those trylocks too. This should
-make that go away.
-
-Jason
