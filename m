@@ -2,126 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2605C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 08:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 645C1C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 09:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232165AbiBXIys (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Feb 2022 03:54:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41394 "EHLO
+        id S231700AbiBXJtu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Feb 2022 04:49:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232151AbiBXIys (ORCPT
+        with ESMTP id S231683AbiBXJtt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Feb 2022 03:54:48 -0500
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCBB7162020;
-        Thu, 24 Feb 2022 00:54:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645692858; x=1677228858;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=12QSyjliW/2N5g2pN9oNa13hL2d3UZLmxKY0dS2g+TU=;
-  b=YJAmvEtDQPl32GD3t/WiXmXJa+powVBNiHIwcdegAd2CrBFgH2RxVpDM
-   mgdcf0UM9ISctIaaU5+lvNMLU7u76DlmKK5nyrnJ8NcLzOybnRPpcqX0j
-   ACs5iLKxOZGIuXUE09kebvSEvSKr7xXThQUbcB6pXRSRQjav1CVjjnKLB
-   E=;
-X-IronPort-AV: E=Sophos;i="5.88,393,1635206400"; 
-   d="scan'208";a="176212703"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP; 24 Feb 2022 08:54:06 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com (Postfix) with ESMTPS id AF91E41634;
-        Thu, 24 Feb 2022 08:54:05 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Thu, 24 Feb 2022 08:54:05 +0000
-Received: from [0.0.0.0] (10.43.161.89) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Thu, 24 Feb
- 2022 08:54:01 +0000
-Message-ID: <234d7952-0379-e3d9-5e02-5eba171024a0@amazon.com>
-Date:   Thu, 24 Feb 2022 09:53:59 +0100
+        Thu, 24 Feb 2022 04:49:49 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA926674C4;
+        Thu, 24 Feb 2022 01:49:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8109BB824F1;
+        Thu, 24 Feb 2022 09:49:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC94EC340E9;
+        Thu, 24 Feb 2022 09:49:16 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Do5PhtlR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645696154;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fIXunQ0/AtwBaCePwIXP2qD27GW0DhIB45r4lJ1eLME=;
+        b=Do5PhtlRKqEQujks44fyPi9kMT+LVGhcBDYS7nMxm0pWM2YKsy3UctvgLTxSBAs94u154k
+        zj4iVzAyit10EWasQ5hm37bXPFfgA9aCTQb/WQezWlw8sIeBg13M2C4TgC0Rg1dVsVEYYf
+        32kCAjFYJOtPYj1lA7e2Z8egCOsqnTM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 053d5ec8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 24 Feb 2022 09:49:14 +0000 (UTC)
+Received: by mail-yb1-f171.google.com with SMTP id p19so2671697ybc.6;
+        Thu, 24 Feb 2022 01:49:13 -0800 (PST)
+X-Gm-Message-State: AOAM530J6pHZtn/TBfVROKhHC8op4Ge+TDiXexc9guSuQmQ8oayZJAPu
+        TeoMlog/sgCwF2sA3WIsuBlf95UAF6Q5psqMM38=
+X-Google-Smtp-Source: ABdhPJyOvLl5VmvQLFSBbWpUhA9AfJiUCFRoxcqCFbKEt2prfsXWWeXkViO9oqn3jcGnknwdnNFU+t+5KOTTYanL6dc=
+X-Received: by 2002:a25:238d:0:b0:619:3e19:b06b with SMTP id
+ j135-20020a25238d000000b006193e19b06bmr1621006ybj.382.1645696152959; Thu, 24
+ Feb 2022 01:49:12 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <adrian@parity.io>
-CC:     <dwmw@amazon.co.uk>, <acatan@amazon.com>, <colmmacc@amazon.com>,
-        <sblbir@amazon.com>, <raduweis@amazon.com>, <jannh@google.com>,
-        <gregkh@linuxfoundation.org>, <tytso@mit.edu>
-References: <20220223131231.403386-1-Jason@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20220223131231.403386-1-Jason@zx2c4.com>
-X-Originating-IP: [10.43.161.89]
-X-ClientProxiedBy: EX13D47UWA001.ant.amazon.com (10.43.163.6) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Received: by 2002:a05:7110:71a8:b0:167:24f9:2d40 with HTTP; Thu, 24 Feb 2022
+ 01:49:12 -0800 (PST)
+In-Reply-To: <Yhc4LwK3biZFIqwQ@owl.dominikbrodowski.net>
+References: <20220223185511.628452-1-Jason@zx2c4.com> <Yhc4LwK3biZFIqwQ@owl.dominikbrodowski.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 24 Feb 2022 10:49:12 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oesPzz4ofe-wo_ZViM=uahL6WQo8-5ov7xjJN8ui1rsg@mail.gmail.com>
+Message-ID: <CAHmME9oesPzz4ofe-wo_ZViM=uahL6WQo8-5ov7xjJN8ui1rsg@mail.gmail.com>
+Subject: Re: [PATCH] random: do crng pre-init loading in worker rather than irq
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bigeasy@linutronix.de, Sultan Alsawaf <sultan@kerneltoast.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGV5IEphc29uLAoKT24gMjMuMDIuMjIgMTQ6MTIsIEphc29uIEEuIERvbmVuZmVsZCB3cm90ZToK
-PiBUaGlzIHNtYWxsIHNlcmllcyBwaWNrcyB1cCB3b3JrIGZyb20gQW1hem9uIHRoYXQgc2VlbXMg
-dG8gaGF2ZSBzdGFsbGVkCj4gb3V0IGxhdGVyIHllYXIgYXJvdW5kIHRoaXMgdGltZTogbGlzdGVu
-aW5nIGZvciB0aGUgdm1nZW5pZCBBQ1BJCj4gbm90aWZpY2F0aW9uLCBhbmQgdXNpbmcgaXQgdG8g
-ImRvIHNvbWV0aGluZy4iIExhc3QgeWVhciwgdGhhdCBzb21ldGhpbmcKPiBpbnZvbHZlZCBhIGNv
-bXBsaWNhdGVkIHVzZXJzcGFjZSBtbWFwIGNoYXJkZXYsIHdoaWNoIHNlZW1zIGZyb3VnaHQgd2l0
-aAo+IGRpZmZpY3VsdHkuIFRoaXMgeWVhciwgSSBoYXZlIHNvbWV0aGluZyBtdWNoIHNpbXBsZXIg
-aW4gbWluZDogc2ltcGx5Cj4gdXNpbmcgdGhvc2UgQUNQSSBub3RpZmljYXRpb25zIHRvIHRlbGwg
-dGhlIFJORyB0byByZWluaXRpYWxpemUgc2FmZWx5LAo+IHNvIHdlIGRvbid0IHJlcGVhdCByYW5k
-b20gbnVtYmVycyBpbiBjbG9uZWQsIGZvcmtlZCwgb3Igcm9sbGVkLWJhY2sgVk0KPiBpbnN0YW5j
-ZXMuCj4KPiBUaGlzIHNlcmllcyBjb25zaXN0cyBvZiB0d28gcGF0Y2hlcy4gVGhlIGZpcnN0IGlz
-IGEgcmF0aGVyCj4gc3RyYWlnaHRmb3J3YXJkIGFkZGl0aW9uIHRvIHJhbmRvbS5jLCB3aGljaCBJ
-IGZlZWwgZmluZSBhYm91dC4gVGhlCj4gc2Vjb25kIHBhdGNoIGlzIHRoZSByZWFzb24gdGhpcyBp
-cyBqdXN0IGFuIFJGQzogaXQncyBhIGNsZWFudXAgb2YgdGhlCj4gQUNQSSBkcml2ZXIgZnJvbSBs
-YXN0IHllYXIsIGFuZCBJIGRvbid0IHJlYWxseSBoYXZlIG11Y2ggZXhwZXJpZW5jZQo+IHdyaXRp
-bmcsIHRlc3RpbmcsIGRlYnVnZ2luZywgb3IgbWFpbnRhaW5pbmcgdGhlc2UgdHlwZXMgb2YgZHJp
-dmVycy4KPiBJZGVhbGx5IHRoaXMgdGhyZWFkIHdvdWxkIHlpZWxkIHNvbWVib2R5IHNheWluZywg
-Ikkgc2VlIHRoZSBpbnRlbnQgb2YKPiB0aGlzOyBJJ20gaGFwcHkgdG8gdGFrZSBvdmVyIG93bmVy
-c2hpcCBvZiB0aGlzIHBhcnQuIiBUaGF0IHdheSwgSSBjYW4KPiBmb2N1cyBvbiB0aGUgUk5HIHBh
-cnQsIGFuZCB3aG9ldmVyIHN0ZXBzIHVwIGZvciB0aGUgcGFyYXZpcnQgQUNQSSBwYXJ0Cj4gY2Fu
-IGZvY3VzIG9uIHRoYXQuCj4KPiBBcyBhIGZpbmFsIG5vdGUsIHRoaXMgc2VyaWVzIGludGVudGlv
-bmFsbHkgZG9lcyBfbm90XyBmb2N1cyBvbgo+IG5vdGlmaWNhdGlvbiBvZiB0aGVzZSBldmVudHMg
-dG8gdXNlcnNwYWNlIG9yIHRvIG90aGVyIGtlcm5lbCBjb25zdW1lcnMuCj4gU2luY2UgdGhlc2Ug
-Vk0gZm9yayBkZXRlY3Rpb24gZXZlbnRzIGZpcnN0IG5lZWQgdG8gaGl0IHRoZSBSTkcsIHdlIGNh
-bgo+IGxhdGVyIHRhbGsgYWJvdXQgd2hhdCBzb3J0cyBvZiBub3RpZmljYXRpb25zIG9yIG1tYXAn
-ZCBjb3VudGVycyB0aGUgUk5HCj4gc2hvdWxkIGJlIG1ha2luZyBhY2Nlc3NpYmxlIHRvIGVsc2V3
-aGVyZS4gQnV0IHRoYXQncyBhIGRpZmZlcmVudCBzb3J0IG9mCj4gcHJvamVjdCBhbmQgdGllcyBp
-bnRvIGEgbG90IG9mIG1vcmUgY29tcGxpY2F0ZWQgY29uY2VybnMgYmV5b25kIHRoaXMKPiBtb3Jl
-IGJhc2ljIHBhdGNoc2V0LiBTbyBob3BlZnVsbHkgd2UgY2FuIGtlZXAgdGhlIGRpc2N1c3Npb24g
-cmF0aGVyCj4gZm9jdXNlZCBoZXJlIHRvIHRoaXMgQUNQSSBidXNpbmVzcy4KCgpUaGUgbWFpbiBw
-cm9ibGVtIHdpdGggVk1HZW5JRCBpcyB0aGF0IGl0IGlzIGluaGVyZW50bHkgcmFjeS4gVGhlcmUg
-d2lsbCAKYWx3YXlzIGJlIGEgKHNob3J0KSBhbW91bnQgb2YgdGltZSB3aGVyZSB0aGUgQUNQSSBu
-b3RpZmljYXRpb24gaXMgbm90IApwcm9jZXNzZWQsIGJ1dCB0aGUgVk0gY291bGQgdXNlIGl0cyBS
-TkcgdG8gZm9yIGV4YW1wbGUgZXN0YWJsaXNoIFRMUyAKY29ubmVjdGlvbnMuCgpIZW5jZSB3ZSBh
-cyB0aGUgbmV4dCBzdGVwIHByb3Bvc2VkIGEgbXVsdGktc3RhZ2UgcXVpZXNjZS9yZXN1bWUgCm1l
-Y2hhbmlzbSB3aGVyZSB0aGUgc3lzdGVtIGlzIGF3YXJlIHRoYXQgaXQgaXMgZ29pbmcgaW50byBz
-dXNwZW5kIC0gY2FuIApibG9jayBuZXR3b3JrIGNvbm5lY3Rpb25zIGZvciBleGFtcGxlIC0gYW5k
-IG9ubHkgcmV0dXJucyB0byBhIGZ1bGx5IApmdW5jdGlvbmFsIHN0YXRlIGFmdGVyIGFuIHVucXVp
-ZXNjZSBwaGFzZToKCiDCoCBodHRwczovL2dpdGh1Yi5jb20vc3lzdGVtZC9zeXN0ZW1kL2lzc3Vl
-cy8yMDIyMgoKTG9va2luZyBhdCB0aGUgaXNzdWUgYWdhaW4sIGl0IHNlZW1zIGxpa2Ugd2UgY29t
-cGxldGVseSBtaXNzZWQgdG8gZm9sbG93IAp1cCB3aXRoIGEgUFIgdG8gaW1wbGVtZW50IHRoYXQg
-ZnVuY3Rpb25hbGl0eSA6KC4KCldoYXQgZXhhY3QgdXNlIGNhc2UgZG8geW91IGhhdmUgaW4gbWlu
-ZCBmb3IgdGhlIFJORy9WTUdlbklEIHVwZGF0ZT8gQ2FuIAp5b3UgdGhpbmsgb2Ygc2l0dWF0aW9u
-cyB3aGVyZSB0aGUgcmFjZSBpcyBub3QgYW4gYWN0dWFsIGNvbmNlcm4/CgoKQWxleAoKCj4KPiBD
-YzogZHdtd0BhbWF6b24uY28udWsKPiBDYzogYWNhdGFuQGFtYXpvbi5jb20KPiBDYzogZ3JhZkBh
-bWF6b24uY29tCj4gQ2M6IGNvbG1tYWNjQGFtYXpvbi5jb20KPiBDYzogc2JsYmlyQGFtYXpvbi5j
-b20KPiBDYzogcmFkdXdlaXNAYW1hem9uLmNvbQo+IENjOiBqYW5uaEBnb29nbGUuY29tCj4gQ2M6
-IGdyZWdraEBsaW51eGZvdW5kYXRpb24ub3JnCj4gQ2M6IHR5dHNvQG1pdC5lZHUKPgo+IEphc29u
-IEEuIERvbmVuZmVsZCAoMik6Cj4gICAgcmFuZG9tOiBhZGQgbWVjaGFuaXNtIGZvciBWTSBmb3Jr
-cyB0byByZWluaXRpYWxpemUgY3JuZwo+ICAgIGRyaXZlcnMvdmlydDogYWRkIHZtZ2VuaWQgZHJp
-dmVyIGZvciByZWluaXRpYWxpemluZyBSTkcKPgo+ICAgZHJpdmVycy9jaGFyL3JhbmRvbS5jICB8
-ICA1OCArKysrKysrKysrKysrKysrKysKPiAgIGRyaXZlcnMvdmlydC9LY29uZmlnICAgfCAgIDgg
-KysrCj4gICBkcml2ZXJzL3ZpcnQvTWFrZWZpbGUgIHwgICAxICsKPiAgIGRyaXZlcnMvdmlydC92
-bWdlbmlkLmMgfCAxMzMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysK
-PiAgIGluY2x1ZGUvbGludXgvcmFuZG9tLmggfCAgIDEgKwo+ICAgNSBmaWxlcyBjaGFuZ2VkLCAy
-MDEgaW5zZXJ0aW9ucygrKQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvdmlydC92bWdl
-bmlkLmMKPgo+IC0tCj4gMi4zNS4xCj4KCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJt
-YW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzog
-Q2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dl
-cmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3Qt
-SUQ6IERFIDI4OSAyMzcgODc5CgoK
+On 2/24/22, Dominik Brodowski <linux@dominikbrodowski.net> wrote:
+> Am Wed, Feb 23, 2022 at 07:55:11PM +0100 schrieb Jason A. Donenfeld:
+>> Taking spinlocks from IRQ context is problematic for PREEMPT_RT. That
+>> is, in part, why we take trylocks instead. But apparently this still
+>> trips up various lock dependency analyzers. That seems like a bug in the
+>> analyzers that should be fixed, rather than having to change things
+>> here.
+>>
+>> But maybe there's another reason to change things up: by deferring the
+>> crng pre-init loading to the worker, we can use the cryptographic hash
+>> function rather than xor, which is perhaps a meaningful difference when
+>> considering this data has only been through the relatively weak
+>> fast_mix() function.
+>>
+>> The biggest downside of this approach is that the pre-init loading is
+>> now deferred until later, which means things that need random numbers
+>> after interrupts are enabled, but before workqueues are running -- or
+>> before this particular worker manages to run -- are going to get into
+>> trouble. Hopefully in the real world, this window is rather small,
+>> especially since this code won't run until 64 interrupts had occurred.
+>>
+>> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+>> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+>> Cc: Sultan Alsawaf <sultan@kerneltoast.com>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Cc: Theodore Ts'o <tytso@mit.edu>
+>> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+>> ---
+>>  drivers/char/random.c | 62 ++++++++++++-------------------------------
+>>  1 file changed, 17 insertions(+), 45 deletions(-)
+>>
+>> diff --git a/drivers/char/random.c b/drivers/char/random.c
+>> index 536237a0f073..9fb06fc298d3 100644
+>> --- a/drivers/char/random.c
+>> +++ b/drivers/char/random.c
+>> @@ -1298,7 +1278,12 @@ static void mix_interrupt_randomness(struct
+>> work_struct *work)
+>>  	local_irq_enable();
+>>
+>>  	mix_pool_bytes(pool, sizeof(pool));
+>> -	credit_entropy_bits(1);
+>> +
+>> +	if (unlikely(crng_init == 0))
+>> +		crng_pre_init_inject(pool, sizeof(pool), true);
+>> +	else
+>> +		credit_entropy_bits(1);
+>> +
+>>  	memzero_explicit(pool, sizeof(pool));
+>>  }
+>
+> Might it make sense to call crng_pre_init_inject() before mix_pool_bytes?
 
+What exactly is the difference you see mattering in the order? I keep
+chasing my tail trying to think about it.
+
+Jason
