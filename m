@@ -2,60 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A10E7C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 10:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C25F3C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Feb 2022 11:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbiBXK6X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Feb 2022 05:58:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        id S233930AbiBXLQV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Feb 2022 06:16:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231864AbiBXK6X (ORCPT
+        with ESMTP id S233812AbiBXLQU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Feb 2022 05:58:23 -0500
+        Thu, 24 Feb 2022 06:16:20 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FC815FCA3;
-        Thu, 24 Feb 2022 02:57:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAAF294552;
+        Thu, 24 Feb 2022 03:15:50 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 95309616A3;
-        Thu, 24 Feb 2022 10:57:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B6CC340E9;
-        Thu, 24 Feb 2022 10:57:52 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4D5696177F;
+        Thu, 24 Feb 2022 11:15:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E0CC340F0;
+        Thu, 24 Feb 2022 11:15:49 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Aev4oP76"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="K0Ba/2BM"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645700268;
+        t=1645701345;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=l9uFhoNHD0ubvFpgP+CfgQfLWDk0rbzVcNs9eAAzOOE=;
-        b=Aev4oP76SM7Ky5tVHBurpSFk24ePStDVbpz4sUcYrWj/NVQsvMbzkZERrzKlvWiREIkUjg
-        pns/T3HQBI1W+E7V4L0ZxLhtdwhTycvyPky5RJ4kmyYS40PqhCMFfq2I7AWj1l2AbnW3gZ
-        2IoA6U4VwICTXSzBigeWX4GouwiGKE4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4fcbc003 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Feb 2022 10:57:48 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2d79394434dso20276797b3.5;
-        Thu, 24 Feb 2022 02:57:46 -0800 (PST)
-X-Gm-Message-State: AOAM530cAMgmcgZdTTGMm6D/VzoaOJA3qcwRN458+R+czbfdmZ8cDRfH
-        gokMg0kKECaG4Otet9xnByjVuwDwZePzfDHPetY=
-X-Google-Smtp-Source: ABdhPJwN40erEHMdIbnTWhaEGW2JI+hoWIa30mje4icqtRKOBfnV+2qG9wPZOdlYssF87EiAylHOO7YqwwX1PQC4yTE=
-X-Received: by 2002:a81:5a83:0:b0:2ca:287c:6b5d with SMTP id
- o125-20020a815a83000000b002ca287c6b5dmr1747645ywb.2.1645700265594; Thu, 24
- Feb 2022 02:57:45 -0800 (PST)
+        bh=tSMJNlgM3iQSZttf3O5yP1K/Zb4cUmNelvTABLfdcOs=;
+        b=K0Ba/2BM/9pExBbaS5Oj8SCJvlvp0LQGyiNAiXDyooG/U9BeyX+5o7RLqsETF26O3Q8oLJ
+        fCsXilmRI7pxc/CYm3kU+fXPDMl1Uchh4ynDmuSO5MbVs6Ufz3QiiawdfSIvm5FepEXDsh
+        cYBAB6wdHUlLLl0Wob5vRSfu6n86I28=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 954041ba (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 24 Feb 2022 11:15:45 +0000 (UTC)
+Received: by mail-yb1-f182.google.com with SMTP id g6so3016428ybe.12;
+        Thu, 24 Feb 2022 03:15:43 -0800 (PST)
+X-Gm-Message-State: AOAM5315RL/lzYI/NtRNh7x5Px9BdD0ydiHXo8b3FpyEVFwamOhtB+0p
+        gx0/jUlkmeQ1PWrF6jia5iAIhGQNRHDmWJyyjDU=
+X-Google-Smtp-Source: ABdhPJwcyLWv29eKkR/4qn6wxUASneof9Mw7kmR85HjE16vurz2uO8LCL0/vq/6Jg597pXgN7D3peAt9nzCkEAyuvVw=
+X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
+ i22-20020a25d116000000b0061de8c9531emr1860406ybg.637.1645701342951; Thu, 24
+ Feb 2022 03:15:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20220223131231.403386-1-Jason@zx2c4.com> <CAHmME9ogH_mx724n_deFfva7-xPCmma1-=2Mv0JdnZ-fC4JCjg@mail.gmail.com>
- <2653b6c7-a851-7a48-f1f8-3bde742a0c9f@redhat.com> <YhdkD4S7Erzl98So@redhat.com>
-In-Reply-To: <YhdkD4S7Erzl98So@redhat.com>
+References: <20220223131231.403386-1-Jason@zx2c4.com> <20220223131231.403386-2-Jason@zx2c4.com>
+ <YhbAOW/KbFW1CFkQ@sol.localdomain> <CAHmME9oa_wE8_n8e5b=iM5v-s5dgyibm4vXMhwzc8zGd6VWZMQ@mail.gmail.com>
+ <YhbfDQ2ernjrRNRX@sol.localdomain>
+In-Reply-To: <YhbfDQ2ernjrRNRX@sol.localdomain>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 24 Feb 2022 11:57:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qRrLHwOjD+_xkGC7-BMVdzO95=DzhCo8KvDNa0JXVybA@mail.gmail.com>
-Message-ID: <CAHmME9qRrLHwOjD+_xkGC7-BMVdzO95=DzhCo8KvDNa0JXVybA@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 0/2] VM fork detection for RNG
-To:     =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
+Date:   Thu, 24 Feb 2022 12:15:32 +0100
+X-Gmail-Original-Message-ID: <CAHmME9rUD5QrgQMpoOCjv3crWFwn+BXXx9Dm0e2Kv4cJCYS+AQ@mail.gmail.com>
+Message-ID: <CAHmME9rUD5QrgQMpoOCjv3crWFwn+BXXx9Dm0e2Kv4cJCYS+AQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v1 1/2] random: add mechanism for VM forks to
+ reinitialize crng
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         QEMU Developers <qemu-devel@nongnu.org>,
         KVM list <kvm@vger.kernel.org>, linux-s390@vger.kernel.org,
@@ -65,29 +65,62 @@ Cc:     Laszlo Ersek <lersek@redhat.com>,
         "Singh, Balbir" <sblbir@amazon.com>,
         "Weiss, Radu" <raduweis@amazon.com>, Jann Horn <jannh@google.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Igor Mammedov <imammedo@redhat.com>, ehabkost@redhat.com,
-        ben@skyportsystems.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        "Richard W.M. Jones" <rjones@redhat.com>
+        "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 24, 2022 at 11:56 AM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> IIRC this part of the QEMU doc was making an implicit assumption
-> about the way QEMU is to be used by mgmt apps doing snapshots.
->
-> Instead of using the 'loadvm' command on the existing running QEMU
-> process, the doc seems to tacitly expect the management app will
-> throwaway the existing QEMU process and spawn a brand new QEMU
-> process to load the snapshot into, thus getting the new GUID on
-> the QEMU command line.
+Hey Eric,
 
-Right, exactly. The "there are no known use cases" bit I think just
-forgot about one very common use case that perhaps just wasn't in use
-by the original author. So I'm pretty sure this remains a QEMU bug.
+On Thu, Feb 24, 2022 at 2:27 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Thu, Feb 24, 2022 at 01:54:54AM +0100, Jason A. Donenfeld wrote:
+> > On 2/24/22, Eric Biggers <ebiggers@kernel.org> wrote:
+> > > I think we should be removing cases where the base_crng key is changed
+> > > directly
+> > > besides extraction from the input_pool, not adding new ones.  Why not
+> > > implement
+> > > this as add_device_randomness() followed by crng_reseed(force=true), where
+> > > the
+> > > 'force' argument forces a reseed to occur even if the entropy_count is too
+> > > low?
+> >
+> > Because that induces a "premature next" condition which can let that
+> > entropy, potentially newly acquired by a storm of IRQs at power-on, be
+> > bruteforced by unprivileged userspace. I actually had it exactly the
+> > way you describe at first, but decided that this here is the lesser of
+> > evils and doesn't really complicate things the way an intentional
+> > premature next would. The only thing we care about here is branching
+> > the crng stream, and so this does explicitly that, without having to
+> > interfere with how we collect entropy. Of course we *also* add it as
+> > non-credited "device randomness" so that it's part of the next
+> > reseeding, whenever that might occur.
+>
+> Can you make sure to properly explain this in the code?
+
+The carousel keeps turning, and after I wrote to you last night I kept
+thinking about the matter. Here's how it breaks down:
+
+Injection method:
+- Assumes existing pool of entropy is still sacred.
+- Assumes base_crng timestamp is representative of pool age.
+- Result: Mixes directly into base_crng to avoid premature-next of pool.
+
+Input pool method:
+- Assumes existing pool of entropy is old / out of date / used by a
+different fork, so not sacred.
+- Assumes base_crng timestamp is tied to irrelevant entropy pool.
+- Result: Force-drains input pool, causing intentional premature-next.
+
+Which of these assumptions better models the situation? I started in
+the input pool method camp, then by the time I posted v1, was
+concerned about power-on IRQs, but now I think relying at all on
+snapshotted entropy represents the biggest issue. And judging from
+your email, it appears that you do too. So v3 of this patchset will
+switch back to the input pool method, per your suggestion.
+
+As a plus, it means we go through the RDSEED'd extraction algorithm
+too, which always helps.
 
 Jason
