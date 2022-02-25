@@ -2,174 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1C9C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 19:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74466C43219
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 20:19:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232313AbiBYTsS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 14:48:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60104 "EHLO
+        id S236351AbiBYUUB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 15:20:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiBYTsR (ORCPT
+        with ESMTP id S236307AbiBYUUA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 14:48:17 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61B6FB878;
-        Fri, 25 Feb 2022 11:47:44 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21PJIvuK015939;
-        Fri, 25 Feb 2022 19:47:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=mfcZmul1/LgH79DlJzxEF9PI3qWC/ZuzsxPFdmLwu6U=;
- b=nZBH7pOluQNEPc046CHObq+32gFDKYcz4rXtWLJT08umEEAt22IusbkBHW0gW5ZZ3cp4
- sBpO0+sL7h7/ZPqgs9cfyfEI1pFoHng0xOelgxVbUC2xlMQ9aQc5nxAb7uCryDOGbj2D
- u+qOII2J2YLxOyqcHD+LfpaEjqbUF9H8Vh25tdgSWm4nyTEl4NjtYuUyjdRxifUf0gFD
- n36Y+97Sa9dJOvvV4Jxxhf8xzs/cURxVoWkjlV5fgDinY4wzmNJOmaDla5QUxLwh86dQ
- +/5+GLgRVQqXeAJNrbPfllvig05dHSvOfbUTh4zyFW0mJsTV9CgK4EAEYXzLdXVifylq ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ef55q0gw8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 25 Feb 2022 19:47:34 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 21PJeqcQ014905;
-        Fri, 25 Feb 2022 19:47:33 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ef55q0gw2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 25 Feb 2022 19:47:33 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 21PJkmQx027597;
-        Fri, 25 Feb 2022 19:47:32 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma05wdc.us.ibm.com with ESMTP id 3edr93dym4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 25 Feb 2022 19:47:32 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 21PJlWWQ12255580
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 25 Feb 2022 19:47:32 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2FE76B2064;
-        Fri, 25 Feb 2022 19:47:32 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2781B2066;
-        Fri, 25 Feb 2022 19:47:31 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 25 Feb 2022 19:47:31 +0000 (GMT)
-Message-ID: <127811ae-ef71-d225-0450-710a6ee6afef@linux.ibm.com>
-Date:   Fri, 25 Feb 2022 14:47:31 -0500
+        Fri, 25 Feb 2022 15:20:00 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E911DAC7F;
+        Fri, 25 Feb 2022 12:19:26 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6463F618C7;
+        Fri, 25 Feb 2022 20:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CEB6C340E7;
+        Fri, 25 Feb 2022 20:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645820365;
+        bh=fbarxrQUlsGe8CHhhQ16VAA753AXYK0Ur+BWrj3mZkE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=o274dGRVGX/tJ1WwuE2TkQfm7QzqdhkLhorTR7EB994GBGz0wFONL4gtzbY6qjLLQ
+         s5txAR554G8DMgeCqOG8eRI+w2sTXZTm550FIy1nscfmx0f0ZDpb0NK6+DxjRvAmZW
+         h6HT/5G55SYCPa+aSM6XxPTTqyOdlT6g+dSfK2CstoiHNu8aCUZ4WALuLiHBGIVqEK
+         sIEc6tRoUFSeJ6OKQHvQ3CdlvsDTaftxGgvOwmk1vUauEZ9xMYptl2P9VtI9sL+WMa
+         h6FqDJsqiH7eJfHB5xIGdBOQILQTKdJrp58O3M/S1LSVZSUkb9ULn6V+QNcfR7ZRiA
+         13fkzGrlUmMpA==
+Date:   Fri, 25 Feb 2022 12:19:24 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jia-Ju Bai <baijiaju1990@gmail.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: drbg: check the return value of
+ crypto_shash_init()
+Message-ID: <Yhk5zA/APtZoJhpT@sol.localdomain>
+References: <20220225074623.17276-1-baijiaju1990@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [RFC PATCH] KEYS: Double max_size to make keyctl pkey_verify work
-Content-Language: en-US
-To:     Vitaly Chikunov <vt@altlinux.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Eric Biggers <ebiggers@kernel.org>
-References: <20220202065906.2598366-1-vt@altlinux.org>
- <7c9d973f-847e-e8bc-95fb-6c98a98a02e6@linux.ibm.com>
- <YhLOyUgSihcdoNJc@iki.fi> <20220221024357.uilp5y77zpgktl6c@altlinux.org>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20220221024357.uilp5y77zpgktl6c@altlinux.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AeNNSejskGSJXGFAlBn_69sZxegEpKTB
-X-Proofpoint-ORIG-GUID: 30dXK0UXwlAgZqLddNnrI61Oe76PpqtL
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-02-25_10,2022-02-25_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1011 impostorscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202250110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220225074623.17276-1-baijiaju1990@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Thu, Feb 24, 2022 at 11:46:23PM -0800, Jia-Ju Bai wrote:
+> Then function crypto_shash_init() in drbg_kcapi_hash() can fail, but
+> there is no check of its return value. To fix this bug, its return value
+> should be checked with new error handling code.
+> 
+> Fixes: 541af946fe13 ("crypto: drbg - SP800-90A Deterministic Random Bit Generator")
+> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+> ---
+>  crypto/drbg.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 177983b6ae38..51feb9538701 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -1725,8 +1725,11 @@ static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
+>  {
+>  	struct sdesc *sdesc = (struct sdesc *)drbg->priv_data;
+>  	struct drbg_string *input = NULL;
+> +	int ret = 0;
+>  
+> -	crypto_shash_init(&sdesc->shash);
+> +	ret = crypto_shash_init(&sdesc->shash);
+> +	if (ret)
+> +		return ret;
+>  	list_for_each_entry(input, in, list)
+>  		crypto_shash_update(&sdesc->shash, input->buf, input->len);
+>  	return crypto_shash_final(&sdesc->shash, outval);
 
-On 2/20/22 21:43, Vitaly Chikunov wrote:
-> On Mon, Feb 21, 2022 at 12:29:13AM +0100, Jarkko Sakkinen wrote:
->> On Wed, Feb 02, 2022 at 10:15:24PM -0500, Stefan Berger wrote:
->>> On 2/2/22 01:59, Vitaly Chikunov wrote:
->>>> Rarely used `keyctl pkey_verify' can verify raw signatures, but was
->>>> failing, because ECDSA/EC-RDSA signature sizes are twice key sizes which
->>>> does not pass in/out sizes check in keyctl_pkey_params_get_2.
->>>> This in turn because these values cannot be distinguished by a single
->>>> `max_size' callback return value.
->>>> Also, `keyctl pkey_query` displays incorrect `max_sig_size' about these
->>>> algorithms.
->>>>
->>>> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
->>>> ---
->>>>    crypto/asymmetric_keys/public_key.c | 15 +++++++++++++--
->>>>    1 file changed, 13 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
->>>> index 4fefb219bfdc..3ffbab07ed2a 100644
->>>> --- a/crypto/asymmetric_keys/public_key.c
->>>> +++ b/crypto/asymmetric_keys/public_key.c
->>>> @@ -143,8 +143,19 @@ static int software_key_query(const struct kernel_pkey_params *params,
->>>>    	len = crypto_akcipher_maxsize(tfm);
->>>>    	info->key_size = len * 8;
->>>> -	info->max_data_size = len;
->>>> -	info->max_sig_size = len;
->>>> +	if (strcmp(alg_name, "ecrdsa") == 0 ||
->>>> +	    strncmp(alg_name, "ecdsa-", 6) == 0) {
->>>> +		/*
->>>> +		 * For these algos sig size is twice key size.
->>>> +		 * keyctl uses max_sig_size as minimum input size, and
->>>> +		 * max_data_size as minimum output size for a signature.
->>>> +		 */
->>>> +		info->max_data_size = len * 2;
->>>> +		info->max_sig_size = len * 2;
->>> I don't know about the data size but following my tests this is not enough
->>> for ECDSA signature size. In ECDSA case the r and s components of the
->>> signature are encode in asn.1, not 'raw'. So there are 2 bytes at the
->>> beginning for sequence identifier , 2 bytes asn.1 for the r component, 1
->>> additional 0-byte to make the r component always a positive number, then the
->>> r component, then 2 bytes asn.1 for the s component, 1 addition 0-byte to
->>> make the s component a positive number, then the s component. Phew.
->>>
->>> info->max_sig_size = 2 + (2 + 1 + len) * 2;
->>>
->>> so for NIST P384 it's: 2 + (2+1+48) * 2 = 104
->>>
->>> Then it works for me as well.
->> Thank you for the trouble of providing this great explanation. This
->> reasoning should be included to the commit message for future reference.
->>
->> It would be also nice to encapsulate this calculation to an inline
->> function.
-> I wanted to discuss if there's a better way to do it. For example,
-> instead of calculating algorithm specific information in
-> software_key_query maybe we should extend akcipher_alg API with a
-> pkey_params request (just for keyctl)?
->
-> Also, there possible other solution - instead of setting info in
-> software_key_query depending on algo (as in this patch), it's possible
-> (in a hackish way) just to return larger value from
-> akcipher_alg::max_size. But this will possible somewhat confuse keyctl
-> users, as, for example, they will see arbitrary value for a key_size.
->
-> Currently, this patch is the simplest non-confusing solution, and it's
-> in accord with how we calculate algorithm specific things all around
-> the code base (outside of algorithm implementation itself).
+What about the call to crypto_shash_update() right below it?
 
-I don't know the answer to the other questions, but I agree that your 
-patch seem to be the simplest non-confusing solution. Are you going to 
-repost it, possibly with my ECDSA modifications added?
-
-    Stefan
-
-
->
-> Thanks,
->
->> /Jarkko
+- Eric
