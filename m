@@ -2,115 +2,238 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D48C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 12:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D2DC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 13:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240823AbiBYM5b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 07:57:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
+        id S241004AbiBYN0F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 08:26:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiBYM53 (ORCPT
+        with ESMTP id S240999AbiBYN0F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 07:57:29 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9B7286EE;
-        Fri, 25 Feb 2022 04:56:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 062BF61BF8;
-        Fri, 25 Feb 2022 12:56:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C3AC340E8;
-        Fri, 25 Feb 2022 12:56:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="enMYkBkI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645793808;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XssgunSt6iK78jyshO3hMq9+wDKO/OCGHO1mFFLrZQQ=;
-        b=enMYkBkIudB/0krPIVVLhzRClwGqp92bzymz3GlaPY/CynpKIXYX03wKBGZ52ZVCe9Eujn
-        kgPdqeLrCuQURxB1lO3tnKlABuuou7tz8M7L/27vzfUSx9/E+GZStDwJkrdcK/PldDBDFn
-        5MO5bLzFBsxUJCj89tpuB1ncnSfIF98=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7f77180f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 25 Feb 2022 12:56:48 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id e140so5677751ybh.9;
-        Fri, 25 Feb 2022 04:56:46 -0800 (PST)
-X-Gm-Message-State: AOAM53285l4JXrzMYBbOkJo7n7JLpOeJRdxReNaxjVuAUerwEvl8CXL2
-        IcW9eAQxCQ2kHgsFCpzMDGf4f8pw0AeFvhKWKGw=
-X-Google-Smtp-Source: ABdhPJy+bf9nC/iTENWy4XIXFN5EQ0KO9hqlk22myA/sDhwpstQSK4hOUUQQu7RToXFr7rymY6Q0NMRfSY8co9VWFh4=
-X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
- i22-20020a25d116000000b0061de8c9531emr7032586ybg.637.1645793805904; Fri, 25
- Feb 2022 04:56:45 -0800 (PST)
+        Fri, 25 Feb 2022 08:26:05 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000D2223100;
+        Fri, 25 Feb 2022 05:25:31 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id hw13so10836615ejc.9;
+        Fri, 25 Feb 2022 05:25:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=gcLAgFJ6UAC+wlMRiqdskTKEQNruEzHTuhKZh7vzXzE=;
+        b=JOg+gainHqPmDqDsMWlfMvMPI7nQFxRwZSseTHbohGOWpvKQwmEIGYAXml+KhJEoBd
+         W0PGOzoResYq2xmiHVS0NHJg/JFnI5xRB71+lKmAs+QW3qoD4hE6YupuCqzAxyaWE1nE
+         eOP4gdKs6F/2ouFqIkOKxDnvqJLhqyVsb8V9Y+X5AXtvcDZgCU+L6s24+1OEKeK6+4Qr
+         0hUHdNSiLSFeqxUPyqwqkkpZgqN90Ir0mfQ99Ge/yuWzunY8/QJV41U9uYsvl7Z5oj0/
+         Pvg65r0W2XadFR/YX4IfIX5QiuMUrC02VA6tjm2RM30vbrWMf7OF5qAfymqoqbuK837v
+         hLRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=gcLAgFJ6UAC+wlMRiqdskTKEQNruEzHTuhKZh7vzXzE=;
+        b=7vVZniMxZiI1LLAeMoP/xUaFqIGtNdbI+4yBjmCf6pJq/3Bak5gQIUQD6tMhTrRGhf
+         xxElaaOQuB5m09aVLxgVa2AN/7/ij2MF6cav60v7dnsxRlDSE59KhWrxOzHke6VJlLLM
+         WTs7NlHRwwrvZIpvey+W6Id4yC37905AxrU/UCkpvdHKlTiE8PqdXdonsxRUBFyHLQDV
+         odJBwTs/6C9i9PxdmYAWLn9Z6zP1ZjER1IjG8v/avFAZ3GNbeCZiDuVYMxj3ssB48th1
+         YU9oEtChBhTJXO1H6cNgTMB15Xt+ZZj0LUw4RdHjtO2+vL001NXOKuOY5DtqGwYipgo/
+         wUWw==
+X-Gm-Message-State: AOAM532gdhpmhJFJ38xWeoVrFhR2CNV716iFUg/NJhrmlku9NxRZ5nsH
+        8tzktyxNnQpXX2aOeWIe1TefI4EVp3HwLnnCaqT8BHbF
+X-Google-Smtp-Source: ABdhPJz8Djbty/w23wxvUK4n9BlOZFJePoyKwaBXcOyMZVw44qnK1bcgHTr/TdtuuhN1divdYsKuxlZbJcoV4c8XIls=
+X-Received: by 2002:a17:906:2695:b0:6ce:b94d:9f07 with SMTP id
+ t21-20020a170906269500b006ceb94d9f07mr6349508ejc.297.1645795530367; Fri, 25
+ Feb 2022 05:25:30 -0800 (PST)
 MIME-Version: 1.0
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com> <YhjRVz2184xhkZK3@kroah.com>
-In-Reply-To: <YhjRVz2184xhkZK3@kroah.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 25 Feb 2022 13:56:35 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
-Message-ID: <CAHmME9pGuPEWjr+RLFQi-kKcRuPxmCYyzAJOJtgx+5phwmkZ6Q@mail.gmail.com>
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     KVM list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        adrian@parity.io, Ard Biesheuvel <ardb@kernel.org>,
-        ben@skyportsystems.com,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        "K . Y . Srinivasan" <kys@microsoft.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
+References: <20220221115234.2544665-1-clabbe@baylibre.com>
+In-Reply-To: <20220221115234.2544665-1-clabbe@baylibre.com>
+Reply-To: jglauber@digitalocean.com
+From:   Jan Glauber <jan.glauber@gmail.com>
+Date:   Fri, 25 Feb 2022 14:25:18 +0100
+Message-ID: <CAEiAFz30J_C2GbbObL2E7Y=YB3FkRSB+S8Ce2WU73CqifueWxQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: cavium: zip: register algorithm only if hardware
+ is present
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jan Glauber <jglauber@cavium.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 1:53 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Feb 25, 2022 at 01:48:48PM +0100, Jason A. Donenfeld wrote:
-> > +static struct acpi_driver acpi_driver = {
-> > +     .name = "vmgenid",
-> > +     .ids = vmgenid_ids,
-> > +     .owner = THIS_MODULE,
-> > +     .ops = {
-> > +             .add = vmgenid_acpi_add,
-> > +             .notify = vmgenid_acpi_notify,
-> > +     }
-> > +};
-> > +
-> > +static int __init vmgenid_init(void)
-> > +{
-> > +     return acpi_bus_register_driver(&acpi_driver);
-> > +}
-> > +
-> > +static void __exit vmgenid_exit(void)
-> > +{
-> > +     acpi_bus_unregister_driver(&acpi_driver);
-> > +}
-> > +
-> > +module_init(vmgenid_init);
-> > +module_exit(vmgenid_exit);
->
-> Nit, you could use module_acpi_driver() to make this even smaller if you
-> want to.
+Hi Corentin,
+your patch looks good to me, but I also lost access to the hardware.
 
-Nice! Will do.
+-- Jan
 
-Jason
+Am Di., 22. Feb. 2022 um 05:34 Uhr schrieb Corentin Labbe <clabbe@baylibre.com>:
+>
+> On my renesas salavator-X, I saw some cavium driver failing crypto
+> self-tests.
+> But salvator does not have such hardware.
+> This is due to cavium/zip driver registering algorithms even if hardware
+> is not present.
+> The solution is to move algorithm registration in the probe function.
+> This permits also to simplify module init/exit by using
+> module_pci_driver.
+>
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>
+> WARNING: this is boot tested only on salvator-X to be sure that the
+> cavium/zip driver no longer registers algorithms.
+> I do not have any cavium hardware unfortunatly.
+>
+>  drivers/crypto/cavium/zip/zip_main.c | 83 ++++++++++++----------------
+>  1 file changed, 35 insertions(+), 48 deletions(-)
+>
+> diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+> index 812b4ac9afd6..dc5b7bf7e1fd 100644
+> --- a/drivers/crypto/cavium/zip/zip_main.c
+> +++ b/drivers/crypto/cavium/zip/zip_main.c
+> @@ -55,6 +55,11 @@ static const struct pci_device_id zip_id_table[] = {
+>         { 0, }
+>  };
+>
+> +static void zip_debugfs_init(void);
+> +static void zip_debugfs_exit(void);
+> +static int zip_register_compression_device(void);
+> +static void zip_unregister_compression_device(void);
+> +
+>  void zip_reg_write(u64 val, u64 __iomem *addr)
+>  {
+>         writeq(val, addr);
+> @@ -235,6 +240,15 @@ static int zip_init_hw(struct zip_device *zip)
+>         return 0;
+>  }
+>
+> +static void zip_reset(struct zip_device *zip)
+> +{
+> +       union zip_cmd_ctl cmd_ctl;
+> +
+> +       cmd_ctl.u_reg64 = 0x0ull;
+> +       cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
+> +       zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
+> +}
+> +
+>  static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  {
+>         struct device *dev = &pdev->dev;
+> @@ -282,8 +296,21 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>         if (err)
+>                 goto err_release_regions;
+>
+> +       /* Register with the Kernel Crypto Interface */
+> +       err = zip_register_compression_device();
+> +       if (err < 0) {
+> +               zip_err("ZIP: Kernel Crypto Registration failed\n");
+> +               goto err_register;
+> +       }
+> +
+> +       /* comp-decomp statistics are handled with debugfs interface */
+> +       zip_debugfs_init();
+> +
+>         return 0;
+>
+> +err_register:
+> +       zip_reset(zip);
+> +
+>  err_release_regions:
+>         if (zip->reg_base)
+>                 iounmap(zip->reg_base);
+> @@ -305,16 +332,17 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  static void zip_remove(struct pci_dev *pdev)
+>  {
+>         struct zip_device *zip = pci_get_drvdata(pdev);
+> -       union zip_cmd_ctl cmd_ctl;
+>         int q = 0;
+>
+>         if (!zip)
+>                 return;
+>
+> +       zip_debugfs_exit();
+> +
+> +       zip_unregister_compression_device();
+> +
+>         if (zip->reg_base) {
+> -               cmd_ctl.u_reg64 = 0x0ull;
+> -               cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
+> -               zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
+> +               zip_reset(zip);
+>                 iounmap(zip->reg_base);
+>         }
+>
+> @@ -585,7 +613,7 @@ DEFINE_SHOW_ATTRIBUTE(zip_regs);
+>  /* Root directory for thunderx_zip debugfs entry */
+>  static struct dentry *zip_debugfs_root;
+>
+> -static void __init zip_debugfs_init(void)
+> +static void zip_debugfs_init(void)
+>  {
+>         if (!debugfs_initialized())
+>                 return;
+> @@ -604,7 +632,7 @@ static void __init zip_debugfs_init(void)
+>
+>  }
+>
+> -static void __exit zip_debugfs_exit(void)
+> +static void zip_debugfs_exit(void)
+>  {
+>         debugfs_remove_recursive(zip_debugfs_root);
+>  }
+> @@ -615,48 +643,7 @@ static void __exit zip_debugfs_exit(void) { }
+>  #endif
+>  /* debugfs - end */
+>
+> -static int __init zip_init_module(void)
+> -{
+> -       int ret;
+> -
+> -       zip_msg("%s\n", DRV_NAME);
+> -
+> -       ret = pci_register_driver(&zip_driver);
+> -       if (ret < 0) {
+> -               zip_err("ZIP: pci_register_driver() failed\n");
+> -               return ret;
+> -       }
+> -
+> -       /* Register with the Kernel Crypto Interface */
+> -       ret = zip_register_compression_device();
+> -       if (ret < 0) {
+> -               zip_err("ZIP: Kernel Crypto Registration failed\n");
+> -               goto err_pci_unregister;
+> -       }
+> -
+> -       /* comp-decomp statistics are handled with debugfs interface */
+> -       zip_debugfs_init();
+> -
+> -       return ret;
+> -
+> -err_pci_unregister:
+> -       pci_unregister_driver(&zip_driver);
+> -       return ret;
+> -}
+> -
+> -static void __exit zip_cleanup_module(void)
+> -{
+> -       zip_debugfs_exit();
+> -
+> -       /* Unregister from the kernel crypto interface */
+> -       zip_unregister_compression_device();
+> -
+> -       /* Unregister this driver for pci zip devices */
+> -       pci_unregister_driver(&zip_driver);
+> -}
+> -
+> -module_init(zip_init_module);
+> -module_exit(zip_cleanup_module);
+> +module_pci_driver(zip_driver);
+>
+>  MODULE_AUTHOR("Cavium Inc");
+>  MODULE_DESCRIPTION("Cavium Inc ThunderX ZIP Driver");
+> --
+> 2.34.1
+>
