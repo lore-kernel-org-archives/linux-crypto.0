@@ -2,139 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 186B0C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 15:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9654C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 15:39:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239396AbiBYPik (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 10:38:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
+        id S242252AbiBYPkC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 10:40:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236500AbiBYPij (ORCPT
+        with ESMTP id S242160AbiBYPj7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:38:39 -0500
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D907F14F2A6;
-        Fri, 25 Feb 2022 07:38:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1645803487; x=1677339487;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zufo2VqoW12ZsZWjP7rvFxXLnq5dHqI9qda+WDGbeVc=;
-  b=LH3E8N31LzI0vBMcwEQnj77bqKXOwFg2SK2cqy2Axa87s6jvM0GgadPN
-   LUpLCWB13QUkYPzPJXgx02xEPz5Bha1NbnBkxdfAZv4XT2JJCo0DG8Kei
-   h7swsUR4lDGXKc0/4BaBEDwL4224I1Kr8z/LAakbv38WPNh+SXt+aRW04
-   8=;
-X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
-   d="scan'208";a="197753896"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-6435a935.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP; 25 Feb 2022 15:37:52 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-6435a935.us-west-2.amazon.com (Postfix) with ESMTPS id DD055418D1;
-        Fri, 25 Feb 2022 15:37:51 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.28; Fri, 25 Feb 2022 15:37:51 +0000
-Received: from [0.0.0.0] (10.43.161.217) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
- 2022 15:37:45 +0000
-Message-ID: <b6c5c4d4-88a5-1ac5-a4d4-2f6895065834@amazon.com>
-Date:   Fri, 25 Feb 2022 16:37:43 +0100
+        Fri, 25 Feb 2022 10:39:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 604A41CFA37
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 07:39:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645803566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PKwIaA6vJQ86hsYmx90S5GHPLZ3QnL0/6rDtNGfZPd8=;
+        b=TbGpEsToCmR6NIPZ8S6Rl5aG1GEm6rf6XAVHcQa6Zy4yIuHqmmn6a0Myi3v8ZlxxmdB2v0
+        NzrOaryyK43wQHBhL0mQ54rAIjOS53gKQ++Nv9MF+lJHNO583smCZ3F0TmdpWfTA12RVAk
+        kmlHmtNTpmvzaKjd+wA5mmJeQlV6Atc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-370-e41bORCJP4O_0wUA4GSfZw-1; Fri, 25 Feb 2022 10:39:23 -0500
+X-MC-Unique: e41bORCJP4O_0wUA4GSfZw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4391C1091DA0;
+        Fri, 25 Feb 2022 15:39:19 +0000 (UTC)
+Received: from localhost (ovpn-12-89.pek2.redhat.com [10.72.12.89])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 507087F0DB;
+        Fri, 25 Feb 2022 15:39:05 +0000 (UTC)
+Date:   Fri, 25 Feb 2022 23:39:02 +0800
+From:   'Baoquan He' <bhe@redhat.com>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "cl@linux.com" <cl@linux.com>,
+        "42.hyeyoo@gmail.com" <42.hyeyoo@gmail.com>,
+        "penberg@kernel.org" <penberg@kernel.org>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "iamjoonsoo.kim@lge.com" <iamjoonsoo.kim@lge.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "david@redhat.com" <david@redhat.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "hca@linux.ibm.com" <hca@linux.ibm.com>,
+        "gor@linux.ibm.com" <gor@linux.ibm.com>,
+        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "svens@linux.ibm.com" <svens@linux.ibm.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "michael@walle.cc" <michael@walle.cc>,
+        "linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>,
+        "wsa@kernel.org" <wsa@kernel.org>
+Subject: Re: [PATCH 1/2] dma-mapping: check dma_mask for streaming mapping
+ allocs
+Message-ID: <20220225153902.GA148875@MiWiFi-R3L-srv>
+References: <20220220084044.GC93179@MiWiFi-R3L-srv>
+ <20220222084530.GA6210@lst.de>
+ <YhSpaGfiQV8Nmxr+@MiWiFi-R3L-srv>
+ <20220222131120.GB10093@lst.de>
+ <YhToFzlSufrliUsi@MiWiFi-R3L-srv>
+ <20220222155904.GA13323@lst.de>
+ <YhV/nabDa5zdNL/4@MiWiFi-R3L-srv>
+ <20220223142555.GA5986@lst.de>
+ <YheSBTJY216m6izG@MiWiFi-R3L-srv>
+ <1fead34bceda468cbe34077a28c4a4b1@AcuMS.aculab.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
- on VM fork
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ardb@kernel.org>, <adrian@parity.io>
-CC:     KVM list <kvm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        <linux-hyperv@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        <ben@skyportsystems.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        "Colm MacCarthaigh" <colmmacc@amazon.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "Igor Mammedov" <imammedo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "QEMU Developers" <qemu-devel@nongnu.org>,
-        "Weiss, Radu" <raduweis@amazon.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
-References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
- <20220225124848.909093-1-Jason@zx2c4.com>
- <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
- <YhjjuMOeV7+T7thS@zx2c4.com>
- <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
- <YhjoyIUv2+18BwiR@zx2c4.com>
- <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
- <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
- <Yhj288aE5rW15Qpj@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <Yhj288aE5rW15Qpj@zx2c4.com>
-X-Originating-IP: [10.43.161.217]
-X-ClientProxiedBy: EX13D15UWA003.ant.amazon.com (10.43.160.182) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1fead34bceda468cbe34077a28c4a4b1@AcuMS.aculab.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ck9uIDI1LjAyLjIyIDE2OjM0LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gT24gRnJpLCBG
-ZWIgMjUsIDIwMjIgYXQgMDQ6MTY6MjdQTSArMDEwMCwgQXJkIEJpZXNoZXV2ZWwgd3JvdGU6Cj4+
-Pj4gSSBqdXN0IGJvb3RlZCB1cCBhIFdpbmRvd3MgVk0sIGFuZCBpdCBsb29rcyBsaWtlIEh5cGVy
-LVYgdXNlcwo+Pj4+ICJIeXBlcl9WX0dlbl9Db3VudGVyX1YxIiwgd2hpY2ggaXMgYWxzbyBxdWl0
-ZSBsb25nLCBzbyB3ZSBjYW4ndCByZWFsbHkKPj4+PiBISUQgbWF0Y2ggb24gdGhhdCBlaXRoZXIu
-Cj4+Pgo+Pj4gWWVzLCBkdWUgdG8gdGhlIHNhbWUgcHJvYmxlbS4gSSdkIHJlYWxseSBwcmVmZXIg
-d2Ugc29ydCBvdXQgdGhlIEFDUEkKPj4+IG1hdGNoaW5nIGJlZm9yZSB0aGlzIGdvZXMgbWFpbmxp
-bmUuIE1hdGNoaW5nIG9uIF9ISUQgaXMgZXhwbGljaXRseQo+Pj4gZGlzY291cmFnZWQgaW4gdGhl
-IFZNR2VuSUQgc3BlYy4KPj4+Cj4+IE9LLCB0aGlzIHJlYWxseSBzdWNrcy4gUXVvdGluZyB0aGUg
-QUNQSSBzcGVjOgo+Pgo+PiAiIiIKPj4gQSBfSElEIG9iamVjdCBldmFsdWF0ZXMgdG8gZWl0aGVy
-IGEgbnVtZXJpYyAzMi1iaXQgY29tcHJlc3NlZCBFSVNBCj4+IHR5cGUgSUQgb3IgYSBzdHJpbmcu
-IElmIGEgc3RyaW5nLCB0aGUgZm9ybWF0IG11c3QgYmUgYW4gYWxwaGFudW1lcmljCj4+IFBOUCBv
-ciBBQ1BJIElEIHdpdGggbm8gYXN0ZXJpc2sgb3Igb3RoZXIgbGVhZGluZyBjaGFyYWN0ZXJzLgo+
-PiBBIHZhbGlkIFBOUCBJRCBtdXN0IGJlIG9mIHRoZSBmb3JtICJBQUEjIyMjIiB3aGVyZSBBIGlz
-IGFuIHVwcGVyY2FzZQo+PiBsZXR0ZXIgYW5kICMgaXMgYSBoZXggZGlnaXQuCj4+IEEgdmFsaWQg
-QUNQSSBJRCBtdXN0IGJlIG9mIHRoZSBmb3JtICJOTk5OIyMjIyIgd2hlcmUgTiBpcyBhbiB1cHBl
-cmNhc2UKPj4gbGV0dGVyIG9yIGEgZGlnaXQgKCcwJy0nOScpIGFuZCAjIGlzIGEgaGV4IGRpZ2l0
-LiBUaGlzIHNwZWNpZmljYXRpb24KPj4gcmVzZXJ2ZXMgdGhlIHN0cmluZyAiQUNQSSIgZm9yIHVz
-ZSBvbmx5IHdpdGggZGV2aWNlcyBkZWZpbmVkIGhlcmVpbi4KPj4gSXQgZnVydGhlciByZXNlcnZl
-cyBhbGwgc3RyaW5ncyByZXByZXNlbnRpbmcgNCBIRVggZGlnaXRzIGZvcgo+PiBleGNsdXNpdmUg
-dXNlIHdpdGggUENJLWFzc2lnbmVkIFZlbmRvciBJRHMuCj4+ICIiIgo+Pgo+PiBTbyBub3cgd2Ug
-aGF2ZSB0byBpbXBsZW1lbnQgTWljcm9zb2Z0J3MgZm9yayBvZiBBQ1BJIHRvIGJlIGFibGUgdG8g
-dXNlCj4+IHRoaXMgZGV2aWNlLCBldmVuIGlmIHdlIGV4cG9zZSBpdCBmcm9tIFFFTVUgaW5zdGVh
-ZCBvZiBIeXBlci1WPyBJCj4+IHN0cm9uZ2x5IG9iamVjdCB0byB0aGF0Lgo+Pgo+PiBJbnN0ZWFk
-LCB3ZSBjYW4gbWF0Y2ggb24gX0hJRCBleHBvc2VkIGJ5IFFFTVUsIGFuZCBjb3JkaWFsbHkgaW52
-aXRlCj4+IE1pY3Jvc29mdCB0byBhbGlnbiB0aGVpciBzcGVjIHdpdGggdGhlIEFDUEkgc3BlYy4K
-PiBJIGRvbid0IGtub3cgYWJvdXQgdGhhdC4uLiBTZWVtcyBhIGJpdCBleHRyZW1lLiBIb3BlZnVs
-bHkgQWxleCB3aWxsIGJlCj4gYWJsZSB0byBzb3J0IHNvbWV0aGluZyBvdXQgd2l0aCB0aGUgQUNQ
-SSBwZW9wbGUsIGFuZCB0aGlzIGRyaXZlciB3aWxsCj4gd29yayBpbnNpZGUgb2YgSHlwZXItVi4K
-Pgo+IEhlcmUncyB3aGF0IHdlIGN1cnJlbnRseSBoYXZlOgo+Cj4gICAgc3RhdGljIGNvbnN0IHN0
-cnVjdCBhY3BpX2RldmljZV9pZCB2bWdlbmlkX2lkc1tdID0gewo+ICAgICAgeyAiVk1HRU5JRCIs
-IDAgfSwgIDwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0gPz8/Cj4gICAgICB7
-ICJRRU1VVkdJRCIsIDAgfSwgPC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSBR
-RU1VCj4gICAgICB7IH0sCj4gICAgfTsKPgo+IEFkcmlhbiBhZGRlZCAiVk1HRU5JRCIgaW4gbGFz
-dCB5ZWFyJ3MgdjQsIHNvIEkgY29waWVkIHRoYXQgZm9yIHRoaXMgbmV3Cj4gZHJpdmVyIGhlcmUu
-IEJ1dCBkb2VzIGFueWJvZHkga25vdyB3aGljaCBoeXBlcnZpc29yIGl0IGlzIGZvcj8gU29tZQo+
-IGludGVybmFsIEFtYXpvbiB0aGluZz8gRmlyZWNyYWNrZXI/IFZNd2FyZT8gSW4gY2FzZSBBbGV4
-IGRvZXMgbm90Cj4gc3VjY2VlZCB3aXRoIHRoZSBBQ1BJIGNoYW5nZXMsIGl0J2QgYmUgbmljZSB0
-byBrbm93IHdoaWNoIEhJRHMgZm9yCj4gd2hpY2ggaHlwZXJ2aXNvcnMgd2UgZG8gYW5kIGRvIG5v
-dCBzdXBwb3J0LgoKCkkgYmVsaWV2ZSAiVk1HRU5JRCIgd2FzIGZvciB0aGUgZmlyZWNyYWNrZXIg
-cHJvdG90eXBlIHRoYXQgQWRyaWFuIGJ1aWx0IApiYWNrIHRoZW4sIHllYWguIE1hdGNoaW5nIG9u
-IF9ISUQgZm9yIHRoaXMgaXMgYSByYXQgaG9sZSB1bmZvcnR1bmF0ZWx5LCAKc28gbGV0J3Mgc2Vl
-IHdoYXQgdGhlIEFDUEkgcGF0Y2ggZ2V0cyB1cyA6KS4KCgpBbGV4CgoKCgoKQW1hem9uIERldmVs
-b3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdl
-c2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWlu
-Z2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBC
-ClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
+On 02/24/22 at 02:27pm, David Laight wrote:
+> From: Baoquan He
+> > Sent: 24 February 2022 14:11
+> ...
+> > With my understanding, there are two kinds of DMA mapping, coherent
+> > mapping (which is also persistent mapping), and streaming mapping. The
+> > coherent mapping will be handled during driver init, and released during
+> > driver de-init. While streaming mapping will be done when needed at any
+> > time, and released after usage.
+> 
+> The lifetime has absolutely nothing to do with it.
+> 
+> It is all about how the DMA cycles (from the device) interact with
+> (or more don't interact with) the cpu memory cache.
+> 
+> For coherent mapping the cpu and device can write to (different)
+> words in the same cache line at the same time, and both will see
+> both updates.
+> On some systems this can only be achieved by making the memory
+> uncached - which significantly slows down cpu access.
+> 
+> For non-coherent (streaming) mapping the cpu writes back and/or
+> invalidates the data cache so that the dma read cycles from memory
+> read the correct data and the cpu re-reads the cache line after
+> the dma has completed.
+> They are only really suitable for data buffers.
+
+Thanks for valuable input, I agree the lifetime is not stuff we can rely
+on to judge. But how do we explain dma_alloc_noncoherent() is not streaming
+mapping? Then which kind of dma mapping is it?
+
+I could miss something important to understand this which is obvious to
+other people, I will make time to check.
 
