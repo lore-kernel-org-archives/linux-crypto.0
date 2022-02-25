@@ -2,90 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C450BC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 07:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6AFC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 07:46:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238034AbiBYHRp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 02:17:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43504 "EHLO
+        id S238200AbiBYHrJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 02:47:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232840AbiBYHRp (ORCPT
+        with ESMTP id S234309AbiBYHrJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 02:17:45 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE5F113D89;
-        Thu, 24 Feb 2022 23:17:12 -0800 (PST)
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K4gzd0rRkzdZS2;
-        Fri, 25 Feb 2022 15:15:57 +0800 (CST)
-Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 25 Feb 2022 15:17:10 +0800
-Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
- (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 25 Feb
- 2022 15:17:10 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-CC:     <herbert@gondor.apana.org.au>, <hkalra@marvell.com>
-Subject: [PATCH -next] crypto: octeontx2 - fix missing unlock
-Date:   Fri, 25 Feb 2022 15:27:24 +0800
-Message-ID: <20220225072724.82507-1-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500007.china.huawei.com (7.185.36.183)
-X-CFilter-Loop: Reflected
+        Fri, 25 Feb 2022 02:47:09 -0500
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53C512743;
+        Thu, 24 Feb 2022 23:46:36 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id i20so1138018wmc.3;
+        Thu, 24 Feb 2022 23:46:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=ZJz7ilUAFhZB5h3mtiWNq9VmQAi0QbvNYr3itVvsTJg=;
+        b=MKzfemHIAI0oomIvEWcUKAgmDE6r7RBjTwJzbe+j0Ek8LD7Tn6ZSnH5ydbe9z1kws8
+         evFnTEVrBNvbhVWGmS/yGPxG7ukcgthwVjVD2ZTt2nQQOf6InMQ81faemR2egcNGglCY
+         Dc5zf42rdJjIUykqqPyNiX7P/ka0HTyv0WdMoFIn8mRZDCc9bTm8qYpgr0GYcH54Bdw8
+         7jGcH6G10nfRF3LpfErIA6GcgGmoHmJzizPZDcGwYk/zzePWNI6cAzEdo5h4nRVXNNUM
+         RMR7OiFS9PluJzDRz1dGIUcgNxTUMZH83CyRbbya4XSHF62Poq9Z0Fm35FUfz8DP4fXA
+         5t3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ZJz7ilUAFhZB5h3mtiWNq9VmQAi0QbvNYr3itVvsTJg=;
+        b=PQUKJJmsus1upUp+7Td810jcAjhBpPDH7an4FMR+O5ap8RekNviOveaj2dTL6LZFur
+         pafLpX2et1qpn1Hh1BsJ6k42NStECqnW62GfF1VFafU/gaiFGpimrctViSKCoA2F81mJ
+         iCGW6M4+7+C74eqwmC3IL/2Eg4hLdONsH4vDxorsEZOujtJgcqdgmc/6ZopIODXNumZs
+         ZNGz+48rDfXhuPkH1EaROXnzNm/ZCtESiWm8QMeAsfWS2qaHCPms6LaZqhAKUv0OlILO
+         iKiaEIHqggXHKZCLLWfSCw7CxQne61cKdeEZz12NueL6MGo+UVy/Lqt5roCUrPqJwMGE
+         JErw==
+X-Gm-Message-State: AOAM530HmO6d3UMIyaqEqPT6D+WIdL53NGaBWnt2VtlFFc3QWHMZ5Hir
+        PFMOX3X1JEISZFv5O7yfDiGwukukkDUDHg==
+X-Google-Smtp-Source: ABdhPJzOrUiwz5a28B3CSjYhJ6wA/4t4S2AvTtKNQ4TyvQflbHkee0hLEcY71PFDK24q/OKgZKpmRw==
+X-Received: by 2002:a05:600c:2d01:b0:381:1ffb:5095 with SMTP id x1-20020a05600c2d0100b003811ffb5095mr1563685wmf.113.1645775195378;
+        Thu, 24 Feb 2022 23:46:35 -0800 (PST)
+Received: from localhost.localdomain ([64.64.123.58])
+        by smtp.gmail.com with ESMTPSA id e8-20020a5d5308000000b001e3139a79f9sm1448269wrv.40.2022.02.24.23.46.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 23:46:34 -0800 (PST)
+From:   Jia-Ju Bai <baijiaju1990@gmail.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] crypto: drbg: check the return value of crypto_shash_init()
+Date:   Thu, 24 Feb 2022 23:46:23 -0800
+Message-Id: <20220225074623.17276-1-baijiaju1990@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the missing unlock before return from error path.
+Then function crypto_shash_init() in drbg_kcapi_hash() can fail, but
+there is no check of its return value. To fix this bug, its return value
+should be checked with new error handling code.
 
-Fixes: 4363f3d3ce8f ("crypto: octeontx2 - add synchronization between mailbox accesses")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+Fixes: 541af946fe13 ("crypto: drbg - SP800-90A Deterministic Random Bit Generator")
+Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 ---
- drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 4 +++-
- drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c | 4 +++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ crypto/drbg.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-index 17a9dd20c8c3..a402ccfac557 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
-@@ -143,8 +143,10 @@ static void cptpf_flr_wq_handler(struct work_struct *work)
- 	mutex_lock(&pf->lock);
- 	req = otx2_mbox_alloc_msg_rsp(mbox, 0, sizeof(*req),
- 				      sizeof(struct msg_rsp));
--	if (!req)
-+	if (!req) {
-+		mutex_unlock(&pf->lock);
- 		return;
-+	}
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index 177983b6ae38..51feb9538701 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -1725,8 +1725,11 @@ static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
+ {
+ 	struct sdesc *sdesc = (struct sdesc *)drbg->priv_data;
+ 	struct drbg_string *input = NULL;
++	int ret = 0;
  
- 	req->sig = OTX2_MBOX_REQ_SIG;
- 	req->id = MBOX_MSG_VF_FLR;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index fee758b86d29..dee0aa60b698 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -20,8 +20,10 @@ static int forward_to_af(struct otx2_cptpf_dev *cptpf,
- 
- 	mutex_lock(&cptpf->lock);
- 	msg = otx2_mbox_alloc_msg(&cptpf->afpf_mbox, 0, size);
--	if (msg == NULL)
-+	if (msg == NULL) {
-+		mutex_unlock(&cptpf->lock);
- 		return -ENOMEM;
-+	}
- 
- 	memcpy((uint8_t *)msg + sizeof(struct mbox_msghdr),
- 	       (uint8_t *)req + sizeof(struct mbox_msghdr), size);
+-	crypto_shash_init(&sdesc->shash);
++	ret = crypto_shash_init(&sdesc->shash);
++	if (ret)
++		return ret;
+ 	list_for_each_entry(input, in, list)
+ 		crypto_shash_update(&sdesc->shash, input->buf, input->len);
+ 	return crypto_shash_final(&sdesc->shash, outval);
 -- 
-2.25.1
+2.17.1
 
