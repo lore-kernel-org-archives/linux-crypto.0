@@ -2,365 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA434C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 18:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86810C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 19:17:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232276AbiBYSEa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 13:04:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60386 "EHLO
+        id S234488AbiBYTSM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 14:18:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232141AbiBYSE1 (ORCPT
+        with ESMTP id S233961AbiBYTSL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 13:04:27 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19BAF2510FD
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 10:03:55 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id i1so4904423ila.7
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 10:03:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nxVYU0Y/GX1SztxwLmOsWDvnyHY9aIhX+L7yaSSKSyA=;
-        b=iT2Ku5SRK/+MrntnqGD8a7Hrq8vnN/uWl0vlnMPbnwOkqua7BA+0Q3PtNH+UNpuTBU
-         XPI9heL5fA7lCT+6vt7ocs2GdRAuZIPBZ5mHoioV2PC1+F49hCDfL2pFWLGhvYoViJqm
-         xtJXHhoInvmOpf+W8u8n0v2UhobZpXZXV9jNB8u+KU4IIcM5YKsA8VWBq/P0kS2dT0nS
-         1LToYoUo20javOTYbvaEaxRef8Ju8YI1MwaBrLMEFuQzr7s7uHyTzTAhyQwUunkEECPy
-         oLenMYy8BRmMGxL9VMzKCLGHFIMl0n240NtSkomLvDsHBCdrDYG5Cpgm6nQfsTkcc7oZ
-         EXoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nxVYU0Y/GX1SztxwLmOsWDvnyHY9aIhX+L7yaSSKSyA=;
-        b=cUPw3PUx0ibGkLd81MaG0V00JwX2AADh9Qmrk2uJTAjijgKM6kDWAIWgcdEpBhyJFn
-         C1Ag8IfVT4mxbAOm3v1uBtuymlmmnYMcHl/i8vCiPhNPsMtU4q5/yoW2k9BEfv2IVC7T
-         S3h6s+s8jKGZv6+icAgKv6a5DtiduJ4VEM+om6xO3Ql6vNzgIMqs8vyHJmxU9X4fk+Hy
-         xXrtF6ToUb4VOuBq9udQid+FlS0rnSKUBwTplixR357+NEi5gFYlkVBiFfCYtKxXUhYE
-         hdDB6wkvXR0qzYN18zMr7yA8WicSDSg95DLg1SvbWzgxSTV/1t7eIg1/Ggmkt6iHaI7y
-         gI6g==
-X-Gm-Message-State: AOAM532i+Yphxg2jYnww+WN9lOKmhYRKCOr8wveVwd8zJpKTSWmWl/ND
-        e0mKUnjYAbZRZQUA4Y8v7FE3CIS3cb0kRAjsNx/MHg==
-X-Google-Smtp-Source: ABdhPJwrKVAUmn1Ancbw20/NQBK86nBHASxQkJw/VYqDyFsL1Tiy5QWwoyWW5QGl4lF1cRGJJ2F4lsbV+aodx11kXDo=
-X-Received: by 2002:a05:6e02:1529:b0:2c1:e960:9d4 with SMTP id
- i9-20020a056e02152900b002c1e96009d4mr7458780ilu.115.1645812234218; Fri, 25
- Feb 2022 10:03:54 -0800 (PST)
+        Fri, 25 Feb 2022 14:18:11 -0500
+X-Greylist: delayed 921 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 25 Feb 2022 11:17:38 PST
+Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228C88BF0F
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 11:17:36 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1645815587; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=Cm8dab068SW0PIgzC5EJTpPrpIB+4sqEGhSOkCcwsaZT5BfWwubnBfqhH1c1aKQTM215wdT94iC2wlTvibXyAOrU2pIqZ593pwwgFqfqe1CQ7y9uPhsQhCzY3Zt62eOtoTgYIuLNiIMw+L6O9QVNOjGuCQ3f8LCk1MyPUji0hEA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1645815587; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=i5ZuVoj7Wk1L0QwoErh4c0VVAEGEC7aOwOMQpSihSQ4=; 
+        b=atWX00xwMRoa2LFwl5bJnunnfj1gVPxa3A+BTxq82wZnpOJW0GOOSXzIe/cPzPqmm7rohv+HQitQ6r1wmdnpmTBO96KBIMiQ/gH8jWfX65B2Go6qZWU7TA2S2vee8Gc4jk9efgaAqXbZltCzTD9amCEUATybthj4ewM6j/dnZ5w=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=apertussolutions.com;
+        spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+        dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1645815587;
+        s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+        h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+        bh=i5ZuVoj7Wk1L0QwoErh4c0VVAEGEC7aOwOMQpSihSQ4=;
+        b=mYm6puW2cz6FbrxiZh0qFWWoSeOhKzjnZZ16DTiqwu8X6h9Op6lLdDf/VyUW6fSO
+        iQyulr1TYT7WnE8IfI/n4sbusFJ6+X0vXAanwLC+4QLMaK87SuPL9x7ETxPbi6Y+0sb
+        Yvt+H6Za74QjCDk+Bvy+ZevhalCu3jxJy7FPy2uk=
+Received: from [10.10.1.138] (static-72-81-132-2.bltmmd.fios.verizon.net [72.81.132.2]) by mx.zohomail.com
+        with SMTPS id 1645815586061964.2611228131527; Fri, 25 Feb 2022 10:59:46 -0800 (PST)
+Message-ID: <19e88c8c-f00a-ff79-6f52-b9575cc57fbd@apertussolutions.com>
+Date:   Fri, 25 Feb 2022 13:57:46 -0500
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-15-brijesh.singh@amd.com>
-In-Reply-To: <20210820155918.7518-15-brijesh.singh@amd.com>
-From:   Alper Gun <alpergun@google.com>
-Date:   Fri, 25 Feb 2022 10:03:42 -0800
-Message-ID: <CABpDEu=jm43jHhv2mA+C1Sz00xuzH_C-Cn9fRYrFkOCM_em1Fw@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 14/45] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Ross Philipson <ross.philipson@oracle.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kexec@lists.infradead.org
+Cc:     iommu@lists.linux-foundation.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, luto@amacapital.net,
+        nivedita@alum.mit.edu, kanth.ghatraju@oracle.com,
+        trenchboot-devel@googlegroups.com
+References: <1645070085-14255-1-git-send-email-ross.philipson@oracle.com>
+ <04080c88-3e69-b4e6-0af2-0690accaa02f@intel.com>
+From:   "Daniel P. Smith" <dpsmith@apertussolutions.com>
+Subject: Re: [PATCH v5 00/12] x86: Trenchboot secure dynamic launch Linux
+ kernel support
+In-Reply-To: <04080c88-3e69-b4e6-0af2-0690accaa02f@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
->
-> The behavior and requirement for the SEV-legacy command is altered when
-> the SNP firmware is in the INIT state. See SEV-SNP firmware specification
-> for more details.
->
-> Allocate the Trusted Memory Region (TMR) as a 2mb sized/aligned region
-> when SNP is enabled to satify new requirements for the SNP. Continue
-> allocating a 1mb region for !SNP configuration.
->
-> While at it, provide API that can be used by others to allocate a page
-> that can be used by the firmware. The immediate user for this API will
-> be the KVM driver. The KVM driver to need to allocate a firmware context
-> page during the guest creation. The context page need to be updated
-> by the firmware. See the SEV-SNP specification for further details.
->
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 169 ++++++++++++++++++++++++++++++++++-
->  include/linux/psp-sev.h      |  11 +++
->  2 files changed, 176 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 01edad9116f2..34dc358b13b9 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -62,6 +62,14 @@ static int psp_timeout;
->  #define SEV_ES_TMR_SIZE                (1024 * 1024)
->  static void *sev_es_tmr;
->
-> +/* When SEV-SNP is enabled the TMR needs to be 2MB aligned and 2MB size. */
-> +#define SEV_SNP_ES_TMR_SIZE    (2 * 1024 * 1024)
-> +
-> +static size_t sev_es_tmr_size = SEV_ES_TMR_SIZE;
-> +
-> +static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret);
-> +static int sev_do_cmd(int cmd, void *data, int *psp_ret);
-> +
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->         struct sev_device *sev = psp_master->sev_data;
-> @@ -159,6 +167,156 @@ static int sev_cmd_buffer_len(int cmd)
->         return 0;
->  }
->
-> +static void snp_leak_pages(unsigned long pfn, unsigned int npages)
-> +{
-> +       WARN(1, "psc failed, pfn 0x%lx pages %d (leaking)\n", pfn, npages);
-> +       while (npages--) {
-> +               memory_failure(pfn, 0);
-> +               dump_rmpentry(pfn);
-> +               pfn++;
-> +       }
-> +}
-> +
-> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages, bool locked)
-> +{
-> +       struct sev_data_snp_page_reclaim data;
-> +       int ret, err, i, n = 0;
-> +
-> +       for (i = 0; i < npages; i++) {
-> +               memset(&data, 0, sizeof(data));
-> +               data.paddr = pfn << PAGE_SHIFT;
-> +
-> +               if (locked)
-> +                       ret = __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> +               else
-> +                       ret = sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
-> +               if (ret)
-> +                       goto cleanup;
-> +
-> +               ret = rmp_make_shared(pfn, PG_LEVEL_4K);
-> +               if (ret)
-> +                       goto cleanup;
-> +
-> +               pfn++;
-> +               n++;
-> +       }
-> +
-> +       return 0;
-> +
-> +cleanup:
-> +       /*
-> +        * If failed to reclaim the page then page is no longer safe to
-> +        * be released, leak it.
-> +        */
-> +       snp_leak_pages(pfn, npages - n);
-> +       return ret;
-> +}
-> +
-> +static inline int rmp_make_firmware(unsigned long pfn, int level)
-> +{
-> +       return rmp_make_private(pfn, 0, level, 0, true);
-> +}
-> +
-> +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, bool to_fw, bool locked,
-> +                            bool need_reclaim)
-> +{
-> +       unsigned long pfn = __sme_clr(paddr) >> PAGE_SHIFT; /* Cbit maybe set in the paddr */
-> +       int rc, n = 0, i;
-> +
-> +       for (i = 0; i < npages; i++) {
-> +               if (to_fw)
-> +                       rc = rmp_make_firmware(pfn, PG_LEVEL_4K);
-> +               else
-> +                       rc = need_reclaim ? snp_reclaim_pages(pfn, 1, locked) :
-> +                                           rmp_make_shared(pfn, PG_LEVEL_4K);
-> +               if (rc)
-> +                       goto cleanup;
-> +
-> +               pfn++;
-> +               n++;
-> +       }
-> +
-> +       return 0;
-> +
-> +cleanup:
-> +       /* Try unrolling the firmware state changes */
-> +       if (to_fw) {
-> +               /*
-> +                * Reclaim the pages which were already changed to the
-> +                * firmware state.
-> +                */
-> +               snp_reclaim_pages(paddr >> PAGE_SHIFT, n, locked);
-> +
-> +               return rc;
-> +       }
-> +
-> +       /*
-> +        * If failed to change the page state to shared, then its not safe
-> +        * to release the page back to the system, leak it.
-> +        */
-> +       snp_leak_pages(pfn, npages - n);
-> +
-> +       return rc;
-> +}
-> +
-> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int order, bool locked)
-> +{
-> +       unsigned long npages = 1ul << order, paddr;
-> +       struct sev_device *sev;
-> +       struct page *page;
-> +
-> +       if (!psp_master || !psp_master->sev_data)
-> +               return ERR_PTR(-EINVAL);
-> +
-> +       page = alloc_pages(gfp_mask, order);
-> +       if (!page)
-> +               return NULL;
-> +
-> +       /* If SEV-SNP is initialized then add the page in RMP table. */
-> +       sev = psp_master->sev_data;
-> +       if (!sev->snp_inited)
-> +               return page;
-> +
-> +       paddr = __pa((unsigned long)page_address(page));
-> +       if (snp_set_rmp_state(paddr, npages, true, locked, false))
-> +               return NULL;
-> +
-> +       return page;
-> +}
-> +
-> +void *snp_alloc_firmware_page(gfp_t gfp_mask)
-> +{
-> +       struct page *page;
-> +
-> +       page = __snp_alloc_firmware_pages(gfp_mask, 0, false);
-> +
-> +       return page ? page_address(page) : NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
-> +
-> +static void __snp_free_firmware_pages(struct page *page, int order, bool locked)
-> +{
-> +       unsigned long paddr, npages = 1ul << order;
-> +
-> +       if (!page)
-> +               return;
-> +
-> +       paddr = __pa((unsigned long)page_address(page));
-> +       if (snp_set_rmp_state(paddr, npages, false, locked, true))
-> +               return;
-> +
-> +       __free_pages(page, order);
-> +}
-> +
-> +void snp_free_firmware_page(void *addr)
-> +{
-> +       if (!addr)
-> +               return;
-> +
-> +       __snp_free_firmware_pages(virt_to_page(addr), 0, false);
-> +}
-> +EXPORT_SYMBOL(snp_free_firmware_page);
-> +
->  static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->  {
->         struct psp_device *psp = psp_master;
-> @@ -281,7 +439,7 @@ static int __sev_platform_init_locked(int *error)
->
->                 data.flags |= SEV_INIT_FLAGS_SEV_ES;
->                 data.tmr_address = tmr_pa;
-> -               data.tmr_len = SEV_ES_TMR_SIZE;
-> +               data.tmr_len = sev_es_tmr_size;
->         }
->
->         rc = __sev_do_cmd_locked(SEV_CMD_INIT, &data, error);
-> @@ -638,6 +796,8 @@ static int __sev_snp_init_locked(int *error)
->         sev->snp_inited = true;
->         dev_dbg(sev->dev, "SEV-SNP firmware initialized\n");
->
-> +       sev_es_tmr_size = SEV_SNP_ES_TMR_SIZE;
-> +
->         return rc;
->  }
->
-> @@ -1161,8 +1321,9 @@ static void sev_firmware_shutdown(struct sev_device *sev)
->                 /* The TMR area was encrypted, flush it from the cache */
->                 wbinvd_on_all_cpus();
->
-> -               free_pages((unsigned long)sev_es_tmr,
-> -                          get_order(SEV_ES_TMR_SIZE));
-> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +                                         get_order(sev_es_tmr_size),
-> +                                         false);
-Shouldn't there be a check here for snp_inited before calling rmpupdate.
-TMR page can exist even if the SNP is not supported.
+Hi Dave!
 
->                 sev_es_tmr = NULL;
->         }
->
-> @@ -1233,7 +1394,7 @@ void sev_pci_init(void)
->         }
->
->         /* Obtain the TMR memory area for SEV-ES use */
-> -       tmr_page = alloc_pages(GFP_KERNEL, get_order(SEV_ES_TMR_SIZE));
-> +       tmr_page = __snp_alloc_firmware_pages(GFP_KERNEL, get_order(sev_es_tmr_size), false);
->         if (tmr_page) {
->                 sev_es_tmr = page_address(tmr_page);
->         } else {
-> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-> index f2105a8755f9..00bd684dc094 100644
-> --- a/include/linux/psp-sev.h
-> +++ b/include/linux/psp-sev.h
-> @@ -12,6 +12,8 @@
->  #ifndef __PSP_SEV_H__
->  #define __PSP_SEV_H__
->
-> +#include <linux/sev.h>
-> +
->  #include <uapi/linux/psp-sev.h>
->
->  #ifdef CONFIG_X86
-> @@ -919,6 +921,8 @@ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
->  int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
->
->  void *psp_copy_user_blob(u64 uaddr, u32 len);
-> +void *snp_alloc_firmware_page(gfp_t mask);
-> +void snp_free_firmware_page(void *addr);
->
->  #else  /* !CONFIG_CRYPTO_DEV_SP_PSP */
->
-> @@ -960,6 +964,13 @@ static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *erro
->         return -ENODEV;
->  }
->
-> +static inline void *snp_alloc_firmware_page(gfp_t mask)
-> +{
-> +       return NULL;
-> +}
-> +
-> +static inline void snp_free_firmware_page(void *addr) { }
-> +
->  #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->
->  #endif /* __PSP_SEV_H__ */
-> --
-> 2.17.1
->
->
+Please find a response that will hopefully address the questions raised.
+The answers were meant to be thorough but succinct, though if there is
+any areas that are not clear for anyone, please feel free to
+ask. This response and any further questions for clarity will be
+incorporated into the documentation patch and the cover letter for the
+next version of the series.
+
+On 2/23/22 12:45, Dave Hansen wrote:
+> On 2/16/22 19:54, Ross Philipson wrote:
+>> The larger focus of the TrenchBoot project (https://github.com/TrenchBoot) is to
+>> enhance the boot security and integrity in a unified manner. The first area of
+>> focus has been on the Trusted Computing Group's Dynamic Launch for establishing
+>> a hardware Root of Trust for Measurement, also know as DRTM (Dynamic Root of
+>> Trust for Measurement). The project has been and continues to work on providing
+>> a unified means to Dynamic Launch that is a cross-platform (Intel and AMD) and
+>> cross-architecture (x86 and Arm), with our recent involvment in the upcoming
+>> Arm DRTM specification. The order of introducing DRTM to the Linux kernel
+>> follows the maturity of DRTM in the architectures. Intel's Trusted eXecution
+>> Technology (TXT) is present today and only requires a preamble loader, e.g. a
+>> boot loader, and an OS kernel that is TXT-aware. AMD DRTM implementation has
+>> been present since the introduction of AMD-V but requires an additional
+>> component that is AMD specific and referred to in the specification as the
+>> Secure Loader, which the TrenchBoot project has an active prototype in
+>> development. Finally Arm's implementation is in specification development stage
+>> and the project is looking to support it when it becomes available.
+> 
+> What problem is this patch series solving?  Is the same problem solved
+> in a different way in the kernel today?  What is wrong with that
+> solution?  What effects will end users see if they apply this series?
+
+
+What problem is the Secure Launch patch series solving?
+-------------------------------------------------------
+
+* This patch series begins solving the problem of maintaining a robust
+  multi-architecture path of entry from DRTM into the Linux kernel.
+* DRTM (Dynamic Root of Trust for Measurement) is a strong security
+  capability that has been used in niche OS environments, including
+  OpenXT and Qubes. For more than a decade, some have successfully
+  deployed Linux with DRTM, but popular Linux distros have not yet used
+  DRTM.
+* The TrenchBoot project was started to improve the usability of DRTM
+  with Open-Source systems software (e.g. Linux, Xen) on hardware
+  architectures that provide a DRTM capability, e.g Intel x86, AMD x86,
+  Arm, and OpenPOWER.
+* Microsoft Secured Core enterprise PCs use DRTM as a cornerstone of
+  establishing device integrity, optionally validated by Azure
+  Attestation. Devices with DRTM and Linux Secure Launch will have
+  necessary building blocks for attestation to local and remote
+  services, including Azure.
+* TrenchBoot contributors have collaborated with Arm on the development
+  of their recently released DRTM specification [1], which can enable
+  Windows VBS (virtualization-based security) and Linux Secure Launch
+  capabilities, on DRTM-capable Arm devices such as Microsoft Secured
+  Core PCs.
+* From 2018-2020, possibly motivated by DRTM requirements in MS Secured
+  Core, Intel Hardware Shield[2] introduced vPro hardware and firmware
+  features for SMM (System Management Mode) trustworthiness via
+  attestable isolation between operating systems and SMM. DRTM prevents
+  any DMA interference during the Intel Hardware Shield PPAM integrity
+  report exchange with Linux.
+
+[1] https://developer.arm.com/documentation/den0113/latest
+[2]
+https://www.intel.com/content/dam/www/central-libraries/us/en/documents/drtm-
+based-computing-whitepaper.pdf
+
+Is the same problem solved in a different way in the kernel today?
+------------------------------------------------------------------
+
+* Today the only way to start Linux via DRTM is with Intel's tboot
+  exokernel.
+* The Secure Launch patch series was designed to co-exist with the
+  existing tboot extensions in the Linux kernel as to not to disrupt
+  existing users of tboot.
+* The first beta release of the Arm DRTM specification was just made
+  public on February 17th, 2022. Obviously there are currently no
+  implementations available yet.
+
+What is wrong with that solution?
+---------------------------------
+
+* A short discussion over tboot can be found in the Overview section of
+  secure_launch_overview.rst in the documentation patch, which is v5
+  patch 02/12.
+* Functionally tboot's primary deficiency is that it is an Intel-only
+  solution.
+* There is no support for the AMD/Hygon, whose SKINIT capability has
+  been around nearly as long as Intel TXT.
+* The security merits of tboot's approach could be debated endlessly by
+  security researchers depending on their view of trust and security.
+
+What effects will end users see if they apply this series?
+----------------------------------------------------------
+
+* To provide a full answer, the capability can be completely disabled
+  via the Kconfig system resulting in no new code paths.
+* The other case is when a kernel is built with Secure Launch enabled
+  and in this case there are two relevant aspects, impacts to user
+  experience and the benefits the user will gain.
+* As to the impacts to user experience, the end users should see no
+  effects in the launch of the kernel from this series.
+* One of the primary goals for this series was to minimize change to the
+  kernel boot flow and to ensure the capability was benign if compiled
+  in but not enabled/used.
+* When the bootloader is configured to launch the kernel via DRTM, again
+  there will be little to no effect on the user experience. There are a
+  few CPU behavior differences that result from doing a DRTM but their
+  effect is only seen by Linux internals, for which this series makes
+  the kernel aware.
+* The benefit is that it removes having to trust all the second and
+  third party code in the UEFI boot chain. For instance during the
+  Boothole vulnerability situation, Boothole had a near zero if not a
+  zero impact for DRTM systems, i.e. it could not be used to compromise
+  nor load a bad kernel.
+* Removing the need to trust every driver, service, and setup code in
+  firmware is not the only benefit as DRTM provides several use cases
+  that are not otherwise possible. Please see my response to Paul Moore
+  or visit trenchboot.org/events to see the numerous talks on usages and
+  capabilities that are possible because of DRTM.
+
+
+V/r,
+Daniel P. Smith
