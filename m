@@ -2,48 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECE0C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 16:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAAAC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 17:53:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242814AbiBYQTi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 11:19:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
+        id S229932AbiBYRx7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 12:53:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242816AbiBYQTh (ORCPT
+        with ESMTP id S229576AbiBYRx7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 11:19:37 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB845469B;
-        Fri, 25 Feb 2022 08:19:05 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6A06F68AA6; Fri, 25 Feb 2022 17:19:02 +0100 (CET)
-Date:   Fri, 25 Feb 2022 17:19:02 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        martin.petersen@oracle.com, colyli@suse.de
-Subject: Re: [PATCHv3 07/10] lib: add crc64 tests
-Message-ID: <20220225161902.GA14059@lst.de>
-References: <20220222163144.1782447-1-kbusch@kernel.org> <20220222163144.1782447-8-kbusch@kernel.org> <20220225160509.GE13610@lst.de> <20220225161259.GA4111669@dhcp-10-100-145-180.wdc.com>
+        Fri, 25 Feb 2022 12:53:59 -0500
+Received: from relay3.hostedemail.com (relay3.hostedemail.com [64.99.140.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C344D187BAF
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 09:53:26 -0800 (PST)
+Received: from omf08.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay07.hostedemail.com (Postfix) with ESMTP id 1280E22362;
+        Fri, 25 Feb 2022 17:53:18 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf08.hostedemail.com (Postfix) with ESMTPA id F0D6F20026;
+        Fri, 25 Feb 2022 17:53:13 +0000 (UTC)
+Message-ID: <cc8405c39037d1b63df3d901051118f9b12c36a9.camel@perches.com>
+Subject: Re: [PATCHv3 03/10] asm-generic: introduce be48 unaligned accessors
+From:   Joe Perches <joe@perches.com>
+To:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        martin.petersen@oracle.com, colyli@suse.de,
+        Hannes Reinecke <hare@suse.de>, Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 25 Feb 2022 09:53:11 -0800
+In-Reply-To: <20220225160300.GC13610@lst.de>
+References: <20220222163144.1782447-1-kbusch@kernel.org>
+         <20220222163144.1782447-4-kbusch@kernel.org>
+         <20220225160300.GC13610@lst.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1ubuntu2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220225161259.GA4111669@dhcp-10-100-145-180.wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: spz4ukuecs8kzmbxa6om18zqso8poejr
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: F0D6F20026
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+7WrsVDd0XN45qTzKLE5sj7V3piTJ4Lf8=
+X-HE-Tag: 1645811593-962451
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 08:12:59AM -0800, Keith Busch wrote:
-> I don't have experience with kunit, but I'll look into that.
+On Fri, 2022-02-25 at 17:03 +0100, Christoph Hellwig wrote:
+> On Tue, Feb 22, 2022 at 08:31:37AM -0800, Keith Busch wrote:
+> > The NVMe protocol extended the data integrity fields with unaligned
+> > 48-bit reference tags. Provide some helper accessors in
+> > preparation for these.
+> > 
+> > Reviewed-by: Hannes Reinecke <hare@suse.de>
+> > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> > Acked-by: Arnd Bergmann <arnd@arndb.de>
+> > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > 
-> I am already changing the way this gets tested. Eric recommended adding
-> to the crypto "testmgr", and I've done that on my private tree. That
-> test framework exercises a lot more than this this patch, and it did
-> reveal a problem with how I've implemented the initial XOR when the
-> buffer is split, so I have some minor updates coming soon.
+> Looks good,
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
 
-I guess if we exercise the algorithm through that we don't really need
-another low-level test anyway, right?
+Perhaps for completeness this should also add the le48 variants
+like the 24 bit accessors above this.
+
