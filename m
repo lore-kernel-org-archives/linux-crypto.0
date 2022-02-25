@@ -2,67 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAAAC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 17:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79462C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 17:59:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbiBYRx7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 12:53:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59998 "EHLO
+        id S231777AbiBYR7r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 12:59:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiBYRx7 (ORCPT
+        with ESMTP id S231835AbiBYR7n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 12:53:59 -0500
-Received: from relay3.hostedemail.com (relay3.hostedemail.com [64.99.140.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C344D187BAF
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 09:53:26 -0800 (PST)
-Received: from omf08.hostedemail.com (a10.router.float.18 [10.200.18.1])
-        by unirelay07.hostedemail.com (Postfix) with ESMTP id 1280E22362;
-        Fri, 25 Feb 2022 17:53:18 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf08.hostedemail.com (Postfix) with ESMTPA id F0D6F20026;
-        Fri, 25 Feb 2022 17:53:13 +0000 (UTC)
-Message-ID: <cc8405c39037d1b63df3d901051118f9b12c36a9.camel@perches.com>
-Subject: Re: [PATCHv3 03/10] asm-generic: introduce be48 unaligned accessors
-From:   Joe Perches <joe@perches.com>
-To:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        Fri, 25 Feb 2022 12:59:43 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A97121C65C8;
+        Fri, 25 Feb 2022 09:59:07 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4855E61E09;
+        Fri, 25 Feb 2022 17:59:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0965C340E7;
+        Fri, 25 Feb 2022 17:59:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645811946;
+        bh=tqc87Jy4ydsthmHNaKwH8I98BKpZjOMSiFRz9wHyYgE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kFKp/oDX2779xseQ5UvOePNjeNUSgFLuUU5hKUewA+RYdKtMOqBNiDyBWzdthk6UN
+         YzXFA6KqQ/ufXCaSrEkdfVgAGviykqebdaMckEyqVxpmCkxAmD9NDlwmk0Sv8DXF7c
+         Bpxjd3w8yH8zXTCI4u4n5H94XuU5Ijjy8OxSWN2etguwPI93ao+pT6bL1occl1L5Je
+         JMQGvk9mB0+HBDKNgyPK9yIXbqBglj5r1BnmjxSidOcT2Nc/LDiyUbY1wl2Va+KKZA
+         uxl3Vyc6rRoO9dv6ZGZDzCbsz+BSQdtHA9f3/NMtqtle2V9Kj1VIAm+8Yo0wJCmUTd
+         iHKOP5pnfyOOg==
+Date:   Fri, 25 Feb 2022 09:59:03 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Joe Perches <joe@perches.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org, axboe@kernel.dk,
         martin.petersen@oracle.com, colyli@suse.de,
         Hannes Reinecke <hare@suse.de>, Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 25 Feb 2022 09:53:11 -0800
-In-Reply-To: <20220225160300.GC13610@lst.de>
+Subject: Re: [PATCHv3 03/10] asm-generic: introduce be48 unaligned accessors
+Message-ID: <20220225175903.GC4111669@dhcp-10-100-145-180.wdc.com>
 References: <20220222163144.1782447-1-kbusch@kernel.org>
-         <20220222163144.1782447-4-kbusch@kernel.org>
-         <20220225160300.GC13610@lst.de>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.40.4-1ubuntu2 
+ <20220222163144.1782447-4-kbusch@kernel.org>
+ <20220225160300.GC13610@lst.de>
+ <cc8405c39037d1b63df3d901051118f9b12c36a9.camel@perches.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: spz4ukuecs8kzmbxa6om18zqso8poejr
-X-Rspamd-Server: rspamout01
-X-Rspamd-Queue-Id: F0D6F20026
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Session-ID: U2FsdGVkX1+7WrsVDd0XN45qTzKLE5sj7V3piTJ4Lf8=
-X-HE-Tag: 1645811593-962451
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cc8405c39037d1b63df3d901051118f9b12c36a9.camel@perches.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2022-02-25 at 17:03 +0100, Christoph Hellwig wrote:
-> On Tue, Feb 22, 2022 at 08:31:37AM -0800, Keith Busch wrote:
-> > The NVMe protocol extended the data integrity fields with unaligned
-> > 48-bit reference tags. Provide some helper accessors in
-> > preparation for these.
+On Fri, Feb 25, 2022 at 09:53:11AM -0800, Joe Perches wrote:
+> On Fri, 2022-02-25 at 17:03 +0100, Christoph Hellwig wrote:
+> > On Tue, Feb 22, 2022 at 08:31:37AM -0800, Keith Busch wrote:
+> > > The NVMe protocol extended the data integrity fields with unaligned
+> > > 48-bit reference tags. Provide some helper accessors in
+> > > preparation for these.
+> > > 
+> > > Reviewed-by: Hannes Reinecke <hare@suse.de>
+> > > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> > > Acked-by: Arnd Bergmann <arnd@arndb.de>
+> > > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > > 
-> > Reviewed-by: Hannes Reinecke <hare@suse.de>
-> > Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> > Acked-by: Arnd Bergmann <arnd@arndb.de>
-> > Signed-off-by: Keith Busch <kbusch@kernel.org>
+> > Looks good,
+> > 
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
 > 
-> Looks good,
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Perhaps for completeness this should also add the le48 variants
+> like the 24 bit accessors above this.
 
-Perhaps for completeness this should also add the le48 variants
-like the 24 bit accessors above this.
-
+I don't know of a user for le48 at this time, and kernel API's without
+users often get culled. If you think it's useful, though, I can
+certainly include it.
