@@ -2,238 +2,253 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D2DC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 13:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5301FC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 13:58:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241004AbiBYN0F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 08:26:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39324 "EHLO
+        id S240999AbiBYN6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 08:58:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240999AbiBYN0F (ORCPT
+        with ESMTP id S231598AbiBYN6h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 08:26:05 -0500
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000D2223100;
-        Fri, 25 Feb 2022 05:25:31 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id hw13so10836615ejc.9;
-        Fri, 25 Feb 2022 05:25:31 -0800 (PST)
+        Fri, 25 Feb 2022 08:58:37 -0500
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC0C2BDA;
+        Fri, 25 Feb 2022 05:58:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=gcLAgFJ6UAC+wlMRiqdskTKEQNruEzHTuhKZh7vzXzE=;
-        b=JOg+gainHqPmDqDsMWlfMvMPI7nQFxRwZSseTHbohGOWpvKQwmEIGYAXml+KhJEoBd
-         W0PGOzoResYq2xmiHVS0NHJg/JFnI5xRB71+lKmAs+QW3qoD4hE6YupuCqzAxyaWE1nE
-         eOP4gdKs6F/2ouFqIkOKxDnvqJLhqyVsb8V9Y+X5AXtvcDZgCU+L6s24+1OEKeK6+4Qr
-         0hUHdNSiLSFeqxUPyqwqkkpZgqN90Ir0mfQ99Ge/yuWzunY8/QJV41U9uYsvl7Z5oj0/
-         Pvg65r0W2XadFR/YX4IfIX5QiuMUrC02VA6tjm2RM30vbrWMf7OF5qAfymqoqbuK837v
-         hLRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=gcLAgFJ6UAC+wlMRiqdskTKEQNruEzHTuhKZh7vzXzE=;
-        b=7vVZniMxZiI1LLAeMoP/xUaFqIGtNdbI+4yBjmCf6pJq/3Bak5gQIUQD6tMhTrRGhf
-         xxElaaOQuB5m09aVLxgVa2AN/7/ij2MF6cav60v7dnsxRlDSE59KhWrxOzHke6VJlLLM
-         WTs7NlHRwwrvZIpvey+W6Id4yC37905AxrU/UCkpvdHKlTiE8PqdXdonsxRUBFyHLQDV
-         odJBwTs/6C9i9PxdmYAWLn9Z6zP1ZjER1IjG8v/avFAZ3GNbeCZiDuVYMxj3ssB48th1
-         YU9oEtChBhTJXO1H6cNgTMB15Xt+ZZj0LUw4RdHjtO2+vL001NXOKuOY5DtqGwYipgo/
-         wUWw==
-X-Gm-Message-State: AOAM532gdhpmhJFJ38xWeoVrFhR2CNV716iFUg/NJhrmlku9NxRZ5nsH
-        8tzktyxNnQpXX2aOeWIe1TefI4EVp3HwLnnCaqT8BHbF
-X-Google-Smtp-Source: ABdhPJz8Djbty/w23wxvUK4n9BlOZFJePoyKwaBXcOyMZVw44qnK1bcgHTr/TdtuuhN1divdYsKuxlZbJcoV4c8XIls=
-X-Received: by 2002:a17:906:2695:b0:6ce:b94d:9f07 with SMTP id
- t21-20020a170906269500b006ceb94d9f07mr6349508ejc.297.1645795530367; Fri, 25
- Feb 2022 05:25:30 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1645797485; x=1677333485;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8kGZS1WN7G6CFiOLfo0q+xlIMR7pw0Iyc1llFmruEA4=;
+  b=tufwJqmVMdYn2o0OGJjHXAGEUt4jdUd1F/lCAn4LwaAf0lRRAF1NQWgC
+   wawcqFJQJjTFj+OMhOTFeN05Op4R200X3lo7qRq3aGfAObbObORnOGIAU
+   b9Q/tco8T5au6YSbFEDdI9NmsAJCNujrC4wyIsURRWLJ9lXl6lc2uc/m4
+   w=;
+X-IronPort-AV: E=Sophos;i="5.90,136,1643673600"; 
+   d="scan'208";a="181239800"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP; 25 Feb 2022 13:57:49 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+        by email-inbound-relay-pdx-2b-05e8af15.us-west-2.amazon.com (Postfix) with ESMTPS id A5E6FA28F4;
+        Fri, 25 Feb 2022 13:57:47 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.28; Fri, 25 Feb 2022 13:57:46 +0000
+Received: from [0.0.0.0] (10.43.161.219) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.28; Fri, 25 Feb
+ 2022 13:57:40 +0000
+Message-ID: <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+Date:   Fri, 25 Feb 2022 14:57:38 +0100
 MIME-Version: 1.0
-References: <20220221115234.2544665-1-clabbe@baylibre.com>
-In-Reply-To: <20220221115234.2544665-1-clabbe@baylibre.com>
-Reply-To: jglauber@digitalocean.com
-From:   Jan Glauber <jan.glauber@gmail.com>
-Date:   Fri, 25 Feb 2022 14:25:18 +0100
-Message-ID: <CAEiAFz30J_C2GbbObL2E7Y=YB3FkRSB+S8Ce2WU73CqifueWxQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: cavium: zip: register algorithm only if hardware
- is present
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jan Glauber <jglauber@cavium.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing RNG
+ on VM fork
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, <kvm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <adrian@parity.io>, <ardb@kernel.org>, <ben@skyportsystems.com>,
+        <berrange@redhat.com>, <colmmacc@amazon.com>,
+        <decui@microsoft.com>, <dwmw@amazon.co.uk>, <ebiggers@kernel.org>,
+        <ehabkost@redhat.com>, <gregkh@linuxfoundation.org>,
+        <haiyangz@microsoft.com>, <imammedo@redhat.com>,
+        <jannh@google.com>, <kys@microsoft.com>, <lersek@redhat.com>,
+        <linux@dominikbrodowski.net>, <mst@redhat.com>,
+        <qemu-devel@nongnu.org>, <raduweis@amazon.com>,
+        <sthemmin@microsoft.com>, <tytso@mit.edu>, <wei.liu@kernel.org>
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <20220225124848.909093-1-Jason@zx2c4.com>
+X-Originating-IP: [10.43.161.219]
+X-ClientProxiedBy: EX13D19UWA001.ant.amazon.com (10.43.160.169) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Corentin,
-your patch looks good to me, but I also lost access to the hardware.
+Ck9uIDI1LjAyLjIyIDEzOjQ4LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4KPiBWTSBHZW5l
+cmF0aW9uIElEIGlzIGEgZmVhdHVyZSBmcm9tIE1pY3Jvc29mdCwgZGVzY3JpYmVkIGF0Cj4gPGh0
+dHBzOi8vZ28ubWljcm9zb2Z0LmNvbS9md2xpbmsvP0xpbmtJZD0yNjA3MDk+LCBhbmQgc3VwcG9y
+dGVkIGJ5Cj4gSHlwZXItViBhbmQgUUVNVS4gSXRzIHVzYWdlIGlzIGRlc2NyaWJlZCBpbiBNaWNy
+b3NvZnQncyBSTkcgd2hpdGVwYXBlciwKPiA8aHR0cHM6Ly9ha2EubXMvd2luMTBybmc+LCBhczoK
+Pgo+ICAgICAgSWYgdGhlIE9TIGlzIHJ1bm5pbmcgaW4gYSBWTSwgdGhlcmUgaXMgYSBwcm9ibGVt
+IHRoYXQgbW9zdAo+ICAgICAgaHlwZXJ2aXNvcnMgY2FuIHNuYXBzaG90IHRoZSBzdGF0ZSBvZiB0
+aGUgbWFjaGluZSBhbmQgbGF0ZXIgcmV3aW5kCj4gICAgICB0aGUgVk0gc3RhdGUgdG8gdGhlIHNh
+dmVkIHN0YXRlLiBUaGlzIHJlc3VsdHMgaW4gdGhlIG1hY2hpbmUgcnVubmluZwo+ICAgICAgYSBz
+ZWNvbmQgdGltZSB3aXRoIHRoZSBleGFjdCBzYW1lIFJORyBzdGF0ZSwgd2hpY2ggbGVhZHMgdG8g
+c2VyaW91cwo+ICAgICAgc2VjdXJpdHkgcHJvYmxlbXMuICBUbyByZWR1Y2UgdGhlIHdpbmRvdyBv
+ZiB2dWxuZXJhYmlsaXR5LCBXaW5kb3dzCj4gICAgICAxMCBvbiBhIEh5cGVyLVYgVk0gd2lsbCBk
+ZXRlY3Qgd2hlbiB0aGUgVk0gc3RhdGUgaXMgcmVzZXQsIHJldHJpZXZlCj4gICAgICBhIHVuaXF1
+ZSAobm90IHJhbmRvbSkgdmFsdWUgZnJvbSB0aGUgaHlwZXJ2aXNvciwgYW5kIHJlc2VlZCB0aGUg
+cm9vdAo+ICAgICAgUk5HIHdpdGggdGhhdCB1bmlxdWUgdmFsdWUuICBUaGlzIGRvZXMgbm90IGVs
+aW1pbmF0ZSB0aGUKPiAgICAgIHZ1bG5lcmFiaWxpdHksIGJ1dCBpdCBncmVhdGx5IHJlZHVjZXMg
+dGhlIHRpbWUgZHVyaW5nIHdoaWNoIHRoZSBSTkcKPiAgICAgIHN5c3RlbSB3aWxsIHByb2R1Y2Ug
+dGhlIHNhbWUgb3V0cHV0cyBhcyBpdCBkaWQgZHVyaW5nIGEgcHJldmlvdXMKPiAgICAgIGluc3Rh
+bnRpYXRpb24gb2YgdGhlIHNhbWUgVk0gc3RhdGUuCj4KPiBMaW51eCBoYXMgdGhlIHNhbWUgaXNz
+dWUsIGFuZCBnaXZlbiB0aGF0IHZtZ2VuaWQgaXMgc3VwcG9ydGVkIGFscmVhZHkgYnkKPiBtdWx0
+aXBsZSBoeXBlcnZpc29ycywgd2UgY2FuIGltcGxlbWVudCBtb3JlIG9yIGxlc3MgdGhlIHNhbWUg
+c29sdXRpb24uCj4gU28gdGhpcyBjb21taXQgd2lyZXMgdXAgdGhlIHZtZ2VuaWQgQUNQSSBub3Rp
+ZmljYXRpb24gdG8gdGhlIFJORydzIG5ld2x5Cj4gYWRkZWQgYWRkX3ZtZm9ya19yYW5kb21uZXNz
+KCkgZnVuY3Rpb24uCj4KPiBJdCBjYW4gYmUgdXNlZCBmcm9tIHFlbXUgdmlhIHRoZSBgLWRldmlj
+ZSB2bWdlbmlkLGd1aWQ9YXV0b2AgcGFyYW1ldGVyLgo+IEFmdGVyIHNldHRpbmcgdGhhdCwgdXNl
+IGBzYXZldm1gIGluIHRoZSBtb25pdG9yIHRvIHNhdmUgdGhlIFZNIHN0YXRlLAo+IHRoZW4gcXVp
+dCBRRU1VLCBzdGFydCBpdCBhZ2FpbiwgYW5kIHVzZSBgbG9hZHZtYC4gVGhhdCB3aWxsIHRyaWdn
+ZXIgdGhpcwo+IGRyaXZlcidzIG5vdGlmeSBmdW5jdGlvbiwgd2hpY2ggaGFuZHMgdGhlIG5ldyBV
+VUlEIHRvIHRoZSBSTkcuIFRoaXMgaXMKPiBkZXNjcmliZWQgaW4gPGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnLz9wPXFlbXUuZ2l0O2E9YmxvYjtmPWRvY3Mvc3BlY3Mvdm1nZW5pZC50eHQ+Lgo+IEFuZCB0
+aGVyZSBhcmUgaG9va3MgZm9yIHRoaXMgaW4gbGlidmlydCBhcyB3ZWxsLCBkZXNjcmliZWQgaW4K
+PiA8aHR0cHM6Ly9saWJ2aXJ0Lm9yZy9mb3JtYXRkb21haW4uaHRtbCNnZW5lcmFsLW1ldGFkYXRh
+Pi4KPgo+IE5vdGUsIGhvd2V2ZXIsIHRoYXQgdGhlIHRyZWF0bWVudCBvZiB0aGlzIGFzIGEgVVVJ
+RCBpcyBjb25zaWRlcmVkIHRvIGJlCj4gYW4gYWNjaWRlbnRhbCBRRU1VIG51YW5jZSwgcGVyCj4g
+PGh0dHBzOi8vZ2l0aHViLmNvbS9saWJndWVzdGZzL3ZpcnQtdjJ2L2Jsb2IvbWFzdGVyL2RvY3Mv
+dm0tZ2VuZXJhdGlvbi1pZC1hY3Jvc3MtaHlwZXJ2aXNvcnMudHh0PiwKPiBzbyB0aGlzIGRyaXZl
+ciBzaW1wbHkgdHJlYXRzIHRoZXNlIGJ5dGVzIGFzIGFuIG9wYXF1ZSAxMjgtYml0IGJpbmFyeQo+
+IGJsb2IsIGFzIHBlciB0aGUgc3BlYy4gVGhpcyBkb2Vzbid0IHJlYWxseSBtYWtlIGEgZGlmZmVy
+ZW5jZSBhbnl3YXksCj4gY29uc2lkZXJpbmcgdGhhdCdzIGhvdyBpdCBlbmRzIHVwIHdoZW4gaGFu
+ZGVkIHRvIHRoZSBSTkcgaW4gdGhlIGVuZC4KPgo+IENjOiBBZHJpYW4gQ2F0YW5naXUgPGFkcmlh
+bkBwYXJpdHkuaW8+Cj4gQ2M6IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJlZGhhdC5j
+b20+Cj4gQ2M6IERvbWluaWsgQnJvZG93c2tpIDxsaW51eEBkb21pbmlrYnJvZG93c2tpLm5ldD4K
+PiBDYzogQXJkIEJpZXNoZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4KPiBDYzogR3JlZyBLcm9haC1I
+YXJ0bWFuIDxncmVna2hAbGludXhmb3VuZGF0aW9uLm9yZz4KPiBSZXZpZXdlZC1ieTogTGFzemxv
+IEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBKYXNvbiBBLiBEb25l
+bmZlbGQgPEphc29uQHp4MmM0LmNvbT4KPiAtLS0KPiBDaGFuZ2VzIHYzLT52NDoKPiAtIEFkZCB0
+aGlzIGRyaXZlciB0byBNQUlOVEFJTkVSUywgcGVyIEFyZCdzIHJlcXVlc3QuCj4gICAgTm90ZTog
+SSBkaWRuJ3QgcmVhbGx5IHdhbnQgdG8gZG8gdGhpcyBhdCBmaXJzdCwgYmVjYXVzZSBJIHdhcyBo
+b3BpbmcgdGhlCj4gICAgb3JpZ2luYWwgQW1hem9uIHRlYW0gbG9va2luZyBpbnRvIHRoaXMgbGFz
+dCB5ZWFyIHdvdWxkIHN0ZXAgdXAuIEJ1dCBpdCBzZWVtcwo+ICAgIGxpa2UgdGhhdCB0ZWFtIGhh
+cyBtb3ZlZCBvbiwgYW5kIGFueXdheSBJJ3ZlIGJhc2ljYWxseSByZXdyaXR0ZW4gdGhlIGRyaXZl
+cgo+ICAgIGZyb20gc2NyYXRjaCBhdCB0aGlzIHBvaW50IC0tIG5vdCBhIHNpbmdsZSBsaW5lIG9m
+IHRoZSBvcmlnaW5hbCBleGlzdHMgLS0KPiAgICBhbmQgc28gSSBndWVzcyBJJ2xsIG1haW50YWlu
+IGl0IG15c2VsZi4gQWRkaW5nIEdyZWcgdG8gdGhlIENDIGZvciBoaXMgYWNrIG9uCj4gICAgdGhp
+cy4KPiAtIERvbid0IHVzZSBhIHN0YXRpYyBnbG9iYWwgc3RhdGUgaW4gY2FzZSB0aGVyZSBhcmUg
+bXVsdGlwbGUgaW5zdGFuY2VzLgo+IC0gVXNlIGRldm1fbWVtcmVtYXAgaW5zdGVhZCBvZiB0aGUg
+YWNwaSBpbnRlcm5hbCBmdW5jdGlvbnMuCj4gLSBEZWZhdWx0IHRvIGJlaW5nIG1vZHVsYXIgaW5z
+dGVhZCBvZiBhIGJ1aWx0LWluLCBhcyBhcHBhcmVudGx5IHRoaXMgaXMKPiAgICB1ZGV2LWFibGUu
+Cj4KPiAgIE1BSU5UQUlORVJTICAgICAgICAgICAgfCAgIDEgKwo+ICAgZHJpdmVycy92aXJ0L0tj
+b25maWcgICB8ICAgOSArKysrCj4gICBkcml2ZXJzL3ZpcnQvTWFrZWZpbGUgIHwgICAxICsKPiAg
+IGRyaXZlcnMvdmlydC92bWdlbmlkLmMgfCAxMTIgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysKPiAgIDQgZmlsZXMgY2hhbmdlZCwgMTIzIGluc2VydGlvbnMoKykKPiAg
+IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3ZpcnQvdm1nZW5pZC5jCj4KPiBkaWZmIC0tZ2l0
+IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwo+IGluZGV4IDc3N2NkNmZhMmIzZC4uYTEwOTk3
+ZTE1MTQ2IDEwMDY0NAo+IC0tLSBhL01BSU5UQUlORVJTCj4gKysrIGIvTUFJTlRBSU5FUlMKPiBA
+QCAtMTYyMTEsNiArMTYyMTEsNyBAQCBNOiAgICAgIEphc29uIEEuIERvbmVuZmVsZCA8SmFzb25A
+engyYzQuY29tPgo+ICAgVDogICAgIGdpdCBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20v
+bGludXgva2VybmVsL2dpdC9jcm5nL3JhbmRvbS5naXQKPiAgIFM6ICAgICBNYWludGFpbmVkCj4g
+ICBGOiAgICAgZHJpdmVycy9jaGFyL3JhbmRvbS5jCj4gK0Y6ICAgICBkcml2ZXJzL3ZpcnQvdm1n
+ZW5pZC5jCj4KPiAgIFJBUElESU8gU1VCU1lTVEVNCj4gICBNOiAgICAgTWF0dCBQb3J0ZXIgPG1w
+b3J0ZXJAa2VybmVsLmNyYXNoaW5nLm9yZz4KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy92aXJ0L0tj
+b25maWcgYi9kcml2ZXJzL3ZpcnQvS2NvbmZpZwo+IGluZGV4IDgwNjFlOGVmNDQ5Zi4uNTU5NmM3
+MzEzZjU5IDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvdmlydC9LY29uZmlnCj4gKysrIGIvZHJpdmVy
+cy92aXJ0L0tjb25maWcKPiBAQCAtMTMsNiArMTMsMTUgQEAgbWVudWNvbmZpZyBWSVJUX0RSSVZF
+UlMKPgo+ICAgaWYgVklSVF9EUklWRVJTCj4KPiArY29uZmlnIFZNR0VOSUQKPiArICAgICAgIHRy
+aXN0YXRlICJWaXJ0dWFsIE1hY2hpbmUgR2VuZXJhdGlvbiBJRCBkcml2ZXIiCj4gKyAgICAgICBk
+ZWZhdWx0IG0KPiArICAgICAgIGRlcGVuZHMgb24gQUNQSQo+ICsgICAgICAgaGVscAo+ICsgICAg
+ICAgICBTYXkgWSBoZXJlIHRvIHVzZSB0aGUgaHlwZXJ2aXNvci1wcm92aWRlZCBWaXJ0dWFsIE1h
+Y2hpbmUgR2VuZXJhdGlvbiBJRAo+ICsgICAgICAgICB0byByZXNlZWQgdGhlIFJORyB3aGVuIHRo
+ZSBWTSBpcyBjbG9uZWQuIFRoaXMgaXMgaGlnaGx5IHJlY29tbWVuZGVkIGlmCj4gKyAgICAgICAg
+IHlvdSBpbnRlbmQgdG8gZG8gYW55IHJvbGxiYWNrIC8gY2xvbmluZyAvIHNuYXBzaG90dGluZyBv
+ZiBWTXMuCj4gKwo+ICAgY29uZmlnIEZTTF9IVl9NQU5BR0VSCj4gICAgICAgICAgdHJpc3RhdGUg
+IkZyZWVzY2FsZSBoeXBlcnZpc29yIG1hbmFnZW1lbnQgZHJpdmVyIgo+ICAgICAgICAgIGRlcGVu
+ZHMgb24gRlNMX1NPQwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUgYi9kcml2
+ZXJzL3ZpcnQvTWFrZWZpbGUKPiBpbmRleCAzZTI3MmVhNjBjZDkuLjEwOGQwZmZjYzlhYSAxMDA2
+NDQKPiAtLS0gYS9kcml2ZXJzL3ZpcnQvTWFrZWZpbGUKPiArKysgYi9kcml2ZXJzL3ZpcnQvTWFr
+ZWZpbGUKPiBAQCAtNCw2ICs0LDcgQEAKPiAgICMKPgo+ICAgb2JqLSQoQ09ORklHX0ZTTF9IVl9N
+QU5BR0VSKSAgICs9IGZzbF9oeXBlcnZpc29yLm8KPiArb2JqLSQoQ09ORklHX1ZNR0VOSUQpICAg
+ICAgICAgICs9IHZtZ2VuaWQubwo+ICAgb2JqLXkgICAgICAgICAgICAgICAgICAgICAgICAgICs9
+IHZib3hndWVzdC8KPgo+ICAgb2JqLSQoQ09ORklHX05JVFJPX0VOQ0xBVkVTKSAgICs9IG5pdHJv
+X2VuY2xhdmVzLwo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQvdm1nZW5pZC5jIGIvZHJpdmVy
+cy92aXJ0L3ZtZ2VuaWQuYwo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gaW5kZXggMDAwMDAwMDAw
+MDAwLi5lM2RkNGFmYjMzYzYKPiAtLS0gL2Rldi9udWxsCj4gKysrIGIvZHJpdmVycy92aXJ0L3Zt
+Z2VuaWQuYwo+IEBAIC0wLDAgKzEsMTEyIEBACj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVy
+OiBHUEwtMi4wCj4gKy8qCj4gKyAqIENvcHlyaWdodCAoQykgMjAyMiBKYXNvbiBBLiBEb25lbmZl
+bGQgPEphc29uQHp4MmM0LmNvbT4uIEFsbCBSaWdodHMgUmVzZXJ2ZWQuCj4gKyAqCj4gKyAqIFRo
+ZSAiVmlydHVhbCBNYWNoaW5lIEdlbmVyYXRpb24gSUQiIGlzIGV4cG9zZWQgdmlhIEFDUEkgYW5k
+IGNoYW5nZXMgd2hlbiBhCj4gKyAqIHZpcnR1YWwgbWFjaGluZSBmb3JrcyBvciBpcyBjbG9uZWQu
+IFRoaXMgZHJpdmVyIGV4aXN0cyBmb3Igc2hlcGhlcmRpbmcgdGhhdAo+ICsgKiBpbmZvcm1hdGlv
+biB0byByYW5kb20uYy4KPiArICovCj4gKwo+ICsjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Cj4g
+KyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4KPiArI2luY2x1ZGUgPGxpbnV4L2FjcGkuaD4KPiAr
+I2luY2x1ZGUgPGxpbnV4L3JhbmRvbS5oPgo+ICsKPiArQUNQSV9NT0RVTEVfTkFNRSgidm1nZW5p
+ZCIpOwo+ICsKPiArZW51bSB7IFZNR0VOSURfU0laRSA9IDE2IH07Cj4gKwo+ICtzdHJ1Y3Qgdm1n
+ZW5pZF9zdGF0ZSB7Cj4gKyAgICAgICB1OCAqbmV4dF9pZDsKPiArICAgICAgIHU4IHRoaXNfaWRb
+Vk1HRU5JRF9TSVpFXTsKPiArfTsKPiArCj4gK3N0YXRpYyBpbnQgdm1nZW5pZF9hY3BpX2FkZChz
+dHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSkKPiArewo+ICsgICAgICAgc3RydWN0IGFjcGlfYnVm
+ZmVyIHBhcnNlZCA9IHsgQUNQSV9BTExPQ0FURV9CVUZGRVIgfTsKPiArICAgICAgIHN0cnVjdCB2
+bWdlbmlkX3N0YXRlICpzdGF0ZTsKPiArICAgICAgIHVuaW9uIGFjcGlfb2JqZWN0ICpvYmo7Cj4g
+KyAgICAgICBwaHlzX2FkZHJfdCBwaHlzX2FkZHI7Cj4gKyAgICAgICBhY3BpX3N0YXR1cyBzdGF0
+dXM7Cj4gKyAgICAgICBpbnQgcmV0ID0gMDsKPiArCj4gKyAgICAgICBzdGF0ZSA9IGRldm1fa21h
+bGxvYygmZGV2aWNlLT5kZXYsIHNpemVvZigqc3RhdGUpLCBHRlBfS0VSTkVMKTsKPiArICAgICAg
+IGlmICghc3RhdGUpCj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PTUVNOwo+ICsKPiArICAg
+ICAgIHN0YXR1cyA9IGFjcGlfZXZhbHVhdGVfb2JqZWN0KGRldmljZS0+aGFuZGxlLCAiQUREUiIs
+IE5VTEwsICZwYXJzZWQpOwo+ICsgICAgICAgaWYgKEFDUElfRkFJTFVSRShzdGF0dXMpKSB7Cj4g
+KyAgICAgICAgICAgICAgIEFDUElfRVhDRVBUSU9OKChBRV9JTkZPLCBzdGF0dXMsICJFdmFsdWF0
+aW5nIEFERFIiKSk7Cj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRU5PREVWOwo+ICsgICAgICAg
+fQo+ICsgICAgICAgb2JqID0gcGFyc2VkLnBvaW50ZXI7Cj4gKyAgICAgICBpZiAoIW9iaiB8fCBv
+YmotPnR5cGUgIT0gQUNQSV9UWVBFX1BBQ0tBR0UgfHwgb2JqLT5wYWNrYWdlLmNvdW50ICE9IDIg
+fHwKPiArICAgICAgICAgICBvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0udHlwZSAhPSBBQ1BJX1RZ
+UEVfSU5URUdFUiB8fAo+ICsgICAgICAgICAgIG9iai0+cGFja2FnZS5lbGVtZW50c1sxXS50eXBl
+ICE9IEFDUElfVFlQRV9JTlRFR0VSKSB7Cj4gKyAgICAgICAgICAgICAgIHJldCA9IC1FSU5WQUw7
+Cj4gKyAgICAgICAgICAgICAgIGdvdG8gb3V0Owo+ICsgICAgICAgfQo+ICsKPiArICAgICAgIHBo
+eXNfYWRkciA9IChvYmotPnBhY2thZ2UuZWxlbWVudHNbMF0uaW50ZWdlci52YWx1ZSA8PCAwKSB8
+Cj4gKyAgICAgICAgICAgICAgICAgICAob2JqLT5wYWNrYWdlLmVsZW1lbnRzWzFdLmludGVnZXIu
+dmFsdWUgPDwgMzIpOwo+ICsgICAgICAgc3RhdGUtPm5leHRfaWQgPSBkZXZtX21lbXJlbWFwKCZk
+ZXZpY2UtPmRldiwgcGh5c19hZGRyLCBWTUdFTklEX1NJWkUsIE1FTVJFTUFQX1dCKTsKPiArICAg
+ICAgIGlmICghc3RhdGUtPm5leHRfaWQpIHsKPiArICAgICAgICAgICAgICAgcmV0ID0gLUVOT01F
+TTsKPiArICAgICAgICAgICAgICAgZ290byBvdXQ7Cj4gKyAgICAgICB9Cj4gKwo+ICsgICAgICAg
+bWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50aGlz
+X2lkKSk7Cj4gKyAgICAgICBhZGRfZGV2aWNlX3JhbmRvbW5lc3Moc3RhdGUtPnRoaXNfaWQsIHNp
+emVvZihzdGF0ZS0+dGhpc19pZCkpOwoKClBsZWFzZSBleHBvc2UgdGhlIHZtZ2VuaWQgdmlhIC9z
+eXNmcyBzbyB0aGF0IHVzZXIgc3BhY2UgZXZlbiByZW1vdGVseSAKaGFzIGEgY2hhbmNlIHRvIGNo
+ZWNrIGlmIGl0J3MgYmVlbiBjbG9uZWQuCgoKPiArCj4gKyAgICAgICBkZXZpY2UtPmRyaXZlcl9k
+YXRhID0gc3RhdGU7Cj4gKwo+ICtvdXQ6Cj4gKyAgICAgICBBQ1BJX0ZSRUUocGFyc2VkLnBvaW50
+ZXIpOwo+ICsgICAgICAgcmV0dXJuIHJldDsKPiArfQo+ICsKPiArc3RhdGljIHZvaWQgdm1nZW5p
+ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgKmRldmljZSwgdTMyIGV2ZW50KQo+ICt7
+Cj4gKyAgICAgICBzdHJ1Y3Qgdm1nZW5pZF9zdGF0ZSAqc3RhdGUgPSBhY3BpX2RyaXZlcl9kYXRh
+KGRldmljZSk7Cj4gKyAgICAgICB1OCBvbGRfaWRbVk1HRU5JRF9TSVpFXTsKPiArCj4gKyAgICAg
+ICBtZW1jcHkob2xkX2lkLCBzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKG9sZF9pZCkpOwo+ICsgICAg
+ICAgbWVtY3B5KHN0YXRlLT50aGlzX2lkLCBzdGF0ZS0+bmV4dF9pZCwgc2l6ZW9mKHN0YXRlLT50
+aGlzX2lkKSk7Cj4gKyAgICAgICBpZiAoIW1lbWNtcChvbGRfaWQsIHN0YXRlLT50aGlzX2lkLCBz
+aXplb2Yob2xkX2lkKSkpCj4gKyAgICAgICAgICAgICAgIHJldHVybjsKPiArICAgICAgIGFkZF92
+bWZvcmtfcmFuZG9tbmVzcyhzdGF0ZS0+dGhpc19pZCwgc2l6ZW9mKHN0YXRlLT50aGlzX2lkKSk7
+Cj4gK30KPiArCj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9kZXZpY2VfaWQgdm1nZW5pZF9p
+ZHNbXSA9IHsKPiArICAgICAgIHsgIlZNR0VOSUQiLCAwIH0sCj4gKyAgICAgICB7ICJRRU1VVkdJ
+RCIsIDAgfSwKCgpBY2NvcmRpbmcgdG8gdGhlIFZNR2VuSUQgc3BlY1sxXSwgeW91IGNhbiBvbmx5
+IHJlbHkgb24gX0NJRCBhbmQgX0RETiBmb3IgCm1hdGNoaW5nLiBUaGV5IGJvdGggY29udGFpbiAi
+Vk1fR2VuX0NvdW50ZXIiLiBUaGUgbGlzdCBhYm92ZSBjb250YWlucyAKX0hJRCB2YWx1ZXMgd2hp
+Y2ggYXJlIG5vdCBhbiBvZmZpY2lhbCBpZGVudGlmaWVyIGZvciB0aGUgVk1HZW5JRCBkZXZpY2Uu
+CgpJSVJDIHRoZSBBQ1BJIGRldmljZSBtYXRjaCBsb2dpYyBkb2VzIG1hdGNoIF9DSUQgaW4gYWRk
+aXRpb24gdG8gX0hJRC4gCkhvd2V2ZXIsIGl0IGlzIGxpbWl0ZWQgdG8gOCBjaGFyYWN0ZXJzLiBM
+ZXQgbWUgcGFzdGUgYW4gZXhwZXJpbWVudGFsIApoYWNrIEkgZGlkIGJhY2sgdGhlbiB0byBkbyB0
+aGUgX0NJRCBtYXRjaGluZyBpbnN0ZWFkLgoKWzFdIApodHRwczovL2Rvd25sb2FkLm1pY3Jvc29m
+dC5jb20vZG93bmxvYWQvMy8xL0MvMzFDRkMzMDctOThDQS00Q0E1LTkxNEMtRDk3NzI2OTFFMjE0
+L1ZpcnR1YWxNYWNoaW5lR2VuZXJhdGlvbklELmRvY3gKCgpBbGV4CgpkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9hY3BpL2J1cy5jIGIvZHJpdmVycy9hY3BpL2J1cy5jCmluZGV4IDE2ODJmOGI0NTRhMi4u
+NDUyNDQzZDc5ZDg3IDEwMDY0NAotLS0gYS9kcml2ZXJzL2FjcGkvYnVzLmMKKysrIGIvZHJpdmVy
+cy9hY3BpL2J1cy5jCkBAIC03NDgsNyArNzQ4LDcgQEAgc3RhdGljIGJvb2wgX19hY3BpX21hdGNo
+X2RldmljZShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsCiDCoMKgwqDCoCDCoMKgwqAgLyog
+Rmlyc3QsIGNoZWNrIHRoZSBBQ1BJL1BOUCBJRHMgcHJvdmlkZWQgYnkgdGhlIGNhbGxlci4gKi8K
+IMKgwqDCoMKgIMKgwqDCoCBpZiAoYWNwaV9pZHMpIHsKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAg
+Zm9yIChpZCA9IGFjcGlfaWRzOyBpZC0+aWRbMF0gfHwgaWQtPmNsczsgaWQrKykgewotwqDCoMKg
+IMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRbMF0gJiYgIXN0cmNtcCgoY2hhciAqKWlk
+LT5pZCwgaHdpZC0+aWQpKQorwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIGlmIChpZC0+aWRb
+MF0gJiYgIXN0cm5jbXAoKGNoYXIgKilpZC0+aWQsIGh3aWQtPmlkLCAKQUNQSV9JRF9MRU4gLSAx
+KSkKIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIMKgwqDCoCBnb3RvIG91dF9hY3BpX21h
+dGNoOwogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgaWYgKGlkLT5jbHMgJiYgX19hY3Bp
+X21hdGNoX2RldmljZV9jbHMoaWQsIGh3aWQpKQogwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKg
+wqAgwqDCoMKgIGdvdG8gb3V0X2FjcGlfbWF0Y2g7CmRpZmYgLS1naXQgYS9kcml2ZXJzL3ZpcnQv
+dm1nZW5pZC5jIGIvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYwppbmRleCA3NWE3ODdkYThhYWQuLjBi
+ZmE0MjJjZjA5NCAxMDA2NDQKLS0tIGEvZHJpdmVycy92aXJ0L3ZtZ2VuaWQuYworKysgYi9kcml2
+ZXJzL3ZpcnQvdm1nZW5pZC5jCkBAIC0zNTYsNyArMzU2LDggQEAgc3RhdGljIHZvaWQgdm1nZW5p
+ZF9hY3BpX25vdGlmeShzdHJ1Y3QgYWNwaV9kZXZpY2UgCipkZXZpY2UsIHUzMiBldmVudCkKIMKg
+fQoKIMKgc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2RldmljZV9pZCB2bWdlbmlkX2lkc1tdID0g
+ewotwqDCoMKgIHsiUUVNVVZHSUQiLCAwfSwKK8KgwqDCoCAvKiBUaGlzIHJlYWxseSBpcyBWTV9H
+ZW5fQ291bnRlciwgYnV0IHdlIGNhbiBvbmx5IG1hdGNoIDggY2hhcmFjdGVycyAqLworwqDCoMKg
+IHsiVk1fR0VOX0MiLCAwfSwKIMKgwqDCoMKgIHsiIiwgMH0sCiDCoH07CgoKCgpBbWF6b24gRGV2
+ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4K
+R2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpF
+aW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTcz
+IEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
--- Jan
-
-Am Di., 22. Feb. 2022 um 05:34 Uhr schrieb Corentin Labbe <clabbe@baylibre.com>:
->
-> On my renesas salavator-X, I saw some cavium driver failing crypto
-> self-tests.
-> But salvator does not have such hardware.
-> This is due to cavium/zip driver registering algorithms even if hardware
-> is not present.
-> The solution is to move algorithm registration in the probe function.
-> This permits also to simplify module init/exit by using
-> module_pci_driver.
->
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->
-> WARNING: this is boot tested only on salvator-X to be sure that the
-> cavium/zip driver no longer registers algorithms.
-> I do not have any cavium hardware unfortunatly.
->
->  drivers/crypto/cavium/zip/zip_main.c | 83 ++++++++++++----------------
->  1 file changed, 35 insertions(+), 48 deletions(-)
->
-> diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-> index 812b4ac9afd6..dc5b7bf7e1fd 100644
-> --- a/drivers/crypto/cavium/zip/zip_main.c
-> +++ b/drivers/crypto/cavium/zip/zip_main.c
-> @@ -55,6 +55,11 @@ static const struct pci_device_id zip_id_table[] = {
->         { 0, }
->  };
->
-> +static void zip_debugfs_init(void);
-> +static void zip_debugfs_exit(void);
-> +static int zip_register_compression_device(void);
-> +static void zip_unregister_compression_device(void);
-> +
->  void zip_reg_write(u64 val, u64 __iomem *addr)
->  {
->         writeq(val, addr);
-> @@ -235,6 +240,15 @@ static int zip_init_hw(struct zip_device *zip)
->         return 0;
->  }
->
-> +static void zip_reset(struct zip_device *zip)
-> +{
-> +       union zip_cmd_ctl cmd_ctl;
-> +
-> +       cmd_ctl.u_reg64 = 0x0ull;
-> +       cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
-> +       zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
-> +}
-> +
->  static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  {
->         struct device *dev = &pdev->dev;
-> @@ -282,8 +296,21 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->         if (err)
->                 goto err_release_regions;
->
-> +       /* Register with the Kernel Crypto Interface */
-> +       err = zip_register_compression_device();
-> +       if (err < 0) {
-> +               zip_err("ZIP: Kernel Crypto Registration failed\n");
-> +               goto err_register;
-> +       }
-> +
-> +       /* comp-decomp statistics are handled with debugfs interface */
-> +       zip_debugfs_init();
-> +
->         return 0;
->
-> +err_register:
-> +       zip_reset(zip);
-> +
->  err_release_regions:
->         if (zip->reg_base)
->                 iounmap(zip->reg_base);
-> @@ -305,16 +332,17 @@ static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  static void zip_remove(struct pci_dev *pdev)
->  {
->         struct zip_device *zip = pci_get_drvdata(pdev);
-> -       union zip_cmd_ctl cmd_ctl;
->         int q = 0;
->
->         if (!zip)
->                 return;
->
-> +       zip_debugfs_exit();
-> +
-> +       zip_unregister_compression_device();
-> +
->         if (zip->reg_base) {
-> -               cmd_ctl.u_reg64 = 0x0ull;
-> -               cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
-> -               zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
-> +               zip_reset(zip);
->                 iounmap(zip->reg_base);
->         }
->
-> @@ -585,7 +613,7 @@ DEFINE_SHOW_ATTRIBUTE(zip_regs);
->  /* Root directory for thunderx_zip debugfs entry */
->  static struct dentry *zip_debugfs_root;
->
-> -static void __init zip_debugfs_init(void)
-> +static void zip_debugfs_init(void)
->  {
->         if (!debugfs_initialized())
->                 return;
-> @@ -604,7 +632,7 @@ static void __init zip_debugfs_init(void)
->
->  }
->
-> -static void __exit zip_debugfs_exit(void)
-> +static void zip_debugfs_exit(void)
->  {
->         debugfs_remove_recursive(zip_debugfs_root);
->  }
-> @@ -615,48 +643,7 @@ static void __exit zip_debugfs_exit(void) { }
->  #endif
->  /* debugfs - end */
->
-> -static int __init zip_init_module(void)
-> -{
-> -       int ret;
-> -
-> -       zip_msg("%s\n", DRV_NAME);
-> -
-> -       ret = pci_register_driver(&zip_driver);
-> -       if (ret < 0) {
-> -               zip_err("ZIP: pci_register_driver() failed\n");
-> -               return ret;
-> -       }
-> -
-> -       /* Register with the Kernel Crypto Interface */
-> -       ret = zip_register_compression_device();
-> -       if (ret < 0) {
-> -               zip_err("ZIP: Kernel Crypto Registration failed\n");
-> -               goto err_pci_unregister;
-> -       }
-> -
-> -       /* comp-decomp statistics are handled with debugfs interface */
-> -       zip_debugfs_init();
-> -
-> -       return ret;
-> -
-> -err_pci_unregister:
-> -       pci_unregister_driver(&zip_driver);
-> -       return ret;
-> -}
-> -
-> -static void __exit zip_cleanup_module(void)
-> -{
-> -       zip_debugfs_exit();
-> -
-> -       /* Unregister from the kernel crypto interface */
-> -       zip_unregister_compression_device();
-> -
-> -       /* Unregister this driver for pci zip devices */
-> -       pci_unregister_driver(&zip_driver);
-> -}
-> -
-> -module_init(zip_init_module);
-> -module_exit(zip_cleanup_module);
-> +module_pci_driver(zip_driver);
->
->  MODULE_AUTHOR("Cavium Inc");
->  MODULE_DESCRIPTION("Cavium Inc ThunderX ZIP Driver");
-> --
-> 2.34.1
->
