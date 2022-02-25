@@ -2,122 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9654C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 15:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1415C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 15:43:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242252AbiBYPkC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 10:40:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33952 "EHLO
+        id S239036AbiBYPoC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Feb 2022 10:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242160AbiBYPj7 (ORCPT
+        with ESMTP id S242272AbiBYPoA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 10:39:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 604A41CFA37
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Feb 2022 07:39:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1645803566;
+        Fri, 25 Feb 2022 10:44:00 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF811D9B4C;
+        Fri, 25 Feb 2022 07:43:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9A9A6B83267;
+        Fri, 25 Feb 2022 15:43:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7222C340F0;
+        Fri, 25 Feb 2022 15:43:19 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FPOE4Qfk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1645803798;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PKwIaA6vJQ86hsYmx90S5GHPLZ3QnL0/6rDtNGfZPd8=;
-        b=TbGpEsToCmR6NIPZ8S6Rl5aG1GEm6rf6XAVHcQa6Zy4yIuHqmmn6a0Myi3v8ZlxxmdB2v0
-        NzrOaryyK43wQHBhL0mQ54rAIjOS53gKQ++Nv9MF+lJHNO583smCZ3F0TmdpWfTA12RVAk
-        kmlHmtNTpmvzaKjd+wA5mmJeQlV6Atc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-370-e41bORCJP4O_0wUA4GSfZw-1; Fri, 25 Feb 2022 10:39:23 -0500
-X-MC-Unique: e41bORCJP4O_0wUA4GSfZw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4391C1091DA0;
-        Fri, 25 Feb 2022 15:39:19 +0000 (UTC)
-Received: from localhost (ovpn-12-89.pek2.redhat.com [10.72.12.89])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 507087F0DB;
-        Fri, 25 Feb 2022 15:39:05 +0000 (UTC)
-Date:   Fri, 25 Feb 2022 23:39:02 +0800
-From:   'Baoquan He' <bhe@redhat.com>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "cl@linux.com" <cl@linux.com>,
-        "42.hyeyoo@gmail.com" <42.hyeyoo@gmail.com>,
-        "penberg@kernel.org" <penberg@kernel.org>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "iamjoonsoo.kim@lge.com" <iamjoonsoo.kim@lge.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "david@redhat.com" <david@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "hca@linux.ibm.com" <hca@linux.ibm.com>,
-        "gor@linux.ibm.com" <gor@linux.ibm.com>,
-        "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "svens@linux.ibm.com" <svens@linux.ibm.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "michael@walle.cc" <michael@walle.cc>,
-        "linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>,
-        "wsa@kernel.org" <wsa@kernel.org>
-Subject: Re: [PATCH 1/2] dma-mapping: check dma_mask for streaming mapping
- allocs
-Message-ID: <20220225153902.GA148875@MiWiFi-R3L-srv>
-References: <20220220084044.GC93179@MiWiFi-R3L-srv>
- <20220222084530.GA6210@lst.de>
- <YhSpaGfiQV8Nmxr+@MiWiFi-R3L-srv>
- <20220222131120.GB10093@lst.de>
- <YhToFzlSufrliUsi@MiWiFi-R3L-srv>
- <20220222155904.GA13323@lst.de>
- <YhV/nabDa5zdNL/4@MiWiFi-R3L-srv>
- <20220223142555.GA5986@lst.de>
- <YheSBTJY216m6izG@MiWiFi-R3L-srv>
- <1fead34bceda468cbe34077a28c4a4b1@AcuMS.aculab.com>
+        bh=IsOywQAnx5u1lAniICwae+nr6IyMZXA1OmfzCOAb3Zw=;
+        b=FPOE4QfkcpcpUHrB2A1WDXR+lDY0zAzQkW+btr90FjI2KBwsgaXqxcYUaTh74AR13T3bec
+        Yuq+dmEB1KAL/5o47dh+J4dVfjPgqb27eTMZOdgW6wbmQITTDTy+iVOdHrF9uOTLWjEQUa
+        8CU9l2kxaCjN41L3TOwepJegb1r1BCs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b8ce3d14 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 25 Feb 2022 15:43:18 +0000 (UTC)
+Date:   Fri, 25 Feb 2022 16:43:11 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, KVM list <kvm@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-hyperv@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        adrian@parity.io, ben@skyportsystems.com,
+        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Dexuan Cui <decui@microsoft.com>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        KY Srinivasan <kys@microsoft.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        "Weiss, Radu" <raduweis@amazon.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Wei Liu <wei.liu@kernel.org>
+Subject: Re: [PATCH v4] virt: vmgenid: introduce driver for reinitializing
+ RNG on VM fork
+Message-ID: <Yhj5Dyd6+oC/R1H5@zx2c4.com>
+References: <CAHmME9pJ3wb=EbUErJrCRC=VYGhFZqj2ar_AkVPsUvAnqGtwwg@mail.gmail.com>
+ <20220225124848.909093-1-Jason@zx2c4.com>
+ <05c9f2a9-accb-e0de-aac7-b212adac7eb2@amazon.com>
+ <YhjjuMOeV7+T7thS@zx2c4.com>
+ <88ebdc32-2e94-ef28-37ed-1c927c12af43@amazon.com>
+ <YhjoyIUv2+18BwiR@zx2c4.com>
+ <9ac68552-c1fc-22c8-13e6-4f344f85a4fb@amazon.com>
+ <CAMj1kXEue6cDCSG0N7WGTVF=JYZx3jwE7EK4tCdhO-HzMtWwVw@mail.gmail.com>
+ <c8066caf-8bbb-b148-57e6-98d8449a64c3@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1fead34bceda468cbe34077a28c4a4b1@AcuMS.aculab.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <c8066caf-8bbb-b148-57e6-98d8449a64c3@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 02/24/22 at 02:27pm, David Laight wrote:
-> From: Baoquan He
-> > Sent: 24 February 2022 14:11
-> ...
-> > With my understanding, there are two kinds of DMA mapping, coherent
-> > mapping (which is also persistent mapping), and streaming mapping. The
-> > coherent mapping will be handled during driver init, and released during
-> > driver de-init. While streaming mapping will be done when needed at any
-> > time, and released after usage.
-> 
-> The lifetime has absolutely nothing to do with it.
-> 
-> It is all about how the DMA cycles (from the device) interact with
-> (or more don't interact with) the cpu memory cache.
-> 
-> For coherent mapping the cpu and device can write to (different)
-> words in the same cache line at the same time, and both will see
-> both updates.
-> On some systems this can only be achieved by making the memory
-> uncached - which significantly slows down cpu access.
-> 
-> For non-coherent (streaming) mapping the cpu writes back and/or
-> invalidates the data cache so that the dma read cycles from memory
-> read the correct data and the cpu re-reads the cache line after
-> the dma has completed.
-> They are only really suitable for data buffers.
+Hi Alex,
 
-Thanks for valuable input, I agree the lifetime is not stuff we can rely
-on to judge. But how do we explain dma_alloc_noncoherent() is not streaming
-mapping? Then which kind of dma mapping is it?
+On Fri, Feb 25, 2022 at 04:22:54PM +0100, Alexander Graf wrote:
+> I don't understand the rush here. This had been sitting on the ML for 1 
+> year - and now suddenly talking the match through properly and getting 
+> VMGenID spec compatible matching support into the ACPI core is a 
+> problem? What did I miss? :)
 
-I could miss something important to understand this which is obvious to
-other people, I will make time to check.
+I don't think this is a question about speed. Ard doesn't like the spec.
+You like the feature more than you dislike the spec. Apparently that
+means there's a disagreement.
 
+As I mentioned earlier, I'd encourage you to send a patch to the ACPI
+people and let them decide. If that gets in, then I'm fine with
+modifying vmgenid to meet the spec and take advantage of the change
+you'll be making to the ACPI code. If it is rejected by the ACPI people,
+and consequently Linux isn't able to match on _CID, then I guess we'll
+have the next best thing, which is "well, it still works on QEMU."
+Hopefully you'll convince them. Feel free to CC me on that patch.
+
+Jason
