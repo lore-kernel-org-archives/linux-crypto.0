@@ -2,276 +2,174 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03871C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Feb 2022 20:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A24CC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Feb 2022 08:17:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236921AbiBYUpD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Feb 2022 15:45:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56594 "EHLO
+        id S229986AbiBZIRt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 26 Feb 2022 03:17:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236918AbiBYUpD (ORCPT
+        with ESMTP id S229924AbiBZIRs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Feb 2022 15:45:03 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F15D1B45DE;
-        Fri, 25 Feb 2022 12:44:29 -0800 (PST)
+        Sat, 26 Feb 2022 03:17:48 -0500
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA56299CA5;
+        Sat, 26 Feb 2022 00:17:15 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 21Q7q7Sf013375;
+        Sat, 26 Feb 2022 00:17:00 -0800
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2171.outbound.protection.outlook.com [104.47.58.171])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3eexvmbwa3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 26 Feb 2022 00:17:00 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TXGFN2lOeMItwOFdsY+xGfonhilIaqtAAsgTDCCOvabNgYWCaaYZm3ZAYMV5nV+t2gMeda633BnryZAocf0voieA7SNWt2BdSJ/8SMTZmlo3DhfcHCSBwBLbq+6HoOUbkInwejJ99hQMQSZlvpd65TbsE2GkbNtA20HIDZ2ToPeaRPu8pkgQ4KPrYJm1fa4j1SZhtv7SmADc/bScmCbvnry9toCWL3WMKi6pMhEZZ/gW69Ft9uakTo8PWhaW0CAbvg3sJiQr51VmqiLV+ofggGILHD4FjtqoM5jltKvFV/LpS5lnIFXSJUPEgyIhgp9I6B0YZBpuP4N6o9BsFzpV/A==
+ b=HQuPdhe15FtZkJwle9ihgkb5np9L3/O6qKKgpXZNu5mREbIRXkFxU6oGl6dAXH1Ahvan3bHB13bK3ARh7ktUQcoa17OX31loZ3wFx4kxHr68OI6917CiSjZi3XQZd5OPhIkc0+sXflbA3dK5ULCZWMzkgmm9LWZlkuKpb6zSSVIQSWTRPHkKtoobYtm2OaK3cW2SCcTEXy4APgGnianxePA10etxel4DrTc/7yyTZgngnNSRRiHTfxESNN68wH8FFJyhc0ID4kHgRFQNAA3HEIx5u8JOw5UjFFHujht8aEmXS+LzBNbF5SAaC9V7rVPZeSuGORkSz0mTzx3Ky17Sig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4WE+x4qMgDuXIeaIuXMpE/8i1pIMcdBvUbU0XIPy/Oc=;
- b=jl0D5/5gCo7aBqI4h5/mVd3FMuwEZMgd5DgQqWrFiSe+NejmsjTKTMLn3JBXmCEXIpus9Y5W1ELU3Z39NEdt3ZSC5XPepip49UeIfrA+wLogQNp5WwCWOWaDjomrej4am7KpJJC9NeSKo8jRTAFcwtKFQ3ThOf0wwX1DN2Qx2Ggd2aIbJx3QzXQUzpyJz2v2c9EWMqsG+q+I+88jpSy3Y8PHXpOmc7nT34b1bRvE0Ni5O3x0Ec3wXpmNucpUbpORp2+JFESdNvepRpp/km9AyLUTHVgXBKq4H40VaEKAfQPVkjR6kNYroR7O7xhED8vtBYGmARdkeSQUdYHDX9tuBA==
+ bh=6fQZpvF4gxHq3nFndW7QPUtap3N2s2CsVLAkomvA8Bw=;
+ b=NdrDPIL04P0kRJt/jHliVWTcXecHng5FtZSpWG3zwR8kXqWaOOZIBuCDVBQR5EyuK5G4GEd0w1IFL89RUaxpFTs1X+XUEifh82/FTGhJeQlcL5i2F7yUcBUpqO6B4sPy38D8POIGQgIIJH/Yh4sXpSh3BrQCX5Or5vEZziKsW3gErF3+WKarL8FxTIVa3FA/DjnvsTEQ8s3+Cq/Hl/ifO0j4jdnUuJn/RDnOpRs9DPpJOK0bEt2flXtZ7KKno1YY+n6babbxQr+Rx/TdK8UpK7vK9p3lowGr0Ma138o6ULEdevqKez72Ikq1MHB+H9K4dcZepbSgyaispVvgHVhjfA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4WE+x4qMgDuXIeaIuXMpE/8i1pIMcdBvUbU0XIPy/Oc=;
- b=mLMBRy9VjrTsKn1LBBgmm8z/e5ypGJdFw5M8hrrLYwmu/cA0HyEA245N+xPi0dNPuxOFchm+X14y012tTNbU4YfoQSjupbqvBOIdA1MMVJUf1yfsqEbj84MPTUdh7/IbPE28OZz/xGZvpYZLHpZbCtiON/6omyGfqkmjCfA3NRRN1uOYURiQLQefFhsHxT52x/mS3JqMvIim8Ubn47gycXdtYa3Ki9+3Bc3B+4OlLmQ/fygm/YqE49pjum83E/9cX3pgm8WBJM1lX3NFF0BCWwdnR46m/eO3XrzdJFinYh090mlkH9qY2RZzW6LWiuqrUKEEIKnJ76+k7/jRRYEF0Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DM6PR12MB4026.namprd12.prod.outlook.com (2603:10b6:5:1cc::33) with
+ bh=6fQZpvF4gxHq3nFndW7QPUtap3N2s2CsVLAkomvA8Bw=;
+ b=Ni9dUvJV+hHKGYlJ6Ehj4bgxZHn/ybN1U5/zfTPlhcT1/rKhGOjefkUmqLx7p29znFhRMBeNITaJioY+nI4RqSeBxhDmlekNf7XcuEGRvwZWJdWG+SpIB0F6k12XQaNYFPi8cWvJj854t7TVtHsvNEePodnreC2GDNg6i9WPBE4=
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com (2603:10b6:a03:3c8::7)
+ by SJ0PR18MB5137.namprd18.prod.outlook.com (2603:10b6:a03:438::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.25; Fri, 25 Feb
- 2022 20:44:25 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::e8f4:9793:da37:1bd3%4]) with mapi id 15.20.5017.026; Fri, 25 Feb 2022
- 20:44:25 +0000
-Date:   Fri, 25 Feb 2022 16:44:24 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.22; Sat, 26 Feb
+ 2022 08:16:56 +0000
+Received: from BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::b4b8:1371:6d16:1521]) by BY3PR18MB4737.namprd18.prod.outlook.com
+ ([fe80::b4b8:1371:6d16:1521%8]) with mapi id 15.20.5017.026; Sat, 26 Feb 2022
+ 08:16:56 +0000
+From:   Sunil Kovvuri Goutham <sgoutham@marvell.com>
+To:     Wan Jiabing <wanjiabing@vivo.com>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: Re: [RFC v2 0/4] vfio/hisilicon: add acc live migration driver
-Message-ID: <20220225204424.GA219866@nvidia.com>
-References: <20220211174933.GQ4160@nvidia.com>
- <34ac016b-000f-d6d6-acf1-f39ca1ca9c54@oracle.com>
- <20220212000117.GS4160@nvidia.com>
- <8338fe24-04ab-130a-1324-ab8f8e14816d@oracle.com>
- <20220214140649.GC4160@nvidia.com>
- <6198d35c-f810-cab1-8b43-2f817de2c1ea@oracle.com>
- <20220215162133.GV4160@nvidia.com>
- <7db79281-e72a-29f8-7192-07b739a63897@oracle.com>
- <20220223010303.GK10061@nvidia.com>
- <e4dba6f8-7f5b-e0d5-8ea8-5588459816f7@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4dba6f8-7f5b-e0d5-8ea8-5588459816f7@oracle.com>
-X-ClientProxiedBy: BL0PR02CA0120.namprd02.prod.outlook.com
- (2603:10b6:208:35::25) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "jiabing.wan@qq.com" <jiabing.wan@qq.com>
+Subject: RE: [EXT] [PATCH] hwrng: cavium: fix NULL but dereferenced coccicheck
+ error
+Thread-Topic: [EXT] [PATCH] hwrng: cavium: fix NULL but dereferenced
+ coccicheck error
+Thread-Index: AQHYKhJxrR9dzEQ5a0aiW/kWobxjsaylfcAA
+Date:   Sat, 26 Feb 2022 08:16:56 +0000
+Message-ID: <BY3PR18MB4737A9EEA5F59B9089A4306DC63F9@BY3PR18MB4737.namprd18.prod.outlook.com>
+References: <20220225063901.893274-1-wanjiabing@vivo.com>
+In-Reply-To: <20220225063901.893274-1-wanjiabing@vivo.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 435786a0-30a5-4c11-1371-08d9f9005ac6
+x-ms-traffictypediagnostic: SJ0PR18MB5137:EE_
+x-microsoft-antispam-prvs: <SJ0PR18MB51379305808D6DB186E49728C63F9@SJ0PR18MB5137.namprd18.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RhDWHkHy+s1T+T+YWFUzCSR2JWX8pO7zAEoaeOcxiRbw/oPlLLBpZtBMj4ojVRcZrGNI6bzw0dVSBQIZZXAx8IQGFt5KxjmKlsBsbqd9sp8yHOtNl1CpWbyDjaHVizSAW7K+VKMIL3QmMt1AUARfIgSZ27Wxo0PLaXhoLLJAPY7kNKco+MkGz0zmyC831cJTkH5p3hMiUAj3L/GfNBnvOllfK1/8KUKeVYvPNGjj+IO+5LxJAN19hHuqQt7NzpW53wK3nl4VLy3e7aKQZgfCIoiFZlE5gsEMpuLhFp+5w+/uIGkNjmkOTWG/BfDLVHX0oY2IVA1GV0l8OwxZNDBS4wxS9eLA2dttx42xjJ26rjRZILkMXSCK4gFheLRERCYsqpvwMzaWiKkwZMZzWQ8kSjXs1ihVgFeo9lwqhXpWvRJ9N8FUFlnA91n9moMRN+24SZEgj5hDKqqzrjtYnhtehA0jSlk5kHF1ltM+m7ZjnTJkO3+B3ttFwxZL4HU61y2ABBIbcGPuuBUdH5r9vjxFr2PFq0C+0dRgBckJvBjs46zBA4or81bnnh8U+YHGM6H81EpYXM9KT9vwvssByqWjWwV2XswnDRzGSyNP1CcrjCa+JHksqmZO57x45L1y4UtQ7rWgUMOEBSOOg0d6WIfDJ6fmwORcOWLDFkBLRRbOE5s1Vi4Fyz6db52YW4aMUZ1fQyvo+nJH9KHMSiBpUhoyEA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4737.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7696005)(6506007)(2906002)(86362001)(66946007)(38070700005)(83380400001)(186003)(52536014)(9686003)(71200400001)(122000001)(53546011)(5660300002)(8936002)(66476007)(76116006)(66446008)(26005)(33656002)(110136005)(55016003)(38100700002)(508600001)(64756008)(4326008)(8676002)(66556008)(316002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uSrCJXhIb5SAUd5GToBEB05C0hW0c1WgtBn+b6KQPvJuv+GWWprmsPBP4tYl?=
+ =?us-ascii?Q?1HvXFEmoRD5/cDQj8yScTpsuiZqmvQBfZxwKu75fP9v5OLDQ5KwEuxCC8adg?=
+ =?us-ascii?Q?se59N6Oa9h61sCgzrk+fiCmE40TAlrYFPTbaRJ4Ozwvr7aIpm9I5PQB3Y6uN?=
+ =?us-ascii?Q?pgp4ObhmYkFqeumcu6ooFnfL5vJ8ztMMlROm50v3EN+HQpibYfdjhLa92ov4?=
+ =?us-ascii?Q?qARHHc/UhFSCjTNJ948tA9wzAuUrV7YTBY0qwKwt0DHRPBwMfmXVBcuFBrma?=
+ =?us-ascii?Q?pumVQmUVJSVwT9WXfZI92afdxk1r48MCoDlS583QtOiKEzeX3igUChqbTwmW?=
+ =?us-ascii?Q?npRBHsUvy7sFVRbqF4L5i06cDJq0zPX3+jfEskXi+lthIP8CMPkqWAtns2gY?=
+ =?us-ascii?Q?TtAY4akdDup+69FgJ5orgc7dKoMo0BTgMMJgGFXWJc7h+lhA3SMs8o/QD26N?=
+ =?us-ascii?Q?gDDgbCcOtNoIqCA+2OymUjcEeqnUd/e67W7cd6FNEkLnVCDa2B2mdIo6OPkc?=
+ =?us-ascii?Q?qqiDmepUGyKQw/ZFWrPnf8zkpfSx1hBgSvS0NPmOz3pwayjjzgAwg7AIelQz?=
+ =?us-ascii?Q?IMbhAIE1YqYnXd3oHA5S2lP/TxtknXuOMkxSTsQZblwBoeCKgIkInsRj6v+f?=
+ =?us-ascii?Q?o52znhZiDW0aqDqmtdXG5i2Y81MACq6hM9bUq+ZABUCC6KHbAzhE9zPyvI1b?=
+ =?us-ascii?Q?lxj9Ul+RB+j72yoH0UuZemDeMS6bb8sXKvBpby/vEt1b0HmpY7FXhLEwlzY2?=
+ =?us-ascii?Q?yuGvTPmMENvVMbBN6Llh9v8ujJb4QiKEHGLLwfzSB9GfcymlZ9pFEooftQz+?=
+ =?us-ascii?Q?zblv/ZWb+fIBdfYpy3pouX+4BJb8Mivpo8kA3dbYuC/E9ThZDNz1jwxcm62H?=
+ =?us-ascii?Q?DTD9wCYeLW2zs+OUMgoqgyoi0DEt4csb1AVeQnRXwMn26zZDiNLhBTub9rUV?=
+ =?us-ascii?Q?iM9DGESB5dS6xnwZAkXtJaakMjGkLszOWBGZucro3UUl/BKmvfYCu3vIocKq?=
+ =?us-ascii?Q?2SwxiTsshHpNny6BpJEg70a1uJ4869Jgrju02utKEKEp6zCNPiI2W9VQKp7H?=
+ =?us-ascii?Q?ABf/grQfft3P0H123RL37r6qiuxlhsNn2yDfrXBiVT0BmQH3gpOFz0Lpyk9N?=
+ =?us-ascii?Q?0XsJxpZid0qJ+Qwp0hVo4n8EeJNWG/W7oOioQPEih0zukwrTAQCaQWPCOIrv?=
+ =?us-ascii?Q?VJ33QhEaXejAaZCvjcQNTg57yjq+ivXkLoeyOC38kd8jvA/iQ9DhBSCJCzlG?=
+ =?us-ascii?Q?kw0L7kaZqQNNELrdIQQPqtPNR2aCWmFY6wAzJfQplUtESsp6DiLKbba4NSTp?=
+ =?us-ascii?Q?nyzxiihRSSH+1wS2TB5DJ/t2BXNkW7+KKXVbmKKfKuoTuxhb2VcuFuX0nLRg?=
+ =?us-ascii?Q?6uXZLSalsHSdFMoDLY3+C2aZSRAJ1fwxYfHJm2BDfDMGyUKNlHj2jfvkaMxL?=
+ =?us-ascii?Q?ofLf02ACbG+f0n71qNptWnlyOy0phQglqSPf1vrzkNWfA6D8LFe0nXiN7N9r?=
+ =?us-ascii?Q?1DgUziq8xiwnmlSLEQXGfF4ZYBKaqKy4SbaaXxyEsJvjJGYLwzl84lA5civs?=
+ =?us-ascii?Q?fALG08MJNdq9IbDGdDhZbpl4A1/sOZgbERFyio2mTKi11cgg3+Bk+/tGVTi3?=
+ =?us-ascii?Q?/SQ/7OzDCJT17xWHl4pFM+Q=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a970486b-195b-4a0a-0913-08d9f89f9c38
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4026:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB40260A7231BD7E9D83AEEDAFC23E9@DM6PR12MB4026.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XGs10FAas4UZYzN0rVxkXg8J5pYkTRJR2uf9n6yuPHeM4rtGRRC0dyJGh/ENDtUybDsTo27+cFtHccQxqkeTWpc7osfzHWGaj/rE6caWcSnhaT/M1UWVi04g+p4PRZkh5nbCON9TNVir8iv9oZaPXvI/gZvGs2vJJrthNsGg/Kf9KTQDS5ftvPfhcGyPsMRQUGZtfu4hFYWK7ge6uMuDOknQchVwgTzKcaDH3IGTcbDAk1v2a7dgAZ24dqO1cJDAnmF5stJRyIIaPwrFfLARX+sMMQNTcOP/oPvxmny+mrYCI6pl7kiVY8uGnbqCNONK9BOD3noEiE2gTc3yMXP/iN2Ju6cygbioCjcqat/d67kLjzWnMMwR0yuclgDnG4ObUdYb74gU67Ayo3haHhPcSsZiWfgHjFxUohYOE9+D3D+PknxqsHbxdPoGxScz4CBvDlfy/DjA7ZmNFE5+kvD84hZashstxSkCDMKtS4bf//XCcPbanvEgQZXM8ZtUHBC/95zErcvueTKVZ1Lyn8q/h5j+vlQFZutK8xVmXb/xtgjcn16CTtOaMzNAuZI1Jaoq3pJWIFreeHgki5EfXFBQMaAvZFYbjen4wbXfCAesIKnB1iEItOR7bpmu7ixssxXONKVlswdNo6b9KzGA94+d6J2DfzXdJN3NgYcQR8hZWIMDckDQIxSatJyunK7cN2qM
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66946007)(66476007)(86362001)(66556008)(8676002)(36756003)(4326008)(2906002)(316002)(83380400001)(2616005)(38100700002)(6916009)(33656002)(54906003)(1076003)(186003)(26005)(6512007)(8936002)(7416002)(5660300002)(53546011)(6506007)(6486002)(508600001)(27376004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?POiM7fIwavhfqNESiES5gEt+PQmHtQbbsnzO8PXjfEXe5/R+ALHKXWoPH6Kk?=
- =?us-ascii?Q?HP1pR4KTyB9kASY6/7JvUKEEMnLNycNESzFMhNnRI+xteueKweHL94utpOvj?=
- =?us-ascii?Q?JJAxsM4yMXQbjQY2zhpKbDbexPwBvuby4wUep//JZPkH72E24EhL6zVCn+sC?=
- =?us-ascii?Q?fq3vyR4iLaoJ9bm1GeCkAKjUJ93VqaIIk1EIGgxxYUqYcXd1jA41B2KApUck?=
- =?us-ascii?Q?lfuo+78ASDkAjj19LWMJ4XEHxXJOat51dwKMmJUGhrzafW2SW0ZsuH4ZOHEE?=
- =?us-ascii?Q?16pROBmyn7GWIdH3rJOX4aEEGCJ25YM+aCl5LGqi29x6RHu1DODx/eUgjv/u?=
- =?us-ascii?Q?Vwqt0hyNyW+sW1C5JQ2Rk2FfoG57LSgRFj/todvR8A6zrFysLOkafZ9m4x/g?=
- =?us-ascii?Q?fs6WB0yD/NRkpGZDyJ/ysrMCMb3AGeoK6+VohREUSueaxzdeds8aNjUZQIMH?=
- =?us-ascii?Q?AyimlGVucu7A5LSDZBxc76bc69OhK2n4QimS5iZbp3HZY0vB2S3Vem0UHyZa?=
- =?us-ascii?Q?Tbs/m+zEw8eddIa6pqecSKZ1DidJib5qB1vO3ih/QBJ4Pgju/YWRLUlxJaVP?=
- =?us-ascii?Q?cmcmjiW2j1ZcVR29PTJR1WKsCeE5OQRaS/nt4PmoRJKXFtT597h8kIiBso59?=
- =?us-ascii?Q?81mpZcTaFu4PcZKYCRJHw6wxCi9jo7BFkXXiUIm+2MkWOnhsa7dhtC5DtgpN?=
- =?us-ascii?Q?uBhHSlcPkDdWM06KOuo9v5OOkyfYQHq1wsbnsEkg1RPVaiyXZUqqO54HFboh?=
- =?us-ascii?Q?xcEIk1oiv2ADf83d4kbhRqiMy3U5TmhjdNGMJRg6l1R276MjsI1Cq6VRim0q?=
- =?us-ascii?Q?p6qxrbP4aUQOR6jxSuYO4dXFQSCvNoyt8w2Ew0FKlGncQq9rsBOai4AUDKuO?=
- =?us-ascii?Q?VxiyG93+PTqcsLE/YiswU4+vUNEmJTU7Jn96BsEhKr8LYVEWrgai9ehO+2ig?=
- =?us-ascii?Q?IF4BBSbFNOoT4cSqSTv6Ajob5z2kT0jevZqJL62wKm8GwWaXxEMc3tPJwcqr?=
- =?us-ascii?Q?jcgR+qmy5P2or1ufLVVMghOyWOSLIKx+FFbKiI9FD9pVFCyu7EfoSyBQJSff?=
- =?us-ascii?Q?Wsz+C6K/g9q36KIPIrBRefOLoCmSRSSX11tWTihzlKNqMDCEvd0KX/vJS282?=
- =?us-ascii?Q?x5JBKBUdmJBvfN/+GSOMrKaL/PODukgHrqSQ3NchGgmCAnywxMmZf8D0Laq7?=
- =?us-ascii?Q?Yq9OFYcn4resNytWE/NAA1V75H3I7fVAgDkD7y/dth46x0bloNzyON37Qwyp?=
- =?us-ascii?Q?j+MNjg0vWVu4IYm5LJqaeMASRMPmZ+MiarvJCEVKksvNK4TGefVh2+lTlrHF?=
- =?us-ascii?Q?jnRCZBNiX4+n14eTrRLJLaUcD6hiFp7lQ1QhHSEVMwiZDQSimcPftSIAxaUn?=
- =?us-ascii?Q?MlAkUJtV/G7SY/hzly/ecWaz3oSK89QSDDLkm7tIcf0XqJaHK6ME9DcNiFBR?=
- =?us-ascii?Q?4mxQxZSRngJYg+emHeXk7zV106zCf2kZHdXDWKmxmQzDVV8ZwGTOv/wZh6q3?=
- =?us-ascii?Q?JF2SqKJYDtL/IbDVJTWkIrBovK6lBhsUZBmZd8O/EqpgtXZgb0S5kWNAEWkn?=
- =?us-ascii?Q?eU8BjHHUu3CJHzfCHi4=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a970486b-195b-4a0a-0913-08d9f89f9c38
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2022 20:44:25.5604
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4737.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 435786a0-30a5-4c11-1371-08d9f9005ac6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2022 08:16:56.7257
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1y3Mj9xSOKlXhFJgMFzfrydBX/KCzUQap6MlxDlnnAfEiohE5J6HgqfBgwlUjauw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4026
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /en/Gz9Q/Ctn/1fO5O6efgAr8z52olsvRcxLR18438utsWRUTIU6gOyPUPalGMr6KKKUteSGWuTb2qbnBHnWJw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR18MB5137
+X-Proofpoint-ORIG-GUID: FJvmj8dRLQ_w3mfYM-f5KqVqlAvKlBtK
+X-Proofpoint-GUID: FJvmj8dRLQ_w3mfYM-f5KqVqlAvKlBtK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-02-25_11,2022-02-25_01,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 07:18:37PM +0000, Joao Martins wrote:
-> On 2/23/22 01:03, Jason Gunthorpe wrote:
-> > On Tue, Feb 22, 2022 at 11:55:55AM +0000, Joao Martins wrote:
-> >>>> If by conclusion you mean the whole thing to be merged, how can the work be
-> >>>> broken up to pieces if we busy-waiting on the new subsystem? Or maybe you meant
-> >>>> in terms of direction...
-> >>>
-> >>> I think go ahead and build it on top of iommufd, start working out the
-> >>> API details, etc. I think once the direction is concluded the new APIs
-> >>> will go forward.
-> >>>
-> >> /me nods, will do. Looking at your repository it is looking good.
-> > 
-> > I would like to come with some plan for dirty tracking on iommufd and
-> > combine that with a plan for dirty tracking inside the new migration
-> > drivers.
-> > 
-> I had a few things going on my end over the past weeks, albeit it is
-> getting a bit better now and I will be coming back to this topic. I hope/want
-> to give you a more concrete update/feedback over the coming week or two wrt
-> to dirty-tracking+iommufd+amd.
-> 
-> So far, I am not particularly concerned that this will affect overall iommufd
-> design. The main thing is really lookups to get vendor iopte, upon on what might
-> be a iommu_sync_dirty_bitmap(domain, iova, size) API. For toggling
-> the tracking,
 
-I'm not very keen on these multiplexer interfaces. I think you should
-just add a new ops to the new iommu_domain_ops 'set_dirty_tracking'
-'read_dirty_bits'
 
-NULL op means not supported.
+> -----Original Message-----
+> From: Wan Jiabing <wanjiabing@vivo.com>
+> Sent: Friday, February 25, 2022 12:09 PM
+> To: Matt Mackall <mpm@selenic.com>; Herbert Xu
+> <herbert@gondor.apana.org.au>; Sunil Kovvuri Goutham
+> <sgoutham@marvell.com>; Wan Jiabing <wanjiabing@vivo.com>; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> Cc: jiabing.wan@qq.com
+> Subject: [EXT] [PATCH] hwrng: cavium: fix NULL but dereferenced coccichec=
+k
+> error
+>=20
+> External Email
+>=20
+> ----------------------------------------------------------------------
+> Fix following coccicheck warning:
+> ./drivers/char/hw_random/cavium-rng-vf.c:182:17-20: ERROR:
+> pdev is NULL but dereferenced.
+>=20
+> Signed-off-by: Wan Jiabing <wanjiabing@vivo.com>
+> ---
+>  drivers/char/hw_random/cavium-rng-vf.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/char/hw_random/cavium-rng-vf.c
+> b/drivers/char/hw_random/cavium-rng-vf.c
+> index 6f66919652bf..7c55f4cf4a8b 100644
+> --- a/drivers/char/hw_random/cavium-rng-vf.c
+> +++ b/drivers/char/hw_random/cavium-rng-vf.c
+> @@ -179,7 +179,7 @@ static int cavium_map_pf_regs(struct cavium_rng
+> *rng)
+>  	pdev =3D pci_get_device(PCI_VENDOR_ID_CAVIUM,
+>  			      PCI_DEVID_CAVIUM_RNG_PF, NULL);
+>  	if (!pdev) {
+> -		dev_err(&pdev->dev, "Cannot find RNG PF device\n");
+> +		pr_err("Cannot find RNG PF device\n");
+>  		return -EIO;
+>  	}
+>=20
+> --
 
-IMHO we don't need a kapi wrapper if only iommufd is going to call the
-op.
+Thanks for the fix.
+Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
 
-> I'll be simplifying the interface in the other type1 series I had and making it
-> a simple iommu_set_feature(domain, flag, value) behind an ioctl for iommufd that can
-> enable/disable over a domain. Perhaps same trick could be expanded to other
-> features to have a bit more control on what userspace is allowed to use. I think
-> this just needs to set/clear a feature bit in the domain, for VFIO or userspace
-> to have full control during the different stages of migration of dirty tracking.
-> In all of the IOMMU implementations/manuals I read it means setting a protection
-> domain descriptor flag: AMD is a 2-bit field in the DTE, on Intel likewise but on
-> the PASID table only for scalable-mode PTEs, on SMMUv3.2 there's an equivalent
-> (albeit past work had also it always-on).
-> 
-> Provided the iommufd does /separately/ more finer granularity on what we can
-> do with page tables. Thus the VMM can demote/promote the ioptes to a lower page size
-> at will as separate operations, before and after migration respectivally. That logic
-> would probably be better to be in separate iommufd ioctls(), as that it's going to be
-> expensive.
 
-This all sounds right to me
-
-Questions I have:
- - Do we need ranges for some reason? You mentioned ARM SMMU wants
-   ranges? how/what/why?
-
- - What about the unmap and read dirty without races operation that
-   vfio has?
-
-> >> I, too, have been wondering what that is going to look like -- and how do we
-> >> convey the setup of dirty tracking versus the steering of it.
-> > 
-> > What I suggested was to just split them.
-> > 
-> > Some ioctl toward IOMMUFD will turn on the system iommu tracker - this
-> > would be on a per-domain basis, not on the ioas.
-> > 
-> > Some ioctl toward the vfio device will turn on the device's tracker.
-> > 
-> In the activation/fetching-data of either trackers I see some things in common in
-> terms of UAPI with the difference that whether a device or a list of devices are passed on
-> as an argument of exiting dirty-track vfio ioctls(). (At least that's how I am reading
-> your suggestion)
-
-I was thinking a VFIO_DEVICE ioctl located on the device FD
-implemented in the end VFIO driver (like mlx5_vfio). No lists..
-
-As you say the driver should just take in the request to set dirty
-tracking and take core of it somehow. There is no value the core VFIO
-code can add here.
-
-> Albeit perhaps the main difference is going to be that one needs to
-> setup with hardware interface with the device tracker and how we
-> carry the regions of memory that want to be tracked i.e. GPA/IOVA
-> ranges that the device should track. The tracking-GPA space is not
-> linear GPA space sadly. But at the same point perhaps the internal
-> VFIO API between core-VFIO and vendor-VFIO is just reading the @dma
-> ranges we mapped.
-
-Yes, this is a point that needs some answering. One option is to pass
-in the tracking range list from userspace. Another is to query it in
-the driver from the currently mapped areas in IOAS.
-
-I know devices have limitations here in terms of how many/how big the
-ranges can be, and devices probably can't track dynamic changes.
-
-> In IOMMU this is sort of cheap and 'stateless', but on the setup of the
-> device tracker might mean giving all the IOVA ranges to the PF (once?).
-> Perhaps leaving to the vendor driver to pick when to register the IOVA space to
-> be tracked, or perhaps when you turn on the device's tracker. But on all cases,
-> the driver needs some form of awareness of and convey that to the PF for
-> tracking purposes.
-
-Yes, this is right
- 
-> Yeap. The high cost is scanning vendor-iommu ioptes and marshaling to a bitmap,
-> following by a smaller cost copying back to userspace (which KVM does too, when it's using
-> a bitmap, same as VFIO today). Maybe could be optimized to either avoid the copy
-> (gup as you mentioned earlier in the thread), or just copying based on the input bitmap
-> (from PF) number of leading zeroes within some threshold.
-
-What I would probably strive for is an API that deliberately OR's in
-the dirty bits. So GUP and kmap a 4k page then call the driver to 'or
-in your dirty data', then do the next page. etc. That is 134M of IOVA
-per chunk which seems OK.
-
-> > This makes qemu more complicated because it has to decide what
-> > trackers to turn on, but that is also the point because we do want
-> > userspace to be able to decide.
-> > 
-> If the interface wants extending to pass a device or an array of devices (if I understood
-> you correctly), it would free/simplify VFIO from having to concatenate potentially
-> different devices bitmaps into one. Albeit would require optimizing the marshalling a bit
-> more to avoid performing too much copying.
-
-Yes. Currently VFIO maintains its own bitmap so it also saves that
-memory by keeping the dirty bits stored in the IOPTEs until read out.
- 
-> > The other idea that has some possible interest is to allow the
-> > trackers to dump their dirty bits into the existing kvm tracker, then
-> > userspace just does a single kvm centric dirty pass.
-> 
-> That would probably limit certain more modern options of ring based dirty tracking,
-> as that kvm dirty bitmap is mutually exclusive with kvm dirty ring. Or at least,
-> would require KVM to always use a bitmap during migration/dirty-rate-estimation with
-> the presence of vfio/vdpa devices. It's a nice idea, though. It would require making
-> core-iommu aware of bitmap as external storage for tracking (that is not iommufd as
-> it's a module).
-
-Yes, I don't know enough about kvm to say if that is a great idea or
-not. The fact the CPUs seem to be going to logging instead of bitmaps
-suggests it isn't. I don't think DMA devices can work effectively with
-logging..
-
-Jason
