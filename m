@@ -2,162 +2,270 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03509C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Feb 2022 10:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB34C433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Feb 2022 10:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiB0KEd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Feb 2022 05:04:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56252 "EHLO
+        id S229634AbiB0KNT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Feb 2022 05:13:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiB0KEc (ORCPT
+        with ESMTP id S229884AbiB0KNS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Feb 2022 05:04:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9477C5C372;
-        Sun, 27 Feb 2022 02:03:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 088BF60A28;
-        Sun, 27 Feb 2022 10:03:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8C83C340E9;
-        Sun, 27 Feb 2022 10:03:54 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SWbE859G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1645956233;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0y6/b4jJfIe6Yc+9ImHaOFk+3EWN1XclfmHMTP1s7ZQ=;
-        b=SWbE859GIbNh8OyLOAmI2smrNAXi/flka98GtIxl51yXAH/dFse9jhZaq095fXTUft8Zd/
-        9KBvfJ1fCbX8Lzebi70QyZDTPfgDSdfuegIZXLsWYbXypz81UnIrvF89rctgS7ehf+Ywr1
-        7EafA1UDBFEqli6XQn8JNOKk0fgQKyY=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b1b97871 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 27 Feb 2022 10:03:52 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2d310db3812so77870457b3.3;
-        Sun, 27 Feb 2022 02:03:52 -0800 (PST)
-X-Gm-Message-State: AOAM532MNMwsdEKzxtXaBLfXWsvqamwWF+GjTU/JC+wTFgnrScFdQnkO
-        IcbkBn4+M3lNKresXYrGPRA7lggt8Ju+yzFVSqw=
-X-Google-Smtp-Source: ABdhPJx41XAu9RouMczPScnz+HcpQjZNqDXsMjF3Oc86TV0YopIgOJfZjbzZY9ZwssTUAKVtbtUed0VoGotlPMFhWxs=
-X-Received: by 2002:a81:8984:0:b0:2db:6b04:be0c with SMTP id
- z126-20020a818984000000b002db6b04be0cmr2276143ywf.2.1645956231622; Sun, 27
- Feb 2022 02:03:51 -0800 (PST)
+        Sun, 27 Feb 2022 05:13:18 -0500
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D971322BE5
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Feb 2022 02:12:38 -0800 (PST)
+Received: by mail-yb1-xb2a.google.com with SMTP id d21so14693514yba.11
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Feb 2022 02:12:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=YN5gXSHoby1JhWgy0jxqxZICsBW2QIk/PtIVlJI1hvU=;
+        b=rJnEcVUeF28k2edHMPFZC2EO8rxyxAxJYv49OYC1Ro+QhIzCUCBWZvIjt/xAu38CrO
+         fUMimmPDcvBQXsPngPaD6M5BUJcffKi8fusU5M3E404hq/cy4BCAXiK43kfsrDS8nGK6
+         81WBGST8T4ArZ6pSl4KiiLi2dE3H38OOTzbVHrPKvpPgpZik//msTjTjm0R2tuNm8tws
+         d8GCEzznR/2/0UqGVlIOoUpIAB/9/Pc1mDLIx4YWkr7mIssffrO/EoLMCvfm5vYaKwJe
+         vXpO3lC9aU4XSkZMRu2an9E7BlaGmaRd51AuItWIeHXpToME8mkEa4h0Yeo9zq8kIARy
+         jrNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=YN5gXSHoby1JhWgy0jxqxZICsBW2QIk/PtIVlJI1hvU=;
+        b=WdoJewcYQmQuSnDCUzIcgJ+fqbgYA2woPrTdbiUQ3cjhBW0TGyQW5kI6EkFBdqx4tB
+         wjyTQdUOvTj0RUG7mElgLA9YJ1FQEyeL8RMDDcYn6xrCe0RQyojrKrN+bunM7z9mE/jS
+         FfD/DbnGHlYsyT9hZ7RlXQSJlkf1uvgxV0oZvo+wYReZJ3z3T3AlBxE3KcND8sWQrXUq
+         DNeatBG4JkDsGOktQQ0i7Q3HWyo2btmCZapyLzoylRl3yTA600LatkbanaD0hUE8/t1A
+         3Gq/7FHh0WT/gl9bDRy9Tih4QdaaT0+iabt574Q6mF8Do8jTC3Xf384TXv0Mcnxk4Et3
+         ohSA==
+X-Gm-Message-State: AOAM531M8IV3N7G1dWaCQGexGpSiMDDuvDvOZfCkvtrlDj/wUc/TGmzW
+        sdEe+gv3iR8L9m2F6XPlvnLT3ImuJGG37ASCF+lZGQ==
+X-Google-Smtp-Source: ABdhPJwlaLq9aI2Vm0ffDhMefpXJ3KAId9EfQSy0et+XHJjaU0jx09HPqwTfoypR/5Y1+2RIZZqaK5VyWbfRnYo5icA=
+X-Received: by 2002:a25:ba04:0:b0:623:ed7a:701d with SMTP id
+ t4-20020a25ba04000000b00623ed7a701dmr13888483ybg.209.1645956757868; Sun, 27
+ Feb 2022 02:12:37 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:7110:71a8:b0:167:24f9:2d40 with HTTP; Sun, 27 Feb 2022
- 02:03:50 -0800 (PST)
-In-Reply-To: <CAMj1kXGRjdjbedQTU8ab+Q4jJPnN7nxc8_4QNiG3R7JE=zk-wA@mail.gmail.com>
-References: <20220226220639.1173594-1-Jason@zx2c4.com> <20220226220639.1173594-3-Jason@zx2c4.com>
- <CAMj1kXGRjdjbedQTU8ab+Q4jJPnN7nxc8_4QNiG3R7JE=zk-wA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sun, 27 Feb 2022 11:03:50 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rPd8Nu8Q0+R6B4Bz-caKpq5SSvLaiKdwXcyNHY8Ebfqg@mail.gmail.com>
-Message-ID: <CAHmME9rPd8Nu8Q0+R6B4Bz-caKpq5SSvLaiKdwXcyNHY8Ebfqg@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] ACPI: allow longer device IDs
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Len Brown <lenb@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
+References: <20220223080400.139367-1-gilad@benyossef.com> <Yhbjq3cVsMVUQLio@sol.localdomain>
+ <YhblA1qQ9XLb2nmO@sol.localdomain> <CAOtvUMfFhQABmmZe7EH-o=ULEChm_t=KY7ORBRgm94O=1MiuFw@mail.gmail.com>
+ <YhfWzLBq2A2nr5Ey@sol.localdomain>
+In-Reply-To: <YhfWzLBq2A2nr5Ey@sol.localdomain>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Sun, 27 Feb 2022 12:12:38 +0200
+Message-ID: <CAOtvUMcDcouMPmVUYpYEPdxPS+7_r9S_OXz1FR5tQJM6hWzRmA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: drbg: fix crypto api abuse
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        stable <stable@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/27/22, Ard Biesheuvel <ardb@kernel.org> wrote:
-> On Sat, 26 Feb 2022 at 23:07, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->>
->> From: Alexander Graf <graf@amazon.com>
->>
+On Thu, Feb 24, 2022 at 9:04 PM Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Please don't invent patch authors like that. Alex's patch that started
-> this discussion was completely different.
+> On Thu, Feb 24, 2022 at 09:07:47AM +0200, Gilad Ben-Yossef wrote:
+> > Hi Eric,
+> >
+> > On Thu, Feb 24, 2022 at 3:53 AM Eric Biggers <ebiggers@kernel.org> wrot=
+e:
+> > >
+> > > On Wed, Feb 23, 2022 at 05:47:25PM -0800, Eric Biggers wrote:
+> > > > On Wed, Feb 23, 2022 at 10:04:00AM +0200, Gilad Ben-Yossef wrote:
+> > > > > the drbg code was binding the same buffer to two different
+> > > > > scatter gather lists and submitting those as source and
+> > > > > destination to a crypto api operation, thus potentially
+> > > > > causing HW crypto drivers to perform overlapping DMA
+> > > > > mappings which are not aware it is the same buffer.
+> > > > >
+> > > > > This can have serious consequences of data corruption of
+> > > > > internal DRBG buffers and wrong RNG output.
+> > > > >
+> > > > > Fix this by reusing the same scatter gatther list for both
+> > > > > src and dst.
+> > > > >
+> > > > > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > > > > Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > > > > Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> > > > > Tested-on: r8a7795-salvator-x
+> > > > > Tested-on: xilinx-zc706
+> > > > > Fixes: 43490e8046b5d ("crypto: drbg - in-place cipher operation f=
+or CTR")
+> > > > > Cc: stable@vger.kernel.org
+> > > >
+> > > > Where is it documented and tested that the API doesn't allow this?
+> > > > I wasn't aware of this case; it sounds perfectly allowed to me.
+> > > > There might be a lot of other users who do this, not just drbg.c.
+> > > >
+> > >
+> > > Just quickly looking through the code I maintain, there is another pl=
+ace that
+> > > uses scatterlists like this: in fscrypt_crypt_block() in fs/crypto/cr=
+ypto.c, the
+> > > source and destination can be the same.  That's just the code I maint=
+ain; I'm
+> > > sure if you looked through the whole kernel you'd find a lot more.
+> > >
+> > > This sounds more like a driver bug, and a case we need to add self-te=
+sts for.
+> >
+> > Thank you for the feedback. That is a very good question. Indeed, I
+> > agree with you that in an ideal world the internal implementation detai=
+ls of DMA
+> > mapping would not pop up and interfere with higher level layer logic.
+> >
+> > Let me describe my point of view and I would be very happy to hear
+> > where I am wrong:
+> >
+> > The root cause underlying this is that, of course,  hardware crypto
+> > drivers map the sglists passed to them for DMA . Indeed, we require
+> > input to crypto
+> > API as sglists of DMAable buffers (and not, say stack allocated buffers=
+) because
+> > of this. So far I am just stating the obvious...
+> >
+> > Now, it looks like the DMA api, accessed via dma_map_sg(), does not
+> > like overlapping mappings. The bug report that triggered this patch (se=
+e:
+> > https://lkml.org/lkml/2022/2/20/240) was an oops message including this
+> > warning: "DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST,
+> > overlapping mappings aren't supported".
+> >
+> > The messages comes from add_dma_entry() in kernel.dma/debug.c,
+> > because, as stated in the commit message that added this check in May 2=
+021:
+> >
+> > "Since, overlapping mappings are not supported by the DMA API we
+> > should report an error if active_cacheline_insert returns -EEXIST."
+> > (https://lkml.org/lkml/2021/5/18/572)
+> >
+> > For now, I will take it at a given that this is proper and you do not
+> > consider this
+> > an issue in the DMA API.
+> >
+> > Now, driver writers are of course aware of this DMA API limitation and =
+thus we
+> > check if the src sglist is the same as the dst sglist and if so only ma=
+p once.
+> > However, the underlying assumption is that the buffers pointed by diffe=
+rent
+> > sglists do not overlap. We do not iterate over all the sglist trying
+> > to find overlaps.
+> >
+> > When I see "we", it is because this behavior is not unique to the ccree=
+ driver:
+> >
+> > Here is the same logic from a marvell cesa driver:
+> > https://elixir.bootlin.com/linux/latest/source/drivers/crypto/marvell/c=
+esa/cipher.c#L326
+> >
+> > Here it is again in the camm driver:
+> > https://elixir.bootlin.com/linux/latest/source/drivers/crypto/caam/caam=
+alg.c#L1619
+> >
+> > I do believe that at least all crypto HW drivers apply the same logic.
+> >
+> > Of course, we can ask that every HW crypto driver (and possibly any oth=
+er
+> > sglist using HW driver) will add logic that scans each sglist for
+> > overlapping buffers
+> > and if found use a more sophisticated mapping (easy for a simple
+> > sglist that has one buffer
+> > identical to some other sglist, maybe more complicated if the overlap
+> > is not identity).
+> > The storage drivers sort of already do on some level, although I think
+> > on a higher abstraction
+> > layer than the drivers themselves if I'm not mistaken, though for
+> > performance reasons.
+> > This is certainly DOABLE in the sense that it can be achieved.
+> >
+> > However, I don't think this is desirable. This will add non trivial
+> > code with non trivial runtime
+> > costs just to spot these cases. And we will need to fix ALL the hw
+> > drivers, because, to the best
+> > of my knowledge, none of them do this right now.
+> >
+> > The remaining option is to enforce the rule of no overlap between
+> > different sglists passed to the
+> > crypto API. This seems much easier to me. Indeed, the fix I sent is a
+> > one liner. I suspect all
+> > other fixes are similar and I assume (but did not check) that there
+> > are not many of those.
+> > Indeed, I think it is much easier to impose the required limitation at
+> > the API caller level.
+> > It is not pretty, nor "just", but easier, I think.
+> >
+> > I hope I've managed to explain my logic here.
+> >
+> > I will note that even if we decide to follow the other route, we do
+> > need to document and fix
+> > probably every hw crypto (and possibly others) driver out there,
+> > because AFAIK, no one is taking
+> > into account this possibility right now.
+>
+> Decryption in dm-crypt is another example where different scatterlists ar=
+e used
+> for in-place data.  (This is because like the fscrypt case, it has a help=
+er
+> function which handles both in-place and out-of-place data.)
+>
+> I don't think it is reasonable to "fix" all these users who are using the=
+ crypto
+> API in a perfectly reasonable way.
 
-Considering the investigative side ("why won't the _CID match?") and
-most the commit message were Alex's, and that those things comprise
-95% of what this patch is, and that the code change itself isn't even
-part of anything Turing complete, I most certainly did not feel
-comfortable stripping Alex's authorship. Instead I added myself as a
-co-author at the bottom. When in doubt, err on the side of crediting
-others. Alex also took a look at this patch, I am under the impression
-of at least, before it went out. Let's minimize the paperwork
-policing, okay? I think it'd make for a much more pleasant space here.
-If Alex objects he can just simply say, "hey feel free to remove me as
-author," and it'll be simple as that, and again doesn't involve your
-policing.
+I understand what you are saying, but assuming the issue is real, the
+alternative seems to be
+to fix all the HW crypto drivers by adding code that will impact their
+performance, so it's a matter
+of choosing the lesser of two evils.
 
 >
->> We create a list of ACPI "PNP" IDs which contains _HID, _CID, and CLS
->> entries of the respective devices. However, we squeeze them into struct
->> acpi_device_id, which only has 9 bytes space to store the identifier. It
->> originally had 16 bytes, but was changed to only have 9 in 6543becf26ff
->> ("mod/file2alias: make modalias generation safe for cross compiling"),
->> presumably on the theory that it would match the ACPI spec so it didn't
->> matter.
->>
->
-> Please clarify that this applies to the module metadata side of
-> things. The ACPI subsystem already captures and exposes _HIDs and
-> _CIDs that are longer than 8 characters, which is why simply
-> increasing the size of this field is sufficient to create modules that
-> can match devices that expose a CID that is longer than 8 bytes.
+> Are you saying that dm-crypt, fscrypt, drbg, etc. never worked with any h=
+ardware
+> crypto driver?  How could that possibly be the case?  Perhaps something c=
+hanged
+> in the DMA API recently that is causing this.  Or maybe it is specific to=
+ the
+> implementation of the DMA API on the platform you are testing.
 
-Good point for strengthening the argument here. Will do.
+That is a very good question. I became aware of this via a bug report
+of Corentin Labbe
+which saw the problem on a Salvator-X board. I have never seen the
+specific issue anywhere else.
 
->
->> Unfortunately, while most people adhere to the ACPI specs, Microsoft
->> decided that its VM Generation Counter device [1] should only be
->> identifiable by _CID with a value of "VM_Gen_Counter", which is longer
->> than 9 characters.
->>
->> To allow device drivers to match identifiers that exceed the 9 byte
->> limit, this simply ups the length to 16, just like it was before the
->> aforementioned commit. Empirical testing indicates that this
->> doesn't actually increase vmlinux size, because the ulong in the same
->> struct caused there to be 7 bytes of padding anyway.
->>
->
-> The padding situation only applies to struct acpi_device_id, whereas
-> ACPI_ID_LEN is used in other places as well. Also, the size of vmlinux
-> only covers statically allocated instances in the core kernel, and
-> most of the ACPI_ID_LEN uses are probably in drivers. So whether
-> vmlinux changes size or not is not that relevant.
+Having said that, the following is also true:
+- The code that checks for this condition was only added in 2021.
+- I am not sure why the DMA api prohibits aliased mappings, but I can
+guess, and if my guess is correct this situation will only happen on a
+platform that both: 1. uses a crypto HW accelerator driven by DMA and
+2. uses some form of IO MMU. I guess the combination might have been
+very rare in the past.
 
-I actually looked at every usage in the tree (there aren't that many)
-and couldn't find a single one where behavior changed, performance
-changed, or memory usage changed. I thought we looked together on IRC
-so I'm surprised to see you mention this, but maybe I misunderstood
-you. Anyway, I can't see the size increase impacting anything at all.
-If you see a case, this would be the time to mention that you see
-something. I didn't find anything though.
+I think the right thing to do right now is to verify that we indeed
+have a general issue and not something specific to one singular
+platform
+So the question becomes - do indeed the DMA api forbits aliased
+mappings and if so, under what conditions?
 
-> Patch 6543becf26ff was wrong to change ACPI_ID_LEN, because it failed
-> to take into account any other uses of ACPI_ID_LEN, and did not bother
-> to explain why the change was necessary in the context of what it was
-> trying to achieve.
+Any ideas on how to check this?
 
-I'm not sure there really were other usages back then. The commit
-message seems descriptive enough to me too. This was about cross
-compiling, so padding. But it certainly did seem to limit future
-drivers in an unintended way, as you wrote:
+Gilad
 
-> So, given that we need more than 8 characters to match drivers to
-> devices exposed by Hyper-V (or other VMMs adhering to the VMGENID
-> spec), I think this change is necessary and correct.
-
-Right, that's the idea.
 
 
 >
-> So, with the authorship/signoff corrected, and the commit log clarified,
->
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+> - Eric
 
-Thanks.
 
-Hopefully we'll hear from Rafael this week.
 
-Jason
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
