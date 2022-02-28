@@ -2,83 +2,271 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C13C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 15:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F173C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 17:37:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231765AbiB1PfP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 10:35:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59284 "EHLO
+        id S238299AbiB1Rie (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 12:38:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237571AbiB1PfM (ORCPT
+        with ESMTP id S238791AbiB1RiW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 10:35:12 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491B26929F;
-        Mon, 28 Feb 2022 07:34:33 -0800 (PST)
-Date:   Mon, 28 Feb 2022 16:34:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1646062470;
+        Mon, 28 Feb 2022 12:38:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63CA276E01
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 09:33:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646069624;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=O+xoOUH6g8lK/tuOxGXMpAp8oFerIC5THYjgTUh9eSE=;
-        b=cp8fkLsoI9zpERUE1MVkprCrx889MwLFPshEDhF/yLVgyphbV0HLI9liO8nY6SciQzvm0g
-        wBy1gsj1wA6QK0x7oqi6craqtJZbP2KGSYPspM82VWd25pmtpxq59AAcOgoQNqR5sfXYIr
-        152RTS7USKanxcMuF0vQYUNxOcM3BxL6iBIgUB3hmyKYFUOi4815pp2vU7bdHnfIXN05wh
-        mhnZds+Y2ZDkMrf7SfCMoVeBznsx96T92tEjEtCkZiwCwyifG6l4Z9TElC9OgZfUJnZGnI
-        bFCh180dEoXJ+UIfBL7QTnsrZQyKPt2vBo04uwFaclQi3OnAiFcqwSJEgIcMVg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1646062470;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=O+xoOUH6g8lK/tuOxGXMpAp8oFerIC5THYjgTUh9eSE=;
-        b=uQPp/hlY+wL3+TcNMu5CKrHI5XNeB++/oV1LgK3VkELpPyreik7i7SxC8/khrns1FZ0wo9
-        zolODMl6NHAEGeCQ==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v2] random: do crng pre-init loading in worker rather
- than irq
-Message-ID: <Yhzrhaa+V7S5/Gtk@linutronix.de>
-References: <CAHmME9pTfwbs9xUJy_jrdPcrhSyVixSXBM==9EuB8v7ufWe9Pw@mail.gmail.com>
- <20220224152937.12747-1-Jason@zx2c4.com>
- <YhzWE1NqYQFKeL5B@linutronix.de>
- <CAHmME9r7bRh+CeBh98UMVCFgmeMWHQ=r3b-8odgV0tR45hOTbw@mail.gmail.com>
- <YhzcTOIQx5EkujXq@linutronix.de>
- <Yhzl7hgV12an3dhR@zx2c4.com>
+        bh=EqPUjuDBqn5Lu6pDeJoTefOb/5PdohRN9v0ddUjXPvo=;
+        b=f3IwtuLYBs6Rs5PAjtfpa9eS6ip0Pbc98Tp7CXrqXJ9DZAvrIg2O8u5J1M9okEWA2PgA2w
+        CSgf4tE2RR47qI1EacQJad8IBSt7bYEtL/UiI+JwlQ9XZl4qTqs/Ep74uNzE6pbFLI1b3Y
+        e4vAmJ9rfvgxqfj3Zk+sGvueAbFVn24=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-461-nx7SOFkEPjC-n0JEq2POkQ-1; Mon, 28 Feb 2022 12:33:43 -0500
+X-MC-Unique: nx7SOFkEPjC-n0JEq2POkQ-1
+Received: by mail-oo1-f72.google.com with SMTP id z4-20020a4ad1a4000000b0031beb2043f7so8930657oor.20
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 09:33:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=EqPUjuDBqn5Lu6pDeJoTefOb/5PdohRN9v0ddUjXPvo=;
+        b=iR4VCTFTgT6DoDu5c2xoakTR0ROslS94wmdIsAu0e9kQD+0Ub1syKdvnayAjwDwKUc
+         cPgypY2qk7yX+LTRfqNaJW6cHFrtZCf5Xzvtgq6nLbn+4gBCAJr0miT5ENzBcZXRqBZ7
+         1m+e17LG4KJYLz3Dh9jpC2JV3SbBHonOPjbW5VddufJQsRPRkmZkVAVyV9ieZamEullH
+         HGQyPteP4GJZD6yGiteO+vlTgwTln4kJfCepS6pP3fZcw6KYNAwffWRAiKQlXL1BFQ+V
+         b5MzUJRMZgY0TAt3qlGPYuNJ9d/u+HpsiSOkQaBs8e/ghbEQA1TK09X+LHT6glSceT5q
+         KnFw==
+X-Gm-Message-State: AOAM531HZYqS7KhET5ATgDZcjdceGmowqlalh/VwagnfHJtuu5ce8jbM
+        KJZQKinS2ToCVNRFIh2EQYhOfw8NPU4OVJZXwQk6uN5o7jX9uMGFm90vbi6MDniDPVauj3RUGiz
+        cEXfVz6e6YH6qj8QrrTNnqjYI
+X-Received: by 2002:a9d:6445:0:b0:59a:ebae:155b with SMTP id m5-20020a9d6445000000b0059aebae155bmr9778557otl.270.1646069621990;
+        Mon, 28 Feb 2022 09:33:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyQPFJaAb0KvlwoTLjIGtuvXmo4QXpyccFci0Rpu++2G9KCLx2NXKpWsI0Q6uTyb2Aa6RRzxQ==
+X-Received: by 2002:a9d:6445:0:b0:59a:ebae:155b with SMTP id m5-20020a9d6445000000b0059aebae155bmr9778519otl.270.1646069621348;
+        Mon, 28 Feb 2022 09:33:41 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id l26-20020a05683004ba00b005af665739e0sm5256946otd.30.2022.02.28.09.33.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 09:33:40 -0800 (PST)
+Date:   Mon, 28 Feb 2022 10:33:38 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <jgg@nvidia.com>,
+        <cohuck@redhat.com>, <mgurtovoy@nvidia.com>, <yishaih@nvidia.com>,
+        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>, bhelgaas@google.com,
+        linux-pci@vger.kernel.org
+Subject: Re: [PATCH v6 03/10] hisi_acc_qm: Move PCI device IDs to common
+ header
+Message-ID: <20220228103338.76da0b3b.alex.williamson@redhat.com>
+In-Reply-To: <20220228090121.1903-4-shameerali.kolothum.thodi@huawei.com>
+References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
+        <20220228090121.1903-4-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yhzl7hgV12an3dhR@zx2c4.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-02-28 16:10:38 [+0100], Jason A. Donenfeld wrote:
-> Hi Sebastian,
-Hi Jason,
+[Cc+ Bjorn, linux-pci]
 
-> Ahh, I understand, okay. Yes, I'll change that first paragraph to
-> incorporate your wording, as:
+On Mon, 28 Feb 2022 09:01:14 +0000
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+
+> Move the PCI Device IDs of HiSilicon ACC devices to
+> a common header and use a uniform naming convention.
 > 
-> """
-> Taking spinlocks from IRQ context is generally problematic for
-> PREEMPT_RT. That is, in part, why we take trylocks instead. However, a
-> spin_try_lock() is also problematic since another spin_lock() invocation
-> can potentially PI-boost the wrong task, as the spin_try_lock() is
-> invoked from an IRQ-context, so the task on CPU (random task or idle) is
-> not the actual owner.
-> """
+> This will be useful when we introduce the vfio PCI
+> HiSilicon ACC live migration driver in subsequent patches.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 12 +++++-------
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 14 ++++++--------
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 11 ++++-------
+>  include/linux/pci_ids.h                   |  6 ++++++
+>  4 files changed, 21 insertions(+), 22 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index ebfab3e14499..ba4043447e53 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -68,8 +68,6 @@
+>  #define HPRE_REG_RD_INTVRL_US		10
+>  #define HPRE_REG_RD_TMOUT_US		1000
+>  #define HPRE_DBGFS_VAL_MAX_LEN		20
+> -#define HPRE_PCI_DEVICE_ID		0xa258
+> -#define HPRE_PCI_VF_DEVICE_ID		0xa259
+>  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
+>  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
+>  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
+> @@ -111,8 +109,8 @@
+>  static const char hpre_name[] = "hisi_hpre";
+>  static struct dentry *hpre_debugfs_root;
+>  static const struct pci_device_id hpre_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
+>  	{ 0, }
+>  };
+>  
+> @@ -242,7 +240,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+>  }
+>  
+>  static const struct kernel_param_ops hpre_pf_q_num_ops = {
+> @@ -921,7 +919,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
+>  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
+>  	hisi_qm_debug_init(qm);
+>  
+> -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
+>  		ret = hpre_ctrl_debug_init(qm);
+>  		if (ret)
+>  			goto failed_to_create;
+> @@ -958,7 +956,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HPRE_SQE_SIZE;
+>  	qm->dev_name = hpre_name;
+>  
+> -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 26d3ab1d308b..ab806fb481ac 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -20,8 +20,6 @@
+>  
+>  #define SEC_VF_NUM			63
+>  #define SEC_QUEUE_NUM_V1		4096
+> -#define SEC_PF_PCI_DEVICE_ID		0xa255
+> -#define SEC_VF_PCI_DEVICE_ID		0xa256
+>  
+>  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
+>  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
+> @@ -225,7 +223,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
+>  
+>  static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
+>  }
+>  
+>  static const struct kernel_param_ops sec_pf_q_num_ops = {
+> @@ -313,8 +311,8 @@ module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
+>  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static const struct pci_device_id sec_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
+> @@ -717,7 +715,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
+>  	regset->base = qm->io_base;
+>  	regset->dev = dev;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
+>  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
+> @@ -735,7 +733,7 @@ static int sec_debug_init(struct hisi_qm *qm)
+>  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+>  	int i;
+>  
+> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
+> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
+>  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
+>  			spin_lock_init(&sec->debug.files[i].lock);
+>  			sec->debug.files[i].index = i;
+> @@ -877,7 +875,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = SEC_SQE_SIZE;
+>  	qm->dev_name = sec_name;
+>  
+> -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = SEC_PF_DEF_Q_BASE;
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 678f8b58ec42..f4a517728385 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -15,9 +15,6 @@
+>  #include <linux/uacce.h>
+>  #include "zip.h"
+>  
+> -#define PCI_DEVICE_ID_ZIP_PF		0xa250
+> -#define PCI_DEVICE_ID_ZIP_VF		0xa251
+> -
+>  #define HZIP_QUEUE_NUM_V1		4096
+>  
+>  #define HZIP_CLOCK_GATE_CTRL		0x301004
+> @@ -246,7 +243,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
+>  
+>  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
+> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
+>  }
+>  
+>  static const struct kernel_param_ops pf_q_num_ops = {
+> @@ -268,8 +265,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
+>  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+>  
+>  static const struct pci_device_id hisi_zip_dev_ids[] = {
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
+> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
+>  	{ 0, }
+>  };
+>  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
+> @@ -838,7 +835,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+>  	qm->sqe_size = HZIP_SQE_SIZE;
+>  	qm->dev_name = hisi_zip_name;
+>  
+> -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
+> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
+>  			QM_HW_PF : QM_HW_VF;
+>  	if (qm->fun_type == QM_HW_PF) {
+>  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
+> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
+> index aad54c666407..6b98e0d91f0a 100644
+> --- a/include/linux/pci_ids.h
+> +++ b/include/linux/pci_ids.h
+> @@ -2529,6 +2529,12 @@
+>  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
+>  
+>  #define PCI_VENDOR_ID_HUAWEI		0x19e5
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
+> +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
+> +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
+> +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
+>  
+>  #define PCI_VENDOR_ID_NETRONOME		0x19ee
+>  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
 
-I didn't expect it that verbose but yes, full ACK from side.
-Thank you.
-
-> Jason
-
-Sebastian
