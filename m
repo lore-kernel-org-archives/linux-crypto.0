@@ -2,104 +2,119 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1989C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Feb 2022 23:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DA9C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 03:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbiB0X2E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Feb 2022 18:28:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
+        id S231841AbiB1DRT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 27 Feb 2022 22:17:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiB0X2D (ORCPT
+        with ESMTP id S231372AbiB1DRS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Feb 2022 18:28:03 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618F8638C;
-        Sun, 27 Feb 2022 15:27:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F39C4611CF;
-        Sun, 27 Feb 2022 23:27:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0601C340E9;
-        Sun, 27 Feb 2022 23:27:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="goL89XZS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646004441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cPJiLooKbNUohnU6yXN63L1h4yYqJ923mGb0t2sRAmM=;
-        b=goL89XZSsZPfaum9fcpaXArg1yGEVHqkD3gJbN6h+aFDXgFSk3FtmNY1XHGFlU+zie+ebw
-        fT4UAbs+ItDDw0QJuyMeed/Dghxx9UVojWm5f0rRImhNElq0sVfCIbyDdQBVbN+4oUuSwm
-        /NzJUKJdUYotOeOWxmz+2GkyXgatyeI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 011a27c7 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 27 Feb 2022 23:27:21 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id j12so17085495ybh.8;
-        Sun, 27 Feb 2022 15:27:21 -0800 (PST)
-X-Gm-Message-State: AOAM530u4qG1qaPgTNsEI8zmuELPSv8QaLeYFk3RqBgIWDTztXJuXTg7
-        eoLNjFbuBcp3KqBgpVWc01lH4257yLyiL3NoqvA=
-X-Google-Smtp-Source: ABdhPJzTL5Q+trTKPAkI1w13K2/b9LgEC7uevfTmCAsJfxl8vfz0K4RBpfa5PKF+e8kAToiRjhCjUiBMURVep4tNPNM=
-X-Received: by 2002:a25:238d:0:b0:619:3e19:b06b with SMTP id
- j135-20020a25238d000000b006193e19b06bmr16106668ybj.382.1646004440064; Sun, 27
- Feb 2022 15:27:20 -0800 (PST)
+        Sun, 27 Feb 2022 22:17:18 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE0174D9ED;
+        Sun, 27 Feb 2022 19:16:40 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id s25so15522231lji.5;
+        Sun, 27 Feb 2022 19:16:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zg0TIK6XMtGo2+14WVBQUgTNyr+m/JGQHLQZEW5xU2I=;
+        b=aHejDxFQsXsgx3XVZLEqq9TlixGkYqPrCIfPFbBd7mAZQ6VxBRYBe5q94HBazcyANR
+         dixNKatc8h1aM+HMbkO4gkwZZh4EkA94iLCQ0z1/0cwDA2QGds9TWdCQwDqxLD9xFe7w
+         eEcDVtLGXlthkIiBHe/kNtE/ddhIoTy9wyisvqsx51UFhkDo58OymdhFcAGTOMk7uLhn
+         ZVKE031sYhK30BqRg0FiFy37agwlXZVfv3BKZSWzGflQ405gucXgl0AdmaiH30p6WuEI
+         TqaVUUGncLpzXK9k1G6hLym5Zxp4H6aGpJ+p0jc6C1ShDisuTs+JDitkePqapLqINbRx
+         6EFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zg0TIK6XMtGo2+14WVBQUgTNyr+m/JGQHLQZEW5xU2I=;
+        b=B5UTqJse0+qDQ/Hs/we47CXVRZ6gGCzgYAZm/NaTcUA0aJuIRuvQ04S5vTDnwVV5IL
+         vLomZbKQ9zz8Qrr04jzF8DHIYtA4MSe/jZqYDYiJ8rSJAcKGQLasKU2rHJH5cua9D9Dt
+         ga8P/Gyt7A1lXIOsobGpzo/lTObeCO7t8c0bcTmIq3BAdeWC+CPr+ivpdksmjYjAu9JW
+         AdXyARJh3VC2rI2UZL6RJyhxNc1b5d7RgQLQyGCFZdegGGDgxlvlO0B6N3DDaINmjbuc
+         mO0hU1W1ezVLMImTesnCDUJQJXcSPJBfomhd6qNtO/Z5mMZv13ljPvHxlFaaYGOTfKtN
+         kr9Q==
+X-Gm-Message-State: AOAM530V5GIotRblpq7OP6OsjEWpFPsxzjbCJa6PvyrxjJCPtCh4uKin
+        KtnqKC1ESg0C+/8e6eq6SfLZEutFsf1s1Q==
+X-Google-Smtp-Source: ABdhPJzW1JTC8WiBx3ECVWXpvKbkrV24ahGPQaJZO/16cqVJvcaLnQHB591UnXukLQkV18W6teMTpQ==
+X-Received: by 2002:a2e:a810:0:b0:23d:7904:dac3 with SMTP id l16-20020a2ea810000000b0023d7904dac3mr12448195ljq.194.1646018198701;
+        Sun, 27 Feb 2022 19:16:38 -0800 (PST)
+Received: from TebraArch.. ([81.198.32.225])
+        by smtp.gmail.com with ESMTPSA id h15-20020a19700f000000b00443e2a42010sm783852lfc.56.2022.02.27.19.16.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Feb 2022 19:16:38 -0800 (PST)
+From:   =?UTF-8?q?D=C4=81vis=20Mos=C4=81ns?= <davispuh@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org,
+        =?UTF-8?q?D=C4=81vis=20Mos=C4=81ns?= <davispuh@gmail.com>
+Subject: [PATCH] ccp: ccp_dmaengine_unregister release dma channels
+Date:   Mon, 28 Feb 2022 05:15:45 +0200
+Message-Id: <20220228031545.11639-1-davispuh@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-References: <20220226220639.1173594-1-Jason@zx2c4.com> <20220226220639.1173594-3-Jason@zx2c4.com>
- <0c73d29e-e558-efb9-d0d7-c612b2bb7e90@amazon.com> <YhtyBHUyFysmZ9bC@zx2c4.com>
-In-Reply-To: <YhtyBHUyFysmZ9bC@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 28 Feb 2022 00:27:09 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pocD1CoZbnF7p4k0ws7-R0Vc9H4i5TRJ_MCX-d3AZhFw@mail.gmail.com>
-Message-ID: <CAHmME9pocD1CoZbnF7p4k0ws7-R0Vc9H4i5TRJ_MCX-d3AZhFw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/3] ACPI: allow longer device IDs
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Len Brown <lenb@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey again,
+ccp_dmaengine_register adds dma_chan->device_node to dma_dev->channels list
+but ccp_dmaengine_unregister didn't remove them.
+That can cause crashes in various dmaengine methods that tries to use dma_dev->channels
 
-On Sun, Feb 27, 2022 at 1:43 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi Alex,
->
-> On Sun, Feb 27, 2022 at 12:42:03PM +0100, Alexander Graf wrote:
-> > > To allow device drivers to match identifiers that exceed the 9 byte
-> > > limit, this simply ups the length to 16, just like it was before the
-> > > aforementioned commit. Empirical testing indicates that this
-> >
-> >
-> > This is only true for 64bit systems where padding automatically bloated
-> > to 9 byte array to 16. I still believe the patch is fine as it is, but
-> > there will be minor .rodata overhead on 32bit targets which you may want
-> > to quantify in the patch description.
->
-> Good point. So I just tried this out with a 32-bit i686 kernel and the
-> results are the same again for the size of vmlinux. I then ran `objdump
-> --headers` and looked at the size of the .rodata section, where it's
-> also the same. I'm not quite sure what to make of this, as it's not what
-> I was expecting, but I think I tested it right. So maybe we're lucky
-> here?
+Signed-off-by: Dāvis Mosāns <davispuh@gmail.com>
+---
+ drivers/crypto/ccp/ccp-dmaengine.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-I tried a little harder to get _some_ difference on 32-bit, and
-managed to get one by doing i386_defconfig and then switching off
-modules to make all M into Y, and then compared sizes:
+diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dmaengine.c
+index d718db224be42..7d4b4ad1db1f3 100644
+--- a/drivers/crypto/ccp/ccp-dmaengine.c
++++ b/drivers/crypto/ccp/ccp-dmaengine.c
+@@ -632,6 +632,20 @@ static int ccp_terminate_all(struct dma_chan *dma_chan)
+ 	return 0;
+ }
+ 
++static void ccp_dma_release(struct ccp_device *ccp)
++{
++	struct ccp_dma_chan *chan;
++	struct dma_chan *dma_chan;
++	unsigned int i;
++
++	for (i = 0; i < ccp->cmd_q_count; i++) {
++		chan = ccp->ccp_dma_chan + i;
++		dma_chan = &chan->dma_chan;
++		tasklet_kill(&chan->cleanup_tasklet);
++		list_del_rcu(&dma_chan->device_node);
++	}
++}
++
+ int ccp_dmaengine_register(struct ccp_device *ccp)
+ {
+ 	struct ccp_dma_chan *chan;
+@@ -736,6 +750,7 @@ int ccp_dmaengine_register(struct ccp_device *ccp)
+ 	return 0;
+ 
+ err_reg:
++	ccp_dma_release(ccp);
+ 	kmem_cache_destroy(ccp->dma_desc_cache);
+ 
+ err_cache:
+@@ -752,6 +767,7 @@ void ccp_dmaengine_unregister(struct ccp_device *ccp)
+ 		return;
+ 
+ 	dma_async_device_unregister(dma_dev);
++	ccp_dma_release(ccp);
+ 
+ 	kmem_cache_destroy(ccp->dma_desc_cache);
+ 	kmem_cache_destroy(ccp->dma_cmd_cache);
+-- 
+2.35.1
 
-vmlinux: 25590780 -> 25598972, so a 0.032% increase.
-bzImage: 8698944 -> 8699424, so a 0.0055% increase.
-
-So it does increase, ever so slightly, but a) on 32-bit, and b) a
-super, super tiny amount.
-
-In other words, I still think this patch is very much a-okay. But very
-eager to hear from Rafael on the approach.
-
-Jason
