@@ -2,64 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0976C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43DDFC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234198AbiB1JJo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:09:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35520 "EHLO
+        id S234262AbiB1JMW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:12:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233379AbiB1JJn (ORCPT
+        with ESMTP id S234260AbiB1JMV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:09:43 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C476E49CA9
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 01:09:04 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id u3so19114907ybh.5
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 01:09:04 -0800 (PST)
+        Mon, 28 Feb 2022 04:12:21 -0500
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D0F166AEE
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 01:11:43 -0800 (PST)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2d68d519a33so99886857b3.7
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 01:11:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=FiyRI5DHlb96l/+rmBXOae4F7ATJ/xLo/4ohoO57pkc=;
-        b=cdKByohAsWXJXwPllDc7pyrfXAVLilSsZKbLHuCjxbOyvB0D8A+9rZpwdn3Ok3JVdy
-         PMne06PyJIyLBNmyxaAAbL3PIWzSkzQ2rTLaihsWtB/oZZmnuOCpgC+R0EUohg9BUTX9
-         1Zx/pyDlo8vGUrXneQhecsXYiesuPwo6XRzNYQ3zTU2lVUuRukRyKQBbyKSX8ExV9iEJ
-         AAIy0Sz7kf+zKkLoXLKUA1pQm7UYHb49/LL+dNqz1DWEHFk60qIJC8M2GOK++nRL36qR
-         mBsHrQvFixzpSEB6IVw63u3qpS0j/IzueLYptj1un7eNwjT+GacOaCx3yOHEMIs/qXFG
-         i0Jw==
+        bh=Apq/HJBWO1/Vh/LXE1a0ZbONtRHS5rU8pD46HevklkY=;
+        b=SSQZkSmtXLj3U9XbRdtbqgiXRWjZTAmimsylCosT7ruNa0h07yrpE0rUg+/kqY2bTJ
+         e08yiRvm90Hyhkk8loX50L2LGZGhEWdRjq71eow0U/pQBeE0hjf/B+x/zokolDIu/Vl9
+         xbc55VLyk5nyueKCI5RmhPe7dModxOw1HRIVzL82LMKmKT0ZF2uFdUA7DhyLnAGZHOVU
+         Iu6jxbQF2qgsuGNz+XFFHu6uuB+oIV5I2xLp0K6lzEG5G4dU4xoRrKS/6k1QcKVNMhY9
+         ixIZThviS3xBQOWMeEiLAeQNnTcTwwGD189NvxoPFTXFTaoM4wnGfNW9jp9mLDsqliIl
+         XKcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=FiyRI5DHlb96l/+rmBXOae4F7ATJ/xLo/4ohoO57pkc=;
-        b=cChp30GX26bViMCXmM6MIwAUJ8e1hn5LIXb0vVonkDXlcjUHXyj4UMDQ6X9hHV+yW7
-         dIC+JaPJ3n+hmEuH5QMvfX+z432ckLoxjHotxqgZFTodKuQJphdugcnxIuIbUylP3K42
-         xnx3CheGeiDYddQH86zBJEEYGk0nnlo9FHcj4xnu+CY1MH9Ge6HEbAHCMTIIDOOPPfdV
-         UMXwWGBaZSzkvfM+3UkR2NYW1FRgUB45/IuksNi6CIpagXo5Xs233Zmis59uu/VRPBcg
-         kgWrSF3ADmY+rZ62bvy54eAHDNB6b3kNFjjtoSbEo9/jFxlJOyqM8UK3SMdj+YgGwq+B
-         RKoA==
-X-Gm-Message-State: AOAM5332Djg8tHcFgyrxt8iil+qcWjDuZcJbGRmAgWy0Aj//rRKb2VwN
-        ljCFMbdwPdQw3dlmYG7MuU3u5y4WHin+TEkCEVyQ4SyPk3A=
-X-Google-Smtp-Source: ABdhPJxi5xP1NReREnqaUApMZPGYKwblM7pKFPpW8ybZdTK+TGL3WH1MfRBRieseBU2tUW8obscPn0cMtmzcquy83zg=
-X-Received: by 2002:a25:5047:0:b0:61a:ea8e:cc6d with SMTP id
- e68-20020a255047000000b0061aea8ecc6dmr17403314ybb.65.1646039343950; Mon, 28
- Feb 2022 01:09:03 -0800 (PST)
+        bh=Apq/HJBWO1/Vh/LXE1a0ZbONtRHS5rU8pD46HevklkY=;
+        b=AnfouJYD7D054a8OWPjlplxwpt7ygOMcmK3aZ+0EThTkprc7hMjSug4cxq/Jtktp6K
+         Fze1GhKORwhKDRidiOB+HCpOiSStoBX64rCdQIi7uedsiAlll5SniT9r4XDWdn7pFSDx
+         5oOB5AoC1Imt/IJErcOpPNGTOppJH/WGxbz0th0YEuIBJxp/r51UlL3EyDEzt42tqb63
+         RbGV3+t3DvsyaDB6PxTeqBkJVEab54+JYtY146SSGf/EyGx2aryq20kiu8nSCD8Seysj
+         fE/Q5/7nxphaTxkkiW6PQRvspT0MEnPsrf6TL71c2FsXsEaM7bN3KjvdvkqqOQthvGJJ
+         rBCg==
+X-Gm-Message-State: AOAM530II25evF+EHz293bqrX80Pau3oAHNpFUr0DOuXe8qJz38wiOTD
+        0+bX4s0AOLQLkfquzlWBhJ0fl5HLS3mZkf/Wj/Akja2VWXiamA==
+X-Google-Smtp-Source: ABdhPJxW8K/XXK18kmFDDAPAouIU00zNNJ1SeFh1/hxBOkjMYFqYyqh5qY/E10KeDKMk4Wv/SDETpxSKB0+Lbmus4fA=
+X-Received: by 2002:a81:47c2:0:b0:2d6:5e1a:46c2 with SMTP id
+ u185-20020a8147c2000000b002d65e1a46c2mr2443759ywa.66.1646039502216; Mon, 28
+ Feb 2022 01:11:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20220223080400.139367-1-gilad@benyossef.com> <Yhbjq3cVsMVUQLio@sol.localdomain>
- <YhblA1qQ9XLb2nmO@sol.localdomain> <CAOtvUMfFhQABmmZe7EH-o=ULEChm_t=KY7ORBRgm94O=1MiuFw@mail.gmail.com>
- <YhfWzLBq2A2nr5Ey@sol.localdomain> <CAOtvUMcDcouMPmVUYpYEPdxPS+7_r9S_OXz1FR5tQJM6hWzRmA@mail.gmail.com>
-In-Reply-To: <CAOtvUMcDcouMPmVUYpYEPdxPS+7_r9S_OXz1FR5tQJM6hWzRmA@mail.gmail.com>
+References: <YgOQBNIdf0UnSH+M@Red> <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
+ <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
+ <YhKV55t90HWm6bhv@Red> <CAOtvUMdRU4wnRCXsC+U5XBDp+b+u8w7W7JCUKW2+ohuJz3PVhQ@mail.gmail.com>
+ <YhOcEQEjIKBrbMIZ@Red> <CAOtvUMfN8U4+eG-TEVW4bSE6kOzuOSsJE4dOYGXYuWQKNzv7wQ@mail.gmail.com>
+In-Reply-To: <CAOtvUMfN8U4+eG-TEVW4bSE6kOzuOSsJE4dOYGXYuWQKNzv7wQ@mail.gmail.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 28 Feb 2022 11:09:05 +0200
-Message-ID: <CAOtvUMdX2N9XcBV81rSKz=orZ-3XHWW8ChXnuKAeiAsQy5P_Vg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: drbg: fix crypto api abuse
-To:     Eric Biggers <ebiggers@kernel.org>
+Date:   Mon, 28 Feb 2022 11:11:43 +0200
+Message-ID: <CAOtvUMeRb=j=NDrc88x8aB-3=D1mxZ_-aA1d4FfvJmj7Jrbi4w@mail.gmail.com>
+Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
+ authsize =0
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        stable <stable@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -70,29 +68,119 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi,
 
-On Sun, Feb 27, 2022 at 12:12 PM Gilad Ben-Yossef <gilad@benyossef.com> wro=
-te:
-...
-
-
+On Tue, Feb 22, 2022 at 9:39 AM Gilad Ben-Yossef <gilad@benyossef.com> wrot=
+e:
 >
-> I think the right thing to do right now is to verify that we indeed
-> have a general issue and not something specific to one singular
-> platform
-> So the question becomes - do indeed the DMA api forbits aliased
-> mappings and if so, under what conditions?
+> On Mon, Feb 21, 2022 at 4:05 PM Corentin Labbe
+> <clabbe.montjoie@gmail.com> wrote:
+> >
+> > Le Mon, Feb 21, 2022 at 12:08:12PM +0200, Gilad Ben-Yossef a =C3=A9crit=
+ :
+> > > Hi,
+> > >
+> > > On Sun, Feb 20, 2022 at 9:26 PM Corentin Labbe
+> > > <clabbe.montjoie@gmail.com> wrote:
+> > > >
+> > > ...
+> > > >
+> > > > Hello
+> > > >
+> > > > While testing your patch for this problem, I saw another warning (u=
+nrelated with your patch):
+> > >
+> > > Dear Corentin, you are a treasure trove of bug reports. I love it.
+> > > Thank you! :-)
+> > >
+> > > > [   34.061953] ------------[ cut here ]------------
+> ...
+> > >
+> > > So, this is an interesting one.
+> > > What I *think* is happening is that the drbg implementation is
+> > > actually doing something naughty: it is passing the same exact memory
+> > > buffer, both as source and destination to an encryption operation to
+> > > the crypto skcipher API, BUT via two different scatter gather lists.
+> > >
+> > > I'm not sure but I believe this is not a legitimate use of the API,
+> > > but before we even go into this, let's see if this little fix helps a=
+t
+> > > all and this is indeed the root cause.
+> > >
+> > > Can you test this small change for me, please?
+> > >
+> > > diff --git a/crypto/drbg.c b/crypto/drbg.c
+> > > index 177983b6ae38..13824fd27627 100644
+> > > --- a/crypto/drbg.c
+> > > +++ b/crypto/drbg.c
+> > > @@ -1851,7 +1851,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state=
+ *drbg,
+> > >                 /* Use scratchpad for in-place operation */
+> > >                 inlen =3D scratchpad_use;
+> > >                 memset(drbg->outscratchpad, 0, scratchpad_use);
+> > > -               sg_set_buf(sg_in, drbg->outscratchpad, scratchpad_use=
+);
+> > > +               sg_in =3D sg_out;
+> > >         }
+> > >
+> > >         while (outlen) {
+> > >
+> >
+> > No more stacktrace !
 >
-> Any ideas on how to check this?
+> Thank you. I will send a patch later today.
 
-OK, I've looked into this further and I think I was wrong.
-The DMA api doesn't like overlapping writable mappings, but it seems
-an overlapping read-only and writable mapping are fine.
-If so I can indeed resolve this in the driver code by better
-specifying DMA direction. Let me give this a go and let's drop this
-patch in the meantime.
+> --
+> Gilad Ben-Yossef
+> Chief Coffee Drinker
+>
+> values of =CE=B2 will give rise to dom!
 
-Thank you and sorry for the noise.
+OK, it seems my direction of fixing the caller site has not been taken
+kindly by the power that be.
+Let's try something else.
 
+Can you please drop the previous patch and test this one instead?
+
+diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c
+b/drivers/crypto/ccree/cc_buffer_mgr.c
+index 11e0278c8631..398843040566 100644
+--- a/drivers/crypto/ccree/cc_buffer_mgr.c
++++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+@@ -377,6 +377,7 @@ int cc_map_cipher_request(struct cc_drvdata
+*drvdata, void *ctx,
+        u32 dummy =3D 0;
+        int rc =3D 0;
+        u32 mapped_nents =3D 0;
++       int src_direction =3D (src !=3D dst ? DMA_TO_DEVICE : DMA_BIDIRECTI=
+ONAL);
+
+        req_ctx->dma_buf_type =3D CC_DMA_BUF_DLLI;
+        mlli_params->curr_pool =3D NULL;
+@@ -399,7 +400,7 @@ int cc_map_cipher_request(struct cc_drvdata
+*drvdata, void *ctx,
+        }
+
+        /* Map the src SGL */
+-       rc =3D cc_map_sg(dev, src, nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_=
+nents,
++       rc =3D cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nent=
+s,
+                       LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
+        if (rc)
+                goto cipher_exit;
+@@ -416,7 +417,7 @@ int cc_map_cipher_request(struct cc_drvdata
+*drvdata, void *ctx,
+                }
+        } else {
+                /* Map the dst sg */
+-               rc =3D cc_map_sg(dev, dst, nbytes, DMA_BIDIRECTIONAL,
++               rc =3D cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
+                               &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENT=
+RIES,
+                               &dummy, &mapped_nents);
+                if (rc)
+
+
+Thanks!
 Gilad
 
 --=20
