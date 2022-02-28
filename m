@@ -2,109 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB84C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D6B6C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:13:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229776AbiB1VDg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 16:03:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54954 "EHLO
+        id S230034AbiB1VNq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 16:13:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbiB1VDf (ORCPT
+        with ESMTP id S229632AbiB1VNq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 16:03:35 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF062B240;
-        Mon, 28 Feb 2022 13:02:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2483A60FB8;
-        Mon, 28 Feb 2022 21:02:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EF2FC340F4;
-        Mon, 28 Feb 2022 21:02:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646082175;
-        bh=VZBP/n5mMCzFS82LeGWNgCwBAvcayN+a60oyEM3zI10=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZScFoXS0ZyN/43hbUGvbiPcAUOzmZi17c9MzKnstPv2k/5GjsIHX81yt+BHSK80kM
-         0JA1hog7ZgzwN78vY0+opHr9tplO8MdbIHddXTwg8r3oq9rrC5Gqd1duEefR1L2N52
-         nqc9zz8HUkP+8Id/LVYArq6uf6X0eB2pwUjH0NHBmF0ovunS4yeo/15IfmWkqhJHsZ
-         1XBMBx/1tVHBjIecW//SL/vgZJEy1alnHfPHZkQsr+aaUOgIknivBYKesIY9aqg2oP
-         Y5toxly29HkwNkVkjoF3AKoatR5ns2tG1BmAqJlwmYTwjYogBFS6J02A23hsLtgiiH
-         GJTtG/cEeLl/Q==
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-2dbd97f9bfcso5236557b3.9;
-        Mon, 28 Feb 2022 13:02:55 -0800 (PST)
-X-Gm-Message-State: AOAM5311jtiVwFC/SG+P4K0O8avlNKBUGkVs56Z+dZYWvZLEZ8yKVA6Z
-        aO5JPbOtDh8syW7XpTWSyXCBFFQSjpnC4MfL66Q=
-X-Google-Smtp-Source: ABdhPJz7wyf8c9zkEn3wAh3JUOqNxojQRB0GSNbuSANIiNR9gRel4B4G58jsBjOLyh+1wcqefAkOWU/x48bTM8mBMHw=
-X-Received: by 2002:a81:84d5:0:b0:2d1:e85:bf04 with SMTP id
- u204-20020a8184d5000000b002d10e85bf04mr22378323ywf.465.1646082174505; Mon, 28
- Feb 2022 13:02:54 -0800 (PST)
+        Mon, 28 Feb 2022 16:13:46 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99AE1369C5;
+        Mon, 28 Feb 2022 13:13:06 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id a8so27433004ejc.8;
+        Mon, 28 Feb 2022 13:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=YElPQ90MzgZ5t7UF5cUawb5iNATJs1V0tAe3h48q5Ic=;
+        b=VzumKY+IFEanIBWPVoBF+6QRo3fWqzDABeMzHukdxfpGhm7Qs4NeK3EDQjUwkRoPqM
+         QyVYV0wukpwoIQmkDwYjT2Wefm5j+vdtSrwPwmBhZRQHv1NdI1hiCYHDDWwL+AXPCNTq
+         6vEb2uH0ArT8ijMlFJe88RWa9APKVj11p4fxch0339KBmiDjqJdarsyYW8sgqiJKD1S+
+         FT44Nb4ORn+Uz1Hoa0+yvqRoX+JkgxvXzg1Mn75bgqSfXFTzGarBm8yqqnm8IkbME+Il
+         4psqYEpN3TLomDnWapAEnXwRwvxSMJpBIFJ2/c07Vjq567JmvS/DuzHDuRoPTk8K01Zx
+         xXFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=YElPQ90MzgZ5t7UF5cUawb5iNATJs1V0tAe3h48q5Ic=;
+        b=udt3roYVWR4aytIvaRI7XEFW27nmU8eic051L/rVCYodqEOyL58gqm7DmE4xpJVfg+
+         bdBHN6SEBGj7AVjeQDKBA0VMG6NkDtIgDRxdlTeH6zbSi6ANGVbyu1Qy/VBc7YF853cZ
+         ifPb1sWR3PulqRBIyxuId6r3Oj7236JDXXDnFth7TaMR9gQFfvi7i86p9H6QERvrGSmH
+         VMeC/ETK3iG0am8eDnl30N81lwS2b8dGnW8IlN6uDJvcXtcyqwLPkNMTccDIlB23OwDD
+         HCNBcBoiYnVqyLxhFpa//SNNjOkcHKSR31ptqjJm4+KoJlyBpVsiuajhjoPHypSYi7oC
+         rzOw==
+X-Gm-Message-State: AOAM533GUIAnbTUUpjVoFe7ZygVuTuXrR/BsSNsbKfIXik2bvPQ16hjr
+        heVxxotRcTjCoaGJWPvUpbs=
+X-Google-Smtp-Source: ABdhPJyoLznZAjc0gfKpSzx7Xn/iaaSpoiD3vjUv9rQSy6YLP//XFpDw0mqFQU2V9Q94Y/3Ca9VsJw==
+X-Received: by 2002:a17:906:6b87:b0:6ce:537b:53bb with SMTP id l7-20020a1709066b8700b006ce537b53bbmr16409243ejr.51.1646082785050;
+        Mon, 28 Feb 2022 13:13:05 -0800 (PST)
+Received: from [192.168.2.27] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
+        by smtp.gmail.com with ESMTPSA id g11-20020a170906538b00b006ae38eb0561sm4677545ejo.195.2022.02.28.13.13.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Feb 2022 13:13:04 -0800 (PST)
+Message-ID: <91fe9f87-54d7-4140-4d1a-eac8e2081a7c@gmail.com>
+Date:   Mon, 28 Feb 2022 22:13:02 +0100
 MIME-Version: 1.0
-References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
- <20220228183355.9090-1-Jason@zx2c4.com> <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
-In-Reply-To: <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 28 Feb 2022 22:02:43 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
-Message-ID: <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
-Subject: Re: [PATCH 2/3 v6] ACPI: allow longer device IDs
-To:     Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Len Brown <lenb@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [dm-devel] Intel QAT on A2SDi-8C-HLN4F causes massive data
+ corruption with dm-crypt + xfs
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Dave Chinner <david@fromorbit.com>,
+        Linux-Kernal <linux-kernel@vger.kernel.org>, qat-linux@intel.com,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
+ <20220219210354.GF59715@dread.disaster.area>
+ <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
+ <YhN76/ONC9qgIKQc@silpixa00400314>
+ <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+ <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+In-Reply-To: <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 28 Feb 2022 at 21:47, Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
->
-> On Mon, Feb 28, 2022 at 9:28 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > From: Alexander Graf <graf@amazon.com>
-> >
-> > We create a list of ACPI "PNP" IDs which contains _HID, _CID, and CLS
-> > entries of the respective devices. However, when making structs for
-> > matching, we squeeze those IDs into acpi_device_id, which only has 9
-> > bytes space to store the identifier. The subsystem actually captures the
-> > full length of the IDs, and the modalias has the full length, but this
-> > struct we use for matching is limited. It originally had 16 bytes, but
-> > was changed to only have 9 in 6543becf26ff ("mod/file2alias: make
-> > modalias generation safe for cross compiling"), presumably on the theory
-> > that it would match the ACPI spec so it didn't matter.
->
-> > Unfortunately, while most people adhere to the ACPI specs, Microsoft
-> > decided that its VM Generation Counter device [1] should only be
-> > identifiable by _CID with a value of "VM_Gen_Counter", which is longer
-> > than 9 characters.
->
-> Then why do we not see the ECR from somebody to update the spec or to
-> fix MS' abuse of it?
-> I believe _this_ should be the prerequisite to the proposed change.
->
+On 28/02/2022 20:25, Linus Torvalds wrote:
+> On Mon, Feb 28, 2022 at 12:18 AM Kyle Sanderson <kyle.leet@gmail.com> wrote:
+>>
+>> Makes sense - this kernel driver has been destroying users for many
+>> years. I'm disappointed that this critical bricking failure isn't
+>> searchable for others.
+> 
+> It does sound like we should just disable that driver entirely until
+> it is fixed.
+> 
+> Or at least the configuration that can cause problems, if there is
+> some particular sub-case. Although from a cursory glance and the
+> noises made in this thread, it looks like it's all of the 'qat_aeads'
+> cases (since that uses qat_alg_aead_enc() which can return -EAGAIN),
+> which effectively means that all of the QAT stuff.
+> 
+> So presumably CRYPTO_DEV_QAT should just be marked as
+> 
+>          depends on BROKEN || COMPILE_TEST
+> 
+> or similar?
 
-What exactly are you suggesting here? That the contributor of this
-patch joins the UEFI forum as an individual adopter in order to get
-the ACPI spec updated before we can advance with this patch? Or that
-he works with Microsoft to get them to refrain from violating it?
+Yes, please! Or at least disable it in stable for now.
 
-I don't think that is reasonable or realistic. The kernel is already
-riddled with UEFI and ACPI quirks that are only there because some
-teams at MS don't take the ACPI spec too literally (which is why they
-have their own AML compiler, for one), and PC vendors only care about
-the Windows sticker, so they don't care about the ACPI spec either.
+During the last years, we had several reports of problems with this driver
+for cryptsetup/LUKS (dm-crypt with qat driver; here it is skcipher, not aead, though).
 
-So I don't think this is the right time to get pedantic about this.
-Our ACPI subsystem already deals with CIDs that are longer than 8
-characters (which are btw permitted by the ACPI spec for bus topology
-related metadata), the only thing being changed here is the ability to
-actually match against such identifiers.
+The problem with the misunderstanding of the crypto API queue has been known
+to authors for some time, at least since 2020
+see https://lore.kernel.org/dm-devel/20200601160418.171851200@debian-a64.vm/
+and it is apparently not fixed yet.
+
+Thanks you,
+Milan
