@@ -2,158 +2,263 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D6AC4321E
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 12:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF3CC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 12:14:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236148AbiB1MHm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 07:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57926 "EHLO
+        id S234945AbiB1MOk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 07:14:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiB1MHl (ORCPT
+        with ESMTP id S231341AbiB1MOj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 07:07:41 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0329366634;
-        Mon, 28 Feb 2022 04:07:02 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id vz16so24389202ejb.0;
-        Mon, 28 Feb 2022 04:07:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=mpq6EOSgaJN9TDHyutZ1vk7Ts/tQX7VWZG2tuQLEVnE=;
-        b=P6Qm9QV+tKwfj02RvG70Y6RM578oBE7xk1h9xLRDl0Phoeno/cOg2X5jGG320h7a80
-         51RqQzzCwbkind1CCh/PsD+YJ2xLuw3nTu9DY+Zris5SVOV1FI+8DsU52Jy5KlVydcNu
-         G0XxThLJxiMxymk0pHTiYIUYA6Uj3RhvFK2FvOkFF3qdetV9R5zYggWzNl+ojj1OXKZf
-         MkNjwD1Q29EHNb+3aSEEQSq9r3HlkkV49QyRIpbAEX1BAYg/I0l3VyVoctyp9PVfLMdm
-         3mwm8jDaSc7WWe042oo4mIB/QOs4nHzHS6+i8MWcrLd/SBvvylJKxoeMQwrp3MTt3slq
-         2wxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=mpq6EOSgaJN9TDHyutZ1vk7Ts/tQX7VWZG2tuQLEVnE=;
-        b=24WWfqqnsD/NG+QE4WdFpI8Hjrqa5CE2WU/U8ebn0q1mJAegySmQ/ZWnYEZZ8D71w2
-         k+tVwfwWIjHS1b9ZBn5zNVXe8ukYyQM7UpogSuFXiMXdthhAiWrzTvuFgTpZNIrr7nbu
-         TLeFEtLJa7QjePoVd8+i5agQ3eyZt/cGtxKSY896LNVu+n7mo0pMFf6sIJuLBg5ZadY7
-         leHLoMK/fqR74aYKgCQ/sHc7aGch5nlaYvLouPr+fo8llkAc72YG/FjB0e2Ab3ccX5XE
-         MVAstfebV4dpbQkfVCAy2rT319DRYfRzM25fn+f+0rD7b68x5KvyloysC6ogE54LTVo6
-         XFDw==
-X-Gm-Message-State: AOAM532LmVJI0aV4Gyf3rxAPyMs86oCeWnUhGH+HHNnO7IG4of6kuNTI
-        Sm4XOqSCnAQ6qQN519a5CTg=
-X-Google-Smtp-Source: ABdhPJw3Wj1NaKaNlFGnSPXqnbDgppea1F4wGZoXZbWDfwDJgXssQhrPLcI1GM9ROPIg4DuPtt07Tg==
-X-Received: by 2002:a17:907:248a:b0:6ce:e03c:e1df with SMTP id zg10-20020a170907248a00b006cee03ce1dfmr14689906ejb.258.1646050020495;
-        Mon, 28 Feb 2022 04:07:00 -0800 (PST)
-Received: from smtpclient.apple ([2a02:8109:9d80:3f6c:957a:1d13:c949:d1f3])
-        by smtp.gmail.com with ESMTPSA id d23-20020a1709067a1700b006d0ebe4af89sm4282959ejo.20.2022.02.28.04.06.58
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Feb 2022 04:07:00 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-In-Reply-To: <Yhyv42ONIxTj04mg@kroah.com>
-Date:   Mon, 28 Feb 2022 13:06:57 +0100
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergman <arnd@arndb.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-sgx@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dmaengine@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-usb@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-        bcm-kernel-feedback-list@broadcom.com, linux-tegra@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, kvm@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        v9fs-developer@lists.sourceforge.net,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <79FCD5F4-0EBA-4E3F-8B3F-D450BBA10367@gmail.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com> <Yhyv42ONIxTj04mg@kroah.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Mon, 28 Feb 2022 07:14:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ED126110;
+        Mon, 28 Feb 2022 04:14:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D0A246111F;
+        Mon, 28 Feb 2022 12:14:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20BECC340F0;
+        Mon, 28 Feb 2022 12:13:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646050440;
+        bh=Km/ETwktcu0d0SJMnDCeHyQj69xN1Lz9uFFUMONXypA=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=n1v5K07n8jOhxyq57xn7BQrEorbQ8yrMw4Ug0tI2DGAYQcMUtfIPciRT+HTKaJmkf
+         dkKdBiPqKImphpI6YQxHf+cNb9TuS10OItQ/rTK8pj4W3/0KiXw9O9uIF9ywMDcM0c
+         m9bEv7m68SSFVeCSQgAn+5MP0xwENwl1Ly2urKNly6PEGvK920nBreaupHLk/kw7wO
+         VaNiktvdcmMnISxVHTTvnrtnYRP5TxzoUgc/xT33OTxlBiWD1vVxaWfaJ0R7vrjZ1k
+         IvqHjKyO77AOORScaclklg9AN4faCvi26+53xWVbku2UCd9TbwZOEVL/n/je90ezi0
+         wJAxsphQpIXCw==
+Message-ID: <79b912b5e9e16f446753270f7b9463fee95ebac7.camel@kernel.org>
+Subject: Re: [PATCH v5 4/5] crypto: caam - add in-kernel interface for blob
+ generator
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
+        David Gstir <david@sigma-star.at>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Tim Harvey <tharvey@gateworks.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Date:   Mon, 28 Feb 2022 13:14:41 +0100
+In-Reply-To: <a8cb99e0-fe01-2234-9839-fea28ca09f6d@pengutronix.de>
+References: <20220222195819.2313913-1-a.fatoum@pengutronix.de>
+         <20220222195819.2313913-5-a.fatoum@pengutronix.de>
+         <YhZVmBy3/nWbqf+/@iki.fi>
+         <a8cb99e0-fe01-2234-9839-fea28ca09f6d@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.42.4 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, 2022-02-23 at 17:20 +0100, Ahmad Fatoum wrote:
+> On 23.02.22 16:41, Jarkko Sakkinen wrote:
+> > On Tue, Feb 22, 2022 at 08:58:18PM +0100, Ahmad Fatoum wrote:
+> > > The NXP Cryptographic Acceleration and Assurance Module (CAAM)
+> > > can be used to protect user-defined data across system reboot:
+> > >=20
+> > > =C2=A0 - When the system is fused and boots into secure state, the ma=
+ster
+> > > =C2=A0=C2=A0=C2=A0 key is a unique never-disclosed device-specific ke=
+y
+> > > =C2=A0 - random key is encrypted by key derived from master key
+> > > =C2=A0 - data is encrypted using the random key
+> > > =C2=A0 - encrypted data and its encrypted random key are stored along=
+side
+> > > =C2=A0 - This blob can now be safely stored in non-volatile memory
+> > >=20
+> > > On next power-on:
+> > > =C2=A0 - blob is loaded into CAAM
+> > > =C2=A0 - CAAM writes decrypted data either into memory or key registe=
+r
+> > >=20
+> > > Add functions to realize encrypting and decrypting into memory alongs=
+ide
+> > > the CAAM driver.
+> > >=20
+> > > They will be used in a later commit as a source for the trusted key
+> > > seal/unseal mechanism.
+> > >=20
+> > > Reviewed-by: David Gstir <david@sigma-star.at>
+> > > Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> > > Tested-By: Tim Harvey <tharvey@gateworks.com>
+> > > Tested-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> > > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> > > Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> > > ---
+> > > To: "Horia Geant=C4=83" <horia.geanta@nxp.com>
+> > > To: Aymen Sghaier <aymen.sghaier@nxp.com>
+> > > To: Herbert Xu <herbert@gondor.apana.org.au>
+> > > To: "David S. Miller" <davem@davemloft.net>
+> > > Cc: James Bottomley <jejb@linux.ibm.com>
+> > > Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> > > Cc: Mimi Zohar <zohar@linux.ibm.com>
+> > > Cc: David Howells <dhowells@redhat.com>
+> > > Cc: James Morris <jmorris@namei.org>
+> > > Cc: Eric Biggers <ebiggers@kernel.org>
+> > > Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> > > Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> > > Cc: David Gstir <david@sigma-star.at>
+> > > Cc: Richard Weinberger <richard@nod.at>
+> > > Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> > > Cc: Sumit Garg <sumit.garg@linaro.org>
+> > > Cc: Tim Harvey <tharvey@gateworks.com>
+> > > Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> > > Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+> > > Cc: linux-integrity@vger.kernel.org
+> > > Cc: keyrings@vger.kernel.org
+> > > Cc: linux-crypto@vger.kernel.org
+> > > Cc: linux-kernel@vger.kernel.org
+> > > Cc: linux-security-module@vger.kernel.org
+> > > ---
+> > > =C2=A0drivers/crypto/caam/Kconfig=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 3 +
+> > > =C2=A0drivers/crypto/caam/Makefile=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
+> > > =C2=A0drivers/crypto/caam/blob_gen.c | 230 ++++++++++++++++++++++++++=
++++++++
+> > > =C2=A0include/soc/fsl/caam-blob.h=C2=A0=C2=A0=C2=A0 |=C2=A0 56 ++++++=
+++
+> > > =C2=A04 files changed, 290 insertions(+)
+> > > =C2=A0create mode 100644 drivers/crypto/caam/blob_gen.c
+> > > =C2=A0create mode 100644 include/soc/fsl/caam-blob.h
+> > >=20
+> > > diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfi=
+g
+> > > index 84ea7cba5ee5..ea9f8b1ae981 100644
+> > > --- a/drivers/crypto/caam/Kconfig
+> > > +++ b/drivers/crypto/caam/Kconfig
+> > > @@ -151,6 +151,9 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Selecting this=
+ will register the SEC4 hardware rng to
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the hw_random =
+API for supplying the kernel entropy pool.
+> > > =C2=A0
+> > > +config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool
+> > > +
+> > > =C2=A0endif # CRYPTO_DEV_FSL_CAAM_JR
+> > > =C2=A0
+> > > =C2=A0endif # CRYPTO_DEV_FSL_CAAM
+> > > diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makef=
+ile
+> > > index 3570286eb9ce..25f7ae5a4642 100644
+> > > --- a/drivers/crypto/caam/Makefile
+> > > +++ b/drivers/crypto/caam/Makefile
+> > > @@ -21,6 +21,7 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI)=
+ +=3D caamalg_qi.o
+> > > =C2=A0caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) +=3D caamhash.o
+> > > =C2=A0caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) +=3D caamrng.o
+> > > =C2=A0caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) +=3D caampkc.o pk=
+c_desc.o
+> > > +caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) +=3D blob_gen.o
+> > > =C2=A0
+> > > =C2=A0caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) +=3D qi.o
+> > > =C2=A0ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
+> > > diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blo=
+b_gen.c
+> > > new file mode 100644
+> > > index 000000000000..513d3f90e438
+> > > --- /dev/null
+> > > +++ b/drivers/crypto/caam/blob_gen.c
+> > > @@ -0,0 +1,230 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright (C) 2015 Pengutronix, Steffen Trumtrar <kernel@pengutro=
+nix.de>
+> > > + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.=
+de>
+> > > + */
+> > > +
+> > > +#include <linux/device.h>
+> > > +#include <soc/fsl/caam-blob.h>
+> > > +
+> > > +#include "compat.h"
+> > > +#include "desc_constr.h"
+> > > +#include "desc.h"
+> > > +#include "error.h"
+> > > +#include "intern.h"
+> > > +#include "jr.h"
+> > > +#include "regs.h"
+> > > +
+> > > +struct caam_blob_priv {
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct device jrdev;
+> > > +};
+> > > +
+> > > +struct caam_blob_job_result {
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int err;
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct completion completi=
+on;
+> > > +};
+> > > +
+> > > +static void caam_blob_job_done(struct device *dev, u32 *desc, u32 er=
+r, void *context)
+> > > +{
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct caam_blob_job_resul=
+t *res =3D context;
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ecode =3D 0;
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dev_dbg(dev, "%s %d: err 0=
+x%x\n", __func__, __LINE__, err);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (err)
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0ecode =3D caam_jr_strstatus(dev, err);
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0res->err =3D ecode;
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Upon completion, desc p=
+oints to a buffer containing a CAAM job
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * descriptor which encaps=
+ulates data into an externally-storable
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * blob.
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0complete(&res->completion)=
+;
+> > > +}
+> > > +
+> > > +static u32 *caam_blob_alloc_desc(size_t keymod_len)
+> > > +{
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size_t len;
+> > > +
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* header + (key mod immed=
+iate) + 2x pointers + op */
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0len =3D 4 + (4 + ALIGN(key=
+mod_len, 4)) + 2*(4 + 4 + CAAM_PTR_SZ_MAX) + 4;
+> >=20
+> > Nit: the amount of magic numbers is overwhelming here. I neither unders=
+tand
+> > the statement nor how that comment should help me to understand it.
+>=20
+> header=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 =3D=C2=A0 4
+> (key mod immediate) =3D (4 + ALIGN(keymod_len, 4))
+> 2x pointer=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D=C2=
+=A0 2 * (4 + 4 + CAAM_PTR_SZ_MAX)
+> op=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D=C2=A0 4
 
+Please create a struct with the associated fields instead and then
+it is just sizeof that.
 
-> On 28. Feb 2022, at 12:20, Greg KH <gregkh@linuxfoundation.org> wrote:
-> 
-> On Mon, Feb 28, 2022 at 12:08:18PM +0100, Jakob Koschel wrote:
->> If the list does not contain the expected element, the value of
->> list_for_each_entry() iterator will not point to a valid structure.
->> To avoid type confusion in such case, the list iterator
->> scope will be limited to list_for_each_entry() loop.
->> 
->> In preparation to limiting scope of a list iterator to the list traversal
->> loop, use a dedicated pointer to point to the found element.
->> Determining if an element was found is then simply checking if
->> the pointer is != NULL.
->> 
->> Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
->> ---
->> arch/x86/kernel/cpu/sgx/encl.c       |  6 +++--
->> drivers/scsi/scsi_transport_sas.c    | 17 ++++++++-----
->> drivers/thermal/thermal_core.c       | 38 ++++++++++++++++++----------
->> drivers/usb/gadget/configfs.c        | 22 ++++++++++------
->> drivers/usb/gadget/udc/max3420_udc.c | 11 +++++---
->> drivers/usb/gadget/udc/tegra-xudc.c  | 11 +++++---
->> drivers/usb/mtu3/mtu3_gadget.c       | 11 +++++---
->> drivers/usb/musb/musb_gadget.c       | 11 +++++---
->> drivers/vfio/mdev/mdev_core.c        | 11 +++++---
->> 9 files changed, 88 insertions(+), 50 deletions(-)
-> 
-> The drivers/usb/ portion of this patch should be in patch 1/X, right?
-
-I kept them separate since it's a slightly different case.
-Using 'ptr' instead of '&ptr->other_member'. Regardless, I'll split
-this commit up as you mentioned.
-
-> 
-> Also, you will have to split these up per-subsystem so that the
-> different subsystem maintainers can take these in their trees.
-
-Thanks for the feedback.
-To clarify I understand you correctly:
-I should do one patch set per-subsystem with every instance/(file?)
-fixed as a separate commit?
-
-If I understand correctly, I'll repost accordingly.
-
-> 
-> thanks,
-> 
-> greg k-h
-
-thanks,
-Jakob Koschel
-
+BR, Jarkko
