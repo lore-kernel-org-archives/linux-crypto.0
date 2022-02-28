@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205A5C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 19:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 239FEC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 19:50:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiB1TuV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 14:50:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43540 "EHLO
+        id S229780AbiB1Tul (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 14:50:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbiB1Ttz (ORCPT
+        with ESMTP id S229697AbiB1TuV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 14:49:55 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADEE6102427
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:48:33 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id bg31-20020a05600c3c9f00b00381590dbb33so93520wmb.3
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:48:33 -0800 (PST)
+        Mon, 28 Feb 2022 14:50:21 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7027EF7BD
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:48:42 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id k29-20020a05600c1c9d00b003817fdc0f00so92531wms.4
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Dt2TIAnb0hgPqs5E3ITetwBw03oi/KH3u9qpCDk2YIc=;
-        b=CzppBtYiraF7Cxt5R+XptC5OZH8T2dPKrJJAwATivyW9xyYv8ML0Zpo3RRuWvWj1b9
-         sbztzFqB0fhBZriWexQYXobqmEYn27dfo2mtBneBPeUY8xoGIm5tqPk0EKcATihU6sim
-         FI7j94CdJvpfOj8JJEXQR8FkJw1TSp1IDUdvLFNCsEhuWza8Wd9QGUfUDQwbkRAi9eFw
-         ZDv7gSrroAHp2d9LQewq1b5E1hnDwirl8RlAvKWjzMkPXLjN357U5NYIPdhRgypkXnLB
-         09LgnjK7rRLBbGsv0vqg02YaDnMI1uoGntf3wbcilLWtye4Fy9lrYqdXg9mkX1jalXpX
-         pVug==
+        bh=n0XDEkVzi02ucM2UrKM/vf81RC1FXZtbtWIn7AE/m+k=;
+        b=Dg/YhTchN/dzit9dPs906M4E2c8W9YbYDdJDkUr+sgVevUcFyxD1MKfKC4NCejyEV3
+         4uooanL4NNVwCzcV0SMou47PR33uiMQn0iqzquGP8ILqcc/7MU0lAHcAl7U1qkAr9qpJ
+         SlqOFUJLzEBZ9XD28j/6CndjNKuVW422jLD3SbyONOO4fQafuu7NYo9xNXGz/R9HjWmO
+         RIEGNQVlAfpbMe8Ak/5lZAMLzj0ddUiKlni1mDB8z6/yvOPsBSuoB+6udugXRuGDm1R3
+         kpL7K1PNtOpgxJvF/8DJ4aq7Gkg5MU6NmxkxgaI6OnnZ7TeMU5jFkn7Un7SyZRFwhbSo
+         68Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Dt2TIAnb0hgPqs5E3ITetwBw03oi/KH3u9qpCDk2YIc=;
-        b=oG/4IK/AKg2lbDPlDh1onLCtImuRMIKklue1m5AzlFzHRDjHDxfUCmyVMcktk/hv8l
-         0qAL/9cJCQlbeA6Z70fliNd7XqjTjFNq6jWSMaXJAlv2FQVVDeGA7DvI7OejhmddR2g6
-         tuKc9shh+1bhPI0ma1v9GW96zgLblBHgSaaGNpHbL1VfP54fBpeLoTyksvh4/sHi0WOL
-         SPO9/w1X8WQohN8mj0brErvt9FN8YUsRzVBtCQUusPIfY+h3W04SxoB/8P2FevAxR3az
-         EVugk/2/CHMu9Q3n9h6jspx10BNldOt00Zi/vBEF8MogEGPMgybhJBAraVjeWXr+vSSf
-         HvmQ==
-X-Gm-Message-State: AOAM533KhUiUik9Cnn9Yir1wiL9LjKubgd+mddH8Jn677tiC/ZFBHWBc
-        NQFvmz1LoANbLjHiyzMjYMhYZ5BAUxstxQ==
-X-Google-Smtp-Source: ABdhPJwxapsCu4s5/opiNJQ1tveKgMBQM6nggLxpg5XCcMpIT8JTP2LSc/eToaPcGR8ftKaNzRfOoQ==
-X-Received: by 2002:a1c:1907:0:b0:380:f6ec:4daa with SMTP id 7-20020a1c1907000000b00380f6ec4daamr14950116wmz.50.1646077255350;
-        Mon, 28 Feb 2022 11:40:55 -0800 (PST)
+        bh=n0XDEkVzi02ucM2UrKM/vf81RC1FXZtbtWIn7AE/m+k=;
+        b=upZnqiawZ/A7uZr6F7bFXaUN8eGtMLIkufcavUND6DWqPFfEbO9Q15n7E/ugvO3vXi
+         jQZTL+WWO9kl37dNOHqCihjQtXMnC/lEF60v7dDFHIoVwCjB8A1HCCuayc9qxflM6p5m
+         oKbCwU2iBifyit68XA9eFTUkxC2HInzzyES8BdLgm+Ak/vRde5X92m83aQN8OFwWkkpH
+         OCw5GY/rJ/aYz+Jx6cV2NsxWAN+xH5uYFLgkUFJgIVdi+ixG4p52xmcmtXBFsurlAnLF
+         3uUceP8xTu1LIifaD85NvCb0OgWXtUmNhoAQ7wGODGcATx8VoPc7YFByWk68ZL1F9+Ke
+         e2nw==
+X-Gm-Message-State: AOAM531oZzAaIKe+oYlSRpo/n+Zy8gr4XJS9YAS1HioJk48H7POVtfSA
+        IXbrgiIIZtdkYnGSdi9hCNMgvtPHxE6g8A==
+X-Google-Smtp-Source: ABdhPJwkZpmQZMj24miJa4rIAkZ9zDJCidU+xH/RIv5ZF56eOWbqUySS6AbKxsXIgvWROOl6Z6N/1A==
+X-Received: by 2002:a05:600c:198f:b0:380:fa8f:be22 with SMTP id t15-20020a05600c198f00b00380fa8fbe22mr14268130wmq.43.1646077252461;
+        Mon, 28 Feb 2022 11:40:52 -0800 (PST)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id v25-20020a05600c215900b0038117f41728sm274143wml.43.2022.02.28.11.40.54
+        by smtp.googlemail.com with ESMTPSA id v25-20020a05600c215900b0038117f41728sm274143wml.43.2022.02.28.11.40.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Feb 2022 11:40:55 -0800 (PST)
+        Mon, 28 Feb 2022 11:40:52 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, herbert@gondor.apana.org.au,
         krzysztof.kozlowski@canonical.com, robh+dt@kernel.org
@@ -55,9 +55,9 @@ Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-rockchip@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 16/16] crypto: rockchip: add myself as maintainer
-Date:   Mon, 28 Feb 2022 19:40:37 +0000
-Message-Id: <20220228194037.1600509-17-clabbe@baylibre.com>
+Subject: [PATCH 12/16] ARM: dts: rk3288: crypto do not need dma clock
+Date:   Mon, 28 Feb 2022 19:40:33 +0000
+Message-Id: <20220228194037.1600509-13-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220228194037.1600509-1-clabbe@baylibre.com>
 References: <20220228194037.1600509-1-clabbe@baylibre.com>
@@ -67,31 +67,29 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Nobody is set as maintainer of rockchip crypto, I propose to do it as I
-have already reworked lot of this code.
+The DMA clock is already enabled by DMA and so crypto does not need to
+handle it.
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm/boot/dts/rk3288.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index db8052bc1d26..b1b2303ac285 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16828,6 +16828,12 @@ F:	Documentation/ABI/*/sysfs-driver-hid-roccat*
- F:	drivers/hid/hid-roccat*
- F:	include/linux/hid-roccat*
- 
-+ROCKCHIP CRYPTO DRIVERS
-+M:	Corentin Labbe <clabbe@baylibre.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	drivers/crypto/rockchip/
-+
- ROCKCHIP I2S TDM DRIVER
- M:	Nicolas Frattaroli <frattaroli.nicolas@gmail.com>
- L:	linux-rockchip@lists.infradead.org
+diff --git a/arch/arm/boot/dts/rk3288.dtsi b/arch/arm/boot/dts/rk3288.dtsi
+index 26b9bbe310af..64be7d4a2d39 100644
+--- a/arch/arm/boot/dts/rk3288.dtsi
++++ b/arch/arm/boot/dts/rk3288.dtsi
+@@ -976,8 +976,8 @@ crypto: crypto@ff8a0000 {
+ 		reg = <0x0 0xff8a0000 0x0 0x4000>;
+ 		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+ 		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+-			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+-		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
++			 <&cru SCLK_CRYPTO>;
++		clock-names = "aclk", "hclk", "sclk";
+ 		resets = <&cru SRST_CRYPTO>;
+ 		reset-names = "crypto-rst";
+ 	};
 -- 
 2.34.1
 
