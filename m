@@ -2,136 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF32C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 22:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 355DEC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 22:59:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231550AbiB1Wrl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 17:47:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S231663AbiB1XAE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 18:00:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231548AbiB1Wrj (ORCPT
+        with ESMTP id S231569AbiB1XAD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 17:47:39 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9A514145D;
-        Mon, 28 Feb 2022 14:46:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 28 Feb 2022 18:00:03 -0500
+Received: from mail-4327.protonmail.ch (mail-4327.protonmail.ch [185.70.43.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85E0C4E25;
+        Mon, 28 Feb 2022 14:59:23 -0800 (PST)
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D1C56134F;
-        Mon, 28 Feb 2022 22:46:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CFC3C36AE2;
-        Mon, 28 Feb 2022 22:46:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646088418;
-        bh=G6GLEJ6Wfn09TOzKxBlcJIFaXURnq/IsC7hPMLt8SC8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=BUts0ap93eFWhQJrO3DOo3KiralkFIxF9lRykNPSwvtarnylb2fBnPArIqVsIDMPa
-         lL+JQQnMswA9onIB3ktOGKRQ7GeMl/Vx0zmo41v3ZX2CTqsm05YlIohf+7YFKg6J8h
-         eTHKNCv3yl5ekWtRNql08HXRf/eYIS4MHFTquhs6ChGsohiagZH2zu8E07mvzCXDik
-         JXoI0B1ZFZ2a0z7OwsAs5hh9CVtB75WkSSVVaF2qlHxpqWCL06/09rWRxZpqpqvouA
-         xI+Exde4XbzmqV5VBdaNRSmtCDENNJhfESHW1fNUaFaVJHAUzUnEoL/+4wlpuE6VbC
-         nma6M8fv1KXKg==
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-2dbd8777564so10745667b3.0;
-        Mon, 28 Feb 2022 14:46:58 -0800 (PST)
-X-Gm-Message-State: AOAM5329DGobQAi9kg4ZBqZFi9FiInEcJKNjePOLzM8tysqTVe0FeHOi
-        2GjVyZ4Zhtx2rjsi+CJoByvM86xMLgBTlz3pKU0=
-X-Google-Smtp-Source: ABdhPJyB6L05mmX+2jIVYVXXY9bxGJucHrm6KGQeG1ruBMHmAj7ly1Q+IfWWXmiXsE40Q16hJcu0TO2OpaCuya+QS1I=
-X-Received: by 2002:a0d:d482:0:b0:2d8:1555:e21d with SMTP id
- w124-20020a0dd482000000b002d81555e21dmr20621347ywd.272.1646088417394; Mon, 28
- Feb 2022 14:46:57 -0800 (PST)
-MIME-Version: 1.0
-References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
- <20220228183355.9090-1-Jason@zx2c4.com> <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
- <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
- <Yh0+LA8B1jw8tnl9@smile.fi.intel.com> <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
- <MN0PR21MB3098981B77F513976A62CA57D7019@MN0PR21MB3098.namprd21.prod.outlook.com>
- <CAMj1kXFZZoOeXnjxdU+gOJTN=Szn=eiXgRhSS9_nnHgwADNHjA@mail.gmail.com> <MN0PR21MB3098EC13B4E8488E692DB28AD7019@MN0PR21MB3098.namprd21.prod.outlook.com>
-In-Reply-To: <MN0PR21MB3098EC13B4E8488E692DB28AD7019@MN0PR21MB3098.namprd21.prod.outlook.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 28 Feb 2022 23:46:46 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFe-B=n1zp6M0yBuqJmmfOXTFbkzj29iK+QpPGK=LxRmA@mail.gmail.com>
-Message-ID: <CAMj1kXFe-B=n1zp6M0yBuqJmmfOXTFbkzj29iK+QpPGK=LxRmA@mail.gmail.com>
-Subject: Re: [PATCH 2/3 v6] ACPI: allow longer device IDs
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-Cc:     jason <jason@zx2c4.com>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
+        by mail-4321.protonmail.ch (Postfix) with ESMTPS id 4K6wZL3fkFz4x6KP;
+        Mon, 28 Feb 2022 22:50:18 +0000 (UTC)
+Authentication-Results: mail-4321.protonmail.ch;
+        dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="cBGwkD0d"
+Date:   Mon, 28 Feb 2022 22:50:06 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1646088609;
+        bh=EcotLxkQaYgY6ajZYic/GfxM/AoG16BTcQ37oNetF9g=;
+        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
+         References:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID;
+        b=cBGwkD0dY6C6UZ8ZjhjHcbwM06BMDKF9S/uxRi+rS2UvdSsFLFOG1HSm6qlJyiCUO
+         uC1XgssvVNSFSsxdHJ1aOl5NwIA18vjg17jCvCkv13dOUO+5hOt3OCcfXLX2AxvryX
+         lsXEg4vAoBljMT4ewAP2cK1EUDuyezakLW8pnSEAczd9xFJNkZ4Y3ZLxhFb22yslY3
+         3xdTS3cTZ9GeOv+wrf2xTPfY4Kamc1tDDmDy3yCaRm+7b1f1xP0Y+5xR0FjORV+5kM
+         cK85iRo45YcxaJSZ64KqeuDyrCIZDsEiDwE78vJR0ycrL/ZWpMTXDPzJnBHTv4Qo8t
+         TiTx0AcdTLM/g==
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+From:   =?utf-8?Q?Barnab=C3=A1s_P=C5=91cze?= <pobrn@protonmail.com>
+Cc:     Mike Rapoport <rppt@kernel.org>,
+        =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Len Brown <lenb@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Reply-To: =?utf-8?Q?Barnab=C3=A1s_P=C5=91cze?= <pobrn@protonmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Message-ID: <Ax76nlte5gO6McgVlkdlM8SHBdfYoG0hb6pFO3MJ6iEg3VCk3kzPWFQ6HS2uVDB8eeyLSr4ku62pXF-FrsROsQvF_VDAW1I5lXTFZTkkMfk=@protonmail.com>
+In-Reply-To: <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com> <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com> <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com> <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com> <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org> <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 28 Feb 2022 at 23:38, Michael Kelley (LINUX)
-<mikelley@microsoft.com> wrote:
->
-> From: Ard Biesheuvel <ardb@kernel.org> Sent: Monday, February 28, 2022 2:22 PM
-> >
-> > On Mon, 28 Feb 2022 at 23:14, Michael Kelley (LINUX)
-> > <mikelley@microsoft.com> wrote:
-> > >
-> > > From: Jason A. Donenfeld <Jason@zx2c4.com> Sent: Monday, February 28, 2022
-> > 1:55 PM
-> > > >
-> > > > Hi Andy,
-> > > >
-> > > > On Mon, Feb 28, 2022 at 10:28 PM Andy Shevchenko
-> > > > <andy.shevchenko@gmail.com> wrote:
-> > > > > My point is that this is clear abuse of the spec and:
-> > > > > 1) we have to enable the broken, because it is already in the wild with
-> > > > >    the comment that this is an issue
-> > > > >
-> > > > > AND
-> > > > >
-> > > > > 2) issue an ECR / work with MS to make sure they understand the problem.
-> > > > >
-> > > > > This can be done in parallel. What I meant as a prerequisite is to start doing
-> > > > > 2) while we have 1) on table.
-> > > >
-> > > > Oh, okay, that makes sense. If you want to get (2) going, by all means
-> > > > go for it. I have no idea how to do this myself; Ard said something
-> > > > about joining the UEFI forum as an individual something or another but
-> > > > I don't think I'm the man for the job there. Is this something that
-> > > > Intel can do with their existing membership (is that the right term?)
-> > > > at the UEFI forum? Or maybe a Microsoft engineer on the list?
-> > >
-> > > My team at Microsoft, which works on Linux, filed a bug on this
-> > > issue against the Hyper-V team about a year ago, probably when the issue
-> > > was raised during the previous attempt to implement the functionality
-> > > in Linux.  I've talked with the Hyper-V dev manager, and they acknowledge
-> > > that the ACPI entry Hyper-V provides to guest VMs violates the spec.  But
-> > > changing to an identifier that meets the spec is problematic because
-> > > of backwards compatibility with Windows guests on Hyper-V that
-> > > consume the current identifier.  There's no practical way to have Hyper-V
-> > > provide a conformant identifier AND fix all the Windows guests out in
-> > > the wild to consume the new identifier.   As a result, at this point Hyper-V
-> > > is not planning to change anything.
-> > >
-> > > It's a lousy state-of-affairs, but as mentioned previously in this thread,
-> > > it seems to be one that we will have to live with.
-> > >
-> >
-> > Thanks for chiming in.
-> >
-> > Why not do something like
-> >
-> > Name (_CID, Package (2) { "VM_GEN_COUNTER", "VMGENCTR" } )
-> >
-> > ?
-> >
-> > That way, older clients can match on the existing _CID and new clients
-> > can match on the spec compliant one.
->
-> I'll run this by the Hyper-V guys.  I don't have the ACPI expertise to disagree
-> with them when they say they can't change it. :-(
->
+Hi
 
-Yes, please, even if it makes no difference for this particular patch.
+
+2022. febru=C3=A1r 28., h=C3=A9tf=C5=91 23:28 keltez=C3=A9ssel, James Botto=
+mley =C3=ADrta:
+> [...]
+> Well, yes, but my objection is more to the size of churn than the
+> desire to do loop local.  I'm not even sure loop local is possible,
+> because it's always annoyed me that for (int i =3D 0; ...  in C++ defines
+> i in the outer scope not the loop scope, which is why I never use it.
+
+It is arguably off-topic to the discussion at hand, but I think you might b=
+e
+thinking of something else (or maybe it was the case in an ancient version =
+of C++)
+because that does not appear to be case. If it were,
+
+  for (int i ...) { ... }
+  for (int i ...) { ... }
+
+would have to trigger a redeclaration error, but that happens neither in C+=
++ nor in C.
+The variable is also inaccessible outside the loop.
+
+
+> [...]
+
+
+Regards,
+Barnab=C3=A1s P=C5=91cze
