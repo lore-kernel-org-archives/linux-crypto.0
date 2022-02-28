@@ -2,145 +2,193 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 723C1C3525B
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A140C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbiB1VTs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 16:19:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33516 "EHLO
+        id S230185AbiB1VVW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 16:21:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbiB1VTr (ORCPT
+        with ESMTP id S230202AbiB1VVW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 16:19:47 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D54EF0A4;
-        Mon, 28 Feb 2022 13:19:07 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id v5-20020a17090ac90500b001bc40b548f9so336908pjt.0;
-        Mon, 28 Feb 2022 13:19:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=pX3FOaQ5tpG+krWAy5EzbawK39YqA5YwRZTg6hddt4E=;
-        b=JpEWCU5sl0Tb/FD34RSH61Ey9dRKreZqOQa3CJ02luf0uqIT78+8GWNevF0TXmNO1k
-         V82hjNGseb3oWLNgnnFwXHAFmfIF+pTCtPsXm95pt2iCzBmJFwg04njU2K1WfIC8K4PQ
-         JYTCrkA4ACMCh2biL4u47uoOFfhnbmO/1jCCSOx3OESfK5+oDGNitg9s7NqsmIU5fVsE
-         xsR4ABTTJUTksMDshckaPyVLHegSArBm3erCaRT01IEJkH2S1g98XNdRHKV6JZW5AanM
-         gI9+nSzlxhKCRaqGLAQjGqwME5o9/K6faQyfblLD265MKP0MWlgdnuFxCRxjUTwlasET
-         Zo4g==
+        Mon, 28 Feb 2022 16:21:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 01949EFFAA
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 13:20:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646083240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=u6wu1+m7/y8nI6BZGp4jNazhv0Rsh6xTe2mPvqYxCIw=;
+        b=FwFs7TKJ6fuql8ALMi5WZ+/x75VA9yoqZbFK788HlzQTLO7Z6SK8EceCurm1bKIlnOJEUo
+        TXcfEUVOSbonP59OtnPI7hYM8g/97Ee3JbfRHaJWm/2sKmbJKBdDE7Pe3GvBpdPV9TQ4WC
+        9jZB30uMNE/ZJgQIe/7rfzTuqxFtjhI=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-19-bJp2rqpZPbeMBRd2A6jZpA-1; Mon, 28 Feb 2022 16:20:38 -0500
+X-MC-Unique: bJp2rqpZPbeMBRd2A6jZpA-1
+Received: by mail-oo1-f70.google.com with SMTP id x130-20020a4a4188000000b0031b2e31acc7so9267332ooa.21
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 13:20:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=pX3FOaQ5tpG+krWAy5EzbawK39YqA5YwRZTg6hddt4E=;
-        b=Ko2q8+/6PEwR0VrAV6h+RSAB96UwzbTdlCl4tV/4WPgEJoF2e5qKA4v8mBfiOzqyZ6
-         nTyB68vN8OhgwW3oPd1ADgqLL/4iPtyyuvzVgQyZfDb8O9/CLlFVuCrU52bK+wieyzAU
-         +p+dnIQ8XTlg6Z758varQBJGtq6QIys7hCKSTGYJJCxqgPmRvHs2mPTu94UyIBXEgoFl
-         uWYi+5nRvD6zyppikWJ0xUOHkjdnjXioM4apZ3DapID1z60zqZ/O0tTxoc7GYgzUDKd0
-         NjTM7mr1kqdSE/jz9SvhqmL8EXw//7pealHn4jxi5FIAKMxKByPt+hAu6e+ZOEAsQXLn
-         AZ2A==
-X-Gm-Message-State: AOAM532vQfsiXoNABePKooePP9squUxMt6sTKNrEfYFcjxUw4wjk1cyZ
-        +dyeYv2/tscfCc4sK4FJKmQ74Pd97eZGL+nXF2Q=
-X-Google-Smtp-Source: ABdhPJxYQDaw0FFWrTXZCk3OvnKpy6mSdQ8Z9qbCWYQ2FvSetamSp4Rz90y2uoGU7tjomvOtre1MYsL9s+rZuYttBVs=
-X-Received: by 2002:a17:902:ce8a:b0:14f:fd0e:e4a4 with SMTP id
- f10-20020a170902ce8a00b0014ffd0ee4a4mr22765912plg.47.1646083147399; Mon, 28
- Feb 2022 13:19:07 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=u6wu1+m7/y8nI6BZGp4jNazhv0Rsh6xTe2mPvqYxCIw=;
+        b=IQv7YthPyxQwQWAQqO9be3sdUXvt45YOMxqRaQKtDFrb/lS2tnkHyvTloGFp+SljnM
+         ymVlnOb97/eC6FjCUVMrjzufCLfFDleiyUCtd0nJQLS0vDzp/cki7nhc8Cs2Ylu6VEi9
+         YWpHx1z+b1F8px7n7pbEAJYqHA/dNthFhSxgDMWDA93IO9kdohN6O/A+UPtG1LYeXcbj
+         c54AG5R+0B+moo/fzHO8rwD5x3K66JBa5M7Uy0KhDrlWVlRsemPwNXX0DeZX7Dha0DSW
+         tS1mcZrzimU4mlJorh2R3YBeX7Pa66SpUd9N74b9sfTye4sqE/Mayj9bwYuYgTVS3M7V
+         E3gg==
+X-Gm-Message-State: AOAM532iYUYuuNad8OQ8VVOwyzLA6wGdLYVii6gvNd09lxBwKJ/+bUTF
+        qv1R4T3/789xiPBJxNkvksIqA08ftFYbR+k2nGWM0E17b/l/Z33rU9rlHgVI81Xef2wzVmC/3ir
+        Xj5i52Z9LSSFHY+wCWdxQbVns
+X-Received: by 2002:a05:6871:79b:b0:d3:4039:7e7c with SMTP id o27-20020a056871079b00b000d340397e7cmr9367038oap.121.1646083237864;
+        Mon, 28 Feb 2022 13:20:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwHK6xVIr8qQr3M46nx2bUSEdvIL0NZBwiWDciAqFz2Oi4tFkHyMFlLCQIvyTFhjzN3Y8aPjg==
+X-Received: by 2002:a05:6871:79b:b0:d3:4039:7e7c with SMTP id o27-20020a056871079b00b000d340397e7cmr9367028oap.121.1646083237618;
+        Mon, 28 Feb 2022 13:20:37 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id v5-20020a544d05000000b002d7652b3c52sm4722517oix.25.2022.02.28.13.20.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 13:20:37 -0800 (PST)
+Date:   Mon, 28 Feb 2022 14:20:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v6 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220228142034.024e7be6.alex.williamson@redhat.com>
+In-Reply-To: <20220228202919.GP219866@nvidia.com>
+References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
+        <20220228090121.1903-10-shameerali.kolothum.thodi@huawei.com>
+        <20220228145731.GH219866@nvidia.com>
+        <58fa5572e8e44c91a77bd293b2ec6e33@huawei.com>
+        <20220228180520.GO219866@nvidia.com>
+        <20220228131614.27ad37dc.alex.williamson@redhat.com>
+        <20220228202919.GP219866@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
-In-Reply-To: <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
-Reply-To: noloader@gmail.com
-From:   Jeffrey Walton <noloader@gmail.com>
-Date:   Mon, 28 Feb 2022 16:18:56 -0500
-Message-ID: <CAH8yC8nwp8f3rANhCiiP_Oiw2cjfqCwAgZdTXY9OxtN9Tmm7HA@mail.gmail.com>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 3:45 PM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
-> ...
-> > Just from skimming over the patches to change this and experience
-> > with the drivers/subsystems I help to maintain I think the primary
-> > pattern looks something like this:
-> >
-> > list_for_each_entry(entry, head, member) {
-> >      if (some_condition_checking(entry))
-> >          break;
-> > }
-> > do_something_with(entry);
->
->
-> Actually, we usually have a check to see if the loop found anything,
-> but in that case it should something like
->
-> if (list_entry_is_head(entry, head, member)) {
->     return with error;
-> }
-> do_somethin_with(entry);
+On Mon, 28 Feb 2022 16:29:19 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Borrowing from c++, perhaps an explicit end should be used:
+> On Mon, Feb 28, 2022 at 01:16:14PM -0700, Alex Williamson wrote:
+> > On Mon, 28 Feb 2022 14:05:20 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Mon, Feb 28, 2022 at 06:01:44PM +0000, Shameerali Kolothum Thodi wrote:
+> > >   
+> > > > +static long hisi_acc_vf_save_unl_ioctl(struct file *filp,
+> > > > +                                      unsigned int cmd, unsigned long arg)
+> > > > +{
+> > > > +       struct hisi_acc_vf_migration_file *migf = filp->private_data;
+> > > > +       loff_t *pos = &filp->f_pos;
+> > > > +       struct vfio_device_mig_precopy precopy;
+> > > > +       unsigned long minsz;
+> > > > +
+> > > > +       if (cmd != VFIO_DEVICE_MIG_PRECOPY)
+> > > > +               return -EINVAL;    
+> > > 
+> > > ENOTTY
+> > >   
+> > > > +
+> > > > +       minsz = offsetofend(struct vfio_device_mig_precopy, dirty_bytes);
+> > > > +
+> > > > +       if (copy_from_user(&precopy, (void __user *)arg, minsz))
+> > > > +               return -EFAULT;
+> > > > +       if (precopy.argsz < minsz)
+> > > > +               return -EINVAL;
+> > > > +
+> > > > +       mutex_lock(&migf->lock);
+> > > > +       if (*pos > migf->total_length) {
+> > > > +               mutex_unlock(&migf->lock);
+> > > > +               return -EINVAL;
+> > > > +       }
+> > > > +
+> > > > +       precopy.dirty_bytes = 0;
+> > > > +       precopy.initial_bytes = migf->total_length - *pos;
+> > > > +       mutex_unlock(&migf->lock);
+> > > > +       return copy_to_user((void __user *)arg, &precopy, minsz) ? -EFAULT : 0;
+> > > > +}    
+> > > 
+> > > Yes
+> > > 
+> > > And I noticed this didn't include the ENOMSG handling, read() should
+> > > return ENOMSG when it reaches EOS for the pre-copy:
+> > > 
+> > > + * During pre-copy the migration data FD has a temporary "end of stream" that is
+> > > + * reached when both initial_bytes and dirty_byte are zero. For instance, this
+> > > + * may indicate that the device is idle and not currently dirtying any internal
+> > > + * state. When read() is done on this temporary end of stream the kernel driver
+> > > + * should return ENOMSG from read(). Userspace can wait for more data (which may
+> > > + * never come) by using poll.  
+> > 
+> > I'm confused by your previous reply that the use of curr_state should
+> > be eliminated, isn't this ioctl only valid while the device is in the
+> > PRE_COPY or PRE_COPY_P2P states?  Otherwise the STOP_COPY state would
+> > have some expectation to be able to use this ioctl for devices
+> > supporting PRE_COPY.    
+> 
+> I think it is fine to keep working on stop copy, though the
+> implementation here isn't quite right for that..
+> 
+> if (migf->total_length > QM_MATCH_SIZE)
+>    precopy.dirty_bytes = migf->total_length - QM_MATCH_SIZE - *pos;
+> else
+>    precopy.dity_bytes = 0;
+> 
+> if (*pos < QM_MATCH_SIZE)
+>     precopy.initial_bytes = QM_MATCH_SIZE - *pos;
+> else
+>     precopy.initial_Bytes = 0;
+> 
+> Unless you think we should block it.
 
-  if (list_entry_not_end(entry))
-    do_somethin_with(entry)
+What's the meaning of initial_bytes and dirty_bytes while in STOP_COPY?
+It seems like these become meaningless and if so, why shouldn't the
+ioctl simply return -EINVAL if the device state doesn't match the
+window where it's useful?
 
-It is modelled after c++ and the 'while(begin != end) {}' pattern.
+> > I'd like to see the uapi clarify exactly what states allow this
+> > ioctl and define the behavior of the ioctl when transitioning out of
+> > those states with an open data_fd, ie. is it defined to return an
+> > -errno once in STOP_COPY?  Thanks,  
+> 
+> The ioctl is on the data_fd, so it should follow all the normal rules
+> of the data_fd just like read() - ie all ioctls/read/write fails when
+> teh state is moved outside one where the data_fd is valid.
+> 
+> That looks like another issue with the above, it doesn't chck
+> migf->disabled.
+> 
+> Should we add another sentence about this?
 
-Jeff
+Right, of course the ioctl goes away when the data_fd is invalid, the
+question is more that we've created this PRE_COPY_* specific ioctl and
+what does it mean to call it when not in a device state where the
+data_fd is still valid but this ioctl is really not.  We should
+specify how the driver is intended to respond to this ioctl in
+STOP_COPY.  Thanks,
+
+Alex
+
