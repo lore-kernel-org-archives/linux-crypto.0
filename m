@@ -2,87 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0995C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 20:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3606CC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 20:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbiB1UNp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 15:13:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60490 "EHLO
+        id S229838AbiB1UP5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 15:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbiB1UNn (ORCPT
+        with ESMTP id S229821AbiB1UP4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 15:13:43 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7908B39815;
-        Mon, 28 Feb 2022 12:13:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1ECC660B2A;
-        Mon, 28 Feb 2022 20:13:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FD6C340F2;
-        Mon, 28 Feb 2022 20:13:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646079181;
-        bh=7itQ1YN7sWBEvhZSZBZDP5YIBB1m6b0J0BY8JZ3d9tI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=LpSSl4Pvrp8HCxpc3HNz9Ev+ThT8eVsPR878QUgqSRGMZ6Kfxt92/qs79ay0u6Fwm
-         IJZUnbV+zWmWE6LwHWIwNAWw91+3X75H1sW48deIlX+ujjZusHvla4eqBS1VJEvGq1
-         qW+p5UYEQcqM6pNM34qZawV9YxnUpq4dTIWH/KhbYbutUY5Jza4qKTqZFmonor4ryU
-         qgPw82VLMmhmybka/6ojUhBzUyHwUvK6P2FSEXpMN5Vx1qiv7GDRWB6Ig+Wza4Ji9l
-         ebGGxve2VH++Vefu1VxQ5mEwFeuxVzCsLO6q5OxEzq0o5h7QkbcPmUvyu9nsTxaYy2
-         Yb+I2zEcH8WqA==
-Date:   Mon, 28 Feb 2022 14:12:59 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, jgg@nvidia.com, cohuck@redhat.com,
-        mgurtovoy@nvidia.com, yishaih@nvidia.com, linuxarm@huawei.com,
-        liulongfang@huawei.com, prime.zeng@hisilicon.com,
-        jonathan.cameron@huawei.com, wangzhou1@hisilicon.com,
-        bhelgaas@google.com, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v6 03/10] hisi_acc_qm: Move PCI device IDs to common
- header
-Message-ID: <20220228201259.GA516607@bhelgaas>
+        Mon, 28 Feb 2022 15:15:56 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 886AE39839
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 12:15:15 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id dr20so2448295ejc.6
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 12:15:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Rhevy6fb5H45VxDHjLDNCxtPhjJ0u7uFLdfSx9pxlIs=;
+        b=SFiiDaskyFzzbW4jCoUqiJYglpNWscp1lwtLHE93w8dRI3h8eXZkrLgebAKqQfA9oZ
+         haXikdZXvfEB810zRURGwChdn/CvMC8Q7Pab3hpE0iVI/nf3FVJvcryQMcC1uZhcoZUU
+         P6IZH9h2w6s9V+B5fc5q6pR5l/tJkcQrm5JJ0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Rhevy6fb5H45VxDHjLDNCxtPhjJ0u7uFLdfSx9pxlIs=;
+        b=1j6mX0P2xJAVO88Ul5iSr7zpihCea3huck6zOJY1mLXoiuDwKZe8wP+tDzWW6ckedz
+         7nMesaHeJCnGkoC9r1T1vd0Cch29biwUncqHiY3LOagly9Yn8/O+9rXeIdBODMAZcwNF
+         bLj+R8GrED8qYWarRDp5hEoOsapoQbLGgbUwG3vmb745EN7yfRC//f42tNup8wO+Yumn
+         2sn78uN9gFmU14r3QsWRsVxgN5t1/zX+9Xpw8B0h3jw108+LAP/HE3IW6VwSYPxociZN
+         dQs8QJtjQ+1GfcIgykhLEw6PQLYg1m64kRE4+hXVJQLMutatmHuRxswz2xB+1x/aP7uy
+         inYw==
+X-Gm-Message-State: AOAM533WChx/HN6lODYsIk6i1Eg8nOJDcaShqXMrFZujU2nsiYd0xY/s
+        ojdyR4XpHrlJkrlbj0tEzQD02Jon/J1lVFS/5tM=
+X-Google-Smtp-Source: ABdhPJzMzm18/ucNStd51YsjFmTu1Zj7AMGZeHeWxmMCfjA3hSCHxKUEn0mxqFt8gzQPrPS9wjHgFg==
+X-Received: by 2002:a17:906:3905:b0:6cf:7ef5:fee0 with SMTP id f5-20020a170906390500b006cf7ef5fee0mr15982149eje.307.1646079313820;
+        Mon, 28 Feb 2022 12:15:13 -0800 (PST)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id d8-20020a170906640800b006d5853081b7sm4657448ejm.70.2022.02.28.12.15.11
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Feb 2022 12:15:12 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id s14so19268967edw.0
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 12:15:11 -0800 (PST)
+X-Received: by 2002:a2e:924d:0:b0:246:370c:5618 with SMTP id
+ v13-20020a2e924d000000b00246370c5618mr15110351ljg.358.1646079300900; Mon, 28
+ Feb 2022 12:15:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220228103338.76da0b3b.alex.williamson@redhat.com>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com> <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+In-Reply-To: <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 28 Feb 2022 12:14:44 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wj27SZQ3kPTesBzkiGhe-mA3gOQqr_adt_bMFzmg1VNaA@mail.gmail.com>
+Message-ID: <CAHk-=wj27SZQ3kPTesBzkiGhe-mA3gOQqr_adt_bMFzmg1VNaA@mail.gmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+To:     =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 10:33:38AM -0700, Alex Williamson wrote:
-> [Cc+ Bjorn, linux-pci]
-> 
-> On Mon, 28 Feb 2022 09:01:14 +0000
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
-> > Move the PCI Device IDs of HiSilicon ACC devices to
-> > a common header and use a uniform naming convention.
+On Mon, Feb 28, 2022 at 12:10 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> We can do
+>
+>         typeof(pos) pos
+>
+> in the 'for ()' loop, and never use __iter at all.
+>
+> That means that inside the for-loop, we use a _different_ 'pos' than outside.
 
-> > --- a/include/linux/pci_ids.h
-> > +++ b/include/linux/pci_ids.h
-> > @@ -2529,6 +2529,12 @@
-> >  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
-> >  
-> >  #define PCI_VENDOR_ID_HUAWEI		0x19e5
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
+The thing that makes me throw up in my mouth a bit is that in that
 
-We usually don't add things to pci_ids.h unless they're used in more
-than one place (see the comment at the top of the file).  AFAICT,
-these device IDs are only used in one file, so you can leave the
-#defines in the file that uses them or use bare hex values.
+        typeof(pos) pos
 
-These device IDs are all in https://pci-ids.ucw.cz/read/PC/19e5
-already, thanks for that!
+the first 'pos' (that we use for just the typeof) is that outer-level
+'pos', IOW it's a *different* 'pos' than the second 'pos' in that same
+declaration that declares the inner level shadowing new 'pos'
+variable.
 
-> >  #define PCI_VENDOR_ID_NETRONOME		0x19ee
-> >  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
-> 
+If I was a compiler person, I would say "Linus, that thing is too ugly
+to live", and I would hate it. I'm just hoping that even compiler
+people say "that's *so* ugly it's almost beautiful".
+
+Because it does seem to work. It's not pretty, but hey, it's not like
+our headers are really ever be winning any beauty contests...
+
+                Linus
