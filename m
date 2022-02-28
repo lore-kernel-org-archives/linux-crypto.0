@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 484A7C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA081C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234145AbiB1JCv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:02:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39916 "EHLO
+        id S229781AbiB1JDW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:03:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiB1JCu (ORCPT
+        with ESMTP id S234268AbiB1JDJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:02:50 -0500
+        Mon, 28 Feb 2022 04:03:09 -0500
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24AEC6663D;
-        Mon, 28 Feb 2022 01:02:12 -0800 (PST)
-Received: from fraeml741-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6ZBm3Qzvz67bMc;
-        Mon, 28 Feb 2022 17:02:08 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACFF7140A0;
+        Mon, 28 Feb 2022 01:02:30 -0800 (PST)
+Received: from fraeml740-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6Z9y5kPjz67N4y;
+        Mon, 28 Feb 2022 17:01:26 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml741-chm.china.huawei.com (10.206.15.222) with Microsoft SMTP Server
+ fraeml740-chm.china.huawei.com (10.206.15.221) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 10:02:10 +0100
+ 15.1.2308.21; Mon, 28 Feb 2022 10:02:28 +0100
 Received: from A2006125610.china.huawei.com (10.47.94.1) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 09:02:02 +0000
+ 15.1.2308.21; Mon, 28 Feb 2022 09:02:20 +0000
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -34,9 +34,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v6 03/10] hisi_acc_qm: Move PCI device IDs to common header
-Date:   Mon, 28 Feb 2022 09:01:14 +0000
-Message-ID: <20220228090121.1903-4-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v6 05/10] hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
+Date:   Mon, 28 Feb 2022 09:01:16 +0000
+Message-ID: <20220228090121.1903-6-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
 References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
@@ -50,191 +50,168 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move the PCI Device IDs of HiSilicon ACC devices to
-a common header and use a uniform naming convention.
+HiSilicon ACC VF device BAR2 region consists of both functional
+register space and migration control register space. From a
+security point of view, it's not advisable to export the migration
+control region to Guest.
 
-This will be useful when we introduce the vfio PCI
-HiSilicon ACC live migration driver in subsequent patches.
+Hence, introduce a separate struct vfio_device_ops for migration
+support which will override the ioctl/read/write/mmap methods to
+hide the migration region and limit the access only to the
+functional register space.
+
+This will be used in subsequent patches when we add migration
+support to the driver.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 12 +++++-------
- drivers/crypto/hisilicon/sec2/sec_main.c  | 14 ++++++--------
- drivers/crypto/hisilicon/zip/zip_main.c   | 11 ++++-------
- include/linux/pci_ids.h                   |  6 ++++++
- 4 files changed, 21 insertions(+), 22 deletions(-)
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 126 ++++++++++++++++++
+ 1 file changed, 126 insertions(+)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index ebfab3e14499..ba4043447e53 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -68,8 +68,6 @@
- #define HPRE_REG_RD_INTVRL_US		10
- #define HPRE_REG_RD_TMOUT_US		1000
- #define HPRE_DBGFS_VAL_MAX_LEN		20
--#define HPRE_PCI_DEVICE_ID		0xa258
--#define HPRE_PCI_VF_DEVICE_ID		0xa259
- #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
- #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
- #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
-@@ -111,8 +109,8 @@
- static const char hpre_name[] = "hisi_hpre";
- static struct dentry *hpre_debugfs_root;
- static const struct pci_device_id hpre_dev_ids[] = {
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
- 	{ 0, }
- };
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index 8129c3457b3b..582ee4fa4109 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -13,6 +13,119 @@
+ #include <linux/vfio.h>
+ #include <linux/vfio_pci_core.h>
  
-@@ -242,7 +240,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
- 
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
++static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
++					size_t count, loff_t *ppos,
++					size_t *new_count)
++{
++	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++
++	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
++		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
++		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
++
++		/* Check if access is for migration control region */
++		if (pos >= end)
++			return -EINVAL;
++
++		*new_count = min(count, (size_t)(end - pos));
++	}
++
++	return 0;
++}
++
++static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
++				  struct vm_area_struct *vma)
++{
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++	unsigned int index;
++
++	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
++	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
++		u64 req_len, pgoff, req_start;
++		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
++
++		req_len = vma->vm_end - vma->vm_start;
++		pgoff = vma->vm_pgoff &
++			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
++		req_start = pgoff << PAGE_SHIFT;
++
++		if (req_start + req_len > end)
++			return -EINVAL;
++	}
++
++	return vfio_pci_core_mmap(core_vdev, vma);
++}
++
++static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
++				       const char __user *buf, size_t count,
++				       loff_t *ppos)
++{
++	size_t new_count = count;
++	int ret;
++
++	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
++	if (ret)
++		return ret;
++
++	return vfio_pci_core_write(core_vdev, buf, new_count, ppos);
++}
++
++static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
++				      char __user *buf, size_t count,
++				      loff_t *ppos)
++{
++	size_t new_count = count;
++	int ret;
++
++	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
++	if (ret)
++		return ret;
++
++	return vfio_pci_core_read(core_vdev, buf, new_count, ppos);
++}
++
++static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
++				    unsigned long arg)
++{
++	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
++		struct vfio_pci_core_device *vdev =
++			container_of(core_vdev, struct vfio_pci_core_device, vdev);
++		struct pci_dev *pdev = vdev->pdev;
++		struct vfio_region_info info;
++		unsigned long minsz;
++
++		minsz = offsetofend(struct vfio_region_info, offset);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
++			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
++
++			/*
++			 * ACC VF dev BAR2 region consists of both functional
++			 * register space and migration control register space.
++			 * Report only the functional region to Guest.
++			 */
++			info.size = pci_resource_len(pdev, info.index) / 2;
++
++			info.flags = VFIO_REGION_INFO_FLAG_READ |
++					VFIO_REGION_INFO_FLAG_WRITE |
++					VFIO_REGION_INFO_FLAG_MMAP;
++
++			return copy_to_user((void __user *)arg, &info, minsz) ?
++					    -EFAULT : 0;
++		}
++	}
++	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
++}
++
+ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
  {
--	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-+	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
+ 	struct vfio_pci_core_device *vdev =
+@@ -28,6 +141,19 @@ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
+ 	return 0;
  }
  
- static const struct kernel_param_ops hpre_pf_q_num_ops = {
-@@ -921,7 +919,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
- 	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
- 	hisi_qm_debug_init(qm);
- 
--	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
-+	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
- 		ret = hpre_ctrl_debug_init(qm);
- 		if (ret)
- 			goto failed_to_create;
-@@ -958,7 +956,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	qm->sqe_size = HPRE_SQE_SIZE;
- 	qm->dev_name = hpre_name;
- 
--	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
-+	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
- 			QM_HW_PF : QM_HW_VF;
- 	if (qm->fun_type == QM_HW_PF) {
- 		qm->qp_base = HPRE_PF_DEF_Q_BASE;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 26d3ab1d308b..ab806fb481ac 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -20,8 +20,6 @@
- 
- #define SEC_VF_NUM			63
- #define SEC_QUEUE_NUM_V1		4096
--#define SEC_PF_PCI_DEVICE_ID		0xa255
--#define SEC_VF_PCI_DEVICE_ID		0xa256
- 
- #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
- #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
-@@ -225,7 +223,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
- 
- static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
-+	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
- }
- 
- static const struct kernel_param_ops sec_pf_q_num_ops = {
-@@ -313,8 +311,8 @@ module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
- MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
- 
- static const struct pci_device_id sec_dev_ids[] = {
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_PF) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
- 	{ 0, }
- };
- MODULE_DEVICE_TABLE(pci, sec_dev_ids);
-@@ -717,7 +715,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
- 	regset->base = qm->io_base;
- 	regset->dev = dev;
- 
--	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
-+	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
- 		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
- 
- 	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
-@@ -735,7 +733,7 @@ static int sec_debug_init(struct hisi_qm *qm)
- 	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
- 	int i;
- 
--	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
-+	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
- 		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
- 			spin_lock_init(&sec->debug.files[i].lock);
- 			sec->debug.files[i].index = i;
-@@ -877,7 +875,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	qm->sqe_size = SEC_SQE_SIZE;
- 	qm->dev_name = sec_name;
- 
--	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
-+	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
- 			QM_HW_PF : QM_HW_VF;
- 	if (qm->fun_type == QM_HW_PF) {
- 		qm->qp_base = SEC_PF_DEF_Q_BASE;
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 678f8b58ec42..f4a517728385 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -15,9 +15,6 @@
- #include <linux/uacce.h>
- #include "zip.h"
- 
--#define PCI_DEVICE_ID_ZIP_PF		0xa250
--#define PCI_DEVICE_ID_ZIP_VF		0xa251
--
- #define HZIP_QUEUE_NUM_V1		4096
- 
- #define HZIP_CLOCK_GATE_CTRL		0x301004
-@@ -246,7 +243,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
- 
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
-+	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
- }
- 
- static const struct kernel_param_ops pf_q_num_ops = {
-@@ -268,8 +265,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
- MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
- 
- static const struct pci_device_id hisi_zip_dev_ids[] = {
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
--	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
-+	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
- 	{ 0, }
- };
- MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
-@@ -838,7 +835,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	qm->sqe_size = HZIP_SQE_SIZE;
- 	qm->dev_name = hisi_zip_name;
- 
--	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
-+	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
- 			QM_HW_PF : QM_HW_VF;
- 	if (qm->fun_type == QM_HW_PF) {
- 		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-index aad54c666407..6b98e0d91f0a 100644
---- a/include/linux/pci_ids.h
-+++ b/include/linux/pci_ids.h
-@@ -2529,6 +2529,12 @@
- #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
- 
- #define PCI_VENDOR_ID_HUAWEI		0x19e5
-+#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
-+#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-+#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
-+#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-+#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
-+#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
- 
- #define PCI_VENDOR_ID_NETRONOME		0x19ee
- #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
++static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
++	.name = "hisi-acc-vfio-pci-migration",
++	.open_device = hisi_acc_vfio_pci_open_device,
++	.close_device = vfio_pci_core_close_device,
++	.ioctl = hisi_acc_vfio_pci_ioctl,
++	.device_feature = vfio_pci_core_ioctl_feature,
++	.read = hisi_acc_vfio_pci_read,
++	.write = hisi_acc_vfio_pci_write,
++	.mmap = hisi_acc_vfio_pci_mmap,
++	.request = vfio_pci_core_request,
++	.match = vfio_pci_core_match,
++};
++
+ static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
+ 	.name = "hisi-acc-vfio-pci",
+ 	.open_device = hisi_acc_vfio_pci_open_device,
 -- 
 2.25.1
 
