@@ -2,99 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A05BCC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 19:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046ECC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 19:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbiB1T0z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 14:26:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42480 "EHLO
+        id S229445AbiB1Tq4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 14:46:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiB1T0y (ORCPT
+        with ESMTP id S229506AbiB1Tqy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 14:26:54 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339B9114FEA
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:09 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id t14so18805573ljh.8
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:08 -0800 (PST)
+        Mon, 28 Feb 2022 14:46:54 -0500
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B992D1FE027
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:45:39 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id j17so17163516wrc.0
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:45:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=k5Nq2+gFOwIAZZv1z8A5AiR5tZQQa62jzNlsasSMp48=;
-        b=hA07tqoOhzsc3WOqNCaR4tUruW+rdsfqY8YOw2mN7ILGOov8LZJfGyOH0+67N/0EaR
-         4t/JTBCib0ytZP3PxoAumfh81bQl7oYkHnLaS7IusFI7m+FXPGCuZ+b2epjKsi5SuwbN
-         6G/m+gkEWqvwTgFEdCkiL46LSGGVnwGjPchjI=
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=B4Tf8ps8Giknxs7LQki4ZGeia2acPTQFjucag6hcCiQ=;
+        b=pQfYzu5gQGvtExS8j6V0wQbX2h22JXAb4mWQmJesNVD6fgWAPw1kFTsYkVzLiIlPjR
+         f64bL1c3Gx57wujouE3pi/q6ZFyeIfh9mZaDu5taM5uqrE+/hrhnYPjtUMTg6sS3KWk7
+         zQlWSwvAKT0x9YyxhP74uQJnwI2tcuPC4OO3zI1W0eeHqO/JAjPZPkIVzEfVo2ewffjS
+         YotD0QLOikj/Tv9v9RtkR3bS10GHMmzOaER/9W7st5PdjApjSLnKA4BFWB+o1AogRxmJ
+         EmGM/V/K/4dbOlP2lq4lqt4FtBhH7c2hLG4VNVqia9cfSWk7ivxc+dRc+HYlqZhMoQrt
+         t67A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=k5Nq2+gFOwIAZZv1z8A5AiR5tZQQa62jzNlsasSMp48=;
-        b=fhpbtvL7wHqkfJsOTOuPSH3UL5nA+C8F+TphUJRlxT0i8pgLdU24B3fLUFWUTq1D06
-         7FCkgXxpHFDyb5dNUcQF2YAaEImhn8yz3ab+1TYY20VSXs/6XuGvtugmuCN085ntf625
-         UM49x+C7bdstWeW3RFFufUFn1JiKYxRDPkCG7KgI3Tc86kbxiXixIOfofWZaxHK4j7d2
-         kldGmhToENj6gAtWECXdXtyFIZaaRNc4GixN59Ea4N2pLqEOOvmKNLI6+UQhshTHuO1i
-         7ESRvVmx3THZYjbct3oeo6bCEc3AYBwy7vRZLvSMH5nqOrEzawQX4m9Khmq0YvI7Y0jv
-         U+Cw==
-X-Gm-Message-State: AOAM5322i5RAUAzgR18Ipmhlr5s2wEaEgm5gX+ABgUHtYVKbpPG5PS+K
-        4ZX8JvhyI0osrOgJAOW7LVDUpun46GtBOznfo8c=
-X-Google-Smtp-Source: ABdhPJyx7ldHO6wPwVqCukEXkHyqjErsapicYT74I+Sb5+3fVf7Yg/FOq9MOdEU8Kcg39UMnim13mw==
-X-Received: by 2002:a2e:9048:0:b0:246:1988:3105 with SMTP id n8-20020a2e9048000000b0024619883105mr15304905ljg.404.1646076367160;
-        Mon, 28 Feb 2022 11:26:07 -0800 (PST)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
-        by smtp.gmail.com with ESMTPSA id o25-20020a2e7319000000b002461a53f353sm1482391ljc.111.2022.02.28.11.26.05
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 11:26:05 -0800 (PST)
-Received: by mail-lf1-f54.google.com with SMTP id bu29so23251946lfb.0
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:05 -0800 (PST)
-X-Received: by 2002:a05:6512:3042:b0:437:96f5:e68a with SMTP id
- b2-20020a056512304200b0043796f5e68amr14128474lfb.449.1646076365434; Mon, 28
- Feb 2022 11:26:05 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=B4Tf8ps8Giknxs7LQki4ZGeia2acPTQFjucag6hcCiQ=;
+        b=siAM+WuBrsV9BLVYsasfWefWGdk0kz32JiZCZgnEt1LCL1oPTl3Uec2LoFTN8wC+Ss
+         dpDf8MAEFBDDgQiij+wvYCDMlQh2UF4kkQ9esjhLgnqYWbQAEm8Fd3V42TT99lvULDsW
+         LuUAwlO+2khbBum+ZULfqAlHU7+IV+dMk7f4n7aaGQ3jgYaYV6TDw6ow/0ScTX4pjPBr
+         bvI2wcbXfxGLNCy3IOGfdUoxU2XSBn87zHhAs3i5jwQOSSphgQ1Q2NEh46ClkidPQ9ee
+         ga4vHsMXfqYcHCwl4QO+Zd+mHp8bNrP9ljEomOJZ8259xpAK0JqwSe2ogEDSk9aJSTBp
+         O8MA==
+X-Gm-Message-State: AOAM5324uOABkEUDJ55FHu91u5uF4HslILIbhrXNNEwAvuUKhm3Ojg+Q
+        SrvaeO9OyBZmtpCswuGeSWMjhw==
+X-Google-Smtp-Source: ABdhPJyCQQtSseZ8J+9GAAAPOG5gkjAhg6vVntdlKc/MqESku4jC3awvJmxxKGnA8cIqcferj+ON6Q==
+X-Received: by 2002:adf:fc8c:0:b0:1ed:f5af:f7c6 with SMTP id g12-20020adffc8c000000b001edf5aff7c6mr16818211wrr.386.1646077244429;
+        Mon, 28 Feb 2022 11:40:44 -0800 (PST)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id v25-20020a05600c215900b0038117f41728sm274143wml.43.2022.02.28.11.40.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Feb 2022 11:40:44 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     heiko@sntech.de, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski@canonical.com, robh+dt@kernel.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 01/16] crypto: rockchip: use dev_err for error message about interrupt
+Date:   Mon, 28 Feb 2022 19:40:22 +0000
+Message-Id: <20220228194037.1600509-2-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220228194037.1600509-1-clabbe@baylibre.com>
+References: <20220228194037.1600509-1-clabbe@baylibre.com>
 MIME-Version: 1.0
-References: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
- <20220219210354.GF59715@dread.disaster.area> <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
- <YhN76/ONC9qgIKQc@silpixa00400314> <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
-In-Reply-To: <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 28 Feb 2022 11:25:49 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
-Message-ID: <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
-Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
- dm-crypt + xfs
-To:     Kyle Sanderson <kyle.leet@gmail.com>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 12:18 AM Kyle Sanderson <kyle.leet@gmail.com> wrote:
->
-> Makes sense - this kernel driver has been destroying users for many
-> years. I'm disappointed that this critical bricking failure isn't
-> searchable for others.
+Interrupt is mandatory so the message should be printed as error.
 
-It does sound like we should just disable that driver entirely until
-it is fixed.
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ drivers/crypto/rockchip/rk3288_crypto.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Or at least the configuration that can cause problems, if there is
-some particular sub-case. Although from a cursory glance and the
-noises made in this thread, it looks like it's all of the 'qat_aeads'
-cases (since that uses qat_alg_aead_enc() which can return -EAGAIN),
-which effectively means that all of the QAT stuff.
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 35d73061d156..45cc5f766788 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -371,8 +371,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 
+ 	crypto_info->irq = platform_get_irq(pdev, 0);
+ 	if (crypto_info->irq < 0) {
+-		dev_warn(crypto_info->dev,
+-			 "control Interrupt is not available.\n");
++		dev_err(&pdev->dev, "control Interrupt is not available.\n");
+ 		err = crypto_info->irq;
+ 		goto err_crypto;
+ 	}
+-- 
+2.34.1
 
-So presumably CRYPTO_DEV_QAT should just be marked as
-
-        depends on BROKEN || COMPILE_TEST
-
-or similar?
-
-              Linus
