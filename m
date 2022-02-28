@@ -2,181 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE76C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936EEC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 21:54:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231190AbiB1Vrt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 16:47:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
+        id S230127AbiB1Vzg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 16:55:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiB1Vrr (ORCPT
+        with ESMTP id S229518AbiB1Vzf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 16:47:47 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DED714ACB4;
-        Mon, 28 Feb 2022 13:47:05 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id s1so19458109edd.13;
-        Mon, 28 Feb 2022 13:47:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=U6qUODqKVLrC7qZqs553HfNOTdovwKFxE93drAu/Dlk=;
-        b=DcAOXNn/ViLnmA/Pl4xJfWkhBybquVghVb27ULjvzphMd1cBlP8EnT2avc3nlq8Ncp
-         XU0OlwqVPcxmpQGfXIX8cDSYeDqzQFDIjUJw6vYkNcJJHsbpQaotozEaUyIGD250VuoD
-         60I5wOFshLHgsaHS54p/JatmHLrrllGTo/egDJjxoeGmck3vK6ZaE0ldZN4szqLK845U
-         BQNwjpOC8zhohOQR/VOEr6j/DtNOqZN6I6F48XJrq+10cNhH40s7WdjZ8f4gJpCeR9JY
-         suF4D0bui+heOiMd0XjHUkKuJX/fj0a+j8l22tTUgDxT9LwW7gkDbHU26uOV2JCB+l1v
-         aZYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=U6qUODqKVLrC7qZqs553HfNOTdovwKFxE93drAu/Dlk=;
-        b=iCiPdpgZCzz3yvJVrexxRCxhLpbHJio56HauB3jk0HOQJrmGA979tsWxPybrFVLGzC
-         rviOdWUGVAfG+SxRFv/OuGvdSCUQk7uF7WuGesOA/C81a/oR1K1Jm3CJszK4ejJYgZAo
-         x2mEVzUwr+4RgfbqKWz6AmZyWjaTRFjzUTjU7bRuHv8ZcadMZrk/teLe0Mtuub6nLp0L
-         a7ZyIBr8F4GE8Uu0Jc+2tXxHlIC2Imv0rNwyvD6j1LRvY9jgGT3tWdWldyGGrRH24vzG
-         nTzMwelCz91AtXEN39znf/7FQEvWlm13iKgxl7UOZY+IIOZsvmK0VqOyef47GdhW5Tmt
-         iBIg==
-X-Gm-Message-State: AOAM530/V9VOK6m4lb/4m2jbnFlZmK2daPDjc3i4TV7YGStA93vU4/Xt
-        eBbhRjdLtbgu479sDO5yQ04=
-X-Google-Smtp-Source: ABdhPJxKG2ff16tCWsK6Ck3Y2a57p3q44AgnQUgUMRZ3ajKrFkwS/Wlp6PHXO9g9MP9OhOujc97TPw==
-X-Received: by 2002:a05:6402:40d0:b0:412:f86a:efd1 with SMTP id z16-20020a05640240d000b00412f86aefd1mr21791110edb.194.1646084823834;
-        Mon, 28 Feb 2022 13:47:03 -0800 (PST)
-Received: from smtpclient.apple ([2a02:8109:9d80:3f6c:957a:1d13:c949:d1f3])
-        by smtp.gmail.com with ESMTPSA id ce7-20020a170906b24700b006cf095c2f5bsm4701847ejb.83.2022.02.28.13.47.01
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Feb 2022 13:47:03 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-In-Reply-To: <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
-Date:   Mon, 28 Feb 2022 22:47:00 +0100
-Cc:     =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
+        Mon, 28 Feb 2022 16:55:35 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3138426550;
+        Mon, 28 Feb 2022 13:54:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 85BBD61216;
+        Mon, 28 Feb 2022 21:54:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 561F0C340F2;
+        Mon, 28 Feb 2022 21:54:54 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ih5F4FRE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646085292;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0gYo+w+F9Yr9jXeKd4yhlIselJQUhTYBVZBr6ICmc44=;
+        b=Ih5F4FREcrCYLk5lw1LYw/3HpDY//WblCvSVj3bAxTYy1u8mnNT+u+M65gLh33zQ3fjbIc
+        q9YZW/dRNDs269fTyRUxqE+Qs9nx1eI100D28JGZLhSwxO8lGoTNswdnsYjHBDvvhplE5q
+        GQ+0usGDCbQ/ovrAkyMhAlFlgukzzVc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 41a9ebdc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 28 Feb 2022 21:54:52 +0000 (UTC)
+Received: by mail-yb1-f179.google.com with SMTP id b35so23321533ybi.13;
+        Mon, 28 Feb 2022 13:54:51 -0800 (PST)
+X-Gm-Message-State: AOAM531gJa5iOwiBkPn12oMb/hEclDlJ0FKFPMQNuzh4ERvGhRWU6WYG
+        VoNp/lbD3iJ5vEh1uaRrFEWM42xZY9HCywAWnVo=
+X-Google-Smtp-Source: ABdhPJwNe9vFPbC4DSpnChci/IikmDINZcY4NEsYLNZXyhxmNiIP/uNzExOmckdLCqpmu7NklpucicQIVD7qYlRH09g=
+X-Received: by 2002:a25:b905:0:b0:61e:23e4:949f with SMTP id
+ x5-20020a25b905000000b0061e23e4949fmr21728876ybj.373.1646085290051; Mon, 28
+ Feb 2022 13:54:50 -0800 (PST)
+MIME-Version: 1.0
+References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
+ <20220228183355.9090-1-Jason@zx2c4.com> <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
+ <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com> <Yh0+LA8B1jw8tnl9@smile.fi.intel.com>
+In-Reply-To: <Yh0+LA8B1jw8tnl9@smile.fi.intel.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 28 Feb 2022 22:54:39 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
+Message-ID: <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
+Subject: Re: [PATCH 2/3 v6] ACPI: allow longer device IDs
+To:     Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Len Brown <lenb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Andy,
 
+On Mon, Feb 28, 2022 at 10:28 PM Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
+> My point is that this is clear abuse of the spec and:
+> 1) we have to enable the broken, because it is already in the wild with
+>    the comment that this is an issue
+>
+> AND
+>
+> 2) issue an ECR / work with MS to make sure they understand the problem.
+>
+> This can be done in parallel. What I meant as a prerequisite is to start doing
+> 2) while we have 1) on table.
 
-> On 28. Feb 2022, at 21:10, Linus Torvalds =
-<torvalds@linux-foundation.org> wrote:
->=20
-> On Mon, Feb 28, 2022 at 12:03 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>=20
->> Side note: we do need *some* way to do it.
->=20
-> Ooh.
->=20
-> This patch is a work of art.
->=20
-> And I mean that in the worst possible way.
->=20
-> We can do
->=20
->        typeof(pos) pos
->=20
-> in the 'for ()' loop, and never use __iter at all.
->=20
-> That means that inside the for-loop, we use a _different_ 'pos' than =
-outside.
->=20
-> And then the compiler will not see some "might be uninitialized", but
-> the outer 'pos' *will* be uninitialized.
->=20
-> Unless, of course, the outer 'pos' had that pointless explicit =
-initializer.
+Oh, okay, that makes sense. If you want to get (2) going, by all means
+go for it. I have no idea how to do this myself; Ard said something
+about joining the UEFI forum as an individual something or another but
+I don't think I'm the man for the job there. Is this something that
+Intel can do with their existing membership (is that the right term?)
+at the UEFI forum? Or maybe a Microsoft engineer on the list?
 
-The goal of this is to get compiler warnings right? This would indeed be =
-great.
+From my side, regarding (1), I'm basically just waiting for Rafael's
+"Acked-by" (or an explicit nack) so I can put this in my tree and move
+on.
 
-Changing the list_for_each_entry() macro first will break all of those =
-cases
-(e.g. the ones using 'list_entry_is_head()).
-I assumed it is better to fix those cases first and then have a simple
-coccinelle script changing the macro + moving the iterator into the =
-scope
-of the macro.
-
->=20
-> Here - can somebody poke holes in this "work of art" patch?
-
-With this you are no longer able to set the 'outer' pos within the list
-iterator loop body or am I missing something? Like this it stays
-uninitialized but you'll probably want to set it from within the loop.
-
-You would then yet again need a variable with another name to use
-after the loop.
-
-I fail to see how this will make most of the changes in this
-patch obsolete (if that was the intention).
-
->=20
->                     Linus
-> <patch.diff>
-
-- Jakob
-
+Jason
