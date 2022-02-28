@@ -2,123 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569B7C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 18:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05BCC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 19:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236809AbiB1S7E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 13:59:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41126 "EHLO
+        id S229549AbiB1T0z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 14:26:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237162AbiB1S7E (ORCPT
+        with ESMTP id S229450AbiB1T0y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 13:59:04 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB8462CC;
-        Mon, 28 Feb 2022 10:58:24 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EFCCAB810DB;
-        Mon, 28 Feb 2022 18:58:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C1DC340F2;
-        Mon, 28 Feb 2022 18:58:21 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="VCWF4Bxu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646074697;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kGBLvUwxCfj+fep4C2uzBBsHHAtZqevXsUStypuqdbU=;
-        b=VCWF4Bxuyr+RXJM6ITDTf88mbFglLf39UfH8vUHhKsdqrdeEaLkHtTAwhk8W6lZnw/jeLP
-        1HXfQV2iK+1JRmGaF6Y7th022Impv9B4GEeNtbAoz65mSbvz3xwhEL85HpduLZo/XCt0wK
-        c3JBr9tQJIFiupfeSJ1YFEOVPXDVeqY=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 171f2415 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 28 Feb 2022 18:58:17 +0000 (UTC)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-2d68d519a33so119525817b3.7;
-        Mon, 28 Feb 2022 10:58:17 -0800 (PST)
-X-Gm-Message-State: AOAM531heUgqi3sxCsEKE+a4T7aDzt8OW29Y2Z+hg1DERNGi6uaWLJoO
-        V6tYDM/0MeylUR5dNvSTclVuapU8jkxiwAodPd8=
-X-Google-Smtp-Source: ABdhPJxaTul8hqPu8UErCAjxykGEG2KpUde+4nXvrW51yM/CwY4RIC071WxchyDjhsJ2Tw95+g9yCuqkz1oGEgKACWk=
-X-Received: by 2002:a0d:e005:0:b0:2d7:fb79:8f36 with SMTP id
- j5-20020a0de005000000b002d7fb798f36mr22843263ywe.404.1646074695845; Mon, 28
- Feb 2022 10:58:15 -0800 (PST)
+        Mon, 28 Feb 2022 14:26:54 -0500
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339B9114FEA
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:09 -0800 (PST)
+Received: by mail-lj1-x236.google.com with SMTP id t14so18805573ljh.8
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=k5Nq2+gFOwIAZZv1z8A5AiR5tZQQa62jzNlsasSMp48=;
+        b=hA07tqoOhzsc3WOqNCaR4tUruW+rdsfqY8YOw2mN7ILGOov8LZJfGyOH0+67N/0EaR
+         4t/JTBCib0ytZP3PxoAumfh81bQl7oYkHnLaS7IusFI7m+FXPGCuZ+b2epjKsi5SuwbN
+         6G/m+gkEWqvwTgFEdCkiL46LSGGVnwGjPchjI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=k5Nq2+gFOwIAZZv1z8A5AiR5tZQQa62jzNlsasSMp48=;
+        b=fhpbtvL7wHqkfJsOTOuPSH3UL5nA+C8F+TphUJRlxT0i8pgLdU24B3fLUFWUTq1D06
+         7FCkgXxpHFDyb5dNUcQF2YAaEImhn8yz3ab+1TYY20VSXs/6XuGvtugmuCN085ntf625
+         UM49x+C7bdstWeW3RFFufUFn1JiKYxRDPkCG7KgI3Tc86kbxiXixIOfofWZaxHK4j7d2
+         kldGmhToENj6gAtWECXdXtyFIZaaRNc4GixN59Ea4N2pLqEOOvmKNLI6+UQhshTHuO1i
+         7ESRvVmx3THZYjbct3oeo6bCEc3AYBwy7vRZLvSMH5nqOrEzawQX4m9Khmq0YvI7Y0jv
+         U+Cw==
+X-Gm-Message-State: AOAM5322i5RAUAzgR18Ipmhlr5s2wEaEgm5gX+ABgUHtYVKbpPG5PS+K
+        4ZX8JvhyI0osrOgJAOW7LVDUpun46GtBOznfo8c=
+X-Google-Smtp-Source: ABdhPJyx7ldHO6wPwVqCukEXkHyqjErsapicYT74I+Sb5+3fVf7Yg/FOq9MOdEU8Kcg39UMnim13mw==
+X-Received: by 2002:a2e:9048:0:b0:246:1988:3105 with SMTP id n8-20020a2e9048000000b0024619883105mr15304905ljg.404.1646076367160;
+        Mon, 28 Feb 2022 11:26:07 -0800 (PST)
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
+        by smtp.gmail.com with ESMTPSA id o25-20020a2e7319000000b002461a53f353sm1482391ljc.111.2022.02.28.11.26.05
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Feb 2022 11:26:05 -0800 (PST)
+Received: by mail-lf1-f54.google.com with SMTP id bu29so23251946lfb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Feb 2022 11:26:05 -0800 (PST)
+X-Received: by 2002:a05:6512:3042:b0:437:96f5:e68a with SMTP id
+ b2-20020a056512304200b0043796f5e68amr14128474lfb.449.1646076365434; Mon, 28
+ Feb 2022 11:26:05 -0800 (PST)
 MIME-Version: 1.0
-References: <Yh0QlQ8aqttjlnKt@linutronix.de>
-In-Reply-To: <Yh0QlQ8aqttjlnKt@linutronix.de>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 28 Feb 2022 19:58:05 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rqhUcVD+rE5NEcvRu6G79aNkf8RZwXZnWtHNmTf3rfaw@mail.gmail.com>
-Message-ID: <CAHmME9rqhUcVD+rE5NEcvRu6G79aNkf8RZwXZnWtHNmTf3rfaw@mail.gmail.com>
-Subject: Re: RFC: Intervals to schedule the worker for mix_interrupt_randomness().
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+References: <CACsaVZ+mt3CfdXV0_yJh7d50tRcGcRZ12j3n6-hoX2cz3+njsg@mail.gmail.com>
+ <20220219210354.GF59715@dread.disaster.area> <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
+ <YhN76/ONC9qgIKQc@silpixa00400314> <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+In-Reply-To: <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 28 Feb 2022 11:25:49 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+Message-ID: <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+To:     Kyle Sanderson <kyle.leet@gmail.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
+        device-mapper development <dm-devel@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sebastian,
+On Mon, Feb 28, 2022 at 12:18 AM Kyle Sanderson <kyle.leet@gmail.com> wrote:
+>
+> Makes sense - this kernel driver has been destroying users for many
+> years. I'm disappointed that this critical bricking failure isn't
+> searchable for others.
 
-I'm actually trying quite hard not to change the details of entropy
-gathering for 5.18. There are lots of little arguments for why each
-little thing is the way it is, and these have built up over a long
-period of time, and reworking /that/ requires some anthropological
-work to understand all the original intents, which I consider to be a
-bit of a different "project" from what I'm working on now with
-random.c. So I'd like to minimize changes to the semantics. Right now,
-those semantics are:
+It does sound like we should just disable that driver entirely until
+it is fixed.
 
-A) crng_init==0: pre_init_inject after 64 interrupts.
-B) crng_init!=0: mix_pool_bytes after 64 interrupts OR after 1 second
-has elapsed.
+Or at least the configuration that can cause problems, if there is
+some particular sub-case. Although from a cursory glance and the
+noises made in this thread, it looks like it's all of the 'qat_aeads'
+cases (since that uses qat_alg_aead_enc() which can return -EAGAIN),
+which effectively means that all of the QAT stuff.
 
-In trying to "reverse engineer" what the rationales for (A) and (B)
-might be, I imagine the reasoning breaks down to:
+So presumably CRYPTO_DEV_QAT should just be marked as
 
-A) Since crng_pre_init_inject will increase crng_init_cnt by 16, we
-want to make sure it's decently entropic [maybe? kind of a weak
-argument perhaps].
-B) We're crediting only 1 bit in this case, so let's consider that to
-have accumulated after 64 fairly fast interrupts, which may be
-"regular", or after a fewer amount that occur within a second, since
-these might be irregular, and so perhaps more entropic per-each. That
-sounds mostly sensible to me, and rather conservative too. So it seems
-okay with me.
+        depends on BROKEN || COMPILE_TEST
 
-Maybe we can revisit these for 5.19, but I'd like not to tinker too
-much with that for now. I think I can actually argue both for and
-against the points I tried to synthesize in (A) and (B) above. It's
-also related to what we collect, which you alluded to in your message.
-Right now we're collecting:
+or similar?
 
-1) random_get_entropy() (i.e. RDTSC): this is the big huge important
-thing that's captured.
-2) jiffies: does this matter if we're already gathering RDTSC? I can
-see an argument both ways. More analysis and thought required
-3) the irq number: maybe it matters, maybe it doesn't.
-4) the return address: maybe it matters, maybe it doesn't.
-5) the value of some register: maybe it matters, maybe it doesn't.
-
-Maybe this could be reduced to only capturing (1); maybe we benefit
-from having all of (1)-(5). Again, I can see the argument both ways,
-and I think that needs a lot more investigation and thought, and if
-that's to happen, it really seems like a 5.19 thing rather than a 5.18
-thing at this point.
-
-But all this brings me to what I'm really wondering when reading your
-email: do your observations matter? Are you observing a performance or
-reliability issue or something like that with those workqueues
-pending? Is this whole workqueue approach a mistake and we should
-revert it? Or is it still okay, but you were just idly wondering about
-that time limit? As you can tell, I'm mostly concerned with not
-breaking something by accident.
-
-Regards,
-Jason
+              Linus
