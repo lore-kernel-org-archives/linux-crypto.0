@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9D0C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8901C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234214AbiB1JEJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43576 "EHLO
+        id S232358AbiB1JEq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:04:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234263AbiB1JDt (ORCPT
+        with ESMTP id S234282AbiB1JEN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:03:49 -0500
+        Mon, 28 Feb 2022 04:04:13 -0500
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ABFB3FBF5;
-        Mon, 28 Feb 2022 01:02:58 -0800 (PST)
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6ZBL2Mf8z67xdg;
-        Mon, 28 Feb 2022 17:01:46 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AD342A3F;
+        Mon, 28 Feb 2022 01:03:18 -0800 (PST)
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6ZD206Snz67ySD;
+        Mon, 28 Feb 2022 17:03:14 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 10:02:56 +0100
+ 15.1.2308.21; Mon, 28 Feb 2022 10:03:15 +0100
 Received: from A2006125610.china.huawei.com (10.47.94.1) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 09:02:48 +0000
+ 15.1.2308.21; Mon, 28 Feb 2022 09:03:08 +0000
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -34,9 +34,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v6 08/10] crypto: hisilicon/qm: Set the VF QM state register
-Date:   Mon, 28 Feb 2022 09:01:19 +0000
-Message-ID: <20220228090121.1903-9-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v6 10/10] hisi_acc_vfio_pci: Use its own PCI reset_done error handler
+Date:   Mon, 28 Feb 2022 09:01:21 +0000
+Message-ID: <20220228090121.1903-11-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
 References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
@@ -50,76 +50,133 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Longfang Liu <liulongfang@huawei.com>
+Register private handler for pci_error_handlers.reset_done and update
+state accordingly.
 
-We use VF QM state register to record the status of the QM configuration
-state. This will be used in the ACC migration driver to determine whether
-we can safely save and restore the QM data.
-
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 8 ++++++++
- include/linux/hisi_acc_qm.h   | 6 ++++++
- 2 files changed, 14 insertions(+)
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 56 ++++++++++++++++++-
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  4 +-
+ 2 files changed, 56 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 8c29f9fba573..5a0ac6cb6eeb 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3492,6 +3492,12 @@ static void hisi_qm_pci_uninit(struct hisi_qm *qm)
- 	pci_disable_device(pdev);
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+index ce57c230d1a0..cdd278d6be11 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+@@ -868,6 +868,26 @@ hisi_acc_vf_set_device_state(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+ 	return ERR_PTR(-EINVAL);
  }
  
-+static void hisi_qm_set_state(struct hisi_qm *qm, u8 state)
++/*
++ * This function is called in all state_mutex unlock cases to
++ * handle a 'deferred_reset' if exists.
++ */
++static void hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
 +{
-+	if (qm->ver > QM_HW_V2 && qm->fun_type == QM_HW_VF)
-+		writel(state, qm->io_base + QM_VF_STATE);
++again:
++	spin_lock(&hisi_acc_vdev->reset_lock);
++	if (hisi_acc_vdev->deferred_reset) {
++		hisi_acc_vdev->deferred_reset = false;
++		spin_unlock(&hisi_acc_vdev->reset_lock);
++		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
++		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
++		hisi_acc_vf_disable_fds(hisi_acc_vdev);
++		goto again;
++	}
++	mutex_unlock(&hisi_acc_vdev->state_mutex);
++	spin_unlock(&hisi_acc_vdev->reset_lock);
 +}
 +
- /**
-  * hisi_qm_uninit() - Uninitialize qm.
-  * @qm: The qm needed uninit.
-@@ -3520,6 +3526,7 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 		dma_free_coherent(dev, qm->qdma.size,
- 				  qm->qdma.va, qm->qdma.dma);
+ static struct file *
+ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
+ 				   enum vfio_device_mig_state new_state)
+@@ -898,7 +918,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
+ 			break;
+ 		}
  	}
-+	hisi_qm_set_state(qm, QM_NOT_READY);
- 	up_write(&qm->qps_lock);
+-	mutex_unlock(&hisi_acc_vdev->state_mutex);
++	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+ 	return res;
+ }
  
- 	qm_irq_unregister(qm);
-@@ -3745,6 +3752,7 @@ int hisi_qm_start(struct hisi_qm *qm)
- 	if (!ret)
- 		atomic_set(&qm->status.flags, QM_START);
+@@ -911,10 +931,35 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
  
-+	hisi_qm_set_state(qm, QM_READY);
- err_unlock:
- 	up_write(&qm->qps_lock);
- 	return ret;
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 70706c1fb7b6..cae3e02ce23e 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -67,6 +67,7 @@
- #define QM_DB_RAND_SHIFT_V2		16
- #define QM_DB_INDEX_SHIFT_V2		32
- #define QM_DB_PRIORITY_SHIFT_V2		48
-+#define QM_VF_STATE			0x60
+ 	mutex_lock(&hisi_acc_vdev->state_mutex);
+ 	*curr_state = hisi_acc_vdev->mig_state;
+-	mutex_unlock(&hisi_acc_vdev->state_mutex);
++	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
+ 	return 0;
+ }
  
- /* qm cache */
- #define QM_CACHE_CTL			0x100050
-@@ -162,6 +163,11 @@ enum qm_debug_file {
- 	DEBUG_FILE_NUM,
- };
++static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
++{
++	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
++
++	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
++				VFIO_MIGRATION_STOP_COPY)
++		return;
++
++	/*
++	 * As the higher VFIO layers are holding locks across reset and using
++	 * those same locks with the mm_lock we need to prevent ABBA deadlock
++	 * with the state_mutex and mm_lock.
++	 * In case the state_mutex was taken already we defer the cleanup work
++	 * to the unlock flow of the other running context.
++	 */
++	spin_lock(&hisi_acc_vdev->reset_lock);
++	hisi_acc_vdev->deferred_reset = true;
++	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
++		spin_unlock(&hisi_acc_vdev->reset_lock);
++		return;
++	}
++	spin_unlock(&hisi_acc_vdev->reset_lock);
++	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
++}
++
+ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
+ {
+ 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
+@@ -1257,12 +1302,17 @@ static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
  
-+enum qm_vf_state {
-+	QM_READY = 0,
-+	QM_NOT_READY,
+ MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
+ 
++static const struct pci_error_handlers hisi_acc_vf_err_handlers = {
++	.reset_done = hisi_acc_vf_pci_aer_reset_done,
++	.error_detected = vfio_pci_core_aer_err_detected,
 +};
 +
- struct qm_dfx {
- 	atomic64_t err_irq_cnt;
- 	atomic64_t aeq_irq_cnt;
+ static struct pci_driver hisi_acc_vfio_pci_driver = {
+ 	.name = KBUILD_MODNAME,
+ 	.id_table = hisi_acc_vfio_pci_table,
+ 	.probe = hisi_acc_vfio_pci_probe,
+ 	.remove = hisi_acc_vfio_pci_remove,
+-	.err_handler = &vfio_pci_core_err_handlers,
++	.err_handler = &hisi_acc_vf_err_handlers,
+ };
+ 
+ module_pci_driver(hisi_acc_vfio_pci_driver);
+diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+index 51bc7e92a776..6c18f7c74f34 100644
+--- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
++++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+@@ -96,6 +96,7 @@ struct hisi_acc_vf_migration_file {
+ struct hisi_acc_vf_core_device {
+ 	struct vfio_pci_core_device core_device;
+ 	u8 match_done:1;
++	u8 deferred_reset:1;
+ 	/* for migration state */
+ 	struct mutex state_mutex;
+ 	enum vfio_device_mig_state mig_state;
+@@ -105,7 +106,8 @@ struct hisi_acc_vf_core_device {
+ 	struct hisi_qm vf_qm;
+ 	u32 vf_qm_state;
+ 	int vf_id;
+-
++	/* for reset handler */
++	spinlock_t reset_lock;
+ 	struct hisi_acc_vf_migration_file resuming_migf;
+ 	struct hisi_acc_vf_migration_file saving_migf;
+ };
 -- 
 2.25.1
 
