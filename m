@@ -2,30 +2,30 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E215C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96F7C433F5
 	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 09:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234181AbiB1JDW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 04:03:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40558 "EHLO
+        id S234187AbiB1JDX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 04:03:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234223AbiB1JC7 (ORCPT
+        with ESMTP id S234304AbiB1JDT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 04:02:59 -0500
+        Mon, 28 Feb 2022 04:03:19 -0500
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A66D31227;
-        Mon, 28 Feb 2022 01:02:21 -0800 (PST)
-Received: from fraeml739-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6Z9n2Cvzz67xJ7;
-        Mon, 28 Feb 2022 17:01:17 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA56D13CDF;
+        Mon, 28 Feb 2022 01:02:39 -0800 (PST)
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K6ZB76yvDz67xJ7;
+        Mon, 28 Feb 2022 17:01:35 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml739-chm.china.huawei.com (10.206.15.220) with Microsoft SMTP Server
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 10:02:19 +0100
+ 15.1.2308.21; Mon, 28 Feb 2022 10:02:37 +0100
 Received: from A2006125610.china.huawei.com (10.47.94.1) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 28 Feb 2022 09:02:11 +0000
+ 15.1.2308.21; Mon, 28 Feb 2022 09:02:30 +0000
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -34,9 +34,9 @@ CC:     <alex.williamson@redhat.com>, <jgg@nvidia.com>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v6 04/10] hisi_acc_vfio_pci: add new vfio_pci driver for HiSilicon ACC devices
-Date:   Mon, 28 Feb 2022 09:01:15 +0000
-Message-ID: <20220228090121.1903-5-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v6 06/10] hisi_acc_vfio_pci: Add helper to retrieve the struct pci_driver
+Date:   Mon, 28 Feb 2022 09:01:17 +0000
+Message-ID: <20220228090121.1903-7-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
 References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
@@ -50,174 +50,83 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a vendor-specific vfio_pci driver for HiSilicon ACC devices.
-This will be extended in subsequent patches to add support for
-VFIO live migration feature.
+struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
+Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
+as we use this in ACC vfio migration driver.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/pci/Kconfig                      |   2 +
- drivers/vfio/pci/Makefile                     |   2 +
- drivers/vfio/pci/hisilicon/Kconfig            |   9 ++
- drivers/vfio/pci/hisilicon/Makefile           |   4 +
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 100 ++++++++++++++++++
- 5 files changed, 117 insertions(+)
- create mode 100644 drivers/vfio/pci/hisilicon/Kconfig
- create mode 100644 drivers/vfio/pci/hisilicon/Makefile
- create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
+ drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
+ drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
+ include/linux/hisi_acc_qm.h               | 5 +++++
+ 4 files changed, 23 insertions(+)
 
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 187b9c259944..4da1914425e1 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -46,4 +46,6 @@ endif
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index ba4043447e53..f7daed8caad1 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -1189,6 +1189,12 @@ static struct pci_driver hpre_pci_driver = {
+ 	.driver.pm		= &hpre_pm_ops,
+ };
  
- source "drivers/vfio/pci/mlx5/Kconfig"
++struct pci_driver *hisi_hpre_get_pf_driver(void)
++{
++	return &hpre_pci_driver;
++}
++EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
++
+ static void hpre_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index ab806fb481ac..952da442ce49 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -1087,6 +1087,12 @@ static struct pci_driver sec_pci_driver = {
+ 	.driver.pm = &sec_pm_ops,
+ };
  
-+source "drivers/vfio/pci/hisilicon/Kconfig"
++struct pci_driver *hisi_sec_get_pf_driver(void)
++{
++	return &sec_pci_driver;
++}
++EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
 +
- endif
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index ed9d6f2e0555..7052ebd893e0 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -9,3 +9,5 @@ vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
- obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
+ static void sec_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index f4a517728385..58568ccb7dfc 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -1010,6 +1010,12 @@ static struct pci_driver hisi_zip_pci_driver = {
+ 	.driver.pm		= &hisi_zip_pm_ops,
+ };
  
- obj-$(CONFIG_MLX5_VFIO_PCI)           += mlx5/
-+
-+obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisilicon/
-diff --git a/drivers/vfio/pci/hisilicon/Kconfig b/drivers/vfio/pci/hisilicon/Kconfig
-new file mode 100644
-index 000000000000..d5acaf74a878
---- /dev/null
-+++ b/drivers/vfio/pci/hisilicon/Kconfig
-@@ -0,0 +1,9 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config HISI_ACC_VFIO_PCI
-+	tristate "VFIO PCI support for HiSilicon ACC devices"
-+	depends on (ARM64 && VFIO_PCI_CORE) || (COMPILE_TEST && 64BIT)
-+	help
-+	  This provides generic PCI support for HiSilicon ACC devices
-+	  using the VFIO framework.
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/pci/hisilicon/Makefile b/drivers/vfio/pci/hisilicon/Makefile
-new file mode 100644
-index 000000000000..c66b3783f2f9
---- /dev/null
-+++ b/drivers/vfio/pci/hisilicon/Makefile
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisi-acc-vfio-pci.o
-+hisi-acc-vfio-pci-y := hisi_acc_vfio_pci.o
-+
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-new file mode 100644
-index 000000000000..8129c3457b3b
---- /dev/null
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -0,0 +1,100 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (c) 2021, HiSilicon Ltd.
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/eventfd.h>
-+#include <linux/file.h>
-+#include <linux/hisi_acc_qm.h>
-+#include <linux/interrupt.h>
-+#include <linux/module.h>
-+#include <linux/pci.h>
-+#include <linux/vfio.h>
-+#include <linux/vfio_pci_core.h>
-+
-+static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
++struct pci_driver *hisi_zip_get_pf_driver(void)
 +{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+	int ret;
-+
-+	ret = vfio_pci_core_enable(vdev);
-+	if (ret)
-+		return ret;
-+
-+	vfio_pci_core_finish_enable(vdev);
-+
-+	return 0;
++	return &hisi_zip_pci_driver;
 +}
++EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
 +
-+static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
-+	.name = "hisi-acc-vfio-pci",
-+	.open_device = hisi_acc_vfio_pci_open_device,
-+	.close_device = vfio_pci_core_close_device,
-+	.ioctl = vfio_pci_core_ioctl,
-+	.device_feature = vfio_pci_core_ioctl_feature,
-+	.read = vfio_pci_core_read,
-+	.write = vfio_pci_core_write,
-+	.mmap = vfio_pci_core_mmap,
-+	.request = vfio_pci_core_request,
-+	.match = vfio_pci_core_match,
-+};
+ static void hisi_zip_register_debugfs(void)
+ {
+ 	if (!debugfs_initialized())
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 8befb59c6fb3..70706c1fb7b6 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
+ int hisi_qm_get_dfx_access(struct hisi_qm *qm);
+ void hisi_qm_put_dfx_access(struct hisi_qm *qm);
+ void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
 +
-+static int hisi_acc_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct vfio_pci_core_device *vdev;
-+	int ret;
-+
-+	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
-+	if (!vdev)
-+		return -ENOMEM;
-+
-+	vfio_pci_core_init_device(vdev, pdev, &hisi_acc_vfio_pci_ops);
-+
-+	ret = vfio_pci_core_register_device(vdev);
-+	if (ret)
-+		goto out_free;
-+
-+	dev_set_drvdata(&pdev->dev, vdev);
-+
-+	return 0;
-+
-+out_free:
-+	vfio_pci_core_uninit_device(vdev);
-+	kfree(vdev);
-+	return ret;
-+}
-+
-+static void hisi_acc_vfio_pci_remove(struct pci_dev *pdev)
-+{
-+	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
-+
-+	vfio_pci_core_unregister_device(vdev);
-+	vfio_pci_core_uninit_device(vdev);
-+	kfree(vdev);
-+}
-+
-+static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
-+	{ }
-+};
-+
-+MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
-+
-+static struct pci_driver hisi_acc_vfio_pci_driver = {
-+	.name = KBUILD_MODNAME,
-+	.id_table = hisi_acc_vfio_pci_table,
-+	.probe = hisi_acc_vfio_pci_probe,
-+	.remove = hisi_acc_vfio_pci_remove,
-+	.err_handler = &vfio_pci_core_err_handlers,
-+};
-+
-+module_pci_driver(hisi_acc_vfio_pci_driver);
-+
-+MODULE_LICENSE("GPL v2");
-+MODULE_AUTHOR("Liu Longfang <liulongfang@huawei.com>");
-+MODULE_AUTHOR("Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>");
-+MODULE_DESCRIPTION("HiSilicon VFIO PCI - Generic VFIO PCI driver for HiSilicon ACC device family");
++/* Used by VFIO ACC live migration driver */
++struct pci_driver *hisi_sec_get_pf_driver(void);
++struct pci_driver *hisi_hpre_get_pf_driver(void);
++struct pci_driver *hisi_zip_get_pf_driver(void);
+ #endif
 -- 
 2.25.1
 
