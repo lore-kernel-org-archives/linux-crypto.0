@@ -2,123 +2,181 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03193C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 22:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84681C4167E
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Feb 2022 22:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbiB1WWt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 17:22:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33054 "EHLO
+        id S231446AbiB1W3p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 17:29:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbiB1WWt (ORCPT
+        with ESMTP id S229741AbiB1W3o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 17:22:49 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33F3506EC;
-        Mon, 28 Feb 2022 14:22:08 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 28 Feb 2022 17:29:44 -0500
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CECE9EDF1A;
+        Mon, 28 Feb 2022 14:29:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1646087344;
+        bh=gnitHaDoKtFYFmdfHx7ZmUK+2K99mC4OdMWiGF3yqts=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=aDv+zUJMVLbpHnTobs88HMeKXt8e/Fsm3NyltqbtXmut8dDpKPmgZQHvU7CQAhpxT
+         x8yyOH8cKkqI9wCCVd7mWgGGPtOdFvurEvTcoJzgoG8F+eqVyUcxI30U1Z3UyKmv+s
+         JFRv6cmaJ/MAgdj571KO+Pve8Zec5bTLqNmzMPjU=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2FE4A1281036;
+        Mon, 28 Feb 2022 17:29:04 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id UdsLtl38GfVe; Mon, 28 Feb 2022 17:29:04 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1646087343;
+        bh=gnitHaDoKtFYFmdfHx7ZmUK+2K99mC4OdMWiGF3yqts=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=u33hwQnb0VqdOXP8ulufSc5IRuZCZipVBGZNcGF9+k1EE0TmKFXpcGOMGd4fMwEgO
+         9syQhDBoNk9Z7GUqfbwA47rALQtXFHUxFeSSP/G0sxjEsJWs9EMuAmppU6twhzQzk+
+         fAgT3F3AJIbVTwM2ufsCoBYKhhHBSRhleqdyR2l4=
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::527])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9BD09B8169B;
-        Mon, 28 Feb 2022 22:22:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36988C340F1;
-        Mon, 28 Feb 2022 22:22:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646086926;
-        bh=P3RJPyvew0u9GaWw0+kawCA+Aa0S0Cg+fhDhJTtI7WY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=kKgSKNxp3dy1v+6fq7H/LaJA67HACjUO8DeHJ7O68Pdj4zyGywNWWgC5VXkw0y5bd
-         w4ynr4JZ64dYDSMBlpniIitw5ZCsocK1WNcwAJoG/x1OhAep29Qh5W9AYc6+KrBV/F
-         SXdsoCRHA7SPtbswz7UbM3c5fnsjDQJuTAUCMXKLuQ4Wl7wSWZ5RLMTeQcXBLgQlbe
-         ES0IU7rzZddlU2GUDOgYT5Ovx0ByJuBv3wnc1l/gamx6V1aLArp+c+4goNkLfjMjcq
-         +HFLaDP9XVOB0q8QVuPyiLM3DM/5UVaZt0CLvFJmOdGkggyPzVBLzapz+I/tNFNn3Z
-         SfIPS6x3wrrWA==
-Received: by mail-yb1-f177.google.com with SMTP id g6so23461228ybe.12;
-        Mon, 28 Feb 2022 14:22:06 -0800 (PST)
-X-Gm-Message-State: AOAM5309mraBstu5+Zydqjdhnm2g9VsWPCJpx5VVfckmFeQHLz91BBN4
-        Y0vQpm53MRmoKDH9W5Ln2yOYiIwOnP3lp8AulSU=
-X-Google-Smtp-Source: ABdhPJypMTo8MRt76kkvfuMrl1ogcW1q2vbMVNiJZF/J6htWVaDJY+qiqmeCSg2/8ymFNE57DSGqOk5DBFs2FxxX7Jw=
-X-Received: by 2002:a25:24ce:0:b0:61e:1276:bfcf with SMTP id
- k197-20020a2524ce000000b0061e1276bfcfmr20824571ybk.299.1646086925296; Mon, 28
- Feb 2022 14:22:05 -0800 (PST)
-MIME-Version: 1.0
-References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
- <20220228183355.9090-1-Jason@zx2c4.com> <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
- <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
- <Yh0+LA8B1jw8tnl9@smile.fi.intel.com> <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
- <MN0PR21MB3098981B77F513976A62CA57D7019@MN0PR21MB3098.namprd21.prod.outlook.com>
-In-Reply-To: <MN0PR21MB3098981B77F513976A62CA57D7019@MN0PR21MB3098.namprd21.prod.outlook.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 28 Feb 2022 23:21:54 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFZZoOeXnjxdU+gOJTN=Szn=eiXgRhSS9_nnHgwADNHjA@mail.gmail.com>
-Message-ID: <CAMj1kXFZZoOeXnjxdU+gOJTN=Szn=eiXgRhSS9_nnHgwADNHjA@mail.gmail.com>
-Subject: Re: [PATCH 2/3 v6] ACPI: allow longer device IDs
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-Cc:     jason <jason@zx2c4.com>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id C21DB1280D34;
+        Mon, 28 Feb 2022 17:28:59 -0500 (EST)
+Message-ID: <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop
+ body as a ptr
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Mike Rapoport <rppt@kernel.org>,
+        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Len Brown <lenb@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Date:   Mon, 28 Feb 2022 17:28:58 -0500
+In-Reply-To: <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+         <20220228110822.491923-3-jakobkoschel@gmail.com>
+         <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+         <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+         <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+         <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+         <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 28 Feb 2022 at 23:14, Michael Kelley (LINUX)
-<mikelley@microsoft.com> wrote:
->
-> From: Jason A. Donenfeld <Jason@zx2c4.com> Sent: Monday, February 28, 2022 1:55 PM
-> >
-> > Hi Andy,
-> >
-> > On Mon, Feb 28, 2022 at 10:28 PM Andy Shevchenko
-> > <andy.shevchenko@gmail.com> wrote:
-> > > My point is that this is clear abuse of the spec and:
-> > > 1) we have to enable the broken, because it is already in the wild with
-> > >    the comment that this is an issue
-> > >
-> > > AND
-> > >
-> > > 2) issue an ECR / work with MS to make sure they understand the problem.
-> > >
-> > > This can be done in parallel. What I meant as a prerequisite is to start doing
-> > > 2) while we have 1) on table.
-> >
-> > Oh, okay, that makes sense. If you want to get (2) going, by all means
-> > go for it. I have no idea how to do this myself; Ard said something
-> > about joining the UEFI forum as an individual something or another but
-> > I don't think I'm the man for the job there. Is this something that
-> > Intel can do with their existing membership (is that the right term?)
-> > at the UEFI forum? Or maybe a Microsoft engineer on the list?
->
-> My team at Microsoft, which works on Linux, filed a bug on this
-> issue against the Hyper-V team about a year ago, probably when the issue
-> was raised during the previous attempt to implement the functionality
-> in Linux.  I've talked with the Hyper-V dev manager, and they acknowledge
-> that the ACPI entry Hyper-V provides to guest VMs violates the spec.  But
-> changing to an identifier that meets the spec is problematic because
-> of backwards compatibility with Windows guests on Hyper-V that
-> consume the current identifier.  There's no practical way to have Hyper-V
-> provide a conformant identifier AND fix all the Windows guests out in
-> the wild to consume the new identifier.   As a result, at this point Hyper-V
-> is not planning to change anything.
->
-> It's a lousy state-of-affairs, but as mentioned previously in this thread,
-> it seems to be one that we will have to live with.
->
+On Mon, 2022-02-28 at 23:59 +0200, Mike Rapoport wrote:
+> 
+> On February 28, 2022 10:42:53 PM GMT+02:00, James Bottomley <
+> James.Bottomley@HansenPartnership.com> wrote:
+> > On Mon, 2022-02-28 at 21:07 +0100, Christian König wrote:
+[...]
+> > > > I do wish we could actually poison the 'pos' value after the
+> > > > loop somehow - but clearly the "might be uninitialized" I was
+> > > > hoping for isn't the way to do it.
+> > > > 
+> > > > Anybody have any ideas?
+> > > 
+> > > I think we should look at the use cases why code is touching
+> > > (pos) after the loop.
+> > > 
+> > > Just from skimming over the patches to change this and experience
+> > > with the drivers/subsystems I help to maintain I think the
+> > > primary pattern looks something like this:
+> > > 
+> > > list_for_each_entry(entry, head, member) {
+> > >      if (some_condition_checking(entry))
+> > >          break;
+> > > }
+> > > do_something_with(entry);
+> > 
+> > Actually, we usually have a check to see if the loop found
+> > anything, but in that case it should something like
+> > 
+> > if (list_entry_is_head(entry, head, member)) {
+> >    return with error;
+> > }
+> > do_somethin_with(entry);
+> > 
+> > Suffice?  The list_entry_is_head() macro is designed to cope with
+> > the bogus entry on head problem.
+> 
+> Won't suffice because the end goal of this work is to limit scope of
+> entry only to loop. Hence the need for additional variable.
 
-Thanks for chiming in.
+Well, yes, but my objection is more to the size of churn than the
+desire to do loop local.  I'm not even sure loop local is possible,
+because it's always annoyed me that for (int i = 0; ...  in C++ defines
+i in the outer scope not the loop scope, which is why I never use it.
 
-Why not do something like
+However, if the desire is really to poison the loop variable then we
+can do
 
-Name (_CID, Package (2) { "VM_GEN_COUNTER", "VMGENCTR" } )
+#define list_for_each_entry(pos, head, member)				\
+	for (pos = list_first_entry(head, typeof(*pos), member);	\
+	     !list_entry_is_head(pos, head, member) && ((pos = NULL) == NULL;			\
+	     pos = list_next_entry(pos, member))
 
-?
+Which would at least set pos to NULL when the loop completes.
 
-That way, older clients can match on the existing _CID and new clients
-can match on the spec compliant one.
+> Besides, there are no guarantees that people won't
+> do_something_with(entry) without the check or won't compare entry to
+> NULL to check if the loop finished with break or not.
+
+I get the wider goal, but we have to patch the problem cases now and a
+simple one-liner is better than a larger patch that may or may not work
+if we ever achieve the local definition or value poisoning idea.  I'm
+also fairly certain coccinelle can come up with a use without checking
+for loop completion semantic patch which we can add to 0day.
+
+James
+
+
