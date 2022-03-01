@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F62C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 23:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C24CEC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 23:11:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238662AbiCAXL4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 18:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
+        id S238504AbiCAXLy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 18:11:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238502AbiCAXLx (ORCPT
+        with ESMTP id S237939AbiCAXLm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 18:11:53 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7E090FF9;
-        Tue,  1 Mar 2022 15:11:00 -0800 (PST)
+        Tue, 1 Mar 2022 18:11:42 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D73E46B32;
+        Tue,  1 Mar 2022 15:10:59 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 764506146F;
-        Tue,  1 Mar 2022 23:11:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4BA8C340EE;
-        Tue,  1 Mar 2022 23:10:58 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E7A97B81E98;
+        Tue,  1 Mar 2022 23:10:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF49AC340F1;
+        Tue,  1 Mar 2022 23:10:55 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PZWdJMvP"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kFJUX7By"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646176257;
+        t=1646176254;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=r94wKsnq6K6ND+X220Ovab4Du6A3foJxGdJh9sRmxh4=;
-        b=PZWdJMvP7n2f1PXzoh3oU+xY+PZFzyyvsm0lKHqtwO9U3E9mHjtqaDthbhA81EZn9f5Fz0
-        aEdPHaZipArVvlP4dHNvOT2G8261DJvChMlbVUhm7mgXctVyU5FbpXZNo5VbwWa7Eaeyaf
-        IX55Cu8fBSiMH0l6aFX+z7/orXFmNNg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 358d3e1e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 1 Mar 2022 23:10:57 +0000 (UTC)
+        bh=JitSAewM5XJnyNcarCeKZoli7SPLiQKyT0vtFg6EFEU=;
+        b=kFJUX7ByF+p+w9SVX+GdmTQCHZhwpA4C+M8oZ1TQhG/Hb/kMcdwY3QaLlhp0KuILVKA0bU
+        6Px26fc96VQg4Jpf8Z+C3Yw6tXVQ3fhyLdB0fPrFaoR7E0ZswLDWEJXZe01kYxHwV8+4jC
+        yob7Q2uIeT+USQKiW2zQOvVxXFvwln4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8b7222fd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 1 Mar 2022 23:10:54 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org, Alexander Graf <graf@amazon.com>,
@@ -43,10 +43,10 @@ To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Greg KH <gregkh@linuxfoundation.org>
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
-        Theodore Ts'o <tytso@mit.edu>, Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 3/3] wireguard: device: clear keys on VM fork
-Date:   Wed,  2 Mar 2022 00:10:38 +0100
-Message-Id: <20220301231038.530897-4-Jason@zx2c4.com>
+        Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH 2/3] random: provide notifier for VM fork
+Date:   Wed,  2 Mar 2022 00:10:37 +0100
+Message-Id: <20220301231038.530897-3-Jason@zx2c4.com>
 In-Reply-To: <20220301231038.530897-1-Jason@zx2c4.com>
 References: <20220301231038.530897-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -55,123 +55,74 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When a virtual machine forks, it's important that WireGuard clear
-existing sessions so that different plaintext is not transmitted using
-the same key+nonce, which can result in catastrophic cryptographic
-failure. To accomplish this, we simply hook into the newly added vmfork
-notifier, which can use the same notification function we're already
-using for PM notifications.
-
-As a bonus, it turns out that, like the vmfork registration function,
-the PM registration function is stubbed out when CONFIG_PM_SLEEP is not
-set, so we can actually just remove the maze of ifdefs, which makes it
-really quite clean to support both notifiers at once.
+Drivers such as WireGuard need to learn when VMs fork in order to clear
+sessions. This commit provides a simple notifier_block for that, with a
+register and unregister function. When no VM fork detection is compiled
+in, this turns into a no-op, similar to how the power notifier works.
 
 Cc: Dominik Brodowski <linux@dominikbrodowski.net>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
-Hi Jakub,
+ drivers/char/random.c  | 15 +++++++++++++++
+ include/linux/random.h |  5 +++++
+ 2 files changed, 20 insertions(+)
 
-I wasn't planning on sending other WireGuard changes to net-next this
-cycle, and this one here depends on previous things in my random.git
-tree. Is it okay with you if I take this through my tree rather than
-net-next? Alternatively, I could send it through net after rc1 if you'd
-prefer that. Or we could just wait for 5.19, but that seems a long way's
-off.
-
-Thanks,
-Jason
-
- drivers/net/wireguard/device.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index a46067c38bf5..22cc27c221f8 100644
---- a/drivers/net/wireguard/device.c
-+++ b/drivers/net/wireguard/device.c
-@@ -59,7 +59,10 @@ static int wg_open(struct net_device *dev)
- 	return ret;
- }
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 6bd1bbab7392..483fd2dc2057 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1141,6 +1141,8 @@ void add_bootloader_randomness(const void *buf, size_t size)
+ EXPORT_SYMBOL_GPL(add_bootloader_randomness);
  
--#ifdef CONFIG_PM_SLEEP
-+static int wg_pm_notification(struct notifier_block *nb, unsigned long action, void *data);
-+static struct notifier_block pm_notifier = { .notifier_call = wg_pm_notification };
-+static struct notifier_block vm_notifier = { .notifier_call = wg_pm_notification };
+ #if IS_ENABLED(CONFIG_VMGENID)
++static BLOCKING_NOTIFIER_HEAD(vmfork_notifier);
 +
- static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
- 			      void *data)
- {
-@@ -70,10 +73,10 @@ static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
- 	 * its normal operation rather than as a somewhat rare event, then we
- 	 * don't actually want to clear keys.
- 	 */
--	if (IS_ENABLED(CONFIG_PM_AUTOSLEEP) || IS_ENABLED(CONFIG_ANDROID))
-+	if (nb == &pm_notifier && (IS_ENABLED(CONFIG_PM_AUTOSLEEP) || IS_ENABLED(CONFIG_ANDROID)))
- 		return 0;
- 
--	if (action != PM_HIBERNATION_PREPARE && action != PM_SUSPEND_PREPARE)
-+	if (nb == &pm_notifier && action != PM_HIBERNATION_PREPARE && action != PM_SUSPEND_PREPARE)
- 		return 0;
- 
- 	rtnl_lock();
-@@ -91,9 +94,6 @@ static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
- 	return 0;
+ /*
+  * Handle a new unique VM ID, which is unique, not secret, so we
+  * don't credit it, but we do immediately force a reseed after so
+@@ -1152,11 +1154,24 @@ void add_vmfork_randomness(const void *unique_vm_id, size_t size)
+ 	if (crng_ready()) {
+ 		crng_reseed(true);
+ 		pr_notice("crng reseeded due to virtual machine fork\n");
++		blocking_notifier_call_chain(&vmfork_notifier, 0, NULL);
+ 	}
  }
- 
--static struct notifier_block pm_notifier = { .notifier_call = wg_pm_notification };
--#endif
--
- static int wg_stop(struct net_device *dev)
- {
- 	struct wg_device *wg = netdev_priv(dev);
-@@ -424,16 +424,18 @@ int __init wg_device_init(void)
- {
- 	int ret;
- 
--#ifdef CONFIG_PM_SLEEP
- 	ret = register_pm_notifier(&pm_notifier);
- 	if (ret)
- 		return ret;
--#endif
- 
--	ret = register_pernet_device(&pernet_ops);
-+	ret = register_random_vmfork_notifier(&vm_notifier);
- 	if (ret)
- 		goto error_pm;
- 
-+	ret = register_pernet_device(&pernet_ops);
-+	if (ret)
-+		goto error_vm;
+ #if IS_MODULE(CONFIG_VMGENID)
+ EXPORT_SYMBOL_GPL(add_vmfork_randomness);
+ #endif
 +
- 	ret = rtnl_link_register(&link_ops);
- 	if (ret)
- 		goto error_pernet;
-@@ -442,10 +444,10 @@ int __init wg_device_init(void)
++int register_random_vmfork_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_register(&vmfork_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(register_random_vmfork_notifier);
++
++int unregister_random_vmfork_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_unregister(&vmfork_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(unregister_random_vmfork_notifier);
+ #endif
  
- error_pernet:
- 	unregister_pernet_device(&pernet_ops);
-+error_vm:
-+	unregister_random_vmfork_notifier(&vm_notifier);
- error_pm:
--#ifdef CONFIG_PM_SLEEP
- 	unregister_pm_notifier(&pm_notifier);
--#endif
- 	return ret;
- }
+ struct fast_pool {
+diff --git a/include/linux/random.h b/include/linux/random.h
+index e84b6fa27435..7fccbc7e5a75 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -31,6 +31,11 @@ extern void add_hwgenerator_randomness(const void *buffer, size_t count,
+ 				       size_t entropy);
+ #if IS_ENABLED(CONFIG_VMGENID)
+ extern void add_vmfork_randomness(const void *unique_vm_id, size_t size);
++extern int register_random_vmfork_notifier(struct notifier_block *nb);
++extern int unregister_random_vmfork_notifier(struct notifier_block *nb);
++#else
++static inline int register_random_vmfork_notifier(struct notifier_block *nb) { return 0; }
++static inline int unregister_random_vmfork_notifier(struct notifier_block *nb) { return 0; }
+ #endif
  
-@@ -453,8 +455,7 @@ void wg_device_uninit(void)
- {
- 	rtnl_link_unregister(&link_ops);
- 	unregister_pernet_device(&pernet_ops);
--#ifdef CONFIG_PM_SLEEP
-+	unregister_random_vmfork_notifier(&vm_notifier);
- 	unregister_pm_notifier(&pm_notifier);
--#endif
- 	rcu_barrier();
- }
+ extern void get_random_bytes(void *buf, size_t nbytes);
 -- 
 2.35.1
 
