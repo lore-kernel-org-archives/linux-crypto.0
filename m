@@ -2,104 +2,185 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CA6C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 18:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A63C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 18:53:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236450AbiCASiP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 13:38:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37806 "EHLO
+        id S237068AbiCASyd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 13:54:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237095AbiCASiI (ORCPT
+        with ESMTP id S237055AbiCASyc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 13:38:08 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEFB25EB0;
-        Tue,  1 Mar 2022 10:37:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 91235B81BFB;
-        Tue,  1 Mar 2022 18:37:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D9E0C340EE;
-        Tue,  1 Mar 2022 18:37:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aQfeTqt3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646159840;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VSlbgJdpoP+AY+bV5mfkN+zErWZpSrp0RJgkPDVSc0A=;
-        b=aQfeTqt3Blqmd7xwmnnemPOkABs2OSRQfD3vrWDfSpclMht5sVb5NhIpVgxjRlEiCLkj7u
-        TWiA9VszkWjvxE0Yx8q/qb/9de6ZpRvFOxGB1JCkF6eZfpa4GxXxMZ/IWhlVmVPlgRK2e5
-        TKYSF2+nWIzlxjGcVXAAqFsV6gVdKi4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 61d2a11b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 1 Mar 2022 18:37:20 +0000 (UTC)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-2dc0364d2ceso5938327b3.7;
-        Tue, 01 Mar 2022 10:37:18 -0800 (PST)
-X-Gm-Message-State: AOAM533aWgITWalmDDlDTyk01ub1VY3yAnLIG9sIfSRQ0gWxD6mJQdbF
-        LnsLkRs33jUjOwpRvgltivZHmvFIxVgMa1kgT8I=
-X-Google-Smtp-Source: ABdhPJxjsymwg5XYl+9GOoc41diKHCjvuVitOGfsmWq8BKG7jLc7Bwscjb/8sbN68Rx5awXeXGZ28M5wy+3vS8Wf7hE=
-X-Received: by 2002:a81:8984:0:b0:2db:6b04:be0c with SMTP id
- z126-20020a818984000000b002db6b04be0cmr13093941ywf.2.1646159837032; Tue, 01
- Mar 2022 10:37:17 -0800 (PST)
+        Tue, 1 Mar 2022 13:54:32 -0500
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 879013D1C9
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Mar 2022 10:53:50 -0800 (PST)
+Received: by mail-ej1-x631.google.com with SMTP id gb39so33392405ejc.1
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Mar 2022 10:53:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JZw99KMpsKBs3Ab/LBNeIPMebXALTITXobBfJpN/EsI=;
+        b=ZEWbFFu3eWrZxUgaaScwD4ZJ//Z7mV4SGMyACB20WwCKEMFGKIBMMEXVkM4kZXdOyd
+         EokMKBVyAcoYChV/SvtOh5q5h0Yafm3wlsC3jCGOeoM0h4pn550KTbE+/sUn3z3m8p0V
+         ZL0gG9ZTrYCOlyUURTCDAGrluijISoqXbB1wA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JZw99KMpsKBs3Ab/LBNeIPMebXALTITXobBfJpN/EsI=;
+        b=skBMWRRAIpl/GkHDYHqwO0H9ZKp5Ft9wSFfPh1EX4qJtb6vbp5HusT2F6Kx0OSeCjF
+         +gBBdFxzC93xIt/3d3dn5h3XoBPxUlQEo8YMX/1GRj8kcNXTYWcAisVaGzymJE9JigxI
+         F3LuPGjtYvGx+E45ScT7QD7lhGMliF98KdZtoJVtgGFtphccoORM7F1nMXHhaxyxYOvo
+         mE1TZcByjwpL3qkjssR3VbYoCuhoVbT5B4AaUvutTKackdxq9bb9BgSYtuWVHBRq3sU/
+         AM5bJylRaq+HcadatOvlRdaRnwOd+xhxGYu4rnni4Sf4hm5UO315wLERchrLCUKYGt2F
+         KMFA==
+X-Gm-Message-State: AOAM531Hjql9143SklYlvNmgaDTctF9NTVQbDvk/kcqu7Dnnl7n9n+MR
+        Mvx8et7467Ya8cgQC3/fJ4hy5UQYKAS2FEIJXCM=
+X-Google-Smtp-Source: ABdhPJyvYht2fb6NR/+wwSKX972EoJeO3GVBRhOSUfQUTZey0bmwUQeBjN+6MS15lvnjYElmh/kcvA==
+X-Received: by 2002:a17:906:7e06:b0:6d6:e459:1469 with SMTP id e6-20020a1709067e0600b006d6e4591469mr3734382ejr.236.1646160828765;
+        Tue, 01 Mar 2022 10:53:48 -0800 (PST)
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com. [209.85.221.46])
+        by smtp.gmail.com with ESMTPSA id fy1-20020a1709069f0100b006d229ed7f30sm5699986ejc.39.2022.03.01.10.53.48
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 10:53:48 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id t11so988916wrm.5
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Mar 2022 10:53:48 -0800 (PST)
+X-Received: by 2002:a05:6512:2033:b0:443:3d49:dac with SMTP id
+ s19-20020a056512203300b004433d490dacmr16440784lfs.52.1646160451271; Tue, 01
+ Mar 2022 10:47:31 -0800 (PST)
 MIME-Version: 1.0
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
- <Yh5JwK6toc/zBNL7@zx2c4.com> <20220301121419-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220301121419-mutt-send-email-mst@kernel.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 1 Mar 2022 19:37:06 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
-Message-ID: <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
-Subject: Re: propagating vmgenid outward and upward
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com> <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+ <Yh0tl3Lni4weIMkl@casper.infradead.org> <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+ <Yh1aMm3hFe/j9ZbI@casper.infradead.org> <CAHk-=wi0gSUMBr2SVF01Gy1xC1w1iGtJT5ztju9BPWYKjdh+NA@mail.gmail.com>
+ <202203011008.AA0B5A2D@keescook>
+In-Reply-To: <202203011008.AA0B5A2D@keescook>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 1 Mar 2022 10:47:14 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whccSm8HKANQbomYrF8cqBa1wUi1dvUEUc3Nf=WoX3WHQ@mail.gmail.com>
+Message-ID: <CAHk-=whccSm8HKANQbomYrF8cqBa1wUi1dvUEUc3Nf=WoX3WHQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Arnd Bergman <arnd@arndb.de>,
         Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michael,
+On Tue, Mar 1, 2022 at 10:14 AM Kees Cook <keescook@chromium.org> wrote:
+>
+> The first big glitch with -Wshadow was with shadowed global variables.
+> GCC 4.8 fixed that, but it still yells about shadowed functions. What
+> _almost_ works is -Wshadow=local.
 
-On Tue, Mar 1, 2022 at 6:17 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> Hmm okay, so it's a performance optimization... some batching then? Do
-> you really need to worry about every packet? Every 64 packets not
-> enough?  Packets are after all queued at NICs etc, and VM fork can
-> happen after they leave wireguard ...
+Heh. Yeah, I just have long memories of "-Wshadow was a disaster". You
+looked into the details.
 
-Unfortunately, yes, this is an "every packet" sort of thing -- if the
-race is to be avoided in a meaningful way. It's really extra bad:
-ChaCha20 and AES-CTR work by xoring a secret stream of bytes with
-plaintext to produce a ciphertext. If you use that same secret stream
-and xor it with a second plaintext and transmit that too, an attacker
-can combine the two different ciphertexts to learn things about the
-original plaintext.
+> Another way to try to catch misused shadow variables is
+> -Wunused-but-set-varible, but it, too, has tons of false positives.
 
-But, anyway, it seems like the race is here to stay given what we have
-_currently_ available with the virtual hardware. That's why I'm
-focused on trying to get something going that's the least bad with
-what we've currently got, which is racy by design. How vitally
-important is it to have something that doesn't race in the far future?
-I don't know, really. It seems plausible that that ACPI notifier
-triggers so early that nothing else really even has a chance, so the
-race concern is purely theoretical. But I haven't tried to measure
-that so I'm not sure.
+That on the face of it should be an easy warning to get technically
+right for a compiler.
 
-Jason
+So I assume the "false positives" are simply because we end up having
+various variables that really don't end up being used - and
+"intentionally" so).
+
+Or rather, they might only be used under some config option - perhaps
+the use is even syntactically there and parsed, but the compiler
+notices that it's turned off under some
+
+        if (IS_ENABLED(..))
+
+option? Because yeah, we have a lot of those.
+
+I think that's a common theme with a lot of compiler warnings: on the
+face of it they sound "obviously sane" and nobody should ever write
+code like that.
+
+A conditional that is always true? Sounds idiotic, and sounds like a
+reasonable thing for a compiler to warn about, since why would you
+have a conditional in the first place for that?
+
+But then you realize that maybe the conditional is a build config
+option, and "always true" suddenly makes sense. Or it's a test for
+something that is always true on _that_architecture_ but not in some
+general sense (ie testing "sizeof()"). Or it's a purely syntactic
+conditional, like "do { } while (0)".
+
+It's why I'm often so down on a lot of the odd warnings that are
+hiding under W=1 and friends. They all may make sense in the trivial
+case ("That is insane") but then in the end they happen for sane code.
+
+And yeah, -Wshadow has had tons of history with macro nesting, and
+just being badly done in the first place (eg "strlen" can be a
+perfectly fine local variable).
+
+That said, maybe people could ask the gcc and clan people for a way to
+_mark_ the places where we expect to validly see shadowing. For
+example, that "local variable in a macro expression statement" thing
+is absolutely horrendous to fix with preprocessor tricks to try to
+make for unique identifiers.
+
+But I think it would be much more syntactically reasonable to add (for
+example) a "shadow" attribute to such a variable exactly to tell the
+compiler "yeah, yeah, I know this identifier could shadow an outer
+one" and turn it off that way.
+
+               Linus
