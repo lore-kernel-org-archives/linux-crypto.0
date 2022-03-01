@@ -2,341 +2,197 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3F7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 17:39:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35142C43219
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 17:40:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236622AbiCARkd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 12:40:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48902 "EHLO
+        id S236690AbiCARla (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 12:41:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236577AbiCARk1 (ORCPT
+        with ESMTP id S236689AbiCARlS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 12:40:27 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208072E6BC;
-        Tue,  1 Mar 2022 09:39:46 -0800 (PST)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 221GanMt030718;
-        Tue, 1 Mar 2022 17:39:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=corp-2021-07-09; bh=TITRB1aPkAbT8oW7Zmx8pVIhc1z9aC1GC5o2A/kMoAw=;
- b=INipUm+7AJs2O6dPKNNXmW/HYi3RODN0xOkvc+rs2mVD2Bp6ThBqJlg5Ol27F9/SHfw6
- KCGCtaFl+jfKfBudqlsdtTVqyDA+gg9JpQMxEixJhWJn3Y872Qlp2N55WJiak392QIuD
- LFq5UsS0SWpM4mtruQc4nsglxv/w5KQwRtlfZPp7eBF28QasjdbkueW8QL8Qp20TUzo5
- P6udY3cdfs2VVWZXbYixaX+figWJ9LWqgA8spY1m1LktnUrbuEhydBLCjJ2V01quL85k
- FtEiLpJPXUdOZR1nkU8z3fqhHo/6WCqh4h/atf2ZGthHYp0TGnhwmMD10lcPPzEm5ler XA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3eh14bukre-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 01 Mar 2022 17:39:14 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 221HaGli075131;
-        Tue, 1 Mar 2022 17:39:12 GMT
-Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2103.outbound.protection.outlook.com [104.47.70.103])
-        by userp3030.oracle.com with ESMTP id 3ef9axv7hc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 01 Mar 2022 17:39:12 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Shxmnxgb+OsnGCJz9xD9+JHcM6sjxbgw3liV+FPkvsQj+e17FhkH0zaBYo0KuRrGXM2Ua+Xwg8JzzZV6GibhilMcbZM+rMikx4SPFDhE1rENuDDKsrtXjCyR6j7Zu5dSoIXm45mKz/PBC8adMvCmtR2uKN/0AnwJQhoYMU57q63Ul+J7hAr+uHfoHT7jP9Y4sAVoWOo20m0K351VgBWAhOUZQgzs3ia2PDCJcqooQzV/9y0FfyDXWHj8FfWlZzd5kV5eKH5X0Q2jhKIVXKX006YPm+CBEtvY9HDEhfAU7kvJGZdXYa+EIwEuQY9S77/WgENowIC4pyMFO4e9TkHPJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TITRB1aPkAbT8oW7Zmx8pVIhc1z9aC1GC5o2A/kMoAw=;
- b=aaHMYj7OeGHexTLnB8neIPh/7TD0Fpp7Y7GDfCOirOjFB3HL9rNhRT8R5Bf1HNW2wPHzdR5tMHoFQfhQpLwhsbwLYcJ4gciGcL1f3bKftXKdvLZISY5fX64aD8DroctvrLoAznmLvGZi9uLArxZ7dJpUrxA4QUxoxv5IFPDd70hu9Jp2ELL512QcP352fO9IXrVrrLe+nnbtguVLVUc4ZjPgUneyt/NV6YaBVMzh8ozWGNbJZHbfFYdawBkQQVacfOcwSZmv43DE+GUYJ7R7SI/C3pFxNQ2riSgfFmZ/84ywnYBlHELSvtn8wX2Flat7NnhFPn9X8TS59IxYRslwVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Tue, 1 Mar 2022 12:41:18 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A557A3FD9A;
+        Tue,  1 Mar 2022 09:40:08 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id qk11so33047112ejb.2;
+        Tue, 01 Mar 2022 09:40:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TITRB1aPkAbT8oW7Zmx8pVIhc1z9aC1GC5o2A/kMoAw=;
- b=XePyFGC9lsFj9Ql3M3EO/8UTpoQPcVogKXOw3hFy06p1l1vsn9GBqjiOuA8Ezz1T6fPjx0axsSAQWCoKSK2XtJEQj/TkFC9HXAwCe4vtn8WWC8rGH807eDqfd5YDWnTKyXMNvfAmllNW56D6q0IY5XLUOTqU+e6i2Mjp/OMbBZs=
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
- by DM6PR10MB2795.namprd10.prod.outlook.com (2603:10b6:5:70::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.24; Tue, 1 Mar
- 2022 17:39:09 +0000
-Received: from CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::49ae:9ccb:2e59:8150]) by CH2PR10MB4150.namprd10.prod.outlook.com
- ([fe80::49ae:9ccb:2e59:8150%4]) with mapi id 15.20.5017.027; Tue, 1 Mar 2022
- 17:39:09 +0000
-From:   Eric Snowberg <eric.snowberg@oracle.com>
-To:     zohar@linux.ibm.com, jarkko@kernel.org, dhowells@redhat.com,
-        dwmw2@infradead.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, eric.snowberg@oracle.com,
-        stefanb@linux.ibm.com, nayna@linux.ibm.com,
-        mic@linux.microsoft.com, konrad.wilk@oracle.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: [PATCH 4/4] integrity: CA enforcement in machine keyring
-Date:   Tue,  1 Mar 2022 12:36:51 -0500
-Message-Id: <20220301173651.3435350-5-eric.snowberg@oracle.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220301173651.3435350-1-eric.snowberg@oracle.com>
-References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SA0PR11CA0194.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::19) To CH2PR10MB4150.namprd10.prod.outlook.com
- (2603:10b6:610:ac::13)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4976faac-0623-4b24-3fac-08d9fbaa6430
-X-MS-TrafficTypeDiagnostic: DM6PR10MB2795:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR10MB2795D5BA1097A9E09F18B8FE87029@DM6PR10MB2795.namprd10.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: p3jnFQUOSE6D1IzK4kZq5xvCOUdoYwQribauWMeGW/uOIyy5PighXmkGzcjee/KXmKTqu4m+Klq9hcLSFe4axvZwDUupdqtiO3PRQdGNKCyzkVxPy9ODLZV3TSWFdC1jWJTBuOY3UwLH92+1qyfcj8lYVb0EGzw65wk5udLvG06ISvycWDdG6gJgCEw9ycKr5mbnvkGTssMifFGNp4aJ6dE2gpMTJkxwLVO+HM3bQqQw1CizAA543D/a77NJRiX1czjXxsAtyPgJTN8K6j9VXfyXnCdZD3nNiy2/C2PimXse9Vv5j4MbhHE5e7c7RoCT+83NU71l9cyS1TBbp0wxKuxEbQtPONtGR0XK13mKy1Z+xBSyGqUppYSjl2aWEByD1pstPNroOYq+JNlYV8AGSAPTzqjnm8YmnVfQpPiGcsLQQAnammqdgET2r/xOA+04IpE8dgAculw6LNLf0WDJiHjJYjg3siQLZohcW3qFMneGVQP+2J4BYq7shHAKyFhbMmIMiSrPdz6fEP+YHn+OL0pawOaCjDENmnnuC49MK7+wyyZeTf0YgztQIKxnTrXQeAi1kCKjVjFvI1MaThIX0zkDwyaahk80txAQJ4TPf7ofO2Eiog9lRIzM9sDXdC6QUGnZZSxlZMwxyO+ZnQaahOCMBNckukEl2grOVNymkEuMTYgaBrICxq0SemzhqInIrgPbzecZXCs1z+MN4ifjsg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(1076003)(6512007)(6666004)(6506007)(52116002)(508600001)(2616005)(36756003)(86362001)(316002)(26005)(66946007)(4326008)(66476007)(66556008)(8676002)(186003)(44832011)(8936002)(6486002)(5660300002)(38350700002)(38100700002)(2906002)(7416002)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bx/Q8vjnlRvuPx5WOCzPkzcQQSLLtyGpBzhNn4ybRIzdAshiIEfjvLw9dXRn?=
- =?us-ascii?Q?2GXi3kJZfNOSP5LXXERh81IN/3vw1QERh6efhMVF9TAbJIkselmuNKl6YdZB?=
- =?us-ascii?Q?pXru1HsFY1HzALlN5cfoUpb7m2V6qLHUsMFliWIuiVxcS04WTZ2SjQ5bsyZp?=
- =?us-ascii?Q?FEDhGoyEZGUr40vHib6aHvcOEJ2/fCy+03levoIfd0W3S2FRpMfVZ89NyQUH?=
- =?us-ascii?Q?NY013u+TVyBeuCM1OHikCNsZWKAwKyn2+X2wI1IKv1Gmf7o6fm2LBB7mGGKL?=
- =?us-ascii?Q?J7dGiWg5Ir+m4br3T6Iws6oiDgliqUoAO02vXohM369mEp0lfbKx50TSQmwG?=
- =?us-ascii?Q?Y9jAkjW5QQuiTobjyE2Qj/Jigmch9VYoTl6cFOINQ5svB4iHVt5s9KcfHkSH?=
- =?us-ascii?Q?9kdvjh9aDWMVD4I48ouL+n1hgu0nhWnUevL9wzau/ikGwUM/QAhw1pV6LWg7?=
- =?us-ascii?Q?hgP6dt3hfOWFyQN1JtucJxudQdrrcKNSNYOVGk3GWyfOo4YOv4TbBGtqlBlk?=
- =?us-ascii?Q?TPB8MEFdABTj9QX8wXNDhAA6e1Mdm68PlJhJ9N2DD4soTeHuH1OEqNMLEyd/?=
- =?us-ascii?Q?y2GbzOVLkOmoo0MN2BKYVnTngIZAGnNog4tKXarAOW0Bn229tirLYtinZ4xd?=
- =?us-ascii?Q?RF5tqJuKP0sXtlCElk6eotm6fuB8NNkyM/Nj+K6K42emgeKXsMn1JNVSY0kU?=
- =?us-ascii?Q?ybDSVh3GtRLVU12Z+XuadweBYk2r1PZY0n6qFazCMmm5rT7P2z3lVcCNsZCa?=
- =?us-ascii?Q?leV67pl7jj6wcozZAcsMBClnooc+9EUYb+tEMbFTWVBlvl99+FamBaKhs+dG?=
- =?us-ascii?Q?xZIl+CjMzDBNRUwb5lvqP4B+RXH9q7XSIfuWzWsGJTDep++ZF1Hq+0iD1GIG?=
- =?us-ascii?Q?P57VGgU+J9VQP7bZSg7g5Q9I9N7a3sb20mUfUSFE+9iBsBKhkuZG/xPgPGle?=
- =?us-ascii?Q?JokkD0MVwKZPN1yAF2Vsaq5us9qHQ0QmmiSqvjxeX3bXP6YxZYVaQ6L3uXRd?=
- =?us-ascii?Q?QHfufD64e09CgTZ0wBagO3RpJgqf5I8D/e21Z6XE3UqXDPgRPuEC/BMIZRpX?=
- =?us-ascii?Q?7yJdgax5fkBxw4BZC3YKrYwpY2T6c4ApoXNCL4O91ld8W3Xwu5nX/sxrT/bt?=
- =?us-ascii?Q?X9lMkPDCD37DDLvJsxQV5yuK06ZUZNV4AU8xL95A480f94cJJyHBUJNPhTnU?=
- =?us-ascii?Q?PWN5XMWvpRp5eLN80PFGGi0hhpPYiCXxpvhkyjFMuzY9S4saak/h7MdAMCMR?=
- =?us-ascii?Q?fwLZgwT3PVF15aMN+hoFc6Y3qe7KPXz/d0wfmwtr8vR2Y3iUgkEa/kLhGnwQ?=
- =?us-ascii?Q?ANK7QWZsYSpXo4pArreaXMISvixXYqdurugY1grW1jOXBa7+s8bMxupT96LV?=
- =?us-ascii?Q?eVIkPUwnTR9gSuGjNPP9DbB0Gk+a9NmI8pLmclyPy/3tn2Oav/ED5QnFXnB6?=
- =?us-ascii?Q?yJIl6Ti8SvPecwdf00HG05NPmqEvaKtzvDvhChevsI+Alcww69RW3jTILCTY?=
- =?us-ascii?Q?FhLEZ4EoM8XY8RD/cScNShumotGg/pDhr0+xt1uyvpzD30EnGHLjZ9YR2lpZ?=
- =?us-ascii?Q?MsbqiIYH88aA+eBpvDJoZC6436/S9gSJ31Fe9kT3GDmN6yvKb77YYwSZSU+5?=
- =?us-ascii?Q?yN3HQYNPr1V5VGjqmfwlZ3FZrV3Irsx8FePExYKGZgtKPvgEy1YBoB207Cdr?=
- =?us-ascii?Q?XuMAzH/2nYMbF6qYmBA0Te7azrw=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4976faac-0623-4b24-3fac-08d9fbaa6430
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Mar 2022 17:39:09.6980
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SPA4rIq/9I4XN3n2zXcfALBxRDtViIOnhuiYYtFq7AzgbwptmZ3xRbd7GofHtGbvbyUnJgz18KK9guUXDJ5Zm4iM/lm/XVGdF+C7T6YeWk4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB2795
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10273 signatures=685966
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 malwarescore=0
- mlxscore=0 phishscore=0 suspectscore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2203010091
-X-Proofpoint-GUID: wQhYRWLiBi3U2pplMMepdnvZCx4Up2X5
-X-Proofpoint-ORIG-GUID: wQhYRWLiBi3U2pplMMepdnvZCx4Up2X5
+        d=gmail.com; s=20210112;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pFdYiycpncfTymiwtZowrsS5EyWiXpYxNs42/BHAfYg=;
+        b=jNa8kCMtl/UUGI9n6DMpRCjqu31f4wAijdvFFxZnjTmTKVAPvZHGvGIS5mEbyeVH7U
+         2x/09r6Vjc5jlvMmGEJ/il9wQB7v0QaDJcbwnO54cttgXGRrRpdgplSbMXJLSVGPucZZ
+         9N0BbQ67CEO0Sz9E19ATZ7SkTLFNHyfaTEafdxDnprAieU2S7WSxP1eMUqDcJyOgT3om
+         KiVwLoBVmeYUr/3jVH1Ywgf3KLmBchJpZXF9NW4w0E+aOTUpi5SfsW8FSQSkfcXvzSp5
+         ZeMWPQFNXAG0u+f0IIKFL+VZxclmrwVLcWvb/ml3Qc/gpz+jEOgbpY53v+25m0fIUJKc
+         BDYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=pFdYiycpncfTymiwtZowrsS5EyWiXpYxNs42/BHAfYg=;
+        b=7BjOqnZ5sU9qNZ+ZbtSmgnT5ugUg93W5EXL23Z5fe91YD2NAMRFaHW96/iox28ODCe
+         zqAFwD48zzIEd81R9GJv5UK+KG9scXt7NvQtyP+Tf5kF63AzEx5N9z8DCwxFBhh7olol
+         j+i7AEIN6OT5RB2ty/uoXl9LTeWga37qhGhumANM9x1vRakL08DEGpxWyxOzWbkagvl5
+         hx2G33gWBsH3/S06EqJo0yi12GOrr5OLeiJxLIPeZrW7pPUk4+hc//wyXdd6sazAO3nv
+         Dav3+r8ijXUxQvrfHbHDAATDTCs2mESdLmjJW2dmuOW4FcQVPcuapDoh+166AMkBBZwv
+         oVhA==
+X-Gm-Message-State: AOAM530VelPFZGzmt8PzE4qZ+PeqHB0a4Jg3ubfAK0hD+zaASk4je+GF
+        jsmkzHlrJhshQu1Koj+2bw0=
+X-Google-Smtp-Source: ABdhPJwzanGhehpmLWEMTTJkMBhYufoyhmHURG9yND716ZZIbM/kd8Ex5thBnsVmcSvoj9ZPyJ3fsw==
+X-Received: by 2002:a17:906:948:b0:6d6:e479:1fe4 with SMTP id j8-20020a170906094800b006d6e4791fe4mr3312230ejd.240.1646156406993;
+        Tue, 01 Mar 2022 09:40:06 -0800 (PST)
+Received: from smtpclient.apple ([2a02:8109:9d80:3f6c:6db3:8d4c:747e:98ad])
+        by smtp.gmail.com with ESMTPSA id a25-20020a50ff19000000b0040f84cd806csm7398100edu.59.2022.03.01.09.40.04
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Mar 2022 09:40:06 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+From:   Jakob Koschel <jakobkoschel@gmail.com>
+In-Reply-To: <Yh5ZmwiH5AxtQ69K@kroah.com>
+Date:   Tue, 1 Mar 2022 18:40:04 +0100
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        =?utf-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        samba-technical@lists.samba.org,
+        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        intel-wired-lan@lists.osuosl.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        bcm-kernel-feedback-list@broadcom.com,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-sgx@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        tipc-discussion@lists.sourceforge.net,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4B1AFAD9-C1B3-499C-945A-C259361ABA8C@gmail.com>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
+ <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
+ <FC710A1A-524E-481B-A668-FC258F529A2E@gmail.com>
+ <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
+ <CEDAD0D9-56EE-4105-9107-72C2EAD940B0@gmail.com> <Yh5ZmwiH5AxtQ69K@kroah.com>
+To:     Greg KH <greg@kroah.com>
+X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When INTEGRITY_MACHINE_KEYRING is set, all Machine Owner Keys (MOK)
-are loaded into the machine keyring.  Add a new
-INTEGRITY_MACHINE_KEYRING_CA_ENFORCED option where only MOK CA keys are
-added.  
 
-Set the restriction check to restrict_link_by_ca.  This will only allow 
-CA keys into the machine keyring. Unlike when INTEGRITY_MACHINE_KEYRING
-is enabled, IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY may
-also be enabled, allowing IMA to use keys in the machine keyring as
-another trust anchor.
 
-Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
----
- certs/system_keyring.c                        |  9 +++++---
- include/keys/system_keyring.h                 |  3 ++-
- security/integrity/Kconfig                    | 21 +++++++++++++++++++
- security/integrity/Makefile                   |  1 +
- security/integrity/digsig.c                   | 14 ++++++++++---
- security/integrity/integrity.h                |  3 ++-
- .../platform_certs/keyring_handler.c          |  4 +++-
- 7 files changed, 46 insertions(+), 9 deletions(-)
+> On 1. Mar 2022, at 18:36, Greg KH <greg@kroah.com> wrote:
+>=20
+> On Tue, Mar 01, 2022 at 12:28:15PM +0100, Jakob Koschel wrote:
+>>=20
+>>=20
+>>> On 1. Mar 2022, at 01:41, Linus Torvalds =
+<torvalds@linux-foundation.org> wrote:
+>>>=20
+>>> On Mon, Feb 28, 2022 at 1:47 PM Jakob Koschel =
+<jakobkoschel@gmail.com> wrote:
+>>>>=20
+>>>> The goal of this is to get compiler warnings right? This would =
+indeed be great.
+>>>=20
+>>> Yes, so I don't mind having a one-time patch that has been gathered
+>>> using some automated checker tool, but I don't think that works from =
+a
+>>> long-term maintenance perspective.
+>>>=20
+>>> So if we have the basic rule being "don't use the loop iterator =
+after
+>>> the loop has finished, because it can cause all kinds of subtle
+>>> issues", then in _addition_ to fixing the existing code paths that
+>>> have this issue, I really would want to (a) get a compiler warning =
+for
+>>> future cases and (b) make it not actually _work_ for future cases.
+>>>=20
+>>> Because otherwise it will just happen again.
+>>>=20
+>>>> Changing the list_for_each_entry() macro first will break all of =
+those cases
+>>>> (e.g. the ones using 'list_entry_is_head()).
+>>>=20
+>>> So I have no problems with breaking cases that we basically already
+>>> have a patch for due to  your automated tool. There were certainly
+>>> more than a handful, but it didn't look _too_ bad to just make the
+>>> rule be "don't use the iterator after the loop".
+>>>=20
+>>> Of course, that's just based on that patch of yours. Maybe there are =
+a
+>>> ton of other cases that your patch didn't change, because they =
+didn't
+>>> match your trigger case, so I may just be overly optimistic here.
+>>=20
+>> Based on the coccinelle script there are ~480 cases that need fixing
+>> in total. I'll now finish all of them and then split them by
+>> submodules as Greg suggested and repost a patch set per submodule.
+>> Sounds good?
+>=20
+> Sounds good to me!
+>=20
+> If you need help carving these up and maintaining them over time as
+> different subsystem maintainers accept/ignore them, just let me know.
+> Doing large patchsets like this can be tough without a lot of
+> experience.
 
-diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-index 05b66ce9d1c9..0811b44cf3bf 100644
---- a/certs/system_keyring.c
-+++ b/certs/system_keyring.c
-@@ -22,7 +22,8 @@ static struct key *builtin_trusted_keys;
- #ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
- static struct key *secondary_trusted_keys;
- #endif
--#ifdef CONFIG_INTEGRITY_MACHINE_KEYRING
-+#if defined(CONFIG_INTEGRITY_MACHINE_KEYRING) || \
-+    defined(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED)
- static struct key *machine_trusted_keys;
- #endif
- #ifdef CONFIG_INTEGRITY_PLATFORM_KEYRING
-@@ -89,7 +90,8 @@ static __init struct key_restriction *get_builtin_and_secondary_restriction(void
- 	if (!restriction)
- 		panic("Can't allocate secondary trusted keyring restriction\n");
- 
--	if (IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING))
-+	if (IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING) ||
-+	    IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED))
- 		restriction->check = restrict_link_by_builtin_secondary_and_machine;
- 	else
- 		restriction->check = restrict_link_by_builtin_and_secondary_trusted;
-@@ -97,7 +99,8 @@ static __init struct key_restriction *get_builtin_and_secondary_restriction(void
- 	return restriction;
- }
- #endif
--#ifdef CONFIG_INTEGRITY_MACHINE_KEYRING
-+#if defined(CONFIG_INTEGRITY_MACHINE_KEYRING) || \
-+    defined(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED)
- void __init set_machine_trusted_keys(struct key *keyring)
- {
- 	machine_trusted_keys = keyring;
-diff --git a/include/keys/system_keyring.h b/include/keys/system_keyring.h
-index 91e080efb918..e4a6574bbcb6 100644
---- a/include/keys/system_keyring.h
-+++ b/include/keys/system_keyring.h
-@@ -45,7 +45,8 @@ extern int restrict_link_by_builtin_and_secondary_trusted(
- #define restrict_link_by_builtin_and_secondary_trusted restrict_link_by_builtin_trusted
- #endif
- 
--#ifdef CONFIG_INTEGRITY_MACHINE_KEYRING
-+#if defined(CONFIG_INTEGRITY_MACHINE_KEYRING) || \
-+    defined(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED)
- extern int restrict_link_by_builtin_secondary_and_machine(
- 	struct key *dest_keyring,
- 	const struct key_type *type,
-diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
-index 599429f99f99..14c927eea5ee 100644
---- a/security/integrity/Kconfig
-+++ b/security/integrity/Kconfig
-@@ -62,6 +62,14 @@ config INTEGRITY_PLATFORM_KEYRING
-          provided by the platform for verifying the kexec'ed kerned image
-          and, possibly, the initramfs signature.
- 
-+
-+choice
-+	prompt "Machine keyring"
-+	default INTEGRITY_MACHINE_NONE
-+
-+config INTEGRITY_MACHINE_NONE
-+	bool "Do not enable the Machine Owner Keyring"
-+
- config INTEGRITY_MACHINE_KEYRING
- 	bool "Provide a keyring to which Machine Owner Keys may be added"
- 	depends on SECONDARY_TRUSTED_KEYRING
-@@ -75,6 +83,19 @@ config INTEGRITY_MACHINE_KEYRING
- 	 in the platform keyring, keys contained in the .machine keyring will
- 	 be trusted within the kernel.
- 
-+config INTEGRITY_MACHINE_KEYRING_CA_ENFORCED
-+	bool "Provide a keyring to which Machine Owner CA Keys may be added"
-+	depends on SECONDARY_TRUSTED_KEYRING
-+	depends on INTEGRITY_ASYMMETRIC_KEYS
-+	depends on SYSTEM_BLACKLIST_KEYRING
-+	depends on LOAD_UEFI_KEYS
-+	help
-+	 If set, provide a keyring to which CA Machine Owner Keys (MOK) may
-+	 be added. This keyring shall contain just CA MOK keys.  Unlike keys
-+	 in the platform keyring, keys contained in the .machine keyring will
-+	 be trusted within the kernel.
-+endchoice
-+
- config LOAD_UEFI_KEYS
-        depends on INTEGRITY_PLATFORM_KEYRING
-        depends on EFI
-diff --git a/security/integrity/Makefile b/security/integrity/Makefile
-index d0ffe37dc1d6..370ee63774c3 100644
---- a/security/integrity/Makefile
-+++ b/security/integrity/Makefile
-@@ -11,6 +11,7 @@ integrity-$(CONFIG_INTEGRITY_SIGNATURE) += digsig.o
- integrity-$(CONFIG_INTEGRITY_ASYMMETRIC_KEYS) += digsig_asymmetric.o
- integrity-$(CONFIG_INTEGRITY_PLATFORM_KEYRING) += platform_certs/platform_keyring.o
- integrity-$(CONFIG_INTEGRITY_MACHINE_KEYRING) += platform_certs/machine_keyring.o
-+integrity-$(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED) += platform_certs/machine_keyring.o
- integrity-$(CONFIG_LOAD_UEFI_KEYS) += platform_certs/efi_parser.o \
- 				      platform_certs/load_uefi.o \
- 				      platform_certs/keyring_handler.o
-diff --git a/security/integrity/digsig.c b/security/integrity/digsig.c
-index c8c8a4a4e7a0..041edd9744db 100644
---- a/security/integrity/digsig.c
-+++ b/security/integrity/digsig.c
-@@ -34,7 +34,11 @@ static const char * const keyring_name[INTEGRITY_KEYRING_MAX] = {
- };
- 
- #ifdef CONFIG_IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY
-+#ifdef CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED
-+#define restrict_link_to_ima restrict_link_by_builtin_secondary_and_machine
-+#else
- #define restrict_link_to_ima restrict_link_by_builtin_and_secondary_trusted
-+#endif
- #else
- #define restrict_link_to_ima restrict_link_by_builtin_trusted
- #endif
-@@ -130,19 +134,23 @@ int __init integrity_init_keyring(const unsigned int id)
- 		| KEY_USR_READ | KEY_USR_SEARCH;
- 
- 	if (id == INTEGRITY_KEYRING_PLATFORM ||
--	    id == INTEGRITY_KEYRING_MACHINE) {
-+	   (IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING))) {
- 		restriction = NULL;
- 		goto out;
- 	}
- 
--	if (!IS_ENABLED(CONFIG_INTEGRITY_TRUSTED_KEYRING))
-+	if (!IS_ENABLED(CONFIG_INTEGRITY_TRUSTED_KEYRING) &&
-+	    id != INTEGRITY_KEYRING_MACHINE)
- 		return 0;
- 
- 	restriction = kzalloc(sizeof(struct key_restriction), GFP_KERNEL);
- 	if (!restriction)
- 		return -ENOMEM;
- 
--	restriction->check = restrict_link_to_ima;
-+	if (id == INTEGRITY_KEYRING_MACHINE)
-+		restriction->check = restrict_link_by_ca;
-+	else
-+		restriction->check = restrict_link_to_ima;
- 
- 	/*
- 	 * MOK keys can only be added through a read-only runtime services
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 2e214c761158..ca4d72fbd045 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -285,7 +285,8 @@ static inline void __init add_to_platform_keyring(const char *source,
- }
- #endif
- 
--#ifdef CONFIG_INTEGRITY_MACHINE_KEYRING
-+#if defined(CONFIG_INTEGRITY_MACHINE_KEYRING) || \
-+    defined(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED)
- void __init add_to_machine_keyring(const char *source, const void *data, size_t len);
- bool __init trust_moklist(void);
- #else
-diff --git a/security/integrity/platform_certs/keyring_handler.c b/security/integrity/platform_certs/keyring_handler.c
-index a2464f3e66cc..9c456ad0ab67 100644
---- a/security/integrity/platform_certs/keyring_handler.c
-+++ b/security/integrity/platform_certs/keyring_handler.c
-@@ -61,7 +61,9 @@ __init efi_element_handler_t get_handler_for_db(const efi_guid_t *sig_type)
- __init efi_element_handler_t get_handler_for_mok(const efi_guid_t *sig_type)
- {
- 	if (efi_guidcmp(*sig_type, efi_cert_x509_guid) == 0) {
--		if (IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING) && trust_moklist())
-+		if ((IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING) ||
-+		     IS_ENABLED(CONFIG_INTEGRITY_MACHINE_KEYRING_CA_ENFORCED)) &&
-+		     trust_moklist())
- 			return add_to_machine_keyring;
- 		else
- 			return add_to_platform_keyring;
--- 
-2.27.0
+Very much appreciated!
 
+There will probably be some cases that do not match one of the pattern
+we already discussed and need separate attention.
+
+I was planning to start with one subsystem and adjust the coming ones
+according to the feedback gather there instead of posting all of them
+in one go.
+
+>=20
+> thanks,
+>=20
+> greg k-h
+
+- Jakob=
