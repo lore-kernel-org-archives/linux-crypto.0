@@ -2,182 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D70DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 10:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D99C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 10:31:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234098AbiCAK3N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 05:29:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51032 "EHLO
+        id S233225AbiCAKci (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 05:32:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234094AbiCAK3M (ORCPT
+        with ESMTP id S233117AbiCAKch (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 05:29:12 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9846756C32
-        for <linux-crypto@vger.kernel.org>; Tue,  1 Mar 2022 02:28:30 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id m22so13734709pja.0
-        for <linux-crypto@vger.kernel.org>; Tue, 01 Mar 2022 02:28:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OnrvTGkeFdz9SdbU5YzUcBSW1gSC4dxIsoPtl5S/0ts=;
-        b=lMlykeCoeBj9pbm8Ib7uSMq9dStt/53mqUfx2z5VFG6jvOn36rzyKO/bfGleQvEiXE
-         FzasQdln3ka7j+JaThLPFGyV6U/ACZts500Rvo7q6u6i20CssPsw9nnuZwPNED0r70UU
-         5SK3n9+/DGKFtTmR8ghteojViVhQui3Cqzdce3A358Y6XD0PPkAOFXP9zod+bwchXybO
-         YBdv506L4f553PXcFwYQ7ywQg7js5X7r/PcC4E6iId7+DfqWvRvwOzc7LFxQ/zWtRVVU
-         /Dp8PKzt37KMYZUWpmtsV6CiTl2Rtryy1BoegmoOY86Al9w3GbFbtgOFWwfN85Qey9Ys
-         ndtQ==
+        Tue, 1 Mar 2022 05:32:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B5349654A1
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Mar 2022 02:31:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646130714;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XvmhzYzIN6YyKOjgRyfse+7E0We+oPI7HyRw5pHUOdE=;
+        b=U9O3l9Hj5BkeF4qr11uBzORUyZZ6rsnL4EGQIsbhVdhSWoQStEC9ZnuPFuzFYEDl+tKWrH
+        izCqxLPEXsO3qjf8k9JBz4vUFIgFudE08/N5tdwNqtdIPxGonLsZC41vfqHWIEZrp+F0Wg
+        52F0xT9NthT21RK9CmbqDb/JfMdAlWg=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-Ph_4Kc5dP_qL3o3FrB8xbQ-1; Tue, 01 Mar 2022 05:31:53 -0500
+X-MC-Unique: Ph_4Kc5dP_qL3o3FrB8xbQ-1
+Received: by mail-ej1-f70.google.com with SMTP id sa22-20020a1709076d1600b006ce78cacb85so6639262ejc.2
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Mar 2022 02:31:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=OnrvTGkeFdz9SdbU5YzUcBSW1gSC4dxIsoPtl5S/0ts=;
-        b=eSpMdMtjSQHnDf/FVmOFGIZcNYdZMfi/YqhYacGWXH/KwDesrtSEjusLlBb2tEZLMk
-         nzFY61tsgeWpqBysdc0wE8DvSOs4rwQqKrxngdLGCRTehwEvy1zeNphXob8zUIIsx0yj
-         egW96Se5G8Bp2EXU33EocQd36UFmH8UFASGxHdWFan48klhUfAE44izbZkvBOLECA4T7
-         s/MJExzfqJOt4tn5klKkskM1kLGFaSxw6LLgfI/+h4sOHECze7q/DZ5z7slKOTVqRBP1
-         BYhMKPwGyLIGlZwLel3Jn7g6Gn4eJbeYcL+8s1jNNdhu1Tlid2Y/zBjUTy8xPlxVv6Ql
-         g1MQ==
-X-Gm-Message-State: AOAM532AlTD4ppMw7mMqB7nWfETrJ3PuJsYd9Qouab7GFqgtswxkiRg/
-        1v2RQMRFVF/PJn0m9TqVFYXlvw==
-X-Google-Smtp-Source: ABdhPJyRALXKhW8s2bFsc2BXDdKE696FpYRLC0WDq+QpkTb6aaJXFusyucj3Yl8gAZuVpQGgt+Wr/A==
-X-Received: by 2002:a17:902:7204:b0:14f:b325:7658 with SMTP id ba4-20020a170902720400b0014fb3257658mr24704466plb.110.1646130510135;
-        Tue, 01 Mar 2022 02:28:30 -0800 (PST)
-Received: from [10.76.15.169] ([61.120.150.76])
-        by smtp.gmail.com with ESMTPSA id r12-20020a63a54c000000b00376047bf784sm12271772pgu.23.2022.03.01.02.28.26
+        bh=XvmhzYzIN6YyKOjgRyfse+7E0We+oPI7HyRw5pHUOdE=;
+        b=JyooVIj0a3RfOFqTEQ5uT5VVtJF5W7ImcLeQa7ieMMl0Lh5tiznM82eldQhV0QHDZp
+         4rCCf/fFvzuwVTNKXTLsLQDsrkfqx8bvRieVSSKHiPaawszV4kpv0oM1fmiX4x1Eah9r
+         0oa7pU+FSxwAxJnnNbI/ugVwhf9WtQK+KKQO+EcISj0cA6qoMrM+88uMVH3ZFd938nD2
+         XRfzFIEoBL2sk2m1iD0y3qevYjHGGUOkyk9L1Oof7XW80oO8WBTio9LQLGp6NNelnk5x
+         cMtottFUs+ag1kvfiux4IYvpjAUWhJxW1abb84sEKnKTOvxVgobVriKLlDTDtpiwy9Uy
+         XgoA==
+X-Gm-Message-State: AOAM532kTGKjpnHsHrJ+CBQmvJ0EXoAgTt5yla2AfuzpOxb25zlKSKkU
+        aWp4d5lVLvAUH0vjeyFVYy2YIXm5Rga3tIjTvhHrb4CIN19+sm6QIty83Fy5QTZM7TfulH80Odi
+        Gv1liUqBedvqeQ3U+gmjFxb2o
+X-Received: by 2002:a50:ee90:0:b0:40f:349f:7368 with SMTP id f16-20020a50ee90000000b0040f349f7368mr23358809edr.236.1646130712553;
+        Tue, 01 Mar 2022 02:31:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz6xIoJMlO1A7ETr4+7k5TUVrUrwV9lNvsl4ikoWZTb0pGV5rskpq4uwCuMs4LHvn+CPJfl5A==
+X-Received: by 2002:a50:ee90:0:b0:40f:349f:7368 with SMTP id f16-20020a50ee90000000b0040f349f7368mr23358795edr.236.1646130712357;
+        Tue, 01 Mar 2022 02:31:52 -0800 (PST)
+Received: from ?IPV6:2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1? (2001-1c00-0c1e-bf00-1db8-22d3-1bc9-8ca1.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1])
+        by smtp.gmail.com with ESMTPSA id b16-20020a170906195000b006cf3810dc99sm5147018eje.208.2022.03.01.02.31.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Mar 2022 02:28:29 -0800 (PST)
-Subject: PING: [PATCH v2 3/3] virtio-crypto: implement RSA algorithm
-From:   zhenwei pi <pizhenwei@bytedance.com>
-To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        kernel test robot <lkp@intel.com>
-References: <20220211084108.1254218-1-pizhenwei@bytedance.com>
- <20220211084108.1254218-4-pizhenwei@bytedance.com>
- <c9144b0d82e34566a960f210ddc32696@huawei.com>
- <8ef2f660-bd84-de70-1539-402c73795dfe@bytedance.com>
- <bc2bbc3b-8a34-2f09-41f5-60f1568a6bef@bytedance.com>
-Message-ID: <0c148ada-9f32-3272-8a89-591299ab098d@bytedance.com>
-Date:   Tue, 1 Mar 2022 18:25:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Tue, 01 Mar 2022 02:31:51 -0800 (PST)
+Message-ID: <7769e728-5864-115d-c3b8-8f52faa40f1a@redhat.com>
+Date:   Tue, 1 Mar 2022 11:31:51 +0100
 MIME-Version: 1.0
-In-Reply-To: <bc2bbc3b-8a34-2f09-41f5-60f1568a6bef@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v5 2/3] ACPI: allow longer device IDs
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To:     "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Alexander Graf <graf@amazon.com>, Len Brown <lenb@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+References: <20220226220639.1173594-1-Jason@zx2c4.com>
+ <20220226220639.1173594-3-Jason@zx2c4.com>
+ <0c73d29e-e558-efb9-d0d7-c612b2bb7e90@amazon.com>
+ <YhtyBHUyFysmZ9bC@zx2c4.com>
+ <CAHmME9pocD1CoZbnF7p4k0ws7-R0Vc9H4i5TRJ_MCX-d3AZhFw@mail.gmail.com>
+ <CAJZ5v0h_Z9XS9ZgSF4CWrZ4RU7=Oa02MY3_g0Y_rcgRNzsizfQ@mail.gmail.com>
+From:   Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <CAJZ5v0h_Z9XS9ZgSF4CWrZ4RU7=Oa02MY3_g0Y_rcgRNzsizfQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PING!
+Hi,
 
-Hi, Lei
-I also take a look at other crypto drivers qat/ccp/hisilicon, they
-separate akcipher/skcipher algo. If you consider that reusing
-virtio_crypto_algs_register/unregister seems better, I will try to merge
-them into a single function.
+On 2/28/22 19:19, Rafael J. Wysocki wrote:
+> +Mika, Andy and Hans in case they have something to add
 
-On 2/23/22 6:17 PM, zhenwei pi wrote:
+Thanks, I don't really have anything to add to the discussion
+on v6 of this patch.
+
+Regards,
+
+Hans
+
+
+
 > 
-> On 2/18/22 11:12 AM, zhenwei pi wrote:
->>>> +void virtio_crypto_akcipher_algs_unregister(struct virtio_crypto
->>>> +*vcrypto) {
->>>> +    int i = 0;
->>>> +
->>>> +    mutex_lock(&algs_lock);
->>>> +
->>>> +    for (i = 0; i < ARRAY_SIZE(virtio_crypto_akcipher_algs); i++) {
->>>> +        uint32_t service = virtio_crypto_akcipher_algs[i].service;
->>>> +        uint32_t algonum = virtio_crypto_akcipher_algs[i].algonum;
->>>> +
->>>> +        if (virtio_crypto_akcipher_algs[i].active_devs == 0 ||
->>>> +            !virtcrypto_algo_is_supported(vcrypto, service, algonum))
->>>> +            continue;
->>>> +
->>>> +        if (virtio_crypto_akcipher_algs[i].active_devs == 1)
->>>> +
->>>>     crypto_unregister_akcipher(&virtio_crypto_akcipher_algs[i].algo);
->>>> +
->>>> +        virtio_crypto_akcipher_algs[i].active_devs--;
->>>> +    }
->>>> +
->>>> +    mutex_unlock(&algs_lock);
->>>> +}
+> On Mon, Feb 28, 2022 at 12:27 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>>
+>> Hey again,
+>>
+>> On Sun, Feb 27, 2022 at 1:43 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >>>
->>> Why don't you reuse the virtio_crypto_algs_register/unregister 
->>> functions?
->>> The current code is too repetitive. Maybe we don't need create the 
->>> new file virtio_crypto_akcipher_algo.c
->>> because we had virtio_crypto_algs.c which includes all algorithms.
+>>> Hi Alex,
 >>>
+>>> On Sun, Feb 27, 2022 at 12:42:03PM +0100, Alexander Graf wrote:
+>>>>> To allow device drivers to match identifiers that exceed the 9 byte
+>>>>> limit, this simply ups the length to 16, just like it was before the
+>>>>> aforementioned commit. Empirical testing indicates that this
+>>>>
+>>>>
+>>>> This is only true for 64bit systems where padding automatically bloated
+>>>> to 9 byte array to 16. I still believe the patch is fine as it is, but
+>>>> there will be minor .rodata overhead on 32bit targets which you may want
+>>>> to quantify in the patch description.
+>>>
+>>> Good point. So I just tried this out with a 32-bit i686 kernel and the
+>>> results are the same again for the size of vmlinux. I then ran `objdump
+>>> --headers` and looked at the size of the .rodata section, where it's
+>>> also the same. I'm not quite sure what to make of this, as it's not what
+>>> I was expecting, but I think I tested it right. So maybe we're lucky
+>>> here?
 >>
->> Yes, this looks similar to virtio_crypto_algs_register/unregister.
+>> I tried a little harder to get _some_ difference on 32-bit, and
+>> managed to get one by doing i386_defconfig and then switching off
+>> modules to make all M into Y, and then compared sizes:
 >>
->> Let's look at the difference:
->> struct virtio_crypto_akcipher_algo {
->>          uint32_t algonum;
->>          uint32_t service;
->>          unsigned int active_devs;
->>          struct akcipher_alg algo;
->> };
+>> vmlinux: 25590780 -> 25598972, so a 0.032% increase.
+>> bzImage: 8698944 -> 8699424, so a 0.0055% increase.
 >>
->> struct virtio_crypto_algo {
->>          uint32_t algonum;
->>          uint32_t service;
->>          unsigned int active_devs;
->>          struct skcipher_alg algo; /* akcipher_alg VS skcipher_alg */
->> };
+>> So it does increase, ever so slightly, but a) on 32-bit, and b) a
+>> super, super tiny amount.
 >>
->> If reusing virtio_crypto_algs_register/unregister, we need to modify 
->> the data structure like this:
->> struct virtio_crypto_akcipher_algo {
->>          uint32_t algonum;
->>          uint32_t service;    /* use service to distinguish 
->> akcipher/skcipher */
->>          unsigned int active_devs;
->>      union {
->>          struct skcipher_alg skcipher;
->>              struct akcipher_alg akcipher;
->>      } alg;
->> };
->>
->> int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto)
->> {
->>      ...
->>          for (i = 0; i < ARRAY_SIZE(virtio_crypto_akcipher_algs); i++) {
->>                  uint32_t service = 
->> virtio_crypto_akcipher_algs[i].service;
->>          ...
->>          /* test service type then call 
->> crypto_register_akcipher/crypto_register_skcipher */
->>                  if (service == VIRTIO_CRYPTO_SERVICE_AKCIPHER)
->> crypto_register_akcipher(&virtio_crypto_akcipher_algs[i].algo.akcipher);
->>          else
->> crypto_register_skcipher(&virtio_crypto_skcipher_algs[i].algo.skcipher);
->>          ...
->>          }
->>      ...
->> }
->>
->> Also test service type and call 
->> crypto_unregister_skcipher/crypto_unregister_akcipher.
->>
->> This gets unclear from current v2 version.
->>
->> On the other hand, the kernel side prefers to separate skcipher and 
->> akcipher(separated header files and implementations).
->>
->
+>> In other words, I still think this patch is very much a-okay. But very
+>> eager to hear from Rafael on the approach.
+> 
+> Increasing the ACPI_ID_LEN value is fine with me, but the patch
+> changelog is not entirely accurate.
+> 
+> The ACPI subsystem uses struct acpi_device_id mostly (if not only) for
+> device ID matching and it is generally used for creating lists of ACPI
+> device IDs in drivers (and allow/deny lists etc).  The device IDs
+> extracted from the ACPI tables can be longer than ACPI_ID_LEN.
+> 
+> This means that drivers cannot match device IDs longer than 8
+> characters (excluding the terminating 0), because the IDs in the lists
+> used by them for ID matching cannot be longer than this and not
+> because the ACPI subsystem is limited by that value.
+> 
 
--- 
-zhenwei pi
