@@ -2,147 +2,193 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A14CC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 19:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCA4C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 19:30:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235151AbiCAT1w (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 14:27:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35062 "EHLO
+        id S235554AbiCATbh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 14:31:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235057AbiCAT1v (ORCPT
+        with ESMTP id S235894AbiCATbg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 14:27:51 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C287069CFA;
-        Tue,  1 Mar 2022 11:27:09 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id ev16-20020a17090aead000b001bc3835fea8so3143766pjb.0;
-        Tue, 01 Mar 2022 11:27:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=sjfszq0s6rA1DoiuWgRAAaEXXX3ctOb/kx6v17T7+bs=;
-        b=BUf/UxXV9ZTYi6bHIcNSeiVmUkwhpOMtCQdiWC+ay4Z9S5wpiOYuCXCIxzehzgVk+o
-         W1Tz6uC//wm7JDPdHnohPUL8ayfoRdAEJXWOuhp93F6AdjS5zhsdIRdXcMl7LoOxgL5S
-         cQ30ZduAtMTvuIT0IWAMAwvVyturUwj7e81GnYaWkgLwpGQx/29YuWDIvgD88vu2/cB6
-         lIW0y9fMxEHGPAxzIoTAq6cd1acGDgmWfhBtF0rb1zYTJ9wsVCsqlUD6L5WIt+Ny+URQ
-         qK/qz8orT5hZdWRoZ/8JDnt+u1fh9VpSE+nS2ipRNMJp4cJoUQCsCZ7QfPYtwzh2NcxW
-         Yddw==
+        Tue, 1 Mar 2022 14:31:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2142252E23
+        for <linux-crypto@vger.kernel.org>; Tue,  1 Mar 2022 11:30:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646163054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rVYpDZQDb15Izn1lzcbcKE0MfzfOugZfslLcf4XgvGM=;
+        b=hMeWnDq+no7L2xJe3xTPuoqqt3DArmQ+G5dQPXWP5J6r/PQtYoMAhDMHqmpwty8IFfekFJ
+        jUiB3yWZkNmxwDUmPX67JfttoPC/uEQKo38qFZGU9geebS/BFukYO70OQYaDC8e0EYUZvr
+        qVGlU23KIuCKWlNOKi8rh73AtwfkyTY=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-26-c7B_4w19NCSpIgPdAm5O_A-1; Tue, 01 Mar 2022 14:30:53 -0500
+X-MC-Unique: c7B_4w19NCSpIgPdAm5O_A-1
+Received: by mail-oo1-f69.google.com with SMTP id b10-20020a4a340a000000b0031937d5a5efso10987300ooa.15
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Mar 2022 11:30:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=sjfszq0s6rA1DoiuWgRAAaEXXX3ctOb/kx6v17T7+bs=;
-        b=5mJ9AYED6j+w2OH8ffop1Ob7J8Mp1YCNk+fqKEPXibEWIGxUcKXEm9zwHxQVI26kDE
-         FKvKjEL5/ji+nHsuWEmhl2aZoO5jhizCAU+k45ZOBifIupq9ZRU3V69DTIHCxoVmlsBW
-         dwQeD2jBgORBejHQV/ZTW6jh2hiftr52WTdYiFQGgQr/zZZ01GUA4dgqmxK0ztuSuYwv
-         k8W2arnbeJS1+GtVrwRmM2vQJozCcwS+WkkSt8XKN1kBoDjaVBcROvyM+2/lgeGlvwpM
-         bZUHVu6GLqQaZOXOqqMwZfqN2AWUKvf/oSrPAwqZvbJvCfc07xpH/dju+w45t4euSVye
-         JPuQ==
-X-Gm-Message-State: AOAM531CjYnwsB4GLqq7u6i4F+EuMOF+50gfTH8Z2F2cMt+ZKgQ3lPOM
-        Pd7UFHD+5A6VLB2qO2EzVxPv9BDet04lNA==
-X-Google-Smtp-Source: ABdhPJzLhA38IVBgeS0jS6fmXrfvYXbSfkWLFcH+ksuu9OxckKZQpge4EPfXA8PI1btrQvPsQzH6hA==
-X-Received: by 2002:a17:90b:4001:b0:1bc:68ec:ce48 with SMTP id ie1-20020a17090b400100b001bc68ecce48mr23182579pjb.133.1646162828937;
-        Tue, 01 Mar 2022 11:27:08 -0800 (PST)
-Received: from kitty ([12.231.191.170])
-        by smtp.gmail.com with ESMTPSA id u9-20020a056a00158900b004de90b164d0sm19309394pfk.9.2022.03.01.11.27.08
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=rVYpDZQDb15Izn1lzcbcKE0MfzfOugZfslLcf4XgvGM=;
+        b=u7qcglJVsdYiYAeZMOIhCwaYVFvdzbcHe0X5tdyQJnaNjr7+C3YvaUnQWVbPg0dRpd
+         0aaEV2+J+axbmzX+YPIiCjFo4NamcOSBF9xdD31OrJiYmFxC7Gh3zkBA/jh9j0WgYpqx
+         lDZaQoi34HeuUlbop2+E8kchOC/T+Xt4tkUYgMvpJGb6ov6iWLLfOm++zrvo0K8HhoPl
+         n5wQ+pBSVt3NAj3ySPSv+pIwz40I2aJWwg4SW38L+Cm8bX0rcvzRz63EtUf9Qr49hhpb
+         7Di1aXb5eR5C5syDHpywQTNiEq3zknqvVFnglb+hAh/3b7bN7pifREqWxN3O6KJAJ3EC
+         4fnA==
+X-Gm-Message-State: AOAM532ud82xNRdalSnuQr7wFTF0VrKELtboqqivAW8ZmaFiJ2STvBKA
+        lsFA5pOnD+omd6lJMGwWImwktq/9JC2P9NQ6T84b7FKuWSmMvtgsk8HzDTxN05S0yQ/B4fZpYmK
+        ZGQDVRQ/HFNO9PDC1gzRHJl/c
+X-Received: by 2002:a05:6830:19c3:b0:5af:451a:c030 with SMTP id p3-20020a05683019c300b005af451ac030mr13071174otp.286.1646163051372;
+        Tue, 01 Mar 2022 11:30:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzaF5m1Erd0R+xb0TZC3q6x+BbKcLz2naWnbTQTKf1pIDI8DHgroVSZtRv1ObZHIAudTnp4WQ==
+X-Received: by 2002:a05:6830:19c3:b0:5af:451a:c030 with SMTP id p3-20020a05683019c300b005af451ac030mr13071154otp.286.1646163051083;
+        Tue, 01 Mar 2022 11:30:51 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a10-20020a9d74ca000000b005af640e9377sm6767132otl.17.2022.03.01.11.30.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 11:27:08 -0800 (PST)
-From:   10maurycy10@gmail.com
-X-Google-Original-From: mz@kitty
-Date:   Tue, 1 Mar 2022 11:27:16 -0800
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org
-Subject: Re: Re: [PATCH RFC v0] random: block in /dev/urandom
-Message-ID: <Yh5zA1T9GRBFi5H9@kitty>
-References: <20220211210757.612595-1-Jason@zx2c4.com>
- <fcab986b-d0bd-c798-de17-266abcdc7da2@gentoo.org>
+        Tue, 01 Mar 2022 11:30:50 -0800 (PST)
+Date:   Tue, 1 Mar 2022 12:30:47 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v6 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220301123047.1171c730.alex.williamson@redhat.com>
+In-Reply-To: <20220301131528.GW219866@nvidia.com>
+References: <20220228090121.1903-1-shameerali.kolothum.thodi@huawei.com>
+        <20220228090121.1903-10-shameerali.kolothum.thodi@huawei.com>
+        <20220228145731.GH219866@nvidia.com>
+        <58fa5572e8e44c91a77bd293b2ec6e33@huawei.com>
+        <20220228180520.GO219866@nvidia.com>
+        <20220228131614.27ad37dc.alex.williamson@redhat.com>
+        <20220228202919.GP219866@nvidia.com>
+        <20220228142034.024e7be6.alex.williamson@redhat.com>
+        <20220228234709.GV219866@nvidia.com>
+        <20220228214110.4deb551f.alex.williamson@redhat.com>
+        <20220301131528.GW219866@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcab986b-d0bd-c798-de17-266abcdc7da2@gentoo.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 12, 2022 at 06:05:54PM -0500, Joshua Kinard wrote:
-> On 2/11/2022 16:07, Jason A. Donenfeld wrote:
-> > This is very much an RFC patch, or maybe even an RFG -- request for
-> > grumbles. This topic has come up a million times, and usually doesn't go
-> > anywhere. This time I thought I'd bring it up with a slightly narrower
-> > focus. Before you read further, realize that I do not intend to merge
-> > this without there being an appropriate amount of consensus for it and
-> > discussion about it.
-> > 
-> > Ever since Linus' 50ee7529ec45 ("random: try to actively add entropy
-> > rather than passively wait for it"), the RNG does a haveged-style jitter
-> > dance around the scheduler, in order to produce entropy (and credit it)
-> > for the case when we're stuck in wait_for_random_bytes(). How ever you
-> > feel about the Linus Jitter Dance is beside the point: it's been there
-> > for three years and usually gets the RNG initialized in a second or so.
-> >
+On Tue, 1 Mar 2022 09:15:28 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-What about the case where a small amount of entropy is avalable?
-
-> > 
-> > As a matter of fact, this is what happens currently when people use
-> > getrandom(2).
-> > 
-> > So, given that the kernel has grown this mechanism for seeding itself
-> > from nothing, and that this procedure happens pretty fast, maybe there's
-> > no point any longer in having /dev/urandom give insecure bytes. In the
-> > past we didn't want the boot process to deadlock, which was
-> > understandable. But now, in the worst case, a second goes by, and the
-> > problem is resolved. It seems like maybe we're finally at a point when
-> > we can get rid of the infamous "urandom read hole".
-> >
-
-Why not keep the distinction between /dev/random and /dev/urandom when a
-good entropy source is not avalable?
-
-> > 
-> > Maybe. And this is why this is a request for grumbles patch: the Linus
-> > Jitter Dance relies on random_get_entropy() returning a cycle counter
-> > value. The first lines of try_to_generate_entropy() are:
-> > 
-> > 	stack.now = random_get_entropy();
-> > 	/* Slow counter - or none. Don't even bother */
-> > 	if (stack.now == random_get_entropy())
-> > 		return;
-> > 
-> > So it would appear that what seemed initially like a panacea does not in
-> > fact work everywhere. Where doesn't it work?
-> > 
-> > On every platform, random_get_entropy() is connected to get_cycles(),
-> > except for three: m68k, MIPS, and RISC-V.
-> > 
+> On Mon, Feb 28, 2022 at 09:41:10PM -0700, Alex Williamson wrote:
 > 
-> [snip]
-> 
+> > > + * returning readable. ENOMSG may not be returned in STOP_COPY. Support
+> > > + * for this ioctl is required when VFIO_MIGRATION_PRE_COPY is set.  
 > > 
-> > I think what this adds up to is that this change would positively affect
-> > everybody, except for _possibly_ negatively affecting poorly configured
-> > non-Amiga m68k systems and the MIPS R6000 and R6000A. Does that analysis
-> > seem correct to folks reading, or did I miss something?
-> > 
-> > Are there other cases where the cycle counter does exist but is simply
-> > too slow? Perhaps some computer historians can chime in here.
-> > 
-> > [snip]
+> > This entire ioctl on the data_fd seems a bit strange given the previous
+> > fuss about how difficult it is for a driver to estimate their migration
+> > data size.  Now drivers are forced to provide those estimates even if
+> > they only intend to use PRE_COPY as an early compatibility test?  
+> 
+> Well, yes. PRE_COPY is designed to be general, not just to serve for
+> compatability. Qemu needs data to understand how the internal dirty
+> accumulation in the device is progressing. So everything has to
+> provide estimates, and at least for acc this is trivial.
 
+But we're not really even living up to that expectation of dirty bytes
+with acc afaict.  We're giving QEMU some initial data it can have
+early, but it looks like the latest proposal hard codes dirty-bytes to
+zero, so QEMU doesn't gain any insight into dirty accumulation, nor
+does it know that the field is invalid.
 
-This should realy be a config flag. (URANDOM_SECURE_RANDOM?).
+Wouldn't it make more sense if initial-bytes started at QM_MATCH_SIZE
+and dirty-bytes was always sizeof(vf_data) - QM_MATCH_SIZE?  ie. QEMU
+would know that it has sizeof(vf_data) - QM_MATCH_SIZE remaining even
+while it's getting ENOMSG after reading QM_MATCH_SIZE bytes of data.
 
+> > Obviously it's trivial for the acc driver that doesn't support dirty
+> > tracking and only has a fixed size migration structure, but it seems to
+> > contradict your earlier statements.   
 > 
+> mlx5 knows exactly this data size once it completes entering
+> STOP_COPY, it has a migf->total_size just like acc, so no problem to
+> generate this ioctl. We just don't have a use case for it and qemu
+> would never call it, so trying not to add dead things to the kernel.
 > 
-> -- 
-> Joshua Kinard
-> Gentoo/MIPS
-> kumba@gentoo.org
-> rsa6144/5C63F4E3F5C6C943 2015-04-27
-> 177C 1972 1FB8 F254 BAD0 3E72 5C63 F4E3 F5C6 C943
+> Are you are talking about the prior discussion about getting this data
+> before reaching STOP_COPY?
+
+That would be the ideal scenario, but again if knowing this information
+once we're in STOP_COPY continues to be useful, which I infer by the
+ongoing operation of this ioctl, then why don't we switch to an ioctl
+that just reports bytes-remaining at that point rather than trying to
+fit the square peg in the round hole to contort a STOP_COPY data
+representation into initial-bytes and dirty-bytes?  If that's not
+useful yet and you don't want to add dead kernel code, then let's
+define that this ioctl is only available in the PRE_COPY* states and
+returns -errno in the STOP_COPY state.
+
+> > For instance, can mlx5 implement a PRE_COPY solely for compatibility
+> > testing or is it blocked by an inability to provide data estimates
+> > for this ioctl?  
 > 
-> "The past tempts us, the present confuses us, the future frightens us.  And
-> our lives slip away, moment by moment, lost in that vast, terrible in-between."
+> I expect it can, it works very similar to acc. It just doesn't match
+> where we are planning for compatability. mlx5 has a more dynamic
+> compatability requirement, it needs to be exposed to orchestration not
+> hidden in pre_copy. acc looks like it is static, so 'have acc' is
+> enough info for orchestration.
 > 
-> --Emperor Turhan, Centauri Republic
+> > Now if we propose that this ioctl is useful during the STOP_COPY phase,
+> > how does a non-PRE_COPY driver opt-in to that beneficial use case?    
+> 
+> Just implement it - userspace will learn if the driver supports it on
+> the first ioctl = ENOTTY means no support.
+> 
+> > Do we later add a different, optional ioctl for non-PRE_COPY and
+> > then require userspace to support two different methods of getting
+> > remaining data estimates for a device in STOP_COPY?  
+> 
+> I wouldn't add a new ioctl unless we discover a new requirement when
+> an implementation is made.
+
+So let's define that this ioctl is only valid in PRE_COPY* states and
+return -errno in STOP_COPY so that we have consistency between all
+devices in STOP_COPY and let's also define if there's actually anything
+userspace can infer about remaining STOP_COPY data size while in
+PRE_COPY* via this ioctl.  For example, is dirty-bytes zero or the
+remaining data structure size?
+
+...
+> > I'm sure that raises questions about how we correlate a
+> > PRE_COPY* session to a STOP_COPY session though, but this PRE_COPY*
+> > specific but ongoing usage in STOP_COPY ioctl seems ad-hoc.  
+> 
+> I do not think it is "pre_copy specific" - the ioctl returns the
+> estimated length of the data_fd, this is always a valid concept.
+
+Yes, some sort of remaining-bytes is always a valid concept.  Splitting
+that into initial-bytes and dirty-bytes doesn't make any sense at
+STOP_COPY though.  If there's no use case for this ioctl in STOP_COPY
+and the partitioning of data exposed in PRE_COPY* mode is fundamentally
+specific to pre-copy support, why not disable the ioctl with the
+intention to replace it with a common one specific to STOP_COPY once
+there's a userspace use case?  Thanks,
+
+Alex
+
