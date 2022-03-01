@@ -2,57 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E31CC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 01:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C3BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 01:26:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbiCABRY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Feb 2022 20:17:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48522 "EHLO
+        id S229590AbiCAB1Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Feb 2022 20:27:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbiCABRX (ORCPT
+        with ESMTP id S229540AbiCAB1X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Feb 2022 20:17:23 -0500
-Received: from mga06.intel.com (mga06.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588AEB80;
-        Mon, 28 Feb 2022 17:16:43 -0800 (PST)
+        Mon, 28 Feb 2022 20:27:23 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A788BCF5;
+        Mon, 28 Feb 2022 17:26:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646097403; x=1677633403;
+  t=1646098003; x=1677634003;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=knh6elYpo4tr7YruYbGImvkmUVglx7N+wZIyoY+SQmA=;
-  b=YvTD9t0kEbS49lE8zPxuc1OM4NXFYyjmnbXuHPApQhaEyNaUMjmsCYkD
-   iP6RjZT8X1p25prUdpJFxM+4rdagioc5o/b6eQ6wdBRVi1jJlahmnGa8L
-   S9WsWybDg4KKZCyRDUT0ZPG59tXYkYHMF2qBAyvzi27MnW1e8YiynsRiZ
-   YbWoqnSHos9DpJ5GLXjijYr4veSKNKHy5KpVo6/f/9QyuvRyf+rP5IHBb
-   nBjV9TeXBeo15fcSE/Cs6jrX0a23qEhtC4RfzYVD1ruStMmfwooBBA1gL
-   rxdBOP+SlWfu/n1GwaAw077RhnVep7F5pcNkY5yMJyWGxsKWprCYXA8AA
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="313748960"
+  bh=W0/EHxfz/6Tlchl0IZZvUXnUObXdh0ufI9V1QGUN19E=;
+  b=RPcXNOszFI+ClTsZPv7FWhtTDCehO424FF/RxxNehn44VWz6Mz94jTgs
+   te5MQUjra1CEJ2Rjxr66dUdpLPCp0po9dUni+Wu7xMWuRFWCTNgkqa0DY
+   e4dvuXjJPArq75xwBrBTLDOZrS+z4LulXfSrUEejhwcDm7vyB26kLqPUK
+   eB7DOCEp/1ZGYceSKRIu9sESfi9jB3TSilESC0gs3x1iia/Y5yaKKGEh3
+   U3krI/UAzELv7Bzp+RhFrq01EstgOmnZijTfGewYiRy6FSI3IWZFUfOKi
+   KVQ8/ya/x9hzWiN++5ubG/u8gSyau3rfkkE2e/1TDSznBUPUucYcDvtJs
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="253221374"
 X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="313748960"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 17:16:42 -0800
+   d="scan'208";a="253221374"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 17:26:43 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="641086490"
+   d="scan'208";a="492931197"
 Received: from lkp-server01.sh.intel.com (HELO 788b1cd46f0d) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 28 Feb 2022 17:16:40 -0800
+  by orsmga003.jf.intel.com with ESMTP; 28 Feb 2022 17:26:40 -0800
 Received: from kbuild by 788b1cd46f0d with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1nOr83-0007y4-9f; Tue, 01 Mar 2022 01:16:39 +0000
-Date:   Tue, 1 Mar 2022 09:15:49 +0800
+        id 1nOrHj-0007yk-Fs; Tue, 01 Mar 2022 01:26:39 +0000
+Date:   Tue, 1 Mar 2022 09:26:09 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
         herbert@gondor.apana.org.au, krzysztof.kozlowski@canonical.com,
         robh+dt@kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org,
+Cc:     kbuild-all@lists.01.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
 Subject: Re: [PATCH 10/16] crypto: rockchip: rework by using crypto_engine
-Message-ID: <202203010936.rO3B1boq-lkp@intel.com>
+Message-ID: <202203010927.TpnG5TzB-lkp@intel.com>
 References: <20220228194037.1600509-11-clabbe@baylibre.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -75,42 +74,52 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/0day-ci/linux/commits/Corentin-Labbe/crypto-rockchip-permit-to-pass-self-tests/20220301-035430
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/mmind/linux-rockchip.git for-next
-config: arm64-randconfig-r006-20220228 (https://download.01.org/0day-ci/archive/20220301/202203010936.rO3B1boq-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20220301/202203010927.TpnG5TzB-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 11.2.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # install arm64 cross compiling tool for clang build
-        # apt-get install binutils-aarch64-linux-gnu
         # https://github.com/0day-ci/linux/commit/7e5f8e4a5f09473643937e0ecff342bf336793fb
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Corentin-Labbe/crypto-rockchip-permit-to-pass-self-tests/20220301-035430
         git checkout 7e5f8e4a5f09473643937e0ecff342bf336793fb
         # save the config file to linux build tree
         mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/crypto/rockchip/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arm SHELL=/bin/bash drivers/crypto/rockchip/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> drivers/crypto/rockchip/rk3288_crypto_skcipher.c:386:10: warning: format specifies type 'unsigned int' but the argument has type 'unsigned long' [-Wformat]
-                           todo, rctx->mode & RK_CRYPTO_DEC);
-                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:163:47: note: expanded from macro 'dev_dbg'
-                   dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
-                                                       ~~~     ^~~~~~~~~~~
-   include/linux/dev_printk.h:129:34: note: expanded from macro 'dev_printk'
-                   _dev_printk(level, dev, fmt, ##__VA_ARGS__);            \
-                                           ~~~    ^~~~~~~~~~~
-   drivers/crypto/rockchip/rk3288_crypto_skcipher.c:474:24: warning: unused variable 'ctx' [-Wunused-variable]
-           struct rk_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-                                 ^
-   2 warnings generated.
+   In file included from include/linux/device.h:15,
+                    from drivers/crypto/rockchip/rk3288_crypto_skcipher.c:11:
+   drivers/crypto/rockchip/rk3288_crypto_skcipher.c: In function 'rk_cipher_run':
+>> drivers/crypto/rockchip/rk3288_crypto_skcipher.c:383:40: warning: format '%x' expects argument of type 'unsigned int', but argument 12 has type 'long unsigned int' [-Wformat=]
+     383 |                 dev_dbg(ctx->dev->dev, "LEN=%d/%d/%u ivsize=%d mode=%x n=%d BI=%d todo=%u way=%x\n",
+         |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:129:41: note: in definition of macro 'dev_printk'
+     129 |                 _dev_printk(level, dev, fmt, ##__VA_ARGS__);            \
+         |                                         ^~~
+   include/linux/dev_printk.h:163:45: note: in expansion of macro 'dev_fmt'
+     163 |                 dev_printk(KERN_DEBUG, dev, dev_fmt(fmt), ##__VA_ARGS__); \
+         |                                             ^~~~~~~
+   drivers/crypto/rockchip/rk3288_crypto_skcipher.c:383:17: note: in expansion of macro 'dev_dbg'
+     383 |                 dev_dbg(ctx->dev->dev, "LEN=%d/%d/%u ivsize=%d mode=%x n=%d BI=%d todo=%u way=%x\n",
+         |                 ^~~~~~~
+   drivers/crypto/rockchip/rk3288_crypto_skcipher.c:383:96: note: format string is defined here
+     383 |                 dev_dbg(ctx->dev->dev, "LEN=%d/%d/%u ivsize=%d mode=%x n=%d BI=%d todo=%u way=%x\n",
+         |                                                                                               ~^
+         |                                                                                                |
+         |                                                                                                unsigned int
+         |                                                                                               %lx
+   drivers/crypto/rockchip/rk3288_crypto_skcipher.c: In function 'rk_ablk_exit_tfm':
+   drivers/crypto/rockchip/rk3288_crypto_skcipher.c:474:31: warning: unused variable 'ctx' [-Wunused-variable]
+     474 |         struct rk_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+         |                               ^~~
 
 
-vim +386 drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+vim +383 drivers/crypto/rockchip/rk3288_crypto_skcipher.c
 
    311	
    312	static int rk_cipher_run(struct crypto_engine *engine, void *async_req)
@@ -184,10 +193,10 @@ vim +386 drivers/crypto/rockchip/rk3288_crypto_skcipher.c
    380	
    381			todo = min(sg_dma_len(sgs), len);
    382			len -= todo;
-   383			dev_dbg(ctx->dev->dev, "LEN=%d/%d/%u ivsize=%d mode=%x n=%d BI=%d todo=%u way=%x\n",
+ > 383			dev_dbg(ctx->dev->dev, "LEN=%d/%d/%u ivsize=%d mode=%x n=%d BI=%d todo=%u way=%x\n",
    384				sg_dma_len(sgs), sg_dma_len(sgd), areq->cryptlen,
    385				ivsize, rctx->mode, n, sgs == sgd,
- > 386				todo, rctx->mode & RK_CRYPTO_DEC);
+   386				todo, rctx->mode & RK_CRYPTO_DEC);
    387			crypto_dma_start(ctx->dev, sgs, sgd, todo / 4);
    388			wait_for_completion_interruptible_timeout(&ctx->dev->complete,
    389								  msecs_to_jiffies(2000));
