@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED326C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 23:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F62C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Mar 2022 23:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238213AbiCAXLj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Mar 2022 18:11:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
+        id S238662AbiCAXL4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 1 Mar 2022 18:11:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236771AbiCAXLf (ORCPT
+        with ESMTP id S238502AbiCAXLx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Mar 2022 18:11:35 -0500
+        Tue, 1 Mar 2022 18:11:53 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF284FC74;
-        Tue,  1 Mar 2022 15:10:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7E090FF9;
+        Tue,  1 Mar 2022 15:11:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 136126100E;
-        Tue,  1 Mar 2022 23:10:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 899EEC340EE;
-        Tue,  1 Mar 2022 23:10:51 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 764506146F;
+        Tue,  1 Mar 2022 23:11:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4BA8C340EE;
+        Tue,  1 Mar 2022 23:10:58 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BPHvCsKI"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PZWdJMvP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646176250;
+        t=1646176257;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=itu+dbhCmW5v2okOGmfaDt4jw9Rzl9SYTqaDbaiyW18=;
-        b=BPHvCsKI1VH+Xru9bqad/KcyNp3hGjS4iY72LwZFC8FIKEbyQx1t134YHwTWJGKRf+m6kO
-        XHNkhgh0SxNTuLS+lJey0YdSpCtge01JQpGM7gV06HzqbJpVLnlfiEfrRC727Xv/IOiBMC
-        3Mi9tevomgyyikUqGkoZ0mXmTi8mRGU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 998be249 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 1 Mar 2022 23:10:49 +0000 (UTC)
+        bh=r94wKsnq6K6ND+X220Ovab4Du6A3foJxGdJh9sRmxh4=;
+        b=PZWdJMvP7n2f1PXzoh3oU+xY+PZFzyyvsm0lKHqtwO9U3E9mHjtqaDthbhA81EZn9f5Fz0
+        aEdPHaZipArVvlP4dHNvOT2G8261DJvChMlbVUhm7mgXctVyU5FbpXZNo5VbwWa7Eaeyaf
+        IX55Cu8fBSiMH0l6aFX+z7/orXFmNNg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 358d3e1e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 1 Mar 2022 23:10:57 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         netdev@vger.kernel.org, Alexander Graf <graf@amazon.com>,
@@ -43,10 +43,10 @@ To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Greg KH <gregkh@linuxfoundation.org>
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 1/3] random: replace custom notifier chain with standard one
-Date:   Wed,  2 Mar 2022 00:10:36 +0100
-Message-Id: <20220301231038.530897-2-Jason@zx2c4.com>
+        Theodore Ts'o <tytso@mit.edu>, Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH 3/3] wireguard: device: clear keys on VM fork
+Date:   Wed,  2 Mar 2022 00:10:38 +0100
+Message-Id: <20220301231038.530897-4-Jason@zx2c4.com>
 In-Reply-To: <20220301231038.530897-1-Jason@zx2c4.com>
 References: <20220301231038.530897-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -55,232 +55,123 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We previously rolled our own randomness readiness notifier, which only
-has two users in the whole kernel. Replace this with a more standard
-atomic notifier block that serves the same purpose with less code. Also
-unexport the symbols, because no modules use it, only unconditional
-builtins. The only drawback is that it's possible for a notification
-handler returning the "stop" code to prevent further processing, but
-given that there are only two users, and that we're unexporting this
-anyway, that doesn't seem like a significant drawback for the
-simplification we receive here.
+When a virtual machine forks, it's important that WireGuard clear
+existing sessions so that different plaintext is not transmitted using
+the same key+nonce, which can result in catastrophic cryptographic
+failure. To accomplish this, we simply hook into the newly added vmfork
+notifier, which can use the same notification function we're already
+using for PM notifications.
+
+As a bonus, it turns out that, like the vmfork registration function,
+the PM registration function is stubbed out when CONFIG_PM_SLEEP is not
+set, so we can actually just remove the maze of ifdefs, which makes it
+really quite clean to support both notifiers at once.
 
 Cc: Dominik Brodowski <linux@dominikbrodowski.net>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/char/random.c  | 67 ++++++++++++------------------------------
- include/linux/random.h | 11 ++-----
- lib/random32.c         | 12 ++++----
- lib/vsprintf.c         | 10 ++++---
- 4 files changed, 35 insertions(+), 65 deletions(-)
+Hi Jakub,
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index fe477a12c1ad..6bd1bbab7392 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -83,8 +83,8 @@ static int crng_init = 0;
- /* Various types of waiters for crng_init->2 transition. */
- static DECLARE_WAIT_QUEUE_HEAD(crng_init_wait);
- static struct fasync_struct *fasync;
--static DEFINE_SPINLOCK(random_ready_list_lock);
--static LIST_HEAD(random_ready_list);
-+static DEFINE_SPINLOCK(random_ready_chain_lock);
-+static RAW_NOTIFIER_HEAD(random_ready_chain);
- 
- /* Control how we warn userspace. */
- static struct ratelimit_state unseeded_warning =
-@@ -145,72 +145,43 @@ EXPORT_SYMBOL(wait_for_random_bytes);
-  *
-  * returns: 0 if callback is successfully added
-  *	    -EALREADY if pool is already initialised (callback not called)
-- *	    -ENOENT if module for callback is not alive
-  */
--int add_random_ready_callback(struct random_ready_callback *rdy)
-+int register_random_ready_notifier(struct notifier_block *nb)
- {
--	struct module *owner;
- 	unsigned long flags;
--	int err = -EALREADY;
-+	int ret = -EALREADY;
- 
- 	if (crng_ready())
--		return err;
--
--	owner = rdy->owner;
--	if (!try_module_get(owner))
--		return -ENOENT;
--
--	spin_lock_irqsave(&random_ready_list_lock, flags);
--	if (crng_ready())
--		goto out;
--
--	owner = NULL;
--
--	list_add(&rdy->list, &random_ready_list);
--	err = 0;
--
--out:
--	spin_unlock_irqrestore(&random_ready_list_lock, flags);
--
--	module_put(owner);
-+		return ret;
- 
--	return err;
-+	spin_lock_irqsave(&random_ready_chain_lock, flags);
-+	if (!crng_ready())
-+		ret = raw_notifier_chain_register(&random_ready_chain, nb);
-+	spin_unlock_irqrestore(&random_ready_chain_lock, flags);
-+	return ret;
- }
--EXPORT_SYMBOL(add_random_ready_callback);
- 
- /*
-  * Delete a previously registered readiness callback function.
-  */
--void del_random_ready_callback(struct random_ready_callback *rdy)
-+int unregister_random_ready_notifier(struct notifier_block *nb)
- {
- 	unsigned long flags;
--	struct module *owner = NULL;
--
--	spin_lock_irqsave(&random_ready_list_lock, flags);
--	if (!list_empty(&rdy->list)) {
--		list_del_init(&rdy->list);
--		owner = rdy->owner;
--	}
--	spin_unlock_irqrestore(&random_ready_list_lock, flags);
-+	int ret;
- 
--	module_put(owner);
-+	spin_lock_irqsave(&random_ready_chain_lock, flags);
-+	ret = raw_notifier_chain_unregister(&random_ready_chain, nb);
-+	spin_unlock_irqrestore(&random_ready_chain_lock, flags);
-+	return ret;
- }
--EXPORT_SYMBOL(del_random_ready_callback);
- 
- static void process_random_ready_list(void)
- {
- 	unsigned long flags;
--	struct random_ready_callback *rdy, *tmp;
- 
--	spin_lock_irqsave(&random_ready_list_lock, flags);
--	list_for_each_entry_safe(rdy, tmp, &random_ready_list, list) {
--		struct module *owner = rdy->owner;
--
--		list_del_init(&rdy->list);
--		rdy->func(rdy);
--		module_put(owner);
--	}
--	spin_unlock_irqrestore(&random_ready_list_lock, flags);
-+	spin_lock_irqsave(&random_ready_chain_lock, flags);
-+	raw_notifier_call_chain(&random_ready_chain, 0, NULL);
-+	spin_unlock_irqrestore(&random_ready_chain_lock, flags);
- }
- 
- #define warn_unseeded_randomness(previous) \
-diff --git a/include/linux/random.h b/include/linux/random.h
-index f209f1a78899..e84b6fa27435 100644
---- a/include/linux/random.h
-+++ b/include/linux/random.h
-@@ -7,15 +7,10 @@
- #include <linux/kernel.h>
- #include <linux/list.h>
- #include <linux/once.h>
-+#include <linux/notifier.h>
- 
- #include <uapi/linux/random.h>
- 
--struct random_ready_callback {
--	struct list_head list;
--	void (*func)(struct random_ready_callback *rdy);
--	struct module *owner;
--};
--
- extern void add_device_randomness(const void *, size_t);
- extern void add_bootloader_randomness(const void *, size_t);
- 
-@@ -42,8 +37,8 @@ extern void get_random_bytes(void *buf, size_t nbytes);
- extern int wait_for_random_bytes(void);
- extern int __init rand_initialize(void);
- extern bool rng_is_initialized(void);
--extern int add_random_ready_callback(struct random_ready_callback *rdy);
--extern void del_random_ready_callback(struct random_ready_callback *rdy);
-+extern int register_random_ready_notifier(struct notifier_block *nb);
-+extern int unregister_random_ready_notifier(struct notifier_block *nb);
- extern size_t __must_check get_random_bytes_arch(void *buf, size_t nbytes);
- 
- #ifndef MODULE
-diff --git a/lib/random32.c b/lib/random32.c
-index 3c19820796d0..976632003ec6 100644
---- a/lib/random32.c
-+++ b/lib/random32.c
-@@ -551,9 +551,11 @@ static void prandom_reseed(struct timer_list *unused)
-  * To avoid worrying about whether it's safe to delay that interrupt
-  * long enough to seed all CPUs, just schedule an immediate timer event.
-  */
--static void prandom_timer_start(struct random_ready_callback *unused)
-+static int prandom_timer_start(struct notifier_block *nb,
-+			       unsigned long action, void *data)
- {
- 	mod_timer(&seed_timer, jiffies);
-+	return 0;
- }
- 
- #ifdef CONFIG_RANDOM32_SELFTEST
-@@ -617,13 +619,13 @@ core_initcall(prandom32_state_selftest);
-  */
- static int __init prandom_init_late(void)
- {
--	static struct random_ready_callback random_ready = {
--		.func = prandom_timer_start
-+	static struct notifier_block random_ready = {
-+		.notifier_call = prandom_timer_start
- 	};
--	int ret = add_random_ready_callback(&random_ready);
-+	int ret = register_random_ready_notifier(&random_ready);
- 
- 	if (ret == -EALREADY) {
--		prandom_timer_start(&random_ready);
-+		prandom_timer_start(&random_ready, 0, NULL);
- 		ret = 0;
- 	}
+I wasn't planning on sending other WireGuard changes to net-next this
+cycle, and this one here depends on previous things in my random.git
+tree. Is it okay with you if I take this through my tree rather than
+net-next? Alternatively, I could send it through net after rc1 if you'd
+prefer that. Or we could just wait for 5.19, but that seems a long way's
+off.
+
+Thanks,
+Jason
+
+ drivers/net/wireguard/device.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index a46067c38bf5..22cc27c221f8 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -59,7 +59,10 @@ static int wg_open(struct net_device *dev)
  	return ret;
-diff --git a/lib/vsprintf.c b/lib/vsprintf.c
-index 3b8129dd374c..36574a806a81 100644
---- a/lib/vsprintf.c
-+++ b/lib/vsprintf.c
-@@ -757,14 +757,16 @@ static void enable_ptr_key_workfn(struct work_struct *work)
- 
- static DECLARE_WORK(enable_ptr_key_work, enable_ptr_key_workfn);
- 
--static void fill_random_ptr_key(struct random_ready_callback *unused)
-+static int fill_random_ptr_key(struct notifier_block *nb,
-+			       unsigned long action, void *data)
- {
- 	/* This may be in an interrupt handler. */
- 	queue_work(system_unbound_wq, &enable_ptr_key_work);
-+	return 0;
  }
  
--static struct random_ready_callback random_ready = {
--	.func = fill_random_ptr_key
-+static struct notifier_block random_ready = {
-+	.notifier_call = fill_random_ptr_key
- };
- 
- static int __init initialize_ptr_random(void)
-@@ -778,7 +780,7 @@ static int __init initialize_ptr_random(void)
+-#ifdef CONFIG_PM_SLEEP
++static int wg_pm_notification(struct notifier_block *nb, unsigned long action, void *data);
++static struct notifier_block pm_notifier = { .notifier_call = wg_pm_notification };
++static struct notifier_block vm_notifier = { .notifier_call = wg_pm_notification };
++
+ static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
+ 			      void *data)
+ {
+@@ -70,10 +73,10 @@ static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
+ 	 * its normal operation rather than as a somewhat rare event, then we
+ 	 * don't actually want to clear keys.
+ 	 */
+-	if (IS_ENABLED(CONFIG_PM_AUTOSLEEP) || IS_ENABLED(CONFIG_ANDROID))
++	if (nb == &pm_notifier && (IS_ENABLED(CONFIG_PM_AUTOSLEEP) || IS_ENABLED(CONFIG_ANDROID)))
  		return 0;
- 	}
  
--	ret = add_random_ready_callback(&random_ready);
-+	ret = register_random_ready_notifier(&random_ready);
- 	if (!ret) {
+-	if (action != PM_HIBERNATION_PREPARE && action != PM_SUSPEND_PREPARE)
++	if (nb == &pm_notifier && action != PM_HIBERNATION_PREPARE && action != PM_SUSPEND_PREPARE)
  		return 0;
- 	} else if (ret == -EALREADY) {
+ 
+ 	rtnl_lock();
+@@ -91,9 +94,6 @@ static int wg_pm_notification(struct notifier_block *nb, unsigned long action,
+ 	return 0;
+ }
+ 
+-static struct notifier_block pm_notifier = { .notifier_call = wg_pm_notification };
+-#endif
+-
+ static int wg_stop(struct net_device *dev)
+ {
+ 	struct wg_device *wg = netdev_priv(dev);
+@@ -424,16 +424,18 @@ int __init wg_device_init(void)
+ {
+ 	int ret;
+ 
+-#ifdef CONFIG_PM_SLEEP
+ 	ret = register_pm_notifier(&pm_notifier);
+ 	if (ret)
+ 		return ret;
+-#endif
+ 
+-	ret = register_pernet_device(&pernet_ops);
++	ret = register_random_vmfork_notifier(&vm_notifier);
+ 	if (ret)
+ 		goto error_pm;
+ 
++	ret = register_pernet_device(&pernet_ops);
++	if (ret)
++		goto error_vm;
++
+ 	ret = rtnl_link_register(&link_ops);
+ 	if (ret)
+ 		goto error_pernet;
+@@ -442,10 +444,10 @@ int __init wg_device_init(void)
+ 
+ error_pernet:
+ 	unregister_pernet_device(&pernet_ops);
++error_vm:
++	unregister_random_vmfork_notifier(&vm_notifier);
+ error_pm:
+-#ifdef CONFIG_PM_SLEEP
+ 	unregister_pm_notifier(&pm_notifier);
+-#endif
+ 	return ret;
+ }
+ 
+@@ -453,8 +455,7 @@ void wg_device_uninit(void)
+ {
+ 	rtnl_link_unregister(&link_ops);
+ 	unregister_pernet_device(&pernet_ops);
+-#ifdef CONFIG_PM_SLEEP
++	unregister_random_vmfork_notifier(&vm_notifier);
+ 	unregister_pm_notifier(&pm_notifier);
+-#endif
+ 	rcu_barrier();
+ }
 -- 
 2.35.1
 
