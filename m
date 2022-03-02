@@ -2,69 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7215FC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 23:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44376C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 00:00:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiCCAAh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:00:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
+        id S229828AbiCCAAs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:00:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiCCAAf (ORCPT
+        with ESMTP id S229861AbiCCAAq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:00:35 -0500
+        Wed, 2 Mar 2022 19:00:46 -0500
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA024925F;
-        Wed,  2 Mar 2022 15:59:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD804D9CF;
+        Wed,  2 Mar 2022 15:59:53 -0800 (PST)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nPXvM-0006CD-2F; Thu, 03 Mar 2022 09:58:25 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:58:24 +1200
-Date:   Thu, 3 Mar 2022 10:58:23 +1200
+        id 1nPXwE-0006DT-Lo; Thu, 03 Mar 2022 09:59:19 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:59:18 +1200
+Date:   Thu, 3 Mar 2022 10:59:18 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     jernej.skrabec@gmail.com, linus.walleij@linaro.org,
-        narmstrong@baylibre.com, ulli.kroll@googlemail.com, wens@csie.org,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH 0/5] crypto: completion should be ran with BH disabled
-Message-ID: <Yh/2j+hxUs/+1BXB@gondor.apana.org.au>
-References: <20220221120833.2618733-1-clabbe@baylibre.com>
+To:     Harsha <harsha.harsha@xilinx.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        michals@xilinx.com, saratcha@xilinx.com, harshj@xilinx.com,
+        git@xilinx.com
+Subject: Re: [PATCH V3 0/4] crypto: Add Xilinx ZynqMP SHA3 driver support
+Message-ID: <Yh/2xoWQ1Ogq69y7@gondor.apana.org.au>
+References: <1645612504-3047-1-git-send-email-harsha.harsha@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220221120833.2618733-1-clabbe@baylibre.com>
+In-Reply-To: <1645612504-3047-1-git-send-email-harsha.harsha@xilinx.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 21, 2022 at 12:08:28PM +0000, Corentin Labbe wrote:
-> Hello
+On Wed, Feb 23, 2022 at 04:05:00PM +0530, Harsha wrote:
+> This patch set does the following:
+>   - Updates the Makefile for xilinx subdirectory
+>   - Adds communication layer support for sha_hash in zynqmp.c
+>   - Adds Xilinx ZynqMP driver for SHA3 Algorithm
+>   - Updates the list of MAINTAINERS
 > 
-> This is the follow up of https://lore.kernel.org/lkml/Yd1SIHUNdLIvKhzz@Red/
-> and https://patchwork.kernel.org/project/linux-crypto/patch/20220127133332.4011509-1-clabbe@baylibre.com/
-> This serie fix all drivers which do not call completion with BH disabled
-> and add the check in crypto/engine asked by Herbert.
-> I have verified that this check does not generate warnings on all other crypto
-> hardware I got (omap, ccree, rockchip)
+> Following tests have been done for the driver:
+>  - Enabled kernel self tests and extra run-time crypto self tests
+>  - Tested SHA hash computation for different sizes of data using
+>    userspace application
+>  - Tested SHA hash computation using multiple updates of data using
+>    userspace application
+>  - Tested parallel hash computation
+>  - Tested using the tcrypt module
 > 
-> Regards
+> V3 changes:
+> Added details of tests in cover letter
+> Added SOB for previous poster of RFC patch
+> Removed module_platform_driver in 3/4
+> Used memzero_explicit instead of memset in 3/4
 > 
-> Corentin Labbe (5):
->   crypto: sun8i-ss: call finalize with bh disabled
->   crypto: sun8i-ce: call finalize with bh disabled
->   crypto: amlogic: call finalize with bh disabled
->   crypto: gemini: call finalize with bh disabled
->   crypto: engine: check if BH is disabled during completion
+> V2 changes:
+> - Removed dependency on COMPILE_TEST in 3/4
+> - Rebased this patchset on latest Cryptodev-2.6 tree which fixed
+> below kernel robot warning
+>    In file included from ./arch/s390/include/generated/asm/cacheflush.h:1,
+>                     from drivers/crypto/xilinx/zynqmp-sha.c:6:
+> include/asm-generic/cacheflush.h:53:46: warning: 'struct folio' declared
+> inside parameter list will not be visible outside of this definition
+> or declaration
+>       53 | static inline void flush_dcache_folio(struct folio *folio) { }
+>          |
+> - Included linux/cacheflush.h instead of asm/cacheflush.h in 3/4
+>  
+> V1 changes:
+> - Converted RFC patch to PATCH
+> - Updated zynqmp-sha driver so that it can be self discovered 
+> - Removed patch 3/6 and 4/6 as they added support for device tree
+> - Substituted hw with hardware in drivers/crypto/Kconfig
 > 
->  crypto/crypto_engine.c                              | 1 +
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 3 +++
->  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 +++
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 3 +++
->  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 3 +++
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 2 ++
->  drivers/crypto/gemini/sl3516-ce-cipher.c            | 2 ++
->  7 files changed, 17 insertions(+)
+> 
+> Harsha (4):
+>   drivers: crypto: Updated Makefile for xilinx subdirectory
+>   firmware: xilinx: Add ZynqMP SHA API for SHA3 functionality
+>   crypto: xilinx: Add Xilinx SHA3 driver
+>   MAINTAINERS: Add maintainer for Xilinx ZynqMP SHA3 driver
+> 
+>  MAINTAINERS                          |   5 +
+>  drivers/crypto/Kconfig               |  10 ++
+>  drivers/crypto/Makefile              |   2 +-
+>  drivers/crypto/xilinx/Makefile       |   1 +
+>  drivers/crypto/xilinx/zynqmp-sha.c   | 283 +++++++++++++++++++++++++++++++++++
+>  drivers/firmware/xilinx/zynqmp.c     |  26 ++++
+>  include/linux/firmware/xlnx-zynqmp.h |   8 +
+>  7 files changed, 334 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/crypto/xilinx/zynqmp-sha.c
 
 All applied.  Thanks.
 -- 
