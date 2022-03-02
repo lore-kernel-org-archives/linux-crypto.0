@@ -2,140 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39127C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 11:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32001C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 11:42:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241353AbiCBL1b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 06:27:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        id S237204AbiCBLm6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 06:42:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241297AbiCBL1a (ORCPT
+        with ESMTP id S241566AbiCBLmr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:27:30 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86BA66622D;
-        Wed,  2 Mar 2022 03:26:47 -0800 (PST)
+        Wed, 2 Mar 2022 06:42:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C25AC053;
+        Wed,  2 Mar 2022 03:42:03 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2419161804;
-        Wed,  2 Mar 2022 11:26:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16F9C340F1;
-        Wed,  2 Mar 2022 11:26:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 59DA861868;
+        Wed,  2 Mar 2022 11:42:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26867C340F1;
+        Wed,  2 Mar 2022 11:42:02 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FLziEXpf"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="feD1be81"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646220402;
+        t=1646221319;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fufxSPRIOrmbnPbDC6hJ7ttxshIW5aGS9pJhSWhnCM4=;
-        b=FLziEXpf2l0WTAhzSsctWfFPyoNczuf0yET5OvrmfeoHkbQdJJUnS5q+NI+vrChRlkMr3x
-        174jqFOO+Z3Pr5c79Gii5Ryw0Vd9q9Ey0Hlr2keq9mQvPlFbNmRp37DUVNhIihEZDWJZG5
-        HjPNCU02XchGOwdc6y1fEsx970Bts6c=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4166dc6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Mar 2022 11:26:41 +0000 (UTC)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2dbc48104beso13440867b3.5;
-        Wed, 02 Mar 2022 03:26:40 -0800 (PST)
-X-Gm-Message-State: AOAM531CCPFcEGKBbRNRGtYXkH9nqJ+pu4T+FHrfbpHSC9V4hrNo0nv0
-        rosp0lWDaH02FtNz1efiEeJ2262x3AcFLqhgPQc=
-X-Google-Smtp-Source: ABdhPJxbaslGOWNMYlqRkibxJ2ICArMnaBOXMWHprS75pC5WtpgRWsCTpsPEORMZE4FcmdBod69a3hNDLa7CXaxndsk=
-X-Received: by 2002:a81:1143:0:b0:2db:ccb4:b0a1 with SMTP id
- 64-20020a811143000000b002dbccb4b0a1mr9951120ywr.499.1646220398624; Wed, 02
- Mar 2022 03:26:38 -0800 (PST)
+        bh=jadzoX9C/bN73zzy6zLRddYPuv7DzXHFERTBnqcFQsA=;
+        b=feD1be81FDZ2KNZDT+O7BxX3N97L8bJKyyhtSYNWjc90kC2/8JaaMq0E03q6E2i8qzR4/n
+        93xbahNhoXQTP0OGQgSK7RwbqaCe9yZQbcouQo6TC+IlvJFjK9KPlG8BAnKtoIm0m35W6x
+        TGpSKfJjNM8MouWBwy+NhzXbThQ98vw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 394da782 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 2 Mar 2022 11:41:59 +0000 (UTC)
+Received: by mail-yb1-f173.google.com with SMTP id t63so363579ybi.8;
+        Wed, 02 Mar 2022 03:41:58 -0800 (PST)
+X-Gm-Message-State: AOAM530oHUFl/pRPqvd2NeDF181BNq01QWu6WNnhGTTdFDaJxHOGhhFy
+        le+EPGpcY7VRVlBtQt0jjaHX2y0zat7FfBOePsc=
+X-Google-Smtp-Source: ABdhPJxmYa1ANBHWQvYIgvsmbhR6xdt5dMngHCS9hJH0CEVY032UXmyfEpxmE6jKmWGAuBe60OFdGZ3VincSNtqExx4=
+X-Received: by 2002:a25:d116:0:b0:61d:e8c9:531e with SMTP id
+ i22-20020a25d116000000b0061de8c9531emr28519929ybg.637.1646221317583; Wed, 02
+ Mar 2022 03:41:57 -0800 (PST)
 MIME-Version: 1.0
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
- <Yh5JwK6toc/zBNL7@zx2c4.com> <20220301121419-mutt-send-email-mst@kernel.org>
- <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com> <20220302031738-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220302031738-mutt-send-email-mst@kernel.org>
+References: <20220301231038.530897-1-Jason@zx2c4.com> <20220301231038.530897-3-Jason@zx2c4.com>
+ <Yh8wjrf7HVf56Anw@kroah.com>
+In-Reply-To: <Yh8wjrf7HVf56Anw@kroah.com>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 2 Mar 2022 12:26:27 +0100
-X-Gmail-Original-Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
-Message-ID: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
-Subject: Re: propagating vmgenid outward and upward
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
+Date:   Wed, 2 Mar 2022 12:41:46 +0100
+X-Gmail-Original-Message-ID: <CAHmME9r4P+5pdrRxaUZs96nshp7rN4GP2xoV9h=umqMOAgs8iA@mail.gmail.com>
+Message-ID: <CAHmME9r4P+5pdrRxaUZs96nshp7rN4GP2xoV9h=umqMOAgs8iA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] random: provide notifier for VM fork
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        Netdev <netdev@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>, Jann Horn <jannh@google.com>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+        "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Michael,
+Hi Greg,
 
-Thanks for the benchmark.
+On Wed, Mar 2, 2022 at 9:53 AM Greg KH <gregkh@linuxfoundation.org> wrote:
+> It seems crazy that the "we just were spawned as a new vm" notifier is
+> based in the random driver, but sure, put it here for now!  :)
 
-On Wed, Mar 2, 2022 at 9:30 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> So yes, the overhead is higher by 50% which seems a lot but it's from a
-> very small number, so I don't see why it's a show stopper, it's not by a
-> factor of 10 such that we should sacrifice safety by default. Maybe a
-> kernel flag that removes the read replacing it with an interrupt will
-> do.
->
-> In other words, premature optimization is the root of all evil.
+I was thinking you might say this. I see it both ways, but I think I'm
+more inclined to doing it this way, at least for now. Here's how it
+breaks down:
 
-Unfortunately I don't think it's as simple as that for several reasons.
+VM forking is usually an okay thing to do because computers are
+deterministic. Usually. Where is there non-determinism in a place that
+it matters? The RNG is supposed to be "the" place of non-determinism.
+If anything is going to happen in response to a VM fork, it's going to
+necessarily be _after_ the RNG becomes sufficiently non-deterministic
+again, and so it's the RNG who announces, "hey I'm safe to use again,
+and please read from me again if you're doing non-misuse resistant
+crypto." It's the proper place to announce that.
 
-First, I'm pretty confident a beefy Intel machine can mostly hide
-non-dependent comparisons in the memory access and have the problem
-mostly go away. But this is much less the case on, say, an in-order
-MIPS32r2, which isn't just "some crappy ISA I'm using for the sake of
-argument," but actually the platform on which a lot of networking and
-WireGuard stuff runs, so I do care about it. There, we have 4
-reads/comparisons which can't pipeline nearly as well.
+On the other hand, I think you could argue that really this should
+come from vmgenid itself, with the caveat that the notifier is called
+after add_vmfork_randomness is called. For now that would exist in
+vmgenid.o itself, and then if we ever have multiple drivers notifying,
+some shared infrastructure could be made. Except vmgenid.o might be
+vmgenid.ko, and then the whole problem gets kind of annoying and maybe
+we actually want that shared infrastructure _now_ instead. And now we
+find ourselves complicating everything with additional Kbuild symbols
+and header files and stubs. It just seems like the road of more pain.
 
-There's also the atomicity aspect, which I think makes your benchmark
-not quite accurate. Those 16 bytes could change between the first and
-second word (or between the Nth and N+1th word for N<=3 on 32-bit).
-What if in that case the word you read second doesn't change, but the
-word you read first did? So then you find yourself having to do a
-hi-lo-hi dance. And then consider the 32-bit case, where that's even
-more annoying. This is just one of those things that comes up when you
-compare the semantics of a "large unique ID" and "word-sized counter",
-as general topics. (My suggestion is that vmgenid provide both.)
-
-Finally, there's a slightly storage aspect, where adding 16 bytes to a
-per-key struct is a little bit heavier than adding 4 bytes and might
-bust a cache line without sufficient care, care which always has some
-cost in one way or another.
-
-So I just don't know if it's realistic to impose a 16-byte per-packet
-comparison all the time like that. I'm familiar with WireGuard
-obviously, but there's also cifs and maybe even wifi and bluetooth,
-and who knows what else, to care about too. Then there's the userspace
-discussion. I can't imagine a 16-byte hotpath comparison being
-accepted as implementable.
-
-> And I feel if linux
-> DTRT and reads the 16 bytes then hypervisor vendors will be motivated to
-> improve and add a 4 byte unique one. As long as linux is interrupt
-> driven there's no motivation for change.
-
-I reeeeeally don't want to get pulled into the politics of this on the
-hypervisor side. I assume an improved thing would begin with QEMU and
-Firecracker or something collaborating because they're both open
-source and Amazon people seem interested. And then pressure builds for
-Microsoft and VMware to do it on their side. And then we get this all
-nicely implemented in the kernel. In the meantime, though, I'm not
-going to refuse to address the problem entirely just because the
-virtual hardware is less than perfect; I'd rather make the most with
-what we've got while still being somewhat reasonable from an
-implementation perspective.
+Anyway, even if we go with the first solution -- keeping it in
+random.o -- now, I wouldn't be opposed to revisiting that decision
+later if the landscape becomes more complex. Luckily this is just the
+kernel side of things and not userspace, so we can easily change
+things down the road.
 
 Jason
