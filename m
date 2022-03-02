@@ -2,83 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BC6C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 11:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C108C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 11:49:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241574AbiCBLpr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 06:45:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38716 "EHLO
+        id S241588AbiCBLuJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 06:50:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241576AbiCBLpp (ORCPT
+        with ESMTP id S234246AbiCBLuI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:45:45 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FDDAC070;
-        Wed,  2 Mar 2022 03:45:03 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A676961876;
-        Wed,  2 Mar 2022 11:45:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D93C004E1;
-        Wed,  2 Mar 2022 11:45:01 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DPvV7ZIO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646221498;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jKc7MGtOlemLQBMVvgMBuRZXG8kkFVyuHdkwiw9Ht6g=;
-        b=DPvV7ZIO9o6sq8lvzTqsDDC84fozhr05iE2RG7Qko7/wZLa8sGt7BnXIkyXZdzUWtDYHKK
-        kDER9R4cfKR3EsNVMVwn0hgApBG7J7sHRC1yAEeAT3U2a7GC77hegBq02xr9f843c4BhZe
-        Uvorml9W9xUYXrc1SpM2AFMxNg2AaXo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 26b0cb37 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 2 Mar 2022 11:44:57 +0000 (UTC)
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-2dbd97f9bfcso13827427b3.9;
-        Wed, 02 Mar 2022 03:44:56 -0800 (PST)
-X-Gm-Message-State: AOAM532G28bN2WEKU3By34V3r3WVng0SWE2BE4MOS5fyWAb6yMsdJqwZ
-        Sn0LWLYdpwVo6/YtL/tB2XWxiKzH6/wXrKOzOT0=
-X-Google-Smtp-Source: ABdhPJxws4pfBz+BuT+rmpnNd8+cc6rFxmT3Lf+5UQ8eG5n64VKU5po/5Iv6gzzsSXHheRzQBsa20adXgGJUTjN6NCI=
-X-Received: by 2002:a81:8984:0:b0:2db:6b04:be0c with SMTP id
- z126-20020a818984000000b002db6b04be0cmr16169292ywf.2.1646221495956; Wed, 02
- Mar 2022 03:44:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20220301231038.530897-1-Jason@zx2c4.com> <20220301231038.530897-4-Jason@zx2c4.com>
- <20220302033314-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220302033314-mutt-send-email-mst@kernel.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 2 Mar 2022 12:44:45 +0100
-X-Gmail-Original-Message-ID: <CAHmME9r6zXw6cByqpbhEBKkvpejrLqGMn55E-uOCQ0V1mQi1LQ@mail.gmail.com>
-Message-ID: <CAHmME9r6zXw6cByqpbhEBKkvpejrLqGMn55E-uOCQ0V1mQi1LQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] wireguard: device: clear keys on VM fork
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Wed, 2 Mar 2022 06:50:08 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB50D457B7;
+        Wed,  2 Mar 2022 03:49:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646221764; x=1677757764;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=v/8Z9henQ4GELSvmZeIpH0uJzq3nMVEvEH4YDo/BPMw=;
+  b=MXdP8tTBhT+PXTOjsN53nzQUS4uBHl1QxGs+wwjdzbAgkqdefD0UVky8
+   YA409pcbyNFHRZcmLH6p23+RZ2l3SB7dWz4EzLKtpAK33O1oV24NOa0x4
+   AedXc4DCUsyiNmiSIWUYbjBROCaQN/bb6huk5egLSviZbhDAhW2GEhobj
+   tGL/HQ4zXYLvr2kA21AbQlCpC8L3+2UnDYguOYGDnhxRzfYp1iwFvZmXr
+   3jawUKa2dddWM+Kk0tf2ZCXEzIGmlOIHALchPM7jdBy2P6+RfZ4Qj3o/K
+   g3IecPoUn3qRFfEaIiOSmvi3igRj8R3QeRP+k7YsT7tspGE4+eap8unxH
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="236892113"
+X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
+   d="scan'208";a="236892113"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 03:49:24 -0800
+X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
+   d="scan'208";a="535358916"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 03:49:22 -0800
+Date:   Wed, 2 Mar 2022 11:49:16 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <Yh9ZvLHuztwQCu0d@silpixa00400314>
+References: <20220219210354.GF59715@dread.disaster.area>
+ <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
+ <YhN76/ONC9qgIKQc@silpixa00400314>
+ <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+ <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+ <Yh0y75aegqS4jIP7@silpixa00400314>
+ <Yh1aLfy/oBawCJIg@gondor.apana.org.au>
+ <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
+ <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
+ <Yh9G7FyCLtsm2mFA@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yh9G7FyCLtsm2mFA@kroah.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michael,
+Hi Greg,
 
-On Wed, Mar 2, 2022 at 9:36 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> Catastrophic cryptographic failure sounds bad :(
-> So in another thread we discussed that there's a race with this
-> approach, and we don't know how big it is. Question is how expensive
-> it would be to fix it properly checking for fork after every use of
-> key+nonce and before transmitting it. I did a quick microbenchmark
-> and it did not seem too bad - care posting some numbers?
+On Wed, Mar 02, 2022 at 11:29:00AM +0100, Greg KH wrote:
+> On Tue, Mar 01, 2022 at 04:11:13PM +1200, Herbert Xu wrote:
+> > On Mon, Feb 28, 2022 at 05:12:20PM -0800, Linus Torvalds wrote:
+> > > 
+> > > It sounds like it was incidental and almost accidental that it fixed
+> > > that thing, and nobody realized it should perhaps be also moved to
+> > > stable.
+> > 
+> > Yes this was incidental.  The patch in question fixes an issue in
+> > OOM situations where drivers that must allocate memory on each
+> > request may lead to dead-lock so it's not really targeted at qat.
+> 
+> Ok, so what commits should I backport to kernels older than 5.10 to
+> resolve this?
+Is it possible to wait for a set that resolves the problem rather than
+backporting the patches that disables the use-case?
+I have a patchset that fixes the actual issue and we are doing an
+internal review before submission to the mailing list.
+I should be able to send a V1 out between today and tomorrow.
 
-I followed up in that thread, which is a larger one, so it might be
-easiest to keep discussion there. My response to you here is the same
-as it was over there. :)
+If not, then these are the patches that should be backported:
+    7bcb2c99f8ed crypto: algapi - use common mechanism for inheriting flags
+    2eb27c11937e crypto: algapi - add NEED_FALLBACK to INHERITED_FLAGS
+    fbb6cda44190 crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
+    b8aa7dc5c753 crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
+    cd74693870fb dm crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
+Herbert, correct me if I'm wrong here.
 
-https://lore.kernel.org/lkml/CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com/
+Thanks,
 
-Jason
+-- 
+Giovanni
