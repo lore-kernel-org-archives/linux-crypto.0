@@ -2,98 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF46AC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 14:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B37C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 14:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241407AbiCBOyu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 09:54:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54742 "EHLO
+        id S238030AbiCBO5X (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 09:57:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234237AbiCBOyt (ORCPT
+        with ESMTP id S234237AbiCBO5X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 09:54:49 -0500
-Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D946239830;
-        Wed,  2 Mar 2022 06:54:05 -0800 (PST)
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-X-isilmar-external: YES
-Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
-        by isilmar-4.linta.de (Postfix) with ESMTPSA id 5F43D2013AD;
-        Wed,  2 Mar 2022 14:54:03 +0000 (UTC)
-Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
-        id D55E58084F; Wed,  2 Mar 2022 15:53:18 +0100 (CET)
-Date:   Wed, 2 Mar 2022 15:53:18 +0100
-From:   Dominik Brodowski <linux@dominikbrodowski.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Wed, 2 Mar 2022 09:57:23 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D6B48396;
+        Wed,  2 Mar 2022 06:56:40 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D761E61666;
+        Wed,  2 Mar 2022 14:56:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA49C004E1;
+        Wed,  2 Mar 2022 14:56:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1646232999;
+        bh=Mi9q+LtieiMun2ocnCwKvyOxp+6VG4htF2rkds+fAQw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ufYPWrZbvXBD/NeSNuQz19nBhfwAGhijZ9tRMN/rue6/lWQxOHlIsLST366pfuDxm
+         f7GRuQ1s+ZrXZlgePnpz4cbU0IOQMu3B4ruSuZfSBLXD3tokBdgZbhtsl033uhE7Vg
+         7uF6KajeDwWHh9R2VhoS985ryxkpaiJVHTFO7um8=
+Date:   Wed, 2 Mar 2022 15:56:36 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>, Jann Horn <jannh@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH 1/3] random: replace custom notifier chain with standard
- one
-Message-ID: <Yh+E3pnWM5lX+X0l@owl.dominikbrodowski.net>
-References: <20220301231038.530897-1-Jason@zx2c4.com>
- <20220301231038.530897-2-Jason@zx2c4.com>
- <Yh8Bsk9RSm22Yr8d@owl.dominikbrodowski.net>
- <CAHmME9rSz-GqvQf9S9fPLUvSwP0iky90bipGj-o94tkAU1QP1g@mail.gmail.com>
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <Yh+FpKuoyj3G16lK@kroah.com>
+References: <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
+ <YhN76/ONC9qgIKQc@silpixa00400314>
+ <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+ <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+ <Yh0y75aegqS4jIP7@silpixa00400314>
+ <Yh1aLfy/oBawCJIg@gondor.apana.org.au>
+ <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
+ <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
+ <Yh9G7FyCLtsm2mFA@kroah.com>
+ <Yh9ZvLHuztwQCu0d@silpixa00400314>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9rSz-GqvQf9S9fPLUvSwP0iky90bipGj-o94tkAU1QP1g@mail.gmail.com>
+In-Reply-To: <Yh9ZvLHuztwQCu0d@silpixa00400314>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
-
-Am Wed, Mar 02, 2022 at 12:42:56PM +0100 schrieb Jason A. Donenfeld:
-> On Wed, Mar 2, 2022 at 6:35 AM Dominik Brodowski
-> <linux@dominikbrodowski.net> wrote:
-> >
-> > Am Wed, Mar 02, 2022 at 12:10:36AM +0100 schrieb Jason A. Donenfeld:
-> > >  /*
-> > >   * Delete a previously registered readiness callback function.
-> > >   */
-> > > -void del_random_ready_callback(struct random_ready_callback *rdy)
-> > > +int unregister_random_ready_notifier(struct notifier_block *nb)
-> > >  {
-> > >       unsigned long flags;
-> > > -     struct module *owner = NULL;
-> > > -
-> > > -     spin_lock_irqsave(&random_ready_list_lock, flags);
-> > > -     if (!list_empty(&rdy->list)) {
-> > > -             list_del_init(&rdy->list);
-> > > -             owner = rdy->owner;
-> > > -     }
-> > > -     spin_unlock_irqrestore(&random_ready_list_lock, flags);
-> > > +     int ret;
-> > >
-> > > -     module_put(owner);
-> > > +     spin_lock_irqsave(&random_ready_chain_lock, flags);
-> > > +     ret = raw_notifier_chain_unregister(&random_ready_chain, nb);
-> > > +     spin_unlock_irqrestore(&random_ready_chain_lock, flags);
-> > > +     return ret;
-> > >  }
-> > > -EXPORT_SYMBOL(del_random_ready_callback);
-> >
-> > That doesn't seem to be used anywhere, so I'd suggest removing this function
-> > altogether.
+On Wed, Mar 02, 2022 at 11:49:16AM +0000, Giovanni Cabiddu wrote:
+> Hi Greg,
 > 
-> I thought about this, but it feels weird to have a registration
-> function without an unregistration function... No other notifier is
-> unbalanced like that.
+> On Wed, Mar 02, 2022 at 11:29:00AM +0100, Greg KH wrote:
+> > On Tue, Mar 01, 2022 at 04:11:13PM +1200, Herbert Xu wrote:
+> > > On Mon, Feb 28, 2022 at 05:12:20PM -0800, Linus Torvalds wrote:
+> > > > 
+> > > > It sounds like it was incidental and almost accidental that it fixed
+> > > > that thing, and nobody realized it should perhaps be also moved to
+> > > > stable.
+> > > 
+> > > Yes this was incidental.  The patch in question fixes an issue in
+> > > OOM situations where drivers that must allocate memory on each
+> > > request may lead to dead-lock so it's not really targeted at qat.
+> > 
+> > Ok, so what commits should I backport to kernels older than 5.10 to
+> > resolve this?
+> Is it possible to wait for a set that resolves the problem rather than
+> backporting the patches that disables the use-case?
 
-... but having unused code compiled in (unless LTO is enabled, of course)
-seems worse. Maybe comment it out, #ifdef COMPILE_TEST or something like
-that?
+It's already disabled in newer kernels, so we should do so for older
+ones to prevent problems and the delay in getting those potential fixes
+merged some day in the future.
 
-Thanks,
-	Dominik
+> I have a patchset that fixes the actual issue and we are doing an
+> internal review before submission to the mailing list.
+> I should be able to send a V1 out between today and tomorrow.
+> 
+> If not, then these are the patches that should be backported:
+>     7bcb2c99f8ed crypto: algapi - use common mechanism for inheriting flags
+>     2eb27c11937e crypto: algapi - add NEED_FALLBACK to INHERITED_FLAGS
+>     fbb6cda44190 crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
+>     b8aa7dc5c753 crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
+>     cd74693870fb dm crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
+> Herbert, correct me if I'm wrong here.
+
+These need to be manually backported as they do not apply cleanly.  Can
+you provide such a set?  Or should I just disable a specific driver here
+instead which would be easier overall?
+
+thanks,
+
+greg k-h
