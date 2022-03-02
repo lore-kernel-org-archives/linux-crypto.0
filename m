@@ -2,120 +2,185 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07221C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 19:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB013C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 20:07:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244812AbiCBTD1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 14:03:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34484 "EHLO
+        id S242881AbiCBUIB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 15:08:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244816AbiCBTDY (ORCPT
+        with ESMTP id S242862AbiCBUH5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 14:03:24 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B375DEE5;
-        Wed,  2 Mar 2022 11:02:40 -0800 (PST)
-Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K83QY1FMLz67LfL;
-        Thu,  3 Mar 2022 03:02:29 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Mar 2022 20:02:37 +0100
-Received: from [10.47.84.129] (10.47.84.129) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 2 Mar
- 2022 19:02:36 +0000
-Message-ID: <499b0d93-9352-b52f-0ee8-7dc7fd0bac5c@huawei.com>
-Date:   Wed, 2 Mar 2022 19:02:35 +0000
+        Wed, 2 Mar 2022 15:07:57 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C97D204E
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 12:07:06 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id i1so2543013plr.2
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 12:07:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
+        b=IvpJRwG7ynxkReEE85KaN5rJUYtD4xKNHA+hy6TwBmoQ8B3uYeJI+QViQcnaGiWq86
+         F88M3HTERkoil1v4VBpPtCvYuei+/tfueI2kCXzM7ddvcotxLyWZwiewhTHLUCy28lRK
+         BraqPBOXvwYRthhpbxTgJWS9pGCc3zSZJBqHk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9llME+iRL2iH9L07jwvbWbmbHLr47Rbz7WJ4fOgTlZc=;
+        b=eyRKYChku4xrJwyZEL/omVNHplfaD7TeQ2M6GaeBMDd7vxMsUF5uFaSz2hnjkwbcLL
+         AdTKqQWlr9ONpXRTUKj1F3i/yiUsucq/YJzyZURh5qlR+BvHP1+qrBar6NQVKlONLR1H
+         0rOv6aAjFxqjBztCqWMkByLDzgO1Dlv9j7PDIkKAc+kpkeIgIjluXxHA/YofOVlZSHSn
+         SwdwPjMDLKcvudosC49i4b6K/LhFChP2U6ziGb3OVuX6N5UvQ/TNf3xI1KMswpdqIsay
+         8f6XeKp566WL9hBb+stViWt4nK6QA0E8BQp+9AcovyPES+nXr7ws23JkehsCqMaABhZA
+         Y47A==
+X-Gm-Message-State: AOAM530ygASEJOqhSlJ+mU0hqik26pcGx5t25M9kFr9MEsJDCpB4a+aa
+        Pcp9OmW5hA8tPlB0HZ/9D7p8aQ==
+X-Google-Smtp-Source: ABdhPJyalZw/yElDAQSdRYusWOxjkvZUrvn+e5j/jboS/+hXUtUpvVb6mMnbBbqlv1j/a0ygzQBPkQ==
+X-Received: by 2002:a17:90b:94e:b0:1bc:c99f:ede1 with SMTP id dw14-20020a17090b094e00b001bcc99fede1mr1518926pjb.49.1646251625762;
+        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id d25-20020a637359000000b0037843afb785sm6664pgn.25.2022.03.02.12.07.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 12:07:05 -0800 (PST)
+Date:   Wed, 2 Mar 2022 12:07:04 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Laight <David.Laight@aculab.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Message-ID: <202203021158.DB5204A0@keescook>
+References: <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+ <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+ <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
+ <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
+ <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+ <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.1
-Subject: Re: [PATCH v7 04/10] hisi_acc_vfio_pci: add new vfio_pci driver for
- HiSilicon ACC devices
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
-References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
- <20220302172903.1995-5-shameerali.kolothum.thodi@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <20220302172903.1995-5-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.84.129]
-X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 02/03/2022 17:28, Shameer Kolothum wrote:
-> +config HISI_ACC_VFIO_PCI
-> +	tristate "VFIO PCI support for HiSilicon ACC devices"
-> +	depends on (ARM64 && VFIO_PCI_CORE) || (COMPILE_TEST && 64BIT)
+On Wed, Mar 02, 2022 at 10:29:31AM +0100, Rasmus Villemoes wrote:
+> This won't help the current issue (because it doesn't exist and might
+> never), but just in case some compiler people are listening, I'd like to
+> have some sort of way to tell the compiler "treat this variable as
+> uninitialized from here on". So one could do
+> 
+> #define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
+> 
+> with __magic_uninit being a magic no-op that doesn't affect the
+> semantics of the code, but could be used by the compiler's "[is/may be]
+> used uninitialized" machinery to flag e.g. double frees on some odd
+> error path etc. It would probably only work for local automatic
+> variables, but it should be possible to just ignore the hint if p is
+> some expression like foo->bar or has side effects. If we had that, the
+> end-of-loop test could include that to "uninitialize" the iterator.
 
-This means that we will have HISI_ACC_VFIO_PCI=y for COMPILE_TEST=y and 
-64BIT=y and VFIO_PCI_CORE=n, but ...
+I've long wanted to change kfree() to explicitly set pointers to NULL on
+free. https://github.com/KSPP/linux/issues/87
 
-> +	help
-> +	  This provides generic PCI support for HiSilicon ACC devices
-> +	  using the VFIO framework.
-> +
-> +	  If you don't know what to do here, say N.
-> diff --git a/drivers/vfio/pci/hisilicon/Makefile b/drivers/vfio/pci/hisilicon/Makefile
-> new file mode 100644
-> index 000000000000..c66b3783f2f9
-> --- /dev/null
-> +++ b/drivers/vfio/pci/hisilicon/Makefile
-> @@ -0,0 +1,4 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +obj-$(CONFIG_HISI_ACC_VFIO_PCI) += hisi-acc-vfio-pci.o
-> +hisi-acc-vfio-pci-y := hisi_acc_vfio_pci.o
-> +
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> new file mode 100644
-> index 000000000000..8129c3457b3b
-> --- /dev/null
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -0,0 +1,100 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2021, HiSilicon Ltd.
-> + */
-> +
-> +#include <linux/device.h>
-> +#include <linux/eventfd.h>
-> +#include <linux/file.h>
-> +#include <linux/hisi_acc_qm.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/module.h>
-> +#include <linux/pci.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vfio_pci_core.h>
-> +
-> +static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
-> +{
-> +	struct vfio_pci_core_device *vdev =
-> +		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-> +	int ret;
-> +
-> +	ret = vfio_pci_core_enable(vdev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	vfio_pci_core_finish_enable(vdev);
+The thing stopping a trivial transformation of kfree() is:
 
-... there does not seem to be a stub for vfio_pci_core_finish_enable(), 
-so I don't think that we compile under the conditions described. I think 
-that HISI_ACC_VFIO_PCI should always depends on HISI_ACC_VFIO_PCI
+	kfree(get_some_pointer());
 
-> +
-> +	return 0;
-> +}
+I would argue, though, that the above is poor form: the thing holding
+the pointer should be the thing freeing it, so these cases should be
+refactored and kfree() could do the NULLing by default.
 
+Quoting myself in the above issue:
+
+
+Without doing massive tree-wide changes, I think we need compiler
+support. If we had something like __builtin_is_lvalue(), we could
+distinguish function returns from lvalues. For example, right now a
+common case are things like:
+
+	kfree(get_some_ptr());
+
+But if we could at least gain coverage of the lvalue cases, and detect
+them statically at compile-time, we could do:
+
+#define __kfree_and_null(x) do { __kfree(*x); *x = NULL; } while (0)
+#define kfree(x) __builtin_choose_expr(__builtin_is_lvalue(x),
+			__kfree_and_null(&(x)), __kfree(x))
+
+Alternatively, we could do a tree-wide change of the former case (findable
+with Coccinelle) and change them into something like kfree_no_null()
+and redefine kfree() itself:
+
+#define kfree_no_null(x) do { void *__ptr = (x); __kfree(__ptr); } while (0)
+#define kfree(x) do { __kfree(x); x = NULL; } while (0)
+
+-- 
+Kees Cook
