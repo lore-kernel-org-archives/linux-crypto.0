@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F411EC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 21:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E23C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 21:11:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245116AbiCBVMQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 16:12:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41654 "EHLO
+        id S245171AbiCBVM0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 16:12:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245122AbiCBVMN (ORCPT
+        with ESMTP id S245133AbiCBVMO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 16:12:13 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82A5FDBD39
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 13:11:25 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id b5so4761203wrr.2
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 13:11:25 -0800 (PST)
+        Wed, 2 Mar 2022 16:12:14 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1AEDD447
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 13:11:26 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id y5so2003529wmi.0
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 13:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=B4Tf8ps8Giknxs7LQki4ZGeia2acPTQFjucag6hcCiQ=;
-        b=qWH4UXD2/XPcCp9fm8xXwAshYS4tc/CUXtc2uubCPvniyywLyxaml90tAQR59l/P1A
-         2aKv7bUtzWzYQ3S7xmrY2xqtX988cCK/uvEMfW0q9bXXg8PbpFv94D42gZ1JuYP2wjnK
-         JIV8mHOETs5IBnfEthCUHruqxplzo7ZHA47duBbY5g4wAHhFs+xiiiNwH3Olu36pF2qD
-         U7CN/Cr+6GorNkBuDNDJiYvYLPw8gKqgW1WbYMwChBzuCpt5tvCHd+yzkgWJHCXMRxM9
-         +CeNBc5nBdulz/HRokTD1cOJXVdV/Zn11OGYjS+dehHGnwlVn0AUphRIuHh5myy/B48Q
-         n4/w==
+        bh=5/nH1g76OJr2xP0kEzxoO9d69o0mEYaKTMfwjCEna4k=;
+        b=s/I0Z2y4z8YB6ZgpjPwn9fMiOpI90kwAS3l0VUO3xvtkNUJzA9qE3bhuyGk/bXfQyX
+         CaLoMUsM5bZeyiAJNnSt1vQiKqvQNMOlvbItUvclxl441XuqepRsZyfpgjMSmtGF0A7P
+         3ULeQDYSW5jYhYhSUYI7a4jRSa8K6qHGn6hfgQdyAe+kHzeGqB+o1h8CvJPeuNtMyXlF
+         1iDb3yANtGm4wZMsOQf3ULA5P0y4XIkn8TZ3l/zpcuTro47K9g+PBA1L47uSICN0lUJR
+         bl/w5MqNWNLcDwJ54KJC2eF3jCXaEWg0ziruH6Z6kIgIjPNUyHy+ESBVMKQPJLHOhaOL
+         9B4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=B4Tf8ps8Giknxs7LQki4ZGeia2acPTQFjucag6hcCiQ=;
-        b=1JEyGSTnMZ7F5+aP6Tz84fqLMmTeU5QsyYMHncIUskye4MlHI+xUx+5ED03N3HqQQY
-         sG/PEN7Z2DU4Q38y05ggVQe9bchQPbXVBVfC1fhcDU4Cg1mofPEsui5No7KN5JgFsfiC
-         VWm0zSJmQBDYG+U1LQMlve6rMTqfLu64vOUF97HSs5EItVCpXxW5gJ9EULbpRwlWz5Xb
-         8GRCgsuJSc3rL9C+L4W4ky7btM9kDcIqTb58tZ3PA8aFp8bRYOmqQgrOW5yWsAFANY7s
-         IXgOkou3S6BBMCiBxLYiOfFok9qVHzb7026WIXc3XoHibBkzZT1S0IAI81vWOqUolK73
-         qgRQ==
-X-Gm-Message-State: AOAM533fUAQrlS16eFPdkw8xb4htlUIs1L5JY2yD6kdgzSOlZB9BeIPu
-        bHye/WdEJI23Fb/kudPyjJvlfA==
-X-Google-Smtp-Source: ABdhPJy8UJKYTq/gnyeSX8atQZtgLFqkKuFQj+B+6mjLkl5a4vVgucpywjrYJ37k4zl8awGraqZMgw==
-X-Received: by 2002:a5d:6103:0:b0:1ed:9e65:b090 with SMTP id v3-20020a5d6103000000b001ed9e65b090mr23743120wrt.332.1646255483922;
-        Wed, 02 Mar 2022 13:11:23 -0800 (PST)
+        bh=5/nH1g76OJr2xP0kEzxoO9d69o0mEYaKTMfwjCEna4k=;
+        b=lwLPTgnJ4V2TVmQC+wm4m+PExjWmZBAxxOSN7IscXwiq5q1Jq//h6Z0NezraMznRgX
+         ZdT29fq9zPv7+eezJ40DqoHjfR373ly7Ee8g/XmxMHnpxDnP2zZ4FwMeZQZGqzUhI2T4
+         lpVoE0LMNVwL3pVE5TT67qHB5Kzqdo2X35xdtKCpMe7rnO9l5NeMJMl4Xym/hJJ+2Tnp
+         xGl5dD/B1eM9vTQThDl6R77dmeIuLu6AMzccymiEdTcVqyF60yOpyTr/n3kK5VQWLy+k
+         k6ysD9IgL80h8UL41HDs3o9ZjPvAXz1nzDDhJSa/VaufFW2lg4YqW5Sry0+nXpIrQLxW
+         1S8A==
+X-Gm-Message-State: AOAM530KNWiEAYx0lIVWNb1nFhNo5oGbtR0uKULwirDTnMtdep1qZIeY
+        TRU2Dcqg6fQPde6CgALwluN7YQ==
+X-Google-Smtp-Source: ABdhPJwPZwmrufp36YqMiXKGpIU+QwG7owyQ8MQP9+2rxoDOdGiEo9TNglb3MQRuVp+z7hOzJXjONQ==
+X-Received: by 2002:a05:600c:1990:b0:381:1806:1d9 with SMTP id t16-20020a05600c199000b00381180601d9mr1365346wmq.93.1646255484689;
+        Wed, 02 Mar 2022 13:11:24 -0800 (PST)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id z5-20020a05600c0a0500b0037fa93193a8sm145776wmp.44.2022.03.02.13.11.23
+        by smtp.googlemail.com with ESMTPSA id z5-20020a05600c0a0500b0037fa93193a8sm145776wmp.44.2022.03.02.13.11.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 13:11:23 -0800 (PST)
+        Wed, 02 Mar 2022 13:11:24 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org
 Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-rockchip@lists.infradead.org, john@metanate.com,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 01/18] crypto: rockchip: use dev_err for error message about interrupt
-Date:   Wed,  2 Mar 2022 21:10:56 +0000
-Message-Id: <20220302211113.4003816-2-clabbe@baylibre.com>
+Subject: [PATCH v2 02/18] crypto: rockchip: do not use uninit variable
+Date:   Wed,  2 Mar 2022 21:10:57 +0000
+Message-Id: <20220302211113.4003816-3-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220302211113.4003816-1-clabbe@baylibre.com>
 References: <20220302211113.4003816-1-clabbe@baylibre.com>
@@ -66,27 +66,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Interrupt is mandatory so the message should be printed as error.
+crypto_info->dev is not yet set, so use pdev-dev instead.
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 35d73061d156..45cc5f766788 100644
+index 45cc5f766788..21d3f1458584 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -371,8 +371,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+@@ -381,7 +381,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 			       "rk-crypto", pdev);
  
- 	crypto_info->irq = platform_get_irq(pdev, 0);
- 	if (crypto_info->irq < 0) {
--		dev_warn(crypto_info->dev,
--			 "control Interrupt is not available.\n");
-+		dev_err(&pdev->dev, "control Interrupt is not available.\n");
- 		err = crypto_info->irq;
+ 	if (err) {
+-		dev_err(crypto_info->dev, "irq request failed.\n");
++		dev_err(&pdev->dev, "irq request failed.\n");
  		goto err_crypto;
  	}
+ 
 -- 
 2.34.1
 
