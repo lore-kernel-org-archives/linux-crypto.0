@@ -2,106 +2,184 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C108C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 11:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C94C43217
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 12:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241588AbiCBLuJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 06:50:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47356 "EHLO
+        id S242004AbiCBM72 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 07:59:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234246AbiCBLuI (ORCPT
+        with ESMTP id S241998AbiCBM70 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 06:50:08 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB50D457B7;
-        Wed,  2 Mar 2022 03:49:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646221764; x=1677757764;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=v/8Z9henQ4GELSvmZeIpH0uJzq3nMVEvEH4YDo/BPMw=;
-  b=MXdP8tTBhT+PXTOjsN53nzQUS4uBHl1QxGs+wwjdzbAgkqdefD0UVky8
-   YA409pcbyNFHRZcmLH6p23+RZ2l3SB7dWz4EzLKtpAK33O1oV24NOa0x4
-   AedXc4DCUsyiNmiSIWUYbjBROCaQN/bb6huk5egLSviZbhDAhW2GEhobj
-   tGL/HQ4zXYLvr2kA21AbQlCpC8L3+2UnDYguOYGDnhxRzfYp1iwFvZmXr
-   3jawUKa2dddWM+Kk0tf2ZCXEzIGmlOIHALchPM7jdBy2P6+RfZ4Qj3o/K
-   g3IecPoUn3qRFfEaIiOSmvi3igRj8R3QeRP+k7YsT7tspGE4+eap8unxH
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="236892113"
-X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
-   d="scan'208";a="236892113"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 03:49:24 -0800
-X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
-   d="scan'208";a="535358916"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2022 03:49:22 -0800
-Date:   Wed, 2 Mar 2022 11:49:16 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Kyle Sanderson <kyle.leet@gmail.com>,
-        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
+        Wed, 2 Mar 2022 07:59:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CC152FFCA
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 04:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646225921;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ls8zGvhed1PmT8PXmpNjbgsZ/iW5f7ZrkDvrKVFI5BU=;
+        b=jPjgeR4mZAPP5nUdwpQ/IBwdSHnK64G1cBajxPAW7XyCD9bEY666E8W27aSF9pWsHCc10G
+        CakiURxBVhUIEerk2+QC514WdXXnN5GiVInllOTV6nj8rkU8S+XwkgY62d8LCyjUVRWdYA
+        CrDkGCC4T2fz4k9Mrr+OAVtWhwhhUSE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-418-LyQNIuLkO9CQHyctiUU9KA-1; Wed, 02 Mar 2022 07:58:40 -0500
+X-MC-Unique: LyQNIuLkO9CQHyctiUU9KA-1
+Received: by mail-wm1-f71.google.com with SMTP id h206-20020a1c21d7000000b003552c13626cso1897398wmh.3
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 04:58:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ls8zGvhed1PmT8PXmpNjbgsZ/iW5f7ZrkDvrKVFI5BU=;
+        b=Rt7RHLRA8cg/p51PQkuNACLrEx3VHPxhvoEYjG4WZJ3NqpmALK52trHHeskBQyDQDK
+         +TXFpw0aykW3rHJkImSxbiaBYbbbybJwElO40c//BUQ8zbjY+8LpuoG7t+moca/MlT6O
+         Ob5lvd+h/SovFOiw6MtvPA4qYl0pjvpb7VpeIdf0tIoo2fX50W3Q2Feqonyfw57urLw0
+         WfRrI9BBx32qAg+BZXO9c6nYj6yQsbKnzMFCadS+Cub3h8qdZtC9JQ1PCTJtEQuFmNsn
+         UZNcJi+Y2DMLGya3qpLN+G1cGmWyCfrsDCG+RXGrMZcBooyAMuu5d1eIOn3xZQ41zOGM
+         G7hQ==
+X-Gm-Message-State: AOAM532ga+khnTUpvfylsvNfbNwSEnClO0OoWQWKXb5Eqw7fnCxf7A+J
+        v0OEUadZoBr0VhgTPmDJm4dZ/uQp40OCgnyAAb3x5kTq2HRXoUDTiD/9xV8+oUGi2rBJUZ8Cm7M
+        tgsKeCqIQYNOrT9vJ2Y12tpTt
+X-Received: by 2002:adf:a198:0:b0:1f0:2477:3b79 with SMTP id u24-20020adfa198000000b001f024773b79mr3317323wru.24.1646225919057;
+        Wed, 02 Mar 2022 04:58:39 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzhoJzzmGubO9T+P2rp5sbzN9oKf63KELhC21OUOh6oTtXAlLF5dbd9EHC5QGAjjnU8td/9tg==
+X-Received: by 2002:adf:a198:0:b0:1f0:2477:3b79 with SMTP id u24-20020adfa198000000b001f024773b79mr3317289wru.24.1646225918794;
+        Wed, 02 Mar 2022 04:58:38 -0800 (PST)
+Received: from redhat.com ([2a10:8006:355c:0:48d6:b937:2fb9:b7de])
+        by smtp.gmail.com with ESMTPSA id z16-20020a7bc7d0000000b00381004c643asm5397040wmk.30.2022.03.02.04.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 04:58:36 -0800 (PST)
+Date:   Wed, 2 Mar 2022 07:58:33 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Laszlo Ersek <lersek@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>
-Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
- dm-crypt + xfs
-Message-ID: <Yh9ZvLHuztwQCu0d@silpixa00400314>
-References: <20220219210354.GF59715@dread.disaster.area>
- <CACsaVZ+LZUebtsGuiKhNV_No8fNLTv5kJywFKOigieB1cZcKUw@mail.gmail.com>
- <YhN76/ONC9qgIKQc@silpixa00400314>
- <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
- <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
- <Yh0y75aegqS4jIP7@silpixa00400314>
- <Yh1aLfy/oBawCJIg@gondor.apana.org.au>
- <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
- <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
- <Yh9G7FyCLtsm2mFA@kroah.com>
+        Alexander Graf <graf@amazon.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        adrian@parity.io,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <20220302074503-mutt-send-email-mst@kernel.org>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+ <223f858c-34c5-3ccd-b9e8-7585a976364d@redhat.com>
+ <Yh5JwK6toc/zBNL7@zx2c4.com>
+ <20220301121419-mutt-send-email-mst@kernel.org>
+ <CAHmME9qieLUDVoPYZPo=N8NCL1T-RzQ4p7kCFv3PKFUkhWZPsw@mail.gmail.com>
+ <20220302031738-mutt-send-email-mst@kernel.org>
+ <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yh9G7FyCLtsm2mFA@kroah.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+In-Reply-To: <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Greg,
-
-On Wed, Mar 02, 2022 at 11:29:00AM +0100, Greg KH wrote:
-> On Tue, Mar 01, 2022 at 04:11:13PM +1200, Herbert Xu wrote:
-> > On Mon, Feb 28, 2022 at 05:12:20PM -0800, Linus Torvalds wrote:
-> > > 
-> > > It sounds like it was incidental and almost accidental that it fixed
-> > > that thing, and nobody realized it should perhaps be also moved to
-> > > stable.
-> > 
-> > Yes this was incidental.  The patch in question fixes an issue in
-> > OOM situations where drivers that must allocate memory on each
-> > request may lead to dead-lock so it's not really targeted at qat.
+On Wed, Mar 02, 2022 at 12:26:27PM +0100, Jason A. Donenfeld wrote:
+> Hey Michael,
 > 
-> Ok, so what commits should I backport to kernels older than 5.10 to
-> resolve this?
-Is it possible to wait for a set that resolves the problem rather than
-backporting the patches that disables the use-case?
-I have a patchset that fixes the actual issue and we are doing an
-internal review before submission to the mailing list.
-I should be able to send a V1 out between today and tomorrow.
+> Thanks for the benchmark.
+> 
+> On Wed, Mar 2, 2022 at 9:30 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > So yes, the overhead is higher by 50% which seems a lot but it's from a
+> > very small number, so I don't see why it's a show stopper, it's not by a
+> > factor of 10 such that we should sacrifice safety by default. Maybe a
+> > kernel flag that removes the read replacing it with an interrupt will
+> > do.
+> >
+> > In other words, premature optimization is the root of all evil.
+> 
+> Unfortunately I don't think it's as simple as that for several reasons.
+> 
+> First, I'm pretty confident a beefy Intel machine can mostly hide
+> non-dependent comparisons in the memory access and have the problem
+> mostly go away. But this is much less the case on, say, an in-order
+> MIPS32r2, which isn't just "some crappy ISA I'm using for the sake of
+> argument," but actually the platform on which a lot of networking and
+> WireGuard stuff runs, so I do care about it. There, we have 4
+> reads/comparisons which can't pipeline nearly as well.
 
-If not, then these are the patches that should be backported:
-    7bcb2c99f8ed crypto: algapi - use common mechanism for inheriting flags
-    2eb27c11937e crypto: algapi - add NEED_FALLBACK to INHERITED_FLAGS
-    fbb6cda44190 crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
-    b8aa7dc5c753 crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
-    cd74693870fb dm crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
-Herbert, correct me if I'm wrong here.
+Sure. Want to try running some benchmarks on that platform?
+Presumably you have access to such a box, right?
 
-Thanks,
+
+> There's also the atomicity aspect, which I think makes your benchmark
+> not quite accurate. Those 16 bytes could change between the first and
+> second word (or between the Nth and N+1th word for N<=3 on 32-bit).
+> What if in that case the word you read second doesn't change, but the
+> word you read first did? So then you find yourself having to do a
+> hi-lo-hi dance.
+> And then consider the 32-bit case, where that's even
+> more annoying. This is just one of those things that comes up when you
+> compare the semantics of a "large unique ID" and "word-sized counter",
+> as general topics. (My suggestion is that vmgenid provide both.)
+
+I don't see how this matters for any applications at all. Feel free to
+present a case that would be race free with a word but not a 16
+byte value, I could not imagine one. It's human to err of course.
+
+>
+> Finally, there's a slightly storage aspect, where adding 16 bytes to a
+> per-key struct is a little bit heavier than adding 4 bytes and might
+> bust a cache line without sufficient care, care which always has some
+> cost in one way or another.
+> 
+> So I just don't know if it's realistic to impose a 16-byte per-packet
+> comparison all the time like that. I'm familiar with WireGuard
+> obviously, but there's also cifs and maybe even wifi and bluetooth,
+> and who knows what else, to care about too. Then there's the userspace
+> discussion. I can't imagine a 16-byte hotpath comparison being
+> accepted as implementable.
+
+I think this hinges on benchmarking results. Want to start with
+my silly benchmark at least? If you can't measure an order of
+magnitude gain then I think any effect on wireguard will be in the
+noise.
+
+
+> > And I feel if linux
+> > DTRT and reads the 16 bytes then hypervisor vendors will be motivated to
+> > improve and add a 4 byte unique one. As long as linux is interrupt
+> > driven there's no motivation for change.
+> 
+> I reeeeeally don't want to get pulled into the politics of this on the
+> hypervisor side. I assume an improved thing would begin with QEMU and
+> Firecracker or something collaborating because they're both open
+> source and Amazon people seem interested.
+
+I think it would begin with a benchmark showing there's even any
+measureable performance to be gained by switching the semantics.
+
+> And then pressure builds for
+> Microsoft and VMware to do it on their side. And then we get this all
+> nicely implemented in the kernel. In the meantime, though, I'm not
+> going to refuse to address the problem entirely just because the
+> virtual hardware is less than perfect; I'd rather make the most with
+> what we've got while still being somewhat reasonable from an
+> implementation perspective.
+> 
+> Jason
+
+Right but given you are trading security off for performance, it matters
+a lot what the performance gain is.
 
 -- 
-Giovanni
+MST
+
