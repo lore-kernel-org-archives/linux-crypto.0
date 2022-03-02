@@ -2,79 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D11EC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 00:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 394A9C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 00:00:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbiCCAAz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S229875AbiCCAAz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 2 Mar 2022 19:00:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50796 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbiCCAAw (ORCPT
+        with ESMTP id S229880AbiCCAAx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:00:52 -0500
+        Wed, 2 Mar 2022 19:00:53 -0500
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F281D532DF
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 16:00:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D48C13D2E;
+        Wed,  2 Mar 2022 16:00:05 -0800 (PST)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nPXwQ-0006Dh-Em; Thu, 03 Mar 2022 09:59:31 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:59:30 +1200
-Date:   Thu, 3 Mar 2022 10:59:30 +1200
+        id 1nPXvY-0006Ci-I9; Thu, 03 Mar 2022 09:58:37 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:58:36 +1200
+Date:   Thu, 3 Mar 2022 10:58:36 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Petr Vorel <pvorel@suse.cz>
-Cc:     linux-crypto@vger.kernel.org, Nicolai Stange <nstange@suse.de>,
-        leitao@debian.org, Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v4 1/1] crypto: vmx - add missing dependencies
-Message-ID: <Yh/20gN+shzCcGYC@gondor.apana.org.au>
-References: <20220223151115.28536-1-pvorel@suse.cz>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        Hannes Reinecke <hare@suse.de>, Torsten Duwe <duwe@suse.de>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org
+Subject: Re: [PATCH v4 00/15] crypto: dh - infrastructure for NVM in-band
+ auth and FIPS conformance
+Message-ID: <Yh/2nD1wEh0BovMC@gondor.apana.org.au>
+References: <20220221121101.1615-1-nstange@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220223151115.28536-1-pvorel@suse.cz>
+In-Reply-To: <20220221121101.1615-1-nstange@suse.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 23, 2022 at 04:11:15PM +0100, Petr Vorel wrote:
-> vmx-crypto module depends on CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or
-> CRYPTO_XTS, thus add them.
+On Mon, Feb 21, 2022 at 01:10:46PM +0100, Nicolai Stange wrote:
+> Hi all,
 > 
-> These dependencies are likely to be enabled, but if
-> CRYPTO_DEV_VMX=y && !CRYPTO_MANAGER_DISABLE_TESTS
-> and either of CRYPTO_AES, CRYPTO_CBC, CRYPTO_CTR or CRYPTO_XTS is built
-> as module or disabled, alg_test() from crypto/testmgr.c complains during
-> boot about failing to allocate the generic fallback implementations
-> (2 == ENOENT):
+> first of all, to the people primarily interested in security/keys/, there's
+> a rather trivial change to security/keys/dh.c in patch 4/15. It would be
+> great to get ACKs for that...
 > 
-> [    0.540953] Failed to allocate xts(aes) fallback: -2
-> [    0.541014] alg: skcipher: failed to allocate transform for p8_aes_xts: -2
-> [    0.541120] alg: self-tests for p8_aes_xts (xts(aes)) failed (rc=-2)
-> [    0.544440] Failed to allocate ctr(aes) fallback: -2
-> [    0.544497] alg: skcipher: failed to allocate transform for p8_aes_ctr: -2
-> [    0.544603] alg: self-tests for p8_aes_ctr (ctr(aes)) failed (rc=-2)
-> [    0.547992] Failed to allocate cbc(aes) fallback: -2
-> [    0.548052] alg: skcipher: failed to allocate transform for p8_aes_cbc: -2
-> [    0.548156] alg: self-tests for p8_aes_cbc (cbc(aes)) failed (rc=-2)
-> [    0.550745] Failed to allocate transformation for 'aes': -2
-> [    0.550801] alg: cipher: Failed to load transform for p8_aes: -2
-> [    0.550892] alg: self-tests for p8_aes (aes) failed (rc=-2)
+> This patchset's main objective is to provide the DH related preprequisite
+> bits needed by the upcoming support for NVME in-band authentication ([1]),
+> namely
+> - support for the RFC 7919 ffdheXYZ group parameters (patches [1-8/15]) and
+> - an ephemeral key generation primitive for these (patches [9-11/15]).
 > 
-> Fixes: c07f5d3da643 ("crypto: vmx - Adding support for XTS")
-> Fixes: d2e3ae6f3aba ("crypto: vmx - Enabling VMX module for PPC64")
+> With this in place, it happens to become relatively straight-forward to
+> achieve conformance with NIST SP800-56Ar3. The remainder of this patchset,
+> i.e. patches [12-15/15], implements the required changes.
 > 
-> Suggested-by: Nicolai Stange <nstange@suse.de>
-> Signed-off-by: Petr Vorel <pvorel@suse.cz>
-> ---
-> Changes v3->v4:
-> * Drop commit which merged CRYPTO_DEV_VMX and CRYPTO_DEV_VMX_ENCRYPT
->   (Herbert)
+> The previous v3 of this patchset can be found at [2]. The only difference
+> between v3 and the v4 here is the removal of a superfluous "default n"
+> Kconfig statement in patch [7/15] ("crypto: dh - implement ffdheXYZ(dh)
+> templates").
 > 
->  drivers/crypto/vmx/Kconfig | 4 ++++
->  1 file changed, 4 insertions(+)
+> I would like to reiterate that [12/15] ("crypto: api - allow algs only in
+> specific constructions in FIPS mode") is heavily based on a patch
+> previously posted by Herbert. Please refer to the v3 cover letter at [2]
+> for the full history.
+> 
+> Finally note that Stephan has granted his
+> Tested-by: Stephan Mueller <smueller@chronox.de>
+> to v3 already ([3]). Stephan, with the trivial diff between v3 and v4,
+> would you be Ok with carrying it over?
+> 
+> Thanks,
+> 
+> Nicolai
+> 
+> [1] https://lore.kernel.org/r/20211202152358.60116-1-hare@suse.de
+> [2] https://lore.kernel.org/r/20220202104012.4193-1-nstange@suse.de
+> [3] https://lore.kernel.org/r/8937519.l8FpVtv5Hg@tauon.chronox.de
+> 
+> Nicolai Stange (15):
+>   crypto: kpp - provide support for KPP template instances
+>   crypto: kpp - provide support for KPP spawns
+>   crypto: dh - remove struct dh's ->q member
+>   crypto: dh - constify struct dh's pointer members
+>   crypto: dh - split out deserialization code from crypto_dh_decode()
+>   crypto: dh - introduce common code for built-in safe-prime group
+>     support
+>   crypto: dh - implement ffdheXYZ(dh) templates
+>   crypto: testmgr - add known answer tests for ffdheXYZ(dh) templates
+>   crypto: dh - implement private key generation primitive for
+>     ffdheXYZ(dh)
+>   crypto: testmgr - add keygen tests for ffdheXYZ(dh) templates
+>   crypto: dh - allow for passing NULL to the ffdheXYZ(dh)s'
+>     ->set_secret()
+>   crypto: api - allow algs only in specific constructions in FIPS mode
+>   crypto: dh - disallow plain "dh" usage in FIPS mode
+>   lib/mpi: export mpi_rshift
+>   crypto: dh - calculate Q from P for the full public key verification
+> 
+>  crypto/Kconfig                |    7 +
+>  crypto/algapi.c               |   18 +-
+>  crypto/api.c                  |   19 +-
+>  crypto/dh.c                   |  687 +++++++++++++++-
+>  crypto/dh_helper.c            |   42 +-
+>  crypto/kpp.c                  |   29 +
+>  crypto/tcrypt.c               |    4 +-
+>  crypto/testmgr.c              |   61 +-
+>  crypto/testmgr.h              | 1445 ++++++++++++++++++++++++++++++++-
+>  include/crypto/dh.h           |   26 +-
+>  include/crypto/internal/kpp.h |  158 ++++
+>  include/linux/crypto.h        |    9 +
+>  lib/mpi/mpi-bit.c             |    1 +
+>  security/keys/dh.c            |    2 +-
+>  14 files changed, 2441 insertions(+), 67 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
