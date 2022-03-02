@@ -2,51 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604D4C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 23:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7215FC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 23:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229848AbiCCAAd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:00:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49088 "EHLO
+        id S229824AbiCCAAh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:00:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbiCCAAb (ORCPT
+        with ESMTP id S229861AbiCCAAf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 19:00:31 -0500
+        Wed, 2 Mar 2022 19:00:35 -0500
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8BC347AF9;
-        Wed,  2 Mar 2022 15:59:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA024925F;
+        Wed,  2 Mar 2022 15:59:49 -0800 (PST)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nPXwq-0006EU-Ps; Thu, 03 Mar 2022 09:59:57 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:59:56 +1200
-Date:   Thu, 3 Mar 2022 10:59:56 +1200
+        id 1nPXvM-0006CD-2F; Thu, 03 Mar 2022 09:58:25 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:58:24 +1200
+Date:   Thu, 3 Mar 2022 10:58:23 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Yingliang <yangyingliang@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        hkalra@marvell.com
-Subject: Re: [PATCH -next] crypto: octeontx2 - fix missing unlock
-Message-ID: <Yh/27BwQ5W/6inj7@gondor.apana.org.au>
-References: <20220225072724.82507-1-yangyingliang@huawei.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     jernej.skrabec@gmail.com, linus.walleij@linaro.org,
+        narmstrong@baylibre.com, ulli.kroll@googlemail.com, wens@csie.org,
+        linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH 0/5] crypto: completion should be ran with BH disabled
+Message-ID: <Yh/2j+hxUs/+1BXB@gondor.apana.org.au>
+References: <20220221120833.2618733-1-clabbe@baylibre.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220225072724.82507-1-yangyingliang@huawei.com>
+In-Reply-To: <20220221120833.2618733-1-clabbe@baylibre.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 25, 2022 at 03:27:24PM +0800, Yang Yingliang wrote:
-> Add the missing unlock before return from error path.
+On Mon, Feb 21, 2022 at 12:08:28PM +0000, Corentin Labbe wrote:
+> Hello
 > 
-> Fixes: 4363f3d3ce8f ("crypto: octeontx2 - add synchronization between mailbox accesses")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->  drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c | 4 +++-
->  drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
+> This is the follow up of https://lore.kernel.org/lkml/Yd1SIHUNdLIvKhzz@Red/
+> and https://patchwork.kernel.org/project/linux-crypto/patch/20220127133332.4011509-1-clabbe@baylibre.com/
+> This serie fix all drivers which do not call completion with BH disabled
+> and add the check in crypto/engine asked by Herbert.
+> I have verified that this check does not generate warnings on all other crypto
+> hardware I got (omap, ccree, rockchip)
+> 
+> Regards
+> 
+> Corentin Labbe (5):
+>   crypto: sun8i-ss: call finalize with bh disabled
+>   crypto: sun8i-ce: call finalize with bh disabled
+>   crypto: amlogic: call finalize with bh disabled
+>   crypto: gemini: call finalize with bh disabled
+>   crypto: engine: check if BH is disabled during completion
+> 
+>  crypto/crypto_engine.c                              | 1 +
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 3 +++
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c   | 3 +++
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 3 +++
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c   | 3 +++
+>  drivers/crypto/amlogic/amlogic-gxl-cipher.c         | 2 ++
+>  drivers/crypto/gemini/sl3516-ce-cipher.c            | 2 ++
+>  7 files changed, 17 insertions(+)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
