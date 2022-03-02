@@ -2,187 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20BA7C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 09:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B19AC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 09:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230023AbiCBJIZ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 04:08:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
+        id S236980AbiCBJaW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 04:30:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237615AbiCBJIY (ORCPT
+        with ESMTP id S240436AbiCBJaV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 04:08:24 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D7A31532;
-        Wed,  2 Mar 2022 01:07:41 -0800 (PST)
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K7pBv2bRRz67LWc;
-        Wed,  2 Mar 2022 17:06:31 +0800 (CST)
-Received: from lhreml717-chm.china.huawei.com (10.201.108.68) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Mar 2022 10:07:39 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml717-chm.china.huawei.com (10.201.108.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Wed, 2 Mar 2022 09:07:38 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Wed, 2 Mar 2022 09:07:38 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v6 09/10] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Thread-Topic: [PATCH v6 09/10] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Thread-Index: AQHYLIIBaGfq6jzuvUWvoNXYZoVi1qypDgGAgAAyBYCAAAJ0AIAAJJMAgAADqICAAA5SAIAAKPSAgABSJgCAAI+xAIAAaN2AgAATPQCAACLkgIAAFhCAgACQeqA=
-Date:   Wed, 2 Mar 2022 09:07:38 +0000
-Message-ID: <635f11c40e814d749ccf533f1414ba4e@huawei.com>
-References: <20220228180520.GO219866@nvidia.com>
- <20220228131614.27ad37dc.alex.williamson@redhat.com>
- <20220228202919.GP219866@nvidia.com>
- <20220228142034.024e7be6.alex.williamson@redhat.com>
- <20220228234709.GV219866@nvidia.com>
- <20220228214110.4deb551f.alex.williamson@redhat.com>
- <20220301131528.GW219866@nvidia.com>
- <20220301123047.1171c730.alex.williamson@redhat.com>
- <20220301203938.GY219866@nvidia.com>
- <20220301154431.42b27278.alex.williamson@redhat.com>
- <20220302000329.GZ219866@nvidia.com>
-In-Reply-To: <20220302000329.GZ219866@nvidia.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.91.128]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 2 Mar 2022 04:30:21 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8188CB8211
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 01:29:36 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id r20so1407168ljj.1
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 01:29:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rasmusvillemoes.dk; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=IQg4uBejV+wOE9gbvRPz3nvi4LkiiVw4YSIjC8NPteocLXX0uLpiZyGXJ60leACu72
+         E2mMgbaj2BDeYnhoOw0DKPRcT2bjIlB4yRTWQZ65OcYRTHhlWzgeq8LyFprIEpiij6N8
+         YNaymndxJaFKphqyYHlKdyPolm4uaJOX+WJuI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=XH8CYV/Z50iBLZ27uSo3DlVY0KhJ8ZO+RiecWTcYel0=;
+        b=dzq3chbYEREJECrpfA0c75NKcR0Gpzbw1PYFp2ngCb8UOkRz+cnxb2mob4fPzHoQP2
+         9tB1x0ERA9AxufulbUoT5SPXoniX2iHZViWg7tusNUTuA1mtu0PQXdb+06Gg6qpny55o
+         DA7B2l4Y5fcuCNZThBXa9otlmdNNTMyUX2zfUnuM5Au8YkvuOGGtcMcGWt0tZPjM2pwb
+         XqEEDkgq8eiAyso8hLtQJOZ4dJO3WJ8GH7gQ4emRlu/NuzIhsWG8PLRC3bvYnDAJ0VLQ
+         0JFigwXAALcMoANoAdaZ0Lcf8pIRBSVlbeQMTGBMYaQ72TZwAc9uiqzmJ7Qxq3yzZjTe
+         KL+Q==
+X-Gm-Message-State: AOAM531tAcihxyW7GB1XxkTeXiyAmjslwULq3lRZ/Hb3MhNiI8V5SWDI
+        WOvq0JhQdtMDUYl5+1YDETgOgA==
+X-Google-Smtp-Source: ABdhPJxPRWTwhfDKGEWi/HTZUmtnN6xoKL1T2KNwEAF9KgB2sMMXSt6lke7BfBVtPRIEaNMyntkyzw==
+X-Received: by 2002:a2e:3c0d:0:b0:246:3c52:7ada with SMTP id j13-20020a2e3c0d000000b002463c527adamr19885072lja.459.1646213374808;
+        Wed, 02 Mar 2022 01:29:34 -0800 (PST)
+Received: from [172.16.11.74] ([81.216.59.226])
+        by smtp.gmail.com with ESMTPSA id f36-20020a0565123b2400b0043795432e87sm1960430lfv.150.2022.03.02.01.29.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Mar 2022 01:29:33 -0800 (PST)
+Message-ID: <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk>
+Date:   Wed, 2 Mar 2022 10:29:31 +0100
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        David Laight <David.Laight@aculab.com>
+Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Arnd Bergman <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Mike Rapoport <rppt@kernel.org>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+ <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com>
+ <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
+ <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org>
+ <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
+ <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
+ <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com>
+ <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
+ <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com>
+ <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
+In-Reply-To: <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 02/03/2022 00.55, Linus Torvalds wrote:
+> On Tue, Mar 1, 2022 at 3:19 PM David Laight <David.Laight@aculab.com> wrote:
+>>
 
+> With the "don't use iterator outside the loop" approach, the exact
+> same code works in both the old world order and the new world order,
+> and you don't have the semantic confusion. And *if* you try to use the
+> iterator outside the loop, you'll _mostly_ (*) get a compiler warning
+> about it not being initialized.
+> 
+>              Linus
+> 
+> (*) Unless somebody initializes the iterator pointer pointlessly.
+> Which clearly does happen. Thus the "mostly". It's not perfect, and
+> that's most definitely not nice - but it should at least hopefully
+> make it that much harder to mess up.
 
-> -----Original Message-----
-> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
-> Sent: 02 March 2022 00:03
-> To: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; cohuck@redhat.com; mgurtovoy@nvidia.com;
-> yishaih@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
-> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
-> <wangzhou1@hisilicon.com>
-> Subject: Re: [PATCH v6 09/10] hisi_acc_vfio_pci: Add support for VFIO live
-> migration
-> 
-> On Tue, Mar 01, 2022 at 03:44:31PM -0700, Alex Williamson wrote:
-> > On Tue, 1 Mar 2022 16:39:38 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> > > On Tue, Mar 01, 2022 at 12:30:47PM -0700, Alex Williamson wrote:
-> > > > Wouldn't it make more sense if initial-bytes started at QM_MATCH_SIZE
-> > > > and dirty-bytes was always sizeof(vf_data) - QM_MATCH_SIZE?  ie.
-> QEMU
-> > > > would know that it has sizeof(vf_data) - QM_MATCH_SIZE remaining even
-> > > > while it's getting ENOMSG after reading QM_MATCH_SIZE bytes of data.
-> > >
-> > > The purpose of this ioctl is to help userspace guess when moving on to
-> > > STOP_COPY is a good idea ie when the device has done almost all the
-> > > work it is going to be able to do in PRE_COPY. ENOMSG is a similar
-> > > indicator.
-> > >
-> > > I expect all devices to have some additional STOP_COPY trailer_data in
-> > > addition to their PRE_COPY initial_data and dirty_data
-> > >
-> > > There is a choice to make if we report the trailer_data during
-> > > PRE_COPY or not. As this is all estimates, it doesn't matter unless
-> > > the trailer_data is very big.
-> > >
-> > > Having all devices trend toward a 0 dirty_bytes to say they are are
-> > > done all the pre-copy they can do makes sense from an API
-> > > perspective. If one device trends toward 10MB due to a big
-> > > trailer_data and one trends toward 0 bytes, how will qemu consistently
-> > > decide when best to trigger STOP_COPY? It makes the API less useful.
-> > >
-> > > So, I would not include trailer_data in the dirty_bytes.
-> >
-> > That assumes that it's possible to keep up with the device dirty
-> > rate.
-> 
-> It keeps options open so we have this choice someday.
-> 
-> We already see that implementations are using vCPU throttling as part
-> of their migration strategy, and we are seriously looking at DMA
-> throttling. It is not a big leap to imagine that
-> internal-state-dirtying throttling will happne someday.
-> 
-> With throttling iterations would ratchet up the throttle until they
-> reach an absolute small amount of dirty then cut over to STOP_COPY
-> 
-> > It seems like a better approach for userspace would be to look at how
-> > dirty_bytes is trending.
-> 
-> It may be biw, but this approach doesn't care if the trailing_bytes
-> are included or not, so lets leave them out and preserve the other
-> operating model.
-> 
-> > If we exclude STOP_COPY trailing data from the VFIO_DEVICE_MIG_PRECOPY
-> > ioctl, it seems even more of a disconnect that when we enter the
-> > STOP_COPY state, suddenly we start getting new data out of a PRECOPY
-> > ioctl.
-> 
-> Why? That amounts can go up at any time, how does it matter if it goes
-> up after STOP_COPY or instantly before?
-> 
-> > BTW, "VFIO_DEVICE" should be reserved for ioctls and data structures
-> > relative to the device FD, appending it with _MIG is too subtle for me.
-> > This is also a GET operation for INFO, so I'd think for consistency
-> > with the existing vfio uAPI we'd name this something like
-> > VFIO_MIG_GET_PRECOPY_INFO where the structure might be named
-> > vfio_precopy_info.
-> 
-> Sure
-> 
-> > So if we don't think this is the right approach for STOP_COPY, then why
-> > are we pushing that it has any purpose outside of PRECOPY or might be
-> > implemented by a non-PRECOPY driver for use in STOP_COPY?
-> 
-> It is just simpler and more consistent to implement the math under
-> this ioctl in all cases then to try and artificially restrict it.
-> 
-> But I don't have a use case for it, so lets block it if you prefer.
-> 
-> Shameerali will you make these adjustments to the PRE_COPY patch?
+This won't help the current issue (because it doesn't exist and might
+never), but just in case some compiler people are listening, I'd like to
+have some sort of way to tell the compiler "treat this variable as
+uninitialized from here on". So one could do
 
-Sure. I think we can summarize the discussion as below,
+#define kfree(p) do { __kfree(p); __magic_uninit(p); } while (0)
 
- - Rename the MIG_PRECOPY ioctl to VFIO_MIG_GET_PRECOPY_INFO and
-  structure to vfio_precopy_info.
- - This ioctl is only valid in PRE_COPY state and should return -EINVAL in
-  other states(Update the documentation).
- - No changes to the initial_bytes & dirty_bytes descriptions.
+with __magic_uninit being a magic no-op that doesn't affect the
+semantics of the code, but could be used by the compiler's "[is/may be]
+used uninitialized" machinery to flag e.g. double frees on some odd
+error path etc. It would probably only work for local automatic
+variables, but it should be possible to just ignore the hint if p is
+some expression like foo->bar or has side effects. If we had that, the
+end-of-loop test could include that to "uninitialize" the iterator.
 
-Please let me know if I missed anything.
+Maybe sparse/smatch or some other static analyzer could implement such a
+magic thing? Maybe it's better as a function attribute
+[__attribute__((uninitializes(1)))] to avoid having to macrofy all
+functions that release resources.
 
-I will address other comments on this series as well and sent out a
-revised one soon.
-
-Thanks,
-Shameer    
+Rasmus
