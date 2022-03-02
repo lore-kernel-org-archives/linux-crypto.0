@@ -2,88 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDBAC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 22:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1B5C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Mar 2022 22:28:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbiCBWYK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 17:24:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36236 "EHLO
+        id S230344AbiCBW2o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 17:28:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbiCBWYK (ORCPT
+        with ESMTP id S229831AbiCBW2o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 17:24:10 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D61CE0AEA;
-        Wed,  2 Mar 2022 14:23:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E629B61AA8;
-        Wed,  2 Mar 2022 22:23:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 125FEC004E1;
-        Wed,  2 Mar 2022 22:23:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646259805;
-        bh=ruaxpWDeM+wgTsYbBMTZZvhUl9cquYwlcym89lKCGMA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jED46bNwHfOG4K5q0CuXZfDANIQ8ePJYDXhNnnl9bX2mI1ZBrbEJWrEkYfKLFt9xY
-         WQn9JurdZoalUi8N6A+v/fjWbn6PwaDS7Rdmf0rJXTocM4dw6EDwEQC5GnoHLpKg1a
-         NOFKJuOt/APeiQgqXKgURqb5c2JI4jcbW0qWO68/CS96SB+a4aDen9guhtKNwV2CWb
-         rT9S0oUTr1/i87mpUDFtoaerBU3SCvmvb4s+DLjM8Xpo0ZL0bEov/tdLo5JO1B5zEw
-         ZsnXzzxtTh69nVk26ccAeIq/Dc6K0AY31FUHYeknifGSWzpq8aedZag9t07BSj+qco
-         pvLpM9VMZn/BA==
-Date:   Wed, 2 Mar 2022 22:23:23 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        X86 ML <x86@kernel.org>,
+        Wed, 2 Mar 2022 17:28:44 -0500
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF96E6D90;
+        Wed,  2 Mar 2022 14:27:59 -0800 (PST)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nPXRj-0005os-MI; Thu, 03 Mar 2022 09:27:48 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Mar 2022 10:27:47 +1200
+Date:   Thu, 3 Mar 2022 10:27:47 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/3] crypto: sm4 - create SM4 library based on sm4
- generic code
-Message-ID: <Yh/uW6z7aOyG0Jl8@gmail.com>
-References: <20210610134459.28541-1-tianjia.zhang@linux.alibaba.com>
- <20210610134459.28541-2-tianjia.zhang@linux.alibaba.com>
- <Yh32tEhUgGeSXf/A@zx2c4.com>
- <Yh65NU6TwcvW/VZV@gondor.apana.org.au>
- <CAHmME9qL4gHwJZcYGRmJ8sxcjkpGFjWDH2gxu15FXzgCUDLifw@mail.gmail.com>
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <Yh/vY4t3xnuoCW3Q@gondor.apana.org.au>
+References: <YhN76/ONC9qgIKQc@silpixa00400314>
+ <CACsaVZJFane88cXxG_E1VkcMcJm8YVN+GDqQ2+tRYNpCf+m8zA@mail.gmail.com>
+ <CAHk-=whVT2GcwiJM8m-XzgJj8CjytTHi_pmgmOnSpzvGWzZM1A@mail.gmail.com>
+ <Yh0y75aegqS4jIP7@silpixa00400314>
+ <Yh1aLfy/oBawCJIg@gondor.apana.org.au>
+ <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
+ <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
+ <Yh9G7FyCLtsm2mFA@kroah.com>
+ <Yh9ZvLHuztwQCu0d@silpixa00400314>
+ <Yh+FpKuoyj3G16lK@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9qL4gHwJZcYGRmJ8sxcjkpGFjWDH2gxu15FXzgCUDLifw@mail.gmail.com>
+In-Reply-To: <Yh+FpKuoyj3G16lK@kroah.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 01:26:13AM +0100, Jason A. Donenfeld wrote:
-> On Wed, Mar 2, 2022 at 1:24 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Tue, Mar 01, 2022 at 11:34:28AM +0100, Jason A. Donenfeld wrote:
-> > > >  lib/crypto/Kconfig   |   3 +
-> > > >  lib/crypto/Makefile  |   3 +
-> > > >  lib/crypto/sm4.c     | 184 +++++++++++++++++++++++++++++++++++++++++++
-> > >
-> > > If this is only used by the crypto API, it does not belong in
-> > > lib/crypto.
-> >
-> > Nope there is no such rule.  lib/crypto is fine if you're adding
-> > code that is shared between crypto and arch/*/crypto.
+On Wed, Mar 02, 2022 at 03:56:36PM +0100, Greg KH wrote:
+>
+> > If not, then these are the patches that should be backported:
+> >     7bcb2c99f8ed crypto: algapi - use common mechanism for inheriting flags
+> >     2eb27c11937e crypto: algapi - add NEED_FALLBACK to INHERITED_FLAGS
+> >     fbb6cda44190 crypto: algapi - introduce the flag CRYPTO_ALG_ALLOCATES_MEMORY
+> >     b8aa7dc5c753 crypto: drivers - set the flag CRYPTO_ALG_ALLOCATES_MEMORY
+> >     cd74693870fb dm crypt: don't use drivers that have CRYPTO_ALG_ALLOCATES_MEMORY
+> > Herbert, correct me if I'm wrong here.
 > 
-> The sprawling madness continues then... Noted.
+> These need to be manually backported as they do not apply cleanly.  Can
+> you provide such a set?  Or should I just disable a specific driver here
+> instead which would be easier overall?
 
-I think it would make more sense for this code to be in crypto/, for the reason
-that Jason gave.
+I think the safest thing is to disable qat in stable (possibly only
+when DM_CRYPT is enabled/modular).  The patches in question while
+good may have too wide an effect for the stable kernel series.
 
-- Eric
+Giovanni, could you send Greg a Kconfig patch to do that?
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
