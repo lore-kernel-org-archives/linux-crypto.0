@@ -2,66 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A59C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 20:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38032C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 21:24:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232772AbiCCUtQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 15:49:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38080 "EHLO
+        id S236519AbiCCVZi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 16:25:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235403AbiCCUtP (ORCPT
+        with ESMTP id S236516AbiCCVZh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 15:49:15 -0500
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E28A63C4B1;
-        Thu,  3 Mar 2022 12:48:29 -0800 (PST)
-Received: by mail-pj1-f49.google.com with SMTP id gb21so5671521pjb.5;
-        Thu, 03 Mar 2022 12:48:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=W427vGVOP9COvIncLQi5lkNxw4mE4Ce/dWUY7QiH0Xg=;
-        b=EXXEnNfottz8Z1Qrv11P9yiQgtbmEr+FfoBTpyP12pGZHDbxc19LEj0Q3tS9wRli+g
-         5Crmf1LVbz4LCGTUUE3Sj9OwhWu8WWFQwEDJkmw0EGDoLWQh+zbewakjQe2xy72vlsmE
-         DxekIdZeOMDzRJ6sb5Zkb1gUTBdw2y8gtIplVBYDwcYxqWgNDNkLjow2wBcEGJphomoD
-         AoO5LOXzdHc1iKP2sGmwI31ei4CZxNWUgco6L9mRVZxvenW1WaBlRoyqz0hjz1TJzn98
-         ko39dXZUSulVHdTPpKiG0wQ0LUmgplUraMlZuF/0uodSUunTPLHQY8PpFgTdBNwwAS7d
-         GJ2g==
-X-Gm-Message-State: AOAM530p0YoZPvMwdWIeF9HmMltMQc2uh/Q3k21wKg0XdTSgFt5yvshf
-        XA25CMm0BnQyAClfi+FIDxY=
-X-Google-Smtp-Source: ABdhPJxfF/clBtd6VN69ha8tFxwXtqt3Q8ovp5PNA9jYR15BiWZSha6oKrI3dpXe9dRFfVNKHE22iA==
-X-Received: by 2002:a17:90b:789:b0:1bc:293c:1445 with SMTP id l9-20020a17090b078900b001bc293c1445mr7232867pjz.111.1646340509303;
-        Thu, 03 Mar 2022 12:48:29 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id lx7-20020a17090b4b0700b001b7d5b6d10asm2782399pjb.48.2022.03.03.12.48.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Mar 2022 12:48:28 -0800 (PST)
-Message-ID: <52af105a-8b89-518f-7663-84163788f66b@acm.org>
-Date:   Thu, 3 Mar 2022 12:48:27 -0800
+        Thu, 3 Mar 2022 16:25:37 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A18713DE03;
+        Thu,  3 Mar 2022 13:24:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646342691; x=1677878691;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cePptrGSsl2dfgN2SgrOoddSMEntTjj47nFxKZ1BSv8=;
+  b=TmzAhPPwm2oHd4RPA8TMIT91CeANV4gC0T8QIewXeMczVCqEkueO4lRo
+   khtxAIFHbOG/6ZB4iRiWAx2ZPNgWE4QdHqDaUT7k5UWEFoqg0FhJ0TcwE
+   nfjyoMrdIdEyZ/ZPVIBR3U8womyBU6xE8mRT8I3nlfIAxUMGHJAjIoYUO
+   nWCd7NA9HcKrQgQsnAywr/vYPi0T4V/ikoNkn4aQ/nRBBWGU9RqZAIhz8
+   E0ZHPY8xljFGs/F1PH2CkWlEy3c1AXkiSMH8nHPcP6d5CKxtB2JbrtXkj
+   08Xd73wRq6pp7rg0iCqB49psJCBa39ltNSA/d6xlAXSF8EDwHmPlYGRDy
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="253747927"
+X-IronPort-AV: E=Sophos;i="5.90,153,1643702400"; 
+   d="scan'208";a="253747927"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 13:24:51 -0800
+X-IronPort-AV: E=Sophos;i="5.90,153,1643702400"; 
+   d="scan'208";a="536016037"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 13:24:48 -0800
+Date:   Thu, 3 Mar 2022 21:24:42 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <YiEyGoHacN80FcOL@silpixa00400314>
+References: <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
+ <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
+ <Yh9G7FyCLtsm2mFA@kroah.com>
+ <Yh9ZvLHuztwQCu0d@silpixa00400314>
+ <Yh+FpKuoyj3G16lK@kroah.com>
+ <Yh/vY4t3xnuoCW3Q@gondor.apana.org.au>
+ <Yh/yr6oB5yeOUErL@silpixa00400314>
+ <Yh/znCnZzWaL49+o@gondor.apana.org.au>
+ <YiDHT31ujlGdQEe/@silpixa00400314>
+ <YiEVPc2cd38AnLZB@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCHv4 4/8] linux/kernel: introduce lower_48_bits function
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-5-kbusch@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220303201312.3255347-5-kbusch@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YiEVPc2cd38AnLZB@gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/3/22 12:13, Keith Busch wrote:
-> Recent data integrity field enhancements allow reference tags to be up
-> to 48 bits. Introduce an inline helper function since this will be a
-> repeated operation.
+On Thu, Mar 03, 2022 at 07:21:33PM +0000, Eric Biggers wrote:
+> If these algorithms have critical bugs, which it appears they do, then IMO it
+> would be better to disable them (either stop registering them, or disable the
+> whole driver) than to leave them available with low cra_priority.  Low
+> cra_priority doesn't guarantee that they aren't used.
+Thanks for your feedback Eric.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Here is a patch that disables the registration of the algorithms in the
+QAT driver by setting, a config time, the number of HW queues (aka
+instances) to zero.
+
+---8<---
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - disable registration of algorithms
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+
+The implementations of aead and skcipher in the QAT driver do not
+support properly requests with the CRYPTO_TFM_REQ_MAY_BACKLOG flag set.
+If the HW queue is full, the driver returns -EBUSY but does not enqueue
+the request.
+This can result in applications like dm-crypt waiting indefinitely for a
+completion of a request that was never submitted to the hardware.
+
+To avoid this problem, disable the registration of all skcipher and aead
+implementations in the QAT driver by setting the number of crypto
+instances to 0 at configuration time.
+
+This patch deviates from the original upstream solution, that prevents
+dm-crypt to use drivers registered with the flag
+CRYPTO_ALG_ALLOCATES_MEMORY, since a backport of that set to stable
+kernels may have a too wide effect.
+
+commit 7bcb2c99f8ed032cfb3f5596b4dccac6b1f501df upstream
+commit 2eb27c11937ee9984c04b75d213a737291c5f58c upstream
+commit fbb6cda44190d72aa5199d728797aabc6d2ed816 upstream
+commit b8aa7dc5c7535f9abfca4bceb0ade9ee10cf5f54 upstream
+commit cd74693870fb748d812867ba49af733d689a3604 upstream
+
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_crypto.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.c b/drivers/crypto/qat/qat_common/qat_crypto.c
+index 3852d31ce0a4..611d214d5198 100644
+--- a/drivers/crypto/qat/qat_common/qat_crypto.c
++++ b/drivers/crypto/qat/qat_common/qat_crypto.c
+@@ -159,9 +159,7 @@ struct qat_crypto_instance *qat_crypto_get_instance_node(int node)
+  */
+ int qat_crypto_dev_config(struct adf_accel_dev *accel_dev)
+ {
+-	int cpus = num_online_cpus();
+-	int banks = GET_MAX_BANKS(accel_dev);
+-	int instances = min(cpus, banks);
++	int instances = 0;
+ 	char key[ADF_CFG_MAX_KEY_LEN_IN_BYTES];
+ 	int i;
+ 	unsigned long val;
+
+base-commit: 866ae42cf4788c8b18de6bda0a522362702861d7
+-- 
+2.35.1
