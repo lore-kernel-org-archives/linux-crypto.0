@@ -2,187 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C520DC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 04:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C393C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 07:27:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbiCCE7V convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 23:59:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60846 "EHLO
+        id S229787AbiCCH1r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 02:27:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbiCCE7R (ORCPT
+        with ESMTP id S230168AbiCCH1p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 23:59:17 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A7C413DE2A
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 20:58:28 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mtapsc-5-c9saVIHFMHux_Sno3vxg6w-1; Thu, 03 Mar 2022 04:58:25 +0000
-X-MC-Unique: c9saVIHFMHux_Sno3vxg6w-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.28; Thu, 3 Mar 2022 04:58:23 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.028; Thu, 3 Mar 2022 04:58:23 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Xiaomeng Tong' <xiam0nd.tong@gmail.com>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "bcm-kernel-feedback-list@broadcom.com" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        "bjohannesmeyer@gmail.com" <bjohannesmeyer@gmail.com>,
-        "c.giuffrida@vu.nl" <c.giuffrida@vu.nl>,
-        "christian.koenig@amd.com" <christian.koenig@amd.com>,
-        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
-        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "h.j.bos@vu.nl" <h.j.bos@vu.nl>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        "jakobkoschel@gmail.com" <jakobkoschel@gmail.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "kgdb-bugreport@lists.sourceforge.net" 
-        <kgdb-bugreport@lists.sourceforge.net>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "linux1394-devel@lists.sourceforge.net" 
-        <linux1394-devel@lists.sourceforge.net>,
-        "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>,
-        "v9fs-developer@lists.sourceforge.net" 
-        <v9fs-developer@lists.sourceforge.net>
-Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Thread-Index: AQHYLhg9+DU/OogLf0+tiSFmjztyUKysHu+QgADRVYCAACVtoA==
-Date:   Thu, 3 Mar 2022 04:58:23 +0000
-Message-ID: <39404befad5b44b385698ff65465abe5@AcuMS.aculab.com>
-References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
- <20220303022729.9321-1-xiam0nd.tong@gmail.com>
-In-Reply-To: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Thu, 3 Mar 2022 02:27:45 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F53216DAE3
+        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 23:27:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 21BA1B82372
+        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 07:26:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDCA9C004E1
+        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 07:26:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646292417;
+        bh=g+Qkel0q81INfGY2BfeVP9mlM37Pf9LbpvJ+1Cv64rY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=hO3XNfqiC9HOepl6idaTnPzypuRaVwuFakTSwQENEXX04Ejeb/+8S3I1l2pS2EWYa
+         ujLFft8eoGb5qDE8ut/Zo16OgEMDptemnDmhqBSyvJl6WER+kF+V+vRkZY7B/DoWW7
+         jMjzA1DDS/EfwYpwdZm/fM2+DeSP8ClAgtQy5gnZ5Rr3Q9geF1cSobIAEzHhBoVhpy
+         1yePB5kq/ZxFT3Cfwkj6WOxXlucAQJYHCJxIaP++YHf1QP/VPvSdFkH0fl2RPZvz1O
+         M9oC4IwdLDfCuNp8Yu1vKsTUs1DhTaVVDfMBf+yFqu32k0GjzJEOMRodcn19weD9nH
+         xeHkxOeT0VH/A==
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-2dc348dab52so11473347b3.6
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 23:26:57 -0800 (PST)
+X-Gm-Message-State: AOAM533MbXonbqM4xLO8NpKY9D+1DvUKsTTN0Ix1O2d2+AIZXA/0gk0U
+        TVgPq/n3Zxhzl9he8VT/oazu9b1KMkynSIdiclM=
+X-Google-Smtp-Source: ABdhPJyyJ7OePIxQ78awbDiflwiym3Cp0FbXGU9xOeN8uFu2PveWX+q+2FKzxeYN/qGMXODeiOJFU2ni2qMEWyEVU9Q=
+X-Received: by 2002:a81:e90c:0:b0:2db:d63e:56ff with SMTP id
+ d12-20020a81e90c000000b002dbd63e56ffmr13505259ywm.60.1646292416781; Wed, 02
+ Mar 2022 23:26:56 -0800 (PST)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <20220302165438.1140256-1-broonie@kernel.org>
+In-Reply-To: <20220302165438.1140256-1-broonie@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 3 Mar 2022 07:26:45 +0000
+X-Gmail-Original-Message-ID: <CAMj1kXHhTNsB8V=4LNMqSXrAWXroHHNXzjS0xWERboG7a3G-Lg@mail.gmail.com>
+Message-ID: <CAMj1kXHhTNsB8V=4LNMqSXrAWXroHHNXzjS0xWERboG7a3G-Lg@mail.gmail.com>
+Subject: Re: [PATCH] arm64: crypto: Don't allow v8.2 extensions to be used
+ with BROKEN_GAS_INST
+To:     Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Xiaomeng Tong
-> Sent: 03 March 2022 02:27
-> 
-> On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
-> <David.Laight@ACULAB.COM> wrote:
-> > I think that it would be better to make any alternate loop macro
-> > just set the variable to NULL on the loop exit.
-> > That is easier to code for and the compiler might be persuaded to
-> > not redo the test.
-> 
-> No, that would lead to a NULL dereference.
-
-Why, it would make it b ethe same as the 'easy to use':
-	for (item = head; item; item = item->next) {
-		...
-		if (...)
-			break;
-		...
-	}
-	if (!item)
-		return;
- 
-> The problem is the mis-use of iterator outside the loop on exit, and
-> the iterator will be the HEAD's container_of pointer which pointers
-> to a type-confused struct. Sidenote: The *mis-use* here refers to
-> mistakely access to other members of the struct, instead of the
-> list_head member which acutally is the valid HEAD.
-
-The problem is that the HEAD's container_of pointer should never
-be calculated at all.
-This is what is fundamentally broken about the current definition.
-
-> IOW, you would dereference a (NULL + offset_of_member) address here.
-
-Where?
-
-> Please remind me if i missed something, thanks.
+On Wed, 2 Mar 2022 at 16:54, Mark Brown <broonie@kernel.org> wrote:
 >
-> Can you share your "alternative definitions" details? thanks!
+> We support building the kernel with archaic versions of binutils which
+> had some confusion regarding how instructions should be encoded for .inst
+> which we work around with the __emit_inst() macro. Unfortunately we have
+> not consistently used this macro, one of the places where it's missed being
+> the macros that manually encode v8.2 crypto instructions. This means that
+> kernels built with such toolchains have never supported use of the affected
+> instructions correctly.
+>
+> Since these toolchains are very old (some idle research suggested 2015
+> era) it seems more sensible to just refuse to build v8.2 crypto support
+> with them, in the unlikely event that someone has a need to use such a
+> toolchain to build a kernel which will run on a system with v8.2 crypto
+> support they can always fix this properly but it seems more likely that
+> we will deprecate support for these toolchains and remove __emit_inst()
+> before that happens.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-The loop should probably use as extra variable that points
-to the 'list node' in the next structure.
-Something like:
-	for (xxx *iter = head->next;
-		iter == &head ? ((item = NULL),0) : ((item = list_item(iter),1));
-		iter = item->member->next) {
-	   ...
-With a bit of casting you can use 'item' to hold 'iter'.
+IIRC this is not about .inst getting the encoding wrong, but about
+confusion over the size of the generated opcode, resulting in problems
+generating constants involving relative offsets between labels. (The
+endian swap is there so that .long can be used on BE to emit the LE
+opcodes)
 
-> 
-> > OTOH there may be alternative definitions that can be used to get
-> > the compiler (or other compiler-like tools) to detect broken code.
-> > Even if the definition can't possibly generate a working kerrnel.
-> 
-> The "list_for_each_entry_inside(pos, type, head, member)" way makes
-> the iterator invisiable outside the loop, and would be catched by
-> compiler if use-after-loop things happened.
+This is not an issue here, so I don't think this change is necessary.
 
-It is also a compete PITA for anything doing a search.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+> ---
+>  arch/arm64/crypto/Kconfig | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+> index 2a965aa0188d..90dd62d46739 100644
+> --- a/arch/arm64/crypto/Kconfig
+> +++ b/arch/arm64/crypto/Kconfig
+> @@ -32,12 +32,14 @@ config CRYPTO_SHA2_ARM64_CE
+>  config CRYPTO_SHA512_ARM64_CE
+>         tristate "SHA-384/SHA-512 digest algorithm (ARMv8 Crypto Extensions)"
+>         depends on KERNEL_MODE_NEON
+> +       depends on !BROKEN_GAS_INST
+>         select CRYPTO_HASH
+>         select CRYPTO_SHA512_ARM64
+>
+>  config CRYPTO_SHA3_ARM64
+>         tristate "SHA3 digest algorithm (ARMv8.2 Crypto Extensions)"
+>         depends on KERNEL_MODE_NEON
+> +       depends on !BROKEN_GAS_INST
+>         select CRYPTO_HASH
+>         select CRYPTO_SHA3
+>
+> @@ -50,6 +52,7 @@ config CRYPTO_SM3_ARM64_CE
+>  config CRYPTO_SM4_ARM64_CE
+>         tristate "SM4 symmetric cipher (ARMv8.2 Crypto Extensions)"
+>         depends on KERNEL_MODE_NEON
+> +       depends on !BROKEN_GAS_INST
+>         select CRYPTO_ALGAPI
+>         select CRYPTO_LIB_SM4
+>
+> --
+> 2.30.2
+>
