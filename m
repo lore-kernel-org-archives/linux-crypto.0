@@ -2,225 +2,261 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC48C4321E
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 12:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D86C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 12:57:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233372AbiCCMih (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 07:38:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49572 "EHLO
+        id S233251AbiCCM6D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 07:58:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232047AbiCCMig (ORCPT
+        with ESMTP id S229954AbiCCM6D (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 07:38:36 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179C340A1E;
-        Thu,  3 Mar 2022 04:37:48 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id z2so4410135plg.8;
-        Thu, 03 Mar 2022 04:37:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FF/MJjppdIPbLAPuX69GDDcuetlfqDD+38vpsQJKjV4=;
-        b=bORDDPjE3HJ8Q+lkuHUI9YXm2z2OfuiHyYo73LjCVUqKH+mzapaLyTx7j6vUSzodyH
-         H1fbBW3W0VvnP5bKsE/Cw0qa3UKie6z+yV023jD/NJPLY9kKDIxXXIT7NvpcVUCfUtIs
-         KFg6MVSLFINqOtsOfPJChC2DDL1HsjgJIQ8T87wI93Fz/8cIhc43z3LdnIXEJu5YqpzN
-         mnmxIpvlp/TKF5EWx4k9hHupAU2T1e2iVIXLRuFiSvdgN4U8XMzx7dalBaWhuU90/nq+
-         yD0rNidPjh7VKui8oE8v/Ywp+ZPTs/OvJCCqJBXBdG8sdbvMpiVPMu/2SHGpauCCE/Ok
-         XUow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FF/MJjppdIPbLAPuX69GDDcuetlfqDD+38vpsQJKjV4=;
-        b=5nmLDPdt4158KChLD7ZNId285UqdJIJg11uAueR32aF7hOqlaYWbUvnmXZpM/JktUK
-         1qvgKYbYiTRkWHI5gTGarJSXkv/BPsY02qYjIyaKu5D1VoFhfQK3OfOvvBA1mitkp1pl
-         PHdB5t5bp1FMJUVOAH0K8EpBEK1rG15MNH4CTtmiib6Vw4Pr7eykcIDH7EDZNF9GTY6z
-         II2zykestbe6hJIjCaKLuZLX/2vbbnq4OYS/ayY74gRe/rgTtqZBgMurHZQMjy38p/aF
-         qArR0GkBo8iuzNewabyxKOYNjpfwJ8HcLGIyXlRseL3hv363FaX+5Gl48VoKpzYF3kmL
-         oM/A==
-X-Gm-Message-State: AOAM530wAj2kNlYNbl2xdlwDu3GliNRaOBAj8yqWQoWLLlVxSGhp9Yd4
-        BQspS3STPlljfAwrfky5Csc=
-X-Google-Smtp-Source: ABdhPJwaQutGx29a4puPWhBgOBT74prgxxfsvHgGuVwO/yqGuQ+dVL8XCd59bWLeDERLYwR3js66yQ==
-X-Received: by 2002:a17:903:22d0:b0:151:97f5:db54 with SMTP id y16-20020a17090322d000b0015197f5db54mr7837971plg.58.1646311068298;
-        Thu, 03 Mar 2022 04:37:48 -0800 (PST)
-Received: from ubuntu.huawei.com ([119.3.119.19])
-        by smtp.googlemail.com with ESMTPSA id t7-20020a17090a024700b001bf12386db4sm1483030pje.47.2022.03.03.04.37.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 04:37:47 -0800 (PST)
-From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
-To:     david.laight@aculab.com
-Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
-        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
-        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
-        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
-        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        gustavo@embeddedor.com, h.j.bos@vu.nl,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
-        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
-        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        rppt@kernel.org, samba-technical@lists.samba.org,
-        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
-        torvalds@linux-foundation.org,
-        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
-Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
-Date:   Thu,  3 Mar 2022 20:37:18 +0800
-Message-Id: <20220303123718.12426-1-xiam0nd.tong@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <2d208771c50b4c6db4f43039e9d62851@AcuMS.aculab.com>
-References: <2d208771c50b4c6db4f43039e9d62851@AcuMS.aculab.com>
+        Thu, 3 Mar 2022 07:58:03 -0500
+Received: from metanate.com (unknown [IPv6:2001:8b0:1628:5005::111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEABF186218;
+        Thu,  3 Mar 2022 04:57:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=metanate.com; s=stronger; h=In-Reply-To:Content-Type:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description; bh=Ui7Wx3HT5wFF2lD9OqwpaMhrO7qy33DzT68PqCTpFeA=; b=t2ko4
+        NFlATGyheALC9w+H68/z3RvSSOEB6BrmYEzUF5r8KqMq1m06wmG4/48fY/k1SirfLL8ebbuWySbK+
+        yAIBOZP7CNmNQwuVEQFAyP6sY3UK1LSpXV+t+8dZS/gAeJjam7Eu7BQ1fmtksh1ecMYZM7QJCHYtn
+        kBW0GuvUjAebv5yS+bC5ZA0izcBIu8XwZBDNE8aadZPiBBeTFnvKy1vu7Nb0iW8b60M7xMAX9fUIL
+        kVAxrsn/p2QVIA4oUW3Ety5Agn002vZfP/aTWFOu8FDRIHiBKgqt4I8XPykJQCQ8JszenDrhULJNU
+        z9o0dmnVkLuKL3W7mSH/OAvSeAIsQ==;
+Received: from [81.174.171.191] (helo=donbot)
+        by email.metanate.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <john@metanate.com>)
+        id 1nPl0y-0004oa-Jj; Thu, 03 Mar 2022 12:57:04 +0000
+Date:   Thu, 3 Mar 2022 12:57:03 +0000
+From:   John Keeping <john@metanate.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v2 15/18] crypto: rockchip: introduce PM
+Message-ID: <YiC7Hxm0epcAcHen@donbot>
+References: <20220302211113.4003816-1-clabbe@baylibre.com>
+ <20220302211113.4003816-16-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220302211113.4003816-16-clabbe@baylibre.com>
+X-Authenticated: YES
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> From: Xiaomeng Tong
-> > Sent: 03 March 2022 07:27
-> > 
-> > On Thu, 3 Mar 2022 04:58:23 +0000, David Laight wrote:
-> > > on 3 Mar 2022 10:27:29 +0800, Xiaomeng Tong wrote:
-> > > > The problem is the mis-use of iterator outside the loop on exit, and
-> > > > the iterator will be the HEAD's container_of pointer which pointers
-> > > > to a type-confused struct. Sidenote: The *mis-use* here refers to
-> > > > mistakely access to other members of the struct, instead of the
-> > > > list_head member which acutally is the valid HEAD.
-> > >
-> > > The problem is that the HEAD's container_of pointer should never
-> > > be calculated at all.
-> > > This is what is fundamentally broken about the current definition.
-> > 
-> > Yes, the rule is "the HEAD's container_of pointer should never be
-> > calculated at all outside the loop", but how do you make sure everyone
-> > follows this rule?
-> > Everyone makes mistakes, but we can eliminate them all from the beginning
-> > with the help of compiler which can catch such use-after-loop things.
-> > 
-> > > > IOW, you would dereference a (NULL + offset_of_member) address here.
-> > >
-> > >Where?
-> > 
-> > In the case where a developer do not follows the above rule, and mistakely
-> > access a non-list-head member of the HEAD's container_of pointer outside
-> > the loop. For example:
-> >     struct req{
-> >       int a;
-> >       struct list_head h;
-> >     }
-> >     struct req *r;
-> >     list_for_each_entry(r, HEAD, h) {
-> >       if (r->a == 0x10)
-> >         break;
-> >     }
-> >     // the developer made a mistake: he didn't take this situation into
-> >     // account where all entries in the list are *r->a != 0x10*, and now
-> >     // the r is the HEAD's container_of pointer.
-> >     r->a = 0x20;
-> > Thus the "r->a = 0x20" would dereference a (NULL + offset_of_member)
-> > address here.
+On Wed, Mar 02, 2022 at 09:11:10PM +0000, Corentin Labbe wrote:
+> Add runtime PM support for rockchip crypto.
 > 
-> That is just a bug.
-> No different to failing to check anything else might 'return'
-> a NULL pointer.
-
-Yes, but it‘s a mistake everyone has made and will make, we should avoid
-this at the beginning with the help of compiler.
-
-> Because it is a NULL dereference you find out pretty quickly.
-
-AFAIK，NULL dereference is a undefined bahavior, can compiler quickly
-catch it? Or it can only be applied to some simple/restricted cases.
-
-> The existing loop leaves you with a valid pointer to something
-> that isn't a list item.
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  drivers/crypto/Kconfig                        |  1 +
+>  drivers/crypto/rockchip/rk3288_crypto.c       | 50 ++++++++++++++++++-
+>  drivers/crypto/rockchip/rk3288_crypto.h       |  1 +
+>  drivers/crypto/rockchip/rk3288_crypto_ahash.c | 11 ++++
+>  .../crypto/rockchip/rk3288_crypto_skcipher.c  | 10 ++++
+>  5 files changed, 71 insertions(+), 2 deletions(-)
 > 
-> > > > Please remind me if i missed something, thanks.
-> > > >
-> > > > Can you share your "alternative definitions" details? thanks!
-> > >
-> > > The loop should probably use as extra variable that points
-> > > to the 'list node' in the next structure.
-> > > Something like:
-> > > 	for (xxx *iter = head->next;
-> > > 		iter == &head ? ((item = NULL),0) : ((item = list_item(iter),1));
-> > > 		iter = item->member->next) {
-> > > 	   ...
-> > > With a bit of casting you can use 'item' to hold 'iter'.
-> > 
-> > you still can not make sure everyone follows this rule:
-> > "do not use iterator outside the loop" without the help of compiler,
-> > because item is declared outside the loop.
-> 
-> That one has 'iter' defined in the loop.
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 04c8e332c5a1..685631a5cbea 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -784,6 +784,7 @@ config CRYPTO_DEV_IMGTEC_HASH
+>  config CRYPTO_DEV_ROCKCHIP
+>  	tristate "Rockchip's Cryptographic Engine driver"
+>  	depends on OF && ARCH_ROCKCHIP
+> +	depends on PM
 
-Oh, sorry, I misunderstood. Then this is the same way with my way of
-list_for_each_entry_inside(pos, type, head, member), which declare
-the iterator inside the loop.
-You go further and make things like "&pos->member == (head)" goes away
-to avoid calculate the HEAD's container_of pointer, although the
-calculation is harmless.
+Does this need to depend on PM?  If you enable the clock in _probe then
+use pm_runtime_put_autosuspend() the no-op helpers when !PM will mean
+this works whether PM is enabled or not.
 
-> 
-> > BTW, to avoid ambiguity，the "alternative definitions" here i asked is
-> > something from you in this context:
-> > "OTOH there may be alternative definitions that can be used to get
-> > the compiler (or other compiler-like tools) to detect broken code.
-> > Even if the definition can't possibly generate a working kerrnel."
-> 
-> I was thinking of something like:
-> 	if ((pos = list_first)), 1) pos = NULL else
-> so that unchecked dereferences after the loop will be detectable
-> as NULL pointer offsets - but that in itself isn't enough to avoid
-> other warnings.
-> 
+>  	select CRYPTO_AES
+>  	select CRYPTO_ENGINE
+>  	select CRYPTO_LIB_DES
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+> index cd0755731cf7..ba56f8ff97c3 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+> @@ -57,6 +57,48 @@ static void rk_crypto_disable_clk(struct rk_crypto_info *dev)
+>  	clk_disable_unprepare(dev->sclk);
+>  }
+>  
+> +/*
+> + * Power management strategy: The device is suspended unless a TFM exists for
+> + * one of the algorithms proposed by this driver.
+> + */
+> +static int rk_crypto_pm_suspend(struct device *dev)
+> +{
+> +	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
+> +
+> +	rk_crypto_disable_clk(rkdev);
+> +	return 0;
+> +}
+> +
+> +static int rk_crypto_pm_resume(struct device *dev)
+> +{
+> +	struct rk_crypto_info *rkdev = dev_get_drvdata(dev);
+> +
+> +	return rk_crypto_enable_clk(rkdev);
+> +}
+> +
+> +static const struct dev_pm_ops rk_crypto_pm_ops = {
+> +	SET_RUNTIME_PM_OPS(rk_crypto_pm_suspend, rk_crypto_pm_resume, NULL)
+> +};
+> +
+> +static int rk_crypto_pm_init(struct rk_crypto_info *rkdev)
+> +{
+> +	int err;
+> +
+> +	pm_runtime_use_autosuspend(rkdev->dev);
+> +	pm_runtime_set_autosuspend_delay(rkdev->dev, 2000);
+> +
+> +	err = pm_runtime_set_suspended(rkdev->dev);
+> +	if (err)
+> +		return err;
+> +	pm_runtime_enable(rkdev->dev);
+> +	return err;
+> +}
+> +
+> +static void rk_crypto_pm_exit(struct rk_crypto_info *rkdev)
+> +{
+> +	pm_runtime_disable(rkdev->dev);
+> +}
+> +
+>  static irqreturn_t rk_crypto_irq_handle(int irq, void *dev_id)
+>  {
+>  	struct rk_crypto_info *dev  = platform_get_drvdata(dev_id);
+> @@ -259,7 +301,9 @@ static int rk_crypto_probe(struct platform_device *pdev)
+>  	crypto_engine_start(crypto_info->engine);
+>  	init_completion(&crypto_info->complete);
+>  
+> -	rk_crypto_enable_clk(crypto_info);
+> +	err = rk_crypto_pm_init(crypto_info);
+> +	if (err)
+> +		goto err_crypto;
+>  
+>  	err = rk_crypto_register(crypto_info);
+>  	if (err) {
+> @@ -280,6 +324,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+>  	return 0;
+>  
+>  err_register_alg:
+> +	rk_crypto_pm_exit(crypto_info);
+>  err_crypto:
+>  	dev_err(dev, "Crypto Accelerator not successfully registered\n");
+>  	return err;
+> @@ -293,7 +338,7 @@ static int rk_crypto_remove(struct platform_device *pdev)
+>  	debugfs_remove_recursive(crypto_tmp->dbgfs_dir);
+>  #endif
+>  	rk_crypto_unregister();
+> -	rk_crypto_disable_clk(crypto_tmp);
+> +	rk_crypto_pm_exit(crypto_tmp);
+>  	return 0;
+>  }
+>  
+> @@ -302,6 +347,7 @@ static struct platform_driver crypto_driver = {
+>  	.remove		= rk_crypto_remove,
+>  	.driver		= {
+>  		.name	= "rk3288-crypto",
+> +		.pm		= &rk_crypto_pm_ops,
+>  		.of_match_table	= crypto_of_id_table,
+>  	},
+>  };
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+> index e2a6d735f2e2..06b2d9f52a80 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.h
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+> @@ -9,6 +9,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/debugfs.h>
+>  #include <linux/delay.h>
+> +#include <linux/pm_runtime.h>
+>  #include <linux/scatterlist.h>
+>  #include <crypto/engine.h>
+>  #include <crypto/internal/hash.h>
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+> index 8856c6226be6..a41e21c7141b 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+> @@ -328,6 +328,7 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
+>  	struct ahash_alg *alg = __crypto_ahash_alg(tfm->__crt_alg);
+>  
+>  	const char *alg_name = crypto_tfm_alg_name(tfm);
+> +	int err;
+>  
+>  	algt = container_of(alg, struct rk_crypto_tmp, alg.hash);
+>  
+> @@ -349,7 +350,16 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
+>  	tctx->enginectx.op.prepare_request = rk_hash_prepare;
+>  	tctx->enginectx.op.unprepare_request = rk_hash_unprepare;
+>  
+> +	err = pm_runtime_get_sync(tctx->dev->dev);
 
-Do you mean put this right after the loop (I changed somthing that i
-do not understand, please correct me if i am worng, thanks):
-       if (pos == list_first) pos = NULL; else
-and compiler can detect the following NULL derefernce?
-But if the NULL derefernce is just right after the loop originally,
-it will be masked by the *else* keyword。
+pm_runtime_resume_and_get() ?  The error handling is nicer with that.
 
-> > > > The "list_for_each_entry_inside(pos, type, head, member)" way makes
-> > > > the iterator invisiable outside the loop, and would be catched by
-> > > > compiler if use-after-loop things happened.
-> > 
-> > > It is also a compete PITA for anything doing a search.
-> > 
-> > You mean it would be a burden on search? can you show me some examples?
-> 
-> The whole business of having to save the pointer to the located item
-> before breaking the loop, remembering to have set it to NULL earlier etc.
+> +	if (err < 0)
+> +		goto error_pm;
+> +
+>  	return 0;
+> +error_pm:
+> +	pm_runtime_put_noidle(tctx->dev->dev);
+> +	crypto_free_ahash(tctx->fallback_tfm);
+> +
+> +	return err;
+>  }
+>  
+>  static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+> @@ -357,6 +367,7 @@ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+>  	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(tfm);
+>  
+>  	crypto_free_ahash(tctx->fallback_tfm);
+> +	pm_runtime_put_sync_suspend(tctx->dev->dev);
 
-Ok, i see. And then you need pass a "item" to the list_for_each_entry macro
-as a new argument.
+Why use sync_suspend here?  Could this be pm_runtime_put_autosuspend()?
 
-> 
-> It is so much better if you can just do:
-> 		if (found)
-> 			break;
-> 
-> 	David
+>  }
+>  
+>  struct rk_crypto_tmp rk_ahash_sha1 = {
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> index a8cfb520eaf8..55efda6ea3e7 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> @@ -458,6 +458,7 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
+>  	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+>  	const char *name = crypto_tfm_alg_name(&tfm->base);
+>  	struct rk_crypto_tmp *algt;
+> +	int err;
+>  
+>  	algt = container_of(alg, struct rk_crypto_tmp, alg.skcipher);
+>  
+> @@ -475,7 +476,15 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
+>  
+>  	ctx->enginectx.op.do_one_request = rk_cipher_run;
+>  
+> +	err = pm_runtime_get_sync(ctx->dev->dev);
 
-this confused me. this way is better or the "save the pointer to the located item
-before breaking the loop" one?
+Another place for pm_runtime_resume_and_get() ?
 
---
-Xiaomeng Tong
+> +	if (err < 0)
+> +		goto error_pm;
+> +
+>  	return 0;
+> +error_pm:
+> +	pm_runtime_put_noidle(ctx->dev->dev);
+> +	crypto_free_skcipher(ctx->fallback_tfm);
+> +	return err;
+>  }
+>  
+>  static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+> @@ -484,6 +493,7 @@ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+>  
+>  	memzero_explicit(ctx->key, ctx->keylen);
+>  	crypto_free_skcipher(ctx->fallback_tfm);
+> +	pm_runtime_put_sync_suspend(ctx->dev->dev);
+
+Again, can this be pm_runtime_put_autosuspend() ?
