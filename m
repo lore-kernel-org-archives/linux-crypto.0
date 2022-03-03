@@ -2,214 +2,166 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26118C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 13:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6FCC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 13:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232459AbiCCNIS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 08:08:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38770 "EHLO
+        id S230193AbiCCNR4 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 08:17:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbiCCNIM (ORCPT
+        with ESMTP id S229914AbiCCNRz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 08:08:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C6068186B8F
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 05:07:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646312844;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lj6VpxefHrxOOwhnhf4/p/2XcRsNuTwXL6WEnQsA11I=;
-        b=AFKMr6vLTJWojOBP40PvbVBn1m5IyHKXATf+pa5Hobu4V5OMP8sbaNFrn+rxqJIZMY15iN
-        DpEF1aJMLtM2sKgimKisKN0yB7SxGzq99mg2ISELIhDlyS9YhsahXYv2X/4KtBnimaT9GD
-        VzKKoNEgpTnrfsm+cqLLd7wlZiJ2S+w=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-444-p1dgK0YBOniL0zF52CjnlQ-1; Thu, 03 Mar 2022 08:07:23 -0500
-X-MC-Unique: p1dgK0YBOniL0zF52CjnlQ-1
-Received: by mail-wm1-f69.google.com with SMTP id f7-20020a7bcd07000000b003815081b984so1308308wmj.7
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Mar 2022 05:07:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=lj6VpxefHrxOOwhnhf4/p/2XcRsNuTwXL6WEnQsA11I=;
-        b=JNJl+tVTHLJZcP3vVmwYiEkCcVxR3RWw1I0OsHx1M81m0sQ8VGGvtqKQuSCdbaAWQ+
-         Qb5x036PTkX7B4dGhP4FYjjtW4b88O9M+Wf6mP734Ez7HX12WMef5jSqD1kodW3DSISt
-         bji2ZlAgRD9DdkENZFrT0SC9QY1uQe9+TH42oaA98WytoykYr/syZE2+pBTMnC3/EGz8
-         g/eYNuW5lpKSIpGueTpoll0KAdIZFqUMJ3i7OpH9ROqqtMJ9oPGDxkve903k0oRRDOJC
-         39jpesxdtZR64BIat0wB9RSdLB9daLTjH+y+SBKBKQX7NXTRfu4lY76kItqYkjgXvCuj
-         AOcg==
-X-Gm-Message-State: AOAM532O07FcG2Djjgrod6zMLV2vZYRDSwmN1qv3TP462n2a/P2EEau5
-        lOhiDfEazBX7wTZge+h5Qzez4CIb4Lc+9lt4q1fqoSqKiZ4NCCn30RJAWS+M4Fs6D0CA3KZoNj/
-        /ePsrpDbXgzW4az2D0ymClA7X
-X-Received: by 2002:a5d:5512:0:b0:1ef:5f08:29fb with SMTP id b18-20020a5d5512000000b001ef5f0829fbmr23412274wrv.653.1646312842497;
-        Thu, 03 Mar 2022 05:07:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwBprWCBbiaeng1f6eFEkBly6o9vzAc3MArh79lj54xDzLKMIA0Xs/dF3R5oQGH8dSoCNnPBA==
-X-Received: by 2002:a5d:5512:0:b0:1ef:5f08:29fb with SMTP id b18-20020a5d5512000000b001ef5f0829fbmr23412254wrv.653.1646312842242;
-        Thu, 03 Mar 2022 05:07:22 -0800 (PST)
-Received: from redhat.com ([2.55.143.133])
-        by smtp.gmail.com with ESMTPSA id f1-20020a5d4dc1000000b001eeadc98c0csm1908052wru.101.2022.03.03.05.07.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 05:07:20 -0800 (PST)
-Date:   Thu, 3 Mar 2022 08:07:16 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Laszlo Ersek <lersek@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: propagating vmgenid outward and upward
-Message-ID: <20220303075426-mutt-send-email-mst@kernel.org>
-References: <20220302031738-mutt-send-email-mst@kernel.org>
- <CAHmME9pf-bjnZuweoLqoFEmPy1OK7ogEgGEAva1T8uVTufhCuw@mail.gmail.com>
- <20220302074503-mutt-send-email-mst@kernel.org>
- <Yh93UZMQSYCe2LQ7@zx2c4.com>
- <20220302092149-mutt-send-email-mst@kernel.org>
- <CAHmME9rf7hQP78kReP2diWNeX=obPem=f8R-dC7Wkpic2xmffg@mail.gmail.com>
- <20220302101602-mutt-send-email-mst@kernel.org>
- <Yh+PET49oHNpxn+H@zx2c4.com>
- <20220302111737-mutt-send-email-mst@kernel.org>
- <Yh+cB5bWarl8CFN1@zx2c4.com>
+        Thu, 3 Mar 2022 08:17:55 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D521704CD;
+        Thu,  3 Mar 2022 05:17:08 -0800 (PST)
+Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K8Wh76J62z67r9d;
+        Thu,  3 Mar 2022 21:15:51 +0800 (CST)
+Received: from lhreml714-chm.china.huawei.com (10.201.108.65) by
+ fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Thu, 3 Mar 2022 14:17:05 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml714-chm.china.huawei.com (10.201.108.65) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 3 Mar 2022 13:17:05 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Thu, 3 Mar 2022 13:17:05 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v7 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Topic: [PATCH v7 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Thread-Index: AQHYLltL2nbHr5hFZkexUhHVpQU6TqyszJkAgADNzBCAAAc9gIAAApOw
+Date:   Thu, 3 Mar 2022 13:17:05 +0000
+Message-ID: <f2172fa9f84447699cb0973bec3ca0da@huawei.com>
+References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
+ <20220302172903.1995-10-shameerali.kolothum.thodi@huawei.com>
+ <20220303002142.GE1026713@nvidia.com>
+ <19e294814f284755b207be3ba7054ec2@huawei.com>
+ <20220303130411.GY219866@nvidia.com>
+In-Reply-To: <20220303130411.GY219866@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.82.4]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yh+cB5bWarl8CFN1@zx2c4.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 05:32:07PM +0100, Jason A. Donenfeld wrote:
-> Hi Michael,
+
+
+> -----Original Message-----
+> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> Sent: 03 March 2022 13:04
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org;
+> alex.williamson@redhat.com; cohuck@redhat.com; mgurtovoy@nvidia.com;
+> yishaih@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
+> <wangzhou1@hisilicon.com>
+> Subject: Re: [PATCH v7 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+> migration
 > 
-> On Wed, Mar 02, 2022 at 11:22:46AM -0500, Michael S. Tsirkin wrote:
-> > > Because that 16 byte read of vmgenid is not atomic. Let's say you read
-> > > the first 8 bytes, and then the VM is forked.
-> > 
-> > But at this point when VM was forked plaintext key and nonce are all in
-> > buffer, and you previously indicated a fork at this point is harmless.
-> > You wrote "If it changes _after_ that point of check ... it doesn't
-> > matter:"
+> On Thu, Mar 03, 2022 at 12:57:29PM +0000, Shameerali Kolothum Thodi
+> wrote:
+> >
+> >
+> > > From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> > > Sent: 03 March 2022 00:22
+> > > To: Shameerali Kolothum Thodi
+> <shameerali.kolothum.thodi@huawei.com>
+> > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > > linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org;
+> > > alex.williamson@redhat.com; cohuck@redhat.com;
+> mgurtovoy@nvidia.com;
+> > > yishaih@nvidia.com; Linuxarm <linuxarm@huawei.com>; liulongfang
+> > > <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
+> > > Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
+> > > <wangzhou1@hisilicon.com>
+> > > Subject: Re: [PATCH v7 09/10] hisi_acc_vfio_pci: Add support for VFIO live
+> > > migration
+> > >
+> > > On Wed, Mar 02, 2022 at 05:29:02PM +0000, Shameer Kolothum wrote:
+> > > > +static long hisi_acc_vf_save_unl_ioctl(struct file *filp,
+> > > > +				       unsigned int cmd, unsigned long arg)
+> > > > +{
+> > > > +	struct hisi_acc_vf_migration_file *migf = filp->private_data;
+> > > > +	struct hisi_acc_vf_core_device *hisi_acc_vdev = container_of(migf,
+> > > > +			struct hisi_acc_vf_core_device, saving_migf);
+> > > > +	loff_t *pos = &filp->f_pos;
+> > > > +	struct vfio_precopy_info info;
+> > > > +	unsigned long minsz;
+> > > > +	int ret;
+> > > > +
+> > > > +	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
+> > > > +		return -ENOTTY;
+> > > > +
+> > > > +	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
+> > > > +
+> > > > +	if (copy_from_user(&info, (void __user *)arg, minsz))
+> > > > +		return -EFAULT;
+> > > > +	if (info.argsz < minsz)
+> > > > +		return -EINVAL;
+> > > > +
+> > > > +	mutex_lock(&hisi_acc_vdev->state_mutex);
+> > > > +	if (hisi_acc_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY) {
+> > > > +		mutex_unlock(&hisi_acc_vdev->state_mutex);
+> > > > +		return -EINVAL;
+> > > > +	}
+> > >
+> > > IMHO it is easier just to check the total_length and not grab this
+> > > other lock
+> >
+> > The problem with checking the total_length here is that it is possible that
+> > in STOP_COPY the dev is not ready and there are no more data to be
+> transferred
+> > and the total_length remains at QM_MATCH_SIZE.
 > 
-> Ahhh, fair point. I think you're right.
+> Tthere is a scenario that transfers only QM_MATCH_SIZE in stop_copy?
+> This doesn't seem like a good idea, I think you should transfer a
+> positive indication 'this device is not ready' instead of truncating
+> the stream. A truncated stream should not be a valid stream.
 > 
-> Alright, so all we're talking about here is an ordinary 16-byte read,
-> and 16 bytes of storage per keypair, and a 16-byte comparison.
+> ie always transfer the whole struct.
+
+We could add a 'qm_state' and return the whole struct. But the rest
+of the struct is basically invalid if qm_state = QM_NOT_REDAY.
+
 > 
-> Still seems much worse than just having a single word...
+> > Looks like setting the total_length = 0 in STOP_COPY is a better
+> > solution(If there are no other issues with that) as it will avoid
+> > grabbing the state_mutex as you mentioned above.
 > 
-> Jason
+> That seems really weird, I wouldn't recommend doing that..
 
-Oh I forgot about __int128.
+Does that mean we don't support a zero data transfer in STOP_COPY?
+The concern is if we always transfer the whole struct, we end up reading
+and writing the whole thing even if most of the data is invalid.
 
-
-
-#include <stdio.h>
-#include <assert.h>
-#include <limits.h>
-#include <string.h>
-
-struct lng {
-	__int128 l;
-};
-
-struct shrt {
-	unsigned long s;
-};
-
-
-struct lng l = { 1 };
-struct shrt s = { 3 };
-
-static void test1(volatile struct shrt *sp)
-{
-	if (sp->s != s.s) {
-		printf("short mismatch!\n");
-		s.s = sp->s;
-	}
-}
-static void test2(volatile struct lng *lp)
-{
-	if (lp->l != l.l) {
-		printf("long mismatch!\n");
-		l.l = lp->l;
-	}
-}
-
-int main(int argc, char **argv)
-{
-	volatile struct shrt sv = { 4 };
-	volatile struct lng lv = { 5 };
-
-	if (argc > 1) {
-		printf("test 1\n");
-		for (int i = 0; i < 100000000; ++i) 
-			test1(&sv);
-	} else {
-		printf("test 2\n");
-		for (int i = 0; i < 100000000; ++i)
-			test2(&lv);
-	}
-	return 0;
-}
-
-
-with that the compiler has an easier time to produce optimal
-code, so the difference is smaller.
-Note: compiled with
-gcc -O2 -mno-sse -mno-sse2 -ggdb bench3.c 
-
-since with sse there's no difference at all.
-
-
-[mst@tuck ~]$ perf stat -r 100 ./a.out 1 > /dev/null 
-
-
- Performance counter stats for './a.out 1' (100 runs):
-
-             94.55 msec task-clock:u              #    0.996 CPUs utilized            ( +-  0.09% )
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-                52      page-faults:u             #  548.914 /sec                     ( +-  0.21% )
-       400,459,851      cycles:u                  #    4.227 GHz                      ( +-  0.03% )
-       500,147,935      instructions:u            #    1.25  insn per cycle           ( +-  0.00% )
-       200,032,462      branches:u                #    2.112 G/sec                    ( +-  0.00% )
-             1,810      branch-misses:u           #    0.00% of all branches          ( +-  0.73% )
-
-         0.0949732 +- 0.0000875 seconds time elapsed  ( +-  0.09% )
-
-[mst@tuck ~]$ 
-[mst@tuck ~]$ perf stat -r 100 ./a.out > /dev/null 
-
- Performance counter stats for './a.out' (100 runs):
-
-            110.19 msec task-clock:u              #    1.136 CPUs utilized            ( +-  0.18% )
-                 0      context-switches:u        #    0.000 /sec                   
-                 0      cpu-migrations:u          #    0.000 /sec                   
-                52      page-faults:u             #  537.743 /sec                     ( +-  0.22% )
-       428,518,442      cycles:u                  #    4.431 GHz                      ( +-  0.07% )
-       900,147,986      instructions:u            #    2.24  insn per cycle           ( +-  0.00% )
-       200,032,505      branches:u                #    2.069 G/sec                    ( +-  0.00% )
-             2,139      branch-misses:u           #    0.00% of all branches          ( +-  0.77% )
-
-          0.096956 +- 0.000203 seconds time elapsed  ( +-  0.21% )
-
--- 
-MST
-
+Thanks,
+Shameer
