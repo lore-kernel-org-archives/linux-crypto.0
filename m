@@ -2,180 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A039C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 13:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47366C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 14:21:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbiCCNt6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 08:49:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59168 "EHLO
+        id S234030AbiCCOWk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 09:22:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230384AbiCCNt6 (ORCPT
+        with ESMTP id S234034AbiCCOWj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 08:49:58 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1CA48889;
-        Thu,  3 Mar 2022 05:49:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646315352; x=1677851352;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=K3zaEHW1S0fJNBI4MmfbUZ44fQEWX4hjX1GkFZ8s7LY=;
-  b=aH3on0SFW1hTOfcb59+iU6wasa2rr4tKp3kagcTeEILd+QtdpOnP+Ig7
-   Y8sBgZKKQm4y9B2l04GLA5kvKeIBgmJRCNr8VmYYAxt21Dp4sj9LDdA6C
-   Bae4xO9f2Nl4iBt6rRHrwA2t4b1z6ATtyQWKdylST/b3zwuw7wnVbKL9G
-   EpkpUSi9TTk1B7CLhjBJGVk4moUIpxJCARGm2YH1L8T2zhvz/3+kgijc4
-   DFono/QQ25QiA0w1SbVUx7ENYCpZEfCC64usLYqYjEsPSUdqHBt8R3LbP
-   RRJNH6nQTzTQEW/PYMC+KAqNI2pYBEaATS7Dv4mO9zVWzsIsMkGvaYVo0
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10274"; a="253410146"
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="253410146"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 05:49:12 -0800
-X-IronPort-AV: E=Sophos;i="5.90,151,1643702400"; 
-   d="scan'208";a="709928521"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 05:49:09 -0800
-Date:   Thu, 3 Mar 2022 13:49:03 +0000
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Kyle Sanderson <kyle.leet@gmail.com>,
-        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
-        Linux-Kernal <linux-kernel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>
-Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
- dm-crypt + xfs
-Message-ID: <YiDHT31ujlGdQEe/@silpixa00400314>
-References: <Yh0y75aegqS4jIP7@silpixa00400314>
- <Yh1aLfy/oBawCJIg@gondor.apana.org.au>
- <CAHk-=wi+xewHz=BH7LcZAxrj9JXi66s9rp+kBqRchVG3a-b2BA@mail.gmail.com>
- <Yh2c4Vwu61s51d6N@gondor.apana.org.au>
- <Yh9G7FyCLtsm2mFA@kroah.com>
- <Yh9ZvLHuztwQCu0d@silpixa00400314>
- <Yh+FpKuoyj3G16lK@kroah.com>
- <Yh/vY4t3xnuoCW3Q@gondor.apana.org.au>
- <Yh/yr6oB5yeOUErL@silpixa00400314>
- <Yh/znCnZzWaL49+o@gondor.apana.org.au>
+        Thu, 3 Mar 2022 09:22:39 -0500
+Received: from metanate.com (unknown [IPv6:2001:8b0:1628:5005::111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462C118E3E6;
+        Thu,  3 Mar 2022 06:21:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=metanate.com; s=stronger; h=In-Reply-To:Content-Type:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description; bh=qjeRQXDRHJDEOFaM/bFhRf+N+QLbWVSGAMDaOy7ZtIw=; b=Rvpp4
+        8c8iAHDqTdLm8OD88p2G1kMMZO1W9Qi8uaYRy6VtgwIne1WnNP5cFq+1yHtWWbJKgAzkyrTZ2OD/t
+        1GAjcpLSaQ2q1Z/zbJhwn+ZgShs+EEoJtL4NtYR7Lr4tJBrTiRgJjUiYtedY05KN3wsNw56tzeXd5
+        xYsbHbNtEHBnddcHxE2yKCNmG24T3XqK0lcyH9rwZlwmW76WtWKTAsk6ZiB2mxqelhLwKG/iIkfPH
+        Q4t4f9pYMq0gttOHOmdDFCcchJpb1xwWOAz2XvzIyq0SEQiHiymNXyNpwu9qTLXc/GpjeaUg474I2
+        zs2suSeUxZ4I2VTyRjKIDlr7YdiWQ==;
+Received: from [81.174.171.191] (helo=donbot)
+        by email.metanate.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <john@metanate.com>)
+        id 1nPmKo-0005yL-KP; Thu, 03 Mar 2022 14:21:38 +0000
+Date:   Thu, 3 Mar 2022 14:21:37 +0000
+From:   John Keeping <john@metanate.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v2 06/18] crypto: rockchip: add fallback for cipher
+Message-ID: <YiDO8Tt9Lhx530Oz@donbot>
+References: <20220302211113.4003816-1-clabbe@baylibre.com>
+ <20220302211113.4003816-7-clabbe@baylibre.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yh/znCnZzWaL49+o@gondor.apana.org.au>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+In-Reply-To: <20220302211113.4003816-7-clabbe@baylibre.com>
+X-Authenticated: YES
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 10:45:48AM +1200, Herbert Xu wrote:
-> On Wed, Mar 02, 2022 at 10:42:20PM +0000, Giovanni Cabiddu wrote:
-> >
-> > I was thinking, as an alternative, to lower the cra_priority in the QAT
-> > driver for the algorithms used by dm-crypt so they are not used by
-> > default.
-> > Is that a viable option?
+On Wed, Mar 02, 2022 at 09:11:01PM +0000, Corentin Labbe wrote:
+> The hardware does not handle 0 size length request, let's add a
+> fallback.
+> Furthermore fallback will be used for all unaligned case the hardware
+> cannot handle.
 > 
-> Yes I think that should work too.
-The patch below implements that solution and applies to linux-5.4.y.
-If it is ok, I can send it to stable for all kernels <= 5.4 following
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html#option-3
+> Fixes: ce0183cb6464b ("crypto: rockchip - switch to skcipher API")
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  drivers/crypto/rockchip/rk3288_crypto.h       |  2 +
+>  .../crypto/rockchip/rk3288_crypto_skcipher.c  | 97 ++++++++++++++++---
+>  2 files changed, 86 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+> index c919d9a43a08..8b1e15d8ddc6 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto.h
+> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+> @@ -246,10 +246,12 @@ struct rk_cipher_ctx {
+>  	struct rk_crypto_info		*dev;
+>  	unsigned int			keylen;
+>  	u8				iv[AES_BLOCK_SIZE];
+> +	struct crypto_skcipher *fallback_tfm;
+>  };
+>  
+>  struct rk_cipher_rctx {
+>  	u32				mode;
+> +	struct skcipher_request fallback_req;   // keep at the end
+>  };
+>  
+>  enum alg_type {
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> index bbd0bf52bf07..bf9d398cc54c 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> @@ -13,6 +13,63 @@
+>  
+>  #define RK_CRYPTO_DEC			BIT(0)
+>  
+> +static int rk_cipher_need_fallback(struct skcipher_request *req)
+> +{
+> +	struct scatterlist *sgs, *sgd;
+> +
+> +	if (!req->cryptlen)
+> +		return true;
+> +
+> +	sgs = req->src;
+> +	while (sgs) {
+> +		if (!IS_ALIGNED(sgs->offset, sizeof(u32))) {
+> +			return true;
+> +		}
+> +		if (sgs->length % 16) {
 
----8<---
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Date: Thu, 3 Mar 2022 11:54:07 +0000
-Subject: [PATCH] crypto: qat - drop priority of algorithms
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Can this be relaxed to check for alignment to 4 rather than 16?  That's
+the requirement for programming the registers.
 
-The implementations of aead and skcipher in the QAT driver are not
-properly supporting requests with the CRYPTO_TFM_REQ_MAY_BACKLOG flag set.
-If the HW queue is full, the driver returns -EBUSY but does not enqueue
-the request.
-This can result in applications like dm-crypt waiting indefinitely for a
-completion of a request that was never submitted to the hardware.
-
-To mitigate this problem, reduce the priority of all skcipher and aead
-implementations in the QAT driver so they are not used by default.
-
-This patch deviates from the original upstream solution, that prevents
-dm-crypt to use drivers registered with the flag
-CRYPTO_ALG_ALLOCATES_MEMORY, since a backport of that set to stable
-kernels may have a too wide effect.
-
-commit 7bcb2c99f8ed032cfb3f5596b4dccac6b1f501df upstream
-commit 2eb27c11937ee9984c04b75d213a737291c5f58c upstream
-commit fbb6cda44190d72aa5199d728797aabc6d2ed816 upstream
-commit b8aa7dc5c7535f9abfca4bceb0ade9ee10cf5f54 upstream
-commit cd74693870fb748d812867ba49af733d689a3604 upstream
-
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 6b8ad3d67481..a5c28a08fd8c 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -1274,7 +1274,7 @@ static struct aead_alg qat_aeads[] = { {
- 	.base = {
- 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
- 		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
--		.cra_priority = 4001,
-+		.cra_priority = 1,
- 		.cra_flags = CRYPTO_ALG_ASYNC,
- 		.cra_blocksize = AES_BLOCK_SIZE,
- 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-@@ -1291,7 +1291,7 @@ static struct aead_alg qat_aeads[] = { {
- 	.base = {
- 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
- 		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
--		.cra_priority = 4001,
-+		.cra_priority = 1,
- 		.cra_flags = CRYPTO_ALG_ASYNC,
- 		.cra_blocksize = AES_BLOCK_SIZE,
- 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-@@ -1308,7 +1308,7 @@ static struct aead_alg qat_aeads[] = { {
- 	.base = {
- 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
- 		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
--		.cra_priority = 4001,
-+		.cra_priority = 1,
- 		.cra_flags = CRYPTO_ALG_ASYNC,
- 		.cra_blocksize = AES_BLOCK_SIZE,
- 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
-@@ -1326,7 +1326,7 @@ static struct aead_alg qat_aeads[] = { {
- static struct crypto_alg qat_algs[] = { {
- 	.cra_name = "cbc(aes)",
- 	.cra_driver_name = "qat_aes_cbc",
--	.cra_priority = 4001,
-+	.cra_priority = 1,
- 	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize = AES_BLOCK_SIZE,
- 	.cra_ctxsize = sizeof(struct qat_alg_ablkcipher_ctx),
-@@ -1348,7 +1348,7 @@ static struct crypto_alg qat_algs[] = { {
- }, {
- 	.cra_name = "ctr(aes)",
- 	.cra_driver_name = "qat_aes_ctr",
--	.cra_priority = 4001,
-+	.cra_priority = 1,
- 	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize = 1,
- 	.cra_ctxsize = sizeof(struct qat_alg_ablkcipher_ctx),
-@@ -1370,7 +1370,7 @@ static struct crypto_alg qat_algs[] = { {
- }, {
- 	.cra_name = "xts(aes)",
- 	.cra_driver_name = "qat_aes_xts",
--	.cra_priority = 4001,
-+	.cra_priority = 1,
- 	.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
- 	.cra_blocksize = AES_BLOCK_SIZE,
- 	.cra_ctxsize = sizeof(struct qat_alg_ablkcipher_ctx),
-
-base-commit: 866ae42cf4788c8b18de6bda0a522362702861d7
--- 
-2.35.1
-
+But I think this check is wrong in general as it doesn't account for
+cryptlen; with fscrypt I'm seeing sgs->length == 255 but cryptlen == 16
+so the hardware can be used but at the moment the fallback path is
+triggered.
