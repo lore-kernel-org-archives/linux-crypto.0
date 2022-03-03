@@ -2,96 +2,225 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6534FC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 12:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC48C4321E
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 12:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233344AbiCCMgK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 07:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47366 "EHLO
+        id S233372AbiCCMih (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 07:38:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230202AbiCCMgJ (ORCPT
+        with ESMTP id S232047AbiCCMig (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 07:36:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01E317AED8
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 04:35:23 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 882B46195D
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 12:35:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33949C004E1;
-        Thu,  3 Mar 2022 12:35:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646310922;
-        bh=MwDLPcO1Ocp7QjMOHMDw33bbS0SqixUvjnBHcbbCEUg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cWBLz87Z0hSBQK18GhI/3lgmhYAK8lelFaAt3OwtAFPH/MG4yKa6WdhsHAn8p6pd+
-         GIj+nq9XyIBz5nCkp+So1N3cN4fdVN3U/QTfSuCwP81oOYCKrkjNZolXMOaOcUBfmg
-         pUR0GIAnMSq7ocMAo6qyn9ImBrnJaXr8FlZxJcvzzFGkNDVf0rcxcL/ZGSGVcZMBHp
-         8R6Pn7wIGrtxDUCnISU8jXsD5el9UsacfMyr/4EVsAsgDeyuX9dc0pGXjZ3CsE/HBx
-         47NCxfTIIfP6PKuHyMpF7QThVIgZldHJMGZbdzdhKCW7/FlC64p5yKj1dmHWgbtyia
-         43Vm8PY/hRoHg==
-Date:   Thu, 3 Mar 2022 12:35:17 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH] arm64: crypto: Don't allow v8.2 extensions to be used
- with BROKEN_GAS_INST
-Message-ID: <YiC2Be4/vo9y51Z8@sirena.org.uk>
-References: <20220302165438.1140256-1-broonie@kernel.org>
- <CAMj1kXHhTNsB8V=4LNMqSXrAWXroHHNXzjS0xWERboG7a3G-Lg@mail.gmail.com>
- <87y21r1e2b.wl-maz@kernel.org>
+        Thu, 3 Mar 2022 07:38:36 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179C340A1E;
+        Thu,  3 Mar 2022 04:37:48 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id z2so4410135plg.8;
+        Thu, 03 Mar 2022 04:37:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=FF/MJjppdIPbLAPuX69GDDcuetlfqDD+38vpsQJKjV4=;
+        b=bORDDPjE3HJ8Q+lkuHUI9YXm2z2OfuiHyYo73LjCVUqKH+mzapaLyTx7j6vUSzodyH
+         H1fbBW3W0VvnP5bKsE/Cw0qa3UKie6z+yV023jD/NJPLY9kKDIxXXIT7NvpcVUCfUtIs
+         KFg6MVSLFINqOtsOfPJChC2DDL1HsjgJIQ8T87wI93Fz/8cIhc43z3LdnIXEJu5YqpzN
+         mnmxIpvlp/TKF5EWx4k9hHupAU2T1e2iVIXLRuFiSvdgN4U8XMzx7dalBaWhuU90/nq+
+         yD0rNidPjh7VKui8oE8v/Ywp+ZPTs/OvJCCqJBXBdG8sdbvMpiVPMu/2SHGpauCCE/Ok
+         XUow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FF/MJjppdIPbLAPuX69GDDcuetlfqDD+38vpsQJKjV4=;
+        b=5nmLDPdt4158KChLD7ZNId285UqdJIJg11uAueR32aF7hOqlaYWbUvnmXZpM/JktUK
+         1qvgKYbYiTRkWHI5gTGarJSXkv/BPsY02qYjIyaKu5D1VoFhfQK3OfOvvBA1mitkp1pl
+         PHdB5t5bp1FMJUVOAH0K8EpBEK1rG15MNH4CTtmiib6Vw4Pr7eykcIDH7EDZNF9GTY6z
+         II2zykestbe6hJIjCaKLuZLX/2vbbnq4OYS/ayY74gRe/rgTtqZBgMurHZQMjy38p/aF
+         qArR0GkBo8iuzNewabyxKOYNjpfwJ8HcLGIyXlRseL3hv363FaX+5Gl48VoKpzYF3kmL
+         oM/A==
+X-Gm-Message-State: AOAM530wAj2kNlYNbl2xdlwDu3GliNRaOBAj8yqWQoWLLlVxSGhp9Yd4
+        BQspS3STPlljfAwrfky5Csc=
+X-Google-Smtp-Source: ABdhPJwaQutGx29a4puPWhBgOBT74prgxxfsvHgGuVwO/yqGuQ+dVL8XCd59bWLeDERLYwR3js66yQ==
+X-Received: by 2002:a17:903:22d0:b0:151:97f5:db54 with SMTP id y16-20020a17090322d000b0015197f5db54mr7837971plg.58.1646311068298;
+        Thu, 03 Mar 2022 04:37:48 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id t7-20020a17090a024700b001bf12386db4sm1483030pje.47.2022.03.03.04.37.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 04:37:47 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     david.laight@aculab.com
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        gustavo@embeddedor.com, h.j.bos@vu.nl,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 20:37:18 +0800
+Message-Id: <20220303123718.12426-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <2d208771c50b4c6db4f43039e9d62851@AcuMS.aculab.com>
+References: <2d208771c50b4c6db4f43039e9d62851@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="wZ3mfu1XPtsV0i4b"
-Content-Disposition: inline
-In-Reply-To: <87y21r1e2b.wl-maz@kernel.org>
-X-Cookie: Password:
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+> From: Xiaomeng Tong
+> > Sent: 03 March 2022 07:27
+> > 
+> > On Thu, 3 Mar 2022 04:58:23 +0000, David Laight wrote:
+> > > on 3 Mar 2022 10:27:29 +0800, Xiaomeng Tong wrote:
+> > > > The problem is the mis-use of iterator outside the loop on exit, and
+> > > > the iterator will be the HEAD's container_of pointer which pointers
+> > > > to a type-confused struct. Sidenote: The *mis-use* here refers to
+> > > > mistakely access to other members of the struct, instead of the
+> > > > list_head member which acutally is the valid HEAD.
+> > >
+> > > The problem is that the HEAD's container_of pointer should never
+> > > be calculated at all.
+> > > This is what is fundamentally broken about the current definition.
+> > 
+> > Yes, the rule is "the HEAD's container_of pointer should never be
+> > calculated at all outside the loop", but how do you make sure everyone
+> > follows this rule?
+> > Everyone makes mistakes, but we can eliminate them all from the beginning
+> > with the help of compiler which can catch such use-after-loop things.
+> > 
+> > > > IOW, you would dereference a (NULL + offset_of_member) address here.
+> > >
+> > >Where?
+> > 
+> > In the case where a developer do not follows the above rule, and mistakely
+> > access a non-list-head member of the HEAD's container_of pointer outside
+> > the loop. For example:
+> >     struct req{
+> >       int a;
+> >       struct list_head h;
+> >     }
+> >     struct req *r;
+> >     list_for_each_entry(r, HEAD, h) {
+> >       if (r->a == 0x10)
+> >         break;
+> >     }
+> >     // the developer made a mistake: he didn't take this situation into
+> >     // account where all entries in the list are *r->a != 0x10*, and now
+> >     // the r is the HEAD's container_of pointer.
+> >     r->a = 0x20;
+> > Thus the "r->a = 0x20" would dereference a (NULL + offset_of_member)
+> > address here.
+> 
+> That is just a bug.
+> No different to failing to check anything else might 'return'
+> a NULL pointer.
 
---wZ3mfu1XPtsV0i4b
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yes, but it‘s a mistake everyone has made and will make, we should avoid
+this at the beginning with the help of compiler.
 
-On Thu, Mar 03, 2022 at 11:16:28AM +0000, Marc Zyngier wrote:
+> Because it is a NULL dereference you find out pretty quickly.
 
-> Indeed. The only case where the broken GAS .inst has hit us was in
-> combination with alternatives (see eb7c11ee3c5c for details). The
-> encoding itself is always correct, and it is only the label generation
-> that was broken. If we were affected by this, the kernel would simply
-> fail to build with these toolchains.
+AFAIK，NULL dereference is a undefined bahavior, can compiler quickly
+catch it? Or it can only be applied to some simple/restricted cases.
 
-> If this ever happens (because we'd add some extra alternative
-> sequences to the crypto code?), we can revisit this. But in the
-> meantime, I don't see anything warranting this extra dependency.
+> The existing loop leaves you with a valid pointer to something
+> that isn't a list item.
+> 
+> > > > Please remind me if i missed something, thanks.
+> > > >
+> > > > Can you share your "alternative definitions" details? thanks!
+> > >
+> > > The loop should probably use as extra variable that points
+> > > to the 'list node' in the next structure.
+> > > Something like:
+> > > 	for (xxx *iter = head->next;
+> > > 		iter == &head ? ((item = NULL),0) : ((item = list_item(iter),1));
+> > > 		iter = item->member->next) {
+> > > 	   ...
+> > > With a bit of casting you can use 'item' to hold 'iter'.
+> > 
+> > you still can not make sure everyone follows this rule:
+> > "do not use iterator outside the loop" without the help of compiler,
+> > because item is declared outside the loop.
+> 
+> That one has 'iter' defined in the loop.
 
-Ah, in that case the SVE code should be fine too and there's no issue
-with either.  I'd understood the issue to be with the actual instruction
-encoding.
+Oh, sorry, I misunderstood. Then this is the same way with my way of
+list_for_each_entry_inside(pos, type, head, member), which declare
+the iterator inside the loop.
+You go further and make things like "&pos->member == (head)" goes away
+to avoid calculate the HEAD's container_of pointer, although the
+calculation is harmless.
 
---wZ3mfu1XPtsV0i4b
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > BTW, to avoid ambiguity，the "alternative definitions" here i asked is
+> > something from you in this context:
+> > "OTOH there may be alternative definitions that can be used to get
+> > the compiler (or other compiler-like tools) to detect broken code.
+> > Even if the definition can't possibly generate a working kerrnel."
+> 
+> I was thinking of something like:
+> 	if ((pos = list_first)), 1) pos = NULL else
+> so that unchecked dereferences after the loop will be detectable
+> as NULL pointer offsets - but that in itself isn't enough to avoid
+> other warnings.
+> 
 
------BEGIN PGP SIGNATURE-----
+Do you mean put this right after the loop (I changed somthing that i
+do not understand, please correct me if i am worng, thanks):
+       if (pos == list_first) pos = NULL; else
+and compiler can detect the following NULL derefernce?
+But if the NULL derefernce is just right after the loop originally,
+it will be masked by the *else* keyword。
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIgtgUACgkQJNaLcl1U
-h9ClFQf+JOwIfwI3NV/+kxTUaYpHaafyj0zMiec+gqHkcG3v0aqCKUMJ/P9ky/rw
-ZAUncu2aekMm4bCrGKhJPxtAvLSOZdcAu2tFwBARFz4hbXWksezYxePv5rpnrcy8
-t6O+tc1oGQmaoqjas1XbMSkxkg8WxNVkeIMQDShwhtnamxa2Sxj7LtFRK+W73WQC
-kf9OIK9UzqbC4dpG1tgXLJaYQH0RBwPBlghA8dSNwXqeNK8JgL9UvjwQuEpqC45H
-func/j2M4J3s2mCIzzqDQerDRf3JqYQFeJLEQbepuFHGvHLWp6/Eu9eCP6tLrxer
-eHhl7MTDtSFvhC185naNBHGeG+43PA==
-=rBcZ
------END PGP SIGNATURE-----
+> > > > The "list_for_each_entry_inside(pos, type, head, member)" way makes
+> > > > the iterator invisiable outside the loop, and would be catched by
+> > > > compiler if use-after-loop things happened.
+> > 
+> > > It is also a compete PITA for anything doing a search.
+> > 
+> > You mean it would be a burden on search? can you show me some examples?
+> 
+> The whole business of having to save the pointer to the located item
+> before breaking the loop, remembering to have set it to NULL earlier etc.
 
---wZ3mfu1XPtsV0i4b--
+Ok, i see. And then you need pass a "item" to the list_for_each_entry macro
+as a new argument.
+
+> 
+> It is so much better if you can just do:
+> 		if (found)
+> 			break;
+> 
+> 	David
+
+this confused me. this way is better or the "save the pointer to the located item
+before breaking the loop" one?
+
+--
+Xiaomeng Tong
