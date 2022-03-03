@@ -2,128 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8955C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 02:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6751C4321E
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 02:28:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbiCCCCq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Mar 2022 21:02:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
+        id S231782AbiCCC2l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 2 Mar 2022 21:28:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231575AbiCCCCp (ORCPT
+        with ESMTP id S231743AbiCCC2i (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Mar 2022 21:02:45 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8FC38AB
-        for <linux-crypto@vger.kernel.org>; Wed,  2 Mar 2022 18:02:00 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id p8so3519004pfh.8
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Mar 2022 18:02:00 -0800 (PST)
+        Wed, 2 Mar 2022 21:28:38 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B340D10FC6;
+        Wed,  2 Mar 2022 18:27:53 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso6464723pjj.2;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8cIobXUGos4eqS6yTcZeG6b/dnVbjGhFoz3W2ZVDn2s=;
-        b=pleEBLa8m2cMQ+1uDstwD0gO1ujAkJC8w7JX+czCrNwEkcW9bkeKolv4JBH2kbWED1
-         oHA/3CKBiHmeMxHnnzeho4c/9sIh/mPhWU5exgMIHWstHaWw/xYA+XiYWebJr8xjaqsg
-         X7Si2rizZdoIr2D8a5142aKNXUXUfrDG6qOQpPR+zcyq5HKDO5kNSDJcG757SjEZNu/B
-         OcjGbnDzxHJBTOpukLJBNgGO0SXAX0M63wQbM7cp4tWZ4iNueL8g9NFR6DnvtSOlt1Vo
-         IYQ3PsOFmEdcbEuVEqI3HQ87cWES8Rsvp2cWgNCeentZUMnAE8y613pJBOVE6vVSBfjl
-         WG9Q==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=qBGtve+IuFrAkJa+gsN1WQjHRs2fvQkSK1D44BenBKAqsyswWIPF49CjeAw6Lc/Xiz
+         7VY9uX10GWOeYOq3Roffx9lK59MGCnSnWmLkHD6Zz3XGADMqQbIXFAspvzlfyt7tl87F
+         C44YITS/y0gKUKqqxM42VKL4jH/Xx4KasojD++jZOWXtcwkx1m//DlSoFwhQEbp4i/NS
+         eGEaCL2abI9d2Qo/vgVE47lljuFHl9RIsYb9haWI9DYl1+oIMHXMK3O9uyeK26H4D1AX
+         Jy4saNgfSyFkb5FP8pbKE6ds3BSqIpGBCoZu+qijzq/vfSl1dGYXTnehjmH9/ySByi+z
+         BIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8cIobXUGos4eqS6yTcZeG6b/dnVbjGhFoz3W2ZVDn2s=;
-        b=WBG09mYXCjikctLwB6Rlu4C5xXlWmaCaO6/uFux1Dz+uox5gJr7aWeCVxhcZdQ5f90
-         iJbpeBRMOporn45JDa/UNxc1jC8BxxoWon+bqq2ZIAmc66t1/9XMvsX1O0fYNZud3bSY
-         /y9kImU9hqVtOm9ekKUaQQqoGmqduF6OYZy64iIJgfxJniJaxTkuTn7qN416yy/7XK7l
-         JxUjeoIAxR0kSGyQCNP1Ny0a8fefpVi22ZQjGoQJK/xDi6uBeHfYYG4dmF+cjuRlMLzY
-         RlUr5koMF2OHiKQ8mGPmAVjIlG29cUxEAMtPDBIPdlkis6vdyJVLknbbOguhWc56ebMz
-         3gbQ==
-X-Gm-Message-State: AOAM532rrfxgdjzGxrNEkBhYB/JQgVpIiTpKC1gf/5SNjbrsLrMc6mQo
-        DXnrQ7koQU+bF7bIuRU/LR55VA==
-X-Google-Smtp-Source: ABdhPJwRB/dmHAgWApB90i9J8EAZVtuLSwQQucQk9VP2MLtTU7Q5qC6rx8boQVavL1CF4KOQf6x0Tg==
-X-Received: by 2002:a63:914a:0:b0:36c:70c9:8057 with SMTP id l71-20020a63914a000000b0036c70c98057mr28260012pge.597.1646272920429;
-        Wed, 02 Mar 2022 18:02:00 -0800 (PST)
-Received: from [10.76.15.169] ([61.120.150.76])
-        by smtp.gmail.com with ESMTPSA id g15-20020a056a0023cf00b004e17e11cb17sm474850pfc.111.2022.03.02.18.01.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 18:01:59 -0800 (PST)
-Subject: Re: Re: [PATCH v3 0/4] Introduce akcipher service for virtio-crypto
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     arei.gonglei@huawei.com, mst@redhat.com, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, helei.sig11@bytedance.com
-References: <20220302033917.1295334-1-pizhenwei@bytedance.com>
- <Yh/WUSBesj/tRncT@gmail.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-Message-ID: <9bb1446c-2ae2-09b0-e7fe-4643567542d1@bytedance.com>
-Date:   Thu, 3 Mar 2022 09:59:06 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <Yh/WUSBesj/tRncT@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=C6016/38QKZUQAyk5HMPjenTvm42Pe8sPBzTcqL5vmY=;
+        b=CzJtZPcuhcWcftaDgdBMfTH8+c9EoS3XmQ505LWS57kdN7/Y7hxiGiFhGCtkVhWR4n
+         9QiYMg9DgjK+2U+OgCUW8Ihc/Zsz1tArsI+VPvsbHeizYXBDN8PT/Evowom4DSVx5ZKW
+         SbKPrObrC5eMgExacIP+ZPEND4qx5Us+NJQ0WRDXPRpYk5m/o2sqMuwebEko7dN7/HEk
+         eAq5ky/UWz0+SWqk5EOcM1gkci5Yts4Pn4Ct+p/tQQvAT2EONElmTfre57WvwdfOJKPi
+         0JSo3Tr1FuDqKJWi6MM1A+v0Yqa4E2WoDAES5x9cgi/rm9pPbPuEvHVBoD12sn5e/d+j
+         6agg==
+X-Gm-Message-State: AOAM531YwoKciGKl5/xB3iguH9sB6KyY7W/Y8igN4n9GDfpUTuo8ZSvU
+        LuwF03lr62QEMLGgZKYD3hLDUsWYyg5BSQ==
+X-Google-Smtp-Source: ABdhPJwdGKGtPoJbq9KB0b78P8kOQOqlHazHAUCZQHvA6TzNHcldJErwW75BUHOqmaVxrll88UvLqQ==
+X-Received: by 2002:a17:902:ec90:b0:151:a632:7ebb with SMTP id x16-20020a170902ec9000b00151a6327ebbmr1936164plg.154.1646274473191;
+        Wed, 02 Mar 2022 18:27:53 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id d15-20020a17090ab30f00b001b8e65326b3sm359822pjr.9.2022.03.02.18.27.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 18:27:52 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     david.laight@aculab.com
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        gustavo@embeddedor.com, h.j.bos@vu.nl,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 10:27:29 +0800
+Message-Id: <20220303022729.9321-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+References: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/3/22 4:40 AM, Eric Biggers wrote:
-> On Wed, Mar 02, 2022 at 11:39:13AM +0800, zhenwei pi wrote:
->> v2 -> v3:
->>    Rename virtio_crypto_algs.c to virtio_crypto_skcipher_algs.c, and
->>      minor changes of function name.
->>    Minor changes in virtio_crypto_akcipher_algs.c: no need to copy from
->>      buffer if opcode is verify.
->>
->> v1 -> v2:
->>    Fix 1 compiling warning reported by kernel test robot <lkp@intel.com>
->>    Put "__le32 akcipher_algo;" instead of "__le32 reserve;" field of
->>      struct virtio_crypto_config directly without size change.
->>    Add padding in struct virtio_crypto_ecdsa_session_para to keep
->>      64-bit alignment.
->>    Remove irrelevant change by code format alignment.
->>
->>    Also CC crypto gurus Herbert and linux-crypto@vger.kernel.org.
->>
->>    Test with QEMU(patched by the v2 version), works fine.
->>
->> v1:
->>    Introduce akcipher service, implement RSA algorithm, and a minor fix.
->>
->> zhenwei pi (4):
->>    virtio_crypto: Introduce VIRTIO_CRYPTO_NOSPC
->>    virtio-crypto: introduce akcipher service
->>    virtio-crypto: implement RSA algorithm
->>    virtio-crypto: rename skcipher algs
->>
->>   drivers/crypto/virtio/Makefile                |   3 +-
->>   .../virtio/virtio_crypto_akcipher_algs.c      | 585 ++++++++++++++++++
->>   drivers/crypto/virtio/virtio_crypto_common.h  |   7 +-
->>   drivers/crypto/virtio/virtio_crypto_core.c    |   6 +-
->>   drivers/crypto/virtio/virtio_crypto_mgr.c     |  15 +-
->>   ...o_algs.c => virtio_crypto_skcipher_algs.c} |   4 +-
->>   include/uapi/linux/virtio_crypto.h            |  82 ++-
->>   7 files changed, 693 insertions(+), 9 deletions(-)
->>   create mode 100644 drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->>   rename drivers/crypto/virtio/{virtio_crypto_algs.c => virtio_crypto_skcipher_algs.c} (99%)
-> 
-> Why is this patchset useful?  That isn't explained anywhere.
-> 
-> - Eric
-> 
-Sorry about this missing part.
+On Wed, 2 Mar 2022 14:04:06 +0000, David Laight
+<David.Laight@ACULAB.COM> wrote:
+> I think that it would be better to make any alternate loop macro
+> just set the variable to NULL on the loop exit.
+> That is easier to code for and the compiler might be persuaded to
+> not redo the test.
 
-This feature provides akcipher service offloading capability for guest 
-side. And I also sent a patchset of QEMU:
-https://patchwork.kernel.org/project/qemu-devel/cover/20220211084335.1254281-1-pizhenwei@bytedance.com/
+No, that would lead to a NULL dereference.
 
-The two patchsets work together, guest side sends 
-encrypt/decrypt/sign/verify requests to host side, host side handles 
-request and return response to the guest.
+The problem is the mis-use of iterator outside the loop on exit, and
+the iterator will be the HEAD's container_of pointer which pointers
+to a type-confused struct. Sidenote: The *mis-use* here refers to
+mistakely access to other members of the struct, instead of the
+list_head member which acutally is the valid HEAD.
 
--- 
-zhenwei pi
+IOW, you would dereference a (NULL + offset_of_member) address here.
+
+Please remind me if i missed something, thanks.
+
+> OTOH there may be alternative definitions that can be used to get
+> the compiler (or other compiler-like tools) to detect broken code.
+> Even if the definition can't possibly generate a working kerrnel.
+
+The "list_for_each_entry_inside(pos, type, head, member)" way makes
+the iterator invisiable outside the loop, and would be catched by
+compiler if use-after-loop things happened.
+
+Can you share your "alternative definitions" details? thanks!
+
+--
+Xiaomeng Tong
