@@ -2,141 +2,207 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40009C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 19:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 253CCC433FE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Mar 2022 19:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbiCCTzu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Mar 2022 14:55:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46262 "EHLO
+        id S235957AbiCCUAY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 3 Mar 2022 15:00:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235269AbiCCTzu (ORCPT
+        with ESMTP id S235927AbiCCUAX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Mar 2022 14:55:50 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C01ED18A794
-        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 11:55:03 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id j17so9545002wrc.0
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Mar 2022 11:55:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=zsIbz0/b386hU/ZdkOSBubB6mU+6IwbbmnEE1Ycu+MY=;
-        b=P2/lLp3fpnzXDyB/a8TOfUWFAEABVhPQyw4vrBIqcCPNSqVsh75hfUEo7ksNNW/Lcb
-         ORQN/swrL9IYwChFBbsy08B20shjCFURo9fA0UgjDt75cIZKeskIDctWDweIMszbiF6m
-         3+nmbWDgvuxmybGFmrYHRHpPTjZCB/qljmJZ3vd6zWuX2A0yZ1UHZY77KScrPe2Ub+16
-         4cEBAP5AxkTO00SGIVZ8/zdzMBBN5llAfSpc1JftBSSCtowCDLpqBx1t2zciHAwnwV+W
-         7sLq/+PwEBc8tt8f0vczCDQUcL29TKHITgigXYDaIVbTLoXTERVs1vX0tt/vf35T8kAu
-         f+tw==
+        Thu, 3 Mar 2022 15:00:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0739C1A39FB
+        for <linux-crypto@vger.kernel.org>; Thu,  3 Mar 2022 11:59:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646337575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KII+3wpRDYxBkpQXpVqXMzOFERtKv6nriOIaVlE+FgA=;
+        b=e4la4o4F/CjnnmOTc5nyzmdjBuqpUZ+5F6CatK2llCme4+kY09mVePKVS0/q8PWZpL9l/V
+        b6zCIwEduD9TJBD4JVuxJ/1/LCG4Ad5wrvy8t5o5JDSk0KBVxTcthzwcG/k2vNwqO2aFbk
+        UYqCcfjzhW7FZ9PWV2kzyPwvploMVlA=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-201-BELEdJ2cN8q7lHbiGQOjdQ-1; Thu, 03 Mar 2022 14:59:33 -0500
+X-MC-Unique: BELEdJ2cN8q7lHbiGQOjdQ-1
+Received: by mail-oo1-f71.google.com with SMTP id r10-20020a4a700a000000b0031bf70c4866so4203610ooc.12
+        for <linux-crypto@vger.kernel.org>; Thu, 03 Mar 2022 11:59:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=zsIbz0/b386hU/ZdkOSBubB6mU+6IwbbmnEE1Ycu+MY=;
-        b=xAs7GJK5WDYuGIRBOaoeqNZwLhqe3OiwzoB93RUE0/XOn11Xfx96YAC3DflA+kLae/
-         BqEN+UWotjUW1NpsT+LVtoj8cyH/X2SV/iXkuuJOHVBcHzsOebFCN27//g5eRXPBoBnW
-         3tHtsu0EAZFZBtRT92ua/OTJaBHnV67k6fo1GFRBq5AyGqrvLRixnioHpDynTHzgmCIZ
-         MCFawqUslFpL4L8xsMgpbKC8sdpoezVxXiS7JR+VFgrZj+Fm2BvjzkbjWL/69JvVs/4C
-         KE4jNs5Cadq7YmpujhOXAuTG9uLXIOqIDqsCiZw+VTbKzQFuSeXbRVsDYIPVxu5gWe0L
-         sZrg==
-X-Gm-Message-State: AOAM53172/BHhzVEoDErKe4xLHonzAROMZ+oSEOFLqVaIkZtHy+J3TQC
-        lrOrosOfafZI8yk7HzilZZwxnw==
-X-Google-Smtp-Source: ABdhPJwSAaV6ui1w2AUfj/WG1jEQ2FypYIkPGjDYhD/nRjjjEqPVDKL8xOYDM+Z1Oa9dFUUITZz1Yw==
-X-Received: by 2002:a5d:5407:0:b0:1f0:1246:5a8c with SMTP id g7-20020a5d5407000000b001f012465a8cmr10294116wrv.193.1646337302326;
-        Thu, 03 Mar 2022 11:55:02 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id x2-20020a7bc762000000b00380fd1ba4ebsm16466518wmk.9.2022.03.03.11.55.01
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=KII+3wpRDYxBkpQXpVqXMzOFERtKv6nriOIaVlE+FgA=;
+        b=HRKrn/ujntpOy6gOmp3FoJGdnK6R7h9vjjSUXW08SkiKk0amtxRl4lvhZxuTGN4Jeo
+         prRmJVs/E1oYRdwpykSRJFI+V/oUpBKIPHtTHLAZMQA1hiAxHcyW9hlkOed0mEjM517p
+         n9T2Iafs8JbT3tV1aJJhduGiW5iWjq7nEyMkIm4iQHLgSJKbhpc2ib94H0P6C/9+Sjpv
+         muSe6kDX8nDFVqd0bl1FrR7+fL6qgvY8k9wyotk3ed1CSkL5jW62TfP+6QXjNInyJ09d
+         OMtZHoGbuD58RDSds1XEbg+DmxpY7bwHE/emfgT5XTlQhKMKc601sWscwmPjJ5aAF/gZ
+         QQbQ==
+X-Gm-Message-State: AOAM5325VB3rfiw+n2VGBfvmc447srx2BBqXuL8mPKRwIM4sAq35irew
+        rgSmsySPjeNeBvhVchZG1MeIfTjjnB3oXrVMI6lUxjm/b43dO2yHC5Hd+eBWyZEvN78nI9EzeLO
+        cgL55HlFcQd/KV3jzjdU6mUyE
+X-Received: by 2002:a4a:c719:0:b0:2eb:c34a:2ba7 with SMTP id n25-20020a4ac719000000b002ebc34a2ba7mr19498055ooq.98.1646337573201;
+        Thu, 03 Mar 2022 11:59:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz6XTO+OhibXSv5NZahUVm0cq34tr89yXWaoMFB6Fqiab+SUFF3Phx50x9lVSIdc9AfUbbmhg==
+X-Received: by 2002:a4a:c719:0:b0:2eb:c34a:2ba7 with SMTP id n25-20020a4ac719000000b002ebc34a2ba7mr19498041ooq.98.1646337572985;
+        Thu, 03 Mar 2022 11:59:32 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u21-20020a056870951500b000d9b9ac69cdsm901630oal.1.2022.03.03.11.59.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Mar 2022 11:55:01 -0800 (PST)
-Date:   Thu, 3 Mar 2022 20:54:58 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     John Keeping <john@metanate.com>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v2 06/18] crypto: rockchip: add fallback for cipher
-Message-ID: <YiEdEoX79kDp8kUY@Red>
-References: <20220302211113.4003816-1-clabbe@baylibre.com>
- <20220302211113.4003816-7-clabbe@baylibre.com>
- <YiDO8Tt9Lhx530Oz@donbot>
+        Thu, 03 Mar 2022 11:59:32 -0800 (PST)
+Date:   Thu, 3 Mar 2022 12:59:30 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v7 07/10] vfio: Extend the device migration protocol
+ with PRE_COPY
+Message-ID: <20220303125930.43d9940b.alex.williamson@redhat.com>
+In-Reply-To: <0cee64d555624e669028ba17d04b8737@huawei.com>
+References: <20220302172903.1995-1-shameerali.kolothum.thodi@huawei.com>
+        <20220302172903.1995-8-shameerali.kolothum.thodi@huawei.com>
+        <20220302133159.3c803f56.alex.williamson@redhat.com>
+        <20220303000528.GW219866@nvidia.com>
+        <20220302204752.71ea8b32.alex.williamson@redhat.com>
+        <20220303130124.GX219866@nvidia.com>
+        <20220303082040.1f88e24c.alex.williamson@redhat.com>
+        <0cee64d555624e669028ba17d04b8737@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YiDO8Tt9Lhx530Oz@donbot>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Thu, Mar 03, 2022 at 02:21:37PM +0000, John Keeping a écrit :
-> On Wed, Mar 02, 2022 at 09:11:01PM +0000, Corentin Labbe wrote:
-> > The hardware does not handle 0 size length request, let's add a
-> > fallback.
-> > Furthermore fallback will be used for all unaligned case the hardware
-> > cannot handle.
+On Thu, 3 Mar 2022 18:05:53 +0000
+Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+
+> > -----Original Message-----
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: 03 March 2022 15:21
+> > To: Jason Gunthorpe <jgg@nvidia.com>
+> > Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; cohuck@redhat.com;
+> > mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> > <prime.zeng@hisilicon.com>; Jonathan Cameron
+> > <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> > Subject: Re: [PATCH v7 07/10] vfio: Extend the device migration protocol with
+> > PRE_COPY
 > > 
-> > Fixes: ce0183cb6464b ("crypto: rockchip - switch to skcipher API")
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  drivers/crypto/rockchip/rk3288_crypto.h       |  2 +
-> >  .../crypto/rockchip/rk3288_crypto_skcipher.c  | 97 ++++++++++++++++---
-> >  2 files changed, 86 insertions(+), 13 deletions(-)
+> > On Thu, 3 Mar 2022 09:01:24 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Wed, Mar 02, 2022 at 08:47:52PM -0700, Alex Williamson wrote:  
+> > > > On Wed, 2 Mar 2022 20:05:28 -0400
+> > > > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> > > >  
+> > > > > On Wed, Mar 02, 2022 at 01:31:59PM -0700, Alex Williamson wrote:  
+> > > > > > > + * initial_bytes reflects the estimated remaining size of any
+> > > > > > > + initial mandatory
+> > > > > > > + * precopy data transfer. When initial_bytes returns as zero
+> > > > > > > + then the initial
+> > > > > > > + * phase of the precopy data is completed. Generally initial_bytes  
+> > should start  
+> > > > > > > + * out as approximately the entire device state.  
+> > > > > >
+> > > > > > What is "mandatory" intended to mean here?  The user isn't required  
+> > to  
+> > > > > > collect any data from the device in the PRE_COPY states.  
+> > > > >
+> > > > > If the data is split into initial,dirty,trailer then mandatory
+> > > > > means that first chunk.  
+> > > >
+> > > > But there's no requirement to read anything in PRE_COPY, so initial
+> > > > becomes indistinguishable from trailer and dirty doesn't exist.  
+> > >
+> > > It is still mandatory to read that data out, it doesn't matter if it
+> > > is read during PRE_COPY or STOP_COPY.  
 > > 
-> > diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-> > index c919d9a43a08..8b1e15d8ddc6 100644
-> > --- a/drivers/crypto/rockchip/rk3288_crypto.h
-> > +++ b/drivers/crypto/rockchip/rk3288_crypto.h
-> > @@ -246,10 +246,12 @@ struct rk_cipher_ctx {
-> >  	struct rk_crypto_info		*dev;
-> >  	unsigned int			keylen;
-> >  	u8				iv[AES_BLOCK_SIZE];
-> > +	struct crypto_skcipher *fallback_tfm;
-> >  };
-> >  
-> >  struct rk_cipher_rctx {
-> >  	u32				mode;
-> > +	struct skcipher_request fallback_req;   // keep at the end
-> >  };
-> >  
-> >  enum alg_type {
-> > diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-> > index bbd0bf52bf07..bf9d398cc54c 100644
-> > --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-> > +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-> > @@ -13,6 +13,63 @@
-> >  
-> >  #define RK_CRYPTO_DEC			BIT(0)
-> >  
-> > +static int rk_cipher_need_fallback(struct skcipher_request *req)
-> > +{
-> > +	struct scatterlist *sgs, *sgd;
-> > +
-> > +	if (!req->cryptlen)
-> > +		return true;
-> > +
-> > +	sgs = req->src;
-> > +	while (sgs) {
-> > +		if (!IS_ALIGNED(sgs->offset, sizeof(u32))) {
-> > +			return true;
-> > +		}
-> > +		if (sgs->length % 16) {
+> > Not really, PRE_COPY -> RUNNING is a valid arc.
+> >   
+> > > > > > "The vfio_precopy_info data structure returned by this ioctl
+> > > > > > provides  estimates of data available from the device during the  
+> > PRE_COPY states.  
+> > > > > >  This estimate is split into two categories, initial_bytes and
+> > > > > > dirty_bytes.
+> > > > > >
+> > > > > >  The initial_bytes field indicates the amount of static data
+> > > > > > available  from the device.  This field should have a non-zero initial  
+> > value and  
+> > > > > >  decrease as migration data is read from the device.  
+> > > > >
+> > > > > static isn't great either, how about just say 'minimum data available'  
+> > > >
+> > > > 'initial precopy data-set'?  
+> > >
+> > > Sure
+> > >  
+> > > > We have no basis to make that assertion.  We've agreed that precopy
+> > > > can be used for nothing more than a compatibility test, so we could
+> > > > have a vGPU with a massive framebuffer and no ability to provide
+> > > > dirty tracking implement precopy only to include the entire
+> > > > framebuffer in the trailing STOP_COPY data set.  Per my
+> > > > understanding and the fact that we cannot enforce any heuristics
+> > > > regarding the size of the tailer relative to the pre-copy data set,
+> > > > I think the above strongly phrased sentence is necessary to
+> > > > understand the limitations of what this ioctl is meant to convey.
+> > > > Thanks,  
+> > >
+> > > This is why abusing precopy for compatability is not a great idea. It
+> > > is OK for acc because its total state is tiny, but I would not agree
+> > > to a vGPU driver being merged working like you describe. It distorts
+> > > the entire purpose of PRE_COPY and this whole estimation mechanism.
+> > >
+> > > The ioctl is intended to convey when to switch to STOP_COPY, and the
+> > > driver should provide a semantic where the closer the reported length
+> > > is to 0 then the faster the STOP_COPY will go.  
+> > 
+> > If it's an abuse, then let's not do it.  It was never my impression or intention
+> > that this was ok for acc only due to the minimal trailing data size.  My
+> > statement was that use of PRE_COPY for compatibility testing only had been a
+> > previously agreed valid use case of the original migration interface.
+> > 
+> > Furthermore the acc driver was explicitly directed not to indicate any degree
+> > of trailing data size in dirty_bytes, so while trailing data may be small for acc,
+> > this interface is explicitly not intended to provide any indication of trailing
+> > data size.  Thanks,  
 > 
-> Can this be relaxed to check for alignment to 4 rather than 16?  That's
-> the requirement for programming the registers.
-
-No we cannot, the hardware could operate only one SG at a time, and the cipher operation need to be complete, so the length should be a multiple of AES_BLOCK_SIZE.
-The original driver already have this size check.
-But for DES/3DES this check is bad and should be 8, so a fix is needed anyway.
-
+> Just to clarify, so the suggestion here is not to use PRE_COPY for compatibility
+> check at all and have a different proper infrastructure for that later as Jason
+> suggested?
 > 
-> But I think this check is wrong in general as it doesn't account for
-> cryptlen; with fscrypt I'm seeing sgs->length == 255 but cryptlen == 16
-> so the hardware can be used but at the moment the fallback path is
-> triggered.
+> If so, I will remove this patch from this series and go back to the old revision
+> where we only have STOP_COPY and do the compatibility check during the final
+> load data operation.
 
-Yes, I need to check min(sg->length, cryptlen_remaining) instead.
-I will fix that.
+Hi Shameer,
 
-Thanks.
+I think NVIDIA has a company long weekend, so I'm not sure how quickly
+we'll hear a rebuttal from Jason, but at this point I'd rather not move
+forward with using PRE_COPY exclusively for compatibility testing if
+that is seen as an abuse of the interface, regardless of the size of
+the remaining STOP_COPY data.  It might be most expedient to respin
+without PRE_COPY and we'll revisit methods to perform early
+compatibility testing in the future.  Thanks,
+
+Alex
+
