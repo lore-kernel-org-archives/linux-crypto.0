@@ -2,127 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEECEC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 09:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E069C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 09:52:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239084AbiCDJn6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Mar 2022 04:43:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
+        id S231233AbiCDJxA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Mar 2022 04:53:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239254AbiCDJn4 (ORCPT
+        with ESMTP id S239313AbiCDJw7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Mar 2022 04:43:56 -0500
+        Fri, 4 Mar 2022 04:52:59 -0500
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1443F80235;
-        Fri,  4 Mar 2022 01:43:05 -0800 (PST)
-Received: from canpemm500005.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K92td3Bwbzdg4v;
-        Fri,  4 Mar 2022 17:41:45 +0800 (CST)
-Received: from [10.67.103.22] (10.67.103.22) by canpemm500005.china.huawei.com
- (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7636D979;
+        Fri,  4 Mar 2022 01:52:12 -0800 (PST)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K93576PYXzdgBy;
+        Fri,  4 Mar 2022 17:50:51 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Fri, 4 Mar 2022 17:52:10 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 4 Mar
- 2022 17:43:04 +0800
-Message-ID: <9ea8eabb-0581-dbc6-d7af-acd019173f7e@hisilicon.com>
-Date:   Fri, 4 Mar 2022 17:43:03 +0800
+ 2022 17:52:10 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>
+Subject: [PATCH] crypto: hisilicon/qm - fix memset during queues clearing
+Date:   Fri, 4 Mar 2022 17:46:47 +0800
+Message-ID: <20220304094647.6845-1-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH v8 7/9] crypto: hisilicon/qm: Set the VF QM state register
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-8-shameerali.kolothum.thodi@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20220303230131.2103-8-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.22]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500005.china.huawei.com (7.192.104.229)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> From: Longfang Liu <liulongfang@huawei.com>>
-> We use VF QM state register to record the status of the QM configuration
-> state. This will be used in the ACC migration driver to determine whether
-> we can safely save and restore the QM data.
-> 
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Due to that extra page addr is used as a qp error flag when the device
+resetting. So it not should to clear this qp flag in userspace.
 
-Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Best,
-Zhou
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 3b29c8993b8c..453390044181 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3840,7 +3840,7 @@ static void qm_clear_queues(struct hisi_qm *qm)
+ 
+ 	for (i = 0; i < qm->qp_num; i++) {
+ 		qp = &qm->qp_array[i];
+-		if (qp->is_resetting)
++		if (qp->is_in_kernel && qp->is_resetting)
+ 			memset(qp->qdma.va, 0, qp->qdma.size);
+ 	}
+ 
+-- 
+2.33.0
 
-> ---
->  drivers/crypto/hisilicon/qm.c | 8 ++++++++
->  include/linux/hisi_acc_qm.h   | 6 ++++++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index c88e013371af..6a8776db38b5 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -3492,6 +3492,12 @@ static void hisi_qm_pci_uninit(struct hisi_qm *qm)
->  	pci_disable_device(pdev);
->  }
->  
-> +static void hisi_qm_set_state(struct hisi_qm *qm, u8 state)
-> +{
-> +	if (qm->ver > QM_HW_V2 && qm->fun_type == QM_HW_VF)
-> +		writel(state, qm->io_base + QM_VF_STATE);
-> +}
-> +
->  /**
->   * hisi_qm_uninit() - Uninitialize qm.
->   * @qm: The qm needed uninit.
-> @@ -3520,6 +3526,7 @@ void hisi_qm_uninit(struct hisi_qm *qm)
->  		dma_free_coherent(dev, qm->qdma.size,
->  				  qm->qdma.va, qm->qdma.dma);
->  	}
-> +	hisi_qm_set_state(qm, QM_NOT_READY);
->  	up_write(&qm->qps_lock);
->  
->  	qm_irq_unregister(qm);
-> @@ -3745,6 +3752,7 @@ int hisi_qm_start(struct hisi_qm *qm)
->  	if (!ret)
->  		atomic_set(&qm->status.flags, QM_START);
->  
-> +	hisi_qm_set_state(qm, QM_READY);
->  err_unlock:
->  	up_write(&qm->qps_lock);
->  	return ret;
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 00f2a4db8723..177f7b7cd414 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -67,6 +67,7 @@
->  #define QM_DB_RAND_SHIFT_V2		16
->  #define QM_DB_INDEX_SHIFT_V2		32
->  #define QM_DB_PRIORITY_SHIFT_V2		48
-> +#define QM_VF_STATE			0x60
->  
->  /* qm cache */
->  #define QM_CACHE_CTL			0x100050
-> @@ -162,6 +163,11 @@ enum qm_debug_file {
->  	DEBUG_FILE_NUM,
->  };
->  
-> +enum qm_vf_state {
-> +	QM_READY = 0,
-> +	QM_NOT_READY,
-> +};
-> +
->  struct qm_dfx {
->  	atomic64_t err_irq_cnt;
->  	atomic64_t aeq_irq_cnt;
-> 
