@@ -2,195 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B06DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 15:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9845EC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 17:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240158AbiCDP3T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Mar 2022 10:29:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52468 "EHLO
+        id S238079AbiCDRvf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Mar 2022 12:51:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240103AbiCDP3R (ORCPT
+        with ESMTP id S236389AbiCDRvf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Mar 2022 10:29:17 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6FFE1B7609;
-        Fri,  4 Mar 2022 07:28:29 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 224ErmgO012060;
-        Fri, 4 Mar 2022 15:28:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=v5Se0jKm4CMv9uIVa6be0qCve1fQPCIql88P/RlscIA=;
- b=TRvzmKdRhjqQG5owYoA3iDZXDs8fOo4vA5+NtcI+bfol5C0RNiqHlufIkai16ejsDRPy
- 0zQ18peXmYR8jxR1c0sK8nBzRImmgWdaQBS9BZHNuhFh5qjhW9C50VKk6ZvAdMAenBIA
- 1WCHhsva/oe2qOqq4jzjV+PmBZhKjn43GrFuS/zEtLQzPvVxJdhaJMCWgfJNQ7SoLNOH
- bTikiOj6QK7wZJdd/hJxujVeil9aO385m7T/zlRPomqgs3fGKefUjWWcqbV1curyALyL
- 9bHN0bRp9XeWSMZG+vxR97NF/4PdHu3jXYAZPSzP1yHYzNtjGY/82EOXQd8x6/590SeW ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ekmxe0r2g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 15:28:15 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 224FMRHb004683;
-        Fri, 4 Mar 2022 15:28:14 GMT
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ekmxe0r28-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 15:28:14 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 224F3Vla026833;
-        Fri, 4 Mar 2022 15:28:13 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma04wdc.us.ibm.com with ESMTP id 3ek4kbdk9t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 04 Mar 2022 15:28:13 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 224FSCrJ32309540
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 4 Mar 2022 15:28:12 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2730228064;
-        Fri,  4 Mar 2022 15:28:12 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC07328059;
-        Fri,  4 Mar 2022 15:28:11 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri,  4 Mar 2022 15:28:11 +0000 (GMT)
-Message-ID: <47f3654e-892d-a35a-e77c-70ada1ebcf43@linux.ibm.com>
-Date:   Fri, 4 Mar 2022 10:28:11 -0500
+        Fri, 4 Mar 2022 12:51:35 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76FB1E1B54;
+        Fri,  4 Mar 2022 09:50:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646416247; x=1677952247;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8gdC/LTDrr4qcvIX6OPCBxrk+BVbgh5qgr9DkwVSOOU=;
+  b=npfMvh+m/Bj6va7xhfG5hWScX84tApKuC/3XDJdVQg8zrQrSmnv14uap
+   o9YTYj8pHtjQaT2A9dyaPPsvPhxC+V+szUBFYqfIDp0FolQA/c5bgiaZn
+   CEG1T0h7lbaYfpSbJ6KfhOwNrvNRLD6/FcdX7StJZkGBbs95Iu37IZTdo
+   1CVK5ETtDi+4WxtrotLivc+SlldPpw8ueKm0cwsGuoCo+zRogUTloMlFR
+   VqnRt2YBHgRawgjsC8+vB5p/g0a+/zku6XtHQIHhvCipMKPpr+gqDgCO0
+   eu9HRfRb2dGOKsv4kZqt0K10LAlfJ+R45+zHhVjCAHDZpw9mPp/qP07ix
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10276"; a="253755655"
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="253755655"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 09:50:47 -0800
+X-IronPort-AV: E=Sophos;i="5.90,155,1643702400"; 
+   d="scan'208";a="509047350"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2022 09:50:44 -0800
+Date:   Fri, 4 Mar 2022 17:50:38 +0000
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kyle Sanderson <kyle.leet@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <YiJRQQmSxA/fbm6P@silpixa00400314>
+References: <Yh9G7FyCLtsm2mFA@kroah.com>
+ <Yh9ZvLHuztwQCu0d@silpixa00400314>
+ <Yh+FpKuoyj3G16lK@kroah.com>
+ <Yh/vY4t3xnuoCW3Q@gondor.apana.org.au>
+ <Yh/yr6oB5yeOUErL@silpixa00400314>
+ <Yh/znCnZzWaL49+o@gondor.apana.org.au>
+ <YiDHT31ujlGdQEe/@silpixa00400314>
+ <YiEVPc2cd38AnLZB@gmail.com>
+ <YiEyGoHacN80FcOL@silpixa00400314>
+ <YiE21aPGG5DHwJvb@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 3/4] KEYS: CA link restriction
-Content-Language: en-US
-To:     Eric Snowberg <eric.snowberg@oracle.com>, zohar@linux.ibm.com,
-        jarkko@kernel.org, dhowells@redhat.com, dwmw2@infradead.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        jmorris@namei.org, serge@hallyn.com, nayna@linux.ibm.com,
-        mic@linux.microsoft.com, konrad.wilk@oracle.com,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
-References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
- <20220301173651.3435350-4-eric.snowberg@oracle.com>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20220301173651.3435350-4-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: RuNIIzeS8WIQ_TOMFwmjOBKOWyyIVYyO
-X-Proofpoint-GUID: h-ySz9CxSLuwNKm-arhd5Et2R_ciAJ8n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-04_06,2022-03-04_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- spamscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0
- suspectscore=0 impostorscore=0 bulkscore=0 mlxscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203040081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YiE21aPGG5DHwJvb@gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Thu, Mar 03, 2022 at 09:44:53PM +0000, Eric Biggers wrote:
+> On Thu, Mar 03, 2022 at 09:24:42PM +0000, Giovanni Cabiddu wrote:
+> > On Thu, Mar 03, 2022 at 07:21:33PM +0000, Eric Biggers wrote:
+> > > If these algorithms have critical bugs, which it appears they do, then IMO it
+> > > would be better to disable them (either stop registering them, or disable the
+> > > whole driver) than to leave them available with low cra_priority.  Low
+> > > cra_priority doesn't guarantee that they aren't used.
+> > Thanks for your feedback Eric.
+> > 
+> > Here is a patch that disables the registration of the algorithms in the
+> > QAT driver by setting, a config time, the number of HW queues (aka
+> > instances) to zero.
+> > 
+> > ---8<---
+> > From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > Subject: [PATCH] crypto: qat - disable registration of algorithms
+> > Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+> > 
+> > The implementations of aead and skcipher in the QAT driver do not
+> > support properly requests with the CRYPTO_TFM_REQ_MAY_BACKLOG flag set.
+> > If the HW queue is full, the driver returns -EBUSY but does not enqueue
+> > the request.
+> > This can result in applications like dm-crypt waiting indefinitely for a
+> > completion of a request that was never submitted to the hardware.
+> > 
+> > To avoid this problem, disable the registration of all skcipher and aead
+> > implementations in the QAT driver by setting the number of crypto
+> > instances to 0 at configuration time.
+> > 
+> > This patch deviates from the original upstream solution, that prevents
+> > dm-crypt to use drivers registered with the flag
+> > CRYPTO_ALG_ALLOCATES_MEMORY, since a backport of that set to stable
+> > kernels may have a too wide effect.
+> > 
+> > commit 7bcb2c99f8ed032cfb3f5596b4dccac6b1f501df upstream
+> > commit 2eb27c11937ee9984c04b75d213a737291c5f58c upstream
+> > commit fbb6cda44190d72aa5199d728797aabc6d2ed816 upstream
+> > commit b8aa7dc5c7535f9abfca4bceb0ade9ee10cf5f54 upstream
+> > commit cd74693870fb748d812867ba49af733d689a3604 upstream
+> > 
+> > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > ---
+> >  drivers/crypto/qat/qat_common/qat_crypto.c | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> Sounds good; is there any reason not to apply this upstream too, though?
+> You could revert it later as part of the patch series that fixes the driver.
+Makes sense. I'm going to send it upstream and Cc stable as documented
+in https://www.kernel.org/doc/html/v4.10/process/stable-kernel-rules.html#option-1
+I will then revert this change in the set that fixes the problem.
 
-On 3/1/22 12:36, Eric Snowberg wrote:
-> Add a new link restriction.  Restrict the addition of keys in a keyring
-> based on the key to be added being a CA.
->
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> ---
->   crypto/asymmetric_keys/restrict.c | 43 +++++++++++++++++++++++++++++++
->   include/crypto/public_key.h       | 15 +++++++++++
->   2 files changed, 58 insertions(+)
->
-> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-> index 6b1ac5f5896a..49bb2ea7f609 100644
-> --- a/crypto/asymmetric_keys/restrict.c
-> +++ b/crypto/asymmetric_keys/restrict.c
-> @@ -108,6 +108,49 @@ int restrict_link_by_signature(struct key *dest_keyring,
->   	return ret;
->   }
->   
-> +/**
-> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
-> + * @dest_keyring: Keyring being linked to.
-> + * @type: The type of key being added.
-> + * @payload: The payload of the new key.
-> + * @trust_keyring: Unused.
-> + *
-> + * Check if the new certificate is a CA. If it is a CA, then mark the new
-> + * certificate as being ok to link.
+Thanks,
 
-CA = root CA here, right?
-
-
-> + *
-> + * Returns 0 if the new certificate was accepted, -ENOKEY if the
-> + * certificate is not a CA. -ENOPKG if the signature uses unsupported
-> + * crypto, or some other error if there is a matching certificate but
-> + * the signature check cannot be performed.
-> + */
-> +int restrict_link_by_ca(struct key *dest_keyring,
-> +			const struct key_type *type,
-> +			const union key_payload *payload,
-> +			struct key *trust_keyring)
-This function needs to correspond to the key_restrict_link_func_t and 
-therefore has 4 parameter. Call the unused 'trust_keyring' 'unused' instead?
-> +{
-> +	const struct public_key_signature *sig;
-> +	const struct public_key *pkey;
-> +
-> +	if (type != &key_type_asymmetric)
-> +		return -EOPNOTSUPP;
-> +
-> +	sig = payload->data[asym_auth];
-> +	if (!sig)
-> +		return -ENOPKG;
-> +
-> +	if (!sig->auth_ids[0] && !sig->auth_ids[1])
-> +		return -ENOKEY;
-> +
-> +	pkey = payload->data[asym_crypto];
-> +	if (!pkey)
-> +		return -ENOPKG;
-> +
-> +	if (!pkey->key_is_ca)
-> +		return -ENOKEY;
-> +
-> +	return public_key_verify_signature(pkey, sig);
-> +}
-> +
-
-Comparing this to 'restrict_link_by_signature'... looks good.
-
-
->   static bool match_either_id(const struct asymmetric_key_id **pair,
->   			    const struct asymmetric_key_id *single)
->   {
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index 0521241764b7..5eadb182a400 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -72,6 +72,21 @@ extern int restrict_link_by_key_or_keyring_chain(struct key *trust_keyring,
->   						 const union key_payload *payload,
->   						 struct key *trusted);
->   
-> +#if IS_REACHABLE(CONFIG_ASYMMETRIC_KEY_TYPE)
-> +extern int restrict_link_by_ca(struct key *dest_keyring,
-> +			       const struct key_type *type,
-> +			       const union key_payload *payload,
-> +			       struct key *trust_keyring);
-> +#else
-> +static inline int restrict_link_by_ca(struct key *dest_keyring,
-> +				      const struct key_type *type,
-> +				      const union key_payload *payload,
-> +				      struct key *trust_keyring)
-> +{
-> +	return 0;
-> +}
-> +#endif
-> +
->   extern int query_asymmetric_key(const struct kernel_pkey_params *,
->   				struct kernel_pkey_query *);
->   
+-- 
+Giovanni
