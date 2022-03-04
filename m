@@ -2,227 +2,467 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E75C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 11:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B32DC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Mar 2022 11:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235607AbiCDLgr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Mar 2022 06:36:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35770 "EHLO
+        id S230091AbiCDLmf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 4 Mar 2022 06:42:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235309AbiCDLgq (ORCPT
+        with ESMTP id S229604AbiCDLmd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Mar 2022 06:36:46 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71CE71B1279;
-        Fri,  4 Mar 2022 03:35:58 -0800 (PST)
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K95Nw2qWpz67nFV;
-        Fri,  4 Mar 2022 19:34:40 +0800 (CST)
-Received: from lhreml713-chm.china.huawei.com (10.201.108.64) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 4 Mar 2022 12:35:56 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml713-chm.china.huawei.com (10.201.108.64) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 4 Mar 2022 11:35:55 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Fri, 4 Mar 2022 11:35:55 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Xu Zaibo <xuzaibo@huawei.com>
-CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>
-Subject: RE: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Topic: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Index: AQHYL1K65T0xdQtNbkGb+oampkIrK6yu93mAgAAhk5A=
-Date:   Fri, 4 Mar 2022 11:35:55 +0000
-Message-ID: <7825c26f18d441acb046fe6aaade8926@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
- <e0ccebeb-b5ff-5bb7-87c9-c453eb71fa3f@hisilicon.com>
-In-Reply-To: <e0ccebeb-b5ff-5bb7-87c9-c453eb71fa3f@hisilicon.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.88.247]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Fri, 4 Mar 2022 06:42:33 -0500
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-eopbgr80070.outbound.protection.outlook.com [40.107.8.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCEC416203C;
+        Fri,  4 Mar 2022 03:41:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ijRWQWtrfRvmfQO5p859wK4uniGCkNLyXfnfSu3GIzVJUkcFEAdF16/8dNkz3c8RLE07g/RLCplYiRAwyVCC8LkXAXDL9JN1eQSVP+3mJ4rK3IB7xDIZBN29aNW1BoHxxs61OONPyg496azHMjPxbs+2SktYgcNniCH/P8sMVaE0xIT+sXKUl+P9XNwxGC8V7NUC9gk8TmjLsOUn20KNrwgurNktFA75t19vWft6oxhSKByEwOaKuFkb7MoGqsvzB1VRx6X6cxRNwfJeuW9HnA9kdQnl4PG3rxKvqvOcBjtjlbQZSKECmISCbWlj8p5H5R+F5wxJ8F8EfgdmJ+10lA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JrWsu9cJQx6DxpOOXR0trsCdFv5+qVebF0wrFVCn7iY=;
+ b=fwKP1ZaZ8fKKjcvo4WkJsAWLvKVEtq0UZEYv72CZDGOXCP4uVhNJVViVI38jnKAr4OCbOVmPvCeS08g3mqtOENNuRyTCr9/WmXmmDrzrk9Vga8BPRiM8EtP1qXAZRdnX4zYhwGW52+NXDSoHGZU+6Uccg9MBfkCLOwr0VADH/m1lOzwLzxYHgfjf+P+nXxtXto7kBpVCFWbgCq5FhhFh9nnKKU/OprK2G3RpoazTcy3ztt+NI2Icz3ZYE5kpxk94blcNzGw8nUvC25o0WelrhEnT1EqCVGbpXZIxHuToqGbyhKNsl2xhqjM7rkf63mPNFoWCim70KdKLv6slsfs8jA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JrWsu9cJQx6DxpOOXR0trsCdFv5+qVebF0wrFVCn7iY=;
+ b=VxzCCij+ivuADkDtiSXtcHgDflohGRtSptNJyOpFmMMZDCn24W08CY5CPkpQupY7FTfrZk98G7X5C73sjK6HA1wFf6JQHpPWEeb58t6Q537JmpylGWTq6CtjVf+EX65Cq2JRrnwgP8nse5zHeAikWI7ZAM2vIQBAzC1/CcD21ng=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from HE1PR04MB2971.eurprd04.prod.outlook.com (2603:10a6:7:24::13) by
+ VE1PR04MB6509.eurprd04.prod.outlook.com (2603:10a6:803:125::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.16; Fri, 4 Mar
+ 2022 11:41:41 +0000
+Received: from HE1PR04MB2971.eurprd04.prod.outlook.com
+ ([fe80::bd8c:f89a:866:d92e]) by HE1PR04MB2971.eurprd04.prod.outlook.com
+ ([fe80::bd8c:f89a:866:d92e%3]) with mapi id 15.20.5017.030; Fri, 4 Mar 2022
+ 11:41:41 +0000
+From:   meenakshi.aggarwal@nxp.com
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Gaurav Jain <gaurav.jain@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx@nxp.com, Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+Subject: [PATCH] crypto: caam/rng: Add support for PRNG
+Date:   Fri,  4 Mar 2022 12:41:23 +0100
+Message-Id: <20220304114123.3762649-1-meenakshi.aggarwal@nxp.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR01CA0140.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:168::45) To HE1PR04MB2971.eurprd04.prod.outlook.com
+ (2603:10a6:7:24::13)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8a74c5cb-5e54-497b-d4f2-08d9fdd3f351
+X-MS-TrafficTypeDiagnostic: VE1PR04MB6509:EE_
+X-Microsoft-Antispam-PRVS: <VE1PR04MB65097F0B9ED432066D6E51468E059@VE1PR04MB6509.eurprd04.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: r5HXDkiuYTwgKMiuyUPwkbQiP6tivtL3UTtg7fIHcVSvcN2NVv15ufFcJAMmcMxfR7YGYhQXlTac9x/dbGxG/q0UKmxLXlfiKNcs0HcjZCDZ0Tuah5CP5X3hRleqP/4YMdIVxnUXFTpo/L3cof4m9lUQiNKnDRLHdijiHMoPwnhfvplB69Fb7tmZXNgUVIwDFFywHin4OTWoZqq8wvCUZOHWmaTPjlEZqBSNhts/U5dGYEZ4OQ6HIjwzFRQ/UYAXZULK2prjfwusZ/Z8Dd/y7KMObZCCA5aqabDocDCprroZGSOtsGJN8Z6XGd/WR+ypY98qkAX3noBW7jNad3LBGmCNIHZULW1OOpdoXQHZhKlb/wf26TeqeezIFPtZ45+CEXC9WEbWDgVFlz2fzvIPH67KQgsuZjawnbbBXg/2AFLnidvZhCg0AznCpZV7p/OjcB6lo1R6ht/Rh+M1YqpF1rYMPWmvaTRvdfQvsD8OCihBkm39Qto1Z+DQIE55dtV2Tl/3XUm+e7Zgv4/SeOMKv/XE5ayyc3qv+ytvFIMhn8BBW+rZGzY2TuZ8U48xazU3a4icuKzjj0X8hHpJyDjW0gkRAxwysoVUpVl98AGU/Kg+lRI2KKtSq0Bbgr+QTes1057F0W6WEgZOYBhwsHKCvS3+i3DYZbeY6zR/2x4mbjNP3XF10V2VRppFZW1+/PLtI9sY7lVk3/GcqT9/o8hdYQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR04MB2971.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6512007)(8936002)(6666004)(9686003)(52116002)(5660300002)(6506007)(2906002)(498600001)(6486002)(86362001)(38350700002)(38100700002)(36756003)(8676002)(83380400001)(66476007)(66946007)(186003)(66556008)(1076003)(4326008)(26005)(2616005)(110136005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?72bfdhd8KxmRH6mUouJhOl/jr3utGukcbb3riB9wYtpsNtLskESdoOTgYhf6?=
+ =?us-ascii?Q?ndjPVUvmWOtJVcro+pZNTtTIf6DYsyoiTzlRGca2XhGMG+7tGBMAPE/eDs45?=
+ =?us-ascii?Q?B5qUzi3fRwaOTm9gs53ap3tfxUq/YQC7QBfalk6oSy6t0dV6pqdjPYQg5d+8?=
+ =?us-ascii?Q?g+U+qZ4PHik/SfH6ZtDpsSBXj9w/Fs1V2CITvp+RK/51wAzjyiyGBqbzfUzm?=
+ =?us-ascii?Q?dfmGr0pqKT5WT0gxAoKu+A+9SPLDsDculKq3w1FPKfxnfytjGGQd0AkCgdEg?=
+ =?us-ascii?Q?QwHv+Ny0OBghkBDJSUzm77tdFPdImAdWkMdE9u1JeWoqa9rZL+sg2AAWJ1UD?=
+ =?us-ascii?Q?hISvcSMfORuBYGswXkZTecRt2idRPZfd9UnZPPkB+PzwkYWkcEE+c/LKvI41?=
+ =?us-ascii?Q?kq42b0Q7lRrSLrNAnRnpTcWY2bXw8hfnT9nQ3TBlWH+Jl4J1HlNjKx8SawWD?=
+ =?us-ascii?Q?2QBBdUKtHHmtzfxatTDHt+/wtEVYR26LhRQKZWs4GGOwIvTt3nhVPMrrw5iL?=
+ =?us-ascii?Q?097ZAL5QyTzkJjYpB16byMroP/T9ewBNYC+iWIPJBWAVPhDd2+W/bd0Ij8zY?=
+ =?us-ascii?Q?K5xejuZm9eZyWNG1Pt5s22iFFcGsILFGapEsg/hurDpj1ItOWHJ3PS5VToFH?=
+ =?us-ascii?Q?onUrLmJzopdjFIeWKdnEyKmajsUkz6WakO/PaIvD4frJuNYAotY1bVaPKaBQ?=
+ =?us-ascii?Q?8NHiEwzTXEC18OyAEOQlzorL+Q68tGzqwnG7IQQgZCMQRsN8ybMEEVdS8uz6?=
+ =?us-ascii?Q?mwdrmiKtzwW2zOIz+kci1kmUXeqs5fw6xmo6B4SGidGnTbcV9nGva+FufQN+?=
+ =?us-ascii?Q?nokA4wUW/bqnrj3lrjfuqqJw4WAXXgoJFMc9gimFTEqncDcSgIZyRqLZio41?=
+ =?us-ascii?Q?oKwXJdcg442qYYB27M0bG9tA9AI7ts+yWMI1oR0wPYupWSiPzk9Aixdw0G8w?=
+ =?us-ascii?Q?s6/dnrWRp9dK8SvQAFomx9ch8gxIKLeDHkI/4sqpHBQ0L6x8ehaKic1drscu?=
+ =?us-ascii?Q?DnkVRInbtYncnBfXdRFuIomwlazhHjc3vYVR0kFpMvLxW06S4HYBxW7Z/VlL?=
+ =?us-ascii?Q?qui0QXVNBDZIcJ5nyD8hNyvCH+VRt9p4PiZpSAiABCGrKGxWlQNrAtzuiCkj?=
+ =?us-ascii?Q?M95AAzJa64zBwnArLvhZ/qHROqh5Z8jtbXaSaPJKH/ZIsQhNj3ySpwt/ZzDB?=
+ =?us-ascii?Q?V5BOIRzm438Q7ISuoBXgxGlWuh5Fm5/+gNiNkZwvHiNe7NuyedjbCz38i6Xb?=
+ =?us-ascii?Q?4sfYYNqP+WlkshheS+pdKfuFm69dPTRef9JU8owREFxXO7zhN8OCQantxfXx?=
+ =?us-ascii?Q?umHlvJDTgbGYt71ubxZomecRuRr5SediLRWlogWgfPFs+uyvTdjrU1+avK9A?=
+ =?us-ascii?Q?1sTGtc33sg2aD5V3bwnQxv9Ap1E9oTbk/eHw3yt6vvcw2Bgx8W2Tk1bin9w0?=
+ =?us-ascii?Q?UO9Xf6xbgo8h8w10G8ww7ViK/UXPvVgRS8oPDLW1UFc1XzZUkxaJfmi9tqsq?=
+ =?us-ascii?Q?Y2AKdKqJNLD5iVkhlmsyM6LXfc58QIXz+lVcyQj6b0QEAIT2A6QzSotunz8G?=
+ =?us-ascii?Q?5fUHoShI0Ofce4LAzOOxC6k7JtrrnyI/Dp+nA3cr49xS9dIohMdUlynI8d3r?=
+ =?us-ascii?Q?W/MSVPYuplfjFt4AccRpIyI5LM7BPE9Q0pJAcCDJFifR4Nx0p5WR10ZK5WiA?=
+ =?us-ascii?Q?YDqXcg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a74c5cb-5e54-497b-d4f2-08d9fdd3f351
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR04MB2971.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2022 11:41:41.5070
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jJaXDFYjcFoZm6k1bEfpBsTsojHRxSq00rGHb5sdqKSos/bqY8K+YaMRc0AJurpN01VYfM1B9GeH6uqRWYjyxM00a+Ff0nv4IveLM9eaQl4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB6509
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-WytaYWlib10NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBXYW5nemhv
-dSAoQikNCj4gU2VudDogMDQgTWFyY2ggMjAyMiAwOTozNQ0KPiBUbzogU2hhbWVlcmFsaSBLb2xv
-dGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPjsNCj4ga3Zt
-QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsNCj4gbGludXgt
-Y3J5cHRvQHZnZXIua2VybmVsLm9yZw0KPiBDYzogbGludXgtcGNpQHZnZXIua2VybmVsLm9yZzsg
-YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IGpnZ0BudmlkaWEuY29tOw0KPiBjb2h1Y2tAcmVk
-aGF0LmNvbTsgbWd1cnRvdm95QG52aWRpYS5jb207IHlpc2hhaWhAbnZpZGlhLmNvbTsgTGludXhh
-cm0NCj4gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyBsaXVsb25nZmFuZyA8bGl1bG9uZ2ZhbmdAaHVh
-d2VpLmNvbT47IFplbmd0YW8gKEIpDQo+IDxwcmltZS56ZW5nQGhpc2lsaWNvbi5jb20+OyBKb25h
-dGhhbiBDYW1lcm9uDQo+IDxqb25hdGhhbi5jYW1lcm9uQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6
-IFJlOiBbUEFUQ0ggdjggMy85XSBoaXNpX2FjY19xbTogTW92ZSBWRiBQQ0kgZGV2aWNlIElEcyB0
-byBjb21tb24NCj4gaGVhZGVyDQo+IA0KPiA+IE1vdmUgdGhlIFBDSSBEZXZpY2UgSURzIG9mIEhp
-U2lsaWNvbiBBQ0MgVkYgZGV2aWNlcyB0byBhIGNvbW1vbiBoZWFkZT4NCj4gYW5kIGFsc28gdXNl
-IGEgdW5pZm9ybSBuYW1pbmcgY29udmVudGlvbi4NCj4gPg0KPiA+IFRoaXMgd2lsbCBiZSB1c2Vm
-dWwgd2hlbiB3ZSBpbnRyb2R1Y2UgdGhlIHZmaW8gUENJIEhpU2lsaWNvbiBBQ0MgbGl2ZQ0KPiA+
-IG1pZ3JhdGlvbiBkcml2ZXIgaW4gc3Vic2VxdWVudCBwYXRjaGVzLg0KPiA+DQo+ID4gU2lnbmVk
-LW9mZi1ieTogU2hhbWVlciBLb2xvdGh1bQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBo
-dWF3ZWkuY29tPg0KPiANCj4gQWNrZWQtYnk6IFpob3UgV2FuZyA8d2FuZ3pob3UxQGhpc2lsaWNv
-bi5jb20+DQoNClRoYW5rcy4gQWRkZWQgWmFpYm8gZm9yIGhwcmUvc2VjIHBhcnRzLg0KDQo+ID4g
-LS0tDQo+ID4gIGRyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9ocHJlL2hwcmVfbWFpbi5jIHwgMTMg
-KysrKysrLS0tLS0tLQ0KPiA+ICBkcml2ZXJzL2NyeXB0by9oaXNpbGljb24vc2VjMi9zZWNfbWFp
-bi5jICB8IDE1ICsrKysrKystLS0tLS0tLQ0KPiA+ICBkcml2ZXJzL2NyeXB0by9oaXNpbGljb24v
-emlwL3ppcF9tYWluLmMgICB8IDExICsrKysrLS0tLS0tDQo+ID4gIGluY2x1ZGUvbGludXgvcGNp
-X2lkcy5oICAgICAgICAgICAgICAgICAgIHwgIDMgKysrDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwg
-MjEgaW5zZXJ0aW9ucygrKSwgMjEgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL2hwcmUvaHByZV9tYWluLmMNCj4gYi9kcml2ZXJzL2Ny
-eXB0by9oaXNpbGljb24vaHByZS9ocHJlX21haW4uYw0KPiA+IGluZGV4IGViZmFiM2UxNDQ5OS4u
-MzU4OWQ4ODc5YjVlIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2hpc2lsaWNvbi9o
-cHJlL2hwcmVfbWFpbi5jDQo+ID4gKysrIGIvZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL2hwcmUv
-aHByZV9tYWluLmMNCj4gPiBAQCAtNjgsOCArNjgsNyBAQA0KPiA+ICAjZGVmaW5lIEhQUkVfUkVH
-X1JEX0lOVFZSTF9VUwkJMTANCj4gPiAgI2RlZmluZSBIUFJFX1JFR19SRF9UTU9VVF9VUwkJMTAw
-MA0KPiA+ICAjZGVmaW5lIEhQUkVfREJHRlNfVkFMX01BWF9MRU4JCTIwDQo+ID4gLSNkZWZpbmUg
-SFBSRV9QQ0lfREVWSUNFX0lECQkweGEyNTgNCj4gPiAtI2RlZmluZSBIUFJFX1BDSV9WRl9ERVZJ
-Q0VfSUQJCTB4YTI1OQ0KPiA+ICsjZGVmaW5lIFBDSV9ERVZJQ0VfSURfSFVBV0VJX0hQUkVfUEYJ
-MHhhMjU4DQo+ID4gICNkZWZpbmUgSFBSRV9RTV9VU1JfQ0ZHX01BU0sJCUdFTk1BU0soMzEsIDEp
-DQo+ID4gICNkZWZpbmUgSFBSRV9RTV9BWElfQ0ZHX01BU0sJCUdFTk1BU0soMTUsIDApDQo+ID4g
-ICNkZWZpbmUgSFBSRV9RTV9WRkdfQVhfTUFTSwkJR0VOTUFTSyg3LCAwKQ0KPiA+IEBAIC0xMTEs
-OCArMTEwLDggQEANCj4gPiAgc3RhdGljIGNvbnN0IGNoYXIgaHByZV9uYW1lW10gPSAiaGlzaV9o
-cHJlIjsNCj4gPiAgc3RhdGljIHN0cnVjdCBkZW50cnkgKmhwcmVfZGVidWdmc19yb290Ow0KPiA+
-ICBzdGF0aWMgY29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWQgaHByZV9kZXZfaWRzW10gPSB7DQo+
-ID4gLQl7IFBDSV9ERVZJQ0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIEhQUkVfUENJX0RFVklDRV9J
-RCkgfSwNCj4gPiAtCXsgUENJX0RFVklDRShQQ0lfVkVORE9SX0lEX0hVQVdFSSwgSFBSRV9QQ0lf
-VkZfREVWSUNFX0lEKSB9LA0KPiA+ICsJeyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURfSFVBV0VJ
-LA0KPiBQQ0lfREVWSUNFX0lEX0hVQVdFSV9IUFJFX1BGKSB9LA0KPiA+ICsJeyBQQ0lfREVWSUNF
-KFBDSV9WRU5ET1JfSURfSFVBV0VJLA0KPiBQQ0lfREVWSUNFX0lEX0hVQVdFSV9IUFJFX1ZGKSB9
-LA0KPiA+ICAJeyAwLCB9DQo+ID4gIH07DQo+ID4NCj4gPiBAQCAtMjQyLDcgKzI0MSw3IEBAIE1P
-RFVMRV9QQVJNX0RFU0ModWFjY2VfbW9kZSwNCj4gVUFDQ0VfTU9ERV9ERVNDKTsNCj4gPg0KPiA+
-ICBzdGF0aWMgaW50IHBmX3FfbnVtX3NldChjb25zdCBjaGFyICp2YWwsIGNvbnN0IHN0cnVjdCBr
-ZXJuZWxfcGFyYW0gKmtwKQ0KPiA+ICB7DQo+ID4gLQlyZXR1cm4gcV9udW1fc2V0KHZhbCwga3As
-IEhQUkVfUENJX0RFVklDRV9JRCk7DQo+ID4gKwlyZXR1cm4gcV9udW1fc2V0KHZhbCwga3AsIFBD
-SV9ERVZJQ0VfSURfSFVBV0VJX0hQUkVfUEYpOw0KPiA+ICB9DQo+ID4NCj4gPiAgc3RhdGljIGNv
-bnN0IHN0cnVjdCBrZXJuZWxfcGFyYW1fb3BzIGhwcmVfcGZfcV9udW1fb3BzID0gew0KPiA+IEBA
-IC05MjEsNyArOTIwLDcgQEAgc3RhdGljIGludCBocHJlX2RlYnVnZnNfaW5pdChzdHJ1Y3QgaGlz
-aV9xbSAqcW0pDQo+ID4gIAlxbS0+ZGVidWcuc3FlX21hc2tfbGVuID0gSFBSRV9TUUVfTUFTS19M
-RU47DQo+ID4gIAloaXNpX3FtX2RlYnVnX2luaXQocW0pOw0KPiA+DQo+ID4gLQlpZiAocW0tPnBk
-ZXYtPmRldmljZSA9PSBIUFJFX1BDSV9ERVZJQ0VfSUQpIHsNCj4gPiArCWlmIChxbS0+cGRldi0+
-ZGV2aWNlID09IFBDSV9ERVZJQ0VfSURfSFVBV0VJX0hQUkVfUEYpIHsNCj4gPiAgCQlyZXQgPSBo
-cHJlX2N0cmxfZGVidWdfaW5pdChxbSk7DQo+ID4gIAkJaWYgKHJldCkNCj4gPiAgCQkJZ290byBm
-YWlsZWRfdG9fY3JlYXRlOw0KPiA+IEBAIC05NTgsNyArOTU3LDcgQEAgc3RhdGljIGludCBocHJl
-X3FtX2luaXQoc3RydWN0IGhpc2lfcW0gKnFtLCBzdHJ1Y3QNCj4gcGNpX2RldiAqcGRldikNCj4g
-PiAgCXFtLT5zcWVfc2l6ZSA9IEhQUkVfU1FFX1NJWkU7DQo+ID4gIAlxbS0+ZGV2X25hbWUgPSBo
-cHJlX25hbWU7DQo+ID4NCj4gPiAtCXFtLT5mdW5fdHlwZSA9IChwZGV2LT5kZXZpY2UgPT0gSFBS
-RV9QQ0lfREVWSUNFX0lEKSA/DQo+ID4gKwlxbS0+ZnVuX3R5cGUgPSAocGRldi0+ZGV2aWNlID09
-IFBDSV9ERVZJQ0VfSURfSFVBV0VJX0hQUkVfUEYpID8NCj4gPiAgCQkJUU1fSFdfUEYgOiBRTV9I
-V19WRjsNCj4gPiAgCWlmIChxbS0+ZnVuX3R5cGUgPT0gUU1fSFdfUEYpIHsNCj4gPiAgCQlxbS0+
-cXBfYmFzZSA9IEhQUkVfUEZfREVGX1FfQkFTRTsNCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9j
-cnlwdG8vaGlzaWxpY29uL3NlYzIvc2VjX21haW4uYw0KPiBiL2RyaXZlcnMvY3J5cHRvL2hpc2ls
-aWNvbi9zZWMyL3NlY19tYWluLmMNCj4gPiBpbmRleCAyNmQzYWIxZDMwOGIuLjMxMWE4NzQ3YjVi
-ZiAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vc2VjMi9zZWNfbWFp
-bi5jDQo+ID4gKysrIGIvZHJpdmVycy9jcnlwdG8vaGlzaWxpY29uL3NlYzIvc2VjX21haW4uYw0K
-PiA+IEBAIC0yMCw4ICsyMCw3IEBADQo+ID4NCj4gPiAgI2RlZmluZSBTRUNfVkZfTlVNCQkJNjMN
-Cj4gPiAgI2RlZmluZSBTRUNfUVVFVUVfTlVNX1YxCQk0MDk2DQo+ID4gLSNkZWZpbmUgU0VDX1BG
-X1BDSV9ERVZJQ0VfSUQJCTB4YTI1NQ0KPiA+IC0jZGVmaW5lIFNFQ19WRl9QQ0lfREVWSUNFX0lE
-CQkweGEyNTYNCj4gPiArI2RlZmluZSBQQ0lfREVWSUNFX0lEX0hVQVdFSV9TRUNfUEYJMHhhMjU1
-DQo+ID4NCj4gPiAgI2RlZmluZSBTRUNfQkRfRVJSX0NIS19FTjAJCTB4RUZGRkZGRkYNCj4gPiAg
-I2RlZmluZSBTRUNfQkRfRVJSX0NIS19FTjEJCTB4N2ZmZmY3ZmQNCj4gPiBAQCAtMjI1LDcgKzIy
-NCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgZGVidWdmc19yZWczMiBzZWNfZGZ4X3JlZ3NbXSA9
-IHsNCj4gPg0KPiA+ICBzdGF0aWMgaW50IHNlY19wZl9xX251bV9zZXQoY29uc3QgY2hhciAqdmFs
-LCBjb25zdCBzdHJ1Y3Qga2VybmVsX3BhcmFtDQo+ICprcCkNCj4gPiAgew0KPiA+IC0JcmV0dXJu
-IHFfbnVtX3NldCh2YWwsIGtwLCBTRUNfUEZfUENJX0RFVklDRV9JRCk7DQo+ID4gKwlyZXR1cm4g
-cV9udW1fc2V0KHZhbCwga3AsIFBDSV9ERVZJQ0VfSURfSFVBV0VJX1NFQ19QRik7DQo+ID4gIH0N
-Cj4gPg0KPiA+ICBzdGF0aWMgY29uc3Qgc3RydWN0IGtlcm5lbF9wYXJhbV9vcHMgc2VjX3BmX3Ff
-bnVtX29wcyA9IHsNCj4gPiBAQCAtMzEzLDggKzMxMiw4IEBAIG1vZHVsZV9wYXJhbV9jYih1YWNj
-ZV9tb2RlLA0KPiAmc2VjX3VhY2NlX21vZGVfb3BzLCAmdWFjY2VfbW9kZSwgMDQ0NCk7DQo+ID4g
-IE1PRFVMRV9QQVJNX0RFU0ModWFjY2VfbW9kZSwgVUFDQ0VfTU9ERV9ERVNDKTsNCj4gPg0KPiA+
-ICBzdGF0aWMgY29uc3Qgc3RydWN0IHBjaV9kZXZpY2VfaWQgc2VjX2Rldl9pZHNbXSA9IHsNCj4g
-PiAtCXsgUENJX0RFVklDRShQQ0lfVkVORE9SX0lEX0hVQVdFSSwgU0VDX1BGX1BDSV9ERVZJQ0Vf
-SUQpIH0sDQo+ID4gLQl7IFBDSV9ERVZJQ0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIFNFQ19WRl9Q
-Q0lfREVWSUNFX0lEKSB9LA0KPiA+ICsJeyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURfSFVBV0VJ
-LA0KPiBQQ0lfREVWSUNFX0lEX0hVQVdFSV9TRUNfUEYpIH0sDQo+ID4gKwl7IFBDSV9ERVZJQ0Uo
-UENJX1ZFTkRPUl9JRF9IVUFXRUksDQo+IFBDSV9ERVZJQ0VfSURfSFVBV0VJX1NFQ19WRikgfSwN
-Cj4gPiAgCXsgMCwgfQ0KPiA+ICB9Ow0KPiA+ICBNT0RVTEVfREVWSUNFX1RBQkxFKHBjaSwgc2Vj
-X2Rldl9pZHMpOw0KPiA+IEBAIC03MTcsNyArNzE2LDcgQEAgc3RhdGljIGludCBzZWNfY29yZV9k
-ZWJ1Z19pbml0KHN0cnVjdCBoaXNpX3FtICpxbSkNCj4gPiAgCXJlZ3NldC0+YmFzZSA9IHFtLT5p
-b19iYXNlOw0KPiA+ICAJcmVnc2V0LT5kZXYgPSBkZXY7DQo+ID4NCj4gPiAtCWlmIChxbS0+cGRl
-di0+ZGV2aWNlID09IFNFQ19QRl9QQ0lfREVWSUNFX0lEKQ0KPiA+ICsJaWYgKHFtLT5wZGV2LT5k
-ZXZpY2UgPT0gUENJX0RFVklDRV9JRF9IVUFXRUlfU0VDX1BGKQ0KPiA+ICAJCWRlYnVnZnNfY3Jl
-YXRlX2ZpbGUoInJlZ3MiLCAwNDQ0LCB0bXBfZCwgcmVnc2V0LCAmc2VjX3JlZ3NfZm9wcyk7DQo+
-ID4NCj4gPiAgCWZvciAoaSA9IDA7IGkgPCBBUlJBWV9TSVpFKHNlY19kZnhfbGFiZWxzKTsgaSsr
-KSB7DQo+ID4gQEAgLTczNSw3ICs3MzQsNyBAQCBzdGF0aWMgaW50IHNlY19kZWJ1Z19pbml0KHN0
-cnVjdCBoaXNpX3FtICpxbSkNCj4gPiAgCXN0cnVjdCBzZWNfZGV2ICpzZWMgPSBjb250YWluZXJf
-b2YocW0sIHN0cnVjdCBzZWNfZGV2LCBxbSk7DQo+ID4gIAlpbnQgaTsNCj4gPg0KPiA+IC0JaWYg
-KHFtLT5wZGV2LT5kZXZpY2UgPT0gU0VDX1BGX1BDSV9ERVZJQ0VfSUQpIHsNCj4gPiArCWlmIChx
-bS0+cGRldi0+ZGV2aWNlID09IFBDSV9ERVZJQ0VfSURfSFVBV0VJX1NFQ19QRikgew0KPiA+ICAJ
-CWZvciAoaSA9IFNFQ19DTEVBUl9FTkFCTEU7IGkgPCBTRUNfREVCVUdfRklMRV9OVU07IGkrKykg
-ew0KPiA+ICAJCQlzcGluX2xvY2tfaW5pdCgmc2VjLT5kZWJ1Zy5maWxlc1tpXS5sb2NrKTsNCj4g
-PiAgCQkJc2VjLT5kZWJ1Zy5maWxlc1tpXS5pbmRleCA9IGk7DQo+ID4gQEAgLTg3Nyw3ICs4NzYs
-NyBAQCBzdGF0aWMgaW50IHNlY19xbV9pbml0KHN0cnVjdCBoaXNpX3FtICpxbSwgc3RydWN0DQo+
-IHBjaV9kZXYgKnBkZXYpDQo+ID4gIAlxbS0+c3FlX3NpemUgPSBTRUNfU1FFX1NJWkU7DQo+ID4g
-IAlxbS0+ZGV2X25hbWUgPSBzZWNfbmFtZTsNCj4gPg0KPiA+IC0JcW0tPmZ1bl90eXBlID0gKHBk
-ZXYtPmRldmljZSA9PSBTRUNfUEZfUENJX0RFVklDRV9JRCkgPw0KPiA+ICsJcW0tPmZ1bl90eXBl
-ID0gKHBkZXYtPmRldmljZSA9PSBQQ0lfREVWSUNFX0lEX0hVQVdFSV9TRUNfUEYpID8NCj4gPiAg
-CQkJUU1fSFdfUEYgOiBRTV9IV19WRjsNCj4gPiAgCWlmIChxbS0+ZnVuX3R5cGUgPT0gUU1fSFdf
-UEYpIHsNCj4gPiAgCQlxbS0+cXBfYmFzZSA9IFNFQ19QRl9ERUZfUV9CQVNFOw0KPiA+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vemlwL3ppcF9tYWluLmMNCj4gYi9kcml2
-ZXJzL2NyeXB0by9oaXNpbGljb24vemlwL3ppcF9tYWluLmMNCj4gPiBpbmRleCA2NzhmOGI1OGVj
-NDIuLjY2ZGVjZmUwNzI4MiAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9oaXNpbGlj
-b24vemlwL3ppcF9tYWluLmMNCj4gPiArKysgYi9kcml2ZXJzL2NyeXB0by9oaXNpbGljb24vemlw
-L3ppcF9tYWluLmMNCj4gPiBAQCAtMTUsOCArMTUsNyBAQA0KPiA+ICAjaW5jbHVkZSA8bGludXgv
-dWFjY2UuaD4NCj4gPiAgI2luY2x1ZGUgInppcC5oIg0KPiA+DQo+ID4gLSNkZWZpbmUgUENJX0RF
-VklDRV9JRF9aSVBfUEYJCTB4YTI1MA0KPiA+IC0jZGVmaW5lIFBDSV9ERVZJQ0VfSURfWklQX1ZG
-CQkweGEyNTENCj4gPiArI2RlZmluZSBQQ0lfREVWSUNFX0lEX0hVQVdFSV9aSVBfUEYJMHhhMjUw
-DQo+ID4NCj4gPiAgI2RlZmluZSBIWklQX1FVRVVFX05VTV9WMQkJNDA5Ng0KPiA+DQo+ID4gQEAg
-LTI0Niw3ICsyNDUsNyBAQCBNT0RVTEVfUEFSTV9ERVNDKHVhY2NlX21vZGUsDQo+IFVBQ0NFX01P
-REVfREVTQyk7DQo+ID4NCj4gPiAgc3RhdGljIGludCBwZl9xX251bV9zZXQoY29uc3QgY2hhciAq
-dmFsLCBjb25zdCBzdHJ1Y3Qga2VybmVsX3BhcmFtICprcCkNCj4gPiAgew0KPiA+IC0JcmV0dXJu
-IHFfbnVtX3NldCh2YWwsIGtwLCBQQ0lfREVWSUNFX0lEX1pJUF9QRik7DQo+ID4gKwlyZXR1cm4g
-cV9udW1fc2V0KHZhbCwga3AsIFBDSV9ERVZJQ0VfSURfSFVBV0VJX1pJUF9QRik7DQo+ID4gIH0N
-Cj4gPg0KPiA+ICBzdGF0aWMgY29uc3Qgc3RydWN0IGtlcm5lbF9wYXJhbV9vcHMgcGZfcV9udW1f
-b3BzID0gew0KPiA+IEBAIC0yNjgsOCArMjY3LDggQEAgbW9kdWxlX3BhcmFtX2NiKHZmc19udW0s
-ICZ2ZnNfbnVtX29wcywNCj4gJnZmc19udW0sIDA0NDQpOw0KPiA+ICBNT0RVTEVfUEFSTV9ERVND
-KHZmc19udW0sICJOdW1iZXIgb2YgVkZzIHRvIGVuYWJsZSgxLTYzKSwNCj4gMChkZWZhdWx0KSIp
-Ow0KPiA+DQo+ID4gIHN0YXRpYyBjb25zdCBzdHJ1Y3QgcGNpX2RldmljZV9pZCBoaXNpX3ppcF9k
-ZXZfaWRzW10gPSB7DQo+ID4gLQl7IFBDSV9ERVZJQ0UoUENJX1ZFTkRPUl9JRF9IVUFXRUksIFBD
-SV9ERVZJQ0VfSURfWklQX1BGKSB9LA0KPiA+IC0JeyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURf
-SFVBV0VJLCBQQ0lfREVWSUNFX0lEX1pJUF9WRikgfSwNCj4gPiArCXsgUENJX0RFVklDRShQQ0lf
-VkVORE9SX0lEX0hVQVdFSSwNCj4gUENJX0RFVklDRV9JRF9IVUFXRUlfWklQX1BGKSB9LA0KPiA+
-ICsJeyBQQ0lfREVWSUNFKFBDSV9WRU5ET1JfSURfSFVBV0VJLA0KPiBQQ0lfREVWSUNFX0lEX0hV
-QVdFSV9aSVBfVkYpIH0sDQo+ID4gIAl7IDAsIH0NCj4gPiAgfTsNCj4gPiAgTU9EVUxFX0RFVklD
-RV9UQUJMRShwY2ksIGhpc2lfemlwX2Rldl9pZHMpOw0KPiA+IEBAIC04MzgsNyArODM3LDcgQEAg
-c3RhdGljIGludCBoaXNpX3ppcF9xbV9pbml0KHN0cnVjdCBoaXNpX3FtICpxbSwgc3RydWN0DQo+
-IHBjaV9kZXYgKnBkZXYpDQo+ID4gIAlxbS0+c3FlX3NpemUgPSBIWklQX1NRRV9TSVpFOw0KPiA+
-ICAJcW0tPmRldl9uYW1lID0gaGlzaV96aXBfbmFtZTsNCj4gPg0KPiA+IC0JcW0tPmZ1bl90eXBl
-ID0gKHBkZXYtPmRldmljZSA9PSBQQ0lfREVWSUNFX0lEX1pJUF9QRikgPw0KPiA+ICsJcW0tPmZ1
-bl90eXBlID0gKHBkZXYtPmRldmljZSA9PSBQQ0lfREVWSUNFX0lEX0hVQVdFSV9aSVBfUEYpID8N
-Cj4gPiAgCQkJUU1fSFdfUEYgOiBRTV9IV19WRjsNCj4gPiAgCWlmIChxbS0+ZnVuX3R5cGUgPT0g
-UU1fSFdfUEYpIHsNCj4gPiAgCQlxbS0+cXBfYmFzZSA9IEhaSVBfUEZfREVGX1FfQkFTRTsNCj4g
-PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9wY2lfaWRzLmggYi9pbmNsdWRlL2xpbnV4L3Bj
-aV9pZHMuaA0KPiA+IGluZGV4IGFhZDU0YzY2NjQwNy4uMzFkZWUyYjY1YTYyIDEwMDY0NA0KPiA+
-IC0tLSBhL2luY2x1ZGUvbGludXgvcGNpX2lkcy5oDQo+ID4gKysrIGIvaW5jbHVkZS9saW51eC9w
-Y2lfaWRzLmgNCj4gPiBAQCAtMjUyOSw2ICsyNTI5LDkgQEANCj4gPiAgI2RlZmluZSBQQ0lfREVW
-SUNFX0lEX0tPUkVOSVhfSkVUQ0FSREYzCTB4MTdmZg0KPiA+DQo+ID4gICNkZWZpbmUgUENJX1ZF
-TkRPUl9JRF9IVUFXRUkJCTB4MTllNQ0KPiA+ICsjZGVmaW5lIFBDSV9ERVZJQ0VfSURfSFVBV0VJ
-X1pJUF9WRgkweGEyNTENCj4gPiArI2RlZmluZSBQQ0lfREVWSUNFX0lEX0hVQVdFSV9TRUNfVkYJ
-MHhhMjU2DQo+ID4gKyNkZWZpbmUgUENJX0RFVklDRV9JRF9IVUFXRUlfSFBSRV9WRgkweGEyNTkN
-Cj4gPg0KPiA+ICAjZGVmaW5lIFBDSV9WRU5ET1JfSURfTkVUUk9OT01FCQkweDE5ZWUNCj4gPiAg
-I2RlZmluZSBQQ0lfREVWSUNFX0lEX05FVFJPTk9NRV9ORlA0MDAwCTB4NDAwMA0KPiA+DQo=
+From: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+
+Add support for random number generation using PRNG
+mode of CAAM and expose the interface through crypto API.
+
+Signed-off-by: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+---
+ drivers/crypto/caam/Kconfig    |   9 ++
+ drivers/crypto/caam/Makefile   |   1 +
+ drivers/crypto/caam/caamprng.c | 238 +++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/desc.h     |   1 +
+ drivers/crypto/caam/intern.h   |  15 +++
+ drivers/crypto/caam/jr.c       |   2 +
+ 6 files changed, 266 insertions(+)
+ create mode 100644 drivers/crypto/caam/caamprng.c
+
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 84ea7cba5ee5..d94250348b32 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -151,6 +151,15 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 	  Selecting this will register the SEC4 hardware rng to
+ 	  the hw_random API for supplying the kernel entropy pool.
+ 
++
++config CRYPTO_DEV_FSL_CAAM_PRNG_API
++	bool "Register Pseudo random number generation implementation with Crypto API"
++	default y
++	select CRYPTO_RNG
++	help
++	  Selecting this will register the SEC hardware prng to
++	  the Crypto API.
++
+ endif # CRYPTO_DEV_FSL_CAAM_JR
+ 
+ endif # CRYPTO_DEV_FSL_CAAM
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index 3570286eb9ce..59961a0bbfe4 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -21,6 +21,7 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
++caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PRNG_API) += caamprng.o
+ 
+ caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
+ ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
+diff --git a/drivers/crypto/caam/caamprng.c b/drivers/crypto/caam/caamprng.c
+new file mode 100644
+index 000000000000..be0cf0e214f0
+--- /dev/null
++++ b/drivers/crypto/caam/caamprng.c
+@@ -0,0 +1,238 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Driver to expose SEC4 PRNG via crypto RNG API
++ *
++ * Copyright 2022 NXP
++ *
++ */
++
++#include <linux/completion.h>
++#include <crypto/internal/rng.h>
++#include "compat.h"
++#include "regs.h"
++#include "intern.h"
++#include "desc_constr.h"
++#include "jr.h"
++#include "error.h"
++
++/*
++ * Length of used descriptors, see caam_init_desc()
++ */
++#define CAAM_PRNG_DESC_LEN (CAAM_CMD_SZ +				\
++			    CAAM_CMD_SZ +				\
++			    CAAM_CMD_SZ + CAAM_PTR_SZ_MAX)
++
++/* prng per-device context */
++struct caam_prng_ctx {
++	struct device *jrdev;
++	struct completion done;
++};
++
++struct caam_prng_alg {
++	struct rng_alg rng;
++	bool registered;
++};
++
++static void caam_prng_done(struct device *jrdev, u32 *desc, u32 err,
++			  void *context)
++{
++	struct caam_prng_ctx *jctx = context;
++
++	if (err)
++		caam_jr_strstatus(jrdev, err);
++
++	complete(&jctx->done);
++}
++
++static u32 *caam_init_reseed_desc(u32 *desc, dma_addr_t seed_dma, u32 len)
++{
++	init_job_desc(desc, 0);	/* + 1 cmd_sz */
++	/* Generate random bytes: + 1 cmd_sz */
++	append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
++			OP_ALG_AS_FINALIZE | OP_ALG_AI_ON);
++	/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
++	append_load(desc, seed_dma, len, CLASS_1 | LDST_SRCDST_BYTE_CONTEXT);
++
++	print_hex_dump_debug("prng reseed desc@: ", DUMP_PREFIX_ADDRESS,
++			     16, 4, desc, desc_bytes(desc), 1);
++
++	return desc;
++}
++
++static u32 *caam_init_prng_desc(u32 *desc, dma_addr_t dst_dma, u32 len)
++{
++	init_job_desc(desc, 0);	/* + 1 cmd_sz */
++	/* Generate random bytes: + 1 cmd_sz */
++	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
++	/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
++	append_fifo_store(desc, dst_dma,
++			  len, FIFOST_TYPE_RNGSTORE);
++
++	print_hex_dump_debug("prng job desc@: ", DUMP_PREFIX_ADDRESS,
++			     16, 4, desc, desc_bytes(desc), 1);
++
++	return desc;
++}
++
++static int caam_prng_generate(struct crypto_rng *tfm,
++			     const u8 *src, unsigned int slen,
++			     u8 *dst, unsigned int dlen)
++{
++	struct caam_prng_ctx ctx;
++	dma_addr_t dst_dma;
++	u32 *desc;
++	int ret;
++
++	ctx.jrdev = caam_jr_alloc();
++	ret = PTR_ERR_OR_ZERO(ctx.jrdev);
++	if (ret) {
++		pr_err("Job Ring Device allocation failed\n");
++		return ret;
++	}
++
++	desc = kzalloc(CAAM_PRNG_DESC_LEN, GFP_KERNEL | GFP_DMA);
++	if (!desc) {
++		caam_jr_free(ctx.jrdev);
++		return -ENOMEM;
++	}
++
++	dst_dma = dma_map_single(ctx.jrdev, dst, dlen, DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx.jrdev, dst_dma)) {
++		dev_err(ctx.jrdev, "Failed to map destination buffer memory\n");
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	init_completion(&ctx.done);
++	ret = caam_jr_enqueue(ctx.jrdev,
++			      caam_init_prng_desc(desc, dst_dma, dlen),
++			      caam_prng_done, &ctx);
++
++	if (ret == -EINPROGRESS) {
++		wait_for_completion(&ctx.done);
++		ret = 0;
++	}
++
++	dma_unmap_single(ctx.jrdev, dst_dma, dlen, DMA_FROM_DEVICE);
++
++out:
++	kfree(desc);
++	caam_jr_free(ctx.jrdev);
++	return ret;
++}
++
++static void caam_prng_exit(struct crypto_tfm *tfm)
++{
++
++	return;
++}
++
++static int caam_prng_init(struct crypto_tfm *tfm)
++{
++	return 0;
++}
++
++static int caam_prng_seed(struct crypto_rng *tfm,
++			 const u8 *seed, unsigned int slen)
++{
++	struct caam_prng_ctx ctx;
++	dma_addr_t seed_dma;
++	u32 *desc;
++	int ret;
++
++	ctx.jrdev = caam_jr_alloc();
++	ret = PTR_ERR_OR_ZERO(ctx.jrdev);
++	if (ret) {
++		pr_err("Job Ring Device allocation failed\n");
++		return ret;
++	}
++
++	desc = kzalloc(CAAM_PRNG_DESC_LEN, GFP_KERNEL | GFP_DMA);
++	if (!desc) {
++		caam_jr_free(ctx.jrdev);
++		return -ENOMEM;
++	}
++
++	seed_dma = dma_map_single(ctx.jrdev, seed, slen, DMA_FROM_DEVICE);
++	if (dma_mapping_error(ctx.jrdev, seed_dma)) {
++		dev_err(ctx.jrdev, "Failed to map destination buffer memory\n");
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	init_completion(&ctx.done);
++	ret = caam_jr_enqueue(ctx.jrdev,
++			      caam_init_reseed_desc(desc, seed_dma, slen),
++			      caam_prng_done, &ctx);
++
++	if (ret == -EINPROGRESS) {
++		wait_for_completion(&ctx.done);
++		ret = 0;
++	}
++
++	dma_unmap_single(ctx.jrdev, seed_dma, slen, DMA_FROM_DEVICE);
++
++out:
++	kfree(desc);
++	caam_jr_free(ctx.jrdev);
++	return ret;
++}
++
++static struct caam_prng_alg caam_prng_alg = {
++	.rng = {
++		.generate = caam_prng_generate,
++		.seed = caam_prng_seed,
++		.seedsize = 32,
++		.base = {
++			.cra_name = "stdrng",
++			.cra_driver_name = "prng-caam",
++			.cra_priority = 500,
++			.cra_ctxsize = sizeof(struct caam_prng_ctx),
++			.cra_module = THIS_MODULE,
++			.cra_init = caam_prng_init,
++			.cra_exit = caam_prng_exit,
++		},
++	}
++};
++
++void caam_prng_unregister(void *data)
++{
++	if (caam_prng_alg.registered)
++		crypto_unregister_rng(&caam_prng_alg.rng);
++}
++
++int caam_prng_register(struct device *ctrldev)
++{
++	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
++	u32 rng_inst;
++	int ret = 0;
++
++	/* Check for available RNG blocks before registration */
++	if (priv->era < 10)
++		rng_inst = (rd_reg32(&priv->jr[0]->perfmon.cha_num_ls) &
++			    CHA_ID_LS_RNG_MASK) >> CHA_ID_LS_RNG_SHIFT;
++	else
++		rng_inst = rd_reg32(&priv->jr[0]->vreg.rng) & CHA_VER_NUM_MASK;
++
++	if (!rng_inst) {
++		dev_dbg(ctrldev, "RNG block is not available..."
++				"skipping registering rng algorithm\n");
++
++		return ret;
++	}
++
++	ret = crypto_register_rng(&caam_prng_alg.rng);
++	if (ret) {
++		dev_err(ctrldev,
++			"couldn't register rng crypto alg: %d\n",
++			ret);
++		return ret;
++	}
++
++	caam_prng_alg.registered = true;
++
++	dev_info(ctrldev,
++		 "rng crypto API alg registered %s\n", caam_prng_alg.rng.base.cra_name);
++
++	return 0;
++}
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index e13470901586..33db8ed2b49e 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -1255,6 +1255,7 @@
+ #define OP_ALG_ICV_ON		(1 << OP_ALG_ICV_SHIFT)
+ 
+ #define OP_ALG_PR_ON		BIT(1)
++#define OP_ALG_AI_ON		BIT(11)
+ 
+ #define OP_ALG_DIR_SHIFT	0
+ #define OP_ALG_DIR_MASK		1
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 7d45b21bd55a..c2f51365df1b 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -185,6 +185,21 @@ static inline void caam_rng_exit(struct device *dev) {}
+ 
+ #endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API */
+ 
++#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_PRNG_API
++
++int caam_prng_register(struct device *dev);
++void caam_prng_unregister(void *data);
++
++#else
++
++static inline int caam_prng_register(struct device *dev)
++{
++	return 0;
++}
++
++static inline void caam_prng_unregister(void *data) {}
++#endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_PRNG_API */
++
+ #ifdef CONFIG_CAAM_QI
+ 
+ int caam_qi_algapi_init(struct device *dev);
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 7f2b1101f567..11849362f912 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -39,6 +39,7 @@ static void register_algs(struct caam_drv_private_jr *jrpriv,
+ 	caam_algapi_hash_init(dev);
+ 	caam_pkc_init(dev);
+ 	jrpriv->hwrng = !caam_rng_init(dev);
++	caam_prng_register(dev);
+ 	caam_qi_algapi_init(dev);
+ 
+ algs_unlock:
+@@ -56,6 +57,7 @@ static void unregister_algs(void)
+ 
+ 	caam_pkc_exit();
+ 	caam_algapi_hash_exit();
++	caam_prng_unregister(NULL);
+ 	caam_algapi_exit();
+ 
+ algs_unlock:
+-- 
+2.25.1
+
