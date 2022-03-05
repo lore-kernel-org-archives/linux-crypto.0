@@ -2,73 +2,244 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70139C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Mar 2022 05:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2230C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Mar 2022 07:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231318AbiCEFxa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Mar 2022 00:53:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
+        id S231394AbiCEHMb convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 5 Mar 2022 02:12:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiCEFx2 (ORCPT
+        with ESMTP id S229479AbiCEHMa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Mar 2022 00:53:28 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7453014F99C;
-        Fri,  4 Mar 2022 21:52:39 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0FFAE60A69;
-        Sat,  5 Mar 2022 05:52:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC6B4C004E1;
-        Sat,  5 Mar 2022 05:52:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646459558;
-        bh=TmX5r4HLh5PvrrD8E4B032rd4bRI0/BSVKu04zx6gRc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=R53ud9Y7CmHi7fMzJHtJQtOZIV3Nwu780KGZF3vDfW27RC1Cj89XES2t7FVjmmD6W
-         1z6kbr9oEwj/Z0vQduwUb/jxUfQ6cL+XhDdc9mHT05xeS96Eg5z63cn3dlafmc9se4
-         pxQm0xKDXrCbs952Nlou4LOV1E1tDEUpc2QW7OV2KVI3Bg/r40saTTN6/1HQ6Zpi/W
-         y/MEChzdL6bWaibSI3og1DXKkUogdnMCPt6gzEtplelnDxIxc4diq7K23miFBBGYcz
-         0P7Jjnaxyo1QVNPCbW0XKm7IwCEHCXOcpnu5DUZvPviqdpS+wM7yaWh1oyZGZOP7dg
-         PyPQjdIsKO9+g==
-Date:   Sat, 5 Mar 2022 07:51:52 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Mimi Zohar <zohar@linux.ibm.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] KEYS: asymmetric: enforce that sig algo matches key
- algo
-Message-ID: <YiL6ePrlN8OhsKEW@iki.fi>
-References: <20220201003414.55380-1-ebiggers@kernel.org>
- <20220201003414.55380-2-ebiggers@kernel.org>
- <YhLuOeIKLwlucpKv@kernel.org>
- <YiJn0lJxoUMUJ6wP@sol.localdomain>
+        Sat, 5 Mar 2022 02:12:30 -0500
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71536224749;
+        Fri,  4 Mar 2022 23:11:40 -0800 (PST)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4K9bQn0KV3z9sH3;
+        Sat,  5 Mar 2022 15:08:01 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 5 Mar 2022 15:11:37 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2308.021;
+ Sat, 5 Mar 2022 15:11:37 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>,
+        "mst@redhat.com" <mst@redhat.com>
+CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>
+Subject: RE: [PATCH v3 2/4] virtio-crypto: introduce akcipher service
+Thread-Topic: [PATCH v3 2/4] virtio-crypto: introduce akcipher service
+Thread-Index: AQHYLeeMUc1GsWuz90i/NBDHup0cZaywZIOw
+Date:   Sat, 5 Mar 2022 07:11:37 +0000
+Message-ID: <fb80509cfc6e4658bdda886ca3405101@huawei.com>
+References: <20220302033917.1295334-1-pizhenwei@bytedance.com>
+ <20220302033917.1295334-3-pizhenwei@bytedance.com>
+In-Reply-To: <20220302033917.1295334-3-pizhenwei@bytedance.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YiJn0lJxoUMUJ6wP@sol.localdomain>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 11:26:10AM -0800, Eric Biggers wrote:
-> On Mon, Feb 21, 2022 at 02:43:21AM +0100, Jarkko Sakkinen wrote:
-> > 
-> > Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > 
-> > David, do you want to pick this?
-> > 
-> 
-> No response from David, so I think you need to take these.
-> 
-> - Eric
 
-I did, they're applied now, thank you.
 
-BR, Jarkko
+> -----Original Message-----
+> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
+> Sent: Wednesday, March 2, 2022 11:39 AM
+> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com
+> Cc: jasowang@redhat.com; virtualization@lists.linux-foundation.org;
+> linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org;
+> herbert@gondor.apana.org.au; helei.sig11@bytedance.com; zhenwei pi
+> <pizhenwei@bytedance.com>
+> Subject: [PATCH v3 2/4] virtio-crypto: introduce akcipher service
+> 
+> Introduce asymmetric service definition, asymmetric operations and several
+> well known algorithms.
+> 
+> Co-developed-by: lei he <helei.sig11@bytedance.com>
+> Signed-off-by: lei he <helei.sig11@bytedance.com>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>  include/uapi/linux/virtio_crypto.h | 81 +++++++++++++++++++++++++++++-
+>  1 file changed, 80 insertions(+), 1 deletion(-)
+> 
+
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+
+Regards,
+-Gonglei
+
+> diff --git a/include/uapi/linux/virtio_crypto.h
+> b/include/uapi/linux/virtio_crypto.h
+> index 1166a49084b0..71a54a6849ca 100644
+> --- a/include/uapi/linux/virtio_crypto.h
+> +++ b/include/uapi/linux/virtio_crypto.h
+> @@ -37,6 +37,7 @@
+>  #define VIRTIO_CRYPTO_SERVICE_HASH   1
+>  #define VIRTIO_CRYPTO_SERVICE_MAC    2
+>  #define VIRTIO_CRYPTO_SERVICE_AEAD   3
+> +#define VIRTIO_CRYPTO_SERVICE_AKCIPHER 4
+> 
+>  #define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op))
+> 
+> @@ -57,6 +58,10 @@ struct virtio_crypto_ctrl_header {
+>  	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x02)
+> #define VIRTIO_CRYPTO_AEAD_DESTROY_SESSION \
+>  	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x03)
+> +#define VIRTIO_CRYPTO_AKCIPHER_CREATE_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x04)
+> #define
+> +VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION \
+> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER,
+> 0x05)
+>  	__le32 opcode;
+>  	__le32 algo;
+>  	__le32 flag;
+> @@ -180,6 +185,58 @@ struct virtio_crypto_aead_create_session_req {
+>  	__u8 padding[32];
+>  };
+> 
+> +struct virtio_crypto_rsa_session_para {
+> +#define VIRTIO_CRYPTO_RSA_RAW_PADDING   0
+> +#define VIRTIO_CRYPTO_RSA_PKCS1_PADDING 1
+> +	__le32 padding_algo;
+> +
+> +#define VIRTIO_CRYPTO_RSA_NO_HASH   0
+> +#define VIRTIO_CRYPTO_RSA_MD2       1
+> +#define VIRTIO_CRYPTO_RSA_MD3       2
+> +#define VIRTIO_CRYPTO_RSA_MD4       3
+> +#define VIRTIO_CRYPTO_RSA_MD5       4
+> +#define VIRTIO_CRYPTO_RSA_SHA1      5
+> +#define VIRTIO_CRYPTO_RSA_SHA256    6
+> +#define VIRTIO_CRYPTO_RSA_SHA384    7
+> +#define VIRTIO_CRYPTO_RSA_SHA512    8
+> +#define VIRTIO_CRYPTO_RSA_SHA224    9
+> +	__le32 hash_algo;
+> +};
+> +
+> +struct virtio_crypto_ecdsa_session_para {
+> +#define VIRTIO_CRYPTO_CURVE_UNKNOWN   0
+> +#define VIRTIO_CRYPTO_CURVE_NIST_P192 1 #define
+> +VIRTIO_CRYPTO_CURVE_NIST_P224 2 #define
+> VIRTIO_CRYPTO_CURVE_NIST_P256 3
+> +#define VIRTIO_CRYPTO_CURVE_NIST_P384 4 #define
+> +VIRTIO_CRYPTO_CURVE_NIST_P521 5
+> +	__le32 curve_id;
+> +	__le32 padding;
+> +};
+> +
+> +struct virtio_crypto_akcipher_session_para {
+> +#define VIRTIO_CRYPTO_NO_AKCIPHER    0
+> +#define VIRTIO_CRYPTO_AKCIPHER_RSA   1
+> +#define VIRTIO_CRYPTO_AKCIPHER_DSA   2
+> +#define VIRTIO_CRYPTO_AKCIPHER_ECDSA 3
+> +	__le32 algo;
+> +
+> +#define VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PUBLIC  1 #define
+> +VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PRIVATE 2
+> +	__le32 keytype;
+> +	__le32 keylen;
+> +
+> +	union {
+> +		struct virtio_crypto_rsa_session_para rsa;
+> +		struct virtio_crypto_ecdsa_session_para ecdsa;
+> +	} u;
+> +};
+> +
+> +struct virtio_crypto_akcipher_create_session_req {
+> +	struct virtio_crypto_akcipher_session_para para;
+> +	__u8 padding[36];
+> +};
+> +
+>  struct virtio_crypto_alg_chain_session_para {  #define
+> VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_HASH_THEN_CIPHER  1
+> #define VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_CIPHER_THEN_HASH  2
+> @@ -247,6 +304,8 @@ struct virtio_crypto_op_ctrl_req {
+>  			mac_create_session;
+>  		struct virtio_crypto_aead_create_session_req
+>  			aead_create_session;
+> +		struct virtio_crypto_akcipher_create_session_req
+> +			akcipher_create_session;
+>  		struct virtio_crypto_destroy_session_req
+>  			destroy_session;
+>  		__u8 padding[56];
+> @@ -266,6 +325,14 @@ struct virtio_crypto_op_header {
+>  	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x00)
+> #define VIRTIO_CRYPTO_AEAD_DECRYPT \
+>  	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x01)
+> +#define VIRTIO_CRYPTO_AKCIPHER_ENCRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x00)
+> #define
+> +VIRTIO_CRYPTO_AKCIPHER_DECRYPT \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x01)
+> #define
+> +VIRTIO_CRYPTO_AKCIPHER_SIGN \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x02)
+> #define
+> +VIRTIO_CRYPTO_AKCIPHER_VERIFY \
+> +	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x03)
+>  	__le32 opcode;
+>  	/* algo should be service-specific algorithms */
+>  	__le32 algo;
+> @@ -390,6 +457,16 @@ struct virtio_crypto_aead_data_req {
+>  	__u8 padding[32];
+>  };
+> 
+> +struct virtio_crypto_akcipher_para {
+> +	__le32 src_data_len;
+> +	__le32 dst_data_len;
+> +};
+> +
+> +struct virtio_crypto_akcipher_data_req {
+> +	struct virtio_crypto_akcipher_para para;
+> +	__u8 padding[40];
+> +};
+> +
+>  /* The request of the data virtqueue's packet */  struct
+> virtio_crypto_op_data_req {
+>  	struct virtio_crypto_op_header header; @@ -399,6 +476,7 @@ struct
+> virtio_crypto_op_data_req {
+>  		struct virtio_crypto_hash_data_req hash_req;
+>  		struct virtio_crypto_mac_data_req mac_req;
+>  		struct virtio_crypto_aead_data_req aead_req;
+> +		struct virtio_crypto_akcipher_data_req akcipher_req;
+>  		__u8 padding[48];
+>  	} u;
+>  };
+> @@ -409,6 +487,7 @@ struct virtio_crypto_op_data_req {
+>  #define VIRTIO_CRYPTO_NOTSUPP   3
+>  #define VIRTIO_CRYPTO_INVSESS   4 /* Invalid session id */
+>  #define VIRTIO_CRYPTO_NOSPC     5 /* no free session ID */
+> +#define VIRTIO_CRYPTO_KEY_REJECTED 6 /* Signature verification failed
+> +*/
+> 
+>  /* The accelerator hardware is ready */  #define
+> VIRTIO_CRYPTO_S_HW_READY  (1 << 0) @@ -439,7 +518,7 @@ struct
+> virtio_crypto_config {
+>  	__le32 max_cipher_key_len;
+>  	/* Maximum length of authenticated key */
+>  	__le32 max_auth_key_len;
+> -	__le32 reserve;
+> +	__le32 akcipher_algo;
+>  	/* Maximum size of each crypto request's content */
+>  	__le64 max_size;
+>  };
+> --
+> 2.20.1
+
