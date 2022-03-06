@@ -2,547 +2,329 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB6EC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Mar 2022 16:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D01C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Mar 2022 16:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233774AbiCFQDq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 6 Mar 2022 11:03:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34940 "EHLO
+        id S233796AbiCFQwj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 6 Mar 2022 11:52:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230313AbiCFQDp (ORCPT
+        with ESMTP id S231229AbiCFQwj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Mar 2022 11:03:45 -0500
-Received: from na01-obe.outbound.protection.outlook.com (mail-eus2azon11021014.outbound.protection.outlook.com [52.101.57.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638D23B57D
-        for <linux-crypto@vger.kernel.org>; Sun,  6 Mar 2022 08:02:51 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CFRIHDvrEcF43fhIILxInBph44air0ghhDU60R8JbnwyDXo8SLZA6um+D8EpxzPYwEp8130Tt3f6Yqv1fp0nedwIAXZHcB7mJfs8wIIGt4tjbp62nwzPjPp+DB5tK0zHV26Sz61s0PJC0sH2X3UEDSkWO3Mp8dN/wq5DkxuU1lGg+7wxsc0yNJuWjzmuZiv4Z1HiThuJ7oe6SXAJ4Ek7jdxLoMW6dOgMzNF9K9ofnflWfQwqQvKDQCJpufi83WLL6kZ0L/UI9PvixpGyAqB2tfLsLghYcz2MkTgoyZWUW3U+LtJCOg4nS0+j7S4yK/AMRCPsNbN7R9YgcCOPUVoNSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eC3Jp9Teb8VnVtBcP1UtRMOzrKr9IaFNHF3iyZJyOb4=;
- b=MwbvVbLYMfhQkvRZisCJxtbwlT0AAoPtHS5AHpe3ftOp+Qm+ORhyvS9NZEFFEoI21vDKYqNybjxh2ONm8kbMU3hODyA0xDa4AWiZePFOjwLdvSqVijhiEFf07Yq0gfjEITKcPnmlG8jpG+wplV4kTG7lmYX2gbHd51pKGAia7HHs/m5q7198rQt3uSclEc/uh/TnAwgw3WPYc6iZLpbxooAYdJoYwXVf4/uXZD3fLYu1Mk4Z9gktzKxSkAYC0ZvVrNkBi0Smh+29EVlD3B/ZRhpyqV8GyzPvTz+VWb1xFY/+v2l4gfoxhtBYLiu57tdpkqzA0aCAqlMaCQvuzAmWFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eC3Jp9Teb8VnVtBcP1UtRMOzrKr9IaFNHF3iyZJyOb4=;
- b=bAswKtWQSpikPiLflg/x4lKg1UMDqspey8l6mXSDYYZt36upQBo1qQrbhBhJ6i0PPj5WTPC4f9R8a7k0qp+6iEbVvcJlHwQRivhexqgMJ4+rbLyPLAULO//et0kl1SkNOBMP3hpt5x5cUuMwwUCi1Ws//K/MLp+Stytz0a+j3kI=
-Received: from MN0PR21MB3098.namprd21.prod.outlook.com (2603:10b6:208:376::14)
- by SJ0PR21MB2024.namprd21.prod.outlook.com (2603:10b6:a03:395::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.3; Sun, 6 Mar
- 2022 16:02:44 +0000
-Received: from MN0PR21MB3098.namprd21.prod.outlook.com
- ([fe80::a0b3:c840:b085:5d7b]) by MN0PR21MB3098.namprd21.prod.outlook.com
- ([fe80::a0b3:c840:b085:5d7b%8]) with mapi id 15.20.5061.008; Sun, 6 Mar 2022
- 16:02:43 +0000
-Content-Type: multipart/mixed;
-        boundary="_000_MN0PR21MB3098869F7EF526BF6E18A00DD7079MN0PR21MB3098namp_"
-From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To:     jason <jason@zx2c4.com>, Len Brown <lenb@kernel.org>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "souradch.linux@gmail.com" <souradch.linux@gmail.com>
-CC:     jason <jason@zx2c4.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
+        Sun, 6 Mar 2022 11:52:39 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15CF17A81;
+        Sun,  6 Mar 2022 08:51:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2978160EF4;
+        Sun,  6 Mar 2022 16:51:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB9FBC340EF;
+        Sun,  6 Mar 2022 16:51:44 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cOzI/taB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646585502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0Laylo4Gssaa7IN7BRi5RjrAx77Gcgm2U5INwrFKfCA=;
+        b=cOzI/taBLbL0n+EZEdfZRlhbs1udL7ZwnVxDBWDmdC6bQx1KZqlflFInAUdqrzAKxu1pca
+        Sp96HdQJ31t0ZClvL46GP4xaGqJJeyRuB386/ynuqu5HD8PE0iMdWoU4gReS4LL52Pt/Sk
+        DXhPJM5su4toa4WfRWhOueoPuVH/UM0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0ae0701b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 6 Mar 2022 16:51:42 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Adrian Catangiu <adrian@parity.io>,
-        =?iso-8859-1?Q?Daniel_P_=2E_Berrang=E9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        Laszlo Ersek <lersek@redhat.com>
-Subject: RE: [PATCH v5 3/3] virt: vmgenid: introduce driver for reinitializing
- RNG on VM fork
-Thread-Topic: [PATCH v5 3/3] virt: vmgenid: introduce driver for
- reinitializing RNG on VM fork
-Thread-Index: AQHYK11gIYiE2nIxS0mrVE8/JU+KrKyyjVcQ
-Date:   Sun, 6 Mar 2022 16:02:43 +0000
-Message-ID: <MN0PR21MB3098869F7EF526BF6E18A00DD7079@MN0PR21MB3098.namprd21.prod.outlook.com>
-References: <20220226220639.1173594-1-Jason@zx2c4.com>
- <20220226220639.1173594-4-Jason@zx2c4.com>
-In-Reply-To: <20220226220639.1173594-4-Jason@zx2c4.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: <MN0PR21MB3098869F7EF526BF6E18A00DD7079@MN0PR21MB3098.namprd21.prod.outlook.com>
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d5631f25-7439-4542-ada7-b8177f6b2162;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-03-06T15:51:25Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a33e37a2-3b73-4e98-3bc8-08d9ff8abfd2
-x-ms-traffictypediagnostic: SJ0PR21MB2024:EE_
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-ms-exchange-atpmessageproperties: SA|SL
-x-microsoft-antispam-prvs: <SJ0PR21MB2024D6B1F26CD1C5393F3D44D7079@SJ0PR21MB2024.namprd21.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9Iy5miJ1pBytUqglGU6SENDsWG39+qyG9zgLGbo9OOqOeiaY9DPCCV75FSe1jBjbOyrvA+aR36LZxrbofoeGdrOru1VGPJh5l9N2CuEbCsDbvXgYTHVKPjr/HLzaKZ99ajqfDcZnIbyQpYmwjyMrGTsRdWXRdpHctcCMwCMyhO3ImHW2RQBndWFXBhQPqUPcESMe4z7lTIQQkWlmzjGS+cBEtOBEKmf1E8VWwEZV7Xs0EopmJHhUpyL9PFsfitwSByYrbNYw3KEIPOYpHj8+f3PuOXO8kzm9Vn2PCHVQdbEqZTfXXOVY+9zDZ5t2kZycKhccwGHYvOniP9u5iow3p2UwiZCPqEUl/6/92sVdNZzA16Cx2CW4oCmAYP8Mf/bO07SVVOqTM/N75yWiBGZkZFhGjtiRjxA2JyXung0RxmXxGL0XINb8P+Y2PFbO/1CTgIGJY2d2yBeC5Jxasgil8CmrjEZQKuzV7F75kdW+r9oyHqQqKFmOT0fTH8a1OdvQ5xxcIX/E3BbFQTPZnaR+Z7HT8nw+hZyXx+Zc/T7dXYWpQVOBo8H4eOEdfsL/0M+l/W4SF8FB1W6sX8Jn1DXjMGppZyUrT+qYDNW7goyshiBU9LTwh06yw/Co4c8mRMaqpoBzoHRH/Y/eYYJQwcyLMwilRUwWS8vGph/6L591f527Yd3vFq1srIqIA+5XjOeEGjTpR9+6wmr67udL64/jAPrDOT/5ciabAJ/whLPJHWZtAEiZMCAH0iTwT1mTXnVJfIVx/RbKMEFbBPjpWU9finpE+tLMznSeiLtD2zQSrCrCxbI9U6w1bnwd4Ovzpl3Ky7v8y6gydqjl4bcxjew0YBJj0zBKih8uvO/I6SrUhTi9FD3G5xsEuRb0jjoAnedC
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR21MB3098.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(55016003)(38100700002)(2906002)(7696005)(33656002)(8936002)(52536014)(66476007)(64756008)(26005)(5660300002)(4326008)(54906003)(186003)(6506007)(508600001)(66556008)(9686003)(316002)(38070700005)(76116006)(82950400001)(71200400001)(82960400001)(8676002)(122000001)(86362001)(10290500003)(8990500004)(110136005)(7416002)(66946007)(83380400001)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?vZZzUPRbn1vM/KiDwOYyXqIPUlCMEB/qCv3kM2ZODfxVwgnSn0SLfj18a3?=
- =?iso-8859-1?Q?4J/OcF7/nmV3IBtu+k4+aWamkzhra4fRYVYVZtokS9i7vxCJpn/RAU3LHM?=
- =?iso-8859-1?Q?2U3WF66U24T4cyRAwHdA4E9r8ujhkQ32dS7RqCnfYZTLWWhNXge9m7iGb2?=
- =?iso-8859-1?Q?bviilaHNIh8UodvJ7WpePneMferFbAnAJ3lSXj1bMaxZiQGFKPwVnTHIYq?=
- =?iso-8859-1?Q?OeEIYU6ZUsm/Q7AEXBUyPKTkG8BBkqjoygNXmU25zptpn67fQn6NgMPk2i?=
- =?iso-8859-1?Q?T8d5Hnh7ReqmijM0IpDl9w22qhQWinNk0IQG/YfdLxUtmJRgTf7Dqb6WKZ?=
- =?iso-8859-1?Q?MNdYglZGTSlXHrQRDO194cFkg3IOkXIn7CFkQm8bq7+j3WA2WzWovDMHVU?=
- =?iso-8859-1?Q?/kfpwD/l1F/QT9riRAOj4CrD1g9dW3Ah3Wcm/+fxv7FEg8/0vDsevkbnrf?=
- =?iso-8859-1?Q?IMPxzJKpXYoPg2muepRnFmvNsIlFWYiNWA0yNtjmyB+kg/o66CZLz7P2pp?=
- =?iso-8859-1?Q?dV6h70qkzyvdOVlxH1W19yXMQNVIdtEI8z0pMWJ0DyMySCBKaK2TUmo/CR?=
- =?iso-8859-1?Q?k98ES33yuhj1FrK18QOEeY4W2JIqUHuK4b/ABnrP3OBI8h07VNjAsMTOJf?=
- =?iso-8859-1?Q?/xstkTwuTWFtSZjvK21PHm+sZ+m9pv99NOlausQ8fXqRM2NJjEAGNCdOGp?=
- =?iso-8859-1?Q?YIQyLBnbe+4OA27r/vp8+UC/9FYTd1SMnvx0dQYVPf62XYq+HE9hufTvtg?=
- =?iso-8859-1?Q?FnmgUsQnDdHOpKcdGKPcsJ4SImkU9+P6V8aHJH1G0pb1HRpeaYNR7PnlSl?=
- =?iso-8859-1?Q?OdSP4m6L9mF/lpofAZOBW45HvaO9vmdwQN8iShnD+mtIJGOjjKPe8Rrybp?=
- =?iso-8859-1?Q?gwQxIvAod8TbATZmAMXbIdoPru/it6Udtz7MmqMzulnD9NhkE8d/LX97/u?=
- =?iso-8859-1?Q?mPKMR2xbAocN6DuJYkMyW24Nv5vNMrzRHDOi3YrsL8hX8Ef4/X/ub82QzS?=
- =?iso-8859-1?Q?rPZaQjP7dg04NoxuBgBjf7hyK0axHh7asoyMN5jpT8d8X1mQNBbTqEbYpY?=
- =?iso-8859-1?Q?5RfvHBuMyuqxMgdGDB/9dXkejt9NqZQDaNHvdqVFVEolryoGNghAlibG+S?=
- =?iso-8859-1?Q?LkSKcqSi8ayuqMFbpOKERe8e3F2UQD5xuoVPTjr+fxOzeigCMI+1UEQnSA?=
- =?iso-8859-1?Q?ykXqTUdbKmC6j/jKVdOgCuw6hmiSrW0CuJobtBuynVimcq9kARAV7n3iyz?=
- =?iso-8859-1?Q?XhugAQTd3W8YvpOGPdteEAuKoVpHNkisOx0lbY0n5A5TRe1tsByYL+O8lg?=
- =?iso-8859-1?Q?nfzKT74GWUnVJfnG9XnjpkJ40l2qkx9+EoQODYoqi5k1klyEk87UdnujAa?=
- =?iso-8859-1?Q?ux7LZVcSIenkpVsKcD5mGwMAsNkLjIhydOVgZfOvOIjgHTridbe8XCTH7O?=
- =?iso-8859-1?Q?s7y1ENAzQU8raQVfiZIP96mmNZg1VJrW9afL5GQtAmEDEtapP7yggLcwBg?=
- =?iso-8859-1?Q?Z26En8xGK1kuD1XJgV9U5THYOB4e/h8Py3SGecOujn5A=3D=3D?=
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: [PATCH v2] random: use SipHash as interrupt entropy accumulator
+Date:   Sun,  6 Mar 2022 09:51:23 -0700
+Message-Id: <20220306165123.71024-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR21MB3098.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a33e37a2-3b73-4e98-3bc8-08d9ff8abfd2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2022 16:02:43.7282
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mw5dMhmfNo2yKfVf/m1xpL/he5pB06YXvNS3jahwJWXpm+xNZx1Xl67Q9AiRs1jcu4+eP+c52UKMopw4IBMELv6ScGZvt7b2FeoCu7Hor0s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR21MB2024
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---_000_MN0PR21MB3098869F7EF526BF6E18A00DD7079MN0PR21MB3098namp_
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+The current fast_mix() function is a piece of classic mailing list
+crypto, where it just sort of sprung up by an anonymous author without a
+lot of real analysis of what precisely it was accomplishing. As an ARX
+permutation alone, there are some easily searchable differential trails
+in it, and as a means of preventing malicious interrupts, it completely
+fails, since it xors new data into the entire state every time. It can't
+really be analyzed as a random permutation, because it clearly isn't,
+and it can't be analyzed as an interesting linear algebraic structure
+either, because it's also not that. There really is very little one can
+say about it in terms of entropy accumulation. It might diffuse bits,
+some of the time, maybe, we hope, I guess. But for the most part, it
+fails to accomplish anything concrete.
 
-From: Souradeep Chakrabarti <souradch.linux@gmail.com>
+As a reminder, the simple goal of add_interrupt_randomness() is to
+simply accumulate entropy until ~64 interrupts have elapsed, and then
+dump it into the main input pool, which uses a cryptographic hash.
 
-Jason A. Donenfeld <Jason@zx2c4.com> Sent: Saturday, February 26, 2022 2:07=
- PM
->=20
-> VM Generation ID is a feature from Microsoft, described at
-> <https://go.microsoft.com/fwlink/?LinkId=3D260709>, and supported by
-> Hyper-V and QEMU. Its usage is described in Microsoft's RNG whitepaper,
-> <https://aka.ms/win10rng>, as:
->=20
->     If the OS is running in a VM, there is a problem that most
->     hypervisors can snapshot the state of the machine and later rewind
->     the VM state to the saved state. This results in the machine running
->     a second time with the exact same RNG state, which leads to serious
->     security problems.  To reduce the window of vulnerability, Windows
->     10 on a Hyper-V VM will detect when the VM state is reset, retrieve
->     a unique (not random) value from the hypervisor, and reseed the root
->     RNG with that unique value.  This does not eliminate the
->     vulnerability, but it greatly reduces the time during which the RNG
->     system will produce the same outputs as it did during a previous
->     instantiation of the same VM state.
->=20
-> Linux has the same issue, and given that vmgenid is supported already by
-> multiple hypervisors, we can implement more or less the same solution.
-> So this commit wires up the vmgenid ACPI notification to the RNG's newly
-> added add_vmfork_randomness() function.
->=20
-> It can be used from qemu via the `-device vmgenid,guid=3Dauto` parameter.
-> After setting that, use `savevm` in the monitor to save the VM state,
-> then quit QEMU, start it again, and use `loadvm`. That will trigger this
-> driver's notify function, which hands the new UUID to the RNG. This is
-> described in <https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/specs/=
-vmgenid.txt>.
-> And there are hooks for this in libvirt as well, described in
-> <https://libvirt.org/formatdomain.html#general-metadata>.
->=20
-> Note, however, that the treatment of this as a UUID is considered to be
-> an accidental QEMU nuance, per
-> <https://github.com/libguestfs/virt-v2v/blob/master/docs/vm-generation-id=
--across-hypervisors.txt>,
-> so this driver simply treats these bytes as an opaque 128-bit binary
-> blob, as per the spec. This doesn't really make a difference anyway,
-> considering that's how it ends up when handed to the RNG in the end.
->=20
-> Cc: Alexander Graf <graf@amazon.com>
-> Cc: Adrian Catangiu <adrian@parity.io>
-> Cc: Daniel P. Berrang=E9 <berrange@redhat.com>
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Wei Yongjun <weiyongjun1@huawei.com>
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+It would be nice to have something cryptographically strong in the
+interrupt handler itself, in case a malicious interrupt compromises a
+per-cpu fast pool within the 64 interrupts / 1 second window, and then
+inside of that same window somehow can control its return address and
+cycle counter, even if that's a bit far fetched. However, with a very
+CPU-limited budget, actually doing that remains an active research
+project (and perhaps there'll be something useful for Linux to come out
+of it). And while the abundance of caution would be nice, this isn't
+*currently* the security model, and we don't yet have a fast enough
+solution to make it our security model. Plus there's not exactly a
+pressing need to do that. (And for the avoidance of doubt, the actual
+cluster of 64 accumulated interrupts still gets dumped into our
+cryptographically secure input pool.)
 
-The patch has been successfully verified in Hyper-V. I have used checkpoint
-to create snapshot and restarted the VM multiple times from the same snapsh=
-ot
-by applying it each time. To confirm the unique VM generation id, printk ha=
-s
-been used to print the value each time.
+So, for now we are going to stick with the existing interrupt security
+model, which assumes that each cluster of 64 interrupt data samples is
+mostly non-malicious and not colluding with an infoleaker. With this as
+our goal, we have a few more choices, simply aiming to accumulate
+entropy, while discarding the least amount of it.
 
-Tested-by: Souradeep Chakrabarti <souradch.linux@gmail.com>
+We know from <https://eprint.iacr.org/2019/198> that random oracles,
+instantiated as computational hash functions, make good entropy
+accumulators and extractors, which is the justification for using
+BLAKE2s in the main input pool. As mentioned, we don't have that luxury
+here, but we also don't have the same security model requirements,
+because we're assuming that there aren't malicious inputs. A
+pseudorandom function instance can approximately behave like a random
+oracle, provided that the key is uniformly random. But since we're not
+concerned with malicious inputs, we can pick a fixed key, which is not
+secret, knowing that "nature" won't interact with a sufficiently chosen
+fixed key by accident. So we pick a PRF with a fixed initial key, and
+accumulate into it continuously, dumping the result every 64 interrupts
+into our cryptographically secure input pool.
 
-> ---
-> Changes v4->v5:
-> - [Greg] Use module_acpi_driver instead of writing my own code.
-> - [Alex] Match on _CID instead of _HID.
-> - Prefer Y over M but still allow M, to handle initramfs reseeds.
-> - [Wei] Use IS_ERR instead of NULL check with devm_memremap.
->=20
->  MAINTAINERS            |   1 +
->  drivers/virt/Kconfig   |  11 +++++
->  drivers/virt/Makefile  |   1 +
->  drivers/virt/vmgenid.c | 100 +++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 113 insertions(+)
->  create mode 100644 drivers/virt/vmgenid.c
->=20
+For this, we make use of SipHash-1-x on 64-bit and HalfSipHash-1-x on
+32-bit, which are already in use in the kernel and achieve the same
+performance as the function they replace. It would be nice to do two
+rounds, but we don't exactly have the CPU budget handy for that, and one
+round alone is already sufficient.
 
---_000_MN0PR21MB3098869F7EF526BF6E18A00DD7079MN0PR21MB3098namp_
-Content-Disposition: attachment; filename="winmail.dat"
-Content-Transfer-Encoding: base64
-Content-Type: application/ms-tnef; name="winmail.dat"
+As mentioned, we start with a fixed initial key (zeros is fine), and
+allow SipHash's symmetry breaking constants to turn that into a useful
+starting point. Also, since we're dumping the result (or half of it on
+64-bit) into the cryptographically secure input pool, there's no point
+in finalizing SipHash's output, since it'll wind up being finalized by
+something much stronger. This means that all we need to do is use the
+ordinary round function word-by-word, as normal SipHash does.
+Simplified, the flow is as follows:
 
-eJ8+IgoeAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEJgAEAIQAAAEJBMTYxNzU3
-NDQ3MkIyNEVBNjgyNDc1MTg5NzM0QjExAOEGAQ2ABAACAAAAAgACAAEFgAMADgAAAOYHAwAGABAA
-AgArAAAAMwEBIIADAA4AAADmBwMABgAQAAIAKwAAADMBAQiABwAYAAAASVBNLk1pY3Jvc29mdCBN
-YWlsLk5vdGUAMQgBBIABAFUAAABSRTogW1BBVENIIHY1IDMvM10gdmlydDogdm1nZW5pZDogaW50
-cm9kdWNlIGRyaXZlciBmb3IgcmVpbml0aWFsaXppbmcgUk5HIG9uIFZNIGZvcmsAlxwBA5AGABBI
-AABvAAAAAgF/AAEAAABRAAAAPE1OMFBSMjFNQjMwOTg4NjlGN0VGNTI2QkY2RTE4QTAwREQ3MDc5
-QE1OMFBSMjFNQjMwOTgubmFtcHJkMjEucHJvZC5vdXRsb29rLmNvbT4AAAAACwAfDgAAAAACAQkQ
-AQAAABYKAAASCgAAOBEAAExaRnWrQV2FYQAKZmJpZAQAAGNjwHBnMTI1MgD+A0PwdGV4dAH3AqQD
-4wIABGNoCsBzZXQwIO8HbQKDAFARTTIKgAa0AoCWfQqACMg7CWIxOQ7AvwnDFnIKMhZxAoAVYioJ
-sHMJ8ASQYXQFsg5QA2Bzom8BgCBFeBHBbhgwXQZSdgSQF7YCEHIAwHR9CFBuGjEQIAXABaAbZGSa
-IANSIBAiF7JcdgiQ5HdrC4BkNR1TBPAHQA0XcDAKcRfyYmttawZzAZAAICBCTV9C4EVHSU59CvwB
-8QvwaDIgRgNhOgYACGFhoQEAZXAgQxHQaxhw4mIfgWkgPBkgIiIRwIQubAuAdXhAZwDARQMQLgWg
-bT5cJAFlMwqBJRRKYRkgA6BBLowgRAIgCfBmZWwcYAI8JeNAengyYzQ/JLMGUQIwIeEYgAhwZGGE
-eSwhkGVicnUKwHB5IDI2KRAB0CFxMsA6MDcgUE0lBSgQoSrHVk0gRxhEaSYRSElEIAQAIGEccGV/
-KKIZ4ByDGNcpEAEABPJiJxxRGIAqxzxoAkBwc4A6Ly9nby5tGOYRJLIvZnckAWsvP2JMMeFJZD0p
-wCpwMBw5PikQAHAcYHN1cCZwCREcUWJ5KsdIeRJwBJAtVjMjUUVNElUmUEl0BCB1c2FfGdEs8S7I
-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
-Em0poFLQA6AFoAEAb8H4/BHDYvyATeKT31FfZkMswv4oX0gswP/6UP8JcLxB0IBDkLTSK/Bksh9g
-/1aiu1FS0T6yR0CUcnZRzNH/WTBNUBFAXaVRcPuK0FH8hEBJU19FUlL+Ck44VUxM5kRMRIWxbV9t
-TWBtFkBEEHDB/zyhTXpBICBUDTEJID2ADdl8OVUyICs8OJJ0r0QvS/fucz4wDnMxDtERcg8PEBR/
-ASC7wH2wdlEOjw+cm5ZjvxPBHpERZBb/GA8RqjQccN8TgUIR+qPwkRFAM22C1VDzLHKBkCspVJjn
-lfzht2F5HqA2NBngFO8V8wv+fQZ98bAgcAAAHwBCAAEAAAAuAAAATQBpAGMAaABhAGUAbAAgAEsA
-ZQBsAGwAZQB5ACAAKABMAEkATgBVAFgAKQAAAAAAHwBlAAEAAAAuAAAAbQBpAGsAZQBsAGwAZQB5
-AEAAbQBpAGMAcgBvAHMAbwBmAHQALgBjAG8AbQAAAAAAHwBkAAEAAAAKAAAAUwBNAFQAUAAAAAAA
-AgFBAAEAAAB+AAAAAAAAAIErH6S+oxAZnW4A3QEPVAIAAACATQBpAGMAaABhAGUAbAAgAEsAZQBs
-AGwAZQB5ACAAKABMAEkATgBVAFgAKQAAAFMATQBUAFAAAABtAGkAawBlAGwAbABlAHkAQABtAGkA
-YwByAG8AcwBvAGYAdAAuAGMAbwBtAAAAAAAfAAJdAQAAAC4AAABtAGkAawBlAGwAbABlAHkAQABt
-AGkAYwByAG8AcwBvAGYAdAAuAGMAbwBtAAAAAAAfAOVfAQAAADYAAABzAGkAcAA6AG0AaQBrAGUA
-bABsAGUAeQBAAG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0AAAAAAB8AGgwBAAAALgAAAE0AaQBj
-AGgAYQBlAGwAIABLAGUAbABsAGUAeQAgACgATABJAE4AVQBYACkAAAAAAB8AHwwBAAAALgAAAG0A
-aQBrAGUAbABsAGUAeQBAAG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0AAAAAAB8AHgwBAAAACgAA
-AFMATQBUAFAAAAAAAAIBGQwBAAAAfgAAAAAAAACBKx+kvqMQGZ1uAN0BD1QCAAAAgE0AaQBjAGgA
-YQBlAGwAIABLAGUAbABsAGUAeQAgACgATABJAE4AVQBYACkAAABTAE0AVABQAAAAbQBpAGsAZQBs
-AGwAZQB5AEAAbQBpAGMAcgBvAHMAbwBmAHQALgBjAG8AbQAAAAAAHwABXQEAAAAuAAAAbQBpAGsA
-ZQBsAGwAZQB5AEAAbQBpAGMAcgBvAHMAbwBmAHQALgBjAG8AbQAAAAAACwBAOgEAAAAfABoAAQAA
-ABIAAABJAFAATQAuAE4AbwB0AGUAAAAAAAMA8T8JBAAACwBAOgEAAAADAP0/5AQAAAIBCzABAAAA
-EAAAALoWF1dEcrJOpoJHUYlzSxEDABcAAQAAAEAAOQCAk9qcczHYAUAACDAcZ0edczHYAR8ANwAB
-AAAAqgAAAFIARQA6ACAAWwBQAEEAVABDAEgAIAB2ADUAIAAzAC8AMwBdACAAdgBpAHIAdAA6ACAA
-dgBtAGcAZQBuAGkAZAA6ACAAaQBuAHQAcgBvAGQAdQBjAGUAIABkAHIAaQB2AGUAcgAgAGYAbwBy
-ACAAcgBlAGkAbgBpAHQAaQBhAGwAaQB6AGkAbgBnACAAUgBOAEcAIABvAG4AIABWAE0AIABmAG8A
-cgBrAAAAAAAfAD0AAQAAAAoAAABSAEUAOgAgAAAAAAADAN4/r28AAAsAAgABAAAACwAjAAAAAAAD
-ACYAAAAAAAsAKQAAAAAACwArAAAAAAADAC4AAAAAAAMANgAAAAAAHwBwAAEAAACiAAAAWwBQAEEA
-VABDAEgAIAB2ADUAIAAzAC8AMwBdACAAdgBpAHIAdAA6ACAAdgBtAGcAZQBuAGkAZAA6ACAAaQBu
-AHQAcgBvAGQAdQBjAGUAIABkAHIAaQB2AGUAcgAgAGYAbwByACAAcgBlAGkAbgBpAHQAaQBhAGwA
-aQB6AGkAbgBnACAAUgBOAEcAIABvAG4AIABWAE0AIABmAG8AcgBrAAAAAAACAXEAAQAAABsAAAAB
-AdgrXWAhiITacjFLSatUTz8lT4qsrLKNVxAACwAGDAAAAAAfADUQAQAAAKIAAAA8AE0ATgAwAFAA
-UgAyADEATQBCADMAMAA5ADgAOAA2ADkARgA3AEUARgA1ADIANgBCAEYANgBFADEAOABBADAAMABE
-AEQANwAwADcAOQBAAE0ATgAwAFAAUgAyADEATQBCADMAMAA5ADgALgBuAGEAbQBwAHIAZAAyADEA
-LgBwAHIAbwBkAC4AbwB1AHQAbABvAG8AawAuAGMAbwBtAD4AAAAAAB8AORABAAAArAAAADwAMgAw
-ADIAMgAwADIAMgA2ADIAMgAwADYAMwA5AC4AMQAxADcAMwA1ADkANAAtADEALQBKAGEAcwBvAG4A
-QAB6AHgAMgBjADQALgBjAG8AbQA+ACAAPAAyADAAMgAyADAAMgAyADYAMgAyADAANgAzADkALgAx
-ADEANwAzADUAOQA0AC0ANAAtAEoAYQBzAG8AbgBAAHoAeAAyAGMANAAuAGMAbwBtAD4AAAAfAEIQ
-AQAAAFYAAAA8ADIAMAAyADIAMAAyADIANgAyADIAMAA2ADMAOQAuADEAMQA3ADMANQA5ADQALQA0
-AC0ASgBhAHMAbwBuAEAAegB4ADIAYwA0AC4AYwBvAG0APgAAAAAAAwCAEP////8DABMSAAAAAEAA
-BzDts6WcczHYAQIBEDABAAAARgAAAAAAAABhxaufc+oVTb0HLTd5yHHjBwAYB9thiaf8S7tO0dvP
-3wUrAAAAAAARAACh+n32jReQQZSvFLhmfg5fAAOUznf+AAAAAAIBEzABAAAAEAAAACGIhNpyMUtJ
-q1RPPyVPiqwCARQwAQAAAAwAAADcAQAAH+Y2oUYAAAADAFszAQAAAAMAWjYAAAAAAwBoNg0AAAAL
-APo2AQAAAB8A2T8BAAAAAAIAAEYAcgBvAG0AOgAgAFMAbwB1AHIAYQBkAGUAZQBwACAAQwBoAGEA
-awByAGEAYgBhAHIAdABpACAAPABzAG8AdQByAGEAZABjAGgALgBsAGkAbgB1AHgAQABnAG0AYQBp
-AGwALgBjAG8AbQA+AA0ACgANAAoASgBhAHMAbwBuACAAQQAuACAARABvAG4AZQBuAGYAZQBsAGQA
-IAA8AEoAYQBzAG8AbgBAAHoAeAAyAGMANAAuAGMAbwBtAD4AIABTAGUAbgB0ADoAIABTAGEAdAB1
-AHIAZABhAHkALAAgAEYAZQBiAHIAdQBhAHIAeQAgADIANgAsACAAMgAwADIAMgAgADIAOgAwADcA
-IABQAE0ADQAKAD4AIAANAAoAPgAgAFYATQAgAEcAZQBuAGUAcgBhAHQAaQBvAG4AIABJAEQAIABp
-AHMAIABhACAAZgBlAGEAdAB1AHIAZQAgAGYAcgBvAG0AIABNAGkAYwByAG8AcwBvAGYAdAAsACAA
-ZABlAHMAYwByAGkAYgBlAGQAIABhAHQADQAKAD4AIAA8AGgAdAB0AHAAcwA6AC8ALwBnAG8ALgBt
-AGkAYwByAG8AcwBvAGYAdAAuAGMAbwBtAC8AZgB3AGwAaQBuAGsALwA/AEwAaQBuAGsASQBkAD0A
-MgA2ADAANwAwADkAPgAsAAAAHwD4PwEAAAAuAAAATQBpAGMAaABhAGUAbAAgAEsAZQBsAGwAZQB5
-ACAAKABMAEkATgBVAFgAKQAAAAAAHwD6PwEAAAAuAAAATQBpAGMAaABhAGUAbAAgAEsAZQBsAGwA
-ZQB5ACAAKABMAEkATgBVAFgAKQAAAAAAHwAiQAEAAAAGAAAARQBYAAAAAAAfACNAAQAAACYBAAAv
-AE8APQBFAFgAQwBIAEEATgBHAEUATABBAEIAUwAvAE8AVQA9AEUAWABDAEgAQQBOAEcARQAgAEEA
-RABNAEkATgBJAFMAVABSAEEAVABJAFYARQAgAEcAUgBPAFUAUAAgACgARgBZAEQASQBCAE8ASABG
-ADIAMwBTAFAARABMAFQAKQAvAEMATgA9AFIARQBDAEkAUABJAEUATgBUAFMALwBDAE4APQBNAEkA
-QwBSAE8AUwBPAEYAVAAuAE8ATgBNAEkAQwBSAE8AUwBPAEYAVAAuAEMATwBNAC0ANQA1ADcANgAw
-AC0ATQBJAEMASABBAEUATAAgAEsARQBMAEwARQBZACAAKABTAFkAUwBUAEUATQAgAEMARQBOAFQA
-RQBSACkAAAAAAB8AJEABAAAABgAAAEUAWAAAAAAAHwAlQAEAAAAmAQAALwBPAD0ARQBYAEMASABB
-AE4ARwBFAEwAQQBCAFMALwBPAFUAPQBFAFgAQwBIAEEATgBHAEUAIABBAEQATQBJAE4ASQBTAFQA
-UgBBAFQASQBWAEUAIABHAFIATwBVAFAAIAAoAEYAWQBEAEkAQgBPAEgARgAyADMAUwBQAEQATABU
-ACkALwBDAE4APQBSAEUAQwBJAFAASQBFAE4AVABTAC8AQwBOAD0ATQBJAEMAUgBPAFMATwBGAFQA
-LgBPAE4ATQBJAEMAUgBPAFMATwBGAFQALgBDAE8ATQAtADUANQA3ADYAMAAtAE0ASQBDAEgAQQBF
-AEwAIABLAEUATABMAEUAWQAgACgAUwBZAFMAVABFAE0AIABDAEUATgBUAEUAUgApAAAAAAAfADBA
-AQAAAC4AAABNAGkAYwBoAGEAZQBsACAASwBlAGwAbABlAHkAIAAoAEwASQBOAFUAWAApAAAAAAAf
-ADFAAQAAAC4AAABNAGkAYwBoAGEAZQBsACAASwBlAGwAbABlAHkAIAAoAEwASQBOAFUAWAApAAAA
-AAAfADhAAQAAAC4AAABNAGkAYwBoAGEAZQBsACAASwBlAGwAbABlAHkAIAAoAEwASQBOAFUAWAAp
-AAAAAAAfADlAAQAAAC4AAABNAGkAYwBoAGEAZQBsACAASwBlAGwAbABlAHkAIAAoAEwASQBOAFUA
-WAApAAAAAAADAFlAAAAAAAMAWkAAAAAAAwA3UAEAAAADAAlZAQAAAB8ACl0BAAAALgAAAG0AaQBr
-AGUAbABsAGUAeQBAAG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0AAAAAAB8AC10BAAAALgAAAG0A
-aQBrAGUAbABsAGUAeQBAAG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0AAAAAAAIBFV0BAAAAEgAA
-AAK/iPly8YavQZGrLXzQEdtHAQAAAgEWXQEAAAASAAAAAr+I+XLxhq9BkastfNAR20cBAAALAACA
-CCAGAAAAAADAAAAAAAAARgAAAAAUhQAAAAAAAAMAAIBQ42MLzJzQEbzbAIBfzM4EAQAAACQAAABJ
-AG4AZABlAHgAaQBuAGcARQByAHIAbwByAEMAbwBkAGUAAAAbAAAACwAAgFDjYwvMnNARvNsAgF/M
-zgQBAAAAJgAAAEkAcwBQAGUAcgBtAGEAbgBlAG4AdABGAGEAaQBsAHUAcgBlAAAAAAAAAAAAAwAA
-gAggBgAAAAAAwAAAAAAAAEYBAAAAMgAAAEUAeABjAGgAYQBuAGcAZQBBAHAAcABsAGkAYwBhAHQA
-aQBvAG4ARgBsAGEAZwBzAAAAAAAgAAAACwAAgAggBgAAAAAAwAAAAAAAAEYAAAAAA4UAAAAAAAAL
-AACACCAGAAAAAADAAAAAAAAARgAAAAAOhQAAAAAAAB8AAIATj/JB9IMUQaWE7ttaawv/AQAAABYA
-AABDAGwAaQBlAG4AdABJAG4AZgBvAAAAAAABAAAAKgAAAEMAbABpAGUAbgB0AD0ATQBTAEUAeABj
-AGgAYQBuAGcAZQBSAFAAQwAAAAAACwAAgAggBgAAAAAAwAAAAAAAAEYAAAAABoUAAAAAAAADAACA
-CCAGAAAAAADAAAAAAAAARgAAAAABhQAAAAAAAAIBAIATj/JB9IMUQaWE7ttaawv/AQAAAC4AAABI
-AGUAYQBkAGUAcgBCAG8AZAB5AEYAcgBhAGcAbQBlAG4AdABMAGkAcwB0AAAAAAABAAAAIgAAAAEA
-CgAAAAQAAAAAAAAAFAAAAAAAAAAAAAAA/////wAAAAAAAAsAAIATj/JB9IMUQaWE7ttaawv/AQAA
-ABwAAABIAGEAcwBRAHUAbwB0AGUAZABUAGUAeAB0AAAAAAAAAAsAAIATj/JB9IMUQaWE7ttaawv/
-AQAAACgAAABJAHMAUQB1AG8AdABlAGQAVABlAHgAdABDAGgAYQBuAGcAZQBkAAAAAQAAAAIBAIAT
-j/JB9IMUQaWE7ttaawv/AQAAAEAAAABDAG8AbgB2AGUAcgBzAGEAdABpAG8AbgBUAHIAZQBlAFAA
-YQByAGUAbgB0AFIAZQBjAG8AcgBkAEsAZQB5AAAAAQAAAC4AAAAAAAAAYcWrn3PqFU29By03echx
-4wEAofp99o0XkEGUrxS4Zn4OXwADlM6XTwAAAAAfAACAH6TrM6h6LkK+e3nhqY5UswEAAAA4AAAA
-QwBvAG4AdgBlAHIAcwBhAHQAaQBvAG4ASQBuAGQAZQB4AFQAcgBhAGMAawBpAG4AZwBFAHgAAAAB
-AAAA5gEAAEkASQA9AFsAQwBJAEQAPQBkAGEAOAA0ADgAOAAyADEALQAzADEANwAyAC0ANAA5ADQA
-YgAtAGEAYgA1ADQALQA0AGYAMwBmADIANQA0AGYAOABhAGEAYwA7AEkARABYAEgARQBBAEQAPQAw
-ADEARAA4ADIAQgA1AEQANgAwADsASQBEAFgAQwBPAFUATgBUAD0AMgBdADsAUwBCAE0ASQBEAD0A
-NwAwADsAUwAxAD0APAAyADAAMgAyADAAMgAyADYAMgAyADAANgAzADkALgAxADEANwAzADUAOQA0
-AC0ANAAtAEoAYQBzAG8AbgBAAHoAeAAyAGMANAAuAGMAbwBtAD4AOwBSAFQAUAA9AEQAaQByAGUA
-YwB0AEMAaABpAGwAZAA7AFQARABOAD0ATQBpAHMAbQBhAHQAYwBoADsAVABQAD0AUwBhAG0AZQA7
-AFQARgBSAD0ATgBvAHQARgBvAHIAawBpAG4AZwA7AFYAZQByAHMAaQBvAG4APQBWAGUAcgBzAGkA
-bwBuACAAMQA1AC4AMgAwACAAKABCAHUAaQBsAGQAIAA1ADAANgAxAC4AMAApACwAIABTAHQAYQBn
-AGUAPQBIADEAOwBVAFAAPQBEADAAOwBEAFAAPQAxADAAMQAAAAAAAwAAgAggBgAAAAAAwAAAAAAA
-AEYAAAAAEIUAAAAAAAAfAACAUONjC8yc0BG82wCAX8zOBAEAAAAqAAAASQBuAGQAZQB4AGkAbgBn
-AEUAcgByAG8AcgBNAGUAcwBzAGEAZwBlAAAAAAABAAAAcAAAAEkAbgBkAGUAeABpAG4AZwAgAFAA
-ZQBuAGQAaQBuAGcAIAB3AGgAaQBsAGUAIABCAGkAZwBGAHUAbgBuAGUAbABQAE8ASQBJAHMAVQBw
-AFQAbwBEAGEAdABlACAAaQBzACAAZgBhAGwAcwBlAC4AAAADAACACCAGAAAAAADAAAAAAAAARgAA
-AAAYhQAAAAAAAAsAAIAIIAYAAAAAAMAAAAAAAABGAAAAAIKFAAAAAAAAHwAAgAggBgAAAAAAwAAA
-AAAAAEYAAAAA2IUAAAEAAAASAAAASQBQAE0ALgBOAG8AdABlAAAAAABAAACACCAGAAAAAADAAAAA
-AAAARgAAAAC/hQAAYIDL0HIx2AECAQCACCAGAAAAAADAAAAAAAAARgEAAAA2AAAASQBuAFQAcgBh
-AG4AcwBpAHQATQBlAHMAcwBhAGcAZQBDAG8AcgByAGUAbABhAHQAbwByAAAAAAABAAAAEAAAAMFk
-qal8iK9IqADXcOWwRuUfAACAhgMCAAAAAADAAAAAAAAARgEAAAAYAAAAbQBzAGkAcABfAGwAYQBi
-AGUAbABzAAAAAQAAAAIEAABNAFMASQBQAF8ATABhAGIAZQBsAF8AZgA0ADIAYQBhADMANAAyAC0A
-OAA3ADAANgAtADQAMgA4ADgALQBiAGQAMQAxAC0AZQBiAGIAOAA1ADkAOQA1ADAAMgA4AGMAXwBB
-AGMAdABpAG8AbgBJAGQAPQBkADUANgAzADEAZgAyADUALQA3ADQAMwA5AC0ANAA1ADQAMgAtAGEA
-ZABhADcALQBiADgAMQA3ADcAZgA2AGIAMgAxADYAMgA7AE0AUwBJAFAAXwBMAGEAYgBlAGwAXwBm
-ADQAMgBhAGEAMwA0ADIALQA4ADcAMAA2AC0ANAAyADgAOAAtAGIAZAAxADEALQBlAGIAYgA4ADUA
-OQA5ADUAMAAyADgAYwBfAEMAbwBuAHQAZQBuAHQAQgBpAHQAcwA9ADAAOwBNAFMASQBQAF8ATABh
-AGIAZQBsAF8AZgA0ADIAYQBhADMANAAyAC0AOAA3ADAANgAtADQAMgA4ADgALQBiAGQAMQAxAC0A
-ZQBiAGIAOAA1ADkAOQA1ADAAMgA4AGMAXwBFAG4AYQBiAGwAZQBkAD0AdAByAHUAZQA7AE0AUwBJ
-AFAAXwBMAGEAYgBlAGwAXwBmADQAMgBhAGEAMwA0ADIALQA4ADcAMAA2AC0ANAAyADgAOAAtAGIA
-ZAAxADEALQBlAGIAYgA4ADUAOQA5ADUAMAAyADgAYwBfAE0AZQB0AGgAbwBkAD0AUwB0AGEAbgBk
-AGEAcgBkADsATQBTAEkAUABfAEwAYQBiAGUAbABfAGYANAAyAGEAYQAzADQAMgAtADgANwAwADYA
-LQA0ADIAOAA4AC0AYgBkADEAMQAtAGUAYgBiADgANQA5ADkANQAwADIAOABjAF8ATgBhAG0AZQA9
-AEkAbgB0AGUAcgBuAGEAbAA7AE0AUwBJAFAAXwBMAGEAYgBlAGwAXwBmADQAMgBhAGEAMwA0ADIA
-LQA4ADcAMAA2AC0ANAAyADgAOAAtAGIAZAAxADEALQBlAGIAYgA4ADUAOQA5ADUAMAAyADgAYwBf
-AFMAZQB0AEQAYQB0AGUAPQAyADAAMgAyAC0AMAAzAC0AMAA2AFQAMQA1ADoANQAxADoAMgA1AFoA
-OwBNAFMASQBQAF8ATABhAGIAZQBsAF8AZgA0ADIAYQBhADMANAAyAC0AOAA3ADAANgAtADQAMgA4
-ADgALQBiAGQAMQAxAC0AZQBiAGIAOAA1ADkAOQA1ADAAMgA4AGMAXwBTAGkAdABlAEkAZAA9ADcA
-MgBmADkAOAA4AGIAZgAtADgANgBmADEALQA0ADEAYQBmAC0AOQAxAGEAYgAtADIAZAA3AGMAZAAw
-ADEAMQBkAGIANAA3ADsAAAAAAEgAAIBrxT9AMM3FR4b47enjWgIrAQAAABwAAABNAFMASQBQAEwA
-YQBiAGUAbABHAHUAaQBkAAAAQqMq9AaHiEK9Eeu4WZUCjAMADTT9PwAAHwAAgIYDAgAAAAAAwAAA
-AAAAAEYBAAAALgAAAGEAdQB0AGgAZQBuAHQAaQBjAGEAdABpAG8AbgAtAHIAZQBzAHUAbAB0AHMA
-AAAAAAEAAAC+AAAAZABrAGkAbQA9AG4AbwBuAGUAIAAoAG0AZQBzAHMAYQBnAGUAIABuAG8AdAAg
-AHMAaQBnAG4AZQBkACkAIABoAGUAYQBkAGUAcgAuAGQAPQBuAG8AbgBlADsAZABtAGEAcgBjAD0A
-bgBvAG4AZQAgAGEAYwB0AGkAbwBuAD0AbgBvAG4AZQAgAGgAZQBhAGQAZQByAC4AZgByAG8AbQA9
-AG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0AOwAAAAAAHwAAgIYDAgAAAAAAwAAAAAAAAEYBAAAA
-HgAAAGEAYwBjAGUAcAB0AGwAYQBuAGcAdQBhAGcAZQAAAAAAAQAAAAwAAABlAG4ALQBVAFMAAAAf
-AACAhgMCAAAAAADAAAAAAAAARgEAAAAgAAAAeAAtAG0AcwAtAGgAYQBzAC0AYQB0AHQAYQBjAGgA
-AAABAAAAAgAAAAAAAAAfAACAa8U/QDDNxUeG+O3p41oCKwEAAAASAAAATQBJAFAATABhAGIAZQBs
-AAAAAAABAAAAzgEAAFsAewAiAGkAZAAiADoAIgBmADQAMgBhAGEAMwA0ADIALQA4ADcAMAA2AC0A
-NAAyADgAOAAtAGIAZAAxADEALQBlAGIAYgA4ADUAOQA5ADUAMAAyADgAYwAiACwAIgB0AGkAIgA6
-ACIANwAyAGYAOQA4ADgAYgBmAC0AOAA2AGYAMQAtADQAMQBhAGYALQA5ADEAYQBiAC0AMgBkADcA
-YwBkADAAMQAxAGQAYgA0ADcAIgAsACIAcABpACIAOgAiADAAMAAwADAAMAAwADAAMAAtADAAMAAw
-ADAALQAwADAAMAAwAC0AMAAwADAAMAAtADAAMAAwADAAMAAwADAAMAAwADAAMAAwACIALAAiAG4A
-bQAiADoAIgBJAG4AdABlAHIAbgBhAGwAIgAsACIAYQBjACIAOgAwACwAIgBvAHAAIgA6ADEALAAi
-AGMAdAAiADoAIgAyADAAMgAyAC0AMAAzAC0AMAA2AFQAMQA1ADoANQAxADoAMgA1AFoAIgAsACIA
-bQB0ACIAOgAiADAAMAAwADEALQAwADEALQAwADEAVAAwADAAOgAwADAAOgAwADAAIgAsACIAdQBj
-ACIAOgBuAHUAbABsAH0AXQAAAAAASAAAgAggBgAAAAAAwAAAAAAAAEYBAAAAIgAAAE4AZQB0AHcA
-bwByAGsATQBlAHMAcwBhAGcAZQBJAGQAAAAAAKI3PqNzO5hOO8gI2f+Kv9IfAACAhgMCAAAAAADA
-AAAAAAAARgEAAAAuAAAAeAAtAG0AcwAtAHAAdQBiAGwAaQBjAHQAcgBhAGYAZgBpAGMAdAB5AHAA
-ZQAAAAAAAQAAAAwAAABFAG0AYQBpAGwAAAAfAACAhgMCAAAAAADAAAAAAAAARgEAAABQAAAAeAAt
-AG0AcwAtAG8AZgBmAGkAYwBlADMANgA1AC0AZgBpAGwAdABlAHIAaQBuAGcALQBjAG8AcgByAGUA
-bABhAHQAaQBvAG4ALQBpAGQAAAABAAAASgAAAGEAMwAzAGUAMwA3AGEAMgAtADMAYgA3ADMALQA0
-AGUAOQA4AC0AMwBiAGMAOAAtADAAOABkADkAZgBmADgAYQBiAGYAZAAyAAAAAAAfAACAhgMCAAAA
-AADAAAAAAAAARgEAAAA2AAAAeAAtAG0AcwAtAHQAcgBhAGYAZgBpAGMAdAB5AHAAZQBkAGkAYQBn
-AG4AbwBzAHQAaQBjAAAAAAABAAAAJAAAAFMASgAwAFAAUgAyADEATQBCADIAMAAyADQAOgBFAEUA
-XwAAAB8AAIBrxT9AMM3FR4b47enjWgIrAQAAABQAAABEAEMAUwBKAG8AYgBVAHIAbAAAAAEAAADm
-AAAAaAB0AHQAcABzADoALwAvAGcAcgBhAHAAaAAuAG0AaQBjAHIAbwBzAG8AZgB0AC4AYwBvAG0A
-LwBiAGUAdABhAC8AZABhAHQAYQBDAGwAYQBzAHMAaQBmAGkAYwBhAHQAaQBvAG4ALwBqAG8AYgBz
-AC8AMAAwADAAMAAwADAATgBDAFUAUwAwADIAUAByAG8AZABfADUAMAAxAGUAMQAwADgANgAtAGIA
-MgAxADgALQA0ADgAMQA0AC0AYQA4ADcAMgAtADQAZABkAGYAYgA3ADgAYwA3ADkAOAAzAF8AMgBf
-ADMAAAAAAB8AAICGAwIAAAAAAMAAAAAAAABGAQAAAB4AAAB4AC0AbABkAC0AcAByAG8AYwBlAHMA
-cwBlAGQAAAAAAAEAAABaAAAANwAyAGYAOQA4ADgAYgBmAC0AOAA2AGYAMQAtADQAMQBhAGYALQA5
-ADEAYQBiAC0AMgBkADcAYwBkADAAMQAxAGQAYgA0ADcALABFAHgAdABBAGQAZAByAAAAAAAfAACA
-hgMCAAAAAADAAAAAAAAARgEAAABGAAAAeAAtAG0AcwAtAGUAeABjAGgAYQBuAGcAZQAtAGEAdABw
-AG0AZQBzAHMAYQBnAGUAcAByAG8AcABlAHIAdABpAGUAcwAAAAAAAQAAAAwAAABTAEEAfABTAEwA
-AAAfAACAhgMCAAAAAADAAAAAAAAARgEAAAA0AAAAeAAtAG0AaQBjAHIAbwBzAG8AZgB0AC0AYQBu
-AHQAaQBzAHAAYQBtAC0AcAByAHYAcwAAAAEAAACiAAAAPABTAEoAMABQAFIAMgAxAE0AQgAyADAA
-MgA0AEQANgBCADEARgAyADYAQwBEADEAQwA1ADMAOQAzAEYAMwBEADQANABEADcAMAA3ADkAQABT
-AEoAMABQAFIAMgAxAE0AQgAyADAAMgA0AC4AbgBhAG0AcAByAGQAMgAxAC4AcAByAG8AZAAuAG8A
-dQB0AGwAbwBvAGsALgBjAG8AbQA+AAAAAAAfAACAhgMCAAAAAADAAAAAAAAARgEAAAA4AAAAeAAt
-AG0AcwAtAGUAeABjAGgAYQBuAGcAZQAtAHMAZQBuAGQAZQByAGEAZABjAGgAZQBjAGsAAAABAAAA
-BAAAADEAAAAfAACAhgMCAAAAAADAAAAAAAAARgEAAAA6AAAAeAAtAG0AcwAtAGUAeABjAGgAYQBu
-AGcAZQAtAGEAbgB0AGkAcwBwAGEAbQAtAHIAZQBsAGEAeQAAAAAAAQAAAAQAAAAwAAAAHwAAgIYD
-AgAAAAAAwAAAAAAAAEYBAAAAKgAAAHgALQBtAGkAYwByAG8AcwBvAGYAdAAtAGEAbgB0AGkAcwBw
-AGEAbQAAAAAAAQAAAA4AAABCAEMATAA6ADAAOwAAAAAAHwAAgIYDAgAAAAAAwAAAAAAAAEYBAAAA
-RAAAAHgALQBtAGkAYwByAG8AcwBvAGYAdAAtAGEAbgB0AGkAcwBwAGEAbQAtAG0AZQBzAHMAYQBn
-AGUALQBpAG4AZgBvAAAAAQAAAAIHAAA5AEkAeQA1AG0AaQBKADEAcABCAHkAdABVAHEAZwBsAEcA
-VQA2AFMARQBOAEQAcwBXAEcAMwA5ACsAcQB5AEcAOQB6AGcATABHAGIAbwA5AE8ATwBxAE8AZQBp
-AGEAWQA5AEQAUABDAEMAVgA3ADUARgBTAGUAMQBqAEIAagBiAE8AeQByAHYAQQArAGEAUgAzADYA
-TABaAHgAcgBiAG8AZgBvAGUARwBkAHIATwByAHUAMQBWAEcAUABKAGgANQBsADkATgAyAEMAdQBF
-AGIAQwBzAEQAYgB2AFgAZwBZAFQASABWAEsAUABqAHIALwBIAEwAegBhAEsAWgA5ADkAYQBqAHEA
-ZgBEAGMAWgBuAEkAYgB5AFEAcABZAG0AdwBqAHkATQByAEcAVABzAFIAZABXAFgAUgBkAHAASABj
-AHQAYwBDAE0AdwBDAE0AeQBoAE8AMwBJAG0ASABXADIAUgBRAEIAbgBkAFcARgBYAEIAaABRAFAA
-cQBVAFAAYwBFAFMATQBlADQAegA3AGwAVABJAFEAUQBrAFcAbABtAHoAagBHAFMAKwBjAEIARQB0
-AE8AQgBFAEsAbQBmADEARQA4AFYAVwB3AEUAWgBWADcAWABzADAARQBvAHAAbQBKAEgAaABVAHAA
-eQBMADkAUABGAHMAZgBpAHQAdwBTAEIAeQBZAHIAYgBOAFkAdwAzAEsARQBJAFAATwBZAHAASABq
-ADgAKwBmADMAUAB1AE8AWABPADgAawB6AG0AOQBWAG4AMgBQAEMASABWAFEAZABiAEUAcQBaAFQA
-ZgBYAFgATwBWAFkAKwA5AHoARABaADUAdAAyAGsAWgB5AGMASwBoAGMAYwB3AEcASABZAHYATwBu
-AGkAUAA5AHUANQBpAG8AdwAzAHAAMgBVAHcAaQBaAEMAUABxAEUAVQBsAC8ANgAvADkAMgBzAFYA
-ZABOAFoAegBBADEANgBDAHgAMgBDAFcANABvAEMAbQBBAFkAUAA4AE0AZgAvAGIATwAwADcAUwBW
-AFYATwBxAFQATQAvAE4ANwA1AHkAVwBpAEIARwBaAGsAWgBGAGgARwBqAHQAaQBSAGoAeABBADIA
-SgB5AFgAdQBuAGcAMABSAHgAbQBYAHgARwBMADAAWABJAE4AYgA4AFAAKwBZADIAUABGAGIATwAv
-ADEAQwBUAGcASQBHAEoAWQAyAGQAMgB5AEIAZQBDADUASgB4AGEAcwBnAGkAbAA4AEMAbQByAGoA
-RQBaAFEASwB1AHoAVgA3AEYANwA1AGsAZABXACsAcgA5AG8AeQBIAHEAUQBxAEsARgBtAE8AVAAw
-AGYAVABIADgAYQAxAE8AZAB2AFEANQB4AHgAYwBJAFgALwBFADMAQgBiAEYAUQBUAFAAWgBuAGEA
-UgArAFoANwBIAFQAOABuAHcAKwBoAFoAeQBYAHgAKwBaAGMALwBUADcAZABYAFkAVwBwAFEAVgBP
-AEIAbwA4AEgANABlAE8ARQBkAGYAcwBMAC8AMABNACsAbAAvAFcANABTAEYAOABGAEIAMQBXADYA
-cwBYADgASgBuADEARABYAGoATQBHAHAAcABaAHkAVQByAFQAKwBxAFkARABOAFcANwBnAG8AeQBz
-AGgAaQBCAFUAOQBMAFQAdwBoADAANgB5AHcALwBDAG8ANABjADgAbQBSAE0AYQBxAHAAbwBCAHoA
-bwBIAFIASAAvAFkALwBlAFkAWQBKAFEAdwBjAHkATABNAHcAaQBsAFIAVQB3AFcAUwA4AHYARwBw
-AGgALwA2AEwANQA5ADEAZgA1ADIANwBZAGQAMwB2AEYAcQAxAHMAcgBJAHEASQBBACsANQBYAGoA
-TwBlAEUARwBqAFQAcABSADkAKwA2AHcAbQByADYANwB1AGQATAA2ADQALwBqAEEAUAByAEQATwBU
-AC8ANQBjAGkAYQBiAEEASgAvAHcAaABMAFAASgBIAFcAWgB0AEEARQBpAFoATQBDAEEASAAwAGkA
-VAB3AFQAMQBtAFQAWABuAFYASgBmAEkAVgB4AC8AUgBiAEsATQBFAEYAYgBCAFAAagBwAFcAVQA5
-AGYAaQBuAHAARQArAHQATABNAHoAbgBTAGUAaQBMAHQARAAyAHoAUQBTAHIAQwByAEMAeABiAEkA
-OQBVADYAdwAxAGIAbgB3AGQANABPAHYAegBwAGwAMwBLAHkANwB2ADgAeQA2AGcAeQBkAHEAagBs
-ADQAYgBjAHgAagBlAHcAMABZAEIASgBqADAAegBCAEsAaQBoADgAdQB2AE8ALwBJADYAUwByAFUA
-aABUAGkAOQBGAEQAMwBHADUAeABzAEUAdQBSAGIAMABqAGoAbwBBAG4AZQBkAEMAAAAAAB8AAICG
-AwIAAAAAAMAAAAAAAABGAQAAADgAAAB4AC0AZgBvAHIAZQBmAHIAbwBuAHQALQBhAG4AdABpAHMA
-cABhAG0ALQByAGUAcABvAHIAdAAAAAEAAAASBAAAQwBJAFAAOgAyADUANQAuADIANQA1AC4AMgA1
-ADUALgAyADUANQA7AEMAVABSAFkAOgA7AEwAQQBOAEcAOgBlAG4AOwBTAEMATAA6ADEAOwBTAFIA
-VgA6ADsASQBQAFYAOgBOAEwASQA7AFMARgBWADoATgBTAFAATQA7AEgAOgBNAE4AMABQAFIAMgAx
-AE0AQgAzADAAOQA4AC4AbgBhAG0AcAByAGQAMgAxAC4AcAByAG8AZAAuAG8AdQB0AGwAbwBvAGsA
-LgBjAG8AbQA7AFAAVABSADoAOwBDAEEAVAA6AE4ATwBOAEUAOwBTAEYAUwA6ACgAMQAzADIAMwAw
-ADAAMAAxACkAKAA0ADYAMwA2ADAAMAA5ACkAKAAzADYANgAwADAANAApACgANQA1ADAAMQA2ADAA
-MAAzACkAKAAzADgAMQAwADAANwAwADAAMAAwADIAKQAoADIAOQAwADYAMAAwADIAKQAoADcANgA5
-ADYAMAAwADUAKQAoADMAMwA2ADUANgAwADAAMgApACgAOAA5ADMANgAwADAAMgApACgANQAyADUA
-MwA2ADAAMQA0ACkAKAA2ADYANAA3ADYAMAAwADcAKQAoADYANAA3ADUANgAwADAAOAApACgAMgA2
-ADAAMAA1ACkAKAA1ADYANgAwADMAMAAwADAAMAAyACkAKAA0ADMAMgA2ADAAMAA4ACkAKAA1ADQA
-OQAwADYAMAAwADMAKQAoADEAOAA2ADAAMAAzACkAKAA2ADUAMAA2ADAAMAA3ACkAKAA1ADAAOAA2
-ADAAMAAwADAAMQApACgANgA2ADUANQA2ADAAMAA4ACkAKAA5ADYAOAA2ADAAMAAzACkAKAAzADEA
-NgAwADAAMgApACgAMwA4ADAANwAwADcAMAAwADAAMAA1ACkAKAA3ADYAMQAxADYAMAAwADYAKQAo
-ADgAMgA5ADUAMAA0ADAAMAAwADAAMQApACgANwAxADIAMAAwADQAMAAwADAAMAAxACkAKAA4ADIA
-OQA2ADAANAAwADAAMAAwADEAKQAoADgANgA3ADYAMAAwADIAKQAoADEAMgAyADAAMAAwADAAMAAx
-ACkAKAA4ADYAMwA2ADIAMAAwADEAKQAoADEAMAAyADkAMAA1ADAAMAAwADAAMwApACgAOAA5ADkA
-MAA1ADAAMAAwADAANAApACgAMQAxADAAMQAzADYAMAAwADUAKQAoADcANAAxADYAMAAwADIAKQAo
-ADYANgA5ADQANgAwADAANwApACgAOAAzADMAOAAwADQAMAAwADAAMAAxACkAKAA2ADYANAA0ADYA
-MAAwADgAKQA7AEQASQBSADoATwBVAFQAOwBTAEYAUAA6ADEAMQAwADIAOwAAAAAAHwAAgIYDAgAA
-AAAAwAAAAAAAAEYBAAAAXAAAAHgALQBtAHMALQBlAHgAYwBoAGEAbgBnAGUALQBhAG4AdABpAHMA
-cABhAG0ALQBtAGUAcwBzAGEAZwBlAGQAYQB0AGEALQBjAGgAdQBuAGsAYwBvAHUAbgB0AAAAAQAA
-AAQAAAAxAAAAHwAAgIYDAgAAAAAAwAAAAAAAAEYBAAAASgAAAHgALQBtAHMALQBlAHgAYwBoAGEA
-bgBnAGUALQBhAG4AdABpAHMAcABhAG0ALQBtAGUAcwBzAGEAZwBlAGQAYQB0AGEALQAwAAAAAAAB
-AAAAsgsAAHYAWgBaAHoAVQBQAFIAYgBuADEAdgBNAC8ASwBpAEQAdwBPAFkAeQBYAHEASQBQAFUA
-bABDAE0ARQBCAC8AcQBDAHYAMwBrAE0AMgBaAE8ARABmAHgAVgB3AGcAbgBTAG4AMABTAEwAZgBq
-ADEAOABhADMANABKAC8ATwBjAEYANwAvAG4AbQBWADMASQBCAHQAdQArAGsANAArAGEAVwBhAG0A
-awB6AGgAcgBhADQAZgBSAFkAVgBZAFYAWgB0AG8AawBTADkAaQA3AHYAeABDAEoAcABuAC8AUgBB
-AFUAMwBMAEgATQAyAFUAMwBXAEYANgA2AFUAMgA0AFQANABjAHkAUgBBAHcASABkAEEANABFADkA
-cgA4AHUAagBoAGsAUQAzADIAZABTADcAUgBxAEMAbgBmAFkAWgBUAEwAVwBXAGgATgBYAGcAZQA5
-AG0ANwBpAEcAYgAyAGIAdgBpAGkAbABhAEgATgBJAGgAOABVAG8AZAB2AEoANwBXAHAAZQBQAG4A
-ZQBNAGYAZQByAEYAYgBBAG4AQQBKADMAbABTAFgAagAxAGIATQBhAHgAWgBpAFEARwBGAEsAUAB3
-AFYAbgBUAEgASQBZAHEATwBlAEUASQBZAFUANgBaAFUAcwBtAC8AUQA3AEEARQBYAEIAVQB5AFAA
-SwBUAGsARwA4AEIAQgBrAHEAagBvAHkAZwBOAFgAbQBVADIANQB6AHAAdABwAG4ANgA3AGYAUQBu
-ADYATgBnAE0AUABrADIAaQBUADgAZAA1AEgAbgBoADcAUgBlAHEAbQBpAGoATQAwAEkAcABEAGwA
-OQB3ADIAMgBxAGgAUQBXAGkAbgBOAGsAMABJAFEARwAvAFkAZgBkAEwAeABVAHQAbQBKAFIAZwBU
-AGYANwBEAHEAYgA2AFcASwBaAE0ATgBkAFkAZwBsAFoARwBUAFMAbABYAEgAcgBRAFIARABPADEA
-OQA0AGMARgBrAGcAMwBJAE8AawBYAEkAbgA3AEMARgBrAFEAbQA4AGIAcQA3ACsAagAzAFcAQQAy
-AFcAegBXAG8AdgBEAE0ASABWAFUALwBrAGYAcAB3AEQALwBsADEARgAvAFEAVAA5AHIAaQBSAEEA
-TwBqADQAQwByAEQAMQBnADkAZABXADMAQQBoADMAVwBjAG0ALwArAGYAeAB2ADcARgBFAGcAOAAv
-ADAAdgBEAHMAZQB2AGsAYgBuAHIAZgBJAE0AUAB4AHoASgBLAHAAWABZAG8AUABnADIAbQB1AGUA
-cABSAG4ARgBtAHYATgBzAEkAbABGAFcAWQBpAE4AVwBBADAAeQBOAHQAagBtAHkAQgArAGsAZwAv
-AG8ANgA2AEMAWgBMAHoANwBQADIAcABwAGQAVgA2AGgANwAwAHEAawB6AHkAdgBkAE8AVgBsAHgA
-SAAxAFcAMQA5AHkAWABNAFEATgBWAEkAZAB0AEUASQA4AHoAMABwAE0AVwBKADAARAB5AE0AeQBT
-AEMAQgBLAGEASwAyAFQAVQBtAG8ALwBDAFIAawA5ADgARQBTADMAMwB5AHUAaABqADEARgByAEsA
-MQA4AFEATwBFAGUAWQA0AFcAMgBKAEkAcQBVAEgAdQBLADQAYgAvAEEAQgBuAHIAUAAzAE8AQgBJ
-ADgAaAAwADcAVgBOAGoAQQBzAE0AVABPAEoAZgAvAHgAcwB0AGsAVAB3AHUAVABXAEYAdABTAFoA
-agB2AEsAMgAxAFAASABtACsAcwBaACsAbQA5AHAAdgA5ADkATgBPAGwAYQB1AHMAUQA4AGYAWABx
-AFIATQAyAE4ASgBqAEUAQQBHAE4AQwBkAE8ARwBwAFkASQBRAHkATABCAG4AYgBlACsANABPAEEA
-MgA3AHIALwB2AHAAOAArAFUAQwAvADkARgBZAFQAZAAxAFMATQBuAHYAeAAwAGQAUQBZAFYAUABm
-ADYAMgBYAFkAcQArAEgARQA5AGgAdQBmAFQAdgB0AGcARgBuAG0AZwBVAHMAUQBuAEQAZABIAE8A
-cABLAGMAZABHAEsAUABjAHMASgA0AFMASQBtAGsAVQA5ACsAUAA2AFYAOABhAEgASgBIADEARwAw
-AHAAYgAxAEgAUgBwAGUAYQBZAE4AUgA3AFAAbgBsAFMAbABPAGQAUwBQADQAbQA2AEwAOQBtAEYA
-LwBsAHAAbwBmAEEAWgBPAEIAVwA0ADUASAB2AGEATwA5AHYAbQBkAHcAUQBOADgAaQBTAGgAbgBE
-ACsAbQB0AEkASgBHAE8AagBqAEsAUABlADgAUgByAHkAYgBwAGcAdwBRAHgASQB2AEEAbwBkADgA
-VABiAEEAVABaAG0AQQBNAFgAYgBJAGQAbwBQAHIAdQAvAGkAdAA2AFUAZAB0AHoANwBNAG0AcQBN
-AHoAdQBsAG4ARAA5AE4AaABrAEUAOABkAC8ATABYADkANwAvAHUAbQBQAEsATQBSADIAeABiAEEA
-bwBjAE4ANgBEAHUASgBZAGsATQB5AFcAMgA0AE4AdgA1AHYATgBNAHIAegBSAEgARABPAGkAMwBZ
-AHIAcwBMADgAaABYADgARQBmADQALwBYAC8AdQBiADgAMgBRAHoAUwByAFAAWgBhAFEAagBQADcA
-ZABnADAANABOAG8AeAB1AEIAZwBCAGoAZgA3AGgAeQBLADAAYQB4AEgAaAA3AGEAcwBvAHkATQBO
-ADUAagBwAFQAOABkADgAWAAxAG0AUQBOAEIAYgBUAHEARQBiAFkAcABZADUAUgBmAHYASABCAHUA
-TQB5AHUAcQB4AE0AZwBkAEcARABCAC8AOQBkAFgAawBlAGoAdAA5AE4AcQBaAFEARABhAE4ASAB2
-AGQAcQBWAEYAVgBFAG8AbAByAHkAbwBHAE4AZwBoAEEAbABpAGIARwArAFMATABrAFMASwBjAHEA
-UwBpADgAYQB5AHUAcQBNAEYAYgBwAE8ASwBFAFIAZQA4AGUAMwBGADIAVQBRAEQANQB4AHUAbwBW
-AFAAVABqAHIAKwBmAHgATwB6AGUAaQBnAEMATQBJACsAMQBVAEUAUQBuAFMAQQB5AGsAWABxAFQA
-VQBkAGIASwBtAEMANgBqAC8AagBLAFYAZABPAGcAQwB1AHcANgBoAG0AaQBTAHIAVwAwAEMAdQBK
-AG8AYgB0AEIAdQB5AG4AVgBpAG0AYwBxADkAawBBAFIAQQBWADcAbgAzAGkAeQB6AFgAaAB1AGcA
-QQBRAFQAZAAzAFcAOABZAHYAcABPAEcAUABkAHQAZQBFAEEAdQBLAG8AVgBwAEgATgBrAGkAcwBP
-AHgAMABsAGIAWQAwAG4ANQBBADUAVABSAGUAMQB0AHMAQgB5AFkATAArAE8AOABsAGcAbgBmAHoA
-SwBUADcANABHAFcAVQBuAFYASgBmAG4ARwA5AFgAbgBqAHAAawBKADQAMABsADIAcQBrAHgAOQAr
-AEUAbwBRAE8ARABZAG8AcQBpADUAawAxAGsAbAB5AEUAawA4ADcAVQBkAG4AdQBqAEEAYQB1AHgA
-NwBMAFoAVgBjAFMASQBlAG4AawBwAFYAcwBLAGMARAA1AG0ARwB3AE0AQQBzAE4AawBMAGoASQBo
-AHkAZABPAFYAZwBaAGYATwB2AE8ASQBqAGcASABUAHIAaQBkAGIAZQA4AFgAQwBUAEgANwBPAHMA
-NwB5ADEARQBOAEEAegBRAFUAOAByAGEAUQBWAGYAaQBaAEkAUAA5ADYAbQBtAE4AWgBnADEAVgBK
-AHIAVwA5AGEAZgBMADUARwBRAHQAQQBtAEUARABFAHQAYQBwAFAANwB5AGcAZwBMAGMAdwBCAGcA
-WgAyADYARQBuADgAeABHAEsAMQBrAHUARAAxAFgASgBnAFYAOQBVADUAVABIAFkATwBCADQAZQAv
-AGgAOABQAHkAMwBTAEcAZQBjAE8AdQBqAG4ANQBBAD0APQAAAAAAN1Y=
+Initialize:
 
---_000_MN0PR21MB3098869F7EF526BF6E18A00DD7079MN0PR21MB3098namp_--
+    siphash_state_t state;
+    siphash_init(&state, key={0, 0, 0, 0});
+
+Update (accumulate) on interrupt:
+
+    siphash_update(&state, interrupt_data_and_timing);
+
+Dump into input pool after 64 interrupts:
+
+    blake2s_update(&input_pool, &state, sizeof(state) / 2);
+
+The result of all of this is that the security model is unchanged from
+before -- we assume non-malicious inputs -- yet we now implement that
+model with a stronger argument. I would like to emphasize, again, that
+the purpose of this commit is to improve the existing design, by making
+it analyzable, without changing any fundamental assumptions. There may
+well be value down the road in changing up the existing design, using
+something cryptographically strong, or simply using a ring buffer of
+samples rather than having a fast_mix() at all, or changing which and
+how much data we collect each interrupt so that we can use something
+linear, or a variety of other ideas. This commit does not invalidate the
+potential for those in the future.
+
+For example, in the future, if we're able to characterize the data we're
+collecting on each interrupt, we may be able to inch toward information
+theoretic accumulators. <https://eprint.iacr.org/2021/523> shows that `s
+= ror32(s, 7) ^ x` and `s = ror64(s, 19) ^ x` make very good
+accumulators for 2-monotone distributions, which would apply to
+timestamp counters, like random_get_entropy() or jiffies, but would not
+apply to our current combination of the two values, or to the various
+function addresses and register values we mix in. Alternatively,
+<https://eprint.iacr.org/2021/1002> shows that max-period linear
+functions with no non-trivial invariant subspace make good extractors,
+used in the form `s = f(s) ^ x`. However, this only works if the input
+data is both identical and independent, and obviously a collection of
+address values and counters fails; so it goes with theoretical papers.
+Future directions here may involve trying to characterize more precisely
+what we actually need to collect in the interrupt handler, and building
+something specific around that.
+
+However, as mentioned, the morass of data we're gathering at the
+interrupt handler presently defies characterization, and so we use
+SipHash for now, which works well and performs well.
+
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+Hi Greg,
+
+You reviewed v1 of this patch, but I did not carry your Reviewed-by over
+to this v2, because it is so substantially different. I started having
+some doubts about the strength of the claims that the theoretical papers
+could really make, and so I dialed things up a bit with a much more
+conservative choice of just using SipHash, which is more than enough for
+our purposes. It's also already sort of a "known quantity" in the
+kernel, in terms of security and performance, so this feels like much
+less of a radical change.
+
+Jason
+
+ drivers/char/random.c | 86 +++++++++++++++++++++++--------------------
+ 1 file changed, 47 insertions(+), 39 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 07ca3164522c..edb5b06544da 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1175,48 +1175,51 @@ EXPORT_SYMBOL_GPL(unregister_random_vmfork_notifier);
+ #endif
+ 
+ struct fast_pool {
+-	union {
+-		u32 pool32[4];
+-		u64 pool64[2];
+-	};
+ 	struct work_struct mix;
++	unsigned long pool[4];
+ 	unsigned long last;
+ 	unsigned int count;
+ 	u16 reg_idx;
+ };
+ 
++static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
++#ifdef CONFIG_64BIT
++	/* SipHash constants */
++	.pool = { 0x736f6d6570736575UL, 0x646f72616e646f6dUL,
++		  0x6c7967656e657261UL, 0x7465646279746573UL }
++#else
++	/* HalfSipHash constants */
++	.pool = { 0, 0, 0x6c796765U, 0x74656462U }
++#endif
++};
++
+ /*
+- * This is a fast mixing routine used by the interrupt randomness
+- * collector. It's hardcoded for an 128 bit pool and assumes that any
+- * locks that might be needed are taken by the caller.
++ * This is [Half]SipHash-1-x, starting from an empty key. Because
++ * the key is fixed, it assumes that its inputs are non-malicious,
++ * and therefore this has no security on its own. s represents the
++ * 128 or 256-bit SipHash state, while v represents a 128-bit input.
+  */
+-static void fast_mix(u32 pool[4])
++static void fast_mix(unsigned long s[4], const unsigned long *v)
+ {
+-	u32 a = pool[0],	b = pool[1];
+-	u32 c = pool[2],	d = pool[3];
+-
+-	a += b;			c += d;
+-	b = rol32(b, 6);	d = rol32(d, 27);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 16);	d = rol32(d, 14);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 6);	d = rol32(d, 27);
+-	d ^= a;			b ^= c;
+-
+-	a += b;			c += d;
+-	b = rol32(b, 16);	d = rol32(d, 14);
+-	d ^= a;			b ^= c;
++	size_t i;
+ 
+-	pool[0] = a;  pool[1] = b;
+-	pool[2] = c;  pool[3] = d;
++	for (i = 0; i < 16 / sizeof(long); ++i) {
++		s[3] ^= v[i];
++#ifdef CONFIG_64BIT
++		s[0] += s[1]; s[1] = rol64(s[1], 13); s[1] ^= s[0]; s[0] = rol64(s[0], 32);
++		s[2] += s[3]; s[3] = rol64(s[3], 16); s[3] ^= s[2];
++		s[0] += s[3]; s[3] = rol64(s[3], 21); s[3] ^= s[0];
++		s[2] += s[1]; s[1] = rol64(s[1], 17); s[1] ^= s[2]; s[2] = rol64(s[2], 32);
++#else
++		s[0] += s[1]; s[1] = rol32(s[1],  5); s[1] ^= s[0]; s[0] = rol32(s[0], 16);
++		s[2] += s[3]; s[3] = rol32(s[3],  8); s[3] ^= s[2];
++		s[0] += s[3]; s[3] = rol32(s[3],  7); s[3] ^= s[0];
++		s[2] += s[1]; s[1] = rol32(s[1], 13); s[1] ^= s[2]; s[2] = rol32(s[2], 16);
++#endif
++		s[0] ^= v[i];
++	}
+ }
+ 
+-static DEFINE_PER_CPU(struct fast_pool, irq_randomness);
+-
+ #ifdef CONFIG_SMP
+ /*
+  * This function is called when the CPU has just come online, with
+@@ -1258,7 +1261,7 @@ static unsigned long get_reg(struct fast_pool *f, struct pt_regs *regs)
+ static void mix_interrupt_randomness(struct work_struct *work)
+ {
+ 	struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
+-	u32 pool[4];
++	u8 pool[16];
+ 
+ 	/* Check to see if we're running on the wrong CPU due to hotplug. */
+ 	local_irq_disable();
+@@ -1271,7 +1274,7 @@ static void mix_interrupt_randomness(struct work_struct *work)
+ 	 * Copy the pool to the stack so that the mixer always has a
+ 	 * consistent view, before we reenable irqs again.
+ 	 */
+-	memcpy(pool, fast_pool->pool32, sizeof(pool));
++	memcpy(pool, fast_pool->pool, sizeof(pool));
+ 	fast_pool->count = 0;
+ 	fast_pool->last = jiffies;
+ 	local_irq_enable();
+@@ -1295,25 +1298,30 @@ void add_interrupt_randomness(int irq)
+ 	struct fast_pool *fast_pool = this_cpu_ptr(&irq_randomness);
+ 	struct pt_regs *regs = get_irq_regs();
+ 	unsigned int new_count;
++	union {
++		u32 u32[4];
++		u64 u64[2];
++		unsigned long longs[16 / sizeof(long)];
++	} irq_data;
+ 
+ 	if (cycles == 0)
+ 		cycles = get_reg(fast_pool, regs);
+ 
+ 	if (sizeof(cycles) == 8)
+-		fast_pool->pool64[0] ^= cycles ^ rol64(now, 32) ^ irq;
++		irq_data.u64[0] = cycles ^ rol64(now, 32) ^ irq;
+ 	else {
+-		fast_pool->pool32[0] ^= cycles ^ irq;
+-		fast_pool->pool32[1] ^= now;
++		irq_data.u32[0] = cycles ^ irq;
++		irq_data.u32[1] = now;
+ 	}
+ 
+ 	if (sizeof(unsigned long) == 8)
+-		fast_pool->pool64[1] ^= regs ? instruction_pointer(regs) : _RET_IP_;
++		irq_data.u64[1] = regs ? instruction_pointer(regs) : _RET_IP_;
+ 	else {
+-		fast_pool->pool32[2] ^= regs ? instruction_pointer(regs) : _RET_IP_;
+-		fast_pool->pool32[3] ^= get_reg(fast_pool, regs);
++		irq_data.u32[2] = regs ? instruction_pointer(regs) : _RET_IP_;
++		irq_data.u32[3] = get_reg(fast_pool, regs);
+ 	}
+ 
+-	fast_mix(fast_pool->pool32);
++	fast_mix(fast_pool->pool, irq_data.longs);
+ 	new_count = ++fast_pool->count;
+ 
+ 	if (new_count & MIX_INFLIGHT)
+-- 
+2.35.1
+
