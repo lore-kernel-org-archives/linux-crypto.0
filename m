@@ -2,49 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBA2C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 12:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7EAC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 12:24:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242065AbiCGMTW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 07:19:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40986 "EHLO
+        id S231560AbiCGMZO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 07:25:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241776AbiCGMTJ (ORCPT
+        with ESMTP id S229745AbiCGMZO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 07:19:09 -0500
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F0C3E0F5
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 04:18:10 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2dc28791ecbso147625867b3.4
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 04:18:10 -0800 (PST)
+        Mon, 7 Mar 2022 07:25:14 -0500
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA31A63EF
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 04:24:19 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2d6d0cb5da4so161332777b3.10
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 04:24:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=kNo3uSHysShLR0FJhmk5oSOi1tMyXHYvJloBJLNHZCg=;
-        b=F9pKvRvYdMxTrF6jqw8vUsqcHxvyFAKgh5ws7S3CM2QebpqvTAkwKJO4XRUJMn1a4m
-         S02+miqQ7jyunEQuEeulaQyWcId+gR5KG7TutDPcjKuCtEcHBjTG1i4YT/gVLEsoxOOc
-         RgbbrBzgB1K4PTYrzpLz6nzuHzEVTWkriR3PiQVn2MAuG3toHMwVrmUOxFC/kojcgKDu
-         bgBoWYtsX6xfM/Zfv24MczYLcwpIalwMwZLiNQHIRJuqvHEcmqx9VAtux5Np3YLZEgUW
-         WJVbRfRg/Xqrbi0JQoGI8D+wNbjL4FMS/5OVwpAYRkwscIEOmnIwQLw+TVsqay1b09Op
-         iaag==
+        bh=Tj6WbMsdxlADcgXiMOHHwve+HOHgnfHXu+gQYVdroXE=;
+        b=pHA+arVpLeTc3erxecGoIXrFCvy4PoDrWBlqN8JIF7mY2IGoJbMBczR89LA2bS8aMC
+         yguRLI+tmcPDIgqqdDUxTOs/kjZFjF5CeNzYIGsqsIQg314nMvzyZOBF02WbUroTpWtV
+         GDarJgyW7mr2EOnsWgcBsoa7X44OG1aPm3YigITnEba1sXuXKJfiaVAAkO/G+fs8hWLZ
+         gbImZMGZnvXL73zDUG4UevZDohbEcoBL59i64nUpIoPESpteWCFwyi49hKcXFjzlVzcJ
+         Bk1TMLuG4GI7/6Zz0I/Y+8IGDZLfq58POLxPMxi5crda+VOekW9RP4bhWlUAyN2YzXng
+         kyjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kNo3uSHysShLR0FJhmk5oSOi1tMyXHYvJloBJLNHZCg=;
-        b=MaOqfDhbER9i1C7iWqV1dLRvsp1cYQTEJrGwGrg21zdO/G7b4X5/BMLzW7JhFjdqAl
-         57H5UlEFtZSEK9w25Q8ufawlLswq7vPlyn1quY8zm8UpJQAepGTG5eHKXE9I+9Ga8y6C
-         y8HwNLF9Gz7Mqoe4DyHrLLAN78ym+CZ+Cpyp/9LTXyJ5n06te5sM+ztoZ37z2ixjkQ9E
-         LA+tufDJKKfrLz0MPDiGAZYNdMQ8lzVG1fQBXzXKRKrKGUFhiYHPZukd5Hry5wrbXvxI
-         lrDJzvtGHMgHfOR2vJumUP2KoRLRVlp8W1t4BurO5Akrd6ck8bmf+Li/OemrLXhHFNKg
-         JpVA==
-X-Gm-Message-State: AOAM53057bPaQ5HG4r9N46MQzo4cY8AQX5wZKJb5AWRFG61NdWFGku4U
-        itzJFet6UTG1Dtq2hz8rw7zfgHVOtl2b7hhH4OCH3w==
-X-Google-Smtp-Source: ABdhPJxAwnlLxiebvOvVJXEOc3iSvoRJ/FztSSfnXBmJMWTvypvCDGrt5qtTbdf4SAXSCTruNN8YCoUGrS6E6lw0PWg=
-X-Received: by 2002:a81:6c6:0:b0:2dc:616b:468b with SMTP id
- 189-20020a8106c6000000b002dc616b468bmr7855366ywg.472.1646655489767; Mon, 07
- Mar 2022 04:18:09 -0800 (PST)
+        bh=Tj6WbMsdxlADcgXiMOHHwve+HOHgnfHXu+gQYVdroXE=;
+        b=McXn39Xj7vpMqzhpt6owiTiWHNGAgTTfn7Ww6MwxSVgdUz1mR+dFBNxqVDN131uCdF
+         NN0NmHhzLr7gHChG6aPXVazJBdsr+y+PBBx6NoE+jk+92Ax14S8UIGZbCFdVne/q9YbD
+         8fbtYHI3LDdN3vcjgIGFm6ar2XKNC0KxNMyYq90YfLmhfHxHnvdK3PmItZQwlqSD2DiU
+         /cDUwvt6XAz64Ey4hMZmriT1/w3OV+Y1d+Wpf/pipx4WCtM0Dqi4Q0Vl452n3tsbJ3Qx
+         y6nnTmMAjnrSebsw8K5P/ma1++kSO0wERix8wHuPWoxZ5a5QEvelfyWECBIMupOfQQY1
+         VORQ==
+X-Gm-Message-State: AOAM5337ZfbTXRzA4eK6Ng9qiGQVEdi2yWVvUQ7zEH4pvM0YrZZcLlM9
+        l1PLDYg0l/EwmU0x9YsSegEnLc/8fBc+tI0Td63N9A==
+X-Google-Smtp-Source: ABdhPJwIUBOImWd12VmEHZQOywK+J1aNy/4vn/CBPX5NYh0qWlcSv8SAgVPPCFqajq3puTrLz/Yhh6dWwpatPuuumFM=
+X-Received: by 2002:a0d:d8d6:0:b0:2dc:1054:13a0 with SMTP id
+ a205-20020a0dd8d6000000b002dc105413a0mr8131121ywe.54.1646655858855; Mon, 07
+ Mar 2022 04:24:18 -0800 (PST)
 MIME-Version: 1.0
 References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
@@ -52,17 +52,16 @@ References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <YhOcEQEjIKBrbMIZ@Red> <CAOtvUMfN8U4+eG-TEVW4bSE6kOzuOSsJE4dOYGXYuWQKNzv7wQ@mail.gmail.com>
  <CAOtvUMeRb=j=NDrc88x8aB-3=D1mxZ_-aA1d4FfvJmj7Jrbi4w@mail.gmail.com>
  <YiIUXtxd44ut5uzV@Red> <YiUsWosH+MKMF7DQ@gondor.apana.org.au>
- <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com>
- <YiXjCcXXk0f18FDL@Red> <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
-In-Reply-To: <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
+ <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com> <YiXjCcXXk0f18FDL@Red>
+In-Reply-To: <YiXjCcXXk0f18FDL@Red>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 7 Mar 2022 14:17:59 +0200
-Message-ID: <CAOtvUMePFR4e2jgHZKOvs3J3Xt4NzRbzD_=vr_49Qgs5HTrvHw@mail.gmail.com>
+Date:   Mon, 7 Mar 2022 14:24:08 +0200
+Message-ID: <CAOtvUMd_mtDjP1WRQ9imjh99bEf3gtJSb3OCr7Q6-Aky2_5-dQ@mail.gmail.com>
 Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
  authsize =0
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
+        Robin Murphy <robin.murphy@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
@@ -73,43 +72,100 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com> wrote:
+On Mon, Mar 7, 2022 at 12:48 PM Corentin Labbe
+<clabbe.montjoie@gmail.com> wrote:
 
-> The "overlap" is in the sense of having more than one mapping within the
-> same cacheline:
 >
-> [  142.458120] DMA-API: add_dma_entry start P=3Dba79f200 N=3Dba79f
-> D=3Dba79f200 L=3D10 DMA_FROM_DEVICE attrs=3D0
-> [  142.458156] DMA-API: add_dma_entry start P=3D445dc010 N=3D445dc
-> D=3D445dc010 L=3D10 DMA_TO_DEVICE attrs=3D0
-> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=3D16 bi=3D=
-0
-> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=3D16 bi=3D=
-0
-> [  142.458234] DMA-API: add_dma_entry start P=3Dba79f210 N=3Dba79f
-> D=3Dba79f210 L=3D10 DMA_FROM_DEVICE attrs=3D0
+> Hello
 >
-> This actually illustrates exactly the reason why this is unsupportable.
-> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapping
-> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the range
-> ba79f200-ba79f23f to be written back over the top of data that the
-> device has already started to write to memory. Hello data corruption.
->
-> Separate DMA mappings should be from separate memory allocations,
-> respecting ARCH_DMA_MINALIGN.
+> I still get the warning:
+> [  433.406230] ------------[ cut here ]------------
+> [  433.406326] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST,=
+ overlapping mappings aren't supported
+> [  433.406386] WARNING: CPU: 7 PID: 31074 at /home/clabbe/linux-next/kern=
+el/dma/debug.c:571 add_dma_entry+0x1d0/0x288
+> [  433.406434] Modules linked in:
+> [  433.406458] CPU: 7 PID: 31074 Comm: kcapi Not tainted 5.17.0-rc6-next-=
+20220303-00130-g30042e47ee47-dirty #54
+> [  433.406473] Hardware name: Renesas Salvator-X board based on r8a77950 =
+(DT)
+> [  433.406484] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYP=
+E=3D--)
+> [  433.406498] pc : add_dma_entry+0x1d0/0x288
+> [  433.406510] lr : add_dma_entry+0x1d0/0x288
+> [  433.406522] sp : ffff800015da3690
+> [  433.406531] x29: ffff800015da3690 x28: 0000000000000000 x27: 000000000=
+0000000
+> [  433.406562] x26: 0000000000000000 x25: ffff80000b4c7bc0 x24: ffff80000=
+b4c7000
+> [  433.406593] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000=
+a9b6000
+> [  433.406623] x20: ffff0004c0af5c00 x19: ffff80000b420000 x18: fffffffff=
+fffffff
+> [  433.406653] x17: 6c7265766f202c54 x16: 534958454520676e x15: 000000000=
+000022e
+> [  433.406683] x14: ffff800015da3380 x13: 00000000ffffffea x12: ffff80000=
+b4be010
+> [  433.406713] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000=
+b4a6028
+> [  433.406743] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000=
+b4a5fd0
+> [  433.406773] x5 : ffff0006ff795c48 x4 : 0000000000000000 x3 : 000000000=
+0000027
+> [  433.406802] x2 : 0000000000000023 x1 : 8ca4e4fbf4b87900 x0 : 000000000=
+0000000
+> [  433.406833] Call trace:
+> [  433.406841]  add_dma_entry+0x1d0/0x288
+> [  433.406854]  debug_dma_map_sg+0x150/0x398
+> [  433.406869]  __dma_map_sg_attrs+0x9c/0x108
+> [  433.406889]  dma_map_sg_attrs+0x10/0x28
+> [  433.406904]  cc_map_sg+0x80/0x100
+> [  433.406924]  cc_map_cipher_request+0x178/0x3c8
+> [  433.406939]  cc_cipher_process+0x210/0xb58
+> [  433.406953]  cc_cipher_encrypt+0x2c/0x38
+> [  433.406967]  crypto_skcipher_encrypt+0x44/0x78
+> [  433.406986]  skcipher_recvmsg+0x36c/0x420
+> [  433.407003]  ____sys_recvmsg+0x90/0x280
+> [  433.407024]  ___sys_recvmsg+0x88/0xd0
+> [  433.407038]  __sys_recvmsg+0x6c/0xd0
+> [  433.407049]  __arm64_sys_recvmsg+0x24/0x30
+> [  433.407061]  invoke_syscall+0x44/0x100
+> [  433.407082]  el0_svc_common.constprop.3+0x90/0x120
+> [  433.407096]  do_el0_svc+0x24/0x88
+> [  433.407110]  el0_svc+0x4c/0x100
+> [  433.407131]  el0t_64_sync_handler+0x90/0xb8
+> [  433.407145]  el0t_64_sync+0x170/0x174
+> [  433.407160] irq event stamp: 5624
+> [  433.407168] hardirqs last  enabled at (5623): [<ffff80000812f6a8>] __u=
+p_console_sem+0x60/0x98
+> [  433.407191] hardirqs last disabled at (5624): [<ffff800009c9a060>] el1=
+_dbg+0x28/0x90
+> [  433.407208] softirqs last  enabled at (5570): [<ffff8000097e62f8>] loc=
+k_sock_nested+0x80/0xa0
+> [  433.407226] softirqs last disabled at (5568): [<ffff8000097e62d8>] loc=
+k_sock_nested+0x60/0xa0
+> [  433.407241] ---[ end trace 0000000000000000 ]---
+> [  433.407381] DMA-API: Mapped at:
+> [  433.407396]  debug_dma_map_sg+0x16c/0x398
+> [  433.407416]  __dma_map_sg_attrs+0x9c/0x108
+> [  433.407436]  dma_map_sg_attrs+0x10/0x28
+> [  433.407455]  cc_map_sg+0x80/0x100
+> [  433.407475]  cc_map_cipher_request+0x178/0x3c8
 
-hmm... I know I'm missing something here, but how does this align with
-the following from active_cacheline_insert() in kernel/dma/debug.c ?
+By the way, this comes from a totally different call site than the
+previous drbg.
 
-        /* If the device is not writing memory then we don't have any
-         * concerns about the cpu consuming stale data.  This mitigates
-         * legitimate usages of overlapping mappings.
-         */
-        if (entry->direction =3D=3D DMA_TO_DEVICE)
-                return 0;
+Judging from the fact that we've never seen this error before and that
+you start seeing it suddenly from different drivers on different
+platforms from different call sites ...
 
-Thanks,
+I suspect this is caused by some recent addition or change.
+
+Which tree are you building this from and does it have dma related
+commits? may try toi bisect this?
+
 Gilad
+
 
 --=20
 Gilad Ben-Yossef
