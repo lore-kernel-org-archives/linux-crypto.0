@@ -2,40 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A2DC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91350C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234619AbiCGNEd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 08:04:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51336 "EHLO
+        id S239906AbiCGNNa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 08:13:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232482AbiCGNEc (ORCPT
+        with ESMTP id S241410AbiCGNN3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 08:04:32 -0500
+        Mon, 7 Mar 2022 08:13:29 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AAEFA70CEF;
-        Mon,  7 Mar 2022 05:03:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C931B26AF0;
+        Mon,  7 Mar 2022 05:12:34 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02A4BD6E;
-        Mon,  7 Mar 2022 05:03:37 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74BC6D6E;
+        Mon,  7 Mar 2022 05:12:34 -0800 (PST)
 Received: from [10.57.39.47] (unknown [10.57.39.47])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 195CE3F66F;
-        Mon,  7 Mar 2022 05:03:34 -0800 (PST)
-Message-ID: <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com>
-Date:   Mon, 7 Mar 2022 13:03:28 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 574253F66F;
+        Mon,  7 Mar 2022 05:12:33 -0800 (PST)
+Message-ID: <b7a3e828-c848-2d42-9f91-d282b9c1ac9e@arm.com>
+Date:   Mon, 7 Mar 2022 13:12:29 +0000
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
  Thunderbird/91.6.1
 Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
  authsize =0
 Content-Language: en-GB
+From:   Robin Murphy <robin.murphy@arm.com>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org
+        iommu@lists.linux-foundation.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
 References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
  <YhKV55t90HWm6bhv@Red>
@@ -49,69 +50,81 @@ References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <CAOtvUMePFR4e2jgHZKOvs3J3Xt4NzRbzD_=vr_49Qgs5HTrvHw@mail.gmail.com>
  <6cf91f43-df23-3ac9-e9b5-958d99d37422@arm.com>
  <CAOtvUMedqSNKx9Aah0R_aAyjKO0pn4K75MrCnbh_zX+Zw9vRQA@mail.gmail.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <CAOtvUMedqSNKx9Aah0R_aAyjKO0pn4K75MrCnbh_zX+Zw9vRQA@mail.gmail.com>
+ <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com>
+In-Reply-To: <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022-03-07 12:47, Gilad Ben-Yossef wrote:
-> On Mon, Mar 7, 2022 at 2:36 PM Robin Murphy <robin.murphy@arm.com> wrote:
->>
->> On 2022-03-07 12:17, Gilad Ben-Yossef wrote:
->>> On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com> wrote:
+On 2022-03-07 13:03, Robin Murphy wrote:
+> On 2022-03-07 12:47, Gilad Ben-Yossef wrote:
+>> On Mon, Mar 7, 2022 at 2:36 PM Robin Murphy <robin.murphy@arm.com> wrote:
 >>>
->>>> The "overlap" is in the sense of having more than one mapping within the
->>>> same cacheline:
+>>> On 2022-03-07 12:17, Gilad Ben-Yossef wrote:
+>>>> On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com> 
+>>>> wrote:
 >>>>
->>>> [  142.458120] DMA-API: add_dma_entry start P=ba79f200 N=ba79f
->>>> D=ba79f200 L=10 DMA_FROM_DEVICE attrs=0
->>>> [  142.458156] DMA-API: add_dma_entry start P=445dc010 N=445dc
->>>> D=445dc010 L=10 DMA_TO_DEVICE attrs=0
->>>> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=16 bi=0
->>>> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=16 bi=0
->>>> [  142.458234] DMA-API: add_dma_entry start P=ba79f210 N=ba79f
->>>> D=ba79f210 L=10 DMA_FROM_DEVICE attrs=0
+>>>>> The "overlap" is in the sense of having more than one mapping 
+>>>>> within the
+>>>>> same cacheline:
+>>>>>
+>>>>> [  142.458120] DMA-API: add_dma_entry start P=ba79f200 N=ba79f
+>>>>> D=ba79f200 L=10 DMA_FROM_DEVICE attrs=0
+>>>>> [  142.458156] DMA-API: add_dma_entry start P=445dc010 N=445dc
+>>>>> D=445dc010 L=10 DMA_TO_DEVICE attrs=0
+>>>>> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=16 bi=0
+>>>>> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=16 bi=0
+>>>>> [  142.458234] DMA-API: add_dma_entry start P=ba79f210 N=ba79f
+>>>>> D=ba79f210 L=10 DMA_FROM_DEVICE attrs=0
+>>>>>
+>>>>> This actually illustrates exactly the reason why this is 
+>>>>> unsupportable.
+>>>>> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapping
+>>>>> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the range
+>>>>> ba79f200-ba79f23f to be written back over the top of data that the
+>>>>> device has already started to write to memory. Hello data corruption.
+>>>>>
+>>>>> Separate DMA mappings should be from separate memory allocations,
+>>>>> respecting ARCH_DMA_MINALIGN.
 >>>>
->>>> This actually illustrates exactly the reason why this is unsupportable.
->>>> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapping
->>>> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the range
->>>> ba79f200-ba79f23f to be written back over the top of data that the
->>>> device has already started to write to memory. Hello data corruption.
+>>>> hmm... I know I'm missing something here, but how does this align with
+>>>> the following from active_cacheline_insert() in kernel/dma/debug.c ?
 >>>>
->>>> Separate DMA mappings should be from separate memory allocations,
->>>> respecting ARCH_DMA_MINALIGN.
+>>>>           /* If the device is not writing memory then we don't have any
+>>>>            * concerns about the cpu consuming stale data.  This 
+>>>> mitigates
+>>>>            * legitimate usages of overlapping mappings.
+>>>>            */
+>>>>           if (entry->direction == DMA_TO_DEVICE)
+>>>>                   return 0;
 >>>
->>> hmm... I know I'm missing something here, but how does this align with
->>> the following from active_cacheline_insert() in kernel/dma/debug.c ?
+>>> It's OK to have multiple mappings that are *all* DMA_TO_DEVICE, which
+>>> looks to be the case that this check was intended to allow. However I
+>>> think you're right that it should still actually check for conflicting
+>>> directions between the new entry and any existing ones, otherwise it
+>>> ends up a bit too lenient.
 >>>
->>>           /* If the device is not writing memory then we don't have any
->>>            * concerns about the cpu consuming stale data.  This mitigates
->>>            * legitimate usages of overlapping mappings.
->>>            */
->>>           if (entry->direction == DMA_TO_DEVICE)
->>>                   return 0;
+>>> Cheers,
+>>> Robin.
 >>
->> It's OK to have multiple mappings that are *all* DMA_TO_DEVICE, which
->> looks to be the case that this check was intended to allow. However I
->> think you're right that it should still actually check for conflicting
->> directions between the new entry and any existing ones, otherwise it
->> ends up a bit too lenient.
->>
->> Cheers,
->> Robin.
+>> I understand what you are saying about why checking for conflicting
+>> directions may be a good thing, but given that the code is as it is
+>> right now, how are we seeing the warning for two mapping that one of
+>> them is DMA_TO_DEVICE?
 > 
-> I understand what you are saying about why checking for conflicting
-> directions may be a good thing, but given that the code is as it is
-> right now, how are we seeing the warning for two mapping that one of
-> them is DMA_TO_DEVICE?
+> Because it's the second one that isn't. The warning is triggered by 
+> adding the DMA_FROM_DEVICE entry, which *is* checked, and finds the 
+> DMA_TO_DEVICE entry already present. What's not great is that if those 
+> two mappings happened to be made in the opposite order then it would be 
+> missed entirely.
 
-Because it's the second one that isn't. The warning is triggered by 
-adding the DMA_FROM_DEVICE entry, which *is* checked, and finds the 
-DMA_TO_DEVICE entry already present. What's not great is that if those 
-two mappings happened to be made in the opposite order then it would be 
-missed entirely.
+Urgh, no, sorry, that's some imaginary conflation of the cacheline radix 
+tree with the entry hash bucket...
+
+What's actually happened here is that I've failed to read the log 
+properly and they're both DMA_FROM_DEVICE. But the potential problem of 
+mixed-direction mappings being missed does still stand in general.
 
 Robin.
