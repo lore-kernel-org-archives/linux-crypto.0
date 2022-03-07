@@ -2,291 +2,206 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B98DC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 14:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B17C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 15:02:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239516AbiCGOGX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 09:06:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37720 "EHLO
+        id S243494AbiCGPDl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 10:03:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233239AbiCGOGX (ORCPT
+        with ESMTP id S243463AbiCGPDk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 09:06:23 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 252295C868;
-        Mon,  7 Mar 2022 06:05:28 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id c192so9237631wma.4;
-        Mon, 07 Mar 2022 06:05:28 -0800 (PST)
+        Mon, 7 Mar 2022 10:03:40 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2160213CD3;
+        Mon,  7 Mar 2022 07:02:45 -0800 (PST)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227EhPPT010128;
+        Mon, 7 Mar 2022 15:01:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=x1Z8v8EkivpLkEtwJQKAOgXpTNObPmq0E2YTEG1eV80=;
+ b=Dg9v6mq3ZY49K7dv8mVx+7YTXcu5DpYlLSB56tB8Lv7c8vUKEuAC+Ln+DGTfeAsBLPbc
+ HsLsgriLDJ6yPnDEiJ+JAvFXLiWaRSFRITBgZkhxxa1KJ88Lx81LPOxVSVWo2/sI2smE
+ Qk+QqZJ99YwmFUguJpoWEeaES30pTwTrF9EouzWH+MUwiH/9QSHWlboBHy/g5GqWn9Dh
+ nqrs/brqswoJ3H76eZKtgTZ0Zte2rWSqq8IeDW1TROSz/LVzycXddxzaLXSKofKJwwn9
+ 0LX2WGlD8iHTz11FLpDqPc0HLFlRX3eV4kt7alsIdTiAw+TuafbLMtKtRSl7NwvFvRUA dw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ekx9cc0uw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 07 Mar 2022 15:01:37 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 227F1YB8182831;
+        Mon, 7 Mar 2022 15:01:36 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
+        by aserp3030.oracle.com with ESMTP id 3ekwwb2ceg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 07 Mar 2022 15:01:35 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZVxJCQH5xNzO3rnfAv830aUd7WYux8KegXHKjztVeeuY0Psr1rQHhg75Db+FsMCz0FiiZsf35jkHeMdxUqhhAoTula8BUaRj7pTs/65NHjz6BRvHhtApD7yxSd2SRpFCuxFgQn9D4PMo39iPUj4bCTUPnttCwfzCuxARP5DLY858t/juyFyBQlEDsdN6C05vyeJADD+7m5ntFvexeIu6BcUbSyEsjyikQSMG/stuDpSoUTaifnr5k+jON94hbAymivJw+ar9ps3N6xTi8tizrBeebQT+3dwgyJUj7nnNxE5hP58uauTpcgeEem+tiQRgCh6VGJx8oCozqYT4UJ878w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x1Z8v8EkivpLkEtwJQKAOgXpTNObPmq0E2YTEG1eV80=;
+ b=T1RBS/H4uxN+ed6NkiG9eof4AnRTtgXwT05Anuk8il8H1ij8v1e0UrftdhvCiw6fp3ZWNqwT+mPWB3mTK/PrA+IYRltCpfFUwmDgJU6ozBaTFXEjK/LPnY74RbmnJEYiKv65G41bjLZ+IFhxZUN7r87iN76OO13/3XIDQUo9Rw+V9cRBMkvL9z/SkJrb2xKoHC25ZslkEktS9tYOSE6edRrZfsLWQ3Owlcq0B92Q11tPUBOiEX2XXBcmVk4aTybL3hLLQyEj5Rzeu1AIGHPkqMH2zcj8JghEhxgM5OqaSlQMv7qvI5f099AQBS1Onv4IdWhkb8y4B6rdreWySGIjuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=cPCPfCto9HtHcoYx4KA9jMbfoIz/FloUnMSSYA+d0k4=;
-        b=BTE2/1Qef0yz/V0uaAKthJorX2GBLbkZzcxKGR2Nm4au3qlnPQyrgfu1mlgXoaQXXJ
-         t+FWXJxNMjy1iKehlIo+ZxIxlHmvTo0CBFhEGJ+mBZY2b0uf7Yzjw4TuR4Y7ZWGloLAx
-         kqo2yu7tTvYID8HDIjWa3CQghSghXo74XdMeaKJt22fUxv2L66PkJ7QfQXQskV0vb+el
-         3EO3CjnPepNlZXn7wfRukXbwps/Z5cv4IMONsqLWIddmhdlkz4EZR9ErQ/yN66pquo3C
-         z7Rafkbyu8kmfTzpIpeVSBWk69OL34Jl4NVgf3IwTxKzUKvQL0JeiEaiK638iSnonExN
-         It5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=cPCPfCto9HtHcoYx4KA9jMbfoIz/FloUnMSSYA+d0k4=;
-        b=LuNFGOQjApxbEhJHxEE9IryCkf/kgEnOEFyi2L1k+VWQkQj0Y0tAFTPH/3o7892aVQ
-         QzoaLjsI4symSEJy0BycFKxkgYKBN5XX4xJ8Y2Zf0xS/VWd05SiHNK4/xaiZ3j8ioZLz
-         j1LireCUmSqIoB0j1r9tRIhT4odAeG/jc++LqkN7dmuQkfiZBBB2C0Gw1ywapDJwZs3U
-         z+DjY13TJzTGdNP4Hkt/zIi/g6zXoqKCXk8EDTI52VeDnsymeJi83cpvWNU1EriAojvT
-         w7835DSHU69sOvG/68aF7q+eYQ2mGunfE/vqzIlfdOC9IG4hQMWwPYY8datKebHQQSLI
-         V9hA==
-X-Gm-Message-State: AOAM532hVfWKcZNz+743Af+TSfTrjF1mYwicpZ04olJ9NlCxO9SSGOzi
-        Rs4eB3WM26H1ii18MEYRMX0=
-X-Google-Smtp-Source: ABdhPJw/5N67lpL9Hf7fIZQLVJfIywdH1lBuwaVVedppeZ7Dkl2OG1Z7eQ0bXKp6L3JocgQWhHw8qA==
-X-Received: by 2002:a7b:c30a:0:b0:389:9e1e:a15f with SMTP id k10-20020a7bc30a000000b003899e1ea15fmr6709974wmj.28.1646661926469;
-        Mon, 07 Mar 2022 06:05:26 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id z5-20020a05600c0a0500b0037bb8df81a2sm24852516wmp.13.2022.03.07.06.05.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 06:05:26 -0800 (PST)
-Date:   Mon, 7 Mar 2022 15:05:24 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Robin Murphy <robin.murphy@arm.com>,
-        Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org
-Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen
- = authsize =0
-Message-ID: <YiYRJH+EtVA4hJMX@Red>
-References: <CAOtvUMeRb=j=NDrc88x8aB-3=D1mxZ_-aA1d4FfvJmj7Jrbi4w@mail.gmail.com>
- <YiIUXtxd44ut5uzV@Red>
- <YiUsWosH+MKMF7DQ@gondor.apana.org.au>
- <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com>
- <YiXjCcXXk0f18FDL@Red>
- <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
- <YiYMeFf+Lsa9y4ss@Red>
- <CAOtvUMccCai9gFrTv6CZB-U56UtCPtmnZUyW5WmUr=+6YiUHZg@mail.gmail.com>
- <YiYPBdRIi4+HYsmW@Red>
- <CAOtvUMewFLaNHu1UmoHhnszBNmLrcVV6nCTd7-th8s9=1+h4bg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x1Z8v8EkivpLkEtwJQKAOgXpTNObPmq0E2YTEG1eV80=;
+ b=RxwdW2rzDCZD0qWd/XaY98p+dmcfiggvHn2cZf4CURZpYtDt62oszWyey/oixeSjClOuHWh7B2B2HlO6iogDTrJls4Qmg+xSKBanhi98fi6rONd9mHcMBfDSa2NFnhm18wXVa/tlrq1kkT5GWOz16thid1PowWArmAhKZ0Fmb+4=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by DM6PR10MB3162.namprd10.prod.outlook.com
+ (2603:10b6:5:1a7::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.15; Mon, 7 Mar
+ 2022 15:01:27 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::2c3d:92b5:42b3:c1c5]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::2c3d:92b5:42b3:c1c5%4]) with mapi id 15.20.5038.026; Mon, 7 Mar 2022
+ 15:01:27 +0000
+Date:   Mon, 7 Mar 2022 18:00:37 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergman <arnd@arndb.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sgx@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-usb@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        bcm-kernel-feedback-list@broadcom.com, linux-tegra@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, kvm@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        v9fs-developer@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [PATCH 0/6] Remove usage of list iterator past the loop body
+Message-ID: <20220307150037.GD3293@kadam>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOtvUMewFLaNHu1UmoHhnszBNmLrcVV6nCTd7-th8s9=1+h4bg@mail.gmail.com>
+In-Reply-To: <20220228110822.491923-1-jakobkoschel@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: JNAP275CA0067.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4f::13)
+ To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a790898f-2ec8-463f-3dc0-08da004b5aa8
+X-MS-TrafficTypeDiagnostic: DM6PR10MB3162:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR10MB3162E5B690ED927B678D923E8E089@DM6PR10MB3162.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Y/fLTcENPy3FDPNbRhqURAmaW2b+qsga24wWjHAJa2bIyULxvWUIl2ol/8oP9OpffdCI9+WIU/mdnsgId0Ia5t6Y571afcH5tstavjRljpRPfo+54PM0gqPjoq828bWe+A9YGLh4zXv5yNSoCFUqx/IhBqVaONfo6avK+iwn3140w3noRjVXsjSXyS87BkBaHyVpEvOQzcX5L4l1pNk4ANAwGEatJJfh1jfUOz/vGFvi/BKEGTCNnnIpLeBlhtAhTts8DTrk18T/OlTF+JBJ4ikYzLV5MHKpRKroTDZhsLceSwaXwAOiAnNSx7t2MuAIgwwRX7ZQoVs43AgjsG+Fg6BLneQojEcGKiR6b2BGzKIgAzleffcWgpHQy9UoUVPk/+C3EIFr9UszIpi7TavCp2FHEtJGl/SVafQVW6aCWyoAHs88Luhzkj71LnU3wCLb4c+8Z3H1XPYjXL3h3uAoFIqzaNkjNcOSIAfbwQ6iuicT8Vki8+YKCR1aToL6Z8tugzM6uY24TmoT3SavWW+FJxQhewHw1CdSx04GF3NxGph8aG8BzAL/WvMnHz2nv5fZaY14jCvAxM2OD3mgGpks2il9IciqttjmkYqJdj2l5Ku4EwbO6Q/s4EoBojCoh9Ei2UGFxJ5LYiZlKSIt1GHfidLEcqmQ/F4bj6oYeWLtfBwd1h6CFc8cBOYZkpOeQ5imTBMIiyQoluLm/4ZVf1oQrA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(366004)(66476007)(33716001)(66556008)(66946007)(4326008)(1076003)(8676002)(186003)(26005)(86362001)(83380400001)(7366002)(7416002)(2906002)(7406005)(38100700002)(38350700002)(44832011)(5660300002)(8936002)(6486002)(6506007)(6916009)(54906003)(508600001)(316002)(9686003)(6512007)(33656002)(52116002)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bWnw9vDUW8VZdEEeOBoLe1Y2rGYUV11qKNE9g6dxqMiuS87/ZyKsTccHFR0h?=
+ =?us-ascii?Q?zsB0WiEiqlAdSnYChqWyixjeTe8J70lFdgZDxvpYY8Md1QJlCxc57WI3lKKW?=
+ =?us-ascii?Q?7OKVtZZPwo4PQELlJDxenjkgFckWDcGxekNXoRiALgGlLG8LqMmpbMB8ekyf?=
+ =?us-ascii?Q?G9MyP6chT/cDn70t0b0ueGN5RG+81wHOZAjBs8HDDvAaxhGaNbnfncAdt8Yz?=
+ =?us-ascii?Q?qX72thiL+n24WSbMLcuBJJ8V1ccly/dGK5UDZGkFOFVT4AXyXoELapcqNS9z?=
+ =?us-ascii?Q?NDhaaoIUKUexKB2+F4X5Y98PCgFTSNenrUz1PIjLEhyc3Q/ZE8sAIfA2h29O?=
+ =?us-ascii?Q?bQjjNrixP+R7RSxpVCbbgsDGbv/ZATRvk3WhKWwb+jmrZDtXDwxLOMHZ8yBc?=
+ =?us-ascii?Q?4pHu7DI8TyzkjqTF1upf8s5iN4CMqoFQdu4wUb7MaRHV72jMkEUXsFkASQSF?=
+ =?us-ascii?Q?vv7Ac+6drIRQn/r1jQ982aqhi7u5vO5ZL+dEMNOjGriG3gC1OcYvZQ1u8c+n?=
+ =?us-ascii?Q?g8NZ2LHY9el7yNIaIukR4Zm1ktcTCctIG4XS/pg46BXoL1qdKLQRRYagZFK0?=
+ =?us-ascii?Q?/n7DreZfZaB3/y6z/AfBYEefukHPXeDe7d5ezAitzK+d2QQog4rIlDD8qa+8?=
+ =?us-ascii?Q?zymgVQ4pYNtlCsnjeMBG+jeXNkGWjbBYLXnAKxwmjjZXhcMZumddOy+Ox579?=
+ =?us-ascii?Q?4AO7+KrxbY8OaHng70JT1yHw7jJ41cKVMyj6+lSTTT0hY/vBD/EjaHX7CQGj?=
+ =?us-ascii?Q?gn+ib54LqJK5ERUYLkPyLTr3fL3+8qVsU6VJuAMogYWficUmoqE1kgh3VfYy?=
+ =?us-ascii?Q?5GG2gh3eUz3ZmDWGrWLk37QmW8AjdqWL331TJqq2Vtfi2os1mSDeNEMNgTfs?=
+ =?us-ascii?Q?JigyK6JXXFG/AjbfCvKyxTb5b97bfuqzQYdE4eHJbcn0vo5hRiIhGLbJf54r?=
+ =?us-ascii?Q?1+wj0BXD4HTyx09AT7V8I93fCvHTD4ORTHncQiR55MrEjVVVy2S/EZ4ptMEb?=
+ =?us-ascii?Q?TJM0wnWIaTrGbKcSA81X6pV7ijz2Wk0PZGUl92KsTsSPo6c4I02gYNS2TSAe?=
+ =?us-ascii?Q?K9VDwr5GETgPv8BUisSpiQzgq9JMAGL7ZnOl5wVX/XqKWvpIc07KZtQcXnwM?=
+ =?us-ascii?Q?Jtjl9gkcqxAFpr/BjcYIaEQjfGCfJ6idypOOy3N2d/uEFFqMaOjZtDKDIYwv?=
+ =?us-ascii?Q?oEIKeog/E7IrMTA6satUj+vLfWFpsVkMzFoWxRRR8DQAkSF4xn7i35zyuOiw?=
+ =?us-ascii?Q?irH+K1abxkvnaTDv9ZoTXuNBzuRMTaGXYA62J39eVJbq3yJy0RQEPW6c0rcx?=
+ =?us-ascii?Q?g4pKQAKlIR+gQdM+vVMBlpeZKtU9aKXqqCOO0sXGBz9wOH+Aj8leCTE7a3IZ?=
+ =?us-ascii?Q?JCCfiA7fX21qLYfVF1XBAOUSvI0Ernt29iTu8NYZpO7IoQmKhLGZr4GbkcTZ?=
+ =?us-ascii?Q?hiPa/2oyjB36rA+wClvc51mBbcVTEESLuNZYDurf2ZbK37ErAOGCOnXBlzO+?=
+ =?us-ascii?Q?JqGgc+A6MF0WAnahTTJHEWvldUZikGnWltMXf1mxdNBxe2cMPy+SzwaHv47W?=
+ =?us-ascii?Q?Ezb+s+3OJuV1G7JHkGx4LKYHG8u/EbA6EEPLRBhVPvvFEpozXSOWy4gopb23?=
+ =?us-ascii?Q?liAgqtWCS98yMgwNB8XKXCa2EWsUifta9yDiiGpqy2G7yeH4aoZGFsf04L6O?=
+ =?us-ascii?Q?iPDcFg=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a790898f-2ec8-463f-3dc0-08da004b5aa8
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2022 15:01:27.4868
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2UjWK/F6sROiJEXQUOU6TRAnQMxXsqg9czn6a4AF3iOMRRrzhwWtM+yb68NNSa/ELQMga9NSOgJl/ugDx/4aSzJoYDeZK1PeFGaYPs8ke5I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB3162
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10278 signatures=690470
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0
+ phishscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203070088
+X-Proofpoint-ORIG-GUID: fjWplAebQ6s5baA-c6tMuaOl9h85GlXo
+X-Proofpoint-GUID: fjWplAebQ6s5baA-c6tMuaOl9h85GlXo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Mon, Mar 07, 2022 at 04:00:44PM +0200, Gilad Ben-Yossef a écrit :
-> On Mon, Mar 7, 2022 at 3:56 PM Corentin Labbe <clabbe.montjoie@gmail.com> wrote:
-> >
-> > Le Mon, Mar 07, 2022 at 03:53:02PM +0200, Gilad Ben-Yossef a écrit :
-> > > On Mon, Mar 7, 2022 at 3:45 PM Corentin Labbe <clabbe.montjoie@gmail.com> wrote:
-> > > >
-> > > > Le Mon, Mar 07, 2022 at 11:14:16AM +0000, Robin Murphy a écrit :
-> > > > > On 2022-03-07 10:48, Corentin Labbe wrote:
-> > > > > > Le Mon, Mar 07, 2022 at 09:59:29AM +0200, Gilad Ben-Yossef a ďż˝crit :
-> > > > > >> On Sun, Mar 6, 2022 at 11:49 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > > > > >>>
-> > > > > >>> On Fri, Mar 04, 2022 at 02:30:06PM +0100, Corentin Labbe wrote:
-> > > > > >>>>
-> > > > > >>>> Hello
-> > > > > >>>>
-> > > > > >>>> I got:
-> > > > > >>>> [   17.563793] ------------[ cut here ]------------
-> > > > > >>>> [   17.568492] DMA-API: ccree e6601000.crypto: device driver frees DMA memory with different direction [device address=0x0000000078fe5800] [size=8 bytes] [mapped with DMA_TO_DEVICE] [unmapped with DMA_BIDIRECTIONAL]
-> > > > > >>>
-> > > > > >>> The direction argument during unmap must match whatever direction
-> > > > > >>> you used during the original map call.
-> > > > > >>
-> > > > > >>
-> > > > > >> Yes, of course. I changed one but forgot the other.
-> > > > > >>
-> > > > > >> Corentin, could you be kind and check that this solves the original
-> > > > > >> problem and does not produce new warnings?
-> > > > > >>
-> > > > > >> diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c
-> > > > > >> b/drivers/crypto/ccree/cc_buffer_mgr.c
-> > > > > >> index 11e0278c8631..31cfe014922e 100644
-> > > > > >> --- a/drivers/crypto/ccree/cc_buffer_mgr.c
-> > > > > >> +++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-> > > > > >> @@ -356,12 +356,14 @@ void cc_unmap_cipher_request(struct device *dev,
-> > > > > >> void *ctx,
-> > > > > >>                                req_ctx->mlli_params.mlli_dma_addr);
-> > > > > >>          }
-> > > > > >>
-> > > > > >> -       dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
-> > > > > >> -       dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
-> > > > > >> -
-> > > > > >>          if (src != dst) {
-> > > > > >> -               dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
-> > > > > >> +               dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_TO_DEVICE);
-> > > > > >> +               dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_FROM_DEVICE);
-> > > > > >>                  dev_dbg(dev, "Unmapped req->dst=%pK\n", sg_virt(dst));
-> > > > > >> +               dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
-> > > > > >> +       } else {
-> > > > > >> +               dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
-> > > > > >> +               dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
-> > > > > >>          }
-> > > > > >>   }
-> > > > > >>
-> > > > > >> @@ -377,6 +379,7 @@ int cc_map_cipher_request(struct cc_drvdata
-> > > > > >> *drvdata, void *ctx,
-> > > > > >>          u32 dummy = 0;
-> > > > > >>          int rc = 0;
-> > > > > >>          u32 mapped_nents = 0;
-> > > > > >> +       int src_direction = (src != dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
-> > > > > >>
-> > > > > >>          req_ctx->dma_buf_type = CC_DMA_BUF_DLLI;
-> > > > > >>          mlli_params->curr_pool = NULL;
-> > > > > >> @@ -399,7 +402,7 @@ int cc_map_cipher_request(struct cc_drvdata
-> > > > > >> *drvdata, void *ctx,
-> > > > > >>          }
-> > > > > >>
-> > > > > >>          /* Map the src SGL */
-> > > > > >> -       rc = cc_map_sg(dev, src, nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_nents,
-> > > > > >> +       rc = cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nents,
-> > > > > >>                         LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
-> > > > > >>          if (rc)
-> > > > > >>                  goto cipher_exit;
-> > > > > >> @@ -416,7 +419,7 @@ int cc_map_cipher_request(struct cc_drvdata
-> > > > > >> *drvdata, void *ctx,
-> > > > > >>                  }
-> > > > > >>          } else {
-> > > > > >>                  /* Map the dst sg */
-> > > > > >> -               rc = cc_map_sg(dev, dst, nbytes, DMA_BIDIRECTIONAL,
-> > > > > >> +               rc = cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
-> > > > > >>                                 &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENTRIES,
-> > > > > >>                                 &dummy, &mapped_nents);
-> > > > > >>                  if (rc)
-> > > > > >>
-> > > > > >>
-> > > > > >
-> > > > > > Hello
-> > > > > >
-> > > > > > I still get the warning:
-> > > > > > [  433.406230] ------------[ cut here ]------------
-> > > > > > [  433.406326] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
-> > > > > > [  433.406386] WARNING: CPU: 7 PID: 31074 at /home/clabbe/linux-next/kernel/dma/debug.c:571 add_dma_entry+0x1d0/0x288
-> > > > > > [  433.406434] Modules linked in:
-> > > > > > [  433.406458] CPU: 7 PID: 31074 Comm: kcapi Not tainted 5.17.0-rc6-next-20220303-00130-g30042e47ee47-dirty #54
-> > > > > > [  433.406473] Hardware name: Renesas Salvator-X board based on r8a77950 (DT)
-> > > > > > [  433.406484] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> > > > > > [  433.406498] pc : add_dma_entry+0x1d0/0x288
-> > > > > > [  433.406510] lr : add_dma_entry+0x1d0/0x288
-> > > > > > [  433.406522] sp : ffff800015da3690
-> > > > > > [  433.406531] x29: ffff800015da3690 x28: 0000000000000000 x27: 0000000000000000
-> > > > > > [  433.406562] x26: 0000000000000000 x25: ffff80000b4c7bc0 x24: ffff80000b4c7000
-> > > > > > [  433.406593] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000a9b6000
-> > > > > > [  433.406623] x20: ffff0004c0af5c00 x19: ffff80000b420000 x18: ffffffffffffffff
-> > > > > > [  433.406653] x17: 6c7265766f202c54 x16: 534958454520676e x15: 000000000000022e
-> > > > > > [  433.406683] x14: ffff800015da3380 x13: 00000000ffffffea x12: ffff80000b4be010
-> > > > > > [  433.406713] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000b4a6028
-> > > > > > [  433.406743] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000b4a5fd0
-> > > > > > [  433.406773] x5 : ffff0006ff795c48 x4 : 0000000000000000 x3 : 0000000000000027
-> > > > > > [  433.406802] x2 : 0000000000000023 x1 : 8ca4e4fbf4b87900 x0 : 0000000000000000
-> > > > > > [  433.406833] Call trace:
-> > > > > > [  433.406841]  add_dma_entry+0x1d0/0x288
-> > > > > > [  433.406854]  debug_dma_map_sg+0x150/0x398
-> > > > > > [  433.406869]  __dma_map_sg_attrs+0x9c/0x108
-> > > > > > [  433.406889]  dma_map_sg_attrs+0x10/0x28
-> > > > > > [  433.406904]  cc_map_sg+0x80/0x100
-> > > > > > [  433.406924]  cc_map_cipher_request+0x178/0x3c8
-> > > > > > [  433.406939]  cc_cipher_process+0x210/0xb58
-> > > > > > [  433.406953]  cc_cipher_encrypt+0x2c/0x38
-> > > > > > [  433.406967]  crypto_skcipher_encrypt+0x44/0x78
-> > > > > > [  433.406986]  skcipher_recvmsg+0x36c/0x420
-> > > > > > [  433.407003]  ____sys_recvmsg+0x90/0x280
-> > > > > > [  433.407024]  ___sys_recvmsg+0x88/0xd0
-> > > > > > [  433.407038]  __sys_recvmsg+0x6c/0xd0
-> > > > > > [  433.407049]  __arm64_sys_recvmsg+0x24/0x30
-> > > > > > [  433.407061]  invoke_syscall+0x44/0x100
-> > > > > > [  433.407082]  el0_svc_common.constprop.3+0x90/0x120
-> > > > > > [  433.407096]  do_el0_svc+0x24/0x88
-> > > > > > [  433.407110]  el0_svc+0x4c/0x100
-> > > > > > [  433.407131]  el0t_64_sync_handler+0x90/0xb8
-> > > > > > [  433.407145]  el0t_64_sync+0x170/0x174
-> > > > > > [  433.407160] irq event stamp: 5624
-> > > > > > [  433.407168] hardirqs last  enabled at (5623): [<ffff80000812f6a8>] __up_console_sem+0x60/0x98
-> > > > > > [  433.407191] hardirqs last disabled at (5624): [<ffff800009c9a060>] el1_dbg+0x28/0x90
-> > > > > > [  433.407208] softirqs last  enabled at (5570): [<ffff8000097e62f8>] lock_sock_nested+0x80/0xa0
-> > > > > > [  433.407226] softirqs last disabled at (5568): [<ffff8000097e62d8>] lock_sock_nested+0x60/0xa0
-> > > > > > [  433.407241] ---[ end trace 0000000000000000 ]---
-> > > > > > [  433.407381] DMA-API: Mapped at:
-> > > > > > [  433.407396]  debug_dma_map_sg+0x16c/0x398
-> > > > > > [  433.407416]  __dma_map_sg_attrs+0x9c/0x108
-> > > > > > [  433.407436]  dma_map_sg_attrs+0x10/0x28
-> > > > > > [  433.407455]  cc_map_sg+0x80/0x100
-> > > > > > [  433.407475]  cc_map_cipher_request+0x178/0x3c8
-> > > > > >
-> > > > > >
-> > > > > > BUT I start to thing this is a bug in DMA-API debug.
-> > > > > >
-> > > > > >
-> > > > > > My sun8i-ss driver hit the same warning:
-> > > > > > [  142.458351] WARNING: CPU: 1 PID: 90 at kernel/dma/debug.c:597 add_dma_entry+0x2ec/0x4cc
-> > > > > > [  142.458429] DMA-API: sun8i-ss 1c15000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
-> > > > > > [  142.458455] Modules linked in: ccm algif_aead xts cmac
-> > > > > > [  142.458563] CPU: 1 PID: 90 Comm: 1c15000.crypto- Not tainted 5.17.0-rc6-next-20220307-00132-g39dad568d20a-dirty #223
-> > > > > > [  142.458581] Hardware name: Allwinner A83t board
-> > > > > > [  142.458596]  unwind_backtrace from show_stack+0x10/0x14
-> > > > > > [  142.458627]  show_stack from 0xf0abdd1c
-> > > > > > [  142.458646] irq event stamp: 31747
-> > > > > > [  142.458660] hardirqs last  enabled at (31753): [<c019316c>] __up_console_sem+0x50/0x60
-> > > > > > [  142.458688] hardirqs last disabled at (31758): [<c0193158>] __up_console_sem+0x3c/0x60
-> > > > > > [  142.458710] softirqs last  enabled at (31600): [<c06990c8>] sun8i_ss_handle_cipher_request+0x300/0x8b8
-> > > > > > [  142.458738] softirqs last disabled at (31580): [<c06990c8>] sun8i_ss_handle_cipher_request+0x300/0x8b8
-> > > > > > [  142.458758] ---[ end trace 0000000000000000 ]---
-> > > > > > [  142.458771] DMA-API: Mapped at:
-> > > > > >
-> > > > > > Yes the mapped at is empty just after.
-> > > > > >
-> > > > > > And the sequence of DMA operations in my driver is simple, so I cannot see how any overlap could occur.
-> > > > >
-> > > > > The "overlap" is in the sense of having more than one mapping within the
-> > > > > same cacheline:
-> > > > >
-> > > > > [  142.458120] DMA-API: add_dma_entry start P=ba79f200 N=ba79f
-> > > > > D=ba79f200 L=10 DMA_FROM_DEVICE attrs=0
-> > > > > [  142.458156] DMA-API: add_dma_entry start P=445dc010 N=445dc
-> > > > > D=445dc010 L=10 DMA_TO_DEVICE attrs=0
-> > > > > [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=16 bi=0
-> > > > > [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=16 bi=0
-> > > > > [  142.458234] DMA-API: add_dma_entry start P=ba79f210 N=ba79f
-> > > > > D=ba79f210 L=10 DMA_FROM_DEVICE attrs=0
-> > > > >
-> > > > > This actually illustrates exactly the reason why this is unsupportable.
-> > > > > ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapping
-> > > > > ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the range
-> > > > > ba79f200-ba79f23f to be written back over the top of data that the
-> > > > > device has already started to write to memory. Hello data corruption.
-> > > > >
-> > > > > Separate DMA mappings should be from separate memory allocations,
-> > > > > respecting ARCH_DMA_MINALIGN.
-> > > > >
-> > > >
-> > > > I just saw something strange, only one SG is involved, and I dont see any DMA_TO_DEVICE for ba79f210.
-> > > > I see 2 DMA_FROM_DEVICE (ba79f200 and ba79f210), but only one should be done.
-> > > > Why 2 FROM mappings are added with only one sg ?
-> > > >
-> > >
-> > > The thing that does the memory allocation of user calls from libkcapi
-> > > tests is the crypto/af_alg.c code ...
-> > >
-> > > I assume the sglist has two buffers? could it be that somehow they are
-> > > not DMA aligned? that would be weird indeed...
-> > >
-> >
-> > The SGlist has only one SG, so only one buffer, it is why I dont understand the double call to add_dma_entry().
-> 
-> But... a scatter gather list by its nature can hold more than one
-> buffer, no? that is the whole purpose of a scatter gather list...?
-> 
+Updating this API is risky because some places rely on the old behavior
+and not all of them have been updated.  Here are some additional places
+you might want to change.
 
-Each buffer is "in" one struct scatterlist (this is what I call SG, perhaps wrongly).
-The debug sun8i-ss 1c15000.crypto: DST 0/1/1 show that we have only one entry (as given by sg_nents_for_len() and dma_map_sg())
+drivers/usb/host/uhci-q.c:466 link_async() warn: iterator used outside loop: 'pqh'
+drivers/infiniband/core/mad.c:968 ib_get_rmpp_segment() warn: iterator used outside loop: 'mad_send_wr->cur_seg'
+drivers/opp/debugfs.c:208 opp_migrate_dentry() warn: iterator used outside loop: 'new_dev'
+drivers/staging/greybus/audio_codec.c:602 gbcodec_mute_stream() warn: iterator used outside loop: 'module'
+drivers/staging/media/atomisp/pci/atomisp_acc.c:508 atomisp_acc_load_extensions() warn: iterator used outside loop: 'acc_fw'
+drivers/perf/thunderx2_pmu.c:814 tx2_uncore_pmu_init_dev() warn: iterator used outside loop: 'rentry'
+drivers/gpu/drm/nouveau/nvkm/engine/device/ctrl.c:111 nvkm_control_mthd_pstate_attr() warn: iterator used outside loop: 'pstate'
+drivers/gpu/drm/panfrost/panfrost_mmu.c:203 panfrost_mmu_as_get() warn: iterator used outside loop: 'lru_mmu'
+drivers/media/usb/uvc/uvc_v4l2.c:885 uvc_ioctl_enum_input() warn: iterator used outside loop: 'iterm'
+drivers/media/usb/uvc/uvc_v4l2.c:896 uvc_ioctl_enum_input() warn: iterator used outside loop: 'iterm'
+drivers/scsi/dc395x.c:3596 device_alloc() warn: iterator used outside loop: 'p'
+drivers/net/ethernet/mellanox/mlx4/alloc.c:379 __mlx4_alloc_from_zone() warn: iterator used outside loop: 'curr_node'
+fs/ocfs2/dlm/dlmdebug.c:573 lockres_seq_start() warn: iterator used outside loop: 'res'
 
-Sorry for my misleading SG.
+This patchset fixes 3 bugs.  Initially when it's merged it's probably
+going to introduce some bugs because there are likely other places which
+rely on the old behavior.
+
+In an ideal world, with the new API the compiler would warn about
+uninitialized variables, but unfortunately that warning is disabled by
+default so we still have to rely on kbuild/Clang/Smatch to find the
+bugs.
+
+But hopefully the new API encourages people to write clearer code so it
+prevents bugs in the long run.
+
+regards,
+dan carpenter
+
