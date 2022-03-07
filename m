@@ -2,49 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400E0C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36012C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241862AbiCGNON (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 08:14:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51944 "EHLO
+        id S242819AbiCGNXG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 08:23:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237139AbiCGNOM (ORCPT
+        with ESMTP id S242908AbiCGNXE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 08:14:12 -0500
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413EF82D1A
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 05:13:17 -0800 (PST)
-Received: by mail-yb1-xb2a.google.com with SMTP id j2so30925647ybu.0
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 05:13:17 -0800 (PST)
+        Mon, 7 Mar 2022 08:23:04 -0500
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A367A9A0
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 05:22:10 -0800 (PST)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2d07ae0b1c0so163514397b3.2
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 05:22:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=FTOQLkPABjgFHbcpYh08NxXX3AnkIW8zDVxaxnJ63AA=;
-        b=DcLYhdXta5yl8UjuFS/qcxIrxj4lqv9WyXc3/4S1ZfTA8qudVdOqOdtdNpJMh1qdof
-         Z5ftjB+ehud2ofGMkDW6hVsPdsxvCOjZ/KA7pgDY12xY9Oigd3KsPHKfESy263khNi7/
-         XVKs1s6U/dLC+N61e2D5BZGBGx38mYU78J6V/0KQWEi+JdAieZAqV8rGuOdc22jnqUxZ
-         XD0z6sLwo5GMK0UpVzOw9JRI8LRLKdE/xG/nToRr22qZJ+M/LCUp/uWvZi0I1J4P1jdT
-         wIKiJNWDrecTVLsOGttHwnSdbKob/edeHZbo6T5d6s517KcS2oA6GUQVQ0KrfyVuJjAy
-         FFfg==
+        bh=7oDoWa/WXO0HRiAR3FYfDPHuuMG9SE634o9q9OLcXr4=;
+        b=zyZStyBdAViuPZW9wkcsXwR7+fT9bJrITQ2ZKvu3QTWVKxlWLy5mrmZ19yZxqPmpyI
+         VkAXmRizMHDJh/MFSFGxk5NJA2cVrrmKt4U/hdrGDscEVzujD5VMRyzLGnQJU3v+OYcQ
+         brxCntmql2y/zoTn7yXUn9bN9lRsoD66D9zQgQ9CMWcENYen15Z05vI8LBSCCceSyFuC
+         zcEkIAR2P2AoneetJjwo3iniEadu3BeXE/fuyDeAjsi6XfEUnzd/a5pEDGJsODMZh7k3
+         9XzRm1hCzWr2NN/drttHWY0ZQr6etkSbnTytwsAYutdn5clAjadxkuWsaAd+DlmEP+nb
+         caaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=FTOQLkPABjgFHbcpYh08NxXX3AnkIW8zDVxaxnJ63AA=;
-        b=aLwQeOLP3iazwdlOH1mXJ7+xtJNl7+WI5wULmkBKFkBHkwgvOCkHqO4T7ccymAWtvr
-         tLIuvcwwHJ5uL5oOFdHgF0E58JMwfALb0vAj0SgUW6lnmhyjKSKUkC86l4dn7366luw2
-         FZJgE9l13KNZAONPpQlWDYtktUxJ10X7NVgsGpUOV98begMkoTauwuM/DgMS4EU+RkcD
-         ++MnOKfREZGWps8O0h33BzKmQ4Qe+Hd2kdHoEj5V1bP9Lk+0ACcXzLcE/FsLUij0Nz/h
-         aFhnXv/zo4c/V/MZTPHZJguvxORHMEDIyDI3BjXOEvEV5QO7Vq7nGe5+jze8Ss1xjf/3
-         u+lA==
-X-Gm-Message-State: AOAM532DnR/4eDc1dYaqovuwiDWar1VVLnVs0iZIJ6iBhTLKQXolwD0s
-        Uld0uSmo0B1ZQVMJWd1/pvZtYtbCCZ6fw09LO9wnMQ==
-X-Google-Smtp-Source: ABdhPJzwr0HyjzESewd0ZLqGIIXTOlieb/gEYoK49h1Rd5QKtQQsd809tOBlz8U2SyCY5D/c2nGkNyO3lxaUCXyAKDk=
-X-Received: by 2002:a25:e0c7:0:b0:629:182a:4b75 with SMTP id
- x190-20020a25e0c7000000b00629182a4b75mr7234257ybg.539.1646658796453; Mon, 07
- Mar 2022 05:13:16 -0800 (PST)
+        bh=7oDoWa/WXO0HRiAR3FYfDPHuuMG9SE634o9q9OLcXr4=;
+        b=ZT/5JBDetnc6Ppyw8gjtjxKeZSKtNxzKgEpewMm4RuBFlgH3GWSFd7lQMoePnCVqHO
+         hJk6kao1V/5pPjYLRnCDZ7sQockg4y9w0pu+RO1jps8+WjuuNvfK/gAGtQgz8a/sgE7W
+         UScag9AILTTG366Xmr9BOFBBO+ws9MaAtjwfp4poC/xGFjOvLUo4Rk+QG6Mm3bi4zYVw
+         hfiv3ZnhGN7z9wELwasIrA1MDdM3lFajhWXNG1pzNec9FmxtO22g8N9n4JPgSIILgQKv
+         rO2z5WJbXqrrRR/8a4XJVnXeLDdrNou2xKUgeeYBD9hIuPS9u3XhvAn5+oQSCNB05PDq
+         +b6g==
+X-Gm-Message-State: AOAM532+Q+/ZyNo54YKDAJPrgLj2V4YLmgRhedtaVFZgpqo8cXuj2JMz
+        mVZa9q0YjcjnpNuQFxlI7x3An/l3/GpKgB75JjQqLg==
+X-Google-Smtp-Source: ABdhPJwWHyCRmEtXGbQdVI93JxNWbSQv1j1WSn4xgNCCimNig7ktZEtlxXBn4d3h3waSXP57EYn48/o/1hPC6BYVksE=
+X-Received: by 2002:a81:6c6:0:b0:2dc:616b:468b with SMTP id
+ 189-20020a8106c6000000b002dc616b468bmr8087023ywg.472.1646659329804; Mon, 07
+ Mar 2022 05:22:09 -0800 (PST)
 MIME-Version: 1.0
 References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
@@ -56,158 +56,131 @@ References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <YiXjCcXXk0f18FDL@Red> <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
  <CAOtvUMePFR4e2jgHZKOvs3J3Xt4NzRbzD_=vr_49Qgs5HTrvHw@mail.gmail.com>
  <6cf91f43-df23-3ac9-e9b5-958d99d37422@arm.com> <CAOtvUMedqSNKx9Aah0R_aAyjKO0pn4K75MrCnbh_zX+Zw9vRQA@mail.gmail.com>
- <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com>
-In-Reply-To: <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com>
+ <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com> <b7a3e828-c848-2d42-9f91-d282b9c1ac9e@arm.com>
+In-Reply-To: <b7a3e828-c848-2d42-9f91-d282b9c1ac9e@arm.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 7 Mar 2022 15:13:05 +0200
-Message-ID: <CAOtvUMcp8X9Zex9QE3qz5mKVR9MC3kdUymO1oXVdUc=k1NcwXA@mail.gmail.com>
+Date:   Mon, 7 Mar 2022 15:21:58 +0200
+Message-ID: <CAOtvUMf_LPN80MV_GmnA6P2y8-PiazZ8nahDp_Gdpz-Ns3n8pw@mail.gmail.com>
 Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
  authsize =0
 To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org
+        iommu@lists.linux-foundation.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 7, 2022 at 3:03 PM Robin Murphy <robin.murphy@arm.com> wrote:
+On Mon, Mar 7, 2022 at 3:12 PM Robin Murphy <robin.murphy@arm.com> wrote:
 >
-> On 2022-03-07 12:47, Gilad Ben-Yossef wrote:
-> > On Mon, Mar 7, 2022 at 2:36 PM Robin Murphy <robin.murphy@arm.com> wrot=
-e:
-> >>
-> >> On 2022-03-07 12:17, Gilad Ben-Yossef wrote:
-> >>> On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com> wr=
-ote:
+> On 2022-03-07 13:03, Robin Murphy wrote:
+> > On 2022-03-07 12:47, Gilad Ben-Yossef wrote:
+> >> On Mon, Mar 7, 2022 at 2:36 PM Robin Murphy <robin.murphy@arm.com> wro=
+te:
 > >>>
-> >>>> The "overlap" is in the sense of having more than one mapping within=
- the
-> >>>> same cacheline:
+> >>> On 2022-03-07 12:17, Gilad Ben-Yossef wrote:
+> >>>> On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com>
+> >>>> wrote:
 > >>>>
-> >>>> [  142.458120] DMA-API: add_dma_entry start P=3Dba79f200 N=3Dba79f
-> >>>> D=3Dba79f200 L=3D10 DMA_FROM_DEVICE attrs=3D0
-> >>>> [  142.458156] DMA-API: add_dma_entry start P=3D445dc010 N=3D445dc
-> >>>> D=3D445dc010 L=3D10 DMA_TO_DEVICE attrs=3D0
-> >>>> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=3D16 =
-bi=3D0
-> >>>> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=3D16 =
-bi=3D0
-> >>>> [  142.458234] DMA-API: add_dma_entry start P=3Dba79f210 N=3Dba79f
-> >>>> D=3Dba79f210 L=3D10 DMA_FROM_DEVICE attrs=3D0
+> >>>>> The "overlap" is in the sense of having more than one mapping
+> >>>>> within the
+> >>>>> same cacheline:
+> >>>>>
+> >>>>> [  142.458120] DMA-API: add_dma_entry start P=3Dba79f200 N=3Dba79f
+> >>>>> D=3Dba79f200 L=3D10 DMA_FROM_DEVICE attrs=3D0
+> >>>>> [  142.458156] DMA-API: add_dma_entry start P=3D445dc010 N=3D445dc
+> >>>>> D=3D445dc010 L=3D10 DMA_TO_DEVICE attrs=3D0
+> >>>>> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=3D16=
+ bi=3D0
+> >>>>> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=3D16=
+ bi=3D0
+> >>>>> [  142.458234] DMA-API: add_dma_entry start P=3Dba79f210 N=3Dba79f
+> >>>>> D=3Dba79f210 L=3D10 DMA_FROM_DEVICE attrs=3D0
+> >>>>>
+> >>>>> This actually illustrates exactly the reason why this is
+> >>>>> unsupportable.
+> >>>>> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapp=
+ing
+> >>>>> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the ran=
+ge
+> >>>>> ba79f200-ba79f23f to be written back over the top of data that the
+> >>>>> device has already started to write to memory. Hello data corruptio=
+n.
+> >>>>>
+> >>>>> Separate DMA mappings should be from separate memory allocations,
+> >>>>> respecting ARCH_DMA_MINALIGN.
 > >>>>
-> >>>> This actually illustrates exactly the reason why this is unsupportab=
-le.
-> >>>> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mappi=
-ng
-> >>>> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the rang=
-e
-> >>>> ba79f200-ba79f23f to be written back over the top of data that the
-> >>>> device has already started to write to memory. Hello data corruption=
-.
+> >>>> hmm... I know I'm missing something here, but how does this align wi=
+th
+> >>>> the following from active_cacheline_insert() in kernel/dma/debug.c ?
 > >>>>
-> >>>> Separate DMA mappings should be from separate memory allocations,
-> >>>> respecting ARCH_DMA_MINALIGN.
+> >>>>           /* If the device is not writing memory then we don't have =
+any
+> >>>>            * concerns about the cpu consuming stale data.  This
+> >>>> mitigates
+> >>>>            * legitimate usages of overlapping mappings.
+> >>>>            */
+> >>>>           if (entry->direction =3D=3D DMA_TO_DEVICE)
+> >>>>                   return 0;
 > >>>
-> >>> hmm... I know I'm missing something here, but how does this align wit=
-h
-> >>> the following from active_cacheline_insert() in kernel/dma/debug.c ?
+> >>> It's OK to have multiple mappings that are *all* DMA_TO_DEVICE, which
+> >>> looks to be the case that this check was intended to allow. However I
+> >>> think you're right that it should still actually check for conflictin=
+g
+> >>> directions between the new entry and any existing ones, otherwise it
+> >>> ends up a bit too lenient.
 > >>>
-> >>>           /* If the device is not writing memory then we don't have a=
-ny
-> >>>            * concerns about the cpu consuming stale data.  This mitig=
-ates
-> >>>            * legitimate usages of overlapping mappings.
-> >>>            */
-> >>>           if (entry->direction =3D=3D DMA_TO_DEVICE)
-> >>>                   return 0;
+> >>> Cheers,
+> >>> Robin.
 > >>
-> >> It's OK to have multiple mappings that are *all* DMA_TO_DEVICE, which
-> >> looks to be the case that this check was intended to allow. However I
-> >> think you're right that it should still actually check for conflicting
-> >> directions between the new entry and any existing ones, otherwise it
-> >> ends up a bit too lenient.
-> >>
-> >> Cheers,
-> >> Robin.
+> >> I understand what you are saying about why checking for conflicting
+> >> directions may be a good thing, but given that the code is as it is
+> >> right now, how are we seeing the warning for two mapping that one of
+> >> them is DMA_TO_DEVICE?
 > >
-> > I understand what you are saying about why checking for conflicting
-> > directions may be a good thing, but given that the code is as it is
-> > right now, how are we seeing the warning for two mapping that one of
-> > them is DMA_TO_DEVICE?
+> > Because it's the second one that isn't. The warning is triggered by
+> > adding the DMA_FROM_DEVICE entry, which *is* checked, and finds the
+> > DMA_TO_DEVICE entry already present. What's not great is that if those
+> > two mappings happened to be made in the opposite order then it would be
+> > missed entirely.
 >
-> Because it's the second one that isn't. The warning is triggered by
-> adding the DMA_FROM_DEVICE entry, which *is* checked, and finds the
-> DMA_TO_DEVICE entry already present. What's not great is that if those
-> two mappings happened to be made in the opposite order then it would be
-> missed entirely.
+> Urgh, no, sorry, that's some imaginary conflation of the cacheline radix
+> tree with the entry hash bucket...
+>
+> What's actually happened here is that I've failed to read the log
+> properly and they're both DMA_FROM_DEVICE. But the potential problem of
+> mixed-direction mappings being missed does still stand in general.
 
-Please accept my sincere apologies if I'm being daft , but here is the
-code for add_dma_entry():
+Ah, right!
 
-static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attr=
-s)
-{
-        struct hash_bucket *bucket;
-        unsigned long flags;
-        int rc;
+OK, Now I feel a little better.
 
-        bucket =3D get_hash_bucket(entry, &flags);
-        hash_bucket_add(bucket, entry);
-        put_hash_bucket(bucket, flags);
+You know, I think that dma debug logic is oversimplified a bit in
+other ways too.
 
-        rc =3D active_cacheline_insert(entry);
-        if (rc =3D=3D -ENOMEM) {
-                pr_err("cacheline tracking ENOMEM, dma-debug disabled\n");
-                global_disable =3D true;
-        } else if (rc =3D=3D -EEXIST && !(attrs & DMA_ATTR_SKIP_CPU_SYNC)) =
-{
-                err_printk(entry->dev, entry,
-                        "cacheline tracking EEXIST, overlapping
-mappings aren't supported\n");
-        }
-}
+Think for example about the scenario that started this - a (crypto,
+but it doesn't matter) gets two sg lists - src and dst.
+It will map the src for DMA_TO_DEVICE and the dst as DMA_FROM_DEVICE.
 
-Clearly we get to active_cacheline_insert() unconditionally.
+Now the two sg list might actually be one and the same or they might
+be two different sg lists but referring to the exact same buffers.
 
-Here is the code of active_cacheline_insert():
+So long as  the driver DMA maps, says, the src first and then the dst,
+or vice versa, and does not initiate any read/write from either the
+CPU or device until the 2nd mapping, I would claim that this is
+perfectly safe (same thing for not touching the buffer post the first
+unmap and before the 2nd) and it does simplify the driver quite a bit
+- but the dma debug logic will consider it an error right now.
 
-static int active_cacheline_insert(struct dma_debug_entry *entry)
-{
-        phys_addr_t cln =3D to_cacheline_number(entry);
-        unsigned long flags;
-        int rc;
-
-        /* If the device is not writing memory then we don't have any
-         * concerns about the cpu consuming stale data.  This mitigates
-         * legitimate usages of overlapping mappings.
-         */
-        if (entry->direction =3D=3D DMA_TO_DEVICE)
-                return 0;
-
-        spin_lock_irqsave(&radix_lock, flags);
-        rc =3D radix_tree_insert(&dma_active_cacheline, cln, entry);
-        if (rc =3D=3D -EEXIST)
-                active_cacheline_inc_overlap(cln);
-        spin_unlock_irqrestore(&radix_lock, flags);
-
-        return rc;
-}
-
-Clearly the check for direction happens BEFORE we ever attempt to add
-the cacheline tracking data.
-
-So it shouldn't matter at all which is first and which is second... :-(
-
-I know I'm missing something. But what?
-
-Thanks,
 Gilad
+
+
+
 
 --=20
 Gilad Ben-Yossef
