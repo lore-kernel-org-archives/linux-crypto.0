@@ -2,49 +2,49 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36012C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 125F2C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 13:43:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242819AbiCGNXG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 08:23:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47010 "EHLO
+        id S240700AbiCGNoQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 08:44:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242908AbiCGNXE (ORCPT
+        with ESMTP id S242921AbiCGNoO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 08:23:04 -0500
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A367A9A0
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 05:22:10 -0800 (PST)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2d07ae0b1c0so163514397b3.2
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 05:22:10 -0800 (PST)
+        Mon, 7 Mar 2022 08:44:14 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 285143C494
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 05:43:19 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id u3so31000455ybh.5
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 05:43:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=7oDoWa/WXO0HRiAR3FYfDPHuuMG9SE634o9q9OLcXr4=;
-        b=zyZStyBdAViuPZW9wkcsXwR7+fT9bJrITQ2ZKvu3QTWVKxlWLy5mrmZ19yZxqPmpyI
-         VkAXmRizMHDJh/MFSFGxk5NJA2cVrrmKt4U/hdrGDscEVzujD5VMRyzLGnQJU3v+OYcQ
-         brxCntmql2y/zoTn7yXUn9bN9lRsoD66D9zQgQ9CMWcENYen15Z05vI8LBSCCceSyFuC
-         zcEkIAR2P2AoneetJjwo3iniEadu3BeXE/fuyDeAjsi6XfEUnzd/a5pEDGJsODMZh7k3
-         9XzRm1hCzWr2NN/drttHWY0ZQr6etkSbnTytwsAYutdn5clAjadxkuWsaAd+DlmEP+nb
-         caaQ==
+        bh=JCKv7BiBf9KG6Lbs2x2WUR/OIGhabVnbX0TExKcjkAM=;
+        b=gRhar2tLLWw3vujECxYDIPLVv4cP5OMth9dsY81IrziJVDaknPrMFo+BiUFhiXJ7DS
+         nWaS4XgP8LTp2gx/tyJR+2S3YX0eVmdK7AozFzzDdgjWt8kCC/DHARuASPKl8yWqdqj0
+         EVvhKHnxTyfHPGhZ8l5klawlyZUoD5ZehNQ0EsJRCuLFeYrIa4bMqF2N+7zGpEu6FjmY
+         polRoaLpZLFE5t9vTCI3w7sMTd/dZO7L6D9fFMkorMIMUTXhl4gvM3IhuAlnnphN7hyf
+         nbAXNJE9C7rhsL58LAKTnwd2rbH9I29vLJrJr+MeibQ7XwmgGRYn+iDc4SEKsIQG37eT
+         5JBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7oDoWa/WXO0HRiAR3FYfDPHuuMG9SE634o9q9OLcXr4=;
-        b=ZT/5JBDetnc6Ppyw8gjtjxKeZSKtNxzKgEpewMm4RuBFlgH3GWSFd7lQMoePnCVqHO
-         hJk6kao1V/5pPjYLRnCDZ7sQockg4y9w0pu+RO1jps8+WjuuNvfK/gAGtQgz8a/sgE7W
-         UScag9AILTTG366Xmr9BOFBBO+ws9MaAtjwfp4poC/xGFjOvLUo4Rk+QG6Mm3bi4zYVw
-         hfiv3ZnhGN7z9wELwasIrA1MDdM3lFajhWXNG1pzNec9FmxtO22g8N9n4JPgSIILgQKv
-         rO2z5WJbXqrrRR/8a4XJVnXeLDdrNou2xKUgeeYBD9hIuPS9u3XhvAn5+oQSCNB05PDq
-         +b6g==
-X-Gm-Message-State: AOAM532+Q+/ZyNo54YKDAJPrgLj2V4YLmgRhedtaVFZgpqo8cXuj2JMz
-        mVZa9q0YjcjnpNuQFxlI7x3An/l3/GpKgB75JjQqLg==
-X-Google-Smtp-Source: ABdhPJwWHyCRmEtXGbQdVI93JxNWbSQv1j1WSn4xgNCCimNig7ktZEtlxXBn4d3h3waSXP57EYn48/o/1hPC6BYVksE=
-X-Received: by 2002:a81:6c6:0:b0:2dc:616b:468b with SMTP id
- 189-20020a8106c6000000b002dc616b468bmr8087023ywg.472.1646659329804; Mon, 07
- Mar 2022 05:22:09 -0800 (PST)
+        bh=JCKv7BiBf9KG6Lbs2x2WUR/OIGhabVnbX0TExKcjkAM=;
+        b=6fZVTiIvFNzstqpo0aP8tDO3VjjoPQhXuCF3iLyusWfIu/ZYl7xQ0tFqtO5mc4FRe6
+         65mbtatNiicZ9TACSzMoIPMLp6Nerhg7fKSLPBrTrM7Ir0NK76HgXznMWgIKoGfT2NQU
+         Jda6Fe9wUq/VQa1mxyMqnYw2p3ZAP2BaJX6DAhEHOcrMlxavxE+gCQ1W5hamSS4kBofe
+         JfwmwlMEdmtTvSKlDtTLXWZFey14LYktuBOpylu9iLgP0GWsXgJVHFPkLHQ+iMz3aU6J
+         3GHx669qebE+IblRTATA8XQCnWenSkbFtxG1+W7/W4vwNsGHXe3ChVAl/qW0f/oy/Cor
+         1szg==
+X-Gm-Message-State: AOAM533ejpQTA4Q++c1EMJOV/vaadnfml3Ii22E4LonWFKIT+FYYz/9a
+        9J6lXyyjW5Vc1VlmOYDfTeRz4B0HD7Wju7FeLmWLfKnkEeUBeA==
+X-Google-Smtp-Source: ABdhPJzFyMKnNGi+vCbsh8ASrlugLFK23AGLqc1/O9wGTI5xnE6q4Cl9t28M03oKxU1zc0ZjlqYNyJSxdT4uOPVVyho=
+X-Received: by 2002:a25:7804:0:b0:628:ec4c:989b with SMTP id
+ t4-20020a257804000000b00628ec4c989bmr7562231ybc.428.1646660598309; Mon, 07
+ Mar 2022 05:43:18 -0800 (PST)
 MIME-Version: 1.0
 References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <CAOtvUMfy1fF35B2sfbOMui8n9Q4iCke9rgn5TiYMUMjd8gqHsA@mail.gmail.com>
@@ -52,134 +52,146 @@ References: <CAOtvUMeoYcVm7OQdqXd1V5iPSXW_BkVxx6TA6nF7zTLVeHe0Ww@mail.gmail.com>
  <YhOcEQEjIKBrbMIZ@Red> <CAOtvUMfN8U4+eG-TEVW4bSE6kOzuOSsJE4dOYGXYuWQKNzv7wQ@mail.gmail.com>
  <CAOtvUMeRb=j=NDrc88x8aB-3=D1mxZ_-aA1d4FfvJmj7Jrbi4w@mail.gmail.com>
  <YiIUXtxd44ut5uzV@Red> <YiUsWosH+MKMF7DQ@gondor.apana.org.au>
- <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com>
- <YiXjCcXXk0f18FDL@Red> <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
- <CAOtvUMePFR4e2jgHZKOvs3J3Xt4NzRbzD_=vr_49Qgs5HTrvHw@mail.gmail.com>
- <6cf91f43-df23-3ac9-e9b5-958d99d37422@arm.com> <CAOtvUMedqSNKx9Aah0R_aAyjKO0pn4K75MrCnbh_zX+Zw9vRQA@mail.gmail.com>
- <371ef3f2-883d-91ab-ed96-da8921efb465@arm.com> <b7a3e828-c848-2d42-9f91-d282b9c1ac9e@arm.com>
-In-Reply-To: <b7a3e828-c848-2d42-9f91-d282b9c1ac9e@arm.com>
+ <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com> <YiXjCcXXk0f18FDL@Red>
+In-Reply-To: <YiXjCcXXk0f18FDL@Red>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 7 Mar 2022 15:21:58 +0200
-Message-ID: <CAOtvUMf_LPN80MV_GmnA6P2y8-PiazZ8nahDp_Gdpz-Ns3n8pw@mail.gmail.com>
+Date:   Mon, 7 Mar 2022 15:43:07 +0200
+Message-ID: <CAOtvUMffp3K1q2uXwS4X4dJbFE2_J-nRj8nxBvLewBAVWc8TvQ@mail.gmail.com>
 Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen =
  authsize =0
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        iommu@lists.linux-foundation.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
+        Robin Murphy <robin.murphy@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 7, 2022 at 3:12 PM Robin Murphy <robin.murphy@arm.com> wrote:
+On Mon, Mar 7, 2022 at 12:48 PM Corentin Labbe
+<clabbe.montjoie@gmail.com> wrote:
+
 >
-> On 2022-03-07 13:03, Robin Murphy wrote:
-> > On 2022-03-07 12:47, Gilad Ben-Yossef wrote:
-> >> On Mon, Mar 7, 2022 at 2:36 PM Robin Murphy <robin.murphy@arm.com> wro=
-te:
-> >>>
-> >>> On 2022-03-07 12:17, Gilad Ben-Yossef wrote:
-> >>>> On Mon, Mar 7, 2022 at 1:14 PM Robin Murphy <robin.murphy@arm.com>
-> >>>> wrote:
-> >>>>
-> >>>>> The "overlap" is in the sense of having more than one mapping
-> >>>>> within the
-> >>>>> same cacheline:
-> >>>>>
-> >>>>> [  142.458120] DMA-API: add_dma_entry start P=3Dba79f200 N=3Dba79f
-> >>>>> D=3Dba79f200 L=3D10 DMA_FROM_DEVICE attrs=3D0
-> >>>>> [  142.458156] DMA-API: add_dma_entry start P=3D445dc010 N=3D445dc
-> >>>>> D=3D445dc010 L=3D10 DMA_TO_DEVICE attrs=3D0
-> >>>>> [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=3D16=
- bi=3D0
-> >>>>> [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=3D16=
- bi=3D0
-> >>>>> [  142.458234] DMA-API: add_dma_entry start P=3Dba79f210 N=3Dba79f
-> >>>>> D=3Dba79f210 L=3D10 DMA_FROM_DEVICE attrs=3D0
-> >>>>>
-> >>>>> This actually illustrates exactly the reason why this is
-> >>>>> unsupportable.
-> >>>>> ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapp=
-ing
-> >>>>> ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the ran=
-ge
-> >>>>> ba79f200-ba79f23f to be written back over the top of data that the
-> >>>>> device has already started to write to memory. Hello data corruptio=
-n.
-> >>>>>
-> >>>>> Separate DMA mappings should be from separate memory allocations,
-> >>>>> respecting ARCH_DMA_MINALIGN.
-> >>>>
-> >>>> hmm... I know I'm missing something here, but how does this align wi=
-th
-> >>>> the following from active_cacheline_insert() in kernel/dma/debug.c ?
-> >>>>
-> >>>>           /* If the device is not writing memory then we don't have =
-any
-> >>>>            * concerns about the cpu consuming stale data.  This
-> >>>> mitigates
-> >>>>            * legitimate usages of overlapping mappings.
-> >>>>            */
-> >>>>           if (entry->direction =3D=3D DMA_TO_DEVICE)
-> >>>>                   return 0;
-> >>>
-> >>> It's OK to have multiple mappings that are *all* DMA_TO_DEVICE, which
-> >>> looks to be the case that this check was intended to allow. However I
-> >>> think you're right that it should still actually check for conflictin=
-g
-> >>> directions between the new entry and any existing ones, otherwise it
-> >>> ends up a bit too lenient.
-> >>>
-> >>> Cheers,
-> >>> Robin.
-> >>
-> >> I understand what you are saying about why checking for conflicting
-> >> directions may be a good thing, but given that the code is as it is
-> >> right now, how are we seeing the warning for two mapping that one of
-> >> them is DMA_TO_DEVICE?
-> >
-> > Because it's the second one that isn't. The warning is triggered by
-> > adding the DMA_FROM_DEVICE entry, which *is* checked, and finds the
-> > DMA_TO_DEVICE entry already present. What's not great is that if those
-> > two mappings happened to be made in the opposite order then it would be
-> > missed entirely.
+> Hello
 >
-> Urgh, no, sorry, that's some imaginary conflation of the cacheline radix
-> tree with the entry hash bucket...
+> I still get the warning:
+> [  433.406230] ------------[ cut here ]------------
+> [  433.406326] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST,=
+ overlapping mappings aren't supported
+> [  433.406386] WARNING: CPU: 7 PID: 31074 at /home/clabbe/linux-next/kern=
+el/dma/debug.c:571 add_dma_entry+0x1d0/0x288
+> [  433.406434] Modules linked in:
+> [  433.406458] CPU: 7 PID: 31074 Comm: kcapi Not tainted 5.17.0-rc6-next-=
+20220303-00130-g30042e47ee47-dirty #54
+> [  433.406473] Hardware name: Renesas Salvator-X board based on r8a77950 =
+(DT)
+> [  433.406484] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYP=
+E=3D--)
+> [  433.406498] pc : add_dma_entry+0x1d0/0x288
+> [  433.406510] lr : add_dma_entry+0x1d0/0x288
+> [  433.406522] sp : ffff800015da3690
+> [  433.406531] x29: ffff800015da3690 x28: 0000000000000000 x27: 000000000=
+0000000
+> [  433.406562] x26: 0000000000000000 x25: ffff80000b4c7bc0 x24: ffff80000=
+b4c7000
+> [  433.406593] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000=
+a9b6000
+> [  433.406623] x20: ffff0004c0af5c00 x19: ffff80000b420000 x18: fffffffff=
+fffffff
+> [  433.406653] x17: 6c7265766f202c54 x16: 534958454520676e x15: 000000000=
+000022e
+> [  433.406683] x14: ffff800015da3380 x13: 00000000ffffffea x12: ffff80000=
+b4be010
+> [  433.406713] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000=
+b4a6028
+> [  433.406743] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000=
+b4a5fd0
+> [  433.406773] x5 : ffff0006ff795c48 x4 : 0000000000000000 x3 : 000000000=
+0000027
+> [  433.406802] x2 : 0000000000000023 x1 : 8ca4e4fbf4b87900 x0 : 000000000=
+0000000
+> [  433.406833] Call trace:
+> [  433.406841]  add_dma_entry+0x1d0/0x288
+> [  433.406854]  debug_dma_map_sg+0x150/0x398
+> [  433.406869]  __dma_map_sg_attrs+0x9c/0x108
+> [  433.406889]  dma_map_sg_attrs+0x10/0x28
+> [  433.406904]  cc_map_sg+0x80/0x100
+> [  433.406924]  cc_map_cipher_request+0x178/0x3c8
+> [  433.406939]  cc_cipher_process+0x210/0xb58
+> [  433.406953]  cc_cipher_encrypt+0x2c/0x38
+> [  433.406967]  crypto_skcipher_encrypt+0x44/0x78
+> [  433.406986]  skcipher_recvmsg+0x36c/0x420
+> [  433.407003]  ____sys_recvmsg+0x90/0x280
+> [  433.407024]  ___sys_recvmsg+0x88/0xd0
+> [  433.407038]  __sys_recvmsg+0x6c/0xd0
+> [  433.407049]  __arm64_sys_recvmsg+0x24/0x30
+> [  433.407061]  invoke_syscall+0x44/0x100
+> [  433.407082]  el0_svc_common.constprop.3+0x90/0x120
+> [  433.407096]  do_el0_svc+0x24/0x88
+> [  433.407110]  el0_svc+0x4c/0x100
+> [  433.407131]  el0t_64_sync_handler+0x90/0xb8
+> [  433.407145]  el0t_64_sync+0x170/0x174
+> [  433.407160] irq event stamp: 5624
+> [  433.407168] hardirqs last  enabled at (5623): [<ffff80000812f6a8>] __u=
+p_console_sem+0x60/0x98
+> [  433.407191] hardirqs last disabled at (5624): [<ffff800009c9a060>] el1=
+_dbg+0x28/0x90
+> [  433.407208] softirqs last  enabled at (5570): [<ffff8000097e62f8>] loc=
+k_sock_nested+0x80/0xa0
+> [  433.407226] softirqs last disabled at (5568): [<ffff8000097e62d8>] loc=
+k_sock_nested+0x60/0xa0
+> [  433.407241] ---[ end trace 0000000000000000 ]---
+> [  433.407381] DMA-API: Mapped at:
+> [  433.407396]  debug_dma_map_sg+0x16c/0x398
+> [  433.407416]  __dma_map_sg_attrs+0x9c/0x108
+> [  433.407436]  dma_map_sg_attrs+0x10/0x28
+> [  433.407455]  cc_map_sg+0x80/0x100
+> [  433.407475]  cc_map_cipher_request+0x178/0x3c8
 >
-> What's actually happened here is that I've failed to read the log
-> properly and they're both DMA_FROM_DEVICE. But the potential problem of
-> mixed-direction mappings being missed does still stand in general.
+>
+> BUT I start to thing this is a bug in DMA-API debug.
+>
+>
+> My sun8i-ss driver hit the same warning:
+> [  142.458351] WARNING: CPU: 1 PID: 90 at kernel/dma/debug.c:597 add_dma_=
+entry+0x2ec/0x4cc
+> [  142.458429] DMA-API: sun8i-ss 1c15000.crypto: cacheline tracking EEXIS=
+T, overlapping mappings aren't supported
+> [  142.458455] Modules linked in: ccm algif_aead xts cmac
+> [  142.458563] CPU: 1 PID: 90 Comm: 1c15000.crypto- Not tainted 5.17.0-rc=
+6-next-20220307-00132-g39dad568d20a-dirty #223
+> [  142.458581] Hardware name: Allwinner A83t board
+> [  142.458596]  unwind_backtrace from show_stack+0x10/0x14
+> [  142.458627]  show_stack from 0xf0abdd1c
+> [  142.458646] irq event stamp: 31747
+> [  142.458660] hardirqs last  enabled at (31753): [<c019316c>] __up_conso=
+le_sem+0x50/0x60
+> [  142.458688] hardirqs last disabled at (31758): [<c0193158>] __up_conso=
+le_sem+0x3c/0x60
+> [  142.458710] softirqs last  enabled at (31600): [<c06990c8>] sun8i_ss_h=
+andle_cipher_request+0x300/0x8b8
+> [  142.458738] softirqs last disabled at (31580): [<c06990c8>] sun8i_ss_h=
+andle_cipher_request+0x300/0x8b8
+> [  142.458758] ---[ end trace 0000000000000000 ]---
+> [  142.458771] DMA-API: Mapped at:
 
-Ah, right!
+The more I think about it, the more I suspect that this is a problem
+of the input sglists to crypto API calls overlapping in some fashion,
+either between src and dst or maybe even across different crypto
+operations and HW crypto drivers just mapping those sglists, oblivious
+to it.
 
-OK, Now I feel a little better.
+What are crypto HW drivers to do? scan each input scatterlist for
+overlap, not just between src and dst of the same operation but also
+across different crypto operations? That is insane...
 
-You know, I think that dma debug logic is oversimplified a bit in
-other ways too.
-
-Think for example about the scenario that started this - a (crypto,
-but it doesn't matter) gets two sg lists - src and dst.
-It will map the src for DMA_TO_DEVICE and the dst as DMA_FROM_DEVICE.
-
-Now the two sg list might actually be one and the same or they might
-be two different sg lists but referring to the exact same buffers.
-
-So long as  the driver DMA maps, says, the src first and then the dst,
-or vice versa, and does not initiate any read/write from either the
-CPU or device until the 2nd mapping, I would claim that this is
-perfectly safe (same thing for not touching the buffer post the first
-unmap and before the 2nd) and it does simplify the driver quite a bit
-- but the dma debug logic will consider it an error right now.
+ I am not sure where to go from here.
 
 Gilad
-
-
 
 
 --=20
