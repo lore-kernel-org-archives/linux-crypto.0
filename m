@@ -2,163 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBFAC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 19:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A6DC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Mar 2022 23:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245174AbiCGTxl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 14:53:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38456 "EHLO
+        id S237546AbiCGXDB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 18:03:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245167AbiCGTxj (ORCPT
+        with ESMTP id S233376AbiCGXDA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 14:53:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7231F37A3D
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 11:52:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646682762;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iFbyRAhrzPJ35m4rXo3BdXpPkOXNFqEyv1VvtxCidZQ=;
-        b=jFLimqnENX2TR+7bzNt1xhS0ld1VUPt32LUGqYqczLeNjdaICeGze6rUwK38LTwJjyBgfT
-        ay21zHfYZnVIeQfOv6Zk/iCBlLlcfGyUPYN4vt+oJYLrcERlCN100+MDYLuIq8iadzq8nx
-        uyIP0fG67YbHIWzNc+ZGZMfji4kzPbQ=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-657-uQt0zFLTNayY0ZC_tHKLpA-1; Mon, 07 Mar 2022 14:52:41 -0500
-X-MC-Unique: uQt0zFLTNayY0ZC_tHKLpA-1
-Received: by mail-ot1-f70.google.com with SMTP id q8-20020a056830232800b005ab75f5e906so13824373otg.18
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 11:52:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=iFbyRAhrzPJ35m4rXo3BdXpPkOXNFqEyv1VvtxCidZQ=;
-        b=0BneIsUK5h32xj7AjItHFna5ZtHPbdSHosgYjkffCvRU2JlZ87mzShSvKydI0ZQ1PO
-         heH0z9Kgw/j9tj+qJbc9MZchDp+9dsyKhLOiyO39Q8wal8X6aZZ1gbc2BysxWFUq1URQ
-         z2EQnkoFXDL4+PCANDRrDZWatf3rPV3RBGO+qx0u7NJDFLGHQy389bcSk+ohOK/H88+3
-         hr1ePTxV1kCwvHxtoKTlaVzCRhY5NyZrQxU+CmyY1/c2ck9F8NTA3cN8vD9/l2FHBh4l
-         OhOx5gh7OgQeBrWnBmwXE+7lY9BEaf+vEpV6QOAA1mpCNHSbvSqONok8fsj1krfEJo4O
-         N+hg==
-X-Gm-Message-State: AOAM5318VgIrxfg6N7ZqB2+PwdkT+sGvHYY5j3cXRkipdd6LH2asPZ1s
-        N1wtNUmBVZgT37MgUC8M3yYDUFsmbOKaTxMm5PWsGrK+SSRykitrKpWR0yRfBOQdnRygVZTxFv/
-        8oF/SdckOfq5eI+JqnRbdBD0l
-X-Received: by 2002:a05:6870:a986:b0:da:b3f:3277 with SMTP id ep6-20020a056870a98600b000da0b3f3277mr342137oab.295.1646682761031;
-        Mon, 07 Mar 2022 11:52:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx0o5c3OjTqpzOiX0FaElSIgrmfr2mM6c5nUGHrH+xd+UeH8aVo4Q4lHgUzzZO76/LqpgApLg==
-X-Received: by 2002:a05:6870:a986:b0:da:b3f:3277 with SMTP id ep6-20020a056870a98600b000da0b3f3277mr342120oab.295.1646682760849;
-        Mon, 07 Mar 2022 11:52:40 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u21-20020a056870951500b000d9b9ac69cdsm5373410oal.1.2022.03.07.11.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 11:52:40 -0800 (PST)
-Date:   Mon, 7 Mar 2022 12:52:39 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Mon, 7 Mar 2022 18:03:00 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C3E4D61C;
+        Mon,  7 Mar 2022 15:02:05 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 227MKeSx006271;
+        Mon, 7 Mar 2022 23:01:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=CFwKlekU1PBsgaEJRwpNrri29MPy0+lafy81A1tEMzk=;
+ b=e+Qk59rmDS3Iere5pS6c/hVrRpyr/bS0X9vS6v2VCdFczpjz5QQVGMk6a5qQJFEIds+F
+ gZMQQyjtc14msPUUochMl/9uHkZn1n9VSnWZo3IQiEP/Q3/k7BMBujDYNyYSU8vpkZNh
+ NIHwuk5ra1GI4nhy7EyG0OUoOvSBRLn7YgfcCiAsY9b5+qA5iS4yDWU9oGiqPi6/5cuY
+ 63hA/kC0plZlInkcYYUDEYQF4N6Jh6EnbXrDkvyI2u0zhblUW3h6YHrZL+JF5lvX6s1/
+ TTnizEcDqx7VA3n9Ohk3wzNA3GWZcXgXO9xSgae3eRvhBELjeMoiOhf4G+vSVdNaNERf Ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3engn5pbxg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:01:52 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 227MsEGF027962;
+        Mon, 7 Mar 2022 23:01:52 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3engn5pbws-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:01:52 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 227Mxu34017016;
+        Mon, 7 Mar 2022 23:01:49 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3eky4hwtn7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 07 Mar 2022 23:01:49 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 227N1kxW49611184
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 7 Mar 2022 23:01:46 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 42F1BA406B;
+        Mon,  7 Mar 2022 23:01:46 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E21ECA406E;
+        Mon,  7 Mar 2022 23:01:43 +0000 (GMT)
+Received: from sig-9-65-67-225.ibm.com (unknown [9.65.67.225])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  7 Mar 2022 23:01:43 +0000 (GMT)
+Message-ID: <e2dd58cd6074ae692256333b43b5ecde70bcdbdd.camel@linux.ibm.com>
+Subject: Re: [PATCH 3/4] KEYS: CA link restriction
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>,
+        Stefan Berger <stefanb@linux.ibm.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "mic@linux.microsoft.com" <mic@linux.microsoft.com>,
+        Konrad Wilk <konrad.wilk@oracle.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Xu Zaibo <xuzaibo@huawei.com>
-Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220307125239.7261c97d.alex.williamson@redhat.com>
-In-Reply-To: <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
-        <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
-        <20220304205720.GE219866@nvidia.com>
-        <20220307120513.74743f17.alex.williamson@redhat.com>
-        <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Date:   Mon, 07 Mar 2022 18:01:43 -0500
+In-Reply-To: <2415444C-AD8F-4F03-8B1C-C0770F83ADAE@oracle.com>
+References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
+         <20220301173651.3435350-4-eric.snowberg@oracle.com>
+         <47f3654e-892d-a35a-e77c-70ada1ebcf43@linux.ibm.com>
+         <2415444C-AD8F-4F03-8B1C-C0770F83ADAE@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: f41ARC6yxgvb8MJAb-Tz6Pt_sxfpqcDd
+X-Proofpoint-GUID: p2bDuE9O5v-DjwMtdWv87DMdKKBRHHtz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-07_12,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=999 adultscore=0 mlxscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203070118
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 7 Mar 2022 19:29:06 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> > -----Original Message-----
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: 07 March 2022 19:05
-> > To: Jason Gunthorpe <jgg@nvidia.com>
-> > Cc: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; cohuck@redhat.com;
-> > mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
-> > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
-> > <prime.zeng@hisilicon.com>; Jonathan Cameron
-> > <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
-> > Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
-> > migration
-> > 
-> > On Fri, 4 Mar 2022 16:57:20 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Thu, Mar 03, 2022 at 11:01:30PM +0000, Shameer Kolothum wrote:  
-> > > > From: Longfang Liu <liulongfang@huawei.com>
-> > > >
-> > > > VMs assigned with HiSilicon ACC VF devices can now perform live  
-> > migration  
-> > > > if the VF devices are bind to the hisi_acc_vfio_pci driver.
-> > > >
-> > > > Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> > > > Signed-off-by: Shameer Kolothum  
-> > <shameerali.kolothum.thodi@huawei.com>  
-> > > > ---
-> > > >  drivers/vfio/pci/hisilicon/Kconfig            |    7 +
-> > > >  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 1078 ++++++++++++++++-
-> > > >  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  114 ++
-> > > >  3 files changed, 1181 insertions(+), 18 deletions(-)
-> > > >  create mode 100644 drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> > > >
-> > > > diff --git a/drivers/vfio/pci/hisilicon/Kconfig  
-> > b/drivers/vfio/pci/hisilicon/Kconfig  
-> > > > index dc723bad05c2..2a68d39f339f 100644
-> > > > --- a/drivers/vfio/pci/hisilicon/Kconfig
-> > > > +++ b/drivers/vfio/pci/hisilicon/Kconfig
-> > > > @@ -3,6 +3,13 @@ config HISI_ACC_VFIO_PCI
-> > > >  	tristate "VFIO PCI support for HiSilicon ACC devices"
-> > > >  	depends on ARM64 || (COMPILE_TEST && 64BIT)
-> > > >  	depends on VFIO_PCI_CORE
-> > > > +	depends on PCI && PCI_MSI  
-> > >
-> > > PCI is already in the depends from the 2nd line in
-> > > drivers/vfio/pci/Kconfig, but it is harmless
-> > >  
-> > > > +	depends on UACCE || UACCE=n
-> > > > +	depends on ACPI  
-> > >
-> > > Scratching my head a bit on why we have these  
-> > 
-> > Same curiosity from me, each of the CRYPTO_DEV_HISI_* options selected
-> > also depend on these so they seem redundant.  
+On Mon, 2022-03-07 at 18:06 +0000, Eric Snowberg wrote:
 > 
-> Yes, they are redundant now since we have added CRYPTO_DEV_HISI_ drivers
-> as "depends" now. I will remove that.
->  
-> > I think we still require acks from Bjorn and Zaibo for select patches
-> > in this series.  
+> >> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+> >> index 6b1ac5f5896a..49bb2ea7f609 100644
+> >> --- a/crypto/asymmetric_keys/restrict.c
+> >> +++ b/crypto/asymmetric_keys/restrict.c
+> >> @@ -108,6 +108,49 @@ int restrict_link_by_signature(struct key *dest_keyring,
+> >>  	return ret;
+> >>  }
+> >>  +/**
+> >> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
+> >> + * @dest_keyring: Keyring being linked to.
+> >> + * @type: The type of key being added.
+> >> + * @payload: The payload of the new key.
+> >> + * @trust_keyring: Unused.
+> >> + *
+> >> + * Check if the new certificate is a CA. If it is a CA, then mark the new
+> >> + * certificate as being ok to link.
+> > 
+> > CA = root CA here, right?
 > 
-> I checked with Ziabo. He moved projects and is no longer looking into crypto stuff.
-> Wangzhou and LiuLongfang now take care of this. Received acks from Wangzhou
-> already and I will request Longfang to provide his. Hope that's ok.
+> Yes, I’ll update the comment
 
-Maybe a good time to have them update MAINTAINERS as well.  Thanks,
+Updating the comment is not enough.  There's an existing function named
+"x509_check_for_self_signed()" which determines whether the certificate
+is self-signed.
 
-Alex
+thanks,
+
+Mimi
 
