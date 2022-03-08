@@ -2,161 +2,286 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CED4C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 08:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1ADC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 09:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242263AbiCHIxa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 03:53:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
+        id S243948AbiCHJlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Mar 2022 04:41:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242666AbiCHIx3 (ORCPT
+        with ESMTP id S241797AbiCHJlS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 03:53:29 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6BADF9E;
-        Tue,  8 Mar 2022 00:52:33 -0800 (PST)
-Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCTZJ5hGSz6F93y;
-        Tue,  8 Mar 2022 16:51:04 +0800 (CST)
-Received: from lhreml715-chm.china.huawei.com (10.201.108.66) by
- fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 09:52:31 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml715-chm.china.huawei.com (10.201.108.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 08:52:30 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Tue, 8 Mar 2022 08:52:30 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Thread-Topic: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Thread-Index: AQHYL1LUtVDDY2S/e06nk5NDxfriXKy1IT6AgAASKKA=
-Date:   Tue, 8 Mar 2022 08:52:30 +0000
-Message-ID: <50b0d11d57d3488da809f318576466cd@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
- <BN9PR11MB527661103A2CFE13E4F3EC528C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB527661103A2CFE13E4F3EC528C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.27.151]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 8 Mar 2022 04:41:18 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A45C31932;
+        Tue,  8 Mar 2022 01:40:21 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id k24so18036314wrd.7;
+        Tue, 08 Mar 2022 01:40:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=L6CEbSPoK42XaOKUwGtERWayh0p61adsWqFpO0ze1SU=;
+        b=cVwKBg1mTAg9KDP8IwOC6k1qWQNWxRFf51u6T5BJDryLB9wwMtUQE1e6DkEdY66qhX
+         KBpQNBL8q/4v6RnVW4vqljITSTRbATgN+eFJN8iSq+2z3hPF+H20CMWc+zeRB2y4e1EW
+         W6WDNSxvEEiQzL0RbdlEVHdyvdMW5rTyvayQGBAMunCPw+jiNFn6DXCaAp+ALfCfkG8/
+         iUwWUCaYoQDxuH9UlI3CNU+Zh1CyCGYqSrr49Bnk3usZ8AO8LHwCbsgN9pTXc2H39ybA
+         zCpObZkGOiRjsRxPTHNvRpoSXgpGkYi2xYRZMFGzyXg5AEpZjrmVaRG1+9ZqpIW8XC+r
+         BuVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=L6CEbSPoK42XaOKUwGtERWayh0p61adsWqFpO0ze1SU=;
+        b=v7htplwpHfc0hDSVys3ZzYnCVDdBv9ykmPO0E+3uLRPi/xZZnU/5JUzkJ96qA1SwPq
+         LQjZDz76mQzwlSd2yuvUv9TYCYlukoT7FYcOV6tCNzE/+6JL6eGa88xlpOWkGvj+nSsH
+         8T1eQyuFPrUdgs2LiwVEjN0LSfNge6eHnVXL84y0peLjM6kAxm5MOuKHvRy4/u7XB43k
+         WnOHujD3EabPpEBIkqx61XkJbUGrrloz6VXgKSKwdkP9g/gc8q0TD0WDSs3HJ6rBrlJ/
+         owcrQHDJQb4GcZSRLxxJd86iRWEVpWRe5DlA7TxL4STHqE+J4roTaSYP4fMvx1phde+T
+         OffQ==
+X-Gm-Message-State: AOAM530gP3wIgzup5+Ukorr+dLtBXqmxb0ccKmdWFIJJFhBULsdS5eBA
+        24S44NKEXTZLnAtCrdnwWWI=
+X-Google-Smtp-Source: ABdhPJyj59U21RsmDOl7SYYXgs/alHQiUGMYyi55+UhFrgl1DX1mX1s4idSDSzBtKgDuVyY9ouZYxg==
+X-Received: by 2002:a5d:6c66:0:b0:1f1:f12d:442d with SMTP id r6-20020a5d6c66000000b001f1f12d442dmr8132734wrz.338.1646732419521;
+        Tue, 08 Mar 2022 01:40:19 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id f17-20020adffcd1000000b001edbf438d83sm13143578wrs.32.2022.03.08.01.40.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 01:40:19 -0800 (PST)
+Date:   Tue, 8 Mar 2022 10:40:15 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Christoph Hellwig <hch@lst.de>, m.szyprowski@samsung.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        iommu@lists.linux-foundation.org
+Subject: Re: [BUG] crypto: ccree: driver does not handle case where cryptlen
+ = authsize =0
+Message-ID: <Yickf3IFiPiFFfTH@Red>
+References: <CAOtvUMfN8U4+eG-TEVW4bSE6kOzuOSsJE4dOYGXYuWQKNzv7wQ@mail.gmail.com>
+ <CAOtvUMeRb=j=NDrc88x8aB-3=D1mxZ_-aA1d4FfvJmj7Jrbi4w@mail.gmail.com>
+ <YiIUXtxd44ut5uzV@Red>
+ <YiUsWosH+MKMF7DQ@gondor.apana.org.au>
+ <CAOtvUMcudG3ySU+VeE7hfneDVWGLKFTnws-xjhq4hgFYSj0qOg@mail.gmail.com>
+ <YiXjCcXXk0f18FDL@Red>
+ <aca4117c-b7a5-f7eb-eb03-4e1f1a93a730@arm.com>
+ <YiYMeFf+Lsa9y4ss@Red>
+ <CAOtvUMccCai9gFrTv6CZB-U56UtCPtmnZUyW5WmUr=+6YiUHZg@mail.gmail.com>
+ <YiYPBdRIi4+HYsmW@Red>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YiYPBdRIi4+HYsmW@Red>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogVGlhbiwgS2V2aW4gW21h
-aWx0bzprZXZpbi50aWFuQGludGVsLmNvbV0NCj4gU2VudDogMDggTWFyY2ggMjAyMiAwNzo0Mg0K
-PiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9k
-aUBodWF3ZWkuY29tPjsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIu
-a2VybmVsLm9yZzsNCj4gbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZw0KPiBDYzogbGludXgt
-cGNpQHZnZXIua2VybmVsLm9yZzsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207IGpnZ0Budmlk
-aWEuY29tOw0KPiBjb2h1Y2tAcmVkaGF0LmNvbTsgbWd1cnRvdm95QG52aWRpYS5jb207IHlpc2hh
-aWhAbnZpZGlhLmNvbTsgTGludXhhcm0NCj4gPGxpbnV4YXJtQGh1YXdlaS5jb20+OyBsaXVsb25n
-ZmFuZyA8bGl1bG9uZ2ZhbmdAaHVhd2VpLmNvbT47IFplbmd0YW8gKEIpDQo+IDxwcmltZS56ZW5n
-QGhpc2lsaWNvbi5jb20+OyBKb25hdGhhbiBDYW1lcm9uDQo+IDxqb25hdGhhbi5jYW1lcm9uQGh1
-YXdlaS5jb20+OyBXYW5nemhvdSAoQikgPHdhbmd6aG91MUBoaXNpbGljb24uY29tPg0KPiBTdWJq
-ZWN0OiBSRTogW1BBVENIIHY4IDgvOV0gaGlzaV9hY2NfdmZpb19wY2k6IEFkZCBzdXBwb3J0IGZv
-ciBWRklPIGxpdmUNCj4gbWlncmF0aW9uDQo+IA0KPiA+IEZyb206IFNoYW1lZXIgS29sb3RodW0g
-PHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT4NCj4gPiBTZW50OiBGcmlkYXks
-IE1hcmNoIDQsIDIwMjIgNzowMiBBTQ0KPiA+ICsvKg0KPiA+ICsgKiBFYWNoIHN0YXRlIFJlZyBp
-cyBjaGVja2VkIDEwMCB0aW1lcywNCj4gPiArICogd2l0aCBhIGRlbGF5IG9mIDEwMCBtaWNyb3Nl
-Y29uZHMgYWZ0ZXIgZWFjaCBjaGVjayAgKi8gc3RhdGljIHUzMg0KPiA+ICthY2NfY2hlY2tfcmVn
-X3N0YXRlKHN0cnVjdCBoaXNpX3FtICpxbSwgdTMyIHJlZ3MpDQo+IA0KPiBxbV9jaGVja19yZWdf
-c3RhdGUoKSBnaXZlbiB0aGUgMXN0IGFyZ3VtZW50IGlzIHFtDQo+IA0KPiA+ICsvKiBDaGVjayB0
-aGUgUEYncyBSQVMgc3RhdGUgYW5kIEZ1bmN0aW9uIElOVCBzdGF0ZSAqLyBzdGF0aWMgaW50DQo+
-ID4gK3FtX2NoZWNrX2ludF9zdGF0ZShzdHJ1Y3QgaGlzaV9hY2NfdmZfY29yZV9kZXZpY2UgKmhp
-c2lfYWNjX3ZkZXYpDQo+IA0KPiB0aGVuIHRoaXMgc2hvdWxkIGJlIGFjY19jaGVja19pbnRfc3Rh
-dGUoKSBnaXZlbiB0aGUgaW5wdXQgaXMgYW4gYWNjIGRldmljZT8NCj4gDQo+IGFueXdheSBwbGVh
-c2UgaGF2ZSBhIGNvbnNpc3RlbnQgbmFtaW5nIGNvbnZlbnRpb24gaGVyZS4NCj4gDQo+ID4gK3N0
-YXRpYyBpbnQgcW1fcmVhZF9yZWcoc3RydWN0IGhpc2lfcW0gKnFtLCB1MzIgcmVnX2FkZHIsDQo+
-ID4gKwkJICAgICAgIHUzMiAqZGF0YSwgdTggbnVtcykNCj4gDQo+IHFtX3JlYWRfcmVncygpIHRv
-IHJlZmxlY3QgdGhhdCBtdWx0aXBsZSByZWdpc3RlcnMgYXJlIHByb2Nlc3NlZC4NCj4gDQo+ID4g
-Kw0KPiA+ICtzdGF0aWMgaW50IHFtX3dyaXRlX3JlZyhzdHJ1Y3QgaGlzaV9xbSAqcW0sIHUzMiBy
-ZWcsDQo+ID4gKwkJCXUzMiAqZGF0YSwgdTggbnVtcykNCj4gDQo+IHFtX3dyaXRlX3JlZ3MoKQ0K
-PiANCj4gPiArDQo+ID4gK3N0YXRpYyBpbnQgcW1fcndfcmVnc19yZWFkKHN0cnVjdCBoaXNpX3Ft
-ICpxbSwgc3RydWN0IGFjY192Zl9kYXRhDQo+ID4gKyp2Zl9kYXRhKQ0KPiANCj4gcW1fbG9hZF9y
-ZWdzKCkuIEl0J3MgY29uZnVzaW5nIHRvIGhhdmUgYm90aCAncncnIGFuZCAncmVhZCcuDQo+IA0K
-PiA+ICsNCj4gPiArc3RhdGljIGludCBxbV9yd19yZWdzX3dyaXRlKHN0cnVjdCBoaXNpX3FtICpx
-bSwgc3RydWN0IGFjY192Zl9kYXRhDQo+ID4gKnZmX2RhdGEpDQo+IA0KPiBxbV9zYXZlX3JlZ3Mo
-KQ0KDQpSaWdodC4gSSBhbSBPayB3aXRoIHRoZSBhYm92ZSBzdWdnZXN0aW9ucy4NCg0KPiANCj4g
-PiArc3RhdGljIGludCBoaXNpX2FjY192Zl9xbV9pbml0KHN0cnVjdCBoaXNpX2FjY192Zl9jb3Jl
-X2RldmljZQ0KPiA+ICsqaGlzaV9hY2NfdmRldikgew0KPiA+ICsJc3RydWN0IHZmaW9fcGNpX2Nv
-cmVfZGV2aWNlICp2ZGV2ID0gJmhpc2lfYWNjX3ZkZXYtPmNvcmVfZGV2aWNlOw0KPiA+ICsJc3Ry
-dWN0IGhpc2lfcW0gKnZmX3FtID0gJmhpc2lfYWNjX3ZkZXYtPnZmX3FtOw0KPiA+ICsJc3RydWN0
-IHBjaV9kZXYgKnZmX2RldiA9IHZkZXYtPnBkZXY7DQo+ID4gKw0KPiA+ICsJLyoNCj4gPiArCSAq
-IEFDQyBWRiBkZXYgQkFSMiByZWdpb24gY29uc2lzdHMgb2YgYm90aCBmdW5jdGlvbmFsIHJlZ2lz
-dGVyIHNwYWNlDQo+ID4gKwkgKiBhbmQgbWlncmF0aW9uIGNvbnRyb2wgcmVnaXN0ZXIgc3BhY2Uu
-IEZvciBtaWdyYXRpb24gdG8gd29yaywgd2UNCj4gPiArCSAqIG5lZWQgYWNjZXNzIHRvIGJvdGgu
-IEhlbmNlLCB3ZSBtYXAgdGhlIGVudGlyZSBCQVIyIHJlZ2lvbiBoZXJlLg0KPiA+ICsJICogQnV0
-IGZyb20gYSBzZWN1cml0eSBwb2ludCBvZiB2aWV3LCB3ZSByZXN0cmljdCBhY2Nlc3MgdG8gdGhl
-DQo+ID4gKwkgKiBtaWdyYXRpb24gY29udHJvbCBzcGFjZSBmcm9tIEd1ZXN0KFBsZWFzZSBzZWUN
-Cj4gPiBtbWFwL2lvY3RsL3JlYWQvd3JpdGUNCj4gPiArCSAqIG92ZXJyaWRlIGZ1bmN0aW9ucyku
-DQo+IA0KPiAoUGxlYXNlIHNlZSBoaXNpX2FjY192ZmlvX3BjaV9taWdybl9vcHMpDQo+IA0KPiA+
-ICsJICoNCj4gPiArCSAqIEFsc28gdGhlIEhpU2lsaWNvbiBBQ0MgVkYgZGV2aWNlcyBzdXBwb3J0
-ZWQgYnkgdGhpcyBkcml2ZXIgb24NCj4gPiArCSAqIEhpU2lsaWNvbiBoYXJkd2FyZSBwbGF0Zm9y
-bXMgYXJlIGludGVncmF0ZWQgZW5kIHBvaW50IGRldmljZXMNCj4gPiArCSAqIGFuZCBoYXMgbm8g
-Y2FwYWJpbGl0eSB0byBwZXJmb3JtIFBDSWUgUDJQLg0KPiANCj4gQWNjb3JkaW5nIHRvIHY1IGRp
-c2N1c3Npb24gSSB0aGluayBpdCBpcyB0aGUgcGxhdGZvcm0gd2hpY2ggbGFja3Mgb2YgdGhlIFAy
-UA0KPiBjYXBhYmlsaXR5IGluc3RlYWQgb2YgdGhlIGRldmljZS4gQ3VycmVudCB3cml0aW5nIGlz
-IHJlYWQgdG8gdGhlIGxhdHRlci4NCj4gDQo+IGJldHRlciBjbGFyaWZ5IGl0IGFjY3VyYXRlbHku
-IPCfmIoNCg0KVGhhdOKAmXMgcmlnaHQuIEl0IGlzIHRoZSBwbGF0Zm9ybS4NCg0KPiANCj4gPiAg
-c3RhdGljIGludCBoaXNpX2FjY192ZmlvX3BjaV9wcm9iZShzdHJ1Y3QgcGNpX2RldiAqcGRldiwg
-Y29uc3Qgc3RydWN0DQo+ID4gcGNpX2RldmljZV9pZCAqaWQpICB7DQo+ID4gLQlzdHJ1Y3QgdmZp
-b19wY2lfY29yZV9kZXZpY2UgKnZkZXY7DQo+ID4gKwlzdHJ1Y3QgaGlzaV9hY2NfdmZfY29yZV9k
-ZXZpY2UgKmhpc2lfYWNjX3ZkZXY7DQo+ID4gKwlzdHJ1Y3QgaGlzaV9xbSAqcGZfcW07DQo+ID4g
-IAlpbnQgcmV0Ow0KPiA+DQo+ID4gLQl2ZGV2ID0ga3phbGxvYyhzaXplb2YoKnZkZXYpLCBHRlBf
-S0VSTkVMKTsNCj4gPiAtCWlmICghdmRldikNCj4gPiArCWhpc2lfYWNjX3ZkZXYgPSBremFsbG9j
-KHNpemVvZigqaGlzaV9hY2NfdmRldiksIEdGUF9LRVJORUwpOw0KPiA+ICsJaWYgKCFoaXNpX2Fj
-Y192ZGV2KQ0KPiA+ICAJCXJldHVybiAtRU5PTUVNOw0KPiA+DQo+ID4gLQl2ZmlvX3BjaV9jb3Jl
-X2luaXRfZGV2aWNlKHZkZXYsIHBkZXYsICZoaXNpX2FjY192ZmlvX3BjaV9vcHMpOw0KPiA+ICsJ
-cGZfcW0gPSBoaXNpX2FjY19nZXRfcGZfcW0ocGRldik7DQo+ID4gKwlpZiAocGZfcW0gJiYgcGZf
-cW0tPnZlciA+PSBRTV9IV19WMykgew0KPiA+ICsJCXJldCA9IGhpc2lfYWNjX3ZmaW9fcGNpX21p
-Z3JuX2luaXQoaGlzaV9hY2NfdmRldiwgcGRldiwNCj4gPiBwZl9xbSk7DQo+ID4gKwkJaWYgKCFy
-ZXQpIHsNCj4gPiArCQkJdmZpb19wY2lfY29yZV9pbml0X2RldmljZSgmaGlzaV9hY2NfdmRldi0N
-Cj4gPiA+Y29yZV9kZXZpY2UsIHBkZXYsDQo+ID4gKw0KPiA+ICZoaXNpX2FjY192ZmlvX3BjaV9t
-aWdybl9vcHMpOw0KPiA+ICsJCX0gZWxzZSB7DQo+ID4gKwkJCXBjaV93YXJuKHBkZXYsICJtaWdy
-YXRpb24gc3VwcG9ydCBmYWlsZWQsIGNvbnRpbnVlDQo+ID4gd2l0aCBnZW5lcmljIGludGVyZmFj
-ZVxuIik7DQo+ID4gKwkJCXZmaW9fcGNpX2NvcmVfaW5pdF9kZXZpY2UoJmhpc2lfYWNjX3ZkZXYt
-DQo+ID4gPmNvcmVfZGV2aWNlLCBwZGV2LA0KPiA+ICsJCQkJCQkgICZoaXNpX2FjY192ZmlvX3Bj
-aV9vcHMpOw0KPiA+ICsJCX0NCj4gDQo+IFRoaXMgbG9naWMgbG9va3Mgd2VpcmQuIEVhcmxpZXIg
-eW91IHN0YXRlIHRoYXQgdGhlIG1pZ3JhdGlvbiBjb250cm9sIHJlZ2lvbiBtdXN0DQo+IGJlIGhp
-ZGRlbiBmcm9tIHRoZSB1c2Vyc3BhY2UgYXMgYSBzZWN1cml0eSByZXF1aXJlbWVudCwgYnV0IGFi
-b3ZlIGxvZ2ljIHJlYWRzDQo+IGxpa2UgaWYgdGhlIGRyaXZlciBmYWlscyB0byBpbml0aWFsaXpl
-IG1pZ3JhdGlvbiBzdXBwb3J0IHRoZW4gd2UganVzdCBmYWxsIGJhY2sgdG8gdGhlDQo+IGRlZmF1
-bHQgb3BzIHdoaWNoIGdyYW50cyB0aGUgdXNlciB0aGUgZnVsbCBhY2Nlc3MgdG8gdGhlIGVudGly
-ZSBNTUlPIGJhci4NCg0KQXMgSSBleHBsYWluZWQgcHJldmlvdXNseSB0aGUgcmlzayBvZiBleHBv
-c2luZyBtaWdyYXRpb24gQkFSIGlzIG9ubHkgbGltaXRlZCB0byBtaWdyYXRpb24NCnVzZSBjYXNl
-LiBTbyBpZiBmb3Igc29tZSByZWFzb24gd2UgY2FuJ3QgZ2V0IHRoZSBtaWdyYXRpb24gd29ya2lu
-Zywgd2UgZGVmYXVsdCB0byB0aGUNCmdlbmVyaWMgdmZpby1wY2kgbGlrZSBiZWhhdmlvci4NCiAN
-Cj4gDQo+ID4gKwl9IGVsc2Ugew0KPiA+ICsJCXZmaW9fcGNpX2NvcmVfaW5pdF9kZXZpY2UoJmhp
-c2lfYWNjX3ZkZXYtPmNvcmVfZGV2aWNlLCBwZGV2LA0KPiA+ICsJCQkJCSAgJmhpc2lfYWNjX3Zm
-aW9fcGNpX29wcyk7DQo+ID4gKwl9DQo+IA0KPiBJZiB0aGUgaGFyZHdhcmUgaXRzZWxmIGRvZXNu
-J3Qgc3VwcG9ydCB0aGUgbWlncmF0aW9uIGNhcGFiaWxpdHksIGNhbiB3ZSBqdXN0DQo+IG1vdmUg
-aXQgb3V0IG9mIHRoZSBpZCB0YWJsZSBhbmQgbGV0IHZmaW8tcGNpIHRvIGRyaXZlIGl0Pw0KPiAN
-CiBCdXQgdGhlIGFib3ZlIGlzIGp1c3QgbGlrZSB2ZmlvLXBjaSBkcml2aW5nIGl0LCByaWdodD8N
-Cg0KVGhhbmtzLA0KU2hhbWVlcg0K
+Le Mon, Mar 07, 2022 at 02:56:21PM +0100, Corentin Labbe a écrit :
+> Le Mon, Mar 07, 2022 at 03:53:02PM +0200, Gilad Ben-Yossef a écrit :
+> > On Mon, Mar 7, 2022 at 3:45 PM Corentin Labbe <clabbe.montjoie@gmail.com> wrote:
+> > >
+> > > Le Mon, Mar 07, 2022 at 11:14:16AM +0000, Robin Murphy a écrit :
+> > > > On 2022-03-07 10:48, Corentin Labbe wrote:
+> > > > > Le Mon, Mar 07, 2022 at 09:59:29AM +0200, Gilad Ben-Yossef a ï¿½crit :
+> > > > >> On Sun, Mar 6, 2022 at 11:49 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > > > >>>
+> > > > >>> On Fri, Mar 04, 2022 at 02:30:06PM +0100, Corentin Labbe wrote:
+> > > > >>>>
+> > > > >>>> Hello
+> > > > >>>>
+> > > > >>>> I got:
+> > > > >>>> [   17.563793] ------------[ cut here ]------------
+> > > > >>>> [   17.568492] DMA-API: ccree e6601000.crypto: device driver frees DMA memory with different direction [device address=0x0000000078fe5800] [size=8 bytes] [mapped with DMA_TO_DEVICE] [unmapped with DMA_BIDIRECTIONAL]
+> > > > >>>
+> > > > >>> The direction argument during unmap must match whatever direction
+> > > > >>> you used during the original map call.
+> > > > >>
+> > > > >>
+> > > > >> Yes, of course. I changed one but forgot the other.
+> > > > >>
+> > > > >> Corentin, could you be kind and check that this solves the original
+> > > > >> problem and does not produce new warnings?
+> > > > >>
+> > > > >> diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c
+> > > > >> b/drivers/crypto/ccree/cc_buffer_mgr.c
+> > > > >> index 11e0278c8631..31cfe014922e 100644
+> > > > >> --- a/drivers/crypto/ccree/cc_buffer_mgr.c
+> > > > >> +++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+> > > > >> @@ -356,12 +356,14 @@ void cc_unmap_cipher_request(struct device *dev,
+> > > > >> void *ctx,
+> > > > >>                                req_ctx->mlli_params.mlli_dma_addr);
+> > > > >>          }
+> > > > >>
+> > > > >> -       dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
+> > > > >> -       dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+> > > > >> -
+> > > > >>          if (src != dst) {
+> > > > >> -               dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
+> > > > >> +               dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_TO_DEVICE);
+> > > > >> +               dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_FROM_DEVICE);
+> > > > >>                  dev_dbg(dev, "Unmapped req->dst=%pK\n", sg_virt(dst));
+> > > > >> +               dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+> > > > >> +       } else {
+> > > > >> +               dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
+> > > > >> +               dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+> > > > >>          }
+> > > > >>   }
+> > > > >>
+> > > > >> @@ -377,6 +379,7 @@ int cc_map_cipher_request(struct cc_drvdata
+> > > > >> *drvdata, void *ctx,
+> > > > >>          u32 dummy = 0;
+> > > > >>          int rc = 0;
+> > > > >>          u32 mapped_nents = 0;
+> > > > >> +       int src_direction = (src != dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
+> > > > >>
+> > > > >>          req_ctx->dma_buf_type = CC_DMA_BUF_DLLI;
+> > > > >>          mlli_params->curr_pool = NULL;
+> > > > >> @@ -399,7 +402,7 @@ int cc_map_cipher_request(struct cc_drvdata
+> > > > >> *drvdata, void *ctx,
+> > > > >>          }
+> > > > >>
+> > > > >>          /* Map the src SGL */
+> > > > >> -       rc = cc_map_sg(dev, src, nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_nents,
+> > > > >> +       rc = cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nents,
+> > > > >>                         LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
+> > > > >>          if (rc)
+> > > > >>                  goto cipher_exit;
+> > > > >> @@ -416,7 +419,7 @@ int cc_map_cipher_request(struct cc_drvdata
+> > > > >> *drvdata, void *ctx,
+> > > > >>                  }
+> > > > >>          } else {
+> > > > >>                  /* Map the dst sg */
+> > > > >> -               rc = cc_map_sg(dev, dst, nbytes, DMA_BIDIRECTIONAL,
+> > > > >> +               rc = cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
+> > > > >>                                 &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENTRIES,
+> > > > >>                                 &dummy, &mapped_nents);
+> > > > >>                  if (rc)
+> > > > >>
+> > > > >>
+> > > > >
+> > > > > Hello
+> > > > >
+> > > > > I still get the warning:
+> > > > > [  433.406230] ------------[ cut here ]------------
+> > > > > [  433.406326] DMA-API: ccree e6601000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
+> > > > > [  433.406386] WARNING: CPU: 7 PID: 31074 at /home/clabbe/linux-next/kernel/dma/debug.c:571 add_dma_entry+0x1d0/0x288
+> > > > > [  433.406434] Modules linked in:
+> > > > > [  433.406458] CPU: 7 PID: 31074 Comm: kcapi Not tainted 5.17.0-rc6-next-20220303-00130-g30042e47ee47-dirty #54
+> > > > > [  433.406473] Hardware name: Renesas Salvator-X board based on r8a77950 (DT)
+> > > > > [  433.406484] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > > > > [  433.406498] pc : add_dma_entry+0x1d0/0x288
+> > > > > [  433.406510] lr : add_dma_entry+0x1d0/0x288
+> > > > > [  433.406522] sp : ffff800015da3690
+> > > > > [  433.406531] x29: ffff800015da3690 x28: 0000000000000000 x27: 0000000000000000
+> > > > > [  433.406562] x26: 0000000000000000 x25: ffff80000b4c7bc0 x24: ffff80000b4c7000
+> > > > > [  433.406593] x23: 0000000000000000 x22: 00000000ffffffef x21: ffff80000a9b6000
+> > > > > [  433.406623] x20: ffff0004c0af5c00 x19: ffff80000b420000 x18: ffffffffffffffff
+> > > > > [  433.406653] x17: 6c7265766f202c54 x16: 534958454520676e x15: 000000000000022e
+> > > > > [  433.406683] x14: ffff800015da3380 x13: 00000000ffffffea x12: ffff80000b4be010
+> > > > > [  433.406713] x11: 0000000000000001 x10: 0000000000000001 x9 : ffff80000b4a6028
+> > > > > [  433.406743] x8 : c0000000ffffefff x7 : 0000000000017fe8 x6 : ffff80000b4a5fd0
+> > > > > [  433.406773] x5 : ffff0006ff795c48 x4 : 0000000000000000 x3 : 0000000000000027
+> > > > > [  433.406802] x2 : 0000000000000023 x1 : 8ca4e4fbf4b87900 x0 : 0000000000000000
+> > > > > [  433.406833] Call trace:
+> > > > > [  433.406841]  add_dma_entry+0x1d0/0x288
+> > > > > [  433.406854]  debug_dma_map_sg+0x150/0x398
+> > > > > [  433.406869]  __dma_map_sg_attrs+0x9c/0x108
+> > > > > [  433.406889]  dma_map_sg_attrs+0x10/0x28
+> > > > > [  433.406904]  cc_map_sg+0x80/0x100
+> > > > > [  433.406924]  cc_map_cipher_request+0x178/0x3c8
+> > > > > [  433.406939]  cc_cipher_process+0x210/0xb58
+> > > > > [  433.406953]  cc_cipher_encrypt+0x2c/0x38
+> > > > > [  433.406967]  crypto_skcipher_encrypt+0x44/0x78
+> > > > > [  433.406986]  skcipher_recvmsg+0x36c/0x420
+> > > > > [  433.407003]  ____sys_recvmsg+0x90/0x280
+> > > > > [  433.407024]  ___sys_recvmsg+0x88/0xd0
+> > > > > [  433.407038]  __sys_recvmsg+0x6c/0xd0
+> > > > > [  433.407049]  __arm64_sys_recvmsg+0x24/0x30
+> > > > > [  433.407061]  invoke_syscall+0x44/0x100
+> > > > > [  433.407082]  el0_svc_common.constprop.3+0x90/0x120
+> > > > > [  433.407096]  do_el0_svc+0x24/0x88
+> > > > > [  433.407110]  el0_svc+0x4c/0x100
+> > > > > [  433.407131]  el0t_64_sync_handler+0x90/0xb8
+> > > > > [  433.407145]  el0t_64_sync+0x170/0x174
+> > > > > [  433.407160] irq event stamp: 5624
+> > > > > [  433.407168] hardirqs last  enabled at (5623): [<ffff80000812f6a8>] __up_console_sem+0x60/0x98
+> > > > > [  433.407191] hardirqs last disabled at (5624): [<ffff800009c9a060>] el1_dbg+0x28/0x90
+> > > > > [  433.407208] softirqs last  enabled at (5570): [<ffff8000097e62f8>] lock_sock_nested+0x80/0xa0
+> > > > > [  433.407226] softirqs last disabled at (5568): [<ffff8000097e62d8>] lock_sock_nested+0x60/0xa0
+> > > > > [  433.407241] ---[ end trace 0000000000000000 ]---
+> > > > > [  433.407381] DMA-API: Mapped at:
+> > > > > [  433.407396]  debug_dma_map_sg+0x16c/0x398
+> > > > > [  433.407416]  __dma_map_sg_attrs+0x9c/0x108
+> > > > > [  433.407436]  dma_map_sg_attrs+0x10/0x28
+> > > > > [  433.407455]  cc_map_sg+0x80/0x100
+> > > > > [  433.407475]  cc_map_cipher_request+0x178/0x3c8
+> > > > >
+> > > > >
+> > > > > BUT I start to thing this is a bug in DMA-API debug.
+> > > > >
+> > > > >
+> > > > > My sun8i-ss driver hit the same warning:
+> > > > > [  142.458351] WARNING: CPU: 1 PID: 90 at kernel/dma/debug.c:597 add_dma_entry+0x2ec/0x4cc
+> > > > > [  142.458429] DMA-API: sun8i-ss 1c15000.crypto: cacheline tracking EEXIST, overlapping mappings aren't supported
+> > > > > [  142.458455] Modules linked in: ccm algif_aead xts cmac
+> > > > > [  142.458563] CPU: 1 PID: 90 Comm: 1c15000.crypto- Not tainted 5.17.0-rc6-next-20220307-00132-g39dad568d20a-dirty #223
+> > > > > [  142.458581] Hardware name: Allwinner A83t board
+> > > > > [  142.458596]  unwind_backtrace from show_stack+0x10/0x14
+> > > > > [  142.458627]  show_stack from 0xf0abdd1c
+> > > > > [  142.458646] irq event stamp: 31747
+> > > > > [  142.458660] hardirqs last  enabled at (31753): [<c019316c>] __up_console_sem+0x50/0x60
+> > > > > [  142.458688] hardirqs last disabled at (31758): [<c0193158>] __up_console_sem+0x3c/0x60
+> > > > > [  142.458710] softirqs last  enabled at (31600): [<c06990c8>] sun8i_ss_handle_cipher_request+0x300/0x8b8
+> > > > > [  142.458738] softirqs last disabled at (31580): [<c06990c8>] sun8i_ss_handle_cipher_request+0x300/0x8b8
+> > > > > [  142.458758] ---[ end trace 0000000000000000 ]---
+> > > > > [  142.458771] DMA-API: Mapped at:
+> > > > >
+> > > > > Yes the mapped at is empty just after.
+> > > > >
+> > > > > And the sequence of DMA operations in my driver is simple, so I cannot see how any overlap could occur.
+> > > >
+> > > > The "overlap" is in the sense of having more than one mapping within the
+> > > > same cacheline:
+> > > >
+> > > > [  142.458120] DMA-API: add_dma_entry start P=ba79f200 N=ba79f
+> > > > D=ba79f200 L=10 DMA_FROM_DEVICE attrs=0
+> > > > [  142.458156] DMA-API: add_dma_entry start P=445dc010 N=445dc
+> > > > D=445dc010 L=10 DMA_TO_DEVICE attrs=0
+> > > > [  142.458178] sun8i-ss 1c15000.crypto: SRC 0/1/1 445dc000 len=16 bi=0
+> > > > [  142.458215] sun8i-ss 1c15000.crypto: DST 0/1/1 ba79f200 len=16 bi=0
+> > > > [  142.458234] DMA-API: add_dma_entry start P=ba79f210 N=ba79f
+> > > > D=ba79f210 L=10 DMA_FROM_DEVICE attrs=0
+> > > >
+> > > > This actually illustrates exactly the reason why this is unsupportable.
+> > > > ba79f200 is mapped for DMA_FROM_DEVICE, therefore subsequently mapping
+> > > > ba79f210 for DMA_TO_DEVICE may cause the cacheline covering the range
+> > > > ba79f200-ba79f23f to be written back over the top of data that the
+> > > > device has already started to write to memory. Hello data corruption.
+> > > >
+> > > > Separate DMA mappings should be from separate memory allocations,
+> > > > respecting ARCH_DMA_MINALIGN.
+> > > >
+> > >
+> > > I just saw something strange, only one SG is involved, and I dont see any DMA_TO_DEVICE for ba79f210.
+> > > I see 2 DMA_FROM_DEVICE (ba79f200 and ba79f210), but only one should be done.
+> > > Why 2 FROM mappings are added with only one sg ?
+> > >
+> > 
+> > The thing that does the memory allocation of user calls from libkcapi
+> > tests is the crypto/af_alg.c code ...
+> > 
+> > I assume the sglist has two buffers? could it be that somehow they are
+> > not DMA aligned? that would be weird indeed...
+> > 
+> 
+> The SGlist has only one SG, so only one buffer, it is why I dont understand the double call to add_dma_entry().
+
+
+Answering myself, the driver can handle 2 requests in parallel, this is the reason of 2 dma call.
+And both are using the same key, and so first DMA call (for the key) give same address.
+
+This is something hard to prevent at driver level.
