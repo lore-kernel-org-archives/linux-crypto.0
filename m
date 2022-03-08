@@ -2,55 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 221B6C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 10:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930CCC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 11:02:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345867AbiCHK37 (ORCPT
+        id S1346092AbiCHLDS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 05:29:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
+        Tue, 8 Mar 2022 06:03:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244341AbiCHK36 (ORCPT
+        with ESMTP id S1346137AbiCHLDG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 05:29:58 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB1D3C48F;
-        Tue,  8 Mar 2022 02:29:01 -0800 (PST)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KCWjk5KmWzdb2N;
-        Tue,  8 Mar 2022 18:27:38 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+        Tue, 8 Mar 2022 06:03:06 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D29443AED;
+        Tue,  8 Mar 2022 03:02:08 -0800 (PST)
+Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCXRw6Gsmz67bj2;
+        Tue,  8 Mar 2022 19:00:44 +0800 (CST)
+Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
+ fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 12:02:06 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:29:00 +0800
-Received: from [10.67.103.212] (10.67.103.212) by
- dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:28:59 +0800
-Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
- struct pci_driver
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
+ 15.1.2308.21; Tue, 8 Mar 2022 11:02:05 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Tue, 8 Mar 2022 11:02:05 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Topic: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+ migration region
+Thread-Index: AQHYL1LES66RK6Gs/kmsjFJ+eUfqqKy1C2eAgAAh4CCAAB0qAIAADCAA
+Date:   Tue, 8 Mar 2022 11:02:05 +0000
+Message-ID: <1695cf776d7744bdb984e9f8f61d63b1@huawei.com>
 References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <liulongfang@huawei.com>, <prime.zeng@hisilicon.com>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>
-From:   "yekai(A)" <yekai13@huawei.com>
-Message-ID: <77d96509-bad2-b271-aaaf-07ca6b699db6@huawei.com>
-Date:   Tue, 8 Mar 2022 18:28:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ <20220303230131.2103-6-shameerali.kolothum.thodi@huawei.com>
+ <BN9PR11MB527681F9F6B0906596A77A178C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <21c1ddd171df45bdb62220cf997e58e6@huawei.com>
+ <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+In-Reply-To: <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.27.151]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.103.212]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml100012.china.huawei.com (7.185.36.121)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -58,91 +74,94 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 2022/3/4 7:01, Shameer Kolothum wrote:
-> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
-> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
-> as we use this in ACC vfio migration driver.
->
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
->  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
->  include/linux/hisi_acc_qm.h               | 5 +++++
->  4 files changed, 23 insertions(+)
->
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> index 3589d8879b5e..36ab30e9e654 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
->  	.driver.pm		= &hpre_pm_ops,
->  };
->
-> +struct pci_driver *hisi_hpre_get_pf_driver(void)
-> +{
-> +	return &hpre_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
-> +
->  static void hpre_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 311a8747b5bf..421a405ca337 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
->  	.driver.pm = &sec_pm_ops,
->  };
->
-> +struct pci_driver *hisi_sec_get_pf_driver(void)
-> +{
-> +	return &sec_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
-> +
->  static void sec_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-> index 66decfe07282..4534e1e107d1 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
->  	.driver.pm		= &hisi_zip_pm_ops,
->  };
->
-> +struct pci_driver *hisi_zip_get_pf_driver(void)
-> +{
-> +	return &hisi_zip_pci_driver;
-> +}
-> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
-> +
->  static void hisi_zip_register_debugfs(void)
->  {
->  	if (!debugfs_initialized())
-> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-> index 6a6477c34666..00f2a4db8723 100644
-> --- a/include/linux/hisi_acc_qm.h
-> +++ b/include/linux/hisi_acc_qm.h
-> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
->  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
->  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
-> +
-> +/* Used by VFIO ACC live migration driver */
-> +struct pci_driver *hisi_sec_get_pf_driver(void);
-> +struct pci_driver *hisi_hpre_get_pf_driver(void);
-> +struct pci_driver *hisi_zip_get_pf_driver(void);
->  #endif
->
+> -----Original Message-----
+> From: Tian, Kevin [mailto:kevin.tian@intel.com]
+> Sent: 08 March 2022 10:09
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> linux-crypto@vger.kernel.org
+> Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
+> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
+> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
+> <prime.zeng@hisilicon.com>; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
+> migration region
+> 
+> > From: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>
+> > Sent: Tuesday, March 8, 2022 4:33 PM
+> >
+> > Hi Kevin,
+> >
+> > > -----Original Message-----
+> > > From: Tian, Kevin [mailto:kevin.tian@intel.com]
+> > > Sent: 08 March 2022 06:23
+> > > To: Shameerali Kolothum Thodi
+> > <shameerali.kolothum.thodi@huawei.com>;
+> > > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > > linux-crypto@vger.kernel.org
+> > > Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com;
+> > jgg@nvidia.com;
+> > > cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com;
+> > Linuxarm
+> > > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>;
+> > Zengtao (B)
+> > > <prime.zeng@hisilicon.com>; Jonathan Cameron
+> > > <jonathan.cameron@huawei.com>; Wangzhou (B)
+> > <wangzhou1@hisilicon.com>
+> > > Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev
+> > BAR2
+> > > migration region
+> > >
+> > > Hi, Shameer,
+> > >
+> > > > From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > > > Sent: Friday, March 4, 2022 7:01 AM
+> > > >
+> > > > HiSilicon ACC VF device BAR2 region consists of both functional
+> > > > register space and migration control register space. From a
+> > > > security point of view, it's not advisable to export the migration
+> > > > control region to Guest.
+> > > >
+> > > > Hence, introduce a separate struct vfio_device_ops for migration
+> > > > support which will override the ioctl/read/write/mmap methods to
+> > > > hide the migration region and limit the access only to the
+> > > > functional register space.
+> > > >
+> > > > This will be used in subsequent patches when we add migration
+> > > > support to the driver.
+> > >
+> > > As a security concern the migration control region should be always
+> > > disabled regardless of whether migration support is added to the
+> > > driver for such device... It sounds like we should first fix this security
+> > > hole for acc device assignment and then add the migration support
+> > > atop (at least organize the series in this way).
+> >
+> > By exposing the migration BAR region, there is a possibility that a malicious
+> > Guest can prevent migration from happening by manipulating the migration
+> > BAR region. I don't think there are any other security concerns now
+> especially
+> > since we only support the STOP_COPY state.  And the approach has been
+> > that
+> > we only restrict this if migration support is enabled. I think I can change the
+> > above "security concern" description to "malicious Guest can prevent
+> > migration"
+> > to make it more clear.
+> >
+> 
+> In concept migrated device state may include both the state directly
+> touched by the guest driver and also the one that is configured by
+> the PF driver. Unless there is guarantee that the state managed via
+> the migration control interface only touches the former (which implies
+> the latter managed via the PF driver) this security concern will hold
+> even for normal device assignment.
+> 
+> If the acc device has such guarantee it's worth of a clarification here.
 
-Hi Shameer,
-
-It looks good to me for this movement.
-
-Acked-by:  Kai Ye <yekai13@huawei.com>
+I just double-checked with our ACC team and the VF migration region 
+manipulations will not affect the PF configurations. I will add a clarification
+here to make it clear.
 
 Thanks,
-Kai
+Shameer
