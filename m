@@ -2,31 +2,31 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AE0C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 18:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BA0C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 18:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349748AbiCHSvq (ORCPT
+        id S1349768AbiCHSv7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 13:51:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51924 "EHLO
+        Tue, 8 Mar 2022 13:51:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349804AbiCHSvh (ORCPT
+        with ESMTP id S1349794AbiCHSv6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 13:51:37 -0500
+        Tue, 8 Mar 2022 13:51:58 -0500
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF62A53B75;
-        Tue,  8 Mar 2022 10:50:40 -0800 (PST)
-Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCkrQ5lyvz67n3l;
-        Wed,  9 Mar 2022 02:49:10 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657EF53B59;
+        Tue,  8 Mar 2022 10:51:01 -0800 (PST)
+Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCkrx45sBz67NyL;
+        Wed,  9 Mar 2022 02:49:37 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.21; Tue, 8 Mar 2022 19:50:38 +0100
+ fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 19:50:59 +0100
 Received: from A2006125610.china.huawei.com (10.47.82.254) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:50:30 +0000
+ 15.1.2308.21; Tue, 8 Mar 2022 18:50:51 +0000
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linux-crypto@vger.kernel.org>
@@ -36,15 +36,14 @@ CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
         <linuxarm@huawei.com>, <liulongfang@huawei.com>,
         <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v9 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2 migration region
-Date:   Tue, 8 Mar 2022 18:48:58 +0000
-Message-ID: <20220308184902.2242-6-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v9 7/9] crypto: hisilicon/qm: Set the VF QM state register
+Date:   Tue, 8 Mar 2022 18:49:00 +0000
+Message-ID: <20220308184902.2242-8-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
 References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.47.82.254]
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  lhreml710-chm.china.huawei.com (10.201.108.61)
@@ -53,172 +52,77 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HiSilicon ACC VF device BAR2 region consists of both functional register
-space and migration control register space. Unnecessarily exposing the
-migration BAR region to the Guest has the potential to prevent/corrupt
-the Guest migration.
+From: Longfang Liu <liulongfang@huawei.com>
 
-Hence, introduce a separate struct vfio_device_ops for migration support
-which will override the ioctl/read/write/mmap methods to hide the
-migration region and limit the Guest access only to the functional
-register space.
+We use VF QM state register to record the status of the QM configuration
+state. This will be used in the ACC migration driver to determine whether
+we can safely save and restore the QM data.
 
-This will be used in subsequent patches when we add migration support
-to the driver.
-
-Please note that it is OK to export the entire VF BAR if migration is
-not supported or required as this cannot affect the PF configurations.
-
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 126 ++++++++++++++++++
- 1 file changed, 126 insertions(+)
+ drivers/crypto/hisilicon/qm.c | 8 ++++++++
+ include/linux/hisi_acc_qm.h   | 6 ++++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 8129c3457b3b..582ee4fa4109 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -13,6 +13,119 @@
- #include <linux/vfio.h>
- #include <linux/vfio_pci_core.h>
- 
-+static int hisi_acc_pci_rw_access_check(struct vfio_device *core_vdev,
-+					size_t count, loff_t *ppos,
-+					size_t *new_count)
-+{
-+	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
-+		loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
-+		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+
-+		/* Check if access is for migration control region */
-+		if (pos >= end)
-+			return -EINVAL;
-+
-+		*new_count = min(count, (size_t)(end - pos));
-+	}
-+
-+	return 0;
-+}
-+
-+static int hisi_acc_vfio_pci_mmap(struct vfio_device *core_vdev,
-+				  struct vm_area_struct *vma)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+	unsigned int index;
-+
-+	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
-+	if (index == VFIO_PCI_BAR2_REGION_INDEX) {
-+		u64 req_len, pgoff, req_start;
-+		resource_size_t end = pci_resource_len(vdev->pdev, index) / 2;
-+
-+		req_len = vma->vm_end - vma->vm_start;
-+		pgoff = vma->vm_pgoff &
-+			((1U << (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT)) - 1);
-+		req_start = pgoff << PAGE_SHIFT;
-+
-+		if (req_start + req_len > end)
-+			return -EINVAL;
-+	}
-+
-+	return vfio_pci_core_mmap(core_vdev, vma);
-+}
-+
-+static ssize_t hisi_acc_vfio_pci_write(struct vfio_device *core_vdev,
-+				       const char __user *buf, size_t count,
-+				       loff_t *ppos)
-+{
-+	size_t new_count = count;
-+	int ret;
-+
-+	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
-+	if (ret)
-+		return ret;
-+
-+	return vfio_pci_core_write(core_vdev, buf, new_count, ppos);
-+}
-+
-+static ssize_t hisi_acc_vfio_pci_read(struct vfio_device *core_vdev,
-+				      char __user *buf, size_t count,
-+				      loff_t *ppos)
-+{
-+	size_t new_count = count;
-+	int ret;
-+
-+	ret = hisi_acc_pci_rw_access_check(core_vdev, count, ppos, &new_count);
-+	if (ret)
-+		return ret;
-+
-+	return vfio_pci_core_read(core_vdev, buf, new_count, ppos);
-+}
-+
-+static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int cmd,
-+				    unsigned long arg)
-+{
-+	if (cmd == VFIO_DEVICE_GET_REGION_INFO) {
-+		struct vfio_pci_core_device *vdev =
-+			container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+		struct pci_dev *pdev = vdev->pdev;
-+		struct vfio_region_info info;
-+		unsigned long minsz;
-+
-+		minsz = offsetofend(struct vfio_region_info, offset);
-+
-+		if (copy_from_user(&info, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (info.argsz < minsz)
-+			return -EINVAL;
-+
-+		if (info.index == VFIO_PCI_BAR2_REGION_INDEX) {
-+			info.offset = VFIO_PCI_INDEX_TO_OFFSET(info.index);
-+
-+			/*
-+			 * ACC VF dev BAR2 region consists of both functional
-+			 * register space and migration control register space.
-+			 * Report only the functional region to Guest.
-+			 */
-+			info.size = pci_resource_len(pdev, info.index) / 2;
-+
-+			info.flags = VFIO_REGION_INFO_FLAG_READ |
-+					VFIO_REGION_INFO_FLAG_WRITE |
-+					VFIO_REGION_INFO_FLAG_MMAP;
-+
-+			return copy_to_user((void __user *)arg, &info, minsz) ?
-+					    -EFAULT : 0;
-+		}
-+	}
-+	return vfio_pci_core_ioctl(core_vdev, cmd, arg);
-+}
-+
- static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
- {
- 	struct vfio_pci_core_device *vdev =
-@@ -28,6 +141,19 @@ static int hisi_acc_vfio_pci_open_device(struct vfio_device *core_vdev)
- 	return 0;
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index c88e013371af..6a8776db38b5 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -3492,6 +3492,12 @@ static void hisi_qm_pci_uninit(struct hisi_qm *qm)
+ 	pci_disable_device(pdev);
  }
  
-+static const struct vfio_device_ops hisi_acc_vfio_pci_migrn_ops = {
-+	.name = "hisi-acc-vfio-pci-migration",
-+	.open_device = hisi_acc_vfio_pci_open_device,
-+	.close_device = vfio_pci_core_close_device,
-+	.ioctl = hisi_acc_vfio_pci_ioctl,
-+	.device_feature = vfio_pci_core_ioctl_feature,
-+	.read = hisi_acc_vfio_pci_read,
-+	.write = hisi_acc_vfio_pci_write,
-+	.mmap = hisi_acc_vfio_pci_mmap,
-+	.request = vfio_pci_core_request,
-+	.match = vfio_pci_core_match,
++static void hisi_qm_set_state(struct hisi_qm *qm, u8 state)
++{
++	if (qm->ver > QM_HW_V2 && qm->fun_type == QM_HW_VF)
++		writel(state, qm->io_base + QM_VF_STATE);
++}
++
+ /**
+  * hisi_qm_uninit() - Uninitialize qm.
+  * @qm: The qm needed uninit.
+@@ -3520,6 +3526,7 @@ void hisi_qm_uninit(struct hisi_qm *qm)
+ 		dma_free_coherent(dev, qm->qdma.size,
+ 				  qm->qdma.va, qm->qdma.dma);
+ 	}
++	hisi_qm_set_state(qm, QM_NOT_READY);
+ 	up_write(&qm->qps_lock);
+ 
+ 	qm_irq_unregister(qm);
+@@ -3745,6 +3752,7 @@ int hisi_qm_start(struct hisi_qm *qm)
+ 	if (!ret)
+ 		atomic_set(&qm->status.flags, QM_START);
+ 
++	hisi_qm_set_state(qm, QM_READY);
+ err_unlock:
+ 	up_write(&qm->qps_lock);
+ 	return ret;
+diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+index 00f2a4db8723..177f7b7cd414 100644
+--- a/include/linux/hisi_acc_qm.h
++++ b/include/linux/hisi_acc_qm.h
+@@ -67,6 +67,7 @@
+ #define QM_DB_RAND_SHIFT_V2		16
+ #define QM_DB_INDEX_SHIFT_V2		32
+ #define QM_DB_PRIORITY_SHIFT_V2		48
++#define QM_VF_STATE			0x60
+ 
+ /* qm cache */
+ #define QM_CACHE_CTL			0x100050
+@@ -162,6 +163,11 @@ enum qm_debug_file {
+ 	DEBUG_FILE_NUM,
+ };
+ 
++enum qm_vf_state {
++	QM_READY = 0,
++	QM_NOT_READY,
 +};
 +
- static const struct vfio_device_ops hisi_acc_vfio_pci_ops = {
- 	.name = "hisi-acc-vfio-pci",
- 	.open_device = hisi_acc_vfio_pci_open_device,
+ struct qm_dfx {
+ 	atomic64_t err_irq_cnt;
+ 	atomic64_t aeq_irq_cnt;
 -- 
 2.25.1
 
