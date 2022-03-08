@@ -2,76 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE7EC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 00:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA9BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 00:52:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233412AbiCHAJV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 19:09:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47940 "EHLO
+        id S244338AbiCHAxr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 19:53:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243897AbiCHAJU (ORCPT
+        with ESMTP id S1344137AbiCHAxp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 19:09:20 -0500
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6120BDFA6
-        for <linux-crypto@vger.kernel.org>; Mon,  7 Mar 2022 16:08:24 -0800 (PST)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-2dc348dab52so150213047b3.6
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Mar 2022 16:08:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mx5hLEqn8My0F+yXTcGcX8saGMYANVTYsACmCpFd5d0=;
-        b=LiHV6K7JBJSMYhKhrKF9W2mHES55ZBn8mEURsw17mfuBV4BSev7POOOhRzd8JKyBKF
-         paBwZnN+QOzLeUc0+g7vXjBOguhMIuEnf1ZzfLj4rTs40Tnk9H0t9vCr5wE3rHn0D+gV
-         EWtZrTqcTGgFWFx7nknKXdOQIhqGEenOZKYB7PKKunlLxXOUMVndrc89oQV6wAgrYTut
-         SjP7NBczzWSbkdpJMULm7WEqLrJoggoPCkrhfB9dXfxHFE80l5050MfAK+EirIfJ0ry2
-         RulRW9iQLwlKAPRgozIw8dYstsFGH/t5TM5OGhdxL5bZT3gwfFmrXCCO+mzlUHow/h/t
-         Gevw==
+        Mon, 7 Mar 2022 19:53:45 -0500
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87733FD1C;
+        Mon,  7 Mar 2022 16:52:50 -0800 (PST)
+Received: by mail-oo1-f43.google.com with SMTP id l24-20020a4a8558000000b00320d5a1f938so7490867ooh.8;
+        Mon, 07 Mar 2022 16:52:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mx5hLEqn8My0F+yXTcGcX8saGMYANVTYsACmCpFd5d0=;
-        b=J5VZTFRaF7NrI2NU8EVrytJf4L8MnNH1DKeUIvjM2+gXMOBhoZbcemVz5gp1YMT8k5
-         u2wiMBqgFxTHkW/sXDlBdw5q3PKCmFRi1LOpBSI7cSmeJt0zbBultjGCmtslSu80suuC
-         xAcGQCo7fbKUXNqbdnmce+OEJo4D7+w/sQAvQkpINYNcXvblvITFJGU/dpoXwa3xH2hf
-         68uq8oTyf5EzyjqVB4/QsAGTrleeCuapTuHurzqE8rGQzdxtR+pZ5XDphps4Um2lgkWA
-         W7VxfVsx2LgN1bZ8tsUQNEP8pue0qxIYjm+ZdaD97ews4hQTANov4hCMRyxEwuKKGUrw
-         EYFQ==
-X-Gm-Message-State: AOAM532XvaQGZ50NWZcF1RDHF+dHRRJTfywCxDGO1enpl2SYWZBmr9n/
-        7o9yw1kIKlvoLjBg7+7u+45LfUOZvkGvoEtRG/ePKw==
-X-Google-Smtp-Source: ABdhPJwxi+FboTfWrIvFpQLriAStK9q1fbskER46jhk3WG0eM/a3DZxitYTJ/w20P3pnlqOQ/WkPO91Kvl7D/sPujJU=
-X-Received: by 2002:a81:854:0:b0:2db:255b:dd6 with SMTP id 81-20020a810854000000b002db255b0dd6mr11185948ywi.140.1646698103518;
- Mon, 07 Mar 2022 16:08:23 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Sd+Yvw7691O5dkoC55ZXaEZXMBAfmesOquSTaxPr6kY=;
+        b=XIeCRWr0oJCHzJfklxqzTR2EmtlZ3hmBrk/n0ehcxAN1+HbwYsWGopCYP46ZT9swoF
+         CTZH4Wtd6vu0DzO29h/GPJ67Fj44yV3/0OYnFVMzvigF9cr3ibo2RuwGmVfrf8SJ7tN5
+         re+U4fMQHI/DfQRT6pI+3x/3DKV/cU9hbeLnJySZ+uF6j3sCKtJHvj3cqDgCsEt+rAwJ
+         yT5ENJlWTGv9X5SKOEd8EUVfB/ZGlWR9vWJNqM/29+21bxx/UteslrV+kECRtWd0erlU
+         ltOS0X7orogtpT020xKVq8EJf6w4LBpiLL5gGsCmLCKEtgdCJHDZSRDUTxkLJAY4WKcv
+         IrHg==
+X-Gm-Message-State: AOAM530tZ/GcBndYuuKwkHdqLVbJekdNKMk7KgoRgtdB59hDzRQdnYSF
+        uLfObbs1msHeP4lreVmf9A==
+X-Google-Smtp-Source: ABdhPJyrPMIEYs2Re1cHCaK70TNE5OWYk3dnU6R6oQyemNgrc5HfUeAElgm60shCfY0mfNEIckSurQ==
+X-Received: by 2002:a05:6870:8310:b0:d3:8767:a832 with SMTP id p16-20020a056870831000b000d38767a832mr941761oae.113.1646700769882;
+        Mon, 07 Mar 2022 16:52:49 -0800 (PST)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id c17-20020a056830001100b005b236450790sm2086502otp.77.2022.03.07.16.52.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 16:52:49 -0800 (PST)
+Received: (nullmailer pid 3598816 invoked by uid 1000);
+        Tue, 08 Mar 2022 00:52:47 -0000
+Date:   Mon, 7 Mar 2022 18:52:47 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     john@metanate.com, linux-crypto@vger.kernel.org, heiko@sntech.de,
+        devicetree@vger.kernel.org, linux-rockchip@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        robh+dt@kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH v2 17/18] dt-bindings: crypto: convert rockchip-crypto to
+ yaml
+Message-ID: <Yiao36rJVmPw/yGL@robh.at.kernel.org>
+References: <20220302211113.4003816-1-clabbe@baylibre.com>
+ <20220302211113.4003816-18-clabbe@baylibre.com>
 MIME-Version: 1.0
-References: <20220307110728.15635-1-linmq006@gmail.com>
-In-Reply-To: <20220307110728.15635-1-linmq006@gmail.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Tue, 8 Mar 2022 01:08:12 +0100
-Message-ID: <CACRpkdYTZDeumBHewcP79nvVOkHZtKZFecRQHtP4Uqouhzxu4Q@mail.gmail.com>
-Subject: Re: [PATCH] hwrng: nomadik: Change clk_disable to clk_disable_unprepare
-To:     Miaoqian Lin <linmq006@gmail.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220302211113.4003816-18-clabbe@baylibre.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 7, 2022 at 12:07 PM Miaoqian Lin <linmq006@gmail.com> wrote:
+On Wed, 02 Mar 2022 21:11:12 +0000, Corentin Labbe wrote:
+> convert rockchip-crypto to yaml
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  .../crypto/rockchip,rk3288-crypto.yaml        | 64 +++++++++++++++++++
+>  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
+>  2 files changed, 64 insertions(+), 28 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> 
 
-> The corresponding API for clk_prepare_enable is clk_disable_unprepare,
-> other than clk_disable_unprepare.
->
-> Fix this by changing clk_disable to clk_disable_unprepare.
->
-> Fixes: beca35d05cc2 ("hwrng: nomadik - use clk_prepare_enable()")
-> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
-
-Thanks for fixing this!
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+Reviewed-by: Rob Herring <robh@kernel.org>
