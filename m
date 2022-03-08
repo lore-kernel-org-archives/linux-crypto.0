@@ -2,190 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F2CC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 01:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8073FC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 02:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233699AbiCHBPL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 20:15:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
+        id S1344364AbiCHCck (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 21:32:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbiCHBPL (ORCPT
+        with ESMTP id S233411AbiCHCcj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 20:15:11 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2B13616B;
-        Mon,  7 Mar 2022 17:14:15 -0800 (PST)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KCHPb4bQ7zdZyb;
-        Tue,  8 Mar 2022 09:12:51 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 09:14:12 +0800
-Received: from [10.67.102.118] (10.67.102.118) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 09:14:12 +0800
-Subject: Re: [PATCH v8 9/9] hisi_acc_vfio_pci: Use its own PCI reset_done
- error handler
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-10-shameerali.kolothum.thodi@huawei.com>
-From:   liulongfang <liulongfang@huawei.com>
-Message-ID: <c4c07776-cd6c-f21e-b8e0-4cbf102a0389@huawei.com>
-Date:   Tue, 8 Mar 2022 09:14:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 7 Mar 2022 21:32:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6618F35DE9;
+        Mon,  7 Mar 2022 18:31:44 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 2281NISf012621;
+        Tue, 8 Mar 2022 02:31:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=pem2LRWua62Gj1EwQLYWIUQJFcSzowZruXSnDTsOI/M=;
+ b=N5PAUuplRwFJjlGbOQiPmCgYX1zKpPPsIFGSJbVsgpZBxWr9Ev7raMO2QLlDcxu2voFn
+ HghmurKP3vK2mu1YkYcRfSPnIUnupClhdhW0i5PGjdVGufmV88hbTtV6iODr8H8vQl0T
+ a9z4fkNZ4kUxHeYnNFX2GSAVM97pi98iZPnQYu9ls/dx5w3hFGjN2hQXzHFassA/fqAD
+ KE+zYJQMgCKaihVv0pWC/rtWaT8qds+FvswlutJIJToYKyU9Xvovw1JO2N+U4IdiaPgK
+ aWaAeJpWcbg/6qLPMnDtfFs4RbYVlk64fZAmOQv4GP6a/rG5iaUUQzkeJBhQYx4NWoBb OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3enwegrx5a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 02:31:27 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2282QXLa014207;
+        Tue, 8 Mar 2022 02:31:26 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3enwegrx57-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 02:31:26 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2282HpDB024805;
+        Tue, 8 Mar 2022 02:31:26 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+        by ppma01wdc.us.ibm.com with ESMTP id 3ekyg921pp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 02:31:26 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2282VO4l17302104
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Mar 2022 02:31:24 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D28626A047;
+        Tue,  8 Mar 2022 02:31:24 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EAA66A04F;
+        Tue,  8 Mar 2022 02:31:22 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue,  8 Mar 2022 02:31:21 +0000 (GMT)
+Message-ID: <22860730-d615-5683-6af0-05b6f4f3e71d@linux.ibm.com>
+Date:   Mon, 7 Mar 2022 21:31:21 -0500
 MIME-Version: 1.0
-In-Reply-To: <20220303230131.2103-10-shameerali.kolothum.thodi@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.102.118]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600005.china.huawei.com (7.193.23.191)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 3/4] KEYS: CA link restriction
+Content-Language: en-US
+To:     Eric Snowberg <eric.snowberg@oracle.com>,
+        Mimi Zohar <zohar@linux.ibm.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
+        "mic@linux.microsoft.com" <mic@linux.microsoft.com>,
+        Konrad Wilk <konrad.wilk@oracle.com>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
+ <20220301173651.3435350-4-eric.snowberg@oracle.com>
+ <47f3654e-892d-a35a-e77c-70ada1ebcf43@linux.ibm.com>
+ <2415444C-AD8F-4F03-8B1C-C0770F83ADAE@oracle.com>
+ <e2dd58cd6074ae692256333b43b5ecde70bcdbdd.camel@linux.ibm.com>
+ <67456A73-8B72-4DB6-8E23-7C603661A0A4@oracle.com>
+From:   Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <67456A73-8B72-4DB6-8E23-7C603661A0A4@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: niRBz8tVgOm5ryOaD3F9qE65KNsF8t0m
+X-Proofpoint-ORIG-GUID: FHLxAsBlhdbLXzyX9mGYubIMSOQXBE-9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-07_12,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ phishscore=0 priorityscore=1501 suspectscore=0 clxscore=1015 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203080000
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2022/3/4 7:01, Shameer Kolothum wrote:
-> Register private handler for pci_error_handlers.reset_done and update
-> state accordingly.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 57 ++++++++++++++++++-
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  4 +-
->  2 files changed, 57 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
 
-Thanks,
-Longfang
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index aa2e4b6bf598..53e4c5cb3a71 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -625,6 +625,27 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
->  	}
->  }
->  
-> +/*
-> + * This function is called in all state_mutex unlock cases to
-> + * handle a 'deferred_reset' if exists.
-> + */
-> +static void
-> +hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-> +{
-> +again:
-> +	spin_lock(&hisi_acc_vdev->reset_lock);
-> +	if (hisi_acc_vdev->deferred_reset) {
-> +		hisi_acc_vdev->deferred_reset = false;
-> +		spin_unlock(&hisi_acc_vdev->reset_lock);
-> +		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-> +		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-> +		hisi_acc_vf_disable_fds(hisi_acc_vdev);
-> +		goto again;
-> +	}
-> +	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> +	spin_unlock(&hisi_acc_vdev->reset_lock);
-> +}
-> +
->  static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->  {
->  	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> @@ -921,7 +942,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
->  			break;
->  		}
->  	}
-> -	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> +	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
->  	return res;
->  }
->  
-> @@ -934,10 +955,35 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
->  
->  	mutex_lock(&hisi_acc_vdev->state_mutex);
->  	*curr_state = hisi_acc_vdev->mig_state;
-> -	mutex_unlock(&hisi_acc_vdev->state_mutex);
-> +	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
->  	return 0;
->  }
->  
-> +static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
-> +{
-> +	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-> +
-> +	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
-> +				VFIO_MIGRATION_STOP_COPY)
-> +		return;
-> +
-> +	/*
-> +	 * As the higher VFIO layers are holding locks across reset and using
-> +	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-> +	 * with the state_mutex and mm_lock.
-> +	 * In case the state_mutex was taken already we defer the cleanup work
-> +	 * to the unlock flow of the other running context.
-> +	 */
-> +	spin_lock(&hisi_acc_vdev->reset_lock);
-> +	hisi_acc_vdev->deferred_reset = true;
-> +	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
-> +		spin_unlock(&hisi_acc_vdev->reset_lock);
-> +		return;
-> +	}
-> +	spin_unlock(&hisi_acc_vdev->reset_lock);
-> +	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-> +}
-> +
->  static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
->  {
->  	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
-> @@ -1252,12 +1298,17 @@ static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
->  
->  MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
->  
-> +static const struct pci_error_handlers hisi_acc_vf_err_handlers = {
-> +	.reset_done = hisi_acc_vf_pci_aer_reset_done,
-> +	.error_detected = vfio_pci_core_aer_err_detected,
-> +};
-> +
->  static struct pci_driver hisi_acc_vfio_pci_driver = {
->  	.name = KBUILD_MODNAME,
->  	.id_table = hisi_acc_vfio_pci_table,
->  	.probe = hisi_acc_vfio_pci_probe,
->  	.remove = hisi_acc_vfio_pci_remove,
-> -	.err_handler = &vfio_pci_core_err_handlers,
-> +	.err_handler = &hisi_acc_vf_err_handlers,
->  };
->  
->  module_pci_driver(hisi_acc_vfio_pci_driver);
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> index 1c7d75408790..5494f4983bbe 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> @@ -98,6 +98,7 @@ struct hisi_acc_vf_migration_file {
->  
->  struct hisi_acc_vf_core_device {
->  	struct vfio_pci_core_device core_device;
-> +	u8 deferred_reset:1;
->  	/* for migration state */
->  	struct mutex state_mutex;
->  	enum vfio_device_mig_state mig_state;
-> @@ -107,7 +108,8 @@ struct hisi_acc_vf_core_device {
->  	struct hisi_qm vf_qm;
->  	u32 vf_qm_state;
->  	int vf_id;
-> -
-> +	/* for reset handler */
-> +	spinlock_t reset_lock;
->  	struct hisi_acc_vf_migration_file *resuming_migf;
->  	struct hisi_acc_vf_migration_file *saving_migf;
->  };
+
+On 3/7/22 18:38, Eric Snowberg wrote:
 > 
+> 
+>> On Mar 7, 2022, at 4:01 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+>>
+>> On Mon, 2022-03-07 at 18:06 +0000, Eric Snowberg wrote:
+>>>
+>>>>> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+>>>>> index 6b1ac5f5896a..49bb2ea7f609 100644
+>>>>> --- a/crypto/asymmetric_keys/restrict.c
+>>>>> +++ b/crypto/asymmetric_keys/restrict.c
+>>>>> @@ -108,6 +108,49 @@ int restrict_link_by_signature(struct key *dest_keyring,
+>>>>> 	return ret;
+>>>>> }
+>>>>> +/**
+>>>>> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
+>>>>> + * @dest_keyring: Keyring being linked to.
+>>>>> + * @type: The type of key being added.
+>>>>> + * @payload: The payload of the new key.
+>>>>> + * @trust_keyring: Unused.
+>>>>> + *
+>>>>> + * Check if the new certificate is a CA. If it is a CA, then mark the new
+>>>>> + * certificate as being ok to link.
+>>>>
+>>>> CA = root CA here, right?
+>>>
+>>> Yes, I’ll update the comment
+>>
+>> Updating the comment is not enough.  There's an existing function named
+>> "x509_check_for_self_signed()" which determines whether the certificate
+>> is self-signed.
+> 
+> Originally I tried using that function.  However when the restrict link code is called,
+> all the necessary x509 information is no longer available.   The code in
+> restrict_link_by_ca is basically doing the equivalent to x509_check_for_self_signed.
+> After verifying the cert has the CA flag set, the call to public_key_verify_signature
+> validates the cert is self signed.
+> 
+Isn't x509_cert_parse() being called as part of parsing the certificate? 
+If so, it seems to check for a self-signed certificate every time. You 
+could add something like the following to x509_check_for_self_signed(cert):
+pub->x509_self_signed = cert->self_signed = true;
+
+This could then reduce the function in 3/4 to something like:
+
+return payload->data[asym_crypto]->x509_self_signed;
+
+
+    Stefan
