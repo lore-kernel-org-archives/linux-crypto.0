@@ -2,186 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AA6C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 18:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67210C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 19:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349755AbiCHSwW (ORCPT
+        id S1349949AbiCHTeR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 13:52:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53208 "EHLO
+        Tue, 8 Mar 2022 14:34:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349796AbiCHSwT (ORCPT
+        with ESMTP id S1349618AbiCHTeQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 13:52:19 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CAD53E35;
-        Tue,  8 Mar 2022 10:51:22 -0800 (PST)
-Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCksD3Q1qz67NqQ;
-        Wed,  9 Mar 2022 02:49:52 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 19:51:20 +0100
-Received: from A2006125610.china.huawei.com (10.47.82.254) by
- lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 18:51:12 +0000
-From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
-        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <kevin.tian@intel.com>,
-        <linuxarm@huawei.com>, <liulongfang@huawei.com>,
-        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>
-Subject: [PATCH v9 9/9] hisi_acc_vfio_pci: Use its own PCI reset_done error handler
-Date:   Tue, 8 Mar 2022 18:49:02 +0000
-Message-ID: <20220308184902.2242-10-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
-References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
+        Tue, 8 Mar 2022 14:34:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D114F53E0A
+        for <linux-crypto@vger.kernel.org>; Tue,  8 Mar 2022 11:33:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646767997;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bmFvlno7qSph5d/HcceOLIPkKssn1EWwfPpWF2drkf8=;
+        b=UD5qHH96lfvSSr1C6bXNDWeIpIrPW4bGiTIocBD+Dfg8Uw/ejoWznyfRdmwDaX7YuhbcJ1
+        9avAuWiFtx0NTBJTvQvlIuMQSYlm80gvVrbw3WyfEHN1Ul8Qe9EfV0Ah+lLJ4H8M1dHz3r
+        54U4oV/XxiQwwT+UIlqaztFNtNXWhtw=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-222-9Q0ursUePju4GdN2aJg9ew-1; Tue, 08 Mar 2022 14:33:16 -0500
+X-MC-Unique: 9Q0ursUePju4GdN2aJg9ew-1
+Received: by mail-il1-f200.google.com with SMTP id y18-20020a927d12000000b002c2e830dc22so13142100ilc.20
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Mar 2022 11:33:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=bmFvlno7qSph5d/HcceOLIPkKssn1EWwfPpWF2drkf8=;
+        b=jJ4gFfb//oLwpNSL/qmARjef7W5a8ba3UYJRHWLdpNTWpoKVj2N+r21uChMtRzO1UY
+         uN6bq5x2+aSZYaXoZdWENbZbzIGuXL1tAfqq3sj631AA9UEwtZthkt/WrOpboX8FGwV+
+         CTW+3oqxx0ihmuhQYSPg5oi0GA8v84Wplc8pMw9TKwbwspVOwyBXXwS9pkDnN/tZ1Mzd
+         HvHdUfv+3ti3Z9RLvgmW1X1q8XeQR4dxWBvz3+uOP87IZsUS/cnJlhOLjUot6nECGIz0
+         lbJpCdeLaFhFm1IycO/HknOoW1tHdEeHEsAPfTWicsDymDSgscmfxf2aHUKKy9at/XIW
+         TsCg==
+X-Gm-Message-State: AOAM531ktDyvYRR61BeyNzQBrWF94ZgTIjwRMbe9KSrhdrQvm2OE2pZR
+        qSFkGg4q7H7+yHsaYt8oaDZh6dtcgJIivfTkVW6d429UMMORms+vzMwMjFouwEBDYwwND0TcwAV
+        hfXojmQ2VPU+MHUvgMsdX/QSH
+X-Received: by 2002:a05:6638:3014:b0:317:9daf:c42c with SMTP id r20-20020a056638301400b003179dafc42cmr16033251jak.10.1646767995287;
+        Tue, 08 Mar 2022 11:33:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxDpYCevcieEIuPGlNXODXoatrNQxiFQEvGtMSUMx1SJ+hhy7jWFeUDPSTwNXSqLKnEDsZnrQ==
+X-Received: by 2002:a05:6638:3014:b0:317:9daf:c42c with SMTP id r20-20020a056638301400b003179dafc42cmr16033227jak.10.1646767995008;
+        Tue, 08 Mar 2022 11:33:15 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id k5-20020a5d97c5000000b006412c791f90sm10607942ios.31.2022.03.08.11.33.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 11:33:14 -0800 (PST)
+Date:   Tue, 8 Mar 2022 12:33:12 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Xu Zaibo <xuzaibo@huawei.com>
+Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220308123312.1f4ba768.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
+ <20220304205720.GE219866@nvidia.com>
+ <20220307120513.74743f17.alex.williamson@redhat.com>
+ <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
+ <20220307125239.7261c97d.alex.williamson@redhat.com>
+ <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.47.82.254]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Register private handler for pci_error_handlers.reset_done and update
-state accordingly.
+On Tue, 8 Mar 2022 08:11:11 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 57 ++++++++++++++++++-
- .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  4 +-
- 2 files changed, 57 insertions(+), 4 deletions(-)
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Tuesday, March 8, 2022 3:53 AM =20
+> > > =20
+> > > > I think we still require acks from Bjorn and Zaibo for select patch=
+es
+> > > > in this series. =20
+> > >
+> > > I checked with Ziabo. He moved projects and is no longer looking into=
+ =20
+> > crypto stuff. =20
+> > > Wangzhou and LiuLongfang now take care of this. Received acks from =20
+> > Wangzhou =20
+> > > already and I will request Longfang to provide his. Hope that's ok. =
+=20
+> >=20
+> > Maybe a good time to have them update MAINTAINERS as well.  Thanks,
+> >  =20
+>=20
+> I have one question here (similar to what we discussed for mdev before).
+>=20
+> Now we are adding vendor specific drivers under /drivers/vfio. Two drivers
+> on radar and more will come. Then what would be the criteria for=20
+> accepting such a driver? Do we prefer to a model in which the author shou=
+ld
+> provide enough background for vfio community to understand how it works=20
+> or as done here just rely on the PF driver owner to cover device specific
+> code?
+>=20
+> If the former we may need document some process for what information
+> is necessary and also need secure increased review bandwidth from key
+> reviewers in vfio community.
+>=20
+> If the latter then how can we guarantee no corner case overlooked by both
+> sides (i.e. how to know the coverage of total reviews)? Another open is w=
+ho
+> from the PF driver sub-system should be considered as the one to give the
+> green signal. If the sub-system maintainer trusts the PF driver owner and
+> just pulls commits from him then having the r-b from the PF driver owner =
+is
+> sufficient. But if the sub-system maintainer wants to review detail change
+> in every underlying driver then we probably also want to get the ack from
+> the maintainer.
+>=20
+> Overall I didn't mean to slow down the progress of this series. But above
+> does be some puzzle occurred in my review. =F0=9F=98=8A
 
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-index 51b814f4303b..767b5d47631a 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-@@ -626,6 +626,27 @@ static void hisi_acc_vf_disable_fds(struct hisi_acc_vf_core_device *hisi_acc_vde
- 	}
- }
- 
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ */
-+static void
-+hisi_acc_vf_state_mutex_unlock(struct hisi_acc_vf_core_device *hisi_acc_vdev)
-+{
-+again:
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	if (hisi_acc_vdev->deferred_reset) {
-+		hisi_acc_vdev->deferred_reset = false;
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		hisi_acc_vdev->vf_qm_state = QM_NOT_READY;
-+		hisi_acc_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+		hisi_acc_vf_disable_fds(hisi_acc_vdev);
-+		goto again;
-+	}
-+	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+}
-+
- static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-@@ -922,7 +943,7 @@ hisi_acc_vfio_pci_set_device_state(struct vfio_device *vdev,
- 			break;
- 		}
- 	}
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return res;
- }
- 
-@@ -935,10 +956,35 @@ hisi_acc_vfio_pci_get_device_state(struct vfio_device *vdev,
- 
- 	mutex_lock(&hisi_acc_vdev->state_mutex);
- 	*curr_state = hisi_acc_vdev->mig_state;
--	mutex_unlock(&hisi_acc_vdev->state_mutex);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
- 	return 0;
- }
- 
-+static void hisi_acc_vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct hisi_acc_vf_core_device *hisi_acc_vdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (hisi_acc_vdev->core_device.vdev.migration_flags !=
-+				VFIO_MIGRATION_STOP_COPY)
-+		return;
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vdev->deferred_reset = true;
-+	if (!mutex_trylock(&hisi_acc_vdev->state_mutex)) {
-+		spin_unlock(&hisi_acc_vdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&hisi_acc_vdev->reset_lock);
-+	hisi_acc_vf_state_mutex_unlock(hisi_acc_vdev);
-+}
-+
- static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
- {
- 	struct vfio_pci_core_device *vdev = &hisi_acc_vdev->core_device;
-@@ -1259,12 +1305,17 @@ static const struct pci_device_id hisi_acc_vfio_pci_table[] = {
- 
- MODULE_DEVICE_TABLE(pci, hisi_acc_vfio_pci_table);
- 
-+static const struct pci_error_handlers hisi_acc_vf_err_handlers = {
-+	.reset_done = hisi_acc_vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
- static struct pci_driver hisi_acc_vfio_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = hisi_acc_vfio_pci_table,
- 	.probe = hisi_acc_vfio_pci_probe,
- 	.remove = hisi_acc_vfio_pci_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &hisi_acc_vf_err_handlers,
- };
- 
- module_pci_driver(hisi_acc_vfio_pci_driver);
-diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-index 1c7d75408790..5494f4983bbe 100644
---- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-+++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-@@ -98,6 +98,7 @@ struct hisi_acc_vf_migration_file {
- 
- struct hisi_acc_vf_core_device {
- 	struct vfio_pci_core_device core_device;
-+	u8 deferred_reset:1;
- 	/* for migration state */
- 	struct mutex state_mutex;
- 	enum vfio_device_mig_state mig_state;
-@@ -107,7 +108,8 @@ struct hisi_acc_vf_core_device {
- 	struct hisi_qm vf_qm;
- 	u32 vf_qm_state;
- 	int vf_id;
--
-+	/* for reset handler */
-+	spinlock_t reset_lock;
- 	struct hisi_acc_vf_migration_file *resuming_migf;
- 	struct hisi_acc_vf_migration_file *saving_migf;
- };
--- 
-2.25.1
+Hi Kevin,
+
+Good questions, I'd like a better understanding of expectations as
+well.  I think the intentions are the same as any other sub-system, the
+drivers make use of shared interfaces and extensions and the role of
+the sub-system should be to make sure those interfaces are used
+correctly and extensions fit well within the overall design.  However,
+just as the network maintainer isn't expected to fully understand every
+NIC driver, I think/hope we have the same expectations here.  It's
+certainly a benefit to the community and perceived trustworthiness if
+each driver outlines its operating model and security nuances, but
+those are only ever going to be the nuances identified by the people
+who have the access and energy to evaluate the device.
+
+It's going to be up to the community to try to determine that any new
+drivers are seriously considering security and not opening any new gaps
+relative to behavior using the base vfio-pci driver.  For the driver
+examples we have, this seems a bit easier than evaluating an entire
+mdev device because they're largely providing direct access to the
+device rather than trying to multiplex a shared physical device.  We
+can therefore focus on incremental functionality, as both drivers have
+done, implementing a boilerplate vendor driver, then adding migration
+support.  I imagine this won't always be the case though and some
+drivers will re-implement much of the core to support further emulation
+and shared resources.
+
+So how do we as a community want to handle this?  I wouldn't mind, I'd
+actually welcome, some sort of review requirement for new vfio vendor
+driver variants.  Is that reasonable?  What would be the criteria?
+Approval from the PF driver owner, if different/necessary, and at least
+one unaffiliated reviewer (preferably an active vfio reviewer or
+existing vfio variant driver owner/contributor)?  Ideas welcome.
+Thanks,
+
+Alex
 
