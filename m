@@ -2,73 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA9BC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 00:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7F1C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 01:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244338AbiCHAxr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Mar 2022 19:53:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47830 "EHLO
+        id S238634AbiCHBIQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 7 Mar 2022 20:08:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344137AbiCHAxp (ORCPT
+        with ESMTP id S231221AbiCHBIP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Mar 2022 19:53:45 -0500
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87733FD1C;
-        Mon,  7 Mar 2022 16:52:50 -0800 (PST)
-Received: by mail-oo1-f43.google.com with SMTP id l24-20020a4a8558000000b00320d5a1f938so7490867ooh.8;
-        Mon, 07 Mar 2022 16:52:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Sd+Yvw7691O5dkoC55ZXaEZXMBAfmesOquSTaxPr6kY=;
-        b=XIeCRWr0oJCHzJfklxqzTR2EmtlZ3hmBrk/n0ehcxAN1+HbwYsWGopCYP46ZT9swoF
-         CTZH4Wtd6vu0DzO29h/GPJ67Fj44yV3/0OYnFVMzvigF9cr3ibo2RuwGmVfrf8SJ7tN5
-         re+U4fMQHI/DfQRT6pI+3x/3DKV/cU9hbeLnJySZ+uF6j3sCKtJHvj3cqDgCsEt+rAwJ
-         yT5ENJlWTGv9X5SKOEd8EUVfB/ZGlWR9vWJNqM/29+21bxx/UteslrV+kECRtWd0erlU
-         ltOS0X7orogtpT020xKVq8EJf6w4LBpiLL5gGsCmLCKEtgdCJHDZSRDUTxkLJAY4WKcv
-         IrHg==
-X-Gm-Message-State: AOAM530tZ/GcBndYuuKwkHdqLVbJekdNKMk7KgoRgtdB59hDzRQdnYSF
-        uLfObbs1msHeP4lreVmf9A==
-X-Google-Smtp-Source: ABdhPJyrPMIEYs2Re1cHCaK70TNE5OWYk3dnU6R6oQyemNgrc5HfUeAElgm60shCfY0mfNEIckSurQ==
-X-Received: by 2002:a05:6870:8310:b0:d3:8767:a832 with SMTP id p16-20020a056870831000b000d38767a832mr941761oae.113.1646700769882;
-        Mon, 07 Mar 2022 16:52:49 -0800 (PST)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id c17-20020a056830001100b005b236450790sm2086502otp.77.2022.03.07.16.52.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 16:52:49 -0800 (PST)
-Received: (nullmailer pid 3598816 invoked by uid 1000);
-        Tue, 08 Mar 2022 00:52:47 -0000
-Date:   Mon, 7 Mar 2022 18:52:47 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     john@metanate.com, linux-crypto@vger.kernel.org, heiko@sntech.de,
-        devicetree@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        robh+dt@kernel.org, herbert@gondor.apana.org.au
-Subject: Re: [PATCH v2 17/18] dt-bindings: crypto: convert rockchip-crypto to
- yaml
-Message-ID: <Yiao36rJVmPw/yGL@robh.at.kernel.org>
-References: <20220302211113.4003816-1-clabbe@baylibre.com>
- <20220302211113.4003816-18-clabbe@baylibre.com>
+        Mon, 7 Mar 2022 20:08:15 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E52E331202;
+        Mon,  7 Mar 2022 17:07:18 -0800 (PST)
+Received: from kwepemi100018.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KCHFb25nSzdfwr;
+        Tue,  8 Mar 2022 09:05:55 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi100018.china.huawei.com (7.221.188.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 09:07:16 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 09:07:16 +0800
+Subject: Re: [PATCH v8 1/9] crypto: hisilicon/qm: Move the QM header to
+ include/linux
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <42d94745-c664-bd7c-7bc5-d20359669765@huawei.com>
+Date:   Tue, 8 Mar 2022 09:07:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220302211113.4003816-18-clabbe@baylibre.com>
+In-Reply-To: <20220303230131.2103-2-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 02 Mar 2022 21:11:12 +0000, Corentin Labbe wrote:
-> convert rockchip-crypto to yaml
+On 2022/3/4 7:01, Shameer Kolothum Wrote:
+> Since we are going to introduce VFIO PCI HiSilicon ACC driver for live
+> migration in subsequent patches, move the ACC QM header file to a
+> common include dir.
 > 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  .../crypto/rockchip,rk3288-crypto.yaml        | 64 +++++++++++++++++++
->  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
->  2 files changed, 64 insertions(+), 28 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+>  drivers/crypto/hisilicon/hpre/hpre.h                         | 2 +-
+>  drivers/crypto/hisilicon/qm.c                                | 2 +-
+>  drivers/crypto/hisilicon/sec2/sec.h                          | 2 +-
+>  drivers/crypto/hisilicon/sgl.c                               | 2 +-
+>  drivers/crypto/hisilicon/zip/zip.h                           | 2 +-
+>  drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h | 0
+>  6 files changed, 5 insertions(+), 5 deletions(-)
+>  rename drivers/crypto/hisilicon/qm.h => include/linux/hisi_acc_qm.h (100%)
 > 
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+> index e0b4a1982ee9..9a0558ed82f9 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre.h
+> +++ b/drivers/crypto/hisilicon/hpre/hpre.h
+> @@ -4,7 +4,7 @@
+>  #define __HISI_HPRE_H
+>  
+>  #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  #define HPRE_SQE_SIZE			sizeof(struct hpre_sqe)
+>  #define HPRE_PF_DEF_Q_NUM		64
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index c5b84a5ea350..ed23e1d3fa27 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -15,7 +15,7 @@
+>  #include <linux/uacce.h>
+>  #include <linux/uaccess.h>
+>  #include <uapi/misc/uacce/hisi_qm.h>
+> -#include "qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  /* eq/aeq irq enable */
+>  #define QM_VF_AEQ_INT_SOURCE		0x0
+> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> index d97cf02b1df7..c2e9b01187a7 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> @@ -4,7 +4,7 @@
+>  #ifndef __HISI_SEC_V2_H
+>  #define __HISI_SEC_V2_H
+>  
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  #include "sec_crypto.h"
+>  
+>  /* Algorithm resource per hardware SEC queue */
+> diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+> index 057273769f26..f7efc02b065f 100644
+> --- a/drivers/crypto/hisilicon/sgl.c
+> +++ b/drivers/crypto/hisilicon/sgl.c
+> @@ -1,9 +1,9 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (c) 2019 HiSilicon Limited. */
+>  #include <linux/dma-mapping.h>
+> +#include <linux/hisi_acc_qm.h>
+>  #include <linux/module.h>
+>  #include <linux/slab.h>
+> -#include "qm.h"
+>  
+>  #define HISI_ACC_SGL_SGE_NR_MIN		1
+>  #define HISI_ACC_SGL_NR_MAX		256
+> diff --git a/drivers/crypto/hisilicon/zip/zip.h b/drivers/crypto/hisilicon/zip/zip.h
+> index 517fdbdff3ea..3dfd3bac5a33 100644
+> --- a/drivers/crypto/hisilicon/zip/zip.h
+> +++ b/drivers/crypto/hisilicon/zip/zip.h
+> @@ -7,7 +7,7 @@
+>  #define pr_fmt(fmt)	"hisi_zip: " fmt
+>  
+>  #include <linux/list.h>
+> -#include "../qm.h"
+> +#include <linux/hisi_acc_qm.h>
+>  
+>  enum hisi_zip_error_type {
+>  	/* negative compression */
+> diff --git a/drivers/crypto/hisilicon/qm.h b/include/linux/hisi_acc_qm.h
+> similarity index 100%
+> rename from drivers/crypto/hisilicon/qm.h
+> rename to include/linux/hisi_acc_qm.h
+> 
+Acked-by: Longfang Liu <liulongfang@huawei.com>
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Thanks,
+Longfang
