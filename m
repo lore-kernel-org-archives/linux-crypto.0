@@ -2,179 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67210C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 19:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F673C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 20:22:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349949AbiCHTeR (ORCPT
+        id S1350201AbiCHUW5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 14:34:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
+        Tue, 8 Mar 2022 15:22:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349618AbiCHTeQ (ORCPT
+        with ESMTP id S1350244AbiCHUWy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 14:34:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D114F53E0A
-        for <linux-crypto@vger.kernel.org>; Tue,  8 Mar 2022 11:33:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646767997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bmFvlno7qSph5d/HcceOLIPkKssn1EWwfPpWF2drkf8=;
-        b=UD5qHH96lfvSSr1C6bXNDWeIpIrPW4bGiTIocBD+Dfg8Uw/ejoWznyfRdmwDaX7YuhbcJ1
-        9avAuWiFtx0NTBJTvQvlIuMQSYlm80gvVrbw3WyfEHN1Ul8Qe9EfV0Ah+lLJ4H8M1dHz3r
-        54U4oV/XxiQwwT+UIlqaztFNtNXWhtw=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-222-9Q0ursUePju4GdN2aJg9ew-1; Tue, 08 Mar 2022 14:33:16 -0500
-X-MC-Unique: 9Q0ursUePju4GdN2aJg9ew-1
-Received: by mail-il1-f200.google.com with SMTP id y18-20020a927d12000000b002c2e830dc22so13142100ilc.20
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Mar 2022 11:33:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=bmFvlno7qSph5d/HcceOLIPkKssn1EWwfPpWF2drkf8=;
-        b=jJ4gFfb//oLwpNSL/qmARjef7W5a8ba3UYJRHWLdpNTWpoKVj2N+r21uChMtRzO1UY
-         uN6bq5x2+aSZYaXoZdWENbZbzIGuXL1tAfqq3sj631AA9UEwtZthkt/WrOpboX8FGwV+
-         CTW+3oqxx0ihmuhQYSPg5oi0GA8v84Wplc8pMw9TKwbwspVOwyBXXwS9pkDnN/tZ1Mzd
-         HvHdUfv+3ti3Z9RLvgmW1X1q8XeQR4dxWBvz3+uOP87IZsUS/cnJlhOLjUot6nECGIz0
-         lbJpCdeLaFhFm1IycO/HknOoW1tHdEeHEsAPfTWicsDymDSgscmfxf2aHUKKy9at/XIW
-         TsCg==
-X-Gm-Message-State: AOAM531ktDyvYRR61BeyNzQBrWF94ZgTIjwRMbe9KSrhdrQvm2OE2pZR
-        qSFkGg4q7H7+yHsaYt8oaDZh6dtcgJIivfTkVW6d429UMMORms+vzMwMjFouwEBDYwwND0TcwAV
-        hfXojmQ2VPU+MHUvgMsdX/QSH
-X-Received: by 2002:a05:6638:3014:b0:317:9daf:c42c with SMTP id r20-20020a056638301400b003179dafc42cmr16033251jak.10.1646767995287;
-        Tue, 08 Mar 2022 11:33:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxDpYCevcieEIuPGlNXODXoatrNQxiFQEvGtMSUMx1SJ+hhy7jWFeUDPSTwNXSqLKnEDsZnrQ==
-X-Received: by 2002:a05:6638:3014:b0:317:9daf:c42c with SMTP id r20-20020a056638301400b003179dafc42cmr16033227jak.10.1646767995008;
-        Tue, 08 Mar 2022 11:33:15 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id k5-20020a5d97c5000000b006412c791f90sm10607942ios.31.2022.03.08.11.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 11:33:14 -0800 (PST)
-Date:   Tue, 8 Mar 2022 12:33:12 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Xu Zaibo <xuzaibo@huawei.com>
-Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220308123312.1f4ba768.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
- <20220304205720.GE219866@nvidia.com>
- <20220307120513.74743f17.alex.williamson@redhat.com>
- <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
- <20220307125239.7261c97d.alex.williamson@redhat.com>
- <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+        Tue, 8 Mar 2022 15:22:54 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98D3254692;
+        Tue,  8 Mar 2022 12:21:57 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 228HJJx1003039;
+        Tue, 8 Mar 2022 20:21:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=aUmpq3/gedphZ0HCbq8IcpU6KYbu4FDfoTHZmJKY8zM=;
+ b=Xe6eyj7QrWGgC0kTioz4yjCw3Gb92o2whnCljwc4aVrS/JyOS5KbLYeZDkNhdzQUhObw
+ ZlGm519azKOV7mxXcSs94tHvrT7IHY737MDfRBkx8U74HxVsgkLVQtRVK0wIRpQJTvIQ
+ 8QcSk9TyXyn3sPA3NsRLZJ2VETbgewklATab58NYyrvzIhKfygC1SeVHd1QCCT4sHbv+
+ OrYoPMDjsgdCrn1PqcQs1TwM79BmAs46q9kLYlHh0sJ7ztQoDshuy8CJFxPgVq7Ujz7u
+ DHauMr3GGz4WR/0H3VDIX7Q0bj9ZHWt93RKziK5vzrTWFxRZpxD1gMvmKwNnaWO8Qqsk KQ== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3env4uee4x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 20:21:47 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 228JaXAL012109;
+        Tue, 8 Mar 2022 20:21:45 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 3ekyg977wn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 08 Mar 2022 20:21:45 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 228KLhI251577294
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Mar 2022 20:21:43 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 008B1AE051;
+        Tue,  8 Mar 2022 20:21:43 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9EF0AAE04D;
+        Tue,  8 Mar 2022 20:21:42 +0000 (GMT)
+Received: from localhost (unknown [9.171.69.133])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue,  8 Mar 2022 20:21:42 +0000 (GMT)
+Date:   Tue, 8 Mar 2022 21:21:41 +0100
+From:   Vasily Gorbik <gor@linux.ibm.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
+Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
+Message-ID: <your-ad-here.call-01646770901-ext-3299@work.hours>
+References: <20220303201312.3255347-1-kbusch@kernel.org>
+ <20220303201312.3255347-7-kbusch@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220303201312.3255347-7-kbusch@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FrdWzzvmbea_LPGEzKr2854rpZdc0D5Q
+X-Proofpoint-ORIG-GUID: FrdWzzvmbea_LPGEzKr2854rpZdc0D5Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
+ definitions=2022-03-08_08,2022-03-04_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 suspectscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ phishscore=0 spamscore=0 mlxlogscore=822 malwarescore=0 impostorscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203080104
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 8 Mar 2022 08:11:11 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Thu, Mar 03, 2022 at 12:13:10PM -0800, Keith Busch wrote:
+> Hardware specific features may be able to calculate a crc64, so provide
+> a framework for drivers to register their implementation. If nothing is
+> registered, fallback to the generic table lookup implementation. The
+> implementation is modeled after the crct10dif equivalent.
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Tuesday, March 8, 2022 3:53 AM =20
-> > > =20
-> > > > I think we still require acks from Bjorn and Zaibo for select patch=
-es
-> > > > in this series. =20
-> > >
-> > > I checked with Ziabo. He moved projects and is no longer looking into=
- =20
-> > crypto stuff. =20
-> > > Wangzhou and LiuLongfang now take care of this. Received acks from =20
-> > Wangzhou =20
-> > > already and I will request Longfang to provide his. Hope that's ok. =
-=20
-> >=20
-> > Maybe a good time to have them update MAINTAINERS as well.  Thanks,
-> >  =20
->=20
-> I have one question here (similar to what we discussed for mdev before).
->=20
-> Now we are adding vendor specific drivers under /drivers/vfio. Two drivers
-> on radar and more will come. Then what would be the criteria for=20
-> accepting such a driver? Do we prefer to a model in which the author shou=
-ld
-> provide enough background for vfio community to understand how it works=20
-> or as done here just rely on the PF driver owner to cover device specific
-> code?
->=20
-> If the former we may need document some process for what information
-> is necessary and also need secure increased review bandwidth from key
-> reviewers in vfio community.
->=20
-> If the latter then how can we guarantee no corner case overlooked by both
-> sides (i.e. how to know the coverage of total reviews)? Another open is w=
-ho
-> from the PF driver sub-system should be considered as the one to give the
-> green signal. If the sub-system maintainer trusts the PF driver owner and
-> just pulls commits from him then having the r-b from the PF driver owner =
-is
-> sufficient. But if the sub-system maintainer wants to review detail change
-> in every underlying driver then we probably also want to get the ack from
-> the maintainer.
->=20
-> Overall I didn't mean to slow down the progress of this series. But above
-> does be some puzzle occurred in my review. =F0=9F=98=8A
+Hi Keith,
 
-Hi Kevin,
+this is failing on big-endian systems. I get the following on s390:
 
-Good questions, I'd like a better understanding of expectations as
-well.  I think the intentions are the same as any other sub-system, the
-drivers make use of shared interfaces and extensions and the role of
-the sub-system should be to make sure those interfaces are used
-correctly and extensions fit well within the overall design.  However,
-just as the network maintainer isn't expected to fully understand every
-NIC driver, I think/hope we have the same expectations here.  It's
-certainly a benefit to the community and perceived trustworthiness if
-each driver outlines its operating model and security nuances, but
-those are only ever going to be the nuances identified by the people
-who have the access and energy to evaluate the device.
-
-It's going to be up to the community to try to determine that any new
-drivers are seriously considering security and not opening any new gaps
-relative to behavior using the base vfio-pci driver.  For the driver
-examples we have, this seems a bit easier than evaluating an entire
-mdev device because they're largely providing direct access to the
-device rather than trying to multiplex a shared physical device.  We
-can therefore focus on incremental functionality, as both drivers have
-done, implementing a boilerplate vendor driver, then adding migration
-support.  I imagine this won't always be the case though and some
-drivers will re-implement much of the core to support further emulation
-and shared resources.
-
-So how do we as a community want to handle this?  I wouldn't mind, I'd
-actually welcome, some sort of review requirement for new vfio vendor
-driver variants.  Is that reasonable?  What would be the criteria?
-Approval from the PF driver owner, if different/necessary, and at least
-one unaffiliated reviewer (preferably an active vfio reviewer or
-existing vfio variant driver owner/contributor)?  Ideas welcome.
-Thanks,
-
-Alex
-
+[    0.551573] crc32: CRC_LE_BITS = 64, CRC_BE BITS = 64
+[    0.551575] crc32: self tests passed, processed 225944 bytes in 118879 nsec
+[    0.551697] crc32c: CRC_LE_BITS = 64
+[    0.551698] crc32c: self tests passed, processed 112972 bytes in 58963 nsec
+[    0.577325] crc32_combine: 8373 self tests passed
+[    0.603321] crc32c_combine: 8373 self tests passed
+[    0.603502] alg: shash: crc64-rocksoft-generic test failed (wrong result) on test vector 0, cfg="init+update+final aligned buffer"
+[    0.603506] ------------[ cut here ]------------
+[    0.603507] alg: self-tests for crc64-rocksoft-generic (crc64-rocksoft) failed (rc=-22)
+[    0.603542] WARNING: CPU: 0 PID: 43 at crypto/testmgr.c:5726 alg_test+0x3c2/0x638
+[    0.603554] Modules linked in:
+[    0.603557] CPU: 0 PID: 43 Comm: cryptomgr_test Not tainted 5.17.0-rc7-next-20220308-118584-gcb153b68ff91 #168
+[    0.603560] Hardware name: IBM 8561 T01 701 (KVM/Linux)
+[    0.603562] Krnl PSW : 0704e00180000000 00000000007d2286 (alg_test+0x3c6/0x638)
+[    0.603565]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+[    0.603568] Krnl GPRS: 00000000ffffffea 000000000177c350 000000000000004b 00000000ffffefff
+[    0.603570]            0000000001663ed0 0000038000000001 0000000001ed1720 0000000081a4e480
+[    0.603572]            0000000081a4e400 000003800000003e ffffffffffffffea 000000000000003e
+[    0.603611]            0000000081a5a100 000000000000003e 00000000007d2282 00000380001b7cf0
+[    0.603618] Krnl Code: 00000000007d2276: c02000495b9e        larl    %r2,00000000010fd9b2
+[    0.603618]            00000000007d227c: c0e50026dbc6        brasl   %r14,0000000000cada08
+[    0.603618]           #00000000007d2282: af000000            mc      0,0
+[    0.603618]           >00000000007d2286: b904002a            lgr     %r2,%r10
+[    0.603618]            00000000007d228a: eb6ff1380004        lmg     %r6,%r15,312(%r15)
+[    0.603618]            00000000007d2290: 07fe                bcr     15,%r14
+[    0.603618]            00000000007d2292: 47000700            bc      0,1792
+[    0.603618]            00000000007d2296: 1842                lr      %r4,%r2
+[    0.603632] Call Trace:
+[    0.603634]  [<00000000007d2286>] alg_test+0x3c6/0x638
+[    0.603636] ([<00000000007d2282>] alg_test+0x3c2/0x638)
+[    0.603638]  [<00000000007cfff8>] cryptomgr_test+0x68/0x70
+[    0.603641]  [<000000000017b228>] kthread+0x108/0x110
+[    0.603646]  [<0000000000103374>] __ret_from_fork+0x3c/0x58
+[    0.603650]  [<0000000000ccc3ba>] ret_from_fork+0xa/0x40
+[    0.603658] Last Breaking-Event-Address:
+[    0.603659]  [<0000000000cada68>] __warn_printk+0x60/0x68
+[    0.603663] ---[ end trace 0000000000000000 ]---
