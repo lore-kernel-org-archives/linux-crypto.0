@@ -2,307 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA0BC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 11:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5549C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 12:02:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245346AbiCHLz3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 06:55:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55630 "EHLO
+        id S1346594AbiCHMDd (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Mar 2022 07:03:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235676AbiCHLz3 (ORCPT
+        with ESMTP id S233849AbiCHMDc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 06:55:29 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB8F2DD5F;
-        Tue,  8 Mar 2022 03:54:32 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 02D12616B4;
-        Tue,  8 Mar 2022 11:54:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E320C340EE;
-        Tue,  8 Mar 2022 11:54:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646740471;
-        bh=mK13UO2icdJkbKzDbJRR7VE/cOk6rGlpu6tEY0bGCuI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Re5QDj7KRYzTymY4POCxVl1W2LAH0TjcmZxoB7Lcljws/4CY5LeietEgW+tc6LQ+S
-         iEDz677lvA1j7kmfIoqfKmPa6Hury9ctUNCbbdkWgNYiR8vMexjRRBCKxXMwAvIrMd
-         r4nrMUUZWzdOlzGP56ssPqA4ZqGCiEiOFibWz8STmwMRuF/FCDiFMaFnB6V2aZjFfY
-         vZHLYQJ7a2GAk2LM0Q8tGJ63WFN4b9hLuLGFe9aXqKjJcMtxNvFapkaomSWGx75JhS
-         hk2bDSCmqbjAsjtsygHOFwRdfHqTi8Kwoz6hQHGpEum45KLH7qoxv7a66TY5iCYe40
-         X7BOwDpy4dnNw==
-Date:   Tue, 8 Mar 2022 13:53:50 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v8 5/5] certs: Allow root user to append signed hashes to
- the blacklist keyring
-Message-ID: <YidDznCPSmFmfNwE@iki.fi>
-References: <20210712170313.884724-1-mic@digikod.net>
- <20210712170313.884724-6-mic@digikod.net>
+        Tue, 8 Mar 2022 07:03:32 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6DC8AE69;
+        Tue,  8 Mar 2022 04:02:34 -0800 (PST)
+Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KCYjh6Clnz1GCDT;
+        Tue,  8 Mar 2022 19:57:44 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 20:02:32 +0800
+Received: from [10.67.102.118] (10.67.102.118) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 8 Mar 2022 20:02:31 +0800
+Subject: Re: [PATCH v8 6/9] hisi_acc_vfio_pci: Add helper to retrieve the
+ struct pci_driver
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>
+CC:     <linux-pci@vger.kernel.org>, <alex.williamson@redhat.com>,
+        <jgg@nvidia.com>, <cohuck@redhat.com>, <mgurtovoy@nvidia.com>,
+        <yishaih@nvidia.com>, <linuxarm@huawei.com>,
+        <prime.zeng@hisilicon.com>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+From:   liulongfang <liulongfang@huawei.com>
+Message-ID: <553bf6f3-b473-d72c-f120-230d02f9a74a@huawei.com>
+Date:   Tue, 8 Mar 2022 20:02:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210712170313.884724-6-mic@digikod.net>
+In-Reply-To: <20220303230131.2103-7-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.118]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 12, 2021 at 07:03:13PM +0200, Mickaël Salaün wrote:
-> From: Mickaël Salaün <mic@linux.microsoft.com>
+On 2022/3/4 7:01, Shameer Kolothum wrote:
+> struct pci_driver pointer is an input into the pci_iov_get_pf_drvdata().
+> Introduce helpers to retrieve the ACC PF dev struct pci_driver pointers
+> as we use this in ACC vfio migration driver.
 > 
-> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
-> to dynamically add new keys to the blacklist keyring.  This enables to
-> invalidate new certificates, either from being loaded in a keyring, or
-> from being trusted in a PKCS#7 certificate chain.  This also enables to
-> add new file hashes to be denied by the integrity infrastructure.
-> 
-> Being able to untrust a certificate which could have normaly been
-> trusted is a sensitive operation.  This is why adding new hashes to the
-> blacklist keyring is only allowed when these hashes are signed and
-> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
-> key description.  The PKCS#7 signature of this description must be
-> provided as the key payload.
-> 
-> Marking a certificate as untrusted should be enforced while the system
-> is running.  It is then forbiden to remove such blacklist keys.
-> 
-> Update blacklist keyring, blacklist key and revoked certificate access rights:
-> * allows the root user to search for a specific blacklisted hash, which
->   make sense because the descriptions are already viewable;
-> * forbids key update (blacklist and asymmetric ones);
-> * restricts kernel rights on the blacklist keyring to align with the
->   root user rights.
-> 
-> See help in tools/certs/print-cert-tbs-hash.sh .
-> 
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: David Woodhouse <dwmw2@infradead.org>
-> Cc: Eric Snowberg <eric.snowberg@oracle.com>
-> Cc: Jarkko Sakkinen <jarkko@kernel.org>
-> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
-> Link: https://lore.kernel.org/r/20210712170313.884724-6-mic@digikod.net
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 6 ++++++
+>  drivers/crypto/hisilicon/sec2/sec_main.c  | 6 ++++++
+>  drivers/crypto/hisilicon/zip/zip_main.c   | 6 ++++++
+>  include/linux/hisi_acc_qm.h               | 5 +++++
+>  4 files changed, 23 insertions(+)
 > 
-> Changes since v6:
-> * Rebase on keys-cve-2020-26541-v3: commit ebd9c2ae369a ("integrity:
->   Load mokx variables into the blacklist keyring").
-> 
-> Changes since v5:
-> * Rebase on keys-next, fix Kconfig conflict, and update the asymmetric
->   key rights added to the blacklist keyring by the new
->   add_key_to_revocation_list(): align with blacklist key rights by
->   removing KEY_POS_WRITE as a safeguard, and add
->   KEY_ALLOC_BYPASS_RESTRICTION to not be subject to
->   restrict_link_for_blacklist() that only allows blacklist key types to
->   be added to the keyring.
-> * Change the return code for restrict_link_for_blacklist() from -EPERM
->   to -EOPNOTSUPP to align with asymmetric key keyrings.
-> 
-> Changes since v3:
-> * Update commit message for print-cert-tbs-hash.sh .
-> 
-> Changes since v2:
-> * Add comment for blacklist_key_instantiate().
-> ---
->  certs/Kconfig     | 10 +++++
->  certs/blacklist.c | 96 ++++++++++++++++++++++++++++++++++++-----------
->  2 files changed, 85 insertions(+), 21 deletions(-)
-> 
-> diff --git a/certs/Kconfig b/certs/Kconfig
-> index 0fbe184ceca5..e0e524b7eff9 100644
-> --- a/certs/Kconfig
-> +++ b/certs/Kconfig
-> @@ -103,4 +103,14 @@ config SYSTEM_REVOCATION_KEYS
->  	  containing X.509 certificates to be included in the default blacklist
->  	  keyring.
->  
-> +config SYSTEM_BLACKLIST_AUTH_UPDATE
-> +	bool "Allow root to add signed blacklist keys"
-> +	depends on SYSTEM_BLACKLIST_KEYRING
-> +	depends on SYSTEM_DATA_VERIFICATION
-> +	help
-> +	  If set, provide the ability to load new blacklist keys at run time if
-> +	  they are signed and vouched by a certificate from the builtin trusted
-> +	  keyring.  The PKCS#7 signature of the description is set in the key
-> +	  payload.  Blacklist keys cannot be removed.
-> +
->  endmenu
-> diff --git a/certs/blacklist.c b/certs/blacklist.c
-> index b254c87ceb3a..486ce0dd8e9c 100644
-> --- a/certs/blacklist.c
-> +++ b/certs/blacklist.c
-> @@ -15,6 +15,7 @@
->  #include <linux/err.h>
->  #include <linux/seq_file.h>
->  #include <linux/uidgid.h>
-> +#include <linux/verification.h>
->  #include <keys/system_keyring.h>
->  #include "blacklist.h"
->  #include "common.h"
-> @@ -26,6 +27,9 @@
->   */
->  #define MAX_HASH_LEN	128
->  
-> +#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIEW | \
-> +			    KEY_USR_SEARCH | KEY_USR_VIEW)
-> +
->  static const char tbs_prefix[] = "tbs";
->  static const char bin_prefix[] = "bin";
->  
-> @@ -80,19 +84,51 @@ static int blacklist_vet_description(const char *desc)
->  	return 0;
->  }
->  
-> -/*
-> - * The hash to be blacklisted is expected to be in the description.  There will
-> - * be no payload.
-> - */
-> -static int blacklist_preparse(struct key_preparsed_payload *prep)
-> +static int blacklist_key_instantiate(struct key *key,
-> +		struct key_preparsed_payload *prep)
->  {
-> -	if (prep->datalen > 0)
-> -		return -EINVAL;
-> -	return 0;
-> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
-> +	int err;
-> +#endif
-> +
-> +	/* Sets safe default permissions for keys loaded by user space. */
-> +	key->perm = BLACKLIST_KEY_PERM;
-> +
-> +	/*
-> +	 * Skips the authentication step for builtin hashes, they are not
-> +	 * signed but still trusted.
-> +	 */
-> +	if (key->flags & (1 << KEY_FLAG_BUILTIN))
-> +		goto out;
-> +
-> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
-> +	/*
-> +	 * Verifies the description's PKCS#7 signature against the builtin
-> +	 * trusted keyring.
-> +	 */
-> +	err = verify_pkcs7_signature(key->description,
-> +			strlen(key->description), prep->data, prep->datalen,
-> +			NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
-> +	if (err)
-> +		return err;
-> +#else
-> +	/*
-> +	 * It should not be possible to come here because the keyring doesn't
-> +	 * have KEY_USR_WRITE and the only other way to call this function is
-> +	 * for builtin hashes.
-> +	 */
-> +	WARN_ON_ONCE(1);
-> +	return -EPERM;
-> +#endif
-> +
-> +out:
-> +	return generic_key_instantiate(key, prep);
->  }
->  
-> -static void blacklist_free_preparse(struct key_preparsed_payload *prep)
-> +static int blacklist_key_update(struct key *key,
-> +		struct key_preparsed_payload *prep)
->  {
-> +	return -EPERM;
->  }
->  
->  static void blacklist_describe(const struct key *key, struct seq_file *m)
-> @@ -103,9 +139,8 @@ static void blacklist_describe(const struct key *key, struct seq_file *m)
->  static struct key_type key_type_blacklist = {
->  	.name			= "blacklist",
->  	.vet_description	= blacklist_vet_description,
-> -	.preparse		= blacklist_preparse,
-> -	.free_preparse		= blacklist_free_preparse,
-> -	.instantiate		= generic_key_instantiate,
-> +	.instantiate		= blacklist_key_instantiate,
-> +	.update			= blacklist_key_update,
->  	.describe		= blacklist_describe,
+Acked-by: Longfang Liu <liulongfang@huawei.com>
+
+Thanks,
+Longfang.
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index 3589d8879b5e..36ab30e9e654 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -1190,6 +1190,12 @@ static struct pci_driver hpre_pci_driver = {
+>  	.driver.pm		= &hpre_pm_ops,
 >  };
 >  
-> @@ -154,8 +189,7 @@ static int mark_raw_hash_blacklisted(const char *hash)
->  				   hash,
->  				   NULL,
->  				   0,
-> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
-> -				    KEY_USR_VIEW),
-> +				   BLACKLIST_KEY_PERM,
->  				   KEY_ALLOC_NOT_IN_QUOTA |
->  				   KEY_ALLOC_BUILT_IN);
->  	if (IS_ERR(key)) {
-> @@ -232,8 +266,10 @@ int add_key_to_revocation_list(const char *data, size_t size)
->  				   NULL,
->  				   data,
->  				   size,
-> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
-> -				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
-> +				   KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
-> +				   | KEY_USR_VIEW,
-> +				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
-> +				   | KEY_ALLOC_BYPASS_RESTRICTION);
->  
->  	if (IS_ERR(key)) {
->  		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
-> @@ -260,25 +296,43 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
->  }
->  #endif
->  
-> +static int restrict_link_for_blacklist(struct key *dest_keyring,
-> +		const struct key_type *type, const union key_payload *payload,
-> +		struct key *restrict_key)
+> +struct pci_driver *hisi_hpre_get_pf_driver(void)
 > +{
-> +	if (type == &key_type_blacklist)
-> +		return 0;
-> +	return -EOPNOTSUPP;
+> +	return &hpre_pci_driver;
 > +}
+> +EXPORT_SYMBOL_GPL(hisi_hpre_get_pf_driver);
 > +
->  /*
->   * Initialise the blacklist
->   */
->  static int __init blacklist_init(void)
+>  static void hpre_register_debugfs(void)
 >  {
->  	const char *const *bl;
-> +	struct key_restriction *restriction;
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 311a8747b5bf..421a405ca337 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -1088,6 +1088,12 @@ static struct pci_driver sec_pci_driver = {
+>  	.driver.pm = &sec_pm_ops,
+>  };
 >  
->  	if (register_key_type(&key_type_blacklist) < 0)
->  		panic("Can't allocate system blacklist key type\n");
+> +struct pci_driver *hisi_sec_get_pf_driver(void)
+> +{
+> +	return &sec_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_sec_get_pf_driver);
+> +
+>  static void sec_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+> index 66decfe07282..4534e1e107d1 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_main.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
+> @@ -1012,6 +1012,12 @@ static struct pci_driver hisi_zip_pci_driver = {
+>  	.driver.pm		= &hisi_zip_pm_ops,
+>  };
 >  
-> +	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
-> +	if (!restriction)
-> +		panic("Can't allocate blacklist keyring restriction\n");
-
-
-This prevents me from taking this to my pull request. In moderns standards,
-no new BUG_ON(), panic() etc. should never added to the kernel.
-
-I missed this in my review.
-
-This should rather be e.g.
-
-        restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
-	if (!restriction) {
-		pr_err("Can't allocate blacklist keyring restriction\n");
-                return 0;
-        }
-
-Unfortunately I need to drop this patch set, because adding new panic()
-is simply a no-go.
-
-BR, Jarkko
+> +struct pci_driver *hisi_zip_get_pf_driver(void)
+> +{
+> +	return &hisi_zip_pci_driver;
+> +}
+> +EXPORT_SYMBOL_GPL(hisi_zip_get_pf_driver);
+> +
+>  static void hisi_zip_register_debugfs(void)
+>  {
+>  	if (!debugfs_initialized())
+> diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
+> index 6a6477c34666..00f2a4db8723 100644
+> --- a/include/linux/hisi_acc_qm.h
+> +++ b/include/linux/hisi_acc_qm.h
+> @@ -476,4 +476,9 @@ void hisi_qm_pm_init(struct hisi_qm *qm);
+>  int hisi_qm_get_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_put_dfx_access(struct hisi_qm *qm);
+>  void hisi_qm_regs_dump(struct seq_file *s, struct debugfs_regset32 *regset);
+> +
+> +/* Used by VFIO ACC live migration driver */
+> +struct pci_driver *hisi_sec_get_pf_driver(void);
+> +struct pci_driver *hisi_hpre_get_pf_driver(void);
+> +struct pci_driver *hisi_zip_get_pf_driver(void);
+>  #endif
+> 
