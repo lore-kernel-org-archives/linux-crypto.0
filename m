@@ -2,166 +2,307 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930CCC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 11:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CA0BC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 11:54:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346092AbiCHLDS convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 06:03:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55568 "EHLO
+        id S245346AbiCHLz3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Mar 2022 06:55:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346137AbiCHLDG (ORCPT
+        with ESMTP id S235676AbiCHLz3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 06:03:06 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D29443AED;
-        Tue,  8 Mar 2022 03:02:08 -0800 (PST)
-Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KCXRw6Gsmz67bj2;
-        Tue,  8 Mar 2022 19:00:44 +0800 (CST)
-Received: from lhreml719-chm.china.huawei.com (10.201.108.70) by
- fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.21; Tue, 8 Mar 2022 12:02:06 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml719-chm.china.huawei.com (10.201.108.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 11:02:05 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Tue, 8 Mar 2022 11:02:05 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
- migration region
-Thread-Topic: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
- migration region
-Thread-Index: AQHYL1LES66RK6Gs/kmsjFJ+eUfqqKy1C2eAgAAh4CCAAB0qAIAADCAA
-Date:   Tue, 8 Mar 2022 11:02:05 +0000
-Message-ID: <1695cf776d7744bdb984e9f8f61d63b1@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
- <20220303230131.2103-6-shameerali.kolothum.thodi@huawei.com>
- <BN9PR11MB527681F9F6B0906596A77A178C099@BN9PR11MB5276.namprd11.prod.outlook.com>
- <21c1ddd171df45bdb62220cf997e58e6@huawei.com>
- <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-In-Reply-To: <BN9PR11MB527673BB7DCF28B782927E658C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.27.151]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Tue, 8 Mar 2022 06:55:29 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB8F2DD5F;
+        Tue,  8 Mar 2022 03:54:32 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 02D12616B4;
+        Tue,  8 Mar 2022 11:54:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E320C340EE;
+        Tue,  8 Mar 2022 11:54:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646740471;
+        bh=mK13UO2icdJkbKzDbJRR7VE/cOk6rGlpu6tEY0bGCuI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Re5QDj7KRYzTymY4POCxVl1W2LAH0TjcmZxoB7Lcljws/4CY5LeietEgW+tc6LQ+S
+         iEDz677lvA1j7kmfIoqfKmPa6Hury9ctUNCbbdkWgNYiR8vMexjRRBCKxXMwAvIrMd
+         r4nrMUUZWzdOlzGP56ssPqA4ZqGCiEiOFibWz8STmwMRuF/FCDiFMaFnB6V2aZjFfY
+         vZHLYQJ7a2GAk2LM0Q8tGJ63WFN4b9hLuLGFe9aXqKjJcMtxNvFapkaomSWGx75JhS
+         hk2bDSCmqbjAsjtsygHOFwRdfHqTi8Kwoz6hQHGpEum45KLH7qoxv7a66TY5iCYe40
+         X7BOwDpy4dnNw==
+Date:   Tue, 8 Mar 2022 13:53:50 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v8 5/5] certs: Allow root user to append signed hashes to
+ the blacklist keyring
+Message-ID: <YidDznCPSmFmfNwE@iki.fi>
+References: <20210712170313.884724-1-mic@digikod.net>
+ <20210712170313.884724-6-mic@digikod.net>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210712170313.884724-6-mic@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Tian, Kevin [mailto:kevin.tian@intel.com]
-> Sent: 08 March 2022 10:09
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org
-> Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.com;
-> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
-> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
-> <prime.zeng@hisilicon.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
-> Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev BAR2
-> migration region
+On Mon, Jul 12, 2021 at 07:03:13PM +0200, Mickaël Salaün wrote:
+> From: Mickaël Salaün <mic@linux.microsoft.com>
 > 
-> > From: Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com>
-> > Sent: Tuesday, March 8, 2022 4:33 PM
-> >
-> > Hi Kevin,
-> >
-> > > -----Original Message-----
-> > > From: Tian, Kevin [mailto:kevin.tian@intel.com]
-> > > Sent: 08 March 2022 06:23
-> > > To: Shameerali Kolothum Thodi
-> > <shameerali.kolothum.thodi@huawei.com>;
-> > > kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > > linux-crypto@vger.kernel.org
-> > > Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com;
-> > jgg@nvidia.com;
-> > > cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com;
-> > Linuxarm
-> > > <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>;
-> > Zengtao (B)
-> > > <prime.zeng@hisilicon.com>; Jonathan Cameron
-> > > <jonathan.cameron@huawei.com>; Wangzhou (B)
-> > <wangzhou1@hisilicon.com>
-> > > Subject: RE: [PATCH v8 5/9] hisi_acc_vfio_pci: Restrict access to VF dev
-> > BAR2
-> > > migration region
-> > >
-> > > Hi, Shameer,
-> > >
-> > > > From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > > Sent: Friday, March 4, 2022 7:01 AM
-> > > >
-> > > > HiSilicon ACC VF device BAR2 region consists of both functional
-> > > > register space and migration control register space. From a
-> > > > security point of view, it's not advisable to export the migration
-> > > > control region to Guest.
-> > > >
-> > > > Hence, introduce a separate struct vfio_device_ops for migration
-> > > > support which will override the ioctl/read/write/mmap methods to
-> > > > hide the migration region and limit the access only to the
-> > > > functional register space.
-> > > >
-> > > > This will be used in subsequent patches when we add migration
-> > > > support to the driver.
-> > >
-> > > As a security concern the migration control region should be always
-> > > disabled regardless of whether migration support is added to the
-> > > driver for such device... It sounds like we should first fix this security
-> > > hole for acc device assignment and then add the migration support
-> > > atop (at least organize the series in this way).
-> >
-> > By exposing the migration BAR region, there is a possibility that a malicious
-> > Guest can prevent migration from happening by manipulating the migration
-> > BAR region. I don't think there are any other security concerns now
-> especially
-> > since we only support the STOP_COPY state.  And the approach has been
-> > that
-> > we only restrict this if migration support is enabled. I think I can change the
-> > above "security concern" description to "malicious Guest can prevent
-> > migration"
-> > to make it more clear.
-> >
+> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
+> to dynamically add new keys to the blacklist keyring.  This enables to
+> invalidate new certificates, either from being loaded in a keyring, or
+> from being trusted in a PKCS#7 certificate chain.  This also enables to
+> add new file hashes to be denied by the integrity infrastructure.
 > 
-> In concept migrated device state may include both the state directly
-> touched by the guest driver and also the one that is configured by
-> the PF driver. Unless there is guarantee that the state managed via
-> the migration control interface only touches the former (which implies
-> the latter managed via the PF driver) this security concern will hold
-> even for normal device assignment.
+> Being able to untrust a certificate which could have normaly been
+> trusted is a sensitive operation.  This is why adding new hashes to the
+> blacklist keyring is only allowed when these hashes are signed and
+> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
+> key description.  The PKCS#7 signature of this description must be
+> provided as the key payload.
 > 
-> If the acc device has such guarantee it's worth of a clarification here.
+> Marking a certificate as untrusted should be enforced while the system
+> is running.  It is then forbiden to remove such blacklist keys.
+> 
+> Update blacklist keyring, blacklist key and revoked certificate access rights:
+> * allows the root user to search for a specific blacklisted hash, which
+>   make sense because the descriptions are already viewable;
+> * forbids key update (blacklist and asymmetric ones);
+> * restricts kernel rights on the blacklist keyring to align with the
+>   root user rights.
+> 
+> See help in tools/certs/print-cert-tbs-hash.sh .
+> 
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: David Woodhouse <dwmw2@infradead.org>
+> Cc: Eric Snowberg <eric.snowberg@oracle.com>
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+> Link: https://lore.kernel.org/r/20210712170313.884724-6-mic@digikod.net
+> ---
+> 
+> Changes since v6:
+> * Rebase on keys-cve-2020-26541-v3: commit ebd9c2ae369a ("integrity:
+>   Load mokx variables into the blacklist keyring").
+> 
+> Changes since v5:
+> * Rebase on keys-next, fix Kconfig conflict, and update the asymmetric
+>   key rights added to the blacklist keyring by the new
+>   add_key_to_revocation_list(): align with blacklist key rights by
+>   removing KEY_POS_WRITE as a safeguard, and add
+>   KEY_ALLOC_BYPASS_RESTRICTION to not be subject to
+>   restrict_link_for_blacklist() that only allows blacklist key types to
+>   be added to the keyring.
+> * Change the return code for restrict_link_for_blacklist() from -EPERM
+>   to -EOPNOTSUPP to align with asymmetric key keyrings.
+> 
+> Changes since v3:
+> * Update commit message for print-cert-tbs-hash.sh .
+> 
+> Changes since v2:
+> * Add comment for blacklist_key_instantiate().
+> ---
+>  certs/Kconfig     | 10 +++++
+>  certs/blacklist.c | 96 ++++++++++++++++++++++++++++++++++++-----------
+>  2 files changed, 85 insertions(+), 21 deletions(-)
+> 
+> diff --git a/certs/Kconfig b/certs/Kconfig
+> index 0fbe184ceca5..e0e524b7eff9 100644
+> --- a/certs/Kconfig
+> +++ b/certs/Kconfig
+> @@ -103,4 +103,14 @@ config SYSTEM_REVOCATION_KEYS
+>  	  containing X.509 certificates to be included in the default blacklist
+>  	  keyring.
+>  
+> +config SYSTEM_BLACKLIST_AUTH_UPDATE
+> +	bool "Allow root to add signed blacklist keys"
+> +	depends on SYSTEM_BLACKLIST_KEYRING
+> +	depends on SYSTEM_DATA_VERIFICATION
+> +	help
+> +	  If set, provide the ability to load new blacklist keys at run time if
+> +	  they are signed and vouched by a certificate from the builtin trusted
+> +	  keyring.  The PKCS#7 signature of the description is set in the key
+> +	  payload.  Blacklist keys cannot be removed.
+> +
+>  endmenu
+> diff --git a/certs/blacklist.c b/certs/blacklist.c
+> index b254c87ceb3a..486ce0dd8e9c 100644
+> --- a/certs/blacklist.c
+> +++ b/certs/blacklist.c
+> @@ -15,6 +15,7 @@
+>  #include <linux/err.h>
+>  #include <linux/seq_file.h>
+>  #include <linux/uidgid.h>
+> +#include <linux/verification.h>
+>  #include <keys/system_keyring.h>
+>  #include "blacklist.h"
+>  #include "common.h"
+> @@ -26,6 +27,9 @@
+>   */
+>  #define MAX_HASH_LEN	128
+>  
+> +#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIEW | \
+> +			    KEY_USR_SEARCH | KEY_USR_VIEW)
+> +
+>  static const char tbs_prefix[] = "tbs";
+>  static const char bin_prefix[] = "bin";
+>  
+> @@ -80,19 +84,51 @@ static int blacklist_vet_description(const char *desc)
+>  	return 0;
+>  }
+>  
+> -/*
+> - * The hash to be blacklisted is expected to be in the description.  There will
+> - * be no payload.
+> - */
+> -static int blacklist_preparse(struct key_preparsed_payload *prep)
+> +static int blacklist_key_instantiate(struct key *key,
+> +		struct key_preparsed_payload *prep)
+>  {
+> -	if (prep->datalen > 0)
+> -		return -EINVAL;
+> -	return 0;
+> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> +	int err;
+> +#endif
+> +
+> +	/* Sets safe default permissions for keys loaded by user space. */
+> +	key->perm = BLACKLIST_KEY_PERM;
+> +
+> +	/*
+> +	 * Skips the authentication step for builtin hashes, they are not
+> +	 * signed but still trusted.
+> +	 */
+> +	if (key->flags & (1 << KEY_FLAG_BUILTIN))
+> +		goto out;
+> +
+> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> +	/*
+> +	 * Verifies the description's PKCS#7 signature against the builtin
+> +	 * trusted keyring.
+> +	 */
+> +	err = verify_pkcs7_signature(key->description,
+> +			strlen(key->description), prep->data, prep->datalen,
+> +			NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
+> +	if (err)
+> +		return err;
+> +#else
+> +	/*
+> +	 * It should not be possible to come here because the keyring doesn't
+> +	 * have KEY_USR_WRITE and the only other way to call this function is
+> +	 * for builtin hashes.
+> +	 */
+> +	WARN_ON_ONCE(1);
+> +	return -EPERM;
+> +#endif
+> +
+> +out:
+> +	return generic_key_instantiate(key, prep);
+>  }
+>  
+> -static void blacklist_free_preparse(struct key_preparsed_payload *prep)
+> +static int blacklist_key_update(struct key *key,
+> +		struct key_preparsed_payload *prep)
+>  {
+> +	return -EPERM;
+>  }
+>  
+>  static void blacklist_describe(const struct key *key, struct seq_file *m)
+> @@ -103,9 +139,8 @@ static void blacklist_describe(const struct key *key, struct seq_file *m)
+>  static struct key_type key_type_blacklist = {
+>  	.name			= "blacklist",
+>  	.vet_description	= blacklist_vet_description,
+> -	.preparse		= blacklist_preparse,
+> -	.free_preparse		= blacklist_free_preparse,
+> -	.instantiate		= generic_key_instantiate,
+> +	.instantiate		= blacklist_key_instantiate,
+> +	.update			= blacklist_key_update,
+>  	.describe		= blacklist_describe,
+>  };
+>  
+> @@ -154,8 +189,7 @@ static int mark_raw_hash_blacklisted(const char *hash)
+>  				   hash,
+>  				   NULL,
+>  				   0,
+> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
+> -				    KEY_USR_VIEW),
+> +				   BLACKLIST_KEY_PERM,
+>  				   KEY_ALLOC_NOT_IN_QUOTA |
+>  				   KEY_ALLOC_BUILT_IN);
+>  	if (IS_ERR(key)) {
+> @@ -232,8 +266,10 @@ int add_key_to_revocation_list(const char *data, size_t size)
+>  				   NULL,
+>  				   data,
+>  				   size,
+> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
+> -				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
+> +				   KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
+> +				   | KEY_USR_VIEW,
+> +				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
+> +				   | KEY_ALLOC_BYPASS_RESTRICTION);
+>  
+>  	if (IS_ERR(key)) {
+>  		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
+> @@ -260,25 +296,43 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
+>  }
+>  #endif
+>  
+> +static int restrict_link_for_blacklist(struct key *dest_keyring,
+> +		const struct key_type *type, const union key_payload *payload,
+> +		struct key *restrict_key)
+> +{
+> +	if (type == &key_type_blacklist)
+> +		return 0;
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  /*
+>   * Initialise the blacklist
+>   */
+>  static int __init blacklist_init(void)
+>  {
+>  	const char *const *bl;
+> +	struct key_restriction *restriction;
+>  
+>  	if (register_key_type(&key_type_blacklist) < 0)
+>  		panic("Can't allocate system blacklist key type\n");
+>  
+> +	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
+> +	if (!restriction)
+> +		panic("Can't allocate blacklist keyring restriction\n");
 
-I just double-checked with our ACC team and the VF migration region 
-manipulations will not affect the PF configurations. I will add a clarification
-here to make it clear.
 
-Thanks,
-Shameer
+This prevents me from taking this to my pull request. In moderns standards,
+no new BUG_ON(), panic() etc. should never added to the kernel.
+
+I missed this in my review.
+
+This should rather be e.g.
+
+        restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
+	if (!restriction) {
+		pr_err("Can't allocate blacklist keyring restriction\n");
+                return 0;
+        }
+
+Unfortunately I need to drop this patch set, because adding new panic()
+is simply a no-go.
+
+BR, Jarkko
