@@ -2,223 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF53C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 19:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75152C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 19:19:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235862AbiCITDt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Mar 2022 14:03:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
+        id S237643AbiCITUU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Mar 2022 14:20:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233594AbiCITDs (ORCPT
+        with ESMTP id S237602AbiCITUD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Mar 2022 14:03:48 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A00DF43;
-        Wed,  9 Mar 2022 11:02:49 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 229Igtii028637;
-        Wed, 9 Mar 2022 19:02:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=u455U2uzaGTy4XroNh75yJeEs9gW7zIyr+WZzL7o5O4=;
- b=dq2KBmxUgrXyTQ9bVRZ2TvYaJThUrjH0PK5HuCWcM24+K+U+v8ipx7Hx3kcMbCviemL4
- qpDDoqcIZUMzV7kBOEWRbUH+1ilF7RdSES6kL4Gl5z0XfD9teYZeQtvjBAdPMwEfxJYD
- gv5oWnC/xL2mMNnhHuZPvRoL028SUOSAUzKnhSU8jjxTCN/7eSKmukHx9hA+N+D6bZrl
- DBl9jHxuYiiZTaohIJUEwc2GB0dZZkrNfGStRPvafvQCXn6Rbt2iJLv3hSFh3q77zmEk
- 1jWD0abeWr7MOgZhnFlrsoowNonN4Y1/FmJXkTfjGcqLPz8FWlAcRCBuf9So+tVOJWEX zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny19aqnj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 19:02:29 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 229Iha1H000932;
-        Wed, 9 Mar 2022 19:02:28 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3eny19aqmf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 19:02:28 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 229IgvBi032575;
-        Wed, 9 Mar 2022 19:02:27 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
-        by ppma05wdc.us.ibm.com with ESMTP id 3enk8xg2k7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 09 Mar 2022 19:02:27 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 229J2OoN39977344
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 9 Mar 2022 19:02:25 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EC9F1C6057;
-        Wed,  9 Mar 2022 19:02:24 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A2160C606D;
-        Wed,  9 Mar 2022 19:02:22 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed,  9 Mar 2022 19:02:22 +0000 (GMT)
-Message-ID: <9ea53711-73ab-d242-9eb6-87497c8dc7ac@linux.ibm.com>
-Date:   Wed, 9 Mar 2022 14:02:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 3/4] KEYS: CA link restriction
-Content-Language: en-US
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "mic@linux.microsoft.com" <mic@linux.microsoft.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
- <20220301173651.3435350-4-eric.snowberg@oracle.com>
- <47f3654e-892d-a35a-e77c-70ada1ebcf43@linux.ibm.com>
- <2415444C-AD8F-4F03-8B1C-C0770F83ADAE@oracle.com>
- <e2dd58cd6074ae692256333b43b5ecde70bcdbdd.camel@linux.ibm.com>
- <67456A73-8B72-4DB6-8E23-7C603661A0A4@oracle.com>
- <22860730-d615-5683-6af0-05b6f4f3e71d@linux.ibm.com>
- <e10f2161aaa69a9d301b3a16a37cbab266318aee.camel@linux.ibm.com>
- <068F32E0-B202-4B20-9DE7-57373EF71BFE@oracle.com>
- <930d970d-0120-d3f0-939a-b5ef3b596318@linux.ibm.com>
- <B9A8F5BD-5FDE-4501-9C0A-865579C45627@oracle.com>
-From:   Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <B9A8F5BD-5FDE-4501-9C0A-865579C45627@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Yp4_8YcLujAz14V6k3KiRojzhZwhPdK6
-X-Proofpoint-ORIG-GUID: 5ZQTZpmKSS8gPamGYf7wDTk4nCC53n3x
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Wed, 9 Mar 2022 14:20:03 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E50165D0D;
+        Wed,  9 Mar 2022 11:19:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EA62CB82398;
+        Wed,  9 Mar 2022 19:19:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE562C36AE3;
+        Wed,  9 Mar 2022 19:18:58 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="maxLcaMK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646853537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YReXvjHUbAAhDAs2s/JP83U4bEs+VmUCWZJEXNYLMXM=;
+        b=maxLcaMKxbEJy2aJqFkh5KSz00MMwDd5WE0jcrb7fhMVvweE6+dEh0aJPCjqGh9zDYdirj
+        EFVvGjMjf8VsPfeGswlJWDZkL4UJanUIyLn6j0H3w8volTxE3MqJPhM8lDDSVLTsUGh4PS
+        wEC9/UUCXyZGi7ngyi+tAlege7FEoI0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d2039f6e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 9 Mar 2022 19:18:56 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH v2] random: reseed more often immediately after booting
+Date:   Wed,  9 Mar 2022 12:18:50 -0700
+Message-Id: <20220309191850.1508953-1-Jason@zx2c4.com>
+In-Reply-To: <20220309152653.1244096-1-Jason@zx2c4.com>
+References: <20220309152653.1244096-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-09_07,2022-03-09_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 impostorscore=0 malwarescore=0
- suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203090103
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+In order to chip away at the "premature first" problem, we augment our
+existing entropy accounting with increased reseedings at boot. The idea
+is that at boot, we're getting entropy from various places, and we're
+not very sure which of early boot entropy is good and which isn't. Even
+when we're crediting the entropy, we're still not totally certain that
+it's any good. Since boot is the one time (aside from a compromise) that
+we have zero entropy, it's important that we shephard entropy into the
+crng fairly often. At the same time, we don't want a "premature next"
+problem, whereby an attacker can brute force individual bits of added
+entropy. In lieu of going full-on Fortuna (for now), we can pick a
+simpler strategy of just reseeding more often during the first 5 minutes
+after boot. This is still bounded by the 256-bit entropy credit
+requirement, so we'll skip a reseeding if we haven't reached that, but
+in case entropy /is/ coming in, this ensures that it makes its way into
+the crng rather rapidly during these early stages. For this we start at
+5 seconds after boot, and double that interval until it's more than 5
+minutes. After that, we then move to our normal schedule of reseeding
+not more than once per 5 minutes.
 
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+Changes v1->v2:
+- Simplified arithmetic, prevented overflow.
 
-On 3/9/22 13:13, Eric Snowberg wrote:
-> 
-> 
->> On Mar 9, 2022, at 10:12 AM, Stefan Berger <stefanb@linux.ibm.com> wrote:
->>
->>
->>
->> On 3/8/22 13:02, Eric Snowberg wrote:
->>>> On Mar 8, 2022, at 5:45 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
->>>>
->>>> On Mon, 2022-03-07 at 21:31 -0500, Stefan Berger wrote:
->>>>>
->>>>> On 3/7/22 18:38, Eric Snowberg wrote:
->>>>>>
->>>>>>
->>>>>>> On Mar 7, 2022, at 4:01 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
->>>>>>>
->>>>>>> On Mon, 2022-03-07 at 18:06 +0000, Eric Snowberg wrote:
->>>>>>>>
->>>>>>>>>> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
->>>>>>>>>> index 6b1ac5f5896a..49bb2ea7f609 100644
->>>>>>>>>> --- a/crypto/asymmetric_keys/restrict.c
->>>>>>>>>> +++ b/crypto/asymmetric_keys/restrict.c
->>>>>>>>>> @@ -108,6 +108,49 @@ int restrict_link_by_signature(struct key *dest_keyring,
->>>>>>>>>> 	return ret;
->>>>>>>>>> }
->>>>>>>>>> +/**
->>>>>>>>>> + * restrict_link_by_ca - Restrict additions to a ring of CA keys
->>>>>>>>>> + * @dest_keyring: Keyring being linked to.
->>>>>>>>>> + * @type: The type of key being added.
->>>>>>>>>> + * @payload: The payload of the new key.
->>>>>>>>>> + * @trust_keyring: Unused.
->>>>>>>>>> + *
->>>>>>>>>> + * Check if the new certificate is a CA. If it is a CA, then mark the new
->>>>>>>>>> + * certificate as being ok to link.
->>>>>>>>>
->>>>>>>>> CA = root CA here, right?
->>>>>>>>
->>>>>>>> Yes, I’ll update the comment
->>>>>>>
->>>>>>> Updating the comment is not enough.  There's an existing function named
->>>>>>> "x509_check_for_self_signed()" which determines whether the certificate
->>>>>>> is self-signed.
->>>>>>
->>>>>> Originally I tried using that function.  However when the restrict link code is called,
->>>>>> all the necessary x509 information is no longer available.   The code in
->>>>>> restrict_link_by_ca is basically doing the equivalent to x509_check_for_self_signed.
->>>>>> After verifying the cert has the CA flag set, the call to public_key_verify_signature
->>>>>> validates the cert is self signed.
->>>>>>
->>>>> Isn't x509_cert_parse() being called as part of parsing the certificate?
->>>>> If so, it seems to check for a self-signed certificate every time. You
->>>>> could add something like the following to x509_check_for_self_signed(cert):
->>>>> pub->x509_self_signed = cert->self_signed = true;
->>>>>
->>>>> This could then reduce the function in 3/4 to something like:
->>>>>
->>>>> return payload->data[asym_crypto]->x509_self_signed;
->>> When I was studying the restriction code, before writing this patch, it looked like
->>> it was written from the standpoint to be as generic as possible.  All code contained
->>> within it works on either a public_key_signature or a public_key.  I had assumed it
->>> was written this way to be used with different asymmetrical key types now and in
->>> the future. I called the public_key_verify_signature function instead of interrogating
->>> the x509 payload to keep in line with what I thought was the original design. Let me
->>> know if I should be carrying x509 code in here to make the change above.
->>
->> It does not seem right if there were two functions trying to determine whether an x509 cert is self-signed. The existing is invoked as part of loading a key onto the machine keyring from what I can see. It has access to more data about the cert and therefore can do stronger tests, yours doesn't have access to the data. So I guess I would remember in a boolean in the public key structure that the x509 cert it comes from was self signed following the existing test. Key in your function may be that that payload->data[] array is guaranteed to be from the x509 cert as set in x509_key_preparse().
->>
->> https://elixir.bootlin.com/linux/v5.17-rc7/source/crypto/asymmetric_keys/x509_public_key.c#L236
-> 
-> I could add another bool to the public key structure to designate if the key was self signed,
-> but this seems to go against what the kernel document states. "Asymmetric / Public-key
-> Cryptography Key Type” [1] states:
-> 
-> "The “asymmetric” key type is designed to be a container for the keys used in public-key
-> cryptography, without imposing any particular restrictions on the form or mechanism of
-> the cryptography or form of the key.
-> 
-> The asymmetric key is given a subtype that defines what sort of data is associated with
-> the key and provides operations to describe and destroy it. However, no requirement is
-> made that the key data actually be stored in the key."
-> 
-> Now every public key type would need to fill in the information on whether the key is self
-> signed or not.  Instead of going through the public_key_verify_signature function currently
-> used in this patch.
+ drivers/char/random.c | 27 ++++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
 
-Every public key extracted from a x509 certificate would have to set 
-this field to true if the public key originates from a self-signed x509 
-cert. Is this different from this code here where now every public key 
-would have to set the key_is_ca field?
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 0ceda9a12bfe..8c08186205f4 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -333,6 +333,27 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
+ 	memzero_explicit(first_block, sizeof(first_block));
+ }
+ 
++/*
++ * Return whether the crng seed is considered to be sufficiently
++ * old that a reseeding might be attempted. This is the case 5,
++ * 10, 20, 40, 80, and 160 seconds after boot, and after if the
++ * last reseeding was CRNG_RESEED_INTERVAL ago.
++ */
++static bool crng_has_old_seed(void)
++{
++	static unsigned int next_init_secs = 5;
++
++	if (unlikely(next_init_secs < CRNG_RESEED_INTERVAL / HZ)) {
++		unsigned int uptime = min_t(u64, INT_MAX, ktime_get_seconds());
++		if (uptime >= READ_ONCE(next_init_secs)) {
++			WRITE_ONCE(next_init_secs, 5U << fls(uptime / 5));
++			return true;
++		}
++		return false;
++	}
++	return time_after(jiffies, READ_ONCE(base_crng.birth) + CRNG_RESEED_INTERVAL);
++}
++
+ /*
+  * This function returns a ChaCha state that you may use for generating
+  * random data. It also returns up to 32 bytes on its own of random data
+@@ -366,10 +387,10 @@ static void crng_make_state(u32 chacha_state[CHACHA_STATE_WORDS],
+ 	}
+ 
+ 	/*
+-	 * If the base_crng is more than 5 minutes old, we reseed, which
+-	 * in turn bumps the generation counter that we check below.
++	 * If the base_crng is old enough, we try to reseed, which in turn
++	 * bumps the generation counter that we check below.
+ 	 */
+-	if (unlikely(time_after(jiffies, READ_ONCE(base_crng.birth) + CRNG_RESEED_INTERVAL)))
++	if (unlikely(crng_has_old_seed()))
+ 		crng_reseed(false);
+ 
+ 	local_lock_irqsave(&crngs.lock, flags);
+-- 
+2.35.1
 
-+		if (v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
-+			ctx->cert->pub->key_is_ca = true;
-
-The extension I would have suggested looked similar:
-
-cert->pub->x509_self_sign = cert->self_signed = true
-
-[ to be put here: 
-https://elixir.bootlin.com/linux/v5.17-rc7/source/crypto/asymmetric_keys/x509_public_key.c#L147 
-]
-
-
-
-> 
-> https://docs.kernel.org/crypto/asymmetric-keys.html
-> 
