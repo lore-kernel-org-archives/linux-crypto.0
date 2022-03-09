@@ -2,85 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02318C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 19:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDEEC4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 20:01:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237900AbiCIThc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Mar 2022 14:37:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
+        id S235462AbiCIUCH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Mar 2022 15:02:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237898AbiCIThb (ORCPT
+        with ESMTP id S235423AbiCIUCG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Mar 2022 14:37:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10C21A4;
-        Wed,  9 Mar 2022 11:36:32 -0800 (PST)
+        Wed, 9 Mar 2022 15:02:06 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1814D2D8;
+        Wed,  9 Mar 2022 12:01:07 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 36510B82398;
-        Wed,  9 Mar 2022 19:36:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08E13C340E8;
-        Wed,  9 Mar 2022 19:31:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A78AA61982;
+        Wed,  9 Mar 2022 19:50:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBB0EC340F6;
+        Wed,  9 Mar 2022 19:49:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646854289;
-        bh=bbCEaeZ6kj/X8f+p8As796Wn0k/8aBP9PNr1a78uZNA=;
+        s=k20201202; t=1646855349;
+        bh=vLWP7Mz1loKXAb3DtQpG0OTSE1xeUnN23OMpCL3CeWA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lM4+beyoJs2qor9r9JVwhzgyyugqlkR/2q5Y97uShJ9WcvQosx9cmiBjHf6KMCnsu
-         QLbGWvruJxIG8YEyRhpKJaucuifcytA9/a+z4WCRnLBa6ws8VexY80WlZ+FL284/4z
-         nISI5Al8Cu67rJxNGt1VgmQZh9t2dlUnoheZi3m3z5B+1IhjTaPTk5u3zh4JxFB60w
-         H1b/YupgF5NKQi+a03frHhjSxvgQnATcLqCJGBphIcWpkn1TQ2ULrM9QsJsydwBwbe
-         cakvh71vbcL3J9AbusKlsi5r+WvGWqyMZ8L5seRXK8Kj9LqbckuE7mipJ58FvcnPKu
-         Xdrx9vOTE4gHA==
-Date:   Wed, 9 Mar 2022 11:31:26 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
+        b=KDQyLvFoiqpenp9TLxg7LLUJNyjnj7ylkJMcOzp6owy80ytt6FI07RIh5EW9UJFpE
+         EVa7KR0f17MBf4Qjb1ckQ1kkCvl/CYsRfdBzc2nsz63RxM2FA0ymXd9QTneB+GAhK/
+         DgzqOfcsLb22La8VJMRGG1wWWAC2yb/gOqdRnuGdNJ2ILYFSz8dkXzGeaXlIOUnh6O
+         fpHTqJeralBNOQaLkuXvqIB3//XGERraP26JGoYJYPnIDNFLcd9KvPvhrFohk5OwQX
+         m4h+woBg34bDT6DK8932+pOn7HsLwq9OPr7eHDnUOU1ZAit+dgWxASMpS3UjuQqbK/
+         e3il182jgGS9Q==
+Date:   Wed, 9 Mar 2022 19:49:07 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
 Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com
+        martin.petersen@oracle.com,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
-Message-ID: <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
+Message-ID: <YikEs7RNgPXTQolv@gmail.com>
 References: <20220303201312.3255347-1-kbusch@kernel.org>
  <20220303201312.3255347-7-kbusch@kernel.org>
  <your-ad-here.call-01646770901-ext-3299@work.hours>
  <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
  <YigzoKRJ1EHFRZY9@sol.localdomain>
+ <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YigzoKRJ1EHFRZY9@sol.localdomain>
+In-Reply-To: <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 08:57:04PM -0800, Eric Biggers wrote:
-> On Tue, Mar 08, 2022 at 12:27:47PM -0800, Keith Busch wrote:
-> > On Tue, Mar 08, 2022 at 09:21:41PM +0100, Vasily Gorbik wrote:
-> > > On Thu, Mar 03, 2022 at 12:13:10PM -0800, Keith Busch wrote:
-> > > > Hardware specific features may be able to calculate a crc64, so provide
-> > > > a framework for drivers to register their implementation. If nothing is
-> > > > registered, fallback to the generic table lookup implementation. The
-> > > > implementation is modeled after the crct10dif equivalent.
+On Wed, Mar 09, 2022 at 11:31:26AM -0800, Keith Busch wrote:
+> On Tue, Mar 08, 2022 at 08:57:04PM -0800, Eric Biggers wrote:
+> > On Tue, Mar 08, 2022 at 12:27:47PM -0800, Keith Busch wrote:
+> > > On Tue, Mar 08, 2022 at 09:21:41PM +0100, Vasily Gorbik wrote:
+> > > > On Thu, Mar 03, 2022 at 12:13:10PM -0800, Keith Busch wrote:
+> > > > > Hardware specific features may be able to calculate a crc64, so provide
+> > > > > a framework for drivers to register their implementation. If nothing is
+> > > > > registered, fallback to the generic table lookup implementation. The
+> > > > > implementation is modeled after the crct10dif equivalent.
+> > > > 
+> > > > Hi Keith,
+> > > > 
+> > > > this is failing on big-endian systems. I get the following on s390:
 > > > 
-> > > Hi Keith,
-> > > 
-> > > this is failing on big-endian systems. I get the following on s390:
+> > > Oh, I see the put_unaligned_le64() in chksum_final() was not the correct
+> > > action. I'll send an update, thank you for the report.
 > > 
-> > Oh, I see the put_unaligned_le64() in chksum_final() was not the correct
-> > action. I'll send an update, thank you for the report.
+> > Or you could make the digests in your test vectors have have a consistent byte
+> > order, probably little endian.  That's how "shash" algorithms in the crypto API
+> > normally work, including crc32 and crc32c; they produce bytes as output.  I see
+> > that crct10dif violates that convention, and I assume you copied it from there.
+> > I'm not sure you should do that; crct10dif might be more of a one-off quirk.
 > 
-> Or you could make the digests in your test vectors have have a consistent byte
-> order, probably little endian.  That's how "shash" algorithms in the crypto API
-> normally work, including crc32 and crc32c; they produce bytes as output.  I see
-> that crct10dif violates that convention, and I assume you copied it from there.
-> I'm not sure you should do that; crct10dif might be more of a one-off quirk.
+> Right, I started with the t10dif implementation. I changed it to the
+> unaligned accessor since you indicated the output buffer doesn't have an
+> alignment guarantee.
+> 
+> Perhaps I'm missing something, but it looks easier to just use the CPU
+> native endianess here. The only users for t10 and rocksoft transform to
+> big-endian for the wire protocol at the end, but there's no need to
+> maintain a specific byte order before setting the payload.
 
-Right, I started with the t10dif implementation. I changed it to the
-unaligned accessor since you indicated the output buffer doesn't have an
-alignment guarantee.
+The issue is that every other "shash" algorithm besides crct10dif, including
+crc32 and crc32c, follow the convention of treating the digest as bytes.  Doing
+otherwise is unusual for the crypto API.  So I have a slight preference for
+treating it as bytes.  Perhaps see what Herbert Xu (maintainer of the crypto
+API, Cc'ed) recommends?
 
-Perhaps I'm missing something, but it looks easier to just use the CPU
-native endianess here. The only users for t10 and rocksoft transform to
-big-endian for the wire protocol at the end, but there's no need to
-maintain a specific byte order before setting the payload.
+- Eric
