@@ -2,285 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D00C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Mar 2022 22:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB22DC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 02:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244483AbiCHWup (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Mar 2022 17:50:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46284 "EHLO
+        id S231527AbiCIC7F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 8 Mar 2022 21:59:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237427AbiCHWup (ORCPT
+        with ESMTP id S231497AbiCIC7E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Mar 2022 17:50:45 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130964EF44;
-        Tue,  8 Mar 2022 14:49:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646779788; x=1678315788;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+n/RZ+ZsI1FXtTahOLr2TYDxkaDcUckT809xviUSmTk=;
-  b=gswRdk4OQpKW69ZII4YK+yGSafoWwdKxDMofSf3/hhvVqsPMAoXKR/H+
-   X/z0ta1GaCO+HywE1u+rmMEUfQWWZA/q8MAqr3SvWsgLj2zXIFUYZ0PGz
-   LoR4ivf7HyQT3QgwrkR/HoQZrE5hz8HQLmk++NDJlFHOwSVx19aPZuqpC
-   cNjSxOQPFFyAfu61hHcWQwaRjHHaECa5FLPE4mgyB9db8GZSPWhRcDjOR
-   nbu9W9xRibXynJ9sH8ZeBzLkFImj7YIim6PzsukeYa3sKc2OuN44Fkq5J
-   sY3F714bICTMs5VBm+HUhqu0w9hhjdgMn0v7m47fprGMhOv0ON8Q0xalY
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="318062340"
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="318062340"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2022 14:49:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
-   d="scan'208";a="643824407"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 08 Mar 2022 14:49:41 -0800
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nRieC-00028O-SW; Tue, 08 Mar 2022 22:49:40 +0000
-Date:   Wed, 9 Mar 2022 06:49:37 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     meenakshi.aggarwal@nxp.com, Horia Geanta <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-imx@nxp.com,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-Subject: Re: [PATCH] crypto: caam/rng: Add support for PRNG
-Message-ID: <202203090603.qhbToPLJ-lkp@intel.com>
-References: <20220304114123.3762649-1-meenakshi.aggarwal@nxp.com>
+        Tue, 8 Mar 2022 21:59:04 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F24127D44;
+        Tue,  8 Mar 2022 18:58:06 -0800 (PST)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KCxZz6tFZz1GBxv;
+        Wed,  9 Mar 2022 10:53:15 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 9 Mar 2022 10:58:04 +0800
+Received: from huawei.com (10.67.165.24) by kwepemm600005.china.huawei.com
+ (7.193.23.191) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 9 Mar
+ 2022 10:58:03 +0800
+From:   Longfang Liu <liulongfang@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <alex.williamson@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <liulongfang@huawei.com>
+Subject: [PATCH] MAINTAINERS: update HPRE/SEC2/TRNG driver maintainers list
+Date:   Wed, 9 Mar 2022 10:52:44 +0800
+Message-ID: <20220309025244.25838-1-liulongfang@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220304114123.3762649-1-meenakshi.aggarwal@nxp.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600005.china.huawei.com (7.193.23.191)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Zaibo moved projects and is not looking into crypto stuff.
+I am responsible for checking the patches of these modules.
+so the maintainers list needs to be updated.
 
-Thank you for the patch! Perhaps something to improve:
+I take care of HPRE, Qian Weili take care of TRNG,
+Ye Kai and me take care of SEC2.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master v5.17-rc7 next-20220308]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/meenakshi-aggarwal-nxp-com/crypto-caam-rng-Add-support-for-PRNG/20220307-142401
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: arm-multi_v7_defconfig (https://download.01.org/0day-ci/archive/20220309/202203090603.qhbToPLJ-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/bc27c1a2748de5052fb4c042d90fa1e0e4132043
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review meenakshi-aggarwal-nxp-com/crypto-caam-rng-Add-support-for-PRNG/20220307-142401
-        git checkout bc27c1a2748de5052fb4c042d90fa1e0e4132043
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arm SHELL=/bin/bash drivers/crypto/caam/ drivers/rtc/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/crypto/caam/compat.h:18,
-                    from drivers/crypto/caam/caamprng.c:11:
-   drivers/crypto/caam/caamprng.c: In function 'caam_prng_seed':
->> drivers/crypto/caam/caamprng.c:156:46: warning: passing argument 2 of 'dma_map_single_attrs' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-     156 |         seed_dma = dma_map_single(ctx.jrdev, seed, slen, DMA_FROM_DEVICE);
-         |                                              ^~~~
-   include/linux/dma-mapping.h:406:60: note: in definition of macro 'dma_map_single'
-     406 | #define dma_map_single(d, a, s, r) dma_map_single_attrs(d, a, s, r, 0)
-         |                                                            ^
-   include/linux/dma-mapping.h:322:73: note: expected 'void *' but argument is of type 'const u8 *' {aka 'const unsigned char *'}
-     322 | static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
-         |                                                                   ~~~~~~^~~
-
-
-vim +156 drivers/crypto/caam/caamprng.c
-
-  > 11	#include "compat.h"
-    12	#include "regs.h"
-    13	#include "intern.h"
-    14	#include "desc_constr.h"
-    15	#include "jr.h"
-    16	#include "error.h"
-    17	
-    18	/*
-    19	 * Length of used descriptors, see caam_init_desc()
-    20	 */
-    21	#define CAAM_PRNG_DESC_LEN (CAAM_CMD_SZ +				\
-    22				    CAAM_CMD_SZ +				\
-    23				    CAAM_CMD_SZ + CAAM_PTR_SZ_MAX)
-    24	
-    25	/* prng per-device context */
-    26	struct caam_prng_ctx {
-    27		struct device *jrdev;
-    28		struct completion done;
-    29	};
-    30	
-    31	struct caam_prng_alg {
-    32		struct rng_alg rng;
-    33		bool registered;
-    34	};
-    35	
-    36	static void caam_prng_done(struct device *jrdev, u32 *desc, u32 err,
-    37				  void *context)
-    38	{
-    39		struct caam_prng_ctx *jctx = context;
-    40	
-    41		if (err)
-    42			caam_jr_strstatus(jrdev, err);
-    43	
-    44		complete(&jctx->done);
-    45	}
-    46	
-    47	static u32 *caam_init_reseed_desc(u32 *desc, dma_addr_t seed_dma, u32 len)
-    48	{
-    49		init_job_desc(desc, 0);	/* + 1 cmd_sz */
-    50		/* Generate random bytes: + 1 cmd_sz */
-    51		append_operation(desc, OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
-    52				OP_ALG_AS_FINALIZE | OP_ALG_AI_ON);
-    53		/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
-    54		append_load(desc, seed_dma, len, CLASS_1 | LDST_SRCDST_BYTE_CONTEXT);
-    55	
-    56		print_hex_dump_debug("prng reseed desc@: ", DUMP_PREFIX_ADDRESS,
-    57				     16, 4, desc, desc_bytes(desc), 1);
-    58	
-    59		return desc;
-    60	}
-    61	
-    62	static u32 *caam_init_prng_desc(u32 *desc, dma_addr_t dst_dma, u32 len)
-    63	{
-    64		init_job_desc(desc, 0);	/* + 1 cmd_sz */
-    65		/* Generate random bytes: + 1 cmd_sz */
-    66		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
-    67		/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
-    68		append_fifo_store(desc, dst_dma,
-    69				  len, FIFOST_TYPE_RNGSTORE);
-    70	
-    71		print_hex_dump_debug("prng job desc@: ", DUMP_PREFIX_ADDRESS,
-    72				     16, 4, desc, desc_bytes(desc), 1);
-    73	
-    74		return desc;
-    75	}
-    76	
-    77	static int caam_prng_generate(struct crypto_rng *tfm,
-    78				     const u8 *src, unsigned int slen,
-    79				     u8 *dst, unsigned int dlen)
-    80	{
-    81		struct caam_prng_ctx ctx;
-    82		dma_addr_t dst_dma;
-    83		u32 *desc;
-    84		int ret;
-    85	
-    86		ctx.jrdev = caam_jr_alloc();
-    87		ret = PTR_ERR_OR_ZERO(ctx.jrdev);
-    88		if (ret) {
-    89			pr_err("Job Ring Device allocation failed\n");
-    90			return ret;
-    91		}
-    92	
-    93		desc = kzalloc(CAAM_PRNG_DESC_LEN, GFP_KERNEL | GFP_DMA);
-    94		if (!desc) {
-    95			caam_jr_free(ctx.jrdev);
-    96			return -ENOMEM;
-    97		}
-    98	
-    99		dst_dma = dma_map_single(ctx.jrdev, dst, dlen, DMA_FROM_DEVICE);
-   100		if (dma_mapping_error(ctx.jrdev, dst_dma)) {
-   101			dev_err(ctx.jrdev, "Failed to map destination buffer memory\n");
-   102			ret = -ENOMEM;
-   103			goto out;
-   104		}
-   105	
-   106		init_completion(&ctx.done);
-   107		ret = caam_jr_enqueue(ctx.jrdev,
-   108				      caam_init_prng_desc(desc, dst_dma, dlen),
-   109				      caam_prng_done, &ctx);
-   110	
-   111		if (ret == -EINPROGRESS) {
-   112			wait_for_completion(&ctx.done);
-   113			ret = 0;
-   114		}
-   115	
-   116		dma_unmap_single(ctx.jrdev, dst_dma, dlen, DMA_FROM_DEVICE);
-   117	
-   118	out:
-   119		kfree(desc);
-   120		caam_jr_free(ctx.jrdev);
-   121		return ret;
-   122	}
-   123	
-   124	static void caam_prng_exit(struct crypto_tfm *tfm)
-   125	{
-   126	
-   127		return;
-   128	}
-   129	
-   130	static int caam_prng_init(struct crypto_tfm *tfm)
-   131	{
-   132		return 0;
-   133	}
-   134	
-   135	static int caam_prng_seed(struct crypto_rng *tfm,
-   136				 const u8 *seed, unsigned int slen)
-   137	{
-   138		struct caam_prng_ctx ctx;
-   139		dma_addr_t seed_dma;
-   140		u32 *desc;
-   141		int ret;
-   142	
-   143		ctx.jrdev = caam_jr_alloc();
-   144		ret = PTR_ERR_OR_ZERO(ctx.jrdev);
-   145		if (ret) {
-   146			pr_err("Job Ring Device allocation failed\n");
-   147			return ret;
-   148		}
-   149	
-   150		desc = kzalloc(CAAM_PRNG_DESC_LEN, GFP_KERNEL | GFP_DMA);
-   151		if (!desc) {
-   152			caam_jr_free(ctx.jrdev);
-   153			return -ENOMEM;
-   154		}
-   155	
- > 156		seed_dma = dma_map_single(ctx.jrdev, seed, slen, DMA_FROM_DEVICE);
-   157		if (dma_mapping_error(ctx.jrdev, seed_dma)) {
-   158			dev_err(ctx.jrdev, "Failed to map destination buffer memory\n");
-   159			ret = -ENOMEM;
-   160			goto out;
-   161		}
-   162	
-   163		init_completion(&ctx.done);
-   164		ret = caam_jr_enqueue(ctx.jrdev,
-   165				      caam_init_reseed_desc(desc, seed_dma, slen),
-   166				      caam_prng_done, &ctx);
-   167	
-   168		if (ret == -EINPROGRESS) {
-   169			wait_for_completion(&ctx.done);
-   170			ret = 0;
-   171		}
-   172	
-   173		dma_unmap_single(ctx.jrdev, seed_dma, slen, DMA_FROM_DEVICE);
-   174	
-   175	out:
-   176		kfree(desc);
-   177		caam_jr_free(ctx.jrdev);
-   178		return ret;
-   179	}
-   180	
-
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Kai Ye <yekai12@huawei.com>
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ MAINTAINERS | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6ee244105f5f..e4400d4346bb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8635,7 +8635,7 @@ S:	Maintained
+ F:	drivers/gpio/gpio-hisi.c
+ 
+ HISILICON HIGH PERFORMANCE RSA ENGINE DRIVER (HPRE)
+-M:	Zaibo Xu <xuzaibo@huawei.com>
++M:	Longfang Liu <liulongfang@huawei.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/ABI/testing/debugfs-hisi-hpre
+@@ -8715,8 +8715,8 @@ F:	Documentation/devicetree/bindings/scsi/hisilicon-sas.txt
+ F:	drivers/scsi/hisi_sas/
+ 
+ HISILICON SECURITY ENGINE V2 DRIVER (SEC2)
+-M:	Zaibo Xu <xuzaibo@huawei.com>
+ M:	Kai Ye <yekai13@huawei.com>
++M:	Longfang Liu <liulongfang@huawei.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/ABI/testing/debugfs-hisi-sec
+@@ -8747,7 +8747,7 @@ F:	Documentation/devicetree/bindings/mfd/hisilicon,hi6421-spmi-pmic.yaml
+ F:	drivers/mfd/hi6421-spmi-pmic.c
+ 
+ HISILICON TRUE RANDOM NUMBER GENERATOR V2 SUPPORT
+-M:	Zaibo Xu <xuzaibo@huawei.com>
++M:	Weili Qian <qianweili@huawei.com>
+ S:	Maintained
+ F:	drivers/crypto/hisilicon/trng/trng.c
+ 
+-- 
+2.33.0
+
