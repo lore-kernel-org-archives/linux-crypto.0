@@ -2,165 +2,359 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C01C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 22:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB8CC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Mar 2022 23:11:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234964AbiCIWD3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Mar 2022 17:03:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46322 "EHLO
+        id S237525AbiCIXMy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 9 Mar 2022 18:12:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232704AbiCIWD3 (ORCPT
+        with ESMTP id S238543AbiCIXMx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Mar 2022 17:03:29 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4656EBD0;
-        Wed,  9 Mar 2022 14:02:28 -0800 (PST)
+        Wed, 9 Mar 2022 18:12:53 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6256A122218;
+        Wed,  9 Mar 2022 15:11:53 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E989EB823C9;
-        Wed,  9 Mar 2022 22:02:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BCA4C340EE;
-        Wed,  9 Mar 2022 22:02:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="T1fuvT6G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1646863339;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=inreFAnh9tqy7Qlx+a012zOsU9dSDc7ob/YEs/Oahuw=;
-        b=T1fuvT6GNklQFVlKRs5Fx3/lhU5a5lY+x4d3BmbJ1TqqIVlkrwaQIbxgmi6jwH9EAOFwCQ
-        rckR7B4h3E1/mdErRIlTDIzh3wvR1gGfJ9wLYG3LURJpc1KOhyCQRKHvDssSim+a8W5OGT
-        Z5JNAqH3kaCA8JlF0U6Vt+/w9ac/tRk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 168a9f66 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 9 Mar 2022 22:02:19 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id z30so7271091ybi.2;
-        Wed, 09 Mar 2022 14:02:18 -0800 (PST)
-X-Gm-Message-State: AOAM5321QAGWIjalmdN5yIkXmh06FE1GRZ5qPlmzgJxwoyHDGnuFgE6B
-        SosUaNvGpd76yKzRtTrsvQxBOnOylnRykDM4t8k=
-X-Google-Smtp-Source: ABdhPJyCUVD8T4qqYuq1h5ED6rk/6Kw1l+qk/ag1MpB3SuWxlea1B5XdqPkq5wTPm3WvOPgfJuy34sJfOcw4H5dA8AQ=
-X-Received: by 2002:a25:2312:0:b0:629:60d6:7507 with SMTP id
- j18-20020a252312000000b0062960d67507mr1596488ybj.267.1646863335346; Wed, 09
- Mar 2022 14:02:15 -0800 (PST)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E317E61CAE;
+        Wed,  9 Mar 2022 23:11:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF600C340EE;
+        Wed,  9 Mar 2022 23:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646867512;
+        bh=0UFSIxJXi7mSJwqiqhrBgQB58a7eclLhkZkwGFPtQhY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=V9a9x+857jMnAdT71woVB5DT+F72X4XKraOrTUR0am4P90f1mfXyk+d7oNfsmPdx0
+         Gfwv9IkdwZ+Re0CwEcfT5kuM+whT7Fkg7FwdHHLFrc/8ro0Owxlgb/BnBeV1Fj57cM
+         3tVZhxdK4BkH0TyKyeo6lIeQSz5aS3fBGLUjpOw51DFuFvDaudGR7T9R1mKUG59uN1
+         80a67NJPm2KKOWTCiar4Se5ty2jvP2h4mYbS1UC+KzyHSdD/S8U18nCYGqTaITeMY/
+         pU2RyeegFuUFmW7ARF/EOguyO1u2BLTttiqPpsPuTDQnluxeICqh7j6riG9Ltwk70r
+         heIPLT+YzBGMA==
+Date:   Thu, 10 Mar 2022 01:11:07 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v8 5/5] certs: Allow root user to append signed hashes to
+ the blacklist keyring
+Message-ID: <Yik0C2t7G272YZ73@iki.fi>
+References: <20210712170313.884724-1-mic@digikod.net>
+ <20210712170313.884724-6-mic@digikod.net>
+ <YidDznCPSmFmfNwE@iki.fi>
+ <995fc93b-531b-9840-1523-21ae2adbe4ba@digikod.net>
+ <YidX3jqNJeFfr1G1@iki.fi>
+ <218eb9dc-d9bd-0173-5343-f44b58545aef@digikod.net>
+ <YijPdDULqQipqhjT@iki.fi>
+ <ea866d6d-228e-1250-47d4-46519a1abd30@digikod.net>
 MIME-Version: 1.0
-References: <Yh4+9+UpanJWAIyZ@zx2c4.com> <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
-In-Reply-To: <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 9 Mar 2022 15:02:04 -0700
-X-Gmail-Original-Message-ID: <CAHmME9rTMDkE7UA3_wg87mrDVYps+YaHw+dZwF0EbM0zC4pQQw@mail.gmail.com>
-Message-ID: <CAHmME9rTMDkE7UA3_wg87mrDVYps+YaHw+dZwF0EbM0zC4pQQw@mail.gmail.com>
-Subject: Re: propagating vmgenid outward and upward
-To:     Alexander Graf <graf@amazon.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        linux-hyperv@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        adrian@parity.io, Laszlo Ersek <lersek@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ea866d6d-228e-1250-47d4-46519a1abd30@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Alex,
+On Wed, Mar 09, 2022 at 07:36:50PM +0100, Mickaël Salaün wrote:
+> 
+> On 09/03/2022 17:01, Jarkko Sakkinen wrote:
+> > On Tue, Mar 08, 2022 at 05:02:23PM +0100, Mickaël Salaün wrote:
+> > > 
+> > > On 08/03/2022 14:19, Jarkko Sakkinen wrote:
+> > > > On Tue, Mar 08, 2022 at 01:18:28PM +0100, Mickaël Salaün wrote:
+> > > > > 
+> > > > > On 08/03/2022 12:53, Jarkko Sakkinen wrote:
+> > > > > > On Mon, Jul 12, 2021 at 07:03:13PM +0200, Mickaël Salaün wrote:
+> > > > > > > From: Mickaël Salaün <mic@linux.microsoft.com>
+> > > > > > > 
+> > > > > > > Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
+> > > > > > > to dynamically add new keys to the blacklist keyring.  This enables to
+> > > > > > > invalidate new certificates, either from being loaded in a keyring, or
+> > > > > > > from being trusted in a PKCS#7 certificate chain.  This also enables to
+> > > > > > > add new file hashes to be denied by the integrity infrastructure.
+> > > > > > > 
+> > > > > > > Being able to untrust a certificate which could have normaly been
+> > > > > > > trusted is a sensitive operation.  This is why adding new hashes to the
+> > > > > > > blacklist keyring is only allowed when these hashes are signed and
+> > > > > > > vouched by the builtin trusted keyring.  A blacklist hash is stored as a
+> > > > > > > key description.  The PKCS#7 signature of this description must be
+> > > > > > > provided as the key payload.
+> > > > > > > 
+> > > > > > > Marking a certificate as untrusted should be enforced while the system
+> > > > > > > is running.  It is then forbiden to remove such blacklist keys.
+> > > > > > > 
+> > > > > > > Update blacklist keyring, blacklist key and revoked certificate access rights:
+> > > > > > > * allows the root user to search for a specific blacklisted hash, which
+> > > > > > >      make sense because the descriptions are already viewable;
+> > > > > > > * forbids key update (blacklist and asymmetric ones);
+> > > > > > > * restricts kernel rights on the blacklist keyring to align with the
+> > > > > > >      root user rights.
+> > > > > > > 
+> > > > > > > See help in tools/certs/print-cert-tbs-hash.sh .
+> > > > > > > 
+> > > > > > > Cc: David Howells <dhowells@redhat.com>
+> > > > > > > Cc: David Woodhouse <dwmw2@infradead.org>
+> > > > > > > Cc: Eric Snowberg <eric.snowberg@oracle.com>
+> > > > > > > Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+> > > > > > > Link: https://lore.kernel.org/r/20210712170313.884724-6-mic@digikod.net
+> > > > > > > ---
+> > > > > > > 
+> > > > > > > Changes since v6:
+> > > > > > > * Rebase on keys-cve-2020-26541-v3: commit ebd9c2ae369a ("integrity:
+> > > > > > >      Load mokx variables into the blacklist keyring").
+> > > > > > > 
+> > > > > > > Changes since v5:
+> > > > > > > * Rebase on keys-next, fix Kconfig conflict, and update the asymmetric
+> > > > > > >      key rights added to the blacklist keyring by the new
+> > > > > > >      add_key_to_revocation_list(): align with blacklist key rights by
+> > > > > > >      removing KEY_POS_WRITE as a safeguard, and add
+> > > > > > >      KEY_ALLOC_BYPASS_RESTRICTION to not be subject to
+> > > > > > >      restrict_link_for_blacklist() that only allows blacklist key types to
+> > > > > > >      be added to the keyring.
+> > > > > > > * Change the return code for restrict_link_for_blacklist() from -EPERM
+> > > > > > >      to -EOPNOTSUPP to align with asymmetric key keyrings.
+> > > > > > > 
+> > > > > > > Changes since v3:
+> > > > > > > * Update commit message for print-cert-tbs-hash.sh .
+> > > > > > > 
+> > > > > > > Changes since v2:
+> > > > > > > * Add comment for blacklist_key_instantiate().
+> > > > > > > ---
+> > > > > > >     certs/Kconfig     | 10 +++++
+> > > > > > >     certs/blacklist.c | 96 ++++++++++++++++++++++++++++++++++++-----------
+> > > > > > >     2 files changed, 85 insertions(+), 21 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/certs/Kconfig b/certs/Kconfig
+> > > > > > > index 0fbe184ceca5..e0e524b7eff9 100644
+> > > > > > > --- a/certs/Kconfig
+> > > > > > > +++ b/certs/Kconfig
+> > > > > > > @@ -103,4 +103,14 @@ config SYSTEM_REVOCATION_KEYS
+> > > > > > >     	  containing X.509 certificates to be included in the default blacklist
+> > > > > > >     	  keyring.
+> > > > > > > +config SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > +	bool "Allow root to add signed blacklist keys"
+> > > > > > > +	depends on SYSTEM_BLACKLIST_KEYRING
+> > > > > > > +	depends on SYSTEM_DATA_VERIFICATION
+> > > > > > > +	help
+> > > > > > > +	  If set, provide the ability to load new blacklist keys at run time if
+> > > > > > > +	  they are signed and vouched by a certificate from the builtin trusted
+> > > > > > > +	  keyring.  The PKCS#7 signature of the description is set in the key
+> > > > > > > +	  payload.  Blacklist keys cannot be removed.
+> > > > > > > +
+> > > > > > >     endmenu
+> > > > > > > diff --git a/certs/blacklist.c b/certs/blacklist.c
+> > > > > > > index b254c87ceb3a..486ce0dd8e9c 100644
+> > > > > > > --- a/certs/blacklist.c
+> > > > > > > +++ b/certs/blacklist.c
+> > > > > > > @@ -15,6 +15,7 @@
+> > > > > > >     #include <linux/err.h>
+> > > > > > >     #include <linux/seq_file.h>
+> > > > > > >     #include <linux/uidgid.h>
+> > > > > > > +#include <linux/verification.h>
+> > > > > > >     #include <keys/system_keyring.h>
+> > > > > > >     #include "blacklist.h"
+> > > > > > >     #include "common.h"
+> > > > > > > @@ -26,6 +27,9 @@
+> > > > > > >      */
+> > > > > > >     #define MAX_HASH_LEN	128
+> > > > > > > +#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIEW | \
+> > > > > > > +			    KEY_USR_SEARCH | KEY_USR_VIEW)
+> > > > > > > +
+> > > > > > >     static const char tbs_prefix[] = "tbs";
+> > > > > > >     static const char bin_prefix[] = "bin";
+> > > > > > > @@ -80,19 +84,51 @@ static int blacklist_vet_description(const char *desc)
+> > > > > > >     	return 0;
+> > > > > > >     }
+> > > > > > > -/*
+> > > > > > > - * The hash to be blacklisted is expected to be in the description.  There will
+> > > > > > > - * be no payload.
+> > > > > > > - */
+> > > > > > > -static int blacklist_preparse(struct key_preparsed_payload *prep)
+> > > > > > > +static int blacklist_key_instantiate(struct key *key,
+> > > > > > > +		struct key_preparsed_payload *prep)
+> > > > > > >     {
+> > > > > > > -	if (prep->datalen > 0)
+> > > > > > > -		return -EINVAL;
+> > > > > > > -	return 0;
+> > > > > > > +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > +	int err;
+> > > > > > > +#endif
+> > > > > > > +
+> > > > > > > +	/* Sets safe default permissions for keys loaded by user space. */
+> > > > > > > +	key->perm = BLACKLIST_KEY_PERM;
+> > > > > > > +
+> > > > > > > +	/*
+> > > > > > > +	 * Skips the authentication step for builtin hashes, they are not
+> > > > > > > +	 * signed but still trusted.
+> > > > > > > +	 */
+> > > > > > > +	if (key->flags & (1 << KEY_FLAG_BUILTIN))
+> > > > > > > +		goto out;
+> > > > > > > +
+> > > > > > > +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > +	/*
+> > > > > > > +	 * Verifies the description's PKCS#7 signature against the builtin
+> > > > > > > +	 * trusted keyring.
+> > > > > > > +	 */
+> > > > > > > +	err = verify_pkcs7_signature(key->description,
+> > > > > > > +			strlen(key->description), prep->data, prep->datalen,
+> > > > > > > +			NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
+> > > > > > > +	if (err)
+> > > > > > > +		return err;
+> > > > > > > +#else
+> > > > > > > +	/*
+> > > > > > > +	 * It should not be possible to come here because the keyring doesn't
+> > > > > > > +	 * have KEY_USR_WRITE and the only other way to call this function is
+> > > > > > > +	 * for builtin hashes.
+> > > > > > > +	 */
+> > > > > > > +	WARN_ON_ONCE(1);
+> > > > > > > +	return -EPERM;
+> > > > > > > +#endif
+> > > > > > > +
+> > > > > > > +out:
+> > > > > > > +	return generic_key_instantiate(key, prep);
+> > > > > > >     }
+> > > > > > > -static void blacklist_free_preparse(struct key_preparsed_payload *prep)
+> > > > > > > +static int blacklist_key_update(struct key *key,
+> > > > > > > +		struct key_preparsed_payload *prep)
+> > > > > > >     {
+> > > > > > > +	return -EPERM;
+> > > > > > >     }
+> > > > > > >     static void blacklist_describe(const struct key *key, struct seq_file *m)
+> > > > > > > @@ -103,9 +139,8 @@ static void blacklist_describe(const struct key *key, struct seq_file *m)
+> > > > > > >     static struct key_type key_type_blacklist = {
+> > > > > > >     	.name			= "blacklist",
+> > > > > > >     	.vet_description	= blacklist_vet_description,
+> > > > > > > -	.preparse		= blacklist_preparse,
+> > > > > > > -	.free_preparse		= blacklist_free_preparse,
+> > > > > > > -	.instantiate		= generic_key_instantiate,
+> > > > > > > +	.instantiate		= blacklist_key_instantiate,
+> > > > > > > +	.update			= blacklist_key_update,
+> > > > > > >     	.describe		= blacklist_describe,
+> > > > > > >     };
+> > > > > > > @@ -154,8 +189,7 @@ static int mark_raw_hash_blacklisted(const char *hash)
+> > > > > > >     				   hash,
+> > > > > > >     				   NULL,
+> > > > > > >     				   0,
+> > > > > > > -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
+> > > > > > > -				    KEY_USR_VIEW),
+> > > > > > > +				   BLACKLIST_KEY_PERM,
+> > > > > > >     				   KEY_ALLOC_NOT_IN_QUOTA |
+> > > > > > >     				   KEY_ALLOC_BUILT_IN);
+> > > > > > >     	if (IS_ERR(key)) {
+> > > > > > > @@ -232,8 +266,10 @@ int add_key_to_revocation_list(const char *data, size_t size)
+> > > > > > >     				   NULL,
+> > > > > > >     				   data,
+> > > > > > >     				   size,
+> > > > > > > -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
+> > > > > > > -				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
+> > > > > > > +				   KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
+> > > > > > > +				   | KEY_USR_VIEW,
+> > > > > > > +				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
+> > > > > > > +				   | KEY_ALLOC_BYPASS_RESTRICTION);
+> > > > > > >     	if (IS_ERR(key)) {
+> > > > > > >     		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
+> > > > > > > @@ -260,25 +296,43 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
+> > > > > > >     }
+> > > > > > >     #endif
+> > > > > > > +static int restrict_link_for_blacklist(struct key *dest_keyring,
+> > > > > > > +		const struct key_type *type, const union key_payload *payload,
+> > > > > > > +		struct key *restrict_key)
+> > > > > > > +{
+> > > > > > > +	if (type == &key_type_blacklist)
+> > > > > > > +		return 0;
+> > > > > > > +	return -EOPNOTSUPP;
+> > > > > > > +}
+> > > > > > > +
+> > > > > > >     /*
+> > > > > > >      * Initialise the blacklist
+> > > > > > >      */
+> > > > > > >     static int __init blacklist_init(void)
+> > > > > > >     {
+> > > > > > >     	const char *const *bl;
+> > > > > > > +	struct key_restriction *restriction;
+> > > > > > >     	if (register_key_type(&key_type_blacklist) < 0)
+> > > > > > >     		panic("Can't allocate system blacklist key type\n");
+> > > > > > > +	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
+> > > > > > > +	if (!restriction)
+> > > > > > > +		panic("Can't allocate blacklist keyring restriction\n");
+> > > > > > 
+> > > > > > 
+> > > > > > This prevents me from taking this to my pull request. In moderns standards,
+> > > > > > no new BUG_ON(), panic() etc. should never added to the kernel.
+> > > > > > 
+> > > > > > I missed this in my review.
+> > > > > > 
+> > > > > > This should rather be e.g.
+> > > > > > 
+> > > > > >            restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
+> > > > > > 	if (!restriction) {
+> > > > > > 		pr_err("Can't allocate blacklist keyring restriction\n");
+> > > > > >                    return 0;
+> > > > > >            }
+> > > > > > 
+> > > > > > Unfortunately I need to drop this patch set, because adding new panic()
+> > > > > > is simply a no-go.
+> > > > > 
+> > > > > I agree that panic() is not great in general, but I followed the other part
+> > > > > of the code (just above) that do the same. This part of the kernel should
+> > > > > failed if critical memory allocation failed at boot time (only). It doesn't
+> > > > > impact the kernel once it is running. I don't think that just ignoring this
+> > > > > error with return 0 is fine, after all it's a critical error right?
+> > > > 
+> > > > It's not good reason enough to crash the whole kernel, even if it is a
+> > > > critical error (e.g. run-time foresincs). Even WARN() is not recommended
+> > > > these days [*].
+> > > 
+> > > I think that what Greg said in this email is that WARN*() should only be
+> > > used for cases that should never happen, it is definitely not deprecated,
+> > > but WARN_ON_ONCE() may be a better idea though. WARN*() helps detect such
+> > > thought-to-be-impossible cases, that can happen e.g. with code refactoring.
+> > > 
+> > > A lot of initialization/boot code (e.g. without user space nor external
+> > > interactions, mostly __init functions) do panic if there is unexpected and
+> > > unrecoverable errors like failed memory allocations. I think handling such
+> > > errors otherwise would be more complex for no benefit. Moreover, delegating
+> > > such error handling to user space could create new (silent) issues.
+> > 
+> > To crash the whole kernel, you should be able to clearly explain why it
+> > makes sense in the situation.
+> 
+> If there is no enough memory to allocate 24 bytes (struct key_restriction)
+> during early boot, I really doubt the kernel can do much.
+> 
+> > 
+> > > > 
+> > > > For the existing panic()-statements: I'm happy to review patches that
+> > > > render them out. >
+> > > > Not sure tho, if this fails should it be then "everything blacklisted".
+> > > > Just one thing to consider.
+> > > 
+> > > Well, if it fail it will be "nothing will work afterwards". Do you have a
+> > > working and useful scenario for this kind of error?
+> > 
+> > So you have zero chances to get a shell without blacklist just to do
+> > kernel forensics?
+> 
+> Right, I don't think the kernel can launch any process (nor continue early
+> boot) if it cannot allocate 24 bytes.
 
-On Wed, Mar 9, 2022 at 3:10 AM Alexander Graf <graf@amazon.com> wrote:
-> > The vmgenid driver basically works, though it is racy, because that ACPI
-> > notification can arrive after the system is already running again. This
->
->
-> I believe enough people already pointed out that this assumption is
-> incorrect. The thing that is racy about VMGenID is the interrupt based
-> notification.
+initcall is just wrong layer to choose to crash the kernel. It should be
+either do_initcall_level() or do_one_initcall() that should care about
+this (or not care). You can print error message and return -ENODEV;
 
-I'm having a hard time figuring out what's different between your
-statement and mine. I said that the race is due to the notification.
-You said that the race is due to the notification. What subtle thing
-am I missing here that would lead you to say that my assumption is
-incorrect? Or did you just misread?
-
-> The actual identifier is updated before the VM resumes
-> from its clone operation, so if you match on that you will know whether
-> you are in a new or old world. And that is enough to create
-> transactions: Save the identifier before a "crypto transaction",
-> validate before you finish, if they don't match, abort, reseed and replay.
-
-Right. But more than just transactions, it's useful to preventing key
-reuse vulnerabilities, in which case, you store the current identifier
-just before an ephemeral key is generated, and then subsequently check
-to see that the identifier hasn't changed before transmitting anything
-related to that key.
-
-> If you follow the logic at the beginning of the mail, you can create
-> something race free if you consume the hardware VMGenID counter. You can
-> not make it race free if you rely on the interrupt mechanism.
-
-Yes, as mentioned and discussed in depth before. However, your use of
-the word "counter" is problematic. Vmgenid is not a counter. It's a
-unique identifier. That means you can't compare it with a single word
-comparison but have to compare all of the 16 bytes. That seems
-potentially expensive. It's for that reason that I suggested
-augmenting the vmgenid spec with an additional word-sized _counter_
-that could be mapped into the kernels and into userspaces.
-
-> So following that train of thought, if you expose the hardware VMGenID
-> to user space, you could allow user space to act race free based on
-> VMGenID. That means consumers of user space RNGs could validate whether
-> the ID is identical between the beginning of the crypto operation and
-> the end.
-
-Right.
-
-> However, there are more complicated cases as well. What do you do with
-> Samba for example? It needs to generate a new SID after the clone.
-> That's a super heavy operation. Do you want to have smbd constantly poll
-> on the VMGenID just to see whether it needs to kick off some
-> administrative actions?
-
-Were it a single word-sized integer, mapped into memory, that wouldn't
-be much of a problem at all. It could constantly read this before and
-after every operation. The problem is that it's 16 bytes and
-understandably applications don't want to deal with that clunkiness.
-
-> In that case, all we would need from the kernel is an easily readable
-> GenID that changes
-
-Actually, no, you need even less than that. All that's required is a
-sysfs/procfs file that can be poll()'d on. It doesn't need to have any
-content. When poll() returns readable, the VM has been forked. Then
-userspace rngs and other things like that can call getrandom() to
-receive a fresh value to mix into whatever their operation is. Since
-all we're talking about here is _event notification_, all we need is
-that event, which is what poll() provides.
-
-> I'm also not a super big fan of putting all that logic into systemd. It
-> means applications need to create their own notification mechanisms to
-> pass that cloning notification into actual processes. Don't we have any
-> mechanism that applications and libraries could use to natively get an
-> event when the GenID changes?
-
-Yes. poll() can do this. For the purposes of discussion, I've posted
-an implementation of this idea here:
-https://lore.kernel.org/lkml/20220309215907.77526-1-Jason@zx2c4.com/
-
-What I'm sort of leaning toward is doing something like that patch,
-and then later if vmgenid ever grows an additional word-sized counter,
-moving to explore the race-free approach. Given the amount of
-programming required to actually implement the race-free approach
-(transactions and careful study of each case), the poll() file
-approach might be a medium-grade compromise for the time being.
-Evidently that's what Microsoft decided too.
-
-Jason
+BR, Jarkko
