@@ -2,157 +2,304 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0502AC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 18:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0577BC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 20:50:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239592AbiCJShv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Mar 2022 13:37:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54754 "EHLO
+        id S245708AbiCJUvC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Mar 2022 15:51:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234691AbiCJShu (ORCPT
+        with ESMTP id S245689AbiCJUvC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Mar 2022 13:37:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2DB19D630;
-        Thu, 10 Mar 2022 10:36:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4890E61E79;
-        Thu, 10 Mar 2022 18:36:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE8FC340E8;
-        Thu, 10 Mar 2022 18:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646937408;
-        bh=RdgCysgl6dR7J0j7duKi30HlTSNbetlrjcptAA8yIP4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ORaAk5KDQ7MKF/ON/55HLWHpH4hL8dCDmsb+0tiseGNVUI7173pEQRS2YRjDFuP2d
-         g8voDYpZnRnm6Hlf9R7Ql/GPkOSM56Jfkhq/MXjURxh9/Ikr4UNUstBWB8objSCEGv
-         YDdg4YOl/OwUFVwmSjIM8h4lxYXLDbnXd/05buJtiyPxJ6fnhqL6afwtEAxWnfbDWK
-         XfqNfUFABIZ8dfrnkccAs1AfHA5Ooo/nwVEcdv5fPuelqf3m2qThPB7ZTDk5tBiCF3
-         lXwmN1oxcs+ruTpO0WT/iQgjJWF/goswaST0dk4R3X/7Rh5BwzJrB3X+NkMXBQRZZg
-         v0pnRLNb5v6+A==
-Date:   Thu, 10 Mar 2022 18:36:47 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
-Message-ID: <YipFP8B8MxMxTVBR@gmail.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-7-kbusch@kernel.org>
- <your-ad-here.call-01646770901-ext-3299@work.hours>
- <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
- <YigzoKRJ1EHFRZY9@sol.localdomain>
- <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
- <YikEs7RNgPXTQolv@gmail.com>
- <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
+        Thu, 10 Mar 2022 15:51:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2BE5187E29
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 12:49:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646945397;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/wHyperqVD6yT4MZyOSDrCItm0ScJpHPiGZO3nX6coc=;
+        b=dme5Spj3BzzmWYzkmx+4hVXJm3vJNXtajhD3vUv9xHvg9kh0tV61kxIm7RmiuzwaCkz8+C
+        2+LuCi6po277se54UUIv8OV4yDOF+14aNMGs5GrEhZWPq18RwwQLtCelIq21SZDOaBAQr9
+        jyv6vmH1Z+qgu+CKS9QEJEOfMgwm7Qc=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-314-257eh6RiMeyW5mOvIphfMg-1; Thu, 10 Mar 2022 15:49:56 -0500
+X-MC-Unique: 257eh6RiMeyW5mOvIphfMg-1
+Received: by mail-il1-f197.google.com with SMTP id q6-20020a056e0215c600b002c2c4091914so4112965ilu.14
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 12:49:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=/wHyperqVD6yT4MZyOSDrCItm0ScJpHPiGZO3nX6coc=;
+        b=BezCfyRirMu5swb7A3bM46lK4dyA3t3GdWa2tW7NjNoDJkrfS5TJ99DkB+TMknpZ4U
+         qvXYD+dR93xVy61y2EoRSm9+mc/VOrJjzKm4GV0WefmqidQyb5MPVwMjnHH4EsT3VWKv
+         TEYV1diWbbY/RR0105mzw1ht2aqmfE1tfPf9DcuVaijkeK42yLqUhgIOPuiyiy9FEjYC
+         4mxNHihHzXBK8h5nJXHrmTOwZl9e/MOKK/cQnbXAu+K6CnRJSAO0CQpkbWWUKXFk5+qa
+         hHhtaP6fTviF20CuvdTvFo5atTy2d6y50g0iJ1wtkZPKHt18uF8EqIZ8OYeZqsoPZa/n
+         HEcg==
+X-Gm-Message-State: AOAM530KV6HN31S2bhbliVwVAHWb2cZAkYjfb2wW1nh7PIGQw6KIdxdh
+        NWiPT3XTXu6ClZ4S7lNk0rx93bxpFmCZsYl4IEcKl3KbF5Z8RNrBghvMPRIWO50IYGGy4xqCfnA
+        f95/MvkCghXz953tpKGmzWJde
+X-Received: by 2002:a05:6e02:180d:b0:2c7:733a:f11d with SMTP id a13-20020a056e02180d00b002c7733af11dmr710106ilv.23.1646945395824;
+        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzdGHIOmSFlUA27ptxSyyRFHgWYtRYdyaS5HXsHLwYYnrbDuYuHO7OCWr0eIL08JCnOU3b0MA==
+X-Received: by 2002:a05:6e02:180d:b0:2c7:733a:f11d with SMTP id a13-20020a056e02180d00b002c7733af11dmr710078ilv.23.1646945395433;
+        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id b11-20020a056e02184b00b002c66e75d5f7sm3455113ilv.39.2022.03.10.12.49.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
+Date:   Thu, 10 Mar 2022 13:49:54 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        "Jason Gunthorpe" <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Xu Zaibo <xuzaibo@huawei.com>
+Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220310134954.0df4bb12.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB527634CCF86829E0680E5E678C0A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+        <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
+        <20220304205720.GE219866@nvidia.com>
+        <20220307120513.74743f17.alex.williamson@redhat.com>
+        <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
+        <20220307125239.7261c97d.alex.williamson@redhat.com>
+        <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20220308123312.1f4ba768.alex.williamson@redhat.com>
+        <BN9PR11MB527634CCF86829E0680E5E678C0A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 07:39:59AM -0800, Keith Busch wrote:
-> On Wed, Mar 09, 2022 at 07:49:07PM +0000, Eric Biggers wrote:
-> > The issue is that every other "shash" algorithm besides crct10dif, including
-> > crc32 and crc32c, follow the convention of treating the digest as bytes.  Doing
-> > otherwise is unusual for the crypto API.  So I have a slight preference for
-> > treating it as bytes.  Perhaps see what Herbert Xu (maintainer of the crypto
-> > API, Cc'ed) recommends?
-> 
-> I'm okay either way, they're both simple enough. Here is an update atop
-> this series to match the other shash conventions if this is preferred
-> over my previous fix:
-> 
-> ---
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 914d8cddd43a..f9eb45571bc7 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -282,7 +282,7 @@ EXPORT_SYMBOL(t10_pi_type3_ip);
->  
->  static __be64 ext_pi_crc64(void *data, unsigned int len)
->  {
-> -	return cpu_to_be64(crc64_rocksoft(data, len));
-> +	return cpu_to_be64(le64_to_cpu(crc64_rocksoft(data, len)));
->  }
->  
->  static blk_status_t ext_pi_crc64_generate(struct blk_integrity_iter *iter,
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index f1a22794c404..f9e5f601c657 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -3686,11 +3686,11 @@ static const struct hash_testvec crc64_rocksoft_tv_template[] = {
->  	{
->  		.plaintext	= zeroes,
->  		.psize		= 4096,
-> -		.digest		= (u8 *)(u64[]){ 0x6482d367eb22b64eull },
-> +		.digest		= "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
->  	}, {
->  		.plaintext	= ones,
->  		.psize		= 4096,
-> -		.digest		= (u8 *)(u64[]){ 0xc0ddba7302eca3acull },
-> +		.digest		= "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
->  	}
->  };
->  
-> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-> index e044c60d1e61..5319f9a9fc19 100644
-> --- a/include/linux/crc64.h
-> +++ b/include/linux/crc64.h
-> @@ -12,7 +12,7 @@
->  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
->  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
->  
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
-> +__le64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-> +__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
->  
->  #endif /* _LINUX_CRC64_H */
-> diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
-> index fc9ae0da5df7..215acb79a15d 100644
-> --- a/lib/crc64-rocksoft.c
-> +++ b/lib/crc64-rocksoft.c
-> @@ -54,16 +54,16 @@ static struct notifier_block crc64_rocksoft_nb = {
->  	.notifier_call = crc64_rocksoft_notify,
->  };
->  
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
-> +__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
->  {
->  	struct {
->  		struct shash_desc shash;
-> -		u64 crc;
-> +		__le64 crc;
->  	} desc;
->  	int err;
->  
->  	if (static_branch_unlikely(&crc64_rocksoft_fallback))
-> -		return crc64_rocksoft_generic(crc, buffer, len);
-> +		return cpu_to_le64(crc64_rocksoft_generic(crc, buffer, len));
->  
->  	rcu_read_lock();
->  	desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
-> @@ -77,7 +77,7 @@ u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
->  }
->  EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
->  
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
-> +__le64 crc64_rocksoft(const unsigned char *buffer, size_t len)
->  {
->  	return crc64_rocksoft_update(0, buffer, len);
->  }
-> --
+On Wed, 9 Mar 2022 10:11:06 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-I think the lib functions should still use native endianness, like what crc32
-does.
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, March 9, 2022 3:33 AM
+> >=20
+> > On Tue, 8 Mar 2022 08:11:11 +0000
+> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
+> >  =20
+> > > > From: Alex Williamson <alex.williamson@redhat.com>
+> > > > Sent: Tuesday, March 8, 2022 3:53 AM =20
+> > > > > =20
+> > > > > > I think we still require acks from Bjorn and Zaibo for select p=
+atches
+> > > > > > in this series. =20
+> > > > >
+> > > > > I checked with Ziabo. He moved projects and is no longer looking =
+into =20
+> > > > crypto stuff. =20
+> > > > > Wangzhou and LiuLongfang now take care of this. Received acks fro=
+m =20
+> > > > Wangzhou =20
+> > > > > already and I will request Longfang to provide his. Hope that's o=
+k. =20
+> > > >
+> > > > Maybe a good time to have them update MAINTAINERS as well.  Thanks,
+> > > > =20
+> > >
+> > > I have one question here (similar to what we discussed for mdev befor=
+e).
+> > >
+> > > Now we are adding vendor specific drivers under /drivers/vfio. Two dr=
+ivers
+> > > on radar and more will come. Then what would be the criteria for
+> > > accepting such a driver? Do we prefer to a model in which the author =
+=20
+> > should =20
+> > > provide enough background for vfio community to understand how it =20
+> > works =20
+> > > or as done here just rely on the PF driver owner to cover device spec=
+ific
+> > > code?
+> > >
+> > > If the former we may need document some process for what information
+> > > is necessary and also need secure increased review bandwidth from key
+> > > reviewers in vfio community.
+> > >
+> > > If the latter then how can we guarantee no corner case overlooked by =
+both
+> > > sides (i.e. how to know the coverage of total reviews)? Another open =
+is =20
+> > who =20
+> > > from the PF driver sub-system should be considered as the one to give=
+ the
+> > > green signal. If the sub-system maintainer trusts the PF driver owner=
+ and
+> > > just pulls commits from him then having the r-b from the PF driver ow=
+ner is
+> > > sufficient. But if the sub-system maintainer wants to review detail c=
+hange
+> > > in every underlying driver then we probably also want to get the ack =
+from
+> > > the maintainer.
+> > >
+> > > Overall I didn't mean to slow down the progress of this series. But a=
+bove
+> > > does be some puzzle occurred in my review. =F0=9F=98=8A =20
+> >=20
+> > Hi Kevin,
+> >=20
+> > Good questions, I'd like a better understanding of expectations as
+> > well.  I think the intentions are the same as any other sub-system, the
+> > drivers make use of shared interfaces and extensions and the role of
+> > the sub-system should be to make sure those interfaces are used
+> > correctly and extensions fit well within the overall design.  However,
+> > just as the network maintainer isn't expected to fully understand every
+> > NIC driver, I think/hope we have the same expectations here.  It's
+> > certainly a benefit to the community and perceived trustworthiness if
+> > each driver outlines its operating model and security nuances, but
+> > those are only ever going to be the nuances identified by the people
+> > who have the access and energy to evaluate the device.
+> >=20
+> > It's going to be up to the community to try to determine that any new
+> > drivers are seriously considering security and not opening any new gaps
+> > relative to behavior using the base vfio-pci driver.  For the driver
+> > examples we have, this seems a bit easier than evaluating an entire
+> > mdev device because they're largely providing direct access to the
+> > device rather than trying to multiplex a shared physical device.  We
+> > can therefore focus on incremental functionality, as both drivers have
+> > done, implementing a boilerplate vendor driver, then adding migration
+> > support.  I imagine this won't always be the case though and some
+> > drivers will re-implement much of the core to support further emulation
+> > and shared resources.
+> >=20
+> > So how do we as a community want to handle this?  I wouldn't mind, I'd
+> > actually welcome, some sort of review requirement for new vfio vendor
+> > driver variants.  Is that reasonable?  What would be the criteria?
+> > Approval from the PF driver owner, if different/necessary, and at least
+> > one unaffiliated reviewer (preferably an active vfio reviewer or
+> > existing vfio variant driver owner/contributor)?  Ideas welcome.
+> > Thanks,
+> >  =20
+>=20
+> Yes, and the criteria is the hard part. In the end it largely depend on=20
+> the expectations of the reviewers. =20
+>=20
+> If the unaffiliated reviewer only cares about the usage of shared=20
+> interfaces or extensions as you said then what this series does is
+> just fine. Such type of review can be easily done via reading code=20
+> and doesn't require detail device knowledge.
+>=20
+> On the other hand if the reviewer wants to do a full functional
+> review of how migration is actually supported for such device,=20
+> whatever information (patch description, code comment, kdoc,
+> etc.) necessary to build a standalone migration story would be
+> appreciated, e.g.:
+>=20
+>   - What composes the device state?
+>   - Which portion of the device state is exposed to and managed
+>     by the user and which is hidden from the user (i.e. controlled
+>     by the PF driver)?
+>   - Interface between the vfio driver and the device (and/or PF
+>     driver) to manage the device state;
+>   - Rich functional-level comments for the reviewer to dive into
+>     the migration flow;
+>   - ...
+>=20
+> I guess we don't want to force one model over the other. Just
+> from my impression the more information the driver can=20
+> provide the more time I'd like to spend on the review. Otherwise
+> it has to trend to the minimal form i.e. the first model.
+>=20
+> and currently I don't have a concrete idea how the 2nd model will
+> work. maybe it will get clear only when a future driver attracts=20
+> people to do thorough review...
 
-- Eric
+Do you think we should go so far as to formalize this via a MAINTAINERS
+entry, for example:
+
+diff --git a/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst b/Doc=
+umentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+new file mode 100644
+index 000000000000..54ebafcdd735
+--- /dev/null
++++ b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+@@ -0,0 +1,35 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++Acceptance criteria for vfio-pci device specific driver variants
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Overview
++--------
++The vfio-pci driver exists as a device agnostic driver using the
++system IOMMU and relying on the robustness of platform fault
++handling to provide isolated device access to userspace.  While the
++vfio-pci driver does include some device specific support, further
++extensions for yet more advanced device specific features are not
++sustainable.  The vfio-pci driver has therefore split out
++vfio-pci-core as a library that may be reused to implement features
++requiring device specific knowledge, ex. saving and loading device
++state for the purposes of supporting migration.
++
++In support of such features, it's expected that some device specific
++variants may interact with parent devices (ex. SR-IOV PF in support of
++a user assigned VF) or other extensions that may not be otherwise
++accessible via the vfio-pci base driver.  Authors of such drivers
++should be diligent not to create exploitable interfaces via such
++interactions or allow unchecked userspace data to have an effect
++beyond the scope of the assigned device.
++
++New driver submissions are therefore requested to have approval via
++Sign-off for any interactions with parent drivers.  Additionally,
++drivers should make an attempt to provide sufficient documentation
++for reviewers to understand the device specific extensions, for
++example in the case of migration data, how is the device state
++composed and consumed, which portions are not otherwise available to
++the user via vfio-pci, what safeguards exist to validate the data,
++etc.  To that extent, authors should additionally expect to require
++reviews from at least one of the listed reviewers, in addition to the
++overall vfio maintainer.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4322b5321891..4f7d26f9aac6 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20314,6 +20314,13 @@ F:	drivers/vfio/mdev/
+ F:	include/linux/mdev.h
+ F:	samples/vfio-mdev/
+=20
++VFIO PCI VENDOR DRIVERS
++R:	Your Name <your.name@here.com>
++L:	kvm@vger.kernel.org
++S:	Maintained
++P:	Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
++F:	drivers/vfio/pci/*/
++
+ VFIO PLATFORM DRIVER
+ M:	Eric Auger <eric.auger@redhat.com>
+ L:	kvm@vger.kernel.org
+
+Ideally we'd have at least Yishai, Shameer, Jason, and yourself listed
+as reviewers (Connie and I are included via the higher level entry).
+Thoughts from anyone?  Volunteers for reviewers if we want to press
+forward with this as formal acceptance criteria?  Thanks,
+
+Alex
+
