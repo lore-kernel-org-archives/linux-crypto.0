@@ -2,150 +2,353 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0162FC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 15:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565F5C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 17:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239127AbiCJPlG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Mar 2022 10:41:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40192 "EHLO
+        id S240968AbiCJRxW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Mar 2022 12:53:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237833AbiCJPlG (ORCPT
+        with ESMTP id S237054AbiCJRxV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Mar 2022 10:41:06 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC74182D89;
-        Thu, 10 Mar 2022 07:40:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9676AB81FE1;
-        Thu, 10 Mar 2022 15:40:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0164C340F4;
-        Thu, 10 Mar 2022 15:40:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646926802;
-        bh=cahBW4asS7o8MJX61wLf9y+Vbrl7xpiX2UzUluQj068=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bV6P7OEKz9RqdRT5K1aiRe0ithJo1T4P2oAHJa/2szOqFfjjMr+IV+Wu54dzoRCHb
-         Ol5TE6ygAHhNT8vCpk7kQqrPbdNbiF2P7JexDmKAhy/G81s7PgGyGdVcbQYqmjFSBQ
-         m3I8G2j6F/95D1/4f7dUCcJ3zk85IrsH6I76tfVJms6vNuPSePkjF1YSNK7E3twKnM
-         JcBmhkrL4VZu07r/8y+n+csGTnLd/fmMOEzMIZkDXpnWEo5ckiuHibMRN2s0qD4hGG
-         /3JXwueNtGLsJqCh5r+zplsUxmvr8GIOwusVHyIeTa8IcrEGy4m9X7Fa8/wIKOT4M8
-         tmy7HfBg2SiMQ==
-Date:   Thu, 10 Mar 2022 07:39:59 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
-Message-ID: <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-7-kbusch@kernel.org>
- <your-ad-here.call-01646770901-ext-3299@work.hours>
- <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
- <YigzoKRJ1EHFRZY9@sol.localdomain>
- <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
- <YikEs7RNgPXTQolv@gmail.com>
+        Thu, 10 Mar 2022 12:53:21 -0500
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445C118F21C;
+        Thu, 10 Mar 2022 09:52:18 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id dr20so13702080ejc.6;
+        Thu, 10 Mar 2022 09:52:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=6WXp5qVD5RJpTEot5C084K06yGMaS2AEVin/2qPKdzk=;
+        b=O/x17lahMsmYF73EZdvo9N5D4sKKiI0QOFvA7kVjKasMfoRMAIcHf5loJyU4MERara
+         EiKkvVCV6TSIcbmgszzvLLhL5twQNPGyZec7fb5h4pNyfnpmG8h5jxEAC0Pc1ZwIe8/f
+         BAF/6IrxKL6G56Oh6pbJOmipHA6QMS82aO4aI/NAUbwxVP0ZCPnIzp5M2OIpGksF7XJE
+         +4wlNj4yXLSLKI/0rfgU6feqUMS9qoviY8khstt2sY5kmlxlWcZ2U3pOnlW5qNRlJS7p
+         vXywJBju5msMPlLSiOQ4s6lU6XngApcf+/TExWwutEhyerP03wwhmb3JJl2Pz5orRhE2
+         QJOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6WXp5qVD5RJpTEot5C084K06yGMaS2AEVin/2qPKdzk=;
+        b=ENe3Q6ByrftBrXGf2T3KZ6decwL96ddCYycFwlygsWXmtB718pDjYD+XpmHxwYYS1o
+         WbBo+2cygVeenZkszKR1MC7OURTFIUCGIagXQtmeWwBJoDX3VcfVK4lD5p9WlaLJFhuW
+         ROCB/joovT3CGkiDL0Vmx3Ce9RCZNMNLe8O8iuAdfPxcJvOg21+cHUu4NisBtdvRn+lR
+         s/+/Ko+shpeBywK7KL58d7Ph7+4Y8RajwSCVm3JE8A6nwM+iC5f7qg4f1/BbO4Vji2oh
+         7RC6BN2czIBYNKXn8deMdgZWDq65YmdfxBuGkfin/W315Vi6+QKoNqrr7z+4pa0TLUSq
+         OUCw==
+X-Gm-Message-State: AOAM531fdxLWyIGFtYCnJ0SjmlyzhZ4+PT6yQoGFDjdzJf/rP2jITA+o
+        y1VSRe72pD+6V+ID7FCZEb4=
+X-Google-Smtp-Source: ABdhPJwiHwGaW6QA66HwC9gez8ruNve1mh6cvXVUMIH0VEiDi1A8GZ4l3yaS+wgYOUkvxRLH7wWUtw==
+X-Received: by 2002:a17:906:4a96:b0:6c5:5ea9:5366 with SMTP id x22-20020a1709064a9600b006c55ea95366mr5160528eju.473.1646934736657;
+        Thu, 10 Mar 2022 09:52:16 -0800 (PST)
+Received: from [192.168.2.2] (81-204-249-205.fixed.kpn.net. [81.204.249.205])
+        by smtp.gmail.com with ESMTPSA id o10-20020aa7c7ca000000b00416c8defff0sm298885eds.61.2022.03.10.09.52.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Mar 2022 09:52:16 -0800 (PST)
+Message-ID: <9295c92e-e054-8817-c96c-b33821643ce7@gmail.com>
+Date:   Thu, 10 Mar 2022 18:52:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 11/18] crypto: rockhip: do not handle dma clock
+Content-Language: en-US
+To:     LABBE Corentin <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, john@metanate.com
+References: <20220302211113.4003816-1-clabbe@baylibre.com>
+ <20220302211113.4003816-12-clabbe@baylibre.com>
+ <064626ad-129e-c7eb-5e08-12d93cffa993@gmail.com> <YioPGUFPOerQKak5@Red>
+From:   Johan Jonker <jbx6244@gmail.com>
+In-Reply-To: <YioPGUFPOerQKak5@Red>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YikEs7RNgPXTQolv@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 09, 2022 at 07:49:07PM +0000, Eric Biggers wrote:
-> The issue is that every other "shash" algorithm besides crct10dif, including
-> crc32 and crc32c, follow the convention of treating the digest as bytes.  Doing
-> otherwise is unusual for the crypto API.  So I have a slight preference for
-> treating it as bytes.  Perhaps see what Herbert Xu (maintainer of the crypto
-> API, Cc'ed) recommends?
 
-I'm okay either way, they're both simple enough. Here is an update atop
-this series to match the other shash conventions if this is preferred
-over my previous fix:
 
----
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 914d8cddd43a..f9eb45571bc7 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -282,7 +282,7 @@ EXPORT_SYMBOL(t10_pi_type3_ip);
- 
- static __be64 ext_pi_crc64(void *data, unsigned int len)
- {
--	return cpu_to_be64(crc64_rocksoft(data, len));
-+	return cpu_to_be64(le64_to_cpu(crc64_rocksoft(data, len)));
- }
- 
- static blk_status_t ext_pi_crc64_generate(struct blk_integrity_iter *iter,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index f1a22794c404..f9e5f601c657 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -3686,11 +3686,11 @@ static const struct hash_testvec crc64_rocksoft_tv_template[] = {
- 	{
- 		.plaintext	= zeroes,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0x6482d367eb22b64eull },
-+		.digest		= "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
- 	}, {
- 		.plaintext	= ones,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0xc0ddba7302eca3acull },
-+		.digest		= "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
- 	}
- };
- 
-diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-index e044c60d1e61..5319f9a9fc19 100644
---- a/include/linux/crc64.h
-+++ b/include/linux/crc64.h
-@@ -12,7 +12,7 @@
- u64 __pure crc64_be(u64 crc, const void *p, size_t len);
- u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
- 
--u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
--u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
-+__le64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-+__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
- 
- #endif /* _LINUX_CRC64_H */
-diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
-index fc9ae0da5df7..215acb79a15d 100644
---- a/lib/crc64-rocksoft.c
-+++ b/lib/crc64-rocksoft.c
-@@ -54,16 +54,16 @@ static struct notifier_block crc64_rocksoft_nb = {
- 	.notifier_call = crc64_rocksoft_notify,
- };
- 
--u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
-+__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
- {
- 	struct {
- 		struct shash_desc shash;
--		u64 crc;
-+		__le64 crc;
- 	} desc;
- 	int err;
- 
- 	if (static_branch_unlikely(&crc64_rocksoft_fallback))
--		return crc64_rocksoft_generic(crc, buffer, len);
-+		return cpu_to_le64(crc64_rocksoft_generic(crc, buffer, len));
- 
- 	rcu_read_lock();
- 	desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
-@@ -77,7 +77,7 @@ u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
- }
- EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
- 
--u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
-+__le64 crc64_rocksoft(const unsigned char *buffer, size_t len)
- {
- 	return crc64_rocksoft_update(0, buffer, len);
- }
---
+On 3/10/22 15:45, LABBE Corentin wrote:
+> Le Fri, Mar 04, 2022 at 04:01:58PM +0100, Johan Jonker a Ã©crit :
+>> Hi Corentin,
+>>
+>> Make your clock driver parsing portable.
+>>
+>> ===
+>>     oneOf:
+>>       - const: rockchip,rk3288-crypto
+>>       - items:
+>>           - enum:
+>>               - rockchip,rk3328-crypto
+>>           - const: rockchip,rk3288-crypto
+>>
+>> Compatible string must be SoC related!
+>>
+>> rk3288 was the first in line that had support, so we use that as fall
+>> back string.
+>>
+>> ===
+>>
+>> Make binding fit for more SoC types.
+>> Allow more clocks by using devm_clk_bulk_get_all.
+> 
+> Hello
+> 
+> Thanks for the hint of devm_clk_bulk_get_all, I will switch to it as it simplify clock handling.
+> 
+>> Drop reset-names requirement for devm_reset_control_array_get_exclusive.
+>>
+>> ===
+>>
+>> Use a patch order to prevent the scripts generate notifications.
+> 
+
+> which scripts ?
+
+For Linux users:
+./scripts/checkpatch.pl --strict <patch1> <patch2>
+
+Device tree maintainer rob+dt:
+A bot with unknown scripts.
+
+> 
+>>
+
+
+- dts rk3288 clock removal
+
+>> - dt-bindings conversion
+>>
+>> - add rk3328 compatible string in a separate patch
++ new clock names
+
+
+>>
+>> - your driver changes
+>>
+>> - dts patches
+>>
+>> A proposed maintainer must be able to submit patch series without errors. ;)
+>>
+>> ===
+>>
+>> When you remove a clock in a YAML conversion you must add a note to the
+>> DT maintainer.
+>>
+>> ===
+>>
+>> Johan
+>>
+>> On 3/2/22 22:11, Corentin Labbe wrote:
+>>> The DMA clock is handled by the DMA controller, so the crypto does not
+>>> have to touch it.
+>>>
+>>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+>>> ---
+>>>  drivers/crypto/rockchip/rk3288_crypto.c | 16 +---------------
+>>>  drivers/crypto/rockchip/rk3288_crypto.h |  1 -
+>>>  2 files changed, 1 insertion(+), 16 deletions(-)
+>>>
+>>> diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+>>> index 94ef1283789f..645855d2651b 100644
+>>> --- a/drivers/crypto/rockchip/rk3288_crypto.c
+>>> +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+>>> @@ -40,15 +40,8 @@ static int rk_crypto_enable_clk(struct rk_crypto_info *dev)
+>>>  			__func__, __LINE__);
+>>>  		goto err_hclk;
+>>>  	}
+>>> -	err = clk_prepare_enable(dev->dmaclk);
+>>> -	if (err) {
+>>> -		dev_err(dev->dev, "[%s:%d], Couldn't enable clock dmaclk\n",
+>>> -			__func__, __LINE__);
+>>> -		goto err_dmaclk;
+>>> -	}
+>>> +
+>>>  	return err;
+>>> -err_dmaclk:
+>>> -	clk_disable_unprepare(dev->hclk);
+>>>  err_hclk:
+>>>  	clk_disable_unprepare(dev->aclk);
+>>>  err_aclk:
+>>> @@ -59,7 +52,6 @@ static int rk_crypto_enable_clk(struct rk_crypto_info *dev)
+>>>  
+>>>  static void rk_crypto_disable_clk(struct rk_crypto_info *dev)
+>>>  {
+>>> -	clk_disable_unprepare(dev->dmaclk);
+>>>  	clk_disable_unprepare(dev->hclk);
+>>>  	clk_disable_unprepare(dev->aclk);
+>>>  	clk_disable_unprepare(dev->sclk);
+>>> @@ -199,12 +191,6 @@ static int rk_crypto_probe(struct platform_device *pdev)
+>>>  		goto err_crypto;
+>>>  	}
+>>>  
+>>
+>>> -	crypto_info->dmaclk = devm_clk_get(&pdev->dev, "apb_pclk");
+>>> -	if (IS_ERR(crypto_info->dmaclk)) {
+>>> -		err = PTR_ERR(crypto_info->dmaclk);
+>>> -		goto err_crypto;
+>>> -	}
+>>> -
+>>
+>> rk3288:
+>>  		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+>> -			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+>> -		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+>> +			 <&cru SCLK_CRYPTO>;
+>> +		clock-names = "aclk", "hclk", "sclk";
+>>
+>>
+>> rk3328:
+>> +		clocks = <&cru HCLK_CRYPTO_MST>, <&cru HCLK_CRYPTO_SLV>,
+>> +			 <&cru SCLK_CRYPTO>;
+>> +		clock-names = "aclk", "hclk", "sclk";
+>>
+>> The HCLK_CRYPTO_MST not is related to ACLK_CRYPTO.
+>> You are reusing rk3288 names to not to change the driver.
+>> Give it an other name.
+> 
+> You are right, I will change them.
+> 
+> 
+>>
+>> ===
+>>
+
+>> The sclk goes through a crypto_div_con.
+>> Does that need a frequency set?
+>> Or does that come from nowhere?
+>>
+>> From crypto_v1.c
+>> 	priv->frequency = dev_read_u32_default(dev, "clock-frequency",
+>> 					       CRYPTO_V1_DEFAULT_RATE);
+>>
+>> 	ret = clk_set_rate(&priv->sclk, priv->frequency);
+>>
+> 
+
+> The problem is that I dont see any hints for this in TRM, and their rockchips source are inconsistent, they do this in uboot not in linux....
+
+Rockchip RK3288TRM V1.2 Part2-20170321.pdf
+page 1419
+
+Make sure F crypto do not exceed 150M.
+
+===
+
+For rk3228/rk3328:
+Rockchip RK3228TRM V0.1 20151016-Part3 Graphic and Multi-media.pdf
+page 476
+
+Make sure F crypto do not exceed 150M.
+
+===
+
+Rockchip RK3399TRM V1.1 Part3 20160728.pdf
+page 781
+
+Make sure F crypto do not exceed 200M.
+
+===
+
+They all have a limit.
+Rockchip uses a default in there drivers and in there TRM tables.
+Then stay consistant and use that too what is already set by the bootloader.
+(till someone comes up with a better (yet unknown) approuch)
+
+#define CRYPTO_V1_DEFAULT_RATE		100000000
+
+===
+
+Could you disclose your sclk frequency table from:
+
+/sys/kernel/debug/clk/clk_summary
+
+Does that fit within the limits?
+
+> 
+>> ===
+>>
+>> Could you make this portable?
+>> Example:
+>>
+>> 	int i;
+>>
+>> 	priv->num_clks = devm_clk_bulk_get_all(dev, &priv->clks);
+>> 	if (priv->num_clks < 1)
+>> 		return -EINVAL;
+>>
+>> 	priv->sclk = NULL;
+>> 	for (i = 0; i < priv->num_clks; i++) {
+>> 		if (!strncmp(priv->clks[i].id, "sclk", 3)) {
+>> 			priv->sclk = priv->clks[i].clk;
+>> 			break;
+>> 		}
+>> 	}
+>>
+>> 	if (!priv->sclk) {
+>> 		dev_err(dev, "no sclk found\n");
+>> 		return -EINVAL;
+>> 	}
+>>
+>> Also add optional "sclk1" clock for rk3399.
+>> Use "sclk" and not "sclk0" to be backwards compatible.
+>>
+>> ===
+>>
+>> Also make the resets portable for rk3399.
+>> Remove the requirement for "reset-names".
+>>
+>> Example:
+>> 	priv->phy_rst = devm_reset_control_array_get_exclusive(dev);
+>> 	if (IS_ERR(priv->phy_rst))
+>> 		return dev_err_probe(dev, PTR_ERR(priv->phy_rst), "failed to get phy
+>> reset\n");
+>>
+>>
+>>
+>>>  	crypto_info->irq = platform_get_irq(pdev, 0);
+>>>  	if (crypto_info->irq < 0) {
+>>>  		dev_err(&pdev->dev, "control Interrupt is not available.\n");
+>>> diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+>>> index c741e97057dc..963fbfc4d14e 100644
+>>> --- a/drivers/crypto/rockchip/rk3288_crypto.h
+>>> +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+>>> @@ -191,7 +191,6 @@ struct rk_crypto_info {
+>>
+>>>  	struct clk			*aclk;
+>>>  	struct clk			*hclk;
+>>>  	struct clk			*sclk;
+>>> -	struct clk			*dmaclk;
+>>
+>>
+>> 	int num_clks;
+>> 	struct clk_bulk_data *clks;
+>> 	struct clk *sclk;
+>> 	struct clk *sclk1;
+>>
+>>
+>>>  	struct reset_control		*rst;
+>>>  	void __iomem			*reg;
+>>>  	int				irq;
+> 
+> 
+> For handling rk3399, I have no hardware so I cannot do anything for it easily.
+> I have asked on IRC for some tests, so let's see if it works.
+> Anyway we can always add support for it later, the priority is to fix the driver breakage.
+
+The problem with "later" is always that people "forget".
+Now you have all people there attention, so get it right for
+rk3228/rk3328 (and probably for rk3399).
+
+Success!
+
+Johan
+
+> 
+> Regards
