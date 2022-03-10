@@ -2,314 +2,284 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DD2C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 13:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318B6C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 14:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239460AbiCJN45 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Mar 2022 08:56:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47122 "EHLO
+        id S244638AbiCJOzt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Mar 2022 09:55:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232346AbiCJN45 (ORCPT
+        with ESMTP id S1347208AbiCJOuh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Mar 2022 08:56:57 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E914141FF4;
-        Thu, 10 Mar 2022 05:55:52 -0800 (PST)
-Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KDrDQ5q6Tz67vZB;
-        Thu, 10 Mar 2022 21:55:18 +0800 (CST)
-Received: from lhreml717-chm.china.huawei.com (10.201.108.68) by
- fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Mar 2022 14:55:49 +0100
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml717-chm.china.huawei.com (10.201.108.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 10 Mar 2022 13:55:48 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Thu, 10 Mar 2022 13:55:48 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "helgaas@kernel.org" <helgaas@kernel.org>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        "Jonathan Cameron" <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>
-Subject: RE: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Topic: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Thread-Index: AQHYL1K65T0xdQtNbkGb+oampkIrK6y0Oe0AgARyolA=
-Date:   Thu, 10 Mar 2022 13:55:48 +0000
-Message-ID: <ec2b1e7168714144afcd4bfe5cd39058@huawei.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
-        <20220303230131.2103-4-shameerali.kolothum.thodi@huawei.com>
- <20220307105344.171b4621.alex.williamson@redhat.com>
-In-Reply-To: <20220307105344.171b4621.alex.williamson@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.85.233]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 10 Mar 2022 09:50:37 -0500
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE2418F23C
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 06:45:52 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id q14so8354350wrc.4
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 06:45:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=zU7imf92+d/PezIj5fiCgBU/+AQvUgohjaHX+C+UpeQ=;
+        b=CmyIyYjR7tGnr1QuRp+xPIBulZs4ugi0KQAkU3z0KhniBlnMOY++5g59UgYwCso8YI
+         W8PYFBiS1lxc/vixYi31SpODNYYKTHxTm//84VyYyBug5GL3wME2E0wOtDgIrjk/LPlW
+         Kdke8bcd1RSs9PEqW5NMnh6JjlUWH6R6Zguwyz5qQ7B9TohQzqrAN1vzf8CcYZNOTDjR
+         chYvP4z4LO/T6MxgJd5nOnmc2PcooGqVXAGY1F+foafsu5Zku79jjVlU/rTxsTRlsP0d
+         kgKY5CBZv7Cd7i2WUm6gHlaeKMS2DC6ggig0yAabKv/RaESkQub8szUOCBquQmXlWWGy
+         P5hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=zU7imf92+d/PezIj5fiCgBU/+AQvUgohjaHX+C+UpeQ=;
+        b=pT4BB5zWjJ9ptEdzyiUHa7YJXBDP/BgfxYWKmDQMakFmyjQ0zO457SYU3oWNpU0TrD
+         zeTn930e4OAZcKrIJGD8YfT7WHdF2Z83Vv3SDIlSMiILL1Y2QJBxW6l5rLhcGHPU1Vka
+         VeZS2X+U035nqvT/LdxWkP1npyn63zVy2udrF3igfUzUjQqI11ouJqHFreJjP4vyjl1Y
+         ye//x4LMg2Tu9jHqk5zEep3iGdtrYYrDGz0Rv0EYw/jGOlhMBNAad6U786mMD0csQNPI
+         M6bx6rNgg+GLq5C69R9IKs6yzswWtMfIM2iWYHiERkHfBPdZGb1gR0LDGaOErjl5rsgK
+         Jqmw==
+X-Gm-Message-State: AOAM530eagsi4IVT6K9EWDodvNLJxwSaajNGvTn6uJvbO9G5mzjKNZtm
+        4CGflHdQPhbjuvEypl+DlXtcMONsYMyb0g==
+X-Google-Smtp-Source: ABdhPJyJI8jwQb/Irm6QZNNEQ5Fh9XydIkdFANTWHACe7B4gTCr/8KXVdJR/BIyz1pPmehwTd5rJ2g==
+X-Received: by 2002:a5d:6dad:0:b0:203:84b4:da13 with SMTP id u13-20020a5d6dad000000b0020384b4da13mr3470010wrs.162.1646923551095;
+        Thu, 10 Mar 2022 06:45:51 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id q16-20020a056000137000b001f046a21afcsm4450932wrz.15.2022.03.10.06.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Mar 2022 06:45:50 -0800 (PST)
+Date:   Thu, 10 Mar 2022 15:45:45 +0100
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     Johan Jonker <jbx6244@gmail.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, john@metanate.com
+Subject: Re: [PATCH v2 11/18] crypto: rockhip: do not handle dma clock
+Message-ID: <YioPGUFPOerQKak5@Red>
+References: <20220302211113.4003816-1-clabbe@baylibre.com>
+ <20220302211113.4003816-12-clabbe@baylibre.com>
+ <064626ad-129e-c7eb-5e08-12d93cffa993@gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <064626ad-129e-c7eb-5e08-12d93cffa993@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Bjorn,
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: 07 March 2022 17:54
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> Bjorn Helgaas <bhelgaas@google.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> linux-crypto@vger.kernel.org; linux-pci@vger.kernel.org; jgg@nvidia.com;
-> cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com; Linuxarm
-> <linuxarm@huawei.com>; liulongfang <liulongfang@huawei.com>; Zengtao (B)
-> <prime.zeng@hisilicon.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
-> Subject: Re: [PATCH v8 3/9] hisi_acc_qm: Move VF PCI device IDs to common
-> header
+Le Fri, Mar 04, 2022 at 04:01:58PM +0100, Johan Jonker a écrit :
+> Hi Corentin,
 > 
-> Hi Bjorn,
+> Make your clock driver parsing portable.
 > 
-> Here's the respin of this patch that adds only the VF device IDs to
-> pci_ids.h.  The next patch in the series[1] adds a consumer of these
-> IDs as a vfio-pci vendor driver.  Thanks,
-
-Just a gentle ping on this. Also the latest respin is now at v9 and can be
-found here.
-
-https://lore.kernel.org/kvm/20220308184902.2242-4-shameerali.kolothum.thodi@huawei.com/
-
-Thanks,
-Shameer
-
-> Alex
+> ===
+>     oneOf:
+>       - const: rockchip,rk3288-crypto
+>       - items:
+>           - enum:
+>               - rockchip,rk3328-crypto
+>           - const: rockchip,rk3288-crypto
 > 
-> [1]https://lore.kernel.org/all/20220303230131.2103-5-shameerali.kolothum.t
-> hodi@huawei.com/
+> Compatible string must be SoC related!
 > 
-> On Thu, 3 Mar 2022 23:01:25 +0000
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+> rk3288 was the first in line that had support, so we use that as fall
+> back string.
 > 
-> > Move the PCI Device IDs of HiSilicon ACC VF devices to a common header
-> > and also use a uniform naming convention.
-> >
-> > This will be useful when we introduce the vfio PCI HiSilicon ACC live
-> > migration driver in subsequent patches.
-> >
-> > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
+> ===
+> 
+> Make binding fit for more SoC types.
+> Allow more clocks by using devm_clk_bulk_get_all.
+
+Hello
+
+Thanks for the hint of devm_clk_bulk_get_all, I will switch to it as it simplify clock handling.
+
+> Drop reset-names requirement for devm_reset_control_array_get_exclusive.
+> 
+> ===
+> 
+> Use a patch order to prevent the scripts generate notifications.
+
+which scripts ?
+
+> 
+> - dt-bindings conversion
+> 
+> - add rk3328 compatible string in a separate patch
+> 
+> - your driver changes
+> 
+> - dts patches
+> 
+> A proposed maintainer must be able to submit patch series without errors. ;)
+> 
+> ===
+> 
+> When you remove a clock in a YAML conversion you must add a note to the
+> DT maintainer.
+> 
+> ===
+> 
+> Johan
+> 
+> On 3/2/22 22:11, Corentin Labbe wrote:
+> > The DMA clock is handled by the DMA controller, so the crypto does not
+> > have to touch it.
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 > > ---
-> >  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
-> >  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
-> >  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
-> >  include/linux/pci_ids.h                   |  3 +++
-> >  4 files changed, 21 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > index ebfab3e14499..3589d8879b5e 100644
-> > --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> > @@ -68,8 +68,7 @@
-> >  #define HPRE_REG_RD_INTVRL_US		10
-> >  #define HPRE_REG_RD_TMOUT_US		1000
-> >  #define HPRE_DBGFS_VAL_MAX_LEN		20
-> > -#define HPRE_PCI_DEVICE_ID		0xa258
-> > -#define HPRE_PCI_VF_DEVICE_ID		0xa259
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
-> >  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
-> >  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
-> >  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
-> > @@ -111,8 +110,8 @@
-> >  static const char hpre_name[] = "hisi_hpre";
-> >  static struct dentry *hpre_debugfs_root;
-> >  static const struct pci_device_id hpre_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
-> >  	{ 0, }
-> >  };
-> >
-> > @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode,
-> UACCE_MODE_DESC);
-> >
-> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+> >  drivers/crypto/rockchip/rk3288_crypto.c | 16 +---------------
+> >  drivers/crypto/rockchip/rk3288_crypto.h |  1 -
+> >  2 files changed, 1 insertion(+), 16 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+> > index 94ef1283789f..645855d2651b 100644
+> > --- a/drivers/crypto/rockchip/rk3288_crypto.c
+> > +++ b/drivers/crypto/rockchip/rk3288_crypto.c
+> > @@ -40,15 +40,8 @@ static int rk_crypto_enable_clk(struct rk_crypto_info *dev)
+> >  			__func__, __LINE__);
+> >  		goto err_hclk;
+> >  	}
+> > -	err = clk_prepare_enable(dev->dmaclk);
+> > -	if (err) {
+> > -		dev_err(dev->dev, "[%s:%d], Couldn't enable clock dmaclk\n",
+> > -			__func__, __LINE__);
+> > -		goto err_dmaclk;
+> > -	}
+> > +
+> >  	return err;
+> > -err_dmaclk:
+> > -	clk_disable_unprepare(dev->hclk);
+> >  err_hclk:
+> >  	clk_disable_unprepare(dev->aclk);
+> >  err_aclk:
+> > @@ -59,7 +52,6 @@ static int rk_crypto_enable_clk(struct rk_crypto_info *dev)
+> >  
+> >  static void rk_crypto_disable_clk(struct rk_crypto_info *dev)
 > >  {
-> > -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops hpre_pf_q_num_ops = {
-> > @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
-> >  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
-> >  	hisi_qm_debug_init(qm);
-> >
-> > -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
-> >  		ret = hpre_ctrl_debug_init(qm);
-> >  		if (ret)
-> >  			goto failed_to_create;
-> > @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = HPRE_SQE_SIZE;
-> >  	qm->dev_name = hpre_name;
-> >
-> > -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
-> > diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c
-> b/drivers/crypto/hisilicon/sec2/sec_main.c
-> > index 26d3ab1d308b..311a8747b5bf 100644
-> > --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> > +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> > @@ -20,8 +20,7 @@
-> >
-> >  #define SEC_VF_NUM			63
-> >  #define SEC_QUEUE_NUM_V1		4096
-> > -#define SEC_PF_PCI_DEVICE_ID		0xa255
-> > -#define SEC_VF_PCI_DEVICE_ID		0xa256
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
-> >
-> >  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
-> >  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
-> > @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
-> >
-> >  static int sec_pf_q_num_set(const char *val, const struct kernel_param
-> *kp)
-> >  {
-> > -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops sec_pf_q_num_ops = {
-> > @@ -313,8 +312,8 @@ module_param_cb(uacce_mode,
-> &sec_uacce_mode_ops, &uacce_mode, 0444);
-> >  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
-> >
-> >  static const struct pci_device_id sec_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_SEC_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_SEC_VF) },
-> >  	{ 0, }
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
-> > @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
-> >  	regset->base = qm->io_base;
-> >  	regset->dev = dev;
-> >
-> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
-> >  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
-> >
-> >  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
-> > @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
-> >  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
-> >  	int i;
-> >
-> > -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
-> > +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
-> >  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
-> >  			spin_lock_init(&sec->debug.files[i].lock);
-> >  			sec->debug.files[i].index = i;
-> > @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = SEC_SQE_SIZE;
-> >  	qm->dev_name = sec_name;
-> >
-> > -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = SEC_PF_DEF_Q_BASE;
-> > diff --git a/drivers/crypto/hisilicon/zip/zip_main.c
-> b/drivers/crypto/hisilicon/zip/zip_main.c
-> > index 678f8b58ec42..66decfe07282 100644
-> > --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> > +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> > @@ -15,8 +15,7 @@
-> >  #include <linux/uacce.h>
-> >  #include "zip.h"
-> >
-> > -#define PCI_DEVICE_ID_ZIP_PF		0xa250
-> > -#define PCI_DEVICE_ID_ZIP_VF		0xa251
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
-> >
-> >  #define HZIP_QUEUE_NUM_V1		4096
-> >
-> > @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode,
-> UACCE_MODE_DESC);
-> >
-> >  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
-> >  {
-> > -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
-> > +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
-> >  }
-> >
-> >  static const struct kernel_param_ops pf_q_num_ops = {
-> > @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops,
-> &vfs_num, 0444);
-> >  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63),
-> 0(default)");
-> >
-> >  static const struct pci_device_id hisi_zip_dev_ids[] = {
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
-> > -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
-> > +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI,
-> PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
-> >  	{ 0, }
-> >  };
-> >  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
-> > @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct
-> pci_dev *pdev)
-> >  	qm->sqe_size = HZIP_SQE_SIZE;
-> >  	qm->dev_name = hisi_zip_name;
-> >
-> > -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
-> > +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
-> >  			QM_HW_PF : QM_HW_VF;
-> >  	if (qm->fun_type == QM_HW_PF) {
-> >  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-> > diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> > index aad54c666407..31dee2b65a62 100644
-> > --- a/include/linux/pci_ids.h
-> > +++ b/include/linux/pci_ids.h
-> > @@ -2529,6 +2529,9 @@
-> >  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
-> >
-> >  #define PCI_VENDOR_ID_HUAWEI		0x19e5
-> > +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-> > +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-> > +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
-> >
-> >  #define PCI_VENDOR_ID_NETRONOME		0x19ee
-> >  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
+> > -	clk_disable_unprepare(dev->dmaclk);
+> >  	clk_disable_unprepare(dev->hclk);
+> >  	clk_disable_unprepare(dev->aclk);
+> >  	clk_disable_unprepare(dev->sclk);
+> > @@ -199,12 +191,6 @@ static int rk_crypto_probe(struct platform_device *pdev)
+> >  		goto err_crypto;
+> >  	}
+> >  
+> 
+> > -	crypto_info->dmaclk = devm_clk_get(&pdev->dev, "apb_pclk");
+> > -	if (IS_ERR(crypto_info->dmaclk)) {
+> > -		err = PTR_ERR(crypto_info->dmaclk);
+> > -		goto err_crypto;
+> > -	}
+> > -
+> 
+> rk3288:
+>  		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+> -			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+> -		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+> +			 <&cru SCLK_CRYPTO>;
+> +		clock-names = "aclk", "hclk", "sclk";
+> 
+> 
+> rk3328:
+> +		clocks = <&cru HCLK_CRYPTO_MST>, <&cru HCLK_CRYPTO_SLV>,
+> +			 <&cru SCLK_CRYPTO>;
+> +		clock-names = "aclk", "hclk", "sclk";
+> 
+> The HCLK_CRYPTO_MST not is related to ACLK_CRYPTO.
+> You are reusing rk3288 names to not to change the driver.
+> Give it an other name.
 
+You are right, I will change them.
+
+
+> 
+> ===
+> 
+> The sclk goes through a crypto_div_con.
+> Does that need a frequency set?
+> Or does that come from nowhere?
+> 
+> From crypto_v1.c
+> 	priv->frequency = dev_read_u32_default(dev, "clock-frequency",
+> 					       CRYPTO_V1_DEFAULT_RATE);
+> 
+> 	ret = clk_set_rate(&priv->sclk, priv->frequency);
+> 
+
+The problem is that I dont see any hints for this in TRM, and their rockchips source are inconsistent, they do this in uboot not in linux....
+
+> ===
+> 
+> Could you make this portable?
+> Example:
+> 
+> 	int i;
+> 
+> 	priv->num_clks = devm_clk_bulk_get_all(dev, &priv->clks);
+> 	if (priv->num_clks < 1)
+> 		return -EINVAL;
+> 
+> 	priv->sclk = NULL;
+> 	for (i = 0; i < priv->num_clks; i++) {
+> 		if (!strncmp(priv->clks[i].id, "sclk", 3)) {
+> 			priv->sclk = priv->clks[i].clk;
+> 			break;
+> 		}
+> 	}
+> 
+> 	if (!priv->sclk) {
+> 		dev_err(dev, "no sclk found\n");
+> 		return -EINVAL;
+> 	}
+> 
+> Also add optional "sclk1" clock for rk3399.
+> Use "sclk" and not "sclk0" to be backwards compatible.
+> 
+> ===
+> 
+> Also make the resets portable for rk3399.
+> Remove the requirement for "reset-names".
+> 
+> Example:
+> 	priv->phy_rst = devm_reset_control_array_get_exclusive(dev);
+> 	if (IS_ERR(priv->phy_rst))
+> 		return dev_err_probe(dev, PTR_ERR(priv->phy_rst), "failed to get phy
+> reset\n");
+> 
+> 
+> 
+> >  	crypto_info->irq = platform_get_irq(pdev, 0);
+> >  	if (crypto_info->irq < 0) {
+> >  		dev_err(&pdev->dev, "control Interrupt is not available.\n");
+> > diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+> > index c741e97057dc..963fbfc4d14e 100644
+> > --- a/drivers/crypto/rockchip/rk3288_crypto.h
+> > +++ b/drivers/crypto/rockchip/rk3288_crypto.h
+> > @@ -191,7 +191,6 @@ struct rk_crypto_info {
+> 
+> >  	struct clk			*aclk;
+> >  	struct clk			*hclk;
+> >  	struct clk			*sclk;
+> > -	struct clk			*dmaclk;
+> 
+> 
+> 	int num_clks;
+> 	struct clk_bulk_data *clks;
+> 	struct clk *sclk;
+> 	struct clk *sclk1;
+> 
+> 
+> >  	struct reset_control		*rst;
+> >  	void __iomem			*reg;
+> >  	int				irq;
+
+
+For handling rk3399, I have no hardware so I cannot do anything for it easily.
+I have asked on IRC for some tests, so let's see if it works.
+Anyway we can always add support for it later, the priority is to fix the driver breakage.
+
+Regards
