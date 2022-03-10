@@ -2,304 +2,149 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0577BC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 20:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 600C8C433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Mar 2022 20:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245708AbiCJUvC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Mar 2022 15:51:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
+        id S236624AbiCJVA2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 10 Mar 2022 16:00:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245689AbiCJUvC (ORCPT
+        with ESMTP id S245041AbiCJVA1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Mar 2022 15:51:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2BE5187E29
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 12:49:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646945397;
+        Thu, 10 Mar 2022 16:00:27 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4FEDBD28;
+        Thu, 10 Mar 2022 12:59:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4FC7BB82849;
+        Thu, 10 Mar 2022 20:59:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87145C340E8;
+        Thu, 10 Mar 2022 20:59:21 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ME2n1YTL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1646945958;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/wHyperqVD6yT4MZyOSDrCItm0ScJpHPiGZO3nX6coc=;
-        b=dme5Spj3BzzmWYzkmx+4hVXJm3vJNXtajhD3vUv9xHvg9kh0tV61kxIm7RmiuzwaCkz8+C
-        2+LuCi6po277se54UUIv8OV4yDOF+14aNMGs5GrEhZWPq18RwwQLtCelIq21SZDOaBAQr9
-        jyv6vmH1Z+qgu+CKS9QEJEOfMgwm7Qc=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-314-257eh6RiMeyW5mOvIphfMg-1; Thu, 10 Mar 2022 15:49:56 -0500
-X-MC-Unique: 257eh6RiMeyW5mOvIphfMg-1
-Received: by mail-il1-f197.google.com with SMTP id q6-20020a056e0215c600b002c2c4091914so4112965ilu.14
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 12:49:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=/wHyperqVD6yT4MZyOSDrCItm0ScJpHPiGZO3nX6coc=;
-        b=BezCfyRirMu5swb7A3bM46lK4dyA3t3GdWa2tW7NjNoDJkrfS5TJ99DkB+TMknpZ4U
-         qvXYD+dR93xVy61y2EoRSm9+mc/VOrJjzKm4GV0WefmqidQyb5MPVwMjnHH4EsT3VWKv
-         TEYV1diWbbY/RR0105mzw1ht2aqmfE1tfPf9DcuVaijkeK42yLqUhgIOPuiyiy9FEjYC
-         4mxNHihHzXBK8h5nJXHrmTOwZl9e/MOKK/cQnbXAu+K6CnRJSAO0CQpkbWWUKXFk5+qa
-         hHhtaP6fTviF20CuvdTvFo5atTy2d6y50g0iJ1wtkZPKHt18uF8EqIZ8OYeZqsoPZa/n
-         HEcg==
-X-Gm-Message-State: AOAM530KV6HN31S2bhbliVwVAHWb2cZAkYjfb2wW1nh7PIGQw6KIdxdh
-        NWiPT3XTXu6ClZ4S7lNk0rx93bxpFmCZsYl4IEcKl3KbF5Z8RNrBghvMPRIWO50IYGGy4xqCfnA
-        f95/MvkCghXz953tpKGmzWJde
-X-Received: by 2002:a05:6e02:180d:b0:2c7:733a:f11d with SMTP id a13-20020a056e02180d00b002c7733af11dmr710106ilv.23.1646945395824;
-        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzdGHIOmSFlUA27ptxSyyRFHgWYtRYdyaS5HXsHLwYYnrbDuYuHO7OCWr0eIL08JCnOU3b0MA==
-X-Received: by 2002:a05:6e02:180d:b0:2c7:733a:f11d with SMTP id a13-20020a056e02180d00b002c7733af11dmr710078ilv.23.1646945395433;
-        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id b11-20020a056e02184b00b002c66e75d5f7sm3455113ilv.39.2022.03.10.12.49.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 12:49:55 -0800 (PST)
-Date:   Thu, 10 Mar 2022 13:49:54 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        "Jason Gunthorpe" <jgg@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Xu Zaibo <xuzaibo@huawei.com>
-Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
- migration
-Message-ID: <20220310134954.0df4bb12.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB527634CCF86829E0680E5E678C0A9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
-        <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
-        <20220304205720.GE219866@nvidia.com>
-        <20220307120513.74743f17.alex.williamson@redhat.com>
-        <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
-        <20220307125239.7261c97d.alex.williamson@redhat.com>
-        <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20220308123312.1f4ba768.alex.williamson@redhat.com>
-        <BN9PR11MB527634CCF86829E0680E5E678C0A9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+        bh=/ftjEjnH/rbsDeyFCjGVbhkWso1sbRUDgVGsJ454ha4=;
+        b=ME2n1YTLI1bjpJA3U9PsygwL2CYiWoB3BQ2ERoyg6APueWHj2gUBEcML3CGeE//KWas3hi
+        3jEEbISTG7AchhdPtPS5I/TiIOpfTsmHZfRyeRsJhmj7uYgPgS8x6vopOS+AsyrC0yudqK
+        zxfauqOQfPeASZl8ycSJDKJUT6mCZ4E=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 09fcd7fd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 10 Mar 2022 20:59:18 +0000 (UTC)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-2dc28791ecbso72596157b3.4;
+        Thu, 10 Mar 2022 12:59:17 -0800 (PST)
+X-Gm-Message-State: AOAM5300vOhWmMe9IdxXQBizfIleaZHVw2tt6zu2CzZQeNkBNzwWByvm
+        r6KCVodXSDPlULc6NpTg/zndRGsJ/ru7EwkTj54=
+X-Google-Smtp-Source: ABdhPJw66GRc0k7x4PF+JjD6fyFCOyICz/HdgthgklVUv0i5hNJJrN1nqT5VBWrbVNOehwtXSZxd43NAzcsVcZrHx/I=
+X-Received: by 2002:a81:10c5:0:b0:2dc:4b7:d487 with SMTP id
+ 188-20020a8110c5000000b002dc04b7d487mr5640201ywq.396.1646945956540; Thu, 10
+ Mar 2022 12:59:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20220309152653.1244096-1-Jason@zx2c4.com> <20220309191850.1508953-1-Jason@zx2c4.com>
+ <YimFHeXgw9jfevWq@sol.localdomain>
+In-Reply-To: <YimFHeXgw9jfevWq@sol.localdomain>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 10 Mar 2022 13:59:05 -0700
+X-Gmail-Original-Message-ID: <CAHmME9ohyKKX4Qg_dyGq36MxFkhBoVQYYgs8uUoCfBkJNqfX7Q@mail.gmail.com>
+Message-ID: <CAHmME9ohyKKX4Qg_dyGq36MxFkhBoVQYYgs8uUoCfBkJNqfX7Q@mail.gmail.com>
+Subject: Re: [PATCH v2] random: reseed more often immediately after booting
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 9 Mar 2022 10:11:06 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Hey Eric,
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, March 9, 2022 3:33 AM
-> >=20
-> > On Tue, 8 Mar 2022 08:11:11 +0000
-> > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> >  =20
-> > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > Sent: Tuesday, March 8, 2022 3:53 AM =20
-> > > > > =20
-> > > > > > I think we still require acks from Bjorn and Zaibo for select p=
-atches
-> > > > > > in this series. =20
-> > > > >
-> > > > > I checked with Ziabo. He moved projects and is no longer looking =
-into =20
-> > > > crypto stuff. =20
-> > > > > Wangzhou and LiuLongfang now take care of this. Received acks fro=
-m =20
-> > > > Wangzhou =20
-> > > > > already and I will request Longfang to provide his. Hope that's o=
-k. =20
-> > > >
-> > > > Maybe a good time to have them update MAINTAINERS as well.  Thanks,
-> > > > =20
-> > >
-> > > I have one question here (similar to what we discussed for mdev befor=
-e).
-> > >
-> > > Now we are adding vendor specific drivers under /drivers/vfio. Two dr=
-ivers
-> > > on radar and more will come. Then what would be the criteria for
-> > > accepting such a driver? Do we prefer to a model in which the author =
-=20
-> > should =20
-> > > provide enough background for vfio community to understand how it =20
-> > works =20
-> > > or as done here just rely on the PF driver owner to cover device spec=
-ific
-> > > code?
-> > >
-> > > If the former we may need document some process for what information
-> > > is necessary and also need secure increased review bandwidth from key
-> > > reviewers in vfio community.
-> > >
-> > > If the latter then how can we guarantee no corner case overlooked by =
-both
-> > > sides (i.e. how to know the coverage of total reviews)? Another open =
-is =20
-> > who =20
-> > > from the PF driver sub-system should be considered as the one to give=
- the
-> > > green signal. If the sub-system maintainer trusts the PF driver owner=
- and
-> > > just pulls commits from him then having the r-b from the PF driver ow=
-ner is
-> > > sufficient. But if the sub-system maintainer wants to review detail c=
-hange
-> > > in every underlying driver then we probably also want to get the ack =
-from
-> > > the maintainer.
-> > >
-> > > Overall I didn't mean to slow down the progress of this series. But a=
-bove
-> > > does be some puzzle occurred in my review. =F0=9F=98=8A =20
-> >=20
-> > Hi Kevin,
-> >=20
-> > Good questions, I'd like a better understanding of expectations as
-> > well.  I think the intentions are the same as any other sub-system, the
-> > drivers make use of shared interfaces and extensions and the role of
-> > the sub-system should be to make sure those interfaces are used
-> > correctly and extensions fit well within the overall design.  However,
-> > just as the network maintainer isn't expected to fully understand every
-> > NIC driver, I think/hope we have the same expectations here.  It's
-> > certainly a benefit to the community and perceived trustworthiness if
-> > each driver outlines its operating model and security nuances, but
-> > those are only ever going to be the nuances identified by the people
-> > who have the access and energy to evaluate the device.
-> >=20
-> > It's going to be up to the community to try to determine that any new
-> > drivers are seriously considering security and not opening any new gaps
-> > relative to behavior using the base vfio-pci driver.  For the driver
-> > examples we have, this seems a bit easier than evaluating an entire
-> > mdev device because they're largely providing direct access to the
-> > device rather than trying to multiplex a shared physical device.  We
-> > can therefore focus on incremental functionality, as both drivers have
-> > done, implementing a boilerplate vendor driver, then adding migration
-> > support.  I imagine this won't always be the case though and some
-> > drivers will re-implement much of the core to support further emulation
-> > and shared resources.
-> >=20
-> > So how do we as a community want to handle this?  I wouldn't mind, I'd
-> > actually welcome, some sort of review requirement for new vfio vendor
-> > driver variants.  Is that reasonable?  What would be the criteria?
-> > Approval from the PF driver owner, if different/necessary, and at least
-> > one unaffiliated reviewer (preferably an active vfio reviewer or
-> > existing vfio variant driver owner/contributor)?  Ideas welcome.
-> > Thanks,
-> >  =20
->=20
-> Yes, and the criteria is the hard part. In the end it largely depend on=20
-> the expectations of the reviewers. =20
->=20
-> If the unaffiliated reviewer only cares about the usage of shared=20
-> interfaces or extensions as you said then what this series does is
-> just fine. Such type of review can be easily done via reading code=20
-> and doesn't require detail device knowledge.
->=20
-> On the other hand if the reviewer wants to do a full functional
-> review of how migration is actually supported for such device,=20
-> whatever information (patch description, code comment, kdoc,
-> etc.) necessary to build a standalone migration story would be
-> appreciated, e.g.:
->=20
->   - What composes the device state?
->   - Which portion of the device state is exposed to and managed
->     by the user and which is hidden from the user (i.e. controlled
->     by the PF driver)?
->   - Interface between the vfio driver and the device (and/or PF
->     driver) to manage the device state;
->   - Rich functional-level comments for the reviewer to dive into
->     the migration flow;
->   - ...
->=20
-> I guess we don't want to force one model over the other. Just
-> from my impression the more information the driver can=20
-> provide the more time I'd like to spend on the review. Otherwise
-> it has to trend to the minimal form i.e. the first model.
->=20
-> and currently I don't have a concrete idea how the 2nd model will
-> work. maybe it will get clear only when a future driver attracts=20
-> people to do thorough review...
+On Wed, Mar 9, 2022 at 9:57 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > not more than once per 5 minutes.
+>
+> Break up the above into multiple paragraphs?
 
-Do you think we should go so far as to formalize this via a MAINTAINERS
-entry, for example:
+Will do.
 
-diff --git a/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst b/Doc=
-umentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-new file mode 100644
-index 000000000000..54ebafcdd735
---- /dev/null
-+++ b/Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-@@ -0,0 +1,35 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+Acceptance criteria for vfio-pci device specific driver variants
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+Overview
-+--------
-+The vfio-pci driver exists as a device agnostic driver using the
-+system IOMMU and relying on the robustness of platform fault
-+handling to provide isolated device access to userspace.  While the
-+vfio-pci driver does include some device specific support, further
-+extensions for yet more advanced device specific features are not
-+sustainable.  The vfio-pci driver has therefore split out
-+vfio-pci-core as a library that may be reused to implement features
-+requiring device specific knowledge, ex. saving and loading device
-+state for the purposes of supporting migration.
-+
-+In support of such features, it's expected that some device specific
-+variants may interact with parent devices (ex. SR-IOV PF in support of
-+a user assigned VF) or other extensions that may not be otherwise
-+accessible via the vfio-pci base driver.  Authors of such drivers
-+should be diligent not to create exploitable interfaces via such
-+interactions or allow unchecked userspace data to have an effect
-+beyond the scope of the assigned device.
-+
-+New driver submissions are therefore requested to have approval via
-+Sign-off for any interactions with parent drivers.  Additionally,
-+drivers should make an attempt to provide sufficient documentation
-+for reviewers to understand the device specific extensions, for
-+example in the case of migration data, how is the device state
-+composed and consumed, which portions are not otherwise available to
-+the user via vfio-pci, what safeguards exist to validate the data,
-+etc.  To that extent, authors should additionally expect to require
-+reviews from at least one of the listed reviewers, in addition to the
-+overall vfio maintainer.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4322b5321891..4f7d26f9aac6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20314,6 +20314,13 @@ F:	drivers/vfio/mdev/
- F:	include/linux/mdev.h
- F:	samples/vfio-mdev/
-=20
-+VFIO PCI VENDOR DRIVERS
-+R:	Your Name <your.name@here.com>
-+L:	kvm@vger.kernel.org
-+S:	Maintained
-+P:	Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
-+F:	drivers/vfio/pci/*/
-+
- VFIO PLATFORM DRIVER
- M:	Eric Auger <eric.auger@redhat.com>
- L:	kvm@vger.kernel.org
+>
+> > +/*
+> > + * Return whether the crng seed is considered to be sufficiently
+> > + * old that a reseeding might be attempted. This is the case 5,
+> > + * 10, 20, 40, 80, and 160 seconds after boot, and after if the
+> > + * last reseeding was CRNG_RESEED_INTERVAL ago.
+> > + */
+> > +static bool crng_has_old_seed(void)
+> > +{
+> > +     static unsigned int next_init_secs = 5;
+> > +
+> > +     if (unlikely(next_init_secs < CRNG_RESEED_INTERVAL / HZ)) {
+>
+> The read of 'next_init_secs' needs READ_ONCE(), since it can be written to
+> concurrently.
 
-Ideally we'd have at least Yishai, Shameer, Jason, and yourself listed
-as reviewers (Connie and I are included via the higher level entry).
-Thoughts from anyone?  Volunteers for reviewers if we want to press
-forward with this as formal acceptance criteria?  Thanks,
+Thanks, will fix.
 
-Alex
+> However, one thing that seems a bit odd is that this method can result in two
+> reseeds with very little time in between.  For example, if no one is using the
+> RNG from second 40-78, but then it is used in seconds 79-80, then it will be
+> reseeded at both seconds 79 and 80 if there is entropy available.
 
+I've been sort of going back and forth on this. I think the idea is
+that there are two relative time measurements. The ordinary one we use
+is time since last reseeding. But at boot, we're trying to account for
+the fact that entropy is coming in relative to the init process of the
+system, which means we need it to be relative to boot time rather than
+relative to the last reseeding. As you point out, this is a little
+wonky with how things are now, because we only ever reseed on usage.
+To get closer to what I have in mind, we could reseed in a timer, so
+that it hits it exactly on the 5,10,20,40,etc dot. But that seems a
+bit cumbersome and maybe unnecessary. The effect of the behavior of
+this v1 you pointed out is:
+
+- We might reseed at 79, and then fail to reseed at 80. Consequence:
+we lose 1 second of entropy that could have made it for that try.
+- We might reseed at 79, and then also reseed at 80 too. Consequence:
+that's a fairly quick refresh, but on the other hand, we're still
+requiring 256 bit credits, so maybe not so bad, and if we've got so
+much entropy coming in during that small period of time, maybe it
+really isn't a concern.
+
+So I'm not sure either of these cases really matter that much.
+
+> Perhaps the condition should still be:
+>
+>         time_after(jiffies, READ_ONCE(base_crng.birth) + interval);
+>
+> ... as it is in the non-early case, but where 'interval' is a function of
+> 'uptime' rather than always CRNG_RESEED_INTERVAL?  Maybe something like:
+>
+>         interval = CRNG_RESEED_INTERVAL;
+>         if (uptime < 2 * CRNG_RESEED_INTERVAL / HZ)
+>                 interval = max(5, uptime / 2) * HZ;
+
+I'd experimented with things like that, for example making it exponential:
+
+  static bool early_boot = true;
+  unsigned long interval = CRNG_RESEED_INTERVAL;
+
+  if (unlikely(READ_ONCE(early_boot))) {
+    unsigned int uptime = min_t(u64, INT_MAX, ktime_get_seconds());
+    if (uptime >= CRNG_RESEED_INTERVAL / HZ)
+      WRITE_ONCE(early_boot, false);
+    else
+      interval = (5U << fls(uptime / 5)) * HZ;
+  }
+  return time_after(jiffies, READ_ONCE(base_crng.birth) + interval);
+
+But the whole thing of combining relative-to-last-reseed with
+relative-to-boottime seems really strange. I'm not quite sure what
+that's supposed to represent, whereas what I have in v1 is
+"exponentially increasing intervals from boottime" which is fairly
+easy to understand.
+
+Jason
