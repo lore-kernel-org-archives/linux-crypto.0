@@ -2,221 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2205C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Mar 2022 03:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BDDC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Mar 2022 08:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243391AbiCKDro (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Mar 2022 22:47:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
+        id S229531AbiCKIUw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Mar 2022 03:20:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235829AbiCKDrm (ORCPT
+        with ESMTP id S235475AbiCKIUu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Mar 2022 22:47:42 -0500
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C3DF4052
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 19:46:40 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id w2so61437oie.2
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Mar 2022 19:46:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=C6vfFGaLcvssVHex0UP6Zr+7SJ5PWN1tlE8nC/A476g=;
-        b=O66c9UyPP52n2OztO9GWk+p1q5wdS8eFOo4x3wwxlmxtRFKWkGb43xV9Xgsb4IZKkL
-         K96TItISzaDZ7Ia81lcRMpI3LVMgaAZ8C6BqZ6ArGpug437uCjlxvqHVuL18qEKeQxpX
-         NwPYYN8LbVlo3gHppVRHleWkGqX+RrxV3+jyI0HW85TOmECZJZ8BItHcGxZuXA/RryPH
-         7aMO+1uDEp5FphGBMzGZNlQKR7ezkZA1KClvir49AOUk9uoMWxCVkuvzNbaexQJgiFWe
-         OTGUsetwGxmpfnh2V0acCOHozVsJ6WCbfFTmdIX4TH5lCtPMiEJcMaUf54FJQ9D4+Cpl
-         9W8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C6vfFGaLcvssVHex0UP6Zr+7SJ5PWN1tlE8nC/A476g=;
-        b=fKOjNc+csWXKuCbhuIFQqh061oAQCBoaHeGZifTWXtsPf8Bpo5xSJirRSKn56C6aeF
-         1Ko3UaBATgAjGY9xApDSbUcsdPt3f+MbWjDsKvDHbAsXMLf4cUsmfztMdylQcqyYnsLu
-         hbGyFag8ZCceWoAqOLxKVHY0TkxAuhpRLWVl3TY5Ng2tV8BSwBJWQb5PRPIDtqDp7q6u
-         qnKHJf+JVVarqMdHuBZFfWPQGZrJkZw2tDTnMXEjD/6dVJRjJRPmL0jFFnFoRw6vOwdi
-         ojv/hHnbh7mBprkM1m2OnNQRvoFg3fSVlEnyyYoNB+fF/5l361sqxEkrzNj34m1Z3I+O
-         RWpA==
-X-Gm-Message-State: AOAM530n2iBqWWz4u/gCE+rlVcG6fbpdd3dIMgijHi5g632q2KpAI3iJ
-        BNaNt7b0NeptP3LRp27+iPO6Zw==
-X-Google-Smtp-Source: ABdhPJxQwBydyWONXXRRH31TPbNzgcbsNklB11/mQG1n21KwuZqx9/3hFqab9YvncA0I7KuFVX4iJg==
-X-Received: by 2002:a05:6808:4c2:b0:2ec:8fcb:1d4a with SMTP id a2-20020a05680804c200b002ec8fcb1d4amr563051oie.162.1646970399564;
-        Thu, 10 Mar 2022 19:46:39 -0800 (PST)
-Received: from ripper ([2600:1700:a0:3dc8:205:1bff:fec0:b9b3])
-        by smtp.gmail.com with ESMTPSA id w4-20020a4adec4000000b0032109de628esm3126359oou.6.2022.03.10.19.46.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 19:46:38 -0800 (PST)
-Date:   Thu, 10 Mar 2022 19:48:19 -0800
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Brian Masney <bmasney@redhat.com>
+        Fri, 11 Mar 2022 03:20:50 -0500
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 477401B8FCE;
+        Fri, 11 Mar 2022 00:19:47 -0800 (PST)
+X-IronPort-AV: E=Sophos;i="5.90,173,1643641200"; 
+   d="scan'208";a="114077949"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 11 Mar 2022 17:19:46 +0900
+Received: from localhost.localdomain (unknown [10.166.15.32])
+        by relmlir6.idc.renesas.com (Postfix) with ESMTP id 1B9B5420A724;
+        Fri, 11 Mar 2022 17:19:46 +0900 (JST)
+From:   Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To:     gilad@benyossef.com
 Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qcom-rng: ensure buffer for generate is
- completely filled
-Message-ID: <YirGg8K3DvVhlfMg@ripper>
-References: <20220310232459.749638-1-bmasney@redhat.com>
+        linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        Dung Nguyen <dung.nguyen.zy@renesas.com>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [RFC/PATCH] crypto: ccree - fix a race of enqueue_seq() in send_request_init()
+Date:   Fri, 11 Mar 2022 17:19:09 +0900
+Message-Id: <20220311081909.1661934-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310232459.749638-1-bmasney@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu 10 Mar 15:24 PST 2022, Brian Masney wrote:
+From: Dung Nguyen <dung.nguyen.zy@renesas.com>
 
-> The generate function in struct rng_alg expects that the destination
-> buffer is completely filled if the function returns 0. qcom_rng_read()
-> can run into a situation where the buffer is partially filled with
-> randomness and the remaining part of the buffer is zeroed since
-> qcom_rng_generate() doesn't check the return value. This issue can
-> be reproduced by running the following from libkcapi:
-> 
->     kcapi-rng -b 9000000 > OUTFILE
-> 
-> The generated OUTFILE will have three huge sections that contain all
-> zeros, and this is caused by the code where the test
-> 'val & PRNG_STATUS_DATA_AVAIL' fails.
-> 
-> Let's fix this issue by ensuring that qcom_rng_read() always returns
-> with a full buffer if the function returns success. Let's also have
-> qcom_rng_generate() return the correct value.
-> 
-> Here's some statistics from the ent project
-> (https://www.fourmilab.ch/random/) that shows information about the
-> quality of the generated numbers:
-> 
->     $ ent -c qcom-random-before
->     Value Char Occurrences Fraction
->       0           606748   0.067416
->       1            33104   0.003678
->       2            33001   0.003667
->     ...
->     253   ???        32883   0.003654
->     254   ???        33035   0.003671
->     255   ???        33239   0.003693
-> 
->     Total:       9000000   1.000000
-> 
->     Entropy = 7.811590 bits per byte.
-> 
->     Optimum compression would reduce the size
->     of this 9000000 byte file by 2 percent.
-> 
->     Chi square distribution for 9000000 samples is 9329962.81, and
->     randomly would exceed this value less than 0.01 percent of the
->     times.
-> 
->     Arithmetic mean value of data bytes is 119.3731 (127.5 = random).
->     Monte Carlo value for Pi is 3.197293333 (error 1.77 percent).
->     Serial correlation coefficient is 0.159130 (totally uncorrelated =
->     0.0).
-> 
-> Without this patch, the results of the chi-square test is 0.01%, and
-> the numbers are certainly not random according to ent's project page.
-> The results improve with this patch:
-> 
->     $ ent -c qcom-random-after
->     Value Char Occurrences Fraction
->       0            35432   0.003937
->       1            35127   0.003903
->       2            35424   0.003936
->     ...
->     253   ???        35201   0.003911
->     254   ???        34835   0.003871
->     255   ???        35368   0.003930
-> 
->     Total:       9000000   1.000000
-> 
->     Entropy = 7.999979 bits per byte.
-> 
->     Optimum compression would reduce the size
->     of this 9000000 byte file by 0 percent.
-> 
->     Chi square distribution for 9000000 samples is 258.77, and randomly
->     would exceed this value 42.24 percent of the times.
-> 
->     Arithmetic mean value of data bytes is 127.5006 (127.5 = random).
->     Monte Carlo value for Pi is 3.141277333 (error 0.01 percent).
->     Serial correlation coefficient is 0.000468 (totally uncorrelated =
->     0.0).
-> 
-> This change was tested on a Nexus 5 phone (msm8974 SoC).
-> 
-> Signed-off-by: Brian Masney <bmasney@redhat.com>
-> Fixes: ceec5f5b5988 ("crypto: qcom-rng - Add Qcom prng driver")
-> Cc: stable@vger.kernel.org # 4.19+
+When loading ccree.ko, after registering cipher algorithm at
+cc_cipher_alloc() and cc_hash_alloc() -> send_request_init() ->
+enqueue_seq() has called to pushing descriptor into HW.
 
-Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+On other hand, if another thread have called to encrypt/decrypt
+cipher (cc_cipher_encrypt/decrypt) -> cc_send_request() ->
+cc_do_send_request() -> enqueue_seq() while send_request_init()
+is running, the thread also has called to pushing descriptor into HW.
+And then, it's possible to overwrite data.
 
-Regards,
-Bjorn
+The cc_do_send_request() locks mgr->hw_lock, but send_request_init()
+doesn't lock mgr->hw_lock before enqueue_seq() is called. So,
+send_request_init() should lock mgr->hw_lock before enqueue_seq() is
+called.
 
-> ---
->  drivers/crypto/qcom-rng.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
-> index 99ba8d51d102..11f30fd48c14 100644
-> --- a/drivers/crypto/qcom-rng.c
-> +++ b/drivers/crypto/qcom-rng.c
-> @@ -8,6 +8,7 @@
->  #include <linux/clk.h>
->  #include <linux/crypto.h>
->  #include <linux/io.h>
-> +#include <linux/iopoll.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/platform_device.h>
-> @@ -43,16 +44,19 @@ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
->  {
->  	unsigned int currsize = 0;
->  	u32 val;
-> +	int ret;
->  
->  	/* read random data from hardware */
->  	do {
-> -		val = readl_relaxed(rng->base + PRNG_STATUS);
-> -		if (!(val & PRNG_STATUS_DATA_AVAIL))
-> -			break;
-> +		ret = readl_poll_timeout(rng->base + PRNG_STATUS, val,
-> +					 val & PRNG_STATUS_DATA_AVAIL,
-> +					 200, 10000);
-> +		if (ret)
-> +			return ret;
->  
->  		val = readl_relaxed(rng->base + PRNG_DATA_OUT);
->  		if (!val)
-> -			break;
-> +			return -EINVAL;
->  
->  		if ((max - currsize) >= WORD_SZ) {
->  			memcpy(data, &val, WORD_SZ);
-> @@ -61,11 +65,10 @@ static int qcom_rng_read(struct qcom_rng *rng, u8 *data, unsigned int max)
->  		} else {
->  			/* copy only remaining bytes */
->  			memcpy(data, &val, max - currsize);
-> -			break;
->  		}
->  	} while (currsize < max);
->  
-> -	return currsize;
-> +	return 0;
->  }
->  
->  static int qcom_rng_generate(struct crypto_rng *tfm,
-> @@ -87,7 +90,7 @@ static int qcom_rng_generate(struct crypto_rng *tfm,
->  	mutex_unlock(&rng->lock);
->  	clk_disable_unprepare(rng->clk);
->  
-> -	return 0;
-> +	return ret;
->  }
->  
->  static int qcom_rng_seed(struct crypto_rng *tfm, const u8 *seed,
-> -- 
-> 2.34.1
-> 
+This issue is possible to cause the following way in rare cases:
+- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+- insmod ccree.ko & insmod tcrypt.ko
+
+Signed-off-by: Dung Nguyen <dung.nguyen.zy@renesas.com>
+[shimoda: revise the subject/description]
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+---
+ I believe we should fix this race. But, as I wrote the desciption
+ above, there is in rare cases. So, I marked this patch as RFC.
+
+ drivers/crypto/ccree/cc_request_mgr.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
+index 887162df50f9..eef40022258b 100644
+--- a/drivers/crypto/ccree/cc_request_mgr.c
++++ b/drivers/crypto/ccree/cc_request_mgr.c
+@@ -513,6 +513,7 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+ 
+ 	set_queue_last_ind(drvdata, &desc[(len - 1)]);
+ 
++	spin_lock_bh(&req_mgr_h->hw_lock);
+ 	/*
+ 	 * We are about to push command to the HW via the command registers
+ 	 * that may reference host memory. We need to issue a memory barrier
+@@ -520,6 +521,7 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+ 	 */
+ 	wmb();
+ 	enqueue_seq(drvdata, desc, len);
++	spin_unlock_bh(&req_mgr_h->hw_lock);
+ 
+ 	/* Update the free slots in HW queue */
+ 	req_mgr_h->q_free_slots =
+-- 
+2.25.1
+
