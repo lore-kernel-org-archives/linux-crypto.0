@@ -2,33 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D4DC4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Mar 2022 16:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1812C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Mar 2022 16:46:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350540AbiCKQiO (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Mar 2022 11:38:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40712 "EHLO
+        id S236353AbiCKQrc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 11 Mar 2022 11:47:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345690AbiCKQht (ORCPT
+        with ESMTP id S1349228AbiCKQrc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Mar 2022 11:37:49 -0500
-X-Greylist: delayed 165589 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 11 Mar 2022 08:36:43 PST
-Received: from smtp-190d.mail.infomaniak.ch (smtp-190d.mail.infomaniak.ch [185.125.25.13])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C41A01C65C7;
-        Fri, 11 Mar 2022 08:36:43 -0800 (PST)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4KFWm92BvGzMr6ZX;
-        Fri, 11 Mar 2022 17:36:41 +0100 (CET)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4KFWm60YvKzlj4cR;
-        Fri, 11 Mar 2022 17:36:38 +0100 (CET)
-Message-ID: <d782d661-215a-89ec-43af-cbb747098ca4@digikod.net>
-Date:   Fri, 11 Mar 2022 17:36:47 +0100
-MIME-Version: 1.0
-User-Agent: 
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
+        Fri, 11 Mar 2022 11:47:32 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25A9A1D06DC;
+        Fri, 11 Mar 2022 08:46:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AEA87B827DC;
+        Fri, 11 Mar 2022 16:46:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E111CC340F4;
+        Fri, 11 Mar 2022 16:46:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647017185;
+        bh=bBXv7+nMT5shE7uvBAchmZWADyUTQwK7d0FlvRLXM1M=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=Cf1b3Jr0nyVYOZPFsIbw83LwGUgzARjucwpiqIX+HDv6wxEbk40pb3CAPbcMqdyar
+         ipRi730UbTpv60zfFUCjLGn96DrMev7qz+F/OTMMQ5u5qPauWuBU+S3LnGTLJy99X0
+         uR8iQ6GB5unb/qeDguorI42XoF73JrFJv58cLyO6lZPscNhYLqOl109/1qPxaBgwm1
+         o2qdsfuoAG/0ulu4aKm1fMgESTDGJRJx9P2g9OeYuj7XciOFTS9lPnkKdiS9w355PI
+         pUBPvVcIILbrJgnaAMP2s56UR7bFZkPEzI89MWFGRCQy7+K73Y+DYuJrn7GC8yFTl0
+         ylzCO4LVN0DHA==
+Message-ID: <f8b1ea77afe8d6698b4a2122254ff8be310412b1.camel@kernel.org>
+Subject: Re: [PATCH v8 5/5] certs: Allow root user to append signed hashes
+ to the blacklist keyring
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -36,7 +44,7 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Eric Snowberg <eric.snowberg@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
+        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         "Serge E . Hallyn" <serge@hallyn.com>,
         Tyler Hicks <tyhicks@linux.microsoft.com>,
@@ -44,311 +52,531 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org,
         Paul Moore <paul@paul-moore.com>
+Date:   Fri, 11 Mar 2022 18:45:39 +0200
+In-Reply-To: <d782d661-215a-89ec-43af-cbb747098ca4@digikod.net>
 References: <20210712170313.884724-1-mic@digikod.net>
- <20210712170313.884724-6-mic@digikod.net> <YidDznCPSmFmfNwE@iki.fi>
- <995fc93b-531b-9840-1523-21ae2adbe4ba@digikod.net> <YidX3jqNJeFfr1G1@iki.fi>
- <218eb9dc-d9bd-0173-5343-f44b58545aef@digikod.net> <YijPdDULqQipqhjT@iki.fi>
- <ea866d6d-228e-1250-47d4-46519a1abd30@digikod.net> <Yik0C2t7G272YZ73@iki.fi>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Subject: Re: [PATCH v8 5/5] certs: Allow root user to append signed hashes to
- the blacklist keyring
-In-Reply-To: <Yik0C2t7G272YZ73@iki.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+         <20210712170313.884724-6-mic@digikod.net> <YidDznCPSmFmfNwE@iki.fi>
+         <995fc93b-531b-9840-1523-21ae2adbe4ba@digikod.net>
+         <YidX3jqNJeFfr1G1@iki.fi>
+         <218eb9dc-d9bd-0173-5343-f44b58545aef@digikod.net>
+         <YijPdDULqQipqhjT@iki.fi>
+         <ea866d6d-228e-1250-47d4-46519a1abd30@digikod.net>
+         <Yik0C2t7G272YZ73@iki.fi>
+         <d782d661-215a-89ec-43af-cbb747098ca4@digikod.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.42.4 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, 2022-03-11 at 17:36 +0100, Micka=C3=ABl Sala=C3=BCn wrote:
+>=20
+> On 10/03/2022 00:11, Jarkko Sakkinen wrote:
+> > On Wed, Mar 09, 2022 at 07:36:50PM +0100, Micka=C3=ABl Sala=C3=BCn wrot=
+e:
+> > >=20
+> > > On 09/03/2022 17:01, Jarkko Sakkinen wrote:
+> > > > On Tue, Mar 08, 2022 at 05:02:23PM +0100, Micka=C3=ABl Sala=C3=BCn =
+wrote:
+> > > > >=20
+> > > > > On 08/03/2022 14:19, Jarkko Sakkinen wrote:
+> > > > > > On Tue, Mar 08, 2022 at 01:18:28PM +0100, Micka=C3=ABl Sala=C3=
+=BCn wrote:
+> > > > > > >=20
+> > > > > > > On 08/03/2022 12:53, Jarkko Sakkinen wrote:
+> > > > > > > > On Mon, Jul 12, 2021 at 07:03:13PM +0200, Micka=C3=ABl Sala=
+=C3=BCn wrote:
+> > > > > > > > > From: Micka=C3=ABl Sala=C3=BCn <mic@linux.microsoft.com>
+> > > > > > > > >=20
+> > > > > > > > > Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enabl=
+e the root user
+> > > > > > > > > to dynamically add new keys to the blacklist keyring.=C2=
+=A0 This enables to
+> > > > > > > > > invalidate new certificates, either from being loaded in =
+a keyring, or
+> > > > > > > > > from being trusted in a PKCS#7 certificate chain.=C2=A0 T=
+his also enables to
+> > > > > > > > > add new file hashes to be denied by the integrity infrast=
+ructure.
+> > > > > > > > >=20
+> > > > > > > > > Being able to untrust a certificate which could have norm=
+aly been
+> > > > > > > > > trusted is a sensitive operation.=C2=A0 This is why addin=
+g new hashes to the
+> > > > > > > > > blacklist keyring is only allowed when these hashes are s=
+igned and
+> > > > > > > > > vouched by the builtin trusted keyring.=C2=A0 A blacklist=
+ hash is stored as a
+> > > > > > > > > key description.=C2=A0 The PKCS#7 signature of this descr=
+iption must be
+> > > > > > > > > provided as the key payload.
+> > > > > > > > >=20
+> > > > > > > > > Marking a certificate as untrusted should be enforced whi=
+le the system
+> > > > > > > > > is running.=C2=A0 It is then forbiden to remove such blac=
+klist keys.
+> > > > > > > > >=20
+> > > > > > > > > Update blacklist keyring, blacklist key and revoked certi=
+ficate access rights:
+> > > > > > > > > * allows the root user to search for a specific blacklist=
+ed hash, which
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 make sense because the des=
+criptions are already viewable;
+> > > > > > > > > * forbids key update (blacklist and asymmetric ones);
+> > > > > > > > > * restricts kernel rights on the blacklist keyring to ali=
+gn with the
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 root user rights.
+> > > > > > > > >=20
+> > > > > > > > > See help in tools/certs/print-cert-tbs-hash.sh .
+> > > > > > > > >=20
+> > > > > > > > > Cc: David Howells <dhowells@redhat.com>
+> > > > > > > > > Cc: David Woodhouse <dwmw2@infradead.org>
+> > > > > > > > > Cc: Eric Snowberg <eric.snowberg@oracle.com>
+> > > > > > > > > Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> > > > > > > > > Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@linux.micros=
+oft.com>
+> > > > > > > > > Link: https://lore.kernel.org/r/20210712170313.884724-6-m=
+ic@digikod.net
+> > > > > > > > > ---
+> > > > > > > > >=20
+> > > > > > > > > Changes since v6:
+> > > > > > > > > * Rebase on keys-cve-2020-26541-v3: commit ebd9c2ae369a (=
+"integrity:
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Load mokx variables into t=
+he blacklist keyring").
+> > > > > > > > >=20
+> > > > > > > > > Changes since v5:
+> > > > > > > > > * Rebase on keys-next, fix Kconfig conflict, and update t=
+he asymmetric
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 key rights added to the bl=
+acklist keyring by the new
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add_key_to_revocation_list=
+(): align with blacklist key rights by
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 removing KEY_POS_WRITE as =
+a safeguard, and add
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KEY_ALLOC_BYPASS_RESTRICTI=
+ON to not be subject to
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 restrict_link_for_blacklis=
+t() that only allows blacklist key types to
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 be added to the keyring.
+> > > > > > > > > * Change the return code for restrict_link_for_blacklist(=
+) from -EPERM
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 to -EOPNOTSUPP to align wi=
+th asymmetric key keyrings.
+> > > > > > > > >=20
+> > > > > > > > > Changes since v3:
+> > > > > > > > > * Update commit message for print-cert-tbs-hash.sh .
+> > > > > > > > >=20
+> > > > > > > > > Changes since v2:
+> > > > > > > > > * Add comment for blacklist_key_instantiate().
+> > > > > > > > > ---
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 certs/Kconfig=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 10 +++++
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 certs/blacklist.c | 96 +++++++++=
++++++++++++++++++++++++++++-----------
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 2 files changed, 85 insertions(+=
+), 21 deletions(-)
+> > > > > > > > >=20
+> > > > > > > > > diff --git a/certs/Kconfig b/certs/Kconfig
+> > > > > > > > > index 0fbe184ceca5..e0e524b7eff9 100644
+> > > > > > > > > --- a/certs/Kconfig
+> > > > > > > > > +++ b/certs/Kconfig
+> > > > > > > > > @@ -103,4 +103,14 @@ config SYSTEM_REVOCATION_KEYS
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 co=
+ntaining X.509 certificates to be included in the default blacklist
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ke=
+yring.
+> > > > > > > > > +config SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool "Allow ro=
+ot to add signed blacklist keys"
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on SYS=
+TEM_BLACKLIST_KEYRING
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on SYS=
+TEM_DATA_VERIFICATION
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0help
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 If set,=
+ provide the ability to load new blacklist keys at run time if
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 they ar=
+e signed and vouched by a certificate from the builtin trusted
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 keyring=
+.=C2=A0 The PKCS#7 signature of the description is set in the key
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 payload=
+.=C2=A0 Blacklist keys cannot be removed.
+> > > > > > > > > +
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 endmenu
+> > > > > > > > > diff --git a/certs/blacklist.c b/certs/blacklist.c
+> > > > > > > > > index b254c87ceb3a..486ce0dd8e9c 100644
+> > > > > > > > > --- a/certs/blacklist.c
+> > > > > > > > > +++ b/certs/blacklist.c
+> > > > > > > > > @@ -15,6 +15,7 @@
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include <linux/err.h>
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include <linux/seq_file.h>
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include <linux/uidgid.h>
+> > > > > > > > > +#include <linux/verification.h>
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include <keys/system_keyring.h>
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include "blacklist.h"
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #include "common.h"
+> > > > > > > > > @@ -26,6 +27,9 @@
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #define MAX_HASH_LEN=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0128
+> > > > > > > > > +#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIE=
+W | \
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 KEY_USR_SEARCH | KEY_USR_VIEW)
+> > > > > > > > > +
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 static const char tbs_prefix[] =
+=3D "tbs";
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 static const char bin_prefix[] =
+=3D "bin";
+> > > > > > > > > @@ -80,19 +84,51 @@ static int blacklist_vet_description(=
+const char *desc)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > > > > > -/*
+> > > > > > > > > - * The hash to be blacklisted is expected to be in the d=
+escription.=C2=A0 There will
+> > > > > > > > > - * be no payload.
+> > > > > > > > > - */
+> > > > > > > > > -static int blacklist_preparse(struct key_preparsed_paylo=
+ad *prep)
+> > > > > > > > > +static int blacklist_key_instantiate(struct key *key,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct key_preparsed_payload *prep)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 {
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (prep->data=
+len > 0)
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -EINVAL;
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> > > > > > > > > +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int err;
+> > > > > > > > > +#endif
+> > > > > > > > > +
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Sets safe d=
+efault permissions for keys loaded by user space. */
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0key->perm =3D =
+BLACKLIST_KEY_PERM;
+> > > > > > > > > +
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Skips the a=
+uthentication step for builtin hashes, they are not
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * signed but =
+still trusted.
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (key->flags=
+ & (1 << KEY_FLAG_BUILTIN))
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto out;
+> > > > > > > > > +
+> > > > > > > > > +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Verifies th=
+e description's PKCS#7 signature against the builtin
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * trusted key=
+ring.
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0err =3D verify=
+_pkcs7_signature(key->description,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0strlen(key->description), prep->data, prep->datalen,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (err)
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return err;
+> > > > > > > > > +#else
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * It should n=
+ot be possible to come here because the keyring doesn't
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * have KEY_US=
+R_WRITE and the only other way to call this function is
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * for builtin=
+ hashes.
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0WARN_ON_ONCE(1=
+);
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -EPERM;
+> > > > > > > > > +#endif
+> > > > > > > > > +
+> > > > > > > > > +out:
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return generic=
+_key_instantiate(key, prep);
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > > > > > -static void blacklist_free_preparse(struct key_preparsed=
+_payload *prep)
+> > > > > > > > > +static int blacklist_key_update(struct key *key,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct key_preparsed_payload *prep)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 {
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -EPERM;
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 static void blacklist_describe(c=
+onst struct key *key, struct seq_file *m)
+> > > > > > > > > @@ -103,9 +139,8 @@ static void blacklist_describe(const =
+struct key *key, struct seq_file *m)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 static struct key_type key_type_=
+blacklist =3D {
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.name=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D "blacklist",
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.vet_desc=
+ription=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D blacklist_vet_de=
+scription,
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.preparse=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=3D blacklist_preparse,
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.free_preparse=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D blacklist_f=
+ree_preparse,
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.instantiate=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D=
+ generic_key_instantiate,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.instantiate=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=3D=
+ blacklist_key_instantiate,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.update=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=3D blacklist_key_update,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.describe=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=3D blacklist_describe,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 };
+> > > > > > > > > @@ -154,8 +189,7 @@ static int mark_raw_hash_blacklisted(=
+const char *hash)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ha=
+sh,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NU=
+LL,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0,
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((KEY=
+_POS_ALL & ~KEY_POS_SETATTR) |
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ KEY_USR_VIEW),
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BLACK=
+LIST_KEY_PERM,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KE=
+Y_ALLOC_NOT_IN_QUOTA |
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KE=
+Y_ALLOC_BUILT_IN);
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (IS_ER=
+R(key)) {
+> > > > > > > > > @@ -232,8 +266,10 @@ int add_key_to_revocation_list(const=
+ char *data, size_t size)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NU=
+LL,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 da=
+ta,
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 si=
+ze,
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ((KEY=
+_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
+> > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KEY_A=
+LLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KEY_P=
+OS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | KEY=
+_USR_VIEW,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KEY_A=
+LLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | KEY=
+_ALLOC_BYPASS_RESTRICTION);
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (IS_ER=
+R(key)) {
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pr_err("Problem with revocation key =
+(%ld)\n", PTR_ERR(key));
+> > > > > > > > > @@ -260,25 +296,43 @@ int is_key_on_revocation_list(struc=
+t pkcs7_message *pkcs7)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 }
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 #endif
+> > > > > > > > > +static int restrict_link_for_blacklist(struct key *dest_=
+keyring,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const struct key_type *type, const unio=
+n key_payload *payload,
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct key *restrict_key)
+> > > > > > > > > +{
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (type =3D=
+=3D &key_type_blacklist)
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -EOPNOT=
+SUPP;
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 /*
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Initialise the blacklist
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 static int __init blacklist_init=
+(void)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 {
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const cha=
+r *const *bl;
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct key_res=
+triction *restriction;
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (regis=
+ter_key_type(&key_type_blacklist) < 0)
+> > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0panic("Can't allocate system blackli=
+st key type\n");
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0restriction =
+=3D kzalloc(sizeof(*restriction), GFP_KERNEL);
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!restricti=
+on)
+> > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0panic("Can't allocate blacklist keyring=
+ restriction\n");
+> > > > > > > >=20
+> > > > > > > >=20
+> > > > > > > > This prevents me from taking this to my pull request. In mo=
+derns standards,
+> > > > > > > > no new BUG_ON(), panic() etc. should never added to the ker=
+nel.
+> > > > > > > >=20
+> > > > > > > > I missed this in my review.
+> > > > > > > >=20
+> > > > > > > > This should rather be e.g.
+> > > > > > > >=20
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 restriction =3D kzalloc(sizeof(*restriction), GFP_KERNEL);
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!restri=
+ction) {
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pr_err("Can't allocate blacklist key=
+ring restriction\n");
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 }
+> > > > > > > >=20
+> > > > > > > > Unfortunately I need to drop this patch set, because adding=
+ new panic()
+> > > > > > > > is simply a no-go.
+> > > > > > >=20
+> > > > > > > I agree that panic() is not great in general, but I followed =
+the other part
+> > > > > > > of the code (just above) that do the same. This part of the k=
+ernel should
+> > > > > > > failed if critical memory allocation failed at boot time (onl=
+y). It doesn't
+> > > > > > > impact the kernel once it is running. I don't think that just=
+ ignoring this
+> > > > > > > error with return 0 is fine, after all it's a critical error =
+right?
+> > > > > >=20
+> > > > > > It's not good reason enough to crash the whole kernel, even if =
+it is a
+> > > > > > critical error (e.g. run-time foresincs). Even WARN() is not re=
+commended
+> > > > > > these days [*].
+> > > > >=20
+> > > > > I think that what Greg said in this email is that WARN*() should =
+only be
+> > > > > used for cases that should never happen, it is definitely not dep=
+recated,
+> > > > > but WARN_ON_ONCE() may be a better idea though. WARN*() helps det=
+ect such
+> > > > > thought-to-be-impossible cases, that can happen e.g. with code re=
+factoring.
+> > > > >=20
+> > > > > A lot of initialization/boot code (e.g. without user space nor ex=
+ternal
+> > > > > interactions, mostly __init functions) do panic if there is unexp=
+ected and
+> > > > > unrecoverable errors like failed memory allocations. I think hand=
+ling such
+> > > > > errors otherwise would be more complex for no benefit. Moreover, =
+delegating
+> > > > > such error handling to user space could create new (silent) issue=
+s.
+> > > >=20
+> > > > To crash the whole kernel, you should be able to clearly explain wh=
+y it
+> > > > makes sense in the situation.
+> > >=20
+> > > If there is no enough memory to allocate 24 bytes (struct key_restric=
+tion)
+> > > during early boot, I really doubt the kernel can do much.
+> > >=20
+> > > >=20
+> > > > > >=20
+> > > > > > For the existing panic()-statements: I'm happy to review patche=
+s that
+> > > > > > render them out. >
+> > > > > > Not sure tho, if this fails should it be then "everything black=
+listed".
+> > > > > > Just one thing to consider.
+> > > > >=20
+> > > > > Well, if it fail it will be "nothing will work afterwards". Do yo=
+u have a
+> > > > > working and useful scenario for this kind of error?
+> > > >=20
+> > > > So you have zero chances to get a shell without blacklist just to d=
+o
+> > > > kernel forensics?
+> > >=20
+> > > Right, I don't think the kernel can launch any process (nor continue =
+early
+> > > boot) if it cannot allocate 24 bytes.
+> >=20
+> > initcall is just wrong layer to choose to crash the kernel. It should b=
+e
+> > either do_initcall_level() or do_one_initcall() that should care about
+> > this (or not care). You can print error message and return -ENODEV;
+>=20
+> Ok, I'll do that. Is it OK if I send you a patch fixing all panic calls=
+=20
+> from blacklist_init() and system_trusted_keyring_init() to apply after=
+=20
+> this series (with the panic call)?
 
-On 10/03/2022 00:11, Jarkko Sakkinen wrote:
-> On Wed, Mar 09, 2022 at 07:36:50PM +0100, Mickaël Salaün wrote:
->>
->> On 09/03/2022 17:01, Jarkko Sakkinen wrote:
->>> On Tue, Mar 08, 2022 at 05:02:23PM +0100, Mickaël Salaün wrote:
->>>>
->>>> On 08/03/2022 14:19, Jarkko Sakkinen wrote:
->>>>> On Tue, Mar 08, 2022 at 01:18:28PM +0100, Mickaël Salaün wrote:
->>>>>>
->>>>>> On 08/03/2022 12:53, Jarkko Sakkinen wrote:
->>>>>>> On Mon, Jul 12, 2021 at 07:03:13PM +0200, Mickaël Salaün wrote:
->>>>>>>> From: Mickaël Salaün <mic@linux.microsoft.com>
->>>>>>>>
->>>>>>>> Add a kernel option SYSTEM_BLACKLIST_AUTH_UPDATE to enable the root user
->>>>>>>> to dynamically add new keys to the blacklist keyring.  This enables to
->>>>>>>> invalidate new certificates, either from being loaded in a keyring, or
->>>>>>>> from being trusted in a PKCS#7 certificate chain.  This also enables to
->>>>>>>> add new file hashes to be denied by the integrity infrastructure.
->>>>>>>>
->>>>>>>> Being able to untrust a certificate which could have normaly been
->>>>>>>> trusted is a sensitive operation.  This is why adding new hashes to the
->>>>>>>> blacklist keyring is only allowed when these hashes are signed and
->>>>>>>> vouched by the builtin trusted keyring.  A blacklist hash is stored as a
->>>>>>>> key description.  The PKCS#7 signature of this description must be
->>>>>>>> provided as the key payload.
->>>>>>>>
->>>>>>>> Marking a certificate as untrusted should be enforced while the system
->>>>>>>> is running.  It is then forbiden to remove such blacklist keys.
->>>>>>>>
->>>>>>>> Update blacklist keyring, blacklist key and revoked certificate access rights:
->>>>>>>> * allows the root user to search for a specific blacklisted hash, which
->>>>>>>>       make sense because the descriptions are already viewable;
->>>>>>>> * forbids key update (blacklist and asymmetric ones);
->>>>>>>> * restricts kernel rights on the blacklist keyring to align with the
->>>>>>>>       root user rights.
->>>>>>>>
->>>>>>>> See help in tools/certs/print-cert-tbs-hash.sh .
->>>>>>>>
->>>>>>>> Cc: David Howells <dhowells@redhat.com>
->>>>>>>> Cc: David Woodhouse <dwmw2@infradead.org>
->>>>>>>> Cc: Eric Snowberg <eric.snowberg@oracle.com>
->>>>>>>> Cc: Jarkko Sakkinen <jarkko@kernel.org>
->>>>>>>> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
->>>>>>>> Link: https://lore.kernel.org/r/20210712170313.884724-6-mic@digikod.net
->>>>>>>> ---
->>>>>>>>
->>>>>>>> Changes since v6:
->>>>>>>> * Rebase on keys-cve-2020-26541-v3: commit ebd9c2ae369a ("integrity:
->>>>>>>>       Load mokx variables into the blacklist keyring").
->>>>>>>>
->>>>>>>> Changes since v5:
->>>>>>>> * Rebase on keys-next, fix Kconfig conflict, and update the asymmetric
->>>>>>>>       key rights added to the blacklist keyring by the new
->>>>>>>>       add_key_to_revocation_list(): align with blacklist key rights by
->>>>>>>>       removing KEY_POS_WRITE as a safeguard, and add
->>>>>>>>       KEY_ALLOC_BYPASS_RESTRICTION to not be subject to
->>>>>>>>       restrict_link_for_blacklist() that only allows blacklist key types to
->>>>>>>>       be added to the keyring.
->>>>>>>> * Change the return code for restrict_link_for_blacklist() from -EPERM
->>>>>>>>       to -EOPNOTSUPP to align with asymmetric key keyrings.
->>>>>>>>
->>>>>>>> Changes since v3:
->>>>>>>> * Update commit message for print-cert-tbs-hash.sh .
->>>>>>>>
->>>>>>>> Changes since v2:
->>>>>>>> * Add comment for blacklist_key_instantiate().
->>>>>>>> ---
->>>>>>>>      certs/Kconfig     | 10 +++++
->>>>>>>>      certs/blacklist.c | 96 ++++++++++++++++++++++++++++++++++++-----------
->>>>>>>>      2 files changed, 85 insertions(+), 21 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/certs/Kconfig b/certs/Kconfig
->>>>>>>> index 0fbe184ceca5..e0e524b7eff9 100644
->>>>>>>> --- a/certs/Kconfig
->>>>>>>> +++ b/certs/Kconfig
->>>>>>>> @@ -103,4 +103,14 @@ config SYSTEM_REVOCATION_KEYS
->>>>>>>>      	  containing X.509 certificates to be included in the default blacklist
->>>>>>>>      	  keyring.
->>>>>>>> +config SYSTEM_BLACKLIST_AUTH_UPDATE
->>>>>>>> +	bool "Allow root to add signed blacklist keys"
->>>>>>>> +	depends on SYSTEM_BLACKLIST_KEYRING
->>>>>>>> +	depends on SYSTEM_DATA_VERIFICATION
->>>>>>>> +	help
->>>>>>>> +	  If set, provide the ability to load new blacklist keys at run time if
->>>>>>>> +	  they are signed and vouched by a certificate from the builtin trusted
->>>>>>>> +	  keyring.  The PKCS#7 signature of the description is set in the key
->>>>>>>> +	  payload.  Blacklist keys cannot be removed.
->>>>>>>> +
->>>>>>>>      endmenu
->>>>>>>> diff --git a/certs/blacklist.c b/certs/blacklist.c
->>>>>>>> index b254c87ceb3a..486ce0dd8e9c 100644
->>>>>>>> --- a/certs/blacklist.c
->>>>>>>> +++ b/certs/blacklist.c
->>>>>>>> @@ -15,6 +15,7 @@
->>>>>>>>      #include <linux/err.h>
->>>>>>>>      #include <linux/seq_file.h>
->>>>>>>>      #include <linux/uidgid.h>
->>>>>>>> +#include <linux/verification.h>
->>>>>>>>      #include <keys/system_keyring.h>
->>>>>>>>      #include "blacklist.h"
->>>>>>>>      #include "common.h"
->>>>>>>> @@ -26,6 +27,9 @@
->>>>>>>>       */
->>>>>>>>      #define MAX_HASH_LEN	128
->>>>>>>> +#define BLACKLIST_KEY_PERM (KEY_POS_SEARCH | KEY_POS_VIEW | \
->>>>>>>> +			    KEY_USR_SEARCH | KEY_USR_VIEW)
->>>>>>>> +
->>>>>>>>      static const char tbs_prefix[] = "tbs";
->>>>>>>>      static const char bin_prefix[] = "bin";
->>>>>>>> @@ -80,19 +84,51 @@ static int blacklist_vet_description(const char *desc)
->>>>>>>>      	return 0;
->>>>>>>>      }
->>>>>>>> -/*
->>>>>>>> - * The hash to be blacklisted is expected to be in the description.  There will
->>>>>>>> - * be no payload.
->>>>>>>> - */
->>>>>>>> -static int blacklist_preparse(struct key_preparsed_payload *prep)
->>>>>>>> +static int blacklist_key_instantiate(struct key *key,
->>>>>>>> +		struct key_preparsed_payload *prep)
->>>>>>>>      {
->>>>>>>> -	if (prep->datalen > 0)
->>>>>>>> -		return -EINVAL;
->>>>>>>> -	return 0;
->>>>>>>> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
->>>>>>>> +	int err;
->>>>>>>> +#endif
->>>>>>>> +
->>>>>>>> +	/* Sets safe default permissions for keys loaded by user space. */
->>>>>>>> +	key->perm = BLACKLIST_KEY_PERM;
->>>>>>>> +
->>>>>>>> +	/*
->>>>>>>> +	 * Skips the authentication step for builtin hashes, they are not
->>>>>>>> +	 * signed but still trusted.
->>>>>>>> +	 */
->>>>>>>> +	if (key->flags & (1 << KEY_FLAG_BUILTIN))
->>>>>>>> +		goto out;
->>>>>>>> +
->>>>>>>> +#ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
->>>>>>>> +	/*
->>>>>>>> +	 * Verifies the description's PKCS#7 signature against the builtin
->>>>>>>> +	 * trusted keyring.
->>>>>>>> +	 */
->>>>>>>> +	err = verify_pkcs7_signature(key->description,
->>>>>>>> +			strlen(key->description), prep->data, prep->datalen,
->>>>>>>> +			NULL, VERIFYING_UNSPECIFIED_SIGNATURE, NULL, NULL);
->>>>>>>> +	if (err)
->>>>>>>> +		return err;
->>>>>>>> +#else
->>>>>>>> +	/*
->>>>>>>> +	 * It should not be possible to come here because the keyring doesn't
->>>>>>>> +	 * have KEY_USR_WRITE and the only other way to call this function is
->>>>>>>> +	 * for builtin hashes.
->>>>>>>> +	 */
->>>>>>>> +	WARN_ON_ONCE(1);
->>>>>>>> +	return -EPERM;
->>>>>>>> +#endif
->>>>>>>> +
->>>>>>>> +out:
->>>>>>>> +	return generic_key_instantiate(key, prep);
->>>>>>>>      }
->>>>>>>> -static void blacklist_free_preparse(struct key_preparsed_payload *prep)
->>>>>>>> +static int blacklist_key_update(struct key *key,
->>>>>>>> +		struct key_preparsed_payload *prep)
->>>>>>>>      {
->>>>>>>> +	return -EPERM;
->>>>>>>>      }
->>>>>>>>      static void blacklist_describe(const struct key *key, struct seq_file *m)
->>>>>>>> @@ -103,9 +139,8 @@ static void blacklist_describe(const struct key *key, struct seq_file *m)
->>>>>>>>      static struct key_type key_type_blacklist = {
->>>>>>>>      	.name			= "blacklist",
->>>>>>>>      	.vet_description	= blacklist_vet_description,
->>>>>>>> -	.preparse		= blacklist_preparse,
->>>>>>>> -	.free_preparse		= blacklist_free_preparse,
->>>>>>>> -	.instantiate		= generic_key_instantiate,
->>>>>>>> +	.instantiate		= blacklist_key_instantiate,
->>>>>>>> +	.update			= blacklist_key_update,
->>>>>>>>      	.describe		= blacklist_describe,
->>>>>>>>      };
->>>>>>>> @@ -154,8 +189,7 @@ static int mark_raw_hash_blacklisted(const char *hash)
->>>>>>>>      				   hash,
->>>>>>>>      				   NULL,
->>>>>>>>      				   0,
->>>>>>>> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) |
->>>>>>>> -				    KEY_USR_VIEW),
->>>>>>>> +				   BLACKLIST_KEY_PERM,
->>>>>>>>      				   KEY_ALLOC_NOT_IN_QUOTA |
->>>>>>>>      				   KEY_ALLOC_BUILT_IN);
->>>>>>>>      	if (IS_ERR(key)) {
->>>>>>>> @@ -232,8 +266,10 @@ int add_key_to_revocation_list(const char *data, size_t size)
->>>>>>>>      				   NULL,
->>>>>>>>      				   data,
->>>>>>>>      				   size,
->>>>>>>> -				   ((KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW),
->>>>>>>> -				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN);
->>>>>>>> +				   KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH
->>>>>>>> +				   | KEY_USR_VIEW,
->>>>>>>> +				   KEY_ALLOC_NOT_IN_QUOTA | KEY_ALLOC_BUILT_IN
->>>>>>>> +				   | KEY_ALLOC_BYPASS_RESTRICTION);
->>>>>>>>      	if (IS_ERR(key)) {
->>>>>>>>      		pr_err("Problem with revocation key (%ld)\n", PTR_ERR(key));
->>>>>>>> @@ -260,25 +296,43 @@ int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
->>>>>>>>      }
->>>>>>>>      #endif
->>>>>>>> +static int restrict_link_for_blacklist(struct key *dest_keyring,
->>>>>>>> +		const struct key_type *type, const union key_payload *payload,
->>>>>>>> +		struct key *restrict_key)
->>>>>>>> +{
->>>>>>>> +	if (type == &key_type_blacklist)
->>>>>>>> +		return 0;
->>>>>>>> +	return -EOPNOTSUPP;
->>>>>>>> +}
->>>>>>>> +
->>>>>>>>      /*
->>>>>>>>       * Initialise the blacklist
->>>>>>>>       */
->>>>>>>>      static int __init blacklist_init(void)
->>>>>>>>      {
->>>>>>>>      	const char *const *bl;
->>>>>>>> +	struct key_restriction *restriction;
->>>>>>>>      	if (register_key_type(&key_type_blacklist) < 0)
->>>>>>>>      		panic("Can't allocate system blacklist key type\n");
->>>>>>>> +	restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
->>>>>>>> +	if (!restriction)
->>>>>>>> +		panic("Can't allocate blacklist keyring restriction\n");
->>>>>>>
->>>>>>>
->>>>>>> This prevents me from taking this to my pull request. In moderns standards,
->>>>>>> no new BUG_ON(), panic() etc. should never added to the kernel.
->>>>>>>
->>>>>>> I missed this in my review.
->>>>>>>
->>>>>>> This should rather be e.g.
->>>>>>>
->>>>>>>             restriction = kzalloc(sizeof(*restriction), GFP_KERNEL);
->>>>>>> 	if (!restriction) {
->>>>>>> 		pr_err("Can't allocate blacklist keyring restriction\n");
->>>>>>>                     return 0;
->>>>>>>             }
->>>>>>>
->>>>>>> Unfortunately I need to drop this patch set, because adding new panic()
->>>>>>> is simply a no-go.
->>>>>>
->>>>>> I agree that panic() is not great in general, but I followed the other part
->>>>>> of the code (just above) that do the same. This part of the kernel should
->>>>>> failed if critical memory allocation failed at boot time (only). It doesn't
->>>>>> impact the kernel once it is running. I don't think that just ignoring this
->>>>>> error with return 0 is fine, after all it's a critical error right?
->>>>>
->>>>> It's not good reason enough to crash the whole kernel, even if it is a
->>>>> critical error (e.g. run-time foresincs). Even WARN() is not recommended
->>>>> these days [*].
->>>>
->>>> I think that what Greg said in this email is that WARN*() should only be
->>>> used for cases that should never happen, it is definitely not deprecated,
->>>> but WARN_ON_ONCE() may be a better idea though. WARN*() helps detect such
->>>> thought-to-be-impossible cases, that can happen e.g. with code refactoring.
->>>>
->>>> A lot of initialization/boot code (e.g. without user space nor external
->>>> interactions, mostly __init functions) do panic if there is unexpected and
->>>> unrecoverable errors like failed memory allocations. I think handling such
->>>> errors otherwise would be more complex for no benefit. Moreover, delegating
->>>> such error handling to user space could create new (silent) issues.
->>>
->>> To crash the whole kernel, you should be able to clearly explain why it
->>> makes sense in the situation.
->>
->> If there is no enough memory to allocate 24 bytes (struct key_restriction)
->> during early boot, I really doubt the kernel can do much.
->>
->>>
->>>>>
->>>>> For the existing panic()-statements: I'm happy to review patches that
->>>>> render them out. >
->>>>> Not sure tho, if this fails should it be then "everything blacklisted".
->>>>> Just one thing to consider.
->>>>
->>>> Well, if it fail it will be "nothing will work afterwards". Do you have a
->>>> working and useful scenario for this kind of error?
->>>
->>> So you have zero chances to get a shell without blacklist just to do
->>> kernel forensics?
->>
->> Right, I don't think the kernel can launch any process (nor continue early
->> boot) if it cannot allocate 24 bytes.
-> 
-> initcall is just wrong layer to choose to crash the kernel. It should be
-> either do_initcall_level() or do_one_initcall() that should care about
-> this (or not care). You can print error message and return -ENODEV;
+Yes, and I still have not sent my PR, i.e. can include this if you
+can provide me patches soonish (include that to the same series).
 
-Ok, I'll do that. Is it OK if I send you a patch fixing all panic calls 
-from blacklist_init() and system_trusted_keyring_init() to apply after 
-this series (with the panic call)?
+In the end of the day it comes to this: it's not a void function.
+ATM the framework above does not do much at all but it is IMHO
+going beyond the abstraction, which we should not do.
+
+BR, Jarkko
+
