@@ -2,136 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB74AC433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Mar 2022 19:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBE5C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Mar 2022 20:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbiCLTpw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Mar 2022 14:45:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35898 "EHLO
+        id S232031AbiCLUST (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 12 Mar 2022 15:18:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232525AbiCLTpw (ORCPT
+        with ESMTP id S230017AbiCLUSS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Mar 2022 14:45:52 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160F71F1D0F;
-        Sat, 12 Mar 2022 11:44:45 -0800 (PST)
+        Sat, 12 Mar 2022 15:18:18 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C25205972;
+        Sat, 12 Mar 2022 12:17:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8F302B8009F;
-        Sat, 12 Mar 2022 19:44:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D08EDC340EB;
-        Sat, 12 Mar 2022 19:44:41 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 66C8EB80AFD;
+        Sat, 12 Mar 2022 20:17:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5579EC340EB;
+        Sat, 12 Mar 2022 20:17:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647114282;
-        bh=QoeCE1AMflsi0jNLsirge94ZLm5l276p10BwoRsSZA8=;
+        s=k20201202; t=1647116229;
+        bh=GadeI9krdmz72UAKX4LbaW8MXzY58uGXhigxFEem6Ec=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=d+NH3Rz2tqPYL+F2PTyuS4ZRNoR+wQvhcO3nUx6iU1kqLi8WKRXorsTbSDY7VAoDJ
-         melaWzpJdzqwBui3FvTKDpQvCF8QUwuOd3jX81wr4fx1ldJcbB2DqOWl78GOybAzgb
-         masvm5pV6CI920SZ8V91Zp0MI2xS2FG+QziS5PmGK09RdZAhMJbpZyTRn1MF6gRHBU
-         I/ULSKkT/FZ85co3HG6+Icvl6loZkSXerAqwTYkfp/4x0Zhyos4EGlkJxoFjq772Rk
-         uCXLNSnjf3E/YFVnszuBKl3O6st5V1kmBfKLyjSibbROUGPprIlLcmqc2cuDFcxY1h
-         0dbbg+FglIthw==
-Date:   Sat, 12 Mar 2022 11:44:40 -0800
+        b=jE3/CwikWAHLy/vqmyy6WAdYAkZIYo18cP1UTBbNI+1qsTH8/ey4mJDVOwp5KnOJD
+         CctZ0fpjWAK9ar+FEBg8naCczl9EI0rh/I2HBSa8IuhdJaDaoputRSDhpjkQEwRUYz
+         f1PLc/A01nyLo7xirNHN8cObJVcjFjcrePXcinOLYdLyW7dLu/B9wBfijr3ZvMl9qj
+         hASD7WSQe5Li02dTiC7rM+tULT+ShfOi7u+4AWvO5SNpLn2pMlnEMLi5Az+1vzVFiH
+         Hx0dvNjx7Qsw9YhSkQcMg1UxBt9O1Qi83GgaTfR2LdHMZAwVCUwSiOcBmmA5/GURvu
+         h02OwujwM4Rww==
+Date:   Sat, 12 Mar 2022 12:17:06 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v2] random: reseed more often immediately after booting
-Message-ID: <Yiz4KBqaxURu/6mZ@sol.localdomain>
-References: <20220309152653.1244096-1-Jason@zx2c4.com>
- <20220309191850.1508953-1-Jason@zx2c4.com>
- <YimFHeXgw9jfevWq@sol.localdomain>
- <CAHmME9ohyKKX4Qg_dyGq36MxFkhBoVQYYgs8uUoCfBkJNqfX7Q@mail.gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+Message-ID: <Yiz/wm3nlJ/wOo6n@sol.localdomain>
+References: <20220217162848.303601-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9ohyKKX4Qg_dyGq36MxFkhBoVQYYgs8uUoCfBkJNqfX7Q@mail.gmail.com>
+In-Reply-To: <20220217162848.303601-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 01:59:05PM -0700, Jason A. Donenfeld wrote:
-> > However, one thing that seems a bit odd is that this method can result in two
-> > reseeds with very little time in between.  For example, if no one is using the
-> > RNG from second 40-78, but then it is used in seconds 79-80, then it will be
-> > reseeded at both seconds 79 and 80 if there is entropy available.
+On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
+> This topic has come up countless times, and usually doesn't go anywhere.
+> This time I thought I'd bring it up with a slightly narrower focus,
+> updated for some developments over the last three years: we finally can
+> make /dev/urandom always secure, in light of the fact that our RNG is
+> now always seeded.
 > 
-> I've been sort of going back and forth on this. I think the idea is
-> that there are two relative time measurements. The ordinary one we use
-> is time since last reseeding. But at boot, we're trying to account for
-> the fact that entropy is coming in relative to the init process of the
-> system, which means we need it to be relative to boot time rather than
-> relative to the last reseeding. As you point out, this is a little
-> wonky with how things are now, because we only ever reseed on usage.
-> To get closer to what I have in mind, we could reseed in a timer, so
-> that it hits it exactly on the 5,10,20,40,etc dot. But that seems a
-> bit cumbersome and maybe unnecessary. The effect of the behavior of
-> this v1 you pointed out is:
+> Ever since Linus' 50ee7529ec45 ("random: try to actively add entropy
+> rather than passively wait for it"), the RNG does a haveged-style jitter
+> dance around the scheduler, in order to produce entropy (and credit it)
+> for the case when we're stuck in wait_for_random_bytes(). How ever you
+> feel about the Linus Jitter Dance is beside the point: it's been there
+> for three years and usually gets the RNG initialized in a second or so.
 > 
-> - We might reseed at 79, and then fail to reseed at 80. Consequence:
-> we lose 1 second of entropy that could have made it for that try.
-> - We might reseed at 79, and then also reseed at 80 too. Consequence:
-> that's a fairly quick refresh, but on the other hand, we're still
-> requiring 256 bit credits, so maybe not so bad, and if we've got so
-> much entropy coming in during that small period of time, maybe it
-> really isn't a concern.
+> As a matter of fact, this is what happens currently when people use
+> getrandom(). It's already there and working, and most people have been
+> using it for years without realizing.
 > 
-> So I'm not sure either of these cases really matter that much.
+> So, given that the kernel has grown this mechanism for seeding itself
+> from nothing, and that this procedure happens pretty fast, maybe there's
+> no point any longer in having /dev/urandom give insecure bytes. In the
+> past we didn't want the boot process to deadlock, which was
+> understandable. But now, in the worst case, a second goes by, and the
+> problem is resolved. It seems like maybe we're finally at a point when
+> we can get rid of the infamous "urandom read hole".
 > 
-> > Perhaps the condition should still be:
-> >
-> >         time_after(jiffies, READ_ONCE(base_crng.birth) + interval);
-> >
-> > ... as it is in the non-early case, but where 'interval' is a function of
-> > 'uptime' rather than always CRNG_RESEED_INTERVAL?  Maybe something like:
-> >
-> >         interval = CRNG_RESEED_INTERVAL;
-> >         if (uptime < 2 * CRNG_RESEED_INTERVAL / HZ)
-> >                 interval = max(5, uptime / 2) * HZ;
+> The one slight drawback is that the Linus Jitter Dance relies on random_
+> get_entropy() being implemented. The first lines of try_to_generate_
+> entropy() are:
 > 
-> I'd experimented with things like that, for example making it exponential:
+> 	stack.now = random_get_entropy();
+> 	if (stack.now == random_get_entropy())
+> 		return;
 > 
->   static bool early_boot = true;
->   unsigned long interval = CRNG_RESEED_INTERVAL;
+> On most platforms, random_get_entropy() is simply aliased to get_cycles().
+> The number of machines without a cycle counter or some other
+> implementation of random_get_entropy() in 2022, which can also run a
+> mainline kernel, and at the same time have a both broken and out of date
+> userspace that relies on /dev/urandom never blocking at boot is thought
+> to be exceedingly low. And to be clear: those museum pieces without
+> cycle counters will continue to run Linux just fine, and even
+> /dev/urandom will be operable just like before; the RNG just needs to be
+> seeded first through the usual means, which should already be the case
+> now.
 > 
->   if (unlikely(READ_ONCE(early_boot))) {
->     unsigned int uptime = min_t(u64, INT_MAX, ktime_get_seconds());
->     if (uptime >= CRNG_RESEED_INTERVAL / HZ)
->       WRITE_ONCE(early_boot, false);
->     else
->       interval = (5U << fls(uptime / 5)) * HZ;
->   }
->   return time_after(jiffies, READ_ONCE(base_crng.birth) + interval);
+> On systems that really do want unseeded randomness, we already offer
+> getrandom(GRND_INSECURE), which is in use by, e.g., systemd for seeding
+> their hash tables at boot. Nothing in this commit would affect
+> GRND_INSECURE, and it remains the means of getting those types of random
+> numbers.
 > 
-> But the whole thing of combining relative-to-last-reseed with
-> relative-to-boottime seems really strange. I'm not quite sure what
-> that's supposed to represent, whereas what I have in v1 is
-> "exponentially increasing intervals from boottime" which is fairly
-> easy to understand.
+> This patch goes a long way toward eliminating a long overdue userspace
+> crypto footgun. After several decades of endless user confusion, we will
+> finally be able to say, "use any single one of our random interfaces and
+> you'll be fine. They're all the same. It doesn't matter." And that, I
+> think, is really something. Finally all of those blog posts and
+> disagreeing forums and contradictory articles will all become correct
+> about whatever they happened to recommend, and along with it, a whole
+> class of vulnerabilities eliminated.
+> 
+> With very minimal downside, we're finally in a position where we can
+> make this change.
+> 
+> Cc: Dinh Nguyen <dinguyen@kernel.org>
+> Cc: Nick Hu <nickhu@andestech.com>
+> Cc: Max Filippov <jcmvbkbc@gmail.com>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+> Cc: Michal Simek <monstr@monstr.eu>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Guo Ren <guoren@kernel.org>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: Joshua Kinard <kumba@gentoo.org>
+> Cc: David Laight <David.Laight@aculab.com>
+> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Having learned that MIPS32 isn't affected by this (initially my largest
+> worry), and then heartened today upon reading LWN's summary of our
+> previous discussion ("it would seem there are no huge barriers to
+> removing the final distinction between /dev/random and /dev/urandom"), I
+> figured I'd go ahead and submit a v1 of this. It seems at least worth
+> trying and seeing if somebody arrives with legitimate complaints. To
+> that end I've also widened the CC list quite a bit.
+> 
+> Changes v0->v1:
+> - We no longer touch GRND_INSECURE at all, in anyway. Lennart (and to an
+>   extent, Andy) pointed out that getting insecure numbers immediately at
+>   boot is still something that has legitimate use cases, so this patch
+>   no longer touches that code.
+> 
+>  drivers/char/mem.c     |  2 +-
+>  drivers/char/random.c  | 51 ++++++------------------------------------
+>  include/linux/random.h |  2 +-
+>  3 files changed, 9 insertions(+), 46 deletions(-)
+> 
 
-I don't think it's strange.  Maybe it seems strange because of how you wrote it
-('interval = (5U << fls(uptime / 5)) * HZ'), where the reseed interval suddenly
-jumps from X to 2*X seconds.  The version I suggested is 'interval = max(5,
-uptime / 2) * HZ', which is smoother.  It's simply saying that the reseed
-interval increases as the uptime increases, which seems to be what we want.
-(Bounded by [5*HZ, CRNG_RESEED_INTERVAL], of course.)
-
-Your current patch interacts badly with how crng_reseed() is a no-op if fewer
-than 256 entropy bits are available.  Suppose that random bytes are requested at
-seconds 10 and 15, and at second 10 there are 200 entropy bits available and at
-second 15 there are 256.  With your current patch, the CRNG wouldn't be reseeded
-before either request, since the no-op reseed at second 10 would consume the
-only attempt for the whole interval of 10-19.  I.e. the request at second 10
-would actually be preventing the CRNG from being reseeded when it should be.
-
-Using an interval since the actual last reseed time (base_crng.birth) avoids
-this quirk, as well the one I mentioned before where two reseeds can be done
-with very little time in between.
-
-What you have now is still better than the status quo, but I'm not sure it's the
-best way.
+Just a small nit: the comments above rng_is_initialized() and
+wait_for_random_bytes() still imply that /dev/urandom is nonblocking.
 
 - Eric
