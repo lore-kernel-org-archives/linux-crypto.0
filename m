@@ -2,191 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6446C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Mar 2022 20:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F17C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Mar 2022 21:43:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbiCLU20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Mar 2022 15:28:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39354 "EHLO
+        id S232739AbiCLVk2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 12 Mar 2022 16:40:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230017AbiCLU2Y (ORCPT
+        with ESMTP id S229803AbiCLVk1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Mar 2022 15:28:24 -0500
+        Sat, 12 Mar 2022 16:40:27 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190BE20D51F;
-        Sat, 12 Mar 2022 12:27:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F77BF7468;
+        Sat, 12 Mar 2022 13:39:20 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C2115B80B03;
-        Sat, 12 Mar 2022 20:27:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98142C340EB;
-        Sat, 12 Mar 2022 20:27:14 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ADB38B80B06;
+        Sat, 12 Mar 2022 21:39:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 109B1C340EB;
+        Sat, 12 Mar 2022 21:39:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647116835;
-        bh=Ie1UhR5izPv39jYtF6t6kb5H5qt3LTLahMQQOGyrXWg=;
+        s=k20201202; t=1647121157;
+        bh=nPUhEhml+PJkRdcl8Fz3Qoc64pioCFs//SBmVg2UE/0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UKXMLtACco1+OKfG1NIWG98y2K0pSU1C7ZGfarFptU7Zq7GUgeGwzNj77Zg6NaQrq
-         dByjyfVjsIvnvpZz3M18TJneHhQWtXAircDQ1Y6cFOUb3uZOGnUH2d4qgRRjNMQHH/
-         IQ19JWeZ9qiOKAFGVT0kT2R0/iik0iAy5grhFlc//YTnG7rV77EL3EfHpsnAlLC31S
-         MPz9X/DZQ3R4Rv57RYEOGreGLiYzZQBJchi4fV0HrmDL2JraNFgo28ePiDGy6mLvfR
-         nZn73YDjj6qzz3aApz9CR5C5fwms8Hvwb3cXTMzaNxsV7p8YcCpVjbuySDIf+fMgcF
-         FRuG4OYziJ8qQ==
-Date:   Sat, 12 Mar 2022 12:27:13 -0800
+        b=V3oSyQgx9tmCb7JILolRXSVCOfS3a1lhGrzHsxhke8iSd75z5jq6wO+wCz1bsu+pN
+         AbhbjAgIhQkfibYARIlV+veSJckwAt+HRUzf0fkAeQz9oKeAcE1ESN3dC4ZkYJQDAx
+         s4rjBeeqew6ogexjU6I6hFhbuNenUGg6a1Cl+F69vPmuDNMdZe2GFlFiVOBM27uDSC
+         ZRkYDM6QpuZRzOhZQAmr6do1dMl0W37FGQ5jQV3K966fnid/ll5+Uy5qRWlDmX8HYG
+         RzRiC+UmrNimAc9cw28l45rLLvxBrhe70hCsmkX8AUrwKd+qpwR6AT74+95z73ydG1
+         /9pHp9zZAp99Q==
+Date:   Sat, 12 Mar 2022 13:39:15 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        Theodore Ts'o <tytso@mit.edu>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <Yi0CIRlY6/tDpjpf@sol.localdomain>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <Yiz/wm3nlJ/wOo6n@sol.localdomain>
+        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
+Subject: Re: [PATCH v2] random: use SipHash as interrupt entropy accumulator
+Message-ID: <Yi0TA1r81AXh7nP/@sol.localdomain>
+References: <20220306165123.71024-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yiz/wm3nlJ/wOo6n@sol.localdomain>
+In-Reply-To: <20220306165123.71024-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Mar 12, 2022 at 12:17:09PM -0800, Eric Biggers wrote:
-> On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
-> > This topic has come up countless times, and usually doesn't go anywhere.
-> > This time I thought I'd bring it up with a slightly narrower focus,
-> > updated for some developments over the last three years: we finally can
-> > make /dev/urandom always secure, in light of the fact that our RNG is
-> > now always seeded.
-> > 
-> > Ever since Linus' 50ee7529ec45 ("random: try to actively add entropy
-> > rather than passively wait for it"), the RNG does a haveged-style jitter
-> > dance around the scheduler, in order to produce entropy (and credit it)
-> > for the case when we're stuck in wait_for_random_bytes(). How ever you
-> > feel about the Linus Jitter Dance is beside the point: it's been there
-> > for three years and usually gets the RNG initialized in a second or so.
-> > 
-> > As a matter of fact, this is what happens currently when people use
-> > getrandom(). It's already there and working, and most people have been
-> > using it for years without realizing.
-> > 
-> > So, given that the kernel has grown this mechanism for seeding itself
-> > from nothing, and that this procedure happens pretty fast, maybe there's
-> > no point any longer in having /dev/urandom give insecure bytes. In the
-> > past we didn't want the boot process to deadlock, which was
-> > understandable. But now, in the worst case, a second goes by, and the
-> > problem is resolved. It seems like maybe we're finally at a point when
-> > we can get rid of the infamous "urandom read hole".
-> > 
-> > The one slight drawback is that the Linus Jitter Dance relies on random_
-> > get_entropy() being implemented. The first lines of try_to_generate_
-> > entropy() are:
-> > 
-> > 	stack.now = random_get_entropy();
-> > 	if (stack.now == random_get_entropy())
-> > 		return;
-> > 
-> > On most platforms, random_get_entropy() is simply aliased to get_cycles().
-> > The number of machines without a cycle counter or some other
-> > implementation of random_get_entropy() in 2022, which can also run a
-> > mainline kernel, and at the same time have a both broken and out of date
-> > userspace that relies on /dev/urandom never blocking at boot is thought
-> > to be exceedingly low. And to be clear: those museum pieces without
-> > cycle counters will continue to run Linux just fine, and even
-> > /dev/urandom will be operable just like before; the RNG just needs to be
-> > seeded first through the usual means, which should already be the case
-> > now.
-> > 
-> > On systems that really do want unseeded randomness, we already offer
-> > getrandom(GRND_INSECURE), which is in use by, e.g., systemd for seeding
-> > their hash tables at boot. Nothing in this commit would affect
-> > GRND_INSECURE, and it remains the means of getting those types of random
-> > numbers.
-> > 
-> > This patch goes a long way toward eliminating a long overdue userspace
-> > crypto footgun. After several decades of endless user confusion, we will
-> > finally be able to say, "use any single one of our random interfaces and
-> > you'll be fine. They're all the same. It doesn't matter." And that, I
-> > think, is really something. Finally all of those blog posts and
-> > disagreeing forums and contradictory articles will all become correct
-> > about whatever they happened to recommend, and along with it, a whole
-> > class of vulnerabilities eliminated.
-> > 
-> > With very minimal downside, we're finally in a position where we can
-> > make this change.
-> > 
-> > Cc: Dinh Nguyen <dinguyen@kernel.org>
-> > Cc: Nick Hu <nickhu@andestech.com>
-> > Cc: Max Filippov <jcmvbkbc@gmail.com>
-> > Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> > Cc: Michal Simek <monstr@monstr.eu>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Guo Ren <guoren@kernel.org>
-> > Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-> > Cc: Joshua Kinard <kumba@gentoo.org>
-> > Cc: David Laight <David.Laight@aculab.com>
-> > Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> > Cc: Eric Biggers <ebiggers@google.com>
-> > Cc: Ard Biesheuvel <ardb@kernel.org>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Andy Lutomirski <luto@kernel.org>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Lennart Poettering <mzxreary@0pointer.de>
-> > Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-> > Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: Theodore Ts'o <tytso@mit.edu>
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > ---
-> > Having learned that MIPS32 isn't affected by this (initially my largest
-> > worry), and then heartened today upon reading LWN's summary of our
-> > previous discussion ("it would seem there are no huge barriers to
-> > removing the final distinction between /dev/random and /dev/urandom"), I
-> > figured I'd go ahead and submit a v1 of this. It seems at least worth
-> > trying and seeing if somebody arrives with legitimate complaints. To
-> > that end I've also widened the CC list quite a bit.
-> > 
-> > Changes v0->v1:
-> > - We no longer touch GRND_INSECURE at all, in anyway. Lennart (and to an
-> >   extent, Andy) pointed out that getting insecure numbers immediately at
-> >   boot is still something that has legitimate use cases, so this patch
-> >   no longer touches that code.
-> > 
-> >  drivers/char/mem.c     |  2 +-
-> >  drivers/char/random.c  | 51 ++++++------------------------------------
-> >  include/linux/random.h |  2 +-
-> >  3 files changed, 9 insertions(+), 46 deletions(-)
-> > 
+On Sun, Mar 06, 2022 at 09:51:23AM -0700, Jason A. Donenfeld wrote:
 > 
-> Just a small nit: the comments above rng_is_initialized() and
-> wait_for_random_bytes() still imply that /dev/urandom is nonblocking.
+> For this, we make use of SipHash-1-x on 64-bit and HalfSipHash-1-x on
+> 32-bit, which are already in use in the kernel and achieve the same
+> performance as the function they replace. It would be nice to do two
+> rounds, but we don't exactly have the CPU budget handy for that, and one
+> round alone is already sufficient.
 > 
 
-Also the comment describing 'Fast key erasure RNG, the "crng".' still claims
-that get_random_bytes(), get_random_u32(), etc. are "equivalent to a read from
-/dev/urandom".  With this patch, they're not, since they don't block whereas
-/dev/urandom will block.
+I'm a bit confused by the argument here.  It's not SipHash-1-x that's used
+elsewhere in the kernel, but rather SipHash-2-4.  HalfSipHash-1-3 is used too,
+but the documentation (Documentation/security/siphash.rst) is very explicit that
+HalfSipHash-1-3 must only ever be used as a hashtable key function.
+
+It sounds like you're not actually claiming cryptographic security here, and
+this is probably better than the homebrew ARX that was there before.  But there
+are definitely some contradictions in your explanation.
+
+>  struct fast_pool {
+> -	union {
+> -		u32 pool32[4];
+> -		u64 pool64[2];
+> -	};
+>  	struct work_struct mix;
+> +	unsigned long pool[4];
+>  	unsigned long last;
+>  	unsigned int count;
+>  	u16 reg_idx;
+>  };
+
+Increasing the size of the pool partially breaks mix_interrupt_randomness()
+which does:
+
+static void mix_interrupt_randomness(struct work_struct *work)
+{
+        struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
+        u8 pool[16];
+
+	[...]
+
+        /*
+         * Copy the pool to the stack so that the mixer always has a
+         * consistent view, before we reenable irqs again.
+         */
+        memcpy(pool, fast_pool->pool, sizeof(pool));
+
+	[...]
+
+So on 64-bit platforms it now throws away half of the pool.
+
+It should use 'u8 pool[sizeof(fast_pool->pool)]' to avoid hardcoding a size.
 
 - Eric
