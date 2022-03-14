@@ -2,76 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8915FC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Mar 2022 21:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E275FC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 02:32:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234482AbiCMVep (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Mar 2022 17:34:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48370 "EHLO
+        id S235926AbiCNCdo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Mar 2022 22:33:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231556AbiCMVeo (ORCPT
+        with ESMTP id S233265AbiCNCdn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Mar 2022 17:34:44 -0400
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BCC5A152
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Mar 2022 14:33:35 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id j25so3940923edj.11
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Mar 2022 14:33:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=tJHa6JKFDscsSEurCzG9MK0b3hvjTr26NmT70tZt0vA=;
-        b=WTPCg9XAfVejQc6YmHtkqFWgmLpf+9Vc97eW9ZDtf8zTwFP4JwysAGlUbHKLL7zNcB
-         SJetXnq1gzJfuAEI7eIjWzZVcMl+ZLLQacbrf1yxyAh4PnLNp/JoQat75LU1/SBoYd3Q
-         F/1a+4Uhc+9GBZwsPRfBU/vFsur9bibGjkqCqOe6Xl3NkFP9pmdpWN4+dAvlP851bGco
-         Suop348bFAwJEGl6TnuA+LzVxPwKpNN7tOW27fwTZHSPEILSxDo5LteHM8BwJ02wdxZB
-         QWe8nCAj0u+lidZrjVO9Yr3ILrnlQOeVrgsWRsIy5wfS4dLqvFa4pfvx6ho8L9peuKfX
-         LZdg==
-X-Gm-Message-State: AOAM532ZS12605qHwE0Yr1xF572a2An9eVwDKy/n42KvnPad17BOYp3w
-        KbHuCN5yQj2IK+mQLeqFILE=
-X-Google-Smtp-Source: ABdhPJxMPpuV6DrC7UOpam7Ndh4Xdvp+5rh3TQtxDvesTMhlmQkgGKNWietGITnJSUX5jXoaY8USUw==
-X-Received: by 2002:a50:cd8c:0:b0:418:65c2:8b77 with SMTP id p12-20020a50cd8c000000b0041865c28b77mr6914446edi.170.1647207213608;
-        Sun, 13 Mar 2022 14:33:33 -0700 (PDT)
-Received: from [10.100.102.14] (46-117-116-119.bb.netvision.net.il. [46.117.116.119])
-        by smtp.gmail.com with ESMTPSA id z23-20020a170906435700b006b0e62bee84sm5891207ejm.115.2022.03.13.14.33.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Mar 2022 14:33:33 -0700 (PDT)
-Message-ID: <ac3056fe-e5bb-92cb-2d4f-a86c04117e5d@grimberg.me>
-Date:   Sun, 13 Mar 2022 23:33:31 +0200
+        Sun, 13 Mar 2022 22:33:43 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB46117D;
+        Sun, 13 Mar 2022 19:32:32 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0V72sF0B_1647225146;
+Received: from 30.240.100.21(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V72sF0B_1647225146)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 14 Mar 2022 10:32:28 +0800
+Message-ID: <d8e6305a-b535-5952-aa2a-275ca18c1bd9@linux.alibaba.com>
+Date:   Mon, 14 Mar 2022 10:32:25 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCHv8 00/12] nvme: In-band authentication support
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: [PATCH 1/3] crypto: sm4 - create SM4 library based on sm4 generic
+ code
 Content-Language: en-US
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Niolai Stange <nstange@suse.com>
-Cc:     Keith Busch <keith.busch@wdc.com>, linux-nvme@lists.infradead.org,
-        linux-crypto@vger.kernel.org
-References: <20211202152358.60116-1-hare@suse.de>
- <20211213080853.GA21223@lst.de>
- <9853d36a-036c-7f2b-5fb4-b3fb4bae473f@suse.de>
- <4328e4f0-9674-9362-4ed5-89ec7edba4a2@grimberg.me>
- <56f1ce1c-2272-bed2-fd6b-642854b612bb@suse.de>
- <483836f5-f850-6eac-8c38-3f03db3189ab@grimberg.me>
- <0c4613ff-ba30-c812-a6e9-1954d77b1d1b@suse.de>
- <ad9af172-4b7b-4206-feab-8ab54ba7cfe5@grimberg.me>
- <e2ccd5bf-c13f-8660-c4c0-31a1053846ed@suse.de>
- <1d1522c6-7f6b-7023-9e66-a05ac5a5a0be@grimberg.me>
-In-Reply-To: <1d1522c6-7f6b-7023-9e66-a05ac5a5a0be@grimberg.me>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        X86 ML <x86@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20210610134459.28541-1-tianjia.zhang@linux.alibaba.com>
+ <20210610134459.28541-2-tianjia.zhang@linux.alibaba.com>
+ <Yh32tEhUgGeSXf/A@zx2c4.com> <Yh65NU6TwcvW/VZV@gondor.apana.org.au>
+ <CAHmME9qL4gHwJZcYGRmJ8sxcjkpGFjWDH2gxu15FXzgCUDLifw@mail.gmail.com>
+ <Yh/uW6z7aOyG0Jl8@gmail.com>
+ <CAHmME9rUUGAM+MP802=dSe0HMLnGAq4Yne-NHfJxyGaKMcdSxg@mail.gmail.com>
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <CAHmME9rUUGAM+MP802=dSe0HMLnGAq4Yne-NHfJxyGaKMcdSxg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Jason,
 
-> Hannes and co,
+On 3/12/22 7:03 AM, Jason A. Donenfeld wrote:
+> Hi Tianjia,
 > 
-> Do you know what is the state of this dependency? Or when should
-> we expect to revisit this patch set?
+> On Wed, Mar 2, 2022 at 3:23 PM Eric Biggers <ebiggers@kernel.org> wrote:
+>>
+>> On Wed, Mar 02, 2022 at 01:26:13AM +0100, Jason A. Donenfeld wrote:
+>>> On Wed, Mar 2, 2022 at 1:24 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>>>>
+>>>> On Tue, Mar 01, 2022 at 11:34:28AM +0100, Jason A. Donenfeld wrote:
+>>>>>>   lib/crypto/Kconfig   |   3 +
+>>>>>>   lib/crypto/Makefile  |   3 +
+>>>>>>   lib/crypto/sm4.c     | 184 +++++++++++++++++++++++++++++++++++++++++++
+>>>>>
+>>>>> If this is only used by the crypto API, it does not belong in
+>>>>> lib/crypto.
+>>>>
+>>>> Nope there is no such rule.  lib/crypto is fine if you're adding
+>>>> code that is shared between crypto and arch/*/crypto.
+>>>
+>>> The sprawling madness continues then... Noted.
+>>
+>> I think it would make more sense for this code to be in crypto/, for the reason
+>> that Jason gave.
+> 
+> Were you planning on submitting a patch for this?
+> 
+> Thanks,
+> Jason
 
-Ping?
+I agree with Herbert that this is not necessary and the community is 
+currently not in agreement on this point, and I'd be happy to do the 
+work if there's a more reasonable reason.
+
+Thanks so much for your suggestion.
+
+Best regards,
+Tianjia
