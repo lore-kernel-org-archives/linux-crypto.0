@@ -2,331 +2,311 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D28C4332F
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 13:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51339C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 13:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241868AbiCNNfL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Mar 2022 09:35:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52172 "EHLO
+        id S242024AbiCNNut (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Mar 2022 09:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241903AbiCNNfJ (ORCPT
+        with ESMTP id S230419AbiCNNut (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Mar 2022 09:35:09 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5144275CE;
-        Mon, 14 Mar 2022 06:33:45 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22EDDHcE016652;
-        Mon, 14 Mar 2022 13:33:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=LMJFaAgHdqbGvaIyBBVYqbbKH2deYolKiZTupdEucls=;
- b=HAeR0D2I+pane1ovMIrng6EDGULH2VsdZOpRcMO6jevKnmD7gxixnd1gK+ONZdtHxn51
- ZUNkfhrwGe3xVVOq+8/zYccEOtbuUCtaIb1fmdJDfMz+xUTlWuZhx3i8zvkBCagL0brQ
- 8/s3nOAJ0liVTkGooiC18SUg7Xgx0qFiBN0ey8eNodspg9INDRN6yZjFFUcIDXIJIFth
- d6iEUcH7y8gjLuGgRj3jZUgbKU9LfkfFlJIONyTPEGaPm9NkMvjHjxZTk0i/ohMLIvbP
- thctRttoV23SmD0e6IjT8RE+NqNkHMymFWMnBIkukLKrvWx+I76LCQfhQb6qSIu1Ulrs YQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6d98udc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 13:33:16 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22EDDPmD017894;
-        Mon, 14 Mar 2022 13:33:16 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3et6d98ncm-402
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 13:33:15 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22EBtDYk007855;
-        Mon, 14 Mar 2022 12:00:35 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01wdc.us.ibm.com with ESMTP id 3erk595hxx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 14 Mar 2022 12:00:35 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22EC0YXl21692912
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Mar 2022 12:00:34 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB33C28065;
-        Mon, 14 Mar 2022 12:00:33 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 81D602805A;
-        Mon, 14 Mar 2022 12:00:33 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 14 Mar 2022 12:00:33 +0000 (GMT)
-Message-ID: <a00860ca-8da9-ec03-6306-edf0623e67c1@linux.ibm.com>
-Date:   Mon, 14 Mar 2022 08:00:33 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 3/4] KEYS: CA link restriction
-Content-Language: en-US
-From:   Stefan Berger <stefanb@linux.ibm.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "nayna@linux.ibm.com" <nayna@linux.ibm.com>,
-        "mic@linux.microsoft.com" <mic@linux.microsoft.com>,
-        Konrad Wilk <konrad.wilk@oracle.com>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-References: <20220301173651.3435350-1-eric.snowberg@oracle.com>
- <20220301173651.3435350-4-eric.snowberg@oracle.com>
- <47f3654e-892d-a35a-e77c-70ada1ebcf43@linux.ibm.com>
- <2415444C-AD8F-4F03-8B1C-C0770F83ADAE@oracle.com>
- <e2dd58cd6074ae692256333b43b5ecde70bcdbdd.camel@linux.ibm.com>
- <67456A73-8B72-4DB6-8E23-7C603661A0A4@oracle.com>
- <22860730-d615-5683-6af0-05b6f4f3e71d@linux.ibm.com>
- <e10f2161aaa69a9d301b3a16a37cbab266318aee.camel@linux.ibm.com>
- <068F32E0-B202-4B20-9DE7-57373EF71BFE@oracle.com>
- <930d970d-0120-d3f0-939a-b5ef3b596318@linux.ibm.com>
- <B9A8F5BD-5FDE-4501-9C0A-865579C45627@oracle.com>
- <9ea53711-73ab-d242-9eb6-87497c8dc7ac@linux.ibm.com>
- <00B288C0-5011-4706-B393-481910489FFE@oracle.com>
- <e3a64c96-18b7-f940-8da5-ced3786c33b8@linux.ibm.com>
-In-Reply-To: <e3a64c96-18b7-f940-8da5-ced3786c33b8@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eKDQCl-p-ZW3PuK9TWICh8KxI8SwMJ_f
-X-Proofpoint-ORIG-GUID: VcjmHzGoSvAaEvskIiDy1Fhebj7-AvHN
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Mon, 14 Mar 2022 09:50:49 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EB4BD46646;
+        Mon, 14 Mar 2022 06:49:38 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AF3551FB;
+        Mon, 14 Mar 2022 06:49:38 -0700 (PDT)
+Received: from e120937-lin (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 934A23F7D7;
+        Mon, 14 Mar 2022 06:49:37 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 13:49:27 +0000
+From:   Cristian Marussi <cristian.marussi@arm.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Dung Nguyen <dung.nguyen.zy@renesas.com>,
+        Ofir Drang <Ofir.Drang@arm.com>
+Subject: Re: [RFC/PATCH] crypto: ccree - fix a race of enqueue_seq() in
+ send_request_init()
+Message-ID: <Yi9Hyx8215bHVQfk@e120937-lin>
+References: <20220311081909.1661934-1-yoshihiro.shimoda.uh@renesas.com>
+ <CAOtvUMc67nT_hVJ8C5pnAQfSGSGtae79OJtadgD8wZC3dcNRLA@mail.gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-14_08,2022-03-14_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- phishscore=0 impostorscore=0 bulkscore=0 spamscore=0 priorityscore=1501
- mlxscore=0 clxscore=1015 mlxlogscore=999 adultscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2203140085
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMc67nT_hVJ8C5pnAQfSGSGtae79OJtadgD8wZC3dcNRLA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sun, Mar 13, 2022 at 04:52:20PM +0200, Gilad Ben-Yossef wrote:
+> Hi,
+> 
 
+Hi Gilad,
 
-On 3/11/22 15:23, Stefan Berger wrote:
+> On Fri, Mar 11, 2022 at 10:19 AM Yoshihiro Shimoda
+> <yoshihiro.shimoda.uh@renesas.com> wrote:
+> >
+> > From: Dung Nguyen <dung.nguyen.zy@renesas.com>
+> >
+> > When loading ccree.ko, after registering cipher algorithm at
+> > cc_cipher_alloc() and cc_hash_alloc() -> send_request_init() ->
+> > enqueue_seq() has called to pushing descriptor into HW.
+> >
+> > On other hand, if another thread have called to encrypt/decrypt
+> > cipher (cc_cipher_encrypt/decrypt) -> cc_send_request() ->
+> > cc_do_send_request() -> enqueue_seq() while send_request_init()
+> > is running, the thread also has called to pushing descriptor into HW.
+> > And then, it's possible to overwrite data.
+> >
+> > The cc_do_send_request() locks mgr->hw_lock, but send_request_init()
+> > doesn't lock mgr->hw_lock before enqueue_seq() is called. So,
+> > send_request_init() should lock mgr->hw_lock before enqueue_seq() is
+> > called.
+> >
+> > This issue is possible to cause the following way in rare cases:
+> > - CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+> > - insmod ccree.ko & insmod tcrypt.ko
+> 
+> Thank you very much Dung and Yoshihiro!
+> 
+> This is a very good catch and an issue we have missed indeed.
+> 
+> >
+> > Signed-off-by: Dung Nguyen <dung.nguyen.zy@renesas.com>
+> > [shimoda: revise the subject/description]
+> > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> > ---
+> >  I believe we should fix this race. But, as I wrote the desciption
+> >  above, there is in rare cases. So, I marked this patch as RFC.
+> >
+> >  drivers/crypto/ccree/cc_request_mgr.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
+> > index 887162df50f9..eef40022258b 100644
+> > --- a/drivers/crypto/ccree/cc_request_mgr.c
+> > +++ b/drivers/crypto/ccree/cc_request_mgr.c
+> > @@ -513,6 +513,7 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+> >
+> >         set_queue_last_ind(drvdata, &desc[(len - 1)]);
+> >
+> > +       spin_lock_bh(&req_mgr_h->hw_lock);
+> >         /*
+> >          * We are about to push command to the HW via the command registers
+> >          * that may reference host memory. We need to issue a memory barrier
+> > @@ -520,6 +521,7 @@ int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
+> >          */
+> >         wmb();
+> >         enqueue_seq(drvdata, desc, len);
+> > +       spin_unlock_bh(&req_mgr_h->hw_lock);
+> >
+> >         /* Update the free slots in HW queue */
+> >         req_mgr_h->q_free_slots =
+> > --
+> > 2.25.1
+> >
+> 
+> Having said that, adding a lock here is not the best solution. To be
+> effective, the lock should be taken before the call to
+> cc_queues_status() and released only after the updating of the free
+> slots.
+> However, while doing so will ensure there is no race condition with
+> regard to writing to the hardware control registers, it does not deal
+> at all with the case the hardware command FIFO is full due to
+> encryption/decryption requests.
+> This is by design, as the whole purpose of a seperate init time only
+> send_request variant is to avoid these complexities, under the
+> assumption that all access to the hardware is serialised at init time.
+> 
+> Therefore, a better solution is to switch the order of algo
+> allocations so that the hash is allocated first, prior to any other
+> alg that might be using the hardware FIFO and thus guaranteeing
+> synchronized access and available FIFO space.
+> 
+> Can you please verify that the following patch indeed resolves the
+> issue for you?
+> 
+> diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+> index 790fa9058a36..7d1bee86d581 100644
+> --- a/drivers/crypto/ccree/cc_driver.c
+> +++ b/drivers/crypto/ccree/cc_driver.c
+> @@ -529,24 +529,26 @@ static int init_cc_resources(struct
+> platform_device *plat_dev)
+>                 goto post_req_mgr_err;
+>         }
+> 
+> -       /* Allocate crypto algs */
+> -       rc = cc_cipher_alloc(new_drvdata);
+> +       /* hash must be allocated first due to use of send_request_init()
+> +        * and dependency of AEAD on it
+> +        */
+> +       rc = cc_hash_alloc(new_drvdata);
+>         if (rc) {
+> -               dev_err(dev, "cc_cipher_alloc failed\n");
+> +               dev_err(dev, "cc_hash_alloc failed\n");
+>                 goto post_buf_mgr_err;
+>         }
+> 
+> -       /* hash must be allocated before aead since hash exports APIs */
+> -       rc = cc_hash_alloc(new_drvdata);
+> +       /* Allocate crypto algs */
+> +       rc = cc_cipher_alloc(new_drvdata);
+>         if (rc) {
+> -               dev_err(dev, "cc_hash_alloc failed\n");
+> -               goto post_cipher_err;
+> +               dev_err(dev, "cc_cipher_alloc failed\n");
+> +               goto post_hash_err;
+>         }
+> 
+>         rc = cc_aead_alloc(new_drvdata);
+>         if (rc) {
+>                 dev_err(dev, "cc_aead_alloc failed\n");
+> -               goto post_hash_err;
+> +               goto post_cipher_err;
+>         }
+> 
+>         /* If we got here and FIPS mode is enabled
+> @@ -558,10 +560,10 @@ static int init_cc_resources(struct
+> platform_device *plat_dev)
+>         pm_runtime_put(dev);
+>         return 0;
+> 
+> -post_hash_err:
+> -       cc_hash_free(new_drvdata);
+>  post_cipher_err:
+>         cc_cipher_free(new_drvdata);
+> +post_hash_err:
+> +       cc_hash_free(new_drvdata);
+>  post_buf_mgr_err:
+>          cc_buffer_mgr_fini(new_drvdata);
+>  post_req_mgr_err:
+> @@ -593,8 +595,8 @@ static void cleanup_cc_resources(struct
+> platform_device *plat_dev)
+>                 (struct cc_drvdata *)platform_get_drvdata(plat_dev);
 > 
 > 
-> On 3/11/22 13:44, Eric Snowberg wrote:
->>
->>
->>> On Mar 9, 2022, at 12:02 PM, Stefan Berger <stefanb@linux.ibm.com> 
->>> wrote:
->>>
->>>
->>>
->>> On 3/9/22 13:13, Eric Snowberg wrote:
->>>>> On Mar 9, 2022, at 10:12 AM, Stefan Berger <stefanb@linux.ibm.com> 
->>>>> wrote:
->>>>>
->>>>>
->>>>>
->>>>> On 3/8/22 13:02, Eric Snowberg wrote:
->>>>>>> On Mar 8, 2022, at 5:45 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
->>>>>>>
->>>>>>> On Mon, 2022-03-07 at 21:31 -0500, Stefan Berger wrote:
->>>>>>>>
->>>>>>>> On 3/7/22 18:38, Eric Snowberg wrote:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>>> On Mar 7, 2022, at 4:01 PM, Mimi Zohar <zohar@linux.ibm.com> 
->>>>>>>>>> wrote:
->>>>>>>>>>
->>>>>>>>>> On Mon, 2022-03-07 at 18:06 +0000, Eric Snowberg wrote:
->>>>>>>>>>>
->>>>>>>>>>>>> diff --git a/crypto/asymmetric_keys/restrict.c 
->>>>>>>>>>>>> b/crypto/asymmetric_keys/restrict.c
->>>>>>>>>>>>> index 6b1ac5f5896a..49bb2ea7f609 100644
->>>>>>>>>>>>> --- a/crypto/asymmetric_keys/restrict.c
->>>>>>>>>>>>> +++ b/crypto/asymmetric_keys/restrict.c
->>>>>>>>>>>>> @@ -108,6 +108,49 @@ int restrict_link_by_signature(struct 
->>>>>>>>>>>>> key *dest_keyring,
->>>>>>>>>>>>>     return ret;
->>>>>>>>>>>>> }
->>>>>>>>>>>>> +/**
->>>>>>>>>>>>> + * restrict_link_by_ca - Restrict additions to a ring of 
->>>>>>>>>>>>> CA keys
->>>>>>>>>>>>> + * @dest_keyring: Keyring being linked to.
->>>>>>>>>>>>> + * @type: The type of key being added.
->>>>>>>>>>>>> + * @payload: The payload of the new key.
->>>>>>>>>>>>> + * @trust_keyring: Unused.
->>>>>>>>>>>>> + *
->>>>>>>>>>>>> + * Check if the new certificate is a CA. If it is a CA, 
->>>>>>>>>>>>> then mark the new
->>>>>>>>>>>>> + * certificate as being ok to link.
->>>>>>>>>>>>
->>>>>>>>>>>> CA = root CA here, right?
->>>>>>>>>>>
->>>>>>>>>>> Yes, I’ll update the comment
->>>>>>>>>>
->>>>>>>>>> Updating the comment is not enough.  There's an existing 
->>>>>>>>>> function named
->>>>>>>>>> "x509_check_for_self_signed()" which determines whether the 
->>>>>>>>>> certificate
->>>>>>>>>> is self-signed.
->>>>>>>>>
->>>>>>>>> Originally I tried using that function.  However when the 
->>>>>>>>> restrict link code is called,
->>>>>>>>> all the necessary x509 information is no longer available.   
->>>>>>>>> The code in
->>>>>>>>> restrict_link_by_ca is basically doing the equivalent to 
->>>>>>>>> x509_check_for_self_signed.
->>>>>>>>> After verifying the cert has the CA flag set, the call to 
->>>>>>>>> public_key_verify_signature
->>>>>>>>> validates the cert is self signed.
->>>>>>>>>
->>>>>>>> Isn't x509_cert_parse() being called as part of parsing the 
->>>>>>>> certificate?
->>>>>>>> If so, it seems to check for a self-signed certificate every 
->>>>>>>> time. You
->>>>>>>> could add something like the following to 
->>>>>>>> x509_check_for_self_signed(cert):
->>>>>>>> pub->x509_self_signed = cert->self_signed = true;
->>>>>>>>
->>>>>>>> This could then reduce the function in 3/4 to something like:
->>>>>>>>
->>>>>>>> return payload->data[asym_crypto]->x509_self_signed;
->>>>>> When I was studying the restriction code, before writing this 
->>>>>> patch, it looked like
->>>>>> it was written from the standpoint to be as generic as possible.  
->>>>>> All code contained
->>>>>> within it works on either a public_key_signature or a public_key.  
->>>>>> I had assumed it
->>>>>> was written this way to be used with different asymmetrical key 
->>>>>> types now and in
->>>>>> the future. I called the public_key_verify_signature function 
->>>>>> instead of interrogating
->>>>>> the x509 payload to keep in line with what I thought was the 
->>>>>> original design. Let me
->>>>>> know if I should be carrying x509 code in here to make the change 
->>>>>> above.
->>>>>
->>>>> It does not seem right if there were two functions trying to 
->>>>> determine whether an x509 cert is self-signed. The existing is 
->>>>> invoked as part of loading a key onto the machine keyring from what 
->>>>> I can see. It has access to more data about the cert and therefore 
->>>>> can do stronger tests, yours doesn't have access to the data. So I 
->>>>> guess I would remember in a boolean in the public key structure 
->>>>> that the x509 cert it comes from was self signed following the 
->>>>> existing test. Key in your function may be that that 
->>>>> payload->data[] array is guaranteed to be from the x509 cert as set 
->>>>> in x509_key_preparse().
->>>>>
->>>>> https://elixir.bootlin.com/linux/v5.17-rc7/source/crypto/asymmetric_keys/x509_public_key.c#L236 
->>>>>
->>>> I could add another bool to the public key structure to designate if 
->>>> the key was self signed,
->>>> but this seems to go against what the kernel document states. 
->>>> "Asymmetric / Public-key
->>>> Cryptography Key Type” [1] states:
->>>> "The “asymmetric” key type is designed to be a container for the 
->>>> keys used in public-key
->>>> cryptography, without imposing any particular restrictions on the 
->>>> form or mechanism of
->>>> the cryptography or form of the key.
->>>> The asymmetric key is given a subtype that defines what sort of data 
->>>> is associated with
->>>> the key and provides operations to describe and destroy it. However, 
->>>> no requirement is
->>>> made that the key data actually be stored in the key."
->>>> Now every public key type would need to fill in the information on 
->>>> whether the key is self
->>>> signed or not.  Instead of going through the 
->>>> public_key_verify_signature function currently
->>>> used in this patch.
->>>
->>> Every public key extracted from a x509 certificate would have to set 
->>> this field to true if the public key originates from a self-signed 
->>> x509 cert. Is this different from this code here where now every 
->>> public key would have to set the key_is_ca field?
->>
->> The information to determine if the key is a CA can not be derived 
->> without help from
->> the specific key type.  Up to this point, no one has needed it.
->>
->>>
->>> +        if (v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
->>> +            ctx->cert->pub->key_is_ca = true;
->>>
->>> The extension I would have suggested looked similar:
->>>
->>> cert->pub->x509_self_sign = cert->self_signed = true
->>>
->>> [ to be put here: 
->>> https://elixir.bootlin.com/linux/v5.17-rc7/source/crypto/asymmetric_keys/x509_public_key.c#L147 
->>> ]
->>
->> The information to determine if a key is self signed can be derived 
->> without help
->> from the specific key type.  This can be achieved without modification 
->> to a generic
->> public header file.  Adding a field to the public header would need to 
->> either be
->> x509 specific or generic for all key types.  Adding a x509 specific 
->> field seems to
->> go against the goal outlined in the kernel documentation.  Adding a 
->> generic
->> self_signed field impacts all key types, now each needs to be modified 
->> to fill in
->> the new field.
->>
-> 
-> If we now called the generic field cert_self_signed we could let it 
-> indicate whether the certificate the key was extracted from was 
-> self-self signed. The next question then is how many different types of 
-> certificates does the key subsystem support besides x509 so we know 
-> where to set this field if necessary? I don't know of any other...  x509 
-> seems to be the only type of certificate associated with struct public_key.
-> What seems to be the case is that pkcs7 also runs the x509 cert parser 
-> to extract an x509 certificate, thus the flag will be set down this call 
-> path as well.
-> 
-> https://elixir.bootlin.com/linux/latest/source/crypto/asymmetric_keys/pkcs7_parser.c#L408 
-> 
-> 
-> Further, the public_key struct is only used in a few places and only in 
-> the crypto/asymmetric_keys directory filled in. Its usage in pkcs8 seems 
-> not relevant for certs, so leaving cert_self_signed there uninitialized 
-> seems just right. The code in public_key.c seems to not deal with 
-> certificates. So what's left is the x509_cert_parser.c and the function 
-> x509_cert_parse() allocates it and then calls 
-> x509_check_for_self_signed(cert), which can set the flag.
-> 
-> It looks to me giving it a generic name and only ever setting it to true 
-> iin x509_check_for_self_sign(cert) should work.
 
-Otherwise maybe we could introduce
+I gave it a go to the above patch on my JUNO CCREE on top of a v5.17-rc8
+(plus your ebad9d8fbadd crypto: ccree - don't attempt 0 len DMA
+mappings) and it seems to solve have some sort of good effect :D but not
+sure really what was the reproducer...
 
-struct cert_info {
-         bool is_ca;
-         bool self_sign;
-}
+...I explain...without your fix that reorders hash and cipher allocs, in a
+few occasions when I issue a
 
-And use it like this:
-+		if (v[1] != 0 && v[2] == ASN1_BOOL && v[3] == 1)
-+			ctx->cert->cert_info->is_ca = true;
+modprobe ccree & modprobe tcrypt
 
-New index in the data array:
+my system hung with no output at all....
 
-	prep->payload.data[asym_subtype] = &public_key_subtype;
-	prep->payload.data[asym_key_ids] = kids;
-	prep->payload.data[asym_crypto] = cert->pub;
-	prep->payload.data[asym_auth] = cert->sig;
-	prep->payload.data[asym_cert_info] = cert->cert_info;
+Is this the (rare) apparent behaviour of the reported race ?
 
-There are a few more places where this new array index would need to be 
-set to NULL.
+I would more likely expect that some tests failed due to the data
+overwrite/corruption from the race....
+
+Indeed, running a few loop of load/unload as above I observed also these
+errors (wrong results) before the WARN splat:
+
+[  207.923373] ccree 60010000.crypto: ARM CryptoCell 713 Driver: HW version 0x040BB0D0/0xB105F00D, Driver version 5.0
+[  207.934975] alg: No test for essiv(cbc(paes),sha256) (essiv-paes-ccree)
+[  208.186828] "modprobe" (1704) uses obsolete ecb(arc4) skcipher
+[  208.648749] alg: No test for authenc(xcbc(aes),cbc(aes)) (authenc-xcbc-aes-cbc-aes-ccree)
+[  208.658296] alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes))) (authenc-xcbc-aes-rfc3686-ctr-aes-ccree) 
+[  208.743217] alg: aead: rfc4106(gcm-aes-ccree) encryption test failed (wrong result) on test vector 0, cfg="two even aligned splits"
+[  208.755148] ------------[ cut here ]------------
+[  208.759824] alg: self-tests for rfc4106(gcm-aes-ccree) (rfc4106(gcm(aes))) failed (rc=-22)
+[  208.759868] WARNING: CPU: 3 PID: 1851 at crypto/testmgr.c:5673 alg_test.part.45+0x110/0x3a8
+[  208.776524] Modules linked in: ccree(+) tcrypt(+) authenc sm3_generic
+
+
+...AND
+
+[  220.380080] ccree 60010000.crypto: ARM CryptoCell 713 Driver: HWversion 0x040BB0D0/0xB105F00D, Driver version 5.0
+[  220.391697] alg: No test for essiv(cbc(paes),sha256) (essiv-paes-ccree)
+[  220.480167] alg: skcipher: cbc-aes-ccree decryption test failed (wrong result) on test vector 4, cfg="unaligned buffer, offset=1"
+[  220.491911] ------------[ cut here ]------------
+[  220.496596] alg: self-tests for cbc(aes) (cbc(aes)) failed (rc=-22)
+[  220.496627] WARNING: CPU: 1 PID: 2681 at crypto/testmgr.c:5673 alg_test.part.45+0x110/0x3a8
+
+
+... MOREOVER on one occasion after having made a mess as above with a load/unload loop
+I hit also a splat at reboot (after a timeout/hang while trying to reboot):
+
+[  742.442235] ------------[ cut here ]------------
+[  742.442625] systemd-shutdown[1]: Sending SIGKILL to PID 3118 (modprobe).
+[  742.446868] WARNING: CPU: 5 PID: 3117 at crypto/api.c:174 crypto_wait_for_test+0x70/0x78
+[  742.446903] Modules linked in: ccree(+) tcrypt(+) authenc sm3_generic ofb md5 cmac vmac sm4_generic libsm4 ccm gcm streebog_generic sha3_generic ghash_generic seed blake2b_generic blake2s_generic rmd160 xxhash_generic lzo camellia_generic fcrypt pcbc anubis wp512 khazad tea michael_mic arc4 libarc4 cast6_generic cast5_generic cast_common cfb serpent_generic xts lrw twofish_generic twofish_common cbc blowfish_generic blowfish_common ecb md4 des_generic ctr libdes ip_tables x_tables ipv6 [last unloaded: authenc]
+[  742.507343] CPU: 5 PID: 3117 Comm: modprobe Not tainted 5.17.0-rc8-00005-g61eb74b1c2a5 #9
+[  742.515551] Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development Platform, BIOS EDK II Jan 23 2017
+[  742.526361] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  742.533352] pc : crypto_wait_for_test+0x70/0x78
+[  742.537902] lr : crypto_wait_for_test+0x34/0x78
+[  742.542452] sp : ffff800008903820
+[  742.545775] x29: ffff800008903820 x28: ffff333542690880 x27: 0000000000000000
+[  742.552952] x26: 0000000000000001 x25: 000048ca62342cfc x24: ffff3335414b2f88
+[  742.560127] x23: ffff3335403a7010 x22: 0000000000000001 x21: ffffb736076f7230
+[  742.567303] x20: 0000000000000000 x19: ffff3335418e3c00 x18: 0000000000000000
+[  742.574477] x17: 000000040044ffff x16: 00400032b5503510 x15: 0000000000000000
+[  742.581652] x14: ffff3335400e6200 x13: ffff7c00b7eff000 x12: 0000000034d4d91d
+[  742.588827] x11: 0000000000000000 x10: 00000000000009a0 x9 : ffff800008903680
+[  742.596003] x8 : ffff3335421fd000 x7 : ffff333540aa5680 x6 : 0000000947dfecad
+[  742.603178] x5 : 00000000410fd030 x4 : 0000000000000000 x3 : ffff3335418e3d98
+[  742.610353] x2 : ece3a452fbc36d00 x1 : 0000000000000000 x0 : 00000000fffffe00
+[  742.617528] Call trace:
+[  742.619979]  crypto_wait_for_test+0x70/0x78
+[  742.624184]  crypto_register_alg+0xb8/0xe8
+[  742.628301]  crypto_register_ahash+0x4c/0x60
+[  742.632595]  cc_hash_alloc+0x17c/0x288 [ccree]
+[  742.637136]  ccree_probe+0x810/0x8f0 [ccree]
+[  742.641490]  platform_probe+0x68/0xd8
+[  742.645176]  really_probe+0x184/0x400
+[  742.648858]  __driver_probe_device+0x114/0x188
+[  742.653324]  driver_probe_device+0x7c/0x108
+[  742.657528]  __driver_attach+0xbc/0x1a0
+[  742.661384]  bus_for_each_dev+0x74/0xc8
+[  742.665238]  driver_attach+0x24/0x30
+[  742.668832]  bus_add_driver+0x19c/0x238
+[  742.672686]  driver_register+0x64/0x120
+[  742.676542]  __platform_driver_register+0x28/0x38
+[  742.681271]  ccree_init+0x28/0x34 [ccree]
+[  742.685365]  do_one_initcall+0x74/0x1d0
+[  742.689221]  do_init_module+0x44/0x200
+[  742.692992]  load_module+0x2008/0x2688
+[  742.696761]  __do_sys_finit_module+0xc4/0x138
+[  742.701142]  __arm64_sys_finit_module+0x20/0x30
+[  742.705695]  invoke_syscall+0x44/0x108
+[  742.709467]  el0_svc_common.constprop.3+0x94/0xf8
+[  742.714195]  do_el0_svc+0x24/0x88
+[  742.717529]  el0_svc+0x20/0x50
+[  742.720603]  el0t_64_sync_handler+0x90/0xb8
+[  742.724808]  el0t_64_sync+0x180/0x184
+[  742.728487] ---[ end trace 0000000000000000 ]---
+
+
+On the BRIGHT side instead, with your fix instead I've never seen the system hang
+or any of the above errors in several attempts and the output is as usual when loading
+ccree before tcrypt:
+
+root@tx2-juno-ccree:~# modprobe ccree & modprobe tcrypt
+[1] 194
+[   88.225366] ccree 60010000.crypto: ARM CryptoCell 713 Driver: HW version 0x040BB0D0/0xB105F00D, Driver version 5.0
+[   88.861999] alg: No test for essiv(cbc(paes),sha256) (essiv-paes-ccree)
+[   88.949896] alg: No test for authenc(xcbc(aes),cbc(aes)) (authenc-xcbc-aes-cbc-aes-ccree)
+[   88.959134] alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes))) (authenc-xcbc-aes-rfc3686-ctr-aes-ccree)
+[   89.168893] ccree 60010000.crypto: ARM ccree device initialized
+[   90.268538] "cryptomgr_test" (474) uses obsolete ecb(arc4) skcipher
+[   90.288225] "modprobe" (195) uses obsolete ecb(arc4) skcipher
+[   93.545850] tcrypt: all tests passed
+
+Does it make sense ? 
+Hope that helps a bit, let me know I have to do more (or different)
+testing....(still lots of ignorance on my side about all of this :D...)
+
+Thanks,
+Cristian
