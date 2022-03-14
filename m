@@ -2,72 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1ADC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 02:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABC9C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 02:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234660AbiCNCrk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 13 Mar 2022 22:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45080 "EHLO
+        id S235990AbiCNCzE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 13 Mar 2022 22:55:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235875AbiCNCri (ORCPT
+        with ESMTP id S235997AbiCNCzE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Mar 2022 22:47:38 -0400
+        Sun, 13 Mar 2022 22:55:04 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588EE32065;
-        Sun, 13 Mar 2022 19:46:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769193A723;
+        Sun, 13 Mar 2022 19:53:55 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nTahk-00032e-MQ; Mon, 14 Mar 2022 13:45:05 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 14 Mar 2022 14:45:05 +1200
-Date:   Mon, 14 Mar 2022 14:45:05 +1200
+        id 1nTaqB-0003Aw-KF; Mon, 14 Mar 2022 13:53:48 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 14 Mar 2022 14:53:47 +1200
+Date:   Mon, 14 Mar 2022 14:53:47 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
-        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
-        X86 ML <x86@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/3] crypto: sm4 - create SM4 library based on sm4
- generic code
-Message-ID: <Yi6sMd51viEl3de6@gondor.apana.org.au>
-References: <20210610134459.28541-1-tianjia.zhang@linux.alibaba.com>
- <20210610134459.28541-2-tianjia.zhang@linux.alibaba.com>
- <Yh32tEhUgGeSXf/A@zx2c4.com>
- <Yh65NU6TwcvW/VZV@gondor.apana.org.au>
- <CAHmME9qL4gHwJZcYGRmJ8sxcjkpGFjWDH2gxu15FXzgCUDLifw@mail.gmail.com>
- <Yh/uW6z7aOyG0Jl8@gmail.com>
- <CAHmME9rUUGAM+MP802=dSe0HMLnGAq4Yne-NHfJxyGaKMcdSxg@mail.gmail.com>
- <d8e6305a-b535-5952-aa2a-275ca18c1bd9@linux.alibaba.com>
- <CAHmME9r5CiU9kB=h4QJGeQ5HtkznCaZeTV3e1pBDv1UjrS1AsQ@mail.gmail.com>
+To:     Miaoqian Lin <linmq006@gmail.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: nomadik: Change clk_disable to
+ clk_disable_unprepare
+Message-ID: <Yi6uOygG1Egb1GVt@gondor.apana.org.au>
+References: <20220307110728.15635-1-linmq006@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9r5CiU9kB=h4QJGeQ5HtkznCaZeTV3e1pBDv1UjrS1AsQ@mail.gmail.com>
+In-Reply-To: <20220307110728.15635-1-linmq006@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 13, 2022 at 08:40:00PM -0600, Jason A. Donenfeld wrote:
-> Hi Herbert,
+On Mon, Mar 07, 2022 at 11:07:24AM +0000, Miaoqian Lin wrote:
+> The corresponding API for clk_prepare_enable is clk_disable_unprepare,
+> other than clk_disable_unprepare.
 > 
-> Are you willing to consider the views of Eric and me? Or is this a
-> hard nack from you?
+> Fix this by changing clk_disable to clk_disable_unprepare.
+> 
+> Fixes: beca35d05cc2 ("hwrng: nomadik - use clk_prepare_enable()")
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> ---
+>  drivers/char/hw_random/nomadik-rng.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Please present your patch to move the code with the reasoning
-for the move and then I can consider it.
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
