@@ -2,266 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E79C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 14:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 603D8C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 15:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242345AbiCNOTg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Mar 2022 10:19:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56038 "EHLO
+        id S240709AbiCNPEz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 14 Mar 2022 11:04:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242286AbiCNOT2 (ORCPT
+        with ESMTP id S235147AbiCNPEy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Mar 2022 10:19:28 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3F91A393
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Mar 2022 07:18:18 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nTlVQ-0004zL-Eh; Mon, 14 Mar 2022 15:17:04 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nTlVI-000f2l-Q9; Mon, 14 Mar 2022 15:16:55 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nTlVG-0097af-Ma; Mon, 14 Mar 2022 15:16:54 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Lars Povlsen <lars.povlsen@microchip.com>,
-        Steen Hegelund <Steen.Hegelund@microchip.com>,
-        UNGLinuxDriver@microchip.com, linux-hwmon@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Lars-Peter Clausen <lars@metafoo.de>,
-        Michael Hennerich <Michael.Hennerich@analog.com>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-clk@vger.kernel.org, kernel@pengutronix.de,
-        Paul Cercueil <paul@crapouillou.net>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Tomislav Denis <tomislav.denis@avl.com>,
-        Anand Ashok Dumbre <anand.ashok.dumbre@xilinx.com>,
-        Michal Simek <michal.simek@xilinx.com>,
-        =?utf-8?q?Andr=C3=A9_Gustavo_Nakagomi_Lopez?= <andregnl@usp.br>,
-        Cai Huoqing <caihuoqing@baidu.com>, linux-iio@vger.kernel.org,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org
-Subject: [PATCH v8 03/16] hwmon: Make use of devm_clk_get_enabled()
-Date:   Mon, 14 Mar 2022 15:16:30 +0100
-Message-Id: <20220314141643.22184-4-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
-References: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
+        Mon, 14 Mar 2022 11:04:54 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2054.outbound.protection.outlook.com [40.107.94.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1CD3D1CB;
+        Mon, 14 Mar 2022 08:03:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WMNqcHprSPjfvFpdKQzgsA3weSJglo/FphreohFVg/1g+lQN3tuLlXaW4STobJcHPo090ZFb7kjVGlLgUhyMrqVnhRDCDHaREhBO9vjP7qsHySIzZWTFKbnk7JXCgxT7GiiFQ9zai/YH6KS7WkOB6J7Cfm9lOURFQaxTXt7r2vpMTojCZY8Ah9b6srKQdbz5Q86Q5qGzDlXaP/yqVnq4YHrmZIL88a2VhIcKew2aK9nQ+WJPPNq4oKEfHFkxgP1dfUH6cKCHpbrf0Tvizdv5mokvghU9NQEM09bmUmjQ+K5ZX6CKXo+ErJQG9XbWA2mGYHWWtt65vGRtk7ZM3lf+TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kJ8aWSlHPgQDMyq4D3N2pdzjFkaCvtNK7VLsYMrmbIk=;
+ b=C+/qXgoYgupQYEo94gO2UjDn9BFCcjElHp91GyLNtSRkyvV9Xm8HXqTYQU8kE9vXK1B08SEJZjn1AV/skX7Zmybytzs6maczk0KoAOF7a6xyxwMMZUZSAM+lCFiLzTZfU6YHMlHSl6MsDOdwB12BU+8OSfUDxbPpIV2FH3xW2xrabGXwJymS1zV2PQ3RZTNzvYQ5r717sscr3qoAJ0cebEHJ7SpS3PzvWm7Jc4oTL7BhIVa+LK/VJdD4TwotsTdz2NYiWmKaanrQS09I5O4bDIYPXQTkhoM2Lubx0DmkLdBFU2HP7noxLroXnmISgXJKhFhEuijDrLBFL14rheo68w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kJ8aWSlHPgQDMyq4D3N2pdzjFkaCvtNK7VLsYMrmbIk=;
+ b=idJBTWRZpjs7feB5K1uBQFzoQ93m6T47pWQ0rubRv52K9rZ6eBfMjtGTcU5nX3/X1aYZU33TuDmZzF1dKYwgQ5HRTpGKCZOCb2tvNhCPmgK1DuIoaMcOckJsrsTc080ZA9KsJwxk3D8q3k7VFChYiW4w7K4ekdHz8dQ4qqtw3BctzCxikKMBDnUkOnGXE2iQqxWjHxpAqMJujzKX1b+2U7cpl2DEwhXMpsXuo3S9yPdnsYB4t9BHzo7owJT+T2FVqclaTLrlSkNfmwfzhGptqFoxI92dNhzq1AWNzBi/qTl/4MyW3DdhW84SiVqq9S2q93+r0wsdcC6eZxxh13H7Gg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BL1PR12MB5112.namprd12.prod.outlook.com (2603:10b6:208:316::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.21; Mon, 14 Mar
+ 2022 15:03:42 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::51a0:4aee:2b4c:ca28]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::51a0:4aee:2b4c:ca28%4]) with mapi id 15.20.5061.028; Mon, 14 Mar 2022
+ 15:03:42 +0000
+Date:   Mon, 14 Mar 2022 12:03:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        Linuxarm <linuxarm@huawei.com>,
+        liulongfang <liulongfang@huawei.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Xu Zaibo <xuzaibo@huawei.com>
+Subject: Re: [PATCH v8 8/9] hisi_acc_vfio_pci: Add support for VFIO live
+ migration
+Message-ID: <20220314150341.GD11336@nvidia.com>
+References: <20220303230131.2103-1-shameerali.kolothum.thodi@huawei.com>
+ <20220303230131.2103-9-shameerali.kolothum.thodi@huawei.com>
+ <20220304205720.GE219866@nvidia.com>
+ <20220307120513.74743f17.alex.williamson@redhat.com>
+ <aac9a26dc27140d9a1ce56ebdec393a6@huawei.com>
+ <20220307125239.7261c97d.alex.williamson@redhat.com>
+ <BN9PR11MB5276EBE887402EBE22630BAB8C099@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220308123312.1f4ba768.alex.williamson@redhat.com>
+ <BN9PR11MB527634CCF86829E0680E5E678C0A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20220310134954.0df4bb12.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220310134954.0df4bb12.alex.williamson@redhat.com>
+X-ClientProxiedBy: BL0PR03CA0035.namprd03.prod.outlook.com
+ (2603:10b6:208:2d::48) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5520; i=uwe@kleine-koenig.org; h=from:subject; bh=yoWCqkNop/4c6OeHmiSUVdq/1kzaWm1CMWom+WTtANQ=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBiL03yCpTW66mjenPvolXbHi93VsM0yzx1/1i/xg38 JATIi6SJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYi9N8gAKCRDB/BR4rcrsCQkqB/ 9PjEPh2PyWfNPLXABv6MwOZQFQlkQEqb7Uekuh33gB2X0gHncSoOfkEhvSA3yU5f1JKsoWGktEOVRg n+3bvFwDe1hNoOS5coZgZV7FTfW8NcDdt1L55ROM501f7GHgh9/VyyqTbW9Jfg108IB6GXoVFmyiA3 zdrIOdlQb2gSicQGiLiTWR0+HZModM3RWjv+KN8b3Mz5fHJdX2rt20lVLbG6aC4fgbxgl/k2GNIq7F utAI4QGzo9+Vc41UCForfyIXi/JNyyOSfFvugrXq8ze/4V3IkxdO+/DOtDfkPum8ClhrVLXZeDmngJ RvozUy0kpU8RDShp4aDvanTK0USO9z
-X-Developer-Key: i=uwe@kleine-koenig.org; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8303c6ed-abc9-4f2d-18a8-08da05cbd422
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5112:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB51128CED82C1AE5CF27E6243C20F9@BL1PR12MB5112.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UuRaeAkOFl+GnWckgNXRc77J2WofDTefZhZQZIIqlC0Ah3ECNqaaCyMbk4V+0pbXqRlC3eWmDBt9DDP0RO+B2ATXLLg8f7fvhlzr6N7Tj9fgMku9ZrUvVRI7iR9LOzVcSK4a7ixTeGDlG34AdRFjRN19Wwhiid3uqQGTLofiOjsZqEYP6uCkxBPZhAjxVFYtlMvbJSAjM0lOE1S/m4ZTzxg4mM2myvCi8gqSY++D7myjCiRGnRRNArqwlSuuBHtib3O45eoVIHDbIURB0XywvIpGQx2p4vZmmxSFtmed/tgkUEQwqneh2aJJFT0LQABJk7KjLlqQTlLMSsAV1L0ylfgUaebnZxv5dmHlrhRLaNHK1wbYsGPwzl6e8UADkVIoQrfutLGwbyACl5jMcLbFPkxY39ywiGKAaBDfVdU0QLjO3exbV+6bYyWv2XKxyh5N2CEdrbNdcTft1fNZyP2icxmTejOl5g8m/pjDYMUJm61Jwm+DJ4b130HS5xaaHzDKOG0BZ4dccc0jW92dp2zXhnDmvZfi8bcK7mOvJD9nn5Z1GBXDAvf8LB8ytxiTNgj6VxYW2D52+HDw7ZE2B0sdTA+E0F1aeY3O9ytSVboCHVhhMaA2nCdKLRil1CIJyA+JaoTzwUrZ1yVwHcY2Tw3yoA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66946007)(6512007)(4326008)(38100700002)(8676002)(66476007)(6506007)(1076003)(2616005)(66556008)(186003)(2906002)(26005)(83380400001)(508600001)(316002)(6916009)(6486002)(54906003)(33656002)(86362001)(8936002)(36756003)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HmLY0k539fDXQnpq5mULd6zlayrOFsA9GD7+74Q+A9AJwnpDWyordNMvdvyE?=
+ =?us-ascii?Q?TBup0G7XAN5uJLZWaNw0k8rGCT5Hm3EJdT/cfoxKkAYrgUhjMwEBzdQEWfxg?=
+ =?us-ascii?Q?RAoO9ylqNVUk7aDB46ldSGdP1RA7JyNd73T6tzDLhWr4JISMEYK3PG+ophT7?=
+ =?us-ascii?Q?h4Nmpv3xabHGjBd7mrbDu5RR4todAs1YNUo41fUikPTDFUtjwuU8gtBN50T/?=
+ =?us-ascii?Q?wDnrG+h2kjZZCSqlKgeGDUG/VspE2lTw99lv9sPWNZvtDLBM8MnHk/8IPVWM?=
+ =?us-ascii?Q?2e6KP0CaVevMfEhCwY1s8/Pb+4qIeuPiYJ0TIHkxvWUczmsU2iaK91u16leX?=
+ =?us-ascii?Q?CbAnGDm3fSROl0V8t/v1YWcNi2/Wa3JQI7ywlw6AuG+Aqvt8qfptQfZMr2kn?=
+ =?us-ascii?Q?Wa5vNJGG216Qm+m4fURQjPqLi758QrCdH89jPKs+OOXjEPJacXmoPJ+q8VvH?=
+ =?us-ascii?Q?PlglsOQPQhMxfWvT/ufr9hp63gBRDXFEDMzWAUm3yqAZI+0HF7iBcoGJ/ILe?=
+ =?us-ascii?Q?NKenoL1wLvY9FmgOAJeoG+TzXqoX/nWz26NmldUPjr741iXqH1G1nca4QCk8?=
+ =?us-ascii?Q?ghqDwzBm4YVbAM0TujvK1KhEkEnT0SHIemM92m/PuPSvJPmsqZ2bIg69VCKT?=
+ =?us-ascii?Q?cup3cI+PdLJIixme3YWyP4777P+o103+wfpMJtEkqhfquLLDi19l0L5UikoT?=
+ =?us-ascii?Q?TuXONBXsMA1+G3SOb3bDVjaNNZIKBDXSNXfMHYzTNGbvNmFf7hcHULo0pxbm?=
+ =?us-ascii?Q?wOyeGMh8YVsYVEIp69MqGzM3rzcjQ1or/Gn+6tUqD1acw/EsyrgAIb4rulp5?=
+ =?us-ascii?Q?RTixU+4rjwGBIOY/JAuPnW+ofuEnJTm8f98v9ltu6IjRHTMmR31UswzOlnF+?=
+ =?us-ascii?Q?YjJTK2UclCnOrbolywtbxIU7sRyWFZs1RQyGFBpocQO3yJKsH4o77kwQmlLn?=
+ =?us-ascii?Q?r1s9aDz4nWWOP+0ARC2hd802vEsbkMQqqmyv7ajdKLjU6Nr65AT4cXL/2M78?=
+ =?us-ascii?Q?w5CO4Hrdp0Ixx0pLJKd34J4m+1UjPUl2z01gNZD+NnHZNemnd1RIxraNoB+/?=
+ =?us-ascii?Q?aVUl5h9sNEL/Ti8oNGX9UuE6r0t4VIyNw5fBqiPl8EyGFbmza7YQsB8TAp5j?=
+ =?us-ascii?Q?XH5/CG/zSOor6/c/luLwXajA9cgNSkzbqjIGk9PDACT+v9GGRnK1SzLTpGMG?=
+ =?us-ascii?Q?GD57kzSrZTosrak9EkmFgAk8BC7km/CCR8bvKpYEzXVH0TCJw2h1RSeslIlr?=
+ =?us-ascii?Q?hhVmNC/H9KG9QT4ttW5HegARESabpyPAG+xdnpm21mU1TMEkUqC2MSnEGGNn?=
+ =?us-ascii?Q?+eo2TdvZQyswP7vfNl5MdY5vTstkU1wTQS9PKTf4C69WTmfotSbMu0s65QNo?=
+ =?us-ascii?Q?i/oU9S0XnGB0500sMAZlEmRDfMjwELPxcENLTUnJrOyUhddAYAECgJ11qyyP?=
+ =?us-ascii?Q?Xc8DHFs8kLxIfmnfVOfFCG2lO7j3vths?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8303c6ed-abc9-4f2d-18a8-08da05cbd422
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2022 15:03:42.5456
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y1Xav2xsjZCZ6oVjEb/mDKV7Hi9gIXHXQi98r3bqvLWMNjGgAkLVyEdML9DrHnw1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5112
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Several drivers manually register a devm handler to disable their clk.
-Convert them to devm_clk_get_enabled().
+On Thu, Mar 10, 2022 at 01:49:54PM -0700, Alex Williamson wrote:
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/hwmon/axi-fan-control.c | 15 +--------------
- drivers/hwmon/ltc2947-core.c    | 17 +----------------
- drivers/hwmon/mr75203.c         | 26 +-------------------------
- drivers/hwmon/sparx5-temp.c     | 19 +------------------
- 4 files changed, 4 insertions(+), 73 deletions(-)
+> +New driver submissions are therefore requested to have approval via
+> +Sign-off for any interactions with parent drivers.  Additionally,
 
-diff --git a/drivers/hwmon/axi-fan-control.c b/drivers/hwmon/axi-fan-control.c
-index d2092c17d993..ce404ed9c53e 100644
---- a/drivers/hwmon/axi-fan-control.c
-+++ b/drivers/hwmon/axi-fan-control.c
-@@ -393,11 +393,6 @@ static int axi_fan_control_init(struct axi_fan_control_data *ctl,
- 	return ret;
- }
- 
--static void axi_fan_control_clk_disable(void *clk)
--{
--	clk_disable_unprepare(clk);
--}
--
- static const struct hwmon_channel_info *axi_fan_control_info[] = {
- 	HWMON_CHANNEL_INFO(pwm, HWMON_PWM_INPUT),
- 	HWMON_CHANNEL_INFO(fan, HWMON_F_INPUT | HWMON_F_FAULT | HWMON_F_LABEL),
-@@ -477,20 +472,12 @@ static int axi_fan_control_probe(struct platform_device *pdev)
- 	if (IS_ERR(ctl->base))
- 		return PTR_ERR(ctl->base);
- 
--	clk = devm_clk_get(&pdev->dev, NULL);
-+	clk = devm_clk_get_enabled(&pdev->dev, NULL);
- 	if (IS_ERR(clk)) {
- 		dev_err(&pdev->dev, "clk_get failed with %ld\n", PTR_ERR(clk));
- 		return PTR_ERR(clk);
- 	}
- 
--	ret = clk_prepare_enable(clk);
--	if (ret)
--		return ret;
--
--	ret = devm_add_action_or_reset(&pdev->dev, axi_fan_control_clk_disable, clk);
--	if (ret)
--		return ret;
--
- 	ctl->clk_rate = clk_get_rate(clk);
- 	if (!ctl->clk_rate)
- 		return -EINVAL;
-diff --git a/drivers/hwmon/ltc2947-core.c b/drivers/hwmon/ltc2947-core.c
-index 5423466de697..626f5bf2c9c7 100644
---- a/drivers/hwmon/ltc2947-core.c
-+++ b/drivers/hwmon/ltc2947-core.c
-@@ -956,13 +956,6 @@ static struct attribute *ltc2947_attrs[] = {
- };
- ATTRIBUTE_GROUPS(ltc2947);
- 
--static void ltc2947_clk_disable(void *data)
--{
--	struct clk *extclk = data;
--
--	clk_disable_unprepare(extclk);
--}
--
- static int ltc2947_setup(struct ltc2947_data *st)
- {
- 	int ret;
-@@ -989,7 +982,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
- 		return ret;
- 
- 	/* check external clock presence */
--	extclk = devm_clk_get_optional(st->dev, NULL);
-+	extclk = devm_clk_get_optional_enabled(st->dev, NULL);
- 	if (IS_ERR(extclk))
- 		return dev_err_probe(st->dev, PTR_ERR(extclk),
- 				     "Failed to get external clock\n");
-@@ -1007,14 +1000,6 @@ static int ltc2947_setup(struct ltc2947_data *st)
- 			return -EINVAL;
- 		}
- 
--		ret = clk_prepare_enable(extclk);
--		if (ret)
--			return ret;
--
--		ret = devm_add_action_or_reset(st->dev, ltc2947_clk_disable,
--					       extclk);
--		if (ret)
--			return ret;
- 		/* as in table 1 of the datasheet */
- 		if (rate_hz >= LTC2947_CLK_MIN && rate_hz <= 1000000)
- 			pre = 0;
-diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
-index 1ba1e3145969..0c691f291a64 100644
---- a/drivers/hwmon/mr75203.c
-+++ b/drivers/hwmon/mr75203.c
-@@ -461,24 +461,6 @@ static int pvt_get_regmap(struct platform_device *pdev, char *reg_name,
- 	return 0;
- }
- 
--static void pvt_clk_disable(void *data)
--{
--	struct pvt_device *pvt = data;
--
--	clk_disable_unprepare(pvt->clk);
--}
--
--static int pvt_clk_enable(struct device *dev, struct pvt_device *pvt)
--{
--	int ret;
--
--	ret = clk_prepare_enable(pvt->clk);
--	if (ret)
--		return ret;
--
--	return devm_add_action_or_reset(dev, pvt_clk_disable, pvt);
--}
--
- static void pvt_reset_control_assert(void *data)
- {
- 	struct pvt_device *pvt = data;
-@@ -515,16 +497,10 @@ static int mr75203_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	pvt->clk = devm_clk_get(dev, NULL);
-+	pvt->clk = devm_clk_get_enabled(dev, NULL);
- 	if (IS_ERR(pvt->clk))
- 		return dev_err_probe(dev, PTR_ERR(pvt->clk), "failed to get clock\n");
- 
--	ret = pvt_clk_enable(dev, pvt);
--	if (ret) {
--		dev_err(dev, "failed to enable clock\n");
--		return ret;
--	}
--
- 	pvt->rst = devm_reset_control_get_exclusive(dev, NULL);
- 	if (IS_ERR(pvt->rst))
- 		return dev_err_probe(dev, PTR_ERR(pvt->rst),
-diff --git a/drivers/hwmon/sparx5-temp.c b/drivers/hwmon/sparx5-temp.c
-index 98be48e3a22a..04fd8505e5d6 100644
---- a/drivers/hwmon/sparx5-temp.c
-+++ b/drivers/hwmon/sparx5-temp.c
-@@ -26,13 +26,6 @@ struct s5_hwmon {
- 	struct clk *clk;
- };
- 
--static void s5_temp_clk_disable(void *data)
--{
--	struct clk *clk = data;
--
--	clk_disable_unprepare(clk);
--}
--
- static void s5_temp_enable(struct s5_hwmon *hwmon)
- {
- 	u32 val = readl(hwmon->base + TEMP_CFG);
-@@ -113,7 +106,6 @@ static int s5_temp_probe(struct platform_device *pdev)
- {
- 	struct device *hwmon_dev;
- 	struct s5_hwmon *hwmon;
--	int ret;
- 
- 	hwmon = devm_kzalloc(&pdev->dev, sizeof(*hwmon), GFP_KERNEL);
- 	if (!hwmon)
-@@ -123,19 +115,10 @@ static int s5_temp_probe(struct platform_device *pdev)
- 	if (IS_ERR(hwmon->base))
- 		return PTR_ERR(hwmon->base);
- 
--	hwmon->clk = devm_clk_get(&pdev->dev, NULL);
-+	hwmon->clk = devm_clk_get_enabled(&pdev->dev, NULL);
- 	if (IS_ERR(hwmon->clk))
- 		return PTR_ERR(hwmon->clk);
- 
--	ret = clk_prepare_enable(hwmon->clk);
--	if (ret)
--		return ret;
--
--	ret = devm_add_action_or_reset(&pdev->dev, s5_temp_clk_disable,
--				       hwmon->clk);
--	if (ret)
--		return ret;
--
- 	s5_temp_enable(hwmon);
- 
- 	hwmon_dev = devm_hwmon_device_register_with_info(&pdev->dev,
--- 
-2.35.1
+Acked-by/etc.
 
+> +drivers should make an attempt to provide sufficient documentation
+> +for reviewers to understand the device specific extensions, for
+> +example in the case of migration data, how is the device state
+> +composed and consumed, which portions are not otherwise available to
+> +the user via vfio-pci, what safeguards exist to validate the data,
+> +etc.  To that extent, authors should additionally expect to require
+> +reviews from at least one of the listed reviewers, in addition to the
+> +overall vfio maintainer.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4322b5321891..4f7d26f9aac6 100644
+> +++ b/MAINTAINERS
+> @@ -20314,6 +20314,13 @@ F:	drivers/vfio/mdev/
+>  F:	include/linux/mdev.h
+>  F:	samples/vfio-mdev/
+>  
+> +VFIO PCI VENDOR DRIVERS
+> +R:	Your Name <your.name@here.com>
+> +L:	kvm@vger.kernel.org
+> +S:	Maintained
+> +P:	Documentation/vfio/vfio-pci-vendor-driver-acceptance.rst
+> +F:	drivers/vfio/pci/*/
+> +
+>  VFIO PLATFORM DRIVER
+>  M:	Eric Auger <eric.auger@redhat.com>
+>  L:	kvm@vger.kernel.org
+> 
+> Ideally we'd have at least Yishai, Shameer, Jason, and yourself listed
+> as reviewers (Connie and I are included via the higher level entry).
+> Thoughts from anyone?  Volunteers for reviewers if we want to press
+> forward with this as formal acceptance criteria?  Thanks,
+
+I've not seen such formalism before in the kernel, but seems like it
+might be an interesting experiment. You can add my name
+
+Jason
