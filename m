@@ -2,213 +2,297 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC60C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Mar 2022 23:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D07CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Mar 2022 23:49:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352486AbiCOXCX (ORCPT
+        id S1352647AbiCOXu7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Mar 2022 19:02:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
+        Tue, 15 Mar 2022 19:50:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352470AbiCOXCU (ORCPT
+        with ESMTP id S234932AbiCOXu6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Mar 2022 19:02:20 -0400
-Received: from mail-ua1-x94a.google.com (mail-ua1-x94a.google.com [IPv6:2607:f8b0:4864:20::94a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5915DA43
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Mar 2022 16:01:05 -0700 (PDT)
-Received: by mail-ua1-x94a.google.com with SMTP id f15-20020ab032cf000000b0034a3f7989bbso246517uao.18
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Mar 2022 16:01:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=suaKSImjwVWUKasHdAueNOcQEbe2FYBxmaL4SY3JCTA=;
-        b=FNEzez77+s9QcMNNjdb00ZBn4WVqlQ0bPaLiJ/BciO6Ci9Q59MfEvCQWYR2lXbk2dm
-         gL9CMWB08AFAmvQ16yZguPDnoPb3pkEDS36SW+tLpGFh6Xp2ivJXUAlJE0V5sCYAGUZg
-         vteG940vPsPNv8pDgaoq3RzX2WzI0kIusXQbBaqvTyQKDarKnwxz383lv12mKt+XQsLF
-         mreOg19yfHGLQSOE+qp1CfF6rCxlbv6zqaCyuDu4Eqny8Qj7XLULs7pe+H8NCt2cnAV7
-         qDPNHBYbn1Di+21wzupi2MXiNLxP+oEeDhPYUR6i2kJ86ClS4tXY4DAMy3dRS+uFbk7s
-         lgWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=suaKSImjwVWUKasHdAueNOcQEbe2FYBxmaL4SY3JCTA=;
-        b=pOuO2OUkPZky0mVomXunxN2J12GS090+C7FIYNDKoS1L84bQa0q1s6hEG8kUh9cW9w
-         ieFKKo0PrIY/FnoksE/kPPcERmEC2mSWWRHqLIDP+fCCSUYEeHzDJPl5HCKKpqcq4bVB
-         FolMRCfavab63WSEkmREq+wRLNBNbmZbMVqAqj1orj9eAcraEjupAOWc9+ZUL50QlTMY
-         d3gs+3SIzSL/h6plz9JcLpS+1OrbFlUjLoX/7EAd0JJS6BIKbnz1fOJqJn1BZ9Z1VXlU
-         oAcZCPRDMBbCDsUVKr3gsSvGKdP/c4HUAikZucBIjOM31kO1NoBLJ6w+z87iHnNuxLvy
-         YnCQ==
-X-Gm-Message-State: AOAM531R1cwVgPWFavPJrP609MdQD9ZeCKJI5M5bU4X3AKA/upQC+WTQ
-        7lB11S3dH2BmXqvGa7Ww5rBpppbdPyRwc+BtA8wxHWOonfvwKzfeqXHbkbTrovSBe3cK4wfb0Rf
-        9HFL9vRDwjzXN+izoyBzcdiEMBC0TEiW5GCgrQujN1Obq8A1tpcTM61lA/bGzWNwd72s=
-X-Google-Smtp-Source: ABdhPJw3hHrikig2O1QCkQsJ1/YMtfNG2lAXtLPx2ZrYR6CJsQLijLwqqF0LioOrVCcPgBAc+U6ri7y40g==
-X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
- (user=nhuck job=sendgmr) by 2002:a05:6122:8ca:b0:332:64b4:8109 with SMTP id
- 10-20020a05612208ca00b0033264b48109mr12954628vkg.7.1647385264152; Tue, 15 Mar
- 2022 16:01:04 -0700 (PDT)
-Date:   Tue, 15 Mar 2022 23:00:35 +0000
-In-Reply-To: <20220315230035.3792663-1-nhuck@google.com>
-Message-Id: <20220315230035.3792663-9-nhuck@google.com>
-Mime-Version: 1.0
-References: <20220315230035.3792663-1-nhuck@google.com>
-X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v3 8/8] fscrypt: Add HCTR2 support for filename encryption
-From:   Nathan Huckleberry <nhuck@google.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+        Tue, 15 Mar 2022 19:50:58 -0400
+X-Greylist: delayed 1380 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 15 Mar 2022 16:49:46 PDT
+Received: from gateway34.websitewelcome.com (gateway34.websitewelcome.com [192.185.148.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EAE12C13A
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Mar 2022 16:49:45 -0700 (PDT)
+Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
+        by gateway34.websitewelcome.com (Postfix) with ESMTP id 90D5C8420AD
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Mar 2022 18:26:44 -0500 (CDT)
+Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
+        by cmsmtp with SMTP
+        id UGYunwO5Vdx86UGYunrc2u; Tue, 15 Mar 2022 18:26:44 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=roeck-us.net; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=FMz4dv/MLCPqxMquT9pFk6KUEVB5ed9lWVOqB/G2Qsw=; b=5lgvZgsRcs9SGWnnx6JtY06wdS
+        zNXTyuY4WPr1wuvZdRXTiodbvM++DqqAvJyC19CA1efn2LGgFXA5qswXI8+H5ekOniOW4LesN/j9c
+        MOLxvpN0OUjSoIQtD2nynya5Z+MpWX7hY0+xSke5stHgb/hj87kik5FoJ+WSanS7i4229VDCICafa
+        FpS6GM3T4sp7pPNRFf1ZKKt7C2hqPvlWWwBvComWpmZ8BAlO2Uh4UK6DwxqNpaxM51BUQSCIFiM/u
+        ZNCUOiYA+JF/3hjMpkpc9Whgk7qsXtGL4Z09OfHF1aVB6HSuN8siwqS7wVzAwtMpZY6c+Z9LoMT+5
+        fWYrEG3A==;
+Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:54298)
+        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@roeck-us.net>)
+        id 1nUGYs-002Vpc-Bh; Tue, 15 Mar 2022 23:26:42 +0000
+Message-ID: <4af362d3-999d-cc3c-50e2-5a91d888f09f@roeck-us.net>
+Date:   Tue, 15 Mar 2022 16:26:38 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v8 03/16] hwmon: Make use of devm_clk_get_enabled()
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        =?UTF-8?Q?Nuno_S=c3=a1?= <nuno.sa@analog.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Lars Povlsen <lars.povlsen@microchip.com>,
+        Steen Hegelund <Steen.Hegelund@microchip.com>,
+        UNGLinuxDriver@microchip.com, linux-hwmon@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nathan Huckleberry <nhuck@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Michael Hennerich <Michael.Hennerich@analog.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-clk@vger.kernel.org, kernel@pengutronix.de,
+        Paul Cercueil <paul@crapouillou.net>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Tomislav Denis <tomislav.denis@avl.com>,
+        Anand Ashok Dumbre <anand.ashok.dumbre@xilinx.com>,
+        Michal Simek <michal.simek@xilinx.com>,
+        =?UTF-8?Q?Andr=c3=a9_Gustavo_Nakagomi_Lopez?= <andregnl@usp.br>,
+        Cai Huoqing <caihuoqing@baidu.com>, linux-iio@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org
+References: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
+ <20220314141643.22184-4-u.kleine-koenig@pengutronix.de>
+From:   Guenter Roeck <linux@roeck-us.net>
+In-Reply-To: <20220314141643.22184-4-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - roeck-us.net
+X-BWhitelist: no
+X-Source-IP: 108.223.40.66
+X-Source-L: No
+X-Exim-ID: 1nUGYs-002Vpc-Bh
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net [108.223.40.66]:54298
+X-Source-Auth: linux@roeck-us.net
+X-Email-Count: 2
+X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HCTR2 is a tweakable, length-preserving encryption mode.  It has the
-same security guarantees as Adiantum, but is intended for use on CPUs
-with dedicated crypto instructions.  It fixes a known weakness with
-filename encryption: when two filenames in the same directory share a
-prefix of >= 16 bytes, with CTS-CBC their encrypted filenames share a
-common substring, leaking information.  HCTR2 does not have this
-problem.
+On 3/14/22 07:16, Uwe Kleine-König wrote:
+> Several drivers manually register a devm handler to disable their clk.
+> Convert them to devm_clk_get_enabled().
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-More information on HCTR2 can be found here: Length-preserving
-encryption with HCTR2: https://eprint.iacr.org/2021/1441.pdf
+Let's see if it goes anywhere this time.
 
-Signed-off-by: Nathan Huckleberry <nhuck@google.com>
----
- Documentation/filesystems/fscrypt.rst | 19 ++++++++++++++-----
- fs/crypto/fscrypt_private.h           |  2 +-
- fs/crypto/keysetup.c                  |  7 +++++++
- fs/crypto/policy.c                    |  4 ++++
- include/uapi/linux/fscrypt.h          |  3 ++-
- tools/include/uapi/linux/fscrypt.h    |  3 ++-
- 6 files changed, 30 insertions(+), 8 deletions(-)
+Acked-by: Guenter Roeck <linux@roeck-us.net>
 
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index 4d5d50dca65c..09915086abd8 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -337,6 +337,7 @@ Currently, the following pairs of encryption modes are supported:
- - AES-256-XTS for contents and AES-256-CTS-CBC for filenames
- - AES-128-CBC for contents and AES-128-CTS-CBC for filenames
- - Adiantum for both contents and filenames
-+- AES-256-XTS for contents and AES-256-HCTR2 for filenames
- 
- If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.
- 
-@@ -357,6 +358,14 @@ To use Adiantum, CONFIG_CRYPTO_ADIANTUM must be enabled.  Also, fast
- implementations of ChaCha and NHPoly1305 should be enabled, e.g.
- CONFIG_CRYPTO_CHACHA20_NEON and CONFIG_CRYPTO_NHPOLY1305_NEON for ARM.
- 
-+AES-256-HCTR2 is another true wide-block encryption mode.  It has the same
-+security guarantees as Adiantum, but is intended for use on CPUs with dedicated
-+crypto instructions. See the paper "Length-preserving encryption with HCTR2"
-+(https://eprint.iacr.org/2021/1441.pdf) for more details. To use HCTR2,
-+CONFIG_CRYPTO_HCTR2 must be enabled. Also, fast implementations of XCTR and
-+POLYVAL should be enabled, e.g. CRYPTO_POLYVAL_ARM64_CE and
-+CRYPTO_AES_ARM64_CE_BLK for ARM64.
-+
- New encryption modes can be added relatively easily, without changes
- to individual filesystems.  However, authenticated encryption (AE)
- modes are not currently supported because of the difficulty of dealing
-@@ -404,11 +413,11 @@ alternatively has the file's nonce (for `DIRECT_KEY policies`_) or
- inode number (for `IV_INO_LBLK_64 policies`_) included in the IVs.
- Thus, IV reuse is limited to within a single directory.
- 
--With CTS-CBC, the IV reuse means that when the plaintext filenames
--share a common prefix at least as long as the cipher block size (16
--bytes for AES), the corresponding encrypted filenames will also share
--a common prefix.  This is undesirable.  Adiantum does not have this
--weakness, as it is a wide-block encryption mode.
-+With CTS-CBC, the IV reuse means that when the plaintext filenames share a
-+common prefix at least as long as the cipher block size (16 bytes for AES), the
-+corresponding encrypted filenames will also share a common prefix.  This is
-+undesirable.  Adiantum and HCTR2 do not have this weakness, as they are
-+wide-block encryption modes.
- 
- All supported filenames encryption modes accept any plaintext length
- >= 16 bytes; cipher block alignment is not required.  However,
-diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-index 5b0a9e6478b5..d8617d01f7bd 100644
---- a/fs/crypto/fscrypt_private.h
-+++ b/fs/crypto/fscrypt_private.h
-@@ -31,7 +31,7 @@
- #define FSCRYPT_CONTEXT_V2	2
- 
- /* Keep this in sync with include/uapi/linux/fscrypt.h */
--#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_ADIANTUM
-+#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_AES_256_HCTR2
- 
- struct fscrypt_context_v1 {
- 	u8 version; /* FSCRYPT_CONTEXT_V1 */
-diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-index eede186b04ce..ae24b581d3d7 100644
---- a/fs/crypto/keysetup.c
-+++ b/fs/crypto/keysetup.c
-@@ -53,6 +53,13 @@ struct fscrypt_mode fscrypt_modes[] = {
- 		.ivsize = 32,
- 		.blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
- 	},
-+	[FSCRYPT_MODE_AES_256_HCTR2] = {
-+		.friendly_name = "HCTR2",
-+		.cipher_str = "hctr2(aes)",
-+		.keysize = 32,
-+		.security_strength = 32,
-+		.ivsize = 32,
-+	},
- };
- 
- static DEFINE_MUTEX(fscrypt_mode_key_setup_mutex);
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index ed3d623724cd..fa8bdb8c76b7 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -54,6 +54,10 @@ static bool fscrypt_valid_enc_modes(u32 contents_mode, u32 filenames_mode)
- 	    filenames_mode == FSCRYPT_MODE_ADIANTUM)
- 		return true;
- 
-+	if (contents_mode == FSCRYPT_MODE_AES_256_XTS &&
-+	    filenames_mode == FSCRYPT_MODE_AES_256_HCTR2)
-+		return true;
-+
- 	return false;
- }
- 
-diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-index 9f4428be3e36..a756b29afcc2 100644
---- a/include/uapi/linux/fscrypt.h
-+++ b/include/uapi/linux/fscrypt.h
-@@ -27,7 +27,8 @@
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
- #define FSCRYPT_MODE_ADIANTUM			9
--/* If adding a mode number > 9, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-+#define FSCRYPT_MODE_AES_256_HCTR2		10
-+/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
- 
- /*
-  * Legacy policy version; ad-hoc KDF and no key verification.
-diff --git a/tools/include/uapi/linux/fscrypt.h b/tools/include/uapi/linux/fscrypt.h
-index 9f4428be3e36..a756b29afcc2 100644
---- a/tools/include/uapi/linux/fscrypt.h
-+++ b/tools/include/uapi/linux/fscrypt.h
-@@ -27,7 +27,8 @@
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
- #define FSCRYPT_MODE_ADIANTUM			9
--/* If adding a mode number > 9, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-+#define FSCRYPT_MODE_AES_256_HCTR2		10
-+/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
- 
- /*
-  * Legacy policy version; ad-hoc KDF and no key verification.
--- 
-2.35.1.723.g4982287a31-goog
+> ---
+>   drivers/hwmon/axi-fan-control.c | 15 +--------------
+>   drivers/hwmon/ltc2947-core.c    | 17 +----------------
+>   drivers/hwmon/mr75203.c         | 26 +-------------------------
+>   drivers/hwmon/sparx5-temp.c     | 19 +------------------
+>   4 files changed, 4 insertions(+), 73 deletions(-)
+> 
+> diff --git a/drivers/hwmon/axi-fan-control.c b/drivers/hwmon/axi-fan-control.c
+> index d2092c17d993..ce404ed9c53e 100644
+> --- a/drivers/hwmon/axi-fan-control.c
+> +++ b/drivers/hwmon/axi-fan-control.c
+> @@ -393,11 +393,6 @@ static int axi_fan_control_init(struct axi_fan_control_data *ctl,
+>   	return ret;
+>   }
+>   
+> -static void axi_fan_control_clk_disable(void *clk)
+> -{
+> -	clk_disable_unprepare(clk);
+> -}
+> -
+>   static const struct hwmon_channel_info *axi_fan_control_info[] = {
+>   	HWMON_CHANNEL_INFO(pwm, HWMON_PWM_INPUT),
+>   	HWMON_CHANNEL_INFO(fan, HWMON_F_INPUT | HWMON_F_FAULT | HWMON_F_LABEL),
+> @@ -477,20 +472,12 @@ static int axi_fan_control_probe(struct platform_device *pdev)
+>   	if (IS_ERR(ctl->base))
+>   		return PTR_ERR(ctl->base);
+>   
+> -	clk = devm_clk_get(&pdev->dev, NULL);
+> +	clk = devm_clk_get_enabled(&pdev->dev, NULL);
+>   	if (IS_ERR(clk)) {
+>   		dev_err(&pdev->dev, "clk_get failed with %ld\n", PTR_ERR(clk));
+>   		return PTR_ERR(clk);
+>   	}
+>   
+> -	ret = clk_prepare_enable(clk);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ret = devm_add_action_or_reset(&pdev->dev, axi_fan_control_clk_disable, clk);
+> -	if (ret)
+> -		return ret;
+> -
+>   	ctl->clk_rate = clk_get_rate(clk);
+>   	if (!ctl->clk_rate)
+>   		return -EINVAL;
+> diff --git a/drivers/hwmon/ltc2947-core.c b/drivers/hwmon/ltc2947-core.c
+> index 5423466de697..626f5bf2c9c7 100644
+> --- a/drivers/hwmon/ltc2947-core.c
+> +++ b/drivers/hwmon/ltc2947-core.c
+> @@ -956,13 +956,6 @@ static struct attribute *ltc2947_attrs[] = {
+>   };
+>   ATTRIBUTE_GROUPS(ltc2947);
+>   
+> -static void ltc2947_clk_disable(void *data)
+> -{
+> -	struct clk *extclk = data;
+> -
+> -	clk_disable_unprepare(extclk);
+> -}
+> -
+>   static int ltc2947_setup(struct ltc2947_data *st)
+>   {
+>   	int ret;
+> @@ -989,7 +982,7 @@ static int ltc2947_setup(struct ltc2947_data *st)
+>   		return ret;
+>   
+>   	/* check external clock presence */
+> -	extclk = devm_clk_get_optional(st->dev, NULL);
+> +	extclk = devm_clk_get_optional_enabled(st->dev, NULL);
+>   	if (IS_ERR(extclk))
+>   		return dev_err_probe(st->dev, PTR_ERR(extclk),
+>   				     "Failed to get external clock\n");
+> @@ -1007,14 +1000,6 @@ static int ltc2947_setup(struct ltc2947_data *st)
+>   			return -EINVAL;
+>   		}
+>   
+> -		ret = clk_prepare_enable(extclk);
+> -		if (ret)
+> -			return ret;
+> -
+> -		ret = devm_add_action_or_reset(st->dev, ltc2947_clk_disable,
+> -					       extclk);
+> -		if (ret)
+> -			return ret;
+>   		/* as in table 1 of the datasheet */
+>   		if (rate_hz >= LTC2947_CLK_MIN && rate_hz <= 1000000)
+>   			pre = 0;
+> diff --git a/drivers/hwmon/mr75203.c b/drivers/hwmon/mr75203.c
+> index 1ba1e3145969..0c691f291a64 100644
+> --- a/drivers/hwmon/mr75203.c
+> +++ b/drivers/hwmon/mr75203.c
+> @@ -461,24 +461,6 @@ static int pvt_get_regmap(struct platform_device *pdev, char *reg_name,
+>   	return 0;
+>   }
+>   
+> -static void pvt_clk_disable(void *data)
+> -{
+> -	struct pvt_device *pvt = data;
+> -
+> -	clk_disable_unprepare(pvt->clk);
+> -}
+> -
+> -static int pvt_clk_enable(struct device *dev, struct pvt_device *pvt)
+> -{
+> -	int ret;
+> -
+> -	ret = clk_prepare_enable(pvt->clk);
+> -	if (ret)
+> -		return ret;
+> -
+> -	return devm_add_action_or_reset(dev, pvt_clk_disable, pvt);
+> -}
+> -
+>   static void pvt_reset_control_assert(void *data)
+>   {
+>   	struct pvt_device *pvt = data;
+> @@ -515,16 +497,10 @@ static int mr75203_probe(struct platform_device *pdev)
+>   	if (ret)
+>   		return ret;
+>   
+> -	pvt->clk = devm_clk_get(dev, NULL);
+> +	pvt->clk = devm_clk_get_enabled(dev, NULL);
+>   	if (IS_ERR(pvt->clk))
+>   		return dev_err_probe(dev, PTR_ERR(pvt->clk), "failed to get clock\n");
+>   
+> -	ret = pvt_clk_enable(dev, pvt);
+> -	if (ret) {
+> -		dev_err(dev, "failed to enable clock\n");
+> -		return ret;
+> -	}
+> -
+>   	pvt->rst = devm_reset_control_get_exclusive(dev, NULL);
+>   	if (IS_ERR(pvt->rst))
+>   		return dev_err_probe(dev, PTR_ERR(pvt->rst),
+> diff --git a/drivers/hwmon/sparx5-temp.c b/drivers/hwmon/sparx5-temp.c
+> index 98be48e3a22a..04fd8505e5d6 100644
+> --- a/drivers/hwmon/sparx5-temp.c
+> +++ b/drivers/hwmon/sparx5-temp.c
+> @@ -26,13 +26,6 @@ struct s5_hwmon {
+>   	struct clk *clk;
+>   };
+>   
+> -static void s5_temp_clk_disable(void *data)
+> -{
+> -	struct clk *clk = data;
+> -
+> -	clk_disable_unprepare(clk);
+> -}
+> -
+>   static void s5_temp_enable(struct s5_hwmon *hwmon)
+>   {
+>   	u32 val = readl(hwmon->base + TEMP_CFG);
+> @@ -113,7 +106,6 @@ static int s5_temp_probe(struct platform_device *pdev)
+>   {
+>   	struct device *hwmon_dev;
+>   	struct s5_hwmon *hwmon;
+> -	int ret;
+>   
+>   	hwmon = devm_kzalloc(&pdev->dev, sizeof(*hwmon), GFP_KERNEL);
+>   	if (!hwmon)
+> @@ -123,19 +115,10 @@ static int s5_temp_probe(struct platform_device *pdev)
+>   	if (IS_ERR(hwmon->base))
+>   		return PTR_ERR(hwmon->base);
+>   
+> -	hwmon->clk = devm_clk_get(&pdev->dev, NULL);
+> +	hwmon->clk = devm_clk_get_enabled(&pdev->dev, NULL);
+>   	if (IS_ERR(hwmon->clk))
+>   		return PTR_ERR(hwmon->clk);
+>   
+> -	ret = clk_prepare_enable(hwmon->clk);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ret = devm_add_action_or_reset(&pdev->dev, s5_temp_clk_disable,
+> -				       hwmon->clk);
+> -	if (ret)
+> -		return ret;
+> -
+>   	s5_temp_enable(hwmon);
+>   
+>   	hwmon_dev = devm_hwmon_device_register_with_info(&pdev->dev,
 
