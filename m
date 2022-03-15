@@ -2,250 +2,269 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1EFC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Mar 2022 17:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02790C4167D
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Mar 2022 18:05:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350581AbiCORcC (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Mar 2022 13:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34476 "EHLO
+        id S245390AbiCOSGN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Mar 2022 14:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236042AbiCORcB (ORCPT
+        with ESMTP id S245048AbiCOSGN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Mar 2022 13:32:01 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1B156771;
-        Tue, 15 Mar 2022 10:30:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 878D5CE1C2F;
-        Tue, 15 Mar 2022 17:30:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C02BBC340F5;
-        Tue, 15 Mar 2022 17:30:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647365444;
-        bh=MKZ1FBnWhRw3+Onsjj47uEyG6R09YKLOHaysX/LnFdg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=N+OqYB7MuOEUBiVT15o4Tr0iC3sYRIHqOphPQKOZFhJo/8Ltw4R/8ViEAwJTfKaty
-         6C9gCzkdb+GHTqTamqskahfWgxxIXqVXHwS8mNyJ/DGjgSCOWY5QyhIznRcAfP1Cx8
-         ZlL/ATSy7Atr/ZdNyxdLFUAG3O7gqrCnDvCSsnyyQcyfuVpd8v0wxf1sSq6uZJMVu0
-         PwsnDSmmWqLHUAkiNhpCIu+/Y1KCO04K+A0GQyVMwVmtwHoda9MbheUDPkDghaaKzf
-         50G3n+EHMJRiIamf4mcgVxBdZo4dHMM9nop2CrjHkXmxq658zxaFALxVHr55mt9J5r
-         Sscw74nS/6mPw==
-Date:   Tue, 15 Mar 2022 12:30:42 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-        alex.williamson@redhat.com, jgg@nvidia.com, cohuck@redhat.com,
-        mgurtovoy@nvidia.com, yishaih@nvidia.com, kevin.tian@intel.com,
-        linuxarm@huawei.com, liulongfang@huawei.com,
-        prime.zeng@hisilicon.com, jonathan.cameron@huawei.com,
-        wangzhou1@hisilicon.com, Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v9 3/9] hisi_acc_qm: Move VF PCI device IDs to common
- header
-Message-ID: <20220315173042.GA636129@bhelgaas>
+        Tue, 15 Mar 2022 14:06:13 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39542205E8;
+        Tue, 15 Mar 2022 11:05:00 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id qx21so43187918ejb.13;
+        Tue, 15 Mar 2022 11:05:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=7bpalvhMp7syEkA5bOD6m3Hiadeq1GFGR2u5DFZQUPg=;
+        b=DFsEVIcpVFZmsLrzVsuXGfCDAOQo45HphHPPHqSlOIJqflipspyIX6nDmHEdm7p5ZN
+         qStS1Me4q0ChYcco/kXFdiYP6BFh8vXOSO+RranC2vJEEDyM2cTCdEwWsBLGXaFTO3cm
+         ZrLXhRs0Zr57Jp4HWFlA6dsjObFGsCSo2ta1XqASGUjr5h2618FD/7YtapV90aJTALFH
+         26YUJTPAW2tj1bjGYJa3B53LWudxdy+KC1sO3IaOfXY9WMLiKhQeh7CYPtaRCelYukQ0
+         ykHuhInylyATUkZelWpM9ZbZh88D3lun1+FtqQDueri5iYlC11fvs52nKVwDvhxDADZb
+         itcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=7bpalvhMp7syEkA5bOD6m3Hiadeq1GFGR2u5DFZQUPg=;
+        b=yVfeJO3gp/REeXZIAbrCfnUauoMDNukzvOt+Ib7pMTueQeZnhQIdN2WBQ9/6zyb6zw
+         xNMrU8Otvg13BeDddgnh/rZ3uOpHmbwd/NBcwex85O+R+6TRZXFxNMs1j+EauSvrnuSM
+         Pm5QX6PpavKom9jkLi7WLaXVvwer5rQdBFHCX3HHf1tJXu/6wc/vaigfg1+ivlhjUcAo
+         klmFHc9KrcZP5pjj/6oPJ9/c3T1UbHd4SUTMlcn0sClHF1DQJyWIxPV/y0Zzsi6rgxy9
+         t9h/Ej0hC89MhvoJYPmA2JISLdv1gExzoaLlKpGTGnuuiC0oMDH1Hgjy5uIQWAM/4vq7
+         Zz/A==
+X-Gm-Message-State: AOAM530Clz67FnSELuQ15ggvBCzqWF1EVfqlFx1bcpwTtteZjaDKElG3
+        eXcXRw5FmpnUrIi4XirIVp0QDNBnKzvZISRXXig=
+X-Google-Smtp-Source: ABdhPJxW6+1eFC3OcTirM9mgeDfTXvBfatrTIVC6OBa4JEN+KNKCGi5wT8QrdQtnyTpzndOFbCuPp9umJm3+8HzbnXM=
+X-Received: by 2002:a17:906:4cc7:b0:6d0:7efb:49f with SMTP id
+ q7-20020a1709064cc700b006d07efb049fmr23301879ejt.639.1647367498316; Tue, 15
+ Mar 2022 11:04:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220308184902.2242-4-shameerali.kolothum.thodi@huawei.com>
+References: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Tue, 15 Mar 2022 20:03:44 +0200
+Message-ID: <CAHp75VdH4vGr57v6tfkRuxh-3agRKO8C08+DH8dsB1HnPfnz5Q@mail.gmail.com>
+Subject: Re: [PATCH v8 00/16] clk: provide new devm helpers for prepared and
+ enabled clocks
+To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Lars Povlsen <lars.povlsen@microchip.com>,
+        Steen Hegelund <Steen.Hegelund@microchip.com>,
+        Microchip Linux Driver Support <UNGLinuxDriver@microchip.com>,
+        linux-hwmon@vger.kernel.org,
+        linux-arm Mailing List <linux-arm-kernel@lists.infradead.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Michael Hennerich <Michael.Hennerich@analog.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Neil Armstrong <narmstrong@baylibre.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Jerome Brunet <jbrunet@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Paul Cercueil <paul@crapouillou.net>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Oleksij Rempel <linux@rempel-privat.de>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Mark Brown <broonie@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        linux-clk <linux-clk@vger.kernel.org>,
+        Sascha Hauer <kernel@pengutronix.de>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Tomislav Denis <tomislav.denis@avl.com>,
+        Anand Ashok Dumbre <anand.ashok.dumbre@xilinx.com>,
+        Michal Simek <michal.simek@xilinx.com>,
+        =?UTF-8?Q?Andr=C3=A9_Gustavo_Nakagomi_Lopez?= <andregnl@usp.br>,
+        Cai Huoqing <caihuoqing@baidu.com>,
+        linux-iio <linux-iio@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        linux-amlogic <linux-amlogic@lists.infradead.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        "open list:REAL TIME CLOCK (RTC) SUBSYSTEM" 
+        <linux-rtc@vger.kernel.org>,
+        Keguang Zhang <keguang.zhang@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Patrice Chotard <patrice.chotard@foss.st.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+        linux-watchdog@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-pwm@vger.kernel.org, linux-i2c <linux-i2c@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        Amireddy Mallikarjuna reddy 
+        <mallikarjunax.reddy@linux.intel.com>,
+        dmaengine <dmaengine@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 06:48:56PM +0000, Shameer Kolothum wrote:
-> Move the PCI Device IDs of HiSilicon ACC VF devices to a common header
-> and also use a uniform naming convention.
-> 
-> This will be useful when we introduce the vfio PCI HiSilicon ACC live
-> migration driver in subsequent patches.
-> 
-> Cc: Bjorn Helgaas <bhelgaas@google.com>
-> Acked-by: Zhou Wang <wangzhou1@hisilicon.com>
-> Acked-by: Longfang Liu <liulongfang@huawei.com>
-> Acked-by: Kai Ye <yekai13@huawei.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+On Mon, Mar 14, 2022 at 5:14 PM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@pengutronix.de> wrote:
+>
+> Hello,
+>
+> this is another try to convince the relevant people that
+> devm_clk_get_enabled() is a nice idea. Compared to v7 (back in May 2021) =
+this
+> series is rebased to v5.17-rc8 and converts quite some drivers that open =
+code
+> devm_clk_get_enabled() up to now (patches #3 - #11).
+>
+> A concern about devm_clk_get_enabled() in v7 was that it helps people to =
+be
+> lazy and I agree that in some situations when devm_clk_get_enabled() is u=
+sed it
+> would be more efficient and sensible to care to only enable the clk when =
+really
+> needed.
+>
+> On the other hand, the function is right for some users, e.g. the watchdo=
+g
+> drivers. For the others it's not so simple to judge. Given that there are=
+ a
+> lot of drivers that are lazy even if doing so is some effort (i.e. callin=
+g
+> clk_prepare_enable() and devm_add_action()) convinces me, that introducin=
+g the
+> function family is sensible. (And if you want to work on these drivers,
+> grepping for devm_clk_get_enabled gives you a few candidates once the
+> series is in :-)
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>	# pci_ids.h
+FWIW,
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+for drivers/iio
 
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 13 ++++++-------
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 15 +++++++--------
->  drivers/crypto/hisilicon/zip/zip_main.c   | 11 +++++------
->  include/linux/pci_ids.h                   |  3 +++
->  4 files changed, 21 insertions(+), 21 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> index ebfab3e14499..3589d8879b5e 100644
-> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-> @@ -68,8 +68,7 @@
->  #define HPRE_REG_RD_INTVRL_US		10
->  #define HPRE_REG_RD_TMOUT_US		1000
->  #define HPRE_DBGFS_VAL_MAX_LEN		20
-> -#define HPRE_PCI_DEVICE_ID		0xa258
-> -#define HPRE_PCI_VF_DEVICE_ID		0xa259
-> +#define PCI_DEVICE_ID_HUAWEI_HPRE_PF	0xa258
->  #define HPRE_QM_USR_CFG_MASK		GENMASK(31, 1)
->  #define HPRE_QM_AXI_CFG_MASK		GENMASK(15, 0)
->  #define HPRE_QM_VFG_AX_MASK		GENMASK(7, 0)
-> @@ -111,8 +110,8 @@
->  static const char hpre_name[] = "hisi_hpre";
->  static struct dentry *hpre_debugfs_root;
->  static const struct pci_device_id hpre_dev_ids[] = {
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID) },
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_VF_DEVICE_ID) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_PF) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_HPRE_VF) },
->  	{ 0, }
->  };
->  
-> @@ -242,7 +241,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
->  
->  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
->  {
-> -	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_HPRE_PF);
->  }
->  
->  static const struct kernel_param_ops hpre_pf_q_num_ops = {
-> @@ -921,7 +920,7 @@ static int hpre_debugfs_init(struct hisi_qm *qm)
->  	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
->  	hisi_qm_debug_init(qm);
->  
-> -	if (qm->pdev->device == HPRE_PCI_DEVICE_ID) {
-> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) {
->  		ret = hpre_ctrl_debug_init(qm);
->  		if (ret)
->  			goto failed_to_create;
-> @@ -958,7 +957,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
->  	qm->sqe_size = HPRE_SQE_SIZE;
->  	qm->dev_name = hpre_name;
->  
-> -	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
-> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_HPRE_PF) ?
->  			QM_HW_PF : QM_HW_VF;
->  	if (qm->fun_type == QM_HW_PF) {
->  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
-> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 26d3ab1d308b..311a8747b5bf 100644
-> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
-> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -20,8 +20,7 @@
->  
->  #define SEC_VF_NUM			63
->  #define SEC_QUEUE_NUM_V1		4096
-> -#define SEC_PF_PCI_DEVICE_ID		0xa255
-> -#define SEC_VF_PCI_DEVICE_ID		0xa256
-> +#define PCI_DEVICE_ID_HUAWEI_SEC_PF	0xa255
->  
->  #define SEC_BD_ERR_CHK_EN0		0xEFFFFFFF
->  #define SEC_BD_ERR_CHK_EN1		0x7ffff7fd
-> @@ -225,7 +224,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
->  
->  static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
->  {
-> -	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
-> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
->  }
->  
->  static const struct kernel_param_ops sec_pf_q_num_ops = {
-> @@ -313,8 +312,8 @@ module_param_cb(uacce_mode, &sec_uacce_mode_ops, &uacce_mode, 0444);
->  MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
->  
->  static const struct pci_device_id sec_dev_ids[] = {
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_PF) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_SEC_VF) },
->  	{ 0, }
->  };
->  MODULE_DEVICE_TABLE(pci, sec_dev_ids);
-> @@ -717,7 +716,7 @@ static int sec_core_debug_init(struct hisi_qm *qm)
->  	regset->base = qm->io_base;
->  	regset->dev = dev;
->  
-> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
-> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
->  		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
->  
->  	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
-> @@ -735,7 +734,7 @@ static int sec_debug_init(struct hisi_qm *qm)
->  	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
->  	int i;
->  
-> -	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
-> +	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) {
->  		for (i = SEC_CLEAR_ENABLE; i < SEC_DEBUG_FILE_NUM; i++) {
->  			spin_lock_init(&sec->debug.files[i].lock);
->  			sec->debug.files[i].index = i;
-> @@ -877,7 +876,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
->  	qm->sqe_size = SEC_SQE_SIZE;
->  	qm->dev_name = sec_name;
->  
-> -	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
-> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF) ?
->  			QM_HW_PF : QM_HW_VF;
->  	if (qm->fun_type == QM_HW_PF) {
->  		qm->qp_base = SEC_PF_DEF_Q_BASE;
-> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-> index 678f8b58ec42..66decfe07282 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> @@ -15,8 +15,7 @@
->  #include <linux/uacce.h>
->  #include "zip.h"
->  
-> -#define PCI_DEVICE_ID_ZIP_PF		0xa250
-> -#define PCI_DEVICE_ID_ZIP_VF		0xa251
-> +#define PCI_DEVICE_ID_HUAWEI_ZIP_PF	0xa250
->  
->  #define HZIP_QUEUE_NUM_V1		4096
->  
-> @@ -246,7 +245,7 @@ MODULE_PARM_DESC(uacce_mode, UACCE_MODE_DESC);
->  
->  static int pf_q_num_set(const char *val, const struct kernel_param *kp)
->  {
-> -	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
-> +	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_ZIP_PF);
->  }
->  
->  static const struct kernel_param_ops pf_q_num_ops = {
-> @@ -268,8 +267,8 @@ module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
->  MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
->  
->  static const struct pci_device_id hisi_zip_dev_ids[] = {
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
-> -	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_PF) },
-> +	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_HUAWEI_ZIP_VF) },
->  	{ 0, }
->  };
->  MODULE_DEVICE_TABLE(pci, hisi_zip_dev_ids);
-> @@ -838,7 +837,7 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
->  	qm->sqe_size = HZIP_SQE_SIZE;
->  	qm->dev_name = hisi_zip_name;
->  
-> -	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ?
-> +	qm->fun_type = (pdev->device == PCI_DEVICE_ID_HUAWEI_ZIP_PF) ?
->  			QM_HW_PF : QM_HW_VF;
->  	if (qm->fun_type == QM_HW_PF) {
->  		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> index aad54c666407..31dee2b65a62 100644
-> --- a/include/linux/pci_ids.h
-> +++ b/include/linux/pci_ids.h
-> @@ -2529,6 +2529,9 @@
->  #define PCI_DEVICE_ID_KORENIX_JETCARDF3	0x17ff
->  
->  #define PCI_VENDOR_ID_HUAWEI		0x19e5
-> +#define PCI_DEVICE_ID_HUAWEI_ZIP_VF	0xa251
-> +#define PCI_DEVICE_ID_HUAWEI_SEC_VF	0xa256
-> +#define PCI_DEVICE_ID_HUAWEI_HPRE_VF	0xa259
->  
->  #define PCI_VENDOR_ID_NETRONOME		0x19ee
->  #define PCI_DEVICE_ID_NETRONOME_NFP4000	0x4000
-> -- 
-> 2.25.1
-> 
+Thanks for doing this!
+
+> Otherwise looking at the diffstat of this series:
+>
+>  48 files changed, 257 insertions(+), 851 deletions(-)
+>
+> is quite convincing. Just the first two patches (which introduce the new
+> functions) account for
+>
+>  2 files changed, 169 insertions(+), 17 deletions(-)
+>
+> . A rough third of the added lines is documentation. The rest is driver
+> updates which then has:
+>
+>  46 files changed, 88 insertions(+), 834 deletions(-)
+>
+> which makes a really nice cleanup.
+>
+> The series is build-tested on arm64, m68k, powerpc, riscv, s390, sparc64
+> and x86_64 using an allmodconfig.
+>
+> Best regards
+> Uwe
+>
+> Uwe Kleine-K=C3=B6nig (16):
+>   clk: generalize devm_clk_get() a bit
+>   clk: Provide new devm_clk helpers for prepared and enabled clocks
+>   hwmon: Make use of devm_clk_get_enabled()
+>   iio: Make use of devm_clk_get_enabled()
+>   hwrng: meson - Don't open-code devm_clk_get_optional_enabled()
+>   bus: bt1: Don't open code devm_clk_get_enabled()
+>   gpio: vf610: Simplify error handling in probe
+>   drm/meson: dw-hdmi: Don't open code devm_clk_get_enabled()
+>   rtc: ingenic: Simplify using devm_clk_get_enabled()
+>   clk: meson: axg-audio: Don't duplicate devm_clk_get_enabled()
+>   watchdog: Make use of devm_clk_get_enabled()
+>   pwm: atmel: Simplify using devm_clk_get_prepared()
+>   rtc: at91sam9: Simplify using devm_clk_get_enabled()
+>   i2c: imx: Simplify using devm_clk_get_enabled()
+>   spi: davinci: Simplify using devm_clk_get_enabled()
+>   dmaengine: lgm: Fix error handling
+>
+>  drivers/bus/bt1-apb.c                 | 23 +------
+>  drivers/bus/bt1-axi.c                 | 23 +------
+>  drivers/char/hw_random/meson-rng.c    | 20 +-----
+>  drivers/clk/clk-devres.c              | 96 ++++++++++++++++++++++-----
+>  drivers/clk/meson/axg-audio.c         | 36 ++--------
+>  drivers/dma/lgm/lgm-dma.c             |  8 +--
+>  drivers/gpio/gpio-vf610.c             | 45 +++----------
+>  drivers/gpu/drm/meson/meson_dw_hdmi.c | 48 +++++---------
+>  drivers/hwmon/axi-fan-control.c       | 15 +----
+>  drivers/hwmon/ltc2947-core.c          | 17 +----
+>  drivers/hwmon/mr75203.c               | 26 +-------
+>  drivers/hwmon/sparx5-temp.c           | 19 +-----
+>  drivers/i2c/busses/i2c-imx.c          | 12 +---
+>  drivers/iio/adc/ad7124.c              | 15 +----
+>  drivers/iio/adc/ad7768-1.c            | 17 +----
+>  drivers/iio/adc/ad9467.c              | 17 +----
+>  drivers/iio/adc/ingenic-adc.c         | 15 +----
+>  drivers/iio/adc/lpc18xx_adc.c         | 18 +----
+>  drivers/iio/adc/rockchip_saradc.c     | 44 +-----------
+>  drivers/iio/adc/ti-ads131e08.c        | 19 +-----
+>  drivers/iio/adc/xilinx-ams.c          | 15 +----
+>  drivers/iio/adc/xilinx-xadc-core.c    | 18 +----
+>  drivers/iio/frequency/adf4371.c       | 17 +----
+>  drivers/iio/frequency/admv1013.c      | 15 +----
+>  drivers/iio/frequency/adrf6780.c      | 16 +----
+>  drivers/iio/imu/adis16475.c           | 15 +----
+>  drivers/pwm/pwm-atmel.c               | 16 +----
+>  drivers/rtc/rtc-at91sam9.c            | 22 ++----
+>  drivers/rtc/rtc-jz4740.c              | 21 +-----
+>  drivers/spi/spi-davinci.c             | 11 +--
+>  drivers/watchdog/cadence_wdt.c        | 17 +----
+>  drivers/watchdog/davinci_wdt.c        | 18 +----
+>  drivers/watchdog/imgpdc_wdt.c         | 31 +--------
+>  drivers/watchdog/imx2_wdt.c           | 15 +----
+>  drivers/watchdog/imx7ulp_wdt.c        | 15 +----
+>  drivers/watchdog/loongson1_wdt.c      | 17 +----
+>  drivers/watchdog/lpc18xx_wdt.c        | 30 +--------
+>  drivers/watchdog/meson_gxbb_wdt.c     | 16 +----
+>  drivers/watchdog/of_xilinx_wdt.c      | 16 +----
+>  drivers/watchdog/pic32-dmt.c          | 15 +----
+>  drivers/watchdog/pic32-wdt.c          | 17 +----
+>  drivers/watchdog/pnx4008_wdt.c        | 15 +----
+>  drivers/watchdog/qcom-wdt.c           | 16 +----
+>  drivers/watchdog/rtd119x_wdt.c        | 16 +----
+>  drivers/watchdog/st_lpc_wdt.c         | 16 +----
+>  drivers/watchdog/stm32_iwdg.c         | 31 +--------
+>  drivers/watchdog/visconti_wdt.c       | 18 +----
+>  include/linux/clk.h                   | 90 ++++++++++++++++++++++++-
+>  48 files changed, 257 insertions(+), 851 deletions(-)
+>
+>
+> base-commit: 09688c0166e76ce2fb85e86b9d99be8b0084cdf9
+> --
+> 2.35.1
+>
+
+
+--=20
+With Best Regards,
+Andy Shevchenko
