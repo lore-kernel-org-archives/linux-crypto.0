@@ -2,137 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BDBC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Mar 2022 17:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ABDAC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Mar 2022 09:45:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239096AbiCNRrP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Mar 2022 13:47:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32774 "EHLO
+        id S245402AbiCOJqO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Mar 2022 05:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiCNRrO (ORCPT
+        with ESMTP id S236443AbiCOJqN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Mar 2022 13:47:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E826BCB4
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Mar 2022 10:46:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647279963;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YEJG0IObRkUr69r2f7J23FXjPgRCTJSeRdoCwh8LUrA=;
-        b=FjY3WnLXJFEGZDsR8GU0MH+aJTMb8Tq2Lj2HHQRn+Pg8zKBFJccv7hQBEZMtCT5huAtUOV
-        cdMvdK/DXjUfXd/MH8vDS0SRYezuxElCpkG02S6N4zTZofIyKUQzEPbdqQsZRy06L7v7+t
-        LZVe3T23HOOzC9STZ2KyQ43zAM2+uhA=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-1WpEAWPqNWe-CsWkEgfVcw-1; Mon, 14 Mar 2022 13:46:02 -0400
-X-MC-Unique: 1WpEAWPqNWe-CsWkEgfVcw-1
-Received: by mail-il1-f199.google.com with SMTP id a2-20020a056e020e0200b002c6344a01c9so9727807ilk.13
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Mar 2022 10:46:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YEJG0IObRkUr69r2f7J23FXjPgRCTJSeRdoCwh8LUrA=;
-        b=mrIUaljO+nKBa6mOVtkXDQAwwmGuNjhB/1ZbxQybQw1XLDt6rXvvNx7MqocwpjgoO2
-         G3nOEK+JMnWKP++58uL/usghcQRU1sTgmAvQXj0WeXEwFOVsxXFScna+JkgWNhbN/XeD
-         4GMyOS80fkmRyXJbJRasHzvfA0GYJmo5tO5Zd2sArlIcK+KpnS5ldbWh/ovlu8akzR5+
-         bYZ2g8B0InfM4w349E6WZerlUMWVOQzCy0KXG1+rAhxJFl/98EORwOfzZps9bV229Mfb
-         Rgdbb0oQXad020uXae5DXCOrcFB0TSwwe3NFeMkyI6iC9CRCee5lQgzpfMCS3818Gxbs
-         j0bw==
-X-Gm-Message-State: AOAM533T9c8ce1auh/rfWy8wpBMgYsrGxhq53cEX6u1clnh+SC3iDjA7
-        LGMjoRm56dDMM+c5hpXbChW8F33XpjFvd+2piTRO7kZX8z7QNQzqucMh3BVr/UFjgyTAzuHaWlb
-        4E8Y259OvA8VYrjffLrenvvdN
-X-Received: by 2002:a05:6602:3c5:b0:613:8644:591c with SMTP id g5-20020a05660203c500b006138644591cmr20675140iov.161.1647279961388;
-        Mon, 14 Mar 2022 10:46:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxZJJA4WojvmGdmtZ74f1wNxVgekXaAUaGHvuviIsQF6/0w1VCSMfKnNrXxBYkfIXxrO2Rn+w==
-X-Received: by 2002:a05:6602:3c5:b0:613:8644:591c with SMTP id g5-20020a05660203c500b006138644591cmr20675084iov.161.1647279960174;
-        Mon, 14 Mar 2022 10:46:00 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id b2-20020a923402000000b002c25b16552fsm9227068ila.14.2022.03.14.10.45.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 10:45:59 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 11:45:58 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        liulongfang <liulongfang@huawei.com>,
-        "Zengtao (B)" <prime.zeng@hisilicon.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "Wangzhou (B)" <wangzhou1@hisilicon.com>,
-        Linuxarm <linuxarm@huawei.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
-Message-ID: <20220314114558.2cdd57fc.alex.williamson@redhat.com>
-In-Reply-To: <df217839a41b47dc94ef201dfe379e4e@huawei.com>
-References: <20220308184902.2242-1-shameerali.kolothum.thodi@huawei.com>
-        <df217839a41b47dc94ef201dfe379e4e@huawei.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 15 Mar 2022 05:46:13 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94074ECD6;
+        Tue, 15 Mar 2022 02:45:00 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0V7H-Cvw_1647337496;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0V7H-Cvw_1647337496)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 15 Mar 2022 17:44:57 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        "Markku-Juhani O . Saarinen" <mjos@iki.fi>,
+        Jussi Kivilinna <jussi.kivilinna@iki.fi>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Jia Zhang <zhang.jia@linux.alibaba.com>, zhuolong.lq@antfin.com
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH 0/4] Add ARMv8 NEON and Crypto Extensions implementation of SM4-ECB/CBC/CFB/CTR
+Date:   Tue, 15 Mar 2022 17:44:50 +0800
+Message-Id: <20220315094454.45269-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 14 Mar 2022 17:26:59 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+This series of patches adds ARMv8 implementations of SM4 in ECB, CBC,
+CFB and CTR modes, both for ARMv8 with Crypto Extensions and for plain
+ARMv8 NEON.
 
-> Hi Alex,
->=20
-> > -----Original Message-----
-> > From: Shameerali Kolothum Thodi
-> > Sent: 08 March 2022 18:49
-> > To: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > linux-crypto@vger.kernel.org
-> > Cc: linux-pci@vger.kernel.org; alex.williamson@redhat.com; jgg@nvidia.c=
-om;
-> > cohuck@redhat.com; mgurtovoy@nvidia.com; yishaih@nvidia.com;
-> > kevin.tian@intel.com; Linuxarm <linuxarm@huawei.com>; liulongfang
-> > <liulongfang@huawei.com>; Zengtao (B) <prime.zeng@hisilicon.com>;
-> > Jonathan Cameron <jonathan.cameron@huawei.com>; Wangzhou (B)
-> > <wangzhou1@hisilicon.com>
-> > Subject: [PATCH v9 0/9] vfio/hisilicon: add ACC live migration driver
-> >=20
-> > Hi,
-> >=20
-> > This series attempts to add vfio live migration support for HiSilicon
-> > ACC VF devices based on the new v2 migration protocol definition and
-> > mlx5 v9 series discussed here[0].
-> >=20
-> > v8 --> v9
-> > =C2=A0- Added acks by Wangzhou/Longfang/Yekai
-> > =C2=A0- Added R-by tags by Jason.
-> > =C2=A0- Addressed comments=C2=A0by Alex on v8.
-> > =C2=A0- Fixed the pf_queue pointer assignment error in patch #8.
-> > =C2=A0- Addressed=C2=A0comments from Kevin,
-> >  =C2=A0 =C2=A0-Updated patch #5 commit log msg with a clarification tha=
-t VF
-> > =C2=A0 =C2=A0 =C2=A0migration BAR assignment is fine if migration suppo=
-rt is not there.
-> >  =C2=A0 =C2=A0-Added QM description to patch #8 commit msg. =20
->=20
-> Hope there is nothing pending for this series now to make it to next.
-> I know ack from Bjorn is still pending for patch #3, and I have
-> sent a ping last week and also CCd him on that patch.
->=20
-> Please let me know if there is anything I missed.=20
+NEON is a general-purpose SIMD instruction set under ARMv8, and SM4
+acceleration instructions are optional supported by Crypto Extensions.
 
-Hi Shameer,
+Patch 1 exports the constant array in the SM4 software implementation,
+sm4_sbox are used for the tbl/tbx instruction lookup table in the NEON
+implementation, sm4_fk and sm4_ck are used for the key expansion in the
+CE implementation.
 
-Nothing still pending from my end, as soon as we can get an ack on
-patch #3 and barring issues in the interim, I'll merge it.  Thanks,
+Patch 2 renamed the existing sm4-ce to sm4-ce-cipher, which is a
+single-block CE algorithm implementation that does not support the mode.
+This naming rule follows the AES algorithm in the same directory.
 
-Alex
+Patch 3 introduces an SM4 accelerated implementation of plain NEON.
+
+Patch 4 introduced the SM4 CE instruction set implementation.
+
+In order to be more intuitive, the following compares the performance of
+the four algorithms sm4-generic, sm4-neon, sm4-ce-cipher, and sm4-ce,
+their performance is from low to high.
+
+Benchmark on T-Head Yitian-710 2.75 GHz, the data comes from the 218
+mode of tcrypt. The abscissas are blocks of different lengths. The
+data is tabulated and the unit is Mb/s:
+
+sm4-generic |     16       64      128      256     1024     1420     4096
+    ECB enc |  80.05    91.42    93.66    94.77    95.69    95.77    95.86
+    ECB dec |  79.98    91.41    93.64    94.76    95.66    95.77    95.85
+    CBC enc |  78.55    86.50    88.02    88.77    89.36    89.42    89.48
+    CBC dec |  76.82    89.06    91.52    92.77    93.75    93.83    93.96
+    CFB enc |  77.64    86.13    87.62    88.42    89.08    88.83    89.18
+    CFB dec |  77.57    88.34    90.36    91.45    92.34    92.00    92.44
+    CTR enc |  77.80    88.28    90.23    91.22    92.11    91.81    92.25
+    CTR dec |  77.83    88.22    90.22    91.22    92.04    91.82    92.28
+sm4-neon
+    ECB enc |  28.31   112.77   203.03   209.89   215.49   202.11   210.59
+    ECB dec |  28.36   113.45   203.23   210.00   215.52   202.13   210.65
+    CBC enc |  79.32    87.02    88.51    89.28    89.85    89.89    89.97
+    CBC dec |  28.29   112.20   203.30   209.82   214.99   201.51   209.95
+    CFB enc |  79.59    87.16    88.54    89.30    89.83    89.62    89.92
+    CFB dec |  28.12   111.05   202.47   209.02   214.21   210.90   209.12
+    CTR enc |  28.04   108.81   200.62   206.65   211.78   208.78   206.74
+    CTR dec |  28.02   108.82   200.45   206.62   211.78   208.74   206.70
+sm4-ce-cipher
+    ECB enc | 336.79   587.13   682.70   747.37   803.75   811.52   818.06
+    ECB dec | 339.18   584.52   679.72   743.68   798.82   803.83   811.54
+    CBC enc | 316.63   521.47   597.00   647.14   690.82   695.21   700.55
+    CBC dec | 291.80   503.79   585.66   640.82   689.86   695.16   701.72
+    CFB enc | 294.79   482.31   552.13   594.71   631.60   628.91   638.92
+    CFB dec | 293.09   466.44   526.56   563.17   594.41   592.26   601.97
+    CTR enc | 309.61   506.13   576.86   620.47   656.38   654.51   665.10
+    CTR dec | 306.69   505.57   576.84   620.18   657.09   654.52   665.32
+sm4-ce
+    ECB enc | 366.96  1329.81  2024.29  2755.50  3790.07  3861.91  4051.40
+    ECB dec | 367.30  1323.93  2018.72  2747.43  3787.39  3862.55  4052.62
+    CBC enc | 358.09   682.68   807.24   885.35   958.29   963.60   973.73
+    CBC dec | 366.51  1303.63  1978.64  2667.93  3624.53  3683.41  3856.08
+    CFB enc | 351.51   681.26   807.81   893.10   968.54   969.17   985.83
+    CFB dec | 354.98  1266.61  1929.63  2634.81  3614.23  3611.59  3841.68
+    CTR enc | 324.23  1121.25  1689.44  2256.70  2981.90  3007.79  3060.74
+    CTR dec | 324.18  1120.44  1694.31  2258.32  2982.01  3010.09  3060.99
+
+
+Tianjia Zhang (4):
+  crypto: lib/sm4 - export sm4 constant arrays
+  crypto: arm64/sm4-ce - rename to sm4-ce-cipher
+  crypto: arm64/sm4 - add ARMv8 NEON implementation
+  crypto: arm64/sm4 - add ARMv8 Crypto Extensions implementation
+
+ arch/arm64/crypto/Kconfig              |  12 +
+ arch/arm64/crypto/Makefile             |   8 +-
+ arch/arm64/crypto/sm4-ce-cipher-core.S |  36 ++
+ arch/arm64/crypto/sm4-ce-cipher-glue.c |  82 +++
+ arch/arm64/crypto/sm4-ce-core.S        | 688 +++++++++++++++++++++++--
+ arch/arm64/crypto/sm4-ce-glue.c        | 386 ++++++++++++--
+ arch/arm64/crypto/sm4-neon-core.S      | 487 +++++++++++++++++
+ arch/arm64/crypto/sm4-neon-glue.c      | 442 ++++++++++++++++
+ include/crypto/sm4.h                   |   4 +
+ lib/crypto/sm4.c                       |  10 +-
+ 10 files changed, 2073 insertions(+), 82 deletions(-)
+ create mode 100644 arch/arm64/crypto/sm4-ce-cipher-core.S
+ create mode 100644 arch/arm64/crypto/sm4-ce-cipher-glue.c
+ create mode 100644 arch/arm64/crypto/sm4-neon-core.S
+ create mode 100644 arch/arm64/crypto/sm4-neon-glue.c
+
+-- 
+2.24.3 (Apple Git-128)
 
