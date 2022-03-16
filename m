@@ -2,69 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA06C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 22:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E373C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 22:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbiCPWU0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Mar 2022 18:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52768 "EHLO
+        id S231970AbiCPWjc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Mar 2022 18:39:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231695AbiCPWUX (ORCPT
+        with ESMTP id S232218AbiCPWja (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Mar 2022 18:20:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F70025EAE
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 15:19:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35F2A61599
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 22:19:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA4AC340EE
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 22:19:07 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FBor0JFH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1647469145;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SauEBXZB34PiIy+YfRRxIke6bZwXnS9rAFjJet79nZA=;
-        b=FBor0JFHXeDX8fam098LNEyoJv9pVVZSz9UuUWf0qgwLFtl91tnbNMONrevsuik0OxkIgQ
-        oPXRyL1RjXTQ5WLBf5WZZ2Fls0aiNMGVvidpPZPjiIaUZFmfMf7WqpSmKwATkwDjAPAuLf
-        i1glTtP2FJYdh5jawbnF1VCI47cYJHg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ffd2be8d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Wed, 16 Mar 2022 22:19:05 +0000 (UTC)
-Received: by mail-yb1-f181.google.com with SMTP id z8so6989714ybh.7
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 15:19:05 -0700 (PDT)
-X-Gm-Message-State: AOAM531y1pIJv7sG9TX/KHm0TH0iHsz31Dpq44quPgpEML9+oACiClqe
-        khSdPVHLCGcWLQRcEn0kaq78I1xbGlB+3EbEAiE=
-X-Google-Smtp-Source: ABdhPJyS6px1jw46AVWzb3kZEV2FnmOoaxHio3LOzbhhhtYCOuEaEZAohPJlv6OpM9tMa/oT/BTdnD/cRBW4UYe+uSc=
-X-Received: by 2002:a5b:6cf:0:b0:61e:1371:3cda with SMTP id
- r15-20020a5b06cf000000b0061e13713cdamr2309757ybq.235.1647469143874; Wed, 16
- Mar 2022 15:19:03 -0700 (PDT)
+        Wed, 16 Mar 2022 18:39:30 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC64B140A2
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 15:38:14 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nUcHT-0008Ij-E3; Thu, 17 Mar 2022 09:38:12 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Mar 2022 10:38:10 +1200
+Date:   Thu, 17 Mar 2022 10:38:10 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Simo Sorce <ssorce@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kernel@pengutronix.de, Guenter Roeck <linux@roeck-us.net>,
+        Vladis Dronov <vdronov@redhat.com>
+Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
+Message-ID: <YjJm0sCDZLWhJQxV@gondor.apana.org.au>
+References: <20210917002619.GA6407@gondor.apana.org.au>
+ <20211026163319.GA2785420@roeck-us.net>
+ <20211106034725.GA18680@gondor.apana.org.au>
+ <729fc135-8e55-fd4f-707a-60b9a222ab97@roeck-us.net>
+ <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
+ <YcvCglFcJEA87KNN@gondor.apana.org.au>
+ <20211229110523.rsbzlkpjzwmqyvfs@pengutronix.de>
+ <YjE5Ed5e1jjFFVn3@gondor.apana.org.au>
+ <20220316163719.ud2s36e5zwmtmzef@pengutronix.de>
+ <20220316214417.khho2qno76bby3qm@pengutronix.de>
 MIME-Version: 1.0
-References: <20220314031101.663883-1-Jason@zx2c4.com> <YjIbiX5swxfO6B43@gmail.com>
-In-Reply-To: <YjIbiX5swxfO6B43@gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 16 Mar 2022 16:18:53 -0600
-X-Gmail-Original-Message-ID: <CAHmME9pkB+Mjyxpp0+LPExkX8_NX3Yq9G9YuatRg9A_BQNMEgQ@mail.gmail.com>
-Message-ID: <CAHmME9pkB+Mjyxpp0+LPExkX8_NX3Yq9G9YuatRg9A_BQNMEgQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: move sm3 and sm4 into crypto directory
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220316214417.khho2qno76bby3qm@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Wed, Mar 16, 2022 at 10:44:17PM +0100, Uwe Kleine-König wrote:
+>
+> Digging a bit deeper the problem is that simd_skcipher_create_compat()
+> fails for aes_algs[1] in arch/arm/crypto/aes-neonbs-glue.c with -ENOENT
+> and then aes_exit -> simd_skcipher_free -> crypto_unregister_skcipher ->
+> crypto_unregister_alg stumbles over refcount_read(&alg->cra_refcnt)
+> being 2. Is this enough to understand the actual problem?
 
-I guess I could do that, but I think that might partially weaken the
-argument for moving this out of lib/. Can we do that in a subsequent
-patch, so that this one stays hermetic to its purpose?
+That itself isn't enough as I already had reports on this.  The
+question is why it's returning ENOENT.  The good news is that with
+your kconfig I can reproduce the crash so I should be able to
+figure out the root cause.
 
-Jason
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
