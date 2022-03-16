@@ -2,75 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF93C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 01:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F448C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 07:23:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243912AbiCPBPG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Mar 2022 21:15:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52464 "EHLO
+        id S244761AbiCPHYw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Mar 2022 03:24:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242484AbiCPBPD (ORCPT
+        with ESMTP id S242653AbiCPHYw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Mar 2022 21:15:03 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E8AC11174;
-        Tue, 15 Mar 2022 18:13:50 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nUIES-0004jT-TI; Wed, 16 Mar 2022 12:13:46 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Mar 2022 13:13:45 +1200
-Date:   Wed, 16 Mar 2022 13:13:45 +1200
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.17
-Message-ID: <YjE5yThYIzih2kM6@gondor.apana.org.au>
-References: <20201026011159.GA2428@gondor.apana.org.au>
- <20201227113221.GA28744@gondor.apana.org.au>
- <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
+        Wed, 16 Mar 2022 03:24:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C4D31DE2
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 00:23:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 07E22612FF
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 07:23:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B846C340EE
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 07:23:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647415416;
+        bh=q4j46fhryJnvKa1/K5vmoMKIyPO8wirfdALCJ72+mls=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=lojkhxhJmPape33fEH2a70JG8SvZiOxl7eTGNcqCMYXuQAVPgoHUBrE0WdOTKn00x
+         EieuEL4R9yVcDFyk5SGadOInO9TMIecSSu8IwBSavpVaVi1Y5vDjvy44PWAU6ArH+r
+         GqoBw1k0wuBKS1cgkp2h7nsGH7pwGOqcYylNwXsV9lu0MEnRkXt4/vT2wmdKq8dXrP
+         r91Cl95qShyeMbkTEvgXEjjBQuhnx/TFenAxF3lX8GBqXVx0XMqAYoHO7mKW+alDbn
+         duYCuo/ATlZCj9h4c7MLTO4NA5EZxUWfgjcz7MAX8VPOZ+ypVtK96AfFlwn4puO2Tw
+         ALlgJ8MMdaFfg==
+Received: by mail-yb1-f169.google.com with SMTP id w16so2775052ybi.12
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 00:23:36 -0700 (PDT)
+X-Gm-Message-State: AOAM5324yQIGjCsJb9T7LGS//N9XQuHHV8yyWVornYHaFGab6JjhhKcM
+        NqR3HeK1mW46g0EYfkU5dVKpZPuWO7luY6jk+xQ=
+X-Google-Smtp-Source: ABdhPJwSlJk6yD5bo/oquhUEqOyNCT41R4aynQ5MZ0x23XPC7uqExHT2QIk0h+QfFOl7FEytgfmyaBJ61322kkSi9C8=
+X-Received: by 2002:a25:585:0:b0:628:9860:39da with SMTP id
+ 127-20020a250585000000b00628986039damr26751848ybf.383.1647415415482; Wed, 16
+ Mar 2022 00:23:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YgMn+1qQPQId50hO@gondor.apana.org.au>
+References: <20220126145322.646723-1-p.zabel@pengutronix.de>
+ <c572bf6f0b0a5d7fd3f8f0744a85eb5660a003d4.camel@pengutronix.de> <YjE5UCeoziA8f+Q4@gondor.apana.org.au>
+In-Reply-To: <YjE5UCeoziA8f+Q4@gondor.apana.org.au>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Wed, 16 Mar 2022 08:23:24 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXF-BdRCN-239cRHgSGM3K9EPSrRFEDJu+e6Gtri2pONaA@mail.gmail.com>
+Message-ID: <CAMj1kXF-BdRCN-239cRHgSGM3K9EPSrRFEDJu+e6Gtri2pONaA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: algapi - Remove test larvals to fix error paths
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Philipp Zabel <p.zabel@pengutronix.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kernel@pengutronix.de, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Wed, 16 Mar 2022 at 02:11, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Wed, Jan 26, 2022 at 04:01:04PM +0100, Philipp Zabel wrote:
+> >
+> > I see this happen on ARM with CONFIG_CRYPTO_AES_ARM_BS=y since v5.16-rc1
+> > because the simd_skcipher_create_compat("ecb(aes)", "ecb-aes-neonbs",
+> > "__ecb-aes-neonbs") call in arch/arm/crypto/aes-neonbs-glue.c returns
+> > -ENOENT. I believe that is the same issue as reported in [1].
+>
+> I cannot reproduce this crash with qemu.  If you can still
+> reproduce this, please send me your complete kconfig file.
+>
 
-This push fixes a bug where qcom-rng can return a buffer that is
-not completely filled with random data.
+According to the bisect log in the other thread,
+adad556efcdd42a1d9e060cb is the culprit, which does not seem
+surprising, at is would result in the SIMD skcipher being encapsulated
+to not be available yet when the SIMD helper tries to take a reference
+to it.
 
-The following changes since commit c6ce9c5831cae515d375a01b97ae1778689acf19:
-
-  crypto: api - Move cryptomgr soft dependency into algapi (2022-02-05 15:10:07 +1100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
-
-for you to fetch changes up to a680b1832ced3b5fa7c93484248fd221ea0d614b:
-
-  crypto: qcom-rng - ensure buffer for generate is completely filled (2022-03-14 14:41:04 +1200)
-
-----------------------------------------------------------------
-Brian Masney (1):
-      crypto: qcom-rng - ensure buffer for generate is completely filled
-
- drivers/crypto/qcom-rng.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Given that the resulting algo will be subject to testing as well,
+could we simply override the test requirement for the inner algo? That
+should make it available immediately, IIUC, and the outer algo test is
+guaranteed to cover the inner one.
