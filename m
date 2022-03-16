@@ -2,64 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AD9C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 01:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB37C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 01:10:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352889AbiCPBEW (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Mar 2022 21:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
+        id S243596AbiCPBMA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 15 Mar 2022 21:12:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352888AbiCPBEV (ORCPT
+        with ESMTP id S234875AbiCPBMA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Mar 2022 21:04:21 -0400
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87CE5E36;
-        Tue, 15 Mar 2022 18:03:06 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0V7JXSGt_1647392583;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0V7JXSGt_1647392583)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 16 Mar 2022 09:03:04 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] crypto: engine: Add parameter description in crypto_transfer_request() kernel-doc comment
-Date:   Wed, 16 Mar 2022 09:03:01 +0800
-Message-Id: <20220316010301.3166-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Tue, 15 Mar 2022 21:12:00 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A38D43EE2
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Mar 2022 18:10:46 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nUIBU-0004eO-Vg; Wed, 16 Mar 2022 12:10:42 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Mar 2022 13:10:41 +1200
+Date:   Wed, 16 Mar 2022 13:10:41 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Simo Sorce <ssorce@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kernel@pengutronix.de, Guenter Roeck <linux@roeck-us.net>,
+        Vladis Dronov <vdronov@redhat.com>
+Subject: Re: [v2 PATCH] crypto: api - Fix built-in testing dependency failures
+Message-ID: <YjE5Ed5e1jjFFVn3@gondor.apana.org.au>
+References: <20210913071251.GA15235@gondor.apana.org.au>
+ <20210917002619.GA6407@gondor.apana.org.au>
+ <20211026163319.GA2785420@roeck-us.net>
+ <20211106034725.GA18680@gondor.apana.org.au>
+ <729fc135-8e55-fd4f-707a-60b9a222ab97@roeck-us.net>
+ <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
+ <YcvCglFcJEA87KNN@gondor.apana.org.au>
+ <20211229110523.rsbzlkpjzwmqyvfs@pengutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211229110523.rsbzlkpjzwmqyvfs@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the description of @need_pump in crypto_transfer_request() kernel-doc
-comment to remove warning found by running scripts/kernel-doc, which is
-caused by using 'make W=1'.
+On Wed, Dec 29, 2021 at 12:05:23PM +0100, Uwe Kleine-König wrote:
+> On Wed, Dec 29, 2021 at 01:05:54PM +1100, Herbert Xu wrote:
+> > On Wed, Dec 22, 2021 at 11:22:46AM +0100, Uwe Kleine-König wrote:
+> > >
+> > > I still experience a problem with the patch that got
+> > > adad556efcdd42a1d9e060cbe5f6161cccf1fa28 in v5.16-rc1. I saw there are
+> > > two commit fixing this one (
+> > > 
+> > > 	cad439fc040e crypto: api - Do not create test larvals if manager is disabled
+> > > 	e42dff467ee6 crypto: api - Export crypto_boot_test_finished
+> > > 
+> > > ) but I still encounter the following on 2f47a9a4dfa3:
+> > 
+> > Perhaps you missed the last fix?
+> > 
+> > commit beaaaa37c664e9afdf2913aee19185d8e3793b50
+> > Author: Herbert Xu <herbert@gondor.apana.org.au>
+> > Date:   Fri Nov 5 15:26:08 2021 +0800
+> > 
+> >     crypto: api - Fix boot-up crash when crypto manager is disabled
+> 
+> As 2f47a9a4dfa3 includes this commit, this is not the problem.
 
-crypto/crypto_engine.c:260: warning: Function parameter or member
-'need_pump' not described in 'crypto_transfer_request'
+Using the config snippet in this email thread I was unable to
+reproduce the failure under qemu.  Can you still reproduce this
+with the latest upstream kernel? If yes please send me your complete
+config file.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
----
- crypto/crypto_engine.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index 6056a990c9f2..bb8e77077f02 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -253,6 +253,7 @@ static void crypto_pump_work(struct kthread_work *work)
-  * crypto_transfer_request - transfer the new request into the engine queue
-  * @engine: the hardware engine
-  * @req: the request need to be listed into the engine queue
-+ * @need_pump: indicates whether queue the pump of request to kthread_work
-  */
- static int crypto_transfer_request(struct crypto_engine *engine,
- 				   struct crypto_async_request *req,
+Thanks,
 -- 
-2.20.1.7.g153144c
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
