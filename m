@@ -2,62 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96640C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 22:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1325AC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 22:13:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358260AbiCPWMF (ORCPT
+        id S1357043AbiCPWOn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Mar 2022 18:12:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35324 "EHLO
+        Wed, 16 Mar 2022 18:14:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358320AbiCPWL5 (ORCPT
+        with ESMTP id S1353502AbiCPWOn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Mar 2022 18:11:57 -0400
+        Wed, 16 Mar 2022 18:14:43 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A2D286D4
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 15:10:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0DB91F5;
+        Wed, 16 Mar 2022 15:13:27 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nUbqS-000809-IF; Thu, 17 Mar 2022 09:10:17 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Mar 2022 10:10:15 +1200
-Date:   Thu, 17 Mar 2022 10:10:15 +1200
+        id 1nUbtK-00082l-NU; Thu, 17 Mar 2022 09:13:15 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Mar 2022 10:13:13 +1200
+Date:   Thu, 17 Mar 2022 10:13:13 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Philipp Zabel <p.zabel@pengutronix.de>,
+To:     Kyle Sanderson <kyle.leet@gmail.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Dave Chinner <david@fromorbit.com>, qat-linux@intel.com,
+        Linux-Kernal <linux-kernel@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        kernel@pengutronix.de, "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: algapi - Remove test larvals to fix error paths
-Message-ID: <YjJgR2FxAaXNHhTa@gondor.apana.org.au>
-References: <20220126145322.646723-1-p.zabel@pengutronix.de>
- <c572bf6f0b0a5d7fd3f8f0744a85eb5660a003d4.camel@pengutronix.de>
- <YjE5UCeoziA8f+Q4@gondor.apana.org.au>
- <CAMj1kXF-BdRCN-239cRHgSGM3K9EPSrRFEDJu+e6Gtri2pONaA@mail.gmail.com>
+        device-mapper development <dm-devel@redhat.com>
+Subject: Re: Intel QAT on A2SDi-8C-HLN4F causes massive data corruption with
+ dm-crypt + xfs
+Message-ID: <YjJg+ZRQ8ufOgRtD@gondor.apana.org.au>
+References: <Yh+FpKuoyj3G16lK@kroah.com>
+ <Yh/vY4t3xnuoCW3Q@gondor.apana.org.au>
+ <Yh/yr6oB5yeOUErL@silpixa00400314>
+ <Yh/znCnZzWaL49+o@gondor.apana.org.au>
+ <YiDHT31ujlGdQEe/@silpixa00400314>
+ <YiEVPc2cd38AnLZB@gmail.com>
+ <YiEyGoHacN80FcOL@silpixa00400314>
+ <YiE21aPGG5DHwJvb@gmail.com>
+ <YiJRQQmSxA/fbm6P@silpixa00400314>
+ <CACsaVZJ2JH1M9-fB9uO=XKDuO74ZPKBHX81TQ4+bBvr_iSNiWQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXF-BdRCN-239cRHgSGM3K9EPSrRFEDJu+e6Gtri2pONaA@mail.gmail.com>
+In-Reply-To: <CACsaVZJ2JH1M9-fB9uO=XKDuO74ZPKBHX81TQ4+bBvr_iSNiWQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 08:23:24AM +0100, Ard Biesheuvel wrote:
->
-> According to the bisect log in the other thread,
-> adad556efcdd42a1d9e060cb is the culprit, which does not seem
-> surprising, at is would result in the SIMD skcipher being encapsulated
-> to not be available yet when the SIMD helper tries to take a reference
-> to it.
+On Wed, Mar 16, 2022 at 02:38:10PM -0700, Kyle Sanderson wrote:
+> > Makes sense. I'm going to send it upstream and Cc stable as documented
+> > in https://www.kernel.org/doc/html/v4.10/process/stable-kernel-rules.html#option-1
+> > I will then revert this change in the set that fixes the problem.
+> 
+> Did this go anywhere? I'm still not seeing it in any of the stable trees.
 
-It's supposed to work because any use of an algorithm prior to
-the tests starting will automatically trigger the test right away.
-I confirmed this by booting the kernel in qemu with AES_ARM_BS=y
-and it successfully registered those algorithms and passed the
-self-tests.
+It's in the cryptodev tree which should hit mainline when the merge
+window opens.
 
-Someone else has already sent me a complete kconfig file which
-hopefully should reproduce the crash for me.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
