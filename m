@@ -2,88 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37906C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Mar 2022 22:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 716A6C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 02:39:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbiCPW4e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Mar 2022 18:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43128 "EHLO
+        id S1357250AbiCQCkW (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 16 Mar 2022 22:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiCPW4d (ORCPT
+        with ESMTP id S1358444AbiCQCkV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Mar 2022 18:56:33 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25EA11E3D2
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Mar 2022 15:55:18 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nUcXy-0000Ly-NI; Thu, 17 Mar 2022 09:55:15 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 17 Mar 2022 10:55:13 +1200
-Date:   Thu, 17 Mar 2022 10:55:13 +1200
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Simo Sorce <ssorce@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        kernel@pengutronix.de, Guenter Roeck <linux@roeck-us.net>,
-        Vladis Dronov <vdronov@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH] crypto: arm/aes-neonbs-cbc - Select generic cbc and aes
-Message-ID: <YjJq0RLIHvN7YWaT@gondor.apana.org.au>
-References: <20210913071251.GA15235@gondor.apana.org.au>
- <20210917002619.GA6407@gondor.apana.org.au>
- <20211026163319.GA2785420@roeck-us.net>
- <20211106034725.GA18680@gondor.apana.org.au>
- <729fc135-8e55-fd4f-707a-60b9a222ab97@roeck-us.net>
- <20211222102246.qibf7v2q4atl6gc6@pengutronix.de>
- <YcvCglFcJEA87KNN@gondor.apana.org.au>
- <20211229110523.rsbzlkpjzwmqyvfs@pengutronix.de>
- <YjE5Ed5e1jjFFVn3@gondor.apana.org.au>
- <20220316163719.ud2s36e5zwmtmzef@pengutronix.de>
+        Wed, 16 Mar 2022 22:40:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F14A1FCF0;
+        Wed, 16 Mar 2022 19:39:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F001BB81DD5;
+        Thu, 17 Mar 2022 02:39:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A07C340F0;
+        Thu, 17 Mar 2022 02:38:57 +0000 (UTC)
+Date:   Wed, 16 Mar 2022 22:38:55 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: Re: [PATCH 9/9] testmmiotrace: eliminate anonymous module_init &
+ module_exit
+Message-ID: <20220316223855.5c31ae25@gandalf.local.home>
+In-Reply-To: <20220316192010.19001-10-rdunlap@infradead.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+        <20220316192010.19001-10-rdunlap@infradead.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220316163719.ud2s36e5zwmtmzef@pengutronix.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 05:37:19PM +0100, Uwe Kleine-König wrote:
->
-> # CONFIG_CRYPTO_CBC is not set
+On Wed, 16 Mar 2022 12:20:10 -0700
+Randy Dunlap <rdunlap@infradead.org> wrote:
 
-This was the issue.  The failure occurs on registering __cbc_aes
-and the reason is that the neonbs cbc-aes requirs a fallback which
-isn't available due to CBC being disabled.
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
+> 
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
+> 
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
+> 
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
+> 
+> Fixes: 8b7d89d02ef3 ("x86: mmiotrace - trace memory mapped IO")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
 
-I have no idea why this started occurring only with the testmgr
-change though as this should have been fatal all along.
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
----8<---
-The algorithm __cbc-aes-neonbs requires a fallback so we need
-to select the config options for them or otherwise it will fail
-to register on boot-up.
+-- Steve
 
-Fixes: 00b99ad2bac2 ("crypto: arm/aes-neonbs - Use generic cbc...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Cc: Karol Herbst <karolherbst@gmail.com>
+> Cc: Pekka Paalanen <ppaalanen@gmail.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: nouveau@lists.freedesktop.org
+> Cc: x86@kernel.org
+> ---
+>  arch/x86/mm/testmmiotrace.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> --- lnx-517-rc8.orig/arch/x86/mm/testmmiotrace.c
+> +++ lnx-517-rc8/arch/x86/mm/testmmiotrace.c
+> @@ -113,7 +113,7 @@ static void do_test_bulk_ioremapping(voi
+>  	synchronize_rcu();
+>  }
+>  
+> -static int __init init(void)
+> +static int __init testmmiotrace_init(void)
+>  {
+>  	unsigned long size = (read_far) ? (8 << 20) : (16 << 10);
+>  	int ret = security_locked_down(LOCKDOWN_MMIOTRACE);
+> @@ -136,11 +136,11 @@ static int __init init(void)
+>  	return 0;
+>  }
+>  
+> -static void __exit cleanup(void)
+> +static void __exit testmmiotrace_cleanup(void)
+>  {
+>  	pr_debug("unloaded.\n");
+>  }
+>  
+> -module_init(init);
+> -module_exit(cleanup);
+> +module_init(testmmiotrace_init);
+> +module_exit(testmmiotrace_cleanup);
+>  MODULE_LICENSE("GPL");
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 2b575792363e..e4dba5461cb3 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -102,6 +102,8 @@ config CRYPTO_AES_ARM_BS
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_AES
-+	select CRYPTO_AES
-+	select CRYPTO_CBC
- 	select CRYPTO_SIMD
- 	help
- 	  Use a faster and more secure NEON based implementation of AES in CBC,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
