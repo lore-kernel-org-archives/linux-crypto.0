@@ -2,171 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF91C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 20:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EBDBC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 20:56:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbiCQUoD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Mar 2022 16:44:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
+        id S229934AbiCQU5c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Mar 2022 16:57:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbiCQUn7 (ORCPT
+        with ESMTP id S229953AbiCQU5b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Mar 2022 16:43:59 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1779A133690;
-        Thu, 17 Mar 2022 13:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=3Vg3YWtqMNGIO5AWtFE29onUKdIZ8x188s7SviF5pPg=; b=tiAHL3PCQ2t7+lPOxKztKxihGl
-        vd4Y8NiotnXISBxPTEpDpjnfGwN/+2gCzocwX9f1n0YfUlqtTEW8abkTbOXNks1/pe9V0o1aeVqiU
-        mg+cp1CpvBpg/qj5G5LZWflb4aiFP803B14dktG2eQTzUpOmEwNqtoyK5FiuDb0e8dEHA1UwaTcNb
-        TjTsqtIXdQy5uDTkofF/krC+Z1b0PK1+/Sh9yQPukGAwmINpZ+kCjgEBdHe1EVJZaGIr2Nw3tHUkm
-        Ajhuyth6TCxfsRDyg2dioL17ZEbHaHLKorjuGU+sNiNOS0MkF5l5E/OHgiJGeyQY6IVrPFktt2Xla
-        WvlJyMgw==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUwxB-007IuO-IC; Thu, 17 Mar 2022 20:42:37 +0000
-Message-ID: <15fdafd4-e753-2c0e-4e61-6b168e064e72@infradead.org>
-Date:   Thu, 17 Mar 2022 13:42:23 -0700
+        Thu, 17 Mar 2022 16:57:31 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F701544BF
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2022 13:56:13 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id v130-20020a1cac88000000b00389d0a5c511so5595851wme.5
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2022 13:56:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=FDPzallkxZHrwYGOlhVbPbIqdaMTkxdkI7weP88y4Cg=;
+        b=F+oR8ZJqpHJsxjl0c3X+43Uxvn4qu91BG1wLTrWZa6BEx6hfV5Bx/jtufjc4fYKiTd
+         niZ2DOD0y9nTtR8fpiSZUYWmZK8Lo9L4gznSGEYBYNMW1luvYr8hG4WEjWcA9J3aX8ka
+         xGrIauj8hye7PYByLPCzkKEihjbxWMv6ygX10GFjp9BWh+R7d9qEu1i1rqTEu9q2AlG6
+         ld3rIaiffB/vSsYldxmLqijnWhwpwc1RYBsaVsBBD2IW71FqrifEycqj2MTUMa9O4iz1
+         +1e4YA2nImwikiTMxsrDb06O99jUtwND3MDsXl/ru1HXCmMVl+EFN+C5Dz8tuhG7PJjx
+         Ckjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FDPzallkxZHrwYGOlhVbPbIqdaMTkxdkI7weP88y4Cg=;
+        b=cwT87r/EF+eiBuH+yCT0i09KXA2cM3ObyqwmZiwrBDfrgoc8Q+doIVNuQiBCYdJROP
+         zrr/J1wOp4FqSA7fJfSDv/3WvBGOJBjP0BbQS2ZI3sc6jPmtxpasBAbNqXGIx8bxP/N9
+         7YiMC58kQtP1jcds05iX41/5VstMf+OQY1GDDvURaZJ6Fds3wvKXw4jgRtFo9eS2hE+H
+         vbuHzPFXnUKQLpfMTDrDLnHjf350EJMhLNko8jIUzlDvaeIIQzeIkwzssMXiUDPt5pm8
+         a99TRBZr2pQkRwc0ZYwsKrJwGO5weHDtBdfk/Y30Rtx+c0ZgZbyrTxpizWJ9VHN1lAkU
+         zGww==
+X-Gm-Message-State: AOAM531PjSENcnmUqbsKor2rZOQLQaJWZPzZ0yITVLokjqUXaDv1qrVe
+        0ckgxa/Kiu/Zm6Q6tZrNUAnQqg==
+X-Google-Smtp-Source: ABdhPJyA6v3tzW6pBOq5BDaDhMkbXkD+9ITBlMrutFmQXIA+EA1OcHttTwjC8fP3bmUU6MYWk44YAg==
+X-Received: by 2002:a05:600c:1f11:b0:38c:6ce7:69c5 with SMTP id bd17-20020a05600c1f1100b0038c6ce769c5mr5690186wmb.64.1647550572234;
+        Thu, 17 Mar 2022 13:56:12 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id r4-20020a05600c35c400b00389f368cf1esm3695424wmq.40.2022.03.17.13.56.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Mar 2022 13:56:11 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
+        samuel@sholland.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 01/19] crypto: sun8i-ce: Fix minor style issue
+Date:   Thu, 17 Mar 2022 20:55:47 +0000
+Message-Id: <20220317205605.3924836-2-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220317205605.3924836-1-clabbe@baylibre.com>
+References: <20220317205605.3924836-1-clabbe@baylibre.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 4/9] netfilter: h323: eliminate anonymous module_init &
- module_exit
-Content-Language: en-US
-To:     Pablo Neira Ayuso <pablo@netfilter.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-5-rdunlap@infradead.org> <YjNYo2LKM3smgEJM@salvia>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <YjNYo2LKM3smgEJM@salvia>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This patch remove a double blank line.
 
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-On 3/17/22 08:49, Pablo Neira Ayuso wrote:
-> On Wed, Mar 16, 2022 at 12:20:05PM -0700, Randy Dunlap wrote:
->> Eliminate anonymous module_init() and module_exit(), which can lead to
->> confusion or ambiguity when reading System.map, crashes/oops/bugs,
->> or an initcall_debug log.
->>
->> Give each of these init and exit functions unique driver-specific
->> names to eliminate the anonymous names.
->>
->> Example 1: (System.map)
->>  ffffffff832fc78c t init
->>  ffffffff832fc79e t init
->>  ffffffff832fc8f8 t init
->>
->> Example 2: (initcall_debug log)
->>  calling  init+0x0/0x12 @ 1
->>  initcall init+0x0/0x12 returned 0 after 15 usecs
->>  calling  init+0x0/0x60 @ 1
->>  initcall init+0x0/0x60 returned 0 after 2 usecs
->>  calling  init+0x0/0x9a @ 1
->>  initcall init+0x0/0x9a returned 0 after 74 usecs
-> 
-> LGTM.
-> 
-> Should I route this through the netfilter tree?
-
-Yes, please.
-Thanks.
-
-> 
->> Fixes: f587de0e2feb ("[NETFILTER]: nf_conntrack/nf_nat: add H.323 helper port")
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
->> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
->> Cc: Florian Westphal <fw@strlen.de>
->> Cc: netfilter-devel@vger.kernel.org
->> Cc: coreteam@netfilter.org
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: netdev@vger.kernel.org
->> ---
->>  net/ipv4/netfilter/nf_nat_h323.c |    8 ++++----
->>  1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> --- lnx-517-rc8.orig/net/ipv4/netfilter/nf_nat_h323.c
->> +++ lnx-517-rc8/net/ipv4/netfilter/nf_nat_h323.c
->> @@ -580,7 +580,7 @@ static struct nf_ct_helper_expectfn call
->>  };
->>  
->>  /****************************************************************************/
->> -static int __init init(void)
->> +static int __init nf_nat_h323_init(void)
->>  {
->>  	BUG_ON(set_h245_addr_hook != NULL);
->>  	BUG_ON(set_h225_addr_hook != NULL);
->> @@ -607,7 +607,7 @@ static int __init init(void)
->>  }
->>  
->>  /****************************************************************************/
->> -static void __exit fini(void)
->> +static void __exit nf_nat_h323_fini(void)
->>  {
->>  	RCU_INIT_POINTER(set_h245_addr_hook, NULL);
->>  	RCU_INIT_POINTER(set_h225_addr_hook, NULL);
->> @@ -624,8 +624,8 @@ static void __exit fini(void)
->>  }
->>  
->>  /****************************************************************************/
->> -module_init(init);
->> -module_exit(fini);
->> +module_init(nf_nat_h323_init);
->> +module_exit(nf_nat_h323_fini);
->>  
->>  MODULE_AUTHOR("Jing Min Zhao <zhaojingmin@users.sourceforge.net>");
->>  MODULE_DESCRIPTION("H.323 NAT helper");
-
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 35e3cadccac2..01d032e08825 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -398,7 +398,6 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 	sktfm->reqsize = sizeof(struct sun8i_cipher_req_ctx) +
+ 			 crypto_skcipher_reqsize(op->fallback_tfm);
+ 
+-
+ 	dev_info(op->ce->dev, "Fallback for %s is %s\n",
+ 		 crypto_tfm_alg_driver_name(&sktfm->base),
+ 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(op->fallback_tfm)));
 -- 
-~Randy
+2.34.1
+
