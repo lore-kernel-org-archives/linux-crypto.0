@@ -2,115 +2,139 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA54C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 15:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A52C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 15:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235689AbiCQPSy convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Mar 2022 11:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43120 "EHLO
+        id S236127AbiCQPtb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Mar 2022 11:49:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235359AbiCQPSy (ORCPT
+        with ESMTP id S236102AbiCQPt3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Mar 2022 11:18:54 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAB1205962;
-        Thu, 17 Mar 2022 08:17:37 -0700 (PDT)
-Received: from canpemm100005.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KK9gn3zqhzCqmW;
-        Thu, 17 Mar 2022 23:15:33 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- canpemm100005.china.huawei.com (7.192.105.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 17 Mar 2022 23:17:34 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.021; Thu, 17 Mar 2022 15:17:33 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-CC:     "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Thu, 17 Mar 2022 11:49:29 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FA138B8;
+        Thu, 17 Mar 2022 08:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=ThAyvdoG1U35K2Hzsm1O2USOWq/3qlMrhSaUoYHrsOs=; b=F6Vs/65oeZV/y3wN6Bw/M7u1FQ
+        5O+4lQTnS32R0VfdvOK1oVjLmv61tBR4yMMjN/NVDsOnHzoBbLMjP382aAGEyJMaumvolGSgA+m71
+        1Ehmx8UPj/GCllYWg+tBYociITo9JftToXJThRJBZ9nw2p07B62DgVCik4yzpt77Z8S9KNWcKP8vq
+        3tLkrgPZtcMac/dncj65oYGZ4SvtO6CK7F7u84MgNbC6goRbCxod26J//CJV7WZO58VGV5QhSn55l
+        /KYfPXjDju0sdq2JANUCt29NuoEjYNFSGZB5nEbrQ97N+XXeTVv8WhJJ+KmWXn+usTtelySDGt3Ln
+        87L6gQCw==;
+Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nUsLq-0075ta-2M; Thu, 17 Mar 2022 15:47:46 +0000
+Message-ID: <f7b858bb438d1979c1f092e105e0db4c7af47758.camel@infradead.org>
+Subject: Re: [PATCH 2/9] virtio_console: eliminate anonymous module_init &
+ module_exit
+From:   Amit Shah <amit@infradead.org>
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?UTF-8?Q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Subject: RE: [PATCH] MAINTAINERS: adjust entry for header movement in
- hisilicon qm driver
-Thread-Topic: [PATCH] MAINTAINERS: adjust entry for header movement in
- hisilicon qm driver
-Thread-Index: AQHYOTNV513lw7emgUOm96IZ4FdBD6zDr8SA
-Date:   Thu, 17 Mar 2022 15:17:32 +0000
-Message-ID: <75f18d2f04f949d390a9b97cdc81c284@huawei.com>
-References: <20220316124224.29091-1-lukas.bulwahn@gmail.com>
-In-Reply-To: <20220316124224.29091-1-lukas.bulwahn@gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Date:   Thu, 17 Mar 2022 16:47:42 +0100
+In-Reply-To: <20220316192010.19001-3-rdunlap@infradead.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+         <20220316192010.19001-3-rdunlap@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Lukas Bulwahn [mailto:lukas.bulwahn@gmail.com]
-> Sent: 16 March 2022 12:42
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> Alex Williamson <alex.williamson@redhat.com>
-> Cc: Wangzhou (B) <wangzhou1@hisilicon.com>; Herbert Xu
-> <herbert@gondor.apana.org.au>; David S . Miller <davem@davemloft.net>;
-> linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org;
-> kernel-janitors@vger.kernel.org; Lukas Bulwahn <lukas.bulwahn@gmail.com>
-> Subject: [PATCH] MAINTAINERS: adjust entry for header movement in hisilicon
-> qm driver
+On Wed, 2022-03-16 at 12:20 -0700, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
 > 
-> Commit ff5812e00d5e ("crypto: hisilicon/qm: Move the QM header to
-> include/linux") moves drivers/crypto/hisilicon/qm.h to
-> include/linux/hisi_acc_qm.h, but misses to adjust MAINTAINERS.
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
 > 
-> Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about a
-> broken reference.
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
 > 
-> Adjust the file entry in the HISILICON QM AND ZIP Controller DRIVER
-> following this file movement.
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
 > 
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> Fixes: 31610434bc35 ("Virtio console driver")
+> Fixes: 7177876fea83 ("virtio: console: Add ability to remove module")
+> Signed-off-by: Randy Dunlap <
+> rdunlap@infradead.org
+> >
+> Cc: Amit Shah <
+> amit@kernel.org
+> >
+> Cc: 
+> virtualization@lists.linux-foundation.org
+> 
+> Cc: Arnd Bergmann <
+> arnd@arndb.de
+> >
+> Cc: Greg Kroah-Hartman <
+> gregkh@linuxfoundation.org
+> >
 > ---
+>  drivers/char/virtio_console.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thanks for this.
+Reviewed-by: Amit Shah <amit@kernel.org>
 
-Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+I don't think the Fixes-by really applies here, though - we don't
+really want to push this into stable, nor do we want any automated
+tools to pick this up because of that tag..
 
-Shameer
-
-> Alex, please pick this minor clean-up on your -next tree on top of the
-> commit above.
-> 
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 845b36c0f0f5..963d7001f2ce 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8852,9 +8852,9 @@ L:	linux-crypto@vger.kernel.org
->  S:	Maintained
->  F:	Documentation/ABI/testing/debugfs-hisi-zip
->  F:	drivers/crypto/hisilicon/qm.c
-> -F:	drivers/crypto/hisilicon/qm.h
->  F:	drivers/crypto/hisilicon/sgl.c
->  F:	drivers/crypto/hisilicon/zip/
-> +F:	include/linux/hisi_acc_qm.h
-> 
->  HISILICON ROCE DRIVER
->  M:	Wenpeng Liang <liangwenpeng@huawei.com>
-> --
-> 2.17.1
+		Amit
 
