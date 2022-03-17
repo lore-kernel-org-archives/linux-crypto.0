@@ -2,127 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 457CCC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 07:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFEBC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 08:29:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbiCQHiO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Mar 2022 03:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46806 "EHLO
+        id S231252AbiCQIao (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Mar 2022 04:30:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbiCQHiO (ORCPT
+        with ESMTP id S231247AbiCQIan (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Mar 2022 03:38:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77768EE4DE;
-        Thu, 17 Mar 2022 00:36:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 24B77B81DBB;
-        Thu, 17 Mar 2022 07:36:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71EE9C340EE;
-        Thu, 17 Mar 2022 07:36:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647502615;
-        bh=Lq/j8Muv+YhQPhXUdIbr3sM8xNZ7ybJA7We/n6/A47c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=FDMQbANAaOAqnU3GhJW4lx8iDyzGXT0FrAVV49RebNIZTkND47CSxvBFhEDFB+ccw
-         PCQlNa+IwNgisR6eoDYOAUUT1AGJEDRuh+MU9uhokgF5+dqZkXSvN7zHyF/uji85Gh
-         /QOpi+DDDHR3v0YAOGYM3Tm8JmyklxRQ7wqS/EM57C+GzA8JsUADxKbBtWAWjQ7pjT
-         Lyzf08H/q+QCh8j89EvKl8RsWEnF+wvOSlHLAcSyIyNUONWZYEOtT2X+g3jj/osrsq
-         MDAycSjiJ8sXcdZtLBNm5lRRM68QHMFk7REFVNj4q5K8yaAGOGZRe2bhG+CXJtttGw
-         kyqN+a0Uz2Gow==
-Date:   Thu, 17 Mar 2022 09:36:06 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+        Thu, 17 Mar 2022 04:30:43 -0400
+Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [IPv6:2001:1600:4:17::8faa])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A5FDAFD7
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2022 01:29:22 -0700 (PDT)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4KK0g45ZWXzMpnl0;
+        Thu, 17 Mar 2022 09:29:20 +0100 (CET)
+Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
+        by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4KK0g342cGzlhSMZ;
+        Thu, 17 Mar 2022 09:29:19 +0100 (CET)
+Message-ID: <57a2e3ef-5baa-16ef-7865-245134a26e25@digikod.net>
+Date:   Thu, 17 Mar 2022 09:30:02 +0100
+MIME-Version: 1.0
+User-Agent: 
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>
 Cc:     David Howells <dhowells@redhat.com>,
         David Woodhouse <dwmw2@infradead.org>,
         "David S . Miller" <davem@davemloft.net>,
         Eric Snowberg <eric.snowberg@oracle.com>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
+        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
         Paul Moore <paul@paul-moore.com>, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220311174741.250424-1-mic@digikod.net>
+ <20220311174741.250424-3-mic@digikod.net> <YjLk5p1ej3JwFdaJ@iki.fi>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
 Subject: Re: [PATCH v1 2/2] certs: Remove panic() calls from
  system_trusted_keyring_init()
-Message-ID: <YjLk5p1ej3JwFdaJ@iki.fi>
-References: <20220311174741.250424-1-mic@digikod.net>
- <20220311174741.250424-3-mic@digikod.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <YjLk5p1ej3JwFdaJ@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220311174741.250424-3-mic@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 06:47:41PM +0100, Mickaël Salaün wrote:
-> From: Mickaël Salaün <mic@linux.microsoft.com>
-> 
-> Replace panic() calls from device_initcall(system_trusted_keyring_init)
-> with proper error handling using -ENODEV.
-> 
-> Suggested-by: Jarkko Sakkinen <jarkko@kernel.org> [1]
-> Link: https://lore.kernel.org/r/Yik0C2t7G272YZ73@iki.fi [1]
-> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
-> Link: https://lore.kernel.org/r/20220311174741.250424-3-mic@digikod.net
-> ---
->  certs/system_keyring.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
-> index 05b66ce9d1c9..428046a7aa7f 100644
-> --- a/certs/system_keyring.c
-> +++ b/certs/system_keyring.c
-> @@ -148,8 +148,10 @@ static __init int system_trusted_keyring_init(void)
->  			      KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH),
->  			      KEY_ALLOC_NOT_IN_QUOTA,
->  			      NULL, NULL);
-> -	if (IS_ERR(builtin_trusted_keys))
-> -		panic("Can't allocate builtin trusted keyring\n");
-> +	if (IS_ERR(builtin_trusted_keys)) {
-> +		pr_err("Can't allocate builtin trusted keyring\n");
-> +		return -ENODEV;
-> +	}
->  
->  #ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
->  	secondary_trusted_keys =
-> @@ -161,14 +163,26 @@ static __init int system_trusted_keyring_init(void)
->  			      KEY_ALLOC_NOT_IN_QUOTA,
->  			      get_builtin_and_secondary_restriction(),
->  			      NULL);
-> -	if (IS_ERR(secondary_trusted_keys))
-> -		panic("Can't allocate secondary trusted keyring\n");
-> +	if (IS_ERR(secondary_trusted_keys)) {
-> +		pr_err("Can't allocate secondary trusted keyring\n");
-> +		goto err_secondary;
-> +	}
->  
-> -	if (key_link(secondary_trusted_keys, builtin_trusted_keys) < 0)
-> -		panic("Can't link trusted keyrings\n");
-> +	if (key_link(secondary_trusted_keys, builtin_trusted_keys) < 0) {
-> +		pr_err("Can't link trusted keyrings\n");
-> +		goto err_link;
-> +	}
->  #endif
->  
->  	return 0;
-> +
-> +err_link:
-> +	key_put(secondary_trusted_keys);
-> +
-> +err_secondary:
-> +	key_put(builtin_trusted_keys);
-> +
-> +	return -ENODEV;
->  }
->  
->  /*
-> -- 
-> 2.35.1
-> 
 
-Changes make sense to me but you should implement all this to the original
-patch set.
+On 17/03/2022 08:36, Jarkko Sakkinen wrote:
+> On Fri, Mar 11, 2022 at 06:47:41PM +0100, MickaÃ«l SalaÃ¼n wrote:
+>> From: MickaÃ«l SalaÃ¼n <mic@linux.microsoft.com>
+>>
+>> Replace panic() calls from device_initcall(system_trusted_keyring_init)
+>> with proper error handling using -ENODEV.
+>>
+>> Suggested-by: Jarkko Sakkinen <jarkko@kernel.org> [1]
+>> Link: https://lore.kernel.org/r/Yik0C2t7G272YZ73@iki.fi [1]
+>> Signed-off-by: MickaÃ«l SalaÃ¼n <mic@linux.microsoft.com>
+>> Link: https://lore.kernel.org/r/20220311174741.250424-3-mic@digikod.net
+>> ---
+>>   certs/system_keyring.c | 26 ++++++++++++++++++++------
+>>   1 file changed, 20 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+>> index 05b66ce9d1c9..428046a7aa7f 100644
+>> --- a/certs/system_keyring.c
+>> +++ b/certs/system_keyring.c
+>> @@ -148,8 +148,10 @@ static __init int system_trusted_keyring_init(void)
+>>   			      KEY_USR_VIEW | KEY_USR_READ | KEY_USR_SEARCH),
+>>   			      KEY_ALLOC_NOT_IN_QUOTA,
+>>   			      NULL, NULL);
+>> -	if (IS_ERR(builtin_trusted_keys))
+>> -		panic("Can't allocate builtin trusted keyring\n");
+>> +	if (IS_ERR(builtin_trusted_keys)) {
+>> +		pr_err("Can't allocate builtin trusted keyring\n");
+>> +		return -ENODEV;
+>> +	}
+>>   
+>>   #ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
+>>   	secondary_trusted_keys =
+>> @@ -161,14 +163,26 @@ static __init int system_trusted_keyring_init(void)
+>>   			      KEY_ALLOC_NOT_IN_QUOTA,
+>>   			      get_builtin_and_secondary_restriction(),
+>>   			      NULL);
+>> -	if (IS_ERR(secondary_trusted_keys))
+>> -		panic("Can't allocate secondary trusted keyring\n");
+>> +	if (IS_ERR(secondary_trusted_keys)) {
+>> +		pr_err("Can't allocate secondary trusted keyring\n");
+>> +		goto err_secondary;
+>> +	}
+>>   
+>> -	if (key_link(secondary_trusted_keys, builtin_trusted_keys) < 0)
+>> -		panic("Can't link trusted keyrings\n");
+>> +	if (key_link(secondary_trusted_keys, builtin_trusted_keys) < 0) {
+>> +		pr_err("Can't link trusted keyrings\n");
+>> +		goto err_link;
+>> +	}
+>>   #endif
+>>   
+>>   	return 0;
+>> +
+>> +err_link:
+>> +	key_put(secondary_trusted_keys);
+>> +
+>> +err_secondary:
+>> +	key_put(builtin_trusted_keys);
+>> +
+>> +	return -ENODEV;
+>>   }
+>>   
+>>   /*
+>> -- 
+>> 2.35.1
+>>
+> 
+> Changes make sense to me but you should implement all this to the original
+> patch set.
 
-BR, Jarkko
+You agreed to add this patch on top of the others a few days ago: 
+https://lore.kernel.org/r/f8b1ea77afe8d6698b4a2122254ff8be310412b1.camel@kernel.org
+
+What do you think about Paul's concerns?
