@@ -2,125 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBDDC4321E
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 16:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F52AC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 20:41:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236375AbiCQQM6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Mar 2022 12:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55978 "EHLO
+        id S229866AbiCQUmT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Mar 2022 16:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236365AbiCQQM6 (ORCPT
+        with ESMTP id S229845AbiCQUmR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Mar 2022 12:12:58 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A179C214FA1
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2022 09:11:40 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id z3so4830413plg.8
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Mar 2022 09:11:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=wywg4x91ht1wDsZE8LDgwKs/937jDdBiI3aoJq8Icig=;
-        b=EcRFu47wdTKbqMSAq17bN6l3fW68je9I7sz6dNGS5tKD2WRbtx22XzizUZtR0qkyAQ
-         QWP1OHwCDN5A0Nw0t3Q7qmd76Q7jNga+edrTyslT2xibkPds1nD37wWbuAnO8SwFuhrO
-         gsVcYZtwJfnoFR7QpeZ53g8ha9BP7vQeAQagIeRfmuB8NZSh871Oy/O22T8GKZQsso7+
-         GAqKZ5LuYXbJaI8VOrspWlTrq9NYT2zp8TS48/UvpIibmW0S8anvsp+TLqAO1q5KW6Bh
-         lxRLQvTEz/3EMFmPsbBbDBLIo1E7GTCaZssTwBenfG227MP1XIuXr1IbCZbQ1ApUnFqh
-         aueg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=wywg4x91ht1wDsZE8LDgwKs/937jDdBiI3aoJq8Icig=;
-        b=yk+EyuL2lLYlLv0Mwr9M2Ytx39ZvHaxencWJrwgIzjYCL60CMW6d0/rNBJ1hhMdZxz
-         B3yhSYVijosMdBIjhXkEqO2oum73M4QuhCAtxCdLG47FfCUm0CBxLhMUHEFiH/SdulUn
-         Q3buUwhsWhfCWqV5ECGLSFP2lMcxHfevIIYe9+7FOZJDsWP2uWGQfKNbzI1TkQ0wyH6B
-         /S9U0fZvEcPBUwyS/cUl89qFiQEWRXP97TzmgRK3oK3snV6u0uSfDR0IYRtvaw6xt+i2
-         csjXZpkrHg0KHbaEqRDD4/63sFzyAKwKtXxNSsRVBz7P3Jq1EssMb7lFGjr28eMaaKZz
-         Z7RQ==
-X-Gm-Message-State: AOAM532NfRHfP8CDS0vfd2naBCWJqKCsmgRhXSxBrcxrvo14jA3X1NYI
-        4oc7AcqQF4ul9MGaJ385IMjsAA==
-X-Google-Smtp-Source: ABdhPJzujChC6izQDJEHNAPYk2A2y6Fs/ty0Hxcz37xAtsWb7B2FaolAnh/R0gH50blU6B7YVSPE4w==
-X-Received: by 2002:a17:902:7613:b0:151:6e1c:c49c with SMTP id k19-20020a170902761300b001516e1cc49cmr5906213pll.109.1647533499805;
-        Thu, 17 Mar 2022 09:11:39 -0700 (PDT)
-Received: from [127.0.1.1] ([2620:10d:c090:400::5:d2fd])
-        by smtp.gmail.com with ESMTPSA id q10-20020a056a00088a00b004f7ceff389esm7702590pfj.152.2022.03.17.09.11.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Mar 2022 09:11:39 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-scsi@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Florian Westphal <fw@strlen.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>, x86@kernel.org,
-        netfilter-devel@vger.kernel.org,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-        Amit Shah <amit@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Thu, 17 Mar 2022 16:42:17 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62D9B82E7;
+        Thu, 17 Mar 2022 13:41:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 56614B8200B;
+        Thu, 17 Mar 2022 20:40:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E5E63C340E9;
+        Thu, 17 Mar 2022 20:40:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647549657;
+        bh=Q7jdUq/TXyJQ/AkZzk1Y/hc/BA0YWfpTX3RTM+IexcA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=RZwtIy0BcCAAag/CFpKG3xPhtSYXqf3tKcsKwyFY2qco/46kKjNPCdjoCd2A9lo5/
+         A3finhsVjKETKkr0zZ1LShoiD2qcMSIwn8Jw5GkhQVd9GzgQN19Mgqb37c3tOv8q5z
+         kNRgJviuC8OWgGjXa9vu33Yh2qVOgDXoUdquJfNHw3toMROcacqna8Ryvi4e9b0a77
+         +k8vdlPE92RqG/L8pcOnRLOYDLCx82rRHP5mfBgr5J4B2nFEB1a9PoXIVaGorKNn3l
+         kwQ4l363SuYAGwvrVI+G77bg1MJD6Ycj8RrfAwZObNETB2RmG45DWy89lnyNIQKinh
+         VKJiMSmfjjVng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1993E6D3DD;
+        Thu, 17 Mar 2022 20:40:57 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 5.17
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <YjE5yThYIzih2kM6@gondor.apana.org.au>
+References: <20201026011159.GA2428@gondor.apana.org.au>
+ <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au> <YjE5yThYIzih2kM6@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <YjE5yThYIzih2kM6@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: a680b1832ced3b5fa7c93484248fd221ea0d614b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d34c58247f73c5358ceae1ae648fb9daa408ef23
+Message-Id: <164754965784.20112.16356756424689821980.pr-tracker-bot@kernel.org>
+Date:   Thu, 17 Mar 2022 20:40:57 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        linux-block@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-        linux-usb@vger.kernel.org, coreteam@netfilter.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        nouveau@lists.freedesktop.org, Jason Wang <jasowang@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        virtualization@lists.linux-foundation.org,
-        Leon Romanovsky <leon@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        linux-rdma@vger.kernel.org,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Joachim Fritschi <jfritschi@freenet.de>
-In-Reply-To: <20220316192010.19001-1-rdunlap@infradead.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
-Subject: Re: (subset) [PATCH 0/9] treewide: eliminate anonymous module_init & module_exit
-Message-Id: <164753349550.89091.10994175450707575992.b4-ty@kernel.dk>
-Date:   Thu, 17 Mar 2022 10:11:35 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 16 Mar 2022 12:20:01 -0700, Randy Dunlap wrote:
-> There are a number of drivers that use "module_init(init)" and
-> "module_exit(exit)", which are anonymous names and can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
-> 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
-> 
-> [...]
+The pull request you sent on Wed, 16 Mar 2022 13:13:45 +1200:
 
-Applied, thanks!
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-[1/9] virtio_blk: eliminate anonymous module_init & module_exit
-      commit: bcfe9b6cbb4438b8c1cc4bd475221652c8f9301b
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d34c58247f73c5358ceae1ae648fb9daa408ef23
 
-Best regards,
+Thank you!
+
 -- 
-Jens Axboe
-
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
