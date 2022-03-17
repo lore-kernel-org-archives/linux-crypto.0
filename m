@@ -2,72 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0039C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 13:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA54C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Mar 2022 15:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234415AbiCQNUY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Mar 2022 09:20:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56102 "EHLO
+        id S235689AbiCQPSy convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 17 Mar 2022 11:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231321AbiCQNUX (ORCPT
+        with ESMTP id S235359AbiCQPSy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Mar 2022 09:20:23 -0400
+        Thu, 17 Mar 2022 11:18:54 -0400
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645701728B8;
-        Thu, 17 Mar 2022 06:19:06 -0700 (PDT)
-Received: from kwepemi500013.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KK7322MQBzCqkp;
-        Thu, 17 Mar 2022 21:17:02 +0800 (CST)
-Received: from huawei.com (10.175.112.208) by kwepemi500013.china.huawei.com
- (7.221.188.120) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Thu, 17 Mar
- 2022 21:19:03 +0800
-From:   Zheng Yongjun <zhengyongjun3@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: fix reference leak in stm32_crc_remove
-Date:   Thu, 17 Mar 2022 13:16:13 +0000
-Message-ID: <20220317131613.53628-1-zhengyongjun3@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAB1205962;
+        Thu, 17 Mar 2022 08:17:37 -0700 (PDT)
+Received: from canpemm100005.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KK9gn3zqhzCqmW;
+        Thu, 17 Mar 2022 23:15:33 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ canpemm100005.china.huawei.com (7.192.105.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 17 Mar 2022 23:17:34 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Thu, 17 Mar 2022 15:17:33 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "Wangzhou (B)" <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
+Subject: RE: [PATCH] MAINTAINERS: adjust entry for header movement in
+ hisilicon qm driver
+Thread-Topic: [PATCH] MAINTAINERS: adjust entry for header movement in
+ hisilicon qm driver
+Thread-Index: AQHYOTNV513lw7emgUOm96IZ4FdBD6zDr8SA
+Date:   Thu, 17 Mar 2022 15:17:32 +0000
+Message-ID: <75f18d2f04f949d390a9b97cdc81c284@huawei.com>
+References: <20220316124224.29091-1-lukas.bulwahn@gmail.com>
+In-Reply-To: <20220316124224.29091-1-lukas.bulwahn@gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.112.208]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500013.china.huawei.com (7.221.188.120)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-pm_runtime_get_sync() will increment pm usage counter even it
-failed. Forgetting to call pm_runtime_put_noidle will result
-in reference leak in stm32_crc_remove, so we should fix it.
 
-Signed-off-by: Zheng Yongjun <zhengyongjun3@huawei.com>
----
- drivers/crypto/stm32/stm32-crc32.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
-index be1bf39a317d..90a920e7f664 100644
---- a/drivers/crypto/stm32/stm32-crc32.c
-+++ b/drivers/crypto/stm32/stm32-crc32.c
-@@ -384,8 +384,10 @@ static int stm32_crc_remove(struct platform_device *pdev)
- 	struct stm32_crc *crc = platform_get_drvdata(pdev);
- 	int ret = pm_runtime_get_sync(crc->dev);
- 
--	if (ret < 0)
-+	if (ret < 0) {
-+		pm_runtime_put_noidle(crc->dev);
- 		return ret;
-+	}
- 
- 	spin_lock(&crc_list.lock);
- 	list_del(&crc->list);
--- 
-2.17.1
+> -----Original Message-----
+> From: Lukas Bulwahn [mailto:lukas.bulwahn@gmail.com]
+> Sent: 16 March 2022 12:42
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> Alex Williamson <alex.williamson@redhat.com>
+> Cc: Wangzhou (B) <wangzhou1@hisilicon.com>; Herbert Xu
+> <herbert@gondor.apana.org.au>; David S . Miller <davem@davemloft.net>;
+> linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org;
+> kernel-janitors@vger.kernel.org; Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> Subject: [PATCH] MAINTAINERS: adjust entry for header movement in hisilicon
+> qm driver
+> 
+> Commit ff5812e00d5e ("crypto: hisilicon/qm: Move the QM header to
+> include/linux") moves drivers/crypto/hisilicon/qm.h to
+> include/linux/hisi_acc_qm.h, but misses to adjust MAINTAINERS.
+> 
+> Hence, ./scripts/get_maintainer.pl --self-test=patterns complains about a
+> broken reference.
+> 
+> Adjust the file entry in the HISILICON QM AND ZIP Controller DRIVER
+> following this file movement.
+> 
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> ---
+
+Thanks for this.
+
+Reviewed-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+
+Shameer
+
+> Alex, please pick this minor clean-up on your -next tree on top of the
+> commit above.
+> 
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 845b36c0f0f5..963d7001f2ce 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -8852,9 +8852,9 @@ L:	linux-crypto@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/ABI/testing/debugfs-hisi-zip
+>  F:	drivers/crypto/hisilicon/qm.c
+> -F:	drivers/crypto/hisilicon/qm.h
+>  F:	drivers/crypto/hisilicon/sgl.c
+>  F:	drivers/crypto/hisilicon/zip/
+> +F:	include/linux/hisi_acc_qm.h
+> 
+>  HISILICON ROCE DRIVER
+>  M:	Wenpeng Liang <liangwenpeng@huawei.com>
+> --
+> 2.17.1
 
