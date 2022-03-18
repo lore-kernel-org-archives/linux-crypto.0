@@ -2,180 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9D3C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Mar 2022 10:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8440C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Mar 2022 12:33:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234924AbiCRKVY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Mar 2022 06:21:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60372 "EHLO
+        id S236272AbiCRMe2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 18 Mar 2022 08:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234915AbiCRKVX (ORCPT
+        with ESMTP id S236076AbiCRMe1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Mar 2022 06:21:23 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF121EDA1B
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Mar 2022 03:20:04 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 123-20020a1c1981000000b0038b3616a71aso4554895wmz.4
-        for <linux-crypto@vger.kernel.org>; Fri, 18 Mar 2022 03:20:04 -0700 (PDT)
+        Fri, 18 Mar 2022 08:34:27 -0400
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF5D103BB9
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Mar 2022 05:33:08 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id k8-20020a05600c1c8800b003899c7ac55dso4574390wms.1
+        for <linux-crypto@vger.kernel.org>; Fri, 18 Mar 2022 05:33:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=YYBm1RX0czLMaWTTQInKeCgdVYhgkLcZ7jFkas/Rfhs=;
-        b=AUl19gddWU+TGkn91rwswKtkRuunsoS1xg6IvUppECEb8oSzjSfXJv2d87cqXYs3Yy
-         95nkaF7kHo7GBGVTNaBNkuO6Rp5JM8YHyT8tVX8NcbKasWURoUqgjvOhVr+6gsjwxf67
-         6VqySP3QaYydQWitA3XNyI6fTecEOPfuXE2b/2PqMFm9CN17Tvi8nhCUC2lm71oY1H+o
-         2GWqd42sqZxKapISXzA8vBpYH53HlV8UMGJz1fKwf0WuqukOHYuMyfohAKbTkm1O00uV
-         wU2oONr93WQy0UguF3b7ebHHu3pc+OUgVdXyQBp284tjYnM5VG8acVPte/GGuH+vp6P+
-         tK6A==
+        d=conchuod-ie.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=IVKS+fo96/p9+Ih0mtD1prOXn3p+8FAfNSeavgBoyPA=;
+        b=3GHvS5GfsxA3hWn2yBsGEk+Id9A1k83DXM7Qz7rPLPSbaLz70JZuOs7fhFKFiF/tVE
+         qN72ygb18bLrX2baBq9OIxfq6pbxhprw5EJrLQ7MgevpG97wS48Iu/Ro1H+pFzl148W5
+         efTpmQB1RZnXoR+Z3B2qqXC4fOeDs0oiQCnxwoDls4Ak/wqZ7VkhWEnNFXdKXlEO7/N7
+         kVrFK3ZubPjJAePF0HppUIb7cZlFvs6x8nC0blI0z89RL2nWdhyiGnmHiKBNDa5W3ME2
+         4RvRH3oef2qhEgsTzSr8kQCsamWAEfZinSXODgPAvG408hYTyC2gbxhyM5KEbnYO28SE
+         Eprg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=YYBm1RX0czLMaWTTQInKeCgdVYhgkLcZ7jFkas/Rfhs=;
-        b=xUMxTOK1kkQvjLboNCP+GovC2+fe0FNkcLh5Z1kUmMlGNqsLHPJ64DvvpRF4xI2xex
-         0IXzQxKGermouYEPo9gE80UnqY90uJNShax0b0XPTYHEZagIDUwPtKKQwANG7WXIjhHS
-         jWkx9xP8YMMU9wQsGTqPjmqkc+MSG8fY2ECpacfl7/thCTW7gwGTnwreTbUQojjRQwAV
-         jOrqB67z1WtEQPtn/9AgfRNpRGPpn9EoKMzjCnQO1DaTcSGXKtnxlWnxWCA/jZ3dd54P
-         7Op61Goc/xDhUWaGEpW5bLT9UAuIG137a0jT2K8PACzUJYOQn/D4613VxroDRTsCaV3A
-         oKkg==
-X-Gm-Message-State: AOAM531GXVPhdyGJxN0/y7xqghhyIxDsfGhxI9ndB6NYdaOeGUkRuxTE
-        0sPuJMpJZQKrL1WndGwNbF92wA==
-X-Google-Smtp-Source: ABdhPJykd7CP6qm5/RS39Zs+vu5rb4PuIDjEBZiEVPnAb1oCr3QXbjSKOIF+Kzx93wjR66zRLBNlTA==
-X-Received: by 2002:a7b:c7c3:0:b0:389:cbf1:fadf with SMTP id z3-20020a7bc7c3000000b00389cbf1fadfmr15021009wmk.147.1647598802494;
-        Fri, 18 Mar 2022 03:20:02 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id f10-20020adffcca000000b00203e6a34d3esm5889436wrs.99.2022.03.18.03.20.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Mar 2022 03:20:01 -0700 (PDT)
-Date:   Fri, 18 Mar 2022 11:20:00 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Johan Jonker <jbx6244@gmail.com>
-Cc:     heiko@sntech.de, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        robh+dt@kernel.org, krzysztof.kozlowski@canonical.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH v3] dt-bindings: crypto: convert rockchip-crypto to yaml
-Message-ID: <YjRc0Cf8m/kpcwAQ@Red>
-References: <20220211115925.3382735-1-clabbe@baylibre.com>
- <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=IVKS+fo96/p9+Ih0mtD1prOXn3p+8FAfNSeavgBoyPA=;
+        b=itA4pIGTC6kfvZa+VGWWStFfToTWl96sPEEKaAj85z37c4I7cD9AP199Ydow+uaGry
+         LguziE5Q8J1WCwJ7rY77ZanyLIFvAgGzXWjD13QeSzjHVxWGkyqzBDf9AKI2uNl0rQic
+         7Uew+3zJ0W0YdGXntCKtB1dEFBLZ6WBRJv+QSKkP8WFvoFRSyzu197rysyB/ORBa6FrW
+         G1e4daxBvdHKxEA8GKdNMheguBETDJ3sj4SPKey2TjBwui5z6xv+MEwNIrFZzQEEV5op
+         RAgHuRjpEqxwRxv0f/rj4hybMj6PaBPBDpiQN2fLx9H2U3QxWHKtQh2ioAGdGdSFEZR8
+         yhvQ==
+X-Gm-Message-State: AOAM5310ON9phHJ9ksjuzOwREMQuamWh8uEE6P3FmXUMc/TKUlIU2qYV
+        0cUEtXqgqUy+tf3IRL17DtP6Tg==
+X-Google-Smtp-Source: ABdhPJzwV71tEEpc6CSFgC+ZWzrTAQczGRUmTh+nKq++cYrW3WPOz/9gdoKDEDyvmVHSUi2XSLkP2Q==
+X-Received: by 2002:a05:600c:3c89:b0:37f:aacb:cac7 with SMTP id bg9-20020a05600c3c8900b0037faacbcac7mr478320wmb.1.1647606786696;
+        Fri, 18 Mar 2022 05:33:06 -0700 (PDT)
+Received: from [192.168.2.222] ([109.76.4.19])
+        by smtp.gmail.com with ESMTPSA id g6-20020adfd1e6000000b00203f8effc22sm1701999wrd.63.2022.03.18.05.33.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Mar 2022 05:33:06 -0700 (PDT)
+Message-ID: <c11f65fb-a756-0233-791b-6ecc3d9f4f05@conchuod.ie>
+Date:   Fri, 18 Mar 2022 12:33:04 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f078ac6f-5605-7b86-5734-cbbf7dc52c71@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 0/2] Add support for hwrng on PolarFire SoC
+Content-Language: en-US
+To:     conor.dooley@microchip.com, mpm@selenic.com,
+        herbert@gondor.apana.org.au
+Cc:     lewis.hanly@microchip.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-riscv@lists.infradead.org
+References: <20220307154023.813158-1-conor.dooley@microchip.com>
+From:   Conor Dooley <mail@conchuod.ie>
+In-Reply-To: <20220307154023.813158-1-conor.dooley@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Feb 15, 2022 at 03:07:56PM +0100, Johan Jonker a écrit :
-> Hi Heiko,
-> 
-> On 2/11/22 12:59, Corentin Labbe wrote:
-> > Convert rockchip-crypto to yaml
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> > Changes since v1:
-> > - fixed example
-> > - renamed to a new name
-> > - fixed some maxItems
-> > 
-> > Change since v2:
-> > - Fixed maintainers section
-> > 
-> >  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
-> >  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
-> >  2 files changed, 66 insertions(+), 28 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> 
-> rockchip,crypto.yaml
-> 
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> > 
-> > diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > new file mode 100644
-> > index 000000000000..2e1e9fa711c4
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > @@ -0,0 +1,66 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> 
-> rockchip,crypto.yaml
-> 
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Rockchip Electronics And Security Accelerator
-> > +
-> > +maintainers:
-> > +  - Heiko Stuebner <heiko@sntech.de>
-> > +
-> > +properties:
-> > +  compatible:
-> 
->     oneOf:
->       - const: rockchip,rk3288-crypto
->       - items:
->           - enum:
->               - rockchip,rk3228-crypto
->               - rockchip,rk3328-crypto
->               - rockchip,rk3368-crypto
->               - rockchip,rk3399-crypto
->           - const: rockchip,rk3288-crypto
-> 
-> rk3288 was the first in line that had support, so we use that as fall
-> back string.
-> 
-> > +    const: rockchip,rk3288-crypto
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: clock data
-> > +      - description: clock data
-> > +      - description: clock crypto accelerator
-> 
-> > +      - description: clock dma
-> 
-> remove ???
-> 
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: aclk
-> > +      - const: hclk
-> > +      - const: sclk
-> 
-> > +      - const: apb_pclk
-> 
-> remove ???
-> 
-> Similar to the rk3568 pclk_xpcs discussion ACLK_DMAC1 belongs to the
-> dmac_bus_s node and should have been enabled by the DMA driver I think.
-> Could you advise if this is correct or should we remove parsing/enabling
-> ACLK_DMAC1 in rk3288_crypto.c in order to it easier
-> porting/adding/syncing nodes for other SoC types?
-> 
-> Johan
-> 
+There's an error in the probe function's reference counting.
+Will fix that along with the quality estimation in v2.
 
-Hello
+Can safely ignore this version of the series.
 
-I came back on this as I got access to a rk3288-miqi, and crypto does not work at all.
-This is due to ACLK_DMAC1 not being enabled.
+Thanks,
+Conor.
 
-While not touching it work on rk3399 and rk3328, rk3288 seems to need it.
-
-Probably the DMA controller goes to sleep under PM.
-
-Any idea on how to create a dependency so dma controller does not sleep ?
+On 07/03/2022 15:40, conor.dooley@microchip.com wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+> 
+> As it says on the tin, add support for the hardware rng on PolarFire
+> SoC, which is accessed via the system controller. While we're at it,
+> add the rng driver to the list of files included as part of the SoC
+> support in MAINTAINERS.
+> 
+> Base commit is in arm/soc branch of the soc tree as the hwrng driver
+> depends on the system controller, which is to be introduced via that
+> tree in 5.18
+> 
+> Conor Dooley (2):
+>    hwrng: mpfs - add polarfire soc hwrng support
+>    MAINTAINERS: update PolarFire SoC support
+> 
+>   MAINTAINERS                       |   1 +
+>   drivers/char/hw_random/Kconfig    |  13 ++++
+>   drivers/char/hw_random/Makefile   |   1 +
+>   drivers/char/hw_random/mpfs-rng.c | 103 ++++++++++++++++++++++++++++++
+>   4 files changed, 118 insertions(+)
+>   create mode 100644 drivers/char/hw_random/mpfs-rng.c
+> 
+> 
+> base-commit: a483b1b232e616d0095a59b987ffc739bc1b56bc
