@@ -2,186 +2,274 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A04C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 20 Mar 2022 12:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B0FC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Mar 2022 21:01:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245029AbiCTMG1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 20 Mar 2022 08:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40660 "EHLO
+        id S236833AbiCTVCd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Mar 2022 17:02:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244971AbiCTMG0 (ORCPT
+        with ESMTP id S233463AbiCTVCc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 20 Mar 2022 08:06:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 226EB37A9E
-        for <linux-crypto@vger.kernel.org>; Sun, 20 Mar 2022 05:05:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647777901;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dluyFNWHj0wdqGZD9WiZi8hb8qI80pWjkbX+xynrT7U=;
-        b=Qj3nUJCKv0aRAzzU185bNxKaIr55ILXROrj5ddr/QbgaKYC9fKHx82LbU7lbF2tkTvU8ch
-        /xKW9/+Y77BTuzY5aH4nf2/hJ6y5XpNEwFCov6OTOmhxrTWl1NWWiAMujstRc3UHkl7LJP
-        ZJZJAlr4QI6Uanv00o/Srf5tM624064=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-331-ybrT6qHKO7mML1HOAmi_aw-1; Sun, 20 Mar 2022 08:04:59 -0400
-X-MC-Unique: ybrT6qHKO7mML1HOAmi_aw-1
-Received: by mail-ej1-f72.google.com with SMTP id og28-20020a1709071ddc00b006dfb92d8e3fso2268529ejc.14
-        for <linux-crypto@vger.kernel.org>; Sun, 20 Mar 2022 05:04:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dluyFNWHj0wdqGZD9WiZi8hb8qI80pWjkbX+xynrT7U=;
-        b=XVr+jfDsE7iiJJQVvJ04Tm/XcIttR1gvJf7N4KrPNA7O6uddsvgLzGQW5ASAlka+q2
-         RWjV+2Fg4tvlb+6tJaMr/6+alB+UAoStJVQYu99NOIcZsdmw0wky44gEMLJP0cH2zPgR
-         LVuC/+PATY0u+NY0Py+Joyd8VZogoJeRkHQCNLcOWmWUHYCba+iUaJEJQc3U5XiJanmR
-         mYeeu8svnU7gnIWaEL5AwrEuNJgRaVnwdeo4D8Jad9LfNVY9k3T3b5OLITX3XS/ckzic
-         P+toBZigwTNdZ9TMwY0BNDrzkGre5h7EUCUOK8aguK+kU7iBdX3nPhSYaJRclzh0liZx
-         paFw==
-X-Gm-Message-State: AOAM531Pp1KKZaVPpyQkfajcUb/FLqrmFb75/ktMxB67xtBAXGNpyh6U
-        koQPsIuoxgvUKEYTtN5icm/ZBd5Ab1C6W6ml4/AYXl/ufRjmfmlF/rmP9I5zsokm0DQNxgeRSHK
-        s+2oN2dCJpX7elQQVmJgiQSxG
-X-Received: by 2002:a05:6402:40c5:b0:418:e73c:a1ab with SMTP id z5-20020a05640240c500b00418e73ca1abmr18517076edb.52.1647777898149;
-        Sun, 20 Mar 2022 05:04:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfAQhzmlNy6q9yY+EnFX+2g1gYETe+axmQh3kzhVOc32at9/0TqUx+j50nzMAK4FS++1BWlA==
-X-Received: by 2002:a05:6402:40c5:b0:418:e73c:a1ab with SMTP id z5-20020a05640240c500b00418e73ca1abmr18517008edb.52.1647777897820;
-        Sun, 20 Mar 2022 05:04:57 -0700 (PDT)
-Received: from redhat.com ([2.55.132.0])
-        by smtp.gmail.com with ESMTPSA id 27-20020a17090600db00b006df6b34d9b8sm5854831eji.211.2022.03.20.05.04.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Mar 2022 05:04:57 -0700 (PDT)
-Date:   Sun, 20 Mar 2022 08:04:48 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
+        Sun, 20 Mar 2022 17:02:32 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A70610E06C;
+        Sun, 20 Mar 2022 14:01:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF9376120E;
+        Sun, 20 Mar 2022 21:01:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11773C340E9;
+        Sun, 20 Mar 2022 21:01:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647810063;
+        bh=QkcuWtvqI1Q66ovVqgPxGTb0hK/D8TPonQFWbPcoTf4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GAQVx9UifFRIj2eKn6LDYXWXtndTiid3dn2V7S4gjL+GLoVI3kSb+QN1J+e2xnBTH
+         sff82e2DEpCqKwE/kVsLJ7Zcs18DWtjyNVXULBYXIOgO4zgz/E/DdGR5CzAJe+kGV0
+         thrIjyPwKxmc4wy1NxG+Oe0wfrBC+a/qDcrOUBBaSSeKkh72OXc5t9sLKeZJgddg39
+         mMmuuTxZ3IvtEOeM06b4sGVs+eZe8faA6RL39CXSr9daC/UAhSQdUQtI2fFsuDRfEr
+         e9I6hjKjwu01+VUWzZ/OdoKT6KIQxU2SUMZbYzHOX16e0klnn5kt3vjHkcRcV8C3bV
+         cBqtPQZf5KVqA==
+Date:   Sun, 20 Mar 2022 23:02:03 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>, kernel@pengutronix.de,
+        David Gstir <david@sigma-star.at>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Tim Harvey <tharvey@gateworks.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: Re: [PATCH 2/9] virtio_console: eliminate anonymous module_init &
- module_exit
-Message-ID: <20220320080438-mutt-send-email-mst@kernel.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-3-rdunlap@infradead.org>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v6 4/4] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Message-ID: <YjeWSx84ev7u/YAi@iki.fi>
+References: <20220316164335.1720255-1-a.fatoum@pengutronix.de>
+ <20220316164335.1720255-5-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220316192010.19001-3-rdunlap@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220316164335.1720255-5-a.fatoum@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 12:20:03PM -0700, Randy Dunlap wrote:
-> Eliminate anonymous module_init() and module_exit(), which can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
+On Wed, Mar 16, 2022 at 05:43:35PM +0100, Ahmad Fatoum wrote:
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
+> built into many newer i.MX and QorIQ SoCs by NXP.
 > 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
+> The CAAM does crypto acceleration, hardware number generation and
+> has a blob mechanism for encapsulation/decapsulation of sensitive material.
 > 
-> Example 1: (System.map)
->  ffffffff832fc78c t init
->  ffffffff832fc79e t init
->  ffffffff832fc8f8 t init
+> This blob mechanism depends on a device specific random 256-bit One Time
+> Programmable Master Key that is fused in each SoC at manufacturing
+> time. This key is unreadable and can only be used by the CAAM for AES
+> encryption/decryption of user data.
 > 
-> Example 2: (initcall_debug log)
->  calling  init+0x0/0x12 @ 1
->  initcall init+0x0/0x12 returned 0 after 15 usecs
->  calling  init+0x0/0x60 @ 1
->  initcall init+0x0/0x60 returned 0 after 2 usecs
->  calling  init+0x0/0x9a @ 1
->  initcall init+0x0/0x9a returned 0 after 74 usecs
+> This makes it a suitable backend (source) for kernel trusted keys.
 > 
-> Fixes: 31610434bc35 ("Virtio console driver")
-> Fixes: 7177876fea83 ("virtio: console: Add ability to remove module")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Amit Shah <amit@kernel.org>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-
-If this is done tree-wide, it's ok to do it for virtio too.
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-No real opinion on whether it's a good idea.
-
-
+> Previous commits generalized trusted keys to support multiple backends
+> and added an API to access the CAAM blob mechanism. Based on these,
+> provide the necessary glue to use the CAAM for trusted keys.
+> 
+> Reviewed-by: David Gstir <david@sigma-star.at>
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Tested-By: Tim Harvey <tharvey@gateworks.com>
+> Tested-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Tested-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
 > ---
->  drivers/char/virtio_console.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> v5 -> v6:
+>   - Rename caam_trusted_key_ops to trusted_key_caam_ops for symmetry
+>     with other trust sources (Pankaj)
+>   - collected Pankaj's Reviewed-by
+> v4 -> v5:
+>   - Collected Reviewed-by's and Tested-by's
+>   - Changed modifier to SECURE_KEY for compatibility with linux-imx
+>     (Matthias)
+> v3 -> v4:
+>   - Collected Acked-by's, Reviewed-by's and Tested-by
+> v2 -> v3:
+>  - add MAINTAINERS entry
+> v1 -> v2:
+>  - Extend trusted keys documentation for CAAM
 > 
-> --- lnx-517-rc8.orig/drivers/char/virtio_console.c
-> +++ lnx-517-rc8/drivers/char/virtio_console.c
-> @@ -2245,7 +2245,7 @@ static struct virtio_driver virtio_rproc
->  	.remove =	virtcons_remove,
->  };
+> To: Jonathan Corbet <corbet@lwn.net>
+> To: David Howells <dhowells@redhat.com>
+> To: Jarkko Sakkinen <jarkko@kernel.org>
+> To: James Bottomley <jejb@linux.ibm.com>
+> To: Mimi Zohar <zohar@linux.ibm.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: "Horia Geantă" <horia.geanta@nxp.com>
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> Cc: David Gstir <david@sigma-star.at>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Cc: Sumit Garg <sumit.garg@linaro.org>
+> Cc: keyrings@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-integrity@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-security-module@vger.kernel.org
+> ---
+>  .../admin-guide/kernel-parameters.txt         |  1 +
+>  .../security/keys/trusted-encrypted.rst       | 40 +++++++++-
+>  MAINTAINERS                                   |  9 +++
+>  include/keys/trusted_caam.h                   | 11 +++
+>  security/keys/trusted-keys/Kconfig            | 11 ++-
+>  security/keys/trusted-keys/Makefile           |  2 +
+>  security/keys/trusted-keys/trusted_caam.c     | 74 +++++++++++++++++++
+>  security/keys/trusted-keys/trusted_core.c     |  6 +-
+>  8 files changed, 151 insertions(+), 3 deletions(-)
+>  create mode 100644 include/keys/trusted_caam.h
+>  create mode 100644 security/keys/trusted-keys/trusted_caam.c
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 844c883ca9d8..9e7ef4c6585d 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -5875,6 +5875,7 @@
+>  			sources:
+>  			- "tpm"
+>  			- "tee"
+> +			- "caam"
+>  			If not specified then it defaults to iterating through
+>  			the trust source list starting with TPM and assigns the
+>  			first trust source as a backend which is initialized
+> diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
+> index 99cf34d7c025..ed60c48cb692 100644
+> --- a/Documentation/security/keys/trusted-encrypted.rst
+> +++ b/Documentation/security/keys/trusted-encrypted.rst
+> @@ -35,6 +35,13 @@ safe.
+>           Rooted to Hardware Unique Key (HUK) which is generally burnt in on-chip
+>           fuses and is accessible to TEE only.
 >  
-> -static int __init init(void)
-> +static int __init virtio_console_init(void)
->  {
->  	int err;
+> +     (3) CAAM (Cryptographic Acceleration and Assurance Module: IP on NXP SoCs)
+> +
+> +         When High Assurance Boot (HAB) is enabled and the CAAM is in secure
+> +         mode, trust is rooted to the OTPMK, a never-disclosed 256-bit key
+> +         randomly generated and fused into each SoC at manufacturing time.
+> +         Otherwise, a common fixed test key is used instead.
+> +
+>    *  Execution isolation
 >  
-> @@ -2280,7 +2280,7 @@ free:
->  	return err;
->  }
+>       (1) TPM
+> @@ -46,6 +53,10 @@ safe.
+>           Customizable set of operations running in isolated execution
+>           environment verified via Secure/Trusted boot process.
 >  
-> -static void __exit fini(void)
-> +static void __exit virtio_console_fini(void)
->  {
->  	reclaim_dma_bufs();
+> +     (3) CAAM
+> +
+> +         Fixed set of operations running in isolated execution environment.
+> +
+>    * Optional binding to platform integrity state
 >  
-> @@ -2290,8 +2290,8 @@ static void __exit fini(void)
->  	class_destroy(pdrvdata.class);
->  	debugfs_remove_recursive(pdrvdata.debugfs_dir);
->  }
-> -module_init(init);
-> -module_exit(fini);
-> +module_init(virtio_console_init);
-> +module_exit(virtio_console_fini);
+>       (1) TPM
+> @@ -63,6 +74,11 @@ safe.
+>           Relies on Secure/Trusted boot process for platform integrity. It can
+>           be extended with TEE based measured boot process.
 >  
->  MODULE_DESCRIPTION("Virtio console driver");
->  MODULE_LICENSE("GPL");
+> +     (3) CAAM
+> +
+> +         Relies on the High Assurance Boot (HAB) mechanism of NXP SoCs
+> +         for platform integrity.
+> +
+>    *  Interfaces and APIs
+>  
+>       (1) TPM
+> @@ -74,10 +90,13 @@ safe.
+>           TEEs have well-documented, standardized client interface and APIs. For
+>           more details refer to ``Documentation/staging/tee.rst``.
+>  
+> +     (3) CAAM
+> +
+> +         Interface is specific to silicon vendor.
+>  
+>    *  Threat model
+>  
+> -     The strength and appropriateness of a particular TPM or TEE for a given
+> +     The strength and appropriateness of a particular trust source for a given
+>       purpose must be assessed when using them to protect security-relevant data.
+>  
+>  
+> @@ -104,6 +123,12 @@ selected trust source:
+>       from platform specific hardware RNG or a software based Fortuna CSPRNG
+>       which can be seeded via multiple entropy sources.
+>  
+> +  *  CAAM: Kernel RNG
+> +
+> +     The normal kernel random number generator is used. To seed it from the
+> +     CAAM HWRNG, enable CRYPTO_DEV_FSL_CAAM_RNG_API and ensure the device
+> +     is probed.
+> +
+>  Users may override this by specifying ``trusted.rng=kernel`` on the kernel
+>  command-line to override the used RNG with the kernel's random number pool.
+>  
+> @@ -192,6 +217,19 @@ Usage::
+>  specific to TEE device implementation.  The key length for new keys is always
+>  in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+>  
+> +Trusted Keys usage: CAAM
+> +------------------------
+> +
+> +Usage::
+> +
+> +    keyctl add trusted name "new keylen" ring
+> +    keyctl add trusted name "load hex_blob" ring
+> +    keyctl print keyid
+> +
+> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in format
+> +specific to CAAM device implementation.  The key length for new keys is always
+> +in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+> +
+>  Encrypted Keys usage
+>  --------------------
+>  
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 05fd080b82f3..f13382a14967 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10647,6 +10647,15 @@ S:	Supported
+>  F:	include/keys/trusted_tee.h
+>  F:	security/keys/trusted-keys/trusted_tee.c
+>  
+> +KEYS-TRUSTED-CAAM
+> +M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
+> +R:	Pengutronix Kernel Team <kernel@pengutronix.de>
+> +L:	linux-integrity@vger.kernel.org
+> +L:	keyrings@vger.kernel.org
+> +S:	Maintained
+> +F:	include/keys/trusted_caam.h
+> +F:	security/keys/trusted-keys/trusted_caam.c
+> +
+>  KEYS/KEYRINGS
+>  M:	David Howells <dhowells@redhat.com>
+>  M:	Jarkko Sakkinen <jarkko@kernel.org>
 
+Documentation and MAINTAINERS updates must be separate patches.
+
+BR, Jarkko
