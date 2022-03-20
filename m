@@ -2,336 +2,185 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC889C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 19 Mar 2022 18:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA67FC433FE
+	for <linux-crypto@archiver.kernel.org>; Sun, 20 Mar 2022 12:04:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243872AbiCSSXy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 19 Mar 2022 14:23:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
+        id S244997AbiCTMFn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 20 Mar 2022 08:05:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243868AbiCSSXx (ORCPT
+        with ESMTP id S244991AbiCTMFi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 19 Mar 2022 14:23:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45FED2689A8;
-        Sat, 19 Mar 2022 11:22:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C1A85B80D9B;
-        Sat, 19 Mar 2022 18:22:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E32FEC340EC;
-        Sat, 19 Mar 2022 18:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647714148;
-        bh=hhu+iiM+PEsCTNMjvrEDz1ucmDg+Fr+55HCY0c8/UsU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NXtiYgj8z1V7NwGkSTBqzfcsA2AcF0FUaqWmKBlbJdkZlY+5X/Y+POt10MISO2kS/
-         +1wBVMn6in+UaYxrsB+ld5KedeYkHNIj02KA2XruXSe2eHDPJ8URwB8AcSYSv8ps+Z
-         Ifuohar81D4hwwl9tgfqOVucJpMb+IwOwfp/yuzmcpASxtg1A0RlMGefuRRTYs6DZ8
-         Xkap8/jSbiLBifie7GY6O1b3vhEHaGasq6nPAxrFZ7DCPkDSnV0SrTrqs0Z0rxACg7
-         vwu2sYtiP3sQddRlnOw3C8WIjDKnbeTbeq2k5N++3G6fabIoEi1fRpinli5QNuYYzo
-         nvfjeQZ5q5TAQ==
-Date:   Sat, 19 Mar 2022 18:29:36 +0000
-From:   Jonathan Cameron <jic23@kernel.org>
-To:     Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Lars Povlsen <lars.povlsen@microchip.com>,
-        Steen Hegelund <Steen.Hegelund@microchip.com>,
-        UNGLinuxDriver@microchip.com, linux-hwmon@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Lars-Peter Clausen <lars@metafoo.de>,
-        Michael Hennerich <Michael.Hennerich@analog.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 20 Mar 2022 08:05:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D85237013
+        for <linux-crypto@vger.kernel.org>; Sun, 20 Mar 2022 05:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647777854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9OfrrvJ+JSNxjBs8qAJPKPxz/pmLtZ2ITjpHEArPw5E=;
+        b=RNM2hDPx/BuydcEGMaDPuIaI2BD33giuOYfEV6AIYnkPJcwIUzDFtdoLqcM196GMiiYXie
+        fsR6ecLotW6stPnE40yLWRCsxB7cM4329NQ3ELfBZ8aegmWwpK/MHPjtLxIoZyzQfrKLEv
+        OVS4dIDn/qxWT1EUxoErDFf8VqEPKc0=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-496-hGdIMVx_MqGOXoFp0WkDFQ-1; Sun, 20 Mar 2022 08:04:12 -0400
+X-MC-Unique: hGdIMVx_MqGOXoFp0WkDFQ-1
+Received: by mail-ed1-f70.google.com with SMTP id bq19-20020a056402215300b0040f276105a4so7385124edb.2
+        for <linux-crypto@vger.kernel.org>; Sun, 20 Mar 2022 05:04:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9OfrrvJ+JSNxjBs8qAJPKPxz/pmLtZ2ITjpHEArPw5E=;
+        b=EVSkJ+7xpFRxhLGR4yY1wdT2BjEmBzC1w8qfmbr0PuR/a3PBTZYtZPxGM7xbeivoy9
+         G9YNjVRVg4yJsXopy34a/Z+asoTvi85Nkx/JYW1NOLLki6gNXzWlCx2s/LEvj9fxk9PN
+         9CDHaSzZxoABfYdmXBXmx0RsSBF14NgcQcqoJG+k3cpgLEn6Cu64JRrAbpmcAJJN5LuS
+         KXFRzv6/2wzRuk1+9Zb2QZlD6ODHsBqUxj9LmLwH8LXAR8cBBlcIG2pbh6Qo/muEpNPd
+         7xQakQRn3J4J2q1rZhXrDyqWyqSwK9DAGliCJkw0PJAT+a+ZcNXIlT2vzwLEreuaIpCD
+         QEyg==
+X-Gm-Message-State: AOAM53115tPTABH2trjp1kPO0xUoYALUitYnyqc1a2RQAnh5HQ13pPX3
+        KF67CX2IadzkDJxcJeyj4zLBxxZyPbaonvwltOHBOVcz8sBnCtZv9NSf99T5lfnaah9qY/F/FHe
+        KT+d6tS3yU/dQzwSmiDKSE7do
+X-Received: by 2002:a17:907:7e88:b0:6db:ad88:2294 with SMTP id qb8-20020a1709077e8800b006dbad882294mr16017825ejc.371.1647777851541;
+        Sun, 20 Mar 2022 05:04:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybuaY3RTwLFhNmn8ph3qfEMlXOeFvtOmTr+FUYne4h/XgSMGx9RwM3ZmeWDHdWHYLvNIiqSA==
+X-Received: by 2002:a17:907:7e88:b0:6db:ad88:2294 with SMTP id qb8-20020a1709077e8800b006dbad882294mr16017754ejc.371.1647777851178;
+        Sun, 20 Mar 2022 05:04:11 -0700 (PDT)
+Received: from redhat.com ([2.55.132.0])
+        by smtp.gmail.com with ESMTPSA id hb6-20020a170907160600b006dff6a979fdsm856220ejc.51.2022.03.20.05.04.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Mar 2022 05:04:10 -0700 (PDT)
+Date:   Sun, 20 Mar 2022 08:04:00 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Neil Armstrong <narmstrong@baylibre.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Paul Cercueil <paul@crapouillou.net>,
-        Alessandro Zummo <a.zummo@towertech.it>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Oleksij Rempel <linux@rempel-privat.de>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Mark Brown <broonie@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        linux-clk@vger.kernel.org, kernel@pengutronix.de,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Tomislav Denis <tomislav.denis@avl.com>,
-        Anand Ashok Dumbre <anand.ashok.dumbre@xilinx.com>,
-        Michal Simek <michal.simek@xilinx.com>,
-        =?UTF-8?B?QW5kcsOp?= Gustavo Nakagomi Lopez <andregnl@usp.br>,
-        Cai Huoqing <caihuoqing@baidu.com>, linux-iio@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-mips@vger.kernel.org, linux-rtc@vger.kernel.org,
-        Keguang Zhang <keguang.zhang@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Patrice Chotard <patrice.chotard@foss.st.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-        linux-watchdog@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-pwm@vger.kernel.org, linux-i2c@vger.kernel.org,
-        linux-spi@vger.kernel.org,
-        Amireddy Mallikarjuna reddy 
-        <mallikarjunax.reddy@linux.intel.com>, dmaengine@vger.kernel.org,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Alexandru Ardelean <aardelean@deviqon.com>
-Subject: Re: [PATCH v8 02/16] clk: Provide new devm_clk helpers for prepared
- and enabled clocks
-Message-ID: <20220319182936.06d75742@jic23-huawei>
-In-Reply-To: <20220314141643.22184-3-u.kleine-koenig@pengutronix.de>
-References: <20220314141643.22184-1-u.kleine-koenig@pengutronix.de>
-        <20220314141643.22184-3-u.kleine-koenig@pengutronix.de>
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: Re: [PATCH 1/9] virtio_blk: eliminate anonymous module_init &
+ module_exit
+Message-ID: <20220320080242-mutt-send-email-mst@kernel.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+ <20220316192010.19001-2-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220316192010.19001-2-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 14 Mar 2022 15:16:29 +0100
-Uwe Kleine-K=C3=B6nig         <u.kleine-koenig@pengutronix.de> wrote:
+On Wed, Mar 16, 2022 at 12:20:02PM -0700, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
+> 
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
+> 
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
+> 
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
+> 
+> Fixes: e467cde23818 ("Block driver using virtio.")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
 
-> When a driver keeps a clock prepared (or enabled) during the whole
-> lifetime of the driver, these helpers allow to simplify the drivers.
->=20
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Alexandru Ardelean <aardelean@deviqon.com>
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 
-One trivial thing below.
+If this is done tree-wide, it's ok to do it for virtio too.
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+No real opinion on whether it's a good idea.
 
 > ---
->  drivers/clk/clk-devres.c | 31 ++++++++++++++
->  include/linux/clk.h      | 90 +++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 120 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/clk/clk-devres.c b/drivers/clk/clk-devres.c
-> index fb7761888b30..4707fe718f0b 100644
-> --- a/drivers/clk/clk-devres.c
-> +++ b/drivers/clk/clk-devres.c
-> @@ -67,12 +67,43 @@ struct clk *devm_clk_get(struct device *dev, const ch=
-ar *id)
->  }
->  EXPORT_SYMBOL(devm_clk_get);
-> =20
-> +struct clk *devm_clk_get_prepared(struct device *dev, const char *id)
-> +{
-> +	return __devm_clk_get(dev, id, clk_get, clk_prepare, clk_unprepare);
-
-Nitpick but this spacing before } in functions is rather unusual and not
-in keeping with the existing code in this file.
-
-> +
-> +}
-> +EXPORT_SYMBOL(devm_clk_get_prepared);
-> +
-> +struct clk *devm_clk_get_enabled(struct device *dev, const char *id)
-> +{
-> +	return __devm_clk_get(dev, id, clk_get,
-> +			      clk_prepare_enable, clk_disable_unprepare);
-> +
-> +}
-> +EXPORT_SYMBOL(devm_clk_get_enabled);
-> +
->  struct clk *devm_clk_get_optional(struct device *dev, const char *id)
+>  drivers/block/virtio_blk.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> --- lnx-517-rc8.orig/drivers/block/virtio_blk.c
+> +++ lnx-517-rc8/drivers/block/virtio_blk.c
+> @@ -1058,7 +1058,7 @@ static struct virtio_driver virtio_blk =
+>  #endif
+>  };
+>  
+> -static int __init init(void)
+> +static int __init virtio_blk_init(void)
 >  {
->  	return __devm_clk_get(dev, id, clk_get_optional, NULL, NULL);
+>  	int error;
+>  
+> @@ -1084,14 +1084,14 @@ out_destroy_workqueue:
+>  	return error;
 >  }
->  EXPORT_SYMBOL(devm_clk_get_optional);
-> =20
-> +struct clk *devm_clk_get_optional_prepared(struct device *dev, const cha=
-r *id)
-> +{
-> +	return __devm_clk_get(dev, id, clk_get_optional,
-> +			      clk_prepare, clk_unprepare);
-> +
-> +}
-> +EXPORT_SYMBOL(devm_clk_get_optional_prepared);
-> +
-> +struct clk *devm_clk_get_optional_enabled(struct device *dev, const char=
- *id)
-> +{
-> +	return __devm_clk_get(dev, id, clk_get_optional,
-> +			      clk_prepare_enable, clk_disable_unprepare);
-> +
-> +}
-> +EXPORT_SYMBOL(devm_clk_get_optional_enabled);
-> +
->  struct clk_bulk_devres {
->  	struct clk_bulk_data *clks;
->  	int num_clks;
-> diff --git a/include/linux/clk.h b/include/linux/clk.h
-> index 266e8de3cb51..b011dbba7109 100644
-> --- a/include/linux/clk.h
-> +++ b/include/linux/clk.h
-> @@ -449,7 +449,7 @@ int __must_check devm_clk_bulk_get_all(struct device =
-*dev,
->   * the clock producer.  (IOW, @id may be identical strings, but
->   * clk_get may return different clock producers depending on @dev.)
->   *
-> - * Drivers must assume that the clock source is not enabled.
-> + * Drivers must assume that the clock source is neither prepared nor ena=
-bled.
->   *
->   * devm_clk_get should not be called from within interrupt context.
->   *
-> @@ -458,6 +458,47 @@ int __must_check devm_clk_bulk_get_all(struct device=
- *dev,
->   */
->  struct clk *devm_clk_get(struct device *dev, const char *id);
-> =20
-> +/**
-> + * devm_clk_get_prepared - devm_clk_get() + clk_prepare()
-> + * @dev: device for clock "consumer"
-> + * @id: clock consumer ID
-> + *
-> + * Returns a struct clk corresponding to the clock producer, or
-> + * valid IS_ERR() condition containing errno.  The implementation
-> + * uses @dev and @id to determine the clock consumer, and thereby
-> + * the clock producer.  (IOW, @id may be identical strings, but
-> + * clk_get may return different clock producers depending on @dev.)
-> + *
-> + * The returned clk (if valid) is prepared. Drivers must however assume =
-that the
-> + * clock is not enabled.
-> + *
-> + * devm_clk_get_prepared should not be called from within interrupt cont=
-ext.
-> + *
-> + * The clock will automatically be unprepared and freed when the
-> + * device is unbound from the bus.
-> + */
-> +struct clk *devm_clk_get_prepared(struct device *dev, const char *id);
-> +
-> +/**
-> + * devm_clk_get_enabled - devm_clk_get() + clk_prepare_enable()
-> + * @dev: device for clock "consumer"
-> + * @id: clock consumer ID
-> + *
-> + * Returns a struct clk corresponding to the clock producer, or valid IS=
-_ERR()
-> + * condition containing errno.  The implementation uses @dev and @id to
-> + * determine the clock consumer, and thereby the clock producer.  (IOW, =
-@id may
-> + * be identical strings, but clk_get may return different clock producers
-> + * depending on @dev.)
-> + *
-> + * The returned clk (if valid) is prepared and enabled.
-> + *
-> + * devm_clk_get_prepared should not be called from within interrupt cont=
-ext.
-> + *
-> + * The clock will automatically be disabled, unprepared and freed when t=
-he
-> + * device is unbound from the bus.
-> + */
-> +struct clk *devm_clk_get_enabled(struct device *dev, const char *id);
-> +
->  /**
->   * devm_clk_get_optional - lookup and obtain a managed reference to an o=
-ptional
->   *			   clock producer.
-> @@ -469,6 +510,29 @@ struct clk *devm_clk_get(struct device *dev, const c=
-har *id);
->   */
->  struct clk *devm_clk_get_optional(struct device *dev, const char *id);
-> =20
-> +/**
-> + * devm_clk_get_optional_prepared - devm_clk_get_optional() + clk_prepar=
-e()
-> + * @dev: device for clock "consumer"
-> + * @id: clock consumer ID
-> + *
-> + * Behaves the same as devm_clk_get_prepared() except where there is no =
-clock
-> + * producer.  In this case, instead of returning -ENOENT, the function r=
-eturns
-> + * NULL.
-> + */
-> +struct clk *devm_clk_get_optional_prepared(struct device *dev, const cha=
-r *id);
-> +
-> +/**
-> + * devm_clk_get_optional_enabled - devm_clk_get_optional() +
-> + *                                 clk_prepare_enable()
-> + * @dev: device for clock "consumer"
-> + * @id: clock consumer ID
-> + *
-> + * Behaves the same as devm_clk_get_enabled() except where there is no c=
-lock
-> + * producer.  In this case, instead of returning -ENOENT, the function r=
-eturns
-> + * NULL.
-> + */
-> +struct clk *devm_clk_get_optional_enabled(struct device *dev, const char=
- *id);
-> +
->  /**
->   * devm_get_clk_from_child - lookup and obtain a managed reference to a
->   *			     clock producer from child node.
-> @@ -813,12 +877,36 @@ static inline struct clk *devm_clk_get(struct devic=
-e *dev, const char *id)
->  	return NULL;
->  }
-> =20
-> +static inline struct clk *devm_clk_get_prepared(struct device *dev,
-> +						const char *id)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline struct clk *devm_clk_get_enabled(struct device *dev,
-> +					       const char *id)
-> +{
-> +	return NULL;
-> +}
-> +
->  static inline struct clk *devm_clk_get_optional(struct device *dev,
->  						const char *id)
+>  
+> -static void __exit fini(void)
+> +static void __exit virtio_blk_fini(void)
 >  {
->  	return NULL;
+>  	unregister_virtio_driver(&virtio_blk);
+>  	unregister_blkdev(major, "virtblk");
+>  	destroy_workqueue(virtblk_wq);
 >  }
-> =20
-> +static inline struct clk *devm_clk_get_optional_prepared(struct device *=
-dev,
-> +							 const char *id)
-> +{
-> +	return NULL;
-> +}
-> +
-> +static inline struct clk *devm_clk_get_optional_enabled(struct device *d=
-ev,
-> +							const char *id)
-> +{
-> +	return NULL;
-> +}
-> +
->  static inline int __must_check devm_clk_bulk_get(struct device *dev, int=
- num_clks,
->  						 struct clk_bulk_data *clks)
->  {
+> -module_init(init);
+> -module_exit(fini);
+> +module_init(virtio_blk_init);
+> +module_exit(virtio_blk_fini);
+>  
+>  MODULE_DEVICE_TABLE(virtio, id_table);
+>  MODULE_DESCRIPTION("Virtio block driver");
 
