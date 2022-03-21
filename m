@@ -2,78 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1D9C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Mar 2022 23:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D4CC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Mar 2022 23:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232734AbiCUXZi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Mar 2022 19:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43510 "EHLO
+        id S233593AbiCUX7Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Mar 2022 19:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233015AbiCUXZU (ORCPT
+        with ESMTP id S233617AbiCUX7W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Mar 2022 19:25:20 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7373134B531;
-        Mon, 21 Mar 2022 16:19:08 -0700 (PDT)
+        Mon, 21 Mar 2022 19:59:22 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7338628D295;
+        Mon, 21 Mar 2022 16:56:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D23A614D2;
-        Mon, 21 Mar 2022 23:18:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0348DC340F0;
-        Mon, 21 Mar 2022 23:18:45 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AD7B0B81ACE;
+        Mon, 21 Mar 2022 23:53:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B99CC340E8;
+        Mon, 21 Mar 2022 23:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647904725;
-        bh=ge9/KE0MvPV2x4BOJKi7lxKFuT0TDOkEUBeJ1gTLFTI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=jESsbixbCw4x2xf/+Da8jgRr+MXdwWKADpN2Kw6DRC7G7dH0na+anH9Yr3YCjc9gy
-         mxqX/9uCa81UrhkgjL6dTYbwgP9AbVP8ZW59L2ijm2Sgc9uNLn2+PvndGhrmIs7HRB
-         jMX0W5LxTimtj0J+Sbkh47kAEbehjtsYH6+/0SlucU2qn7OqV5LT2rMGaWBzd4l/nZ
-         W/54NuBNZVgq+Y9/9JjeGsWbU28bivfvNgYk+PmNCSAoKqEzTpF0zSM9C74EnRz8Kq
-         yU1zDPnJYAoJ3/VucG07Q9D1SPJucgJDf895KjGd98AiME7xIR0Z+JAS4O8jAk7J6G
-         uX+An6v/2cdQw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E60A1E6D44B;
-        Mon, 21 Mar 2022 23:18:44 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 5.18
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yje766s7fIqYg1Tk@gondor.apana.org.au>
-References: <20200803044024.GA6429@gondor.apana.org.au>
- <20201012033249.GA25179@gondor.apana.org.au>
- <20201214055515.GA14196@gondor.apana.org.au>
- <20210215024721.GA20593@gondor.apana.org.au>
- <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au>
- <20210628110050.GA12162@gondor.apana.org.au>
- <20210830082818.GA30921@gondor.apana.org.au>
- <20211102035201.GA23331@gondor.apana.org.au>
- <Ydzlo+UmL5bbDgUZ@gondor.apana.org.au> <Yje766s7fIqYg1Tk@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Yje766s7fIqYg1Tk@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 0e03b8fd29363f2df44e2a7a176d486de550757a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 93e220a62da36f766b3188e76e234607e41488f9
-Message-Id: <164790472493.24500.15386999744557853585.pr-tracker-bot@kernel.org>
-Date:   Mon, 21 Mar 2022 23:18:44 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        s=k20201202; t=1647906838;
+        bh=cj/bg1sLNNaJqVbORGbd8V+TtcWsAd5DpPi34vxVBaI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jG6Iugnvq9+d6FpMQh4OXsHDYag7OBVdmKGbPXMugx1nLVkFXiyjGHP4SzRll0IzV
+         WZEf51AichSBMW4+Gdh9AvgLqBUX5O61NRj0ceCc8GRODHAx7Z2JTKCIt4zzNoW+Z6
+         GxpRtL2Ay9j3e1spyAd5WEHRi/b1d4+JCWba3RfAK7kICHe6dpDnt1K5hno/9cklzi
+         +nXWKcR5tToM7qwPcll7bLb2rs8LQfB/qLI1eEppJGbz4l2SUSN+RBXgKB6NBILqef
+         /Gypl4G3TQk+syuMICPME9IbehTQ5ZZjO4pagqsRxoV+eadF95vyuRMfOsC32ngFw1
+         yroKlFAIAqzvQ==
+Date:   Tue, 22 Mar 2022 01:53:09 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+        David Howells <dhowells@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>
+Subject: Re: [PATCH v1 1/1] certs: Explain the rational to call panic()
+Message-ID: <YjkP5d6e6SU8BPtO@iki.fi>
+References: <20220321174548.510516-1-mic@digikod.net>
+ <20220321174548.510516-2-mic@digikod.net>
+ <CAHC9VhR+Ss5VAUHLutTvyS8g+agZy7d0YGcu_9dV1LBx_8ifNQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhR+Ss5VAUHLutTvyS8g+agZy7d0YGcu_9dV1LBx_8ifNQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Mon, 21 Mar 2022 11:42:35 +1200:
+On Mon, Mar 21, 2022 at 02:23:54PM -0400, Paul Moore wrote:
+> On Mon, Mar 21, 2022 at 1:45 PM Mickaël Salaün <mic@digikod.net> wrote:
+> >
+> > From: Mickaël Salaün <mic@linux.microsoft.com>
+> >
+> > The blacklist_init() function calls panic() for memory allocation
+> > errors.  This change documents the reason why we don't return -ENODEV.
+> >
+> > Suggested-by: Paul Moore <paul@paul-moore.com> [1]
+> > Requested-by: Jarkko Sakkinen <jarkko@kernel.org> [1]
+> > Link: https://lore.kernel.org/r/YjeW2r6Wv55Du0bJ@iki.fi [1]
+> > Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+> > Link: https://lore.kernel.org/r/20220321174548.510516-2-mic@digikod.net
+> > ---
+> >  certs/blacklist.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> 
+> I would suggest changing the second sentence as shown below, but
+> otherwise it looks good to me.
+> 
+> Reviewed-by: Paul Moore <paul@paul-moore.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/93e220a62da36f766b3188e76e234607e41488f9
+Mickaël, I think since your patch set was not huge in the first place, I'm
+considering making it part of rc2 pull request while I normally try to
+avoid any features after rc1. It's anyway throughly tested, and generally
+has been around for a *long time*. I've even tested it myself a few times.
 
-Thank you!
+Just trying to be responsible as a maintainer and if something does not
+feel right, I don't  try to pretend that "I get it", if you know what 
+I mean. This fully clarifies "not getting it" part :-)
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks!
+
+BR, Jarkko
