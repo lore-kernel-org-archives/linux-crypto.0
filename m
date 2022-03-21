@@ -2,101 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B45BBC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Mar 2022 20:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1087C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Mar 2022 23:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353101AbiCUULn (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Mar 2022 16:11:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44406 "EHLO
+        id S232450AbiCUXWl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Mar 2022 19:22:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353102AbiCUUKU (ORCPT
+        with ESMTP id S232455AbiCUXWb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Mar 2022 16:10:20 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD8D186160
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Mar 2022 13:08:11 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id a1so20846286wrh.10
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Mar 2022 13:08:11 -0700 (PDT)
+        Mon, 21 Mar 2022 19:22:31 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E2A54682
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Mar 2022 16:15:09 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id bu29so27116910lfb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Mar 2022 16:15:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=BLjOQyn7vWMkEPL3YYfpuMi7xJgnIr5nJYm6Y0L1/14=;
-        b=jKZtZBoF+9D29LJdTrP/WOpH/cL6jYaJC9M0oJuNgOyTdPr1TJAPI1W2pBoz9Layd9
-         7uSO+zDYiRBUX0UM8LbbsPxXW91fIBcgIqvMT8eaf1xa2hWGc3CNRNq4CXuQ1Y6eu9eJ
-         6hqRRER8yr1rBhBksWX42igHEepCKJnCHaDZbl1Kp7FdNrkS4eBZohJS+YpYLOFo5z/p
-         yrr3hOdZpAuRTTFF0I7rHrh+pqKRW7GmLAGgTcNBz/DiHtFUsoM0WMfltE7owv7QMGxZ
-         jG9wL+y2FdunXMckttPckesTN2HvpfXNg9vM2yI26FsFxEqFPrWGb4NI9t1tVdn4jlPD
-         oHXQ==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aJ9Cb5knxaydut4A69DGxHwlprGSZbckXL16qciG47U=;
+        b=JJSzV91d6Mz09E35tlZODBUUR1INh/MgMi3TieAJqFtFVS46iVh9M1Q49i70AEnbaj
+         hnmR0WUYT/+Qc4/tV3cWzDoNkvKrbUlLG6REkoGBt3sE1lc0NnSvCRqRwqnkbFgm1Ozw
+         o5oyBE7O+2JdYVnmizZrwHmHk7Pj0fup2zIs0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=BLjOQyn7vWMkEPL3YYfpuMi7xJgnIr5nJYm6Y0L1/14=;
-        b=oK7qOGDy05+JRCSY7QorW6sMnkNVNOdg7Y8mhUpaAFPx+Nv1dd2nosEhykDDQcxU+7
-         G9JI2MeusPkMHUtp6R2KQJk46t0or9LGIJURgr2CdtK0Nudsna3/51sohdUsd6Bb3VuC
-         UGLlEakZDNlP9feIc6OLBHXNYL/WB0z/57zQKSPurTl45qU1slXBfUAwD++c0NJ4Lg1S
-         1HbWW0duOFe2QCPop3Kcpw+JvHM8iAjeqDQKZQl6E37EAb1+PwvJDsltszpkP2U6VzBC
-         I5unzmqMMZGcgEAPY8XnztzTkeFWrOoKDL6S7mMZt2gt+FiUUmEn5hNdgDJ7JjHijLch
-         KX+w==
-X-Gm-Message-State: AOAM532DhVU3hBWgKV1xM584/tb4Aefu1D0MdW4NcYzcrYWLRQex5oZM
-        qPG5E6H7Vc2jJBu8eZJjbFdC4Q==
-X-Google-Smtp-Source: ABdhPJw+15wozTaGAkfF7E2x/BPx9ctqPg1cM7rmgS855iWGEC3nUElEC3OQjcdUVIZxkSJwNtjFmw==
-X-Received: by 2002:a5d:59a1:0:b0:204:1777:fc08 with SMTP id p1-20020a5d59a1000000b002041777fc08mr3924749wrr.545.1647893289973;
-        Mon, 21 Mar 2022 13:08:09 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id i14-20020a0560001ace00b00203da1fa749sm24426988wry.72.2022.03.21.13.08.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Mar 2022 13:08:09 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v3 26/26] crypto: rockchip: use read_poll_timeout
-Date:   Mon, 21 Mar 2022 20:07:39 +0000
-Message-Id: <20220321200739.3572792-27-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220321200739.3572792-1-clabbe@baylibre.com>
-References: <20220321200739.3572792-1-clabbe@baylibre.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aJ9Cb5knxaydut4A69DGxHwlprGSZbckXL16qciG47U=;
+        b=KFS4SIhL7hOvTklssnmz1Y6z+0NCnJhs8nnr2Z336c0oR0g0Ww0rEQb0OT5qaVc1w5
+         rlQd/dQJvjjR42vS6IYM0rdpPjNXIbO2xd8YKO3NaGAMjsvoON263mIUkhTRcwAAiCf6
+         QXutoh8oQ2SbRdoQLSZog7x+D56HAAFvXcyo7XF32+ST2FYKK8YDyzSKfOEnhsSwHCqV
+         Vs5NLI4wuWjyb+t5ZmLfa/pOGkWGY2ec8z1AUN5Du0vU26gz0MaznOmGBouBiZavDM8Q
+         lczI6Jtv2ZqNrQuiWWOIeTVSmfU9r1PU+YGWpgsGrbafbjgoxoo5RjcL8MM38T7mb83Y
+         kTOQ==
+X-Gm-Message-State: AOAM530EHxJG3iFyrL+7l85QJMQfL7C+EHT/ThOryDKR5Fsam5oQQi5V
+        KW5OR0GmxNBnETfNck1mI+KSPsC0L53pFP9jnQs=
+X-Google-Smtp-Source: ABdhPJxxYscBn7MGIFOFB/tQ2lu6fHa5eX5RGTpOVnoYt1IvCAcUaWMXXwKAGtSZXH/x8XO+57YqvQ==
+X-Received: by 2002:a05:6512:2349:b0:448:9b45:7718 with SMTP id p9-20020a056512234900b004489b457718mr16597240lfu.347.1647904507235;
+        Mon, 21 Mar 2022 16:15:07 -0700 (PDT)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com. [209.85.167.48])
+        by smtp.gmail.com with ESMTPSA id z2-20020ac24f82000000b0044850790636sm1951920lfs.87.2022.03.21.16.15.06
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Mar 2022 16:15:06 -0700 (PDT)
+Received: by mail-lf1-f48.google.com with SMTP id a26so9036976lfg.10
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Mar 2022 16:15:06 -0700 (PDT)
+X-Received: by 2002:a19:e048:0:b0:448:2caa:7ed2 with SMTP id
+ g8-20020a19e048000000b004482caa7ed2mr16519280lfj.449.1647904506069; Mon, 21
+ Mar 2022 16:15:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200803044024.GA6429@gondor.apana.org.au> <20201012033249.GA25179@gondor.apana.org.au>
+ <20201214055515.GA14196@gondor.apana.org.au> <20210215024721.GA20593@gondor.apana.org.au>
+ <20210426123200.kgbyk6ayey4l4lrw@gondor.apana.org.au> <20210628110050.GA12162@gondor.apana.org.au>
+ <20210830082818.GA30921@gondor.apana.org.au> <20211102035201.GA23331@gondor.apana.org.au>
+ <Ydzlo+UmL5bbDgUZ@gondor.apana.org.au> <Yje766s7fIqYg1Tk@gondor.apana.org.au>
+In-Reply-To: <Yje766s7fIqYg1Tk@gondor.apana.org.au>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 21 Mar 2022 16:14:50 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wix0F2nwk8v2Hmo-x6Yr0PEji9=oMTewk6YhL+ATM2fVg@mail.gmail.com>
+Message-ID: <CAHk-=wix0F2nwk8v2Hmo-x6Yr0PEji9=oMTewk6YhL+ATM2fVg@mail.gmail.com>
+Subject: Re: [GIT PULL] Crypto Update for 5.18
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use read_poll_timeout instead of open coding it.
+On Sun, Mar 20, 2022 at 4:42 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- drivers/crypto/rockchip/rk3288_crypto_ahash.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So perhaps somewhat ironically, the crypto tree is now the first tree
+I'm merging in this merge window that doesn't have a signed tag.
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-index 1d20f58275f0..0ea47f50607e 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
-@@ -9,6 +9,7 @@
-  * Some ideas are from marvell/cesa.c and s5p-sss.c driver.
-  */
- #include <linux/device.h>
-+#include <linux/iopoll.h>
- #include <asm/unaligned.h>
- #include "rk3288_crypto.h"
- 
-@@ -314,8 +315,7 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
- 		 * efficiency, and make it response quickly when dma
- 		 * complete.
- 		 */
--	while (!readl(reg + RK_CRYPTO_HASH_STS))
--		udelay(10);
-+	read_poll_timeout(readl, v, v == 0, 10, 1000, false, reg + RK_CRYPTO_HASH_STS);
- 
- 	for (i = 0; i < crypto_ahash_digestsize(tfm) / 4; i++) {
- 		v = readl(reg + RK_CRYPTO_HASH_DOUT_0 + i * 4);
--- 
-2.34.1
+I don't require signed tags for kernel.org pulls, but I really do
+heavily prefer them, and they aren't that hard to do.
 
+I'm sure there are several other non-signed pull requests waiting in
+the queue, but still, your pull request stands out as being the first
+one - out of 27 so far - that didn't have it.
+
+Can I prod you in the direction of making signed tags a part of your
+workflow? The tag can contain the details of the pull - in which case
+git request-pull will populate the pull request with it - or it can be
+just some dummy message and you write the details separately in the
+pull request email like you do now.
+
+I know you have a pgp key, because I have one in my keyring from you
+going all the way back to 2011. And if you have lost sight of that one
+and need to create a new one, that still better going forward than not
+signing your pull requests at all..
+
+            Linus
