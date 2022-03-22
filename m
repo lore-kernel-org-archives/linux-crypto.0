@@ -2,87 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24D4C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 13:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2757C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 13:34:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbiCVNV0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 09:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38834 "EHLO
+        id S235318AbiCVNf0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 09:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235360AbiCVNVZ (ORCPT
+        with ESMTP id S234566AbiCVNfX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 09:21:25 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F716A014
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:19:58 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id c62so2130276edf.5
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=uJzve08biZhB4r1QtUm+S3/m2cJlwVKYr43Is/lArT8=;
-        b=isioKpILG85LIxzS8L9QmbzGpxJlwVCT5xcPWHLWbkBQGWRo5XDALH1PPTy8OuKuBa
-         wlp/ixRVWxUf0hzgva2gcrlpBrUsELB2vigN/BHh7wGlFQmnB06rRQB74hf6DN8Ytn4Q
-         Q2sS9PZyTFY3KfT5h6s1dM8/u/JR61e0kMJ/Iqq99Z8+SiTmvRbqCVHocMRWsG+4z6o3
-         T88Sphrs+/90nNPGvmf7RnKJXHA2KoXkry5mn6iuPzzDhv8hWqAzYEPOz5R9iY41jWpV
-         o1RxdbJXiDDTgPJc81ResXiYMYiKlyt8kth+McPO1Gw1l+Q32Tw8DKjllrv8KVNpYuPb
-         wRhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=uJzve08biZhB4r1QtUm+S3/m2cJlwVKYr43Is/lArT8=;
-        b=qgJfhN0ucEHDWbQbbzVvrqlQ0eMTM4d1V0uvnK9kZwAnwfgxW5qThYHNvYyyHZs1zp
-         uOJZDSnNMmc4/6n7Bn7kN7IlJBgSFVw+TG0NcHZ/8xMnhUaUANlJ89JXZMT2l/QnAtS6
-         a6OMVYa9cv+ceIovFW4/pwshbvD9f41wKuT9tD6f0miHTZX/s3NAl5djEerSL3EYdQye
-         TCqf537SV3D0cA6CdD6GSQ8qhJM6drNhnzwLuQhjikuwDbC0IvXtsnhxV76IEAUJ4f8p
-         u3e61pjTBzM9V0cfq+yWRR3+fCX7m7RJ6GXfHJ8CLEhwsRLbmQStEecZtKjFWHYfBT6b
-         M7WA==
-X-Gm-Message-State: AOAM530eAYKfACC+FghALpeMUj508mDfzBsiabqQHkAB8MmACRHVpbEn
-        khQMO8Ba/T5w0pKOlENK4EC5MqyT13qy8LN8hJ85EdRj
-X-Google-Smtp-Source: ABdhPJw34eppP/81iFScRAVr/l/ItTww1SYLOwcLrmlxR7o49DrgZ6FqMSznot7KFJKITmF1wkbU+9U/O2MterSqIPs=
-X-Received: by 2002:aa7:cf08:0:b0:418:e5f7:b2a1 with SMTP id
- a8-20020aa7cf08000000b00418e5f7b2a1mr27878480edy.76.1647955196602; Tue, 22
- Mar 2022 06:19:56 -0700 (PDT)
+        Tue, 22 Mar 2022 09:35:23 -0400
+X-Greylist: delayed 1226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Mar 2022 06:33:56 PDT
+Received: from gateway24.websitewelcome.com (gateway24.websitewelcome.com [192.185.51.253])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B858B6D38E
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:33:56 -0700 (PDT)
+Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
+        by gateway24.websitewelcome.com (Postfix) with ESMTP id E50CB2A48
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 08:13:28 -0500 (CDT)
+Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
+        by cmsmtp with SMTP
+        id WeKGngsSPb6UBWeKGnx9VE; Tue, 22 Mar 2022 08:13:28 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=roeck-us.net; s=default; h=In-Reply-To:Content-Type:MIME-Version:References
+        :Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
+        :Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=A+xNZ3MvECqWmVurH8kTIBYeensVUd574nB3jEFM9QA=; b=IaO90SuNkjvu0rc3bzfU3AAwxC
+        G6mgIyiJJD37N4vFEBE8h1DQul9RNySgTDmrN+sZWwfN1g7APykRCg17R5slOKP/+3QyMNgruWIYN
+        gCPgOFOQAMVQXrnjDNkLvLj1gqzywawVBrZE+2uVP3HTV4RJwNvMaJpcF5LApArDTOGh3V2WxoXyl
+        Pou0i5xbIlFQ0qLfrQ1T60GtpnsUQLWqZ1zI3mlw4H6QboxwfxvjK+Ngd0jIJhukD0jlUWUkH51pe
+        7AyFEReEZ21zdg+zIr4V/R5EGjnyHMB8jJZliJ429hvFgKqYKHIRxFx33aofSBZ8x81PQbhr2Kdq1
+        rSjlxl6g==;
+Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:57608 helo=localhost)
+        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@roeck-us.net>)
+        id 1nWeKF-0034fO-UT; Tue, 22 Mar 2022 13:13:28 +0000
+Date:   Tue, 22 Mar 2022 06:13:27 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Harsha <harsha.harsha@xilinx.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: crypto: xilinx - Turn SHA into a tristate and allow COMPILE_TEST
+Message-ID: <20220322131327.GA747088@roeck-us.net>
+References: <Yigc4cQlTJRRZsQg@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <20220111124104.2379295-1-festevam@gmail.com> <YfOL3Yxvb5srGKp4@gondor.apana.org.au>
- <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
-In-Reply-To: <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Tue, 22 Mar 2022 10:19:44 -0300
-Message-ID: <CAOMZO5AAYHRUUy872KgO9PuYwHbnOTQ80TSCx1jvmtgH+HzDGg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: caam - enable prediction resistance conditionally
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        "andrew.smirnov@gmail.com" <andrew.smirnov@gmail.com>,
-        "fredrik.yhlen@endian.se" <fredrik.yhlen@endian.se>,
-        "hs@denx.de" <hs@denx.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yigc4cQlTJRRZsQg@gondor.apana.org.au>
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - roeck-us.net
+X-BWhitelist: no
+X-Source-IP: 108.223.40.66
+X-Source-L: No
+X-Exim-ID: 1nWeKF-0034fO-UT
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net (localhost) [108.223.40.66]:57608
+X-Source-Auth: guenter@roeck-us.net
+X-Email-Count: 7
+X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia and Varun,
+On Wed, Mar 09, 2022 at 03:20:01PM +1200, Herbert Xu wrote:
+> This patch turns the new SHA driver into a tristate and also allows
+> compile testing.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-On Fri, Jan 28, 2022 at 4:44 AM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
-ote:
+This results in:
 
-> We've been in contact with Fabio and we're working on a solution.
-> Now I realize the list hasn't been Cc-ed - sorry for the confusion
-> and for not providing an explicit Nack.
->
-> Herbert, could you please revert this patch?
->
-> It's doing more harm than good, since it's making the internal CAAM RNG
-> work like a DRBG / PRNG (instead of TRNG) while the driver registers
-> to hwrng as an entropy source.
+Building s390:allmodconfig ... failed
+--------------
+Error log:
+In file included from drivers/crypto/xilinx/zynqmp-sha.c:6:
+include/linux/cacheflush.h:12:46: error: 'struct folio' declared inside parameter list will not be visible outside of this definition or declaration [-Werror]
+   12 | static inline void flush_dcache_folio(struct folio *folio)
 
-Any progress on the proper fix for this issue?
+Guenter
 
-Thanks
+> 
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 5d7508230b7d..97455a5f05c1 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -809,8 +809,8 @@ config CRYPTO_DEV_ZYNQMP_AES
+>  	  for AES algorithms.
+>  
+>  config CRYPTO_DEV_ZYNQMP_SHA3
+> -	bool "Support for Xilinx ZynqMP SHA3 hardware accelerator"
+> -	depends on ZYNQMP_FIRMWARE
+> +	tristate "Support for Xilinx ZynqMP SHA3 hardware accelerator"
+> +	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
+>  	select CRYPTO_SHA3
+>  	help
+>  	  Xilinx ZynqMP has SHA3 engine used for secure hash calculation.
