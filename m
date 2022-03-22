@@ -2,141 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E597CC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 12:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2FFC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 13:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235004AbiCVMqG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 08:46:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54710 "EHLO
+        id S234966AbiCVNDv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 09:03:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231920AbiCVMqF (ORCPT
+        with ESMTP id S235195AbiCVNDu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 08:46:05 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DF61DA56
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 05:44:37 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 1532B210F3;
-        Tue, 22 Mar 2022 12:44:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1647953076; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=66C1Tt60lTc2dTAFcxf1X3iml+8FNPPGH0Qyxe2exkM=;
-        b=m4C/gOsMBBnj5U7SD+3qeaHORCCSvGe5MKOq3rdx+ohqp1dIMEcpZeiHrgZPmq2rZZKZMW
-        lWIFdfioQq6AV2fUjcthrWLywR44oL8krxzFsA70211wfxZ9A1xtL6lDRw50BrmVL883QF
-        DTmEFNm6Xz+sTLyuA3wI6xfijHxanlc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1647953076;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=66C1Tt60lTc2dTAFcxf1X3iml+8FNPPGH0Qyxe2exkM=;
-        b=5O1rlcfNil8Ak4Qfk+aZgCzmVnyLAbw3Qbf7NveAxg+37znAA85TxmoprPREG1aViF7ve4
-        z1ZHIF5V6qp5t7Bw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0465912FC5;
-        Tue, 22 Mar 2022 12:44:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id cODWALTEOWKecAAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 22 Mar 2022 12:44:36 +0000
-Message-ID: <d7689bfa-787c-8ece-1b87-d147ad5e3ed2@suse.de>
-Date:   Tue, 22 Mar 2022 13:44:35 +0100
+        Tue, 22 Mar 2022 09:03:50 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434A885BC1
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:02:23 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id q5so6161125plg.3
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:02:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=M/XbYmdchGb4htIgyglLZmtK2Rqo0eR5QKNfFg2mxH8=;
+        b=TFPNMS9qTjP0AvWCDwmzNwq5vcwJPaA9h+ATwVKFM9eUj0XaV5kZt2be9vvjr4LGcQ
+         DF5xrzSXGINDeq14lyZrHGCW8S7YkcTNTSr4BTKMuvI/0DQN9sggYqY7QC0T3vJNee86
+         lKyKPsZvmARNTeDT5O6qAdS885M1wtzNEfZkVL5/05KB0rzbD4/1ZYF6vrwRBjZGA1J1
+         4ltnMBsV+AGjQneA8ux95gebwUKY0d4oUO7LSXYPTYXs5hro22X60OZKR1uUn1A+dRwN
+         8919m/tDL8B1cCrGkq5V2oYWIB8EIhCuGXyypwNES9wUiaSmpjCCPmdAvY5mwrkWDvgy
+         4/GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=M/XbYmdchGb4htIgyglLZmtK2Rqo0eR5QKNfFg2mxH8=;
+        b=Mj8T29QAUfzffvPNydKNHQNNyewG4YnIjZlKpXn2NaybYYj3HwLU+4LrRfEjjzLdyu
+         X2qPft967lX5PNCAJ09rbS/gsKXLGFD1HQNkELK+PrUkeb/MDEQ3yACw4WvjlKDghgyF
+         iHv+aH1xHbC7ueVATpjztj4g6mw6oaAa8dxn9LNkAVnrUx2/G8EDZe48yvqSAqwES7X1
+         BeFsDZcndjBCL/ksFV/FDlZUc2RnQ3UltLMS7nW8BLR/2Ybwx0BO0YyXlaSVQh1yYuOU
+         FVHFxk8uYBCZvtqS6ROIoPo32Hd25xfXRteBD5MJBZiPXbCKV9kz7cZQXa8Gz/b0G2LI
+         8UWQ==
+X-Gm-Message-State: AOAM532aYXy5Ink+Zn6IRtapbzeFGQjQrToiAG0aEs0+PasWFDQeHca4
+        vUVj63ldR3aiGP2AWT5Vqy6TQJDcYNC8oF9D
+X-Google-Smtp-Source: ABdhPJwFI/IRn1/8u+uFGz/5nbAX4iuEA+B9DgJePrej8zIN1Ok43G5ao3329yIy/Ob6/yjwYYmSig==
+X-Received: by 2002:a17:90a:628b:b0:1c6:a410:d73f with SMTP id d11-20020a17090a628b00b001c6a410d73fmr5051550pjj.96.1647954142569;
+        Tue, 22 Mar 2022 06:02:22 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id f14-20020a056a0022ce00b004fabe9fac23sm2618177pfj.151.2022.03.22.06.02.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Mar 2022 06:02:22 -0700 (PDT)
+Message-ID: <650655da-e719-4e48-5dc5-2e6529674f65@kernel.dk>
+Date:   Tue, 22 Mar 2022 07:02:20 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: crypto: crc64-rocksoft-generic test failed (wrong result) on test
+ vector 0
 Content-Language: en-US
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <keith.busch@wdc.com>,
-        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20211202152358.60116-1-hare@suse.de>
- <20211202152358.60116-8-hare@suse.de>
- <346e03e9-ece1-73f9-f7f4-c987055c5b9f@nvidia.com>
- <3382242d-7349-e6f9-9b3c-4a5162f630c0@suse.de>
- <4f320d3b-7ade-211c-e1ff-d4eb37fe540a@nvidia.com>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 07/12] nvme: Implement In-Band authentication
-In-Reply-To: <4f320d3b-7ade-211c-e1ff-d4eb37fe540a@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        herbert@gondor.apana.org.au, kbusch@kernel.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <YjmeVttXDd/FPwUP@Red>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YjmeVttXDd/FPwUP@Red>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/22/22 13:21, Max Gurtovoy wrote:
+On 3/22/22 4:00 AM, Corentin Labbe wrote:
+> Hello
 > 
-> On 3/22/2022 2:10 PM, Hannes Reinecke wrote:
->> On 3/22/22 12:40, Max Gurtovoy wrote:
->>> Hi Hannes,
->>>
->>> On 12/2/2021 5:23 PM, Hannes Reinecke wrote:
->>>> Implement NVMe-oF In-Band authentication according to NVMe TPAR 8006.
->>>> This patch adds two new fabric options 'dhchap_secret' to specify the
->>>> pre-shared key (in ASCII respresentation according to NVMe 2.0 section
->>>> 8.13.5.8 'Secret representation') and 'dhchap_ctrl_secret' to specify
->>>> the pre-shared controller key for bi-directional authentication of both
->>>> the host and the controller.
->>>> Re-authentication can be triggered by writing the PSK into the new
->>>> controller sysfs attribute 'dhchap_secret' or 'dhchap_ctrl_secret'.
->>>
->>> Can you please add to commit log an example of the process ?
->>>
->>>  From target configuration through the 'nvme connect' cmd.
->>>
->>>
->>
->> Please check:
->>
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Fhreinecke%2Fblktests%2Ftree%2Fauth.v3&amp;data=04%7C01%7Cmgurtovoy%40nvidia.com%7C4e6a16198c834c87e2ac08da0bfd01fc%7C43083d15727340c1b7db39efd9ccc17a%7C0%7C0%7C637835478535167965%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=OgZkPCwDUIllRWfKF0SoC6osWJy3hqAZouME3KDnIGQ%3D&amp;reserved=0 
->>
->>
->> That contains the blktest scripts I'm using to validate the 
->> implementation.
->>
-> blktest is great but for features in this magnitude I think we need to 
-> add a simple usage example in the commit log or in the cover letter.
+> Booting an arm64_defconfig with BigEndian lead to:
+> alg: shash: crc64-rocksoft-generic test failed (wrong result) on test vector 0, cfg=\"init+update+final aligned buffer\"
 > 
-> for someone that is not familiar with blktests, one should start reverse 
-> engineering 4000 LOC to use it.
+> Reproductible on the virt qemu machine.
 > 
+> Furthermore, none of crc64 files have clear MAINTAINERS entry.
 
-Right.
-Essentially it boils down to this:
+Keith, can you send in your BE fix? The commit is upstream now.
 
-nvme gen-dhchap-key > host_key.txt
-nvme gen-dhchap-key > target_key.txt
-mkdir /sys/kernel/config/nvmet/hosts/<hostnqn>
-cd /sys/kernel/config/nvmet/hosts/<hostnqn>
-cat host_key.txt > dhchap_key
-cat target_key.txt > dhchap_ctrl_key
-<link 'hostnqn' to the target subsystem>
-
-And then one the host you need to call
-
-'nvme connect ... --dhchap-key=$(cat host_key)'
-
-And things should work.
-
-But I can put a more detailed description in the commit log.
-
-Note, I'm waiting for Herbert Xu to merge his 'cryptodev' tree with 
-upstream; once that's done I'll be submitting these patches.
-
-Cheers,
-
-Hannes
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Jens Axboe
+
