@@ -2,129 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447CEC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 09:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979AAC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 09:37:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232253AbiCVJNj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 05:13:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49596 "EHLO
+        id S232619AbiCVJi5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 05:38:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbiCVJNi (ORCPT
+        with ESMTP id S232608AbiCVJix (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 05:13:38 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC41D7E59C
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 02:12:08 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id h4so6015086wrc.13
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 02:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=qjT77DYYL/GJDwodJ6Rapm1bpiNcBpPlg2Vo7gCqJB8=;
-        b=YHPUJUn3zIjNoMGTdwff2Vfop45kQtaHqwdMY6Nf8YYhoP7j4H4GyXGENtvzHBaohP
-         F2MgM6pQidOA1F9Uq+q+SVMZR6AGKPBRf8tBeqoqe6Mdq2WTxk7cNHZ6zlePagEwmM91
-         Yo3oMJuAk+OfT3Hp6pPqHN1iV5UhwJ7kJcjVRcnRF9bGo8WXBUr1dmWcuxv0rxlQ5WJx
-         PRn8cHwW9Q2h2QVnvyff5uKC7pk3mUtYBsAzefyp7x9sdbToS2G+u8m4HdvZUkEXYVxS
-         5IAnOPoa+Rog0P93TZ+oXkPfUbVVnlAqf4smHVGah/4oE00rlX/6OLWizehJas3RtOyt
-         KXtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=qjT77DYYL/GJDwodJ6Rapm1bpiNcBpPlg2Vo7gCqJB8=;
-        b=j6xjIGxeOkk1kuBnpMXbFLzrm7P/E1VNBrSL+/ZRh0ungdBqIQnRtNaDqB512GHT6O
-         vBOspwG2OdJF0k5VnGAQg0L1qXdSoGFRQddnuPuCIp1ELvJXiWNlnQxmQoUxz+wCVygq
-         8BUPJc8CLrLvwsks9mu7uBhJtIPSdR9ZTB6h/rR/TkcAQb10GgK6MNCVHsfx554eFFdX
-         X3A050QfXMNyTXruo08TTActSbIL9Alq7wiRZojJF5J6wVJrEJzCDhTVsDVLg2CPMSXZ
-         BPWjj6wzQU88mZoJApemdhC9sMRL++9SkuBJvR1T7lzBaEmNXQJTI7/7GjDgBKTy/DF2
-         14CA==
-X-Gm-Message-State: AOAM531IW+PdmXmUUeS47xGgW1IeyGnUm/vy7mz8hO/Dfdpfj0Pas/hD
-        yU/Kg1rEYO1n6QA94nHEbi767Q==
-X-Google-Smtp-Source: ABdhPJwLrFHSs/rg59Z4qNL8r8Ak6OWe1nu8EXetVqZllyP8jhyj2fCHM/JwIgFdiBq/bbrEdWHwGA==
-X-Received: by 2002:a05:6000:2ca:b0:204:1e6a:d2a9 with SMTP id o10-20020a05600002ca00b002041e6ad2a9mr3768869wry.182.1647940327256;
-        Tue, 22 Mar 2022 02:12:07 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id u7-20020a5d6da7000000b00203d9d1875bsm17176008wrs.73.2022.03.22.02.12.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 02:12:06 -0700 (PDT)
-Date:   Tue, 22 Mar 2022 10:12:04 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Rob Herring <robh@kernel.org>
-Cc:     sboyd@kernel.org, devicetree@vger.kernel.org,
-        linux-rockchip@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        krzk+dt@kernel.org, mturquette@baylibre.com,
-        linux-crypto@vger.kernel.org, heiko@sntech.de, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v3 21/26] dt-bindings: crypto: convert rockchip-crypto to
- yaml
-Message-ID: <YjmS5DE95xTuJMi7@Red>
-References: <20220321200739.3572792-1-clabbe@baylibre.com>
- <20220321200739.3572792-22-clabbe@baylibre.com>
- <1647913851.207213.941032.nullmailer@robh.at.kernel.org>
+        Tue, 22 Mar 2022 05:38:53 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9FE5F88
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 02:37:26 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1nWawt-0006Jj-Mp; Tue, 22 Mar 2022 10:37:07 +0100
+Message-ID: <828a8d00-ab9a-a7eb-4ad0-f95a63c7fb39@pengutronix.de>
+Date:   Tue, 22 Mar 2022 10:37:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1647913851.207213.941032.nullmailer@robh.at.kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [EXT] [PATCH v6 3/4] crypto: caam - add in-kernel interface for
+ blob generator
+Content-Language: en-US
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Sumit Garg <sumit.garg@linaro.org>,
+        David Gstir <david@sigma-star.at>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Richard Weinberger <richard@nod.at>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        James Morris <jmorris@namei.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "tharvey@gateworks.com" <tharvey@gateworks.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+References: <20220316164335.1720255-1-a.fatoum@pengutronix.de>
+ <20220316164335.1720255-4-a.fatoum@pengutronix.de>
+ <DU2PR04MB86302DB35042F4DAE7C27FA695179@DU2PR04MB8630.eurprd04.prod.outlook.com>
+ <23cd140f-1046-7059-c9bd-ca4aac1d5183@pengutronix.de>
+In-Reply-To: <23cd140f-1046-7059-c9bd-ca4aac1d5183@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Mon, Mar 21, 2022 at 08:50:51PM -0500, Rob Herring a écrit :
-> On Mon, 21 Mar 2022 20:07:34 +0000, Corentin Labbe wrote:
-> > Convert rockchip-crypto to yaml
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  .../crypto/rockchip,rk3288-crypto.yaml        | 84 +++++++++++++++++++
-> >  .../bindings/crypto/rockchip-crypto.txt       | 28 -------
-> >  2 files changed, 84 insertions(+), 28 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> > 
+Hello Pankaj,
+
+On 22.03.22 08:32, Ahmad Fatoum wrote:
+> Hello Pankaj,
 > 
-> Running 'make dtbs_check' with the schema in this patch gives the
-> following warnings. Consider if they are expected or the schema is
-> incorrect. These may not be new warnings.
+> On 22.03.22 07:25, Pankaj Gupta wrote:
+>> Hi Ahmad,
+>>
+>> Suggested to define macro with more details.
+>> Please find comments in-line.
+>>
 > 
-> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
-> This will change in the future.
+>> len = 4 + (4 + ALIGN(keymod_len, 4)) + 2*(4 + 4 + 
+>>>>>> + CAAM_PTR_SZ_MAX) + 4;
+>>
+>>> +/* header + (key mod immediate) + 2x seq_intlen pointers + op */
+>>> +#define CAAM_BLOB_DESC_BYTES_MAX \
+>>> +       (CAAM_CMD_SZ + \
+>>> +        CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH + \
+>>> +        2 * (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \
+>>> +        CAAM_CMD_SZ)
+>>> +
+>>
+>> Suggested to replace the above macro like below:
+>>
+>> +#define CAAM_BLOB_DESC_BYTES_MAX \			
+>> +       (CAAM_CMD_SZ + \					/* Command to initialize & stating length of  descriptor */
+>> +        CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH + \	/* Command to append the key-modifier + followed by the key-modifier data */
+>> +        (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \		/* Command to include input plain key and pointer to the input key */
+>> +        (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \		/* Command to include output-key blob and pointer to the output-key blob */
+>> +        CAAM_CMD_SZ)						/* Command describing the Operation to perform */
 > 
-> Full log is available here: https://patchwork.ozlabs.org/patch/1607887
 > 
+> Sure thing, will do for v7. Otherwise, if all looks good to you,
+> can I have your Reviewed-by?
+This doesn't compile as-is and it leads to quite long lines.
+The description isn't accurate also, because what's plain and what's blob
+changes depending on whether we encapsulate or decapsulate.
+
+Here's my revised macro version:
+
+#define CAAM_BLOB_DESC_BYTES_MAX                                        \
+        /* Command to initialize & stating length of descriptor */      \
+        (CAAM_CMD_SZ +                                                  \
+        /* Command to append the key-modifier + key-modifier data */    \
+         CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH +                        \
+        /* Command to include input key + pointer to the input key */   \
+         CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +                                \
+        /* Command to include output key + pointer to the output key */ \
+         CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +                                \
+        /* Command describing the Operation to perform */               \
+         CAAM_CMD_SZ)
+
+Alternatively, I can change it back into a function:
+
+static inline u32 *caam_blob_desc_alloc(void)
+{
+        size_t size = 0;
+
+        /* Command to initialize & stating length of descriptor */
+        size += CAAM_CMD_SZ;
+        /* Command to append the key-modifier + key-modifier data */
+        size += CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH;
+        /* Command to include input plain key + pointer to the input key */
+        size += CAAM_CMD_SZ + CAAM_PTR_SZ_MAX;
+        /* Command to include output-key blob + pointer to the output key */
+        size += CAAM_CMD_SZ + CAAM_PTR_SZ_MAX;
+        /* Command describing the Operation to perform */
+        size += CAAM_CMD_SZ;
+
+        return kzalloc(size, GFP_KERNEL | GFP_DMA);
+}
+
+Let me know what works better for you.
+
+Cheers,
+Ahmad
+
 > 
-> cypto-controller@ff8a0000: 'reset-names' does not match any of the regexes: 'pinctrl-[0-9]+'
-> 	arch/arm/boot/dts/rk3288-evb-act8846.dt.yaml
-> 	arch/arm/boot/dts/rk3288-evb-rk808.dt.yaml
-> 	arch/arm/boot/dts/rk3288-firefly-beta.dt.yaml
-> 	arch/arm/boot/dts/rk3288-firefly.dt.yaml
-> 	arch/arm/boot/dts/rk3288-firefly-reload.dt.yaml
-> 	arch/arm/boot/dts/rk3288-miqi.dt.yaml
-> 	arch/arm/boot/dts/rk3288-phycore-rdk.dt.yaml
-> 	arch/arm/boot/dts/rk3288-popmetal.dt.yaml
-> 	arch/arm/boot/dts/rk3288-r89.dt.yaml
-> 	arch/arm/boot/dts/rk3288-rock2-square.dt.yaml
-> 	arch/arm/boot/dts/rk3288-rock-pi-n8.dt.yaml
-> 	arch/arm/boot/dts/rk3288-tinker.dt.yaml
-> 	arch/arm/boot/dts/rk3288-tinker-s.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-brain.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-fievel.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-jaq.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-jerry.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-mickey.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-mighty.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-minnie.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-pinky.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-speedy.dt.yaml
-> 	arch/arm/boot/dts/rk3288-veyron-tiger.dt.yaml
-> 	arch/arm/boot/dts/rk3288-vyasa.dt.yaml
+> Thanks,
+> Ahmad
 > 
 
-Hello
 
-This should not happen since patch 20 remove it.
-
-Regards
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
