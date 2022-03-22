@@ -2,42 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCBAC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB95C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240335AbiCVS1B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 14:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
+        id S240420AbiCVSbI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 14:31:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240474AbiCVS0t (ORCPT
+        with ESMTP id S240413AbiCVSbI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 14:26:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6082291AE6;
-        Tue, 22 Mar 2022 11:24:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DBCCE615C1;
-        Tue, 22 Mar 2022 18:24:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A312DC340EC;
-        Tue, 22 Mar 2022 18:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647973468;
-        bh=FvpGfCbFl7jiIv+5qDBixSNKRQDQ0tuqYtKpgJTJImM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tQuDXUlhqs9CKsHkSjY/ScbmM/fz5A8eD7iftU4YRevtwvus6YLjyHciExv9uEdvK
-         ODgx6yqbrUVHYitdapwSw4VSk3x+3dDFFmpv5S3UydMRalWps10DNbqG6qzDgFeSri
-         tCuYrOWRikPlVAOw3zibpylqKvA34k+giMV9sDN+3SZ18VosQbFmMMNYqyS7RzYk7W
-         San13jBR7ieHdupZcUbtNZo0+rG5hNfra34zL1x9muYlzHDpqu0rkEVeg2jxCsbBLR
-         vi2JhVOE/Fgj8jBj4RQeaxhNngtN4bUtwQOvWzlVEwWN09QoJcBGUj208CehiBpojp
-         K3AoZ6dmCtHdw==
-Date:   Tue, 22 Mar 2022 18:24:19 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Tue, 22 Mar 2022 14:31:08 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3CC8BE17
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 11:29:40 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id h7so13792671lfl.2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 11:29:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s7fGS2THKosBu353nmhFTYnuK74oZhJix6ssyL7knBQ=;
+        b=Q/ZAdDUNaeSeKURz7X4B2cBhM6bNXJWO2xu3e29wki3/WuCjnbZ82m1VywcC7gHSKD
+         H9PkeROEneN6EmxZABVo727EtN9zLqdiAke3RVkes/bdmZ76eQ4mDBg23CtRHP7GBYTG
+         20z98gmaXsaOS7HD7PH1Wzt9H+PEEaXY+7i5w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s7fGS2THKosBu353nmhFTYnuK74oZhJix6ssyL7knBQ=;
+        b=j0/f9TV5QjGs4E2RGTxzOCdzhz/hfIrT/jdCVTXqs+UYAeQevln2/RNbKUVgyQleZR
+         JYYwi9e3dpQwfR8BXegEbJTNmdM4yG5Odc6+Oah8Yqd62nEjq+EoGvB0OjI/il5t3QIU
+         yuUMu0cKcwFvtR91e7uhVE/vUlh5rgIpi28eAwTeyxfyTI7IFpZlN4ReDK97ouu8h/81
+         zJLqK/EVtsUk30dhzXsEUnUuu65f27/QS5fuwPw9DV5xXQHKbvGuqYCymCCv/qPDv7x3
+         RsHRBjNrOGTlLTWmyoXPiAz4R2RbvrD9fgLdMMOb/Tvks5vpaiXbKaPOKkoBVjIK7HY0
+         Ze7Q==
+X-Gm-Message-State: AOAM532ETUS8hmC40HsNPtdJAPuF+IQnwGYumHKpU4Kp1U0nMhuVR1yH
+        /q2hz41q2erQPtpvvo1PndvYDLkSI6ZHs95UhOw=
+X-Google-Smtp-Source: ABdhPJxfXTt4N/RbPutrd/C5QjDgp+Tgt8LFjIHltGFGUkbyYxHodJZaqcdQjYcvVQKPBF6o2gG4VA==
+X-Received: by 2002:ac2:57db:0:b0:44a:23ce:b7f5 with SMTP id k27-20020ac257db000000b0044a23ceb7f5mr9988990lfo.235.1647973778660;
+        Tue, 22 Mar 2022 11:29:38 -0700 (PDT)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id b3-20020a056512304300b004488e49f2fasm2271210lfb.129.2022.03.22.11.29.38
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Mar 2022 11:29:38 -0700 (PDT)
+Received: by mail-lj1-f179.google.com with SMTP id q14so11861955ljc.12
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 11:29:38 -0700 (PDT)
+X-Received: by 2002:a2e:9904:0:b0:247:ec95:fdee with SMTP id
+ v4-20020a2e9904000000b00247ec95fdeemr20248728lji.291.1647973777786; Tue, 22
+ Mar 2022 11:29:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
+ <YjoC5kQMqyC/3L5Y@zx2c4.com> <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
+ <YjoTJFRook+rGyDI@zx2c4.com>
+In-Reply-To: <YjoTJFRook+rGyDI@zx2c4.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 22 Mar 2022 11:29:21 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wiq3bKDdt7noWOaMnDL-yYfFHb1CEsNkk8huq4O7ByetA@mail.gmail.com>
+Message-ID: <CAHk-=wiq3bKDdt7noWOaMnDL-yYfFHb1CEsNkk8huq4O7ByetA@mail.gmail.com>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Guenter Roeck <linux@roeck-us.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
         Nick Hu <nickhu@andestech.com>,
         Max Filippov <jcmvbkbc@gmail.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -57,70 +86,39 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Kees Cook <keescook@chromium.org>,
         Lennart Poettering <mzxreary@0pointer.de>,
         Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <YjoUU+8zrzB02pW7@sirena.org.uk>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="9GphWWnfqSfQwrGD"
-Content-Disposition: inline
-In-Reply-To: <20220322155820.GA1745955@roeck-us.net>
-X-Cookie: I exist, therefore I am paid.
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Mar 22, 2022 at 11:19 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> The first point is why we had to revert this patch. But the second one
+> is actually a bit dangerous: you might write in a perfectly good seed to
+> /dev/urandom, but what you read out for the subsequent seed may be
+> complete deterministic crap. This is because the call to write_pool()
+> goes right into the input pool and doesn't touch any of the "fast init"
+> stuff, where we immediately mutate the crng key during early boot.
 
---9GphWWnfqSfQwrGD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Christ, how I hate the crazy "no entropy means that we can't use it".
 
-On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
+It's a disease, I tell you.
 
-> This patch (or a later version of it) made it into mainline and causes a
-> large number of qemu boot test failures for various architectures (arm,
-> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
-> denominator is that boot hangs at "Saving random seed:". A sample bisect
-> log is attached. Reverting this patch fixes the problem.
+And it seems to be the direct cause of this misfeature.
 
-Just as a datapoint for debugging at least qemu/arm is getting coverage
-in CI systems (KernelCI is covering a bunch of different emulated
-machines and LKFT has at least one configuration as well, clang's tests
-have some wider architecture coverage as well I think) and they don't
-seem to be seeing any problems - there's some other variable in there.
+By all means the code can say "I can't credit this as entropy", but
+the fact that it then doesn't even mix it into the fast pool is just
+wrong, wrong, wrong.
 
-For example current basic boot tests for KernelCI are at:
+I think *that* is what we should fix. The fact is, urandom has
+long-standing semantics as "don't block", and that it shouldn't care
+about the (often completely insane) entropy crediting rules.
 
-   https://linux.kernelci.org/test/job/mainline/branch/master/kernel/v5.17-=
-1442-gb47d5a4f6b8d/plan/baseline/
+But that "don't care about entropy rules" should then also mean "oh,
+we'll mix things in even if we don't credit entropy".
 
-for mainline and -next has:
+I hope that's the easy fix you are thinking about.
 
-   https://linux.kernelci.org/test/job/next/branch/master/kernel/next-20220=
-322/plan/baseline/
-
-These are with a buildroot based rootfs that has a "Saving random seed: "=
-=20
-step in the boot process FWIW.
-
---9GphWWnfqSfQwrGD
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmI6FFIACgkQJNaLcl1U
-h9BikAf9GyEwspA1FgiJqGxDrpcFJatNlthPVfssfjxi3+PM/Sr3aGVYuI1cucrY
-rOXZc5iGh0WzI6+6SJa4LHN9Az3zbhAbXim3xfsdRA6H43LLTo2Nnm5X7WXiimIs
-+DoFKihIN+SIeYLbYORzZpmCnZ23wcVviG2W3WdzUCKj7LzOQYcPKzAoBfqvXM0H
-DdzlPyQMQMo1RwxuMv7gokqg/ZXNKt3bTJ8ptBTYY+uOwYKAifVdzsJc8GF+FfE7
-1vZPgBdPNegM/QLA2E5p5OlfmymsdJfN0+M6pjVINH9CyIKvAPpoFkXacv8EV/2i
-QuDiWltRqivsK2Px9ISnKQzA9wB5tw==
-=nsEK
------END PGP SIGNATURE-----
-
---9GphWWnfqSfQwrGD--
+              Linus
