@@ -2,135 +2,155 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 364C0C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 21:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 475A6C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 22:06:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237131AbiCVVzz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 17:55:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56092 "EHLO
+        id S237443AbiCVWIO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 18:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237043AbiCVVzy (ORCPT
+        with ESMTP id S237435AbiCVWIN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 17:55:54 -0400
-Received: from gateway24.websitewelcome.com (gateway24.websitewelcome.com [192.185.51.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF28F6EB1E
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 14:54:25 -0700 (PDT)
-Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
-        by gateway24.websitewelcome.com (Postfix) with ESMTP id 58E755F5C
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 16:54:25 -0500 (CDT)
-Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
-        by cmsmtp with SMTP
-        id WmSPnCQcWHnotWmSPnFnBk; Tue, 22 Mar 2022 16:54:25 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=roeck-us.net; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:Subject:From:References:Cc:To:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=85qDSXjuy3bqX48/V7qNAooeuLGvtvt332ffL0LuTg8=; b=WSLUVe52oGs/Ddtq6qQsCamGOs
-        BMT1coTNJUYWPu167rm2U2dlsI6QLQehPvM9u4V/1wCnCJHSoLHHgj8NYbHP3oZO4gXj8xVL9c9zS
-        vvD/zl0LNnzW/1HzjfgD25wzBtawy5bmlHT346hYaIsu+zPzLHQXnxZv9/GHee71iQnYGVrf6Llxf
-        79yWtF5uQ6iini3C4yMLmO/gy5ruQL7shgzTfehlB4C2yLa66ka7nkeMfMoLQTE1KTqnOzbLFcSv+
-        hAQGgxVECzthuOQLPiZ6TDCWR+k8GavdUHT0rUh8pP9ABeyGMoRWqb1PLayQ3iMyvBINUosOVKeof
-        rywwIZ/A==;
-Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:54406)
-        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@roeck-us.net>)
-        id 1nWmSO-0015dB-47; Tue, 22 Mar 2022 21:54:24 +0000
-Message-ID: <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
-Date:   Tue, 22 Mar 2022 14:54:20 -0700
+        Tue, 22 Mar 2022 18:08:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED62E008;
+        Tue, 22 Mar 2022 15:06:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3EDACB81DAD;
+        Tue, 22 Mar 2022 22:06:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05999C340FA;
+        Tue, 22 Mar 2022 22:06:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647986803;
+        bh=mkg1qzlpDfb8rzrMfdwYz5AKWcOTZhQ8mO9w318eT9o=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=d9G7L5+lPZpH53b0ey+oGWv+2tGAcP8cEl8Bx9iJ/0hS76Fy8K9QlhEXBDs4Jd9+u
+         K0dx5LWcLPuYf+xdkXusWhconJoJklFhZ5SIjr+MXRCi9Hxv3UFgNiQx4yNT234fR3
+         myjw2PESLEd9Z46wykuVqdAJKbBWjqJPL9x8APiX+w8xKvys/NXjJPdYM2snVNE594
+         U/r3n4XRX1yOZwg+gXcQ7rGCpSDjel6lEsFtmwwZkG+eH+CdeyzAtIL3Lak0ZyJux3
+         plws/doNMcbNEVbCRLSk/oAI8mOW4n/OI0Rfp9WrJIVT+4itmgL16ayaI3r8OEonip
+         Ho/2BPtfXjaEQ==
+Received: by mail-yb1-f176.google.com with SMTP id h126so36251079ybc.1;
+        Tue, 22 Mar 2022 15:06:42 -0700 (PDT)
+X-Gm-Message-State: AOAM533xREK2yDb5G8LFWa7P909texqlw/5yyGqCeo7UcbB25N8wwfuJ
+        zX5oxXmtYoKDGaDetchpCiAbY5TLStNXTHzuCbM=
+X-Google-Smtp-Source: ABdhPJxLy+5zWhBsOwtnVQro4RBvWFDVe4aHTyAblqqEFQKy5Iye2g0ASHutFG1ARpOeAdfs4qi4PZ92rjS6vv4fdCc=
+X-Received: by 2002:a25:dd03:0:b0:633:3cd1:8f1d with SMTP id
+ u3-20020a25dd03000000b006333cd18f1dmr28477586ybg.617.1647986801927; Tue, 22
+ Mar 2022 15:06:41 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Mark Brown <broonie@kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net> <YjoUU+8zrzB02pW7@sirena.org.uk>
-From:   Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-In-Reply-To: <YjoUU+8zrzB02pW7@sirena.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - roeck-us.net
-X-BWhitelist: no
-X-Source-IP: 108.223.40.66
-X-Source-L: No
-X-Exim-ID: 1nWmSO-0015dB-47
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net [108.223.40.66]:54406
-X-Source-Auth: linux@roeck-us.net
-X-Email-Count: 47
-X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
-X-Local-Domain: yes
+References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
+ <20220228183355.9090-1-Jason@zx2c4.com> <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
+ <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
+ <Yh0+LA8B1jw8tnl9@smile.fi.intel.com> <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
+ <MN0PR21MB3098981B77F513976A62CA57D7019@MN0PR21MB3098.namprd21.prod.outlook.com>
+ <CAMj1kXFZZoOeXnjxdU+gOJTN=Szn=eiXgRhSS9_nnHgwADNHjA@mail.gmail.com>
+ <MN0PR21MB3098EC13B4E8488E692DB28AD7019@MN0PR21MB3098.namprd21.prod.outlook.com>
+ <CAMj1kXFe-B=n1zp6M0yBuqJmmfOXTFbkzj29iK+QpPGK=LxRmA@mail.gmail.com> <PH0PR21MB30253A8BA8B189686B8E65EAD7179@PH0PR21MB3025.namprd21.prod.outlook.com>
+In-Reply-To: <PH0PR21MB30253A8BA8B189686B8E65EAD7179@PH0PR21MB3025.namprd21.prod.outlook.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 22 Mar 2022 23:06:30 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEExWbD9imqNUr1RYRzJmbQX5i3CdG7MPseQh8Q=N1y9g@mail.gmail.com>
+Message-ID: <CAMj1kXEExWbD9imqNUr1RYRzJmbQX5i3CdG7MPseQh8Q=N1y9g@mail.gmail.com>
+Subject: Re: [PATCH 2/3 v6] ACPI: allow longer device IDs
+To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+Cc:     jason <jason@zx2c4.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Len Brown <lenb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/22/22 11:24, Mark Brown wrote:
-> On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
-> 
->> This patch (or a later version of it) made it into mainline and causes a
->> large number of qemu boot test failures for various architectures (arm,
->> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
->> denominator is that boot hangs at "Saving random seed:". A sample bisect
->> log is attached. Reverting this patch fixes the problem.
-> 
-> Just as a datapoint for debugging at least qemu/arm is getting coverage
-> in CI systems (KernelCI is covering a bunch of different emulated
-> machines and LKFT has at least one configuration as well, clang's tests
-> have some wider architecture coverage as well I think) and they don't
-> seem to be seeing any problems - there's some other variable in there.
-> 
-> For example current basic boot tests for KernelCI are at:
-> 
->     https://linux.kernelci.org/test/job/mainline/branch/master/kernel/v5.17-1442-gb47d5a4f6b8d/plan/baseline/
-> 
-> for mainline and -next has:
-> 
->     https://linux.kernelci.org/test/job/next/branch/master/kernel/next-20220322/plan/baseline/
-> 
-> These are with a buildroot based rootfs that has a "Saving random seed: "
-> step in the boot process FWIW.
+On Tue, 22 Mar 2022 at 20:59, Michael Kelley (LINUX)
+<mikelley@microsoft.com> wrote:
+>
+> From: Ard Biesheuvel <ardb@kernel.org> Sent: Monday, February 28, 2022 2:47 PM
+> >
+> > On Mon, 28 Feb 2022 at 23:38, Michael Kelley (LINUX)
+> > <mikelley@microsoft.com> wrote:
+> > >
+> > > From: Ard Biesheuvel <ardb@kernel.org> Sent: Monday, February 28, 2022 2:22 PM
+> > > >
+> > > > On Mon, 28 Feb 2022 at 23:14, Michael Kelley (LINUX)
+> > > > <mikelley@microsoft.com> wrote:
+> > > > >
+> > > > > From: Jason A. Donenfeld <Jason@zx2c4.com> Sent: Monday, February 28, 2022
+> > > > 1:55 PM
+> > > > > >
+> > > > > > Hi Andy,
+> > > > > >
+> > > > > > On Mon, Feb 28, 2022 at 10:28 PM Andy Shevchenko
+> > > > > > <andy.shevchenko@gmail.com> wrote:
+> > > > > > > My point is that this is clear abuse of the spec and:
+> > > > > > > 1) we have to enable the broken, because it is already in the wild with
+> > > > > > >    the comment that this is an issue
+> > > > > > >
+> > > > > > > AND
+> > > > > > >
+> > > > > > > 2) issue an ECR / work with MS to make sure they understand the problem.
+> > > > > > >
+> > > > > > > This can be done in parallel. What I meant as a prerequisite is to start doing
+> > > > > > > 2) while we have 1) on table.
+> > > > > >
+> > > > > > Oh, okay, that makes sense. If you want to get (2) going, by all means
+> > > > > > go for it. I have no idea how to do this myself; Ard said something
+> > > > > > about joining the UEFI forum as an individual something or another but
+> > > > > > I don't think I'm the man for the job there. Is this something that
+> > > > > > Intel can do with their existing membership (is that the right term?)
+> > > > > > at the UEFI forum? Or maybe a Microsoft engineer on the list?
+> > > > >
+> > > > > My team at Microsoft, which works on Linux, filed a bug on this
+> > > > > issue against the Hyper-V team about a year ago, probably when the issue
+> > > > > was raised during the previous attempt to implement the functionality
+> > > > > in Linux.  I've talked with the Hyper-V dev manager, and they acknowledge
+> > > > > that the ACPI entry Hyper-V provides to guest VMs violates the spec.  But
+> > > > > changing to an identifier that meets the spec is problematic because
+> > > > > of backwards compatibility with Windows guests on Hyper-V that
+> > > > > consume the current identifier.  There's no practical way to have Hyper-V
+> > > > > provide a conformant identifier AND fix all the Windows guests out in
+> > > > > the wild to consume the new identifier.   As a result, at this point Hyper-V
+> > > > > is not planning to change anything.
+> > > > >
+> > > > > It's a lousy state-of-affairs, but as mentioned previously in this thread,
+> > > > > it seems to be one that we will have to live with.
+> > > > >
+> > > >
+> > > > Thanks for chiming in.
+> > > >
+> > > > Why not do something like
+> > > >
+> > > > Name (_CID, Package (2) { "VM_GEN_COUNTER", "VMGENCTR" } )
+> > > >
+> > > > ?
+> > > >
+> > > > That way, older clients can match on the existing _CID and new clients
+> > > > can match on the spec compliant one.
+> > >
+> > > I'll run this by the Hyper-V guys.  I don't have the ACPI expertise to disagree
+> > > with them when they say they can't change it. :-(
+> > >
+> >
+> > Yes, please, even if it makes no difference for this particular patch.
+>
+> The Hyper-V guys pass along their thanks for your suggestion.  They have
+> created an internal build with the change and verified that it preserves
+> compatibility with Windows guests.  I've tested with Linux guests and
+> Jason's new driver (modified to look for "VMGENCTR"), and it all looks good.
+> It will take a little while to wend its way through the Windows/Hyper-V
+> release system, but they are planning to take the change.
+>
 
-I use buildroot 2021.02.3. I have not changed the buildroot code, and it
-still seems to be the same in 2022.02. I don't see the problem with all
-boot tests, only with the architectures mentioned above, and not with all
-qemu machines on the affected platforms. For arm, mostly older machines
-are affected (versatile, realview, pxa configurations, collie, integratorcp,
-sx1, mps2-an385, vexpress-a9, cubieboard). I didn't check, but maybe
-kernelci doesn't test those machines ?
+Thanks for reporting back.
 
-Guenter
+Will the spec be updated accordingly?
