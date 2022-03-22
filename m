@@ -2,128 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C196C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C45D0C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:19:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240167AbiCVSHH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 14:07:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44264 "EHLO
+        id S234340AbiCVSU6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 14:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240162AbiCVSHG (ORCPT
+        with ESMTP id S240234AbiCVSU4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 14:07:06 -0400
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B234C430;
-        Tue, 22 Mar 2022 11:05:38 -0700 (PDT)
-Received: by mail-ej1-f42.google.com with SMTP id p15so37983556ejc.7;
-        Tue, 22 Mar 2022 11:05:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xBJ03RbkQ2mzOlnG3ngY0wg3ZtIL080pq1pFXF62OoA=;
-        b=XF+awp6VFKRbPpLTaRct/HixJf7pIEmRCkDYsRG+1m/YYzBffmjT4McMI4TGdK/aCm
-         PUaPWmjWsrSaOk4Q5lafFqVoKEFva+zXgrdLT5vHIc+wkB9GWiFj6zlSbFx9IHJrD/jQ
-         tU8VEQVpQxv29zE8gxQ4pI2Hr3LLOaqiRDeTnopRzmcCtewmMyY6rFF2dzalvNTpF1Xr
-         POBTsi3nXhWBGNM66apD2frOY/Fkk8/CmgJAP/dmMNKgrtX+mFTToUbvtdy/vl5JZruv
-         KHHVtw1m3y1AaWLsPCNHp8+RbimaM98T8BcE4/A2uT7mSFP0cakxhZSGDxyMIGHYblp7
-         yGxA==
-X-Gm-Message-State: AOAM53371HuhPUxPUKXCkrx2Lu2cKMEWMraq1m9ewkk6ul3iE5zlsc/0
-        05j/S/4NGZLG1Zd3H1cYhB8=
-X-Google-Smtp-Source: ABdhPJw95gsYqtTGMcuFCiiZW9xd9E4ovb6BYDBpZBwyDT/tkLLn/dlfwhpTxOwXJ2rYmpNaZ30hrA==
-X-Received: by 2002:a17:906:36ce:b0:6d6:e540:ed65 with SMTP id b14-20020a17090636ce00b006d6e540ed65mr27061623ejc.330.1647972336954;
-        Tue, 22 Mar 2022 11:05:36 -0700 (PDT)
-Received: from [192.168.0.17] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.googlemail.com with ESMTPSA id z23-20020a170906435700b006b0e62bee84sm8599506ejm.115.2022.03.22.11.05.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 11:05:36 -0700 (PDT)
-Message-ID: <eb1b1702-5470-3e63-b0c6-70624c5c120b@kernel.org>
-Date:   Tue, 22 Mar 2022 19:05:35 +0100
+        Tue, 22 Mar 2022 14:20:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF786FF6B;
+        Tue, 22 Mar 2022 11:19:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BAE84B81D57;
+        Tue, 22 Mar 2022 18:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB13C340EC;
+        Tue, 22 Mar 2022 18:19:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="f7++ytaT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1647973161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kC3rlTX6IZ1qsGZ7LbDOlnDblc/s2ccWEzBAw4VZMDc=;
+        b=f7++ytaT+H4u8qIP3z8QM4EFX6FAMoDH590KSUK64ZOpOrVJ5PuZLQuBMwkGrSFTEN1k/a
+        d05Aa9C/shaEo0E+EIQY7x2vghRnB6o4FvQbDIhwvvXfNkxlVtbdf2zIVQKm0FLTxA2H1K
+        /o8yXOT4AC4cjLQqpX6LcrKPdfygCxQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 262f21e8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 22 Mar 2022 18:19:20 +0000 (UTC)
+Date:   Tue, 22 Mar 2022 12:19:16 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+Message-ID: <YjoTJFRook+rGyDI@zx2c4.com>
+References: <20220217162848.303601-1-Jason@zx2c4.com>
+ <20220322155820.GA1745955@roeck-us.net>
+ <YjoC5kQMqyC/3L5Y@zx2c4.com>
+ <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v3 21/26] dt-bindings: crypto: convert rockchip-crypto to
- yaml
-Content-Language: en-US
-To:     LABBE Corentin <clabbe@baylibre.com>, Rob Herring <robh@kernel.org>
-Cc:     sboyd@kernel.org, devicetree@vger.kernel.org,
-        linux-rockchip@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        krzk+dt@kernel.org, mturquette@baylibre.com,
-        linux-crypto@vger.kernel.org, heiko@sntech.de, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au, linux-clk@vger.kernel.org
-References: <20220321200739.3572792-1-clabbe@baylibre.com>
- <20220321200739.3572792-22-clabbe@baylibre.com>
- <1647913851.207213.941032.nullmailer@robh.at.kernel.org>
- <YjmS5DE95xTuJMi7@Red>
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-In-Reply-To: <YjmS5DE95xTuJMi7@Red>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 22/03/2022 10:12, LABBE Corentin wrote:
-> Le Mon, Mar 21, 2022 at 08:50:51PM -0500, Rob Herring a écrit :
->> On Mon, 21 Mar 2022 20:07:34 +0000, Corentin Labbe wrote:
->>> Convert rockchip-crypto to yaml
->>>
->>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
->>> ---
->>>  .../crypto/rockchip,rk3288-crypto.yaml        | 84 +++++++++++++++++++
->>>  .../bindings/crypto/rockchip-crypto.txt       | 28 -------
->>>  2 files changed, 84 insertions(+), 28 deletions(-)
->>>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
->>>  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
->>>
->>
->> Running 'make dtbs_check' with the schema in this patch gives the
->> following warnings. Consider if they are expected or the schema is
->> incorrect. These may not be new warnings.
->>
->> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
->> This will change in the future.
->>
->> Full log is available here: https://patchwork.ozlabs.org/patch/1607887
->>
->>
->> cypto-controller@ff8a0000: 'reset-names' does not match any of the regexes: 'pinctrl-[0-9]+'
->> 	arch/arm/boot/dts/rk3288-evb-act8846.dt.yaml
->> 	arch/arm/boot/dts/rk3288-evb-rk808.dt.yaml
->> 	arch/arm/boot/dts/rk3288-firefly-beta.dt.yaml
->> 	arch/arm/boot/dts/rk3288-firefly.dt.yaml
->> 	arch/arm/boot/dts/rk3288-firefly-reload.dt.yaml
->> 	arch/arm/boot/dts/rk3288-miqi.dt.yaml
->> 	arch/arm/boot/dts/rk3288-phycore-rdk.dt.yaml
->> 	arch/arm/boot/dts/rk3288-popmetal.dt.yaml
->> 	arch/arm/boot/dts/rk3288-r89.dt.yaml
->> 	arch/arm/boot/dts/rk3288-rock2-square.dt.yaml
->> 	arch/arm/boot/dts/rk3288-rock-pi-n8.dt.yaml
->> 	arch/arm/boot/dts/rk3288-tinker.dt.yaml
->> 	arch/arm/boot/dts/rk3288-tinker-s.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-brain.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-fievel.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-jaq.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-jerry.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-mickey.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-mighty.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-minnie.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-pinky.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-speedy.dt.yaml
->> 	arch/arm/boot/dts/rk3288-veyron-tiger.dt.yaml
->> 	arch/arm/boot/dts/rk3288-vyasa.dt.yaml
->>
-> 
-> Hello
-> 
-> This should not happen since patch 20 remove it.
+Hi Guenter,
 
+On Tue, Mar 22, 2022 at 10:56:44AM -0700, Guenter Roeck wrote:
+> Everything - including the various root file systems - is at
+> git@github.com:groeck/linux-build-test.git. Look into rootfs/ for the
+> various boot tests. I'll be happy to provide some qemu command lines
+> if needed.
 
-From all DTBS in the world? If you want to deprecate a property, add a
-"deprecated: true".
+Thanks. It looks like the "problem" is with this shell script:
 
+  init_rng() {
+    if check_file_size; then
+      printf 'Initializing random number generator: '
+      dd if="$URANDOM_SEED" bs="$pool_size" of=/dev/urandom count=1 2> /dev/null
+      status=$?
+      if [ "$status" -eq 0 ]; then
+        echo "OK"
+      else
+        echo "FAIL"
+      fi
+      return "$status"
+    fi
+  }
+  
+  save_random_seed() {
+    printf 'Saving random seed: '
+    if touch "$URANDOM_SEED" 2> /dev/null; then
+      old_umask=$(umask)
+      umask 077
+      dd if=/dev/urandom of="$URANDOM_SEED" bs="$pool_size" count=1 2> /dev/null
+      status=$?
+      umask "$old_umask"
+      if [ "$status" -eq 0 ]; then
+        echo "OK"
+      else
+        echo "FAIL"
+      fi
+    else
+      status=$?
+      echo "SKIP (read-only file system detected)"
+    fi
+    return "$status"
+  }
 
-Best regards,
-Krzysztof
+  case "$1" in
+    start|restart|reload)
+      # Carry a random seed from start-up to start-up
+      # Load and then save the whole entropy pool
+      init_rng && save_random_seed;;
+
+This code is actually problematic for a number of reasons. (And Linus,
+I'm not saying "userspace is wrong" to justify breaking it or something,
+don't worry.)
+
+The first `dd if="$URANDOM_SEED" bs="$pool_size" of=/dev/urandom count=1`
+will write the seed into the input pool, but:
+
+  - It won't credit the entropy from that seed, so the pool won't
+    actually initialize. (You need to use the ioctl to credit it.)
+  - Because the pool doesn't initialize, subsequent reads from
+    /dev/urandom won't actually use that seed.
+
+The first point is why we had to revert this patch. But the second one
+is actually a bit dangerous: you might write in a perfectly good seed to
+/dev/urandom, but what you read out for the subsequent seed may be
+complete deterministic crap. This is because the call to write_pool()
+goes right into the input pool and doesn't touch any of the "fast init"
+stuff, where we immediately mutate the crng key during early boot.
+
+As far as I can tell, this has been the behavior for a really long time,
+making the above innocuous pattern a pretty old thing that's broken. So
+I could perhaps say, "this behavior is so old now, that your userspace
+code is just plain broken," but I think I might actually have a very
+quick unobtrusive fix for this. I'll mull some things over for rc2 or
+later in rc1.
+
+But, anyway, this only fixes the second point mentioned above. The first
+one -- which resulted in the revert -- remains a stumper for now.
+
+Jason
