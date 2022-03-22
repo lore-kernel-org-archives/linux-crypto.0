@@ -2,32 +2,39 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5904C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 07:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9B2C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 08:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236808AbiCVHfZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 03:35:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47308 "EHLO
+        id S229854AbiCVISF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 04:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237446AbiCVHfX (ORCPT
+        with ESMTP id S230415AbiCVISC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 03:35:23 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E6BB27150
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 00:33:57 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1nWZ1M-0007uz-8w; Tue, 22 Mar 2022 08:33:36 +0100
-Message-ID: <c946cce8-674a-43d2-1000-b57eba4bc45c@pengutronix.de>
-Date:   Tue, 22 Mar 2022 08:33:34 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v6 4/4] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
+        Tue, 22 Mar 2022 04:18:02 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5620D517CA;
+        Tue, 22 Mar 2022 01:16:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 4D719CE1D27;
+        Tue, 22 Mar 2022 08:16:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 969DBC340EC;
+        Tue, 22 Mar 2022 08:16:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647936991;
+        bh=wViT03VO9WUj9KY0s8wKyKJNf+YcAvGEWXKoZ9AleN8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=W9Ue5cxIv8a2d8N6iYN533cFeIPEjXCJoeK1SMOj1yKL9jlMLWv2hpUePy4W2OOeI
+         2/GfhIzr7iKeyu13vGPOdlUE4Z88QOXfK1iofqjHcHKQUqJbLDOFDEoWrSR0Vccevd
+         E7UD3u4Bv81VODfXeTDk0Ds+1OhZhuStj8PSh5pKPwxW4FsS3KVOi587EFHNq0BCZl
+         B+9VLpFoX5r9+g54AGfK7b4fAKZWMTh61sVM1H9x+u2Q8NTHuf98ZioWtJZcyNudLN
+         qdYgiuy5fyanXQWqbfWw5tp05xwrO+/jqwNZ9dwMqIWlFOZo8oukfq1L3pqLSkNTdn
+         JSOt8GXcFgUzA==
+Date:   Tue, 22 Mar 2022 10:17:33 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
 Cc:     Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>,
         James Bottomley <jejb@linux.ibm.com>,
@@ -38,7 +45,7 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
         James Morris <jmorris@namei.org>,
         "Serge E. Hallyn" <serge@hallyn.com>,
-        =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -50,79 +57,75 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v6 4/4] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Message-ID: <YjmGHRK5TzteGwNu@iki.fi>
 References: <20220316164335.1720255-1-a.fatoum@pengutronix.de>
- <20220316164335.1720255-5-a.fatoum@pengutronix.de> <YjeWSx84ev7u/YAi@iki.fi>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <YjeWSx84ev7u/YAi@iki.fi>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+ <20220316164335.1720255-5-a.fatoum@pengutronix.de>
+ <YjeWSx84ev7u/YAi@iki.fi>
+ <c946cce8-674a-43d2-1000-b57eba4bc45c@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c946cce8-674a-43d2-1000-b57eba4bc45c@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Jarkko,
-
-On 20.03.22 22:02, Jarkko Sakkinen wrote:
-> On Wed, Mar 16, 2022 at 05:43:35PM +0100, Ahmad Fatoum wrote:
->> @@ -192,6 +217,19 @@ Usage::
->>  specific to TEE device implementation.  The key length for new keys is always
->>  in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
->>  
->> +Trusted Keys usage: CAAM
->> +------------------------
->> +
->> +Usage::
->> +
->> +    keyctl add trusted name "new keylen" ring
->> +    keyctl add trusted name "load hex_blob" ring
->> +    keyctl print keyid
->> +
->> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in format
->> +specific to CAAM device implementation.  The key length for new keys is always
->> +in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
->> +
->>  Encrypted Keys usage
->>  --------------------
->>  
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 05fd080b82f3..f13382a14967 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -10647,6 +10647,15 @@ S:	Supported
->>  F:	include/keys/trusted_tee.h
->>  F:	security/keys/trusted-keys/trusted_tee.c
->>  
->> +KEYS-TRUSTED-CAAM
->> +M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
->> +R:	Pengutronix Kernel Team <kernel@pengutronix.de>
->> +L:	linux-integrity@vger.kernel.org
->> +L:	keyrings@vger.kernel.org
->> +S:	Maintained
->> +F:	include/keys/trusted_caam.h
->> +F:	security/keys/trusted-keys/trusted_caam.c
->> +
->>  KEYS/KEYRINGS
->>  M:	David Howells <dhowells@redhat.com>
->>  M:	Jarkko Sakkinen <jarkko@kernel.org>
+On Tue, Mar 22, 2022 at 08:33:34AM +0100, Ahmad Fatoum wrote:
+> Hello Jarkko,
 > 
-> Documentation and MAINTAINERS updates must be separate patches.
-
-I will do so for v7. Does this patch look otherwise ok to you?
-
-Thanks,
-Ahmad
-
+> On 20.03.22 22:02, Jarkko Sakkinen wrote:
+> > On Wed, Mar 16, 2022 at 05:43:35PM +0100, Ahmad Fatoum wrote:
+> >> @@ -192,6 +217,19 @@ Usage::
+> >>  specific to TEE device implementation.  The key length for new keys is always
+> >>  in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+> >>  
+> >> +Trusted Keys usage: CAAM
+> >> +------------------------
+> >> +
+> >> +Usage::
+> >> +
+> >> +    keyctl add trusted name "new keylen" ring
+> >> +    keyctl add trusted name "load hex_blob" ring
+> >> +    keyctl print keyid
+> >> +
+> >> +"keyctl print" returns an ASCII hex copy of the sealed key, which is in format
+> >> +specific to CAAM device implementation.  The key length for new keys is always
+> >> +in bytes. Trusted Keys can be 32 - 128 bytes (256 - 1024 bits).
+> >> +
+> >>  Encrypted Keys usage
+> >>  --------------------
+> >>  
+> >> diff --git a/MAINTAINERS b/MAINTAINERS
+> >> index 05fd080b82f3..f13382a14967 100644
+> >> --- a/MAINTAINERS
+> >> +++ b/MAINTAINERS
+> >> @@ -10647,6 +10647,15 @@ S:	Supported
+> >>  F:	include/keys/trusted_tee.h
+> >>  F:	security/keys/trusted-keys/trusted_tee.c
+> >>  
+> >> +KEYS-TRUSTED-CAAM
+> >> +M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
+> >> +R:	Pengutronix Kernel Team <kernel@pengutronix.de>
+> >> +L:	linux-integrity@vger.kernel.org
+> >> +L:	keyrings@vger.kernel.org
+> >> +S:	Maintained
+> >> +F:	include/keys/trusted_caam.h
+> >> +F:	security/keys/trusted-keys/trusted_caam.c
+> >> +
+> >>  KEYS/KEYRINGS
+> >>  M:	David Howells <dhowells@redhat.com>
+> >>  M:	Jarkko Sakkinen <jarkko@kernel.org>
+> > 
+> > Documentation and MAINTAINERS updates must be separate patches.
 > 
-> BR, Jarkko
+> I will do so for v7. Does this patch look otherwise ok to you?
 > 
+> Thanks,
+> Ahmad
 
+I don't give heads ups. It's improperly constructed patch, i.e. I won't
+review it in this from.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+BR, Jarkko
