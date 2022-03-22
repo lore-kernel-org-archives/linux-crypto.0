@@ -2,190 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B94FFC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 07:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED56AC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 07:33:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237160AbiCVHCV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 03:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57920 "EHLO
+        id S235769AbiCVHey (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 03:34:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237151AbiCVHCT (ORCPT
+        with ESMTP id S237596AbiCVHer (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 03:02:19 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2D221A4
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 00:00:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 1332FCE1CB1
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 07:00:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18A83C340EC;
-        Tue, 22 Mar 2022 07:00:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647932447;
-        bh=yUcgnO83m6wpw6WaeePnlqcDePF0XZJ7jRcIVZ2+Jbg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iOwjqVf1C2VN85JgSPne9cK3Q/5CbqGi0QU3tQriKAMeAPh3VllB2ePZjxNK3RdWA
-         mB8K5Sh6OaIoHL2lIgRTaAbvdrxb148iGPKMSH8aAT7bSe1QXdcjM06ZGOTcdxIqNb
-         NjZULbEMnls4SJUquZOswP3vy6tDP6g9hKTFom6tZePkqL/Q3KdclPySL/cjJmrb+b
-         AkpsoZ81JHC2IwoeoFdBHdw1ofb1VoVUl9Kfn54uMD/B+lHxXyFVjHsR7WOGbSO6ZD
-         IBTDW+R4wMnKOXjZSIMFcfuIl2MXKpdICp8E6C54rMsIMzCtSKFlsKFZ3IaCvAuU1o
-         y2qdajpMhe4Fg==
-Date:   Tue, 22 Mar 2022 00:00:45 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v3 3/8] crypto: hctr2 - Add HCTR2 support
-Message-ID: <Yjl0HeuCyFx8BdH3@sol.localdomain>
-References: <20220315230035.3792663-1-nhuck@google.com>
- <20220315230035.3792663-4-nhuck@google.com>
+        Tue, 22 Mar 2022 03:34:47 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56629237F0
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 00:33:15 -0700 (PDT)
+Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1nWZ0U-0007ql-Hp; Tue, 22 Mar 2022 08:32:42 +0100
+Message-ID: <23cd140f-1046-7059-c9bd-ca4aac1d5183@pengutronix.de>
+Date:   Tue, 22 Mar 2022 08:32:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220315230035.3792663-4-nhuck@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [EXT] [PATCH v6 3/4] crypto: caam - add in-kernel interface for
+ blob generator
+Content-Language: en-US
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        David Gstir <david@sigma-star.at>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Richard Weinberger <richard@nod.at>,
+        "tharvey@gateworks.com" <tharvey@gateworks.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        James Morris <jmorris@namei.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "Serge E. Hallyn" <serge@hallyn.com>
+References: <20220316164335.1720255-1-a.fatoum@pengutronix.de>
+ <20220316164335.1720255-4-a.fatoum@pengutronix.de>
+ <DU2PR04MB86302DB35042F4DAE7C27FA695179@DU2PR04MB8630.eurprd04.prod.outlook.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <DU2PR04MB86302DB35042F4DAE7C27FA695179@DU2PR04MB8630.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 11:00:30PM +0000, Nathan Huckleberry wrote:
-> +struct hctr2_tfm_ctx {
-> +	struct crypto_cipher *blockcipher;
-> +	struct crypto_skcipher *xctr;
-> +	struct crypto_shash *polyval;
-> +	u8 L[BLOCKCIPHER_BLOCK_SIZE];
-> +};
+Hello Pankaj,
 
-How about adding a comment at the end of the struct above that says that the
-struct is followed by the two exported_length_digests?  (Or hashed_tweaklen,
-which is the name suggested in my suggested helper functions below?)
+On 22.03.22 07:25, Pankaj Gupta wrote:
+> Hi Ahmad,
+> 
+> Suggested to define macro with more details.
+> Please find comments in-line.
+> 
 
-> +
-> +struct hctr2_request_ctx {
-> +	u8 first_block[BLOCKCIPHER_BLOCK_SIZE];
-> +	u8 xctr_iv[BLOCKCIPHER_BLOCK_SIZE];
-> +	struct scatterlist *bulk_part_dst;
-> +	struct scatterlist *bulk_part_src;
-> +	struct scatterlist sg_src[2];
-> +	struct scatterlist sg_dst[2];
-> +	/* Sub-requests, must be last */
-> +	union {
-> +		struct shash_desc hash_desc;
-> +		struct skcipher_request xctr_req;
-> +	} u;
-> +};
+> len = 4 + (4 + ALIGN(keymod_len, 4)) + 2*(4 + 4 + 
+>>>>> + CAAM_PTR_SZ_MAX) + 4;
+> 
+>> +/* header + (key mod immediate) + 2x seq_intlen pointers + op */
+>> +#define CAAM_BLOB_DESC_BYTES_MAX \
+>> +       (CAAM_CMD_SZ + \
+>> +        CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH + \
+>> +        2 * (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \
+>> +        CAAM_CMD_SZ)
+>> +
+> 
+> Suggested to replace the above macro like below:
+> 
+> +#define CAAM_BLOB_DESC_BYTES_MAX \			
+> +       (CAAM_CMD_SZ + \					/* Command to initialize & stating length of  descriptor */
+> +        CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH + \	/* Command to append the key-modifier + followed by the key-modifier data */
+> +        (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \		/* Command to include input plain key and pointer to the input key */
+> +        (CAAM_CMD_SZ + CAAM_PTR_SZ_MAX) + \		/* Command to include output-key blob and pointer to the output-key blob */
+> +        CAAM_CMD_SZ)						/* Command describing the Operation to perform */
 
-Likewise above for the hashed tweak.
 
-Also how about adding inline functions or macros that return these new fields,
-so that the arithmetic to find them doesn't have to be duplicated in the code?
-The 'exported_length_digests' array local variables are a bit weird.  Maybe just
-use some helper functions directly to get at the fields?
+Sure thing, will do for v7. Otherwise, if all looks good to you,
+can I have your Reviewed-by?
 
-How about:
+Thanks,
+Ahmad
 
-static inline u8 *hctr2_hashed_tweaklen(const struct hctr2_tfm_ctx *tctx,
-                                        bool odd)
-{
-        u8 *p = (u8 *)tctx + sizeof(*tctx);
-
-        if (odd) /* For messages not a multiple of block length */
-                p += crypto_shash_statesize(tctx->polyval);
-        return p;
-}
-
-static inline u8 *hctr2_hashed_tweak(const struct hctr2_tfm_ctx *tctx,
-                                     struct hctr2_request_ctx *rctx)
-{
-        return (u8 *)rctx + tctx->hashed_tweak_offset;
-}
-
-> +static int hctr2_setkey(struct crypto_skcipher *tfm, const u8 *key,
-> +			unsigned int keylen)
-> +{
-> +	struct hctr2_tfm_ctx *tctx = crypto_skcipher_ctx(tfm);
-> +	u8 hbar[BLOCKCIPHER_BLOCK_SIZE];
-> +	__le64 tweak_length_block[2];
-> +	void *exported_length_digests[2];
-> +	SHASH_DESC_ON_STACK(shash, tfm->polyval);
-> +	int err;
-> +
-> +	exported_length_digests[0] = (u8 *)tctx + sizeof(*tctx);
-> +	exported_length_digests[1] = (u8 *)tctx + sizeof(*tctx) +
-> +				     crypto_shash_descsize(tctx->polyval);
-
-The size needed by crypto_shash_export() is crypto_shash_statesize(), not
-crypto_shash_descsize().  They happen to be the same with all polyval
-implementations you've proposed, but it's not guaranteed for shash algorithms in
-general.
-
-> +	crypto_cipher_clear_flags(tctx->blockcipher, CRYPTO_TFM_REQ_MASK);
-> +	crypto_cipher_set_flags(tctx->blockcipher,
-> +				crypto_skcipher_get_flags(tfm) &
-> +				CRYPTO_TFM_REQ_MASK);
-> +	err = crypto_cipher_setkey(tctx->blockcipher, key, keylen);
-> +	if (err)
-> +		return err;
-> +
-> +	crypto_skcipher_clear_flags(tctx->xctr, CRYPTO_TFM_REQ_MASK);
-> +	crypto_skcipher_set_flags(tctx->xctr,
-> +				  crypto_skcipher_get_flags(tfm) &
-> +				  CRYPTO_TFM_REQ_MASK);
-> +	err = crypto_skcipher_setkey(tctx->xctr, key, keylen);
-> +	if (err)
-> +		return err;
-> +
-> +	memset(tctx->L, 0, sizeof(tctx->L));
-> +	memset(hbar, 0, sizeof(hbar));
-> +	tctx->L[0] = 0x01;
-> +	crypto_cipher_encrypt_one(tctx->blockcipher, tctx->L, tctx->L);
-> +	crypto_cipher_encrypt_one(tctx->blockcipher, hbar, hbar);
-> +
-> +	crypto_shash_clear_flags(tctx->polyval, CRYPTO_TFM_REQ_MASK);
-> +	crypto_shash_set_flags(tctx->polyval, crypto_skcipher_get_flags(tfm) &
-> +			       CRYPTO_TFM_REQ_MASK);
-> +	err = crypto_shash_setkey(tctx->polyval, hbar, BLOCKCIPHER_BLOCK_SIZE);
-> +	if (err)
-> +		return err;
-> +	memzero_explicit(hbar, sizeof(hbar));
-> +
-> +	shash->tfm = tctx->polyval;
-> +	memset(tweak_length_block, 0, sizeof(tweak_length_block));
-> +
-> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 2);
-> +	err = crypto_shash_init(shash);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
-> +				  POLYVAL_BLOCK_SIZE);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_export(shash, exported_length_digests[0]);
-> +	if (err)
-> +		return err;
-> +
-> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 3);
-> +	err = crypto_shash_init(shash);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
-> +				  POLYVAL_BLOCK_SIZE);
-> +	if (err)
-> +		return err;
-> +	return crypto_shash_export(shash, exported_length_digests[1]);
-> +}
-
-hctr2_setkey() is getting pretty long.  How about splitting the tweak length
-pre-hashing into a helper function?
-
-Also, a comment that explains why the tweak length is being pre-hashed, and why
-it *can* be pre-hashed, would be helpful.  Note that it is only possible because
-this implementation only supports one tweak length.
-
-- Eric
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
