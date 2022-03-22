@@ -2,72 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CE6C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 10:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32DAEC4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 10:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232614AbiCVKC0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 06:02:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56786 "EHLO
+        id S233529AbiCVKsk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 06:48:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231782AbiCVKCZ (ORCPT
+        with ESMTP id S233780AbiCVKsH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 06:02:25 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD4E7522B;
-        Tue, 22 Mar 2022 03:00:58 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id h16so9588537wmd.0;
-        Tue, 22 Mar 2022 03:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=vv65An+/8FCaKhiLwRvwgZsqnuTpBsIUWxuVuK2VbD8=;
-        b=AawhzADKmRd2EZUcWfAotrNv4BD4tjVV7cX0YgNPqx7VxFIa5Gkfwj2rZrgswpb8bh
-         O8PHDWTLdtf8xSZFgnsbIGCyqjUKtSxQi+kv4OnyrR5bOrKOtT4d3zNQBXBF2slsXF5M
-         byNuLFzFWF8fXMj00rjpgpwfqQDViW3pqYMmeafZaHSmMahARgaOecyKppqnerck/XxK
-         i+FlGud9OYp/qj6+7CLQYYv7Ivxv1ZdDTBxYGvaS2e3U2hNwDmRntmDS8ACFoHXtLB5b
-         go/4K2MqNc8XSaHsHY1ur8WUsEb1zoGJDlrQuKv2iErQLDjRCIwVX7cayjH1gu8j8c8s
-         ZvNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=vv65An+/8FCaKhiLwRvwgZsqnuTpBsIUWxuVuK2VbD8=;
-        b=5nh83CGc982lNU4HkxxXccQMVc4114z1JvyjlkvIqcSpQMV5JdnCLi7LMnKpfFuplg
-         TLO9XSjIXEf5tsoUQBWo3NcBKeeR5OsHclVJoA5qE4nN+n6nzRB8/cl9OL1JrQjjyAPE
-         Gc5Bor//kBCaBwMMbYaoWnixsGTznq4rGJ2gickMJ0gbReWvaoo180jzFcGCezmY40nB
-         jijvKcEAtxVFFshSk3/6VFCcies+jLBVg026S/0mGVvLXnegdqpTSlrix9254alaMlpl
-         bLx0jRBIqzmZmJgpAwSy5k3dykqP3+QdT6X50nKfDvSylY6WxyscFoUIHGcL9crL1t3l
-         d43w==
-X-Gm-Message-State: AOAM533+MbqHQQNxUDqFUe2/vTaNajO9KNpqxNdrjINQ6Av8Lf4jDCJz
-        BwLGYuM61QT+Ze1uAc4ebIc=
-X-Google-Smtp-Source: ABdhPJzJ3q75PtMwrEHjracDCTSz0PLPTsKFJlK0bJ/mKJiAvFxe247QOYCgyJ/JPmeFZjsIZh87rw==
-X-Received: by 2002:a5d:59a3:0:b0:203:d9fa:6968 with SMTP id p3-20020a5d59a3000000b00203d9fa6968mr22225332wrr.585.1647943256641;
-        Tue, 22 Mar 2022 03:00:56 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id 14-20020a056000154e00b00203f8adde0csm12161019wry.32.2022.03.22.03.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 03:00:56 -0700 (PDT)
-Date:   Tue, 22 Mar 2022 11:00:54 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     herbert@gondor.apana.org.au, kbusch@kernel.org, axboe@kernel.dk
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: crypto: crc64-rocksoft-generic test failed (wrong result) on test
- vector 0
-Message-ID: <YjmeVttXDd/FPwUP@Red>
+        Tue, 22 Mar 2022 06:48:07 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A3282D09;
+        Tue, 22 Mar 2022 03:46:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rPfgvhMPQ8dVRipxfd44pwo2B57Mkhi1IcMui1XtQAc=; b=RrmAjBu0pazgrhak5SiNwzd42D
+        VzTuoBywbx3av/+nL/d8xZavTYmbkOcLxNupCGZTTHLTS6/uzpCn8nXlsnyUKu60FVotTt1+788I1
+        SPfMBbnuziHSu4GNoyMYf7N15OQv19btp21YXvjRIMX/H0avK1kzlybFtHuBe19B77Pr96G/90CYl
+        r3lL3HcF6ydKqIctPE++zBmhyHyxzWqLPRRvXlbpuZeYqen3YPUz/KPPpSzINba7gQJUWp53b3G7j
+        nY9ZDnxYDbUGTRuSgOprMd0xxppfSSMumdKsAFa3JaQ2Gsf8QqQ19YwXmp9nyllMFiu6U1K0Pcf+z
+        IpiY1gbw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nWc1f-00BVrA-Vm; Tue, 22 Mar 2022 10:46:08 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 3E3553001CD;
+        Tue, 22 Mar 2022 11:46:04 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id B1B162C7D1E6F; Tue, 22 Mar 2022 11:46:04 +0100 (CET)
+Date:   Tue, 22 Mar 2022 11:46:04 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, ebiggers@google.com,
+        herbert@gondor.apana.org.au, Jason@zx2c4.com
+Subject: Re: linux-next: build warnings after merge of the tip tree
+Message-ID: <Yjmo7KDlfR537J0W@hirez.programming.kicks-ass.net>
+References: <20220321140327.777f9554@canb.auug.org.au>
+ <Yjh11UjDZogc3foM@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <Yjh11UjDZogc3foM@hirez.programming.kicks-ass.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello
+On Mon, Mar 21, 2022 at 01:55:49PM +0100, Peter Zijlstra wrote:
 
-Booting an arm64_defconfig with BigEndian lead to:
-alg: shash: crc64-rocksoft-generic test failed (wrong result) on test vector 0, cfg=\"init+update+final aligned buffer\"
+> > [ Note I was already getting these:
+> > arch/x86/crypto/chacha-x86_64.o: warning: objtool: chacha_2block_xor_avx512vl() falls through to next function chacha_8block_xor_avx512vl()
+> > arch/x86/crypto/chacha-x86_64.o: warning: objtool: chacha_4block_xor_avx512vl() falls through to next function chacha_8block_xor_avx512vl()
+> > arch/x86/crypto/poly1305-x86_64.o: warning: objtool: poly1305_blocks_avx() falls through to next function poly1305_blocks_x86_64()
+> > arch/x86/crypto/poly1305-x86_64.o: warning: objtool: poly1305_emit_avx() falls through to next function poly1305_emit_x86_64()
+> > arch/x86/crypto/poly1305-x86_64.o: warning: objtool: poly1305_blocks_avx2() falls through to next function poly1305_blocks_x86_64()
+> 
+> Yes, those are somewhere on the todo list, lemme bump them.
 
-Reproductible on the virt qemu machine.
+So the chacha one seems relatively simple, see below.
 
-Furthermore, none of crc64 files have clear MAINTAINERS entry.
-
-Regards
+---
+diff --git a/arch/x86/crypto/chacha-avx512vl-x86_64.S b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+index 946f74dd6fba..259383e1ad44 100644
+--- a/arch/x86/crypto/chacha-avx512vl-x86_64.S
++++ b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+@@ -172,7 +172,7 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
+ 	# xor remaining bytes from partial register into output
+ 	mov		%rcx,%rax
+ 	and		$0xf,%rcx
+-	jz		.Ldone8
++	jz		.Ldone2
+ 	mov		%rax,%r9
+ 	and		$~0xf,%r9
+ 
+@@ -438,7 +438,7 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
+ 	# xor remaining bytes from partial register into output
+ 	mov		%rcx,%rax
+ 	and		$0xf,%rcx
+-	jz		.Ldone8
++	jz		.Ldone4
+ 	mov		%rax,%r9
+ 	and		$~0xf,%r9
+ 
