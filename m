@@ -2,48 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F013C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 16:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E20A7C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 16:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232089AbiCVQBs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 12:01:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
+        id S238198AbiCVQXw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 12:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238948AbiCVQAL (ORCPT
+        with ESMTP id S239075AbiCVQXT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 12:00:11 -0400
-Received: from gateway34.websitewelcome.com (gateway34.websitewelcome.com [192.185.148.164])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242866212C
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 08:58:27 -0700 (PDT)
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway34.websitewelcome.com (Postfix) with ESMTP id 5D6431C1ADA
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 10:58:24 -0500 (CDT)
-Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
-        by cmsmtp with SMTP
-        id WgtrnkjjSb6UBWgtrn0lSR; Tue, 22 Mar 2022 10:58:24 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=roeck-us.net; s=default; h=In-Reply-To:Content-Type:MIME-Version:References
-        :Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
-        :Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=FmnYj8XY37ozsL1ncMDDe7VB7cs7ym+XNgIT3Nh/4mw=; b=Kw0GKrzk9B0sN5VlG6Annzh8cf
-        rq7p+wcAyXObM/5XIdD+jQnafNsb9MldsbS2dJ220mIzfYucD5gyd2BTWJ1gpWkppysQ9fiAJi43d
-        BZAxCn7tC4ErJB0O5csom3VWJFd6gGICvZlBbyT7zyxaxeTYWgYz6N7I3Na8EVNS7DSGHhDWLW1+S
-        YB2J+I8uZOLSahLR36ZwEOvxctQs0PAKcfC13I9vB/n0xn9FiwrCUy9b+FVwwf2Z2uaiDssdV4bpm
-        wvUSKJMPsLbrcH0E3CmeuJRS1Zb83L9dNx1usrPbQhd9JrJ8hhfcqWzzinJMvHfqr8kp1KItot6Fn
-        u2oobCLw==;
-Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:57610 helo=localhost)
-        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@roeck-us.net>)
-        id 1nWgtq-000tfT-Ls; Tue, 22 Mar 2022 15:58:22 +0000
-Date:   Tue, 22 Mar 2022 08:58:20 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Tue, 22 Mar 2022 12:23:19 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020272E9E2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 09:21:44 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id p15so19947816lfk.8
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 09:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=24K1hLJb9rmuEHEKW5a8QYhjnmRyomvMSDjxeIg/X38=;
+        b=VYS/UqPlwEg8dUg0nl76d7UJ1IUszygkxcr1j2/1mvgghsV+p3mYrgwsp34aOKQ6tk
+         ScvhZMD1nx0OBvbT+5UaohuxHTKJjXselVVpziaLmccjKez67+onMBakhk/M73Kxl+Ut
+         p2gOZHShBVjr2xBbgB8NPD9eut9eQpbmThYAM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=24K1hLJb9rmuEHEKW5a8QYhjnmRyomvMSDjxeIg/X38=;
+        b=MeVfkostNctflgbQ76MERYq6nKCRQtAoodmw+P/BKpCQ3SCwYUlxdqcTZbnAyZG0I3
+         0k9j3SaEXZ4dI7uDYJYwuQm042UHGQO2lQaxu2+9oBUHt+WDT7YrwOrarPBMW7oxD4tW
+         Sv6UamlW70GmjMBLhSTvlEQwfOxaTww8AWgxYc4gmpegu2nnHV/Ouj6iX6FZrWZVsFri
+         QbmXI3tOK/gefrtUEW9qq0Cuvwcbekgj8dM8+IdKHcToG7ydjnacvXHwm/RxIWUffW9r
+         NLfBkoBs+kmE74ZwWtZj8ktE1nigrmiit2SeZmh7OWVcLQmBzTp1RX7BWCKldbGtfzHL
+         +YJw==
+X-Gm-Message-State: AOAM530NBtEa0xPfbAUc9Zsl/yV41z3AXF0GninReHpIFG57wLPfEdkd
+        Fn69D3yGkdPhuzRe6t7L8SktDecxtMDWi8LYhgM=
+X-Google-Smtp-Source: ABdhPJwZ9GuCzZuD3X8CUGFpv9TBRWDJbK45Rjlpio0VaA6JneDfKpTHyMJy+sjg4mo4+AGWITQI3g==
+X-Received: by 2002:ac2:5223:0:b0:448:5100:e427 with SMTP id i3-20020ac25223000000b004485100e427mr19113392lfl.87.1647966099481;
+        Tue, 22 Mar 2022 09:21:39 -0700 (PDT)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com. [209.85.208.177])
+        by smtp.gmail.com with ESMTPSA id bu9-20020a056512168900b004489c47d241sm2245803lfb.32.2022.03.22.09.21.37
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Mar 2022 09:21:38 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id bn33so24656388ljb.6
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 09:21:37 -0700 (PDT)
+X-Received: by 2002:a2e:6f17:0:b0:248:124:9c08 with SMTP id
+ k23-20020a2e6f17000000b0024801249c08mr19763021ljc.506.1647966097175; Tue, 22
+ Mar 2022 09:21:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
+In-Reply-To: <20220322155820.GA1745955@roeck-us.net>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 22 Mar 2022 09:21:20 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjH7rNyP_S7ut3EUPfa_dOYAP1T6yOxS6hdVi3zPV9SzA@mail.gmail.com>
+Message-ID: <CAHk-=wjH7rNyP_S7ut3EUPfa_dOYAP1T6yOxS6hdVi3zPV9SzA@mail.gmail.com>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
         Nick Hu <nickhu@andestech.com>,
         Max Filippov <jcmvbkbc@gmail.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -63,79 +84,27 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Kees Cook <keescook@chromium.org>,
         Lennart Poettering <mzxreary@0pointer.de>,
         Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <20220322155820.GA1745955@roeck-us.net>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220217162848.303601-1-Jason@zx2c4.com>
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - roeck-us.net
-X-BWhitelist: no
-X-Source-IP: 108.223.40.66
-X-Source-L: No
-X-Exim-ID: 1nWgtq-000tfT-Ls
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net (localhost) [108.223.40.66]:57610
-X-Source-Auth: guenter@roeck-us.net
-X-Email-Count: 37
-X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
-X-Local-Domain: yes
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
-> This topic has come up countless times, and usually doesn't go anywhere.
-> This time I thought I'd bring it up with a slightly narrower focus,
-> updated for some developments over the last three years: we finally can
-> make /dev/urandom always secure, in light of the fact that our RNG is
-> now always seeded.
-> 
+On Tue, Mar 22, 2022 at 8:58 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> This patch (or a later version of it) made it into mainline and causes a
+> large number of qemu boot test failures for various architectures (arm,
+> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
+> denominator is that boot hangs at "Saving random seed:". A sample bisect
+> log is attached. Reverting this patch fixes the problem.
 
-[ ... ]
+Ok, it was worth trying, but yeah, it clearly causes problems for
+various platforms that can't do jitter entropy and have nothing else
+happening either.
 
-This patch (or a later version of it) made it into mainline and causes a
-large number of qemu boot test failures for various architectures (arm,
-m68k, microblaze, sparc32, xtensa are the ones I observed). Common
-denominator is that boot hangs at "Saving random seed:". A sample bisect
-log is attached. Reverting this patch fixes the problem.
+Will revert.
 
-Guenter
+Thanks.
 
----
-# bad: [8565d64430f8278bea38dab0a3ab60b4e11c71e4] Merge tag 'bounds-fixes-v5.18-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux
-# good: [f443e374ae131c168a065ea1748feac6b2e76613] Linux 5.17
-git bisect start 'HEAD' 'v5.17'
-# bad: [5628b8de1228436d47491c662dc521bc138a3d43] Merge tag 'random-5.18-rc1-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/crng/random
-git bisect bad 5628b8de1228436d47491c662dc521bc138a3d43
-# good: [a04b1bf574e1f4875ea91f5c62ca051666443200] Merge tag 'for-5.18/parisc-1' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
-git bisect good a04b1bf574e1f4875ea91f5c62ca051666443200
-# good: [242ba6656d604aa8dc87451fc08143cb28d5a587] Merge tag 'acpi-5.18-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
-git bisect good 242ba6656d604aa8dc87451fc08143cb28d5a587
-# good: [02b82b02c34321dde10d003aafcd831a769b2a8a] Merge tag 'pm-5.18-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
-git bisect good 02b82b02c34321dde10d003aafcd831a769b2a8a
-# bad: [77553cf8f44863b31da242cf24671d76ddb61597] random: don't let 644 read-only sysctls be written to
-git bisect bad 77553cf8f44863b31da242cf24671d76ddb61597
-# good: [a07fdae346c35c6ba286af1c88e0effcfa330bf9] random: add proper SPDX header
-git bisect good a07fdae346c35c6ba286af1c88e0effcfa330bf9
-# good: [58340f8e952b613e0ead0bed58b97b05bf4743c5] random: defer fast pool mixing to worker
-git bisect good 58340f8e952b613e0ead0bed58b97b05bf4743c5
-# good: [da3951ebdcd1cb1d5c750e08cd05aee7b0c04d9a] random: round-robin registers as ulong, not u32
-git bisect good da3951ebdcd1cb1d5c750e08cd05aee7b0c04d9a
-# good: [abded93ec1e9692920fe309f07f40bd1035f2940] random: unify cycles_t and jiffies usage and types
-git bisect good abded93ec1e9692920fe309f07f40bd1035f2940
-# bad: [6f98a4bfee72c22f50aedb39fb761567969865fe] random: block in /dev/urandom
-git bisect bad 6f98a4bfee72c22f50aedb39fb761567969865fe
-# good: [c2a7de4feb6e09f23af7accc0f882a8fa92e7ae5] random: do crng pre-init loading in worker rather than irq
-git bisect good c2a7de4feb6e09f23af7accc0f882a8fa92e7ae5
-# first bad commit: [6f98a4bfee72c22f50aedb39fb761567969865fe] random: block in /dev/urandom
+               Linus
