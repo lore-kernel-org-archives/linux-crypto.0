@@ -2,101 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045D0C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 17:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB7CC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 17:39:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239423AbiCVRLi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 13:11:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49988 "EHLO
+        id S239782AbiCVRlL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 13:41:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239420AbiCVRLg (ORCPT
+        with ESMTP id S239787AbiCVRlK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 13:11:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745997890C;
-        Tue, 22 Mar 2022 10:10:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E1C3F614BA;
-        Tue, 22 Mar 2022 17:10:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B984C340F0;
-        Tue, 22 Mar 2022 17:10:03 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Umso1iRg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1647969001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gPX0nJxefwWFFSNK75somPtzsLvzvt9oMVqDAB0yArg=;
-        b=Umso1iRg6iLt1J9W2agcmRvJm8/SwpH5XzKQ2jWhqRWp2rJMQFPahsU7BNThUuO3/kTZrU
-        BzyfqemUzgGr2R9+Jlb2Zw0o2gCLNOns0Ma4jGaIgkzGU78vKHYj/MrBuIFFD4YHluuKbF
-        vaCL5KqJKrn+BR1+D5ezEAVXc1tGj+k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f4b3020f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 22 Mar 2022 17:10:01 +0000 (UTC)
-Date:   Tue, 22 Mar 2022 11:09:58 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
+        Tue, 22 Mar 2022 13:41:10 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 97929888ED;
+        Tue, 22 Mar 2022 10:39:39 -0700 (PDT)
+Received: from sequoia (162-237-133-238.lightspeed.rcsntx.sbcglobal.net [162.237.133.238])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 7A9A520DE47A;
+        Tue, 22 Mar 2022 10:39:38 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7A9A520DE47A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1647970779;
+        bh=PtoDzmpopQFbgY2xTih9vlGwSqLfSUwf2Sb2AlNYui8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZFY4mGZeTZxZubHGDUEMEI3uzak1GNiVV7uxJ3M2ACpQgDK88FSTC/razs0NRr/HY
+         PumUlS81DS9EPqFCos4W04o1DJ2f9iVq7b1jSbBHiZd/WlYzpRNaqYEKfGYs7Fh/5o
+         u6jQlQ1UdFqfPsvtfRoK0djRD0w2yaIzeYoq5Dws=
+Date:   Tue, 22 Mar 2022 12:39:32 -0500
+From:   Tyler Hicks <tyhicks@linux.microsoft.com>
+To:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>,
         "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <YjoC5kQMqyC/3L5Y@zx2c4.com>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net>
+        David Woodhouse <dwmw2@infradead.org>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Paul Moore <paul@paul-moore.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>
+Subject: Re: [PATCH v2 1/1] certs: Explain the rationale to call panic()
+Message-ID: <20220322173932.GB7173@sequoia>
+References: <20220322111323.542184-1-mic@digikod.net>
+ <20220322111323.542184-2-mic@digikod.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220322155820.GA1745955@roeck-us.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220322111323.542184-2-mic@digikod.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Guenter,
-
-On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
-> On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
-> > This topic has come up countless times, and usually doesn't go anywhere.
-> > This time I thought I'd bring it up with a slightly narrower focus,
-> > updated for some developments over the last three years: we finally can
-> > make /dev/urandom always secure, in light of the fact that our RNG is
-> > now always seeded.
-> > 
+On 2022-03-22 12:13:23, Mickaël Salaün wrote:
+> From: Mickaël Salaün <mic@linux.microsoft.com>
 > 
-> [ ... ]
+> The blacklist_init() function calls panic() for memory allocation
+> errors.  This change documents the reason why we don't return -ENODEV.
 > 
-> This patch (or a later version of it) made it into mainline and causes a
-> large number of qemu boot test failures for various architectures (arm,
-> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
-> denominator is that boot hangs at "Saving random seed:". A sample bisect
-> log is attached. Reverting this patch fixes the problem.
+> Suggested-by: Paul Moore <paul@paul-moore.com> [1]
+> Requested-by: Jarkko Sakkinen <jarkko@kernel.org> [1]
+> Link: https://lore.kernel.org/r/YjeW2r6Wv55Du0bJ@iki.fi [1]
+> Reviewed-by: Paul Moore <paul@paul-moore.com>
+> Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+> Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
+> Link: https://lore.kernel.org/r/20220322111323.542184-2-mic@digikod.net
 
-As Linus said, it was worth a try, but I guess it just didn't work. For
-my own curiosity, though, do you have a link to those QEMU VMs you could
-share? I'd sort of like to poke around, and if we do ever reattempt this
-sometime down the road, it seems like understanding everything about why
-the previous time failed might be a good idea.
+Reviewed-by: Tyler Hicks <tyhicks@linux.microsoft.com>
 
-Jason
+Tyler
+
+> ---
+> 
+> Changes since v1:
+> * Fix commit subject spelling spotted by David Woodhouse.
+> * Reword one sentence as suggested by Paul Moore.
+> * Add Reviewed-by Paul Moore.
+> * Add Reviewed-by Jarkko Sakkinen.
+> ---
+>  certs/blacklist.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/certs/blacklist.c b/certs/blacklist.c
+> index 486ce0dd8e9c..25094ea73600 100644
+> --- a/certs/blacklist.c
+> +++ b/certs/blacklist.c
+> @@ -307,6 +307,15 @@ static int restrict_link_for_blacklist(struct key *dest_keyring,
+>  
+>  /*
+>   * Initialise the blacklist
+> + *
+> + * The blacklist_init() function is registered as an initcall via
+> + * device_initcall().  As a result if the blacklist_init() function fails for
+> + * any reason the kernel continues to execute.  While cleanly returning -ENODEV
+> + * could be acceptable for some non-critical kernel parts, if the blacklist
+> + * keyring fails to load it defeats the certificate/key based deny list for
+> + * signed modules.  If a critical piece of security functionality that users
+> + * expect to be present fails to initialize, panic()ing is likely the right
+> + * thing to do.
+>   */
+>  static int __init blacklist_init(void)
+>  {
+> -- 
+> 2.35.1
+> 
