@@ -2,123 +2,184 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58705C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD7AC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 19:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240743AbiCVSio (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 14:38:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36984 "EHLO
+        id S229863AbiCVTQa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 15:16:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240887AbiCVSiX (ORCPT
+        with ESMTP id S229523AbiCVTQa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 14:38:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93D684D279;
-        Tue, 22 Mar 2022 11:36:55 -0700 (PDT)
+        Tue, 22 Mar 2022 15:16:30 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88940B87D;
+        Tue, 22 Mar 2022 12:15:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C173615FD;
-        Tue, 22 Mar 2022 18:36:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 143F8C340F6;
-        Tue, 22 Mar 2022 18:36:53 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1C94FB81D59;
+        Tue, 22 Mar 2022 19:15:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAF40C340EC;
+        Tue, 22 Mar 2022 19:14:57 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="U6eTZV/j"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ayNjLncA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1647974210;
+        t=1647976496;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PFNl2hhMhFSK/CjCgits39oiGFWK73F16o9EWoPZX7Y=;
-        b=U6eTZV/jEq7GcZ7SXAwdSpLlLP1XFmZKMdWHADW/M1rz11ul0qik8F2ClsditzoBrJMXKl
-        6pO+qMEQ65jzy6oOlrGqJzILBtCk8bv//uOd4pWHQphuHCWAM6yW0fDbF3LqT1UpjvMTLF
-        akBYSubeYcp6dhVPyRY/0GD5oQQHVGk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e8345de8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 22 Mar 2022 18:36:50 +0000 (UTC)
-Received: by mail-yb1-f175.google.com with SMTP id z8so35270844ybh.7;
-        Tue, 22 Mar 2022 11:36:49 -0700 (PDT)
-X-Gm-Message-State: AOAM530rC/KDqezWoWTCmr6czTbMN7ERT25zw9UGbOifS/zjOPsxJ0h8
-        i+O3wwgrakrLLbcD5LiY0QReXDNjZK5ugWSS6RU=
-X-Google-Smtp-Source: ABdhPJzMi7Riq+0tA+ngc/YdK6aVhmhPnJ7JnVdbmSZAB21cxagMr9oxQwdK2c8/x/OwKm/fAz9e7XzjfCLosl7CGuc=
-X-Received: by 2002:a25:b905:0:b0:61e:23e4:949f with SMTP id
- x5-20020a25b905000000b0061e23e4949fmr29614489ybj.373.1647974206146; Tue, 22
- Mar 2022 11:36:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
- <YjoC5kQMqyC/3L5Y@zx2c4.com> <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
- <YjoTJFRook+rGyDI@zx2c4.com> <CAHk-=wiq3bKDdt7noWOaMnDL-yYfFHb1CEsNkk8huq4O7ByetA@mail.gmail.com>
-In-Reply-To: <CAHk-=wiq3bKDdt7noWOaMnDL-yYfFHb1CEsNkk8huq4O7ByetA@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=i/U5LyvFIKyE1xMxL9o+v3ZqxPzAfBijQuHujE0+oF8=;
+        b=ayNjLncAbSXIHKGoSRZt2lzsl4IKwOpfI0CHuEFRLd58tJC3pCQKgTb3YV766sf0uSJ8tL
+        vbfl7eoejf2RDXytvp1K7Uaomnb7PR0h2dXz0HuJQ/8CepsnqfPcdER+8WZKD4I1o0yxOT
+        tgidsdVAY2g+AhnePuD2pscPNSud2IU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 600c7da9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 22 Mar 2022 19:14:55 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 22 Mar 2022 12:36:35 -0600
-X-Gmail-Original-Message-ID: <CAHmME9oi-XM--3c4fbM6LydM_Q7CTBdEzKC9fDEE7gXcwUwtcw@mail.gmail.com>
-Message-ID: <CAHmME9oi-XM--3c4fbM6LydM_Q7CTBdEzKC9fDEE7gXcwUwtcw@mail.gmail.com>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Guenter Roeck <linux@roeck-us.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
+Subject: [PATCH] random: allow writes to /dev/urandom to influence fast init
+Date:   Tue, 22 Mar 2022 13:14:36 -0600
+Message-Id: <20220322191436.110963-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus,
+For as far back as I can tell, writing to /dev/urandom or /dev/random
+will put entropy into the pool, but won't immediately use it, and won't
+credit it either. Instead, crediting is controlled by the ioctls
+RNDADDTOENTCNT and RNDADDENTROPY. If, however, this happens during early
+boot before the input pool is ready, we have a dangerous situation with
+seed files as commonly used by shell scripts:
 
-On Tue, Mar 22, 2022 at 12:29 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> Christ, how I hate the crazy "no entropy means that we can't use it".
->
-> It's a disease, I tell you.
->
-> And it seems to be the direct cause of this misfeature.
+  dd if=seedfile of=/dev/urandom # write seed into pool
+  dd if=/dev/urandom of=seedfile count=1 bs=32 # read new seed for next boot
 
-A disease indeed.
+Since the entropy in seedfile isn't credited there, this won't cause the
+RNG to transition from crng_init=0 to crng_init=2, and so when we make a
+new seedfile for next boot, we'll still be getting crng_init=0-quality
+randomness, which may well regress from the original seedfile.
 
-> By all means the code can say "I can't credit this as entropy", but
-> the fact that it then doesn't even mix it into the fast pool is just
-> wrong, wrong, wrong.
->
-> I think *that* is what we should fix. The fact is, urandom has
-> long-standing semantics as "don't block", and that it shouldn't care
-> about the (often completely insane) entropy crediting rules.
->
-> But that "don't care about entropy rules" should then also mean "oh,
-> we'll mix things in even if we don't credit entropy".
->
-> I hope that's the easy fix you are thinking about.
+I fixed a related issue in systemd with
+<https://github.com/systemd/systemd/commit/da2862ef06f22fc8d31dafced6d2d6dc14f2ee0b>,
+which is a clean way of doing it, but it doesn't really help with
+existing shell scripts. And the behavior here remains bad and
+surprising.
 
-Yes, exactly. And the patch to fix it is literally 2 lines. I'm
-playing with it now and I'll think about it a bit and hopefully have
-something for you to pull not before long.
+So this patch fixes the issue by including /dev/urandom writes as part
+of the "fast init", but not crediting it as part of the fast init
+counter. This is more or less exactly what's already done for
+kernel-sourced entropy whose quality we don't know, when we use
+add_device_randomness(), which both contributes to the input pool and to
+the fast init key.
 
-In general, your intuition is correct, I think, that the entropy
-crediting scheme is sort of insane and leads to problems. As I wrote
-in <https://www.zx2c4.com/projects/linux-rng-5.17-5.18/> at the end,
-other RNG schemes like Fortuna don't really suffer from this in the
-same way because they're not even counting entropy. This might be
-something to look at seriously in the future.
+There is one caveat to consider, which is what happens if the user
+additionally calls RNDADDTOENTCNT after having written to /dev/urandom,
+expecting to credit that write. That might give way to this pathological
+pattern:
 
-Jason
+   - write(urandom_fd, &single_byte, 1);
+   - ioctl(urandom_fd, RNDADDTOENTCNT, 8);
+   - attacker brute forces that single byte.
+   - write(urandom_fd, &single_byte, 1);
+   - ioctl(urandom_fd, RNDADDTOENTCNT, 8);
+   - attacker brute forces that single byte.
+   - write(urandom_fd, &single_byte, 1);
+   - ioctl(urandom_fd, RNDADDTOENTCNT, 8);
+   - attacker brute forces that single byte.
+   - write(urandom_fd, &single_byte, 1);
+   - ioctl(urandom_fd, RNDADDTOENTCNT, 8);
+   - attacker brute forces that single byte.
+   - write(urandom_fd, &single_byte, 1);
+   - ioctl(urandom_fd, RNDADDTOENTCNT, 8);
+   - attacker brute forces that single byte.
+   - ...
+
+After this goes 32 times, the crng has now initialized, except an
+attacker was able to bruteforce the whole state, making for a sort of
+boot time "premature next" problem.
+
+This is bad, but the case above is pretty pathological. Part of this
+stems from the fact that /dev/urandom write + RNDADDTOENTCNT is a poor
+interface, because it's unclear whether the crediting will follow the
+writing, whereas we know in the add_device_randomness() case that we
+_won't_ credit it, so we don't have to worry about that.
+
+The better interface for userspace is RNDADDENTROPY, which takes the
+input buffer and the entropy credit all at once, so we can make the
+right decision. For the RNDADDENTROPY, we do not take part in fast init
+if entropy is being credited.
+
+And perhaps we might consider attempting to deprecate RNDADDTOENTCNT at
+some point in the future.
+
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Jann Horn <jannh@google.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+This isn't a "perfect" solution, and the of entropy accounting sort of
+points both to problems there and to how the "fast init" phase fits in
+to the overall design. So I'll think this over a bit for a few days, and
+maybe it might lead to more improvements in fast init handling later.
+
+ drivers/char/random.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 706f08edf0dc..7b7f5e6596c2 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1493,7 +1493,7 @@ static __poll_t random_poll(struct file *file, poll_table *wait)
+ 	return mask;
+ }
+ 
+-static int write_pool(const char __user *ubuf, size_t count)
++static int write_pool(const char __user *ubuf, size_t count, bool will_credit)
+ {
+ 	size_t len;
+ 	int ret = 0;
+@@ -1507,6 +1507,8 @@ static int write_pool(const char __user *ubuf, size_t count)
+ 		}
+ 		count -= len;
+ 		ubuf += len;
++		if (unlikely(crng_init == 0 && !will_credit))
++			crng_pre_init_inject(block, len, false);
+ 		mix_pool_bytes(block, len);
+ 		cond_resched();
+ 	}
+@@ -1521,7 +1523,13 @@ static ssize_t random_write(struct file *file, const char __user *buffer,
+ {
+ 	int ret;
+ 
+-	ret = write_pool(buffer, count);
++	/*
++	 * We set "will_credit" to false here, which might be wrong if the
++	 * user subsequently calls RNDADDTOENTCNT. But it accounts for the
++	 * more common case of shell scripts writing to /dev/urandom and
++	 * then immediately reading back a seed file.
++	 */
++	ret = write_pool(buffer, count, false);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -1584,7 +1592,7 @@ static long random_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
+ 			return -EINVAL;
+ 		if (get_user(size, p++))
+ 			return -EFAULT;
+-		retval = write_pool((const char __user *)p, size);
++		retval = write_pool((const char __user *)p, size, ent_count > 0);
+ 		if (retval < 0)
+ 			return retval;
+ 		credit_entropy_bits(ent_count);
+-- 
+2.35.1
+
