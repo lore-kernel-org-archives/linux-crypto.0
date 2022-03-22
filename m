@@ -2,94 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D4CC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Mar 2022 23:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E32C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 01:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233593AbiCUX7Z (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Mar 2022 19:59:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39120 "EHLO
+        id S235128AbiCVBwV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 21 Mar 2022 21:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233617AbiCUX7W (ORCPT
+        with ESMTP id S235118AbiCVBwU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Mar 2022 19:59:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7338628D295;
-        Mon, 21 Mar 2022 16:56:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AD7B0B81ACE;
-        Mon, 21 Mar 2022 23:53:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B99CC340E8;
-        Mon, 21 Mar 2022 23:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647906838;
-        bh=cj/bg1sLNNaJqVbORGbd8V+TtcWsAd5DpPi34vxVBaI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jG6Iugnvq9+d6FpMQh4OXsHDYag7OBVdmKGbPXMugx1nLVkFXiyjGHP4SzRll0IzV
-         WZEf51AichSBMW4+Gdh9AvgLqBUX5O61NRj0ceCc8GRODHAx7Z2JTKCIt4zzNoW+Z6
-         GxpRtL2Ay9j3e1spyAd5WEHRi/b1d4+JCWba3RfAK7kICHe6dpDnt1K5hno/9cklzi
-         +nXWKcR5tToM7qwPcll7bLb2rs8LQfB/qLI1eEppJGbz4l2SUSN+RBXgKB6NBILqef
-         /Gypl4G3TQk+syuMICPME9IbehTQ5ZZjO4pagqsRxoV+eadF95vyuRMfOsC32ngFw1
-         yroKlFAIAqzvQ==
-Date:   Tue, 22 Mar 2022 01:53:09 +0200
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-        David Howells <dhowells@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>
-Subject: Re: [PATCH v1 1/1] certs: Explain the rational to call panic()
-Message-ID: <YjkP5d6e6SU8BPtO@iki.fi>
-References: <20220321174548.510516-1-mic@digikod.net>
- <20220321174548.510516-2-mic@digikod.net>
- <CAHC9VhR+Ss5VAUHLutTvyS8g+agZy7d0YGcu_9dV1LBx_8ifNQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhR+Ss5VAUHLutTvyS8g+agZy7d0YGcu_9dV1LBx_8ifNQ@mail.gmail.com>
+        Mon, 21 Mar 2022 21:52:20 -0400
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94CC43BA5B;
+        Mon, 21 Mar 2022 18:50:54 -0700 (PDT)
+Received: by mail-oi1-f170.google.com with SMTP id j83so18170157oih.6;
+        Mon, 21 Mar 2022 18:50:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
+         :message-id;
+        bh=6wGO95480o++3hkVke2KCQeABv0JOzxQ2AVcywF5mS8=;
+        b=neFfjZUMragKNmD3hjaep8XtQScupTwKAPLsIuiRX09q3gMrUUiFyKEKM5IkExPBRd
+         QOIN093DhF/veq8EV3Mj5HyPxqVPS3hwhrVGewDdt9Lmc/DSQL2y4HOFF/PZRLuBSgjk
+         CqRyjNboEcqKQfa8w30F9AxTCjTc32dCcnkuGv9GAXLD4Gyay3NOwYUlN9Sj63w9OSsu
+         K/O54/U332hVNy1DlusXzXT1essdjEh8JxBsi3rvvmBt3YCBYMWUlIKs40zZgi5H72Fj
+         it9QEivFcSuqVTM8U/qkf66OFLrGL9Qz6qIQM8ebscq1Yp/hJ+LyQqDMG3eeF8Ke9Ue0
+         NNlg==
+X-Gm-Message-State: AOAM533W/hya12U6eaEYX+w4KYceja0DOaM3M1GgxW+uXsK1AiRU/MAa
+        7YKADIsCcwD0FZsmxOSU7w==
+X-Google-Smtp-Source: ABdhPJwj36RCG58UmGKrtvgw5QXEfOwvQc1Y4lLzuT9Y/w9iAv4/yO6DZ834We37179XQTFVsEmSEg==
+X-Received: by 2002:a54:4f89:0:b0:2ef:7561:d35d with SMTP id g9-20020a544f89000000b002ef7561d35dmr1055708oiy.261.1647913853228;
+        Mon, 21 Mar 2022 18:50:53 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id p8-20020a4aac08000000b00324907b406fsm1857479oon.21.2022.03.21.18.50.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Mar 2022 18:50:52 -0700 (PDT)
+Received: (nullmailer pid 941033 invoked by uid 1000);
+        Tue, 22 Mar 2022 01:50:51 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     sboyd@kernel.org, devicetree@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        krzk+dt@kernel.org, mturquette@baylibre.com,
+        linux-crypto@vger.kernel.org, heiko@sntech.de, robh+dt@kernel.org,
+        herbert@gondor.apana.org.au, linux-clk@vger.kernel.org
+In-Reply-To: <20220321200739.3572792-22-clabbe@baylibre.com>
+References: <20220321200739.3572792-1-clabbe@baylibre.com> <20220321200739.3572792-22-clabbe@baylibre.com>
+Subject: Re: [PATCH v3 21/26] dt-bindings: crypto: convert rockchip-crypto to yaml
+Date:   Mon, 21 Mar 2022 20:50:51 -0500
+Message-Id: <1647913851.207213.941032.nullmailer@robh.at.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 21, 2022 at 02:23:54PM -0400, Paul Moore wrote:
-> On Mon, Mar 21, 2022 at 1:45 PM Mickaël Salaün <mic@digikod.net> wrote:
-> >
-> > From: Mickaël Salaün <mic@linux.microsoft.com>
-> >
-> > The blacklist_init() function calls panic() for memory allocation
-> > errors.  This change documents the reason why we don't return -ENODEV.
-> >
-> > Suggested-by: Paul Moore <paul@paul-moore.com> [1]
-> > Requested-by: Jarkko Sakkinen <jarkko@kernel.org> [1]
-> > Link: https://lore.kernel.org/r/YjeW2r6Wv55Du0bJ@iki.fi [1]
-> > Signed-off-by: Mickaël Salaün <mic@linux.microsoft.com>
-> > Link: https://lore.kernel.org/r/20220321174548.510516-2-mic@digikod.net
-> > ---
-> >  certs/blacklist.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
+On Mon, 21 Mar 2022 20:07:34 +0000, Corentin Labbe wrote:
+> Convert rockchip-crypto to yaml
 > 
-> I would suggest changing the second sentence as shown below, but
-> otherwise it looks good to me.
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  .../crypto/rockchip,rk3288-crypto.yaml        | 84 +++++++++++++++++++
+>  .../bindings/crypto/rockchip-crypto.txt       | 28 -------
+>  2 files changed, 84 insertions(+), 28 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+>  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
 > 
-> Reviewed-by: Paul Moore <paul@paul-moore.com>
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Running 'make dtbs_check' with the schema in this patch gives the
+following warnings. Consider if they are expected or the schema is
+incorrect. These may not be new warnings.
 
-Mickaël, I think since your patch set was not huge in the first place, I'm
-considering making it part of rc2 pull request while I normally try to
-avoid any features after rc1. It's anyway throughly tested, and generally
-has been around for a *long time*. I've even tested it myself a few times.
+Note that it is not yet a requirement to have 0 warnings for dtbs_check.
+This will change in the future.
 
-Just trying to be responsible as a maintainer and if something does not
-feel right, I don't  try to pretend that "I get it", if you know what 
-I mean. This fully clarifies "not getting it" part :-)
+Full log is available here: https://patchwork.ozlabs.org/patch/1607887
 
-Thanks!
 
-BR, Jarkko
+cypto-controller@ff8a0000: 'reset-names' does not match any of the regexes: 'pinctrl-[0-9]+'
+	arch/arm/boot/dts/rk3288-evb-act8846.dt.yaml
+	arch/arm/boot/dts/rk3288-evb-rk808.dt.yaml
+	arch/arm/boot/dts/rk3288-firefly-beta.dt.yaml
+	arch/arm/boot/dts/rk3288-firefly.dt.yaml
+	arch/arm/boot/dts/rk3288-firefly-reload.dt.yaml
+	arch/arm/boot/dts/rk3288-miqi.dt.yaml
+	arch/arm/boot/dts/rk3288-phycore-rdk.dt.yaml
+	arch/arm/boot/dts/rk3288-popmetal.dt.yaml
+	arch/arm/boot/dts/rk3288-r89.dt.yaml
+	arch/arm/boot/dts/rk3288-rock2-square.dt.yaml
+	arch/arm/boot/dts/rk3288-rock-pi-n8.dt.yaml
+	arch/arm/boot/dts/rk3288-tinker.dt.yaml
+	arch/arm/boot/dts/rk3288-tinker-s.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-brain.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-fievel.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-jaq.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-jerry.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-mickey.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-mighty.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-minnie.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-pinky.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-speedy.dt.yaml
+	arch/arm/boot/dts/rk3288-veyron-tiger.dt.yaml
+	arch/arm/boot/dts/rk3288-vyasa.dt.yaml
+
