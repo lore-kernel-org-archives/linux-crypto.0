@@ -2,85 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2FFC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 13:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24D4C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 13:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234966AbiCVNDv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 09:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43676 "EHLO
+        id S231882AbiCVNV0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 09:21:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235195AbiCVNDu (ORCPT
+        with ESMTP id S235360AbiCVNVZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 09:03:50 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434A885BC1
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:02:23 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id q5so6161125plg.3
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:02:23 -0700 (PDT)
+        Tue, 22 Mar 2022 09:21:25 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F716A014
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:19:58 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id c62so2130276edf.5
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 06:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=M/XbYmdchGb4htIgyglLZmtK2Rqo0eR5QKNfFg2mxH8=;
-        b=TFPNMS9qTjP0AvWCDwmzNwq5vcwJPaA9h+ATwVKFM9eUj0XaV5kZt2be9vvjr4LGcQ
-         DF5xrzSXGINDeq14lyZrHGCW8S7YkcTNTSr4BTKMuvI/0DQN9sggYqY7QC0T3vJNee86
-         lKyKPsZvmARNTeDT5O6qAdS885M1wtzNEfZkVL5/05KB0rzbD4/1ZYF6vrwRBjZGA1J1
-         4ltnMBsV+AGjQneA8ux95gebwUKY0d4oUO7LSXYPTYXs5hro22X60OZKR1uUn1A+dRwN
-         8919m/tDL8B1cCrGkq5V2oYWIB8EIhCuGXyypwNES9wUiaSmpjCCPmdAvY5mwrkWDvgy
-         4/GA==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=uJzve08biZhB4r1QtUm+S3/m2cJlwVKYr43Is/lArT8=;
+        b=isioKpILG85LIxzS8L9QmbzGpxJlwVCT5xcPWHLWbkBQGWRo5XDALH1PPTy8OuKuBa
+         wlp/ixRVWxUf0hzgva2gcrlpBrUsELB2vigN/BHh7wGlFQmnB06rRQB74hf6DN8Ytn4Q
+         Q2sS9PZyTFY3KfT5h6s1dM8/u/JR61e0kMJ/Iqq99Z8+SiTmvRbqCVHocMRWsG+4z6o3
+         T88Sphrs+/90nNPGvmf7RnKJXHA2KoXkry5mn6iuPzzDhv8hWqAzYEPOz5R9iY41jWpV
+         o1RxdbJXiDDTgPJc81ResXiYMYiKlyt8kth+McPO1Gw1l+Q32Tw8DKjllrv8KVNpYuPb
+         wRhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=M/XbYmdchGb4htIgyglLZmtK2Rqo0eR5QKNfFg2mxH8=;
-        b=Mj8T29QAUfzffvPNydKNHQNNyewG4YnIjZlKpXn2NaybYYj3HwLU+4LrRfEjjzLdyu
-         X2qPft967lX5PNCAJ09rbS/gsKXLGFD1HQNkELK+PrUkeb/MDEQ3yACw4WvjlKDghgyF
-         iHv+aH1xHbC7ueVATpjztj4g6mw6oaAa8dxn9LNkAVnrUx2/G8EDZe48yvqSAqwES7X1
-         BeFsDZcndjBCL/ksFV/FDlZUc2RnQ3UltLMS7nW8BLR/2Ybwx0BO0YyXlaSVQh1yYuOU
-         FVHFxk8uYBCZvtqS6ROIoPo32Hd25xfXRteBD5MJBZiPXbCKV9kz7cZQXa8Gz/b0G2LI
-         8UWQ==
-X-Gm-Message-State: AOAM532aYXy5Ink+Zn6IRtapbzeFGQjQrToiAG0aEs0+PasWFDQeHca4
-        vUVj63ldR3aiGP2AWT5Vqy6TQJDcYNC8oF9D
-X-Google-Smtp-Source: ABdhPJwFI/IRn1/8u+uFGz/5nbAX4iuEA+B9DgJePrej8zIN1Ok43G5ao3329yIy/Ob6/yjwYYmSig==
-X-Received: by 2002:a17:90a:628b:b0:1c6:a410:d73f with SMTP id d11-20020a17090a628b00b001c6a410d73fmr5051550pjj.96.1647954142569;
-        Tue, 22 Mar 2022 06:02:22 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f14-20020a056a0022ce00b004fabe9fac23sm2618177pfj.151.2022.03.22.06.02.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 06:02:22 -0700 (PDT)
-Message-ID: <650655da-e719-4e48-5dc5-2e6529674f65@kernel.dk>
-Date:   Tue, 22 Mar 2022 07:02:20 -0600
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=uJzve08biZhB4r1QtUm+S3/m2cJlwVKYr43Is/lArT8=;
+        b=qgJfhN0ucEHDWbQbbzVvrqlQ0eMTM4d1V0uvnK9kZwAnwfgxW5qThYHNvYyyHZs1zp
+         uOJZDSnNMmc4/6n7Bn7kN7IlJBgSFVw+TG0NcHZ/8xMnhUaUANlJ89JXZMT2l/QnAtS6
+         a6OMVYa9cv+ceIovFW4/pwshbvD9f41wKuT9tD6f0miHTZX/s3NAl5djEerSL3EYdQye
+         TCqf537SV3D0cA6CdD6GSQ8qhJM6drNhnzwLuQhjikuwDbC0IvXtsnhxV76IEAUJ4f8p
+         u3e61pjTBzM9V0cfq+yWRR3+fCX7m7RJ6GXfHJ8CLEhwsRLbmQStEecZtKjFWHYfBT6b
+         M7WA==
+X-Gm-Message-State: AOAM530eAYKfACC+FghALpeMUj508mDfzBsiabqQHkAB8MmACRHVpbEn
+        khQMO8Ba/T5w0pKOlENK4EC5MqyT13qy8LN8hJ85EdRj
+X-Google-Smtp-Source: ABdhPJw34eppP/81iFScRAVr/l/ItTww1SYLOwcLrmlxR7o49DrgZ6FqMSznot7KFJKITmF1wkbU+9U/O2MterSqIPs=
+X-Received: by 2002:aa7:cf08:0:b0:418:e5f7:b2a1 with SMTP id
+ a8-20020aa7cf08000000b00418e5f7b2a1mr27878480edy.76.1647955196602; Tue, 22
+ Mar 2022 06:19:56 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: crypto: crc64-rocksoft-generic test failed (wrong result) on test
- vector 0
-Content-Language: en-US
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        herbert@gondor.apana.org.au, kbusch@kernel.org
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <YjmeVttXDd/FPwUP@Red>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YjmeVttXDd/FPwUP@Red>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220111124104.2379295-1-festevam@gmail.com> <YfOL3Yxvb5srGKp4@gondor.apana.org.au>
+ <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
+In-Reply-To: <ee43a9f9-3746-a48d-5615-b9f4166eaa46@nxp.com>
+From:   Fabio Estevam <festevam@gmail.com>
+Date:   Tue, 22 Mar 2022 10:19:44 -0300
+Message-ID: <CAOMZO5AAYHRUUy872KgO9PuYwHbnOTQ80TSCx1jvmtgH+HzDGg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: caam - enable prediction resistance conditionally
+To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Varun Sethi <V.Sethi@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Andrei Botila <andrei.botila@nxp.com>,
+        "andrew.smirnov@gmail.com" <andrew.smirnov@gmail.com>,
+        "fredrik.yhlen@endian.se" <fredrik.yhlen@endian.se>,
+        "hs@denx.de" <hs@denx.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Fabio Estevam <festevam@denx.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/22/22 4:00 AM, Corentin Labbe wrote:
-> Hello
-> 
-> Booting an arm64_defconfig with BigEndian lead to:
-> alg: shash: crc64-rocksoft-generic test failed (wrong result) on test vector 0, cfg=\"init+update+final aligned buffer\"
-> 
-> Reproductible on the virt qemu machine.
-> 
-> Furthermore, none of crc64 files have clear MAINTAINERS entry.
+Hi Horia and Varun,
 
-Keith, can you send in your BE fix? The commit is upstream now.
+On Fri, Jan 28, 2022 at 4:44 AM Horia Geant=C4=83 <horia.geanta@nxp.com> wr=
+ote:
 
--- 
-Jens Axboe
+> We've been in contact with Fabio and we're working on a solution.
+> Now I realize the list hasn't been Cc-ed - sorry for the confusion
+> and for not providing an explicit Nack.
+>
+> Herbert, could you please revert this patch?
+>
+> It's doing more harm than good, since it's making the internal CAAM RNG
+> work like a DRBG / PRNG (instead of TRNG) while the driver registers
+> to hwrng as an entropy source.
 
+Any progress on the proper fix for this issue?
+
+Thanks
