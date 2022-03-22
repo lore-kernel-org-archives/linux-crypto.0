@@ -2,53 +2,41 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37920C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCBAC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 18:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239866AbiCVSWs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 14:22:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35514 "EHLO
+        id S240335AbiCVS1B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 14:27:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236651AbiCVSWr (ORCPT
+        with ESMTP id S240474AbiCVS0t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 14:22:47 -0400
-X-Greylist: delayed 1470 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Mar 2022 11:21:20 PDT
-Received: from gateway23.websitewelcome.com (gateway23.websitewelcome.com [192.185.47.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6384B8A6C2
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 11:21:20 -0700 (PDT)
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway23.websitewelcome.com (Postfix) with ESMTP id 12DF584F6
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 12:56:49 -0500 (CDT)
-Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
-        by cmsmtp with SMTP
-        id WikSn7tYRXvvJWikSnUC54; Tue, 22 Mar 2022 12:56:49 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=roeck-us.net; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=+7brRiRvYR2VidHiE43DL07dgBdAsSYPqfIk9b4TX/g=; b=StQ7WEwTCb/rt89VCe+LQ+ERB3
-        QXWawfzAKDTeBk43IYokD+KpmviLLj48HZ6Hdz6Gtv7W0x9SfXi41CA7r8C9zZ23Pvsjnaxrq96PA
-        Xh5IdeTdXhHHWO3QJNulu9uqk+8kZeiomOeJiD0ZWg6KT4wgh0R12OuxUioWkkDwKTiTnJM7JGJqi
-        +ZM34ZtPX8NXMvyTGRbVqdYCe+rcqabUesJcdWq64y6z4YsvRI4XcveyYK5C6Uds0zKkh0UxczVYc
-        t23ai+O230YiBstGhXLG2gwrDSTpEMCyE7845DZOyf22ZUtOxKleVeCYKKXbK5ah+HB8WeZaLyZTd
-        j2uEbZpQ==;
-Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:54402)
-        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@roeck-us.net>)
-        id 1nWikR-002XCh-MU; Tue, 22 Mar 2022 17:56:47 +0000
-Message-ID: <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
-Date:   Tue, 22 Mar 2022 10:56:44 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Tue, 22 Mar 2022 14:26:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6082291AE6;
+        Tue, 22 Mar 2022 11:24:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DBCCE615C1;
+        Tue, 22 Mar 2022 18:24:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A312DC340EC;
+        Tue, 22 Mar 2022 18:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647973468;
+        bh=FvpGfCbFl7jiIv+5qDBixSNKRQDQ0tuqYtKpgJTJImM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tQuDXUlhqs9CKsHkSjY/ScbmM/fz5A8eD7iftU4YRevtwvus6YLjyHciExv9uEdvK
+         ODgx6yqbrUVHYitdapwSw4VSk3x+3dDFFmpv5S3UydMRalWps10DNbqG6qzDgFeSri
+         tCuYrOWRikPlVAOw3zibpylqKvA34k+giMV9sDN+3SZ18VosQbFmMMNYqyS7RzYk7W
+         San13jBR7ieHdupZcUbtNZo0+rG5hNfra34zL1x9muYlzHDpqu0rkEVeg2jxCsbBLR
+         vi2JhVOE/Fgj8jBj4RQeaxhNngtN4bUtwQOvWzlVEwWN09QoJcBGUj208CehiBpojp
+         K3AoZ6dmCtHdw==
+Date:   Tue, 22 Mar 2022 18:24:19 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
         Nick Hu <nickhu@andestech.com>,
         Max Filippov <jcmvbkbc@gmail.com>,
@@ -72,63 +60,67 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+Message-ID: <YjoUU+8zrzB02pW7@sirena.org.uk>
 References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net> <YjoC5kQMqyC/3L5Y@zx2c4.com>
-From:   Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <YjoC5kQMqyC/3L5Y@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - roeck-us.net
-X-BWhitelist: no
-X-Source-IP: 108.223.40.66
-X-Source-L: No
-X-Exim-ID: 1nWikR-002XCh-MU
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net [108.223.40.66]:54402
-X-Source-Auth: linux@roeck-us.net
-X-Email-Count: 32
-X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
-X-Local-Domain: yes
+ <20220322155820.GA1745955@roeck-us.net>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="9GphWWnfqSfQwrGD"
+Content-Disposition: inline
+In-Reply-To: <20220322155820.GA1745955@roeck-us.net>
+X-Cookie: I exist, therefore I am paid.
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/22/22 10:09, Jason A. Donenfeld wrote:
-> Hey Guenter,
-> 
-> On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
->> On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
->>> This topic has come up countless times, and usually doesn't go anywhere.
->>> This time I thought I'd bring it up with a slightly narrower focus,
->>> updated for some developments over the last three years: we finally can
->>> make /dev/urandom always secure, in light of the fact that our RNG is
->>> now always seeded.
->>>
->>
->> [ ... ]
->>
->> This patch (or a later version of it) made it into mainline and causes a
->> large number of qemu boot test failures for various architectures (arm,
->> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
->> denominator is that boot hangs at "Saving random seed:". A sample bisect
->> log is attached. Reverting this patch fixes the problem.
-> 
-> As Linus said, it was worth a try, but I guess it just didn't work. For
-> my own curiosity, though, do you have a link to those QEMU VMs you could
-> share? I'd sort of like to poke around, and if we do ever reattempt this
-> sometime down the road, it seems like understanding everything about why
-> the previous time failed might be a good idea.
-> 
 
-Everything - including the various root file systems - is at
-git@github.com:groeck/linux-build-test.git. Look into rootfs/ for the
-various boot tests. I'll be happy to provide some qemu command lines
-if needed.
+--9GphWWnfqSfQwrGD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Guenter
+On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
+
+> This patch (or a later version of it) made it into mainline and causes a
+> large number of qemu boot test failures for various architectures (arm,
+> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
+> denominator is that boot hangs at "Saving random seed:". A sample bisect
+> log is attached. Reverting this patch fixes the problem.
+
+Just as a datapoint for debugging at least qemu/arm is getting coverage
+in CI systems (KernelCI is covering a bunch of different emulated
+machines and LKFT has at least one configuration as well, clang's tests
+have some wider architecture coverage as well I think) and they don't
+seem to be seeing any problems - there's some other variable in there.
+
+For example current basic boot tests for KernelCI are at:
+
+   https://linux.kernelci.org/test/job/mainline/branch/master/kernel/v5.17-=
+1442-gb47d5a4f6b8d/plan/baseline/
+
+for mainline and -next has:
+
+   https://linux.kernelci.org/test/job/next/branch/master/kernel/next-20220=
+322/plan/baseline/
+
+These are with a buildroot based rootfs that has a "Saving random seed: "=
+=20
+step in the boot process FWIW.
+
+--9GphWWnfqSfQwrGD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmI6FFIACgkQJNaLcl1U
+h9BikAf9GyEwspA1FgiJqGxDrpcFJatNlthPVfssfjxi3+PM/Sr3aGVYuI1cucrY
+rOXZc5iGh0WzI6+6SJa4LHN9Az3zbhAbXim3xfsdRA6H43LLTo2Nnm5X7WXiimIs
++DoFKihIN+SIeYLbYORzZpmCnZ23wcVviG2W3WdzUCKj7LzOQYcPKzAoBfqvXM0H
+DdzlPyQMQMo1RwxuMv7gokqg/ZXNKt3bTJ8ptBTYY+uOwYKAifVdzsJc8GF+FfE7
+1vZPgBdPNegM/QLA2E5p5OlfmymsdJfN0+M6pjVINH9CyIKvAPpoFkXacv8EV/2i
+QuDiWltRqivsK2Px9ISnKQzA9wB5tw==
+=nsEK
+-----END PGP SIGNATURE-----
+
+--9GphWWnfqSfQwrGD--
