@@ -2,185 +2,501 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB16FC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Mar 2022 23:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A1EC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 02:15:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240666AbiCVX4c (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 19:56:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56362 "EHLO
+        id S236958AbiCWCQk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 22:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbiCVX4b (ORCPT
+        with ESMTP id S241134AbiCWCQj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 19:56:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9581C5DA0B;
-        Tue, 22 Mar 2022 16:55:02 -0700 (PDT)
+        Tue, 22 Mar 2022 22:16:39 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 607B170075
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 19:15:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 36478B81DCB;
-        Tue, 22 Mar 2022 23:55:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74402C340F2;
-        Tue, 22 Mar 2022 23:54:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gGrZMvSJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1647993296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=f8Wt8uBQYGZQhCEfKCpobGBc6rfav6vAiizVahglg7Y=;
-        b=gGrZMvSJhpGKwYpEvMw3JXc9i6s5pdiVOJLM+Bunnp5sM9tSMfKiBf2V4fBXATB/GK82My
-        yZ4hMzEMg1Ci0b3RNz4rKvEUQ51MCTOltz5eJCOKYMsAjpw8oO/WBUdoC59esVAAAQyqEh
-        7i4r41at9nbrOXp2yKSHJkJcaf+yiCg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 541f7814 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 22 Mar 2022 23:54:56 +0000 (UTC)
-Received: by mail-yb1-f177.google.com with SMTP id j2so36685047ybu.0;
-        Tue, 22 Mar 2022 16:54:55 -0700 (PDT)
-X-Gm-Message-State: AOAM5334vBd6c+Ymx6c3MDZHsZ5f4N/pVa5ZMOQzlDu6zr64LxrsOCq/
-        idMRLy8Kjk7YE3XxfnHavFBi/fsWw4uJ2c3uj3s=
-X-Google-Smtp-Source: ABdhPJwhufIrGQCUm2LFHBr+tlbqbyrb24JNhjp3dM/qKs4S8AeovmWrI2Joovd0HAOMldLapu3D7vYgYBJwknWUgcE=
-X-Received: by 2002:a5b:782:0:b0:634:683f:310e with SMTP id
- b2-20020a5b0782000000b00634683f310emr294616ybq.398.1647993294612; Tue, 22 Mar
- 2022 16:54:54 -0700 (PDT)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C08BBB81DE3
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 02:15:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 462C1C340F3;
+        Wed, 23 Mar 2022 02:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648001705;
+        bh=TDdno/jQsh4BZoZT9Z/5rf8DDidcaJffNvwJocy8FzQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dpvW0nBScJCwkgPD0hJE/QD5nThGWiC2/WGr2D7r0gWc469RiOwGVURsNSotOZCDK
+         lVzGAe1buMb5kex9954MGOqU7HHM6xYFvNYmXMImhHuUpyeEx6xT1siytm8jVTcpin
+         aLQvjzJcn/URaYQmZQqPvpsMkHDhRSF/ixMcpYB5oUHhTGHzt9dRrgSSNdk9RZ1JX5
+         Eif1OyfzRoUS2IbrRshmNcrjVEiTlDNikQ9y7+GH73cyAA7KPsxb0829eXgV/PQLCc
+         DYINib4YrYeE5U74QXg+y3k/hRjfK2nY18GhJrFXKHT6Sgtr5CWQHO9FWjTH5q4Kku
+         pp0h5EhVym4vA==
+Date:   Tue, 22 Mar 2022 19:15:03 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v3 6/8] crypto: x86/polyval: Add PCLMULQDQ accelerated
+ implementation of POLYVAL
+Message-ID: <YjqCpxNiFqefyuFO@sol.localdomain>
+References: <20220315230035.3792663-1-nhuck@google.com>
+ <20220315230035.3792663-7-nhuck@google.com>
 MIME-Version: 1.0
-References: <20220322191436.110963-1-Jason@zx2c4.com> <CAHk-=wgSRk_-Nh5gtDKZj_fKya1NKry1Y5jdejfKNPnB+Pr4cw@mail.gmail.com>
-In-Reply-To: <CAHk-=wgSRk_-Nh5gtDKZj_fKya1NKry1Y5jdejfKNPnB+Pr4cw@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 22 Mar 2022 17:54:43 -0600
-X-Gmail-Original-Message-ID: <CAHmME9oWzXeuEJacLoKWHer82LwCtD6+9Kv9gMOKYcZOhhN7pA@mail.gmail.com>
-Message-ID: <CAHmME9oWzXeuEJacLoKWHer82LwCtD6+9Kv9gMOKYcZOhhN7pA@mail.gmail.com>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast init
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jann Horn <jannh@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220315230035.3792663-7-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Linus,
+On Tue, Mar 15, 2022 at 11:00:33PM +0000, Nathan Huckleberry wrote:
+> diff --git a/arch/x86/crypto/polyval-clmulni_asm.S b/arch/x86/crypto/polyval-clmulni_asm.S
+> new file mode 100644
+> index 000000000000..ad7126d9f0ff
+> --- /dev/null
+> +++ b/arch/x86/crypto/polyval-clmulni_asm.S
+> @@ -0,0 +1,376 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright 2021 Google LLC
+> + */
+> +/*
+> + * This is an efficient implementation of POLYVAL using intel PCLMULQDQ-NI
+> + * instructions. It works on 8 blocks at a time, by precomputing the first 8
+> + * keys powers h^8, ..., h^1 in the POLYVAL finite field. This precomputation
+> + * allows us to split finite field multiplication into two steps.
+> + *
+> + * In the first step, we consider h^i, m_i as normal polynomials of degree less
+> + * than 128. We then compute p(x) = h^8m_0 + ... + h^1m_7 where multiplication
+> + * is simply polynomial multiplication.
+> + *
+> + * In the second step, we compute the reduction of p(x) modulo the finite field
+> + * modulus g(x) = x^128 + x^127 + x^126 + x^121 + 1.
+> + *
+> + * This two step process is equivalent to computing h^8m_0 + ... + h^1m_7 where
+> + * multiplication is finite field multiplication. The advantage is that the
+> + * two-step process  only requires 1 finite field reduction for every 8
+> + * polynomial multiplications. Further parallelism is gained by interleaving the
+> + * multiplications and polynomial reductions.
+> + */
+> +
+> +#include <linux/linkage.h>
+> +#include <asm/frame.h>
+> +
+> +#define NUM_PRECOMPUTE_POWERS 8
 
-On Tue, Mar 22, 2022 at 2:42 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Tue, Mar 22, 2022 at 12:15 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > @@ -1507,6 +1507,8 @@ static int write_pool(const char __user *ubuf, size_t count)
-> >                 }
-> >                 count -= len;
-> >                 ubuf += len;
-> > +               if (unlikely(crng_init == 0 && !will_credit))
-> > +                       crng_pre_init_inject(block, len, false);
-> >                 mix_pool_bytes(block, len);
-> >                 cond_resched();
-> >         }
->
-> Ugh. I hate that whole crng_pre_init_inject() dance.
+STRIDE_BLOCKS might be a better name than NUM_PRECOMPUTE_POWERS.  Shorter but
+more descriptive, IMO.
 
-Yea it's not great, but it's a helluva lot better than what was there
-before 5.18, when there were two different ways of mixing into the
-crng key, both of which were insecure. At least now it's a hash
-function. As I mentioned in that pull request, I tried to shore up the
-existing design as much as I could without departing from it in any
-large fundamental ways. It may well be time to revisit the pre init
-situation though.
+> +/*
+> + * Performs schoolbook1_iteration on two lists of 128-bit polynomials of length
+> + * b pointed to by MSG and KEY_POWERS.
+> + */
+> +.macro schoolbook1 count
+> +	.set i, 0
+> +	.rept (\count)
+> +		schoolbook1_iteration i 0
+> +		.set i, (i +1)
+> +	.endr
+> +.endm
 
-Maybe it'd help if I described what the goals are of the current
-approach and how it attempts to accomplish that.
+'count', not 'b'.
 
-The chacha key that's used for random bytes is separate from the input
-pool, which is where entropy gets dumped. The reason for that
-separation is because it's important that we decide when and under
-what conditions to extract from the input pool into a new chacha key.
-If we do it too often or prematurely, then we risk updating the chacha
-key with very few new bits of entropy. If there aren't enough new
-bits, and an attacker knows the old state (say, because the system
-just booted), then it's trivial to bruteforce those new bits, since
-read access to /dev/urandom is unprivileged. That's very bad.
+> +/*
+> + * Computes the product of two 128-bit polynomials at the memory locations
+> + * specified by (MSG + 16*i) and (KEY_POWERS + 16*i) and XORs the components of the
+> + * 256-bit product into LO, MI, HI.
+> + *
+> + * The multiplication produces four parts:
+> + *   LOW: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of each polynomial
+> + *   MID1: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of the first polynomial and the top 64-bits of the second
+> + *   MID2: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of the second polynomial and the top 64-bits of the first
+> + *   HIGH: The polynomial given by performing carryless multiplication of the
+> + *   top 64-bits of each polynomial
+> + *
+> + * We compute:
+> + *  LO ^= LOW
+> + *  MI ^= MID1 ^ MID2
+> + *  HI ^= HIGH
+> + *
+> + * Later, the 256-bit result can be extracted as:
+> + *   [HI_H : HI_L ^ MI_H : LO_H ^ MI_L : LO_L]
+> + * This step is done when computing the polynomial reduction for efficiency
+> + * reasons.
+> + *
+> + * If xor_sum == 1, then also XOR the value of SUM into m_0.  This avoids an
+> + * extra multiplication of SUM and h^N.
+> + */
 
-For that reason, we only reseed when we've collected 256 bits of
-entropy, and at a schedule of uptime/2 for the first 10 minutes, and
-then every 5 minutes after that.
+h^8 instead of h^N?  The above is one of only two places where "N" is mentioned,
+and the other uses to mean something different from here.
 
-The question, here, is what to do before we've collected 256 bits of
-entropy. 80 bits is still better than 0, for example. The existing
-scheme (from Ted) is that we maintain a state variable, crng_init.
-When crng_init=0, we direct all entropy into the chacha key directly.
-If that entropy is creditable, then we account for up to 64 bytes of
-input total, regardless of how many "bits" of entropy we would
-otherwise be crediting were it not pre-init phase. That's kinda weird,
-but the motivating mantra has always been, "fast init is garbage, but
-it's better than nothing." Then, once we hit 64 bytes of fast init
-accounting, we transition to crng_init=1. At this stage, we're putting
-bytes into the normal input pool and crediting it as usual, not
-updating the crng key directly anymore with injection, and the crng is
-still blocked. When we hit 256 bits of accounted entropy from the
-crng_init=1 stage, then we're ready to go, and we transition to
-crng_init=2.
+> +/*
+> + * Performs the same computation as schoolbook1_iteration, except we expect the
+> + * arguments to already be loaded into xmm0 and xmm1.
+> + */
+> +.macro schoolbook1_noload
+> +	vpclmulqdq $0x01, %xmm0, %xmm1, %xmm2
+> +	vpclmulqdq $0x00, %xmm0, %xmm1, %xmm3
+> +	vpclmulqdq $0x11, %xmm0, %xmm1, %xmm4
+> +	vpclmulqdq $0x10, %xmm0, %xmm1, %xmm5
+> +	vpxor %xmm2, MI, MI
+> +	vpxor %xmm3, LO, LO
+> +	vpxor %xmm5, MI, MI
+> +	vpxor %xmm4, HI, HI
+> +.endm
 
-So this patch helps with the crng_init=0 case. It doesn't address the
-crng_init=1 case, when the bytes written to /dev/urandom won't be
-directly injected as they are for crng_init=0. In any case, the one
-thing we're trying to preserve in all of this is that when we do
-transition to crng_init=2, it's with a pool that contains 256 bits of
-entropy that haven't previously been exposed anywhere, so that they
-can't be brute forced.
+How about making this macro set LO, MI, HI and directly instead of XOR'ing into
+them?  That's actually what the two users of it want.  I.e.:
 
-With that as background, to answer your question:
+/*
+ * Performs the same computation as schoolbook1_iteration, except we expect the
+ * arguments to already be loaded into xmm0 and xmm1, and we set the result
+ * registers LO, MI, and HI directly rather than XOR'ing into them.
+ */
+.macro schoolbook1_noload
+        vpclmulqdq $0x01, %xmm0, %xmm1, MI
+        vpclmulqdq $0x10, %xmm0, %xmm1, %xmm2
+        vpclmulqdq $0x00, %xmm0, %xmm1, LO
+        vpclmulqdq $0x11, %xmm0, %xmm1, HI
+        vpxor %xmm2, MI, MI
+.endm
 
-> Maybe I'm missing something. But it seems kind of silly to use
-> base_crng AT ALL before crng_ready(). Why not use the pool we have
-> that *is* actually updated (that 'input_pool')?
+That would save some instructions.
 
-In this case, base_crng.key is really just doubling as a separate
-pool. The "pre init pool", the "fast init pool", the "super terrible
-but at least not zero pool", the "all bets are off pool", ... whatever
-you want to call it. Why a separate pool for pre init? Because the
-real input pool needs to accumulate 256 bits of entropy before it's
-safe to use.
+> +/*
+> + * Computes the 128-bit reduction of PL, PH. Stores the result in PH.
 
-Your suggestion is to instead not have a separate pool, but perhaps
-just do separate accounting. That might work to some degree, but the
-devil is in the details, and that sounds a lot harder and messier to
-code. For example, you wrote:
+"PL, PH" => "PH : PL".
 
-> +               crng_fast_key_erasure(input_pool.key, chacha_state,
-> +                                     random_data, random_data_len);
+Also mention which register this clobbers.
 
-Except there is no input_pool.key, because the input_pool's state is
-actually an un-finalized hash function. So what you wind up with
-instead is calling extract_entropy() on every read. But then you have
-to decide a certain point when you stop doing that, so it can
-accumulate 256 bits prior to exposure, and things quickly get
-extremely messy. So I don't think your suggestion improves much.
+> + *
+> + * This macro computes p(x) mod g(x) where p(x) is in montgomery form and g(x) =
+> + * x^128 + x^127 + x^126 + x^121 + 1.
+> + *
+> + * We have a 256-bit polynomial P_3 : P_2 : P_1 : P_0 that is the product of
 
-The long term solution to this stuff might be doing away with the
-entropy accounting entirely, as I suggested in the other thread. The
-shorter term solution, though, might be reimagining how the
-crng_init=1/2 states work to begin with. (And the shortest-term "fix"
-is this patch, which while not perfect is at least something.)
+"P_3 : P_2 : P_1 : P_0" => "PH : PL = P_3 : P_2 : P_1 : P_0", so that it's clear
+how P_3 through P_0 relate to PH and PL.
 
-Just sort of spitballing what the shorter term solution might be, we
-could do something exponential, where we get rid of the
-pre_init_inject stuff entirely, but call `crng_reseed(force=true)` at
-1 bit, 2 bits, 4 bits, 8 bits, 16 bits, 32 bits, ... 256 bits, the
-same way we do now with the time. (This is somewhat similar to what NT
-does, fwiw.) A downside is that the gap between, say, 64 bits and 128
-bits is much "longer" than what we have now with pre_init_inject.
+> + * two 128-bit polynomials in Montgomery form.  We need to reduce it mod g(x).
+> + * Also, since polynomials in Montgomery form have an "extra" factor of x^128,
+> + * this product has two extra factors of x^128.  To get it back into Montgomery
+> + * form, we need to remove one of these factors by dividing by x^128.
+> + *
+> + * To accomplish both of these goals, we add multiples of g(x) that cancel out
+> + * the low 128 bits P_1 : P_0, leaving just the high 128 bits. Since the low
+> + * bits are zero, the polynomial division by x^128 can be done by right shifting.
+> + *
+> + * Since the only nonzero term in the low 64 bits of g(x) is the constant term,
+> + * the multiple of g(x) needed to cancel out P_0 is P_0 * g(x).  The CPU can
+> + * only do 64x64 bit multiplications, so split P_0 * g(x) into x^128 * P_0 +
+> + * x^64 g*(x) * P_0 + P_0, where g*(x) is bits 64-127 of g(x).  Adding this to
 
-While the above might be an improvement, that doesn't help with our
-/dev/urandom problem, though. Perhaps for that we could have some
-messy heuristic, like `if (capable(CAP_SYS_ADMIN) && !crng_ready())
-crng_reseed(force=true);`. That's sort of ugly too, but it would help
-with the /dev/urandom shellscript seeders.
+"x^64 g*(x)" => "x^64 * g*(x)"
 
-I'll think on it some more, but these two spitball ideas together
-might result in a nice simplification by eliminating the fast pool
-entirely. Happy to hear more ideas from you too if the above inspires
-anything.
+> + * the original polynomial gives P_3 : P_2 + P_0 + T_1 : P_1 + T_0 : 0, where T
+> + * = T_1 : T_0 = g*(x) * P0.  Thus, bits 0-63 got "folded" into bits 64-191.
 
-Jason
+"P0" => "P_0"
+
+> + *
+> + * Repeating this same process on the next 64 bits "folds" bits 64-127 into bits
+> + * 128-255, giving the answer in bits 128-255. This time, we need to cancel P_1
+> + * + T_0 in bits 64-127. The multiple of g(x) required is (P_1 + T_0) * g(x) *
+> + * x^64. Adding this to our previous computation gives P_3 + P_1 + T_0 + V_1 :
+> + * P_2 + P_0 + T_1 + V_0 : 0 : 0, where V = V_1 : V_0 = g*(x) * (P_1 + T_0).
+> + *
+> + * So our final computation is:
+> + *   T = T_1 : T_0 = g*(x) * P_0
+> + *   V = V_1 : V_0 = g*(x) * (T_0 ^ P_1)
+> + *   p(x) / x^{128} mod g(x) = P_3 ^ P_1 ^ V_1 ^ T_0 : P_2 ^ P_0 ^ V_0 ^ T_1
+
+The notation suddenly changes from + to ^.  How about consistently using +?
+Or ^, either one as long as it's consistent...
+
+Also, for the final line, the order "P_3 + P_1 + T_0 + V_1 : P_2 + P_0 + T_1 +
+V_0" would make more sense, as it would match the logic of the code.
+
+> + *
+> + * The implementation below saves a XOR instruction by computing P_1 ^ T_0 : P_0
+> + * ^ T_1 and XORing into PH, rather than directly XORing P_1 : P_0, T_0 : T1
+> + * into PH.  This allows us to reuse P_1 ^ T_0 when computing V.
+> + */
+> +.macro montgomery_reduction
+> +	movdqa PL, T
+> +	pclmulqdq $0x00, GSTAR, T # T = [P_0 * g*(x)]
+> +	pshufd $0b01001110, T, V # V = [T_0 : T_1]
+> +	pxor V, PL # PL = [P_1 ^ T_0 : P_0 ^ T_1]
+> +	pxor PL, PH # PH = [P_1 ^ T_0 ^ P_3 : P_0 ^ T_1 ^ P_2]
+> +	pclmulqdq $0x11, GSTAR, PL # PL = [(P_1 ^ T_0) * g*(x)]
+> +	pxor PL, PH
+> +.endm
+
+Several comments here:
+
+- Aligning the comments would make them much easier to read.
+
+- Only one temporary register is needed, since T isn't used after it's used to
+  compute V.
+
+- The thing called V isn't actually the same as the V described in the long
+  comment above.  Maybe just call the temporary variable 'TMP_XMM' or something?
+  Or even just hard-code %xmm6, similar to %xmm0-%xmm5.
+
+- It's not necessary to modify PL.
+
+- Since this file is relying on AVX anyway, the three-operand instructions are
+  available, and can be used to avoid the 'movdqa' at the beginning.
+
+- None of the users of this macro really want the result in register PH.  How
+  about passing the destination register as an argument and using vpxor to put
+  it in the appropriate place?
+
+So in summary, this is what I'd suggest:
+
+.macro montgomery_reduction dest
+	vpclmulqdq $0x00, GSTAR, PL, TMP_XMM	# TMP_XMM = T_1 : T_0 = P_0 * g*(x)
+	pshufd $0b01001110, TMP_XMM, TMP_XMM	# TMP_XMM = T_0 : T_1
+	pxor PL, TMP_XMM			# TMP_XMM = P_1 + T_0 : P_0 + T_1
+	pxor TMP_XMM, PH			# PH = P_3 + P_1 + T_0 : P_2 + P_0 + T_1
+	pclmulqdq $0x11, GSTAR, TMP_XMM		# TMP_XMM = V_1 : V_0 = V = [(P_1 + T_0) * g*(x)]
+	vpxor TMP_XMM, PH, \dest
+.endm
+
+> +
+> +/*
+> + * Compute schoolbook multiplication for 8 blocks
+> + * m_0h^8 + ... + m_7h^1
+> + *
+> + * If reduce is set, also computes the montgomery reduction of the
+> + * previous full_stride call and XORs with the first message block.
+> + * (m_0 + REDUCE(PL, PH))h^8 + ... + m_7h^1.
+> + * I.e., the first multiplication uses m_0 + REDUCE(PL, PH) instead of m_0.
+> + *
+> + * Sets PL, PH
+> + * Clobbers LO, HI, MI
+> + *
+> + */
+> +.macro full_stride reduce
+> +	mov %rsi, KEY_POWERS
+
+I don't see why KEY_POWERS and %rsi are different registers.  Why not just
+define KEY_POWERS to %rsi?  It stays the same during any full_strides, and then
+will be incremented by partial_stride.  That's fine.
+
+[...]
+> +	addq $(8*16), KEY_POWERS
+
+As per the above, there's no need to increment KEY_POWERS here.
+
+> +	schoolbook2
+> +.endm
+> +
+> +/*
+> + * Compute poly on window size of %rdx blocks
+> + * 0 < %rdx < NUM_PRECOMPUTE_POWERS
+> + */
+
+The code doesn't actually use %rdx directly.  It should be BLOCKS_LEFT.
+
+> +.macro partial_stride
+> +	pxor LO, LO
+> +	pxor HI, HI
+> +	pxor MI, MI
+> +	mov BLOCKS_LEFT, TMP
+> +	shlq $4, TMP
+> +	mov %rsi, KEY_POWERS
+> +	addq $(16*NUM_PRECOMPUTE_POWERS), KEY_POWERS
+> +	subq TMP, KEY_POWERS
+> +	# Multiply sum by h^N
+> +	movups (KEY_POWERS), %xmm0
+> +	movdqa SUM, %xmm1
+> +	schoolbook1_noload
+> +	schoolbook2
+> +	montgomery_reduction
+> +	movdqa PH, SUM
+> +	pxor LO, LO
+> +	pxor HI, HI
+> +	pxor MI, MI
+> +	xor IDX, IDX
+> +.LloopPartial:
+> +	cmpq BLOCKS_LEFT, IDX # IDX < rdx
+> +	jae .LloopExitPartial
+> +
+> +	movq BLOCKS_LEFT, TMP
+> +	subq IDX, TMP # TMP = rdx - IDX
+> +
+> +	cmp $4, TMP # TMP < 4 ?
+> +	jl .Llt4Partial
+> +	schoolbook1 4
+> +	addq $4, IDX
+> +	addq $(4*16), MSG
+> +	addq $(4*16), KEY_POWERS
+> +	jmp .LoutPartial
+> +.Llt4Partial:
+> +	cmp $3, TMP # TMP < 3 ?
+> +	jl .Llt3Partial
+> +	schoolbook1 3
+> +	addq $3, IDX
+> +	addq $(3*16), MSG
+> +	addq $(3*16), KEY_POWERS
+> +	jmp .LoutPartial
+> +.Llt3Partial:
+> +	cmp $2, TMP # TMP < 2 ?
+> +	jl .Llt2Partial
+> +	schoolbook1 2
+> +	addq $2, IDX
+> +	addq $(2*16), MSG
+> +	addq $(2*16), KEY_POWERS
+> +	jmp .LoutPartial
+> +.Llt2Partial:
+> +	schoolbook1 1 # TMP < 1 ?
+> +	addq $1, IDX
+> +	addq $(1*16), MSG
+> +	addq $(1*16), KEY_POWERS
+> +.LoutPartial:
+> +	jmp .LloopPartial
+> +.LloopExitPartial:
+> +	schoolbook2
+> +	montgomery_reduction
+> +	pxor PH, SUM
+> +.endm
+
+This can be simplified and optimized quite a bit:
+
+- The first schoolbook2 and montgomery_reduction are unnecessary.
+- The IDX variable is unnecessary.
+- There's no need for a loop if there are going to be separate cases for 4, 2,
+  and 1 blocks anyway.  We can just always jump forward.
+- There's no need to increment MSG and KEY_POWERS after the last block.
+
+Can you consider the following?
+
+/*
+ * Process BLOCKS_LEFT blocks, where 0 < BLOCKS_LEFT < STRIDE_BLOCKS
+ */
+.macro partial_stride
+	mov BLOCKS_LEFT, TMP
+	shlq $4, TMP
+	addq $(16*STRIDE_BLOCKS), KEY_POWERS
+	subq TMP, KEY_POWERS
+
+	movups (MSG), %xmm0
+	pxor SUM, %xmm0
+	movaps (KEY_POWERS), %xmm1
+	schoolbook1_noload
+	dec BLOCKS_LEFT
+	addq $16, MSG
+	addq $16, KEY_POWERS
+
+	test $4, BLOCKS_LEFT
+	jz .Lpartial4BlocksDone
+	schoolbook1 4
+	addq $(4*16), MSG
+	addq $(4*16), KEY_POWERS
+.Lpartial4BlocksDone:
+	test $2, BLOCKS_LEFT
+	jz .Lpartial2BlocksDone
+	schoolbook1 2
+	addq $(2*16), MSG
+	addq $(2*16), KEY_POWERS
+.Lpartial2BlocksDone:
+	test $1, BLOCKS_LEFT
+	jz .LpartialDone
+	schoolbook1 1
+.LpartialDone:
+	schoolbook2
+	montgomery_reduction SUM
+.endm
+
+> +	FRAME_END
+> +	ret
+> +SYM_FUNC_END(clmul_polyval_mul)
+
+It needs to be RET, not ret.  See https://git.kernel.org/linus/f94909ceb1ed4bfd
+
+> +
+> +/*
+> + * Perform polynomial evaluation as specified by POLYVAL.  This computes:
+> + * 	h^n * accumulator + h^n * m_0 + ... + h^1 * m_{n-1}
+> + * where n=nblocks, h is the hash key, and m_i are the message blocks.
+> + *
+> + * rdi - pointer to message blocks
+> + * rsi - pointer to precomputed key powers h^8 ... h^1
+> + * rdx - number of blocks to hash
+> + * rcx - pointer to the accumulator
+> + *
+> + * void clmul_polyval_update(const u8 *in, const struct polyval_ctx *ctx,
+> + *			     size_t nblocks, u8 *accumulator);
+> + */
+> +SYM_FUNC_START(clmul_polyval_update)
+> +	FRAME_BEGIN
+> +	vmovdqa .Lgstar(%rip), GSTAR
+> +	movups (%rcx), SUM
+> +	cmpq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
+> +	jb .LstrideLoopExit
+> +	full_stride 0
+> +	subq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
+> +.LstrideLoop:
+> +	cmpq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
+> +	jb .LstrideLoopExitReduce
+> +	full_stride 1
+> +	subq $NUM_PRECOMPUTE_POWERS, BLOCKS_LEFT
+> +	jmp .LstrideLoop
+> +.LstrideLoopExitReduce:
+> +	montgomery_reduction
+> +	movdqa PH, SUM
+> +.LstrideLoopExit:
+> +	test BLOCKS_LEFT, BLOCKS_LEFT
+> +	je .LskipPartial
+> +	partial_stride
+> +.LskipPartial:
+> +	movups SUM, (%rcx)
+> +	FRAME_END
+> +	ret
+> +SYM_FUNC_END(clmul_polyval_update)
+
+There are several unneeded instructions above.  Unconditional jumps can be
+avoided, as can comparisons if they are already paired with subtractions using
+the same amounts (since on x86, subtractions set the flags too).
+
+Consider the following:
+
+SYM_FUNC_START(clmul_polyval_update)
+	FRAME_BEGIN
+	vmovdqa .Lgstar(%rip), GSTAR
+	movups (%rcx), SUM
+	subq $STRIDE_BLOCKS, BLOCKS_LEFT
+	js .LstrideLoopExit
+	full_stride 0
+	subq $STRIDE_BLOCKS, BLOCKS_LEFT
+	js .LstrideLoopExitReduce
+.LstrideLoop:
+	full_stride 1
+	subq $STRIDE_BLOCKS, BLOCKS_LEFT
+	jns .LstrideLoop
+.LstrideLoopExitReduce:
+	montgomery_reduction SUM
+.LstrideLoopExit:
+	add $STRIDE_BLOCKS, BLOCKS_LEFT
+	jz .LskipPartial
+	partial_stride
+.LskipPartial:
+	movups SUM, (%rcx)
+	FRAME_END
+	RET
+SYM_FUNC_END(clmul_polyval_update)
+
+
+- Eric
