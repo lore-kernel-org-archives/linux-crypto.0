@@ -2,96 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D455C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 14:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2E5C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 14:51:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232414AbiCWOmj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 10:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
+        id S231801AbiCWOwa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 10:52:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237353AbiCWOmi (ORCPT
+        with ESMTP id S236610AbiCWOwa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 10:42:38 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 417B27E0A2
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 07:41:08 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id f3so423463pfe.2
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 07:41:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=9S4eZd/rXA3n6neAOpli6HJc1yfp+ivfWjQ96On7pkI=;
-        b=QhZqkNggS08Iaw6ai+E2dKoy/D9zbMKsZp1q7bLscXQKKNTf2iXab7MnrMd1vBk6Er
-         2MWstlzqkm6T21vy6t5M/3ndyjHsZso7L4CrkCYWu2ChTfnRgKwo2TgNg9RMXSEwp9MW
-         GMfSOF1OQQWrio3KOet+GLNOTHxytfLoHtF+kYIrYQUtTUhN0AYpaR6IdBrjTJMNr6Xa
-         /WpnT6wXbFhnN1OR2SQQcLPAGSXzDTvuuPs7jGWyBMTXLtrvgdhQoUgZl+dNRulOviAQ
-         2iKSILaEbeGVSymi+LDckIyJJAyZtHlx8ZIVDLV3O/ut2zEsWbNgJXoV9+kUq9QMDIZ5
-         mKLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9S4eZd/rXA3n6neAOpli6HJc1yfp+ivfWjQ96On7pkI=;
-        b=XkvlEE/VPMfrazm6O2UoE1+HaGzRewzY2R0EQDnos4DZ3VQUIhFpTN+2HGAbDLyLOw
-         924iA3Q95sekGo4b1Q43xut8w7jtvJvdkDWhne+KTb+NFpfzserAAvhjPhveieND4Ojt
-         TnMcpuVRGsnoRTGVeol90qhusDy+QQLflkssQrkgGfdoszp8qObY+r7v9tGVLxkmX9zL
-         T/mfHZ0ElFT9t2ttj47J+aRlcxqLy1o+tezQrUikJJ1ptpZhQrxYJXIy8swQkAb3FdB/
-         CqT9gSf6CYwJUg9cKn8iLddh+7W+IplkNHo1WC85g/9+08gVTYuEC50XnbbHWh5YoAk7
-         8GtA==
-X-Gm-Message-State: AOAM531RFiuTvXSN/h3dbSa/wXINQ0BT3RwZDK8O68Ml3CDbg2nIs3BI
-        FvDFkoPYAr1GpTUSneG8mEkbDw==
-X-Google-Smtp-Source: ABdhPJxs2YxbMDq4cFOUneNrKNpZMka1lWtg2y+oKbcBfOGQcS9WES0IMW0H8pPRUYmVwxqVrEN6wg==
-X-Received: by 2002:a63:ae03:0:b0:386:2b5d:dd7d with SMTP id q3-20020a63ae03000000b003862b5ddd7dmr196912pgf.332.1648046467709;
-        Wed, 23 Mar 2022 07:41:07 -0700 (PDT)
-Received: from [10.255.146.117] ([139.177.225.224])
-        by smtp.gmail.com with ESMTPSA id e11-20020a056a001a8b00b004fab740dbddsm166340pfv.105.2022.03.23.07.41.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Mar 2022 07:41:07 -0700 (PDT)
-Message-ID: <f0b798fe-d341-775d-c722-1d05b99da0c3@bytedance.com>
-Date:   Wed, 23 Mar 2022 22:37:40 +0800
+        Wed, 23 Mar 2022 10:52:30 -0400
+X-Greylist: delayed 1616 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Mar 2022 07:51:00 PDT
+Received: from gateway33.websitewelcome.com (gateway33.websitewelcome.com [192.185.146.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D8BE7E082
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 07:51:00 -0700 (PDT)
+Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
+        by gateway33.websitewelcome.com (Postfix) with ESMTP id 604ED9451
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 09:24:01 -0500 (CDT)
+Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
+        by cmsmtp with SMTP
+        id X1u5nW41EHnotX1u5nYMFF; Wed, 23 Mar 2022 09:24:01 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=roeck-us.net; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:Subject:From:References:Cc:To:MIME-Version:Date:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=id4KakR43VwvSclTscrtuuJMK1IX+RuWRI/B9xFRJpk=; b=SVzwFj19iwEqII6is3hOB116dH
+        +gBfETPclRjBnoEvnRrOoeW+sDTr+HJAtSYVUX8gptsIpITfOUg1cFuME2dcm3P5UMk415bAELP/q
+        feklv8fsUk4sIh/rzmueB+y6EwGWnCT8cYq9MBPTPnF+K6XqVjwm20bzbyvaGgIARVK331DUeq7vB
+        iKjDb2KIwYx0QExPQA1aDN8T9L8/ZY9tOlyI2WV8vMP8YqAcjUROIvSlWeFIoFUome6eiJCc1+sNL
+        HC35XPU2SmqRcuAwhX0a9ZQNFnMOgeqdHQUFBTz4nCq7XF7OxOzzMW6Uk8Q4rdd1dU0F/DaKDZhG1
+        0UL+lFyA==;
+Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:54412)
+        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@roeck-us.net>)
+        id 1nX1u3-002CJg-TF; Wed, 23 Mar 2022 14:23:59 +0000
+Message-ID: <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
+Date:   Wed, 23 Mar 2022 07:23:56 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: Re: [PATCH v3 0/6] Support akcipher for virtio-crypto
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>
-References: <20220323024912.249789-1-pizhenwei@bytedance.com>
- <20220323083558-mutt-send-email-mst@kernel.org>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20220323083558-mutt-send-email-mst@kernel.org>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+References: <20220217162848.303601-1-Jason@zx2c4.com>
+ <20220322155820.GA1745955@roeck-us.net> <YjoUU+8zrzB02pW7@sirena.org.uk>
+ <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
+ <YjsOHmvDgAxwLFMg@sirena.org.uk>
+From:   Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+In-Reply-To: <YjsOHmvDgAxwLFMg@sirena.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - roeck-us.net
+X-BWhitelist: no
+X-Source-IP: 108.223.40.66
+X-Source-L: No
+X-Exim-ID: 1nX1u3-002CJg-TF
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net [108.223.40.66]:54412
+X-Source-Auth: linux@roeck-us.net
+X-Email-Count: 26
+X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/23/22 20:36, Michael S. Tsirkin wrote:
-> On Wed, Mar 23, 2022 at 10:49:06AM +0800, zhenwei pi wrote:
->> v2 -> v3:
->> - Introduce akcipher types to qapi
->> - Add test/benchmark suite for akcipher class
->> - Seperate 'virtio_crypto: Support virtio crypto asym operation' into:
->>    - crypto: Introduce akcipher crypto class
->>    - virtio-crypto: Introduce RSA algorithm
+On 3/23/22 05:10, Mark Brown wrote:
+> On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
+>> On 3/22/22 11:24, Mark Brown wrote:
 > 
-> Thanks!
-> I tagged this but qemu is in freeze. If possible pls ping or
-> repost after the release to help make sure I don't lose it.
+>>> Just as a datapoint for debugging at least qemu/arm is getting coverage
+>>> in CI systems (KernelCI is covering a bunch of different emulated
+>>> machines and LKFT has at least one configuration as well, clang's tests
+>>> have some wider architecture coverage as well I think) and they don't
+>>> seem to be seeing any problems - there's some other variable in there.
 > 
-Hi,
+>> I use buildroot 2021.02.3. I have not changed the buildroot code, and it
+>> still seems to be the same in 2022.02. I don't see the problem with all
+>> boot tests, only with the architectures mentioned above, and not with all
+>> qemu machines on the affected platforms. For arm, mostly older machines
+>> are affected (versatile, realview, pxa configurations, collie, integratorcp,
+>> sx1, mps2-an385, vexpress-a9, cubieboard). I didn't check, but maybe
+>> kernelci doesn't test those machines ?
+> 
+> Kind of academic given that Jason seems to have a handle on what the
+> issues are but for KernelCI it's variations on mach-virt, plus
+> versatile-pb.  There's a physical cubietruck as well, and BeagleBone
+> Blacks among others.  My best guess would be systems with low RAM are
+> somehow more prone to issues.
 
-Daniel has started to review this patchset, according to Daniel's 
-important suggestion, I'll rework this feature and post the next version 
-later.
+I don't think it is entirely academic. versatile-pb fails for me;
+if it doesn't fail at KernelCI, I'd like to understand why - not to
+fix it in my test environment, but to make sure that I _don't_ fix it.
+After all, it _is_ a regression. Even if that regression is triggered
+by bad (for a given definition of "bad") userspace code, it is still
+a regression.
 
-Thanks a lot!
-
--- 
-zhenwei pi
+Thanks,
+Guenter
