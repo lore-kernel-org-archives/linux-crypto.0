@@ -2,97 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201C7C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 08:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C50C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 11:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233813AbiCWIpD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 04:45:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44560 "EHLO
+        id S235967AbiCWLr2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 07:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233771AbiCWIpC (ORCPT
+        with ESMTP id S232619AbiCWLr2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 04:45:02 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71671289A0
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 01:43:31 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id pv16so1448622ejb.0
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 01:43:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rasmusvillemoes.dk; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=pRO4rstzkYbiRB43WCgljqZ0gGunsig7pbQkCRR7eS4=;
-        b=V0H6JJEsX/kP88LBQGwSzKsUzCuehVEQpcqioopP70NXELFAXalLXyT9r07twli41J
-         0KuCmHcHjgoEToWBFQCIAZ4KUlrT8dEXkWbgbmyH3AnUbFkJvNylOycctCZWD4xYgFb7
-         YRSGg1Nun0ULHBB0Nc7j5Q1Np7cPxSpMuHAQo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pRO4rstzkYbiRB43WCgljqZ0gGunsig7pbQkCRR7eS4=;
-        b=U8JnoK/O25H9NqShIL5I8f5Lcd+ZfbsoTKxzLECTQHFO9CiGrQeQIiEr+32imOgaC+
-         BXJClOR5REl6F/Y3Y0CvCj+tEi9KnDJGguuukyKwZM3pT/qukmmR0wUUY5PJDWSkuj+z
-         V8iLvqxaRjbfhrdBEtheRuISNSNad40lPTMnP48s3v5KeJVLzoIEIWAs8+0mN/LYQWEL
-         5NehdGEYsApa+mmXjHii0jeqNCiIGUv6aKg2ru3zDgqC7HeF8xbDXsswCZf3lwuncGX8
-         QYHl6GfmIgF0EmujkHPJOEL4eL/5N9NMZUAyUnmo+GughNAX/HHFrE5PD0RWdjpcyalW
-         8gYg==
-X-Gm-Message-State: AOAM533v3CwmY1lbE/+6UYHm3tS81INKtCSxiz+dWefK1b+KR2zmmnoq
-        kCCnQxoX0JC3FfWpoypFEsWICw==
-X-Google-Smtp-Source: ABdhPJwxlFaK5ERurGt1STHyjrOvX3N42n72G3mzxFQ6NKLxJ7OfFxip6rHXGoG+HmcSLtZNaVOYXg==
-X-Received: by 2002:a17:906:9743:b0:6d8:632a:a42d with SMTP id o3-20020a170906974300b006d8632aa42dmr30717674ejy.157.1648025009968;
-        Wed, 23 Mar 2022 01:43:29 -0700 (PDT)
-Received: from [192.168.1.149] ([80.208.64.233])
-        by smtp.gmail.com with ESMTPSA id hb19-20020a170906b89300b006daa95d178esm9503171ejb.60.2022.03.23.01.43.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Mar 2022 01:43:29 -0700 (PDT)
-Message-ID: <3707a8f9-93e7-ee54-42a3-ac12a279c6bc@rasmusvillemoes.dk>
-Date:   Wed, 23 Mar 2022 09:43:28 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        David Laight <David.Laight@ACULAB.COM>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Wed, 23 Mar 2022 07:47:28 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E27C7939A
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 04:45:58 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-251-3EBf9A9TPvaSMLqZWsEjrw-1; Wed, 23 Mar 2022 11:45:55 +0000
+X-MC-Unique: 3EBf9A9TPvaSMLqZWsEjrw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Wed, 23 Mar 2022 11:45:55 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.033; Wed, 23 Mar 2022 11:45:55 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Guenter Roeck <linux@roeck-us.net>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
+        "Dominik Brodowski" <linux@dominikbrodowski.net>,
+        Theodore Ts'o <tytso@mit.edu>, "Jann Horn" <jannh@google.com>
+Subject: RE: [PATCH] random: allow writes to /dev/urandom to influence fast
+ init
+Thread-Topic: [PATCH] random: allow writes to /dev/urandom to influence fast
+ init
+Thread-Index: AQHYPiElHr6Egf4vbEGW28icqj7YNKzMOPHggAAMXYCAAJACUA==
+Date:   Wed, 23 Mar 2022 11:45:55 +0000
+Message-ID: <0f9b31b346504d28a908d16884df5e02@AcuMS.aculab.com>
 References: <20220322191436.110963-1-Jason@zx2c4.com>
  <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
  <YjqLAWbZ8K7eg3Fw@zx2c4.com>
-From:   Rasmus Villemoes <linux@rasmusvillemoes.dk>
 In-Reply-To: <YjqLAWbZ8K7eg3Fw@zx2c4.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 23/03/2022 03.50, Jason A. Donenfeld wrote:
+RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDIzIE1hcmNoIDIwMjIgMDI6NTENCj4g
+DQo+IE9uIFR1ZSwgTWFyIDIyLCAyMDIyIGF0IDg6MTYgUE0gRGF2aWQgTGFpZ2h0IDxEYXZpZC5M
+YWlnaHRAYWN1bGFiLmNvbT4gd3JvdGU6DQo+ID4gTmV2ZXIgbWluZCBzY3JpcHRzIHRoYXQgdHJ5
+IHRvIGltbWVkaWF0ZWx5IHNhdmUgYSBuZXcgc2VlZGZpbGUgWzFdLg0KPiA+DQo+ID4gV2hhdCBh
+Ym91dCBjb2RlIHJ1biBieSBsYXRlciBzdGFydHVwIHNjcmlwdHMgdGhhdCB3YW50cyByYW5kb20g
+bnVtYmVycy4NCj4gPiBUaGV5IHJlYWxseSBkbyB3YW50IHRoZSBzZWVkZmlsZSBkYXRhIHRvIGJl
+IHVzZWQuDQo+ID4gSWYgaXQgaXNuJ3QgdXNlZCB0aGVuIHRoZXkgYXJlIGxpa2VseSB0byBnZXQg
+dmVyeSB3ZWFrIHJhbmRvbSBudW1iZXJzLg0KPiA+DQo+ID4gWW91IGNhbid0IHJlYWxseSBleHBl
+Y3Qgc3RhcnR1cCBzY3JpcHRzIHRvIGJlIGlzc3VpbmcgaW9jdGwgcmVxdWVzdHMuDQo+IA0KPiBU
+byBiZSBjbGVhciwgdGhpcyAiZXhwZWN0W2F0aW9uXSIgb2YgeW91cnMgaXMgdmVyeSBtdWNoIGEg
+bmV3DQo+IGV4cGVjdGF0aW9uLiBDcmVkaXRpbmcgYml0cyBoYXMgcmVxdWlyZWQgYW4gaW9jdGwg
+c2luY2UgZm9yZXZlci4gVGhvc2UNCj4gc2hlbGwgc2NyaXB0cyBoYXZlIGJlZW4gYnJva2VuIGZv
+cmV2ZXIuIFRoZSBwcm9wb3NhbCBoZXJlIGlzIHRvIGFkZCBuZXcNCj4gYmVoYXZpb3IgdG8gc3Vw
+cG9ydCB0aG9zZSBvbGQgYnJva2VuIHNoZWxsIHNjcmlwdHMuDQouLi4NCg0KSSBwZXJzb25hbGx5
+IHdvbid0IGhhdmUgZXhwZWN0ZWQgdGhlIGJlaGF2aW91ciBmb3IgbG9uZyENCkkgd2FzIG9ubHkg
+dHJ5aW5nIHRvIGdldCBhIGJ1aWxkcm9vdCBzeXN0ZW0gdG8gaW5pdGlhbGlzZSB0aGUNCnJhbmRv
+bSBudW1iZXIgZ2VuZXJhdG9yIGxhc3QgeWVhci4NCkJ1dCBJJ20gc3VyZSBJIHJlYWQgc29tZSBv
+ZiB0aGUgZG9jdW1lbnRhdGlvbiBhcyB3ZWxsIGFzIGxvb2tpbmcNCmF0IHRoZSBzY3JpcHRzIGFu
+ZCB0aGUga2VybmVsIHNvdXJjZXMuDQoNClRoZSBidWlsZHJvb3Qgc2NyaXB0cyBhY3R1YWxseSBu
+ZWVkIGZpeGluZyBzbyB0aGV5IGFjdHVhbGx5DQphZGQgZW50cm9weSBvbiBvbGRlciBrZXJuZWwu
+DQoNCkkgZG8gcmVtZW1iZXIgbG9va2luZyBhdCBvbmUgb2YgdGhlIGtlcm5lbCBlbnRyb3B5IHN0
+b3Jlcw0KKHByb2JhYmx5IHRoZSBMaW51eCBvbmUpIGEgZmV3IHllYXJzIGJhY2sgYW5kIHRoaW5r
+aW5nDQp0aGF0IGl0IHdhcyBvdmVyLWNvbXBsZXggYW5kIHByb2JhYmx5IGRpZG4ndCBhY3R1YWxs
+eSB3b3JrDQp0aGF0IHdlbGwgaW4gcmVhbGl0eS4NCklJUkMgaXQgc2F2ZWQgJ2VudHJvcHkgYnl0
+ZXMnIGFuZCB0aGUgbnVtYmVyIG9mIGJpdHMgb2YgZW50cm9weQ0KdGhleSByZXByZXNlbnRlZCAt
+IGFuZCB0aGVuIHJlYWQgb3V0IGVub3VnaCBieXRlcyB0byBnZXQNCnRoZSByZXF1aXJlZCBlbnRy
+b3B5IHRvIHJlc2VlZCB0aGUgUFJORy4NCk5vdyBpZiB5b3VyIFBSTkcgaGFzIE4gYml0cyBvZiBz
+dGF0ZS4gSW4gcHJpbmNpcGxlIGF0IGxlYXN0DQphZnRlciB5b3UndmUgb3V0cHV0IE4gYml0cyBz
+b21lb25lIGNhbiBzb2x2ZSB0aGUgc2ltdWx0YW5lb3VzDQplcXVhdGlvbnMgYW5kIGRldGVybWlu
+ZSB0aGUgUFJORyBzdGF0ZS4NCkJ1dCBhcyBzb29uIGFzIHlvdSB1c2UgYSBjcnlwdG9ncmFwaGlj
+IGhhc2ggZnVuY3Rpb24gdGhhdA0KaXMgbm90IHJlYWxseSBwb3NzaWJsZSBpbiBhbnkgcmVhc29u
+YWJsZSB0aW1lZnJhbWUuDQooSXMgZXZlbiBNRDUgdGhhdCBicm9rZW4/KQ0KDQpCdXQgdGhlICdl
+bnRyb3B5IHN0b3JlJyBjYW4ganVzdCBzdGlyIGluIG5ldyBieXRlcyBhbmQNCmNvdW50IHRoZSBu
+dW1iZXIgb2YgZW50cm9weSBiaXRzLg0KVGhlbiBpdCBkb2Vzbid0IHJlYWxseSBjYXJlIGhvdyBy
+YW5kb20gdGhlIGJ5dGVzIGFyZS4NCihBcGFydCBmcm9tIGFuIGVzdGltYXRpb24gb2YgaG93ICdm
+dWxsJyBpdCBpcy4pDQpDb3B5IGJpdHMgdG8gdGhlIFBSTkcgYW5kIHlvdSByZWR1Y2UgdGhlIG51
+bWJlciBvZg0KYml0cyBpbiB0aGUgZW50cm9weSBzdG9yZSAtIGJ1dCBjb250aW51ZSBqdXN0IHN0
+aXJyaW5nDQppbiBuZXcgZGF0YS4NCg0KSSd2ZSBvZnRlbiB3b25kZXJlZCB3aGV0aGVyIHRoZSBS
+QzUgYWxnb3JpdGhtIHdvdWxkDQptYWtlIGEgZ29vZCBlbnRyb3B5IHN0b3JlLg0KSnVzdCBjeWNs
+ZSB0aGUgYWxnb3JpdGhtIHdpdGggZWFjaCBlbnRyb3B5IGJ5dGUgYXMNCmlzIGRvbmUgd2hlbiBz
+ZXR0aW5nIGVhY2gga2V5IGJ5dGUuDQpDbGVhcmx5IHlvdSBkb24ndCB3YW50IHRvIHVzZSB0aGUg
+UkM1IG91dHB1dCBhcyByYW5kb20gZGF0YS4NCkJ1dCBpdCBvdWdodCB0byBiZSBwbGVudHkgZ29v
+ZCBlbm91Z2ggdG8ga2VlcCBlbnRyb3B5Lg0KVGhlIG9ubHkgcmVhbCBwcm9ibGVtIGlzIHRoYXQg
+UkM1IGlzIHByZXR0eSBob3JyaWQgb24NCnRoZSBkYXRhIGNhY2hlLCBhbmQgcHJvYmFibHkgYSBi
+aXQgYmlnIGZvciBwZXItY3B1IGRhdGEuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJl
+c3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsx
+IDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-> - Since these seeding shell scripts have always been broken, because
->   this is how the rng has always been, rather than trying to bolt on a
->   very imperfect fix in the kernel for something that never worked
->   right, we could suggest shell scripts take the path that I implemented
->   for systemd:
->   https://github.com/systemd/systemd/commit/da2862ef06f22fc8d31dafced6d2d6dc14f2ee0b
->   In shell, this would look like:
-> 
->     #!/bin/bash
->     cat seedfile > /dev/urandom
->     { cat seedfile; head -c 32 /dev/urandom; } | sha256sum | cut -d ' ' -f 1 > seedfile
-
-Maybe stating the obvious, but in the interest of preventing
-proliferation of more broken shell scripts: The tail of the above should
-be spelled
-
-  ...  > seedfile.tmp && mv seedfile.tmp seedfile
-
-or seedfile would be truncated before cat had a chance to read it.
-
-Rasmus
