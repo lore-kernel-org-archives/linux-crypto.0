@@ -2,123 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E459C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 02:50:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB2FC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 02:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbiCWCwS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 22:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
+        id S231241AbiCWCyX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 22:54:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231241AbiCWCwR (ORCPT
+        with ESMTP id S230312AbiCWCyX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 22:52:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E46B424BC;
-        Tue, 22 Mar 2022 19:50:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 316DA614BB;
-        Wed, 23 Mar 2022 02:50:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBD2C340EC;
-        Wed, 23 Mar 2022 02:50:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="poRXks2Z"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1648003845;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=O8lqUtskFi5/phmZS/7w/6wHcFNDZz88pVD3yzMOtmE=;
-        b=poRXks2ZqAlyrhowVfj78TCEO1u+sqJoy64CvMmeiefhDY/RYqUQI8la451MQPYB5rw7uI
-        k6qV2y/eT4I+bKlgVkJD8lpJX7mbwFdHR7f8pPOJ7t/ho4VL9sTYrKmmWLrGrAj3luRkg+
-        s7WHiAYNOeCfxoX7SeBMix1m+FAPmhQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 434f7487 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 23 Mar 2022 02:50:44 +0000 (UTC)
-Date:   Tue, 22 Mar 2022 20:50:41 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     David Laight <David.Laight@ACULAB.COM>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Message-ID: <YjqLAWbZ8K7eg3Fw@zx2c4.com>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
- <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
+        Tue, 22 Mar 2022 22:54:23 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E62BA4A93A
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 19:52:53 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id c23so347238plo.0
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 19:52:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g0D/WBKifaDu0QJZs9LIL569qdjw+FHM82ekkuU6fuM=;
+        b=KoN+nML2TonJR5xMgMr2gMwkQES9A1FLa7BAlsvaQ9f1w5K4h4DgAyB0dhKwP7wtiG
+         HrCJDRQiUP8skWsJMTV+GJZkwIt4iOMdNEwvFBPHsZHzRukCNGcKlfxbmWcQ2qjS+UsN
+         IzLXJ65q/j5ijvMs3h+fZX+VBNaPgkKPagKLxCglfYX6TEPjEiCrxGfsMWXg/DOer4cs
+         Q1K77VSirNxaSNNvcmonpH5NyriNtv5/A1M35DA2w2rKjth/kpjiNHeycdqEAvVDbbCg
+         8FI3Dr6WXU9WPceBfJvv20+zLz7mfPZ5WF7EQNMe9fV7igx6VkBrN8WrNtev+T/69JHp
+         ryeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g0D/WBKifaDu0QJZs9LIL569qdjw+FHM82ekkuU6fuM=;
+        b=2G81GCgXvXeNBTaCYs8ybqyOHmuAs8YMlOLWkS/nj/SUExSh3ehaXmfe2ngaSRnCVZ
+         SggMLB8zOsy4YXjr6hLlb7evWs88G5r9kP+FOhvir+0UGnbYiV32W6lkAYAWHY4OxXuI
+         j271X42w0MiG16tUIw8wQXM4oTTIK4/K0uZp8OKJM+PVe0actkRXqXWXD5d96t2MQwDl
+         5wSL5gq8dSPXlA61/1jgcR0TLUFeL5AuQUOpu1Poo+l3j4jSIA4tipYLEk8PjllgrN88
+         yfoXw9aYnMDy87YdmA/00lcUpnGcU17v+66Q+e69smc0gG8wUDBg6x3renhiBRei+HOh
+         d+ow==
+X-Gm-Message-State: AOAM530DfNDM6ZEb6xIoewaJt1opWWjmHDLDk+iq53uXL522d8S21jRD
+        aq1vvozpMIklJhq7/vTYZAs6SQ==
+X-Google-Smtp-Source: ABdhPJxYBmxv6gXRXs+b+cxGIwP3jmoRCvK74xS07EPSxgN90S1/2mQYEwexyNb2ELj/F4UwKJNm3A==
+X-Received: by 2002:a17:902:6845:b0:153:9af1:3134 with SMTP id f5-20020a170902684500b001539af13134mr21522767pln.169.1648003973459;
+        Tue, 22 Mar 2022 19:52:53 -0700 (PDT)
+Received: from always-x1.www.tendawifi.com ([139.177.225.224])
+        by smtp.gmail.com with ESMTPSA id t2-20020a63a602000000b0038062a0bc6fsm18104869pge.67.2022.03.22.19.52.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 19:52:52 -0700 (PDT)
+From:   zhenwei pi <pizhenwei@bytedance.com>
+To:     arei.gonglei@huawei.com, mst@redhat.com
+Cc:     jasowang@redhat.com, virtualization@lists.linux-foundation.org,
+        qemu-devel@nongnu.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, zhenwei pi <pizhenwei@bytedance.com>
+Subject: [PATCH v3 0/6] Support akcipher for virtio-crypto
+Date:   Wed, 23 Mar 2022 10:49:06 +0800
+Message-Id: <20220323024912.249789-1-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David (and Linus),
+v2 -> v3:
+- Introduce akcipher types to qapi
+- Add test/benchmark suite for akcipher class
+- Seperate 'virtio_crypto: Support virtio crypto asym operation' into:
+  - crypto: Introduce akcipher crypto class
+  - virtio-crypto: Introduce RSA algorithm
 
-On Tue, Mar 22, 2022 at 8:16 PM David Laight <David.Laight@aculab.com> wrote:
-> Never mind scripts that try to immediately save a new seedfile [1].
->
-> What about code run by later startup scripts that wants random numbers.
-> They really do want the seedfile data to be used.
-> If it isn't used then they are likely to get very weak random numbers.
->
-> You can't really expect startup scripts to be issuing ioctl requests.
+v1 -> v2:
+- Update virtio_crypto.h from v2 version of related kernel patch.
 
-To be clear, this "expect[ation]" of yours is very much a new
-expectation. Crediting bits has required an ioctl since forever. Those
-shell scripts have been broken forever. The proposal here is to add new
-behavior to support those old broken shell scripts.
+v1:
+- Support akcipher for virtio-crypto.
+- Introduce akcipher class.
+- Introduce ASN1 decoder into QEMU.
+- Implement RSA backend by nettle/hogweed.
 
-Fortunately, it seems sort of fixable. But only sort of. There are also
-a lot of complications, as detailed above. Part of it is that some
-people use /dev/urandom writes expecting it not to credit, while others
-use that and then later manually credit it with the ioctl. Both of those
-in general seem like not a very good interface for seeding the rng. The
-correct interface to use is RNDADDENTROPY, which takes both the data and
-whether it should be credited, since then the kernel knows what the
-intentions are and can do something smart with it. Barring that
-knowledge, we're in this vague middle ground where it's unclear what the
-user intends to do.
+Lei He (3):
+  crypto-akcipher: Introduce akcipher types to qapi
+  crypto: Implement RSA algorithm by hogweed
+  tests/crypto: Add test suite for crypto akcipher
 
-"But I want my shell scripts to work, even if they have never worked,"
-you fairly protest. I'll do my best here to figure something out, but
-note that introducing sane behavior to /dev/urandom writes might imply
-breaking compatibility with the behavior /dev/urandom writes have always
-had in the past. So the "perfect" solution for a shell script seeding
-interface might prove elusive, and we'll be left with something merely,
-"not terrible."
+Zhenwei Pi (3):
+  virtio-crypto: header update
+  crypto: Introduce akcipher crypto class
+  virtio-crypto: Introduce RSA algorithm
 
-However, if you do think you have a "perfect" solution that takes into
-account all these concerns and doesn't break any prior contracts, please
-do pipe up.
+ backends/cryptodev-builtin.c                  | 319 +++++++-
+ backends/cryptodev-vhost-user.c               |  34 +-
+ backends/cryptodev.c                          |  32 +-
+ crypto/akcipher-nettle.c                      | 523 +++++++++++++
+ crypto/akcipher.c                             |  81 ++
+ crypto/asn1_decoder.c                         | 185 +++++
+ crypto/asn1_decoder.h                         |  42 +
+ crypto/meson.build                            |   4 +
+ hw/virtio/virtio-crypto.c                     | 326 ++++++--
+ include/crypto/akcipher.h                     | 155 ++++
+ include/hw/virtio/virtio-crypto.h             |   5 +-
+ .../standard-headers/linux/virtio_crypto.h    |  82 +-
+ include/sysemu/cryptodev.h                    |  88 ++-
+ meson.build                                   |  11 +
+ qapi/crypto.json                              |  86 +++
+ tests/bench/benchmark-crypto-akcipher.c       | 163 ++++
+ tests/bench/meson.build                       |   6 +
+ tests/bench/test_akcipher_keys.inc            | 277 +++++++
+ tests/unit/meson.build                        |   1 +
+ tests/unit/test-crypto-akcipher.c             | 715 ++++++++++++++++++
+ 20 files changed, 2990 insertions(+), 145 deletions(-)
+ create mode 100644 crypto/akcipher-nettle.c
+ create mode 100644 crypto/akcipher.c
+ create mode 100644 crypto/asn1_decoder.c
+ create mode 100644 crypto/asn1_decoder.h
+ create mode 100644 include/crypto/akcipher.h
+ create mode 100644 tests/bench/benchmark-crypto-akcipher.c
+ create mode 100644 tests/bench/test_akcipher_keys.inc
+ create mode 100644 tests/unit/test-crypto-akcipher.c
 
-Two more thoughts, also for Linus' consideration:
+-- 
+2.25.1
 
-- Had we not needed to revert the /dev/urandom + /dev/random unification
-  patch, we wouldn't be facing this problem. So a last minute creative
-  solution to save that effort would be quite welcome. I'm not
-  optimistic about us finding that right away, but if a lightbulb goes
-  off, I'd be quite happy.
-
-- Since these seeding shell scripts have always been broken, because
-  this is how the rng has always been, rather than trying to bolt on a
-  very imperfect fix in the kernel for something that never worked
-  right, we could suggest shell scripts take the path that I implemented
-  for systemd:
-  https://github.com/systemd/systemd/commit/da2862ef06f22fc8d31dafced6d2d6dc14f2ee0b
-  In shell, this would look like:
-
-    #!/bin/bash
-    cat seedfile > /dev/urandom
-    { cat seedfile; head -c 32 /dev/urandom; } | sha256sum | cut -d ' ' -f 1 > seedfile
- 
-  This seems better in nearly every way to trying to retroactively fix it
-  in the kernel by changing the semantics of an extremely old interface.
-  The more I think about it, the more I'm inclined to go with this "do
-  nothing" approach. Open to hearing your thoughts though.
-
-Jason
