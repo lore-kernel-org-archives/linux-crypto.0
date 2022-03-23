@@ -2,121 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3625CC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 12:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F7FC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 12:32:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235668AbiCWMLr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 08:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41836 "EHLO
+        id S234531AbiCWMdq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 08:33:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234249AbiCWMLr (ORCPT
+        with ESMTP id S231716AbiCWMdq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 08:11:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE74739162;
-        Wed, 23 Mar 2022 05:10:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FFC7614DD;
-        Wed, 23 Mar 2022 12:10:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338B1C340E8;
-        Wed, 23 Mar 2022 12:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648037416;
-        bh=vbcI4mero0N/bJWLX90aYg9H0pV4+j0AozrkgOJahHY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JEITn10iUJpImQkt/uXRjniHYZUsd6BAzcy643WWTVYjsTo6LxFwUOnlQRwy8OBWs
-         w+4D6eknX4FOtFXmSAea1GdGlwv0HFpq0K1HD3cALlwlnsouh+AQX8r/I0wsJUGDxp
-         8BIw8b8ZDdFDNkobUgmmMF3gItUrnC9A2s0QrNjQKU2xQ8hD+mT9YeZ/822MKbVIln
-         cCPNK2h+QBEWIOYkWi/kUDqmg9dWlU6ayXMjSlhvOuiqzrp6L1J0sK1ZBwiBEV5Emi
-         f97DvFO2X4mz0npZGdc9uAPrqNl/o/+geIXj5acz32k1eHUYV1tvby8dwPUkZicHfI
-         XSuP6rifB8qRg==
-Date:   Wed, 23 Mar 2022 12:10:06 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Wed, 23 Mar 2022 08:33:46 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940B57B54D;
+        Wed, 23 Mar 2022 05:32:16 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 22NCVt8l013239
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 23 Mar 2022 08:31:55 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id E977015C0038; Wed, 23 Mar 2022 08:31:54 -0400 (EDT)
+Date:   Wed, 23 Mar 2022 08:31:54 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <YjsOHmvDgAxwLFMg@sirena.org.uk>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net>
- <YjoUU+8zrzB02pW7@sirena.org.uk>
- <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
+        Guenter Roeck <linux@roeck-us.net>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>
+Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
+ init
+Message-ID: <YjsTOsqiNaURZQLM@mit.edu>
+References: <20220322191436.110963-1-Jason@zx2c4.com>
+ <YjqVemCkZCU1pOzj@mit.edu>
+ <YjqbcQbYHCOpgqGg@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="tJxr+BfuLW0D7ewQ"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
-X-Cookie: Nice guys get sick.
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YjqbcQbYHCOpgqGg@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, Mar 22, 2022 at 10:00:49PM -0600, Jason A. Donenfeld wrote:
+> 
+> Another variation on that would be to do what this current patch does,
+> but only crng_pre_init_inject() on CAP_SYS_ADMIN. But this has the same
+> pitfall of only working as intended at cnrg_init=0 but not crng_init=1.
+> That's better than nothing, but it's not perfect, and it introduces that
+> problem with RNDADDTOENTCNT.
 
---tJxr+BfuLW0D7ewQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Well, one could argue that "RNDADDTOENTCNT" is a problem that has
+always been there, and it already requires CAP_SYS_ADMIN.  So I'm not
+sure it makes it any worse.
 
-On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
-> On 3/22/22 11:24, Mark Brown wrote:
+> > > And perhaps we might consider attempting to deprecate RNDADDTOENTCNT at
+> > > some point in the future.
+> >
+> > That would be a good idea.  :-)
+> 
+> Oh cool, I'm glad you agree. Let's do that then. Have a preferred path?
+> Maybe just a pr_once() saying not to use it?
 
-> > Just as a datapoint for debugging at least qemu/arm is getting coverage
-> > in CI systems (KernelCI is covering a bunch of different emulated
-> > machines and LKFT has at least one configuration as well, clang's tests
-> > have some wider architecture coverage as well I think) and they don't
-> > seem to be seeing any problems - there's some other variable in there.
+Probably.  We could get more aggressive (e.g., WARN), but the first
+Google search on RNDADDTOENTCNT returned:
 
-> I use buildroot 2021.02.3. I have not changed the buildroot code, and it
-> still seems to be the same in 2022.02. I don't see the problem with all
-> boot tests, only with the architectures mentioned above, and not with all
-> qemu machines on the affected platforms. For arm, mostly older machines
-> are affected (versatile, realview, pxa configurations, collie, integratorcp,
-> sx1, mps2-an385, vexpress-a9, cubieboard). I didn't check, but maybe
-> kernelci doesn't test those machines ?
+	https://github.com/jumpnow/rndaddtoentcnt
 
-Kind of academic given that Jason seems to have a handle on what the
-issues are but for KernelCI it's variations on mach-virt, plus
-versatile-pb.  There's a physical cubietruck as well, and BeagleBone
-Blacks among others.  My best guess would be systems with low RAM are
-somehow more prone to issues.
+So I'm now regretting not silently making it vanish a decade or more ago...
 
---tJxr+BfuLW0D7ewQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmI7Dh0ACgkQJNaLcl1U
-h9BcKgf9GIwAeN+f0WgtlSoiS81pYIPqyjQ+X1zRuvJIR7xCVZq+sYQ27js719v2
-oES8pLcPkyjZHNziBmIDbpiNeKJWWbYlxxXdyyW5sTe+GzEUzh/+MVxLeGUDF1Qx
-rpZYsiZ/NybofrWfkOwDmm/R5tTn2JgJFZaRHtMeUn67ElJPNu107LsgeDVujePG
-Pywun/VDDjcC5scInU3cbhzRoo2ipY8/nwAxPcM6fddMqgaymdFrC5wU8+ihxGsc
-55rSw4QnKKPRpX8CGjc4wSmYXax1OsLc5Lsh9FQHf9EqVs46ZsJHwd6FntTpIht2
-fiOwR2pk7XiyL1tJEsCZyQfE4vAmBw==
-=b+8U
------END PGP SIGNATURE-----
-
---tJxr+BfuLW0D7ewQ--
+       	   	      	  	   	     - Ted
