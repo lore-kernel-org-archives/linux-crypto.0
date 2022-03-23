@@ -2,128 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851D2C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 16:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02689C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 16:28:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238732AbiCWQUO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 12:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45168 "EHLO
+        id S245410AbiCWQaE convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 12:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238855AbiCWQUM (ORCPT
+        with ESMTP id S242091AbiCWQaE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 12:20:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8784C59A65;
-        Wed, 23 Mar 2022 09:18:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2390C6184B;
-        Wed, 23 Mar 2022 16:18:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04A62C340E8;
-        Wed, 23 Mar 2022 16:18:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648052320;
-        bh=xmssCclpuXkvokPOIc8kA2TpF6hDPr1nfNP2UJCwIVc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kQDEhbn2dsQ+pF3/zFmCMhiRAPwUL9hr3vakvVKREmueBHXYPPkGc1Yjk77g1+upO
-         lsDQg0C3crQmPNkuUwYh3N5/NCPu7xCYzLRLkINXEPhXo6X4YJjVbQqoAXsUk9wZ3M
-         Nph/NkDtXZQ3cUm86JAvalrgq86oea+2tvOlDFHw7B8O56nOXfcl0t6rQ0d6AY4qwA
-         IadGNCw72DxDcmz7wQcxJVg1G9vsRI9GsUIHs91zDchMl/QMSewj0sA6+BEoIVeyXh
-         T7p/CRUlVXHmloiINmMA/7xJ6LVM8pjEqYnS63qXXzPUgIkiBU7MrJsgohHJmDkTAQ
-         /q/OmoZUIiA7g==
-Date:   Wed, 23 Mar 2022 16:18:31 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <YjtIVymPEZ4t16tP@sirena.org.uk>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net>
- <YjoUU+8zrzB02pW7@sirena.org.uk>
- <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
- <YjsOHmvDgAxwLFMg@sirena.org.uk>
- <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
- <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
+        Wed, 23 Mar 2022 12:30:04 -0400
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F070D23BD9;
+        Wed, 23 Mar 2022 09:28:31 -0700 (PDT)
+Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <heiko@sntech.de>)
+        id 1nX3qT-00030m-16; Wed, 23 Mar 2022 17:28:25 +0100
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        LABBE Corentin <clabbe@baylibre.com>
+Cc:     herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v3 18/26] arm64: dts: rockchip: rk3399: add crypto node
+Date:   Wed, 23 Mar 2022 17:28:24 +0100
+Message-ID: <1898921.yKVeVyVuyW@diego>
+In-Reply-To: <YjsfIbLQRvoxkana@Red>
+References: <20220321200739.3572792-1-clabbe@baylibre.com> <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com> <YjsfIbLQRvoxkana@Red>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="rbHr+yLemIUaUxTK"
-Content-Disposition: inline
-In-Reply-To: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
-X-Cookie: Nice guys get sick.
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Am Mittwoch, 23. März 2022, 14:22:41 CET schrieb LABBE Corentin:
+> Le Tue, Mar 22, 2022 at 12:00:06PM +0000, Robin Murphy a écrit :
+> > On 2022-03-21 20:07, Corentin Labbe wrote:
+> > > The rk3399 has a crypto IP handled by the rk3288 crypto driver so adds a
+> > > node for it.
+> > > 
+> > > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > > ---
+> > >   arch/arm64/boot/dts/rockchip/rk3399.dtsi | 12 ++++++++++++
+> > >   1 file changed, 12 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > > index 88f26d89eea1..ca2c658371a5 100644
+> > > --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > > +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > > @@ -573,6 +573,18 @@ saradc: saradc@ff100000 {
+> > >   		status = "disabled";
+> > >   	};
+> > >   
+> > > +	crypto0: crypto@ff8b0000 {
+> > > +		compatible = "rockchip,rk3399-crypto";
+> > > +		reg = <0x0 0xff8b0000 0x0 0x4000>,
+> > > +		      <0x0 0xff8b8000 0x0 0x4000>;
+> > > +		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>,
+> > > +			     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
+> > > +		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>,
+> > > +			 <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
+> > > +		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>,
+> > > +			 <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
+> > > +	};
+> > 
+> > What's going on here? If these are simply two instances of the same IP 
+> > block as the evidence suggests, why are they crammed into a single DT 
+> > node rather than simply being described as two separate instances? I was 
+> > rather wondering what all the confusing mess in patch #16 was about, 
+> > until I got here.
+> > 
+> > If there's something in the crypto API that means the driver can't 
+> > simply naively register itself multiple times, there should be any 
+> > number of ways for the probe routine to keep track of whether it's 
+> > already registered something and associate any subsequent devices with 
+> > the first one internally if need be. Linux implementation details should 
+> > not leak out as non-standard DT weirdness.
+> > 
+> > I know the Rockchip IOMMU driver does this, but in that case the two 
+> > IOMMU instances are closely coupled and sharing work such that they 
+> > effectively need to be programmed identically at all times, so it was a 
+> > bit more justifiable. I don't know the full story here, but it certainly 
+> > looks like rk_get_engine_number() is just a means to schedule work on 
+> > any available unit independently, so looks like it wouldn't take much to 
+> > select between distinct devices at that point, and actually end up a lot 
+> > simpler and cleaner overall.
+> 
+> Yes rk3399 has 2 instances of the same IP (Exception: crypto1 does not have RSA).
+> 
+> The problem is that only one drivername (like rk-md5) could exists.
+> If crypto0 and crypto1 register with different drivername (rk-md5-0/rk-md5-1), only one will be used anyway.
+> So I merged them into only one instance.
+> I think this way will be easier, but you are right, this is not pretty.
+> 
+> I found another way with 2 nodes:
+> You could preview it at https://github.com/montjoie/linux/tree/cryptorockchipv4
+> Basicly the crypto0 is a normal instance, and crypto1 "registers" itself against crypto0.
+> So if crypto0 know another instance exists it will load balance requests.
 
---rbHr+yLemIUaUxTK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The DT-nodes in that branch are
 
-On Wed, Mar 23, 2022 at 04:53:13PM +0100, Arnd Bergmann wrote:
-> On Wed, Mar 23, 2022 at 3:23 PM Guenter Roeck <linux@roeck-us.net> wrote:
+@@ -573,6 +573,22 @@
+ 		status = "disabled";
+ 	};
+ 
++	crypto0: crypto@ff8b0000 {
++		compatible = "rockchip,rk3399-crypto0";
++		reg = <0x0 0xff8b0000 0x0 0x4000>;
++		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>;
++		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>;
++		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>;
++	};
++
++	crypto1: crypto@ff8b8000 {
++		compatible = "rockchip,rk3399-crypto1";
++		reg = <0x0 0xff8b8000 0x0 0x4000>;
++		interrupts = <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
++		clocks = <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
++		resets = <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
++	};
++
+ 	i2c1: i2c@ff110000 {
+ 		compatible = "rockchip,rk3399-i2c";
+ 		reg = <0x0 0xff110000 0x0 0x1000>;
 
-> > I don't think it is entirely academic. versatile-pb fails for me;
-> > if it doesn't fail at KernelCI, I'd like to understand why - not to
-> > fix it in my test environment, but to make sure that I _don't_ fix it.
-> > After all, it _is_ a regression. Even if that regression is triggered
-> > by bad (for a given definition of "bad") userspace code, it is still
-> > a regression.
+which looks at lot better :-) .
 
-> Maybe kernelci has a virtio-rng device assigned to the machine
-> and you don't? That would clearly avoid the issue here.
+I'm not sure about the different compatibles yet, but as the blocks
+are really _not_ the same implementation that actually does make sense
+[i.e. one not having RSA]
 
-No, nothing I can see in the boot log:
+Though I think you'll need to update the binding for them.
 
-https://storage.kernelci.org/next/master/next-20220323/arm/versatile_defcon=
-fig/gcc-10/lab-baylibre/baseline-qemu_arm-versatilepb.html
 
-and I'd be surprised if virtio devices made it through with a specific
-platform emulation.  However it looks like for that test the init
-scripts didn't do anything with the random seed (possibly due to running
-=66rom ramdisk?) so we'd not have hit the condition.
+Heiko
 
---rbHr+yLemIUaUxTK
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmI7SFYACgkQJNaLcl1U
-h9DyDgf/U3gmBBfzqO9p6NhtOGB/g28xQ3p6y1kJ4Sg2NhFwA6wgeFfZE8b8k9Ps
-4Fra0rZ5ps4ygGLxhk0sD0yHMtRlFP95ybscWVOP/hEDxqDOzqTwAZ5zbYAgyIxS
-a1hKm0AbnEmEpXyK7AhxHXsl3stNSqzCY9OFhJgMFekKkv7L3CAdrBUQCxZhfnKr
-obsPPejMdrEI5IX1ge4QCq9HFI0ohwRDaINOHWXGAX1p4+s6OwFjxvmzZZA87DPs
-OCApFRP6IbCHGqiIykL0UsxWZ6qDRdjLqnCaAK6N5+ZnrP13/C4O3M+dCxV8Vfx6
-Y/3OlG3UrMouJEWe/iwV0bq4UdP6wA==
-=FAu8
------END PGP SIGNATURE-----
 
---rbHr+yLemIUaUxTK--
