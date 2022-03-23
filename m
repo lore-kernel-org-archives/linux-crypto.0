@@ -2,137 +2,348 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B13B4C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 13:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2ABC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 13:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244264AbiCWNYR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 09:24:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57196 "EHLO
+        id S244305AbiCWNfA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 09:35:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244261AbiCWNYQ (ORCPT
+        with ESMTP id S244304AbiCWNe7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 09:24:16 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F0A7CDFE
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:22:45 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id h4so2081718wrc.13
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=nFhPQ/2TAffPjbDjiI/2I0v37r+CcQs5C7D/sWxAMI8=;
-        b=quPIS4rlbqNNwzlG7UsIcANuXUutqUX2+fS2vwwVrkSb8FadLyZ9PZuzt3n4FECs6b
-         JD3NheA8m53Arv3IJp2+FRXgb8apclZMBwVLZzL1u949YS0k93kjWRoPRC7j6cfksk60
-         qxWnya1GQ0o6FnD0kdxsnW3YSZ6iUb00BQ9WyMilezQ5n3ltGCDn+C8jl6rMTHz5Oakz
-         /607HtEh8xP6zzvxbUd5PSpNYWuV9/bc8PQYBMTN/o3/amywjFJkjwFPiEjWUSPZsUf+
-         UUicmWGMkDbN/NfGnIkjbJTQNk7WhHnpkDNNvhtM2OQ7+b+7vY0duYDYvrj3Vwl6M31g
-         2puA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=nFhPQ/2TAffPjbDjiI/2I0v37r+CcQs5C7D/sWxAMI8=;
-        b=LY9m7hVuEfX0wRdWuBvv8oOCHwaJPeh4VawNpOhLIPgjNGU/7qBFSE+zZUPCkxBZOB
-         tZZdXAbcF7pY7kym7Ze4ly97ewgK40SpD1MFHTIFwLAlpYDodRt5xErSkhue8SDzpj1h
-         04XsQSeWsPpuDNlalqgPtRNqiHpNSeDrvpf7p1r3UCg2VzpaY8q1ZqpdgFlncBxuCgJk
-         GkWyL6SWJ54qTyxiIAfNtB/g2bX6AG0Q/XuJbWCZ09QKx3+JEiozZNu9EL6d2e6Lm87U
-         HyJMfsWWTlrE2agQBzMbG3S4pBvHOeOfZgdOrqUmiuOJ5ITW+bJ1Eqg5YpZNvO1FRiW3
-         DJew==
-X-Gm-Message-State: AOAM532AOhqknb1+TB2N5mBWZYybEcdWhz8slwE6qjL3wIVCBxnOyTsK
-        O5491h43DaYCyinPOy8skWM9jg==
-X-Google-Smtp-Source: ABdhPJzktCyQ+4ZXtq4E5zEr/KHSW2QBwhlwN+M/BloZ0THBfCmhcKR2IkHX5we1S2uX5VNg/THYAA==
-X-Received: by 2002:a05:6000:1b86:b0:1f0:d6f:1424 with SMTP id r6-20020a0560001b8600b001f00d6f1424mr26954876wru.174.1648041764214;
-        Wed, 23 Mar 2022 06:22:44 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id l15-20020a05600c4f0f00b0038cbdf5221dsm2806353wmq.41.2022.03.23.06.22.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 06:22:43 -0700 (PDT)
-Date:   Wed, 23 Mar 2022 14:22:41 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v3 18/26] arm64: dts: rockchip: rk3399: add crypto node
-Message-ID: <YjsfIbLQRvoxkana@Red>
-References: <20220321200739.3572792-1-clabbe@baylibre.com>
- <20220321200739.3572792-19-clabbe@baylibre.com>
- <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com>
+        Wed, 23 Mar 2022 09:34:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 293461F616
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:33:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648042407;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=y5Rgz7zRBtwS9sgp9hliTVIYayavWePuczXPGQW/xDc=;
+        b=HUYxt5Ly5wcfMO8P44jqWY2IFAwx9CHUka5TGm8JGw5XqMHoEObbKwxUTaqvm1ZxLXZyN4
+        LE2kYWmKsWwuidbVO54oSwuWupv7etCkOFIaNzBbbDffggyoVkjq7/h9ofZZyEUr8F2dNx
+        2cHKcAqyV1k0I49YljNGuVHELmrWRac=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-8-AS287SegM2Wd-SIAuhaOsg-1; Wed, 23 Mar 2022 09:33:24 -0400
+X-MC-Unique: AS287SegM2Wd-SIAuhaOsg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C1F2F1C07831;
+        Wed, 23 Mar 2022 13:33:23 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6543141ADA5;
+        Wed, 23 Mar 2022 13:33:21 +0000 (UTC)
+Date:   Wed, 23 Mar 2022 13:33:19 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>
+Cc:     arei.gonglei@huawei.com, mst@redhat.com,
+        herbert@gondor.apana.org.au, jasowang@redhat.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, lei he <helei.sig11@bytedance.com>
+Subject: Re: [PATCH v3 3/6] crypto: Introduce akcipher crypto class
+Message-ID: <Yjshn2T0n0hyuup5@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220323024912.249789-1-pizhenwei@bytedance.com>
+ <20220323024912.249789-4-pizhenwei@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com>
+In-Reply-To: <20220323024912.249789-4-pizhenwei@bytedance.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Mar 22, 2022 at 12:00:06PM +0000, Robin Murphy a écrit :
-> On 2022-03-21 20:07, Corentin Labbe wrote:
-> > The rk3399 has a crypto IP handled by the rk3288 crypto driver so adds a
-> > node for it.
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >   arch/arm64/boot/dts/rockchip/rk3399.dtsi | 12 ++++++++++++
-> >   1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > index 88f26d89eea1..ca2c658371a5 100644
-> > --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > @@ -573,6 +573,18 @@ saradc: saradc@ff100000 {
-> >   		status = "disabled";
-> >   	};
-> >   
-> > +	crypto0: crypto@ff8b0000 {
-> > +		compatible = "rockchip,rk3399-crypto";
-> > +		reg = <0x0 0xff8b0000 0x0 0x4000>,
-> > +		      <0x0 0xff8b8000 0x0 0x4000>;
-> > +		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>,
-> > +			     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
-> > +		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>,
-> > +			 <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
-> > +		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>,
-> > +			 <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
-> > +	};
+On Wed, Mar 23, 2022 at 10:49:09AM +0800, zhenwei pi wrote:
+> Support basic asymmetric operations: encrypt, decrypt, sign and
+> verify.
 > 
-> What's going on here? If these are simply two instances of the same IP 
-> block as the evidence suggests, why are they crammed into a single DT 
-> node rather than simply being described as two separate instances? I was 
-> rather wondering what all the confusing mess in patch #16 was about, 
-> until I got here.
+> Co-developed-by: lei he <helei.sig11@bytedance.com>
+> Signed-off-by: lei he <helei.sig11@bytedance.com>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>  crypto/akcipher.c         |  78 +++++++++++++++++++++
+>  crypto/meson.build        |   1 +
+>  include/crypto/akcipher.h | 139 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 218 insertions(+)
+>  create mode 100644 crypto/akcipher.c
+>  create mode 100644 include/crypto/akcipher.h
 > 
-> If there's something in the crypto API that means the driver can't 
-> simply naively register itself multiple times, there should be any 
-> number of ways for the probe routine to keep track of whether it's 
-> already registered something and associate any subsequent devices with 
-> the first one internally if need be. Linux implementation details should 
-> not leak out as non-standard DT weirdness.
-> 
-> I know the Rockchip IOMMU driver does this, but in that case the two 
-> IOMMU instances are closely coupled and sharing work such that they 
-> effectively need to be programmed identically at all times, so it was a 
-> bit more justifiable. I don't know the full story here, but it certainly 
-> looks like rk_get_engine_number() is just a means to schedule work on 
-> any available unit independently, so looks like it wouldn't take much to 
-> select between distinct devices at that point, and actually end up a lot 
-> simpler and cleaner overall.
+> diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+> new file mode 100644
+> index 0000000000..1e52f2fd76
+> --- /dev/null
+> +++ b/crypto/akcipher.c
+> @@ -0,0 +1,78 @@
+> +/*
+> + * QEMU Crypto akcipher algorithms
+> + *
+> + * Copyright (c) 2022 Bytedance
+> + * Author: zhenwei pi <pizhenwei@bytedance.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/host-utils.h"
+> +#include "qapi/error.h"
+> +#include "crypto/akcipher.h"
+> +
+> +QCryptoAkcipher *qcrypto_akcipher_new(QCryptoAkcipherAlgorithm alg,
+> +                                      QCryptoAkcipherKeyType type,
+> +                                      const uint8_t *key, size_t keylen,
+> +                                      void *para, Error **errp)
+> +{
+> +    QCryptoAkcipher *akcipher = NULL;
+> +
+> +    return akcipher;
+> +}
+> +
+> +int qcrypto_akcipher_encrypt(QCryptoAkcipher *akcipher,
+> +                             const void *data, size_t data_len,
+> +                             void *enc, size_t enc_len, Error **errp)
+> +{
+> +    const QCryptoAkcipherDriver *drv = akcipher->driver;
+> +
+> +    return drv->encrypt(akcipher, data, data_len, enc, enc_len, errp);
+> +}
+> +
+> +int qcrypto_akcipher_decrypt(struct QCryptoAkcipher *akcipher,
+> +                             const void *enc, size_t enc_len,
+> +                             void *data, size_t data_len, Error **errp)
+> +{
+> +    const QCryptoAkcipherDriver *drv = akcipher->driver;
+> +
+> +    return drv->decrypt(akcipher, enc, enc_len, data, data_len, errp);
+> +}
+> +
+> +int qcrypto_akcipher_sign(struct QCryptoAkcipher *akcipher,
+> +                          const void *data, size_t data_len,
+> +                          void *sig, size_t sig_len, Error **errp)
+> +{
+> +    const QCryptoAkcipherDriver *drv = akcipher->driver;
+> +
+> +    return drv->sign(akcipher, data, data_len, sig, sig_len, errp);
+> +}
+> +
+> +int qcrypto_akcipher_verify(struct QCryptoAkcipher *akcipher,
+> +                            const void *sig, size_t sig_len,
+> +                            const void *data, size_t data_len, Error **errp)
+> +{
+> +    const QCryptoAkcipherDriver *drv = akcipher->driver;
+> +
+> +    return drv->verify(akcipher, sig, sig_len, data, data_len, errp);
+> +}
+> +
+> +int qcrypto_akcipher_free(struct QCryptoAkcipher *akcipher, Error **errp)
+> +{
+> +    const QCryptoAkcipherDriver *drv = akcipher->driver;
+> +
+> +    return drv->free(akcipher, errp);
+> +}
+> diff --git a/crypto/meson.build b/crypto/meson.build
+> index 19c44bea89..c32b57aeda 100644
+> --- a/crypto/meson.build
+> +++ b/crypto/meson.build
+> @@ -19,6 +19,7 @@ crypto_ss.add(files(
+>    'tlscredspsk.c',
+>    'tlscredsx509.c',
+>    'tlssession.c',
+> +  'akcipher.c',
+>  ))
+>  
+>  if nettle.found()
+> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+> new file mode 100644
+> index 0000000000..03cc3bf46b
+> --- /dev/null
+> +++ b/include/crypto/akcipher.h
+> @@ -0,0 +1,139 @@
+> +/*
+> + * QEMU Crypto asymmetric algorithms
+> + *
+> + * Copyright (c) 2022 Bytedance
+> + * Author: zhenwei pi <pizhenwei@bytedance.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + *
+> + */
+> +
+> +#ifndef QCRYPTO_AKCIPHER_H
+> +#define QCRYPTO_AKCIPHER_H
+> +
+> +#include "qemu/typedefs.h"
+> +#include "qapi/qapi-types-crypto.h"
+> +
+> +typedef struct QCryptoAkcipher QCryptoAkcipher;
+> +typedef struct QCryptoAkcipherDriver QCryptoAkcipherDriver;
+> +
+> +struct QCryptoAkcipherDriver {
+> +    int (*encrypt)(struct QCryptoAkcipher *akcipher,
+> +                   const void *data, size_t data_len,
+> +                   void *enc, size_t enc_len, Error **errp);
+> +    int (*decrypt)(struct QCryptoAkcipher *akcipher,
+> +                   const void *enc, size_t enc_len,
+> +                   void *data, size_t data_len, Error **errp);
+> +    int (*sign)(struct QCryptoAkcipher *akcipher,
+> +                const void *data, size_t data_len,
+> +                void *sig, size_t sig_len, Error **errp);
+> +    int (*verify)(struct QCryptoAkcipher *akcipher,
+> +                  const void *sig, size_t sig_len,
+> +                  const void *data, size_t data_len, Error **errp);
+> +    int (*free)(struct QCryptoAkcipher *akcipher, Error **errp);
+> +};
+> +
+> +struct QCryptoAkcipher {
+> +    QCryptoAkcipherAlgorithm alg;
+> +    QCryptoAkcipherKeyType type;
+> +    uint8_t *key;
+> +    size_t keylen;
+> +    int max_plaintext_len;
+> +    int max_ciphertext_len;
+> +    int max_signature_len;
+> +    int max_dgst_len;
+> +    QCryptoAkcipherDriver *driver;
+> +};
 
-Yes rk3399 has 2 instances of the same IP (Exception: crypto1 does not have RSA).
+These two structs should be treated as private impl details for
+the crypto subsystem, so they should not be exposed in the public
+include/crypto/akcipher.h
 
-The problem is that only one drivername (like rk-md5) could exists.
-If crypto0 and crypto1 register with different drivername (rk-md5-0/rk-md5-1), only one will be used anyway.
-So I merged them into only one instance.
-I think this way will be easier, but you are right, this is not pretty.
+There needs to be a crypto/akcipherpriv.h file, as we've done with
+other APIs in crypto/*priv.h
 
-I found another way with 2 nodes:
-You could preview it at https://github.com/montjoie/linux/tree/cryptorockchipv4
-Basicly the crypto0 is a normal instance, and crypto1 "registers" itself against crypto0.
-So if crypto0 know another instance exists it will load balance requests.
+Also, as with the QAPI def, I'd suggest QCryptoAkCipher as the
+capitalization for all the structs.
 
-Regards
+> +
+> +QCryptoAkcipher *qcrypto_akcipher_new(QCryptoAkcipherAlgorithm alg,
+> +                                      QCryptoAkcipherKeyType type,
+> +                                      const uint8_t *key, size_t keylen,
+> +                                      void *para, Error **errp);
+
+'void *para'  looks pretty dubious.  I suspect this is where 
+it needs to be using the discriminated union for the options.
+ie
+
+ QCryptoAkcipher *qcrypto_akcipher_new(QCryptoAkCipherOptions opts,
+                                       QCryptoAkcipherKeyType type,
+                                       const uint8_t *key, size_t keylen,
+                                       Error **errp);
+
+> +
+> +/**
+> + * qcrypto_akcipher_encrypt:
+> + * @akcipher: akcipher used to do encryption
+> + * @data: plaintext pending to be encrypted
+> + * @data_len: length of the plaintext, MUST less or equal
+> + * akcipher->max_plaintext_len
+> + * @enc: buffer to store the ciphertext
+> + * @enc_len: the length of ciphertext buffer, usually equals to
+> + * akcipher->max_ciphertext_len
+> + * @errp: error pointer
+> + *
+> + * Encrypt data and write ciphertext into enc
+> + *
+> + * Returns: length of ciphertext if encrypt succeed, otherwise -1 is returned
+> + */
+> +int qcrypto_akcipher_encrypt(QCryptoAkcipher *akcipher,
+> +                             const void *data, size_t data_len,
+> +                             void *enc, size_t enc_len, Error **errp);
+
+I'd prefer to keep naming matching qcrypto_cipher_encrypt ie
+
+ int qcrypto_akcipher_encrypt(QCryptoAkcipher *akcipher,
+                              const void *in, size_t in_len,
+                              void *out, size_t out_len,
+			      Error **errp);
+
+If thue caller njeeds to know about max_ciphertext_len, then we'll
+need a API to query that, since the struct should be private.
+
+
+
+> +/**
+> + * qcrypto_akcipher_sign:
+> + * @akcipher: akcipher used to generate signature
+> + * @data: data to be signed
+> + * @data_len: the length of data
+> + * @sig: buffer to store the signature
+> + * @sig_len: length of the signature buffer, usually equals to
+> + * akcipher->max_signature_len
+> + * @errp: error pointer
+> + *
+> + * Generate signature for data using akcipher
+> + *
+> + * Returns: length of signature if succeed, otherwise -1 is returned
+> + */
+> +int qcrypto_akcipher_sign(struct QCryptoAkcipher *akcipher,
+
+Using 'struct' is redundant - use the typedef.
+
+> +                          const void *data, size_t data_len,
+> +                          void *sig, size_t sig_len, Error **errp);
+
+
+
+> +
+> +/**
+> + * qcrypto_akcipher_verify:
+> + * @akcipher: akcipher used to do verifycation
+> + * @sig: pointer to the signature
+> + * @sig_len: length of the signature
+> + * @data: pointer to original data
+> + * @data_len: the length of data
+> + * @errp: error pointer
+> + *
+> + * Verify the signature and the data match or not
+> + *
+> + * Returns: 0 for succeed, otherwise -1 is returned
+> + */
+> +int qcrypto_akcipher_verify(struct QCryptoAkcipher *akcipher,
+
+Using 'struct' is redundant - use the typedef.
+
+> +                            const void *sig, size_t sig_len,
+> +                            const void *data, size_t data_len, Error **errp);
+> +
+> +int qcrypto_akcipher_free(struct QCryptoAkcipher *akcipher, Error **errp);
+
+Using 'struct' is redundant - use the typedef.
+
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
