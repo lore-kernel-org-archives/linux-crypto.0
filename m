@@ -2,99 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55278C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 02:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E459C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 02:50:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241132AbiCWCRi convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Mar 2022 22:17:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        id S231364AbiCWCwS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 22 Mar 2022 22:52:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241127AbiCWCRh (ORCPT
+        with ESMTP id S231241AbiCWCwR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Mar 2022 22:17:37 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32C5770056
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 19:16:05 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-188-9RN3NbaTNnehPJOCmKjD3g-1; Wed, 23 Mar 2022 02:15:58 +0000
-X-MC-Unique: 9RN3NbaTNnehPJOCmKjD3g-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.32; Wed, 23 Mar 2022 02:15:55 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.033; Wed, 23 Mar 2022 02:15:55 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Tue, 22 Mar 2022 22:52:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E46B424BC;
+        Tue, 22 Mar 2022 19:50:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 316DA614BB;
+        Wed, 23 Mar 2022 02:50:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBD2C340EC;
+        Wed, 23 Mar 2022 02:50:46 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="poRXks2Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1648003845;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=O8lqUtskFi5/phmZS/7w/6wHcFNDZz88pVD3yzMOtmE=;
+        b=poRXks2ZqAlyrhowVfj78TCEO1u+sqJoy64CvMmeiefhDY/RYqUQI8la451MQPYB5rw7uI
+        k6qV2y/eT4I+bKlgVkJD8lpJX7mbwFdHR7f8pPOJ7t/ho4VL9sTYrKmmWLrGrAj3luRkg+
+        s7WHiAYNOeCfxoX7SeBMix1m+FAPmhQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 434f7487 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 23 Mar 2022 02:50:44 +0000 (UTC)
+Date:   Tue, 22 Mar 2022 20:50:41 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Guenter Roeck <linux@roeck-us.net>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
-Subject: RE: [PATCH] random: allow writes to /dev/urandom to influence fast
+Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
  init
-Thread-Topic: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Thread-Index: AQHYPiElHr6Egf4vbEGW28icqj7YNKzMOPHg
-Date:   Wed, 23 Mar 2022 02:15:55 +0000
-Message-ID: <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
+Message-ID: <YjqLAWbZ8K7eg3Fw@zx2c4.com>
 References: <20220322191436.110963-1-Jason@zx2c4.com>
-In-Reply-To: <20220322191436.110963-1-Jason@zx2c4.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+ <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jason A. Donenfeld
-> Sent: 22 March 2022 19:15
-> 
-> For as far back as I can tell, writing to /dev/urandom or /dev/random
-> will put entropy into the pool, but won't immediately use it, and won't
-> credit it either. Instead, crediting is controlled by the ioctls
-> RNDADDTOENTCNT and RNDADDENTROPY. If, however, this happens during early
-> boot before the input pool is ready, we have a dangerous situation with
-> seed files as commonly used by shell scripts:
-> 
->   dd if=seedfile of=/dev/urandom # write seed into pool
->   dd if=/dev/urandom of=seedfile count=1 bs=32 # read new seed for next boot
-> 
-> Since the entropy in seedfile isn't credited there, this won't cause the
-> RNG to transition from crng_init=0 to crng_init=2, and so when we make a
-> new seedfile for next boot, we'll still be getting crng_init=0-quality
-> randomness, which may well regress from the original seedfile.
+Hi David (and Linus),
 
-Never mind scripts that try to immediately save a new seedfile [1].
+On Tue, Mar 22, 2022 at 8:16 PM David Laight <David.Laight@aculab.com> wrote:
+> Never mind scripts that try to immediately save a new seedfile [1].
+>
+> What about code run by later startup scripts that wants random numbers.
+> They really do want the seedfile data to be used.
+> If it isn't used then they are likely to get very weak random numbers.
+>
+> You can't really expect startup scripts to be issuing ioctl requests.
 
-What about code run by later startup scripts that wants random numbers.
-They really do want the seedfile data to be used.
-If it isn't used then they are likely to get very weak random numbers.
+To be clear, this "expect[ation]" of yours is very much a new
+expectation. Crediting bits has required an ioctl since forever. Those
+shell scripts have been broken forever. The proposal here is to add new
+behavior to support those old broken shell scripts.
 
-You can't really expect startup scripts to be issuing ioctl requests.
+Fortunately, it seems sort of fixable. But only sort of. There are also
+a lot of complications, as detailed above. Part of it is that some
+people use /dev/urandom writes expecting it not to credit, while others
+use that and then later manually credit it with the ioctl. Both of those
+in general seem like not a very good interface for seeding the rng. The
+correct interface to use is RNDADDENTROPY, which takes both the data and
+whether it should be credited, since then the kernel knows what the
+intentions are and can do something smart with it. Barring that
+knowledge, we're in this vague middle ground where it's unclear what the
+user intends to do.
 
-[1] I suspect the initial 'save' is just there to ensure that the
-random numbers don't exactly repeat if the system crashes.
-The seedfile will be written again during normal shutdown.
+"But I want my shell scripts to work, even if they have never worked,"
+you fairly protest. I'll do my best here to figure something out, but
+note that introducing sane behavior to /dev/urandom writes might imply
+breaking compatibility with the behavior /dev/urandom writes have always
+had in the past. So the "perfect" solution for a shell script seeding
+interface might prove elusive, and we'll be left with something merely,
+"not terrible."
 
+However, if you do think you have a "perfect" solution that takes into
+account all these concerns and doesn't break any prior contracts, please
+do pipe up.
 
-	David
+Two more thoughts, also for Linus' consideration:
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+- Had we not needed to revert the /dev/urandom + /dev/random unification
+  patch, we wouldn't be facing this problem. So a last minute creative
+  solution to save that effort would be quite welcome. I'm not
+  optimistic about us finding that right away, but if a lightbulb goes
+  off, I'd be quite happy.
 
+- Since these seeding shell scripts have always been broken, because
+  this is how the rng has always been, rather than trying to bolt on a
+  very imperfect fix in the kernel for something that never worked
+  right, we could suggest shell scripts take the path that I implemented
+  for systemd:
+  https://github.com/systemd/systemd/commit/da2862ef06f22fc8d31dafced6d2d6dc14f2ee0b
+  In shell, this would look like:
+
+    #!/bin/bash
+    cat seedfile > /dev/urandom
+    { cat seedfile; head -c 32 /dev/urandom; } | sha256sum | cut -d ' ' -f 1 > seedfile
+ 
+  This seems better in nearly every way to trying to retroactively fix it
+  in the kernel by changing the semantics of an extremely old interface.
+  The more I think about it, the more I'm inclined to go with this "do
+  nothing" approach. Open to hearing your thoughts though.
+
+Jason
