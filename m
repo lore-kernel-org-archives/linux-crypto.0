@@ -2,111 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C50C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 11:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3625CC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 12:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235967AbiCWLr2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 07:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44036 "EHLO
+        id S235668AbiCWMLr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 08:11:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232619AbiCWLr2 (ORCPT
+        with ESMTP id S234249AbiCWMLr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 07:47:28 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E27C7939A
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 04:45:58 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-251-3EBf9A9TPvaSMLqZWsEjrw-1; Wed, 23 Mar 2022 11:45:55 +0000
-X-MC-Unique: 3EBf9A9TPvaSMLqZWsEjrw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.32; Wed, 23 Mar 2022 11:45:55 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.033; Wed, 23 Mar 2022 11:45:55 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Wed, 23 Mar 2022 08:11:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE74739162;
+        Wed, 23 Mar 2022 05:10:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1FFC7614DD;
+        Wed, 23 Mar 2022 12:10:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338B1C340E8;
+        Wed, 23 Mar 2022 12:10:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648037416;
+        bh=vbcI4mero0N/bJWLX90aYg9H0pV4+j0AozrkgOJahHY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JEITn10iUJpImQkt/uXRjniHYZUsd6BAzcy643WWTVYjsTo6LxFwUOnlQRwy8OBWs
+         w+4D6eknX4FOtFXmSAea1GdGlwv0HFpq0K1HD3cALlwlnsouh+AQX8r/I0wsJUGDxp
+         8BIw8b8ZDdFDNkobUgmmMF3gItUrnC9A2s0QrNjQKU2xQ8hD+mT9YeZ/822MKbVIln
+         cCPNK2h+QBEWIOYkWi/kUDqmg9dWlU6ayXMjSlhvOuiqzrp6L1J0sK1ZBwiBEV5Emi
+         f97DvFO2X4mz0npZGdc9uAPrqNl/o/+geIXj5acz32k1eHUYV1tvby8dwPUkZicHfI
+         XSuP6rifB8qRg==
+Date:   Wed, 23 Mar 2022 12:10:06 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        "Dominik Brodowski" <linux@dominikbrodowski.net>,
-        Theodore Ts'o <tytso@mit.edu>, "Jann Horn" <jannh@google.com>
-Subject: RE: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Thread-Topic: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Thread-Index: AQHYPiElHr6Egf4vbEGW28icqj7YNKzMOPHggAAMXYCAAJACUA==
-Date:   Wed, 23 Mar 2022 11:45:55 +0000
-Message-ID: <0f9b31b346504d28a908d16884df5e02@AcuMS.aculab.com>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
- <6716f3ffefae4ed8b5fd332bfcca8a9a@AcuMS.aculab.com>
- <YjqLAWbZ8K7eg3Fw@zx2c4.com>
-In-Reply-To: <YjqLAWbZ8K7eg3Fw@zx2c4.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+Message-ID: <YjsOHmvDgAxwLFMg@sirena.org.uk>
+References: <20220217162848.303601-1-Jason@zx2c4.com>
+ <20220322155820.GA1745955@roeck-us.net>
+ <YjoUU+8zrzB02pW7@sirena.org.uk>
+ <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="tJxr+BfuLW0D7ewQ"
+Content-Disposition: inline
+In-Reply-To: <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
+X-Cookie: Nice guys get sick.
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDIzIE1hcmNoIDIwMjIgMDI6NTENCj4g
-DQo+IE9uIFR1ZSwgTWFyIDIyLCAyMDIyIGF0IDg6MTYgUE0gRGF2aWQgTGFpZ2h0IDxEYXZpZC5M
-YWlnaHRAYWN1bGFiLmNvbT4gd3JvdGU6DQo+ID4gTmV2ZXIgbWluZCBzY3JpcHRzIHRoYXQgdHJ5
-IHRvIGltbWVkaWF0ZWx5IHNhdmUgYSBuZXcgc2VlZGZpbGUgWzFdLg0KPiA+DQo+ID4gV2hhdCBh
-Ym91dCBjb2RlIHJ1biBieSBsYXRlciBzdGFydHVwIHNjcmlwdHMgdGhhdCB3YW50cyByYW5kb20g
-bnVtYmVycy4NCj4gPiBUaGV5IHJlYWxseSBkbyB3YW50IHRoZSBzZWVkZmlsZSBkYXRhIHRvIGJl
-IHVzZWQuDQo+ID4gSWYgaXQgaXNuJ3QgdXNlZCB0aGVuIHRoZXkgYXJlIGxpa2VseSB0byBnZXQg
-dmVyeSB3ZWFrIHJhbmRvbSBudW1iZXJzLg0KPiA+DQo+ID4gWW91IGNhbid0IHJlYWxseSBleHBl
-Y3Qgc3RhcnR1cCBzY3JpcHRzIHRvIGJlIGlzc3VpbmcgaW9jdGwgcmVxdWVzdHMuDQo+IA0KPiBU
-byBiZSBjbGVhciwgdGhpcyAiZXhwZWN0W2F0aW9uXSIgb2YgeW91cnMgaXMgdmVyeSBtdWNoIGEg
-bmV3DQo+IGV4cGVjdGF0aW9uLiBDcmVkaXRpbmcgYml0cyBoYXMgcmVxdWlyZWQgYW4gaW9jdGwg
-c2luY2UgZm9yZXZlci4gVGhvc2UNCj4gc2hlbGwgc2NyaXB0cyBoYXZlIGJlZW4gYnJva2VuIGZv
-cmV2ZXIuIFRoZSBwcm9wb3NhbCBoZXJlIGlzIHRvIGFkZCBuZXcNCj4gYmVoYXZpb3IgdG8gc3Vw
-cG9ydCB0aG9zZSBvbGQgYnJva2VuIHNoZWxsIHNjcmlwdHMuDQouLi4NCg0KSSBwZXJzb25hbGx5
-IHdvbid0IGhhdmUgZXhwZWN0ZWQgdGhlIGJlaGF2aW91ciBmb3IgbG9uZyENCkkgd2FzIG9ubHkg
-dHJ5aW5nIHRvIGdldCBhIGJ1aWxkcm9vdCBzeXN0ZW0gdG8gaW5pdGlhbGlzZSB0aGUNCnJhbmRv
-bSBudW1iZXIgZ2VuZXJhdG9yIGxhc3QgeWVhci4NCkJ1dCBJJ20gc3VyZSBJIHJlYWQgc29tZSBv
-ZiB0aGUgZG9jdW1lbnRhdGlvbiBhcyB3ZWxsIGFzIGxvb2tpbmcNCmF0IHRoZSBzY3JpcHRzIGFu
-ZCB0aGUga2VybmVsIHNvdXJjZXMuDQoNClRoZSBidWlsZHJvb3Qgc2NyaXB0cyBhY3R1YWxseSBu
-ZWVkIGZpeGluZyBzbyB0aGV5IGFjdHVhbGx5DQphZGQgZW50cm9weSBvbiBvbGRlciBrZXJuZWwu
-DQoNCkkgZG8gcmVtZW1iZXIgbG9va2luZyBhdCBvbmUgb2YgdGhlIGtlcm5lbCBlbnRyb3B5IHN0
-b3Jlcw0KKHByb2JhYmx5IHRoZSBMaW51eCBvbmUpIGEgZmV3IHllYXJzIGJhY2sgYW5kIHRoaW5r
-aW5nDQp0aGF0IGl0IHdhcyBvdmVyLWNvbXBsZXggYW5kIHByb2JhYmx5IGRpZG4ndCBhY3R1YWxs
-eSB3b3JrDQp0aGF0IHdlbGwgaW4gcmVhbGl0eS4NCklJUkMgaXQgc2F2ZWQgJ2VudHJvcHkgYnl0
-ZXMnIGFuZCB0aGUgbnVtYmVyIG9mIGJpdHMgb2YgZW50cm9weQ0KdGhleSByZXByZXNlbnRlZCAt
-IGFuZCB0aGVuIHJlYWQgb3V0IGVub3VnaCBieXRlcyB0byBnZXQNCnRoZSByZXF1aXJlZCBlbnRy
-b3B5IHRvIHJlc2VlZCB0aGUgUFJORy4NCk5vdyBpZiB5b3VyIFBSTkcgaGFzIE4gYml0cyBvZiBz
-dGF0ZS4gSW4gcHJpbmNpcGxlIGF0IGxlYXN0DQphZnRlciB5b3UndmUgb3V0cHV0IE4gYml0cyBz
-b21lb25lIGNhbiBzb2x2ZSB0aGUgc2ltdWx0YW5lb3VzDQplcXVhdGlvbnMgYW5kIGRldGVybWlu
-ZSB0aGUgUFJORyBzdGF0ZS4NCkJ1dCBhcyBzb29uIGFzIHlvdSB1c2UgYSBjcnlwdG9ncmFwaGlj
-IGhhc2ggZnVuY3Rpb24gdGhhdA0KaXMgbm90IHJlYWxseSBwb3NzaWJsZSBpbiBhbnkgcmVhc29u
-YWJsZSB0aW1lZnJhbWUuDQooSXMgZXZlbiBNRDUgdGhhdCBicm9rZW4/KQ0KDQpCdXQgdGhlICdl
-bnRyb3B5IHN0b3JlJyBjYW4ganVzdCBzdGlyIGluIG5ldyBieXRlcyBhbmQNCmNvdW50IHRoZSBu
-dW1iZXIgb2YgZW50cm9weSBiaXRzLg0KVGhlbiBpdCBkb2Vzbid0IHJlYWxseSBjYXJlIGhvdyBy
-YW5kb20gdGhlIGJ5dGVzIGFyZS4NCihBcGFydCBmcm9tIGFuIGVzdGltYXRpb24gb2YgaG93ICdm
-dWxsJyBpdCBpcy4pDQpDb3B5IGJpdHMgdG8gdGhlIFBSTkcgYW5kIHlvdSByZWR1Y2UgdGhlIG51
-bWJlciBvZg0KYml0cyBpbiB0aGUgZW50cm9weSBzdG9yZSAtIGJ1dCBjb250aW51ZSBqdXN0IHN0
-aXJyaW5nDQppbiBuZXcgZGF0YS4NCg0KSSd2ZSBvZnRlbiB3b25kZXJlZCB3aGV0aGVyIHRoZSBS
-QzUgYWxnb3JpdGhtIHdvdWxkDQptYWtlIGEgZ29vZCBlbnRyb3B5IHN0b3JlLg0KSnVzdCBjeWNs
-ZSB0aGUgYWxnb3JpdGhtIHdpdGggZWFjaCBlbnRyb3B5IGJ5dGUgYXMNCmlzIGRvbmUgd2hlbiBz
-ZXR0aW5nIGVhY2gga2V5IGJ5dGUuDQpDbGVhcmx5IHlvdSBkb24ndCB3YW50IHRvIHVzZSB0aGUg
-UkM1IG91dHB1dCBhcyByYW5kb20gZGF0YS4NCkJ1dCBpdCBvdWdodCB0byBiZSBwbGVudHkgZ29v
-ZCBlbm91Z2ggdG8ga2VlcCBlbnRyb3B5Lg0KVGhlIG9ubHkgcmVhbCBwcm9ibGVtIGlzIHRoYXQg
-UkM1IGlzIHByZXR0eSBob3JyaWQgb24NCnRoZSBkYXRhIGNhY2hlLCBhbmQgcHJvYmFibHkgYSBi
-aXQgYmlnIGZvciBwZXItY3B1IGRhdGEuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJl
-c3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsx
-IDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
+--tJxr+BfuLW0D7ewQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
+> On 3/22/22 11:24, Mark Brown wrote:
+
+> > Just as a datapoint for debugging at least qemu/arm is getting coverage
+> > in CI systems (KernelCI is covering a bunch of different emulated
+> > machines and LKFT has at least one configuration as well, clang's tests
+> > have some wider architecture coverage as well I think) and they don't
+> > seem to be seeing any problems - there's some other variable in there.
+
+> I use buildroot 2021.02.3. I have not changed the buildroot code, and it
+> still seems to be the same in 2022.02. I don't see the problem with all
+> boot tests, only with the architectures mentioned above, and not with all
+> qemu machines on the affected platforms. For arm, mostly older machines
+> are affected (versatile, realview, pxa configurations, collie, integratorcp,
+> sx1, mps2-an385, vexpress-a9, cubieboard). I didn't check, but maybe
+> kernelci doesn't test those machines ?
+
+Kind of academic given that Jason seems to have a handle on what the
+issues are but for KernelCI it's variations on mach-virt, plus
+versatile-pb.  There's a physical cubietruck as well, and BeagleBone
+Blacks among others.  My best guess would be systems with low RAM are
+somehow more prone to issues.
+
+--tJxr+BfuLW0D7ewQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmI7Dh0ACgkQJNaLcl1U
+h9BcKgf9GIwAeN+f0WgtlSoiS81pYIPqyjQ+X1zRuvJIR7xCVZq+sYQ27js719v2
+oES8pLcPkyjZHNziBmIDbpiNeKJWWbYlxxXdyyW5sTe+GzEUzh/+MVxLeGUDF1Qx
+rpZYsiZ/NybofrWfkOwDmm/R5tTn2JgJFZaRHtMeUn67ElJPNu107LsgeDVujePG
+Pywun/VDDjcC5scInU3cbhzRoo2ipY8/nwAxPcM6fddMqgaymdFrC5wU8+ihxGsc
+55rSw4QnKKPRpX8CGjc4wSmYXax1OsLc5Lsh9FQHf9EqVs46ZsJHwd6FntTpIht2
+fiOwR2pk7XiyL1tJEsCZyQfE4vAmBw==
+=b+8U
+-----END PGP SIGNATURE-----
+
+--tJxr+BfuLW0D7ewQ--
