@@ -2,211 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D113AC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 13:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B13B4C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 13:22:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243536AbiCWNJ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 09:09:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
+        id S244264AbiCWNYR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 09:24:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240813AbiCWNJz (ORCPT
+        with ESMTP id S244261AbiCWNYQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 09:09:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 098B12AF6
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:08:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648040903;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=70BVFp/ay2GtzV9l/8pyutFT6h5mVJO5vmRO+wXGVxo=;
-        b=GlfCOazb21J5quqEqAWGk1c585UoLuL21Znm6hMcZTztKsUC1hLD6DqwBmCNdlNZyfc8tB
-        DRrdlFx1or3UqZ10s/vpbx9EZJgk4nsHf5VSBnZeK7S7JM0Q8zoppmACQeLT5vT+KsbiOF
-        IdpDYXhTORbpqPW2HOtCpwMKFsPq4oo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-NABzQSV7NqqciiVi62vQng-1; Wed, 23 Mar 2022 09:08:22 -0400
-X-MC-Unique: NABzQSV7NqqciiVi62vQng-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8FAD29ABA29;
-        Wed, 23 Mar 2022 13:08:21 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A93B1400E70;
-        Wed, 23 Mar 2022 13:08:19 +0000 (UTC)
-Date:   Wed, 23 Mar 2022 13:08:16 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>
-Cc:     arei.gonglei@huawei.com, mst@redhat.com,
-        herbert@gondor.apana.org.au, jasowang@redhat.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, Lei He <helei.sig11@bytedance.com>
-Subject: Re: [PATCH v3 2/6] crypto-akcipher: Introduce akcipher types to qapi
-Message-ID: <YjsbwNhayhkVJ9G0@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220323024912.249789-1-pizhenwei@bytedance.com>
- <20220323024912.249789-3-pizhenwei@bytedance.com>
+        Wed, 23 Mar 2022 09:24:16 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F0A7CDFE
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:22:45 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id h4so2081718wrc.13
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 06:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=nFhPQ/2TAffPjbDjiI/2I0v37r+CcQs5C7D/sWxAMI8=;
+        b=quPIS4rlbqNNwzlG7UsIcANuXUutqUX2+fS2vwwVrkSb8FadLyZ9PZuzt3n4FECs6b
+         JD3NheA8m53Arv3IJp2+FRXgb8apclZMBwVLZzL1u949YS0k93kjWRoPRC7j6cfksk60
+         qxWnya1GQ0o6FnD0kdxsnW3YSZ6iUb00BQ9WyMilezQ5n3ltGCDn+C8jl6rMTHz5Oakz
+         /607HtEh8xP6zzvxbUd5PSpNYWuV9/bc8PQYBMTN/o3/amywjFJkjwFPiEjWUSPZsUf+
+         UUicmWGMkDbN/NfGnIkjbJTQNk7WhHnpkDNNvhtM2OQ7+b+7vY0duYDYvrj3Vwl6M31g
+         2puA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=nFhPQ/2TAffPjbDjiI/2I0v37r+CcQs5C7D/sWxAMI8=;
+        b=LY9m7hVuEfX0wRdWuBvv8oOCHwaJPeh4VawNpOhLIPgjNGU/7qBFSE+zZUPCkxBZOB
+         tZZdXAbcF7pY7kym7Ze4ly97ewgK40SpD1MFHTIFwLAlpYDodRt5xErSkhue8SDzpj1h
+         04XsQSeWsPpuDNlalqgPtRNqiHpNSeDrvpf7p1r3UCg2VzpaY8q1ZqpdgFlncBxuCgJk
+         GkWyL6SWJ54qTyxiIAfNtB/g2bX6AG0Q/XuJbWCZ09QKx3+JEiozZNu9EL6d2e6Lm87U
+         HyJMfsWWTlrE2agQBzMbG3S4pBvHOeOfZgdOrqUmiuOJ5ITW+bJ1Eqg5YpZNvO1FRiW3
+         DJew==
+X-Gm-Message-State: AOAM532AOhqknb1+TB2N5mBWZYybEcdWhz8slwE6qjL3wIVCBxnOyTsK
+        O5491h43DaYCyinPOy8skWM9jg==
+X-Google-Smtp-Source: ABdhPJzktCyQ+4ZXtq4E5zEr/KHSW2QBwhlwN+M/BloZ0THBfCmhcKR2IkHX5we1S2uX5VNg/THYAA==
+X-Received: by 2002:a05:6000:1b86:b0:1f0:d6f:1424 with SMTP id r6-20020a0560001b8600b001f00d6f1424mr26954876wru.174.1648041764214;
+        Wed, 23 Mar 2022 06:22:44 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id l15-20020a05600c4f0f00b0038cbdf5221dsm2806353wmq.41.2022.03.23.06.22.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Mar 2022 06:22:43 -0700 (PDT)
+Date:   Wed, 23 Mar 2022 14:22:41 +0100
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v3 18/26] arm64: dts: rockchip: rk3399: add crypto node
+Message-ID: <YjsfIbLQRvoxkana@Red>
+References: <20220321200739.3572792-1-clabbe@baylibre.com>
+ <20220321200739.3572792-19-clabbe@baylibre.com>
+ <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220323024912.249789-3-pizhenwei@bytedance.com>
-User-Agent: Mutt/2.1.5 (2021-12-30)
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 10:49:08AM +0800, zhenwei pi wrote:
-> From: Lei He <helei.sig11@bytedance.com>
+Le Tue, Mar 22, 2022 at 12:00:06PM +0000, Robin Murphy a écrit :
+> On 2022-03-21 20:07, Corentin Labbe wrote:
+> > The rk3399 has a crypto IP handled by the rk3288 crypto driver so adds a
+> > node for it.
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > ---
+> >   arch/arm64/boot/dts/rockchip/rk3399.dtsi | 12 ++++++++++++
+> >   1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > index 88f26d89eea1..ca2c658371a5 100644
+> > --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
+> > @@ -573,6 +573,18 @@ saradc: saradc@ff100000 {
+> >   		status = "disabled";
+> >   	};
+> >   
+> > +	crypto0: crypto@ff8b0000 {
+> > +		compatible = "rockchip,rk3399-crypto";
+> > +		reg = <0x0 0xff8b0000 0x0 0x4000>,
+> > +		      <0x0 0xff8b8000 0x0 0x4000>;
+> > +		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>,
+> > +			     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
+> > +		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>,
+> > +			 <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
+> > +		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>,
+> > +			 <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
+> > +	};
 > 
-> Introduce akcipher types, also include RSA & ECDSA related types.
+> What's going on here? If these are simply two instances of the same IP 
+> block as the evidence suggests, why are they crammed into a single DT 
+> node rather than simply being described as two separate instances? I was 
+> rather wondering what all the confusing mess in patch #16 was about, 
+> until I got here.
 > 
-> Signed-off-by: Lei He <helei.sig11@bytedance.com>
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> ---
->  qapi/crypto.json | 86 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 86 insertions(+)
+> If there's something in the crypto API that means the driver can't 
+> simply naively register itself multiple times, there should be any 
+> number of ways for the probe routine to keep track of whether it's 
+> already registered something and associate any subsequent devices with 
+> the first one internally if need be. Linux implementation details should 
+> not leak out as non-standard DT weirdness.
 > 
-> diff --git a/qapi/crypto.json b/qapi/crypto.json
-> index 1ec54c15ca..d44c38e3b1 100644
-> --- a/qapi/crypto.json
-> +++ b/qapi/crypto.json
-> @@ -540,3 +540,89 @@
->    'data': { '*loaded': { 'type': 'bool', 'features': ['deprecated'] },
->              '*sanity-check': 'bool',
->              '*passwordid': 'str' } }
-> +##
-> +# @QCryptoAkcipherAlgorithm:
+> I know the Rockchip IOMMU driver does this, but in that case the two 
+> IOMMU instances are closely coupled and sharing work such that they 
+> effectively need to be programmed identically at all times, so it was a 
+> bit more justifiable. I don't know the full story here, but it certainly 
+> looks like rk_get_engine_number() is just a means to schedule work on 
+> any available unit independently, so looks like it wouldn't take much to 
+> select between distinct devices at that point, and actually end up a lot 
+> simpler and cleaner overall.
 
-Should be named  QCryptoAkCipherAlgorithm
+Yes rk3399 has 2 instances of the same IP (Exception: crypto1 does not have RSA).
 
-> +#
-> +# The supported algorithms for asymmetric encryption ciphers
-> +#
-> +# @rsa: RSA algorithm
-> +# @ecdsa: ECDSA algorithm
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'enum': 'QCryptoAkcipherAlgorithm',
-> +  'prefix': 'QCRYPTO_AKCIPHER_ALG',
-> +  'data': ['rsa', 'ecdsa']}
-> +
-> +##
-> +# @QCryptoAkcipherKeyType:
+The problem is that only one drivername (like rk-md5) could exists.
+If crypto0 and crypto1 register with different drivername (rk-md5-0/rk-md5-1), only one will be used anyway.
+So I merged them into only one instance.
+I think this way will be easier, but you are right, this is not pretty.
 
-Should be named  QCryptoAkCipherKeyType
+I found another way with 2 nodes:
+You could preview it at https://github.com/montjoie/linux/tree/cryptorockchipv4
+Basicly the crypto0 is a normal instance, and crypto1 "registers" itself against crypto0.
+So if crypto0 know another instance exists it will load balance requests.
 
-> +#
-> +# The type of asymmetric keys.
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'enum': 'QCryptoAkcipherKeyType',
-> +  'prefix': 'QCRYPTO_AKCIPHER_KEY_TYPE',
-> +  'data': ['public', 'private']}
-> +
-> +##
-> +# @QCryptoRsaHashAlgorithm:
-> +#
-> +# The hash algorithm for RSA pkcs1 padding algothrim
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'enum': 'QCryptoRsaHashAlgorithm',
-> +  'prefix': 'QCRYPTO_RSA_HASH_ALG',
-> +  'data': [ 'md2', 'md3', 'md4', 'md5', 'sha1', 'sha256', 'sha384', 'sha512', 'sha224' ]}
-
-We already have QCryptoHashAlgorithm and I don't see the
-benefit in duplicating it here.
-
-We don't have md2, md3, and md4 in QCryptoHashAlgorithm, but
-that doesn't look like a real negative as I can't imagine
-those should be used today.
-
-> +##
-> +# @QCryptoRsaPaddingAlgorithm:
-> +#
-> +# The padding algorithm for RSA.
-> +#
-> +# @raw: no padding used
-> +# @pkcs1: pkcs1#v1.5
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'enum': 'QCryptoRsaPaddingAlgorithm',
-> +  'prefix': 'QCRYPTO_RSA_PADDING_ALG',
-> +  'data': ['raw', 'pkcs1']}
-> +
-> +##
-> +# @QCryptoCurveId:
-
-Should be named  QCryptoCurveID
-
-> +#
-> +# The well-known curves, referenced from https://csrc.nist.gov/csrc/media/publications/fips/186/3/archive/2009-06-25/documents/fips_186-3.pdf
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'enum': 'QCryptoCurveId',
-> +  'prefix': 'QCRYPTO_CURVE_ID',
-> +  'data': ['nist-p192', 'nist-p224', 'nist-p256', 'nist-p384', 'nist-p521']}
-
-
-> +
-> +##
-> +# @QCryptoRsaOptions:
-
-This should be named  QCryptoAkCipherOptionsRSA
-
-> +#
-> +# Specific parameters for RSA algorithm.
-> +#
-> +# @hash-algo: QCryptoRsaHashAlgorithm
-> +# @padding-algo: QCryptoRsaPaddingAlgorithm
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'struct': 'QCryptoRsaOptions',
-> +  'data': { 'hash-algo':'QCryptoRsaHashAlgorithm',
-> +            'padding-algo': 'QCryptoRsaPaddingAlgorithm'}}
-
-Our naming convention is  'XXX-alg' rather than 'XXX-algo'.
-
-> +
-> +##
-> +# @QCryptoEcdsaOptions:
-
-This should be named  QCryptoAkCipherOptionsECDSA
-
-> +#
-> +# Specific parameter for ECDSA algorithm.
-> +#
-> +# @curve-id: QCryptoCurveId
-> +#
-> +# Since: 7.0
-> +##
-> +{ 'struct': 'QCryptoEcdsaOptions',
-> +  'data': { 'curve-id': 'QCryptoCurveId' }}
-
-Having these two structs standalone looks wrong to me. I suspect that
-callers will need to be able to conditionally pass in either one, and
-so require the API to use a discriminated union
-
-  { 'union': 'QCryptoAkCipherOptions'
-    'base': { 'algorithm': 'QCryptoAkCipherAlgorithm' },
-    'discriminator': 'algorithm',
-    'data': { 'rsa': 'QCryptoAkCipherOptionsRSA' ,
-              'ecdsa': 'QCryptoAkCipherOptionsECDSA' } }
-
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Regards
