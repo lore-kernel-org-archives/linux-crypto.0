@@ -2,136 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2E5C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 14:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BADEC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 15:01:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231801AbiCWOwa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 10:52:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41348 "EHLO
+        id S244929AbiCWPDE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 11:03:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236610AbiCWOwa (ORCPT
+        with ESMTP id S235615AbiCWPDC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 10:52:30 -0400
-X-Greylist: delayed 1616 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Mar 2022 07:51:00 PDT
-Received: from gateway33.websitewelcome.com (gateway33.websitewelcome.com [192.185.146.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D8BE7E082
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 07:51:00 -0700 (PDT)
-Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 604ED9451
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 09:24:01 -0500 (CDT)
-Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
-        by cmsmtp with SMTP
-        id X1u5nW41EHnotX1u5nYMFF; Wed, 23 Mar 2022 09:24:01 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=roeck-us.net; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:Subject:From:References:Cc:To:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=id4KakR43VwvSclTscrtuuJMK1IX+RuWRI/B9xFRJpk=; b=SVzwFj19iwEqII6is3hOB116dH
-        +gBfETPclRjBnoEvnRrOoeW+sDTr+HJAtSYVUX8gptsIpITfOUg1cFuME2dcm3P5UMk415bAELP/q
-        feklv8fsUk4sIh/rzmueB+y6EwGWnCT8cYq9MBPTPnF+K6XqVjwm20bzbyvaGgIARVK331DUeq7vB
-        iKjDb2KIwYx0QExPQA1aDN8T9L8/ZY9tOlyI2WV8vMP8YqAcjUROIvSlWeFIoFUome6eiJCc1+sNL
-        HC35XPU2SmqRcuAwhX0a9ZQNFnMOgeqdHQUFBTz4nCq7XF7OxOzzMW6Uk8Q4rdd1dU0F/DaKDZhG1
-        0UL+lFyA==;
-Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:54412)
-        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@roeck-us.net>)
-        id 1nX1u3-002CJg-TF; Wed, 23 Mar 2022 14:23:59 +0000
-Message-ID: <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
-Date:   Wed, 23 Mar 2022 07:23:56 -0700
+        Wed, 23 Mar 2022 11:03:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 310C37460A
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 08:01:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648047692;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=nV8tfFGM1AQ/P90Zz8juXEcegOc8r+b10AqC7hoVW0w=;
+        b=YiDha/Ynb0C07GwRjPzWDJaaIVar1wNV/H0OzmYhB6P6hLARz78Co5YSFokIRBbnKgh1GF
+        QK72Sq2XcX44+cVooV+tuQJTtrV1OkiuIkLdg+Gok1PwxAkcBR21/IY7+5hMkOIedKbilS
+        0sAi8p9/PUOk3e4EEBHhGmXJBq8lC44=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-518-JM6FYdXaO_29lV7-FHIALw-1; Wed, 23 Mar 2022 11:01:22 -0400
+X-MC-Unique: JM6FYdXaO_29lV7-FHIALw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4A043838065;
+        Wed, 23 Mar 2022 15:00:58 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.123])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B9ECC15D6F;
+        Wed, 23 Mar 2022 15:00:56 +0000 (UTC)
+Date:   Wed, 23 Mar 2022 15:00:54 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>
+Cc:     arei.gonglei@huawei.com, mst@redhat.com,
+        herbert@gondor.apana.org.au, jasowang@redhat.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, Lei He <helei.sig11@bytedance.com>
+Subject: Re: [PATCH v3 2/6] crypto-akcipher: Introduce akcipher types to qapi
+Message-ID: <Yjs2JshB8ZASiHJT@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220323024912.249789-1-pizhenwei@bytedance.com>
+ <20220323024912.249789-3-pizhenwei@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Mark Brown <broonie@kernel.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arch@vger.kernel.org, Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net> <YjoUU+8zrzB02pW7@sirena.org.uk>
- <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
- <YjsOHmvDgAxwLFMg@sirena.org.uk>
-From:   Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-In-Reply-To: <YjsOHmvDgAxwLFMg@sirena.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - roeck-us.net
-X-BWhitelist: no
-X-Source-IP: 108.223.40.66
-X-Source-L: No
-X-Exim-ID: 1nX1u3-002CJg-TF
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net [108.223.40.66]:54412
-X-Source-Auth: linux@roeck-us.net
-X-Email-Count: 26
-X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
-X-Local-Domain: yes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220323024912.249789-3-pizhenwei@bytedance.com>
+User-Agent: Mutt/2.1.5 (2021-12-30)
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/23/22 05:10, Mark Brown wrote:
-> On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
->> On 3/22/22 11:24, Mark Brown wrote:
+On Wed, Mar 23, 2022 at 10:49:08AM +0800, zhenwei pi wrote:
+> From: Lei He <helei.sig11@bytedance.com>
 > 
->>> Just as a datapoint for debugging at least qemu/arm is getting coverage
->>> in CI systems (KernelCI is covering a bunch of different emulated
->>> machines and LKFT has at least one configuration as well, clang's tests
->>> have some wider architecture coverage as well I think) and they don't
->>> seem to be seeing any problems - there's some other variable in there.
+> Introduce akcipher types, also include RSA & ECDSA related types.
 > 
->> I use buildroot 2021.02.3. I have not changed the buildroot code, and it
->> still seems to be the same in 2022.02. I don't see the problem with all
->> boot tests, only with the architectures mentioned above, and not with all
->> qemu machines on the affected platforms. For arm, mostly older machines
->> are affected (versatile, realview, pxa configurations, collie, integratorcp,
->> sx1, mps2-an385, vexpress-a9, cubieboard). I didn't check, but maybe
->> kernelci doesn't test those machines ?
+> Signed-off-by: Lei He <helei.sig11@bytedance.com>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>  qapi/crypto.json | 86 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 86 insertions(+)
 > 
-> Kind of academic given that Jason seems to have a handle on what the
-> issues are but for KernelCI it's variations on mach-virt, plus
-> versatile-pb.  There's a physical cubietruck as well, and BeagleBone
-> Blacks among others.  My best guess would be systems with low RAM are
-> somehow more prone to issues.
+> diff --git a/qapi/crypto.json b/qapi/crypto.json
+> index 1ec54c15ca..d44c38e3b1 100644
+> --- a/qapi/crypto.json
+> +++ b/qapi/crypto.json
+> @@ -540,3 +540,89 @@
+>    'data': { '*loaded': { 'type': 'bool', 'features': ['deprecated'] },
+>              '*sanity-check': 'bool',
+>              '*passwordid': 'str' } }
+> +##
+> +# @QCryptoAkcipherAlgorithm:
+> +#
+> +# The supported algorithms for asymmetric encryption ciphers
+> +#
+> +# @rsa: RSA algorithm
+> +# @ecdsa: ECDSA algorithm
+> +#
+> +# Since: 7.0
+> +##
+> +{ 'enum': 'QCryptoAkcipherAlgorithm',
+> +  'prefix': 'QCRYPTO_AKCIPHER_ALG',
+> +  'data': ['rsa', 'ecdsa']}
 
-I don't think it is entirely academic. versatile-pb fails for me;
-if it doesn't fail at KernelCI, I'd like to understand why - not to
-fix it in my test environment, but to make sure that I _don't_ fix it.
-After all, it _is_ a regression. Even if that regression is triggered
-by bad (for a given definition of "bad") userspace code, it is still
-a regression.
+What were your intentions wrt  ecdsa - the nettle impl in this patch
+series doesn't appear to actually support ecdsa. Are you intending to
+add this in later versions of this patch series, or do it as separate
+work at a later date ?
 
-Thanks,
-Guenter
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
