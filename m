@@ -2,110 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D67BC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 15:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C273C43219
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 16:03:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242398AbiCWPzD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 11:55:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
+        id S237375AbiCWQF1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 12:05:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244437AbiCWPzC (ORCPT
+        with ESMTP id S234639AbiCWQFZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 11:55:02 -0400
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF7B13CE7;
-        Wed, 23 Mar 2022 08:53:31 -0700 (PDT)
-Received: from mail-wr1-f53.google.com ([209.85.221.53]) by
- mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MeTHG-1o7Ua61NkC-00aTAf; Wed, 23 Mar 2022 16:53:30 +0100
-Received: by mail-wr1-f53.google.com with SMTP id t11so2749847wrm.5;
-        Wed, 23 Mar 2022 08:53:30 -0700 (PDT)
-X-Gm-Message-State: AOAM5334oCF9WPbqFjyvGyT5bM2RvS9gxZiCZU8mBPszgoCoFqsSLljL
-        WI1dBUCQWQoP0/tgc1oC4jNGdvLdD+d81V41e20=
-X-Google-Smtp-Source: ABdhPJwn2dk8wgYkeruvYA1iK2eNqfiEFWQUa6CXrBRFhlq1Swt9ujl43cMfPmB/Ci0z6qBzdxo5W+1Rz1oAMI22UqM=
-X-Received: by 2002:a05:6000:178c:b0:204:648:b4c4 with SMTP id
- e12-20020a056000178c00b002040648b4c4mr427762wrg.219.1648050809881; Wed, 23
- Mar 2022 08:53:29 -0700 (PDT)
+        Wed, 23 Mar 2022 12:05:25 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39C0D140A1
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 09:03:54 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id u17so1817737pfk.11
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 09:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=URu1Cld800RCpFArjD3mILx4RS3EOY2glrIHlB2KP8Q=;
+        b=VFfXM5YxFWV1n769LQtS6lAB0qgqL8kW45iyrLTKOyu5t09OX//Lc2kgTexCPwxO1m
+         DNO1uQtVYMW07nVqiP70fusf6ZNhI64ed4YsTbhAeBGIIV7aNp98yBQ0ltlSZ74Lpjud
+         2+hFvqsrpb9Y25jcKBsrfjnKPQwYspqQcVyM5zL5bHijVyY6qFs15Woa5NzsE24q0oCr
+         Rkbx+JVO5LwjOfYRfg+5cdghuSGXQ6PQi/d6Lm3Y4UXa6BvLDd0fH3lXvIgi1rwa18rD
+         kg5+i306FFdIa9psNvPEBu91D9OSZjRvRynBGzdx5mEQDjvukE8G1MbzsqRPxMXN6ymf
+         gJ8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=URu1Cld800RCpFArjD3mILx4RS3EOY2glrIHlB2KP8Q=;
+        b=zN2LRsUBv9H+YhduB7whGgsLQKCnSVmw0iNeyk6ksJXj4Tsh/PvtDTaf+7LWVTJHnL
+         hWQ1MKKs0eHmJlmNoql59uqZIXQ78qoM+LtCDU27Cxc8ZlSQMsTZoWKUeJyzbIGBLH8e
+         moxtGgCbDxTUE0W91oJSB5i1G//c0ZiE+ewT3hzlKqsNIy8h0hEWOG7eiM1FifcKfdEK
+         vE3lPTeFWPcndC/ceMMf0ChDgxwpFYvA7iK9rgZtGoDY8RawY9VJLSqlBGw9xJB/8i9M
+         iQAEQBqnKZmoxgRV+GPZfcGbMql4j4/htZE30WSUfbQowUY7APwJXnoyZaPsLJKYES1P
+         4u2Q==
+X-Gm-Message-State: AOAM530mv6XlszYIgieqBfHuaUmIv3xRkhwqD+4KDQZUqSe/pcVAL8g/
+        jyLhxCOrEe50hGr87KoUaJl34w==
+X-Google-Smtp-Source: ABdhPJwxGfSENN/9Lwi9Dj6rnEjBTulAhjGbko1yBhAsuIBmI8EdYx67EM0pJ0KJ8RIRRT7o4EbRQw==
+X-Received: by 2002:a05:6a00:3309:b0:4fa:950b:d011 with SMTP id cq9-20020a056a00330900b004fa950bd011mr291249pfb.24.1648051433738;
+        Wed, 23 Mar 2022 09:03:53 -0700 (PDT)
+Received: from [10.255.146.117] ([139.177.225.224])
+        by smtp.gmail.com with ESMTPSA id oa16-20020a17090b1bd000b001c72b632222sm7101041pjb.32.2022.03.23.09.03.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Mar 2022 09:03:41 -0700 (PDT)
+Message-ID: <59113ffd-60c3-8036-d5c8-ca19908f0e65@bytedance.com>
+Date:   Wed, 23 Mar 2022 23:59:46 +0800
 MIME-Version: 1.0
-References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
- <YjoUU+8zrzB02pW7@sirena.org.uk> <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
- <YjsOHmvDgAxwLFMg@sirena.org.uk> <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
-In-Reply-To: <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 23 Mar 2022 16:53:13 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
-Message-ID: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     Mark Brown <broonie@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:COZgfK1VxxiYxTAoPRbuJEh3HPsg9nlpIoaJsVwet2BB8O9NTmy
- iC93M+wKS2KMGMbkvuC9ZqftbfZ91qtQzpd0C6grskgXTRGuH97YA17PK69pdYMG0zDCjBK
- tSU4jdMmxG4qaWrEdlv95bALHrFOJNK1h3llpTqV2+uupE5GS1NmS9BK39WCZpoU5g+TFm3
- dbDhGy/uOsNZu0vOibDAQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ycrPdCsTbgI=:LXth86oMI97+avK5cluOCx
- I5HuEfEjfKrmaYc/pC5XZFWDAF9C17WIULmWQN9FPNXNfSlnGPmc7TAgZjsYUHnZ3dzYjmKCr
- G1vlX7Lg1XOZnL9ICKLL3vV4eYDfIDB3lCSYC1rT2xbMcVbiOnQDLbq8TUp42qMslsjlQhRdy
- L7xkXgStU3cfTb3dWq8CbJOV+yXtBf2StXHvFyEpB3gKw+nPGHoqAACJTpapKFEkr95F+4dHP
- G8T/1G9bkxaYGG/jM/UKMXf9iMLcCOZGEC1/SrFirYvUqrdX+NY4x2z1chplub7sGzpdCIr8N
- bkZcUUPjXzv4IwIjmG2XqczDZSkONyAGCyKVNYR7CiY2PTdLdi/c21APj7kEmnr9IW4VGORu3
- kYvA4xLEfjKoaVhFQ4LROrEWOiYpruKP8EkSDpy1j0meJ5Xjrfjy1Yl/PmedfPVeVx5H55zNK
- Y9pS3H6rQ/urqx+eR1RtU/TKeG+D+6EJBr8kDLrBaWw2gpCZO4kouaWPIaAhdhKS/zjb3cu2w
- ew0igcL4xBSO5GN4+VPiFLEPnFT9FZxtF9UX7kBZA0YV2xFOSkN3GmNLYwYGdugSjNYe3K+N5
- 3Uvjy/idCaXMMBbExf7srXCqoG0XYeyuHYv9Y0xLlNIDao0TsY0zcfGaTBaUX/M5/KHe1mpbA
- q1IQPbMpkn9fgNF0EMMBcWa09CLx2d0qGRHsnKzETWYLcnp7xQPF/YFE3qUKzEB/hDmN7/4XI
- x25/fWB21MdFIrF7hd1ecUjwDyoew1LQlFmcOhbrj/uuuczLF6QOiP/1ylJRu0Yu7mI36wGaP
- iXH+XsRDMFwaQ6Pjt4hAaKzxo/wCxVHWUGhB7Av+X+jr/S4IGw=
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Re: [PATCH v3 1/6] virtio-crypto: header update
+Content-Language: en-US
+To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc:     arei.gonglei@huawei.com, mst@redhat.com,
+        herbert@gondor.apana.org.au, jasowang@redhat.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, lei he <helei.sig11@bytedance.com>
+References: <20220323024912.249789-1-pizhenwei@bytedance.com>
+ <20220323024912.249789-2-pizhenwei@bytedance.com>
+ <Yjs+7TYdumci1Q9h@redhat.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <Yjs+7TYdumci1Q9h@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 3:23 PM Guenter Roeck <linux@roeck-us.net> wrote:
->
-> On 3/23/22 05:10, Mark Brown wrote:
-> > On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
-> > Kind of academic given that Jason seems to have a handle on what the
-> > issues are but for KernelCI it's variations on mach-virt, plus
-> > versatile-pb.  There's a physical cubietruck as well, and BeagleBone
-> > Blacks among others.  My best guess would be systems with low RAM are
-> > somehow more prone to issues.
->
-> I don't think it is entirely academic. versatile-pb fails for me;
-> if it doesn't fail at KernelCI, I'd like to understand why - not to
-> fix it in my test environment, but to make sure that I _don't_ fix it.
-> After all, it _is_ a regression. Even if that regression is triggered
-> by bad (for a given definition of "bad") userspace code, it is still
-> a regression.
+On 3/23/22 23:38, Daniel P. Berrangé wrote:
+> On Wed, Mar 23, 2022 at 10:49:07AM +0800, zhenwei pi wrote:
+>> Update header from linux, support akcipher service.
+> 
+> I'm assuming this is updated for *non-merged* Linux headers, since
+> I don't see these changes present in current linux.git
+> 
+>>
+Hi,
 
-Maybe kernelci has a virtio-rng device assigned to the machine
-and you don't? That would clearly avoid the issue here.
+The related context link:
+https://lkml.org/lkml/2022/3/1/1425
 
-        Arnd
+- The virtio crypto spec is the first part. It will be deferred to 1.3.
+The latest version: 
+https://www.oasis-open.org/committees/ballot.php?id=3681 (need put 
+"__le32 akcipher_algo;" instead of "__le32 reserve;" and repost)
+
+- According to the spec, then we can define the linux headers. (depend 
+on the spec)
+
+- Update the header file for QEMU. (depend on the linux headers)
+
+All the parts are in development.
+
+-- 
+zhenwei pi
