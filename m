@@ -2,166 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CCDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 15:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D67BC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 15:53:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237933AbiCWPkD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 11:40:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        id S242398AbiCWPzD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 11:55:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238063AbiCWPkC (ORCPT
+        with ESMTP id S244437AbiCWPzC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 11:40:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 92F7AB87F
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 08:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648049911;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=52OyT4hNZgnDakpoSYVZAqnZ+3Oak7O7fHORDYjy2eA=;
-        b=bI/hO3vmx6kdRaJ+tj4BCs3350N5CVVq8nLdEkXfyjKjAjS4xIx+DgQeahrb0fYJkBEAfz
-        LvTmiuhMlYZ5DUz6jGMcVIE9+rEwTMLDnypFvxqKMhOcQyN6YcNB5vPGqPw1Y84UQ9WDTO
-        IKm35xu0Kf0VYjczglEhdFMvZY5wJ/Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-39-spB1Q2qaM_GCIH9FixBKRw-1; Wed, 23 Mar 2022 11:38:26 -0400
-X-MC-Unique: spB1Q2qaM_GCIH9FixBKRw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BCBAE2800F6B;
-        Wed, 23 Mar 2022 15:38:25 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.123])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 299AD140241B;
-        Wed, 23 Mar 2022 15:38:24 +0000 (UTC)
-Date:   Wed, 23 Mar 2022 15:38:21 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>
-Cc:     arei.gonglei@huawei.com, mst@redhat.com,
-        herbert@gondor.apana.org.au, jasowang@redhat.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, lei he <helei.sig11@bytedance.com>
-Subject: Re: [PATCH v3 1/6] virtio-crypto: header update
-Message-ID: <Yjs+7TYdumci1Q9h@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220323024912.249789-1-pizhenwei@bytedance.com>
- <20220323024912.249789-2-pizhenwei@bytedance.com>
+        Wed, 23 Mar 2022 11:55:02 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF7B13CE7;
+        Wed, 23 Mar 2022 08:53:31 -0700 (PDT)
+Received: from mail-wr1-f53.google.com ([209.85.221.53]) by
+ mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1MeTHG-1o7Ua61NkC-00aTAf; Wed, 23 Mar 2022 16:53:30 +0100
+Received: by mail-wr1-f53.google.com with SMTP id t11so2749847wrm.5;
+        Wed, 23 Mar 2022 08:53:30 -0700 (PDT)
+X-Gm-Message-State: AOAM5334oCF9WPbqFjyvGyT5bM2RvS9gxZiCZU8mBPszgoCoFqsSLljL
+        WI1dBUCQWQoP0/tgc1oC4jNGdvLdD+d81V41e20=
+X-Google-Smtp-Source: ABdhPJwn2dk8wgYkeruvYA1iK2eNqfiEFWQUa6CXrBRFhlq1Swt9ujl43cMfPmB/Ci0z6qBzdxo5W+1Rz1oAMI22UqM=
+X-Received: by 2002:a05:6000:178c:b0:204:648:b4c4 with SMTP id
+ e12-20020a056000178c00b002040648b4c4mr427762wrg.219.1648050809881; Wed, 23
+ Mar 2022 08:53:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220323024912.249789-2-pizhenwei@bytedance.com>
-User-Agent: Mutt/2.1.5 (2021-12-30)
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
+ <YjoUU+8zrzB02pW7@sirena.org.uk> <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
+ <YjsOHmvDgAxwLFMg@sirena.org.uk> <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
+In-Reply-To: <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 23 Mar 2022 16:53:13 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
+Message-ID: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     Mark Brown <broonie@kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:COZgfK1VxxiYxTAoPRbuJEh3HPsg9nlpIoaJsVwet2BB8O9NTmy
+ iC93M+wKS2KMGMbkvuC9ZqftbfZ91qtQzpd0C6grskgXTRGuH97YA17PK69pdYMG0zDCjBK
+ tSU4jdMmxG4qaWrEdlv95bALHrFOJNK1h3llpTqV2+uupE5GS1NmS9BK39WCZpoU5g+TFm3
+ dbDhGy/uOsNZu0vOibDAQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ycrPdCsTbgI=:LXth86oMI97+avK5cluOCx
+ I5HuEfEjfKrmaYc/pC5XZFWDAF9C17WIULmWQN9FPNXNfSlnGPmc7TAgZjsYUHnZ3dzYjmKCr
+ G1vlX7Lg1XOZnL9ICKLL3vV4eYDfIDB3lCSYC1rT2xbMcVbiOnQDLbq8TUp42qMslsjlQhRdy
+ L7xkXgStU3cfTb3dWq8CbJOV+yXtBf2StXHvFyEpB3gKw+nPGHoqAACJTpapKFEkr95F+4dHP
+ G8T/1G9bkxaYGG/jM/UKMXf9iMLcCOZGEC1/SrFirYvUqrdX+NY4x2z1chplub7sGzpdCIr8N
+ bkZcUUPjXzv4IwIjmG2XqczDZSkONyAGCyKVNYR7CiY2PTdLdi/c21APj7kEmnr9IW4VGORu3
+ kYvA4xLEfjKoaVhFQ4LROrEWOiYpruKP8EkSDpy1j0meJ5Xjrfjy1Yl/PmedfPVeVx5H55zNK
+ Y9pS3H6rQ/urqx+eR1RtU/TKeG+D+6EJBr8kDLrBaWw2gpCZO4kouaWPIaAhdhKS/zjb3cu2w
+ ew0igcL4xBSO5GN4+VPiFLEPnFT9FZxtF9UX7kBZA0YV2xFOSkN3GmNLYwYGdugSjNYe3K+N5
+ 3Uvjy/idCaXMMBbExf7srXCqoG0XYeyuHYv9Y0xLlNIDao0TsY0zcfGaTBaUX/M5/KHe1mpbA
+ q1IQPbMpkn9fgNF0EMMBcWa09CLx2d0qGRHsnKzETWYLcnp7xQPF/YFE3qUKzEB/hDmN7/4XI
+ x25/fWB21MdFIrF7hd1ecUjwDyoew1LQlFmcOhbrj/uuuczLF6QOiP/1ylJRu0Yu7mI36wGaP
+ iXH+XsRDMFwaQ6Pjt4hAaKzxo/wCxVHWUGhB7Av+X+jr/S4IGw=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 10:49:07AM +0800, zhenwei pi wrote:
-> Update header from linux, support akcipher service.
+On Wed, Mar 23, 2022 at 3:23 PM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> On 3/23/22 05:10, Mark Brown wrote:
+> > On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
+> > Kind of academic given that Jason seems to have a handle on what the
+> > issues are but for KernelCI it's variations on mach-virt, plus
+> > versatile-pb.  There's a physical cubietruck as well, and BeagleBone
+> > Blacks among others.  My best guess would be systems with low RAM are
+> > somehow more prone to issues.
+>
+> I don't think it is entirely academic. versatile-pb fails for me;
+> if it doesn't fail at KernelCI, I'd like to understand why - not to
+> fix it in my test environment, but to make sure that I _don't_ fix it.
+> After all, it _is_ a regression. Even if that regression is triggered
+> by bad (for a given definition of "bad") userspace code, it is still
+> a regression.
 
-I'm assuming this is updated for *non-merged* Linux headers, since
-I don't see these changes present in current linux.git 
+Maybe kernelci has a virtio-rng device assigned to the machine
+and you don't? That would clearly avoid the issue here.
 
-> 
-> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: lei he <helei.sig11@bytedance.com>
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> ---
->  .../standard-headers/linux/virtio_crypto.h    | 82 ++++++++++++++++++-
->  1 file changed, 81 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/standard-headers/linux/virtio_crypto.h b/include/standard-headers/linux/virtio_crypto.h
-> index 5ff0b4ee59..68066dafb6 100644
-> --- a/include/standard-headers/linux/virtio_crypto.h
-> +++ b/include/standard-headers/linux/virtio_crypto.h
-> @@ -37,6 +37,7 @@
->  #define VIRTIO_CRYPTO_SERVICE_HASH   1
->  #define VIRTIO_CRYPTO_SERVICE_MAC    2
->  #define VIRTIO_CRYPTO_SERVICE_AEAD   3
-> +#define VIRTIO_CRYPTO_SERVICE_AKCIPHER 4
->  
->  #define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op))
->  
-> @@ -57,6 +58,10 @@ struct virtio_crypto_ctrl_header {
->  	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x02)
->  #define VIRTIO_CRYPTO_AEAD_DESTROY_SESSION \
->  	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x03)
-> +#define VIRTIO_CRYPTO_AKCIPHER_CREATE_SESSION \
-> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x04)
-> +#define VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION \
-> +	   VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AKCIPHER, 0x05)
->  	uint32_t opcode;
->  	uint32_t algo;
->  	uint32_t flag;
-> @@ -180,6 +185,58 @@ struct virtio_crypto_aead_create_session_req {
->  	uint8_t padding[32];
->  };
->  
-> +struct virtio_crypto_rsa_session_para {
-> +#define VIRTIO_CRYPTO_RSA_RAW_PADDING   0
-> +#define VIRTIO_CRYPTO_RSA_PKCS1_PADDING 1
-> +	uint32_t padding_algo;
-> +
-> +#define VIRTIO_CRYPTO_RSA_NO_HASH   0
-> +#define VIRTIO_CRYPTO_RSA_MD2       1
-> +#define VIRTIO_CRYPTO_RSA_MD3       2
-> +#define VIRTIO_CRYPTO_RSA_MD4       3
-> +#define VIRTIO_CRYPTO_RSA_MD5       4
-> +#define VIRTIO_CRYPTO_RSA_SHA1      5
-
-Do we really need to be adding support for all these obsolete
-hash functions. Maybe SHA1 is borderline acceptable, but all
-those obsolete MD* functions too ??
-
-> +#define VIRTIO_CRYPTO_RSA_SHA256    6
-> +#define VIRTIO_CRYPTO_RSA_SHA384    7
-> +#define VIRTIO_CRYPTO_RSA_SHA512    8
-> +#define VIRTIO_CRYPTO_RSA_SHA224    9
-> +	uint32_t hash_algo;
-> +};
-> +
-> +struct virtio_crypto_ecdsa_session_para {
-> +#define VIRTIO_CRYPTO_CURVE_UNKNOWN   0
-> +#define VIRTIO_CRYPTO_CURVE_NIST_P192 1
-> +#define VIRTIO_CRYPTO_CURVE_NIST_P224 2
-> +#define VIRTIO_CRYPTO_CURVE_NIST_P256 3
-> +#define VIRTIO_CRYPTO_CURVE_NIST_P384 4
-> +#define VIRTIO_CRYPTO_CURVE_NIST_P521 5
-> +	uint32_t curve_id;
-> +	uint32_t padding;
-> +};
-> +
-> +struct virtio_crypto_akcipher_session_para {
-> +#define VIRTIO_CRYPTO_NO_AKCIPHER    0
-> +#define VIRTIO_CRYPTO_AKCIPHER_RSA   1
-> +#define VIRTIO_CRYPTO_AKCIPHER_DSA   2
-> +#define VIRTIO_CRYPTO_AKCIPHER_ECDSA 3
-
-Here we have RSA, DSA and ECDSA, but the corresponding QEMU
-qapi/crypto.json doesn't define DSA at all. Is that a mistake
-on the QEMU side, or is the DSA support redundant ?
-
-> +	uint32_t algo;
-> +
-> +#define VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PUBLIC  1
-> +#define VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PRIVATE 2
-> +	uint32_t keytype;
-> +	uint32_t keylen;
-> +
-> +	union {
-> +		struct virtio_crypto_rsa_session_para rsa;
-> +		struct virtio_crypto_ecdsa_session_para ecdsa;
-> +	} u;
-> +};
-
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+        Arnd
