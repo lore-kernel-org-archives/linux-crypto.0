@@ -2,147 +2,127 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02689C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 16:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE63FC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 16:46:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245410AbiCWQaE convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 12:30:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43034 "EHLO
+        id S237372AbiCWQsN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 12:48:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242091AbiCWQaE (ORCPT
+        with ESMTP id S245518AbiCWQrz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 12:30:04 -0400
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F070D23BD9;
-        Wed, 23 Mar 2022 09:28:31 -0700 (PDT)
-Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <heiko@sntech.de>)
-        id 1nX3qT-00030m-16; Wed, 23 Mar 2022 17:28:25 +0100
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     Robin Murphy <robin.murphy@arm.com>,
-        LABBE Corentin <clabbe@baylibre.com>
-Cc:     herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v3 18/26] arm64: dts: rockchip: rk3399: add crypto node
-Date:   Wed, 23 Mar 2022 17:28:24 +0100
-Message-ID: <1898921.yKVeVyVuyW@diego>
-In-Reply-To: <YjsfIbLQRvoxkana@Red>
-References: <20220321200739.3572792-1-clabbe@baylibre.com> <70422777-a3f9-b2f1-5faa-94d24fe200ac@arm.com> <YjsfIbLQRvoxkana@Red>
+        Wed, 23 Mar 2022 12:47:55 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9382DEB2
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 09:46:25 -0700 (PDT)
+Received: from mail-wm1-f54.google.com ([209.85.128.54]) by
+ mrelayeu.kundenserver.de (mreue108 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1M2OAi-1nVP5E3Are-003sH2; Wed, 23 Mar 2022 17:41:18 +0100
+Received: by mail-wm1-f54.google.com with SMTP id 123-20020a1c1981000000b0038b3616a71aso1231626wmz.4;
+        Wed, 23 Mar 2022 09:41:18 -0700 (PDT)
+X-Gm-Message-State: AOAM531Nxs/XarV9jd9ywPi9FCuU+fSNA+0hfrkLNG8pTaniV5dIm110
+        LwmR/5AEa9LypK5YEAuqTMg9M76Y+GeDLwYnDAo=
+X-Google-Smtp-Source: ABdhPJzQ6+sWLiXr8Hp2o8LXfAR2AuwxHJYkOgUowaeEKHIJ0SuNttg2LIiHKo5yBPCGx6C4R7ZFcmIhEjJe1vVdEm0=
+X-Received: by 2002:a05:600c:4b83:b0:38c:49b5:5bfc with SMTP id
+ e3-20020a05600c4b8300b0038c49b55bfcmr10553256wmp.33.1648053678343; Wed, 23
+ Mar 2022 09:41:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
+References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
+ <YjoUU+8zrzB02pW7@sirena.org.uk> <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
+ <YjsOHmvDgAxwLFMg@sirena.org.uk> <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
+ <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com> <YjtIVymPEZ4t16tP@sirena.org.uk>
+In-Reply-To: <YjtIVymPEZ4t16tP@sirena.org.uk>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 23 Mar 2022 17:41:01 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a0Fzryo8Wi2exbQz=qXKGOGU6yxP0FGowa-fJkr0aGJFg@mail.gmail.com>
+Message-ID: <CAK8P3a0Fzryo8Wi2exbQz=qXKGOGU6yxP0FGowa-fJkr0aGJFg@mail.gmail.com>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Guenter Roeck <linux@roeck-us.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:Nrnd2roAseJI6Rsq/gsTAvzXGUaLxalm6mS+yRoH6hjNj5E+ybe
+ pjtUwrVkpNs4hw53lZDlcaj0RFwRa4SZ3gERjEcy//2/PFqlwGBnQjrdJtf9YXTdJZk8sxB
+ f2SwahfUlt4yZKd9WLSPAU6ultg9xJXGZbAw5nVATNXvJjkFaxSfV4XK7z7QKlRU2CSECPL
+ MGJi1RdQzugAzEYfQsgDA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HQwygQXpUv0=:LjVQAU7zBVgJ0TkwLeHsoI
+ x1AtlIxe/2BkE0oNP1BUlvjxO3aVqiIGDn2UrwGxsVg5Xuig1Xn0NHUWSFsisZy9W7OfXFotB
+ Frq03lxs/6pjx9FMma89OypaGD/caIYc5NOXEDIC2WImxZG4qwvLMi2UiIA39Bys5wq0QaVvW
+ 6YojZCMit8HhZlZx2quE+Z8tut09W9YwHiHqmJOFy4uVo4DlVJeWNZl5mpBiVwbRS9MEtxltJ
+ d+KPStjp2wWRaE8H/03Jg+8FsU0fDV8+lNRxDXEoIF2IzxhmUB0P3GXKA2g44D8XSk/6GFrbl
+ dBSr5FQehG80NXMeUKhyW6/hgugeiltluqbkSqfOegCuC1yxgVxBSTJELeISOalSf43XGX+ep
+ Z4Jc/w1MPLFv1tGugE8hNIkF/tA9ahJqS7xoeuT+5FV99skGSsiLJmFcHNUWpGpDzguAo1viC
+ eqgmvN8mtMwY56w6pJsz/Hdub8UecVFwMooLa0b6fBg8BA41Xu7xbVj4Mg/rO7X1CVw+QYfjS
+ Z82aPv+VsHUt9GFaKjdI9MZkYmTxxtOCIFC1QPK0T9f2bdLZsKaE/5HAaF94MDuKr5q0Ce6Ci
+ 0bnYT8h2Wdzu2m6JhHKNBkuyXzIBPQaUONTk9492Jc7ddYZPeVSqCjLTfgpeHkLZNlg4J7f3g
+ w7sV8QIty8ydCSt+QYjtzePCSop3iMqxb21iAHXHTIINJ/TFWr5Gg9xKAhxIV9n6btyzdk/6M
+ Ip3Rt48dcCJ36yllWwvGDzol1UpCR4Rgf+Q3MtKWNbNzwjJa8PhyjsAM588sLUcm7GcD2VvSL
+ prOtVWaWOUuRU54CIdEFiX9fMmSw84r4nZOm5JnNaT74lJdvzA=
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 23. März 2022, 14:22:41 CET schrieb LABBE Corentin:
-> Le Tue, Mar 22, 2022 at 12:00:06PM +0000, Robin Murphy a écrit :
-> > On 2022-03-21 20:07, Corentin Labbe wrote:
-> > > The rk3399 has a crypto IP handled by the rk3288 crypto driver so adds a
-> > > node for it.
-> > > 
-> > > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > > ---
-> > >   arch/arm64/boot/dts/rockchip/rk3399.dtsi | 12 ++++++++++++
-> > >   1 file changed, 12 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/boot/dts/rockchip/rk3399.dtsi b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > > index 88f26d89eea1..ca2c658371a5 100644
-> > > --- a/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > > +++ b/arch/arm64/boot/dts/rockchip/rk3399.dtsi
-> > > @@ -573,6 +573,18 @@ saradc: saradc@ff100000 {
-> > >   		status = "disabled";
-> > >   	};
-> > >   
-> > > +	crypto0: crypto@ff8b0000 {
-> > > +		compatible = "rockchip,rk3399-crypto";
-> > > +		reg = <0x0 0xff8b0000 0x0 0x4000>,
-> > > +		      <0x0 0xff8b8000 0x0 0x4000>;
-> > > +		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>,
-> > > +			     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
-> > > +		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>,
-> > > +			 <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
-> > > +		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>,
-> > > +			 <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
-> > > +	};
-> > 
-> > What's going on here? If these are simply two instances of the same IP 
-> > block as the evidence suggests, why are they crammed into a single DT 
-> > node rather than simply being described as two separate instances? I was 
-> > rather wondering what all the confusing mess in patch #16 was about, 
-> > until I got here.
-> > 
-> > If there's something in the crypto API that means the driver can't 
-> > simply naively register itself multiple times, there should be any 
-> > number of ways for the probe routine to keep track of whether it's 
-> > already registered something and associate any subsequent devices with 
-> > the first one internally if need be. Linux implementation details should 
-> > not leak out as non-standard DT weirdness.
-> > 
-> > I know the Rockchip IOMMU driver does this, but in that case the two 
-> > IOMMU instances are closely coupled and sharing work such that they 
-> > effectively need to be programmed identically at all times, so it was a 
-> > bit more justifiable. I don't know the full story here, but it certainly 
-> > looks like rk_get_engine_number() is just a means to schedule work on 
-> > any available unit independently, so looks like it wouldn't take much to 
-> > select between distinct devices at that point, and actually end up a lot 
-> > simpler and cleaner overall.
-> 
-> Yes rk3399 has 2 instances of the same IP (Exception: crypto1 does not have RSA).
-> 
-> The problem is that only one drivername (like rk-md5) could exists.
-> If crypto0 and crypto1 register with different drivername (rk-md5-0/rk-md5-1), only one will be used anyway.
-> So I merged them into only one instance.
-> I think this way will be easier, but you are right, this is not pretty.
-> 
-> I found another way with 2 nodes:
-> You could preview it at https://github.com/montjoie/linux/tree/cryptorockchipv4
-> Basicly the crypto0 is a normal instance, and crypto1 "registers" itself against crypto0.
-> So if crypto0 know another instance exists it will load balance requests.
+On Wed, Mar 23, 2022 at 5:18 PM Mark Brown <broonie@kernel.org> wrote:
+>
+> On Wed, Mar 23, 2022 at 04:53:13PM +0100, Arnd Bergmann wrote:
+> > On Wed, Mar 23, 2022 at 3:23 PM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> > > I don't think it is entirely academic. versatile-pb fails for me;
+> > > if it doesn't fail at KernelCI, I'd like to understand why - not to
+> > > fix it in my test environment, but to make sure that I _don't_ fix it.
+> > > After all, it _is_ a regression. Even if that regression is triggered
+> > > by bad (for a given definition of "bad") userspace code, it is still
+> > > a regression.
+>
+> > Maybe kernelci has a virtio-rng device assigned to the machine
+> > and you don't? That would clearly avoid the issue here.
+>
+> No, nothing I can see in the boot log:
+>
+> https://storage.kernelci.org/next/master/next-20220323/arm/versatile_defconfig/gcc-10/lab-baylibre/baseline-qemu_arm-versatilepb.html
+>
+> and I'd be surprised if virtio devices made it through with a specific
+> platform emulation.
 
-The DT-nodes in that branch are
+In general they do: virtio devices appear as regular PCI devices
+and get probed from there, as long as the drivers are available.
 
-@@ -573,6 +573,22 @@
- 		status = "disabled";
- 	};
- 
-+	crypto0: crypto@ff8b0000 {
-+		compatible = "rockchip,rk3399-crypto0";
-+		reg = <0x0 0xff8b0000 0x0 0x4000>;
-+		interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH 0>;
-+		clocks = <&cru SCLK_CRYPTO0>, <&cru HCLK_M_CRYPTO0>, <&cru HCLK_S_CRYPTO0>;
-+		resets = <&cru SRST_CRYPTO0>, <&cru SRST_CRYPTO0_S>, <&cru SRST_CRYPTO0_M>;
-+	};
-+
-+	crypto1: crypto@ff8b8000 {
-+		compatible = "rockchip,rk3399-crypto1";
-+		reg = <0x0 0xff8b8000 0x0 0x4000>;
-+		interrupts = <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH 0>;
-+		clocks = <&cru SCLK_CRYPTO1>, <&cru HCLK_M_CRYPTO1>, <&cru HCLK_S_CRYPTO1>;
-+		resets = <&cru SRST_CRYPTO1>, <&cru SRST_CRYPTO1_S>, <&cru SRST_CRYPTO1_M>;
-+	};
-+
- 	i2c1: i2c@ff110000 {
- 		compatible = "rockchip,rk3399-i2c";
- 		reg = <0x0 0xff110000 0x0 0x1000>;
+It looks like the PCI driver does not get initialized here though,
+presumably because it's not enabled in versatile_defconfig.
+It used to also not be enabled in multi_v5_defconfig, but I have
+merged a patch from Anders that enables it in 5.18 for the
+multi_v5_defconfig.
 
-which looks at lot better :-) .
+> However it looks like for that test the init
+> scripts didn't do anything with the random seed (possibly due to running
+> from ramdisk?) so we'd not have hit the condition.
 
-I'm not sure about the different compatibles yet, but as the blocks
-are really _not_ the same implementation that actually does make sense
-[i.e. one not having RSA]
+Right.
 
-Though I think you'll need to update the binding for them.
-
-
-Heiko
-
-
-
-
+     Arnd
