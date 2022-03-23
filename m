@@ -2,122 +2,246 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E1FC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 21:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E40AC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 23:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345034AbiCWV6D (ORCPT
+        id S1345388AbiCWXHj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 17:58:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46542 "EHLO
+        Wed, 23 Mar 2022 19:07:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242437AbiCWV6C (ORCPT
+        with ESMTP id S1345387AbiCWXHi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 17:58:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E33A8C7E5;
-        Wed, 23 Mar 2022 14:56:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D3211616DF;
-        Wed, 23 Mar 2022 21:56:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CAFEC340EE;
-        Wed, 23 Mar 2022 21:56:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648072591;
-        bh=DV/xwXjMs6yUzKDL7xfk7T0Q7lFV5SMLpVQvsFGK4IE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=T+Pp99yb0nkYq7lonLADQdVHW8DZSZo43gBJ0MHaXQDDZ4G3WkpOKmJSGEFhVfNtl
-         atgYQSE2/ODqcpKNbDNBi/wW7KqMgNgf0HoVqZ0Pt0eKnJFH9iQMXCEkJ5v/L6W9zR
-         VKfXxlIZYWcQp5mqvb/qH8aWLKMbnRy+Bgv5INP2sgpLIIiDZsjTLoS6GZv8KBP+1g
-         6ITYL8fvrPV/w+FE9KTF5yxqDgol9OCIUzDJlr9iRhzb0MI9KuFi5mtQ12SQnGQI/m
-         WOIUCxd1du0WfiTmM5oZd6Kkz0wO4eke4MXC9Nu644xqE65/mtLgpGEYBgv+E47n8q
-         EhvFs0vLZkBVw==
-Received: by mail-ot1-f42.google.com with SMTP id o20-20020a9d7194000000b005cb20cf4f1bso2020389otj.7;
-        Wed, 23 Mar 2022 14:56:31 -0700 (PDT)
-X-Gm-Message-State: AOAM530a/nUurZyiSOVCr1vhGZkgsJBB5bgXnU1mgW86glqWG+yXnMjt
-        5obANLTcEQhM7VXl2aaUTsSsBb1Ak1wr60KDDYY=
-X-Google-Smtp-Source: ABdhPJxBFOECq+W0CAvLy4JLZ43MKSWBxAXPwrxsM7HvAy7XqjCVq3nwxA2ZdJQsbXYsNxpg+E324YGd18lYNMhGKUs=
-X-Received: by 2002:a05:6830:2e7:b0:5b2:68c1:182a with SMTP id
- r7-20020a05683002e700b005b268c1182amr913494ote.71.1648072590332; Wed, 23 Mar
- 2022 14:56:30 -0700 (PDT)
+        Wed, 23 Mar 2022 19:07:38 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93AE9027B;
+        Wed, 23 Mar 2022 16:06:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=rTqyapXJEPXdek0o+t1d69NBA3uFR+P099kAs8qNELA=; b=WAWLzaENlDd97FfBI3URKeLG3e
+        ULc78LIKp6yx69ECyiYOH4cjLzIsm6W5K0KIj1D7cxGqZo+59pfCEoJbFTk68RQRgI7UvB42qenGJ
+        WUro0wAMFuXMKGaqYNi5px2CXUN+M0caU8D7v6zZGLTx4Zm/EscOspCRvwFOlbuwpMeiYbjKbuoDS
+        Yg02JBMYkY/UZaOIe9qLNOOwCaTAFAGQVDr5EfAGAOa6wlYXnW9asjUiCXibhf/DI41YF4lnSFnhn
+        /GTUBXD2377lGuDaMmYbK0eV4MtUFfJeSnd98DWrhYhZCJA38qCIswKO3XBkqCbG0VXHOfu+CkmCi
+        jCzt+nNA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nXA3C-00Cv4m-06; Wed, 23 Mar 2022 23:05:58 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A60C4986200; Thu, 24 Mar 2022 00:05:55 +0100 (CET)
+Date:   Thu, 24 Mar 2022 00:05:55 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     x86@kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ebiggers@google.com, herbert@gondor.apana.org.au, Jason@zx2c4.com,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: [PATCH 3/2] x86/poly1305: Fixup SLS
+Message-ID: <20220323230555.GZ8939@worktop.programming.kicks-ass.net>
+References: <20220322114809.381992456@infradead.org>
 MIME-Version: 1.0
-References: <20220323041123.146459-1-Jason@zx2c4.com>
-In-Reply-To: <20220323041123.146459-1-Jason@zx2c4.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Wed, 23 Mar 2022 22:56:19 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGL2J65=ZD7mKEheoPjJFfAeAEx57V35htpbjbpgKDV6g@mail.gmail.com>
-Message-ID: <CAMj1kXGL2J65=ZD7mKEheoPjJFfAeAEx57V35htpbjbpgKDV6g@mail.gmail.com>
-Subject: Re: [PATCH] random: treat bootloader trust toggle the same way as cpu
- trust toggle
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Graham Christensen <graham@grahamc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220322114809.381992456@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 23 Mar 2022 at 05:11, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> If CONFIG_RANDOM_TRUST_CPU is set, the RNG initializes using RDRAND.
-> But, the user can disable (or enable) this behavior by setting
-> `random.trust_cpu=0/1` on the kernel command line. This allows system
-> builders to do reasonable things while avoiding howls from tinfoil
-> hatters. (Or vice versa.)
->
-> CONFIG_RANDOM_TRUST_BOOTLOADER is basically the same thing, but regards
-> the seed passed via EFI or device tree, which might come from RDRAND or
-> a TPM or somewhere else. In order to allow distros to more easily enable
-> this while avoiding those same howls (or vice versa), this commit adds
-> the corresponding `random.trust_bootloader=0/1` toggle.
->
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Graham Christensen <graham@grahamc.com>
-> Link: https://github.com/NixOS/nixpkgs/pull/165355
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Due to being a perl generated asm file, it got missed by the mass
+convertion script.
 
-> ---
->  drivers/char/random.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 7b7f5e6596c2..c8974e5f57e1 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -948,11 +948,17 @@ static bool drain_entropy(void *buf, size_t nbytes, bool force)
->   **********************************************************************/
->
->  static bool trust_cpu __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_CPU);
-> +static bool trust_bootloader __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER);
->  static int __init parse_trust_cpu(char *arg)
->  {
->         return kstrtobool(arg, &trust_cpu);
->  }
-> +static int __init parse_trust_bootloader(char *arg)
-> +{
-> +       return kstrtobool(arg, &trust_bootloader);
-> +}
->  early_param("random.trust_cpu", parse_trust_cpu);
-> +early_param("random.trust_bootloader", parse_trust_bootloader);
->
->  /*
->   * The first collection of entropy occurs at system boot while interrupts
-> @@ -1160,7 +1166,7 @@ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
->   */
->  void add_bootloader_randomness(const void *buf, size_t size)
->  {
-> -       if (IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER))
-> +       if (trust_bootloader)
->                 add_hwgenerator_randomness(buf, size, size * 8);
->         else
->                 add_device_randomness(buf, size);
-> --
-> 2.35.1
->
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_init_x86_64()+0x3a: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_x86_64()+0xf2: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_emit_x86_64()+0x37: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: __poly1305_block()+0x6d: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: __poly1305_init_avx()+0x1e8: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx()+0x18a: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx()+0xaf8: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_emit_avx()+0x99: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx2()+0x18a: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx2()+0x776: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx512()+0x18a: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx512()+0x796: missing int3 after ret
+arch/x86/crypto/poly1305-x86_64-cryptogams.o: warning: objtool: poly1305_blocks_avx512()+0x10bd: missing int3 after ret
+
+Fixes: f94909ceb1ed ("x86: Prepare asm files for straight-line-speculation")
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+ arch/x86/crypto/poly1305-x86_64-cryptogams.pl |   38 +++++++++++++-------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+--- a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
++++ b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
+@@ -297,7 +297,7 @@ ___
+ $code.=<<___;
+ 	mov	\$1,%eax
+ .Lno_key:
+-	ret
++	RET
+ ___
+ &end_function("poly1305_init_x86_64");
+ 
+@@ -373,7 +373,7 @@ $code.=<<___;
+ .cfi_adjust_cfa_offset	-48
+ .Lno_data:
+ .Lblocks_epilogue:
+-	ret
++	RET
+ .cfi_endproc
+ ___
+ &end_function("poly1305_blocks_x86_64");
+@@ -399,7 +399,7 @@ $code.=<<___;
+ 	mov	%rax,0($mac)	# write result
+ 	mov	%rcx,8($mac)
+ 
+-	ret
++	RET
+ ___
+ &end_function("poly1305_emit_x86_64");
+ if ($avx) {
+@@ -429,7 +429,7 @@ ___
+ 	&poly1305_iteration();
+ $code.=<<___;
+ 	pop $ctx
+-	ret
++	RET
+ .size	__poly1305_block,.-__poly1305_block
+ 
+ .type	__poly1305_init_avx,\@abi-omnipotent
+@@ -594,7 +594,7 @@ $code.=<<___;
+ 
+ 	lea	-48-64($ctx),$ctx	# size [de-]optimization
+ 	pop %rbp
+-	ret
++	RET
+ .size	__poly1305_init_avx,.-__poly1305_init_avx
+ ___
+ 
+@@ -747,7 +747,7 @@ $code.=<<___;
+ .cfi_restore	%rbp
+ .Lno_data_avx:
+ .Lblocks_avx_epilogue:
+-	ret
++	RET
+ .cfi_endproc
+ 
+ .align	32
+@@ -1452,7 +1452,7 @@ $code.=<<___	if (!$win64);
+ ___
+ $code.=<<___;
+ 	vzeroupper
+-	ret
++	RET
+ .cfi_endproc
+ ___
+ &end_function("poly1305_blocks_avx");
+@@ -1508,7 +1508,7 @@ $code.=<<___;
+ 	mov	%rax,0($mac)	# write result
+ 	mov	%rcx,8($mac)
+ 
+-	ret
++	RET
+ ___
+ &end_function("poly1305_emit_avx");
+ 
+@@ -1675,7 +1675,7 @@ $code.=<<___;
+ .cfi_restore 	%rbp
+ .Lno_data_avx2$suffix:
+ .Lblocks_avx2_epilogue$suffix:
+-	ret
++	RET
+ .cfi_endproc
+ 
+ .align	32
+@@ -2201,7 +2201,7 @@ $code.=<<___	if (!$win64);
+ ___
+ $code.=<<___;
+ 	vzeroupper
+-	ret
++	RET
+ .cfi_endproc
+ ___
+ if($avx > 2 && $avx512) {
+@@ -2792,7 +2792,7 @@ $code.=<<___	if (!$win64);
+ .cfi_def_cfa_register	%rsp
+ ___
+ $code.=<<___;
+-	ret
++	RET
+ .cfi_endproc
+ ___
+ 
+@@ -2893,7 +2893,7 @@ $code.=<<___	if ($flavour =~ /elf32/);
+ ___
+ $code.=<<___;
+ 	mov	\$1,%eax
+-	ret
++	RET
+ .size	poly1305_init_base2_44,.-poly1305_init_base2_44
+ ___
+ {
+@@ -3010,7 +3010,7 @@ $code.=<<___;
+ 	jnz		.Lblocks_vpmadd52_4x
+ 
+ .Lno_data_vpmadd52:
+-	ret
++	RET
+ .size	poly1305_blocks_vpmadd52,.-poly1305_blocks_vpmadd52
+ ___
+ }
+@@ -3451,7 +3451,7 @@ $code.=<<___;
+ 	vzeroall
+ 
+ .Lno_data_vpmadd52_4x:
+-	ret
++	RET
+ .size	poly1305_blocks_vpmadd52_4x,.-poly1305_blocks_vpmadd52_4x
+ ___
+ }
+@@ -3824,7 +3824,7 @@ $code.=<<___;
+ 	vzeroall
+ 
+ .Lno_data_vpmadd52_8x:
+-	ret
++	RET
+ .size	poly1305_blocks_vpmadd52_8x,.-poly1305_blocks_vpmadd52_8x
+ ___
+ }
+@@ -3861,7 +3861,7 @@ $code.=<<___;
+ 	mov	%rax,0($mac)	# write result
+ 	mov	%rcx,8($mac)
+ 
+-	ret
++	RET
+ .size	poly1305_emit_base2_44,.-poly1305_emit_base2_44
+ ___
+ }	}	}
+@@ -3916,7 +3916,7 @@ $code.=<<___;
+ 
+ .Ldone_enc:
+ 	mov	$otp,%rax
+-	ret
++	RET
+ .size	xor128_encrypt_n_pad,.-xor128_encrypt_n_pad
+ 
+ .globl	xor128_decrypt_n_pad
+@@ -3967,7 +3967,7 @@ $code.=<<___;
+ 
+ .Ldone_dec:
+ 	mov	$otp,%rax
+-	ret
++	RET
+ .size	xor128_decrypt_n_pad,.-xor128_decrypt_n_pad
+ ___
+ }
+@@ -4109,7 +4109,7 @@ $code.=<<___;
+ 	pop	%rbx
+ 	pop	%rdi
+ 	pop	%rsi
+-	ret
++	RET
+ .size	avx_handler,.-avx_handler
+ 
+ .section	.pdata
