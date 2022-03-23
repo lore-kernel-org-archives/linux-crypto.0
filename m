@@ -2,119 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE77C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 04:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94453C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Mar 2022 04:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241785AbiCWEby (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 00:31:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49400 "EHLO
+        id S232170AbiCWEe7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 00:34:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241784AbiCWEbx (ORCPT
+        with ESMTP id S229446AbiCWEe4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 00:31:53 -0400
-Received: from sonic317-21.consmr.mail.gq1.yahoo.com (sonic317-21.consmr.mail.gq1.yahoo.com [98.137.66.147])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AA3583AD
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 21:30:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s2048; t=1648009820; bh=UHqqhARhQk2tEpvZzeynqjMPqlFkPWGdDVNZAAMlX4g=; h=Date:From:Subject:To:Cc:References:In-Reply-To:From:Subject:Reply-To; b=OvuRdx9xMyNW5WDesfLqHk2C8RZFP5Sr/Kwv4wKMeRbC+SKH3d9yJBEDcUeAvUQ7LmApMOv+jdS0rj60aBEAaA7Fa1XRF4hPn8ojM5kOtbNno0WQ7YKePbr79Wwj6+5MXypc2oX3TUveNlyur4LVgRIDqMq8zF5YG+zYz4ucpDlI4gRKjBGjKFEzlneTj7CglznCXlyBkOU16vVTmnYs7QULEso2GLVaku4BeNTe7bOKtXsQekNglP0tCGgkN6gSegxjUDrZahu7hONZfjCVE0bcY4txQZKFCApXODdzUc3tPKZLqRAOzV7lrfEsij9prddhQUgGzul+QoP5mYeWaQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1648009820; bh=aVF9wlHB4/PgnA/Bzbp3gYhU5qkDNPtf1sLYYfseP2I=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=GlepO4YTWSOtbcrbp3brdTQhAXE7+x1e7f4lUiU3iC5rxmwYJ2NBRvoyKlL7C2FhdCwldKvdQejzpWzdYriKSeyDRVfLM6ZBouvzLKs/a5TfHL/VzPHOfcgrNCIbxBEveMvWVvPxkKDcuungovaTiGd2k9lzRyg+zDWf+5TsRrHJTtJpsueDnKHzlsE+Fy6GOy3YMJMuanz6z9kHu/VVXIBWN/sQFc5s8SKlwYpzDuP/bIG4uDKiJzi98jo2VYO6GtksXjnyrRMD/kVE8pqVcLE+56VeuA9rjODvL48p5I9LlzSFxRo9sTyUcLrTVv4KJGgIOMh2eQehUdyleKS9RA==
-X-YMail-OSG: 7tSaq.wVM1m1vwz7tyZmDTBhjioQIVJBsROQsHb9nj34r5.Dvh3W4fZvxML_li3
- YtY3MesRdw0XbFUT9QIzyrHCtwK4Mo9ne9BR7u3Ha0rE9IeEV5fCb5xNliSI5j51bZqBowfcu_YQ
- jyNHWTEmdPfH7n1kpH4QIUR_ClgDSeUT.kpGUacPxI9t3CjMCcBPg6nVH1YzWQowjx1C4EOTjGGU
- mUYEQzGXwB4q3yPf84ewQ0l_F0E9rLapeQuxvxNriIVH6R3aPguT4_1wKPVtN4Khmv18k0Q.Pdv2
- _LI.BomBL0TvblwpHrOXa_Vwgd1ew5vtnP0QrMK_dHGuMlEmCXSTzj6FZdR_ux7uimh0ffJeRuFh
- T8oJzoFFp43rhPCr9cnh7RGjO8ss5vMERdWLL_m1zajwexT961_86GvKQbXsXNqJWNs1igZevcWe
- 8dNcWG.gp0QFyztrSB2pxCSgIal6L2Fy4MNvAL_HxsKsT0Vl8uHL0gSGIT3LrniG9GkUMxgsS5np
- oQtgk5hKTFTov7y3LPB5_PEzco50IeTA7X.ZYw5mbcx5zmyeYAyQiaVXGNpyK9ccfqqDWkC_QX9r
- qZTGOMTpvw3H4BI9hh12QhmwRlERss7jlT.zDZFLg6NajSreudYmgaL2IUm1SqnbaM8u1iUm6Vp6
- d93yfZBaKhIDCkfW5IyNO3pEfNkiZtDJ3cfNseW3OHuW3Bwe0gmKLl10DmO1VOgyj0FR1vW5Zgow
- 0qPn.rJbrnGy1ua3PpRuEqkevDsKg2g8Rk9Htfs00B5Zph3xsYpCKxxi5NkYroa20HynHXwVzU2H
- Zj0JcJi0Uexdp6pGX6uD4BmOx442lvUF9Utz32Y6ZhXPNOOIJyugTWKt9P3IiWVRoVD0omFrHSZj
- phyGpDELdftB5YlHJBRfgeT.bNR_7chKp4J2hf3jlvlH89XtAN0WpFHNc8x9KSA6LLlISwwqA5LM
- hDyo5a2liaf4cCfnHFw4F5jG3wfY0qjhNVqhtt7iQQbVcoUFt8xoLNiNF4_RO0EJgg95LaqBomC3
- wzunagfNAsibDJooZ5wk.f4S.ZleVM2QvjGN7r12SFO9QEUdkbIUYVI3mlD94XCJvM9hSJr6jpSm
- 2nOG0LWTevLswMeo56PJw.Jq1aIostJUE7zRx1HS7.ghzsH80ULvhFaXqcw28Z_Le1fbSQ9ML3Gd
- qQhQQ5NkyedUtmQA_gwWpTPkxuvXhdh..TIt81AZiAEaHG1V8I52GugsIyIgqsEvopaF2Xs5Ad3Y
- JftrfSMP6E6qQ7zRf1q0mNXHMV5DGm4TTiYnMcELjnwKV8cpM9pxvhrqfrHcM8JlV7sFLhy9pJfP
- iNPUI8ejNeqcOZvU3SOsc9zkjrV7swl142KL5Y0MrlbgQ6tRqBTgja75O0nwFL27i5PYhPGJCoUf
- V4M_AW2Z6SVjZ9yNUy3Wkk2CzNgrgSOztPic7KLbLxCB6V0wEmEPfPtuZcFwqMgSRRODzIGVShOy
- Fe39SL0oGjoiACO8EgXyunj8wG8BDzH3RlNkbZSsL.G8Rz5yHzEdRHY2IOL4TZ_nZO2tVt7Mii5h
- C7y1Cx.Zijxp_4z0RkiTWzq1o3t6NReiVzKV1K2FYYH.qKQBYMUs2i2p3r70nwaXh8b0GdVdbGnE
- 0t65L910zkyV1l8IG7E.XRtcYTdUeeK7QuBoKOe.SJKAX0hb7JP36BGJlaNVBN_vo1UFP0Q9TAlO
- i4Oelim6ZlvBTMPO0hbZAZ3FRMbSUvrx0F05gSzdsGU5N7zJV8nFaXQiLq1iU2JoTLB9ZUSx6gx4
- edYCQVO5MWKduC2zvhbs92NZgq_KBPq2Av71UOuV699YFy4sU5Mt7pcwWEvMw1wr1vEC.dW.de7R
- w8uQzRrMIhtg_CDMHKt9sBOdIjleJG4AjwbI7nd1GSF44T9uqoBUA0Bpgfjc8dHncbTguCM5tUgZ
- mBdeVAkugIUmpvvlUEM5Duc3qOo.Jb30x98ZDnqLvs4rq.DXHAsC.t1tLTBnceGY2x6EhVUyZjII
- lmNAqENHKyai07FCyE6.68LGjeS5hGOSlYs1NOiohnFLdzqvZcm4wagK68ahFwkl6o7W1k5IPLhY
- c1tqGvQzGf6u3mliseyJX_V.HCF5k8XLj68xmB7Mwc499l5wAnkaQHl5jiyqqH7ddfCQ0Vz1meXj
- iyjvKwaFqa3_WKNEIKNhDTSb1TadgmOKHdeTExsyGccfkj.4F7wzKEx2DqVn6zd0IUnG6XgNxST2
- wqHjqopsQNRmoFJqEOMByTwvlhwnf5DRbOZdC2L4Ou0UNqkgElcxMSbIX2VvW4PeydcXnuC6m7ex
- wD_6QUw--
-X-Sonic-MF: <alex_y_xu@yahoo.ca>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.gq1.yahoo.com with HTTP; Wed, 23 Mar 2022 04:30:20 +0000
-Received: by kubenode527.mail-prod1.omega.gq1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID 2352dcf8460b8a385807e15ebea4de06;
-          Wed, 23 Mar 2022 04:30:18 +0000 (UTC)
-Date:   Wed, 23 Mar 2022 00:30:14 -0400
-From:   "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jann Horn <jannh@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
-In-Reply-To: <20220322191436.110963-1-Jason@zx2c4.com>
+        Wed, 23 Mar 2022 00:34:56 -0400
+X-Greylist: delayed 1371 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Mar 2022 21:33:26 PDT
+Received: from gateway31.websitewelcome.com (gateway31.websitewelcome.com [192.185.143.234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136035D5F2
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 21:33:24 -0700 (PDT)
+Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
+        by gateway31.websitewelcome.com (Postfix) with ESMTP id 96B1942093
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Mar 2022 23:10:32 -0500 (CDT)
+Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
+        by cmsmtp with SMTP
+        id WsKOnH9Gzdx86WsKOn1cUB; Tue, 22 Mar 2022 23:10:32 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=roeck-us.net; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:Cc:
+        To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=BZKkdo1sSVKxfV6q1iBgWqA7GO4OH2toIRNkvBXIVJQ=; b=criNZPJ6YjDcgtnTv9SiV9ePxq
+        5AgWDQ4b6G7azJqOJiWHrFLIAHe9+chGbQR/hDP92fKcw7QhnNv5Uk0Dpb8wKSxHH8Nly6eXA0Tx6
+        /zDULqUQlbWLBC/GHI7SCIH/cf1QnBtVcXzKJ3rNtfwlbxS6gz72FgEgPgCp1VgmtwQcmDHkJodOb
+        A4Mi9zZdq23n7GcykfDqc4ymOmnT2vUWY91hvbOMf8u4XhaANqbR9pnMc3HMQG2xbEAfQhJNVNJeI
+        TWA1gy2L94sDWV+/aIpaQoZPSE97Au2fsEt00IX7M0JcvEaRH29ZrNMN3KlIXfspZEeB2/2pnQmME
+        eh0Ej1kg==;
+Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:57620 helo=localhost)
+        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <linux@roeck-us.net>)
+        id 1nWsKN-001pSg-Um; Wed, 23 Mar 2022 04:10:32 +0000
+Date:   Tue, 22 Mar 2022 21:10:30 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Harsha <harsha.harsha@xilinx.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] cacheflush.h: Add forward declaration for struct folio
+Message-ID: <20220323041030.GA2968769@roeck-us.net>
 MIME-Version: 1.0
-Message-Id: <1648009787.fah6dos6ya.none@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: WebService/1.1.19894 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - roeck-us.net
+X-BWhitelist: no
+X-Source-IP: 108.223.40.66
+X-Source-L: No
+X-Exim-ID: 1nWsKN-001pSg-Um
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net (localhost) [108.223.40.66]:57620
+X-Source-Auth: guenter@roeck-us.net
+X-Email-Count: 3
+X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
+X-Local-Domain: yes
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I searched for users of RNDADDTOENTCNT using=20
-(?s:ioctl.{1,500}RNDADDTOENTCNT) on Debian Code Search and=20
-"/(?s)ioctl.{1,40},\s*RNDADDTOENTCNT/ -path:incfs_test.c" on GitHub Code=20
-Search (beta).
+On Wed, Mar 23, 2022 at 03:35:10PM +1200, Herbert Xu wrote:
+> On Tue, Mar 22, 2022 at 06:13:27AM -0700, Guenter Roeck wrote:
+> > On Wed, Mar 09, 2022 at 03:20:01PM +1200, Herbert Xu wrote:
+> > > This patch turns the new SHA driver into a tristate and also allows
+> > > compile testing.
+> > > 
+> > > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > 
+> > This results in:
+> > 
+> > Building s390:allmodconfig ... failed
+> > --------------
+> > Error log:
+> > In file included from drivers/crypto/xilinx/zynqmp-sha.c:6:
+> > include/linux/cacheflush.h:12:46: error: 'struct folio' declared inside parameter list will not be visible outside of this definition or declaration [-Werror]
+> >    12 | static inline void flush_dcache_folio(struct folio *folio)
+> 
+> This should be fixed in cacheflush.h:
+> 
+> ---8<---
+> The struct folio is not declared in cacheflush.h so we need to
+> provide a forward declaration as otherwise users of this header
+> file may get warnings.
+> 
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Fixes: 522a0032af00 ("Add linux/cacheflush.h")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Several programs use it for testing purposes, without writing any=20
-entropy to /dev/random or /dev/urandom, including rauc, wireguard, and=20
-openSUSE kdump. Several programs use it as intended, after writing=20
-entropy to /dev/random or /dev/urandom. Of the latter group,
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 
-- kata-containers is a lightweight VM implementation. Its guest-side=20
-  agent offers a gRPC endpoint which will write the provided data to=20
-  /dev/random, then call RNDADDTOENTCNT with the length of the data,=20
-  then call RNDRESEEDRNG. As far as I can tell, this endpoint is=20
-  made available to users on the host, but is not used by=20
-  kata-containers itself.
-
-- aws-nitro-enclaves-sdk-c is an SDK for building lightweight VMs to be=20
-  used with AWS Nitro Enclaves. kmstool-enclave is a sample application=20
-  provided, which writes "up to 256 bytes" (from where?) to /dev/random,=20
-  then calls RNDADDTOENTCNT, then repeats the process until it reaches=20
-  1024 bytes.
-
-- sandy-harris/maxwell is a "jitter entropy" daemon, similar to haveged.=20
-  It writes 4 bytes of "generated entropy" to /dev/random, then calls=20
-  RNDADDTOENTCNT, then repeats.
-
-- guix is, among other things, a "GNU/"Linux distribution. The provided=20
-  base services write the seed file to /dev/urandom, then call=20
-  RNDADDTOENTCNT, then write 512 bytes from /dev/hwrng to /dev/urandom,=20
-  then call RNDADDTOENTCNT, then "immediately" read 512 bytes from=20
-  /dev/urandom and write it to the seed file. On shutdown, 512 bytes are=20
-  read from /dev/urandom and written to the seed file.
-
-I was unable to locate any other public non-archived usages of=20
-RNDADDTOENTCNT on Debian or GitHub Code Search.
-
-I don't have any particular expertise with the random subsystem or=20
-conclusions to make from this data, but I hope this helps inform the=20
-discussion.
-
-Cheers,
-Alex.
+Guenter
+> 
+> diff --git a/include/linux/cacheflush.h b/include/linux/cacheflush.h
+> index fef8b607f97e..a6189d21f2ba 100644
+> --- a/include/linux/cacheflush.h
+> +++ b/include/linux/cacheflush.h
+> @@ -4,6 +4,8 @@
+>  
+>  #include <asm/cacheflush.h>
+>  
+> +struct folio;
+> +
+>  #if ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE
+>  #ifndef ARCH_IMPLEMENTS_FLUSH_DCACHE_FOLIO
+>  void flush_dcache_folio(struct folio *folio);
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
