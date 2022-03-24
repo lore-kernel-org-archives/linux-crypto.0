@@ -2,85 +2,199 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 816C0C433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 14:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 094D4C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 16:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243185AbiCXOoN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 10:44:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39436 "EHLO
+        id S1351559AbiCXQWR (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 12:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243117AbiCXOoM (ORCPT
+        with ESMTP id S236831AbiCXQWQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 10:44:12 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24673AC924
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 07:42:40 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id n35so2848998wms.5
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 07:42:40 -0700 (PDT)
+        Thu, 24 Mar 2022 12:22:16 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EAA9E9CD
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 09:20:43 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id w4so7337869wrg.12
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 09:20:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RUuYp2gzZTfveRrYj1nKJKJ6GLr04No5LqGCeqkgp50=;
-        b=G9HidbaMnDHtTrEAhAkiDwkyMIMMc6Wqcu/xpKqMNAqZgScFmSCAILoCtXpISK+Hhy
-         uB+8YBCUwdxf1Gocu8dCsTLDhaqkZGMeh6nNJ3sUFCCJImFnDwOyBw6dRyGd8Rm8I3OK
-         4rKkIdOoe9qcnCYK25u26XittRZwpnKn4rAlusYwV9HlRFHoau53kWOf/+m6xWfwxB/h
-         zQ54w0wxyEcRcwkFJuJ+1mJTTVlkBlhHn7TzrxHuLg+m4FtaPlh57mFRtuAS7w7hH6M9
-         cbq8IvAUXGMjZvK+w4GvQp66umUGHCpUGcbSgAPAW4awO2p2dX6wGm5kdQWdDSl4axza
-         EZmA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=u+XoZ+fuIL/ZPqi/MqDlAYN5/s61cbWyTsDVR6ShDXg=;
+        b=7x7yo5Bs1LpGDx1Z/m5ZaOu8cUAl21e7wWdU9yxKzW8vX0CjUGxZctK8KwWnscCoVZ
+         9LxP65DgHeKtf/hZGwB3qLTaAxg9dIFAjsyvDPXqNwfjZtUKy31VfYnkNC7UVPNVhb6p
+         DFWKacToNwykDGrrPa4EO7lI3DYAFLrP9A23HcrD22Cuy78HpnamrgybwQGMWkFwx1vF
+         I2bjpDirPChL6lZVg/QNemvqzmFlvAhQfsuXZ3ej8UrR1kv1YekCXLTJiHsiaXPrtTae
+         h+qV/ldDYsSEqJnAvk5LP5ZdsoTcHaGCBpcPUfGIqZo9CLNPQOMpHfRMEaa847gLl9Yx
+         aBsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RUuYp2gzZTfveRrYj1nKJKJ6GLr04No5LqGCeqkgp50=;
-        b=6lUV0g2Glt2Y9Votcn/4UOO549JJD/4cOUBGAoYA22LFByOC/PjLulKp7j1Y2JtwnG
-         NrDNreJibeyOW/K9ANEt0Zio1fHxzfS4gCeLDtHKm3UtZ10ZbhnaAMhmVULZGka3GFi6
-         F3uW3NfsztnLHL8YQ+tv+qlc6tUQ4cC8ua+bGJelJoAKjbjYmnzcl4pEuh9KoPGtXfQd
-         EK3yb1uf1QpU8P3WDORS66Hv30wm7C4MwfNkJRRgJiep9UTWcNl5g8gECx2WqER5hXwC
-         hvChyWeHUqE2lhGCOsbZWGFsJQXxFVRH8CpULN4tG/YCzi6ZVmJHXyZ9zMzKxYv1AalC
-         Da+Q==
-X-Gm-Message-State: AOAM531AZzR0bLV98PR/JNEEpHmhCkamwoD7mbJi4Sh/+BGUWtdArY1c
-        KoI+WQRn6GZRS6k0Ow0uoRAuHA==
-X-Google-Smtp-Source: ABdhPJw3kEFmgdFvOYqPEE/cnML2UreW9i+I5UewFAmsjCiGfAtVJ0zEiql/LajWmccl86QQnyLLPQ==
-X-Received: by 2002:a05:600c:4608:b0:38c:6ba3:1c9f with SMTP id m8-20020a05600c460800b0038c6ba31c9fmr14542211wmo.39.1648132958693;
-        Thu, 24 Mar 2022 07:42:38 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id r15-20020a5d6c6f000000b002040552e88esm3273175wrz.29.2022.03.24.07.42.37
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=u+XoZ+fuIL/ZPqi/MqDlAYN5/s61cbWyTsDVR6ShDXg=;
+        b=DUjpN1wB2NabEv1K+XgBAjoOV6qdk/YGr2IY60bDeTtmubKD2YpbJI3dd5khRJ1wdM
+         Uxoz0cy9JBODxIgVCNdJutWnqffq6Jy4XG1d47563j5sotaa/Chskuidt+aY6hoUz00K
+         obBaj7geCKqKn+FucSIc/ErNFIYTcoX26KrEhqBf2VhPL0qUQBnj8SGwZl7qwhT+0cl4
+         Lo4PV6mDqTBA5jMNPi4DAHgMQgdihReh5DoZeTYR+jWb3s44piRm4gAh2FKtHmSAf5rj
+         jEPDBNfZXgaa1TpUlkfl0N6JGOqZVir58843AqTCF6T4eLnicQVcndZYPkeQtjiPtKhT
+         bTOw==
+X-Gm-Message-State: AOAM532gUIN3Y6vNWucuckTZsT3YQVqb2xF1ymf3U1CjHYof19zhzWZ/
+        a1U1AHCA1QAHklqjODavhPKYlA==
+X-Google-Smtp-Source: ABdhPJzeYjDJdSI+WUHT0aW2nK8ZdlM/pdZDaZr/eYh34FM+5W0i/XYyjvNvYiq5Hbek/iwW1aWLpQ==
+X-Received: by 2002:a05:6000:181a:b0:205:9051:ab6d with SMTP id m26-20020a056000181a00b002059051ab6dmr5239391wrh.191.1648138841944;
+        Thu, 24 Mar 2022 09:20:41 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id r2-20020a0560001b8200b00203dffb9598sm2914810wru.86.2022.03.24.09.20.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 07:42:38 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        jernej.skrabec@gmail.com, krzk+dt@kernel.org, robh+dt@kernel.org,
-        samuel@sholland.org, wens@csie.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sunxi@lists.linux.dev, Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] dt-bindings: crypto: sun8i-ce: remove extra line
-Date:   Thu, 24 Mar 2022 14:42:33 +0000
-Message-Id: <20220324144233.1119495-1-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 24 Mar 2022 09:20:41 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 17:20:39 +0100
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     Krzysztof Kozlowski <krzk@kernel.org>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v3 21/26] dt-bindings: crypto: convert rockchip-crypto to
+ yaml
+Message-ID: <YjyaV68mTsJAr9Xm@Red>
+References: <20220321200739.3572792-1-clabbe@baylibre.com>
+ <20220321200739.3572792-22-clabbe@baylibre.com>
+ <90ebea0b-1d67-98dc-2b49-a6e3b97a2c4a@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <90ebea0b-1d67-98dc-2b49-a6e3b97a2c4a@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-yamllint complains about this extra line.
+Le Tue, Mar 22, 2022 at 07:04:43PM +0100, Krzysztof Kozlowski a écrit :
+> On 21/03/2022 21:07, Corentin Labbe wrote:
+> > Convert rockchip-crypto to yaml
+> > 
+> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> > ---
+> >  .../crypto/rockchip,rk3288-crypto.yaml        | 84 +++++++++++++++++++
+> >  .../bindings/crypto/rockchip-crypto.txt       | 28 -------
+> >  2 files changed, 84 insertions(+), 28 deletions(-)
+> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+> > 
+> > diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+> > new file mode 100644
+> > index 000000000000..a6be89a1c890
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+> > @@ -0,0 +1,84 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Rockchip Electronics And Security Accelerator
+> > +
+> > +maintainers:
+> > +  - Heiko Stuebner <heiko@sntech.de>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - rockchip,rk3288-crypto
+> > +      - rockchip,rk3328-crypto
+> > +      - rockchip,rk3399-crypto
+> 
+> Waaaait, what? Only rockchip,rk3288-crypto is in original bindings.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml | 1 -
- 1 file changed, 1 deletion(-)
+Hello
 
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-index 00648f9d9278..026a9f9e1aeb 100644
---- a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-@@ -82,4 +82,3 @@ examples:
-       clock-names = "bus", "mod";
-       resets = <&ccu RST_BUS_CE>;
-     };
--
--- 
-2.34.1
+Yes, my way is an error.
+Next time, I will split my patch in 2, first a 1 to 1 conversion, then a binding update.
 
+> 
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    minItems: 4
+> > +
+> > +  clock-names:
+> > +    minItems: 4
+> > +
+> > +  resets:
+> > +    maxItems: 1
+> 
+> You missed reset-names.
+> 
+> This patch is quite different than previous, in unexpected way. What
+> happened here?
+> 
+> > +
+> > +if:
+> 
+> Please define it after "allOf:", so it could be easily extended without
+> changing indentation.
+> 
+> > +  properties:
+> > +    compatible:
+> > +      const: rockchip,rk3399-crypto
+> > +then:
+> > +  properties:
+> > +    reg:
+> > +      minItems: 2
+> > +    interrupts:
+> > +      minItems: 2
+> 
+> List interrupts. This is really different than your v1. It also looks
+> different than original bindings and you did not mention any differences
+> here, nor in the commit msg. Either explain in commit msg all
+> differences (and why) or move them to separate commit.
+> 
+> You seem to change the bindings a lot (new properties, different
+> constraints, new compatibles), so this should all go to separate commit.
+> Now it is just confusing.
+> 
+> > +    clocks:
+> > +      minItems: 6
+> 
+> You need maxItems. Everywhere.
+> 
+> > +    clock-names:
+> > +      minItems: 6
+> 
+> List all items.
+> 
+> > +    resets:
+> > +      minItems: 6
+> > +else:
+> > +  if:
+> > +    properties:
+> > +      compatible:
+> > +        const: rockchip,rk3328-crypto
+> > +  then:
+> > +    properties:
+> > +      clocks:
+> > +        minItems: 3
+> > +      clock-names:
+> > +        minItems: 3
+> > +
+> 
+
+I have create a binding update patch (https://github.com/montjoie/linux/commit/da05ef9bb488c16cfd15a47054f5b1161829b6bf)
+But I have lot of problem, DT are not validating.
+Example: Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.example.dtb: crypto@ff8a0000: resets: [[4294967295, 174]] is too short
+
+I have tried also to set default resets/maxItems to 3 and setting it to 4 via an if. But I still got error like maxItems cannot be update after initial set.
+
+Any idea on why my new binding update patch is failling ?
+
+Regards
