@@ -2,64 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF186C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 06:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290BDC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 09:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238260AbiCXGMM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 02:12:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46752 "EHLO
+        id S242175AbiCXJ4V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 05:56:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbiCXGMM (ORCPT
+        with ESMTP id S241065AbiCXJ4U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 02:12:12 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E1B5AEEE
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 23:10:40 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id b5so4750728ljf.13
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 23:10:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=LqfrhH7nLLN1gFNpfkxdVh8qEuR20wWFYGhJe9S517U=;
-        b=iSWT8vdc0yh8SYKvhuJvzQ6NVn1IxgAjTuZEFO1ykT13+epT5g7ufWwM+n3wVsMIvD
-         Oqa49d/1hG5loWRMKTYhQOkaVSnaNjItyxyOYSMTJMJs/zuJQXhvGrOHJFLXc+bbgZMu
-         v79J4bMOv3va4ogUV7REzdILG6gdDR0x4hLTUzfd7j5HZgbaLEoiEETYlRSBNiHRdBSO
-         WmUlOgf8FbQ2nXVQ2b9U3xjfYrpBQ2BXts7IuMGxPyESeSJpNy1yCtV6ls6OP5T7pX6j
-         vy1abDaGxQsndufKA+scn/28b6MIFlN5SQsIZWDVeK7dsxiX2+TyV1mdvi6Krs6BJj41
-         egBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=LqfrhH7nLLN1gFNpfkxdVh8qEuR20wWFYGhJe9S517U=;
-        b=5+aAJIC2Z3SPovR6LALtpZ63EZv0HBHofKWKuwYFrg1k7OwZvmeYU/ttO+WOxk7Mt4
-         nrJ3uDwgEnpiIkSrypugGDhdZUU00OPd4xZAwF4xkjAd93HRXgLrgXiz+ETn27emUIwc
-         i3mPPKojzOiqNkwtiDL+SmsQvPBdLn0YRop/Mhii+jiisTCYgauwKI6RJSE0c0C6eXFc
-         554wDwMr7vq/1a0sOK6aYmiV+PyX+im0v7dddSL5qquuADQhiG0W8nKXE0nM/7ZLwkDN
-         yUO2H4U5BSfGhmTpkWV/5kMUXVAzJVTJgBEVh8fn07981KYuHU36ale3Baiz8fSDBaWu
-         LqEg==
-X-Gm-Message-State: AOAM531botw0vRe2GpV8/YJLrgJBRv3KsM/3Bru4Q7uOq69+FHnveihg
-        nbV29E0dVTkHSs7p0ADtKuAbxRVyHKJBepRwcsRdE8tcwLQ=
-X-Google-Smtp-Source: ABdhPJxps7xqXnoV2uIjIdahK9iCgECSWiv/DVl810GrTW+CDJ/GIRCdZsh6a1y5kiT7yU2NJiq1Gf/2jmTzKPhEYEM=
-X-Received: by 2002:a2e:7f13:0:b0:247:ef72:9e8b with SMTP id
- a19-20020a2e7f13000000b00247ef729e8bmr2812996ljd.205.1648102238526; Wed, 23
- Mar 2022 23:10:38 -0700 (PDT)
-MIME-Version: 1.0
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 24 Mar 2022 14:10:26 +0800
-Message-ID: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
-Subject: Entropy as a Service?
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, "Ted Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 24 Mar 2022 05:56:20 -0400
+X-Greylist: delayed 944 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 24 Mar 2022 02:54:48 PDT
+Received: from m12-11.163.com (m12-11.163.com [220.181.12.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 556BA5C863
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 02:54:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id; bh=Fj18xbrLORt0+H0IrJ
+        pnPpEvXa/QkSFc+cbAzNAcUnk=; b=Hw/rnSvsruhki0fAY1KK6s/rTCVy9vOK1T
+        L0Za/aUCSwA8zzg0Ub6iPBVuurlyFZQlRiOoFxioOCDj+FF0LWe/DIaBmiU4YO/D
+        APfqWpnyEIgyXL9y9vwXJLUWrviXUyI5Szcj0PRg7CoKzxXZgR356Z2OU2Fe78GG
+        TaSuRctMw=
+Received: from localhost (unknown [159.226.95.33])
+        by smtp7 (Coremail) with SMTP id C8CowAAHBI4GPDxit6YIEA--.9600S2;
+        Thu, 24 Mar 2022 17:38:14 +0800 (CST)
+From:   QintaoShen <unSimple1993@163.com>
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, QintaoShen <unSimple1993@163.com>
+Subject: [PATCH v1] crypto: stm32: Check for NULL return of kmalloc_array()
+Date:   Thu, 24 Mar 2022 17:38:12 +0800
+Message-Id: <1648114692-11175-1-git-send-email-unSimple1993@163.com>
+X-Mailer: git-send-email 2.7.4
+X-CM-TRANSID: C8CowAAHBI4GPDxit6YIEA--.9600S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZw1rZry5tr1rZw1kJFyfCrg_yoWfZwc_CF
+        18Wr97W34jv392yrsFq393XryYqr4fZ3s29a90yF13t345Z3yfW3WxWrZxAF43C3y8K3W8
+        C3WxCry2yr17XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VUUpRRPUUUUU==
+X-Originating-IP: [159.226.95.33]
+X-CM-SenderInfo: 5xqvxz5sohimizt6il2tof0z/1tbiNBvNH1aD-KvjPQABsg
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-NIST have a project called Entropy as a Service; the main goal seems
-to be to provide adequate entropy even on IoT devices which may have
-various limitations.
-https://csrc.nist.gov/projects/entropy-as-a-service
+As the potential failure of memory allocation, kmalloc_array() may return
+NULL and lead to NULL pointer dereference because of the usage of 'rctx->hw_context'.
 
-I have not yet looked at all the details but -- since Linux runs on
-many IoT devices and on some of them random(4) encounters difficulties
--- I wonder to what extent this might be relevant for Linux.
+Therefore, it is better to check the return value of kmalloc_array().
+
+Signed-off-by: QintaoShen <unSimple1993@163.com>
+---
+ drivers/crypto/stm32/stm32-hash.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index d33006d..f1a1a13 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -970,7 +970,8 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+ 	rctx->hw_context = kmalloc_array(3 + HASH_CSR_REGISTER_NUMBER,
+ 					 sizeof(u32),
+ 					 GFP_KERNEL);
+-
++	if (!rctx->hw_context)
++		return -ENOMEM;
+ 	preg = rctx->hw_context;
+ 
+ 	*preg++ = stm32_hash_read(hdev, HASH_IMR);
+-- 
+2.7.4
+
