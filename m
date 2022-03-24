@@ -2,102 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FF9C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 18:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8D9C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 18:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241899AbiCXSDP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 14:03:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52678 "EHLO
+        id S1352463AbiCXSFS (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 14:05:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236126AbiCXSDO (ORCPT
+        with ESMTP id S236126AbiCXSFR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 14:03:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A30CB53C4;
-        Thu, 24 Mar 2022 11:01:42 -0700 (PDT)
+        Thu, 24 Mar 2022 14:05:17 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39247B6D1C;
+        Thu, 24 Mar 2022 11:03:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 49301B82403;
-        Thu, 24 Mar 2022 18:01:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7551C340F0;
-        Thu, 24 Mar 2022 18:01:39 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 8CE82CE25B1;
+        Thu, 24 Mar 2022 18:03:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA14C340F0;
+        Thu, 24 Mar 2022 18:03:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648144900;
-        bh=6YSptuyb/nPo61g6P7HGPQKpojq+QMPFUW9m0WrmURE=;
+        s=k20201202; t=1648145021;
+        bh=t4qj3yzjpmPxrk9bbLyU8usx0IFZLTWW+/9wIEcE8T0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vB1xjy2xksJGdNhsZR0L1pgmxXo9R8tXW74OtHNK7h+gkBp5baK3v3ClAUMBJcmtp
-         nhPI7DgyPjCo3xuCaTuk10FG/mB3d95wy0lA/Zu6K9I1mB0rUabMlQG3YQUek0hDuF
-         y1mLISX5G9gVpgTZVJ8ZgmcO0S7gFFNyLo70bGDRFn3RMYtU5ZhgL92H+SLwijt7k3
-         vjj42dkriKs0ZX1OcaAf9K1TO8cYijldSr0pPtWRiriEDkLY+pzgH8JLDomFhXTBUm
-         hsUrRDwXE+TlZ0mQNmiwV8s44dehEZKyCgTcwokvL76RRh7oaRnS+om9g41Tzg24TG
-         GxzKWB01Xkmhg==
-Date:   Thu, 24 Mar 2022 18:01:38 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     David Laight <David.Laight@aculab.com>,
-        "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jann Horn <jannh@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Sandy Harris <sandyinchina@gmail.com>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Message-ID: <YjyyAm9pyOp9Fyqi@gmail.com>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
- <1648009787.fah6dos6ya.none@localhost>
- <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
- <7cde489e73c8448b95a1b7bc6ed1d75b@AcuMS.aculab.com>
- <CAHmME9rxV-WLBCGyMRwba_8nF_onRfBi0+-xz84-HLNfee=R3Q@mail.gmail.com>
+        b=RyuBJrVfvGAO3I+jdGpD3wWjzHZ5BPFyIqWkxNU+ZGEMVRx7okKrAVg0PHdIgXy4E
+         j4cvG8KokWZHeHXK0v8HaHHhcoisqdch4CPoA+WYVrKKai6xags4j49GUPqZZ6xnEB
+         vX/rIS8hBuibENDX1LmjivHy2I6Qh8ZIvogvzXRALHN4kltJcr6V23dr2ZqJgOU6mP
+         TD93ffV9fwme715cdPhGHRTErYTO3HZf9IkAexYWpInnigQvrxwRqgDcZRUpt8BBf8
+         0zasG5ShtBezkzkb66iOesP0vxz0bNxkuOcwbWqujbYehvDg4uxsOffNUk+FMD/dgV
+         IsMlJ1z61ezEw==
+Date:   Thu, 24 Mar 2022 20:03:37 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: Re: [PATCH 3/9] net: mlx5: eliminate anonymous module_init &
+ module_exit
+Message-ID: <YjyyeUEAo+1Kob5v@unreal>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+ <20220316192010.19001-4-rdunlap@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9rxV-WLBCGyMRwba_8nF_onRfBi0+-xz84-HLNfee=R3Q@mail.gmail.com>
+In-Reply-To: <20220316192010.19001-4-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 01:53:03PM -0600, Jason A. Donenfeld wrote:
-> Hi David,
+On Wed, Mar 16, 2022 at 12:20:04PM -0700, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
 > 
-> On Wed, Mar 23, 2022 at 8:01 AM David Laight <David.Laight@aculab.com> wrote:
-> >
-> > From: Jason A. Donenfeld
-> > > Sent: 23 March 2022 04:48
-> > ...
-> > > - Plenty of things are seeding the RNG correctly, and buildroot's
-> > > shell script is just "doing it wrong".
-> > >
-> > > On that last point, I should reiterate that buildroot's shell script
-> > > still isn't actually initializing the RNG, despite what it says in its
-> > > echo; there's never been a way to initialize the RNG from a shell
-> > > script, without calling out to various special purpose ioctl-aware
-> > > binaries.
-> >
-> > Perhaps the very first write after boot could be assumed to
-> > be valid initialisation data?
-> > (On top of a few other tests.)
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
 > 
-> I addressed this already earlier. That approach does not work. Too
-> many things already pass in garbage, not expecting for it to be
-> credited, but just contributory. /dev/urandom writes simply has never
-> had the semantics one would want for credited seeding. Adding a
-> heuristic like this will break users.
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
+> 
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
+> 
+> Fixes: e126ba97dba9 ("mlx5: Add driver for Mellanox Connect-IB adapters")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Eli Cohen <eli@mellanox.com>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: netdev@vger.kernel.org
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: linux-rdma@vger.kernel.org
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/main.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
 
-Just to give an example of this, one of the first things that Android does at
-boot time is copy the kernel command line into /dev/urandom:
-https://android.googlesource.com/platform/system/core/+/refs/heads/android12-release/rootdir/init.rc#122
-
-It would certainly be undesirable if that started crediting entropy, given that
-the command line might not contain much entropy, or any at all.
-
-(And yes, copying the kernel command line into /dev/urandom is redundant in
-kernels v4.14 and later due to https://git.kernel.org/linus/33d72f3822d7ff8a.
-But this is going to be kept around for a while longer due to older kernels.)
-
-- Eric
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
