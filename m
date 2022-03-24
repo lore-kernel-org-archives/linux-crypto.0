@@ -2,146 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D040CC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 05:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF186C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 06:10:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236035AbiCXFLN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 01:11:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        id S238260AbiCXGMM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 02:12:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiCXFLM (ORCPT
+        with ESMTP id S232070AbiCXGMM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 01:11:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086D556406;
-        Wed, 23 Mar 2022 22:09:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E3D260ACB;
-        Thu, 24 Mar 2022 05:09:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF8CBC340EC;
-        Thu, 24 Mar 2022 05:09:38 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BFq7sgrG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1648098576;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EIf6XUpZNn8sdyg0oBZDJvT0q3CuPDNYwe6tNeipyVU=;
-        b=BFq7sgrG6Kfp/UxzBKwBahmmqFqH3YoVM+Qfud2jawdf25sDFMS5ZZNAu8qpXokoNlFx9t
-        N5DdkFJh0amprbtj/wuGIjDKsHGxnx/a287nq75d3oICW3EBPjCkCxcFrPnOhKDvH/Ud7t
-        SrCrpkUzzEoPOgpv45UPfC64dWHUKqk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1da81b14 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Mar 2022 05:09:36 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Graham Christensen <graham@grahamc.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: [PATCH v2] random: treat bootloader trust toggle the same way as cpu trust toggle
-Date:   Wed, 23 Mar 2022 23:09:30 -0600
-Message-Id: <20220324050930.207107-1-Jason@zx2c4.com>
-In-Reply-To: <20220323041123.146459-1-Jason@zx2c4.com>
-References: <20220323041123.146459-1-Jason@zx2c4.com>
+        Thu, 24 Mar 2022 02:12:12 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E1B5AEEE
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 23:10:40 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id b5so4750728ljf.13
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 23:10:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LqfrhH7nLLN1gFNpfkxdVh8qEuR20wWFYGhJe9S517U=;
+        b=iSWT8vdc0yh8SYKvhuJvzQ6NVn1IxgAjTuZEFO1ykT13+epT5g7ufWwM+n3wVsMIvD
+         Oqa49d/1hG5loWRMKTYhQOkaVSnaNjItyxyOYSMTJMJs/zuJQXhvGrOHJFLXc+bbgZMu
+         v79J4bMOv3va4ogUV7REzdILG6gdDR0x4hLTUzfd7j5HZgbaLEoiEETYlRSBNiHRdBSO
+         WmUlOgf8FbQ2nXVQ2b9U3xjfYrpBQ2BXts7IuMGxPyESeSJpNy1yCtV6ls6OP5T7pX6j
+         vy1abDaGxQsndufKA+scn/28b6MIFlN5SQsIZWDVeK7dsxiX2+TyV1mdvi6Krs6BJj41
+         egBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LqfrhH7nLLN1gFNpfkxdVh8qEuR20wWFYGhJe9S517U=;
+        b=5+aAJIC2Z3SPovR6LALtpZ63EZv0HBHofKWKuwYFrg1k7OwZvmeYU/ttO+WOxk7Mt4
+         nrJ3uDwgEnpiIkSrypugGDhdZUU00OPd4xZAwF4xkjAd93HRXgLrgXiz+ETn27emUIwc
+         i3mPPKojzOiqNkwtiDL+SmsQvPBdLn0YRop/Mhii+jiisTCYgauwKI6RJSE0c0C6eXFc
+         554wDwMr7vq/1a0sOK6aYmiV+PyX+im0v7dddSL5qquuADQhiG0W8nKXE0nM/7ZLwkDN
+         yUO2H4U5BSfGhmTpkWV/5kMUXVAzJVTJgBEVh8fn07981KYuHU36ale3Baiz8fSDBaWu
+         LqEg==
+X-Gm-Message-State: AOAM531botw0vRe2GpV8/YJLrgJBRv3KsM/3Bru4Q7uOq69+FHnveihg
+        nbV29E0dVTkHSs7p0ADtKuAbxRVyHKJBepRwcsRdE8tcwLQ=
+X-Google-Smtp-Source: ABdhPJxps7xqXnoV2uIjIdahK9iCgECSWiv/DVl810GrTW+CDJ/GIRCdZsh6a1y5kiT7yU2NJiq1Gf/2jmTzKPhEYEM=
+X-Received: by 2002:a2e:7f13:0:b0:247:ef72:9e8b with SMTP id
+ a19-20020a2e7f13000000b00247ef729e8bmr2812996ljd.205.1648102238526; Wed, 23
+ Mar 2022 23:10:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Thu, 24 Mar 2022 14:10:26 +0800
+Message-ID: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
+Subject: Entropy as a Service?
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>, "Ted Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If CONFIG_RANDOM_TRUST_CPU is set, the RNG initializes using RDRAND.
-But, the user can disable (or enable) this behavior by setting
-`random.trust_cpu=0/1` on the kernel command line. This allows system
-builders to do reasonable things while avoiding howls from tinfoil
-hatters. (Or vice versa.)
+NIST have a project called Entropy as a Service; the main goal seems
+to be to provide adequate entropy even on IoT devices which may have
+various limitations.
+https://csrc.nist.gov/projects/entropy-as-a-service
 
-CONFIG_RANDOM_TRUST_BOOTLOADER is basically the same thing, but regards
-the seed passed via EFI or device tree, which might come from RDRAND or
-a TPM or somewhere else. In order to allow distros to more easily enable
-this while avoiding those same howls (or vice versa), this commit adds
-the corresponding `random.trust_bootloader=0/1` toggle.
-
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Graham Christensen <graham@grahamc.com>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
-Link: https://github.com/NixOS/nixpkgs/pull/165355
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
-v2 updates the documentation, using the same verbage as the trust_cpu
-text.
-
- Documentation/admin-guide/kernel-parameters.txt | 6 ++++++
- drivers/char/Kconfig                            | 3 ++-
- drivers/char/random.c                           | 8 +++++++-
- 3 files changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index c658e5d2d52c..b9d764a49207 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -4400,6 +4400,12 @@
- 			fully seed the kernel's CRNG. Default is controlled
- 			by CONFIG_RANDOM_TRUST_CPU.
- 
-+	random.trust_bootloader={on,off}
-+			[KNL] Enable or disable trusting the use of the
-+			a seed passed by the bootloader (if available) to
-+			fully seed the kernel's CRNG. Default is controlled
-+			by CONFIG_RANDOM_TRUST_BOOTLOADER.
-+
- 	randomize_kstack_offset=
- 			[KNL] Enable or disable kernel stack offset
- 			randomization, which provides roughly 5 bits of
-diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
-index 740811893c57..55f48375e3fe 100644
---- a/drivers/char/Kconfig
-+++ b/drivers/char/Kconfig
-@@ -449,6 +449,7 @@ config RANDOM_TRUST_BOOTLOADER
- 	device randomness. Say Y here to assume the entropy provided by the
- 	booloader is trustworthy so it will be added to the kernel's entropy
- 	pool. Otherwise, say N here so it will be regarded as device input that
--	only mixes the entropy pool.
-+	only mixes the entropy pool. This can also be configured at boot with
-+	"random.trust_bootloader=on/off".
- 
- endmenu
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 81dab72b611a..40107f8b9e9e 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -949,11 +949,17 @@ static bool drain_entropy(void *buf, size_t nbytes, bool force)
-  **********************************************************************/
- 
- static bool trust_cpu __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_CPU);
-+static bool trust_bootloader __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER);
- static int __init parse_trust_cpu(char *arg)
- {
- 	return kstrtobool(arg, &trust_cpu);
- }
-+static int __init parse_trust_bootloader(char *arg)
-+{
-+	return kstrtobool(arg, &trust_bootloader);
-+}
- early_param("random.trust_cpu", parse_trust_cpu);
-+early_param("random.trust_bootloader", parse_trust_bootloader);
- 
- /*
-  * The first collection of entropy occurs at system boot while interrupts
-@@ -1161,7 +1167,7 @@ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
-  */
- void add_bootloader_randomness(const void *buf, size_t size)
- {
--	if (IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER))
-+	if (trust_bootloader)
- 		add_hwgenerator_randomness(buf, size, size * 8);
- 	else
- 		add_device_randomness(buf, size);
--- 
-2.35.1
-
+I have not yet looked at all the details but -- since Linux runs on
+many IoT devices and on some of them random(4) encounters difficulties
+-- I wonder to what extent this might be relevant for Linux.
