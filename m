@@ -2,113 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA611C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 03:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D040CC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 05:09:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbiCXDUK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 23:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60200 "EHLO
+        id S236035AbiCXFLN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 01:11:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244337AbiCXDUH (ORCPT
+        with ESMTP id S229911AbiCXFLM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 23:20:07 -0400
+        Thu, 24 Mar 2022 01:11:12 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3555DFCB;
-        Wed, 23 Mar 2022 20:18:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 086D556406;
+        Wed, 23 Mar 2022 22:09:40 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E7FEA6199C;
-        Thu, 24 Mar 2022 03:18:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F408BC340E9;
-        Thu, 24 Mar 2022 03:18:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E3D260ACB;
+        Thu, 24 Mar 2022 05:09:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF8CBC340EC;
+        Thu, 24 Mar 2022 05:09:38 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GLvc05F/"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BFq7sgrG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1648091909;
+        t=1648098576;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aEOduEdFqKFMsa9nTvbpRapPlloyfuvJVgMDVaG/kLk=;
-        b=GLvc05F/ZBFHwRQoMoOJCs6oatQ73VJN9ev+Gl4S0u4drEeyAo50IQndQTv0n/37WzAoxI
-        Jr/9Gk9q73hjAKXycqTBurBsapuNvWr3Rw3CD/sGVs3KO46n/5OnC9D4gP9h/ag03/O6Xc
-        3n/jr0dET87Aw2YPNdPQcKiUsxR5Q1k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fc86e14f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 24 Mar 2022 03:18:28 +0000 (UTC)
-Received: by mail-yb1-f177.google.com with SMTP id f38so6247787ybi.3;
-        Wed, 23 Mar 2022 20:18:28 -0700 (PDT)
-X-Gm-Message-State: AOAM5338wvh+XSteC7liNIrnmEXtdyDhPE8Q6NIHn0oMDo9otX4ihqNL
-        xIbU/tlezO6erN98xui0YyYAdvcf8ongkMSBX9c=
-X-Google-Smtp-Source: ABdhPJxxixvasKF5K+F4iJp7DM3PyC2Qdmh51RlYyfsnm4HKDWCuCjmR8heKzY7GsSAZI+e4HnmwS2ez/CC3rZNar8A=
-X-Received: by 2002:a25:b905:0:b0:61e:23e4:949f with SMTP id
- x5-20020a25b905000000b0061e23e4949fmr2995975ybj.373.1648091907198; Wed, 23
- Mar 2022 20:18:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220322191436.110963-1-Jason@zx2c4.com> <1648009787.fah6dos6ya.none@localhost>
- <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
-In-Reply-To: <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
+        bh=EIf6XUpZNn8sdyg0oBZDJvT0q3CuPDNYwe6tNeipyVU=;
+        b=BFq7sgrG6Kfp/UxzBKwBahmmqFqH3YoVM+Qfud2jawdf25sDFMS5ZZNAu8qpXokoNlFx9t
+        N5DdkFJh0amprbtj/wuGIjDKsHGxnx/a287nq75d3oICW3EBPjCkCxcFrPnOhKDvH/Ud7t
+        SrCrpkUzzEoPOgpv45UPfC64dWHUKqk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1da81b14 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 24 Mar 2022 05:09:36 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Mar 2022 21:18:16 -0600
-X-Gmail-Original-Message-ID: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
-Message-ID: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast init
-To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
-        Jann Horn <jannh@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Graham Christensen <graham@grahamc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH v2] random: treat bootloader trust toggle the same way as cpu trust toggle
+Date:   Wed, 23 Mar 2022 23:09:30 -0600
+Message-Id: <20220324050930.207107-1-Jason@zx2c4.com>
+In-Reply-To: <20220323041123.146459-1-Jason@zx2c4.com>
+References: <20220323041123.146459-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi all,
+If CONFIG_RANDOM_TRUST_CPU is set, the RNG initializes using RDRAND.
+But, the user can disable (or enable) this behavior by setting
+`random.trust_cpu=0/1` on the kernel command line. This allows system
+builders to do reasonable things while avoiding howls from tinfoil
+hatters. (Or vice versa.)
 
-On Tue, Mar 22, 2022 at 10:47 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Very much so, thanks again. What I take away from your results is:
->
-> - RNDADDTOENTCNT is in active use in a safe way. Sure, RNDADDENTROPY
-> is still much better, but RNDADDTOENTCNT isn't entirely broken in the
-> above configurations either.
-> - This patch would make RNDADDTOENTCNT unsafe for some of the above
-> configurations in a way that it currently isn't unsafe.
-> - Plenty of things are seeding the RNG correctly, and buildroot's
-> shell script is just "doing it wrong".
->
-> On that last point, I should reiterate that buildroot's shell script
-> still isn't actually initializing the RNG, despite what it says in its
-> echo; there's never been a way to initialize the RNG from a shell
-> script, without calling out to various special purpose ioctl-aware
-> binaries.
+CONFIG_RANDOM_TRUST_BOOTLOADER is basically the same thing, but regards
+the seed passed via EFI or device tree, which might come from RDRAND or
+a TPM or somewhere else. In order to allow distros to more easily enable
+this while avoiding those same howls (or vice versa), this commit adds
+the corresponding `random.trust_bootloader=0/1` toggle.
 
-Based on this, the fact that shell scripts cannot seed the RNG anyway,
-and due to the hazards in trying to retrofit some heuristics onto an
-interface that was never designed to work like this, I'm convinced at
-this point that the right course of action here is to leave this
-alone. There's no combination of /dev/urandom write hacks/heuristics
-that do the right thing without creating some big problem elsewhere.
-It just does not have the right semantics for it, and changing the
-existing semantics will break existing users.
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Graham Christensen <graham@grahamc.com>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Link: https://github.com/NixOS/nixpkgs/pull/165355
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+v2 updates the documentation, using the same verbage as the trust_cpu
+text.
 
-In light of that conclusion, I'm going to work with every userspace
-downstream I can find to help them fix their file-based seeding, if it
-has bugs. I've started talking with the buildroot folks, and then I'll
-speak with the OpenRC people (being a Gentoo dev, that should be easy
-going). Systemd does the right thing already.
+ Documentation/admin-guide/kernel-parameters.txt | 6 ++++++
+ drivers/char/Kconfig                            | 3 ++-
+ drivers/char/random.c                           | 8 +++++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-I wrote a little utility for potential inclusion in
-busybox/util-linux/whatever when it matures beyond its current age of
-being half hour old:
-- https://git.zx2c4.com/seedrng/about/
-- https://git.zx2c4.com/seedrng/tree/seedrng.c
-So I'll see what the buildroot people think of this and take it from there.
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index c658e5d2d52c..b9d764a49207 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -4400,6 +4400,12 @@
+ 			fully seed the kernel's CRNG. Default is controlled
+ 			by CONFIG_RANDOM_TRUST_CPU.
+ 
++	random.trust_bootloader={on,off}
++			[KNL] Enable or disable trusting the use of the
++			a seed passed by the bootloader (if available) to
++			fully seed the kernel's CRNG. Default is controlled
++			by CONFIG_RANDOM_TRUST_BOOTLOADER.
++
+ 	randomize_kstack_offset=
+ 			[KNL] Enable or disable kernel stack offset
+ 			randomization, which provides roughly 5 bits of
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index 740811893c57..55f48375e3fe 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -449,6 +449,7 @@ config RANDOM_TRUST_BOOTLOADER
+ 	device randomness. Say Y here to assume the entropy provided by the
+ 	booloader is trustworthy so it will be added to the kernel's entropy
+ 	pool. Otherwise, say N here so it will be regarded as device input that
+-	only mixes the entropy pool.
++	only mixes the entropy pool. This can also be configured at boot with
++	"random.trust_bootloader=on/off".
+ 
+ endmenu
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 81dab72b611a..40107f8b9e9e 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -949,11 +949,17 @@ static bool drain_entropy(void *buf, size_t nbytes, bool force)
+  **********************************************************************/
+ 
+ static bool trust_cpu __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_CPU);
++static bool trust_bootloader __ro_after_init = IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER);
+ static int __init parse_trust_cpu(char *arg)
+ {
+ 	return kstrtobool(arg, &trust_cpu);
+ }
++static int __init parse_trust_bootloader(char *arg)
++{
++	return kstrtobool(arg, &trust_bootloader);
++}
+ early_param("random.trust_cpu", parse_trust_cpu);
++early_param("random.trust_bootloader", parse_trust_bootloader);
+ 
+ /*
+  * The first collection of entropy occurs at system boot while interrupts
+@@ -1161,7 +1167,7 @@ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+  */
+ void add_bootloader_randomness(const void *buf, size_t size)
+ {
+-	if (IS_ENABLED(CONFIG_RANDOM_TRUST_BOOTLOADER))
++	if (trust_bootloader)
+ 		add_hwgenerator_randomness(buf, size, size * 8);
+ 	else
+ 		add_device_randomness(buf, size);
+-- 
+2.35.1
 
-The plus side of doing all this is that, if the efforts pan out, it
-means there'll actually be proper seeding on devices that don't
-currently do that, which then might lead to a better ecosystem and
-less boot time blocking and all that jazz.
-
-Jason
