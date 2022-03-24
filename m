@@ -2,121 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1048FC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 01:37:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA611C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 03:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240020AbiCXBjR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Mar 2022 21:39:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37554 "EHLO
+        id S232989AbiCXDUK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 23 Mar 2022 23:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233077AbiCXBjQ (ORCPT
+        with ESMTP id S244337AbiCXDUH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Mar 2022 21:39:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C9892D25
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Mar 2022 18:37:45 -0700 (PDT)
+        Wed, 23 Mar 2022 23:20:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3555DFCB;
+        Wed, 23 Mar 2022 20:18:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 444F86193C
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 01:37:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B169C340E9;
-        Thu, 24 Mar 2022 01:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648085864;
-        bh=a1kYGdgex96NKMG8cYYpKD+LeiQiL8pwC9I+H0A1ER8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S+QKPpcHrwUQ7wMwJahqQnSZ1XpEdl/9jrkggX3oLufEuLi01P5fM7z39y3pmqU57
-         Rs/2ByH+J/PTJdyLHBfJkvZwt8UYE3BqNWlZSbleYnR4+hXzt4XKxDB6cyVrazsL9w
-         ZsahPVNZSHXFwftn2S+JWvEnBuvdewYrou9mykvdp8hSuyR8JJmwxdAG6CKFaAJN/t
-         7r2+rHFV8+ZuhL+fcz9SFgXoP95qb5E7uuBBqPO27+6tufVELTFiGutiAPUzHHtwiR
-         KzsT0LMs20jEq94RyT8dGlrx5TzguCytV8iVNzDDKmwq+S3smWazfGLa5/MxGp763b
-         C5mTEYjtPJMKQ==
-Date:   Wed, 23 Mar 2022 18:37:42 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v3 7/8] crypto: arm64/polyval: Add PMULL accelerated
- implementation of POLYVAL
-Message-ID: <YjvLZkjW2ts8qDfr@sol.localdomain>
-References: <20220315230035.3792663-1-nhuck@google.com>
- <20220315230035.3792663-8-nhuck@google.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E7FEA6199C;
+        Thu, 24 Mar 2022 03:18:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F408BC340E9;
+        Thu, 24 Mar 2022 03:18:32 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GLvc05F/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1648091909;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aEOduEdFqKFMsa9nTvbpRapPlloyfuvJVgMDVaG/kLk=;
+        b=GLvc05F/ZBFHwRQoMoOJCs6oatQ73VJN9ev+Gl4S0u4drEeyAo50IQndQTv0n/37WzAoxI
+        Jr/9Gk9q73hjAKXycqTBurBsapuNvWr3Rw3CD/sGVs3KO46n/5OnC9D4gP9h/ag03/O6Xc
+        3n/jr0dET87Aw2YPNdPQcKiUsxR5Q1k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fc86e14f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 24 Mar 2022 03:18:28 +0000 (UTC)
+Received: by mail-yb1-f177.google.com with SMTP id f38so6247787ybi.3;
+        Wed, 23 Mar 2022 20:18:28 -0700 (PDT)
+X-Gm-Message-State: AOAM5338wvh+XSteC7liNIrnmEXtdyDhPE8Q6NIHn0oMDo9otX4ihqNL
+        xIbU/tlezO6erN98xui0YyYAdvcf8ongkMSBX9c=
+X-Google-Smtp-Source: ABdhPJxxixvasKF5K+F4iJp7DM3PyC2Qdmh51RlYyfsnm4HKDWCuCjmR8heKzY7GsSAZI+e4HnmwS2ez/CC3rZNar8A=
+X-Received: by 2002:a25:b905:0:b0:61e:23e4:949f with SMTP id
+ x5-20020a25b905000000b0061e23e4949fmr2995975ybj.373.1648091907198; Wed, 23
+ Mar 2022 20:18:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220315230035.3792663-8-nhuck@google.com>
+References: <20220322191436.110963-1-Jason@zx2c4.com> <1648009787.fah6dos6ya.none@localhost>
+ <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
+In-Reply-To: <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 23 Mar 2022 21:18:16 -0600
+X-Gmail-Original-Message-ID: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+Message-ID: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast init
+To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
+        Jann Horn <jannh@google.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 11:00:34PM +0000, Nathan Huckleberry wrote:
-> Add hardware accelerated version of POLYVAL for ARM64 CPUs with
-> Crypto Extension support.
+Hi all,
 
-Nit: It's "Crypto Extensions", not "Crypto Extension".
+On Tue, Mar 22, 2022 at 10:47 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Very much so, thanks again. What I take away from your results is:
+>
+> - RNDADDTOENTCNT is in active use in a safe way. Sure, RNDADDENTROPY
+> is still much better, but RNDADDTOENTCNT isn't entirely broken in the
+> above configurations either.
+> - This patch would make RNDADDTOENTCNT unsafe for some of the above
+> configurations in a way that it currently isn't unsafe.
+> - Plenty of things are seeding the RNG correctly, and buildroot's
+> shell script is just "doing it wrong".
+>
+> On that last point, I should reiterate that buildroot's shell script
+> still isn't actually initializing the RNG, despite what it says in its
+> echo; there's never been a way to initialize the RNG from a shell
+> script, without calling out to various special purpose ioctl-aware
+> binaries.
 
-> +config CRYPTO_POLYVAL_ARM64_CE
-> +	tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
-> +	depends on KERNEL_MODE_NEON
-> +	select CRYPTO_CRYPTD
-> +	select CRYPTO_HASH
-> +	select CRYPTO_POLYVAL
+Based on this, the fact that shell scripts cannot seed the RNG anyway,
+and due to the hazards in trying to retrofit some heuristics onto an
+interface that was never designed to work like this, I'm convinced at
+this point that the right course of action here is to leave this
+alone. There's no combination of /dev/urandom write hacks/heuristics
+that do the right thing without creating some big problem elsewhere.
+It just does not have the right semantics for it, and changing the
+existing semantics will break existing users.
 
-CRYPTO_POLYVAL selects CRYPTO_HASH already, so there's no need to select it
-here.
+In light of that conclusion, I'm going to work with every userspace
+downstream I can find to help them fix their file-based seeding, if it
+has bugs. I've started talking with the buildroot folks, and then I'll
+speak with the OpenRC people (being a Gentoo dev, that should be easy
+going). Systemd does the right thing already.
 
-> +/*
-> + * Perform polynomial evaluation as specified by POLYVAL.  This computes:
-> + * 	h^n * accumulator + h^n * m_0 + ... + h^1 * m_{n-1}
-> + * where n=nblocks, h is the hash key, and m_i are the message blocks.
-> + *
-> + * x0 - pointer to message blocks
-> + * x1 - pointer to precomputed key powers h^8 ... h^1
-> + * x2 - number of blocks to hash
-> + * x3 - pointer to accumulator
-> + *
-> + * void pmull_polyval_update(const u8 *in, const struct polyval_ctx *ctx,
-> + *			     size_t nblocks, u8 *accumulator);
-> + */
-> +SYM_FUNC_START(pmull_polyval_update)
-> +	adr		TMP, .Lgstar
-> +	ld1		{GSTAR.2d}, [TMP]
-> +	ld1		{SUM.16b}, [x3]
-> +	ands		PARTIAL_LEFT, BLOCKS_LEFT, #7
-> +	beq		.LskipPartial
-> +	partial_stride
-> +.LskipPartial:
-> +	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> +	blt		.LstrideLoopExit
-> +	ld1		{KEY8.16b, KEY7.16b, KEY6.16b, KEY5.16b}, [x1], #64
-> +	ld1		{KEY4.16b, KEY3.16b, KEY2.16b, KEY1.16b}, [x1], #64
-> +	full_stride 0
-> +	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> +	blt		.LstrideLoopExitReduce
-> +.LstrideLoop:
-> +	full_stride 1
-> +	subs		BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> +	bge		.LstrideLoop
-> +.LstrideLoopExitReduce:
-> +	montgomery_reduction
-> +	mov		SUM.16b, PH.16b
-> +.LstrideLoopExit:
-> +	st1		{SUM.16b}, [x3]
-> +	ret
-> +SYM_FUNC_END(pmull_polyval_update)
+I wrote a little utility for potential inclusion in
+busybox/util-linux/whatever when it matures beyond its current age of
+being half hour old:
+- https://git.zx2c4.com/seedrng/about/
+- https://git.zx2c4.com/seedrng/tree/seedrng.c
+So I'll see what the buildroot people think of this and take it from there.
 
-Is there a reason why partial_stride is done first in the arm64 implementation,
-but last in the x86 implementation?  It would be nice if the implementations
-worked the same way.  Probably last would be better?  What is the advantage of
-doing it first?
+The plus side of doing all this is that, if the efforts pan out, it
+means there'll actually be proper seeding on devices that don't
+currently do that, which then might lead to a better ecosystem and
+less boot time blocking and all that jazz.
 
-Besides that, many of the comments I made on the x86 implementation apply to the
-arm64 implementation too.
-
-- Eric
+Jason
