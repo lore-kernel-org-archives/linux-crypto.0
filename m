@@ -2,79 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB463C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 18:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E68C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 18:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233548AbiCXS2f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 14:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60366 "EHLO
+        id S1352288AbiCXSdF (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 24 Mar 2022 14:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352621AbiCXS2b (ORCPT
+        with ESMTP id S1343922AbiCXSdE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 14:28:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A6D7B7C60;
-        Thu, 24 Mar 2022 11:26:59 -0700 (PDT)
+        Thu, 24 Mar 2022 14:33:04 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E777AF1D2;
+        Thu, 24 Mar 2022 11:31:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BA0DE61AB9;
-        Thu, 24 Mar 2022 18:26:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC3DC340EC;
-        Thu, 24 Mar 2022 18:26:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648146418;
-        bh=up9oP7zqNV212tSUvD9C7zUAWeokV+evSB4LintGnYc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WUbyaM0NZ7qowR+z1FSGEy7loNgmXo8C/Ky1gtC/r+F6YAfDwTNOEiMDKjEePTD7a
-         9ALVU9dbI/cuMCiuYHBwJTcnPCU7+5cxw7gp1gqfgbb9PJylEd6cnIF+o3o+K5NxQ/
-         nmLxj6gWLdeuqHLn1kLp/8vRahs9yrwb3ZzkV5nRzZodyuN1eRRa6Zog4MFaUT0BH1
-         DHguxVE4ByIItAqRCNKdjTz2kOvexI44CDpGtp8yEcda4D/OD65yCYIcR0zwiFdK3J
-         B41+JMa3fEwtYP4De1AyvwnzwdIsUYatSaXSOosL2U8xA2MwKMAePNlE5ndVxK0WxG
-         iPvLGV/4NYYfw==
-Date:   Thu, 24 Mar 2022 18:26:56 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        by sin.source.kernel.org (Postfix) with ESMTPS id 0CA5ECE23A9;
+        Thu, 24 Mar 2022 18:31:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B0AFC340F0;
+        Thu, 24 Mar 2022 18:31:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gwP1uU2g"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1648146683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=04jnsrH/k5FGISNyxH5afqVngH3wf0OI2j533NgQ5yM=;
+        b=gwP1uU2g2TJPCCB646TQ2kPBRVevypIeu3F/lInNCav4gMyn/KEc3kxOZMju0qio4i+695
+        q8p68XZFsueGJo3j0EUHY421Lh+b3VzgaqUCiZtP1k3qezKNVQQT9luBU58U6F87UJDZ9t
+        3E6EeTI9Be6Tr90X7mXty+oLpOlmLvM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 88971558 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 24 Mar 2022 18:31:23 +0000 (UTC)
+Received: by mail-yb1-f176.google.com with SMTP id j2so10045642ybu.0;
+        Thu, 24 Mar 2022 11:31:23 -0700 (PDT)
+X-Gm-Message-State: AOAM530WmBXq9WHCTIdnWiVbuftEsEON0OjIVOLC4L3kPkffa8Wavd7m
+        s1dMmm0ZQQnEj+X1lkQ/hhVAsoI7inOITGQDYQQ=
+X-Google-Smtp-Source: ABdhPJwCDBYq48ICgIxKeXLyUOIHAxOaeNumwB8J4JMlYFW+RqNY7q8fP4fukuZuJnwe9VNmX0vJGBxFaM4viis+CAA=
+X-Received: by 2002:a25:ad83:0:b0:633:abf6:5f69 with SMTP id
+ z3-20020a25ad83000000b00633abf65f69mr5772660ybi.382.1648146681826; Thu, 24
+ Mar 2022 11:31:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220322191436.110963-1-Jason@zx2c4.com> <1648009787.fah6dos6ya.none@localhost>
+ <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
+ <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com> <Yjy38Nl2wYf0L1eY@gmail.com>
+In-Reply-To: <Yjy38Nl2wYf0L1eY@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 24 Mar 2022 12:31:10 -0600
+X-Gmail-Original-Message-ID: <CAHmME9oMeBqEa_GtGXDDVrVe+N=nJH8zB9APDb-mUxx+3_zouw@mail.gmail.com>
+Message-ID: <CAHmME9oMeBqEa_GtGXDDVrVe+N=nJH8zB9APDb-mUxx+3_zouw@mail.gmail.com>
+Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast init
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
         Jann Horn <jannh@google.com>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Guenter Roeck <linux@roeck-us.net>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Theodore Ts'o <tytso@mit.edu>,
+        "Theodore Ts'o" <tytso@mit.edu>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Message-ID: <Yjy38Nl2wYf0L1eY@gmail.com>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
- <1648009787.fah6dos6ya.none@localhost>
- <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
- <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 09:18:16PM -0600, Jason A. Donenfeld wrote:
-> In light of that conclusion, I'm going to work with every userspace
-> downstream I can find to help them fix their file-based seeding, if it
-> has bugs. I've started talking with the buildroot folks, and then I'll
-> speak with the OpenRC people (being a Gentoo dev, that should be easy
-> going). Systemd does the right thing already.
-> 
-> I wrote a little utility for potential inclusion in
-> busybox/util-linux/whatever when it matures beyond its current age of
-> being half hour old:
-> - https://git.zx2c4.com/seedrng/about/
-> - https://git.zx2c4.com/seedrng/tree/seedrng.c
-> So I'll see what the buildroot people think of this and take it from there.
-> 
+Hi Eric,
 
-The example in random(4) needs to be fixed too, right?
+On Thu, Mar 24, 2022 at 12:27 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> The example in random(4) needs to be fixed too, right?
+>
+> https://man7.org/linux/man-pages/man4/random.4.html
 
-https://man7.org/linux/man-pages/man4/random.4.html
+Yes, that's always been wrong, at least for all of 2.6.... There are a
+number of issues with the man page that I plan on addressing all at
+once with a series.
 
-- Eric
+Jason
