@@ -2,199 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 094D4C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 16:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CA0C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 16:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351559AbiCXQWR (ORCPT
+        id S1351689AbiCXQah (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 12:22:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42976 "EHLO
+        Thu, 24 Mar 2022 12:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236831AbiCXQWQ (ORCPT
+        with ESMTP id S229562AbiCXQah (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 12:22:16 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86EAA9E9CD
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 09:20:43 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id w4so7337869wrg.12
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 09:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=u+XoZ+fuIL/ZPqi/MqDlAYN5/s61cbWyTsDVR6ShDXg=;
-        b=7x7yo5Bs1LpGDx1Z/m5ZaOu8cUAl21e7wWdU9yxKzW8vX0CjUGxZctK8KwWnscCoVZ
-         9LxP65DgHeKtf/hZGwB3qLTaAxg9dIFAjsyvDPXqNwfjZtUKy31VfYnkNC7UVPNVhb6p
-         DFWKacToNwykDGrrPa4EO7lI3DYAFLrP9A23HcrD22Cuy78HpnamrgybwQGMWkFwx1vF
-         I2bjpDirPChL6lZVg/QNemvqzmFlvAhQfsuXZ3ej8UrR1kv1YekCXLTJiHsiaXPrtTae
-         h+qV/ldDYsSEqJnAvk5LP5ZdsoTcHaGCBpcPUfGIqZo9CLNPQOMpHfRMEaa847gLl9Yx
-         aBsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=u+XoZ+fuIL/ZPqi/MqDlAYN5/s61cbWyTsDVR6ShDXg=;
-        b=DUjpN1wB2NabEv1K+XgBAjoOV6qdk/YGr2IY60bDeTtmubKD2YpbJI3dd5khRJ1wdM
-         Uxoz0cy9JBODxIgVCNdJutWnqffq6Jy4XG1d47563j5sotaa/Chskuidt+aY6hoUz00K
-         obBaj7geCKqKn+FucSIc/ErNFIYTcoX26KrEhqBf2VhPL0qUQBnj8SGwZl7qwhT+0cl4
-         Lo4PV6mDqTBA5jMNPi4DAHgMQgdihReh5DoZeTYR+jWb3s44piRm4gAh2FKtHmSAf5rj
-         jEPDBNfZXgaa1TpUlkfl0N6JGOqZVir58843AqTCF6T4eLnicQVcndZYPkeQtjiPtKhT
-         bTOw==
-X-Gm-Message-State: AOAM532gUIN3Y6vNWucuckTZsT3YQVqb2xF1ymf3U1CjHYof19zhzWZ/
-        a1U1AHCA1QAHklqjODavhPKYlA==
-X-Google-Smtp-Source: ABdhPJzeYjDJdSI+WUHT0aW2nK8ZdlM/pdZDaZr/eYh34FM+5W0i/XYyjvNvYiq5Hbek/iwW1aWLpQ==
-X-Received: by 2002:a05:6000:181a:b0:205:9051:ab6d with SMTP id m26-20020a056000181a00b002059051ab6dmr5239391wrh.191.1648138841944;
-        Thu, 24 Mar 2022 09:20:41 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id r2-20020a0560001b8200b00203dffb9598sm2914810wru.86.2022.03.24.09.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 09:20:41 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 17:20:39 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org, sboyd@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v3 21/26] dt-bindings: crypto: convert rockchip-crypto to
- yaml
-Message-ID: <YjyaV68mTsJAr9Xm@Red>
-References: <20220321200739.3572792-1-clabbe@baylibre.com>
- <20220321200739.3572792-22-clabbe@baylibre.com>
- <90ebea0b-1d67-98dc-2b49-a6e3b97a2c4a@kernel.org>
+        Thu, 24 Mar 2022 12:30:37 -0400
+Received: from sonic306-20.consmr.mail.gq1.yahoo.com (sonic306-20.consmr.mail.gq1.yahoo.com [98.137.68.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7D48CCD1
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 09:29:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s2048; t=1648139343; bh=UXKrT12a3DzKh+2zloU1ZQGM6ZmFTDIcHcEdgd5rtCE=; h=Date:From:Subject:To:Cc:References:In-Reply-To:From:Subject:Reply-To; b=SpD496npca3OWk7NJfUyz2hn6xVaBe1HsENuvuh3UR3PBAs2xuc7eDYECXSFIridlK/PUAOKX2Oc1gTYzA2P6+VFSyYrNHu18hC27gIcfePNETWDQ9KrZf2pYuKsucprR8yxj9uGUz0mi6LO2cMbU9Om2IENMWltw6d3RH+29CK2zxscI42bWtVMD7iXbqESCgFvBuIwxT9Z0wtI3/T0Nrdqv45LI+Gf/0FLjVuqJFnFm6FkWcvFVPRSK3Qr2DTuLEDRv6GjkNlD+UR/9vTmQC88ipK1eUKpt4aPXflbctC68nW50urCSHuPCxHb5CHO5z6/BDKbqXEFQWioeHKUJA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1648139343; bh=aumSlAenBaTUgKziRCUvNevO7sKIELeaGbhUjKjyyTL=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=XkRcMHVCRr7W1CtP47RathZmm43vWMCXhKhOBeh+NrYxACalodd0KO9YcguO8c2rN9MCAbituco1sUEeVLPzvqKwZvO4+uVN30fUR25nh2qLkGA70RFYA7tNoCd+VG4BMR9irGWtv9DkvedK4Ene/NgaHBS+uy4pql4TKapep0adReBxT/f5r74rb/FF1E2DKXiGqC5P+450WNlJ6etHuje6WhOnHENAq4ch+xPmAN/zRgUBQmlikTUPon5zDQtfUiqN0a5LEkJCJgXhIjV8P+BI6ghkqwQNdbhSbFnxjgej/QylD9ZlRrMSK1Am/E0zxDQZHoSoE9S4F8AvuDhmYA==
+X-YMail-OSG: ze8S4cMVM1letCAw46Ei7hgeZ7VUgXN8.j5mkprIv4RR8ENyxPPCQoXc42hvsvJ
+ YrChXB1DqhWPopCohFYWUkohFl0LpPgfOs5irK5xltrv9c2wQPtaNq4.iitq_WUxglMqKSxns7b.
+ 01qD25HnS5I9qw1fUg7lIp63JMDm8L0SlflQGT7ED9B8lQ_x1mDjBfFcDnWicoVJwKXQ_MQyyThK
+ q8UNMhq54V8bush_f.w7LxVTRGsfbR_HvgJjmamomYE_YPg0zgAyTTYM0YHknP0Zm2k7n8Q.paVB
+ BOSuaUrqknTmWHV90XIKg9N5Zhsuw0eFejtcI2bGqyfQv5mJDtxTaJezeF2ssFSzEAEqCeY0Azks
+ mGebK41Lu7oGnAPkHlTHE_Hh5PqpNVow.OxF0ZME2h.FlzwmuVPz6XXstYKW8buOUoM45_gKG4Gz
+ qAjc0D2uozs2GTmvEDsuKBcsKvdus2XFVV9FpHMSLodPPb0Td6pi9aEAN.q0eDTAkTMG_6OFcgUJ
+ k2zjfg65YoFhj.X.d1JOL01CAhmafzubPEeb_fvgOe5vpfDDX3P_b_TpJLFUqiznQtynNXao8zQF
+ v8BU35f8Uh8M1P4dBlNm3xIpFoAm13veCOdTFwPZiYiPyjenZv3i9rjNxZFRWxBRxU0JW6N3n82P
+ cZHkSV66imZxm8ig138gTNIyvdSbKNUocuTbhf15HBW1vN66SpcbLQDDZRWVtchdexkvC6CnAl7C
+ fKe_UwdXpO214FKfUadnVQWRofhRTKK3LU862zfJM8j8L3Xy8HNge5R5dyIs7FfQ2zKQJP75uc0w
+ EE1G3Q4ElVH0rr8DYB3sPPX.h71AjaB7BhWW8pP5D.Q2Ij6kUvWt7zAzWbDQjwaa4PGSK.8pCGsH
+ frmXWgBp9WNk6uH_D4NtH9m2rEN.pdZ_45dwrywKrFHDfa0qlbuhiokpDEBV0H_yrbeFqWLREn_o
+ JbNVK7lX0jxZE1UEiR3uinJ57qVV1DVJK_qV0PX8geRb9rbmSHRftLuL0T6M616.hOTwSu_Ntto3
+ 3G96cJPK5107_H5lD4atW.bwHOOVkCcncg6341VhYNwZrTMZqMPKyC.b35aYGE.vubNoUdlwy8Jq
+ u4Lv_nkpiAGoyR4nLKRQK30..JbS5HaKv3oYstzX7PR5j9.JQI5bq77Yl8VdCYolXPeynjCPSIi5
+ 6hEcrm99zLuDv7k8p7olKqdnLi5fAANofNYDZhEcT18GwxKoZOoJ9XTreco6K7yyEqT0rgzy4jIC
+ br74Z23.8pPpGdUcoSPRnRChh2wnGFfoCSZRPaZDVEkvWOBnsk8mzRevNpf7G1nrvkzJ1Kr1ixQK
+ xvzlB3F22t2_mzJC57ZLjBQ5BhplIqxmzCEzm.dZ681nprLtlNtJFeVANbfgAweFhQ4lj6J.kGdR
+ Fmi4UmetRSLyN5ALjhXu81zISpUfQ16HXy.ffrrpFT.LuSc9XNl0UztAKNQOJiYfVKjbylemA769
+ Kt2JyQd7ycZSZSiIIAJoXlNz6I0Paqmr28XvlJSydygLJ2MmGudv.xqOsvp5FXg1vS4IRn6yJPXO
+ gCJ5R9gZOiGWurbshf7BpMrIjFBF7rpDbU6IL1Wh7stFVpn8lz7FTzc3s7GgO3cokogZo_OaX1bc
+ OsNwMaG3FCOct7tzTdLXKG5rfsv8WqctkQQTKdzAEp8gzHsdOWWR9_rsT3AcSdE8rLkZJGrl0v1g
+ adCdsloFegjHqYQGkWIh_GMIfx11tADf3qQziUfumjCYCvJDk.haEft7f9F.oji2xY.LSYfEcDBL
+ oPnrZ.Sdf4KPIV7.Jq73OFCaRjtDR6TDY4eeFJ3SzJBBCmK.O5.MhIeSIAbUo0j71dPIUeS2aImN
+ cdDMzXI9V0HVtl9oaOMdlw9UMksqxdceahee9GxqTo_Eth87Uoiz25CwnPmxV8CRqmt0hdi7fajS
+ dfWsZ8eT1ViZvh9ZeYFKbaqzhQJNsczz0W8keMasNRjGUYxdoUSxbBiXaZWgVz21ze7Cp8dM02Os
+ ROr7MYKi02mip5IXcH.84iKg5qPnP0q1OgyPf4jL9hRwT_v14Z_5yGOShR7N_Yi0Suuzxu4nXGEv
+ pvSUN8wtwki5klaQWAgPniM6kuzyvl991k8KCqpuah.pKPwUQMekTt9dVHY0fC9sfX81GJal.hdM
+ kDlaOAnJe_k4uDn4b7TfMB4lVXxUR_8KzJClN8QhKLSPGgAQ2YSmrLN5TBEHwgam7nh97KI7P_OF
+ Jzx2zezwg.4Bqj5H7qAG3fb9g_jgpHTU3l.3U7IXkn7L6eoFGclTPLHBSZsJROyCk2h2osSZT6i9
+ GPFLErMEFnQ--
+X-Sonic-MF: <alex_y_xu@yahoo.ca>
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.gq1.yahoo.com with HTTP; Thu, 24 Mar 2022 16:29:03 +0000
+Received: by hermes--canary-production-bf1-665cdb9985-6hz22 (VZM Hermes SMTP Server) with ESMTPA ID 69cdc785063c6e607374d345053147b1;
+          Thu, 24 Mar 2022 16:29:00 +0000 (UTC)
+Date:   Thu, 24 Mar 2022 12:28:56 -0400
+From:   "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
+ init
+To:     Jann Horn <jannh@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20220322191436.110963-1-Jason@zx2c4.com>
+        <1648009787.fah6dos6ya.none@localhost>
+        <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
+        <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+In-Reply-To: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <90ebea0b-1d67-98dc-2b49-a6e3b97a2c4a@kernel.org>
+Message-Id: <1648138746.2zrnsqdlu7.none@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.19894 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Tue, Mar 22, 2022 at 07:04:43PM +0100, Krzysztof Kozlowski a écrit :
-> On 21/03/2022 21:07, Corentin Labbe wrote:
-> > Convert rockchip-crypto to yaml
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  .../crypto/rockchip,rk3288-crypto.yaml        | 84 +++++++++++++++++++
-> >  .../bindings/crypto/rockchip-crypto.txt       | 28 -------
-> >  2 files changed, 84 insertions(+), 28 deletions(-)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> > 
-> > diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > new file mode 100644
-> > index 000000000000..a6be89a1c890
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> > @@ -0,0 +1,84 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Rockchip Electronics And Security Accelerator
-> > +
-> > +maintainers:
-> > +  - Heiko Stuebner <heiko@sntech.de>
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - rockchip,rk3288-crypto
-> > +      - rockchip,rk3328-crypto
-> > +      - rockchip,rk3399-crypto
-> 
-> Waaaait, what? Only rockchip,rk3288-crypto is in original bindings.
+Excerpts from Jason A. Donenfeld's message of March 23, 2022 11:18 pm:
+> Hi all,
+>=20
+> [...]
+>
+> In light of that conclusion, I'm going to work with every userspace
+> downstream I can find to help them fix their file-based seeding, if it
+> has bugs. I've started talking with the buildroot folks, and then I'll
+> speak with the OpenRC people (being a Gentoo dev, that should be easy
+> going). Systemd does the right thing already.
+>=20
+> I wrote a little utility for potential inclusion in
+> busybox/util-linux/whatever when it matures beyond its current age of
+> being half hour old:
+> - https://git.zx2c4.com/seedrng/about/
+> - https://git.zx2c4.com/seedrng/tree/seedrng.c
+> So I'll see what the buildroot people think of this and take it from ther=
+e.
+>=20
+> The plus side of doing all this is that, if the efforts pan out, it
+> means there'll actually be proper seeding on devices that don't
+> currently do that, which then might lead to a better ecosystem and
+> less boot time blocking and all that jazz.
+>=20
+> Jason
+>=20
 
-Hello
+The issue, in systemd developers' opinion, is that counting seed file=20
+towards entropy initialization potentially causes repeated RNG output if=20
+a system is cloned without resetting the seed file. This is discussed at=20
+length in https://github.com/systemd/systemd/pull/4513. A few years ago,=20
+I wrote most of a program to check machine ID, disk ID, DMI ID, and some=20
+other things in order to avoid this issue. Since then, systemd decided=20
+to store the random seed in EFI variables, I assume on the basis that=20
+machine cloning typically does not clone the EFI variables? In my=20
+opinion, since the same argument applies to machine ID, ssh keys, and=20
+any other persistent cryptographic (or even non-cryptographic) material,=20
+this falls outside the scope of random seeding and into a general=20
+machine cloning "sysprep"-like utility.
 
-Yes, my way is an error.
-Next time, I will split my patch in 2, first a 1 to 1 conversion, then a binding update.
-
-> 
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    minItems: 4
-> > +
-> > +  clock-names:
-> > +    minItems: 4
-> > +
-> > +  resets:
-> > +    maxItems: 1
-> 
-> You missed reset-names.
-> 
-> This patch is quite different than previous, in unexpected way. What
-> happened here?
-> 
-> > +
-> > +if:
-> 
-> Please define it after "allOf:", so it could be easily extended without
-> changing indentation.
-> 
-> > +  properties:
-> > +    compatible:
-> > +      const: rockchip,rk3399-crypto
-> > +then:
-> > +  properties:
-> > +    reg:
-> > +      minItems: 2
-> > +    interrupts:
-> > +      minItems: 2
-> 
-> List interrupts. This is really different than your v1. It also looks
-> different than original bindings and you did not mention any differences
-> here, nor in the commit msg. Either explain in commit msg all
-> differences (and why) or move them to separate commit.
-> 
-> You seem to change the bindings a lot (new properties, different
-> constraints, new compatibles), so this should all go to separate commit.
-> Now it is just confusing.
-> 
-> > +    clocks:
-> > +      minItems: 6
-> 
-> You need maxItems. Everywhere.
-> 
-> > +    clock-names:
-> > +      minItems: 6
-> 
-> List all items.
-> 
-> > +    resets:
-> > +      minItems: 6
-> > +else:
-> > +  if:
-> > +    properties:
-> > +      compatible:
-> > +        const: rockchip,rk3328-crypto
-> > +  then:
-> > +    properties:
-> > +      clocks:
-> > +        minItems: 3
-> > +      clock-names:
-> > +        minItems: 3
-> > +
-> 
-
-I have create a binding update patch (https://github.com/montjoie/linux/commit/da05ef9bb488c16cfd15a47054f5b1161829b6bf)
-But I have lot of problem, DT are not validating.
-Example: Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.example.dtb: crypto@ff8a0000: resets: [[4294967295, 174]] is too short
-
-I have tried also to set default resets/maxItems to 3 and setting it to 4 via an if. But I still got error like maxItems cannot be update after initial set.
-
-Any idea on why my new binding update patch is failling ?
-
-Regards
+Cheers,
+Alex.
