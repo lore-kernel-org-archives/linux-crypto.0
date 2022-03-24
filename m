@@ -2,151 +2,165 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32566C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 19:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED36BC433FE
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Mar 2022 19:24:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352812AbiCXTF3 (ORCPT
+        id S1347775AbiCXT0T (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 15:05:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40530 "EHLO
+        Thu, 24 Mar 2022 15:26:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245360AbiCXTF3 (ORCPT
+        with ESMTP id S1346128AbiCXT0J (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 15:05:29 -0400
-Received: from sonic315-55.consmr.mail.gq1.yahoo.com (sonic315-55.consmr.mail.gq1.yahoo.com [98.137.65.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2655F5D1B1
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 12:03:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s2048; t=1648148636; bh=UNNMV8/CFSa205arhP+OW27CLzMCkhU8HDwxmydKjxg=; h=Date:From:Subject:To:Cc:References:In-Reply-To:From:Subject:Reply-To; b=fGUS6SIePFYcpVzee0eEzmCQYX9ACOsVVxM/Syx2EN5ezLAcxahhVUrDt04NVfB46Vq5SgXUmCedck8icb4XRI9on4qWiJGCMWIpX/5EJqODBucEV+mYu+oUBvCrqTjZAnoNqDjD+xVq6LrOCGlCIoWEebpcuRP0Zp1UIfyQ+AW6ZxATaVjF11Lv5Z4DT1sQIWTaczj1uWthRL0TewYLtLkbD132lrpYk7hGOaBH4nCQszxHkgqosyOoPtDGnh5zmySkXZrITUJbeESe72gsgLsZiY5npK5FF4HX3xf976wECtSa+h2dKVOFpBt5zDbfFX6MK0CPQZSTHnDI3tLfiQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1648148636; bh=LztHCICx+CyyMKi/YOfmF66g4ljK9RySnwMZ1AdE964=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=Q2Nz4GkpiTTcblpjWoC+Pp4hFkseBQjaIp6bULCXu7neZ5yzjoFZXwSZvs4O3w0CXeg3S2Zm3VKFxUCvvvzQc4Rg5RDLdhudqP3mxg90zmoSXlDl5nmxT9OL1TurHg6Y+beQPHa1jgWcoiaXA8D+FKa0lbk+oaQUI+dCOtTxmVbeZ/XKdrjN5my8b/4yMi+VmwUG24tG/xTmx18pVz7vQU6COBxuoKAQ/A3am76OqHToO2GK6EI8E1FZepFdA32eV6DQ7tzIF4cjXsWjnj0qXsk4NaTLOtkAB97/9DNSDr0Y1plg77ejWS9wP0EDLbuwqsOhfXhIFKsjgXnTW7y2cQ==
-X-YMail-OSG: KJ3afmwVM1ndxaRE7RsdKv.0.WD7OfGMIlbAuSC3M3Eu31.iJQZ0_rZ7n7EGQnG
- KmRDlSRTE_QbVHIU3x6qXat6qyLxH0plrHJVOCALKuD0kHfY_4PnHzupApX7uUNjJjSyHpwK.DnD
- tWzVRRIr0Ws9.UUXS1HAxqVzyKhzYhDFARjpx2XhIryYYkUqB3WtznnXyiEBxSj24n_SJyvq8wV1
- _sFbIwcKNTYBNSnBnYsvp3fMYHC50FouiWaoSHKMZYu_h_rNYrvBQM_riGFHagPu.6H2F8gViy6v
- XGM9g3w3J7iS20D6xNf83oxpvjI0iRBgWEsK0KxQjwXEPVMxb6MYP9lWQ0CAJ817C_24ZP00Z9WG
- qw1ighp1y.yenPCoKTWq1RVshpeYak0b9zSwbGJeE_jMPJWn1INqNqMPcHVWl0yxZzaYUPJ7FZHr
- UydVVa43atnybWpgfWTNssL1j3FvykNCtIORgxvMnGU0jfZSUznE6V3RyW.9BJYnDM0G4lmHj0K5
- gMBgSysq0jAgqVVqUPVt8J_Vs8XvzECeY1STS8aRXzHicXL7qGBJ1HozB9ebWOgwMYVWJn177MeE
- T.DXmtuY_mWaYWQUcm2Zhx5m1ScHrHflpqiXImZpHHIUNH4DP7be37RVDcDj8p2_fX3YzunKx4ld
- f3iu8iO34WJleAw1As1RiIlMwzgFA425Kt0Sgv20LtnaLmAgQMo9ABhV3rSnOyPdUHo0YLU.yYdj
- reR_b_q2EpfdDnjPyd4CH7sx81ROkjo5ft1ILk50M3yeDRZScdd7GS.v3KSD4N6qSpH8X0sD2U7P
- iUirzy1VWLC8WZE8qc9N5CJk85LG5HDOHxtEvWQQxb3zIIemzOyMhHM6RlYTGqoTpXvwqfNqAzeV
- BW1cARmgmVgF6oU31JOXbjXcvkLjF1HE_RM9qo19tLmGAHy7h2ZHkQ3IeteHFKCMmnKcVL2fyeEn
- 9gnZrC1RwdH.7jUpJGC9umaL_VuatkGYxSDHDF6Eb4MWpdLX71Lw6K62Ok_KSUs5UzeRRuCb8uI5
- rgoLCLZ.J_R9B16xAKp7HQV_SfCqs4nqacsIjRXN.KCDhJbo5rfWEjmmfAXyVYRAxNZ1FIhac2nY
- AOdprl71gN0LimICHdaXjqOMqQJjYH2PWJ0d3fQstoIcA.wMxxVV1AFrpCm2QyYpz8x8K6U10Ma0
- CHu37mOOG3FMnx3AsxjSooV1HHeWTEzE8juMkwgBsUpARyW5wvtHic3gDPaFZNhmwnt8FY_MtVZG
- aY9Who5eVXVC6kIEbKIBoOae3KLozyWK6uc521JfsHwOUk8PfvglQJkz7OI0BPqFjAv8NO5CLmG9
- 1ttHM9vcShVnzndoH.6xhBqmtVwvsrhrWXZPaqn.sPmpfpIOSzUYD3B2bTR_Y2GJ5t.DURNM7fOO
- EB.Lp8nW0DCRArLlFJeWNa2Ri8EEFtWv_5th1P9aP5ROxU646svesrcHeXw4uxpb4UJoRATfrzeS
- GqhyvlUCJYmUXPnW9fFSCCD5wBokPP1E3icFUhzh0YR1jGY2CDGZWxQNX6T1bslJdXA9YaD12v5M
- szMUTnajqFtu7lS5J2bOySXOR8ZTxhZ5AmRCewsjj6WXxam5g_fMwsaY5c5z3KXpBqK1CLxUe0Fe
- 3dLUumhXZKZ1DBnScOsVyttRz0.uFYGWoGzxARCAtJ6u_qNhAhhnvRvGp2Z_aNDL_sGdmi1d.hLq
- 4VyL8q7NK33088Qm0gDuScRzS.5cF_EWDpgnL9OfxtCplsqkO78wbCgc.ZxrrkTCr3myT9bNseHN
- qwDUmy_aVDTn16tWFc5COZpWXvEO_1ObBY6KPnnuc5yi3fFbbGJC9csJbAIrCh2J4td9_hrKbZVT
- l3A2CKFkwF230CK98sVnW00jTY8tNH_qikgq5k56GCVhctM.BQwEzrkicSCrIyCesaU1JdPUAnGb
- vf4QxBQiB7aFKLtXM1ZiYtMIHm5CAO0IdZ6X.rOMlQfOFbpuxsJ3GmtxUmu9n9iMArzAkebTeUE7
- KRaEMAOGbMxcJdxNSX0z3YY_qGcgAzV5GNsuntgFoFrAtOklV21sCNS3glBZ.Tpj4qdb_sDCR9jq
- H1QO1J04_PzUfcSY1b1ms6bS1cMatX9FKOdYLYKQ4R7CPdPzE9G8oN5z4nYFWf5QX62JRfqhXth6
- sbriy.njyPBpDZswg09sqLUcAxlhlanGattVJS_gS2B9CgyvZ_iSxWfb9SGlXN8aJUVmaeB9i3Ha
- GunP8_dpCCH5xGEQHVSC6KUTMdpqa07ojwX4iRMalJIxho0ZcRxT40y39eF_gy_CgPTnrRb66FUo
- hI2plEplECQ--
-X-Sonic-MF: <alex_y_xu@yahoo.ca>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic315.consmr.mail.gq1.yahoo.com with HTTP; Thu, 24 Mar 2022 19:03:56 +0000
-Received: by hermes--canary-production-bf1-665cdb9985-6hz22 (VZM Hermes SMTP Server) with ESMTPA ID 183683c88045089ba67b9b130d79d949;
-          Thu, 24 Mar 2022 19:03:54 +0000 (UTC)
-Date:   Thu, 24 Mar 2022 15:03:50 -0400
-From:   "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Jann Horn <jannh@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
-        <1648009787.fah6dos6ya.none@localhost>
-        <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
-        <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
-        <1648138746.2zrnsqdlu7.none@localhost> <YjyoaEZLb+GzxJFT@zx2c4.com>
-In-Reply-To: <YjyoaEZLb+GzxJFT@zx2c4.com>
+        Thu, 24 Mar 2022 15:26:09 -0400
+Received: from na01-obe.outbound.protection.outlook.com (mail-centralusazon11021027.outbound.protection.outlook.com [52.101.62.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F5CB9184;
+        Thu, 24 Mar 2022 12:24:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R3J9p91NboaSG1EAA+P4lnyU0/S5P237X9d7ia20qdr6trUbUctgG/bb5Wl0vD8WW0FKI4nDzOZqKbu9/lyvnfGbHsuzoVsw5T9GUj62lVVz4+atx/W8N0jXji2IiQ23b9uoS1KmcZYnD2ztQvJaehndWBnlWFN/VkEqYKDv3KrH5wUtpGlqqaX1JS4abuAwJVjCY/NVPZ03F4i770/dy1gIpO27WqSdYhCshkwpk6J6BUjnXppv9l8YoYkIDdnlrK6av/RPmf5/HJgkEjMnfUkaT9lLNSoOUAdf00ViZToETnhzvJMUq02kwyPu/vObvXKdbjXdHfoymNCi3OfxjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OsyNSyeBzgUboz1K6bFcsFcfam8+gkTs4osH97hHaUw=;
+ b=SV2833iQgjf1dQROjCVG3mEbW/+SERh1aAv4Z1DFJuy7VzRyI0BkB+9rfsQugnbUWmaMW5d+W2btFHcxK/VfIVEPH+3sjxCMdHH6bPvQiL3AXf8i25grCvdTOcHy6Gs6wfTT7kOgFa5JURpmbCSuVvAKilqotFOIcla0Ajt6Wya+71pttG6s9yK5ANc9qmADUFs9CcSj6/ChsNwRrCcjPIx2ey3qsIQ2XEdLgjmYdJdaXg8s3slq2ZzFG6H69u8/zhCCC0MOPkbgnRsKSx67QEuxjhqWvhunXI/qTQ1Qir/djWloo5Qrgj6/RW+Cfi2Sh8zm4FXutKYEfvL70Wm53w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OsyNSyeBzgUboz1K6bFcsFcfam8+gkTs4osH97hHaUw=;
+ b=UfZmF0Ezs8lUQfKDDlXaVnIoxEyy5Rn3GnuTmaZEnrAcivZnnS+9GzfX/vpyeiB6li+NFnqYiOujhOo0h4R4euLgNuqvKha/LPmC7zTpqbva66cP01HINi9bDUXE1Xg1NZ3S6YQaWGQ1mXs9qFWkB11GGZ23C4ZZP9x0CDGzYDw=
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com (2603:10b6:510:d2::21)
+ by DM6PR21MB1611.namprd21.prod.outlook.com (2603:10b6:5:ce::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.8; Thu, 24 Mar
+ 2022 19:24:33 +0000
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::71de:a6ad:facf:dfbe]) by PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::71de:a6ad:facf:dfbe%5]) with mapi id 15.20.5123.010; Thu, 24 Mar 2022
+ 19:24:33 +0000
+From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+CC:     jason <jason@zx2c4.com>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Len Brown <lenb@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: RE: [PATCH 2/3 v6] ACPI: allow longer device IDs
+Thread-Topic: [PATCH 2/3 v6] ACPI: allow longer device IDs
+Thread-Index: AQHYLNK4fL59pmJF2Ea4CQMRQ5s3a6ypbsWAgAAEo4CAAAbTAIAAB7CAgAACs/CAAATqAIAAA+TAgAADDwCAImLl4IAAJSUAgAL2u4A=
+Date:   Thu, 24 Mar 2022 19:24:33 +0000
+Message-ID: <PH0PR21MB30251D429344378FE8D47E35D7199@PH0PR21MB3025.namprd21.prod.outlook.com>
+References: <CAHmME9qHnvwrxEue4Pdm_E1qZQGXFuR9orJSKCWj8fH5TSh6fA@mail.gmail.com>
+ <20220228183355.9090-1-Jason@zx2c4.com>
+ <CAHp75VcjrD3kwN1BfWpjKXaVpG7MHfftMUscSGhcJfStm4b-Xg@mail.gmail.com>
+ <CAMj1kXFmEAKJRHCiuXyGECCmOs0+xX9AVeBDxfuD0XuX2TQ2Uw@mail.gmail.com>
+ <Yh0+LA8B1jw8tnl9@smile.fi.intel.com>
+ <CAHmME9qW4EiYU6_kTffMdK5ijJY1DF6YRt=gDjj1vKqDxB0Raw@mail.gmail.com>
+ <MN0PR21MB3098981B77F513976A62CA57D7019@MN0PR21MB3098.namprd21.prod.outlook.com>
+ <CAMj1kXFZZoOeXnjxdU+gOJTN=Szn=eiXgRhSS9_nnHgwADNHjA@mail.gmail.com>
+ <MN0PR21MB3098EC13B4E8488E692DB28AD7019@MN0PR21MB3098.namprd21.prod.outlook.com>
+ <CAMj1kXFe-B=n1zp6M0yBuqJmmfOXTFbkzj29iK+QpPGK=LxRmA@mail.gmail.com>
+ <PH0PR21MB30253A8BA8B189686B8E65EAD7179@PH0PR21MB3025.namprd21.prod.outlook.com>
+ <CAMj1kXEExWbD9imqNUr1RYRzJmbQX5i3CdG7MPseQh8Q=N1y9g@mail.gmail.com>
+In-Reply-To: <CAMj1kXEExWbD9imqNUr1RYRzJmbQX5i3CdG7MPseQh8Q=N1y9g@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=112bea88-3f90-453c-8ca8-5e9df96a6072;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-03-24T19:22:06Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a041544e-2ede-4f04-b688-08da0dcbecf6
+x-ms-traffictypediagnostic: DM6PR21MB1611:EE_
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-ms-exchange-atpmessageproperties: SA|SL
+x-microsoft-antispam-prvs: <DM6PR21MB1611790B220894B59DA6D2F5D7199@DM6PR21MB1611.namprd21.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: AG6XAUJb1/iRQtlXNjPCBmvBW+TVTylMueQtawVSs2Zz5qVZXWc5cBVbIZODMaDZ86brQuqfIM58qqvVx+IXfmZfngFh3Gt/w1TbadQOles0svpnsvlDTctUIiGALAPlNNQnJ04e8VD6UN5+mt0eN4mK3pwbRhXraL7PYrEMO78w+guaA3R0fYusMzkj3frYQISMbG4QjWY47BkTCRUUW8fODCZQnIwzByGHbGE4yKpB8HH23zhy8ibl2/rCp9xbzC6YSoL0caqPyS2PQRDhxcwY1lhIjjG/a2E4Ylbb4x4oR8t4MXWCc7Zx98jQe+L/S7qwIuTK6Qt0uFnrUsYRzaYVhyQjU7NYMeeQrJ60ZMcnA/FzBSv0qYZmWEyhlGYkq6R89VS8uwOWcAr+vtaeZTV2+zKneEOyd8o/BtMQOVfs7hHUyZeFcK1VGVkiuXS4ksogMIfqNJgQw+K+0spmHVilf5toMPDwJtjb3nTmQ/egxFulKnaEus6nSluiukMawBnhWndJXTpCzFEBhTe0tCe4f5DNKBDruhw1o7Yen/bpHoVXqZ6PEjFBDR0kzxftjwCAArvIrGA1BmgeEifVWuwMIBJF/tRsyhHT7mYI7xAuOMnw9NuQVRPpPfdl0js+Aej10EoqfJYV6Vi2WWmaS+WwFQNWrlcaOoA3YqdyoVKv3VxEHYqUHr7ew4h/ZHHRM/sSJrP15Q70ON9MzQUylGrrQNb21lHMf+pWlQjKu/78DmhWxUHT4GtJ+35KIL62bl3UU6L0UZxwC2wMr5Fsc+/wqji3CFIFmKtXUXhMGO8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR21MB3025.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(451199009)(71200400001)(186003)(83380400001)(26005)(7416002)(6506007)(38070700005)(4326008)(8676002)(66446008)(5660300002)(55016003)(7696005)(122000001)(8990500004)(64756008)(9686003)(82950400001)(33656002)(82960400001)(38100700002)(316002)(66946007)(508600001)(76116006)(4744005)(66476007)(52536014)(8936002)(6916009)(10290500003)(54906003)(66556008)(86362001)(2906002)(148743002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OVJVU0sySVZpN3E4cDBzVEdtcFJxaHdTZ3NlZ2R3blJuVnkzdzM3dnJTSUto?=
+ =?utf-8?B?S0lhRldYZFJlMndGbi9aa3NIRjZxRElSRnFma2g4azBCWElRYlZzeWVraFFP?=
+ =?utf-8?B?WlFvU3hPeWI4QXNnZHZvZnlia2ttNXMvZ0NYaWxPQzRXY0JUVzdINThXZjcx?=
+ =?utf-8?B?aXZNMTR3bzBrN1FJSy9zeDBpbDNqSUJZVExuRlhXV2pFd2gxTlhxR1R4dmJQ?=
+ =?utf-8?B?Y2wvRTJFSVc0cmZHYW4vc3Bmd1A5OTVWdGJDR1A3eFdBbDdHWkNaczBwNGhn?=
+ =?utf-8?B?VzRFYVdzTGhHVVpSeklYVThld2V4eHdHNjNyRDNZSGtHZnVEZklGdjgvc3dX?=
+ =?utf-8?B?QmN4TnZDV3hIVGdvd1dLa3REQk1vMGhuZGVCRk5qOC9QNDI4QThsVGdmRzRl?=
+ =?utf-8?B?SS9kTnoyZ1AxRGkxUEdQWWxScnowdWU1MFdSazBPTGRHYzgxUHo2S0ZDVkt4?=
+ =?utf-8?B?aUJnSkNnM0dhVzc4K1JqQ3E2ZTlIV2EvQ0t2Ym9UNjg3TVBqWm9kVDErTnRF?=
+ =?utf-8?B?RnZuY3JPc1k1dkl3cHp6NWxmRDVMWXhkS1hXKzFMd2ZBQ1hHNGIrSmxGVEVp?=
+ =?utf-8?B?ZHNiZ2JRaXlQdzBjdk9LWWswalM4UjFBSEtDWmVWNXRKZGtCY3JMTHdMdEx1?=
+ =?utf-8?B?WUpzczVsK01HTGo3U05KNDhNMWN5TEVmay9YK2tNc0JPbk9Va1F4MVk3U0J5?=
+ =?utf-8?B?bE0rcHNtVFZXc0VJbEdDajVSZnhXT1dBRXZQU1R1MXhrNk5ua2hBemtkWEIv?=
+ =?utf-8?B?K0RoUlNGRmo1UFp0T3kveXo1U3JRL1JlSTZqbVdqcURqMG03eldibWVxdW8w?=
+ =?utf-8?B?eDVPNW01OWpXcU85dnNlMzllanYrcXh6dlBvaFZkU3I2VTJtenN1NkxIb1lL?=
+ =?utf-8?B?L2h3VmtrdFhTV21GenNKMUNna01jekc3T3RwbzV5ZzlsSndlSTBPTHhyb3lR?=
+ =?utf-8?B?TDByaVJRZmhIUzk5ZlNaVkI2bWlpc1VEcjE4R3hSK2U0ays1VG50V1pqYWxM?=
+ =?utf-8?B?OXgyeG4ra29qYmdLcnErYTFTYmRHTkpHRFpZdldRbUhUTU9kdm5mdGpFYisw?=
+ =?utf-8?B?RnEvUS9Pd0dsdFdiTEtRUVJ5a0VoMnFqRXdKQzRFSnhTcGFjRWxLZWlmMm1E?=
+ =?utf-8?B?UDRySnd0RzhhUWNmWHpMRXNzN3dkR0JXVmwwZUo0Z2RaYmlFTHM2SzlLUUZC?=
+ =?utf-8?B?d1F0aHBDTHNnNWc3bERaK0pXcUhSMU0ycU5FRVFZQlJORnYwVG1KQkNwMTVX?=
+ =?utf-8?B?dEFId0pQUlQ2YWpDVVJqYk5HOWhhWFZnV2dlNlB2bVQwUmxVU0NoU1JoMFA3?=
+ =?utf-8?B?d0VTTU1KTTBFaW5sZlRhK0Z6ZHh5YWRBdk1GQTFHMHEvZmhWR0pacWl0bWFp?=
+ =?utf-8?B?UlZwMG5CYXZtSnNVcURxTW9ranU4a3pqZytXTFUvM0I4Q203TCtBVG54aFlD?=
+ =?utf-8?B?ZkRZaHhVN0ZoSytWQXo2Sk9RMnlnODlpQnh0cjkrYUVhL2tuK2F6NFRzVFdU?=
+ =?utf-8?B?T2tIVDV2emFjZE9oTjJRK0cvR3dTUnlIUGJIRHA4blhNL1NmZkVRa0VrQkFU?=
+ =?utf-8?B?d1AzK3Z4WlJXRTRrSFdXbWRCb0sxRmozbzB0YjZvY2EyeGN0ZHpIeml2T3g4?=
+ =?utf-8?B?YnY0Wmp4VGN5WUZoRExQVkJDK0xnQmFCa2I2OWNFdEcwMkVMUThjQjZEblVW?=
+ =?utf-8?B?elpDTDlRMHRtVDYyYWR0ZHpZNjlVUUZDWUJwMDIzSjV5bU9HbjVPSTNScUg4?=
+ =?utf-8?B?L09iQSs0N1plK0RpZFIzWUZCNDRydllYbUVyR1Z0bUd1b1BISkdOUHJ3bXB2?=
+ =?utf-8?B?V3VMaXd6azdITWR3MG12amdJTDdHZVdKbHlMRXREUXFVcEpmTnNjUVhnTWNw?=
+ =?utf-8?B?OFZzbC9XdjJrOTg0cWVKN0hpTEgyMmY2QWt3dG9KMWVYU0FEWWVaYnFkUm1M?=
+ =?utf-8?B?VUlML0tsYXg5V0w1Tjh2dkdOR3hTWTNLNFZlT1ZZNEtWbkYzcjR0SVA2a2lZ?=
+ =?utf-8?B?NnNnY1psS000c21xYysxa3RLM1NQTTNKT3hER2wxSTNpcmdHUWVxME52M1hl?=
+ =?utf-8?B?MHIycGpjd3BjUkhMSEU0QXR5djR6YXh1WjhCYmZIMkhVMS8rclhOVmlSMDZs?=
+ =?utf-8?B?WVhWMUNzakkvSm1SZ0hURkZzM1RjN0dyZTliNis3RldIMUZnZi9tVVZQWVdP?=
+ =?utf-8?B?Y2dwSEJOZ01Gc3RmZ2Q4M0t5cC90YVVnQkFpbDNpWERkMWJVY2tKN0c2eWpZ?=
+ =?utf-8?B?L0FNdDA3RzN6WUZJRk81YkcvRDBoR2xSR3lSaDRqd016RE1hQVZ5TDUxSHQ1?=
+ =?utf-8?B?K0xvT211alo5N1hjS2FoZFhtZkdHZmk0QWtBd3A1WEFSU3doQ3gzd0pyc2N6?=
+ =?utf-8?Q?NcfhStiKDvTnsY0M=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Message-Id: <1648148400.ytc07g7pbi.none@localhost>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: WebService/1.1.19894 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR21MB3025.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a041544e-2ede-4f04-b688-08da0dcbecf6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Mar 2022 19:24:33.0410
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UViacidJSrfGLU8VeswWs1oLj2Pv9yaBAFVnArxAvj21+mwOgZu1qtv84yzYR3rJ06LG12EEQGErVoM7qunCZMO4FxocnGbZn7mfdYzSn3A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR21MB1611
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Excerpts from Jason A. Donenfeld's message of March 24, 2022 1:20 pm:
-> Hi Alex,
->=20
-> On Thu, Mar 24, 2022 at 10:29 AM Alex Xu (Hello71) <alex_y_xu@yahoo.ca> w=
-rote:
->> The issue, in systemd developers' opinion, is that counting seed file
->> towards entropy initialization potentially causes repeated RNG output if
->> a system is cloned without resetting the seed file. This is discussed at
->> length in https://github.com/systemd/systemd/pull/4513. A few years ago,
->> I wrote most of a program to check machine ID, disk ID, DMI ID, and some
->> other things in order to avoid this issue. Since then, systemd decided
->> to store the random seed in EFI variables, I assume on the basis that
->> machine cloning typically does not clone the EFI variables? In my
->> opinion, since the same argument applies to machine ID, ssh keys, and
->> any other persistent cryptographic (or even non-cryptographic) material,
->> this falls outside the scope of random seeding and into a general
->> machine cloning "sysprep"-like utility.
->=20
-> systemd's seed utility will credit a seed file if the seed file was
-> generated properly (e.g. after the RNG was initialized). For that they
-> use the user.random-seed-creditable xattr, which is a reasonable way of
-> deciding. If that attribute is present, it's credited; if it's not, it's
-> not. Here's their source:
->=20
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If we got this random seed data from getra=
-ndom() the data is suitable for crediting
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* entropy later on. Let's keep that in =
-mind by setting an extended attribute. on the file */
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (getrandom_worked)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (fsetxattr(see=
-d_fd, "user.random-seed-creditable", "1", 1, 0) < 0)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 log_full_errno(ERRNO_IS_NOT_SUPPORTED(errno) ? LOG_DEBUG : LOG_W=
-ARNING, errno,
-> =C2=A0  =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0"Failed to ma=
-rk seed file as creditable, ignoring: %m");
->=20
-> Since my seedrng.c is designed for more minimal systems (running
-> buildroot or openrc or whatever), which might not have xattrs available,
-> it distinguishes just based on the filename:
->=20
-> 	if (new_seed_creditable && rename(NON_CREDITABLE_SEED, CREDITABLE_SEED) =
-< 0) {
-> 		fprintf(stderr, "ERROR: Unable to make new seed creditable: %s\n", stre=
-rror(errno));
-> 		program_ret |=3D 1 << 6;
-> 	}
->=20
-> It's no surprise that these are very similar; I've read systemd's
-> seeding logic and contributed a fix to it.
->=20
-> By the way, if you think something is different or wrong or whatever in
-> seedrng.c, please feel free to send me a patch for it. It already
-> received its first contribution this morning (from the buildroot
-> maintainer). Hopefully the code will reach a good settling point soon,
-> and then various projects that want it can just copy and paste it
-> verbatim into their environment, and tweak idiomatic things as needed.
->=20
-> Jason
->=20
-
-Right, but I'm saying that even if the seed file is good when you wrote=20
-it, it becomes bad if you copy it to multiple machines (e.g. by VM=20
-cloning). For various reasons, I think this is outside the scope of the=20
-random seed services to handle, but I think it's good to keep in mind.
-
-Cheers,
-Alex.
+RnJvbTogQXJkIEJpZXNoZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4gU2VudDogVHVlc2RheSwgTWFy
+Y2ggMjIsIDIwMjIgMzowNyBQTQ0KPiANCj4gT24gVHVlLCAyMiBNYXIgMjAyMiBhdCAyMDo1OSwg
+TWljaGFlbCBLZWxsZXkgKExJTlVYKQ0KPiA8bWlrZWxsZXlAbWljcm9zb2Z0LmNvbT4gd3JvdGU6
+DQo+ID4NCj4gPiBUaGUgSHlwZXItViBndXlzIHBhc3MgYWxvbmcgdGhlaXIgdGhhbmtzIGZvciB5
+b3VyIHN1Z2dlc3Rpb24uICBUaGV5IGhhdmUNCj4gPiBjcmVhdGVkIGFuIGludGVybmFsIGJ1aWxk
+IHdpdGggdGhlIGNoYW5nZSBhbmQgdmVyaWZpZWQgdGhhdCBpdCBwcmVzZXJ2ZXMNCj4gPiBjb21w
+YXRpYmlsaXR5IHdpdGggV2luZG93cyBndWVzdHMuICBJJ3ZlIHRlc3RlZCB3aXRoIExpbnV4IGd1
+ZXN0cyBhbmQNCj4gPiBKYXNvbidzIG5ldyBkcml2ZXIgKG1vZGlmaWVkIHRvIGxvb2sgZm9yICJW
+TUdFTkNUUiIpLCBhbmQgaXQgYWxsIGxvb2tzIGdvb2QuDQo+ID4gSXQgd2lsbCB0YWtlIGEgbGl0
+dGxlIHdoaWxlIHRvIHdlbmQgaXRzIHdheSB0aHJvdWdoIHRoZSBXaW5kb3dzL0h5cGVyLVYNCj4g
+PiByZWxlYXNlIHN5c3RlbSwgYnV0IHRoZXkgYXJlIHBsYW5uaW5nIHRvIHRha2UgdGhlIGNoYW5n
+ZS4NCj4gPg0KPiANCj4gVGhhbmtzIGZvciByZXBvcnRpbmcgYmFjay4NCj4gDQo+IFdpbGwgdGhl
+IHNwZWMgYmUgdXBkYXRlZCBhY2NvcmRpbmdseT8NCg0KVGhlIEh5cGVyLVYgdGVhbSBpcyBsb29r
+aW5nIGludG8gdXBkYXRpbmcgdGhlIHNwZWMuICBUaGUgZG9jdW1lbnQNCmlzIDEwIHllYXJzIG9s
+ZCwgc28gdGhleSBuZWVkIHRvIGZpbmQgdGhlIG9yaWdpbmFsIHNvdXJjZSBmb3IgdGhlIFBERi4N
+Cg0KTWljaGFlbA0K
