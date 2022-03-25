@@ -2,67 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C6FC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 12:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A7AC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 14:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237386AbiCYMcb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Mar 2022 08:32:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38846 "EHLO
+        id S1359394AbiCYOsr (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Mar 2022 10:48:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244732AbiCYMc3 (ORCPT
+        with ESMTP id S1359387AbiCYOsr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Mar 2022 08:32:29 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 765E3D0817;
-        Fri, 25 Mar 2022 05:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YcSVVivNSS6HKwFtzFw9OEfDniOM+I9GJAUb7FZ1W4A=; b=fxduNBYyWHO7Q1Uha+uM3IlStL
-        lTG/7c1EFPnG0OYn5uQ6TJEuaizhCeLP5adQrm26TsmRP7uZPScATVueABjnfn2sg0ocQO1wkR6IA
-        e9YxSGZrMvzUu4XZCoJPfekTLsjnlLYiivJD6F9XYR4NEWARiqVKLGG3DBf8CuV+wj6CoDVrdiuo8
-        LoqIB+iwnrCoERz0M9v0HOK9Zl0kfsMHIEdoqT3GKx8NBFheOqDyqR5G1ZF//Aekrl0P/sjJD0FYv
-        vPprZhs55FC4NtDE+I6pHZQT4wKMkIFjjDNeio2ub3qLZFqIvqLMIzD2iXlBDAK5qFxnqBAWcwO77
-        F6rD3BUg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXj5c-00EM6s-F7; Fri, 25 Mar 2022 12:30:48 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 13483987D26; Fri, 25 Mar 2022 13:30:48 +0100 (CET)
-Date:   Fri, 25 Mar 2022 13:30:47 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     x86@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        ebiggers@google.com, herbert@gondor.apana.org.au, Jason@zx2c4.com,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: [PATCH 5/2] x86/sm3: Fixup SLS
-Message-ID: <20220325123047.GR8939@worktop.programming.kicks-ass.net>
-References: <20220322114809.381992456@infradead.org>
+        Fri, 25 Mar 2022 10:48:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0D7BD95D9;
+        Fri, 25 Mar 2022 07:47:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 75F15B82865;
+        Fri, 25 Mar 2022 14:47:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F74C340F1;
+        Fri, 25 Mar 2022 14:47:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="e29jYBt5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1648219627;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r7mADfdfaorIen+c2NdaURScY/0cf8Ufs1ore6VUMAw=;
+        b=e29jYBt5BMK3Id1OJdZkzAo7GD2xNLM/W6AOpHe0d0p7U5r9wO5XiwmBt9PT6xVnjmUhGt
+        /nLqcSz6/zGQMP9PZmbcRY7p36vzpq9H8U8SBDeiAFUB4uPlUs5yhdIFVJf6ZfPY3R0ZtO
+        mrB9trfnO4jXdq15YgKwAFCnrZwZD/8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 173d7ea9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 25 Mar 2022 14:47:07 +0000 (UTC)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-2d07ae0b1c0so85596277b3.2;
+        Fri, 25 Mar 2022 07:47:07 -0700 (PDT)
+X-Gm-Message-State: AOAM532/Z2xVNCAxAnyKFaVOs1km3+PKtSBpkuCHv8HJ+tIOBE3VmpFL
+        xT6sBX4zl2L1BBbLZoaSRtWgqNDtm4Tev5BZHK0=
+X-Google-Smtp-Source: ABdhPJwxj9mfYcs4dcAt6tUFCKskMVxa7zReVBf5dKvFgxuwo4mx3BQh2NSD0QwY1Q9wAsGrGDsW9qSQpByR3DVcx7s=
+X-Received: by 2002:a81:5250:0:b0:2e6:af4d:22b1 with SMTP id
+ g77-20020a815250000000b002e6af4d22b1mr11078817ywb.396.1648219626122; Fri, 25
+ Mar 2022 07:47:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220322114809.381992456@infradead.org>
+References: <CA+icZUXYH4xfWtR=P8jXQfks7=zh0Os45yDFOiHNtM_KNWrfiw@mail.gmail.com>
+In-Reply-To: <CA+icZUXYH4xfWtR=P8jXQfks7=zh0Os45yDFOiHNtM_KNWrfiw@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 25 Mar 2022 08:46:55 -0600
+X-Gmail-Original-Message-ID: <CAHmME9rPYOAZ2V660SbgbTvZgD7MDpn9r7ZzDEHzOPjjm8sFVA@mail.gmail.com>
+Message-ID: <CAHmME9rPYOAZ2V660SbgbTvZgD7MDpn9r7ZzDEHzOPjjm8sFVA@mail.gmail.com>
+Subject: Re: random: treat bootloader trust toggle the same way as cpu trust toggle
+To:     sedat.dilek@gmail.com
+Cc:     "Theodore Ts'o" <tytso@mit.edu>,
+        Graham Christensen <graham@grahamc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Sedat,
 
-This missed the big asm update due to being merged through the crypto
-tree.
+On Fri, Mar 25, 2022 at 5:46 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> I am not a security expert but following the exciting changes to
+> random/crng changes in upcoming v5.18 and using it on top of Linux
+> v5.17.
+>
+> Just saw this typo in [0]:
 
-Fixes: f94909ceb1ed ("x86: Prepare asm files for straight-line-speculation")
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- arch/x86/crypto/sm3-avx-asm_64.S |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks. Will fix a the bug.
 
---- a/arch/x86/crypto/sm3-avx-asm_64.S
-+++ b/arch/x86/crypto/sm3-avx-asm_64.S
-@@ -513,5 +513,5 @@ SYM_FUNC_START(sm3_transform_avx)
- 
- 	movq %rbp, %rsp;
- 	popq %rbp;
--	ret;
-+	RET;
- SYM_FUNC_END(sm3_transform_avx)
+Jason
