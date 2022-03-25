@@ -2,98 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5762C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 00:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 478CBC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 01:46:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354781AbiCYAnA (ORCPT
+        id S1357612AbiCYBrk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 20:43:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53952 "EHLO
+        Thu, 24 Mar 2022 21:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348270AbiCYAm7 (ORCPT
+        with ESMTP id S1355124AbiCYBri (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 20:42:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2662BA30B;
-        Thu, 24 Mar 2022 17:41:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E6AA617E3;
-        Fri, 25 Mar 2022 00:41:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C80FDC340EC;
-        Fri, 25 Mar 2022 00:41:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648168885;
-        bh=FbOzwJQ3VItTPiRwVL0i6iYEw4wn48XltfsXSq3Gp0I=;
-        h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-        b=heQg+oDa7Y6hrV9cfifoxjjs109z+q36R8eT3+BFw4M0zUjooFDcroS4+WlBhFu8P
-         GeyTbIPNwH8DN4D5L87WCjB6fsExxxYylolVtUVdqMnWNZLSXMI0bt77o83lwoDqsf
-         U1V//fakJzWSm9GAFDn51NoPEQr2Xd/B88ALmkyf10pi8RjLf/6XnUHqOXwnRd6dx/
-         Hbgm258ar/AEJ/RMB7grT+bdeR48/HT9+1RBcl9MaqOquU/xj0rDw4URq56v8wncNP
-         Pk4HrDByhLh2ixpsORYTVluAGEBpP2gInzE4wN2G4QWvXSfZO8sZ6SsS+OisfXWtjV
-         tR3pLBOcq+IAw==
-Content-Type: text/plain; charset="utf-8"
+        Thu, 24 Mar 2022 21:47:38 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBEF5418E
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 18:46:01 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 22P1jugn025011
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Mar 2022 21:45:57 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id D25F515C0038; Thu, 24 Mar 2022 21:45:56 -0400 (EDT)
+Date:   Thu, 24 Mar 2022 21:45:56 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: Entropy as a Service?
+Message-ID: <Yj0e1MOaneLNMHim@mit.edu>
+References: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220321200739.3572792-18-clabbe@baylibre.com>
-References: <20220321200739.3572792-1-clabbe@baylibre.com> <20220321200739.3572792-18-clabbe@baylibre.com>
-Subject: Re: [PATCH v3 17/26] clk: rk3399: use proper crypto0 name
-From:   Stephen Boyd <sboyd@kernel.org>
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        Corentin Labbe <clabbe@baylibre.com>
-To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
-        herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org
-Date:   Thu, 24 Mar 2022 17:41:23 -0700
-User-Agent: alot/0.10
-Message-Id: <20220325004125.C80FDC340EC@smtp.kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting Corentin Labbe (2022-03-21 13:07:30)
-> rk3399 has 2 crypto instance, reset for crypto1 is correctly named, but
-> crypto0 not.
-> Add a 0 to be consistent.
+On Thu, Mar 24, 2022 at 02:10:26PM +0800, Sandy Harris wrote:
+> NIST have a project called Entropy as a Service; the main goal seems
+> to be to provide adequate entropy even on IoT devices which may have
+> various limitations.
+> https://csrc.nist.gov/projects/entropy-as-a-service
+> 
+> I have not yet looked at all the details but -- since Linux runs on
+> many IoT devices and on some of them random(4) encounters difficulties
+> -- I wonder to what extent this might be relevant for Linux.
 
-This is OK because nothing is using the define today?
+There is more detail about the proposal here:
 
->=20
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  include/dt-bindings/clock/rk3399-cru.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/dt-bindings/clock/rk3399-cru.h b/include/dt-bindings=
-/clock/rk3399-cru.h
-> index 44e0a319f077..39169d94a44e 100644
-> --- a/include/dt-bindings/clock/rk3399-cru.h
-> +++ b/include/dt-bindings/clock/rk3399-cru.h
-> @@ -547,8 +547,8 @@
->  #define SRST_H_PERILP0                 171
->  #define SRST_H_PERILP0_NOC             172
->  #define SRST_ROM                       173
-> -#define SRST_CRYPTO_S                  174
-> -#define SRST_CRYPTO_M                  175
-> +#define SRST_CRYPTO0_S                 174
-> +#define SRST_CRYPTO0_M                 175
-> =20
->  /* cru_softrst_con11 */
->  #define SRST_P_DCF                     176
-> @@ -556,7 +556,7 @@
->  #define SRST_CM0S                      178
->  #define SRST_CM0S_DBG                  179
->  #define SRST_CM0S_PO                   180
-> -#define SRST_CRYPTO                    181
-> +#define SRST_CRYPTO0                   181
+   https://csrc.nist.gov/Projects/Entropy-as-a-Service/Architectures
 
-$ git grep SRST_CRYPTO
-Documentation/devicetree/bindings/crypto/rockchip-crypto.txt:           res=
-ets =3D <&cru SRST_CRYPTO>;
-arch/arm/boot/dts/rk3288.dtsi:          resets =3D <&cru SRST_CRYPTO>;
+My initial reactions:
 
-Uh oh. Just don't change it and think about something else when it
-starts to feel inconsistent.
+1) This is not a matter for the kernel, but for userspace to
+implement, since it involves multiple HTTP (yes, really, HTTP, not
+HTTPS) and NTP exchanges --- the crypto is done explicitly since
+presumably the designers didn't want to assume the IOT has a comment
+and bug-free(tm) implementation of HTTPS.  Probably a good idea....
+
+2) The scheme only works if you assume that there is no collusion
+between the operators of the various remote servers used in the
+protocol.
+
+3)  NIST recognizes this, and has the following warning:
+
+   WARNING:The resulting from Step 6 of the protocol random data shall
+   not be used directly for constructing cryptographic keys with it or
+   as a seed to a DRBG. Instead, known cryptographic mechanisms for
+   combining multiple random data sources shall be used to mix random
+   data obtained from multiple remote EaaS instances with local, with
+   respect to the client system and the HRT device, randomness to
+   create a seed for a NIST approved DRBG. Such cryptographic
+   mechanisms are known in the trade as entropy/randomness extraction.
+
+   It is strongly recommended at a minimum two independent EaaS
+   instances located in different geopolitical locales be used as
+   remote sources....
+
+My conclusion is that it's not snake oil, but it's not a magic bullet,
+either.  TNSTAAFL.
+
+						- Ted
+							
