@@ -2,87 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 478CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 01:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 602D4C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 04:16:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357612AbiCYBrk (ORCPT
+        id S1348572AbiCYESA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Mar 2022 21:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40376 "EHLO
+        Fri, 25 Mar 2022 00:18:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355124AbiCYBri (ORCPT
+        with ESMTP id S1348284AbiCYER7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Mar 2022 21:47:38 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBEF5418E
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Mar 2022 18:46:01 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 22P1jugn025011
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 24 Mar 2022 21:45:57 -0400
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id D25F515C0038; Thu, 24 Mar 2022 21:45:56 -0400 (EDT)
-Date:   Thu, 24 Mar 2022 21:45:56 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: Entropy as a Service?
-Message-ID: <Yj0e1MOaneLNMHim@mit.edu>
-References: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
+        Fri, 25 Mar 2022 00:17:59 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CBCC6255;
+        Thu, 24 Mar 2022 21:16:25 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nXbN6-0003Na-0k; Fri, 25 Mar 2022 15:16:21 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Mar 2022 16:16:20 +1200
+Date:   Fri, 25 Mar 2022 16:16:19 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     QintaoShen <unSimple1993@163.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, unSimple1993@163.com
+Subject: Re: [PATCH v1] crypto: stm32: Check for NULL return of
+ kmalloc_array()
+Message-ID: <Yj1CE0IPS+JB9V8I@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CACXcFm=UTJ_wJL0w4=4kD5xcN+n-oi_4zmaxQqPunQGsPqhO1g@mail.gmail.com>
+In-Reply-To: <1648114692-11175-1-git-send-email-unSimple1993@163.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 02:10:26PM +0800, Sandy Harris wrote:
-> NIST have a project called Entropy as a Service; the main goal seems
-> to be to provide adequate entropy even on IoT devices which may have
-> various limitations.
-> https://csrc.nist.gov/projects/entropy-as-a-service
+QintaoShen <unSimple1993@163.com> wrote:
+> As the potential failure of memory allocation, kmalloc_array() may return
+> NULL and lead to NULL pointer dereference because of the usage of 'rctx->hw_context'.
 > 
-> I have not yet looked at all the details but -- since Linux runs on
-> many IoT devices and on some of them random(4) encounters difficulties
-> -- I wonder to what extent this might be relevant for Linux.
+> Therefore, it is better to check the return value of kmalloc_array().
+> 
+> Signed-off-by: QintaoShen <unSimple1993@163.com>
+> ---
+> drivers/crypto/stm32/stm32-hash.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+> index d33006d..f1a1a13 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -970,7 +970,8 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+>        rctx->hw_context = kmalloc_array(3 + HASH_CSR_REGISTER_NUMBER,
+>                                         sizeof(u32),
+>                                         GFP_KERNEL);
+> -
+> +       if (!rctx->hw_context)
+> +               return -ENOMEM;
 
-There is more detail about the proposal here:
+This patch introduces a runtime PM imbalance.  Please fix.
 
-   https://csrc.nist.gov/Projects/Entropy-as-a-Service/Architectures
-
-My initial reactions:
-
-1) This is not a matter for the kernel, but for userspace to
-implement, since it involves multiple HTTP (yes, really, HTTP, not
-HTTPS) and NTP exchanges --- the crypto is done explicitly since
-presumably the designers didn't want to assume the IOT has a comment
-and bug-free(tm) implementation of HTTPS.  Probably a good idea....
-
-2) The scheme only works if you assume that there is no collusion
-between the operators of the various remote servers used in the
-protocol.
-
-3)  NIST recognizes this, and has the following warning:
-
-   WARNING:The resulting from Step 6 of the protocol random data shall
-   not be used directly for constructing cryptographic keys with it or
-   as a seed to a DRBG. Instead, known cryptographic mechanisms for
-   combining multiple random data sources shall be used to mix random
-   data obtained from multiple remote EaaS instances with local, with
-   respect to the client system and the HRT device, randomness to
-   create a seed for a NIST approved DRBG. Such cryptographic
-   mechanisms are known in the trade as entropy/randomness extraction.
-
-   It is strongly recommended at a minimum two independent EaaS
-   instances located in different geopolitical locales be used as
-   remote sources....
-
-My conclusion is that it's not snake oil, but it's not a magic bullet,
-either.  TNSTAAFL.
-
-						- Ted
-							
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
