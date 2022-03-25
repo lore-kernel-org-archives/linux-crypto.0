@@ -2,67 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 602D4C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 04:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ED8C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 04:22:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348572AbiCYESA (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Mar 2022 00:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56574 "EHLO
+        id S233173AbiCYEYY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 25 Mar 2022 00:24:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348284AbiCYER7 (ORCPT
+        with ESMTP id S230312AbiCYEYX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Mar 2022 00:17:59 -0400
+        Fri, 25 Mar 2022 00:24:23 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CBCC6255;
-        Thu, 24 Mar 2022 21:16:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51806C626C;
+        Thu, 24 Mar 2022 21:22:50 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
-        id 1nXbN6-0003Na-0k; Fri, 25 Mar 2022 15:16:21 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Mar 2022 16:16:20 +1200
-Date:   Fri, 25 Mar 2022 16:16:19 +1200
+        id 1nXbT3-0003VS-7e; Fri, 25 Mar 2022 15:22:30 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 25 Mar 2022 16:22:29 +1200
+Date:   Fri, 25 Mar 2022 16:22:29 +1200
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     QintaoShen <unSimple1993@163.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, unSimple1993@163.com
-Subject: Re: [PATCH v1] crypto: stm32: Check for NULL return of
- kmalloc_array()
-Message-ID: <Yj1CE0IPS+JB9V8I@gondor.apana.org.au>
+To:     Zheng Yongjun <zhengyongjun3@huawei.com>
+Cc:     davem@davemloft.net, mcoquelin.stm32@gmail.com,
+        alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: fix reference leak in stm32_crc_remove
+Message-ID: <Yj1DhXpNbVLe6/Lo@gondor.apana.org.au>
+References: <20220317131613.53628-1-zhengyongjun3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1648114692-11175-1-git-send-email-unSimple1993@163.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20220317131613.53628-1-zhengyongjun3@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QintaoShen <unSimple1993@163.com> wrote:
-> As the potential failure of memory allocation, kmalloc_array() may return
-> NULL and lead to NULL pointer dereference because of the usage of 'rctx->hw_context'.
+On Thu, Mar 17, 2022 at 01:16:13PM +0000, Zheng Yongjun wrote:
+> pm_runtime_get_sync() will increment pm usage counter even it
+> failed. Forgetting to call pm_runtime_put_noidle will result
+> in reference leak in stm32_crc_remove, so we should fix it.
 > 
-> Therefore, it is better to check the return value of kmalloc_array().
-> 
-> Signed-off-by: QintaoShen <unSimple1993@163.com>
+> Signed-off-by: Zheng Yongjun <zhengyongjun3@huawei.com>
 > ---
-> drivers/crypto/stm32/stm32-hash.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-> index d33006d..f1a1a13 100644
-> --- a/drivers/crypto/stm32/stm32-hash.c
-> +++ b/drivers/crypto/stm32/stm32-hash.c
-> @@ -970,7 +970,8 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
->        rctx->hw_context = kmalloc_array(3 + HASH_CSR_REGISTER_NUMBER,
->                                         sizeof(u32),
->                                         GFP_KERNEL);
-> -
-> +       if (!rctx->hw_context)
-> +               return -ENOMEM;
+>  drivers/crypto/stm32/stm32-crc32.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-This patch introduces a runtime PM imbalance.  Please fix.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
