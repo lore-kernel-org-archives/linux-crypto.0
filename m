@@ -2,43 +2,30 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 423DCC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Mar 2022 07:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2775C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Mar 2022 17:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231765AbiCZHPR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 26 Mar 2022 03:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41582 "EHLO
+        id S233077AbiCZRta (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 26 Mar 2022 13:49:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbiCZHPQ (ORCPT
+        with ESMTP id S232395AbiCZRt3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 26 Mar 2022 03:15:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4A7193F7;
-        Sat, 26 Mar 2022 00:13:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 93F91B80E78;
-        Sat, 26 Mar 2022 07:13:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 303F4C340ED;
-        Sat, 26 Mar 2022 07:13:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648278813;
-        bh=SbCQiLcdpwK95EMOKB+awhm02w2+pKKQBhuDoxlYSak=;
-        h=From:To:Cc:Subject:Date:From;
-        b=CgH7x0hb0EquZmt+J6V02nwP9Zff35QzQN2Of+aUA1U3b2QcokVApMfEUw03XjHKz
-         tVO8uQVnBw35cdO1LDed/vvQC7m1OOlOvSIkr6YApbQRtMF2O8mAijGRGkJ6i57bV7
-         VUuJfaSl8H5k1QH8MAs9jZrnjZFqCOmsH/5q4eEhEdf8KcfzpHnxyOfxFobJndnY5q
-         hxn1+uBWNSkrtuFoyV31jAFGeRnPjbeQfceXRWkAWNZbXy/zoOuDMVt6AXzb1eomek
-         pHaPkFZyiFq3rHPZUOsQX/hIzqkph9z1t78loEEefHYVTAV+qsbmfPsuQ9Opxmiqe7
-         hvJ2BDfFQYmpQ==
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: testmgr - test in-place en/decryption with two sglists
-Date:   Sat, 26 Mar 2022 00:11:59 -0700
-Message-Id: <20220326071159.56056-1-ebiggers@kernel.org>
+        Sat, 26 Mar 2022 13:49:29 -0400
+X-Greylist: delayed 1200 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 26 Mar 2022 10:47:51 PDT
+Received: from mail.thepaulodoom.com (www.thepaulodoom.com [45.77.108.202])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4296C36B56;
+        Sat, 26 Mar 2022 10:47:51 -0700 (PDT)
+Received: from localhost (h252.183.30.69.ip.windstream.net [69.30.183.252])
+        by vultr.guest (OpenSMTPD) with ESMTPSA id 915f4e9a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 26 Mar 2022 17:21:10 +0000 (UTC)
+From:   Paul Lemmermann <thepaulodoom@thepaulodoom.com>
+To:     davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paul Lemmermann <thepaulodoom@thepaulodoom.com>
+Subject: [PATCH] crypto: aes_generic: fixed styling warnings
+Date:   Sat, 26 Mar 2022 12:20:51 -0500
+Message-Id: <20220326172051.14722-1-thepaulodoom@thepaulodoom.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -46,182 +33,138 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Fixed all styling warnings from the checkpatch.pl script.
 
-As was established in the thread
-https://lore.kernel.org/linux-crypto/20220223080400.139367-1-gilad@benyossef.com/T/#u,
-many crypto API users doing in-place en/decryption don't use the same
-scatterlist pointers for the source and destination, but rather use
-separate scatterlists that point to the same memory.  This case isn't
-tested by the self-tests, resulting in bugs.
-
-This is the natural usage of the crypto API in some cases, so requiring
-API users to avoid this usage is not reasonable.
-
-Therefore, update the self-tests to start testing this case.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Paul Lemmermann <thepaulodoom@thepaulodoom.com>
 ---
- crypto/testmgr.c | 75 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 63 insertions(+), 12 deletions(-)
+ crypto/aes_generic.c | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 2d632a285869f..24a1f9365b9bb 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -232,6 +232,20 @@ enum finalization_type {
- 	FINALIZATION_TYPE_DIGEST,	/* use digest() */
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index 27ab27931..322e345ac 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -1,3 +1,4 @@
++// SPDX-License-Identifier: GPL-2.0+
+ /*
+  * Cryptographic API.
+  *
+@@ -56,7 +57,7 @@
+ #include <asm/byteorder.h>
+ #include <asm/unaligned.h>
+ 
+-static inline u8 byte(const u32 x, const unsigned n)
++static inline u8 byte(const u32 x, const unsigned int n)
+ {
+ 	return x >> (n << 3);
+ }
+@@ -325,6 +326,7 @@ __visible const u32 crypto_ft_tab[4][256] ____cacheline_aligned = {
+ 		0x7bcbb0b0, 0xa8fc5454, 0x6dd6bbbb, 0x2c3a1616,
+ 	}
+ };
++EXPORT_SYMBOL_GPL(crypto_ft_tab);
+ 
+ static const u32 crypto_fl_tab[4][256] ____cacheline_aligned = {
+ 	{
+@@ -853,6 +855,7 @@ __visible const u32 crypto_it_tab[4][256] ____cacheline_aligned = {
+ 		0x7b6184cb, 0xd570b632, 0x48745c6c, 0xd04257b8,
+ 	}
+ };
++EXPORT_SYMBOL_GPL(crypto_it_tab);
+ 
+ static const u32 crypto_il_tab[4][256] ____cacheline_aligned = {
+ 	{
+@@ -1118,8 +1121,6 @@ static const u32 crypto_il_tab[4][256] ____cacheline_aligned = {
+ 	}
  };
  
-+/*
-+ * Whether the crypto operation will occur in-place, and if so whether the
-+ * source and destination scatterlist pointers will coincide (req->src ==
-+ * req->dst), or whether they'll merely point to two separate scatterlists
-+ * (req->src != req->dst) that reference the same underlying memory.
-+ *
-+ * This is only relevant for algorithm types that support in-place operation.
-+ */
-+enum inplace_mode {
-+	OUT_OF_PLACE,
-+	INPLACE_ONE_SGLIST,
-+	INPLACE_TWO_SGLISTS,
-+};
-+
- #define TEST_SG_TOTAL	10000
+-EXPORT_SYMBOL_GPL(crypto_ft_tab);
+-EXPORT_SYMBOL_GPL(crypto_it_tab);
  
  /**
-@@ -265,7 +279,7 @@ struct test_sg_division {
-  * crypto test vector can be tested.
-  *
-  * @name: name of this config, logged for debugging purposes if a test fails
-- * @inplace: operate on the data in-place, if applicable for the algorithm type?
-+ * @inplace_mode: whether and how to operate on the data in-place, if applicable
-  * @req_flags: extra request_flags, e.g. CRYPTO_TFM_REQ_MAY_SLEEP
-  * @src_divs: description of how to arrange the source scatterlist
-  * @dst_divs: description of how to arrange the dst scatterlist, if applicable
-@@ -282,7 +296,7 @@ struct test_sg_division {
-  */
- struct testvec_config {
- 	const char *name;
--	bool inplace;
-+	enum inplace_mode inplace_mode;
- 	u32 req_flags;
- 	struct test_sg_division src_divs[XBUFSIZE];
- 	struct test_sg_division dst_divs[XBUFSIZE];
-@@ -307,11 +321,16 @@ struct testvec_config {
- /* Configs for skciphers and aeads */
- static const struct testvec_config default_cipher_testvec_configs[] = {
- 	{
--		.name = "in-place",
--		.inplace = true,
-+		.name = "in-place (one sglist)",
-+		.inplace_mode = INPLACE_ONE_SGLIST,
-+		.src_divs = { { .proportion_of_total = 10000 } },
-+	}, {
-+		.name = "in-place (two sglists)",
-+		.inplace_mode = INPLACE_TWO_SGLISTS,
- 		.src_divs = { { .proportion_of_total = 10000 } },
- 	}, {
- 		.name = "out-of-place",
-+		.inplace_mode = OUT_OF_PLACE,
- 		.src_divs = { { .proportion_of_total = 10000 } },
- 	}, {
- 		.name = "unaligned buffer, offset=1",
-@@ -349,7 +368,7 @@ static const struct testvec_config default_cipher_testvec_configs[] = {
- 		.key_offset = 3,
- 	}, {
- 		.name = "misaligned splits crossing pages, inplace",
--		.inplace = true,
-+		.inplace_mode = INPLACE_ONE_SGLIST,
- 		.src_divs = {
- 			{
- 				.proportion_of_total = 7500,
-@@ -749,18 +768,39 @@ static int build_cipher_test_sglists(struct cipher_test_sglists *tsgls,
+  * crypto_aes_set_key - Set the AES key.
+@@ -1144,34 +1145,34 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
  
- 	iov_iter_kvec(&input, WRITE, inputs, nr_inputs, src_total_len);
- 	err = build_test_sglist(&tsgls->src, cfg->src_divs, alignmask,
--				cfg->inplace ?
-+				cfg->inplace_mode != OUT_OF_PLACE ?
- 					max(dst_total_len, src_total_len) :
- 					src_total_len,
- 				&input, NULL);
- 	if (err)
- 		return err;
+ /* encrypt a block of text */
  
--	if (cfg->inplace) {
-+	/*
-+	 * In-place crypto operations can use the same scatterlist for both the
-+	 * source and destination (req->src == req->dst), or can use separate
-+	 * scatterlists (req->src != req->dst) which point to the same
-+	 * underlying memory.  Make sure to test both cases.
-+	 */
-+	if (cfg->inplace_mode == INPLACE_ONE_SGLIST) {
- 		tsgls->dst.sgl_ptr = tsgls->src.sgl;
- 		tsgls->dst.nents = tsgls->src.nents;
- 		return 0;
- 	}
-+	if (cfg->inplace_mode == INPLACE_TWO_SGLISTS) {
-+		/*
-+		 * For now we keep it simple and only test the case where the
-+		 * two scatterlists have identical entries, rather than
-+		 * different entries that split up the same memory differently.
-+		 */
-+		memcpy(tsgls->dst.sgl, tsgls->src.sgl,
-+		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
-+		memcpy(tsgls->dst.sgl_saved, tsgls->src.sgl,
-+		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
-+		tsgls->dst.sgl_ptr = tsgls->dst.sgl;
-+		tsgls->dst.nents = tsgls->src.nents;
-+		return 0;
-+	}
-+	/* Out of place */
- 	return build_test_sglist(&tsgls->dst,
- 				 cfg->dst_divs[0].proportion_of_total ?
- 					cfg->dst_divs : cfg->src_divs,
-@@ -995,9 +1035,19 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+-#define f_rn(bo, bi, n, k)	do {				\
++#define f_rn(bo, bi, n, k)	while (0) {				\
+ 	bo[n] = crypto_ft_tab[0][byte(bi[n], 0)] ^			\
+ 		crypto_ft_tab[1][byte(bi[(n + 1) & 3], 1)] ^		\
+ 		crypto_ft_tab[2][byte(bi[(n + 2) & 3], 2)] ^		\
+ 		crypto_ft_tab[3][byte(bi[(n + 3) & 3], 3)] ^ *(k + n);	\
+-} while (0)
++}
  
- 	p += scnprintf(p, end - p, "random:");
+-#define f_nround(bo, bi, k)	do {\
++#define f_nround(bo, bi, k)	while (0) {\
+ 	f_rn(bo, bi, 0, k);	\
+ 	f_rn(bo, bi, 1, k);	\
+ 	f_rn(bo, bi, 2, k);	\
+ 	f_rn(bo, bi, 3, k);	\
+ 	k += 4;			\
+-} while (0)
++}
  
--	if (prandom_u32() % 2 == 0) {
--		cfg->inplace = true;
--		p += scnprintf(p, end - p, " inplace");
-+	switch (prandom_u32() % 4) {
-+	case 0:
-+	case 1:
-+		cfg->inplace_mode = OUT_OF_PLACE;
-+		break;
-+	case 2:
-+		cfg->inplace_mode = INPLACE_ONE_SGLIST;
-+		p += scnprintf(p, end - p, " inplace_one_sglist");
-+		break;
-+	default:
-+		cfg->inplace_mode = INPLACE_TWO_SGLISTS;
-+		p += scnprintf(p, end - p, " inplace_two_sglists");
-+		break;
- 	}
+-#define f_rl(bo, bi, n, k)	do {				\
++#define f_rl(bo, bi, n, k)	while (0) {				\
+ 	bo[n] = crypto_fl_tab[0][byte(bi[n], 0)] ^			\
+ 		crypto_fl_tab[1][byte(bi[(n + 1) & 3], 1)] ^		\
+ 		crypto_fl_tab[2][byte(bi[(n + 2) & 3], 2)] ^		\
+ 		crypto_fl_tab[3][byte(bi[(n + 3) & 3], 3)] ^ *(k + n);	\
+-} while (0)
++}
  
- 	if (prandom_u32() % 2 == 0) {
-@@ -1034,7 +1084,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
- 					  cfg->req_flags);
- 	p += scnprintf(p, end - p, "]");
+-#define f_lround(bo, bi, k)	do {\
++#define f_lround(bo, bi, k)	while (0) {\
+ 	f_rl(bo, bi, 0, k);	\
+ 	f_rl(bo, bi, 1, k);	\
+ 	f_rl(bo, bi, 2, k);	\
+ 	f_rl(bo, bi, 3, k);	\
+-} while (0)
++}
  
--	if (!cfg->inplace && prandom_u32() % 2 == 0) {
-+	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32() % 2 == 0) {
- 		p += scnprintf(p, end - p, " dst_divs=[");
- 		p = generate_random_sgl_divisions(cfg->dst_divs,
- 						  ARRAY_SIZE(cfg->dst_divs),
-@@ -2085,7 +2135,8 @@ static int test_aead_vec_cfg(int enc, const struct aead_testvec *vec,
- 	/* Check for the correct output (ciphertext or plaintext) */
- 	err = verify_correct_output(&tsgls->dst, enc ? vec->ctext : vec->ptext,
- 				    enc ? vec->clen : vec->plen,
--				    vec->alen, enc || !cfg->inplace);
-+				    vec->alen,
-+				    enc || cfg->inplace_mode == OUT_OF_PLACE);
- 	if (err == -EOVERFLOW) {
- 		pr_err("alg: aead: %s %s overran dst buffer on test vector %s, cfg=\"%s\"\n",
- 		       driver, op, vec_name, cfg->name);
-
-base-commit: 46f538bf2404ee9c32648deafb886f49144bfd5e
+ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+@@ -1214,12 +1215,12 @@ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 
+ /* decrypt a block of text */
+ 
+-#define i_rn(bo, bi, n, k)	do {				\
++#define i_rn(bo, bi, n, k)	while (0) {				\
+ 	bo[n] = crypto_it_tab[0][byte(bi[n], 0)] ^			\
+ 		crypto_it_tab[1][byte(bi[(n + 3) & 3], 1)] ^		\
+ 		crypto_it_tab[2][byte(bi[(n + 2) & 3], 2)] ^		\
+ 		crypto_it_tab[3][byte(bi[(n + 1) & 3], 3)] ^ *(k + n);	\
+-} while (0)
++}
+ 
+ #define i_nround(bo, bi, k)	do {\
+ 	i_rn(bo, bi, 0, k);	\
+@@ -1229,19 +1230,19 @@ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	k += 4;			\
+ } while (0)
+ 
+-#define i_rl(bo, bi, n, k)	do {			\
++#define i_rl(bo, bi, n, k)	while (0) {			\
+ 	bo[n] = crypto_il_tab[0][byte(bi[n], 0)] ^		\
+ 	crypto_il_tab[1][byte(bi[(n + 3) & 3], 1)] ^		\
+ 	crypto_il_tab[2][byte(bi[(n + 2) & 3], 2)] ^		\
+ 	crypto_il_tab[3][byte(bi[(n + 1) & 3], 3)] ^ *(k + n);	\
+-} while (0)
++}
+ 
+-#define i_lround(bo, bi, k)	do {\
++#define i_lround(bo, bi, k)	while (0) {\
+ 	i_rl(bo, bi, 0, k);	\
+ 	i_rl(bo, bi, 1, k);	\
+ 	i_rl(bo, bi, 2, k);	\
+ 	i_rl(bo, bi, 3, k);	\
+-} while (0)
++}
+ 
+ static void crypto_aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
 -- 
 2.35.1
 
