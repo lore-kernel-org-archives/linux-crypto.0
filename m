@@ -2,73 +2,226 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFC3C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Mar 2022 16:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423DCC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Mar 2022 07:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376556AbiCYQyR (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Mar 2022 12:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44862 "EHLO
+        id S231765AbiCZHPR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 26 Mar 2022 03:15:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241225AbiCYQyQ (ORCPT
+        with ESMTP id S230024AbiCZHPQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Mar 2022 12:54:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3212E5400;
-        Fri, 25 Mar 2022 09:52:41 -0700 (PDT)
+        Sat, 26 Mar 2022 03:15:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4A7193F7;
+        Sat, 26 Mar 2022 00:13:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 77C43618CA;
-        Fri, 25 Mar 2022 16:52:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A6DC2BBE4;
-        Fri, 25 Mar 2022 16:52:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 93F91B80E78;
+        Sat, 26 Mar 2022 07:13:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 303F4C340ED;
+        Sat, 26 Mar 2022 07:13:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648227160;
-        bh=Ra8ieuBzaiUMPlsrjMnh2eiTTbFJ7RF3zaiOYqpcWRY=;
-        h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-        b=Yc5KjUsXj0C3ePGmhyRuZJgrCSRp4+HyI1a7yErLlR/GcQnY5tNLV1BmC+enHzLg7
-         VkPDqNzov93jRYdDqfRphGZaqNe/6MrJKtu0chA542UYeMVcO+026KPHUvImpJHRy2
-         SSD8o8rU0W/9ZVKZ5jWypI28tPMm5CFeJHLQj6GiDSEMXIwcm1fA5Ibf42imrE9nnZ
-         uC1wRNKl95f+lsEt7efD2foDSsaT82ItZjSJdVJt0btni/gsKvvntazhgnpTDA3D9d
-         ljIaXMIYw1l6gpYSSETL24GOW5zcqJ+uT5dWsIDJpz4+X5/ekL/ToquYczoXPsnd+s
-         CQYhh6dO5mFPA==
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1648278813;
+        bh=SbCQiLcdpwK95EMOKB+awhm02w2+pKKQBhuDoxlYSak=;
+        h=From:To:Cc:Subject:Date:From;
+        b=CgH7x0hb0EquZmt+J6V02nwP9Zff35QzQN2Of+aUA1U3b2QcokVApMfEUw03XjHKz
+         tVO8uQVnBw35cdO1LDed/vvQC7m1OOlOvSIkr6YApbQRtMF2O8mAijGRGkJ6i57bV7
+         VUuJfaSl8H5k1QH8MAs9jZrnjZFqCOmsH/5q4eEhEdf8KcfzpHnxyOfxFobJndnY5q
+         hxn1+uBWNSkrtuFoyV31jAFGeRnPjbeQfceXRWkAWNZbXy/zoOuDMVt6AXzb1eomek
+         pHaPkFZyiFq3rHPZUOsQX/hIzqkph9z1t78loEEefHYVTAV+qsbmfPsuQ9Opxmiqe7
+         hvJ2BDfFQYmpQ==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: testmgr - test in-place en/decryption with two sglists
+Date:   Sat, 26 Mar 2022 00:11:59 -0700
+Message-Id: <20220326071159.56056-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Yj1x5hJEKVL71JZ1@Red>
-References: <20220321200739.3572792-1-clabbe@baylibre.com> <20220321200739.3572792-18-clabbe@baylibre.com> <20220325004125.C80FDC340EC@smtp.kernel.org> <Yj1x5hJEKVL71JZ1@Red>
-Subject: Re: [PATCH v3 17/26] clk: rk3399: use proper crypto0 name
-From:   Stephen Boyd <sboyd@kernel.org>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        mturquette@baylibre.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-To:     LABBE Corentin <clabbe@baylibre.com>
-Date:   Fri, 25 Mar 2022 09:52:38 -0700
-User-Agent: alot/0.10
-Message-Id: <20220325165240.C9A6DC2BBE4@smtp.kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting LABBE Corentin (2022-03-25 00:40:22)
-> Le Thu, Mar 24, 2022 at 05:41:23PM -0700, Stephen Boyd a =C3=A9crit :
-> > Quoting Corentin Labbe (2022-03-21 13:07:30)
-> >=20
-> > $ git grep SRST_CRYPTO
-> > Documentation/devicetree/bindings/crypto/rockchip-crypto.txt:          =
- resets =3D <&cru SRST_CRYPTO>;
-> > arch/arm/boot/dts/rk3288.dtsi:          resets =3D <&cru SRST_CRYPTO>;
-> >=20
-> > Uh oh. Just don't change it and think about something else when it
-> > starts to feel inconsistent.
->=20
-> This is on rk3288, so not related to rk3399.
-> Even on the RK3399 TRM, all crypto clocks are called either crypto0 or cr=
-ypto1 (neither just crypto)
->=20
+From: Eric Biggers <ebiggers@google.com>
 
-Ok. Please add a note in the commit text why it's OK to change the
-define names.
+As was established in the thread
+https://lore.kernel.org/linux-crypto/20220223080400.139367-1-gilad@benyossef.com/T/#u,
+many crypto API users doing in-place en/decryption don't use the same
+scatterlist pointers for the source and destination, but rather use
+separate scatterlists that point to the same memory.  This case isn't
+tested by the self-tests, resulting in bugs.
+
+This is the natural usage of the crypto API in some cases, so requiring
+API users to avoid this usage is not reasonable.
+
+Therefore, update the self-tests to start testing this case.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/testmgr.c | 75 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 63 insertions(+), 12 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 2d632a285869f..24a1f9365b9bb 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -232,6 +232,20 @@ enum finalization_type {
+ 	FINALIZATION_TYPE_DIGEST,	/* use digest() */
+ };
+ 
++/*
++ * Whether the crypto operation will occur in-place, and if so whether the
++ * source and destination scatterlist pointers will coincide (req->src ==
++ * req->dst), or whether they'll merely point to two separate scatterlists
++ * (req->src != req->dst) that reference the same underlying memory.
++ *
++ * This is only relevant for algorithm types that support in-place operation.
++ */
++enum inplace_mode {
++	OUT_OF_PLACE,
++	INPLACE_ONE_SGLIST,
++	INPLACE_TWO_SGLISTS,
++};
++
+ #define TEST_SG_TOTAL	10000
+ 
+ /**
+@@ -265,7 +279,7 @@ struct test_sg_division {
+  * crypto test vector can be tested.
+  *
+  * @name: name of this config, logged for debugging purposes if a test fails
+- * @inplace: operate on the data in-place, if applicable for the algorithm type?
++ * @inplace_mode: whether and how to operate on the data in-place, if applicable
+  * @req_flags: extra request_flags, e.g. CRYPTO_TFM_REQ_MAY_SLEEP
+  * @src_divs: description of how to arrange the source scatterlist
+  * @dst_divs: description of how to arrange the dst scatterlist, if applicable
+@@ -282,7 +296,7 @@ struct test_sg_division {
+  */
+ struct testvec_config {
+ 	const char *name;
+-	bool inplace;
++	enum inplace_mode inplace_mode;
+ 	u32 req_flags;
+ 	struct test_sg_division src_divs[XBUFSIZE];
+ 	struct test_sg_division dst_divs[XBUFSIZE];
+@@ -307,11 +321,16 @@ struct testvec_config {
+ /* Configs for skciphers and aeads */
+ static const struct testvec_config default_cipher_testvec_configs[] = {
+ 	{
+-		.name = "in-place",
+-		.inplace = true,
++		.name = "in-place (one sglist)",
++		.inplace_mode = INPLACE_ONE_SGLIST,
++		.src_divs = { { .proportion_of_total = 10000 } },
++	}, {
++		.name = "in-place (two sglists)",
++		.inplace_mode = INPLACE_TWO_SGLISTS,
+ 		.src_divs = { { .proportion_of_total = 10000 } },
+ 	}, {
+ 		.name = "out-of-place",
++		.inplace_mode = OUT_OF_PLACE,
+ 		.src_divs = { { .proportion_of_total = 10000 } },
+ 	}, {
+ 		.name = "unaligned buffer, offset=1",
+@@ -349,7 +368,7 @@ static const struct testvec_config default_cipher_testvec_configs[] = {
+ 		.key_offset = 3,
+ 	}, {
+ 		.name = "misaligned splits crossing pages, inplace",
+-		.inplace = true,
++		.inplace_mode = INPLACE_ONE_SGLIST,
+ 		.src_divs = {
+ 			{
+ 				.proportion_of_total = 7500,
+@@ -749,18 +768,39 @@ static int build_cipher_test_sglists(struct cipher_test_sglists *tsgls,
+ 
+ 	iov_iter_kvec(&input, WRITE, inputs, nr_inputs, src_total_len);
+ 	err = build_test_sglist(&tsgls->src, cfg->src_divs, alignmask,
+-				cfg->inplace ?
++				cfg->inplace_mode != OUT_OF_PLACE ?
+ 					max(dst_total_len, src_total_len) :
+ 					src_total_len,
+ 				&input, NULL);
+ 	if (err)
+ 		return err;
+ 
+-	if (cfg->inplace) {
++	/*
++	 * In-place crypto operations can use the same scatterlist for both the
++	 * source and destination (req->src == req->dst), or can use separate
++	 * scatterlists (req->src != req->dst) which point to the same
++	 * underlying memory.  Make sure to test both cases.
++	 */
++	if (cfg->inplace_mode == INPLACE_ONE_SGLIST) {
+ 		tsgls->dst.sgl_ptr = tsgls->src.sgl;
+ 		tsgls->dst.nents = tsgls->src.nents;
+ 		return 0;
+ 	}
++	if (cfg->inplace_mode == INPLACE_TWO_SGLISTS) {
++		/*
++		 * For now we keep it simple and only test the case where the
++		 * two scatterlists have identical entries, rather than
++		 * different entries that split up the same memory differently.
++		 */
++		memcpy(tsgls->dst.sgl, tsgls->src.sgl,
++		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
++		memcpy(tsgls->dst.sgl_saved, tsgls->src.sgl,
++		       tsgls->src.nents * sizeof(tsgls->src.sgl[0]));
++		tsgls->dst.sgl_ptr = tsgls->dst.sgl;
++		tsgls->dst.nents = tsgls->src.nents;
++		return 0;
++	}
++	/* Out of place */
+ 	return build_test_sglist(&tsgls->dst,
+ 				 cfg->dst_divs[0].proportion_of_total ?
+ 					cfg->dst_divs : cfg->src_divs,
+@@ -995,9 +1035,19 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 
+ 	p += scnprintf(p, end - p, "random:");
+ 
+-	if (prandom_u32() % 2 == 0) {
+-		cfg->inplace = true;
+-		p += scnprintf(p, end - p, " inplace");
++	switch (prandom_u32() % 4) {
++	case 0:
++	case 1:
++		cfg->inplace_mode = OUT_OF_PLACE;
++		break;
++	case 2:
++		cfg->inplace_mode = INPLACE_ONE_SGLIST;
++		p += scnprintf(p, end - p, " inplace_one_sglist");
++		break;
++	default:
++		cfg->inplace_mode = INPLACE_TWO_SGLISTS;
++		p += scnprintf(p, end - p, " inplace_two_sglists");
++		break;
+ 	}
+ 
+ 	if (prandom_u32() % 2 == 0) {
+@@ -1034,7 +1084,7 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 					  cfg->req_flags);
+ 	p += scnprintf(p, end - p, "]");
+ 
+-	if (!cfg->inplace && prandom_u32() % 2 == 0) {
++	if (cfg->inplace_mode == OUT_OF_PLACE && prandom_u32() % 2 == 0) {
+ 		p += scnprintf(p, end - p, " dst_divs=[");
+ 		p = generate_random_sgl_divisions(cfg->dst_divs,
+ 						  ARRAY_SIZE(cfg->dst_divs),
+@@ -2085,7 +2135,8 @@ static int test_aead_vec_cfg(int enc, const struct aead_testvec *vec,
+ 	/* Check for the correct output (ciphertext or plaintext) */
+ 	err = verify_correct_output(&tsgls->dst, enc ? vec->ctext : vec->ptext,
+ 				    enc ? vec->clen : vec->plen,
+-				    vec->alen, enc || !cfg->inplace);
++				    vec->alen,
++				    enc || cfg->inplace_mode == OUT_OF_PLACE);
+ 	if (err == -EOVERFLOW) {
+ 		pr_err("alg: aead: %s %s overran dst buffer on test vector %s, cfg=\"%s\"\n",
+ 		       driver, op, vec_name, cfg->name);
+
+base-commit: 46f538bf2404ee9c32648deafb886f49144bfd5e
+-- 
+2.35.1
+
