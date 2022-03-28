@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81301C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 11:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FC9C4167B
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 11:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240680AbiC1LVn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57190 "EHLO
+        id S240944AbiC1LYh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240731AbiC1LV3 (ORCPT
+        with ESMTP id S241177AbiC1LXV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:21:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842AF56224;
-        Mon, 28 Mar 2022 04:18:57 -0700 (PDT)
+        Mon, 28 Mar 2022 07:23:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 822AB583A5;
+        Mon, 28 Mar 2022 04:20:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0F415B8104D;
-        Mon, 28 Mar 2022 11:18:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E707FC340ED;
-        Mon, 28 Mar 2022 11:18:53 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ED48EB8105A;
+        Mon, 28 Mar 2022 11:20:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44C1C340EC;
+        Mon, 28 Mar 2022 11:20:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466334;
-        bh=KL2U+DdtwFetDLdywa1BvKB0ub14yiL29O6JG2SZpkM=;
+        s=k20201202; t=1648466417;
+        bh=jMXBVNqKNtY5SwQApfQIem+dk90jTHentgzLuqf7CW0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QB+LqtuXiIejX/CPG2WgoNxeB699oEp1GwEVqFJSElnSW+ZHjmz1Bp3b5bl2l6HA+
-         TwsrdBSz6zZvw+XJN7wYfVquVCA/6/C6zYflTXq4QjkfQ06pp3eWU43g84CYhOyG6V
-         GsMSBknwaycnQ5nAtC7RbMweCJDzynt3orki07v90mB8k6lyQaPc/zOwww23dwIEUr
-         mDfQBUqLmbSai9+wfSCkRIVeAKgGs+mJi96NwFJpgffC3tdzmju+F/cpL6g3x9o48I
-         RRD+vxfRH66hS39cOAsZEtoo6IQRM/k97MRhCOTHersAp1/pI09XbdBsA2ZJxee367
-         GWtVk2/MaC7DA==
+        b=ViHqhpTXkj0Ihbm11xWEq2SibJ0oX7aJWNsgHD+DOaP+a51ExlgXWWpve+39ir6Tc
+         URqKgjTo9SvMHqLti72+2OgmawPC6rZ3y9yCBEmT/rSzwXTXvHyUEzSqTUxFSU9z8j
+         vXX8GQDHixfEnf+uTJsgOuxELKWfsGFMAvSWmzcbvtX/ohnaqqP9J86WUzyuOvlJNX
+         Wq6iQSt21Hckk7BMd5kiXARZmgPSzrhmLVL0GBBAIS1OntW2glrDAnbGjyXrT4/BLK
+         CfByuc3rWPHf41v/mcN0Rl9ecqy/+VRr/Hll1ZqvnZiyyG71J85xnIJxFXf93+9CWF
+         Vg7VUUkGowLGg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Kai Ye <yekai13@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, liulongfang@huawei.com,
+        Sasha Levin <sashal@kernel.org>, wangzhou1@hisilicon.com,
         davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 13/43] crypto: hisilicon/sec - not need to enable sm4 extra mode at HW V3
-Date:   Mon, 28 Mar 2022 07:17:57 -0400
-Message-Id: <20220328111828.1554086-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.16 03/35] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
+Date:   Mon, 28 Mar 2022 07:19:39 -0400
+Message-Id: <20220328112011.1555169-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328111828.1554086-1-sashal@kernel.org>
-References: <20220328111828.1554086-1-sashal@kernel.org>
+In-Reply-To: <20220328112011.1555169-1-sashal@kernel.org>
+References: <20220328112011.1555169-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,36 +54,32 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Kai Ye <yekai13@huawei.com>
 
-[ Upstream commit f8a2652826444d13181061840b96a5d975d5b6c6 ]
+[ Upstream commit 05b3bade290d6c940701f97f3233c07cfe27205d ]
 
-It is not need to enable sm4 extra mode in at HW V3. Here is fix it.
+The kernel test rebot report this warning: Uninitialized variable: ret.
+The code flow may return value of ret directly. This value is an
+uninitialized variable, here is fix it.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec_main.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 26d3ab1d308b..89d4cc767d36 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -443,9 +443,11 @@ static int sec_engine_init(struct hisi_qm *qm)
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 1dc6a27ba0e0..82d2b117e162 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -4145,7 +4145,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm, u32 fun_num)
+ static int qm_vf_read_qos(struct hisi_qm *qm)
+ {
+ 	int cnt = 0;
+-	int ret;
++	int ret = -EINVAL;
  
- 	writel(SEC_SAA_ENABLE, qm->io_base + SEC_SAA_EN_REG);
- 
--	/* Enable sm4 extra mode, as ctr/ecb */
--	writel_relaxed(SEC_BD_ERR_CHK_EN0,
--		       qm->io_base + SEC_BD_ERR_CHK_EN_REG0);
-+	/* HW V2 enable sm4 extra mode, as ctr/ecb */
-+	if (qm->ver < QM_HW_V3)
-+		writel_relaxed(SEC_BD_ERR_CHK_EN0,
-+			       qm->io_base + SEC_BD_ERR_CHK_EN_REG0);
-+
- 	/* Enable sm4 xts mode multiple iv */
- 	writel_relaxed(SEC_BD_ERR_CHK_EN1,
- 		       qm->io_base + SEC_BD_ERR_CHK_EN_REG1);
+ 	/* reset mailbox qos val */
+ 	qm->mb_qos = 0;
 -- 
 2.34.1
 
