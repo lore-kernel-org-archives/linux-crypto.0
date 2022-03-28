@@ -2,95 +2,313 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93ABCC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 12:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06801C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 13:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242658AbiC1Mxf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Mar 2022 08:53:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36084 "EHLO
+        id S242098AbiC1NJZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Mar 2022 09:09:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242688AbiC1Mxd (ORCPT
+        with ESMTP id S242991AbiC1NJT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Mar 2022 08:53:33 -0400
-Received: from mail.thepaulodoom.com (www.thepaulodoom.com [45.77.108.202])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BFB3C5D19F;
-        Mon, 28 Mar 2022 05:51:43 -0700 (PDT)
-Received: from hp-amd-paul (c-98-240-189-147.hsd1.mn.comcast.net [98.240.189.147])
-        by vultr.guest (OpenSMTPD) with ESMTPSA id 6629f991 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 28 Mar 2022 12:51:41 +0000 (UTC)
-Date:   Mon, 28 Mar 2022 07:51:37 -0500
-From:   Paul Lemmermann <thepaulodoom@thepaulodoom.com>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: aes_generic: fixed styling warnings
-Message-ID: <20220328125137.bsbvroyxcjw6rl5m@hp-amd-paul>
-References: <20220326172051.14722-1-thepaulodoom@thepaulodoom.com>
- <CAMj1kXEQtTAMPLTtgc=9sDYvgxs+oihfnY7Q6bggC0p5u-V1Hw@mail.gmail.com>
- <20220327224009.2jotnczk67j4cfh2@hp-amd-paul>
- <CAMj1kXHCR1nD24WDnYpD4Nu23x9+hw+=7EXOpq7y7m9LDk2J0w@mail.gmail.com>
+        Mon, 28 Mar 2022 09:09:19 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB345E76B;
+        Mon, 28 Mar 2022 06:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648472848; x=1680008848;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FqfsiE3snWKbR3m9c7+ouyCSPmgoFSul4+2Q+s6NlrA=;
+  b=P5Zsj1U2Mbh/7Z+TePlXeJKs1+L8fMLAnLP6D+nrX2xpWb17KjFuKs8a
+   XBUPLiXeMC4ZxN3mXfuqNijshaOCuD6p1kc/d3sfy016lGBLIaHVzgjVl
+   L/dbV8tCjosIpztzr0klm9hTEX/E8Mqe+oPiD0gnOsfo6IW3T/TexDGTe
+   DKYRIKhMQhqiLbm2LY+lOQks2djD6BUKm338xquWoZdxmqegroTq7Fo2U
+   HhrTna3Sb1TdSpsntU2+G0K7TyZCXAkiNn3XDgy4DaBTAUPgwOD9vLYwW
+   ULbPXZ63+0+E5wdby2AkOb9/+bqa+ovG/pqjqG0v60xYO+FV4E5hALa5L
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10299"; a="259178992"
+X-IronPort-AV: E=Sophos;i="5.90,217,1643702400"; 
+   d="scan'208";a="259178992"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2022 06:07:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,217,1643702400"; 
+   d="scan'208";a="563641096"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga008.jf.intel.com with ESMTP; 28 Mar 2022 06:07:24 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        stable@vger.kernel.org, Mikulas Patocka <mpatocka@redhat.com>,
+        Marco Chiappero <marco.chiappero@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: [PATCH 1/4] crypto: qat - use pre-allocated buffers in datapath
+Date:   Mon, 28 Mar 2022 14:07:11 +0100
+Message-Id: <20220328130714.31606-2-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220328130714.31606-1-giovanni.cabiddu@intel.com>
+References: <20220328130714.31606-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXHCR1nD24WDnYpD4Nu23x9+hw+=7EXOpq7y7m9LDk2J0w@mail.gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 28, 2022 at 09:39:14AM +0200, Ard Biesheuvel wrote:
-> (please keep the cc's)
-> 
-> On Mon, 28 Mar 2022 at 00:46, Paul Lemmermann
-> <thepaulodoom@thepaulodoom.com> wrote:
-> >
-> > On Sun, Mar 27, 2022 at 01:41:19PM +0200, Ard Biesheuvel wrote:
-> > > On Sat, 26 Mar 2022 at 18:48, Paul Lemmermann
-> > > <thepaulodoom@thepaulodoom.com> wrote:
-> > > >
-> > > > Fixed all styling warnings from the checkpatch.pl script.
-> > > >
-> > > > Signed-off-by: Paul Lemmermann <thepaulodoom@thepaulodoom.com>
-> > >
-> > > Did you test this code after 'fixing' it?
-> > >
-> > No, I did not. Now that I scrutinized it a bit more, I realized the
-> > kernel coding conventions. Sorry about that, this is my first patch.
-> 
-> In that case, welcome!
-> 
-> This is not about coding conventions. This is about correctness.
-> 
-> For instance,
-> 
-> > > >
-> > > > -#define f_nround(bo, bi, k)    do {\
-> > > > +#define f_nround(bo, bi, k)    while (0) {\
-> > > >         f_rn(bo, bi, 0, k);     \
-> > > >         f_rn(bo, bi, 1, k);     \
-> > > >         f_rn(bo, bi, 2, k);     \
-> > > >         f_rn(bo, bi, 3, k);     \
-> > > >         k += 4;                 \
-> > > > -} while (0)
-> > > > +}
-> > > >
-> 
-> Why are you making this change, and why do you think it produces the
-> same result?
-> 
-> > Can you remove everything in the patch past the section with line
-> > 1144, or do I have to resubit the patch?
-> >
-> 
-> checkpatch.pl is a useful tool for finding style issues, but please
-> use it with care. And changing decades old code just to fix issues
-> reported by checkpatch.pl is really just pointless churn.
-> 
-> So let's just drop this patch altogether, shall we? If you're
-> interested in helping out, please have a look at the staging/ tree -
-> there is a lot of code there that needs cleaning up.
-> 
-Yes, we can drop the patch. Thank you so much for your help and support.
-Looking forward to contributing more to the Linux kernel.
+In order to do DMAs, the QAT device requires that scatterlists are
+mapped and translated in a format that the firmware can understand. This
+is defined as the composition of an sgl descriptor header, the struct
+qat_alg_buf_list, plus a variable number of flat buffer descriptors,
+the struct qat_alg_buf.
 
-Thanks,
-Paul
+The allocation and mapping of these data structures is done each time a
+request is received from the skcipher and aead APIs.
+In an OOM situation, this behaviour might lead to a dead-lock as
+allocations might fail.
+
+Based on the conversation in [1], increase the size of the aead and
+skcipher request contexts to include an SGL descriptor that can handle
+maximum 4 flat buffers.
+If requests exceed 4 entries buffers, memory is allocated dynamically.
+
+In addition, remove the CRYPTO_ALG_ALLOCATES_MEMORY flag from both aead
+and skcipher alg structures.
+
+[1] https://lore.kernel.org/linux-crypto/20200722072932.GA27544@gondor.apana.org.au/
+
+Cc: stable@vger.kernel.org
+Fixes: d370cec32194 ("crypto: qat - Intel(R) QAT crypto interface")
+Reported-by: Mikulas Patocka <mpatocka@redhat.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
+Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_algs.c   | 77 ++++++++++++----------
+ drivers/crypto/qat/qat_common/qat_crypto.h | 24 +++++++
+ 2 files changed, 67 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+index f998ed58457c..b9228f3a26de 100644
+--- a/drivers/crypto/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_algs.c
+@@ -46,19 +46,6 @@
+ static DEFINE_MUTEX(algs_lock);
+ static unsigned int active_devs;
+ 
+-struct qat_alg_buf {
+-	u32 len;
+-	u32 resrvd;
+-	u64 addr;
+-} __packed;
+-
+-struct qat_alg_buf_list {
+-	u64 resrvd;
+-	u32 num_bufs;
+-	u32 num_mapped_bufs;
+-	struct qat_alg_buf bufers[];
+-} __packed __aligned(64);
+-
+ /* Common content descriptor */
+ struct qat_alg_cd {
+ 	union {
+@@ -693,7 +680,10 @@ static void qat_alg_free_bufl(struct qat_crypto_instance *inst,
+ 				 bl->bufers[i].len, DMA_BIDIRECTIONAL);
+ 
+ 	dma_unmap_single(dev, blp, sz, DMA_TO_DEVICE);
+-	kfree(bl);
++
++	if (!qat_req->buf.sgl_src_valid)
++		kfree(bl);
++
+ 	if (blp != blpout) {
+ 		/* If out of place operation dma unmap only data */
+ 		int bufless = blout->num_bufs - blout->num_mapped_bufs;
+@@ -704,7 +694,9 @@ static void qat_alg_free_bufl(struct qat_crypto_instance *inst,
+ 					 DMA_BIDIRECTIONAL);
+ 		}
+ 		dma_unmap_single(dev, blpout, sz_out, DMA_TO_DEVICE);
+-		kfree(blout);
++
++		if (!qat_req->buf.sgl_dst_valid)
++			kfree(blout);
+ 	}
+ }
+ 
+@@ -721,15 +713,24 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 	dma_addr_t blp = DMA_MAPPING_ERROR;
+ 	dma_addr_t bloutp = DMA_MAPPING_ERROR;
+ 	struct scatterlist *sg;
+-	size_t sz_out, sz = struct_size(bufl, bufers, n + 1);
++	size_t sz_out, sz = struct_size(bufl, bufers, n);
++	int node = dev_to_node(&GET_DEV(inst->accel_dev));
+ 
+ 	if (unlikely(!n))
+ 		return -EINVAL;
+ 
+-	bufl = kzalloc_node(sz, GFP_ATOMIC,
+-			    dev_to_node(&GET_DEV(inst->accel_dev)));
+-	if (unlikely(!bufl))
+-		return -ENOMEM;
++	qat_req->buf.sgl_src_valid = false;
++	qat_req->buf.sgl_dst_valid = false;
++
++	if (n > QAT_MAX_BUFF_DESC) {
++		bufl = kzalloc_node(sz, GFP_ATOMIC, node);
++		if (unlikely(!bufl))
++			return -ENOMEM;
++	} else {
++		bufl = &qat_req->buf.sgl_src.sgl_hdr;
++		memset(bufl, 0, sizeof(struct qat_alg_buf_list));
++		qat_req->buf.sgl_src_valid = true;
++	}
+ 
+ 	for_each_sg(sgl, sg, n, i)
+ 		bufl->bufers[i].addr = DMA_MAPPING_ERROR;
+@@ -760,12 +761,18 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 		struct qat_alg_buf *bufers;
+ 
+ 		n = sg_nents(sglout);
+-		sz_out = struct_size(buflout, bufers, n + 1);
++		sz_out = struct_size(buflout, bufers, n);
+ 		sg_nctr = 0;
+-		buflout = kzalloc_node(sz_out, GFP_ATOMIC,
+-				       dev_to_node(&GET_DEV(inst->accel_dev)));
+-		if (unlikely(!buflout))
+-			goto err_in;
++
++		if (n > QAT_MAX_BUFF_DESC) {
++			buflout = kzalloc_node(sz_out, GFP_ATOMIC, node);
++			if (unlikely(!buflout))
++				goto err_in;
++		} else {
++			buflout = &qat_req->buf.sgl_dst.sgl_hdr;
++			memset(buflout, 0, sizeof(struct qat_alg_buf_list));
++			qat_req->buf.sgl_dst_valid = true;
++		}
+ 
+ 		bufers = buflout->bufers;
+ 		for_each_sg(sglout, sg, n, i)
+@@ -810,7 +817,9 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 			dma_unmap_single(dev, buflout->bufers[i].addr,
+ 					 buflout->bufers[i].len,
+ 					 DMA_BIDIRECTIONAL);
+-	kfree(buflout);
++
++	if (!qat_req->buf.sgl_dst_valid)
++		kfree(buflout);
+ 
+ err_in:
+ 	if (!dma_mapping_error(dev, blp))
+@@ -823,7 +832,8 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
+ 					 bufl->bufers[i].len,
+ 					 DMA_BIDIRECTIONAL);
+ 
+-	kfree(bufl);
++	if (!qat_req->buf.sgl_src_valid)
++		kfree(bufl);
+ 
+ 	dev_err(dev, "Failed to map buf for dma\n");
+ 	return -ENOMEM;
+@@ -1434,7 +1444,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha1),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha1",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1451,7 +1461,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha256),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha256",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1468,7 +1478,7 @@ static struct aead_alg qat_aeads[] = { {
+ 		.cra_name = "authenc(hmac(sha512),cbc(aes))",
+ 		.cra_driver_name = "qat_aes_cbc_hmac_sha512",
+ 		.cra_priority = 4001,
+-		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
++		.cra_flags = CRYPTO_ALG_ASYNC,
+ 		.cra_blocksize = AES_BLOCK_SIZE,
+ 		.cra_ctxsize = sizeof(struct qat_alg_aead_ctx),
+ 		.cra_module = THIS_MODULE,
+@@ -1486,7 +1496,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "cbc(aes)",
+ 	.base.cra_driver_name = "qat_aes_cbc",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
++	.base.cra_flags = CRYPTO_ALG_ASYNC,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+@@ -1504,7 +1514,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "ctr(aes)",
+ 	.base.cra_driver_name = "qat_aes_ctr",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY,
++	.base.cra_flags = CRYPTO_ALG_ASYNC,
+ 	.base.cra_blocksize = 1,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+@@ -1522,8 +1532,7 @@ static struct skcipher_alg qat_skciphers[] = { {
+ 	.base.cra_name = "xts(aes)",
+ 	.base.cra_driver_name = "qat_aes_xts",
+ 	.base.cra_priority = 4001,
+-	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK |
+-			  CRYPTO_ALG_ALLOCATES_MEMORY,
++	.base.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
+ 	.base.cra_blocksize = AES_BLOCK_SIZE,
+ 	.base.cra_ctxsize = sizeof(struct qat_alg_skcipher_ctx),
+ 	.base.cra_alignmask = 0,
+diff --git a/drivers/crypto/qat/qat_common/qat_crypto.h b/drivers/crypto/qat/qat_common/qat_crypto.h
+index b6a4c95ae003..0928f159ea99 100644
+--- a/drivers/crypto/qat/qat_common/qat_crypto.h
++++ b/drivers/crypto/qat/qat_common/qat_crypto.h
+@@ -21,6 +21,26 @@ struct qat_crypto_instance {
+ 	atomic_t refctr;
+ };
+ 
++#define QAT_MAX_BUFF_DESC	4
++
++struct qat_alg_buf {
++	u32 len;
++	u32 resrvd;
++	u64 addr;
++} __packed;
++
++struct qat_alg_buf_list {
++	u64 resrvd;
++	u32 num_bufs;
++	u32 num_mapped_bufs;
++	struct qat_alg_buf bufers[];
++} __packed;
++
++struct qat_alg_fixed_buf_list {
++	struct qat_alg_buf_list sgl_hdr;
++	struct qat_alg_buf descriptors[QAT_MAX_BUFF_DESC];
++} __packed __aligned(64);
++
+ struct qat_crypto_request_buffs {
+ 	struct qat_alg_buf_list *bl;
+ 	dma_addr_t blp;
+@@ -28,6 +48,10 @@ struct qat_crypto_request_buffs {
+ 	dma_addr_t bloutp;
+ 	size_t sz;
+ 	size_t sz_out;
++	bool sgl_src_valid;
++	bool sgl_dst_valid;
++	struct qat_alg_fixed_buf_list sgl_src;
++	struct qat_alg_fixed_buf_list sgl_dst;
+ };
+ 
+ struct qat_crypto_request;
+-- 
+2.35.1
+
