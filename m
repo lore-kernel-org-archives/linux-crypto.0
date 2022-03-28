@@ -2,51 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 611EAC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Mar 2022 11:41:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69436C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 07:39:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229967AbiC0LnL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Mar 2022 07:43:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52656 "EHLO
+        id S234976AbiC1HlM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Mar 2022 03:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbiC0LnL (ORCPT
+        with ESMTP id S238875AbiC1HlK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Mar 2022 07:43:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF28A473B4;
-        Sun, 27 Mar 2022 04:41:32 -0700 (PDT)
+        Mon, 28 Mar 2022 03:41:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2822B52E1C;
+        Mon, 28 Mar 2022 00:39:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 796F060FCC;
-        Sun, 27 Mar 2022 11:41:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB47DC36AE2;
-        Sun, 27 Mar 2022 11:41:31 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D3428B80E67;
+        Mon, 28 Mar 2022 07:39:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51D28C34100;
+        Mon, 28 Mar 2022 07:39:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648381291;
-        bh=t6VoOcLomeFANprad8EaurUJN8+EeVJVkUX7A97oYUI=;
+        s=k20201202; t=1648453166;
+        bh=Y3D0Y07G0RU3hYpbOKQsQlIhpGXe9fEsIt2tSvoMROQ=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=vAuaW8qdbt32Sps3YQjCuRzvyZxR3J30RLTO9MZ6RhZ/reUJOKaULrD0/8011qhOt
-         ntipwcBsejX64J4OdPXCT+xnfjS8hZwrbusKemmIfqDCct0KWjg4GJIwF15Fm8NMwO
-         zuik+C9EkdKfNM+Wl+mgMtylMmQuCh7z3ch7MD8XIcE8ig46uUu1UPBSVIAp3mr0DZ
-         ZgsVL73x3GzcVsojpVVFCJPg/4QwY8WaZvLe6OWQBzzkxR6piTE9PluVuYXwZbKihd
-         g1aopNABXZsrs1XPBhQfhacNc3QY4EyFAe/+i5ZBFMDCd6A1XXBBBUQC+/KwBpgJjo
-         o8NlU2kC02w7Q==
-Received: by mail-ot1-f42.google.com with SMTP id a7-20020a9d5c87000000b005ad1467cb59so8864482oti.5;
-        Sun, 27 Mar 2022 04:41:31 -0700 (PDT)
-X-Gm-Message-State: AOAM533wEd57HtjhizLo78Paiu1qejrzDDEZkFcPFVCVBj7CH0lo1ehD
-        RNlygsaqO5frEqlX+KcK4iO5lZ3q2iJefrWMvY4=
-X-Google-Smtp-Source: ABdhPJwbFzNiF8UXyMQB0oPJA8iaxP5kyH9o9CKgVspvtL2guF9j+aorv/84jG2eXsbuXsiyhz/DR2or3jw3VcaJxzg=
+        b=sszPDGSg+zPRYwRHrekax9kkwFh7EIknbfoPAkDT5rE0ezdFWguwVHLUF4FTNLbUp
+         aqhNQOrNivckgEQA/LTuF64CchTZoa/ZhCYM90v3FOkqaaqHx9KTC6LJUVRhorOGU9
+         i8Tzq4Vns59glvv7UQVg7LUTVCi713NhBGWcFv12cDTWAd4W+yqkU5t/RBPBe2wCaM
+         fuz0pLa69M/OfccqsH1YiFxxglPbOI7vxp0bPViEGIrh9PCm1UPowsUaTi1Vl3knPR
+         jygLaKKjBy+jUdSXOzZsQqpRMsdl99AGyFl0GEjP3Spw7ngso54Fr2A8q5SMoz1nVv
+         z/fvulXQaFVZw==
+Received: by mail-ot1-f52.google.com with SMTP id i11-20020a9d4a8b000000b005cda3b9754aso10121001otf.12;
+        Mon, 28 Mar 2022 00:39:26 -0700 (PDT)
+X-Gm-Message-State: AOAM531oPd6PEqGRDDs1Ne5t59kx6y6VrnAKdkgH0ZmhHUsBVozPGzja
+        wWlWqRfPcuxzLSyPFZlUwoprkKLLcNFCczz69+A=
+X-Google-Smtp-Source: ABdhPJzn1zIPrYjl5hE8jh+EbsIGMCPB+U0fNhCYfMpIJclzXpSeC2ympvLgAsQF0DbLd/W/NtHGF3vMBf2Cv0M/qR0=
 X-Received: by 2002:a05:6830:1e9c:b0:5cd:8c15:5799 with SMTP id
- n28-20020a0568301e9c00b005cd8c155799mr7946760otr.265.1648381290883; Sun, 27
- Mar 2022 04:41:30 -0700 (PDT)
+ n28-20020a0568301e9c00b005cd8c155799mr9420603otr.265.1648453165431; Mon, 28
+ Mar 2022 00:39:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220326172051.14722-1-thepaulodoom@thepaulodoom.com>
-In-Reply-To: <20220326172051.14722-1-thepaulodoom@thepaulodoom.com>
+ <CAMj1kXEQtTAMPLTtgc=9sDYvgxs+oihfnY7Q6bggC0p5u-V1Hw@mail.gmail.com> <20220327224009.2jotnczk67j4cfh2@hp-amd-paul>
+In-Reply-To: <20220327224009.2jotnczk67j4cfh2@hp-amd-paul>
 From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sun, 27 Mar 2022 13:41:19 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEQtTAMPLTtgc=9sDYvgxs+oihfnY7Q6bggC0p5u-V1Hw@mail.gmail.com>
-Message-ID: <CAMj1kXEQtTAMPLTtgc=9sDYvgxs+oihfnY7Q6bggC0p5u-V1Hw@mail.gmail.com>
+Date:   Mon, 28 Mar 2022 09:39:14 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHCR1nD24WDnYpD4Nu23x9+hw+=7EXOpq7y7m9LDk2J0w@mail.gmail.com>
+Message-ID: <CAMj1kXHCR1nD24WDnYpD4Nu23x9+hw+=7EXOpq7y7m9LDk2J0w@mail.gmail.com>
 Subject: Re: [PATCH] crypto: aes_generic: fixed styling warnings
 To:     Paul Lemmermann <thepaulodoom@thepaulodoom.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -57,144 +58,56 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 26 Mar 2022 at 18:48, Paul Lemmermann
+(please keep the cc's)
+
+On Mon, 28 Mar 2022 at 00:46, Paul Lemmermann
 <thepaulodoom@thepaulodoom.com> wrote:
 >
-> Fixed all styling warnings from the checkpatch.pl script.
->
-> Signed-off-by: Paul Lemmermann <thepaulodoom@thepaulodoom.com>
+> On Sun, Mar 27, 2022 at 01:41:19PM +0200, Ard Biesheuvel wrote:
+> > On Sat, 26 Mar 2022 at 18:48, Paul Lemmermann
+> > <thepaulodoom@thepaulodoom.com> wrote:
+> > >
+> > > Fixed all styling warnings from the checkpatch.pl script.
+> > >
+> > > Signed-off-by: Paul Lemmermann <thepaulodoom@thepaulodoom.com>
+> >
+> > Did you test this code after 'fixing' it?
+> >
+> No, I did not. Now that I scrutinized it a bit more, I realized the
+> kernel coding conventions. Sorry about that, this is my first patch.
 
-Did you test this code after 'fixing' it?
+In that case, welcome!
 
-> ---
->  crypto/aes_generic.c | 35 ++++++++++++++++++-----------------
->  1 file changed, 18 insertions(+), 17 deletions(-)
+This is not about coding conventions. This is about correctness.
+
+For instance,
+
+> > >
+> > > -#define f_nround(bo, bi, k)    do {\
+> > > +#define f_nround(bo, bi, k)    while (0) {\
+> > >         f_rn(bo, bi, 0, k);     \
+> > >         f_rn(bo, bi, 1, k);     \
+> > >         f_rn(bo, bi, 2, k);     \
+> > >         f_rn(bo, bi, 3, k);     \
+> > >         k += 4;                 \
+> > > -} while (0)
+> > > +}
+> > >
+
+Why are you making this change, and why do you think it produces the
+same result?
+
+> Can you remove everything in the patch past the section with line
+> 1144, or do I have to resubit the patch?
 >
-> diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-> index 27ab27931..322e345ac 100644
-> --- a/crypto/aes_generic.c
-> +++ b/crypto/aes_generic.c
-> @@ -1,3 +1,4 @@
-> +// SPDX-License-Identifier: GPL-2.0+
->  /*
->   * Cryptographic API.
->   *
-> @@ -56,7 +57,7 @@
->  #include <asm/byteorder.h>
->  #include <asm/unaligned.h>
->
-> -static inline u8 byte(const u32 x, const unsigned n)
-> +static inline u8 byte(const u32 x, const unsigned int n)
->  {
->         return x >> (n << 3);
->  }
-> @@ -325,6 +326,7 @@ __visible const u32 crypto_ft_tab[4][256] ____cacheline_aligned = {
->                 0x7bcbb0b0, 0xa8fc5454, 0x6dd6bbbb, 0x2c3a1616,
->         }
->  };
-> +EXPORT_SYMBOL_GPL(crypto_ft_tab);
->
->  static const u32 crypto_fl_tab[4][256] ____cacheline_aligned = {
->         {
-> @@ -853,6 +855,7 @@ __visible const u32 crypto_it_tab[4][256] ____cacheline_aligned = {
->                 0x7b6184cb, 0xd570b632, 0x48745c6c, 0xd04257b8,
->         }
->  };
-> +EXPORT_SYMBOL_GPL(crypto_it_tab);
->
->  static const u32 crypto_il_tab[4][256] ____cacheline_aligned = {
->         {
-> @@ -1118,8 +1121,6 @@ static const u32 crypto_il_tab[4][256] ____cacheline_aligned = {
->         }
->  };
->
-> -EXPORT_SYMBOL_GPL(crypto_ft_tab);
-> -EXPORT_SYMBOL_GPL(crypto_it_tab);
->
->  /**
->   * crypto_aes_set_key - Set the AES key.
-> @@ -1144,34 +1145,34 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
->
->  /* encrypt a block of text */
->
-> -#define f_rn(bo, bi, n, k)     do {                            \
-> +#define f_rn(bo, bi, n, k)     while (0) {                             \
->         bo[n] = crypto_ft_tab[0][byte(bi[n], 0)] ^                      \
->                 crypto_ft_tab[1][byte(bi[(n + 1) & 3], 1)] ^            \
->                 crypto_ft_tab[2][byte(bi[(n + 2) & 3], 2)] ^            \
->                 crypto_ft_tab[3][byte(bi[(n + 3) & 3], 3)] ^ *(k + n);  \
-> -} while (0)
-> +}
->
-> -#define f_nround(bo, bi, k)    do {\
-> +#define f_nround(bo, bi, k)    while (0) {\
->         f_rn(bo, bi, 0, k);     \
->         f_rn(bo, bi, 1, k);     \
->         f_rn(bo, bi, 2, k);     \
->         f_rn(bo, bi, 3, k);     \
->         k += 4;                 \
-> -} while (0)
-> +}
->
-> -#define f_rl(bo, bi, n, k)     do {                            \
-> +#define f_rl(bo, bi, n, k)     while (0) {                             \
->         bo[n] = crypto_fl_tab[0][byte(bi[n], 0)] ^                      \
->                 crypto_fl_tab[1][byte(bi[(n + 1) & 3], 1)] ^            \
->                 crypto_fl_tab[2][byte(bi[(n + 2) & 3], 2)] ^            \
->                 crypto_fl_tab[3][byte(bi[(n + 3) & 3], 3)] ^ *(k + n);  \
-> -} while (0)
-> +}
->
-> -#define f_lround(bo, bi, k)    do {\
-> +#define f_lround(bo, bi, k)    while (0) {\
->         f_rl(bo, bi, 0, k);     \
->         f_rl(bo, bi, 1, k);     \
->         f_rl(bo, bi, 2, k);     \
->         f_rl(bo, bi, 3, k);     \
-> -} while (0)
-> +}
->
->  static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
-> @@ -1214,12 +1215,12 @@ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->
->  /* decrypt a block of text */
->
-> -#define i_rn(bo, bi, n, k)     do {                            \
-> +#define i_rn(bo, bi, n, k)     while (0) {                             \
->         bo[n] = crypto_it_tab[0][byte(bi[n], 0)] ^                      \
->                 crypto_it_tab[1][byte(bi[(n + 3) & 3], 1)] ^            \
->                 crypto_it_tab[2][byte(bi[(n + 2) & 3], 2)] ^            \
->                 crypto_it_tab[3][byte(bi[(n + 1) & 3], 3)] ^ *(k + n);  \
-> -} while (0)
-> +}
->
->  #define i_nround(bo, bi, k)    do {\
->         i_rn(bo, bi, 0, k);     \
-> @@ -1229,19 +1230,19 @@ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->         k += 4;                 \
->  } while (0)
->
-> -#define i_rl(bo, bi, n, k)     do {                    \
-> +#define i_rl(bo, bi, n, k)     while (0) {                     \
->         bo[n] = crypto_il_tab[0][byte(bi[n], 0)] ^              \
->         crypto_il_tab[1][byte(bi[(n + 3) & 3], 1)] ^            \
->         crypto_il_tab[2][byte(bi[(n + 2) & 3], 2)] ^            \
->         crypto_il_tab[3][byte(bi[(n + 1) & 3], 3)] ^ *(k + n);  \
-> -} while (0)
-> +}
->
-> -#define i_lround(bo, bi, k)    do {\
-> +#define i_lround(bo, bi, k)    while (0) {\
->         i_rl(bo, bi, 0, k);     \
->         i_rl(bo, bi, 1, k);     \
->         i_rl(bo, bi, 2, k);     \
->         i_rl(bo, bi, 3, k);     \
-> -} while (0)
-> +}
->
->  static void crypto_aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
-> --
-> 2.35.1
->
+
+checkpatch.pl is a useful tool for finding style issues, but please
+use it with care. And changing decades old code just to fix issues
+reported by checkpatch.pl is really just pointless churn.
+
+So let's just drop this patch altogether, shall we? If you're
+interested in helping out, please have a look at the staging/ tree -
+there is a lot of code there that needs cleaning up.
+
+Thanks,
+Ard.
