@@ -2,45 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FC9C4167B
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 11:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE757C46467
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Mar 2022 11:23:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240944AbiC1LYh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:24:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
+        id S240984AbiC1LYl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:24:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241177AbiC1LXV (ORCPT
+        with ESMTP id S241303AbiC1LXh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:23:21 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 822AB583A5;
-        Mon, 28 Mar 2022 04:20:20 -0700 (PDT)
+        Mon, 28 Mar 2022 07:23:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6A0593A9;
+        Mon, 28 Mar 2022 04:20:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id ED48EB8105A;
-        Mon, 28 Mar 2022 11:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E44C1C340EC;
-        Mon, 28 Mar 2022 11:20:16 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CA25E611BD;
+        Mon, 28 Mar 2022 11:20:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 912FBC340EC;
+        Mon, 28 Mar 2022 11:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466417;
-        bh=jMXBVNqKNtY5SwQApfQIem+dk90jTHentgzLuqf7CW0=;
+        s=k20201202; t=1648466431;
+        bh=p4qOkgGo1/eyoeVeoSnjF3H2g47JG7CGB9P5oxsXQkc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ViHqhpTXkj0Ihbm11xWEq2SibJ0oX7aJWNsgHD+DOaP+a51ExlgXWWpve+39ir6Tc
-         URqKgjTo9SvMHqLti72+2OgmawPC6rZ3y9yCBEmT/rSzwXTXvHyUEzSqTUxFSU9z8j
-         vXX8GQDHixfEnf+uTJsgOuxELKWfsGFMAvSWmzcbvtX/ohnaqqP9J86WUzyuOvlJNX
-         Wq6iQSt21Hckk7BMd5kiXARZmgPSzrhmLVL0GBBAIS1OntW2glrDAnbGjyXrT4/BLK
-         CfByuc3rWPHf41v/mcN0Rl9ecqy/+VRr/Hll1ZqvnZiyyG71J85xnIJxFXf93+9CWF
-         Vg7VUUkGowLGg==
+        b=hqnQmDx2im5mBqCmsC65tKlL9Tn9/jmBMJXAxCJidP9pOUJbLGDqPFnOlvrVExYSr
+         H8emEdda9UkqGTvUpLwMUKX4ZwkUhmi5QXvE78fCzP4vr6QoT7Fnsgl0pJ0+EhhTYB
+         nGX3m/DB8N9IRPhTAx1ZDWc21WiAhc37t/5BfCCQRZ+wJN3ZXn5w4oywA5TxDr6E7p
+         Nw1ZxqFiA4rRVNd8E/i4nwN09t8kc0NgchhdGA2nFpdtsWJ4oTVESu3+uVKxHR1muF
+         9nwFeGAoTWak9wLZfcIRmPSLt09YEYNXNvxyg6q74Vc+63yKWzsMP26USs+nPsypzG
+         U2uiPn+yccquA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai Ye <yekai13@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, wangzhou1@hisilicon.com,
-        davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 03/35] crypto: hisilicon/qm - cleanup warning in qm_vf_read_qos
-Date:   Mon, 28 Mar 2022 07:19:39 -0400
-Message-Id: <20220328112011.1555169-3-sashal@kernel.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>, rftc <rftc@gmx.de>,
+        Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 11/35] crypto: xts - Add softdep on ecb
+Date:   Mon, 28 Mar 2022 07:19:47 -0400
+Message-Id: <20220328112011.1555169-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220328112011.1555169-1-sashal@kernel.org>
 References: <20220328112011.1555169-1-sashal@kernel.org>
@@ -52,34 +51,30 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit 05b3bade290d6c940701f97f3233c07cfe27205d ]
+[ Upstream commit dfe085d8dcd0bb1fe20cc2327e81c8064cead441 ]
 
-The kernel test rebot report this warning: Uninitialized variable: ret.
-The code flow may return value of ret directly. This value is an
-uninitialized variable, here is fix it.
+The xts module needs ecb to be present as it's meant to work
+on top of ecb.  This patch adds a softdep so ecb can be included
+automatically into the initramfs.
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Reported-by: rftc <rftc@gmx.de>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/hisilicon/qm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/xts.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 1dc6a27ba0e0..82d2b117e162 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4145,7 +4145,7 @@ static void qm_vf_get_qos(struct hisi_qm *qm, u32 fun_num)
- static int qm_vf_read_qos(struct hisi_qm *qm)
- {
- 	int cnt = 0;
--	int ret;
-+	int ret = -EINVAL;
- 
- 	/* reset mailbox qos val */
- 	qm->mb_qos = 0;
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 6c12f30dbdd6..63c85b9e64e0 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -466,3 +466,4 @@ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("XTS block cipher mode");
+ MODULE_ALIAS_CRYPTO("xts");
+ MODULE_IMPORT_NS(CRYPTO_INTERNAL);
++MODULE_SOFTDEP("pre: ecb");
 -- 
 2.34.1
 
