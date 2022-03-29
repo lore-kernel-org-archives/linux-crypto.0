@@ -2,43 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EB5C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Mar 2022 03:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F87EC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Mar 2022 03:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231508AbiC2DRn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S231513AbiC2DRn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 28 Mar 2022 23:17:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54750 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231488AbiC2DRl (ORCPT
+        with ESMTP id S231502AbiC2DRm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Mar 2022 23:17:41 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam07on2067.outbound.protection.outlook.com [40.107.95.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5C618CD29;
-        Mon, 28 Mar 2022 20:15:59 -0700 (PDT)
+        Mon, 28 Mar 2022 23:17:42 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24B3118D994;
+        Mon, 28 Mar 2022 20:16:00 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YMAwN5i9cq2j3VtewPqjWRxCMXEcrQndqYIfkz/ydhSsWgj/Rz4u6CpqJ6bVT8AhdT8JPyfIJvqJbVnb4z5W3u5AV4rnD/dcYEDbamGw6tPTf5D/35hHqAM3FPTJOp5ztA40Hnt85pv6zGol7DwIp3giVpuNH2Wlns79DKs3exQpMPasttLG5m8nsX60qnM5u/tj6Qmu02GUgd0jkBkbIUQ7FLAkRF9Kq41m0fyshnUHBxflM8VY8g2t3MRwpVf1gRQZ1wCXhF4kXNgh6PjJe77sDSS9+aNau//FRUfWDFZ9GgiSF1xVdog+xOxUuxpLAqvmf8gcKmvKiHu4VNylzg==
+ b=TRT+uJ4W7ia0p9qJaHnZOp69Ne30Xan02UPIWT4+KhtQfvMGA18MeUqeo9kTU4fLbugoqNTuW/MhokomLx8acQRKfqIt1aE8+t5DINRByvuDWPOZqz8BiHyZRXSHqW0DSewdi9Q7LRQ3e9cLJsyLzWnupHXGaeWiCOq2aMImkNkjyvx7/2j9yofKkjvXh0vehu4wbFKdA/q4FhCtTXjij4YdhxSj+bTZPe4dGqRgRWh8KxyiZyEls5Ig1qj+WjqL73j8b7ZjGoqztWk1Ov7RV1cF0/QLGeu3pIdEVr3SeW/A4BI/QaR/6hq4+soLwht2+1vAzCsqdEqrzwCKPqh5/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/TkoavJ7f4fXuIz37liTxxcX7CuLAd6PxDS5IB59J2w=;
- b=WNUWgLXGGgo2FG9uQnLhBWuIihIgkbPfnNNmi8Fc7A9Jr0tlOmWwD2sGUo8fUxB78VgU23fpgkQbJaqUit9Oo9wg8ZqL0Pgr9bAL4KhKOzG2R1dxKdL52myHnE0djxc3D4v8BHcb/Fb7cRy+tWc0SsWL2F9BnjJj7uTUUhUZOWrJdXCUjOnNvaX5q+JqX/UirsMl9mCM2F5BslKAyU47c33VQsw/JTH+GnY3DDgrw0qXWTJDNvFmrbh4n5tO0oXWZ/S9sLbhPMTqkR12sENbNT4cFc+17YSxaQr2vPUJW8DutXksXWO3+HY+E+/5LrORaIkyBD9kSUYLUdVRvF9Mzg==
+ bh=mtNFohs/U1tWZRNn1oyc2ADDVyu8/D4lDo6Iid53kE4=;
+ b=BYwIZ1f8VLDKuu9FbzJwGTLIa5JF48z8ACfImveRGOvWZ5zO/CyWvkQrpv3X1SS++CXOMFDvvR0DMJE2c2/m4gEWO0bYcPCSTcbNXmo1JnP6fAy3uNlq8nL3tySR0Hs9fq4/32Nkk8795Rw4xF9eWH2VRW/yiThIJJYoHAF1ljhDpvz/LfxMJ4T12AYdDVfLE/4raBEI46uEcYkrdJFSh4QaCPtZ+sZckdQCJeNRAdgf2eQdSmtwmtMWNPPA0gfV9A9e5rmqcDtDEo2bVVFrTIySS4JBnvK3jr5aEdILK2LUvOH6Bb+15CuIaXVy3ReCJ349uP8UgS7iIEkpFBVk/Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/TkoavJ7f4fXuIz37liTxxcX7CuLAd6PxDS5IB59J2w=;
- b=ubZyanHyqxYYqRbbzB97uVRuMcD7fJJKqI35E7RR1OLOUxVEX0p5kx9ZyuYOFBwAlvcKfmRP/tosSdSBpNngRz0R6hGGJqXvyg1Wc3ftx8BIoeiG74pHsUXMc+rtRgWnmzCE0zG/UZOhsdXPy30lGiEjtp/GzZhQD0uaa0PJer4=
-Received: from DM5PR19CA0036.namprd19.prod.outlook.com (2603:10b6:3:9a::22) by
- MW3PR12MB4569.namprd12.prod.outlook.com (2603:10b6:303:57::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5102.19; Tue, 29 Mar 2022 03:15:58 +0000
+ bh=mtNFohs/U1tWZRNn1oyc2ADDVyu8/D4lDo6Iid53kE4=;
+ b=STWNC7QhtCVENCdEtvtHk7+Vz97HUJuz7BFsBItGl2VKj2g3H+Lj2LBIzxV/FdyYFHfu52pXJ+9hTRC/VWNAy49d/ocxSZB8JqkaSk+8etX7gqDXFELO9MpJs19NNVENE2v0a/gq/iMy9gTjLfjroDqvYSB1Aidu3O0qbjjh/JY=
+Received: from DM5PR19CA0042.namprd19.prod.outlook.com (2603:10b6:3:9a::28) by
+ BYAPR12MB3512.namprd12.prod.outlook.com (2603:10b6:a03:134::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.17; Tue, 29 Mar
+ 2022 03:15:56 +0000
 Received: from DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:9a:cafe::d1) by DM5PR19CA0036.outlook.office365.com
- (2603:10b6:3:9a::22) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:3:9a:cafe::51) by DM5PR19CA0042.outlook.office365.com
+ (2603:10b6:3:9a::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.23 via Frontend
- Transport; Tue, 29 Mar 2022 03:15:57 +0000
+ Transport; Tue, 29 Mar 2022 03:15:56 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,11 +49,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DM6NAM11FT004.mail.protection.outlook.com (10.13.172.217) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5102.17 via Frontend Transport; Tue, 29 Mar 2022 03:15:57 +0000
+ 15.20.5102.17 via Frontend Transport; Tue, 29 Mar 2022 03:15:55 +0000
 Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 28 Mar
- 2022 22:15:55 -0500
+ 2022 22:15:53 -0500
 From:   Mario Limonciello <mario.limonciello@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         John Allen <john.allen@amd.com>,
@@ -64,12 +65,10 @@ CC:     open list <linux-kernel@vger.kernel.org>,
         Kerneis Gabriel <Gabriel.Kerneis@ssi.gouv.fr>,
         Richard Hughes <hughsient@gmail.com>,
         "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH 3/4] crypto: ccp: Allow PSP driver to load without SEV/TEE support
-Date:   Mon, 28 Mar 2022 22:15:52 -0500
-Message-ID: <20220329031553.798-3-mario.limonciello@amd.com>
+Subject: [PATCH 1/4] crypto: ccp: cache capability into psp device
+Date:   Mon, 28 Mar 2022 22:15:50 -0500
+Message-ID: <20220329031553.798-1-mario.limonciello@amd.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220329031553.798-1-mario.limonciello@amd.com>
-References: <20220329031553.798-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -78,76 +77,167 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 13c2c790-cc78-4512-f4a6-08da1132719d
-X-MS-TrafficTypeDiagnostic: MW3PR12MB4569:EE_
-X-Microsoft-Antispam-PRVS: <MW3PR12MB4569B5ECD87AAE1008D5B7E7E21E9@MW3PR12MB4569.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 082cc340-5e21-4029-fa75-08da11327016
+X-MS-TrafficTypeDiagnostic: BYAPR12MB3512:EE_
+X-Microsoft-Antispam-PRVS: <BYAPR12MB35129BFFABE852766733506EE21E9@BYAPR12MB3512.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: weUet0QyA6D2/LerxGahijoYCqpmRa7Sdu9bGf4SUzxyedYWDy0w5Waex4FpY/yBPIhoSiU1y06d/a81aq3X4sn4KNM3QyJm5ITv1EKYe/5WJ7tKnnmSPSiWkdk/Sd7E104Nf2iH4UO/oz9J6OBCEVnmP4glDGRwyqRieYQmH2f0puhBl3CkclDeZr/wwrtLhxNTnm1JouvC3MGv4f0ucYvmiIxoBeWjB7vEElx/Yfmy9hAQmxFintjIuLe2rEIE6l+gM6niDDmXALSKPtvr2g5JQteTJu0wAF8QucOMrEpSodf4vKAxeNpwWWW4e3lZsrHheO2A61g3vStjlwSr/au/CgmM/H8ydQ6mkdb4+vQTj06IYKyZlFVjBC7NVQfEubq7p7sgRByz7lmuzotz8s+U1BhnYn/5k3K+PDrr4pyumyxZZK2KhoXRYhKhj3+9IPf1fwNANJRsvjtLvwlrHukz6A909Ad+lXCEsGmRa+4v1Fhjx38ow3AG0p9dFfsJ9b2HDm4O6ACB4k6Z4Jxzm5VEmkTJyTwYpWWQGyV7upYtYP8JsZxx+aMwrZPsOQF5gc4DV53A2kdgMt4UepbdEtR+o0yU+84sHaQgL9D3f3otDUDD2H3fuxaNTOS+4ZM+ZHS30jXougOER2d9BZ8F3QNb6dBBp0qRrAm3tipu3lU+CeybVmrSol+eNCZcf+AmqLZeFNcAGy89Jq9yiQnIYQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(36840700001)(40470700004)(5660300002)(356005)(8936002)(81166007)(82310400004)(2906002)(44832011)(316002)(16526019)(1076003)(54906003)(26005)(186003)(110136005)(336012)(6666004)(508600001)(7696005)(426003)(4326008)(8676002)(70586007)(70206006)(36860700001)(47076005)(83380400001)(2616005)(36756003)(40460700003)(86362001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 3I5lKmia2sBrXJrDlelDlsJ7CyX9+37iLgl/RfvpQ7tMdAQ2dzIJvSYXh9lX5b88NvbbwjlZasrc8ry5kNTaDesnqmXvPzfofH1O4At/NtmH+tkae8yPD+tJYf91ZUCD1sdrPIg/amGK11lzmH+IvoNmEfvftLwOSzanfLlK7aAhHXsZC+LC6Bqf54hoFZB3kFfxfxChB9HWIHdrgm3ZCJrxmarnxcuD7I85T8H2U8eBfWUjUD9bErWHT39nmXAN/Vr01eyy18AHFOGDzQtz9YSRFcbKNvR+7NomMmNvx4cYZY6OzYoW6Y7WAnDrTk+74VhwI0eHyvWsDDeJ6Ph+MPOGmxGtwlyjwp5nk241wNw+uP/Z7psY8I3jdvye3T+yhhExNPYhR+NN/dUQBp4cZ/ni3vIkcifs7aVINDiHzji+H7qxYr2QzOD9LFtWay2EC6YSFXcOGqblIMbV7wviS8oU62DJ+Sl6o/p+Q930Cz25vLyEe3sPniTGv6a/367kD+P4PXYJw5+EBSgN+N7pWvW+S+z7fp19aEHbB5W55xWD2pJ28Vxi48Ikw6gL1v9LZPOQryv4CwSwThOUjjGGuyoqUkznaFg+YF7qEO5tGU1RRHNxhbvFEEawFRiWpUPpR0PR3n5zJVY4iiPUPucAP5N51YdKJBNdtffx/rP9aUFf1MCQ3N4q/6ohneHTB0pPSWLwmrQVWIPvEHcnnOJ0qw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(46966006)(40470700004)(4326008)(8676002)(336012)(70586007)(2616005)(110136005)(316002)(86362001)(70206006)(7696005)(508600001)(26005)(82310400004)(1076003)(16526019)(186003)(83380400001)(426003)(54906003)(40460700003)(81166007)(5660300002)(36756003)(2906002)(356005)(44832011)(36860700001)(8936002)(47076005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2022 03:15:57.7467
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2022 03:15:55.1843
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13c2c790-cc78-4512-f4a6-08da1132719d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 082cc340-5e21-4029-fa75-08da11327016
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT004.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4569
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3512
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Previously the PSP probe routine would fail if both SEV and TEE were
-missing.  This is possibly the case for some client parts.
-
-As capabilities can now be accessed from userspace, it may still be
-useful to have the PSP driver finish loading so that those capabilities
-can be read.
+The results of the capability register will be used by future
+code at runtime rather than just initialization.
 
 Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- drivers/crypto/ccp/psp-dev.c | 2 +-
- drivers/crypto/ccp/sp-dev.c  | 4 ++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ drivers/crypto/ccp/psp-dev.c | 37 +++++++++++++++++-------------------
+ drivers/crypto/ccp/psp-dev.h |  5 +++++
+ 2 files changed, 22 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index 8cd404121cd5..3f47b2d81e3c 100644
+index ae7b44599914..8cd404121cd5 100644
 --- a/drivers/crypto/ccp/psp-dev.c
 +++ b/drivers/crypto/ccp/psp-dev.c
-@@ -158,7 +158,7 @@ int psp_dev_init(struct sp_device *sp)
+@@ -70,17 +70,17 @@ static unsigned int psp_get_capability(struct psp_device *psp)
+ 	 */
+ 	if (val == 0xffffffff) {
+ 		dev_notice(psp->dev, "psp: unable to access the device: you might be running a broken BIOS.\n");
+-		return 0;
++		return -ENODEV;
+ 	}
++	psp->capability = val;
  
- 	ret = psp_check_support(psp);
+-	return val;
++	return 0;
+ }
+ 
+-static int psp_check_sev_support(struct psp_device *psp,
+-				 unsigned int capability)
++static int psp_check_sev_support(struct psp_device *psp)
+ {
+ 	/* Check if device supports SEV feature */
+-	if (!(capability & 1)) {
++	if (!(psp->capability & PSP_CAPABILITY_SEV)) {
+ 		dev_dbg(psp->dev, "psp does not support SEV\n");
+ 		return -ENODEV;
+ 	}
+@@ -88,11 +88,10 @@ static int psp_check_sev_support(struct psp_device *psp,
+ 	return 0;
+ }
+ 
+-static int psp_check_tee_support(struct psp_device *psp,
+-				 unsigned int capability)
++static int psp_check_tee_support(struct psp_device *psp)
+ {
+ 	/* Check if device supports TEE feature */
+-	if (!(capability & 2)) {
++	if (!(psp->capability & PSP_CAPABILITY_TEE)) {
+ 		dev_dbg(psp->dev, "psp does not support TEE\n");
+ 		return -ENODEV;
+ 	}
+@@ -100,11 +99,10 @@ static int psp_check_tee_support(struct psp_device *psp,
+ 	return 0;
+ }
+ 
+-static int psp_check_support(struct psp_device *psp,
+-			     unsigned int capability)
++static int psp_check_support(struct psp_device *psp)
+ {
+-	int sev_support = psp_check_sev_support(psp, capability);
+-	int tee_support = psp_check_tee_support(psp, capability);
++	int sev_support = psp_check_sev_support(psp);
++	int tee_support = psp_check_tee_support(psp);
+ 
+ 	/* Return error if device neither supports SEV nor TEE */
+ 	if (sev_support && tee_support)
+@@ -113,17 +111,17 @@ static int psp_check_support(struct psp_device *psp,
+ 	return 0;
+ }
+ 
+-static int psp_init(struct psp_device *psp, unsigned int capability)
++static int psp_init(struct psp_device *psp)
+ {
+ 	int ret;
+ 
+-	if (!psp_check_sev_support(psp, capability)) {
++	if (!psp_check_sev_support(psp)) {
+ 		ret = sev_dev_init(psp);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
+-	if (!psp_check_tee_support(psp, capability)) {
++	if (!psp_check_tee_support(psp)) {
+ 		ret = tee_dev_init(psp);
+ 		if (ret)
+ 			return ret;
+@@ -136,7 +134,6 @@ int psp_dev_init(struct sp_device *sp)
+ {
+ 	struct device *dev = sp->dev;
+ 	struct psp_device *psp;
+-	unsigned int capability;
+ 	int ret;
+ 
+ 	ret = -ENOMEM;
+@@ -155,11 +152,11 @@ int psp_dev_init(struct sp_device *sp)
+ 
+ 	psp->io_regs = sp->io_map;
+ 
+-	capability = psp_get_capability(psp);
+-	if (!capability)
++	ret = psp_get_capability(psp);
++	if (ret)
+ 		goto e_disable;
+ 
+-	ret = psp_check_support(psp, capability);
++	ret = psp_check_support(psp);
  	if (ret)
--		goto e_disable;
-+		return 0;
+ 		goto e_disable;
  
- 	/* Disable and clear interrupts until ready */
- 	iowrite32(0, psp->io_regs + psp->vdata->inten_reg);
-diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-index 7eb3e4668286..77cf533b0db0 100644
---- a/drivers/crypto/ccp/sp-dev.c
-+++ b/drivers/crypto/ccp/sp-dev.c
-@@ -132,6 +132,8 @@ int sp_request_psp_irq(struct sp_device *sp, irq_handler_t handler,
+@@ -174,7 +171,7 @@ int psp_dev_init(struct sp_device *sp)
+ 		goto e_err;
+ 	}
  
- void sp_free_ccp_irq(struct sp_device *sp, void *data)
- {
-+	if (!sp->irq_registered)
-+		return;
- 	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->psp_vdata) {
- 		/* Using common routine to manage all interrupts */
- 		if (!sp->psp_irq_handler) {
-@@ -151,6 +153,8 @@ void sp_free_ccp_irq(struct sp_device *sp, void *data)
+-	ret = psp_init(psp, capability);
++	ret = psp_init(psp);
+ 	if (ret)
+ 		goto e_irq;
  
- void sp_free_psp_irq(struct sp_device *sp, void *data)
- {
-+	if (!sp->irq_registered)
-+		return;
- 	if ((sp->psp_irq == sp->ccp_irq) && sp->dev_vdata->ccp_vdata) {
- 		/* Using common routine to manage all interrupts */
- 		if (!sp->ccp_irq_handler) {
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
+index ef38e4135d81..d811da28cce6 100644
+--- a/drivers/crypto/ccp/psp-dev.h
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -45,6 +45,8 @@ struct psp_device {
+ 
+ 	void *sev_data;
+ 	void *tee_data;
++
++	unsigned int capability;
+ };
+ 
+ void psp_set_sev_irq_handler(struct psp_device *psp, psp_irq_handler_t handler,
+@@ -57,4 +59,7 @@ void psp_clear_tee_irq_handler(struct psp_device *psp);
+ 
+ struct psp_device *psp_get_master_device(void);
+ 
++#define PSP_CAPABILITY_SEV			BIT(0)
++#define PSP_CAPABILITY_TEE			BIT(1)
++
+ #endif /* __PSP_DEV_H */
 -- 
 2.34.1
 
