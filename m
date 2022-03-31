@@ -2,111 +2,134 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62CAC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 16:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C8A9C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 16:42:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239560AbiCaQFB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Mar 2022 12:05:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35494 "EHLO
+        id S238497AbiCaQoA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Mar 2022 12:44:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239600AbiCaQE4 (ORCPT
+        with ESMTP id S232615AbiCaQn7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:04:56 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFE91F1278
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Mar 2022 09:02:37 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id bh17so269530ejb.8
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Mar 2022 09:02:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sweetwater-ai.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UOsM5fHRpbJTbGazwZ9GiS6zVSzVYyLU6fFhBXbjeRM=;
-        b=BiUxkq9eAqApCSa7neVYcwP2HDDyO/cyl5dYWiP8k9WjKNqodLI7mhlEJsDAwvv5nG
-         rimdHaw4zzHiI3v+GM1Gwu3n0m+bFjis9ht4sYTb3tLnrxyi3ZpdoZ+G09zk6NMK3V3h
-         nGWQSW6hGRvqIdo5fpsKAhwM5CYXwdhqm055ttZkqUjCvC94NUJIOXUv0vdkgYFhDSLs
-         UcsxpINNa0aNxWnzBuQzsr+5bZMfYrxQmclnkRK6sRVr4UZoSNNwhz/419yUR3V9vy5s
-         Y3bKN2nKfp/hQwMBFBxeI1D/JQTpmSu2o0Kfwy9Y18cqRwXCoA1yANwIeKsyC7GUzQAx
-         iS4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UOsM5fHRpbJTbGazwZ9GiS6zVSzVYyLU6fFhBXbjeRM=;
-        b=IE3oiNW55IT2TQO+ViJs5eas30jmPSY0Kntbcxgdy9JrVQdJdKInLaNK/iFF2cayY5
-         Im38zdKfPdQNA0T9E/S1S9VVkodx5utY2+Hx0zIT/pxSGCymdCOwfKUNGGgwGUzUJdtS
-         sSwrfnjDGJJwXMDzDViig3n4Y/k2Un3ZH2MyvW3f1W81btnSlb5tRZksIRIGpgboRhKS
-         BFnjns/bH72cuRh+Fq8IOM/VcG62qr2f4u4g+a+rDoWJspCT2yz1RFUZtoXp4XSZTdHG
-         0IW6I8r6dmGkTMS7HTt6TcHDvgBghmPXnpTjSvQRjDnEvMSZskI8l6n3Xho+1teqktFT
-         /7wg==
-X-Gm-Message-State: AOAM530YKkw61qtPdqgLLLPbyXX4qTVpLAvpQl4UM9WT+aax560YYc4N
-        0r1qlXs5ZtbMGbzwJQosgEwrhF2lenxUgO0OV/Iz1Q==
-X-Google-Smtp-Source: ABdhPJyoE+CVoRyGVXg+1A8+GHnoymttwhN3C/n20/DaHgqTLnG4/V+XvWWB9L68jg9tnaMekQ4ZlxJQD2DFKCUnryE=
-X-Received: by 2002:a17:906:7304:b0:6da:9243:865 with SMTP id
- di4-20020a170906730400b006da92430865mr5583200ejc.665.1648742556371; Thu, 31
- Mar 2022 09:02:36 -0700 (PDT)
+        Thu, 31 Mar 2022 12:43:59 -0400
+Received: from aposti.net (aposti.net [89.234.176.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F03220E947;
+        Thu, 31 Mar 2022 09:42:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=crapouillou.net;
+        s=mail; t=1648744927; h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:references; bh=IAvMrhVHS/428HmJmNcZO9TFoCp/orv0qlTHSEiIHbc=;
+        b=tznwXdrdiBiRDvepwYYMPhTVr04PPgDcJ7Ruoue3YkWqZRIPmeiLPikWU8YEMJ5g0dPVxw
+        uhZEbSGIUKaYIBnzMtKbwtg6yjuNnEwe4/leZdiigFdXZCK4VDXUDAJ+Hvccc6alH1sGpm
+        y9zc+tiTVNSvZ/cPqcbQEEttqV58WlY=
+From:   Paul Cercueil <paul@crapouillou.net>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Maciej W . Rozycki" <macro@orcam.me.uk>,
+        linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        Paul Cercueil <paul@crapouillou.net>, stable@vger.kernel.org,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH] MIPS: crypto: Fix CRC32 code
+Date:   Thu, 31 Mar 2022 17:42:00 +0100
+Message-Id: <20220331164200.177015-1-paul@crapouillou.net>
 MIME-Version: 1.0
-References: <20220331150706.124075-1-Jason@zx2c4.com> <20220331152641.169301-1-Jason@zx2c4.com>
-In-Reply-To: <20220331152641.169301-1-Jason@zx2c4.com>
-From:   Michael Brooks <m@sweetwater.ai>
-Date:   Thu, 31 Mar 2022 09:02:27 -0700
-Message-ID: <CAOnCY6Sv1goLQMJkvjsVb+TGdowUk6_vQ4ELQ_GkHu8Wjs3PAA@mail.gmail.com>
-Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at init
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-mix_pool_bytes() has numerous problems, as discussed in prior emails.
-Do we still want to be putting so much effort into a development dead
-end?
+Commit 67512a8cf5a7 ("MIPS: Avoid macro redefinitions") changed how the
+MIPS register macros were defined, in order to allow the code to compile
+under LLVM/Clang.
 
--Michael
+The MIPS CRC32 code however wasn't updated accordingly, causing a build
+bug when using a MIPS32r6 toolchain without CRC support.
 
-On Thu, Mar 31, 2022 at 8:28 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Prior, the "input_pool_data" array needed no real initialization, and so
-> it was easy to mark it with __latent_entropy to populate it during
-> compile-time. In switching to using a hash function, this required us to
-> specifically initialize it to some specific state, which means we
-> dropped the __latent_entropy attribute. An unfortunate side effect was
-> this meant the pool was no longer seeded using compile-time random data.
-> In order to bring this back, we declare an array in rand_initialize()
-> with __latent_entropy and call mix_pool_bytes() on that at init, which
-> accomplishes the same thing as before. We make this __initconst, so that
-> it doesn't take up space at runtime after init.
->
-> Fixes: 6e8ec2552c7d ("random: use computational hash for entropy extraction")
-> Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> Changes v1->v2:
-> - Use __initconst.
->
->  drivers/char/random.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 40107f8b9e9e..1d8242969751 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -975,6 +975,11 @@ int __init rand_initialize(void)
->         bool arch_init = true;
->         unsigned long rv;
->
-> +#if defined(LATENT_ENTROPY_PLUGIN)
-> +       static const u8 compiletime_seed[BLAKE2S_BLOCK_SIZE] __initconst __latent_entropy;
-> +       _mix_pool_bytes(compiletime_seed, sizeof(compiletime_seed));
-> +#endif
-> +
->         for (i = 0; i < BLAKE2S_BLOCK_SIZE; i += sizeof(rv)) {
->                 if (!arch_get_random_seed_long_early(&rv) &&
->                     !arch_get_random_long_early(&rv)) {
-> --
-> 2.35.1
->
+Update the CRC32 code to use the macros correctly, to fix the build
+failures.
+
+Fixes: 67512a8cf5a7 ("MIPS: Avoid macro redefinitions")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Paul Cercueil <paul@crapouillou.net>
+Reported-by: kernel test robot <lkp@intel.com>
+---
+ arch/mips/crypto/crc32-mips.c | 46 ++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
+
+diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+index 0a03529cf317..3e4f5ba104f8 100644
+--- a/arch/mips/crypto/crc32-mips.c
++++ b/arch/mips/crypto/crc32-mips.c
+@@ -28,7 +28,7 @@ enum crc_type {
+ };
+ 
+ #ifndef TOOLCHAIN_SUPPORTS_CRC
+-#define _ASM_MACRO_CRC32(OP, SZ, TYPE)					  \
++#define _ASM_SET_CRC(OP, SZ, TYPE)					  \
+ _ASM_MACRO_3R(OP, rt, rs, rt2,						  \
+ 	".ifnc	\\rt, \\rt2\n\t"					  \
+ 	".error	\"invalid operands \\\"" #OP " \\rt,\\rs,\\rt2\\\"\"\n\t" \
+@@ -37,30 +37,36 @@ _ASM_MACRO_3R(OP, rt, rs, rt2,						  \
+ 			  ((SZ) <<  6) | ((TYPE) << 8))			  \
+ 	_ASM_INSN32_IF_MM(0x00000030 | (__rs << 16) | (__rt << 21) |	  \
+ 			  ((SZ) << 14) | ((TYPE) << 3)))
+-_ASM_MACRO_CRC32(crc32b,  0, 0);
+-_ASM_MACRO_CRC32(crc32h,  1, 0);
+-_ASM_MACRO_CRC32(crc32w,  2, 0);
+-_ASM_MACRO_CRC32(crc32d,  3, 0);
+-_ASM_MACRO_CRC32(crc32cb, 0, 1);
+-_ASM_MACRO_CRC32(crc32ch, 1, 1);
+-_ASM_MACRO_CRC32(crc32cw, 2, 1);
+-_ASM_MACRO_CRC32(crc32cd, 3, 1);
+-#define _ASM_SET_CRC ""
++#define _ASM_UNSET_CRC(op, SZ, TYPE) ".purgem " #op "\n\t"
+ #else /* !TOOLCHAIN_SUPPORTS_CRC */
+-#define _ASM_SET_CRC ".set\tcrc\n\t"
++#define _ASM_SET_CRC(op, SZ, TYPE) ".set\tcrc\n\t"
++#define _ASM_UNSET_CRC(op, SZ, TYPE)
+ #endif
+ 
+-#define _CRC32(crc, value, size, type)		\
+-do {						\
+-	__asm__ __volatile__(			\
+-		".set	push\n\t"		\
+-		_ASM_SET_CRC			\
+-		#type #size "	%0, %1, %0\n\t"	\
+-		".set	pop"			\
+-		: "+r" (crc)			\
+-		: "r" (value));			\
++#define __CRC32(crc, value, op, SZ, TYPE)		\
++do {							\
++	__asm__ __volatile__(				\
++		".set	push\n\t"			\
++		_ASM_SET_CRC(op, SZ, TYPE)		\
++		#op "	%0, %1, %0\n\t"			\
++		_ASM_UNSET_CRC(op, SZ, TYPE)		\
++		".set	pop"				\
++		: "+r" (crc)				\
++		: "r" (value));				\
+ } while (0)
+ 
++#define _CRC32_crc32b(crc, value)	__CRC32(crc, value, crc32b, 0, 0)
++#define _CRC32_crc32h(crc, value)	__CRC32(crc, value, crc32h, 1, 0)
++#define _CRC32_crc32w(crc, value)	__CRC32(crc, value, crc32w, 2, 0)
++#define _CRC32_crc32d(crc, value)	__CRC32(crc, value, crc32d, 3, 0)
++#define _CRC32_crc32cb(crc, value)	__CRC32(crc, value, crc32cb, 0, 1)
++#define _CRC32_crc32ch(crc, value)	__CRC32(crc, value, crc32ch, 1, 1)
++#define _CRC32_crc32cw(crc, value)	__CRC32(crc, value, crc32cw, 2, 1)
++#define _CRC32_crc32cd(crc, value)	__CRC32(crc, value, crc32cd, 3, 1)
++
++#define _CRC32(crc, value, size, op) \
++	_CRC32_##op##size(crc, value)
++
+ #define CRC32(crc, value, size) \
+ 	_CRC32(crc, value, size, crc32)
+ 
+-- 
+2.35.1
+
