@@ -2,141 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C178C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 21:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED1DDC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 21:59:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241724AbiCaVOY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Mar 2022 17:14:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36796 "EHLO
+        id S240227AbiCaWBl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Mar 2022 18:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241676AbiCaVOA (ORCPT
+        with ESMTP id S229947AbiCaWBk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Mar 2022 17:14:00 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2047.outbound.protection.outlook.com [40.107.237.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB7F223872;
-        Thu, 31 Mar 2022 14:12:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OsT+PxDuIdvH/YSAkJIQ4mcEorYFFN2hAh6yJ4LV0L1p5GuoQ8+8JAnhoBN9864aprxhrLHdHt0rdxI1vFKizw8/6svoTgFWv67TAf4cB8QB2OyM7+04VbYd6GqwHOp1ltk4awpvex5CheiM34S0Yzo2rWKlGlsrjx5YZJYDmElVb5ze1Kwh0BiNHw4XR1fTV4erqIw8OcQ0ggnmOncA2r9knuHOjnMWMlbRTztkge4Tlhybxp+3+aFSGTNbprZlheJ08k19ucGDs21VUx0M0bWm1+BoRo5SueOVx84oz45aJWXK35VgF6kG1w63/gVcBnxE+I7fKmUu0Jw1Ua8FkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qYPIHBx2LmPULSamdRNsWiXpJcuExp/yHCz09gERJV4=;
- b=R/CqF9RlWL1cXfkYUYGBj7+o7dw+omKgqmSrUklZRHVCiBmZDDbOQ24PRKDMCleQGbxzeYB4Qp0VNw/09gSTeT9jJ1phlh/n2SfB3q1b9kHxVnkjNpsCong4oADJsIMvxwzQw1JZX8WxxbkxZhRJDQFXvrnVWWhsddN/lT2YClwU5S8gU2US1QVrmbgCurQfPejSyKI2vVGkC0Y+rZNEHuOepKBt8ySSUAtEyVor69QLblquBDr/a6nVkELfEOssbCX4JzX2BrFDNmktCUL3cYnmlbWxDwVSMsLa7QdX7ItApUWUHzV4pT9yVveCKCK+aFn9VIFql2UlUMM9gnqInA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qYPIHBx2LmPULSamdRNsWiXpJcuExp/yHCz09gERJV4=;
- b=b3riI43I74YRLU49N2AizMy96gxbbab9CDadLQunKAa/L5mp/Lzrtr/3UUiwIVrunGAZGjd0CYCsn2Ywt3CFScqrR7D0nkhQMEcNDiXW1ERjmI5JQzb91/GPhgYP9Mx/0w1jbYUQhthEneGYQezOpxMJsbC/4gZrtnbHxh6Ki7Y=
-Received: from MW4PR03CA0146.namprd03.prod.outlook.com (2603:10b6:303:8c::31)
- by MW4PR12MB5667.namprd12.prod.outlook.com (2603:10b6:303:18a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.19; Thu, 31 Mar
- 2022 21:12:08 +0000
-Received: from CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:8c:cafe::e2) by MW4PR03CA0146.outlook.office365.com
- (2603:10b6:303:8c::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.23 via Frontend
- Transport; Thu, 31 Mar 2022 21:12:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT005.mail.protection.outlook.com (10.13.174.147) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5123.19 via Frontend Transport; Thu, 31 Mar 2022 21:12:08 +0000
-Received: from AUS-LX-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 31 Mar
- 2022 16:12:05 -0500
-From:   Mario Limonciello <mario.limonciello@amd.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-CC:     open list <linux-kernel@vger.kernel.org>,
-        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER" 
-        <linux-crypto@vger.kernel.org>,
-        Kerneis Gabriel <Gabriel.Kerneis@ssi.gouv.fr>,
-        Richard Hughes <hughsient@gmail.com>,
-        "Mario Limonciello" <mario.limonciello@amd.com>
-Subject: [PATCH v3 4/4] crypto: ccp: When TSME and SME both detected notify user
-Date:   Thu, 31 Mar 2022 16:12:13 -0500
-Message-ID: <20220331211213.2844-5-mario.limonciello@amd.com>
+        Thu, 31 Mar 2022 18:01:40 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB815C862;
+        Thu, 31 Mar 2022 14:59:52 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id o10so2125893ejd.1;
+        Thu, 31 Mar 2022 14:59:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=kwHbdjP10TRRqI+6Tt9UEWSARGjNpA5V3m4oa6S5RlQ=;
+        b=aASkEwbkLgFVJ3ep87CW9QgvRZdGtSX052nEzPHRP51D9EaleRKeUfsayNKhOkNg/8
+         0cdjUc0ZaW0o7HjCU6Unzo3m/DLfVVqgiryrJE4QcCt9gBLiJNW38hcui0Lmq3OYqPj/
+         8DR1WNyKoAuQb9zQ34GR7ZpGqiV+B0s91iBCkkFIVT5MAdIQSHcL1UwG2Jg6xk6tRSSF
+         0a+8krq1QY0MfnzBv/HDtAT6vrY36Q9cvOn7fWBd0CiVOJgQCjChGLsE1N8loauow3q+
+         ly2V0YOkfI5813+wqRSxobBRSX5mO20BvV6l+SCDUl98Hzbk0wYkbD77gmN2OpZYA+yy
+         0QXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=kwHbdjP10TRRqI+6Tt9UEWSARGjNpA5V3m4oa6S5RlQ=;
+        b=lhnApqAqWgwn3/9ulcMd4MSfWIPlEQmvli6A6HmbK67pIN6v5aVEqgIgiMezCElsjW
+         Mb3C1JlWvMQKwzRZXyUuLsYSorD9KRgfjyZzfQFRtieBMt4eBsgH9Ok0jc+jBHA8oOdm
+         RwLZWV/A1ouKiScHWKh/SKuzxjGyn5I4Ems/HNtA5sdbQSawCMOEIZZv7Fb+hCER8Um+
+         GQKeLvNgT82wNzfCoVhA89K9Ip5WDz6DhhtuTCH4iIzqI6CzWPyI3DHlVDpGmz+w5GdD
+         eezVuNFPHDKXmZ1VsbbX1YPP7ZAvhUlGzZTbOqQQO0yrGoSzE8DTpNeN5M62wyLLcQHQ
+         DzcA==
+X-Gm-Message-State: AOAM5306avRJiAQi5raDDktLzfMDqFbawpWhS3MxI9k0gEyP4Dv9Ety0
+        V9pSeow1TkPDWkjkdbx+z1k=
+X-Google-Smtp-Source: ABdhPJxFKZ+BPTbRvDqwWxkLmLmqzNgHdtbJLCGlKtGaAZgT4VKqZKOI3TgvhAoAoCOOVpxIwVHzXA==
+X-Received: by 2002:a17:907:971e:b0:6da:8221:c82f with SMTP id jg30-20020a170907971e00b006da8221c82fmr6683849ejc.443.1648763991136;
+        Thu, 31 Mar 2022 14:59:51 -0700 (PDT)
+Received: from localhost.localdomain (i130160.upc-i.chello.nl. [62.195.130.160])
+        by smtp.googlemail.com with ESMTPSA id m20-20020a056402431400b00419315cc3e2sm287799edc.61.2022.03.31.14.59.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 14:59:50 -0700 (PDT)
+From:   Jakob Koschel <jakobkoschel@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Amey Narkhede <ameynarkhede03@gmail.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Lee Jones <lee.jones@linaro.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Mike Rapoport <rppt@kernel.org>,
+        "Brian Johannesmeyer" <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>, Jakob Koschel <jakobkoschel@gmail.com>
+Subject: [PATCH] crypto: cavium/nitrox - remove check of list iterator against head past the loop body
+Date:   Thu, 31 Mar 2022 23:59:10 +0200
+Message-Id: <20220331215910.884374-1-jakobkoschel@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220331211213.2844-1-mario.limonciello@amd.com>
-References: <20220331211213.2844-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1ec53764-f551-483d-5ea0-08da135b1d97
-X-MS-TrafficTypeDiagnostic: MW4PR12MB5667:EE_
-X-Microsoft-Antispam-PRVS: <MW4PR12MB5667521CE2ADF15587FC3574E2E19@MW4PR12MB5667.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ugyLLP5KjQD2hpraRkwsM9Mh1O7zajardXrtiuvQTQoDZBcGojI0yzths49PhTp4QTVKcGjfJavZHuX09UYdh2p1Ih04aGaXcNUY4r9+DiWv9DVvuuKxzSsxLUHAT2B0Iyv1q07OOvl7DCBZKTOJNotyrqHY9SV7xOTgOV2tqtiigAJSVXswjoJjyeoB7nSpRd43u5K0LFcMECzO0kgN06SQRGtj4uPJSAgH18EMvMiPat1ygb5ewPg3bgwjTH0iI3okhHDYiC7Be9PPVCdYxMzxfkgOpIW3NRqlExjakmyjZfxSZmpihESwtKO6/sc7N3rmoV2RNBH7Oh63vxjUddFMAhmrVkn72jTqdwU+vQkOUZhfbjXUZQ0xqa1EpfbyErdrBaYCmqcQ8u5ogU3BH/vBS2Sl+2jtICysSJo+KWdfpda9fF8RsVqnz457IXuQe8UAaVQSiUMtS1JzMUyAz1Hx3LphtQ+dsp9G2v8pyRJuCEvEcnEk8AaaYUMqtWjNO7JigehycyU1Yu4NGEYPv9cj39+dY5cpWa4uJKwBPaiQ8VGBX2cBACIuub8KTbo+dxxuv9QaS+HbA2F7C5nRJSGkbgJlkvI1dZqg6PbTfJ6uYO/eFn88UqKNfjpEBO1gv3vHIBKyJvDag9hx40HeBQfra5ay7dvlo9o2R7zpX9ODeZcwK9WRJtiO/EtTa7iw43vHCcgYqaW/U6GAvcr2Rg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(46966006)(40470700004)(36840700001)(81166007)(2906002)(426003)(40460700003)(86362001)(8676002)(356005)(47076005)(82310400004)(54906003)(508600001)(110136005)(6666004)(316002)(70586007)(44832011)(83380400001)(70206006)(5660300002)(8936002)(7696005)(186003)(26005)(16526019)(336012)(36860700001)(36756003)(2616005)(4326008)(1076003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2022 21:12:08.4038
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ec53764-f551-483d-5ea0-08da135b1d97
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT005.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5667
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CC_ATTR_HOST_MEM_ENCRYPT is used to relay that memory encryption has been
-activated by the kernel.
+When list_for_each_entry() completes the iteration over the whole list
+without breaking the loop, the iterator value will be a bogus pointer
+computed based on the head element.
 
-As it's technically possible to enable both SME and TSME at the same time,
-detect this scenario and notify the user that enabling TSME and SME at the
-same time is unnecessary.
+While it is safe to use the pointer to determine if it was computed
+based on the head element, either with list_entry_is_head() or
+&pos->member == head, using the iterator variable after the loop should
+be avoided.
 
-Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+In preparation to limit the scope of a list iterator to the list
+traversal loop, use a dedicated pointer to point to the found element [1].
+
+Link: https://lore.kernel.org/all/CAHk-=wgRr_D8CB-D9Kg-c=EHreAsk5SqXPwr9Y7k9sA6cWXJ6w@mail.gmail.com/ [1]
+Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
 ---
-v2->v3:
- * Remove extra whitespace
- * Reword comment
-v1->v2:
- * Reword notice about TSME/SME
- * Use cc_platform_has instead
----
- drivers/crypto/ccp/psp-dev.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index a3b7b5130be4..c9c741ac8442 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -74,6 +74,12 @@ static unsigned int psp_get_capability(struct psp_device *psp)
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index 6c61817996a3..432a61aca0c5 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -269,15 +269,17 @@ static void nitrox_remove_from_devlist(struct nitrox_device *ndev)
+ 
+ struct nitrox_device *nitrox_get_first_device(void)
+ {
+-	struct nitrox_device *ndev;
++	struct nitrox_device *ndev = NULL, *iter;
+ 
+ 	mutex_lock(&devlist_lock);
+-	list_for_each_entry(ndev, &ndevlist, list) {
+-		if (nitrox_ready(ndev))
++	list_for_each_entry(iter, &ndevlist, list) {
++		if (nitrox_ready(iter)) {
++			ndev = iter;
+ 			break;
++		}
  	}
- 	psp->capability = val;
+ 	mutex_unlock(&devlist_lock);
+-	if (&ndev->list == &ndevlist)
++	if (!ndev)
+ 		return NULL;
  
-+	/* Detect if TSME and SME are both enabled */
-+	if (psp->capability & PSP_CAPABILITY_PSP_SECURITY_REPORTING &&
-+	    psp->capability & (PSP_SECURITY_TSME_STATUS << PSP_CAPABILITY_PSP_SECURITY_OFFSET) &&
-+	    cc_platform_has(CC_ATTR_HOST_MEM_ENCRYPT))
-+		dev_notice(psp->dev, "psp: Both TSME and SME are active, SME is unnecessary when TSME is active.\n");
-+
- 	return 0;
- }
- 
+ 	refcount_inc(&ndev->refcnt);
+
+base-commit: f82da161ea75dc4db21b2499e4b1facd36dab275
 -- 
-2.34.1
+2.25.1
 
