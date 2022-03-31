@@ -2,117 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB48C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 18:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 637DBC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 19:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234199AbiCaSXe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Mar 2022 14:23:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38076 "EHLO
+        id S240437AbiCaTOj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Mar 2022 15:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234161AbiCaSXc (ORCPT
+        with ESMTP id S240560AbiCaTOg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Mar 2022 14:23:32 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C373A1E533F;
-        Thu, 31 Mar 2022 11:21:43 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 22VILc1V023698
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 14:21:38 -0400
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 0F7B715C003E; Thu, 31 Mar 2022 14:21:38 -0400 (EDT)
-Date:   Thu, 31 Mar 2022 14:21:38 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Michael Brooks <m@sweetwater.ai>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at
- init
-Message-ID: <YkXxMpAW+rZd+Wyx@mit.edu>
-References: <20220331150706.124075-1-Jason@zx2c4.com>
- <20220331152641.169301-1-Jason@zx2c4.com>
- <CAOnCY6Sv1goLQMJkvjsVb+TGdowUk6_vQ4ELQ_GkHu8Wjs3PAA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOnCY6Sv1goLQMJkvjsVb+TGdowUk6_vQ4ELQ_GkHu8Wjs3PAA@mail.gmail.com>
+        Thu, 31 Mar 2022 15:14:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0DE239337;
+        Thu, 31 Mar 2022 12:12:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7624C619A0;
+        Thu, 31 Mar 2022 19:12:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DCC6CC340EE;
+        Thu, 31 Mar 2022 19:12:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648753967;
+        bh=uDyNBjEF7PaH09wbRXFm8lyjBRNLFNyqwu53PDdVkn0=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=kKLGhv+hr7CPl7KKP2YoJEjfOKgvJujqXJe8nV30g5E/cuOJCcZldRrzvhxLZ2+pO
+         sgZof/lwMQBuTMw8cVYRZtxlsiAQQcGALrkF0DLW1h81mMgjeZDbbZ/s8CXAJG1umZ
+         PkJRUeRJ3t1WyjQIOaIgzKexIBPC7AdF0BQ9c2e9wYipUM4tRwnaKfY+as95jcn+el
+         rzZtZ4WeUaLUCVazXKJy1OwpeHnIEtCN7vOHQDKq690WDRIQObx8OMEaCv7D/er6vr
+         0zx3FGGSO5HHow+vIpddkiCfe+7NGCHnIzIBC7J+hNweJOCdKk3mKxUiZhDfwRS8ee
+         HOrnOt44dRxcg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C811CE7BB0B;
+        Thu, 31 Mar 2022 19:12:47 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 5.18
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+References: <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au> <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p1
+X-PR-Tracked-Commit-Id: aa8e73eed7d3084c18dd16d195748661c7e881b5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 93235e3df29c084a37e0daed17801c6adfce4cb6
+Message-Id: <164875396781.22373.16661691261433119146.pr-tracker-bot@kernel.org>
+Date:   Thu, 31 Mar 2022 19:12:47 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 09:02:27AM -0700, Michael Brooks wrote:
-> mix_pool_bytes() has numerous problems, as discussed in prior emails.
-> Do we still want to be putting so much effort into a development dead
-> end?
+The pull request you sent on Thu, 31 Mar 2022 15:16:58 +1200:
 
-Michael, with respect, there were a number of things in your analysis
-which simply didn't make any sense.  Discussing it on an e-mail thread
-relating to stable bacports wasn't the right place, so I didn't extend
-the discussion there.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p1
 
-You believe that max_pool_bytes() has numerous problems.  That's not
-the same thing as it having problems.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/93235e3df29c084a37e0daed17801c6adfce4cb6
 
-And making incremental changes, with code review, is the much better
-approach than just doing a rip-and-replace with some something else
---- which might have different, even more exciting problems.
+Thank you!
 
-Something for you to consider, since your comments seem to indicate
-that you are not familiar with the full random driver design.  There
-are two halves to how the random driver works.  The first half is the
-collection of entropy, and the priamry way this is accomplished is by
-taking timestamps of various events that an external attacker
-hopefully won't have access to.  For example, keystrokes from the
-user, mouse motion events, network and disk interrupts, etc.  Where
-possible, we don't just use jiffies, but we also use high preceision
-counters, such as the CPU counter.  The idea here is that even if the
-external interrupts sources can be seen by an attacker, when the
-interrupt is serviced when measured by a high precision cycle counter
-(for example) is not going to be as easily guessed.  That being said,
-we only get a tiny amount of entropy (by which I mean uncertainty by
-the attacker) out of each event.  This is why it is important to
-distill it in an input pool, so that as we add more and more
-unpredictable inputs into the pool, it becomes less and less tractible
-for the attacker to make educating guesses about what is in the pool.
-
-Then periodically (and doing this periodically is important, because
-we want to wait until there we have a large amount of uncertainty with
-respect to the attacker accumulated in the pool) we extract from the
-input pool and use that to reseed the second part of the random
-driver, which is used to be called the "output pool".
-
-It used to be that both the input pool and output pool were literally
-bitpools that were mixed using an LFSR scheme, and then extracted
-using cryptographic hash.
-
-The output pool is now a ChaCha-based CRNG, and most recently the
-"input pool" is a accumulating entropy using a Blake2 hash.  So in
-many ways, the term "input pool" is a bit of a misnomer now, and
-perhaps should be renamed.
-
-For more information, I direct you to the Yarrow paper[1].  The basic
-idea of using two pools coupled with a catastrophic reseed was
-shamelessly stolen from Bruce Schneier's work.
-
-[1] https://www.schneier.com/wp-content/uploads/2016/02/paper-yarrow.pdf
-
-Are there reasons why we didn't just implement Yarrow?  That's because
-/dev/random predates Yarrow, and we made incremental changes to adopt
-("steal") good ideas from other sources, which hopefully don't
-invalidate previous analysis and reviews about /dev/random.  Please
-note that there are a number of academic researches who have published
-peer previews of /dev/random, and that is incredibly useful.
-
-We've made changes over time to improve /dev/random and to addresses
-various theoretical weaknesses noted by these academic reviewers.  So
-when you claim that there are "numerous problems" with the input pool,
-I'll have to note that /dev/random has undergone reviews by
-cryptographers, and they have not identified the problems that you
-claim are there.
-
-Regards,
-
-						- Ted
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
