@@ -2,210 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED70C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 02:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53128C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Mar 2022 04:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbiCaChf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Mar 2022 22:37:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47934 "EHLO
+        id S229892AbiCaEQe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 31 Mar 2022 00:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbiCaChc (ORCPT
+        with ESMTP id S229882AbiCaEQ1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Mar 2022 22:37:32 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD408BF04;
-        Wed, 30 Mar 2022 19:35:44 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KTS6g14k7zgYBd;
-        Thu, 31 Mar 2022 10:34:03 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Thu, 31 Mar 2022 10:35:41 +0800
-Subject: Re: [PATCH net] net/tls: fix slab-out-of-bounds bug in
- decrypt_internal
-To:     Jakub Kicinski <kuba@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <borisp@nvidia.com>, <john.fastabend@gmail.com>,
-        <daniel@iogearbox.net>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <netdev@vger.kernel.org>, <vakul.garg@nxp.com>,
-        <davejwatson@fb.com>, <linux-kernel@vger.kernel.org>,
-        Vadim Fedorenko <vfedorenko@novek.ru>,
-        <linux-crypto@vger.kernel.org>
-References: <20220330085009.1011614-1-william.xuanziyang@huawei.com>
- <20220330093925.2d8ee6ca@kernel.org> <20220330132406.633c2da8@kernel.org>
-From:   "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <d7f55e84-ae87-ffd1-a488-a7bf6e65f3b1@huawei.com>
-Date:   Thu, 31 Mar 2022 10:35:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Thu, 31 Mar 2022 00:16:27 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35C3B82CA;
+        Wed, 30 Mar 2022 20:59:24 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1nZlIw-0003JX-6d; Thu, 31 Mar 2022 14:16:59 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 31 Mar 2022 15:16:58 +1200
+Date:   Thu, 31 Mar 2022 15:16:58 +1200
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.18
+Message-ID: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+References: <20201227113221.GA28744@gondor.apana.org.au>
+ <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20220330132406.633c2da8@kernel.org>
-Content-Type: text/plain; charset="gbk"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjE5yThYIzih2kM6@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> On Wed, 30 Mar 2022 09:39:25 -0700 Jakub Kicinski wrote:
->> On Wed, 30 Mar 2022 16:50:09 +0800 Ziyang Xuan wrote:
->>> The memory size of tls_ctx->rx.iv for AES128-CCM is 12 setting in
->>> tls_set_sw_offload(). The return value of crypto_aead_ivsize()
->>> for "ccm(aes)" is 16. So memcpy() require 16 bytes from 12 bytes
->>> memory space will trigger slab-out-of-bounds bug as following:
->>>
->>> ==================================================================
->>> BUG: KASAN: slab-out-of-bounds in decrypt_internal+0x385/0xc40 [tls]
->>> Read of size 16 at addr ffff888114e84e60 by task tls/10911
->>>
->>> Call Trace:
->>>  <TASK>
->>>  dump_stack_lvl+0x34/0x44
->>>  print_report.cold+0x5e/0x5db
->>>  ? decrypt_internal+0x385/0xc40 [tls]
->>>  kasan_report+0xab/0x120
->>>  ? decrypt_internal+0x385/0xc40 [tls]
->>>  kasan_check_range+0xf9/0x1e0
->>>  memcpy+0x20/0x60
->>>  decrypt_internal+0x385/0xc40 [tls]
->>>  ? tls_get_rec+0x2e0/0x2e0 [tls]
->>>  ? process_rx_list+0x1a5/0x420 [tls]
->>>  ? tls_setup_from_iter.constprop.0+0x2e0/0x2e0 [tls]
->>>  decrypt_skb_update+0x9d/0x400 [tls]
->>>  tls_sw_recvmsg+0x3c8/0xb50 [tls]
->>>
->>> Allocated by task 10911:
->>>  kasan_save_stack+0x1e/0x40
->>>  __kasan_kmalloc+0x81/0xa0
->>>  tls_set_sw_offload+0x2eb/0xa20 [tls]
->>>  tls_setsockopt+0x68c/0x700 [tls]
->>>  __sys_setsockopt+0xfe/0x1b0  
->>
->> Interesting, are you running on non-x86 platform or with some crypto
->> accelerator? I wonder why we're not hitting it with KASAN and the
->> selftest we have.
-> 
-> I take that back, I can repro on x86 and 5.17, not sure why we're only
-> discovering this now.
-> 
-> Noob question for crypto folks, ivsize for AES CCM is reported 
-> as 16, but the real nonce size is 13 for TLS (q == 2, n == 13
-> using NIST's variable names AFAICT). Are we required to zero out 
-> the rest of the buffer?
-> 
-> In particular I think I've seen transient crypto failures with
-> SM4 CCM in the past and zeroing the tail of the iv buffer seems
-> to make the tests pass reliably.
-> 
->>> Reserve MAX_IV_SIZE memory space for iv to be compatible with all
->>> ciphers. And do iv and salt copy like done in tls_do_encryption().
->>>
->>> Fixes: f295b3ae9f59 ("net/tls: Add support of AES128-CCM based ciphers")
->>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
->>> ---
->>>  net/tls/tls_sw.c | 10 +++-------
->>>  1 file changed, 3 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
->>> index 0024a692f0f8..6b858f995b23 100644
->>> --- a/net/tls/tls_sw.c
->>> +++ b/net/tls/tls_sw.c
->>> @@ -1456,7 +1456,7 @@ static int decrypt_internal(struct sock *sk, struct sk_buff *skb,
->>>  	aead_size = sizeof(*aead_req) + crypto_aead_reqsize(ctx->aead_recv);
->>>  	mem_size = aead_size + (nsg * sizeof(struct scatterlist));
->>>  	mem_size = mem_size + prot->aad_size;
->>> -	mem_size = mem_size + crypto_aead_ivsize(ctx->aead_recv);
->>> +	mem_size = mem_size + MAX_IV_SIZE;  
->>
->> This change is not strictly required for the patch, right?
->> Can we drop it, and perhaps send as an optimization separately later?
->>
-Yes, it is not required for the problem.
+Hi Linus:
 
->>>  	/* Allocate a single block of memory which contains
->>>  	 * aead_req || sgin[] || sgout[] || aad || iv.
->>> @@ -1493,12 +1493,8 @@ static int decrypt_internal(struct sock *sk, struct sk_buff *skb,
->>>  		kfree(mem);
->>>  		return err;
->>>  	}
->>> -	if (prot->version == TLS_1_3_VERSION ||
->>> -	    prot->cipher_type == TLS_CIPHER_CHACHA20_POLY1305)
->>> -		memcpy(iv + iv_offset, tls_ctx->rx.iv,
->>> -		       crypto_aead_ivsize(ctx->aead_recv));
->>> -	else
->>> -		memcpy(iv + iv_offset, tls_ctx->rx.iv, prot->salt_size);
->>> +	memcpy(iv + iv_offset, tls_ctx->rx.iv,
->>> +	       prot->iv_size + prot->salt_size);  
->>
->> If the IV really is 16B then we're passing 4 bytes of uninitialized
->> data at the end of the buffer, right?
->>
->>>  	xor_iv_with_seq(prot, iv + iv_offset, tls_ctx->rx.rec_seq);
-> 
-> FWIW this is the fix I tested:
-> 
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index 0024a692f0f8..dbc6bce01898 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -1473,6 +1473,8 @@ static int decrypt_internal(struct sock *sk, struct sk_buff *skb,
->  	aad = (u8 *)(sgout + n_sgout);
->  	iv = aad + prot->aad_size;
->  
-> +	/* Prepare IV */
-> +	memset(iv, 0, crypto_aead_ivsize(ctx->aead_recv));
->  	/* For CCM based ciphers, first byte of nonce+iv is a constant */
->  	switch (prot->cipher_type) {
->  	case TLS_CIPHER_AES_CCM_128:
-> @@ -1485,21 +1487,20 @@ static int decrypt_internal(struct sock *sk, struct sk_buff *skb,
->  		break;
->  	}
->  
-> -	/* Prepare IV */
-> -	err = skb_copy_bits(skb, rxm->offset + TLS_HEADER_SIZE,
-> -			    iv + iv_offset + prot->salt_size,
-> -			    prot->iv_size);
-> -	if (err < 0) {
-> -		kfree(mem);
-> -		return err;
-> -	}
->  	if (prot->version == TLS_1_3_VERSION ||
-> -	    prot->cipher_type == TLS_CIPHER_CHACHA20_POLY1305)
-> +	    prot->cipher_type == TLS_CIPHER_CHACHA20_POLY1305) {
->  		memcpy(iv + iv_offset, tls_ctx->rx.iv,
-> -		       crypto_aead_ivsize(ctx->aead_recv));
-> -	else
-> +		       prot->iv_size + prot->salt_size);
-> +	} else {
-> +		err = skb_copy_bits(skb, rxm->offset + TLS_HEADER_SIZE,
-> +				    iv + iv_offset + prot->salt_size,
-> +				    prot->iv_size);
-> +		if (err < 0) {
-> +			kfree(mem);
-> +			return err;
-> +		}
->  		memcpy(iv + iv_offset, tls_ctx->rx.iv, prot->salt_size);
-> -
-> +	}
-I am thinking about is skb_copy_bits() necessary in non-TLS_1_3_VERSION
-and non-TLS_CIPHER_CHACHA20_POLY1305 scenarios?
+The following changes since commit 0e03b8fd29363f2df44e2a7a176d486de550757a:
 
-If the inital iv+salt negotiated configuration for tx/rx offload is right
-and reliable, what is the reason why we have to extract the iv value from
-received skb instead if using the negotiated iv value? Does it can be
-modified or just follow spec that versions below TLS_1_3_VERSION?
+  crypto: xilinx - Turn SHA into a tristate and allow COMPILE_TEST (2022-03-14 14:45:45 +1200)
 
-Without skb_copy_bits(), tls selftest all passed.
+are available in the Git repository at:
 
-Forgive my noob question.
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p1
 
->  	xor_iv_with_seq(prot, iv + iv_offset, tls_ctx->rx.rec_seq);
->  
->  	/* Prepare AAD */
-> 
+for you to fetch changes up to aa8e73eed7d3084c18dd16d195748661c7e881b5:
+
+  crypto: x86/sm3 - Fixup SLS (2022-03-30 16:33:11 +1200)
+
+----------------------------------------------------------------
+This push fixes the following issues:
+
+- Missing Kconfig dependency on arm that leads to boot failure.
+- x86 SLS fixes.
+- Reference leak in the stm32 driver.
+
+----------------------------------------------------------------
+Herbert Xu (1):
+      crypto: arm/aes-neonbs-cbc - Select generic cbc and aes
+
+Peter Zijlstra (3):
+      crypto: x86/chacha20 - Avoid spurious jumps to other functions
+      crypto: x86/poly1305 - Fixup SLS
+      crypto: x86/sm3 - Fixup SLS
+
+Zheng Yongjun (1):
+      crypto: stm32 - fix reference leak in stm32_crc_remove
+
+ arch/arm/crypto/Kconfig                       |  2 ++
+ arch/x86/crypto/chacha-avx512vl-x86_64.S      |  4 +--
+ arch/x86/crypto/poly1305-x86_64-cryptogams.pl | 38 +++++++++++++--------------
+ arch/x86/crypto/sm3-avx-asm_64.S              |  2 +-
+ drivers/crypto/stm32/stm32-crc32.c            |  4 ++-
+ 5 files changed, 27 insertions(+), 23 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
