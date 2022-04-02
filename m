@@ -2,642 +2,117 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75310C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 19:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F98C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 20:04:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242572AbiDBTaV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 Apr 2022 15:30:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45292 "EHLO
+        id S243739AbiDBUGL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Apr 2022 16:06:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242253AbiDBTaU (ORCPT
+        with ESMTP id S1348174AbiDBUGK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 Apr 2022 15:30:20 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B539126EC
-        for <linux-crypto@vger.kernel.org>; Sat,  2 Apr 2022 12:28:24 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a6so1386707ejk.0
-        for <linux-crypto@vger.kernel.org>; Sat, 02 Apr 2022 12:28:24 -0700 (PDT)
+        Sat, 2 Apr 2022 16:06:10 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0CE3EB8C
+        for <linux-crypto@vger.kernel.org>; Sat,  2 Apr 2022 13:04:16 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id v64-20020a1cac43000000b0038cfd1b3a6dso5380179wme.5
+        for <linux-crypto@vger.kernel.org>; Sat, 02 Apr 2022 13:04:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LyaA5oNQO5OuXiPbk5OIIbMXaiCWEbCXALdzmJEtNOw=;
-        b=io2yNzQFocbxf/GN7IHJDdYKJdnlxFFdR59pq7HPwV0SFPqjAGO4uy6kB00KBUZDsO
-         vUatcCT44pwS71J0TC/HuL9FVIiGKYxepmd1vPLe2lQEYd6mG2/8bIk1LenXPsFUDKUP
-         V1Y0IjiY930OLV2odz+gVUF/ebhl+dcnnaWI7e1jvKgmU7sI5em0dfIZBhKKiCOgo3Wf
-         zQ43anzd9bjxl4foU+Ks5JRPwua+kz5rkxnW15r6b5Vw+SB78ozzCIKGHmRGOX8K9NnN
-         NRvCCsZaiJZEoagV2ABNCR8YMsIRFGIpAnQ3pmqFKaTdiDxUdOpA+mARqztyBL/UMYXJ
-         rJmA==
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=yQeqwIeqI5CMAgG8hDfKbZn0Debf8w0vr8QNNYkJmUI=;
+        b=rg468YkTGw4qq+7BTqNb+9e2AW7798nZyQsEw7APtpHfEScIn4mAxPp40epSJ/DqqM
+         FW1ukFdIVMS8churmP06RZyQPTzPyQdeidOkNAX+hpVRYnSNHIas4ePrAYUdilNlEtP6
+         yhnuvRTNyZSAysfMJPll2xZUF3wAuxL6zspWSXz5gwdt66ugNBr5eNsZNqbFT3zYWfIS
+         xF11MED8ko9Bbk+x/u3f9nXO5nIl3PYMXVFAdWugobCvQR8MjCmx7qd9kQCp38gnhfrO
+         fC+b2Ptuhb93WvKGvSwgJ6rFJy4o9pM7VSVPTbWuBDCRyrqbelhElQJYJEsZnujnWVO5
+         McYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LyaA5oNQO5OuXiPbk5OIIbMXaiCWEbCXALdzmJEtNOw=;
-        b=wTRNJiio8y0ttXg/vkbHTU4/XfNUwnTDxNNIkUBQQjaVJWWw1XHTJ5AwhRF7Rs6qHF
-         Z0tTGpiqU+b/9pqVQLEOJqaH7hvwJpaLT17iAcvd54pKLSq8MNJEl/FRiHV79aAzYXgd
-         krijn4eEQh8aZ82R7dMLqiOtsdh7omfABaE/5kKmqQjRM0Y3SDt79Lg1/5Sasom47PQd
-         DyklqXvvzwIeDlFHINwRjBnAG9nN/mdQnYLLn153pUjUGVKVkkaQaXVDsjS6rYY45b2d
-         HPybtkStYv14W4bQeI5+9z+Eq0Z8y/ugzEcs2OncsASSFgvSqFZWgvU1GuBgvzFtcG9A
-         oilA==
-X-Gm-Message-State: AOAM530iIhc6c2nIMw82GqSO/e42D0/Maqt6CumUPHqwg0t1QGQyx4hR
-        ertRmJiCZEouf6dm8011BLegVQ==
-X-Google-Smtp-Source: ABdhPJx3rgPTw/IeWjHD03K97q2qNv1msgi16+Yi+TijH4p2II07NldKpDvS/hO16DV/NYqcyBQpOw==
-X-Received: by 2002:a17:907:7255:b0:6df:6b81:3872 with SMTP id ds21-20020a170907725500b006df6b813872mr5017865ejc.461.1648927703117;
-        Sat, 02 Apr 2022 12:28:23 -0700 (PDT)
-Received: from localhost.localdomain (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
-        by smtp.gmail.com with ESMTPSA id n13-20020a170906724d00b006cedd6d7e24sm2408985ejk.119.2022.04.02.12.28.21
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=yQeqwIeqI5CMAgG8hDfKbZn0Debf8w0vr8QNNYkJmUI=;
+        b=ZZ3eL489ZGVChITxbVW/svWscxrq4YrXwGQylHDeqquvxXIDtb2E/cDIluF0d8a4WP
+         uPjvwa+0Rl1y3fp+Ms0WPLHiDDYhU40pK75DUkaV8jAK2Frddui6rchI34CH8TPrEH5M
+         NFNHQ7+kCffFt355KwEU7wIQQxPT/Km1XVm9GDaFQ57053iE0TyaBu6s13AUY4Bsrlc6
+         rG4RS8UVyZ5VNpCzXAdDP1QxX90Dgt0D42RAqzxho5QXM8rzypEUbVPsPc3LC8RgPUMv
+         Wyf+ObLBoK+i6kWKle57zvOfcaKnP2DUgnwgd/SiLZinf3FC99A02t0OhuK9VzrJeKn9
+         TqQw==
+X-Gm-Message-State: AOAM5324lmQAy/Lt+W6NmU5Lgdnb75w8VJzymOJ8fzLJImqMuPIiYfdi
+        MroJibjUziesMGsVAKy4/k5WGQ==
+X-Google-Smtp-Source: ABdhPJy6NaiDP7v3t/VgL9bpERiXPtZ6xlytZQf5riyEAwmfhgWKXXpEcvulkX/plHpsKoVk6W8Z4A==
+X-Received: by 2002:a05:600c:5029:b0:38c:9768:b4c with SMTP id n41-20020a05600c502900b0038c97680b4cmr13117148wmr.123.1648929854661;
+        Sat, 02 Apr 2022 13:04:14 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id h10-20020a05600c144a00b0038ccc75a6adsm13008386wmi.37.2022.04.02.13.04.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Apr 2022 12:28:22 -0700 (PDT)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] dt-bindings: white-space cleanups
-Date:   Sat,  2 Apr 2022 21:28:19 +0200
-Message-Id: <20220402192819.154691-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.32.0
+        Sat, 02 Apr 2022 13:04:13 -0700 (PDT)
+Date:   Sat, 2 Apr 2022 22:04:11 +0200
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+        robh+dt@kernel.org, llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v4 10/33] crypto: rockchip: rework by using crypto_engine
+Message-ID: <YkisOxklZgCejfad@Red>
+References: <20220401201804.2867154-11-clabbe@baylibre.com>
+ <202204021634.IhyHrjoT-lkp@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <202204021634.IhyHrjoT-lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove trailing white-spaces and trailing blank lines (yamllint when run
-manually does not like them).
+Le Sat, Apr 02, 2022 at 04:22:56PM +0800, kernel test robot a écrit :
+> Hi Corentin,
+> 
+> I love your patch! Perhaps something to improve:
+> 
+> [auto build test WARNING on next-20220331]
+> [also build test WARNING on v5.17]
+> [cannot apply to rockchip/for-next herbert-cryptodev-2.6/master herbert-crypto-2.6/master v5.17 v5.17-rc8 v5.17-rc7]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Corentin-Labbe/crypto-rockchip-permit-to-pass-self-tests/20220402-042221
+> base:    fdcbcd1348f4ef713668bae1b0fa9774e1811205
+> config: arm64-buildonly-randconfig-r001-20220402 (https://download.01.org/0day-ci/archive/20220402/202204021634.IhyHrjoT-lkp@intel.com/config)
+> compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c4a1b07d0979e7ff20d7d541af666d822d66b566)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # install arm64 cross compiling tool for clang build
+>         # apt-get install binutils-aarch64-linux-gnu
+>         # https://github.com/intel-lab-lkp/linux/commit/be381eb03ba20a6e06f0e880a9929d14a1e13064
+>         git remote add linux-review https://github.com/intel-lab-lkp/linux
+>         git fetch --no-tags linux-review Corentin-Labbe/crypto-rockchip-permit-to-pass-self-tests/20220402-042221
+>         git checkout be381eb03ba20a6e06f0e880a9929d14a1e13064
+>         # save the config file to linux build tree
+>         mkdir build_dir
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash drivers/crypto/rockchip/
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    drivers/crypto/rockchip/rk3288_crypto_skcipher.c:21:46: error: use of undeclared identifier 'tfm'
+>            unsigned int bs = crypto_skcipher_blocksize(tfm);
+>                                                        ^
+> >> drivers/crypto/rockchip/rk3288_crypto_skcipher.c:328:6: warning: variable 'n' set but not used [-Wunused-but-set-variable]
+>            int n = 0;
+>                ^
+>    1 warning and 1 error generated.
+> 
 
-Suggested-by: Corentin Labbe <clabbe@baylibre.com>
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- .../bindings/clock/samsung,exynos4412-isp-clock.yaml          | 1 -
- .../devicetree/bindings/crypto/allwinner,sun8i-ce.yaml        | 1 -
- .../devicetree/bindings/display/amlogic,meson-dw-hdmi.yaml    | 1 -
- .../bindings/display/bridge/google,cros-ec-anx7688.yaml       | 1 -
- Documentation/devicetree/bindings/display/bridge/ps8640.yaml  | 1 -
- .../devicetree/bindings/display/imx/nxp,imx8mq-dcss.yaml      | 1 -
- .../devicetree/bindings/display/mediatek/mediatek,merge.yaml  | 1 -
- .../devicetree/bindings/display/panel/ilitek,ili9341.yaml     | 1 -
- .../devicetree/bindings/display/panel/orisetech,otm8009a.yaml | 1 -
- .../bindings/display/sprd/sprd,display-subsystem.yaml         | 1 -
- Documentation/devicetree/bindings/display/st,stm32-ltdc.yaml  | 1 -
- Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml    | 1 -
- Documentation/devicetree/bindings/dma/st,stm32-mdma.yaml      | 1 -
- Documentation/devicetree/bindings/gpu/samsung-rotator.yaml    | 1 -
- Documentation/devicetree/bindings/hwmon/adt7475.yaml          | 1 -
- Documentation/devicetree/bindings/i2c/i2c-gate.yaml           | 1 -
- Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml      | 1 -
- Documentation/devicetree/bindings/iio/adc/adi,ad7291.yaml     | 1 -
- Documentation/devicetree/bindings/iio/dac/lltc,ltc1660.yaml   | 2 +-
- Documentation/devicetree/bindings/iommu/samsung,sysmmu.yaml   | 1 -
- .../devicetree/bindings/leds/backlight/qcom-wled.yaml         | 2 +-
- .../devicetree/bindings/mailbox/amlogic,meson-gxbb-mhu.yaml   | 1 -
- Documentation/devicetree/bindings/media/microchip,xisc.yaml   | 1 -
- Documentation/devicetree/bindings/net/ti,k3-am654-cpts.yaml   | 1 -
- .../devicetree/bindings/net/wireless/qcom,ath11k.yaml         | 2 +-
- .../devicetree/bindings/power/amlogic,meson-sec-pwrc.yaml     | 1 -
- .../devicetree/bindings/power/supply/cw2015_battery.yaml      | 1 -
- .../devicetree/bindings/power/supply/power-supply.yaml        | 1 -
- Documentation/devicetree/bindings/power/supply/ti,lp8727.yaml | 1 -
- .../devicetree/bindings/power/supply/tps65217-charger.yaml    | 2 +-
- .../bindings/regulator/socionext,uniphier-regulator.yaml      | 1 -
- .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml       | 1 -
- .../devicetree/bindings/reserved-memory/ramoops.yaml          | 1 -
- Documentation/devicetree/bindings/reset/microchip,rst.yaml    | 1 -
- Documentation/devicetree/bindings/rng/intel,ixp46x-rng.yaml   | 1 -
- Documentation/devicetree/bindings/serial/sprd-uart.yaml       | 2 +-
- .../devicetree/bindings/soc/amlogic/amlogic,canvas.yaml       | 1 -
- Documentation/devicetree/bindings/sound/adi,adau1372.yaml     | 1 -
- .../devicetree/bindings/sound/amlogic,gx-sound-card.yaml      | 1 -
- Documentation/devicetree/bindings/sound/maxim,max98520.yaml   | 1 -
- Documentation/devicetree/bindings/sound/mchp,spdifrx.yaml     | 2 +-
- Documentation/devicetree/bindings/sound/mchp,spdiftx.yaml     | 2 +-
- .../devicetree/bindings/sound/nvidia,tegra-audio-rt5640.yaml  | 1 -
- .../devicetree/bindings/sound/samsung,aries-wm8994.yaml       | 1 -
- Documentation/devicetree/bindings/sound/samsung,odroid.yaml   | 1 -
- Documentation/devicetree/bindings/sound/tas2562.yaml          | 1 -
- Documentation/devicetree/bindings/sound/tas2770.yaml          | 1 -
- .../devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml       | 1 -
- .../devicetree/bindings/spi/amlogic,meson6-spifc.yaml         | 1 -
- Documentation/devicetree/bindings/spi/renesas,hspi.yaml       | 1 -
- Documentation/devicetree/bindings/usb/dwc2.yaml               | 4 ++--
- Documentation/devicetree/bindings/usb/smsc,usb3503.yaml       | 2 +-
- 52 files changed, 10 insertions(+), 53 deletions(-)
+Argh, I didnt retry to compile this serie one patch by one.
 
-diff --git a/Documentation/devicetree/bindings/clock/samsung,exynos4412-isp-clock.yaml b/Documentation/devicetree/bindings/clock/samsung,exynos4412-isp-clock.yaml
-index 1ed64add4355..7ad8a0c23b2a 100644
---- a/Documentation/devicetree/bindings/clock/samsung,exynos4412-isp-clock.yaml
-+++ b/Documentation/devicetree/bindings/clock/samsung,exynos4412-isp-clock.yaml
-@@ -61,4 +61,3 @@ examples:
-         clocks = <&clock CLK_ACLK200>, <&clock CLK_ACLK400_MCUISP>;
-         clock-names = "aclk200", "aclk400_mcuisp";
-     };
--
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-index 00648f9d9278..026a9f9e1aeb 100644
---- a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-@@ -82,4 +82,3 @@ examples:
-       clock-names = "bus", "mod";
-       resets = <&ccu RST_BUS_CE>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/amlogic,meson-dw-hdmi.yaml b/Documentation/devicetree/bindings/display/amlogic,meson-dw-hdmi.yaml
-index 343598c9f473..2e208d2fc98f 100644
---- a/Documentation/devicetree/bindings/display/amlogic,meson-dw-hdmi.yaml
-+++ b/Documentation/devicetree/bindings/display/amlogic,meson-dw-hdmi.yaml
-@@ -150,4 +150,3 @@ examples:
-              };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/bridge/google,cros-ec-anx7688.yaml b/Documentation/devicetree/bindings/display/bridge/google,cros-ec-anx7688.yaml
-index a88a5d8c7ba5..a44d025d33bd 100644
---- a/Documentation/devicetree/bindings/display/bridge/google,cros-ec-anx7688.yaml
-+++ b/Documentation/devicetree/bindings/display/bridge/google,cros-ec-anx7688.yaml
-@@ -78,4 +78,3 @@ examples:
-             };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/bridge/ps8640.yaml b/Documentation/devicetree/bindings/display/bridge/ps8640.yaml
-index 186e17be51fb..8ab156e0a8cf 100644
---- a/Documentation/devicetree/bindings/display/bridge/ps8640.yaml
-+++ b/Documentation/devicetree/bindings/display/bridge/ps8640.yaml
-@@ -119,4 +119,3 @@ examples:
-             };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/imx/nxp,imx8mq-dcss.yaml b/Documentation/devicetree/bindings/display/imx/nxp,imx8mq-dcss.yaml
-index 0091df9dd73b..989ab312c1f4 100644
---- a/Documentation/devicetree/bindings/display/imx/nxp,imx8mq-dcss.yaml
-+++ b/Documentation/devicetree/bindings/display/imx/nxp,imx8mq-dcss.yaml
-@@ -105,4 +105,3 @@ examples:
-             };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/mediatek/mediatek,merge.yaml b/Documentation/devicetree/bindings/display/mediatek/mediatek,merge.yaml
-index d635c5dcb68b..69ba75777dac 100644
---- a/Documentation/devicetree/bindings/display/mediatek/mediatek,merge.yaml
-+++ b/Documentation/devicetree/bindings/display/mediatek/mediatek,merge.yaml
-@@ -102,4 +102,3 @@ examples:
-             clock-names = "merge";
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/panel/ilitek,ili9341.yaml b/Documentation/devicetree/bindings/display/panel/ilitek,ili9341.yaml
-index 20ce88ab4b3a..6058948a9764 100644
---- a/Documentation/devicetree/bindings/display/panel/ilitek,ili9341.yaml
-+++ b/Documentation/devicetree/bindings/display/panel/ilitek,ili9341.yaml
-@@ -75,4 +75,3 @@ examples:
-              };
-         };
- ...
--
-diff --git a/Documentation/devicetree/bindings/display/panel/orisetech,otm8009a.yaml b/Documentation/devicetree/bindings/display/panel/orisetech,otm8009a.yaml
-index 17cbd0ad32bf..ad7d3575190e 100644
---- a/Documentation/devicetree/bindings/display/panel/orisetech,otm8009a.yaml
-+++ b/Documentation/devicetree/bindings/display/panel/orisetech,otm8009a.yaml
-@@ -50,4 +50,3 @@ examples:
-       };
-     };
- ...
--
-diff --git a/Documentation/devicetree/bindings/display/sprd/sprd,display-subsystem.yaml b/Documentation/devicetree/bindings/display/sprd/sprd,display-subsystem.yaml
-index d0a5592bd89d..b3d5e1b96fae 100644
---- a/Documentation/devicetree/bindings/display/sprd/sprd,display-subsystem.yaml
-+++ b/Documentation/devicetree/bindings/display/sprd/sprd,display-subsystem.yaml
-@@ -63,4 +63,3 @@ examples:
-         compatible = "sprd,display-subsystem";
-         ports = <&dpu_out>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/display/st,stm32-ltdc.yaml b/Documentation/devicetree/bindings/display/st,stm32-ltdc.yaml
-index 01e2da23790b..d6ea4d62a2cf 100644
---- a/Documentation/devicetree/bindings/display/st,stm32-ltdc.yaml
-+++ b/Documentation/devicetree/bindings/display/st,stm32-ltdc.yaml
-@@ -75,4 +75,3 @@ examples:
-     };
- 
- ...
--
-diff --git a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml b/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
-index 7b1833d6caa2..1e1d8549b7ef 100644
---- a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
-+++ b/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
-@@ -51,4 +51,3 @@ examples:
-     };
- 
- ...
--
-diff --git a/Documentation/devicetree/bindings/dma/st,stm32-mdma.yaml b/Documentation/devicetree/bindings/dma/st,stm32-mdma.yaml
-index 87b4afd2cf62..00cfa3913652 100644
---- a/Documentation/devicetree/bindings/dma/st,stm32-mdma.yaml
-+++ b/Documentation/devicetree/bindings/dma/st,stm32-mdma.yaml
-@@ -104,4 +104,3 @@ examples:
-     };
- 
- ...
--
-diff --git a/Documentation/devicetree/bindings/gpu/samsung-rotator.yaml b/Documentation/devicetree/bindings/gpu/samsung-rotator.yaml
-index 62486f55177d..d60626ffb28e 100644
---- a/Documentation/devicetree/bindings/gpu/samsung-rotator.yaml
-+++ b/Documentation/devicetree/bindings/gpu/samsung-rotator.yaml
-@@ -53,4 +53,3 @@ examples:
-         clocks = <&clock 278>;
-         clock-names = "rotator";
-     };
--
-diff --git a/Documentation/devicetree/bindings/hwmon/adt7475.yaml b/Documentation/devicetree/bindings/hwmon/adt7475.yaml
-index 7d9c083632b9..38879419c364 100644
---- a/Documentation/devicetree/bindings/hwmon/adt7475.yaml
-+++ b/Documentation/devicetree/bindings/hwmon/adt7475.yaml
-@@ -81,4 +81,3 @@ examples:
-         adi,pwm-active-state = <1 0 1>;
-       };
-     };
--
-diff --git a/Documentation/devicetree/bindings/i2c/i2c-gate.yaml b/Documentation/devicetree/bindings/i2c/i2c-gate.yaml
-index bd67b0766599..0cdc3e890df7 100644
---- a/Documentation/devicetree/bindings/i2c/i2c-gate.yaml
-+++ b/Documentation/devicetree/bindings/i2c/i2c-gate.yaml
-@@ -36,4 +36,3 @@ examples:
-         };
-     };
- ...
--
-diff --git a/Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml b/Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml
-index 9b0603a72f40..b6af924dee2e 100644
---- a/Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml
-+++ b/Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml
-@@ -28,7 +28,6 @@ description: |+
-       '------------'                  '-----'  '-----'  '-----'
- 
- 
--
- allOf:
-   - $ref: /schemas/i2c/i2c-mux.yaml#
- 
-diff --git a/Documentation/devicetree/bindings/iio/adc/adi,ad7291.yaml b/Documentation/devicetree/bindings/iio/adc/adi,ad7291.yaml
-index 930f9e3904d7..0b2f5dc80600 100644
---- a/Documentation/devicetree/bindings/iio/adc/adi,ad7291.yaml
-+++ b/Documentation/devicetree/bindings/iio/adc/adi,ad7291.yaml
-@@ -44,4 +44,3 @@ examples:
-       };
-     };
- ...
--
-diff --git a/Documentation/devicetree/bindings/iio/dac/lltc,ltc1660.yaml b/Documentation/devicetree/bindings/iio/dac/lltc,ltc1660.yaml
-index e51a585bd5a3..133b0f867992 100644
---- a/Documentation/devicetree/bindings/iio/dac/lltc,ltc1660.yaml
-+++ b/Documentation/devicetree/bindings/iio/dac/lltc,ltc1660.yaml
-@@ -41,7 +41,7 @@ examples:
-     spi {
-       #address-cells = <1>;
-       #size-cells = <0>;
--  
-+
-       dac@0 {
-         compatible = "lltc,ltc1660";
-         reg = <0>;
-diff --git a/Documentation/devicetree/bindings/iommu/samsung,sysmmu.yaml b/Documentation/devicetree/bindings/iommu/samsung,sysmmu.yaml
-index af51b91c893e..783c6b37c9f0 100644
---- a/Documentation/devicetree/bindings/iommu/samsung,sysmmu.yaml
-+++ b/Documentation/devicetree/bindings/iommu/samsung,sysmmu.yaml
-@@ -107,4 +107,3 @@ examples:
-       power-domains = <&pd_gsc>;
-       #iommu-cells = <0>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/leds/backlight/qcom-wled.yaml b/Documentation/devicetree/bindings/leds/backlight/qcom-wled.yaml
-index 1c24b333c6e2..5d66c3e4def5 100644
---- a/Documentation/devicetree/bindings/leds/backlight/qcom-wled.yaml
-+++ b/Documentation/devicetree/bindings/leds/backlight/qcom-wled.yaml
-@@ -81,7 +81,7 @@ properties:
-     description: |
-       kHz; switching frequency.
-     $ref: /schemas/types.yaml#/definitions/uint32
--    enum: [ 600, 640, 685, 738, 800, 872, 960, 1066, 1200, 1371, 1600, 1920, 
-+    enum: [ 600, 640, 685, 738, 800, 872, 960, 1066, 1200, 1371, 1600, 1920,
-             2400, 3200, 4800, 9600 ]
- 
-   qcom,ovp:
-diff --git a/Documentation/devicetree/bindings/mailbox/amlogic,meson-gxbb-mhu.yaml b/Documentation/devicetree/bindings/mailbox/amlogic,meson-gxbb-mhu.yaml
-index aa2b3bf56b57..ea06976fbbc7 100644
---- a/Documentation/devicetree/bindings/mailbox/amlogic,meson-gxbb-mhu.yaml
-+++ b/Documentation/devicetree/bindings/mailbox/amlogic,meson-gxbb-mhu.yaml
-@@ -51,4 +51,3 @@ examples:
-           interrupts = <208>, <209>, <210>;
-           #mbox-cells = <1>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/media/microchip,xisc.yaml b/Documentation/devicetree/bindings/media/microchip,xisc.yaml
-index 086e1430af4f..40947f18873a 100644
---- a/Documentation/devicetree/bindings/media/microchip,xisc.yaml
-+++ b/Documentation/devicetree/bindings/media/microchip,xisc.yaml
-@@ -126,4 +126,3 @@ examples:
-                 };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpts.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpts.yaml
-index a30419ef550a..b783ad0d1f53 100644
---- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpts.yaml
-+++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpts.yaml
-@@ -142,4 +142,3 @@ examples:
-                assigned-clock-parents = <&k3_clks 118 11>;
-          };
-     };
--
-diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-index cdf7b873b419..82d0a6b2a0a0 100644
---- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-@@ -302,7 +302,7 @@ examples:
-         pcie0 {
-             #size-cells = <2>;
-             #address-cells = <3>;
-- 
-+
-             wifi_0: wifi@0 {
-                 reg = <0 0 0 0 0>;
-                 memory-region = <&qcn9074_0>;
-diff --git a/Documentation/devicetree/bindings/power/amlogic,meson-sec-pwrc.yaml b/Documentation/devicetree/bindings/power/amlogic,meson-sec-pwrc.yaml
-index 7657721a4e96..86e5f6513bb3 100644
---- a/Documentation/devicetree/bindings/power/amlogic,meson-sec-pwrc.yaml
-+++ b/Documentation/devicetree/bindings/power/amlogic,meson-sec-pwrc.yaml
-@@ -40,4 +40,3 @@ examples:
-             #power-domain-cells = <1>;
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/power/supply/cw2015_battery.yaml b/Documentation/devicetree/bindings/power/supply/cw2015_battery.yaml
-index 2dda91587dc3..dc697b6147b2 100644
---- a/Documentation/devicetree/bindings/power/supply/cw2015_battery.yaml
-+++ b/Documentation/devicetree/bindings/power/supply/cw2015_battery.yaml
-@@ -78,4 +78,3 @@ examples:
-            power-supplies = <&mains_charger>, <&usb_charger>;
-        };
-     };
--
-diff --git a/Documentation/devicetree/bindings/power/supply/power-supply.yaml b/Documentation/devicetree/bindings/power/supply/power-supply.yaml
-index 531b67225c74..9a490fbd32e1 100644
---- a/Documentation/devicetree/bindings/power/supply/power-supply.yaml
-+++ b/Documentation/devicetree/bindings/power/supply/power-supply.yaml
-@@ -19,4 +19,3 @@ properties:
-       supply it power, referenced by their phandles.
- 
- additionalProperties: true
--
-diff --git a/Documentation/devicetree/bindings/power/supply/ti,lp8727.yaml b/Documentation/devicetree/bindings/power/supply/ti,lp8727.yaml
-index a23f6653f332..93654e732cda 100644
---- a/Documentation/devicetree/bindings/power/supply/ti,lp8727.yaml
-+++ b/Documentation/devicetree/bindings/power/supply/ti,lp8727.yaml
-@@ -87,4 +87,3 @@ examples:
-         };
-       };
-     };
--
-diff --git a/Documentation/devicetree/bindings/power/supply/tps65217-charger.yaml b/Documentation/devicetree/bindings/power/supply/tps65217-charger.yaml
-index a33408c3a407..2c2fe883bb48 100644
---- a/Documentation/devicetree/bindings/power/supply/tps65217-charger.yaml
-+++ b/Documentation/devicetree/bindings/power/supply/tps65217-charger.yaml
-@@ -24,7 +24,7 @@ properties:
-     items:
-       - const: USB
-       - const: AC
--      
-+
- required:
-   - compatible
-   - interrupts
-diff --git a/Documentation/devicetree/bindings/regulator/socionext,uniphier-regulator.yaml b/Documentation/devicetree/bindings/regulator/socionext,uniphier-regulator.yaml
-index 1218f21ba320..b48790cc05c8 100644
---- a/Documentation/devicetree/bindings/regulator/socionext,uniphier-regulator.yaml
-+++ b/Documentation/devicetree/bindings/regulator/socionext,uniphier-regulator.yaml
-@@ -83,4 +83,3 @@ examples:
-             resets = <&sys_rst 14>;
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
-index 836d4156d54c..a5a27ee0a9e6 100644
---- a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
-+++ b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
-@@ -51,4 +51,3 @@ examples:
-     };
- 
- ...
--
-diff --git a/Documentation/devicetree/bindings/reserved-memory/ramoops.yaml b/Documentation/devicetree/bindings/reserved-memory/ramoops.yaml
-index f4c351a69542..0391871cf44d 100644
---- a/Documentation/devicetree/bindings/reserved-memory/ramoops.yaml
-+++ b/Documentation/devicetree/bindings/reserved-memory/ramoops.yaml
-@@ -142,4 +142,3 @@ examples:
-             };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/reset/microchip,rst.yaml b/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-index 578bfa529b16..81cd8c837623 100644
---- a/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-+++ b/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-@@ -57,4 +57,3 @@ examples:
-         #reset-cells = <1>;
-         cpu-syscon = <&cpu_ctrl>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/rng/intel,ixp46x-rng.yaml b/Documentation/devicetree/bindings/rng/intel,ixp46x-rng.yaml
-index 61963fa9347e..067e71e8ebe8 100644
---- a/Documentation/devicetree/bindings/rng/intel,ixp46x-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/intel,ixp46x-rng.yaml
-@@ -33,4 +33,3 @@ examples:
-       compatible = "intel,ixp46x-rng";
-       reg = <0x70002100 4>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/serial/sprd-uart.yaml b/Documentation/devicetree/bindings/serial/sprd-uart.yaml
-index a444bebd2c1a..da0e2745b5fc 100644
---- a/Documentation/devicetree/bindings/serial/sprd-uart.yaml
-+++ b/Documentation/devicetree/bindings/serial/sprd-uart.yaml
-@@ -35,7 +35,7 @@ properties:
- 
-   clock-names:
-     description: |
--      "enable" for UART module enable clock, "uart" for UART clock, "source" 
-+      "enable" for UART module enable clock, "uart" for UART clock, "source"
-       for UART source (parent) clock.
-     items:
-       - const: enable
-diff --git a/Documentation/devicetree/bindings/soc/amlogic/amlogic,canvas.yaml b/Documentation/devicetree/bindings/soc/amlogic/amlogic,canvas.yaml
-index 02b2d5ba01d6..17db87cb9dab 100644
---- a/Documentation/devicetree/bindings/soc/amlogic/amlogic,canvas.yaml
-+++ b/Documentation/devicetree/bindings/soc/amlogic/amlogic,canvas.yaml
-@@ -48,4 +48,3 @@ examples:
-         compatible = "amlogic,canvas";
-         reg = <0x48 0x14>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/adi,adau1372.yaml b/Documentation/devicetree/bindings/sound/adi,adau1372.yaml
-index 701449311fec..59f7c60a14ba 100644
---- a/Documentation/devicetree/bindings/sound/adi,adau1372.yaml
-+++ b/Documentation/devicetree/bindings/sound/adi,adau1372.yaml
-@@ -64,4 +64,3 @@ examples:
-         clock-frequency = <12288000>;
-     };
- ...
--
-diff --git a/Documentation/devicetree/bindings/sound/amlogic,gx-sound-card.yaml b/Documentation/devicetree/bindings/sound/amlogic,gx-sound-card.yaml
-index 8b5be4b92f35..b4b35edcb493 100644
---- a/Documentation/devicetree/bindings/sound/amlogic,gx-sound-card.yaml
-+++ b/Documentation/devicetree/bindings/sound/amlogic,gx-sound-card.yaml
-@@ -112,4 +112,3 @@ examples:
-                 };
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/maxim,max98520.yaml b/Documentation/devicetree/bindings/sound/maxim,max98520.yaml
-index b6509cb2c8e0..3f88c7d61e34 100644
---- a/Documentation/devicetree/bindings/sound/maxim,max98520.yaml
-+++ b/Documentation/devicetree/bindings/sound/maxim,max98520.yaml
-@@ -33,4 +33,3 @@ examples:
-         reg = <0x38>;
-       };
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/mchp,spdifrx.yaml b/Documentation/devicetree/bindings/sound/mchp,spdifrx.yaml
-index 4a2129005c0f..970311143253 100644
---- a/Documentation/devicetree/bindings/sound/mchp,spdifrx.yaml
-+++ b/Documentation/devicetree/bindings/sound/mchp,spdifrx.yaml
-@@ -10,7 +10,7 @@ maintainers:
-   - Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
- 
- description:
--  The Microchip Sony/Philips Digital Interface Receiver is a serial port 
-+  The Microchip Sony/Philips Digital Interface Receiver is a serial port
-   compliant with the IEC-60958 standard.
- 
- properties:
-diff --git a/Documentation/devicetree/bindings/sound/mchp,spdiftx.yaml b/Documentation/devicetree/bindings/sound/mchp,spdiftx.yaml
-index bdfb63387c53..d5c022e49526 100644
---- a/Documentation/devicetree/bindings/sound/mchp,spdiftx.yaml
-+++ b/Documentation/devicetree/bindings/sound/mchp,spdiftx.yaml
-@@ -10,7 +10,7 @@ maintainers:
-   - Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
- 
- description:
--  The Microchip Sony/Philips Digital Interface Transmitter is a serial port 
-+  The Microchip Sony/Philips Digital Interface Transmitter is a serial port
-   compliant with the IEC-60958 standard.
- 
- properties:
-diff --git a/Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5640.yaml b/Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5640.yaml
-index e768fb0e9a59..b1deaf271afa 100644
---- a/Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5640.yaml
-+++ b/Documentation/devicetree/bindings/sound/nvidia,tegra-audio-rt5640.yaml
-@@ -82,4 +82,3 @@ examples:
-         clocks = <&clk 216>, <&clk 217>, <&clk 120>;
-         clock-names = "pll_a", "pll_a_out0", "mclk";
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/samsung,aries-wm8994.yaml b/Documentation/devicetree/bindings/sound/samsung,aries-wm8994.yaml
-index 97f83eeaf091..a01c4ad929b8 100644
---- a/Documentation/devicetree/bindings/sound/samsung,aries-wm8994.yaml
-+++ b/Documentation/devicetree/bindings/sound/samsung,aries-wm8994.yaml
-@@ -149,4 +149,3 @@ examples:
-             sound-dai = <&wm8994>;
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/samsung,odroid.yaml b/Documentation/devicetree/bindings/sound/samsung,odroid.yaml
-index db2513f3e168..7b4e08ddef6a 100644
---- a/Documentation/devicetree/bindings/sound/samsung,odroid.yaml
-+++ b/Documentation/devicetree/bindings/sound/samsung,odroid.yaml
-@@ -92,4 +92,3 @@ examples:
-             sound-dai = <&hdmi>, <&max98090>;
-         };
-     };
--
-diff --git a/Documentation/devicetree/bindings/sound/tas2562.yaml b/Documentation/devicetree/bindings/sound/tas2562.yaml
-index acd4bbe69731..5f7dd5d6cbca 100644
---- a/Documentation/devicetree/bindings/sound/tas2562.yaml
-+++ b/Documentation/devicetree/bindings/sound/tas2562.yaml
-@@ -76,4 +76,3 @@ examples:
-        ti,imon-slot-no = <0>;
-      };
-    };
--
-diff --git a/Documentation/devicetree/bindings/sound/tas2770.yaml b/Documentation/devicetree/bindings/sound/tas2770.yaml
-index 027bebf4e8cf..bc90e72bf7cf 100644
---- a/Documentation/devicetree/bindings/sound/tas2770.yaml
-+++ b/Documentation/devicetree/bindings/sound/tas2770.yaml
-@@ -80,4 +80,3 @@ examples:
-        ti,vmon-slot-no = <2>;
-      };
-    };
--
-diff --git a/Documentation/devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml b/Documentation/devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml
-index 4d46c49ec32b..50de0da42c13 100644
---- a/Documentation/devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml
-+++ b/Documentation/devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml
-@@ -95,4 +95,3 @@ examples:
-               reg = <0>;
-           };
-     };
--
-diff --git a/Documentation/devicetree/bindings/spi/amlogic,meson6-spifc.yaml b/Documentation/devicetree/bindings/spi/amlogic,meson6-spifc.yaml
-index 54b6f15eca18..8a9d526d06eb 100644
---- a/Documentation/devicetree/bindings/spi/amlogic,meson6-spifc.yaml
-+++ b/Documentation/devicetree/bindings/spi/amlogic,meson6-spifc.yaml
-@@ -52,4 +52,3 @@ examples:
-               spi-max-frequency = <40000000>;
-           };
-     };
--
-diff --git a/Documentation/devicetree/bindings/spi/renesas,hspi.yaml b/Documentation/devicetree/bindings/spi/renesas,hspi.yaml
-index c0eccf703039..bab5d4b7fc3d 100644
---- a/Documentation/devicetree/bindings/spi/renesas,hspi.yaml
-+++ b/Documentation/devicetree/bindings/spi/renesas,hspi.yaml
-@@ -56,4 +56,3 @@ examples:
-         #address-cells = <1>;
-         #size-cells = <0>;
-     };
--
-diff --git a/Documentation/devicetree/bindings/usb/dwc2.yaml b/Documentation/devicetree/bindings/usb/dwc2.yaml
-index 4cebce682d16..17fc471a12bd 100644
---- a/Documentation/devicetree/bindings/usb/dwc2.yaml
-+++ b/Documentation/devicetree/bindings/usb/dwc2.yaml
-@@ -139,12 +139,12 @@ properties:
- 
-   snps,need-phy-for-wake:
-     $ref: /schemas/types.yaml#/definitions/flag
--    description: If present indicates that the phy needs to be left on for 
-+    description: If present indicates that the phy needs to be left on for
-       remote wakeup during suspend.
- 
-   snps,reset-phy-on-wake:
-     $ref: /schemas/types.yaml#/definitions/flag
--    description: If present indicates that we need to reset the PHY when we 
-+    description: If present indicates that we need to reset the PHY when we
-       detect a wakeup. This is due to a hardware errata.
- 
-   port:
-diff --git a/Documentation/devicetree/bindings/usb/smsc,usb3503.yaml b/Documentation/devicetree/bindings/usb/smsc,usb3503.yaml
-index 39228a506b93..b9e219829801 100644
---- a/Documentation/devicetree/bindings/usb/smsc,usb3503.yaml
-+++ b/Documentation/devicetree/bindings/usb/smsc,usb3503.yaml
-@@ -77,7 +77,7 @@ examples:
-       i2c {
-           #address-cells = <1>;
-           #size-cells = <0>;
--        
-+
-           usb-hub@8 {
-               compatible = "smsc,usb3503";
-               reg = <0x08>;
--- 
-2.32.0
-
+Thanks, I will fix that in v5.
