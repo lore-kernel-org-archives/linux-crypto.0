@@ -2,110 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DCAC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 12:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7E5C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 13:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241795AbiDBMMR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 Apr 2022 08:12:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60448 "EHLO
+        id S1355794AbiDBNu1 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Apr 2022 09:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237949AbiDBMMQ (ORCPT
+        with ESMTP id S1355801AbiDBNu1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 Apr 2022 08:12:16 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759414B1FD
-        for <linux-crypto@vger.kernel.org>; Sat,  2 Apr 2022 05:10:24 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id h4so7634172wrc.13
-        for <linux-crypto@vger.kernel.org>; Sat, 02 Apr 2022 05:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=LU4WxTcoo4DIwvyGzKiLAb7OdkkMkGG5Idq3rF5DsZw=;
-        b=ef8plMMHl5f+/DwKN6AYys4AGd20iAAP/lJWVnZ+USiqWdotHiVFucoV0Ns8yaIFqp
-         78VEj1B5qf0XCKvUiuIOb1isK2b8BMd5PdyVF+Q6KVT6KsBgU7Dy7bjMkICwStIQn5Xy
-         xQ8g0EpXq8uKhr3HE/51Sc66nAcs1WnrQWTA9/xgAgJ7bRvtPgzULl4xs/FMnuZMZsuf
-         uaLm/FEFF2uKvmNrxfhYVv0VoBAp6LVlw4QWpqPvRXircYkLNeK2ZkKHJMJUg4SNqhKR
-         kIYCDV5rTaBduHQHDTrJ7xz97BGs4x/oDXuPsXit13xE6gTbHthiQitk03Xy1DKUDtLc
-         wLSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LU4WxTcoo4DIwvyGzKiLAb7OdkkMkGG5Idq3rF5DsZw=;
-        b=u0t0yUbzRY14ymGqltvzcj1/Bs+joq6cI6lDHPATjC7ADskE+Lfdop2CP7T/tUbMMi
-         fykCWxKXknGZ2BGxk6g3etQO65hpKG06L+lV28sMlH7ibcPne1/LszXakCTWQwM+tigW
-         Yyt+y2QU1MxokjcSq4hzMhLhl8dCJ+p43jZ2DwQW/ChYyFO5LhaGdxtjdMZO33xD0ua+
-         yN8YgGZoQEsSMS4DthA/lZCQ73v1PL6Pb+XFvp2RpuFxbPr5bEJCZgFRAmPVZ+Zc3hRt
-         EN3mh1ECOXuCIzXo7qwJzvBQ4fwd+VVbRhHxntj+gpdC5FJDCBxza+IQtWxqMBwm/Llt
-         WiCw==
-X-Gm-Message-State: AOAM531fejjX+ZZKYlGlEuWgTAsq/UBvGjb/B7EVMtPNI5/gUqKst9sL
-        ZYr8uswljkmlotODVt6xAUaH8w==
-X-Google-Smtp-Source: ABdhPJxiuq9UlKATWx/wJwEiZRHVK/pago1Lfs023MNtO94iCjNNQ67WIi2xbjW7sWPvyKpFfHrMMA==
-X-Received: by 2002:a05:6000:1789:b0:206:2d1:6f35 with SMTP id e9-20020a056000178900b0020602d16f35mr2227545wrg.613.1648901423075;
-        Sat, 02 Apr 2022 05:10:23 -0700 (PDT)
-Received: from [192.168.0.171] (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
-        by smtp.gmail.com with ESMTPSA id m3-20020a5d64a3000000b00203ed35b0aesm7713966wrp.108.2022.04.02.05.10.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Apr 2022 05:10:22 -0700 (PDT)
-Message-ID: <3969db0e-50e8-e042-4696-97f56bd38999@linaro.org>
-Date:   Sat, 2 Apr 2022 14:10:21 +0200
+        Sat, 2 Apr 2022 09:50:27 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD2CEA1;
+        Sat,  2 Apr 2022 06:48:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7B055B808C6;
+        Sat,  2 Apr 2022 13:48:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C8AC340F3;
+        Sat,  2 Apr 2022 13:48:31 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d28JnGQn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1648907309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NgYDNU0LQiY6oGkA7JBX7Ywvm2wYE+9Kr5hdSyar1FY=;
+        b=d28JnGQnNAjDqdvF6yV+SPY3luDFLVLJizwvnP2vvfCCuZoTZMV1RgPIKd+yVRWT4D0wUt
+        1gsNfKVSBsgY9KGVpEVlML9M9aSPi0H2fDZO0+EPanG67VCUe+uOQOoztN1eG8frOC7QgA
+        eca+VPWzaBFuhZRG+eu6Cs05KO5kqcE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ec277bcf (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 2 Apr 2022 13:48:29 +0000 (UTC)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-2eafabbc80aso58077437b3.11;
+        Sat, 02 Apr 2022 06:48:29 -0700 (PDT)
+X-Gm-Message-State: AOAM530Ou8CWE+8rh98X9kKOxbScL0YDK5VjStP8RN5jgoKvNn5fgz0r
+        vPzrDavWQkeVsDtOnNWS7I9ZR4Laj3noRRAbeBE=
+X-Google-Smtp-Source: ABdhPJx4PUBZG9fWTmS3fDp6+Djy5WxFlwhbGEo6ocKKRYNhKoMpheI843vvlWLu9wgp8qX/jvyi3v1lXm+tqqM+9HM=
+X-Received: by 2002:a81:66c3:0:b0:2eb:41cf:1202 with SMTP id
+ a186-20020a8166c3000000b002eb41cf1202mr1884044ywc.396.1648907308407; Sat, 02
+ Apr 2022 06:48:28 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v4 27/33] dt-bindings: crypto: convert rockchip-crypto to
- yaml
-Content-Language: en-US
-To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
-        herbert@gondor.apana.org.au, krzk+dt@kernel.org, robh+dt@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-References: <20220401201804.2867154-1-clabbe@baylibre.com>
- <20220401201804.2867154-28-clabbe@baylibre.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20220401201804.2867154-28-clabbe@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220331150706.124075-1-Jason@zx2c4.com> <20220331152641.169301-1-Jason@zx2c4.com>
+ <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
+In-Reply-To: <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Sat, 2 Apr 2022 15:48:17 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qd_jHB-7FHNqNhZC1AQBAZjUjQAYwqcLn3sz-FXoEAFw@mail.gmail.com>
+Message-ID: <CAHmME9qd_jHB-7FHNqNhZC1AQBAZjUjQAYwqcLn3sz-FXoEAFw@mail.gmail.com>
+Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at init
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 01/04/2022 22:17, Corentin Labbe wrote:
-> Convert rockchip-crypto to yaml
+Hi Sandy,
 
-s/yaml/YAML/
-and a full stop.
+On Sat, Apr 2, 2022 at 6:45 AM Sandy Harris <sandyinchina@gmail.com> wrote:
+> > In switching to using a hash function, this required us to
+> > specifically initialize it to some specific state,
+>
+> Hash functions do not require that. Any such function must
+> work correctly with a new input block and a more-or-less
+> random state from hashing previous blocks.
 
-Looks good but please mention in commit msg that the names for clocks
-and resets will be provided in next patch. Otherwise it looks like
-incomplete conversion.
+Well yes and no. Strictly no in the sense that blake2s_state has a few
+book-keeping variables, which we probably benefit in terms of caching
+from having next to the other state variables. Almost yes in the sense
+that in the ideal model, the hash state can become _anything_ so
+initializing it to random might be okay. But in practice, maybe not,
+because at the moment the latent entropy plugin is actually expanding
+a 64-bit seed with a basic LFSR, rather than supplying more uniformly
+random bytes (I have a patch out for that now). These details might
+matter, so rather than tempting fate, just calling blake2s_update the
+way the hash function is intended to be used seems a lot more cautious
+than poking at the function's innards unnecessarily.
 
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  .../crypto/rockchip,rk3288-crypto.yaml        | 59 +++++++++++++++++++
->  .../bindings/crypto/rockchip-crypto.txt       | 28 ---------
->  2 files changed, 59 insertions(+), 28 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> new file mode 100644
-> index 000000000000..66db671118c3
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> @@ -0,0 +1,59 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Rockchip Electronics And Security Accelerator
-
-Remove "And". It looks like company name is the name of the hardware.
-
-Best regards,
-Krzysztof
+Jason
