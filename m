@@ -2,87 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7E5C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 13:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF41AC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 19:27:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355794AbiDBNu1 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 Apr 2022 09:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45912 "EHLO
+        id S240733AbiDBT32 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Apr 2022 15:29:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355801AbiDBNu1 (ORCPT
+        with ESMTP id S231857AbiDBT31 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 Apr 2022 09:50:27 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD2CEA1;
-        Sat,  2 Apr 2022 06:48:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7B055B808C6;
-        Sat,  2 Apr 2022 13:48:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C8AC340F3;
-        Sat,  2 Apr 2022 13:48:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d28JnGQn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1648907309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NgYDNU0LQiY6oGkA7JBX7Ywvm2wYE+9Kr5hdSyar1FY=;
-        b=d28JnGQnNAjDqdvF6yV+SPY3luDFLVLJizwvnP2vvfCCuZoTZMV1RgPIKd+yVRWT4D0wUt
-        1gsNfKVSBsgY9KGVpEVlML9M9aSPi0H2fDZO0+EPanG67VCUe+uOQOoztN1eG8frOC7QgA
-        eca+VPWzaBFuhZRG+eu6Cs05KO5kqcE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ec277bcf (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 2 Apr 2022 13:48:29 +0000 (UTC)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-2eafabbc80aso58077437b3.11;
-        Sat, 02 Apr 2022 06:48:29 -0700 (PDT)
-X-Gm-Message-State: AOAM530Ou8CWE+8rh98X9kKOxbScL0YDK5VjStP8RN5jgoKvNn5fgz0r
-        vPzrDavWQkeVsDtOnNWS7I9ZR4Laj3noRRAbeBE=
-X-Google-Smtp-Source: ABdhPJx4PUBZG9fWTmS3fDp6+Djy5WxFlwhbGEo6ocKKRYNhKoMpheI843vvlWLu9wgp8qX/jvyi3v1lXm+tqqM+9HM=
-X-Received: by 2002:a81:66c3:0:b0:2eb:41cf:1202 with SMTP id
- a186-20020a8166c3000000b002eb41cf1202mr1884044ywc.396.1648907308407; Sat, 02
- Apr 2022 06:48:28 -0700 (PDT)
+        Sat, 2 Apr 2022 15:29:27 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5836D3982C
+        for <linux-crypto@vger.kernel.org>; Sat,  2 Apr 2022 12:27:34 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id qh7so2320989ejb.11
+        for <linux-crypto@vger.kernel.org>; Sat, 02 Apr 2022 12:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=B/ThbT3SvZKv7VBFEIOx/aCT3sIWnDNaa+6uy/zfsM4=;
+        b=O+DYIcytzcGH8LsniuGvzc2VJVr6cymGR5ki+yc8dKSyiQa4ST2C04SjHaClrr/Dyd
+         rPwx4rn/13xt6+XkEfBruUXf5yS5uchOzmxnzQrGFUOYeu0E2s6TrY6SfCCGq/hNNUxh
+         OhW2kTsmvPedmVI5zSAuOSzL2jDrWYBQAWB+A7UVkHopWu11T8frRst1Z5gl5pFWhvXY
+         FuD0hflgf/PZy17AgOobHb5lHfF+bAzZOUAqVVSanEgl3sIdfPM3i2kGw6Jad5DefrI0
+         Dj3aMKYGslQqlRhZLALva5pqXuLeV29r4qobp7ruxuKfLTm6FB4CfR/GUhSuiqk/edBu
+         +hYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=B/ThbT3SvZKv7VBFEIOx/aCT3sIWnDNaa+6uy/zfsM4=;
+        b=kVrRmmHZqnNZdtnII3VFsoAhTHs3SQxf00xJRzrtcJ2vG2jygCA9fHCct6suWXj8QM
+         a4Fogj4eQQRPHfINBr7efl29XZlUlSAaQ5i4lQu98k9c8rdlxhhWkfGZInvDuVz/NRVz
+         KY3g2nsta4quU/V8+wdzc0YWZJkZTxpudDPxXRIj1Vp/xlSMWrIA6SHxIfmTXjzPi7mc
+         oFAHzDFRM7xfYmd1ENm8f2J2s1t3ZuTT6/DhGTYe1I8V5fOYb9Eljg1ROw5n2GHkiFd0
+         gUDK5E2O6NC/I+0hkTnlpvMBIjD3LoFwL5BXfhyk1DnfuhHLl8cGkIqMwU+UAI/uKGke
+         KVGg==
+X-Gm-Message-State: AOAM530KpgaWMDBCKrrqR1un/xhR2gOYnjxbiENL4Q5JJjVsXw36Yk64
+        H83rM1MulVs6410salJvTjCy9g==
+X-Google-Smtp-Source: ABdhPJzd9yaY1T32nO+3zxYbCF1eHA+h4DL4En/lqWXtB9SjL9rtunjp4WJcpVorDE8q85caXJ35Ng==
+X-Received: by 2002:a17:906:c107:b0:6df:c114:e286 with SMTP id do7-20020a170906c10700b006dfc114e286mr4846182ejc.216.1648927652962;
+        Sat, 02 Apr 2022 12:27:32 -0700 (PDT)
+Received: from [192.168.0.171] (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
+        by smtp.gmail.com with ESMTPSA id qp27-20020a170907207b00b006e66a4e924bsm972077ejb.201.2022.04.02.12.27.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Apr 2022 12:27:32 -0700 (PDT)
+Message-ID: <bdd2e853-d056-2646-f9c7-f58321134d5d@linaro.org>
+Date:   Sat, 2 Apr 2022 21:27:31 +0200
 MIME-Version: 1.0
-References: <20220331150706.124075-1-Jason@zx2c4.com> <20220331152641.169301-1-Jason@zx2c4.com>
- <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
-In-Reply-To: <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 2 Apr 2022 15:48:17 +0200
-X-Gmail-Original-Message-ID: <CAHmME9qd_jHB-7FHNqNhZC1AQBAZjUjQAYwqcLn3sz-FXoEAFw@mail.gmail.com>
-Message-ID: <CAHmME9qd_jHB-7FHNqNhZC1AQBAZjUjQAYwqcLn3sz-FXoEAFw@mail.gmail.com>
-Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at init
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] dt-bindings: crypto: sun8i-ce: remove extra line
+Content-Language: en-US
+To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
+        krzk+dt@kernel.org, robh+dt@kernel.org, samuel@sholland.org,
+        wens@csie.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sunxi@lists.linux.dev
+References: <20220324144233.1119495-1-clabbe@baylibre.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20220324144233.1119495-1-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sandy,
+On 24/03/2022 15:42, Corentin Labbe wrote:
+> yamllint complains about this extra line.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml | 1 -
+>  1 file changed, 1 deletion(-)
+> 
 
-On Sat, Apr 2, 2022 at 6:45 AM Sandy Harris <sandyinchina@gmail.com> wrote:
-> > In switching to using a hash function, this required us to
-> > specifically initialize it to some specific state,
->
-> Hash functions do not require that. Any such function must
-> work correctly with a new input block and a more-or-less
-> random state from hashing previous blocks.
+Thanks for the patch. It's ok, but this should be rather done for all
+files. Otherwise it's a churn.
 
-Well yes and no. Strictly no in the sense that blake2s_state has a few
-book-keeping variables, which we probably benefit in terms of caching
-from having next to the other state variables. Almost yes in the sense
-that in the ideal model, the hash state can become _anything_ so
-initializing it to random might be okay. But in practice, maybe not,
-because at the moment the latent entropy plugin is actually expanding
-a 64-bit seed with a basic LFSR, rather than supplying more uniformly
-random bytes (I have a patch out for that now). These details might
-matter, so rather than tempting fate, just calling blake2s_update the
-way the hash function is intended to be used seems a lot more cautious
-than poking at the function's innards unnecessarily.
+I sent a global cleanup.
 
-Jason
+Best regards,
+Krzysztof
