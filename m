@@ -2,209 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1CBC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Apr 2022 20:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4E2C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 Apr 2022 04:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349352AbiDAUVv (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Apr 2022 16:21:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49300 "EHLO
+        id S237214AbiDBEqs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Apr 2022 00:46:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352352AbiDAUVW (ORCPT
+        with ESMTP id S236134AbiDBEqs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Apr 2022 16:21:22 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E38109D
-        for <linux-crypto@vger.kernel.org>; Fri,  1 Apr 2022 13:18:36 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id j18so5800952wrd.6
-        for <linux-crypto@vger.kernel.org>; Fri, 01 Apr 2022 13:18:36 -0700 (PDT)
+        Sat, 2 Apr 2022 00:46:48 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC98A103BA8;
+        Fri,  1 Apr 2022 21:44:56 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id lr4so9660725ejb.11;
+        Fri, 01 Apr 2022 21:44:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=4CfXM7leMN5pRFOjPHWHxGcJrApetL12geqzG0hLkdA=;
-        b=xgTbv0BySELvx8Y6w1muFk/fSYXMJa+Ne1fthEts2plXS8pZu/NuZSx5P8+V5wIg+D
-         n8UVA2MVIvhx9nfmseXaju/85nmFurPxGG//0WdLCecD62vejPXRW8CqUQrrL6fG0+VZ
-         0+2f0vlHwtMaoV9YK5EM37kv26mif+jrfbWTVHHw1sxZj9ShApITGr1AuqZtg72gGrGi
-         Kh5Ki1YJC+k2oFvkaGa25mQguTTrXVBkPtxPFpKZsnDcTSizxfQTCmpManurk2GVZ89F
-         aaaC+ewHiIfQsmDUGSg6oiwzjTbKbAnhsefDal7jnShyMmml64ASz/BYNntU4d/Z5LSr
-         fyfw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=huB97C9JBbD4NTragcMdF5Fe+et3P5wIBlAUz2Cnm5I=;
+        b=pkItxN8skI+/hoTjotTO11YLRC79aIEmK9zrlQYQGwHFPTYzrmxMYRdEyohxMNAaqH
+         VdDrr/d4JSaUHhWA6GeFPQVUEMAT6PUMOnoIgntfbqZYlg7y53a8JHLc3LiZ3NgQJ+Q6
+         mDK3FS3+yXP4gwKgxdioMVmQn71Ldm2RRIsypCLBVVMI14nAYI7rPc02LnWR0ZfMWg9s
+         FGsCRKtMeY+dyJFREY8NAbkulli4VBrcu/hKk8TQ9HDMgbvynToOjg4rhsBAqYYfgAc6
+         MInrRIYSk6hFKDUdND7aLHJwzPlUi8I70WTXkUH30jPIq9KHvg74wR0tspRfGcwhkxhE
+         7MGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4CfXM7leMN5pRFOjPHWHxGcJrApetL12geqzG0hLkdA=;
-        b=nOqJM1oMwkBM0HjdnFR8yfBE7rqy40WB3FWxM0v1wGrTbzy/wfMPGU58d2lsOummM3
-         Q8IZt41KeLUBZUVzex6+KPy/p41OuPZyzr4tP44ukNe/Lk5LFnIZXsg1HQ16JVw5rnX0
-         vOJDz8D7QnQfzKpVVlwUffsADNttLGGnfhIFAXzh/AfkMz2CKqqrLADY/9mlZFU7y88L
-         pfMReX9c8G/NoJr4XTvppES+rywVQt1RrtUva/AKPIzE0lzrsDnqyAcnVXAkXZgU+33+
-         f8wvAtQngvNqrvo8ie5pa+XEZ53eMZ1w7ySEQ+tZ4PefnlDvVMLUgYBkiRQONXqpIeem
-         IP1A==
-X-Gm-Message-State: AOAM533yTq4z+lpBDTF4+UBUG8+EmK7vDLT9MkHhWkAdEb7Ta942rJvy
-        uHNN03p9UNdVdBkSvEW8bq0bTg==
-X-Google-Smtp-Source: ABdhPJwL0g8nYklbcJJtem7pvN8rmEB5bnkJhEB8bG5p00EedbdcmqrsBo0vMQsd6IexZoar32yoIw==
-X-Received: by 2002:adf:eb4d:0:b0:1ed:c1f7:a951 with SMTP id u13-20020adfeb4d000000b001edc1f7a951mr8648367wrn.454.1648844314873;
-        Fri, 01 Apr 2022 13:18:34 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id j16-20020a05600c191000b0038ca3500494sm17823838wmq.27.2022.04.01.13.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 13:18:34 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        robh+dt@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v4 33/33] crypto: rockchip: Check for clocks numbers and their frequencies
-Date:   Fri,  1 Apr 2022 20:18:04 +0000
-Message-Id: <20220401201804.2867154-34-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220401201804.2867154-1-clabbe@baylibre.com>
-References: <20220401201804.2867154-1-clabbe@baylibre.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=huB97C9JBbD4NTragcMdF5Fe+et3P5wIBlAUz2Cnm5I=;
+        b=euaHCe2jQ6rvJ+5eWS5KdCDfCuiN4KbNCiWgILl/tVapuEykRnwzrY5IHXZ5ZggeHb
+         rXu73QF35IXvlJxWUyfr1cKFsUQ4N8tbX27aGBznWNJQxMtNlBpQ5yL3bwN5/qa/bX2F
+         UrnxvBqQ8nmnGDFcr19+EBX8kTgmhyj6g4mpGnF3ivryXK86OLRbe4Yy6TUTfJj0LbX2
+         haJ41a+RzyFyLTT3RrfT/qUADWQqIaD/kg+rnYWH/S+P5Lrcp1sZq2hVqhe+mK/8w0L5
+         rVO0RFCRxwjH3LCF3891V+GUMPP6tyUkzSK5pDQkPHj+sYV5VN4RbtgOi/iTng6QNbTw
+         EjxA==
+X-Gm-Message-State: AOAM531AfbtXh2TJ5VznTpfIJgyC8L14ltSCba380rfVHegR2gJ7iKVS
+        h+yLjdpTYdEmknGsy8ze6PjRG2ReBA+EueQyvXY=
+X-Google-Smtp-Source: ABdhPJxGUbe2S/w0yEZATeM3Hg+1QWKhd1I/yFnFNIB5iULEMsTrThhTL9l10t/icmfRuf01nhoUGdG88OHyKDLm3v4=
+X-Received: by 2002:a17:907:7e96:b0:6da:f7ee:4a25 with SMTP id
+ qb22-20020a1709077e9600b006daf7ee4a25mr2509602ejc.436.1648874695341; Fri, 01
+ Apr 2022 21:44:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220331150706.124075-1-Jason@zx2c4.com> <20220331152641.169301-1-Jason@zx2c4.com>
+In-Reply-To: <20220331152641.169301-1-Jason@zx2c4.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 2 Apr 2022 12:44:42 +0800
+Message-ID: <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
+Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at init
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the number of clocks needed for each compatible.
-Rockchip's datasheet give maximum frequencies for some clocks, so add
-checks for verifying they are within limits. Let's start with rk3288 for
-clock frequency check, other will came later.
+On Fri, Apr 1, 2022 at 11:16 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- drivers/crypto/rockchip/rk3288_crypto.c | 56 +++++++++++++++++++++----
- drivers/crypto/rockchip/rk3288_crypto.h |  9 ++++
- 2 files changed, 57 insertions(+), 8 deletions(-)
+> Prior, the "input_pool_data" array needed no real initialization, and so
+> it was easy to mark it with __latent_entropy to populate it during
+> compile-time.
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 89a6aa65d2c1..f759ed7160d0 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -29,20 +29,63 @@ static struct rk_crypto_info *main;
- 
- static const struct rk_variant rk3288_variant = {
- 	.main = true,
-+	.num_clks = 4,
-+	.rkclks = {
-+		{ "sclk", 150000000},
-+	}
- };
- 
- static const struct rk_variant rk3328_variant = {
- 	.main = true,
-+	.num_clks = 3,
- };
- 
- static const struct rk_variant rk3399_variant0 = {
- 	.main = true,
-+	.num_clks = 3,
- };
- 
- static const struct rk_variant rk3399_variant1 = {
- 	.sub = true,
-+	.num_clks = 3,
- };
- 
-+static int rk_crypto_get_clks(struct rk_crypto_info *dev)
-+{
-+	int i, j, err;
-+	unsigned long cr;
-+
-+	dev->num_clks = devm_clk_bulk_get_all(dev->dev, &dev->clks);
-+	if (dev->num_clks < dev->variant->num_clks) {
-+		dev_err(dev->dev, "Missing clocks, got %d instead of %d\n",
-+			dev->num_clks, dev->variant->num_clks);
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < dev->num_clks; i++) {
-+		cr = clk_get_rate(dev->clks[i].clk);
-+		for (j = 0; j < ARRAY_SIZE(dev->variant->rkclks); j++) {
-+			if (dev->variant->rkclks[j].max == 0)
-+				continue;
-+			if (strcmp(dev->variant->rkclks[j].name, dev->clks[i].id))
-+				continue;
-+			if (cr > dev->variant->rkclks[j].max) {
-+				err = clk_set_rate(dev->clks[i].clk,
-+						   dev->variant->rkclks[j].max);
-+				if (err)
-+					dev_err(dev->dev, "Fail downclocking %s from %lu to %lu\n",
-+						dev->variant->rkclks[j].name, cr,
-+						dev->variant->rkclks[j].max);
-+				else
-+					dev_info(dev->dev, "Downclocking %s from %lu to %lu\n",
-+						 dev->variant->rkclks[j].name, cr,
-+						 dev->variant->rkclks[j].max);
-+			}
-+		}
-+	}
-+	return 0;
-+}
-+
- static int rk_crypto_enable_clk(struct rk_crypto_info *dev)
- {
- 	int err;
-@@ -266,6 +309,9 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 		goto err_crypto;
- 	}
- 
-+	crypto_info->dev = &pdev->dev;
-+	platform_set_drvdata(pdev, crypto_info);
-+
- 	crypto_info->variant = of_device_get_match_data(&pdev->dev);
- 	if (!crypto_info->variant) {
- 		dev_err(&pdev->dev, "Missing variant\n");
-@@ -289,12 +335,9 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 		goto err_crypto;
- 	}
- 
--	crypto_info->num_clks = devm_clk_bulk_get_all(&pdev->dev,
--						      &crypto_info->clks);
--	if (crypto_info->num_clks < 3) {
--		err = -EINVAL;
-+	err = rk_crypto_get_clks(crypto_info);
-+	if (err)
- 		goto err_crypto;
--	}
- 
- 	crypto_info->irq = platform_get_irq(pdev, 0);
- 	if (crypto_info->irq < 0) {
-@@ -312,9 +355,6 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 		goto err_crypto;
- 	}
- 
--	crypto_info->dev = &pdev->dev;
--	platform_set_drvdata(pdev, crypto_info);
--
- 	crypto_info->engine = crypto_engine_alloc_init(&pdev->dev, true);
- 	crypto_engine_start(crypto_info->engine);
- 	init_completion(&crypto_info->complete);
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index 5662a1491a9e..b49bdc7541b1 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.h
-+++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -188,9 +188,18 @@
- #define CRYPTO_WRITE(dev, offset, val)	  \
- 		writel_relaxed((val), ((dev)->reg + (offset)))
- 
-+#define RK_MAX_CLKS 4
-+
-+struct rk_clks {
-+	const char *name;
-+	unsigned long max;
-+};
-+
- struct rk_variant {
- 	bool main;
- 	bool sub;
-+	int num_clks;
-+	struct rk_clks rkclks[RK_MAX_CLKS];
- };
- 
- struct rk_crypto_info {
--- 
-2.35.1
+As I see it, that was the correct approach.
 
+> In switching to using a hash function, this required us to
+> specifically initialize it to some specific state,
+
+Hash functions do not require that. Any such function must
+work correctly with a new input block and a more-or-less
+random state from hashing previous blocks.
+
+In general, except perhaps at boot time, I do not think
+any of the hopefully-random data structures -- input
+pool, hash context or chacha context -- should ever be
+set to any specific state. Update them only with += or
+^= and preferably not with constants.
+
+What requires a fixed initialisation is your decision to
+eliminate the input pool & just collect entropy in a hash
+context. In effect you are reducing the driver to a
+Yarrow-like design, which I think is an error.
+
+Yarrow is a good design, but it has limitations; in particular
+the Yarrow paper says the cryptographic strength is limited
+to the size of the hash context, 160 bits for their SHA-1 &
+512 for our Blake.
+
+512 bits is more than enough for nearly all use cases, but
+we may have some where it is not. How many random bits
+are needed to generate a 4k-bit PGP key?
+
+Will some users try to generate one-time pads from /dev/random?
+The OTP security proof requires truly random data as long as the
+message; with anything short of that the proof fails & you get
+a stream cipher.
+
+Patches will follow, but likely not soon; I'm busy with
+other things.
