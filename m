@@ -2,73 +2,76 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDFFC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 21:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60721C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 23:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349522AbiDDVxp (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Apr 2022 17:53:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
+        id S231849AbiDDX3o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Apr 2022 19:29:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380507AbiDDVVp (ORCPT
+        with ESMTP id S231179AbiDDX3n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Apr 2022 17:21:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8E1A31357;
-        Mon,  4 Apr 2022 14:19:29 -0700 (PDT)
+        Mon, 4 Apr 2022 19:29:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5572B243;
+        Mon,  4 Apr 2022 16:27:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1DB6AB819DB;
-        Mon,  4 Apr 2022 21:18:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7EF6C34111;
-        Mon,  4 Apr 2022 21:18:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8DA6D61741;
+        Mon,  4 Apr 2022 23:27:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0764C2BBE4;
+        Mon,  4 Apr 2022 23:27:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649107110;
-        bh=2MFBSXfZ3tqekRBgiYDJufp0daex8Cm6j3gRGmigYc8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=aA/qpq3/DjEcJdSppyeto3ZRmFM0a8WjC9n9jVNNvBw15zoxpXgzFqQR39jcQASC6
-         ePU2vamYPT/j39J/05ZpBOBZuIfasCs7j6Q4R1UMqVTE6P3329sdW9i5PR6QAujIHH
-         HDlBaOostsy/CJKKirYrFBxbyn0x3WdUPkW3f0M5L0XtTnnLSgyISsEVdB3mqI0MZp
-         KLZsjjMF/SRDmoNDystXRXJKOIIM4wDelwoNAQQXW0Sjnw8xH7NbLQfM/MBDAaSXgL
-         +K0N/f7OC3Ji8E/sihBt4x0Bl7waUHV8M0Z8ZPP+fiERNkqCSJ/H4LoeiIE3ZgD0sk
-         RW9JiI+8yvQbw==
-Received: by mail-io1-f46.google.com with SMTP id z7so12966029iom.1;
-        Mon, 04 Apr 2022 14:18:30 -0700 (PDT)
-X-Gm-Message-State: AOAM533tHn3V9zonrRtuYyXFB+SkmRJcxmhocjXrwZS9pXdxELMHcuqK
-        kRpzxgWuXeKeZEk4MiTBRkL1HM+OaCdSBezujg==
-X-Google-Smtp-Source: ABdhPJwATjUBuVkxonnV8pK5+2/qD+WTsPj3L7mqbhvekuXa465j73EULKK5S8ov3InZONGcDfsngm0ogv9Ext2ciys=
-X-Received: by 2002:a05:6638:1301:b0:323:3b47:8b3f with SMTP id
- r1-20020a056638130100b003233b478b3fmr150659jad.291.1649107109921; Mon, 04 Apr
- 2022 14:18:29 -0700 (PDT)
+        s=k20201202; t=1649114866;
+        bh=BHAEMEC2Xzqxff2phETmd0GsUVbEpBkIHHNgkUNSvu8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=t/Z+2E7DJBPTZr3ZFQvWbfIGaH5MFEGfzD1Svs3K+jCtjQ0qa5gdwj0tMJnzpMG0n
+         VQMlvfCqT0wUSNuvHmbPdB6aZSvFauzCmrbs7X5Oqs91uR7ppmmUFwH+QW8W0P1Yrz
+         b/Gpag0GZcTZCGCzJ8pOO88fFcpRujT+IAPFA5Ci5z9vPu0iIQFdy7kKkoqGoGvFXy
+         MrXmfT7/RHSQSCeyTdRHarWXKsHpSkRjwW/SY3mtdu+JP6cPbVUYlIXOkZ7Ymwdjxr
+         3QjuCofrGzFTwI3QhBncmRfsPV3B9FGhiTv8ASQ3ucOVzRS5tXJwzNSg/t3tNzQyl1
+         AhcVHINzNL9cA==
+Date:   Mon, 4 Apr 2022 16:27:44 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v2] random: mix build-time latent entropy into pool at
+ init
+Message-ID: <Ykt+8Fk9QP45XBmI@sol.localdomain>
+References: <20220331150706.124075-1-Jason@zx2c4.com>
+ <20220331152641.169301-1-Jason@zx2c4.com>
+ <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220402192819.154691-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20220402192819.154691-1-krzysztof.kozlowski@linaro.org>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Mon, 4 Apr 2022 16:18:19 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqKuFAY4QENRb3dKETKcaJm-fcguoCFOgUnzf0Pwmf1Ezg@mail.gmail.com>
-Message-ID: <CAL_JsqKuFAY4QENRb3dKETKcaJm-fcguoCFOgUnzf0Pwmf1Ezg@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: white-space cleanups
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        devicetree@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Corentin Labbe <clabbe@baylibre.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACXcFm=vw6XCnO8peYH4V+sPR076O-Gav46r83+CZJ8oXM8iHA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 2, 2022 at 2:28 PM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> Remove trailing white-spaces and trailing blank lines (yamllint when run
-> manually does not like them).
+On Sat, Apr 02, 2022 at 12:44:42PM +0800, Sandy Harris wrote:
+> Yarrow is a good design, but it has limitations; in particular
+> the Yarrow paper says the cryptographic strength is limited
+> to the size of the hash context, 160 bits for their SHA-1 &
+> 512 for our Blake.
+> 
+> 512 bits is more than enough for nearly all use cases, but
+> we may have some where it is not. How many random bits
+> are needed to generate a 4k-bit PGP key?
+> 
+> Will some users try to generate one-time pads from /dev/random?
+> The OTP security proof requires truly random data as long as the
+> message; with anything short of that the proof fails & you get
+> a stream cipher.
 
-I assume you mean run without our configuration file. I probably
-disabled the check because I didn't want to go fix everywhere. If we
-are going to fix, then we should enable the check to not get more.
+All the data from /dev/{u,}random is generated by ChaCha20, which is a 256-bit
+stream cipher.  We don't target, or need to target, more than 256-bit security.
+So the entropy pool itself doesn't need to be more than 256 bits, provided that
+it is implemented properly using a cryptographic hash function, which it now is.
 
-Rob
+- Eric
