@@ -2,68 +2,149 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4185BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 08:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A45C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 11:26:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236769AbiDDISn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Apr 2022 04:18:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43126 "EHLO
+        id S237528AbiDDL20 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Apr 2022 07:28:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239213AbiDDISj (ORCPT
+        with ESMTP id S235756AbiDDL2Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Apr 2022 04:18:39 -0400
-X-Greylist: delayed 479 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Apr 2022 01:16:44 PDT
-Received: from mail.coredeal.pl (mail.coredeal.pl [51.75.73.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80553B3DF
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 01:16:44 -0700 (PDT)
-Received: by mail.coredeal.pl (Postfix, from userid 1002)
-        id 12AAAA397A; Mon,  4 Apr 2022 08:06:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=coredeal.pl; s=mail;
-        t=1649059590; bh=9KGuIG62LgzC9aYmjKxzocuYLRCVghXg6v9Q1q2LHec=;
-        h=Date:From:To:Subject:From;
-        b=PSmMf6ibONG2xKTYnemKhmb2Bwk+zmnIj/3TIf7jbdzCf00oZTdkujnJMZnCT8Cno
-         1pdiaKtywU/3Kh2m6NVzokbH/dgiuGCS0J5l7CP+20GvYoRsQfj8txu8dJVCIw+TsR
-         QahCcK1u83tfJr2famrYkWwD+Q4oEYpzqwoBN+bkuq5djtV6UcULXGidJZulJEAVDg
-         akxDIwz715Yf91I3D/8D1+8K+nmqrv9bMkw/g1rciznpRPWglKU3Hzlj/C2DeiIOc8
-         ZmqsmLQlLpFF/GGFt/dPtBVDbCB/2IS9qbAMqiptN+tCs2cr9g7o1yAviW60I6j6t5
-         GC0P9e6GgFB7w==
-Received: by mail.coredeal.pl for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 08:05:41 GMT
-Message-ID: <20220404064500-0.1.2c.c7yq.0.07t9p6d11c@coredeal.pl>
-Date:   Mon,  4 Apr 2022 08:05:41 GMT
-From:   "Krzysztof Maj" <krzysztof.maj@coredeal.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Biznesowy angielski
-X-Mailer: mail.coredeal.pl
+        Mon, 4 Apr 2022 07:28:25 -0400
+Received: from metanate.com (unknown [IPv6:2001:8b0:1628:5005::111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B78286F4;
+        Mon,  4 Apr 2022 04:26:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=metanate.com; s=stronger; h=In-Reply-To:Content-Type:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description; bh=LnoUpy8pxIXgWxR6IblJWmslcB05NK68pxcDoWJlSfk=; b=DS0Ou
+        KQrIxO23qLzQ+DvY1bPnIzGjxCX+gnmtE3eBpqcpIXxFZjFSi0XgG2mnhdIc4Ik7fv8qpH+1Rgp+N
+        bQAnGfv54pnAWgdwYR1UMrCb9NdGt+QiiVIqgiNUo92tROAqdINZ3OmjptNRJAHgYZjzg5ApcVHgF
+        8qi5gA8zjgnPzlvpFLmA4qADwJOYI+N1gZVF1k9AmJVnnNoySJHIcnq0XUMJuDM7rDIdn+zyxYOyP
+        WRSJp0L+JBAhncHRrGKPhcBvUAs4WOLn31lJ2K4mOzr81hAXgB6yJ+DI8y9+qs/yI9COakF74xcid
+        XUYRM30D38syFfuDQtjFlGRJoQvXw==;
+Received: from [81.174.171.191] (helo=donbot)
+        by email.metanate.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <john@metanate.com>)
+        id 1nbKqe-0004ue-SJ; Mon, 04 Apr 2022 12:26:16 +0100
+Date:   Mon, 4 Apr 2022 12:26:15 +0100
+From:   John Keeping <john@metanate.com>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
+        robh+dt@kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v4 06/33] crypto: rockchip: add fallback for cipher
+Message-ID: <YkrV1z5GPVXc+d/X@donbot>
+References: <20220401201804.2867154-1-clabbe@baylibre.com>
+ <20220401201804.2867154-7-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220401201804.2867154-7-clabbe@baylibre.com>
+X-Authenticated: YES
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+On Fri, Apr 01, 2022 at 08:17:37PM +0000, Corentin Labbe wrote:
+> The hardware does not handle 0 size length request, let's add a
+> fallback.
+> Furthermore fallback will be used for all unaligned case the hardware
+> cannot handle.
+> 
+> Fixes: ce0183cb6464b ("crypto: rockchip - switch to skcipher API")
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+> diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> index bbd0bf52bf07..c6b601086c04 100644
+> --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
+> @@ -13,6 +13,71 @@
+>  
+>  #define RK_CRYPTO_DEC			BIT(0)
+>  
+> +static int rk_cipher_need_fallback(struct skcipher_request *req)
+> +{
+> +	struct scatterlist *sgs, *sgd;
+> +	unsigned int todo, len;
+> +	unsigned int bs = crypto_skcipher_blocksize(tfm);
+> +
+> +	if (!req->cryptlen)
+> +		return true;
+> +
+> +	len = req->cryptlen;
+> +	sgs = req->src;
+> +	while (sgs) {
+> +		if (!IS_ALIGNED(sgs->offset, sizeof(u32))) {
+> +			return true;
+> +		}
+> +		todo = min(len, sgs->length);
+> +		if (todo % bs) {
+> +			return true;
+> +		}
+> +		len -= todo;
+> +		sgs = sg_next(sgs);
+> +	}
+> +	len = req->cryptlen;
+> +	sgd = req->dst;
+> +	while (sgd) {
+> +		if (!IS_ALIGNED(sgd->offset, sizeof(u32))) {
+> +			return true;
+> +		}
+> +		todo = min(len, sgd->length);
+> +		if (todo % bs) {
+> +			return true;
+> +		}
+> +		len -= todo;
+> +		sgd = sg_next(sgd);
+> +	}
+> +	sgs = req->src;
+> +	sgd = req->dst;
+> +	while (sgs && sgd) {
+> +		if (sgs->length != sgd->length)
 
-czy rozwa=C5=BCali Pa=C5=84stwo rozw=C3=B3j kwalifikacji j=C4=99zykowych =
-swoich pracownik=C3=B3w?
+This check still seems to be triggering the fallback when it is not
+needed.
 
-Opracowali=C5=9Bmy kursy j=C4=99zykowe dla r=C3=B3=C5=BCnych bran=C5=BC, =
-w kt=C3=B3rych koncentrujemy si=C4=99 na podniesieniu poziomu s=C5=82owni=
-ctwa i jako=C5=9Bci komunikacji wykorzystuj=C4=85c autorsk=C4=85 metod=C4=
-=99, stworzon=C4=85 specjalnie dla wymagaj=C4=85cego biznesu.=20
+I've done some testing with fscrypt and the series is working great, but
+the stats show the fallback triggering more than I'd expect.  With some
+extra logging here I see output like:
 
-Niestandardowy kurs on-line, dopasowany do profilu firmy i obszar=C3=B3w =
-=C5=9Bwiadczonych us=C5=82ug, w szybkim czasie przyniesie efekty, kt=C3=B3=
-re zwi=C4=99ksz=C4=85 komfort i jako=C5=9B=C4=87 pracy, rozwijaj=C4=85c m=
-o=C5=BCliwo=C5=9Bci biznesowe.=20
+	sgs->length=32 sgd->length=255 req->cryptlen=16
 
-Zdalne szkolenie j=C4=99zykowe to m.in. zaj=C4=99cia z native speakerami,=
- kt=C3=B3re w szybkim czasie naucz=C4=85 pracownik=C3=B3w rozmawia=C4=87 =
-za pomoc=C4=85 jasnego i zwi=C4=99z=C5=82ego j=C4=99zyka Business English=
-=2E
+In this case sgs and sgd are both the first (and only) entries in the
+list.  Should this take account of req->cryptlen as well?
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 wi=C4=99cej szczeg=C3=B3=C5=82=C3=B3=
-w i opowiedzie=C4=87 jak dzia=C5=82amy?=20
+In fact, can't this whole function be folded into one loop over src and
+dst at the same time, since all the checks must be the same?  Something
+like this (untested):
 
+	while (sgs && sgd) {
+		if (!IS_ALIGNED(sgs->offset, sizeof(u32)) ||
+		    !IS_ALIGNED(sgd->offset, sizeof(u32)))
+			return true;
 
-Pozdrawiam
-Krzysztof Maj
+		todo = min(len, sgs->length);
+		if (todo % bs)
+			return true;
+
+		if (sgd->length < todo)
+			return true;
+
+		len -= todo;
+		sgs = sg_next(sgs);
+		sgd = sg_next(sgd);
+	}
+
+	if (len)
+		return true;
+
+> +			return true;
+> +		sgs = sg_next(sgs);
+> +		sgd = sg_next(sgd);
+> +	}
+> +	return false;
+> +}
