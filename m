@@ -2,129 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D468C433EF
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 Apr 2022 18:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4185BC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 08:16:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236555AbiDCTAd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 Apr 2022 15:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53918 "EHLO
+        id S236769AbiDDISn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Apr 2022 04:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234612AbiDCTAc (ORCPT
+        with ESMTP id S239213AbiDDISj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 Apr 2022 15:00:32 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E076447
-        for <linux-crypto@vger.kernel.org>; Sun,  3 Apr 2022 11:58:36 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id r11-20020a1c440b000000b0038ccb70e239so840285wma.3
-        for <linux-crypto@vger.kernel.org>; Sun, 03 Apr 2022 11:58:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=t/RpIWdhbQVBXdaJ9oI5/IoGk7GgpeKKoOGSNN4wvL4=;
-        b=iiuksQImYHQwFGIIvxhiUz1Kb7RqQfCkD9nr2/f9EKEev9O1Gerai4R+qVyYrIqgGx
-         nitAv//xgEQNlKcwzDj8hHfToG/ZXHGJO94o+PqurCzSX6zSrMqIx4NsIG2+61MIs3DM
-         H/2NklABJqKRd2J95fJCHDgnjQjfD8UsWsj6+sqOcPS1nVtPR+hGx5uzY+BQ0+a3ssnl
-         azRlg9npq9HlKarVHYEgprjkGiq4LTNfkQxuSwl+s+MPxn+9OBhy0YIceeO/cp+GiS/2
-         /665pzb6/czZxtTshSQc8c43PpTc5ymPNf1sOa6ERhZ6BTL0QNHJVWVukWfvUr2gLBHB
-         7J3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=t/RpIWdhbQVBXdaJ9oI5/IoGk7GgpeKKoOGSNN4wvL4=;
-        b=nOkVuTvcEDlejoeMIuc/A3DqLXoFCva3QPDBGXrNl9o7ILAtD2RwPGBgPn0Ty/Jv3W
-         vtQJLlIjB0X/PGrRp4jd4rnvHvVP4bhoxO7J+HOi3mUHVV+lvEEBcDy73QWuLTqnIx0E
-         nn6ioTnZs8fbxR+h69Gzw0VWlLtCVl/xlk4VG0upV56sN/zoK7ubVpCK9OSe5QDBx9Kd
-         7aPTmDrp/0i5H56qyr+x5eclwzsDojf9PSjhWSvLT2A9g2lY2/HLnYEZM8K3ZP6gqSFK
-         K6HYrZ3JsP/4TXSPFoPUyBfuSjsCHIrHgT7GsQ0uhnMeKLRawiBzl5ZGhdnbcyRAWoNM
-         z1ZQ==
-X-Gm-Message-State: AOAM530x6VD/tHUTf7mLKj9xlf55+GmxphK5iGwQSxnC3hDKqT4nhGHd
-        La8/JlLu8uVS0usVZzVL3fT93A==
-X-Google-Smtp-Source: ABdhPJzaazCPH6bFmU44UKKw6seoXSI3MBgT9c48Etfj1O+qSs+lrQUM2JPkuI1O1SQe4ZWjHVI07g==
-X-Received: by 2002:a05:600c:1c1e:b0:38c:b393:b357 with SMTP id j30-20020a05600c1c1e00b0038cb393b357mr16709948wms.66.1649012315105;
-        Sun, 03 Apr 2022 11:58:35 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id m7-20020adffe47000000b002060d09327fsm2505092wrs.16.2022.04.03.11.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Apr 2022 11:58:34 -0700 (PDT)
-Date:   Sun, 3 Apr 2022 20:58:32 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au, krzk+dt@kernel.org,
-        robh+dt@kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH v4 28/33] dt-bindings: crypto: rockchip: convert to new
- driver bindings
-Message-ID: <YknuWEOPq+I6jq9X@Red>
-References: <20220401201804.2867154-1-clabbe@baylibre.com>
- <20220401201804.2867154-29-clabbe@baylibre.com>
- <30305936-4b69-e1ce-44c2-0d1d113b460e@linaro.org>
- <d092ede9-df92-9b34-d2d0-5da043e11679@linaro.org>
+        Mon, 4 Apr 2022 04:18:39 -0400
+X-Greylist: delayed 479 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 04 Apr 2022 01:16:44 PDT
+Received: from mail.coredeal.pl (mail.coredeal.pl [51.75.73.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80553B3DF
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 01:16:44 -0700 (PDT)
+Received: by mail.coredeal.pl (Postfix, from userid 1002)
+        id 12AAAA397A; Mon,  4 Apr 2022 08:06:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=coredeal.pl; s=mail;
+        t=1649059590; bh=9KGuIG62LgzC9aYmjKxzocuYLRCVghXg6v9Q1q2LHec=;
+        h=Date:From:To:Subject:From;
+        b=PSmMf6ibONG2xKTYnemKhmb2Bwk+zmnIj/3TIf7jbdzCf00oZTdkujnJMZnCT8Cno
+         1pdiaKtywU/3Kh2m6NVzokbH/dgiuGCS0J5l7CP+20GvYoRsQfj8txu8dJVCIw+TsR
+         QahCcK1u83tfJr2famrYkWwD+Q4oEYpzqwoBN+bkuq5djtV6UcULXGidJZulJEAVDg
+         akxDIwz715Yf91I3D/8D1+8K+nmqrv9bMkw/g1rciznpRPWglKU3Hzlj/C2DeiIOc8
+         ZmqsmLQlLpFF/GGFt/dPtBVDbCB/2IS9qbAMqiptN+tCs2cr9g7o1yAviW60I6j6t5
+         GC0P9e6GgFB7w==
+Received: by mail.coredeal.pl for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 08:05:41 GMT
+Message-ID: <20220404064500-0.1.2c.c7yq.0.07t9p6d11c@coredeal.pl>
+Date:   Mon,  4 Apr 2022 08:05:41 GMT
+From:   "Krzysztof Maj" <krzysztof.maj@coredeal.pl>
+To:     <linux-crypto@vger.kernel.org>
+Subject: Biznesowy angielski
+X-Mailer: mail.coredeal.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d092ede9-df92-9b34-d2d0-5da043e11679@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Sat, Apr 02, 2022 at 02:07:26PM +0200, Krzysztof Kozlowski a écrit :
-> On 02/04/2022 13:53, Krzysztof Kozlowski wrote:
-> > On 01/04/2022 22:17, Corentin Labbe wrote:
-> >> The latest addition to the rockchip crypto driver need to update the
-> >> driver bindings.
-> >>
-> >> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> >> ---
-> >>  .../crypto/rockchip,rk3288-crypto.yaml        | 68 +++++++++++++++++--
-> >>  1 file changed, 63 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >> index 66db671118c3..e6c00bc8bebf 100644
-> >> --- a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> >> @@ -11,8 +11,18 @@ maintainers:
-> >>  
-> >>  properties:
-> >>    compatible:
-> >> -    enum:
-> >> -      - rockchip,rk3288-crypto
-> >> +    oneOf:
-> >> +      - description: crypto IP present on RK3288 SoCs
-> >> +        items:
-> >> +          - const: rockchip,rk3288-crypto
-> >> +      - description: crypto IP present on RK3328 SoCs
-> > 
-> > These two comments are not helping, so this should be just enum.
-> > 
-> >> +        items:
-> >> +          - const: rockchip,rk3328-crypto
-> >> +      - description: crypto IPs present on RK3399. crypto0 is the first IP with
-> >> +                     RSA support, crypto1 is the second IP without RSA.
-> > 
-> > The second part of this comment is helpful, first not. You have chosen
-> > enum in your first patch, so just extend it with comments. Additionally
-> > indexing does not scale. What if next generation reverses it and crypto0
-> > does not have RSA and crypto1 has?
-> 
-> Actually let me re-think this. Is programming model (registers?) same
-> between crypto0 and crypto1? If yes, this should be same compatible and
-> add a dedicated property "rockchip,rsa"?
-> 
-> I looked at your driver and you modeled it as main and sub devices. I
-> wonder why - are there some dependencies? It would be helpful to have
-> such information here in commit msg as well. Your commit #26 says that
-> only difference is the RSA.
-> 
+Dzie=C5=84 dobry,=20
 
-Hello
+czy rozwa=C5=BCali Pa=C5=84stwo rozw=C3=B3j kwalifikacji j=C4=99zykowych =
+swoich pracownik=C3=B3w?
 
-There is no dependency, my only problem is that only one of 2 instance need to register crypto algos.
-The only perfect way is to have a list_head of devices, but I found this a bit complex/overkill.
-I understand my current way is not ideal, I will probably try this other way. In that case, yes problably the 2 node need to have the same compatible (and only a future rockchip,rsa will permit to distinct where RSA is).
+Opracowali=C5=9Bmy kursy j=C4=99zykowe dla r=C3=B3=C5=BCnych bran=C5=BC, =
+w kt=C3=B3rych koncentrujemy si=C4=99 na podniesieniu poziomu s=C5=82owni=
+ctwa i jako=C5=9Bci komunikacji wykorzystuj=C4=85c autorsk=C4=85 metod=C4=
+=99, stworzon=C4=85 specjalnie dla wymagaj=C4=85cego biznesu.=20
 
-Regards
+Niestandardowy kurs on-line, dopasowany do profilu firmy i obszar=C3=B3w =
+=C5=9Bwiadczonych us=C5=82ug, w szybkim czasie przyniesie efekty, kt=C3=B3=
+re zwi=C4=99ksz=C4=85 komfort i jako=C5=9B=C4=87 pracy, rozwijaj=C4=85c m=
+o=C5=BCliwo=C5=9Bci biznesowe.=20
+
+Zdalne szkolenie j=C4=99zykowe to m.in. zaj=C4=99cia z native speakerami,=
+ kt=C3=B3re w szybkim czasie naucz=C4=85 pracownik=C3=B3w rozmawia=C4=87 =
+za pomoc=C4=85 jasnego i zwi=C4=99z=C5=82ego j=C4=99zyka Business English=
+=2E
+
+Czy m=C3=B3g=C5=82bym przedstawi=C4=87 wi=C4=99cej szczeg=C3=B3=C5=82=C3=B3=
+w i opowiedzie=C4=87 jak dzia=C5=82amy?=20
+
+
+Pozdrawiam
+Krzysztof Maj
