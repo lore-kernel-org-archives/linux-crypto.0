@@ -2,140 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 910D2C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 02:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D81DFC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 05:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbiDECt4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Apr 2022 22:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48118 "EHLO
+        id S229713AbiDEFXs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Apr 2022 01:23:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbiDECtm (ORCPT
+        with ESMTP id S229847AbiDEFXa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Apr 2022 22:49:42 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C813256E5
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 18:56:07 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id y32so5333994lfa.6
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Apr 2022 18:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cRMKHMEeY9+RKsGGifttcYB8078b1P2NNUuN3rXNHsA=;
-        b=LlZFviyzsfP62rQJSDGGCX3c9ZzlqUhIw0Grkn+0VsM5rBKFmnTsvaGr6mPFYw/tj6
-         ZBlT4zeTLpFbNjJFxipLzirk3SZnQBkKZztZrogl8TdhoIqBfNsmEHMQAwoLN4wDBSb1
-         RX6dA3jOFOe37TqV8nAumLk8bTAHjDZcvlCQ7IG1JaltWKxP8ngirmIA6lxxLG8A2Jz+
-         A/eJ43HBVW5k9XKtbxoZealcoZb77DOHQc72k2eDNR0zVMPrdx6whfcxtnwjka6gcAen
-         A1ItInfmns7dDfPE74B3SyF17i4AKPzOoaFKdp52yNvyaChvEdHGjckkPvPTrw3IIDYA
-         fxoA==
+        Tue, 5 Apr 2022 01:23:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1E6E32DC3
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 22:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649136049;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hXNd3S63I+/DnvIHKzVjn0CsQfzi1GKX7Atsgl6DyUY=;
+        b=Aj8viwLBQejEOhZ4x+8nLx/BkAe0HyKtHO8v1WZ6hPVfiGO728bj6zCLDd7rTgjnEL+LQ1
+        9sZqfcLgTBmClRPjoxGsIHjH5cTIUKis1GwX7yHp3cCPpzh+zKSYelCUW4q6bYMXIxviso
+        GUDg2k8vi8e1A4j0g1KYoVWtcuQhT2I=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-331-07UXkeM_MOa6v5P6ZyydUg-1; Tue, 05 Apr 2022 01:20:48 -0400
+X-MC-Unique: 07UXkeM_MOa6v5P6ZyydUg-1
+Received: by mail-wm1-f71.google.com with SMTP id r206-20020a1c44d7000000b0038e6a1b25f1so756394wma.7
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Apr 2022 22:20:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cRMKHMEeY9+RKsGGifttcYB8078b1P2NNUuN3rXNHsA=;
-        b=fy7Nh8VjWSti+hV+3yp0rlKH8rg6107knL8WvM2GQKyA4nuVrdYXVmg9x6+iLJ0jvE
-         I094FIghrlyqtSlx4aZ59lapJhPRVcga53HzVmwsLV7/68FR8wNKSrOB5A5BQPUgjtLc
-         lTNX9O3KNke0S1TqSKkhYjy5luszx/j3Glk0so/VUzcqAY4p2uUz8WK0fuZ4I7B7Z8KM
-         G9/sq2xHOLpP5rR7PvhqI6RswCJz2L75oDEs53YayICwLDc05tiKrCfMkXxYxOvLrsWd
-         IMNam1MFH+uU0ct3agpjCkIEsO8vP/xwYfWp1wQx5hImb34Av/qc+XqfmUAYZ2dsWsHM
-         ///g==
-X-Gm-Message-State: AOAM5304TSnYc9+kPPgXFYGD83finctPKaCWN2n5LxTG9cw4Y5xmkhn/
-        Bv5uCalkwLif0y8IsgFOzjG3pNNz2Cqfuzl0EEKPmCJDkfg=
-X-Google-Smtp-Source: ABdhPJwP68brfn2rAlyZj8ifciA/yGBj3dOA1XzN+z0hIDf8y32OrKqN3zR2RIoCsOMVm7zYU2M/MhPE2Upm9zNrwX4=
-X-Received: by 2002:a05:6512:1153:b0:44a:3b47:4f88 with SMTP id
- m19-20020a056512115300b0044a3b474f88mr852181lfg.447.1649123765408; Mon, 04
- Apr 2022 18:56:05 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hXNd3S63I+/DnvIHKzVjn0CsQfzi1GKX7Atsgl6DyUY=;
+        b=nOUEE3zGOiqcoSWifcDxyYODgikBP4uMvIPrAQOO6s7yeCZqr0KDTR+Z8agxIYzqSX
+         CJh370q7ESnzdNOApBeN1P3bXTw3OBZed6qs0M1xfVlVlYtrgxDZTNYdwSWVjNkS4aCy
+         4F8Ejxi6A6Y+hutGFBv3m6U89whUcTdHpdMLJ5YIGzQw2i+rf0+PDXom7OvoLGGVsQA5
+         H3FcFl2iJWxDwX3z4QTtwKmh3/5i+jNN+FSuKlnaCg3ejUO/bTsn6uFppR5BZuANZ9UG
+         D5jK7yrFzP+Sizu9Gr9XF1RBOl8G4VT8CMmWMyDGjaiYWqU4ylxV4sfIXK/cI4q6kmns
+         LOWA==
+X-Gm-Message-State: AOAM5328aCyBXAjyGibhGdFHb7HfG6gIYwzKMdSML6pXr6TP3uubS2PL
+        SbuyQMYuVUnWJYbwNlOwCEweB9Af7zy77N7sLkle90g7mvPM9SsjogxZhTygx71amuUKv5Ug74C
+        /9Atwlc54AjIAaUoqOfV3Nahe
+X-Received: by 2002:a7b:cb87:0:b0:38e:7464:f796 with SMTP id m7-20020a7bcb87000000b0038e7464f796mr1343555wmi.133.1649136046821;
+        Mon, 04 Apr 2022 22:20:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz5pSIpqXDbMjBhGhF2Ym8NkkUzOiS8ugQkJZJSUEkD8mJRZ/i+6rvspLskok00+YPdm3I8bA==
+X-Received: by 2002:a7b:cb87:0:b0:38e:7464:f796 with SMTP id m7-20020a7bcb87000000b0038e7464f796mr1343528wmi.133.1649136046521;
+        Mon, 04 Apr 2022 22:20:46 -0700 (PDT)
+Received: from redhat.com ([2.52.17.211])
+        by smtp.gmail.com with ESMTPSA id d14-20020a056000186e00b0020405198faasm12295878wri.52.2022.04.04.22.20.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Apr 2022 22:20:45 -0700 (PDT)
+Date:   Tue, 5 Apr 2022 01:20:41 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     zhenwei pi <pizhenwei@bytedance.com>, arei.gonglei@huawei.com,
+        jasowang@redhat.com, virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, helei.sig11@bytedance.com
+Subject: Re: [PATCH v3 0/4] Introduce akcipher service for virtio-crypto
+Message-ID: <20220405012015-mutt-send-email-mst@kernel.org>
+References: <20220302033917.1295334-1-pizhenwei@bytedance.com>
+ <a9d1dfc1-080e-fba2-8fbb-28718b067e0d@bytedance.com>
+ <20220307040431-mutt-send-email-mst@kernel.org>
+ <87h778g8nn.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20220315230035.3792663-1-nhuck@google.com> <20220315230035.3792663-8-nhuck@google.com>
- <YjvLZkjW2ts8qDfr@sol.localdomain>
-In-Reply-To: <YjvLZkjW2ts8qDfr@sol.localdomain>
-From:   Nathan Huckleberry <nhuck@google.com>
-Date:   Mon, 4 Apr 2022 20:55:54 -0500
-Message-ID: <CAJkfWY7gU7ZfziTmUbRKkWH4yLW6mQ3MrWZ6-UQW=EfBG0FtXg@mail.gmail.com>
-Subject: Re: [PATCH v3 7/8] crypto: arm64/polyval: Add PMULL accelerated
- implementation of POLYVAL
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h778g8nn.fsf@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 8:37 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Mar 15, 2022 at 11:00:34PM +0000, Nathan Huckleberry wrote:
-> > Add hardware accelerated version of POLYVAL for ARM64 CPUs with
-> > Crypto Extension support.
->
-> Nit: It's "Crypto Extensions", not "Crypto Extension".
->
-> > +config CRYPTO_POLYVAL_ARM64_CE
-> > +     tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
-> > +     depends on KERNEL_MODE_NEON
-> > +     select CRYPTO_CRYPTD
-> > +     select CRYPTO_HASH
-> > +     select CRYPTO_POLYVAL
->
-> CRYPTO_POLYVAL selects CRYPTO_HASH already, so there's no need to select it
-> here.
->
-> > +/*
-> > + * Perform polynomial evaluation as specified by POLYVAL.  This computes:
-> > + *   h^n * accumulator + h^n * m_0 + ... + h^1 * m_{n-1}
-> > + * where n=nblocks, h is the hash key, and m_i are the message blocks.
-> > + *
-> > + * x0 - pointer to message blocks
-> > + * x1 - pointer to precomputed key powers h^8 ... h^1
-> > + * x2 - number of blocks to hash
-> > + * x3 - pointer to accumulator
-> > + *
-> > + * void pmull_polyval_update(const u8 *in, const struct polyval_ctx *ctx,
-> > + *                        size_t nblocks, u8 *accumulator);
-> > + */
-> > +SYM_FUNC_START(pmull_polyval_update)
-> > +     adr             TMP, .Lgstar
-> > +     ld1             {GSTAR.2d}, [TMP]
-> > +     ld1             {SUM.16b}, [x3]
-> > +     ands            PARTIAL_LEFT, BLOCKS_LEFT, #7
-> > +     beq             .LskipPartial
-> > +     partial_stride
-> > +.LskipPartial:
-> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> > +     blt             .LstrideLoopExit
-> > +     ld1             {KEY8.16b, KEY7.16b, KEY6.16b, KEY5.16b}, [x1], #64
-> > +     ld1             {KEY4.16b, KEY3.16b, KEY2.16b, KEY1.16b}, [x1], #64
-> > +     full_stride 0
-> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> > +     blt             .LstrideLoopExitReduce
-> > +.LstrideLoop:
-> > +     full_stride 1
-> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
-> > +     bge             .LstrideLoop
-> > +.LstrideLoopExitReduce:
-> > +     montgomery_reduction
-> > +     mov             SUM.16b, PH.16b
-> > +.LstrideLoopExit:
-> > +     st1             {SUM.16b}, [x3]
-> > +     ret
-> > +SYM_FUNC_END(pmull_polyval_update)
->
-> Is there a reason why partial_stride is done first in the arm64 implementation,
-> but last in the x86 implementation?  It would be nice if the implementations
-> worked the same way.  Probably last would be better?  What is the advantage of
-> doing it first?
+On Mon, Apr 04, 2022 at 05:39:24PM +0200, Cornelia Huck wrote:
+> On Mon, Mar 07 2022, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Mar 07, 2022 at 10:42:30AM +0800, zhenwei pi wrote:
+> >> Hi, Michael & Lei
+> >> 
+> >> The full patchset has been reviewed by Gonglei, thanks to Gonglei.
+> >> Should I modify the virtio crypto specification(use "__le32 akcipher_algo;"
+> >> instead of "__le32 reserve;" only, see v1->v2 change), and start a new issue
+> >> for a revoting procedure?
+> >
+> > You can but not it probably will be deferred to 1.3. OK with you?
+> >
+> >> Also cc Cornelia Huck.
+> 
+> [Apologies, I'm horribly behind on my email backlog, and on virtio
+> things in general :(]
+> 
+> The akcipher update had been deferred for 1.2, so I think it will be 1.3
+> material. However, I just noticed while browsing the fine lwn.net merge
+> window summary that this seems to have been merged already. That
+> situation is less than ideal, although I don't expect any really bad
+> problems, given that there had not been any negative feedback for the
+> spec proposal that I remember.
 
-It was so I could return early without loading keys into registers,
-since I only need them if there's
-a full stride. I was able to rewrite it in the same way that the x86
-implementation works.
->
-> Besides that, many of the comments I made on the x86 implementation apply to the
-> arm64 implementation too.
->
-> - Eric
+Let's open a 1.3 branch? What do you think?
+
+-- 
+MST
+
