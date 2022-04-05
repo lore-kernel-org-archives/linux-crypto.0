@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BB3C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 08:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB95C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 10:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236147AbiDEJAJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Apr 2022 05:00:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48678 "EHLO
+        id S240226AbiDEKyz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Apr 2022 06:54:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244215AbiDEIvu (ORCPT
+        with ESMTP id S244560AbiDEJl2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Apr 2022 04:51:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AB1D3AF4;
-        Tue,  5 Apr 2022 01:40:31 -0700 (PDT)
+        Tue, 5 Apr 2022 05:41:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41996BBE09;
+        Tue,  5 Apr 2022 02:27:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6CF2361516;
-        Tue,  5 Apr 2022 08:40:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C87C385A5;
-        Tue,  5 Apr 2022 08:40:13 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D2E036165C;
+        Tue,  5 Apr 2022 09:26:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B584BC385A2;
+        Tue,  5 Apr 2022 09:26:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1649148013;
-        bh=4MlSW4cAS64L9zVTicoHovuyU0G38E9keWqJ6LuGm+s=;
+        s=korg; t=1649150819;
+        bh=nYwfEtMFbMAE6czzSoryuRv5ziTITHooF+OvNTqn/1M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=y2CjkHF5M9rcop+YVZtlWDkO07Ay4nvcdzIR0WrmGHTrqyyM9Q4MpjQMrnRWDRCYf
-         H8TVZ2vfBkKLrH+rYgXmeB4wiO9VmDmmDgZCWxd6pxsLmlS1B4q3VcnUmXCMq7JCKr
-         ihovbgn4rHMatPNP/aWa8bJnKfejdCkQ+LZKdevk=
+        b=WflVkywDr0T1Fdut3pd1zeI0Vj6Km4nxDkvgZmW8+81ftWgQfgfeVSm7sY1+UjYOi
+         RH9K3IBzBbor1YG0Fy08PULsmGzbvaSNfNOlyAZAwCCACP0G6jNJpVzFN6+9QCP/Ow
+         nVJXcaKMsxHoTDdyiHVWGvKfGkyDvI8OD80qoEig=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -41,12 +41,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         John Allen <john.allen@amd.com>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.16 0203/1017] crypto: ccp - Ensure psp_ret is always initd in __sev_platform_init_locked()
-Date:   Tue,  5 Apr 2022 09:18:36 +0200
-Message-Id: <20220405070400.276279078@linuxfoundation.org>
+Subject: [PATCH 5.15 192/913] crypto: ccp - Ensure psp_ret is always initd in __sev_platform_init_locked()
+Date:   Tue,  5 Apr 2022 09:20:54 +0200
+Message-Id: <20220405070345.613291615@linuxfoundation.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220405070354.155796697@linuxfoundation.org>
-References: <20220405070354.155796697@linuxfoundation.org>
+In-Reply-To: <20220405070339.801210740@linuxfoundation.org>
+References: <20220405070339.801210740@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -82,7 +82,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 581a1b13d5c3..de015995189f 100644
+index e2806ca3300a..5040726fc119 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
 @@ -241,7 +241,7 @@ static int __sev_platform_init_locked(int *error)
