@@ -2,135 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B74D4C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Apr 2022 23:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910D2C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 02:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbiDDXgL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Apr 2022 19:36:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
+        id S229912AbiDECt4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Apr 2022 22:49:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiDDXgK (ORCPT
+        with ESMTP id S230075AbiDECtm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Apr 2022 19:36:10 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E6813EB7;
-        Mon,  4 Apr 2022 16:34:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 98A43B81A12;
-        Mon,  4 Apr 2022 23:34:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F290C2BBE4;
-        Mon,  4 Apr 2022 23:34:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649115243;
-        bh=eyAsMKYGzvH+3OrgXnEs+25VO7XTUXzbVRM181PAF5U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eh2BN5YS5fjaSbHOqWp41DWSblIIt/lekO/Z/1O6HKNmGiF5IWQXxVme0XUwPkRPv
-         pawsPW+56uspMKlkm+7O+ogN6DC0h2iPHD3D1UgUvWEg1ZxvhiuEGMCZb54YD8NlG+
-         5sDNJnUwcfyPShs5oL8e4ryBW/WwUfu/uwofE2neiFuz8gymutRaZhIH0+B9/Uc3Y5
-         Gcu8/PrKrz+fRPQGInplyt2Eo6kO1XrwNOvkdljXSihi2o6L4DXo2zwCgF+AZvvR68
-         JZeqJDK0d9Q2J24LBQxG5eIwgbXc8oMJJQcZiO60Dk7oqoeUWKjCXg4MgAaG651P3t
-         Kjl/GGM1oeDdw==
-Date:   Mon, 4 Apr 2022 16:34:01 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: testmgr - test in-place en/decryption with two
- sglists
-Message-ID: <YkuAaabISmyqcjoS@sol.localdomain>
-References: <20220326071159.56056-1-ebiggers@kernel.org>
- <CAOtvUMfpqxrdgmnzpkCW=EdUmquXYC6F=rwW+n8koJAt0Wg38g@mail.gmail.com>
+        Mon, 4 Apr 2022 22:49:42 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C813256E5
+        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 18:56:07 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id y32so5333994lfa.6
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Apr 2022 18:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cRMKHMEeY9+RKsGGifttcYB8078b1P2NNUuN3rXNHsA=;
+        b=LlZFviyzsfP62rQJSDGGCX3c9ZzlqUhIw0Grkn+0VsM5rBKFmnTsvaGr6mPFYw/tj6
+         ZBlT4zeTLpFbNjJFxipLzirk3SZnQBkKZztZrogl8TdhoIqBfNsmEHMQAwoLN4wDBSb1
+         RX6dA3jOFOe37TqV8nAumLk8bTAHjDZcvlCQ7IG1JaltWKxP8ngirmIA6lxxLG8A2Jz+
+         A/eJ43HBVW5k9XKtbxoZealcoZb77DOHQc72k2eDNR0zVMPrdx6whfcxtnwjka6gcAen
+         A1ItInfmns7dDfPE74B3SyF17i4AKPzOoaFKdp52yNvyaChvEdHGjckkPvPTrw3IIDYA
+         fxoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cRMKHMEeY9+RKsGGifttcYB8078b1P2NNUuN3rXNHsA=;
+        b=fy7Nh8VjWSti+hV+3yp0rlKH8rg6107knL8WvM2GQKyA4nuVrdYXVmg9x6+iLJ0jvE
+         I094FIghrlyqtSlx4aZ59lapJhPRVcga53HzVmwsLV7/68FR8wNKSrOB5A5BQPUgjtLc
+         lTNX9O3KNke0S1TqSKkhYjy5luszx/j3Glk0so/VUzcqAY4p2uUz8WK0fuZ4I7B7Z8KM
+         G9/sq2xHOLpP5rR7PvhqI6RswCJz2L75oDEs53YayICwLDc05tiKrCfMkXxYxOvLrsWd
+         IMNam1MFH+uU0ct3agpjCkIEsO8vP/xwYfWp1wQx5hImb34Av/qc+XqfmUAYZ2dsWsHM
+         ///g==
+X-Gm-Message-State: AOAM5304TSnYc9+kPPgXFYGD83finctPKaCWN2n5LxTG9cw4Y5xmkhn/
+        Bv5uCalkwLif0y8IsgFOzjG3pNNz2Cqfuzl0EEKPmCJDkfg=
+X-Google-Smtp-Source: ABdhPJwP68brfn2rAlyZj8ifciA/yGBj3dOA1XzN+z0hIDf8y32OrKqN3zR2RIoCsOMVm7zYU2M/MhPE2Upm9zNrwX4=
+X-Received: by 2002:a05:6512:1153:b0:44a:3b47:4f88 with SMTP id
+ m19-20020a056512115300b0044a3b474f88mr852181lfg.447.1649123765408; Mon, 04
+ Apr 2022 18:56:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMfpqxrdgmnzpkCW=EdUmquXYC6F=rwW+n8koJAt0Wg38g@mail.gmail.com>
+References: <20220315230035.3792663-1-nhuck@google.com> <20220315230035.3792663-8-nhuck@google.com>
+ <YjvLZkjW2ts8qDfr@sol.localdomain>
+In-Reply-To: <YjvLZkjW2ts8qDfr@sol.localdomain>
+From:   Nathan Huckleberry <nhuck@google.com>
+Date:   Mon, 4 Apr 2022 20:55:54 -0500
+Message-ID: <CAJkfWY7gU7ZfziTmUbRKkWH4yLW6mQ3MrWZ6-UQW=EfBG0FtXg@mail.gmail.com>
+Subject: Re: [PATCH v3 7/8] crypto: arm64/polyval: Add PMULL accelerated
+ implementation of POLYVAL
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 27, 2022 at 09:04:43AM +0300, Gilad Ben-Yossef wrote:
-> On Sat, Mar 26, 2022 at 10:13 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > As was established in the thread
-> > https://lore.kernel.org/linux-crypto/20220223080400.139367-1-gilad@benyossef.com/T/#u,
-> > many crypto API users doing in-place en/decryption don't use the same
-> > scatterlist pointers for the source and destination, but rather use
-> > separate scatterlists that point to the same memory.  This case isn't
-> > tested by the self-tests, resulting in bugs.
-> >
-> > This is the natural usage of the crypto API in some cases, so requiring
-> > API users to avoid this usage is not reasonable.
-> >
-> > Therefore, update the self-tests to start testing this case.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> 
-> 
-> Thank you Eric.
-> 
-> I have given this a lot of thought and here is what I predict will
-> happen thanks to this added test:
-> - We will not find a driver that this breaks, in the sense of
-> producing wrong results and triggering failure in this test.
-> - We probably will see drivers that when running this test when DMA
-> debug is compiled and enabled trigger the debug warning about double
-> DMA mapping of the same cache line.
-> 
-> The reason is that these double mapping stemming from this test will
-> be from mapping the same buffer as source and destination.
-> As such, the situation that is the cause for the DMA debug warning, of
-> a mapping causing  cache flush invalidate, followed by DMA, followed
-> by another mapping causing cache flush/invalidate while the DMA is in
-> flight, will not happen. Instead we will have mapping ->
-> flush/invalidate -> another mapping -> flush/invalidate -> DMA ...
-> 
-> Note, this is certainly not a claim we should not add this test! on
-> the contrary ...
-> 
-> In fact, I would be tempted to claim that this means the real problem
-> is with an over zealous DMA debug logic. Unfortunately, I can think of
-> other scenarios where things are not so simple:
-> 
-> For example, what happens if a crypto API user has a buffer, which it
-> divides into two parts, and then submit a crypto op on one part and
-> another crypto op on the 2nd part (say encrypt and hash, just as an
-> example). For the best of my knowledge, there is nothing forcing the
-> split between the two parts to fall on a cache line. This can cause a
-> double mapping of the same cache line - and this time the warning is
-> real, because we are not guaranteed a single DMA operation following
-> the two mappings. There is nothing much a crypto driver can do even -
-> the two operations don't have to be done by the same driver at all...
-> 
-> I believe the scenario you are proposing to test is a benign example
-> of a larger issue. I also believe this is an example of Worse in
-> Better* and that the right solution is to dictate certain rules on the
-> callers of the crypto API. Whether these rules should or should not
-> include a limitation of not passing the same buffer via two different
-> scatter gather list to the same crypto op is debatable, but I think we
-> cannot run away from defining some rules.
-> 
-> I would really love for others to voice an opinion on this. It seems a
-> rather narrow discussion so far between the two of us on what I feel
-> is  a broader issue.
+On Wed, Mar 23, 2022 at 8:37 PM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Mar 15, 2022 at 11:00:34PM +0000, Nathan Huckleberry wrote:
+> > Add hardware accelerated version of POLYVAL for ARM64 CPUs with
+> > Crypto Extension support.
+>
+> Nit: It's "Crypto Extensions", not "Crypto Extension".
+>
+> > +config CRYPTO_POLYVAL_ARM64_CE
+> > +     tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
+> > +     depends on KERNEL_MODE_NEON
+> > +     select CRYPTO_CRYPTD
+> > +     select CRYPTO_HASH
+> > +     select CRYPTO_POLYVAL
+>
+> CRYPTO_POLYVAL selects CRYPTO_HASH already, so there's no need to select it
+> here.
+>
+> > +/*
+> > + * Perform polynomial evaluation as specified by POLYVAL.  This computes:
+> > + *   h^n * accumulator + h^n * m_0 + ... + h^1 * m_{n-1}
+> > + * where n=nblocks, h is the hash key, and m_i are the message blocks.
+> > + *
+> > + * x0 - pointer to message blocks
+> > + * x1 - pointer to precomputed key powers h^8 ... h^1
+> > + * x2 - number of blocks to hash
+> > + * x3 - pointer to accumulator
+> > + *
+> > + * void pmull_polyval_update(const u8 *in, const struct polyval_ctx *ctx,
+> > + *                        size_t nblocks, u8 *accumulator);
+> > + */
+> > +SYM_FUNC_START(pmull_polyval_update)
+> > +     adr             TMP, .Lgstar
+> > +     ld1             {GSTAR.2d}, [TMP]
+> > +     ld1             {SUM.16b}, [x3]
+> > +     ands            PARTIAL_LEFT, BLOCKS_LEFT, #7
+> > +     beq             .LskipPartial
+> > +     partial_stride
+> > +.LskipPartial:
+> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
+> > +     blt             .LstrideLoopExit
+> > +     ld1             {KEY8.16b, KEY7.16b, KEY6.16b, KEY5.16b}, [x1], #64
+> > +     ld1             {KEY4.16b, KEY3.16b, KEY2.16b, KEY1.16b}, [x1], #64
+> > +     full_stride 0
+> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
+> > +     blt             .LstrideLoopExitReduce
+> > +.LstrideLoop:
+> > +     full_stride 1
+> > +     subs            BLOCKS_LEFT, BLOCKS_LEFT, #NUM_PRECOMPUTE_POWERS
+> > +     bge             .LstrideLoop
+> > +.LstrideLoopExitReduce:
+> > +     montgomery_reduction
+> > +     mov             SUM.16b, PH.16b
+> > +.LstrideLoopExit:
+> > +     st1             {SUM.16b}, [x3]
+> > +     ret
+> > +SYM_FUNC_END(pmull_polyval_update)
+>
+> Is there a reason why partial_stride is done first in the arm64 implementation,
+> but last in the x86 implementation?  It would be nice if the implementations
+> worked the same way.  Probably last would be better?  What is the advantage of
+> doing it first?
 
-I don't have an answer, sorry.
-
-I personally don't actually have a lot of interest in the crypto accelerator
-support in the crypto API, since in the domain I work in (storage encryption)
-it's much more common for inline encryption hardware to be used instead, and
-that has its own support in the Linux block layer, separate from the crypto API.
-
-If there are fundamental issues with how crypto accelerators are supported in
-the crypto API, then I think that the people who actually care about such
-hardware need to get together to create a plan for correctly supporting it.
-Doing separate crypto operations on contiguous buffers is absolutely something
-that users can expect to work, so if that in fact cannot work, then I expect
-that this limitation will need to be very explicitly documented and checked in
-the crypto API, and users will need to explicitly opt-in to being able to use
-crypto accelerators rather than having them (sort of) be used by default.
-
-- Eric
+It was so I could return early without loading keys into registers,
+since I only need them if there's
+a full stride. I was able to rewrite it in the same way that the x86
+implementation works.
+>
+> Besides that, many of the comments I made on the x86 implementation apply to the
+> arm64 implementation too.
+>
+> - Eric
