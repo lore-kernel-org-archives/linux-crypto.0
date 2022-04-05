@@ -2,90 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A40C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 06:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EFB8C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 07:50:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbiDEGXN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Apr 2022 02:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46920 "EHLO
+        id S232136AbiDEHw1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Apr 2022 03:52:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbiDEGXN (ORCPT
+        with ESMTP id S232800AbiDEHvm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Apr 2022 02:23:13 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA5C30F49
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Apr 2022 23:21:15 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id bh17so24485502ejb.8
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Apr 2022 23:21:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=dFScsEWOIQMzMNWYs3fFmAJMFFVGjdTXWlfZ6OzACcM=;
-        b=ThW/SFaboNZtHF1joXB0EOfD3+A0oYJ68xb8vJwAGJJiAGdr5v9cOdv2Dn66J/LFyu
-         tDNav6AsyulSZuGIEw7SaLofwLqlZpeX62mUTRZP80YMIBFpCdQj2Z9FyiN3CqOSYQm2
-         LalCB5F1uP33hNg9iwBf7oB6uMrnWQNDoPsglXr10xJOBqkYwAjCgqnqd3jj45MnEqDa
-         Lg30iUzsG5H5ep1/kiOcndp8nAfuZgbCulVghu/RP2S+rGF53vYqBWYVeYqdV6ixfuza
-         RiDXrjpU+PItsGYrqSpREsv+U6svzjtGW0w42psnSUBOu1BB8eBwq0W9Bp7xR8totzeV
-         8KAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=dFScsEWOIQMzMNWYs3fFmAJMFFVGjdTXWlfZ6OzACcM=;
-        b=laNbTcnV8dNEs4euIFI3sXaP8NQuz3CjzrnBfQ04RceONkSRnHs9QKdawMpSrJvQvm
-         V9vr74/5GHN0DeW5hIzjAEFLxbcAuJYV5pOX3+XehXzqyNFgCIewEog1X+yAz9Rva7v1
-         2ndRsFMn/Da0w2HzztSJaa5QpYFle3RsQDx6TuMtM4Xm60XtZRxk1JHbeW/bo17P+pH4
-         uUBgk6dEriEkViSk9uPGwiuIy8FPyokG8vTpOsZmuAyUOSskRyyBqUnD/tOr3lcY1NQ6
-         CC2jg+kngaOCgvrddUWwK3bUnQ542ySHTKpxzS8GKVYt7A4lEUJYIGJEPVQ1Q+CLFqu0
-         O5CA==
-X-Gm-Message-State: AOAM530WVBIx2zT8899Hkzc0R+BH+gsrbKnBlQbogczJHgi96qmQ+FJ3
-        3cVR7kEthYTCMud2N7l7qVXmJg==
-X-Google-Smtp-Source: ABdhPJyYwzqhusFM2acIFejF6DscmAD/F8UQ9YmVdk9ycgo6D64esQZRZXphTaTK1r5QecxoV/dc7Q==
-X-Received: by 2002:a17:906:c145:b0:6da:aaaf:770c with SMTP id dp5-20020a170906c14500b006daaaaf770cmr1919863ejc.504.1649139674388;
-        Mon, 04 Apr 2022 23:21:14 -0700 (PDT)
-Received: from [192.168.0.179] (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
-        by smtp.gmail.com with ESMTPSA id f13-20020a50bf0d000000b0041cdd9c9147sm1051481edk.40.2022.04.04.23.21.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Apr 2022 23:21:13 -0700 (PDT)
-Message-ID: <12b2cd08-f296-1c48-4ea4-0d119597854e@linaro.org>
-Date:   Tue, 5 Apr 2022 08:21:13 +0200
+        Tue, 5 Apr 2022 03:51:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A02431835E;
+        Tue,  5 Apr 2022 00:47:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 02ECC616C4;
+        Tue,  5 Apr 2022 07:47:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D859AC340EE;
+        Tue,  5 Apr 2022 07:47:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1649144871;
+        bh=XbcS6J5pKTc2UDgppCxx12CWm5kB7pk+jArTB3TU6mc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MRyPXqiWub7ZQCR3XYncrv5V2+03gIAEaNjYJSDQWQ1XB9/Oj5hbNPbSiqdScU64C
+         kyLYkCceXakv3CfK6LpD4lfh1IBslX3EadDuFY3aPJ29oYxrjQVr3L0pDKOb/aCYCa
+         09Mi6kVNXIvEA1eXoMQJl/8fefDBVB4iBT/YoZik=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        John Allen <john.allen@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.17 0201/1126] crypto: ccp - Ensure psp_ret is always initd in __sev_platform_init_locked()
+Date:   Tue,  5 Apr 2022 09:15:48 +0200
+Message-Id: <20220405070413.506377453@linuxfoundation.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220405070407.513532867@linuxfoundation.org>
+References: <20220405070407.513532867@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] dt-bindings: white-space cleanups
-Content-Language: en-US
-To:     Rob Herring <robh+dt@kernel.org>
-Cc:     Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        devicetree@vger.kernel.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Corentin Labbe <clabbe@baylibre.com>
-References: <20220402192819.154691-1-krzysztof.kozlowski@linaro.org>
- <CAL_JsqKuFAY4QENRb3dKETKcaJm-fcguoCFOgUnzf0Pwmf1Ezg@mail.gmail.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <CAL_JsqKuFAY4QENRb3dKETKcaJm-fcguoCFOgUnzf0Pwmf1Ezg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 04/04/2022 23:18, Rob Herring wrote:
-> On Sat, Apr 2, 2022 at 2:28 PM Krzysztof Kozlowski
-> <krzysztof.kozlowski@linaro.org> wrote:
->>
->> Remove trailing white-spaces and trailing blank lines (yamllint when run
->> manually does not like them).
-> 
-> I assume you mean run without our configuration file. I probably
-> disabled the check because I didn't want to go fix everywhere. If we
-> are going to fix, then we should enable the check to not get more.
+From: Peter Gonda <pgonda@google.com>
 
-Yes, just "yamllint *yaml".
+[ Upstream commit 1e1ec11d3ec3134e05d4710f4dee5f9bd05e828d ]
+
+Initialize psp_ret inside of __sev_platform_init_locked() because there
+are many failure paths with PSP initialization that do not set
+__sev_do_cmd_locked().
+
+Fixes: e423b9d75e77: ("crypto: ccp - Move SEV_INIT retry for corrupted data")
+
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: John Allen <john.allen@amd.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/ccp/sev-dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 8fd774a10edc..6ab93dfd478a 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -413,7 +413,7 @@ static int __sev_platform_init_locked(int *error)
+ {
+ 	struct psp_device *psp = psp_master;
+ 	struct sev_device *sev;
+-	int rc, psp_ret;
++	int rc, psp_ret = -1;
+ 	int (*init_function)(int *error);
+ 
+ 	if (!psp || !psp->sev_data)
+-- 
+2.34.1
 
 
-Best regards,
-Krzysztof
+
