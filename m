@@ -2,70 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF2AC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Apr 2022 14:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A536CC433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 01:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236610AbiDEPBI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Apr 2022 11:01:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
+        id S239984AbiDFBBm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Apr 2022 21:01:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388178AbiDENVW (ORCPT
+        with ESMTP id S1457457AbiDEQDP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Apr 2022 09:21:22 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A137113A;
-        Tue,  5 Apr 2022 05:25:15 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3159FD6E;
-        Tue,  5 Apr 2022 05:25:15 -0700 (PDT)
-Received: from e121345-lin.cambridge.arm.com (e121345-lin.cambridge.arm.com [10.1.196.40])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2B3F53F5A1;
-        Tue,  5 Apr 2022 05:25:14 -0700 (PDT)
-From:   Robin Murphy <robin.murphy@arm.com>
-To:     giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: qat - stop using iommu_present()
-Date:   Tue,  5 Apr 2022 13:25:11 +0100
-Message-Id: <ef01fbd7d2c60d56a0b8e8847a08ccb3ee5132af.1649161511.git.robin.murphy@arm.com>
-X-Mailer: git-send-email 2.28.0.dirty
+        Tue, 5 Apr 2022 12:03:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5E0B78;
+        Tue,  5 Apr 2022 08:46:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7003261864;
+        Tue,  5 Apr 2022 15:46:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BFDEC385A0;
+        Tue,  5 Apr 2022 15:46:37 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IrqXNjNr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649173595;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kMW6nv0KgyiuvN9yvKUvui9YNVE/98hEjd4XPkThs90=;
+        b=IrqXNjNr7ddyqE5MMjbXjHDxIX0NW+WVojRksZ6m0S4+lmcqURfAp2f6dg+tp5HZEYj0BN
+        7VDPM5mxDQYq2XrJtyazvVVJ+LnJm9flQ72ub1UFG5bYuX5BUoj+xjFn3GR00z2iP+ZMZg
+        0G9HiVfUq8xpP0VzzddhAzUow8GfS9k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ebe173d8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 5 Apr 2022 15:46:35 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
+Subject: [PATCH] random: do not allow user to keep crng key around on stack
+Date:   Tue,  5 Apr 2022 17:46:27 +0200
+Message-Id: <20220405154627.244473-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Even if an IOMMU might be present for some PCI segment in the system,
-that doesn't necessarily mean it provides translation for the device
-we care about. Replace iommu_present() with a more appropriate check.
+The fast key erasure RNG design relies on the key that's used to be used
+and then discarded. We do this, making judicious use of
+memzero_explicit().  However, reads to /dev/urandom and calls to
+getrandom() involve a copy_to_user(), and userspace can use FUSE or
+userfaultfd, or make a massive call, dynamically remap memory addresses
+as it goes, and set the process priority to idle, in order to keep a
+kernel stack alive indefinitely. By probing
+/proc/sys/kernel/random/entropy_avail to learn when the crng key is
+refreshed, a malicious userspace could mount this attack every 5 minutes
+thereafter, breaking the crng's forward secrecy.
 
-Signed-off-by: Robin Murphy <robin.murphy@arm.com>
+In order to fix this, we just overwrite the stack's key with the first
+32 bytes of the "free" fast key erasure output. This makes short reads a
+tiny bit slower, since they no longer get 32 bytes for free, but short
+reads are already faster than syscall overhead, so it doesn't matter.
+And for long reads, the difference is lost in the amortization, so it
+doesn't change anything.
+
+We don't need to do this for get_random_bytes() and the various
+kernel-space callers, and later, if we ever switch to always batching,
+this won't be necessary either, so there's no need to change the API of
+these functions.
+
+Cc: Theodore Ts'o <tytso@mit.edu>
+Reviewed-by: Jann Horn <jannh@google.com>
+Fixes: c92e040d575a ("random: add backtracking protection to the CRNG")
+Fixes: 186873c549df ("random: use simpler fast key erasure flow on per-cpu keys")
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/crypto/qat/qat_common/adf_sriov.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/char/random.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
-index b960bca1f9d2..7f9c18dc4540 100644
---- a/drivers/crypto/qat/qat_common/adf_sriov.c
-+++ b/drivers/crypto/qat/qat_common/adf_sriov.c
-@@ -3,7 +3,6 @@
- #include <linux/workqueue.h>
- #include <linux/pci.h>
- #include <linux/device.h>
--#include <linux/iommu.h>
- #include "adf_common_drv.h"
- #include "adf_cfg.h"
- #include "adf_pfvf_pf_msg.h"
-@@ -176,7 +175,7 @@ int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
- 		return -EFAULT;
- 	}
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 388025d6d38d..1eb220a5f44f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -532,19 +532,20 @@ static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
+ 	if (!nbytes)
+ 		return 0;
  
--	if (!iommu_present(&pci_bus_type))
-+	if (!device_iommu_mapped(&pdev->dev))
- 		dev_warn(&pdev->dev, "IOMMU should be enabled for SR-IOV to work correctly\n");
+-	len = min_t(size_t, 32, nbytes);
+-	crng_make_state(chacha_state, output, len);
+-
+-	if (copy_to_user(buf, output, len))
+-		return -EFAULT;
+-	nbytes -= len;
+-	buf += len;
+-	ret += len;
++	/*
++	 * Immediately overwrite the ChaCha key at index 4, in case userspace
++	 * causes copy_to_user() below to sleep forever, so that we still
++	 * retain forward secrecy in that case.
++	 */
++	crng_make_state(chacha_state, (u8 *)&chacha_state[4], CHACHA_KEY_SIZE);
  
- 	if (accel_dev->pf.vf_info) {
+-	while (nbytes) {
++	do {
+ 		if (large_request && need_resched()) {
+-			if (signal_pending(current))
++			if (signal_pending(current)) {
++				if (!ret)
++					ret = -ERESTARTSYS;
+ 				break;
++			}
+ 			schedule();
+ 		}
+ 
+@@ -561,7 +562,7 @@ static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
+ 		nbytes -= len;
+ 		buf += len;
+ 		ret += len;
+-	}
++	} while (nbytes);
+ 
+ 	memzero_explicit(chacha_state, sizeof(chacha_state));
+ 	memzero_explicit(output, sizeof(output));
 -- 
-2.28.0.dirty
+2.35.1
 
