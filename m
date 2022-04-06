@@ -2,174 +2,204 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EC6C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 11:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC370C43219
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 12:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230422AbiDFLbo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 07:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
+        id S232084AbiDFMEF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 08:04:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbiDFLbK (ORCPT
+        with ESMTP id S232608AbiDFMCu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 07:31:10 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4277D569494
-        for <linux-crypto@vger.kernel.org>; Wed,  6 Apr 2022 01:16:27 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id w134so2694269ybe.10
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Apr 2022 01:16:27 -0700 (PDT)
+        Wed, 6 Apr 2022 08:02:50 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2372435BC0;
+        Tue,  5 Apr 2022 18:54:31 -0700 (PDT)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 235KPK5t012575;
+        Wed, 6 Apr 2022 01:53:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2021-07-09;
+ bh=SxX0UPruCNSzfcVtv4TDsStS5bBn7z7zG7P2demI2Cs=;
+ b=ZtDONmn8lV2OaRalTm2Vr0hP2VGTfKmWM5fqIxwRuorUQPodKkSYdB98Z8VegQSoaQ7x
+ tVBCDv5/LPrKgiq3vCiBcYQ0sDSWl/MCUwQ/as17uM52ZydHSZR9WcuYV5szkkIr+GDL
+ j3rdC5CdSdfmzLl9Ss4VS0ANkTSTJPT7eT/FuC+MJiCadIEFr3UgcTocMe8ky0rpoEcq
+ p+hghglLplHZWq6Pp0awqal8kKRWsPz4D8guc9r0mnP8hPHnY+9evAbEbR+M5slo71ZZ
+ juJo6LEMaRLV7GvJaq+k7yIO/Uc9eKu3T6H2pqEpXp/GenTBzgi63LzgRCb1+1GthPlY nA== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3f6cwcfdkn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Apr 2022 01:53:52 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 2361ogWE018012;
+        Wed, 6 Apr 2022 01:53:51 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2102.outbound.protection.outlook.com [104.47.58.102])
+        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3f6cx43rv5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 06 Apr 2022 01:53:51 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U+Fj5vdqHCIyuH0cIaN0FL/P/roLIpSGSNdjK+6+ydDwUuyjHXRKS2RxC8OLe7wrtJq4HyC1wp+GhTuIjDVZ+0suwog4WUP7MrJE8QtESe+yrSOtdC5ow3gYROIgk7VgDiyZnBqvhCzDQecgRcm3np9NigjDgpKl4il5IFFm2D5ZEHNJOc6sGOUamauVLhtkQLNvGC8jqDLAjARb3BPmm5Aw5/M5tsLWOOdVGYZ9cyiE3D3csp8SUHEmaIWaTET0ztPp0yEZ5idMnVSai09uORe4go3ZBm/7+DcSkfh9rQqa/v7hG4vC6vwprp2DVcGfEr4aEtlXiyzxFH/spLU6xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SxX0UPruCNSzfcVtv4TDsStS5bBn7z7zG7P2demI2Cs=;
+ b=hG/QxbM2sU19MKZE7RAkW7WyePi9T33EmFBlaSYAZ9KTxx/CIH6gzVeBEIFBW/na3hPyjD8gZf78uh+6+4u8iTpGyq9DTmq5VpJVf+JtmOYGQVaADPHTzZJPaBWg47eh43Vys8DKZfY98Gxtc98u/B613+IoShxV2eZC/tzhffAnoRumzkQhmr0IcvSmiq2+aWvGA/t0UQSeXP6dMZBkuoPIa6os/+f6xHWoBs43yHwQNtCtPVZo+CR3w5FkvG0c7MdaQVI9fcKaqiskYtQbN/uJ63woPXLlxkQW6SWw+siDIBw5l/98O7maRKXipBx5ucb6eirjYRvavj1bWl/4CQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=HkJYbIHMqwQ6KzQhnlyh94SGyp2xoVLs+8NE9EwLMWg=;
-        b=pdEzYhc3D/8vfTe+xdqkwb9W3OA/Nn+PUf/QQnIvGlmAtOLtscQNdTChoStLaXhp7w
-         UGsnor+Lfy+KKJAjSprZoff8bCD1eJzNIIrQRFf2JV58NbWtPc8autMR22UrpsZtzjNQ
-         KV5yhiEiLmLV6cl33VwIta9RFWffLigB+yC92XyfauYPSpV31pMdsceWG/Ra+dioaURH
-         FPTNzss6/H8NxVDb/PlOg4Cb30+UOg1maqec3axzVXeL267MRChqwXDxsNHYsXxI2lfg
-         zrsBihbByYHmTUwlv6kXBRCLKSj+MDxL9lNmHUD0wyDMmS0WnKv0A+jo9vIzaG9iuwvg
-         +IRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=HkJYbIHMqwQ6KzQhnlyh94SGyp2xoVLs+8NE9EwLMWg=;
-        b=d0TmrDBFlLZPopYerNgKTevfXfraI6vlDNDiz3Tx2BtBJxMZ4+82nTfg+3/RgE7vG5
-         Bg9FH/XDTLDc4Bw4+QoX8OnHw1coKjfMa749eIT3RpEk2Ru+t0I0mifD+Nn18iNCmyNd
-         jeVcVXJGnJAEWnhzSGC55uYYkD5rjBdoEFeojXRt/kLDVFFSLLlPfNdJOUy2atxCdoQ+
-         pWLVSm/BJimnlPxZD5EQK6hEcUMyf04LEW+HNJFPrL1oCvcKv0lUt6OFtTJqUKTKKS/s
-         jiI+WyReFwNmY+bQhthCCoPP8XeUg2eg7GiMee/oQqkY5aVN0Wg1qnWrA3BxAbWZM6gW
-         ohig==
-X-Gm-Message-State: AOAM530OEiWuVvfO8QHUknKe/qSrayLuPgqSRqQ+lQMAGvTzmvn0X4xM
-        XHORiAj1+V4Vkm0l6gtFnRQdkAE2tgcF+zbuFMWgQSwoHQD5SBO0ZQc=
-X-Google-Smtp-Source: ABdhPJzMrCurQ3/dMDZuGfj7fAlAKqY4rSbL4z205qGDy3ZsS/DZmDyMXNksW5lk4Wmv7bQp7yblJKZ4p03bo7PF5HY=
-X-Received: by 2002:a25:bfc9:0:b0:63d:a284:3616 with SMTP id
- q9-20020a25bfc9000000b0063da2843616mr5495810ybm.416.1649232986369; Wed, 06
- Apr 2022 01:16:26 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SxX0UPruCNSzfcVtv4TDsStS5bBn7z7zG7P2demI2Cs=;
+ b=I2xPXXQzgBJ5hBGgqD6z1F+GSMHBC6SeSjP8BfwfliBdbLzH2FvVVZG5p3b7iqUtJnYj+mznLiDN/opQ8aJ5hhW6bjjFQSYyAWg1PZi/3g9fNBXGRNQtsY0HPzCGfaa6aRDJp4rG7jMVI6jik5I1tith3vU68osa+8LtMPBJ2IU=
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com (2603:10b6:610:ac::13)
+ by MN2PR10MB4349.namprd10.prod.outlook.com (2603:10b6:208:1d4::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.31; Wed, 6 Apr
+ 2022 01:53:49 +0000
+Received: from CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::7ded:5b3:a28f:2e55]) by CH2PR10MB4150.namprd10.prod.outlook.com
+ ([fe80::7ded:5b3:a28f:2e55%5]) with mapi id 15.20.5123.031; Wed, 6 Apr 2022
+ 01:53:49 +0000
+From:   Eric Snowberg <eric.snowberg@oracle.com>
+To:     dhowells@redhat.com, dwmw2@infradead.org, jarkko@kernel.org,
+        zohar@linux.ibm.com, linux-integrity@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dmitry.kasatkin@gmail.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, nramas@linux.microsoft.com,
+        eric.snowberg@oracle.com, pvorel@suse.cz, tiwai@suse.de,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: [PATCH 0/7] Add CA enforcement keyring restrictions
+Date:   Tue,  5 Apr 2022 21:53:30 -0400
+Message-Id: <20220406015337.4000739-1-eric.snowberg@oracle.com>
+X-Mailer: git-send-email 2.27.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SA0PR11CA0091.namprd11.prod.outlook.com
+ (2603:10b6:806:d1::6) To CH2PR10MB4150.namprd10.prod.outlook.com
+ (2603:10b6:610:ac::13)
 MIME-Version: 1.0
-References: <20220326071159.56056-1-ebiggers@kernel.org> <CAOtvUMfpqxrdgmnzpkCW=EdUmquXYC6F=rwW+n8koJAt0Wg38g@mail.gmail.com>
- <YkuAaabISmyqcjoS@sol.localdomain>
-In-Reply-To: <YkuAaabISmyqcjoS@sol.localdomain>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 6 Apr 2022 11:16:16 +0300
-Message-ID: <CAOtvUMc3n0p8pcbrxTLYYWhpT=nQOQqEfXoB0DOJBoZUq7riPA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: testmgr - test in-place en/decryption with two sglists
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3f2469ee-2e8b-499f-91d4-08da17704b2e
+X-MS-TrafficTypeDiagnostic: MN2PR10MB4349:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR10MB43498A121753412CD5439A8887E79@MN2PR10MB4349.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JKtMmfS4eifG0j4g01hHfBm4WsOvizNkuqBOBM8bPmdE1SvkWOpuy5qEtIiwYAF+kxNB8AM0PnxN9Wxp4kOyN3e4FJadOaQ04NH0jSsj1TiH3nC/8+Mp+jzIWiX6L2+dDG7D4wUANUotqcFahSbmLmiS4UbWIh3UcChVd3iI6W3RIOEE9Hv2zKx1SEueELnr9Mna8Yge1QOXHB/vxxrKIA29rZdixvDIua66TNIxUIwkvQTV9ryt+V1tbSWuB2BhQZLghBsfVwM9z6dJDK40cVaCu7n6aZRceIbzOJUzoZ2JBLV0TEs2ebMZ8NmE9xlpADAD+rtwQS5B2+IqegKJ2luRyBeZ+z9kbiB6accK/KwFibUUkenWPetXQGvh1cg0iLRbsXN1OibEty6wDXY0Zyyr60Njj8I87G8j5V671ofxmI4z6l2o+5X/HMCGOo/vUfY2DScCFVYHizbWDSPg+m+2KCyO2aWnG76V963o8f0M5wNsjl1uKIz8h4ohlwLq7FFhrNMWfxg5AbDuJX233mfLzMpCI7lhq08+CDcSfrnPiDEjjbrF+IpQ82BvtPf2EGysmbMSs5owXAIr1zafweu4F6fMzn1J/d37oDxKUDNmoUSEesrareshQqSW8ut8TuGrVfgKxldrSpIQRin0iMg+t3YMJhqpbXJIJPQSRnCg0HbII+tP3d7MLq9X/5MK3QCOjYBFPpKFbRyUykYVuoE2ktg8WI0hXQ8p2ogEl/uwqPbBfOmq7YFxXJUUhid4YpXA7ReKwRaMY/13ikOB1I2etbHPn7THIqwJCxajTCk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4150.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(66476007)(8676002)(6486002)(6506007)(6512007)(6666004)(966005)(5660300002)(508600001)(316002)(4326008)(66556008)(1076003)(83380400001)(36756003)(186003)(26005)(44832011)(38350700002)(38100700002)(66946007)(2616005)(86362001)(8936002)(2906002)(7416002)(52116002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fMf1ajpRaa02eA3/ONvYfPdhva2mLjJpnvYo3QPknWf+iJs8UaU3J+T0A6PG?=
+ =?us-ascii?Q?FElyEdyZALFqeGkm9JJuloRpz4ZddRtFYtSk2yeyQ1rq2CTVgy2+EpXSJlIv?=
+ =?us-ascii?Q?d+19s3KeTH5c0dDPUjOE4oXvqiHhjN/iYU8G30iiWXy8NKPUmYsGAwc2eGDh?=
+ =?us-ascii?Q?u9+iY9g8taoR/ZqH50TpI/n4CzJqtH3SR+O5bxM+TZkuzjWLZsYDeFANPU2M?=
+ =?us-ascii?Q?WKtcXkfnBqUraHQFpqf/b5Eo6ToswRVfbbUXHoCM88Ox5KCA2RuqnsLt0Y2C?=
+ =?us-ascii?Q?jdTPGfyyuG2YWforlhe8745+jY0iUz4RpLKZnEFCkiiTW0JjEzJdShca1Qhv?=
+ =?us-ascii?Q?8LeiAuHLYEZHasrU63lwrdFRWaWSWKTmnnV+4I1XX1OfcgnroqXlPDP4xXER?=
+ =?us-ascii?Q?vFey3rI1zoSdpu2prAN+y/i5AyElc1MmVGevh8ahw1EfwVJ6W2HUarFO8Ve6?=
+ =?us-ascii?Q?rUEKp7nTHU4eESSckjyeI3lgJmz7b3wcIQh+8EWeReAwUp5m++0WK2SYmjBC?=
+ =?us-ascii?Q?ET1XYguddKLZmsEm5zt/4QKGBI/pGwfASqHCX+bCjpdyPKq5YRCgc0TemKFn?=
+ =?us-ascii?Q?J0zvxxROciVjWFjuhGxcCRCEpuiaNB3pUtMkMGxsJAl6ZYPqfSczq4YL6wkv?=
+ =?us-ascii?Q?wHtwfpyVZwpCFxDQQ1tSibdzsAXZixHY8W2pAlfQDfi+tzJ0i0UtL9wxmmF2?=
+ =?us-ascii?Q?L1TIQ07UvFK3p6vAXau2pvQPxSRcT/ersn/3SH+oIpL2b3Uj14wbnD/b3buj?=
+ =?us-ascii?Q?K6aeB+u1zBPbAtsNoV0u4jMbPoUt01ahhLIzz0Ee7hwcUuLJPUy6y6BAJksE?=
+ =?us-ascii?Q?bIz1lQikf1Q6AO/rl6FQ9gQOdMLAdtfPeN0okg9K8Lqr8PF8+U0hq3aQwCMx?=
+ =?us-ascii?Q?gLb0C56yUw0NeDTs468Cg+SQUzQCTNmjDPsohFI0gj2N4sRjS+RKYxju26ye?=
+ =?us-ascii?Q?L5AZZHjL01IWn0ls17+tFI4wZqUkuxEaQaYRZH4jV93G9GcYERU5ilhEJUN/?=
+ =?us-ascii?Q?Zt3X1K9DTc9WIn/I652Hw4WMhtwZMnORknAWJ9cWwYlhve+nqLffbOwUuJ5m?=
+ =?us-ascii?Q?P77DDloswWoUX5GXGxMCih0U1TddA6pVUJr1jGD2WvTojotA0SG1DaxkXT4G?=
+ =?us-ascii?Q?xztlfQd+XIw9Kx7K/eZ2uiNludj1l0Y27UIn3BZ+f/N4K1hJkm1xySFnfGlO?=
+ =?us-ascii?Q?TU6h3WYgbChWYLy4E8RzqVD3nTy4PxmHG+DVVFOQue+OaTIaQB4zZIzb+mMH?=
+ =?us-ascii?Q?kxIV1axyPyYFlnommS4EZ9j3dFLXSdgt/RgQXF3onvcTuif0CNvrpBmV3itN?=
+ =?us-ascii?Q?SzXKgUbKDHOHRn4W4PwLKThX6h+U7RxknLW+dyarrk02FY90OMcwaQ91Fg6x?=
+ =?us-ascii?Q?WkC3iAnG6Yjtiu+F7Sy2EcL4HQUOf0vj79inWilbCzX4/R5NhcqDl5338upd?=
+ =?us-ascii?Q?8K8KQMqzNl43A0IBmDQmN5tOMtlDvk6FrNWhh3RC+f3R0V/gaAUzoaQ0ayVy?=
+ =?us-ascii?Q?msgsotEc5saO4tnJbpbDoUuJXiwTTQOO7YIk1J2ho0TQ3phc0OgsVpFhHgMC?=
+ =?us-ascii?Q?WuvPP1H1mfeunfFNKHAndjFcq5ZonXZC2NKo1QzmDVIZyBe2ziJywNkTdnK5?=
+ =?us-ascii?Q?Wt0kyPtVBf7YdBUTb4fqylyE2KkB73tg2hQev4Ca5SJibepYs/Co3v4vl3fD?=
+ =?us-ascii?Q?DLaJCb3aRPGONET0egSIrvSpDG+uRGkLFVvARuAE4ZwLSYv7yfio8QZCEeMt?=
+ =?us-ascii?Q?zSkkVJsI1s6no8SqbFTJL/IHUrG+UjQ=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f2469ee-2e8b-499f-91d4-08da17704b2e
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4150.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2022 01:53:49.3184
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3BGmD+/VYgHJGZRd/120CbOBYGsHdzfgwOlVKBT0rEPoBpLUurZOmnWhis8uaj4X3dWb+SLMq+6K8xZ14QK50mJqR6rEikhhFAMI/KjXnjQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4349
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.425,18.0.850
+ definitions=2022-04-05_08:2022-04-04,2022-04-05 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=938 phishscore=0 suspectscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204060004
+X-Proofpoint-ORIG-GUID: j9k-xhLQDPR2TzLsu4-FksArfUnJgyp2
+X-Proofpoint-GUID: j9k-xhLQDPR2TzLsu4-FksArfUnJgyp2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 5, 2022 at 2:34 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Sun, Mar 27, 2022 at 09:04:43AM +0300, Gilad Ben-Yossef wrote:
-> > On Sat, Mar 26, 2022 at 10:13 AM Eric Biggers <ebiggers@kernel.org> wro=
-te:
-> > >
-> > > From: Eric Biggers <ebiggers@google.com>
-> > >
-> > > As was established in the thread
-> > > https://lore.kernel.org/linux-crypto/20220223080400.139367-1-gilad@be=
-nyossef.com/T/#u,
-> > > many crypto API users doing in-place en/decryption don't use the same
-> > > scatterlist pointers for the source and destination, but rather use
-> > > separate scatterlists that point to the same memory.  This case isn't
-> > > tested by the self-tests, resulting in bugs.
-> > >
-> > > This is the natural usage of the crypto API in some cases, so requiri=
-ng
-> > > API users to avoid this usage is not reasonable.
-> > >
-> > > Therefore, update the self-tests to start testing this case.
-> > >
-> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> >
-> >
-> > Thank you Eric.
-> >
-> > I have given this a lot of thought and here is what I predict will
-> > happen thanks to this added test:
-> > - We will not find a driver that this breaks, in the sense of
-> > producing wrong results and triggering failure in this test.
-> > - We probably will see drivers that when running this test when DMA
-> > debug is compiled and enabled trigger the debug warning about double
-> > DMA mapping of the same cache line.
-> >
-> > The reason is that these double mapping stemming from this test will
-> > be from mapping the same buffer as source and destination.
-> > As such, the situation that is the cause for the DMA debug warning, of
-> > a mapping causing  cache flush invalidate, followed by DMA, followed
-> > by another mapping causing cache flush/invalidate while the DMA is in
-> > flight, will not happen. Instead we will have mapping ->
-> > flush/invalidate -> another mapping -> flush/invalidate -> DMA ...
-> >
-> > Note, this is certainly not a claim we should not add this test! on
-> > the contrary ...
-> >
-> > In fact, I would be tempted to claim that this means the real problem
-> > is with an over zealous DMA debug logic. Unfortunately, I can think of
-> > other scenarios where things are not so simple:
-> >
-> > For example, what happens if a crypto API user has a buffer, which it
-> > divides into two parts, and then submit a crypto op on one part and
-> > another crypto op on the 2nd part (say encrypt and hash, just as an
-> > example). For the best of my knowledge, there is nothing forcing the
-> > split between the two parts to fall on a cache line. This can cause a
-> > double mapping of the same cache line - and this time the warning is
-> > real, because we are not guaranteed a single DMA operation following
-> > the two mappings. There is nothing much a crypto driver can do even -
-> > the two operations don't have to be done by the same driver at all...
-> >
-> > I believe the scenario you are proposing to test is a benign example
-> > of a larger issue. I also believe this is an example of Worse in
-> > Better* and that the right solution is to dictate certain rules on the
-> > callers of the crypto API. Whether these rules should or should not
-> > include a limitation of not passing the same buffer via two different
-> > scatter gather list to the same crypto op is debatable, but I think we
-> > cannot run away from defining some rules.
-> >
-> > I would really love for others to voice an opinion on this. It seems a
-> > rather narrow discussion so far between the two of us on what I feel
-> > is  a broader issue.
->
-> I don't have an answer, sorry.
->
-> I personally don't actually have a lot of interest in the crypto accelera=
-tor
-> support in the crypto API, since in the domain I work in (storage encrypt=
-ion)
-> it's much more common for inline encryption hardware to be used instead, =
-and
-> that has its own support in the Linux block layer, separate from the cryp=
-to API.
->
-> If there are fundamental issues with how crypto accelerators are supporte=
-d in
-> the crypto API, then I think that the people who actually care about such
-> hardware need to get together to create a plan for correctly supporting i=
-t.
-> Doing separate crypto operations on contiguous buffers is absolutely some=
-thing
-> that users can expect to work, so if that in fact cannot work, then I exp=
-ect
-> that this limitation will need to be very explicitly documented and check=
-ed in
-> the crypto API, and users will need to explicitly opt-in to being able to=
- use
-> crypto accelerators rather than having them (sort of) be used by default.
+A key added to the ima keyring must be signed by a key contained within 
+either the builtin trusted or secondary trusted keyrings. Currently, there are 
+CA restrictions described in IMA_KEYRINGS_PERMIT_SIGNED_BY_BUILTIN_OR_SECONDARY,
+but these restrictions are not enforced within code. Therefore, keys within 
+either the builtin or secondary may not be a CA and could be used to
+vouch for an ima key.
 
-Very well. Since the issue I've raised is right now an theoretical
-issue, I'm going to leave it be for now.
+The machine keyring can not be used as another trust anchor for adding keys 
+to the ima keyring, since CA enforcement does not currently exist [1]. This 
+would expand the current integrity gap.
 
-FWIW, the ccree driver passes this extra test with no failures.
+Introduce a new root of trust key flag to close this integrity gap for
+all keyrings.  The first key type to use this is X.509.  When a X.509 
+certificate is self signed, contains kernCertSign Key Usage and contains 
+the CA bit, the new flag is set.  Introduce new keyring restrictions 
+that not only validates a key is signed by a key contained within the 
+keyring, but also validates the key has the new root of trust key flag 
+set.  Use this new restriction for keys added to the ima keyring.  Now 
+that we have CA enforcement, allow the machine keyring to be used as another 
+trust anchor for the ima keyring.
 
-Thanks,
-Gilad
+To recap, all keys that previously loaded into the builtin, secondary or
+machine keyring will still load after applying this series.  Keys
+contained within these keyrings may carry the root of trust flag. The
+ima keyring will use the new root of trust restriction to validate
+CA enforcement. Other keyrings that require a root of trust could also 
+use this in the future.
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+[1] https://lore.kernel.org/lkml/2d681148b6ea57241f6a7c518dd331068a5f47b0.camel@linux.ibm.com/
 
-values of =CE=B2 will give rise to dom!
+Eric Snowberg (7):
+  KEYS: Create static version of public_key_verify_signature
+  KEYS: X.509: Parse Basic Constraints for CA
+  KEYS: X.509: Parse Key Usage
+  KEYS: Introduce a builtin root of trust key flag
+  KEYS: Introduce sig restriction that validates root of trust
+  KEYS: X.509: Flag Intermediate CA certs as built in
+  integrity: Use root of trust signature restriction
+
+ certs/system_keyring.c                    | 18 ++++++++++
+ crypto/asymmetric_keys/restrict.c         | 42 +++++++++++++++++++++++
+ crypto/asymmetric_keys/x509_cert_parser.c | 29 ++++++++++++++++
+ crypto/asymmetric_keys/x509_parser.h      |  2 ++
+ crypto/asymmetric_keys/x509_public_key.c  | 12 +++++++
+ include/crypto/public_key.h               |  9 +++++
+ include/keys/system_keyring.h             | 17 ++++++++-
+ include/linux/ima.h                       | 16 +++++++++
+ include/linux/key-type.h                  |  3 ++
+ include/linux/key.h                       |  2 ++
+ security/integrity/Kconfig                |  1 -
+ security/integrity/digsig.c               |  4 +--
+ security/keys/key.c                       | 13 +++++++
+ 13 files changed, 164 insertions(+), 4 deletions(-)
+
+
+base-commit: 3123109284176b1532874591f7c81f3837bbdc17
+-- 
+2.27.0
+
