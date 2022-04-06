@@ -2,72 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46410C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 17:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D83C5C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 21:11:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239756AbiDFR5P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:57:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58032 "EHLO
+        id S231319AbiDFVNo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 17:13:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239758AbiDFR5H (ORCPT
+        with ESMTP id S235518AbiDFVMd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 13:57:07 -0400
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02293305B22;
-        Wed,  6 Apr 2022 09:07:12 -0700 (PDT)
-Received: by mail-oi1-f176.google.com with SMTP id 12so2831088oix.12;
-        Wed, 06 Apr 2022 09:07:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mi0PlXno3D6jBV7awtJNZHmVjzTuCmSnSrCiUvwpU7E=;
-        b=ixA+1+fWlID6n92LIWvIyDbKuSPpFwo/ptM4XSfETNyHRztEoISeuDm5oZOuBfejFA
-         cdz3ZZJx4uvmM3qrCfDt1fX5xa/W47mHPv43UE1MiViOzbrzXPWzy5HB/69wFAR/UvgS
-         l8D0qbFbcX4en5QUcqp2oHfbOL7BM4jMbyBFsG8JP3Wye62z/mkBRT4bvZ/ZnVL8npBJ
-         kh0l2C25nNAeQTJxLjxMqzCd+ZIMAC33ljbzKaG4YBb8aYjDMcDsNONcT+pecjDvM3Ym
-         my9d+7ELK8uqzb6N41hDEUv4NO9lIb9nOlZ8a1D8YZXDV+F7d0BpTrC6pwpP8oOofjkz
-         PpYQ==
-X-Gm-Message-State: AOAM530WwdKiwYs1OJ3zYCBky39w8xkAL/bqm9GAGo1uKfNSJbG8VYE+
-        9hX6gnUS8TyELR3hXA6I1A==
-X-Google-Smtp-Source: ABdhPJyf9cDvzdnJyrz88zNtK+fVSdGACNFc6ZhTULEzyvDAXPx26QtcqONjw4TvsYhTPVBvMs061A==
-X-Received: by 2002:a05:6808:2183:b0:2da:6d62:6ec6 with SMTP id be3-20020a056808218300b002da6d626ec6mr3895459oib.51.1649261230982;
-        Wed, 06 Apr 2022 09:07:10 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id mj27-20020a0568700d9b00b000de29e1d6adsm4905187oab.16.2022.04.06.09.07.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Apr 2022 09:07:10 -0700 (PDT)
-Received: (nullmailer pid 2334572 invoked by uid 1000);
-        Wed, 06 Apr 2022 16:07:09 -0000
-Date:   Wed, 6 Apr 2022 11:07:09 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     krzk+dt@kernel.org, linux-crypto@vger.kernel.org,
-        linux-rockchip@lists.infradead.org, robh+dt@kernel.org,
-        heiko@sntech.de, herbert@gondor.apana.org.au,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org
-Subject: Re: [PATCH v4 29/33] clk: rk3399: use proper crypto0 name
-Message-ID: <Yk26rQaTfZ1QvLN0@robh.at.kernel.org>
-References: <20220401201804.2867154-1-clabbe@baylibre.com>
- <20220401201804.2867154-30-clabbe@baylibre.com>
+        Wed, 6 Apr 2022 17:12:33 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1496D7908;
+        Wed,  6 Apr 2022 12:55:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649274940; x=1680810940;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J20fzEWTWmR3uYtjMGA+kYNrfafUzFxfY0/tWjpo4Js=;
+  b=FCLralDZ2y5c+n5eyzl2OiHHACRbmYf7kxeimP94PKNKTJCMsJZFnYmT
+   QkvZLQQ/gVtfSI3vrAJR51R4Ey3HTXe7Zv2I0m1NhtKSjPelBG4aLEApJ
+   isXm1u1JmRLFbCr1goiTrjdmnSBl+RsXfx3ko6UWBm45u5urLJzTrJOjP
+   8uYw4VWQfGcOzgcMYvJhFBnnFN+k8COeytB+D4op3ZUdQRgtDUR1Ts2t8
+   wbY1dZKBBHECn0z0ITBo87VIzyZU8RmSQbeOYH10ZkPxz5WNAXJy0aH6l
+   xFys/9q120W2eBc4VibibGl6ECGv/g0WTxrzkwxto3wAoI27PqY8YxWKs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="241072221"
+X-IronPort-AV: E=Sophos;i="5.90,240,1643702400"; 
+   d="scan'208";a="241072221"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 12:55:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,240,1643702400"; 
+   d="scan'208";a="697504089"
+Received: from lkp-server02.sh.intel.com (HELO a44fdfb70b94) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 06 Apr 2022 12:55:34 -0700
+Received: from kbuild by a44fdfb70b94 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1ncBkc-0004hT-7R;
+        Wed, 06 Apr 2022 19:55:34 +0000
+Date:   Thu, 7 Apr 2022 03:55:00 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>, dhowells@redhat.com,
+        dwmw2@infradead.org, jarkko@kernel.org, zohar@linux.ibm.com,
+        linux-integrity@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, dmitry.kasatkin@gmail.com, jmorris@namei.org,
+        serge@hallyn.com, roberto.sassu@huawei.com,
+        nramas@linux.microsoft.com, eric.snowberg@oracle.com,
+        pvorel@suse.cz, tiwai@suse.de, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 5/7] KEYS: Introduce sig restriction that validates root
+ of trust
+Message-ID: <202204070321.X7bLj3Ce-lkp@intel.com>
+References: <20220406015337.4000739-6-eric.snowberg@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220401201804.2867154-30-clabbe@baylibre.com>
+In-Reply-To: <20220406015337.4000739-6-eric.snowberg@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 01 Apr 2022 20:18:00 +0000, Corentin Labbe wrote:
-> RK3399 has 2 crypto instance, named crypto0 and crypto1 in the TRM.
-> Only reset for crypto1 is correctly named, but crypto0 is not.
-> Since nobody use them, add a 0 to be consistent with the TRM and crypto1 entries.
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  include/dt-bindings/clock/rk3399-cru.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
+Hi Eric,
 
-Acked-by: Rob Herring <robh@kernel.org>
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on 3123109284176b1532874591f7c81f3837bbdc17]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Snowberg/Add-CA-enforcement-keyring-restrictions/20220407-003209
+base:   3123109284176b1532874591f7c81f3837bbdc17
+config: riscv-randconfig-r042-20220406 (https://download.01.org/0day-ci/archive/20220407/202204070321.X7bLj3Ce-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/68d98a175d29032d888f3f5700c43cf771ef17d8
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Eric-Snowberg/Add-CA-enforcement-keyring-restrictions/20220407-003209
+        git checkout 68d98a175d29032d888f3f5700c43cf771ef17d8
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=riscv SHELL=/bin/bash crypto/asymmetric_keys/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> crypto/asymmetric_keys/restrict.c:111:5: warning: no previous prototype for 'restrict_link_by_rot_and_signature' [-Wmissing-prototypes]
+     111 | int restrict_link_by_rot_and_signature(struct key *dest_keyring,
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/restrict_link_by_rot_and_signature +111 crypto/asymmetric_keys/restrict.c
+
+   110	
+ > 111	int restrict_link_by_rot_and_signature(struct key *dest_keyring,
+   112					       const struct key_type *type,
+   113					       const union key_payload *payload,
+   114					       struct key *trust_keyring)
+   115	{
+   116		const struct public_key_signature *sig;
+   117		struct key *key;
+   118		int ret;
+   119	
+   120		if (!trust_keyring)
+   121			return -ENOKEY;
+   122	
+   123		if (type != &key_type_asymmetric)
+   124			return -EOPNOTSUPP;
+   125	
+   126		sig = payload->data[asym_auth];
+   127		if (!sig)
+   128			return -ENOPKG;
+   129		if (!sig->auth_ids[0] && !sig->auth_ids[1] && !sig->auth_ids[2])
+   130			return -ENOKEY;
+   131	
+   132		if (ca_keyid && !asymmetric_key_id_partial(sig->auth_ids[1], ca_keyid))
+   133			return -EPERM;
+   134	
+   135		/* See if we have a key that signed this one. */
+   136		key = find_asymmetric_key(trust_keyring,
+   137					  sig->auth_ids[0], sig->auth_ids[1],
+   138					  sig->auth_ids[2], false);
+   139		if (IS_ERR(key))
+   140			return -ENOKEY;
+   141	
+   142		if (!test_bit(KEY_FLAG_BUILTIN_ROT, &key->flags))
+   143			ret = -ENOKEY;
+   144		else if (use_builtin_keys && !test_bit(KEY_FLAG_BUILTIN, &key->flags))
+   145			ret = -ENOKEY;
+   146		else
+   147			ret = verify_signature(key, sig);
+   148		key_put(key);
+   149		return ret;
+   150	}
+   151	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
