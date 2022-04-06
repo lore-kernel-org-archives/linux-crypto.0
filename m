@@ -2,148 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EDBC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 12:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17990C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 15:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232758AbiDFM0i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 08:26:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57084 "EHLO
+        id S236535AbiDFPow (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 11:44:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232810AbiDFM0G (ORCPT
+        with ESMTP id S236369AbiDFPoI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 08:26:06 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC1322EC118;
-        Wed,  6 Apr 2022 01:12:17 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 64D3F23A;
-        Wed,  6 Apr 2022 01:12:17 -0700 (PDT)
-Received: from e122247.kfn.arm.com (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81F0B3F718;
-        Wed,  6 Apr 2022 01:12:15 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Cristian Marussi <cristian.marussi@arm.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: ccree: use fine grained DMA mapping dir
-Date:   Wed,  6 Apr 2022 11:11:39 +0300
-Message-Id: <20220406081139.1963615-3-gilad@benyossef.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220406081139.1963615-1-gilad@benyossef.com>
-References: <20220406081139.1963615-1-gilad@benyossef.com>
+        Wed, 6 Apr 2022 11:44:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A224DA2A7;
+        Wed,  6 Apr 2022 06:10:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5909DB82389;
+        Wed,  6 Apr 2022 13:09:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B257C385AD;
+        Wed,  6 Apr 2022 13:09:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kimauhVO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649250566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pBb2vjofyUluOQh7TVdillsblyWSB74FkGKE9XEp+88=;
+        b=kimauhVO0qreQir90l3FGbnPsUNRHKDvOy4Uc0hYovmeIqu1/9DdSwv3VPVdSQkoJpfoWS
+        gG+ouJKYHGIFOV4oYdnN8CE4JAOKA3xnSQMxtb257wVesu4Dq/6wclPU7fPyprqjQw6JN8
+        lQ9GzjFocqmruezeV6trtk1iFH0rmr4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e40af94 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 6 Apr 2022 13:09:25 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
+Subject: [PATCH v2] random: do not allow user to keep crng key around on stack
+Date:   Wed,  6 Apr 2022 15:09:13 +0200
+Message-Id: <20220406130913.14481-1-Jason@zx2c4.com>
+In-Reply-To: <20220405154627.244473-1-Jason@zx2c4.com>
+References: <20220405154627.244473-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use a fine grained specification of DMA mapping directions
-in certain cases, allowing both a more optimized operation
-as well as shushing out a harmless, though persky
-dma-debug warning.
+The fast key erasure RNG design relies on the key that's used to be used
+and then discarded. We do this, making judicious use of
+memzero_explicit().  However, reads to /dev/urandom and calls to
+getrandom() involve a copy_to_user(), and userspace can use FUSE or
+userfaultfd, or make a massive call, dynamically remap memory addresses
+as it goes, and set the process priority to idle, in order to keep a
+kernel stack alive indefinitely. By probing
+/proc/sys/kernel/random/entropy_avail to learn when the crng key is
+refreshed, a malicious userspace could mount this attack every 5 minutes
+thereafter, breaking the crng's forward secrecy.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+In order to fix this, we just overwrite the stack's key with the first
+32 bytes of the "free" fast key erasure output. If we're returning <= 32
+bytes to the user, then we can still return those bytes directly, so
+that short reads don't become slower. And for long reads, the difference
+is hopefully lost in the amortization, so it doesn't change much, with
+that amortization helping variously for medium reads.
 
+We don't need to do this for get_random_bytes() and the various
+kernel-space callers, and later, if we ever switch to always batching,
+this won't be necessary either, so there's no need to change the API of
+these functions.
+
+Cc: Theodore Ts'o <tytso@mit.edu>
+Reviewed-by: Jann Horn <jannh@google.com>
+Fixes: c92e040d575a ("random: add backtracking protection to the CRNG")
+Fixes: 186873c549df ("random: use simpler fast key erasure flow on per-cpu keys")
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/crypto/ccree/cc_buffer_mgr.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+Changes v1->v2:
+- If len <= 32, return bytes directly to caller.
 
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
-index 11e0278c8631..6140e4927322 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.c
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-@@ -356,12 +356,14 @@ void cc_unmap_cipher_request(struct device *dev, void *ctx,
- 			      req_ctx->mlli_params.mlli_dma_addr);
- 	}
+ drivers/char/random.c | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 388025d6d38d..47f01b1482a9 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -532,19 +532,29 @@ static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
+ 	if (!nbytes)
+ 		return 0;
  
--	dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
--	dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+-	len = min_t(size_t, 32, nbytes);
+-	crng_make_state(chacha_state, output, len);
 -
- 	if (src != dst) {
--		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
-+		dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_FROM_DEVICE);
- 		dev_dbg(dev, "Unmapped req->dst=%pK\n", sg_virt(dst));
-+		dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
-+	} else {
-+		dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
-+		dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
- 	}
+-	if (copy_to_user(buf, output, len))
+-		return -EFAULT;
+-	nbytes -= len;
+-	buf += len;
+-	ret += len;
++	/*
++	 * Immediately overwrite the ChaCha key at index 4 with random
++	 * bytes, in case userspace causes copy_to_user() below to sleep
++	 * forever, so that we still retain forward secrecy in that case.
++	 */
++	crng_make_state(chacha_state, (u8 *)&chacha_state[4], CHACHA_KEY_SIZE);
++	/*
++	 * However, if we're doing a read of len <= 32, we don't need to
++	 * use chacha_state after, so we can simply return those bytes to
++	 * the user directly.
++	 */
++	if (nbytes <= CHACHA_KEY_SIZE) {
++		ret = copy_to_user(buf, &chacha_state[4], nbytes) ? -EFAULT : nbytes;
++		goto out_zero_chacha;
++	}
+ 
+-	while (nbytes) {
++	do {
+ 		if (large_request && need_resched()) {
+-			if (signal_pending(current))
++			if (signal_pending(current)) {
++				if (!ret)
++					ret = -ERESTARTSYS;
+ 				break;
++			}
+ 			schedule();
+ 		}
+ 
+@@ -561,10 +571,11 @@ static ssize_t get_random_bytes_user(void __user *buf, size_t nbytes)
+ 		nbytes -= len;
+ 		buf += len;
+ 		ret += len;
+-	}
++	} while (nbytes);
+ 
+-	memzero_explicit(chacha_state, sizeof(chacha_state));
+ 	memzero_explicit(output, sizeof(output));
++out_zero_chacha:
++	memzero_explicit(chacha_state, sizeof(chacha_state));
+ 	return ret;
  }
  
-@@ -377,6 +379,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
- 	u32 dummy = 0;
- 	int rc = 0;
- 	u32 mapped_nents = 0;
-+	int src_direction = (src != dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
- 
- 	req_ctx->dma_buf_type = CC_DMA_BUF_DLLI;
- 	mlli_params->curr_pool = NULL;
-@@ -399,7 +402,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
- 	}
- 
- 	/* Map the src SGL */
--	rc = cc_map_sg(dev, src, nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_nents,
-+	rc = cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nents,
- 		       LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
- 	if (rc)
- 		goto cipher_exit;
-@@ -416,7 +419,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
- 		}
- 	} else {
- 		/* Map the dst sg */
--		rc = cc_map_sg(dev, dst, nbytes, DMA_BIDIRECTIONAL,
-+		rc = cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
- 			       &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENTRIES,
- 			       &dummy, &mapped_nents);
- 		if (rc)
-@@ -456,6 +459,7 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
- 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
- 	unsigned int hw_iv_size = areq_ctx->hw_iv_size;
- 	struct cc_drvdata *drvdata = dev_get_drvdata(dev);
-+	int src_direction = (req->src != req->dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
- 
- 	if (areq_ctx->mac_buf_dma_addr) {
- 		dma_unmap_single(dev, areq_ctx->mac_buf_dma_addr,
-@@ -514,13 +518,11 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
- 		sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents,
- 		areq_ctx->assoclen, req->cryptlen);
- 
--	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents,
--		     DMA_BIDIRECTIONAL);
-+	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents, src_direction);
- 	if (req->src != req->dst) {
- 		dev_dbg(dev, "Unmapping dst sgl: req->dst=%pK\n",
- 			sg_virt(req->dst));
--		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents,
--			     DMA_BIDIRECTIONAL);
-+		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents, DMA_FROM_DEVICE);
- 	}
- 	if (drvdata->coherent &&
- 	    areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT &&
-@@ -843,7 +845,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 		else
- 			size_for_map -= authsize;
- 
--		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_BIDIRECTIONAL,
-+		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_FROM_DEVICE,
- 			       &areq_ctx->dst.mapped_nents,
- 			       LLI_MAX_NUM_OF_DATA_ENTRIES, &dst_last_bytes,
- 			       &dst_mapped_nents);
-@@ -1056,7 +1058,8 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 		size_to_map += authsize;
- 	}
- 
--	rc = cc_map_sg(dev, req->src, size_to_map, DMA_BIDIRECTIONAL,
-+	rc = cc_map_sg(dev, req->src, size_to_map,
-+		       (req->src != req->dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL),
- 		       &areq_ctx->src.mapped_nents,
- 		       (LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES +
- 			LLI_MAX_NUM_OF_DATA_ENTRIES),
 -- 
-2.25.1
+2.35.1
 
