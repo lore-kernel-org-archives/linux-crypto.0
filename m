@@ -2,111 +2,72 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAF7C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 17:02:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46410C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Apr 2022 17:55:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238297AbiDFREh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:04:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45272 "EHLO
+        id S239756AbiDFR5P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:57:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238422AbiDFREI (ORCPT
+        with ESMTP id S239758AbiDFR5H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 13:04:08 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831A44922DD
-        for <linux-crypto@vger.kernel.org>; Wed,  6 Apr 2022 07:27:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 33E0EB82252
-        for <linux-crypto@vger.kernel.org>; Wed,  6 Apr 2022 14:27:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDBD2C385A3;
-        Wed,  6 Apr 2022 14:27:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649255255;
-        bh=2KqtO9ZfcftXFWtkQBPByUGxg2nETlz9BoiAzSQJ1ME=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PHnZLKLo2GPUS6hSNJxWr7vy/wP0YLs8Xnm8yu7ADdxhclIS2HERLU2IP37UUI9HK
-         IdQ5lsp2fz32lY/eKlXsM84nWp4PXqzsd2yTNL0VunagYvLgASWKDp02s2eoLgK5Fe
-         XzVq12IUTyhCFnZYSgnPp7Y5zIyNIdOfL2qoNy8Q1HKG5Yfpn9o93gWVJbatF2yuOD
-         D9kFDdrqLOQxMaVjciuPy79qbGMRI3HGI1Smgb5W++w9Nmu3FfLhKD9F0cXC4IzifE
-         vJA/4xkxSbVE+s7ibOuspB8LohhbIpOKJjQwkeYk8Mui/VTkf/ZF3ZIF0+eAp0ZSFw
-         gevw6HfwC43iw==
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, keescook@chromium.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 7/8] crypto: ahash - avoid DMA alignment for request structures unless needed
-Date:   Wed,  6 Apr 2022 16:27:14 +0200
-Message-Id: <20220406142715.2270256-8-ardb@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220406142715.2270256-1-ardb@kernel.org>
-References: <20220406142715.2270256-1-ardb@kernel.org>
+        Wed, 6 Apr 2022 13:57:07 -0400
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02293305B22;
+        Wed,  6 Apr 2022 09:07:12 -0700 (PDT)
+Received: by mail-oi1-f176.google.com with SMTP id 12so2831088oix.12;
+        Wed, 06 Apr 2022 09:07:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=mi0PlXno3D6jBV7awtJNZHmVjzTuCmSnSrCiUvwpU7E=;
+        b=ixA+1+fWlID6n92LIWvIyDbKuSPpFwo/ptM4XSfETNyHRztEoISeuDm5oZOuBfejFA
+         cdz3ZZJx4uvmM3qrCfDt1fX5xa/W47mHPv43UE1MiViOzbrzXPWzy5HB/69wFAR/UvgS
+         l8D0qbFbcX4en5QUcqp2oHfbOL7BM4jMbyBFsG8JP3Wye62z/mkBRT4bvZ/ZnVL8npBJ
+         kh0l2C25nNAeQTJxLjxMqzCd+ZIMAC33ljbzKaG4YBb8aYjDMcDsNONcT+pecjDvM3Ym
+         my9d+7ELK8uqzb6N41hDEUv4NO9lIb9nOlZ8a1D8YZXDV+F7d0BpTrC6pwpP8oOofjkz
+         PpYQ==
+X-Gm-Message-State: AOAM530WwdKiwYs1OJ3zYCBky39w8xkAL/bqm9GAGo1uKfNSJbG8VYE+
+        9hX6gnUS8TyELR3hXA6I1A==
+X-Google-Smtp-Source: ABdhPJyf9cDvzdnJyrz88zNtK+fVSdGACNFc6ZhTULEzyvDAXPx26QtcqONjw4TvsYhTPVBvMs061A==
+X-Received: by 2002:a05:6808:2183:b0:2da:6d62:6ec6 with SMTP id be3-20020a056808218300b002da6d626ec6mr3895459oib.51.1649261230982;
+        Wed, 06 Apr 2022 09:07:10 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id mj27-20020a0568700d9b00b000de29e1d6adsm4905187oab.16.2022.04.06.09.07.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Apr 2022 09:07:10 -0700 (PDT)
+Received: (nullmailer pid 2334572 invoked by uid 1000);
+        Wed, 06 Apr 2022 16:07:09 -0000
+Date:   Wed, 6 Apr 2022 11:07:09 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     krzk+dt@kernel.org, linux-crypto@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, robh+dt@kernel.org,
+        heiko@sntech.de, herbert@gondor.apana.org.au,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org
+Subject: Re: [PATCH v4 29/33] clk: rk3399: use proper crypto0 name
+Message-ID: <Yk26rQaTfZ1QvLN0@robh.at.kernel.org>
+References: <20220401201804.2867154-1-clabbe@baylibre.com>
+ <20220401201804.2867154-30-clabbe@baylibre.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2242; h=from:subject; bh=2KqtO9ZfcftXFWtkQBPByUGxg2nETlz9BoiAzSQJ1ME=; b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBiTaNB72ErJCPBXR93LPKYLwjlp6ikb8R1gricj8QN pddACUKJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYk2jQQAKCRDDTyI5ktmPJG4LC/ 9PG+G5I2qS0lZXHGekRj+aM6VF0dxtRpAQy9j1pPcsqHPvzL9vwmLtXVzdKsN6rVGEXstYXRfmgN4k YuFYnP+AOI4uB+UQhY0F2QTEa24tgCS6Mrhbq7YJV2YYiXqS+/l1EBPcnAXSTUwA2Y83ye8Op13vEU lheuUxBSm1YXEAefwCOMv/851XyvsC/bbBdb6sSFqWrLcOv+cRpxJepn5iTKRLylofdp+NFwb1G4Qe QSkplhp96RCvRGLVtNHDfoC5yP+J2K0e8QkM8Vzwx6aw14wxei3gNkt7PK76VHWCYqngr1DVfCfCKe 8ObeFswbCnX8oI2Vi3LKgEmEKJMHhuV4uLatrxnMJNDB6rAFHMmcLlmOJHpOEVICRJxviAOR7/NgbZ ohYO2pdrmaIcFPdITREL4RsHXF2I0zDt25PUBXk6XPEBp4Zi2ftE9Lsd/pvcIcXQdMo6ssVBrCs0q5 6HArpnv4mQ3ogHxpkATDHfnhoQc6icHSfmDVn69gJoXEc=
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220401201804.2867154-30-clabbe@baylibre.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-AHASH request structures are currently aligned to minimal DMA alignment
-for the arcitecture, which defaults to 128 bytes on arm64. This is
-excessive, and rarely needed, i.e., only when doing non-coherent inbound
-DMA on the contents of the request context buffer. So let's relax this
-requirement, and only use this alignment if the
-CRYPTO_ALG_NEED_DMA_ALIGNMENT flag is set by the implementation.
+On Fri, 01 Apr 2022 20:18:00 +0000, Corentin Labbe wrote:
+> RK3399 has 2 crypto instance, named crypto0 and crypto1 in the TRM.
+> Only reset for crypto1 is correctly named, but crypto0 is not.
+> Since nobody use them, add a 0 to be consistent with the TRM and crypto1 entries.
+> 
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  include/dt-bindings/clock/rk3399-cru.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- include/crypto/hash.h          |  5 +++--
- include/crypto/internal/hash.h | 10 +++++++++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index f140e4643949..cd16c37c38af 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -56,7 +56,7 @@ struct ahash_request {
- 	/* This field may only be used by the ahash API code. */
- 	void *priv;
- 
--	void *__ctx[] CRYPTO_MINALIGN_ATTR;
-+	void *__ctx[] CRYPTO_REQ_MINALIGN_ATTR;
- };
- 
- /**
-@@ -417,7 +417,8 @@ static inline unsigned int crypto_ahash_reqsize(struct crypto_ahash *tfm)
- 
- static inline void *ahash_request_ctx(struct ahash_request *req)
- {
--	return req->__ctx;
-+	return PTR_ALIGN(&req->__ctx,
-+			 crypto_tfm_alg_req_alignmask(req->base.tfm) + 1);
- }
- 
- /**
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index 25806141db59..222c2df009c6 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -143,7 +143,15 @@ static inline struct ahash_alg *__crypto_ahash_alg(struct crypto_alg *alg)
- static inline void crypto_ahash_set_reqsize(struct crypto_ahash *tfm,
- 					    unsigned int reqsize)
- {
--	tfm->reqsize = reqsize;
-+	unsigned int align = crypto_tfm_alg_req_alignmask(crypto_ahash_tfm(tfm)) + 1;
-+
-+	/*
-+	 * The request structure itself is only aligned to CRYPTO_REQ_MINALIGN,
-+	 * so we need to add some headroom, allowing us to return a suitably
-+	 * aligned context buffer pointer. We also need to round up the size so
-+	 * we don't end up sharing a cacheline at the end of the buffer.
-+	 */
-+	tfm->reqsize = ALIGN(reqsize, align) + align - CRYPTO_REQ_MINALIGN;
- }
- 
- static inline struct crypto_instance *ahash_crypto_instance(
--- 
-2.30.2
-
+Acked-by: Rob Herring <robh@kernel.org>
