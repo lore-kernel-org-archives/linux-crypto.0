@@ -2,51 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE19C4167D
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Apr 2022 01:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC98FC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Apr 2022 01:20:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238961AbiDGBWH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 21:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60866 "EHLO
+        id S238971AbiDGBWL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 21:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240461AbiDGBUB (ORCPT
+        with ESMTP id S239540AbiDGBTU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 21:20:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A9B019059E;
-        Wed,  6 Apr 2022 18:16:29 -0700 (PDT)
+        Wed, 6 Apr 2022 21:19:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E96F6190B47;
+        Wed,  6 Apr 2022 18:14:41 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 99F8F61DCF;
-        Thu,  7 Apr 2022 01:16:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE83DC385A8;
-        Thu,  7 Apr 2022 01:16:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3612261DCC;
+        Thu,  7 Apr 2022 01:14:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E56C385A7;
+        Thu,  7 Apr 2022 01:14:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649294188;
-        bh=rtSw1l7QdPTLRBp089iUJcQX1L9N+GkfaDN1OeqXWJ0=;
+        s=k20201202; t=1649294080;
+        bh=kyCpt+kxit9oAreUT89imPW8qUa5FVx/lcfqw+8Zcqo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rKJd6gA5a1JKgxjHsjUk/tTNgbOV+cREJGlqIV9PSBceCH31QBHU4YA3dlEuxWnD/
-         OIAGQqyRj8XrrpyJNOlx8zFUYh7pDjl5rX9PcjxoJidgT5iPoBorLa5SCUM97KwmZF
-         O4pTlqq1UGnUi3Kx1pnOz8/lQeFi37umEURymbZlVwjlOsciEuj84Nm5yEkImvP873
-         abepI95O6bd+nb+jA2qEXSKGWJFpDsKwbmRNyE8Hv+uG0Y6OU+3mCxYDjmcq/5V/Bh
-         CuOI0ToVLaqLr/QbugxleHQREFjzI3dx0621dp7RxufR6jBqNzySSVp9uEoqwZ3ttW
-         ESTMDgI3KvEtA==
+        b=SAWKeb2D7RfN9vhPcw/CJU6FytGgLXHSxdO+lVDeumVO961SxXW80RQ7JYjFspwcC
+         V5LGHgM5MLhzLW06EX8dr/fm87li/CMcp8YYPWfjbZoLMrJ1/ek/b0/kwHi7SenORc
+         4BXBq2k47PHxlqw8JJeN9vwHULu7yZ0SuSSl1tGyr1n4p5tP+USWhQFCOFDucA0T1l
+         c/VK44CmfridpKjSio6g8yL3AcTxGkKJP2D74wAnvEEHRkZfITQWxsvLb+/GHrdtpI
+         J/y+JpVCC6z8zBvR9lkAkoNyoZLuUatekfn+KaJDNHqN5qMt49ByEi8e7KvVonfeOH
+         s1QylVdMEeskA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zheng Yongjun <zhengyongjun3@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
         mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        nicolas.toromanoff@foss.st.com, marex@denx.de,
         linux-crypto@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 4.19 06/11] crypto: stm32 - fix reference leak in stm32_crc_remove
-Date:   Wed,  6 Apr 2022 21:16:03 -0400
-Message-Id: <20220407011609.115258-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 11/25] crypto: stm32 - fix reference leak in stm32_crc_remove
+Date:   Wed,  6 Apr 2022 21:13:59 -0400
+Message-Id: <20220407011413.114662-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220407011609.115258-1-sashal@kernel.org>
-References: <20220407011609.115258-1-sashal@kernel.org>
+In-Reply-To: <20220407011413.114662-1-sashal@kernel.org>
+References: <20220407011413.114662-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -67,14 +68,14 @@ Signed-off-by: Zheng Yongjun <zhengyongjun3@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/stm32/stm32_crc32.c | 4 +++-
+ drivers/crypto/stm32/stm32-crc32.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/stm32/stm32_crc32.c b/drivers/crypto/stm32/stm32_crc32.c
-index 6848f34a9e66..de645bf84980 100644
---- a/drivers/crypto/stm32/stm32_crc32.c
-+++ b/drivers/crypto/stm32/stm32_crc32.c
-@@ -334,8 +334,10 @@ static int stm32_crc_remove(struct platform_device *pdev)
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index be1bf39a317d..90a920e7f664 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -384,8 +384,10 @@ static int stm32_crc_remove(struct platform_device *pdev)
  	struct stm32_crc *crc = platform_get_drvdata(pdev);
  	int ret = pm_runtime_get_sync(crc->dev);
  
