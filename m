@@ -2,122 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B438FC43217
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Apr 2022 01:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90163C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Apr 2022 01:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbiDGBHO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Apr 2022 21:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
+        id S234811AbiDGBNX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Apr 2022 21:13:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbiDGBHK (ORCPT
+        with ESMTP id S234877AbiDGBNO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Apr 2022 21:07:10 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC23CBE1A;
-        Wed,  6 Apr 2022 18:05:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649293507; x=1680829507;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=myer2bVBJAzVTcO8FK/Itx5etIcCeXikEzZUTZdKYyQ=;
-  b=CRTGINvpegqE3Ct4eATioeXgEOoVjVJ/SiNTNo7WZNxYuIBo20K4WiLN
-   B3hN51N6MQrB51lHpSK3EnWDVlHQxCM+xHvN7bY2ezStPZkj92VOJjyK5
-   DKjQaWZFIRHMb+OCBrLkSLMuL4zAqpwYK69p5PxH7qHjfepzFy8nSuLgP
-   cR0rKvkNhTVmxTGl/Fsr1Qeuhoa+QNHN+YG+HwX7FDQoFLCmx4QVZyupD
-   AqtRwO+UBAjDsbzs5a9heCZ3HmbV+eG7PNeaxOViv73EJshe0yghbz+J4
-   DPf8+CW98RMXb+v6aF8cQmGBFJ7AXcYYTWuWnUsAyCPz+w1TOS4pOueG8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10309"; a="243330976"
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="243330976"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2022 18:05:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,241,1643702400"; 
-   d="scan'208";a="609119120"
-Received: from lkp-server02.sh.intel.com (HELO a44fdfb70b94) ([10.239.97.151])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Apr 2022 18:05:02 -0700
-Received: from kbuild by a44fdfb70b94 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ncGa6-0004ur-5a;
-        Thu, 07 Apr 2022 01:05:02 +0000
-Date:   Thu, 7 Apr 2022 09:04:25 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Eric Snowberg <eric.snowberg@oracle.com>, dhowells@redhat.com,
-        dwmw2@infradead.org, jarkko@kernel.org, zohar@linux.ibm.com,
-        linux-integrity@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, dmitry.kasatkin@gmail.com, jmorris@namei.org,
-        serge@hallyn.com, roberto.sassu@huawei.com,
-        nramas@linux.microsoft.com, eric.snowberg@oracle.com,
-        pvorel@suse.cz, tiwai@suse.de, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 6/7] KEYS: X.509: Flag Intermediate CA certs as built in
-Message-ID: <202204070929.nFQNU3B8-lkp@intel.com>
-References: <20220406015337.4000739-7-eric.snowberg@oracle.com>
+        Wed, 6 Apr 2022 21:13:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F2D1834E6;
+        Wed,  6 Apr 2022 18:11:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 56FF0B8268A;
+        Thu,  7 Apr 2022 01:11:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C08E2C385A6;
+        Thu,  7 Apr 2022 01:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649293860;
+        bh=MhlatHOKjDvAenLsvRoSmy3peqsebSGy0OT2bhO+oQs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DBQozSpmqSAAPk+mgRcXYd+53IH5MdOS5EXx1ybPeCTYHdX1Gj4elwgvFDNVmk4z6
+         itiddTid+bMSSaA2PC0rNnvkZBi8sQ6SBqNkUjTZpxB17Q/e2Z+5nRf9BMGf4yo03R
+         rzVn42scKysvTr+Cxv0/0XwSJVEomDU4FDQqWfv1r+6ujWs3jCdNNZ4Mx3cVrwrCWt
+         2WZ2sPGvalJ4mXBX4yu5TMznZAoDwcshOkO2JB9C9TN3wpTxRc5gHA3NG2X8eKSV3T
+         0f/8AWFj56r3ZQyUYTPaKtQubLa6WqevYPxTSWeXKAP1hQ28q9s22nX4JSPo9eFryq
+         PZt5O3V5xGjlA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Martin Willi <martin@strongswan.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.17 15/31] crypto: x86/chacha20 - Avoid spurious jumps to other functions
+Date:   Wed,  6 Apr 2022 21:10:13 -0400
+Message-Id: <20220407011029.113321-15-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220407011029.113321-1-sashal@kernel.org>
+References: <20220407011029.113321-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220406015337.4000739-7-eric.snowberg@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+From: Peter Zijlstra <peterz@infradead.org>
 
-Thank you for the patch! Perhaps something to improve:
+[ Upstream commit 4327d168515fd8b5b92fa1efdf1d219fb6514460 ]
 
-[auto build test WARNING on 3123109284176b1532874591f7c81f3837bbdc17]
+The chacha_Nblock_xor_avx512vl() functions all have their own,
+identical, .LdoneN label, however in one particular spot {2,4} jump to
+the 8 version instead of their own. Resulting in:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Snowberg/Add-CA-enforcement-keyring-restrictions/20220407-003209
-base:   3123109284176b1532874591f7c81f3837bbdc17
-config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20220407/202204070929.nFQNU3B8-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-19) 11.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/b0858df3dd6d627f8fa75cc973f55516372a5c98
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Eric-Snowberg/Add-CA-enforcement-keyring-restrictions/20220407-003209
-        git checkout b0858df3dd6d627f8fa75cc973f55516372a5c98
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=um SUBARCH=i386 SHELL=/bin/bash
+  arch/x86/crypto/chacha-x86_64.o: warning: objtool: chacha_2block_xor_avx512vl() falls through to next function chacha_8block_xor_avx512vl()
+  arch/x86/crypto/chacha-x86_64.o: warning: objtool: chacha_4block_xor_avx512vl() falls through to next function chacha_8block_xor_avx512vl()
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+Make each function consistently use its own done label.
 
-All warnings (new ones prefixed by >>):
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Martin Willi <martin@strongswan.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/x86/crypto/chacha-avx512vl-x86_64.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-   In file included from fs/file_table.c:28:
->> include/linux/ima.h:189:56: warning: 'union key_payload' declared inside parameter list will not be visible outside of this definition or declaration
-     189 |                                            const union key_payload *payload,
-         |                                                        ^~~~~~~~~~~
->> include/linux/ima.h:188:57: warning: 'struct key_type' declared inside parameter list will not be visible outside of this definition or declaration
-     188 |                                            const struct key_type *type,
-         |                                                         ^~~~~~~~
-
-
-vim +189 include/linux/ima.h
-
-   179	
-   180	#ifdef CONFIG_ASYMMETRIC_KEY_TYPE
-   181	#ifdef CONFIG_SECONDARY_TRUSTED_KEYRING
-   182	#define ima_validate_builtin_rot restrict_link_by_rot_builtin_and_secondary_trusted
-   183	#else
-   184	#define ima_validate_builtin_rot restrict_link_by_rot_builtin_trusted
-   185	#endif
-   186	#else
-   187	static inline int ima_validate_builtin_rot(struct key *dest_keyring,
- > 188						   const struct key_type *type,
- > 189						   const union key_payload *payload,
-   190						   struct key *unused){
-   191		return -EPERM;
-   192	}
-   193	#endif
-   194	
-
+diff --git a/arch/x86/crypto/chacha-avx512vl-x86_64.S b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+index 946f74dd6fba..259383e1ad44 100644
+--- a/arch/x86/crypto/chacha-avx512vl-x86_64.S
++++ b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+@@ -172,7 +172,7 @@ SYM_FUNC_START(chacha_2block_xor_avx512vl)
+ 	# xor remaining bytes from partial register into output
+ 	mov		%rcx,%rax
+ 	and		$0xf,%rcx
+-	jz		.Ldone8
++	jz		.Ldone2
+ 	mov		%rax,%r9
+ 	and		$~0xf,%r9
+ 
+@@ -438,7 +438,7 @@ SYM_FUNC_START(chacha_4block_xor_avx512vl)
+ 	# xor remaining bytes from partial register into output
+ 	mov		%rcx,%rax
+ 	and		$0xf,%rcx
+-	jz		.Ldone8
++	jz		.Ldone4
+ 	mov		%rax,%r9
+ 	and		$~0xf,%r9
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.35.1
+
