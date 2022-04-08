@@ -2,61 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62A5C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 08:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F029CC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 08:32:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231731AbiDHId5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Apr 2022 04:33:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
+        id S231820AbiDHIeR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Apr 2022 04:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231790AbiDHId4 (ORCPT
+        with ESMTP id S231834AbiDHIeQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Apr 2022 04:33:56 -0400
+        Fri, 8 Apr 2022 04:34:16 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A87034648;
-        Fri,  8 Apr 2022 01:31:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45C74D083C;
+        Fri,  8 Apr 2022 01:32:13 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nck1y-000SEc-NL; Fri, 08 Apr 2022 18:31:48 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Apr 2022 16:31:46 +0800
-Date:   Fri, 8 Apr 2022 16:31:46 +0800
+        id 1nck2E-000SHh-5E; Fri, 08 Apr 2022 18:32:03 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Apr 2022 16:32:02 +0800
+Date:   Fri, 8 Apr 2022 16:32:02 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, gilad@benyossef.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: testmgr - test in-place en/decryption with two
- sglists
-Message-ID: <Yk/y8i26b+b8h8mw@gondor.apana.org.au>
+To:     Mario Limonciello <mario.limonciello@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        John Allen <john.allen@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER" 
+        <linux-crypto@vger.kernel.org>,
+        Kerneis Gabriel <Gabriel.Kerneis@ssi.gouv.fr>,
+        Richard Hughes <hughsient@gmail.com>
+Subject: Re: [PATCH v3 0/4] Export PSP security attributes
+Message-ID: <Yk/zAo91ztEq/qTv@gondor.apana.org.au>
+References: <20220331211213.2844-1-mario.limonciello@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220326071159.56056-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20220331211213.2844-1-mario.limonciello@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Thu, Mar 31, 2022 at 04:12:09PM -0500, Mario Limonciello wrote:
+> Select AMD SOCs include the ability to export capabilities that
+> have been activated or detected by the platform security processor.
 > 
-> As was established in the thread
-> https://lore.kernel.org/linux-crypto/20220223080400.139367-1-gilad@benyossef.com/T/#u,
-> many crypto API users doing in-place en/decryption don't use the same
-> scatterlist pointers for the source and destination, but rather use
-> separate scatterlists that point to the same memory.  This case isn't
-> tested by the self-tests, resulting in bugs.
+> This information is useful for both system designers as well as system
+> administrators to ensure that the system has been properly locked down
+> to their expectations.
 > 
-> This is the natural usage of the crypto API in some cases, so requiring
-> API users to avoid this usage is not reasonable.
+> Software such as fwupd will also be modified to use this information
+> as part of the calculations for a security level score that may be
+> presented to a user.
 > 
-> Therefore, update the self-tests to start testing this case.
+> This series also adds the ability to detect that TSME and SME are both
+> activated simultaneously to notify a user.  Previously a user could turn
+> on TSME and SME at the same time, but the kernel was unable to detect
+> that TSME was enabled in the OS.
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> crypto/testmgr.c | 75 ++++++++++++++++++++++++++++++++++++++++--------
-> 1 file changed, 63 insertions(+), 12 deletions(-)
+> This information is evaluated "too late" right now in the kernel to stop
+> the kernel from enabling SME, but if that is desirable at a later time
+> some of the early code can be modified to read the same information and
+> make that decision.
+> 
+> Mario Limonciello (4):
+>   crypto: ccp: cache capability into psp device
+>   crypto: ccp: Export PSP security bits to userspace
+>   crypto: ccp: Allow PSP driver to load without SEV/TEE support
+>   crypto: ccp: When TSME and SME both detected notify user
+> 
+>  Documentation/ABI/testing/sysfs-driver-ccp | 87 ++++++++++++++++++++++
+>  drivers/crypto/ccp/psp-dev.c               | 49 +++++-------
+>  drivers/crypto/ccp/psp-dev.h               | 22 ++++++
+>  drivers/crypto/ccp/sp-pci.c                | 62 +++++++++++++++
+>  4 files changed, 189 insertions(+), 31 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-driver-ccp
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
