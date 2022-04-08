@@ -2,127 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FFDC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 08:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7FEC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 10:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbiDHIfC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Apr 2022 04:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46566 "EHLO
+        id S232117AbiDHKMG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Apr 2022 06:12:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231904AbiDHIfB (ORCPT
+        with ESMTP id S229565AbiDHKME (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Apr 2022 04:35:01 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D520B2FF537;
-        Fri,  8 Apr 2022 01:32:58 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nck1W-000SEY-Od; Fri, 08 Apr 2022 18:31:20 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Apr 2022 16:31:19 +0800
-Date:   Fri, 8 Apr 2022 16:31:19 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: Re: [PATCH 8/9] x86/crypto: eliminate anonymous module_init &
- module_exit
-Message-ID: <Yk/y12WSN5+PpDkP@gondor.apana.org.au>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-9-rdunlap@infradead.org>
+        Fri, 8 Apr 2022 06:12:04 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC8B58E6D;
+        Fri,  8 Apr 2022 03:09:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1649412599; x=1680948599;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PRW1z5BDKUyVp87gb5BA0bIYa/nZ8N7XjvhnUwpnBG8=;
+  b=HnOM63grL35nN5rXKNAZs0ATZoPm0DdcdILckJ2J5HKi28HQpdFb/3xO
+   +YrF7qJFfn0WsYhslTGUdxz8LgTx6sXnh3ubpbdqq4vcVWDKAhq/fHTvV
+   VEyVcPAskcfOtGhwE30y6UZNTTr39blTGCm5FUxBQdVAkTCXcbhNmkbZv
+   Mu12++WAXPXKmJKiNqkokPMpJgVUZWqmAth8gbuvyIKydGQh0UKEPbjhL
+   6PaIiXhZRsG6RI4xUS0+m9Sh9VH31wL9a7rqnrfvLVOKY5csJEkTdGbs6
+   sQm3668t3Vk1ynJG/rJwdqoATWKWeBm8yzTCfOzml/ZY4HzBnmenKa2HI
+   w==;
+X-IronPort-AV: E=Sophos;i="5.90,244,1643698800"; 
+   d="scan'208";a="91749499"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Apr 2022 03:09:58 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Fri, 8 Apr 2022 03:09:57 -0700
+Received: from wendy.microchip.com (10.10.115.15) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2375.17 via Frontend
+ Transport; Fri, 8 Apr 2022 03:09:56 -0700
+From:   <conor.dooley@microchip.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>,
+        Conor Dooley <conor.dooley@microchip.com>
+Subject: [v2] Add support for hwrng on PolarFire SoC
+Date:   Fri, 8 Apr 2022 10:09:11 +0000
+Message-ID: <20220408100911.1638478-1-conor.dooley@microchip.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220316192010.19001-9-rdunlap@infradead.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 12:20:09PM -0700, Randy Dunlap wrote:
-> Eliminate anonymous module_init() and module_exit(), which can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
-> 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
-> 
-> Example 1: (System.map)
->  ffffffff832fc78c t init
->  ffffffff832fc79e t init
->  ffffffff832fc8f8 t init
-> 
-> Example 2: (initcall_debug log)
->  calling  init+0x0/0x12 @ 1
->  initcall init+0x0/0x12 returned 0 after 15 usecs
->  calling  init+0x0/0x60 @ 1
->  initcall init+0x0/0x60 returned 0 after 2 usecs
->  calling  init+0x0/0x9a @ 1
->  initcall init+0x0/0x9a returned 0 after 74 usecs
-> 
-> Fixes: 64b94ceae8c1 ("crypto: blowfish - add x86_64 assembly implementation")
-> Fixes: 676a38046f4f ("crypto: camellia-x86_64 - module init/exit functions should be static")
-> Fixes: 0b95ec56ae19 ("crypto: camellia - add assembler implementation for x86_64")
-> Fixes: 56d76c96a9f3 ("crypto: serpent - add AVX2/x86_64 assembler implementation of serpent cipher")
-> Fixes: b9f535ffe38f ("[CRYPTO] twofish: i586 assembly version")
-> Fixes: ff0a70fe0536 ("crypto: twofish-x86_64-3way - module init/exit functions should be static")
-> Fixes: 8280daad436e ("crypto: twofish - add 3-way parallel x86_64 assembler implemention")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
-> Cc: Joachim Fritschi <jfritschi@freenet.de>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: x86@kernel.org
-> ---
->  arch/x86/crypto/blowfish_glue.c     |    8 ++++----
->  arch/x86/crypto/camellia_glue.c     |    8 ++++----
->  arch/x86/crypto/serpent_avx2_glue.c |    8 ++++----
->  arch/x86/crypto/twofish_glue.c      |    8 ++++----
->  arch/x86/crypto/twofish_glue_3way.c |    8 ++++----
->  5 files changed, 20 insertions(+), 20 deletions(-)
+From: Conor Dooley <conor.dooley@microchip.com>
 
-Patch applied.  Thanks.
+As it says on the tin, add support for the hardware rng on PolarFire
+SoC, which is accessed via the system controller.
+I dropped the maintainers entry change that v1 had, I will send a
+single update via RISCV to avoid any conflicts.
+
+On v1 I replied saying there was a refcount issue, but that's not
+actually the case, so no changes required there.
+
+Thanks,
+Conor
+
+Changes since v1:
+- Rebased on v5.18-rc1
+- Dropped the MAINTAINERS change
+- Added quality estimation
+
+Conor Dooley (1):
+  hwrng: mpfs - add polarfire soc hwrng support
+
+ drivers/char/hw_random/Kconfig    |  13 ++++
+ drivers/char/hw_random/Makefile   |   1 +
+ drivers/char/hw_random/mpfs-rng.c | 104 ++++++++++++++++++++++++++++++
+ 3 files changed, 118 insertions(+)
+ create mode 100644 drivers/char/hw_random/mpfs-rng.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.35.1
+
