@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18286C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 18:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9DDC4167B
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Apr 2022 18:23:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236313AbiDHSZK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Apr 2022 14:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41830 "EHLO
+        id S238623AbiDHSZR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Apr 2022 14:25:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237803AbiDHSYx (ORCPT
+        with ESMTP id S238615AbiDHSZK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Apr 2022 14:24:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC83937C91E;
-        Fri,  8 Apr 2022 11:22:48 -0700 (PDT)
+        Fri, 8 Apr 2022 14:25:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D8938237B;
+        Fri,  8 Apr 2022 11:23:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A5DC4B82CDC;
-        Fri,  8 Apr 2022 18:22:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFAEC385A1;
-        Fri,  8 Apr 2022 18:22:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D981C621E6;
+        Fri,  8 Apr 2022 18:23:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99E13C385A3;
+        Fri,  8 Apr 2022 18:22:59 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GAIaUJEC"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CLPULdzg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1649442162;
+        t=1649442178;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DbIus65zpzI+xHKEAM5+xHyu+CtmATmWW3aZiXwzgc4=;
-        b=GAIaUJEC1HUSfuNdrnqAWUTn3284cm/0xfh3fiKI5ZuipFFMuZvPn8LjBm4e+qk0cDLs3N
-        9VBsCM134dJPVZQe2Z1dOghNMM/0hI7v2FG5TdMR6v08EqeWuaCzCNYpKR7kcHopDDiZi5
-        UhU8/gd1mZNEseTUYlFrm8hfIl5ta+Q=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 94b0c155 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 8 Apr 2022 18:22:41 +0000 (UTC)
+        bh=QhQ1HwDDQ0VBViTeG0LB+139Jo2Xk5438IuvpR3RiNg=;
+        b=CLPULdzgGXJrwK4uCCHM7+j7CQPO/TnUdFHV8jGVPXt2oRPuFGfQuIGVwrwhQmuAXIEyIK
+        +pMFaA2OsSQLAz2u75tmYrg486K8df6y/V/MHRdhzu90z8Dl9A4EKbCnoFVpvWCWqoNp4p
+        IgJX3Y50X9yQA9wOGJqYKrd+/9+6GG8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2adbe4d1 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 8 Apr 2022 18:22:58 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         arnd@arndb.de
@@ -66,9 +66,9 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
         linux-um@lists.infradead.org, x86@kernel.org,
         linux-xtensa@linux-xtensa.org
-Subject: [PATCH RFC v1 04/10] mips: use sched_clock() for random_get_entropy() instead of zero
-Date:   Fri,  8 Apr 2022 20:21:39 +0200
-Message-Id: <20220408182145.142506-5-Jason@zx2c4.com>
+Subject: [PATCH RFC v1 06/10] x86: use sched_clock() for random_get_entropy() instead of zero
+Date:   Fri,  8 Apr 2022 20:21:41 +0200
+Message-Id: <20220408182145.142506-7-Jason@zx2c4.com>
 In-Reply-To: <20220408182145.142506-1-Jason@zx2c4.com>
 References: <20220408182145.142506-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -85,33 +85,44 @@ eventually. It's not as though sched_clock() is super high precision or
 guaranteed to be entropic, but basically anything that's not zero all
 the time is better than returning zero all the time.
 
+If CONFIG_X86_TSC=n, then it's possible that we're running on a 486 with
+no RDTSC, so we only need the fallback code for that case.
+
 Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: x86@kernel.org
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- arch/mips/include/asm/timex.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/tsc.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
-index b05bb70a2e46..1de8ded08bb7 100644
---- a/arch/mips/include/asm/timex.h
-+++ b/arch/mips/include/asm/timex.h
-@@ -12,6 +12,7 @@
- #ifdef __KERNEL__
+diff --git a/arch/x86/include/asm/tsc.h b/arch/x86/include/asm/tsc.h
+index 01a300a9700b..b0c0b2b9e0f7 100644
+--- a/arch/x86/include/asm/tsc.h
++++ b/arch/x86/include/asm/tsc.h
+@@ -5,6 +5,7 @@
+ #ifndef _ASM_X86_TSC_H
+ #define _ASM_X86_TSC_H
  
- #include <linux/compiler.h>
 +#include <linux/sched/clock.h>
+ #include <asm/processor.h>
+ #include <asm/cpufeature.h>
  
- #include <asm/cpu.h>
- #include <asm/cpu-features.h>
-@@ -94,7 +95,7 @@ static inline unsigned long random_get_entropy(void)
- 	else if (likely(imp != PRID_IMP_R6000 && imp != PRID_IMP_R6000A))
- 		return read_c0_random();
- 	else
--		return 0;	/* no usable register */
-+		return sched_clock();	/* no usable register */
+@@ -28,6 +29,16 @@ static inline cycles_t get_cycles(void)
+ 	return rdtsc();
  }
- #define random_get_entropy random_get_entropy
+ 
++static inline unsigned long random_get_entropy(void)
++{
++#ifndef CONFIG_X86_TSC
++	if (!boot_cpu_has(X86_FEATURE_TSC))
++		return sched_clock();
++#endif
++	return rdtsc();
++}
++#define random_get_entropy random_get_entropy
++
+ extern struct system_counterval_t convert_art_to_tsc(u64 art);
+ extern struct system_counterval_t convert_art_ns_to_tsc(u64 art_ns);
  
 -- 
 2.35.1
