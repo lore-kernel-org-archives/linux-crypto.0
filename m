@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54F3C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 08:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB63FC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 08:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239483AbiDIILW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Apr 2022 04:11:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48532 "EHLO
+        id S240372AbiDIILX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 9 Apr 2022 04:11:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234868AbiDIILT (ORCPT
+        with ESMTP id S235263AbiDIILT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 9 Apr 2022 04:11:19 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43308393F1;
-        Sat,  9 Apr 2022 01:09:12 -0700 (PDT)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Kb76c228Sz1HBbG;
-        Sat,  9 Apr 2022 16:08:40 +0800 (CST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04D22F02A;
+        Sat,  9 Apr 2022 01:09:11 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kb76b2DdHzdZMl;
+        Sat,  9 Apr 2022 16:08:39 +0800 (CST)
 Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2308.21; Sat, 9 Apr 2022 16:09:10 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
  (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Sat, 9 Apr
- 2022 16:09:10 +0800
+ 2022 16:09:09 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>,
         <liulongfang@huawei.com>
-Subject: [PATCH 08/11] crypto: hisilicon/qm - add last word dumping for ACC
-Date:   Sat, 9 Apr 2022 16:03:25 +0800
-Message-ID: <20220409080328.15783-9-yekai13@huawei.com>
+Subject: [PATCH 04/11] crypto: hisilicon/zip - support register checking
+Date:   Sat, 9 Apr 2022 16:03:21 +0800
+Message-ID: <20220409080328.15783-5-yekai13@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20220409080328.15783-1-yekai13@huawei.com>
 References: <20220409080328.15783-1-yekai13@huawei.com>
@@ -48,143 +48,146 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add last word dumping function during acc engines controller reset.
-The last words are reported to the printed information during the
-reset. The dmesg information included qm debugging registers and
-engine debugging registers. It can help to improve debugging
-capability.
+The value of the register is changed after the task running. A debugfs
+file node is added to help users to check the change of register values.
 
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- drivers/crypto/hisilicon/qm.c | 57 +++++++++++++++++++++++++++++++++++
- include/linux/hisi_acc_qm.h   |  4 +++
- 2 files changed, 61 insertions(+)
+ drivers/crypto/hisilicon/zip/zip_main.c | 78 ++++++++++++++++++++++---
+ 1 file changed, 70 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 5e0695a8900c..7f5c3186a895 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3673,6 +3673,17 @@ static void hisi_qm_set_state(struct hisi_qm *qm, u8 state)
- 		writel(state, qm->io_base + QM_VF_STATE);
- }
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 4534e1e107d1..2d5663d8d87f 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -49,14 +49,18 @@
  
-+static void qm_last_regs_uninit(struct hisi_qm *qm)
+ #define HZIP_QM_IDEL_STATUS		0x3040e4
+ 
+-#define HZIP_CORE_DEBUG_COMP_0		0x302000
+-#define HZIP_CORE_DEBUG_COMP_1		0x303000
+-#define HZIP_CORE_DEBUG_DECOMP_0	0x304000
+-#define HZIP_CORE_DEBUG_DECOMP_1	0x305000
+-#define HZIP_CORE_DEBUG_DECOMP_2	0x306000
+-#define HZIP_CORE_DEBUG_DECOMP_3	0x307000
+-#define HZIP_CORE_DEBUG_DECOMP_4	0x308000
+-#define HZIP_CORE_DEBUG_DECOMP_5	0x309000
++#define HZIP_CORE_DFX_BASE		0x301000
++#define HZIP_CLOCK_GATED_CONTL		0X301004
++#define HZIP_CORE_DFX_COMP_0		0x302000
++#define HZIP_CORE_DFX_COMP_1		0x303000
++#define HZIP_CORE_DFX_DECOMP_0		0x304000
++#define HZIP_CORE_DFX_DECOMP_1		0x305000
++#define HZIP_CORE_DFX_DECOMP_2		0x306000
++#define HZIP_CORE_DFX_DECOMP_3		0x307000
++#define HZIP_CORE_DFX_DECOMP_4		0x308000
++#define HZIP_CORE_DFX_DECOMP_5		0x309000
++#define HZIP_CORE_REGS_BASE_LEN		0xB0
++#define HZIP_CORE_REGS_DFX_LEN		0x28
+ 
+ #define HZIP_CORE_INT_SOURCE		0x3010A0
+ #define HZIP_CORE_INT_MASK_REG		0x3010A4
+@@ -230,6 +234,48 @@ static const struct debugfs_reg32 hzip_dfx_regs[] = {
+ 	{"HZIP_DECOMP_LZ77_CURR_ST       ",  0x9cull},
+ };
+ 
++/* define the ZIP's dfx regs region and region length */
++static struct dfx_diff_registers hzip_diff_regs[] = {
++	{
++		.reg_offset = HZIP_CORE_DFX_BASE,
++		.reg_len = HZIP_CORE_REGS_BASE_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_COMP_0,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_COMP_1,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_0,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_1,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_2,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_3,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_4,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	}, {
++		.reg_offset = HZIP_CORE_DFX_DECOMP_5,
++		.reg_len = HZIP_CORE_REGS_DFX_LEN,
++	},
++};
++
++static int hzip_diff_regs_show(struct seq_file *s, void *unused)
 +{
-+	struct qm_debug *debug = &qm->debug;
++	struct hisi_qm *qm = s->private;
 +
-+	if (qm->fun_type == QM_HW_VF || !debug->qm_last_words)
-+		return;
++	hisi_qm_acc_diff_regs_dump(qm, s, qm->debug.acc_diff_regs,
++					ARRAY_SIZE(hzip_diff_regs));
 +
-+	kfree(debug->qm_last_words);
-+	debug->qm_last_words = NULL;
++	return 0;
 +}
-+
- /**
-  * hisi_qm_uninit() - Uninitialize qm.
-  * @qm: The qm needed uninit.
-@@ -3684,6 +3695,8 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 	struct pci_dev *pdev = qm->pdev;
- 	struct device *dev = &pdev->dev;
++DEFINE_SHOW_ATTRIBUTE(hzip_diff_regs);
+ static const struct kernel_param_ops zip_uacce_mode_ops = {
+ 	.set = uacce_mode_set,
+ 	.get = param_get_int,
+@@ -621,6 +667,7 @@ static int hisi_zip_core_debug_init(struct hisi_qm *qm)
  
-+	qm_last_regs_uninit(qm);
-+
- 	qm_cmd_uninit(qm);
- 	kfree(qm->factor);
- 	down_write(&qm->qps_lock);
-@@ -5361,6 +5374,24 @@ static int qm_controller_reset_done(struct hisi_qm *qm)
- 	return 0;
- }
- 
-+static void qm_show_last_dfx_regs(struct hisi_qm *qm)
-+{
-+	struct qm_debug *debug = &qm->debug;
-+	struct pci_dev *pdev = qm->pdev;
-+	u32 val;
-+	int i;
-+
-+	if (qm->fun_type == QM_HW_VF || !debug->qm_last_words)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(qm_dfx_regs); i++) {
-+		val = readl_relaxed(qm->io_base + qm_dfx_regs[i].offset);
-+		if (debug->qm_last_words[i] != val)
-+			pci_info(pdev, "%s \t= 0x%08x => 0x%08x\n",
-+			qm_dfx_regs[i].name, debug->qm_last_words[i], val);
-+	}
-+}
-+
- static int qm_controller_reset(struct hisi_qm *qm)
+ static void hisi_zip_dfx_debug_init(struct hisi_qm *qm)
  {
- 	struct pci_dev *pdev = qm->pdev;
-@@ -5376,6 +5407,10 @@ static int qm_controller_reset(struct hisi_qm *qm)
- 		return ret;
++	struct dfx_diff_registers *hzip_regs = qm->debug.acc_diff_regs;
+ 	struct hisi_zip *zip = container_of(qm, struct hisi_zip, qm);
+ 	struct hisi_zip_dfx *dfx = &zip->dfx;
+ 	struct dentry *tmp_dir;
+@@ -634,6 +681,10 @@ static void hisi_zip_dfx_debug_init(struct hisi_qm *qm)
+ 				    0644, tmp_dir, data,
+ 				    &zip_atomic64_ops);
  	}
- 
-+	qm_show_last_dfx_regs(qm);
-+	if (qm->err_ini->show_last_dfx_regs)
-+		qm->err_ini->show_last_dfx_regs(qm);
 +
- 	ret = qm_soft_reset(qm);
- 	if (ret) {
- 		pci_err(pdev, "Controller reset failed (%d)\n", ret);
-@@ -6086,6 +6121,26 @@ static int hisi_qm_memory_init(struct hisi_qm *qm)
++	if (qm->fun_type == QM_HW_PF && hzip_regs)
++		debugfs_create_file("diff_regs", 0444, tmp_dir,
++				      qm, &hzip_diff_regs_fops);
+ }
+ 
+ static int hisi_zip_ctrl_debug_init(struct hisi_qm *qm)
+@@ -666,6 +717,13 @@ static int hisi_zip_debugfs_init(struct hisi_qm *qm)
+ 	qm->debug.sqe_mask_offset = HZIP_SQE_MASK_OFFSET;
+ 	qm->debug.sqe_mask_len = HZIP_SQE_MASK_LEN;
+ 	qm->debug.debug_root = dev_d;
++	ret = hisi_qm_diff_regs_init(qm, hzip_diff_regs,
++				ARRAY_SIZE(hzip_diff_regs));
++	if (ret) {
++		dev_warn(dev, "Failed to init ZIP diff regs!\n");
++		goto debugfs_remove;
++	}
++
+ 	hisi_qm_debug_init(qm);
+ 
+ 	if (qm->fun_type == QM_HW_PF) {
+@@ -679,6 +737,8 @@ static int hisi_zip_debugfs_init(struct hisi_qm *qm)
+ 	return 0;
+ 
+ failed_to_create:
++	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(hzip_diff_regs));
++debugfs_remove:
+ 	debugfs_remove_recursive(hzip_debugfs_root);
  	return ret;
  }
+@@ -703,6 +763,8 @@ static void hisi_zip_debug_regs_clear(struct hisi_qm *qm)
  
-+static void qm_last_regs_init(struct hisi_qm *qm)
-+{
-+	int dfx_regs_num = ARRAY_SIZE(qm_dfx_regs);
-+	struct qm_debug *debug = &qm->debug;
-+	int i;
+ static void hisi_zip_debugfs_exit(struct hisi_qm *qm)
+ {
++	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(hzip_diff_regs));
 +
-+	if (qm->fun_type == QM_HW_VF)
-+		return;
-+
-+	debug->qm_last_words = kcalloc(dfx_regs_num, sizeof(unsigned int),
-+								GFP_KERNEL);
-+	if (!debug->qm_last_words)
-+		return;
-+
-+	for (i = 0; i < dfx_regs_num; i++) {
-+		debug->qm_last_words[i] = readl_relaxed(qm->io_base +
-+			qm_dfx_regs[i].offset);
-+	}
-+}
-+
- /**
-  * hisi_qm_init() - Initialize configures about qm.
-  * @qm: The qm needing init.
-@@ -6138,6 +6193,8 @@ int hisi_qm_init(struct hisi_qm *qm)
- 	qm_cmd_init(qm);
- 	atomic_set(&qm->status.flags, QM_INIT);
+ 	debugfs_remove_recursive(qm->debug.debug_root);
  
-+	qm_last_regs_init(qm);
-+
- 	return 0;
- 
- err_alloc_uacce:
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 39acc0316a60..e5522eaf88fd 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -196,6 +196,9 @@ struct qm_debug {
- 	struct dentry *debug_root;
- 	struct dentry *qm_d;
- 	struct debugfs_file files[DEBUG_FILE_NUM];
-+	unsigned int *qm_last_words;
-+	/* ACC engines recoreding last regs */
-+	unsigned int *last_words;
- 	struct dfx_diff_registers *qm_diff_regs;
- 	struct dfx_diff_registers *acc_diff_regs;
- };
-@@ -251,6 +254,7 @@ struct hisi_qm_err_ini {
- 	void (*open_sva_prefetch)(struct hisi_qm *qm);
- 	void (*close_sva_prefetch)(struct hisi_qm *qm);
- 	void (*log_dev_hw_err)(struct hisi_qm *qm, u32 err_sts);
-+	void (*show_last_dfx_regs)(struct hisi_qm *qm);
- 	void (*err_info_init)(struct hisi_qm *qm);
- };
- 
+ 	if (qm->fun_type == QM_HW_PF) {
 -- 
 2.33.0
 
