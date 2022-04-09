@@ -2,38 +2,38 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC73C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 08:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F12C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 08:09:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240489AbiDIILa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Apr 2022 04:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48534 "EHLO
+        id S240485AbiDIIL2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 9 Apr 2022 04:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237584AbiDIILT (ORCPT
+        with ESMTP id S237546AbiDIILT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 9 Apr 2022 04:11:19 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CE23AA42;
-        Sat,  9 Apr 2022 01:09:12 -0700 (PDT)
-Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Kb76c2y9sz1HBbS;
-        Sat,  9 Apr 2022 16:08:40 +0800 (CST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A055533E16;
+        Sat,  9 Apr 2022 01:09:11 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kb7574d8hzgYPB;
+        Sat,  9 Apr 2022 16:07:23 +0800 (CST)
 Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 9 Apr 2022 16:09:10 +0800
+ 15.1.2308.21; Sat, 9 Apr 2022 16:09:09 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
  (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Sat, 9 Apr
- 2022 16:09:10 +0800
+ 2022 16:09:09 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <wangzhou1@hisilicon.com>, <yekai13@huawei.com>,
         <liulongfang@huawei.com>
-Subject: [PATCH 09/11] crypto: hisilicon/sec - support last word dumping
-Date:   Sat, 9 Apr 2022 16:03:26 +0800
-Message-ID: <20220409080328.15783-10-yekai13@huawei.com>
+Subject: [PATCH 03/11] crypto: hisilicon/sec - support register checking
+Date:   Sat, 9 Apr 2022 16:03:20 +0800
+Message-ID: <20220409080328.15783-4-yekai13@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20220409080328.15783-1-yekai13@huawei.com>
 References: <20220409080328.15783-1-yekai13@huawei.com>
@@ -48,107 +48,119 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add last word dumping function during sec engine controller reset.
+The value of the register is changed after the task running. A debugfs
+file node is added to help users to check the change of register values.
 
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec_main.c | 55 +++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
+ drivers/crypto/hisilicon/sec2/sec_main.c | 53 ++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
 diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 93ef0e3b5b16..4d85d2cbf376 100644
+index 92fae706bdb2..93ef0e3b5b16 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_main.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -861,6 +861,53 @@ static void sec_debugfs_exit(struct hisi_qm *qm)
- 	debugfs_remove_recursive(qm->debug.debug_root);
- }
+@@ -110,6 +110,15 @@
+ #define SEC_SQE_MASK_LEN		48
+ #define SEC_SHAPER_TYPE_RATE		400
  
-+static int sec_show_last_regs_init(struct hisi_qm *qm)
++#define SEC_DFX_BASE		0x301000
++#define SEC_DFX_CORE		0x302100
++#define SEC_DFX_COMMON1		0x301600
++#define SEC_DFX_COMMON2		0x301C00
++#define SEC_DFX_BASE_LEN		0x9D
++#define SEC_DFX_CORE_LEN		0x32B
++#define SEC_DFX_COMMON1_LEN		0x45
++#define SEC_DFX_COMMON2_LEN		0xBA
++
+ struct sec_hw_error {
+ 	u32 int_msk;
+ 	const char *msg;
+@@ -226,6 +235,34 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
+ 	{"SEC_BD_SAA8                   ",  0x301C40},
+ };
+ 
++/* define the SEC's dfx regs region and region length */
++static struct dfx_diff_registers sec_diff_regs[] = {
++	{
++		.reg_offset = SEC_DFX_BASE,
++		.reg_len = SEC_DFX_BASE_LEN,
++	}, {
++		.reg_offset = SEC_DFX_COMMON1,
++		.reg_len = SEC_DFX_COMMON1_LEN,
++	}, {
++		.reg_offset = SEC_DFX_COMMON2,
++		.reg_len = SEC_DFX_COMMON2_LEN,
++	}, {
++		.reg_offset = SEC_DFX_CORE,
++		.reg_len = SEC_DFX_CORE_LEN,
++	},
++};
++
++static int sec_diff_regs_show(struct seq_file *s, void *unused)
 +{
-+	struct qm_debug *debug = &qm->debug;
-+	int i;
++	struct hisi_qm *qm = s->private;
 +
-+	debug->last_words = kcalloc(ARRAY_SIZE(sec_dfx_regs),
-+					sizeof(unsigned int), GFP_KERNEL);
-+	if (!debug->last_words)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < ARRAY_SIZE(sec_dfx_regs); i++)
-+		debug->last_words[i] = readl_relaxed(qm->io_base +
-+							sec_dfx_regs[i].offset);
++	hisi_qm_acc_diff_regs_dump(qm, s, qm->debug.acc_diff_regs,
++					ARRAY_SIZE(sec_diff_regs));
 +
 +	return 0;
 +}
++DEFINE_SHOW_ATTRIBUTE(sec_diff_regs);
 +
-+static void sec_show_last_regs_uninit(struct hisi_qm *qm)
-+{
-+	struct qm_debug *debug = &qm->debug;
-+
-+	if (qm->fun_type == QM_HW_VF || !debug->last_words)
-+		return;
-+
-+	kfree(debug->last_words);
-+	debug->last_words = NULL;
-+}
-+
-+static void sec_show_last_dfx_regs(struct hisi_qm *qm)
-+{
-+	struct qm_debug *debug = &qm->debug;
-+	struct pci_dev *pdev = qm->pdev;
-+	u32 val;
-+	int i;
-+
-+	if (qm->fun_type == QM_HW_VF || !debug->last_words)
-+		return;
-+
-+	/* dumps last word of the debugging registers during controller reset */
-+	for (i = 0; i < ARRAY_SIZE(sec_dfx_regs); i++) {
-+		val = readl_relaxed(qm->io_base + sec_dfx_regs[i].offset);
-+		if (val != debug->last_words[i])
-+			pci_info(pdev, "%s \t= 0x%08x => 0x%08x\n",
-+				sec_dfx_regs[i].name, debug->last_words[i], val);
-+	}
-+}
-+
- static void sec_log_hw_error(struct hisi_qm *qm, u32 err_sts)
+ static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
  {
- 	const struct sec_hw_error *errs = sec_hw_errors;
-@@ -927,6 +974,7 @@ static const struct hisi_qm_err_ini sec_err_ini = {
- 	.open_axi_master_ooo	= sec_open_axi_master_ooo,
- 	.open_sva_prefetch	= sec_open_sva_prefetch,
- 	.close_sva_prefetch	= sec_close_sva_prefetch,
-+	.show_last_dfx_regs	= sec_show_last_dfx_regs,
- 	.err_info_init		= sec_err_info_init,
- };
+ 	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
+@@ -729,6 +766,7 @@ DEFINE_SHOW_ATTRIBUTE(sec_regs);
  
-@@ -945,8 +993,11 @@ static int sec_pf_probe_init(struct sec_dev *sec)
- 	sec_open_sva_prefetch(qm);
- 	hisi_qm_dev_err_init(qm);
- 	sec_debug_regs_clear(qm);
-+	ret = sec_show_last_regs_init(qm);
-+	if (ret)
-+		pci_err(qm->pdev, "Failed to init last word regs!\n");
+ static int sec_core_debug_init(struct hisi_qm *qm)
+ {
++	struct dfx_diff_registers *sec_regs = qm->debug.acc_diff_regs;
+ 	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+ 	struct device *dev = &qm->pdev->dev;
+ 	struct sec_dfx *dfx = &sec->debug.dfx;
+@@ -749,6 +787,9 @@ static int sec_core_debug_init(struct hisi_qm *qm)
  
--	return 0;
-+	return ret;
+ 	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
+ 		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
++	if (qm->fun_type == QM_HW_PF && sec_regs)
++		debugfs_create_file("diff_regs", 0444, tmp_d,
++				      qm, &sec_diff_regs_fops);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
+ 		atomic64_t *data = (atomic64_t *)((uintptr_t)dfx +
+@@ -790,6 +831,14 @@ static int sec_debugfs_init(struct hisi_qm *qm)
+ 						  sec_debugfs_root);
+ 	qm->debug.sqe_mask_offset = SEC_SQE_MASK_OFFSET;
+ 	qm->debug.sqe_mask_len = SEC_SQE_MASK_LEN;
++
++	ret = hisi_qm_diff_regs_init(qm, sec_diff_regs,
++				ARRAY_SIZE(sec_diff_regs));
++	if (ret) {
++		dev_warn(dev, "Failed to init SEC diff regs!\n");
++		goto debugfs_remove;
++	}
++
+ 	hisi_qm_debug_init(qm);
+ 
+ 	ret = sec_debug_init(qm);
+@@ -799,12 +848,16 @@ static int sec_debugfs_init(struct hisi_qm *qm)
+ 	return 0;
+ 
+ failed_to_create:
++	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(sec_diff_regs));
++debugfs_remove:
+ 	debugfs_remove_recursive(sec_debugfs_root);
+ 	return ret;
  }
  
- static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
-@@ -1120,6 +1171,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	sec_debugfs_exit(qm);
- 	hisi_qm_stop(qm, QM_NORMAL);
- err_probe_uninit:
-+	sec_show_last_regs_uninit(qm);
- 	sec_probe_uninit(qm);
- err_qm_uninit:
- 	sec_qm_uninit(qm);
-@@ -1144,6 +1196,7 @@ static void sec_remove(struct pci_dev *pdev)
- 
- 	if (qm->fun_type == QM_HW_PF)
- 		sec_debug_regs_clear(qm);
-+	sec_show_last_regs_uninit(qm);
- 
- 	sec_probe_uninit(qm);
+ static void sec_debugfs_exit(struct hisi_qm *qm)
+ {
++	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(sec_diff_regs));
++
+ 	debugfs_remove_recursive(qm->debug.debug_root);
+ }
  
 -- 
 2.33.0
