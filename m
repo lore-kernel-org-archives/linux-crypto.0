@@ -2,166 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F12C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 08:09:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC1BDC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Apr 2022 09:35:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240485AbiDIIL2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Apr 2022 04:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48528 "EHLO
+        id S241429AbiDIJhH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 9 Apr 2022 05:37:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237546AbiDIILT (ORCPT
+        with ESMTP id S241311AbiDIJhD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Apr 2022 04:11:19 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A055533E16;
-        Sat,  9 Apr 2022 01:09:11 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kb7574d8hzgYPB;
-        Sat,  9 Apr 2022 16:07:23 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+        Sat, 9 Apr 2022 05:37:03 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4623D23EC7F;
+        Sat,  9 Apr 2022 02:34:45 -0700 (PDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Kb8z95pl0zDq8C;
+        Sat,  9 Apr 2022 17:32:21 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (7.185.36.74) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 9 Apr 2022 16:09:09 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Sat, 9 Apr
- 2022 16:09:09 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>,
-        <liulongfang@huawei.com>
-Subject: [PATCH 03/11] crypto: hisilicon/sec - support register checking
-Date:   Sat, 9 Apr 2022 16:03:20 +0800
-Message-ID: <20220409080328.15783-4-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20220409080328.15783-1-yekai13@huawei.com>
-References: <20220409080328.15783-1-yekai13@huawei.com>
+ 15.1.2308.21; Sat, 9 Apr 2022 17:34:42 +0800
+Received: from localhost.localdomain (10.67.164.66) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 9 Apr 2022 17:34:41 +0800
+From:   Yang Shen <shenyang39@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>
+Subject: [PATCH] crypto: hisilicon/sgl - align the hardware sgl dma address
+Date:   Sat, 9 Apr 2022 17:33:09 +0800
+Message-ID: <20220409093309.55715-1-shenyang39@huawei.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml100012.china.huawei.com (7.185.36.121)
+X-Originating-IP: [10.67.164.66]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The value of the register is changed after the task running. A debugfs
-file node is added to help users to check the change of register values.
+The hardware needs aligned sgl dma address. So expend the sgl_size to
+align 64 bytes.
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-Signed-off-by: Kai Ye <yekai13@huawei.com>
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec_main.c | 53 ++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ drivers/crypto/hisilicon/sgl.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 92fae706bdb2..93ef0e3b5b16 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -110,6 +110,15 @@
- #define SEC_SQE_MASK_LEN		48
- #define SEC_SHAPER_TYPE_RATE		400
+diff --git a/drivers/crypto/hisilicon/sgl.c b/drivers/crypto/hisilicon/sgl.c
+index f7efc02b065f..2b6f2281cfd6 100644
+--- a/drivers/crypto/hisilicon/sgl.c
++++ b/drivers/crypto/hisilicon/sgl.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* Copyright (c) 2019 HiSilicon Limited. */
++#include <linux/align.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/hisi_acc_qm.h>
+ #include <linux/module.h>
+@@ -64,8 +65,9 @@ struct hisi_acc_sgl_pool *hisi_acc_create_sgl_pool(struct device *dev,
+ 	if (!dev || !count || !sge_nr || sge_nr > HISI_ACC_SGL_SGE_NR_MAX)
+ 		return ERR_PTR(-EINVAL);
  
-+#define SEC_DFX_BASE		0x301000
-+#define SEC_DFX_CORE		0x302100
-+#define SEC_DFX_COMMON1		0x301600
-+#define SEC_DFX_COMMON2		0x301C00
-+#define SEC_DFX_BASE_LEN		0x9D
-+#define SEC_DFX_CORE_LEN		0x32B
-+#define SEC_DFX_COMMON1_LEN		0x45
-+#define SEC_DFX_COMMON2_LEN		0xBA
-+
- struct sec_hw_error {
- 	u32 int_msk;
- 	const char *msg;
-@@ -226,6 +235,34 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
- 	{"SEC_BD_SAA8                   ",  0x301C40},
- };
+-	sgl_size = sizeof(struct acc_hw_sge) * sge_nr +
+-		   sizeof(struct hisi_acc_hw_sgl);
++	sgl_size = ALIGN(sizeof(struct acc_hw_sge) * sge_nr +
++			 sizeof(struct hisi_acc_hw_sgl),
++			 HISI_ACC_SGL_ALIGN_SIZE);
  
-+/* define the SEC's dfx regs region and region length */
-+static struct dfx_diff_registers sec_diff_regs[] = {
-+	{
-+		.reg_offset = SEC_DFX_BASE,
-+		.reg_len = SEC_DFX_BASE_LEN,
-+	}, {
-+		.reg_offset = SEC_DFX_COMMON1,
-+		.reg_len = SEC_DFX_COMMON1_LEN,
-+	}, {
-+		.reg_offset = SEC_DFX_COMMON2,
-+		.reg_len = SEC_DFX_COMMON2_LEN,
-+	}, {
-+		.reg_offset = SEC_DFX_CORE,
-+		.reg_len = SEC_DFX_CORE_LEN,
-+	},
-+};
-+
-+static int sec_diff_regs_show(struct seq_file *s, void *unused)
-+{
-+	struct hisi_qm *qm = s->private;
-+
-+	hisi_qm_acc_diff_regs_dump(qm, s, qm->debug.acc_diff_regs,
-+					ARRAY_SIZE(sec_diff_regs));
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(sec_diff_regs);
-+
- static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
- 	return q_num_set(val, kp, PCI_DEVICE_ID_HUAWEI_SEC_PF);
-@@ -729,6 +766,7 @@ DEFINE_SHOW_ATTRIBUTE(sec_regs);
- 
- static int sec_core_debug_init(struct hisi_qm *qm)
- {
-+	struct dfx_diff_registers *sec_regs = qm->debug.acc_diff_regs;
- 	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
- 	struct device *dev = &qm->pdev->dev;
- 	struct sec_dfx *dfx = &sec->debug.dfx;
-@@ -749,6 +787,9 @@ static int sec_core_debug_init(struct hisi_qm *qm)
- 
- 	if (qm->pdev->device == PCI_DEVICE_ID_HUAWEI_SEC_PF)
- 		debugfs_create_file("regs", 0444, tmp_d, regset, &sec_regs_fops);
-+	if (qm->fun_type == QM_HW_PF && sec_regs)
-+		debugfs_create_file("diff_regs", 0444, tmp_d,
-+				      qm, &sec_diff_regs_fops);
- 
- 	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
- 		atomic64_t *data = (atomic64_t *)((uintptr_t)dfx +
-@@ -790,6 +831,14 @@ static int sec_debugfs_init(struct hisi_qm *qm)
- 						  sec_debugfs_root);
- 	qm->debug.sqe_mask_offset = SEC_SQE_MASK_OFFSET;
- 	qm->debug.sqe_mask_len = SEC_SQE_MASK_LEN;
-+
-+	ret = hisi_qm_diff_regs_init(qm, sec_diff_regs,
-+				ARRAY_SIZE(sec_diff_regs));
-+	if (ret) {
-+		dev_warn(dev, "Failed to init SEC diff regs!\n");
-+		goto debugfs_remove;
-+	}
-+
- 	hisi_qm_debug_init(qm);
- 
- 	ret = sec_debug_init(qm);
-@@ -799,12 +848,16 @@ static int sec_debugfs_init(struct hisi_qm *qm)
- 	return 0;
- 
- failed_to_create:
-+	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(sec_diff_regs));
-+debugfs_remove:
- 	debugfs_remove_recursive(sec_debugfs_root);
- 	return ret;
- }
- 
- static void sec_debugfs_exit(struct hisi_qm *qm)
- {
-+	hisi_qm_diff_regs_uninit(qm, ARRAY_SIZE(sec_diff_regs));
-+
- 	debugfs_remove_recursive(qm->debug.debug_root);
- }
- 
+ 	/*
+ 	 * the pool may allocate a block of memory of size PAGE_SIZE * 2^(MAX_ORDER - 1),
 -- 
-2.33.0
+2.24.0
 
