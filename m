@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03189C43219
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 21:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0569C43217
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 21:51:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235344AbiDJVxq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Apr 2022 17:53:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44532 "EHLO
+        id S244152AbiDJVxw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 10 Apr 2022 17:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244054AbiDJVxS (ORCPT
+        with ESMTP id S244093AbiDJVxp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Apr 2022 17:53:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A266C1C125;
-        Sun, 10 Apr 2022 14:50:59 -0700 (PDT)
+        Sun, 10 Apr 2022 17:53:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB3791BE8F;
+        Sun, 10 Apr 2022 14:51:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EBC1460DBE;
-        Sun, 10 Apr 2022 21:50:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B421C385A4;
-        Sun, 10 Apr 2022 21:50:55 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 64622B80ECB;
+        Sun, 10 Apr 2022 21:51:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1256C385A4;
+        Sun, 10 Apr 2022 21:51:10 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lRyRLonZ"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HSRuLPF+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1649627453;
+        t=1649627469;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SSX7U4wa9cltqh9+okLsswtZRwrikCLPITiZ2u/h7CU=;
-        b=lRyRLonZk8b09UJFho2SIWp9Foyd0FzLMoCHzOADidJrAIZdMFIPPeEFanRwibw6Ql3t40
-        21CxmRLKakuXCoVIZKi+bjqXQe+fCxt/Rd/Vj5+cHAmGQmTOUMye32xDhpjpyKUhIvn4k3
-        mfko2Iy/6OA/jrZGVwCPi1qdQqZHC0k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e85d0e85 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 10 Apr 2022 21:50:53 +0000 (UTC)
+        bh=9Cu7QXRsL/z13xQn/GFGGfZ5O+ssd8ncuQpowmlC+V8=;
+        b=HSRuLPF+VEh5X+14lNQIOIFMHoOjiZe3dSYDy4a6n3H8a3H9VkjOITzBcZyRFj//HRr2Mm
+        t6DBVplsZGwsPuaoIOTCX9UmrGJTeMZzXbEOLZSVNNhNta5KvvLPw2gQ+dNWWnwBbEQ+wc
+        6Tt5kGdkQwkh5Zu4gPG1UBVc3RaNcBk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8bb042a8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 10 Apr 2022 21:51:09 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         tglx@linutronix.de, arnd@arndb.de
@@ -66,9 +66,9 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
         linux-um@lists.infradead.org, x86@kernel.org,
         linux-xtensa@linux-xtensa.org
-Subject: [PATCH v2 08/11] x86: use ktime_read_raw_clock() for random_get_entropy() instead of zero
-Date:   Sun, 10 Apr 2022 23:49:48 +0200
-Message-Id: <20220410214951.55294-9-Jason@zx2c4.com>
+Subject: [PATCH v2 11/11] xtensa: use ktime_read_raw_clock() for random_get_entropy() instead of zero
+Date:   Sun, 10 Apr 2022 23:49:51 +0200
+Message-Id: <20220410214951.55294-12-Jason@zx2c4.com>
 In-Reply-To: <20220410214951.55294-1-Jason@zx2c4.com>
 References: <20220410214951.55294-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -85,38 +85,40 @@ jiffies eventually. It's not as though ktime_read_raw_clock() is super
 high precision or guaranteed to be entropic, but basically anything
 that's not zero all the time is better than returning zero all the time.
 
-If CONFIG_X86_TSC=n, then it's possible that we're running on a 486 with
-no RDTSC, so we only need the fallback code for that case.
+This is accomplished by just including the asm-generic code like on
+other architectures, which means we can get rid of the empty stub
+function here.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: x86@kernel.org
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- arch/x86/include/asm/tsc.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/xtensa/include/asm/timex.h | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/tsc.h b/arch/x86/include/asm/tsc.h
-index 01a300a9700b..dad3027bf6a2 100644
---- a/arch/x86/include/asm/tsc.h
-+++ b/arch/x86/include/asm/tsc.h
-@@ -28,6 +28,16 @@ static inline cycles_t get_cycles(void)
- 	return rdtsc();
+diff --git a/arch/xtensa/include/asm/timex.h b/arch/xtensa/include/asm/timex.h
+index 233ec75e60c6..3f2462f2d027 100644
+--- a/arch/xtensa/include/asm/timex.h
++++ b/arch/xtensa/include/asm/timex.h
+@@ -29,10 +29,6 @@
+ 
+ extern unsigned long ccount_freq;
+ 
+-typedef unsigned long long cycles_t;
+-
+-#define get_cycles()	(0)
+-
+ void local_timer_setup(unsigned cpu);
+ 
+ /*
+@@ -59,4 +55,6 @@ static inline void set_linux_timer (unsigned long ccompare)
+ 	xtensa_set_sr(ccompare, SREG_CCOMPARE + LINUX_TIMER);
  }
  
-+static inline unsigned long random_get_entropy(void)
-+{
-+#ifndef CONFIG_X86_TSC
-+	if (!boot_cpu_has(X86_FEATURE_TSC))
-+		return ktime_read_raw_clock();
-+#endif
-+	return rdtsc();
-+}
-+#define random_get_entropy random_get_entropy
++#include <asm-generic/timex.h>
 +
- extern struct system_counterval_t convert_art_to_tsc(u64 art);
- extern struct system_counterval_t convert_art_ns_to_tsc(u64 art_ns);
- 
+ #endif	/* _XTENSA_TIMEX_H */
 -- 
 2.35.1
 
