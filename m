@@ -2,99 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3DFC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 19:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62EF8C4332F
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 20:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233033AbiDJTyg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Apr 2022 15:54:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43518 "EHLO
+        id S235014AbiDJU7W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 10 Apr 2022 16:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241787AbiDJTyf (ORCPT
+        with ESMTP id S242351AbiDJU7U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Apr 2022 15:54:35 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDA649F2F;
-        Sun, 10 Apr 2022 12:52:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1649620344; x=1681156344;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EF5s5J7GPdqeiz1pEHQ/PowHu/TjKguTo2H6OD1EN7Q=;
-  b=bhO3jBMoQBJj79oZoo3KxdtcY/2c2NeEmQeGhvDmg7ODQ23i15dVKVIY
-   jAZopaVTOo8joH5bLaBCDl5IO2p4H5DGz7JpZVNWmBQ+Zw3y/P5CRztDy
-   oocY+rjaHz7WNjW67PAomN5AbaovM4U2cfAZyVKJPuNJRjDCKCvZrYIPv
-   sB4Cm1miAUQAdjGCVr5WgA82vhAhq9FiSXtSwkNN+2hU5A2yOP7mvi1nB
-   ybqoTEzLsE9hrsz3yKleuhmGbiG5yMvIOtYrJQs/t1rj6rxbirVeM2q0h
-   TCyXDhc//rkx/FjkilPJdV4o0naS4SsLxRl5A7VrHMEKUknxXqnGIxw4t
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="261430993"
-X-IronPort-AV: E=Sophos;i="5.90,250,1643702400"; 
-   d="scan'208";a="261430993"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2022 12:52:23 -0700
-X-IronPort-AV: E=Sophos;i="5.90,250,1643702400"; 
-   d="scan'208";a="571814308"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2022 12:52:21 -0700
-Date:   Sun, 10 Apr 2022 20:52:14 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - stop using iommu_present()
-Message-ID: <YlM1bmo8M80Wjnov@silpixa00400314>
-References: <ef01fbd7d2c60d56a0b8e8847a08ccb3ee5132af.1649161511.git.robin.murphy@arm.com>
+        Sun, 10 Apr 2022 16:59:20 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BFF11C2D;
+        Sun, 10 Apr 2022 13:57:04 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1649624223;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hE+Xcw0JizEU8Wnq0ZP70KLvw79L4CjFSDQ+JeFdg1E=;
+        b=wcxdyIRUujqol7xM6/jNUaTiJK9LjQ2TxNswzkFqW9IdoCXdLl06LKnKcZu+/PhgcujoFD
+        4BL6UvqV2KyZxKcXAHyaYhKgWh+hW7kmtVsrR50bN2kEyItTRS4qenN4xdW+pqDVD/EBQJ
+        FRBUDZAXAnKdCAGLESQsbxyitf9btYLvPr88J6g6SWQULeVv1+BpRryz8V4vlo0Sxn5A1B
+        B7jn62NOZrsua6pLpW1KUXCpCdbVHaodhuhDNbeQMQoqpedjr6x5wCT5mekwEWTjKpLkBQ
+        ZhVOGqfjVtVh2uqjxiB4TKZirCwCtL5e55pMSWAO2Ry+8zKLnyd7j8EtVVFiMg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1649624223;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hE+Xcw0JizEU8Wnq0ZP70KLvw79L4CjFSDQ+JeFdg1E=;
+        b=WYkLY0CPXnB/0QIxOUzf7pdAwpOuVx9Tljat/8ZOy+GrRKgqIku37SjusWmBW3We4uxu9x
+        QGtzsFUk86/12iAg==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, x86@kernel.org,
+        linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH RFC v1 00/10] archs/random: fallback to using
+ sched_clock() if no cycle counter
+In-Reply-To: <YlLo8JVOS6FDmWUM@zx2c4.com>
+References: <20220408182145.142506-1-Jason@zx2c4.com> <87wnfxhm3n.ffs@tglx>
+ <YlLo8JVOS6FDmWUM@zx2c4.com>
+Date:   Sun, 10 Apr 2022 22:57:02 +0200
+Message-ID: <877d7whd29.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ef01fbd7d2c60d56a0b8e8847a08ccb3ee5132af.1649161511.git.robin.murphy@arm.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 05, 2022 at 01:25:11PM +0100, Robin Murphy wrote:
-> Even if an IOMMU might be present for some PCI segment in the system,
-> that doesn't necessarily mean it provides translation for the device
-> we care about. Replace iommu_present() with a more appropriate check.
-> 
-> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
-> ---
->  drivers/crypto/qat/qat_common/adf_sriov.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
-> index b960bca1f9d2..7f9c18dc4540 100644
-> --- a/drivers/crypto/qat/qat_common/adf_sriov.c
-> +++ b/drivers/crypto/qat/qat_common/adf_sriov.c
-> @@ -3,7 +3,6 @@
->  #include <linux/workqueue.h>
->  #include <linux/pci.h>
->  #include <linux/device.h>
-> -#include <linux/iommu.h>
->  #include "adf_common_drv.h"
->  #include "adf_cfg.h"
->  #include "adf_pfvf_pf_msg.h"
-> @@ -176,7 +175,7 @@ int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
->  		return -EFAULT;
->  	}
->  
-> -	if (!iommu_present(&pci_bus_type))
-> +	if (!device_iommu_mapped(&pdev->dev))
->  		dev_warn(&pdev->dev, "IOMMU should be enabled for SR-IOV to work correctly\n");
->  
->  	if (accel_dev->pf.vf_info) {
-> -- 
-> 2.28.0.dirty
-> 
-I tried this patch and it appears to work as expected.
+Jason,
 
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+On Sun, Apr 10 2022 at 16:25, Jason A. Donenfeld wrote:
+> On Sun, Apr 10, 2022 at 01:29:32AM +0200, Thomas Gleixner wrote:
+>> But the below uncompiled hack gives you access to the 'best' clocksource
+>> of a machine, i.e. the one which the platform decided to be the one
+>> which is giving the best resolution. The minimal bitwidth of that is
+>> AFAICT 20 bits. In the jiffies case this will at least advance every
+>> tick.
+>
+> Oh, huh, that's pretty cool. I can try to make a commit out of that. Are
+> you suggesting I use this as the fallback for all platforms that
+> currently return zero, or just for m68k per Arnd's suggestion, and then
+> use sched_clock() for the others? It sounds to me like you're saying
+> this would be best for all of them. If so, that'd be quite nice.
 
-Regards,
+It's the best in terms of timekeeping. Not the fastest :)
 
--- 
-Giovanni
+>> The price, e.g. on x86 would be that RDTSC would be invoked via an
+>> indirect function call. Not the end of the world...
+>
+> Well on x86, random_get_entropy() is overridden in the arch/ code to
+> call get_cycles(). So this would really just be for 486 and for other
+> architectures with no cycle counter that are currently returning zero.
+> However, this brings up a good point: if your proposed
+> ktime_read_raw_clock() function really is so nice, should it be used
+> everywhere unconditionally with no arch-specific overrides? On x86, is
+> it really guaranteed to be RDTSC, and not, say, some off-core HPET
+> situation? And is this acceptable to call from the hard irq handler?
+
+No, that's the sad part. On system where TSC is unstable (for whatever
+reason) this might fallback to some off-core clock (HPET, PMTIMER).
+The good news is that this is mostly affecting older systems. After 20+
+years of complaining the hardware people seem to have figured out that a
+fast accessible and realiable clocksource is something useful. :)
+
+> Not yet having too much knowledge, I'm tentatively leaning toward the
+> safe side, of just using ktime_read_raw_clock() in the current places
+> that return zero all the time -- that is, for the purpose this patchset
+> has.
+
+That's probably a good approach and it's init/runtime discoverable.
+
+Thanks,
+
+        tglx
