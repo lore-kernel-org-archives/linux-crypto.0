@@ -2,112 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2D2C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 14:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24665C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Apr 2022 19:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238194AbiDJO23 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Apr 2022 10:28:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43622 "EHLO
+        id S239511AbiDJTtX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 10 Apr 2022 15:49:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234968AbiDJO2Y (ORCPT
+        with ESMTP id S233614AbiDJTtX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Apr 2022 10:28:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7879C25C75;
-        Sun, 10 Apr 2022 07:26:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D2081B80B73;
-        Sun, 10 Apr 2022 14:26:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1C7C385A4;
-        Sun, 10 Apr 2022 14:26:06 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Xd0Enayl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1649600764;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ACW34jCdChesB8O9mr3A3gFQd+fZkgemUpW2KIQGTs8=;
-        b=Xd0Enayl8UdMOLK8hb+p9ElFGR/nkOk182JQ3t/5PAWGrTN3GF03N95qlf3rrZl/Mt+RZI
-        7g+OoLToQKHdL9+kdXKajZ1a3hsadEW5sVaIiDYC9L5V8y9LrnjV28ZvqwgrOh6rFPazES
-        NrUCO3Ev2CsBJg7e3SN1A3lzDB/MMQU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8a808d78 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 10 Apr 2022 14:26:04 +0000 (UTC)
-Date:   Sun, 10 Apr 2022 16:25:52 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, x86@kernel.org,
-        linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH RFC v1 00/10] archs/random: fallback to using
- sched_clock() if no cycle counter
-Message-ID: <YlLo8JVOS6FDmWUM@zx2c4.com>
-References: <20220408182145.142506-1-Jason@zx2c4.com>
- <87wnfxhm3n.ffs@tglx>
+        Sun, 10 Apr 2022 15:49:23 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 006236210B
+        for <linux-crypto@vger.kernel.org>; Sun, 10 Apr 2022 12:47:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1649620032; x=1681156032;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WSN6dHNcWEcA+qWBm031A0zXsH36N6TSf9UiBFOlPR4=;
+  b=IcdMpsKUT7+HPVe9gQr7vY30VKT5SVHMZZuOQquaIUojms+a/TMQFq0R
+   M1DkMrA7Yw4NeQ1PiGMJqisqwPZnBzywg+orkWW+6sT683gjqmXnaVbHt
+   vJSC9oO/u09L+q/Xa8uD7SUq3wfQnJtGFTRhkuHoiK4GZug2xA06Ui8wZ
+   osC/+SP8fsLUow7p1L8CiRMZvXS01sC97vqbFDACOxdSWD3Z+t4umbaKE
+   m/AZqURNn8Sf6hLIthIpSUcKSW2o4OGRfFRTvE3WZtFMk6c8RVtp4hi0J
+   6ovC3gg+QnnD5gd2zDp+mjW5Xb0pOLPsQRJWkIGeiuV4W2LbnWqwtVTJw
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10313"; a="324905153"
+X-IronPort-AV: E=Sophos;i="5.90,250,1643702400"; 
+   d="scan'208";a="324905153"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2022 12:47:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,250,1643702400"; 
+   d="scan'208";a="506849181"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga003.jf.intel.com with ESMTP; 10 Apr 2022 12:47:10 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v3 0/3] crypto: qat - fix dm-crypt related issues
+Date:   Sun, 10 Apr 2022 20:47:04 +0100
+Message-Id: <20220410194707.9746-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87wnfxhm3n.ffs@tglx>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+This set fixes the issues related with the dm-crypt + QAT driver
+use-case.
 
-On Sun, Apr 10, 2022 at 01:29:32AM +0200, Thomas Gleixner wrote:
-> But the below uncompiled hack gives you access to the 'best' clocksource
-> of a machine, i.e. the one which the platform decided to be the one
-> which is giving the best resolution. The minimal bitwidth of that is
-> AFAICT 20 bits. In the jiffies case this will at least advance every
-> tick.
+The first patch fixes a potential dead-lock that might occur when using
+dm-crypt + QAT in out of memory conditions. The datapaths of the aead
+and skcipher implementations have been changed to use pre-allocated
+buffers that are part of the request contexts.
+The also removes the CRYPTO_ALG_ALLOCATES_MEMORY flag from the aead and
+skcipher implementations.
 
-Oh, huh, that's pretty cool. I can try to make a commit out of that. Are
-you suggesting I use this as the fallback for all platforms that
-currently return zero, or just for m68k per Arnd's suggestion, and then
-use sched_clock() for the others? It sounds to me like you're saying
-this would be best for all of them. If so, that'd be quite nice.
+The second patch refactors the submission logic in preparation for the
+introduction of a backlog queue to handle crypto requests with the
+CRYPTO_TFM_REQ_MAY_BACKLOG flag set.
 
+The third patch addresses a stall in the dm-crypt + QAT usecase by
+adding support for the CRYPTO_TFM_REQ_MAY_BACKLOG flag. If the HW queue
+is full, the driver enqueues the request in a list and resubmit it at
+a later time, avoiding losing it.
 
-> The price, e.g. on x86 would be that RDTSC would be invoked via an
-> indirect function call. Not the end of the world...
+Changes from v1:
+ - Patch #3: removed worqueues. Requests in the backlog queue are now
+   resubmitted in the context of the callback of a previously submitted
+   request. This reduces the CPU utilization as the resubmit backlog
+   function always finds a free slot in the HW queues when resubmits a
+   job.
 
-Well on x86, random_get_entropy() is overridden in the arch/ code to
-call get_cycles(). So this would really just be for 486 and for other
-architectures with no cycle counter that are currently returning zero.
-However, this brings up a good point: if your proposed
-ktime_read_raw_clock() function really is so nice, should it be used
-everywhere unconditionally with no arch-specific overrides? On x86, is
-it really guaranteed to be RDTSC, and not, say, some off-core HPET
-situation? And is this acceptable to call from the hard irq handler?
+Changes from v2:
+  - Patch #3: added initialization of list element before insertion in
+    backlog list.
+  - Patch #3: changed read order of pointer to backlog structure in the
+    callback. The pointer to the backlog structure, which is part of the
+    request context, needs to be read before the request is completed.
+    This is since the user might free the request structure after the
+    request is completed.
+  - Removed patch 4 to keep the algorithms disabled as there is now a
+    regression on the rsa implementation after commit f5ff79fddf0e
+    ("dma-mapping: remove CONFIG_DMA_REMAP") is showing a regression
+    unrelated to this set.
 
-Not yet having too much knowledge, I'm tentatively leaning toward the
-safe side, of just using ktime_read_raw_clock() in the current places
-that return zero all the time -- that is, for the purpose this patchset
-has.
+Giovanni Cabiddu (3):
+  crypto: qat - use pre-allocated buffers in datapath
+  crypto: qat - refactor submission logic
+  crypto: qat - add backlog mechanism
 
-Jason
+ drivers/crypto/qat/qat_common/Makefile        |   1 +
+ drivers/crypto/qat/qat_common/adf_transport.c |  11 ++
+ drivers/crypto/qat/qat_common/adf_transport.h |   1 +
+ .../qat/qat_common/adf_transport_internal.h   |   1 +
+ drivers/crypto/qat/qat_common/qat_algs.c      | 151 ++++++++++--------
+ drivers/crypto/qat/qat_common/qat_algs_send.c |  86 ++++++++++
+ drivers/crypto/qat/qat_common/qat_algs_send.h |  11 ++
+ drivers/crypto/qat/qat_common/qat_asym_algs.c |  57 ++++---
+ drivers/crypto/qat/qat_common/qat_crypto.c    |   3 +
+ drivers/crypto/qat/qat_common/qat_crypto.h    |  39 +++++
+ 10 files changed, 273 insertions(+), 88 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.h
+
+-- 
+2.35.1
+
