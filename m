@@ -2,95 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F833C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Apr 2022 19:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E62BC433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Apr 2022 22:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349605AbiDKTiK (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Apr 2022 15:38:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43864 "EHLO
+        id S235026AbiDKWPb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Apr 2022 18:15:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230134AbiDKTiJ (ORCPT
+        with ESMTP id S229678AbiDKWPa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Apr 2022 15:38:09 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8A213F0C
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Apr 2022 12:35:54 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id t67so12530750ybi.2
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Apr 2022 12:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ctsBGHHI9fHwwFQuTHX2ntOMJxKsTa2iIDRP2hXt+D0=;
-        b=slGV0/Ar19gJuMe7YfVJmI0gWO/MmehfBZr/e3d8u1vwMKQDfD1ZQ7zU9cj9fDFuwp
-         wqKkiOUS43bCN4vuYG4V4ux9AgeWG2YzhWrq2NzRnZI5RvWLZudhZiPAxOVSdD2v434n
-         cbC2aypUD7NBboBMLUhKyfxLHZXWERTa1uM6W7zwJjsd40XAmUZ+0evN2w6RDLBrYZgu
-         bCJEyWbyvNnzOIg+xNefryDdGUVEikcChZsvnbox/NIowRGnvZk7b9YypdOcXQjCcAz+
-         qqhXlFPRSyNA47L2ge11qrzzytK2u/YbkE5j/RtysNa8mvW8dlOPXsy5sFU2cjxrUX0w
-         rPgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ctsBGHHI9fHwwFQuTHX2ntOMJxKsTa2iIDRP2hXt+D0=;
-        b=rCLZszVGb5WsmfE4soq4brv6kjjGHYm6HLGNnH+QPO99+zEHhDohBwUb+YafBsGacV
-         Oybiv6hjH+gf1OoOqqXQC8XwaLP84LPNY3AecRNxaUn0PiNRyhMNm+5EF1/6T/yg3+Qb
-         /DYY52F3I79n0hdQ2iq3UpP0wiXf5b6qNdVdJmytpTK8UrtpYWtbqLGe1pwE19jEJHuc
-         Br6UqSwJmY5crCI6yIESJQBaIBNUGbqmT9ahB/5MTOMzIkE0gKizXwdOLxkrbDJ0CZ5g
-         dT++xs/yrqTmcK7n24lqMx84Ky2Y+F6/TwKaaZky/ypUqYB+2iktIX2IQYIkmERKapOI
-         HPEA==
-X-Gm-Message-State: AOAM532OVxY0grk43fBmIrTRmkMz85Zmv7/1VhVnCUWKtcmxErClGy8G
-        gkzsgmH7a3AXf2ZIFnTg0U5Ces7C2XteV2Fx3Cxn
-X-Google-Smtp-Source: ABdhPJzxdu+zSoihQSMJl+2XUSrgNDyTf8QD+9tKSBur49OSsRbf3Dting9soeQbT4KwfUCDKsy4mk3XI39sNW95F1U=
-X-Received: by 2002:a05:6902:706:b0:641:5f7d:8ff2 with SMTP id
- k6-20020a056902070600b006415f7d8ff2mr5176516ybt.80.1649705753449; Mon, 11 Apr
- 2022 12:35:53 -0700 (PDT)
+        Mon, 11 Apr 2022 18:15:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B49162E8;
+        Mon, 11 Apr 2022 15:13:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 97EE76173E;
+        Mon, 11 Apr 2022 22:13:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C231C385A3;
+        Mon, 11 Apr 2022 22:13:13 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KybX01zY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649715191;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gSudnh1FVwn/cRuaWERLZCgg6VCPqB/kIypq5KjigTQ=;
+        b=KybX01zYWKByBGHHcfMAmavnP7L0p3jg7aV2fmW50XiFpz7B1LAEyJXHq3V4iRh7NnrsVG
+        WlIHJ9f0wTZy8WOOgmyYrCIi8QNK9nY17FyQTt9LA8IcFXu4dkJkUI/J2c7LyuJha0Ot6K
+        tj5LHYp+jIpnZFZ/H9s4FciDdH7BJ7o=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 43c1faab (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 11 Apr 2022 22:13:10 +0000 (UTC)
+Received: by mail-yb1-xb2a.google.com with SMTP id p65so11704866ybp.9;
+        Mon, 11 Apr 2022 15:13:10 -0700 (PDT)
+X-Gm-Message-State: AOAM531o3aMtHXCKOjNg5ZH62+QRpI2yDLO1zJgtX3N5nGdsMGVgt6jA
+        1CxTuqgqwJRJjIifKG5V2sqCHa2KYEntwdUMm64=
+X-Google-Smtp-Source: ABdhPJyrbHcZ7X1J23rQnANqA3RR06u0ZM3R7CT8etsKwGDR+r4LAk7JuXL3JmvpUSxPvBr0OEr8z3kykwSI+XeJazE=
+X-Received: by 2002:a5b:6cf:0:b0:61e:1371:3cda with SMTP id
+ r15-20020a5b06cf000000b0061e13713cdamr24066153ybq.235.1649714889427; Mon, 11
+ Apr 2022 15:08:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220411180006.4187548-1-jackyli@google.com> <4278ae8b-eb87-06ac-43af-41a1c741f9a9@amd.com>
-In-Reply-To: <4278ae8b-eb87-06ac-43af-41a1c741f9a9@amd.com>
-From:   Jacky Li <jackyli@google.com>
-Date:   Mon, 11 Apr 2022 12:35:42 -0700
-Message-ID: <CAJxe5cvAq9+FVfHrCMkN-re9v_v33FZNVsT6b1NyVZb8bdcC8w@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ccp - Fix the INIT_EX data file open failure
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Marc Orr <marcorr@google.com>, Alper Gun <alpergun@google.com>,
-        Peter Gonda <pgonda@google.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <20220410214951.55294-1-Jason@zx2c4.com> <20220410214951.55294-4-Jason@zx2c4.com>
+ <87sfqkf2y1.ffs@tglx>
+In-Reply-To: <87sfqkf2y1.ffs@tglx>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 12 Apr 2022 00:07:58 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qU7x3=KsjfH0qDW=isdcGxTweHbssvshYxkV5iHpamGw@mail.gmail.com>
+Message-ID: <CAHmME9qU7x3=KsjfH0qDW=isdcGxTweHbssvshYxkV5iHpamGw@mail.gmail.com>
+Subject: Re: [PATCH v2 03/11] m68k: use ktime_read_raw_clock() for
+ random_get_entropy() instead of zero
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 11:58 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 4/11/22 13:00, Jacky Li wrote:
-> > There are 2 common cases when INIT_EX data file might not be
-> > opened successfully and fail the sev initialization:
-> >
-> > 1. In user namespaces, normal user tasks (e.g. VMM) can change their
-> >     current->fs->root to point to arbitrary directories. While
-> >     init_ex_path is provided as a module param related to root file
-> >     system. Solution: use the root directory of init_task to avoid
-> >     accessing the wrong file.
-> >
-> > 2. Normal user tasks (e.g. VMM) don't have the privilege to access
-> >     the INIT_EX data file. Solution: open the file as root and
-> >     restore permissions immediately.
-> >
-> > Signed-off-by: Jacky Li <jackyli@google.com>
->
-> Should this have a Fixes: tag?
+Hi Thomas,
 
-Yes you are right, will add the Fixes: tag in v2.
-
-Thanks,
-Jacky
-
+On Mon, Apr 11, 2022 at 10:18 AM Thomas Gleixner <tglx@linutronix.de> wrote:
+> > diff --git a/arch/m68k/include/asm/timex.h b/arch/m68k/include/asm/timex.h
+> > index 6a21d9358280..5351b10e1b18 100644
+> > --- a/arch/m68k/include/asm/timex.h
+> > +++ b/arch/m68k/include/asm/timex.h
+> > @@ -35,7 +35,7 @@ static inline unsigned long random_get_entropy(void)
+> >  {
+> >       if (mach_random_get_entropy)
+> >               return mach_random_get_entropy();
+> > -     return 0;
+> > +     return ktime_read_raw_clock();
 >
-> Thanks,
-> Tom
+> I'd rather do something like this in a common header:
+>
+> unsigned long random_get_entropy_fallback(void);
+>
+> and use random_get_entropy_fallback() in the architecture specific
+> files.
+>
+> That way you can encapsulate the fallback implementation in the random
+> code and if it turns out that ktime_read_raw_clock() is a stupid idea or
+> someone has a better idea then you have to change exactly one place and
+> not patch the whole tree again.
+
+Absolutely. That's a good idea. I'll do that for v3.
+
+Jason
