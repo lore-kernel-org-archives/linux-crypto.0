@@ -2,213 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E12C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Apr 2022 17:29:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0168C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Apr 2022 17:29:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358147AbiDLRbu (ORCPT
+        id S1358194AbiDLRcF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Apr 2022 13:31:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35582 "EHLO
+        Tue, 12 Apr 2022 13:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358136AbiDLRbB (ORCPT
+        with ESMTP id S229464AbiDLRbu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:31:01 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A13C54186
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 10:28:42 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id d129-20020a254f87000000b006411bf3f331so8082599ybb.4
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 10:28:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=9pExrAuyAU/+6FhLqziAkiz0jY/4rL5PhuNATPlrUaw=;
-        b=nNXQaZyVsPm1JY0KIGCCQb+pxY/QnOTOkzkjsT9erx9FpMApCRw+AP++lL3+4fmjJl
-         Luvc8c1ewnOp3JAJ6BNjqtZ3K/PnsmVgbrjAxKb+HvwYStN43gLdAszrKb3ceDQ71e+X
-         OgBG4pQMboitSy9RrfvKccO7ZqFpZFl+PtyKvCmotBSKmdDtVYNRZ8rT9ZdiWIQ4Maxc
-         zdp0n/rrkf2L+sQOXHg0pDmzEYPKow7PMJO73m3AkGYDFDj36Id77PMSvMhv13QHIedA
-         7YGG2UoWyq4VR11WjVlldGvRuohvZEaWGXPaSxv2dNqahWbOE7Y2TF965sWgkjuvtgvg
-         WK9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=9pExrAuyAU/+6FhLqziAkiz0jY/4rL5PhuNATPlrUaw=;
-        b=UpBKjIOziH5HnV7aaHiJk06v7OCP5LkbDiwQGaH83kkK9z/vPsB3weBMoEqYl/ijbB
-         1iyVbeaM8SnvJyGR8Y7hqv+mXniYO4fkyVKi7+qa9slqQxt19Oo/PyT57uQUzXpQodVZ
-         RoMN0C2XeTcf3PUfkN7V2heCubk2wPBhpKdXYECCdU19LIGtnI7pXlexJQ5pslxQKYyL
-         wILPunyet63Y+EattZYTeUdlwl7DoVgMwhV57m3JaDCl9zTmMAfnNU55TcKmTOLMq3pu
-         fu3hmdOhhA0aW4mvJoVG/OWCL69f4x+Hm6Gg+OIS4ldrVFHOmf6eI9EdtkPjo1z/1I5N
-         ZOtA==
-X-Gm-Message-State: AOAM533qiwkf/mDYXeuYcj6Sltv5sgLm8atULe7i3sWR04ePk3EOx5nj
-        i/S2aFQp5YYxHWT+qxrjtXPz3cDFLgMSnCzVGVAg5kmRemPzsyNTsRKnMb7chZL+/4u8wLSd/+m
-        iT8KPrciOpFUE0Os0vJ8UXM3bpCpZFWwsNIoBoA1hQMYETSVt1iM1asVwOgT3LZjrl28=
-X-Google-Smtp-Source: ABdhPJzkrj3zDxikqNQ5OyInOR6Eo7M02YCMnerp8SfuR72VPPKsI5TC/SWS/qcbEBYCIrc3iuBZKv03tA==
-X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
- (user=nhuck job=sendgmr) by 2002:a05:6902:10c1:b0:63e:df54:7095 with SMTP id
- w1-20020a05690210c100b0063edf547095mr17311929ybu.433.1649784521194; Tue, 12
- Apr 2022 10:28:41 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 17:28:16 +0000
-In-Reply-To: <20220412172816.917723-1-nhuck@google.com>
-Message-Id: <20220412172816.917723-9-nhuck@google.com>
-Mime-Version: 1.0
-References: <20220412172816.917723-1-nhuck@google.com>
-X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH v4 8/8] fscrypt: Add HCTR2 support for filename encryption
-From:   Nathan Huckleberry <nhuck@google.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+        Tue, 12 Apr 2022 13:31:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C02100E;
+        Tue, 12 Apr 2022 10:29:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 42748619D7;
+        Tue, 12 Apr 2022 17:29:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F2DAC385A5;
+        Tue, 12 Apr 2022 17:29:06 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZbW8euRP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649784544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4VTpQMB6FPkc9MfFhDmCuhLparbR0CcHVnNxwSqiAkQ=;
+        b=ZbW8euRPWSiaKBuJacJ8+ZTX0gthq1mBuxj+4d079R3slGuBehd1GNvnixSfFTw+9RRV8/
+        Lf8UmDxB2StOfSrsXmpDuV5zTO+YGC1PywJ+SHTMEnuJSZMy6SLJiTOfO/heSCdbnRWlO+
+        zgjakwT8Hd8n3HcHvqKdq54xw1mF2wg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c1694ffd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 12 Apr 2022 17:29:03 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, arnd@arndb.de
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
         linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nathan Huckleberry <nhuck@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, x86@kernel.org,
+        linux-xtensa@linux-xtensa.org
+Subject: [PATCH v3 00/10] archs/random: fallback to best raw ktime when no cycle counter
+Date:   Tue, 12 Apr 2022 19:27:44 +0200
+Message-Id: <20220412172754.149498-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HCTR2 is a tweakable, length-preserving encryption mode.  It has the
-same security guarantees as Adiantum, but is intended for use on CPUs
-with dedicated crypto instructions.  It fixes a known weakness with
-filename encryption: when two filenames in the same directory share a
-prefix of >= 16 bytes, with CTS-CBC their encrypted filenames share a
-common substring, leaking information.  HCTR2 does not have this
-problem.
+Hi folks,
 
-More information on HCTR2 can be found here: Length-preserving
-encryption with HCTR2: https://eprint.iacr.org/2021/1441.pdf
+The RNG uses a function called random_get_entropy() basically anytime
+that it needs to timestamp an event. For example, an interrupt comes in,
+and we mix a random_get_entropy() into the entropy pool somehow.
+Somebody mashes their keyboard or moves their mouse around? We mix a
+random_get_entropy() into the entropy pool. It's one of the main
+varieties of input.
 
-Signed-off-by: Nathan Huckleberry <nhuck@google.com>
----
- Documentation/filesystems/fscrypt.rst | 19 ++++++++++++++-----
- fs/crypto/fscrypt_private.h           |  2 +-
- fs/crypto/keysetup.c                  |  7 +++++++
- fs/crypto/policy.c                    |  4 ++++
- include/uapi/linux/fscrypt.h          |  3 ++-
- tools/include/uapi/linux/fscrypt.h    |  3 ++-
- 6 files changed, 30 insertions(+), 8 deletions(-)
+Unfortunately, it's always 0 on a few platforms. The RNG has accumulated
+various hacks to deal with this, but in general it's not great. Surely
+we can do better than 0. In fact, *anything* that's not the same exact
+value all the time would be better than 0. Even a counter that
+increments once per hour would be better than 0! I think you get the
+idea.
 
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index 4d5d50dca65c..09915086abd8 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -337,6 +337,7 @@ Currently, the following pairs of encryption modes are supported:
- - AES-256-XTS for contents and AES-256-CTS-CBC for filenames
- - AES-128-CBC for contents and AES-128-CTS-CBC for filenames
- - Adiantum for both contents and filenames
-+- AES-256-XTS for contents and AES-256-HCTR2 for filenames
- 
- If unsure, you should use the (AES-256-XTS, AES-256-CTS-CBC) pair.
- 
-@@ -357,6 +358,14 @@ To use Adiantum, CONFIG_CRYPTO_ADIANTUM must be enabled.  Also, fast
- implementations of ChaCha and NHPoly1305 should be enabled, e.g.
- CONFIG_CRYPTO_CHACHA20_NEON and CONFIG_CRYPTO_NHPOLY1305_NEON for ARM.
- 
-+AES-256-HCTR2 is another true wide-block encryption mode.  It has the same
-+security guarantees as Adiantum, but is intended for use on CPUs with dedicated
-+crypto instructions. See the paper "Length-preserving encryption with HCTR2"
-+(https://eprint.iacr.org/2021/1441.pdf) for more details. To use HCTR2,
-+CONFIG_CRYPTO_HCTR2 must be enabled. Also, fast implementations of XCTR and
-+POLYVAL should be enabled, e.g. CRYPTO_POLYVAL_ARM64_CE and
-+CRYPTO_AES_ARM64_CE_BLK for ARM64.
-+
- New encryption modes can be added relatively easily, without changes
- to individual filesystems.  However, authenticated encryption (AE)
- modes are not currently supported because of the difficulty of dealing
-@@ -404,11 +413,11 @@ alternatively has the file's nonce (for `DIRECT_KEY policies`_) or
- inode number (for `IV_INO_LBLK_64 policies`_) included in the IVs.
- Thus, IV reuse is limited to within a single directory.
- 
--With CTS-CBC, the IV reuse means that when the plaintext filenames
--share a common prefix at least as long as the cipher block size (16
--bytes for AES), the corresponding encrypted filenames will also share
--a common prefix.  This is undesirable.  Adiantum does not have this
--weakness, as it is a wide-block encryption mode.
-+With CTS-CBC, the IV reuse means that when the plaintext filenames share a
-+common prefix at least as long as the cipher block size (16 bytes for AES), the
-+corresponding encrypted filenames will also share a common prefix.  This is
-+undesirable.  Adiantum and HCTR2 do not have this weakness, as they are
-+wide-block encryption modes.
- 
- All supported filenames encryption modes accept any plaintext length
- >= 16 bytes; cipher block alignment is not required.  However,
-diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-index 5b0a9e6478b5..d8617d01f7bd 100644
---- a/fs/crypto/fscrypt_private.h
-+++ b/fs/crypto/fscrypt_private.h
-@@ -31,7 +31,7 @@
- #define FSCRYPT_CONTEXT_V2	2
- 
- /* Keep this in sync with include/uapi/linux/fscrypt.h */
--#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_ADIANTUM
-+#define FSCRYPT_MODE_MAX	FSCRYPT_MODE_AES_256_HCTR2
- 
- struct fscrypt_context_v1 {
- 	u8 version; /* FSCRYPT_CONTEXT_V1 */
-diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
-index eede186b04ce..ae24b581d3d7 100644
---- a/fs/crypto/keysetup.c
-+++ b/fs/crypto/keysetup.c
-@@ -53,6 +53,13 @@ struct fscrypt_mode fscrypt_modes[] = {
- 		.ivsize = 32,
- 		.blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
- 	},
-+	[FSCRYPT_MODE_AES_256_HCTR2] = {
-+		.friendly_name = "HCTR2",
-+		.cipher_str = "hctr2(aes)",
-+		.keysize = 32,
-+		.security_strength = 32,
-+		.ivsize = 32,
-+	},
- };
- 
- static DEFINE_MUTEX(fscrypt_mode_key_setup_mutex);
-diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
-index ed3d623724cd..fa8bdb8c76b7 100644
---- a/fs/crypto/policy.c
-+++ b/fs/crypto/policy.c
-@@ -54,6 +54,10 @@ static bool fscrypt_valid_enc_modes(u32 contents_mode, u32 filenames_mode)
- 	    filenames_mode == FSCRYPT_MODE_ADIANTUM)
- 		return true;
- 
-+	if (contents_mode == FSCRYPT_MODE_AES_256_XTS &&
-+	    filenames_mode == FSCRYPT_MODE_AES_256_HCTR2)
-+		return true;
-+
- 	return false;
- }
- 
-diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-index 9f4428be3e36..a756b29afcc2 100644
---- a/include/uapi/linux/fscrypt.h
-+++ b/include/uapi/linux/fscrypt.h
-@@ -27,7 +27,8 @@
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
- #define FSCRYPT_MODE_ADIANTUM			9
--/* If adding a mode number > 9, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-+#define FSCRYPT_MODE_AES_256_HCTR2		10
-+/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
- 
- /*
-  * Legacy policy version; ad-hoc KDF and no key verification.
-diff --git a/tools/include/uapi/linux/fscrypt.h b/tools/include/uapi/linux/fscrypt.h
-index 9f4428be3e36..a756b29afcc2 100644
---- a/tools/include/uapi/linux/fscrypt.h
-+++ b/tools/include/uapi/linux/fscrypt.h
-@@ -27,7 +27,8 @@
- #define FSCRYPT_MODE_AES_128_CBC		5
- #define FSCRYPT_MODE_AES_128_CTS		6
- #define FSCRYPT_MODE_ADIANTUM			9
--/* If adding a mode number > 9, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-+#define FSCRYPT_MODE_AES_256_HCTR2		10
-+/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
- 
- /*
-  * Legacy policy version; ad-hoc KDF and no key verification.
+On most platforms, random_get_entropy() is aliased to get_cycles(),
+which makes sense for platforms where get_cycles() is defined. RDTSC,
+for example, has all the characteristics we care about for this
+function: it's fast to acquire (i.e. acceptable in an irq handler),
+pretty high precision, available, forms a 2-monotone distribution, etc.
+But for platforms without that, what is the next best thing?
+
+Sometimes the next best thing is architecture-defined. For example,
+really old MIPS has the CP0 random register, which isn't a cycle
+counter, but is at least something. However, some platforms don't even
+have an architecture-defined fallback.
+
+Fortunately, the timekeeping subsystem has already solved this problem
+of trying to determine what the least bad clock is on constrained
+systems, falling back to jiffies in the worst case. By exporting the raw
+clock, we can get a decent fallback function for when there's no cycle
+counter or architecture-specific function.
+
+This series makes the RNG more useful on: m68k, RISC-V, MIPS, ARM32,
+NIOS II, SPARC32, Xtensa, and Usermode Linux. Previously these platforms
+would, in certain circumstances, but out of luck with regards to having
+any type of event timestamping source in the RNG.
+
+Finally, note that this series isn't about "jitter entropy" or other
+ways of initializing the RNG. That's a different topic for a different
+thread. Please don't let this discussion veer off into that. Here, I'm
+just trying to find a good fallback counter/timer for platforms without
+get_cycles(), a question with limited scope.
+
+If this (or a future revision) looks good to you all and receives the
+requisite acks, my plan was to take these through the random.git tree
+for 5.19, so that I can then build on top of it. Alternatively, maybe
+Thomas wants to take it through his timekeeping tree? Or something else.
+If anybody has strong preferences, please pipe up.
+
+Thanks,
+Jason
+
+Changes v2->v3:
+- Name the fallback function random_get_entropy_fallback(), so that it
+  can be changed out as needed.
+- Include header with prototype in timekeeping.c to avoid compiler
+  warning.
+- Export fallback function symbol.
+
+Changes v1->v2:
+- Use ktime_read_raw_clock() instead of sched_clock(), per Thomas'
+  suggestion.
+- Drop arm64 change.
+- Cleanup header inclusion ordering problem.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Chris Zankel <chris@zankel.net>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: John Stultz <john.stultz@linaro.org>
+Cc: Stephen Boyd <sboyd@kernel.org>
+Cc: Dinh Nguyen <dinguyen@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-um@lists.infradead.org
+Cc: x86@kernel.org
+Cc: linux-xtensa@linux-xtensa.org
+
+Jason A. Donenfeld (10):
+  timekeeping: add raw clock fallback for random_get_entropy()
+  m68k: use fallback for random_get_entropy() instead of zero
+  riscv: use fallback for random_get_entropy() instead of zero
+  mips: use fallback for random_get_entropy() instead of zero
+  arm: use fallback for random_get_entropy() instead of zero
+  nios2: use fallback for random_get_entropy() instead of zero
+  x86: use fallback for random_get_entropy() instead of zero
+  um: use fallback for random_get_entropy() instead of zero
+  sparc: use fallback for random_get_entropy() instead of zero
+  xtensa: use fallback for random_get_entropy() instead of zero
+
+ arch/arm/include/asm/timex.h      |  1 +
+ arch/m68k/include/asm/timex.h     |  2 +-
+ arch/mips/include/asm/timex.h     |  2 +-
+ arch/nios2/include/asm/timex.h    |  2 ++
+ arch/riscv/include/asm/timex.h    |  2 +-
+ arch/sparc/include/asm/timex_32.h |  4 +---
+ arch/um/include/asm/timex.h       |  9 ++-------
+ arch/x86/include/asm/tsc.h        | 10 ++++++++++
+ arch/xtensa/include/asm/timex.h   |  6 ++----
+ include/linux/timex.h             |  8 ++++++++
+ kernel/time/timekeeping.c         | 10 ++++++++++
+ 11 files changed, 39 insertions(+), 17 deletions(-)
+
 -- 
-2.35.1.1178.g4f1659d476-goog
+2.35.1
 
