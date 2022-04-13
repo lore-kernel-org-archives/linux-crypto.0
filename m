@@ -2,95 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09E4AC4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 12:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1C8C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 14:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233195AbiDMMsw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 08:48:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51368 "EHLO
+        id S236062AbiDMOTN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 10:19:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231896AbiDMMsv (ORCPT
+        with ESMTP id S235971AbiDMOTM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 08:48:51 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A08B31EAF3;
-        Wed, 13 Apr 2022 05:46:30 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id 3F3EF92009C; Wed, 13 Apr 2022 14:46:29 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id 2EF4892009B;
-        Wed, 13 Apr 2022 13:46:29 +0100 (BST)
-Date:   Wed, 13 Apr 2022 13:46:29 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tglx@linutronix.de, arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, x86@kernel.org,
-        linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
- instead of zero
-In-Reply-To: <20220413122546.GA11860@alpha.franken.de>
-Message-ID: <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
-References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        Wed, 13 Apr 2022 10:19:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5F2661A3F
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 07:16:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649859404;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CP0hKdNBKFA3C6vNpQyMC9BfObsY0/nex9TqHmZbQhw=;
+        b=OzV3hlmHct3OHFWaeJa7jpXtek+bQ84Q1vtmTQrPgK/JVpRNbfkp9jrMFFF8LzXuEeWrtw
+        pWiNVKMIVux1FDTZ0PqmQL9aAeN6kDcM5PLSmEB/tpl49L3q4IRBD5KBHHJmlWugHzF172
+        AYaPAVaNfpekMNHUcSVDaM1EwpcDKSA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-_MI3sLHiNyq4HSXbyiFXuw-1; Wed, 13 Apr 2022 10:16:40 -0400
+X-MC-Unique: _MI3sLHiNyq4HSXbyiFXuw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EB2086B8A1;
+        Wed, 13 Apr 2022 14:16:39 +0000 (UTC)
+Received: from rules.brq.redhat.com (unknown [10.40.208.43])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E77339E63;
+        Wed, 13 Apr 2022 14:16:33 +0000 (UTC)
+From:   Vladis Dronov <vdronov@redhat.com>
+To:     vdronov@redhat.com, Sunil Goutham <sgoutham@marvell.com>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Joseph Longever <jlongever@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] hwrng: cn10k - Optimize random number generator driver
+Date:   Wed, 13 Apr 2022 16:16:04 +0200
+Message-Id: <20220413141606.8261-1-vdronov@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 13 Apr 2022, Thomas Bogendoerfer wrote:
+Hi,
 
-> > diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
-> > index b05bb70a2e46..abc60a6395e3 100644
-> > --- a/arch/mips/include/asm/timex.h
-> > +++ b/arch/mips/include/asm/timex.h
-> > @@ -94,7 +94,7 @@ static inline unsigned long random_get_entropy(void)
-> >  	else if (likely(imp != PRID_IMP_R6000 && imp != PRID_IMP_R6000A))
-> >  		return read_c0_random();
-> >  	else
-> > -		return 0;	/* no usable register */
-> > +		return random_get_entropy_fallback();	/* no usable register */
-> >  }
-> >  #define random_get_entropy random_get_entropy
-> >  
-> > -- 
-> > 2.35.1
-> 
-> Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+I'm suggesting couple of tweaks and fixes for the CN10K Random Number Generator
+driver. Main points are: fix a logic, optimize a loop and make an error message
+more informative.
 
- Or we could drop the PRID_IMP_R6000/A check and the final `else' clause 
-entirely, as we don't even pretend to support the R6k at all anymore, and 
-this is the final reference remaining.  For one we no longer handle the 
-CPU in `cpu_probe_legacy' so any attempt to boot on such a CPU would 
-inevitably fail as no CPU options would be set (we probably should have a 
-`panic' or suchlike as the default case for the switch statement there).
+Vladis Dronov (2):
+  hwrng: cn10k - Optimize cn10k_rng_read()
+  hwrng: cn10k - Make check_rng_health() return an error code
 
- Therefore I'm all for removing this piece instead, complementing commit 
-3b2db173f012 ("MIPS: Remove unused R6000 support"), where it should have 
-really happened.
+ drivers/char/hw_random/cn10k-rng.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-  Maciej
