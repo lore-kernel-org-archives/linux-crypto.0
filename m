@@ -2,99 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7F3C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 15:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19232C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 19:07:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232957AbiDMQBE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 12:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57918 "EHLO
+        id S236655AbiDMTJs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 15:09:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235138AbiDMQBE (ORCPT
+        with ESMTP id S236660AbiDMTJr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 12:01:04 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17546579C
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 08:58:40 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id p4-20020a631e44000000b00399598a48c5so1330481pgm.1
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 08:58:40 -0700 (PDT)
+        Wed, 13 Apr 2022 15:09:47 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE656E55A
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:07:25 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id q8so1463407wmc.0
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:07:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=esOVAp2irCJ3Vjv6n3zKptfZxPr7nea31riVyn8IwzA=;
-        b=mugdlaJfqV6BzoMRpaiK5wVOC89SQxXWIv/7SA2IWoQeqGxtkOVO5e99zdgZO6ByHl
-         waiSJsfhCL8jqtYwCQ+fct8ZE+R7hsIX7mDJG3xCepYJfGzVjAF17sRtKceMz1Ke6++B
-         jjzcxRMODxHIXlk+civmhu5EkMlEGgmhhDBQ39UBF8bdxHZTihLRAEhZ+kFHYq7ZqRFj
-         BGZxnU/CjHVMuSNUZ+YeDA5zl9m/A0BEuNgfjkFNb5KPtaZ10l4OfZXEfO2hotQy1l2A
-         LmoeViJzWmwIYiPEioHmqUIQ/ZkrOXZayOBr74hv0PSB3twNNCLdMtbml7MOTKkjjJjB
-         KcuA==
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=yV669w6ThAcunb2ptGEHL08NqOMgexsX7UsYGNNFxgw=;
+        b=0+C6Qtec0B3cxtI8hQ7+5AaUwzZpKeedDIxHRwF6kg26C6z5E0gQg5fzxViZaXWWr0
+         LpKCYiZx9zOnCr073zRxmkE9adjWpuBQUT3gFIoOFljLl7uwaTd2u5qVi1uhD4dve56I
+         XFpmauVUwU0ui+/bi1s26wYA/KKin38UZO1pca6AYJlesBKqq9LeZLLtx7u/c1e+Ve4V
+         3r73e52rOJ9RRfEXzhHTV9vGNCVOy0/bzpNhSRqg5gxQZMtSvBNPDpy8S5YkD2AZqWeJ
+         zZVxrxDU37WfINUNkiCvOJHaoR824Ta6zLOQbiWLzCOfO5BDMOgdDBdRaGfVg10SosMZ
+         XkCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=esOVAp2irCJ3Vjv6n3zKptfZxPr7nea31riVyn8IwzA=;
-        b=BHFmYRi+fIUsCg3ENhHFUzeXfsB5wgDsQaJKpngKhyVai0D/KauIOEqOxtXKcsdVPO
-         rrzLVpRjZpbjWHTBcDXUN9LxUc1i4mg8nf5NPUa+9F4gOI1VsdWRwC6vWXZN2Z8J7yI6
-         wLXteSxFBTvFaJvQSLLtxxJuAfzOlJxy1ZwPmSBJwJSO2wyPIZ10YpqM+z2cSwCx4lol
-         Ta1/FtAAEt496FNTZIVLBHVsqVT4f6EMoEG9suKutvSyKn8IWJB7AuVKuOYLvgFYMbLF
-         eCD7b26avL22bEo2eUgfgN3iwXmJYASjm3QaEkWA25L+WLMRmhNura22sIr24YjdqaMC
-         NsqA==
-X-Gm-Message-State: AOAM5325QY64p/xvg9KrJceruMvP+6f8pW2shZ3Qr8Ve+yOjTlrRwwRo
-        zZA1HqbUo7tl0IaaHGvH7qSrjOmYMQjrHqdAofbClmO0WkAPOoiLj2Ukzr53ZAdbbAaE177S6cy
-        SeOw10wRAcGLqRwtJoPZE93SyvR/k4p48T+642i2d2/VZh6shDaB7wJ+4YgwmaeE3sWyFpw==
-X-Google-Smtp-Source: ABdhPJxIsFvYT4ZGMIA9rMTLc6Euk99wC0DXG4Y79LtsWB+wAou+COvDqA1Unv9b4P15r7HklQzyIXoFiTI=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:9bb6:f53:456a:fd2d])
- (user=pgonda job=sendgmr) by 2002:a17:90b:2384:b0:1cb:5223:9dc4 with SMTP id
- mr4-20020a17090b238400b001cb52239dc4mr58307pjb.1.1649865519822; Wed, 13 Apr
- 2022 08:58:39 -0700 (PDT)
-Date:   Wed, 13 Apr 2022 08:58:35 -0700
-Message-Id: <20220413155835.439785-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
-Subject: [PATCH] crypto: ccp - Log when resetting PSP SEV state
-From:   Peter Gonda <pgonda@google.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        David Rientjes <rientjes@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        John Allen <john.allen@amd.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=yV669w6ThAcunb2ptGEHL08NqOMgexsX7UsYGNNFxgw=;
+        b=eZxnZiu8YpquzFwZZOxa/4ikBe+shB6+PvisXhe90Mm1YexXvbbaQmH1ZoLZyQlACQ
+         iYvQDiJd8iYVk4gZMTdd+2+2u0/SkntiyycuM6eL+q4c3hGa2aXkITxvlQd9a2SvJHNx
+         ejP6olkEiGzGesV0wLkj8r9VEswe93htMTryDhmm3reav5pC2XykpGLkOv8c6kmXudAX
+         /QJLfbtA3zsnlF9rBWQk7oL3JrE6XTxWYdyhyngcSUTojuz8VoJ755kB32pCeA7VKVzs
+         U/WHkCy3NJTCVheKvRoMoDHL0QGYRuhbq7frhRKKU7OX+QmVSheRd7SSeezHddd5YhKg
+         yeww==
+X-Gm-Message-State: AOAM530ZUNRahhajKsVx8TakSAFfrjgxB66UxbCjGPiRiVdIfUPO0YHb
+        1q2O9dw8PnaKaRyYFjq8RGY5tg==
+X-Google-Smtp-Source: ABdhPJx1Gjtc8izayGqu0sc2TncLxcVz1bg9m/bNlpID/7ijNYiFAxDc3MO/z1/WPyNVBlTUDwaRUQ==
+X-Received: by 2002:a05:600c:3493:b0:38e:bbbb:26f7 with SMTP id a19-20020a05600c349300b0038ebbbb26f7mr167635wmq.114.1649876843673;
+        Wed, 13 Apr 2022 12:07:23 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id o29-20020a05600c511d00b0038e3532b23csm3551852wms.15.2022.04.13.12.07.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 12:07:23 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     heiko@sntech.de, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v5 02/33] crypto: rockchip: do not use uninitialized variable
+Date:   Wed, 13 Apr 2022 19:06:42 +0000
+Message-Id: <20220413190713.1427956-3-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220413190713.1427956-1-clabbe@baylibre.com>
+References: <20220413190713.1427956-1-clabbe@baylibre.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently when the PSP returns a SECURE_DATA_INVALID error on INIT or
-INIT_EX the driver retries the command once which should reset the PSP's
-state SEV related state, meaning the PSP will regenerate its keying
-material. This is logged with a dbg log but given this will change
-system state this should be logged at a higher priority and with more
-information.
+crypto_info->dev is not yet set, so use pdev->dev instead.
 
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: John Allen <john.allen@amd.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 2 +-
+ drivers/crypto/rockchip/rk3288_crypto.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 6ab93dfd478a..fd928199bf1e 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -435,7 +435,7 @@ static int __sev_platform_init_locked(int *error)
- 		 * initialization function should succeed by replacing the state
- 		 * with a reset state.
- 		 */
--		dev_dbg(sev->dev, "SEV: retrying INIT command");
-+		dev_err(sev->dev, "SEV: retrying INIT command because of SECURE_DATA_INVALID error. Retrying once to reset PSP SEV state.");
- 		rc = init_function(&psp_ret);
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 45cc5f766788..21d3f1458584 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -381,7 +381,7 @@ static int rk_crypto_probe(struct platform_device *pdev)
+ 			       "rk-crypto", pdev);
+ 
+ 	if (err) {
+-		dev_err(crypto_info->dev, "irq request failed.\n");
++		dev_err(&pdev->dev, "irq request failed.\n");
+ 		goto err_crypto;
  	}
- 	if (error)
+ 
 -- 
-2.35.1.1178.g4f1659d476-goog
+2.35.1
 
