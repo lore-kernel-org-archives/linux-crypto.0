@@ -2,65 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A6E7C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 10:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 733C3C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 11:49:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234883AbiDMKYg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 06:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49052 "EHLO
+        id S232730AbiDMLve (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 07:51:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbiDMKYg (ORCPT
+        with ESMTP id S231590AbiDMLvd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 06:24:36 -0400
+        Wed, 13 Apr 2022 07:51:33 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6C065640C;
-        Wed, 13 Apr 2022 03:22:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A765AEE3;
+        Wed, 13 Apr 2022 04:49:12 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 766D261D2D;
-        Wed, 13 Apr 2022 10:22:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C468C385A4;
-        Wed, 13 Apr 2022 10:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649845334;
-        bh=WkWz5MkjiuAA8gGAG2uM+XkeWqraNIKMu2kBxG+E2Iw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sLL4tle5Doriw4yMhQWIHHzUyEJTRxfcFDsei/9Filjn6v/Eby404zt2t92Ak2gd4
-         Hfd2Mk1dycQ4ir8Nij6eOWYfwIbJXCMw/DU4xVWsoux519rIiTrMtnckHnLTIkqnop
-         YiE18jsNW6p6lIJmDq74vdCQZP/q1QOqUHitIYf/bnIK15tTRoH8JSd02kUmWTT2da
-         0lipni9BL+pHEyYYh8U4migDtnjqVJr9zj+zYidUcT/muZkWg+DeJE5VIU1/3K80/z
-         aBiVICrqx87JKqvOEVn9fE2pCWXKT6KoInMuWpcu3TodV4BOi1HYOdp5L6wMd2tVD/
-         aTbZRoIzU9csQ==
-Date:   Wed, 13 Apr 2022 11:22:09 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E62B661DED;
+        Wed, 13 Apr 2022 11:49:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68962C385A3;
+        Wed, 13 Apr 2022 11:49:10 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bfKghglO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649850548;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=q8Ex0PxSMkX6hLvtleAT2Su1yp40GVqczv/isAdXg5A=;
+        b=bfKghglOXKd8bI5FupKt8r0GvzCdggBiAJl20u1AmZ0Jt8yh1RsaEkpS49+Zt06rAVWxf3
+        NO2bU7iJMYLIgAmKhUZ1Xhama/JBzEZ/0Oy3M8eXJyB2zjVjGq9BqX7F863Ew6VVm8wuVV
+        FKvh6oX4HU6XEoKjS4laHtOOgeR7JEU=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 69785bfc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 13 Apr 2022 11:49:08 +0000 (UTC)
+Date:   Wed, 13 Apr 2022 13:48:53 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Catalin Marinas <catalin.marinas@arm.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
         linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] crypto: arm64/sm4 - Fix wrong dependency of NEON/CE
  implementation
-Message-ID: <20220413102209.GB1229@willie-the-truck>
+Message-ID: <Yla4pSKW+6I5jIfS@zx2c4.com>
 References: <20220411031313.35449-1-tianjia.zhang@linux.alibaba.com>
+ <20220413102209.GB1229@willie-the-truck>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220411031313.35449-1-tianjia.zhang@linux.alibaba.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20220413102209.GB1229@willie-the-truck>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 11:13:13AM +0800, Tianjia Zhang wrote:
-> Commit d2825fa9365d ("crypto: sm3,sm4 - move into crypto directory")
-> moved the sm4 library implementation from the lib/crypto directory to
-> the crypto directory and configured the name as CRYPTO_SM4. The arm64
-> SM4 NEON/CE implementation depends on this and needs to be modified
-> uniformly.
+Hi Will,
 
-d2825fa9365d doesn't appear in my tree -- is this something in linux-next?
+On Wed, Apr 13, 2022 at 11:22:09AM +0100, Will Deacon wrote:
+> On Mon, Apr 11, 2022 at 11:13:13AM +0800, Tianjia Zhang wrote:
+> > Commit d2825fa9365d ("crypto: sm3,sm4 - move into crypto directory")
+> > moved the sm4 library implementation from the lib/crypto directory to
+> > the crypto directory and configured the name as CRYPTO_SM4. The arm64
+> > SM4 NEON/CE implementation depends on this and needs to be modified
+> > uniformly.
+> 
+> d2825fa9365d doesn't appear in my tree -- is this something in linux-next?
 
-Will
+This is in Herbert's tree for next:
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=d2825fa9365d
+
+Jason
