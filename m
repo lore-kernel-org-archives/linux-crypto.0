@@ -2,40 +2,40 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A162C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 11:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5963DC43217
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 11:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235351AbiDML6P (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 07:58:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56008 "EHLO
+        id S235387AbiDML61 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 07:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235352AbiDML6L (ORCPT
+        with ESMTP id S235391AbiDML5n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 07:58:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE8831935;
-        Wed, 13 Apr 2022 04:55:50 -0700 (PDT)
+        Wed, 13 Apr 2022 07:57:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7465D31DC2;
+        Wed, 13 Apr 2022 04:55:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 55CBE61DF7;
-        Wed, 13 Apr 2022 11:55:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77BE8C385A4;
-        Wed, 13 Apr 2022 11:55:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E93D61E00;
+        Wed, 13 Apr 2022 11:55:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27237C385A4;
+        Wed, 13 Apr 2022 11:55:06 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cNRrvj+O"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="C2i/j6CO"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1649850945;
+        t=1649850905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0AODITKYyJtEle+S4cX8w6pvyuCOHjrS7aFRmGybDo8=;
-        b=cNRrvj+OHP8TIAgbpphFdAlGJ2gZ3RT0Y6msoDztzpSaAprtyjw1gUz6xAsym8KBCe9Boy
-        aRAM7s86BDMOEcB+Q1VyRNgtz50crRDhmxMI3EkzGGt3A5meZ09jc9avxxwWdzTuu1kRB8
-        Fg2pO36e+u5qb7Uie3inGTl/9GCTM7E=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id becf7c91 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 13 Apr 2022 11:55:45 +0000 (UTC)
+        bh=IHzRJmPvA7OgZjJx+ZTbqcYHIM/uCZIijqXsNo6FZ2U=;
+        b=C2i/j6COYrH2Ir/9YfejGPtCEir9fLD3flKTNzWxM3qtFKGfSSvDfd7Id1ygvKepoM/pol
+        Ki+JEztNXLkml4iO4CuGyueab/W/2Sh2YlsHRyldHvXhCd9zlKZyZklBEK6Qj8S9W7+Lc6
+        9hBIabkwBgsudPJcl+vU3Bd5hRFaD68=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5b8e3e5e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 13 Apr 2022 11:55:04 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         tglx@linutronix.de, arnd@arndb.de
@@ -66,9 +66,9 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
         linux-um@lists.infradead.org, x86@kernel.org,
         linux-xtensa@linux-xtensa.org
-Subject: [PATCH v4 08/11] um: use fallback for random_get_entropy() instead of zero
-Date:   Wed, 13 Apr 2022 13:54:08 +0200
-Message-Id: <20220413115411.21489-9-Jason@zx2c4.com>
+Subject: [PATCH v4 04/11] mips: use fallback for random_get_entropy() instead of zero
+Date:   Wed, 13 Apr 2022 13:54:04 +0200
+Message-Id: <20220413115411.21489-5-Jason@zx2c4.com>
 In-Reply-To: <20220413115411.21489-1-Jason@zx2c4.com>
 References: <20220413115411.21489-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -86,40 +86,27 @@ random_get_entropy_fallback() is super high precision or guaranteed to
 be entropic, but basically anything that's not zero all the time is
 better than returning zero all the time.
 
-This is accomplished by just including the asm-generic code like on
-other architectures, which means we can get rid of the empty stub
-function here.
-
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- arch/um/include/asm/timex.h | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ arch/mips/include/asm/timex.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/um/include/asm/timex.h b/arch/um/include/asm/timex.h
-index e392a9a5bc9b..9f27176adb26 100644
---- a/arch/um/include/asm/timex.h
-+++ b/arch/um/include/asm/timex.h
-@@ -2,13 +2,8 @@
- #ifndef __UM_TIMEX_H
- #define __UM_TIMEX_H
+diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
+index b05bb70a2e46..abc60a6395e3 100644
+--- a/arch/mips/include/asm/timex.h
++++ b/arch/mips/include/asm/timex.h
+@@ -94,7 +94,7 @@ static inline unsigned long random_get_entropy(void)
+ 	else if (likely(imp != PRID_IMP_R6000 && imp != PRID_IMP_R6000A))
+ 		return read_c0_random();
+ 	else
+-		return 0;	/* no usable register */
++		return random_get_entropy_fallback();	/* no usable register */
+ }
+ #define random_get_entropy random_get_entropy
  
--typedef unsigned long cycles_t;
--
--static inline cycles_t get_cycles (void)
--{
--	return 0;
--}
--
- #define CLOCK_TICK_RATE (HZ)
- 
-+#include <asm-generic/timex.h>
-+
- #endif
 -- 
 2.35.1
 
