@@ -2,137 +2,268 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E470DC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Apr 2022 23:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C64C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 04:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231395AbiDLXgW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Apr 2022 19:36:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
+        id S232268AbiDMEXR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 00:23:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231644AbiDLXdY (ORCPT
+        with ESMTP id S229633AbiDMEXR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Apr 2022 19:33:24 -0400
-Received: from mail.thepaulodoom.com (www.thepaulodoom.com [45.77.108.202])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2A31DCB035;
-        Tue, 12 Apr 2022 15:23:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thepaulodoom.com;
-        s=mail; t=1649795811;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8WIUxSILGoa621kLouaI9IDPNclUbXv2ynq7QIv21bM=;
-        b=KFFNZN2iWcO1Y/CgUgrQ92KJQL0qEbb0Fe5iFrZevng+xVaPFf65uhtUVRIwgJ1vCeGWfc
-        bHQz9/6w3ZeJ0Bq8xb+3tuLec/a3bIs1nHidAFsnpOaVgZgkIc4zKf28PE569yMc9855xC
-        9+eoe7ZCWKx99x6/Cdsx0Dozpf81MtVcu96R/eqdLhJ87wlHSkf9z/LPTtiBtqIoVk32Ok
-        irjI2cTn1zPwvX8LIwhnfxW9r6xaLY+77I4j7lAsTiGQkZ0HEg1Wxi+HJcCM0/POpiua7m
-        quReXUCno71MBKkrfCOnTKPcU6sniMeHw86pTBGahsErW0R5L6a5V9kmZ0GWILdjxTDiau
-        AyqTlzYUZslQiQ2rIQhPfsRjlfa2YHZpReonqrJMDEue/2ArJVkidjeOgEPkBs9h4Psf2P
-        BhSfRwKCMfzEnEo0ll5QOo78GyweCrqIMQrPK0RkZd5t9tEEbZAgMMqjo/UFhqNhpYFDTu
-        rcHJJvCOWamUt4OzlK2MjNegYjpKV4jiXey2PFCsLn3hcxm2Gn6nKj0SrDX9Jo8LKl6KAw
-        A3dQfSBJ/46+oGlEDq4xWHL0+FkgUdCvwa3l5hdABoac5/cyhbUA+Qr1IXJLmM3t0TvMeE
-        TGRg8pcFYPQBdC1rER+jCxqfV0gyhEuU9s4QyOaNcj5o8fWuS16XU=
-Received: from hp-amd-paul (c-98-240-189-147.hsd1.mn.comcast.net [98.240.189.147])
-        by vultr.guest (OpenSMTPD) with ESMTPSA id 247ba27f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 12 Apr 2022 20:36:51 +0000 (UTC)
-Date:   Tue, 12 Apr 2022 15:36:47 -0500
-From:   Paul Lemmermann <thepaulodoom@thepaulodoom.com>
-To:     kernel test robot <oliver.sang@intel.com>
-Cc:     0day robot <lkp@intel.com>, LKML <linux-kernel@vger.kernel.org>,
-        lkp@lists.01.org, davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [crypto]  8505b026c9: hwsim.fils_sk_hlp_oom.fail
-Message-ID: <YlXi3wmj30rM258J@hp-amd-paul>
-References: <20220326172051.14722-1-thepaulodoom@thepaulodoom.com>
- <20220411103421.GC21954@xsang-OptiPlex-9020>
+        Wed, 13 Apr 2022 00:23:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CE031939
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 21:20:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A7F2661B89
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 04:20:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE75C385A4;
+        Wed, 13 Apr 2022 04:20:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649823656;
+        bh=c/fCEPTx2HVL8TUiXs+ChZnbqm4uSRO6M1PiAupk78U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KeVb1v8dFZmF+mI1DSKFG/MDNdX/p1xW6Fyg0bq3QuKnTnQprWRjmB2O49LCRfqoD
+         DLuiByllu3mJaGJ+VOglTvrsT8FYzYEwIVQGH+mYZgK71PCnmlRIoIbiyuKsBxTzdl
+         nqCHsv4GxtH3NxIyG7DXgJogoykNxNB0f5CeTnC6ADF8Hk3TRIKcqY9CaQHNKOjGTg
+         x6eK0+SjXZyJ0Px8BYfftGt6G59R34hu+woF+EdwCZpnLRnEBca4hlbGE5Dfw4CuLt
+         5AFqESZJMaXeLcO3z+0cCQYcDJzvIr/I5jfaSI8T20hcQzNSJM2NULDea7czw6W7bN
+         cH82rcAoDv+QA==
+Date:   Tue, 12 Apr 2022 21:20:42 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 3/8] crypto: hctr2 - Add HCTR2 support
+Message-ID: <YlZPmoCPYQgZ6SQZ@sol.localdomain>
+References: <20220412172816.917723-1-nhuck@google.com>
+ <20220412172816.917723-4-nhuck@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220411103421.GC21954@xsang-OptiPlex-9020>
+In-Reply-To: <20220412172816.917723-4-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 06:34:21PM +0800, kernel test robot wrote:
-> 
-> 
-> Greeting,
-> 
-> FYI, we noticed the following commit (built with gcc-9):
-> 
-> commit: 8505b026c91a3e6d6c562a1fe46c2b8c20835de8 ("[PATCH] crypto: aes_generic: fixed styling warnings")
+On Tue, Apr 12, 2022 at 05:28:11PM +0000, Nathan Huckleberry wrote:
+> + /*                                                                               
+> +  * HCTR2 is a length-preserving encryption mode that is efficient on             
+> +  * processors with instructions to accelerate aes and carryless                  
 
-According to the following emails, it was agreed to drop this patch:
-https://lore.kernel.org/linux-crypto/CAMj1kXHCR1nD24WDnYpD4Nu23x9+hw+=7EXOpq7y7m9LDk2J0w@mail.gmail.com/
-https://lore.kernel.org/linux-crypto/20220328125137.bsbvroyxcjw6rl5m@hp-amd-paul/
+"aes" should be capitalized ("AES")
 
-Regards,
-Paul
+> * For more details, see the paper: Length-preserving encryption with HCTR2
 
-> url: https://github.com/intel-lab-lkp/linux/commits/Paul-Lemmermann/crypto-aes_generic-fixed-styling-warnings/20220327-014837
-> base: https://git.kernel.org/cgit/linux/kernel/git/herbert/cryptodev-2.6.git master
-> patch link: https://lore.kernel.org/linux-crypto/20220326172051.14722-1-thepaulodoom@thepaulodoom.com
-> 
-> in testcase: hwsim
-> version: hwsim-x86_64-717e5d7-1_20220325
-> with following parameters:
-> 
-> 	test: group-36
-> 	ucode: 0x21
-> 
-> 
-> 
-> on test machine: 4 threads 1 sockets Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz with 8G memory
-> 
-> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
-> 
-> 
-> 
-> 
-> If you fix the issue, kindly add following tag
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> 
-> 
-> 
-> 2022-04-07 14:59:07 ./run-tests.py fils_sk_hlp_oom
-> DEV: wlan0: 02:00:00:00:00:00
-> DEV: wlan1: 02:00:00:00:01:00
-> DEV: wlan2: 02:00:00:00:02:00
-> APDEV: wlan3
-> APDEV: wlan4
-> START fils_sk_hlp_oom 1/1
-> Test: FILS SK HLP and hostapd OOM
-> Starting AP as-erp
-> Starting AP wlan3 (old add_ap argument type)
-> Connect STA wlan0 to AP
-> Connection timed out
-> Traceback (most recent call last):
->   File "./run-tests.py", line 531, in main
->     t(dev, apdev, params)
->   File "/lkp/benchmarks/hwsim/tests/hwsim/test_fils.py", line 919, in test_fils_sk_hlp_oom
->     dev[0].wait_connected()
->   File "/lkp/benchmarks/hwsim/tests/hwsim/wpasupplicant.py", line 1411, in wait_connected
->     raise Exception(error)
-> Exception: Connection timed out
-> FAIL fils_sk_hlp_oom 10.282646 2022-04-07 14:59:18.241254
-> passed 0 test case(s)
-> skipped 0 test case(s)
-> failed tests: fils_sk_hlp_oom
-> 
-> 
-> 
-> To reproduce:
-> 
->         git clone https://github.com/intel/lkp-tests.git
->         cd lkp-tests
->         sudo bin/lkp install job.yaml           # job file is attached in this email
->         bin/lkp split-job --compatible job.yaml # generate the yaml file for lkp run
->         sudo bin/lkp run generated-yaml-file
-> 
->         # if come across any failure that blocks the test,
->         # please remove ~/.lkp and /lkp dir to run from a clean state.
-> 
-> 
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://01.org/lkp
-> 
+Quote the title to distinguish it from the surrounding text:
+
+	For more details, see the paper "Length-preserving encryption with HCTR2"
+
+> +struct hctr2_tfm_ctx {
+> +	struct crypto_cipher *blockcipher;
+> +	struct crypto_skcipher *xctr;
+> +	struct crypto_shash *polyval;
+> +	u8 L[BLOCKCIPHER_BLOCK_SIZE];
+> +	int hashed_tweak_offset;
+> +	/*
+> +	 * This struct is allocated with extra space for two exported hash
+> +	 * digests.  Since the digest length is not known at compile-time, we
+> +	 * can't add them to the struct directly.
+> +	 *
+> +	 * hashed_tweaklen_even;
+> +	 * hashed_tweaklen_odd;
+> +	 */
+> +};
+
+The digest length *is* known at compile time; it's POLYVAL_DIGEST_SIZE.
+This should say "hash state" instead of "hash digest", and "hash state size"
+instead of "digest length".
+
+> +      /* Sub-requests, must be last */
+> +      union {
+> +              struct shash_desc hash_desc;
+> +              struct skcipher_request xctr_req;
+> +      } u;
+
+Clarify what "last" means above, since it is no longer really last.
+
+> +
+> +	/*
+> +	 * This struct is allocated with extra space for one exported hash
+> +	 * digest.  Since the digest length is not known at compile-time, we
+> +	 * can't add it to the struct directly.
+> +	 *
+> +	 * hashed_tweak;
+> +	 */
+
+Similarly, this should say "hash state" and "hash state size", not "hash digest"
+and "digest length".
+
+> +/*
+> + * HCTR2 requires hashing values based off the tweak length.  Since the kernel
+> + * implementation only supports 32-byte tweaks, we can precompute these when
+> + * setting the key.
+
+It's not clear what "hashing values based off the tweak length" means.  Please
+write something clearer like:
+
+"The input data for each HCTR2 hash step begins with a 16-byte block that
+contains the tweak length and a flag that indicates whether the input is evenly
+divisible into blocks.  Since this implementation only supports one tweak
+length, we precompute the two hash states resulting from hashing the two
+possible values of this initial block.  This reduces by one block the amount of
+data that needs to be hashed for each encryption/decryption."
+
+> + * If the message length is a multiple of the blocksize, we use H(tweak_len * 2
+> + * + 2).  If the message length is not a multiple of the blocksize, we use
+> + * H(tweak_len * 2 + 3).
+> + */
+
+This would basically be covered by what I suggested above.  Repeating the exact
+formula isn't really needed, especially if it's going to be misleading.  (As
+written, it omits the conversion from bytes to bits.)
+
+> +static int hctr2_hash_tweaklens(struct hctr2_tfm_ctx *tctx)
+> +{
+> +	SHASH_DESC_ON_STACK(shash, tfm->polyval);
+> +	__le64 tweak_length_block[2];
+> +	int err;
+> +
+> +	shash->tfm = tctx->polyval;
+> +	memset(tweak_length_block, 0, sizeof(tweak_length_block));
+> +
+> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 2);
+> +	err = crypto_shash_init(shash);
+> +	if (err)
+> +		return err;
+> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
+> +				  POLYVAL_BLOCK_SIZE);
+> +	if (err)
+> +		return err;
+> +	err = crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, true));
+> +	if (err)
+> +		return err;
+> +
+> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 3);
+> +	err = crypto_shash_init(shash);
+> +	if (err)
+> +		return err;
+> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
+> +				  POLYVAL_BLOCK_SIZE);
+> +	if (err)
+> +		return err;
+> +	return crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, false));
+> +}
+
+The two hashed_tweaklens are backwards; odd means even, and even means odd :-(
+Can you write it the logical way?  Even should mean evenly divisible into
+blocks, while odd should mean *not* evenly divisible into blocks.  If you want
+to call it something else, like aligned and unaligned, that could also work, but
+the way you've written it is definitely backwards if we're going with even/odd.
+
+Also, when possible please keep things concise and avoid duplicating code.
+This could be replaced with just the following:
+
+static int hctr2_hash_tweaklen(struct hctr2_tfm_ctx *tctx, bool odd)
+{
+	SHASH_DESC_ON_STACK(shash, unused);
+	__le64 block[2] = { cpu_to_le64(TWEAK_SIZE * 8 * 2 + 2 + odd), 0 };
+
+	shash->tfm = tctx->polyval;
+
+	return crypto_shash_init(shash) ?:
+	       crypto_shash_update(shash, (u8 *)block, sizeof(block)) ?:
+	       crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, odd));
+}
+
+/* (comment here) */
+static int hctr2_hash_tweaklens(struct hctr2_tfm_ctx *tctx)
+{
+	return hctr2_hash_tweaklen(tctx, false) ?:
+	       hctr2_hash_tweaklen(tctx, true);
+}
+
+> +       subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
+> +                         crypto_shash_statesize(polyval), sizeof_field(struct
+> +                         hctr2_request_ctx, u.xctr_req) +
+> +                         crypto_skcipher_reqsize(xctr));
+
+This one needs to be crypto_shash_descsize(), not crypto_shash_statesize().  The
+descsize is the size of the context that follows the struct shash_desc, whereas
+the statesize is the size of the opaque byte array used by crypto_shash_export()
+and crypto_shash_import().  They don't necessarily have the same value.
+
+Also, this would be easier to read if the two parts were indented the same:
+
+        subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
+                          crypto_shash_descsize(polyval),
+                          sizeof_field(struct hctr2_request_ctx, u.xctr_req) +
+                          crypto_skcipher_reqsize(xctr));
+
+> +        if (!strncmp(xctr_alg->base.cra_name, "xctr(", 5)) {                     
+> +                len = strscpy(blockcipher_name, xctr_name + 5,                   
+> +                            sizeof(blockcipher_name));                           
+> +                                                                                 
+> +                if (len < 1)                                                     
+> +                        return -EINVAL;                                          
+> +                                                                                 
+> +                if (blockcipher_name[len - 1] != ')')                            
+> +                        return -EINVAL;                                          
+> +                                                                                 
+> +                blockcipher_name[len - 1] = 0;                                   
+> +        } else                                                                   
+> +                return -EINVAL;                                                  
+
+The "return -EINVAL" cases are leaking memory.  How about writing this as:
+
+	err = -EINVAL;
+	if (strncmp(xctr_alg->base.cra_name, "xctr(", 5))
+		goto err_free_inst;
+	len = strscpy(blockcipher_name, xctr_name + 5,
+		      sizeof(blockcipher_name));
+	if (len < 1)
+		goto err_free_inst;
+	if (blockcipher_name[len - 1] != ')')
+		goto err_free_inst;
+	blockcipher_name[len - 1] = 0;
+
+> + /* hctr2(blockcipher_name) */                                                    
+> + /* hctr2_base(xctr_name, polyval_name) */                                        
+> + static struct crypto_template hctr2_tmpls[] = {                                  
+> +         {                                                                        
+> +                 .name = "hctr2_base",                                            
+> +                 .create = hctr2_create_base,                                     
+> +                 .module = THIS_MODULE,                                           
+> +         }, {                                                                     
+> +                 .name = "hctr2",                                                 
+> +                 .create = hctr2_create,                                          
+> +                 .module = THIS_MODULE,                                           
+> +         }                                                                        
+> + };                                                                               
+
+Perhaps put the comments by the corresponding entries?
+
+static struct crypto_template hctr2_tmpls[] = {
+	{
+		/* hctr2_base(xctr_name, polyval_name) */
+		.name = "hctr2_base",
+		.create = hctr2_create_base,
+		.module = THIS_MODULE,
+	}, {
+		/* hctr2(blockcipher_name) */
+		.name = "hctr2",
+		.create = hctr2_create,
+		.module = THIS_MODULE,
+	}
+};
+
+
+- Eric
