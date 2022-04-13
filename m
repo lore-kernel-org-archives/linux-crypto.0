@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C64C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 04:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890AC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 05:18:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232268AbiDMEXR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 00:23:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
+        id S229478AbiDMFVC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 01:21:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbiDMEXR (ORCPT
+        with ESMTP id S231961AbiDMFU7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 00:23:17 -0400
+        Wed, 13 Apr 2022 01:20:59 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CE031939
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 21:20:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726DB4F45E
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 22:18:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7F2661B89
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 04:20:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE75C385A4;
-        Wed, 13 Apr 2022 04:20:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 160D361BD6
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 05:18:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E9DC385A4;
+        Wed, 13 Apr 2022 05:18:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649823656;
-        bh=c/fCEPTx2HVL8TUiXs+ChZnbqm4uSRO6M1PiAupk78U=;
+        s=k20201202; t=1649827117;
+        bh=YF7s/uh4r2IfvRPpRiLQpidvPG4vDPRr2Md+fbiMFIw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KeVb1v8dFZmF+mI1DSKFG/MDNdX/p1xW6Fyg0bq3QuKnTnQprWRjmB2O49LCRfqoD
-         DLuiByllu3mJaGJ+VOglTvrsT8FYzYEwIVQGH+mYZgK71PCnmlRIoIbiyuKsBxTzdl
-         nqCHsv4GxtH3NxIyG7DXgJogoykNxNB0f5CeTnC6ADF8Hk3TRIKcqY9CaQHNKOjGTg
-         x6eK0+SjXZyJ0Px8BYfftGt6G59R34hu+woF+EdwCZpnLRnEBca4hlbGE5Dfw4CuLt
-         5AFqESZJMaXeLcO3z+0cCQYcDJzvIr/I5jfaSI8T20hcQzNSJM2NULDea7czw6W7bN
-         cH82rcAoDv+QA==
-Date:   Tue, 12 Apr 2022 21:20:42 -0700
+        b=NyhlYkW55CvPKOVhahJkdJlUkScvBgmfBXJGH8nWB6lCnOVSt0E696tu1iKdx+GxO
+         krHfMqRmJ7ATyuCE/BNioPT7SkboMtYuuDM0PRjtSYUphe2fQDXCVbqv+lFEmCh1n7
+         yFTpiQ5kjEatUPwH+Vu8Yp2u2if/7oz0LhTdVteD7rXmNY78MiRLsmTO4c/mzlC7YY
+         NILCNAcFZUMm7oArgG0JtzuJVjPUAsLXtoR+0AvMIwvT+qS8Ij0t24k5eWmd4lK81X
+         8R8d3PwqkjrqNs4GZ8aFuIz0mcZ4armz401TT2o/LnvlSszmoMjBQAjqE7AZ75fHK1
+         PBix6bHrWsZYw==
+Date:   Tue, 12 Apr 2022 22:18:35 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Nathan Huckleberry <nhuck@google.com>
 Cc:     linux-crypto@vger.kernel.org,
@@ -42,228 +42,279 @@ Cc:     linux-crypto@vger.kernel.org,
         Paul Crowley <paulcrowley@google.com>,
         Sami Tolvanen <samitolvanen@google.com>,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v4 3/8] crypto: hctr2 - Add HCTR2 support
-Message-ID: <YlZPmoCPYQgZ6SQZ@sol.localdomain>
+Subject: Re: [PATCH v4 6/8] crypto: x86/polyval: Add PCLMULQDQ accelerated
+ implementation of POLYVAL
+Message-ID: <YlZdK8u0hL8hxzxh@sol.localdomain>
 References: <20220412172816.917723-1-nhuck@google.com>
- <20220412172816.917723-4-nhuck@google.com>
+ <20220412172816.917723-7-nhuck@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220412172816.917723-4-nhuck@google.com>
+In-Reply-To: <20220412172816.917723-7-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 12, 2022 at 05:28:11PM +0000, Nathan Huckleberry wrote:
-> + /*                                                                               
-> +  * HCTR2 is a length-preserving encryption mode that is efficient on             
-> +  * processors with instructions to accelerate aes and carryless                  
+On Tue, Apr 12, 2022 at 05:28:14PM +0000, Nathan Huckleberry wrote:
+> diff --git a/arch/x86/crypto/polyval-clmulni_asm.S b/arch/x86/crypto/polyval-clmulni_asm.S
+[...]
+> +/*
+> + * Computes the product of two 128-bit polynomials at the memory locations
+> + * specified by (MSG + 16*i) and (KEY_POWERS + 16*i) and XORs the components of the
+> + * 256-bit product into LO, MI, HI.
+> + *
+> + * The multiplication produces four parts:
+> + *   LOW: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of each polynomial
+> + *   MID1: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of the first polynomial and the top 64-bits of the second
+> + *   MID2: The polynomial given by performing carryless multiplication of the
+> + *   bottom 64-bits of the second polynomial and the top 64-bits of the first
+> + *   HIGH: The polynomial given by performing carryless multiplication of the
+> + *   top 64-bits of each polynomial
+> + *
+> + * We compute:
+> + *  LO += LOW
+> + *  MI += MID1 + MID2
+> + *  HI += HIGH
+> + *
+> + * LO = [L0_1 : LO_0]
+> + * MI = [MI_1 : MI_0]
+> + * HI = [HI_1 : HI_0]
 
-"aes" should be capitalized ("AES")
+One of the "LO" has a 0 instead of an O.
 
-> * For more details, see the paper: Length-preserving encryption with HCTR2
+> +.macro schoolbook1_iteration i xor_sum
+> +	movups (16*\i)(MSG), %xmm0
+> +	.if (\i == 0 && \xor_sum == 1)
+> +		pxor SUM, %xmm0
+> +	.endif
+> +	vpclmulqdq $0x00, (16*\i)(KEY_POWERS), %xmm0, %xmm2
+> +	vpclmulqdq $0x01, (16*\i)(KEY_POWERS), %xmm0, %xmm1
+> +	vpclmulqdq $0x11, (16*\i)(KEY_POWERS), %xmm0, %xmm3
+> +	vpclmulqdq $0x10, (16*\i)(KEY_POWERS), %xmm0, %xmm4
+> +	vpxor %xmm2, LO, LO
+> +	vpxor %xmm1, MI, MI
+> +	vpxor %xmm4, MI, MI
+> +	vpxor %xmm3, HI, HI
+> +.endm
 
-Quote the title to distinguish it from the surrounding text:
-
-	For more details, see the paper "Length-preserving encryption with HCTR2"
-
-> +struct hctr2_tfm_ctx {
-> +	struct crypto_cipher *blockcipher;
-> +	struct crypto_skcipher *xctr;
-> +	struct crypto_shash *polyval;
-> +	u8 L[BLOCKCIPHER_BLOCK_SIZE];
-> +	int hashed_tweak_offset;
-> +	/*
-> +	 * This struct is allocated with extra space for two exported hash
-> +	 * digests.  Since the digest length is not known at compile-time, we
-> +	 * can't add them to the struct directly.
-> +	 *
-> +	 * hashed_tweaklen_even;
-> +	 * hashed_tweaklen_odd;
-> +	 */
-> +};
-
-The digest length *is* known at compile time; it's POLYVAL_DIGEST_SIZE.
-This should say "hash state" instead of "hash digest", and "hash state size"
-instead of "digest length".
-
-> +      /* Sub-requests, must be last */
-> +      union {
-> +              struct shash_desc hash_desc;
-> +              struct skcipher_request xctr_req;
-> +      } u;
-
-Clarify what "last" means above, since it is no longer really last.
+Can you allocate the xmm1-xmm4 registers in a logical order?  Either in order as
+they are first used, or in the same order as the vpclmulqdq constants.  It
+doesn't actually matter, of course, but I don't understand the logic here.  Did
+you also consider my suggestion
+https://lore.kernel.org/r/YhA%2FtAaDi%2F3e35Q1@sol.localdomain which would avoid
+adjacent instructions that depend on each other, like the XORs into MI that you
+have?  In that version I had allocated the registers in the same order as the
+vpclmulqdq constants, so there was some logic behind it; it wasn't just random.
+(Whereas what you have here seems "random" to me!)
 
 > +
-> +	/*
-> +	 * This struct is allocated with extra space for one exported hash
-> +	 * digest.  Since the digest length is not known at compile-time, we
-> +	 * can't add it to the struct directly.
-> +	 *
-> +	 * hashed_tweak;
-> +	 */
+> +/*
+> + * Performs the same computation as schoolbook1_iteration, except we expect the
+> + * arguments to already be loaded into xmm0 and xmm1.
+> + */
+> +.macro schoolbook1_noload
+> +	vpclmulqdq $0x01, %xmm0, %xmm1, MI
+> +	vpclmulqdq $0x10, %xmm0, %xmm1, %xmm2
+> +	vpclmulqdq $0x00, %xmm0, %xmm1, LO
+> +	vpclmulqdq $0x11, %xmm0, %xmm1, HI
+> +	vpxor %xmm2, MI, MI
+> +.endm
 
-Similarly, this should say "hash state" and "hash state size", not "hash digest"
-and "digest length".
+The comment should be updated to to mention the second difference from
+schoolbook1_iteration:
+
+"... and we set the result registers LO, MI, and HI directly rather than XOR'ing
+into them."
+
+> + * So our final computation is:
+> + *   T = T_1 : T_0 = g*(x) * P_0
+> + *   V = V_1 : V_0 = g*(x) * (T_0 + P_1)
+
+Above should use "P_1 + T_0" to keep using a consistent order.
+
+> rather than directly XORing P_1 : P_0, T_0 : T1 into dest.
+
+"rather than separately XORing P_1 : P_0 and T_0 : T_1 into dest"
 
 > +/*
-> + * HCTR2 requires hashing values based off the tweak length.  Since the kernel
-> + * implementation only supports 32-byte tweaks, we can precompute these when
-> + * setting the key.
-
-It's not clear what "hashing values based off the tweak length" means.  Please
-write something clearer like:
-
-"The input data for each HCTR2 hash step begins with a 16-byte block that
-contains the tweak length and a flag that indicates whether the input is evenly
-divisible into blocks.  Since this implementation only supports one tweak
-length, we precompute the two hash states resulting from hashing the two
-possible values of this initial block.  This reduces by one block the amount of
-data that needs to be hashed for each encryption/decryption."
-
-> + * If the message length is a multiple of the blocksize, we use H(tweak_len * 2
-> + * + 2).  If the message length is not a multiple of the blocksize, we use
-> + * H(tweak_len * 2 + 3).
+> + * Compute schoolbook multiplication for 8 blocks
+> + * m_0h^8 + ... + m_7h^1
+> + *
+> + * If reduce is set, also computes the montgomery reduction of the
+> + * previous full_stride call and XORs with the first message block.
+> + * (m_0 + REDUCE(PL, PH))h^8 + ... + m_7h^1.
+> + * I.e., the first multiplication uses m_0 + REDUCE(PL, PH) instead of m_0.
+> + *
+> + * Sets PL, PH
+> + * Clobbers LO, HI, MI
+> + *
 > + */
 
-This would basically be covered by what I suggested above.  Repeating the exact
-formula isn't really needed, especially if it's going to be misleading.  (As
-written, it omits the conversion from bytes to bits.)
+The "Sets PL, PH ... Clobbers LO, HI, MI" part is incomplete.  PL and PH are
+sometimes used as inputs, not just set, and other registers are clobbered too.
 
-> +static int hctr2_hash_tweaklens(struct hctr2_tfm_ctx *tctx)
+This part of the comment should either be complete, or it should be removed.
+
+> +.macro full_stride reduce
+> +	pxor LO, LO
+> +	pxor HI, HI
+> +	pxor MI, MI
+> +
+> +	schoolbook1_iteration 7 0
+> +	.if (\reduce)
+
+.if expressions don't need parentheses around them; this isn't C.
+
+> diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
+> new file mode 100644
+> index 000000000000..4f62284f980c
+> --- /dev/null
+> +++ b/arch/x86/crypto/polyval-clmulni_glue.c
+[...]
+
+> +#include <crypto/algapi.h>
+> +#include <crypto/cryptd.h>
+> +#include <crypto/gf128mul.h>
+> +#include <crypto/internal/hash.h>
+> +#include <crypto/internal/simd.h>
+> +#include <crypto/polyval.h>
+> +#include <linux/crypto.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <asm/cpu_device_id.h>
+> +#include <asm/simd.h>
+
+Includes that are no longer required should be removed.  At least
+<crypto/cryptd.h> is no longer required.
+
+> +static void reverse_be128(be128 *x)
 > +{
-> +	SHASH_DESC_ON_STACK(shash, tfm->polyval);
-> +	__le64 tweak_length_block[2];
-> +	int err;
+> +	__be64 a = x->a;
+> +	__be64 b = x->b;
 > +
-> +	shash->tfm = tctx->polyval;
-> +	memset(tweak_length_block, 0, sizeof(tweak_length_block));
-> +
-> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 2);
-> +	err = crypto_shash_init(shash);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
-> +				  POLYVAL_BLOCK_SIZE);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, true));
-> +	if (err)
-> +		return err;
-> +
-> +	tweak_length_block[0] = cpu_to_le64(TWEAK_SIZE * 8 * 2 + 3);
-> +	err = crypto_shash_init(shash);
-> +	if (err)
-> +		return err;
-> +	err = crypto_shash_update(shash, (u8 *)tweak_length_block,
-> +				  POLYVAL_BLOCK_SIZE);
-> +	if (err)
-> +		return err;
-> +	return crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, false));
+> +	x->a = swab64(b);
+> +	x->b = swab64(a);
 > +}
 
-The two hashed_tweaklens are backwards; odd means even, and even means odd :-(
-Can you write it the logical way?  Even should mean evenly divisible into
-blocks, while odd should mean *not* evenly divisible into blocks.  If you want
-to call it something else, like aligned and unaligned, that could also work, but
-the way you've written it is definitely backwards if we're going with even/odd.
+This is generating warnings from 'sparse':
 
-Also, when possible please keep things concise and avoid duplicating code.
-This could be replaced with just the following:
+	arch/x86/crypto/polyval-clmulni_glue.c:56:16: warning: cast from restricted __be64
+	arch/x86/crypto/polyval-clmulni_glue.c:56:14: warning: incorrect type in assignment (different base types)
+	arch/x86/crypto/polyval-clmulni_glue.c:56:14:    expected restricted __be64 [usertype] a
+	arch/x86/crypto/polyval-clmulni_glue.c:56:14:    got unsigned long long [usertype]
+	arch/x86/crypto/polyval-clmulni_glue.c:57:16: warning: cast from restricted __be64
+	arch/x86/crypto/polyval-clmulni_glue.c:57:14: warning: incorrect type in assignment (different base types)
+	arch/x86/crypto/polyval-clmulni_glue.c:57:14:    expected restricted __be64 [usertype] b
+	arch/x86/crypto/polyval-clmulni_glue.c:57:14:    got unsigned long long [usertype]
 
-static int hctr2_hash_tweaklen(struct hctr2_tfm_ctx *tctx, bool odd)
-{
-	SHASH_DESC_ON_STACK(shash, unused);
-	__le64 block[2] = { cpu_to_le64(TWEAK_SIZE * 8 * 2 + 2 + odd), 0 };
+Make sure to run 'make C=2' on changed files.
 
-	shash->tfm = tctx->polyval;
+> +
+> +static void generic_polyval_mul(u8 *op1, const u8 *op2)
+> +{
+> +	be128 a, b;
+> +
+> +	// Assume one argument is in Montgomery form and one is not.
+> +	memcpy(&a, op1, sizeof(a));
+> +	memcpy(&b, op2, sizeof(b));
+> +	reverse_be128(&a);
+> +	reverse_be128(&b);
+> +	gf128mul_x_lle(&a, &a);
+> +	gf128mul_lle(&a, &b);
+> +	reverse_be128(&a);
+> +	memcpy(op1, &a, sizeof(a));
+> +}
+> +
+> +static void generic_polyval_update(const u8 *in, struct polyval_ctx *keys,
+> +			  size_t nblocks, u8 *accumulator)
+> +{
+> +	while (nblocks--) {
+> +		crypto_xor(accumulator, in, POLYVAL_BLOCK_SIZE);
+> +		generic_polyval_mul(accumulator, keys->key_powers[7]);
+> +		in += POLYVAL_BLOCK_SIZE;
+> +	}
+> +}
 
-	return crypto_shash_init(shash) ?:
-	       crypto_shash_update(shash, (u8 *)block, sizeof(block)) ?:
-	       crypto_shash_export(shash, hctr2_hashed_tweaklen(tctx, odd));
-}
+The above is hardcoding 7, whereas other places are using
+NUM_PRECOMPUTE_POWERS-1 for the same thing.
 
-/* (comment here) */
-static int hctr2_hash_tweaklens(struct hctr2_tfm_ctx *tctx)
-{
-	return hctr2_hash_tweaklen(tctx, false) ?:
-	       hctr2_hash_tweaklen(tctx, true);
-}
+The naming of NUM_PRECOMPUTE_POWERS is also not great.  It's missing a "D" at
+the end of "PRECOMPUTE", right?  I think NUM_KEY_POWERS would make more sense.
 
-> +       subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
-> +                         crypto_shash_statesize(polyval), sizeof_field(struct
-> +                         hctr2_request_ctx, u.xctr_req) +
-> +                         crypto_skcipher_reqsize(xctr));
+generic_polyval_update() is also duplicated in both
+arch/x86/crypto/polyval-clmulni_glue.c and arch/arm64/crypto/polyval-ce-glue.c.
+How about putting it in crypto/polyval.c to share the code?  It would need to be
+passed the key directly, rather than the implementation-specific polyval_ctx,
+but otherwise it would work, right?
 
-This one needs to be crypto_shash_descsize(), not crypto_shash_statesize().  The
-descsize is the size of the context that follows the struct shash_desc, whereas
-the statesize is the size of the opaque byte array used by crypto_shash_export()
-and crypto_shash_import().  They don't necessarily have the same value.
+> +
+> +static void internal_polyval_update(const u8 *in, struct polyval_ctx *keys,
+> +			  size_t nblocks, u8 *accumulator)
 
-Also, this would be easier to read if the two parts were indented the same:
+struct polyval_ctx should be 'const', everywhere except in ->setkey().
 
-        subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
-                          crypto_shash_descsize(polyval),
-                          sizeof_field(struct hctr2_request_ctx, u.xctr_req) +
-                          crypto_skcipher_reqsize(xctr));
+> +static int polyval_init(struct shash_desc *desc)
+> +{
+> +	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
+> +
+> +	memset(dctx, 0, sizeof(*dctx));
+> +
+> +	return 0;
+> +}
+> +
+> +static int polyval_setkey(struct crypto_shash *tfm,
+> +			const u8 *key, unsigned int keylen)
+> +{
+> +	struct polyval_ctx *ctx = crypto_shash_ctx(tfm);
+> +	int i;
+> +
+> +	if (keylen != POLYVAL_BLOCK_SIZE)
+> +		return -EINVAL;
+> +
+> +	memcpy(ctx->key_powers[NUM_PRECOMPUTE_POWERS-1], key,
+> +	       POLYVAL_BLOCK_SIZE);
+> +
+> +	for (i = NUM_PRECOMPUTE_POWERS-2; i >= 0; i--) {
+> +		memcpy(ctx->key_powers[i], key, POLYVAL_BLOCK_SIZE);
+> +		internal_polyval_mul(ctx->key_powers[i], ctx->key_powers[i+1]);
+> +	}
+> +
+> +	return 0;
+> +}
 
-> +        if (!strncmp(xctr_alg->base.cra_name, "xctr(", 5)) {                     
-> +                len = strscpy(blockcipher_name, xctr_name + 5,                   
-> +                            sizeof(blockcipher_name));                           
-> +                                                                                 
-> +                if (len < 1)                                                     
-> +                        return -EINVAL;                                          
-> +                                                                                 
-> +                if (blockcipher_name[len - 1] != ')')                            
-> +                        return -EINVAL;                                          
-> +                                                                                 
-> +                blockcipher_name[len - 1] = 0;                                   
-> +        } else                                                                   
-> +                return -EINVAL;                                                  
+polyval_setkey() is the first step, so it would make sense to put its definition
+before polyval_init() so that everything more or less goes in order.
 
-The "return -EINVAL" cases are leaking memory.  How about writing this as:
+Also: the names of these functions, and polyval_update and polyval_final below,
+collide with the same-named functions in crypto/polyval-generic.c.  This is sort
+of okay since these are all static, but it is bad practice as it can create
+confusing stack traces and require that the functions be renamed if/when things
+get refactored in the future.  How about calling these
+polyval_x86_{setkey,init,update,final}()?
 
-	err = -EINVAL;
-	if (strncmp(xctr_alg->base.cra_name, "xctr(", 5))
-		goto err_free_inst;
-	len = strscpy(blockcipher_name, xctr_name + 5,
-		      sizeof(blockcipher_name));
-	if (len < 1)
-		goto err_free_inst;
-	if (blockcipher_name[len - 1] != ')')
-		goto err_free_inst;
-	blockcipher_name[len - 1] = 0;
+Similarly, polyval_arm64_{setkey,init,update,final} in the arm64 version.
 
-> + /* hctr2(blockcipher_name) */                                                    
-> + /* hctr2_base(xctr_name, polyval_name) */                                        
-> + static struct crypto_template hctr2_tmpls[] = {                                  
-> +         {                                                                        
-> +                 .name = "hctr2_base",                                            
-> +                 .create = hctr2_create_base,                                     
-> +                 .module = THIS_MODULE,                                           
-> +         }, {                                                                     
-> +                 .name = "hctr2",                                                 
-> +                 .create = hctr2_create,                                          
-> +                 .module = THIS_MODULE,                                           
-> +         }                                                                        
-> + };                                                                               
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index aa06af0e0ebe..c6aec88213b1 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -787,6 +787,16 @@ config CRYPTO_POLYVAL
+>  	  POLYVAL is the hash function used in HCTR2.  It is not a general-purpose
+>  	  cryptographic hash function.
+>  
+> +config CRYPTO_POLYVAL_CLMUL_NI
+> +	tristate "POLYVAL hash function (CLMUL-NI accelerated)"
+> +	depends on X86 && 64BIT
+> +	select CRYPTO_CRYPTD
+> +	select CRYPTO_POLYVAL
+> +	help
+> +	  This is the x86_64 CLMUL-NI accelerated implementation of POLYVAL. It is
+> +	  used to efficiently implement HCTR2 on x86-64 processors that support
+> +	  carry-less multiplication instructions.
 
-Perhaps put the comments by the corresponding entries?
-
-static struct crypto_template hctr2_tmpls[] = {
-	{
-		/* hctr2_base(xctr_name, polyval_name) */
-		.name = "hctr2_base",
-		.create = hctr2_create_base,
-		.module = THIS_MODULE,
-	}, {
-		/* hctr2(blockcipher_name) */
-		.name = "hctr2",
-		.create = hctr2_create,
-		.module = THIS_MODULE,
-	}
-};
-
+Selecting CRYPTO_CRYPTD is no longer required.
 
 - Eric
