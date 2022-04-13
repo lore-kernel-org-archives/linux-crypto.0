@@ -2,87 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBB8C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 19:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFBAC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 19:31:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234951AbiDMTPq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 15:15:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
+        id S238066AbiDMTdk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 15:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238182AbiDMTPP (ORCPT
+        with ESMTP id S234491AbiDMTdj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 15:15:15 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68F0D7247A
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:12:02 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id c7so4059529wrd.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:12:02 -0700 (PDT)
+        Wed, 13 Apr 2022 15:33:39 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1C776292
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:31:17 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id t25so3652987edt.9
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:31:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=b4u0FSgm7UEprR/XOQsUro7nRxCCkzBs0dJXK5VF/nw=;
-        b=be2XYlIV3hKuMHZFfs8ZgBhkPTakJ/0hO/iue5Z9Kxxn6Ubxh4af/umxn+J3DscMba
-         JQU57e8smOdtiaSa5iIkpnF463fAwCXB1VXZwgdbhuEUUS0HcabTZtPZ97zNXURgaKtl
-         Vnqs4DIw2TLx2psZVueuti+6LyTa+uSBem33NxP40D+mP1PIVE6iDpinvWBzpLZgKo5z
-         AOUgO81VsI+KeXCbHPXyY7Ep1qo9E1TYxxecm3irzNJ7awAJCliiF7MIm/81I/uuIhXD
-         RHe2IeDavYS3xaGYb19vOHTfmYkQoI6pwCBvy86e+09+MtU8vSc49r95vLgLLAEfOx9r
-         A4Qg==
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=frTEyC0/+CfTIF4PYPNiHQ4Gsfm5fIkYJSxFNrCEuso=;
+        b=USSnSZtoD5qwvH/yvxHC79p7rIcFBfYSAwCS/8l+UAOQVYZUKJ+vDuBaAJB/nJmEPx
+         g7xJs94b53G9SqzrTEyV7LiPRqY0+FlEUHXsFaG0byJs5XO9935tw+7S/EMAJuTtQhFu
+         VjfWoAx3Fgh06C/08DWnLONaqlnuWzNwZGJHbJI9za5M55H9pRP/jioGj6z6SD5mSuf5
+         OhqjpbUnqQeW/s2ZVSve+5lCImK8h2qDomy0YIMCtTsk3zqfpMMDy2LoFmTLoUjvNvp4
+         WpBvZbIOz7I46fmHuumVjEpqpu1SEQkwedZ3gusL5+0cPXdh1QTDfn/NzBsWi6w2TCm3
+         pPRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=b4u0FSgm7UEprR/XOQsUro7nRxCCkzBs0dJXK5VF/nw=;
-        b=wgreCFGL9s2mgOdCuFGMa9qg+KcU8H91dIyy/v5hc6Cq3P3w06MphYDQ+9O6Rh3R+z
-         fxzb+x5KrOSEsoIpFHbttRDeqAFicPzYgXhLSejnJnBMh+AjgfTixpS1xUUQe8lYAH3V
-         x7zJ1Z8GBAgikval9/31hGaWh0+nFFHqQwD+NmYu4KOnq8O777ZtRYNiA53Rso6Qx27N
-         YoadrxP9DyPEKsoMc7GRlmCdlRz1SpjulOiFRBT6+fQmz7fGRP4Mx1SNzoW2fOj/3fYI
-         VvWgvOwt7Jn/JJqJk8SNA5CXosaZDuUbkximjRxFGfTFxdGmpYB0YwFIx0U1XNSSrqJz
-         D02g==
-X-Gm-Message-State: AOAM532YngVsMU2CArg+NWQ8lv7ZdEjEDrjz6KGJPUCZAC/5N+8uv4Kg
-        l5Masqx72qTt2WLaElfqOVxtWxI8vrKm1w==
-X-Google-Smtp-Source: ABdhPJyIhECBx1HpwCm7GI17j6xzSXop0bZhpHOm87wOsfJOmVErCvF2jL7dngSacO+wqhrLtSmpnw==
-X-Received: by 2002:a5d:6983:0:b0:207:a226:df4b with SMTP id g3-20020a5d6983000000b00207a226df4bmr269887wru.192.1649877121261;
-        Wed, 13 Apr 2022 12:12:01 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id o6-20020a05600002c600b00207a389117csm11963336wry.53.2022.04.13.12.12.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Apr 2022 12:12:00 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     arno@natisbad.org, bbrezillon@kernel.org,
-        herbert@gondor.apana.org.au, schalla@marvell.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 1/2] crypto: marvell: cesa: ECB does not IV
-Date:   Wed, 13 Apr 2022 19:11:54 +0000
-Message-Id: <20220413191155.1429137-1-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.25.1
+        bh=frTEyC0/+CfTIF4PYPNiHQ4Gsfm5fIkYJSxFNrCEuso=;
+        b=xkj7cmHm/Uw2jGUBuEZDO82RrUkUO1t4dNlkX3bnpoJpoqHnn9qnEw3jgLYWblTr57
+         BO1+WjFVlmyRtOCBprCnR3MWfVc2GoXxD+sIDultNiDqFeZ6zur3k602cH5K2jADaS4U
+         kCS/JAD0wvhIlx9EVoP448MA6aEDMFp9UKU1/5oOgVVNdGByQRTGaOw+wbwh4keScaQi
+         6XhsIMoPTLsm1jY/J9f/caiVP7ydoDHuyU4FHGrX6SCk0uNX29oPP7cBtjA5LcYehAWf
+         kp7nec0uUqhVFMGPEkZIpI6zoozqZuzLErAQaNVIs75shzjIuLw+psWUGJr5MkymEzwW
+         nakw==
+X-Gm-Message-State: AOAM532zmeybaHFjvypwUwbyM2Twr79l+Aeb4wHZTFg0hUb04Ibo+ex6
+        I4XlBGL6vPePFVgt4tsMDGRbRg==
+X-Google-Smtp-Source: ABdhPJxCWuXB+xuTb6sKG9nbhRjhHzVASERrwIqlT8IubgeDh/aIhOShiVtJmLn6LiaKB+HEOkgWow==
+X-Received: by 2002:a05:6402:5250:b0:41d:8556:4191 with SMTP id t16-20020a056402525000b0041d85564191mr14027035edd.269.1649878275612;
+        Wed, 13 Apr 2022 12:31:15 -0700 (PDT)
+Received: from [192.168.0.207] (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
+        by smtp.gmail.com with ESMTPSA id e26-20020a50ec9a000000b004193fe50151sm1584782edr.9.2022.04.13.12.31.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Apr 2022 12:31:15 -0700 (PDT)
+Message-ID: <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
+Date:   Wed, 13 Apr 2022 21:31:13 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to
+ YAML
+Content-Language: en-US
+To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
+        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
+        robh+dt@kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220413190713.1427956-1-clabbe@baylibre.com>
+ <20220413190713.1427956-25-clabbe@baylibre.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20220413190713.1427956-25-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The DES3 ECB has an IV size set but ECB does not need one.
+On 13/04/2022 21:07, Corentin Labbe wrote:
+> Convert rockchip-crypto to YAML.
 
-Fixes: 4ada483978237 ("crypto: marvell/cesa - add Triple-DES support")
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- drivers/crypto/marvell/cesa/cipher.c | 1 -
- 1 file changed, 1 deletion(-)
+Thank you for your patch. There is something to discuss/improve.
 
-diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
-index b739d3b873dc..c6f2fa753b7c 100644
---- a/drivers/crypto/marvell/cesa/cipher.c
-+++ b/drivers/crypto/marvell/cesa/cipher.c
-@@ -624,7 +624,6 @@ struct skcipher_alg mv_cesa_ecb_des3_ede_alg = {
- 	.decrypt = mv_cesa_ecb_des3_ede_decrypt,
- 	.min_keysize = DES3_EDE_KEY_SIZE,
- 	.max_keysize = DES3_EDE_KEY_SIZE,
--	.ivsize = DES3_EDE_BLOCK_SIZE,
- 	.base = {
- 		.cra_name = "ecb(des3_ede)",
- 		.cra_driver_name = "mv-ecb-des3-ede",
--- 
-2.35.1
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - rockchip,rk3288-crypto
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 4
+> +
+> +  clock-names:
+> +    maxItems: 4
 
+This is not needed and dt_bindings_check should complain.
+
+> +    items:
+> +      const: aclk
+> +      const: hclk
+> +      const: sclk
+> +      const: apb_pclk
+> +
+> +  resets:
+> +    maxItems: 1
+> +
+> +  reset-names:
+> +    maxItems: 1
+
+The same.
+
+
+Best regards,
+Krzysztof
