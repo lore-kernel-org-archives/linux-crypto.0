@@ -2,115 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFBAC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 19:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C961C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 22:36:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238066AbiDMTdk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 15:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40206 "EHLO
+        id S234591AbiDMWii (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 18:38:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234491AbiDMTdj (ORCPT
+        with ESMTP id S234083AbiDMWih (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 15:33:39 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1C776292
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:31:17 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id t25so3652987edt.9
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 12:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=frTEyC0/+CfTIF4PYPNiHQ4Gsfm5fIkYJSxFNrCEuso=;
-        b=USSnSZtoD5qwvH/yvxHC79p7rIcFBfYSAwCS/8l+UAOQVYZUKJ+vDuBaAJB/nJmEPx
-         g7xJs94b53G9SqzrTEyV7LiPRqY0+FlEUHXsFaG0byJs5XO9935tw+7S/EMAJuTtQhFu
-         VjfWoAx3Fgh06C/08DWnLONaqlnuWzNwZGJHbJI9za5M55H9pRP/jioGj6z6SD5mSuf5
-         OhqjpbUnqQeW/s2ZVSve+5lCImK8h2qDomy0YIMCtTsk3zqfpMMDy2LoFmTLoUjvNvp4
-         WpBvZbIOz7I46fmHuumVjEpqpu1SEQkwedZ3gusL5+0cPXdh1QTDfn/NzBsWi6w2TCm3
-         pPRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=frTEyC0/+CfTIF4PYPNiHQ4Gsfm5fIkYJSxFNrCEuso=;
-        b=xkj7cmHm/Uw2jGUBuEZDO82RrUkUO1t4dNlkX3bnpoJpoqHnn9qnEw3jgLYWblTr57
-         BO1+WjFVlmyRtOCBprCnR3MWfVc2GoXxD+sIDultNiDqFeZ6zur3k602cH5K2jADaS4U
-         kCS/JAD0wvhIlx9EVoP448MA6aEDMFp9UKU1/5oOgVVNdGByQRTGaOw+wbwh4keScaQi
-         6XhsIMoPTLsm1jY/J9f/caiVP7ydoDHuyU4FHGrX6SCk0uNX29oPP7cBtjA5LcYehAWf
-         kp7nec0uUqhVFMGPEkZIpI6zoozqZuzLErAQaNVIs75shzjIuLw+psWUGJr5MkymEzwW
-         nakw==
-X-Gm-Message-State: AOAM532zmeybaHFjvypwUwbyM2Twr79l+Aeb4wHZTFg0hUb04Ibo+ex6
-        I4XlBGL6vPePFVgt4tsMDGRbRg==
-X-Google-Smtp-Source: ABdhPJxCWuXB+xuTb6sKG9nbhRjhHzVASERrwIqlT8IubgeDh/aIhOShiVtJmLn6LiaKB+HEOkgWow==
-X-Received: by 2002:a05:6402:5250:b0:41d:8556:4191 with SMTP id t16-20020a056402525000b0041d85564191mr14027035edd.269.1649878275612;
-        Wed, 13 Apr 2022 12:31:15 -0700 (PDT)
-Received: from [192.168.0.207] (xdsl-188-155-201-27.adslplus.ch. [188.155.201.27])
-        by smtp.gmail.com with ESMTPSA id e26-20020a50ec9a000000b004193fe50151sm1584782edr.9.2022.04.13.12.31.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Apr 2022 12:31:15 -0700 (PDT)
-Message-ID: <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
-Date:   Wed, 13 Apr 2022 21:31:13 +0200
+        Wed, 13 Apr 2022 18:38:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7E84D61A;
+        Wed, 13 Apr 2022 15:36:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 64C5961FA2;
+        Wed, 13 Apr 2022 22:36:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 470EDC385A3;
+        Wed, 13 Apr 2022 22:36:10 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="G9/lJZvu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649889364;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i/qY7Q5+txJsN2VM3hmo/BuFNHf1fzlowER9ysRVbtU=;
+        b=G9/lJZvutks3OBqL5Nu4B1yW4jBFb7W4ukR3afqp2x1riI/HnkanKh59pDPmGb6Y90x99g
+        9x0vTbtaEb+KLGvTJAFyA66m7Xv29xQZ9oYexjJfdBOtaFoBppboktTAxX/1YKeV1Yw39n
+        a37nwgA1eGMO6ujUD1Zudlu5gCeStNI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fe08f002 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 13 Apr 2022 22:36:03 +0000 (UTC)
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-2ebf4b91212so37963667b3.8;
+        Wed, 13 Apr 2022 15:36:02 -0700 (PDT)
+X-Gm-Message-State: AOAM531082+ZhP0yMYZsQtDpQlAfCkMl9qsIMk8+jr7dmLsTWeC1qJ6B
+        ANbQAjMCVqv/6F8uDKqzlhlEKHzGz8Q/xF41O6Q=
+X-Google-Smtp-Source: ABdhPJzIgqKFKpMhZPLEtAEhlDJTJz5RK85xvL5Zr9EJ3NPhLwoCvgqk5B4Jz+dLnTIilLBy7lbr9KCRJA+XIbc15b8=
+X-Received: by 2002:a81:1a49:0:b0:2eb:f4cd:b3f1 with SMTP id
+ a70-20020a811a49000000b002ebf4cdb3f1mr976064ywa.231.1649889360067; Wed, 13
+ Apr 2022 15:36:00 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to
- YAML
-Content-Language: en-US
-To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        robh+dt@kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220413190713.1427956-1-clabbe@baylibre.com>
- <20220413190713.1427956-25-clabbe@baylibre.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20220413190713.1427956-25-clabbe@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com>
+ <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+In-Reply-To: <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 14 Apr 2022 00:35:49 +0200
+X-Gmail-Original-Message-ID: <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+Message-ID: <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 13/04/2022 21:07, Corentin Labbe wrote:
-> Convert rockchip-crypto to YAML.
+Hi Maciej,
 
-Thank you for your patch. There is something to discuss/improve.
+On Wed, Apr 13, 2022 at 2:46 PM Maciej W. Rozycki <macro@orcam.me.uk> wrote:
+>
+> On Wed, 13 Apr 2022, Thomas Bogendoerfer wrote:
+>
+> > > diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
+> > > index b05bb70a2e46..abc60a6395e3 100644
+> > > --- a/arch/mips/include/asm/timex.h
+> > > +++ b/arch/mips/include/asm/timex.h
+> > > @@ -94,7 +94,7 @@ static inline unsigned long random_get_entropy(void)
+> > >     else if (likely(imp != PRID_IMP_R6000 && imp != PRID_IMP_R6000A))
+> > >             return read_c0_random();
+> > >     else
+> > > -           return 0;       /* no usable register */
+> > > +           return random_get_entropy_fallback();   /* no usable register */
+> > >  }
+> > >  #define random_get_entropy random_get_entropy
+> > >
+> > > --
+> > > 2.35.1
+> >
+> > Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+>
+>  Or we could drop the PRID_IMP_R6000/A check and the final `else' clause
+> entirely, as we don't even pretend to support the R6k at all anymore, and
+> this is the final reference remaining.  For one we no longer handle the
+> CPU in `cpu_probe_legacy' so any attempt to boot on such a CPU would
+> inevitably fail as no CPU options would be set (we probably should have a
+> `panic' or suchlike as the default case for the switch statement there).
+>
+>  Therefore I'm all for removing this piece instead, complementing commit
+> 3b2db173f012 ("MIPS: Remove unused R6000 support"), where it should have
+> really happened.
 
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - rockchip,rk3288-crypto
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 4
-> +
-> +  clock-names:
-> +    maxItems: 4
+That's fine with me, if that's what Thomas wants to do, and I can
+submit a v5 with that in it. Indeed, from our previous conversations,
+I'm aware that the `else` there is probably never hit.
 
-This is not needed and dt_bindings_check should complain.
+However, one thing that I've been thinking about is that the c0 random
+register is actually kind of garbage. In my fuzzy decade-old memory of
+MIPS, I believe the c0 random register starts at the maximum number of
+TLB entries (16?), and then counts down cyclically, decrementing once
+per CPU cycle. Is that right?
 
-> +    items:
-> +      const: aclk
-> +      const: hclk
-> +      const: sclk
-> +      const: apb_pclk
-> +
-> +  resets:
-> +    maxItems: 1
-> +
-> +  reset-names:
-> +    maxItems: 1
+If it is, there are some real pros and cons here to consider:
+- Pro: decrementing each CPU cycle means pretty good granularity
+- Con: wrapping at, like, 16 or something really is very limited, to
+the point of being almost bad
 
-The same.
+Meanwhile, on systems without the c0 cycles counter, what is the
+actual resolution of random_get_entropy_fallback()? Is this just
+falling back to jiffies?
 
+IF (a) the fallback is jiffies AND (b) c0 wraps at 16, then actually,
+what would be really nice would be something like:
 
-Best regards,
-Krzysztof
+    return (jiffies << 4) | read_c0_random();
+
+It seems like that would give us something somewhat more ideal than
+the status quo. Still crap, of course, but undoubtedly better.
+
+Unfortunately, I don't know enough about whether assumptions (a) and
+(b) hold for all hardware that doesn't have the c0 cycle counter. Can
+you or Thomas confirm/deny this? And if it is more nuanced than my
+optimistic assumption above, can we think of some scheme together that
+nicely combines jiffies or the fallback function with the c0 random
+register that would be sensible?
+
+Jason
