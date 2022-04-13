@@ -2,37 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4890AC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 05:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE3D2C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Apr 2022 05:53:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229478AbiDMFVC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 01:21:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56288 "EHLO
+        id S232632AbiDMFz6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Apr 2022 01:55:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231961AbiDMFU7 (ORCPT
+        with ESMTP id S232623AbiDMFz6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 01:20:59 -0400
+        Wed, 13 Apr 2022 01:55:58 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726DB4F45E
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 22:18:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E13E38DB5
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Apr 2022 22:53:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 160D361BD6
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 05:18:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E9DC385A4;
-        Wed, 13 Apr 2022 05:18:37 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C08F61B84
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Apr 2022 05:53:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CEA2C385AA;
+        Wed, 13 Apr 2022 05:53:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649827117;
-        bh=YF7s/uh4r2IfvRPpRiLQpidvPG4vDPRr2Md+fbiMFIw=;
+        s=k20201202; t=1649829216;
+        bh=ffA8Ck5Ner0hO8yk+sLPWxYviMDUp/PT2I0A/QmHAVg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NyhlYkW55CvPKOVhahJkdJlUkScvBgmfBXJGH8nWB6lCnOVSt0E696tu1iKdx+GxO
-         krHfMqRmJ7ATyuCE/BNioPT7SkboMtYuuDM0PRjtSYUphe2fQDXCVbqv+lFEmCh1n7
-         yFTpiQ5kjEatUPwH+Vu8Yp2u2if/7oz0LhTdVteD7rXmNY78MiRLsmTO4c/mzlC7YY
-         NILCNAcFZUMm7oArgG0JtzuJVjPUAsLXtoR+0AvMIwvT+qS8Ij0t24k5eWmd4lK81X
-         8R8d3PwqkjrqNs4GZ8aFuIz0mcZ4armz401TT2o/LnvlSszmoMjBQAjqE7AZ75fHK1
-         PBix6bHrWsZYw==
-Date:   Tue, 12 Apr 2022 22:18:35 -0700
+        b=gVcDI4lVanRBTYjPlmSJnfXrRpX64ir5Iz+/pHBAAwyD98HtFTRvLafF458Ek3hLl
+         A+mnzhDbbN6/l4UKCaBStMu7IfHIFxNq/+eOT9CSE1uS6pEm2C7MaBgrKcFm7lEM19
+         RbAOElJaiuC1VCll7jfU78HBo02094yBOd9/1+wdoM7qe2m/Oet0kbv3TV9a9sQrQo
+         fabXGJDmeN9bwd6eqmqcJCiU0lXkhkDhreH7TaqqHztqrbYl8tZLlfmhe220ycl83E
+         A+eWrZ0Q71y92uE0hm9JnKGbGptUVGSlQi4DwUbUmHiyBOzyD2MvqrffDmvypmT4tl
+         aCQJn1z4cUKgQ==
+Date:   Tue, 12 Apr 2022 22:53:34 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Nathan Huckleberry <nhuck@google.com>
 Cc:     linux-crypto@vger.kernel.org,
@@ -42,229 +42,134 @@ Cc:     linux-crypto@vger.kernel.org,
         Paul Crowley <paulcrowley@google.com>,
         Sami Tolvanen <samitolvanen@google.com>,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v4 6/8] crypto: x86/polyval: Add PCLMULQDQ accelerated
+Subject: Re: [PATCH v4 7/8] crypto: arm64/polyval: Add PMULL accelerated
  implementation of POLYVAL
-Message-ID: <YlZdK8u0hL8hxzxh@sol.localdomain>
+Message-ID: <YlZlXq96e96Bg6tL@sol.localdomain>
 References: <20220412172816.917723-1-nhuck@google.com>
- <20220412172816.917723-7-nhuck@google.com>
+ <20220412172816.917723-8-nhuck@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220412172816.917723-7-nhuck@google.com>
+In-Reply-To: <20220412172816.917723-8-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 12, 2022 at 05:28:14PM +0000, Nathan Huckleberry wrote:
-> diff --git a/arch/x86/crypto/polyval-clmulni_asm.S b/arch/x86/crypto/polyval-clmulni_asm.S
-[...]
+Many of the comments I made on the x86 version apply to this too, but a few
+unique comments below:
+
+On Tue, Apr 12, 2022 at 05:28:15PM +0000, Nathan Huckleberry wrote:
+> Add hardware accelerated version of POLYVAL for ARM64 CPUs with
+> Crypto Extension support.
+
+As I've mentioned, it seems to be "Crypto Extensions", not "Crypto Extension".
+That's what everything else in the kernel says, at least.  It's just a nit, but
+it's unclear whether you intentionally decided to not change this, or missed it.
+
+> diff --git a/arch/arm64/crypto/polyval-ce-core.S b/arch/arm64/crypto/polyval-ce-core.S
+[..]
+> +	.text
+> +	.align	4
+> +
+> +	.arch	armv8-a+crypto
+> +	.align	4
+
+Having '.align' twice is redundant, right?
+
+> +
+> +.Lgstar:
+> +	.quad	0xc200000000000000, 0xc200000000000000
+> +
 > +/*
-> + * Computes the product of two 128-bit polynomials at the memory locations
-> + * specified by (MSG + 16*i) and (KEY_POWERS + 16*i) and XORs the components of the
-> + * 256-bit product into LO, MI, HI.
+> + * Computes the product of two 128-bit polynomials in X and Y and XORs the
+> + * components of the 256-bit product into LO, MI, HI.
+> + *
+> + * X = [X_1 : X_0]
+> + * Y = [Y_1 : Y_0]
 > + *
 > + * The multiplication produces four parts:
-> + *   LOW: The polynomial given by performing carryless multiplication of the
-> + *   bottom 64-bits of each polynomial
-> + *   MID1: The polynomial given by performing carryless multiplication of the
-> + *   bottom 64-bits of the first polynomial and the top 64-bits of the second
-> + *   MID2: The polynomial given by performing carryless multiplication of the
-> + *   bottom 64-bits of the second polynomial and the top 64-bits of the first
-> + *   HIGH: The polynomial given by performing carryless multiplication of the
-> + *   top 64-bits of each polynomial
+> + *   LOW: The polynomial given by performing carryless multiplication of X_0 and
+> + *   Y_0
+> + *   MID: The polynomial given by performing carryless multiplication of (X_0 +
+> + *   X_1) and (Y_0 + Y_1)
+> + *   HIGH: The polynomial given by performing carryless multiplication of X_1
+> + *   and Y_1
 > + *
 > + * We compute:
 > + *  LO += LOW
-> + *  MI += MID1 + MID2
+> + *  MI += MID
 > + *  HI += HIGH
 > + *
-> + * LO = [L0_1 : LO_0]
-> + * MI = [MI_1 : MI_0]
-> + * HI = [HI_1 : HI_0]
+> + * Later, the 256-bit result can be extracted as:
+> + *   [HI_1 : HI_0 + HI_1 + MI_1 + LO_1 :: LO_1 + HI_0 + MI_0 + LO_0 : LO_0]
 
-One of the "LO" has a 0 instead of an O.
+What does the double colon mean?
 
-> +.macro schoolbook1_iteration i xor_sum
-> +	movups (16*\i)(MSG), %xmm0
-> +	.if (\i == 0 && \xor_sum == 1)
-> +		pxor SUM, %xmm0
-> +	.endif
-> +	vpclmulqdq $0x00, (16*\i)(KEY_POWERS), %xmm0, %xmm2
-> +	vpclmulqdq $0x01, (16*\i)(KEY_POWERS), %xmm0, %xmm1
-> +	vpclmulqdq $0x11, (16*\i)(KEY_POWERS), %xmm0, %xmm3
-> +	vpclmulqdq $0x10, (16*\i)(KEY_POWERS), %xmm0, %xmm4
-> +	vpxor %xmm2, LO, LO
-> +	vpxor %xmm1, MI, MI
-> +	vpxor %xmm4, MI, MI
-> +	vpxor %xmm3, HI, HI
+> + * This step is done when computing the polynomial reduction for efficiency
+> + * reasons.
+> + */
+> +.macro karatsuba1 X Y
+
+A super brief explanation of why Karatsuba multiplication is used instead of
+schoolbook multiplication would be helpful.
+
+> +	X .req \X
+> +	Y .req \Y
+> +	ext	v25.16b, X.16b, X.16b, #8
+> +	ext	v26.16b, Y.16b, Y.16b, #8
+> +	eor	v25.16b, v25.16b, X.16b
+> +	eor	v26.16b, v26.16b, Y.16b
+> +	pmull	v27.1q, v25.1d, v26.1d
+> +	pmull2	v28.1q, X.2d, Y.2d
+> +	pmull	v29.1q, X.1d, Y.1d
+> +	eor	MI.16b, MI.16b, v27.16b
+> +	eor	HI.16b, HI.16b, v28.16b
+> +	eor	LO.16b, LO.16b, v29.16b
+> +	.unreq X
+> +	.unreq Y
 > +.endm
 
-Can you allocate the xmm1-xmm4 registers in a logical order?  Either in order as
-they are first used, or in the same order as the vpclmulqdq constants.  It
-doesn't actually matter, of course, but I don't understand the logic here.  Did
-you also consider my suggestion
-https://lore.kernel.org/r/YhA%2FtAaDi%2F3e35Q1@sol.localdomain which would avoid
-adjacent instructions that depend on each other, like the XORs into MI that you
-have?  In that version I had allocated the registers in the same order as the
-vpclmulqdq constants, so there was some logic behind it; it wasn't just random.
-(Whereas what you have here seems "random" to me!)
+Maybe move the pmull into v27 and the eor into MI down a bit, since they have
+more dependencies?  I.e.
 
-> +
-> +/*
-> + * Performs the same computation as schoolbook1_iteration, except we expect the
-> + * arguments to already be loaded into xmm0 and xmm1.
-> + */
-> +.macro schoolbook1_noload
-> +	vpclmulqdq $0x01, %xmm0, %xmm1, MI
-> +	vpclmulqdq $0x10, %xmm0, %xmm1, %xmm2
-> +	vpclmulqdq $0x00, %xmm0, %xmm1, LO
-> +	vpclmulqdq $0x11, %xmm0, %xmm1, HI
-> +	vpxor %xmm2, MI, MI
+	ext	v25.16b, X.16b, X.16b, #8
+	ext	v26.16b, Y.16b, Y.16b, #8
+	eor	v25.16b, v25.16b, X.16b
+	eor	v26.16b, v26.16b, Y.16b
+	pmull2	v28.1q, X.2d, Y.2d
+	pmull	v29.1q, X.1d, Y.1d
+	pmull	v27.1q, v25.1d, v26.1d
+	eor	HI.16b, HI.16b, v28.16b
+	eor	LO.16b, LO.16b, v29.16b
+	eor	MI.16b, MI.16b, v27.16b
+
+I don't know whether it will actually matter on arm64, but on lower-powered
+arm32 CPUs this sort of thing definitely can matter.
+
+> +.macro karatsuba1_store X Y
+> +	X .req \X
+> +	Y .req \Y
+> +	ext	v25.16b, X.16b, X.16b, #8
+> +	ext	v26.16b, Y.16b, Y.16b, #8
+> +	eor	v25.16b, v25.16b, X.16b
+> +	eor	v26.16b, v26.16b, Y.16b
+> +	pmull	MI.1q, v25.1d, v26.1d
+> +	pmull2	HI.1q, X.2d, Y.2d
+> +	pmull	LO.1q, X.1d, Y.1d
+> +	.unreq X
+> +	.unreq Y
 > +.endm
 
-The comment should be updated to to mention the second difference from
-schoolbook1_iteration:
+Likewise above.
 
-"... and we set the result registers LO, MI, and HI directly rather than XOR'ing
-into them."
-
-> + * So our final computation is:
-> + *   T = T_1 : T_0 = g*(x) * P_0
-> + *   V = V_1 : V_0 = g*(x) * (T_0 + P_1)
-
-Above should use "P_1 + T_0" to keep using a consistent order.
-
-> rather than directly XORing P_1 : P_0, T_0 : T1 into dest.
-
-"rather than separately XORing P_1 : P_0 and T_0 : T_1 into dest"
-
-> +/*
-> + * Compute schoolbook multiplication for 8 blocks
-> + * m_0h^8 + ... + m_7h^1
-> + *
-> + * If reduce is set, also computes the montgomery reduction of the
-> + * previous full_stride call and XORs with the first message block.
-> + * (m_0 + REDUCE(PL, PH))h^8 + ... + m_7h^1.
-> + * I.e., the first multiplication uses m_0 + REDUCE(PL, PH) instead of m_0.
-> + *
-> + * Sets PL, PH
-> + * Clobbers LO, HI, MI
-> + *
-> + */
-
-The "Sets PL, PH ... Clobbers LO, HI, MI" part is incomplete.  PL and PH are
-sometimes used as inputs, not just set, and other registers are clobbered too.
-
-This part of the comment should either be complete, or it should be removed.
-
-> +.macro full_stride reduce
-> +	pxor LO, LO
-> +	pxor HI, HI
-> +	pxor MI, MI
-> +
-> +	schoolbook1_iteration 7 0
-> +	.if (\reduce)
-
-.if expressions don't need parentheses around them; this isn't C.
-
-> diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
-> new file mode 100644
-> index 000000000000..4f62284f980c
-> --- /dev/null
-> +++ b/arch/x86/crypto/polyval-clmulni_glue.c
+> diff --git a/arch/arm64/crypto/polyval-ce-glue.c b/arch/arm64/crypto/polyval-ce-glue.c
 [...]
+> +struct polyval_async_ctx {
+> +	struct cryptd_ahash *cryptd_tfm;
+> +};
 
-> +#include <crypto/algapi.h>
-> +#include <crypto/cryptd.h>
-> +#include <crypto/gf128mul.h>
-> +#include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
-> +#include <crypto/polyval.h>
-> +#include <linux/crypto.h>
-> +#include <linux/init.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <asm/cpu_device_id.h>
-> +#include <asm/simd.h>
+struct polyval_async_ctx is no longer used.
 
-Includes that are no longer required should be removed.  At least
-<crypto/cryptd.h> is no longer required.
-
-> +static void reverse_be128(be128 *x)
-> +{
-> +	__be64 a = x->a;
-> +	__be64 b = x->b;
-> +
-> +	x->a = swab64(b);
-> +	x->b = swab64(a);
-> +}
-
-This is generating warnings from 'sparse':
-
-	arch/x86/crypto/polyval-clmulni_glue.c:56:16: warning: cast from restricted __be64
-	arch/x86/crypto/polyval-clmulni_glue.c:56:14: warning: incorrect type in assignment (different base types)
-	arch/x86/crypto/polyval-clmulni_glue.c:56:14:    expected restricted __be64 [usertype] a
-	arch/x86/crypto/polyval-clmulni_glue.c:56:14:    got unsigned long long [usertype]
-	arch/x86/crypto/polyval-clmulni_glue.c:57:16: warning: cast from restricted __be64
-	arch/x86/crypto/polyval-clmulni_glue.c:57:14: warning: incorrect type in assignment (different base types)
-	arch/x86/crypto/polyval-clmulni_glue.c:57:14:    expected restricted __be64 [usertype] b
-	arch/x86/crypto/polyval-clmulni_glue.c:57:14:    got unsigned long long [usertype]
-
-Make sure to run 'make C=2' on changed files.
-
-> +
-> +static void generic_polyval_mul(u8 *op1, const u8 *op2)
-> +{
-> +	be128 a, b;
-> +
-> +	// Assume one argument is in Montgomery form and one is not.
-> +	memcpy(&a, op1, sizeof(a));
-> +	memcpy(&b, op2, sizeof(b));
-> +	reverse_be128(&a);
-> +	reverse_be128(&b);
-> +	gf128mul_x_lle(&a, &a);
-> +	gf128mul_lle(&a, &b);
-> +	reverse_be128(&a);
-> +	memcpy(op1, &a, sizeof(a));
-> +}
-> +
-> +static void generic_polyval_update(const u8 *in, struct polyval_ctx *keys,
-> +			  size_t nblocks, u8 *accumulator)
-> +{
-> +	while (nblocks--) {
-> +		crypto_xor(accumulator, in, POLYVAL_BLOCK_SIZE);
-> +		generic_polyval_mul(accumulator, keys->key_powers[7]);
-> +		in += POLYVAL_BLOCK_SIZE;
-> +	}
-> +}
-
-The above is hardcoding 7, whereas other places are using
-NUM_PRECOMPUTE_POWERS-1 for the same thing.
-
-The naming of NUM_PRECOMPUTE_POWERS is also not great.  It's missing a "D" at
-the end of "PRECOMPUTE", right?  I think NUM_KEY_POWERS would make more sense.
-
-generic_polyval_update() is also duplicated in both
-arch/x86/crypto/polyval-clmulni_glue.c and arch/arm64/crypto/polyval-ce-glue.c.
-How about putting it in crypto/polyval.c to share the code?  It would need to be
-passed the key directly, rather than the implementation-specific polyval_ctx,
-but otherwise it would work, right?
-
-> +
-> +static void internal_polyval_update(const u8 *in, struct polyval_ctx *keys,
-> +			  size_t nblocks, u8 *accumulator)
-
-struct polyval_ctx should be 'const', everywhere except in ->setkey().
-
-> +static int polyval_init(struct shash_desc *desc)
-> +{
-> +	struct polyval_desc_ctx *dctx = shash_desc_ctx(desc);
-> +
-> +	memset(dctx, 0, sizeof(*dctx));
-> +
-> +	return 0;
-> +}
-> +
 > +static int polyval_setkey(struct crypto_shash *tfm,
 > +			const u8 *key, unsigned int keylen)
 > +{
@@ -274,47 +179,8 @@ struct polyval_ctx should be 'const', everywhere except in ->setkey().
 > +	if (keylen != POLYVAL_BLOCK_SIZE)
 > +		return -EINVAL;
 > +
-> +	memcpy(ctx->key_powers[NUM_PRECOMPUTE_POWERS-1], key,
-> +	       POLYVAL_BLOCK_SIZE);
-> +
-> +	for (i = NUM_PRECOMPUTE_POWERS-2; i >= 0; i--) {
-> +		memcpy(ctx->key_powers[i], key, POLYVAL_BLOCK_SIZE);
-> +		internal_polyval_mul(ctx->key_powers[i], ctx->key_powers[i+1]);
-> +	}
-> +
-> +	return 0;
-> +}
+> +	BUILD_BUG_ON(sizeof(u128) != POLYVAL_BLOCK_SIZE);
 
-polyval_setkey() is the first step, so it would make sense to put its definition
-before polyval_init() so that everything more or less goes in order.
-
-Also: the names of these functions, and polyval_update and polyval_final below,
-collide with the same-named functions in crypto/polyval-generic.c.  This is sort
-of okay since these are all static, but it is bad practice as it can create
-confusing stack traces and require that the functions be renamed if/when things
-get refactored in the future.  How about calling these
-polyval_x86_{setkey,init,update,final}()?
-
-Similarly, polyval_arm64_{setkey,init,update,final} in the arm64 version.
-
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index aa06af0e0ebe..c6aec88213b1 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -787,6 +787,16 @@ config CRYPTO_POLYVAL
->  	  POLYVAL is the hash function used in HCTR2.  It is not a general-purpose
->  	  cryptographic hash function.
->  
-> +config CRYPTO_POLYVAL_CLMUL_NI
-> +	tristate "POLYVAL hash function (CLMUL-NI accelerated)"
-> +	depends on X86 && 64BIT
-> +	select CRYPTO_CRYPTD
-> +	select CRYPTO_POLYVAL
-> +	help
-> +	  This is the x86_64 CLMUL-NI accelerated implementation of POLYVAL. It is
-> +	  used to efficiently implement HCTR2 on x86-64 processors that support
-> +	  carry-less multiplication instructions.
-
-Selecting CRYPTO_CRYPTD is no longer required.
+Where does 'sizeof(u128)' come from?  This file doesn't use u128 at all.
 
 - Eric
