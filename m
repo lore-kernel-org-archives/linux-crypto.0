@@ -2,96 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF98C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 07:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F9AC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 09:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240255AbiDNHSU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Apr 2022 03:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42932 "EHLO
+        id S240665AbiDNJaB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Apr 2022 05:30:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240310AbiDNHST (ORCPT
+        with ESMTP id S229733AbiDNJ37 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Apr 2022 03:18:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5AF449F9B
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 00:15:54 -0700 (PDT)
+        Thu, 14 Apr 2022 05:29:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EAD50E2A;
+        Thu, 14 Apr 2022 02:27:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 70A9661F2F
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 07:15:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2516C385A1
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 07:15:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649920553;
-        bh=EeV/5Nhdg/5bu9cfDt0xS09M8xVJV+b2pAVgIXM9lio=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=RKbZpmHt/FaZvRse12kTPsVac6uMr4L1qYv2+c8TmFqTRu7LIaHkvYvytvE1IBp9c
-         WA09atZlJCHEpTYDmvDlcFblSKquIyCHtr2kKEc1+M95/v79ZiQQSFuyrXuQHHgnyO
-         2invVhfTo8VtdL9bjWAgfaGfntFJBzID/vGpSb0Thco9w1VJRhvzF0rMatKEg22lNY
-         1KAYqhcvdKkzsZ3+WhOtDGfeFNfQTYx8gzxuxaCreYxDVIa1qeDXYj8B8Q2cX58ZZ2
-         xZ1kIPER1Pyjs0Vctk8xWe43iPZxQSFDnp+q2tiftsQxBqk5d1V8UaUFGRENzfD/0C
-         CBjnrg7VhtWKg==
-Received: by mail-oo1-f47.google.com with SMTP id c2-20020a4aacc2000000b003333c8697bbso78715oon.12
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 00:15:53 -0700 (PDT)
-X-Gm-Message-State: AOAM532zB61NgeV5IEsIp0bbnTJQIbVYcj2x0PO1Vd0Z/eorxWZG/Tfi
-        7zeTgmLW1kzGsN+QlkRS+bYY5TsCb7dCbKjMKms=
-X-Google-Smtp-Source: ABdhPJwU8m6J1/8TnOfpldGcdxoxNXyxO6cQyeM/8MHRmGfEbICG+w0u6oMeo2B26uGCEZYTX2S7qSio6Rs+TXJnzOk=
-X-Received: by 2002:a4a:e6c2:0:b0:329:1863:6c3a with SMTP id
- v2-20020a4ae6c2000000b0032918636c3amr392945oot.98.1649920552947; Thu, 14 Apr
- 2022 00:15:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220412172816.917723-1-nhuck@google.com> <20220412172816.917723-9-nhuck@google.com>
- <YlZpUijo/1nJp0Bw@sol.localdomain> <CAMj1kXH1C8W6Cxa7jTZ8_h3L4_Xefwv2=r1JRNva101CvWWsjw@mail.gmail.com>
- <YlfJYwwCukoGuLek@sol.localdomain>
-In-Reply-To: <YlfJYwwCukoGuLek@sol.localdomain>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 14 Apr 2022 09:15:42 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGS_vtcgZSB5qXt4dekTb51FeZ7yMWbtu8-DrvFU39ogA@mail.gmail.com>
-Message-ID: <CAMj1kXGS_vtcgZSB5qXt4dekTb51FeZ7yMWbtu8-DrvFU39ogA@mail.gmail.com>
-Subject: Re: [PATCH v4 8/8] fscrypt: Add HCTR2 support for filename encryption
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Nathan Huckleberry <nhuck@google.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F56861CB7;
+        Thu, 14 Apr 2022 09:27:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F941C385A1;
+        Thu, 14 Apr 2022 09:27:29 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iCKw8U+B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649928448;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jitaCCQ2e/PpJGSBhLHWsevtZEgEekS1b3Wk73klyKA=;
+        b=iCKw8U+BX0unZDHdCqu1WEQPpDnLVael4IDVYgWvfW7w0XcoPFz96Q+X7Oh/HXcBDfoQgf
+        relkkKJiqLUs0hWWbJBeLDEdKmFO5iYlsrmp12SxDsveaByJUqA4gI9QfV6k/NrhryczGl
+        YX1t4UDjk8/egPtL7ZCNgWMOfE4aDFg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ff3c9dc5 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 14 Apr 2022 09:27:27 +0000 (UTC)
+Date:   Thu, 14 Apr 2022 11:27:22 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+Message-ID: <YlfoeGRM6w2O+eXA@zx2c4.com>
+References: <20220413115411.21489-1-Jason@zx2c4.com>
+ <20220413115411.21489-5-Jason@zx2c4.com>
+ <20220413122546.GA11860@alpha.franken.de>
+ <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+ <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 14 Apr 2022 at 09:12, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, Apr 13, 2022 at 08:16:25AM +0200, Ard Biesheuvel wrote:
-> > > > diff --git a/tools/include/uapi/linux/fscrypt.h b/tools/include/uapi/linux/fscrypt.h
-> > > > index 9f4428be3e36..a756b29afcc2 100644
-> > > > --- a/tools/include/uapi/linux/fscrypt.h
-> > > > +++ b/tools/include/uapi/linux/fscrypt.h
-> > > > @@ -27,7 +27,8 @@
-> > > >  #define FSCRYPT_MODE_AES_128_CBC             5
-> > > >  #define FSCRYPT_MODE_AES_128_CTS             6
-> > > >  #define FSCRYPT_MODE_ADIANTUM                        9
-> > > > -/* If adding a mode number > 9, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-> > > > +#define FSCRYPT_MODE_AES_256_HCTR2           10
-> > > > +/* If adding a mode number > 10, update FSCRYPT_MODE_MAX in fscrypt_private.h */
-> > > >
-> > >
-> > > As far as I know, you don't actually need to update the copy of UAPI headers in
-> > > tools/.  The people who maintain those files handle that.  It doesn't make sense
-> > > to have copies of files in the source tree anyway.
-> > >
-> >
-> > Doesn't the x86 build emit a warning if these go out of sync?
->
-> The warning is emitted when building tools/perf/, not the kernel itself.
->
-> According to https://lore.kernel.org/r/20191001185741.GD13904@kernel.org, the
-> perf maintainers actually prefer that their files are *not* updated for them.
-> And I'd like to push back against having duplicate source files in the tree
-> anyway, for obvious reasons.  So I think we shouldn't update this file.
->
+Hi Maciej,
 
-Fair enough.
+On Thu, Apr 14, 2022 at 02:16:18AM +0100, Maciej W. Rozycki wrote:
+>  Yes, for the relevant CPUs the range is 63-8 << 8 for R3k machines and 
+> 47-0 (the lower bound can be higher if wired entries are used, which I 
+> think we occasionally do) for R4k machines with a buggy CP0 counter.  So 
+> there are either 56 or up to 48 distinct CP0 Random register values.
+
+Ahh interesting, so it varies a bit, but it remains rather small.
+
+>  It depends on the exact system.  Some have a 32-bit high-resolution 
+> counter in the chipset (arch/mips/kernel/csrc-ioasic.c) giving like 25MHz 
+> resolution, some have nothing but jiffies.
+
+Alright, so there _are_ machines with no c0 cycles but with a good
+clock. Yet, 25MHz is still less than the cpu cycle, so this c0 random
+ORing trick remains useful perhaps.
+
+>  It seems like a reasonable idea to me, but the details would have to be 
+> sorted out, because where a chipset high-resolution counter is available 
+> we want to factor it in, and otherwise we need to extract the right bits 
+> from the CP0 Random register, either 13:8 for the R3k or 5:0 for the R4k.
+
+One thing we could do here that would seemingly cover all the cases
+without losing _that_ much would be:
+
+    return (random_get_entropy_fallback() << 13) | ((1<<13) - read_c0_random());
+
+Or in case the 13 turns out to be wrong on some hardware, we could
+mitigate the effect with:
+
+    return (random_get_entropy_fallback() << 13) ^ ((1<<13) - read_c0_random());
+
+As mentioned in the 1/xx patch of this series,
+random_get_entropy_fallback() should call the highest resolution thing.
+We then shave off the least-changing bits and stuff in the
+faster-changing bits from read_c0_random(). Then, in order to keep it
+counting up instead of down, we do the subtraction there.
+
+What do you think of this plan?
+
+Jason
