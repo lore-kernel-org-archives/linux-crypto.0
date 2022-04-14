@@ -2,44 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 725E8C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 10:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 321AFC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 11:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbiDNKPK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Apr 2022 06:15:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49786 "EHLO
+        id S241471AbiDNL7q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Apr 2022 07:59:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbiDNKPJ (ORCPT
+        with ESMTP id S232169AbiDNL7p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Apr 2022 06:15:09 -0400
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66886C927;
-        Thu, 14 Apr 2022 03:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=upqcvBN0c/2twwWoHUne//eX4ki0XQTMtmfsi6ArAXU=; b=HjGPsWLJY1Ur/Qd9SaLg0YiKnR
-        95tjp26+YgI/HwEOdRqvSlAROO2sO63Z/uXu1t6/V5/PtASP1IW3k8kj55+7tgoHxaUyNfpLnuymj
-        G+Nuireb4o2uAs9tgNLn8PCnmIvfeYm/3imhJXibehEvAyy2bcpTUxyuVWUQ0H1lRVoogDYJt+XGn
-        +JXGGLKSFLPO1NgiG/h6Ou0ERgDMxxK3z39Afa9Ihp7G2oki6nDRlwzM4i7qfs+r/iBEJYNjoTAgZ
-        nYexjH0hGr4I1XQ6yy/K0FsGtjU27thDPBNsh2vJZf5a5imdfgQbx4As5XreqUcbwl+Pi+VE00syg
-        bbEnVKOQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58256)
-        by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1newSp-0004M9-DZ; Thu, 14 Apr 2022 11:12:35 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1newSh-0004Du-6v; Thu, 14 Apr 2022 11:12:27 +0100
-Date:   Thu, 14 Apr 2022 11:12:27 +0100
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tglx@linutronix.de, arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>,
+        Thu, 14 Apr 2022 07:59:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7640F7DA9A;
+        Thu, 14 Apr 2022 04:57:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 05C88B82930;
+        Thu, 14 Apr 2022 11:57:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58C5BC385A9;
+        Thu, 14 Apr 2022 11:57:17 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DA3FZELa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1649937431;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=P5/ULzB2dBV6wVJcVqNwMtw/WLd6F6dq7ksMxHzz5tA=;
+        b=DA3FZELaUNpOSYvN5LZg46a4BKQ2y+Ds4aokgH0c/AscA0yjtWDKAlopToI81Zx0gDnFKd
+        TNnyt4pavfAonj7xLVnay1D+NQ9kmjmZtZW1ABjaB7447fL2qIhnSvM0du/CfvkvtOHUPa
+        HeDydNmQb9rYBpps776+yfVJXvO7nz8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 79fb6ffd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 14 Apr 2022 11:57:10 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id p65so8921323ybp.9;
+        Thu, 14 Apr 2022 04:57:08 -0700 (PDT)
+X-Gm-Message-State: AOAM5317LT+TX16N/elP9Kdo68aBNXUwvo9Zzpe0CDVZOONV612AyZSh
+        QGieUKMvwI2CawZk7kSAgjEbnCtrK2z2dLZcbwA=
+X-Google-Smtp-Source: ABdhPJyKcg613GF5x9fgeLFiZXh8/mhAmu2M+VzMPDTSDm44Qulp172KDH/PBSl3qtPO19ZfXo8qsw8aP1vhDQLRj1E=
+X-Received: by 2002:a25:fe0c:0:b0:641:2884:2c7e with SMTP id
+ k12-20020a25fe0c000000b0064128842c7emr1344925ybe.382.1649937427424; Thu, 14
+ Apr 2022 04:57:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-2-Jason@zx2c4.com>
+ <Ylfzi1lNWTH1wjLA@shell.armlinux.org.uk>
+In-Reply-To: <Ylfzi1lNWTH1wjLA@shell.armlinux.org.uk>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 14 Apr 2022 13:56:56 +0200
+X-Gmail-Original-Message-ID: <CAHmME9q8R+uHNF_VBkJezfWn78kyw0RgGf-36JJKs6t3h3wQnA@mail.gmail.com>
+Message-ID: <CAHmME9q8R+uHNF_VBkJezfWn78kyw0RgGf-36JJKs6t3h3wQnA@mail.gmail.com>
+Subject: Re: [PATCH v4 01/11] timekeeping: add raw clock fallback for random_get_entropy()
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
@@ -59,72 +76,29 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         John Stultz <john.stultz@linaro.org>,
         Stephen Boyd <sboyd@kernel.org>,
         Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, x86@kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-um@lists.infradead.org, X86 ML <x86@kernel.org>,
         linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH v4 01/11] timekeeping: add raw clock fallback for
- random_get_entropy()
-Message-ID: <Ylfzi1lNWTH1wjLA@shell.armlinux.org.uk>
-References: <20220413115411.21489-1-Jason@zx2c4.com>
- <20220413115411.21489-2-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220413115411.21489-2-Jason@zx2c4.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 01:54:01PM +0200, Jason A. Donenfeld wrote:
-> The addition of random_get_entropy_fallback() provides access to
-> whichever time source has the highest frequency, which is useful for
-> gathering entropy on platforms without available cycle counters. It's
-> not necessarily as good as being able to quickly access a cycle counter
-> that the CPU has, but it's still something, even when it falls back to
-> being jiffies-based.
-> 
-> In the event that a given arch does not define get_cycles(), falling
-> back to the get_cycles() default implementation that returns 0 is really
-> not the best we can do. Instead, at least calling
-> random_get_entropy_fallback() would be preferable, because that always
-> needs to return _something_, even falling back to jiffies eventually.
-> It's not as though random_get_entropy_fallback() is super high precision
-> or guaranteed to be entropic, but basically anything that's not zero all
-> the time is better than returning zero all the time.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  include/linux/timex.h     |  8 ++++++++
->  kernel/time/timekeeping.c | 10 ++++++++++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/include/linux/timex.h b/include/linux/timex.h
-> index 5745c90c8800..fbbe34226044 100644
-> --- a/include/linux/timex.h
-> +++ b/include/linux/timex.h
-> @@ -62,6 +62,8 @@
->  #include <linux/types.h>
->  #include <linux/param.h>
->  
-> +extern unsigned long random_get_entropy_fallback(void);
+Hi Russell,
 
-Hi
+On Thu, Apr 14, 2022 at 12:12 PM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+> I'm surprised this didn't trigger checkpatch to warn. From
+> coding-style:
+>
+> 6.1) Function prototypes
+> Do not use the ``extern`` keyword with function declarations as this makes
+> lines longer and isn't strictly necessary.
 
-I'm surprised this didn't trigger checkpatch to warn. From
-coding-style:
+Okay, will do for v+1.
 
-6.1) Function prototypes
-Do not use the ``extern`` keyword with function declarations as this makes
-lines longer and isn't strictly necessary.
-
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Jason
