@@ -2,135 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035B6C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 13:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3CA2C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 15:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233980AbiDNNgJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Apr 2022 09:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57740 "EHLO
+        id S239479AbiDNPKq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Apr 2022 11:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344150AbiDNNal (ORCPT
+        with ESMTP id S1351199AbiDNOao (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Apr 2022 09:30:41 -0400
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BADFE6;
-        Thu, 14 Apr 2022 06:28:16 -0700 (PDT)
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-ddfa38f1c1so5209497fac.11;
-        Thu, 14 Apr 2022 06:28:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
-         :message-id;
-        bh=1uOhWs8cm16131L6dfi8BY/Hr1kwqioEhMv1kPjh21A=;
-        b=n5HIYEo0RplCPe63s7fiDIbFnbQl/vT4PiFq0QMHxuT4cCGZg6fZoCveh01zMR2pYb
-         qvCUC+1b361Vjhzr09bJmwlLJbl3wbP3WnXUIm/7fme8x6Av3I0UmX+DskRV0JAvxEXm
-         hPpfm9bH486vFn0ITdpKeVKLqXDLz6L7KUAkl6TrvDxPaiXJNKDGyROje6bTwzIziknT
-         WMxlSeXeKRtKPlh/FRqhdz4JePFYl+o52e+is6JLKzJPU7dHcHTqiZ+4eMwE7+9k4Hhu
-         HIB7I+ChBKux+ZBx6+XQh3C0HWO3YhYCNHDsnGuNc6OQWUFjT2SSP9hHgt9IzKpbESFS
-         79vw==
-X-Gm-Message-State: AOAM531VBeulcAsz02HQ08hu4/4UqmvD4Rtfio0b/tz4Y/ISHI75VVDE
-        ofVO2GxNYL/nzx+qauan0g==
-X-Google-Smtp-Source: ABdhPJyH1P7seZTuHtknt0P9RpLaIUL8KvuTzAmz12RLMFPKbN6I+QpfZtLgjNxlPTOvprxh63GYuQ==
-X-Received: by 2002:a05:6870:d0ce:b0:de:79e2:7ec7 with SMTP id k14-20020a056870d0ce00b000de79e27ec7mr1224269oaa.245.1649942895544;
-        Thu, 14 Apr 2022 06:28:15 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id o8-20020a05680803c800b00321034c99a6sm8965oie.3.2022.04.14.06.28.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 06:28:15 -0700 (PDT)
-Received: (nullmailer pid 1863786 invoked by uid 1000);
-        Thu, 14 Apr 2022 13:28:14 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     devicetree@vger.kernel.org, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au, krzysztof.kozlowski+dt@linaro.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        heiko@sntech.de, linux-rockchip@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20220413190713.1427956-25-clabbe@baylibre.com>
-References: <20220413190713.1427956-1-clabbe@baylibre.com> <20220413190713.1427956-25-clabbe@baylibre.com>
-Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to YAML
-Date:   Thu, 14 Apr 2022 08:28:14 -0500
-Message-Id: <1649942894.398402.1863785.nullmailer@robh.at.kernel.org>
+        Thu, 14 Apr 2022 10:30:44 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5083022BF2
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 07:19:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id B5030CE29FD
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 14:19:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 069ABC385A5
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 14:19:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649945951;
+        bh=Q1WpI1P2qqbFgHB/7bjfsFc19FhHImxCTccviOynmi4=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=HmbY9jAHlchFisUj26Z0tCXjqt61T3Gpr+PXMA+xpI0rmrQwd1ao/bvGNhjCoqMTW
+         2sqzE7MOH5eEIb3iL5wAB9Eno6w2B/V6ltpzT5eOqR2r/ZNys1xUFjd9zFfs9DB3uB
+         qwodabxc5qmi4N8+TeZ2cN6cJxwPB+SWrYIryF7aksQYTBgCh60i+Ztz9MCDxNOg+Z
+         6ex0tUh/KNKUySVoho+CFg8prxWhJyLIiuuBe8NQsT++SLQonGO94RZUf46+HpKooa
+         b8ELBGH2UekSx62l61lC3y7eh20XsEzRTin8Fsh5KkUCTP7bj4bnBTZsHExtZwUL0D
+         iqbhhwe4kJL9g==
+Received: by mail-oi1-f172.google.com with SMTP id w127so5500645oig.10
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 07:19:10 -0700 (PDT)
+X-Gm-Message-State: AOAM532T1PY55VOZSRhzMtiZMdnqA+c47SCzDiob6loWDG7LFAfrWQT9
+        U6hUy/C83VaEpH7JKBHZs/NxC44k/JWk0AkMCsk=
+X-Google-Smtp-Source: ABdhPJxlhB00QTSTNNT0SDfuEthV4YMzN9dPxF0NacMc2/92RTBmRucwb49MeiOYMA0UmyVcV3mUWnVZ0WKT+Ko2fT4=
+X-Received: by 2002:a05:6808:1513:b0:2fa:7a40:c720 with SMTP id
+ u19-20020a056808151300b002fa7a40c720mr1446182oiw.126.1649945950087; Thu, 14
+ Apr 2022 07:19:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220412172816.917723-1-nhuck@google.com>
+In-Reply-To: <20220412172816.917723-1-nhuck@google.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 14 Apr 2022 16:18:58 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEFOQWohWXQKdgDUoZU83S9TA1Tyr+4Rw9WEPFna3eLHw@mail.gmail.com>
+Message-ID: <CAMj1kXEFOQWohWXQKdgDUoZU83S9TA1Tyr+4Rw9WEPFna3eLHw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/8] crypto: HCTR2 support
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Paul Crowley <paulcrowley@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 13 Apr 2022 19:07:04 +0000, Corentin Labbe wrote:
-> Convert rockchip-crypto to YAML.
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  .../crypto/rockchip,rk3288-crypto.yaml        | 66 +++++++++++++++++++
->  .../bindings/crypto/rockchip-crypto.txt       | 28 --------
->  2 files changed, 66 insertions(+), 28 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
->  delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
-> 
+On Tue, 12 Apr 2022 at 19:28, Nathan Huckleberry <nhuck@google.com> wrote:
+>
+> HCTR2 is a length-preserving encryption mode that is efficient on
+> processors with instructions to accelerate AES and carryless
+> multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
+> processors with the ARMv8 Crypto Extensions.
+>
+> HCTR2 is specified in https://ia.cr/2021/1441 "Length-preserving encrypti=
+on
+> with HCTR2" which shows that if AES is secure and HCTR2 is instantiated
+> with AES, then HCTR2 is secure.  Reference code and test vectors are at
+> https://github.com/google/hctr2.
+>
+> As a length-preserving encryption mode, HCTR2 is suitable for application=
+s
+> such as storage encryption where ciphertext expansion is not possible, an=
+d
+> thus authenticated encryption cannot be used.  Currently, such applicatio=
+ns
+> usually use XTS, or in some cases Adiantum.  XTS has the disadvantage tha=
+t
+> it is a narrow-block mode: a bitflip will only change 16 bytes in the
+> resulting ciphertext or plaintext.  This reveals more information to an
+> attacker than necessary.
+>
+> HCTR2 is a wide-block mode, so it provides a stronger security property: =
+a
+> bitflip will change the entire message.  HCTR2 is somewhat similar to
+> Adiantum, which is also a wide-block mode.  However, HCTR2 is designed to
+> take advantage of existing crypto instructions, while Adiantum targets
+> devices without such hardware support.  Adiantum is also designed with
+> longer messages in mind, while HCTR2 is designed to be efficient even on
+> short messages.
+>
+> The first intended use of this mode in the kernel is for the encryption o=
+f
+> filenames, where for efficiency reasons encryption must be fully
+> deterministic (only one ciphertext for each plaintext) and the existing C=
+BC
+> solution leaks more information than necessary for filenames with common
+> prefixes.
+>
+> HCTR2 uses two passes of an =CE=B5-almost-=E2=88=86-universal hash functi=
+on called
+> POLYVAL and one pass of a block cipher mode called XCTR.  POLYVAL is a
+> polynomial hash designed for efficiency on modern processors and was
+> originally specified for use in AES-GCM-SIV (RFC 8452).  XCTR mode is a
+> variant of CTR mode that is more efficient on little-endian machines.
+>
+> This patchset adds HCTR2 to Linux's crypto API, including generic
+> implementations of XCTR and POLYVAL, hardware accelerated implementations
+> of XCTR and POLYVAL for both x86-64 and ARM64, a templated implementation
+> of HCTR2, and an fscrypt policy for using HCTR2 for filename encryption.
+>
+> Changes in v4:
+>  * Small style fixes in generic POLYVAL and XCTR
+>  * Move HCTR2 hash exporting/importing to helper functions
+>  * Rewrite montgomery reduction for x86-64 POLYVAL
+>  * Rewrite partial block handling for x86-64 POLYVAL
+>  * Optimize x86-64 POLYVAL loop handling
+>  * Remove ahash wrapper from x86-64 POLYVAL
+>  * Add simd-unavailable handling to x86-64 POLYVAL
+>  * Rewrite montgomery reduction for ARM64 POLYVAL
+>  * Rewrite partial block handling for ARM64 POLYVAL
+>  * Optimize ARM64 POLYVAL loop handling
+>  * Remove ahash wrapper from ARM64 POLYVAL
+>  * Add simd-unavailable handling to ARM64 POLYVAL
+>
+> Changes in v3:
+>  * Improve testvec coverage for XCTR, POLYVAL and HCTR2
+>  * Fix endianness bug in xctr.c
+>  * Fix alignment issues in polyval-generic.c
+>  * Optimize hctr2.c by exporting/importing hash states
+>  * Fix blockcipher name derivation in hctr2.c
+>  * Move x86-64 XCTR implementation into aes_ctrby8_avx-x86_64.S
+>  * Reuse ARM64 CTR mode tail handling in ARM64 XCTR
+>  * Fix x86-64 POLYVAL comments
+>  * Fix x86-64 POLYVAL key_powers type to match asm
+>  * Fix ARM64 POLYVAL comments
+>  * Fix ARM64 POLYVAL key_powers type to match asm
+>  * Add XTS + HCTR2 policy to fscrypt
+>
+> Nathan Huckleberry (8):
+>   crypto: xctr - Add XCTR support
+>   crypto: polyval - Add POLYVAL support
+>   crypto: hctr2 - Add HCTR2 support
+>   crypto: x86/aesni-xctr: Add accelerated implementation of XCTR
+>   crypto: arm64/aes-xctr: Add accelerated implementation of XCTR
+>   crypto: x86/polyval: Add PCLMULQDQ accelerated implementation of
+>     POLYVAL
+>   crypto: arm64/polyval: Add PMULL accelerated implementation of POLYVAL
+>   fscrypt: Add HCTR2 support for filename encryption
+>
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+This is looking very good, thanks for your continued efforts on this.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml:30:7: [error] duplication of key "const" in mapping (key-duplicates)
-./Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml:31:7: [error] duplication of key "const" in mapping (key-duplicates)
-./Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml:32:7: [error] duplication of key "const" in mapping (key-duplicates)
+Once Eric's feeback has been addressed, feel free to add
 
-dtschema/dtc warnings/errors:
-make[1]: *** Deleting file 'Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.example.dts'
-Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml: found duplicate key "const" with value "hclk" (original value: "aclk")
-make[1]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.example.dts] Error 1
-make[1]: *** Waiting for unfinished jobs....
-Traceback (most recent call last):
-  File "/usr/local/bin/dt-doc-validate", line 25, in check_doc
-    testtree = dtschema.load(filename, line_number=line_number)
-  File "/usr/local/lib/python3.8/dist-packages/dtschema/lib.py", line 912, in load
-    return yaml.load(f.read())
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/main.py", line 434, in load
-    return constructor.get_single_data()
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 121, in get_single_data
-    return self.construct_document(node)
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 131, in construct_document
-    for _dummy in generator:
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 674, in construct_yaml_map
-    value = self.construct_mapping(node)
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 445, in construct_mapping
-    return BaseConstructor.construct_mapping(self, node, deep=deep)
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 263, in construct_mapping
-    if self.check_mapping_key(node, key_node, mapping, key, value):
-  File "/usr/local/lib/python3.8/dist-packages/ruamel/yaml/constructor.py", line 294, in check_mapping_key
-    raise DuplicateKeyError(*args)
-ruamel.yaml.constructor.DuplicateKeyError: while constructing a mapping
-  in "<unicode string>", line 29, column 7
-found duplicate key "const" with value "hclk" (original value: "aclk")
-  in "<unicode string>", line 30, column 7
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-To suppress this check see:
-    http://yaml.readthedocs.io/en/latest/api.html#duplicate-keys
+to the series.
 
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/local/bin/dt-doc-validate", line 74, in <module>
-    ret = check_doc(f)
-  File "/usr/local/bin/dt-doc-validate", line 30, in check_doc
-    print(filename + ":", exc.path[-1], exc.message, file=sys.stderr)
-AttributeError: 'DuplicateKeyError' object has no attribute 'path'
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml: ignoring, error parsing file
-make: *** [Makefile:1401: dt_binding_check] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/patch/
-
-This check can fail if there are any dependencies. The base for a patch
-series is generally the most recent rc1.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit.
-
+>  Documentation/filesystems/fscrypt.rst   |   19 +-
+>  arch/arm64/crypto/Kconfig               |   10 +-
+>  arch/arm64/crypto/Makefile              |    3 +
+>  arch/arm64/crypto/aes-glue.c            |   65 +-
+>  arch/arm64/crypto/aes-modes.S           |  134 ++
+>  arch/arm64/crypto/polyval-ce-core.S     |  366 ++++++
+>  arch/arm64/crypto/polyval-ce-glue.c     |  240 ++++
+>  arch/x86/crypto/Makefile                |    3 +
+>  arch/x86/crypto/aes_ctrby8_avx-x86_64.S |  233 ++--
+>  arch/x86/crypto/aesni-intel_asm.S       |   70 ++
+>  arch/x86/crypto/aesni-intel_glue.c      |   89 ++
+>  arch/x86/crypto/polyval-clmulni_asm.S   |  333 +++++
+>  arch/x86/crypto/polyval-clmulni_glue.c  |  234 ++++
+>  crypto/Kconfig                          |   40 +-
+>  crypto/Makefile                         |    3 +
+>  crypto/hctr2.c                          |  616 +++++++++
+>  crypto/polyval-generic.c                |  214 ++++
+>  crypto/tcrypt.c                         |   10 +
+>  crypto/testmgr.c                        |   20 +
+>  crypto/testmgr.h                        | 1536 +++++++++++++++++++++++
+>  crypto/xctr.c                           |  191 +++
+>  fs/crypto/fscrypt_private.h             |    2 +-
+>  fs/crypto/keysetup.c                    |    7 +
+>  fs/crypto/policy.c                      |    4 +
+>  include/crypto/polyval.h                |   17 +
+>  include/uapi/linux/fscrypt.h            |    3 +-
+>  tools/include/uapi/linux/fscrypt.h      |    3 +-
+>  27 files changed, 4376 insertions(+), 89 deletions(-)
+>  create mode 100644 arch/arm64/crypto/polyval-ce-core.S
+>  create mode 100644 arch/arm64/crypto/polyval-ce-glue.c
+>  create mode 100644 arch/x86/crypto/polyval-clmulni_asm.S
+>  create mode 100644 arch/x86/crypto/polyval-clmulni_glue.c
+>  create mode 100644 crypto/hctr2.c
+>  create mode 100644 crypto/polyval-generic.c
+>  create mode 100644 crypto/xctr.c
+>  create mode 100644 include/crypto/polyval.h
+>
+> --
+> 2.35.1.1178.g4f1659d476-goog
+>
