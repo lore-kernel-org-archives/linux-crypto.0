@@ -2,107 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24258C4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 01:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6846AC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 07:01:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239115AbiDNBSn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Apr 2022 21:18:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52320 "EHLO
+        id S240205AbiDNHDc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Apr 2022 03:03:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235222AbiDNBSn (ORCPT
+        with ESMTP id S240190AbiDNHDV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Apr 2022 21:18:43 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48DF74E38E;
-        Wed, 13 Apr 2022 18:16:20 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id D411B92009C; Thu, 14 Apr 2022 03:16:18 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id C508F92009B;
-        Thu, 14 Apr 2022 02:16:18 +0100 (BST)
-Date:   Thu, 14 Apr 2022 02:16:18 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
- instead of zero
-In-Reply-To: <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk>
-References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
- <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        Thu, 14 Apr 2022 03:03:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD5C21807
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 00:00:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 28DDFB827CB
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 07:00:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B075C385A5;
+        Thu, 14 Apr 2022 07:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649919653;
+        bh=uHr1+Cwk86eR3a3pxOBg7H43IWRGQGcenpXAPlFZX4w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AOcwbyv8bz3OKJR/W9KdvGEitDnENEPLZ0FbcyK6tb8Q9nBqE+05Um11dUIT4+Dvc
+         u0hjXDCoTv1Kq+uwp8ZzhFkjeD2KPPKPDUabZ3LuB0X+h+xwpwz5gNYQjiJwSVvEZd
+         8YwC8y83PeGlO/JFx2aY1OYnV8T96ICtdB6eSrVbnH57SaRGjVJIxdO/RIcnGwzWo6
+         KLI8mEPP7Uaf5GdHMSax42P6kR+qMoqg28hAj+gxuto5AKHQw642s5AdNixMdTZiwJ
+         sxwmzKDv7NUuK9VD7ABVlYMB00te7PcscP36DoVGnizsk7HVTblYjzUBJySeuQJP0K
+         AqDjxDLqjwUYA==
+Date:   Thu, 14 Apr 2022 00:00:51 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 4/8] crypto: x86/aesni-xctr: Add accelerated
+ implementation of XCTR
+Message-ID: <YlfGo8wSXS58mKmL@sol.localdomain>
+References: <20220412172816.917723-1-nhuck@google.com>
+ <20220412172816.917723-5-nhuck@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412172816.917723-5-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+A few initial comments, I'll take a closer look at the .S file soon...
 
-> However, one thing that I've been thinking about is that the c0 random
-> register is actually kind of garbage. In my fuzzy decade-old memory of
-> MIPS, I believe the c0 random register starts at the maximum number of
-> TLB entries (16?), and then counts down cyclically, decrementing once
-> per CPU cycle. Is that right?
-
- Yes, for the relevant CPUs the range is 63-8 << 8 for R3k machines and 
-47-0 (the lower bound can be higher if wired entries are used, which I 
-think we occasionally do) for R4k machines with a buggy CP0 counter.  So 
-there are either 56 or up to 48 distinct CP0 Random register values.
-
-> If it is, there are some real pros and cons here to consider:
-> - Pro: decrementing each CPU cycle means pretty good granularity
-> - Con: wrapping at, like, 16 or something really is very limited, to
-> the point of being almost bad
+On Tue, Apr 12, 2022 at 05:28:12PM +0000, Nathan Huckleberry wrote:
+> Add hardware accelerated versions of XCTR for x86-64 CPUs with AESNI
+> support.  These implementations are modified versions of the CTR
+> implementations found in aesni-intel_asm.S and aes_ctrby8_avx-x86_64.S.
 > 
-> Meanwhile, on systems without the c0 cycles counter, what is the
-> actual resolution of random_get_entropy_fallback()? Is this just
-> falling back to jiffies?
+> More information on XCTR can be found in the HCTR2 paper:
+> Length-preserving encryption with HCTR2:
+> https://enterprint.iacr.org/2021/1441.pdf
 
- It depends on the exact system.  Some have a 32-bit high-resolution 
-counter in the chipset (arch/mips/kernel/csrc-ioasic.c) giving like 25MHz 
-resolution, some have nothing but jiffies.
+The above link doesn't work.
 
-> IF (a) the fallback is jiffies AND (b) c0 wraps at 16, then actually,
-> what would be really nice would be something like:
-> 
->     return (jiffies << 4) | read_c0_random();
-> 
-> It seems like that would give us something somewhat more ideal than
-> the status quo. Still crap, of course, but undoubtedly better.
+> +#ifdef __x86_64__
+> +/*
+> + * void aesni_xctr_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+> + *		      size_t len, u8 *iv, int byte_ctr)
+> + */
 
- It seems like a reasonable idea to me, but the details would have to be 
-sorted out, because where a chipset high-resolution counter is available 
-we want to factor it in, and otherwise we need to extract the right bits 
-from the CP0 Random register, either 13:8 for the R3k or 5:0 for the R4k.
+This prototype doesn't match the one declared in the .c file.
 
-  Maciej
+> +
+> +asmlinkage void aes_xctr_enc_128_avx_by8(const u8 *in, u8 *iv, void *keys, u8
+> +	*out, unsigned int num_bytes, unsigned int byte_ctr);
+> +
+> +asmlinkage void aes_xctr_enc_192_avx_by8(const u8 *in, u8 *iv, void *keys, u8
+> +	*out, unsigned int num_bytes, unsigned int byte_ctr);
+> +
+> +asmlinkage void aes_xctr_enc_256_avx_by8(const u8 *in, u8 *iv, void *keys, u8
+> +	*out, unsigned int num_bytes, unsigned int byte_ctr);
+
+Please don't have line breaks between parameter types and their names.
+These should look like:
+
+asmlinkage void aes_xctr_enc_128_avx_by8(const u8 *in, u8 *iv, void *keys,
+	u8 *out, unsigned int num_bytes, unsigned int byte_ctr);
+
+Also, why aren't the keys const?
+
+> +static void aesni_xctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out, const u8
+> +				   *in, unsigned int len, u8 *iv, unsigned int
+> +				   byte_ctr)
+> +{
+> +	if (ctx->key_length == AES_KEYSIZE_128)
+> +		aes_xctr_enc_128_avx_by8(in, iv, (void *)ctx, out, len,
+> +					 byte_ctr);
+> +	else if (ctx->key_length == AES_KEYSIZE_192)
+> +		aes_xctr_enc_192_avx_by8(in, iv, (void *)ctx, out, len,
+> +					 byte_ctr);
+> +	else
+> +		aes_xctr_enc_256_avx_by8(in, iv, (void *)ctx, out, len,
+> +					 byte_ctr);
+> +}
+
+Same comments above.
+
+> +static int xctr_crypt(struct skcipher_request *req)
+> +{
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	struct crypto_aes_ctx *ctx = aes_ctx(crypto_skcipher_ctx(tfm));
+> +	u8 keystream[AES_BLOCK_SIZE];
+> +	u8 ctr[AES_BLOCK_SIZE];
+> +	struct skcipher_walk walk;
+> +	unsigned int nbytes;
+> +	unsigned int byte_ctr = 0;
+> +	int err;
+> +	__le32 ctr32;
+> +
+> +	err = skcipher_walk_virt(&walk, req, false);
+> +
+> +	while ((nbytes = walk.nbytes) > 0) {
+> +		kernel_fpu_begin();
+> +		if (nbytes & AES_BLOCK_MASK)
+> +			static_call(aesni_xctr_enc_tfm)(ctx, walk.dst.virt.addr,
+> +				walk.src.virt.addr, nbytes & AES_BLOCK_MASK,
+> +				walk.iv, byte_ctr);
+> +		nbytes &= ~AES_BLOCK_MASK;
+> +		byte_ctr += walk.nbytes - nbytes;
+> +
+> +		if (walk.nbytes == walk.total && nbytes > 0) {
+> +			ctr32 = cpu_to_le32(byte_ctr / AES_BLOCK_SIZE + 1);
+> +			memcpy(ctr, walk.iv, AES_BLOCK_SIZE);
+> +			crypto_xor(ctr, (u8 *)&ctr32, sizeof(ctr32));
+> +			aesni_enc(ctx, keystream, ctr);
+> +			crypto_xor_cpy(walk.dst.virt.addr + walk.nbytes -
+> +				       nbytes, walk.src.virt.addr + walk.nbytes
+> +				       - nbytes, keystream, nbytes);
+> +			byte_ctr += nbytes;
+> +			nbytes = 0;
+> +		}
+
+For the final block case, it would be a bit simpler to do something like this:
+
+	__le32 block[AES_BLOCK_SIZE / sizeof(__le32)]
+
+	
+	...
+	memcpy(block, walk.iv, AES_BLOCK_SIZE);
+	block[0] ^= cpu_to_le32(1 + byte_ctr / AES_BLOCK_SIZE);
+	aesni_enc(ctx, (u8 *)block, (u8 *)block);
+
+I.e., have one buffer, use a regular XOR instead of crypto_xor(), and encrypt it
+in-place.
+
+> @@ -1162,6 +1249,8 @@ static int __init aesni_init(void)
+>  		/* optimize performance of ctr mode encryption transform */
+>  		static_call_update(aesni_ctr_enc_tfm, aesni_ctr_enc_avx_tfm);
+>  		pr_info("AES CTR mode by8 optimization enabled\n");
+> +		static_call_update(aesni_xctr_enc_tfm, aesni_xctr_enc_avx_tfm);
+> +		pr_info("AES XCTR mode by8 optimization enabled\n");
+>  	}
+
+Please don't add the log message above, as it would get printed at every boot-up
+on most x86 systems, and it's not important enough for that.  The existing
+message "AES CTR mode ..." shouldn't really exist in the first place.
+
+- Eric
