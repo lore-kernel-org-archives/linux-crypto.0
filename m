@@ -2,135 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B676C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 20:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BF8C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 20:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350972AbiDOUJ6 (ORCPT
+        id S1352476AbiDOVAA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Apr 2022 16:09:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
+        Fri, 15 Apr 2022 17:00:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351017AbiDOUJq (ORCPT
+        with ESMTP id S237596AbiDOVAA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Apr 2022 16:09:46 -0400
+        Fri, 15 Apr 2022 17:00:00 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7124D8F7F
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Apr 2022 13:07:17 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1nfSDg-0005eL-9y; Fri, 15 Apr 2022 22:07:04 +0200
-Message-ID: <7c9c093a-cfb8-c997-87f8-db769eaa2c62@pengutronix.de>
-Date:   Fri, 15 Apr 2022 22:07:01 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [EXT] [PATCH v6 3/4] crypto: caam - add in-kernel interface for
- blob generator
-Content-Language: en-US
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Sumit Garg <sumit.garg@linaro.org>,
-        David Gstir <david@sigma-star.at>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Richard Weinberger <richard@nod.at>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        James Morris <jmorris@namei.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        James Bottomley <jejb@linux.ibm.com>,
-        "tharvey@gateworks.com" <tharvey@gateworks.com>,
-        "Serge E. Hallyn" <serge@hallyn.com>
-References: <20220316164335.1720255-1-a.fatoum@pengutronix.de>
- <20220316164335.1720255-4-a.fatoum@pengutronix.de>
- <DU2PR04MB8630BDFC29AA31074C623A7B95199@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <ae941471-43c0-1aea-2567-89eed98a61a6@pengutronix.de>
- <DU2PR04MB86306DE99EA993BF596BA729951D9@DU2PR04MB8630.eurprd04.prod.outlook.com>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83ED360CFC
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Apr 2022 13:57:30 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <afa@pengutronix.de>)
+        id 1nfT0A-0002iF-W8; Fri, 15 Apr 2022 22:57:11 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <afa@pengutronix.de>)
+        id 1nfT0A-003FIo-36; Fri, 15 Apr 2022 22:57:08 +0200
+Received: from afa by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <afa@pengutronix.de>)
+        id 1nfT07-000C0R-Jp; Fri, 15 Apr 2022 22:57:07 +0200
 From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <DU2PR04MB86306DE99EA993BF596BA729951D9@DU2PR04MB8630.eurprd04.prod.outlook.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>
+Cc:     kernel@pengutronix.de, Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v7 6/6] MAINTAINERS: add myself as CAAM trusted key maintainer
+Date:   Fri, 15 Apr 2022 22:56:47 +0200
+Message-Id: <20220415205647.46056-7-a.fatoum@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220415205647.46056-1-a.fatoum@pengutronix.de>
+References: <20220415205647.46056-1-a.fatoum@pengutronix.de>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: afa@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 28.03.22 11:29, Pankaj Gupta wrote:
->>> struct keyblob_info {
->>>         void *key;
->>>         size_t key_len;
->>>
->>>         void *blob;
->>>         size_t blob_len;
->>>
->>>         size_t key_mod_len;
->>>         const void *key_mod;
->>> };
->>
->> I can do that.
->>
-> 
-> Please do. Thanks.
+Add myself as maintainer for the just added trusted key integration
+with the NXP Cryptographic Acceleration and Assurance Module.
 
-I went with your other suggestion instead: void *input and void *output.
-This keeps the code simple and avoids having to do:
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+v6 -> v7:
+  - split off as separate patch (Jarkko)
 
-if (encap) {
-  in = info->key;
-  in_len = info->key_len;
-  out = info->blob_len;
-  out_len = info->key_len + CAAM_BLOB_OVERHEAD; 
-} else {
-  in = info->blob;
-  in_len = info->blob_len;
-  out = info->key_len;
-  out_len = info->blob_len - CAAM_BLOB_OVERHEAD; 
-}
+To: Jarkko Sakkinen <jarkko@kernel.org>
+To: James Bottomley <jejb@linux.ibm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+To: David Howells <dhowells@redhat.com>
+Cc: James Morris <jmorris@namei.org>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+Cc: David Gstir <david@sigma-star.at>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Sumit Garg <sumit.garg@linaro.org>
+Cc: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+---
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> Patch 4/4, needs to be re-worked to.
-> 
->> Whats your opinion on the desc size computation? Comment the macro or
->> add the static inline helper?
->>
-> 
-> Comment the macro is fine.
-> 
->> Cheers,
->> Ahmad
->>
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       |
->> https://eur01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.
->> pengutronix.de%2F&amp;data=04%7C01%7Cpankaj.gupta%40nxp.com%7C4
->> d60f0d524a04b7cbd7b08da0d7e7d21%7C686ea1d3bc2b4c6fa92cd99c5c30163
->> 5%7C0%7C0%7C637837134158793951%7CUnknown%7CTWFpbGZsb3d8eyJWI
->> joiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3
->> 000&amp;sdata=PetvZm8teusBwQ4BeZ1VLEOvBlCrZ2k2bNG3SJBEXPw%3D&
->> amp;reserved=0  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-> 
-> 
-
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 61d9f114c37f..e13e179729f7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10854,6 +10854,15 @@ S:	Supported
+ F:	include/keys/trusted_tee.h
+ F:	security/keys/trusted-keys/trusted_tee.c
+ 
++KEYS-TRUSTED-CAAM
++M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
++R:	Pengutronix Kernel Team <kernel@pengutronix.de>
++L:	linux-integrity@vger.kernel.org
++L:	keyrings@vger.kernel.org
++S:	Maintained
++F:	include/keys/trusted_caam.h
++F:	security/keys/trusted-keys/trusted_caam.c
++
+ KEYS/KEYRINGS
+ M:	David Howells <dhowells@redhat.com>
+ M:	Jarkko Sakkinen <jarkko@kernel.org>
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.30.2
+
