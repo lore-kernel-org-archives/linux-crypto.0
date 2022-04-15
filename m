@@ -2,132 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CDCC4332F
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Apr 2022 22:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7E4C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 06:45:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344480AbiDNW2U (ORCPT
+        id S1349607AbiDOGro (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Apr 2022 18:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
+        Fri, 15 Apr 2022 02:47:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229769AbiDNW2T (ORCPT
+        with ESMTP id S1350733AbiDOGrm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Apr 2022 18:28:19 -0400
-X-Greylist: delayed 2096 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 14 Apr 2022 15:25:52 PDT
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF970C1CB5;
-        Thu, 14 Apr 2022 15:25:51 -0700 (PDT)
-Received: from [IPv6:::1] ([IPv6:2607:fb90:7391:dbf4:ac39:3cd7:6899:402e])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.15.2) with ESMTPSA id 23ELn22M2798814
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Thu, 14 Apr 2022 14:49:06 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 23ELn22M2798814
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2022040301; t=1649972954;
-        bh=jiFuth2NsJ6kFB5qJAnKixgQm17ojdbszGGbG4v/FeY=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=WlSCH46pkTTvkaONLTYtjSkmVwtV4qIeEdMmXnK56j8qtfwYS7JikfRA16t5MViVC
-         EM1qWGvWzhlh2WlFCdtk8/UVeYPWJN9pelM2/l0cF13oibPwWutbgFsYCsjE65uNxL
-         UzaMe4CX9mRVu4ZeBkEf3DAcp1R7Lu0Q4CjYfJaSmfE341ksWVeh/c/jWjfchMFBDB
-         Kc/0+g7g2/qKBHAy4Z8aTTrUnbJmj1jVMpR2c1aRJI76xB5zAdlw1ESnuyChATNlb9
-         ESUZ4Kayt9mmYcOKPJjEWAfQnrQPber7lZBL2bGlkPEFzqEejAivyie3AdvPo+WqEc
-         sBsC/PwpLjncQ==
-Date:   Thu, 14 Apr 2022 14:49:01 -0700
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Rob Herring <robh@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-m68k <linux-m68k@vger.kernel.org>,
-        "open list:MIPS" <linux-mips@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-um@lists.infradead.org, X86 ML <x86@kernel.org>,
-        linux-xtensa@linux-xtensa.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v4_01/11=5D_timekeeping=3A_add_ra?= =?US-ASCII?Q?w_clock_fallback_for_random=5Fget=5Fentropy=28=29?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <YliHAl0XpQ57FSGy@robh.at.kernel.org>
-References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-2-Jason@zx2c4.com> <CAL_JsqJYq5Oe_zBbcwYNMpfpqGLGCyaSfGqOrPjZ_Pj=nF73mA@mail.gmail.com> <CAHmME9pn++c0qHzq39YWyXogcKRbn2XK=yA3kFqch0wH7qPcAg@mail.gmail.com> <YliHAl0XpQ57FSGy@robh.at.kernel.org>
-Message-ID: <B465920D-5799-4799-A0AC-68837E159D66@zytor.com>
+        Fri, 15 Apr 2022 02:47:42 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DB2B0A51
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 23:45:14 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id t12so6477092pll.7
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Apr 2022 23:45:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ldV1uCjsScyMqnX29S2Mnzm56eDt6Wx9wkmuB11hEfM=;
+        b=rDb8Gh4XiSJ5bCNnQ/GtnJIzx5ChDSHZ4lV22jBcV+F9GyJoIkOE+UWgey1kEpy0gI
+         MTKaFOriP4KbyNke3RHlowF7AzZ8vUNcqA+TwvlHlayovLLg57TbgJXaNYd9fpE64GSZ
+         ABXn/A0Tx029H5JDtT1XMYUFDzq0jEaK9jWxYNCherEopNOslLePPx/F+lrjS9pBVK/A
+         9dpWjF77ljcGRCaQK7cvGyxJE/KLO5/lQq2+8MwZm4Q9PnjS1vEyAdD7UlP5UuCfx7RW
+         f+X1YiQzmVoG1vIaEQcymb5C98hqfNYIoFZUyzS8Jq2XoPr8jS+wGPmsTLuYAXyggK+m
+         Ji1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ldV1uCjsScyMqnX29S2Mnzm56eDt6Wx9wkmuB11hEfM=;
+        b=Q9OK7G6mCScZvaXruwTabAUo6zU9JBI3KbUG/9h+SrmQFByq53H7GwDCmUvTGhqB8S
+         lYFRc6gss70IJrN/cZNgrlqThS7jDNoj+pm6c+xubKjFNoYPwoNAoDJ02eKvPAwJDq9c
+         JP4Zlii7uGZHnuGHjDJxbw2E8Pzf0G8PGndwIqEkOUYIc3s2rYEi0AyaFXM+vFESj7RN
+         2qlglKj4+JRP84u52+ohJSnSDfpgCl1D8JM4q12UKE/666bFamgmksx5oqE5jdcHZb9n
+         ZE5kufd1JdTU01v6243Vm/Q741uwgMgxAJ3x+dBn6krz3V910GDmlSv7mVasduZB4jiP
+         cOLg==
+X-Gm-Message-State: AOAM531LYeh2n3h4H17X59W3sHzF9IU0qHRli2wt3MHAJFT/hS6BlvYV
+        hYAGD+v0mgyEurRBKMVM889f/g==
+X-Google-Smtp-Source: ABdhPJyBEsq9NBxcUGHmvrk5wwfGZRmZAh1nf0tDGbK7Ic0lp5x83dUfzjLylmDxDhgTYThkApUAEw==
+X-Received: by 2002:a17:902:9309:b0:156:983d:2193 with SMTP id bc9-20020a170902930900b00156983d2193mr49846482plb.158.1650005113570;
+        Thu, 14 Apr 2022 23:45:13 -0700 (PDT)
+Received: from always-x1.bytedance.net ([61.120.150.70])
+        by smtp.gmail.com with ESMTPSA id d8-20020a056a00198800b004fab740dbe6sm1867385pfl.15.2022.04.14.23.45.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 23:45:12 -0700 (PDT)
+From:   zhenwei pi <pizhenwei@bytedance.com>
+To:     arei.gonglei@huawei.com, mst@redhat.com
+Cc:     jasowang@redhat.com, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
+        davem@davemloft.net, zhenwei pi <pizhenwei@bytedance.com>
+Subject: [PATCH 0/4] virtio-crypto: Improve performance
+Date:   Fri, 15 Apr 2022 14:41:32 +0800
+Message-Id: <20220415064136.304661-1-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On April 14, 2022 1:41:38 PM PDT, Rob Herring <robh@kernel=2Eorg> wrote:
->On Thu, Apr 14, 2022 at 12:38:49AM +0200, Jason A=2E Donenfeld wrote:
->> Hi Rob,
->>=20
->> On Wed, Apr 13, 2022 at 4:32 PM Rob Herring <robh@kernel=2Eorg> wrote:
->> > 'does not have a usable get_cycles(), =2E=2E=2E' as clearly some arch=
-es have
->> > get_cycles() and yet still need a fallback=2E
->> >
->> > Why not handle the 'if get_cycles() returns 0 do the fallback' within
->> > a weak random_get_entropy() function? Then more arches don't need any
->> > random_get_entropy() implementation=2E
->>=20
->> No, this doesn't really work=2E Actually, most archs don't need a
->> random_get_entropy() function, because it exists in asm-generic doing
->> the thing we want=2E So that's taken care of=2E But weak functions as y=
-ou
->> suggested would be quite suboptimal, because on, e=2Eg=2E x86, what we
->> have now gets inlined into a single rdtsc instruction=2E Also, the
->> relation between get_cycles() and random_get_entropy() doesn't always
->> hold; some archs may not have a working get_cycles() function but do
->> have a path for a random_get_entropy()=2E Etc, etc=2E So I'm pretty sur=
-e
->> that this commit is really the most simple and optimal thing to do=2E I
->> really don't want to go the weak functions route=2E
->
->Is random_get_entropy() a hot path?
->
->
->It doesn't have to be a weak function, but look at it this way=2E We have=
-=20
->the following possibilities for what random_get_entropy() does:
->
->- get_cycles()
->- get_cycles() but returns 0 sometimes
->- returns 0
->- something else
->
->You're handling the 3rd case=2E
->
->For the 2nd case, that's riscv, arm, nios2, and x86=2E That's not a lot,=
-=20
->but is 2 or 3 of the most widely used architectures=2E Is it really too=
-=20
->much to ask to support the 2nd case in the generic code/header?
->
->Rob
+Hi,
 
-It goes into interrupts, which means it is latency critical=2E
+The main point of this series is to improve the performance for
+virtio crypto:
+- Use wait mechanism instead of busy polling for ctrl queue, this
+  reduces CPU and lock racing, it's possiable to create/destroy session
+  parallelly, QPS increases from ~40K/s to ~200K/s.
+- Enable retry on crypto engine to improve performance for data queue,
+  this allows the larger depth instead of 1.
+- Fix dst data length in akcipher service.
+- Other style fix.
+
+lei he (2):
+  virtio-crypto: adjust dst_len at ops callback
+  virtio-crypto: enable retry for virtio-crypto-dev
+
+zhenwei pi (2):
+  virtio-crypto: wait ctrl queue instead of busy polling
+  virtio-crypto: move helpers into virtio_crypto_common.c
+
+ drivers/crypto/virtio/Makefile                |   1 +
+ .../virtio/virtio_crypto_akcipher_algs.c      |  92 ++++++------
+ drivers/crypto/virtio/virtio_crypto_common.c  |  92 ++++++++++++
+ drivers/crypto/virtio/virtio_crypto_common.h  |  25 +++-
+ drivers/crypto/virtio/virtio_crypto_core.c    |  37 +----
+ .../virtio/virtio_crypto_skcipher_algs.c      | 134 ++++++++----------
+ 6 files changed, 222 insertions(+), 159 deletions(-)
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_common.c
+
+-- 
+2.20.1
+
