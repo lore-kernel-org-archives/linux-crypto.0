@@ -2,161 +2,232 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1035DC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 13:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD956C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 16:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354141AbiDONwW (ORCPT
+        id S1355756AbiDOQRx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Apr 2022 09:52:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57592 "EHLO
+        Fri, 15 Apr 2022 12:17:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231714AbiDONwS (ORCPT
+        with ESMTP id S1355822AbiDOQRp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Apr 2022 09:52:18 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2076.outbound.protection.outlook.com [40.107.94.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE7C55214;
-        Fri, 15 Apr 2022 06:49:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QmFc7N99aGpeydUFYrBo0VqNBMny/r/jdIuDDFYiHcRvIMfrzVkU2zBeAMIp1452qJSA8MB21BYBu1fFFCrcLqolK6ODZkGOgc8WS982LiH+4WUtAsM/JYMxEQAlkBWe2KANIm2NRXxtK4tXGf+dp6IZ3zw+RQm0YzMICIx/IuSDVhb3JfZm1oJ3Pu+RsFzKepf9CuRf3tseqQKEkhwnlQQQMLtZwEAU2S1lPvJnvM67eTSrWuY0nNl4SsBesIKBsiiauIkbxIyzN5hkUfUmdUrDrpSmYQvUFksC9nUDcUSflIbqvxxOPlNRuVCnVkyJlk6csZoCY9OPW1PqPwyr+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QYgDIEzNCC0o1mXK8w6IW4/B9W+QLaYMDydDrsVaDAc=;
- b=dekI5SIyi6iwyxyHxucXO/DKeeOqwOe5LORP/+dfLizbsnBhg55tanrChJY5IVdjFkPb92KUcWPFHu6lEtcExRndtw1WsFv6hmSCRmyObCqkeyblE3TNs3pI+IaFG2kFtI3L3Wj0CwIT0vMfbA9jqXZmvF+AoWhsEcqGZPDSiFJQM/YObYEjpDvGDjPlplgYeuBIL1vHd/WVTmyqsPh01N617B1nlSJOV9l3aU6Wuuu8DzacHoDlCpduUH5zYYQ9Fh7UAh/r1jfLuZLSAJ8vJinmcZsdrssChvLwJckd4bLTyLqEA5vtiGFeE9Qh+5bRsSBCGcVRXJgQP9Ec8oTsfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QYgDIEzNCC0o1mXK8w6IW4/B9W+QLaYMDydDrsVaDAc=;
- b=1VRbdEodW0ZspUulI+nBs8VGVmnKhKSBat6zK51kIxA3RRqNvZe11kdjWzNSJvWmkkPzYjZiG/dx3i/AuzR+AtzV+L4ukvpdcYiOHP0CHm2RTUrGM2TQP6nIByDRORlfFqEYa/mNASGd/aC1J0YbHpzMKGEkVmQSiSgpzyd1GJM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM6PR12MB3452.namprd12.prod.outlook.com (2603:10b6:5:115::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18; Fri, 15 Apr
- 2022 13:49:46 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::781d:15d6:8f63:a4e7]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::781d:15d6:8f63:a4e7%5]) with mapi id 15.20.5164.020; Fri, 15 Apr 2022
- 13:49:46 +0000
-Message-ID: <fe209f25-6119-cc26-2608-8aaccf11ac36@amd.com>
-Date:   Fri, 15 Apr 2022 08:49:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Jacky Li <jackyli@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        John Allen <john.allen@amd.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Marc Orr <marcorr@google.com>, Alper Gun <alpergun@google.com>,
-        Peter Gonda <pgonda@google.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220414162325.1830014-1-jackyli@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v2] crypto: ccp - Fix the INIT_EX data file open failure
-In-Reply-To: <20220414162325.1830014-1-jackyli@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR16CA0041.namprd16.prod.outlook.com
- (2603:10b6:805:ca::18) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8955330a-06f0-46b0-6ce2-08da1ee6cd10
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3452:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3452B09B7D5FD5C4EABADC6AECEE9@DM6PR12MB3452.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0dwF0aS5gx+b8XwWTWbJpYFbYlu48oZLa3zf1QyzucamG42C1VWwlfBP3yWQts8fcrQQ9hF13AOvF7leFjWH/+wIFvNK4F0lGtkMeKcgHNS2K0Hx4dbW1GV4SviedTR9hi4ojUXfV6DeBX58V82/YF8iRQeWn0nfJjLVfsxuTI0hNMHeFumOOJijVD74zNAM5L2SZeC4FB4WdQyejvTivCKFDpbxj/iKwQHve8LroYcCrGaCDdyW0E7I675IiZ4SpCCBEI/F8BJZvRDRl4mcQw/aTSyFJsw2hHGQKGPgKuGfsK29nlqPf7RCOlqoVu0ERiCezU+rjP2N02ULKwxEN597O9y+SJU4omguKirIVSL/tJVxbTS4gCnzVmBfzrKlfkmZFdt0ynb5V9rN0+5laR7HGvFVL+sNnpEGvC7VY+WliCQ/37tbSSCskvEeW/0cjWnC1EWJh59BkvisTfnKY1JGD4gidqfYqXuC0cdP9rNjeIxr5+TMZiLUJVc96UxL3Lzj3wOimh3MIKR7fPZVnAmXUbDozz8rvWjq3JD6WFmrSVRxQLoP1AKg28C+F6k/nBOo2H0Ta2B7yaCkfZ9LW6IatbzGXrB4mLGRzFXhbOZPA29757XPXGvuEP65hto9Q/dDGOofynOa0wxkg0VUYeI7T+PhlGedP69RdmPfpSF7QxMkTod76zHtnUuofNMvLsldbnIFTIjWhs/Eqodmxnhyy8z4tDV2Pe+6L3dfALo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(31696002)(26005)(186003)(2616005)(6486002)(508600001)(6506007)(6666004)(38100700002)(2906002)(86362001)(6512007)(5660300002)(53546011)(83380400001)(66556008)(8676002)(66946007)(4326008)(6636002)(316002)(54906003)(110136005)(36756003)(66476007)(8936002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWFWMElzcjRXTEFYUElGVXNLSXl1V01UcmkwS0JJQVNZWjNaaU5ERURDVHVB?=
- =?utf-8?B?dDBUNUNMT1NJcHJHVU5HVE0rdHkxc2tPb2tPR2drRHkxY2ZJMm54dnJiMWlR?=
- =?utf-8?B?M1VKbkljQ3JxN1l6YVFjTGIxdC9kUVhWc3AwTXk0aDF6Yy9xSTFWcjRLQm1D?=
- =?utf-8?B?eSs4b0VZeFNMaGxqUzhMWVNFY0ZLb2c1N0ZmZzI4b1dhNmJlNXZ2bjZ3S25N?=
- =?utf-8?B?T2xvNEs3Rmthc3I4bzNMQ1lJRzZTcEIrMUxkd1Ixb21GY1JtR3FxNUFDODEx?=
- =?utf-8?B?eDFDOWtkWnBHYkU4VUdIWWtaMDU5dDRGK0xIOXRENDJwN1B3VGNpRGZnOEtn?=
- =?utf-8?B?MmxQWmlYZDFlLzZaczd1S3lQdmtiUzhaK281UXIxV3dOZ3pDMkU4VjZSQVdw?=
- =?utf-8?B?UXdEZC96SVdMYkx4L0NMMlo2SFdGeUo4LzlWbmFsSCtlV1ZJVUdUU204MGda?=
- =?utf-8?B?RW5qelNwUkxIMjMvSUlhamk3cHZBUE5oeWFIVlVYaVJmZDdzMUdIUGcxUnQr?=
- =?utf-8?B?QnlnY1d6SHk1S3FVS0JoU2liNGFUNSt4T3F1Mlo2dDU4ZytONGtDRlpDQVp3?=
- =?utf-8?B?Vk9QcW5IUE9RcUJ5WXB0RHJpMTJxUSttQU02QzkzbENPSEFHOUFCNkZqTXRJ?=
- =?utf-8?B?cC9WQ05mV3pwamQ2aWZIdHJaTkJ1R1FGWWNtTmJEMmxsOFlZOHN4Vk04WHVK?=
- =?utf-8?B?akFSQ015d1h6bEZSZU9EQmJ1dXN5S2JoUHBXOUswclJoVDVtYmx1Q0NKNGJB?=
- =?utf-8?B?TWt1bFU3Q2RmVi92U1QrN1JWYzdJK3R4cXNNc3pZREpaNG5yTkpTRG9DbHRM?=
- =?utf-8?B?QnRWQmd1Vi83dHRRbE4zdHVGdlBMSE9ld3crb3hFSW9zeGRuOXpaWGlGL2h4?=
- =?utf-8?B?R0dBV1dYdVd4eSsvWExmMitraHpDc3U1c0dsUnRtZjY0Z1Z1K1RGZUpQRTNS?=
- =?utf-8?B?VkJjSSszMXdreHBtYjcvV0oyVmxrZzh1eFpOTnhYdjM1OTg3U0o5N3FOanRz?=
- =?utf-8?B?L3NLdVYwSHozZkNHRE5mYWl3QTI4SEloNUdBK1YxdmRhVGlGRW03cStUQmc3?=
- =?utf-8?B?MzlzdHpScUFrd1FkaUJmR2s1a1B4Y1J3Rldkdlg4UWM3eDB6MWxuNHo5WXhU?=
- =?utf-8?B?R2IvMWZ1VDMwbERIbDU1WDQzbnhUdStrS3JwSHFnVGxQRnRhelpCcVdqZWpo?=
- =?utf-8?B?d01vTDhPMUlmT3BicGJCaG5VZGpHYjdjZ1hBZ3kyV3BONllnQk1ORFZKemZG?=
- =?utf-8?B?aER2c1Frb2xnYzZpV251SlphQ2pyOHhWdmZxdkI1Wm42TEpJLzY5YVo0eGhu?=
- =?utf-8?B?UUF2NW5CRzdQd1M1ODZhc2JDSXQySmcwaURIbE4zaG5ZS2pHTzY5emxhbW1h?=
- =?utf-8?B?VHU2ODNsenVzNndVcWs3RlRxWmU4K0FPK3VBSnhUVGthZ1JpT0xGa0JrTWpi?=
- =?utf-8?B?ajlJZWZhbUFMa0w4V2xBVHlWSCttN3dta2VQSXJMUDlOdmVZcFdSL0JmZzhV?=
- =?utf-8?B?TkJXZjlkejdJeHdDQ3pIejlWdXZLVmk2SzJVUy9FVlFCenBwdmxraE5BSDVE?=
- =?utf-8?B?eEgwMFlySTFMQkV4Rm9DMVVEVFpUZmJHOVYwNVZDMFYrdHcwb3hOR3lyUzV2?=
- =?utf-8?B?UExwREp5NFJ2MThzNDltenRZNmNXK2pVVGpxYVlPYjF5KzR3WWhXUnlNdHdW?=
- =?utf-8?B?SHd4dGNhWGN0aU1ueVBBV2JWaUxUbVFpK3JOaGsxRGcwV2t0d0pIbzRQU2Jz?=
- =?utf-8?B?RzVBOE81ZnJDczZZNzJhaFVnY0ZOK1lvaU1Jbmxva1JDNzFGZlVodW5MUkg1?=
- =?utf-8?B?YlRZY2RUbjJsWjFXREozUkZSNnlxNFFTRGZvUEs0eVE3MFVUNU1FWXlNRXB4?=
- =?utf-8?B?MlVxMHlhL1lJSlpBSk5mUDZxTkFxU3l4MHVnT1NXSStaL3dPY1ZEOElpZXdl?=
- =?utf-8?B?VFBBcWtPZTVJVW9Vc1JaSXM2cmI0V1YyaHBEUVpndkVPU3h3WkIzNnRxUTdI?=
- =?utf-8?B?MjdVSkxVbnp5N0NmeXQyWUpBTkxnVlF4WDk0dkkwcXhKUlRjcFRSNnRvZmF5?=
- =?utf-8?B?eENIK1hwbUF1dkpMZTE5SzUwUVl5OG5PMlJwWjQzYkhNLysvZHhjaXBQMmJL?=
- =?utf-8?B?Rzlva2FjdzFnNHdrQlZXUlRRV2hEeVFKMUswMVhneWZHc1pBNk9VMDhvaTBq?=
- =?utf-8?B?dUNnWERuT1IvenMyZ0d3UjE4S0h4VEx2ZndGc0VpT1BaVUx3ay9zb0ZBbXhD?=
- =?utf-8?B?UkFobVJZUzRWLzF4TG5mcERpTS9EaVRWSFhBTkpkNExMc1JBVkJWS1ppcng0?=
- =?utf-8?B?ZWdCQmxsZlRjYWtPQkdCdkp6dzk0alB1RVJqRGJSYmlOc1N4UmJsdz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8955330a-06f0-46b0-6ce2-08da1ee6cd10
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2022 13:49:45.9950
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HyNXXnGAmUI79rwUZwbZpSIMdsDfNIVzWTY2yUtbzDSpOSuLwmSdCjbAoWdt+Usu2B7i5Gmw/1uBOFks/jDF4Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3452
+        Fri, 15 Apr 2022 12:17:45 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F41F95A35;
+        Fri, 15 Apr 2022 09:15:16 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23FEsYZs006010;
+        Fri, 15 Apr 2022 16:14:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=UWTIYmrEftbLWJ6XCjLqKzy6zE8O8MmJwK2RB40wCX0=;
+ b=GzERIESg5aYp7Igqk+Ju9n6r2wA04zssnpBGCoVdrNXJSrlPY+dFeeZzQT9Fda9dv3Pe
+ ZDi67zzS/mjO4n1moq3BrOYCN6ombcz6K7aBCJH2E8JJvl59Ho0LqYsFYt0cmdHQwso1
+ F8nfUWPLlHYyy5kO6Q81TOBZMzIUY8SdFywR3/9KH6rZozCMpuTih7R7XJo7twib5tcP
+ iW3IPinDuaSFjilyXRFo2fpiN/z9RsHSVnSzhoyz2+iJjDcHlDp1IiOM75z6WcY6zhGU
+ BhvGdY7ik+1dHYBSFuXGry31eoMyyAfL2aU/CP8O9p0C2EkpMcm/vkUy6rQ067o1mUlp 7Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fedxth8jg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Apr 2022 16:14:17 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 23FFxgu0004430;
+        Fri, 15 Apr 2022 16:14:17 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3fedxth8ht-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Apr 2022 16:14:17 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23FFsCiO009562;
+        Fri, 15 Apr 2022 16:14:15 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03fra.de.ibm.com with ESMTP id 3fb1s8rnfg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Apr 2022 16:14:14 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23FGECIP35258678
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Apr 2022 16:14:12 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A0BB24C04A;
+        Fri, 15 Apr 2022 16:14:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 496A44C044;
+        Fri, 15 Apr 2022 16:14:10 +0000 (GMT)
+Received: from sig-9-65-86-1.ibm.com (unknown [9.65.86.1])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Apr 2022 16:14:10 +0000 (GMT)
+Message-ID: <faf4f539ca163a0f458a8b9d23f1f6d23a8fea21.camel@linux.ibm.com>
+Subject: Re: [PATCH 4/7] KEYS: Introduce a builtin root of trust key flag
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Eric Snowberg <eric.snowberg@oracle.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        Roberto Sassu <roberto.sassu@huawei.com>,
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        "pvorel@suse.cz" <pvorel@suse.cz>, "tiwai@suse.de" <tiwai@suse.de>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Date:   Fri, 15 Apr 2022 12:14:09 -0400
+In-Reply-To: <0A0B0B93-80BD-49A9-B0B3-56C6F74D2BE0@oracle.com>
+References: <20220406015337.4000739-1-eric.snowberg@oracle.com>
+         <20220406015337.4000739-5-eric.snowberg@oracle.com>
+         <4fbef0889d6f286c7fcd317db099b4857e1b2fa3.camel@linux.ibm.com>
+         <EF1544D5-54E8-4D47-82F8-F9337CA7AEA0@oracle.com>
+         <b8965652274b49ba7c6f67cad6d42965cf984b42.camel@linux.ibm.com>
+         <16DDA7F1-95BA-4279-BE4E-9F713A905B36@oracle.com>
+         <986199739ff8bd730b9aabe8882e245946d3d9e9.camel@linux.ibm.com>
+         <BFA04505-F4BC-4CF8-B813-EE81DBD90E09@oracle.com>
+         <6798c67d748ecdc92455a8be8c63fb55e243368a.camel@linux.ibm.com>
+         <B67D99B1-1DF9-4146-9147-08B2C4A72FEA@oracle.com>
+         <909b435d947070b44e66e7e8a10951972fc3da7b.camel@linux.ibm.com>
+         <0A0B0B93-80BD-49A9-B0B3-56C6F74D2BE0@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ziH38Z-OoTUwMmE8yfdLa-pHsc1HGAo8
+X-Proofpoint-GUID: xlYX5krNaH4nMQ7dc99L2jxRQeumkgDT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-15_06,2022-04-15_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 phishscore=0 malwarescore=0
+ adultscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204150092
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/14/22 11:23, Jacky Li wrote:
-> There are 2 common cases when INIT_EX data file might not be
-> opened successfully and fail the sev initialization:
+On Thu, 2022-04-14 at 21:59 +0000, Eric Snowberg wrote:
 > 
-> 1. In user namespaces, normal user tasks (e.g. VMM) can change their
->     current->fs->root to point to arbitrary directories. While
->     init_ex_path is provided as a module param related to root file
->     system. Solution: use the root directory of init_task to avoid
->     accessing the wrong file.
+> > On Apr 14, 2022, at 12:09 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> > 
+> > On Thu, 2022-04-14 at 16:36 +0000, Eric Snowberg wrote:
+> >> 
+> >>> On Apr 11, 2022, at 9:30 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> >>> 
+> >>> On Fri, 2022-04-08 at 21:59 +0000, Eric Snowberg wrote:
+> >>>>> On Apr 8, 2022, at 12:49 PM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> >>>>> 
+> >>>>> On Fri, 2022-04-08 at 17:34 +0000, Eric Snowberg wrote:
+> >>>>>> 
+> >>>>>>> On Apr 8, 2022, at 10:55 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> >>>>>>> 
+> >>>>>>> On Fri, 2022-04-08 at 15:27 +0000, Eric Snowberg wrote:
+> >>>>>>>> 
+> >>>>>>>>> On Apr 8, 2022, at 8:40 AM, Mimi Zohar <zohar@linux.ibm.com> wrote:
+> >>>>>>>>> 
+> >>>>>>>>> On Tue, 2022-04-05 at 21:53 -0400, Eric Snowberg wrote:
+> >>>>>>>>>> 
+> >>>>>>>>>> The first type of key to use this is X.509.  When a X.509 certificate
+> >>>>>>>>>> is self signed, has the kernCertSign Key Usage set and contains the
+> >>>>>>>>>> CA bit set this new flag is set.
+> >>>>>>>>>> 
+> >>>>>>>>>> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+> >>>>>>>>>> 
+> >>>>>>>>>> diff --git a/include/linux/key.h b/include/linux/key.h
+> >>>>>>>>>> index 7febc4881363..97f6a1f86a27 100644
+> >>>>>>>>>> --- a/include/linux/key.h
+> >>>>>>>>>> +++ b/include/linux/key.h
+> >>>>>>>>>> @@ -230,6 +230,7 @@ struct key {
+> >>>>>>>>>> #define KEY_FLAG_ROOT_CAN_INVAL  7       /* set if key can be invalidated by root without permission */
+> >>>>>>>>>> #define KEY_FLAG_KEEP            8       /* set if key should not be removed */
+> >>>>>>>>>> #define KEY_FLAG_UID_KEYRING     9       /* set if key is a user or user session keyring */
+> >>>>>>>>>> +#define KEY_FLAG_BUILTIN_ROT    10      /* set if key is a builtin Root of Trust key */
+> >>>>>>>>>> 
+> >>>>>>>>>> /* the key type and key description string
+> >>>>>>>>>> * - the desc is used to match a key against search criteria
+> >>>>>>>>>> @@ -290,6 +291,7 @@ extern struct key *key_alloc(struct key_type *type,
+> >>>>>>>>>> #define KEY_ALLOC_BYPASS_RESTRICTION     0x0008  /* Override the check on restricted keyrings */
+> >>>>>>>>>> #define KEY_ALLOC_UID_KEYRING            0x0010  /* allocating a user or user session keyring */
+> >>>>>>>>>> #define KEY_ALLOC_SET_KEEP               0x0020  /* Set the KEEP flag on the key/keyring */
+> >>>>>>>>>> +#define KEY_ALLOC_BUILT_IN_ROT          0x0040  /* Add builtin root of trust key */
+> >>>>>>>>> 
+> >>>>>>>>> Since the concept of root of trust is not generic, but limited to
+> >>>>>>>>> specific keyrings, the root CA certificate signing keys on the
+> >>>>>>>>> "machine" keyring need to be identified.  Similar to the
+> >>>>>>>>> KEY_ALLOC_BUILT_IN/KEY_FLAG_BUILTIN, new flags
+> >>>>>>>>> KEY_ALLOC_MACHINE/KEY_FLAG_MACHINE should be defined instead.
+> >>>>>>>> 
+> >>>>>>>> I’m open to renaming these, however this name change seems confusing to me.  
+> >>>>>>>> This flag gets set when the X.509 certificate contains the three CA requirements 
+> >>>>>>>> identified above.  The remaining keys in the machine keyring can be used for 
+> >>>>>>>> anything else.
+> >>>>>>> 
+> >>>>>>> Renaming the flag to KEY_ALLOC_MACHINE/KEY_FLAG_MACHINE differentiates
+> >>>>>>> between the "builtin" keys from the "machine" keys.  The trust models
+> >>>>>>> are very different.
+> >>>>>> 
+> >>>>>> Isn’t the trust model the same for machine and secondary keys?  Both are supplied by 
+> >>>>>> the end-user. That is why I’m confused by naming something _MACHINE when it applies 
+> >>>>>> to more than one keyring.
+> >>>>> 
+> >>>>> True both are supplied by the end-user, but the trust models are
+> >>>>> different.
+> >>>> 
+> >>>> I think I need more information here, I’m not seeing how they are different trust 
+> >>>> models.
+> >>> 
+> >>> In order to discuss trust models, we need to understand the different
+> >>> use-cases that are being discussed here without ever having been
+> >>> explicitly stated.  Here are a few:
+> >>> - Allow users to sign their own kernel modules.
+> >>> - Allow users to selectively authorize 3rd party certificates to verify
+> >>> kernel modules.
+> >>> - From an IMA perspective, allow users to sign files within their own
+> >>> software packages.
+> >>> 
+> >>> Each of the above use-cases needs to be independently configurable,
+> >>> thoroughly explained, and enforced.
+> >> 
+> >> I’m still confused by the request here.  All these use cases can be done 
+> >> today with insert-sys-cert.  Take the, " allow user to sign their own kernel 
+> >> modules" use case.  Using insert-sys-cert, any type of key can be added 
+> >> to the builtin trusted keyring, it doesn’t need to be self signed, there are 
+> >> no restrictions on fields in the certificate.  The same approach can be used 
+> >> to allow users to ima sign their own files. Any key can be added, it doesn’t 
+> >> need to be a CA. The same goes for 3rd party signed modules.
+> > 
+> > The difference is "where" the key is coming from.  In the builtin use-
+> > case or the post build insert-sys-cert case, the kernel image is
+> > signed, or re-signed, and the kernel image signature is verified.  The
+> > root of trust is straight forward - secure boot with a HW root of trust
+> > up to and including verifying the kernel image signature, then
+> > transition to the builtin keys.
+> > 
+> > Keys on the "machine" keyring are not part of that signature chain of
+> > trust,
 > 
-> 2. Normal user tasks (e.g. VMM) don't have the privilege to access
->     the INIT_EX data file. Solution: open the file as root and
->     restore permissions immediately.
-> 
-> Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
-> Signed-off-by: Jacky Li <jackyli@google.com>
-> Reviewed-by: Peter Gonda <pgonda@google.com>
+> The machine keyring contains all keys in the MokList. On x86 (and other 
+> architectures that boot with shim) all keys in the MokList are part of the signature 
+> chain of trust. Shim uses MOKList keys to validate the kernel image signature 
+> when booting with SecureBoot enabled. Secure Boot DB keys are used to
+> validate shim, but rarely used to validate the kernel.
 
-Looks good, just a quick question. Should there be any type of access 
-checks before switching credentials? Should we check access to /dev/sev or 
-such? Or is the capability to load the module enough?
+Sure, keys on the "machine" keyring can be used to verify the kexec
+kernel image signature.
 
-Thanks,
-Tom
+As all of the above requirements is satisfied by loading a root CA, def
+ined as a KeySigning cert, without needing to load all of the MOK keys
+onto the "machine" keyring, support both trust models.  Please make
+loading all MOK keys configurable, with a thorough explanation.
 
-> ---
-> Changelog since v1:
-> - Added Fixes tag and Reviewed-By tag.
-> 
->   drivers/crypto/ccp/sev-dev.c | 30 ++++++++++++++++++++++++++++--
->   1 file changed, 28 insertions(+), 2 deletions(-)
-> 
+thanks,
+
+Mimi
+
