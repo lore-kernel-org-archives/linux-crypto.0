@@ -2,227 +2,151 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C0EC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 10:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4B2C4332F
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Apr 2022 12:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352440AbiDOK4Y (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Apr 2022 06:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44366 "EHLO
+        id S244498AbiDOM3T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Apr 2022 08:29:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348531AbiDOK4X (ORCPT
+        with ESMTP id S230172AbiDOM3S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Apr 2022 06:56:23 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84AA5BD2E5
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Apr 2022 03:53:55 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id t13so7030469pgn.8
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Apr 2022 03:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=v25j9pVEhbMktYwFx92BN9tsBGsH4edaYFgugzwOmUg=;
-        b=JF6Lff8ej65NV8siYjJEr1UptUhgsK9nkctiMIF6kYuiLMwCctA6LfpEnOUDjMP1k/
-         jtsvMSfv+ZNGSJobTkvFny2Yq3SrjOr1ML2JcKGhWcsIWaKTVS+7Arv6eQGw/St1Akz2
-         Qk9QtAg2a1vmCriFGXLP0AcXB2zSNXdJmllBpt5NTWbpKP6mfwxrX+yoy0evrF82WMAd
-         jmaYnZMAUO3zH/ulivIy3e4QZQpEoR/wtq0oWM2HtZVTjDiLlnQ0Es0z+I+1/BWd90/k
-         WVJFKPidBKmubDP6Yl0gjAg+cTe1lFZW89P6Ql4+bjxpAUakgfP3ZIJ8jCVSEtOXQikg
-         RIrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=v25j9pVEhbMktYwFx92BN9tsBGsH4edaYFgugzwOmUg=;
-        b=1fenPPSjSIDB4xWUcg9qgvWK1WoxDw9EveHxirbLcRoOtGu4n/lz9redolwl5T9V+h
-         98iNA3xA9+o9n9+kGZVO0QSaW0vgpzXx17eX5tjvnZLVi0RgCjWOM84dWoF9wboCymFr
-         TZTNmWGyFdXwOCGEUR6Mjue0uJH1S1hVQzz0cJzyrZoncb+XwF/EOYyrTYvpJCYzUMwD
-         1sdxlua7njZ5o+rL5H9OqjbecRRAupRgjnv58Llr0i7AAAzyejgPuVN5C0sNOXAg06on
-         GTBCI2kfpbdRWsGX9XbKMRGSL0wvNQLmQZEmIzUFkNmblJc03KpSSJiddao0ql0ruyp4
-         0oCg==
-X-Gm-Message-State: AOAM532PpOnPzocV+iM4XAh17eOI0uBm+djuMmTuY30iQJNBFhXm5aka
-        Dv/ADdjfSvxDBcSLZc120gDWNQ==
-X-Google-Smtp-Source: ABdhPJxWIf7LR4JpBEFnUEq+V6Xq/jXOi/zsLN03YsTXVQIlDSn8WU1ApikzlPvI8wLmMMMs86txcQ==
-X-Received: by 2002:a65:5b84:0:b0:398:fd62:6497 with SMTP id i4-20020a655b84000000b00398fd626497mr5861213pgr.179.1650020034979;
-        Fri, 15 Apr 2022 03:53:54 -0700 (PDT)
-Received: from [10.76.15.169] ([61.120.150.70])
-        by smtp.gmail.com with ESMTPSA id mq6-20020a17090b380600b001c6357f146csm9572238pjb.12.2022.04.15.03.53.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Apr 2022 03:53:54 -0700 (PDT)
-Message-ID: <eba72a32-aa94-0d9c-b927-a9e6b965ca44@bytedance.com>
-Date:   Fri, 15 Apr 2022 18:50:19 +0800
+        Fri, 15 Apr 2022 08:29:18 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 35895C1C9D;
+        Fri, 15 Apr 2022 05:26:50 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id 4C8D392009C; Fri, 15 Apr 2022 14:26:48 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id 4517592009B;
+        Fri, 15 Apr 2022 13:26:48 +0100 (BST)
+Date:   Fri, 15 Apr 2022 13:26:48 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+In-Reply-To: <YlfoeGRM6w2O+eXA@zx2c4.com>
+Message-ID: <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk> <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk> <YlfoeGRM6w2O+eXA@zx2c4.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: Re: [PATCH 1/4] virtio-crypto: wait ctrl queue instead of busy
- polling
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
-        davem@davemloft.net
-References: <20220415064136.304661-1-pizhenwei@bytedance.com>
- <20220415064136.304661-2-pizhenwei@bytedance.com>
- <20220415042555-mutt-send-email-mst@kernel.org>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20220415042555-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/15/22 16:41, Michael S. Tsirkin wrote:
->> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> index f3ec9420215e..bf7c1aa4be37 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> @@ -102,107 +102,100 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
->>   {
->>   	struct scatterlist outhdr_sg, key_sg, inhdr_sg, *sgs[3];
->>   	struct virtio_crypto *vcrypto = ctx->vcrypto;
->> +	struct virtio_crypto_ctrl_request *vc_ctrl_req = NULL;
-> 
-> this is initialized down the road, I think you can skip = NULL here.
-> 
-OK.
->>   	uint8_t *pkey;
->> -	unsigned int inlen;
->> -	int err;
->> +	int err = -ENOMEM;
-> 
-> I would assign this in the single case where this value is used.
-> 
-OK
->>   	unsigned int num_out = 0, num_in = 0;
->> +	int node = dev_to_node(&vcrypto->vdev->dev);
->>   
-> are you sure it is
-> better to allocate close to device and not to current node
-> which is the default?
->
-Also with this part:
-  /* Internal representation of a data virtqueue */
-@@ -65,11 +66,6 @@ struct virtio_crypto {
-  	/* Maximum size of per request */
-  	u64 max_size;
+Hi Jason,
 
--	/* Control VQ buffers: protected by the ctrl_lock */
--	struct virtio_crypto_op_ctrl_req ctrl;
--	struct virtio_crypto_session_input input;
--	struct virtio_crypto_inhdr ctrl_status;
--
-  	unsigned long status;
-  	atomic_t ref_count;
-
-Orignally virtio crypto driver allocates ctrl&input&ctrl_status 
-per-device, and protects this with ctrl_lock. This is the reason why the 
-control queue reaches the bottleneck of performance. I'll append this in 
-the next version in commit message.
-
-Instead of the single request buffer, declare struct 
-virtio_crypto_ctrl_request {
-         struct virtio_crypto_op_ctrl_req ctrl;
-         struct virtio_crypto_session_input input;
-         struct virtio_crypto_inhdr ctrl_status;
-	... }
-
-The motivation of this change is to allocate buffer from the same node 
-with device during control queue operations.
-
+> >  It depends on the exact system.  Some have a 32-bit high-resolution 
+> > counter in the chipset (arch/mips/kernel/csrc-ioasic.c) giving like 25MHz 
+> > resolution, some have nothing but jiffies.
 > 
->>   	pkey = kmemdup(key, keylen, GFP_ATOMIC);
->>   	if (!pkey)
->>   		return -ENOMEM;
->>   
->> -	spin_lock(&vcrypto->ctrl_lock);
->> -	memcpy(&vcrypto->ctrl.header, header, sizeof(vcrypto->ctrl.header));
->> -	memcpy(&vcrypto->ctrl.u, para, sizeof(vcrypto->ctrl.u));
->> -	vcrypto->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
->> +	vc_ctrl_req = kzalloc_node(sizeof(*vc_ctrl_req), GFP_KERNEL, node);
->> +	if (!vc_ctrl_req)
->> +		goto out;
-> 
-> do you need to allocate it with kzalloc?
-> is anything wrong with just keeping it part of device?
-> even if yes this change is better split in a separate patch, would make the patch smaller.
-Because there are padding field in 
-virtio_crypto_op_ctrl_req&virtio_crypto_session_input, I suppose the 
-original version also needs to clear padding field.
-So I use kzalloc to make sure that the padding field gets cleared.
-If this is reasonable, to separate this patch is OK to me, or I append 
-this reason into commit message and comments in code.
+> Alright, so there _are_ machines with no c0 cycles but with a good
+> clock. Yet, 25MHz is still less than the cpu cycle, so this c0 random
+> ORing trick remains useful perhaps.
 
->> +
->> +void virtcrypto_ctrlq_callback(struct virtqueue *vq)
->> +{
->> +	struct virtio_crypto *vcrypto = vq->vdev->priv;
->> +	struct virtio_crypto_ctrl_request *vc_ctrl_req;
->> +	unsigned long flags;
->> +	unsigned int len;
->> +
->> +	spin_lock_irqsave(&vcrypto->ctrl_lock, flags);
->> +	do {
->> +		virtqueue_disable_cb(vq);
->> +		while ((vc_ctrl_req = virtqueue_get_buf(vq, &len)) != NULL) {
-> 
-> 
-> you really need to break out of this loop if vq is broken,
-> virtqueue_get_buf will keep returning NULL in this case.
-> 
-I'm a little confused here, if virtqueue_get_buf return NULL, this loop 
-will break. Could you please give me more hints?
-> 
->> +			spin_unlock_irqrestore(&vcrypto->ctrl_lock, flags);
->> +			if (vc_ctrl_req->ctrl_cb)
->> +				vc_ctrl_req->ctrl_cb(vc_ctrl_req);
->> +			spin_lock_irqsave(&vcrypto->ctrl_lock, flags);
->> +		}
->> +		if (unlikely(virtqueue_is_broken(vq)))
->> +			break;
->> +	} while (!virtqueue_enable_cb(vq));
->> +	spin_unlock_irqrestore(&vcrypto->ctrl_lock, flags);
-> 
-> speaking of which existing code does not handle vq broken case
-> all that well but it looks like this patch makes it a bit worse.
-> want to try fixing? basically report an error ...
-> 
->if virtqueue is broken, I can print log.
+ It's not much less than the CPU cycle really, given that the R3k CPUs are 
+clocked at up to 40MHz in the systems concerned and likewise the buggy R4k 
+CPUs run at up to 60MHz (and mind that their CP0 Count register increments 
+at half the clock rate, so the rate is up to 30MHz anyway).  The overhead 
+of the calculation is more than that, let alone the latency and issue rate 
+of an uncached MMIO access to the chipset register.
 
->> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
->> index c6f482db0bc0..e668d4b1bc6a 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_core.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
->> @@ -73,7 +73,7 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
->>   		goto err_names;
->>   
->>   	/* Parameters for control virtqueue */
->> -	callbacks[total_vqs - 1] = NULL;
->> +	callbacks[total_vqs - 1] = virtcrypto_ctrlq_callback;
->>   	names[total_vqs - 1] = "controlq";
->>   
->>   	/* Allocate/initialize parameters for data virtqueues */
->> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> index a618c46a52b8..b8999dab3e66 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
->> +	err = 0;
->> +out:
->> +	kfree_sensitive(vc_ctrl_req);
+ Also the systems I have in mind and that lack a counter in the chipset 
+actually can make use of the buggy CP0 timer, because it's only when CP0 
+timer interrupts are used that the erratum matters, but they use a DS1287 
+RTC interrupt instead unconditionally as the clock event (see the comment 
+at the bottom of arch/mips/dec/time.c).  But this has not been factored in 
+with `can_use_mips_counter' (should it just check for `mips_hpt_frequency' 
+being zero perhaps, meaning the timer interrupt not being used?).
+
+ Thomas, do you happen to know if any of the SGI systems that we support 
+had buggy early R4k chips?
+
+> >  It seems like a reasonable idea to me, but the details would have to be 
+> > sorted out, because where a chipset high-resolution counter is available 
+> > we want to factor it in, and otherwise we need to extract the right bits 
+> > from the CP0 Random register, either 13:8 for the R3k or 5:0 for the R4k.
 > 
-> it is interesting that you use kfree_sensitive here. why is that?
-> is there in fact anything sensitive here? if yes this is a security
-> improvement and might need its own patch, or at least documentation.
->
+> One thing we could do here that would seemingly cover all the cases
+> without losing _that_ much would be:
+> 
+>     return (random_get_entropy_fallback() << 13) | ((1<<13) - read_c0_random());
 
-OK, kfree is good enough here, I'll fix this.
+ Except this would have to be:
 
+    return (random_get_entropy_fallback() << 14) | ((1<<14) - read_c0_random());
 
-Thanks a lot!
+of course, as bit 13 is still one of the active ones in the R3k CP0 Random 
+register.
 
+> Or in case the 13 turns out to be wrong on some hardware, we could
+> mitigate the effect with:
+> 
+>     return (random_get_entropy_fallback() << 13) ^ ((1<<13) - read_c0_random());
 
--- 
-zhenwei pi
+ There are two variants only of the CP0 Random register that we can ever 
+encounter, as it's been de-facto standardised in early 1990s already and 
+then written down in the MIPSr1 architecture specification ~2000.  So I 
+think it may make sense to actually handle them both explictitly with 
+individual calculations, possibly conditionalised on a CONFIG setting or 
+`cpu_has_3kex', because kernels that support the two variants of the MMU 
+architecture are mutually incompatible.
+
+ Ah, there's that buggy non-compliant JZ4740 chip too.  I guess we can 
+figure out how many CP0 Random bits it implements, though it may be worth 
+noting that architecturally the register is not required to decrement, so 
+again it may be good to double-check how the JZ4740 selects the values 
+there.
+
+ I think the check for a buggy CP0 timer in `can_use_mips_counter' should 
+also be qualified with !(CONFIG_CPU_MIPS32 || CONFIG_CPU_MIPS64), which 
+will reduce the function to a constant 1 for the overwhelming majority of 
+systems out there, without a need to refer to CP0 PRId every time.
+
+> As mentioned in the 1/xx patch of this series,
+> random_get_entropy_fallback() should call the highest resolution thing.
+> We then shave off the least-changing bits and stuff in the
+> faster-changing bits from read_c0_random(). Then, in order to keep it
+> counting up instead of down, we do the subtraction there.
+
+ Isn't it going to be an issue for an entropy source that the distribution 
+of values obtained from the CP0 Random bit-field is not even, that is some 
+values from the 6-bit range will never appear?
+
+> What do you think of this plan?
+
+ Otherwise it makes absolute sense to me.
+
+  Maciej
