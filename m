@@ -2,110 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BD7C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 14:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4D1C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 14:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232316AbiDPOgj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Apr 2022 10:36:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37254 "EHLO
+        id S232307AbiDPOr3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Apr 2022 10:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231469AbiDPOgh (ORCPT
+        with ESMTP id S232287AbiDPOr2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Apr 2022 10:36:37 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5FA496AB
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Apr 2022 07:34:05 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id u18so12920645eda.3
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Apr 2022 07:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tqjBkilQU4/PdTDZWQ+UTomQZExWyaCh/YDiUIu/GK4=;
-        b=TtJHMZjJUqWZ8runjgNUOpr4dITWJRHLP6WMMarHjVPZWQxReNhtcclP2YlABPMIyk
-         oXtf4FrXGTCbYfQgCJWiMvM0x4ahlBy5/6y1FMQPYg854mH6EB64mqhFjnul7TD79fPp
-         x7wGMwb8hPRoNmKGgmw9YIH6BXBR/IbnqhhUkPoW0ZBdb30IKunR0hArxGHVAVXwSqKH
-         TpHIbpoO7Fyn7QDCO0ViClRDKswUhKNVNwIOEbnkIaK/c7SAqpJtDReTJurlg6V/gijP
-         jNLaMlD6o2L4Eem5jOcqQ1K0n0ugzGVoeQ5A1RNvhr3IL3almJBa0y2lutf+34b5WPxq
-         Ko4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tqjBkilQU4/PdTDZWQ+UTomQZExWyaCh/YDiUIu/GK4=;
-        b=1jgZrh2s9r8ngEbvvyHvQqXx97f8pyqzoqsKRbPWO32znc6AO4puDVFoEKrVUqa9gX
-         gkku2974G1oPn0Azv0jZwl1Pt899cYsACxAkaNZ2zfH7SpNE9t1RS07VKIKfK/PV5zGQ
-         njCAeZixcfjnTfk9UepUL9SE7P5hSPJ6rQKkAWaHEtvK7T5I2XNGc+NPqS4+B9080N9p
-         uRs4NB6ApHPx8Pduq5jD4y+/mgo2PStFVwvZ7FG6fZzdRzw0WBpdY9VuiMBrPa8EVUPO
-         b6x+GFoDgSh7/awchSpoivP5L7bsT/wNLo3RgeTcPXjljcQLyCp5OIg8LqiAocAv/K50
-         SQWg==
-X-Gm-Message-State: AOAM533k5C/fzZ/U7/0F3a2XrDRHh3Lg5RraFW3HrQ/xuv9jGpQEOljx
-        WSzJa+hjcBx5kde5ZLuoohb18XEg1r+rSp2lN5u1tOXtMrY=
-X-Google-Smtp-Source: ABdhPJxHhbxpeh9qaVT9RLKFzkUvwUzINODyQmF/uXNsNS1dU10DTaqrQxkQyw5GhGoMbPLZn20Y6tJtfhz6vyEh8MQ=
-X-Received: by 2002:a05:6402:11cf:b0:41c:dbc7:79d2 with SMTP id
- j15-20020a05640211cf00b0041cdbc779d2mr4091457edw.50.1650119643786; Sat, 16
- Apr 2022 07:34:03 -0700 (PDT)
+        Sat, 16 Apr 2022 10:47:28 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A6E1516598;
+        Sat, 16 Apr 2022 07:44:55 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id EDBF792009E; Sat, 16 Apr 2022 16:44:53 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id E02D092009C;
+        Sat, 16 Apr 2022 15:44:53 +0100 (BST)
+Date:   Sat, 16 Apr 2022 15:44:53 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-um@lists.infradead.org, X86 ML <x86@kernel.org>,
+        linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+In-Reply-To: <CAHmME9qzkZqkGntLn--XfMKzyR=tYiCaZu1uFpoQBzAzCipZ-A@mail.gmail.com>
+Message-ID: <alpine.DEB.2.21.2204161533420.9383@angie.orcam.me.uk>
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk> <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk> <YlfoeGRM6w2O+eXA@zx2c4.com> <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk> <CAHmME9qzkZqkGntLn--XfMKzyR=tYiCaZu1uFpoQBzAzCipZ-A@mail.gmail.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-References: <20220416135412.4109213-1-festevam@gmail.com>
-In-Reply-To: <20220416135412.4109213-1-festevam@gmail.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Sat, 16 Apr 2022 11:33:53 -0300
-Message-ID: <CAOMZO5B3ENSkK0aL+n=cm73--60mVukNtej=LOdx-Xa8XDkV4g@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: caam - fix i.MX6SX entropy delay value
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Horia Geanta Neag <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Fabio Estevam <festevam@denx.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia and Varun,
+Hi Jason,
 
-On Sat, Apr 16, 2022 at 10:54 AM Fabio Estevam <festevam@gmail.com> wrote:
->
-> From: Fabio Estevam <festevam@denx.de>
->
-> Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
-> in HRWNG") the following CAAM errors can be seen on i.MX6SX:
->
-> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-> hwrng: no data available
-> caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-> ...
->
-> This error is due to an incorrect entropy delay for i.MX6SX.
->
-> Fix it by increasing the minimum entropy delay for i.MX6SX
-> as done in U-Boot:
-> https://patchwork.ozlabs.org/project/uboot/patch/20220415111049.2565744-1-gaurav.jain@nxp.com/
->
-> Signed-off-by: Fabio Estevam <festevam@denx.de>
-> ---
-> Change since v1:
-> - Align the fix with U-Boot.
+> >  There are two variants only of the CP0 Random register that we can ever
+> > encounter, as it's been de-facto standardised in early 1990s already and
+> > then written down in the MIPSr1 architecture specification ~2000.  So I
+> > think it may make sense to actually handle them both explictitly with
+> > individual calculations, possibly conditionalised on a CONFIG setting or
+> > `cpu_has_3kex', because kernels that support the two variants of the MMU
+> > architecture are mutually incompatible.
+> 
+> Okay, I can give this a shot, but this certainly isn't my forté. It
+> may ultimately wind up being simpler for you to just send some code of
+> what you envision for this, but if I understand your idea correctly,
+> what you're saying is something like:
+> 
+> static inline unsigned long random_get_entropy(void)
+> {
+>         unsigned int prid = read_c0_prid();
+>         unsigned int imp = prid & PRID_IMP_MASK;
+>         unsigned int c0_random;
+> 
+>         if (can_use_mips_counter(prid))
+>                 return read_c0_count();
+> 
+>         if (cpu_has_3kex)
+>                 c0_random = (read_c0_random() >> 8) & 0x3f;
+>         else
+>                 c0_random = read_c0_random() & 0x3f;
+>         return (random_get_entropy_fallback() << 6) | (0x3f - c0_random);
+> }
+> 
+> What do you think of that? Some tweak I'm missing?
 
-Actually, after thinking more about it, I realize that this issue is
-not i.MX6SX specific as
-I have seen reports of the same failures on i.MX6D as well.
+ It certainly looks good to me.  Do you have a way I could verify how this 
+function performs?  If so, then I could put it through my systems as I can 
+cover all the cases handled here.
 
-Would it make sense to fix it like this instead?
+ Any improvements I previously discussed can then be made locally in the 
+MIPS port as follow-up changes.
 
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -516,7 +516,7 @@ struct rng4tst {
-        };
- #define RTSDCTL_ENT_DLY_SHIFT 16
- #define RTSDCTL_ENT_DLY_MASK (0xffff << RTSDCTL_ENT_DLY_SHIFT)
--#define RTSDCTL_ENT_DLY_MIN 3200
-+#define RTSDCTL_ENT_DLY_MIN 12000
- #define RTSDCTL_ENT_DLY_MAX 12800
-        u32 rtsdctl;            /* seed control register */
-        union {
+> >  Isn't it going to be an issue for an entropy source that the distribution
+> > of values obtained from the CP0 Random bit-field is not even, that is some
+> > values from the 6-bit range will never appear?
+> 
+> It's the same situation without inverting the order: instead of some
+> bits on the top never happening, some bits on the bottom never happen
+> instead. In general, counters don't form uniform distributions anyway,
+> since the lower bits change faster, and neither are they independent,
+> since one sample in large part depends on the previous. This is just
+> sort of the nature of the beast, and the code that calls
+> random_get_entropy() deals with this appropriately (by, at the moment,
+> just hashing all the bits).
 
-Any drawbacks in using this generic approach?
+ OK then, thanks for your clarification.
 
-Please advise.
+  Maciej
