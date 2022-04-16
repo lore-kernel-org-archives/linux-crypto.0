@@ -2,144 +2,230 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF7DC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 19:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DAFC433FE
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 22:55:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232824AbiDPTe7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Apr 2022 15:34:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40060 "EHLO
+        id S230377AbiDPW5l (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Apr 2022 18:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232768AbiDPTe7 (ORCPT
+        with ESMTP id S233086AbiDPW5i (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Apr 2022 15:34:59 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1BF9968B;
-        Sat, 16 Apr 2022 12:32:24 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id k22so14237384wrd.2;
-        Sat, 16 Apr 2022 12:32:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=zKq3t9+WVckk287gJXVdTxBsvDIgk8B6FZnSS1BTPL4=;
-        b=hFNxStPk6ljDQwSVsjzOkbywBaCgUHFTMhRf8KLzWQKkAK634TFpEv/iqqflmNmc+4
-         H5nPQkWkiCU5YeKVCZyn9zW2a0IzF5fciuEckFnKEkxcMmv/IliYbvr7PY0OQC8wO1J7
-         D5duSREpTHMOB/N5dyAEucbZIv8PnD3VrVhYI1hMKM8jNKMBLBmrtXkpuLAJsMzQUJHx
-         kpO7aJeENbJYmrwewNwsbiwZirIGezWs9INOqa0rj/PUxb3hridsT8SLJtx94UvJ+/Ps
-         B7zYWz90bX9w/cGmPrCiyYRos0wXG13wi8iUXmqdoaEhqNEpJqz/StjpZHP4ZnK7rHKI
-         p4Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=zKq3t9+WVckk287gJXVdTxBsvDIgk8B6FZnSS1BTPL4=;
-        b=d5Q+sD3DPL1gQTx8UXgShR1zYprNz1vamwRSmcgwfqJaor1CQRK9kpyaYYn2/GS3rS
-         oMelwH9QdwQokm1zAB/yL1GIDnLY8LKSBkV9h0UJnjhouV3ez+AfCVTJCcpCbW38D6hL
-         YGpnPFIEzxNf+TVD1Kmvb9i+x+v7tpX38FbkLlorV5yinMA2FilDTJYhae0H7vBEFnwP
-         HbtAyXcp0fZd9UsTF+W4s0SyKvF78XZ6wEK1cRjv7knfqnyogowmw1ZU00pluxADx5jV
-         BSIOhD4IUHCO9K3/OH13wnLz7Y2fo/R1pZT2y1Wkc1UFgZRqvPccKysL6MYkBc8M3JNB
-         5nsQ==
-X-Gm-Message-State: AOAM531W+hoBHzOZKKX/jj2J84NI5yVbaveTnI7PCpzg2BQFxCHZX2ek
-        tgVe8SASd8Dri27lD6DlOa8=
-X-Google-Smtp-Source: ABdhPJwXXdg4aIH03y8wvyozMGxucmhHV8S1YG4lSMDVE8AYMR7NHA91JGYnlXTGTd4gigMfa1nlvQ==
-X-Received: by 2002:a05:6000:1568:b0:1f0:250a:d3ef with SMTP id 8-20020a056000156800b001f0250ad3efmr3322201wrz.402.1650137543384;
-        Sat, 16 Apr 2022 12:32:23 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id p18-20020adfba92000000b001e4ae791663sm6798423wrg.62.2022.04.16.12.32.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Apr 2022 12:32:22 -0700 (PDT)
-Date:   Sat, 16 Apr 2022 21:32:21 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Samuel Holland <samuel@sholland.org>
-Cc:     Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
-        paul.walmsley@sifive.com, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, wefu@redhat.com, guoren@kernel.org,
-        atishp@atishpatra.org, anup@brainfault.org, mick@ics.forth.gr,
-        cmuellner@linux.com, philipp.tomsich@vrull.eu,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/2] riscv: implement Zicbom-based CMO instructions + the
- t-head variant
-Message-ID: <YlsZxVjgt3ZNQ7Ub@Red>
-References: <20220307224620.1933061-1-heiko@sntech.de>
- <YllWTN+15CoskNBt@Red>
- <70da24dd-2d03-fc49-151d-daabb315a5f6@sholland.org>
- <YlpxsYREWv/LQ+HY@Red>
- <849a3728-7e84-4f26-0c73-4d68eae9ae01@sholland.org>
+        Sat, 16 Apr 2022 18:57:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36056140F1;
+        Sat, 16 Apr 2022 15:55:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DFF65B809E3;
+        Sat, 16 Apr 2022 22:55:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED602C385A1;
+        Sat, 16 Apr 2022 22:54:57 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ke3CzabD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650149696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+2nP+VdPEpPNPoKQqSrgbL4ZK7I/c4P/cLhbUMeqeEs=;
+        b=Ke3CzabDCTCN7z1X+blAnwmP5mSkY04Aqwf/G5fDtQU6WM6tPriviP3rwnh0y2BbiEiSI5
+        kxvqYG3bXaLOy2oV1jIUlAv1SxvW/krAz60U3oZjY/ozmULtrXkPvuBaIxrnDhhjiRe7WK
+        DiZ/+FwTFNQXboYw4FOs1PNDoMoDXRw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cef1d983 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 16 Apr 2022 22:54:56 +0000 (UTC)
+Date:   Sun, 17 Apr 2022 00:54:49 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-um@lists.infradead.org, X86 ML <x86@kernel.org>,
+        linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+Message-ID: <YltJOfEylRC0rhKv@zx2c4.com>
+References: <20220413115411.21489-1-Jason@zx2c4.com>
+ <20220413115411.21489-5-Jason@zx2c4.com>
+ <20220413122546.GA11860@alpha.franken.de>
+ <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+ <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk>
+ <YlfoeGRM6w2O+eXA@zx2c4.com>
+ <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
+ <CAHmME9qzkZqkGntLn--XfMKzyR=tYiCaZu1uFpoQBzAzCipZ-A@mail.gmail.com>
+ <alpine.DEB.2.21.2204161533420.9383@angie.orcam.me.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <849a3728-7e84-4f26-0c73-4d68eae9ae01@sholland.org>
+In-Reply-To: <alpine.DEB.2.21.2204161533420.9383@angie.orcam.me.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Sat, Apr 16, 2022 at 12:47:29PM -0500, Samuel Holland a écrit :
-> On 4/16/22 2:35 AM, Corentin Labbe wrote:
-> > Le Fri, Apr 15, 2022 at 09:19:23PM -0500, Samuel Holland a écrit :
-> >> On 4/15/22 6:26 AM, Corentin Labbe wrote:
-> >>> Le Mon, Mar 07, 2022 at 11:46:18PM +0100, Heiko Stuebner a écrit :
-> >>>> This series is based on the alternatives changes done in my svpbmt series
-> >>>> and thus also depends on Atish's isa-extension parsing series.
-> >>>>
-> >>>> It implements using the cache-management instructions from the  Zicbom-
-> >>>> extension to handle cache flush, etc actions on platforms needing them.
-> >>>>
-> >>>> SoCs using cpu cores from T-Head like the Allwinne D1 implement a
-> >>>> different set of cache instructions. But while they are different,
-> >>>> instructions they provide the same functionality, so a variant can
-> >>>> easly hook into the existing alternatives mechanism on those.
-> >>>>
-> >>>>
-> >>>
-> >>> Hello
-> >>>
-> >>> I am testing https://github.com/smaeul/linux.git branch:origin/riscv/d1-wip which contain this serie.
-> >>>
-> >>> I am hitting a buffer corruption problem with DMA.
-> >>> The sun8i-ce crypto driver fail self tests due to "device overran destination buffer".
-> >>> In fact the buffer is not overran by device but by dma_map_single() operation.
-> >>>
-> >>> The following small code show the problem:
-> >>>
-> >>> dma_addr_t dma;
-> >>> u8 *buf;
-> >>> #define BSIZE 2048
-> >>> #define DMASIZE 16
-> >>>
-> >>> buf = kmalloc(BSIZE, GFP_KERNEL | GFP_DMA);
-> >>> for (i = 0; i < BSIZE; i++)
-> >>>     buf[i] = 0xFE;
-> >>> print_hex_dump(KERN_INFO, "DMATEST1:", DUMP_PREFIX_NONE, 16, 4, buf, 256, false);
-> >>> dma = dma_map_single(ce->dev, buf, DMASIZE, DMA_FROM_DEVICE);
-> >>
-> >> This function (through dma_direct_map_page()) ends up calling
-> >> arch_sync_dma_for_device(..., ..., DMA_FROM_DEVICE), which invalidates the CPU's
-> >> cache. This is the same thing other architectures do (at least arm, arm64,
-> >> openrisc, and powerpc). So this appears to be working as intended.
+Hi Maciej,
+
+On Sat, Apr 16, 2022 at 03:44:53PM +0100, Maciej W. Rozycki wrote:
+> > Okay, I can give this a shot, but this certainly isn't my fortÃ©. It
+> > may ultimately wind up being simpler for you to just send some code of
+> > what you envision for this, but if I understand your idea correctly,
+> > what you're saying is something like:
 > > 
-> > This behavour is not present at least on ARM and ARM64.
-> > The sample code I provided does not corrupt the buffer on them.
+> > static inline unsigned long random_get_entropy(void)
+> > {
+> >         unsigned int prid = read_c0_prid();
+> >         unsigned int imp = prid & PRID_IMP_MASK;
+> >         unsigned int c0_random;
+> > 
+> >         if (can_use_mips_counter(prid))
+> >                 return read_c0_count();
+> > 
+> >         if (cpu_has_3kex)
+> >                 c0_random = (read_c0_random() >> 8) & 0x3f;
+> >         else
+> >                 c0_random = read_c0_random() & 0x3f;
+> >         return (random_get_entropy_fallback() << 6) | (0x3f - c0_random);
+> > }
+> > 
+> > What do you think of that? Some tweak I'm missing?
 > 
-> That can be explained by the 0xFE bytes having been flushed to DRAM already in
-> your ARM/ARM64 tests, whereas in your riscv64 case, the 0xFE bytes were still in
-> a dirty cache line. The cache topology and implementation is totally different
-> across the SoCs, so this is not too surprising.
-> 
-> Semantically, dma_map_single(..., DMA_FROM_DEVICE) means you are doing a
-> unidirectional DMA transfer from the device into that buffer. So the contents of
-> the buffer are "undefined" until the DMA transfer completes. If you are also
-> writing data into the buffer from the CPU side, then you need DMA_BIDIRECTIONAL.
-> 
-> Regards,
-> Samuel
+>  It certainly looks good to me.  Do you have a way I could verify how this 
+> function performs?  If so, then I could put it through my systems as I can 
+> cover all the cases handled here.
 
-+CC crypto mailing list + maintainer
+Oh, awesome about the test rig. Below is a little patch that adds some
+printf code to init, calling the above sequence 70 times in a busy loop
+and then 30 times after that with a scheduler 1 ms delay in there,
+printing lots of various about the above calculation. Hopefully that's
+enough information that it'll be possible to notice if something looks
+really off when we squint at it.
 
-My problem is that crypto selftest, for each buffer where I need to do a cipher operation,
-concat a poison buffer to check that device does write beyond buffer.
+Jason
 
-But the dma_map_sg(FROM_DEVICE) corrupts this poison buffer and crypto selftests fails thinking my device did a buffer overrun.
+-------------------8<-----------------------------------------------------
 
-So you mean that on SoC D1, this crypto API check strategy is impossible ?
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 3a293f919af9..0b32203aa47f 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -48,6 +48,7 @@
+ #include <linux/ptrace.h>
+ #include <linux/workqueue.h>
+ #include <linux/irq.h>
++#include <linux/delay.h>
+ #include <linux/ratelimit.h>
+ #include <linux/syscalls.h>
+ #include <linux/completion.h>
+@@ -1781,6 +1782,26 @@ static struct ctl_table random_table[] = {
+  */
+ static int __init random_sysctls_init(void)
+ {
++
++	int i;
++	for (i = 0; i < 100; ++i) {
++		if (can_use_mips_counter(read_c0_prid()))
++			pr_err("SARU %d c0 count: %08x\n", i, read_c0_count());
++		else {
++			unsigned int c0_random = read_c0_random(), c0_random_mask;
++			unsigned long fallback = random_get_entropy_fallback(), out;
++			if (cpu_has_3kex)
++				c0_random_mask = (c0_random >> 8) & 0x3f;
++			else
++				c0_random_mask = c0_random & 0x3f;
++			out = (fallback << 6) | (0x3f - c0_random_mask);
++			pr_err("SARU: %d (%08x >> n) & 0x3f = %08x, inverted = %08x, fallback = %08lx, fallback << 6 = %08lx, combined = %08lx\n",
++			       i, c0_random, c0_random_mask, 0x3f - c0_random_mask, fallback, fallback << 6, out);
++		}
++		if (i > 70)
++			msleep(1);
++	}
++
+ 	register_sysctl_init("kernel/random", random_table);
+ 	return 0;
+ }
+diff --git a/include/linux/timex.h b/include/linux/timex.h
+index 5745c90c8800..3871b06bd302 100644
+--- a/include/linux/timex.h
++++ b/include/linux/timex.h
+@@ -62,6 +62,8 @@
+ #include <linux/types.h>
+ #include <linux/param.h>
+
++unsigned long random_get_entropy_fallback(void);
++
+ #include <asm/timex.h>
+
+ #ifndef random_get_entropy
+@@ -74,8 +76,14 @@
+  *
+  * By default we use get_cycles() for this purpose, but individual
+  * architectures may override this in their asm/timex.h header file.
++ * If a given arch does not have get_cycles(), then we fallback to
++ * using random_get_entropy_fallback().
+  */
++#ifdef get_cycles
+ #define random_get_entropy()	((unsigned long)get_cycles())
++#else
++#define random_get_entropy()	random_get_entropy_fallback()
++#endif
+ #endif
+
+ /*
+diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+index dcdcb85121e4..7cd2ec239cae 100644
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -17,6 +17,7 @@
+ #include <linux/clocksource.h>
+ #include <linux/jiffies.h>
+ #include <linux/time.h>
++#include <linux/timex.h>
+ #include <linux/tick.h>
+ #include <linux/stop_machine.h>
+ #include <linux/pvclock_gtod.h>
+@@ -2380,6 +2381,15 @@ static int timekeeping_validate_timex(const struct __kernel_timex *txc)
+ 	return 0;
+ }
+
++/**
++ * random_get_entropy_fallback - Returns the raw clock source value,
++ * used by random.c for platforms with no valid random_get_entropy().
++ */
++unsigned long random_get_entropy_fallback(void)
++{
++	return tk_clock_read(&tk_core.timekeeper.tkr_mono);
++}
++EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
+
+ /**
+  * do_adjtimex() - Accessor function to NTP __do_adjtimex function
+
