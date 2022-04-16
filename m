@@ -2,125 +2,156 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE8BC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 10:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23802C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 11:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231584AbiDPKya (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Apr 2022 06:54:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45924 "EHLO
+        id S230149AbiDPLMX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Apr 2022 07:12:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231547AbiDPKyW (ORCPT
+        with ESMTP id S231664AbiDPLMW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Apr 2022 06:54:22 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1FCD3AA72;
-        Sat, 16 Apr 2022 03:51:50 -0700 (PDT)
-Received: from kwepemi100006.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KgVPb1LDvzgYsg;
-        Sat, 16 Apr 2022 18:51:47 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100006.china.huawei.com (7.221.188.165) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 16 Apr 2022 18:51:49 +0800
-Received: from localhost.localdomain (10.67.165.24) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 16 Apr 2022 18:51:48 +0800
-From:   Weili Qian <qianweili@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
-        Weili Qian <qianweili@huawei.com>
-Subject: [PATCH 4/4] crypto: hisilicon/qm - remove hisi_qm_get_free_qp_num()
-Date:   Sat, 16 Apr 2022 18:45:59 +0800
-Message-ID: <20220416104559.10826-5-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20220416104559.10826-1-qianweili@huawei.com>
-References: <20220416104559.10826-1-qianweili@huawei.com>
+        Sat, 16 Apr 2022 07:12:22 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C0213E39;
+        Sat, 16 Apr 2022 04:09:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23DBFB81CF6;
+        Sat, 16 Apr 2022 11:09:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D0CFC385A1;
+        Sat, 16 Apr 2022 11:09:44 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="USvjSmaf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650107378;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BWpDj5fGUy3iYp41L7HbRmBg65jO9i+zxCcxvQs/HHk=;
+        b=USvjSmaf62xWI4Mu+SjeA+l/EdDg6mkMGtOkrJ5IuGMc8Ak4z74cOnCaVNUG4iuc/5T5ri
+        EYyJCvrxgHowkyOAZITSJXGOJjpMyM7Xzd5IWCIL6tDicEpJGjOn3PmZsj56+RDfHRoa7a
+        MBB8v+5KJQeVMnoJRIWq/D/sjWbXTT4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e09da8c6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 16 Apr 2022 11:09:38 +0000 (UTC)
+Received: by mail-yb1-f172.google.com with SMTP id h8so18152485ybj.11;
+        Sat, 16 Apr 2022 04:09:37 -0700 (PDT)
+X-Gm-Message-State: AOAM53210w7fHEMYiI9J/AfuVVnbCCngkl8/AkMcSUM5lLJFc9aZuaBR
+        wpV6a9x9sqRi15Y0XGCgn2I/JVJ5b7eaAX8wOeQ=
+X-Google-Smtp-Source: ABdhPJyAY5xi4OGR681ypI25l7Liwu41MbRbYQFXrT4jbAkvhI1v7BitiVeDW4TLYpgWqNVatNZXdBjODAZ+DfSqjbM=
+X-Received: by 2002:a5b:782:0:b0:634:683f:310e with SMTP id
+ b2-20020a5b0782000000b00634683f310emr2707608ybq.398.1650107375189; Sat, 16
+ Apr 2022 04:09:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com>
+ <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+ <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk> <YlfoeGRM6w2O+eXA@zx2c4.com>
+ <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
+In-Reply-To: <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Sat, 16 Apr 2022 13:09:24 +0200
+X-Gmail-Original-Message-ID: <CAHmME9qzkZqkGntLn--XfMKzyR=tYiCaZu1uFpoQBzAzCipZ-A@mail.gmail.com>
+Message-ID: <CAHmME9qzkZqkGntLn--XfMKzyR=tYiCaZu1uFpoQBzAzCipZ-A@mail.gmail.com>
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-um@lists.infradead.org, X86 ML <x86@kernel.org>,
+        linux-xtensa@linux-xtensa.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-hisi_qm_get_free_qp_num() is to get the free queue number on the function.
-It is a simple function and is only called by
-hisi_qm_get_available_instances().
+Hi Maciej,
 
-This patch modifies to get the free queue directly in
-hisi_qm_get_available_instances(), and remove hisi_qm_get_free_qp_num().
+On Fri, Apr 15, 2022 at 2:26 PM Maciej W. Rozycki <macro@orcam.me.uk> wrote=
+:
+>     return (random_get_entropy_fallback() << 14) | ((1<<14) - read_c0_ran=
+dom());
+>
+> of course, as bit 13 is still one of the active ones in the R3k CP0 Rando=
+m
+> register.
 
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 28 +++++++++-------------------
- include/linux/hisi_acc_qm.h   |  1 -
- 2 files changed, 9 insertions(+), 20 deletions(-)
+Ah, thanks, will do that.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index f708a632a2f5..cd4c146340dd 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -3051,9 +3051,17 @@ static void qm_qp_event_notifier(struct hisi_qp *qp)
- 	wake_up_interruptible(&qp->uacce_q->wait);
- }
- 
-+ /* This function returns free number of qp in qm. */
- static int hisi_qm_get_available_instances(struct uacce_device *uacce)
- {
--	return hisi_qm_get_free_qp_num(uacce->priv);
-+	struct hisi_qm *qm = uacce->priv;
-+	int ret;
-+
-+	down_read(&qm->qps_lock);
-+	ret = qm->qp_num - qm->qp_in_used;
-+	up_read(&qm->qps_lock);
-+
-+	return ret;
- }
- 
- static void hisi_qm_set_hw_reset(struct hisi_qm *qm, int offset)
-@@ -3365,24 +3373,6 @@ void hisi_qm_wait_task_finish(struct hisi_qm *qm, struct hisi_qm_list *qm_list)
- }
- EXPORT_SYMBOL_GPL(hisi_qm_wait_task_finish);
- 
--/**
-- * hisi_qm_get_free_qp_num() - Get free number of qp in qm.
-- * @qm: The qm which want to get free qp.
-- *
-- * This function return free number of qp in qm.
-- */
--int hisi_qm_get_free_qp_num(struct hisi_qm *qm)
--{
--	int ret;
--
--	down_read(&qm->qps_lock);
--	ret = qm->qp_num - qm->qp_in_used;
--	up_read(&qm->qps_lock);
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(hisi_qm_get_free_qp_num);
--
- static void hisi_qp_memory_uninit(struct hisi_qm *qm, int num)
- {
- 	struct device *dev = &qm->pdev->dev;
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 46974d641af1..545f58432412 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -436,7 +436,6 @@ int hisi_qm_stop(struct hisi_qm *qm, enum qm_stop_reason r);
- int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg);
- int hisi_qm_stop_qp(struct hisi_qp *qp);
- int hisi_qp_send(struct hisi_qp *qp, const void *msg);
--int hisi_qm_get_free_qp_num(struct hisi_qm *qm);
- void hisi_qm_debug_init(struct hisi_qm *qm);
- void hisi_qm_debug_regs_clear(struct hisi_qm *qm);
- int hisi_qm_sriov_enable(struct pci_dev *pdev, int max_vfs);
--- 
-2.33.0
+>  There are two variants only of the CP0 Random register that we can ever
+> encounter, as it's been de-facto standardised in early 1990s already and
+> then written down in the MIPSr1 architecture specification ~2000.  So I
+> think it may make sense to actually handle them both explictitly with
+> individual calculations, possibly conditionalised on a CONFIG setting or
+> `cpu_has_3kex', because kernels that support the two variants of the MMU
+> architecture are mutually incompatible.
 
+Okay, I can give this a shot, but this certainly isn't my fort=C3=A9. It
+may ultimately wind up being simpler for you to just send some code of
+what you envision for this, but if I understand your idea correctly,
+what you're saying is something like:
+
+static inline unsigned long random_get_entropy(void)
+{
+        unsigned int prid =3D read_c0_prid();
+        unsigned int imp =3D prid & PRID_IMP_MASK;
+        unsigned int c0_random;
+
+        if (can_use_mips_counter(prid))
+                return read_c0_count();
+
+        if (cpu_has_3kex)
+                c0_random =3D (read_c0_random() >> 8) & 0x3f;
+        else
+                c0_random =3D read_c0_random() & 0x3f;
+        return (random_get_entropy_fallback() << 6) | (0x3f - c0_random);
+}
+
+What do you think of that? Some tweak I'm missing?
+
+>  Isn't it going to be an issue for an entropy source that the distributio=
+n
+> of values obtained from the CP0 Random bit-field is not even, that is som=
+e
+> values from the 6-bit range will never appear?
+
+It's the same situation without inverting the order: instead of some
+bits on the top never happening, some bits on the bottom never happen
+instead. In general, counters don't form uniform distributions anyway,
+since the lower bits change faster, and neither are they independent,
+since one sample in large part depends on the previous. This is just
+sort of the nature of the beast, and the code that calls
+random_get_entropy() deals with this appropriately (by, at the moment,
+just hashing all the bits).
+
+Jason
