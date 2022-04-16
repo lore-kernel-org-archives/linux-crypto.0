@@ -2,81 +2,144 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77ADBC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 19:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF7DC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Apr 2022 19:32:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232779AbiDPTNz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Apr 2022 15:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36246 "EHLO
+        id S232824AbiDPTe7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Apr 2022 15:34:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230293AbiDPTNy (ORCPT
+        with ESMTP id S232768AbiDPTe7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Apr 2022 15:13:54 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29D13E0CD
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Apr 2022 12:11:21 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id l7so20646236ejn.2
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Apr 2022 12:11:21 -0700 (PDT)
+        Sat, 16 Apr 2022 15:34:59 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1BF9968B;
+        Sat, 16 Apr 2022 12:32:24 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id k22so14237384wrd.2;
+        Sat, 16 Apr 2022 12:32:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7f9hzlC0S9E4wJ5S3GtPWz4T5gOZM6q0pLzKxL5hF34=;
-        b=VluIbiEzmKAQ1nvS/n90Viy8/kx4JVmSK1atdlT68xTehQc9APWNyrEsfObOIbWM1B
-         F4vrc4QcLuk/nPoACBM2f+GfdSk6jUNZshwBKIBu3w3dDVAc9/rZM2qWFdyTLVtZM3Ze
-         4hXsD7CLWvcRZzSDUYDhifng2F33AqNbuuBJe9851K5XgpiUhDDi4pngDgrWlajR21te
-         pWDVlqusd31PJg4OuzbVc6afssn9Fm+oine43nbH2b3SU1Me/oiTIs1fiBZqsM5CPvMT
-         4rUk0L/mhMUAgC2a4p5cW6YUfSu47eTmY7EEPGMmDcM+JVnQ6cSSYuV3aHpQewYmXDn9
-         6+ug==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=zKq3t9+WVckk287gJXVdTxBsvDIgk8B6FZnSS1BTPL4=;
+        b=hFNxStPk6ljDQwSVsjzOkbywBaCgUHFTMhRf8KLzWQKkAK634TFpEv/iqqflmNmc+4
+         H5nPQkWkiCU5YeKVCZyn9zW2a0IzF5fciuEckFnKEkxcMmv/IliYbvr7PY0OQC8wO1J7
+         D5duSREpTHMOB/N5dyAEucbZIv8PnD3VrVhYI1hMKM8jNKMBLBmrtXkpuLAJsMzQUJHx
+         kpO7aJeENbJYmrwewNwsbiwZirIGezWs9INOqa0rj/PUxb3hridsT8SLJtx94UvJ+/Ps
+         B7zYWz90bX9w/cGmPrCiyYRos0wXG13wi8iUXmqdoaEhqNEpJqz/StjpZHP4ZnK7rHKI
+         p4Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7f9hzlC0S9E4wJ5S3GtPWz4T5gOZM6q0pLzKxL5hF34=;
-        b=wS/WG6WQzbtLxE2NTjUAB8pH9EMW57WV5qRk0iOhA52oXKdmCn8OF6sAkybQjaBiVc
-         LLhUdqW99Jy70Vdbt3m3CxO88+E4fOkatly0yNCed8wiua2JwhAN9egcMraYCZxVBIv3
-         iZs7ncgwk8RKsazq0gts2A9UetQj8iOsofma/xCEhKjYAcLIUTvkJz0REbdgdwb48DbX
-         mr40YR78Mk7Zni/C8muf0029SMl7q33TFtWmmiBhAhR1LmJooGD0zJp65DmujvXd18JT
-         DYt/d7+2KBNTyngbOlbmpjzi6FIcWVi/ywl2sd85u1qRc16kJAkgG747CAZ7myCfIEcS
-         84Ow==
-X-Gm-Message-State: AOAM5330fHO7xabMUky1Tx4ahp7oT8YHZK2vicjZsjWxfVdc+ldcdUh/
-        LfpnjvGAhlTLQhbSKK820EoJGkmcWA9O4uv3QPQ=
-X-Google-Smtp-Source: ABdhPJzxWWn3TuJnKMyBLiVXjT3G5QSw6z8eLKDzcq51ZrPL5P4/npSvUWasKsM8EbE8QPTTuWudt6lOzN4IW1TOT8g=
-X-Received: by 2002:a17:907:3f1a:b0:6e8:b17c:e353 with SMTP id
- hq26-20020a1709073f1a00b006e8b17ce353mr3582151ejc.626.1650136279454; Sat, 16
- Apr 2022 12:11:19 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=zKq3t9+WVckk287gJXVdTxBsvDIgk8B6FZnSS1BTPL4=;
+        b=d5Q+sD3DPL1gQTx8UXgShR1zYprNz1vamwRSmcgwfqJaor1CQRK9kpyaYYn2/GS3rS
+         oMelwH9QdwQokm1zAB/yL1GIDnLY8LKSBkV9h0UJnjhouV3ez+AfCVTJCcpCbW38D6hL
+         YGpnPFIEzxNf+TVD1Kmvb9i+x+v7tpX38FbkLlorV5yinMA2FilDTJYhae0H7vBEFnwP
+         HbtAyXcp0fZd9UsTF+W4s0SyKvF78XZ6wEK1cRjv7knfqnyogowmw1ZU00pluxADx5jV
+         BSIOhD4IUHCO9K3/OH13wnLz7Y2fo/R1pZT2y1Wkc1UFgZRqvPccKysL6MYkBc8M3JNB
+         5nsQ==
+X-Gm-Message-State: AOAM531W+hoBHzOZKKX/jj2J84NI5yVbaveTnI7PCpzg2BQFxCHZX2ek
+        tgVe8SASd8Dri27lD6DlOa8=
+X-Google-Smtp-Source: ABdhPJwXXdg4aIH03y8wvyozMGxucmhHV8S1YG4lSMDVE8AYMR7NHA91JGYnlXTGTd4gigMfa1nlvQ==
+X-Received: by 2002:a05:6000:1568:b0:1f0:250a:d3ef with SMTP id 8-20020a056000156800b001f0250ad3efmr3322201wrz.402.1650137543384;
+        Sat, 16 Apr 2022 12:32:23 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id p18-20020adfba92000000b001e4ae791663sm6798423wrg.62.2022.04.16.12.32.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Apr 2022 12:32:22 -0700 (PDT)
+Date:   Sat, 16 Apr 2022 21:32:21 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Samuel Holland <samuel@sholland.org>
+Cc:     Heiko Stuebner <heiko@sntech.de>, palmer@dabbelt.com,
+        paul.walmsley@sifive.com, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org, wefu@redhat.com, guoren@kernel.org,
+        atishp@atishpatra.org, anup@brainfault.org, mick@ics.forth.gr,
+        cmuellner@linux.com, philipp.tomsich@vrull.eu,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/2] riscv: implement Zicbom-based CMO instructions + the
+ t-head variant
+Message-ID: <YlsZxVjgt3ZNQ7Ub@Red>
+References: <20220307224620.1933061-1-heiko@sntech.de>
+ <YllWTN+15CoskNBt@Red>
+ <70da24dd-2d03-fc49-151d-daabb315a5f6@sholland.org>
+ <YlpxsYREWv/LQ+HY@Red>
+ <849a3728-7e84-4f26-0c73-4d68eae9ae01@sholland.org>
 MIME-Version: 1.0
-References: <20220416135412.4109213-1-festevam@gmail.com> <AM9PR04MB82115516947967193216FE60E8F19@AM9PR04MB8211.eurprd04.prod.outlook.com>
-In-Reply-To: <AM9PR04MB82115516947967193216FE60E8F19@AM9PR04MB8211.eurprd04.prod.outlook.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Sat, 16 Apr 2022 16:11:09 -0300
-Message-ID: <CAOMZO5BX9JhqJapqfqup9DdzL=nUvO1qBjg_H9R8Ly+hs92ErQ@mail.gmail.com>
-Subject: Re: [EXT] [PATCH v2] crypto: caam - fix i.MX6SX entropy delay value
-To:     Varun Sethi <V.Sethi@nxp.com>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Vabhav Sharma <vabhav.sharma@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <849a3728-7e84-4f26-0c73-4d68eae9ae01@sholland.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Varun,
+Le Sat, Apr 16, 2022 at 12:47:29PM -0500, Samuel Holland a écrit :
+> On 4/16/22 2:35 AM, Corentin Labbe wrote:
+> > Le Fri, Apr 15, 2022 at 09:19:23PM -0500, Samuel Holland a écrit :
+> >> On 4/15/22 6:26 AM, Corentin Labbe wrote:
+> >>> Le Mon, Mar 07, 2022 at 11:46:18PM +0100, Heiko Stuebner a écrit :
+> >>>> This series is based on the alternatives changes done in my svpbmt series
+> >>>> and thus also depends on Atish's isa-extension parsing series.
+> >>>>
+> >>>> It implements using the cache-management instructions from the  Zicbom-
+> >>>> extension to handle cache flush, etc actions on platforms needing them.
+> >>>>
+> >>>> SoCs using cpu cores from T-Head like the Allwinne D1 implement a
+> >>>> different set of cache instructions. But while they are different,
+> >>>> instructions they provide the same functionality, so a variant can
+> >>>> easly hook into the existing alternatives mechanism on those.
+> >>>>
+> >>>>
+> >>>
+> >>> Hello
+> >>>
+> >>> I am testing https://github.com/smaeul/linux.git branch:origin/riscv/d1-wip which contain this serie.
+> >>>
+> >>> I am hitting a buffer corruption problem with DMA.
+> >>> The sun8i-ce crypto driver fail self tests due to "device overran destination buffer".
+> >>> In fact the buffer is not overran by device but by dma_map_single() operation.
+> >>>
+> >>> The following small code show the problem:
+> >>>
+> >>> dma_addr_t dma;
+> >>> u8 *buf;
+> >>> #define BSIZE 2048
+> >>> #define DMASIZE 16
+> >>>
+> >>> buf = kmalloc(BSIZE, GFP_KERNEL | GFP_DMA);
+> >>> for (i = 0; i < BSIZE; i++)
+> >>>     buf[i] = 0xFE;
+> >>> print_hex_dump(KERN_INFO, "DMATEST1:", DUMP_PREFIX_NONE, 16, 4, buf, 256, false);
+> >>> dma = dma_map_single(ce->dev, buf, DMASIZE, DMA_FROM_DEVICE);
+> >>
+> >> This function (through dma_direct_map_page()) ends up calling
+> >> arch_sync_dma_for_device(..., ..., DMA_FROM_DEVICE), which invalidates the CPU's
+> >> cache. This is the same thing other architectures do (at least arm, arm64,
+> >> openrisc, and powerpc). So this appears to be working as intended.
+> > 
+> > This behavour is not present at least on ARM and ARM64.
+> > The sample code I provided does not corrupt the buffer on them.
+> 
+> That can be explained by the 0xFE bytes having been flushed to DRAM already in
+> your ARM/ARM64 tests, whereas in your riscv64 case, the 0xFE bytes were still in
+> a dirty cache line. The cache topology and implementation is totally different
+> across the SoCs, so this is not too surprising.
+> 
+> Semantically, dma_map_single(..., DMA_FROM_DEVICE) means you are doing a
+> unidirectional DMA transfer from the device into that buffer. So the contents of
+> the buffer are "undefined" until the DMA transfer completes. If you are also
+> writing data into the buffer from the CPU side, then you need DMA_BIDIRECTIONAL.
+> 
+> Regards,
+> Samuel
 
-On Sat, Apr 16, 2022 at 3:00 PM Varun Sethi <V.Sethi@nxp.com> wrote:
->
-> Hi Fabio,
-> Vabhav is working on a fix for the Linux driver. He would be introducing a new property in the CAAM device tree node, which would be used for specifying the entropy delay value. This would make the solution generic. This property is optional.
++CC crypto mailing list + maintainer
 
-Unfortunately, a devicetree property solution via optional property
-would not work.
+My problem is that crypto selftest, for each buffer where I need to do a cipher operation,
+concat a poison buffer to check that device does write beyond buffer.
 
-Such a solution would not be backported to stable kernels and people running old
-devicetree with new kernels would still face the problem.
+But the dma_map_sg(FROM_DEVICE) corrupts this poison buffer and crypto selftests fails thinking my device did a buffer overrun.
 
-This problem is seen since kernel 5.10, so we need a kernel-only fix.
-
-Thanks
+So you mean that on SoC D1, this crypto API check strategy is impossible ?
