@@ -2,401 +2,205 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 824DFC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Apr 2022 15:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD158C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Apr 2022 17:35:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234289AbiDQPIR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 17 Apr 2022 11:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44870 "EHLO
+        id S232241AbiDQRiF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 17 Apr 2022 13:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiDQPIQ (ORCPT
+        with ESMTP id S231321AbiDQRiF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 Apr 2022 11:08:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE4AEBA;
-        Sun, 17 Apr 2022 08:05:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 765716122A;
-        Sun, 17 Apr 2022 15:05:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58033C385A7;
-        Sun, 17 Apr 2022 15:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650207934;
-        bh=TCEyh3gyXRnZ90K4gJfzgIbuDBywNlbZ2X/YTY7EWds=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=vJjQVh9/cnR4yymb1LjBhXhoIw0pYfMbOeY1gn3uSvU9VydPRBdO35sIimj9rsakq
-         6jkPV3DyMwZck+8d43DTLrbJMJVSJtm+X7bBnLAFqjA03Bb0Y2x1n8eDbVpiv56OXx
-         Kuu/gZ3b4t5eRiSLBOd6y06RCvOm4Qqm80qh8UkSatyKKaTu6suGei7chJ0YVeYGmC
-         B+wB/t0VZ7coxtI9FHVqCAAiUpe1dhX39jPvuYfNQvhV/4glP5LdP7xp1IFJVUPa6z
-         QpOZ9GWL2NW3o0MOUFOEOkNUhDYyJL8ORp0JdDkKdu2odeJBCUaeZAr6smXOdoM3S2
-         Ukewjhj+5ZIEg==
-Message-ID: <45b00778d60cdef80f89041e5c9597d78c0d8ae7.camel@kernel.org>
-Subject: Re: [PATCH v7 4/6] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        David Howells <dhowells@redhat.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc:     kernel@pengutronix.de, David Gstir <david@sigma-star.at>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Horia =?UTF-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Sun, 17 Apr 2022 13:38:05 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9261AD80;
+        Sun, 17 Apr 2022 10:35:28 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id r64so7647621wmr.4;
+        Sun, 17 Apr 2022 10:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=KMZt2bVJM1zLo0DjhLeNEZmiJ3z7y7UdEFlYZgbQlFo=;
+        b=q47vSOyXrisZAu15yZ/0sW7h8Q1Lfy+mVgQNnOiQuxL7ftDD6Mgqi91ddqdMfJTXNQ
+         QCggWtKnMC2cOJwFanDTSNBGXgoNwRCZ4W0Ng+/sqKvinwD1rRKcVJir4FfI94iEqgwL
+         gJP2tfvpK+Qyzaem3XUao6rcSukVIwBDS1O4ahoRBQi6pHfJDvQlaOxvmElPmoW+oxta
+         j1TItDP0/MVQjSZV6zR685EPFhlUEqLab4+f/2p3zWMi9iUQ8vOaOMcVcqwjT5UOB+eJ
+         G8ya2Kbe88YDUrbkSwd8a5snLJqn1QjrSl7Bms1Y4MQh6kF+JfXheULQlrb89+PUSyWW
+         mdhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=KMZt2bVJM1zLo0DjhLeNEZmiJ3z7y7UdEFlYZgbQlFo=;
+        b=zk/ErCWUM1PaM9MNtSgpdcPkIdSRGTajC/WgFDMtFUPWZnFEIDGgN2JLs2CeDpMM33
+         PUQtDbvvQL493wCn7Gj1STjl7FCUYSSOcFnClXcsxJuINHdfqk+jJTIWkJaJC+GIHPFD
+         7x1HyKFufi6JzQ/PD+ywvmawlnBF7K/N5P+xwj3Jc5Na6nxsb67NBAEr2c0Se6GTzWmV
+         HVQ73gAZ5StOT3F9cjrAyT8MnAufkvquzMnXCkh+hFDwZtE/eRVQQCs5oosq94RQcsAn
+         H20m/tfe698QgH9yZ4DMKQvUl/W0MK9Doq2VAL3z2zmHr2KreL4oaeG7Uv8uJI++Ur0V
+         nWdQ==
+X-Gm-Message-State: AOAM532y8Jk8HAbPjhX6yFmaZYD0cQv/Hrw4GewnyC6++ugNKSrMeSHs
+        TfodmnX3VS0lUswKPz+/qts=
+X-Google-Smtp-Source: ABdhPJyzBVGsbyJQgmx7ekA8ANp0KKP/jg8CuPLV7HzroOXyLwKn/H/m+WZRFyk65/0ebFnQ9bF/JQ==
+X-Received: by 2002:a7b:c016:0:b0:38f:53c2:b8b3 with SMTP id c22-20020a7bc016000000b0038f53c2b8b3mr11677148wmb.13.1650216925713;
+        Sun, 17 Apr 2022 10:35:25 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id e1-20020a05600c4e4100b00392910b276esm2954901wmq.9.2022.04.17.10.35.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Apr 2022 10:35:25 -0700 (PDT)
+Date:   Sun, 17 Apr 2022 19:35:23 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Guo Ren <guoren@kernel.org>
+Cc:     Samuel Holland <samuel@sholland.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Wei Fu <wefu@redhat.com>, Atish Patra <atishp@atishpatra.org>,
+        Anup Patel <anup@brainfault.org>,
+        Nick Kossifidis <mick@ics.forth.gr>,
+        Christoph Muellner <cmuellner@linux.com>,
+        Philipp Tomsich <philipp.tomsich@vrull.eu>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Sun, 17 Apr 2022 18:04:24 +0300
-In-Reply-To: <20220415205647.46056-5-a.fatoum@pengutronix.de>
-References: <20220415205647.46056-1-a.fatoum@pengutronix.de>
-         <20220415205647.46056-5-a.fatoum@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.0 
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/2] riscv: implement Zicbom-based CMO instructions + the
+ t-head variant
+Message-ID: <YlxP26dklDj2y+cP@Red>
+References: <20220307224620.1933061-1-heiko@sntech.de>
+ <YllWTN+15CoskNBt@Red>
+ <70da24dd-2d03-fc49-151d-daabb315a5f6@sholland.org>
+ <YlpxsYREWv/LQ+HY@Red>
+ <849a3728-7e84-4f26-0c73-4d68eae9ae01@sholland.org>
+ <YlsZxVjgt3ZNQ7Ub@Red>
+ <CAJF2gTSNzLfon7yH3zvOJfYwQnVRvNWW7KygShLqcagRfbyAkg@mail.gmail.com>
+ <YlvTkfIO9Oz3ib5i@Red>
+ <CAJF2gTQ5rYATTHj2UtwxKw0dpvdHBUAih1RJf0XuGM8b6euZwQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJF2gTQ5rYATTHj2UtwxKw0dpvdHBUAih1RJf0XuGM8b6euZwQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2022-04-15 at 22:56 +0200, Ahmad Fatoum wrote:
-> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
-> built into many newer i.MX and QorIQ SoCs by NXP.
->=20
-> The CAAM does crypto acceleration, hardware number generation and
-> has a blob mechanism for encapsulation/decapsulation of sensitive materia=
-l.
->=20
-> This blob mechanism depends on a device specific random 256-bit One Time
-> Programmable Master Key that is fused in each SoC at manufacturing
-> time. This key is unreadable and can only be used by the CAAM for AES
-> encryption/decryption of user data.
->=20
-> This makes it a suitable backend (source) for kernel trusted keys.
->=20
-> Previous commits generalized trusted keys to support multiple backends
-> and added an API to access the CAAM blob mechanism. Based on these,
-> provide the necessary glue to use the CAAM for trusted keys.
->=20
-> Reviewed-by: David Gstir <david@sigma-star.at>
-> Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Tested-by: Tim Harvey <tharvey@gateworks.com>
-> Tested-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Tested-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
-> v6 -> v7:
-> =C2=A0 - Split off MAINTAINERS and documentation chanes into separate pat=
-ches
-> =C2=A0=C2=A0=C2=A0 (Jarkko)
-> =C2=A0 - Use new struct caam_blob_info API (Pankaj)
-> v5 -> v6:
-> =C2=A0 - Rename caam_trusted_key_ops to trusted_key_caam_ops for symmetry
-> =C2=A0=C2=A0=C2=A0 with other trust sources (Pankaj)
-> =C2=A0 - Collected Pankaj's Reviewed-by
-> v4 -> v5:
-> =C2=A0 - Collected Reviewed-by's and Tested-by's
-> =C2=A0 - Changed modifier to SECURE_KEY for compatibility with linux-imx
-> =C2=A0=C2=A0=C2=A0 (Matthias)
-> v3 -> v4:
-> =C2=A0 - Collected Acked-by's, Reviewed-by's and Tested-by
-> v2 -> v3:
-> =C2=A0- add MAINTAINERS entry
-> v1 -> v2:
-> =C2=A0- Extend trusted keys documentation for CAAM
->=20
-> To: David Howells <dhowells@redhat.com>
-> To: Jarkko Sakkinen <jarkko@kernel.org>
-> To: James Bottomley <jejb@linux.ibm.com>
-> To: Mimi Zohar <zohar@linux.ibm.com>
-> To: Jonathan Corbet <corbet@lwn.net>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-> Cc: David Gstir <david@sigma-star.at>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Cc: Sumit Garg <sumit.garg@linaro.org>
-> Cc: keyrings@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-integrity@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-security-module@vger.kernel.org
-> ---
-> =C2=A0.../admin-guide/kernel-parameters.txt=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A0include/keys/trusted_caam.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 11 =
-+++
-> =C2=A0security/keys/trusted-keys/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 11 ++-
-> =C2=A0security/keys/trusted-keys/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +
-> =C2=A0security/keys/trusted-keys/trusted_caam.c=C2=A0=C2=A0=C2=A0=C2=A0 |=
- 82 +++++++++++++++++++
-> =C2=A0security/keys/trusted-keys/trusted_core.c=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 6 +-
-> =C2=A06 files changed, 111 insertions(+), 2 deletions(-)
-> =C2=A0create mode 100644 include/keys/trusted_caam.h
-> =C2=A0create mode 100644 security/keys/trusted-keys/trusted_caam.c
->=20
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentat=
-ion/admin-guide/kernel-parameters.txt
-> index 4deed1908a75..9afb7046ce97 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -5958,6 +5958,7 @@
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0sou=
-rces:
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- "=
-tpm"
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- "=
-tee"
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0- "caam"
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0If =
-not specified then it defaults to iterating through
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0the=
- trust source list starting with TPM and assigns the
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fir=
-st trust source as a backend which is initialized
-> diff --git a/include/keys/trusted_caam.h b/include/keys/trusted_caam.h
-> new file mode 100644
-> index 000000000000..73fe2f32f65e
-> --- /dev/null
-> +++ b/include/keys/trusted_caam.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-> + */
-> +
-> +#ifndef __CAAM_TRUSTED_KEY_H
-> +#define __CAAM_TRUSTED_KEY_H
-> +
-> +extern struct trusted_key_ops trusted_key_caam_ops;
-> +
-> +#endif
-> diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-k=
-eys/Kconfig
-> index fc4abd581abb..dbfdd8536468 100644
-> --- a/security/keys/trusted-keys/Kconfig
-> +++ b/security/keys/trusted-keys/Kconfig
-> @@ -24,6 +24,15 @@ config TRUSTED_KEYS_TEE
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable use of the =
-Trusted Execution Environment (TEE) as trusted
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 key backend.
-> =C2=A0
-> -if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
-> +config TRUSTED_KEYS_CAAM
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool "CAAM-based trusted keys"
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0depends on CRYPTO_DEV_FSL_CAAM=
-_JR >=3D TRUSTED_KEYS
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0select CRYPTO_DEV_FSL_CAAM_BLO=
-B_GEN
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0default y
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0help
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Enable use of NXP's Cry=
-ptographic Accelerator and Assurance Module
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (CAAM) as trusted key b=
-ackend.
-> +
-> +if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE && !TRUSTED_KEYS_CAAM
-> =C2=A0comment "No trust source selected!"
-> =C2=A0endif
-> diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-=
-keys/Makefile
-> index 2e2371eae4d5..735aa0bc08ef 100644
-> --- a/security/keys/trusted-keys/Makefile
-> +++ b/security/keys/trusted-keys/Makefile
-> @@ -12,3 +12,5 @@ trusted-$(CONFIG_TRUSTED_KEYS_TPM) +=3D trusted_tpm2.o
-> =C2=A0trusted-$(CONFIG_TRUSTED_KEYS_TPM) +=3D tpm2key.asn1.o
-> =C2=A0
-> =C2=A0trusted-$(CONFIG_TRUSTED_KEYS_TEE) +=3D trusted_tee.o
-> +
-> +trusted-$(CONFIG_TRUSTED_KEYS_CAAM) +=3D trusted_caam.o
-> diff --git a/security/keys/trusted-keys/trusted_caam.c b/security/keys/tr=
-usted-keys/trusted_caam.c
-> new file mode 100644
-> index 000000000000..46cb2484ec36
-> --- /dev/null
-> +++ b/security/keys/trusted-keys/trusted_caam.c
-> @@ -0,0 +1,82 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-> + */
-> +
-> +#include <keys/trusted_caam.h>
-> +#include <keys/trusted-type.h>
-> +#include <linux/build_bug.h>
-> +#include <linux/key-type.h>
-> +#include <soc/fsl/caam-blob.h>
-> +
-> +static struct caam_blob_priv *blobifier;
-> +
-> +#define KEYMOD "SECURE_KEY"
-> +
-> +static_assert(MAX_KEY_SIZE + CAAM_BLOB_OVERHEAD <=3D CAAM_BLOB_MAX_LEN);
-> +static_assert(MAX_BLOB_SIZE <=3D CAAM_BLOB_MAX_LEN);
-> +
-> +static int trusted_caam_seal(struct trusted_key_payload *p, char *databl=
-ob)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct caam_blob_info info =3D=
- {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.input=C2=A0 =3D p->key,=C2=A0 .input_len=C2=A0=C2=A0 =3D=
- p->key_len,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.output =3D p->blob, .output_len=C2=A0 =3D MAX_BLOB_SIZE,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.key_mod =3D KEYMOD, .key_mod_len =3D sizeof(KEYMOD) - 1,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0};
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D caam_encap_blob(blobif=
-ier, &info);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return ret;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p->blob_len =3D info.output_le=
-n;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> +}
-> +
-> +static int trusted_caam_unseal(struct trusted_key_payload *p, char *data=
-blob)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct caam_blob_info info =3D=
- {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.input=C2=A0=C2=A0 =3D p->blob,=C2=A0 .input_len=C2=A0 =
-=3D p->blob_len,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.output=C2=A0 =3D p->key,=C2=A0=C2=A0 .output_len =3D MAX=
-_KEY_SIZE,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0.key_mod =3D KEYMOD,=C2=A0 .key_mod_len =3D sizeof(KEYMOD=
-) - 1,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0};
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D caam_decap_blob(blobif=
-ier, &info);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return ret;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p->key_len =3D info.output_len=
-;
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-> +}
-> +
-> +static int trusted_caam_init(void)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int ret;
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0blobifier =3D caam_blob_gen_in=
-it();
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (IS_ERR(blobifier)) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0pr_err("Job Ring Device allocation for transform failed\n=
-");
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0return PTR_ERR(blobifier);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ret =3D register_key_type(&key=
-_type_trusted);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ret)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0caam_blob_gen_exit(blobifier);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return ret;
-> +}
-> +
-> +static void trusted_caam_exit(void)
-> +{
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unregister_key_type(&key_type_=
-trusted);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0caam_blob_gen_exit(blobifier);
-> +}
-> +
-> +struct trusted_key_ops trusted_key_caam_ops =3D {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.migratable =3D 0, /* non-migr=
-atable */
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.init =3D trusted_caam_init,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.seal =3D trusted_caam_seal,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.unseal =3D trusted_caam_unsea=
-l,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0.exit =3D trusted_caam_exit,
-> +};
-> diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/tr=
-usted-keys/trusted_core.c
-> index 9235fb7d0ec9..c6fc50d67214 100644
-> --- a/security/keys/trusted-keys/trusted_core.c
-> +++ b/security/keys/trusted-keys/trusted_core.c
-> @@ -9,6 +9,7 @@
-> =C2=A0#include <keys/user-type.h>
-> =C2=A0#include <keys/trusted-type.h>
-> =C2=A0#include <keys/trusted_tee.h>
-> +#include <keys/trusted_caam.h>
-> =C2=A0#include <keys/trusted_tpm.h>
-> =C2=A0#include <linux/capability.h>
-> =C2=A0#include <linux/err.h>
-> @@ -29,7 +30,7 @@ MODULE_PARM_DESC(rng, "Select trusted key RNG");
-> =C2=A0
-> =C2=A0static char *trusted_key_source;
-> =C2=A0module_param_named(source, trusted_key_source, charp, 0);
-> -MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
-> +MODULE_PARM_DESC(source, "Select trusted keys source (tpm, tee or caam)"=
-);
-> =C2=A0
-> =C2=A0static const struct trusted_key_source trusted_key_sources[] =3D {
-> =C2=A0#if defined(CONFIG_TRUSTED_KEYS_TPM)
-> @@ -38,6 +39,9 @@ static const struct trusted_key_source trusted_key_sour=
-ces[] =3D {
-> =C2=A0#if defined(CONFIG_TRUSTED_KEYS_TEE)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ "tee", &trusted_key_tee=
-_ops },
-> =C2=A0#endif
-> +#if defined(CONFIG_TRUSTED_KEYS_CAAM)
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ "caam", &trusted_key_caam_op=
-s },
-> +#endif
-> =C2=A0};
-> =C2=A0
-> =C2=A0DEFINE_STATIC_CALL_NULL(trusted_key_init, *trusted_key_sources[0].o=
-ps->init);
+Le Sun, Apr 17, 2022 at 04:49:34PM +0800, Guo Ren a écrit :
+> On Sun, Apr 17, 2022 at 4:45 PM Corentin Labbe
+> <clabbe.montjoie@gmail.com> wrote:
+> >
+> > Le Sun, Apr 17, 2022 at 10:17:34AM +0800, Guo Ren a écrit :
+> > > On Sun, Apr 17, 2022 at 3:32 AM Corentin Labbe
+> > > <clabbe.montjoie@gmail.com> wrote:
+> > > >
+> > > > Le Sat, Apr 16, 2022 at 12:47:29PM -0500, Samuel Holland a écrit :
+> > > > > On 4/16/22 2:35 AM, Corentin Labbe wrote:
+> > > > > > Le Fri, Apr 15, 2022 at 09:19:23PM -0500, Samuel Holland a écrit :
+> > > > > >> On 4/15/22 6:26 AM, Corentin Labbe wrote:
+> > > > > >>> Le Mon, Mar 07, 2022 at 11:46:18PM +0100, Heiko Stuebner a écrit :
+> > > > > >>>> This series is based on the alternatives changes done in my svpbmt series
+> > > > > >>>> and thus also depends on Atish's isa-extension parsing series.
+> > > > > >>>>
+> > > > > >>>> It implements using the cache-management instructions from the  Zicbom-
+> > > > > >>>> extension to handle cache flush, etc actions on platforms needing them.
+> > > > > >>>>
+> > > > > >>>> SoCs using cpu cores from T-Head like the Allwinne D1 implement a
+> > > > > >>>> different set of cache instructions. But while they are different,
+> > > > > >>>> instructions they provide the same functionality, so a variant can
+> > > > > >>>> easly hook into the existing alternatives mechanism on those.
+> > > > > >>>>
+> > > > > >>>>
+> > > > > >>>
+> > > > > >>> Hello
+> > > > > >>>
+> > > > > >>> I am testing https://github.com/smaeul/linux.git branch:origin/riscv/d1-wip which contain this serie.
+> > > > > >>>
+> > > > > >>> I am hitting a buffer corruption problem with DMA.
+> > > > > >>> The sun8i-ce crypto driver fail self tests due to "device overran destination buffer".
+> > > > > >>> In fact the buffer is not overran by device but by dma_map_single() operation.
+> > > > > >>>
+> > > > > >>> The following small code show the problem:
+> > > > > >>>
+> > > > > >>> dma_addr_t dma;
+> > > > > >>> u8 *buf;
+> > > > > >>> #define BSIZE 2048
+> > > > > >>> #define DMASIZE 16
+> > > > > >>>
+> > > > > >>> buf = kmalloc(BSIZE, GFP_KERNEL | GFP_DMA);
+> > > > > >>> for (i = 0; i < BSIZE; i++)
+> > > > > >>>     buf[i] = 0xFE;
+> > > > > >>> print_hex_dump(KERN_INFO, "DMATEST1:", DUMP_PREFIX_NONE, 16, 4, buf, 256, false);
+> > > > > >>> dma = dma_map_single(ce->dev, buf, DMASIZE, DMA_FROM_DEVICE);
+> > > > > >>
+> > > > > >> This function (through dma_direct_map_page()) ends up calling
+> > > > > >> arch_sync_dma_for_device(..., ..., DMA_FROM_DEVICE), which invalidates the CPU's
+> > > > > >> cache. This is the same thing other architectures do (at least arm, arm64,
+> > > > > >> openrisc, and powerpc). So this appears to be working as intended.
+> > > > > >
+> > > > > > This behavour is not present at least on ARM and ARM64.
+> > > > > > The sample code I provided does not corrupt the buffer on them.
+> > > > >
+> > > > > That can be explained by the 0xFE bytes having been flushed to DRAM already in
+> > > > > your ARM/ARM64 tests, whereas in your riscv64 case, the 0xFE bytes were still in
+> > > > > a dirty cache line. The cache topology and implementation is totally different
+> > > > > across the SoCs, so this is not too surprising.
+> > > > >
+> > > > > Semantically, dma_map_single(..., DMA_FROM_DEVICE) means you are doing a
+> > > > > unidirectional DMA transfer from the device into that buffer. So the contents of
+> > > > > the buffer are "undefined" until the DMA transfer completes. If you are also
+> > > > > writing data into the buffer from the CPU side, then you need DMA_BIDIRECTIONAL.
+> > > > >
+> > > > > Regards,
+> > > > > Samuel
+> > > >
+> > > > +CC crypto mailing list + maintainer
+> > > >
+> > > > My problem is that crypto selftest, for each buffer where I need to do a cipher operation,
+> > > > concat a poison buffer to check that device does write beyond buffer.
+> > > >
+> > > > But the dma_map_sg(FROM_DEVICE) corrupts this poison buffer and crypto selftests fails thinking my device did a buffer overrun.
+> > > >
+> > > > So you mean that on SoC D1, this crypto API check strategy is impossible ?
+> > >
+> > > I think you could try to replace all CLEAN & INVAL ops with FLUSH ops
+> > > for the testing. (All cache block-aligned data from the device for the
+> > > CPU should be invalided.)
+> > >
+> >
+> > With:
+> > diff --git a/arch/riscv/mm/dma-noncoherent.c b/arch/riscv/mm/dma-noncoherent.c
+> > index 2c124bcc1932..608483522e05 100644
+> > --- a/arch/riscv/mm/dma-noncoherent.c
+> > +++ b/arch/riscv/mm/dma-noncoherent.c
+> > @@ -21,7 +21,7 @@ void arch_sync_dma_for_device(phys_addr_t paddr, size_t size, enum dma_data_dire
+> >                 ALT_CMO_OP(CLEAN, (unsigned long)phys_to_virt(paddr), size);
+> >                 break;
+> >         case DMA_FROM_DEVICE:
+> > -               ALT_CMO_OP(INVAL, (unsigned long)phys_to_virt(paddr), size);
+> > +               ALT_CMO_OP(FLUSH, (unsigned long)phys_to_virt(paddr), size);
+> >                 break;
+> >         case DMA_BIDIRECTIONAL:
+> >                 ALT_CMO_OP(FLUSH, (unsigned long)phys_to_virt(paddr), size);
+> >
+> >
+> > The crypto self test works and I got no more buffer corruption.
+> No, No ... it's not a solution. That means your driver has a problem.
+> From device, we only need INVAL enough.
+> 
 
+For me, my driver works fine, the problem came from dma_map_sg(), probably I didnt explain right, I restart.
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Example:
+crypto self test send to my driver an AES cipher operation of 16 bytes inside a SG, but the original buffer is greater (said 32 for the example).
+So the first 16 bytes are used by the SG and the last 16 bytes are a poisoned buffer (with value 0xFE) to check driver do not write beyong the normal operation of 16 bytes (and beyond the SG length).
 
-BR, Jarkko
+Doing the dma_map_sg(FROM_DEVICE) on the SG corrupt the whole buffer.
+My driver write normally via DMA the first 16 bytes.
+Crypto API check the last bytes, no more 0xFE, so it fail believing my driver wrote beyond the first 16 bytes.
 
+But even If I disable my hardware operation, the buffer is still corrupted. (See my sample code which just do dma_map/dma_unmap)
+
+So the problem is the dma_map(FROM_DEVICE) which change buffer content.
+
+So if this behavour is normal on D1 SoC, how to fix the crypto self tests ?
