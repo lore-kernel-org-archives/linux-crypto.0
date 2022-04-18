@@ -2,107 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D34E5C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 01:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3F6C43217
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 07:10:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235737AbiDRB7p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 17 Apr 2022 21:59:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44390 "EHLO
+        id S235175AbiDRHNV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Apr 2022 03:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231700AbiDRB7o (ORCPT
+        with ESMTP id S230360AbiDRHNU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 Apr 2022 21:59:44 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB7EF18397;
-        Sun, 17 Apr 2022 18:57:06 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id s70so3568393qke.8;
-        Sun, 17 Apr 2022 18:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x6skCzjnPnfmaS7HpmFApF1dSN6+QpLWVgexcP1E8vQ=;
-        b=Gp4O0bN2vCo+5nkLdlS2Bx/PD+7K7u0tRutLBkwTlr8udDd9nOP9Tyt4TAu0+zge0a
-         y8XAbrcZJssNfj/+1UdeCddGXWcnYlCT1zxhwXDsUk1kLYX4U9w1T63Gh7Lo1uWz5ass
-         azHU/KB1oDmC/K7nMiO2/1FwP9XUy6Rt7Nhd7BL7jHSlNjCtJBvjGK2tsjyghRZtc/kH
-         TU6ADYsjFyy0+Nq4+4NgTQXpK3ZI37a1I3kDUNxZv67tpl2xGLAQJns9XgHZT6GmesCK
-         iN7VqZ6PaS+5rTXl1AVmJNAjU0M4+boZwrSC3Ath7d7vnImjDmr7j+NQ6/NgUtRsZHrH
-         GX9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=x6skCzjnPnfmaS7HpmFApF1dSN6+QpLWVgexcP1E8vQ=;
-        b=khFA9fWlSzh0/1loN/OHAIrRgUkExA1eGbGqfHWrHfhtlxICk6Cp+5R1+RNMwBIsvG
-         qFYF2apyMXzjPSE8F3VQy4WRZFVYKc6p5FdvoFwUdaJMlgg5zH+PxEezkn1wa6kA4yux
-         9VxcfXXKosbbQh1Nf0xOVwBixhEEWx8CkV4h4nU76uXznViEigNXBPPIUOsZ+RQnsRDq
-         li+f6iHNyxuGdvteKKFc02iaJjrnivfKu53s+rX2O8adHvtzQRIoD3kGSFxGPcVWyzrq
-         t9zOXsZ+t2mut9xpUk+r0CzcCqJNRJfRLxnHCODnPCD2uNi0NNxPl6B61v5BTcR6bQ6g
-         c/fA==
-X-Gm-Message-State: AOAM532xsNNYCyARMJSH7wQ8vl30VBInRG2xXq7g6RMZKSj1rHdQeM5m
-        C9Ox0OoLKRV5AHmOozE2kDY=
-X-Google-Smtp-Source: ABdhPJx768t4koiQGIMbqKbqc3sIQ8bjo19VJUdpyYcW9FuUBCH2Mn1+obKzgl4c+BGVG2Yo8tbzDw==
-X-Received: by 2002:a37:bf04:0:b0:69e:6243:f141 with SMTP id p4-20020a37bf04000000b0069e6243f141mr5340443qkf.229.1650247025944;
-        Sun, 17 Apr 2022 18:57:05 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id c79-20020ae9ed52000000b0069e9bfecd6esm994205qkg.98.2022.04.17.18.57.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Apr 2022 18:57:05 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: lv.ruyi@zte.com.cn
-To:     daniele.alessandrelli@intel.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Lv Ruyi <lv.ruyi@zte.com.cn>, Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] crypto: Make use of the helper function devm_platform_ioremap_resource()
-Date:   Mon, 18 Apr 2022 01:57:00 +0000
-Message-Id: <20220418015700.2556801-1-lv.ruyi@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Mon, 18 Apr 2022 03:13:20 -0400
+Received: from elvis.franken.de (elvis.franken.de [193.175.24.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 098C6167E7;
+        Mon, 18 Apr 2022 00:10:41 -0700 (PDT)
+Received: from uucp (helo=alpha)
+        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
+        id 1ngLWo-0008Ga-00; Mon, 18 Apr 2022 09:10:30 +0200
+Received: by alpha.franken.de (Postfix, from userid 1000)
+        id 7A686C0193; Mon, 18 Apr 2022 09:10:05 +0200 (CEST)
+Date:   Mon, 18 Apr 2022 09:10:05 +0200
+From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+Message-ID: <20220418071005.GA4075@alpha.franken.de>
+References: <20220413115411.21489-1-Jason@zx2c4.com>
+ <20220413115411.21489-5-Jason@zx2c4.com>
+ <20220413122546.GA11860@alpha.franken.de>
+ <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk>
+ <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk>
+ <YlfoeGRM6w2O+eXA@zx2c4.com>
+ <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Lv Ruyi <lv.ruyi@zte.com.cn>
+On Fri, Apr 15, 2022 at 01:26:48PM +0100, Maciej W. Rozycki wrote:
+> Hi Jason,
+> 
+> > >  It depends on the exact system.  Some have a 32-bit high-resolution 
+> > > counter in the chipset (arch/mips/kernel/csrc-ioasic.c) giving like 25MHz 
+> > > resolution, some have nothing but jiffies.
+> > 
+> > Alright, so there _are_ machines with no c0 cycles but with a good
+> > clock. Yet, 25MHz is still less than the cpu cycle, so this c0 random
+> > ORing trick remains useful perhaps.
+> 
+>  It's not much less than the CPU cycle really, given that the R3k CPUs are 
+> clocked at up to 40MHz in the systems concerned and likewise the buggy R4k 
+> CPUs run at up to 60MHz (and mind that their CP0 Count register increments 
+> at half the clock rate, so the rate is up to 30MHz anyway).  The overhead 
+> of the calculation is more than that, let alone the latency and issue rate 
+> of an uncached MMIO access to the chipset register.
+> 
+>  Also the systems I have in mind and that lack a counter in the chipset 
+> actually can make use of the buggy CP0 timer, because it's only when CP0 
+> timer interrupts are used that the erratum matters, but they use a DS1287 
+> RTC interrupt instead unconditionally as the clock event (see the comment 
+> at the bottom of arch/mips/dec/time.c).  But this has not been factored in 
+> with `can_use_mips_counter' (should it just check for `mips_hpt_frequency' 
+> being zero perhaps, meaning the timer interrupt not being used?).
+> 
+>  Thomas, do you happen to know if any of the SGI systems that we support 
+> had buggy early R4k chips?
 
-Use the devm_platform_ioremap_resource() helper instead of calling
-platform_get_resource() and devm_ioremap_resource() separately.Make the
-code simpler without functional changes.
+IP22 has probably seen all buggy MIPS chips produced, so yes I even own
+Indy/Indigo2 CPU boards with early R4k chips.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Lv Ruyi <lv.ruyi@zte.com.cn>
----
- drivers/crypto/keembay/keembay-ocs-aes-core.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Thomas.
 
-diff --git a/drivers/crypto/keembay/keembay-ocs-aes-core.c b/drivers/crypto/keembay/keembay-ocs-aes-core.c
-index e2a39fdaf623..9953f5590ac4 100644
---- a/drivers/crypto/keembay/keembay-ocs-aes-core.c
-+++ b/drivers/crypto/keembay/keembay-ocs-aes-core.c
-@@ -1598,7 +1598,6 @@ static int kmb_ocs_aes_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct ocs_aes_dev *aes_dev;
--	struct resource *aes_mem;
- 	int rc;
- 
- 	aes_dev = devm_kzalloc(dev, sizeof(*aes_dev), GFP_KERNEL);
-@@ -1616,13 +1615,7 @@ static int kmb_ocs_aes_probe(struct platform_device *pdev)
- 	}
- 
- 	/* Get base register address. */
--	aes_mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	if (!aes_mem) {
--		dev_err(dev, "Could not retrieve io mem resource\n");
--		return -ENODEV;
--	}
--
--	aes_dev->base_reg = devm_ioremap_resource(&pdev->dev, aes_mem);
-+	aes_dev->base_reg = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(aes_dev->base_reg))
- 		return PTR_ERR(aes_dev->base_reg);
- 
 -- 
-2.25.1
-
+Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
+good idea.                                                [ RFC1925, 2.3 ]
