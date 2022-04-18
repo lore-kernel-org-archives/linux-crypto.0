@@ -2,68 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB47C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 20:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409F7C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 20:46:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237413AbiDRUEG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Apr 2022 16:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48216 "EHLO
+        id S237431AbiDRUtM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Apr 2022 16:49:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231805AbiDRUEE (ORCPT
+        with ESMTP id S231984AbiDRUtM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Apr 2022 16:04:04 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44E42CE1C;
-        Mon, 18 Apr 2022 13:01:24 -0700 (PDT)
+        Mon, 18 Apr 2022 16:49:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A392E20BE1
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 13:46:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4BD0AB80EC4;
-        Mon, 18 Apr 2022 20:01:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8587FC385A1;
-        Mon, 18 Apr 2022 20:01:21 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pG8Ndra0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650312079;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CYZ+Z9Ozm/sOwtZ7bRzsoS0NjGviFOdZGjMdd7k2zp4=;
-        b=pG8Ndra0z0iGnbTwvyh0c5fIJp5TgAIfis8b7H9oHt54ec0yKu2NzFGSoUzIVDFZBqj1o4
-        xL6jqQnH6tQjSpfvPEelQeSMgnAycr/YDMr69hJA0H5/uXBLXsNDw5Cpk2NxXdKup2GFFY
-        hQf2AycSYk2J8byiqhC7JokdEWO2Npc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 569098aa (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 18 Apr 2022 20:01:19 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id p65so27356488ybp.9;
-        Mon, 18 Apr 2022 13:01:19 -0700 (PDT)
-X-Gm-Message-State: AOAM5330TUfWTXqFvluWtN/asYMhfxZYy8XNAEcw0pX+IDGVqRHf42A6
-        XA8uDYWo8g/UxKd+AxykwYDm3lWp9HKnE/Q6GGQ=
-X-Google-Smtp-Source: ABdhPJyQG4SVtnDxvZIbdMCVQf1kqzah1Ej4aSHVIAcjRXiJ8kMZwymqsOddAOMe3UxzVZcneYz4UMRbJRO4FphKrUs=
-X-Received: by 2002:a25:bd8e:0:b0:644:d8dc:1198 with SMTP id
- f14-20020a25bd8e000000b00644d8dc1198mr9077422ybh.398.1650312078851; Mon, 18
- Apr 2022 13:01:18 -0700 (PDT)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EB512B810BF
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 20:46:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F35FC385A1;
+        Mon, 18 Apr 2022 20:46:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650314788;
+        bh=7WRNotIpr2rO8OMkXe6YR/zlvSemzZ4fIi0nEfMDJYs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fuRqt7FG6MkXGSPG9Xyy8NtPLvZNq3MVVMJGnHNlOfKVmaA+5n9ekx5C7G4v0JXSd
+         WScDQ0ugZREHhjqlICMCiTvHVMvxjYURdYX8FvKw3bYJRKPCN0XR/oAzX/GBal7ceA
+         4Z7+EZK3gwV14W7yGYNO5dLsrjWogNlcUdMdP5AgrfJpg6T/zngMqijrXkvKXy0izA
+         rQpfxFf9qCefHKEX2+J/CTAx2ZsJOh9eOPxWpwC3NTsWBf/in7CsRJjJqtp5FH4vyK
+         g21yo8KeA+/TdYLAIyIE2WWthZkRzb5uH6olAN/4pV0wI433QAMeSpzl54lbWkmhrM
+         bgQhaiGqNl86w==
+Date:   Mon, 18 Apr 2022 13:46:26 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 3/8] crypto: hctr2 - Add HCTR2 support
+Message-ID: <Yl3OIuhhnEN+E9fp@sol.localdomain>
+References: <20220412172816.917723-1-nhuck@google.com>
+ <20220412172816.917723-4-nhuck@google.com>
 MIME-Version: 1.0
-References: <20220418192344.1510712-1-Jason@zx2c4.com> <Yl2+YfuFNQzhFVbP@sol.localdomain>
-In-Reply-To: <Yl2+YfuFNQzhFVbP@sol.localdomain>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 18 Apr 2022 22:01:08 +0200
-X-Gmail-Original-Message-ID: <CAHmME9ouyHTxZKBAg7SNDmUVCh2Z9sAirYPBgyBDQXktctE4Nw@mail.gmail.com>
-Message-ID: <CAHmME9ouyHTxZKBAg7SNDmUVCh2Z9sAirYPBgyBDQXktctE4Nw@mail.gmail.com>
-Subject: Re: [PATCH] random: document crng_fast_key_erasure() destination possibility
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412172816.917723-4-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 18, 2022 at 9:39 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> "that state" => "this state" or "the state" in the two places above, otherwise
-> the first sentence can be misparsed (as "So that, state" rather than "So, that
-> state").
+One more comment:
 
-Will do.
+On Tue, Apr 12, 2022 at 05:28:11PM +0000, Nathan Huckleberry wrote:
+> +/*
+> + * Check for a supported set of inner algorithms.
+> + * See the comment at the beginning of this file.
+> + */
+> +static bool hctr2_supported_algorithms(struct skcipher_alg *xctr_alg,
+> +				       struct crypto_alg *blockcipher_alg,
+> +				       struct shash_alg *polyval_alg)
+> +{
+> +	if (strncmp(xctr_alg->base.cra_name, "xctr(", 4) != 0)
+> +		return false;
+> +
+> +	if (blockcipher_alg->cra_blocksize != BLOCKCIPHER_BLOCK_SIZE)
+> +		return false;
+> +
+> +	if (strcmp(polyval_alg->base.cra_name, "polyval") != 0)
+> +		return false;
+> +
+> +	return true;
+> +}
 
-Jason
+There are a couple issues here:
+
+- "See the comment at the beginning of this file" doesn't make sense.  I guess
+  this was copied from adiantum.c where there is indeed a comment at the
+  beginning of the file that explains which "inner" algorithms are allowed.
+  However, in hctr2.c there is no such comment (and that's fine; there aren't as
+  many special considerations in this area for hctr2 as for adiantum).
+
+- The strncmp() expression uses a string of 5 characters but only compares 4.
+  Also this check is redundant anyway, since hctr2_create_common() already does
+  this check (correctly, with 5 characters).
+
+How about deleting the hctr2_supported_algorithms() function and putting the 2
+needed checks directly in hctr2_create_common()?  I.e., check
+blockcipher_alg->cra_blocksize right after the line:
+
+	blockcipher_alg = crypto_spawn_cipher_alg(&ictx->blockcipher_spawn);
+
+... and check polyval_alg->base.cra_name right after the line:
+
+	polyval_alg = crypto_spawn_shash_alg(&ictx->polyval_spawn);
+
+Note, the pr_warn() message "Unsupported HCTR2 instantiation" isn't very
+important, and it arguably shouldn't be there since it is user-triggerable.
+So you can just delete it.
+
+- Eric
