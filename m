@@ -2,91 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1009BC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 21:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F633C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 21:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240947AbiDRVUH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Apr 2022 17:20:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
+        id S230031AbiDRVjm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Apr 2022 17:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231374AbiDRVUF (ORCPT
+        with ESMTP id S230011AbiDRVjm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Apr 2022 17:20:05 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476822CE16;
-        Mon, 18 Apr 2022 14:17:25 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        Mon, 18 Apr 2022 17:39:42 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D8682E9FB
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 14:37:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Kj0BW4nx9z4x7V;
-        Tue, 19 Apr 2022 07:17:23 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1650316644;
-        bh=/tNqYXoNy1mjldE8pgn14x6sLKNc9koqdiS4bX8mZ0w=;
-        h=Date:From:To:Cc:Subject:From;
-        b=rBwaCCTcawxEtB9B4kWOKnOtkbQUmv8sgckJ7cHewUIFF6BtaBLWkEh85KXsgJqCq
-         q47dW2MojZBoQ1YQzatEQWRo7gNL/qnG9kdsgpmDfkKolm3M2b0Ddr6NpjWxpaA0hl
-         7UryH4NuhyQie2lOikRdwL7oJx7ZIyHXhYrYyOql+FBaUxniP+B21kD7Qo9KwjARx5
-         V8QfAyLsgt6OGgtSSTwnXpvWypntJW85Yb6ewJkCRm7GeWs3CSwA0pQm6k3JE4lZBA
-         uM2djouPIFgOZOpNa9KQoc5YAg2aihDyjJQ/KOCvEK/RKtHVpmJknCHjXzzWu2Xu9X
-         WGEQ0VRfZ5CCA==
-Date:   Tue, 19 Apr 2022 07:17:22 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Marco Chiappero <marco.chiappero@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the crypto tree
-Message-ID: <20220419071722.6e47c542@canb.auug.org.au>
+        by sin.source.kernel.org (Postfix) with ESMTPS id 71C3BCE126E
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 21:37:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49577C385A1;
+        Mon, 18 Apr 2022 21:36:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650317818;
+        bh=0esn0ZH9jB3UkEnwylL/XnIYQGl+ogu9/kfSDs3o3eM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=byYpAVVOjxv+V5btrjCBxU52fJE5kp6fjOhg6cTgLyFuU8k1+Q8EckIdcdEUIX4Kp
+         6tMevuZ6lyCDJ7teGYTdPquoraepyHDwQg/5ke9qVD1D6wkbKvWeaonG9ngt+DJjCh
+         7Po370AuSB3zEkfcvSAZLAFWF3wdSWQpySVIe648FjT+lSc9lDqQYlwPESFhHMT+iK
+         cLEVtF4OI7pXAf8YMdge1gL0UvSrT2iPpM53bwekFjh0oPSJ76tW0+K5HLtdKdm0Jk
+         IT0jyuYECLc7GE7CE17rRfTo6W5k8Q4jvPGLcAtFzBwnU1l+wi18rBmnId1LUquCWN
+         0u0AKlkgR02gw==
+Date:   Mon, 18 Apr 2022 14:36:56 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 6/8] crypto: x86/polyval: Add PCLMULQDQ accelerated
+ implementation of POLYVAL
+Message-ID: <Yl3Z+CqZIZOBTfOs@sol.localdomain>
+References: <20220412172816.917723-1-nhuck@google.com>
+ <20220412172816.917723-7-nhuck@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_///p1V/r8TiyK/y4q9yfw9Ct";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412172816.917723-7-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_///p1V/r8TiyK/y4q9yfw9Ct
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+A few more comments:
 
-Hi all,
+On Tue, Apr 12, 2022 at 05:28:14PM +0000, Nathan Huckleberry wrote:
+> +/*
+> + * Computes the 256-bit polynomial represented by LO, HI, MI. Stores
+> + * the result in PL, PH.
+> + *   [PH :: PL] = [HI_1 : HI_0 + MI_1 :: LO_1 + MI_0 : LO_0]
+> + */
 
-In commit
+It is unclear what the double colon means.  Maybe you meant for it to indicate
+128-bit boundaries, as opposed to 64-bit boundaries?  It is not used
+consistently, though.
 
-  c690c7f6312c ("crypto: qat - rework the VF2PF interrupt handling logic")
+> +/*
+> + * Computes the 128-bit reduction of PL : PH. Stores the result in dest.
 
-Fixes tag
+This should use the order "PH : PL", to be consistent with the notation
+elsewhere.
 
-  Fixes: 993161d ("crypto: qat - fix handling of VF to PF interrupts")
+> diff --git a/arch/x86/crypto/polyval-clmulni_glue.c b/arch/x86/crypto/polyval-clmulni_glue.c
+[...]
+> +struct polyval_ctx {
+> +	/*
+> +	 * These powers must be in the order h^8, ..., h^1.
+> +	 */
+> +	u8 key_powers[NUM_PRECOMPUTE_POWERS][POLYVAL_BLOCK_SIZE];
+> +};
+> +
+> +struct polyval_desc_ctx {
+> +	u8 buffer[POLYVAL_BLOCK_SIZE];
+> +	u32 bytes;
+> +};
 
-has these problem(s):
+As I've mentioned elsewhere, it is confusing to have both ctx and desc_ctx.  The
+former should be called polyval_tfm_ctx, like it is in polyval-generic.c.
 
-  - SHA1 should be at least 12 digits long
-    This can be fixed for the future by setting core.abbrev to 12 (or
-    more) or (for git v2.11 or later) just making sure it is not set
-    (or set to "auto").
+> +asmlinkage void clmul_polyval_update(const u8 *in, struct polyval_ctx *keys,
+> +				     size_t nblocks, u8 *accumulator);
 
---=20
-Cheers,
-Stephen Rothwell
+The argument order here is a bit weird.  It would be more logical to have it be
+(keys, in, nblocks, accumulator), similar to crypto_shash_digest().
 
---Sig_///p1V/r8TiyK/y4q9yfw9Ct
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Also, 'keys' should be const.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmJd1WMACgkQAVBC80lX
-0Gwi+Qf/ZYiwAXVKRIff6Jx2ftmH2rUTqCfE21zeiManMQR8S0ue/GMAeJotK7eE
-RAg/QaQhYTEZHtYN8uMH7GSaNbaA+Ckn9wX5MkzREwPs8TXaWhTwlpMdhJUociSM
-c5HW7yefb9/MeC2v5IIiDDD/2D8GrXiSML7HRakyvpxFecbOJUPxU/9/UWs5LDZg
-zUxAy/AZOjei/lNsHWBtbhveZJW+jpXwWMWN0oQXf7TM5FvLtB9Pqy8iCjtFlYSA
-d2OzYJ7p4bV+r8QYYxZFmVfbNfAoX29Q7bKTZhUfc5VMB0kBiXo53w4P0hXZKosx
-v+oX0nQcVEe8nyTwhdGpo1zAlfJ6ZA==
-=VJsk
------END PGP SIGNATURE-----
-
---Sig_///p1V/r8TiyK/y4q9yfw9Ct--
+- Eric
