@@ -2,76 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37763C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 16:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EF0C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Apr 2022 18:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346411AbiDRQsn (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Apr 2022 12:48:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50706 "EHLO
+        id S230174AbiDRSH4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Apr 2022 14:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346407AbiDRQsm (ORCPT
+        with ESMTP id S229651AbiDRSHy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Apr 2022 12:48:42 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93DB626ACC
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 09:46:03 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id c6so18060118edn.8
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 09:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6N6Bzc7Co9vBma952u0rB5ztm908YSlcIGZvYmyCGes=;
-        b=h7gS9hBLMEDNvZocY+FdL2FlnH37wUDz5sEVXOtAOehbslTD8hdEaokGthI1JxFVPI
-         tyJ1d/XX6pVoZcRIsY/IEitT0oSYhY6Ahp4mQrHvGIT3kEVr0UIui+cj+oLoy4sbDDrV
-         sKkVh9pTMiNBKpccd01lqcnQmetC0WBlACLssgBhBBS5UFOGQGgIMJ6AGN+dLWF5dr1j
-         ow4kpvvun4QQV+nUFl8ORMRBpY0eSm6wBJbvP+oDBwGYAYW5w0SknBM7NAHHXeta7Oul
-         jw+TH03oHLnkGx/8Udq07mtJsImMacagvKqRpNjtbOBK1512KW3LwEvKaZ7pp3R7/fY5
-         FhFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6N6Bzc7Co9vBma952u0rB5ztm908YSlcIGZvYmyCGes=;
-        b=IOKZmBPbiLu2554hIS994UU00WJdN8wIfidhIyRkpAJIX3fUVM7A3oxPppAfTb9CAs
-         3Y1teuvBvu/H6j4VlgxThotFSwLaLB/MRim1jUvLgWQNwdojzUPxRCazPLqxTaLEKe88
-         VRuRWlZ+1MmvHtF/ZR5Fyqprhry8u8ARQYGK+/Pp+m09bxc+LZwVIZdETUIGs80jxwXr
-         b9hIBoXGn/gN3eT6Uem4KYKQVy1fieKrf11l1mo77Jnw+do3s9UU5ZFlEndI5W7xkIhq
-         qzc8PFPHCvda3wGYdojtBH2yeq+zUuKc/WCjEn9ST8TOyCyPi49kSUpCaMOPNIdGBwc7
-         1xMg==
-X-Gm-Message-State: AOAM533+1TqG8Ccbv18pwal1Msacf+0n80+Uxes2ELrd5rwniDLdTcXY
-        vsaKCk0qR93ZXo65ROSX1VqoB2vkInY+hCIlIMY=
-X-Google-Smtp-Source: ABdhPJwcssNilOcYCmVFoMDr/kfaeaRcczVbk7LnMIOB3yhSnD0pNplEAIVyuq2wU6TQzJ9JBwksMVAb63MDoCjLzpw=
-X-Received: by 2002:a05:6402:51d2:b0:41c:e157:84f1 with SMTP id
- r18-20020a05640251d200b0041ce15784f1mr13160538edd.135.1650300362071; Mon, 18
- Apr 2022 09:46:02 -0700 (PDT)
+        Mon, 18 Apr 2022 14:07:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3367E36153
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 11:05:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BEA826138B
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Apr 2022 18:05:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0DA2C385A1;
+        Mon, 18 Apr 2022 18:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650305114;
+        bh=iTh2BkOqbHJTxvKBcPXRBs8xRFkDQ76lvXa466UhJLw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aSU3BpucxT9Zzk/p5V77sXpgvetmRV+ga2HeRdb0/UF/ImvjiUK+HEFk6EU1aqXR/
+         NnVVC4ShHFVeLvDbdVDSN4Ln1qxnUKQsLL4z3BA2tFrPOq8WMLh6/w0jLJzA/NcX2S
+         cVQPGgpJpAb86p/ogH85UdotB+kTfDehGBqGcQD8IgoGFds+1ZwXaugI4Aeqdj1VXg
+         Kf9da3B6cz5U6+qLwTS2XrDZXDFAMjPIsn0aem0N7GLq0MdqcvIWQ5OBojkAswvIy8
+         anaXmVT7kSXXaTfSbGiVzTWOmxpKVzU+qTWQOjkTN4Bc+EPnMlt+O0/l1IoOonM0gH
+         2qICaLnnHsTag==
+Date:   Mon, 18 Apr 2022 18:05:12 +0000
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v4 8/8] fscrypt: Add HCTR2 support for filename encryption
+Message-ID: <Yl2oWPGekEMxiaJU@gmail.com>
+References: <20220412172816.917723-1-nhuck@google.com>
+ <20220412172816.917723-9-nhuck@google.com>
 MIME-Version: 1.0
-References: <20220416135412.4109213-1-festevam@gmail.com> <AM9PR04MB82115516947967193216FE60E8F19@AM9PR04MB8211.eurprd04.prod.outlook.com>
- <CAOMZO5BX9JhqJapqfqup9DdzL=nUvO1qBjg_H9R8Ly+hs92ErQ@mail.gmail.com>
- <AS8PR04MB89485964ED3248A45D7ADB27F3F39@AS8PR04MB8948.eurprd04.prod.outlook.com>
- <AM9PR04MB82116FD8C00D305A4955E105E8F39@AM9PR04MB8211.eurprd04.prod.outlook.com>
-In-Reply-To: <AM9PR04MB82116FD8C00D305A4955E105E8F39@AM9PR04MB8211.eurprd04.prod.outlook.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Mon, 18 Apr 2022 13:45:50 -0300
-Message-ID: <CAOMZO5C4gdY=0+yEVxs_cUg8C_6GcEFi=JNumn0gPEpFambiWQ@mail.gmail.com>
-Subject: Re: [EXT] [PATCH v2] crypto: caam - fix i.MX6SX entropy delay value
-To:     Varun Sethi <V.Sethi@nxp.com>
-Cc:     Vabhav Sharma <vabhav.sharma@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220412172816.917723-9-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 18, 2022 at 12:36 PM Varun Sethi <V.Sethi@nxp.com> wrote:
+On Tue, Apr 12, 2022 at 05:28:16PM +0000, Nathan Huckleberry wrote:
+> diff --git a/fs/crypto/keysetup.c b/fs/crypto/keysetup.c
+> index eede186b04ce..ae24b581d3d7 100644
+> --- a/fs/crypto/keysetup.c
+> +++ b/fs/crypto/keysetup.c
+> @@ -53,6 +53,13 @@ struct fscrypt_mode fscrypt_modes[] = {
+>  		.ivsize = 32,
+>  		.blk_crypto_mode = BLK_ENCRYPTION_MODE_ADIANTUM,
+>  	},
+> +	[FSCRYPT_MODE_AES_256_HCTR2] = {
+> +		.friendly_name = "HCTR2",
 
-> Fabio,
-> We feel that it would be better to have a provision to provide entropy delay parameter via device tree. This offers more flexibility.
->  For i.M6SX we can follow the approach proposed by you but at the same time we can still have the device tree provision.
+Can you use "AES-256-HCTR2" here instead of just "HCTR2"?  This would be similar
+to how FSCRYPT_MODE_AES_256_XTS uses .friendly_name = "AES-256-XTS".
 
-Yes, agreed.
+- Eric
