@@ -2,90 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3585EC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 10:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5910FC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238009AbiDSKoK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 06:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        id S1350902AbiDSLMA (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Apr 2022 07:12:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbiDSKoJ (ORCPT
+        with ESMTP id S1350894AbiDSLL7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 06:44:09 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE07E22526;
-        Tue, 19 Apr 2022 03:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650364887; x=1681900887;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=b4BbrvlcJlEUt6KlwjbPenGMBsgO5Lw1f0hq973jPg0=;
-  b=Vo/LHV0ilIM9sYNDfFWzvQo+xSP7NFmgoB/x0go8Jj02xIiaTynsjp9Q
-   cfRHbjhjoDu0w14MG44r+69FXHwyLmepb6Ny+66LKJe0TI6o33nsfsR1g
-   2WSZIDU7FmXXRvNB8kMkcto+yhMUo5RQE3Fs2VZ6Ny0qj0snJ9gjxKWiz
-   U9meiQ3XfSO10mffnjVjZY7Uqy17zWjrbzxwjxCccDsVOGMKQTwVnebQG
-   i504MwmoWYhoL+hXuCxr13TBZFCwbByggzSsEijAxTCVD0b30leHDqzcy
-   cOJUI0jA8RpQ2UtmC1PvSPBypOhowJR1NxTqrzo0rNIjNIK4H8s7ZB+s5
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10321"; a="251036878"
-X-IronPort-AV: E=Sophos;i="5.90,272,1643702400"; 
-   d="scan'208";a="251036878"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 03:41:27 -0700
-X-IronPort-AV: E=Sophos;i="5.90,272,1643702400"; 
-   d="scan'208";a="561672309"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 03:41:13 -0700
-Date:   Tue, 19 Apr 2022 11:41:05 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: Fixes tag needs some work in the crypto tree
-Message-ID: <Yl6Rwe1okkWqC6ou@silpixa00400314>
-References: <20220419071722.6e47c542@canb.auug.org.au>
+        Tue, 19 Apr 2022 07:11:59 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5562657A
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:09:15 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id y21so8922185wmi.2
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:09:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=k9SQS6DEx7PcK3aZSt7NFnPshwNlUhuY2vj8QCcgdU8=;
+        b=f8jTBzdCgR6gZoEBSlPxq90yrNFz+cJET9rvKb4SBbgJ3hbal36VvgdomSIglGgnO2
+         3m52LyW2/NdxIy6Gtfurhq600ou6nWq7Vo8VlhKKUxdcfpzNbNSLAAfHScLAiqIPJnli
+         D04SCxBNOYYZDuahNhtsJDUlWB5unMRdTrn/kJnFc31Ui5htITjZeD61zi+pb1l97IW/
+         9L2Qo1bthVeE7l1MPTQDaeETEDSUvtMflBQ2dm1j4rDzIRWNfzKlW/Uw0sUAHMuob9pS
+         l8EMODJrZvsH0VNyDN0nBwcr4Kae1lvAroCpPCxGh5764YFDnTKwa7A2Abu/qUz8uQLW
+         /tNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=k9SQS6DEx7PcK3aZSt7NFnPshwNlUhuY2vj8QCcgdU8=;
+        b=QFSTx+yaKHOeuVtEB3RNY+DQeOTA+iiiiu7N9MAZWhkw04/SWgOocIKOl1nQOxeePX
+         KI0co4yaVam7MMDMmi/bQ4vga95ljBk7Z8Uh60RlCKz3fMkJmKz304Y02/PtYaHm2ois
+         V4HJxeJPPwkOzTc9mwmd+c4rhKpym++JMI+qyuwRt+LFaMkVK5Hvo2RJftaRPsdTFA57
+         ctwnWTd/cwTAtHLDoYHUa53c2IReG1oEbbrh6xurZdRgvaq5ZNvIeqK4wb+tw/GJfocB
+         KY99K/hZUfo3pLuQ7lkg5HgKzuqI2vLdSVkLN5g61PMfln3YxuduvNMMRtCojSy2Bkeg
+         uVCQ==
+X-Gm-Message-State: AOAM531DekA3+aK0ar0cHPANw1DZel6dcfCo6poEoNkxMDMymrjHaNxa
+        bKPen/IFodrpDojxuWerILVWWA==
+X-Google-Smtp-Source: ABdhPJyom0pejQx9+muBJ4LXKjDgivoBsIZxgzm1mENjReqSKOE98rUgPTpWVyVn3NH52/xaRjs95g==
+X-Received: by 2002:a05:600c:4f87:b0:392:9236:3c73 with SMTP id n7-20020a05600c4f8700b0039292363c73mr11110988wmq.158.1650366554533;
+        Tue, 19 Apr 2022 04:09:14 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id 7-20020a05600c024700b0038ec0c4a2e7sm18549936wmj.11.2022.04.19.04.09.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Apr 2022 04:09:14 -0700 (PDT)
+Date:   Tue, 19 Apr 2022 13:09:11 +0200
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to
+ YAML
+Message-ID: <Yl6YV9nLVI4qYsPP@Red>
+References: <20220413190713.1427956-1-clabbe@baylibre.com>
+ <20220413190713.1427956-25-clabbe@baylibre.com>
+ <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220419071722.6e47c542@canb.auug.org.au>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks Stephen.
+Le Wed, Apr 13, 2022 at 09:31:13PM +0200, Krzysztof Kozlowski a écrit :
+> On 13/04/2022 21:07, Corentin Labbe wrote:
+> > Convert rockchip-crypto to YAML.
+> 
+> Thank you for your patch. There is something to discuss/improve.
+> 
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - rockchip,rk3288-crypto
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    maxItems: 1
+> > +
+> > +  clocks:
+> > +    maxItems: 4
+> > +
+> > +  clock-names:
+> > +    maxItems: 4
+> 
+> This is not needed and dt_bindings_check should complain.
+> 
+> > +    items:
+> > +      const: aclk
+> > +      const: hclk
+> > +      const: sclk
+> > +      const: apb_pclk
+> > +
+> > +  resets:
+> > +    maxItems: 1
+> > +
+> > +  reset-names:
+> > +    maxItems: 1
+> 
+> The same.
+> 
 
-On Tue, Apr 19, 2022 at 07:17:22AM +1000, Stephen Rothwell wrote:
-> Hi all,
-> 
-> In commit
-> 
->   c690c7f6312c ("crypto: qat - rework the VF2PF interrupt handling logic")
-> 
-> Fixes tag
-> 
->   Fixes: 993161d ("crypto: qat - fix handling of VF to PF interrupts")
-> 
-> has these problem(s):
-> 
->   - SHA1 should be at least 12 digits long
->     This can be fixed for the future by setting core.abbrev to 12 (or
->     more) or (for git v2.11 or later) just making sure it is not set
->     (or set to "auto").
-Apologies, I missed this during the review of the patch.
-
-@Herbert, should I resend the patch with the correct Fixes tag or can
-you amend the commit in your tree.
-
-This should be the correct tag:
-    Fixes: 993161d36ab5 ("crypto: qat - fix handling of VF to PF interrupts")
-
-Regards,
-
--- 
-Giovanni
+I forgot to test the intermediate patch...
+Before I send a new version, does the final document is okay ?
