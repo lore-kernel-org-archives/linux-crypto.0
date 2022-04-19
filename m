@@ -2,58 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C8BC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 07:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2EBC433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 07:52:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349521AbiDSHqw (ORCPT
+        id S1349605AbiDSHzI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 03:46:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
+        Tue, 19 Apr 2022 03:55:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242669AbiDSHqv (ORCPT
+        with ESMTP id S1349610AbiDSHzG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 03:46:51 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75AFA23BF6;
-        Tue, 19 Apr 2022 00:44:08 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id x18so13375920wrc.0;
-        Tue, 19 Apr 2022 00:44:08 -0700 (PDT)
+        Tue, 19 Apr 2022 03:55:06 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FA831342;
+        Tue, 19 Apr 2022 00:52:21 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id c190-20020a1c35c7000000b0038e37907b5bso979528wma.0;
+        Tue, 19 Apr 2022 00:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Td4Hy43R6SEG1pSO6X3vGzswl7vCz1dgDqCHGi0vEko=;
-        b=amXfhlUYJ0+KM8IxEq4FT8n4km/zvVadqRbfTjwrztbRO8AjAy9ooKFJu1tnjVihT5
-         bNW2u/auAZA6P2JiXMtrqZsk9sN73gFbu6/60Ls4TV0dm1xmqSEy6ouZ2Q75O8byGRQW
-         6caopDBH0jU7rXoaf/3OXByzjLbC/UmnEJUkGl+3qFDw7clw2haCYusMnkmFH8tnyBcc
-         tcQ4Bus1Nk2FSeEUUGyx/V9lHEJSKO9IYx1hgRshvUZ0bspAaH/FdX6EfmH7Wt5yqTpu
-         Nq8i9BdrOq01JnXs1TQK6oCGq0KED0opFguEMn0wJ0/1ByIF9DuIhlN/g+DoRBlVWPu7
-         xRrw==
+        bh=eZpQIMcf57eQ4Toe30lop11XB/wtE4XfPzcJjOelQAQ=;
+        b=ZtBJaerAOEjk+R53uNhpU1wTf+RmUBy2/7sWUosxlIh7R7F9g7AQ6qw9nLavxeC2cK
+         kU/CAWn/3GZRLINAGcGerEoooPYKXVHIlb2SiqlpCwmnW3dRfamr1idgDSuV9UFGoWk3
+         YDP/1REHzokK8iOWwDy44uY066OU1mApx5+XjgJVP6FIC31ug6At/QQtzhkxnqAhpEsG
+         bfUdrTfcsKa1/SdvHYz4PwE9pMT9yBBANBOzNz2AOO0jrQes992FroVBXZXTZsDWopJ5
+         uC44V6XX+jhh15uHG0hzY9S7qsTwP+/Vug/z8VV8tkrhwaADfR6cmp5I+3c5q9XZW8Mz
+         L9ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=Td4Hy43R6SEG1pSO6X3vGzswl7vCz1dgDqCHGi0vEko=;
-        b=peAx1Vs6OFcmmRnSY/TiyGdTvSX7GJZrY8m+pdFUmiV+mm1fuue0ahubIIbg6zWV3X
-         SUJr2bQvWwXpM90hFEtyunButRMHoM6zewAC6ffhhBSjSqeFJCHwXq1AFQo4f76XWejN
-         EyaMYhIIHK/QQQMHWnqjzyFrUyLUXIJMV0VgffBRqC8NleQphjmeHXaPV2tcFSE3AVTA
-         6SyT1q3QuezPcCdUeSqJHArMsyFqub76vD3JtkW/KoGljCC41XecagUUPCHQDcZrbcpW
-         ktYDOP/FBHSccywbC8wFOrxwxSNSYDy414jRcfMxBJxjOGLWK+K4LlL2y56vtPiwTtUY
-         CcIw==
-X-Gm-Message-State: AOAM533HXNCRE0CviQ7+y+ZobDUnEUv1t+xsJyha/jAIjWEFVQ4u+G9S
-        hbOCxnD15/XyQk6yzsA4Jo8=
-X-Google-Smtp-Source: ABdhPJyPmfPsbf+yNodLgTbvOFCNxRsuD75a/3auxzXxSukB3FUe2LejoxHw+cdrH2+O79tXHPG8Ow==
-X-Received: by 2002:a5d:6650:0:b0:207:ac24:a825 with SMTP id f16-20020a5d6650000000b00207ac24a825mr10545728wrw.97.1650354246817;
-        Tue, 19 Apr 2022 00:44:06 -0700 (PDT)
+        bh=eZpQIMcf57eQ4Toe30lop11XB/wtE4XfPzcJjOelQAQ=;
+        b=Vwe28eqifRAS1JJYSVavsQW3HG86XO66tMEI6BBXiO8OwmJRfLCbQGgPDj8ThvdKOn
+         rkIGXV1iw2OU6LfFd+DuaNiuSLnpE4lIvyrrhPcUSy+XcsNNPUYsZR3KFZ1sGVMPWHtI
+         uvCARmqQ5N7Rstn+gVbhefCkPqfRq4DqnL/QHcLm5POhVdfkgy4zxdsnWLVDx3JOY5j6
+         fuh+pl/0nV9NOAR73Z78lJLeObybcheD3zIAspC2BGDUP4geYZRXD7fjrKNcrBZX2Tot
+         opHna5WwDfWd8vCeof5CE4FOk+N7pbHVcTLDFMK9aZOCXEyrETELLJV58NJhJTo7i9vO
+         cSOQ==
+X-Gm-Message-State: AOAM530fe+JrO42eUnDxbvU3JYErzqxUcDXz3pMpr8TMZ9OEclmt2Y8z
+        KsBazmk0JAzST0KDINJplj2SPHRf8LU=
+X-Google-Smtp-Source: ABdhPJweuRk6oDVCcwSRhuZjnG9UdFTrsXSCa+eFj3YFe7XBwPmwPUjSO5MQvyDdgW/2DwT8soCYJw==
+X-Received: by 2002:a1c:3587:0:b0:381:50ff:cbd with SMTP id c129-20020a1c3587000000b0038150ff0cbdmr18757314wma.140.1650354739543;
+        Tue, 19 Apr 2022 00:52:19 -0700 (PDT)
 Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id l8-20020a5d5608000000b00207ab405d15sm11882256wrv.42.2022.04.19.00.44.05
+        by smtp.googlemail.com with ESMTPSA id m188-20020a1c26c5000000b0039187bb7e9asm12472904wmm.6.2022.04.19.00.52.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 00:44:06 -0700 (PDT)
-Date:   Tue, 19 Apr 2022 09:44:04 +0200
+        Tue, 19 Apr 2022 00:52:19 -0700 (PDT)
+Date:   Tue, 19 Apr 2022 09:52:17 +0200
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Guo Ren <guoren@kernel.org>
-Cc:     Samuel Holland <samuel@sholland.org>,
+To:     Philipp Tomsich <philipp.tomsich@vrull.eu>
+Cc:     Guo Ren <guoren@kernel.org>, Samuel Holland <samuel@sholland.org>,
         Heiko Stuebner <heiko@sntech.de>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
@@ -63,12 +63,11 @@ Cc:     Samuel Holland <samuel@sholland.org>,
         Anup Patel <anup@brainfault.org>,
         Nick Kossifidis <mick@ics.forth.gr>,
         Christoph Muellner <cmuellner@linux.com>,
-        Philipp Tomsich <philipp.tomsich@vrull.eu>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org
 Subject: Re: [PATCH 0/2] riscv: implement Zicbom-based CMO instructions + the
  t-head variant
-Message-ID: <Yl5oRPuNC3w+UI0q@Red>
+Message-ID: <Yl5qMXCpwmxho/FN@Red>
 References: <YllWTN+15CoskNBt@Red>
  <70da24dd-2d03-fc49-151d-daabb315a5f6@sholland.org>
  <YlpxsYREWv/LQ+HY@Red>
@@ -78,33 +77,32 @@ References: <YllWTN+15CoskNBt@Red>
  <YlvTkfIO9Oz3ib5i@Red>
  <CAJF2gTQ5rYATTHj2UtwxKw0dpvdHBUAih1RJf0XuGM8b6euZwQ@mail.gmail.com>
  <YlxP26dklDj2y+cP@Red>
- <CAJF2gTQNBVBGqbtHckwtB59wjrPoN-Li32BcUJpLahaYDnU3WQ@mail.gmail.com>
+ <CAAeLtUC=eF6hp2V2d7wEWWX=vkEcP8NoPLLz=hUrE4x4Q7u4mw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJF2gTQNBVBGqbtHckwtB59wjrPoN-Li32BcUJpLahaYDnU3WQ@mail.gmail.com>
+In-Reply-To: <CAAeLtUC=eF6hp2V2d7wEWWX=vkEcP8NoPLLz=hUrE4x4Q7u4mw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Mon, Apr 18, 2022 at 06:50:57AM +0800, Guo Ren a écrit :
-> On Mon, Apr 18, 2022 at 1:35 AM Corentin Labbe
-> <clabbe.montjoie@gmail.com> wrote:
+Le Mon, Apr 18, 2022 at 05:29:10PM +0200, Philipp Tomsich a Ã©crit :
+> On Sun, 17 Apr 2022 at 19:35, Corentin Labbe <clabbe.montjoie@gmail.com> wrote:
 > >
-> > Le Sun, Apr 17, 2022 at 04:49:34PM +0800, Guo Ren a écrit :
+> > Le Sun, Apr 17, 2022 at 04:49:34PM +0800, Guo Ren a Ã©crit :
 > > > On Sun, Apr 17, 2022 at 4:45 PM Corentin Labbe
 > > > <clabbe.montjoie@gmail.com> wrote:
 > > > >
-> > > > Le Sun, Apr 17, 2022 at 10:17:34AM +0800, Guo Ren a écrit :
+> > > > Le Sun, Apr 17, 2022 at 10:17:34AM +0800, Guo Ren a Ã©crit :
 > > > > > On Sun, Apr 17, 2022 at 3:32 AM Corentin Labbe
 > > > > > <clabbe.montjoie@gmail.com> wrote:
 > > > > > >
-> > > > > > Le Sat, Apr 16, 2022 at 12:47:29PM -0500, Samuel Holland a écrit :
+> > > > > > Le Sat, Apr 16, 2022 at 12:47:29PM -0500, Samuel Holland a Ã©crit :
 > > > > > > > On 4/16/22 2:35 AM, Corentin Labbe wrote:
-> > > > > > > > Le Fri, Apr 15, 2022 at 09:19:23PM -0500, Samuel Holland a écrit :
+> > > > > > > > Le Fri, Apr 15, 2022 at 09:19:23PM -0500, Samuel Holland a Ã©crit :
 > > > > > > > >> On 4/15/22 6:26 AM, Corentin Labbe wrote:
-> > > > > > > >>> Le Mon, Mar 07, 2022 at 11:46:18PM +0100, Heiko Stuebner a écrit :
+> > > > > > > >>> Le Mon, Mar 07, 2022 at 11:46:18PM +0100, Heiko Stuebner a Ã©crit :
 > > > > > > > >>>> This series is based on the alternatives changes done in my svpbmt series
 > > > > > > > >>>> and thus also depends on Atish's isa-extension parsing series.
 > > > > > > > >>>>
@@ -202,19 +200,53 @@ Le Mon, Apr 18, 2022 at 06:50:57AM +0800, Guo Ren a écrit :
 > > So the first 16 bytes are used by the SG and the last 16 bytes are a poisoned buffer (with value 0xFE) to check driver do not write beyong the normal operation of 16 bytes (and beyond the SG length).
 > >
 > > Doing the dma_map_sg(FROM_DEVICE) on the SG corrupt the whole buffer.
-> > My driver write normally via DMA the first 16 bytes.
-> > Crypto API check the last bytes, no more 0xFE, so it fail believing my driver wrote beyond the first 16 bytes.
-> >
-> > But even If I disable my hardware operation, the buffer is still corrupted. (See my sample code which just do dma_map/dma_unmap)
-> >
-> > So the problem is the dma_map(FROM_DEVICE) which change buffer content.
-> >
-> > So if this behavour is normal on D1 SoC, how to fix the crypto self tests ?
-> Actually, FLUSH is safe for all, but more expensive. Can you tell me
-> which arm SOC are you using? And which version of linux is running on
-> your arm SOC?
+> 
+> Doesn't the DMA_FROM_DEVICE indicate that there are no expected writes
+> from the CPU to the buffer (and that any modifications to the
+> underlying cache line can be dropped via an invalidation)?
+> In other words: does the behavior change when mapping as
+> DMA_BIDIRECTIONAL â€” and: should a map/unmap sequence be used where it
+> is first mapped as DMA_TO_DEVICE when poisoning the buffer and later
+> as DMA_FROM_DEVICE when in normal operation?
 > 
 
-The SOC is Allwinner D1 (RiscV).
-I am testing linux from https://github.com/smaeul/linux.git branch:origin/riscv/d1-wip
+There are no cpu writes after the dma_map(FROM_DEVICE).
+The buffer is initialized by the cryptoAPI before.
+Furtheremore, the buffer corrupted is next to the buffer being mapped.
 
+I verified the size of dma_map_sg() via some debug:
+sun8i-ce 3040000.crypto: sun8i_ce_cipher_prepare ecb(aes) cryptlen=16
+dma_direct_map_sg:483 SG0 len=16   <- dma_map TO_DEVICE
+dma_direct_map_sg:483 SG0 len=16   <- dma_map FROM_DEVICE
+need:a47ca9dd e0df4c86 a070af6e 91710dec 
+have:a47ca9dd e0df4c86 a070af6e 91710dec
+dump whole buffer:
+over:a47ca9dd e0df4c86 a070af6e 91710dec
+over:ec05e6f2 d542fb77 128b2059 5bf06986 < here we should have 0xFE
+alg: skcipher: ecb-aes-sun8i-ce encryption overran dst buffer on test vector 1, cfg=\"random: use_finup src_divs=[<reimport>100.0%@+1604]\"
+
+
+Note that I tried the following patch:
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4948201065cc..c5b945974441 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -19,6 +19,7 @@
+ #include <crypto/aead.h>
+ #include <crypto/hash.h>
+ #include <crypto/skcipher.h>
++#include <linux/cacheflush.h>
+ #include <linux/err.h>
+ #include <linux/fips.h>
+ #include <linux/module.h>
+@@ -205,6 +206,7 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
+ static inline void testmgr_poison(void *addr, size_t len)
+ {
+        memset(addr, TESTMGR_POISON_BYTE, len);
++       flush_icache_range(addr, addr + len);
+ }
+ 
+ /* Is the memory region still fully poisoned? */
+
+This patch fixes the problem, but I am not sure this is the rigth way.
+A DMA mapping operation corrupting buffer around seems not good.
