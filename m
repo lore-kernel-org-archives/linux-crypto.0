@@ -2,136 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3A6C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322B4C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243139AbiDSLsF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 07:48:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35318 "EHLO
+        id S242774AbiDSL6I (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 19 Apr 2022 07:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351908AbiDSLrj (ORCPT
+        with ESMTP id S1351970AbiDSL5l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 07:47:39 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36AC962C0;
-        Tue, 19 Apr 2022 04:44:56 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id bj24so12347602oib.11;
-        Tue, 19 Apr 2022 04:44:56 -0700 (PDT)
+        Tue, 19 Apr 2022 07:57:41 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE923895
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:54:58 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id u18so20931615eda.3
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:54:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GhrWXEBejEoGYINmoxSt4Hg2zDfPVlPzh5IAsrk9hr4=;
-        b=TCxMjKAMC9+71rvkYOvXr7pAqpfR5vi34e1w1UAKCOhGkGv0QouTFPHYOG5COXeIU1
-         RJiyknrbwkpLwPm/O0BvUrt72SQ3OcInOCY67rKX+9apluM2gctJolsZIe75W4ePzya1
-         E0B7CyiSgxFLdGJPQYw3OrASzApYn87ZH0zPJ5mNFooAD7L/J5yOw8S98NhuiPxvgdYC
-         9m9qM2NWL1tOIJR8FqhP4C0RGqikzaCHREw5u7bONw0tkTTwFimkQu9G8vf4YuhaerHb
-         UDVSVCByk4C+zCWoJhiy3t14nPqNX3aPRnMv8Ed/vdtfDnDabh8LWVtJU6RawlSLP9Dn
-         ilMg==
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=nfsMBJ2xALLgOjM4oOlK5BSYjJIFPGL8NAkh/N0/6yg=;
+        b=ZyjMtC8vDpunrZ/RnPfYn6O9lMWHMhEmyFxdKg41YVJvyDuwtoxrmOfkHUt26wLrf0
+         8Vra8yynqYlFbnTVedtpqXhG3EjBrNLGB0d4IE5S7o6A2XMii46/SNSAWK0yXDPm10up
+         7CSFHusMxjfK2TCkeN6FCjVfhsJgIRRzP6n8gHvMuQZ8OcTpG2OHJft/fq1Cnw0gIVOr
+         OwYI8aF1erqTvLAp3Urtm0zi7uAfXiutEQwIOjVKoyHnALBOzadlbILaB2ILvfYmzI4U
+         M3lD7DO+wmXjYcJC83REAy8fnhkz/1nN5Q5gW8yGlB64nU3tnbXxpG4SUtR3hFvlovKD
+         pfjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=GhrWXEBejEoGYINmoxSt4Hg2zDfPVlPzh5IAsrk9hr4=;
-        b=sOOP6xa6In7V4lx91h/OzzSc5nRWwY0qlKxmPFoLdaTx69x59sbTww8wUulHNRgqix
-         3fuuYW7afJxBitSB0Ga5p2NE1Dcixn9K7yXcriyQ8ZvGRsTsL7hK56VOrJxDi+T4g9BH
-         aAGHdSbsVYgA8DMxtwruUxPh9LbMmo3wqhIJ3UIvvBjl9vdlynY6paDDHlSOm+5Do413
-         3rB3QSb6X+XlTSAj5ipLSzL0QSCv8+I7s23PKh0gvPr4t/N2REBJSdfvSq++zqggiiyC
-         Us811q2EvYuLVXl18tbbSlLJNRREr3CFI3UtpojqiLapCdYlqJyaE0ypJjcn8RI1yyDp
-         iA+w==
-X-Gm-Message-State: AOAM532OoYILmEa5RcivxZhehLc/CxwlFUQSGGAwFFnpFR79lQlN4Fkt
-        JUGe+yV3jY3vUK0e31VUODuIwVvPER4=
-X-Google-Smtp-Source: ABdhPJz24VZkEu+ZrwncyjJFqIb20zSy4c3vLKiE9WwJJvm6Uqim1aBTYTzEqJrjvm1imx1H1WTNMA==
-X-Received: by 2002:aca:f185:0:b0:2ef:1fa6:3dca with SMTP id p127-20020acaf185000000b002ef1fa63dcamr6996766oih.140.1650368695479;
-        Tue, 19 Apr 2022 04:44:55 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:485:4b69:7fde:d182:c6e:e90])
-        by smtp.gmail.com with ESMTPSA id r19-20020a056830121300b005cdb11a7b85sm5299402otp.29.2022.04.19.04.44.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 04:44:54 -0700 (PDT)
-From:   Fabio Estevam <festevam@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     horia.geanta@nxp.com, gaurav.jain@nxp.com, V.Sethi@nxp.com,
-        linux-crypto@vger.kernel.org, Fabio Estevam <festevam@denx.de>,
-        stable@vger.kernel.org
-Subject: [PATCH v4] crypto: caam - fix i.MX6SX entropy delay value
-Date:   Tue, 19 Apr 2022 08:44:44 -0300
-Message-Id: <20220419114444.586113-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        bh=nfsMBJ2xALLgOjM4oOlK5BSYjJIFPGL8NAkh/N0/6yg=;
+        b=jziDSvvGqS1edcv8X4vouy78rW6TzdFsIxJT3jUeCN8kGk1A/Pr/W+3m8RHMTMG3mk
+         mQoaWK+R82CRGAAxXZN/83Wvsl0WMIKHcKKhul4NdI7DpPIdUJ9QRrqAMrnr4BrJb2Rl
+         0qyOz5Lw5D8jZqsgofwpT+A+Bn61oZXH3d56Xhv0RqOwLo+LqaFhpWn2DXrUxmm+2InN
+         7pw1nx3UzwAG2eowTjwruGiruB8qgNkQ2jsNHEPU64eelphY+5V9RbKM0SOkL4goKOHE
+         w89LMHjvp82ymBwVEM9CsT1JD5S2fbOb6zpMZoGXhM9/ypDuCK39JoxqTpUQV/NXL6c0
+         vqzQ==
+X-Gm-Message-State: AOAM532HhwI/MP1PzwCc9qyqs/OYSohDFHOpxT6nkXN/ad5VsUQ6APJa
+        23Q3Td0IEU6r/gUoZJH9LroNnQ==
+X-Google-Smtp-Source: ABdhPJwTmG5NGqJbQnGnpk+8S5HiLxzmh4OPgLZyw4Ghg8byqWFSS06JiSgvvJYqgbuxen9bp911BA==
+X-Received: by 2002:a05:6402:3046:b0:420:120e:ef2c with SMTP id bs6-20020a056402304600b00420120eef2cmr17002877edb.160.1650369296744;
+        Tue, 19 Apr 2022 04:54:56 -0700 (PDT)
+Received: from [192.168.0.217] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
+        by smtp.gmail.com with ESMTPSA id r24-20020aa7c158000000b00423fd948d56sm952196edp.3.2022.04.19.04.54.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Apr 2022 04:54:56 -0700 (PDT)
+Message-ID: <07d7fa69-dd2f-3e10-f959-474814105d3b@linaro.org>
+Date:   Tue, 19 Apr 2022 13:54:55 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to
+ YAML
+Content-Language: en-US
+To:     LABBE Corentin <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220413190713.1427956-1-clabbe@baylibre.com>
+ <20220413190713.1427956-25-clabbe@baylibre.com>
+ <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org> <Yl6YV9nLVI4qYsPP@Red>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <Yl6YV9nLVI4qYsPP@Red>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Fabio Estevam <festevam@denx.de>
+On 19/04/2022 13:09, LABBE Corentin wrote:
+>> This is not needed and dt_bindings_check should complain.
+>>
+>>> +    items:
+>>> +      const: aclk
+>>> +      const: hclk
+>>> +      const: sclk
+>>> +      const: apb_pclk
+>>> +
+>>> +  resets:
+>>> +    maxItems: 1
+>>> +
+>>> +  reset-names:
+>>> +    maxItems: 1
+>>
+>> The same.
+>>
+> 
+> I forgot to test the intermediate patch...
+> Before I send a new version, does the final document is okay ?
 
-Since commit 358ba762d9f1 ("crypto: caam - enable prediction resistance
-in HRWNG") the following CAAM errors can be seen on i.MX6SX:
+Looks ok, if it works. :) I don't remember if dtschema likes the cases:
+clock-names:
+  minItems:3
+  maxItems:4
+if:
+ ...
+clock-names:
+  items:
+    - ...
+     ...
+  maxItems:3
 
-caam_jr 2101000.jr: 20003c5b: CCB: desc idx 60: RNG: Hardware error
-hwrng: no data available
+This should work correctly, but dtschema has checks for unneeded
+min/maxItems so be sure they are not complaining.
 
-This error is due to an incorrect entropy delay for i.MX6SX.
-
-Fix it by increasing the minimum entropy delay for i.MX6SX
-as done in U-Boot:
-https://patchwork.ozlabs.org/project/uboot/patch/20220415111049.2565744-1-gaurav.jain@nxp.com/
-
-Cc: <stable@vger.kernel.org>
-Fixes: 358ba762d9f1 ("crypto: caam - enable prediction resistance in HRWNG") 
-Signed-off-by: Fabio Estevam <festevam@denx.de>
----
-Changes since v3:
-- Add a needs_extended_entropy_delay() function
-- Assign the 'ent_delay' inside the the RNG initialization area. (Horia)
-- Change the terminology as per Horia's explanation.
-
- drivers/crypto/caam/ctrl.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index ca0361b2dbb0..5b989a842ee9 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -609,6 +609,13 @@ static bool check_version(struct fsl_mc_version *mc_version, u32 major,
- }
- #endif
- 
-+static bool needs_extended_entropy_delay(void)
-+{
-+	if (of_machine_is_compatible("fsl,imx6sx"))
-+		return true;
-+	return false;
-+}
-+
- /* Probe routine for CAAM top (controller) level */
- static int caam_probe(struct platform_device *pdev)
- {
-@@ -855,6 +862,8 @@ static int caam_probe(struct platform_device *pdev)
- 			 * Also, if a handle was instantiated, do not change
- 			 * the TRNG parameters.
- 			 */
-+			if (needs_extended_entropy_delay())
-+				ent_delay = 12000;
- 			if (!(ctrlpriv->rng4_sh_init || inst_handles)) {
- 				dev_info(dev,
- 					 "Entropy delay = %u\n",
-@@ -871,6 +880,15 @@ static int caam_probe(struct platform_device *pdev)
- 			 */
- 			ret = instantiate_rng(dev, inst_handles,
- 					      gen_sk);
-+			/*
-+			 * Entropy delay is determined via TRNG characterization.
-+			 * TRNG characterization is run across different voltages
-+			 * and temperatures.
-+			 * If worst case value for ent_dly is identified,
-+			 * the loop can be skipped for that platform.
-+			 */
-+			if (needs_extended_entropy_delay())
-+				break;
- 			if (ret == -EAGAIN)
- 				/*
- 				 * if here, the loop will rerun,
--- 
-2.25.1
-
+Best regards,
+Krzysztof
