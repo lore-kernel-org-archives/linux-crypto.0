@@ -2,116 +2,215 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5910FC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3A2C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:17:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350902AbiDSLMA (ORCPT
+        id S1351003AbiDSLUU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 07:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41220 "EHLO
+        Tue, 19 Apr 2022 07:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350894AbiDSLL7 (ORCPT
+        with ESMTP id S1350979AbiDSLUQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 07:11:59 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5562657A
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:09:15 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id y21so8922185wmi.2
-        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 04:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=k9SQS6DEx7PcK3aZSt7NFnPshwNlUhuY2vj8QCcgdU8=;
-        b=f8jTBzdCgR6gZoEBSlPxq90yrNFz+cJET9rvKb4SBbgJ3hbal36VvgdomSIglGgnO2
-         3m52LyW2/NdxIy6Gtfurhq600ou6nWq7Vo8VlhKKUxdcfpzNbNSLAAfHScLAiqIPJnli
-         D04SCxBNOYYZDuahNhtsJDUlWB5unMRdTrn/kJnFc31Ui5htITjZeD61zi+pb1l97IW/
-         9L2Qo1bthVeE7l1MPTQDaeETEDSUvtMflBQ2dm1j4rDzIRWNfzKlW/Uw0sUAHMuob9pS
-         l8EMODJrZvsH0VNyDN0nBwcr4Kae1lvAroCpPCxGh5764YFDnTKwa7A2Abu/qUz8uQLW
-         /tNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=k9SQS6DEx7PcK3aZSt7NFnPshwNlUhuY2vj8QCcgdU8=;
-        b=QFSTx+yaKHOeuVtEB3RNY+DQeOTA+iiiiu7N9MAZWhkw04/SWgOocIKOl1nQOxeePX
-         KI0co4yaVam7MMDMmi/bQ4vga95ljBk7Z8Uh60RlCKz3fMkJmKz304Y02/PtYaHm2ois
-         V4HJxeJPPwkOzTc9mwmd+c4rhKpym++JMI+qyuwRt+LFaMkVK5Hvo2RJftaRPsdTFA57
-         ctwnWTd/cwTAtHLDoYHUa53c2IReG1oEbbrh6xurZdRgvaq5ZNvIeqK4wb+tw/GJfocB
-         KY99K/hZUfo3pLuQ7lkg5HgKzuqI2vLdSVkLN5g61PMfln3YxuduvNMMRtCojSy2Bkeg
-         uVCQ==
-X-Gm-Message-State: AOAM531DekA3+aK0ar0cHPANw1DZel6dcfCo6poEoNkxMDMymrjHaNxa
-        bKPen/IFodrpDojxuWerILVWWA==
-X-Google-Smtp-Source: ABdhPJyom0pejQx9+muBJ4LXKjDgivoBsIZxgzm1mENjReqSKOE98rUgPTpWVyVn3NH52/xaRjs95g==
-X-Received: by 2002:a05:600c:4f87:b0:392:9236:3c73 with SMTP id n7-20020a05600c4f8700b0039292363c73mr11110988wmq.158.1650366554533;
-        Tue, 19 Apr 2022 04:09:14 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
-        by smtp.googlemail.com with ESMTPSA id 7-20020a05600c024700b0038ec0c4a2e7sm18549936wmj.11.2022.04.19.04.09.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 04:09:14 -0700 (PDT)
-Date:   Tue, 19 Apr 2022 13:09:11 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     heiko@sntech.de, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 24/33] dt-bindings: crypto: convert rockchip-crypto to
- YAML
-Message-ID: <Yl6YV9nLVI4qYsPP@Red>
-References: <20220413190713.1427956-1-clabbe@baylibre.com>
- <20220413190713.1427956-25-clabbe@baylibre.com>
- <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
+        Tue, 19 Apr 2022 07:20:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6175524BE0;
+        Tue, 19 Apr 2022 04:17:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A656F61303;
+        Tue, 19 Apr 2022 11:17:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E8EC385A7;
+        Tue, 19 Apr 2022 11:17:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eKu71o/w"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650367046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0EoN7tnN1LCPqubEUIru3BR6P29FWyCRZEgkgRKqrIs=;
+        b=eKu71o/wuLb8HMfrlfRkyKaK3L3SGE3X4RYEu0LRXYWKWx//EBIj6NogsRI1FlmFf/WRDb
+        KY7tvUqrgUIPUY2sMJPkRYudWOx36rh7R+nR0QmtE8WSLPjSn46Y+Jyp+wJaVp7f6O9o9O
+        YBM8ta6GUXOcD1Fk09CXNIL2XCb+2Mc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0623ad04 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 19 Apr 2022 11:17:26 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, arnd@arndb.de
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, x86@kernel.org,
+        linux-xtensa@linux-xtensa.org
+Subject: [PATCH v5 00/11] archs/random: fallback to best raw ktime when no cycle counter
+Date:   Tue, 19 Apr 2022 13:16:39 +0200
+Message-Id: <20220419111650.1582274-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <44efe8b6-1712-5b87-f030-2f1328533ee8@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le Wed, Apr 13, 2022 at 09:31:13PM +0200, Krzysztof Kozlowski a écrit :
-> On 13/04/2022 21:07, Corentin Labbe wrote:
-> > Convert rockchip-crypto to YAML.
-> 
-> Thank you for your patch. There is something to discuss/improve.
-> 
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - rockchip,rk3288-crypto
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 4
-> > +
-> > +  clock-names:
-> > +    maxItems: 4
-> 
-> This is not needed and dt_bindings_check should complain.
-> 
-> > +    items:
-> > +      const: aclk
-> > +      const: hclk
-> > +      const: sclk
-> > +      const: apb_pclk
-> > +
-> > +  resets:
-> > +    maxItems: 1
-> > +
-> > +  reset-names:
-> > +    maxItems: 1
-> 
-> The same.
-> 
+Hi folks,
 
-I forgot to test the intermediate patch...
-Before I send a new version, does the final document is okay ?
+The RNG uses a function called random_get_entropy() basically anytime
+that it needs to timestamp an event. For example, an interrupt comes in,
+and we mix a random_get_entropy() into the entropy pool somehow.
+Somebody mashes their keyboard or moves their mouse around? We mix a
+random_get_entropy() into the entropy pool. It's one of the main
+varieties of input.
+
+Unfortunately, it's always 0 on a few platforms. The RNG has accumulated
+various hacks to deal with this, but in general it's not great. Surely
+we can do better than 0. In fact, *anything* that's not the same exact
+value all the time would be better than 0. Even a counter that
+increments once per hour would be better than 0! I think you get the
+idea.
+
+On most platforms, random_get_entropy() is aliased to get_cycles(),
+which makes sense for platforms where get_cycles() is defined. RDTSC,
+for example, has all the characteristics we care about for this
+function: it's fast to acquire (i.e. acceptable in an irq handler),
+pretty high precision, available, forms a 2-monotone distribution, etc.
+But for platforms without that, what is the next best thing?
+
+Sometimes the next best thing is architecture-defined. For example,
+really old MIPS has the C0 random register, which isn't quite a cycle
+counter, but is at least something. However, some platforms don't even
+have an architecture-defined fallback.
+
+Fortunately, the timekeeping subsystem has already solved this problem
+of trying to determine what the least bad clock is on constrained
+systems, falling back to jiffies in the worst case. By exporting the raw
+clock, we can get a decent fallback function for when there's no cycle
+counter or architecture-specific function.
+
+This series makes the RNG more useful on: m68k, RISC-V, MIPS, ARM32,
+NIOS II, SPARC32, Xtensa, and Usermode Linux. Previously these platforms
+would, in certain circumstances, but out of luck with regards to having
+any type of event timestamping source in the RNG.
+
+Finally, note that this series isn't about "jitter entropy" or other
+ways of initializing the RNG. That's a different topic for a different
+thread. Please don't let this discussion veer off into that. Here, I'm
+just trying to find a good fallback counter/timer for platforms without
+get_cycles(), a question with limited scope.
+
+If this (or a future revision) looks good to you all and receives the
+requisite acks, my plan was to take these through the random.git tree
+for 5.19, so that I can then build on top of it.
+
+Thanks,
+Jason
+
+Changes v4->v5:
+- Do not prototype symbol with 'extern', according to style guide.
+- On MIPS, combine random_get_entropy_fallback() with the c0 random
+  register in a way that matches the format of the c0 random value, so
+  that we get the best of a high precision cycle counter and of larger
+  period timer, joined together. As a result, Thomas Bogendoerfer's
+  ack on v4 of patch 4 has been dropped, since this is a substantial
+  change.
+
+Changes v3->v4:
+- Use EXPORT_SYMBOL_GPL instead of EXPORT_SYMBOL.
+
+Changes v2->v3:
+- Name the fallback function random_get_entropy_fallback(), so that it
+  can be changed out as needed.
+- Include header with prototype in timekeeping.c to avoid compiler
+  warning.
+- Export fallback function symbol.
+
+Changes v1->v2:
+- Use ktime_read_raw_clock() instead of sched_clock(), per Thomas'
+  suggestion.
+- Drop arm64 change.
+- Cleanup header inclusion ordering problem.
+
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Chris Zankel <chris@zankel.net>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Stephen Boyd <sboyd@kernel.org>
+Cc: Dinh Nguyen <dinguyen@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-mips@vger.kernel.org
+Cc: linux-riscv@lists.infradead.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-um@lists.infradead.org
+Cc: x86@kernel.org
+Cc: linux-xtensa@linux-xtensa.org
+
+Jason A. Donenfeld (11):
+  timekeeping: add raw clock fallback for random_get_entropy()
+  m68k: use fallback for random_get_entropy() instead of zero
+  riscv: use fallback for random_get_entropy() instead of zero
+  mips: use fallback for random_get_entropy() instead of just c0 random
+  arm: use fallback for random_get_entropy() instead of zero
+  nios2: use fallback for random_get_entropy() instead of zero
+  x86: use fallback for random_get_entropy() instead of zero
+  um: use fallback for random_get_entropy() instead of zero
+  sparc: use fallback for random_get_entropy() instead of zero
+  xtensa: use fallback for random_get_entropy() instead of zero
+  random: insist on random_get_entropy() existing in order to simplify
+
+ arch/arm/include/asm/timex.h      |  1 +
+ arch/m68k/include/asm/timex.h     |  2 +-
+ arch/mips/include/asm/timex.h     | 16 +++---
+ arch/nios2/include/asm/timex.h    |  2 +
+ arch/riscv/include/asm/timex.h    |  2 +-
+ arch/sparc/include/asm/timex_32.h |  4 +-
+ arch/um/include/asm/timex.h       |  9 +---
+ arch/x86/include/asm/timex.h      | 10 ++++
+ arch/xtensa/include/asm/timex.h   |  6 +--
+ drivers/char/random.c             | 89 ++++++++++---------------------
+ include/linux/timex.h             |  8 +++
+ kernel/time/timekeeping.c         | 10 ++++
+ 12 files changed, 74 insertions(+), 85 deletions(-)
+
+-- 
+2.35.1
+
