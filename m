@@ -2,46 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762F1C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE67C4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 11:34:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351091AbiDSLW4 (ORCPT
+        id S1344814AbiDSLgz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 07:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49238 "EHLO
+        Tue, 19 Apr 2022 07:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351149AbiDSLV3 (ORCPT
+        with ESMTP id S235055AbiDSLgy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 07:21:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F352DA88;
-        Tue, 19 Apr 2022 04:18:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8C3A961303;
-        Tue, 19 Apr 2022 11:18:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEFC2C385A5;
-        Tue, 19 Apr 2022 11:18:15 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EO+fMVfQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650367095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=K5nR87uOKXXd54FwCfFxFI6wdMpbbvs52+8XcBr77mU=;
-        b=EO+fMVfQwHgW5T75WUj3Fd8DgVkYhTpa+GBoZPoplljMXlB5T92ArNr1qWGSKFiejPZYA5
-        hwNDqJmBn1T2oWaBT40IecXJLB4/fbiQjvpiZ5techDxYrNg8em8eeum+iYsATu6RzevD/
-        XLuUIphOfRuUgPq98SioR7nmVYiaLZ0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e187e4ec (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 19 Apr 2022 11:18:14 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Tue, 19 Apr 2022 07:36:54 -0400
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCD02E9C9;
+        Tue, 19 Apr 2022 04:34:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+        Resent-Cc:Resent-Message-ID; bh=PBEaZlFaHYvw3+tY3UhjQeVca+KaL0Du1BTdeZIcC7U=;
+        t=1650368051; x=1651577651; b=sfd1r0tjdRraJErLzIANMDeOfosZEMb0ui5naTY2Sv8s1iq
+        ZQioNRVtMzu7mArCV2oZOA5f4Kc4lvB62uJmdDSVceTw1XyW8DJnGSgv2dT+tzHR+6nly5Fb+RQH0
+        /K1/CWN5jCuIGac6qOaw8rWSnslEkeS9CMwbSgLfzdgmjgSZwwBsdmeFEIHW3it8vLR5yNchX36PJ
+        RaqoFLdtI6GL9kKDGCa/IyvPG6z5wQ2yOZH3Tg3gg6b7NS0QzW5f6PCqdziEWNHBS0pzC9ce65O0U
+        KkE6kQYQ9mnhWQaLoVgiPWDi1rbO4NT9B4YGlILW31ICGdTVvqwpVKP+ak4aLhwg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.95)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1ngm6l-00BueY-OI;
+        Tue, 19 Apr 2022 13:33:23 +0200
+Message-ID: <694c2318d98973ee8995e891f81216ad267341dc.camel@sipsolutions.net>
+Subject: Re: [PATCH v5 08/11] um: use fallback for random_get_entropy()
+ instead of zero
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         tglx@linutronix.de, arnd@arndb.de
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
+Cc:     Theodore Ts'o <tytso@mit.edu>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Russell King <linux@armlinux.org.uk>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -54,7 +51,6 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         "David S . Miller" <davem@davemloft.net>,
         Richard Weinberger <richard@nod.at>,
         Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
@@ -66,52 +62,39 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
         linux-um@lists.infradead.org, x86@kernel.org,
         linux-xtensa@linux-xtensa.org
-Subject: [PATCH v5 09/11] sparc: use fallback for random_get_entropy() instead of zero
-Date:   Tue, 19 Apr 2022 13:16:48 +0200
-Message-Id: <20220419111650.1582274-10-Jason@zx2c4.com>
-In-Reply-To: <20220419111650.1582274-1-Jason@zx2c4.com>
+Date:   Tue, 19 Apr 2022 13:33:21 +0200
+In-Reply-To: <20220419111650.1582274-9-Jason@zx2c4.com>
 References: <20220419111650.1582274-1-Jason@zx2c4.com>
+         <20220419111650.1582274-9-Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the event that random_get_entropy() can't access a cycle counter or
-similar, falling back to returning 0 is really not the best we can do.
-Instead, at least calling random_get_entropy_fallback() would be
-preferable, because that always needs to return _something_, even
-falling back to jiffies eventually. It's not as though
-random_get_entropy_fallback() is super high precision or guaranteed to
-be entropic, but basically anything that's not zero all the time is
-better than returning zero all the time.
+On Tue, 2022-04-19 at 13:16 +0200, Jason A. Donenfeld wrote:
+> In the event that random_get_entropy() can't access a cycle counter or
+> similar, falling back to returning 0 is really not the best we can do.
+> Instead, at least calling random_get_entropy_fallback() would be
+> preferable, because that always needs to return _something_, even
+> falling back to jiffies eventually. It's not as though
+> random_get_entropy_fallback() is super high precision or guaranteed to
+> be entropic, but basically anything that's not zero all the time is
+> better than returning zero all the time.
+> 
+> This is accomplished by just including the asm-generic code like on
+> other architectures, which means we can get rid of the empty stub
+> function here.
 
-This is accomplished by just including the asm-generic code like on
-other architectures, which means we can get rid of the empty stub
-function here.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: David S. Miller <davem@davemloft.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/sparc/include/asm/timex_32.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+LGTM, actually better than before, though not even sure any drivers in
+ARCH=um have interrupts that say they can be used for this.
 
-diff --git a/arch/sparc/include/asm/timex_32.h b/arch/sparc/include/asm/timex_32.h
-index 542915b46209..f86326a6f89e 100644
---- a/arch/sparc/include/asm/timex_32.h
-+++ b/arch/sparc/include/asm/timex_32.h
-@@ -9,8 +9,6 @@
- 
- #define CLOCK_TICK_RATE	1193180 /* Underlying HZ */
- 
--/* XXX Maybe do something better at some point... -DaveM */
--typedef unsigned long cycles_t;
--#define get_cycles()	(0)
-+#include <asm-generic/timex.h>
- 
- #endif
--- 
-2.35.1
+Acked-by: Johannes Berg <johannes@sipsolutions.net>
 
+I assume you're going to take this through the random tree?
+
+johannes
