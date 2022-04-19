@@ -2,90 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B69C352B6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C91E6C352A7
 	for <linux-crypto@archiver.kernel.org>; Tue, 19 Apr 2022 16:47:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355397AbiDSQtk (ORCPT
+        id S1355390AbiDSQtj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 12:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54728 "EHLO
+        Tue, 19 Apr 2022 12:49:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354857AbiDSQpH (ORCPT
+        with ESMTP id S1344637AbiDSQp5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 12:45:07 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0861923BF4;
-        Tue, 19 Apr 2022 09:42:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 98FD361828;
-        Tue, 19 Apr 2022 16:42:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88B24C385AB;
-        Tue, 19 Apr 2022 16:42:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="APjJnJG5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650386541;
+        Tue, 19 Apr 2022 12:45:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D0273A5D5
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 09:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650386592;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=DbYOZGBq5KrFSwlc2YV1AKjCLUSH+OPRXx+/9nV6IJU=;
-        b=APjJnJG5C0iabYt25SXnu9XyX6Tl7POtgqLfznlID6gfQpXRhwILH3jdFqM3K6qgNwZbUu
-        hBaSI9xDuGqxJtNXgZ5mLGIP1Jlo1CqTIpFMBbpaR8u2U/owGKAGYbl1gfRQ+iuFkgE5oT
-        +hdjJOuuH+bNZPVDHBT5tXrf3hmT/Tc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b5041d5f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 19 Apr 2022 16:42:21 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2ec42eae76bso178725127b3.10;
-        Tue, 19 Apr 2022 09:42:20 -0700 (PDT)
-X-Gm-Message-State: AOAM533c40SrPq6+YxxkrQq5zSnRusQYyvyASfnTVzC8Eow7PmcBTtKk
-        TpdGYcsp0MxKfxXYmQaC/gfkScDeSwTo7FSBhn0=
-X-Google-Smtp-Source: ABdhPJwfGxSUNuIrFeX1GBvrPtyXTqhnRgzjLKBthgOJFOXlJ/13XNneWEON3yCcwy6xO9WOOQJsc4Kr24WZhjo09F4=
-X-Received: by 2002:a81:1d4:0:b0:2eb:1b10:f43e with SMTP id
- 203-20020a8101d4000000b002eb1b10f43emr16846705ywb.100.1650386539906; Tue, 19
- Apr 2022 09:42:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220419160407.1740458-1-Jason@zx2c4.com> <CAG48ez3amS6=omb8XVDEz9H2bk3MxTEK_XPjD=ZO-cXcDqz-cg@mail.gmail.com>
-In-Reply-To: <CAG48ez3amS6=omb8XVDEz9H2bk3MxTEK_XPjD=ZO-cXcDqz-cg@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 19 Apr 2022 18:42:09 +0200
-X-Gmail-Original-Message-ID: <CAHmME9r7Vt1XFzceHhy7O67iVMhtpLJ-d0p8UGgV4Srd4Dt2Hg@mail.gmail.com>
-Message-ID: <CAHmME9r7Vt1XFzceHhy7O67iVMhtpLJ-d0p8UGgV4Srd4Dt2Hg@mail.gmail.com>
-Subject: Re: [PATCH] random: add fork_event sysctl for polling VM forks
-To:     Jann Horn <jannh@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        bh=V3ODNWfMW+rRhSokZu86v1GXhJjBricpy30YxedvS1g=;
+        b=GGC/aKc6epjyb8qz33WDzkz7vdHatLFmsDOSeJq77hCEJ6oyzCiZ0EFdOm52+mMK1ay6Ju
+        xXNCJDNzjRJ4OimnpdrBcIX9/M6OpCf18OiLh84LH/skKgzZQbYlJ55COX7O6F6g12hcBD
+        T3Tpah57XcNPKzT6ZXuaTyaIiH1NCsQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-138-ecP0Usk1Pdyo8nwaOb2QmA-1; Tue, 19 Apr 2022 12:43:10 -0400
+X-MC-Unique: ecP0Usk1Pdyo8nwaOb2QmA-1
+Received: by mail-wm1-f71.google.com with SMTP id v191-20020a1cacc8000000b0038ce818d2efso9549269wme.1
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 09:43:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=V3ODNWfMW+rRhSokZu86v1GXhJjBricpy30YxedvS1g=;
+        b=oTka21F0QltTnzC6subCJ0GKluUEQSzteMFYt/fonXV2Jv0ukwpVQpXH2X0dBYMcZi
+         ASCdGtmQwi0NXdHPY/VEG+oEQGiJZCkONe54lMonPCXcaxapv5SReheyF4XHH/Z2GN3u
+         bLMS0HBGEsC9DKfCInQzeUs+7q4b1MghHTJCxuo31dql0WMzRSBNnkQygahtiO26SnLD
+         d4mf73YLr47hy6XIJ3sfeZ7fgH5ZfAQ4X5d9Pm3PuQhoH4vpJsrRcwpowTN3Q9k8B+cH
+         e5wV6nxclNLDsXDaPtdviIwlXFJUwHJGXAz2x5FcZvkSUYTKbgtHW+iplBL7hCXgqXe/
+         l5Jg==
+X-Gm-Message-State: AOAM531hu4oafI96s9J0+xr5KHRMwJM7ZtXAKmCZsd/NQPRhTK8UCBoR
+        mvQAWGw5t8S0G1cyQeU15lcjB932Lpf43YDp7+dD+anewZPagKNWFDrYD5MM/I6+4CWPGK9WkbT
+        +XlxizZ2N3KvRcT27KrJv0KyL
+X-Received: by 2002:adf:f981:0:b0:205:c3e1:9eba with SMTP id f1-20020adff981000000b00205c3e19ebamr12387499wrr.244.1650386589519;
+        Tue, 19 Apr 2022 09:43:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/sBvEGx6+IXc/dmS3LEsLdRrH83M0si6np7xgLC//YEu1El92MuYL5XEmIp9phspX0ZKpFQ==
+X-Received: by 2002:adf:f981:0:b0:205:c3e1:9eba with SMTP id f1-20020adff981000000b00205c3e19ebamr12387485wrr.244.1650386589266;
+        Tue, 19 Apr 2022 09:43:09 -0700 (PDT)
+Received: from redhat.com ([2.53.17.80])
+        by smtp.gmail.com with ESMTPSA id v14-20020a7bcb4e000000b0034492fa24c6sm16631515wmj.34.2022.04.19.09.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Apr 2022 09:43:07 -0700 (PDT)
+Date:   Tue, 19 Apr 2022 12:43:03 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        linux-hyperv@vger.kernel.org,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Colm MacCarthaigh <colmmacc@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+        adrian@parity.io, Laszlo Ersek <lersek@redhat.com>,
+        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Jann Horn <jannh@google.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Brown, Len" <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
+        Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: propagating vmgenid outward and upward
+Message-ID: <20220419124245-mutt-send-email-mst@kernel.org>
+References: <Yh4+9+UpanJWAIyZ@zx2c4.com>
+ <c5181fb5-38fb-f261-9de5-24655be1c749@amazon.com>
+ <CAHmME9rTMDkE7UA3_wg87mrDVYps+YaHw+dZwF0EbM0zC4pQQw@mail.gmail.com>
+ <47137806-9162-0f60-e830-1a3731595c8c@amazon.com>
+ <CAHmME9pwfKfKp_qqbmAO5tEaQSZ5srCO5COThK3vWZR4avRF1g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9pwfKfKp_qqbmAO5tEaQSZ5srCO5COThK3vWZR4avRF1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Jann,
+On Tue, Apr 19, 2022 at 05:12:36PM +0200, Jason A. Donenfeld wrote:
+> Hey Alex,
+> 
+> On Thu, Mar 10, 2022 at 12:18 PM Alexander Graf <graf@amazon.com> wrote:
+> > I agree on the slightly racy compromise and that it's a step into the
+> > right direction. Doing this is a no brainer IMHO and I like the proc
+> > based poll approach.
+> 
+> Alright. I'm going to email a more serious patch for that in the next
+> few hours and you can have a look. Let's do that for 5.19.
+> 
+> > I have an additional problem you might have an idea for with the poll
+> > based path. In addition to the clone notification, I'd need to know at
+> > which point everyone who was listening to a clone notification is
+> > finished acting up it. If I spawn a tiny VM to do "work", I want to know
+> > when it's safe to hand requests into it. How do I find out when that
+> > point in time is?
+> 
+> Seems tricky to solve. Even a count of current waiters and a
+> generation number won't be sufficient, since it wouldn't take into
+> account users who haven't _yet_ gotten to waiting. But maybe it's not
+> the right problem to solve? Or somehow not necessary? For example, if
+> the problem is a bit more constrained a solution becomes easier: you
+> have a fixed/known set of readers that you know about, and you
+> guarantee that they're all waiting before the fork. Then after the
+> fork, they all do something to alert you in their poll()er, and you
+> count up how many alerts you get until it matches the number of
+> expected waiters. Would that work? It seems like anything more general
+> than that is just butting heads with the racy compromise we're already
+> making.
+> 
+> Jason
 
-On Tue, Apr 19, 2022 at 6:38 PM Jann Horn <jannh@google.com> wrote:
-> This is a bit of a weird API, because normally .poll is supposed to be
-> level-triggered rather than edge-triggered... and AFAIK things like
-> epoll also kinda assume that ->poll() doesn't modify state (but that
-> only _really_ matters in weird cases). But at the same time, it looks
-> like the existing proc_sys_poll() already goes against that? So I
-> don't know what the right thing to do there is...
+I have some ideas here ... but can you explain the use-case a bit more?
 
-Doesn't the level vs edge distinction apply to POLLIN/POLLOUT events?
-In this case, the event generated is actually POLLERR. On one hand,
-this is sort of weird. On the other hand, it perhaps makes sense,
-since nothing changes respect to its readability/writeability. And it
-also happens to be how the sysctl poll() infrastructure was designed;
-I didn't need to change anything for this behavior, and it comes as a
-result of this rather trivial commit only. Looking at where else it's
-used, it appears to be the intended use case for changes to
-hostname/domainname. So while it's unusual, it also appears to be the
-usual way that sysctl poll() works. So perhaps we're quite lucky here
-in that sysctl poll() winds up being the correct interface for what we
-want?
+-- 
+MST
 
-Jason
