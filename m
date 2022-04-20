@@ -2,58 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C79C4332F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 07:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 410D9C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 10:29:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376459AbiDTHxm (ORCPT
+        id S1351715AbiDTKcF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Apr 2022 03:53:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
+        Wed, 20 Apr 2022 06:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376437AbiDTHxi (ORCPT
+        with ESMTP id S234821AbiDTKcB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Apr 2022 03:53:38 -0400
-X-Greylist: delayed 441 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 20 Apr 2022 00:50:35 PDT
-Received: from mail.fixingbiz.pl (mail.fixingbiz.pl [217.61.22.139])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019063BA71
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Apr 2022 00:50:34 -0700 (PDT)
-Received: by mail.fixingbiz.pl (Postfix, from userid 1001)
-        id A7B87A3A06; Wed, 20 Apr 2022 08:41:28 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fixingbiz.pl; s=mail;
-        t=1650440565; bh=FDuFY3XQoq0gMX1b2gxgT7Py2p4Sxl0PJZYZ4NVaPho=;
-        h=Date:From:To:Subject:From;
-        b=MZsY59cYhvGHCXUIHyNvyRL4SsCQdJmo9qbFp6fo8+huurI3ijJgwI9JgO+7QLwSp
-         vL8EkdO2qQ2tq3aA3BBf31tIXOufeyI2mwgmaHP6O36c9yevSZmJsqq++RmSeHZfC4
-         hu6qhkocuhzYVjqK0wskDF8RhhiGqyUkcZQn8xCrNwdyxp/FXjhocWUdsVZ49XOCqw
-         RMlLsoHewZUgUlBRPwl1LM0FarQkT+ycZ16pmx1+gQbc+cLVYDH4iT1ThYSCTOyntm
-         8VGTp8DT6iGMbsFb+N6pw7KC1tvZGSICx8bdwpcYB6o+NBosK1MSTo9ZmJrwDpczfi
-         5Wygwm9oV8o9Q==
-Received: by mail.fixingbiz.pl for <linux-crypto@vger.kernel.org>; Wed, 20 Apr 2022 07:40:53 GMT
-Message-ID: <20220420074501-0.1.1x.6teb.0.h29fk8p1yy@fixingbiz.pl>
-Date:   Wed, 20 Apr 2022 07:40:53 GMT
-From:   =?UTF-8?Q? "Przemys=C5=82aw_Wr=C3=B3blewski" ?= 
-        <przemyslaw.wroblewski@fixingbiz.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Wycena paneli fotowoltaicznych
-X-Mailer: mail.fixingbiz.pl
+        Wed, 20 Apr 2022 06:32:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D06C3F890
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Apr 2022 03:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650450555;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KIJu0PnDJV4/uO0UdPgu/58WGciQu1suUPJ1SFUvK60=;
+        b=SM0CWFeQRknY+2vXhIKwxZDRIEAcagCUbNhNyNGPN3vin+UWjSybQYLQlbLX0z1tv3E0Mz
+        E4r0wCSEM5GiDEDVfjJ/SF6jp9wPb+EF+DER2runUmY6dMeB/H4AdFbJcWvqP42Yl+PGDn
+        3lp/IhsoPd9ZuaRyJNtF3PvgPQcibWg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-441-5Q0XG3XRM2uJXHWtLXv0tg-1; Wed, 20 Apr 2022 06:29:12 -0400
+X-MC-Unique: 5Q0XG3XRM2uJXHWtLXv0tg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83F2338149C1;
+        Wed, 20 Apr 2022 10:29:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E39654022C4;
+        Wed, 20 Apr 2022 10:29:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210312171232.2681989-4-mic@digikod.net>
+References: <20210312171232.2681989-4-mic@digikod.net> <20210312171232.2681989-1-mic@digikod.net>
+To:     =?us-ascii?Q?=3D=3FUTF-8=3Fq=3FMicka=3DC3=3DABl=3D20Sala=3DC3=3DBCn=3F?=
+         =?us-ascii?Q?=3D?= <mic@digikod.net>
+Cc:     dhowells@redhat.com, David Woodhouse <dwmw2@infradead.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Snowberg <eric.snowberg@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        James Morris <jmorris@namei.org>,
+        =?us-ascii?Q?=3D=3FUTF-8=3Fq=3FMicka=3DC3=3DABl?=
+         =?us-ascii?Q?=3D20Sala=3DC3=3DBCn=3F=3D?= 
+        <mic@linux.microsoft.com>, Mimi Zohar <zohar@linux.ibm.com>,
+        "Serge E . Hallyn" <serge@hallyn.com>,
+        Tyler Hicks <tyhicks@linux.microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v7 3/5] certs: Make blacklist_vet_description() more strict
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 20 Apr 2022 11:29:08 +0100
+Message-ID: <648218.1650450548@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Micka=C3=ABl Sala=C3=BCn <mic@digikod.net> wrote:
 
-dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
-irm=C4=85.
+> +	/* The following algorithm only works if prefix lengths match. */
+> +	BUILD_BUG_ON(sizeof(tbs_prefix) !=3D sizeof(bin_prefix));
+> +	prefix_len =3D sizeof(tbs_prefix) - 1;
+> +	for (i =3D 0; *desc; desc++, i++) {
+> +		if (*desc =3D=3D ':') {
+> +			if (tbs_step =3D=3D prefix_len)
+> +				goto found_colon;
+> +			if (bin_step =3D=3D prefix_len)
+> +				goto found_colon;
+> +			return -EINVAL;
+> +		}
+> +		if (i >=3D prefix_len)
+> +			return -EINVAL;
+> +		if (*desc =3D=3D tbs_prefix[i])
+> +			tbs_step++;
+> +		if (*desc =3D=3D bin_prefix[i])
+> +			bin_step++;
+> +	}
 
-=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
-ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
+I wonder if:
 
-Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
-ropozycji?
+	static const char tbs_prefix[] =3D "tbs:";
+	static const char bin_prefix[] =3D "bin:";
 
+	if (strncmp(desc, tbs_prefix, sizeof(tbs_prefix) - 1) =3D=3D 0 ||
+	    strncmp(desc, bin_prefix, sizeof(bin_prefix) - 1) =3D=3D 0)
+		goto found_colon;
 
-Pozdrawiam,
-Przemys=C5=82aw Wr=C3=B3blewski
+might be better.
+
+David
+
