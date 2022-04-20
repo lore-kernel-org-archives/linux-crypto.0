@@ -2,80 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31474C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 12:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48881C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 13:25:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378387AbiDTMLQ (ORCPT
+        id S1353934AbiDTN15 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Apr 2022 08:11:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47352 "EHLO
+        Wed, 20 Apr 2022 09:27:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352716AbiDTMLP (ORCPT
+        with ESMTP id S1379023AbiDTN1p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Apr 2022 08:11:15 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A1B3FBE1;
-        Wed, 20 Apr 2022 05:08:30 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 21so2023151edv.1;
-        Wed, 20 Apr 2022 05:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lptHMHNd+ScUKuWl5/8SwvwIgfn4FN1iUnreSYZVnhE=;
-        b=KFvaUy2ImpPtYrZu5D1FENi5KXRUr+3TF1P+jAK8bh7kMDramrZS0iTogxFF07IN7N
-         UvEZ685bkw0/aDh9cijBhlXly8ZYKLDSYINdM3ZLdYVoaq4Rr5JLhpcDkttbSSlXlTd3
-         /BsO8NFEcc5Blp/Z/24PgVbGo7ANSkMDDV1odxmrd3sf3iBB8tv5HNPGhO3deDbmBJlV
-         WjJBHNGYeHSwJh16gnRzz9ESdRSde9/yeM8YY+5cmQGrd7KyZ6nc5vvDUjvPtiWASuRp
-         YqPIjLxTku3LM+4b1wLmuSTx/l44o0rQo3NBr1WWA0Tx0u0w8mxc0zopJ3y0R/BlhkIX
-         Q7DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lptHMHNd+ScUKuWl5/8SwvwIgfn4FN1iUnreSYZVnhE=;
-        b=5M1uT+ZYBcM3jlwKAT4LrBDAq24YrYvhdRIAIi+R8MjUGzYjgm26mAQfnxXyXHUHs+
-         nsrd7bhzXZXJGEgUc0dsuv4oVwq0qUBxb169A69PjqBosGvTYRwN90g0solTC853fgBq
-         utOiWN+HL350HM5I+JxIQInHBBx1f3HliccQhI/8mVfBSEm+QxZt/dMexOSLG1ZehG9e
-         pcr5vc+YGReiPGMAPEs+RBl2zoLtva8s3KLqz6PdvkX37vKtRkQN4VBdk+OCPkpTmomL
-         xDkfS74vjswkhP3p7EViRRvAZHcQ5wJNOzpwKS1Fx4efbCDHEqvtYomfQINUkebX4IyL
-         8KLQ==
-X-Gm-Message-State: AOAM531LpLphtxvnQHSDlLxYkPaGm52fUlOT/f5/1je1pNuHEplewd9V
-        V4NJ8BSprHRumH+I5DQawq6HJA2jApl6ls2Q2Bw=
-X-Google-Smtp-Source: ABdhPJwRET8r1MQZzGGrQkb0juXyiesspodWW0S94Yj5o3/2+PuCtjnX/U1Oy3cu/ruepfpdp6LrLU42nuBThUoZqQ4=
-X-Received: by 2002:a05:6402:f29:b0:424:27d:3a7d with SMTP id
- i41-20020a0564020f2900b00424027d3a7dmr7858018eda.155.1650456508590; Wed, 20
- Apr 2022 05:08:28 -0700 (PDT)
+        Wed, 20 Apr 2022 09:27:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E014326FF;
+        Wed, 20 Apr 2022 06:24:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7A55861A51;
+        Wed, 20 Apr 2022 13:24:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9748C385A0;
+        Wed, 20 Apr 2022 13:24:56 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ULX6+t9a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650461094;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zViedf6BdiM4N8cQIaCXVT7SDe0/tNGlIcqUURYcAYo=;
+        b=ULX6+t9a/xxPf4XzndnIwSFsYT5uvJpuLLc2zAsEzslp56ek1vg8kNusNcqCina89HNUQj
+        tOTWG62irY7DedbldzdwUfOr9vD0oC9i17vTjXdyhH3igO2AuA5KuxdeVenbkDAe3PU24M
+        FaKDQBzUXupl2lyEVh0PsBcUAM0h48U=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 65fa884e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 20 Apr 2022 13:24:54 +0000 (UTC)
+Date:   Wed, 20 Apr 2022 15:24:48 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Jann Horn <jannh@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alexander Graf <graf@amazon.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Colm MacCarthaigh <colmmacc@amazon.com>
+Subject: Re: [PATCH] random: add fork_event sysctl for polling VM forks
+Message-ID: <YmAJoGtqA3PMrZmD@zx2c4.com>
+References: <20220419160407.1740458-1-Jason@zx2c4.com>
+ <CAG48ez3amS6=omb8XVDEz9H2bk3MxTEK_XPjD=ZO-cXcDqz-cg@mail.gmail.com>
+ <CAHmME9r7Vt1XFzceHhy7O67iVMhtpLJ-d0p8UGgV4Srd4Dt2Hg@mail.gmail.com>
+ <CAG48ez2X72XkpxaEDmzykewreuhk8=5t5L5b2Qdr1dn8LcFutw@mail.gmail.com>
+ <CAHmME9q+mDw6n3FNJLvoZoD3UsX-G5PvTwb5L7h_M9RFKNemSw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220419114444.586113-1-festevam@gmail.com> <VI1PR04MB5342FB22BDAF3163C7C8ECD9E7F59@VI1PR04MB5342.eurprd04.prod.outlook.com>
- <AS8PR04MB8948B99965ECED11AEE35D2FF3F59@AS8PR04MB8948.eurprd04.prod.outlook.com>
-In-Reply-To: <AS8PR04MB8948B99965ECED11AEE35D2FF3F59@AS8PR04MB8948.eurprd04.prod.outlook.com>
-From:   Fabio Estevam <festevam@gmail.com>
-Date:   Wed, 20 Apr 2022 09:08:17 -0300
-Message-ID: <CAOMZO5CR9XFVXgMqkws-RbjjLfo-XvxHLOZGqB9+=CSoDK6w9Q@mail.gmail.com>
-Subject: Re: [EXT] [PATCH v4] crypto: caam - fix i.MX6SX entropy delay value
-To:     Vabhav Sharma <vabhav.sharma@nxp.com>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Fabio Estevam <festevam@denx.de>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHmME9q+mDw6n3FNJLvoZoD3UsX-G5PvTwb5L7h_M9RFKNemSw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Vabhav,
+Hey again,
 
-On Wed, Apr 20, 2022 at 8:34 AM Vabhav Sharma <vabhav.sharma@nxp.com> wrote:
+On Wed, Apr 20, 2022 at 02:15:45AM +0200, Jason A. Donenfeld wrote:
+> Hi Jann,
+> 
+> On Tue, Apr 19, 2022 at 9:45 PM Jann Horn <jannh@google.com> wrote:
+> > AFAIK this also means that if you make an epoll watch for
+> > /proc/sys/kernel/random/fork_event, and then call poll() *on the epoll
+> > fd* for some reason, that will probably already consume the event; and
+> > if you then try to actually receive the epoll event via epoll_wait(),
+> > it'll already be gone (because epoll tries to re-poll the "ready"
+> > files to figure out what state those files are at now). Similarly if
+> > you try to create an epoll watch for an FD that already has an event
+> > pending: Installing the watch will call the ->poll handler once,
+> > resetting the file's state, and the following epoll_wait() will call
+> > ->poll again and think the event is already gone. See the call paths
+> > to vfs_poll() in fs/eventpoll.c.
+> >
+> > Maybe we don't care about such exotic usage, and are willing to accept
+> > the UAPI inconsistency and slight epoll breakage of plumbing
+> > edge-triggered polling through APIs designed for level-triggered
+> > polling. IDK.
+> 
+> Hmm, I see. The thing is, this is _already_ what's done for
+> domainname/hostname. It's how the sysctl poll handler was "designed".
+> So our options here are:
+> 
+> a) Remove this quirky behavior from domainname/hostname and start
+> over. This would potentially break userspace, but maybe nobody uses
+> this? No idea, but sounds risky.
+> 
+> b) Apply this commit as-is, because it's using the API as the API was
+> designed, and call it a day.
+> 
+> c) Apply this commit as-is, because it's using the API as the API was
+> designed, and then later try to fix up the epoll behavior on this.
+> 
+> Of these, (a) seems like a non-starter. (c) is most appealing, but it
+> sounds like it might not actually be possible?
+> 
+> Jason
 
-> There is nothing like extended entropy delay and function name seems to be incorrect, The software test were run offline across ranges of temperature, voltage and process to determine the correct entropy delay.
-> However, value of 12000 is determined by running said test across voltage and temperature only for iMX6SX.
+I actually tried to verify your concern but didn't have success doing
+so.
 
-Ok, I did as you suggested and sent a v5.
+Both of these worked:
 
-Just realized that I forgot to add you on Cc. Sorry about that.
+        int efd = epoll_create1(0);
+        assert(efd >= 0);
+        struct epoll_event event = {
+                .data.fd = open("/proc/sys/kernel/random/fork_event", O_RDONLY)
+        };
+        assert(event.data.fd >= 0);
+        assert(epoll_ctl(efd, EPOLL_CTL_ADD, event.data.fd, &event) == 0);
+        for (;;) {
+                assert(epoll_wait(efd, &event, 1, -1) == 1);
+                puts("vm fork detected");
+        }
 
-Thanks
+And:
+
+        int efd = epoll_create1(0);
+        assert(efd >= 0);
+        struct epoll_event event = {
+                .data.fd = open("/proc/sys/kernel/random/fork_event", O_RDONLY)
+        };
+        assert(event.data.fd >= 0);
+        assert(epoll_ctl(efd, EPOLL_CTL_ADD, event.data.fd, &event) == 0);
+        for (;;) {
+                assert(poll(&(struct pollfd){ .fd = efd, .events = POLLIN }, 1, -1) == 1);
+                puts("vm fork detected");
+        }
+
+It also worked if I added EPOLLET to the epoll_event. It did not work if
+I removed POLLIN from the pollfd event.
+
+Maybe I'm missing some subtlety. But what exactly is broken? (Either
+way, it doesn't change the (a) vs (c) calculus in my previous email.)
+
+Jason
