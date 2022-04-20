@@ -2,105 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED84BC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 00:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9090FC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Apr 2022 01:27:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347878AbiDTASu (ORCPT
+        id S1347136AbiDTBaT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Apr 2022 20:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32856 "EHLO
+        Tue, 19 Apr 2022 21:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244218AbiDTASt (ORCPT
+        with ESMTP id S232010AbiDTBaT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Apr 2022 20:18:49 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C69A24F18;
-        Tue, 19 Apr 2022 17:16:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B155DB815A3;
-        Wed, 20 Apr 2022 00:16:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE5DDC385AB;
-        Wed, 20 Apr 2022 00:16:01 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="L+9XBwP8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650413758;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UYx+8vgHYYbBz/GEqXcU/jKRA0n6JzTFCxnZ5uZ49b0=;
-        b=L+9XBwP8ADwRXUpfaI41DqkMjJL5FVS5fP2e2CGN32RFIgl/pbntyqZUGh21aCsmGb/XMb
-        TYZwRNxoWp4uzuRYOUSWLEge+sOD8p00wMDEtli1MACJgvLBeLJ7C4iZJDDsSO3wj8xBxI
-        SndXeRNz8rpHIRoUdAxm1F35qLaTIQg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 54bdc775 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 20 Apr 2022 00:15:58 +0000 (UTC)
-Received: by mail-yb1-f173.google.com with SMTP id p65so31862ybp.9;
-        Tue, 19 Apr 2022 17:15:57 -0700 (PDT)
-X-Gm-Message-State: AOAM531zw1J8v2dDculXjVxEskWIat8B2vRHEfI7WUtUS7psYwe2WIYT
-        Mh6TtddB7D1rTH+7l4oXxVmCTiH2ql+8Xt/d67I=
-X-Google-Smtp-Source: ABdhPJyKmzHpgml4b2/70chA1ertzgkMdR1iPqBXnX+lzTkitHamRxGNG77ff6llGW5G3Bb0wx/FhHHBqbQkVs9ZKxM=
-X-Received: by 2002:a25:d88c:0:b0:645:570:72d2 with SMTP id
- p134-20020a25d88c000000b00645057072d2mr12340966ybg.373.1650413756667; Tue, 19
- Apr 2022 17:15:56 -0700 (PDT)
+        Tue, 19 Apr 2022 21:30:19 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A46E245A2
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Apr 2022 18:27:34 -0700 (PDT)
+Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23K1RECK068633;
+        Wed, 20 Apr 2022 10:27:14 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
+ Wed, 20 Apr 2022 10:27:14 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23K1RDNr068630
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 20 Apr 2022 10:27:14 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <35da6cb2-910f-f892-b27a-4a8bac9fd1b1@I-love.SAKURA.ne.jp>
+Date:   Wed, 20 Apr 2022 10:27:11 +0900
 MIME-Version: 1.0
-References: <20220419160407.1740458-1-Jason@zx2c4.com> <CAG48ez3amS6=omb8XVDEz9H2bk3MxTEK_XPjD=ZO-cXcDqz-cg@mail.gmail.com>
- <CAHmME9r7Vt1XFzceHhy7O67iVMhtpLJ-d0p8UGgV4Srd4Dt2Hg@mail.gmail.com> <CAG48ez2X72XkpxaEDmzykewreuhk8=5t5L5b2Qdr1dn8LcFutw@mail.gmail.com>
-In-Reply-To: <CAG48ez2X72XkpxaEDmzykewreuhk8=5t5L5b2Qdr1dn8LcFutw@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 20 Apr 2022 02:15:45 +0200
-X-Gmail-Original-Message-ID: <CAHmME9q+mDw6n3FNJLvoZoD3UsX-G5PvTwb5L7h_M9RFKNemSw@mail.gmail.com>
-Message-ID: <CAHmME9q+mDw6n3FNJLvoZoD3UsX-G5PvTwb5L7h_M9RFKNemSw@mail.gmail.com>
-Subject: Re: [PATCH] random: add fork_event sysctl for polling VM forks
-To:     Jann Horn <jannh@google.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Colm MacCarthaigh <colmmacc@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>
+Cc:     linux-crypto@vger.kernel.org
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] crypto: atmel - Avoid flush_scheduled_work() usage
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jann,
+Flushing system-wide workqueues is dangerous and will be forbidden.
+Replace system_wq with local atmel_wq.
 
-On Tue, Apr 19, 2022 at 9:45 PM Jann Horn <jannh@google.com> wrote:
-> AFAIK this also means that if you make an epoll watch for
-> /proc/sys/kernel/random/fork_event, and then call poll() *on the epoll
-> fd* for some reason, that will probably already consume the event; and
-> if you then try to actually receive the epoll event via epoll_wait(),
-> it'll already be gone (because epoll tries to re-poll the "ready"
-> files to figure out what state those files are at now). Similarly if
-> you try to create an epoll watch for an FD that already has an event
-> pending: Installing the watch will call the ->poll handler once,
-> resetting the file's state, and the following epoll_wait() will call
-> ->poll again and think the event is already gone. See the call paths
-> to vfs_poll() in fs/eventpoll.c.
->
-> Maybe we don't care about such exotic usage, and are willing to accept
-> the UAPI inconsistency and slight epoll breakage of plumbing
-> edge-triggered polling through APIs designed for level-triggered
-> polling. IDK.
+Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Note: This patch is only compile tested.
 
-Hmm, I see. The thing is, this is _already_ what's done for
-domainname/hostname. It's how the sysctl poll handler was "designed".
-So our options here are:
+ drivers/crypto/atmel-ecc.c     |  2 +-
+ drivers/crypto/atmel-i2c.c     | 24 +++++++++++++++++++++++-
+ drivers/crypto/atmel-i2c.h     |  1 +
+ drivers/crypto/atmel-sha204a.c |  2 +-
+ 4 files changed, 26 insertions(+), 3 deletions(-)
 
-a) Remove this quirky behavior from domainname/hostname and start
-over. This would potentially break userspace, but maybe nobody uses
-this? No idea, but sounds risky.
-
-b) Apply this commit as-is, because it's using the API as the API was
-designed, and call it a day.
-
-c) Apply this commit as-is, because it's using the API as the API was
-designed, and then later try to fix up the epoll behavior on this.
-
-Of these, (a) seems like a non-starter. (c) is most appealing, but it
-sounds like it might not actually be possible?
-
-Jason
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 333fbefbbccb..59a57279e77b 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -398,7 +398,7 @@ static int __init atmel_ecc_init(void)
+ 
+ static void __exit atmel_ecc_exit(void)
+ {
+-	flush_scheduled_work();
++	atmel_i2c_flush_queue();
+ 	i2c_del_driver(&atmel_ecc_driver);
+ }
+ 
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index 6fd3e969211d..226c55bfb9d6 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -263,6 +263,8 @@ static void atmel_i2c_work_handler(struct work_struct *work)
+ 	work_data->cbk(work_data, work_data->areq, status);
+ }
+ 
++static struct workqueue_struct *atmel_wq;
++
+ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 		       void (*cbk)(struct atmel_i2c_work_data *work_data,
+ 				   void *areq, int status),
+@@ -272,10 +274,16 @@ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 	work_data->areq = areq;
+ 
+ 	INIT_WORK(&work_data->work, atmel_i2c_work_handler);
+-	schedule_work(&work_data->work);
++	queue_work(atmel_wq, &work_data->work);
+ }
+ EXPORT_SYMBOL(atmel_i2c_enqueue);
+ 
++void atmel_i2c_flush_queue(void)
++{
++	flush_workqueue(atmel_wq);
++}
++EXPORT_SYMBOL(atmel_i2c_flush_queue);
++
+ static inline size_t atmel_i2c_wake_token_sz(u32 bus_clk_rate)
+ {
+ 	u32 no_of_bits = DIV_ROUND_UP(TWLO_USEC * bus_clk_rate, USEC_PER_SEC);
+@@ -372,6 +380,20 @@ int atmel_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+ }
+ EXPORT_SYMBOL(atmel_i2c_probe);
+ 
++static int __init atmel_i2c_init(void)
++{
++	atmel_wq = alloc_workqueue("atmel_wq", 0, 0);
++	return atmel_wq ? 0 : -ENOMEM;
++}
++
++static void __exit atmel_i2c_exit(void)
++{
++	destroy_workqueue(atmel_wq);
++}
++
++module_init(atmel_i2c_init);
++module_exit(atmel_i2c_exit);
++
+ MODULE_AUTHOR("Tudor Ambarus <tudor.ambarus@microchip.com>");
+ MODULE_DESCRIPTION("Microchip / Atmel ECC (I2C) driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 63b97b104f16..48929efe2a5b 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -173,6 +173,7 @@ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 		       void (*cbk)(struct atmel_i2c_work_data *work_data,
+ 				   void *areq, int status),
+ 		       void *areq);
++void atmel_i2c_flush_queue(void);
+ 
+ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd);
+ 
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index c96c14e7dab1..2168f877bd43 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -159,7 +159,7 @@ static int __init atmel_sha204a_init(void)
+ 
+ static void __exit atmel_sha204a_exit(void)
+ {
+-	flush_scheduled_work();
++	atmel_i2c_flush_queue();
+ 	i2c_del_driver(&atmel_sha204a_driver);
+ }
+ 
+-- 
+2.32.0
