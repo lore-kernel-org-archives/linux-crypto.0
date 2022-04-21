@@ -2,109 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EE3C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 23:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD237C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 23:40:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353054AbiDUXfh (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 19:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38286 "EHLO
+        id S233104AbiDUXnJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Apr 2022 19:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349332AbiDUXfg (ORCPT
+        with ESMTP id S233046AbiDUXnI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 19:35:36 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4243BBC1;
-        Thu, 21 Apr 2022 16:32:45 -0700 (PDT)
+        Thu, 21 Apr 2022 19:43:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D34DEC1;
+        Thu, 21 Apr 2022 16:40:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D5080B82936;
-        Thu, 21 Apr 2022 23:32:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7294BC385A7;
-        Thu, 21 Apr 2022 23:32:42 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D0E3BB82936;
+        Thu, 21 Apr 2022 23:40:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B228C385A5;
+        Thu, 21 Apr 2022 23:40:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650583962;
-        bh=N4PWRNQyzJhdBLpeVkHT5hgPnH2wpLBteBcwAUC81uE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=f8YS12Zp7oN2fmrppBL6o2uUJlnajln7s1JQIlCTwf9dCQ5/Agk23KsKyH0YQ6Dd9
-         WKRFXTdtIhrmrF/faG+0TlsWpsZAgJIoI3OTeogEISAQVe+LKb0tk86yMccaiWf968
-         9lX+Uo56dK/d+xhVZzi6xAmGBfeUhwiuxbs5ZUncttLaMOmw1ztDAuASWfPwf+LCre
-         hl/LPuipt9dWg6RxGKyfURGGjonUOPuUKuWGVi8K277vX9iX051fGkJvrnYY58ccGy
-         gWgcoKgFqX0gz0iJZhHlh1ZUCfL1Fvdw7KOfwpoOkvzkogfyqcYzznCd9Xt6qvmtn5
-         P7D1xQ0fWWCaA==
+        s=k20201202; t=1650584413;
+        bh=r+B+a9qe9EGZlPpgDWEZE6L+yz+T/1PvmPc0KaKhDYQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sobvn5CG7XBpSKCjyxvscvOwImJG/D8eqprsf19Qhp+zHZhtwyvjrRsMUr9w/5uzc
+         ucQgCgpFJVsz0QYzvQh8lWjF0OXMP+vDCAfUDgm070ndKhYvGkD6n2zqmrLJBCGzt5
+         AJD2jDjHglKV6jfpISWIu8ZmxjRszam9eh7BTdv0n7SKBeRNhbHspp886URJ1muxMT
+         GQZY7BxqP9e+bVlZ0Q56bER4HSemcEwOHYWJfMFtGjitT4xB8sF+Mrm3NeMFBhW00P
+         PuXSnEODDXKK9ycqkvtIVwT7jT9zA1C7p/sFzWGygc0b4+rttXEG2D+Lw9Vsq7dfTw
+         4jztugeDkfg/Q==
+Date:   Thu, 21 Apr 2022 16:40:11 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A . Donenfeld " <Jason@zx2c4.com>,
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Theodore Ts'o <tytso@mit.edu>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH v2] random: avoid mis-detecting a slow counter as a cycle counter
-Date:   Thu, 21 Apr 2022 16:31:52 -0700
-Message-Id: <20220421233152.58522-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.35.2
+Subject: Re: [PATCH] siphash: update the HalfSipHash documentation
+Message-ID: <YmHrWy2o72k2cFLM@sol.localdomain>
+References: <20220421204320.258010-1-ebiggers@kernel.org>
+ <CAHmME9rtrjyE0Cqk9qvW_xxhFduvbMt5-cmjD134JCxk2iLKDQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9rtrjyE0Cqk9qvW_xxhFduvbMt5-cmjD134JCxk2iLKDQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Apr 22, 2022 at 01:08:01AM +0200, Jason A. Donenfeld wrote:
+> Hi Eric,
+> 
+> On Thu, Apr 21, 2022 at 10:44 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > -Danger!
+> > +**Danger!** HalfSipHash should only be used in a very limited set of use cases
+> > +where nothing better is possible, namely:
+> >
+> > -Do not ever use HalfSipHash except for as a hashtable key function, and only
+> > -then when you can be absolutely certain that the outputs will never be
+> > -transmitted out of the kernel. This is only remotely useful over `jhash` as a
+> > -means of mitigating hashtable flooding denial of service attacks.
+> > +- Hashtable key functions, where the outputs will never be transmitted out of
+> > +  the kernel. This is only remotely useful over `jhash` as a means of mitigating
+> > +  hashtable flooding denial of service attacks.
+> 
+> I think we should actually drop this chunk of the patch. You wrote in
+> your commit message, "HalfSipHash-1-3 is not entirely limited to
+> hashtable functions, with it now being used in the interrupt entropy
+> accumulator." But in fact, random.c uses HalfSipHash-1, with no three
+> round finalization (since we use BLAKE2s for that). So it's not
+> _quite_ the same thing. If it were, we could have gotten away by just
+> calling the actual hsiphash function, but instead it's just applying
+> the round function as a permutation.
+> 
+> If you feel strongly that somebody might accidentally copy and paste
+> that after grepping for halfsiphash and trying to figure out how to
+> use it, I suppose we could keep this. But it strikes me as very much
+> not the same thing as the hsiphash_* family of functions.
 
-The method that try_to_generate_entropy() uses to detect a cycle counter
-is to check whether two calls to random_get_entropy() return different
-values.  This is uncomfortably prone to false positives if
-random_get_entropy() is a slow counter, as the two calls could return
-different values if the counter happens to be on the cusp of a change.
-Making things worse, the task can be preempted between the calls.
+Well, this documentation starts out by introducing HalfSipHash, and then moves
+on to the the hsiphash functions.  This part is still talking about HalfSipHash,
+so in that context the mention of its use in random.c is relevant.  But I could
+certainly reword it to make it all about the hsiphash functions, with
+HalfSipHash being mentioned more as an implementation detail.
 
-This is problematic because try_to_generate_entropy() doesn't do any
-real entropy estimation later; it always credits 1 bit per loop
-iteration.  To avoid crediting garbage, it relies entirely on the
-preceding check for whether a cycle counter is present.
-
-Therefore, increase the number of counter comparisons from 1 to 3, to
-greatly reduce the rate of false positive cycle counter detections.
-
-Fixes: 50ee7529ec45 ("random: try to actively add entropy rather than passively wait for it")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
-
-v2: compare with previous value rather than first one.
-
- drivers/char/random.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index bf89c6f27a192..18d2d1f959683 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1382,12 +1382,22 @@ static void try_to_generate_entropy(void)
- 		unsigned long entropy;
- 		struct timer_list timer;
- 	} stack;
-+	int i;
- 
-+	/*
-+	 * We must not proceed if we don't actually have a cycle counter.  To
-+	 * detect a cycle counter, check whether random_get_entropy() returns a
-+	 * new value each time.  Check this multiple times to avoid false
-+	 * positives where a slow counter could be just on the cusp of a change.
-+	 */
- 	stack.entropy = random_get_entropy();
-+	for (i = 0; i < 3; i++) {
-+		unsigned long entropy = random_get_entropy();
- 
--	/* Slow counter - or none. Don't even bother */
--	if (stack.entropy == random_get_entropy())
--		return;
-+		if (stack.entropy == entropy)
-+			return;
-+		stack.entropy = entropy;
-+	}
- 
- 	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
- 	while (!crng_ready() && !signal_pending(current)) {
-
-base-commit: 939ee380b17589d026e132a1be91199409c3c934
--- 
-2.35.2
-
+- Eric
