@@ -2,190 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D69C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 13:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC65C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 13:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231186AbiDUNjD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 09:39:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54982 "EHLO
+        id S1386772AbiDUNsq (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Apr 2022 09:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387094AbiDUNiu (ORCPT
+        with ESMTP id S1386739AbiDUNsp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 09:38:50 -0400
+        Thu, 21 Apr 2022 09:48:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E943703C;
-        Thu, 21 Apr 2022 06:35:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0E530F7C;
+        Thu, 21 Apr 2022 06:45:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 35F0C61CD7;
-        Thu, 21 Apr 2022 13:35:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C004EC385A5;
-        Thu, 21 Apr 2022 13:35:57 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GoqJAm4C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650548156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fBF8XmsRCiIUYjI80Gf8USuRO0jyBLOQW0ghuIzMUfs=;
-        b=GoqJAm4Cu0KTquqP5gqWtOhdH6rMAGoykUEHa4E3FJVRieAjwJsYSQLGrNH/OPTdgQ712G
-        wibc9dDaaTdJWUhf/4vWAtNO0Fj31CIvGnoEi6D0jy151tSLvZXy507joUUvU0FOvzIPqW
-        IF507Sg3e50aFwVGBF1oZ8tnC6jHztk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2e7f28a6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 21 Apr 2022 13:35:55 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Alexander Graf <graf@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
-Subject: [PATCH v2] random: add fork_event sysctl for polling VM forks
-Date:   Thu, 21 Apr 2022 15:35:42 +0200
-Message-Id: <20220421133542.277768-1-Jason@zx2c4.com>
-In-Reply-To: <20220419160407.1740458-1-Jason@zx2c4.com>
-References: <20220419160407.1740458-1-Jason@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D9D9661D28;
+        Thu, 21 Apr 2022 13:45:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E300C385A5;
+        Thu, 21 Apr 2022 13:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650548752;
+        bh=qFtjHvTTgWNO14N1FTUsuOdtVG+DvB3hqnuYa75QkOI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=SE1Vam8sVZvXGW1C6EBlMpdMtRLMpHLoJEwBNo+98BGtzmgrJ+0he/ZyoLN+X4PGm
+         2LJ8jT2mosmoRRG5jXx4rb00MNgoqIU7zuwXp9HfsP8RBSK6vnAxDDK6PXVtDUHeVv
+         tI+IP9LoS5TNMU6oTtK7t+NyZr8uT5ErOhIgo/NnhPy8hABRW9lGjSiERBtSedTOqp
+         lRC0xwoz2dTSz9nQM+ZRKRa2e3yK9GqpsbYsjm56hNbLV/XEb35DI/o5WG6wa2DuPd
+         5xNVh7KxNVgqTrG3bqjtA5uGSigxqSsYJh1n3YhOcRjSUBuHfpwyF0Hj4mFfnFF4gu
+         nj0nuyg84MLXA==
+Received: by pali.im (Postfix)
+        id 5EA92CD7; Thu, 21 Apr 2022 15:45:49 +0200 (CEST)
+From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-sha204a: Add support for ATSHA204 cryptochip
+Date:   Thu, 21 Apr 2022 15:44:57 +0200
+Message-Id: <20220421134457.5867-1-pali@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to inform userspace of virtual machine forks, this commit adds
-a "fork_event" sysctl, which does not return any data, but allows
-userspace processes to poll() on it for notification of VM forks.
+ATSHA204 is predecessor of ATSHA204A which supports less features and some
+of them are slightly different.
 
-It avoids exposing the actual vmgenid from the hypervisor to userspace,
-in case there is any randomness value in keeping it secret. Rather,
-userspace is expected to simply use getrandom() if it wants a fresh
-value.
+Introduce a new compatible string for ATSHA204 cryptochip "atmel,atsha204".
 
-For example, the following snippet can be used to print a message every
-time a VM forks, after the RNG has been reseeded:
+Current version of Linux kernel driver atmel-sha204a.c implements only hw
+random number generator which is same in both ATSHA204 and ATSHA204A
+cryptochips. So driver already supports also ATSHA204 hw generator, so just
+simply extends list of compatible strings.
 
-  struct pollfd fd = { .fd = open("/proc/sys/kernel/random/fork_event", O_RDONLY)  };
-  assert(fd.fd >= 0);
-  for (;;) {
-    assert(poll(&fd, 1, -1) > 0);
-    puts("vm fork detected");
-  }
-
-Various programs and libraries that utilize cryptographic operations
-depending on fresh randomness can invalidate old keys or take other
-appropriate actions when receiving that event. While this is racier than
-allowing userspace to mmap/vDSO the vmgenid itself, it's an incremental
-step forward that's not as heavyweight.
-
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Alexander Graf <graf@amazon.com>
-Cc: Jann Horn <jannh@google.com>
-Cc: Colm MacCarthaigh <colmmacc@amazon.com>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
-Alex/Colm - Could you guys let me know if this satisfies what you'd need
-it for at Amazon?
+ Documentation/devicetree/bindings/trivial-devices.yaml | 4 +++-
+ drivers/crypto/atmel-sha204a.c                         | 2 ++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-Changes v1->v2:
-- Some small fixes with the CONFIG_SYSCTL ifdef.
-
- Documentation/admin-guide/sysctl/kernel.rst |  6 ++++--
- drivers/char/random.c                       | 24 +++++++++++++++++++++
- 2 files changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
-index 1144ea3229a3..ddbd603f0be7 100644
---- a/Documentation/admin-guide/sysctl/kernel.rst
-+++ b/Documentation/admin-guide/sysctl/kernel.rst
-@@ -1001,7 +1001,7 @@ This is a directory, with the following entries:
- * ``urandom_min_reseed_secs``: obsolete (used to determine the minimum
-   number of seconds between urandom pool reseeding). This file is
-   writable for compatibility purposes, but writing to it has no effect
--  on any RNG behavior.
-+  on any RNG behavior;
- 
- * ``uuid``: a UUID generated every time this is retrieved (this can
-   thus be used to generate UUIDs at will);
-@@ -1009,8 +1009,10 @@ This is a directory, with the following entries:
- * ``write_wakeup_threshold``: when the entropy count drops below this
-   (as a number of bits), processes waiting to write to ``/dev/random``
-   are woken up. This file is writable for compatibility purposes, but
--  writing to it has no effect on any RNG behavior.
-+  writing to it has no effect on any RNG behavior;
- 
-+* ``fork_event``: unreadable, but can be poll()'d on for notifications
-+  delivered after the RNG reseeds following a virtual machine fork.
- 
- randomize_va_space
- ==================
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index bf89c6f27a19..36196e463b90 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1187,6 +1187,9 @@ EXPORT_SYMBOL_GPL(add_bootloader_randomness);
- 
- #if IS_ENABLED(CONFIG_VMGENID)
- static BLOCKING_NOTIFIER_HEAD(vmfork_chain);
-+#ifdef CONFIG_SYSCTL
-+static DEFINE_CTL_TABLE_POLL(sysctl_fork_event_poll);
-+#endif
- 
- /*
-  * Handle a new unique VM ID, which is unique, not secret, so we
-@@ -1201,6 +1204,9 @@ void add_vmfork_randomness(const void *unique_vm_id, size_t size)
- 		pr_notice("crng reseeded due to virtual machine fork\n");
- 	}
- 	blocking_notifier_call_chain(&vmfork_chain, 0, NULL);
-+#ifdef CONFIG_SYSCTL
-+	proc_sys_poll_notify(&sysctl_fork_event_poll);
-+#endif
- }
- #if IS_MODULE(CONFIG_VMGENID)
- EXPORT_SYMBOL_GPL(add_vmfork_randomness);
-@@ -1655,6 +1661,8 @@ const struct file_operations urandom_fops = {
-  *   It is writable to avoid breaking old userspaces, but writing
-  *   to it does not change any behavior of the RNG.
-  *
-+ * - fork_event - an unreadable file that can be poll()'d on for VM forks.
-+ *
-  ********************************************************************/
- 
- #ifdef CONFIG_SYSCTL
-@@ -1708,6 +1716,14 @@ static int proc_do_rointvec(struct ctl_table *table, int write, void *buffer,
- 	return write ? 0 : proc_dointvec(table, 0, buffer, lenp, ppos);
+diff --git a/Documentation/devicetree/bindings/trivial-devices.yaml b/Documentation/devicetree/bindings/trivial-devices.yaml
+index 091792ba993e..bbff73e1b03a 100644
+--- a/Documentation/devicetree/bindings/trivial-devices.yaml
++++ b/Documentation/devicetree/bindings/trivial-devices.yaml
+@@ -47,7 +47,9 @@ properties:
+           - at,24c08
+             # i2c trusted platform module (TPM)
+           - atmel,at97sc3204t
+-            # i2c h/w symmetric crypto module
++            # ATSHA204 - i2c h/w symmetric crypto module
++          - atmel,atsha204
++            # ATSHA204A - i2c h/w symmetric crypto module
+           - atmel,atsha204a
+             # i2c h/w elliptic curve crypto module
+           - atmel,atecc508a
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index c96c14e7dab1..3a03f4aaf100 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -132,12 +132,14 @@ static int atmel_sha204a_remove(struct i2c_client *client)
  }
  
-+#if IS_ENABLED(CONFIG_VMGENID)
-+static int proc_do_nodata(struct ctl_table *table, int write, void *buffer,
-+			  size_t *lenp, loff_t *ppos)
-+{
-+	return -ENODATA;
-+}
-+#endif
-+
- static struct ctl_table random_table[] = {
- 	{
- 		.procname	= "poolsize",
-@@ -1748,6 +1764,14 @@ static struct ctl_table random_table[] = {
- 		.mode		= 0444,
- 		.proc_handler	= proc_do_uuid,
- 	},
-+#if IS_ENABLED(CONFIG_VMGENID)
-+	{
-+		.procname	= "fork_event",
-+		.mode		= 0444,
-+		.poll		= &sysctl_fork_event_poll,
-+		.proc_handler	= proc_do_nodata,
-+	},
-+#endif
- 	{ }
+ static const struct of_device_id atmel_sha204a_dt_ids[] = {
++	{ .compatible = "atmel,atsha204", },
+ 	{ .compatible = "atmel,atsha204a", },
+ 	{ /* sentinel */ }
  };
+ MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
  
+ static const struct i2c_device_id atmel_sha204a_id[] = {
++	{ "atsha204", 0 },
+ 	{ "atsha204a", 0 },
+ 	{ /* sentinel */ }
+ };
 -- 
-2.35.1
+2.20.1
 
