@@ -2,116 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1906EC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 17:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7809C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 17:34:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390772AbiDURby (ORCPT
+        id S1355257AbiDURgz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 13:31:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59770 "EHLO
+        Thu, 21 Apr 2022 13:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbiDURbx (ORCPT
+        with ESMTP id S1390806AbiDURgy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 13:31:53 -0400
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc08])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E618446B1E
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 10:29:02 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-        by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Kkkzd1GFJzMq0wj;
-        Thu, 21 Apr 2022 19:29:01 +0200 (CEST)
-Received: from ns3096276.ip-94-23-54.eu (unknown [23.97.221.149])
-        by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4KkkzZ4twRzljsTN;
-        Thu, 21 Apr 2022 19:28:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-        s=20191114; t=1650562141;
-        bh=AWCSMTsYxeqMfpT4j3/IgWzaiuTFvDGAFKxBu/PEs7A=;
-        h=Date:To:Cc:References:From:Subject:In-Reply-To:From;
-        b=z/OZ9pMPUnN5igC3T/CamIvR4CIXw3gz6R7fedUtl/VSHSza2ngjhZy0EATPOaHDm
-         agAxEYfJstLZ6XqTARPrKMFOzlTvA9/IQvygJjWfIK3xUJfZKaSnsL7Vk5jCIofP9l
-         RzFPfwpm0yireL020AbdYTSvdNbgMY7Uw0+hj3fw=
-Message-ID: <329a078d-29e3-e41e-3118-cd8f3e00b003@digikod.net>
-Date:   Thu, 21 Apr 2022 19:29:10 +0200
+        Thu, 21 Apr 2022 13:36:54 -0400
+X-Greylist: delayed 521 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Apr 2022 10:34:03 PDT
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3E474A3CE
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 10:34:03 -0700 (PDT)
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 87EA972C8DC;
+        Thu, 21 Apr 2022 20:25:21 +0300 (MSK)
+Received: from beacon.altlinux.org (unknown [193.43.10.250])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 39C424A46F0;
+        Thu, 21 Apr 2022 20:25:21 +0300 (MSK)
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ecrdsa - Fix incorrect use of vli_cmp
+Date:   Thu, 21 Apr 2022 20:25:10 +0300
+Message-Id: <20220421172511.14371-1-vt@altlinux.org>
+X-Mailer: git-send-email 2.11.0
 MIME-Version: 1.0
-User-Agent: 
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Snowberg <eric.snowberg@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        James Morris <jmorris@namei.org>,
-        =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@linux.microsoft.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "Serge E . Hallyn" <serge@hallyn.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-References: <20210312171232.2681989-4-mic@digikod.net>
- <20210312171232.2681989-1-mic@digikod.net>
- <648218.1650450548@warthog.procyon.org.uk> <YmF0eAh7dYmtLDVx@kernel.org>
- <01ec2ce7-986d-451a-4a36-f627263ef826@digikod.net>
- <YmF+4ZZCZxH9OrS+@kernel.org>
-From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-Subject: Re: [PATCH v7 3/5] certs: Make blacklist_vet_description() more
- strict
-In-Reply-To: <YmF+4ZZCZxH9OrS+@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Correctly compare values that shall be greater-or-equal and not just
+greater.
 
-On 21/04/2022 17:57, Jarkko Sakkinen wrote:
-> On Thu, Apr 21, 2022 at 05:27:42PM +0200, Mickaël Salaün wrote:
->>
->> On 21/04/2022 17:12, Jarkko Sakkinen wrote:
->>> On Wed, Apr 20, 2022 at 11:29:08AM +0100, David Howells wrote:
->>>> Mickaël Salaün <mic@digikod.net> wrote:
->>>>
->>>>> +	/* The following algorithm only works if prefix lengths match. */
->>>>> +	BUILD_BUG_ON(sizeof(tbs_prefix) != sizeof(bin_prefix));
->>>>> +	prefix_len = sizeof(tbs_prefix) - 1;
->>>>> +	for (i = 0; *desc; desc++, i++) {
->>>>> +		if (*desc == ':') {
->>>>> +			if (tbs_step == prefix_len)
->>>>> +				goto found_colon;
->>>>> +			if (bin_step == prefix_len)
->>>>> +				goto found_colon;
->>>>> +			return -EINVAL;
->>>>> +		}
->>>>> +		if (i >= prefix_len)
->>>>> +			return -EINVAL;
->>>>> +		if (*desc == tbs_prefix[i])
->>>>> +			tbs_step++;
->>>>> +		if (*desc == bin_prefix[i])
->>>>> +			bin_step++;
->>>>> +	}
->>>>
->>>> I wonder if:
->>>>
->>>> 	static const char tbs_prefix[] = "tbs:";
->>>> 	static const char bin_prefix[] = "bin:";
->>>>
->>>> 	if (strncmp(desc, tbs_prefix, sizeof(tbs_prefix) - 1) == 0 ||
->>>> 	    strncmp(desc, bin_prefix, sizeof(bin_prefix) - 1) == 0)
->>>> 		goto found_colon;
->>>>
->>>> might be better.
->>>>
->>>> David
->>>
->>> I think it'd be.
->>>
->>> BR, Jarkko
->>
->> I'm confused. Didn't you plan to send this patch series before v5.18-rc2?
->> It's been a while since I started working on this.
-> 
-> That was my original plan but due to some other things, I've sent
-> a PR for rc4. I CC'd you to the PR.
+Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+---
+ crypto/ecrdsa.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-OK, I missed it. My micro-optimization isn't worth it, strncmp is much 
-simple indeed.
+diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
+index b32ffcaad9adf..f3c6b5e15e75b 100644
+--- a/crypto/ecrdsa.c
++++ b/crypto/ecrdsa.c
+@@ -113,15 +113,15 @@ static int ecrdsa_verify(struct akcipher_request *req)
+ 
+ 	/* Step 1: verify that 0 < r < q, 0 < s < q */
+ 	if (vli_is_zero(r, ndigits) ||
+-	    vli_cmp(r, ctx->curve->n, ndigits) == 1 ||
++	    vli_cmp(r, ctx->curve->n, ndigits) >= 0 ||
+ 	    vli_is_zero(s, ndigits) ||
+-	    vli_cmp(s, ctx->curve->n, ndigits) == 1)
++	    vli_cmp(s, ctx->curve->n, ndigits) >= 0)
+ 		return -EKEYREJECTED;
+ 
+ 	/* Step 2: calculate hash (h) of the message (passed as input) */
+ 	/* Step 3: calculate e = h \mod q */
+ 	vli_from_le64(e, digest, ndigits);
+-	if (vli_cmp(e, ctx->curve->n, ndigits) == 1)
++	if (vli_cmp(e, ctx->curve->n, ndigits) >= 0)
+ 		vli_sub(e, e, ctx->curve->n, ndigits);
+ 	if (vli_is_zero(e, ndigits))
+ 		e[0] = 1;
+@@ -137,7 +137,7 @@ static int ecrdsa_verify(struct akcipher_request *req)
+ 	/* Step 6: calculate point C = z_1P + z_2Q, and R = x_c \mod q */
+ 	ecc_point_mult_shamir(&cc, z1, &ctx->curve->g, z2, &ctx->pub_key,
+ 			      ctx->curve);
+-	if (vli_cmp(cc.x, ctx->curve->n, ndigits) == 1)
++	if (vli_cmp(cc.x, ctx->curve->n, ndigits) >= 0)
+ 		vli_sub(cc.x, cc.x, ctx->curve->n, ndigits);
+ 
+ 	/* Step 7: if R == r signature is valid */
+-- 
+2.11.0
+
