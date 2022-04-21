@@ -2,53 +2,53 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCFBC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86761C4332F
 	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 10:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388516AbiDUKrP (ORCPT
+        id S1388492AbiDUKrQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 06:47:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
+        Thu, 21 Apr 2022 06:47:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388517AbiDUKrN (ORCPT
+        with ESMTP id S1388522AbiDUKrN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 21 Apr 2022 06:47:13 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA5F2D1CC
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 03:44:18 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id s17so4455110plg.9
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 03:44:18 -0700 (PDT)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B261B2D1E0
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 03:44:23 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id t13so4303732pgn.8
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 03:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6zOuRYVFWDGuC1PrwNUGb6FpSSDkw8m8NU3bhEpx4ck=;
-        b=kCpy3srq/EiBanbPyFzUd0w0fdOrd3PL2QHCcbTp7TZh1XfM6gSXBFFrxDXiKzePET
-         BwCk62X45XrHU1TRgo+rpF5cPK87lvBqe9Z5X9gX1XXa42IXLMh0wrxSbi/ZzoLCkWyg
-         SG7njy+qJTfzPqsl+gQYTHqx+ULb086FwT7Ngo75IOdDDyyoxoL5pgLeUqjDxGNWgG9G
-         225aPoSR1vTY6k9fszQ/AZzu6oQaJEoYoAUR+o+wuYp5q30SnukeGjrXpM2hl3VEYIsH
-         JgLtg/EZ6VTM4QfR2EGeiOBXfMD7vkr3EurEZ95KVGyPnNSwjYsuJ7l1lwN1LgNM1bFS
-         TBag==
+        bh=Vgyphshva4+1MoZbiUZHYBed15/dj2PxkqwfRwCNPpE=;
+        b=EfTBFRclrg2OJBpUoWZLcqlhoTqhRPEqclktYCgbN7WckD+ipu67xVjpp/KgX7S3df
+         0IajjdCl6lQ4JqNYZ2giw2+aoayfss17DKxqHwh6fCOCKA+6vJXZux5rCgrI/FvsvgZW
+         6maMRybm/GRxdmiP7SY1PPpQYHJ3wabRoo8f+BHWM0ec9Z8SSDXgW5f4txOhg+0YNp9e
+         igR+AHPtL0BXLeX/E03XpjTxJnzt+JoQtKDa/lJErvLuZ7Mnh2Vs9vvIAggOKq9U4eSY
+         xmdDLBRPP7BdgUm0SkYvRhfiNAkFaZkxy2rIWHF7ahWI1j//YJPqwXC44BuF6XA7i7kQ
+         FeHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6zOuRYVFWDGuC1PrwNUGb6FpSSDkw8m8NU3bhEpx4ck=;
-        b=UXYX/pvu23asJCmPsRNNmOK3dg/bf6ICqczZjoCXZaHmyBqMLCsAz9I+dc3kU+QLC7
-         hy9ChZcns505NrxBIHaMXByjOlQ0jVjoIrLgbWBK0nCLyghuuruRBbZz4rhcy2l22EeB
-         fmI7p34bvGRw5On3oZKYqutoyoxhDJU+jG7dtw+gSuKbTLPpW7VZZROEf63gwtBydAdF
-         8SZ5CkclLypEsjLGiBMeg+x7Kvn+LQf0vpE5ThR5D9hnQdIrc/O1OIz4UTAMCtVH5pIk
-         3DJ5MZsb9JERRKo4esaWGeH7X64ob/AR22hth04MpLYcefHrnvN6mRpg9kPSTh+1Wwiz
-         DOmw==
-X-Gm-Message-State: AOAM531gnJc5yR1o0e36GCW80T1yBCseSJxrwRrKeo45wQXHuVeMIdgG
-        YAcHHT9nlIyCZ0oPHPbjFI/Idg==
-X-Google-Smtp-Source: ABdhPJxu/20L6f4UIu3TjxYb9mGaNdxihBAZzHQCrTg/qmpKmPcYQWNqpuUUco8L1qBhWTdWiI8RRQ==
-X-Received: by 2002:a17:90b:15c9:b0:1d2:f2f0:e15e with SMTP id lh9-20020a17090b15c900b001d2f2f0e15emr9734310pjb.195.1650537857872;
-        Thu, 21 Apr 2022 03:44:17 -0700 (PDT)
+        bh=Vgyphshva4+1MoZbiUZHYBed15/dj2PxkqwfRwCNPpE=;
+        b=0FOnfrZUiyLVe2cHz7lIiFIUjf34iQ7b/KqYgl8sMm+8nrxUK72U20qcdjj6jMzajn
+         KBn5CAVjPvqurrB+heQIVDC8UOjDICLxv4SnabKdxhEvepjGA4dd8HIbdXR/TMusDQpG
+         86NwXC6m33QjCV9naeTFHbhG/KHp97RLwM9O0nyq/gaU8PJCyCn3ipO2fZ4uC1wHmoTb
+         str/7phzsAqkrjSoAXdESMdwcBlDUe0LD50/m+Mx0wrHjSrihorCn0b8hLikfx2ooIwP
+         CXHxeC2fYnHxo3eX4472mfFg09aavlmz1SzEjEreuAlaLYgh0WDj74vsSpxGTTap447G
+         hJPQ==
+X-Gm-Message-State: AOAM532suE6tsKhdYRuX0lItQs4MymTkSRpSQHl+k4GFp4pItLvbym0P
+        EpuUPPD8f9DhgpniHIWzGYonPw==
+X-Google-Smtp-Source: ABdhPJyJLS3mZ53Vu2R9I+Mt2sPcqwMG8V444JCZXnqM/k/gHuRh+50aLFK0VyGbedV642Rj9fvPKg==
+X-Received: by 2002:a65:6e9a:0:b0:382:1804:35c8 with SMTP id bm26-20020a656e9a000000b00382180435c8mr23664506pgb.584.1650537863265;
+        Thu, 21 Apr 2022 03:44:23 -0700 (PDT)
 Received: from always-x1.bytedance.net ([61.120.150.69])
-        by smtp.gmail.com with ESMTPSA id w7-20020aa79547000000b0050ad0e82e6dsm3772485pfq.215.2022.04.21.03.44.13
+        by smtp.gmail.com with ESMTPSA id w7-20020aa79547000000b0050ad0e82e6dsm3772485pfq.215.2022.04.21.03.44.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Apr 2022 03:44:17 -0700 (PDT)
+        Thu, 21 Apr 2022 03:44:22 -0700 (PDT)
 From:   zhenwei pi <pizhenwei@bytedance.com>
 To:     arei.gonglei@huawei.com, mst@redhat.com
 Cc:     jasowang@redhat.com, herbert@gondor.apana.org.au,
@@ -56,9 +56,9 @@ Cc:     jasowang@redhat.com, herbert@gondor.apana.org.au,
         virtualization@lists.linux-foundation.org,
         linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
         davem@davemloft.net, zhenwei pi <pizhenwei@bytedance.com>
-Subject: [PATCH v3 4/5] virtio-crypto: adjust dst_len at ops callback
-Date:   Thu, 21 Apr 2022 18:40:15 +0800
-Message-Id: <20220421104016.453458-5-pizhenwei@bytedance.com>
+Subject: [PATCH v3 5/5] virtio-crypto: enable retry for virtio-crypto-dev
+Date:   Thu, 21 Apr 2022 18:40:16 +0800
+Message-Id: <20220421104016.453458-6-pizhenwei@bytedance.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220421104016.453458-1-pizhenwei@bytedance.com>
 References: <20220421104016.453458-1-pizhenwei@bytedance.com>
@@ -70,10 +70,8 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: lei he <helei.sig11@bytedance.com>
 
-For some akcipher operations(eg, decryption of pkcs1pad(rsa)),
-the length of returned result maybe less than akcipher_req->dst_len,
-we need to recalculate the actual dst_len through the virt-queue
-protocol.
+Enable retry for virtio-crypto-dev, so that crypto-engine
+can process cipher-requests parallelly.
 
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -81,27 +79,23 @@ Cc: Gonglei <arei.gonglei@huawei.com>
 Signed-off-by: lei he <helei.sig11@bytedance.com>
 Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
 ---
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/virtio/virtio_crypto_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index 9561bc2df62b..82db86e088c2 100644
---- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -90,9 +90,12 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
- 	}
- 
- 	akcipher_req = vc_akcipher_req->akcipher_req;
--	if (vc_akcipher_req->opcode != VIRTIO_CRYPTO_AKCIPHER_VERIFY)
-+	if (vc_akcipher_req->opcode != VIRTIO_CRYPTO_AKCIPHER_VERIFY) {
-+		/* actuall length maybe less than dst buffer */
-+		akcipher_req->dst_len = len - sizeof(vc_req->status);
- 		sg_copy_from_buffer(akcipher_req->dst, sg_nents(akcipher_req->dst),
- 				    vc_akcipher_req->dst_buf, akcipher_req->dst_len);
-+	}
- 	virtio_crypto_akcipher_finalize_req(vc_akcipher_req, akcipher_req, error);
- }
- 
+diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+index d8edefcb966c..5c0d68c9e894 100644
+--- a/drivers/crypto/virtio/virtio_crypto_core.c
++++ b/drivers/crypto/virtio/virtio_crypto_core.c
+@@ -62,7 +62,8 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
+ 		spin_lock_init(&vi->data_vq[i].lock);
+ 		vi->data_vq[i].vq = vqs[i];
+ 		/* Initialize crypto engine */
+-		vi->data_vq[i].engine = crypto_engine_alloc_init(dev, 1);
++		vi->data_vq[i].engine = crypto_engine_alloc_init_and_set(dev, true, NULL, 1,
++						virtqueue_get_vring_size(vqs[i]));
+ 		if (!vi->data_vq[i].engine) {
+ 			ret = -ENOMEM;
+ 			goto err_engine;
 -- 
 2.20.1
 
