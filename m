@@ -2,70 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 326B7C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 23:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B035C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 23:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442614AbiDUXn2 (ORCPT
+        id S1442639AbiDUXpl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 19:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42908 "EHLO
+        Thu, 21 Apr 2022 19:45:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442612AbiDUXnW (ORCPT
+        with ESMTP id S1442641AbiDUXpk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 19:43:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7142565CF;
-        Thu, 21 Apr 2022 16:40:30 -0700 (PDT)
+        Thu, 21 Apr 2022 19:45:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73072DF94;
+        Thu, 21 Apr 2022 16:42:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C93B61ED6;
-        Thu, 21 Apr 2022 23:40:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A32C385A7;
-        Thu, 21 Apr 2022 23:40:28 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 32C41B82936;
+        Thu, 21 Apr 2022 23:42:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 964C0C385A5;
+        Thu, 21 Apr 2022 23:42:46 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="QvHrmzwU"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NVmiYK09"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650584427;
+        t=1650584564;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=LKGSSXBewV8iwcVtrAOqicwFSmOZw+K6H7Pd52VpMcY=;
-        b=QvHrmzwUGemOIsU3YRqPcoKjV5EFRVm/GbypSc0nolztWPEAS0uQUoSkafHp01gyNmOKKV
-        TTa3D1rCL0c1RAAJJljgS5tK7DC1mAnppgi4zO2A+MJ6XFIu/lo+Uu3PkEcOI8IeUN+EoM
-        QPtowJpnEXOpxsvHh9f9/cXQUEQRvA8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4a195fe7 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 21 Apr 2022 23:40:27 +0000 (UTC)
-Date:   Fri, 22 Apr 2022 01:40:25 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2] random: avoid mis-detecting a slow counter as a cycle
- counter
-Message-ID: <YmHraZcGnY3stnp9@zx2c4.com>
-References: <20220421233152.58522-1-ebiggers@kernel.org>
+        bh=fIzHio+uxVuTQw5AaXIBz3IslDSgrYMj80mgg85aq28=;
+        b=NVmiYK09KEDShaBadngaz4Lp+bC64fimPUzeMa1CJeDpmBhmSSpuiwC/mhyueCcIB+wPna
+        xyuaHO3VBpQf3O8bQss5Oib2otF9j3ALCdtVlWLN88XrRDG/ugNGkFzhFBAajV9dPeHDTx
+        /Aq+G+QvwQKG/CgbdUQMCHCW/LT4haQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8cec7543 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 21 Apr 2022 23:42:43 +0000 (UTC)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-2ec42eae76bso68827087b3.10;
+        Thu, 21 Apr 2022 16:42:43 -0700 (PDT)
+X-Gm-Message-State: AOAM53089ijOGAjwEHrvooWdP8NEoEpYvV0ObJMfLng5u/MCas5qXnTM
+        Ere8k5Ftx94Pan62INvgGOzgq64pSoD5Pqo4nn4=
+X-Google-Smtp-Source: ABdhPJyhwBhwVx853EkJ6v1OHlANWFc0m51HpFCbvj021jqbLAw/CZSPBJWVYXr7iLFAu7q6T/xDWZIk+aRkFG4U4fI=
+X-Received: by 2002:a05:690c:39a:b0:2ef:67cc:ddd6 with SMTP id
+ bh26-20020a05690c039a00b002ef67ccddd6mr2353983ywb.2.1650584563035; Thu, 21
+ Apr 2022 16:42:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220421233152.58522-1-ebiggers@kernel.org>
+References: <20220421204320.258010-1-ebiggers@kernel.org> <CAHmME9rtrjyE0Cqk9qvW_xxhFduvbMt5-cmjD134JCxk2iLKDQ@mail.gmail.com>
+ <YmHrWy2o72k2cFLM@sol.localdomain>
+In-Reply-To: <YmHrWy2o72k2cFLM@sol.localdomain>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 22 Apr 2022 01:42:32 +0200
+X-Gmail-Original-Message-ID: <CAHmME9ozRGG9V=jsf=Ebg-ipXpyU_3uyFcRn=YYXSgdgqhM33Q@mail.gmail.com>
+Message-ID: <CAHmME9ozRGG9V=jsf=Ebg-ipXpyU_3uyFcRn=YYXSgdgqhM33Q@mail.gmail.com>
+Subject: Re: [PATCH] siphash: update the HalfSipHash documentation
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi Eric,
 
-Thanks. This looks better.
+On Fri, Apr 22, 2022 at 1:40 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> Well, this documentation starts out by introducing HalfSipHash, and then moves
+> on to the the hsiphash functions.  This part is still talking about HalfSipHash,
+> so in that context the mention of its use in random.c is relevant.  But I could
+> certainly reword it to make it all about the hsiphash functions, with
+> HalfSipHash being mentioned more as an implementation detail.
 
-On Thu, Apr 21, 2022 at 04:31:52PM -0700, Eric Biggers wrote:
-> Therefore, increase the number of counter comparisons from 1 to 3, to
-> greatly reduce the rate of false positive cycle counter detections.
-> +	for (i = 0; i < 3; i++) {
-> +		unsigned long entropy = random_get_entropy();
- 
-Wondering: why do you do 3 comparisons rather than 2? What does 3 get
-you that 2 doesn't already? I thought the only real requirement was that
-in the event where (a)!=(b), (b) is read as meaningfully close as
-possible to when the counter changes.
+Alright, so let's just drop that hunk for v2 then.
 
 Jason
