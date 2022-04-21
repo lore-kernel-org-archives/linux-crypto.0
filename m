@@ -2,110 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0C7C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 18:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F196C4321E
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 19:25:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379172AbiDUTAk (ORCPT
+        id S1391930AbiDUT2s (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 15:00:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
+        Thu, 21 Apr 2022 15:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351440AbiDUTAk (ORCPT
+        with ESMTP id S1391925AbiDUT2r (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 15:00:40 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3651D2194;
-        Thu, 21 Apr 2022 11:57:48 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23LINT1q004811;
-        Thu, 21 Apr 2022 18:57:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=yH3e3O+rZ2tn1EqO8Imom1AG6duRE+lhELtbT/HFyQQ=;
- b=HoRT8AfGNws3DCRe8JbbeZdb47cRPtTdbowwNQ89lQ811a8pm4EeZHQIHWJAjuXDEJk8
- AgxSoDB9yBO7rd0o0QJiG7MaxkoAzLQ/gfKgGzTOTiNU+0Nmbd4yuP13gYUxT+9DeMRo
- lxau7Ymh1XOIt6jRKtd9IlASWqDi9/4diZ5YW0fdoA59w0KV/INByjP1LpBSg0Ju49Hp
- YHyGF/Z8+l55c4Y0E0tyuVto0s2gdDCnwZeNZQA5bMAIqVYzpfybbStmPxmpzzKr6uQS
- rbgbnig5qsXDLs9pbhc1F49VyMZ27a37Zbn1R2qUHc+1kp0JICPkRfUL4sMIhzV1RJF3 Zw== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8xke8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 18:57:43 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LIr0kx027257;
-        Thu, 21 Apr 2022 18:57:42 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04wdc.us.ibm.com with ESMTP id 3ffneantn8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 21 Apr 2022 18:57:42 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LIvggD61342052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Apr 2022 18:57:42 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D78E124053;
-        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15F89124052;
-        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
-From:   Stefan Berger <stefanb@linux.ibm.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Stefan Berger <stefanb@linux.ibm.com>, stable@vger.kernel.org
-Subject: [PATCH] ecdsa: Fix incorrect usage of vli_cmp
-Date:   Thu, 21 Apr 2022 14:57:40 -0400
-Message-Id: <20220421185740.799271-1-stefanb@linux.ibm.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 21 Apr 2022 15:28:47 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A13D4D26C;
+        Thu, 21 Apr 2022 12:25:56 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id 1C9CB92009D; Thu, 21 Apr 2022 21:25:53 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id 18FDA92009C;
+        Thu, 21 Apr 2022 20:25:53 +0100 (BST)
+Date:   Thu, 21 Apr 2022 20:25:53 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, x86@kernel.org,
+        linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v5 04/11] mips: use fallback for random_get_entropy()
+ instead of just c0 random
+In-Reply-To: <20220419111650.1582274-5-Jason@zx2c4.com>
+Message-ID: <alpine.DEB.2.21.2204212018540.9383@angie.orcam.me.uk>
+References: <20220419111650.1582274-1-Jason@zx2c4.com> <20220419111650.1582274-5-Jason@zx2c4.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7VZxFIY05jd0-f9UHPCO1iLIfXjU5szl
-X-Proofpoint-ORIG-GUID: 7VZxFIY05jd0-f9UHPCO1iLIfXjU5szl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-21_04,2022-04-21_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204210098
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix incorrect usage of vli_cmp when calculating the value of res.x. For
-signature verification to succeed, res.x must be the same as the r
-component of the signature which is in the range of [1..n-1] with 'n'
-being the order of the curve. Therefore, when res.x equals n calculate
-res.x = res.x - n as well. Signature verification could have previously
-unnecessarily failed in extremely rare cases.
+On Tue, 19 Apr 2022, Jason A. Donenfeld wrote:
 
-Fixes: 4e6602916bc6 ("crypto: ecdsa - Add support for ECDSA signature verification")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- crypto/ecdsa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> For situations in which we don't have a c0 counter register available,
+> we've been falling back to reading the c0 "random" register, which is
+> usually bounded by the amount of TLB entries and changes every other
+> cycle or so. This means it wraps extremely often. We can do better by
+> combining this fast-changing counter with a potentially slower-changing
+> counter from random_get_entropy_fallback() in the more significant bits.
+> This commit combines the two, taking into account that the changing bits
+> are in a different bit position depending on the CPU model. In addition,
+> we previously were falling back to 0 for ancient CPUs that Linux does
+> not support anyway; remove that dead path entirely.
 
-diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index b3a8a6b572ba..674ab9275366 100644
---- a/crypto/ecdsa.c
-+++ b/crypto/ecdsa.c
-@@ -120,8 +120,8 @@ static int _ecdsa_verify(struct ecc_ctx *ctx, const u64 *hash, const u64 *r, con
- 	/* res = u1*G + u2 * pub_key */
- 	ecc_point_mult_shamir(&res, u1, &curve->g, u2, &ctx->pub_key, curve);
- 
--	/* res.x = res.x mod n (if res.x > order) */
--	if (unlikely(vli_cmp(res.x, curve->n, ndigits) == 1))
-+	/* res.x = res.x mod n (if res.x >= order) */
-+	if (unlikely(vli_cmp(res.x, curve->n, ndigits) >= 0))
- 		/* faster alternative for NIST p384, p256 & p192 */
- 		vli_sub(res.x, res.x, curve->n, ndigits);
- 
--- 
-2.34.1
+Tested-by: Maciej W. Rozycki <macro@orcam.me.uk>
 
+ I've pushed the algorithm through testing with a number of suitable 
+systems:
+
+- an R2000A and an R3000A with no timer of any kind, only jiffies,
+
+- an R3400 with a chipset timer only,
+
+- an R4400SC with a usable buggy CP0 counter and a chipset timer,
+
+- a 5Kc with a good CP0 counter only,
+
+with no obvious issues spotted.  Thank you for working on this!
+
+  Maciej
