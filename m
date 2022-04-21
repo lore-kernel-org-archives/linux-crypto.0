@@ -2,108 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 20:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CADC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 20:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384811AbiDUUXd (ORCPT
+        id S1392535AbiDUUrF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 16:23:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44024 "EHLO
+        Thu, 21 Apr 2022 16:47:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232935AbiDUUXd (ORCPT
+        with ESMTP id S1349411AbiDUUrF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 16:23:33 -0400
+        Thu, 21 Apr 2022 16:47:05 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9152C36171;
-        Thu, 21 Apr 2022 13:20:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A234E391;
+        Thu, 21 Apr 2022 13:44:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4D43FB8290E;
-        Thu, 21 Apr 2022 20:20:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49FCDC385A5;
-        Thu, 21 Apr 2022 20:20:39 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CXoE+Cc0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650572437;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AOnL2h4VjVIz9OJWMKbJ/CWQbIxRNPBwFjf/MNHCgKk=;
-        b=CXoE+Cc0sY67hYi7NqwUUGDxSv6pcZTnS6LCm7VH15g6E9nGKYm9P8kLremZ666ri3W6HM
-        +eD2wrhREOQkbLwqYk15t+cdbnaK0fkppCJBrD1Je6k32SNSiazMAW3YCB6c9DGf5fo5nK
-        gye2OchubXp3bYga2HjwAX2V76422Ik=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e61353f9 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 21 Apr 2022 20:20:37 +0000 (UTC)
-Date:   Thu, 21 Apr 2022 22:20:35 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Andy Polyakov <appro@cryptogams.org>
-Subject: Re: [PATCH] random: avoid mis-detecting a slow counter as a cycle
- counter
-Message-ID: <YmG8k1JrVexBGmJL@zx2c4.com>
-References: <20220421192939.250680-1-ebiggers@kernel.org>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 082E1B828D8;
+        Thu, 21 Apr 2022 20:44:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A652DC385A7;
+        Thu, 21 Apr 2022 20:44:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650573851;
+        bh=8xH5wV1KvrkMTwGdQxQZPmkY2ffhRKacNykV31qXzQA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ll979oUoHbSxXuVHKN9EkSPu3NI0XxkU+Xe2izKWxGiK6wBGtmrtZA8ncRq8kIuJ0
+         u7gXJh+q/F88e4uAwPEiJKrDm1jy4tT8iH20ArGHJNFC4DYpRwYHEkUzYSXNWPKKgQ
+         RRtZ74nI1LStL9ozF3v/tG77EEp2XEjGYgfV1SPU3dRmzzUbDGCGwTPl66RD7z8SJi
+         k6+i1Er7adPa015OAr2wRzO/WTikDK6zO6zm6FLxbr/3qH5tUTF8UP9bjr2DfTZh/T
+         n/WippRsMYbWH/HkzfV3XIgCbZWiTIGDfxIOpVOhmFX80VgFjNIMxteE26O9KK53/k
+         wCI8RYjAP2YPg==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A . Donenfeld " <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH] siphash: update the HalfSipHash documentation
+Date:   Thu, 21 Apr 2022 13:43:20 -0700
+Message-Id: <20220421204320.258010-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.35.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220421192939.250680-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+From: Eric Biggers <ebiggers@google.com>
 
-On Thu, Apr 21, 2022 at 9:30 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> The method that try_to_generate_entropy() uses to detect a cycle counter
-> is to check whether two calls to random_get_entropy() return different
-> values.  This is uncomfortably prone to false positives if
-> random_get_entropy() is a slow counter, as the two calls could return
-> different values if the counter happens to be on the cusp of a change.
-> Making things worse, the task can be preempted between the calls.
->
-> This is problematic because try_to_generate_entropy() doesn't do any
-> real entropy estimation later; it always credits 1 bit per loop
-> iteration.  To avoid crediting garbage, it relies entirely on the
-> preceding check for whether a cycle counter is present.
->
-> Therefore, increase the number of counter comparisons from 1 to 3, to
-> greatly reduce the rate of false positive cycle counter detections.
+Update the documentation for HalfSipHash to correctly explain that the
+kernel actually implements either HalfSipHash-1-3 or SipHash-1-3, and
+that HalfSipHash-1-3 is not entirely limited to hashtable functions,
+with it now being used in the interrupt entropy accumulator.
 
-Thanks for the patch. It seems like this at least is not worse than
-before. But before I commit this and we forget about the problem for a
-while, I was also wondering if we can do much, much better than before,
-and actually make this "work" with slow counters. Right now, the core
-algorithm is:
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ Documentation/security/siphash.rst | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-    while (!crng_ready()) {
-        if (no timer) mod_timer(jiffies + 1);
-	mix(sample);
-	schedule();    // <---- calls the timer, which does credit_entry_bits(1)
-	sample = rdtsc;
-    }
+diff --git a/Documentation/security/siphash.rst b/Documentation/security/siphash.rst
+index bd9363025fcbc..9b079b2ac2a1a 100644
+--- a/Documentation/security/siphash.rst
++++ b/Documentation/security/siphash.rst
+@@ -121,15 +121,23 @@ even scarier, uses an easily brute-forcable 64-bit key (with a 32-bit output)
+ instead of SipHash's 128-bit key. However, this may appeal to some
+ high-performance `jhash` users.
+ 
+-Danger!
++**Danger!** HalfSipHash should only be used in a very limited set of use cases
++where nothing better is possible, namely:
+ 
+-Do not ever use HalfSipHash except for as a hashtable key function, and only
+-then when you can be absolutely certain that the outputs will never be
+-transmitted out of the kernel. This is only remotely useful over `jhash` as a
+-means of mitigating hashtable flooding denial of service attacks.
++- Hashtable key functions, where the outputs will never be transmitted out of
++  the kernel. This is only remotely useful over `jhash` as a means of mitigating
++  hashtable flooding denial of service attacks.
+ 
+-Generating a HalfSipHash key
+-============================
++- The interrupt entropy accumulator in ``drivers/char/random.c``. This is a very
++  special case; do *not* use this as example code for anything else.
++
++Note, 64-bit kernels actually implement SipHash-1-3 instead of HalfSipHash-1-3;
++the "hsiphash" functions redirect to either algorithm. This is done for
++performance reasons; it does *not* mean that the hsiphash functions are
++cryptographically secure on 64-bit platforms.
++
++Generating a hsiphash key
++=========================
+ 
+ Keys should always be generated from a cryptographically secure source of
+ random numbers, either using get_random_bytes or get_random_once:
+@@ -139,8 +147,8 @@ get_random_bytes(&key, sizeof(key));
+ 
+ If you're not deriving your key from here, you're doing it wrong.
+ 
+-Using the HalfSipHash functions
+-===============================
++Using the hsiphash functions
++============================
+ 
+ There are two variants of the function, one that takes a list of integers, and
+ one that takes a buffer::
+-- 
+2.35.2
 
-So we credit 1 bit every time that timer fires. What if the timer
-instead did this:
-
-    static void entropy_timer(struct timer_list *t)
-    {
-        struct timer_state *s = container_of(...t...);
-        if (++s->samples == s->samples_per_bit) {
-            credit_entropy_bits(1);
-            s->samples = 0;
-        }
-    }
-
-Currently, samples_per_bit is 1. What if we make it >1 on systems with
-slow cycle counters? The question then is: how do we relate some
-information about cycle counter samples to the samples_per_bit estimate?
-The jitter stuff in crypto/ does something. Andy (CC'd) mentioned to me
-last week that he did something some time ago computing FFTs on the fly
-or something like that. And maybe there are other ideas still. I wonder
-if we can find something appropriate for the kernel here.
-
-Any thoughts on that direction?
-
-Jason
