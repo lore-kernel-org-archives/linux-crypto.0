@@ -2,52 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B50C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 09:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B10DC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 10:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242624AbiDUJ7a (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 05:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
+        id S232617AbiDUKC6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Apr 2022 06:02:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232617AbiDUJ73 (ORCPT
+        with ESMTP id S1388042AbiDUKCv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 05:59:29 -0400
+        Thu, 21 Apr 2022 06:02:51 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D758521250
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 02:56:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7870F559E;
+        Thu, 21 Apr 2022 03:00:01 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nhTYC-005CyX-GS; Thu, 21 Apr 2022 19:56:38 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 21 Apr 2022 17:56:36 +0800
-Date:   Thu, 21 Apr 2022 17:56:36 +0800
+        id 1nhTbO-005D0w-ND; Thu, 21 Apr 2022 19:59:56 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 21 Apr 2022 17:59:55 +0800
+Date:   Thu, 21 Apr 2022 17:59:55 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] hwrng: cn10k - Enable compile testing
-Message-ID: <YmEqVLcteYSrDYr6@gondor.apana.org.au>
+To:     Jayesh Choudhary <j-choudhary@ti.com>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, davem@davemloft.net,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
+Subject: Re: [PATCH 0/2] New compatible for sa3ul for AM62x
+Message-ID: <YmErG35E5B2hqrEc@gondor.apana.org.au>
+References: <20220412073016.6014-1-j-choudhary@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20220412073016.6014-1-j-choudhary@ti.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch enables COMPILE_TEST for cn10k.
+On Tue, Apr 12, 2022 at 01:00:14PM +0530, Jayesh Choudhary wrote:
+> This series add the new compatible for sa3ul in the bindings and
+> driver file which will be used further in device tree nodes to
+> enable crypto support in TI SoC AM62x.
+> 
+> I will post the patch to enable crypto accelerator once this series
+> is merged.
+> 
+> Jayesh Choudhary (2):
+>   dt-bindings: crypto: ti,sa2ul: Add a new compatible for AM62
+>   crypto: sa2ul: Add the new compatible for AM62
+> 
+>  Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml | 1 +
+>  drivers/crypto/sa2ul.c                                 | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> -- 
+> 2.17.1
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index dad084c0ecee..faf0116fa9de 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -540,7 +540,7 @@ config HW_RANDOM_ARM_SMCCC_TRNG
- 
- config HW_RANDOM_CN10K
-        tristate "Marvell CN10K Random Number Generator support"
--       depends on HW_RANDOM && PCI && ARM64
-+       depends on HW_RANDOM && PCI && (ARM64 || COMPILE_TEST)
-        default HW_RANDOM
-        help
- 	 This driver provides support for the True Random Number
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
