@@ -2,83 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7809C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 17:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0C7C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Apr 2022 18:57:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355257AbiDURgz (ORCPT
+        id S1379172AbiDUTAk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 13:36:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39076 "EHLO
+        Thu, 21 Apr 2022 15:00:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390806AbiDURgy (ORCPT
+        with ESMTP id S1351440AbiDUTAk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 13:36:54 -0400
-X-Greylist: delayed 521 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 21 Apr 2022 10:34:03 PDT
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3E474A3CE
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 10:34:03 -0700 (PDT)
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 87EA972C8DC;
-        Thu, 21 Apr 2022 20:25:21 +0300 (MSK)
-Received: from beacon.altlinux.org (unknown [193.43.10.250])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 39C424A46F0;
-        Thu, 21 Apr 2022 20:25:21 +0300 (MSK)
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+        Thu, 21 Apr 2022 15:00:40 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3651D2194;
+        Thu, 21 Apr 2022 11:57:48 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23LINT1q004811;
+        Thu, 21 Apr 2022 18:57:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=yH3e3O+rZ2tn1EqO8Imom1AG6duRE+lhELtbT/HFyQQ=;
+ b=HoRT8AfGNws3DCRe8JbbeZdb47cRPtTdbowwNQ89lQ811a8pm4EeZHQIHWJAjuXDEJk8
+ AgxSoDB9yBO7rd0o0QJiG7MaxkoAzLQ/gfKgGzTOTiNU+0Nmbd4yuP13gYUxT+9DeMRo
+ lxau7Ymh1XOIt6jRKtd9IlASWqDi9/4diZ5YW0fdoA59w0KV/INByjP1LpBSg0Ju49Hp
+ YHyGF/Z8+l55c4Y0E0tyuVto0s2gdDCnwZeNZQA5bMAIqVYzpfybbStmPxmpzzKr6uQS
+ rbgbnig5qsXDLs9pbhc1F49VyMZ27a37Zbn1R2qUHc+1kp0JICPkRfUL4sMIhzV1RJF3 Zw== 
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3fjer8xke8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 18:57:43 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23LIr0kx027257;
+        Thu, 21 Apr 2022 18:57:42 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma04wdc.us.ibm.com with ESMTP id 3ffneantn8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Apr 2022 18:57:42 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23LIvggD61342052
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Apr 2022 18:57:42 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2D78E124053;
+        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 15F89124052;
+        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 21 Apr 2022 18:57:42 +0000 (GMT)
+From:   Stefan Berger <stefanb@linux.ibm.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: ecrdsa - Fix incorrect use of vli_cmp
-Date:   Thu, 21 Apr 2022 20:25:10 +0300
-Message-Id: <20220421172511.14371-1-vt@altlinux.org>
-X-Mailer: git-send-email 2.11.0
+Cc:     linux-kernel@vger.kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>, stable@vger.kernel.org
+Subject: [PATCH] ecdsa: Fix incorrect usage of vli_cmp
+Date:   Thu, 21 Apr 2022 14:57:40 -0400
+Message-Id: <20220421185740.799271-1-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7VZxFIY05jd0-f9UHPCO1iLIfXjU5szl
+X-Proofpoint-ORIG-GUID: 7VZxFIY05jd0-f9UHPCO1iLIfXjU5szl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-21_04,2022-04-21_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ mlxscore=0 priorityscore=1501 phishscore=0 malwarescore=0 mlxlogscore=999
+ lowpriorityscore=0 spamscore=0 adultscore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204210098
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Correctly compare values that shall be greater-or-equal and not just
-greater.
+Fix incorrect usage of vli_cmp when calculating the value of res.x. For
+signature verification to succeed, res.x must be the same as the r
+component of the signature which is in the range of [1..n-1] with 'n'
+being the order of the curve. Therefore, when res.x equals n calculate
+res.x = res.x - n as well. Signature verification could have previously
+unnecessarily failed in extremely rare cases.
 
-Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+Fixes: 4e6602916bc6 ("crypto: ecdsa - Add support for ECDSA signature verification")
 Cc: <stable@vger.kernel.org>
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- crypto/ecrdsa.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ crypto/ecdsa.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
-index b32ffcaad9adf..f3c6b5e15e75b 100644
---- a/crypto/ecrdsa.c
-+++ b/crypto/ecrdsa.c
-@@ -113,15 +113,15 @@ static int ecrdsa_verify(struct akcipher_request *req)
+diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
+index b3a8a6b572ba..674ab9275366 100644
+--- a/crypto/ecdsa.c
++++ b/crypto/ecdsa.c
+@@ -120,8 +120,8 @@ static int _ecdsa_verify(struct ecc_ctx *ctx, const u64 *hash, const u64 *r, con
+ 	/* res = u1*G + u2 * pub_key */
+ 	ecc_point_mult_shamir(&res, u1, &curve->g, u2, &ctx->pub_key, curve);
  
- 	/* Step 1: verify that 0 < r < q, 0 < s < q */
- 	if (vli_is_zero(r, ndigits) ||
--	    vli_cmp(r, ctx->curve->n, ndigits) == 1 ||
-+	    vli_cmp(r, ctx->curve->n, ndigits) >= 0 ||
- 	    vli_is_zero(s, ndigits) ||
--	    vli_cmp(s, ctx->curve->n, ndigits) == 1)
-+	    vli_cmp(s, ctx->curve->n, ndigits) >= 0)
- 		return -EKEYREJECTED;
+-	/* res.x = res.x mod n (if res.x > order) */
+-	if (unlikely(vli_cmp(res.x, curve->n, ndigits) == 1))
++	/* res.x = res.x mod n (if res.x >= order) */
++	if (unlikely(vli_cmp(res.x, curve->n, ndigits) >= 0))
+ 		/* faster alternative for NIST p384, p256 & p192 */
+ 		vli_sub(res.x, res.x, curve->n, ndigits);
  
- 	/* Step 2: calculate hash (h) of the message (passed as input) */
- 	/* Step 3: calculate e = h \mod q */
- 	vli_from_le64(e, digest, ndigits);
--	if (vli_cmp(e, ctx->curve->n, ndigits) == 1)
-+	if (vli_cmp(e, ctx->curve->n, ndigits) >= 0)
- 		vli_sub(e, e, ctx->curve->n, ndigits);
- 	if (vli_is_zero(e, ndigits))
- 		e[0] = 1;
-@@ -137,7 +137,7 @@ static int ecrdsa_verify(struct akcipher_request *req)
- 	/* Step 6: calculate point C = z_1P + z_2Q, and R = x_c \mod q */
- 	ecc_point_mult_shamir(&cc, z1, &ctx->curve->g, z2, &ctx->pub_key,
- 			      ctx->curve);
--	if (vli_cmp(cc.x, ctx->curve->n, ndigits) == 1)
-+	if (vli_cmp(cc.x, ctx->curve->n, ndigits) >= 0)
- 		vli_sub(cc.x, cc.x, ctx->curve->n, ndigits);
- 
- 	/* Step 7: if R == r signature is valid */
 -- 
-2.11.0
+2.34.1
 
