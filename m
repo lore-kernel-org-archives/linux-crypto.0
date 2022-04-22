@@ -2,129 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EE4C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 02:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C596C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 06:58:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1443468AbiDVCod (ORCPT
+        id S1352012AbiDVHBe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Apr 2022 22:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41000 "EHLO
+        Fri, 22 Apr 2022 03:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353014AbiDVCod (ORCPT
+        with ESMTP id S1349101AbiDVHBd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Apr 2022 22:44:33 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD494C41D
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 19:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650595298; x=1682131298;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0H+dqDafy0QtwS4F6hhvIGfbg8sBLbyVV0ipTGHQWrk=;
-  b=PpG6WVoAY/lX4k3kVelFw+aPH+8ZQS3BwziFD9sHpY5U0ZEHfCfgIpVI
-   ge+gXwCFqSF3dN+HTR8+8uOvzmN1IIiRlUlyKXEpUkBol9qdiI672emCJ
-   GiE6D4fRWTYvYRMH8Yk9fqKEy2MugMiUbpI5ZIHoASxRuLugpERr5jxZt
-   ufYJPov9spSeXR1TEKebFqlE5Tg0HoiDFOKr0i+X45gN8nDDWou7BmWti
-   klAyrqa1V466RiViIn9NDuh1ARkSwofB41vqTsoXKdGhBu7niPb4OLkYE
-   FrR6N2e2zXa6LRZhqF1fuFsSuLCPzK/aFKXbdzNW4dU++jH0P+2ru4TV5
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="350987816"
-X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
-   d="scan'208";a="350987816"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 19:41:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
-   d="scan'208";a="728297781"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 21 Apr 2022 19:41:35 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nhjEl-000980-7v;
-        Fri, 22 Apr 2022 02:41:35 +0000
-Date:   Fri, 22 Apr 2022 10:40:59 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org
-Subject: Re: [PATCH] hwrng: cn10k - Enable compile testing
-Message-ID: <202204221037.taeIlED5-lkp@intel.com>
-References: <YmEqVLcteYSrDYr6@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YmEqVLcteYSrDYr6@gondor.apana.org.au>
+        Fri, 22 Apr 2022 03:01:33 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C9450E2D
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 23:58:41 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id t4so6656321pgc.1
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 23:58:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ilKMohUyCVfP3cDqrVw2LdFD9mYpqar2wJSPIf9OKBA=;
+        b=2f7kR5hrJh3MurGD6PTL+aTZYNv/GAgABQCqmAi1wf/jUtevyutOHHAAkLnwNK/TiF
+         hI4IxRca1WEjgA3lmLueTRqkH9ObwBxIAE6wpmq1N/Dnpy80j+WXSXihAXn/3R3SjdjU
+         XAU4udqLPqBVPGiGNp3Ou+agh3I5f9v1MESSh9NHPEs7Vpfy0JQMx5sWS26M36QrT2y8
+         dWfVkRqvRRKmw2QYdxf0UB+KF51lMIZMtOw2YnRlq16vJLRSpJwu7WUAJfOzmD3FNF+8
+         AysH2x0WajWEoqxLOY7s/1JaUqEpn0zC0iiAJ4d2Oc4ZKv+cBrrzN+Vk2fUieFdwM1B6
+         hTiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=ilKMohUyCVfP3cDqrVw2LdFD9mYpqar2wJSPIf9OKBA=;
+        b=1wvK6Y/v6CJwDqAO74AVzkcy2eZhXxBQB+G6BRyR7R3AAiHKwkXfRJIsWKEBzxs6gJ
+         b0/dNyrYcTS2lqdYmIBD5g9MMRhjswIFvR11s3CJYccZZl9BqVBwZbXQbFIil3zLKWoC
+         a9JEiN3Uhqj0wXmlklkgA5hmKsidPlYEOC4/Zem5PDO6gRf5nGM4zfCCoq5pk9ktWHhq
+         8ljYI9/VD9YBfm56rKyvpjB1fCiS5YbCLN5OBg5ByEzv4CuYeunOukvv3NRzfTupUEvZ
+         qMGptcH6T7j09eJfCHrz6FuSGZTglwwf6S+566pg7PVNK1JbU7SwVu/3sQzNzhdfqqsn
+         awPQ==
+X-Gm-Message-State: AOAM531+WIF0nFCDR85l3yZipvydl/1Ml6+hf1umGnGhL8pYoxBIRaac
+        35fAUq8/UyKrwjHLpy2CMixybA==
+X-Google-Smtp-Source: ABdhPJwAxvRXOUtp5mektbxoAMvMclDpwduv3JT8wNDZcxAmMT1Qefc5+E5HUvI054mZm0L51/Y1Xg==
+X-Received: by 2002:a63:5859:0:b0:3aa:4cf7:fbfd with SMTP id i25-20020a635859000000b003aa4cf7fbfdmr2753287pgm.522.1650610720608;
+        Thu, 21 Apr 2022 23:58:40 -0700 (PDT)
+Received: from [10.76.43.148] ([61.120.150.78])
+        by smtp.gmail.com with ESMTPSA id x23-20020a17090a0bd700b001cd498dc152sm5139199pjd.2.2022.04.21.23.58.36
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Apr 2022 23:58:40 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [External] [PATCH v3 4/5] virtio-crypto: adjust dst_len at ops
+ callback
+From:   =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>
+In-Reply-To: <4edf9c3d37f1435a8a6701a7429a3aba@huawei.com>
+Date:   Fri, 22 Apr 2022 14:58:33 +0800
+Cc:     =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>,
+        zhenwei pi <pizhenwei@bytedance.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7B16C43E-1C25-44B6-A4F0-B546935ECA27@bytedance.com>
+References: <20220421104016.453458-1-pizhenwei@bytedance.com>
+ <20220421104016.453458-5-pizhenwei@bytedance.com>
+ <4edf9c3d37f1435a8a6701a7429a3aba@huawei.com>
+To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
-
-I love your patch! Yet something to improve:
-
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on herbert-cryptodev-2.6/master v5.18-rc3 next-20220421]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/hwrng-cn10k-Enable-compile-testing/20220421-181432
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git c50c29a806113614098efd8da9fd7b48d605ba45
-config: arm-randconfig-r023-20220421 (https://download.01.org/0day-ci/archive/20220422/202204221037.taeIlED5-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 5bd87350a5ae429baf8f373cb226a57b62f87280)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm cross compiling tool for clang build
-        # apt-get install binutils-arm-linux-gnueabi
-        # https://github.com/intel-lab-lkp/linux/commit/c804fd47b3fa542852a8cbd9c76ded8a43d32a90
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Herbert-Xu/hwrng-cn10k-Enable-compile-testing/20220421-181432
-        git checkout c804fd47b3fa542852a8cbd9c76ded8a43d32a90
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/char/hw_random/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
->> drivers/char/hw_random/cn10k-rng.c:55:11: error: call to undeclared function 'readq'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           status = readq(rng->reg_base + RNM_PF_EBG_HEALTH);
-                    ^
-   drivers/char/hw_random/cn10k-rng.c:71:11: error: call to undeclared function 'readq'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-           *value = readq(rng->reg_base + RNM_PF_RANDOM);
-                    ^
-   2 errors generated.
 
 
-vim +/readq +55 drivers/char/hw_random/cn10k-rng.c
+> On Apr 21, 2022, at 9:46 PM, Gonglei (Arei) <arei.gonglei@huawei.com> =
+wrote:
+>=20
+>=20
+>=20
+>> -----Original Message-----
+>> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
+>> Sent: Thursday, April 21, 2022 6:40 PM
+>> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com
+>> Cc: jasowang@redhat.com; herbert@gondor.apana.org.au;
+>> linux-kernel@vger.kernel.org; =
+virtualization@lists.linux-foundation.org;
+>> linux-crypto@vger.kernel.org; helei.sig11@bytedance.com;
+>> davem@davemloft.net; zhenwei pi <pizhenwei@bytedance.com>
+>> Subject: [PATCH v3 4/5] virtio-crypto: adjust dst_len at ops callback
+>>=20
+>> From: lei he <helei.sig11@bytedance.com>
+>>=20
+>> For some akcipher operations(eg, decryption of pkcs1pad(rsa)), the =
+length of
+>> returned result maybe less than akcipher_req->dst_len, we need to =
+recalculate
+>> the actual dst_len through the virt-queue protocol.
+>>=20
+> OK ...
+>=20
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Gonglei <arei.gonglei@huawei.com>
+>> Signed-off-by: lei he <helei.sig11@bytedance.com>
+>> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+>> ---
+>> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 ++++-
+>> 1 file changed, 4 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+>> b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+>> index 9561bc2df62b..82db86e088c2 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+>> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+>> @@ -90,9 +90,12 @@ static void
+>> virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+>> 	}
+>>=20
+>> 	akcipher_req =3D vc_akcipher_req->akcipher_req;
+>> -	if (vc_akcipher_req->opcode !=3D VIRTIO_CRYPTO_AKCIPHER_VERIFY)
+>> +	if (vc_akcipher_req->opcode !=3D VIRTIO_CRYPTO_AKCIPHER_VERIFY) =
+{
+>> +		/* actuall length maybe less than dst buffer */
+>> +		akcipher_req->dst_len =3D len - sizeof(vc_req->status);
+>=20
+> ...but why minus sizeof(vc_req->status)?
 
-38e9791a020904 Sunil Goutham 2021-12-14  45  
-38e9791a020904 Sunil Goutham 2021-12-14  46  static int check_rng_health(struct cn10k_rng *rng)
-38e9791a020904 Sunil Goutham 2021-12-14  47  {
-38e9791a020904 Sunil Goutham 2021-12-14  48  	u64 status;
-38e9791a020904 Sunil Goutham 2021-12-14  49  	int err;
-38e9791a020904 Sunil Goutham 2021-12-14  50  
-38e9791a020904 Sunil Goutham 2021-12-14  51  	/* Skip checking health */
-38e9791a020904 Sunil Goutham 2021-12-14  52  	if (!rng->reg_base)
-38e9791a020904 Sunil Goutham 2021-12-14  53  		return 0;
-38e9791a020904 Sunil Goutham 2021-12-14  54  
-38e9791a020904 Sunil Goutham 2021-12-14 @55  	status = readq(rng->reg_base + RNM_PF_EBG_HEALTH);
-38e9791a020904 Sunil Goutham 2021-12-14  56  	if (status & BIT_ULL(20)) {
-38e9791a020904 Sunil Goutham 2021-12-14  57  		err = reset_rng_health_state(rng);
-38e9791a020904 Sunil Goutham 2021-12-14  58  		if (err) {
-38e9791a020904 Sunil Goutham 2021-12-14  59  			dev_err(&rng->pdev->dev, "HWRNG: Health test failed (status=%llx)\n",
-38e9791a020904 Sunil Goutham 2021-12-14  60  					status);
-38e9791a020904 Sunil Goutham 2021-12-14  61  			dev_err(&rng->pdev->dev, "HWRNG: error during reset\n");
-38e9791a020904 Sunil Goutham 2021-12-14  62  		}
-38e9791a020904 Sunil Goutham 2021-12-14  63  	}
-38e9791a020904 Sunil Goutham 2021-12-14  64  	return 0;
-38e9791a020904 Sunil Goutham 2021-12-14  65  }
-38e9791a020904 Sunil Goutham 2021-12-14  66  
+The len here indicates the total length of data written by the device. =
+for encrypt/decrypt/sign,
+the virt crypto device writes two parts of data: dst_data and =
+status(virtio_crypto_inhdr).=20
+To obtain dst_len, the size of status needs to be subtracted.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+>=20
+>=20
+> Regards,
+> -Gonglei
+
