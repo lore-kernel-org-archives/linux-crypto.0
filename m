@@ -2,132 +2,159 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1B0C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 13:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 571C4C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 22:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1448120AbiDVNqE (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Apr 2022 09:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
+        id S233765AbiDVW67 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Apr 2022 18:58:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234180AbiDVNqC (ORCPT
+        with ESMTP id S233726AbiDVW60 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Apr 2022 09:46:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD34583BA;
-        Fri, 22 Apr 2022 06:43:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26818620E2;
-        Fri, 22 Apr 2022 13:43:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CF18C385A9;
-        Fri, 22 Apr 2022 13:43:08 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MlmeQg3/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650634981;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=R42MnBKkf8h8aMzJ+cq5aRlVGTDAAdFMWhjGUtpnOIw=;
-        b=MlmeQg3/JN/ztJlQabbkkw8Vcws4ZxrJJbHqrroh7rKqcWjE7Yc5bQnl0asaPf2cRPMJ3/
-        rNMDBgiJF8qj2EuXsJ6s5DY2dEzRFJQMjR4qgjJPGD6+9ENYshkAhJUvQHiUxMX6HPh2DG
-        hqGqpWH26uIs2yIJMZyE9VhEtJ9qHVE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 83ceb0e7 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 22 Apr 2022 13:43:01 +0000 (UTC)
-Received: by mail-yb1-f171.google.com with SMTP id r189so14556958ybr.6;
-        Fri, 22 Apr 2022 06:43:00 -0700 (PDT)
-X-Gm-Message-State: AOAM532kZN3KWlfpy0pTnJJTnPZShZYo6OnV6ncjJxkZ1tqgY9E+XC7X
-        nNSRr6rwIv7kaggvgw06LQAZ6imzvwGzBcuRIG8=
-X-Google-Smtp-Source: ABdhPJx9K/LQrXlpklM23ol0Z3JZyNOCdXqSd2EzOTmrZn2FBUeMKgXLI+QYgcW5HOkaYMQeJS5qVmG3QVbckVtLCVU=
-X-Received: by 2002:a05:6902:154d:b0:644:b2e7:146 with SMTP id
- r13-20020a056902154d00b00644b2e70146mr4512095ybu.271.1650634978328; Fri, 22
- Apr 2022 06:42:58 -0700 (PDT)
+        Fri, 22 Apr 2022 18:58:26 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7C124C102;
+        Fri, 22 Apr 2022 15:23:14 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id b15so9237824pfm.5;
+        Fri, 22 Apr 2022 15:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=JHEFbCSzTituLXCXTybtRDjC+y4H0lJbUwGY4K6dh4E=;
+        b=JospNFsSTIe/Rnweo7xoBSMAwPsWRhI+HalpospItgXy7W/qZdF3kmQY1hbWUmC3w0
+         fq4SvMARuC4IKQw+C1r1t+l5xrKV3UFnYLpdpCMB9XOEYRxOchbAjkh/OMxa+tLWXMh0
+         SqApkjtdPHkNun3pqATVhKID/GJuDTkIGRUqyFK3qq3Ok03w07uBcQ82XkkyScmYCctC
+         xGZDGvU3IT2WWjd10DQ0Z5fpCHak72FDL6PDx2W5pvLNO4YKduoX34KwWDreLBNgjScS
+         0JBnYiCzEPoU+FGoFZzwFre2EVDC8v/VxBYCzPuEYpoHOtDXuT6oNIvQReaV0woyXJZF
+         SPuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JHEFbCSzTituLXCXTybtRDjC+y4H0lJbUwGY4K6dh4E=;
+        b=AXihqnn69CVEpaQ7oeQH9kG1ghe1zOBJDePBkfrr00PgSJMYg1Xcbn29VpyRGN93dU
+         TCjHTUkOQO6ACgflrMLYMn9YG36vmbUTlL1SpI3xD1tAI8on52mbb26GsbjeTBTR4SHT
+         ajgl6pSjweazDHihbc6uv3M3dTGvWNA5H7DU3ZdlEBCyEgJFr8mbFxjyXxDf2xGpdRyI
+         XKqYE8rOH8v+iZk4dREpGhGjAvKV+sqeRUFUGsdycoL8Rdevzn+zS4ly8srfq9PluEIS
+         FO0eeg4MYCniKjhVPnXjstEd9MbvfcoUTcWncPqLdu2e2ChagI2+I9cGQtFAau2eLo3X
+         INCQ==
+X-Gm-Message-State: AOAM533Pzf/4S5hK4QSMlP3PYYY6nlLLhVODZvRYbaRgiiC9gvGMDxw0
+        De5m8WbYNr2/we2o0pSxqdJKdeFvr+nySgoRCpU=
+X-Google-Smtp-Source: ABdhPJyDQUVX549ZAM/GhSq5TvdRe+3wmbnPKS/TXPeMAAHJlEEBOkpcQqH3k9vfAcdEgLYcT0dXF4t1xGtEgApvjUE=
+X-Received: by 2002:a05:6a00:22c8:b0:50a:dbf5:59cf with SMTP id
+ f8-20020a056a0022c800b0050adbf559cfmr7056093pfj.74.1650666193435; Fri, 22 Apr
+ 2022 15:23:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
- <YjoC5kQMqyC/3L5Y@zx2c4.com> <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
-In-Reply-To: <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 22 Apr 2022 15:42:46 +0200
-X-Gmail-Original-Message-ID: <CAHmME9rmeQAD2DwG=APTmDxuVxFDH=6GXoKpgPrU9rc9oXrmxQ@mail.gmail.com>
-Message-ID: <CAHmME9rmeQAD2DwG=APTmDxuVxFDH=6GXoKpgPrU9rc9oXrmxQ@mail.gmail.com>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
+References: <20220405212129.2270-1-cf.natali@gmail.com> <YmHwjdfZJJ2DeLTK@zx2c4.com>
+In-Reply-To: <YmHwjdfZJJ2DeLTK@zx2c4.com>
+From:   =?UTF-8?Q?Charles=2DFran=C3=A7ois_Natali?= <cf.natali@gmail.com>
+Date:   Fri, 22 Apr 2022 23:23:01 +0100
+Message-ID: <CAH_1eM2ECPKLcHAKQ-RNf4Zj5hrgT-aJ9pjTKfChf9fnZp5Vkw@mail.gmail.com>
+Subject: Re: [PATCH] WireGuard: restrict packet handling to non-isolated CPUs.
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Guenter,
+Hi,
 
-On Tue, Mar 22, 2022 at 6:56 PM Guenter Roeck <linux@roeck-us.net> wrote:
+On Fri, 22 Apr 2022 at 01:02, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> On 3/22/22 10:09, Jason A. Donenfeld wrote:
-> > Hey Guenter,
-> >
-> > On Tue, Mar 22, 2022 at 08:58:20AM -0700, Guenter Roeck wrote:
-> >> On Thu, Feb 17, 2022 at 05:28:48PM +0100, Jason A. Donenfeld wrote:
-> >>> This topic has come up countless times, and usually doesn't go anywhere.
-> >>> This time I thought I'd bring it up with a slightly narrower focus,
-> >>> updated for some developments over the last three years: we finally can
-> >>> make /dev/urandom always secure, in light of the fact that our RNG is
-> >>> now always seeded.
-> >>>
-> >>
-> >> [ ... ]
-> >>
-> >> This patch (or a later version of it) made it into mainline and causes a
-> >> large number of qemu boot test failures for various architectures (arm,
-> >> m68k, microblaze, sparc32, xtensa are the ones I observed). Common
-> >> denominator is that boot hangs at "Saving random seed:". A sample bisect
-> >> log is attached. Reverting this patch fixes the problem.
-> >
-> > As Linus said, it was worth a try, but I guess it just didn't work. For
-> > my own curiosity, though, do you have a link to those QEMU VMs you could
-> > share? I'd sort of like to poke around, and if we do ever reattempt this
-> > sometime down the road, it seems like understanding everything about why
-> > the previous time failed might be a good idea.
-> >
+> netdev@ - Original thread is at
+> https://lore.kernel.org/wireguard/20220405212129.2270-1-cf.natali@gmail.c=
+om/
 >
-> Everything - including the various root file systems - is at
-> git@github.com:groeck/linux-build-test.git. Look into rootfs/ for the
-> various boot tests. I'll be happy to provide some qemu command lines
-> if needed.
+> Hi Charles-Fran=C3=A7ois,
+>
+> On Tue, Apr 05, 2022 at 10:21:29PM +0100, Charles-Francois Natali wrote:
+> > WireGuard currently uses round-robin to dispatch the handling of
+> > packets, handling them on all online CPUs, including isolated ones
+> > (isolcpus).
+> >
+> > This is unfortunate because it causes significant latency on isolated
+> > CPUs - see e.g. below over 240 usec:
+> >
+> > kworker/47:1-2373323 [047] 243644.756405: funcgraph_entry: |
+> > process_one_work() { kworker/47:1-2373323 [047] 243644.756406:
+> > funcgraph_entry: | wg_packet_decrypt_worker() { [...]
+> > kworker/47:1-2373323 [047] 243644.756647: funcgraph_exit: 0.591 us | }
+> > kworker/47:1-2373323 [047] 243644.756647: funcgraph_exit: ! 242.655 us
+> > | }
+> >
+> > Instead, restrict to non-isolated CPUs.
+>
+> Huh, interesting... I haven't seen this feature before. What's the
+> intended use case? To never run _anything_ on those cores except
+> processes you choose? To run some things but not intensive things? Is it
+> sort of a RT-lite?
 
-I've been playing with a few things, and I'm wondering how close I am
-to making this problem go away. I just made this branch:
-https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/log/?h=jd/for-guenter
+Yes, the idea is to not run anything on those cores: no user tasks, no unbo=
+und
+workqueues, etc.
+Typically one would also set IRQ affinity etc to avoid those cores, to avoi=
+d
+(soft)IRQS which cause significant latency as well.
 
-Any interest in setting your tests on that and seeing if it still
-breaks? Or, perhaps better, do you have a single script that runs all
-your various tests and does all the toolchain things right, so I can
-just point it at that tree and iterate?
+This series by Frederic Weisbecker is a good introduction:
+https://www.suse.com/c/cpu-isolation-introduction-part-1/
 
-Jason
+The idea is to achieve low latency and jitter.
+With a reasonably tuned kernel one can reach around 10usec latency - howeve=
+r
+whenever we start using wireguard, we can see the bound workqueues used for
+round-robin dispatch cause up to 1ms stalls, which is just not
+acceptable for us.
+Currently our only option is to either patch the wireguard code, or
+stop using it,
+which would be a shame :).
+
+> I took a look in padata/pcrypt and it doesn't look like they're
+> examining the housekeeping mask at all. Grepping for
+> housekeeping_cpumask doesn't appear to show many results in things like
+> workqueues, but rather in core scheduling stuff. So I'm not quite sure
+> what to make of this patch.
+
+Thanks, I didn't know about padata, but after skimming through the code it =
+does
+seem that it would suffer from the same issue.
+
+> I suspect the thing to do might be to patch both wireguard and padata,
+> and send a patch series to me, the padata people, and
+> netdev@vger.kernel.org, and we can all hash this out together.
+
+Sure, I'll try to have a look at the padata code and write something up.
+
+> Regarding your patch, is there a way to make that a bit more succinct,
+> without introducing all of those helper functions? It seems awfully
+> verbose for something that seems like a matter of replacing the online
+> mask with the housekeeping mask.
+
+Indeed, I wasn't really happy about that.
+The reason I've written those helper functions is that the housekeeping mas=
+k
+includes possible CPUs (cpu_possible_mask), so unfortunately it's not just =
+a
+matter of e.g. replacing cpu_online_mask with
+housekeeping_cpumask(HK_FLAG_DOMAIN), we have to perform an AND
+whenever we compute the weight, find the next CPU in the mask etc.
+
+And I'd rather have the operations and mask in a single location instead of
+scattered throughout the code, to make it easier to understand and maintain=
+.
+
+Happy to change to something more inline though, or open to suggestions.
+
+Cheers,
+
+Charles
+
+
+>
+> Jason
