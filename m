@@ -2,145 +2,663 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C596C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 06:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A82C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Apr 2022 07:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352012AbiDVHBe (ORCPT
+        id S1444980AbiDVHom (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Apr 2022 03:01:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57878 "EHLO
+        Fri, 22 Apr 2022 03:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349101AbiDVHBd (ORCPT
+        with ESMTP id S1444971AbiDVHom (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Apr 2022 03:01:33 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C9450E2D
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 23:58:41 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id t4so6656321pgc.1
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Apr 2022 23:58:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ilKMohUyCVfP3cDqrVw2LdFD9mYpqar2wJSPIf9OKBA=;
-        b=2f7kR5hrJh3MurGD6PTL+aTZYNv/GAgABQCqmAi1wf/jUtevyutOHHAAkLnwNK/TiF
-         hI4IxRca1WEjgA3lmLueTRqkH9ObwBxIAE6wpmq1N/Dnpy80j+WXSXihAXn/3R3SjdjU
-         XAU4udqLPqBVPGiGNp3Ou+agh3I5f9v1MESSh9NHPEs7Vpfy0JQMx5sWS26M36QrT2y8
-         dWfVkRqvRRKmw2QYdxf0UB+KF51lMIZMtOw2YnRlq16vJLRSpJwu7WUAJfOzmD3FNF+8
-         AysH2x0WajWEoqxLOY7s/1JaUqEpn0zC0iiAJ4d2Oc4ZKv+cBrrzN+Vk2fUieFdwM1B6
-         hTiw==
+        Fri, 22 Apr 2022 03:44:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1A9B1506F9
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Apr 2022 00:41:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650613308;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pdKLtwZK5Sd17EXPwwL/D1E/z7xr4keMdDdXRl8/G4Q=;
+        b=Yb5fYRH02FY0MMCbAdGpVNn5TZ0/rAwL7UzCKfQuFeShTOsk7r4FmSutNzngmwbGPVXNQY
+        +NJ8w/yV2yufLmoGDX+oETIVyeQXNzvP1+bO3xYpLx++mywJBWxJOnmd7cVRaEGHs9d5/u
+        x1iRQjFd2AjRqLqEovRtXry/tcwqIcM=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-408-OMLaqmkzNBiLZlN093X9Jg-1; Fri, 22 Apr 2022 03:41:44 -0400
+X-MC-Unique: OMLaqmkzNBiLZlN093X9Jg-1
+Received: by mail-pf1-f200.google.com with SMTP id h66-20020a628345000000b0050ac8fa710eso4742094pfe.0
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Apr 2022 00:41:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=ilKMohUyCVfP3cDqrVw2LdFD9mYpqar2wJSPIf9OKBA=;
-        b=1wvK6Y/v6CJwDqAO74AVzkcy2eZhXxBQB+G6BRyR7R3AAiHKwkXfRJIsWKEBzxs6gJ
-         b0/dNyrYcTS2lqdYmIBD5g9MMRhjswIFvR11s3CJYccZZl9BqVBwZbXQbFIil3zLKWoC
-         a9JEiN3Uhqj0wXmlklkgA5hmKsidPlYEOC4/Zem5PDO6gRf5nGM4zfCCoq5pk9ktWHhq
-         8ljYI9/VD9YBfm56rKyvpjB1fCiS5YbCLN5OBg5ByEzv4CuYeunOukvv3NRzfTupUEvZ
-         qMGptcH6T7j09eJfCHrz6FuSGZTglwwf6S+566pg7PVNK1JbU7SwVu/3sQzNzhdfqqsn
-         awPQ==
-X-Gm-Message-State: AOAM531+WIF0nFCDR85l3yZipvydl/1Ml6+hf1umGnGhL8pYoxBIRaac
-        35fAUq8/UyKrwjHLpy2CMixybA==
-X-Google-Smtp-Source: ABdhPJwAxvRXOUtp5mektbxoAMvMclDpwduv3JT8wNDZcxAmMT1Qefc5+E5HUvI054mZm0L51/Y1Xg==
-X-Received: by 2002:a63:5859:0:b0:3aa:4cf7:fbfd with SMTP id i25-20020a635859000000b003aa4cf7fbfdmr2753287pgm.522.1650610720608;
-        Thu, 21 Apr 2022 23:58:40 -0700 (PDT)
-Received: from [10.76.43.148] ([61.120.150.78])
-        by smtp.gmail.com with ESMTPSA id x23-20020a17090a0bd700b001cd498dc152sm5139199pjd.2.2022.04.21.23.58.36
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Apr 2022 23:58:40 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [External] [PATCH v3 4/5] virtio-crypto: adjust dst_len at ops
- callback
-From:   =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>
-In-Reply-To: <4edf9c3d37f1435a8a6701a7429a3aba@huawei.com>
-Date:   Fri, 22 Apr 2022 14:58:33 +0800
-Cc:     =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>,
-        zhenwei pi <pizhenwei@bytedance.com>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7B16C43E-1C25-44B6-A4F0-B546935ECA27@bytedance.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=pdKLtwZK5Sd17EXPwwL/D1E/z7xr4keMdDdXRl8/G4Q=;
+        b=aWqZYVxQMAvC2pWkUwOlEEfler40eWT6LIlQpYcpCUSm4Cr4JhAPSVHe6LI6e1X5R5
+         9dNaoLvi8nFq4x0SwS0ZbFmiHmDjuY/k8h7nqaAcOKFrp6ceca5O2xEWrjubzdqaWa4C
+         VGjZv05Fqq47lBLuaqUGXbA0nUSGnVWf4UwTtveqaUgxSDVtKybP+QDJh3tegRR+O6xN
+         DenlcFPqGi9DX7jbFePMW6XM38IzmiKr+pnECB2DKuvb2LqMWPM9KVWCaUCxXDtC/YIm
+         13VpubtZNujyt36Ikwtze6ZNdDOANPGBXugYPGV/RXWU0CUzn+cBt3kwZ4prJWYL/H3Q
+         diHA==
+X-Gm-Message-State: AOAM530gPw4Etu9CrE+oSCwGexWN5sUPLZiB1BBDgu+FIuKjc/osG9at
+        Z5xGCzZEGOZugEpYtK2XLSBowFIlfwnP2JgbLXv7C1acn+RWSEy0RYJhn8OxB2iWaa5ix/X/fjj
+        RgMRMG8Tw65kNrQynuxHAUybD
+X-Received: by 2002:a17:90b:1b45:b0:1d2:d46f:57d4 with SMTP id nv5-20020a17090b1b4500b001d2d46f57d4mr3951991pjb.214.1650613303424;
+        Fri, 22 Apr 2022 00:41:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/lQLk2H6hJW4zMuC9L+S5/UfIPvYNJfvCLIzNthe22JQT76Zt2zmJ+Vy4cNLeHTZqE/D22g==
+X-Received: by 2002:a17:90b:1b45:b0:1d2:d46f:57d4 with SMTP id nv5-20020a17090b1b4500b001d2d46f57d4mr3951958pjb.214.1650613303083;
+        Fri, 22 Apr 2022 00:41:43 -0700 (PDT)
+Received: from [10.72.12.62] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id n184-20020a6227c1000000b0050a3bbd36d6sm1418035pfn.204.2022.04.22.00.41.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Apr 2022 00:41:42 -0700 (PDT)
+Message-ID: <7996f495-3bb8-fa80-7866-fa1fbff3e80a@redhat.com>
+Date:   Fri, 22 Apr 2022 15:41:37 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v3 1/5] virtio-crypto: use private buffer for control
+ request
+Content-Language: en-US
+To:     zhenwei pi <pizhenwei@bytedance.com>, arei.gonglei@huawei.com,
+        mst@redhat.com
+Cc:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
+        davem@davemloft.net
 References: <20220421104016.453458-1-pizhenwei@bytedance.com>
- <20220421104016.453458-5-pizhenwei@bytedance.com>
- <4edf9c3d37f1435a8a6701a7429a3aba@huawei.com>
-To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+ <20220421104016.453458-2-pizhenwei@bytedance.com>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220421104016.453458-2-pizhenwei@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
+在 2022/4/21 18:40, zhenwei pi 写道:
+> Originally, all of the control requests share a single buffer(
+> ctrl & input & ctrl_status fields in struct virtio_crypto), this
+> allows queue depth 1 only, the performance of control queue gets
+> limited by this design.
+>
+> In this patch, each request allocates request buffer dynamically, and
+> free buffer after request, it's possible to optimize control queue
+> depth in the next step.
+>
+> A necessary comment is already in code, still describe it again:
+> /*
+>   * Note: there are padding fields in request, clear them to zero before
+>   * sending to host,
+>   * Ex, virtio_crypto_ctrl_request::ctrl::u::destroy_session::padding[48]
+>   */
+> So use kzalloc to allocate buffer of struct virtio_crypto_ctrl_request.
+>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Gonglei <arei.gonglei@huawei.com>
+> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+> ---
+>   drivers/crypto/virtio/Makefile                |   1 +
+>   .../virtio/virtio_crypto_akcipher_algs.c      |  90 ++++++------
+>   drivers/crypto/virtio/virtio_crypto_common.c  |  39 +++++
 
-> On Apr 21, 2022, at 9:46 PM, Gonglei (Arei) <arei.gonglei@huawei.com> =
-wrote:
->=20
->=20
->=20
->> -----Original Message-----
->> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
->> Sent: Thursday, April 21, 2022 6:40 PM
->> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com
->> Cc: jasowang@redhat.com; herbert@gondor.apana.org.au;
->> linux-kernel@vger.kernel.org; =
-virtualization@lists.linux-foundation.org;
->> linux-crypto@vger.kernel.org; helei.sig11@bytedance.com;
->> davem@davemloft.net; zhenwei pi <pizhenwei@bytedance.com>
->> Subject: [PATCH v3 4/5] virtio-crypto: adjust dst_len at ops callback
->>=20
->> From: lei he <helei.sig11@bytedance.com>
->>=20
->> For some akcipher operations(eg, decryption of pkcs1pad(rsa)), the =
-length of
->> returned result maybe less than akcipher_req->dst_len, we need to =
-recalculate
->> the actual dst_len through the virt-queue protocol.
->>=20
-> OK ...
->=20
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Jason Wang <jasowang@redhat.com>
->> Cc: Gonglei <arei.gonglei@huawei.com>
->> Signed-off-by: lei he <helei.sig11@bytedance.com>
->> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
->> ---
->> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 5 ++++-
->> 1 file changed, 4 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> index 9561bc2df62b..82db86e088c2 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> @@ -90,9 +90,12 @@ static void
->> virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
->> 	}
->>=20
->> 	akcipher_req =3D vc_akcipher_req->akcipher_req;
->> -	if (vc_akcipher_req->opcode !=3D VIRTIO_CRYPTO_AKCIPHER_VERIFY)
->> +	if (vc_akcipher_req->opcode !=3D VIRTIO_CRYPTO_AKCIPHER_VERIFY) =
-{
->> +		/* actuall length maybe less than dst buffer */
->> +		akcipher_req->dst_len =3D len - sizeof(vc_req->status);
->=20
-> ...but why minus sizeof(vc_req->status)?
 
-The len here indicates the total length of data written by the device. =
-for encrypt/decrypt/sign,
-the virt crypto device writes two parts of data: dst_data and =
-status(virtio_crypto_inhdr).=20
-To obtain dst_len, the size of status needs to be subtracted.
+Any reason we can't use virtio_crypto_core.c?
 
->=20
->=20
-> Regards,
-> -Gonglei
+
+>   drivers/crypto/virtio/virtio_crypto_common.h  |  19 ++-
+>   .../virtio/virtio_crypto_skcipher_algs.c      | 133 ++++++++----------
+>   5 files changed, 156 insertions(+), 126 deletions(-)
+>   create mode 100644 drivers/crypto/virtio/virtio_crypto_common.c
+>
+> diff --git a/drivers/crypto/virtio/Makefile b/drivers/crypto/virtio/Makefile
+> index bfa6cbae342e..49c1fa80e465 100644
+> --- a/drivers/crypto/virtio/Makefile
+> +++ b/drivers/crypto/virtio/Makefile
+> @@ -3,5 +3,6 @@ obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio_crypto.o
+>   virtio_crypto-objs := \
+>   	virtio_crypto_skcipher_algs.o \
+>   	virtio_crypto_akcipher_algs.o \
+> +	virtio_crypto_common.o \
+>   	virtio_crypto_mgr.o \
+>   	virtio_crypto_core.o
+> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> index f3ec9420215e..9561bc2df62b 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+> @@ -102,8 +102,8 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+>   {
+>   	struct scatterlist outhdr_sg, key_sg, inhdr_sg, *sgs[3];
+>   	struct virtio_crypto *vcrypto = ctx->vcrypto;
+> +	struct virtio_crypto_ctrl_request *vc_ctrl_req;
+>   	uint8_t *pkey;
+> -	unsigned int inlen;
+>   	int err;
+>   	unsigned int num_out = 0, num_in = 0;
+>   
+> @@ -111,98 +111,91 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+>   	if (!pkey)
+>   		return -ENOMEM;
+>   
+> -	spin_lock(&vcrypto->ctrl_lock);
+> -	memcpy(&vcrypto->ctrl.header, header, sizeof(vcrypto->ctrl.header));
+> -	memcpy(&vcrypto->ctrl.u, para, sizeof(vcrypto->ctrl.u));
+> -	vcrypto->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+> +	vc_ctrl_req = kzalloc(sizeof(*vc_ctrl_req), GFP_KERNEL);
+> +	if (!vc_ctrl_req) {
+> +		err = -ENOMEM;
+> +		goto out;
+> +	}
+>   
+> -	sg_init_one(&outhdr_sg, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	memcpy(&vc_ctrl_req->ctrl.header, header, sizeof(vc_ctrl_req->ctrl.header));
+> +	memcpy(&vc_ctrl_req->ctrl.u, para, sizeof(vc_ctrl_req->ctrl.u));
+> +	sg_init_one(&outhdr_sg, &vc_ctrl_req->ctrl, sizeof(vc_ctrl_req->ctrl));
+>   	sgs[num_out++] = &outhdr_sg;
+>   
+>   	sg_init_one(&key_sg, pkey, keylen);
+>   	sgs[num_out++] = &key_sg;
+>   
+> -	sg_init_one(&inhdr_sg, &vcrypto->input, sizeof(vcrypto->input));
+> +	vc_ctrl_req->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+
+
+Nit: if there's no special reason, let's move this after the above 
+memcpys as what's done previously.
+
+
+> +	sg_init_one(&inhdr_sg, &vc_ctrl_req->input, sizeof(vc_ctrl_req->input));
+>   	sgs[num_out + num_in++] = &inhdr_sg;
+>   
+> -	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out, num_in, vcrypto, GFP_ATOMIC);
+> +	err = virtio_crypto_ctrl_vq_request(vcrypto, sgs, num_out, num_in, vc_ctrl_req);
+
+
+I'd split this into a separate patch.
+
+
+>   	if (err < 0)
+>   		goto out;
+>   
+> -	virtqueue_kick(vcrypto->ctrl_vq);
+> -	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &inlen) &&
+> -	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> -		cpu_relax();
+> -
+> -	if (le32_to_cpu(vcrypto->input.status) != VIRTIO_CRYPTO_OK) {
+> +	if (le32_to_cpu(vc_ctrl_req->input.status) != VIRTIO_CRYPTO_OK) {
+> +		pr_err("virtio_crypto: Create session failed status: %u\n",
+> +			le32_to_cpu(vc_ctrl_req->input.status));
+>   		err = -EINVAL;
+>   		goto out;
+>   	}
+
+
+Do we need a warning for -ENOMEM?
+
+
+>   
+> -	ctx->session_id = le64_to_cpu(vcrypto->input.session_id);
+> +	ctx->session_id = le64_to_cpu(vc_ctrl_req->input.session_id);
+>   	ctx->session_valid = true;
+>   	err = 0;
+>   
+>   out:
+> -	spin_unlock(&vcrypto->ctrl_lock);
+> +	kfree(vc_ctrl_req);
+>   	kfree_sensitive(pkey);
+>   
+> -	if (err < 0)
+> -		pr_err("virtio_crypto: Create session failed status: %u\n",
+> -			le32_to_cpu(vcrypto->input.status));
+> -
+>   	return err;
+>   }
+>   
+>   static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akcipher_ctx *ctx)
+>   {
+>   	struct scatterlist outhdr_sg, inhdr_sg, *sgs[2];
+> +	struct virtio_crypto_ctrl_request *vc_ctrl_req;
+>   	struct virtio_crypto_destroy_session_req *destroy_session;
+>   	struct virtio_crypto *vcrypto = ctx->vcrypto;
+> -	unsigned int num_out = 0, num_in = 0, inlen;
+> +	unsigned int num_out = 0, num_in = 0;
+>   	int err;
+>   
+> -	spin_lock(&vcrypto->ctrl_lock);
+> -	if (!ctx->session_valid) {
+> -		err = 0;
+> -		goto out;
+> -	}
+> -	vcrypto->ctrl_status.status = VIRTIO_CRYPTO_ERR;
+> -	vcrypto->ctrl.header.opcode = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION);
+> -	vcrypto->ctrl.header.queue_id = 0;
+> +	if (!ctx->session_valid)
+> +		return 0;
+>   
+> -	destroy_session = &vcrypto->ctrl.u.destroy_session;
+> +	vc_ctrl_req = kzalloc(sizeof(*vc_ctrl_req), GFP_KERNEL);
+> +	if (!vc_ctrl_req)
+> +		return -ENOMEM;
+> +
+> +	vc_ctrl_req->ctrl.header.opcode = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION);
+> +	vc_ctrl_req->ctrl.header.queue_id = 0;
+> +
+> +	destroy_session = &vc_ctrl_req->ctrl.u.destroy_session;
+>   	destroy_session->session_id = cpu_to_le64(ctx->session_id);
+>   
+> -	sg_init_one(&outhdr_sg, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	sg_init_one(&outhdr_sg, &vc_ctrl_req->ctrl, sizeof(vc_ctrl_req->ctrl));
+>   	sgs[num_out++] = &outhdr_sg;
+>   
+> -	sg_init_one(&inhdr_sg, &vcrypto->ctrl_status.status, sizeof(vcrypto->ctrl_status.status));
+> +	vc_ctrl_req->ctrl_status.status = VIRTIO_CRYPTO_ERR;
+
+
+If no special reason, let's move this above:
+
+vc_ctrl_req->ctrl.header.opcode = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION);
+
+
+> +	sg_init_one(&inhdr_sg, &vc_ctrl_req->ctrl_status.status,
+> +		sizeof(vc_ctrl_req->ctrl_status.status));
+>   	sgs[num_out + num_in++] = &inhdr_sg;
+>   
+> -	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out, num_in, vcrypto, GFP_ATOMIC);
+> +	err = virtio_crypto_ctrl_vq_request(vcrypto, sgs, num_out, num_in, vc_ctrl_req);
+>   	if (err < 0)
+>   		goto out;
+>   
+> -	virtqueue_kick(vcrypto->ctrl_vq);
+> -	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &inlen) &&
+> -	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> -		cpu_relax();
+> -
+> -	if (vcrypto->ctrl_status.status != VIRTIO_CRYPTO_OK) {
+> +	if (vc_ctrl_req->ctrl_status.status != VIRTIO_CRYPTO_OK) {
+>   		err = -EINVAL;
+> +		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+> +			vc_ctrl_req->ctrl_status.status, destroy_session->session_id);
+>   		goto out;
+>   	}
+>   
+>   	err = 0;
+>   	ctx->session_valid = false;
+> -
+>   out:
+> -	spin_unlock(&vcrypto->ctrl_lock);
+> -	if (err < 0) {
+> -		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+> -			vcrypto->ctrl_status.status, destroy_session->session_id);
+> -	}
+> +	kfree(vc_ctrl_req);
+>   
+>   	return err;
+>   }
+> @@ -210,14 +203,11 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
+>   static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request *vc_akcipher_req,
+>   		struct akcipher_request *req, struct data_queue *data_vq)
+>   {
+> -	struct virtio_crypto_akcipher_ctx *ctx = vc_akcipher_req->akcipher_ctx;
+>   	struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
+> -	struct virtio_crypto *vcrypto = ctx->vcrypto;
+>   	struct virtio_crypto_op_data_req *req_data = vc_req->req_data;
+>   	struct scatterlist *sgs[4], outhdr_sg, inhdr_sg, srcdata_sg, dstdata_sg;
+>   	void *src_buf = NULL, *dst_buf = NULL;
+>   	unsigned int num_out = 0, num_in = 0;
+> -	int node = dev_to_node(&vcrypto->vdev->dev);
+>   	unsigned long flags;
+>   	int ret = -ENOMEM;
+>   	bool verify = vc_akcipher_req->opcode == VIRTIO_CRYPTO_AKCIPHER_VERIFY;
+> @@ -228,7 +218,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>   	sgs[num_out++] = &outhdr_sg;
+>   
+>   	/* src data */
+> -	src_buf = kcalloc_node(src_len, 1, GFP_KERNEL, node);
+> +	src_buf = kcalloc(src_len, 1, GFP_KERNEL);
+
+
+This seems not a relevant change. If it is a must we need use a separate 
+for this and describe the rationale.
+
+
+>   	if (!src_buf)
+>   		goto err;
+>   
+> @@ -243,7 +233,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
+>   		sgs[num_out++] = &srcdata_sg;
+>   
+>   		/* dst data */
+> -		dst_buf = kcalloc_node(req->dst_len, 1, GFP_KERNEL, node);
+> +		dst_buf = kcalloc(req->dst_len, 1, GFP_KERNEL);
+
+
+And this.
+
+
+>   		if (!dst_buf)
+>   			goto err;
+>   
+> diff --git a/drivers/crypto/virtio/virtio_crypto_common.c b/drivers/crypto/virtio/virtio_crypto_common.c
+> new file mode 100644
+> index 000000000000..e65125a74db2
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_common.c
+> @@ -0,0 +1,39 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* Common functions and helpers
+> + *
+> + * Authors: zhenwei pi <pizhenwei@bytedance.com>
+> + *
+> + * Copyright 2022 Bytedance CO., LTD.
+> + */
+> +
+> +#include "virtio_crypto_common.h"
+> +
+> +int virtio_crypto_ctrl_vq_request(struct virtio_crypto *vcrypto, struct scatterlist *sgs[],
+> +				  unsigned int out_sgs, unsigned int in_sgs,
+> +				  struct virtio_crypto_ctrl_request *vc_ctrl_req)
+> +{
+> +	int err;
+> +	unsigned int inlen;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&vcrypto->ctrl_lock, flags);
+> +	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, out_sgs, in_sgs, vc_ctrl_req, GFP_ATOMIC);
+> +	if (err < 0) {
+> +		spin_unlock_irqrestore(&vcrypto->ctrl_lock, flags);
+> +		return err;
+> +	}
+> +
+> +	virtqueue_kick(vcrypto->ctrl_vq);
+> +
+> +	/*
+> +	 * Trapping into the hypervisor, so the request should be
+> +	 * handled immediately.
+> +	 */
+> +	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &inlen) &&
+> +		!virtqueue_is_broken(vcrypto->ctrl_vq))
+> +		cpu_relax();
+> +
+> +	spin_unlock_irqrestore(&vcrypto->ctrl_lock, flags);
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
+> index e693d4ee83a6..d2a20fe6e13e 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_common.h
+> +++ b/drivers/crypto/virtio/virtio_crypto_common.h
+> @@ -13,6 +13,7 @@
+>   #include <crypto/aead.h>
+>   #include <crypto/aes.h>
+>   #include <crypto/engine.h>
+> +#include <uapi/linux/virtio_crypto.h>
+>   
+>   
+>   /* Internal representation of a data virtqueue */
+> @@ -65,11 +66,6 @@ struct virtio_crypto {
+>   	/* Maximum size of per request */
+>   	u64 max_size;
+>   
+> -	/* Control VQ buffers: protected by the ctrl_lock */
+> -	struct virtio_crypto_op_ctrl_req ctrl;
+> -	struct virtio_crypto_session_input input;
+> -	struct virtio_crypto_inhdr ctrl_status;
+> -
+>   	unsigned long status;
+>   	atomic_t ref_count;
+>   	struct list_head list;
+> @@ -85,6 +81,16 @@ struct virtio_crypto_sym_session_info {
+>   	__u64 session_id;
+>   };
+>   
+> +/*
+> + * Note: there are padding fields in request, clear them to zero before sending to host,
+> + * Ex, virtio_crypto_ctrl_request::ctrl::u::destroy_session::padding[48]
+> + */
+> +struct virtio_crypto_ctrl_request {
+> +	struct virtio_crypto_op_ctrl_req ctrl;
+> +	struct virtio_crypto_session_input input;
+> +	struct virtio_crypto_inhdr ctrl_status;
+> +};
+> +
+>   struct virtio_crypto_request;
+>   typedef void (*virtio_crypto_data_callback)
+>   		(struct virtio_crypto_request *vc_req, int len);
+> @@ -135,4 +141,7 @@ void virtio_crypto_skcipher_algs_unregister(struct virtio_crypto *vcrypto);
+>   int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto);
+>   void virtio_crypto_akcipher_algs_unregister(struct virtio_crypto *vcrypto);
+>   
+> +int virtio_crypto_ctrl_vq_request(struct virtio_crypto *vcrypto, struct scatterlist *sgs[],
+> +				  unsigned int out_sgs, unsigned int in_sgs,
+> +				  struct virtio_crypto_ctrl_request *vc_ctrl_req);
+>   #endif /* _VIRTIO_CRYPTO_COMMON_H */
+> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> index a618c46a52b8..fef355ff461c 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> @@ -118,11 +118,13 @@ static int virtio_crypto_alg_skcipher_init_session(
+>   		int encrypt)
+>   {
+>   	struct scatterlist outhdr, key_sg, inhdr, *sgs[3];
+> -	unsigned int tmp;
+>   	struct virtio_crypto *vcrypto = ctx->vcrypto;
+
+
+Can we simply rename this to virtcrypto and then we can use the name 
+"vcrypto" for virtio_crypto_ctrl_request then we save tons lot changes?
+
+It simplify the life of reviewers and backporting.
+
+Thanks
+
+
+>   	int op = encrypt ? VIRTIO_CRYPTO_OP_ENCRYPT : VIRTIO_CRYPTO_OP_DECRYPT;
+>   	int err;
+>   	unsigned int num_out = 0, num_in = 0;
+> +	struct virtio_crypto_ctrl_request *vc_ctrl_req;
+> +	struct virtio_crypto_ctrl_header *header;
+> +	struct virtio_crypto_sym_create_session_req *sym_create_session;
+>   
+>   	/*
+>   	 * Avoid to do DMA from the stack, switch to using
+> @@ -133,26 +135,27 @@ static int virtio_crypto_alg_skcipher_init_session(
+>   	if (!cipher_key)
+>   		return -ENOMEM;
+>   
+> -	spin_lock(&vcrypto->ctrl_lock);
+> +	vc_ctrl_req = kzalloc(sizeof(*vc_ctrl_req), GFP_KERNEL);
+> +	if (!vc_ctrl_req) {
+> +		err = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+>   	/* Pad ctrl header */
+> -	vcrypto->ctrl.header.opcode =
+> -		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
+> -	vcrypto->ctrl.header.algo = cpu_to_le32(alg);
+> +	header = &vc_ctrl_req->ctrl.header;
+> +	header->opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
+> +	header->algo = cpu_to_le32(alg);
+>   	/* Set the default dataqueue id to 0 */
+> -	vcrypto->ctrl.header.queue_id = 0;
+> +	header->queue_id = 0;
+>   
+> -	vcrypto->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+>   	/* Pad cipher's parameters */
+> -	vcrypto->ctrl.u.sym_create_session.op_type =
+> -		cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+> -	vcrypto->ctrl.u.sym_create_session.u.cipher.para.algo =
+> -		vcrypto->ctrl.header.algo;
+> -	vcrypto->ctrl.u.sym_create_session.u.cipher.para.keylen =
+> -		cpu_to_le32(keylen);
+> -	vcrypto->ctrl.u.sym_create_session.u.cipher.para.op =
+> -		cpu_to_le32(op);
+> -
+> -	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	sym_create_session = &vc_ctrl_req->ctrl.u.sym_create_session;
+> +	sym_create_session->op_type = cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+> +	sym_create_session->u.cipher.para.algo = header->algo;
+> +	sym_create_session->u.cipher.para.keylen = cpu_to_le32(keylen);
+> +	sym_create_session->u.cipher.para.op = cpu_to_le32(op);
+> +
+> +	sg_init_one(&outhdr, &vc_ctrl_req->ctrl, sizeof(vc_ctrl_req->ctrl));
+>   	sgs[num_out++] = &outhdr;
+>   
+>   	/* Set key */
+> @@ -160,45 +163,34 @@ static int virtio_crypto_alg_skcipher_init_session(
+>   	sgs[num_out++] = &key_sg;
+>   
+>   	/* Return status and session id back */
+> -	sg_init_one(&inhdr, &vcrypto->input, sizeof(vcrypto->input));
+> +	vc_ctrl_req->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+> +	sg_init_one(&inhdr, &vc_ctrl_req->input, sizeof(vc_ctrl_req->input));
+>   	sgs[num_out + num_in++] = &inhdr;
+>   
+> -	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+> -				num_in, vcrypto, GFP_ATOMIC);
+> -	if (err < 0) {
+> -		spin_unlock(&vcrypto->ctrl_lock);
+> -		kfree_sensitive(cipher_key);
+> -		return err;
+> -	}
+> -	virtqueue_kick(vcrypto->ctrl_vq);
+> -
+> -	/*
+> -	 * Trapping into the hypervisor, so the request should be
+> -	 * handled immediately.
+> -	 */
+> -	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &tmp) &&
+> -	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> -		cpu_relax();
+> +	err = virtio_crypto_ctrl_vq_request(vcrypto, sgs, num_out, num_in, vc_ctrl_req);
+> +	if (err < 0)
+> +		goto out;
+>   
+> -	if (le32_to_cpu(vcrypto->input.status) != VIRTIO_CRYPTO_OK) {
+> -		spin_unlock(&vcrypto->ctrl_lock);
+> +	if (le32_to_cpu(vc_ctrl_req->input.status) != VIRTIO_CRYPTO_OK) {
+>   		pr_err("virtio_crypto: Create session failed status: %u\n",
+> -			le32_to_cpu(vcrypto->input.status));
+> -		kfree_sensitive(cipher_key);
+> -		return -EINVAL;
+> +			le32_to_cpu(vc_ctrl_req->input.status));
+> +		err = -EINVAL;
+> +		goto out;
+>   	}
+>   
+>   	if (encrypt)
+>   		ctx->enc_sess_info.session_id =
+> -			le64_to_cpu(vcrypto->input.session_id);
+> +			le64_to_cpu(vc_ctrl_req->input.session_id);
+>   	else
+>   		ctx->dec_sess_info.session_id =
+> -			le64_to_cpu(vcrypto->input.session_id);
+> -
+> -	spin_unlock(&vcrypto->ctrl_lock);
+> +			le64_to_cpu(vc_ctrl_req->input.session_id);
+>   
+> +	err = 0;
+> +out:
+> +	kfree(vc_ctrl_req);
+>   	kfree_sensitive(cipher_key);
+> -	return 0;
+> +
+> +	return err;
+>   }
+>   
+>   static int virtio_crypto_alg_skcipher_close_session(
+> @@ -206,21 +198,24 @@ static int virtio_crypto_alg_skcipher_close_session(
+>   		int encrypt)
+>   {
+>   	struct scatterlist outhdr, status_sg, *sgs[2];
+> -	unsigned int tmp;
+>   	struct virtio_crypto_destroy_session_req *destroy_session;
+>   	struct virtio_crypto *vcrypto = ctx->vcrypto;
+>   	int err;
+>   	unsigned int num_out = 0, num_in = 0;
+> +	struct virtio_crypto_ctrl_request *vc_ctrl_req;
+> +	struct virtio_crypto_ctrl_header *header;
+> +
+> +	vc_ctrl_req = kzalloc(sizeof(*vc_ctrl_req), GFP_KERNEL);
+> +	if (!vc_ctrl_req)
+> +		return -ENOMEM;
+>   
+> -	spin_lock(&vcrypto->ctrl_lock);
+> -	vcrypto->ctrl_status.status = VIRTIO_CRYPTO_ERR;
+>   	/* Pad ctrl header */
+> -	vcrypto->ctrl.header.opcode =
+> -		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
+> +	header = &vc_ctrl_req->ctrl.header;
+> +	header->opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
+>   	/* Set the default virtqueue id to 0 */
+> -	vcrypto->ctrl.header.queue_id = 0;
+> +	header->queue_id = 0;
+>   
+> -	destroy_session = &vcrypto->ctrl.u.destroy_session;
+> +	destroy_session = &vc_ctrl_req->ctrl.u.destroy_session;
+>   
+>   	if (encrypt)
+>   		destroy_session->session_id =
+> @@ -229,37 +224,33 @@ static int virtio_crypto_alg_skcipher_close_session(
+>   		destroy_session->session_id =
+>   			cpu_to_le64(ctx->dec_sess_info.session_id);
+>   
+> -	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
+> +	sg_init_one(&outhdr, &vc_ctrl_req->ctrl, sizeof(vc_ctrl_req->ctrl));
+>   	sgs[num_out++] = &outhdr;
+>   
+>   	/* Return status and session id back */
+> -	sg_init_one(&status_sg, &vcrypto->ctrl_status.status,
+> -		sizeof(vcrypto->ctrl_status.status));
+> +	vc_ctrl_req->ctrl_status.status = VIRTIO_CRYPTO_ERR;
+> +	sg_init_one(&status_sg, &vc_ctrl_req->ctrl_status.status,
+> +		sizeof(vc_ctrl_req->ctrl_status.status));
+>   	sgs[num_out + num_in++] = &status_sg;
+>   
+> -	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+> -			num_in, vcrypto, GFP_ATOMIC);
+> -	if (err < 0) {
+> -		spin_unlock(&vcrypto->ctrl_lock);
+> -		return err;
+> -	}
+> -	virtqueue_kick(vcrypto->ctrl_vq);
+> -
+> -	while (!virtqueue_get_buf(vcrypto->ctrl_vq, &tmp) &&
+> -	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+> -		cpu_relax();
+> +	err = virtio_crypto_ctrl_vq_request(vcrypto, sgs, num_out, num_in, vc_ctrl_req);
+> +	if (err < 0)
+> +		goto out;
+>   
+> -	if (vcrypto->ctrl_status.status != VIRTIO_CRYPTO_OK) {
+> -		spin_unlock(&vcrypto->ctrl_lock);
+> +	if (vc_ctrl_req->ctrl_status.status != VIRTIO_CRYPTO_OK) {
+>   		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+> -			vcrypto->ctrl_status.status,
+> +			vc_ctrl_req->ctrl_status.status,
+>   			destroy_session->session_id);
+>   
+> -		return -EINVAL;
+> +		err = -EINVAL;
+> +		goto out;
+>   	}
+> -	spin_unlock(&vcrypto->ctrl_lock);
+>   
+> -	return 0;
+> +	err = 0;
+> +out:
+> +	kfree(vc_ctrl_req);
+> +
+> +	return err;
+>   }
+>   
+>   static int virtio_crypto_alg_skcipher_init_sessions(
 
