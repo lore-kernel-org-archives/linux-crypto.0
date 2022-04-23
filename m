@@ -2,280 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED30C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 21:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B08C43217
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 23:33:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236283AbiDWVbw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Apr 2022 17:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50388 "EHLO
+        id S234407AbiDWXgr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Apr 2022 19:36:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237324AbiDWVbm (ORCPT
+        with ESMTP id S231690AbiDWXgq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Apr 2022 17:31:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAE4522FE;
-        Sat, 23 Apr 2022 14:27:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5527B61032;
-        Sat, 23 Apr 2022 21:27:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6A1C385A5;
-        Sat, 23 Apr 2022 21:27:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="C8luVCeb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650749269;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hu1lHLanvuWgDiYPkgc7jxugEFdHG8nWUyE1TlHRrEs=;
-        b=C8luVCebv3YG9BqZ3ogBOPu9yRbwkzPcKVVuzjwAAe4sh8FBZdzMZ+pekTkHq8daxAocFG
-        DoK+YUdfvAg9e4NnI5KcRPuQ8y9ETSdolP5+YG35UimIIvxdJU0x7f5GljKYtfMSLCD1Ra
-        aP80gS0bz9htr4paxBRnmQw22CrcXs0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a63ddb13 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 23 Apr 2022 21:27:48 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tglx@linutronix.de, arnd@arndb.de
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH v6 17/17] random: insist on random_get_entropy() existing in order to simplify
-Date:   Sat, 23 Apr 2022 23:26:23 +0200
-Message-Id: <20220423212623.1957011-18-Jason@zx2c4.com>
-In-Reply-To: <20220423212623.1957011-1-Jason@zx2c4.com>
-References: <20220423212623.1957011-1-Jason@zx2c4.com>
+        Sat, 23 Apr 2022 19:36:46 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF34A16FAFE;
+        Sat, 23 Apr 2022 16:33:46 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id AD45492009C; Sun, 24 Apr 2022 01:33:44 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id 9D31992009B;
+        Sun, 24 Apr 2022 00:33:44 +0100 (BST)
+Date:   Sun, 24 Apr 2022 00:33:44 +0100 (BST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
+To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "David S . Miller" <davem@davemloft.net>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        John Stultz <john.stultz@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-m68k <linux-m68k@lists.linux-m68k.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
+Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
+ instead of zero
+In-Reply-To: <20220418071005.GA4075@alpha.franken.de>
+Message-ID: <alpine.DEB.2.21.2204220029590.9383@angie.orcam.me.uk>
+References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk> <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
+ <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk> <YlfoeGRM6w2O+eXA@zx2c4.com> <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk> <20220418071005.GA4075@alpha.franken.de>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-All platforms are now guaranteed to provide some value for
-random_get_entropy(). In case some bug leads to this not being so, we
-print a warning, because that indicates that something is really very
-wrong (and likely other things are impacted too). This should never be
-hit, but it's a good and cheap way of finding out if something ever is
-problematic.
+On Mon, 18 Apr 2022, Thomas Bogendoerfer wrote:
 
-Since we now have viable fallback code for random_get_entropy() on all
-platforms, which is, in the worst case, not worse than jiffies, we can
-count on getting the best possible value out of it. That means there's
-no longer a use for using jiffies as entropy input. It also means we no
-longer have a reason for doing the round-robin register flow in the IRQ
-handler, which was always of fairly dubious value.
+> >  Also the systems I have in mind and that lack a counter in the chipset 
+> > actually can make use of the buggy CP0 timer, because it's only when CP0 
+> > timer interrupts are used that the erratum matters, but they use a DS1287 
+> > RTC interrupt instead unconditionally as the clock event (see the comment 
+> > at the bottom of arch/mips/dec/time.c).  But this has not been factored in 
+> > with `can_use_mips_counter' (should it just check for `mips_hpt_frequency' 
+> > being zero perhaps, meaning the timer interrupt not being used?).
+> > 
+> >  Thomas, do you happen to know if any of the SGI systems that we support 
+> > had buggy early R4k chips?
+> 
+> IP22 has probably seen all buggy MIPS chips produced, so yes I even own
+> Indy/Indigo2 CPU boards with early R4k chips.
 
-Instead we can greatly simplify the IRQ handler inputs and also unify
-the construction between 64-bits and 32-bits. We now collect the cycle
-counter and the return address, since those are the two things that
-matter. Because the return address and the irq number are likely
-related, to the extent we mix in the irq number, we can just xor it into
-the top unchanging bytes of the return address, rather than the bottom
-changing bytes of the cycle counter as before. Then, we can do a fixed 2
-rounds of SipHash/HSipHash. Finally, we use the same construction of
-hashing only half of the [H]SipHash state on 32-bit and 64-bit. We're
-not actually discarding any entropy, since that entropy is carried
-through until the next time. And more importantly, it lets us do the
-same sponge-like construction everywhere.
+ Do they actually use the CP0 timer as a clock event device?  Do they have 
+an alternative high-precision timer available?
 
-Cc: Theodore Ts'o <tytso@mit.edu>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 89 ++++++++++++++-----------------------------
- 1 file changed, 29 insertions(+), 60 deletions(-)
+ In the course of verifying this change I have noticed my DECstation
+5000/260, which has a high-precision timer in the chipset available as a 
+clock source device, does register the CP0 timer as a clock source device 
+regardless.  Upon a closer inspection I have noticed that the CP0 timer 
+interrupt is non-functional in this machine, which I have then confirmed 
+as a valid CPU hardware configuration via the TimIntDis/TimerIntDis (the 
+R4k CPU manual is inconsistent in naming here) boot-mode bit.  It allows 
+IP7 to be used as an external interrupt source instead.  I used not to be 
+aware of the presence of this boot-mode bit.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 4c9adb4f3d5d..bf89c6f27a19 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1012,6 +1012,9 @@ int __init rand_initialize(void)
- 		urandom_warning.interval = 0;
- 		unseeded_warning.interval = 0;
- 	}
-+
-+	WARN(!random_get_entropy(), "Missing cycle counter and fallback timer; RNG "
-+				    "entropy collection will consequently suffer.");
- 	return 0;
- }
- 
-@@ -1025,15 +1028,14 @@ int __init rand_initialize(void)
-  */
- void add_device_randomness(const void *buf, size_t size)
- {
--	unsigned long cycles = random_get_entropy();
--	unsigned long flags, now = jiffies;
-+	unsigned long entropy = random_get_entropy();
-+	unsigned long flags;
- 
- 	if (crng_init == 0 && size)
- 		crng_pre_init_inject(buf, size, false);
- 
- 	spin_lock_irqsave(&input_pool.lock, flags);
--	_mix_pool_bytes(&cycles, sizeof(cycles));
--	_mix_pool_bytes(&now, sizeof(now));
-+	_mix_pool_bytes(&entropy, sizeof(entropy));
- 	_mix_pool_bytes(buf, size);
- 	spin_unlock_irqrestore(&input_pool.lock, flags);
- }
-@@ -1056,12 +1058,11 @@ struct timer_rand_state {
-  */
- static void add_timer_randomness(struct timer_rand_state *state, unsigned int num)
- {
--	unsigned long cycles = random_get_entropy(), now = jiffies, flags;
-+	unsigned long entropy = random_get_entropy(), now = jiffies, flags;
- 	long delta, delta2, delta3;
- 
- 	spin_lock_irqsave(&input_pool.lock, flags);
--	_mix_pool_bytes(&cycles, sizeof(cycles));
--	_mix_pool_bytes(&now, sizeof(now));
-+	_mix_pool_bytes(&entropy, sizeof(entropy));
- 	_mix_pool_bytes(&num, sizeof(num));
- 	spin_unlock_irqrestore(&input_pool.lock, flags);
- 
-@@ -1223,7 +1224,6 @@ struct fast_pool {
- 	unsigned long pool[4];
- 	unsigned long last;
- 	unsigned int count;
--	u16 reg_idx;
- };
- 
- static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
-@@ -1241,13 +1241,13 @@ static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
-  * This is [Half]SipHash-1-x, starting from an empty key. Because
-  * the key is fixed, it assumes that its inputs are non-malicious,
-  * and therefore this has no security on its own. s represents the
-- * 128 or 256-bit SipHash state, while v represents a 128-bit input.
-+ * four-word SipHash state, while v represents a two-word input.
-  */
--static void fast_mix(unsigned long s[4], const unsigned long *v)
-+static void fast_mix(unsigned long s[4], const unsigned long v[2])
- {
- 	size_t i;
- 
--	for (i = 0; i < 16 / sizeof(long); ++i) {
-+	for (i = 0; i < 2; ++i) {
- 		s[3] ^= v[i];
- #ifdef CONFIG_64BIT
- 		s[0] += s[1]; s[1] = rol64(s[1], 13); s[1] ^= s[0]; s[0] = rol64(s[0], 32);
-@@ -1287,33 +1287,17 @@ int random_online_cpu(unsigned int cpu)
- }
- #endif
- 
--static unsigned long get_reg(struct fast_pool *f, struct pt_regs *regs)
--{
--	unsigned long *ptr = (unsigned long *)regs;
--	unsigned int idx;
--
--	if (regs == NULL)
--		return 0;
--	idx = READ_ONCE(f->reg_idx);
--	if (idx >= sizeof(struct pt_regs) / sizeof(unsigned long))
--		idx = 0;
--	ptr += idx++;
--	WRITE_ONCE(f->reg_idx, idx);
--	return *ptr;
--}
--
- static void mix_interrupt_randomness(struct work_struct *work)
- {
- 	struct fast_pool *fast_pool = container_of(work, struct fast_pool, mix);
- 	/*
--	 * The size of the copied stack pool is explicitly 16 bytes so that we
--	 * tax mix_pool_byte()'s compression function the same amount on all
--	 * platforms. This means on 64-bit we copy half the pool into this,
--	 * while on 32-bit we copy all of it. The entropy is supposed to be
--	 * sufficiently dispersed between bits that in the sponge-like
--	 * half case, on average we don't wind up "losing" some.
-+	 * The size of the copied stack pool is explicitly 2 longs so that we
-+	 * only ever ingest half of the siphash output each time, retaining
-+	 * the other half as the next "key" that carries over. The entropy is
-+	 * supposed to be sufficiently dispersed between bits so on average
-+	 * we don't wind up "losing" some.
- 	 */
--	u8 pool[16];
-+	unsigned long pool[2];
- 
- 	/* Check to see if we're running on the wrong CPU due to hotplug. */
- 	local_irq_disable();
-@@ -1345,36 +1329,21 @@ static void mix_interrupt_randomness(struct work_struct *work)
- void add_interrupt_randomness(int irq)
- {
- 	enum { MIX_INFLIGHT = 1U << 31 };
--	unsigned long cycles = random_get_entropy(), now = jiffies;
-+	unsigned long cycles = random_get_entropy();
- 	struct fast_pool *fast_pool = this_cpu_ptr(&irq_randomness);
- 	struct pt_regs *regs = get_irq_regs();
- 	unsigned int new_count;
--	union {
--		u32 u32[4];
--		u64 u64[2];
--		unsigned long longs[16 / sizeof(long)];
--	} irq_data;
--
--	if (cycles == 0)
--		cycles = get_reg(fast_pool, regs);
--
--	if (sizeof(unsigned long) == 8) {
--		irq_data.u64[0] = cycles ^ rol64(now, 32) ^ irq;
--		irq_data.u64[1] = regs ? instruction_pointer(regs) : _RET_IP_;
--	} else {
--		irq_data.u32[0] = cycles ^ irq;
--		irq_data.u32[1] = now;
--		irq_data.u32[2] = regs ? instruction_pointer(regs) : _RET_IP_;
--		irq_data.u32[3] = get_reg(fast_pool, regs);
--	}
- 
--	fast_mix(fast_pool->pool, irq_data.longs);
-+	fast_mix(fast_pool->pool, (unsigned long[2]){
-+		(regs ? instruction_pointer(regs) : _RET_IP_) ^ swab(irq),
-+		cycles
-+	});
- 	new_count = ++fast_pool->count;
- 
- 	if (new_count & MIX_INFLIGHT)
- 		return;
- 
--	if (new_count < 64 && (!time_after(now, fast_pool->last + HZ) ||
-+	if (new_count < 64 && (!time_is_before_jiffies(fast_pool->last + HZ) ||
- 			       unlikely(crng_init == 0)))
- 		return;
- 
-@@ -1410,28 +1379,28 @@ static void entropy_timer(struct timer_list *t)
- static void try_to_generate_entropy(void)
- {
- 	struct {
--		unsigned long cycles;
-+		unsigned long entropy;
- 		struct timer_list timer;
- 	} stack;
- 
--	stack.cycles = random_get_entropy();
-+	stack.entropy = random_get_entropy();
- 
- 	/* Slow counter - or none. Don't even bother */
--	if (stack.cycles == random_get_entropy())
-+	if (stack.entropy == random_get_entropy())
- 		return;
- 
- 	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
- 	while (!crng_ready() && !signal_pending(current)) {
- 		if (!timer_pending(&stack.timer))
- 			mod_timer(&stack.timer, jiffies + 1);
--		mix_pool_bytes(&stack.cycles, sizeof(stack.cycles));
-+		mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- 		schedule();
--		stack.cycles = random_get_entropy();
-+		stack.entropy = random_get_entropy();
- 	}
- 
- 	del_timer_sync(&stack.timer);
- 	destroy_timer_on_stack(&stack.timer);
--	mix_pool_bytes(&stack.cycles, sizeof(stack.cycles));
-+	mix_pool_bytes(&stack.entropy, sizeof(stack.entropy));
- }
- 
- 
--- 
-2.35.1
+ I find this arrangement odd, because IP7 used to be wired internally as 
+the FPU interrupt with the 5000/240's CPU module, so it's not usable as an 
+external interrupt anyway with this system's mainboard.
 
+ That means however that this machine (and possibly the 5000/150 as well, 
+but I'll have to verify that once I get at the KN04 CPU module I have in a 
+drawer at my other place) can use the CP0 timer as a clock source device 
+unconditionally.  I think this discovery asks for code optimisation, which 
+I'll try to cook up sometime.
+
+ I don't expect the IP22 to have a similar arrangement with the CP0 timer 
+interrupt given that the CPU was an in-house design at SGI, but who knows?  
+Do you?
+
+  Maciej
