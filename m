@@ -2,101 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2878C4332F
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 10:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2534C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 10:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234501AbiDWKDo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Apr 2022 06:03:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44666 "EHLO
+        id S235049AbiDWKxn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Apr 2022 06:53:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234283AbiDWKDn (ORCPT
+        with ESMTP id S235075AbiDWKxl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Apr 2022 06:03:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC9015CF4D;
-        Sat, 23 Apr 2022 03:00:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E964960EF3;
-        Sat, 23 Apr 2022 10:00:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09578C385A0;
-        Sat, 23 Apr 2022 10:00:40 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BrTNBu3U"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650708039;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yzboIlk5vJyGJ9lIUicUoHDvMySNFYIAfwJpuAS8VE0=;
-        b=BrTNBu3UPGd/snRKQaW6FCT2ETTW5AjxdyJ6d5OFslB53rAsjYQWfTknmHGingrsxLV4ix
-        yB3Z33fq8ZEu9lWFNSAsBIXFWS69ptmi6XvOsvr/W2o6ZDyCsI3ruk6NWXUUVsrydwnSwy
-        QbHGR2xD+RPJeLJSPg/mehva8mt8n/8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d5a8aa6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 23 Apr 2022 10:00:38 +0000 (UTC)
-Date:   Sat, 23 Apr 2022 12:00:33 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
-        linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, x86@kernel.org,
-        linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH v5 11/11] random: insist on random_get_entropy() existing
- in order to simplify
-Message-ID: <YmPOQS9GvdiM2brX@zx2c4.com>
-References: <20220419111650.1582274-1-Jason@zx2c4.com>
- <20220419111650.1582274-12-Jason@zx2c4.com>
- <CACXcFmksd3cw+xa-c2gEdd4=96PO8GCCMF6q2d6JHnJum2LjiA@mail.gmail.com>
+        Sat, 23 Apr 2022 06:53:41 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4E31F8DB9;
+        Sat, 23 Apr 2022 03:50:35 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id f6so100186wma.0;
+        Sat, 23 Apr 2022 03:50:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=SCwRS2IZSctZE0rauI3WxmX9NRINEUqAAu3EKI6iWX8=;
+        b=e/0d3hetA2x+tfxMeCxEPmJy5Cm4E94IJ8Ou5Us6keC9FpRQBjvm1HjxMJxoQGOosU
+         d5JZ/MEq4iRD5Bk5MgBfiFJoSj/wpWpFHOkEABSAsal1PKGUhcqshJLRH1JeZ9W6696Y
+         +ZhL0qyKoFDwhFebGpNKPBR6LkE/Zfd1vD9kzi6MnifctCj6RFUycJ063VPI48yNHy7D
+         HxR+gBUvBWyiv2reIzaheMC7FEIBrzBtHOMt8R0enul2h5i+5Dy/xZy83EDLd6HwTDmj
+         bjPgmDiBYUFFITot1ob5d0TodQaSTWTMy+y+ZPs68WwrBLvktWxuKGjfU9AorQ780aRP
+         qUYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=SCwRS2IZSctZE0rauI3WxmX9NRINEUqAAu3EKI6iWX8=;
+        b=SHmoPxVxeRSOZbRBa5GoZPsHLLMVcer3komLFgfCxVs2dnMuukJU12RUYQUJ/RzsNk
+         Vr1EZ+FmI/vUhV8V9lpG3wWJtKVfmitag+2NrPRfwrEbbD3PifM4HdLd1+1p6DPb4gvB
+         qlLF+tPrk6LRGzvyLkOAojqIQWONPtZvS1FlxrlO9QrrQO6auwfltVHbPZp4jhj9UOUf
+         nEIfeqgCswA5m7kwTJbeDKHxHBjSLlZc+5tXRRU57Y1FslTGNNdZUJc1oLN6O8oamB5v
+         MldH92PolIKbvQUVIXlRNgjOiH/btfW0RB6nzu7SnabaAke7XAFmuZ3RPOdGQ+pPOJEo
+         qMvQ==
+X-Gm-Message-State: AOAM530tmidQFureYlmghj7lUPrWmKlTBYTu79Ekqx+HapbQI7ULSWua
+        Hz3AyHr/9nvFT9EYhcumKsw=
+X-Google-Smtp-Source: ABdhPJwu4IKR06vKshXnmlBQEP5JWyFFpahFDrio3RAgTCbcTJuLwvGu1XPbRWXl3XBCKFf0lbsFvQ==
+X-Received: by 2002:a05:600c:3541:b0:38f:5f3:3f4c with SMTP id i1-20020a05600c354100b0038f05f33f4cmr18110508wmq.158.1650711034419;
+        Sat, 23 Apr 2022 03:50:34 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id t18-20020a05600c199200b0039291537cfesm6682792wmq.21.2022.04.23.03.50.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Apr 2022 03:50:34 -0700 (PDT)
+Date:   Sat, 23 Apr 2022 12:50:31 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     cgel.zte@gmail.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: Re: [PATCH] crypto: sun8i-ce: using pm_runtime_resume_and_get
+ instead of pm_runtime_get_sync
+Message-ID: <YmPZ91MQEVTn+DrY@Red>
+References: <20220420030218.2575565-1-chi.minghao@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CACXcFmksd3cw+xa-c2gEdd4=96PO8GCCMF6q2d6JHnJum2LjiA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220420030218.2575565-1-chi.minghao@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sandy,
-
-On Sat, Apr 23, 2022 at 10:24:07AM +0800, Sandy Harris wrote:
-> On Sat, Apr 23, 2022 at 6:37 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > All platforms are now guaranteed to provide some value for
-> > random_get_entropy(). In case some bug leads to this not being so, we
-> > print a warning, ...
+Le Wed, Apr 20, 2022 at 03:02:18AM +0000, cgel.zte@gmail.com a écrit :
+> From: Minghao Chi <chi.minghao@zte.com.cn>
 > 
-> Would it make sense to test at compile time? If there is no hardware
-> RNG nor a cycle counter, then the kernel should be compiled with
-> the gcc latent entropy plugin. Generate a warning suggesting that,
-> or even an error insisting on it.
+> Using pm_runtime_resume_and_get() to replace pm_runtime_get_sync and
+> pm_runtime_put_noidle. This change is just to simplify the code, no
+> actual functional changes.
+> 
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
+> ---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
 
-Unfortunately, as a last ditch warning safeguard against bugs, I don't
-think that's something we can determine at build time. A lot of this
-machinery is dynamic. Fortunately a single check at init time brings
-with it zero appreciable overhead.
+Thanks for your patch
 
-Jason
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+
+Regards
