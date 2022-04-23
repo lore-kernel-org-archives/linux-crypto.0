@@ -2,62 +2,46 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCE1C43217
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 02:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2878C4332F
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 10:00:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232017AbiDWC1T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Apr 2022 22:27:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58860 "EHLO
+        id S234501AbiDWKDo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Apr 2022 06:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbiDWC1S (ORCPT
+        with ESMTP id S234283AbiDWKDn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Apr 2022 22:27:18 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B5F61B5302;
-        Fri, 22 Apr 2022 19:24:22 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id y20so19569047eju.7;
-        Fri, 22 Apr 2022 19:24:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qqZdE0u9CYPlQ6MQcqOeN4oZEKzgzl5ZlEVKxJ+FAHk=;
-        b=OE7s3CPe37nMb1dGmVaIey7JbUtRJ7f6vav2gncQroL5ziOpNrqKAczdsVbRdftZTp
-         lvDGoua7DfR0a3ih2mXvBGp/pr8YIwFWvJ7rYtm1KItJ7lzb7bsnCbr0XO6Al/bLSqmY
-         wShQ3Q4PeDbaGhthAQmvyUaYMWSIREyHdWzLfIHLlO4xqjeROrsWMsY/13vozvUovkD1
-         TOAKaEV8j7EP/9ImivPEP7f9+9yBUR0jy0QdxfQqm1cDoP57+Iq+yV30nc+nepkuJNn4
-         1e6bTF9LZV27/+Lsu7KDZ5aSI6QmdhEq2BG3Q9STkKqaymG9HXWUrXc+hO38EBpNkLCd
-         yQnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qqZdE0u9CYPlQ6MQcqOeN4oZEKzgzl5ZlEVKxJ+FAHk=;
-        b=J6Pp8w0xhTdRSm1ODUYS0bBxI8ISFH88psRrVam2XqS+LkPWGfpXKHd5K2dFAdKd2v
-         7we1UD+5/mB0Y0CnDS8toO21KkSkeAf1KWLA+r0ydF+7j0I6jV/fkOU1xcAohKxUOLR8
-         CPLrtNCvLQd2j25PZGF7ueoPm6o0rLNbMaMetKeAjp/O12zgyEnXVDCCdbRIavjSbjyH
-         jE+XTazQlpY5zj4mjOByNFBwJNYyZbWNQBTURnGNi1WqnHnBnKqndcwHXGNN881Jxws6
-         EmFnKY1rr1cl3vIf7wPqGKodaQlVEekxhjdT8rgKJoh5V00l8z0+egYIfgVP9e6gbxzP
-         nYRQ==
-X-Gm-Message-State: AOAM530UQbATXHrDDldaYNK8a5OgaaijVwJIaNMuZsFY6LL7IOOZCxpU
-        nbBTIZR01ISWvkCk5lfDMXY8P9mtN4C48XyWud0=
-X-Google-Smtp-Source: ABdhPJzcIFiqsw8tqvA51BF/kojpRX8faca/GR9O0BKNi3Ttrspe1sgBeJ1OHPMIBfTzzBlAO8IBPBsJXGKx+2s4Z5Y=
-X-Received: by 2002:a17:906:d108:b0:6e8:7765:a70b with SMTP id
- b8-20020a170906d10800b006e87765a70bmr6585155ejz.436.1650680660905; Fri, 22
- Apr 2022 19:24:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220419111650.1582274-1-Jason@zx2c4.com> <20220419111650.1582274-12-Jason@zx2c4.com>
-In-Reply-To: <20220419111650.1582274-12-Jason@zx2c4.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sat, 23 Apr 2022 10:24:07 +0800
-Message-ID: <CACXcFmksd3cw+xa-c2gEdd4=96PO8GCCMF6q2d6JHnJum2LjiA@mail.gmail.com>
-Subject: Re: [PATCH v5 11/11] random: insist on random_get_entropy() existing
- in order to simplify
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Sat, 23 Apr 2022 06:03:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC9015CF4D;
+        Sat, 23 Apr 2022 03:00:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E964960EF3;
+        Sat, 23 Apr 2022 10:00:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09578C385A0;
+        Sat, 23 Apr 2022 10:00:40 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BrTNBu3U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650708039;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yzboIlk5vJyGJ9lIUicUoHDvMySNFYIAfwJpuAS8VE0=;
+        b=BrTNBu3UPGd/snRKQaW6FCT2ETTW5AjxdyJ6d5OFslB53rAsjYQWfTknmHGingrsxLV4ix
+        yB3Z33fq8ZEu9lWFNSAsBIXFWS69ptmi6XvOsvr/W2o6ZDyCsI3ruk6NWXUUVsrydwnSwy
+        QbHGR2xD+RPJeLJSPg/mehva8mt8n/8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d5a8aa6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 23 Apr 2022 10:00:38 +0000 (UTC)
+Date:   Sat, 23 Apr 2022 12:00:33 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Sandy Harris <sandyinchina@gmail.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, "Theodore Ts'o" <tytso@mit.edu>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Russell King <linux@armlinux.org.uk>,
         Catalin Marinas <catalin.marinas@arm.com>,
@@ -82,18 +66,37 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         linux-riscv@lists.infradead.org, sparclinux@vger.kernel.org,
         linux-um@lists.infradead.org, x86@kernel.org,
         linux-xtensa@linux-xtensa.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v5 11/11] random: insist on random_get_entropy() existing
+ in order to simplify
+Message-ID: <YmPOQS9GvdiM2brX@zx2c4.com>
+References: <20220419111650.1582274-1-Jason@zx2c4.com>
+ <20220419111650.1582274-12-Jason@zx2c4.com>
+ <CACXcFmksd3cw+xa-c2gEdd4=96PO8GCCMF6q2d6JHnJum2LjiA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACXcFmksd3cw+xa-c2gEdd4=96PO8GCCMF6q2d6JHnJum2LjiA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 23, 2022 at 6:37 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> All platforms are now guaranteed to provide some value for
-> random_get_entropy(). In case some bug leads to this not being so, we
-> print a warning, ...
+Hi Sandy,
 
-Would it make sense to test at compile time? If there is no hardware
-RNG nor a cycle counter, then the kernel should be compiled with
-the gcc latent entropy plugin. Generate a warning suggesting that,
-or even an error insisting on it.
+On Sat, Apr 23, 2022 at 10:24:07AM +0800, Sandy Harris wrote:
+> On Sat, Apr 23, 2022 at 6:37 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > All platforms are now guaranteed to provide some value for
+> > random_get_entropy(). In case some bug leads to this not being so, we
+> > print a warning, ...
+> 
+> Would it make sense to test at compile time? If there is no hardware
+> RNG nor a cycle counter, then the kernel should be compiled with
+> the gcc latent entropy plugin. Generate a warning suggesting that,
+> or even an error insisting on it.
+
+Unfortunately, as a last ditch warning safeguard against bugs, I don't
+think that's something we can determine at build time. A lot of this
+machinery is dynamic. Fortunately a single check at init time brings
+with it zero appreciable overhead.
+
+Jason
