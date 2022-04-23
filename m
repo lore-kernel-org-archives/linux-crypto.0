@@ -2,122 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F817C433FE
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 00:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51178C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 01:08:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbiDWA4G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Apr 2022 20:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46492 "EHLO
+        id S231307AbiDWBLI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 22 Apr 2022 21:11:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbiDWA4G (ORCPT
+        with ESMTP id S229941AbiDWBLH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Apr 2022 20:56:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6C51738CA;
-        Fri, 22 Apr 2022 17:53:10 -0700 (PDT)
+        Fri, 22 Apr 2022 21:11:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB0A71D51A8;
+        Fri, 22 Apr 2022 18:08:11 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8ECB860FBB;
-        Sat, 23 Apr 2022 00:53:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80106C385A8;
-        Sat, 23 Apr 2022 00:53:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77A8F60FF7;
+        Sat, 23 Apr 2022 01:08:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2231BC385A0;
+        Sat, 23 Apr 2022 01:08:10 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="apuirUnw"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Yy/eAe26"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650675185;
+        t=1650676088;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BtroWoypB74RmLGCXy/EXj5t2W95zgqhXYB+W+c3LYE=;
-        b=apuirUnwiClPZkngdFTOM+QfyFKtnvlwA/luZqphpx2jlS66JX3i7wtN4EjErQfzF+Wktq
-        ULcCQOdPLrsKonuld9pW6IPmx9nMIzMW7PE9KuqHSJGOFnvd19RTov2l7N8+riDdxwSkTx
-        A6j27PAa97zJfQyvB5+w6Yd/uXjGpFg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d8f036cc (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 23 Apr 2022 00:53:05 +0000 (UTC)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-2f7bb893309so21450917b3.12;
-        Fri, 22 Apr 2022 17:53:03 -0700 (PDT)
-X-Gm-Message-State: AOAM530iWDSISiRD3YBdkGykYJ/YnCGEUfI1ouUWPhL11sHhAKJKSFan
-        JTgq/eVTPulaHhhsazS8WWseWBJtiltryO6zkFg=
-X-Google-Smtp-Source: ABdhPJyfQC4xfW2/BqRv5HoqgN8AV6BTcIbuJH0uSB8n2Edr3sir/FlqIFAQgMkIMlNc41QBK/E+q+G0PIuXFxD7crQ=
-X-Received: by 2002:a81:1d4:0:b0:2eb:1b10:f43e with SMTP id
- 203-20020a8101d4000000b002eb1b10f43emr7705887ywb.100.1650675181900; Fri, 22
- Apr 2022 17:53:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220217162848.303601-1-Jason@zx2c4.com> <20220322155820.GA1745955@roeck-us.net>
- <YjoUU+8zrzB02pW7@sirena.org.uk> <0d20fb04-81b8-eeee-49ab-5b0a9e78c9f8@roeck-us.net>
- <YjsOHmvDgAxwLFMg@sirena.org.uk> <ebafdf77-5d96-556b-0197-a172b656bb01@roeck-us.net>
- <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
-In-Reply-To: <CAK8P3a1hzmXTTMsGcCA2ekEHnff+M7GrYSQDN4bVfVk6Ui=Apw@mail.gmail.com>
+        bh=6AW/tHyGYH7buMqMi2HrCUPQKHLBIz8Z8Mq8CEPo14E=;
+        b=Yy/eAe26VKr7OGfH2Y6VmzQOHrBaFcJLcZFxCIwoM5GuWBkc2pVHJvNsZCnWn7qW3IE260
+        elg/9Ox4JG1Pse8sMQB6nuBzab/le2Ft81PiwE6ZwKadRJyrJbbMWUX6Sn6qMScxZY19r8
+        ci2DLY0hWVYObTdHGli6SRfrLCitsj4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ff5900aa (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 23 Apr 2022 01:08:08 +0000 (UTC)
+Date:   Sat, 23 Apr 2022 03:08:04 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 23 Apr 2022 02:52:51 +0200
-X-Gmail-Original-Message-ID: <CAHmME9pMFMk6Uu1p4z9SzdAwg2q52FnH3fcsGXCK0OZod=YwLw@mail.gmail.com>
-Message-ID: <CAHmME9pMFMk6Uu1p4z9SzdAwg2q52FnH3fcsGXCK0OZod=YwLw@mail.gmail.com>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-To:     Arnd Bergmann <arnd@arndb.de>, Guenter Roeck <linux@roeck-us.net>
-Cc:     Mark Brown <broonie@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Theodore Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+To:     =?utf-8?Q?Charles-Fran=C3=A7ois?= Natali <cf.natali@gmail.com>
+Cc:     wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCH] WireGuard: restrict packet handling to non-isolated CPUs.
+Message-ID: <YmNRdLy1U2N9JN2n@zx2c4.com>
+References: <20220405212129.2270-1-cf.natali@gmail.com>
+ <YmHwjdfZJJ2DeLTK@zx2c4.com>
+ <CAH_1eM2ECPKLcHAKQ-RNf4Zj5hrgT-aJ9pjTKfChf9fnZp5Vkw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAH_1eM2ECPKLcHAKQ-RNf4Zj5hrgT-aJ9pjTKfChf9fnZp5Vkw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Arnd/Guenter,
+Hi Charles,
 
-On Wed, Mar 23, 2022 at 4:53 PM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Wed, Mar 23, 2022 at 3:23 PM Guenter Roeck <linux@roeck-us.net> wrote:
-> >
-> > On 3/23/22 05:10, Mark Brown wrote:
-> > > On Tue, Mar 22, 2022 at 02:54:20PM -0700, Guenter Roeck wrote:
-> > > Kind of academic given that Jason seems to have a handle on what the
-> > > issues are but for KernelCI it's variations on mach-virt, plus
-> > > versatile-pb.  There's a physical cubietruck as well, and BeagleBone
-> > > Blacks among others.  My best guess would be systems with low RAM are
-> > > somehow more prone to issues.
-> >
-> > I don't think it is entirely academic. versatile-pb fails for me;
-> > if it doesn't fail at KernelCI, I'd like to understand why - not to
-> > fix it in my test environment, but to make sure that I _don't_ fix it.
-> > After all, it _is_ a regression. Even if that regression is triggered
-> > by bad (for a given definition of "bad") userspace code, it is still
-> > a regression.
->
-> Maybe kernelci has a virtio-rng device assigned to the machine
-> and you don't? That would clearly avoid the issue here.
+On Fri, Apr 22, 2022 at 11:23:01PM +0100, Charles-François Natali wrote:
+> > Regarding your patch, is there a way to make that a bit more succinct,
+> > without introducing all of those helper functions? It seems awfully
+> > verbose for something that seems like a matter of replacing the online
+> > mask with the housekeeping mask.
+> 
+> Indeed, I wasn't really happy about that.
+> The reason I've written those helper functions is that the housekeeping mask
+> includes possible CPUs (cpu_possible_mask), so unfortunately it's not just a
+> matter of e.g. replacing cpu_online_mask with
+> housekeeping_cpumask(HK_FLAG_DOMAIN), we have to perform an AND
+> whenever we compute the weight, find the next CPU in the mask etc.
+> 
+> And I'd rather have the operations and mask in a single location instead of
+> scattered throughout the code, to make it easier to understand and maintain.
+> 
+> Happy to change to something more inline though, or open to suggestions.
 
-Indeed it's probably something like that. Or maybe they're networked
-with something that has a steady stream of interrupts. I say this
-because I was able to reproduce Guenter's findings using the
-versatilepb machine with the versatile_defconfig config and the
-versatile-pb.dtb file. Indeed this board doesn't have a cycle counter.
-However, I did have success using the fallback timer and the other
-patches in the jd/for-guenter branch, so at least for versatile's
-nuances, I think (hope?) there's a reasonable success story here.
+Probably more inlined, yea. A simpler version of your patch would
+probably be something like this, right?
+
+diff --git a/drivers/net/wireguard/queueing.h b/drivers/net/wireguard/queueing.h
+index 583adb37ee1e..b3117cdd647d 100644
+--- a/drivers/net/wireguard/queueing.h
++++ b/drivers/net/wireguard/queueing.h
+@@ -112,6 +112,8 @@ static inline int wg_cpumask_choose_online(int *stored_cpu, unsigned int id)
+ 		cpu = cpumask_first(cpu_online_mask);
+ 		for (i = 0; i < cpu_index; ++i)
+ 			cpu = cpumask_next(cpu, cpu_online_mask);
++		while (!housekeeping_test_cpu(cpu, HK_???))
++			cpu = cpumask_next(cpu, cpu_online_mask);
+ 		*stored_cpu = cpu;
+ 	}
+ 	return cpu;
+@@ -128,7 +130,7 @@ static inline int wg_cpumask_next_online(int *next)
+ {
+ 	int cpu = *next;
+
+-	while (unlikely(!cpumask_test_cpu(cpu, cpu_online_mask)))
++	while (unlikely(!cpumask_test_cpu(cpu, cpu_online_mask) && !housekeeping_test_cpu(cpu, HK_???)))
+ 		cpu = cpumask_next(cpu, cpu_online_mask) % nr_cpumask_bits;
+ 	*next = cpumask_next(cpu, cpu_online_mask) % nr_cpumask_bits;
+ 	return cpu;
+
+However, from looking at kernel/sched/isolation.c a bit, I noticed that
+indeed you're right that most of these functions (save one) are based on
+cpu_possible_mask rather than cpu_online_mask. This is frustrating
+because the code makes smart use of static branches to remain quick, but
+ANDing housekeeping_cpumask() with cpu_online_mask would, in the fast
+path, wind up ANDing cpu_online_mask with cpu_possible_mask, which is
+silly and pointless. That makes me suspect that maybe the best approach
+would be adding a relevant helper to kernel/sched/isolation.c, so that
+the helper can then do the `if (static_branch_unlikely(&housekeeping_overridden))`
+stuff internally.
+
+Or maybe you'll do some measurements and decide that just [ab]using
+housekeeping_test_cpu() like above is actually optimal? Not really sure
+myself.
+
+Anyway, I'll keep an eye out for your joint wireguard/padata series. Be
+sure to CC the people who wrote the isolation & housekeeping code, as
+they likely have opinions about this stuff (and certainly know more than
+me about it).
 
 Jason
