@@ -2,47 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84079C4167E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BF1C4167D
 	for <linux-crypto@archiver.kernel.org>; Sat, 23 Apr 2022 21:27:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237141AbiDWVaN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Apr 2022 17:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43860 "EHLO
+        id S237149AbiDWVaO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 23 Apr 2022 17:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237116AbiDWVaJ (ORCPT
+        with ESMTP id S235494AbiDWVaL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Apr 2022 17:30:09 -0400
+        Sat, 23 Apr 2022 17:30:11 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DA11D320;
-        Sat, 23 Apr 2022 14:27:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA131C931;
+        Sat, 23 Apr 2022 14:27:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EC47C60FD6;
-        Sat, 23 Apr 2022 21:27:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA9DDC385B1;
-        Sat, 23 Apr 2022 21:27:09 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F35660FFE;
+        Sat, 23 Apr 2022 21:27:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B30C385AB;
+        Sat, 23 Apr 2022 21:27:11 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="neZM7woj"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="K4W2tv6i"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650749225;
+        t=1650749231;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aLnH9LfNsXw8wnO3OV8d9NzfRRH/27wi66m+Mfcg6bE=;
-        b=neZM7wojbPocSxxW9ePwx+8ckM3cZBd2kXkC75pofXty4huWgO6u1+GvhmZZpdD1+4WSi/
-        xJwd76y+kiSznfLfnQWBxkEzKCT9t7vmKX7ZcGPsk66ob1Er5AYwAfnAOlSHmbhv0Mq18w
-        Wx7NwYsLLtAHXkYtdm+k4R1kb4tr1QY=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d56cf015 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 23 Apr 2022 21:27:05 +0000 (UTC)
+        bh=P/YWtrWSKlFYrGP8/ZboFqiFpzBykXNGvMW0a6jPb3Y=;
+        b=K4W2tv6iAyL3YHleQy/nkadUrF9oOcZU9gUrIUIUddMMFtFhZOE+5uv7Pkq0kYLfXlq6pI
+        OAkD7Po6L3OVtg2M07O+eId42md72YCYS6Jb9humDTpUtvJpUhRPRBr2aymVW2BcRkUSTN
+        A2oJYKyKtm5CWrUPOG0wUrGpY3n4lHs=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cf8eb529 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 23 Apr 2022 21:27:11 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         tglx@linutronix.de, arnd@arndb.de
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v6 01/17] ia64: define get_cycles macro for arch-override
-Date:   Sat, 23 Apr 2022 23:26:07 +0200
-Message-Id: <20220423212623.1957011-2-Jason@zx2c4.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Helge Deller <deller@gmx.de>
+Subject: [PATCH v6 03/17] parisc: define get_cycles macro for arch-override
+Date:   Sat, 23 Apr 2022 23:26:09 +0200
+Message-Id: <20220423212623.1957011-4-Jason@zx2c4.com>
 In-Reply-To: <20220423212623.1957011-1-Jason@zx2c4.com>
 References: <20220423212623.1957011-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -51,29 +52,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Itanium defines a get_cycles() function, but it forgot to do the usual
+PA-RISC defines a get_cycles() function, but it forgot to do the usual
 `#define get_cycles get_cycles` dance, making it impossible for generic
 code to see if an arch-specific function was defined.
 
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Helge Deller <deller@gmx.de>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- arch/ia64/include/asm/timex.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/parisc/include/asm/timex.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/ia64/include/asm/timex.h b/arch/ia64/include/asm/timex.h
-index 869a3ac6bf23..7ccc077a60be 100644
---- a/arch/ia64/include/asm/timex.h
-+++ b/arch/ia64/include/asm/timex.h
-@@ -39,6 +39,7 @@ get_cycles (void)
- 	ret = ia64_getreg(_IA64_REG_AR_ITC);
- 	return ret;
+diff --git a/arch/parisc/include/asm/timex.h b/arch/parisc/include/asm/timex.h
+index 06b510f8172e..b4622cb06a75 100644
+--- a/arch/parisc/include/asm/timex.h
++++ b/arch/parisc/include/asm/timex.h
+@@ -13,9 +13,10 @@
+ 
+ typedef unsigned long cycles_t;
+ 
+-static inline cycles_t get_cycles (void)
++static inline cycles_t get_cycles(void)
+ {
+ 	return mfctl(16);
  }
 +#define get_cycles get_cycles
  
- extern void ia64_cpu_local_tick (void);
- extern unsigned long long ia64_native_sched_clock (void);
+ #endif
 -- 
 2.35.1
 
