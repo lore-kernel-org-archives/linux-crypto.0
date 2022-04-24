@@ -2,93 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF884C433FE
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Apr 2022 10:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FFDC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Apr 2022 18:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239152AbiDXKym (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Apr 2022 06:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49922 "EHLO
+        id S237001AbiDXSPD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 24 Apr 2022 14:15:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236640AbiDXKyl (ORCPT
+        with ESMTP id S232215AbiDXSPC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Apr 2022 06:54:41 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 578D22494F;
-        Sun, 24 Apr 2022 03:51:40 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id EFE3992009C; Sun, 24 Apr 2022 12:51:38 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id E14B792009B;
-        Sun, 24 Apr 2022 11:51:38 +0100 (BST)
-Date:   Sun, 24 Apr 2022 11:51:38 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-cc:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        "David S . Miller" <davem@davemloft.net>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H . Peter Anvin" <hpa@zytor.com>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        John Stultz <john.stultz@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-m68k <linux-m68k@lists.linux-m68k.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        X86 ML <x86@kernel.org>, linux-xtensa@linux-xtensa.org
-Subject: Re: [PATCH v4 04/11] mips: use fallback for random_get_entropy()
- instead of zero
-In-Reply-To: <YmUHBKPC0bAbs4Vj@zx2c4.com>
-Message-ID: <alpine.DEB.2.21.2204241140290.9383@angie.orcam.me.uk>
-References: <20220413115411.21489-1-Jason@zx2c4.com> <20220413115411.21489-5-Jason@zx2c4.com> <20220413122546.GA11860@alpha.franken.de> <alpine.DEB.2.21.2204131331450.9383@angie.orcam.me.uk> <CAHmME9pQ4xdeTUDxAdrOu=S9NRTonYzJVk50fa0Zfz4knZt5WA@mail.gmail.com>
- <alpine.DEB.2.21.2204140014580.9383@angie.orcam.me.uk> <YlfoeGRM6w2O+eXA@zx2c4.com> <alpine.DEB.2.21.2204142349180.9383@angie.orcam.me.uk> <20220418071005.GA4075@alpha.franken.de> <alpine.DEB.2.21.2204220029590.9383@angie.orcam.me.uk>
- <YmUHBKPC0bAbs4Vj@zx2c4.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        Sun, 24 Apr 2022 14:15:02 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4150668F91;
+        Sun, 24 Apr 2022 11:11:59 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id d22so4131334wrc.13;
+        Sun, 24 Apr 2022 11:11:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ig9YP3YTXVoTvXh+iWd0BxQVnOKiliBqH/4WwV9hMaQ=;
+        b=GdRNvTfO2/Nn/vEPEoSQ3vXDGYmzsxeFwRwK+82Ps4kCWIuPhbRvuIzqBXYZdbCcCt
+         a9cRcxwrEJBg1LmZjA9Y4FjSu/pLzhQnZsbTgWewj5gV/MPxHcewY51KLT7fSE3Yrd6t
+         h1YhFgczYh0N3NTUI0UwkHVJXnYwuR2OYYF/iF4Yln3jNG9XvkZwtNs5vSeIwvo61c/p
+         BfqcStZv4BcmYX08nUcEIIa+LPzHpHWnEkXV8NVt11/Ch9wN476quLX3eFxie0M0T637
+         Sk5Ef+eRIZSQF2eDvvf1UKaKn9eOC0lSa3BfYA2yGVGJx2vcwOC58IEdfBD+g8bkTKab
+         Mg8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ig9YP3YTXVoTvXh+iWd0BxQVnOKiliBqH/4WwV9hMaQ=;
+        b=pqekaEozeizWPrLhAy+5eyX28Fu3G2CQb/HHaodwcNR1S34VxrAbdrT/LifFtgyLeG
+         uoje7XS6GaEqHmYHsTbAqpvJ/ycY+7iVJGBwUsBy9d731K5ivp8HgrHDlUYf7WGvQ4EY
+         +QPeQ4/+Bj7mX5nembZyk/wnNVKDbMSN9IGLSaKNCcPtgokFuHF44El5ziPT/0m4nrK8
+         IbzmwrQzTspCetjl/Mee3K4kjude5EP/9yV+q4pKwCawOXFt/jvfyKbtAcgX/MJVr7Tx
+         qGtbKai83WX1lKsG0kMDkf8ZQYQkFkQiEf3VCfZytZISWm9UadjQ0p+9/kYSWOkf9TJ3
+         w8Jw==
+X-Gm-Message-State: AOAM533KQR6d2cSRVIc60GEmYEfHhAJh0qYb8xaEctXlD63cbLDkoop/
+        0VlojtDOkxgXOK8T6j5V06M=
+X-Google-Smtp-Source: ABdhPJzl8AxrYA9hU6qSgpunjLklruTGLN5eQDyxctexbG3YbYjoQpezFTE60y7Bma4U6LZiH7JRwQ==
+X-Received: by 2002:a05:6000:1547:b0:20a:79dd:28bf with SMTP id 7-20020a056000154700b0020a79dd28bfmr11181514wry.505.1650823917456;
+        Sun, 24 Apr 2022 11:11:57 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id p7-20020a5d4e07000000b002079a418430sm6804254wrt.85.2022.04.24.11.11.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Apr 2022 11:11:57 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Sumit Garg <sumit.garg@linaro.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: optee-rng: remove redundant initialization to variable rng_size
+Date:   Sun, 24 Apr 2022 19:11:56 +0100
+Message-Id: <20220424181156.1364446-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 24 Apr 2022, Jason A. Donenfeld wrote:
+Variable rng_size is being initialized with a value that is never read,
+the variable is being re-assigned later on. The initialization is
+redundant and can be removed.
 
-> > unconditionally.  I think this discovery asks for code optimisation, which 
-> > I'll try to cook up sometime.
-> 
-> At some point too, by the way, we might also consider putting that into
-> a .c file rather than a static inline in the .h, since that function is
-> starting to get sort of big.
+Cleans up cppcheck warning:
+Variable 'rng_size' is assigned a value that is never used.
 
- This code is supposed to produce one to a couple of machine instructions 
-for the majority of configurations.  This is because the conditionals used 
-are usually compile-time constants.  Therefore I think it will be good to 
-continue having it as `static inline' functions.  Cf. the analysis in 
-commit 06947aaaf9bf ("MIPS: Implement random_get_entropy with CP0 
-Random").
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/char/hw_random/optee-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- If this code does expand to a longer sequence for some platforms, then 
-either they need to be verified whether they can be optimised (just as I 
-note here for the DEC systems) or we can consider making these functions 
-`extern inline' instead, with out-of-line code available from a .a file in 
-case the compiler decides the code is too large for inlining to be worth 
-doing after all.  Though I don't expect the latter case to be required 
-really.
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index a948c0727b2b..96b5d546d136 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -115,7 +115,7 @@ static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
+ static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ {
+ 	struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
+-	size_t read = 0, rng_size = 0;
++	size_t read = 0, rng_size;
+ 	int timeout = 1;
+ 	u8 *data = buf;
+ 
+-- 
+2.35.1
 
-  Maciej
