@@ -2,82 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB39C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 12:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0B9C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 12:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232320AbiDYMkX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 08:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57864 "EHLO
+        id S235871AbiDYNCi convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 09:02:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234381AbiDYMkT (ORCPT
+        with ESMTP id S238944AbiDYNCb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 08:40:19 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10A17523A;
-        Mon, 25 Apr 2022 05:37:12 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1650890231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QYgqWlbZPuGUmSJJNxerWK8Fs+cI9fIYPauFk75HEaY=;
-        b=RCo1CGMF/HFPBLHcu9SqOQ+J24t70eVpI5ofvHzUOHEadDBifyNwC/cXMJ9O70I/d1ztC9
-        3rOrIh8MoWXIfB1I7h2Z27IWtjz32Pq8KXeIjFEmoMbM2twuoYlvS5FQMo+embBdmSvPBx
-        3P+Hl11mBYmXerj0HKcaNQ8PlqKKaE/MLiTB8B7N+Q37lh3nYVe9/Y6+BUI92pKbk7w5AI
-        MCHlP/4ZA3jeeW5JgRkX+gN6MRX+ntUcmZzKn1MYZGmZZ56EvZF6gcfKI9auJjk6/9RqiZ
-        Ot6fzIwWRAdRM8zGmHpgP7BcN1qp8nNHDDJR2lSgZI7vff4dNQbspR/GhBoaxg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1650890231;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QYgqWlbZPuGUmSJJNxerWK8Fs+cI9fIYPauFk75HEaY=;
-        b=q1uvaAwrVuP2bFdfV5+Ha6fEi/PMSWgMi5t7At1tYytGo/6N9M6+0nBAF5rPMBitEpoRee
-        mVwl31xVp0KhwjDw==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        arnd@arndb.de
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v6 06/17] timekeeping: add raw clock fallback for
- random_get_entropy()
-In-Reply-To: <20220423212623.1957011-7-Jason@zx2c4.com>
-References: <20220423212623.1957011-1-Jason@zx2c4.com>
- <20220423212623.1957011-7-Jason@zx2c4.com>
-Date:   Mon, 25 Apr 2022 14:37:11 +0200
-Message-ID: <87y1zt1gqw.ffs@tglx>
+        Mon, 25 Apr 2022 09:02:31 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 235C213F11
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 05:59:26 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-246-RsRt4rMLMJSg1HNL0-UwSg-1; Mon, 25 Apr 2022 13:59:24 +0100
+X-MC-Unique: RsRt4rMLMJSg1HNL0-UwSg-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Mon, 25 Apr 2022 13:59:23 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.033; Mon, 25 Apr 2022 13:59:23 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Mikulas Patocka' <mpatocka@redhat.com>
+CC:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        Andy Shevchenko <andy@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
+Thread-Topic: [PATCH] hex2bin: make the function hex_to_bin constant-time
+Thread-Index: AQHYWCRFXKVloRHnAkSgNzNf81l36q0AX1CggAAH/4CAAC5kEA==
+Date:   Mon, 25 Apr 2022 12:59:23 +0000
+Message-ID: <e8de034196df450cb352fa60a570acca@AcuMS.aculab.com>
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
+ <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+ <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
+ <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
+ <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 23 2022 at 23:26, Jason A. Donenfeld wrote:
-> The addition of random_get_entropy_fallback() provides access to
-> whichever time source has the highest frequency, which is useful for
-> gathering entropy on platforms without available cycle counters. It's
-> not necessarily as good as being able to quickly access a cycle counter
-> that the CPU has, but it's still something, even when it falls back to
-> being jiffies-based.
->
-> In the event that a given arch does not define get_cycles(), falling
-> back to the get_cycles() default implementation that returns 0 is really
-> not the best we can do. Instead, at least calling
-> random_get_entropy_fallback() would be preferable, because that always
-> needs to return _something_, even falling back to jiffies eventually.
-> It's not as though random_get_entropy_fallback() is super high precision
-> or guaranteed to be entropic, but basically anything that's not zero all
-> the time is better than returning zero all the time.
->
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+From: Mikulas Patocka
+> Sent: 25 April 2022 12:04
+> 
+> On Mon, 25 Apr 2022, David Laight wrote:
+> 
+> > From: Linus Torvalds
+> > > Sent: 24 April 2022 22:42
+> > >
+> > > On Sun, Apr 24, 2022 at 2:37 PM Linus Torvalds
+> > > <torvalds@linux-foundation.org> wrote:
+> > > >
+> > > > Finally, for the same reason - please don't use ">> 8".  Because I do
+> > > > not believe that bit 8 is well-defined in your arithmetic. The *sign*
+> > > > bit will be, but I'm not convinced bit 8 is.
+> > >
+> > > Hmm.. I think it's ok. It can indeed overflow in 'char' and change the
+> > > sign in bit #7, but I suspect bit #8 is always fine.
+> > >
+> > > Still, If you want to just extend the sign bit, ">> 31" _is_ the
+> > > obvious thing to use (yeah, yeah, properly "sizeof(int)*8-1" or
+> > > whatever, you get my drift).
+> >
+> > Except that right shifts of signed values are UB.
+> > In particular it has always been valid to do an unsigned
+> > shift right on a 2's compliment negative number.
+> >
+> > 	David
+> 
+> Yes. All the standard versions (C89, C99, C11, C2X) say that right shift
+> of a negative value is implementation-defined.
+> 
+> So, we should cast it to "unsigned" before shifting it.
 
-Not that I care much, but in general taking over authorship w/o
-attribution via Suggested-by or such is frowned upon.
+Except that the intent appears to be to replicate the sign bit.
 
-Thanks,
+If it is 'implementation defined' (rather than suddenly being UB)
+it might be that the linux kernel requires sign propagating
+right shifts of negative values.
+This is typically what happens on 2's compliment systems.
+But not all small cpu have the required shift instruction.
+OTOH all the ones bit enough to run Linux probably do.
+(And gcc doesn't support '1's compliment' or 'sign overpunch' cpus.)
 
-        tglx
+The problem is that the compiler writers seem to be entering
+a mindset where they are optimising code based on UB behaviour.
+So given:
+void foo(int x)
+{
+	if (x >> 1 < 0)
+		return;
+	do_something();
+}
+they decide the test is UB, so can always be assumed to be true
+and thus do_something() is compiled away.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
