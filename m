@@ -2,106 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 448CBC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 11:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5A0C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 11:12:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbiDYLIL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 07:08:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49148 "EHLO
+        id S241659AbiDYLPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 07:15:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241765AbiDYLHv (ORCPT
+        with ESMTP id S233379AbiDYLPF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 07:07:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF881C5F
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 04:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650884650;
+        Mon, 25 Apr 2022 07:15:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDDA27B1C;
+        Mon, 25 Apr 2022 04:11:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 98433611BB;
+        Mon, 25 Apr 2022 11:11:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F73BC385A4;
+        Mon, 25 Apr 2022 11:11:55 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Fb81gOwC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650885113;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=53DTezqepMIC9Xq8psxHzqJsjt4jekr/8PlNq1hXFZw=;
-        b=TqptwXh8i3aRWwXleLPIkXHxt7INdH+GvWWUDBzL0rY3mGpDsPkKJv+f9sfHqeeeab8Dts
-        iv3pH9IyC6DqxE+/+Vbx8c+ZhOfl5AEQLSb5FK+aXa/xC8sK05njl/ASl90OuWUsh2HtTM
-        KDkbwksyvSwrL6h7TSbLc5+p18I3pAo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-364-el2x6POnNNCwYQETgj74GQ-1; Mon, 25 Apr 2022 07:04:06 -0400
-X-MC-Unique: el2x6POnNNCwYQETgj74GQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29F88833962;
-        Mon, 25 Apr 2022 11:04:06 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 191FA401475;
-        Mon, 25 Apr 2022 11:04:06 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 23PB463w025596;
-        Mon, 25 Apr 2022 07:04:06 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 23PB45Cv025592;
-        Mon, 25 Apr 2022 07:04:05 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Mon, 25 Apr 2022 07:04:05 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     David Laight <David.Laight@ACULAB.COM>
-cc:     "'Linus Torvalds'" <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        bh=pyGMSlT7TKWMqyO7rxkqbT4wkDaJbn9bAIlXs0o1pvk=;
+        b=Fb81gOwC3EH8unqp6LruzR4yJE1OPRBE1EZPUHJw+CxmH9eHpWvyJQv76wzpowvU+ZAu0Y
+        H2zothHVmufGsf9HWMj5327ATZll2C+DDvP2eA0Cnok2buZ+Mdv6RQNOwuozlzigFulERw
+        hfLhJH2Hy88KUXsF+R2lEgdjz2WG55k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bed3e851 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Apr 2022 11:11:53 +0000 (UTC)
+Date:   Mon, 25 Apr 2022 13:11:45 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
-In-Reply-To: <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
-Message-ID: <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com> <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com> <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
- <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        linux-arch <linux-arch@vger.kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Nick Hu <nickhu@andestech.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Michal Simek <monstr@monstr.eu>,
+        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Joshua Kinard <kumba@gentoo.org>,
+        David Laight <David.Laight@aculab.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v1] random: block in /dev/urandom
+Message-ID: <YmaB8TifJ7EWW1Xi@zx2c4.com>
+References: <20220217162848.303601-1-Jason@zx2c4.com>
+ <20220322155820.GA1745955@roeck-us.net>
+ <YjoC5kQMqyC/3L5Y@zx2c4.com>
+ <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
+ <CAHmME9rmeQAD2DwG=APTmDxuVxFDH=6GXoKpgPrU9rc9oXrmxQ@mail.gmail.com>
+ <20220423135631.GB3958174@roeck-us.net>
+ <YmRrUYfsXkF3XZ5S@zx2c4.com>
+ <5dfb14f4-23c6-1aa9-9ab3-bd5373ceaa64@roeck-us.net>
+ <YmXncURQMUHOS0IQ@zx2c4.com>
+ <8c27dfab-db37-651e-2828-78309755cb87@roeck-us.net>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8c27dfab-db37-651e-2828-78309755cb87@roeck-us.net>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Guenter,
 
-
-On Mon, 25 Apr 2022, David Laight wrote:
-
-> From: Linus Torvalds
-> > Sent: 24 April 2022 22:42
+On Sun, Apr 24, 2022 at 06:54:10PM -0700, Guenter Roeck wrote:
+> On 4/24/22 17:12, Jason A. Donenfeld wrote:
+> > Hi Guenter,
 > > 
-> > On Sun, Apr 24, 2022 at 2:37 PM Linus Torvalds
-> > <torvalds@linux-foundation.org> wrote:
-> > >
-> > > Finally, for the same reason - please don't use ">> 8".  Because I do
-> > > not believe that bit 8 is well-defined in your arithmetic. The *sign*
-> > > bit will be, but I'm not convinced bit 8 is.
+> > On Sat, Apr 23, 2022 at 07:04:26PM -0700, Guenter Roeck wrote:
+> >> I'll run another test tonight.
 > > 
-> > Hmm.. I think it's ok. It can indeed overflow in 'char' and change the
-> > sign in bit #7, but I suspect bit #8 is always fine.
+> > Super, thanks. Looking forward to learning what transpires. Hopefully
+> > all pass this time through...
 > > 
-> > Still, If you want to just extend the sign bit, ">> 31" _is_ the
-> > obvious thing to use (yeah, yeah, properly "sizeof(int)*8-1" or
-> > whatever, you get my drift).
 > 
-> Except that right shifts of signed values are UB.
-> In particular it has always been valid to do an unsigned
-> shift right on a 2's compliment negative number.
+> Build results:
+> 	total: 147 pass: 146 fail: 1
+> Failed builds:
+> 	m68k:allmodconfig
+> Qemu test results:
+> 	total: 489 pass: 489 fail: 0
 > 
-> 	David
+> The failure is inherited from mainline, so all looks good.
 
-Yes. All the standard versions (C89, C99, C11, C2X) say that right shift 
-of a negative value is implementation-defined.
+That is excellent news! Thanks again for testing.
 
-So, we should cast it to "unsigned" before shifting it.
+So what this means is: the rationale for reverting the /dev/random +
+/dev/urandom unification has now been fixed. That's some real tangible
+progress.
 
-Mikulas
+Now, I don't want to rush into trying the unification again too soon. I
+think if anything, the lesson from the first attempt wasn't simply, "I
+should fix a few of Guenter's test cases," but rather that the problem
+is fairly nuanced and will take a lot wider testing and research.
+However, the fact that the initial thing, across multiple platforms,
+that lead to the revert has been fixed gives me a decent amount of
+optimism that at /some point/ down the road, we'll be able to try this
+again. One step at a time.
 
+Jason
