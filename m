@@ -2,154 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54E9C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 13:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E00C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 13:41:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242139AbiDYNgy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 09:36:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35222 "EHLO
+        id S240200AbiDYNoQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 09:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242137AbiDYNgw (ORCPT
+        with ESMTP id S240386AbiDYNoO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 09:36:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18AB263B3
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 06:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650893626;
+        Mon, 25 Apr 2022 09:44:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E834349276;
+        Mon, 25 Apr 2022 06:41:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9D345B817FE;
+        Mon, 25 Apr 2022 13:41:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99CFBC385A4;
+        Mon, 25 Apr 2022 13:41:05 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HCy+TgIw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650894064;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=UqJWCWFq0Pii1oTW8QXvQWCpib7W/X1OWwkM6+ni6Dk=;
-        b=ei5Q8dQJZxUc0hRXnFyZtNQA+gUidROEK6CB2kdbYUxG15uaG2KdPo5Llya1xdTLFnUrgh
-        F+h6xJodKhEn3pS2hokgxErG3Mx9EzTrT98djbsUISK60LMZIa6ZUqkA+5d5hxLYdZMdhY
-        5eMI5NeemVBolsd83JLj6l83APeL+gk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-369-pStr-jH9N5qRAaDNAazn6Q-1; Mon, 25 Apr 2022 09:33:38 -0400
-X-MC-Unique: pStr-jH9N5qRAaDNAazn6Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5079B3834C16;
-        Mon, 25 Apr 2022 13:33:38 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 07E0654C75A;
-        Mon, 25 Apr 2022 13:33:38 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 23PDXbKt006460;
-        Mon, 25 Apr 2022 09:33:37 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 23PDXaJZ006456;
-        Mon, 25 Apr 2022 09:33:37 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Mon, 25 Apr 2022 09:33:36 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     David Laight <David.Laight@ACULAB.COM>
-cc:     "'Linus Torvalds'" <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
-In-Reply-To: <e8de034196df450cb352fa60a570acca@AcuMS.aculab.com>
-Message-ID: <alpine.LRH.2.02.2204250912350.5163@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com> <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com> <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com> <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
- <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com> <e8de034196df450cb352fa60a570acca@AcuMS.aculab.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        bh=uUwRxX7Od1S9mr2fS/Pfy6EUiVME26A+4yI8z6Tcx64=;
+        b=HCy+TgIwoaP/ZwSk50MW69l80eLdoGsRXfg6mcPbSqM2EBcW0J8IIz5hzKDAC0pYZIfCoO
+        WYwESwWjWWG0sHnI0naiYR3+ZqQn/SYABXLVvx/XUbQrM/HbXPLj9kvIMyQvM4Ibt366gR
+        QsKlKrAA6E5XfiPjg9TjhK5mPXQ/f7A=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9eb25e26 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Apr 2022 13:41:03 +0000 (UTC)
+Date:   Mon, 25 Apr 2022 15:41:00 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        arnd@arndb.de, Borislav Petkov <bp@alien8.de>, x86@kernel.org
+Subject: Re: [PATCH v6 13/17] x86: use fallback for random_get_entropy()
+ instead of zero
+Message-ID: <Ymak7LJd6GnFxsOo@zx2c4.com>
+References: <20220423212623.1957011-1-Jason@zx2c4.com>
+ <20220423212623.1957011-14-Jason@zx2c4.com>
+ <871qxl2vdw.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <871qxl2vdw.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Thomas,
 
-
-On Mon, 25 Apr 2022, David Laight wrote:
-
-> From: Mikulas Patocka
-> > Sent: 25 April 2022 12:04
-> > 
-> > On Mon, 25 Apr 2022, David Laight wrote:
-> > 
-> > > From: Linus Torvalds
-> > > > Sent: 24 April 2022 22:42
-> > > >
-> > > > On Sun, Apr 24, 2022 at 2:37 PM Linus Torvalds
-> > > > <torvalds@linux-foundation.org> wrote:
-> > > > >
-> > > > > Finally, for the same reason - please don't use ">> 8".  Because I do
-> > > > > not believe that bit 8 is well-defined in your arithmetic. The *sign*
-> > > > > bit will be, but I'm not convinced bit 8 is.
-> > > >
-> > > > Hmm.. I think it's ok. It can indeed overflow in 'char' and change the
-> > > > sign in bit #7, but I suspect bit #8 is always fine.
-> > > >
-> > > > Still, If you want to just extend the sign bit, ">> 31" _is_ the
-> > > > obvious thing to use (yeah, yeah, properly "sizeof(int)*8-1" or
-> > > > whatever, you get my drift).
-> > >
-> > > Except that right shifts of signed values are UB.
-> > > In particular it has always been valid to do an unsigned
-> > > shift right on a 2's compliment negative number.
-> > >
-> > > 	David
-> > 
-> > Yes. All the standard versions (C89, C99, C11, C2X) say that right shift
-> > of a negative value is implementation-defined.
-> > 
-> > So, we should cast it to "unsigned" before shifting it.
+On Mon, Apr 25, 2022 at 02:35:39PM +0200, Thomas Gleixner wrote:
+> On Sat, Apr 23 2022 at 23:26, Jason A. Donenfeld wrote:
 > 
-> Except that the intent appears to be to replicate the sign bit.
+> Please follow the guidelines of the tip maintainers when touching x86
+> code. https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-subject
+> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#changelog
+
+Will fix up the message and topic.
+
+> > In the event that random_get_entropy() can't access a cycle counter or
+> > similar, falling back to returning 0 is really not the best we can do.
+> > Instead, at least calling random_get_entropy_fallback() would be
+> > preferable, because that always needs to return _something_, even
+> > falling back to jiffies eventually. It's not as though
+> > random_get_entropy_fallback() is super high precision or guaranteed to
+> > be entropic, but basically anything that's not zero all the time is
+> > better than returning zero all the time.
+> >
+> > If CONFIG_X86_TSC=n, then it's possible that we're running on a 486
+> > with no RDTSC, so we only need the fallback code for that case.
 > 
-> If it is 'implementation defined' (rather than suddenly being UB)
+> There are also 586 CPUs which lack TSC.
 
-The standard says "If E1 has a signed type and a negative value, the 
-resulting value is implementation-defined."
+Will note this in the rewritten commit message.
 
-So, it's not undefined behavior.
-
-> it might be that the linux kernel requires sign propagating
-> right shifts of negative values.
-
-It may be that some code in the Linux kernel already assumes that right 
-shifts keep the sign. It's hard to say if such code exists.
-
-BTW. ubsan warns about left shift of negative values, but it doesn't warn 
-about right shift of negative values.
-
-> This is typically what happens on 2's compliment systems.
-> But not all small cpu have the required shift instruction.
-> OTOH all the ones bit enough to run Linux probably do.
-> (And gcc doesn't support '1's compliment' or 'sign overpunch' cpus.)
+> > +static inline unsigned long random_get_entropy(void)
+> > +{
+> > +#ifndef CONFIG_X86_TSC
+> > +	if (!cpu_feature_enabled(X86_FEATURE_TSC))
+> > +		return random_get_entropy_fallback();
+> > +#endif
 > 
-> The problem is that the compiler writers seem to be entering
-> a mindset where they are optimising code based on UB behaviour.
-> So given:
-> void foo(int x)
-> {
-> 	if (x >> 1 < 0)
-> 		return;
-> 	do_something();
-> }
-> they decide the test is UB, so can always be assumed to be true
-> and thus do_something() is compiled away.
+> Please get rid of this ifdeffery. While you are right, that anything
+> with CONFIG_X86_TSC=y should have a TSC, there is virt ....
 > 
-> 	David
+> cpu_feature_enabled() is runtime patched and only evaluated before
+> alternative patching, so the win of this ifdef is marginally, if even
+> noticable.
+> 
+> We surely can think about making TSC mandatory, but not selectively in a
+> particalur context.
 
-If it's implementation-defined (rather than undefined), the compiler 
-shouldn't do such optimization.
+This would be a regression of sorts from the current code, which reads:
 
-The linux kernel uses "-fno-strict-overflow" which disables some of these 
-UB optimizations.
+    static inline cycles_t get_cycles(void)
+    {
+    #ifndef CONFIG_X86_TSC
+            if (!boot_cpu_has(X86_FEATURE_TSC))
+                    return 0;
+    #endif
+            return rdtsc();
+    }
 
-Mikulas
+So my ifdef is just copying that one. I can make it into a `if
+(IS_ENABLED(CONFIG_X86_TSC))` thing, if you'd prefer that. But on
+systems where CONFIG_X86_TSC=n, including the extra code there seems
+kind of undesirable. Consider the current interrupt handler random.c
+code on x86, whose first lines (usually) compile to:
 
+.text:0000000000001A70 add_interrupt_randomness proc near
+.text:0000000000001A70                 movsxd  rcx, edi
+.text:0000000000001A73                 rdtsc
+.text:0000000000001A75                 shl     rdx, 20h
+.text:0000000000001A79                 mov     rdi, [rsp+0]
+.text:0000000000001A7D                 or      rax, rdx
+.text:0000000000001A80                 mov     rdx, offset irq_randomness
+.text:0000000000001A87                 mov     rsi, gs:__irq_regs
+.text:0000000000001A8F                 add     rdx, gs:this_cpu_off
+
+I'm not sure what advantage we'd get by changing that from the ifdefs to
+unconditionally including that if statement. Your argument about virt
+can't be valid, since the current get_cycles() code uses the ifdefs. And
+if you're arguing from the basis that CONFIG_X86_TSC=y is not reliable,
+then why does CONFIG_X86_TSC even exist in the first place?
+
+Rather the stronger argument you could make would be that moving from
+boot_cpu_has() to cpu_feature_enabled() (Borislav's suggestion) means
+that there's now a static branch here, so the actual cost to the
+assembly is a few meaningless nops, which you don't think would play a
+part in quantizing when rdtsc is called. If this is actually what you
+have in mind, and you find that ifdef ugly enough that this would be
+worth it, I can understand, and I'll make that change for v7. But I
+don't understand you to currently be making that argument, so I'm not
+quite sure what your position is.
+
+Could you clarify what you mean here and what your expectations are? And
+how does that point of view tie into the fact that get_cycles()
+currently uses the ifdef?
+
+Thanks,
+Jason
