@@ -2,76 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB031C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 09:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2618C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 10:22:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238512AbiDYJvr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 05:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41892 "EHLO
+        id S231492AbiDYKZC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 06:25:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbiDYJvq (ORCPT
+        with ESMTP id S232020AbiDYKZB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 05:51:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8E83DA44;
-        Mon, 25 Apr 2022 02:48:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 843AAB811A2;
-        Mon, 25 Apr 2022 09:48:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C1DC385A4;
-        Mon, 25 Apr 2022 09:48:37 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="G/HUQzWP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650880116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UKHoAv+vmixzGQZWqsiVdYoM9oUo3C3QU7ycqCxzTcc=;
-        b=G/HUQzWPvHyfPqCDK8eZ4G9oRrbfNsx1/9jy7kd5NaBjcKkh41EHIaqmC+C+wQtMObrQzD
-        CNJg/YNuowYGd7ZyjwEoiQGBJWr8musWmIE5LOu94EapXSWbJHcNwmw4Rvb9NUejyeqsxc
-        nyulzrFVHw86Gtpm8zVr4bKnaChENkQ=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8db81c47 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 25 Apr 2022 09:48:36 +0000 (UTC)
-Received: by mail-yb1-f180.google.com with SMTP id f38so26018199ybi.3;
-        Mon, 25 Apr 2022 02:48:35 -0700 (PDT)
-X-Gm-Message-State: AOAM531WMROtZ+O0a5ey0sFV+dHYjQQVvXctR89D4rp9U1j3lhE+IM7c
-        +cX6A27uZedwEaQ3Nwxg+wudzHo97XDMzxclSZ0=
-X-Google-Smtp-Source: ABdhPJyWYhp+y4cYe4oMYAvdEsEj15xgslG2ghG9AVvAz+nOV1I7ket3X0kl5u7cJeVEyXZU0LLMiXsAZTFv4QwC7uQ=
-X-Received: by 2002:a05:6902:1102:b0:645:1658:e19c with SMTP id
- o2-20020a056902110200b006451658e19cmr15087177ybu.267.1650880115159; Mon, 25
- Apr 2022 02:48:35 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:6410:b0:177:a66e:7c46 with HTTP; Mon, 25 Apr 2022
- 02:48:34 -0700 (PDT)
-In-Reply-To: <YmZtJz4tsP6hr2H5@osiris>
-References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-3-Jason@zx2c4.com>
- <YmZtJz4tsP6hr2H5@osiris>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 25 Apr 2022 11:48:34 +0200
-X-Gmail-Original-Message-ID: <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
-Message-ID: <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
-Subject: Re: [PATCH v6 02/17] s390: define get_cycles macro for arch-override
-To:     Heiko Carstens <hca@linux.ibm.com>
+        Mon, 25 Apr 2022 06:25:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143935D187;
+        Mon, 25 Apr 2022 03:21:57 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23P8MpI7023893;
+        Mon, 25 Apr 2022 10:21:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=Au4JzryWRBYgy4L1Xbqp/CvWbSnc2mAQbKPn+mwsVH0=;
+ b=DgoOhFsX4udMT/K6Kx6FVRwcQGIpR2htQo3Bt4+5upakDxiQ4d9CkTflaZJBvPd/JRnz
+ VNHCTsf2mbuooCU6nPiENk3rHgZgr5JMrP8hUxyn5cSALo3HO66P6Sv++Tp/wV04BB+2
+ iG4oGUXqHS+bSrbHW1RHdCJc3IlGNxluXLErKPP5zwGu5iXWLaVp51N7x5swU2Twcvx7
+ K6KGD4Eor6M9iPMYL8ouMk9mZX7+07J2XLHOxQEdGjgRWJQo3x5Cldyd+O/x+ul2l4Z5
+ HkVQHnFKStFdbbK2TxtHCO+QbngL7Mcu4WPs7PY/AHrQie8Ep/Pua9zRovkfFiU8JhmH Nw== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fmuh5wydy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 10:21:44 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PADNWg029499;
+        Mon, 25 Apr 2022 10:21:42 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3fm8qhhtdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 10:21:42 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PALp3856164610
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Apr 2022 10:21:51 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0FE2A4054;
+        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7E186A405B;
+        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
+Received: from osiris (unknown [9.145.60.82])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
+Date:   Mon, 25 Apr 2022 12:21:37 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         tglx@linutronix.de, arnd@arndb.de,
         Vasily Gorbik <gor@linux.ibm.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v6 02/17] s390: define get_cycles macro for arch-override
+Message-ID: <YmZ2MSQssUNwoprd@osiris>
+References: <20220423212623.1957011-1-Jason@zx2c4.com>
+ <20220423212623.1957011-3-Jason@zx2c4.com>
+ <YmZtJz4tsP6hr2H5@osiris>
+ <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dLjpCHMTCJRAW-5iEGbUuGwEdFn7OJKS
+X-Proofpoint-GUID: dLjpCHMTCJRAW-5iEGbUuGwEdFn7OJKS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-25_06,2022-04-25_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ phishscore=0 adultscore=0 bulkscore=0 spamscore=0 mlxlogscore=626
+ lowpriorityscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204250045
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/25/22, Heiko Carstens <hca@linux.ibm.com> wrote:
-> Is any of your subsequent patches making sure that the asm generic
-> header file gets included everywhere? Otherwise I don't see the point
-> of this patch.
->
+On Mon, Apr 25, 2022 at 11:48:34AM +0200, Jason A. Donenfeld wrote:
+> On 4/25/22, Heiko Carstens <hca@linux.ibm.com> wrote:
+> > Is any of your subsequent patches making sure that the asm generic
+> > header file gets included everywhere? Otherwise I don't see the point
+> > of this patch.
+> 
+> Yes; patch 6 requires this as a prereq. I'm not doing this arbitrarily.
 
-Yes; patch 6 requires this as a prereq. I'm not doing this arbitrarily.
+Ok, that was not obvious to me, especially since I was only cc'ed for
+this patch and assumed this was actually a bug fix.
+Thanks for clarifying.
 
-Jason
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
