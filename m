@@ -2,123 +2,219 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5A0C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 11:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D665C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 12:07:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241659AbiDYLPJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 07:15:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
+        id S231203AbiDYMLA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 08:11:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233379AbiDYLPF (ORCPT
+        with ESMTP id S229491AbiDYMK7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 07:15:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDDA27B1C;
-        Mon, 25 Apr 2022 04:11:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 98433611BB;
-        Mon, 25 Apr 2022 11:11:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F73BC385A4;
-        Mon, 25 Apr 2022 11:11:55 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Fb81gOwC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650885113;
+        Mon, 25 Apr 2022 08:10:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2E7765676A
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 05:07:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650888474;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pyGMSlT7TKWMqyO7rxkqbT4wkDaJbn9bAIlXs0o1pvk=;
-        b=Fb81gOwC3EH8unqp6LruzR4yJE1OPRBE1EZPUHJw+CxmH9eHpWvyJQv76wzpowvU+ZAu0Y
-        H2zothHVmufGsf9HWMj5327ATZll2C+DDvP2eA0Cnok2buZ+Mdv6RQNOwuozlzigFulERw
-        hfLhJH2Hy88KUXsF+R2lEgdjz2WG55k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bed3e851 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 25 Apr 2022 11:11:53 +0000 (UTC)
-Date:   Mon, 25 Apr 2022 13:11:45 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
+        bh=x9icyG6jXOuh0gFgFjOSgaGXc5WizgRAriibQ5e+0eA=;
+        b=K3B+BO560mWDBKrJLZohQV2pMwy6qriIhlrn8DWH3WdYnPLxB73ufglJnCnvLgR8QrMxnU
+        7QtjiTlVSZawAY2E6LzuVpLrDBNtVDYcbYVwzNYh6ZXwR7oJ+U11aSAIlskyCVHikjuwXi
+        Pti/EMbemWM4V8DeELCmz9+KtSPdOXk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-OJ3-yDKPOLauqwyTrBUagQ-1; Mon, 25 Apr 2022 08:07:50 -0400
+X-MC-Unique: OJ3-yDKPOLauqwyTrBUagQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 806BF3811F33;
+        Mon, 25 Apr 2022 12:07:49 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 71B5340316B;
+        Mon, 25 Apr 2022 12:07:49 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 23PC7nql030551;
+        Mon, 25 Apr 2022 08:07:49 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 23PC7mR5030546;
+        Mon, 25 Apr 2022 08:07:49 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Mon, 25 Apr 2022 08:07:48 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+cc:     Andy Shevchenko <andy@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Message-ID: <YmaB8TifJ7EWW1Xi@zx2c4.com>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net>
- <YjoC5kQMqyC/3L5Y@zx2c4.com>
- <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
- <CAHmME9rmeQAD2DwG=APTmDxuVxFDH=6GXoKpgPrU9rc9oXrmxQ@mail.gmail.com>
- <20220423135631.GB3958174@roeck-us.net>
- <YmRrUYfsXkF3XZ5S@zx2c4.com>
- <5dfb14f4-23c6-1aa9-9ab3-bd5373ceaa64@roeck-us.net>
- <YmXncURQMUHOS0IQ@zx2c4.com>
- <8c27dfab-db37-651e-2828-78309755cb87@roeck-us.net>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
+In-Reply-To: <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+Message-ID: <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com> <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8c27dfab-db37-651e-2828-78309755cb87@roeck-us.net>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Guenter,
 
-On Sun, Apr 24, 2022 at 06:54:10PM -0700, Guenter Roeck wrote:
-> On 4/24/22 17:12, Jason A. Donenfeld wrote:
-> > Hi Guenter,
-> > 
-> > On Sat, Apr 23, 2022 at 07:04:26PM -0700, Guenter Roeck wrote:
-> >> I'll run another test tonight.
-> > 
-> > Super, thanks. Looking forward to learning what transpires. Hopefully
-> > all pass this time through...
-> > 
+
+On Sun, 24 Apr 2022, Linus Torvalds wrote:
+
+> On Sun, Apr 24, 2022 at 1:54 PM Mikulas Patocka <mpatocka@redhat.com> wrote:
+> >
+> > + *
+> > + * Explanation of the logic:
+> > + * (ch - '9' - 1) is negative if ch <= '9'
+> > + * ('0' - 1 - ch) is negative if ch >= '0'
 > 
-> Build results:
-> 	total: 147 pass: 146 fail: 1
-> Failed builds:
-> 	m68k:allmodconfig
-> Qemu test results:
-> 	total: 489 pass: 489 fail: 0
+> True, but...
 > 
-> The failure is inherited from mainline, so all looks good.
+> Please, just to make me happier, make the sign of 'ch' be something
+> very explicit. Right now that code uses 'char ch', which could be
+> signed or unsigned.
 
-That is excellent news! Thanks again for testing.
+OK, I fixed it, here I'm sending the second version.
 
-So what this means is: the rationale for reverting the /dev/random +
-/dev/urandom unification has now been fixed. That's some real tangible
-progress.
+> Finally, for the same reason - please don't use ">> 8".  Because I do
+> not believe that bit 8 is well-defined in your arithmetic. The *sign*
 
-Now, I don't want to rush into trying the unification again too soon. I
-think if anything, the lesson from the first attempt wasn't simply, "I
-should fix a few of Guenter's test cases," but rather that the problem
-is fairly nuanced and will take a lot wider testing and research.
-However, the fact that the initial thing, across multiple platforms,
-that lead to the revert has been fixed gives me a decent amount of
-optimism that at /some point/ down the road, we'll be able to try this
-again. One step at a time.
+We are subtracting values that are in the 0 ... 255 range. So, the result 
+will be in the -255 ... 255 range. So, the bits 8 to 31 of the result are 
+equivalent.
 
-Jason
+> bit will be, but I'm not convinced bit 8 is.
+> 
+> So use ">> 31" or similar.
+
+We can pick any number between 8 and 28. 31 won't work because the C 
+standard doesn't specify that the right shift keeps the sign bit.
+
+To make it standard-compliant, I added a cast that casts the int value to 
+unsigned. We have an unsigned value with bits 8 to 31 equivalent. When we 
+shift it 8 bits to the right, we have either 0 or 0xffffff - and this 
+value is suitable for masking.
+
+> Also, I do worry that this is *exactly* the kind of trick that a
+> compiler could easily turn back into a conditional. Usually compilers
+> tend to go the other way (ie turn conditionals into arithmetic if
+> possible), but..
+
+Some old version that I tried used "(ch - '0' + 1) * ((unsigned)(ch - '0') 
+<= 9)" - it worked with gcc, but clang was too smart and turned it into a 
+cmov when compiling for i686 and to a conditional branch when compiling 
+for i586.
+
+Another version used "-(c - '0' + 1) * (((unsigned)(c - '0') >= 10) - 1)" 
+- it almost worked, except that clang still turned it into a conditional 
+jump on sparc32 and powerpc32.
+
+So, I came up with this version that avoids comparison operators at all 
+and tested it with gcc and clang on all architectures that I could try.
+
+Mikulas
+
+>                     Linus
+> 
+
+
+From: Mikulas Patocka <mpatocka@redhat.com>
+
+The function hex2bin is used to load cryptographic keys into device mapper
+targets dm-crypt and dm-integrity. It should take constant time
+independent on the processed data, so that concurrently running
+unprivileged code can't infer any information about the keys via
+microarchitectural convert channels.
+
+This patch changes the function hex_to_bin so that it contains no branches
+and no memory accesses.
+
+Note that this shouldn't cause performance degradation because the size of
+the new function is the same as the size of the old function (on x86-64) -
+and the new function causes no branch misprediction penalties.
+
+I compile-tested this function with gcc on aarch64 alpha arm hppa hppa64
+i386 ia64 m68k mips32 mips64 powerpc powerpc64 riscv sh4 s390x sparc32
+sparc64 x86_64 and with clang on aarch64 arm hexagon i386 mips32 mips64
+powerpc powerpc64 s390x sparc32 sparc64 x86_64 to verify that there are no
+branches in the generated code.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Cc: stable@vger.kernel.org
+
+---
+ include/linux/kernel.h |    2 +-
+ lib/hexdump.c          |   32 +++++++++++++++++++++++++-------
+ 2 files changed, 26 insertions(+), 8 deletions(-)
+
+Index: linux-2.6/lib/hexdump.c
+===================================================================
+--- linux-2.6.orig/lib/hexdump.c	2022-04-24 18:51:20.000000000 +0200
++++ linux-2.6/lib/hexdump.c	2022-04-25 13:15:26.000000000 +0200
+@@ -22,15 +22,33 @@ EXPORT_SYMBOL(hex_asc_upper);
+  *
+  * hex_to_bin() converts one hex digit to its actual value or -1 in case of bad
+  * input.
++ *
++ * This function is used to load cryptographic keys, so it is coded in such a
++ * way that there are no conditions or memory accesses that depend on data.
++ *
++ * Explanation of the logic:
++ * (ch - '9' - 1) is negative if ch <= '9'
++ * ('0' - 1 - ch) is negative if ch >= '0'
++ * we "and" these two values, so the result is negative if ch is in the range
++ *	'0' ... '9'
++ * we are only interested in the sign, so we do a shift ">> 8"; note that right
++ *	shift of a negative value is implementation-defined, so we cast the
++ *	value to (unsigned) before the shift --- we have 0xffffff if ch is in
++ *	the range '0' ... '9', 0 otherwise
++ * we "and" this value with (ch - '0' + 1) --- we have a value 1 ... 10 if ch is
++ *	in the range '0' ... '9', 0 otherwise
++ * we add this value to -1 --- we have a value 0 ... 9 if ch is in the range '0'
++ *	... '9', -1 otherwise
++ * the next line is similar to the previous one, but we need to decode both
++ *	uppercase and lowercase letters, so we use (ch & 0xdf), which converts
++ *	lowercase to uppercase
+  */
+-int hex_to_bin(char ch)
++int hex_to_bin(unsigned char ch)
+ {
+-	if ((ch >= '0') && (ch <= '9'))
+-		return ch - '0';
+-	ch = tolower(ch);
+-	if ((ch >= 'a') && (ch <= 'f'))
+-		return ch - 'a' + 10;
+-	return -1;
++	unsigned char cu = ch & 0xdf;
++	return -1 +
++		((ch - '0' +  1) & (unsigned)((ch - '9' - 1) & ('0' - 1 - ch)) >> 8) +
++		((cu - 'A' + 11) & (unsigned)((cu - 'F' - 1) & ('A' - 1 - cu)) >> 8);
+ }
+ EXPORT_SYMBOL(hex_to_bin);
+ 
+Index: linux-2.6/include/linux/kernel.h
+===================================================================
+--- linux-2.6.orig/include/linux/kernel.h	2022-04-21 17:31:39.000000000 +0200
++++ linux-2.6/include/linux/kernel.h	2022-04-25 07:33:43.000000000 +0200
+@@ -285,7 +285,7 @@ static inline char *hex_byte_pack_upper(
+ 	return buf;
+ }
+ 
+-extern int hex_to_bin(char ch);
++extern int hex_to_bin(unsigned char ch);
+ extern int __must_check hex2bin(u8 *dst, const char *src, size_t count);
+ extern char *bin2hex(char *dst, const void *src, size_t count);
+ 
+
