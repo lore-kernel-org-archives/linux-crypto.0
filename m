@@ -2,122 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4C6C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 01:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FB1C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 05:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240239AbiDYB5Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Apr 2022 21:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38822 "EHLO
+        id S241278AbiDYFzo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 01:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234324AbiDYB5W (ORCPT
+        with ESMTP id S232382AbiDYFzl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Apr 2022 21:57:22 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E536140A32;
-        Sun, 24 Apr 2022 18:54:15 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id i3-20020a056830010300b00605468119c3so9831493otp.11;
-        Sun, 24 Apr 2022 18:54:15 -0700 (PDT)
+        Mon, 25 Apr 2022 01:55:41 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD09A3631C
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Apr 2022 22:52:34 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id s14so24605311plk.8
+        for <linux-crypto@vger.kernel.org>; Sun, 24 Apr 2022 22:52:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=igNMWVB0BCCRkPYfikUJYnBxF9vywzLMTQ38+RboaBU=;
-        b=eGKOKm7arB3Mkck5UGNAVGH1J+LW9yasn1IK/T07ZIbbSGNYF5qegU0+OrvbQAwafz
-         JNdWdyLj/T74zZe5iMRtOwYZSEWqnePyVCDuwzx7ebcF4DTsq9eMSXWzpX/NjFC8u3Fa
-         0sbT6fZdcWjxAPpxGoehybf1M8SXzWaxKb2YC9jzvbtM9A7yhBgF3/DFmnoeaipNXLjV
-         JQhlDMB3SsWnyUdKZOYZjqoxvQ0rjUCwZu8M05px9rxWQRTstKx/CzBj/MBJhU/aXiUU
-         t4ffQDIhzUmvd0nU4+vU/EayqrGotXZr/ih6L/obEZHUhcWjcK+5qy2heREUFCPnrK9a
-         Us7Q==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I8PWt7OjbJmxLANi6mNzNMu0WXmhqmQPufvVnsJYKmw=;
+        b=RN+YWN/6ZEosVdavFx6I+1osrVBC6v3XRA/fIXRE0bY2SOhSo+1/4Wqfie+Hs44EOi
+         hTNboelvwlwPk379FYh10R/YISw23eV3zPOfAuuAZDdKVh05n6aEiv+Y1uf81gHDNEj4
+         OvdOUiAnM4PnFQHQDidUvwNGOAJ8zYHXn2cZlK0qsqgBOlMDOdzYEHdNoDr4UDed78rq
+         QofJYCCDnCmbBK5vX+WWyhb8qoFmhqquCmPYp89NgTY35yQJ9DCDaFB0IxH/vstbfjmf
+         QmytdENTfQFln9XSaOKk0VH55nJgtEA7SKH4I3CuLblBxs1MiT0N26oHoebuSZcKGGCI
+         ACNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=igNMWVB0BCCRkPYfikUJYnBxF9vywzLMTQ38+RboaBU=;
-        b=57llMSg5QAxSxn4DYrzA9PTd6lDOKUu3X3YeiOXwhQ3iys7jlmg+OMpY+OYW1oURRh
-         DiU8wWmTl6KPo+0jMUkFkXvD95VGfqeF9COfVv1hfEEJqs89/1YZRJ+EhxHFIppCPR/9
-         3Hnnf5HVWi9wPgUa1QW2IwOGUMz+c+krsOHzxcPxnm957QRqcEPqupXAEUAewAWzSVH+
-         bQTQwEIC1AijA1Y8MX7l0rbl7SPM8Jxg3/TO20SxLzu1pFDTyw9kOtffvVblYg5yJ0ga
-         dxR7P1zEb/GDK/uJdaVDTz96EtwwIyievLn6jxkdIwcwlTEfagK3o7SK/B/zXafPXTt5
-         AfrA==
-X-Gm-Message-State: AOAM531z+8JYT0DZLhjfjrmv87bYQx8pIpBmnXP2hathOSRcc0Sb5xG5
-        XiLSJWMH5EyogJOL34YVXX4=
-X-Google-Smtp-Source: ABdhPJydeC4xOzNedxnPid3fIWvDUhntKJuRxEUcVA9wj+uWTuCsq7BzKnYP+Eccbkl8lfeC8tg0/g==
-X-Received: by 2002:a9d:2f29:0:b0:605:4290:ec9a with SMTP id h38-20020a9d2f29000000b006054290ec9amr5432881otb.344.1650851655199;
-        Sun, 24 Apr 2022 18:54:15 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id d3-20020a9d2903000000b005cda765f578sm3281005otb.0.2022.04.24.18.54.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Apr 2022 18:54:14 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <8c27dfab-db37-651e-2828-78309755cb87@roeck-us.net>
-Date:   Sun, 24 Apr 2022 18:54:10 -0700
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I8PWt7OjbJmxLANi6mNzNMu0WXmhqmQPufvVnsJYKmw=;
+        b=068kiEGVtqx1k+xCto07YBiNtZ6fZyThrpWDU4gZDzN8I7QwsgIJzjxmhTHDb8wTA/
+         Vu4NF4MDYGFcNA3Qus/jvF8q3sdSdlIm/xEdAknM24wGgN7TxSKubRrpXv3vtneT+wBa
+         9ED0qA9c1x02852uAAl8VbLRGn1bk+vGMpjyJIpCdhHlsn2/y6ZwpSQGK/eRuLJXRavZ
+         ijaCYPEkiyeAe6d+k00QOQMtmZbVvxgxR2r7ABCLjn7xtdPEd5r1uaw/wEWGLa8l/LBv
+         wHzkuWXefxbfKEXOXlIw71HyVicFJBaFyEWP7MyZkdutc6d4/ZUPrNV4oxxvLvRMIOXX
+         7CPQ==
+X-Gm-Message-State: AOAM5338iTq4gfWJE1E5GjNNeKgPdw+yKHnXEcetuHEs3HouRAEsoA/1
+        RNn7KhM+sQ22u3516zfH9OV0nnIlZAkdKq+jOxSF9Q==
+X-Google-Smtp-Source: ABdhPJwHuUIcwQrmSB5z5lvcykuJgyvBocbIF4etjzQWiYbhgjI8gV8ciq759eDd9ud0j1ZfooBpy+vVS4zuhMC83WY=
+X-Received: by 2002:a17:902:9f96:b0:15d:1ee7:4231 with SMTP id
+ g22-20020a1709029f9600b0015d1ee74231mr1335076plq.131.1650865953665; Sun, 24
+ Apr 2022 22:52:33 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v1] random: block in /dev/urandom
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Dinh Nguyen <dinguyen@kernel.org>,
-        Nick Hu <nickhu@andestech.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Michal Simek <monstr@monstr.eu>,
-        Borislav Petkov <bp@alien8.de>, Guo Ren <guoren@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Joshua Kinard <kumba@gentoo.org>,
-        David Laight <David.Laight@aculab.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>
-References: <20220217162848.303601-1-Jason@zx2c4.com>
- <20220322155820.GA1745955@roeck-us.net> <YjoC5kQMqyC/3L5Y@zx2c4.com>
- <d5c23f68-30ba-a5eb-6bea-501736e79c88@roeck-us.net>
- <CAHmME9rmeQAD2DwG=APTmDxuVxFDH=6GXoKpgPrU9rc9oXrmxQ@mail.gmail.com>
- <20220423135631.GB3958174@roeck-us.net> <YmRrUYfsXkF3XZ5S@zx2c4.com>
- <5dfb14f4-23c6-1aa9-9ab3-bd5373ceaa64@roeck-us.net>
- <YmXncURQMUHOS0IQ@zx2c4.com>
-From:   Guenter Roeck <linux@roeck-us.net>
-In-Reply-To: <YmXncURQMUHOS0IQ@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220424181156.1364446-1-colin.i.king@gmail.com>
+In-Reply-To: <20220424181156.1364446-1-colin.i.king@gmail.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Mon, 25 Apr 2022 11:22:19 +0530
+Message-ID: <CAFA6WYMeOv160_mnEHVN9GgN1tqN9Zt0GqnGQRgP4m8V-aztTQ@mail.gmail.com>
+Subject: Re: [PATCH] hwrng: optee-rng: remove redundant initialization to
+ variable rng_size
+To:     Colin Ian King <colin.i.king@gmail.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/24/22 17:12, Jason A. Donenfeld wrote:
-> Hi Guenter,
-> 
-> On Sat, Apr 23, 2022 at 07:04:26PM -0700, Guenter Roeck wrote:
->> I'll run another test tonight.
-> 
-> Super, thanks. Looking forward to learning what transpires. Hopefully
-> all pass this time through...
-> 
+On Sun, 24 Apr 2022 at 23:41, Colin Ian King <colin.i.king@gmail.com> wrote:
+>
+> Variable rng_size is being initialized with a value that is never read,
+> the variable is being re-assigned later on. The initialization is
+> redundant and can be removed.
+>
+> Cleans up cppcheck warning:
+> Variable 'rng_size' is assigned a value that is never used.
+>
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  drivers/char/hw_random/optee-rng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-Build results:
-	total: 147 pass: 146 fail: 1
-Failed builds:
-	m68k:allmodconfig
-Qemu test results:
-	total: 489 pass: 489 fail: 0
+Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
 
-The failure is inherited from mainline, so all looks good.
+-Sumit
 
-Guenter
-
+> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+> index a948c0727b2b..96b5d546d136 100644
+> --- a/drivers/char/hw_random/optee-rng.c
+> +++ b/drivers/char/hw_random/optee-rng.c
+> @@ -115,7 +115,7 @@ static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
+>  static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+>  {
+>         struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
+> -       size_t read = 0, rng_size = 0;
+> +       size_t read = 0, rng_size;
+>         int timeout = 1;
+>         u8 *data = buf;
+>
+> --
+> 2.35.1
+>
