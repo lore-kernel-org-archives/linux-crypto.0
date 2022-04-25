@@ -2,98 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2618C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 10:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 448CBC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 11:05:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbiDYKZC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 06:25:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
+        id S230252AbiDYLIL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 07:08:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232020AbiDYKZB (ORCPT
+        with ESMTP id S241765AbiDYLHv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 06:25:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143935D187;
-        Mon, 25 Apr 2022 03:21:57 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23P8MpI7023893;
-        Mon, 25 Apr 2022 10:21:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=Au4JzryWRBYgy4L1Xbqp/CvWbSnc2mAQbKPn+mwsVH0=;
- b=DgoOhFsX4udMT/K6Kx6FVRwcQGIpR2htQo3Bt4+5upakDxiQ4d9CkTflaZJBvPd/JRnz
- VNHCTsf2mbuooCU6nPiENk3rHgZgr5JMrP8hUxyn5cSALo3HO66P6Sv++Tp/wV04BB+2
- iG4oGUXqHS+bSrbHW1RHdCJc3IlGNxluXLErKPP5zwGu5iXWLaVp51N7x5swU2Twcvx7
- K6KGD4Eor6M9iPMYL8ouMk9mZX7+07J2XLHOxQEdGjgRWJQo3x5Cldyd+O/x+ul2l4Z5
- HkVQHnFKStFdbbK2TxtHCO+QbngL7Mcu4WPs7PY/AHrQie8Ep/Pua9zRovkfFiU8JhmH Nw== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fmuh5wydy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 10:21:44 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 23PADNWg029499;
-        Mon, 25 Apr 2022 10:21:42 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06fra.de.ibm.com with ESMTP id 3fm8qhhtdt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 25 Apr 2022 10:21:42 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 23PALp3856164610
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Apr 2022 10:21:51 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E0FE2A4054;
-        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7E186A405B;
-        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
-Received: from osiris (unknown [9.145.60.82])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 25 Apr 2022 10:21:38 +0000 (GMT)
-Date:   Mon, 25 Apr 2022 12:21:37 +0200
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tglx@linutronix.de, arnd@arndb.de,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v6 02/17] s390: define get_cycles macro for arch-override
-Message-ID: <YmZ2MSQssUNwoprd@osiris>
-References: <20220423212623.1957011-1-Jason@zx2c4.com>
- <20220423212623.1957011-3-Jason@zx2c4.com>
- <YmZtJz4tsP6hr2H5@osiris>
- <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
+        Mon, 25 Apr 2022 07:07:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF881C5F
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 04:04:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650884650;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=53DTezqepMIC9Xq8psxHzqJsjt4jekr/8PlNq1hXFZw=;
+        b=TqptwXh8i3aRWwXleLPIkXHxt7INdH+GvWWUDBzL0rY3mGpDsPkKJv+f9sfHqeeeab8Dts
+        iv3pH9IyC6DqxE+/+Vbx8c+ZhOfl5AEQLSb5FK+aXa/xC8sK05njl/ASl90OuWUsh2HtTM
+        KDkbwksyvSwrL6h7TSbLc5+p18I3pAo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-364-el2x6POnNNCwYQETgj74GQ-1; Mon, 25 Apr 2022 07:04:06 -0400
+X-MC-Unique: el2x6POnNNCwYQETgj74GQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 29F88833962;
+        Mon, 25 Apr 2022 11:04:06 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 191FA401475;
+        Mon, 25 Apr 2022 11:04:06 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 23PB463w025596;
+        Mon, 25 Apr 2022 07:04:06 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 23PB45Cv025592;
+        Mon, 25 Apr 2022 07:04:05 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Mon, 25 Apr 2022 07:04:05 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     David Laight <David.Laight@ACULAB.COM>
+cc:     "'Linus Torvalds'" <torvalds@linux-foundation.org>,
+        Andy Shevchenko <andy@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
+In-Reply-To: <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
+Message-ID: <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com> <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com> <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
+ <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHmME9r84RAvALEA91b+uRaRfhM1VJn=bQkPWQ=n+_ZWpnPb5w@mail.gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dLjpCHMTCJRAW-5iEGbUuGwEdFn7OJKS
-X-Proofpoint-GUID: dLjpCHMTCJRAW-5iEGbUuGwEdFn7OJKS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-25_06,2022-04-25_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- phishscore=0 adultscore=0 bulkscore=0 spamscore=0 mlxlogscore=626
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204250045
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 11:48:34AM +0200, Jason A. Donenfeld wrote:
-> On 4/25/22, Heiko Carstens <hca@linux.ibm.com> wrote:
-> > Is any of your subsequent patches making sure that the asm generic
-> > header file gets included everywhere? Otherwise I don't see the point
-> > of this patch.
+
+
+On Mon, 25 Apr 2022, David Laight wrote:
+
+> From: Linus Torvalds
+> > Sent: 24 April 2022 22:42
+> > 
+> > On Sun, Apr 24, 2022 at 2:37 PM Linus Torvalds
+> > <torvalds@linux-foundation.org> wrote:
+> > >
+> > > Finally, for the same reason - please don't use ">> 8".  Because I do
+> > > not believe that bit 8 is well-defined in your arithmetic. The *sign*
+> > > bit will be, but I'm not convinced bit 8 is.
+> > 
+> > Hmm.. I think it's ok. It can indeed overflow in 'char' and change the
+> > sign in bit #7, but I suspect bit #8 is always fine.
+> > 
+> > Still, If you want to just extend the sign bit, ">> 31" _is_ the
+> > obvious thing to use (yeah, yeah, properly "sizeof(int)*8-1" or
+> > whatever, you get my drift).
 > 
-> Yes; patch 6 requires this as a prereq. I'm not doing this arbitrarily.
+> Except that right shifts of signed values are UB.
+> In particular it has always been valid to do an unsigned
+> shift right on a 2's compliment negative number.
+> 
+> 	David
 
-Ok, that was not obvious to me, especially since I was only cc'ed for
-this patch and assumed this was actually a bug fix.
-Thanks for clarifying.
+Yes. All the standard versions (C89, C99, C11, C2X) say that right shift 
+of a negative value is implementation-defined.
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+So, we should cast it to "unsigned" before shifting it.
+
+Mikulas
+
