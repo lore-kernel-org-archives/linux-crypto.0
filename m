@@ -2,99 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FB1C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 05:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A1FC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 09:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241278AbiDYFzo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 01:55:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57602 "EHLO
+        id S238517AbiDYJmy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 05:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232382AbiDYFzl (ORCPT
+        with ESMTP id S239050AbiDYJmP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 01:55:41 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD09A3631C
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Apr 2022 22:52:34 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id s14so24605311plk.8
-        for <linux-crypto@vger.kernel.org>; Sun, 24 Apr 2022 22:52:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=I8PWt7OjbJmxLANi6mNzNMu0WXmhqmQPufvVnsJYKmw=;
-        b=RN+YWN/6ZEosVdavFx6I+1osrVBC6v3XRA/fIXRE0bY2SOhSo+1/4Wqfie+Hs44EOi
-         hTNboelvwlwPk379FYh10R/YISw23eV3zPOfAuuAZDdKVh05n6aEiv+Y1uf81gHDNEj4
-         OvdOUiAnM4PnFQHQDidUvwNGOAJ8zYHXn2cZlK0qsqgBOlMDOdzYEHdNoDr4UDed78rq
-         QofJYCCDnCmbBK5vX+WWyhb8qoFmhqquCmPYp89NgTY35yQJ9DCDaFB0IxH/vstbfjmf
-         QmytdENTfQFln9XSaOKk0VH55nJgtEA7SKH4I3CuLblBxs1MiT0N26oHoebuSZcKGGCI
-         ACNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=I8PWt7OjbJmxLANi6mNzNMu0WXmhqmQPufvVnsJYKmw=;
-        b=068kiEGVtqx1k+xCto07YBiNtZ6fZyThrpWDU4gZDzN8I7QwsgIJzjxmhTHDb8wTA/
-         Vu4NF4MDYGFcNA3Qus/jvF8q3sdSdlIm/xEdAknM24wGgN7TxSKubRrpXv3vtneT+wBa
-         9ED0qA9c1x02852uAAl8VbLRGn1bk+vGMpjyJIpCdhHlsn2/y6ZwpSQGK/eRuLJXRavZ
-         ijaCYPEkiyeAe6d+k00QOQMtmZbVvxgxR2r7ABCLjn7xtdPEd5r1uaw/wEWGLa8l/LBv
-         wHzkuWXefxbfKEXOXlIw71HyVicFJBaFyEWP7MyZkdutc6d4/ZUPrNV4oxxvLvRMIOXX
-         7CPQ==
-X-Gm-Message-State: AOAM5338iTq4gfWJE1E5GjNNeKgPdw+yKHnXEcetuHEs3HouRAEsoA/1
-        RNn7KhM+sQ22u3516zfH9OV0nnIlZAkdKq+jOxSF9Q==
-X-Google-Smtp-Source: ABdhPJwHuUIcwQrmSB5z5lvcykuJgyvBocbIF4etjzQWiYbhgjI8gV8ciq759eDd9ud0j1ZfooBpy+vVS4zuhMC83WY=
-X-Received: by 2002:a17:902:9f96:b0:15d:1ee7:4231 with SMTP id
- g22-20020a1709029f9600b0015d1ee74231mr1335076plq.131.1650865953665; Sun, 24
- Apr 2022 22:52:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220424181156.1364446-1-colin.i.king@gmail.com>
-In-Reply-To: <20220424181156.1364446-1-colin.i.king@gmail.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Mon, 25 Apr 2022 11:22:19 +0530
-Message-ID: <CAFA6WYMeOv160_mnEHVN9GgN1tqN9Zt0GqnGQRgP4m8V-aztTQ@mail.gmail.com>
-Subject: Re: [PATCH] hwrng: optee-rng: remove redundant initialization to
- variable rng_size
-To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
+        Mon, 25 Apr 2022 05:42:15 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC6B825C70
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 02:37:57 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-264-gSzupilVOGmWAUMzmc48-Q-1; Mon, 25 Apr 2022 10:37:54 +0100
+X-MC-Unique: gSzupilVOGmWAUMzmc48-Q-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Mon, 25 Apr 2022 10:37:53 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.033; Mon, 25 Apr 2022 10:37:53 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        Mikulas Patocka <mpatocka@redhat.com>
+CC:     Andy Shevchenko <andy@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
+Thread-Topic: [PATCH] hex2bin: make the function hex_to_bin constant-time
+Thread-Index: AQHYWCRFXKVloRHnAkSgNzNf81l36q0AX1Cg
+Date:   Mon, 25 Apr 2022 09:37:53 +0000
+Message-ID: <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
+ <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+ <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
+In-Reply-To: <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 24 Apr 2022 at 23:41, Colin Ian King <colin.i.king@gmail.com> wrote:
->
-> Variable rng_size is being initialized with a value that is never read,
-> the variable is being re-assigned later on. The initialization is
-> redundant and can be removed.
->
-> Cleans up cppcheck warning:
-> Variable 'rng_size' is assigned a value that is never used.
->
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/char/hw_random/optee-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjQgQXByaWwgMjAyMiAyMjo0Mg0KPiANCj4g
+T24gU3VuLCBBcHIgMjQsIDIwMjIgYXQgMjozNyBQTSBMaW51cyBUb3J2YWxkcw0KPiA8dG9ydmFs
+ZHNAbGludXgtZm91bmRhdGlvbi5vcmc+IHdyb3RlOg0KPiA+DQo+ID4gRmluYWxseSwgZm9yIHRo
+ZSBzYW1lIHJlYXNvbiAtIHBsZWFzZSBkb24ndCB1c2UgIj4+IDgiLiAgQmVjYXVzZSBJIGRvDQo+
+ID4gbm90IGJlbGlldmUgdGhhdCBiaXQgOCBpcyB3ZWxsLWRlZmluZWQgaW4geW91ciBhcml0aG1l
+dGljLiBUaGUgKnNpZ24qDQo+ID4gYml0IHdpbGwgYmUsIGJ1dCBJJ20gbm90IGNvbnZpbmNlZCBi
+aXQgOCBpcy4NCj4gDQo+IEhtbS4uIEkgdGhpbmsgaXQncyBvay4gSXQgY2FuIGluZGVlZCBvdmVy
+ZmxvdyBpbiAnY2hhcicgYW5kIGNoYW5nZSB0aGUNCj4gc2lnbiBpbiBiaXQgIzcsIGJ1dCBJIHN1
+c3BlY3QgYml0ICM4IGlzIGFsd2F5cyBmaW5lLg0KPiANCj4gU3RpbGwsIElmIHlvdSB3YW50IHRv
+IGp1c3QgZXh0ZW5kIHRoZSBzaWduIGJpdCwgIj4+IDMxIiBfaXNfIHRoZQ0KPiBvYnZpb3VzIHRo
+aW5nIHRvIHVzZSAoeWVhaCwgeWVhaCwgcHJvcGVybHkgInNpemVvZihpbnQpKjgtMSIgb3INCj4g
+d2hhdGV2ZXIsIHlvdSBnZXQgbXkgZHJpZnQpLg0KDQpFeGNlcHQgdGhhdCByaWdodCBzaGlmdHMg
+b2Ygc2lnbmVkIHZhbHVlcyBhcmUgVUIuDQpJbiBwYXJ0aWN1bGFyIGl0IGhhcyBhbHdheXMgYmVl
+biB2YWxpZCB0byBkbyBhbiB1bnNpZ25lZA0Kc2hpZnQgcmlnaHQgb24gYSAyJ3MgY29tcGxpbWVu
+dCBuZWdhdGl2ZSBudW1iZXIuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFr
+ZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwg
+VUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
-
--Sumit
-
-> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-> index a948c0727b2b..96b5d546d136 100644
-> --- a/drivers/char/hw_random/optee-rng.c
-> +++ b/drivers/char/hw_random/optee-rng.c
-> @@ -115,7 +115,7 @@ static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
->  static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
->  {
->         struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
-> -       size_t read = 0, rng_size = 0;
-> +       size_t read = 0, rng_size;
->         int timeout = 1;
->         u8 *data = buf;
->
-> --
-> 2.35.1
->
