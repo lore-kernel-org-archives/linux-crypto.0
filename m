@@ -2,88 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C99E5C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 14:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B9DC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 14:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236284AbiDYOiO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 10:38:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36784 "EHLO
+        id S236463AbiDYO6p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 10:58:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235507AbiDYOiH (ORCPT
+        with ESMTP id S229734AbiDYO6o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 10:38:07 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D845E1E8;
-        Mon, 25 Apr 2022 07:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650897302; x=1682433302;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fWXIa71NeGGWHMHlo+yI2o4Jp974jDRWwSIqgJF5Cjg=;
-  b=YnFXTJmHzTf7rCzyaAukeFh4Cyy0fU/Wx2OApKSd5rIkwfzSW0w5qHsa
-   6DzIjqvXEeHlErmzIA6Q7H+MxB4cmmsoIZoSjnqL0r1l/Olx8LJG9B5BO
-   ahl9xbn1+ZwntEnYcAnO/b0HU2yJfafod5G+PPBfQ5K+/BNXo4612lET2
-   eBMhz5xE60cR7moFIRcRlSoDBON/mgD919pOWTJG6wQDihSrJ52dIVcqg
-   49KoyBi2ggx2juEP4vv+0rjU/mRAXMkqylhfZuKFYwDURjcQu9MdfNimY
-   ym+WXc/ediULOEMQd9i8WpRFtk649hjPBm18G2vd3iS1tjcn6UG98sDcS
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10328"; a="290401705"
-X-IronPort-AV: E=Sophos;i="5.90,288,1643702400"; 
-   d="scan'208";a="290401705"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 07:35:02 -0700
-X-IronPort-AV: E=Sophos;i="5.90,288,1643702400"; 
-   d="scan'208";a="595260898"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 07:35:00 -0700
-Date:   Mon, 25 Apr 2022 15:34:53 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Haowen Bai <baihaowen@meizu.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qat - Fix unsigned function returning negative
- constant
-Message-ID: <YmaxfKXqYNOgGXYI@silpixa00400314>
-References: <1650790231-16894-1-git-send-email-baihaowen@meizu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1650790231-16894-1-git-send-email-baihaowen@meizu.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+        Mon, 25 Apr 2022 10:58:44 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B3338A5
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 07:55:38 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id u7so12057411plg.13
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 07:55:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Irud/fjEDwtKGSTM/fX98kdcWDeez0fxLuYrA6kD/Io=;
+        b=pt1oE5D/nTEMphPF9Jesa4CreIWYUDt98zEimS+bPB2HqmM+w2iDjYbS9+nfLigt4z
+         Vby4H9KCMY1L1V0YNt90Wj9kdCPeN/6pnsOlcQekyw2kux35RQTNFQf3e/QQ/3IPgioc
+         ZRzAv4EVKFXtBUbjUpIacROemdBTgIhH6vtMNSmCls8cCiWmWCBteg5UMr/5xrhsLTCd
+         LQNPjGjHkMB2xaHd90FwRvVwGaw4ItSQ/oF5hWV9EtLiOYjwnZRuHVl7mOopuZp/e9DU
+         sseYqtArUasGUT9jv0nvF8yuuZTF9aGTDzz5vqjJOuyr8/4KRp8Tz+Bh60JMam7zmk1l
+         9wgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=Irud/fjEDwtKGSTM/fX98kdcWDeez0fxLuYrA6kD/Io=;
+        b=iHhApvxHGSShRrlsbROAK1oovIhMaYGQOcScWtz8h2U66a5nhXMTYacuMSAigMTeUo
+         1gsuWAmBSEWl7pXo020g9+Iu7mArTI5EDkgHd5OosWi4mka1/JO7/qSIdr7bIkEr4L4l
+         xJwoDQ0GEBNTjtMKu7nlRro8bMCEspA2cFMPbMrE4fRvNBS3gsTcpmvGrR4GRgB9HZFo
+         NxDKSBB3Qc1CpeJ5Lal5/WheB82P5MmauhY0wqWResJyErnxGucHases5TY6Nme0GeZA
+         sX///JYmYvAriASvLGULL3Qh47tY3BOQUHYD0g8ZkUfhASNZYK7DtzacHQxkjAdZBfpC
+         X8bA==
+X-Gm-Message-State: AOAM533z55+FvwKnSMrDPvoeUwvjXyyzVYccO3OCn1I2I2uY+xayQvOP
+        7cvt8ogtDu96e/jD8NVL3RHMbA==
+X-Google-Smtp-Source: ABdhPJxti0iMF/R5gN1kkmkWl7/kAH49jyNvreI6n/Axh2Unj9WVGxFWcE12SV6PDI9nAfgOOd2jxA==
+X-Received: by 2002:a17:90a:a385:b0:1cb:bfa8:ae01 with SMTP id x5-20020a17090aa38500b001cbbfa8ae01mr20974567pjp.116.1650898538174;
+        Mon, 25 Apr 2022 07:55:38 -0700 (PDT)
+Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net. [76.210.143.223])
+        by smtp.gmail.com with ESMTPSA id w137-20020a62828f000000b0050d2f9c3409sm6325133pfd.199.2022.04.25.07.55.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Apr 2022 07:55:37 -0700 (PDT)
+Date:   Mon, 25 Apr 2022 07:55:37 -0700 (PDT)
+X-Google-Original-Date: Mon, 25 Apr 2022 07:55:33 PDT (-0700)
+Subject:     Re: [PATCH v6 08/17] riscv: use fallback for random_get_entropy() instead of zero
+In-Reply-To: <20220423212623.1957011-9-Jason@zx2c4.com>
+CC:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, Arnd Bergmann <arnd@arndb.de>, Jason@zx2c4.com,
+        Paul Walmsley <paul.walmsley@sifive.com>
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     Jason@zx2c4.com
+Message-ID: <mhng-57e67f41-bbc5-437c-b4cd-c6f5f9924a67@palmer-mbp2014>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Apr 24, 2022 at 04:50:31PM +0800, Haowen Bai wrote:
-> The function qat_uclo_check_image_compat has an unsigned return type, but
-Nit, function names should have parenthesis: qat_uclo_check_image_compat()
-> returns a negative constant to indicate an error condition. So we change
-> unsigned to int.
-> 
-> Signed-off-by: Haowen Bai <baihaowen@meizu.com>
-Fixes: b4b7e67c917f ("crypto: qat - Intel(R) QAT ucode part of fw loader")
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+On Sat, 23 Apr 2022 14:26:14 PDT (-0700), Jason@zx2c4.com wrote:
+> In the event that random_get_entropy() can't access a cycle counter or
+> similar, falling back to returning 0 is really not the best we can do.
+> Instead, at least calling random_get_entropy_fallback() would be
+> preferable, because that always needs to return _something_, even
+> falling back to jiffies eventually. It's not as though
+> random_get_entropy_fallback() is super high precision or guaranteed to
+> be entropic, but basically anything that's not zero all the time is
+> better than returning zero all the time.
 
+Makes sense: we had an architecturally-mandated timer at the time, but 
+we don't any more.  Every real implementation has a timer right now, but 
+that may change in the future so it doesn't hurt to fix it before it's 
+broken.
+
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Paul Walmsley <paul.walmsley@sifive.com>
+> Cc: Palmer Dabbelt <palmer@dabbelt.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
->  drivers/crypto/qat/qat_common/qat_uclo.c | 2 +-
+>  arch/riscv/include/asm/timex.h | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-> index 6356402a2c9e..4b6f37d6e85b 100644
-> --- a/drivers/crypto/qat/qat_common/qat_uclo.c
-> +++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-> @@ -519,7 +519,7 @@ qat_uclo_map_chunk(char *buf, struct icp_qat_uof_filehdr *file_hdr,
->  	return NULL;
->  }
->  
-> -static unsigned int
-> +static int
->  qat_uclo_check_image_compat(struct icp_qat_uof_encap_obj *encap_uof_obj,
->  			    struct icp_qat_uof_image *image)
+>
+> diff --git a/arch/riscv/include/asm/timex.h b/arch/riscv/include/asm/timex.h
+> index 507cae273bc6..d6a7428f6248 100644
+> --- a/arch/riscv/include/asm/timex.h
+> +++ b/arch/riscv/include/asm/timex.h
+> @@ -41,7 +41,7 @@ static inline u32 get_cycles_hi(void)
+>  static inline unsigned long random_get_entropy(void)
 >  {
-> -- 
-> 2.7.4
-> 
+>  	if (unlikely(clint_time_val == NULL))
+> -		return 0;
+> +		return random_get_entropy_fallback();
+>  	return get_cycles();
+>  }
+>  #define random_get_entropy()	random_get_entropy()
+
+Fine for me if this goes in via some other tree, but also happy to take 
+it via the RISC-V tree if you'd like.  IMO we could just call this a 
+fix, maybe
+
+Fixes: aa9887608e77 ("RISC-V: Check clint_time_val before use")
+
+(but that just brought this back, so there's likely older kernels broken 
+too).  Shouldn't be breaking any real hardware, though, so no rush on my 
+end.
+
+Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+
+Thanks!
