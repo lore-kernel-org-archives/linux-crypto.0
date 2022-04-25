@@ -2,148 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E00C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 13:41:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C49BC433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 13:51:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240200AbiDYNoQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 09:44:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59766 "EHLO
+        id S241584AbiDYNys (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 09:54:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240386AbiDYNoO (ORCPT
+        with ESMTP id S238228AbiDYNyr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 09:44:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E834349276;
-        Mon, 25 Apr 2022 06:41:08 -0700 (PDT)
+        Mon, 25 Apr 2022 09:54:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC555A082;
+        Mon, 25 Apr 2022 06:51:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9D345B817FE;
-        Mon, 25 Apr 2022 13:41:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99CFBC385A4;
-        Mon, 25 Apr 2022 13:41:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1AF77B8180A;
+        Mon, 25 Apr 2022 13:51:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E302C385A7;
+        Mon, 25 Apr 2022 13:51:39 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HCy+TgIw"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z8dcto5O"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1650894064;
+        t=1650894698;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uUwRxX7Od1S9mr2fS/Pfy6EUiVME26A+4yI8z6Tcx64=;
-        b=HCy+TgIwoaP/ZwSk50MW69l80eLdoGsRXfg6mcPbSqM2EBcW0J8IIz5hzKDAC0pYZIfCoO
-        WYwESwWjWWG0sHnI0naiYR3+ZqQn/SYABXLVvx/XUbQrM/HbXPLj9kvIMyQvM4Ibt366gR
-        QsKlKrAA6E5XfiPjg9TjhK5mPXQ/f7A=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9eb25e26 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 25 Apr 2022 13:41:03 +0000 (UTC)
-Date:   Mon, 25 Apr 2022 15:41:00 +0200
+        bh=jIgd/PKWEzsWj3P5DRugWZ6j3osZ7OCTzMJj+6jxPmg=;
+        b=Z8dcto5O+eDr7AHq4YeOfCJY3gUT3DE1z67dCpgQRonnlVYObKX4ITBlJAg05iG1eY5MId
+        n0oNYHBpHuniyd6a+A+oYRpaJUzvzIgYWEPacSml21G/1Li4poweEZAz73SkIeuNthVens
+        MHFMa7Cw0Y4pYPQGVBSNJwqE1zGt8mc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d0db84be (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Apr 2022 13:51:38 +0000 (UTC)
+Date:   Mon, 25 Apr 2022 15:51:35 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Thomas Gleixner <tglx@linutronix.de>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         arnd@arndb.de, Borislav Petkov <bp@alien8.de>, x86@kernel.org
 Subject: Re: [PATCH v6 13/17] x86: use fallback for random_get_entropy()
  instead of zero
-Message-ID: <Ymak7LJd6GnFxsOo@zx2c4.com>
+Message-ID: <YmanZ3Gw5mIXSebE@zx2c4.com>
 References: <20220423212623.1957011-1-Jason@zx2c4.com>
  <20220423212623.1957011-14-Jason@zx2c4.com>
  <871qxl2vdw.ffs@tglx>
+ <Ymak7LJd6GnFxsOo@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <871qxl2vdw.ffs@tglx>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Ymak7LJd6GnFxsOo@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+On Mon, Apr 25, 2022 at 03:41:00PM +0200, Jason A. Donenfeld wrote:
+> .text:0000000000001A70 add_interrupt_randomness proc near
+> .text:0000000000001A70                 movsxd  rcx, edi
+> .text:0000000000001A73                 rdtsc
+> .text:0000000000001A75                 shl     rdx, 20h
+> .text:0000000000001A79                 mov     rdi, [rsp+0]
+> .text:0000000000001A7D                 or      rax, rdx
+> .text:0000000000001A80                 mov     rdx, offset irq_randomness
+> .text:0000000000001A87                 mov     rsi, gs:__irq_regs
+> .text:0000000000001A8F                 add     rdx, gs:this_cpu_off
 
-On Mon, Apr 25, 2022 at 02:35:39PM +0200, Thomas Gleixner wrote:
-> On Sat, Apr 23 2022 at 23:26, Jason A. Donenfeld wrote:
-> 
-> Please follow the guidelines of the tip maintainers when touching x86
-> code. https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#patch-subject
-> https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#changelog
+For context, here's what your suggested change looks like:
 
-Will fix up the message and topic.
+.text:0000000000001AF0 add_interrupt_randomness proc near
+.text:0000000000001AF0                 push    rbx
+.text:0000000000001AF1                 movsxd  rbx, edi
+.text:0000000000001AF4                 jmp     loc_25AA
+.text:0000000000001AF9 loc_1AF9:                               ; CODE XREF: add_interrupt_randomness+AC1↓j
+.text:0000000000001AF9                 rdtsc
+.text:0000000000001AFB                 shl     rdx, 20h
+.text:0000000000001AFF                 or      rax, rdx
+.text:0000000000001B02
+.text:0000000000001B02 loc_1B02:                               ; CODE XREF: add_interrupt_randomness+12C↓j
+.text:0000000000001B02                 mov     rdx, offset irq_randomness
+.text:0000000000001B09                 mov     rcx, gs:__irq_regs
+.text:0000000000001B11                 add     rdx, gs:this_cpu_off
+[...]
+.altinstr_aux:00000000000025AA loc_25AA:                               ; CODE XREF: add_interrupt_randomness+4↑j
+.altinstr_aux:00000000000025AA                 test    byte ptr cs:boot_cpu_data+20h, 10h
+.altinstr_aux:00000000000025B1                 jnz     loc_1AF9
+.altinstr_aux:00000000000025B7                 jmp     loc_1C17
 
-> > In the event that random_get_entropy() can't access a cycle counter or
-> > similar, falling back to returning 0 is really not the best we can do.
-> > Instead, at least calling random_get_entropy_fallback() would be
-> > preferable, because that always needs to return _something_, even
-> > falling back to jiffies eventually. It's not as though
-> > random_get_entropy_fallback() is super high precision or guaranteed to
-> > be entropic, but basically anything that's not zero all the time is
-> > better than returning zero all the time.
-> >
-> > If CONFIG_X86_TSC=n, then it's possible that we're running on a 486
-> > with no RDTSC, so we only need the fallback code for that case.
-> 
-> There are also 586 CPUs which lack TSC.
+So an extra push, and then that jmp gets nop'd out (I hope). Plus the
+altinstr area. I guess that's not awful, but I fail to see what we
+actually gain here over the existing code, which doesn't bother messing
+with this at runtime when the kernel builder opts out. The ifdef has
+always been there; what's the reason for adding it now in 2022?
+Virtualization cannot be it.
 
-Will note this in the rewritten commit message.
-
-> > +static inline unsigned long random_get_entropy(void)
-> > +{
-> > +#ifndef CONFIG_X86_TSC
-> > +	if (!cpu_feature_enabled(X86_FEATURE_TSC))
-> > +		return random_get_entropy_fallback();
-> > +#endif
-> 
-> Please get rid of this ifdeffery. While you are right, that anything
-> with CONFIG_X86_TSC=y should have a TSC, there is virt ....
-> 
-> cpu_feature_enabled() is runtime patched and only evaluated before
-> alternative patching, so the win of this ifdef is marginally, if even
-> noticable.
-> 
-> We surely can think about making TSC mandatory, but not selectively in a
-> particalur context.
-
-This would be a regression of sorts from the current code, which reads:
-
-    static inline cycles_t get_cycles(void)
-    {
-    #ifndef CONFIG_X86_TSC
-            if (!boot_cpu_has(X86_FEATURE_TSC))
-                    return 0;
-    #endif
-            return rdtsc();
-    }
-
-So my ifdef is just copying that one. I can make it into a `if
-(IS_ENABLED(CONFIG_X86_TSC))` thing, if you'd prefer that. But on
-systems where CONFIG_X86_TSC=n, including the extra code there seems
-kind of undesirable. Consider the current interrupt handler random.c
-code on x86, whose first lines (usually) compile to:
-
-.text:0000000000001A70 add_interrupt_randomness proc near
-.text:0000000000001A70                 movsxd  rcx, edi
-.text:0000000000001A73                 rdtsc
-.text:0000000000001A75                 shl     rdx, 20h
-.text:0000000000001A79                 mov     rdi, [rsp+0]
-.text:0000000000001A7D                 or      rax, rdx
-.text:0000000000001A80                 mov     rdx, offset irq_randomness
-.text:0000000000001A87                 mov     rsi, gs:__irq_regs
-.text:0000000000001A8F                 add     rdx, gs:this_cpu_off
-
-I'm not sure what advantage we'd get by changing that from the ifdefs to
-unconditionally including that if statement. Your argument about virt
-can't be valid, since the current get_cycles() code uses the ifdefs. And
-if you're arguing from the basis that CONFIG_X86_TSC=y is not reliable,
-then why does CONFIG_X86_TSC even exist in the first place?
-
-Rather the stronger argument you could make would be that moving from
-boot_cpu_has() to cpu_feature_enabled() (Borislav's suggestion) means
-that there's now a static branch here, so the actual cost to the
-assembly is a few meaningless nops, which you don't think would play a
-part in quantizing when rdtsc is called. If this is actually what you
-have in mind, and you find that ifdef ugly enough that this would be
-worth it, I can understand, and I'll make that change for v7. But I
-don't understand you to currently be making that argument, so I'm not
-quite sure what your position is.
-
-Could you clarify what you mean here and what your expectations are? And
-how does that point of view tie into the fact that get_cycles()
-currently uses the ifdef?
-
-Thanks,
 Jason
