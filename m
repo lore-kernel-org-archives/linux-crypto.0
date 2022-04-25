@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4583BC433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 20:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0089C4321E
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 20:21:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245255AbiDYUYo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 16:24:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39064 "EHLO
+        id S245240AbiDYUYp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 16:24:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245220AbiDYUYk (ORCPT
+        with ESMTP id S245218AbiDYUYn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 16:24:40 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8322128CE6
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 13:21:34 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id n126-20020a1c2784000000b0038e8af3e788so260123wmn.1
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 13:21:34 -0700 (PDT)
+        Mon, 25 Apr 2022 16:24:43 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C315712A2A9
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 13:21:37 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id i5so3424924wrc.13
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 13:21:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=NBtkTtzZx99G/0qB6r+axIZfB65vvPlvwuFVXfvR0eo=;
-        b=yv92CrCwZp4h3g0wXD5siw3OQjPzmK533dAajtbBSid3gKAUhNyhqVDuVtkl+IFDME
-         GWC0crCUplHWAO94zczshUbJ1pRS2Rw7WvisVNPqn/cok8JJe09nyRLXeGblZfhB/ubq
-         sWsYtCOJz0dsY6juq67xPfBl3w8bP0kDvE6EZYqfRxKnty/A2ecy4BSyKv6R0mKDA1p4
-         6etrBhHo1so2HCj/9nidbif6pFl2GCCXR6RK9yT5rLdgtt6hNIf0+Z85kGKBPD2Q6PnL
-         CiLjtvvmjzs47HxAn8WLq9+tsS/fZ+zJhKMJwbiIcwA/JQW9EzqVoCkpLjMh38oOPj6c
-         WFOw==
+        bh=aJnJqffMjaG0ri/QRclvSYw2aUWdoPTVCuwI5Qrju5o=;
+        b=sl7ra+j6Bt9qCA5YA9CCSZEO92AZ7zg4XXJAYqPMRxoSage16TCBcLAmWNI0o7mjzb
+         8/fSewOxvkEL1Md3FkxPb9s8bXvMSfVLJRJMXGD4Esd4C5DlYbMHNcYpUr/97zQgCvlz
+         iuYpfJap9e00KUdixh7yVm7JvTALOU5zy4Rwqc1wwJajn7z+X8vOKafFpRHTs7Ie/WYC
+         TyvXmowDSmhTx7ZIWVwAmLEKII4XtW9JvsZZnvo7fKiL33rN0rnIppUCYyxqeWHWNeJK
+         ny6zt+G5oV9w3kMPeMzszKhbS2Q+s3im0sGznk7rIYvTpC5Vx6LwTAEHC2Kr3RQ+Wzrd
+         9bdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=NBtkTtzZx99G/0qB6r+axIZfB65vvPlvwuFVXfvR0eo=;
-        b=KWVmVDrSfZW1Xa/1lqM7JTVPIAWRgySHToQNzYN5+WMFDHOphoVhzjdH812QFKM2jc
-         MbAVoD7k9NLDq7Dm88zdszcF+bfJL6NwR5kcthD0oqr3Q/qrMO1+SVHHZA/zBFN63Oee
-         3/hkUnSU2+hGpDTaNlcDoRE3jxcmsTHvkH/kSRCyxrUeb1IamUDEix2IbMwdaSM7Uu4N
-         EfT9gUkimQAQIOhvuIrcfKWbjVVJATIt/wEK/mbGO8Kq8ZMB1snhe2tWdLFs+oW0jxLJ
-         u4hrQVahsKqzoskxbG0unHjelnSFiEL45WBAoMdOcen+Al3HXmX6Ze91n4Y4zJWVB6p6
-         69oQ==
-X-Gm-Message-State: AOAM530dM4bqkndnNjjMO0uQggCEEBlK/WNCnjtEWyd49hkB58jh2QKF
-        HtTSnbxYcFwYLK0L8rCB1S99WQ==
-X-Google-Smtp-Source: ABdhPJwOSqL+tx2+w1nYCB7klczylA5LPZ70TqZb6/QzO7hvXNxgeaCBQiGpxpvBs5Zf8pU0kscu1g==
-X-Received: by 2002:a7b:c394:0:b0:38e:b415:96af with SMTP id s20-20020a7bc394000000b0038eb41596afmr27264138wmj.68.1650918093344;
-        Mon, 25 Apr 2022 13:21:33 -0700 (PDT)
+        bh=aJnJqffMjaG0ri/QRclvSYw2aUWdoPTVCuwI5Qrju5o=;
+        b=u58LkaAz9PsXTqo0EGwj4JseS26rRkWaQ54BUFpL54goJu86kB+prIRFW4QoYzoDGG
+         BjgNZtghF8Hf/zbq2kex07VxiinmoAmJgQmRBrBVpCBNqTVCFDJZ/bcDYnlJ3RGaoAGf
+         yTdanOd6Ax2tmUFGYvm0N7iR+GIn6YR0QpygZiEs2wMYk4Hic+zcKQqrbibfDjYxpwzl
+         yvxEWNdoLrVjG7x7Wb2zUoe8cUkIQbIgZ9Tx7Gjw2n3Dns6mM7XgPHwb34dHzkbqsr3r
+         GiXAM7PRjjZ54PzB8tB8PuT6wmvZrs5VjxZnfsvh19jOlHexrVPmPD8c835Z3wISjpE4
+         +unA==
+X-Gm-Message-State: AOAM532ZkEuzNGWHFji2+vU1hoqeXyAuFAwNjQbnVnuIY8lPesbGClCR
+        tDnWfu2z2snOSlPuQJHTKcLVKw==
+X-Google-Smtp-Source: ABdhPJwJmkxTG94X6EHc3EFU9IwqrOD//AwsgowEtN9tWuA1pca0pxKZby7Fy+7XLuqtKH9p5bz+1Q==
+X-Received: by 2002:a5d:64cb:0:b0:20a:903f:5d70 with SMTP id f11-20020a5d64cb000000b0020a903f5d70mr15352919wri.138.1650918096202;
+        Mon, 25 Apr 2022 13:21:36 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id p3-20020a5d59a3000000b0020a9132d1fbsm11101003wrr.37.2022.04.25.13.21.32
+        by smtp.googlemail.com with ESMTPSA id p3-20020a5d59a3000000b0020a9132d1fbsm11101003wrr.37.2022.04.25.13.21.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Apr 2022 13:21:32 -0700 (PDT)
+        Mon, 25 Apr 2022 13:21:35 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, herbert@gondor.apana.org.au,
         krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
@@ -55,9 +55,9 @@ Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-rockchip@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v6 06/33] crypto: rockchip: add fallback for cipher
-Date:   Mon, 25 Apr 2022 20:20:52 +0000
-Message-Id: <20220425202119.3566743-7-clabbe@baylibre.com>
+Subject: [PATCH v6 09/33] crypto: rockchip: remove non-aligned handling
+Date:   Mon, 25 Apr 2022 20:20:55 +0000
+Message-Id: <20220425202119.3566743-10-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220425202119.3566743-1-clabbe@baylibre.com>
 References: <20220425202119.3566743-1-clabbe@baylibre.com>
@@ -67,250 +67,271 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The hardware does not handle 0 size length request, let's add a
-fallback.
-Furthermore fallback will be used for all unaligned case the hardware
-cannot handle.
+Now driver have fallback for un-aligned cases, remove all code handling
+those cases.
 
 Fixes: ce0183cb6464b ("crypto: rockchip - switch to skcipher API")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/Kconfig                        |  4 +
- drivers/crypto/rockchip/rk3288_crypto.h       |  2 +
- .../crypto/rockchip/rk3288_crypto_skcipher.c  | 97 ++++++++++++++++---
- 3 files changed, 90 insertions(+), 13 deletions(-)
+ drivers/crypto/rockchip/rk3288_crypto.c       | 69 +++++--------------
+ drivers/crypto/rockchip/rk3288_crypto.h       |  4 --
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 22 ++----
+ .../crypto/rockchip/rk3288_crypto_skcipher.c  | 39 +++--------
+ 4 files changed, 31 insertions(+), 103 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 7b2d138bc83e..84ab14afcbd9 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -784,6 +784,10 @@ config CRYPTO_DEV_IMGTEC_HASH
- config CRYPTO_DEV_ROCKCHIP
- 	tristate "Rockchip's Cryptographic Engine driver"
- 	depends on OF && ARCH_ROCKCHIP
-+	depends on PM
-+	select CRYPTO_ECB
-+	select CRYPTO_CBC
-+	select CRYPTO_DES
- 	select CRYPTO_AES
- 	select CRYPTO_LIB_DES
- 	select CRYPTO_MD5
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
+index 4cff49b82983..b3db096e2ec2 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.c
++++ b/drivers/crypto/rockchip/rk3288_crypto.c
+@@ -88,63 +88,26 @@ static int rk_load_data(struct rk_crypto_info *dev,
+ {
+ 	unsigned int count;
+ 
+-	dev->aligned = dev->aligned ?
+-		check_alignment(sg_src, sg_dst, dev->align_size) :
+-		dev->aligned;
+-	if (dev->aligned) {
+-		count = min(dev->left_bytes, sg_src->length);
+-		dev->left_bytes -= count;
+-
+-		if (!dma_map_sg(dev->dev, sg_src, 1, DMA_TO_DEVICE)) {
+-			dev_err(dev->dev, "[%s:%d] dma_map_sg(src)  error\n",
++	count = min(dev->left_bytes, sg_src->length);
++	dev->left_bytes -= count;
++
++	if (!dma_map_sg(dev->dev, sg_src, 1, DMA_TO_DEVICE)) {
++		dev_err(dev->dev, "[%s:%d] dma_map_sg(src)  error\n",
+ 				__func__, __LINE__);
+-			return -EINVAL;
+-		}
+-		dev->addr_in = sg_dma_address(sg_src);
++		return -EINVAL;
++	}
++	dev->addr_in = sg_dma_address(sg_src);
+ 
+-		if (sg_dst) {
+-			if (!dma_map_sg(dev->dev, sg_dst, 1, DMA_FROM_DEVICE)) {
+-				dev_err(dev->dev,
++	if (sg_dst) {
++		if (!dma_map_sg(dev->dev, sg_dst, 1, DMA_FROM_DEVICE)) {
++			dev_err(dev->dev,
+ 					"[%s:%d] dma_map_sg(dst)  error\n",
+ 					__func__, __LINE__);
+-				dma_unmap_sg(dev->dev, sg_src, 1,
+-					     DMA_TO_DEVICE);
+-				return -EINVAL;
+-			}
+-			dev->addr_out = sg_dma_address(sg_dst);
+-		}
+-	} else {
+-		count = (dev->left_bytes > PAGE_SIZE) ?
+-			PAGE_SIZE : dev->left_bytes;
+-
+-		if (!sg_pcopy_to_buffer(dev->first, dev->src_nents,
+-					dev->addr_vir, count,
+-					dev->total - dev->left_bytes)) {
+-			dev_err(dev->dev, "[%s:%d] pcopy err\n",
+-				__func__, __LINE__);
++			dma_unmap_sg(dev->dev, sg_src, 1,
++					DMA_TO_DEVICE);
+ 			return -EINVAL;
+ 		}
+-		dev->left_bytes -= count;
+-		sg_init_one(&dev->sg_tmp, dev->addr_vir, count);
+-		if (!dma_map_sg(dev->dev, &dev->sg_tmp, 1, DMA_TO_DEVICE)) {
+-			dev_err(dev->dev, "[%s:%d] dma_map_sg(sg_tmp)  error\n",
+-				__func__, __LINE__);
+-			return -ENOMEM;
+-		}
+-		dev->addr_in = sg_dma_address(&dev->sg_tmp);
+-
+-		if (sg_dst) {
+-			if (!dma_map_sg(dev->dev, &dev->sg_tmp, 1,
+-					DMA_FROM_DEVICE)) {
+-				dev_err(dev->dev,
+-					"[%s:%d] dma_map_sg(sg_tmp)  error\n",
+-					__func__, __LINE__);
+-				dma_unmap_sg(dev->dev, &dev->sg_tmp, 1,
+-					     DMA_TO_DEVICE);
+-				return -ENOMEM;
+-			}
+-			dev->addr_out = sg_dma_address(&dev->sg_tmp);
+-		}
++		dev->addr_out = sg_dma_address(sg_dst);
+ 	}
+ 	dev->count = count;
+ 	return 0;
+@@ -154,11 +117,11 @@ static void rk_unload_data(struct rk_crypto_info *dev)
+ {
+ 	struct scatterlist *sg_in, *sg_out;
+ 
+-	sg_in = dev->aligned ? dev->sg_src : &dev->sg_tmp;
++	sg_in = dev->sg_src;
+ 	dma_unmap_sg(dev->dev, sg_in, 1, DMA_TO_DEVICE);
+ 
+ 	if (dev->sg_dst) {
+-		sg_out = dev->aligned ? dev->sg_dst : &dev->sg_tmp;
++		sg_out = dev->sg_dst;
+ 		dma_unmap_sg(dev->dev, sg_out, 1, DMA_FROM_DEVICE);
+ 	}
+ }
 diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
-index c919d9a43a08..8b1e15d8ddc6 100644
+index 540b81a14b9b..a7de5738f6dc 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto.h
 +++ b/drivers/crypto/rockchip/rk3288_crypto.h
-@@ -246,10 +246,12 @@ struct rk_cipher_ctx {
- 	struct rk_crypto_info		*dev;
- 	unsigned int			keylen;
- 	u8				iv[AES_BLOCK_SIZE];
-+	struct crypto_skcipher *fallback_tfm;
- };
+@@ -204,12 +204,8 @@ struct rk_crypto_info {
+ 	/* the public variable */
+ 	struct scatterlist		*sg_src;
+ 	struct scatterlist		*sg_dst;
+-	struct scatterlist		sg_tmp;
+ 	struct scatterlist		*first;
+ 	unsigned int			left_bytes;
+-	void				*addr_vir;
+-	int				aligned;
+-	int				align_size;
+ 	size_t				src_nents;
+ 	size_t				dst_nents;
+ 	unsigned int			total;
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+index 16009bb0bf16..c762e462eb57 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+@@ -236,8 +236,6 @@ static int rk_ahash_start(struct rk_crypto_info *dev)
  
- struct rk_cipher_rctx {
- 	u32				mode;
-+	struct skcipher_request fallback_req;   // keep at the end
- };
+ 	dev->total = req->nbytes;
+ 	dev->left_bytes = req->nbytes;
+-	dev->aligned = 0;
+-	dev->align_size = 4;
+ 	dev->sg_dst = NULL;
+ 	dev->sg_src = req->src;
+ 	dev->first = req->src;
+@@ -272,15 +270,13 @@ static int rk_ahash_crypto_rx(struct rk_crypto_info *dev)
  
- enum alg_type {
+ 	dev->unload_data(dev);
+ 	if (dev->left_bytes) {
+-		if (dev->aligned) {
+-			if (sg_is_last(dev->sg_src)) {
+-				dev_warn(dev->dev, "[%s:%d], Lack of data\n",
+-					 __func__, __LINE__);
+-				err = -ENOMEM;
+-				goto out_rx;
+-			}
+-			dev->sg_src = sg_next(dev->sg_src);
++		if (sg_is_last(dev->sg_src)) {
++			dev_warn(dev->dev, "[%s:%d], Lack of data\n",
++					__func__, __LINE__);
++			err = -ENOMEM;
++			goto out_rx;
+ 		}
++		dev->sg_src = sg_next(dev->sg_src);
+ 		err = rk_ahash_set_data_start(dev);
+ 	} else {
+ 		/*
+@@ -318,11 +314,6 @@ static int rk_cra_hash_init(struct crypto_tfm *tfm)
+ 	algt = container_of(alg, struct rk_crypto_tmp, alg.hash);
+ 
+ 	tctx->dev = algt->dev;
+-	tctx->dev->addr_vir = (void *)__get_free_page(GFP_KERNEL);
+-	if (!tctx->dev->addr_vir) {
+-		dev_err(tctx->dev->dev, "failed to kmalloc for addr_vir\n");
+-		return -ENOMEM;
+-	}
+ 	tctx->dev->start = rk_ahash_start;
+ 	tctx->dev->update = rk_ahash_crypto_rx;
+ 	tctx->dev->complete = rk_ahash_crypto_complete;
+@@ -345,7 +336,6 @@ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+ {
+ 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(tfm);
+ 
+-	free_page((unsigned long)tctx->dev->addr_vir);
+ 	crypto_free_ahash(tctx->fallback_tfm);
+ }
+ 
 diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-index bbd0bf52bf07..eac5bba66e25 100644
+index 1ef94f8db2c5..d067b7f09165 100644
 --- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
 +++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-@@ -13,6 +13,63 @@
+@@ -356,7 +356,6 @@ static int rk_ablk_start(struct rk_crypto_info *dev)
+ 	dev->src_nents = sg_nents(req->src);
+ 	dev->sg_dst = req->dst;
+ 	dev->dst_nents = sg_nents(req->dst);
+-	dev->aligned = 1;
  
- #define RK_CRYPTO_DEC			BIT(0)
+ 	spin_lock_irqsave(&dev->lock, flags);
+ 	rk_ablk_hw_init(dev);
+@@ -376,13 +375,9 @@ static void rk_iv_copyback(struct rk_crypto_info *dev)
  
-+static int rk_cipher_need_fallback(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	unsigned int bs = crypto_skcipher_blocksize(tfm);
-+	struct scatterlist *sgs, *sgd;
-+	unsigned int stodo, dtodo, len;
-+
-+	if (!req->cryptlen)
-+		return true;
-+
-+	len = req->cryptlen;
-+	sgs = req->src;
-+	sgd = req->dst;
-+	while (sgs && sgd) {
-+		if (!IS_ALIGNED(sgs->offset, sizeof(u32))) {
-+			return true;
-+		}
-+		if (!IS_ALIGNED(sgd->offset, sizeof(u32))) {
-+			return true;
-+		}
-+		stodo = min(len, sgs->length);
-+		if (stodo % bs) {
-+			return true;
-+		}
-+		dtodo = min(len, sgd->length);
-+		if (dtodo % bs) {
-+			return true;
-+		}
-+		if (stodo != dtodo) {
-+			return true;
-+		}
-+		len -= stodo;
-+		sgs = sg_next(sgs);
-+		sgd = sg_next(sgd);
-+	}
-+	return false;
-+}
-+
-+static int rk_cipher_fallback(struct skcipher_request *areq)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
-+	struct rk_cipher_ctx *op = crypto_skcipher_ctx(tfm);
-+	struct rk_cipher_rctx *rctx = skcipher_request_ctx(areq);
-+	int err;
-+
-+	skcipher_request_set_tfm(&rctx->fallback_req, op->fallback_tfm);
-+	skcipher_request_set_callback(&rctx->fallback_req, areq->base.flags,
-+				      areq->base.complete, areq->base.data);
-+	skcipher_request_set_crypt(&rctx->fallback_req, areq->src, areq->dst,
-+				   areq->cryptlen, areq->iv);
-+	if (rctx->mode & RK_CRYPTO_DEC)
-+		err = crypto_skcipher_decrypt(&rctx->fallback_req);
-+	else
-+		err = crypto_skcipher_encrypt(&rctx->fallback_req);
-+	return err;
-+}
-+
- static void rk_crypto_complete(struct crypto_async_request *base, int err)
- {
- 	if (base->complete)
-@@ -22,10 +79,10 @@ static void rk_crypto_complete(struct crypto_async_request *base, int err)
- static int rk_handle_req(struct rk_crypto_info *dev,
- 			 struct skcipher_request *req)
- {
--	if (!IS_ALIGNED(req->cryptlen, dev->align_size))
--		return -EINVAL;
--	else
--		return dev->enqueue(dev, &req->base);
-+	if (rk_cipher_need_fallback(req))
-+		return rk_cipher_fallback(req);
-+
-+	return dev->enqueue(dev, &req->base);
+ 	/* Update the IV buffer to contain the next IV for encryption mode. */
+ 	if (!(rctx->mode & RK_CRYPTO_DEC)) {
+-		if (dev->aligned) {
+-			memcpy(req->iv, sg_virt(dev->sg_dst) +
+-				dev->sg_dst->length - ivsize, ivsize);
+-		} else {
+-			memcpy(req->iv, dev->addr_vir +
+-				dev->count - ivsize, ivsize);
+-		}
++		memcpy(req->iv,
++		       sg_virt(dev->sg_dst) + dev->sg_dst->length - ivsize,
++		       ivsize);
+ 	}
  }
  
- static int rk_aes_setkey(struct crypto_skcipher *cipher,
-@@ -39,7 +96,8 @@ static int rk_aes_setkey(struct crypto_skcipher *cipher,
- 		return -EINVAL;
- 	ctx->keylen = keylen;
- 	memcpy_toio(ctx->dev->reg + RK_CRYPTO_AES_KEY_0, key, keylen);
--	return 0;
-+
-+	return crypto_skcipher_setkey(ctx->fallback_tfm, key, keylen);
- }
+@@ -420,27 +415,16 @@ static int rk_ablk_rx(struct rk_crypto_info *dev)
+ 		skcipher_request_cast(dev->async_req);
  
- static int rk_des_setkey(struct crypto_skcipher *cipher,
-@@ -54,7 +112,8 @@ static int rk_des_setkey(struct crypto_skcipher *cipher,
- 
- 	ctx->keylen = keylen;
- 	memcpy_toio(ctx->dev->reg + RK_CRYPTO_TDES_KEY1_0, key, keylen);
--	return 0;
-+
-+	return crypto_skcipher_setkey(ctx->fallback_tfm, key, keylen);
- }
- 
- static int rk_tdes_setkey(struct crypto_skcipher *cipher,
-@@ -69,7 +128,7 @@ static int rk_tdes_setkey(struct crypto_skcipher *cipher,
- 
- 	ctx->keylen = keylen;
- 	memcpy_toio(ctx->dev->reg + RK_CRYPTO_TDES_KEY1_0, key, keylen);
--	return 0;
-+	return crypto_skcipher_setkey(ctx->fallback_tfm, key, keylen);
- }
- 
- static int rk_aes_ecb_encrypt(struct skcipher_request *req)
-@@ -394,6 +453,7 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
- {
- 	struct rk_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	const char *name = crypto_tfm_alg_name(&tfm->base);
- 	struct rk_crypto_tmp *algt;
- 
+ 	dev->unload_data(dev);
+-	if (!dev->aligned) {
+-		if (!sg_pcopy_from_buffer(req->dst, dev->dst_nents,
+-					  dev->addr_vir, dev->count,
+-					  dev->total - dev->left_bytes -
+-					  dev->count)) {
+-			err = -EINVAL;
+-			goto out_rx;
+-		}
+-	}
+ 	if (dev->left_bytes) {
+ 		rk_update_iv(dev);
+-		if (dev->aligned) {
+-			if (sg_is_last(dev->sg_src)) {
+-				dev_err(dev->dev, "[%s:%d] Lack of data\n",
++		if (sg_is_last(dev->sg_src)) {
++			dev_err(dev->dev, "[%s:%d] Lack of data\n",
+ 					__func__, __LINE__);
+-				err = -ENOMEM;
+-				goto out_rx;
+-			}
+-			dev->sg_src = sg_next(dev->sg_src);
+-			dev->sg_dst = sg_next(dev->sg_dst);
++			err = -ENOMEM;
++			goto out_rx;
+ 		}
++		dev->sg_src = sg_next(dev->sg_src);
++		dev->sg_dst = sg_next(dev->sg_dst);
+ 		err = rk_set_data_start(dev);
+ 	} else {
+ 		rk_iv_copyback(dev);
+@@ -462,13 +446,9 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
  	algt = container_of(alg, struct rk_crypto_tmp, alg.skcipher);
-@@ -407,6 +467,16 @@ static int rk_ablk_init_tfm(struct crypto_skcipher *tfm)
- 	if (!ctx->dev->addr_vir)
- 		return -ENOMEM;
  
-+	ctx->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(ctx->fallback_tfm)) {
-+		dev_err(ctx->dev->dev, "ERROR: Cannot allocate fallback for %s %ld\n",
-+			name, PTR_ERR(ctx->fallback_tfm));
-+		return PTR_ERR(ctx->fallback_tfm);
-+	}
-+
-+	tfm->reqsize = sizeof(struct rk_cipher_rctx) +
-+		crypto_skcipher_reqsize(ctx->fallback_tfm);
-+
- 	return 0;
- }
+ 	ctx->dev = algt->dev;
+-	ctx->dev->align_size = crypto_tfm_alg_alignmask(crypto_skcipher_tfm(tfm)) + 1;
+ 	ctx->dev->start = rk_ablk_start;
+ 	ctx->dev->update = rk_ablk_rx;
+ 	ctx->dev->complete = rk_crypto_complete;
+-	ctx->dev->addr_vir = (char *)__get_free_page(GFP_KERNEL);
+-	if (!ctx->dev->addr_vir)
+-		return -ENOMEM;
  
-@@ -415,6 +485,7 @@ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
+ 	ctx->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(ctx->fallback_tfm)) {
+@@ -488,7 +468,6 @@ static void rk_ablk_exit_tfm(struct crypto_skcipher *tfm)
  	struct rk_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
  
- 	free_page((unsigned long)ctx->dev->addr_vir);
-+	crypto_free_skcipher(ctx->fallback_tfm);
+ 	memzero_explicit(ctx->key, ctx->keylen);
+-	free_page((unsigned long)ctx->dev->addr_vir);
+ 	crypto_free_skcipher(ctx->fallback_tfm);
  }
  
- struct rk_crypto_tmp rk_ecb_aes_alg = {
-@@ -423,7 +494,7 @@ struct rk_crypto_tmp rk_ecb_aes_alg = {
- 		.base.cra_name		= "ecb(aes)",
- 		.base.cra_driver_name	= "ecb-aes-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= AES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x0f,
-@@ -445,7 +516,7 @@ struct rk_crypto_tmp rk_cbc_aes_alg = {
- 		.base.cra_name		= "cbc(aes)",
- 		.base.cra_driver_name	= "cbc-aes-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= AES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x0f,
-@@ -468,7 +539,7 @@ struct rk_crypto_tmp rk_ecb_des_alg = {
- 		.base.cra_name		= "ecb(des)",
- 		.base.cra_driver_name	= "ecb-des-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= DES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x07,
-@@ -490,7 +561,7 @@ struct rk_crypto_tmp rk_cbc_des_alg = {
- 		.base.cra_name		= "cbc(des)",
- 		.base.cra_driver_name	= "cbc-des-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= DES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x07,
-@@ -513,7 +584,7 @@ struct rk_crypto_tmp rk_ecb_des3_ede_alg = {
- 		.base.cra_name		= "ecb(des3_ede)",
- 		.base.cra_driver_name	= "ecb-des3-ede-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= DES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x07,
-@@ -535,7 +606,7 @@ struct rk_crypto_tmp rk_cbc_des3_ede_alg = {
- 		.base.cra_name		= "cbc(des3_ede)",
- 		.base.cra_driver_name	= "cbc-des3-ede-rk",
- 		.base.cra_priority	= 300,
--		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK,
- 		.base.cra_blocksize	= DES_BLOCK_SIZE,
- 		.base.cra_ctxsize	= sizeof(struct rk_cipher_ctx),
- 		.base.cra_alignmask	= 0x07,
 -- 
 2.35.1
 
