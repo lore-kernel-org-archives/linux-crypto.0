@@ -2,129 +2,91 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0B9C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 12:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A880C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Apr 2022 13:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235871AbiDYNCi convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Apr 2022 09:02:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42818 "EHLO
+        id S241968AbiDYNZU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 25 Apr 2022 09:25:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238944AbiDYNCb (ORCPT
+        with ESMTP id S241965AbiDYNZQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Apr 2022 09:02:31 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 235C213F11
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Apr 2022 05:59:26 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-246-RsRt4rMLMJSg1HNL0-UwSg-1; Mon, 25 Apr 2022 13:59:24 +0100
-X-MC-Unique: RsRt4rMLMJSg1HNL0-UwSg-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.32; Mon, 25 Apr 2022 13:59:23 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.033; Mon, 25 Apr 2022 13:59:23 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Mikulas Patocka' <mpatocka@redhat.com>
-CC:     'Linus Torvalds' <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: RE: [PATCH] hex2bin: make the function hex_to_bin constant-time
-Thread-Topic: [PATCH] hex2bin: make the function hex_to_bin constant-time
-Thread-Index: AQHYWCRFXKVloRHnAkSgNzNf81l36q0AX1CggAAH/4CAAC5kEA==
-Date:   Mon, 25 Apr 2022 12:59:23 +0000
-Message-ID: <e8de034196df450cb352fa60a570acca@AcuMS.aculab.com>
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
- <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
- <CAHk-=wibmkFz6dybsdpW_3kUnV20FhJazerWDcbm7yCp_Xv+CA@mail.gmail.com>
- <789f0463ce974e90a93f4dbf8c471156@AcuMS.aculab.com>
- <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
-In-Reply-To: <alpine.LRH.2.02.2204250701410.10912@file01.intranet.prod.int.rdu2.redhat.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Mon, 25 Apr 2022 09:25:16 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5727E24951;
+        Mon, 25 Apr 2022 06:22:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 7081CCE1723;
+        Mon, 25 Apr 2022 13:22:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31D59C385A7;
+        Mon, 25 Apr 2022 13:22:07 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="X6ctYhFr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1650892925;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RUgf9fdCddZSXHAZQi+E26zlz/usdttmv9k+wODO6tM=;
+        b=X6ctYhFryjy44M5yK90kNoc8oX3U9zdJqFq+AvqVx0El/Z6vnqTCV1pwWrjGWO7Hh2i3Ou
+        yGF9AHbS9BP1IREWHXKL/DWnlVABTRrqYRB9Et0HcydIRFo2FvSqDd5uN/yZcw58KgncoT
+        kGLCLHFTPMMHbjfuJK+Uq6iUBmxXYLE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bda2c408 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Apr 2022 13:22:04 +0000 (UTC)
+Date:   Mon, 25 Apr 2022 15:22:00 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH v6 06/17] timekeeping: add raw clock fallback for
+ random_get_entropy()
+Message-ID: <YmageFiSs0h1jzS7@zx2c4.com>
+References: <20220423212623.1957011-1-Jason@zx2c4.com>
+ <20220423212623.1957011-7-Jason@zx2c4.com>
+ <87y1zt1gqw.ffs@tglx>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87y1zt1gqw.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Mikulas Patocka
-> Sent: 25 April 2022 12:04
-> 
-> On Mon, 25 Apr 2022, David Laight wrote:
-> 
-> > From: Linus Torvalds
-> > > Sent: 24 April 2022 22:42
-> > >
-> > > On Sun, Apr 24, 2022 at 2:37 PM Linus Torvalds
-> > > <torvalds@linux-foundation.org> wrote:
-> > > >
-> > > > Finally, for the same reason - please don't use ">> 8".  Because I do
-> > > > not believe that bit 8 is well-defined in your arithmetic. The *sign*
-> > > > bit will be, but I'm not convinced bit 8 is.
-> > >
-> > > Hmm.. I think it's ok. It can indeed overflow in 'char' and change the
-> > > sign in bit #7, but I suspect bit #8 is always fine.
-> > >
-> > > Still, If you want to just extend the sign bit, ">> 31" _is_ the
-> > > obvious thing to use (yeah, yeah, properly "sizeof(int)*8-1" or
-> > > whatever, you get my drift).
+Hi Thomas,
+
+On Mon, Apr 25, 2022 at 02:37:11PM +0200, Thomas Gleixner wrote:
+> On Sat, Apr 23 2022 at 23:26, Jason A. Donenfeld wrote:
+> > The addition of random_get_entropy_fallback() provides access to
+> > whichever time source has the highest frequency, which is useful for
+> > gathering entropy on platforms without available cycle counters. It's
+> > not necessarily as good as being able to quickly access a cycle counter
+> > that the CPU has, but it's still something, even when it falls back to
+> > being jiffies-based.
 > >
-> > Except that right shifts of signed values are UB.
-> > In particular it has always been valid to do an unsigned
-> > shift right on a 2's compliment negative number.
+> > In the event that a given arch does not define get_cycles(), falling
+> > back to the get_cycles() default implementation that returns 0 is really
+> > not the best we can do. Instead, at least calling
+> > random_get_entropy_fallback() would be preferable, because that always
+> > needs to return _something_, even falling back to jiffies eventually.
+> > It's not as though random_get_entropy_fallback() is super high precision
+> > or guaranteed to be entropic, but basically anything that's not zero all
+> > the time is better than returning zero all the time.
 > >
-> > 	David
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Theodore Ts'o <tytso@mit.edu>
+> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > 
-> Yes. All the standard versions (C89, C99, C11, C2X) say that right shift
-> of a negative value is implementation-defined.
-> 
-> So, we should cast it to "unsigned" before shifting it.
+> Not that I care much, but in general taking over authorship w/o
+> attribution via Suggested-by or such is frowned upon.
 
-Except that the intent appears to be to replicate the sign bit.
+Sorry about that. Usually I'm pretty good about adding those. I guess
+something must have gotten lost this time through, as the v1 of this
+started out using sched_clock() (Arnd's suggestion) and then moved to
+using the raw ktime clock after your suggestion, and I missed the
+Suggested-by. I'll add that. Meanwhile, do you want to Ack this patch?
+Do the technical aspects look okay to you?
 
-If it is 'implementation defined' (rather than suddenly being UB)
-it might be that the linux kernel requires sign propagating
-right shifts of negative values.
-This is typically what happens on 2's compliment systems.
-But not all small cpu have the required shift instruction.
-OTOH all the ones bit enough to run Linux probably do.
-(And gcc doesn't support '1's compliment' or 'sign overpunch' cpus.)
-
-The problem is that the compiler writers seem to be entering
-a mindset where they are optimising code based on UB behaviour.
-So given:
-void foo(int x)
-{
-	if (x >> 1 < 0)
-		return;
-	do_something();
-}
-they decide the test is UB, so can always be assumed to be true
-and thus do_something() is compiled away.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Jason
