@@ -2,69 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 830FCC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Apr 2022 11:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F282C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Apr 2022 13:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242042AbiDZMDA (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Apr 2022 08:03:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59310 "EHLO
+        id S236980AbiDZN1b (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 26 Apr 2022 09:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239509AbiDZMDA (ORCPT
+        with ESMTP id S232849AbiDZN1b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Apr 2022 08:03:00 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49B566339E;
-        Tue, 26 Apr 2022 04:59:52 -0700 (PDT)
-Received: from dggpeml500023.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KngNV48MVzGpRr;
-        Tue, 26 Apr 2022 19:57:14 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500023.china.huawei.com (7.185.36.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 26 Apr 2022 19:59:50 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 26 Apr
- 2022 19:59:50 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangzhou1@hisilicon.com>, <yekai13@huawei.com>,
-        <liulongfang@huawei.com>
-Subject: [PATCH] crypto: hisilicon/sec - add sm4 generic selection
-Date:   Tue, 26 Apr 2022 19:53:58 +0800
-Message-ID: <20220426115358.52392-1-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
+        Tue, 26 Apr 2022 09:27:31 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF00218C466;
+        Tue, 26 Apr 2022 06:24:23 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B0FD23A;
+        Tue, 26 Apr 2022 06:24:23 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BDF543F774;
+        Tue, 26 Apr 2022 06:24:21 -0700 (PDT)
+Date:   Tue, 26 Apr 2022 14:24:19 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Diego Sueiro <diego.sueiro@arm.com>,
+        Laurent Vivier <lvivier@redhat.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        liviu.dudau@arm.com, sudeep.holla@arm.com,
+        lorenzo.pieralisi@arm.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] arm64: dts: fvp: Add virtio-rng support
+Message-ID: <20220426142419.34f815a2@donnerap.cambridge.arm.com>
+In-Reply-To: <ac3be672c636091ee1e079cadce776b1fb7e0b2e.1650543392.git.diego.sueiro@arm.com>
+References: <ac3be672c636091ee1e079cadce776b1fb7e0b2e.1650543392.git.diego.sueiro@arm.com>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add sm4 generic selection for fallback tfm in the Kconfig.
+On Thu, 21 Apr 2022 15:35:21 +0100
+Diego Sueiro <diego.sueiro@arm.com> wrote:
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Hi,
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index e572f9982d4e..27e1fa912063 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -26,6 +26,7 @@ config CRYPTO_DEV_HISI_SEC2
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
-+	select CRYPTO_SM4
- 	depends on PCI && PCI_MSI
- 	depends on UACCE || UACCE=n
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
--- 
-2.33.0
+> The virtio-rng is available from FVP_Base_RevC-2xAEMvA version 11.17, so add
+> the devicetree node to support it.
+
+The change looks good, although it probably deserves to mention the reason
+for keeping it "disabled" by default (older FVP versions not having the
+device, so they throw an SError on probe).
+
+But when testing it, I discovered that there is some problem with later
+kernels. It works fine up to v5.15, but breaks later on. I bisected it
+down to:
+
+=============
+commit 9a4b612d675b03f7fc9fa1957ca399c8223f3954
+Author: Laurent Vivier <lvivier@redhat.com>
+Date:   Thu Oct 28 12:11:11 2021 +0200
+    
+    hwrng: virtio - always add a pending request
+
+    If we ensure we have already some data available by enqueuing
+    again the buffer once data are exhausted, we can return what we
+    have without waiting for the device answer.
+=============
+
+The effect is that any access to /dev/hwrng hangs, it looks like it's
+waiting for an interrupt to fire (core goes to WFI). The process reading
+the char dev can be Ctrl-C'ed, but there will be no output, and the
+interrupt counter in /proc/interrupts does not increase.
+It works fine with any kernel under QEMU, but definitely breaks the FVP
+usage (reverting that patch makes it work again on mainline).
+
+I didn't have a closer look yet (and have limited knowledge about the
+internals of virtio and virtio-rng in particular), but was wondering if
+someone could give a hint at what could be the issue or the direction to
+debug that?
+
+Cheers,
+Andre
+
+> Signed-off-by: Diego Sueiro <diego.sueiro@arm.com>
+> ---
+>  arch/arm64/boot/dts/arm/fvp-base-revc.dts            | 3 ++-
+>  arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi | 7 +++++++
+>  arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi     | 2 +-
+>  3 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> index 269b649934b5..a496e39e6204 100644
+> --- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> +++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+> @@ -241,6 +241,7 @@ bus@8000000 {
+>  				<0 0 41 &gic 0 0 GIC_SPI 41 IRQ_TYPE_LEVEL_HIGH>,
+>  				<0 0 42 &gic 0 0 GIC_SPI 42 IRQ_TYPE_LEVEL_HIGH>,
+>  				<0 0 43 &gic 0 0 GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>,
+> -				<0 0 44 &gic 0 0 GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+> +				<0 0 44 &gic 0 0 GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>,
+> +				<0 0 46 &gic 0 0 GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
+>  	};
+>  };
+> diff --git a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
+> index 33182d9e5826..1b6326514c97 100644
+> --- a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
+> +++ b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard-rs2.dtsi
+> @@ -21,6 +21,13 @@ virtio-net@150000 {
+>  					reg = <0x150000 0x200>;
+>  					interrupts = <44>;
+>  				};
+> +
+> +				virtio-rng@200000 {
+> +					compatible = "virtio,mmio";
+> +					reg = <0x200000 0x200>;
+> +					interrupts = <46>;
+> +					status = "disabled";
+> +				};
+>  			};
+>  		};
+>  	};
+> diff --git a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi
+> index 5f6cab668aa0..a999e7f52d8b 100644
+> --- a/arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi
+> +++ b/arch/arm64/boot/dts/arm/rtsm_ve-motherboard.dtsi
+> @@ -110,7 +110,7 @@ iofpga-bus@300000000 {
+>  				compatible = "simple-bus";
+>  				#address-cells = <1>;
+>  				#size-cells = <1>;
+> -				ranges = <0 3 0 0x200000>;
+> +				ranges = <0 3 0 0x210000>;
+>  
+>  				v2m_sysreg: sysreg@10000 {
+>  					compatible = "arm,vexpress-sysreg";
 
