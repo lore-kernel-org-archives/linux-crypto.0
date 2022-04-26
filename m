@@ -2,71 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B499FC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Apr 2022 20:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A783EC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Apr 2022 20:32:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354803AbiDZUbv (ORCPT
+        id S1349201AbiDZUfS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Apr 2022 16:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
+        Tue, 26 Apr 2022 16:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354755AbiDZUbu (ORCPT
+        with ESMTP id S234566AbiDZUfR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Apr 2022 16:31:50 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9FAD2644F4;
-        Tue, 26 Apr 2022 13:28:41 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id 810B892009C; Tue, 26 Apr 2022 22:28:39 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id 7B0E992009B;
-        Tue, 26 Apr 2022 21:28:39 +0100 (BST)
-Date:   Tue, 26 Apr 2022 21:28:39 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tglx@linutronix.de, arnd@arndb.de,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: Re: [PATCH v6 09/17] mips: use fallback for random_get_entropy()
- instead of just c0 random
-In-Reply-To: <20220423212623.1957011-10-Jason@zx2c4.com>
-Message-ID: <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk>
-References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-10-Jason@zx2c4.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        Tue, 26 Apr 2022 16:35:17 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FA42A717;
+        Tue, 26 Apr 2022 13:32:09 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id k27so8583489edk.4;
+        Tue, 26 Apr 2022 13:32:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uCJZhZ8JOCOzJDroZy2k47OUeMRvL82ynH0nIu7m01o=;
+        b=iXXkzKNsoPSKLDrNUMP8yKdEuEFTfbu0tyFT2G5AU6YFrPEZoeocyPafPF8ZIlRVs4
+         PDrkFym8Crg0f43QRIYFU/4GxHU2KGz+GU+1cEu6Rf9VOyXqJiePa+MGXIgDHlbWbRBH
+         N4ghHy/zZsz8p09CRq01YFG9BPpRa2J4KWHWVYU/+aRmxtxh3nHt5W5bG12rrlypJq3U
+         VmAzLAmpyBvhats/QPX+mHkTHSKnKdgJoZ+8/Ybz3x9mI7h79Pmeq8gIGiPBP3CwSO0S
+         MNyDMrFi+6zIdS7OFNZuQFB+vYKSFA0bwRkUukkfHiithWp2mC7Ar3kIx5O6c3Djah0Y
+         ZwUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uCJZhZ8JOCOzJDroZy2k47OUeMRvL82ynH0nIu7m01o=;
+        b=vM1dRZB7LtNaovvVJEm7TvH7wZXxapMWnXwlS4COuFb48/7osTmSvNZUU9SYRc3jh0
+         Uk41UATIwcNGnJ5gaN0xCsYkgmHaMbmHMHKx7WThA1Ww3z86PV3fa2rsOKeIIl0Qp+92
+         qwX6aKOTEpUhwC6CXaVn7aJzuRfcUQlfkCdm01wPTlRdqK1lZGyqMEkXJq5PVrAzvSjV
+         gufs6GGXRVcI/uQriVGMc1p/b4/2/lXGy0d1/0GLltzPNE4L8tk+ayhjQ0Ko9U/Xffqb
+         SLMtC03Ixaagt8LjchyyzV9p3at8OETQvuz40nMCuuXyOpuTuhVGgV4cuAjlMuI0Zr/5
+         sUlQ==
+X-Gm-Message-State: AOAM533i40Bv5hdzbUJefvegio5+1fIj0GYRCvw5Y/UOazQqqG9X9TXV
+        OaNKQdgnqqcumxYqmOsOyd3bdXNlcmi8uXoTCo4=
+X-Google-Smtp-Source: ABdhPJxM9ois9zrxPnY0Yglv8Wmwye6OZkLgME14cU+BM1xzqoRFJysfsEUURBF/17qdpY07NDekFmJ6BqLkcCFOIfE=
+X-Received: by 2002:a50:ee11:0:b0:425:b5b3:a48d with SMTP id
+ g17-20020a50ee11000000b00425b5b3a48dmr26701096eds.246.1651005127954; Tue, 26
+ Apr 2022 13:32:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-5-Jason@zx2c4.com>
+In-Reply-To: <20220423212623.1957011-5-Jason@zx2c4.com>
+From:   Matt Turner <mattst88@gmail.com>
+Date:   Tue, 26 Apr 2022 13:31:56 -0700
+Message-ID: <CAEdQ38G+FeEMJ7a1+0Ay_d1e9mG+CUYsR6EABRXDn2j0smMSdw@mail.gmail.com>
+Subject: Re: [PATCH v6 04/17] alpha: define get_cycles macro for arch-override
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ivan Kokshaysky <ink@jurassic.park.msu.ru>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 23 Apr 2022, Jason A. Donenfeld wrote:
-
-> diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
-> index b05bb70a2e46..8cfa485d19e6 100644
-> --- a/arch/mips/include/asm/timex.h
-> +++ b/arch/mips/include/asm/timex.h
-[...]
-> +	if (cpu_has_3kex)
-> +		c0_random = (read_c0_random() >> 8) & 0x3f;
-
- Hmm, I wonder whether we do need to mask the contents of the register out 
-here given that known implementations return zeros in reserved bits.  Even 
-though R3000 documentation I have access to makes no guarantee as to the 
-values of the reserved bits here I think we can safely proceed according 
-to what systems we do actually support do (even though it only saves one 
-instruction).
-
->  	else
-> -		return 0;	/* no usable register */
-> +		c0_random = read_c0_random() & 0x3f;
-
- Here the architecture guarantees unused bits to be zero, but the number 
-of them varies between implementations.  However we'll only ever use this 
-leg for the R4000/R4400 processors, which have 48 TLB entries, and for the 
-Ingenic XBurst cores, which I have now verified in documentation (which 
-user-reported dumps from /proc/cpuinfo are consistent with) that have 32 
-TLB entries.  So I think this mask operation can go as well.
-
- I guess these updates can be made with a follow-up change though.
-
-  Maciej
+Acked-by: Matt Turner <mattst88@gmail.com>
