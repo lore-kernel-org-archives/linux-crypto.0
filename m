@@ -2,189 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F16C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 11:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2F8C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 13:59:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233048AbiD0Lv6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Apr 2022 07:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
+        id S236925AbiD0OC0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Apr 2022 10:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232970AbiD0Lv5 (ORCPT
+        with ESMTP id S236931AbiD0OCZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Apr 2022 07:51:57 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-eopbgr80059.outbound.protection.outlook.com [40.107.8.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A579366A7;
-        Wed, 27 Apr 2022 04:48:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iKC04nZ5cF3OP1JS8RSfNPz3cz/6TOM27YrgAMbDO9sIWdIVMQ7jiOzjBOLRa25CGwiMB1t0A6+P5yD1uhTBkzQwGJmr5QZtzQ6xiRgwxKZvLqsWLpc8ooCiWtzMAXI7MxLzkBKeKcD5FSi3cxNXhU61KpNVp9qoP5yEqJufkQLVExoE94WEPVagFPhS7iss4Hl0PltEEVb5+1+1Pm8Wr2hcZ6HAXURV+2ZHR1r0wBhdJ6Z6sfdwHEUm06NcpcQUO9oxNWOrxel24ywfFRq065hYlzbyKUc9rYWPNhHwchAkONRAL3ytdeMC1UcMCHrfHsL2t20ekfVZSqY84e2rRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mp/47kbsaBPL1mgy4TNM5XQzWOzvsy0dzU+HAdN+QRE=;
- b=kFHcsujSreSc4UZl/N2XLl6QlEo0phrJnQQHbaCgJZEfpC9Um/slz6YRXz8hgjyw72NmF/x7oXmXXxU4KdS7Rcyh8DzVS/KrFbkpT2QDZFGqTOzAErajAV2QbghjCnGASQY9lX9Ya4RigCgf55fLeehGyaPJpX3uDfi58SzmRLUIeGAY3a2mOn81gFB2ihrPoM8D0KRqzw2AOBO10N/Kq9wI8DdHOHFdLQcb5XD3tou1+uWaFHmenHGmi2ms7l/NXxFI//Lmx6MBklof1DtZA57CtkHHNb/e6BnTeHvcEwXarxSIUxxbCcoR9ogeKqh9hEu8ogxh8TPCIv0AHB3pag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mp/47kbsaBPL1mgy4TNM5XQzWOzvsy0dzU+HAdN+QRE=;
- b=Hxx2pCiOCB7PjPws88J6oQmXpWYZwyta8TsewGsLu+btqn7e6+B2Y+0DO7NzeHGec0XzwivKW4OJhv9LVZ2LejYSKrj9Q44tN8Zw8rji6zHj5TnG5malawRnNyuYKJHx80PtotteU8oK94wQ4YkSakx+esLhEWGEac3htRt37gQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9517.eurprd04.prod.outlook.com (2603:10a6:102:229::20)
- by DB3PR0402MB3836.eurprd04.prod.outlook.com (2603:10a6:8:f::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.21; Wed, 27 Apr
- 2022 11:48:43 +0000
-Received: from PAXPR04MB9517.eurprd04.prod.outlook.com
- ([fe80::ecbc:8286:8006:fb5f]) by PAXPR04MB9517.eurprd04.prod.outlook.com
- ([fe80::ecbc:8286:8006:fb5f%6]) with mapi id 15.20.5164.025; Wed, 27 Apr 2022
- 11:48:43 +0000
-Message-ID: <f67acb13-a48e-763b-dce6-d3867b0e4965@nxp.com>
-Date:   Wed, 27 Apr 2022 14:48:39 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v3 1/1] crypto: caam/rng: Add support for PRNG
-Content-Language: en-US
-To:     Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-References: <20220304114123.3762649-1-meenakshi.aggarwal@nxp.com>
- <20220420063808.1089283-1-meenakshi.aggarwal@nxp.com>
- <20220420063808.1089283-2-meenakshi.aggarwal@nxp.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-In-Reply-To: <20220420063808.1089283-2-meenakshi.aggarwal@nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0302CA0036.eurprd03.prod.outlook.com
- (2603:10a6:205:2::49) To PAXPR04MB9517.eurprd04.prod.outlook.com
- (2603:10a6:102:229::20)
+        Wed, 27 Apr 2022 10:02:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3212945503;
+        Wed, 27 Apr 2022 06:59:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CB4BCB82794;
+        Wed, 27 Apr 2022 13:58:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02255C385AC;
+        Wed, 27 Apr 2022 13:58:56 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YPfVYPFf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651067935;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=PkGTsxRJlFtt9ULahCauBVNzw0pkNDHGTuGCtNBsayE=;
+        b=YPfVYPFfxjJRC+Gz5Wg58j517Q3i9/QNwGVpWWZ7SxqownhngZs5eDt2O8lSoQtHvRSjpA
+        VkZvu/WkilP/8nSOvWbfQIXNh/fA7Of8718yiewD9gTiy2dK6vbQRt2Qmzi0aEnIbjkOj3
+        FobG9yGO6YkyXPb5v5bv3dMdw2JXDwA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8f40a0ab (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 27 Apr 2022 13:58:54 +0000 (UTC)
+Date:   Wed, 27 Apr 2022 15:58:51 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
+        tessaro@cs.washington.edu, torvalds@linux-foundation.org,
+        djb@cr.yp.to, tytso@mit.edu, jeanphilippe.aumasson@gmail.com,
+        jann@thejh.net, keescook@chromium.org, gregkh@linuxfoundation.org,
+        peter@cryptojedi.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: is "premature next" a real world rng concern, or just an academic
+ exercise?
+Message-ID: <YmlMGx6+uigkGiZ0@zx2c4.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a9037b32-ae06-4c82-3f4b-08da2843e149
-X-MS-TrafficTypeDiagnostic: DB3PR0402MB3836:EE_
-X-Microsoft-Antispam-PRVS: <DB3PR0402MB3836FA0464EB7B8E366C7E5F98FA9@DB3PR0402MB3836.eurprd04.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WuKA7qlW7hTbAu4H2J8goBBexG1dOjGxMMs8cSlqr73FFkqRovA3VpZxh3BKDjww124cMWbzWTYs2i4KfcpWFobBkhRLFya78HBBdyEuDFdloK4M3LhmrbFIYWoWHQUMA5ny5FLogSRgxnASBV4rMOT9LmVYx2PZso66iIZ9jyhxj5xCHJjYWGp/CaFTLctPF8jfjjZzXDvkXfypnEAZKHAjd0KAaKGuMwO1bNO8PPtcvRfNWRLRrNobYa++QGw+5QZ1QSR1ossiPO+Q1FSi8UciPTTIqpXI3CpbBtGfWab+n2LLfuJ3u7XG0KorsJC+PC/ghOuVLVAiQxylHOs6HFWi83DISiDjUjck2ZpyTSJv13FUpXbNiesTHJrWPV1y3iJZCzIyhBMLmsVFCsqmaFgQdXPZhD5pj2x4ndulm13N4a7dMDsB/FU41MVak1xUszLb33sW4TmoTUr4fwVxXS23UXP4iMNuVhmZh/Ksm5uoO5jWbCHkbCIkdSwM9QnQ9wNmubcC1BG5CoGyh53/jF22MJK3ptQvKtH3M0XCdGWPlMcybDYSR05gqevWaUQO8+AHetgKunGB0gGe40aMVd35sRWAz2pj1v3VLfIVdkvivjUM93cNznFwqaTL33+aWR/PHNjOhTIqiKUdLmjkeZ/YWkaUptF7fEyt8rwZ7gCzoGjm+bVtaH0XJTWyHHbZ98+8AyIXyTAozErPu2APJYNHvC9ahArtKrwI8PXtIxHbh9WKVknxgr9b2tP/QRxWCkj2i7/BHiHocixpB8pk0w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9517.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(26005)(6512007)(6506007)(6666004)(86362001)(55236004)(31686004)(83380400001)(2616005)(186003)(31696002)(8936002)(4326008)(66476007)(66556008)(8676002)(2906002)(38350700002)(53546011)(52116002)(5660300002)(38100700002)(66946007)(36756003)(110136005)(6486002)(508600001)(316002)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N1BiTHVaaGZLOU1IRWRsZkNhcnQrZDNkWndzRkQ2UitELzliSHlqNWhBdnpt?=
- =?utf-8?B?Q0FxWXV0N3dURWtsbWFLclo1VU1vQzZnRmplYkQ1ZmtQUlhtYnpCcGgxRFlE?=
- =?utf-8?B?UU0xYVF5ZWE0Sk1xaUgyOVhCRVU0SStHS1lRNHFpbzhXK25oaWlOWjFabk4w?=
- =?utf-8?B?a05rQlVScmdCM08vQUNJM1JqcGRHb2tKQW9lMnlLbVI1NjExRXVxN3Zxb3dl?=
- =?utf-8?B?cHozOWNhb0hLY0x3WnpSa2pDbXhRTjgrVjYrRUFSZjFaaG01UEFTVENUeXpJ?=
- =?utf-8?B?Q0F5OXpMZTZubUo2ZndtUWVHYW9hd2VRZUh5MDh6TWxsb1B0M1FPcjBTYkVW?=
- =?utf-8?B?T2kzZ1JidEV6OUVVaTE2VHpUeGxtYlBuYndDNnpMRTJVblFwZEcrOEwrbkd4?=
- =?utf-8?B?aWVUSG1pNVhGd3hIVW9jYmZYYlVzZ3lCYTRZZzd6cjl6TkhkeURBVDNGUXdj?=
- =?utf-8?B?a28zQmI2TFplWitFZ1hmSDVpbmRXcGdTR2dVWlBCVVRWVElHcTgvOU1wOTRn?=
- =?utf-8?B?TVNQVDBrTERzeW9rYlNtVXYxNTQrY25weGt5Y3JGQnpPd0I5RHNmQkJuWmdD?=
- =?utf-8?B?dVVyNlZpem9rVWF4VXRER0grakwvTGNnalpEV1V3TjNmU1FMOEVqVVZrN3JT?=
- =?utf-8?B?ZlBWbU5FNnVmNWo5M2JQb1laRkN6UHREL1ByWW1UUlk0aFhLMVF4UXc2RWdN?=
- =?utf-8?B?RXkzSWVZN2FLT1Jsb25CeWp3elVlL0ZDdFFseUdBekFkRTUyNXpWYnErN2U1?=
- =?utf-8?B?ZnNkbzdNaXNVS2o2SStEdXlvWlJJQXNkSGxUTTczWk1heWhEV3hURFpFaXBV?=
- =?utf-8?B?d2YvcldIUWpnQWpESHZFVFVpSzhrTVpNSUpRN21KRHQzbFg1UlIxNDQ0ZFZs?=
- =?utf-8?B?Q2RncmJiMUlJaW1LYmxvSURlUGUvSVpIZTdYTmtLSkRJVkZVcm5ybGluY2lm?=
- =?utf-8?B?WW9SZEVEMlhhRTh6a3IxTmNQSkhJRHlXTE84NDI3LzB1elB0Y004OGEwTTZQ?=
- =?utf-8?B?SmwyMUtwSEVZaHFFa3puVmRPSGU4OG9CZW5sZXdmWWZKUXpTOGtaVjR3U3Qz?=
- =?utf-8?B?Z2oxQythc29TWGE3aXNnY25nRVJWOVNISWhxMzVrckl0aGduN2tIOEdZRFlV?=
- =?utf-8?B?aUNJYzFuUDhRSEhMaFJUY1Rnc2ZQVlVGZUcvY2RBUFhMMzJLcFh5QkVVR1h0?=
- =?utf-8?B?dXQ3R2NpbFVjMEJtcXB1RWVNMStGOWsxSDY0eU93Wk5GZGVhNC81UGlFNHNL?=
- =?utf-8?B?a0VYQjNCQ0k0NE5YNVhYc3ZnNEN4QzNoTUNwQ0tzUzN1aFBITU54NE1LY0VP?=
- =?utf-8?B?dEZITFhKbVdJM3dVTHZXSldsUm9GeWErQTc3b09pM3gxanduZ2t6Wng3VGtB?=
- =?utf-8?B?Y05aM0VzSm1EVFhsLzVuakdDTEtYZEduR1hZMnRPcFF6VmVlUzZUaFZpa3NK?=
- =?utf-8?B?MXQ2bTZHbG4zR0E0aFp4TEsvVjhjbWQ5TDhyQmwyVTNtQVh1VWZZYVVSdlQ3?=
- =?utf-8?B?aUdjQ0g0RDk5NGVVVHBMZmYzcUE0clFBL0l4bWthd0g1NnMzOEVyeURxOU9j?=
- =?utf-8?B?ZmZrNVhyMkZxalpONTJldENsRVNxQlluVHJ0dWtmdS9MS3NCU3MwTmh3aUNk?=
- =?utf-8?B?WThaSFpmU1dIUHRyRDVPc3RoWHd1WlBVUXVaTjVKczgvbG85cjNiS1VIazdV?=
- =?utf-8?B?TEJXanlOV2oraFQrQ2JJQ2R4OGdVUkt1TmZjNm16ak1WblJyMWRvT3JyODF3?=
- =?utf-8?B?ajlSbUl4TlFwaDhsWVFRbnkzZ25mcXh3TzBOSDZvUmZVQmdneDRCSjJsRE1k?=
- =?utf-8?B?djFoS3JYTmZ6WUtxdmd0WnN1N0Ywejh6L1ZBSkZSTmpKL1BndkREM29rNllD?=
- =?utf-8?B?dnZ3dkFTM29zSUFUbkUxZW96QTUzRFNiZG5aUElLNmhja3RIcmdmWlYvYkRn?=
- =?utf-8?B?YVAxSFNOYjJOQmNHSGlHMWpnZ01UV3NoSWxMTTJEK0NYclhzZlk0NFFCZGIy?=
- =?utf-8?B?WE52VmFhZVNSVSt2ZWJZUGZIT0VpYnhOaEExN1ZiM1gzR1g5MW9KS1ZKalRk?=
- =?utf-8?B?eEhDZWhrZkZaRGVWVkt0TGdXc2NkU3BNTytwR0xwdVFiem8wQXg0RDBSQXN3?=
- =?utf-8?B?ekxCT3NuNFVQeDQ2VGVtMW5CQnVaSVpWUkx0dHRGOHY1VzlVUndyMytQL3pT?=
- =?utf-8?B?ZzYvSGNxa1BBU0FzbW9LY0M3ekNxbTgreUhoL0pOOGhHd0p1RjEyVEJ5ZWlj?=
- =?utf-8?B?K242NUJlcXJYVm5WajN3TkhJQmRUYUFUaDA3Njc3ZmYxWDRBOEh0V2FrTDJ2?=
- =?utf-8?B?aDJwcGh3Tk90Ry8weXJuNEp5dG8rbFdyMWZKQlZGOVRPVzhHRk5RSWVvdStq?=
- =?utf-8?Q?BZ7Aw9l/lH9UoKys=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9037b32-ae06-4c82-3f4b-08da2843e149
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9517.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2022 11:48:43.8405
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hrA/BSA8HIWOqqtJvMQW6NyxFAzxe7BuQkjPIcx0YHUJN6bi0gWLszqmHrwTJ42XQxGEYPCkBDVCdr+D+iloUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB3PR0402MB3836
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/20/2022 9:38 AM, Meenakshi Aggarwal wrote:
-> +static void caam_prng_done(struct device *jrdev, u32 *desc, u32 err,
-> +			  void *context)
-> +{
-> +	struct caam_prng_ctx *jctx = context;
-> +
-> +	if (err >> JRSTA_SSRC_SHIFT)
-> +		jctx->err = caam_jr_strstatus(jrdev, err);
-The details of error handling are in error.c, let's keep this abstraction.
+Hi folks,
 
-> +	else
-> +		jctx->err = 0;
-> +
-> +	complete(&jctx->done);
-> +}
-> +
-[...]
-> +static int caam_prng_seed(struct crypto_rng *tfm,
-> +			 const u8 *seed, unsigned int slen)
-> +{
-> +	struct caam_prng_ctx ctx;
-> +	struct device *jrdev;
-> +	dma_addr_t seed_dma;
-> +	u32 *desc;
-> +	u8 *buf;
-> +	int ret = 0;
-> +
-> +	if (seed == NULL) {
-> +		pr_err("Seed not provided\n");
-> +		return ret;
-> +	}
-> +
-> +	buf = kzalloc(slen, GFP_KERNEL);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	jrdev = caam_jr_alloc();
-> +	ret = PTR_ERR_OR_ZERO(jrdev);
-> +	if (ret) {
-> +		pr_err("Job Ring Device allocation failed\n");
-> +		kfree(buf);
-> +		return ret;
-> +	}
-> +
-> +	desc = kzalloc(CAAM_PRNG_DESC_LEN, GFP_KERNEL | GFP_DMA);
-> +	if (!desc) {
-> +		ret = -ENOMEM;
-> +		goto out1;
-> +	}
-> +
-> +	memcpy(buf, seed, slen);
-> +
-> +	seed_dma = dma_map_single(jrdev, buf, slen, DMA_FROM_DEVICE);
-Now that seedsize is 0, the .seed callback is called with slen = 0.
-Reseed descriptor should be updated too.
+The Linux kernel RNG currently pretends to care about the "premature
+next" RNG threat model. I'm wondering whether this is sensible and
+corresponds to anything real.
 
-Horia
+"Premature next" is the scenario in which:
+- Attacker compromises the current state of a fully initialized RNG with
+  a wild 'n crazy kernel infoleak.
+- New bits of entropy are added directly to the key used to generate the
+  /dev/urandom stream, without any buffering or pooling.
+- Attacker then, somehow having read access to /dev/urandom, samples RNG
+  output and brute forces the individual new bits that were added.
+- Result: the RNG never "recovers" from the initial compromise, a
+  so-called violation of what academics term "post-compromise security".
+
+(Note that this is a different scenario from "premature first", which
+relates to boot-time concerns; this email isn't about "premature
+first".)
+
+There are other varied scenarios to this, usually involving some
+combination of:
+a) Attacker has access to /dev/urandom output continuously or at some
+   interesting interval.
+b) Attacker controls one or more entropy sources providing some subset
+   of varying size of those new bits of entropy.
+
+The Linux kernel currently pretends to mitigate this for scenario (a) at
+least, using "entropy estimation". The idea is that it waits until 256
+estimated "bits" of new entropy are pooled before mixing them into the
+key used to generate the /dev/urandom stream. Never mind the fact that
+entropy estimation is an impossible proposition and thus flawed, it
+certainly does nothing in the way of (b), since there's just one pool.
+
+The NT kernel is a bit more robust, by way of their Fortuna RNG, in
+which there are several pools, and entropy sources round-robin into
+those pools. When it's time to reseed, the first pool is used every
+time, the second pool is used every other time, the third pool is used
+every third time, the forth pool is used every forth time, and so on. In
+theory this should handle both (a) and (b) without needing entropy
+estimation, and this sort of scheduler prompts interesting questions for
+academics with regards to different types of scheduling (a random walk
+instead of round-robin? sounds like a paper topic.) and trying to
+characterize the rate of inputs (continuous? sporadic? modelable?).
+
+While the above "problem" maps pretty clearly to things academics are
+interested in -- post-compromise security for a system with a clear
+model and various creative solutions -- I'm wondering whether any of
+this matters in the real world. From conversations over the last several
+months with various security experts and cryptographers, including those
+who work on the "premature next" problem, the impression I get is that
+nobody actually thinks this matters back on planet Earth, even from
+people who write papers on it.
+
+So the purpose of this email is to solicit feedback on whether anybody
+can think of a plausible scenario in which it does matter. If it does
+matter, the next step will be to determine how much it matters exactly,
+in order for me to gauge the cost-benefit ratio of mitigating the issue
+more robustly in the kernel (e.g. Fortuna requires non-zero code
+complexity; does the benefit outweigh the cost of such complexity?). On
+the other hand, if nobody can think of any reason why this matters, then
+there are some nice improvements that I'm eager to make in a different
+direction.
+
+To review, this attack model concerns:
+- An attacker who compromises the RNG at one point in time via a kernel
+  infoleak.
+- After that infoleak, the attacker somehow no longer has access to the
+  system, but can prevent the RNG from recovering from the compromise by
+  having pretty rapid access to /dev/urandom (and possibly also having
+  compromised zero or more entropy sources).
+
+The questions are thus:
+
+1) When does an attacker with a kernel infoleak exercise it just once,
+   and then attempt to maintain the leak with some sort of network access
+   to lots of /dev/urandom output (from, e.g., large nonces)?
+
+2) Or, if it's a local user attacker, when does that attacker infoleak
+   once, but rather than just running the exploit again, cats /dev/urandom
+   continuously?
+
+3) More broadly speaking, what kernel infoleak is actually acceptable to
+   the degree that anybody would feel okay in the first place about the
+   system continuing to run after it's been compromised?
+
+Looking forward to hearing opinions on this. There's certainly a lot to
+split hairs about above -- incomplete/inaccurate description of the
+"premature next" model, what Fortuna actually achieves, my entropy
+estimation remark, and so forth -- but hopefully this at least throws
+enough things at the board to begin the discussion.
+
+Is "premature next" just an academic exercise, rather than a real world
+RNG concern?
+
+Regards,
+Jason
