@@ -2,150 +2,133 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2F8C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 13:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D66C4C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 21:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236925AbiD0OC0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Apr 2022 10:02:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41946 "EHLO
+        id S231668AbiD0Vpq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 27 Apr 2022 17:45:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236931AbiD0OCZ (ORCPT
+        with ESMTP id S233620AbiD0Vpp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Apr 2022 10:02:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3212945503;
-        Wed, 27 Apr 2022 06:59:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CB4BCB82794;
-        Wed, 27 Apr 2022 13:58:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02255C385AC;
-        Wed, 27 Apr 2022 13:58:56 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YPfVYPFf"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651067935;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=PkGTsxRJlFtt9ULahCauBVNzw0pkNDHGTuGCtNBsayE=;
-        b=YPfVYPFfxjJRC+Gz5Wg58j517Q3i9/QNwGVpWWZ7SxqownhngZs5eDt2O8lSoQtHvRSjpA
-        VkZvu/WkilP/8nSOvWbfQIXNh/fA7Of8718yiewD9gTiy2dK6vbQRt2Qmzi0aEnIbjkOj3
-        FobG9yGO6YkyXPb5v5bv3dMdw2JXDwA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8f40a0ab (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 27 Apr 2022 13:58:54 +0000 (UTC)
-Date:   Wed, 27 Apr 2022 15:58:51 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
-        tessaro@cs.washington.edu, torvalds@linux-foundation.org,
-        djb@cr.yp.to, tytso@mit.edu, jeanphilippe.aumasson@gmail.com,
-        jann@thejh.net, keescook@chromium.org, gregkh@linuxfoundation.org,
-        peter@cryptojedi.org
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: is "premature next" a real world rng concern, or just an academic
- exercise?
-Message-ID: <YmlMGx6+uigkGiZ0@zx2c4.com>
+        Wed, 27 Apr 2022 17:45:45 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9035DA16;
+        Wed, 27 Apr 2022 14:42:33 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id z5-20020a17090a468500b001d2bc2743c4so2785035pjf.0;
+        Wed, 27 Apr 2022 14:42:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=74tBYBfjUTcEu+cPUdN10nkHPL3FQx8M2KL24jTaIMg=;
+        b=kUkNwlH/Cmf/BZTymS/svQM50m2sfFE+Oz9m1sc6Je8bacXe8JufW0ysw4JVdz22Sq
+         ABxdlD86pv5YIlZniLya+MsTaR4G+Xk3BoCKP6rnc3A+jWNTYIiFCedQVZ9PboJ4Ca2L
+         MH67JDauiDNyR4ukQv84hSzoR7IN+I4pq+j7TRREuuyfliRxTU17QaJb02vIL8ddJPV2
+         7yoGPkmLop3ol4P9O3E1S9c21vTipLUgsfELvmbhd0mgPAgHtHruNf6M2Vw85iLhWKUJ
+         XlhGUzEmS+2ALBgUNtwJoMmUVW2efQjbXcQ3sjXyHdOugqW6L+CBQw9INmLNe5OVNfkw
+         lX5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=74tBYBfjUTcEu+cPUdN10nkHPL3FQx8M2KL24jTaIMg=;
+        b=oFggIMRZE0s8atfm0KKOQBao2kCfbF+sjg/d2QATDK01niIamAt4RXvEFH2NX2NFKa
+         WOFVXXlaqZcqqRDuWP3pzbTe4eKM7KMwaPy+WKgcFI4LEpx0KxVl1WatOoQ2Ml91cZTa
+         /bgMnVPiejxpmxvcN5TSxGfpcagFjdDYbjOZmDf/zVdIA4xgBSoaYVQwBqWkpjBBGq5x
+         FQohBX5N/Iq5prfOit0bPLsdKY9x1ZQWPpPREGoLkf8Eg4toCFHXfstv7P/Jm8RnD0Wq
+         Cwrqgdl882dMagcf2By1A8K1vSKCylsh3jsicZFKyUdjGE40ExVqCAzydUxq1Rt+02FE
+         /9UA==
+X-Gm-Message-State: AOAM530RT52sNNgoz4YRjctQdrudI4sLqR83lwHswGZojpcAQrOVmLJN
+        3jmfGDzlGoCdPwTrXqn17Pk=
+X-Google-Smtp-Source: ABdhPJyW7pvEA8Y+vM8nCWPanwDnXSalol/rgku8knCNd6bKgD3DfIQlBH7m6kzPSX/xpp66STr8Yg==
+X-Received: by 2002:a17:902:ab55:b0:15c:ecb:81ad with SMTP id ij21-20020a170902ab5500b0015c0ecb81admr29758872plb.50.1651095752994;
+        Wed, 27 Apr 2022 14:42:32 -0700 (PDT)
+Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
+        by smtp.gmail.com with ESMTPSA id 19-20020aa79113000000b00505d5d15d80sm20310724pfh.14.2022.04.27.14.42.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 14:42:32 -0700 (PDT)
+Date:   Thu, 28 Apr 2022 06:42:30 +0900
+From:   Stafford Horne <shorne@gmail.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de, arnd@arndb.de, Jonas Bonn <jonas@southpole.se>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Subject: Re: [PATCH v6 11/17] openrisc: use fallback for random_get_entropy()
+ instead of zero
+Message-ID: <Ymm4xhRDWjvWS+3X@antec>
+References: <20220423212623.1957011-1-Jason@zx2c4.com>
+ <20220423212623.1957011-12-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20220423212623.1957011-12-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi folks,
+On Sat, Apr 23, 2022 at 11:26:17PM +0200, Jason A. Donenfeld wrote:
+> In the event that random_get_entropy() can't access a cycle counter or
+> similar, falling back to returning 0 is really not the best we can do.
+> Instead, at least calling random_get_entropy_fallback() would be
+> preferable, because that always needs to return _something_, even
+> falling back to jiffies eventually. It's not as though
+> random_get_entropy_fallback() is super high precision or guaranteed to
+> be entropic, but basically anything that's not zero all the time is
+> better than returning zero all the time.
+> 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Jonas Bonn <jonas@southpole.se>
+> Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+> Cc: Stafford Horne <shorne@gmail.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/openrisc/include/asm/timex.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/openrisc/include/asm/timex.h b/arch/openrisc/include/asm/timex.h
+> index d52b4e536e3f..115e89b336cd 100644
+> --- a/arch/openrisc/include/asm/timex.h
+> +++ b/arch/openrisc/include/asm/timex.h
+> @@ -23,6 +23,9 @@ static inline cycles_t get_cycles(void)
+>  {
+>  	return mfspr(SPR_TTCR);
+>  }
+> +#define get_cycles get_cycles
+> +
+> +#define random_get_entropy() (((unsigned long)get_cycles()) ?: random_get_entropy_fallback())
+>  
+>  /* This isn't really used any more */
+>  #define CLOCK_TICK_RATE 1000
+> -- 
+> 2.35.1
 
-The Linux kernel RNG currently pretends to care about the "premature
-next" RNG threat model. I'm wondering whether this is sensible and
-corresponds to anything real.
+Hi Jason,
 
-"Premature next" is the scenario in which:
-- Attacker compromises the current state of a fully initialized RNG with
-  a wild 'n crazy kernel infoleak.
-- New bits of entropy are added directly to the key used to generate the
-  /dev/urandom stream, without any buffering or pooling.
-- Attacker then, somehow having read access to /dev/urandom, samples RNG
-  output and brute forces the individual new bits that were added.
-- Result: the RNG never "recovers" from the initial compromise, a
-  so-called violation of what academics term "post-compromise security".
+This looks OK, but I am wondering why we cannot add this to
+"include/linux/timex.h" as the default implementation of random_get_entropy
+if get_cycles is defined.  I see there are 2 cases:
 
-(Note that this is a different scenario from "premature first", which
-relates to boot-time concerns; this email isn't about "premature
-first".)
+   1. architectures that define get_cycles, and random_get_entropy is defined in
+      include/linux/timex.h.
+      (openrisc, sparc*, xtensa*, nios2, um*, arm)
 
-There are other varied scenarios to this, usually involving some
-combination of:
-a) Attacker has access to /dev/urandom output continuously or at some
-   interesting interval.
-b) Attacker controls one or more entropy sources providing some subset
-   of varying size of those new bits of entropy.
+   2. architectures that define random_get_entropy explicitly
+      (mips, m68k, riscv, x86)
 
-The Linux kernel currently pretends to mitigate this for scenario (a) at
-least, using "entropy estimation". The idea is that it waits until 256
-estimated "bits" of new entropy are pooled before mixing them into the
-key used to generate the /dev/urandom stream. Never mind the fact that
-entropy estimation is an impossible proposition and thus flawed, it
-certainly does nothing in the way of (b), since there's just one pool.
+* Those marked with * just define get_cycles as 0.
 
-The NT kernel is a bit more robust, by way of their Fortuna RNG, in
-which there are several pools, and entropy sources round-robin into
-those pools. When it's time to reseed, the first pool is used every
-time, the second pool is used every other time, the third pool is used
-every third time, the forth pool is used every forth time, and so on. In
-theory this should handle both (a) and (b) without needing entropy
-estimation, and this sort of scheduler prompts interesting questions for
-academics with regards to different types of scheduling (a random walk
-instead of round-robin? sounds like a paper topic.) and trying to
-characterize the rate of inputs (continuous? sporadic? modelable?).
+I would think in "include/linux/timex.h" we could define.
 
-While the above "problem" maps pretty clearly to things academics are
-interested in -- post-compromise security for a system with a clear
-model and various creative solutions -- I'm wondering whether any of
-this matters in the real world. From conversations over the last several
-months with various security experts and cryptographers, including those
-who work on the "premature next" problem, the impression I get is that
-nobody actually thinks this matters back on planet Earth, even from
-people who write papers on it.
+    #ifndef random_get_entropy
+    #ifdef get_cycles
+    #define random_get_entropy() (((unsigned long)get_cycles()) ?: random_get_entropy_fallback())
+    #else
+    #define random_get_entropy()   random_get_entropy_fallback()
+    #endif
+    #endif
 
-So the purpose of this email is to solicit feedback on whether anybody
-can think of a plausible scenario in which it does matter. If it does
-matter, the next step will be to determine how much it matters exactly,
-in order for me to gauge the cost-benefit ratio of mitigating the issue
-more robustly in the kernel (e.g. Fortuna requires non-zero code
-complexity; does the benefit outweigh the cost of such complexity?). On
-the other hand, if nobody can think of any reason why this matters, then
-there are some nice improvements that I'm eager to make in a different
-direction.
+For architectures that define get_cycles as 0, they can be cleaned up.
 
-To review, this attack model concerns:
-- An attacker who compromises the RNG at one point in time via a kernel
-  infoleak.
-- After that infoleak, the attacker somehow no longer has access to the
-  system, but can prevent the RNG from recovering from the compromise by
-  having pretty rapid access to /dev/urandom (and possibly also having
-  compromised zero or more entropy sources).
-
-The questions are thus:
-
-1) When does an attacker with a kernel infoleak exercise it just once,
-   and then attempt to maintain the leak with some sort of network access
-   to lots of /dev/urandom output (from, e.g., large nonces)?
-
-2) Or, if it's a local user attacker, when does that attacker infoleak
-   once, but rather than just running the exploit again, cats /dev/urandom
-   continuously?
-
-3) More broadly speaking, what kernel infoleak is actually acceptable to
-   the degree that anybody would feel okay in the first place about the
-   system continuing to run after it's been compromised?
-
-Looking forward to hearing opinions on this. There's certainly a lot to
-split hairs about above -- incomplete/inaccurate description of the
-"premature next" model, what Fortuna actually achieves, my entropy
-estimation remark, and so forth -- but hopefully this at least throws
-enough things at the board to begin the discussion.
-
-Is "premature next" just an academic exercise, rather than a real world
-RNG concern?
-
-Regards,
-Jason
+-Stafford
