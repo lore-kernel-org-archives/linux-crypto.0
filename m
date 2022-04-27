@@ -2,108 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42394C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 07:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD24C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Apr 2022 07:44:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358889AbiD0HhO (ORCPT
+        id S1358982AbiD0HrI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Apr 2022 03:37:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40592 "EHLO
+        Wed, 27 Apr 2022 03:47:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358888AbiD0HhN (ORCPT
+        with ESMTP id S1356434AbiD0HrH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Apr 2022 03:37:13 -0400
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9828D6AD
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Apr 2022 00:34:02 -0700 (PDT)
-Date:   Wed, 27 Apr 2022 07:33:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail2; t=1651044838;
-        bh=piUpAc0wGe60Avq75CM5bLwVBo2lSgqrOZtXltVybnw=;
-        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
-         References:Feedback-ID:From:To:Cc:Date:Subject:Reply-To:
-         Feedback-ID:Message-ID;
-        b=p5TANCxWDN0iWpN28SVEjXN5FOsv0HnWN0jkP8EzNU7VQ3k4FHpfhTDHYZbusqW1I
-         QSEKXWs3y3ROFkOIkVYN3/HBbZpgjUDRY8rwdWT0neQfuB+uPCIsuS1vNigmatzbIz
-         ve5aIKNnBb8W1o0+592wRjya+EPvbTrCkWZoBLpD8+iXoLuPGfwZ5SfuNhnJVL6slm
-         P9fQe+2kBAG61MPiQrIDCDJITmA55lmTjLOweohHWGmSU4zbeVPXcxnS4d+RQIFvvR
-         74hNiU2XMxGgM06UAkHGux0MF9PbIBw5Nvr5hiCzHg9OaB9kRYxUKWd9P+5FESAJV1
-         MQZJ6REW/w6JA==
-To:     Antoine Tenart <atenart@kernel.org>
-From:   Juerg Haefliger <juergh@protonmail.com>
-Cc:     Juerg Haefliger <juerg.haefliger@canonical.com>,
-        davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Reply-To: Juerg Haefliger <juergh@protonmail.com>
-Subject: Re: [PATCH] crypto: inside-secure - Add MODULE_FIRMWARE macros
-Message-ID: <20220427093252.00d013c9@smeagol>
-In-Reply-To: <165104455443.3327.8052402101857118285@kwain>
-References: <20220427070349.388246-1-juergh@protonmail.com> <165104455443.3327.8052402101857118285@kwain>
-Feedback-ID: 10260306:user:proton
+        Wed, 27 Apr 2022 03:47:07 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619E7157830
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Apr 2022 00:43:57 -0700 (PDT)
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id CBE823F323
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Apr 2022 07:43:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1651045435;
+        bh=8jXf4hJvUNA7Zgo2Xy9fULH0xSDw50tBXLQ5NxaCPwc=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=tz7EM3y9eXOS59Ku6qCdubLxcdytS+ZWbicKdZj9tB25+63bP6qscCEyoiSU1LLPe
+         jDl2oEPW4WzE0wH3Y8gPToez6f/h056WNAZaeufHG3dJwcVUlhlIqY5Xnm7tftW3SN
+         11lZKGO1q01/a0/Fp4LShyzfd3T0U4BB4yMHrk8G4dq0GYoR9tBm0c8OXy1cOVRZrn
+         nekSck/hy/Tw4rNO7QQDbZn+LgfyeXp/9xQuYF0uj546kyiHchSUt0zPib0Sj5iR9z
+         HKqJLV8BGVJxnDEuAdvfMSqySMR3Bt9eGC/EpJtkfWFVImS8cz3vu9Up5SJGgh01rT
+         l05+ZSk3qIa5Q==
+Received: by mail-ed1-f69.google.com with SMTP id c23-20020a50d657000000b00425d5162a0dso530263edj.16
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Apr 2022 00:43:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8jXf4hJvUNA7Zgo2Xy9fULH0xSDw50tBXLQ5NxaCPwc=;
+        b=tsRUjfmxpl+G2CLAYxtVOa3cmA2szhXlbmF6XqQhrSSNqAdRisO7+req9AwrfDrvCe
+         +JQORvTBrRuyjy1w0Cea8HeMX4DrPXKO0U/c7HpNmxlJDXqSqaSxZcy8ZqxG7perarFP
+         +kZK2D/bq4R+8DAPOr3LcYnxvk5UFrFNmAH9HtnQY19lqxVJ8dsqdWqLT6VvJVelmXFN
+         McJJ64tgvPkZKg4bNC465i1P2xbxrGd7gEgRxU7yXbfq1o8BYtZUc5BKL1Mmo7ajejYh
+         e8ML7Qs2BCLVRvxUQyP3VIAmLuQvTZWLSwbpQioXOyv+3XOuS8E+8AvpktBGlt+nvnLs
+         qRDg==
+X-Gm-Message-State: AOAM532szwin59GZ8m02VCM5nrMfgbZed/Y5Jwi2HdFKm14hRcV/4edt
+        1x/Ub1rulb2b7W9G4cl4pZP6H7jFmUBNdNKNdkS67hOHV8mAQaYLnR8LkV8SmNuhF4AHe8nbuR6
+        2qOwrTTTGaXHJkJljc7Nqq+Mm1qF/vckFxJxQ4SMauw==
+X-Received: by 2002:a05:6402:4305:b0:423:f73b:4dd8 with SMTP id m5-20020a056402430500b00423f73b4dd8mr28872560edc.218.1651045435585;
+        Wed, 27 Apr 2022 00:43:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw9qGwbmj4RQdcIrM402uZX33x1RmjKuotIbf3u96QABOyiSqGny7stvH42Ubp0YmHhK/i+ZQ==
+X-Received: by 2002:a05:6402:4305:b0:423:f73b:4dd8 with SMTP id m5-20020a056402430500b00423f73b4dd8mr28872550edc.218.1651045435434;
+        Wed, 27 Apr 2022 00:43:55 -0700 (PDT)
+Received: from gollum.fritz.box ([194.191.244.86])
+        by smtp.gmail.com with ESMTPSA id q8-20020a056402040800b004227b347ee3sm7902998edv.56.2022.04.27.00.43.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 00:43:55 -0700 (PDT)
+From:   Juerg Haefliger <juerg.haefliger@canonical.com>
+X-Google-Original-From: Juerg Haefliger <juergh@protonmail.com>
+To:     atenart@kernel.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Juerg Haefliger <juergh@protonmail.com>
+Subject: [PATCH v2] crypto: inside-secure - Add MODULE_FIRMWARE macros
+Date:   Wed, 27 Apr 2022 09:43:51 +0200
+Message-Id: <20220427074351.391580-1-juergh@protonmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_xJCHnbO4zpyNtxSqi4ebN97ZiN1dTAelSXPpKazELCM"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a multi-part message in MIME format.
+The safexcel module loads firmware so add MODULE_FIRMWARE macros to
+provide that information via modinfo.
 
---b1_xJCHnbO4zpyNtxSqi4ebN97ZiN1dTAelSXPpKazELCM
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Juerg Haefliger <juergh@protonmail.com>
+---
+v2:
+ Add legacy fallback firmware locations.
+---
+ drivers/crypto/inside-secure/safexcel.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-On Wed, 27 Apr 2022 09:29:14 +0200
-"Antoine Tenart" <atenart@kernel.org> wrote:
-
-> Hello Juerg,
->
-> Quoting Juerg Haefliger (2022-04-27 09:03:49)
-> > +
-> > +MODULE_FIRMWARE("inside-secure/eip197b/ifpp.bin");
-> > +MODULE_FIRMWARE("inside-secure/eip197b/ipue.bin");
-> > +MODULE_FIRMWARE("inside-secure/eip197d/ifpp.bin");
-> > +MODULE_FIRMWARE("inside-secure/eip197d/ipue.bin");
-> > +MODULE_FIRMWARE("inside-secure/eip197_minifw/ifpp.bin");
-> > +MODULE_FIRMWARE("inside-secure/eip197_minifw/ipue.bin");
->
-> There's also the old location when the EIP197b firmwares were at the
-> root of the linux-firmware repo. The driver still supports it, so I
-> guess those two should have a MODULE_FIRMWARE entry too.
-
-Hi Antoine,
-
-Yeah, I was wondering about that myself but wasn't sure if it should be add=
-ed.
-Will add it then and send a v2.
-
-...Juerg
-
-
-> Thanks,
-> Antoine
-
-
---b1_xJCHnbO4zpyNtxSqi4ebN97ZiN1dTAelSXPpKazELCM
-Content-Type: application/pgp-signature; name=attachment.sig
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=attachment.sig
-
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
-cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbUpvOGFRQUNna1FEOU9MQ1F1bQ0KUXJlYm1BLzlHeDV5M2NG
-V1Uvd3dsUXQrM3dQcUlXNndJWEV4UWxLdEdueVJiMEhka1gwakxBWXJna29OYldaTw0KbC9GdXZz
-RVg5T0Qya3JWWUFEWElLSExFdVVVbnc1bHlGT3Vvd2UzalE0YWhYSGVJc3FPYmp2ZEpKQUh3OWd4
-Yw0KeGpXYmpIRC9kQ0dtcmpaNjZUWHBzY0hhRmN4YnQvVXBxVjRLd1BiRzRoY0U4cFduV2ZSYis3
-eG9Ib0NhaGg3ZA0KVVY2RVVBS0pZNWg0bFNsWG40T2ttWW9tRXlDT2RKbXM2bmluZDNTbXZWV1lw
-TlZxU1diRmtQWTRqOFpIenVrTQ0KMXVXNHpaYityL01CaGprUTV5Q3VGbmYwcys5NnR5OVRBVnoz
-VGdmdWwvUTl1bGlPTmJVenBoNHRrRm9MenRoeg0KOVpmT3RHODFHbnpjRGczL3E3b0pwRXYvUzNq
-K1NxQ2FUUWRIVzJZSFBKSmMrbzFoQ3J4OFNYdUVhbDNHdHlueA0Kc1MzQkh0eUtEdUhrYmt4b1Qw
-dXJtZkdDYW1HVDlEM21tOEptd0tXdy81aFlHSWwrdzFIZ3B5Qm92eno1Y0cveg0KL2gyN3l4bUli
-YkVEdHFnZFVQVS9XcjNaL2s1cWZCQjFDZGE5L0g5dWx1Zmw2bzRUZ3RUdzl5d3k4QkQ2L3BuYw0K
-V1VZSjdLRHJZU1pwZ3ZQRlR2Um40N3NhbHpBbmt2RHZ2a2krN0x5ZlV1dkJObVBLUEVhL2t4Ymlm
-UW9tNW9ScA0KNUE0eHJhRm5OY2FhTDVaMmU1YzlKSDlwRzVGQWJsK1VmVmI2MkJKeGovMlEzVVBE
-ZmVkSUtpa0J0WUNUc2VDTg0Kc1pySGZBMTN1QmRNaTM3R1VVRDZVNGE1dy94NFdXTHVBUENIZEhs
-WVk5YlNYb0VObEE0PQ0KPVczZ04NCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
-
---b1_xJCHnbO4zpyNtxSqi4ebN97ZiN1dTAelSXPpKazELCM--
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 9ff885d50edf..9b1a158aec29 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1997,3 +1997,12 @@ MODULE_AUTHOR("Igal Liberman <igall@marvell.com>");
+ MODULE_DESCRIPTION("Support for SafeXcel cryptographic engines: EIP97 & EIP197");
+ MODULE_LICENSE("GPL v2");
+ MODULE_IMPORT_NS(CRYPTO_INTERNAL);
++
++MODULE_FIRMWARE("ifpp.bin");
++MODULE_FIRMWARE("ipue.bin");
++MODULE_FIRMWARE("inside-secure/eip197b/ifpp.bin");
++MODULE_FIRMWARE("inside-secure/eip197b/ipue.bin");
++MODULE_FIRMWARE("inside-secure/eip197d/ifpp.bin");
++MODULE_FIRMWARE("inside-secure/eip197d/ipue.bin");
++MODULE_FIRMWARE("inside-secure/eip197_minifw/ifpp.bin");
++MODULE_FIRMWARE("inside-secure/eip197_minifw/ipue.bin");
+-- 
+2.32.0
 
