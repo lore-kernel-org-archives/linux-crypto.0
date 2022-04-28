@@ -2,466 +2,214 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D61C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Apr 2022 14:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D667EC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Apr 2022 14:04:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347998AbiD1OF4 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Apr 2022 10:05:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36138 "EHLO
+        id S233320AbiD1OIH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Apr 2022 10:08:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347996AbiD1OFw (ORCPT
+        with ESMTP id S241057AbiD1OIC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Apr 2022 10:05:52 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3A3B42EE
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2022 07:02:22 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nk4iN-0000B4-Qi; Thu, 28 Apr 2022 16:01:51 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nk4iO-005lwx-Gp; Thu, 28 Apr 2022 16:01:51 +0200
-Received: from afa by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nk4iL-003i14-DJ; Thu, 28 Apr 2022 16:01:49 +0200
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     kernel@pengutronix.de, David Gstir <david@sigma-star.at>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH v8 3/6] crypto: caam - add in-kernel interface for blob generator
-Date:   Thu, 28 Apr 2022 16:01:42 +0200
-Message-Id: <20220428140145.870527-4-a.fatoum@pengutronix.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220428140145.870527-1-a.fatoum@pengutronix.de>
-References: <20220428140145.870527-1-a.fatoum@pengutronix.de>
+        Thu, 28 Apr 2022 10:08:02 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E8FB714C
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2022 07:04:19 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id k14so4100874pga.0
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2022 07:04:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zkXWp8YkbHgF6tQunE9Dc1g1IZuQaUaeHQc84WiuWuw=;
+        b=KBf5cjMviFZ3XkhqoulAuU+Jozs8mLNv5F50zJqFkTDeA1vc1WC+OIpkszs1/B6/Si
+         5OpAckCU1cI+q4cMIwDF2JXatP1r7CO6u2va16Bq6oWc1WDFcNVejtRuNg3SdnpqQkh3
+         O6eLvIGjcDA5YoOCQJXIvkyHwG6RwYEzkQvTbokrO5hMGUj8z5fuFw2jb3Xq4wq4wGEH
+         aNPEwhWKFY5y2XN/Fb31CLW2mpvD0njJ7sxC400FLH6bUoyTsIuCTquJwHkZgSHjE8Wm
+         OJ9hkPOE66NwbsoJ7fAGbd5feXBs/WoYAMxTNwPwY4OkknzyjcxkIz6D6D+1OAzX21Db
+         uo1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zkXWp8YkbHgF6tQunE9Dc1g1IZuQaUaeHQc84WiuWuw=;
+        b=rEqO1zBR51AFCKtO5d13C+zyU2BAsxkrRkWtDwZjjfiTLqZ4pRgLnULWYKk771pWRt
+         zJK7keILPGcKFih1YAkIcOkku1d7L2zDBN8c7QLRduU/31+Rv+1Z/afsUbiNTLLgbuFq
+         VHRnDsQD5zSe8ZznAPlmKulYzlo8cLJELBnk2aWlw9KMZMOym4S76Gos4y958/PAe0BD
+         tqwq9zQbiUvArBSLZE0kWc1fhWuyUflz+vWECFFT4WR+cTX+mTy+SrL3ssqUeTUMOa67
+         92zhRDWT1jP8UndZHt4eHOnHpM2B0id4+AeRvC8n52oNrly/2DOuZUu7anteCxypzdkO
+         HH1g==
+X-Gm-Message-State: AOAM533VOV96eSOR4OCLaaXLU+k6v4OfjsDYlfMa5qeBNknlJDKR4WUF
+        5dg9K3EG7I95FAmvoAkxgCRd0Q==
+X-Google-Smtp-Source: ABdhPJxbR3dazvNTLyiio1zH4TfsUXSelYR5IENf0r/5fyXtYZI4SWjfy6a0vf2pfkG2atZ8JyAmjA==
+X-Received: by 2002:a05:6a00:b4d:b0:50d:7e9f:1ff0 with SMTP id p13-20020a056a000b4d00b0050d7e9f1ff0mr9151453pfo.80.1651154658806;
+        Thu, 28 Apr 2022 07:04:18 -0700 (PDT)
+Received: from always-x1.www.tendawifi.com ([139.177.225.254])
+        by smtp.gmail.com with ESMTPSA id x129-20020a623187000000b0050835f6d6a1sm38975pfx.9.2022.04.28.07.04.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Apr 2022 07:04:18 -0700 (PDT)
+From:   zhenwei pi <pizhenwei@bytedance.com>
+To:     mst@redhat.com, arei.gonglei@huawei.com, berrange@redhat.com
+Cc:     qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
+        jasowang@redhat.com, cohuck@redhat.com,
+        zhenwei pi <pizhenwei@bytedance.com>
+Subject: [PATCH v5 0/9] Introduce akcipher service for virtio-crypto
+Date:   Thu, 28 Apr 2022 21:59:34 +0800
+Message-Id: <20220428135943.178254-1-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: afa@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The NXP Cryptographic Acceleration and Assurance Module (CAAM)
-can be used to protect user-defined data across system reboot:
+Hi, Lei & MST
 
-  - When the system is fused and boots into secure state, the master
-    key is a unique never-disclosed device-specific key
-  - random key is encrypted by key derived from master key
-  - data is encrypted using the random key
-  - encrypted data and its encrypted random key are stored alongside
-  - This blob can now be safely stored in non-volatile memory
+Daniel has started to review the akcipher framework and nettle & gcrypt
+implementation, this part seems to be ready soon. Thanks a lot to Daniel!
 
-On next power-on:
-  - blob is loaded into CAAM
-  - CAAM writes decrypted data either into memory or key register
+And the last patch "crypto: Introduce RSA algorithm" handles akcipher
+requests from guest and uses the new akcipher service. The new feature
+can be used to test by the builtin driver. I would appreciate it if you
+could review patch.
 
-Add functions to realize encrypting and decrypting into memory alongside
-the CAAM driver.
-
-They will be used in a later commit as a source for the trusted key
-seal/unseal mechanism.
-
-Reviewed-by: David Gstir <david@sigma-star.at>
-Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-Tested-by: Tim Harvey <tharvey@gateworks.com>
-Tested-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Tested-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-v7 -> v8:
-  - remove unneeded new line in kernel doc (Jarkko)
-  - Make comments parse as kernel-doc and fix associated warnings
-  - add Pankaj's Tested-by
-v6 -> v7:
-  - Added more verbose comment on how CAAM_BLOB_DESC_BYTES_MAX adds up.
-  - remove error message on kzalloc failure (checkpatch)
-  - Replaced buffer arguments with structure containing them (Pankaj)
-v5 -> v6:
-  - Dropped caam_blob_alloc_desc() in favor of kzalloc() with fixed size.
-    This simplifies code and wastes at most 12 bytes which are freed
-    at the end of the function anyway.
-  - Factored out common code between caam_encap_blob and caam_decap_blob
-    as both functions were largely identical
-  - use append_seq_(in|out)_ptr_intlen for both encap/decap as a result
-  - use reverse christmas tree order for caam_process_blob variable
-    definitions.
 v4 -> v5:
-  - Collected Reviewed-by's and Tested-by's
-  - Note in CAAM patch what CAAM is (Jarkko)
+- Move QCryptoAkCipher into akcipherpriv.h, and modify the related comments.
+- Rename asn1_decoder.c to der.c.
+- Code style fix: use 'cleanup' & 'error' lables.
+- Allow autoptr type to auto-free.
+- Add test cases for rsakey to handle DER error.
+- Other minor fixes.
+
 v3 -> v4:
-  - Collected Acked-by's, Reviewed-by's and Tested-by
-  - Fixed typo spotted by David
+- Coding style fix: Akcipher -> AkCipher, struct XXX -> XXX, Rsa -> RSA,
+XXX-alg -> XXX-algo.
+- Change version info in qapi/crypto.json, from 7.0 -> 7.1.
+- Remove ecdsa from qapi/crypto.json, it would be introduced with the implemetion later.
+- Use QCryptoHashAlgothrim instead of QCryptoRSAHashAlgorithm(removed) in qapi/crypto.json.
+- Rename arguments of qcrypto_akcipher_XXX to keep aligned with qcrypto_cipher_XXX(dec/enc/sign/vefiry -> in/out/in2), and add qcrypto_akcipher_max_XXX APIs.
+- Add new API: qcrypto_akcipher_supports.
+- Change the return value of qcrypto_akcipher_enc/dec/sign, these functions return the actual length of result.
+- Separate ASN.1 source code and test case clean.
+- Disable RSA raw encoding for akcipher-nettle.
+- Separate RSA key parser into rsakey.{hc}, and implememts it with builtin-asn1-decoder and nettle respectivly.
+- Implement RSA(pkcs1 and raw encoding) algorithm by gcrypt. This has higher priority than nettle.
+- For some akcipher operations(eg, decryption of pkcs1pad(rsa)), the length of returned result maybe less than the dst buffer size, return the actual length of result instead of the buffer length to the guest side. (in function virtio_crypto_akcipher_input_data_helper)
+- Other minor changes.
+
+Thanks to Daniel!
+
+Eric pointed out this missing part of use case, send it here again.
+
+In our plan, the feature is designed for HTTPS offloading case and other applications which use kernel RSA/ecdsa by keyctl syscall. The full picture shows bellow:
+
+
+                  Nginx/openssl[1] ... Apps
+Guest   -----------------------------------------
+                   virtio-crypto driver[2]
+-------------------------------------------------
+                   virtio-crypto backend[3]
+Host    -----------------------------------------
+                  /          |          \
+              builtin[4]   vhost     keyctl[5] ...
+
+
+[1] User applications can offload RSA calculation to kernel by keyctl syscall. There is no keyctl engine in openssl currently, we developed a engine and tried to contribute it to openssl upstream, but openssl 1.x does not accept new feature. Link:
+    https://github.com/openssl/openssl/pull/16689
+
+This branch is available and maintained by Lei <helei.sig11@bytedance.com>
+    https://github.com/TousakaRin/openssl/tree/OpenSSL_1_1_1-kctl_engine
+
+We tested nginx(change config file only) with openssl keyctl engine, it works fine.
+
+[2] virtio-crypto driver is used to communicate with host side, send requests to host side to do asymmetric calculation.
+    https://lkml.org/lkml/2022/3/1/1425
+
+[3] virtio-crypto backend handles requests from guest side, and forwards request to crypto backend driver of QEMU.
+
+[4] Currently RSA is supported only in builtin driver. This driver is supposed to test the full feature without other software(Ex vhost process) and hardware dependence. ecdsa is introduced into qapi type without implementation, this may be implemented in Q3-2022 or later. If ecdsa type definition should be added with the implementation together, I'll remove this in next version.
+
+[5] keyctl backend is in development, we will post this feature in Q2-2022. keyctl backend can use hardware acceleration(Ex, Intel QAT).
+
+Setup the full environment, tested with Intel QAT on host side, the QPS of HTTPS increase to ~200% in a guest.
+
+VS PCI passthrough: the most important benefit of this solution makes the VM migratable.
+
 v2 -> v3:
- - No change
+- Introduce akcipher types to qapi
+- Add test/benchmark suite for akcipher class
+- Seperate 'virtio_crypto: Support virtio crypto asym operation' into:
+  - crypto: Introduce akcipher crypto class
+  - virtio-crypto: Introduce RSA algorithm
+
 v1 -> v2:
- - Enforce maximum keymod size (Horia)
- - Use append_seq_(in|out)_ptr_intlen instead of append_seq_(in|out)_ptr
-   (Horia)
- - Make blobifier handle private to CAAM glue code file (Horia)
+- Update virtio_crypto.h from v2 version of related kernel patch.
 
-To: "Horia Geantă" <horia.geanta@nxp.com>
-To: Pankaj Gupta <pankaj.gupta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: James Bottomley <jejb@linux.ibm.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-Cc: David Gstir <david@sigma-star.at>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Sumit Garg <sumit.garg@linaro.org>
-Cc: linux-integrity@vger.kernel.org
-Cc: keyrings@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
----
- drivers/crypto/caam/Kconfig    |   3 +
- drivers/crypto/caam/Makefile   |   1 +
- drivers/crypto/caam/blob_gen.c | 164 +++++++++++++++++++++++++++++++++
- include/soc/fsl/caam-blob.h    | 102 ++++++++++++++++++++
- 4 files changed, 270 insertions(+)
- create mode 100644 drivers/crypto/caam/blob_gen.c
- create mode 100644 include/soc/fsl/caam-blob.h
+v1:
+- Support akcipher for virtio-crypto.
+- Introduce akcipher class.
+- Introduce ASN1 decoder into QEMU.
+- Implement RSA backend by nettle/hogweed.
 
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 84ea7cba5ee5..ea9f8b1ae981 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -151,6 +151,9 @@ config CRYPTO_DEV_FSL_CAAM_RNG_API
- 	  Selecting this will register the SEC4 hardware rng to
- 	  the hw_random API for supplying the kernel entropy pool.
- 
-+config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
-+	bool
-+
- endif # CRYPTO_DEV_FSL_CAAM_JR
- 
- endif # CRYPTO_DEV_FSL_CAAM
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index 3570286eb9ce..25f7ae5a4642 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -21,6 +21,7 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
- caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
-+caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) += blob_gen.o
- 
- caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
- ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
-diff --git a/drivers/crypto/caam/blob_gen.c b/drivers/crypto/caam/blob_gen.c
-new file mode 100644
-index 000000000000..d0b1a0015308
---- /dev/null
-+++ b/drivers/crypto/caam/blob_gen.c
-@@ -0,0 +1,164 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015 Pengutronix, Steffen Trumtrar <kernel@pengutronix.de>
-+ * Copyright (C) 2021 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-+ */
-+
-+#include <linux/device.h>
-+#include <soc/fsl/caam-blob.h>
-+
-+#include "compat.h"
-+#include "desc_constr.h"
-+#include "desc.h"
-+#include "error.h"
-+#include "intern.h"
-+#include "jr.h"
-+#include "regs.h"
-+
-+#define CAAM_BLOB_DESC_BYTES_MAX					\
-+	/* Command to initialize & stating length of descriptor */	\
-+	(CAAM_CMD_SZ +							\
-+	/* Command to append the key-modifier + key-modifier data */	\
-+	 CAAM_CMD_SZ + CAAM_BLOB_KEYMOD_LENGTH +			\
-+	/* Command to include input key + pointer to the input key */	\
-+	 CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +				\
-+	/* Command to include output key + pointer to the output key */	\
-+	 CAAM_CMD_SZ + CAAM_PTR_SZ_MAX +				\
-+	/* Command describing the operation to perform */		\
-+	 CAAM_CMD_SZ)
-+
-+struct caam_blob_priv {
-+	struct device jrdev;
-+};
-+
-+struct caam_blob_job_result {
-+	int err;
-+	struct completion completion;
-+};
-+
-+static void caam_blob_job_done(struct device *dev, u32 *desc, u32 err, void *context)
-+{
-+	struct caam_blob_job_result *res = context;
-+	int ecode = 0;
-+
-+	dev_dbg(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
-+
-+	if (err)
-+		ecode = caam_jr_strstatus(dev, err);
-+
-+	res->err = ecode;
-+
-+	/*
-+	 * Upon completion, desc points to a buffer containing a CAAM job
-+	 * descriptor which encapsulates data into an externally-storable
-+	 * blob.
-+	 */
-+	complete(&res->completion);
-+}
-+
-+int caam_process_blob(struct caam_blob_priv *priv,
-+		      struct caam_blob_info *info, bool encap)
-+{
-+	struct caam_blob_job_result testres;
-+	struct device *jrdev = &priv->jrdev;
-+	dma_addr_t dma_in, dma_out;
-+	int op = OP_PCLID_BLOB;
-+	size_t output_len;
-+	u32 *desc;
-+	int ret;
-+
-+	if (info->key_mod_len > CAAM_BLOB_KEYMOD_LENGTH)
-+		return -EINVAL;
-+
-+	if (encap) {
-+		op |= OP_TYPE_ENCAP_PROTOCOL;
-+		output_len = info->input_len + CAAM_BLOB_OVERHEAD;
-+	} else {
-+		op |= OP_TYPE_DECAP_PROTOCOL;
-+		output_len = info->input_len - CAAM_BLOB_OVERHEAD;
-+	}
-+
-+	desc = kzalloc(CAAM_BLOB_DESC_BYTES_MAX, GFP_KERNEL | GFP_DMA);
-+	if (!desc)
-+		return -ENOMEM;
-+
-+	dma_in = dma_map_single(jrdev, info->input, info->input_len,
-+				DMA_TO_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_in)) {
-+		dev_err(jrdev, "unable to map input DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_free;
-+	}
-+
-+	dma_out = dma_map_single(jrdev, info->output, output_len,
-+				 DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, dma_out)) {
-+		dev_err(jrdev, "unable to map output DMA buffer\n");
-+		ret = -ENOMEM;
-+		goto out_unmap_in;
-+	}
-+
-+	/*
-+	 * A data blob is encrypted using a blob key (BK); a random number.
-+	 * The BK is used as an AES-CCM key. The initial block (B0) and the
-+	 * initial counter (Ctr0) are generated automatically and stored in
-+	 * Class 1 Context DWords 0+1+2+3. The random BK is stored in the
-+	 * Class 1 Key Register. Operation Mode is set to AES-CCM.
-+	 */
-+
-+	init_job_desc(desc, 0);
-+	append_key_as_imm(desc, info->key_mod, info->key_mod_len,
-+			  info->key_mod_len, CLASS_2 | KEY_DEST_CLASS_REG);
-+	append_seq_in_ptr_intlen(desc, dma_in, info->input_len, 0);
-+	append_seq_out_ptr_intlen(desc, dma_out, output_len, 0);
-+	append_operation(desc, op);
-+
-+	print_hex_dump_debug("data@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, info->input,
-+			     info->input_len, false);
-+	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 1, desc,
-+			     desc_bytes(desc), false);
-+
-+	testres.err = 0;
-+	init_completion(&testres.completion);
-+
-+	ret = caam_jr_enqueue(jrdev, desc, caam_blob_job_done, &testres);
-+	if (ret == -EINPROGRESS) {
-+		wait_for_completion(&testres.completion);
-+		ret = testres.err;
-+		print_hex_dump_debug("output@"__stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 1, info->output,
-+				     output_len, false);
-+	}
-+
-+	if (ret == 0)
-+		info->output_len = output_len;
-+
-+	dma_unmap_single(jrdev, dma_out, output_len, DMA_FROM_DEVICE);
-+out_unmap_in:
-+	dma_unmap_single(jrdev, dma_in, info->input_len, DMA_TO_DEVICE);
-+out_free:
-+	kfree(desc);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(caam_process_blob);
-+
-+struct caam_blob_priv *caam_blob_gen_init(void)
-+{
-+	struct device *jrdev;
-+
-+	jrdev = caam_jr_alloc();
-+	if (IS_ERR(jrdev))
-+		return ERR_CAST(jrdev);
-+
-+	return container_of(jrdev, struct caam_blob_priv, jrdev);
-+}
-+EXPORT_SYMBOL(caam_blob_gen_init);
-+
-+void caam_blob_gen_exit(struct caam_blob_priv *priv)
-+{
-+	caam_jr_free(&priv->jrdev);
-+}
-+EXPORT_SYMBOL(caam_blob_gen_exit);
-diff --git a/include/soc/fsl/caam-blob.h b/include/soc/fsl/caam-blob.h
-new file mode 100644
-index 000000000000..ec57eec4f2d2
---- /dev/null
-+++ b/include/soc/fsl/caam-blob.h
-@@ -0,0 +1,102 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2020 Pengutronix, Ahmad Fatoum <kernel@pengutronix.de>
-+ */
-+
-+#ifndef __CAAM_BLOB_GEN
-+#define __CAAM_BLOB_GEN
-+
-+#include <linux/types.h>
-+#include <linux/errno.h>
-+
-+#define CAAM_BLOB_KEYMOD_LENGTH		16
-+#define CAAM_BLOB_OVERHEAD		(32 + 16)
-+#define CAAM_BLOB_MAX_LEN		4096
-+
-+struct caam_blob_priv;
-+
-+/**
-+ * struct caam_blob_info - information for CAAM blobbing
-+ * @input:       pointer to input buffer (must be DMAable)
-+ * @input_len:   length of @input buffer in bytes.
-+ * @output:      pointer to output buffer (must be DMAable)
-+ * @output_len:  length of @output buffer in bytes.
-+ * @key_mod:     key modifier
-+ * @key_mod_len: length of @key_mod in bytes.
-+ *	         May not exceed %CAAM_BLOB_KEYMOD_LENGTH
-+ */
-+struct caam_blob_info {
-+	void *input;
-+	size_t input_len;
-+
-+	void *output;
-+	size_t output_len;
-+
-+	const void *key_mod;
-+	size_t key_mod_len;
-+};
-+
-+/**
-+ * caam_blob_gen_init - initialize blob generation
-+ * Return: pointer to new caam_blob_priv instance on success
-+ * and error pointer otherwise
-+ */
-+struct caam_blob_priv *caam_blob_gen_init(void);
-+
-+/**
-+ * caam_blob_gen_exit - free blob generation resources
-+ * @priv: instance returned by caam_blob_gen_init
-+ */
-+void caam_blob_gen_exit(struct caam_blob_priv *priv);
-+
-+/**
-+ * caam_process_blob - encapsulate or decapsulate blob
-+ * @priv:   instance returned by caam_blob_gen_init
-+ * @info:   pointer to blobbing info describing key, blob and
-+ *          key modifier buffers.
-+ * @encap:  true for encapsulation, false for decapsulation
-+ *
-+ * Return: %0 and sets info->output_len on success and a negative
-+ * error code otherwise.
-+ */
-+int caam_process_blob(struct caam_blob_priv *priv,
-+		      struct caam_blob_info *info, bool encap);
-+
-+/**
-+ * caam_encap_blob - encapsulate blob
-+ * @priv:   instance returned by caam_blob_gen_init
-+ * @info:   pointer to blobbing info describing input key,
-+ *          output blob and key modifier buffers.
-+ *
-+ * Return: %0 and sets @info->output_len on success and
-+ * a negative error code otherwise.
-+ */
-+static inline int caam_encap_blob(struct caam_blob_priv *priv,
-+				  struct caam_blob_info *info)
-+{
-+	if (info->output_len < info->input_len + CAAM_BLOB_OVERHEAD)
-+		return -EINVAL;
-+
-+	return caam_process_blob(priv, info, true);
-+}
-+
-+/**
-+ * caam_decap_blob - decapsulate blob
-+ * @priv:   instance returned by caam_blob_gen_init
-+ * @info:   pointer to blobbing info describing output key,
-+ *          input blob and key modifier buffers.
-+ *
-+ * Return: %0 and sets @info->output_len on success and
-+ * a negative error code otherwise.
-+ */
-+static inline int caam_decap_blob(struct caam_blob_priv *priv,
-+				  struct caam_blob_info *info)
-+{
-+	if (info->input_len < CAAM_BLOB_OVERHEAD ||
-+	    info->output_len < info->input_len - CAAM_BLOB_OVERHEAD)
-+		return -EINVAL;
-+
-+	return caam_process_blob(priv, info, false);
-+}
-+
-+#endif
+Lei He (6):
+  qapi: crypto-akcipher: Introduce akcipher types to qapi
+  crypto: add ASN.1 DER decoder
+  crypto: Implement RSA algorithm by hogweed
+  crypto: Implement RSA algorithm by gcrypt
+  test/crypto: Add test suite for crypto akcipher
+  tests/crypto: Add test suite for RSA keys
+
+Zhenwei Pi (3):
+  virtio-crypto: header update
+  crypto: Introduce akcipher crypto class
+  crypto: Introduce RSA algorithm
+
+ backends/cryptodev-builtin.c                  | 272 ++++-
+ backends/cryptodev-vhost-user.c               |  34 +-
+ backends/cryptodev.c                          |  32 +-
+ crypto/akcipher-gcrypt.c.inc                  | 520 +++++++++
+ crypto/akcipher-nettle.c.inc                  | 432 ++++++++
+ crypto/akcipher.c                             | 108 ++
+ crypto/akcipherpriv.h                         |  55 +
+ crypto/der.c                                  | 190 ++++
+ crypto/der.h                                  |  82 ++
+ crypto/meson.build                            |   6 +
+ crypto/rsakey-builtin.c.inc                   | 209 ++++
+ crypto/rsakey-nettle.c.inc                    | 154 +++
+ crypto/rsakey.c                               |  44 +
+ crypto/rsakey.h                               |  94 ++
+ hw/virtio/virtio-crypto.c                     | 323 ++++--
+ include/crypto/akcipher.h                     | 158 +++
+ include/hw/virtio/virtio-crypto.h             |   5 +-
+ .../standard-headers/linux/virtio_crypto.h    |  82 +-
+ include/sysemu/cryptodev.h                    |  83 +-
+ meson.build                                   |  11 +
+ qapi/crypto.json                              |  64 ++
+ tests/bench/benchmark-crypto-akcipher.c       | 157 +++
+ tests/bench/meson.build                       |   4 +
+ tests/bench/test_akcipher_keys.inc            | 537 ++++++++++
+ tests/unit/meson.build                        |   2 +
+ tests/unit/test-crypto-akcipher.c             | 990 ++++++++++++++++++
+ tests/unit/test-crypto-der.c                  | 290 +++++
+ 27 files changed, 4792 insertions(+), 146 deletions(-)
+ create mode 100644 crypto/akcipher-gcrypt.c.inc
+ create mode 100644 crypto/akcipher-nettle.c.inc
+ create mode 100644 crypto/akcipher.c
+ create mode 100644 crypto/akcipherpriv.h
+ create mode 100644 crypto/der.c
+ create mode 100644 crypto/der.h
+ create mode 100644 crypto/rsakey-builtin.c.inc
+ create mode 100644 crypto/rsakey-nettle.c.inc
+ create mode 100644 crypto/rsakey.c
+ create mode 100644 crypto/rsakey.h
+ create mode 100644 include/crypto/akcipher.h
+ create mode 100644 tests/bench/benchmark-crypto-akcipher.c
+ create mode 100644 tests/bench/test_akcipher_keys.inc
+ create mode 100644 tests/unit/test-crypto-akcipher.c
+ create mode 100644 tests/unit/test-crypto-der.c
+
 -- 
-2.30.2
+2.20.1
 
