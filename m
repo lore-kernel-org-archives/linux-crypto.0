@@ -2,57 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 220B2C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 05:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AD2C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 06:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345541AbiD2FyZ (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Apr 2022 01:54:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53918 "EHLO
+        id S241073AbiD2G3y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Apr 2022 02:29:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243441AbiD2FyZ (ORCPT
+        with ESMTP id S230018AbiD2G3x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Apr 2022 01:54:25 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327D5B82C6;
-        Thu, 28 Apr 2022 22:51:08 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nkJWp-008984-TB; Fri, 29 Apr 2022 15:50:57 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Apr 2022 13:50:56 +0800
-Date:   Fri, 29 Apr 2022 13:50:56 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Colin Ian King <colin.i.king@gmail.com>
-Cc:     Sumit Garg <sumit.garg@linaro.org>, Matt Mackall <mpm@selenic.com>,
-        op-tee@lists.trustedfirmware.org, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: optee-rng: remove redundant initialization to
- variable rng_size
-Message-ID: <Ymt8wNWKkLeI4VIV@gondor.apana.org.au>
-References: <20220424181156.1364446-1-colin.i.king@gmail.com>
+        Fri, 29 Apr 2022 02:29:53 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B168A541A0
+        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2022 23:26:35 -0700 (PDT)
+Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23T6QCZF004314;
+        Fri, 29 Apr 2022 15:26:12 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
+ Fri, 29 Apr 2022 15:26:12 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23T6QBj2004307
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 29 Apr 2022 15:26:12 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <5de198b9-7488-13e4-bf22-6c58c1c8b401@I-love.SAKURA.ne.jp>
+Date:   Fri, 29 Apr 2022 15:26:07 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220424181156.1364446-1-colin.i.king@gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH] crypto: atmel - Avoid flush_scheduled_work() usage
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Tudor Ambarus <tudor.ambarus@microchip.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-crypto@vger.kernel.org
+References: <35da6cb2-910f-f892-b27a-4a8bac9fd1b1@I-love.SAKURA.ne.jp>
+ <Ymt4BfQXbXkY2qo0@gondor.apana.org.au>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <Ymt4BfQXbXkY2qo0@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Apr 24, 2022 at 07:11:56PM +0100, Colin Ian King wrote:
-> Variable rng_size is being initialized with a value that is never read,
-> the variable is being re-assigned later on. The initialization is
-> redundant and can be removed.
+On 2022/04/29 14:30, Herbert Xu wrote:
+> On Wed, Apr 20, 2022 at 10:27:11AM +0900, Tetsuo Handa wrote:
+>>
+>> +module_init(atmel_i2c_init);
+>> +module_exit(atmel_i2c_exit);
 > 
-> Cleans up cppcheck warning:
-> Variable 'rng_size' is assigned a value that is never used.
-> 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/char/hw_random/optee-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> What if everything is built-in? Shouldn't this be moved to a place
+> earlier than module_init?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Since drivers/crypto/Makefile has lines in
+
+obj-$(CONFIG_CRYPTO_DEV_ATMEL_I2C) += atmel-i2c.o
+obj-$(CONFIG_CRYPTO_DEV_ATMEL_ECC) += atmel-ecc.o
+obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA204A) += atmel-sha204a.o
+
+order (which will be used as link order for built-in.o), module_init()
+is processed in this order. Also, module_exit() is no-op if built-in.
+Therefore, I think there is no need to explicitly boost the priority
+of atmel_i2c_init().
+
