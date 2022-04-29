@@ -2,68 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EAC3C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 05:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37ECAC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 05:49:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344864AbiD2FwN (ORCPT
+        id S1354262AbiD2Fwm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Apr 2022 01:52:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49382 "EHLO
+        Fri, 29 Apr 2022 01:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354219AbiD2FwH (ORCPT
+        with ESMTP id S1354219AbiD2Fwj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Apr 2022 01:52:07 -0400
+        Fri, 29 Apr 2022 01:52:39 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAB1B18AB;
-        Thu, 28 Apr 2022 22:48:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA885B18AB;
+        Thu, 28 Apr 2022 22:49:22 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nkJUf-00890j-CP; Fri, 29 Apr 2022 15:48:42 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Apr 2022 13:48:41 +0800
-Date:   Fri, 29 Apr 2022 13:48:41 +0800
+        id 1nkJVB-00892g-Es; Fri, 29 Apr 2022 15:49:14 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Apr 2022 13:49:13 +0800
+Date:   Fri, 29 Apr 2022 13:49:13 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jacky Li <jackyli@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Marc Orr <marcorr@google.com>, Alper Gun <alpergun@google.com>,
-        Peter Gonda <pgonda@google.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ccp - Fix the INIT_EX data file open failure
-Message-ID: <Ymt8OSqkna177KCB@gondor.apana.org.au>
-References: <20220414162325.1830014-1-jackyli@google.com>
+To:     cgel.zte@gmail.com
+Cc:     daniele.alessandrelli@intel.com, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lv Ruyi <lv.ruyi@zte.com.cn>, Zeal Robot <zealci@zte.com.cn>
+Subject: Re: [PATCH] crypto: Make use of the helper function
+ devm_platform_ioremap_resource()
+Message-ID: <Ymt8WQtjoiplLu9l@gondor.apana.org.au>
+References: <20220418015700.2556801-1-lv.ruyi@zte.com.cn>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220414162325.1830014-1-jackyli@google.com>
+In-Reply-To: <20220418015700.2556801-1-lv.ruyi@zte.com.cn>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 04:23:25PM +0000, Jacky Li wrote:
-> There are 2 common cases when INIT_EX data file might not be
-> opened successfully and fail the sev initialization:
+On Mon, Apr 18, 2022 at 01:57:00AM +0000, cgel.zte@gmail.com wrote:
+> From: Lv Ruyi <lv.ruyi@zte.com.cn>
 > 
-> 1. In user namespaces, normal user tasks (e.g. VMM) can change their
->    current->fs->root to point to arbitrary directories. While
->    init_ex_path is provided as a module param related to root file
->    system. Solution: use the root directory of init_task to avoid
->    accessing the wrong file.
+> Use the devm_platform_ioremap_resource() helper instead of calling
+> platform_get_resource() and devm_ioremap_resource() separately.Make the
+> code simpler without functional changes.
 > 
-> 2. Normal user tasks (e.g. VMM) don't have the privilege to access
->    the INIT_EX data file. Solution: open the file as root and
->    restore permissions immediately.
-> 
-> Fixes: 3d725965f836 ("crypto: ccp - Add SEV_INIT_EX support")
-> Signed-off-by: Jacky Li <jackyli@google.com>
-> Reviewed-by: Peter Gonda <pgonda@google.com>
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: Lv Ruyi <lv.ruyi@zte.com.cn>
 > ---
-> Changelog since v1:
-> - Added Fixes tag and Reviewed-By tag.
-> 
->  drivers/crypto/ccp/sev-dev.c | 30 ++++++++++++++++++++++++++++--
->  1 file changed, 28 insertions(+), 2 deletions(-)
+>  drivers/crypto/keembay/keembay-ocs-aes-core.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
