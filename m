@@ -2,81 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DF6C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Apr 2022 17:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D7BC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 00:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234884AbiD1RPg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Apr 2022 13:15:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57316 "EHLO
+        id S1353546AbiD2AUZ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 28 Apr 2022 20:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234974AbiD1RPd (ORCPT
+        with ESMTP id S1351307AbiD2AUZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Apr 2022 13:15:33 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65F335B3FD
-        for <linux-crypto@vger.kernel.org>; Thu, 28 Apr 2022 10:12:18 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nk7gX-0006Bd-Tu; Thu, 28 Apr 2022 19:12:09 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nk7gX-005nM8-Hi; Thu, 28 Apr 2022 19:12:08 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nk7gV-006FUQ-Bv; Thu, 28 Apr 2022 19:12:07 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de
-Subject: [PATCH 1/2] crypto: atmel-sha204a: Remove useless check
-Date:   Thu, 28 Apr 2022 19:11:45 +0200
-Message-Id: <20220428171146.188331-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.35.1
+        Thu, 28 Apr 2022 20:20:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9B627CF9;
+        Thu, 28 Apr 2022 17:17:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A9E74B830A9;
+        Fri, 29 Apr 2022 00:17:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCAC8C385AD;
+        Fri, 29 Apr 2022 00:17:05 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i1c9xOsU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651191423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N6XdKUj5iYJ5RwXtCRVRiwXorABzoye1SBxh5BDCkro=;
+        b=i1c9xOsUF+LWwlI4RpyMAD/JNy2GTZMlypd0y4aaVYhgqSJKA9SuCLEn5URQN03fYnXMCK
+        kLQzgwp1QbQtPlr2xo7ZxFh1yv2O2PyDtLjpDEGR6XE4HnIJWQIkhTeH7M/gfkQfDcnwu1
+        rl9j3RbM+5TxC1rvp1p8UiHyRPgwQhg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9e137a29 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 29 Apr 2022 00:17:02 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     Stafford Horne <shorne@gmail.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v7 11/17] openrisc: account for 0 starting value in random_get_entropy()
+Date:   Fri, 29 Apr 2022 02:16:48 +0200
+Message-Id: <20220429001648.1671472-1-Jason@zx2c4.com>
+In-Reply-To: <20220423212623.1957011-12-Jason@zx2c4.com>
+References: <20220423212623.1957011-12-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=754; h=from:subject; bh=5UtBiNq04rrWOgahVSom57KYQrZi//mrUJR010snr00=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBiasrLufiK4i8o/uBVsU7ZNsvsSjVD/ZkdkHl/lmt9 ILJxUxOJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYmrKywAKCRDB/BR4rcrsCcbdB/ 0QBY9tqIC/lwjitWZy37WyxgUBBF/yotPWZ88h1NZqtwnZ73t/jQzVLgY77+rK+mn0Jnjm0oSDh1er bOLMWVHAdb2aY58vR4Vf4/uInMEorDbicVxCfx/QvW0322xxhWCnl6iUuJy7OlEuwVCJQQoU7WuXmO kq7CdDjW5Bifue5ycXFxQJIXj4KbWS5wC4zABirof9mr53OKL52r25+bjB6RJ+PiAbNlTfWzRbpTmc GOmnQc912K+rtew+dPL74LiKMt/xjSwGZR9aMHxwrP05RpuYTKW3sFM3LBMKZZYgXx6eXygRLFVoxd wIKBoQaEefs78d5o6j6Fc7HGgfYXa2
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-kfree(NULL) is a noop, so there is no win in checking a pointer before
-kfreeing it.
+As a sanity check, this series makes sure that during early boot, the
+cycle counter isn't returning all zeros. However, OpenRISC's TTCR timer
+can be rather slow and starts out as zero during stages of early boot.
+We know it works, however. So just always add 1 to random_get_entropy()
+so that it doesn't trigger these checks.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Jonas Bonn <jonas@southpole.se>
+Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Acked-by: Stafford Horne <shorne@gmail.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/crypto/atmel-sha204a.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Changes v6->v7:
+- Add 1 to cycle counter to account for functional but slow-to-begin
+  counter on QEMU.
 
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index c96c14e7dab1..c71fc86eb849 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -125,8 +125,7 @@ static int atmel_sha204a_remove(struct i2c_client *client)
- 		return -EBUSY;
- 	}
- 
--	if (i2c_priv->hwrng.priv)
--		kfree((void *)i2c_priv->hwrng.priv);
-+	kfree((void *)i2c_priv->hwrng.priv);
- 
- 	return 0;
+ arch/openrisc/include/asm/timex.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/openrisc/include/asm/timex.h b/arch/openrisc/include/asm/timex.h
+index d52b4e536e3f..a78a5807c927 100644
+--- a/arch/openrisc/include/asm/timex.h
++++ b/arch/openrisc/include/asm/timex.h
+@@ -23,6 +23,9 @@ static inline cycles_t get_cycles(void)
+ {
+ 	return mfspr(SPR_TTCR);
  }
-
-base-commit: 3123109284176b1532874591f7c81f3837bbdc17
++#define get_cycles get_cycles
++
++#define random_get_entropy() ((unsigned long)get_cycles() + 1)
+ 
+ /* This isn't really used any more */
+ #define CLOCK_TICK_RATE 1000
 -- 
 2.35.1
 
