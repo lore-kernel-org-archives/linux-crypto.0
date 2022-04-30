@@ -2,82 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B6DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Apr 2022 14:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11C8C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 01:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376829AbiD2OK2 (ORCPT
+        id S1381992AbiD3BW1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Apr 2022 10:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55400 "EHLO
+        Fri, 29 Apr 2022 21:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377144AbiD2OKH (ORCPT
+        with ESMTP id S243107AbiD3BWZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:10:07 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE6F45045
-        for <linux-crypto@vger.kernel.org>; Fri, 29 Apr 2022 07:04:11 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nkRE1-00007q-V2; Fri, 29 Apr 2022 16:04:02 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nkRE1-005xiI-FO; Fri, 29 Apr 2022 16:04:00 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nkRDz-006Qza-3C; Fri, 29 Apr 2022 16:03:59 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de
-Subject: [PATCH] crypto: atmel-i2c - Simplify return code in probe function
-Date:   Fri, 29 Apr 2022 16:03:49 +0200
-Message-Id: <20220429140349.215732-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.35.1
+        Fri, 29 Apr 2022 21:22:25 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17708021D;
+        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id i1so2375639plg.7;
+        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IbTkL+PKsaZcJ0raDuP0S5EWrvaEu0x3ypUjmK3lkS8=;
+        b=iHLBiUDEjrdIDKI6r3SYygsWK4PtHbZDZ1SnDLW6YF4z4+qbVBhPnNHG47ozsigie6
+         WMuOWUFYMhxV3fFeY5oQE+v/VwtGlM1FwXDxlL4SYYXPUgvR1o8w9TTqp5Dj3Mjf9gEd
+         rIy1eo1N4UANbNnaMFv/3/51iaaB75nmVZlie805eIYlev23WiDvEzlGI1PQQOvcQHyo
+         yfSOopb72Z6wjuJUEckMTicnKHWrNDCFfaHK/F2nfCmphJjdFT3BWWRbmIpl1Vln/Z0C
+         TL28fiRtptNGkGaQRJD89pp6Tr4NDAT2KGV1Vu6SG4wsn0Q6cw2V+HB557/cSEHyjmcW
+         lgCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IbTkL+PKsaZcJ0raDuP0S5EWrvaEu0x3ypUjmK3lkS8=;
+        b=72ZIY3I0uYUIsVubc8ovUYGIGbouGcmOGG0yvvcWnSnPuzMd5A1DXePLeImZydk1cJ
+         HVL3zbWo1rRvJ0PFRppc9s7ukPNrm4BJVdpKYybxixAdNR7Q+kH7SMXTgPQ6u30GBvaS
+         eCwAD4uGwDLQGDqCHB7gc7jx0J/Br/8GYkrjpR6zzK2LSe4D0+C0Hc3JnXNBBw6I6DqV
+         TSQpevNV75J0CJF1qQbbRK4eLhZCHHjncJgVXwZXsmzhWlIalJH29vtPGKVZguwwl2oL
+         19wZr01y6wmHaTjt4AGpQHLXttdHgdIM106nNuaveraL3v3TwtgokDTa4mDlzj92d1IW
+         wivg==
+X-Gm-Message-State: AOAM530zsMzQtMBxkD46vJV9HFQLC9db/S5tLbZc7iGiqeO9BJERGbjo
+        F1Wch36/7KFyhnYwMC3AjIHOTpjRtWc=
+X-Google-Smtp-Source: ABdhPJwn7ooL9K9Cu0D1h9m0kR4zy6mNCc6whTETZFkr2MwPNrmkkUcxG/VEO+78KDJnzTDCucs/UQ==
+X-Received: by 2002:a17:902:ccc4:b0:156:5d37:b42f with SMTP id z4-20020a170902ccc400b001565d37b42fmr1922669ple.157.1651281545282;
+        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
+Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
+        by smtp.gmail.com with ESMTPSA id p12-20020a170902bd0c00b0015e8d4eb207sm219447pls.81.2022.04.29.18.19.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Apr 2022 18:19:04 -0700 (PDT)
+Date:   Sat, 30 Apr 2022 10:19:03 +0900
+From:   Stafford Horne <shorne@gmail.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v7 11/17] openrisc: account for 0 starting value in
+ random_get_entropy()
+Message-ID: <YmyOh/YbgGJ3DK79@antec>
+References: <20220423212623.1957011-12-Jason@zx2c4.com>
+ <20220429001648.1671472-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=725; h=from:subject; bh=eM8sK1lOooBZsSLyekvsy/75kXT47PM9viuwYVyFGWQ=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBia/BAkoS2DcXmPKLjxF8QXaMJl2Yp7ZcuBKi2Jmlg XsfmGXOJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYmvwQAAKCRDB/BR4rcrsCQVXB/ 9UHZZ96g/RFZpzHnQLcZqKeEurjjk6hwsRlWu0/wRRHKN/Qx+MIQ3OPVg+D+h1WjPHlypIsa1A8xnD tqmSvCPMToSbyg5n47PjTM7B8wfj9K+2TJURTJ+BNFXFutUbppxEHu3s6lDIHwxghWy5styWiLPGls THbxIyAdHHVkIxxpZ3jv6J2AK8HnWksZ6BhosfYlKBYgPwGmsZ/hGUbOh19g65LTS/Uks4lpivuRpf SyWV1VLbgf7RQIYsVx7scNIysdFpAbk7ubem9d3NlKzLp29l2R/GRr54KYvzvmZ3Vs8eIVzKef4T4s 2y4BL1Gb8F2U1AOwWC229+l2Ta0WNx
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220429001648.1671472-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no semantical change introduced by this change.
+Hi Jason,
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/crypto/atmel-i2c.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+On Fri, Apr 29, 2022 at 02:16:48AM +0200, Jason A. Donenfeld wrote:
+> As a sanity check, this series makes sure that during early boot, the
+> cycle counter isn't returning all zeros. However, OpenRISC's TTCR timer
+> can be rather slow and starts out as zero during stages of early boot.
+> We know it works, however. So just always add 1 to random_get_entropy()
+> so that it doesn't trigger these checks.
 
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 6fd3e969211d..384865ef96ce 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -364,11 +364,7 @@ int atmel_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
- 
- 	i2c_set_clientdata(client, i2c_priv);
- 
--	ret = device_sanity_check(client);
--	if (ret)
--		return ret;
--
--	return 0;
-+	return device_sanity_check(client);
- }
- EXPORT_SYMBOL(atmel_i2c_probe);
- 
--- 
-2.35.1
+Just one nit, you might want to qualify that this is related to simulators/qemu:
+ * "However, in simulators OpenRISC's TTCR timer can be rather slow..."
 
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Jonas Bonn <jonas@southpole.se>
+> Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+> Acked-by: Stafford Horne <shorne@gmail.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v6->v7:
+> - Add 1 to cycle counter to account for functional but slow-to-begin
+>   counter on QEMU.
+> 
+>  arch/openrisc/include/asm/timex.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/openrisc/include/asm/timex.h b/arch/openrisc/include/asm/timex.h
+> index d52b4e536e3f..a78a5807c927 100644
+> --- a/arch/openrisc/include/asm/timex.h
+> +++ b/arch/openrisc/include/asm/timex.h
+> @@ -23,6 +23,9 @@ static inline cycles_t get_cycles(void)
+>  {
+>  	return mfspr(SPR_TTCR);
+>  }
+> +#define get_cycles get_cycles
+> +
+> +#define random_get_entropy() ((unsigned long)get_cycles() + 1)
+>  
+>  /* This isn't really used any more */
+>  #define CLOCK_TICK_RATE 1000
+
+Thanks,
+
+-Stafford
