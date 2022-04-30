@@ -2,164 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1676CC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 22:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A60EAC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 22:34:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245603AbiD3WPF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Apr 2022 18:15:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49172 "EHLO
+        id S245756AbiD3Whc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Apr 2022 18:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245553AbiD3WPE (ORCPT
+        with ESMTP id S229489AbiD3Wha (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Apr 2022 18:15:04 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCF554690;
-        Sat, 30 Apr 2022 15:11:40 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id n18so9885196plg.5;
-        Sat, 30 Apr 2022 15:11:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dCo8CMo2v5RYO1RPZD0+ykli4XQwArDVOl1Oec/L0lw=;
-        b=lvjESYcogcQfm73Bw1m+yl6xdhB48HDzK6/euhagLHL5CAPe5BCQHL6k03Ovghtlq3
-         TehYemoidty+ECmFIlp/Y2nnmzblHJIW3FYrlP9lAvBys1X46eE08xDIgrbUeyLkH+7x
-         hyjssu6pH0KuHrj6ZmICJ2fct6J99C0Lrk8u/tYU3A3IxQy7/11PVf+4mlq4TAA2u0vz
-         3/fyopDt26Rw4WPDS0g2Ufw29R2dGL8g4RAHwL4OLMDkY7S3hAqX0fAelrsc7Wzita+b
-         eOXOYDcfvTHllFVziHBgEhMph1yrG71N3gpSlTIj1L2usfsTpYmwxeNlyoyAUglnmFjx
-         TK+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dCo8CMo2v5RYO1RPZD0+ykli4XQwArDVOl1Oec/L0lw=;
-        b=z9T+yJbkU8CKcOd9z1+6gvhgGZnqD8LKPbd9O1j2Q6rA3wK3BpcPztz3bVCnuVLByW
-         fYzvXlRDnI3HSjpXqrC1d8OuJgZxjHVeY9QgenWm+eA1V58/Z0NC7DnW/l52kyqVl17K
-         fWV0i/woAW5V+l4ZmyXQMSLmg+ky2ClmSrKI8VODu36S8OEbNOLQHbqkn4kpKGPCUd8M
-         RRGRiFcbjut0WanuRCEmhMMOejI4nvRFgTvS5rB4Pj37ZsCE32gd1V5JNW464w1s/miA
-         viphsgz3763USUDpLWkx+K3HaNgIHJIT9iX7XSoVyR3q+RqlO+PlLP6tYR4YkFZNhPFZ
-         LaNA==
-X-Gm-Message-State: AOAM531s6RusBKV/lQBr+9CUkzpePpc9GEGc84uRPW5SwJjZID8e95+F
-        UOzbSng9Z7/bVSzSqo0Op2KZIUF+Ju2C8w==
-X-Google-Smtp-Source: ABdhPJwA6YIuYHvQqzAFsZ99QOoThAwY/FlKLpIPxldD7qju7HwbZFDeZ84wvjsTVch9b1t1AkpifQ==
-X-Received: by 2002:a17:902:8b8a:b0:158:fbd0:45ab with SMTP id ay10-20020a1709028b8a00b00158fbd045abmr5325110plb.110.1651356700152;
-        Sat, 30 Apr 2022 15:11:40 -0700 (PDT)
-Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
-        by smtp.gmail.com with ESMTPSA id y10-20020a170902864a00b0015e8d4eb254sm1918584plt.158.2022.04.30.15.11.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Apr 2022 15:11:39 -0700 (PDT)
-Date:   Sun, 1 May 2022 07:11:37 +0900
-From:   Stafford Horne <shorne@gmail.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Sat, 30 Apr 2022 18:37:30 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C253566C92;
+        Sat, 30 Apr 2022 15:34:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4406561115;
+        Sat, 30 Apr 2022 22:34:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF34C385A7;
+        Sat, 30 Apr 2022 22:34:06 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZXTPIYgz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651358044;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7X4EiV6ztlb5Dy3IFR/LWL7UyiLURjSoMIEXEAyUg7U=;
+        b=ZXTPIYgzj+mW681eGPeF+jG/CS+hzR8NGuDayaOYvpcfU6B7dtdhZ4IFLhHXwmsWDbLrBr
+        WFfO4SLZOIAQQUvaW8IKEf82HEo1U8DTc9mob+naWd51hL3CApHTlp8AYx2Vv5RAnpVFeo
+        pYhHOvxjQ7/NrSl1c+qK87OI7Dzvjw0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 74d45aba (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 30 Apr 2022 22:34:04 +0000 (UTC)
+Date:   Sun, 1 May 2022 00:34:02 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Stafford Horne <shorne@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [PATCH v7 11/17] openrisc: account for 0 starting value in
  random_get_entropy()
-Message-ID: <Ym20Ga3VsJRzXppd@antec>
+Message-ID: <Ym25Wn1PtpNgkKyR@zx2c4.com>
 References: <20220423212623.1957011-12-Jason@zx2c4.com>
  <20220429001648.1671472-1-Jason@zx2c4.com>
  <YmyOh/YbgGJ3DK79@antec>
  <YmyRATzJBQX+wnIP@zx2c4.com>
+ <Ym20Ga3VsJRzXppd@antec>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YmyRATzJBQX+wnIP@zx2c4.com>
+In-Reply-To: <Ym20Ga3VsJRzXppd@antec>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 30, 2022 at 03:29:37AM +0200, Jason A. Donenfeld wrote:
-> Hi Stafford,
-> 
-> On Sat, Apr 30, 2022 at 10:19:03AM +0900, Stafford Horne wrote:
-> > Hi Jason,
-> > 
-> > On Fri, Apr 29, 2022 at 02:16:48AM +0200, Jason A. Donenfeld wrote:
-> > > As a sanity check, this series makes sure that during early boot, the
-> > > cycle counter isn't returning all zeros. However, OpenRISC's TTCR timer
-> > > can be rather slow and starts out as zero during stages of early boot.
-> > > We know it works, however. So just always add 1 to random_get_entropy()
-> > > so that it doesn't trigger these checks.
-> > 
-> > Just one nit, you might want to qualify that this is related to simulators/qemu:
-> >  * "However, in simulators OpenRISC's TTCR timer can be rather slow..."
-> 
-> Nice catch, will do.
+Hi Stafford,
 
-I was thinking about this, the reason the tick timer is returing 0 is because
-the timer is not started.  It's getting initialized right after the random
-number generator.
-
-A patch like this helps to startup the timer during intial startup, but I am not
-sure its the best thing:
-
-diff --git a/arch/openrisc/kernel/head.S b/arch/openrisc/kernel/head.S
-index 15f1b38dfe03..a9b3b5614e13 100644
---- a/arch/openrisc/kernel/head.S
-+++ b/arch/openrisc/kernel/head.S
-@@ -521,6 +521,9 @@ _start:
-        l.ori   r3,r0,0x1
-        l.mtspr r0,r3,SPR_SR
+On Sun, May 01, 2022 at 07:11:37AM +0900, Stafford Horne wrote:
  
-+       l.movhi r3,hi(SPR_TTMR_CR)
-+       l.mtspr r0,r3,SPR_TTMR
-+
-        CLEAR_GPR(r1)
-        CLEAR_GPR(r2)
-        CLEAR_GPR(r3)
+> I was thinking about this, the reason the tick timer is returing 0 is because
+> the timer is not started.  It's getting initialized right after the random
+> number generator.
+> 
+> A patch like this helps to startup the timer during intial startup, but I am not
+> sure its the best thing:
+> 
+> diff --git a/arch/openrisc/kernel/head.S b/arch/openrisc/kernel/head.S
+> index 15f1b38dfe03..a9b3b5614e13 100644
+> --- a/arch/openrisc/kernel/head.S
+> +++ b/arch/openrisc/kernel/head.S
+> @@ -521,6 +521,9 @@ _start:
+>         l.ori   r3,r0,0x1
+>         l.mtspr r0,r3,SPR_SR
+>  
+> +       l.movhi r3,hi(SPR_TTMR_CR)
+> +       l.mtspr r0,r3,SPR_TTMR
+> +
+>         CLEAR_GPR(r1)
+>         CLEAR_GPR(r2)
+>         CLEAR_GPR(r3)
 
-I was testing this by removing the get_cycles() + 1 patch and I get the
-following warning. Starting the tick timer early on in kernel boot helps fix
-this issue as well.
+Yea, great, I was thinking about doing it in assembly earlier in boot
+too, but didn't know how you'd feel about that. I like this better.
 
-But I wonder:
- - Why don't any other architectures have similar issues.
- - Is there any more correct place to do an early timer kick off.
+The reason I think this is a good approach is that it means the cycle
+counter includes some information about how long startup takes from the
+earliest stages -- which could involve probing various devices or
+strange things. So enabling the timer in head.S seems good to me.
 
-    exec: /home/shorne/work/openrisc/qemu/build/or1k-softmmu/qemu-system-or1k -cpu or1200 -M or1k-sim -kernel /home/shorne/work/linux/vmlinux -initrd /home/shorne/work/linux/initramfs.cpio.gz -serial mon:stdi
-    o -nographic -gdb tcp::10001 -m 64
+> But I wonder:
+>  - Why don't any other architectures have similar issues.
+>  - Is there any more correct place to do an early timer kick off.
 
-    [    0.000000] OpenRISC Linux -- http://openrisc.io
-    [    0.000000] percpu: Embedded 5 pages/cpu s11584 r8192 d21184 u40960
-    [    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 8160
-    [    0.000000] Kernel command line:
-    [    0.000000] Dentry cache hash table entries: 8192 (order: 2, 32768 bytes, linear)
-    [    0.000000] Inode-cache hash table entries: 4096 (order: 1, 16384 bytes, linear)
-    [    0.000000] Sorting __ex_table...
-    [    0.000000] mem auto-init: stack:all(zero), heap alloc:off, heap free:off
-    [    0.000000] mem_init_done ...........................................
-    [    0.000000] Memory: 57424K/65536K available (4595K kernel code, 157K rwdata, 976K rodata, 195K init, 89K bss, 8112K reserved, 0K cma-reserved)
-    [    0.000000] rcu: Hierarchical RCU implementation.
-    [    0.000000] rcu:     RCU restricting CPUs from NR_CPUS=2 to nr_cpu_ids=1.
-    [    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
-    [    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=1
-    [    0.000000] NR_IRQS: 32, nr_irqs: 32, preallocated irqs: 0
+I think most other archs (like, say, x86) have their cycle counter
+enabled by default at boot time. I was surprised to see that the or1k
+risc cycle counter comes disabled by default actually.
 
-(Warning for get_cycles returning 0)
+I'll send a v9 incorporating your suggested assembly change.
 
-    [    0.000000] ------------[ cut here ]------------
-    [    0.000000] WARNING: CPU: 0 PID: 0 at drivers/char/random.c:1016 rand_initialize+0x15c/0x18c
-    [    0.000000] Missing cycle counter and fallback timer; RNG entropy collection will consequently suffer.
-    [    0.000000] Modules linked in:
-    [    0.000000] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.18.0-rc4-17398-gc576c8ccdc30-dirty #724
-    [    0.000000] Call trace:
-    [    0.000000] [<(ptrval)>] dump_stack_lvl+0x78/0xa0
-    [    0.000000] [<(ptrval)>] dump_stack+0x1c/0x2c
-    [    0.000000] [<(ptrval)>] __warn+0x100/0x13c
-    [    0.000000] [<(ptrval)>] ? rand_initialize+0x15c/0x18c
-    [    0.000000] [<(ptrval)>] warn_slowpath_fmt+0x84/0x9c
-    [    0.000000] [<(ptrval)>] rand_initialize+0x15c/0x18c
-    [    0.000000] [<(ptrval)>] ? start_kernel+0x5dc/0x7c4
-    [    0.000000] [<(ptrval)>] ? start_kernel+0x0/0x7c4
-    [    0.000000] ---[ end trace 0000000000000000 ]---
-
-(Start of OpenRISC tick timer)
-
-    [    0.000000] clocksource: openrisc_timer: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 95563022313 ns
-    [    0.000000] 40.00 BogoMIPS (lpj=200000)
-    [    0.000000] pid_max: default: 32768 minimum: 301
-    [    0.000000] random: get_random_bytes called from net_ns_init+0x94/0x3f8 with crng_init=0
-    [    0.000000] Mount-cache hash table entries: 2048 (order: 0, 8192 bytes, linear)
-    [    0.000000] Mountpoint-cache hash table entries: 2048 (order: 0, 8192 bytes, linear)
-    [    0.010000] rcu: Hierarchical SRCU implementation.
-
-
+Jason
