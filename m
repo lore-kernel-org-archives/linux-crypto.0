@@ -2,111 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C11C8C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 01:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45BEAC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 01:29:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381992AbiD3BW1 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Apr 2022 21:22:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58692 "EHLO
+        id S238809AbiD3BdG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 29 Apr 2022 21:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243107AbiD3BWZ (ORCPT
+        with ESMTP id S238172AbiD3BdG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Apr 2022 21:22:25 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17708021D;
-        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id i1so2375639plg.7;
-        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=IbTkL+PKsaZcJ0raDuP0S5EWrvaEu0x3ypUjmK3lkS8=;
-        b=iHLBiUDEjrdIDKI6r3SYygsWK4PtHbZDZ1SnDLW6YF4z4+qbVBhPnNHG47ozsigie6
-         WMuOWUFYMhxV3fFeY5oQE+v/VwtGlM1FwXDxlL4SYYXPUgvR1o8w9TTqp5Dj3Mjf9gEd
-         rIy1eo1N4UANbNnaMFv/3/51iaaB75nmVZlie805eIYlev23WiDvEzlGI1PQQOvcQHyo
-         yfSOopb72Z6wjuJUEckMTicnKHWrNDCFfaHK/F2nfCmphJjdFT3BWWRbmIpl1Vln/Z0C
-         TL28fiRtptNGkGaQRJD89pp6Tr4NDAT2KGV1Vu6SG4wsn0Q6cw2V+HB557/cSEHyjmcW
-         lgCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=IbTkL+PKsaZcJ0raDuP0S5EWrvaEu0x3ypUjmK3lkS8=;
-        b=72ZIY3I0uYUIsVubc8ovUYGIGbouGcmOGG0yvvcWnSnPuzMd5A1DXePLeImZydk1cJ
-         HVL3zbWo1rRvJ0PFRppc9s7ukPNrm4BJVdpKYybxixAdNR7Q+kH7SMXTgPQ6u30GBvaS
-         eCwAD4uGwDLQGDqCHB7gc7jx0J/Br/8GYkrjpR6zzK2LSe4D0+C0Hc3JnXNBBw6I6DqV
-         TSQpevNV75J0CJF1qQbbRK4eLhZCHHjncJgVXwZXsmzhWlIalJH29vtPGKVZguwwl2oL
-         19wZr01y6wmHaTjt4AGpQHLXttdHgdIM106nNuaveraL3v3TwtgokDTa4mDlzj92d1IW
-         wivg==
-X-Gm-Message-State: AOAM530zsMzQtMBxkD46vJV9HFQLC9db/S5tLbZc7iGiqeO9BJERGbjo
-        F1Wch36/7KFyhnYwMC3AjIHOTpjRtWc=
-X-Google-Smtp-Source: ABdhPJwn7ooL9K9Cu0D1h9m0kR4zy6mNCc6whTETZFkr2MwPNrmkkUcxG/VEO+78KDJnzTDCucs/UQ==
-X-Received: by 2002:a17:902:ccc4:b0:156:5d37:b42f with SMTP id z4-20020a170902ccc400b001565d37b42fmr1922669ple.157.1651281545282;
-        Fri, 29 Apr 2022 18:19:05 -0700 (PDT)
-Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
-        by smtp.gmail.com with ESMTPSA id p12-20020a170902bd0c00b0015e8d4eb207sm219447pls.81.2022.04.29.18.19.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 18:19:04 -0700 (PDT)
-Date:   Sat, 30 Apr 2022 10:19:03 +0900
-From:   Stafford Horne <shorne@gmail.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Fri, 29 Apr 2022 21:33:06 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D3247F20D;
+        Fri, 29 Apr 2022 18:29:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5C82CB83843;
+        Sat, 30 Apr 2022 01:29:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7506CC385A7;
+        Sat, 30 Apr 2022 01:29:42 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SHh4hRgR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651282179;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=19JFfsHR6Tp7LcmMWZO8uINflblFf+OX3ZdrXJdqqB8=;
+        b=SHh4hRgRP6EmLV+d8Xh1tNidnOnYrtcCnOmHoYFbdpuSemy3C8S1fPMV/ldzuGyhATS2wt
+        QX3TUz29I6uiMgr043x0w9kboiVIsCRg4ugDiT1Se1IbNG39pJskGd7b8tMTbSsIetB1ML
+        LgG5Mvoy+gMISDKnoQMhrH+LLo88UhI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8034c9c3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 30 Apr 2022 01:29:39 +0000 (UTC)
+Date:   Sat, 30 Apr 2022 03:29:37 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Stafford Horne <shorne@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [PATCH v7 11/17] openrisc: account for 0 starting value in
  random_get_entropy()
-Message-ID: <YmyOh/YbgGJ3DK79@antec>
+Message-ID: <YmyRATzJBQX+wnIP@zx2c4.com>
 References: <20220423212623.1957011-12-Jason@zx2c4.com>
  <20220429001648.1671472-1-Jason@zx2c4.com>
+ <YmyOh/YbgGJ3DK79@antec>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220429001648.1671472-1-Jason@zx2c4.com>
+In-Reply-To: <YmyOh/YbgGJ3DK79@antec>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+Hi Stafford,
 
-On Fri, Apr 29, 2022 at 02:16:48AM +0200, Jason A. Donenfeld wrote:
-> As a sanity check, this series makes sure that during early boot, the
-> cycle counter isn't returning all zeros. However, OpenRISC's TTCR timer
-> can be rather slow and starts out as zero during stages of early boot.
-> We know it works, however. So just always add 1 to random_get_entropy()
-> so that it doesn't trigger these checks.
-
-Just one nit, you might want to qualify that this is related to simulators/qemu:
- * "However, in simulators OpenRISC's TTCR timer can be rather slow..."
-
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Jonas Bonn <jonas@southpole.se>
-> Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
-> Acked-by: Stafford Horne <shorne@gmail.com>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> Changes v6->v7:
-> - Add 1 to cycle counter to account for functional but slow-to-begin
->   counter on QEMU.
+On Sat, Apr 30, 2022 at 10:19:03AM +0900, Stafford Horne wrote:
+> Hi Jason,
 > 
->  arch/openrisc/include/asm/timex.h | 3 +++
->  1 file changed, 3 insertions(+)
+> On Fri, Apr 29, 2022 at 02:16:48AM +0200, Jason A. Donenfeld wrote:
+> > As a sanity check, this series makes sure that during early boot, the
+> > cycle counter isn't returning all zeros. However, OpenRISC's TTCR timer
+> > can be rather slow and starts out as zero during stages of early boot.
+> > We know it works, however. So just always add 1 to random_get_entropy()
+> > so that it doesn't trigger these checks.
 > 
-> diff --git a/arch/openrisc/include/asm/timex.h b/arch/openrisc/include/asm/timex.h
-> index d52b4e536e3f..a78a5807c927 100644
-> --- a/arch/openrisc/include/asm/timex.h
-> +++ b/arch/openrisc/include/asm/timex.h
-> @@ -23,6 +23,9 @@ static inline cycles_t get_cycles(void)
->  {
->  	return mfspr(SPR_TTCR);
->  }
-> +#define get_cycles get_cycles
-> +
-> +#define random_get_entropy() ((unsigned long)get_cycles() + 1)
->  
->  /* This isn't really used any more */
->  #define CLOCK_TICK_RATE 1000
+> Just one nit, you might want to qualify that this is related to simulators/qemu:
+>  * "However, in simulators OpenRISC's TTCR timer can be rather slow..."
 
-Thanks,
+Nice catch, will do.
 
--Stafford
+Jason
+
+> 
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Jonas Bonn <jonas@southpole.se>
+> > Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+> > Acked-by: Stafford Horne <shorne@gmail.com>
+> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > ---
+> > Changes v6->v7:
+> > - Add 1 to cycle counter to account for functional but slow-to-begin
+> >   counter on QEMU.
+> > 
+> >  arch/openrisc/include/asm/timex.h | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/openrisc/include/asm/timex.h b/arch/openrisc/include/asm/timex.h
+> > index d52b4e536e3f..a78a5807c927 100644
+> > --- a/arch/openrisc/include/asm/timex.h
+> > +++ b/arch/openrisc/include/asm/timex.h
+> > @@ -23,6 +23,9 @@ static inline cycles_t get_cycles(void)
+> >  {
+> >  	return mfspr(SPR_TTCR);
+> >  }
+> > +#define get_cycles get_cycles
+> > +
+> > +#define random_get_entropy() ((unsigned long)get_cycles() + 1)
+> >  
+> >  /* This isn't really used any more */
+> >  #define CLOCK_TICK_RATE 1000
+> 
+> Thanks,
+> 
+> -Stafford
