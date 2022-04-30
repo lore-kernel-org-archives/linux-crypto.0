@@ -2,119 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B89C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 02:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFECDC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 07:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382065AbiD3CMG (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Apr 2022 22:12:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        id S232470AbiD3HFc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Apr 2022 03:05:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240229AbiD3CMF (ORCPT
+        with ESMTP id S231345AbiD3HFb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Apr 2022 22:12:05 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC9ECC1C8E;
-        Fri, 29 Apr 2022 19:08:45 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id m20so18411856ejj.10;
-        Fri, 29 Apr 2022 19:08:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vrNdHxLyFHKMsj56oskv/GALROKVMi7bvEfnrcUxu74=;
-        b=Efjkl7x0Rk6iNHqkxMx3MZ0UTsKnUyuC0ZZ6GUEC5xNBE5wpBNYD2qO9Gfibb+FPVr
-         XjjEG8UF6b8aXW1QKLtqeBVqis5rrL3Bods20YCaBC92t438tW89zi2Xr2/8vVCVYF9p
-         HImjqQXsjE2k1akJs3pwxMlDFLGzmeR8Fe6+ENaA1L3Okpy6JQwskms/IInfsQpXH1T5
-         4gW//ipAOfH/hKPtSagwYS+OpdIKbFbmjBBle30uEuXanyaQtIne7ZMpLG0QCua/Pcjp
-         o6Kc2uZluk2HrWdCkZjhMX5iw++TcDLTg8yFvJiBAyFjneiupoY/twlgwlwj7GQgmo1B
-         u6Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vrNdHxLyFHKMsj56oskv/GALROKVMi7bvEfnrcUxu74=;
-        b=Y1LQyd5+Wlcg8G7zOxlRe/Y88wLkYA4tIpEkqy+9v6h+GBhigYWz8lgwIwuiJwpPTO
-         hkL8NvmHYvniunKBkN4E8kBYrae+Cuo5UxvxlQHLAJJ8ONCaIPU7R77IJzLlowJCxFsP
-         y4c0smUSmJFCAGRVxmqMfW79OUiE6crWdZ51zrLOzqDzcWvanRi9L1A1sQSlgQlzslwG
-         xb7ppW3F6rVZLbW48Qjy2Hd/6FutKWA5onU1kaVt8avQNif+fZazW1oyxeqTYA5nBj+g
-         Wa5qkOVqnq8Yxe5wBGfB3EBdVlgztQRpBhAOsAL/QetxdDz9HTUZpb1aIWqOuloVZ6FQ
-         O59g==
-X-Gm-Message-State: AOAM533vNp17NhG16fFQkf46ixtCxxzhL8aRGppKYs0XhyTTiiAfvQIs
-        5b7yavykLRh3er2qZYwCxu5Cq8mCeT/eOBxjfYY=
-X-Google-Smtp-Source: ABdhPJxMSTHQ8RRCUp4d1GLhpsO8MCmccnnzrS9qGM/JBjw+DKQNJFm2M4xTzuytRB7GpFuC+He0VLkeVUAXdJTcPPQ=
-X-Received: by 2002:a17:906:301a:b0:6f3:fdd3:4d1c with SMTP id
- 26-20020a170906301a00b006f3fdd34d1cmr1963318ejz.235.1651284524118; Fri, 29
- Apr 2022 19:08:44 -0700 (PDT)
+        Sat, 30 Apr 2022 03:05:31 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175AE5BD0E
+        for <linux-crypto@vger.kernel.org>; Sat, 30 Apr 2022 00:02:08 -0700 (PDT)
+Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23U71jon080544;
+        Sat, 30 Apr 2022 16:01:46 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
+ Sat, 30 Apr 2022 16:01:45 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23U71iT2080480
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 30 Apr 2022 16:01:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <15b21200-c639-7d62-bd7f-a559d2ee0ac5@I-love.SAKURA.ne.jp>
+Date:   Sat, 30 Apr 2022 16:01:46 +0900
 MIME-Version: 1.0
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
-In-Reply-To: <YmlMGx6+uigkGiZ0@zx2c4.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sat, 30 Apr 2022 10:08:30 +0800
-Message-ID: <CACXcFmnnS2HPoju3aTd29Nef0BLr9juS6SM4tGsTGe2eNsOyMA@mail.gmail.com>
-Subject: Re: is "premature next" a real world rng concern, or just an academic exercise?
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
-        tessaro@cs.washington.edu,
-        Linus Torvalds <torvalds@linux-foundation.org>, djb@cr.yp.to,
-        "Ted Ts'o" <tytso@mit.edu>,
-        Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
-        Jann Horn <jann@thejh.net>, Kees Cook <keescook@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        peter@cryptojedi.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: [PATCH v2] crypto: atmel - Avoid flush_scheduled_work() usage
+Content-Language: en-US
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Tudor Ambarus <tudor.ambarus@microchip.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-crypto@vger.kernel.org
+References: <35da6cb2-910f-f892-b27a-4a8bac9fd1b1@I-love.SAKURA.ne.jp>
+ <Ymt4BfQXbXkY2qo0@gondor.apana.org.au>
+ <5de198b9-7488-13e4-bf22-6c58c1c8b401@I-love.SAKURA.ne.jp>
+ <YmulfBqsSON47lDR@gondor.apana.org.au>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <YmulfBqsSON47lDR@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+Flushing system-wide workqueues is dangerous and will be forbidden.
+Replace system_wq with local atmel_wq.
 
-> The Linux kernel RNG currently pretends to care about the "premature
-> next" RNG threat model. I'm wondering whether this is sensible and
-> corresponds to anything real.
->
-> "Premature next" is the scenario in which:
-> - Attacker compromises the current state of a fully initialized RNG with
->   a wild 'n crazy kernel infoleak.
-> - New bits of entropy are added directly to the key used to generate the
->   /dev/urandom stream, without any buffering or pooling.
+If CONFIG_CRYPTO_DEV_ATMEL_{I2C,ECC,SHA204A}=y, the ordering in Makefile
+guarantees that module_init() for atmel-i2c runs before module_init()
+for atmel-ecc and atmel-sha204a runs.
 
-So don't do that, then. Keep a separate input pool/buffer and put
-only hashed outputs from ir into the output pool.
+Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Changes in v2:
+  Add a comment for built-in case to Makefile, suggested by Herbert Xu <herbert@gondor.apana.org.au>
 
-> - Attacker then, somehow having read access to /dev/urandom, samples RNG
->   output and brute forces the individual new bits that were added.
-> - Result: the RNG never "recovers" from the initial compromise, a
->   so-called violation of what academics term "post-compromise security".
+ drivers/crypto/Makefile        |  1 +
+ drivers/crypto/atmel-ecc.c     |  2 +-
+ drivers/crypto/atmel-i2c.c     | 24 +++++++++++++++++++++++-
+ drivers/crypto/atmel-i2c.h     |  1 +
+ drivers/crypto/atmel-sha204a.c |  2 +-
+ 5 files changed, 27 insertions(+), 3 deletions(-)
 
-Use chunks big enough for "catastrophic reseeding", impractical to
-brute force, at least 64 bits & preferably larger.
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 0a4fff23d272..f81703a86b98 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -3,6 +3,7 @@ obj-$(CONFIG_CRYPTO_DEV_ALLWINNER) += allwinner/
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_AES) += atmel-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA) += atmel-sha.o
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_TDES) += atmel-tdes.o
++# __init ordering requires atmel-i2c being before atmel-ecc and atmel-sha204a.
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_I2C) += atmel-i2c.o
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_ECC) += atmel-ecc.o
+ obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA204A) += atmel-sha204a.o
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 333fbefbbccb..59a57279e77b 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -398,7 +398,7 @@ static int __init atmel_ecc_init(void)
+ 
+ static void __exit atmel_ecc_exit(void)
+ {
+-	flush_scheduled_work();
++	atmel_i2c_flush_queue();
+ 	i2c_del_driver(&atmel_ecc_driver);
+ }
+ 
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index 6fd3e969211d..226c55bfb9d6 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -263,6 +263,8 @@ static void atmel_i2c_work_handler(struct work_struct *work)
+ 	work_data->cbk(work_data, work_data->areq, status);
+ }
+ 
++static struct workqueue_struct *atmel_wq;
++
+ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 		       void (*cbk)(struct atmel_i2c_work_data *work_data,
+ 				   void *areq, int status),
+@@ -272,10 +274,16 @@ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 	work_data->areq = areq;
+ 
+ 	INIT_WORK(&work_data->work, atmel_i2c_work_handler);
+-	schedule_work(&work_data->work);
++	queue_work(atmel_wq, &work_data->work);
+ }
+ EXPORT_SYMBOL(atmel_i2c_enqueue);
+ 
++void atmel_i2c_flush_queue(void)
++{
++	flush_workqueue(atmel_wq);
++}
++EXPORT_SYMBOL(atmel_i2c_flush_queue);
++
+ static inline size_t atmel_i2c_wake_token_sz(u32 bus_clk_rate)
+ {
+ 	u32 no_of_bits = DIV_ROUND_UP(TWLO_USEC * bus_clk_rate, USEC_PER_SEC);
+@@ -372,6 +380,20 @@ int atmel_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id)
+ }
+ EXPORT_SYMBOL(atmel_i2c_probe);
+ 
++static int __init atmel_i2c_init(void)
++{
++	atmel_wq = alloc_workqueue("atmel_wq", 0, 0);
++	return atmel_wq ? 0 : -ENOMEM;
++}
++
++static void __exit atmel_i2c_exit(void)
++{
++	destroy_workqueue(atmel_wq);
++}
++
++module_init(atmel_i2c_init);
++module_exit(atmel_i2c_exit);
++
+ MODULE_AUTHOR("Tudor Ambarus <tudor.ambarus@microchip.com>");
+ MODULE_DESCRIPTION("Microchip / Atmel ECC (I2C) driver");
+ MODULE_LICENSE("GPL v2");
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 63b97b104f16..48929efe2a5b 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -173,6 +173,7 @@ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
+ 		       void (*cbk)(struct atmel_i2c_work_data *work_data,
+ 				   void *areq, int status),
+ 		       void *areq);
++void atmel_i2c_flush_queue(void);
+ 
+ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd);
+ 
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index c96c14e7dab1..2168f877bd43 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -159,7 +159,7 @@ static int __init atmel_sha204a_init(void)
+ 
+ static void __exit atmel_sha204a_exit(void)
+ {
+-	flush_scheduled_work();
++	atmel_i2c_flush_queue();
+ 	i2c_del_driver(&atmel_sha204a_driver);
+ }
+ 
+-- 
+2.34.1
 
->  Fortuna requires non-zero code
-> complexity; does the benefit outweigh the cost of such complexity?
 
-I'd say certainly not.
-
-> The questions are thus:
-> ...
-> 3) More broadly speaking, what kernel infoleak is actually acceptable to
->    the degree that anybody would feel okay in the first place about the
->    system continuing to run after it's been compromised?
-
-If we have a good entropy source -- e.g. running on an Intel CPU
-& consider their RNG instruction trustworthy, or in a VM & trust
-the host -- then we should be able to guarantee recovery at the
-next reseeding. Just dump at least 128 bits from that source
-into the input pool before hashing.
-
-The interesting question is whether & how soon we can guarantee
-recovery if no such source is available, we rely only on entropy
-gathering from interrupts, with or without the gcc latent entropy
-plugin.
-
-> Is "premature next" just an academic exercise, rather than a real world
-> RNG concern?
-
-No.
