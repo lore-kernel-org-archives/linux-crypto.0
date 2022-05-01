@@ -2,118 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823A2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Apr 2022 22:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB29C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 00:50:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234134AbiD3Wr0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Apr 2022 18:47:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45026 "EHLO
+        id S232783AbiEAAx5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 30 Apr 2022 20:53:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiD3Wr0 (ORCPT
+        with ESMTP id S232966AbiEAAxv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Apr 2022 18:47:26 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8078845057;
-        Sat, 30 Apr 2022 15:44:03 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id o69so8577679pjo.3;
-        Sat, 30 Apr 2022 15:44:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=WX4CoTxj5/IZiX1L7qzvMLL4JHsZq3pvrgPiSDDmODg=;
-        b=pn7kEkvBO2ikIdQXc9JP6FAWHDEViF116WVUTLu3IY6Afo1axbWMGXPRYEKTmjtls9
-         BFE7ItYK2HLWdLursc7I8nxbe+GmGATN0QbN7ZB7QO0KizOb7K+c5+jt35v5ogDuubrk
-         FdJ8NnttNXBFDCjKxfUUm7XNzWYvsjN1Fgn7sCKeH9NsVw+0D3G54TDSYBS2AezeWJ/D
-         P8I+GW3FCJrp/dDheT+4Eqa3BDYHI00QEBw6auUASlzF26ZJQImVQJIplqUirUsmRviY
-         uJkl+9UMvXjJZMocMtdkWqp5IhtUssS1/ZS3rKyiyufcisVAzvdUuaHqoTmywN2QT61+
-         LOMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WX4CoTxj5/IZiX1L7qzvMLL4JHsZq3pvrgPiSDDmODg=;
-        b=k8+38PBpOFBeMv/Qj/Ut0SV7ZWDfWbhNLOES2FR8hhJR3ni3GazpRZViLQcAZ4wSHh
-         SA8EdMmnKnP+cNHEerZZY7c8lfuf7iiUiwrMwiA4CtmPiHaC7Y285fNtLAA2xYaSU2Q6
-         YFnkfZF24xQovi91p/Y6qrF94O7saaOqmXOKWQaj6U5yXx6w3sHNcyUlBw0Vcl5A3zbh
-         j9cdnQVgLHgRe3iMCGb13n3XlzQ8Z/kvXdGdkczmwG7cjVlngkq/sh4FGOP0dI5dnyDM
-         Nu2jas+jvdX4bSSdHiF6d/6t00a9GzUnxBy96QiCf1FW3oTUPaZgncvRwHnKqxTORNRa
-         ULvQ==
-X-Gm-Message-State: AOAM53207e5ZUuxHiOfZBCaUzr2MO2ZokIqrn73Qk/2xU4/XGT08UJLJ
-        I0LJw/yVGACcm3g7zHfjUQBXA/d90Mo2pA==
-X-Google-Smtp-Source: ABdhPJxXTIuoT2HiQVUJ1+hIJNM/ChvjLWl/VuTPbA4l2eJrvQ+IiH4A5GP24qciN65wUETHpAANVA==
-X-Received: by 2002:a17:902:cecb:b0:15e:8bff:1495 with SMTP id d11-20020a170902cecb00b0015e8bff1495mr5422288plg.131.1651358642941;
-        Sat, 30 Apr 2022 15:44:02 -0700 (PDT)
-Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
-        by smtp.gmail.com with ESMTPSA id e7-20020a6558c7000000b003c1bf4c064fsm3223698pgu.72.2022.04.30.15.44.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Apr 2022 15:44:02 -0700 (PDT)
-Date:   Sun, 1 May 2022 07:44:00 +0900
-From:   Stafford Horne <shorne@gmail.com>
+        Sat, 30 Apr 2022 20:53:51 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF2D63E7;
+        Sat, 30 Apr 2022 17:50:25 -0700 (PDT)
+Received: from penguin.thunk.org (rrcs-69-75-72-162.west.biz.rr.com [69.75.72.162])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2410nvLC001587
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 30 Apr 2022 20:49:59 -0400
+Received: by penguin.thunk.org (Postfix, from userid 1000)
+        id B068E3D5B5; Sat, 30 Apr 2022 20:49:55 -0400 (EDT)
+Date:   Sat, 30 Apr 2022 17:49:55 -0700
+From:   tytso <tytso@mit.edu>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v7 11/17] openrisc: account for 0 starting value in
- random_get_entropy()
-Message-ID: <Ym27sFdFZEt5QV0i@antec>
-References: <20220423212623.1957011-12-Jason@zx2c4.com>
- <20220429001648.1671472-1-Jason@zx2c4.com>
- <YmyOh/YbgGJ3DK79@antec>
- <YmyRATzJBQX+wnIP@zx2c4.com>
- <Ym20Ga3VsJRzXppd@antec>
- <Ym25Wn1PtpNgkKyR@zx2c4.com>
+Cc:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
+        tessaro@cs.washington.edu, torvalds@linux-foundation.org,
+        djb@cr.yp.to, jeanphilippe.aumasson@gmail.com, jann@thejh.net,
+        keescook@chromium.org, gregkh@linuxfoundation.org,
+        peter@cryptojedi.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: is "premature next" a real world rng concern, or just an
+ academic exercise?
+Message-ID: <Ym3ZM1P+uYYABtRm@mit.edu>
+References: <YmlMGx6+uigkGiZ0@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ym25Wn1PtpNgkKyR@zx2c4.com>
+In-Reply-To: <YmlMGx6+uigkGiZ0@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, May 01, 2022 at 12:34:02AM +0200, Jason A. Donenfeld wrote:
-> Hi Stafford,
+On Wed, Apr 27, 2022 at 03:58:51PM +0200, Jason A. Donenfeld wrote:
 > 
-> On Sun, May 01, 2022 at 07:11:37AM +0900, Stafford Horne wrote:
->  
-> > I was thinking about this, the reason the tick timer is returing 0 is because
-> > the timer is not started.  It's getting initialized right after the random
-> > number generator.
-> > 
-> > A patch like this helps to startup the timer during intial startup, but I am not
-> > sure its the best thing:
-> > 
-> > diff --git a/arch/openrisc/kernel/head.S b/arch/openrisc/kernel/head.S
-> > index 15f1b38dfe03..a9b3b5614e13 100644
-> > --- a/arch/openrisc/kernel/head.S
-> > +++ b/arch/openrisc/kernel/head.S
-> > @@ -521,6 +521,9 @@ _start:
-> >         l.ori   r3,r0,0x1
-> >         l.mtspr r0,r3,SPR_SR
-> >  
-> > +       l.movhi r3,hi(SPR_TTMR_CR)
-> > +       l.mtspr r0,r3,SPR_TTMR
-> > +
-> >         CLEAR_GPR(r1)
-> >         CLEAR_GPR(r2)
-> >         CLEAR_GPR(r3)
-> 
-> Yea, great, I was thinking about doing it in assembly earlier in boot
-> too, but didn't know how you'd feel about that. I like this better.
-> 
-> The reason I think this is a good approach is that it means the cycle
-> counter includes some information about how long startup takes from the
-> earliest stages -- which could involve probing various devices or
-> strange things. So enabling the timer in head.S seems good to me.
-> 
-> > But I wonder:
-> >  - Why don't any other architectures have similar issues.
-> >  - Is there any more correct place to do an early timer kick off.
-> 
-> I think most other archs (like, say, x86) have their cycle counter
-> enabled by default at boot time. I was surprised to see that the or1k
-> risc cycle counter comes disabled by default actually.
-> 
-> I'll send a v9 incorporating your suggested assembly change.
+> 3) More broadly speaking, what kernel infoleak is actually acceptable to
+>    the degree that anybody would feel okay in the first place about the
+>    system continuing to run after it's been compromised?
 
-Thanks!
+A one-time kernel infoleak where this might seem most likely is one
+where memory is read while the system is suspended/hibernated, or if
+you have a VM which is frozen and then replicated.  A related version
+is one where a VM is getting migrated from one host to another, and
+the attacker is able to grab the system memory from the source "host"
+after the VM is migrated to the destination "host".
 
--Stafford
+Merely reseeding the CRNG from the input pool isn't going to help,
+since the attacker could have grabed not only the CRNG pool, but the
+input pool as well.  In the case where the guest image is "freeze
+dried" and then reconstituted multiple times, and where the attacker
+hasn't actually grabed state, then all you need to do is to mix in
+some kind of nonce, such as the current time (which hopefully will
+vary across different VM "reconstitutions"), or some kind none (for
+example the VM ID, if that can be obtained somehow).
+
+But if the attacker can actually obtain internal state from one
+reconstituted VM, and use that to attack another reconstituted VM, and
+the attacker also knows what the nonce or time seed that was used so
+that different reconstituted VMs will have unique CRNG streams, this
+might be a place where the "premature next" attack might come into
+play.
+
+The simplest mitigation is if you have some kind of external RNG which
+you can actually trust, or at least mostly trust.  e.g., either some
+kind of CPU-based hwrng, such as RDRAND, or a hypervisor-provided
+hwrng, such as Virtio-RNG.  And if the hypervisor is going to playing
+games with reconstituting freeze-dried VM's, I'd argue it can d*mned
+well provide a virtio-rng facility.  And the same argument could be
+made just as easily with live migration scenario, with the hypervisor
+providing some kind of notification that VM had just gotten live
+migrated, so it should really reseed from the virtio-rng facility
+right away.
+
+That leaves the variant where the kernel infoleak happened while the
+system was suspended.  And in that case, we're talking about an
+attacker which had physical access to the machine (say, an "evil maid"
+attack while the laptop was left suspended in a hotel room in Moscow
+or Beijing).  And in that case, there are probably far simpler ways
+that an "evil amid" with temporary physical access to the hardware
+could compromise the secuity of the unattended laptop.
+
+> Is "premature next" just an academic exercise, rather than a real world
+> RNG concern?
+
+I'd say it's mostly an academic exercise.  Given our current model,
+where we only reseed the CRNG periodically, and we're hopefully
+getting some amount of uncertainty into the input pool, there will be
+a certain amount of "catastrophic reseeding" going on, which I don't
+think is a bad thing.  But personally, I don't think the complexity of
+N levels of Fortuna pools are worth it.
+
+						- Ted
+
