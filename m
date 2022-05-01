@@ -2,30 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB29C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 00:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D56C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 11:17:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232783AbiEAAx5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 30 Apr 2022 20:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45548 "EHLO
+        id S1345491AbiEALUW (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 May 2022 07:20:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232966AbiEAAxv (ORCPT
+        with ESMTP id S1345385AbiEALUW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 30 Apr 2022 20:53:51 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF2D63E7;
-        Sat, 30 Apr 2022 17:50:25 -0700 (PDT)
-Received: from penguin.thunk.org (rrcs-69-75-72-162.west.biz.rr.com [69.75.72.162])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2410nvLC001587
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 30 Apr 2022 20:49:59 -0400
-Received: by penguin.thunk.org (Postfix, from userid 1000)
-        id B068E3D5B5; Sat, 30 Apr 2022 20:49:55 -0400 (EDT)
-Date:   Sat, 30 Apr 2022 17:49:55 -0700
-From:   tytso <tytso@mit.edu>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Sun, 1 May 2022 07:20:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA26C33EAA;
+        Sun,  1 May 2022 04:16:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9692860E1F;
+        Sun,  1 May 2022 11:16:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784DAC385A9;
+        Sun,  1 May 2022 11:16:53 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jL/mQeo/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651403812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xHARVfgSK74zGcv02Q7PtU/TQGPI87rkXvTgtZVty90=;
+        b=jL/mQeo/DWCjYW8XzGl+ocGiuu6G7LvWHpM3bjOaMPDEfNohKaNVCaDr34KjE4Fh+9ggnq
+        8FxUF91qzmnWqq8EVqxSUJHMn9nk4IXygtTN9MB11i1Knv/+L4aZ3Qal+L6Eol9VJSsCTF
+        1vur+dSlm6ohYTDk6Vq5EZUduab851o=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c3dae223 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 1 May 2022 11:16:51 +0000 (UTC)
+Date:   Sun, 1 May 2022 13:16:48 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     tytso <tytso@mit.edu>
 Cc:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
         tessaro@cs.washington.edu, torvalds@linux-foundation.org,
         djb@cr.yp.to, jeanphilippe.aumasson@gmail.com, jann@thejh.net,
@@ -34,73 +47,122 @@ Cc:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
         linux-kernel@vger.kernel.org
 Subject: Re: is "premature next" a real world rng concern, or just an
  academic exercise?
-Message-ID: <Ym3ZM1P+uYYABtRm@mit.edu>
+Message-ID: <Ym5sICj5iBMn2w/E@zx2c4.com>
 References: <YmlMGx6+uigkGiZ0@zx2c4.com>
+ <Ym3ZM1P+uYYABtRm@mit.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YmlMGx6+uigkGiZ0@zx2c4.com>
+In-Reply-To: <Ym3ZM1P+uYYABtRm@mit.edu>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 03:58:51PM +0200, Jason A. Donenfeld wrote:
+Hi Ted,
+
+That's a useful analysis; thanks for that.
+
+On Sat, Apr 30, 2022 at 05:49:55PM -0700, tytso wrote:
+> On Wed, Apr 27, 2022 at 03:58:51PM +0200, Jason A. Donenfeld wrote:
+> > 
+> > 3) More broadly speaking, what kernel infoleak is actually acceptable to
+> >    the degree that anybody would feel okay in the first place about the
+> >    system continuing to run after it's been compromised?
 > 
-> 3) More broadly speaking, what kernel infoleak is actually acceptable to
->    the degree that anybody would feel okay in the first place about the
->    system continuing to run after it's been compromised?
+> A one-time kernel infoleak where this might seem most likely is one
+> where memory is read while the system is suspended/hibernated, or if
+> you have a VM which is frozen and then replicated.  A related version
+> is one where a VM is getting migrated from one host to another, and
+> the attacker is able to grab the system memory from the source "host"
+> after the VM is migrated to the destination "host".
 
-A one-time kernel infoleak where this might seem most likely is one
-where memory is read while the system is suspended/hibernated, or if
-you have a VM which is frozen and then replicated.  A related version
-is one where a VM is getting migrated from one host to another, and
-the attacker is able to grab the system memory from the source "host"
-after the VM is migrated to the destination "host".
+You've identified ~two places where compromises happen, but it's not an
+attack that can just be repeated simply by re-running `./sploit > state`.
 
-Merely reseeding the CRNG from the input pool isn't going to help,
-since the attacker could have grabed not only the CRNG pool, but the
-input pool as well.  In the case where the guest image is "freeze
-dried" and then reconstituted multiple times, and where the attacker
-hasn't actually grabed state, then all you need to do is to mix in
-some kind of nonce, such as the current time (which hopefully will
-vary across different VM "reconstitutions"), or some kind none (for
-example the VM ID, if that can be obtained somehow).
+1) Virtual machines:
 
-But if the attacker can actually obtain internal state from one
-reconstituted VM, and use that to attack another reconstituted VM, and
-the attacker also knows what the nonce or time seed that was used so
-that different reconstituted VMs will have unique CRNG streams, this
-might be a place where the "premature next" attack might come into
-play.
+It seems like after a VM state compromise during migration, or during
+snapshotting, the name of the game is getting entropy into the RNG in a
+usable way _as soon as possible_, and not delaying that. This is
+Nadia's point. There's some inherent tension between waiting some amount
+of time to use all available entropy -- the premature next requirement
+-- and using everything you can as fast as you can because your output
+stream is compromised/duplicated and that's very bad and should be
+mitigated ASAP at any expense.
 
-The simplest mitigation is if you have some kind of external RNG which
-you can actually trust, or at least mostly trust.  e.g., either some
-kind of CPU-based hwrng, such as RDRAND, or a hypervisor-provided
-hwrng, such as Virtio-RNG.  And if the hypervisor is going to playing
-games with reconstituting freeze-dried VM's, I'd argue it can d*mned
-well provide a virtio-rng facility.  And the same argument could be
-made just as easily with live migration scenario, with the hypervisor
-providing some kind of notification that VM had just gotten live
-migrated, so it should really reseed from the virtio-rng facility
-right away.
+[I'm also CC'ing Tom Risenpart, who's been following this thread, as he
+ did some work regarding VM snapshots and compromise, and what RNG
+ recovery in that context looks like, and arrived at pretty similar
+ points.]
 
-That leaves the variant where the kernel infoleak happened while the
-system was suspended.  And in that case, we're talking about an
-attacker which had physical access to the machine (say, an "evil maid"
-attack while the laptop was left suspended in a hotel room in Moscow
-or Beijing).  And in that case, there are probably far simpler ways
-that an "evil amid" with temporary physical access to the hardware
-could compromise the secuity of the unattended laptop.
+You mentioned virtio-rng as a mitigation for this. That works, but only
+if the data read from it are actually used rather quickly. So probably
+/waiting/ to use that is suboptimal.
 
-> Is "premature next" just an academic exercise, rather than a real world
-> RNG concern?
+One of the things added for 5.18 is this new "vmgenid" driver, which
+responds to fork/snapshot notifications from hypervisors, so that VMs
+can do something _immediately_ upon resumption/migration/etc. That's
+probably the best general solution to that problem.
 
-I'd say it's mostly an academic exercise.  Given our current model,
-where we only reseed the CRNG periodically, and we're hopefully
-getting some amount of uncertainty into the input pool, there will be
-a certain amount of "catastrophic reseeding" going on, which I don't
-think is a bad thing.  But personally, I don't think the complexity of
-N levels of Fortuna pools are worth it.
+Though vmgenid is supported by QEMU, VMware, Hyper-V, and hopefully soon
+Firecracker, there'll still be people that don't have it for one reason
+or another (and it has to be enabled manually in QEMU with `-device
+vmgenid,guid=auto`; perhaps I should send a patch adding that to some
+default machine types). Maybe that's their problem, but I take as your
+point that we can still try to be less bad than otherwise by using more
+entropy more often, and not delaying as the premature next model
+requirements would have us do.
 
-						- Ted
+2) Suspend / hibernation:
 
+This is kind of the same situation as virtual machines, but the
+particulars are a little bit different:
+
+  - There's no hypervisor giving us new seed material on resumption like
+    we have with VM snapshots and vmgenid; but
+
+  - We also always know when it happens, because it's not transparent to
+    the OS, so at least we can attempt to do something immediately like
+    we do with the vmgenid driver.
+
+Fortunately, most systems that are doing suspend or hibernation these
+days also have a RDRAND-like thing. It seems like it'd be a good idea
+for me to add a PM notifier, mix into the pool both
+ktime_get_boottime_ns() and ktime_get(), in addition to whatever type
+info I get from the notifier block (suspend vs hibernate vs whatever
+else) to account for the amount of time in the sleeping state, and then
+immediately reseed the crng, which will pull in a bunch of
+RDSEED/RDRAND/RDTSC values. This way on resumption, the system is always
+in a good place.
+
+I did this years ago in WireGuard -- clearing key material before
+suspend -- and there are some details around autosuspend (see
+wg_pm_notification() in drivers/net/wireguard/device.c), but it's not
+that hard to get right, so I'll give it a stab and send a patch.
+
+> But if the attacker can actually obtain internal state from one
+> reconstituted VM, and use that to attack another reconstituted VM, and
+> the attacker also knows what the nonce or time seed that was used so
+> that different reconstituted VMs will have unique CRNG streams, this
+> might be a place where the "premature next" attack might come into
+> play.
+
+This is the place where it matters, I guess. It's also where the
+tradeoff's from Nadia's argument come into play. System state gets
+compromised during VM migration / hibernation. It comes back online and
+starts doling out compromised random numbers. Worst case scenario is
+there's no RDRAND or vmgenid or virtio-rng, and we've just got the good
+old interrupt handler mangling cycle counters. Choices: A) recover from
+the compromise /slowly/ in order to mitigate premature next, or B)
+recover from the compromise /quickly/ in order to prevent things like
+nonce reuse.
+
+What is more likely? That an attacker who compromised this state at one
+point in time doesn't have the means to do it again elsewhere in the
+pipeline, will use a high bandwidth /dev/urandom output stream to mount
+a premature next attack, and is going after a high value target that
+inexplicably doesn't have RDRAND/vmgenid/virtio-rng enabled? Or that
+Nadia's group (or that large building in Utah) will get an Internet tap
+and simply start looking for repeated nonces to break?
+ 
+Jason
