@@ -2,167 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D56C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 11:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98104C433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 12:39:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345491AbiEALUW (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 May 2022 07:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
+        id S240287AbiEAMmb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 May 2022 08:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345385AbiEALUW (ORCPT
+        with ESMTP id S234626AbiEAMmb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 May 2022 07:20:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA26C33EAA;
-        Sun,  1 May 2022 04:16:56 -0700 (PDT)
+        Sun, 1 May 2022 08:42:31 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE79C66C92;
+        Sun,  1 May 2022 05:39:05 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9692860E1F;
-        Sun,  1 May 2022 11:16:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784DAC385A9;
-        Sun,  1 May 2022 11:16:53 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 451FBB80D69;
+        Sun,  1 May 2022 12:39:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9260BC385A9;
+        Sun,  1 May 2022 12:39:02 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jL/mQeo/"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z48ZxlW9"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651403812;
+        t=1651408740;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xHARVfgSK74zGcv02Q7PtU/TQGPI87rkXvTgtZVty90=;
-        b=jL/mQeo/DWCjYW8XzGl+ocGiuu6G7LvWHpM3bjOaMPDEfNohKaNVCaDr34KjE4Fh+9ggnq
-        8FxUF91qzmnWqq8EVqxSUJHMn9nk4IXygtTN9MB11i1Knv/+L4aZ3Qal+L6Eol9VJSsCTF
-        1vur+dSlm6ohYTDk6Vq5EZUduab851o=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c3dae223 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 1 May 2022 11:16:51 +0000 (UTC)
-Date:   Sun, 1 May 2022 13:16:48 +0200
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=R7oHxsnSVkJzwRFPbGvtqio8GcixiqQ2bt7n7N7x8fo=;
+        b=Z48ZxlW9ZU1DSDgErx14aIDfbnlkpcae/mMc9c4KDzuO0QZRi0rstdnS8TJWKGLFLc+cqd
+        C45W9bWtCVwTvUK2s52/0F2bdnGhqM9AdJybz2raVhDGD+fTR0ajWcx4V8OXvaS74jzDrq
+        fktRbuR9jgvEiDz7Gv00Wze/Ii/HjSk=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 39f0bf52 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sun, 1 May 2022 12:39:00 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     tytso <tytso@mit.edu>
-Cc:     nadiah@cs.ucsd.edu, noahsd@gmail.com, dodis@cs.nyu.edu,
-        tessaro@cs.washington.edu, torvalds@linux-foundation.org,
-        djb@cr.yp.to, jeanphilippe.aumasson@gmail.com, jann@thejh.net,
-        keescook@chromium.org, gregkh@linuxfoundation.org,
-        peter@cryptojedi.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: is "premature next" a real world rng concern, or just an
- academic exercise?
-Message-ID: <Ym5sICj5iBMn2w/E@zx2c4.com>
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
- <Ym3ZM1P+uYYABtRm@mit.edu>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH] random: mix in timestamps and reseed on system restore
+Date:   Sun,  1 May 2022 14:38:49 +0200
+Message-Id: <20220501123849.3858-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Ym3ZM1P+uYYABtRm@mit.edu>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ted,
+Since the RNG loses freshness system suspend/hibernation, when we
+resume, immediately reseed using whatever data we can, which for this
+particular case is the various timestamps regarding system suspend time,
+in addition to more generally the RDSEED/RDRAND/RDTSC values that happen
+whenever the crng reseeds.
 
-That's a useful analysis; thanks for that.
+On systems that suspend and resume automatically all the time -- such as
+Android -- we skip the reseeding on suspend resumption, since that could
+wind up being far too busy. This is the same trade-off made in
+WireGuard.
 
-On Sat, Apr 30, 2022 at 05:49:55PM -0700, tytso wrote:
-> On Wed, Apr 27, 2022 at 03:58:51PM +0200, Jason A. Donenfeld wrote:
-> > 
-> > 3) More broadly speaking, what kernel infoleak is actually acceptable to
-> >    the degree that anybody would feel okay in the first place about the
-> >    system continuing to run after it's been compromised?
-> 
-> A one-time kernel infoleak where this might seem most likely is one
-> where memory is read while the system is suspended/hibernated, or if
-> you have a VM which is frozen and then replicated.  A related version
-> is one where a VM is getting migrated from one host to another, and
-> the attacker is able to grab the system memory from the source "host"
-> after the VM is migrated to the destination "host".
+In addition to reseeding upon resumption always mix into the pool these
+various stamps on every power notification event.
 
-You've identified ~two places where compromises happen, but it's not an
-attack that can just be repeated simply by re-running `./sploit > state`.
+Cc: Theodore Ts'o <tytso@mit.edu>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-1) Virtual machines:
-
-It seems like after a VM state compromise during migration, or during
-snapshotting, the name of the game is getting entropy into the RNG in a
-usable way _as soon as possible_, and not delaying that. This is
-Nadia's point. There's some inherent tension between waiting some amount
-of time to use all available entropy -- the premature next requirement
--- and using everything you can as fast as you can because your output
-stream is compromised/duplicated and that's very bad and should be
-mitigated ASAP at any expense.
-
-[I'm also CC'ing Tom Risenpart, who's been following this thread, as he
- did some work regarding VM snapshots and compromise, and what RNG
- recovery in that context looks like, and arrived at pretty similar
- points.]
-
-You mentioned virtio-rng as a mitigation for this. That works, but only
-if the data read from it are actually used rather quickly. So probably
-/waiting/ to use that is suboptimal.
-
-One of the things added for 5.18 is this new "vmgenid" driver, which
-responds to fork/snapshot notifications from hypervisors, so that VMs
-can do something _immediately_ upon resumption/migration/etc. That's
-probably the best general solution to that problem.
-
-Though vmgenid is supported by QEMU, VMware, Hyper-V, and hopefully soon
-Firecracker, there'll still be people that don't have it for one reason
-or another (and it has to be enabled manually in QEMU with `-device
-vmgenid,guid=auto`; perhaps I should send a patch adding that to some
-default machine types). Maybe that's their problem, but I take as your
-point that we can still try to be less bad than otherwise by using more
-entropy more often, and not delaying as the premature next model
-requirements would have us do.
-
-2) Suspend / hibernation:
-
-This is kind of the same situation as virtual machines, but the
-particulars are a little bit different:
-
-  - There's no hypervisor giving us new seed material on resumption like
-    we have with VM snapshots and vmgenid; but
-
-  - We also always know when it happens, because it's not transparent to
-    the OS, so at least we can attempt to do something immediately like
-    we do with the vmgenid driver.
-
-Fortunately, most systems that are doing suspend or hibernation these
-days also have a RDRAND-like thing. It seems like it'd be a good idea
-for me to add a PM notifier, mix into the pool both
-ktime_get_boottime_ns() and ktime_get(), in addition to whatever type
-info I get from the notifier block (suspend vs hibernate vs whatever
-else) to account for the amount of time in the sleeping state, and then
-immediately reseed the crng, which will pull in a bunch of
-RDSEED/RDRAND/RDTSC values. This way on resumption, the system is always
-in a good place.
-
-I did this years ago in WireGuard -- clearing key material before
-suspend -- and there are some details around autosuspend (see
-wg_pm_notification() in drivers/net/wireguard/device.c), but it's not
-that hard to get right, so I'll give it a stab and send a patch.
-
-> But if the attacker can actually obtain internal state from one
-> reconstituted VM, and use that to attack another reconstituted VM, and
-> the attacker also knows what the nonce or time seed that was used so
-> that different reconstituted VMs will have unique CRNG streams, this
-> might be a place where the "premature next" attack might come into
-> play.
-
-This is the place where it matters, I guess. It's also where the
-tradeoff's from Nadia's argument come into play. System state gets
-compromised during VM migration / hibernation. It comes back online and
-starts doling out compromised random numbers. Worst case scenario is
-there's no RDRAND or vmgenid or virtio-rng, and we've just got the good
-old interrupt handler mangling cycle counters. Choices: A) recover from
-the compromise /slowly/ in order to mitigate premature next, or B)
-recover from the compromise /quickly/ in order to prevent things like
-nonce reuse.
-
-What is more likely? That an attacker who compromised this state at one
-point in time doesn't have the means to do it again elsewhere in the
-pipeline, will use a high bandwidth /dev/urandom output stream to mount
-a premature next attack, and is going after a high value target that
-inexplicably doesn't have RDRAND/vmgenid/virtio-rng enabled? Or that
-Nadia's group (or that large building in Utah) will get an Internet tap
-and simply start looking for repeated nonces to break?
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 0935a140795e..48eac27214ea 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -53,6 +53,7 @@
+ #include <linux/completion.h>
+ #include <linux/uuid.h>
+ #include <linux/uaccess.h>
++#include <linux/suspend.h>
+ #include <crypto/chacha.h>
+ #include <crypto/blake2s.h>
+ #include <asm/processor.h>
+@@ -966,6 +967,37 @@ static int __init parse_trust_bootloader(char *arg)
+ early_param("random.trust_cpu", parse_trust_cpu);
+ early_param("random.trust_bootloader", parse_trust_bootloader);
  
-Jason
++static int random_pm_notification(struct notifier_block *nb, unsigned long action, void *data)
++{
++	unsigned long flags, entropy = random_get_entropy();
++
++	/*
++	 * Encode a representation of how long the system has been suspended,
++	 * in a way that is distinct from prior system suspends.
++	 */
++	ktime_t stamps[] = {
++		ktime_get(),
++		ktime_get_boottime(),
++		ktime_get_real()
++	};
++
++	spin_lock_irqsave(&input_pool.lock, flags);
++	_mix_pool_bytes(&action, sizeof(action));
++	_mix_pool_bytes(stamps, sizeof(stamps));
++	_mix_pool_bytes(&entropy, sizeof(entropy));
++	spin_unlock_irqrestore(&input_pool.lock, flags);
++
++	if (action == PM_RESTORE_PREPARE ||
++	    (action == PM_POST_SUSPEND &&
++	     !IS_ENABLED(CONFIG_PM_AUTOSLEEP) && !IS_ENABLED(CONFIG_ANDROID))) {
++		crng_reseed(true);
++		pr_notice("crng reseeded on system resumption\n");
++	}
++	return 0;
++}
++
++static struct notifier_block pm_notifier = { .notifier_call = random_pm_notification };
++
+ /*
+  * The first collection of entropy occurs at system boot while interrupts
+  * are still turned off. Here we push in RDSEED, a timestamp, and utsname().
+@@ -1009,6 +1041,8 @@ int __init rand_initialize(void)
+ 		unseeded_warning.interval = 0;
+ 	}
+ 
++	WARN_ON(register_pm_notifier(&pm_notifier));
++
+ 	WARN(!random_get_entropy(), "Missing cycle counter and fallback timer; RNG "
+ 				    "entropy collection will consequently suffer.");
+ 	return 0;
+-- 
+2.35.1
+
