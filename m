@@ -2,131 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98104C433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 12:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA4DC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 13:21:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240287AbiEAMmb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 May 2022 08:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38352 "EHLO
+        id S236552AbiEANZH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 May 2022 09:25:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234626AbiEAMmb (ORCPT
+        with ESMTP id S236165AbiEANZG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 May 2022 08:42:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE79C66C92;
-        Sun,  1 May 2022 05:39:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 451FBB80D69;
-        Sun,  1 May 2022 12:39:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9260BC385A9;
-        Sun,  1 May 2022 12:39:02 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z48ZxlW9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651408740;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=R7oHxsnSVkJzwRFPbGvtqio8GcixiqQ2bt7n7N7x8fo=;
-        b=Z48ZxlW9ZU1DSDgErx14aIDfbnlkpcae/mMc9c4KDzuO0QZRi0rstdnS8TJWKGLFLc+cqd
-        C45W9bWtCVwTvUK2s52/0F2bdnGhqM9AdJybz2raVhDGD+fTR0ajWcx4V8OXvaS74jzDrq
-        fktRbuR9jgvEiDz7Gv00Wze/Ii/HjSk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 39f0bf52 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sun, 1 May 2022 12:39:00 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH] random: mix in timestamps and reseed on system restore
-Date:   Sun,  1 May 2022 14:38:49 +0200
-Message-Id: <20220501123849.3858-1-Jason@zx2c4.com>
+        Sun, 1 May 2022 09:25:06 -0400
+X-Greylist: delayed 310 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 01 May 2022 06:21:41 PDT
+Received: from condef-09.nifty.com (condef-09.nifty.com [202.248.20.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2303F3CFCF
+        for <linux-crypto@vger.kernel.org>; Sun,  1 May 2022 06:21:40 -0700 (PDT)
+Received: from conuserg-11.nifty.com ([10.126.8.74])by condef-09.nifty.com with ESMTP id 241DDAp6024990
+        for <linux-crypto@vger.kernel.org>; Sun, 1 May 2022 22:13:11 +0900
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-11.nifty.com with ESMTP id 241D8TQo018740;
+        Sun, 1 May 2022 22:08:29 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 241D8TQo018740
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1651410510;
+        bh=Fmg4C09ULmcdlCQ7G/HgMU42/2hgN/vUJbg9dyGBwP0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Bzc3Aykk50p2V+GC4ErxY+Z5DdBiuLZXJeYATq47uk3XNLduZCcHy0cApl2Rrsb9Z
+         CXMDw/soW0HsPCFCwa8GWL5e93ozm7jDX/hGrSknNNjIF7Z975qTs2Cvik18XZ12+s
+         rL6O5+ayjD57b/4oHob1wJSaqVi2SbUA/1uL2G7Cmz9Y0AzNWOYdzmv/UZDrUnKmjz
+         EAfTdWXzzsjj5hnLzzpLEyTgtw+5vD0BsUG9R9ulxtxzyn4YETcwmRHGLHmYl7iCpm
+         xpKmmdkLE7vWgJ2DOjeQT0ltGvmCPG02PnqfzJiSmfe2fZNlvdyNBU8TCABp3cS4Yp
+         vvjdHKKtaJ9hQ==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
+Date:   Sun,  1 May 2022 22:07:49 +0900
+Message-Id: <20220501130749.1123387-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since the RNG loses freshness system suspend/hibernation, when we
-resume, immediately reseed using whatever data we can, which for this
-particular case is the various timestamps regarding system suspend time,
-in addition to more generally the RDSEED/RDRAND/RDTSC values that happen
-whenever the crng reseeds.
+I notieced the log is not properly aligned:
 
-On systems that suspend and resume automatically all the time -- such as
-Android -- we skip the reseeding on suspend resumption, since that could
-wind up being far too busy. This is the same trade-off made in
-WireGuard.
+  PERL drivers/crypto/vmx/aesp8-ppc.S
+  CC [M]  fs/xfs/xfs_reflink.o
+  PERL drivers/crypto/vmx/ghashp8-ppc.S
+  CC [M]  drivers/crypto/vmx/aes.o
 
-In addition to reseeding upon resumption always mix into the pool these
-various stamps on every power notification event.
+Add some spaces after 'PERL'.
 
-Cc: Theodore Ts'o <tytso@mit.edu>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+While I was here, I cleaned up the Makefile:
+
+ - Merge the two similar rules
+
+ - Remove redundant 'clean-files' (Having 'targets' is enough)
+
+ - Move the flavour into the build command
+
+This still avoids the build failures fixed by commit 4ee812f6143d
+("crypto: vmx - Avoid weird build failures").
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 ---
- drivers/char/random.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 0935a140795e..48eac27214ea 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -53,6 +53,7 @@
- #include <linux/completion.h>
- #include <linux/uuid.h>
- #include <linux/uaccess.h>
-+#include <linux/suspend.h>
- #include <crypto/chacha.h>
- #include <crypto/blake2s.h>
- #include <asm/processor.h>
-@@ -966,6 +967,37 @@ static int __init parse_trust_bootloader(char *arg)
- early_param("random.trust_cpu", parse_trust_cpu);
- early_param("random.trust_bootloader", parse_trust_bootloader);
+ drivers/crypto/vmx/Makefile | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+index 709670d2b553..df93ba63b1cd 100644
+--- a/drivers/crypto/vmx/Makefile
++++ b/drivers/crypto/vmx/Makefile
+@@ -2,21 +2,10 @@
+ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
+ vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
  
-+static int random_pm_notification(struct notifier_block *nb, unsigned long action, void *data)
-+{
-+	unsigned long flags, entropy = random_get_entropy();
-+
-+	/*
-+	 * Encode a representation of how long the system has been suspended,
-+	 * in a way that is distinct from prior system suspends.
-+	 */
-+	ktime_t stamps[] = {
-+		ktime_get(),
-+		ktime_get_boottime(),
-+		ktime_get_real()
-+	};
-+
-+	spin_lock_irqsave(&input_pool.lock, flags);
-+	_mix_pool_bytes(&action, sizeof(action));
-+	_mix_pool_bytes(stamps, sizeof(stamps));
-+	_mix_pool_bytes(&entropy, sizeof(entropy));
-+	spin_unlock_irqrestore(&input_pool.lock, flags);
-+
-+	if (action == PM_RESTORE_PREPARE ||
-+	    (action == PM_POST_SUSPEND &&
-+	     !IS_ENABLED(CONFIG_PM_AUTOSLEEP) && !IS_ENABLED(CONFIG_ANDROID))) {
-+		crng_reseed(true);
-+		pr_notice("crng reseeded on system resumption\n");
-+	}
-+	return 0;
-+}
-+
-+static struct notifier_block pm_notifier = { .notifier_call = random_pm_notification };
-+
- /*
-  * The first collection of entropy occurs at system boot while interrupts
-  * are still turned off. Here we push in RDSEED, a timestamp, and utsname().
-@@ -1009,6 +1041,8 @@ int __init rand_initialize(void)
- 		unseeded_warning.interval = 0;
- 	}
+-ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
+-override flavour := linux-ppc64le
+-else
+-override flavour := linux-ppc64
+-endif
+-
+-quiet_cmd_perl = PERL $@
+-      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
++quiet_cmd_perl = PERL    $@
++      cmd_perl = $(PERL) $< $(if $(CONFIG_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
  
-+	WARN_ON(register_pm_notifier(&pm_notifier));
-+
- 	WARN(!random_get_entropy(), "Missing cycle counter and fallback timer; RNG "
- 				    "entropy collection will consequently suffer.");
- 	return 0;
+ targets += aesp8-ppc.S ghashp8-ppc.S
+ 
+-$(obj)/aesp8-ppc.S: $(src)/aesp8-ppc.pl FORCE
+-	$(call if_changed,perl)
+-  
+-$(obj)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl FORCE
++$(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
+ 	$(call if_changed,perl)
+-
+-clean-files := aesp8-ppc.S ghashp8-ppc.S
 -- 
-2.35.1
+2.32.0
 
