@@ -2,115 +2,150 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA4DC433F5
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 13:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E7FC433F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 May 2022 18:33:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236552AbiEANZH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 May 2022 09:25:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
+        id S1354970AbiEASg4 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 1 May 2022 14:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236165AbiEANZG (ORCPT
+        with ESMTP id S1354955AbiEASgz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 May 2022 09:25:06 -0400
-X-Greylist: delayed 310 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 01 May 2022 06:21:41 PDT
-Received: from condef-09.nifty.com (condef-09.nifty.com [202.248.20.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2303F3CFCF
-        for <linux-crypto@vger.kernel.org>; Sun,  1 May 2022 06:21:40 -0700 (PDT)
-Received: from conuserg-11.nifty.com ([10.126.8.74])by condef-09.nifty.com with ESMTP id 241DDAp6024990
-        for <linux-crypto@vger.kernel.org>; Sun, 1 May 2022 22:13:11 +0900
-Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 241D8TQo018740;
-        Sun, 1 May 2022 22:08:29 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 241D8TQo018740
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651410510;
-        bh=Fmg4C09ULmcdlCQ7G/HgMU42/2hgN/vUJbg9dyGBwP0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Bzc3Aykk50p2V+GC4ErxY+Z5DdBiuLZXJeYATq47uk3XNLduZCcHy0cApl2Rrsb9Z
-         CXMDw/soW0HsPCFCwa8GWL5e93ozm7jDX/hGrSknNNjIF7Z975qTs2Cvik18XZ12+s
-         rL6O5+ayjD57b/4oHob1wJSaqVi2SbUA/1uL2G7Cmz9Y0AzNWOYdzmv/UZDrUnKmjz
-         EAfTdWXzzsjj5hnLzzpLEyTgtw+5vD0BsUG9R9ulxtxzyn4YETcwmRHGLHmYl7iCpm
-         xpKmmdkLE7vWgJ2DOjeQT0ltGvmCPG02PnqfzJiSmfe2fZNlvdyNBU8TCABp3cS4Yp
-         vvjdHKKtaJ9hQ==
-X-Nifty-SrcIP: [133.32.177.133]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+        Sun, 1 May 2022 14:36:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4C815FF1
+        for <linux-crypto@vger.kernel.org>; Sun,  1 May 2022 11:33:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1544D60F5D
+        for <linux-crypto@vger.kernel.org>; Sun,  1 May 2022 18:33:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30CD5C385AA;
+        Sun,  1 May 2022 18:33:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651430008;
+        bh=IyGWWqmqLPlCfRpXCsmhbH7KCfxVS7fe1ibyNyBxHtg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UOTwP/YhnU8GMK6aNGWtUpmII6yurTzpAZPtA6mVKsGOXwuu1tBge+yI7qURC0T+B
+         1PuqaOCiERdDtqh5ODxt1VmV7RuRNR4WfKPHA0bQple3QGziXLA3E7qDxS2sRUQv/s
+         FHujk5yQY0qRJl8EPcuST+MQj6Yk9PSpW2h8tqLyhNeK94Sse8vfuwgP0DRf7LeG14
+         bEKeqWfNgCWRCcSRwfUd4epBpcB/D/6y58WgcwyZsjM2NSmdIgpceQXZ/e7UhHqPdf
+         5ATZ7svT8obuvwbold17nLEj8anXDLCQJrclj10pgspzlc8R1+B1mG1kZYIXwXpcZE
+         g2VknH1FP1uew==
+Date:   Sun, 1 May 2022 11:33:26 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org,
+        linux-fscrypt.vger.kernel.org@google.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
-Date:   Sun,  1 May 2022 22:07:49 +0900
-Message-Id: <20220501130749.1123387-1-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.32.0
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v5 3/8] crypto: hctr2 - Add HCTR2 support
+Message-ID: <Ym7SdohJAlp6pOM9@sol.localdomain>
+References: <20220427003759.1115361-1-nhuck@google.com>
+ <20220427003759.1115361-4-nhuck@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220427003759.1115361-4-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I notieced the log is not properly aligned:
+On Wed, Apr 27, 2022 at 12:37:54AM +0000, Nathan Huckleberry wrote:
+> +/* The input data for each HCTR2 hash step begins with a 16-byte block that
+> + * contains the tweak length and a flag that indicates whether the input is evenly
+> + * divisible into blocks.  Since this implementation only supports one tweak
+> + * length, we precompute the two hash states resulting from hashing the two
+> + * possible values of this initial block.  This reduces by one block the amount of
+> + * data that needs to be hashed for each encryption/decryption
+> + *
+> + * These precomputed hashes are stored in hctr2_tfm_ctx.
+> + */
 
-  PERL drivers/crypto/vmx/aesp8-ppc.S
-  CC [M]  fs/xfs/xfs_reflink.o
-  PERL drivers/crypto/vmx/ghashp8-ppc.S
-  CC [M]  drivers/crypto/vmx/aes.o
+Block comments should look like this:
 
-Add some spaces after 'PERL'.
+/*
+ * text
+ */
 
-While I was here, I cleaned up the Makefile:
+i.e. there should be a newline after the "/*"
 
- - Merge the two similar rules
+> +	memset(tctx->L, 0, sizeof(tctx->L));
+> +	memset(hbar, 0, sizeof(hbar));
+> +	tctx->L[0] = 0x01;
+> +	crypto_cipher_encrypt_one(tctx->blockcipher, tctx->L, tctx->L);
+> +	crypto_cipher_encrypt_one(tctx->blockcipher, hbar, hbar);
 
- - Remove redundant 'clean-files' (Having 'targets' is enough)
+This would be easier to read if the computations of hbar and L were separated:
 
- - Move the flavour into the build command
+	memset(hbar, 0, sizeof(hbar));
+	crypto_cipher_encrypt_one(tctx->blockcipher, hbar, hbar);
 
-This still avoids the build failures fixed by commit 4ee812f6143d
-("crypto: vmx - Avoid weird build failures").
+	memset(tctx->L, 0, sizeof(tctx->L));
+	tctx->L[0] = 0x01;
+	crypto_cipher_encrypt_one(tctx->blockcipher, tctx->L, tctx->L);
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
+> +static int hctr2_hash_message(struct skcipher_request *req,
+> +			      struct scatterlist *sgl,
+> +			      u8 digest[POLYVAL_DIGEST_SIZE])
+> +{
+> +	u8 padding[BLOCKCIPHER_BLOCK_SIZE];
+> +	struct hctr2_request_ctx *rctx = skcipher_request_ctx(req);
+> +	struct shash_desc *hash_desc = &rctx->u.hash_desc;
+> +	const unsigned int bulk_len = req->cryptlen - BLOCKCIPHER_BLOCK_SIZE;
+> +	struct sg_mapping_iter miter;
+> +	unsigned int remainder = bulk_len % BLOCKCIPHER_BLOCK_SIZE;
+> +	int err, i;
+> +	int n = 0;
+> +
+> +	sg_miter_start(&miter, sgl, sg_nents(sgl),
+> +		       SG_MITER_FROM_SG | SG_MITER_ATOMIC);
+> +	for (i = 0; i < bulk_len; i += n) {
+> +		sg_miter_next(&miter);
+> +		n = min_t(unsigned int, miter.length, bulk_len - i);
+> +		err = crypto_shash_update(hash_desc, miter.addr, n);
+> +		if (err)
+> +			break;
+> +	}
+> +	sg_miter_stop(&miter);
+> +
+> +	if (err)
+> +		return err;
 
- drivers/crypto/vmx/Makefile | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
+There's actually an uninitialized variable bug here.  If bulk_len==0, then 'err'
+never gets initialized before being checked.  I'm surprised this doesn't cause a
+compiler warning, but it doesn't!  'err' needs to be initialized to 0.
 
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index 709670d2b553..df93ba63b1cd 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -2,21 +2,10 @@
- obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
- vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
- 
--ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
--override flavour := linux-ppc64le
--else
--override flavour := linux-ppc64
--endif
--
--quiet_cmd_perl = PERL $@
--      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
-+quiet_cmd_perl = PERL    $@
-+      cmd_perl = $(PERL) $< $(if $(CONFIG_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
- 
- targets += aesp8-ppc.S ghashp8-ppc.S
- 
--$(obj)/aesp8-ppc.S: $(src)/aesp8-ppc.pl FORCE
--	$(call if_changed,perl)
--  
--$(obj)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl FORCE
-+$(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
- 	$(call if_changed,perl)
--
--clean-files := aesp8-ppc.S ghashp8-ppc.S
--- 
-2.32.0
+> +
+> +	if (remainder) {
+> +		memset(padding, 0, BLOCKCIPHER_BLOCK_SIZE);
+> +		padding[0] = 0x01;
 
+'padding' can be static const:
+
+	static const u8 padding[BLOCKCIPHER_BLOCK_SIZE] = { 0x1 };
+
+> +	subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
+> +			  crypto_shash_descsize(polyval), sizeof_field(struct
+> +			  hctr2_request_ctx, u.xctr_req) +
+> +			  crypto_skcipher_reqsize(xctr));
+
+This is a little hard to read; it would be better if the sizeof_field()'s were
+aligned:
+
+	subreq_size = max(sizeof_field(struct hctr2_request_ctx, u.hash_desc) +
+			  crypto_shash_descsize(polyval),
+			  sizeof_field(struct hctr2_request_ctx, u.xctr_req) +
+			  crypto_skcipher_reqsize(xctr));
+
+Other than that, everything looks good.  The only thing that really has to be
+fixed is the uninitialized variable.  After that feel free to add:
+
+	Reviewed-by: Eric Biggers <ebiggers@google.com>
+
+- Eric
