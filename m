@@ -2,108 +2,182 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68764C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 19:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A457EC4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 20:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387144AbiEBTpv (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 15:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S233643AbiEBUHD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 16:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232548AbiEBTpu (ORCPT
+        with ESMTP id S232596AbiEBUHB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 May 2022 15:45:50 -0400
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFA765CF;
-        Mon,  2 May 2022 12:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1651520540; x=1683056540;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7FJBCYXxEPq3Mo4GK9ln8o36ilxGPdXqqt9EWLzX8GA=;
-  b=qk4LpZ7OX6GFFwyXICeMARmucZGSj/gPtXB8MoNAZWCcCAqR9+KvwGau
-   5voyGD6Ud8SMvGOlo5BzSHkHWqny2Zpb5t1cNZ9rAXt2pmIRHz7UL3Pkv
-   O14koN5hHESYXFRWo6cuXZFMuNW95OdIMxsOxq3Y+rCeHJ6vSDyIVNWSw
-   M=;
-X-IronPort-AV: E=Sophos;i="5.91,193,1647302400"; 
-   d="scan'208";a="1012276635"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-828bd003.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 02 May 2022 19:42:04 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1a-828bd003.us-east-1.amazon.com (Postfix) with ESMTPS id B25A4811C3;
-        Mon,  2 May 2022 19:42:02 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.32; Mon, 2 May 2022 19:42:02 +0000
-Received: from [0.0.0.0] (10.43.161.217) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Mon, 2 May
- 2022 19:41:59 +0000
-Message-ID: <97665117-922f-8872-7b7f-a53499db6e15@amazon.com>
-Date:   Mon, 2 May 2022 21:41:57 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     Lennart Poettering <mzxreary@0pointer.de>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        Mon, 2 May 2022 16:07:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A08BC3F;
+        Mon,  2 May 2022 13:03:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C769A614E3;
+        Mon,  2 May 2022 20:03:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031AFC385A4;
+        Mon,  2 May 2022 20:03:28 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RVNBaSAN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651521807;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iQ49h26zaKpjAUeQljwnaf9r3WN1R89i6oAXsSSE18I=;
+        b=RVNBaSANisHa5WiEuHDWzCrh7+tIA5oziEIdE9Hnu+ePF6XkfSXz3BP+8XeZOXaKwtD9zT
+        Uln1eQ8xX2GZTh8XhaCo+crluZ+3GSK09mG1vAdxUSbPXVsvUzT2jf198pEHM9Y4AGLRl+
+        9Mv5NubEd32GzzAi46uWjGnm/+ZW7mc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4a578e43 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 2 May 2022 20:03:26 +0000 (UTC)
+Date:   Mon, 2 May 2022 22:03:21 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Lennart Poettering <mzxreary@0pointer.de>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Theodore Ts'o <tytso@mit.edu>,
-        "Colm MacCarthaigh" <colmmacc@amazon.com>,
+        Colm MacCarthaigh <colmmacc@amazon.com>,
         Torben Hansen <htorben@amazon.co.uk>,
         Jann Horn <jannh@google.com>,
         "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
+Message-ID: <YnA5CUJKvqmXJxf2@zx2c4.com>
 References: <20220502140602.130373-1-Jason@zx2c4.com>
- <20220502140602.130373-2-Jason@zx2c4.com> <Ym/7UlgQ5VjjC76P@gardel-login>
- <YnAC00VtU8MGb7vO@zx2c4.com> <YnAMBzhcJhGR5XOK@gardel-login>
- <YnAc4hwPyByF4kZ5@zx2c4.com>
- <480469e6-0eb0-8d76-0b8d-111579e73701@amazon.com>
- <YnAnCgxmPBrMdKt5@zx2c4.com>
- <cef2694f-d6cc-70e0-1d31-0c9dbd038ce2@amazon.com>
- <YnAwiZv8n6Rzc5+O@zx2c4.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <YnAwiZv8n6Rzc5+O@zx2c4.com>
-X-Originating-IP: [10.43.161.217]
-X-ClientProxiedBy: EX13D04UWA004.ant.amazon.com (10.43.160.234) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+ <20220502140602.130373-2-Jason@zx2c4.com>
+ <Ym/7UlgQ5VjjC76P@gardel-login>
+ <YnAC00VtU8MGb7vO@zx2c4.com>
+ <YnAMBzhcJhGR5XOK@gardel-login>
+ <7a1cfd1c-9f0e-f134-e544-83ee6d3cd9c9@amazon.com>
+ <YnAiylnSytuYM53z@zx2c4.com>
+ <f90d5e06-8cd7-14b3-43d5-c4799597d023@amazon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f90d5e06-8cd7-14b3-43d5-c4799597d023@amazon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ck9uIDAyLjA1LjIyIDIxOjI3LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gT24gTW9uLCBN
-YXkgMDIsIDIwMjIgYXQgMDg6NTY6MDVQTSArMDIwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+
-IE9uIDAyLjA1LjIyIDIwOjQ2LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4+PiBPbiBNb24s
-IE1heSAwMiwgMjAyMiBhdCAwODozNDozOFBNICswMjAwLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToK
-Pj4+PiBNaWNoYWVsLCBzaW5jZSB3ZSBhbHJlYWR5IGNoYW5nZWQgdGhlIENJRCBpbiB0aGUgc3Bl
-YywgY2FuIHdlIGFkZCBhCj4+Pj4gcHJvcGVydHkgdG8gdGhlIGRldmljZSB0aGF0IGluZGljYXRl
-cyB0aGUgZmlyc3QgNCBieXRlcyBvZiB0aGUgVVVJRCB3aWxsCj4+Pj4gYWx3YXlzIGJlIGRpZmZl
-cmVudCBiZXR3ZWVuIHBhcmVudCBhbmQgY2hpbGQ/Cj4+Pj4KPj4+PiBUaGF0IHNob3VsZCBnaXZl
-IHVzIHRoZSBhYmlsaXR5IHRvIG1tYXAgdGhlIHZtZ2VuaWQgZGlyZWN0bHkgdG8gdXNlcgo+Pj4+
-IHNwYWNlIGFuZCBhY3QgYmFzZWQgb24gYSBzaW1wbGUgdTMyIGNvbXBhcmUgZm9yIGNsb25lIG5v
-dGlmaWNhdGlvbiwgbm8/Cj4+PiBUaGF0IGlzIG5vdCBhIGdvb2QgaWRlYS4gV2Ugd2FudCBhbiBf
-YWRkaXRpb25hbF8gNCBieXRlcywgc28gdGhhdCB3ZSBjYW4KPj4+IGtlZXAgdGhlIGZpcnN0IDE2
-IGJ5dGVzICgxMjggYml0cykgYXMgYSBrZXJuZWwgc3BhY2Ugc2VjcmV0Lgo+Pgo+PiBBbiBhZGRp
-dGlvbmFsIDQgYnl0ZXMgd291bGQgYmUgYW4gYWRkaXRpb25hbCA0a2IgKG9yIDY0a2Igb24gQVJN
-KSBwYWdlLgo+PiBEbyB3ZSByZWFsbHkgcmVseSBvbiB0aGVzZSAxNiBieXRlcyB0byByZXNlZWQg
-YWZ0ZXIgY2xvbmU/IElmIHNvLCB3ZSdkCj4+IG5lZWQgdG8gYml0ZSB0aGUgYnVsbGV0IGFuZCBw
-cm92aWRlIGFuIGFkZGl0aW9uYWwgcGFnZSwgeWVzLgo+IFVnaCwgeW91J3JlIHJpZ2h0OyBtZW1v
-cnkgbWFwcGluZyBpcyBwYWdlcy4gVGhlIG90aGVyIG9wdGlvbiB3b3VsZCBiZQo+IHJlbHlpbmcg
-b24gUkRSQU5EIChib3RoIGV4aXN0aW5nIGFuZCBiZWluZyB0cnVzdGVkIGJ5IHRoZSB1c2VyIGV0
-YyksIGJ1dAo+IGdlbmVyYWxseSBwZW9wbGUgYXJlbid0IHRvbyBqYXp6ZWQgYWJvdXQgdGhhdC4g
-V2UgcHJldHR5IG11Y2ggaGF2ZSB0bwo+IGFzc3VtZSB0aGF0IHRoZSBleGlzdGluZyBwb29sIGlz
-IGNvbXByb21pc2VkLCBzaW5jZSBwZW9wbGUgc2hhcmUgY2xvbmVkCj4gVk1zIGNhc3VhbGx5LiBU
-aGUgMTI4LWJpdCB2bWdlbmlkIGlzIGEgbmljZSBpbnB1dCB0byBoYXZlLgoKCkkgY2FuIHNlZSB0
-aGUgbWVyaXQuIFNvIHllcywgd2UnZCB3YW50IGEgc2Vjb25kIGZ1bmN0aW9uIHRvIHRoZSAKVk1f
-R0VOX0NPVU5URVIgZGV2aWNlIGluIGFkZGl0aW9uIHRvICJBRERSIiB0aGF0IC0gaW4gYSBmdWxs
-eSB1c2VyIHNwYWNlIAptYXBwYWJsZSBzZXBhcmF0ZSBwYWdlIC0gZ2l2ZXMgdXMgYSAzMi1iaXQg
-dm1nZW5pZCB0aGF0IGlzIGd1YXJhbnRlZWQgdG8gCmJlIGRpZmZlcmVudCBmcm9tIHRoZSBwcmV2
-aW91cyBvbmUuCgoKQWxleAoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdt
-YkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0
-aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQg
-Q2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERF
-IDI4OSAyMzcgODc5CgoK
+Hi Alex,
 
+On Mon, May 02, 2022 at 08:57:01PM +0200, Alexander Graf wrote:
+> So far I see little that would block your patch? It seems to go into a 
+> good direction from all I can tell.
+
+With kernel code for the kernel, if it's good enough, it's good enough,
+and can be made better later. With kernel code for userspace, it might
+not be possible to make it better later, so if we've got a plethora of
+options, it makes the incrementalism I was enthusiastic about a little
+bit more risky.
+
+Here's where we're at:
+
+- /proc/sys has this easy to use poll() interface [which currently breaks
+  normal poll() semantics; see patch 1/2]. It'd be nice to use this as
+  an async notifier interface.
+
+- A race-free mmap()d mechanism needs virtual hardware support to be
+  useful, so I don't want to add it now. But when we do have it, where
+  should it be added?
+
+  * Atop the same /proc/sys file that this patch has returning -ENODATA
+    at the moment? /proc/sys doesn't do mmap now so that'd be some
+    plumbing work, which would be pretty odd for the sysctl abstraction.
+
+  * Atop some new file elsewhere? Not hard to do, but also begs the
+    question of which driver should do it, where the file should be, and
+    a whole host of bikesheddy questions.
+
+  * In the VDSO? This would make the most sense to me if we're ever
+    going to do a VDSO RNG, and to design it along with the userspace
+    RNG stuff people think they want, even if it's maybe not the best
+    idea in the end. This is a huge can of worms. Termites, even, and
+    they'll eat through the beams of your house.
+
+  * Nowhere, because even though this race-free mechanism is attractive,
+    it's way too hard to program for, and nobody is going to use it, and
+    not many people care /that/ much about having this mechanism being
+    100% race-free. Colm said Amazon doesn't, for example, since it uses
+    quiescent states. And apparently Microsoft doesn't care much either,
+    and they don't even use quiescent states. Maybe I'm the only one
+    raising a fuss about the race window (while hypocritically also not
+    being very eager to write code around an interface that has to check
+    a variable all the time).
+
+- A file in /proc/sys can return -ENODATA, as this patch has it doing,
+  or it can return something else:
+
+  * A counter. Flawed for reasons discussed elsewhere.
+
+  * A UUID, just like /proc/sys/kernel/random/boot_id, except we'd name
+    it generation_id or something and it'd change on VM fork. An earlier
+    version of this patch did that.
+
+  * -ENODATA, as this patch does, because each caller can get a new unique
+    value with getrandom(), as there's no point in having some global
+    identifier like with boot_id. This is what I'm leaning toward. It
+    seems like getrandom() would handle Lennart's case, Go's case, s2n's
+    case, and we don't need a particular ID.
+
+  * The direct value of the ACPI vmgenid value. Discussed in earlier
+    emails; I don't want to do this.
+
+- You don't care about race-free, but you do care about mmap(), for
+  "programming reasons" in s2n. I'm not yet sympathetic to this case
+  :-P. The point of mmap() should be for the race-free stuff. Otherwise
+  poll() should do the job, and if you can't poll, you can hack around
+  it with another process or a thread or whatever other trick. Your
+  systemd proposal with a file was just punting the idea elsewhere in
+  userspace (which I think is a bit ugly too...).
+
+This state of affairs inclines me to:
+
+- Have a /proc/sys/kernel/random/fork_event that has a poll() interface
+  with reads returning -ENODATA (this patch).
+
+- Try to convince whomever that poll()ing on fork_event and then calling
+  getrandom() for a process-local snapshot ID is better than poll()ing
+  on and subsequently read()ing a /proc/sys/kernel/random/generation_id
+  that returns a global UUID like boot_id. [Lennart - I'm specifically
+  interested in trying to convince you of this. Thoughts?]
+
+- Given that you are okay with an async mechanism, figure out how poll()
+  can work for s2n rather than mmap().
+
+- Not really pursue the race-free mmap() thing unless Microsoft goes
+  full steam ahead with it because it's complicated to program for and
+  maybe (or maybe not? I don't know? data please?) a theoretical
+  concern.
+ 
+> You block the thread on poll, so the only option is a thread. I was 
+> until now always under the working assumption that we can't do this in a 
+> thread because you don't want your single threaded application to turn 
+> into a pthreaded one, but you make me wonder. Let me check with Torben 
+> tomorrow.
+
+Can't you use raw clone() and just have a super dirty thread that shares
+a single page mapping and nothing else? Poll on the pidfd of the parent
+and the fork_event fd, quit on the former, and ++ on the latter.
+
+> >> 2) A way to notify larger applications (think Java here) that a system
+> >> is going to be suspended soon so it can wipe PII before it gets cloned
+> >> for example.
+> > Suspension, like S3 power notification stuff? Talk to Rafael about that;
+> 
+> 
+> Whether you go running -> S3 -> clone or you go running -> paused -> 
+> clone is an implementation detail I'm not terribly worried about. Users 
+> can do either, because on both cases the VM is in paused state.
+
+Ahh, I see.
+https://lore.kernel.org/lkml/20220501123849.3858-1-Jason@zx2c4.com/
+might interest you.
+
+Jason
