@@ -2,43 +2,27 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4660AC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 16:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEE1C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 16:51:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386145AbiEBQPo (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 12:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57856 "EHLO
+        id S240158AbiEBQy4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 12:54:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386111AbiEBQPl (ORCPT
+        with ESMTP id S234379AbiEBQyw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 May 2022 12:15:41 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD9EBC93;
-        Mon,  2 May 2022 09:12:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 27141B8187D;
-        Mon,  2 May 2022 16:12:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAA36C385A4;
-        Mon,  2 May 2022 16:12:08 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZTIUL47t"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651507927;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JthCT2QbwaNt2DB/F/sxRyKukGJ0r6w86ZPxmmA4K2I=;
-        b=ZTIUL47tvZtuvCUjjZMxKFfCRkY8sopVe/HQ8NTwyO2noS3cv31HHMJV6NvUrCSpQ5dHy8
-        EjGU0nc0qviHQVdS3wDIY9FPoGDdY52b6Axrn3EkE76PlJx6kWhx1v6LPgD05WgaAxEkV+
-        YSxaN3oHZ8Khpp6ZW3HdGY+r4UpC91k=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d724f6c4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 2 May 2022 16:12:06 +0000 (UTC)
-Date:   Mon, 2 May 2022 18:12:03 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Lennart Poettering <mzxreary@0pointer.de>
+        Mon, 2 May 2022 12:54:52 -0400
+Received: from gardel.0pointer.net (gardel.0pointer.net [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437436245;
+        Mon,  2 May 2022 09:51:22 -0700 (PDT)
+Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
+        by gardel.0pointer.net (Postfix) with ESMTP id A92E1E804AA;
+        Mon,  2 May 2022 18:51:19 +0200 (CEST)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+        id 50F04160011; Mon,  2 May 2022 18:51:19 +0200 (CEST)
+Date:   Mon, 2 May 2022 18:51:19 +0200
+From:   Lennart Poettering <mzxreary@0pointer.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -48,46 +32,62 @@ Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Torben Hansen <htorben@amazon.co.uk>,
         Jann Horn <jannh@google.com>
 Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-Message-ID: <YnAC00VtU8MGb7vO@zx2c4.com>
+Message-ID: <YnAMBzhcJhGR5XOK@gardel-login>
 References: <20220502140602.130373-1-Jason@zx2c4.com>
  <20220502140602.130373-2-Jason@zx2c4.com>
  <Ym/7UlgQ5VjjC76P@gardel-login>
+ <YnAC00VtU8MGb7vO@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Ym/7UlgQ5VjjC76P@gardel-login>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YnAC00VtU8MGb7vO@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 02, 2022 at 05:40:02PM +0200, Lennart Poettering wrote:
-> On Mo, 02.05.22 16:06, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
-> 
-> > In order to inform userspace of virtual machine forks, this commit adds
-> > a "fork_event" sysctl, which does not return any data, but allows
-> > userspace processes to poll() on it for notification of VM forks.
+On Mo, 02.05.22 18:12, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
+
+> > > In order to inform userspace of virtual machine forks, this commit adds
+> > > a "fork_event" sysctl, which does not return any data, but allows
+> > > userspace processes to poll() on it for notification of VM forks.
+> > >
+> > > It avoids exposing the actual vmgenid from the hypervisor to userspace,
+> > > in case there is any randomness value in keeping it secret. Rather,
+> > > userspace is expected to simply use getrandom() if it wants a fresh
+> > > value.
 > >
-> > It avoids exposing the actual vmgenid from the hypervisor to userspace,
-> > in case there is any randomness value in keeping it secret. Rather,
-> > userspace is expected to simply use getrandom() if it wants a fresh
-> > value.
-> 
-> Wouldn't it make sense to expose a monotonic 64bit counter of detected
-> VM forks since boot through read()? It might be interesting to know
-> for userspace how many forks it missed the fork events for. Moreover it
-> might be interesting to userspace to know if any fork happened so far
-> *at* *all*, by checking if the counter is non-zero.
+> > Wouldn't it make sense to expose a monotonic 64bit counter of detected
+> > VM forks since boot through read()? It might be interesting to know
+> > for userspace how many forks it missed the fork events for. Moreover it
+> > might be interesting to userspace to know if any fork happened so far
+> > *at* *all*, by checking if the counter is non-zero.
+>
+> "Might be interesting" is different from "definitely useful". I'm not
+> going to add this without a clear use case. This feature is pretty
+> narrowly scoped in its objectives right now, and I intend to keep it
+> that way if possible.
 
-"Might be interesting" is different from "definitely useful". I'm not
-going to add this without a clear use case. This feature is pretty
-narrowly scoped in its objectives right now, and I intend to keep it
-that way if possible. (And yes, I realize that is likely considerably
-different from your development philosophy.)
+Sure, whatever. I mean, if you think it's preferable to have 3 API
+abstractions for the same concept each for it's special usecase, then
+that's certainly one way to do things. I personally would try to
+figure out a modicum of generalization for things like this. But maybe
+that' just me…
 
-> 
-> (Ideally that counter file would even be mmapable...)
+I can just tell you, that in systemd we'd have a usecase for consuming
+such a generation counter: we try to provide stable MAC addresses for
+synthetic network interfaces managed by networkd, so we hash them from
+/etc/machine-id, but otoh people also want them to change when they
+clone their VMs. We could very nicely solve this if we had a
+generation counter easily accessible from userspace, that starts at 0
+initially. Because then we can hash as we always did when the counter
+is zero, but otherwise use something else, possibly hashed from the
+generation counter.
 
-You missed the last year of discussion about this and why we have wound
-up here as a first step. Check the archives for extensive discussion.
+But anyway, I understand you are not interested in
+generalization/other usecases, so I'll shut up.
 
-Jason
+Lennart
+
+--
+Lennart Poettering, Berlin
