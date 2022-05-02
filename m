@@ -2,77 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E12C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 18:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BEEC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 18:56:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242301AbiEBSuP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 14:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58342 "EHLO
+        id S1379034AbiEBS74 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 14:59:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242074AbiEBSuO (ORCPT
+        with ESMTP id S229819AbiEBS7z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 May 2022 14:50:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894B6BE04;
-        Mon,  2 May 2022 11:46:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C175614A5;
-        Mon,  2 May 2022 18:46:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CB9BC385AC;
-        Mon,  2 May 2022 18:46:43 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pc08Ys26"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651517201;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=pCPz9yDQbtceEsLuC3rMNC0OSyPzfVOMTuOAVe0IAaI=;
-        b=pc08Ys26CvQoChqk5TWzKuQrrCDplm9XM18Nz3iWgufCENImlQUhBGLML2o/lPWGKcqYPq
-        FJaivNTJI9lFFR3MbAQtaedId3uE4WGZg6GClWGiJ/kezmvk29n1zwnUXHv3rFFia4wCQ2
-        wO6oFUr7D6SKvUb91cXB4A6GqTSopfo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fcb55f61 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 2 May 2022 18:46:41 +0000 (UTC)
-Date:   Mon, 2 May 2022 20:46:34 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Lennart Poettering <mzxreary@0pointer.de>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Mon, 2 May 2022 14:59:55 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B6F6467;
+        Mon,  2 May 2022 11:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1651517787; x=1683053787;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UMiyoG0ljnS/EC6Y22bluwsxc6Ze9Gq2jEIDZbxhJDU=;
+  b=nCN1RDH8E9s5AHXTaUhuWNHdpQChqDztxRvuOEpwrPs5F7pY+A7CUeI1
+   8Qp/SRE5BuOUdXYofijPhfQdol4Mw/ZfvTMzVtlG3mNwdQVUIwZ6a/U2M
+   0ehANNJoS9SHHhRjM2IsApRttYbXGnlSP5aT54SuTKpI3pW3luARciNkx
+   0=;
+X-IronPort-AV: E=Sophos;i="5.91,193,1647302400"; 
+   d="scan'208";a="84712483"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-92ba9394.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP; 02 May 2022 18:56:12 +0000
+Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2a-92ba9394.us-west-2.amazon.com (Postfix) with ESMTPS id 3475341C84;
+        Mon,  2 May 2022 18:56:11 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Mon, 2 May 2022 18:56:10 +0000
+Received: from [0.0.0.0] (10.43.160.83) by EX13D20UWC001.ant.amazon.com
+ (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Mon, 2 May
+ 2022 18:56:08 +0000
+Message-ID: <cef2694f-d6cc-70e0-1d31-0c9dbd038ce2@amazon.com>
+Date:   Mon, 2 May 2022 20:56:05 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+CC:     Lennart Poettering <mzxreary@0pointer.de>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Theodore Ts'o <tytso@mit.edu>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
+        "Colm MacCarthaigh" <colmmacc@amazon.com>,
         Torben Hansen <htorben@amazon.co.uk>,
         Jann Horn <jannh@google.com>,
         "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-Message-ID: <YnAnCgxmPBrMdKt5@zx2c4.com>
 References: <20220502140602.130373-1-Jason@zx2c4.com>
- <20220502140602.130373-2-Jason@zx2c4.com>
- <Ym/7UlgQ5VjjC76P@gardel-login>
- <YnAC00VtU8MGb7vO@zx2c4.com>
- <YnAMBzhcJhGR5XOK@gardel-login>
+ <20220502140602.130373-2-Jason@zx2c4.com> <Ym/7UlgQ5VjjC76P@gardel-login>
+ <YnAC00VtU8MGb7vO@zx2c4.com> <YnAMBzhcJhGR5XOK@gardel-login>
  <YnAc4hwPyByF4kZ5@zx2c4.com>
  <480469e6-0eb0-8d76-0b8d-111579e73701@amazon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <480469e6-0eb0-8d76-0b8d-111579e73701@amazon.com>
+ <YnAnCgxmPBrMdKt5@zx2c4.com>
+From:   Alexander Graf <graf@amazon.com>
+In-Reply-To: <YnAnCgxmPBrMdKt5@zx2c4.com>
+X-Originating-IP: [10.43.160.83]
+X-ClientProxiedBy: EX13D20UWC003.ant.amazon.com (10.43.162.18) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 02, 2022 at 08:34:38PM +0200, Alexander Graf wrote:
-> Michael, since we already changed the CID in the spec, can we add a 
-> property to the device that indicates the first 4 bytes of the UUID will 
-> always be different between parent and child?
-> 
-> That should give us the ability to mmap the vmgenid directly to user 
-> space and act based on a simple u32 compare for clone notification, no?
+Ck9uIDAyLjA1LjIyIDIwOjQ2LCBKYXNvbiBBLiBEb25lbmZlbGQgd3JvdGU6Cj4gT24gTW9uLCBN
+YXkgMDIsIDIwMjIgYXQgMDg6MzQ6MzhQTSArMDIwMCwgQWxleGFuZGVyIEdyYWYgd3JvdGU6Cj4+
+IE1pY2hhZWwsIHNpbmNlIHdlIGFscmVhZHkgY2hhbmdlZCB0aGUgQ0lEIGluIHRoZSBzcGVjLCBj
+YW4gd2UgYWRkIGEKPj4gcHJvcGVydHkgdG8gdGhlIGRldmljZSB0aGF0IGluZGljYXRlcyB0aGUg
+Zmlyc3QgNCBieXRlcyBvZiB0aGUgVVVJRCB3aWxsCj4+IGFsd2F5cyBiZSBkaWZmZXJlbnQgYmV0
+d2VlbiBwYXJlbnQgYW5kIGNoaWxkPwo+Pgo+PiBUaGF0IHNob3VsZCBnaXZlIHVzIHRoZSBhYmls
+aXR5IHRvIG1tYXAgdGhlIHZtZ2VuaWQgZGlyZWN0bHkgdG8gdXNlcgo+PiBzcGFjZSBhbmQgYWN0
+IGJhc2VkIG9uIGEgc2ltcGxlIHUzMiBjb21wYXJlIGZvciBjbG9uZSBub3RpZmljYXRpb24sIG5v
+Pwo+IFRoYXQgaXMgbm90IGEgZ29vZCBpZGVhLiBXZSB3YW50IGFuIF9hZGRpdGlvbmFsXyA0IGJ5
+dGVzLCBzbyB0aGF0IHdlIGNhbgo+IGtlZXAgdGhlIGZpcnN0IDE2IGJ5dGVzICgxMjggYml0cykg
+YXMgYSBrZXJuZWwgc3BhY2Ugc2VjcmV0LgoKCkFuIGFkZGl0aW9uYWwgNCBieXRlcyB3b3VsZCBi
+ZSBhbiBhZGRpdGlvbmFsIDRrYiAob3IgNjRrYiBvbiBBUk0pIHBhZ2UuIApEbyB3ZSByZWFsbHkg
+cmVseSBvbiB0aGVzZSAxNiBieXRlcyB0byByZXNlZWQgYWZ0ZXIgY2xvbmU/IElmIHNvLCB3ZSdk
+IApuZWVkIHRvIGJpdGUgdGhlIGJ1bGxldCBhbmQgcHJvdmlkZSBhbiBhZGRpdGlvbmFsIHBhZ2Us
+IHllcy4KCgpBbGV4CgoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdtYkgK
+S3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0aWFu
+IFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hh
+cmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4
+OSAyMzcgODc5CgoK
 
-That is not a good idea. We want an _additional_ 4 bytes, so that we can
-keep the first 16 bytes (128 bits) as a kernel space secret.
-
-Jason
