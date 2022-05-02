@@ -2,81 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 932C0C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 09:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDCFC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 09:41:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384251AbiEBJl0 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 05:41:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41972 "EHLO
+        id S232437AbiEBJo2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 05:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384260AbiEBJlR (ORCPT
+        with ESMTP id S1384402AbiEBJn6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 May 2022 05:41:17 -0400
+        Mon, 2 May 2022 05:43:58 -0400
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4C515A22;
-        Mon,  2 May 2022 02:37:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A03A111D;
+        Mon,  2 May 2022 02:40:30 -0700 (PDT)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1651484267;
+        s=2020; t=1651484429;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bQykcMLoo3whmre75eemO2BA9Si3o9mNKcRIijtvUfk=;
-        b=XBdjfKe1Dkrz1xS4lgbxg4+Xdi9FHfpQWtUHVGsy+kluZqlqT5HZ34j07EpaeTp6Nuoz4A
-        7JN3rh8M87SxPSIMTNlEsEBEB0sFMp893gzxSswdwVWAO4EdASuIxNMtYSiAqEIllm5MmK
-        gxJMraMEpJ+N08aJagDo6zZB0xfsE6yTxAyR2yvbp/iMrGay8rvkO8zo5IEctDWTSgwFVn
-        0XNXVRTetdkyle6WknpSNIXALp1DO7LvKWKHT+oRLzQDtPNLWyqWKqlr2POgteln6/o0fU
-        F7/lLdfFi2fY442kwsD0EkowbQr7KaYER/bqp/R/Qk6Oa2kCbKweNpOTF30keg==
+        bh=jYGGwnXeFPcIOHQmhzSCBgH4HMwEO9aRAXTxvIySbxU=;
+        b=xRWWMcx6q1hFZvKKcNEOiGEFpsCUiKlY3VDrrJdA8NHIq54CXy7UgGxYIgzdrLUKPVauf0
+        WSQlkGf1n6FdJbu4X74JyfeuhB9d+ZwAQNEmSxp1+MyX+kkH3q6zKnRPbOXiXjYoth8uDD
+        sAV576M4VAGOoMYcjo1+6PVJVxCvHQQjHZRYBES853/sY3GVU3pFSbI3f72cKVIgGsmGDn
+        mMFdpXX/e5b6df01EgTZSHHQ8LHWsWKsp2Az2u5dChqNNJqNiJQOLKM/DTSUJGZvrooQgX
+        9Xr8hWfvLEUOC5/+pUe9Sso7X7doWNQiKXxg4xKte2TWxeElwlW3ZCQBQout0Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1651484267;
+        s=2020e; t=1651484429;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bQykcMLoo3whmre75eemO2BA9Si3o9mNKcRIijtvUfk=;
-        b=LY1K/DPFg7Mos6VSpKHVS2booc8Iw7choSEnDW2iiCcxWF2qLPVcST9n1fhHDocoNcuJZw
-        XgOMvnVhGCvCepBg==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        arnd@arndb.de, Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH v6 06/17] timekeeping: add raw clock fallback for
- random_get_entropy()
-In-Reply-To: <YmageFiSs0h1jzS7@zx2c4.com>
-References: <20220423212623.1957011-1-Jason@zx2c4.com>
- <20220423212623.1957011-7-Jason@zx2c4.com> <87y1zt1gqw.ffs@tglx>
- <YmageFiSs0h1jzS7@zx2c4.com>
-Date:   Mon, 02 May 2022 11:37:46 +0200
-Message-ID: <87y1zkmg0l.ffs@tglx>
+        bh=jYGGwnXeFPcIOHQmhzSCBgH4HMwEO9aRAXTxvIySbxU=;
+        b=dOSkoFARma2uJzbg6ynhp4U13J6hLMTQeSZWPMHb9PQQCFgpLOuL3PitpqCpKJt9Ievkw+
+        VKQ03GE9hEn4MmBw==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        bp@alien8.de
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Arnd Bergmann <arnd@arndb.de>, x86@kernel.org
+Subject: Re: [PATCH v7 13/17] x86/asm: use fallback for random_get_entropy()
+ instead of zero
+In-Reply-To: <20220426083301.816458-1-Jason@zx2c4.com>
+References: <YmbZZwXxaC+S863+@zx2c4.com>
+ <20220426083301.816458-1-Jason@zx2c4.com>
+Date:   Mon, 02 May 2022 11:40:28 +0200
+Message-ID: <87v8uomfw3.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 25 2022 at 15:22, Jason A. Donenfeld wrote:
-> On Mon, Apr 25, 2022 at 02:37:11PM +0200, Thomas Gleixner wrote:
->> On Sat, Apr 23 2022 at 23:26, Jason A. Donenfeld wrote:
->> >
->> > Cc: Thomas Gleixner <tglx@linutronix.de>
->> > Cc: Arnd Bergmann <arnd@arndb.de>
->> > Cc: Theodore Ts'o <tytso@mit.edu>
->> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->> 
->> Not that I care much, but in general taking over authorship w/o
->> attribution via Suggested-by or such is frowned upon.
+On Tue, Apr 26 2022 at 10:33, Jason A. Donenfeld wrote:
+
+Subject: x86/tsc: Use .....
+
+This has absolutely nothing to do with ASM and the sentence after the
+colon starts with an uppercase letter.
+
+> In the event that random_get_entropy() can't access a cycle counter or
+> similar, falling back to returning 0 is suboptimal. Instead, fallback
+> to calling random_get_entropy_fallback(), which isn't extremely high
+> precision or guaranteed to be entropic, but is certainly better than
+> returning zero all the time.
 >
-> Sorry about that. Usually I'm pretty good about adding those. I guess
-> something must have gotten lost this time through, as the v1 of this
-> started out using sched_clock() (Arnd's suggestion) and then moved to
-> using the raw ktime clock after your suggestion, and I missed the
-> Suggested-by. I'll add that. Meanwhile, do you want to Ack this patch?
-> Do the technical aspects look okay to you?
+> If CONFIG_X86_TSC=n, then it's possible for the kernel to run on systems
+> without RDTSC, such as 486 and certain 586, so the fallback code is only
+> required for that case.
+>
+> As well, fix up both the new function and the get_cycles() function from
+> which it was derived to use cpu_feature_enabled() rather than
+> boot_cpu_has(), and use !IS_ENABLED() instead of #ifndef.
+>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: x86@kernel.org
 
-Yes. Please fix the subject line:
+Same comments vs. Cc's
 
-     timekeeping: Add raw clock fallback for random_get_entropy()
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v6->v7:
+> - Adjust commit subject and body to match tip commit style.
 
-and stick the Cc's below the SOB, so it conforms with the TIP tree
-rules. Other than that:
+Mostly ... :)
+
+With that fixed:
 
 Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
