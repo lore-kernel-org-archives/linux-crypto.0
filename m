@@ -2,84 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD95C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 20:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C756C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 20:19:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241316AbiEBUPY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 16:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
+        id S1387282AbiEBUXM (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 16:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232411AbiEBUPX (ORCPT
+        with ESMTP id S1352110AbiEBUXM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 May 2022 16:15:23 -0400
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1B67647;
-        Mon,  2 May 2022 13:11:54 -0700 (PDT)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-e9027efe6aso15306516fac.10;
-        Mon, 02 May 2022 13:11:54 -0700 (PDT)
+        Mon, 2 May 2022 16:23:12 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4959EDF21
+        for <linux-crypto@vger.kernel.org>; Mon,  2 May 2022 13:19:41 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id i5so20855799wrc.13
+        for <linux-crypto@vger.kernel.org>; Mon, 02 May 2022 13:19:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gHQq/HbsAlHHV5dqqwIj84YLck22Yu9PAMCyZC7DDlg=;
+        b=LhY6QwHdTM8sO/y2wOJB+t3eHiBsNzak+h83Hp4m1J1hvq8ai83m8COBHL6j7pk4++
+         lUxqqs0i53dp7mv9Lwl9FGd6WdMFi+W2ao0Arx56y6kr8ZwBcqYVwkFvIZ1JM3zrVPx9
+         NXgwPejXSwFqFXpyvn38xsn0QiDAYpQkc8+O/3q8Sf+Vg4LOzjQyppokaset9TCI9WXy
+         99PTZiBAsrye6OPHbuW28pUBewwxLmxHAfdnIMUUWNiZOJPHoBD+9zdtMpPBy1wpge9D
+         clJEPuF8TPSHJePDPmKXWasUEVE8i5rTDXSXSJeNTy3HG+tz3IgDe8BeZOaEf58D6AWm
+         5BIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=iFucsA5Ez9eKEIIJxclpF6rEOIC5QyDejdPoOT0zWNw=;
-        b=jd6nBI5elW5VX3iGDVuMQ3qtAGUpr34tjJuSaJEbo7wJwEljrI/DGFCql39QnMXVub
-         pIXiabt051CjQ/FpRyFyzXG3nhZhEFX710qnSlP3Vm0TbuHnepYjxVRZZVAhO0m5LNv2
-         F22RGNtw9qMVPM+EcCuM1H+velm5CJ5+XueovDR4+/Fb3ZE3W7AEAi8naAMdSWohD4wC
-         tFS5p4m3/GZNk5PELwGFVZfZ8FvWBa/VV4FowNUSBYHicV/ngdl7geeRhyQqw98mLhjH
-         WvOcELEGQWAcMEywlOjzW5e8NUDmdRwnhnxkNnoyHiFa+98lo4+s1kKXwo21rj7+EQtD
-         9EyQ==
-X-Gm-Message-State: AOAM533Z16nVAhRWFVPPqSxh/ITeGX4ADsQIoRAhCRS4otR5nOx4ukrd
-        SbcJLfR+7/htfzfnizenIg==
-X-Google-Smtp-Source: ABdhPJzJQcZp2FqEi2/8eefqdINc5i65zvwbNYjQqC/1tVbA3fFDU4sX5q2bmYR9PaLVnGwIj0xRQg==
-X-Received: by 2002:a05:6870:d785:b0:d2:823a:94df with SMTP id bd5-20020a056870d78500b000d2823a94dfmr375395oab.93.1651522313182;
-        Mon, 02 May 2022 13:11:53 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id m63-20020aca5842000000b00325cda1ff9esm2696562oib.29.2022.05.02.13.11.52
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gHQq/HbsAlHHV5dqqwIj84YLck22Yu9PAMCyZC7DDlg=;
+        b=mTgj4ttpCw6pIkskoDDgYNO/BcqRKhZAxjDBXprYri6Ot2KGtMeUyZfxSaUzjq3HNm
+         PxJRnTkwyPPDG6IpJNQDJSxSuS9R0tRf5lVmgo1eWg/36dTW/eTdui/J/Sz930soBH7e
+         sn5uwGqRLSegZkE7WqPmNU4OBM5zNJwkA4grHdo5LVrGJr0+1ykach8NkJGz63B2i/ed
+         eySqvm1M2VEs0wElT58cw+4kT+eeQqUiLWUig0Ak8KoZrw1J+nEXJitOJ2BJLgmV3aze
+         NYacGLQYq1U2OOoOYx5YRQF+wqT5GiqgyNvLaeeEtwOUZnpHE4U++grvnjYtIvYzQodY
+         kEgg==
+X-Gm-Message-State: AOAM531naS8xlIZUru0NeuE447+A64OjBFyi33xIXa/2/R8Ye2zJQI8B
+        USv4xVGk7ggu2G8jFvbjTH9/kA==
+X-Google-Smtp-Source: ABdhPJyE44hLvQer5Bbx+kYLVwMvd9SshPAUhOsXy+EXdn+wzgYlCJsdPJrr9y/rc/y9ZXR2/xn2ow==
+X-Received: by 2002:adf:d1c9:0:b0:203:c4f8:dd17 with SMTP id b9-20020adfd1c9000000b00203c4f8dd17mr10464782wrd.633.1651522779746;
+        Mon, 02 May 2022 13:19:39 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.googlemail.com with ESMTPSA id l2-20020adfb102000000b0020c547f75easm7238183wra.101.2022.05.02.13.19.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 13:11:52 -0700 (PDT)
-Received: (nullmailer pid 1658903 invoked by uid 1000);
-        Mon, 02 May 2022 20:11:51 -0000
-Date:   Mon, 2 May 2022 15:11:50 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Ludovic Desroches <ludovic.desroches@microchip.com>,
-        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>
-Subject: Re: [PATCH] crypto: atmel-sha204a: Add support for ATSHA204
- cryptochip
-Message-ID: <YnA7BvqB3Y5E8O8m@robh.at.kernel.org>
-References: <20220421134457.5867-1-pali@kernel.org>
+        Mon, 02 May 2022 13:19:39 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
+        samuel@sholland.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v2 00/19] crypto: allwinner: lots of fixes
+Date:   Mon,  2 May 2022 20:19:10 +0000
+Message-Id: <20220502201929.843194-1-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220421134457.5867-1-pali@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 21 Apr 2022 15:44:57 +0200, Pali Rohár wrote:
-> ATSHA204 is predecessor of ATSHA204A which supports less features and some
-> of them are slightly different.
-> 
-> Introduce a new compatible string for ATSHA204 cryptochip "atmel,atsha204".
-> 
-> Current version of Linux kernel driver atmel-sha204a.c implements only hw
-> random number generator which is same in both ATSHA204 and ATSHA204A
-> cryptochips. So driver already supports also ATSHA204 hw generator, so just
-> simply extends list of compatible strings.
-> 
-> Signed-off-by: Pali Rohár <pali@kernel.org>
-> ---
->  Documentation/devicetree/bindings/trivial-devices.yaml | 4 +++-
->  drivers/crypto/atmel-sha204a.c                         | 2 ++
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
+Hello
 
-Acked-by: Rob Herring <robh@kernel.org>
+This series is all fixes which I found on allwinner crypto drivers.
+
+Regards
+
+Change since v1:
+- fixed endianess of hash_pad() paramaters
+
+Corentin Labbe (19):
+  crypto: sun8i-ce: Fix minor style issue
+  crypto: sun8i-ce: do not allocate memory when handling requests
+  crypto: sun4i-ss: do not allocate backup IV on requests
+  crypto: sun8i-ss: rework handling of IV
+  crypto: sun8i-ss: handle zero sized sg
+  crypto: sun8i-ss: remove redundant test
+  crypto: sun8i-ss: test error before assigning
+  crypto: sun8i-ss: use sg_nents_for_len
+  crypto: sun8i-ss: do not allocate memory when handling hash requests
+  crypto: sun8i-ss: do not zeroize all pad
+  crypto: sun8i-ss: handle requests if last block is not modulo 64
+  crypto: sun8i-ss: rework debugging
+  crypto: sun8i-ss: Add function for handling hash padding
+  crypto: sun8i-ss: add hmac(sha1)
+  crypto: sun8i-ss: do not fallback if cryptlen is less than sg length
+  crypto: sun8i-ce: Add function for handling hash padding
+  crypto: sun8i-ce: use sg_nents_for_len
+  crypto: sun8i-ce: rework debugging
+  crypto: sun8i-ce: do not fallback if cryptlen is less than sg length
+
+ .../allwinner/sun4i-ss/sun4i-ss-cipher.c      |  22 +-
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h  |   1 +
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 102 +++--
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  54 ++-
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 130 ++++--
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  19 +-
+ .../allwinner/sun8i-ss/sun8i-ss-cipher.c      | 180 +++++---
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |  92 ++++-
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 385 +++++++++++++++---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h  |  33 +-
+ 10 files changed, 767 insertions(+), 251 deletions(-)
+
+-- 
+2.35.1
+
