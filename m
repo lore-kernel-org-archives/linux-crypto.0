@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9D1C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 20:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECBB9C4332F
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 May 2022 20:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234035AbiEBUZo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 May 2022 16:25:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49652 "EHLO
+        id S244903AbiEBUZq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 2 May 2022 16:25:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387385AbiEBUXo (ORCPT
+        with ESMTP id S1387397AbiEBUXo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 2 May 2022 16:23:44 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A431DF45
-        for <linux-crypto@vger.kernel.org>; Mon,  2 May 2022 13:19:55 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id k2so20880931wrd.5
-        for <linux-crypto@vger.kernel.org>; Mon, 02 May 2022 13:19:55 -0700 (PDT)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EF31DFA7
+        for <linux-crypto@vger.kernel.org>; Mon,  2 May 2022 13:19:57 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id r1-20020a1c2b01000000b00394398c5d51so203118wmr.2
+        for <linux-crypto@vger.kernel.org>; Mon, 02 May 2022 13:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Ev6VkzNd8mWajKtgoY5TumXP3duJOCaOdR600zP4Pxg=;
-        b=Z/Lw+lnGWpcXrOZnRWxKzRVo+wFU5ra06ZgxPTSqzBJpOHO4n17m7KTCr4Sx3BrL+d
-         tJ57TKr6ykabxjkBF0k95jGnlLgO1av4r8iBkp3STLbzb9iT+UfIrgGyrgUPtghKuxeM
-         cBVI9as/TkxdOWs8UzlsbA1XGJ/NcA1zOvtFS3pqwr3aEE+UL251CJj0EsOKuLrMBWG4
-         gH7ALbq1LlnlN0yVou8nVSpuXgc1U7JbrSdO9UHSVqQMN9aVtp3cw9NLqnrhafg2xsfa
-         81Vz0of/NRXBdhbmufz0cZGNGHSvp+3MwmlYtsTq3GibiaRiMBRMcJKp/Uu2HUf5dDl1
-         UjVw==
+        bh=oIeqhKRxF0U5tRj3NnGKzyz6xK4sM71zOrP1ZT9hTbY=;
+        b=yvV6JIXPcOiaU2VTjW9zgzCvbarMzyhovA3J1IuLDT2IK5eyTD5UzGBCyc1mI9WcSZ
+         /mtXCmy9KKa09MqJv1z8LFluLsUy7nlpVjts9/swVbgAV5BWxE4HZxnlTeBwoUjP90PV
+         ZsEbyzJCwn91d99oL5k/uSWNuKGca3J81nJUb4o9/tKBbrb8oMAEV2ZL0sBwOjfj0lVa
+         rAGHSAX1pdd/C8Q94q427LmmkPPBNwoe/jEiM7sh32JkojixN9VLb1KzmfnaOHFbMbgn
+         9KiAWwAHOvMCn5bM+AageKYsNM/JGHty4SUUSqrB1eoF5206muMHWB3ROgpTzxRm6iu7
+         5Hlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Ev6VkzNd8mWajKtgoY5TumXP3duJOCaOdR600zP4Pxg=;
-        b=XNluOhOmXuP/i7bCB7xtz/kxDzZV/gwjJY6XPZ/TtppZ76Xa9cVutIwE+t9hYD6me8
-         RXfaoqV0UpUgpU0BOTOUfp/FGZqinxJRMFbSHb3KpXJtzVeDHUfp/j4Gil06C8C7XXxl
-         X/8oHSPszMgfYoBRbSzrIFFNDrJ9RF65/FlKoRFc1aID5GCbCUS3PUdMt+crVnpXOwVw
-         jJHJKAx5GyJa2VuBHobzIuP8VrSrs0/dn+fFwyuVWCv76iBGovnTyLyhufsAuBijBiMd
-         YDGDFAKy/ssQ8Chviw/xnEs0SDtbTEQhWTp+4WKW4Ik7fa60uJvtDJtsmr6YSgLbAf3O
-         3UMg==
-X-Gm-Message-State: AOAM532EFqWUCQEZwiWmzgTgO9JrxxqaJap9fUxFpWW2Kf3A4oYNfWsv
-        IoVs8x/tRJJUn5307RlmJP2lCw==
-X-Google-Smtp-Source: ABdhPJyemTLSgoak6z+//F8uVgKbFZkCNOJ7AMgwijmSMkhH9eOY/9nZNrRffO5kHMaJB0L+fasVjA==
-X-Received: by 2002:adf:d1c9:0:b0:203:c4f8:dd17 with SMTP id b9-20020adfd1c9000000b00203c4f8dd17mr10465301wrd.633.1651522793740;
-        Mon, 02 May 2022 13:19:53 -0700 (PDT)
+        bh=oIeqhKRxF0U5tRj3NnGKzyz6xK4sM71zOrP1ZT9hTbY=;
+        b=kViMkM86LlZc6vHvTgS+EI7OzNr3Tyt2Nyz7izo8Sx/00as5KmDS1cOzg08aYmRVHp
+         Zc89qX1hVIHNQ+d+zHtTmEW9VzWwq+6VJCMiS91hY9EvXYcfFicDJWqlehb5dvhnmQzi
+         r51QQsB3GoAtDACiqyiDb/N7tluVfYt3hFZA6M4FsFsXCKV6gEDwT0WR03EjdxYbhzED
+         UYCCeR/bWu+CT3l+vvhV7WAc838ODdJuSpu4Ai05YP3xF9d3L1jjp2SWbYK1DQTCrhvi
+         BBHPmQUkZDsS+bCk7zXlroD3G0/HrmIvvHziTncoR2W8UZ9VS7GssJJBE5LSbgzLMpwR
+         dWmQ==
+X-Gm-Message-State: AOAM531qM4KumCwo+UVh7x6rMFPqXONleSl1JBJW98VbGzGhd5nfXTCH
+        bJa0LYyzsRv8eOYNWYdPYP66vg==
+X-Google-Smtp-Source: ABdhPJzKNGeALqIKJ177u6e7uPs+Fezgg1LY8eg9s30A9Ei0ycHJlgHW13RpuwO//tLsJDHW3V2dUQ==
+X-Received: by 2002:a05:600c:35c5:b0:390:9982:73ec with SMTP id r5-20020a05600c35c500b00390998273ecmr583242wmq.196.1651522795957;
+        Mon, 02 May 2022 13:19:55 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id l2-20020adfb102000000b0020c547f75easm7238183wra.101.2022.05.02.13.19.52
+        by smtp.googlemail.com with ESMTPSA id l2-20020adfb102000000b0020c547f75easm7238183wra.101.2022.05.02.13.19.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 13:19:53 -0700 (PDT)
+        Mon, 02 May 2022 13:19:55 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     herbert@gondor.apana.org.au, jernej.skrabec@gmail.com,
         samuel@sholland.org, wens@csie.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 13/19] crypto: sun8i-ss: Add function for handling hash padding
-Date:   Mon,  2 May 2022 20:19:23 +0000
-Message-Id: <20220502201929.843194-14-clabbe@baylibre.com>
+Subject: [PATCH v2 15/19] crypto: sun8i-ss: do not fallback if cryptlen is less than sg length
+Date:   Mon,  2 May 2022 20:19:25 +0000
+Message-Id: <20220502201929.843194-16-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220502201929.843194-1-clabbe@baylibre.com>
 References: <20220502201929.843194-1-clabbe@baylibre.com>
@@ -66,135 +66,72 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move all padding work to a dedicated function.
+The sg length could be more than remaining data on it.
+So check the length requirement against the minimum between those two
+values.
 
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- .../crypto/allwinner/sun8i-ss/sun8i-ss-hash.c | 87 ++++++++++++++-----
- 1 file changed, 65 insertions(+), 22 deletions(-)
+ .../allwinner/sun8i-ss/sun8i-ss-cipher.c      | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-index cb510ec21ec4..0db1e8253667 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c
-@@ -328,6 +328,64 @@ int sun8i_ss_hash_digest(struct ahash_request *areq)
- 	return crypto_transfer_hash_request_to_engine(engine, areq);
- }
- 
-+static u64 hash_pad(__le32 *buf, unsigned int bufsize, u64 padi, u64 byte_count, bool le, int bs)
-+{
-+	u64 fill, min_fill, j, k;
-+	__be64 *bebits;
-+	__le64 *lebits;
-+
-+	j = padi;
-+	buf[j++] = cpu_to_le32(0x80);
-+
-+	if (bs == 64) {
-+		fill = 64 - (byte_count % 64);
-+		min_fill = 2 * sizeof(u32) + sizeof(u32);
-+	} else {
-+		fill = 128 - (byte_count % 128);
-+		min_fill = 4 * sizeof(u32) + sizeof(u32);
-+	}
-+
-+	if (fill < min_fill)
-+		fill += bs;
-+
-+	k = j;
-+	j += (fill - min_fill) / sizeof(u32);
-+	if (j * 4 > bufsize) {
-+		pr_err("%s OVERFLOW %llu\n", __func__, j);
-+		return 0;
-+	}
-+	for (; k < j; k++)
-+		buf[k] = 0;
-+
-+	if (le) {
-+		/* MD5 */
-+		lebits = (__le64 *)&buf[j];
-+		*lebits = cpu_to_le64(byte_count << 3);
-+		j += 2;
-+	} else {
-+		if (bs == 64) {
-+			/* sha1 sha224 sha256 */
-+			bebits = (__be64 *)&buf[j];
-+			*bebits = cpu_to_be64(byte_count << 3);
-+			j += 2;
-+		} else {
-+			/* sha384 sha512*/
-+			bebits = (__be64 *)&buf[j];
-+			*bebits = cpu_to_be64(byte_count >> 61);
-+			j += 2;
-+			bebits = (__be64 *)&buf[j];
-+			*bebits = cpu_to_be64(byte_count << 3);
-+			j += 2;
-+		}
-+	}
-+	if (j * 4 > bufsize) {
-+		pr_err("%s OVERFLOW %llu\n", __func__, j);
-+		return 0;
-+	}
-+
-+	return j;
-+}
-+
- /* sun8i_ss_hash_run - run an ahash request
-  * Send the data of the request to the SS along with an extra SG with padding
-  */
-@@ -342,11 +400,9 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+index 7f1940c6cc41..5bb950182026 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+@@ -28,6 +28,7 @@ static bool sun8i_ss_need_fallback(struct skcipher_request *areq)
+ 	struct scatterlist *in_sg = areq->src;
+ 	struct scatterlist *out_sg = areq->dst;
  	struct scatterlist *sg;
- 	int nr_sgs, err, digestsize;
- 	unsigned int len;
--	u64 fill, min_fill, byte_count;
-+	u64 byte_count;
- 	void *pad, *result;
- 	int j, i, k, todo;
--	__be64 *bebits;
--	__le64 *lebits;
- 	dma_addr_t addr_res, addr_pad;
- 	__le32 *bf;
++	unsigned int todo, len;
  
-@@ -421,33 +477,20 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
- 		i--;
- 
- 	byte_count = areq->nbytes;
--	bf[j++] = cpu_to_le32(0x80);
--
--	fill = 64 - (byte_count % 64);
--	min_fill = 3 * sizeof(u32);
--
--	if (fill < min_fill)
--		fill += 64;
--
--	k = j;
--	j += (fill - min_fill) / sizeof(u32);
--	for (; k < j; k++)
--		bf[k] = 0;
--
- 	switch (algt->ss_algo_id) {
- 	case SS_ID_HASH_MD5:
--		lebits = (__le64 *)&bf[j];
--		*lebits = cpu_to_le64(byte_count << 3);
--		j += 2;
-+		j = hash_pad(bf, 4096, j, byte_count, true, bs);
- 		break;
- 	case SS_ID_HASH_SHA1:
- 	case SS_ID_HASH_SHA224:
- 	case SS_ID_HASH_SHA256:
--		bebits = (__be64 *)&bf[j];
--		*bebits = cpu_to_be64(byte_count << 3);
--		j += 2;
-+		j = hash_pad(bf, 4096, j, byte_count, false, bs);
- 		break;
+ 	if (areq->cryptlen == 0 || areq->cryptlen % 16) {
+ 		algt->stat_fb_len++;
+@@ -40,13 +41,11 @@ static bool sun8i_ss_need_fallback(struct skcipher_request *areq)
+ 		return true;
  	}
-+	if (!j) {
-+		err = -EINVAL;
-+		goto theend;
-+	}
  
- 	addr_pad = dma_map_single(ss->dev, pad, j * 4, DMA_TO_DEVICE);
- 	if (dma_mapping_error(ss->dev, addr_pad)) {
++	len = areq->cryptlen;
+ 	sg = areq->src;
+ 	while (sg) {
+-		if ((sg->length % 16) != 0) {
+-			algt->stat_fb_sglen++;
+-			return true;
+-		}
+-		if ((sg_dma_len(sg) % 16) != 0) {
++		todo = min(len, sg->length);
++		if ((todo % 16) != 0) {
+ 			algt->stat_fb_sglen++;
+ 			return true;
+ 		}
+@@ -54,15 +53,14 @@ static bool sun8i_ss_need_fallback(struct skcipher_request *areq)
+ 			algt->stat_fb_align++;
+ 			return true;
+ 		}
++		len -= todo;
+ 		sg = sg_next(sg);
+ 	}
++	len = areq->cryptlen;
+ 	sg = areq->dst;
+ 	while (sg) {
+-		if ((sg->length % 16) != 0) {
+-			algt->stat_fb_sglen++;
+-			return true;
+-		}
+-		if ((sg_dma_len(sg) % 16) != 0) {
++		todo = min(len, sg->length);
++		if ((todo % 16) != 0) {
+ 			algt->stat_fb_sglen++;
+ 			return true;
+ 		}
+@@ -70,6 +68,7 @@ static bool sun8i_ss_need_fallback(struct skcipher_request *areq)
+ 			algt->stat_fb_align++;
+ 			return true;
+ 		}
++		len -= todo;
+ 		sg = sg_next(sg);
+ 	}
+ 
 -- 
 2.35.1
 
