@@ -2,101 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB61C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 08:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B852C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 09:09:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232517AbiECId1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 04:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45442 "EHLO
+        id S233274AbiECJMi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 May 2022 05:12:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbiECIdZ (ORCPT
+        with ESMTP id S233268AbiECJMi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 04:33:25 -0400
-Received: from gardel.0pointer.net (gardel.0pointer.net [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37E532058;
-        Tue,  3 May 2022 01:29:52 -0700 (PDT)
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-        by gardel.0pointer.net (Postfix) with ESMTP id 74F43E804AA;
-        Tue,  3 May 2022 10:29:50 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-        id 8B74A160011; Tue,  3 May 2022 10:29:49 +0200 (CEST)
-Date:   Tue, 3 May 2022 10:29:49 +0200
-From:   Lennart Poettering <mzxreary@0pointer.de>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Tue, 3 May 2022 05:12:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F6C3630A;
+        Tue,  3 May 2022 02:09:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3B68CB81AEC;
+        Tue,  3 May 2022 09:09:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBB87C385A4;
+        Tue,  3 May 2022 09:09:02 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="e6u3+++1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651568941;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ue0I8PUx1rbJUB/KOG3KInep7V9GfkJzwoaHuOs78ZA=;
+        b=e6u3+++1dicGbC4FMUGxXv1sAJ5Dx51pF4bRcroG8Ol/m76xse1KpyACM45AXrxe7NCnbe
+        ElPY+LRNOcPNm2/kAcadaPbjuBbHPbWgVMmuutqTmpSK7a3rCIGeqlFoxbWg7eISkB376s
+        fkhAFMOg9eWkoXevaW3S8liCdVITnCc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1d3dfc93 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 3 May 2022 09:09:01 +0000 (UTC)
+Date:   Tue, 3 May 2022 11:08:59 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Lennart Poettering <mzxreary@0pointer.de>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Theodore Ts'o <tytso@mit.edu>,
+        Alexander Graf <graf@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Torben Hansen <htorben@amazon.co.uk>,
         Jann Horn <jannh@google.com>
 Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-Message-ID: <YnDn/d6iB0aUZkWJ@gardel-login>
+Message-ID: <YnDxK/O2E6LUhP/2@zx2c4.com>
 References: <20220502140602.130373-1-Jason@zx2c4.com>
  <20220502140602.130373-2-Jason@zx2c4.com>
  <Ym/7UlgQ5VjjC76P@gardel-login>
  <YnAC00VtU8MGb7vO@zx2c4.com>
  <YnAMBzhcJhGR5XOK@gardel-login>
- <7a1cfd1c-9f0e-f134-e544-83ee6d3cd9c9@amazon.com>
+ <YnAc4hwPyByF4kZ5@zx2c4.com>
+ <YnDc8A+oTxsQs/hq@gardel-login>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a1cfd1c-9f0e-f134-e544-83ee6d3cd9c9@amazon.com>
+In-Reply-To: <YnDc8A+oTxsQs/hq@gardel-login>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mo, 02.05.22 19:59, Alexander Graf (graf@amazon.com) wrote:
+Hey Lennart,
 
-> Lennart, looking at the current sysctl proposal, systemd could poll() on the
-> fork file. It would then be able to generate a /run/fork-id file which it
-> can use for the flow above, right?
+On Tue, May 03, 2022 at 09:42:40AM +0200, Lennart Poettering wrote:
+> For this MAC address usecase it's entirely sufficient to be able to
+> distinguish if the system was closed at all, i.e. if the counter is
+> zero or is non-zero. Because that would already be great for a policy
+> of "hash it in a stable way from /etc/machine-id, if counter == 0" +
+> "use random MAC once counter > 0".
 
-I am not to keen on making sytemd such a proxy. Sounds like something
-the kernel could do on its own, better and resulting in an ultimately
-simpler system...
+Hm, are you sure that's actually what you want? It turns out this
+vmgenid notification from the hypervisor might not be sufficiently
+granular for this use case:
 
-If systemd its the proxy this adds in extra raciness. i.e. in a ideal
-world, if we have some form of notification fd, then it would be great
-if that fd is guaranteed to have POLLIN set and its contents updated
-the instant the clone happened. But if we proxy this through
-userspace, there's necessarily a latency involved that it it takes
-userspace to catch up and effect the POLLIN and updated contents
-towards its client apps.
+- vmgenid changes when you fork a new snapshot, so now you have two VMs
+- vmgenid also changes when you rewind to 2 minutes ago
 
-I understand the underlying VM hypervisor APIs currently are designed
-to always imply some notification latency. Which sucks, but I think we
-should be very careful with replicating this design mistake with any
-userspace APIs we add.
+The first is what I assume you care about for this networkd business.
+The second is probably not what any networkd user expects.
 
-i.e. I am pretty sure that even if the underlying VM hypervisor
-primitive isn't as good as we wanted, the Linux kernel→userspace API
-should be built so that if one day a better VM hypervisor interface
-exists it can be plugged behind it without such limitations.
+[Aside: I hope there are few networkd users; having seen what Yu did
+with wireguard and how fast and recklessly that went, I can't recommend
+that part of systemd to anyone.]
 
-> Overall, it sounds to me like the sysctl poll based kernel interface in this
-> patch in combination with systemd inhibitors gives us an answer to most of
-> the flows above.
+From the perspective of randomness, both of these events imply the same
+thing. The situation is BAD; reseed immediately. From the perspective of
+MAC addresses, though, these events would imply different behavior,
+right? So it seems like vmgenid might need an additional field for this
+use case. Relatedly, VMware has that prompt where you select about your
+VM whether, "I moved it" or "I copied it." Presumably something like
+that would play a part in what is decided as part of this hypothetical
+second field.
 
-As mentioned earlier, I am not convinced sysctl is the right place for
-this. sysctls are understood by most people as being the place for
-tweaking kernel settings. This is not a kernel setting, but a
-notification concept, and the way Jason defined it there's nothing to
-read nor write, which strongly suggests to move it elsewhere, but not
-/proc/sys/.
+Let me know if this seems right to you, or if actually you had in mind
+changing MAC addresses in both cases instead.
 
-Use /sys/kernel/ or so. Or maybe O_NOTIFICATION_PIPE or whatever, but
-/proc/sys/ looks really wrong.
-
-> I can see attractiveness in providing the /run/fork-id directly from the
-> kernel though, to remove the dependency on systemd for poll-less
-> notification of libraries.
-
-I agree.
-
-Lennart
-
---
-Lennart Poettering, Berlin
+Jason
