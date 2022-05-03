@@ -2,105 +2,88 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF5EC433FE
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 18:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 375D1C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 19:51:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241315AbiECS2m (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 14:28:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45990 "EHLO
+        id S231940AbiECTz3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 May 2022 15:55:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235501AbiECS2l (ORCPT
+        with ESMTP id S231902AbiECTz1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 14:28:41 -0400
-Received: from ssl.serverraum.org (ssl.serverraum.org [176.9.125.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEC13F309;
-        Tue,  3 May 2022 11:25:08 -0700 (PDT)
-Received: from mwalle01.kontron.local. (unknown [213.135.10.150])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Tue, 3 May 2022 15:55:27 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9183F30B;
+        Tue,  3 May 2022 12:51:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id 5287822248;
-        Tue,  3 May 2022 20:25:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1651602306;
+        by ams.source.kernel.org (Postfix) with ESMTPS id CC735B81EAD;
+        Tue,  3 May 2022 19:51:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AA4DC385A4;
+        Tue,  3 May 2022 19:51:51 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="qGnTUWTZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651607509;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9iC4cXPg9k+4gpVj29AuB8WPa1LP5MNPiMZNf/cbI60=;
-        b=RkDedRUtGXV+rYDTtGD6Re5PzUJOBv4t7jgDYB3cDSNZ0v6oz4lwCp7IpoCeuwt+18s9MY
-        PbLjrkr/lyl3evJtuCAESVCKxhGl+o8DYxappQloW/rX9+eHSPUo4f4RxMt8f654gPLeY4
-        cWqIHbGZ4YO/qwb3alIBVDznZsUDoxo=
-From:   Michael Walle <michael@walle.cc>
-To:     a.fatoum@pengutronix.de
-Cc:     davem@davemloft.net, david@sigma-star.at, dhowells@redhat.com,
-        ebiggers@kernel.org, franck.lenormand@nxp.com,
-        herbert@gondor.apana.org.au, horia.geanta@nxp.com,
-        j.luebbe@pengutronix.de, jarkko@kernel.org, jejb@linux.ibm.com,
-        jmorris@namei.org, kernel@pengutronix.de, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        matthias.schiffer@ew.tq-group.com, pankaj.gupta@nxp.com,
-        richard@nod.at, serge@hallyn.com, sumit.garg@linaro.org,
-        tharvey@gateworks.com, zohar@linux.ibm.com,
-        Michael Walle <michael@walle.cc>
-Subject: Re: [PATCH v8 3/6] crypto: caam - add in-kernel interface for blob generator
-Date:   Tue,  3 May 2022 20:24:54 +0200
-Message-Id: <20220503182454.2749454-1-michael@walle.cc>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220428140145.870527-4-a.fatoum@pengutronix.de>
-References: <20220428140145.870527-4-a.fatoum@pengutronix.de>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BxpYESRIKwi1auTgh5eHR9+TmwXL9lpEEEIwRD9mk/4=;
+        b=qGnTUWTZg5FvW5bMKcItP4+AtWV8VClks/DbJqpTfqqUrCZDZiQjdQwjs42ZJxmjt/2qL1
+        BDhfuLlxprWjB2WWFdpR7BnI6+QbA4/gXEWu9gbm4XABLr5dG1ICyICAql/ZBathdG9Kmi
+        655ZkBgTWX+5Q96U4ReGa1tf34mk+9A=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 394072c4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 3 May 2022 19:51:49 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH] random: mix hwgenerator randomness before sleeping
+Date:   Tue,  3 May 2022 21:51:41 +0200
+Message-Id: <20220503195141.683217-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+The add_hwgenerator_randomness() function is called in a loop from a
+kthread by the hwgenerator core. It's supposed to sleep when there's
+nothing to do, and wake up periodically for more entropy. Right now it
+receives entropy, sleeps, and then mixes it in. This commit reverses the
+order, so that it always mixes in entropy sooner and sleeps after. This
+way the entropy is more fresh.
 
-> The NXP Cryptographic Acceleration and Assurance Module (CAAM)
-> can be used to protect user-defined data across system reboot:
-> 
->   - When the system is fused and boots into secure state, the master
->     key is a unique never-disclosed device-specific key
->   - random key is encrypted by key derived from master key
->   - data is encrypted using the random key
->   - encrypted data and its encrypted random key are stored alongside
->   - This blob can now be safely stored in non-volatile memory
-> 
-> On next power-on:
->   - blob is loaded into CAAM
->   - CAAM writes decrypted data either into memory or key register
-> 
-> Add functions to realize encrypting and decrypting into memory alongside
-> the CAAM driver.
-> 
-> They will be used in a later commit as a source for the trusted key
-> seal/unseal mechanism.
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks for the work on this and I'm excited to try this. I'm currently
-playing with this and one thing I've noticed is that an export restricted
-CAAM isn't handled properly.
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 845f610b6611..d4eae4b167b4 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1154,6 +1154,9 @@ void rand_initialize_disk(struct gendisk *disk)
+ void add_hwgenerator_randomness(const void *buffer, size_t count,
+ 				size_t entropy)
+ {
++	mix_pool_bytes(buffer, count);
++	credit_entropy_bits(entropy);
++
+ 	/*
+ 	 * Throttle writing if we're above the trickle threshold.
+ 	 * We'll be woken up again once below POOL_MIN_BITS, when
+@@ -1164,8 +1167,6 @@ void add_hwgenerator_randomness(const void *buffer, size_t count,
+ 			!system_wq || kthread_should_stop() ||
+ 			input_pool.entropy_count < POOL_MIN_BITS,
+ 			CRNG_RESEED_INTERVAL);
+-	mix_pool_bytes(buffer, count);
+-	credit_entropy_bits(entropy);
+ }
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+ 
+-- 
+2.35.1
 
-That is, there are CAAM's which aren't fully featured. Normally, the
-caam driver will take care of it. For example, see commit f20311cc9c58
-("crypto: caam - disable pkc for non-E SoCs"). For the trusted keys case,
-it would be nice if the kernel will not even probe (or similar).
-
-Right now, everything seems to work fine, but once I try to add a new key,
-I'll get the following errros:
-
-# keyctl add trusted mykey "new 32" @u
-add_key: Invalid argument
-[   23.138714] caam_jr 8020000.jr: 20000b0f: CCB: desc idx 11: : Invalid CHA selected.
-[   23.138740] trusted_key: key_seal failed (-22)
-
-Again this is expected, because I run it on a non-E version. IMHO, it
-should be that the trusted keys shouldn't be enabled at all. Like it is
-for example if an unknown rng is given:
-
-  trusted_key: Unsupported RNG. Supported: kernel, default
-
-Thanks,
--michael
