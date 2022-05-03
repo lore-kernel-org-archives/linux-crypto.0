@@ -2,88 +2,55 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 375D1C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 19:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E3FC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 20:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231940AbiECTz3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 15:55:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
+        id S234656AbiECUF5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 May 2022 16:05:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231902AbiECTz1 (ORCPT
+        with ESMTP id S230514AbiECUF4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 15:55:27 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9183F30B;
-        Tue,  3 May 2022 12:51:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CC735B81EAD;
-        Tue,  3 May 2022 19:51:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AA4DC385A4;
-        Tue,  3 May 2022 19:51:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="qGnTUWTZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651607509;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BxpYESRIKwi1auTgh5eHR9+TmwXL9lpEEEIwRD9mk/4=;
-        b=qGnTUWTZg5FvW5bMKcItP4+AtWV8VClks/DbJqpTfqqUrCZDZiQjdQwjs42ZJxmjt/2qL1
-        BDhfuLlxprWjB2WWFdpR7BnI6+QbA4/gXEWu9gbm4XABLr5dG1ICyICAql/ZBathdG9Kmi
-        655ZkBgTWX+5Q96U4ReGa1tf34mk+9A=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 394072c4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 3 May 2022 19:51:49 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: [PATCH] random: mix hwgenerator randomness before sleeping
-Date:   Tue,  3 May 2022 21:51:41 +0200
-Message-Id: <20220503195141.683217-1-Jason@zx2c4.com>
+        Tue, 3 May 2022 16:05:56 -0400
+X-Greylist: delayed 352 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 03 May 2022 13:02:22 PDT
+Received: from isilmar-4.linta.de (isilmar-4.linta.de [136.243.71.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E3C403C5
+        for <linux-crypto@vger.kernel.org>; Tue,  3 May 2022 13:02:22 -0700 (PDT)
+X-isilmar-external: YES
+X-isilmar-external: YES
+X-isilmar-external: YES
+Received: from owl.dominikbrodowski.net (owl.brodo.linta [10.2.0.111])
+        by isilmar-4.linta.de (Postfix) with ESMTPSA id 37783200286;
+        Tue,  3 May 2022 19:56:27 +0000 (UTC)
+Received: by owl.dominikbrodowski.net (Postfix, from userid 1000)
+        id C0BB380595; Tue,  3 May 2022 21:56:18 +0200 (CEST)
+Date:   Tue, 3 May 2022 21:56:18 +0200
+From:   Dominik Brodowski <linux@dominikbrodowski.net>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] random: mix hwgenerator randomness before sleeping
+Message-ID: <YnGI4lZVJ/FZEkcn@owl.dominikbrodowski.net>
+References: <20220503195141.683217-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220503195141.683217-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The add_hwgenerator_randomness() function is called in a loop from a
-kthread by the hwgenerator core. It's supposed to sleep when there's
-nothing to do, and wake up periodically for more entropy. Right now it
-receives entropy, sleeps, and then mixes it in. This commit reverses the
-order, so that it always mixes in entropy sooner and sleeps after. This
-way the entropy is more fresh.
+Am Tue, May 03, 2022 at 09:51:41PM +0200 schrieb Jason A. Donenfeld:
+> The add_hwgenerator_randomness() function is called in a loop from a
+> kthread by the hwgenerator core. It's supposed to sleep when there's
+> nothing to do, and wake up periodically for more entropy. Right now it
+> receives entropy, sleeps, and then mixes it in. This commit reverses the
+> order, so that it always mixes in entropy sooner and sleeps after. This
+> way the entropy is more fresh.
 
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+... however, the hwgenerator may take quite some time to accumulate entropy
+after wakeup. So now we might have a delay between a wakeup ("we need more
+entropy!") and that entropy becoming available. Beforehand, the thread only 
+went to sleep when there is no current need for "fresh" entropy.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 845f610b6611..d4eae4b167b4 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1154,6 +1154,9 @@ void rand_initialize_disk(struct gendisk *disk)
- void add_hwgenerator_randomness(const void *buffer, size_t count,
- 				size_t entropy)
- {
-+	mix_pool_bytes(buffer, count);
-+	credit_entropy_bits(entropy);
-+
- 	/*
- 	 * Throttle writing if we're above the trickle threshold.
- 	 * We'll be woken up again once below POOL_MIN_BITS, when
-@@ -1164,8 +1167,6 @@ void add_hwgenerator_randomness(const void *buffer, size_t count,
- 			!system_wq || kthread_should_stop() ||
- 			input_pool.entropy_count < POOL_MIN_BITS,
- 			CRNG_RESEED_INTERVAL);
--	mix_pool_bytes(buffer, count);
--	credit_entropy_bits(entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
- 
--- 
-2.35.1
-
+Thanks,
+	Dominik
