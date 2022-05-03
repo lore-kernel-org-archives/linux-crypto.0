@@ -2,79 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D95EC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 12:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104B3C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 12:43:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234547AbiECMhQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 08:37:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47650 "EHLO
+        id S233208AbiECMqf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 May 2022 08:46:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232602AbiECMhP (ORCPT
+        with ESMTP id S233245AbiECMqe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 08:37:15 -0400
-Received: from gardel.0pointer.net (gardel.0pointer.net [85.214.157.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8899F1EAE4;
-        Tue,  3 May 2022 05:33:42 -0700 (PDT)
-Received: from gardel-login.0pointer.net (gardel-mail [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
-        by gardel.0pointer.net (Postfix) with ESMTP id 5366FE804AA;
-        Tue,  3 May 2022 14:33:40 +0200 (CEST)
+        Tue, 3 May 2022 08:46:34 -0400
+Received: from gardel.0pointer.net (gardel.0pointer.net [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033EF1CB05;
+        Tue,  3 May 2022 05:43:01 -0700 (PDT)
+Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
+        by gardel.0pointer.net (Postfix) with ESMTP id 068E7E804AA;
+        Tue,  3 May 2022 14:43:00 +0200 (CEST)
 Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-        id C5E07160011; Tue,  3 May 2022 14:33:39 +0200 (CEST)
-Date:   Tue, 3 May 2022 14:33:39 +0200
+        id 89B62160062; Tue,  3 May 2022 14:42:59 +0200 (CEST)
+Date:   Tue, 3 May 2022 14:42:59 +0200
 From:   Lennart Poettering <mzxreary@0pointer.de>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Alexander Graf <graf@amazon.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Dominik Brodowski <linux@dominikbrodowski.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Theodore Ts'o <tytso@mit.edu>,
+        Alexander Graf <graf@amazon.com>,
         Colm MacCarthaigh <colmmacc@amazon.com>,
         Torben Hansen <htorben@amazon.co.uk>,
         Jann Horn <jannh@google.com>
 Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-Message-ID: <YnEhI3IX0oerUbsZ@gardel-login>
+Message-ID: <YnEjU7+b/9K+HSow@gardel-login>
 References: <20220502140602.130373-1-Jason@zx2c4.com>
  <20220502140602.130373-2-Jason@zx2c4.com>
  <Ym/7UlgQ5VjjC76P@gardel-login>
  <YnAC00VtU8MGb7vO@zx2c4.com>
  <YnAMBzhcJhGR5XOK@gardel-login>
- <7a1cfd1c-9f0e-f134-e544-83ee6d3cd9c9@amazon.com>
- <YnDn/d6iB0aUZkWJ@gardel-login>
- <YnEYN+Q3q76NVX3Q@zx2c4.com>
+ <YnAc4hwPyByF4kZ5@zx2c4.com>
+ <YnDc8A+oTxsQs/hq@gardel-login>
+ <YnDxK/O2E6LUhP/2@zx2c4.com>
+ <YnD2qu8eVn5ix5H7@gardel-login>
+ <YnD+17hDdbFBcaj5@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YnEYN+Q3q76NVX3Q@zx2c4.com>
+In-Reply-To: <YnD+17hDdbFBcaj5@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Di, 03.05.22 13:55, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
+On Di, 03.05.22 12:07, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
 
-> I'm still not convinced there's value in having a counter or a UUID, but
-> if you had to choose, would you prefer a counter or a UUID? It sounds
-> like the former, because you see a use for distinguishing between zero
-> and non-zero? Or did you finally agree with me that vmgenid isn't
-> granular enough for that?
+> I wouldn't be so sure here... Some people have processes around, "always
+> start out from the same place", like for build machines, and employ a
+> single VM snapshot that's always rewound after use. It's never forked
+> into multiple snapshots, but just always goes back to that same starting
+> point.
 
-I would prefer a monotonic counter, since it allows answering
-questions like the following:
+At sometimes it's futile phantasizing which exotic usecases people
+might have.
 
-1. Did this image get cloned at all? (i.e. counter != 0; usecase as per the MAC address
-   discussion)
+> > > >From the perspective of randomness, both of these events imply the same
+> > > thing. The situation is BAD; reseed immediately. From the perspective of
+> > > MAC addresses, though, these events would imply different behavior,
+> > > right? So it seems like vmgenid might need an additional field for this
+> > > use case. Relatedly, VMware has that prompt where you select about your
+> > > VM whether, "I moved it" or "I copied it." Presumably something like
+> > > that would play a part in what is decided as part of this hypothetical
+> > > second field.
+> >
+> > networkd doesn't change MAC addresses in the middle of everything, but
+> > only when a network interface is downed and upped again. This for
+> > example happens when a link beat goes away and comes back. In the
+> > rewind-2min case i'd assume the link beat would probably be restored
+> > to what it was 2min ago (and thus stay online), but in the clone case
+> > it would probably drop momentarily and be restored than, to tell
+> > software to reacquire dhcp and so on.
+>
+> That sounds like it's going to be sort of confusing. Let's say we've got
+> some VM scenario in which rewinds are common due to whatever weird
+> process (such as a build machine that wants to start out at the same
+> place each time). During its course of execution, it reboots, or maybe
+> there's some network connectivity issue and the link goes down. In that
+> case, when the link comes up, it's going to have a different MAC
+> address? That doesn't make much sense to me, but maybe I'm missing some
+> bigger picture detail.
 
-2. Did the image get cloned since the last time I looked? (i.e. counter
-   != my_previously_saved_counter; usecase: detect clones in an "offline"
-   fashion, i.e. from a component that doesn't continously run, but
-   only from time to time)
+It's still better than sticking to the same MAC address for all clones
+in all cases...
 
-3. How many clones did I miss? (i.e. missed_clones =
-   my_previously_saved_counter - counter; usecase: catch up with
-   generating proxy D-Bus signal messages for clones).
-
-There might be more.
-
-Using a UUID would not give us #1 or #3. It would deliver #2 however.
+Dunno, in systemd the MAC address policies are configurable, for a
+reason. We'll never find a default that really makes everyone
+happy. Some people prefer the anonmymity of randomized MAC addresses,
+others like the stability promises of hashed MAC addresses. We support
+both policies. I think it would make sense to add a policy that says
+"stable MAC until the first clone, then random" for example. In fact
+I think it's a choice that has the chance of being a better default
+than the current "always stable" approach we employ. So at the very
+least we should have the option to come up with a policy taking vm
+generations into account, it's a separate discussion to decide whether
+to make it opt-in or the default then, and I doubt that part of the
+discussion really matters here...
 
 Lennart
 
