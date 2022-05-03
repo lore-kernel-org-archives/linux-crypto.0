@@ -2,109 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104B3C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 12:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E290C433FE
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 May 2022 13:02:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233208AbiECMqf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 08:46:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55312 "EHLO
+        id S235714AbiECNGU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 3 May 2022 09:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233245AbiECMqe (ORCPT
+        with ESMTP id S235690AbiECNGS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 08:46:34 -0400
-Received: from gardel.0pointer.net (gardel.0pointer.net [IPv6:2a01:238:43ed:c300:10c3:bcf3:3266:da74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033EF1CB05;
-        Tue,  3 May 2022 05:43:01 -0700 (PDT)
-Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
-        by gardel.0pointer.net (Postfix) with ESMTP id 068E7E804AA;
-        Tue,  3 May 2022 14:43:00 +0200 (CEST)
-Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
-        id 89B62160062; Tue,  3 May 2022 14:42:59 +0200 (CEST)
-Date:   Tue, 3 May 2022 14:42:59 +0200
-From:   Lennart Poettering <mzxreary@0pointer.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Alexander Graf <graf@amazon.com>,
-        Colm MacCarthaigh <colmmacc@amazon.com>,
-        Torben Hansen <htorben@amazon.co.uk>,
-        Jann Horn <jannh@google.com>
-Subject: Re: [PATCH 2/2] random: add fork_event sysctl for polling VM forks
-Message-ID: <YnEjU7+b/9K+HSow@gardel-login>
-References: <20220502140602.130373-1-Jason@zx2c4.com>
- <20220502140602.130373-2-Jason@zx2c4.com>
- <Ym/7UlgQ5VjjC76P@gardel-login>
- <YnAC00VtU8MGb7vO@zx2c4.com>
- <YnAMBzhcJhGR5XOK@gardel-login>
- <YnAc4hwPyByF4kZ5@zx2c4.com>
- <YnDc8A+oTxsQs/hq@gardel-login>
- <YnDxK/O2E6LUhP/2@zx2c4.com>
- <YnD2qu8eVn5ix5H7@gardel-login>
- <YnD+17hDdbFBcaj5@zx2c4.com>
+        Tue, 3 May 2022 09:06:18 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76846CF2;
+        Tue,  3 May 2022 06:02:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651582966; x=1683118966;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UCyDlB85rkoavp7KoFgYBF745HbRXl8o/+z3W4OKNAg=;
+  b=kFqjZ8clsZrZ/4DCdmKmUR2IGDA6x1HIRJZmIzrDev1YzyIlMetknidf
+   500+cBbDDsdDrD0BeF7PDowAQoGKY5tDwNDbC26XQtqGdEmWsPbdlpPwX
+   4WMkQj1Hn4p4VFbcT0ycWIDzKjfu6EKAN1A/L44rajISw4+9oG6J9La8x
+   oDZdKhVq2ohXcswx+WgMqoe5QNiSkt7yxNihyv8beOH8SnSUekhMa+96n
+   jgi4Vt9M4B727KbJsqWbWx0kljItb/lzJRtPH5JoMtwX+MX+yxoNIPsy4
+   BbB7xVHPzM63mkaqCVjhe1HN6TdjIq52JxEPv9a7uoURsDDrY3bnjNoNY
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10335"; a="254933666"
+X-IronPort-AV: E=Sophos;i="5.91,195,1647327600"; 
+   d="scan'208";a="254933666"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2022 06:02:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,195,1647327600"; 
+   d="scan'208";a="663966482"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 03 May 2022 06:02:43 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nlsAs-000ATj-C9;
+        Tue, 03 May 2022 13:02:42 +0000
+Date:   Tue, 3 May 2022 21:01:43 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Masahiro Yamada <masahiroy@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, Masahiro Yamada <masahiroy@kernel.org>,
+        Nayna Jain <nayna@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        Paul Mackerras <paulus@samba.org>,
+        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
+Message-ID: <202205032046.GVMtYY1b-lkp@intel.com>
+References: <20220501130749.1123387-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YnD+17hDdbFBcaj5@zx2c4.com>
+In-Reply-To: <20220501130749.1123387-1-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Di, 03.05.22 12:07, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
+Hi Masahiro,
 
-> I wouldn't be so sure here... Some people have processes around, "always
-> start out from the same place", like for build machines, and employ a
-> single VM snapshot that's always rewound after use. It's never forked
-> into multiple snapshots, but just always goes back to that same starting
-> point.
+I love your patch! Yet something to improve:
 
-At sometimes it's futile phantasizing which exotic usecases people
-might have.
+[auto build test ERROR on herbert-crypto-2.6/master]
+[also build test ERROR on herbert-cryptodev-2.6/master powerpc/next v5.18-rc5 next-20220503]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-> > > >From the perspective of randomness, both of these events imply the same
-> > > thing. The situation is BAD; reseed immediately. From the perspective of
-> > > MAC addresses, though, these events would imply different behavior,
-> > > right? So it seems like vmgenid might need an additional field for this
-> > > use case. Relatedly, VMware has that prompt where you select about your
-> > > VM whether, "I moved it" or "I copied it." Presumably something like
-> > > that would play a part in what is decided as part of this hypothetical
-> > > second field.
-> >
-> > networkd doesn't change MAC addresses in the middle of everything, but
-> > only when a network interface is downed and upped again. This for
-> > example happens when a link beat goes away and comes back. In the
-> > rewind-2min case i'd assume the link beat would probably be restored
-> > to what it was 2min ago (and thus stay online), but in the clone case
-> > it would probably drop momentarily and be restored than, to tell
-> > software to reacquire dhcp and so on.
->
-> That sounds like it's going to be sort of confusing. Let's say we've got
-> some VM scenario in which rewinds are common due to whatever weird
-> process (such as a build machine that wants to start out at the same
-> place each time). During its course of execution, it reboots, or maybe
-> there's some network connectivity issue and the link goes down. In that
-> case, when the link comes up, it's going to have a different MAC
-> address? That doesn't make much sense to me, but maybe I'm missing some
-> bigger picture detail.
+url:    https://github.com/intel-lab-lkp/linux/commits/Masahiro-Yamada/crypto-vmx-Align-the-short-log-with-Makefile-cleanups/20220501-211151
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
+config: powerpc64-randconfig-c024-20220501 (https://download.01.org/0day-ci/archive/20220503/202205032046.GVMtYY1b-lkp@intel.com/config)
+compiler: powerpc64le-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/ee5bc3b577c98befd8dfe65bbcd877e2f246470d
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Masahiro-Yamada/crypto-vmx-Align-the-short-log-with-Makefile-cleanups/20220501-211151
+        git checkout ee5bc3b577c98befd8dfe65bbcd877e2f246470d
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=powerpc SHELL=/bin/bash
 
-It's still better than sticking to the same MAC address for all clones
-in all cases...
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Dunno, in systemd the MAC address policies are configurable, for a
-reason. We'll never find a default that really makes everyone
-happy. Some people prefer the anonmymity of randomized MAC addresses,
-others like the stability promises of hashed MAC addresses. We support
-both policies. I think it would make sense to add a policy that says
-"stable MAC until the first clone, then random" for example. In fact
-I think it's a choice that has the chance of being a better default
-than the current "always stable" approach we employ. So at the very
-least we should have the option to come up with a policy taking vm
-generations into account, it's a separate discussion to decide whether
-to make it opt-in or the default then, and I doubt that part of the
-discussion really matters here...
+All errors (new ones prefixed by >>):
 
-Lennart
-
+   /tmp/ccMTXCTj.s: Assembler messages:
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_set_encrypt_key does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_set_encrypt_key does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_set_decrypt_key does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_set_decrypt_key does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_decrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_decrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_cbc_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_cbc_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_ctr32_encrypt_blocks does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_ctr32_encrypt_blocks does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_xts_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_xts_encrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for aes_p8_xts_decrypt does not evaluate to a constant
+>> /tmp/ccMTXCTj.s: Error: .size expression for .aes_p8_xts_decrypt does not evaluate to a constant
 --
-Lennart Poettering, Berlin
+   /tmp/cci7g2fQ.s: Assembler messages:
+>> /tmp/cci7g2fQ.s: Error: .size expression for gcm_init_p8 does not evaluate to a constant
+>> /tmp/cci7g2fQ.s: Error: .size expression for .gcm_init_p8 does not evaluate to a constant
+>> /tmp/cci7g2fQ.s: Error: .size expression for gcm_gmult_p8 does not evaluate to a constant
+>> /tmp/cci7g2fQ.s: Error: .size expression for .gcm_gmult_p8 does not evaluate to a constant
+>> /tmp/cci7g2fQ.s: Error: .size expression for gcm_ghash_p8 does not evaluate to a constant
+>> /tmp/cci7g2fQ.s: Error: .size expression for .gcm_ghash_p8 does not evaluate to a constant
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
