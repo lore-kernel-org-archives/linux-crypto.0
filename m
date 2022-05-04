@@ -2,103 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D39C8C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 18:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC28AC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 19:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376817AbiEDS3f (ORCPT
+        id S1377452AbiEDTJJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 14:29:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51010 "EHLO
+        Wed, 4 May 2022 15:09:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376825AbiEDS3K (ORCPT
+        with ESMTP id S1377484AbiEDTI4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 14:29:10 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE7C10C9
-        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 11:00:20 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id x33so3688995lfu.1
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 11:00:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=X7nnFcBo5MIhDYQNnEavKTW+QBw/a5S/8r1dgvWPgx4=;
-        b=HydzbIEsqYx4gbpn6Of0F/idsQ70FsOBI/yLQ3l1wlbBjcoSGQqp8LilhBOa//uEDx
-         EWnmRcF4BEWKWbTlT+gtSe5/NRwGYnfkr6Qy6WpkKKFSMAkUba/bzP88tFQGiyyP5qzR
-         slNInsc4mTa9BKrS4jYwCcQzeao9bKelEatb4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=X7nnFcBo5MIhDYQNnEavKTW+QBw/a5S/8r1dgvWPgx4=;
-        b=u32M/LnCEy5CZd2vlp/0xRN4xxds9HYkzgV8/7FckJnF7x5w6lnbqkdVbrWhkTk4I6
-         UXp+PWifzXO0/SgaX33Po/bzkBKOhQIs4bPfDR90QUaJG5/JANlkICIESuCdpJoG3/tR
-         2EZeycssnvYhftDDFWqVJf+V28lVSrGZ9U92zn4OT+Wq/V4IwmlYNNED3pTkbynkFWO6
-         S94N2s3+ekDBiarZhAj20gJ6ncpW6Wp+hY60F1MGnnb25PwuMF9m3Vs92oSeTiDpn2Y9
-         q6ooal8tNq18Xs84dlVLThG0SzFwgTyEW5zUY1EFqistRiPK8PtND5hDzNvrG1oVZzDq
-         NQmQ==
-X-Gm-Message-State: AOAM5330pP+V81Um1Qcpf0munU7YNQIxZ6/+jtBHSBzdACtTccrBDjmF
-        1D2EHVxaWjX634le5uQBN+eL+esBhcpw5LIw
-X-Google-Smtp-Source: ABdhPJzDReeBwVsWGjzPJFzhJNcc5own85QO9OI9rFUfpB5nplndbu72ZsMHbUxd2V0H1L35JjWJ6A==
-X-Received: by 2002:a05:6512:3f96:b0:44a:f504:597f with SMTP id x22-20020a0565123f9600b0044af504597fmr14815111lfa.621.1651687218996;
-        Wed, 04 May 2022 11:00:18 -0700 (PDT)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
-        by smtp.gmail.com with ESMTPSA id n12-20020a19550c000000b0047255d211b8sm1263961lfe.231.2022.05.04.11.00.17
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 May 2022 11:00:17 -0700 (PDT)
-Received: by mail-lf1-f53.google.com with SMTP id x17so3651877lfa.10
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 11:00:17 -0700 (PDT)
-X-Received: by 2002:a05:6512:3c93:b0:44b:4ba:c334 with SMTP id
- h19-20020a0565123c9300b0044b04bac334mr15264136lfv.27.1651687217327; Wed, 04
- May 2022 11:00:17 -0700 (PDT)
+        Wed, 4 May 2022 15:08:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE016DE3;
+        Wed,  4 May 2022 12:05:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C7A33B8282B;
+        Wed,  4 May 2022 19:05:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A6BC385A5;
+        Wed,  4 May 2022 19:05:12 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CRGjQoNR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651691110;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IxergFl485EsXY2KxptRvd0tHpmPVRyaJTdUoOrikA0=;
+        b=CRGjQoNRUpEsYavQXvZk051nbB+Z+hM28IoCV9yZxl4KCq5jebxounT6kA8AqSNG3V6tMx
+        D6VP8NroEjouvUCb68yuju53H+hPnkSFxcQVXa73d146I7PpI6icduzs3UMgZiencdkqoG
+        wzLwBHXOqaVomlZjafSWf5AMOS83Ffw=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 93d71f1d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 4 May 2022 19:05:10 +0000 (UTC)
+Date:   Wed, 4 May 2022 21:05:01 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
+Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
+Message-ID: <YnLOXZp6WgH7ULVU@zx2c4.com>
+References: <20220501192740.203963477@linutronix.de>
+ <20220501193102.704267030@linutronix.de>
+ <Ym/sHqKqmLOJubgE@zn.tnic>
+ <87k0b4lydr.ffs@tglx>
+ <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
+ <87fslpjomx.ffs@tglx>
+ <YnKh96isoB7jiFrv@zx2c4.com>
+ <87czgtjlfq.ffs@tglx>
 MIME-Version: 1.0
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
- <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
- <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
- <YnI7hE4cIfjsdKSF@antec> <YnJI4Ru0AlUgrr9C@zx2c4.com> <YnJOCbLtdATzC+jn@zx2c4.com>
- <YnJQXr3igEMTqY3+@smile.fi.intel.com> <YnJSQ3jJyvhmIstD@zx2c4.com>
-In-Reply-To: <YnJSQ3jJyvhmIstD@zx2c4.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 4 May 2022 11:00:00 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
-Message-ID: <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
-Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Stafford Horne <shorne@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87czgtjlfq.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 4, 2022 at 3:15 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> > Alignment? Compiler bug? HW issue?
->
-> Probably one of those, yea. Removing the instruction addresses, the only
-> difference between the two compiles is: https://xn--4db.cc/Rrn8usaX/diff#=
-line-440
+Hey Thomas,
 
-Well, that address doesn't work for me at all. It turns into =D7=90.cc.
+On Wed, May 04, 2022 at 06:45:45PM +0200, Thomas Gleixner wrote:
+> add_disk_randomness() on !RT kernels. That's what made me look into this
+> in the first place as it unearthed the long standing FPU protection
+> bug. See the first patch in this thread.
+> 
+> Possibly add_device_randomness() too, but I haven't seen evidence so far.
 
-I'd love to see the compiler problem, since I find those fascinating
-(mainly because they scare the hell out of me), but those web
-addresses you use are not working for me.
+It looks like it's being hit from add_input_randomness() via
+input_handle_event() too. There are two positions we could take toward
+this:
 
-It most definitely looks like an OpenRISC compiler bug - that code
-doesn't look like it does anything remotely undefined (and with the
-"unsigned char", nothing implementation-defined either).
+One stance to take would be that if an event happens in an interrupt,
+add_interrupt_randomness() should in theory already be siphashing in a
+cycle counter so additional calls to add_{input,disk}_randomness() don't
+contribute substantially (unless you assume the num field has some
+entropic value). If that's compelling, then the next thing to do would
+be adding a `if (in_interrupt()) return;` early on in some function, and
+then we forever after impose a rule, "never mix into the input pool
+directly from an irq".
 
-             Linus
+The other stance is that these input/disk events are relatively rare --
+compared to, say, a storm of interrupts from a NIC -- so mixing into the
+input pool from there isn't actually a problem, and we benefit from the
+quasi domain-specific accounting and the superior mixing function,
+there, so keep it around. And the non-raw spinlock on the input pool
+won't negatively affect RT from this context, because all its callers on
+RT should be threaded.
+
+The second stance seems easier and more conservative from a certain
+perspective -- we don't need to change anything -- so I'm more inclined
+toward it. And given that you've fixed the bug now, it sounds like
+that's fine with you too. But if you're thinking about it differently in
+fact, let me know.
+
+Jason
