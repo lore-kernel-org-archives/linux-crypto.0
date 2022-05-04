@@ -2,64 +2,64 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D68C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6563FC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347635AbiEDJvd (ORCPT
+        id S1347861AbiEDJy2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 05:51:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58442 "EHLO
+        Wed, 4 May 2022 05:54:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347567AbiEDJvc (ORCPT
+        with ESMTP id S1347832AbiEDJyK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 05:51:32 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B5751EC4D;
-        Wed,  4 May 2022 02:47:56 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id t5so1057977edw.11;
-        Wed, 04 May 2022 02:47:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=UMi5L4NU7YtuCRrDszdWe8xOLn3j2yayIhCAekkyhRM=;
-        b=WDmxoCNXwFJk/LykyGgZ5h6mI4rzQG3Rg9y9I7kpI/c8+Urxqy6b7qcRzX1N/kSF/f
-         WK2ENuP5ABc3//g8suPgi+V176dSQkgsEcDWAM8k2z4JO5A/3yiJ0+rh8JX0v1i/EVBL
-         gNLqXJw2qYFH4+u5xTfiGD8p9kQtN98eA5n8/bQ37xMZSVLRB3nvP9VODCE0bpiybwN/
-         zhxyhW4+//JA8Xk8bHrKKHfX6A9+raZ4IWiKlpNye0P5lY/DD9OnSD8f4D8Vew8iur8D
-         8Cx80hnvraEIbG2EEZRgLKd7dhg5rzkVgJBcJBhG4fgtO7yKdXK+vG3R3vZhuDBoHkLc
-         M10A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=UMi5L4NU7YtuCRrDszdWe8xOLn3j2yayIhCAekkyhRM=;
-        b=OEztZPBFVGDg9WetNTixFKExhYxPNVbTeg+/6InVh9kWMW9n9g7yo/khbQlXpWuWoD
-         z3b6RWuvzodkgvlBP58DKVO4z7U6u6qsOEj8eynZGvOHc1G/QNhnQvXfUAd7BgTdoxyu
-         h2411M4Oh6DsFRLh7lFj/5L0KIYPzl2IoHddvKwQh7f9TGnANoonjmNTpntW36SzVNz/
-         HZwtyys56y67CA2PXcZes4RDnZDPeL7H6rD32y0MwqPbj1sfN6b/D8UFCJYCy4x+pH6h
-         vRYqmjXCFIXe/mQ/xjyQZ8bejux01ViqUtr5Qa3W8UrRPqwTSl+btBy6OiNK5etyYV3w
-         jWNQ==
-X-Gm-Message-State: AOAM531FTmlH5iyX8UxIwaRExDnxYU6aIo1tbAW3drhjd1Hb4SDGKS81
-        mjjeLlnNrGZfVwuho6H+hE4=
-X-Google-Smtp-Source: ABdhPJya6lHf7igGAb2eIfhtj49OpcX70BuRC8nDoJHvWavZcEixqKxkVIAJZ6KPK65JpqjcGV6fqQ==
-X-Received: by 2002:aa7:cc02:0:b0:411:487e:36fe with SMTP id q2-20020aa7cc02000000b00411487e36femr22183786edt.338.1651657674535;
-        Wed, 04 May 2022 02:47:54 -0700 (PDT)
-Received: from [192.168.2.27] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id r23-20020a056402019700b0042617ba637bsm8951540edv.5.2022.05.04.02.47.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 May 2022 02:47:54 -0700 (PDT)
-Message-ID: <24c9a856-be10-e9b3-b26d-e6ced9e13c63@gmail.com>
-Date:   Wed, 4 May 2022 11:47:52 +0200
+        Wed, 4 May 2022 05:54:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22951183BA;
+        Wed,  4 May 2022 02:50:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D3D25B82330;
+        Wed,  4 May 2022 09:50:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B35C385AF;
+        Wed,  4 May 2022 09:50:32 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="XRHm7UCv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651657829;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mu7frDY3tF1mpPfvDkSZ+QoF/RCrkyl1/4guVXYmJNM=;
+        b=XRHm7UCvVR4SkJlHIC4MC9fzP8jGzY9bC6MB7LKcWyM2oxz75UAmXryEZuG+uXtEt+TS6m
+        7BAEw/STne95pFe9MsLMoE+2DBW1cTXOv9w+WUq95lhrV5h8AlAwgLvsRQZIkmVFBqGCvw
+        uuHyzaCbjNRtOiRO4a1R394qbiLNAuM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5ecf50f8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 4 May 2022 09:50:29 +0000 (UTC)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2ec42eae76bso9208577b3.10;
+        Wed, 04 May 2022 02:50:28 -0700 (PDT)
+X-Gm-Message-State: AOAM532f2AD+BUC3f6X3qR/wpdS7R3sEXnCkqlYTEATIGfrI8HKmZnfi
+        qONlLhCU97ZbFl+8kU7/3rlxBnkiv7WE8O0WGW8=
+X-Google-Smtp-Source: ABdhPJzuMzs1bKkUTBLTJ00IJAbYgtTI+hqFcHguOCIXiEYbsg60S5jxhxQzD4lN6i9iMWN9Mzs+4DwAmgNgps7YOKU=
+X-Received: by 2002:a81:cc3:0:b0:2f7:d52b:92bf with SMTP id
+ 186-20020a810cc3000000b002f7d52b92bfmr18719777ywm.231.1651657827651; Wed, 04
+ May 2022 02:50:27 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
+ <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+ <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
+ <YnI7hE4cIfjsdKSF@antec> <alpine.LRH.2.02.2205040453050.22937@file01.intranet.prod.int.rdu2.redhat.com>
+ <YnJFViBFIgYOl7/2@smile.fi.intel.com> <24c9a856-be10-e9b3-b26d-e6ced9e13c63@gmail.com>
+In-Reply-To: <24c9a856-be10-e9b3-b26d-e6ced9e13c63@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 4 May 2022 11:50:16 +0200
+X-Gmail-Original-Message-ID: <CAHmME9roTbjorBTzJGqJjmu7fgE_8w4RV8Pnwkqnoa1V+0kahg@mail.gmail.com>
+Message-ID: <CAHmME9roTbjorBTzJGqJjmu7fgE_8w4RV8Pnwkqnoa1V+0kahg@mail.gmail.com>
 Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-Content-Language: en-US
-To:     Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Stafford Horne <shorne@gmail.com>,
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Stafford Horne <shorne@gmail.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Andy Shevchenko <andy@kernel.org>,
         device-mapper development <dm-devel@redhat.com>,
@@ -68,49 +68,19 @@ Cc:     Stafford Horne <shorne@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>, Jason@zx2c4.com
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
- <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
- <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
- <YnI7hE4cIfjsdKSF@antec>
- <alpine.LRH.2.02.2205040453050.22937@file01.intranet.prod.int.rdu2.redhat.com>
- <YnJFViBFIgYOl7/2@smile.fi.intel.com>
-From:   Milan Broz <gmazyland@gmail.com>
-In-Reply-To: <YnJFViBFIgYOl7/2@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Mimi Zohar <zohar@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 04/05/2022 11:20, Andy Shevchenko wrote:
-> On Wed, May 04, 2022 at 04:57:35AM -0400, Mikulas Patocka wrote:
->> On Wed, 4 May 2022, Stafford Horne wrote:
->>> On Mon, Apr 25, 2022 at 08:07:48AM -0400, Mikulas Patocka wrote:
-> 
-> ...
-> 
->>> Just a heads up it seems this patch is causing some instability with crypto self
->>> tests on OpenRISC when using a PREEMPT kernel (no SMP).
->>>
->>> This was reported by Jason A. Donenfeld as it came up in wireguard testing.
->>>
->>> I am trying to figure out if this is an OpenRISC PREEMPT issue or something
->>> else.
-> 
->> That patch is so simple that I can't imagine how could it break the
->> curve25519 test. Are you sure that you bisected it correctly?
-> 
-> Can you provide a test cases for hex_to_bin()?
+On Wed, May 4, 2022 at 11:47 AM Milan Broz <gmazyland@gmail.com> wrote:
+> BTW we use exactly the same code from Mikulas in cryptsetup now (actually the report
+> was initiated from here :) and I added some tests for this code,
+> you can probably adapt it (we just use generic wrapper around it):
 
-BTW we use exactly the same code from Mikulas in cryptsetup now (actually the report
-was initiated from here :) and I added some tests for this code,
-you can probably adapt it (we just use generic wrapper around it):
+I use something pretty similar in wireguard-tools:
+https://git.zx2c4.com/wireguard-tools/tree/src/encoding.c#n74
 
-https://gitlab.com/cryptsetup/cryptsetup/-/commit/2d8cdb2e356d187658efa6efc7bfa146be5d3f60#d9c94cde02e4509f6d12c3edd40f8a9138696807_0_176
-
-(it calls this: https://gitlab.com/cryptsetup/cryptsetup/-/commit/ff14c17de794fe85299d90e34e12a677e6148b71 )
-
-I do not have OpenRISC available, but it would be interesting to run cryptsetup/tests/vectors-test there...
-
-Milan
+The code is fine. This is looking like a different issue somewhere
+else in the OpenRISC stack...
