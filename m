@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C04DC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 20:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949FAC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 20:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344279AbiEDUEe (ORCPT
+        id S1356198AbiEDUOB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 16:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
+        Wed, 4 May 2022 16:14:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343604AbiEDUEe (ORCPT
+        with ESMTP id S1345790AbiEDUOA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 16:04:34 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C77B1F612
-        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 13:00:56 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id y19so3049604ljd.4
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:00:56 -0700 (PDT)
+        Wed, 4 May 2022 16:14:00 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9F12737
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 13:10:23 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id v4so3061637ljd.10
+        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:10:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LmVnCbPzQFTKVo2J8nBuP0OejuZI/MsiEmrhFI+epZk=;
-        b=IZC4w5jnu/QO9Q2oZdB9KCQz8nOkDzcwjag3H6CKaK97vN+BaEHZ+jhwzac65rOZ7+
-         48ojuixZFxaURG6EsMIJyxIqwbD+7Q9R5n52IgZ+3VJgF10qcua8LStnYEONl9dD3o0K
-         YZ0ThZakHUlxetViKTNCGE76sgsrMnNjFCjoY=
+         :cc;
+        bh=O0/hKmkvb5BoU0+UFK3i+vBfCGj7h/+eV5+6M1+ExZM=;
+        b=OzBXWUbjQ+080MWC14jdCnBvwXL5uDnkzacs7MfgTd/OEo/P0xDEmgLRYvFfLeTaQx
+         JCb2df+pPiKnY5JtAeaEC8UDsr9bOvUNWpODCHqcjIQi993kY6I7kPmVvju01wuAsTcG
+         +NgW70KB4OMXFfc8QJi6r5l0fzPSUGCZdartU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LmVnCbPzQFTKVo2J8nBuP0OejuZI/MsiEmrhFI+epZk=;
-        b=hBhUf+6mpvV+Mg0eqtqhxIAyGyZm/lLyuIZTA6bdqXxxMpBTPhlixV5vXjKRnRZ/Q+
-         y4Tk8RUG7AP2IOTMf8trBvSqase2h7ZFDsBmry8eF8+tyvnrsKpWb+TOq3cZWl385ZRx
-         SiDVrqlsQCUVeXt1KPm266JklBFjoiMigrQli34yHkwauQefe747ul4e3gD3u3VnMBmF
-         cH+lNF+dfcU7lV4fBh4zLMmohBYkp8I3sTdsxqN763TydWiFuWvnfKhF83BpZY9abkU7
-         g/uNk1Hm4rKTz0IFbwr1VFbDK/wec/tMTO91mdwOJcMPrFcF0QXbNqkIx7OqfIkYUNDM
-         /akw==
-X-Gm-Message-State: AOAM530KzZVqpnyLSsHqVK2h3v3FGd0QECKeHmlWuIkgacRO25B83WiO
-        ag8ACXPAkHBoDIBIw8D1COsNdBsVILgACeHTMp4=
-X-Google-Smtp-Source: ABdhPJzYhEs5qdgGFYy1RzvYvbjs07/VjF6Aptn9IbHGyTF5GJ+hh9hT94cjVTd9v7kNWrdnimdZIw==
-X-Received: by 2002:a2e:bb8e:0:b0:250:76dd:3bd9 with SMTP id y14-20020a2ebb8e000000b0025076dd3bd9mr4208143lje.71.1651694454930;
-        Wed, 04 May 2022 13:00:54 -0700 (PDT)
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
-        by smtp.gmail.com with ESMTPSA id 14-20020a2eb94e000000b0024f3d1dae8esm1757370ljs.22.2022.05.04.13.00.52
+         :message-id:subject:to:cc;
+        bh=O0/hKmkvb5BoU0+UFK3i+vBfCGj7h/+eV5+6M1+ExZM=;
+        b=wwYEd2Qf9qb1Zv3o9W2Y6LShZXm0FAWx62NyVJLD2ugIwiS4MrpOg0lFqQRFizy6se
+         Tn1wa1vgtjCV3UMwuqJjD+4QOJL5QftnJniy8i0sdyWsInj9K6IwjgfzAKiK9th0utbz
+         674c7hGa2deB+GZIrOGM0kVrYqbeUd3DDENXnlccxyhx4quxar9SoTuzaM8iaL+G0+aq
+         lP5cHJwycbb1Dgk7QSWVvY2xmjT8WEzmVBFrIWeBIlvQ5hjlQhC8X8uOxFKZcCjFlrBe
+         E0uHaeQaB0lS3ilB3vjhDOlZ1C5JN1aF5QLLAsMDzZdG4V9nts/K8tL5lWeRjXQOwQlR
+         8Nng==
+X-Gm-Message-State: AOAM532uyM3vLQlo1R1mgsSJujJez16M3KmD/YFKTL47HUd31CeS0sOP
+        kllLJu/bra66zAe18PHISgzUzu5vPWBjMpNrWUc=
+X-Google-Smtp-Source: ABdhPJzn4H7u8QzffLRzSHT/wElXtmYk9OmuBkHK1XPKwvmQ4WklX7inKFlHw9djpDyMmXhLMWxAXA==
+X-Received: by 2002:a2e:b8c2:0:b0:250:61c6:8398 with SMTP id s2-20020a2eb8c2000000b0025061c68398mr7162728ljp.378.1651695021410;
+        Wed, 04 May 2022 13:10:21 -0700 (PDT)
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
+        by smtp.gmail.com with ESMTPSA id k8-20020a2eb748000000b0024f3d1dae91sm1762995ljo.25.2022.05.04.13.10.20
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 May 2022 13:00:53 -0700 (PDT)
-Received: by mail-lj1-f174.google.com with SMTP id m23so3073791ljc.0
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:00:52 -0700 (PDT)
-X-Received: by 2002:a2e:934b:0:b0:24f:cce:5501 with SMTP id
- m11-20020a2e934b000000b0024f0cce5501mr13625492ljh.443.1651694452466; Wed, 04
- May 2022 13:00:52 -0700 (PDT)
+        Wed, 04 May 2022 13:10:20 -0700 (PDT)
+Received: by mail-lj1-f172.google.com with SMTP id s27so3088899ljd.2
+        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:10:20 -0700 (PDT)
+X-Received: by 2002:a2e:914d:0:b0:24f:6374:3eba with SMTP id
+ q13-20020a2e914d000000b0024f63743ebamr10017408ljg.506.1651695019712; Wed, 04
+ May 2022 13:10:19 -0700 (PDT)
 MIME-Version: 1.0
 References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
  <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
@@ -59,16 +59,16 @@ References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.r
  <YnI7hE4cIfjsdKSF@antec> <YnJI4Ru0AlUgrr9C@zx2c4.com> <YnJOCbLtdATzC+jn@zx2c4.com>
  <YnJQXr3igEMTqY3+@smile.fi.intel.com> <YnJSQ3jJyvhmIstD@zx2c4.com>
  <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
- <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com> <CAHk-=wiaj8SMSQTWAx2cUFqzRWRqBspO5YV=qA8M+QOC2vDorw@mail.gmail.com>
-In-Reply-To: <CAHk-=wiaj8SMSQTWAx2cUFqzRWRqBspO5YV=qA8M+QOC2vDorw@mail.gmail.com>
+ <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com> <CAAfxs77yaLvWx9KnkDZX7E1eDm9N-NVJn5n8=mCK9BU-cSob=A@mail.gmail.com>
+In-Reply-To: <CAAfxs77yaLvWx9KnkDZX7E1eDm9N-NVJn5n8=mCK9BU-cSob=A@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 4 May 2022 13:00:36 -0700
-X-Gmail-Original-Message-ID: <CAHk-=witNAEG7rRsbxD0-4mxhtijRT8fwSc3QCi5HN1sR=0YcA@mail.gmail.com>
-Message-ID: <CAHk-=witNAEG7rRsbxD0-4mxhtijRT8fwSc3QCi5HN1sR=0YcA@mail.gmail.com>
+Date:   Wed, 4 May 2022 13:10:03 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjLRo-6PbhbvMUDojbMo=L+2jc5VpCYTyF-LGxZPhUngA@mail.gmail.com>
+Message-ID: <CAHk-=wjLRo-6PbhbvMUDojbMo=L+2jc5VpCYTyF-LGxZPhUngA@mail.gmail.com>
 Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Stafford Horne <shorne@gmail.com>,
+To:     Stafford Horne <shorne@gmail.com>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>,
         Mikulas Patocka <mpatocka@redhat.com>,
         Andy Shevchenko <andy@kernel.org>,
         device-mapper development <dm-devel@redhat.com>,
@@ -80,23 +80,31 @@ Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         Milan Broz <gmazyland@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 4, 2022 at 12:51 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
+On Wed, May 4, 2022 at 12:58 PM Stafford Horne <shorne@gmail.com> wrote:
 >
-> But I don't think that it's the browser, actually. Even 'nslookup'
-> refuses to touch it with
+> I have uploaded a diff I created here:
+>   https://gist.github.com/54334556f2907104cd12374872a0597c
 >
->    ** server can't find =D7=90.cc: SERVFAIL
->
-> and it seems it's literally the local dns caching (dnsmasq?)
+> It shows the same output.
 
-Looks like Fedora builds dnsmasq with 'no-i18n', although "dnsmasq -v"
-also shows "IDN2", so who knows.. Maybe it's some default config issue
-rather than the build configuration.
+In hex_to_bin itself it seems to only be a difference due to some
+register allocation (r19 and r3 switched around).
 
-                  Linus
+But then it gets inlined into hex2bin and there changes there seem to
+be about instruction and basic block scheduling, so it's a lot harder
+to see what's going on.
+
+And a lot of constant changes, which honestly look just like code code
+moved around by 16 bytes and offsets changed due to that.
+
+So I doubt it's hex_to_bin() that is causing problems, I think it's
+purely code movement. Which explains why adding a nop or a fake printk
+fixes things.
+
+Some alignment assumption that got broken?
+
+               Linus
