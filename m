@@ -2,65 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B12C433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 19:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C04DC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 20:01:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377780AbiEDUBl (ORCPT
+        id S1344279AbiEDUEe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 16:01:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34668 "EHLO
+        Wed, 4 May 2022 16:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377805AbiEDUBk (ORCPT
+        with ESMTP id S1343604AbiEDUEe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 16:01:40 -0400
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865724EDC7;
-        Wed,  4 May 2022 12:58:03 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id e144so1114737vke.9;
-        Wed, 04 May 2022 12:58:03 -0700 (PDT)
+        Wed, 4 May 2022 16:04:34 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C77B1F612
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 13:00:56 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id y19so3049604ljd.4
+        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=PP0v6E0J74PSlvWpBHKPKv2X563T4tZp8Opf3sME7AY=;
-        b=oxnb5SWdx6otZKup6ob7ZQ7YzSgDp2BKAWcG96ihZJAx8xLXAGpWaAc3r9qU+/9YZc
-         wHTVsiAw5efPwu/XvSO1x2/1aq2b27UQsZN9m4bErqnYEKZ9qkQn0P2BwcFZ95t58e9j
-         7/XyzLBwYoKjaEIlIs80l0zsTlj/oWVVg6cmIvAXISaK2JCV9YOFlik7mzUqJpUhNtjR
-         r9fTWhzJDK184xF9Io+Xoc+9QJ4UGo3OZJGk58Q8/erNhxodCEDQyqQx2voyJcfb0jAi
-         BVi+Jm1L7zMyQKDTFzrbqcovgT/kxpyas1j3tGFBX8edgYLiW0HtsmQrZGnV2wyc+N9g
-         GeOg==
+        bh=LmVnCbPzQFTKVo2J8nBuP0OejuZI/MsiEmrhFI+epZk=;
+        b=IZC4w5jnu/QO9Q2oZdB9KCQz8nOkDzcwjag3H6CKaK97vN+BaEHZ+jhwzac65rOZ7+
+         48ojuixZFxaURG6EsMIJyxIqwbD+7Q9R5n52IgZ+3VJgF10qcua8LStnYEONl9dD3o0K
+         YZ0ThZakHUlxetViKTNCGE76sgsrMnNjFCjoY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=PP0v6E0J74PSlvWpBHKPKv2X563T4tZp8Opf3sME7AY=;
-        b=LUXRLm/I8RONzudQwjBgvG118TOxBpIDqbkIHiVBNvWtyL0oepLyZkjwHI9A6if9To
-         XHgfBfnAIb9hywXUuZ/+sToivMwzPpkAVbBXnzSAnCg5BJ9kGo7uLOircRCoTH8lm2+t
-         wbi3ApXK7ipB9oCxvrjdmsYUOe9XvGykjB/b4+QTOsTtPvFi3IJXM5lA2ub1WNo33NS2
-         I22vnQyP8y2T9Zwb90kcGnV6P46uyQp3roqBXMTEO4hxpeJOK74kDB6mSlM1k8ivYua5
-         P8qH7Xs0H+/mASiY3ILu/ZVCsxpZpuMwjDw+CFEmbHvg/mqtCcVulrlRDuljUBCFTVcx
-         7q7g==
-X-Gm-Message-State: AOAM5324Ca5lcdewW8isgK2ZrDB7uKsIzPqMVt+btX3xV7d9tbQjaS1S
-        6TQUC9ArzGxScJm4n4nz7yto+ubeJmTf0iTEUKw=
-X-Google-Smtp-Source: ABdhPJwbmiH9S1vCJd8kJ2hr5R+OzZsd7uOkoQGEEn9iSx3iQQUzAZ9TBzrKX7ZkQ6BOrCQZo5vN3Qqq1syke+EiO9c=
-X-Received: by 2002:ac5:c856:0:b0:34e:d0b4:7a10 with SMTP id
- g22-20020ac5c856000000b0034ed0b47a10mr5639395vkm.39.1651694282561; Wed, 04
- May 2022 12:58:02 -0700 (PDT)
+        bh=LmVnCbPzQFTKVo2J8nBuP0OejuZI/MsiEmrhFI+epZk=;
+        b=hBhUf+6mpvV+Mg0eqtqhxIAyGyZm/lLyuIZTA6bdqXxxMpBTPhlixV5vXjKRnRZ/Q+
+         y4Tk8RUG7AP2IOTMf8trBvSqase2h7ZFDsBmry8eF8+tyvnrsKpWb+TOq3cZWl385ZRx
+         SiDVrqlsQCUVeXt1KPm266JklBFjoiMigrQli34yHkwauQefe747ul4e3gD3u3VnMBmF
+         cH+lNF+dfcU7lV4fBh4zLMmohBYkp8I3sTdsxqN763TydWiFuWvnfKhF83BpZY9abkU7
+         g/uNk1Hm4rKTz0IFbwr1VFbDK/wec/tMTO91mdwOJcMPrFcF0QXbNqkIx7OqfIkYUNDM
+         /akw==
+X-Gm-Message-State: AOAM530KzZVqpnyLSsHqVK2h3v3FGd0QECKeHmlWuIkgacRO25B83WiO
+        ag8ACXPAkHBoDIBIw8D1COsNdBsVILgACeHTMp4=
+X-Google-Smtp-Source: ABdhPJzYhEs5qdgGFYy1RzvYvbjs07/VjF6Aptn9IbHGyTF5GJ+hh9hT94cjVTd9v7kNWrdnimdZIw==
+X-Received: by 2002:a2e:bb8e:0:b0:250:76dd:3bd9 with SMTP id y14-20020a2ebb8e000000b0025076dd3bd9mr4208143lje.71.1651694454930;
+        Wed, 04 May 2022 13:00:54 -0700 (PDT)
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com. [209.85.208.174])
+        by smtp.gmail.com with ESMTPSA id 14-20020a2eb94e000000b0024f3d1dae8esm1757370ljs.22.2022.05.04.13.00.52
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 May 2022 13:00:53 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id m23so3073791ljc.0
+        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 13:00:52 -0700 (PDT)
+X-Received: by 2002:a2e:934b:0:b0:24f:cce:5501 with SMTP id
+ m11-20020a2e934b000000b0024f0cce5501mr13625492ljh.443.1651694452466; Wed, 04
+ May 2022 13:00:52 -0700 (PDT)
 MIME-Version: 1.0
 References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
  <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
  <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
  <YnI7hE4cIfjsdKSF@antec> <YnJI4Ru0AlUgrr9C@zx2c4.com> <YnJOCbLtdATzC+jn@zx2c4.com>
  <YnJQXr3igEMTqY3+@smile.fi.intel.com> <YnJSQ3jJyvhmIstD@zx2c4.com>
- <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com> <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com>
-In-Reply-To: <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com>
-From:   Stafford Horne <shorne@gmail.com>
-Date:   Thu, 5 May 2022 04:57:50 +0900
-Message-ID: <CAAfxs77yaLvWx9KnkDZX7E1eDm9N-NVJn5n8=mCK9BU-cSob=A@mail.gmail.com>
+ <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
+ <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com> <CAHk-=wiaj8SMSQTWAx2cUFqzRWRqBspO5YV=qA8M+QOC2vDorw@mail.gmail.com>
+In-Reply-To: <CAHk-=wiaj8SMSQTWAx2cUFqzRWRqBspO5YV=qA8M+QOC2vDorw@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 4 May 2022 13:00:36 -0700
+X-Gmail-Original-Message-ID: <CAHk-=witNAEG7rRsbxD0-4mxhtijRT8fwSc3QCi5HN1sR=0YcA@mail.gmail.com>
+Message-ID: <CAHk-=witNAEG7rRsbxD0-4mxhtijRT8fwSc3QCi5HN1sR=0YcA@mail.gmail.com>
 Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
+Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Stafford Horne <shorne@gmail.com>,
         Mikulas Patocka <mpatocka@redhat.com>,
         Andy Shevchenko <andy@kernel.org>,
         device-mapper development <dm-devel@redhat.com>,
@@ -77,66 +85,18 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 5, 2022 at 4:43 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Wed, May 4, 2022 at 12:51 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> Hi Linus,
+> But I don't think that it's the browser, actually. Even 'nslookup'
+> refuses to touch it with
 >
-> On Wed, May 4, 2022 at 8:00 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > On Wed, May 4, 2022 at 3:15 AM Jason A. Donenfeld <Jason@zx2c4.com> wro=
-te:
-> > >
-> > > > Alignment? Compiler bug? HW issue?
-> > >
-> > > Probably one of those, yea. Removing the instruction addresses, the o=
-nly
-> > > difference between the two compiles is: https://xn--4db.cc/Rrn8usaX/d=
-iff#line-440
-> >
-> > Well, that address doesn't work for me at all. It turns into =D7=90.cc.
-> >
-> > I'd love to see the compiler problem, since I find those fascinating
-> > (mainly because they scare the hell out of me), but those web
-> > addresses you use are not working for me.
+>    ** server can't find =D7=90.cc: SERVFAIL
 >
-> =D7=90.cc is correct. If you can't load it, your browser or something in
-> your stack is broken. Choosing a non-ASCII domain like that clearly a
-> bad decision because people with broken stacks can't load it? Yea,
-> maybe. But maybe it's like the arch/alpha/ reordering of dependent
-> loads applied to the web... A bit of stretch.
+> and it seems it's literally the local dns caching (dnsmasq?)
 
-I have uploaded a diff I created here:
-  https://gist.github.com/54334556f2907104cd12374872a0597c
+Looks like Fedora builds dnsmasq with 'no-i18n', although "dnsmasq -v"
+also shows "IDN2", so who knows.. Maybe it's some default config issue
+rather than the build configuration.
 
-It shows the same output.
-
-> > It most definitely looks like an OpenRISC compiler bug - that code
-> > doesn't look like it does anything remotely undefined (and with the
-> > "unsigned char", nothing implementation-defined either).
->
-> I'm not so certain it's in the compiler anymore, actually. The bug
-> exhibits itself even when that code isn't actually called. Adding nops
-> to unrelated code also makes the problem go away. And removing these
-> nops [1] makes the problem go away too. So maybe it's looking more
-> like a linker bug (or linker script bug) related to alignment. Or
-> whatever is jumping between contexts in the preemption code and
-> restoring registers and such is assuming certain things about code
-> layout that doesn't always hold. More fiddling is necessary still.
-
-Bisecting definitely came to this patch which is strange. Then reverting
-e5be15767e7e ("hex2bin: make the function hex_to_bin constant-time")
-did also fix the problem for me.
-
-But it could be any small patch that changes layout could make this go away=
-.
-
-I have things to try:
-  - more close look at the produced asembly diff
-  - newer compiler (I fixed a few bugs in gcc 12 for openrisc, and
-this testing came up in gcc 11)
-  - trying on FPGA's
-
-I'll report as I find things.
-
--Stafford
+                  Linus
