@@ -2,64 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6563FC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185C8C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347861AbiEDJy2 (ORCPT
+        id S1347607AbiEDKBL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 05:54:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32780 "EHLO
+        Wed, 4 May 2022 06:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347832AbiEDJyK (ORCPT
+        with ESMTP id S232653AbiEDKBK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 05:54:10 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22951183BA;
-        Wed,  4 May 2022 02:50:35 -0700 (PDT)
+        Wed, 4 May 2022 06:01:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9261426AFB;
+        Wed,  4 May 2022 02:57:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D3D25B82330;
-        Wed,  4 May 2022 09:50:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B35C385AF;
-        Wed,  4 May 2022 09:50:32 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3625E61A95;
+        Wed,  4 May 2022 09:57:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F749C385A5;
+        Wed,  4 May 2022 09:57:33 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="XRHm7UCv"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LgiOdaZg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651657829;
+        t=1651658252;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=mu7frDY3tF1mpPfvDkSZ+QoF/RCrkyl1/4guVXYmJNM=;
-        b=XRHm7UCvVR4SkJlHIC4MC9fzP8jGzY9bC6MB7LKcWyM2oxz75UAmXryEZuG+uXtEt+TS6m
-        7BAEw/STne95pFe9MsLMoE+2DBW1cTXOv9w+WUq95lhrV5h8AlAwgLvsRQZIkmVFBqGCvw
-        uuHyzaCbjNRtOiRO4a1R394qbiLNAuM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5ecf50f8 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 4 May 2022 09:50:29 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2ec42eae76bso9208577b3.10;
-        Wed, 04 May 2022 02:50:28 -0700 (PDT)
-X-Gm-Message-State: AOAM532f2AD+BUC3f6X3qR/wpdS7R3sEXnCkqlYTEATIGfrI8HKmZnfi
-        qONlLhCU97ZbFl+8kU7/3rlxBnkiv7WE8O0WGW8=
-X-Google-Smtp-Source: ABdhPJzuMzs1bKkUTBLTJ00IJAbYgtTI+hqFcHguOCIXiEYbsg60S5jxhxQzD4lN6i9iMWN9Mzs+4DwAmgNgps7YOKU=
-X-Received: by 2002:a81:cc3:0:b0:2f7:d52b:92bf with SMTP id
- 186-20020a810cc3000000b002f7d52b92bfmr18719777ywm.231.1651657827651; Wed, 04
- May 2022 02:50:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
- <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
- <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
- <YnI7hE4cIfjsdKSF@antec> <alpine.LRH.2.02.2205040453050.22937@file01.intranet.prod.int.rdu2.redhat.com>
- <YnJFViBFIgYOl7/2@smile.fi.intel.com> <24c9a856-be10-e9b3-b26d-e6ced9e13c63@gmail.com>
-In-Reply-To: <24c9a856-be10-e9b3-b26d-e6ced9e13c63@gmail.com>
+        bh=7QxTQmRrU2TPE1t9O7hHsX1uS6rLbGna3bwCr6dOHKs=;
+        b=LgiOdaZgjat5AfzZ+JngxczZs4gg59ImR+qNyDKmwNLroONljXjLYnSgEmdveQcEw2eBOM
+        T3mCyB6rnxs4w/diOMepTIbhU25q5no41388p6Hx6UWUNz6a8ifQ3kKTHUONn7+2u3VRIx
+        mrfhEjCpmlNf0MfkShTqF8vlmqkMFlA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ebcdca06 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 4 May 2022 09:57:31 +0000 (UTC)
+Date:   Wed, 4 May 2022 11:57:29 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 4 May 2022 11:50:16 +0200
-X-Gmail-Original-Message-ID: <CAHmME9roTbjorBTzJGqJjmu7fgE_8w4RV8Pnwkqnoa1V+0kahg@mail.gmail.com>
-Message-ID: <CAHmME9roTbjorBTzJGqJjmu7fgE_8w4RV8Pnwkqnoa1V+0kahg@mail.gmail.com>
-Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Stafford Horne <shorne@gmail.com>,
+To:     Stafford Horne <shorne@gmail.com>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Andy Shevchenko <andy@kernel.org>,
         device-mapper development <dm-devel@redhat.com>,
@@ -68,19 +48,41 @@ Cc:     Andy Shevchenko <andriy.shevchenko@intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
+Message-ID: <YnJOCbLtdATzC+jn@zx2c4.com>
+References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
+ <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
+ <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
+ <YnI7hE4cIfjsdKSF@antec>
+ <YnJI4Ru0AlUgrr9C@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YnJI4Ru0AlUgrr9C@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 4, 2022 at 11:47 AM Milan Broz <gmazyland@gmail.com> wrote:
-> BTW we use exactly the same code from Mikulas in cryptsetup now (actually the report
-> was initiated from here :) and I added some tests for this code,
-> you can probably adapt it (we just use generic wrapper around it):
+On Wed, May 04, 2022 at 11:42:27AM +0200, Jason A. Donenfeld wrote:
+> So more likely is that this patch just helps unmask a real issue
+> elsewhere -- linker, compiler, or register restoration after preemption.
+> I don't think there's anything to do with regards to the patch of this
+> thread, as it's clearly fine. 
 
-I use something pretty similar in wireguard-tools:
-https://git.zx2c4.com/wireguard-tools/tree/src/encoding.c#n74
+The problem even goes away if I just add a nop...
 
-The code is fine. This is looking like a different issue somewhere
-else in the OpenRISC stack...
+diff --git a/lib/hexdump.c b/lib/hexdump.c
+index 06833d404398..ace74f9b3d5a 100644
+--- a/lib/hexdump.c
++++ b/lib/hexdump.c
+@@ -46,6 +46,7 @@ EXPORT_SYMBOL(hex_asc_upper);
+ int hex_to_bin(unsigned char ch)
+ {
+ 	unsigned char cu = ch & 0xdf;
++	__asm__("l.nop 0");
+ 	return -1 +
+ 		((ch - '0' +  1) & (unsigned)((ch - '9' - 1) & ('0' - 1 - ch)) >> 8) +
+ 		((cu - 'A' + 11) & (unsigned)((cu - 'F' - 1) & ('A' - 1 - cu)) >> 8);
+
