@@ -2,83 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37867C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 00:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803F6C4332F
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 04:09:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244498AbiEDAti (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 May 2022 20:49:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53634 "EHLO
+        id S1344456AbiEDENK (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 00:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235116AbiEDAth (ORCPT
+        with ESMTP id S235940AbiEDENJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 May 2022 20:49:37 -0400
+        Wed, 4 May 2022 00:13:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D82522283;
-        Tue,  3 May 2022 17:46:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A2F2180E;
+        Tue,  3 May 2022 21:09:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EAD97618A3;
-        Wed,  4 May 2022 00:46:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A322C385A9;
-        Wed,  4 May 2022 00:45:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OZpBZzv6"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651625158;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vhAiVHXQWmhs81Nrt7gvkFVDwI8H9x6MfqjaLzCCJ78=;
-        b=OZpBZzv6Q/S+weWbYxSCd2P5gOmkFxyC3ZFm1TSb9pf656IRdrw2NOKGrQUpDck1lKpwM9
-        HxaxB7AiRZHGdCAZ3cfp/Z6J1NctIZoVhuvic9IvzRPfQbxxsvv0B2PR0mhHBUJGOmHUdo
-        WGKyVy4C0Vt9Hgbydm0mAc05qajGPCs=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 11dd7b67 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 4 May 2022 00:45:57 +0000 (UTC)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-2f7ca2ce255so565057b3.7;
-        Tue, 03 May 2022 17:45:57 -0700 (PDT)
-X-Gm-Message-State: AOAM530BSzqWIqznK9egzj4SRMZjf/yv8NrXE9nCUJlJI+0NAVRD+TrZ
-        3G3tvHkrVJroNBcH0zKF8Vp5dtbChYC1Zv+VJAk=
-X-Google-Smtp-Source: ABdhPJw2U8dilBujiplVWnwWPnq6AoB6zAETj6rRKMpGI4/rNa1BeoG/ZIj/+lFIicpd3pP4wjy1JTaNwpC9yaRaAWY=
-X-Received: by 2002:a81:5ad6:0:b0:2f8:f7d5:dc6c with SMTP id
- o205-20020a815ad6000000b002f8f7d5dc6cmr14505979ywb.396.1651625156924; Tue, 03
- May 2022 17:45:56 -0700 (PDT)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77DA461994;
+        Wed,  4 May 2022 04:09:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD95C385A4;
+        Wed,  4 May 2022 04:09:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651637373;
+        bh=MRs4nB2lV3N57W1w2TRtVbdRp6xHsxyYRmRSSLkKL2o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lLoLN7zvcgI3p2rlMEzh94MwRo/MGTXspasaHzXxS+BKIine0R1Tkxqo4EgUB3HF1
+         WtoOUg3KyEDnqMYjn0sV5sX9M35eVG3FOwsXse5PDa2bHemurz3+YREgfijN3c+6Yh
+         6652LILOHFoSJAbXfU0/258qoVj1uoIupKHEEOl2n6kIQxGf3KVq/1id8kO91zVunU
+         +C+UGmBoXbxY+ObC2OAT/lg7ea8E86lJ3OYBvHDXqNjsad/NG6g5B2Ffe2ul3KVl06
+         S4bOEqs16yD2FyBDDFNwzX8M3mWlTZmUWhxdNXPA5BcXLjcKKtIywdEZsTQWRB6tMp
+         LdU3t7OEmnOPw==
+Date:   Wed, 4 May 2022 07:08:08 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        "tharvey@gateworks.com" <tharvey@gateworks.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: Re: [EXT] [PATCH v7 0/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Message-ID: <YnH8KGGubFFMcRRU@kernel.org>
+References: <20220415205647.46056-1-a.fatoum@pengutronix.de>
+ <DU2PR04MB86306B75C018C7CAB9FFA57195FD9@DU2PR04MB8630.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-References: <20220503195141.683217-1-Jason@zx2c4.com> <YnGI4lZVJ/FZEkcn@owl.dominikbrodowski.net>
-In-Reply-To: <YnGI4lZVJ/FZEkcn@owl.dominikbrodowski.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 4 May 2022 02:45:46 +0200
-X-Gmail-Original-Message-ID: <CAHmME9o1zhtq=bMetwEx7YEzoW79z36BQ=vTWEv4M_ocChm5eA@mail.gmail.com>
-Message-ID: <CAHmME9o1zhtq=bMetwEx7YEzoW79z36BQ=vTWEv4M_ocChm5eA@mail.gmail.com>
-Subject: Re: [PATCH] random: mix hwgenerator randomness before sleeping
-To:     Dominik Brodowski <linux@dominikbrodowski.net>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DU2PR04MB86306B75C018C7CAB9FFA57195FD9@DU2PR04MB8630.eurprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dominik,
+On Thu, Apr 28, 2022 at 12:50:50PM +0000, Pankaj Gupta wrote:
+> Hi Ahmad,
+> 
+> I have tested the patch-set.
+> It is working as expected even when CAAM is compiled as kernel module.
+> 
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Tested-by: Pankaj Gupta <pankaj.gupta@nxp.com>
 
-On Tue, May 3, 2022 at 9:56 PM Dominik Brodowski
-<linux@dominikbrodowski.net> wrote:
->
-> Am Tue, May 03, 2022 at 09:51:41PM +0200 schrieb Jason A. Donenfeld:
-> > The add_hwgenerator_randomness() function is called in a loop from a
-> > kthread by the hwgenerator core. It's supposed to sleep when there's
-> > nothing to do, and wake up periodically for more entropy. Right now it
-> > receives entropy, sleeps, and then mixes it in. This commit reverses the
-> > order, so that it always mixes in entropy sooner and sleeps after. This
-> > way the entropy is more fresh.
->
-> ... however, the hwgenerator may take quite some time to accumulate entropy
-> after wakeup. So now we might have a delay between a wakeup ("we need more
-> entropy!") and that entropy becoming available. Beforehand, the thread only
-> went to sleep when there is no current need for "fresh" entropy.
+1. Please do not top-post.
+2. Tag the exact patches you tested.
 
-Huh, interesting consideration. I didn't think about that. You wrote,
-"hwgenerator may take quite some time to accumulate entropy" -- any
-idea how long in the worst case? A second? A minute?
-
-Jason
+BR, Jarkko
