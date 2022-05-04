@@ -2,50 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF23C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C39C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 09:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347284AbiEDJYP (ORCPT
+        id S1347664AbiEDJqP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 05:24:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60200 "EHLO
+        Wed, 4 May 2022 05:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347339AbiEDJYG (ORCPT
+        with ESMTP id S238227AbiEDJqO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 05:24:06 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6F965F0;
-        Wed,  4 May 2022 02:20:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651656031; x=1683192031;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TLzDWArVZkel1+bI6EkTXQXMN2nFcD9kEsCR+FoZJaA=;
-  b=DT7w0TubNRhsOzSXIaHYYyFVrvu+oQg574GTPdBA+INHkAo5iuwicEK6
-   DB8GbJZFGIoMc1Ddm3A2mFS3sb+Rk3eh93EBKiWoLuF122i/WSH6q881V
-   DRDnPdrVV3xhyh77oGMndtyN7bqOmpCzI0hd1Sv2l28aqaAlDi9p/K1D7
-   0j9e3XXCztzW6SZo4/vcaGSTuuXx4ZTlv/Ce6j3ZiVn7hqHLdc3nknhfW
-   kZdcYDlpq3hkbC9l1rxSJUYsgRcZEeHMkbtBSJuV6uoVG6TuWH8PFLEvV
-   X68WLn7Pgd2Y76TD3A4A1tixwnHDgj/8AalFRqGkrzy7k1HJGr7danfT3
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10336"; a="249691738"
-X-IronPort-AV: E=Sophos;i="5.91,197,1647327600"; 
-   d="scan'208";a="249691738"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2022 02:20:29 -0700
-X-IronPort-AV: E=Sophos;i="5.91,197,1647327600"; 
-   d="scan'208";a="620727958"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2022 02:20:25 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
-        (envelope-from <andriy.shevchenko@intel.com>)
-        id 1nmBBG-00BpBT-GT;
-        Wed, 04 May 2022 12:20:22 +0300
-Date:   Wed, 4 May 2022 12:20:22 +0300
-From:   Andy Shevchenko <andriy.shevchenko@intel.com>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Stafford Horne <shorne@gmail.com>,
+        Wed, 4 May 2022 05:46:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 178AF275F4;
+        Wed,  4 May 2022 02:42:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 89262B8247D;
+        Wed,  4 May 2022 09:42:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DECB8C385A4;
+        Wed,  4 May 2022 09:42:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pnyjJaBx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651657353;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rW8jljRy3Yv58kuAXOgiGvBjEiUQtfJh49L05E5LnJg=;
+        b=pnyjJaBxYB8uxpm85cAzg+UNyvNUKlJY68olIPhtFJxzIB6Az8cAmeZn05XBKXoj6KdN3D
+        dJ0ZMZKvhABjnKudXmfoGJffPOJgxEyK/Pgc5HavqgBr96VCCH6zl/ibmtnbfSJJ66KYUv
+        R0f/AYldMZwS+QxwVl7hgN9DknE4VmE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 63f3361b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 4 May 2022 09:42:32 +0000 (UTC)
+Date:   Wed, 4 May 2022 11:42:27 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Stafford Horne <shorne@gmail.com>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Andy Shevchenko <andy@kernel.org>,
         device-mapper development <dm-devel@redhat.com>,
@@ -55,44 +49,73 @@ Cc:     Stafford Horne <shorne@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Mike Snitzer <msnitzer@redhat.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>, Jason@zx2c4.com
+        Milan Broz <gmazyland@gmail.com>
 Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-Message-ID: <YnJFViBFIgYOl7/2@smile.fi.intel.com>
+Message-ID: <YnJI4Ru0AlUgrr9C@zx2c4.com>
 References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
  <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
  <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
  <YnI7hE4cIfjsdKSF@antec>
- <alpine.LRH.2.02.2205040453050.22937@file01.intranet.prod.int.rdu2.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2205040453050.22937@file01.intranet.prod.int.rdu2.redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <YnI7hE4cIfjsdKSF@antec>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 04, 2022 at 04:57:35AM -0400, Mikulas Patocka wrote:
-> On Wed, 4 May 2022, Stafford Horne wrote:
-> > On Mon, Apr 25, 2022 at 08:07:48AM -0400, Mikulas Patocka wrote:
+On Wed, May 04, 2022 at 05:38:28PM +0900, Stafford Horne wrote:
+> Just a heads up it seems this patch is causing some instability with crypto self
+> tests on OpenRISC when using a PREEMPT kernel (no SMP).
+> 
+> This was reported by Jason A. Donenfeld as it came up in wireguard testing.
+> 
+> I am trying to figure out if this is an OpenRISC PREEMPT issue or something
+> else.
 
-...
+The code of this commit looks fine. And actually the bug goes away if
+you just add a `pr_err("hello!\n");` to the function. Plus, the function
+is never called by that test kernel.
 
-> > Just a heads up it seems this patch is causing some instability with crypto self
-> > tests on OpenRISC when using a PREEMPT kernel (no SMP).
-> > 
-> > This was reported by Jason A. Donenfeld as it came up in wireguard testing.
-> > 
-> > I am trying to figure out if this is an OpenRISC PREEMPT issue or something
-> > else.
+Actually, the bug even goes away if you change the sign of the input
+back to naked char (which might be semantically better anyway) and then
+let the function itself do the sign change (see below).
 
-> That patch is so simple that I can't imagine how could it break the 
-> curve25519 test. Are you sure that you bisected it correctly?
+So more likely is that this patch just helps unmask a real issue
+elsewhere -- linker, compiler, or register restoration after preemption.
+I don't think there's anything to do with regards to the patch of this
+thread, as it's clearly fine. Unless you want that sign thing below, but
+even then, who cares. We should keep digging in on the OpenRISC front.
 
-Can you provide a test cases for hex_to_bin()?
+Jason
 
--- 
-With Best Regards,
-Andy Shevchenko
+diff --git a/include/linux/kernel.h b/include/linux/kernel.h
+index fe6efb24d151..a890428bcc1a 100644
+--- a/include/linux/kernel.h
++++ b/include/linux/kernel.h
+@@ -285,7 +285,7 @@ static inline char *hex_byte_pack_upper(char *buf, u8 byte)
+ 	return buf;
+ }
 
+-extern int hex_to_bin(unsigned char ch);
++extern int hex_to_bin(char ch);
+ extern int __must_check hex2bin(u8 *dst, const char *src, size_t count);
+ extern char *bin2hex(char *dst, const void *src, size_t count);
+
+diff --git a/lib/hexdump.c b/lib/hexdump.c
+index 06833d404398..b636b4dcabe9 100644
+--- a/lib/hexdump.c
++++ b/lib/hexdump.c
+@@ -43,9 +43,9 @@ EXPORT_SYMBOL(hex_asc_upper);
+  *	uppercase and lowercase letters, so we use (ch & 0xdf), which converts
+  *	lowercase to uppercase
+  */
+-int hex_to_bin(unsigned char ch)
++int hex_to_bin(char ch)
+ {
+-	unsigned char cu = ch & 0xdf;
++	unsigned char cu = ch & 0xdfU;
+ 	return -1 +
+ 		((ch - '0' +  1) & (unsigned)((ch - '9' - 1) & ('0' - 1 - ch)) >> 8) +
+ 		((cu - 'A' + 11) & (unsigned)((cu - 'F' - 1) & ('A' - 1 - cu)) >> 8);
 
