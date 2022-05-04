@@ -2,118 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFB9C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 16:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF9AC43219
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 16:49:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353424AbiEDQtY (ORCPT
+        id S1353824AbiEDQxT convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 12:49:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49612 "EHLO
+        Wed, 4 May 2022 12:53:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353110AbiEDQtX (ORCPT
+        with ESMTP id S1353820AbiEDQwb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 12:49:23 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92FEE6442;
-        Wed,  4 May 2022 09:45:47 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1651682746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TMixN8cuqlcIWYEYdCj7kZizdE9V6yCD9qvxJl7kpU4=;
-        b=aZp5uSAMO1Lhaqq9CN2P0GEVbg+kN095nF1t4DC2J9tMeNKXBbHmBjiQTw2XtIGig/AtRL
-        cgG6kUIVKpSltAvs9fiIBRVLDnVaXoc+4KQmWJXZRBuJMmbqe6DsgMvqaRiMI1WHKhi/iN
-        CXkr4XNBzD1UnRYZcSvQBdKBF3hXxxjaskwODvqAn1qnamSHDDlpbqJhuxN5ei9tpsvUbN
-        HGSWpea+kUQWkX6aAn+tnYXGtcWbg4Aj+0VmN8gw8UtdkZ9KnfrO9OyvjA7liyR/N7cvPa
-        T4U1uYB2f9lfG73hPHMH5ryHU7A9t4SWhfQ1C5A81CQ2qh17rIXsgoDNjgafbw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1651682746;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TMixN8cuqlcIWYEYdCj7kZizdE9V6yCD9qvxJl7kpU4=;
-        b=M805BnjFPz7Ky1Fn4P7lC/lUY7igEkaLMi2ZCxiYCDs0eNWT3KuB2EPvxy/uea2N6KTgKp
-        iBhBieR4eq/9+7AA==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
-Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-In-Reply-To: <YnKh96isoB7jiFrv@zx2c4.com>
-References: <20220501192740.203963477@linutronix.de>
- <20220501193102.704267030@linutronix.de> <Ym/sHqKqmLOJubgE@zn.tnic>
- <87k0b4lydr.ffs@tglx> <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
- <87fslpjomx.ffs@tglx> <YnKh96isoB7jiFrv@zx2c4.com>
-Date:   Wed, 04 May 2022 18:45:45 +0200
-Message-ID: <87czgtjlfq.ffs@tglx>
+        Wed, 4 May 2022 12:52:31 -0400
+X-Greylist: delayed 1681 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 May 2022 09:48:41 PDT
+Received: from mail.megasoftsol.com (mail.megasoftsol.com [43.231.250.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E800473B8
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 09:48:41 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.megasoftsol.com (Postfix) with ESMTP id E93889073E1
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 21:38:46 +0530 (IST)
+Received: from mail.megasoftsol.com ([127.0.0.1])
+        by localhost (mail.megasoftsol.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id iIRxeEGzHLlM for <linux-crypto@vger.kernel.org>;
+        Wed,  4 May 2022 21:38:46 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.megasoftsol.com (Postfix) with ESMTP id 3948C9073D3
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 21:38:46 +0530 (IST)
+X-Virus-Scanned: amavisd-new at megasoftsol.com
+Received: from mail.megasoftsol.com ([127.0.0.1])
+        by localhost (mail.megasoftsol.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id LH45ewyRfeM6 for <linux-crypto@vger.kernel.org>;
+        Wed,  4 May 2022 21:38:46 +0530 (IST)
+Received: from johnlewis.com (unknown [20.97.211.134])
+        (Authenticated sender: admin)
+        by mail.megasoftsol.com (Postfix) with ESMTPSA id 5A9689073A9
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 21:38:45 +0530 (IST)
+Reply-To: robert_turner@johnlewis-trades.com
+From:   John Lewis & Partnersip <robert.turner44@johnlewis.com>
+To:     linux-crypto@vger.kernel.org
+Subject: 5/04/2022 Product Inquiry (JL)
+Date:   04 May 2022 16:11:13 +0000
+Message-ID: <20220504123943.69EDA316036484C4@johnlewis.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason,
-
-On Wed, May 04 2022 at 17:55, Jason A. Donenfeld wrote:
-> On Wed, May 04, 2022 at 05:36:38PM +0200, Thomas Gleixner wrote:
->> But the only use case which utilizes FPU from hard interrupt context is
->> the random generator via add_randomness_...().
->> 
->> I did a benchmark of these functions, which invoke blake2s_update()
->> three times in a row, on a SKL-X and a ZEN3. The generic code and the
->> FPU accelerated code are pretty much on par vs. execution time of the
->> algorithm itself plus/minus noise.
->>
->> IOW, using the FPU blindly for this kind of computations is not
->> necessarily a good plan. I have no idea how these things are analyzed
->> and evaluated if at all. Maybe the crypto people can shed some light on
->> this.
->
-> drivers/net/wireguard/{noise,cookie}.c makes pretty heavy use of BLAKE2s
-> in hot paths where the FPU is already being used for other algorithms,
-> and so there the save/restore is worth it (assuming restore finally
-> works lazily). In benchmarks, the SIMD code made a real difference.
-
-I'm sure there are very valid use cases, but just the two things I
-looked at turned out to be questionable at least.
-
-> But this presumably regards mix_pool_bytes() in the RNG. If it turns out
-> that supporting the FPU in hard IRQ context is a major PITA, and the
-> RNG
-
-Supporting FPU in hard interrupt context is possible if required and the
-preexisting bug which survived 10+ years has been fixed.
-x
-I just started to look into this because of that bug and due to the
-inconsistency between the FPU protections we have. The inconsistency
-comes from the hardirq requirement.
-
-> is the only thing making use of it, then sure, drop hard IRQ context
-> support for it. However... This may be unearthing a larger bug.
-> Sebastian and I put in a decent amount of work during 5.18 to remove all
-> calls to mix_pool_bytes() (and hence to blake2s_compress()) from
-> add_interrupt_randomness(). Have a look:
-
-I know.
-
-> It now accumulates in some per-CPU buffer, and then every 64 interrupts
-> a worker runs that does the actual mix_pool_bytes() from kthread
-> context.
-
-That's add_interrupt_randomness() and not affected by this.
-
-> So the question is: what is still hitting mix_pool_bytes() from hard IRQ
-> context? I'll investigate a bit and see.
-
-add_disk_randomness() on !RT kernels. That's what made me look into this
-in the first place as it unearthed the long standing FPU protection
-bug. See the first patch in this thread.
-
-Possibly add_device_randomness() too, but I haven't seen evidence so far.
-
-Thanks,
-
-        tglx
+Dear linux-crypto
+ 
+ 
+The famous brand John Lewis & Partners, is UK's largest multi-
+channel retailer with over 126 shops and multiple expansion in 
+Africa furnished by European/Asian/American products. We are 
+sourcing new products to attract new customers and also retain 
+our existing ones, create new partnerships with companies dealing 
+with different kinds of goods globally.
+ 
+Your company's products are of interest to our market as we have 
+an amazing market for your products.
+ 
+Provide us your current catalog through email to review more. We 
+hope to be able to order with you and start a long-term friendly, 
+respectable and solid business partnership. Please we would 
+appreciate it if you could send us your stock availability via 
+email if any.
+ 
+ 
+Our payment terms are 15 days net in Europe, 30 days Net in UK 
+and 30 days net in Asia/USA as we have operated with over 5297 
+suppliers around the globe for the past 50 years now. For 
+immediate response Send your reply to "robert_turner@johnlewis-
+trades.com" for us to be able to treat with care and urgency.
+ 
+ 
+ 
+Best Regards
+ 
+ 
+Rob Turner
+Head Of Procurement Operations
+John Lewis & Partners.
+robert_turner@johnlewis-trades.com
+Tel: +44-7451-274090
+WhatsApp: +447497483925
+www.johnlewis.com
+REGISTERED OFFICE: 171 VICTORIA STREET, LONDON SW1E 5NN
