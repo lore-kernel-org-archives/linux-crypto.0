@@ -2,92 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3AFC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 10:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E17ADC433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 11:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240893AbiEDKTP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 06:19:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60468 "EHLO
+        id S1348583AbiEDLQ7 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 07:16:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348057AbiEDKTN (ORCPT
+        with ESMTP id S1348593AbiEDLQx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 06:19:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047511C129;
-        Wed,  4 May 2022 03:15:38 -0700 (PDT)
+        Wed, 4 May 2022 07:16:53 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B92522528E;
+        Wed,  4 May 2022 04:13:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 952BA61ACF;
-        Wed,  4 May 2022 10:15:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97614C385A4;
-        Wed,  4 May 2022 10:15:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2B9CAB821D5;
+        Wed,  4 May 2022 11:13:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A5EAC385AE;
+        Wed,  4 May 2022 11:13:14 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZXttSzmZ"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dWXyH6SD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651659334;
+        t=1651662792;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0NDvnCek1kbw8v3M1u2ks8T9tYgYwuJSuSlmeWt9wN4=;
-        b=ZXttSzmZ40auAREQDE82/7bmboma7RQf04mBPFZe+rWGuQOTcK+aebW02DlqRb2c9GGHUr
-        5TNV+OrdpQ/Q8w85dgDXh3mDwdY0j5/ymG/Fb8wxDTLO082CrtIyox2MsGnHiuixjeP2ZJ
-        UmpoHzECaHVOGW3ShZV3kEj91gz9ph4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 5c3caf4c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 4 May 2022 10:15:33 +0000 (UTC)
-Date:   Wed, 4 May 2022 12:15:31 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc:     Stafford Horne <shorne@gmail.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-Message-ID: <YnJSQ3jJyvhmIstD@zx2c4.com>
-References: <alpine.LRH.2.02.2204241648270.17244@file01.intranet.prod.int.rdu2.redhat.com>
- <CAHk-=wh+Z+OKH3jRttWGHbWSQq2wVMtdnA=ntDiadZu=VxAC7w@mail.gmail.com>
- <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
- <YnI7hE4cIfjsdKSF@antec>
- <YnJI4Ru0AlUgrr9C@zx2c4.com>
- <YnJOCbLtdATzC+jn@zx2c4.com>
- <YnJQXr3igEMTqY3+@smile.fi.intel.com>
+        bh=HXiaK4ictgTSjtvWOEUk+V6lbW8n+flqFYQG/qZp/tc=;
+        b=dWXyH6SDho1vsZk6jp325598IoQxyDX5RdlrojDYWX33rV3qpguAY0xp8e49erwjIbm//7
+        Noa6LXMvAeCBw28nTvaHBCczKc25blHIZKi/Grpmzf52tj13Z+Tfchj99QHzXPuHQOUbhJ
+        rQX0IwJd4uuNLiogVYtxli/EBNVsyO0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1638d895 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 4 May 2022 11:13:12 +0000 (UTC)
+Received: by mail-yb1-f181.google.com with SMTP id h10so1771010ybc.4;
+        Wed, 04 May 2022 04:13:12 -0700 (PDT)
+X-Gm-Message-State: AOAM531HNxE+twLkskJKdM/OH9H0kO5pQGxDJyB2paSJUqoLDBMco6Mm
+        N0S7qYaNTXDB+1Jzc/Lr7K+76cR242HrEuWmIA4=
+X-Google-Smtp-Source: ABdhPJwCBvpDxWGSWccxUCQ9Dcxzd+za7/HrhxllXzM3nsD8TEctq7GSKBM+TEdo8KJm1AuvrqSU4mLti6+HOafgrIk=
+X-Received: by 2002:a25:420b:0:b0:648:4baf:c639 with SMTP id
+ p11-20020a25420b000000b006484bafc639mr17860583yba.373.1651662791725; Wed, 04
+ May 2022 04:13:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YnJQXr3igEMTqY3+@smile.fi.intel.com>
+References: <20220503195141.683217-1-Jason@zx2c4.com> <YnGI4lZVJ/FZEkcn@owl.dominikbrodowski.net>
+ <CAHmME9o1zhtq=bMetwEx7YEzoW79z36BQ=vTWEv4M_ocChm5eA@mail.gmail.com> <YnIQ9RJpP/3j5aWF@owl.dominikbrodowski.net>
+In-Reply-To: <YnIQ9RJpP/3j5aWF@owl.dominikbrodowski.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 4 May 2022 13:13:01 +0200
+X-Gmail-Original-Message-ID: <CAHmME9pAHcXk+jyJDX27JfXbXRKtJmQuKH8aVbOo6d6N1RAakA@mail.gmail.com>
+Message-ID: <CAHmME9pAHcXk+jyJDX27JfXbXRKtJmQuKH8aVbOo6d6N1RAakA@mail.gmail.com>
+Subject: Re: [PATCH] random: mix hwgenerator randomness before sleeping
+To:     Dominik Brodowski <linux@dominikbrodowski.net>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 04, 2022 at 01:07:26PM +0300, Andy Shevchenko wrote:
-> On Wed, May 04, 2022 at 11:57:29AM +0200, Jason A. Donenfeld wrote:
-> > On Wed, May 04, 2022 at 11:42:27AM +0200, Jason A. Donenfeld wrote:
-> > > So more likely is that this patch just helps unmask a real issue
-> > > elsewhere -- linker, compiler, or register restoration after preemption.
-> > > I don't think there's anything to do with regards to the patch of this
-> > > thread, as it's clearly fine. 
-> > 
-> > The problem even goes away if I just add a nop...
-> 
-> Alignment? Compiler bug? HW issue?
+Hi Dominik,
 
-Probably one of those, yea. Removing the instruction addresses, the only
-difference between the two compiles is: https://xn--4db.cc/Rrn8usaX/diff#line-440
+Alright I'll drop this patch for now, and we can revisit it if we ever
+get rid of the premature next stuff.
 
-So either there's some alignment going on here, a compiler thing I
-haven't spotted yet, or some very fragile interrupt/preemption behavior
-that's interacting with this, either on the kernel side or the QEMU
-side.
-
-(I've never touched real HW for this; I just got nerd sniped when
-wondering why my wireguard CI was failing...)
- 
 Jason
