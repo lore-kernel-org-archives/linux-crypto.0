@@ -2,126 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5DBC433FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 20:39:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74EF5C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 May 2022 21:04:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378201AbiEDUmj (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 16:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53584 "EHLO
+        id S236309AbiEDVHw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 17:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378158AbiEDUmi (ORCPT
+        with ESMTP id S235258AbiEDVHv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 16:42:38 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127E050049;
-        Wed,  4 May 2022 13:39:02 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id x52so2017880pfu.11;
-        Wed, 04 May 2022 13:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iPsQSqw38DosWcjT864uHfOF3XMxzmipGYiJZY97a+Y=;
-        b=HeKz8oHH+fsEnc9s5lWFq2PGnWyNSnGkB3GsCOSICh3Cp4xpuN0zvzcUvI23k1GPpH
-         nw3mWSQDbM8My5I3049IDKSslQGytio+8Mu1v/GyBvMuMQ4trIchlQB3blQaFDUoWw56
-         5MOYSYmdvCw3gVpi1BZNreXBJKLNjQ5H95BZjS/NaV1sI8mkk9qQFg/chvTR0o8j0X77
-         gWdUHFVhXgV47R3enUr/M301Ev/8EL3kPPiJ2WjX0OyLFy63ukkqt/cQgyXTSyjZ9Hsk
-         XvI0+0qvOAJO6jLRoAnXAXhUuommEQpTTf4YhnLO6lhcIcblnVFKApPdGCMZMpQFDR5B
-         3q+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iPsQSqw38DosWcjT864uHfOF3XMxzmipGYiJZY97a+Y=;
-        b=FOw185EkRC2nmhe88VRknzEbWWmvWcRSUd6K55vzttqvEkr+zkgg0SyYFFFpmVq1w6
-         xkhqkX9qTFtdQiYCyqGUnVQGRq0BjxchbRQQK0p8QXGDGZEZjwHQ6qXkHQ3ogyqKFXQ1
-         jC7YcRA9ghaQIRis8Nn78zhHk5SVtinUxdO+1QIM1uzbNtC2x3eYJlCCP5u9+Sp97Lcb
-         Ry4rVLaJBW4vluD+oQAgXij4Da5xztYw3fUfqINwzP8dYES/PeD+XeGubIj/7hielvV3
-         1LEr3dwT1BGic1IuMGPJ3CxJiegOwx+3/1EEMPve+3wG/C93Cxk9GyV1i9Bn80nOvp/L
-         HchA==
-X-Gm-Message-State: AOAM531H+KaWyOdPhnpFf6MvHxGW8P2HRZnLj6SevF+f97buBMbnqMIt
-        CN6PkvUf0eZU97qJ4PNMH6fw2uW0YPTamA==
-X-Google-Smtp-Source: ABdhPJyT72f6GCu/Hi0foCbtIUf3rGveJmsZaXeGY5CnNpUoYWUQwAfMmEBdDiFZ9ilZNTjq67JcTg==
-X-Received: by 2002:a63:7c4e:0:b0:380:8ae9:c975 with SMTP id l14-20020a637c4e000000b003808ae9c975mr19713757pgn.25.1651696741592;
-        Wed, 04 May 2022 13:39:01 -0700 (PDT)
-Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
-        by smtp.gmail.com with ESMTPSA id y11-20020a62b50b000000b0050e0a43712esm3644774pfe.63.2022.05.04.13.39.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 13:39:00 -0700 (PDT)
-Date:   Thu, 5 May 2022 05:38:58 +0900
-From:   Stafford Horne <shorne@gmail.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andy Shevchenko <andriy.shevchenko@intel.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Andy Shevchenko <andy@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
-Message-ID: <YnLkYjOF2vEOdjOo@antec>
-References: <alpine.LRH.2.02.2204250723120.26714@file01.intranet.prod.int.rdu2.redhat.com>
- <YnI7hE4cIfjsdKSF@antec>
- <YnJI4Ru0AlUgrr9C@zx2c4.com>
- <YnJOCbLtdATzC+jn@zx2c4.com>
- <YnJQXr3igEMTqY3+@smile.fi.intel.com>
- <YnJSQ3jJyvhmIstD@zx2c4.com>
- <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
- <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com>
- <CAAfxs77yaLvWx9KnkDZX7E1eDm9N-NVJn5n8=mCK9BU-cSob=A@mail.gmail.com>
- <CAHk-=wjLRo-6PbhbvMUDojbMo=L+2jc5VpCYTyF-LGxZPhUngA@mail.gmail.com>
+        Wed, 4 May 2022 17:07:51 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2095132C;
+        Wed,  4 May 2022 14:04:14 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651698253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yscU3WybghtmL24CPVhfe3Npv35TWeHhUhbLPNB/baI=;
+        b=2o4PulypsEzEaBWVKXUxymwhkYsJP/KTJPjb8FRZr+Ih3SjC7rNRe3gMTZ62Zhxqe08LUl
+        Prn+Gl88cMnO4fy59CKk9MWSFjSSblnj75szVkZXRS/pw218lyTttRm8hs69hlbqvD5+4r
+        j7Spi2zSB+/qZi6XUycE2WBtWCrd759FD1kpHPRuXmY/gpuftQmIGEQRFXTcEd9Llm67b4
+        VvIdre3I7NblZMLPy0gpoT6K7GeJsxSeVK3liXZ5Ry0rAF7vzYZhWyNs3AmbfDo3ov9PGt
+        jIaFLQEVGPftCkXx7bujbixeFC6j2mpTed3UhJijSNvnblLacC+JRVzZhTCuqQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651698253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yscU3WybghtmL24CPVhfe3Npv35TWeHhUhbLPNB/baI=;
+        b=XRJx8U7T2flBHP2xUg1gwUnEZLffldEyfEe3a60XlUALYx+birhCBL4LUAs3gFlFAAI227
+        Vi33mqjq76SNcODQ==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
+Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
+In-Reply-To: <YnLOXZp6WgH7ULVU@zx2c4.com>
+References: <20220501192740.203963477@linutronix.de>
+ <20220501193102.704267030@linutronix.de> <Ym/sHqKqmLOJubgE@zn.tnic>
+ <87k0b4lydr.ffs@tglx> <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
+ <87fslpjomx.ffs@tglx> <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com>
+Date:   Wed, 04 May 2022 23:04:12 +0200
+Message-ID: <87wnf1huwj.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjLRo-6PbhbvMUDojbMo=L+2jc5VpCYTyF-LGxZPhUngA@mail.gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 04, 2022 at 01:10:03PM -0700, Linus Torvalds wrote:
-> On Wed, May 4, 2022 at 12:58 PM Stafford Horne <shorne@gmail.com> wrote:
-> >
-> > I have uploaded a diff I created here:
-> >   https://gist.github.com/54334556f2907104cd12374872a0597c
-> >
-> > It shows the same output.
-> 
-> In hex_to_bin itself it seems to only be a difference due to some
-> register allocation (r19 and r3 switched around).
-> 
-> But then it gets inlined into hex2bin and there changes there seem to
-> be about instruction and basic block scheduling, so it's a lot harder
-> to see what's going on.
-> 
-> And a lot of constant changes, which honestly look just like code code
-> moved around by 16 bytes and offsets changed due to that.
-> 
-> So I doubt it's hex_to_bin() that is causing problems, I think it's
-> purely code movement. Which explains why adding a nop or a fake printk
-> fixes things.
-> 
-> Some alignment assumption that got broken?
+Jason,
 
-This is what it looks like to me too.  I will have to do a deep dive on what is
-going on with this particular build combination as I can't figure out what it is
-off the top of my head.
+On Wed, May 04 2022 at 21:05, Jason A. Donenfeld wrote:
+> The other stance is that these input/disk events are relatively rare --
+> compared to, say, a storm of interrupts from a NIC -- so mixing into the
+> input pool from there isn't actually a problem, and we benefit from the
+> quasi domain-specific accounting and the superior mixing function,
+> there, so keep it around. And the non-raw spinlock on the input pool
+> won't negatively affect RT from this context, because all its callers on
+> RT should be threaded.
 
-This test is using a gcc 11 compiler, I tried with my gcc 12 toolchain and the
-issue cannot be reproduced.
+I'm not worried about RT here.
 
-  - musl gcc 11 - https://musl.cc/or1k-linux-musl-cross.tgz
-  - openrisc gcc 12 - https://github.com/openrisc/or1k-gcc/releases/tag/or1k-12.0.1-20220210-20220304
+> The second stance seems easier and more conservative from a certain
+> perspective -- we don't need to change anything -- so I'm more inclined
+> toward it.
 
-But again the difference between the two compiler outputs is a lot of register
-allocation and offsets changes.  Its not easy to see anything that stands out.
-I checked the change log for the openrisc specific changes from gcc 11 to gcc
-12.  Nothing seems to stand out, mcount profiler fix for PIC, a new large binary
-link flag.
+That's not conservative, that's lazy and lame. Staying with the status
+quo and piling more stuff on top because we can is just increasing
+technical debt. Works for a while by some definition of works.
 
--Stafford
+> And given that you've fixed the bug now, it sounds like that's fine
+> with you too. But if you're thinking about it differently in fact, let
+> me know.
+
+That still does not address my observation that using the FPU for this
+mixing, which is handling a couple of bytes per invocation, is not
+really benefitial.
+
+Which in turn bears the question, why we have to maintain an asymmetric
+FPU protection mechanism in order to support hard interrupt FPU usage
+for no or questionable benefit.
+
+The current implementation, courtesy to hard interrupt support, has the
+following downside:
+
+  Any FPU usage in task context where soft interrupts are enabled will
+  prevent FPU usage in soft interrupt processing when the interrupt hits
+  into the FPU usage region. That means the softirq processing has to
+  fall back to the generic implementations.
+
+Sure, the protection could be context dependent, but that's generally
+frowned upon. If we go there, then there has to be a really convincing
+technical argument.
+
+Thanks,
+
+        tglx
