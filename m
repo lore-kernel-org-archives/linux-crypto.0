@@ -2,191 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B23C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 13:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BED5C4332F
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 15:13:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378073AbiEENwv (ORCPT
+        id S1381185AbiEEPRL convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 09:52:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37496 "EHLO
+        Thu, 5 May 2022 11:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231135AbiEENwu (ORCPT
+        with ESMTP id S1381199AbiEEPRJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 09:52:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A81357B13;
-        Thu,  5 May 2022 06:49:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E912761EA1;
-        Thu,  5 May 2022 13:49:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68828C385A4;
-        Thu,  5 May 2022 13:49:09 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OoBA75oD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651758547;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GcYjK1pB4trYMEK7Jg+WFSNQr3tC4Ghpb0u1HgTVVCs=;
-        b=OoBA75oDsRoDieLgtuW7alWNT5/odoKZW2NCx4PzT2OBe01vwUzxaEWwzX07MLErTfTahr
-        yqlCZlL8hPmNY6FSZgJfRmDgUVOhIIm87rlu3GPCqXfjAPVyFzelPrbvjMz9oeqpOwMUVL
-        WTjfYzN6a+YpFPgZzVz3b81iIvAXRb0=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a05ca93b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 5 May 2022 13:49:07 +0000 (UTC)
-Date:   Thu, 5 May 2022 15:48:55 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
-Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-Message-ID: <YnPVx3epmwUWKfvl@zx2c4.com>
-References: <87fslpjomx.ffs@tglx>
- <YnKh96isoB7jiFrv@zx2c4.com>
- <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com>
- <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com>
- <87mtfwiyqp.ffs@tglx>
- <YnMkRLcxczMxdE5z@zx2c4.com>
- <87h764ixjs.ffs@tglx>
- <YnOuqh4YZT8ww96W@zx2c4.com>
+        Thu, 5 May 2022 11:17:09 -0400
+X-Greylist: delayed 902 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 05 May 2022 08:13:28 PDT
+Received: from mail.actia.se (212-181-117-226.customer.telia.com [212.181.117.226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E90A5C35C;
+        Thu,  5 May 2022 08:13:27 -0700 (PDT)
+Received: from S036ANL.actianordic.se (10.12.31.117) by S035ANL.actianordic.se
+ (10.12.31.116) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 5 May
+ 2022 16:58:24 +0200
+Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
+ S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%10]) with mapi id
+ 15.01.2375.024; Thu, 5 May 2022 16:58:24 +0200
+From:   John Ernberg <john.ernberg@actia.se>
+To:     "a.fatoum@pengutronix.de" <a.fatoum@pengutronix.de>
+CC:     "andreas@rammhold.de" <andreas@rammhold.de>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "david@sigma-star.at" <david@sigma-star.at>,
+        "dhowells@redhat.com" <dhowells@redhat.com>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "franck.lenormand@nxp.com" <franck.lenormand@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "horia.geanta@nxp.com" <horia.geanta@nxp.com>,
+        "j.luebbe@pengutronix.de" <j.luebbe@pengutronix.de>,
+        "jarkko@kernel.org" <jarkko@kernel.org>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "jmorris@namei.org" <jmorris@namei.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "matthias.schiffer@ew.tq-group.com" 
+        <matthias.schiffer@ew.tq-group.com>,
+        "pankaj.gupta@nxp.com" <pankaj.gupta@nxp.com>,
+        "richard@nod.at" <richard@nod.at>,
+        "s.trumtrar@pengutronix.de" <s.trumtrar@pengutronix.de>,
+        "serge@hallyn.com" <serge@hallyn.com>,
+        "sumit.garg@linaro.org" <sumit.garg@linaro.org>,
+        "tharvey@gateworks.com" <tharvey@gateworks.com>,
+        "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+        John Ernberg <john.ernberg@actia.se>
+Subject: Re: [PATCH v8 0/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Thread-Topic: [PATCH v8 0/6] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Thread-Index: AQHYYJCRaP1BJI53pkGuwIjy0ObIWw==
+Date:   Thu, 5 May 2022 14:58:23 +0000
+Message-ID: <20220505145756.2492566-1-john.ernberg@actia.se>
+References: <20220428140145.870527-1-a.fatoum@pengutronix.de>
+In-Reply-To: <20220428140145.870527-1-a.fatoum@pengutronix.de>
+Accept-Language: en-US, sv-SE
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.35.1
+x-originating-ip: [10.12.12.58]
+x-esetresult: clean, is OK
+x-esetid: 37303A293105C852667D6B
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YnOuqh4YZT8ww96W@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey again Thomas,
+Gave this a go on iMX8QXP with Linux 5.17.5 and I can't quite get it working.
 
-On Thu, May 05, 2022 at 01:02:02PM +0200, Jason A. Donenfeld wrote:
-> Interestingly, disabling the simd paths makes things around 283 cycles
-> slower on my Tiger Lake laptop, just doing ordinary things. I'm actually
-> slightly surprised, so I'll probably keep playing with this. My patch
-> for this is attached. Let me know if you have a different methodology in
-> mind...
+I get -ENODEV from add_key() via keyctl. When I traced it in dmesg I couldn't
+get an as clear picture as I would like but CAAM (and thus possibly JRs?)
+initialzing after trusted_key.
 
-Using RDPMC/perf, the performance is shown to be even closer for real
-world cases, with the simd code only ~80 cycles faster. Bench code
-follows below. If the observation on this hardware holds for other
-hardware, we can probably improve the performance of the generic code a
-bit, and then the difference really won't matter. Any thoughts about
-this and the test code?
+dmesg snips:
+[    1.296772] trusted_key: Job Ring Device allocation for transform failed
+...
+[    1.799768] caam 31400000.crypto: device ID = 0x0a16040000000100 (Era 9)
+[    1.807142] caam 31400000.crypto: job rings = 2, qi = 0
+[    1.822667] caam algorithms registered in /proc/crypto
+[    1.830541] caam 31400000.crypto: caam pkc algorithms registered in /proc/crypto
+[    1.841807] caam 31400000.crypto: registering rng-caam
 
-Jason
+I didn't quite have the time to get a better trace than that.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index bd292927654c..6577e9f2f3b7 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -53,6 +53,7 @@
- #include <linux/uuid.h>
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
-+#include <linux/sort.h>
- #include <crypto/chacha.h>
- #include <crypto/blake2s.h>
- #include <asm/processor.h>
-@@ -755,9 +756,54 @@ static struct {
- 	.lock = __SPIN_LOCK_UNLOCKED(input_pool.lock),
- };
- 
-+static DEFINE_PER_CPU(int, pmc_index) = -1;
-+static struct {
-+	u32 durations[1 << 20];
-+	u32 pos, len;
-+} irqbench;
-+
- static void _mix_pool_bytes(const void *in, size_t nbytes)
- {
-+	int idx = *this_cpu_ptr(&pmc_index);
-+	u32 ctr = input_pool.hash.t[0], reg = 0;
-+	cycles_t end, start;
-+
-+
-+	native_cpuid(&reg, &reg, &reg, &reg);
-+	start = idx == -1 ? 0 : native_read_pmc(idx);
- 	blake2s_update(&input_pool.hash, in, nbytes);
-+	end = idx == -1 ? 0 : native_read_pmc(idx);
-+
-+	if (ctr == input_pool.hash.t[0] || !in_hardirq() || idx == -1)
-+		return;
-+
-+	irqbench.durations[irqbench.pos++ % ARRAY_SIZE(irqbench.durations)] = end - start;
-+	irqbench.len = min_t(u32, irqbench.len + 1, ARRAY_SIZE(irqbench.durations));
-+}
-+
-+static int cmp_u32(const void *a, const void *b)
-+{
-+	return *(const u32 *)a - *(const u32 *)b;
-+}
-+
-+static int proc_do_irqbench_median(struct ctl_table *table, int write, void *buffer,
-+				   size_t *lenp, loff_t *ppos)
-+{
-+	u32 len = READ_ONCE(irqbench.len), median, *sorted;
-+	struct ctl_table fake_table = {
-+		.data = &median,
-+		.maxlen = sizeof(median)
-+	};
-+	if (!len)
-+		return -ENODATA;
-+	sorted = kmalloc_array(len, sizeof(*sorted), GFP_KERNEL);
-+	if (!sorted)
-+		return -ENOMEM;
-+	memcpy(sorted, irqbench.durations, len * sizeof(*sorted));
-+	sort(sorted, len, sizeof(*sorted), cmp_u32, NULL);
-+	median = sorted[len / 2];
-+	kfree(sorted);
-+	return write ? 0 : proc_douintvec(&fake_table, 0, buffer, lenp, ppos);
- }
- 
- /*
-@@ -1709,6 +1755,18 @@ static struct ctl_table random_table[] = {
- 		.mode		= 0444,
- 		.proc_handler	= proc_do_uuid,
- 	},
-+	{
-+		.procname	= "irqbench_median",
-+		.mode		= 0444,
-+		.proc_handler	= proc_do_irqbench_median,
-+	},
-+	{
-+		.procname	= "irqbench_count",
-+		.data		= &irqbench.len,
-+		.maxlen		= sizeof(irqbench.len),
-+		.mode		= 0444,
-+		.proc_handler	= proc_douintvec,
-+	},
- 	{ }
- };
- 
-@@ -1718,6 +1776,21 @@ static struct ctl_table random_table[] = {
-  */
- static int __init random_sysctls_init(void)
- {
-+	int i;
-+	struct perf_event *cycles_event;
-+	struct perf_event_attr perf_cycles_attr = {
-+		.type = PERF_TYPE_HARDWARE,
-+		.config = PERF_COUNT_HW_CPU_CYCLES,
-+		.size = sizeof(struct perf_event_attr),
-+		.pinned = true
-+	};
-+	for_each_possible_cpu(i) {
-+		cycles_event = perf_event_create_kernel_counter(&perf_cycles_attr, i, NULL, NULL, NULL);
-+		if (IS_ERR(cycles_event))
-+			pr_err("unable to create perf counter on cpu %d: %ld\n", i, PTR_ERR(cycles_event));
-+		else
-+			*per_cpu_ptr(&pmc_index, i) = cycles_event->hw.event_base_rdpmc;
-+	}
- 	register_sysctl_init("kernel/random", random_table);
- 	return 0;
- }
- 
+Best regards // John Ernberg
