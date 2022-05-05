@@ -2,130 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8573CC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 051CDC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:20:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232071AbiEEAFT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 20:05:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
+        id S230319AbiEEAXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 20:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382706AbiEDX4R (ORCPT
+        with ESMTP id S230027AbiEEAXn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 19:56:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58F04E3BD;
-        Wed,  4 May 2022 16:52:39 -0700 (PDT)
+        Wed, 4 May 2022 20:23:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673B618E06;
+        Wed,  4 May 2022 17:20:05 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8A2E0B827B2;
-        Wed,  4 May 2022 23:52:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B5AC385A4;
-        Wed,  4 May 2022 23:52:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 274F2B82A3E;
+        Thu,  5 May 2022 00:20:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E527C385A5;
+        Thu,  5 May 2022 00:20:01 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Xc8ZsKYy"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LjvDclPy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651708354;
+        t=1651710000;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RhWrhB/pJDJtUIEjANxHfC2hV+/L/PFBqp4ZrDUMmMs=;
-        b=Xc8ZsKYyfQYJsg94Vj7Frp+VSERu3KKWi7wDL1PzWR3et9yruS8xtiHdbfGZTobV5aghAA
-        SVmw0WOSvhkAw97LNk2Nq3Pg1pZ+I/QZVuf1zX6Tc3g8pakLowDOHMyBaGxQjv/8hIck4J
-        a9sPVHQj/eUEKnQJR7j7whiHw0/BQbU=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2e9307e2 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 4 May 2022 23:52:34 +0000 (UTC)
-Date:   Thu, 5 May 2022 01:52:32 +0200
+        bh=/x+q8szNDEuBdV29gbI+Fv1fEqHBjjq0rW124DO+QnY=;
+        b=LjvDclPydox5jokMv+8kIIOdf4dsQqmeFatfQLF8P6adL/mNAFRwI33SovkQQmb73Ke43z
+        9ScUiXpoGrx9UAKUTWtg8LG2viDnxaOgzCTdseNNRKR7t/U8GZbkUuvJAxzlkR7EiEN9bY
+        jC1QlNYKz9ghPUUsSEG6g5Y8SWwM+DA=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 152a7184 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 5 May 2022 00:19:59 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
-Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-Message-ID: <YnMRwPFfvB0RlBow@zx2c4.com>
-References: <20220501192740.203963477@linutronix.de>
- <20220501193102.704267030@linutronix.de>
- <Ym/sHqKqmLOJubgE@zn.tnic>
- <87k0b4lydr.ffs@tglx>
- <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
- <87fslpjomx.ffs@tglx>
- <YnKh96isoB7jiFrv@zx2c4.com>
- <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com>
- <87wnf1huwj.ffs@tglx>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     nathan@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH v7] timekeeping: Add raw clock fallback for random_get_entropy()
+Date:   Thu,  5 May 2022 02:19:24 +0200
+Message-Id: <20220505001924.176087-1-Jason@zx2c4.com>
+In-Reply-To: <87y1zkmg0l.ffs@tglx>
+References: <87y1zkmg0l.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87wnf1huwj.ffs@tglx>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+The addition of random_get_entropy_fallback() provides access to
+whichever time source has the highest frequency, which is useful for
+gathering entropy on platforms without available cycle counters. It's
+not necessarily as good as being able to quickly access a cycle counter
+that the CPU has, but it's still something, even when it falls back to
+being jiffies-based.
 
-On Wed, May 04, 2022 at 11:04:12PM +0200, Thomas Gleixner wrote:
+In the event that a given arch does not define get_cycles(), falling
+back to the get_cycles() default implementation that returns 0 is really
+not the best we can do. Instead, at least calling
+random_get_entropy_fallback() would be preferable, because that always
+needs to return _something_, even falling back to jiffies eventually.
+It's not as though random_get_entropy_fallback() is super high precision
+or guaranteed to be entropic, but basically anything that's not zero all
+the time is better than returning zero all the time.
 
-> > The second stance seems easier and more conservative from a certain
-> > perspective -- we don't need to change anything -- so I'm more inclined
-> > toward it.
-> 
-> That's not conservative, that's lazy and lame. Staying with the status
-> quo and piling more stuff on top because we can is just increasing
-> technical debt. Works for a while by some definition of works.
+Finally, since random_get_entropy_fallback() is used during extremely
+early boot when randomizing freelists in mm_init(), it can be called
+before timekeeping has been initialized. In that case there really is
+nothing we can do; jiffies hasn't even started ticking yet. So just give
+up and return 0.
 
-I actually find this minorly upsetting :(. Considering the amount of
-technical debt I've been tirelessly cleaning up over the last 5 months,
-"lazy" certainly can't be correct here. None of this has anything to do
-with laziness, but rather how the entropy collection logic works out.
-It'd be lazy to just wave my hands around and say, "oh well it's handled
-in add_interrupt_randomness() anyway, so let's torch the other thing,"
-without having taken the time to do the analysis to see if that's
-actually true or not. One way or another, it _will_ require real
-analysis. Which obviously I'm volunteering to do here (it's an
-interesting question to me) and have already started poking around with
-it.
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Theodore Ts'o <tytso@mit.edu>
+---
+Changes v6->v7:
+- Return 0 if we're called before timekeeping has been initialized,
+  reported by Nathan.
 
-> > And given that you've fixed the bug now, it sounds like that's fine
-> > with you too. But if you're thinking about it differently in fact, let
-> > me know.
-> 
-> That still does not address my observation that using the FPU for this
-> mixing, which is handling a couple of bytes per invocation, is not
-> really benefitial.
-> 
-> Which in turn bears the question, why we have to maintain an asymmetric
-> FPU protection mechanism in order to support hard interrupt FPU usage
-> for no or questionable benefit.
-> 
-> The current implementation, courtesy to hard interrupt support, has the
-> following downside:
-> 
->   Any FPU usage in task context where soft interrupts are enabled will
->   prevent FPU usage in soft interrupt processing when the interrupt hits
->   into the FPU usage region. That means the softirq processing has to
->   fall back to the generic implementations.
-> 
-> Sure, the protection could be context dependent, but that's generally
-> frowned upon. If we go there, then there has to be a really convincing
-> technical argument.
+ include/linux/timex.h     |  8 ++++++++
+ kernel/time/timekeeping.c | 10 ++++++++++
+ 2 files changed, 18 insertions(+)
 
-That's curious about the softirq; I hadn't realized that. Indeed it
-sounds like the technical burden of supporting it may not be worth it.
-From the perspective of high-speed crypto, I know two areas pretty well:
-pacrypt/padata and wireguard's queueing. Both of these run in workqueues
-pinned to a CPU with queue_work_on(). In some cases, I believe locks may
-be held during various crypto operations though. Also, I suspect some
-paths of xfrm and mac80211 may process during softirq. Anyway, none of
-those cases is hardirq. I haven't looked at dmcrypt, but I'd be
-surprised if that was doing anything in hardirqs either.
+diff --git a/include/linux/timex.h b/include/linux/timex.h
+index 5745c90c8800..3871b06bd302 100644
+--- a/include/linux/timex.h
++++ b/include/linux/timex.h
+@@ -62,6 +62,8 @@
+ #include <linux/types.h>
+ #include <linux/param.h>
+ 
++unsigned long random_get_entropy_fallback(void);
++
+ #include <asm/timex.h>
+ 
+ #ifndef random_get_entropy
+@@ -74,8 +76,14 @@
+  *
+  * By default we use get_cycles() for this purpose, but individual
+  * architectures may override this in their asm/timex.h header file.
++ * If a given arch does not have get_cycles(), then we fallback to
++ * using random_get_entropy_fallback().
+  */
++#ifdef get_cycles
+ #define random_get_entropy()	((unsigned long)get_cycles())
++#else
++#define random_get_entropy()	random_get_entropy_fallback()
++#endif
+ #endif
+ 
+ /*
+diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+index dcdcb85121e4..7cd2ec239cae 100644
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -17,6 +17,7 @@
+ #include <linux/clocksource.h>
+ #include <linux/jiffies.h>
+ #include <linux/time.h>
++#include <linux/timex.h>
+ #include <linux/tick.h>
+ #include <linux/stop_machine.h>
+ #include <linux/pvclock_gtod.h>
+@@ -2380,6 +2381,15 @@ static int timekeeping_validate_timex(const struct __kernel_timex *txc)
+ 	return 0;
+ }
+ 
++/**
++ * random_get_entropy_fallback - Returns the raw clock source value,
++ * used by random.c for platforms with no valid random_get_entropy().
++ */
++unsigned long random_get_entropy_fallback(void)
++{
++	return tk_clock_read(&tk_core.timekeeper.tkr_mono);
++}
++EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
+ 
+ /**
+  * do_adjtimex() - Accessor function to NTP __do_adjtimex function
+-- 
+2.35.1
 
-So if truly the only user of this is random.c as of 5.18 (is it? I'm
-assuming from a not very thorough survey...), and if the performance
-boost doesn't even exist, then yeah, I think it'd make sense to just get
-rid of it, and have kernel_fpu_usable() return false in those cases.
-
-I'll run some benchmarks on a little bit more hardware in representative
-cases and see.
-
-Jason
