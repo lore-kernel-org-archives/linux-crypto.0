@@ -2,97 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D36C0C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 01:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B430C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 01:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231691AbiEEBPV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 21:15:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
+        id S235287AbiEEBZX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 21:25:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbiEEBPV (ORCPT
+        with ESMTP id S230176AbiEEBZX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 21:15:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0769C4EF54;
-        Wed,  4 May 2022 18:11:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A110061D84;
-        Thu,  5 May 2022 01:11:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37832C385A5;
-        Thu,  5 May 2022 01:11:42 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gT/rWxJQ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651713099;
+        Wed, 4 May 2022 21:25:23 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60EF506FD;
+        Wed,  4 May 2022 18:21:45 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651713704;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=4061S/kFTComde7Tg1Wgw643gLcEFT1H9RHECRHeAAY=;
-        b=gT/rWxJQnX+UgZh7rEb0RHwy0zaoA4hyyJA4GWpBj5lVIKXnR6z9Dqny0BBudMfSOdPfLn
-        O31Q2llHXyzHe3ZWczwcxijSSEcK8DlKTZuKyKNgbhUlgERcgIEz0qL3hnZCi3zMdSDi4P
-        t3O+kQvHRT0sbhfnHRU3Qo1VCSb43uE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ab4be267 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 5 May 2022 01:11:39 +0000 (UTC)
-Date:   Thu, 5 May 2022 03:11:32 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
+        bh=kKuGwdSJtS+WiXghVoIOPpH32AVOKBI/15oCiMuq+jQ=;
+        b=mlX+me3NOGEr2QS8iofK25Nzt/JMyKvAWUFvlEBfi3vgWJWAbGFlCJZZBCi9XfpgkVGdTp
+        ezzlLg4sna1GNariY6xv6alMom9mPBIouX8Dz2xknquqKah6lac/eiY40VaI1BdYxv6+kz
+        Rsi9x2ic0FV2GhKQ2a5iLUEkxa80w9VhYdzzIOiChlSow5SrbTchqbqhobT4Kcta8tBYu9
+        u/rOBZfDm6UYayws4BisIIPNBInm0iKwNm+3i3iBGIan9fTxv1DLqdlwe8dxtP5qhYd0Xa
+        BkJMpAmi9qf0duNXFF/25xIvCndY8vKkScVwYD/cAMHO+ZlKsLlokQ0ReZ/Xpw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651713704;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kKuGwdSJtS+WiXghVoIOPpH32AVOKBI/15oCiMuq+jQ=;
+        b=ah23Qu7hQPYvzXRQTkxFXgnobMZPJBL9gXOSfAFn0Ru7tgFXZpLOI06TDd8B5iP1IE87o4
+        Uv3voCCxRFzNvIAg==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     Peter Zijlstra <peterz@infradead.org>,
         Borislav Petkov <bp@alien8.de>,
         LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
         Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
 Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-Message-ID: <YnMkRLcxczMxdE5z@zx2c4.com>
-References: <Ym/sHqKqmLOJubgE@zn.tnic>
- <87k0b4lydr.ffs@tglx>
- <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
- <87fslpjomx.ffs@tglx>
- <YnKh96isoB7jiFrv@zx2c4.com>
- <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com>
- <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com>
- <87mtfwiyqp.ffs@tglx>
+In-Reply-To: <YnMkRLcxczMxdE5z@zx2c4.com>
+References: <Ym/sHqKqmLOJubgE@zn.tnic> <87k0b4lydr.ffs@tglx>
+ <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net> <87fslpjomx.ffs@tglx>
+ <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
+ <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
+ <YnMkRLcxczMxdE5z@zx2c4.com>
+Date:   Thu, 05 May 2022 03:21:43 +0200
+Message-ID: <87h764ixjs.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87mtfwiyqp.ffs@tglx>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
+Jason,
 
-On Thu, May 05, 2022 at 02:55:58AM +0200, Thomas Gleixner wrote:
-> > So if truly the only user of this is random.c as of 5.18 (is it? I'm
-> > assuming from a not very thorough survey...), and if the performance
-> > boost doesn't even exist, then yeah, I think it'd make sense to just get
-> > rid of it, and have kernel_fpu_usable() return false in those cases.
-> >
-> > I'll run some benchmarks on a little bit more hardware in representative
-> > cases and see.
-> 
-> Find below a combo patch which makes use of strict softirq serialization
-> for the price of not supporting the hardirq FPU usage. 
+On Thu, May 05 2022 at 03:11, Jason A. Donenfeld wrote:
+> On Thu, May 05, 2022 at 02:55:58AM +0200, Thomas Gleixner wrote:
+>> > So if truly the only user of this is random.c as of 5.18 (is it? I'm
+>> > assuming from a not very thorough survey...), and if the performance
+>> > boost doesn't even exist, then yeah, I think it'd make sense to just get
+>> > rid of it, and have kernel_fpu_usable() return false in those cases.
+>> >
+>> > I'll run some benchmarks on a little bit more hardware in representative
+>> > cases and see.
+>> 
+>> Find below a combo patch which makes use of strict softirq serialization
+>> for the price of not supporting the hardirq FPU usage. 
+>
+> Thanks, I'll give it a shot in the morning (3am) when trying to do a
+> more realistic benchmark. But just as a synthetic thing, I ran the
+> numbers in kBench900 and am getting:
+>
+>      generic:    430 cycles per call
+>        ssse3:    315 cycles per call
+>       avx512:    277 cycles per call
+>
+> for a single call to the compression function, which is the most any of
+> those mix_pool_bytes() calls do from add_{input,disk}_randomness(), on
+> Tiger Lake, using RDPMC from kernel space.
 
-Thanks, I'll give it a shot in the morning (3am) when trying to do a
-more realistic benchmark. But just as a synthetic thing, I ran the
-numbers in kBench900 and am getting:
+I'm well aware of the difference between synthetic benchmarks and real
+world scenarios and with the more in depth instrumentation of these
+things I'm even more concerned that the difference is underestimated.
 
-     generic:    430 cycles per call
-       ssse3:    315 cycles per call
-      avx512:    277 cycles per call
+> This _doesn't_ take into account the price of calling kernel_fpu_begin().
+> That's a little hard to bench synthetically by running it in a loop and
+> taking medians because of the lazy restoration. But that's an indication
+> anyway that I should be looking at the cost of the actual function as
+> its running in random.c, rather than the synthetic test. Will keep this
+> thread updated.
 
-for a single call to the compression function, which is the most any of
-those mix_pool_bytes() calls do from add_{input,disk}_randomness(), on
-Tiger Lake, using RDPMC from kernel space.
+Appreciated.
 
-This _doesn't_ take into account the price of calling kernel_fpu_begin().
-That's a little hard to bench synthetically by running it in a loop and
-taking medians because of the lazy restoration. But that's an indication
-anyway that I should be looking at the cost of the actual function as
-its running in random.c, rather than the synthetic test. Will keep this
-thread updated.
+Thanks,
 
-Jason
+        tglx
