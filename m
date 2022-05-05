@@ -2,48 +2,48 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 051CDC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0A2C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230319AbiEEAXo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 20:23:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42296 "EHLO
+        id S231928AbiEEAdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 20:33:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbiEEAXn (ORCPT
+        with ESMTP id S232063AbiEEAdR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 20:23:43 -0400
+        Wed, 4 May 2022 20:33:17 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673B618E06;
-        Wed,  4 May 2022 17:20:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B165554BEC;
+        Wed,  4 May 2022 17:29:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 274F2B82A3E;
-        Thu,  5 May 2022 00:20:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E527C385A5;
-        Thu,  5 May 2022 00:20:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6580FB81AF2;
+        Thu,  5 May 2022 00:29:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57C34C385A5;
+        Thu,  5 May 2022 00:29:36 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LjvDclPy"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="So6Pj6BX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651710000;
+        t=1651710574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/x+q8szNDEuBdV29gbI+Fv1fEqHBjjq0rW124DO+QnY=;
-        b=LjvDclPydox5jokMv+8kIIOdf4dsQqmeFatfQLF8P6adL/mNAFRwI33SovkQQmb73Ke43z
-        9ScUiXpoGrx9UAKUTWtg8LG2viDnxaOgzCTdseNNRKR7t/U8GZbkUuvJAxzlkR7EiEN9bY
-        jC1QlNYKz9ghPUUsSEG6g5Y8SWwM+DA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 152a7184 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 5 May 2022 00:19:59 +0000 (UTC)
+        bh=K1NOr1spTsQSWBCHL0IgAOS1hqjEpNdIRU4N7uXqbX8=;
+        b=So6Pj6BXqwXr5a6pTrsjQJwy6urZ5h0f0vSCODCkFzLX6aXI9p6ZHUW8b6wqHUfazL+xL0
+        wTlzmS/Wu30Wj9B5+cvPUYyNx6rXSd5xMN0mxzA+zrXHKeRJzmj9O92iiQ5gF0nYVSd2RW
+        R6ZsTTMrzvTX65jxGKG5CRrK9LTI7JE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 69a44044 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 5 May 2022 00:29:34 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc:     nathan@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>
 Subject: [PATCH v7] timekeeping: Add raw clock fallback for random_get_entropy()
-Date:   Thu,  5 May 2022 02:19:24 +0200
-Message-Id: <20220505001924.176087-1-Jason@zx2c4.com>
+Date:   Thu,  5 May 2022 02:29:10 +0200
+Message-ID: <20220505001924.176087-1-Jason@zx2c4.com>
 In-Reply-To: <87y1zkmg0l.ffs@tglx>
 References: <87y1zkmg0l.ffs@tglx>
 MIME-Version: 1.0
@@ -51,6 +51,7 @@ Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
+Message-ID: <20220505002910.IAcnpEOE2zR2ibERl4Lh3Y_PMmtb0Rf43lVevgztJiM@z>
 
 The addition of random_get_entropy_fallback() provides access to
 whichever time source has the highest frequency, which is useful for
@@ -85,8 +86,8 @@ Changes v6->v7:
   reported by Nathan.
 
  include/linux/timex.h     |  8 ++++++++
- kernel/time/timekeeping.c | 10 ++++++++++
- 2 files changed, 18 insertions(+)
+ kernel/time/timekeeping.c | 12 ++++++++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/include/linux/timex.h b/include/linux/timex.h
 index 5745c90c8800..3871b06bd302 100644
@@ -117,7 +118,7 @@ index 5745c90c8800..3871b06bd302 100644
  
  /*
 diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index dcdcb85121e4..7cd2ec239cae 100644
+index dcdcb85121e4..1d1302ca8d36 100644
 --- a/kernel/time/timekeeping.c
 +++ b/kernel/time/timekeeping.c
 @@ -17,6 +17,7 @@
@@ -128,7 +129,7 @@ index dcdcb85121e4..7cd2ec239cae 100644
  #include <linux/tick.h>
  #include <linux/stop_machine.h>
  #include <linux/pvclock_gtod.h>
-@@ -2380,6 +2381,15 @@ static int timekeeping_validate_timex(const struct __kernel_timex *txc)
+@@ -2380,6 +2381,17 @@ static int timekeeping_validate_timex(const struct __kernel_timex *txc)
  	return 0;
  }
  
@@ -138,6 +139,8 @@ index dcdcb85121e4..7cd2ec239cae 100644
 + */
 +unsigned long random_get_entropy_fallback(void)
 +{
++	if (unlikely(!tk_core.timekeeper.tkr_mono.clock))
++		return 0;
 +	return tk_clock_read(&tk_core.timekeeper.tkr_mono);
 +}
 +EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
