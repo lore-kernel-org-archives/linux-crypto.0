@@ -2,392 +2,358 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 340ABC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 06:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F69C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 09:28:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238481AbiEEGxi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 02:53:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60234 "EHLO
+        id S1353667AbiEEJca (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 May 2022 05:32:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238386AbiEEGxh (ORCPT
+        with ESMTP id S1354260AbiEEJcX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 02:53:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C813447045;
-        Wed,  4 May 2022 23:49:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5FEBFB82BED;
-        Thu,  5 May 2022 06:49:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12D23C385AF;
-        Thu,  5 May 2022 06:49:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651733396;
-        bh=lSak+gmChtT3mVmwO91xlHv2YotCvHVAYhtgGKNtJLs=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=BJeaTFgBMtc827q5iN0XaqC+bBv4lM3hCw8P9T4lvdecp8b0Yv/ZbEJyZ39qfxE0f
-         44gmSi01ufjd+Nmcu0cfRwzIF5Est7GPKWIAJ7G/tMSXbGX22ZgSPo7B+SMXx+j0vm
-         prczYpWMfZOvTZM1FEjpyZdBJ0kFuSqnTRL0qik0ES5vhLgrj1gifH7tEe/d6GCyk4
-         ibZ1/WBCoHkaplGMegq2L83DNNEzK1nb9TUo0jJ6AatU4ouo6fkLBJnq+BLWwumRpP
-         1IjjnEuBsdTtbyTWnMB5vqqw+A8ZFhArjRiVl0BQa0Y77wLfEPBDf7/K4e+I+S/cNP
-         hLWEnCZTw8oZg==
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-e656032735so3430642fac.0;
-        Wed, 04 May 2022 23:49:55 -0700 (PDT)
-X-Gm-Message-State: AOAM531s5tW7WlQg5FXOIb3kWHWCva5qC1o0z61Wlyz4vbatEymrh+w2
-        sD2neejrYo79PDkwWTU3NyTCr2Y7eShHXl3gZAU=
-X-Google-Smtp-Source: ABdhPJxKnLWrnW1L8yR8uq2dbFpGPLDOMqX/j2YHJT0b9PPSxEa7WCkjxaZnMHtPpVjRqb3muybU9BS2nvfQcu68aFA=
-X-Received: by 2002:a05:6870:468e:b0:ed:de90:fa80 with SMTP id
- a14-20020a056870468e00b000edde90fa80mr1544477oap.126.1651733395046; Wed, 04
- May 2022 23:49:55 -0700 (PDT)
+        Thu, 5 May 2022 05:32:23 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91FA527D4
+        for <linux-crypto@vger.kernel.org>; Thu,  5 May 2022 02:28:09 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id z5-20020a17090a468500b001d2bc2743c4so3625538pjf.0
+        for <linux-crypto@vger.kernel.org>; Thu, 05 May 2022 02:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=wZYZZokAYbHkoKNpRYcwId0oz7EL0chjkDT9m64Fs88=;
+        b=frO0QTqQXRV8E6KGCzVWlcEM1m1UhQ4TJEualmfLMhWKVHeD9bQjGbFDa9vzYPUuka
+         DeGYLwpgyIWguNfVCUiawol+ONYQQkIOy1D4AgzVvZH6JMfhehtgEQ79N3b9vrs7aMZm
+         tZgP45sGboQOWU/O9DHfTYsJTT+HN5DxYL9tEeWDfMyidE942J9gtMG4RCjLoo9ZItTS
+         /4YeQ4COn9FR9fxhQXGcVx2Nycfahw6gAyGLs5ToPr/apCyS/KiHsA/S3lOrGGIafymD
+         3d8rRjRUYXLw9g0T+PgkqBV/F5+BSf+cvCl2lA5oQ0fif/hrULyKmFu6GtfqrObuZHiG
+         QU9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=wZYZZokAYbHkoKNpRYcwId0oz7EL0chjkDT9m64Fs88=;
+        b=WwbFMmm0DLnOiMQpBJoflAZURNUmgfxxnli3jU7r/9COJsNxtbRYMRcZTpExGsHQU3
+         p2Hx72gcIZSxKM17Yz0VoZ6wnXaRI60L4jli9EbwbPXUBsWfZ3TtMV07Ep2gJQOhl/Gj
+         lZQQN95vS/aRkwQ4aHwx/rKKzSmX9Xr7sS+fJT/wzEt8rQDeQqi+ST+2zLAiQYp/B5U0
+         TqitCL3Tma+tuW21+x8RdvfP3OMoB8tkPf3NdLOLxk4DVmXrS1k18KxvsDnZuCsU3vM0
+         TMjWmp5f7NuvrEkM46Guw0ZCOarKzT9jM4iwhSR6sVeJOurqXDvF8ocdlAsQovI7skV2
+         ZLuQ==
+X-Gm-Message-State: AOAM5315CxehMoSl09Lhx3baAHZ9JEso3oF1NwDCKEvprHSnJeTmBPqM
+        g7Ij22Q6WgIk30nAjaYZBJYYCg==
+X-Google-Smtp-Source: ABdhPJyRhLD8aVEulYsSZpHbptbu0aq6Evj2kroR4kaUsEEuicOm6LJ0kDXiTRRvBaX9yj4McIl5XA==
+X-Received: by 2002:a17:90a:a509:b0:1ca:c48e:a795 with SMTP id a9-20020a17090aa50900b001cac48ea795mr4842210pjq.165.1651742888960;
+        Thu, 05 May 2022 02:28:08 -0700 (PDT)
+Received: from always-x1.www.tendawifi.com ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id t68-20020a625f47000000b0050dc76281dcsm884224pfb.182.2022.05.05.02.28.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 May 2022 02:28:08 -0700 (PDT)
+From:   zhenwei pi <pizhenwei@bytedance.com>
+To:     arei.gonglei@huawei.com, mst@redhat.com
+Cc:     jasowang@redhat.com, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
+        pizhenwei@bytedance.com, davem@davemloft.net
+Subject: [PATCH v5 1/5] virtio-crypto: change code style
+Date:   Thu,  5 May 2022 17:24:04 +0800
+Message-Id: <20220505092408.53692-2-pizhenwei@bytedance.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220505092408.53692-1-pizhenwei@bytedance.com>
+References: <20220505092408.53692-1-pizhenwei@bytedance.com>
 MIME-Version: 1.0
-References: <20220504001823.2483834-1-nhuck@google.com> <20220504001823.2483834-7-nhuck@google.com>
-In-Reply-To: <20220504001823.2483834-7-nhuck@google.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 5 May 2022 08:49:44 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEBEkGqEx3PaFV0jnufQEkZxe0oiXoxoB2PYwz9BQJmEw@mail.gmail.com>
-Message-ID: <CAMj1kXEBEkGqEx3PaFV0jnufQEkZxe0oiXoxoB2PYwz9BQJmEw@mail.gmail.com>
-Subject: Re: [PATCH v6 6/9] crypto: arm64/aes-xctr: Improve readability of
- XCTR and CTR modes
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fscrypt@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Nathan,
+Use temporary variable to make code easy to read and maintain.
+	/* Pad cipher's parameters */
+        vcrypto->ctrl.u.sym_create_session.op_type =
+                cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+        vcrypto->ctrl.u.sym_create_session.u.cipher.para.algo =
+                vcrypto->ctrl.header.algo;
+        vcrypto->ctrl.u.sym_create_session.u.cipher.para.keylen =
+                cpu_to_le32(keylen);
+        vcrypto->ctrl.u.sym_create_session.u.cipher.para.op =
+                cpu_to_le32(op);
+-->
+	sym_create_session = &ctrl->u.sym_create_session;
+	sym_create_session->op_type = cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+	sym_create_session->u.cipher.para.algo = ctrl->header.algo;
+	sym_create_session->u.cipher.para.keylen = cpu_to_le32(keylen);
+	sym_create_session->u.cipher.para.op = cpu_to_le32(op);
 
-Thanks for cleaning this up.
+The new style shows more obviously:
+- the variable we want to operate.
+- an assignment statement in a single line.
 
-On Wed, 4 May 2022 at 02:18, Nathan Huckleberry <nhuck@google.com> wrote:
->
-> Added some clarifying comments, changed the register allocations to make
-> the code clearer, and added register aliases.
->
-> Signed-off-by: Nathan Huckleberry <nhuck@google.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+---
+ .../virtio/virtio_crypto_akcipher_algs.c      | 40 ++++++-----
+ .../virtio/virtio_crypto_skcipher_algs.c      | 72 +++++++++----------
+ 2 files changed, 59 insertions(+), 53 deletions(-)
 
-With one comment below addressed:
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+index f3ec9420215e..20901a263fc8 100644
+--- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -106,23 +106,27 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+ 	unsigned int inlen;
+ 	int err;
+ 	unsigned int num_out = 0, num_in = 0;
++	struct virtio_crypto_op_ctrl_req *ctrl;
++	struct virtio_crypto_session_input *input;
+ 
+ 	pkey = kmemdup(key, keylen, GFP_ATOMIC);
+ 	if (!pkey)
+ 		return -ENOMEM;
+ 
+ 	spin_lock(&vcrypto->ctrl_lock);
+-	memcpy(&vcrypto->ctrl.header, header, sizeof(vcrypto->ctrl.header));
+-	memcpy(&vcrypto->ctrl.u, para, sizeof(vcrypto->ctrl.u));
+-	vcrypto->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
++	ctrl = &vcrypto->ctrl;
++	memcpy(&ctrl->header, header, sizeof(ctrl->header));
++	memcpy(&ctrl->u, para, sizeof(ctrl->u));
++	input = &vcrypto->input;
++	input->status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+ 
+-	sg_init_one(&outhdr_sg, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
++	sg_init_one(&outhdr_sg, ctrl, sizeof(*ctrl));
+ 	sgs[num_out++] = &outhdr_sg;
+ 
+ 	sg_init_one(&key_sg, pkey, keylen);
+ 	sgs[num_out++] = &key_sg;
+ 
+-	sg_init_one(&inhdr_sg, &vcrypto->input, sizeof(vcrypto->input));
++	sg_init_one(&inhdr_sg, input, sizeof(*input));
+ 	sgs[num_out + num_in++] = &inhdr_sg;
+ 
+ 	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out, num_in, vcrypto, GFP_ATOMIC);
+@@ -134,12 +138,12 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+ 	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+ 		cpu_relax();
+ 
+-	if (le32_to_cpu(vcrypto->input.status) != VIRTIO_CRYPTO_OK) {
++	if (le32_to_cpu(input->status) != VIRTIO_CRYPTO_OK) {
+ 		err = -EINVAL;
+ 		goto out;
+ 	}
+ 
+-	ctx->session_id = le64_to_cpu(vcrypto->input.session_id);
++	ctx->session_id = le64_to_cpu(input->session_id);
+ 	ctx->session_valid = true;
+ 	err = 0;
+ 
+@@ -149,7 +153,7 @@ static int virtio_crypto_alg_akcipher_init_session(struct virtio_crypto_akcipher
+ 
+ 	if (err < 0)
+ 		pr_err("virtio_crypto: Create session failed status: %u\n",
+-			le32_to_cpu(vcrypto->input.status));
++			le32_to_cpu(input->status));
+ 
+ 	return err;
+ }
+@@ -161,23 +165,27 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
+ 	struct virtio_crypto *vcrypto = ctx->vcrypto;
+ 	unsigned int num_out = 0, num_in = 0, inlen;
+ 	int err;
++	struct virtio_crypto_op_ctrl_req *ctrl;
++	struct virtio_crypto_inhdr *ctrl_status;
+ 
+ 	spin_lock(&vcrypto->ctrl_lock);
+ 	if (!ctx->session_valid) {
+ 		err = 0;
+ 		goto out;
+ 	}
+-	vcrypto->ctrl_status.status = VIRTIO_CRYPTO_ERR;
+-	vcrypto->ctrl.header.opcode = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION);
+-	vcrypto->ctrl.header.queue_id = 0;
++	ctrl_status = &vcrypto->ctrl_status;
++	ctrl_status->status = VIRTIO_CRYPTO_ERR;
++	ctrl = &vcrypto->ctrl;
++	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_DESTROY_SESSION);
++	ctrl->header.queue_id = 0;
+ 
+-	destroy_session = &vcrypto->ctrl.u.destroy_session;
++	destroy_session = &ctrl->u.destroy_session;
+ 	destroy_session->session_id = cpu_to_le64(ctx->session_id);
+ 
+-	sg_init_one(&outhdr_sg, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
++	sg_init_one(&outhdr_sg, ctrl, sizeof(*ctrl));
+ 	sgs[num_out++] = &outhdr_sg;
+ 
+-	sg_init_one(&inhdr_sg, &vcrypto->ctrl_status.status, sizeof(vcrypto->ctrl_status.status));
++	sg_init_one(&inhdr_sg, &ctrl_status->status, sizeof(ctrl_status->status));
+ 	sgs[num_out + num_in++] = &inhdr_sg;
+ 
+ 	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out, num_in, vcrypto, GFP_ATOMIC);
+@@ -189,7 +197,7 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
+ 	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+ 		cpu_relax();
+ 
+-	if (vcrypto->ctrl_status.status != VIRTIO_CRYPTO_OK) {
++	if (ctrl_status->status != VIRTIO_CRYPTO_OK) {
+ 		err = -EINVAL;
+ 		goto out;
+ 	}
+@@ -201,7 +209,7 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
+ 	spin_unlock(&vcrypto->ctrl_lock);
+ 	if (err < 0) {
+ 		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+-			vcrypto->ctrl_status.status, destroy_session->session_id);
++			ctrl_status->status, destroy_session->session_id);
+ 	}
+ 
+ 	return err;
+diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+index a618c46a52b8..e3c5bc8d6112 100644
+--- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+@@ -123,6 +123,9 @@ static int virtio_crypto_alg_skcipher_init_session(
+ 	int op = encrypt ? VIRTIO_CRYPTO_OP_ENCRYPT : VIRTIO_CRYPTO_OP_DECRYPT;
+ 	int err;
+ 	unsigned int num_out = 0, num_in = 0;
++	struct virtio_crypto_op_ctrl_req *ctrl;
++	struct virtio_crypto_session_input *input;
++	struct virtio_crypto_sym_create_session_req *sym_create_session;
+ 
+ 	/*
+ 	 * Avoid to do DMA from the stack, switch to using
+@@ -135,24 +138,22 @@ static int virtio_crypto_alg_skcipher_init_session(
+ 
+ 	spin_lock(&vcrypto->ctrl_lock);
+ 	/* Pad ctrl header */
+-	vcrypto->ctrl.header.opcode =
+-		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
+-	vcrypto->ctrl.header.algo = cpu_to_le32(alg);
++	ctrl = &vcrypto->ctrl;
++	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_CREATE_SESSION);
++	ctrl->header.algo = cpu_to_le32(alg);
+ 	/* Set the default dataqueue id to 0 */
+-	vcrypto->ctrl.header.queue_id = 0;
++	ctrl->header.queue_id = 0;
+ 
+-	vcrypto->input.status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
++	input = &vcrypto->input;
++	input->status = cpu_to_le32(VIRTIO_CRYPTO_ERR);
+ 	/* Pad cipher's parameters */
+-	vcrypto->ctrl.u.sym_create_session.op_type =
+-		cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
+-	vcrypto->ctrl.u.sym_create_session.u.cipher.para.algo =
+-		vcrypto->ctrl.header.algo;
+-	vcrypto->ctrl.u.sym_create_session.u.cipher.para.keylen =
+-		cpu_to_le32(keylen);
+-	vcrypto->ctrl.u.sym_create_session.u.cipher.para.op =
+-		cpu_to_le32(op);
+-
+-	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
++	sym_create_session = &ctrl->u.sym_create_session;
++	sym_create_session->op_type = cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
++	sym_create_session->u.cipher.para.algo = ctrl->header.algo;
++	sym_create_session->u.cipher.para.keylen = cpu_to_le32(keylen);
++	sym_create_session->u.cipher.para.op = cpu_to_le32(op);
++
++	sg_init_one(&outhdr, ctrl, sizeof(*ctrl));
+ 	sgs[num_out++] = &outhdr;
+ 
+ 	/* Set key */
+@@ -160,7 +161,7 @@ static int virtio_crypto_alg_skcipher_init_session(
+ 	sgs[num_out++] = &key_sg;
+ 
+ 	/* Return status and session id back */
+-	sg_init_one(&inhdr, &vcrypto->input, sizeof(vcrypto->input));
++	sg_init_one(&inhdr, input, sizeof(*input));
+ 	sgs[num_out + num_in++] = &inhdr;
+ 
+ 	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+@@ -180,20 +181,18 @@ static int virtio_crypto_alg_skcipher_init_session(
+ 	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+ 		cpu_relax();
+ 
+-	if (le32_to_cpu(vcrypto->input.status) != VIRTIO_CRYPTO_OK) {
++	if (le32_to_cpu(input->status) != VIRTIO_CRYPTO_OK) {
+ 		spin_unlock(&vcrypto->ctrl_lock);
+ 		pr_err("virtio_crypto: Create session failed status: %u\n",
+-			le32_to_cpu(vcrypto->input.status));
++			le32_to_cpu(input->status));
+ 		kfree_sensitive(cipher_key);
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (encrypt)
+-		ctx->enc_sess_info.session_id =
+-			le64_to_cpu(vcrypto->input.session_id);
++		ctx->enc_sess_info.session_id = le64_to_cpu(input->session_id);
+ 	else
+-		ctx->dec_sess_info.session_id =
+-			le64_to_cpu(vcrypto->input.session_id);
++		ctx->dec_sess_info.session_id = le64_to_cpu(input->session_id);
+ 
+ 	spin_unlock(&vcrypto->ctrl_lock);
+ 
+@@ -211,30 +210,30 @@ static int virtio_crypto_alg_skcipher_close_session(
+ 	struct virtio_crypto *vcrypto = ctx->vcrypto;
+ 	int err;
+ 	unsigned int num_out = 0, num_in = 0;
++	struct virtio_crypto_op_ctrl_req *ctrl;
++	struct virtio_crypto_inhdr *ctrl_status;
+ 
+ 	spin_lock(&vcrypto->ctrl_lock);
+-	vcrypto->ctrl_status.status = VIRTIO_CRYPTO_ERR;
++	ctrl_status = &vcrypto->ctrl_status;
++	ctrl_status->status = VIRTIO_CRYPTO_ERR;
+ 	/* Pad ctrl header */
+-	vcrypto->ctrl.header.opcode =
+-		cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
++	ctrl = &vcrypto->ctrl;
++	ctrl->header.opcode = cpu_to_le32(VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION);
+ 	/* Set the default virtqueue id to 0 */
+-	vcrypto->ctrl.header.queue_id = 0;
++	ctrl->header.queue_id = 0;
+ 
+-	destroy_session = &vcrypto->ctrl.u.destroy_session;
++	destroy_session = &ctrl->u.destroy_session;
+ 
+ 	if (encrypt)
+-		destroy_session->session_id =
+-			cpu_to_le64(ctx->enc_sess_info.session_id);
++		destroy_session->session_id = cpu_to_le64(ctx->enc_sess_info.session_id);
+ 	else
+-		destroy_session->session_id =
+-			cpu_to_le64(ctx->dec_sess_info.session_id);
++		destroy_session->session_id = cpu_to_le64(ctx->dec_sess_info.session_id);
+ 
+-	sg_init_one(&outhdr, &vcrypto->ctrl, sizeof(vcrypto->ctrl));
++	sg_init_one(&outhdr, ctrl, sizeof(*ctrl));
+ 	sgs[num_out++] = &outhdr;
+ 
+ 	/* Return status and session id back */
+-	sg_init_one(&status_sg, &vcrypto->ctrl_status.status,
+-		sizeof(vcrypto->ctrl_status.status));
++	sg_init_one(&status_sg, &ctrl_status->status, sizeof(ctrl_status->status));
+ 	sgs[num_out + num_in++] = &status_sg;
+ 
+ 	err = virtqueue_add_sgs(vcrypto->ctrl_vq, sgs, num_out,
+@@ -249,11 +248,10 @@ static int virtio_crypto_alg_skcipher_close_session(
+ 	       !virtqueue_is_broken(vcrypto->ctrl_vq))
+ 		cpu_relax();
+ 
+-	if (vcrypto->ctrl_status.status != VIRTIO_CRYPTO_OK) {
++	if (ctrl_status->status != VIRTIO_CRYPTO_OK) {
+ 		spin_unlock(&vcrypto->ctrl_lock);
+ 		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+-			vcrypto->ctrl_status.status,
+-			destroy_session->session_id);
++			ctrl_status->status, destroy_session->session_id);
+ 
+ 		return -EINVAL;
+ 	}
+-- 
+2.20.1
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-
-> ---
->  arch/arm64/crypto/aes-modes.S | 193 ++++++++++++++++++++++------------
->  1 file changed, 128 insertions(+), 65 deletions(-)
->
-> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-> index 55df157fce3a..da7c9f3380f8 100644
-> --- a/arch/arm64/crypto/aes-modes.S
-> +++ b/arch/arm64/crypto/aes-modes.S
-> @@ -322,32 +322,60 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
->          * This macro generates the code for CTR and XCTR mode.
->          */
->  .macro ctr_encrypt xctr
-> +       // Arguments
-> +       OUT             .req x0
-> +       IN              .req x1
-> +       KEY             .req x2
-> +       ROUNDS_W        .req w3
-> +       BYTES_W         .req w4
-> +       IV              .req x5
-> +       BYTE_CTR_W      .req w6         // XCTR only
-> +       // Intermediate values
-> +       CTR_W           .req w11        // XCTR only
-> +       CTR             .req x11        // XCTR only
-> +       IV_PART         .req x12
-> +       BLOCKS          .req x13
-> +       BLOCKS_W        .req w13
-> +
->         stp             x29, x30, [sp, #-16]!
->         mov             x29, sp
->
-> -       enc_prepare     w3, x2, x12
-> -       ld1             {vctr.16b}, [x5]
-> +       enc_prepare     ROUNDS_W, KEY, IV_PART
-> +       ld1             {vctr.16b}, [IV]
->
-> +       /*
-> +        * Keep 64 bits of the IV in a register.  For CTR mode this lets us
-> +        * easily increment the IV.  For XCTR mode this lets us efficiently XOR
-> +        * the 64-bit counter with the IV.
-> +        */
->         .if \xctr
-> -               umov            x12, vctr.d[0]
-> -               lsr             w11, w6, #4
-> +               umov            IV_PART, vctr.d[0]
-> +               lsr             CTR_W, BYTE_CTR_W, #4
->         .else
-> -               umov            x12, vctr.d[1] /* keep swabbed ctr in reg */
-> -               rev             x12, x12
-> +               umov            IV_PART, vctr.d[1]
-> +               rev             IV_PART, IV_PART
->         .endif
->
->  .LctrloopNx\xctr:
-> -       add             w7, w4, #15
-> -       sub             w4, w4, #MAX_STRIDE << 4
-> -       lsr             w7, w7, #4
-> +       add             BLOCKS_W, BYTES_W, #15
-> +       sub             BYTES_W, BYTES_W, #MAX_STRIDE << 4
-> +       lsr             BLOCKS_W, BLOCKS_W, #4
->         mov             w8, #MAX_STRIDE
-> -       cmp             w7, w8
-> -       csel            w7, w7, w8, lt
-> +       cmp             BLOCKS_W, w8
-> +       csel            BLOCKS_W, BLOCKS_W, w8, lt
->
-> +       /*
-> +        * Set up the counter values in v0-v4.
-> +        *
-> +        * If we are encrypting less than MAX_STRIDE blocks, the tail block
-> +        * handling code expects the last keystream block to be in v4.  For
-> +        * example: if encrypting two blocks with MAX_STRIDE=5, then v3 and v4
-> +        * should have the next two counter blocks.
-> +        */
->         .if \xctr
-> -               add             x11, x11, x7
-> +               add             CTR, CTR, BLOCKS
->         .else
-> -               adds            x12, x12, x7
-> +               adds            IV_PART, IV_PART, BLOCKS
->         .endif
->         mov             v0.16b, vctr.16b
->         mov             v1.16b, vctr.16b
-> @@ -355,16 +383,16 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
->         mov             v3.16b, vctr.16b
->  ST5(   mov             v4.16b, vctr.16b                )
->         .if \xctr
-> -               sub             x6, x11, #MAX_STRIDE - 1
-> -               sub             x7, x11, #MAX_STRIDE - 2
-> -               sub             x8, x11, #MAX_STRIDE - 3
-> -               sub             x9, x11, #MAX_STRIDE - 4
-> -ST5(           sub             x10, x11, #MAX_STRIDE - 5       )
-> -               eor             x6, x6, x12
-> -               eor             x7, x7, x12
-> -               eor             x8, x8, x12
-> -               eor             x9, x9, x12
-> -               eor             x10, x10, x12
-> +               sub             x6, CTR, #MAX_STRIDE - 1
-> +               sub             x7, CTR, #MAX_STRIDE - 2
-> +               sub             x8, CTR, #MAX_STRIDE - 3
-> +               sub             x9, CTR, #MAX_STRIDE - 4
-> +ST5(           sub             x10, CTR, #MAX_STRIDE - 5       )
-> +               eor             x6, x6, IV_PART
-> +               eor             x7, x7, IV_PART
-> +               eor             x8, x8, IV_PART
-> +               eor             x9, x9, IV_PART
-> +               eor             x10, x10, IV_PART
->                 mov             v0.d[0], x6
->                 mov             v1.d[0], x7
->                 mov             v2.d[0], x8
-> @@ -381,9 +409,9 @@ ST5(                mov             v4.d[0], x10                    )
->                 ins             vctr.d[0], x8
->
->                 /* apply carry to N counter blocks for N := x12 */
-
-Please update this comment as well. And while at it, it might make
-sense to clarify that doing a conditional branch here is fine wrt time
-invariance, given that the IV is not part of the key or the plaintext,
-and this code rarely triggers in practice anyway.
-
-> -               cbz             x12, 2f
-> +               cbz             IV_PART, 2f
->                 adr             x16, 1f
-> -               sub             x16, x16, x12, lsl #3
-> +               sub             x16, x16, IV_PART, lsl #3
->                 br              x16
->                 bti             c
->                 mov             v0.d[0], vctr.d[0]
-> @@ -398,71 +426,88 @@ ST5(              mov             v4.d[0], vctr.d[0]              )
->  1:             b               2f
->                 .previous
->
-> -2:             rev             x7, x12
-> +2:             rev             x7, IV_PART
->                 ins             vctr.d[1], x7
-> -               sub             x7, x12, #MAX_STRIDE - 1
-> -               sub             x8, x12, #MAX_STRIDE - 2
-> -               sub             x9, x12, #MAX_STRIDE - 3
-> +               sub             x7, IV_PART, #MAX_STRIDE - 1
-> +               sub             x8, IV_PART, #MAX_STRIDE - 2
-> +               sub             x9, IV_PART, #MAX_STRIDE - 3
->                 rev             x7, x7
->                 rev             x8, x8
->                 mov             v1.d[1], x7
->                 rev             x9, x9
-> -ST5(           sub             x10, x12, #MAX_STRIDE - 4       )
-> +ST5(           sub             x10, IV_PART, #MAX_STRIDE - 4   )
->                 mov             v2.d[1], x8
->  ST5(           rev             x10, x10                        )
->                 mov             v3.d[1], x9
->  ST5(           mov             v4.d[1], x10                    )
->         .endif
-> -       tbnz            w4, #31, .Lctrtail\xctr
-> -       ld1             {v5.16b-v7.16b}, [x1], #48
-> +
-> +       /*
-> +        * If there are at least MAX_STRIDE blocks left, XOR the plaintext with
-> +        * keystream and store.  Otherwise jump to tail handling.
-> +        */
-> +       tbnz            BYTES_W, #31, .Lctrtail\xctr
-> +       ld1             {v5.16b-v7.16b}, [IN], #48
->  ST4(   bl              aes_encrypt_block4x             )
->  ST5(   bl              aes_encrypt_block5x             )
->         eor             v0.16b, v5.16b, v0.16b
-> -ST4(   ld1             {v5.16b}, [x1], #16             )
-> +ST4(   ld1             {v5.16b}, [IN], #16             )
->         eor             v1.16b, v6.16b, v1.16b
-> -ST5(   ld1             {v5.16b-v6.16b}, [x1], #32      )
-> +ST5(   ld1             {v5.16b-v6.16b}, [IN], #32      )
->         eor             v2.16b, v7.16b, v2.16b
->         eor             v3.16b, v5.16b, v3.16b
->  ST5(   eor             v4.16b, v6.16b, v4.16b          )
-> -       st1             {v0.16b-v3.16b}, [x0], #64
-> -ST5(   st1             {v4.16b}, [x0], #16             )
-> -       cbz             w4, .Lctrout\xctr
-> +       st1             {v0.16b-v3.16b}, [OUT], #64
-> +ST5(   st1             {v4.16b}, [OUT], #16            )
-> +       cbz             BYTES_W, .Lctrout\xctr
->         b               .LctrloopNx\xctr
->
->  .Lctrout\xctr:
->         .if !\xctr
-> -               st1             {vctr.16b}, [x5] /* return next CTR value */
-> +               st1             {vctr.16b}, [IV] /* return next CTR value */
->         .endif
->         ldp             x29, x30, [sp], #16
->         ret
->
->  .Lctrtail\xctr:
-> +       /*
-> +        * Handle up to MAX_STRIDE * 16 - 1 bytes of plaintext
-> +        *
-> +        * This code expects the last keystream block to be in v4.  For example:
-> +        * if encrypting two blocks with MAX_STRIDE=5, then v3 and v4 should
-> +        * have the next two counter blocks.
-> +        *
-> +        * This allows us to store the ciphertext by writing to overlapping
-> +        * regions of memory.  Any invalid ciphertext blocks get overwritten by
-> +        * correctly computed blocks.  This approach avoids extra conditional
-> +        * branches.
-> +        */
-
-Nit: Without overlapping stores, we'd have to load and store smaller
-quantities and use a loop here, or bounce it via a temp buffer and
-memcpy() it from the C code. So it's not just some extra branches.
-
->         mov             x16, #16
-> -       ands            x6, x4, #0xf
-> -       csel            x13, x6, x16, ne
-> +       ands            w7, BYTES_W, #0xf
-> +       csel            x13, x7, x16, ne
->
-> -ST5(   cmp             w4, #64 - (MAX_STRIDE << 4)     )
-> +ST5(   cmp             BYTES_W, #64 - (MAX_STRIDE << 4))
->  ST5(   csel            x14, x16, xzr, gt               )
-> -       cmp             w4, #48 - (MAX_STRIDE << 4)
-> +       cmp             BYTES_W, #48 - (MAX_STRIDE << 4)
->         csel            x15, x16, xzr, gt
-> -       cmp             w4, #32 - (MAX_STRIDE << 4)
-> +       cmp             BYTES_W, #32 - (MAX_STRIDE << 4)
->         csel            x16, x16, xzr, gt
-> -       cmp             w4, #16 - (MAX_STRIDE << 4)
-> +       cmp             BYTES_W, #16 - (MAX_STRIDE << 4)
->
-> -       adr_l           x12, .Lcts_permute_table
-> -       add             x12, x12, x13
-> +       adr_l           x9, .Lcts_permute_table
-> +       add             x9, x9, x13
->         ble             .Lctrtail1x\xctr
->
-> -ST5(   ld1             {v5.16b}, [x1], x14             )
-> -       ld1             {v6.16b}, [x1], x15
-> -       ld1             {v7.16b}, [x1], x16
-> +ST5(   ld1             {v5.16b}, [IN], x14             )
-> +       ld1             {v6.16b}, [IN], x15
-> +       ld1             {v7.16b}, [IN], x16
->
->  ST4(   bl              aes_encrypt_block4x             )
->  ST5(   bl              aes_encrypt_block5x             )
->
-> -       ld1             {v8.16b}, [x1], x13
-> -       ld1             {v9.16b}, [x1]
-> -       ld1             {v10.16b}, [x12]
-> +       ld1             {v8.16b}, [IN], x13
-> +       ld1             {v9.16b}, [IN]
-> +       ld1             {v10.16b}, [x9]
->
->  ST4(   eor             v6.16b, v6.16b, v0.16b          )
->  ST4(   eor             v7.16b, v7.16b, v1.16b          )
-> @@ -477,30 +522,48 @@ ST5(      eor             v7.16b, v7.16b, v2.16b          )
->  ST5(   eor             v8.16b, v8.16b, v3.16b          )
->  ST5(   eor             v9.16b, v9.16b, v4.16b          )
->
-> -ST5(   st1             {v5.16b}, [x0], x14             )
-> -       st1             {v6.16b}, [x0], x15
-> -       st1             {v7.16b}, [x0], x16
-> -       add             x13, x13, x0
-> +ST5(   st1             {v5.16b}, [OUT], x14            )
-> +       st1             {v6.16b}, [OUT], x15
-> +       st1             {v7.16b}, [OUT], x16
-> +       add             x13, x13, OUT
->         st1             {v9.16b}, [x13]         // overlapping stores
-> -       st1             {v8.16b}, [x0]
-> +       st1             {v8.16b}, [OUT]
->         b               .Lctrout\xctr
->
->  .Lctrtail1x\xctr:
-> -       sub             x7, x6, #16
-> -       csel            x6, x6, x7, eq
-> -       add             x1, x1, x6
-> -       add             x0, x0, x6
-> -       ld1             {v5.16b}, [x1]
-> -       ld1             {v6.16b}, [x0]
-> +       /*
-> +        * Handle <= 16 bytes of plaintext
-> +        */
-> +       sub             x8, x7, #16
-> +       csel            x7, x7, x8, eq
-> +       add             IN, IN, x7
-> +       add             OUT, OUT, x7
-> +       ld1             {v5.16b}, [IN]
-> +       ld1             {v6.16b}, [OUT]
->  ST5(   mov             v3.16b, v4.16b                  )
->         encrypt_block   v3, w3, x2, x8, w7
-> -       ld1             {v10.16b-v11.16b}, [x12]
-> +       ld1             {v10.16b-v11.16b}, [x9]
->         tbl             v3.16b, {v3.16b}, v10.16b
->         sshr            v11.16b, v11.16b, #7
->         eor             v5.16b, v5.16b, v3.16b
->         bif             v5.16b, v6.16b, v11.16b
-> -       st1             {v5.16b}, [x0]
-> +       st1             {v5.16b}, [OUT]
->         b               .Lctrout\xctr
-> +
-> +       // Arguments
-> +       .unreq OUT
-> +       .unreq IN
-> +       .unreq KEY
-> +       .unreq ROUNDS_W
-> +       .unreq BYTES_W
-> +       .unreq IV
-> +       .unreq BYTE_CTR_W       // XCTR only
-> +       // Intermediate values
-> +       .unreq CTR_W            // XCTR only
-> +       .unreq CTR              // XCTR only
-> +       .unreq IV_PART
-> +       .unreq BLOCKS
-> +       .unreq BLOCKS_W
->  .endm
->
->         /*
-> --
-> 2.36.0.464.gb9c8b46e94-goog
->
