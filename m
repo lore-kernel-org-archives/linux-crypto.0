@@ -2,181 +2,78 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BB6C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 11:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC02C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 11:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356277AbiEELFz (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 07:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40298 "EHLO
+        id S235500AbiEELiY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 May 2022 07:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356362AbiEELFy (ORCPT
+        with ESMTP id S1355476AbiEELiX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 07:05:54 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963BB47AE8;
-        Thu,  5 May 2022 04:02:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0354861BEC;
-        Thu,  5 May 2022 11:02:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4FDC385A4;
-        Thu,  5 May 2022 11:02:10 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="h0bSE84+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651748528;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w66ItAgT5NMOeGXzvBnEtBD/csHTCnRqMMsL/3iYAvg=;
-        b=h0bSE84+8RVin308iX0H/iKq7dL+Ojk7E0WxeIaCEP9cgvRp3m8DB5hW1yV8y9bmnSkJZm
-        jqpKlAUFo4zoTq7tZP8c49SeiRja2UPqgTmoNAtUG03if4gx9PDIlYUqSpaubMWB0ZbY3q
-        cyFYpz2TzHCZsQxDFyfKMbmJVrd+VUc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4aea3e4b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 5 May 2022 11:02:08 +0000 (UTC)
-Date:   Thu, 5 May 2022 13:02:02 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Thu, 5 May 2022 07:38:23 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DA0B053B63
+        for <linux-crypto@vger.kernel.org>; Thu,  5 May 2022 04:34:43 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-405-O9jIg1gzOYiRDVV0CyY18A-1; Thu, 05 May 2022 12:34:41 +0100
+X-MC-Unique: O9jIg1gzOYiRDVV0CyY18A-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Thu, 5 May 2022 12:34:40 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.033; Thu, 5 May 2022 12:34:40 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+CC:     Peter Zijlstra <peterz@infradead.org>,
         Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
-Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-Message-ID: <YnOuqh4YZT8ww96W@zx2c4.com>
+        LKML <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        Filipe Manana <fdmanana@suse.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [patch 3/3] x86/fpu: Make FPU protection more robust
+Thread-Topic: [patch 3/3] x86/fpu: Make FPU protection more robust
+Thread-Index: AQHYYG+YWY1FRr4hzkKhJKBT7m/w1q0QJdtA
+Date:   Thu, 5 May 2022 11:34:40 +0000
+Message-ID: <1f4918f734d14e3896071d3c7de1441d@AcuMS.aculab.com>
 References: <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
- <87fslpjomx.ffs@tglx>
- <YnKh96isoB7jiFrv@zx2c4.com>
- <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com>
- <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com>
- <87mtfwiyqp.ffs@tglx>
- <YnMkRLcxczMxdE5z@zx2c4.com>
- <87h764ixjs.ffs@tglx>
+ <87fslpjomx.ffs@tglx> <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
+ <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
+ <YnMkRLcxczMxdE5z@zx2c4.com> <87h764ixjs.ffs@tglx>
+ <YnOuqh4YZT8ww96W@zx2c4.com>
+In-Reply-To: <YnOuqh4YZT8ww96W@zx2c4.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87h764ixjs.ffs@tglx>
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey again,
-
-On Thu, May 05, 2022 at 03:21:43AM +0200, Thomas Gleixner wrote:
-> > Thanks, I'll give it a shot in the morning (3am) when trying to do a
-> > more realistic benchmark. But just as a synthetic thing, I ran the
-> > numbers in kBench900 and am getting:
-> >
-> >      generic:    430 cycles per call
-> >        ssse3:    315 cycles per call
-> >       avx512:    277 cycles per call
-> >
-> > for a single call to the compression function, which is the most any of
-> > those mix_pool_bytes() calls do from add_{input,disk}_randomness(), on
-> > Tiger Lake, using RDPMC from kernel space.
-> 
-> I'm well aware of the difference between synthetic benchmarks and real
-> world scenarios and with the more in depth instrumentation of these
-> things I'm even more concerned that the difference is underestimated.
-> 
-> > This _doesn't_ take into account the price of calling kernel_fpu_begin().
-> > That's a little hard to bench synthetically by running it in a loop and
-> > taking medians because of the lazy restoration. But that's an indication
-> > anyway that I should be looking at the cost of the actual function as
-> > its running in random.c, rather than the synthetic test. Will keep this
-> > thread updated.
-> 
-> Appreciated.
-
-Interestingly, disabling the simd paths makes things around 283 cycles
-slower on my Tiger Lake laptop, just doing ordinary things. I'm actually
-slightly surprised, so I'll probably keep playing with this. My patch
-for this is attached. Let me know if you have a different methodology in
-mind...
-
-Jason
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index bd292927654c..7a70a186c26b 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -53,6 +53,7 @@
- #include <linux/uuid.h>
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
-+#include <linux/sort.h>
- #include <crypto/chacha.h>
- #include <crypto/blake2s.h>
- #include <asm/processor.h>
-@@ -755,9 +756,48 @@ static struct {
- 	.lock = __SPIN_LOCK_UNLOCKED(input_pool.lock),
- };
-
-+struct {
-+	u32 durations[1 << 20];
-+	u32 pos, len;
-+} irqbench;
-+
- static void _mix_pool_bytes(const void *in, size_t nbytes)
- {
-+	u32 ctr = input_pool.hash.t[0];
-+	cycles_t end, start = get_cycles();
- 	blake2s_update(&input_pool.hash, in, nbytes);
-+	end = get_cycles();
-+
-+	if (ctr == input_pool.hash.t[0] || !in_hardirq())
-+		return;
-+
-+	irqbench.durations[irqbench.pos++ % ARRAY_SIZE(irqbench.durations)] = end - start;
-+	irqbench.len = min_t(u32, irqbench.len + 1, ARRAY_SIZE(irqbench.durations));
-+}
-+
-+static int cmp_u32(const void *a, const void *b)
-+{
-+	return *(const u32 *)a - *(const u32 *)b;
-+}
-+
-+static int proc_do_irqbench_median(struct ctl_table *table, int write, void *buffer,
-+				   size_t *lenp, loff_t *ppos)
-+{
-+	u32 len = READ_ONCE(irqbench.len), median, *sorted;
-+	struct ctl_table fake_table = {
-+		.data = &median,
-+		.maxlen = sizeof(median)
-+	};
-+	if (!len)
-+		return -ENODATA;
-+	sorted = kmalloc_array(len, sizeof(*sorted), GFP_KERNEL);
-+	if (!sorted)
-+		return -ENOMEM;
-+	memcpy(sorted, irqbench.durations, len * sizeof(*sorted));
-+	sort(sorted, len, sizeof(*sorted), cmp_u32, NULL);
-+	median = sorted[len / 2];
-+	kfree(sorted);
-+	return write ? 0 : proc_douintvec(&fake_table, 0, buffer, lenp, ppos);
- }
-
- /*
-@@ -1709,6 +1749,18 @@ static struct ctl_table random_table[] = {
- 		.mode		= 0444,
- 		.proc_handler	= proc_do_uuid,
- 	},
-+	{
-+		.procname	= "irqbench_median",
-+		.mode		= 0444,
-+		.proc_handler	= proc_do_irqbench_median,
-+	},
-+	{
-+		.procname	= "irqbench_count",
-+		.data		= &irqbench.len,
-+		.maxlen		= sizeof(irqbench.len),
-+		.mode		= 0444,
-+		.proc_handler	= proc_douintvec,
-+	},
- 	{ }
- };
-
+Li4uDQo+ICsJY3ljbGVzX3QgZW5kLCBzdGFydCA9IGdldF9jeWNsZXMoKTsNCj4gIAlibGFrZTJz
+X3VwZGF0ZSgmaW5wdXRfcG9vbC5oYXNoLCBpbiwgbmJ5dGVzKTsNCj4gKwllbmQgPSBnZXRfY3lj
+bGVzKCk7DQoNCklmIGdldF9jeWNsZXMoKSBpcyByZHRzYyB0aGVuIHRoYXQgZ2l2ZXMgbWVhbmlu
+Z2xlc3MgbnVtYmVycy4NClRoZSBjcHUgY2xvY2sgZnJlcXVlbmN5IHdpbGwgY2hhbmdlIG9uIHlv
+dS4NCg0KWW91IGNhbiB1c2Ugb25lIG9mIHRoZSBwZXJmb3JtYW5jZSBjb3VudGVycyB0byBnZXQg
+YW4gYWN0dWFsDQpjeWNsZSBjb3VudCAtIGFsdGhvdWdoIHRoYXQgaXMgb25seSBzdGFibGUgZm9y
+ICdob3QgY2FjaGUnDQphcyBhbnkgbWVtb3J5IGFjY2Vzc2VzIGFyZSBjbG9jayBzcGVlZCBkZXBl
+bmRhbnQuDQoNCk9UT0ggdGhlIGVudHJvcHkgbWl4aW5nIGlzIHZlcnkgbGlrZWx5IHRvIGJlICdj
+b2xkIGNhY2hlJw0KYW5kIGFsbCB0aGUgdW5yb2xsaW5nIGluIGJsYWtlczcgd2lsbCBjb21wbGV0
+ZWx5IGtpbGwNCnBlcmZvcm1hbmNlLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNz
+IExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAx
+UFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
