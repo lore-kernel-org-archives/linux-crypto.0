@@ -2,124 +2,181 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A0CC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 09:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BB6C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 11:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353749AbiEEJg5 (ORCPT
+        id S1356277AbiEELFz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 05:36:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
+        Thu, 5 May 2022 07:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231132AbiEEJg4 (ORCPT
+        with ESMTP id S1356362AbiEELFy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 05:36:56 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C2BE2ADF
-        for <linux-crypto@vger.kernel.org>; Thu,  5 May 2022 02:33:17 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id 204so423849pfx.3
-        for <linux-crypto@vger.kernel.org>; Thu, 05 May 2022 02:33:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=LAABk+Hqn/ed3olCk7cLLnxGOLs8GPCl8qPvqmsVMMM=;
-        b=ErbXNtFsbGBEns+3J2+rqVHArDPQgCAH5aInArNTr5Ytkh/2HnvkfZXsi+I8K9/fKL
-         FOod075XSxK4u/V8rbUwYiTnw6NXlPrvknjrKk02/PKJgkljGMJxHnB+e1xcGiYhZC4J
-         CVcjLuK/RXUvnMfbnldwLtRd3sIqwBcG5uKkEbX8yd+vyFbQZRSah9nEtuLOhACyZ3ya
-         XaDrcJdsyj6SllWgRfR3/AOf2W1IRrw9wkJdWRgoV9vASSILU2/qzvlVf0Zxqb1gMZYI
-         oIKjAQgqB18wWrdMBJP2VgJ1s0eE++rcSs3OtLqAt5iMcVjZMs3QZ4wqnKyLSuxZIqFR
-         WDmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LAABk+Hqn/ed3olCk7cLLnxGOLs8GPCl8qPvqmsVMMM=;
-        b=GMV0xLBRPh9vjQeCtOGM3SDID0iVJTPsSEiuzWp9rU3EJwQD5W/OcGf/J2Ex8yCgLC
-         zksBmOe09yFl2XIS30dAJJc3uHWmt57Tt+Gdu24PWTNcwxFo/EKwSMpDtPKK9BjBk+OX
-         MTofjkEYvv9HVaN8+lKp8bfTO4ir9eNAjNYcGDMR96evDxqGL0JQiGfI/LoOXw4a/peG
-         p71Lp3nT1TTTATQfilvjTp3pYqFa4e/rgrHFijgk/OhzK/bdZxewY23Rpg05WQFsgcYT
-         rAA1XrvRBPntgBfX+etpv+IXe6FFWJM3XKnWiYF/DkZFD48UGiH7HUN0dCAVryRI11fw
-         su4w==
-X-Gm-Message-State: AOAM530VrdsbJBIVjadpWG5Ul8uD3DbAPWu6NdDYbur7sD8Hvmve8P/M
-        1az96lV8ppwYaDf29vD6PZemhA==
-X-Google-Smtp-Source: ABdhPJwaIsuvBtKuAQv+SmYbKWs22EAjLiyHSuubS0HBGDuWiWajxYniwE9CGElZZX7/xwqc39QOow==
-X-Received: by 2002:a65:5b81:0:b0:3aa:1671:c6a7 with SMTP id i1-20020a655b81000000b003aa1671c6a7mr21224552pgr.169.1651743197230;
-        Thu, 05 May 2022 02:33:17 -0700 (PDT)
-Received: from [10.255.89.252] ([139.177.225.255])
-        by smtp.gmail.com with ESMTPSA id mu6-20020a17090b388600b001d960eaed66sm1054035pjb.42.2022.05.05.02.33.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 May 2022 02:33:16 -0700 (PDT)
-Message-ID: <ea42cb6e-cd1d-e0be-ab9f-382b75c070e8@bytedance.com>
-Date:   Thu, 5 May 2022 17:29:23 +0800
+        Thu, 5 May 2022 07:05:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963BB47AE8;
+        Thu,  5 May 2022 04:02:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0354861BEC;
+        Thu,  5 May 2022 11:02:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4FDC385A4;
+        Thu,  5 May 2022 11:02:10 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="h0bSE84+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651748528;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=w66ItAgT5NMOeGXzvBnEtBD/csHTCnRqMMsL/3iYAvg=;
+        b=h0bSE84+8RVin308iX0H/iKq7dL+Ojk7E0WxeIaCEP9cgvRp3m8DB5hW1yV8y9bmnSkJZm
+        jqpKlAUFo4zoTq7tZP8c49SeiRja2UPqgTmoNAtUG03if4gx9PDIlYUqSpaubMWB0ZbY3q
+        cyFYpz2TzHCZsQxDFyfKMbmJVrd+VUc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4aea3e4b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 5 May 2022 11:02:08 +0000 (UTC)
+Date:   Thu, 5 May 2022 13:02:02 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
+Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
+Message-ID: <YnOuqh4YZT8ww96W@zx2c4.com>
+References: <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
+ <87fslpjomx.ffs@tglx>
+ <YnKh96isoB7jiFrv@zx2c4.com>
+ <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com>
+ <87wnf1huwj.ffs@tglx>
+ <YnMRwPFfvB0RlBow@zx2c4.com>
+ <87mtfwiyqp.ffs@tglx>
+ <YnMkRLcxczMxdE5z@zx2c4.com>
+ <87h764ixjs.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: Re: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
-        "davem@davemloft.net" <davem@davemloft.net>
-References: <20220424104140.44841-1-pizhenwei@bytedance.com>
- <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
- <7f7ab8ae46174ed6b0888b5fbeb5849b@huawei.com>
- <20220505005607-mutt-send-email-mst@kernel.org>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20220505005607-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87h764ixjs.ffs@tglx>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hey again,
 
-On 5/5/22 12:57, Michael S. Tsirkin wrote:
-> On Thu, May 05, 2022 at 03:14:40AM +0000, Gonglei (Arei) wrote:
->>
->>
->>> -----Original Message-----
->>> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
->>> Sent: Thursday, May 5, 2022 10:35 AM
->>> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com;
->>> jasowang@redhat.com
->>> Cc: herbert@gondor.apana.org.au; linux-kernel@vger.kernel.org;
->>> virtualization@lists.linux-foundation.org; linux-crypto@vger.kernel.org;
->>> helei.sig11@bytedance.com; davem@davemloft.net
->>> Subject: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
->>>
->>> Hi, Lei
->>>
->>> Jason replied in another patch:
->>> Still hundreds of lines of changes, I'd leave this change to other maintainers to
->>> decide.
->>>
->>> Quite frankly, the virtio crypto driver changed only a few in the past, and the
->>> performance of control queue is not good enough. I am in doubt about that this
->>> driver is not used widely. So I'd like to rework a lot, it would be best to complete
->>> this work in 5.18 window.
->>>
->>> This gets different point with Jason. I would appreciate it if you could give me
->>> any hint.
->>>
->>
->> This is already in my todo list.
->>
->> Regards,
->> -Gonglei
+On Thu, May 05, 2022 at 03:21:43AM +0200, Thomas Gleixner wrote:
+> > Thanks, I'll give it a shot in the morning (3am) when trying to do a
+> > more realistic benchmark. But just as a synthetic thing, I ran the
+> > numbers in kBench900 and am getting:
+> >
+> >      generic:    430 cycles per call
+> >        ssse3:    315 cycles per call
+> >       avx512:    277 cycles per call
+> >
+> > for a single call to the compression function, which is the most any of
+> > those mix_pool_bytes() calls do from add_{input,disk}_randomness(), on
+> > Tiger Lake, using RDPMC from kernel space.
 > 
-> It's been out a month though, not really acceptable latency for review.
-> So I would apply this for next,  but you need to address Dan Captenter's
-> comment, and look for simular patterns elesewhere in your patch.
+> I'm well aware of the difference between synthetic benchmarks and real
+> world scenarios and with the more in depth instrumentation of these
+> things I'm even more concerned that the difference is underestimated.
 > 
+> > This _doesn't_ take into account the price of calling kernel_fpu_begin().
+> > That's a little hard to bench synthetically by running it in a loop and
+> > taking medians because of the lazy restoration. But that's an indication
+> > anyway that I should be looking at the cost of the actual function as
+> > its running in random.c, rather than the synthetic test. Will keep this
+> > thread updated.
+> 
+> Appreciated.
 
-I fixed this in the v5 series. Thanks!
+Interestingly, disabling the simd paths makes things around 283 cycles
+slower on my Tiger Lake laptop, just doing ordinary things. I'm actually
+slightly surprised, so I'll probably keep playing with this. My patch
+for this is attached. Let me know if you have a different methodology in
+mind...
 
--- 
-zhenwei pi
+Jason
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index bd292927654c..7a70a186c26b 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -53,6 +53,7 @@
+ #include <linux/uuid.h>
+ #include <linux/uaccess.h>
+ #include <linux/suspend.h>
++#include <linux/sort.h>
+ #include <crypto/chacha.h>
+ #include <crypto/blake2s.h>
+ #include <asm/processor.h>
+@@ -755,9 +756,48 @@ static struct {
+ 	.lock = __SPIN_LOCK_UNLOCKED(input_pool.lock),
+ };
+
++struct {
++	u32 durations[1 << 20];
++	u32 pos, len;
++} irqbench;
++
+ static void _mix_pool_bytes(const void *in, size_t nbytes)
+ {
++	u32 ctr = input_pool.hash.t[0];
++	cycles_t end, start = get_cycles();
+ 	blake2s_update(&input_pool.hash, in, nbytes);
++	end = get_cycles();
++
++	if (ctr == input_pool.hash.t[0] || !in_hardirq())
++		return;
++
++	irqbench.durations[irqbench.pos++ % ARRAY_SIZE(irqbench.durations)] = end - start;
++	irqbench.len = min_t(u32, irqbench.len + 1, ARRAY_SIZE(irqbench.durations));
++}
++
++static int cmp_u32(const void *a, const void *b)
++{
++	return *(const u32 *)a - *(const u32 *)b;
++}
++
++static int proc_do_irqbench_median(struct ctl_table *table, int write, void *buffer,
++				   size_t *lenp, loff_t *ppos)
++{
++	u32 len = READ_ONCE(irqbench.len), median, *sorted;
++	struct ctl_table fake_table = {
++		.data = &median,
++		.maxlen = sizeof(median)
++	};
++	if (!len)
++		return -ENODATA;
++	sorted = kmalloc_array(len, sizeof(*sorted), GFP_KERNEL);
++	if (!sorted)
++		return -ENOMEM;
++	memcpy(sorted, irqbench.durations, len * sizeof(*sorted));
++	sort(sorted, len, sizeof(*sorted), cmp_u32, NULL);
++	median = sorted[len / 2];
++	kfree(sorted);
++	return write ? 0 : proc_douintvec(&fake_table, 0, buffer, lenp, ppos);
+ }
+
+ /*
+@@ -1709,6 +1749,18 @@ static struct ctl_table random_table[] = {
+ 		.mode		= 0444,
+ 		.proc_handler	= proc_do_uuid,
+ 	},
++	{
++		.procname	= "irqbench_median",
++		.mode		= 0444,
++		.proc_handler	= proc_do_irqbench_median,
++	},
++	{
++		.procname	= "irqbench_count",
++		.data		= &irqbench.len,
++		.maxlen		= sizeof(irqbench.len),
++		.mode		= 0444,
++		.proc_handler	= proc_douintvec,
++	},
+ 	{ }
+ };
+
+
