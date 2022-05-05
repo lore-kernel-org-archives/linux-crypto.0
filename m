@@ -2,152 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EB4C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 02:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9897BC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 03:14:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239710AbiEECmv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 22:42:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
+        id S240647AbiEEDSW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 23:18:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233332AbiEECmt (ORCPT
+        with ESMTP id S232469AbiEEDSV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 22:42:49 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53EC04AE11
-        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 19:39:11 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so2763165pji.3
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 19:39:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=aEOiwyG+eTh6W3KHKpg7shbqlJQ76/KhFzFg57zL5/0=;
-        b=SxFvslkZn6Q7OGlLS0jfiCTQI0xExlJuAPCV/QgaRH9jHQ3UvOSGxz4PqWTvGgBoOj
-         gBffuL3wuhZtQhDfJigr7X7r7hQ7pNB++kVGMw+ILNK+ZJOd/AkCeDcxTSmZg47MtDoD
-         z80FE3h2Xcbh2AjufRmu/kpVcavdLzpyMOpSRw6Xj1hH6rfCCnRe0xK7XDskvZdjifBr
-         2INqvNc4tChqAjFbu7htLf9yRlSjmfKGuHKu0S1g273gLnpPseYMXEplQsMUT3NjD+fr
-         CGrdIGglM3GN0s8WNVIib+e6y9hsThmkkioTe5fxw/nghkpclZz6l0mWXwD+MKQlmaVj
-         Ui8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=aEOiwyG+eTh6W3KHKpg7shbqlJQ76/KhFzFg57zL5/0=;
-        b=pwWivD1kSzTr+0GTQXVMAkm6g2xk/CTAltSTEw/OYbaZt4pmXtSysc/m3YDxOLbuZP
-         Rop7WGbPZRkJx8pdTzCmWGvtA1ftpCfVSNpGrY/HoVKSrk9N/xTAQP+2OVRpJfhUMo2m
-         TPK1CXRdFXX8jlL8OMU9/FzCFpf4qmcDHqHgExXRKz9rLg75zK1HOCMcZrGu5eb13T7m
-         QR6ZzD/LVwx6xBcyEbPUTviwrjvja1nQt7A5sbseZYhhi3CG+luTIs4VFiTjqGF6pd/w
-         OdYForPlw+u6TVzZT3lIYzJqUGTDE+VD8MoENBibNY0dfZd19GYegFGOjodw/+hjfy0n
-         f2NA==
-X-Gm-Message-State: AOAM533ZqT9QmUjSzieMqVzJIkhIRg9UXD3jqJ6ywrg/e91EcCFlkFyU
-        h1/n8U3mwhpgIQmZ8cwwA1Ugw7QxeNfTow==
-X-Google-Smtp-Source: ABdhPJxJbVfMb0WtsafX9eaZn5+JI7p1n0mchGmJpTKtQMX5xjsduPiS9ugOP+49TDJNvmYc0nwoQw==
-X-Received: by 2002:a17:90b:3903:b0:1dc:8fe0:df4d with SMTP id ob3-20020a17090b390300b001dc8fe0df4dmr3327533pjb.191.1651718350808;
-        Wed, 04 May 2022 19:39:10 -0700 (PDT)
-Received: from [10.255.89.252] ([139.177.225.255])
-        by smtp.gmail.com with ESMTPSA id n1-20020a170902e54100b0015e8d4eb252sm203223plf.156.2022.05.04.19.39.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 May 2022 19:39:10 -0700 (PDT)
-Message-ID: <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
-Date:   Thu, 5 May 2022 10:35:17 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
-Content-Language: en-US
-To:     arei.gonglei@huawei.com, mst@redhat.com, jasowang@redhat.com
-Cc:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
-        davem@davemloft.net
+        Wed, 4 May 2022 23:18:21 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0DA434BE;
+        Wed,  4 May 2022 20:14:43 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KtzLz6CNXzhYx9;
+        Thu,  5 May 2022 11:14:19 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 5 May 2022 11:14:41 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2375.024;
+ Thu, 5 May 2022 11:14:41 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
+Thread-Topic: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
+Thread-Index: AQHYV8hyMXkGqKxZB02P/aEBjf+Trq0PG9WAgACQlMA=
+Date:   Thu, 5 May 2022 03:14:40 +0000
+Message-ID: <7f7ab8ae46174ed6b0888b5fbeb5849b@huawei.com>
 References: <20220424104140.44841-1-pizhenwei@bytedance.com>
-From:   zhenwei pi <pizhenwei@bytedance.com>
-In-Reply-To: <20220424104140.44841-1-pizhenwei@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
+In-Reply-To: <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Lei
-
-Jason replied in another patch:
-Still hundreds of lines of changes, I'd leave this change to other
-maintainers to decide.
-
-Quite frankly, the virtio crypto driver changed only a few in the past, 
-and the performance of control queue is not good enough. I am in doubt 
-about that this driver is not used widely. So I'd like to rework a lot, 
-it would be best to complete this work in 5.18 window.
-
-This gets different point with Jason. I would appreciate it if you could 
-give me any hint.
-
-On 4/24/22 18:41, zhenwei pi wrote:
-> Hi, Lei
-> I'd like to move helper and callback functions(Eg, virtcrypto_clear_request
->   and virtcrypto_ctrlq_callback) from xx_core.c to xx_common.c,
-> then the xx_core.c supports:
->    - probe/remove/irq affinity seting for a virtio device
->    - basic virtio related operations
-> 
-> xx_common.c supports:
->    - common helpers/functions for algos
-> 
-> Do you have any suggestion about this?
-> 
-> v3 -> v4:
->   - Don't create new file virtio_common.c, the new functions are added
->     into virtio_crypto_core.c
->   - Split the first patch into two parts:
->       1, change code style,
->       2, use private buffer instead of shared buffer
->   - Remove relevant change.
->   - Other minor changes.
-> 
-> v2 -> v3:
->   - Jason suggested that spliting the first patch into two part:
->       1, using private buffer
->       2, remove the busy polling
->     Rework as Jason's suggestion, this makes the smaller change in
->     each one and clear.
-> 
-> v1 -> v2:
->   - Use kfree instead of kfree_sensitive for insensitive buffer.
->   - Several coding style fix.
->   - Use memory from current node, instead of memory close to device
->   - Add more message in commit, also explain why removing per-device
->     request buffer.
->   - Add necessary comment in code to explain why using kzalloc to
->     allocate struct virtio_crypto_ctrl_request.
-> 
-> v1:
-> The main point of this series is to improve the performance for
-> virtio crypto:
-> - Use wait mechanism instead of busy polling for ctrl queue, this
->    reduces CPU and lock racing, it's possiable to create/destroy session
->    parallelly, QPS increases from ~40K/s to ~200K/s.
-> - Enable retry on crypto engine to improve performance for data queue,
->    this allows the larger depth instead of 1.
-> - Fix dst data length in akcipher service.
-> - Other style fix.
-> 
-> lei he (2):
->    virtio-crypto: adjust dst_len at ops callback
->    virtio-crypto: enable retry for virtio-crypto-dev
-> 
-> zhenwei pi (3):
->    virtio-crypto: change code style
->    virtio-crypto: use private buffer for control request
->    virtio-crypto: wait ctrl queue instead of busy polling
-> 
->   .../virtio/virtio_crypto_akcipher_algs.c      |  83 ++++++-----
->   drivers/crypto/virtio/virtio_crypto_common.h  |  21 ++-
->   drivers/crypto/virtio/virtio_crypto_core.c    |  55 ++++++-
->   .../virtio/virtio_crypto_skcipher_algs.c      | 140 ++++++++----------
->   4 files changed, 180 insertions(+), 119 deletions(-)
-> 
-
--- 
-zhenwei pi
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogemhlbndlaSBwaSBbbWFp
+bHRvOnBpemhlbndlaUBieXRlZGFuY2UuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgTWF5IDUsIDIw
+MjIgMTA6MzUgQU0NCj4gVG86IEdvbmdsZWkgKEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNv
+bT47IG1zdEByZWRoYXQuY29tOw0KPiBqYXNvd2FuZ0ByZWRoYXQuY29tDQo+IENjOiBoZXJiZXJ0
+QGdvbmRvci5hcGFuYS5vcmcuYXU7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IHZp
+cnR1YWxpemF0aW9uQGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOyBsaW51eC1jcnlwdG9Admdl
+ci5rZXJuZWwub3JnOw0KPiBoZWxlaS5zaWcxMUBieXRlZGFuY2UuY29tOyBkYXZlbUBkYXZlbWxv
+ZnQubmV0DQo+IFN1YmplY3Q6IFBJTkc6IFtQQVRDSCB2NCAwLzVdIHZpcnRpby1jcnlwdG86IElt
+cHJvdmUgcGVyZm9ybWFuY2UNCj4gDQo+IEhpLCBMZWkNCj4gDQo+IEphc29uIHJlcGxpZWQgaW4g
+YW5vdGhlciBwYXRjaDoNCj4gU3RpbGwgaHVuZHJlZHMgb2YgbGluZXMgb2YgY2hhbmdlcywgSSdk
+IGxlYXZlIHRoaXMgY2hhbmdlIHRvIG90aGVyIG1haW50YWluZXJzIHRvDQo+IGRlY2lkZS4NCj4g
+DQo+IFF1aXRlIGZyYW5rbHksIHRoZSB2aXJ0aW8gY3J5cHRvIGRyaXZlciBjaGFuZ2VkIG9ubHkg
+YSBmZXcgaW4gdGhlIHBhc3QsIGFuZCB0aGUNCj4gcGVyZm9ybWFuY2Ugb2YgY29udHJvbCBxdWV1
+ZSBpcyBub3QgZ29vZCBlbm91Z2guIEkgYW0gaW4gZG91YnQgYWJvdXQgdGhhdCB0aGlzDQo+IGRy
+aXZlciBpcyBub3QgdXNlZCB3aWRlbHkuIFNvIEknZCBsaWtlIHRvIHJld29yayBhIGxvdCwgaXQg
+d291bGQgYmUgYmVzdCB0byBjb21wbGV0ZQ0KPiB0aGlzIHdvcmsgaW4gNS4xOCB3aW5kb3cuDQo+
+IA0KPiBUaGlzIGdldHMgZGlmZmVyZW50IHBvaW50IHdpdGggSmFzb24uIEkgd291bGQgYXBwcmVj
+aWF0ZSBpdCBpZiB5b3UgY291bGQgZ2l2ZSBtZQ0KPiBhbnkgaGludC4NCj4gDQoNClRoaXMgaXMg
+YWxyZWFkeSBpbiBteSB0b2RvIGxpc3QuDQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0KDQo+IE9uIDQv
+MjQvMjIgMTg6NDEsIHpoZW53ZWkgcGkgd3JvdGU6DQo+ID4gSGksIExlaQ0KPiA+IEknZCBsaWtl
+IHRvIG1vdmUgaGVscGVyIGFuZCBjYWxsYmFjayBmdW5jdGlvbnMoRWcsIHZpcnRjcnlwdG9fY2xl
+YXJfcmVxdWVzdA0KPiA+ICAgYW5kIHZpcnRjcnlwdG9fY3RybHFfY2FsbGJhY2spIGZyb20geHhf
+Y29yZS5jIHRvIHh4X2NvbW1vbi5jLCB0aGVuDQo+ID4gdGhlIHh4X2NvcmUuYyBzdXBwb3J0czoN
+Cj4gPiAgICAtIHByb2JlL3JlbW92ZS9pcnEgYWZmaW5pdHkgc2V0aW5nIGZvciBhIHZpcnRpbyBk
+ZXZpY2UNCj4gPiAgICAtIGJhc2ljIHZpcnRpbyByZWxhdGVkIG9wZXJhdGlvbnMNCj4gPg0KPiA+
+IHh4X2NvbW1vbi5jIHN1cHBvcnRzOg0KPiA+ICAgIC0gY29tbW9uIGhlbHBlcnMvZnVuY3Rpb25z
+IGZvciBhbGdvcw0KPiA+DQo+ID4gRG8geW91IGhhdmUgYW55IHN1Z2dlc3Rpb24gYWJvdXQgdGhp
+cz8NCj4gPg0KPiA+IHYzIC0+IHY0Og0KPiA+ICAgLSBEb24ndCBjcmVhdGUgbmV3IGZpbGUgdmly
+dGlvX2NvbW1vbi5jLCB0aGUgbmV3IGZ1bmN0aW9ucyBhcmUgYWRkZWQNCj4gPiAgICAgaW50byB2
+aXJ0aW9fY3J5cHRvX2NvcmUuYw0KPiA+ICAgLSBTcGxpdCB0aGUgZmlyc3QgcGF0Y2ggaW50byB0
+d28gcGFydHM6DQo+ID4gICAgICAgMSwgY2hhbmdlIGNvZGUgc3R5bGUsDQo+ID4gICAgICAgMiwg
+dXNlIHByaXZhdGUgYnVmZmVyIGluc3RlYWQgb2Ygc2hhcmVkIGJ1ZmZlcg0KPiA+ICAgLSBSZW1v
+dmUgcmVsZXZhbnQgY2hhbmdlLg0KPiA+ICAgLSBPdGhlciBtaW5vciBjaGFuZ2VzLg0KPiA+DQo+
+ID4gdjIgLT4gdjM6DQo+ID4gICAtIEphc29uIHN1Z2dlc3RlZCB0aGF0IHNwbGl0aW5nIHRoZSBm
+aXJzdCBwYXRjaCBpbnRvIHR3byBwYXJ0Og0KPiA+ICAgICAgIDEsIHVzaW5nIHByaXZhdGUgYnVm
+ZmVyDQo+ID4gICAgICAgMiwgcmVtb3ZlIHRoZSBidXN5IHBvbGxpbmcNCj4gPiAgICAgUmV3b3Jr
+IGFzIEphc29uJ3Mgc3VnZ2VzdGlvbiwgdGhpcyBtYWtlcyB0aGUgc21hbGxlciBjaGFuZ2UgaW4N
+Cj4gPiAgICAgZWFjaCBvbmUgYW5kIGNsZWFyLg0KPiA+DQo+ID4gdjEgLT4gdjI6DQo+ID4gICAt
+IFVzZSBrZnJlZSBpbnN0ZWFkIG9mIGtmcmVlX3NlbnNpdGl2ZSBmb3IgaW5zZW5zaXRpdmUgYnVm
+ZmVyLg0KPiA+ICAgLSBTZXZlcmFsIGNvZGluZyBzdHlsZSBmaXguDQo+ID4gICAtIFVzZSBtZW1v
+cnkgZnJvbSBjdXJyZW50IG5vZGUsIGluc3RlYWQgb2YgbWVtb3J5IGNsb3NlIHRvIGRldmljZQ0K
+PiA+ICAgLSBBZGQgbW9yZSBtZXNzYWdlIGluIGNvbW1pdCwgYWxzbyBleHBsYWluIHdoeSByZW1v
+dmluZyBwZXItZGV2aWNlDQo+ID4gICAgIHJlcXVlc3QgYnVmZmVyLg0KPiA+ICAgLSBBZGQgbmVj
+ZXNzYXJ5IGNvbW1lbnQgaW4gY29kZSB0byBleHBsYWluIHdoeSB1c2luZyBremFsbG9jIHRvDQo+
+ID4gICAgIGFsbG9jYXRlIHN0cnVjdCB2aXJ0aW9fY3J5cHRvX2N0cmxfcmVxdWVzdC4NCj4gPg0K
+PiA+IHYxOg0KPiA+IFRoZSBtYWluIHBvaW50IG9mIHRoaXMgc2VyaWVzIGlzIHRvIGltcHJvdmUg
+dGhlIHBlcmZvcm1hbmNlIGZvciB2aXJ0aW8NCj4gPiBjcnlwdG86DQo+ID4gLSBVc2Ugd2FpdCBt
+ZWNoYW5pc20gaW5zdGVhZCBvZiBidXN5IHBvbGxpbmcgZm9yIGN0cmwgcXVldWUsIHRoaXMNCj4g
+PiAgICByZWR1Y2VzIENQVSBhbmQgbG9jayByYWNpbmcsIGl0J3MgcG9zc2lhYmxlIHRvIGNyZWF0
+ZS9kZXN0cm95IHNlc3Npb24NCj4gPiAgICBwYXJhbGxlbGx5LCBRUFMgaW5jcmVhc2VzIGZyb20g
+fjQwSy9zIHRvIH4yMDBLL3MuDQo+ID4gLSBFbmFibGUgcmV0cnkgb24gY3J5cHRvIGVuZ2luZSB0
+byBpbXByb3ZlIHBlcmZvcm1hbmNlIGZvciBkYXRhIHF1ZXVlLA0KPiA+ICAgIHRoaXMgYWxsb3dz
+IHRoZSBsYXJnZXIgZGVwdGggaW5zdGVhZCBvZiAxLg0KPiA+IC0gRml4IGRzdCBkYXRhIGxlbmd0
+aCBpbiBha2NpcGhlciBzZXJ2aWNlLg0KPiA+IC0gT3RoZXIgc3R5bGUgZml4Lg0KPiA+DQo+ID4g
+bGVpIGhlICgyKToNCj4gPiAgICB2aXJ0aW8tY3J5cHRvOiBhZGp1c3QgZHN0X2xlbiBhdCBvcHMg
+Y2FsbGJhY2sNCj4gPiAgICB2aXJ0aW8tY3J5cHRvOiBlbmFibGUgcmV0cnkgZm9yIHZpcnRpby1j
+cnlwdG8tZGV2DQo+ID4NCj4gPiB6aGVud2VpIHBpICgzKToNCj4gPiAgICB2aXJ0aW8tY3J5cHRv
+OiBjaGFuZ2UgY29kZSBzdHlsZQ0KPiA+ICAgIHZpcnRpby1jcnlwdG86IHVzZSBwcml2YXRlIGJ1
+ZmZlciBmb3IgY29udHJvbCByZXF1ZXN0DQo+ID4gICAgdmlydGlvLWNyeXB0bzogd2FpdCBjdHJs
+IHF1ZXVlIGluc3RlYWQgb2YgYnVzeSBwb2xsaW5nDQo+ID4NCj4gPiAgIC4uLi92aXJ0aW8vdmly
+dGlvX2NyeXB0b19ha2NpcGhlcl9hbGdzLmMgICAgICB8ICA4MyArKysrKystLS0tLQ0KPiA+ICAg
+ZHJpdmVycy9jcnlwdG8vdmlydGlvL3ZpcnRpb19jcnlwdG9fY29tbW9uLmggIHwgIDIxICsrLQ0K
+PiA+ICAgZHJpdmVycy9jcnlwdG8vdmlydGlvL3ZpcnRpb19jcnlwdG9fY29yZS5jICAgIHwgIDU1
+ICsrKysrKy0NCj4gPiAgIC4uLi92aXJ0aW8vdmlydGlvX2NyeXB0b19za2NpcGhlcl9hbGdzLmMg
+ICAgICB8IDE0MCArKysrKysrKy0tLS0tLS0tLS0NCj4gPiAgIDQgZmlsZXMgY2hhbmdlZCwgMTgw
+IGluc2VydGlvbnMoKyksIDExOSBkZWxldGlvbnMoLSkNCj4gPg0KPiANCj4gLS0NCj4gemhlbndl
+aSBwaQ0K
