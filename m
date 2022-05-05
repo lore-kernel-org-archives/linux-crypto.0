@@ -2,151 +2,66 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0A2C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 973B9C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 00:35:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231928AbiEEAdT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 20:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51812 "EHLO
+        id S232415AbiEEAih (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 20:38:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbiEEAdR (ORCPT
+        with ESMTP id S232395AbiEEAig (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 20:33:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B165554BEC;
-        Wed,  4 May 2022 17:29:39 -0700 (PDT)
+        Wed, 4 May 2022 20:38:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CCAF4BB9F;
+        Wed,  4 May 2022 17:34:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6580FB81AF2;
-        Thu,  5 May 2022 00:29:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57C34C385A5;
-        Thu,  5 May 2022 00:29:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2ACDC61D5C;
+        Thu,  5 May 2022 00:34:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31D96C385A4;
+        Thu,  5 May 2022 00:34:58 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="So6Pj6BX"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dIvmPEiz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651710574;
+        t=1651710896;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=K1NOr1spTsQSWBCHL0IgAOS1hqjEpNdIRU4N7uXqbX8=;
-        b=So6Pj6BXqwXr5a6pTrsjQJwy6urZ5h0f0vSCODCkFzLX6aXI9p6ZHUW8b6wqHUfazL+xL0
-        wTlzmS/Wu30Wj9B5+cvPUYyNx6rXSd5xMN0mxzA+zrXHKeRJzmj9O92iiQ5gF0nYVSd2RW
-        R6ZsTTMrzvTX65jxGKG5CRrK9LTI7JE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 69a44044 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 5 May 2022 00:29:34 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     nathan@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>, Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH v7] timekeeping: Add raw clock fallback for random_get_entropy()
-Date:   Thu,  5 May 2022 02:29:10 +0200
-Message-ID: <20220505001924.176087-1-Jason@zx2c4.com>
-In-Reply-To: <87y1zkmg0l.ffs@tglx>
-References: <87y1zkmg0l.ffs@tglx>
+        bh=tnC1+qRF+ciP+q6CHbeRaXIz/leRGorupnOwUpOwflA=;
+        b=dIvmPEizBesoAFpFaMW5IhHZOZ/abNRUv8YA9jGJKrKgyijFfUvV2ylGMaDm1D3M87ar9j
+        3N+jxxVjkkwvRsrwKs8tkYZfCjRgrdgezrCdyoWepSNn4wSu5HUSW7HZanXyGfJa4kapnj
+        DpDItaHtWFjJ2cjiiDS9loKVyL1jc9g=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2307956d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 5 May 2022 00:34:56 +0000 (UTC)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-2f83983782fso33349357b3.6;
+        Wed, 04 May 2022 17:34:56 -0700 (PDT)
+X-Gm-Message-State: AOAM530gEEnf8+5X10gl1at8EwJdbbUUALIkkgMR74vos0kO0+rfL2SI
+        XT7UVCs4F8PYA8i/9ds3ajesKVjPJCXC34cKpRI=
+X-Google-Smtp-Source: ABdhPJxFr907tMrzyLaiI7ZALTgATrZJBmLFKZ4XIFvya0WZsy5rGZDeMn8L4JglFRXceNF2q00ja1PLfDEXJxCdAV4=
+X-Received: by 2002:a81:ad5b:0:b0:2f7:c91e:ab42 with SMTP id
+ l27-20020a81ad5b000000b002f7c91eab42mr22698261ywk.499.1651710895557; Wed, 04
+ May 2022 17:34:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220503131204.571547-1-Jason@zx2c4.com> <20220504111644.284927-1-Jason@zx2c4.com>
+ <YnL6ouh5xxZIJqeN@dev-arch.thelio-3990X>
+In-Reply-To: <YnL6ouh5xxZIJqeN@dev-arch.thelio-3990X>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 5 May 2022 02:34:44 +0200
+X-Gmail-Original-Message-ID: <CAHmME9o8br7cnG1980=sqC89zw8=_C9sO2ytkcwt5tNhJbQTHw@mail.gmail.com>
+Message-ID: <CAHmME9o8br7cnG1980=sqC89zw8=_C9sO2ytkcwt5tNhJbQTHw@mail.gmail.com>
+Subject: Re: [PATCH v3] random: use first 128 bits of input as fast init
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20220505002910.IAcnpEOE2zR2ibERl4Lh3Y_PMmtb0Rf43lVevgztJiM@z>
 
-The addition of random_get_entropy_fallback() provides access to
-whichever time source has the highest frequency, which is useful for
-gathering entropy on platforms without available cycle counters. It's
-not necessarily as good as being able to quickly access a cycle counter
-that the CPU has, but it's still something, even when it falls back to
-being jiffies-based.
-
-In the event that a given arch does not define get_cycles(), falling
-back to the get_cycles() default implementation that returns 0 is really
-not the best we can do. Instead, at least calling
-random_get_entropy_fallback() would be preferable, because that always
-needs to return _something_, even falling back to jiffies eventually.
-It's not as though random_get_entropy_fallback() is super high precision
-or guaranteed to be entropic, but basically anything that's not zero all
-the time is better than returning zero all the time.
-
-Finally, since random_get_entropy_fallback() is used during extremely
-early boot when randomizing freelists in mm_init(), it can be called
-before timekeeping has been initialized. In that case there really is
-nothing we can do; jiffies hasn't even started ticking yet. So just give
-up and return 0.
-
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Theodore Ts'o <tytso@mit.edu>
----
-Changes v6->v7:
-- Return 0 if we're called before timekeeping has been initialized,
-  reported by Nathan.
-
- include/linux/timex.h     |  8 ++++++++
- kernel/time/timekeeping.c | 12 ++++++++++++
- 2 files changed, 20 insertions(+)
-
-diff --git a/include/linux/timex.h b/include/linux/timex.h
-index 5745c90c8800..3871b06bd302 100644
---- a/include/linux/timex.h
-+++ b/include/linux/timex.h
-@@ -62,6 +62,8 @@
- #include <linux/types.h>
- #include <linux/param.h>
- 
-+unsigned long random_get_entropy_fallback(void);
-+
- #include <asm/timex.h>
- 
- #ifndef random_get_entropy
-@@ -74,8 +76,14 @@
-  *
-  * By default we use get_cycles() for this purpose, but individual
-  * architectures may override this in their asm/timex.h header file.
-+ * If a given arch does not have get_cycles(), then we fallback to
-+ * using random_get_entropy_fallback().
-  */
-+#ifdef get_cycles
- #define random_get_entropy()	((unsigned long)get_cycles())
-+#else
-+#define random_get_entropy()	random_get_entropy_fallback()
-+#endif
- #endif
- 
- /*
-diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index dcdcb85121e4..1d1302ca8d36 100644
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -17,6 +17,7 @@
- #include <linux/clocksource.h>
- #include <linux/jiffies.h>
- #include <linux/time.h>
-+#include <linux/timex.h>
- #include <linux/tick.h>
- #include <linux/stop_machine.h>
- #include <linux/pvclock_gtod.h>
-@@ -2380,6 +2381,17 @@ static int timekeeping_validate_timex(const struct __kernel_timex *txc)
- 	return 0;
- }
- 
-+/**
-+ * random_get_entropy_fallback - Returns the raw clock source value,
-+ * used by random.c for platforms with no valid random_get_entropy().
-+ */
-+unsigned long random_get_entropy_fallback(void)
-+{
-+	if (unlikely(!tk_core.timekeeper.tkr_mono.clock))
-+		return 0;
-+	return tk_clock_read(&tk_core.timekeeper.tkr_mono);
-+}
-+EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
- 
- /**
-  * do_adjtimex() - Accessor function to NTP __do_adjtimex function
--- 
-2.35.1
-
+Thanks! Should be fixed by
+https://lore.kernel.org/lkml/20220505002910.IAcnpEOE2zR2ibERl4Lh3Y_PMmtb0Rf43lVevgztJiM@z/
+which is actually an earlier commit but unearthed by the one you
+bisected to.
