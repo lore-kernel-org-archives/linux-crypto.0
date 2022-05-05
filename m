@@ -2,187 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28C3C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 05:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023B5C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 05:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236342AbiEEFHo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 01:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45288 "EHLO
+        id S237018AbiEEFMU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 5 May 2022 01:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbiEEFHn (ORCPT
+        with ESMTP id S233854AbiEEFMS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 01:07:43 -0400
-X-Greylist: delayed 303 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 May 2022 22:04:04 PDT
-Received: from us-smtp-delivery-74.mimecast.com (us-smtp-delivery-74.mimecast.com [170.10.133.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8580213FA8
-        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 22:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651727043;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rzUleSxK9nl8YlNcYVSjvCKZ2tNHw3I29yrW6MqQSZs=;
-        b=M2q9tnv2iErdPywBIGHQLsDyGyLEqRC5dKWJ95urQPLu2oxWxV6SXj+wZxoIDv+cC4+ttt
-        AwnoxlFwniQMigdcHUIFr2I5Val2efqRXj758G26tN+/mVi5bnhzCwiz8/Dw8ukMJy9Zmb
-        VNcyIeEc+HmiN36fwTsAc/gUwaIIW8Y=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-283-BXVD6wL8OdCAGfBQuFi2zQ-1; Thu, 05 May 2022 00:57:56 -0400
-X-MC-Unique: BXVD6wL8OdCAGfBQuFi2zQ-1
-Received: by mail-ed1-f69.google.com with SMTP id dk9-20020a0564021d8900b00425a9c3d40cso1725011edb.7
-        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 21:57:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rzUleSxK9nl8YlNcYVSjvCKZ2tNHw3I29yrW6MqQSZs=;
-        b=QaLmmN7hN5rWcNex0ghKNOapRcOVEu9YlOx9iHy6O/9MrbJKBbKXqE7KRNbWS9xCpu
-         ZLyVwHFrbvj1XXmJ1PhGoH3bDI3iHqiPgMHBbczR7ZSzLzGSO5T2Wxk7cLph5Ycmrs5Q
-         JSfSSva6J7RC8+yneA54bw85hbzUF65sIEkHtzJYkJUx0rzxRohTeeVncxtFAyfkvnAw
-         DFb4AGlUzxThHYO/kWP1zan+iUSYKfelVBLiVx8PVi2FPsnbzeY18AKTZ2sjdcLHP+X9
-         ubLxgXIvidNzPaikgxYBMt35ghFbTcfFEW8CNwQ7VVT6djdhlq7uaTzj3QSvNkopyzlj
-         xV0Q==
-X-Gm-Message-State: AOAM533asmGqDP9SsJZ+ugZDnPkGIgt6GIwHM6IG3vjMssmHyJZn9I7u
-        cT0zySug3EC1m3hNY5eBJoJFb/70h/Gj7J14qW8bAGDViE4dRXSAKbClut7Uzv9iGvv+G3CKgNf
-        LdycvYENyFjuxFfwxBZj2f2cM
-X-Received: by 2002:a17:906:4fcd:b0:6f4:b5c0:aa44 with SMTP id i13-20020a1709064fcd00b006f4b5c0aa44mr7687129ejw.445.1651726674815;
-        Wed, 04 May 2022 21:57:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwbX4SoVGMOKvRO7Omo/n5jSKXm67g9e9YispmVFqRKvn39kXm8wsjujTpuSP3Yg3lt2T129Q==
-X-Received: by 2002:a17:906:4fcd:b0:6f4:b5c0:aa44 with SMTP id i13-20020a1709064fcd00b006f4b5c0aa44mr7687117ejw.445.1651726674576;
-        Wed, 04 May 2022 21:57:54 -0700 (PDT)
-Received: from redhat.com ([2.53.134.204])
-        by smtp.gmail.com with ESMTPSA id q10-20020a1709064cca00b006f3ef214dd7sm311969ejt.61.2022.05.04.21.57.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 21:57:53 -0700 (PDT)
-Date:   Thu, 5 May 2022 00:57:49 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc:     zhenwei pi <pizhenwei@bytedance.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
-Message-ID: <20220505005607-mutt-send-email-mst@kernel.org>
-References: <20220424104140.44841-1-pizhenwei@bytedance.com>
- <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
- <7f7ab8ae46174ed6b0888b5fbeb5849b@huawei.com>
+        Thu, 5 May 2022 01:12:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0DC21821;
+        Wed,  4 May 2022 22:08:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B3D9561ADE;
+        Thu,  5 May 2022 05:08:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAFC3C385A4;
+        Thu,  5 May 2022 05:08:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651727319;
+        bh=lBK8/trxgvR1f4DEH1CbdWJ4Y+Fce8JnB+5d9H6RVS0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=suSziVbVT9y/3fYePbKPNEptGZeRtOsVOFwhAm+gaQTOpu2HbcFR6CdEGNm3Xiolx
+         wyDNW+cVr3bW8fUTb0JjVCKscsjlkrhj+3wLACt7cFD4CJnPVY0e/06E58IQPGkvQK
+         9cT2ALQqC8XuyuDB7peO/lCupdbzCR1f9c+ICnAWvYfjISd4PRYlms6y3xZU+ebN49
+         lUnnA44MyGDnvec6LYVkImKIQ1QaBr0mFFnlYenBI0LyovtQi/Ibue/gBtm0c7DeD/
+         WFHoN3v9CBjzjXKVv2OAG1EWSzDp+Y9dWbx2gylVnOvkdkC0EqhAdLQ9nowJyIzmKE
+         pPMYQSOIw0MWA==
+Date:   Wed, 4 May 2022 22:08:37 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v6 7/9] crypto: x86/polyval: Add PCLMULQDQ accelerated
+ implementation of POLYVAL
+Message-ID: <YnNb1Quo3CAGQmHA@sol.localdomain>
+References: <20220504001823.2483834-1-nhuck@google.com>
+ <20220504001823.2483834-8-nhuck@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7f7ab8ae46174ed6b0888b5fbeb5849b@huawei.com>
+In-Reply-To: <20220504001823.2483834-8-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 05, 2022 at 03:14:40AM +0000, Gonglei (Arei) wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: zhenwei pi [mailto:pizhenwei@bytedance.com]
-> > Sent: Thursday, May 5, 2022 10:35 AM
-> > To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com;
-> > jasowang@redhat.com
-> > Cc: herbert@gondor.apana.org.au; linux-kernel@vger.kernel.org;
-> > virtualization@lists.linux-foundation.org; linux-crypto@vger.kernel.org;
-> > helei.sig11@bytedance.com; davem@davemloft.net
-> > Subject: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
-> > 
-> > Hi, Lei
-> > 
-> > Jason replied in another patch:
-> > Still hundreds of lines of changes, I'd leave this change to other maintainers to
-> > decide.
-> > 
-> > Quite frankly, the virtio crypto driver changed only a few in the past, and the
-> > performance of control queue is not good enough. I am in doubt about that this
-> > driver is not used widely. So I'd like to rework a lot, it would be best to complete
-> > this work in 5.18 window.
-> > 
-> > This gets different point with Jason. I would appreciate it if you could give me
-> > any hint.
-> > 
-> 
-> This is already in my todo list.
-> 
-> Regards,
-> -Gonglei
+On Wed, May 04, 2022 at 12:18:21AM +0000, Nathan Huckleberry wrote:
+> +.macro schoolbook1_iteration i xor_sum
+> +	movups (16*\i)(MSG), %xmm0
+> +	.if (\i == 0 && \xor_sum == 1)
+> +		pxor SUM, %xmm0
+> +	.endif
+> +        vpclmulqdq $0x01, (16*\i)(KEY_POWERS), %xmm0, %xmm2
+> +        vpclmulqdq $0x00, (16*\i)(KEY_POWERS), %xmm0, %xmm1
+> +        vpclmulqdq $0x10, (16*\i)(KEY_POWERS), %xmm0, %xmm3
+> +        vpclmulqdq $0x11, (16*\i)(KEY_POWERS), %xmm0, %xmm4
+> +        vpxor %xmm2, MI, MI
+> +        vpxor %xmm1, LO, LO
+> +        vpxor %xmm4, HI, HI
+> +        vpxor %xmm3, MI, MI
+> +.endm
 
-It's been out a month though, not really acceptable latency for review.
-So I would apply this for next,  but you need to address Dan Captenter's
-comment, and look for simular patterns elesewhere in your patch.
+The 8 lines above are indented with spaces.  They should use tabs, like
+everywhere else.
 
+> + * So our final computation is: T = T_1 : T_0 = g*(x) * P_0 V = V_1 : V_0 =
+> + * g*(x) * (P_1 + T_0) p(x) / x^{128} mod g(x) = P_3 + P_1 + T_0 + V_1 : P_2 +
+> + * P_0 + T_1 + V_0
 
-> > On 4/24/22 18:41, zhenwei pi wrote:
-> > > Hi, Lei
-> > > I'd like to move helper and callback functions(Eg, virtcrypto_clear_request
-> > >   and virtcrypto_ctrlq_callback) from xx_core.c to xx_common.c, then
-> > > the xx_core.c supports:
-> > >    - probe/remove/irq affinity seting for a virtio device
-> > >    - basic virtio related operations
-> > >
-> > > xx_common.c supports:
-> > >    - common helpers/functions for algos
-> > >
-> > > Do you have any suggestion about this?
-> > >
-> > > v3 -> v4:
-> > >   - Don't create new file virtio_common.c, the new functions are added
-> > >     into virtio_crypto_core.c
-> > >   - Split the first patch into two parts:
-> > >       1, change code style,
-> > >       2, use private buffer instead of shared buffer
-> > >   - Remove relevant change.
-> > >   - Other minor changes.
-> > >
-> > > v2 -> v3:
-> > >   - Jason suggested that spliting the first patch into two part:
-> > >       1, using private buffer
-> > >       2, remove the busy polling
-> > >     Rework as Jason's suggestion, this makes the smaller change in
-> > >     each one and clear.
-> > >
-> > > v1 -> v2:
-> > >   - Use kfree instead of kfree_sensitive for insensitive buffer.
-> > >   - Several coding style fix.
-> > >   - Use memory from current node, instead of memory close to device
-> > >   - Add more message in commit, also explain why removing per-device
-> > >     request buffer.
-> > >   - Add necessary comment in code to explain why using kzalloc to
-> > >     allocate struct virtio_crypto_ctrl_request.
-> > >
-> > > v1:
-> > > The main point of this series is to improve the performance for virtio
-> > > crypto:
-> > > - Use wait mechanism instead of busy polling for ctrl queue, this
-> > >    reduces CPU and lock racing, it's possiable to create/destroy session
-> > >    parallelly, QPS increases from ~40K/s to ~200K/s.
-> > > - Enable retry on crypto engine to improve performance for data queue,
-> > >    this allows the larger depth instead of 1.
-> > > - Fix dst data length in akcipher service.
-> > > - Other style fix.
-> > >
-> > > lei he (2):
-> > >    virtio-crypto: adjust dst_len at ops callback
-> > >    virtio-crypto: enable retry for virtio-crypto-dev
-> > >
-> > > zhenwei pi (3):
-> > >    virtio-crypto: change code style
-> > >    virtio-crypto: use private buffer for control request
-> > >    virtio-crypto: wait ctrl queue instead of busy polling
-> > >
-> > >   .../virtio/virtio_crypto_akcipher_algs.c      |  83 ++++++-----
-> > >   drivers/crypto/virtio/virtio_crypto_common.h  |  21 ++-
-> > >   drivers/crypto/virtio/virtio_crypto_core.c    |  55 ++++++-
-> > >   .../virtio/virtio_crypto_skcipher_algs.c      | 140 ++++++++----------
-> > >   4 files changed, 180 insertions(+), 119 deletions(-)
-> > >
-> > 
-> > --
-> > zhenwei pi
+This part is unreadable now -- it looks like you formatted it as regular text?
+The three equations should be on their own lines, like how it was before.
 
+> +__maybe_unused static const struct x86_cpu_id pcmul_cpu_id[] = {
+> +	X86_MATCH_FEATURE(X86_FEATURE_PCLMULQDQ, NULL),
+> +	X86_MATCH_FEATURE(X86_FEATURE_AVX, NULL),
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(x86cpu, pcmul_cpu_id);
+> +
+> +static int __init polyval_clmulni_mod_init(void)
+> +{
+> +	if (!x86_match_cpu(pcmul_cpu_id))
+> +		return -ENODEV;
+> +
+> +	return crypto_register_shash(&polyval_alg);
+> +}
+> +
+> +static void __exit polyval_clmulni_mod_exit(void)
+> +{
+> +	crypto_unregister_shash(&polyval_alg);
+> +}
+
+This won't work as intended; it's registering the algorithm (and autoloading the
+module) if PCLMUL *or* AVX is available, rather than PCLMUL *and* AVX.
+
+I think the way to go is to just have X86_FEATURE_PCLMULQDQ in the table, like
+before, and add a check for boot_cpu_has(X86_FEATURE_AVX) in the init function.
+
+- Eric
