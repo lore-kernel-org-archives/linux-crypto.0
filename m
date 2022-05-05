@@ -2,128 +2,191 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F132C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 11:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B23C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 13:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359138AbiEEL5x (ORCPT
+        id S1378073AbiEENwv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 May 2022 07:57:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34230 "EHLO
+        Thu, 5 May 2022 09:52:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359511AbiEEL5h (ORCPT
+        with ESMTP id S231135AbiEENwu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 May 2022 07:57:37 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BAC79554A8
-        for <linux-crypto@vger.kernel.org>; Thu,  5 May 2022 04:53:34 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-243-yWIO4Up6Mq2IuKgImtOi4w-1; Thu, 05 May 2022 12:53:32 +0100
-X-MC-Unique: yWIO4Up6Mq2IuKgImtOi4w-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.32; Thu, 5 May 2022 12:53:31 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.033; Thu, 5 May 2022 12:53:31 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
-CC:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
+        Thu, 5 May 2022 09:52:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A81357B13;
+        Thu,  5 May 2022 06:49:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E912761EA1;
+        Thu,  5 May 2022 13:49:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68828C385A4;
+        Thu,  5 May 2022 13:49:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OoBA75oD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1651758547;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GcYjK1pB4trYMEK7Jg+WFSNQr3tC4Ghpb0u1HgTVVCs=;
+        b=OoBA75oDsRoDieLgtuW7alWNT5/odoKZW2NCx4PzT2OBe01vwUzxaEWwzX07MLErTfTahr
+        yqlCZlL8hPmNY6FSZgJfRmDgUVOhIIm87rlu3GPCqXfjAPVyFzelPrbvjMz9oeqpOwMUVL
+        WTjfYzN6a+YpFPgZzVz3b81iIvAXRb0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a05ca93b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 5 May 2022 13:49:07 +0000 (UTC)
+Date:   Thu, 5 May 2022 15:48:55 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
         Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Filipe Manana" <fdmanana@suse.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [patch 3/3] x86/fpu: Make FPU protection more robust
-Thread-Topic: [patch 3/3] x86/fpu: Make FPU protection more robust
-Thread-Index: AQHYYG+YWY1FRr4hzkKhJKBT7m/w1q0QJdtA///xC4CAABO40A==
-Date:   Thu, 5 May 2022 11:53:31 +0000
-Message-ID: <a97e89a40b6e49d497f8e165ef11ec16@AcuMS.aculab.com>
-References: <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
- <87fslpjomx.ffs@tglx> <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
- <YnMkRLcxczMxdE5z@zx2c4.com> <87h764ixjs.ffs@tglx>
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
+Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
+Message-ID: <YnPVx3epmwUWKfvl@zx2c4.com>
+References: <87fslpjomx.ffs@tglx>
+ <YnKh96isoB7jiFrv@zx2c4.com>
+ <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com>
+ <87wnf1huwj.ffs@tglx>
+ <YnMRwPFfvB0RlBow@zx2c4.com>
+ <87mtfwiyqp.ffs@tglx>
+ <YnMkRLcxczMxdE5z@zx2c4.com>
+ <87h764ixjs.ffs@tglx>
  <YnOuqh4YZT8ww96W@zx2c4.com>
- <1f4918f734d14e3896071d3c7de1441d@AcuMS.aculab.com>
- <CAHmME9q+1dAg=H2RLDHd=CSCwO4PpL+YYMeDXO6uQ_wD+GNPhg@mail.gmail.com>
-In-Reply-To: <CAHmME9q+1dAg=H2RLDHd=CSCwO4PpL+YYMeDXO6uQ_wD+GNPhg@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YnOuqh4YZT8ww96W@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gQS4gRG9uZW5m
-ZWxkIDxKYXNvbkB6eDJjNC5jb20+DQo+IFNlbnQ6IDA1IE1heSAyMDIyIDEyOjM2DQo+IFRvOiBE
-YXZpZCBMYWlnaHQgPERhdmlkLkxhaWdodEBBQ1VMQUIuQ09NPg0KPiBDYzogVGhvbWFzIEdsZWl4
-bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+OyBQZXRlciBaaWpsc3RyYSA8cGV0ZXJ6QGluZnJhZGVh
-ZC5vcmc+OyBCb3Jpc2xhdiBQZXRrb3YNCj4gPGJwQGFsaWVuOC5kZT47IExLTUwgPGxpbnV4LWtl
-cm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyB4ODZAa2VybmVsLm9yZzsgRmlsaXBlIE1hbmFuYQ0KPiA8
-ZmRtYW5hbmFAc3VzZS5jb20+OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnDQo+IFN1Ympl
-Y3Q6IFJlOiBbcGF0Y2ggMy8zXSB4ODYvZnB1OiBNYWtlIEZQVSBwcm90ZWN0aW9uIG1vcmUgcm9i
-dXN0DQo+IA0KPiBPbiBUaHUsIE1heSA1LCAyMDIyIGF0IDE6MzQgUE0gRGF2aWQgTGFpZ2h0IDxE
-YXZpZC5MYWlnaHRAYWN1bGFiLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiAuLi4NCj4gPiA+ICsgICAg
-IGN5Y2xlc190IGVuZCwgc3RhcnQgPSBnZXRfY3ljbGVzKCk7DQo+ID4gPiAgICAgICBibGFrZTJz
-X3VwZGF0ZSgmaW5wdXRfcG9vbC5oYXNoLCBpbiwgbmJ5dGVzKTsNCj4gPiA+ICsgICAgIGVuZCA9
-IGdldF9jeWNsZXMoKTsNCj4gPg0KPiA+IElmIGdldF9jeWNsZXMoKSBpcyByZHRzYyB0aGVuIHRo
-YXQgZ2l2ZXMgbWVhbmluZ2xlc3MgbnVtYmVycy4NCj4gPiBUaGUgY3B1IGNsb2NrIGZyZXF1ZW5j
-eSB3aWxsIGNoYW5nZSBvbiB5b3UuDQo+ID4NCj4gPiBZb3UgY2FuIHVzZSBvbmUgb2YgdGhlIHBl
-cmZvcm1hbmNlIGNvdW50ZXJzIHRvIGdldCBhbiBhY3R1YWwNCj4gDQo+IEluZGVlZC4gSW4gdGhl
-IHByb2Nlc3Mgb2Ygd2lyaW5nIHVwIHJkcG1jIG5vdy4NCg0KSSd2ZSB1c2VkIHRoaXMgYmVmb3Jl
-IG5vdy4NCkJ1dCB0aGUgbG9vcCBnZXR0aW5nIHRoZSBwbWMgdmFsdWUgaW4gbm9uLWRldGVybWlu
-aXN0aWMuDQpTbyBJIHNvbWV0aW1lcyByZW1vdmUgaXQuDQpBbHNvIHlvdSBuZWVkIHRvIGFkZCBh
-IHNlcmlhbGlzaW5nIGluc3RydWN0aW9uIC0gb3RoZXJ3aXNlDQp0aGUgcG1jIGdldCByZWFkIGJl
-Zm9yZSB0aGUgY29kZSB5b3UgYXJlIG1lYXN1cmluZw0KYWN0dWFsbHkgZmluaXNoZXMuDQoNCkkn
-dmUgdXNlZCBzaW1pbGFyIGNvZGUgdG8gbWVhc3VyZSBpdGVyYXRpb25zIG9uIHRoZSBpcCBjaGVj
-a3N1bSBjb2RlLg0KQ2FuIHNob3cgaG93IG1hbnkgYnl0ZXMvY2xvY2sgdGhhdCBhY2hpZXZlcyBp
-biBpdHMgaW5uZXIgbG9vcC4NCldoaWNoIGNhbiBtYXRjaCB3aGF0IHlvdSBtaWdodCBleHBlY3Qg
-dGhlIGluc3RydWN0aW9ucyB0byBnZW5lcmF0ZS4NCg0KCURhdmlkDQoNCnN0YXRpYyBpbmxpbmUg
-dW5zaWduZWQgaW50IHJkcG1jKHVuc2lnbmVkIGludCBjb3VudGVyKQ0Kew0KICAgICAgICB1bnNp
-Z25lZCBpbnQgbG93LCBoaWdoOw0KDQogICAgICAgIGFzbSB2b2xhdGlsZSgicmRwbWMiIDogIj1h
-IiAobG93KSwgIj1kIiAoaGlnaCkgOiAiYyIgKGNvdW50ZXIpKTsNCg0KICAgICAgICAvLyByZXR1
-cm4gbG93IGJpdHMsIGNvdW50ZXIgbWlnaHQgdG8gMzIgb3IgNDAgYml0cyB3aWRlLg0KICAgICAg
-ICByZXR1cm4gbG93Ow0KfQ0KDQpzdGF0aWMgaW5saW5lIHVuc2lnbmVkIGludCByZHRzYyh2b2lk
-KQ0Kew0KICAgICAgICB1bnNpZ25lZCBpbnQgbG93LCBoaWdoOw0KDQogICAgICAgIGFzbSB2b2xh
-dGlsZSgicmR0c2MiIDogIj1hIiAobG93KSwgIj1kIiAoaGlnaCkpOw0KDQogICAgICAgIHJldHVy
-biBsb3c7DQp9DQoNCnVuc2lnbmVkIGludCByZWFkX2NwdV9jeWNsZXModm9pZCkNCnsNCiAgICAg
-ICAgc3RhdGljIHN0cnVjdCBwZXJmX2V2ZW50X2F0dHIgcGVyZl9hdHRyID0gew0KICAgICAgICAg
-ICAgICAgIC50eXBlID0gUEVSRl9UWVBFX0hBUkRXQVJFLA0KICAgICAgICAgICAgICAgIC5jb25m
-aWcgPSBQRVJGX0NPVU5UX0hXX0NQVV9DWUNMRVMsDQogICAgICAgICAgICAgICAgLnBpbm5lZCA9
-IDEsDQogICAgICAgIH07DQogICAgICAgIHN0YXRpYyBfX3RocmVhZCBzdHJ1Y3QgcGVyZl9ldmVu
-dF9tbWFwX3BhZ2UgKnBjOw0KICAgICAgICBzdGF0aWMgaW50IHBtY19mYWlsZWQ7DQoNCiAgICAg
-ICAgdW5zaWduZWQgaW50IHNlcSwgaWR4LCBjb3VudDsNCg0KICAgICAgICBpZiAocG1jX2ZhaWxl
-ZCkNCiAgICAgICAgICAgICAgICByZXR1cm4gcmR0c2MoKTsNCg0KICAgICAgICBpZiAoIXBjKSB7
-DQogICAgICAgICAgICAgICAgaW50IHBlcmZfZmQ7DQogICAgICAgICAgICAgICAgcGVyZl9mZCA9
-IHN5c2NhbGwoX19OUl9wZXJmX2V2ZW50X29wZW4sICZwZXJmX2F0dHIsIDAsIC0xLCAtMSwgMCk7
-DQogICAgICAgICAgICAgICAgaWYgKHBlcmZfZmQgPCAwKSB7DQogICAgICAgICAgICAgICAgICAg
-ICAgICBwbWNfZmFpbGVkID0gMTsNCiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZHRz
-YygpOw0KICAgICAgICAgICAgICAgIH0NCiAgICAgICAgICAgICAgICBwYyA9IG1tYXAoTlVMTCwg
-c3lzY29uZihfU0NfUEFHRVNJWkUpLCBQUk9UX1JFQUQsIE1BUF9TSEFSRUQsIHBlcmZfZmQsIDAp
-Ow0KICAgICAgICAgICAgICAgIGNsb3NlKHBlcmZfZmQpOw0KICAgICAgICAgICAgICAgIGlmIChw
-YyA9PSBNQVBfRkFJTEVEKSB7DQogICAgICAgICAgICAgICAgICAgICAgICBwbWNfZmFpbGVkID0g
-MTsNCiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiByZHRzYygpOw0KICAgICAgICAgICAg
-ICAgIH0NCiAgICAgICAgfQ0KDQogICAgICAgIGRvIHsNCiAgICAgICAgICAgICAgICBzZXEgPSBw
-Yy0+bG9jazsNCiAgICAgICAgICAgICAgICBhc20gdm9sYXRpbGUoIiI6OjoibWVtb3J5Iik7DQog
-ICAgICAgICAgICAgICAgaWR4ID0gcGMtPmluZGV4Ow0KICAgICAgICAgICAgICAgIGlmICghaWR4
-KSAvLyAgfHwgIXBjLT5jYXBfdXNlcl9yZHBtYykNCiAgICAgICAgICAgICAgICAgICAgICAgIHJl
-dHVybiAwOw0KICAgICAgICAgICAgICAgIGNvdW50ID0gcGMtPm9mZnNldCArIHJkcG1jKGlkeCAt
-IDEpOw0KICAgICAgICAgICAgICAgIGFzbSB2b2xhdGlsZSgiIjo6OiJtZW1vcnkiKTsNCiAgICAg
-ICAgfSB3aGlsZSAocGMtPmxvY2sgIT0gc2VxKTsNCg0KICAgICAgICByZXR1cm4gY291bnQ7DQp9
-DQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBG
-YXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2
-IChXYWxlcykNCg==
+Hey again Thomas,
 
+On Thu, May 05, 2022 at 01:02:02PM +0200, Jason A. Donenfeld wrote:
+> Interestingly, disabling the simd paths makes things around 283 cycles
+> slower on my Tiger Lake laptop, just doing ordinary things. I'm actually
+> slightly surprised, so I'll probably keep playing with this. My patch
+> for this is attached. Let me know if you have a different methodology in
+> mind...
+
+Using RDPMC/perf, the performance is shown to be even closer for real
+world cases, with the simd code only ~80 cycles faster. Bench code
+follows below. If the observation on this hardware holds for other
+hardware, we can probably improve the performance of the generic code a
+bit, and then the difference really won't matter. Any thoughts about
+this and the test code?
+
+Jason
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index bd292927654c..6577e9f2f3b7 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -53,6 +53,7 @@
+ #include <linux/uuid.h>
+ #include <linux/uaccess.h>
+ #include <linux/suspend.h>
++#include <linux/sort.h>
+ #include <crypto/chacha.h>
+ #include <crypto/blake2s.h>
+ #include <asm/processor.h>
+@@ -755,9 +756,54 @@ static struct {
+ 	.lock = __SPIN_LOCK_UNLOCKED(input_pool.lock),
+ };
+ 
++static DEFINE_PER_CPU(int, pmc_index) = -1;
++static struct {
++	u32 durations[1 << 20];
++	u32 pos, len;
++} irqbench;
++
+ static void _mix_pool_bytes(const void *in, size_t nbytes)
+ {
++	int idx = *this_cpu_ptr(&pmc_index);
++	u32 ctr = input_pool.hash.t[0], reg = 0;
++	cycles_t end, start;
++
++
++	native_cpuid(&reg, &reg, &reg, &reg);
++	start = idx == -1 ? 0 : native_read_pmc(idx);
+ 	blake2s_update(&input_pool.hash, in, nbytes);
++	end = idx == -1 ? 0 : native_read_pmc(idx);
++
++	if (ctr == input_pool.hash.t[0] || !in_hardirq() || idx == -1)
++		return;
++
++	irqbench.durations[irqbench.pos++ % ARRAY_SIZE(irqbench.durations)] = end - start;
++	irqbench.len = min_t(u32, irqbench.len + 1, ARRAY_SIZE(irqbench.durations));
++}
++
++static int cmp_u32(const void *a, const void *b)
++{
++	return *(const u32 *)a - *(const u32 *)b;
++}
++
++static int proc_do_irqbench_median(struct ctl_table *table, int write, void *buffer,
++				   size_t *lenp, loff_t *ppos)
++{
++	u32 len = READ_ONCE(irqbench.len), median, *sorted;
++	struct ctl_table fake_table = {
++		.data = &median,
++		.maxlen = sizeof(median)
++	};
++	if (!len)
++		return -ENODATA;
++	sorted = kmalloc_array(len, sizeof(*sorted), GFP_KERNEL);
++	if (!sorted)
++		return -ENOMEM;
++	memcpy(sorted, irqbench.durations, len * sizeof(*sorted));
++	sort(sorted, len, sizeof(*sorted), cmp_u32, NULL);
++	median = sorted[len / 2];
++	kfree(sorted);
++	return write ? 0 : proc_douintvec(&fake_table, 0, buffer, lenp, ppos);
+ }
+ 
+ /*
+@@ -1709,6 +1755,18 @@ static struct ctl_table random_table[] = {
+ 		.mode		= 0444,
+ 		.proc_handler	= proc_do_uuid,
+ 	},
++	{
++		.procname	= "irqbench_median",
++		.mode		= 0444,
++		.proc_handler	= proc_do_irqbench_median,
++	},
++	{
++		.procname	= "irqbench_count",
++		.data		= &irqbench.len,
++		.maxlen		= sizeof(irqbench.len),
++		.mode		= 0444,
++		.proc_handler	= proc_douintvec,
++	},
+ 	{ }
+ };
+ 
+@@ -1718,6 +1776,21 @@ static struct ctl_table random_table[] = {
+  */
+ static int __init random_sysctls_init(void)
+ {
++	int i;
++	struct perf_event *cycles_event;
++	struct perf_event_attr perf_cycles_attr = {
++		.type = PERF_TYPE_HARDWARE,
++		.config = PERF_COUNT_HW_CPU_CYCLES,
++		.size = sizeof(struct perf_event_attr),
++		.pinned = true
++	};
++	for_each_possible_cpu(i) {
++		cycles_event = perf_event_create_kernel_counter(&perf_cycles_attr, i, NULL, NULL, NULL);
++		if (IS_ERR(cycles_event))
++			pr_err("unable to create perf counter on cpu %d: %ld\n", i, PTR_ERR(cycles_event));
++		else
++			*per_cpu_ptr(&pmc_index, i) = cycles_event->hw.event_base_rdpmc;
++	}
+ 	register_sysctl_init("kernel/random", random_table);
+ 	return 0;
+ }
+ 
