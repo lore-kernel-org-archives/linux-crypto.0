@@ -2,106 +2,152 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEEFC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 02:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60EB4C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 02:39:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238268AbiEECYL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 22:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
+        id S239710AbiEECmv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 22:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238258AbiEECYK (ORCPT
+        with ESMTP id S233332AbiEECmt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 22:24:10 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228F049C89;
-        Wed,  4 May 2022 19:20:33 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id fv2so2889762pjb.4;
-        Wed, 04 May 2022 19:20:33 -0700 (PDT)
+        Wed, 4 May 2022 22:42:49 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53EC04AE11
+        for <linux-crypto@vger.kernel.org>; Wed,  4 May 2022 19:39:11 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so2763165pji.3
+        for <linux-crypto@vger.kernel.org>; Wed, 04 May 2022 19:39:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=rNxRZjPsLxGtvu4jqqbMJl1peYsf82mPfHpY5Wt/9NM=;
-        b=U7of+IyeNWIoWfwrDy3FFvAGacCPeD5+Yq3OyPIZVOxmpzNO154UkJP5mzG7PXbhMv
-         Ial0ITVa67FRkYqGTvyh27Yxo0Kg5eJZXFLqNsokgvLBO7M2MlLTuP1cgq00EK8h/tON
-         K86HqvTq5/X2sJbli7DT7tJ+hoPxI1pL8cb/qJCd4VpmlN7jg6v6Xbv3ivvbUxeC9r6g
-         oG3D3opiSUjc6OMZbIsc0eBcQU2HuDz4icNlmQZHGwjtAdAFbdOfXOXx4KtDCBd2N2jt
-         x9IQX/PhhNhw2DoR5o7FQXkMPk0L5Yj6IV9XXdstD0eyJBSEAW3MnCAMjNpP1q84VtkA
-         LHTw==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=aEOiwyG+eTh6W3KHKpg7shbqlJQ76/KhFzFg57zL5/0=;
+        b=SxFvslkZn6Q7OGlLS0jfiCTQI0xExlJuAPCV/QgaRH9jHQ3UvOSGxz4PqWTvGgBoOj
+         gBffuL3wuhZtQhDfJigr7X7r7hQ7pNB++kVGMw+ILNK+ZJOd/AkCeDcxTSmZg47MtDoD
+         z80FE3h2Xcbh2AjufRmu/kpVcavdLzpyMOpSRw6Xj1hH6rfCCnRe0xK7XDskvZdjifBr
+         2INqvNc4tChqAjFbu7htLf9yRlSjmfKGuHKu0S1g273gLnpPseYMXEplQsMUT3NjD+fr
+         CGrdIGglM3GN0s8WNVIib+e6y9hsThmkkioTe5fxw/nghkpclZz6l0mWXwD+MKQlmaVj
+         Ui8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=rNxRZjPsLxGtvu4jqqbMJl1peYsf82mPfHpY5Wt/9NM=;
-        b=cewlzybC6cvme2TcChGRMDoSso9LLNsyuOTBObcRC5yfwW7abW6xw5NZvp5qgMAepN
-         hn93LSZuDqWIKY9X5cTbpbAnWBls4FOY7RmZZBwXNAVg86NMdkBGfsTzeuZRdXGWQKeW
-         isCm3dRr1hs4p8J5ZhSaPWiBpS9nSRv3kUZVUMi/VYBZnRX2yB3cDzmCFhs7oLdAbiWV
-         ADNjltsNCFfE3pN8luvfKorIcvvwCQ5sPUVuHFUyp67ise0mseE+qxslhSzytPN9RiwA
-         n3pv/QGZruyWr6juf26ugv41rIw/vw0VIB50D0mW2fX7F+5VUZ2EF64UcsaiVumEgzZ5
-         eGSg==
-X-Gm-Message-State: AOAM5317FMD+I6pR5w9cuHw2dZpmqdSi8QO2/kk5Ia7XLhbWmmMPHSJ0
-        bVoVBjNpXB7jMIPDGVbcCPQ=
-X-Google-Smtp-Source: ABdhPJxxkplJqxShrGBVhiiwV4wDAmTzqef/PIHgbEK/FxkOV4pp1Kz4V6oB91OzUcUhTzAp2ZHjOQ==
-X-Received: by 2002:a17:902:ea06:b0:15e:8367:150b with SMTP id s6-20020a170902ea0600b0015e8367150bmr24274391plg.167.1651717232671;
-        Wed, 04 May 2022 19:20:32 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id w2-20020a17090ac98200b001cd4989fecdsm3943686pjt.25.2022.05.04.19.20.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 19:20:32 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: chi.minghao@zte.com.cn
-To:     bbrezillon@kernel.org
-Cc:     arno@natisbad.org, schalla@marvell.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] crypto: octeontx2: simplify the return expression of otx2_cpt_aead_cbc_aes_sha_setkey()
-Date:   Thu,  5 May 2022 02:20:24 +0000
-Message-Id: <20220505022024.54586-1-chi.minghao@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        bh=aEOiwyG+eTh6W3KHKpg7shbqlJQ76/KhFzFg57zL5/0=;
+        b=pwWivD1kSzTr+0GTQXVMAkm6g2xk/CTAltSTEw/OYbaZt4pmXtSysc/m3YDxOLbuZP
+         Rop7WGbPZRkJx8pdTzCmWGvtA1ftpCfVSNpGrY/HoVKSrk9N/xTAQP+2OVRpJfhUMo2m
+         TPK1CXRdFXX8jlL8OMU9/FzCFpf4qmcDHqHgExXRKz9rLg75zK1HOCMcZrGu5eb13T7m
+         QR6ZzD/LVwx6xBcyEbPUTviwrjvja1nQt7A5sbseZYhhi3CG+luTIs4VFiTjqGF6pd/w
+         OdYForPlw+u6TVzZT3lIYzJqUGTDE+VD8MoENBibNY0dfZd19GYegFGOjodw/+hjfy0n
+         f2NA==
+X-Gm-Message-State: AOAM533ZqT9QmUjSzieMqVzJIkhIRg9UXD3jqJ6ywrg/e91EcCFlkFyU
+        h1/n8U3mwhpgIQmZ8cwwA1Ugw7QxeNfTow==
+X-Google-Smtp-Source: ABdhPJxJbVfMb0WtsafX9eaZn5+JI7p1n0mchGmJpTKtQMX5xjsduPiS9ugOP+49TDJNvmYc0nwoQw==
+X-Received: by 2002:a17:90b:3903:b0:1dc:8fe0:df4d with SMTP id ob3-20020a17090b390300b001dc8fe0df4dmr3327533pjb.191.1651718350808;
+        Wed, 04 May 2022 19:39:10 -0700 (PDT)
+Received: from [10.255.89.252] ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id n1-20020a170902e54100b0015e8d4eb252sm203223plf.156.2022.05.04.19.39.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 May 2022 19:39:10 -0700 (PDT)
+Message-ID: <cc9eb4aa-2e40-490f-f5a0-beee3a57313b@bytedance.com>
+Date:   Thu, 5 May 2022 10:35:17 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: PING: [PATCH v4 0/5] virtio-crypto: Improve performance
+Content-Language: en-US
+To:     arei.gonglei@huawei.com, mst@redhat.com, jasowang@redhat.com
+Cc:     herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, helei.sig11@bytedance.com,
+        davem@davemloft.net
+References: <20220424104140.44841-1-pizhenwei@bytedance.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <20220424104140.44841-1-pizhenwei@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Minghao Chi <chi.minghao@zte.com.cn>
+Hi, Lei
 
-Simplify the return expression.
+Jason replied in another patch:
+Still hundreds of lines of changes, I'd leave this change to other
+maintainers to decide.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+Quite frankly, the virtio crypto driver changed only a few in the past, 
+and the performance of control queue is not good enough. I am in doubt 
+about that this driver is not used widely. So I'd like to rework a lot, 
+it would be best to complete this work in 5.18 window.
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-index f8f8542ce3e4..67530e90bbfe 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-@@ -896,7 +896,6 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
- 	struct crypto_authenc_key_param *param;
- 	int enckeylen = 0, authkeylen = 0;
- 	struct rtattr *rta = (void *)key;
--	int status;
- 
- 	if (!RTA_OK(rta, keylen))
- 		return -EINVAL;
-@@ -938,11 +937,7 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
- 	ctx->enc_key_len = enckeylen;
- 	ctx->auth_key_len = authkeylen;
- 
--	status = aead_hmac_init(cipher);
--	if (status)
--		return status;
--
--	return 0;
-+	return aead_hmac_init(cipher);
- }
- 
- static int otx2_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
+This gets different point with Jason. I would appreciate it if you could 
+give me any hint.
+
+On 4/24/22 18:41, zhenwei pi wrote:
+> Hi, Lei
+> I'd like to move helper and callback functions(Eg, virtcrypto_clear_request
+>   and virtcrypto_ctrlq_callback) from xx_core.c to xx_common.c,
+> then the xx_core.c supports:
+>    - probe/remove/irq affinity seting for a virtio device
+>    - basic virtio related operations
+> 
+> xx_common.c supports:
+>    - common helpers/functions for algos
+> 
+> Do you have any suggestion about this?
+> 
+> v3 -> v4:
+>   - Don't create new file virtio_common.c, the new functions are added
+>     into virtio_crypto_core.c
+>   - Split the first patch into two parts:
+>       1, change code style,
+>       2, use private buffer instead of shared buffer
+>   - Remove relevant change.
+>   - Other minor changes.
+> 
+> v2 -> v3:
+>   - Jason suggested that spliting the first patch into two part:
+>       1, using private buffer
+>       2, remove the busy polling
+>     Rework as Jason's suggestion, this makes the smaller change in
+>     each one and clear.
+> 
+> v1 -> v2:
+>   - Use kfree instead of kfree_sensitive for insensitive buffer.
+>   - Several coding style fix.
+>   - Use memory from current node, instead of memory close to device
+>   - Add more message in commit, also explain why removing per-device
+>     request buffer.
+>   - Add necessary comment in code to explain why using kzalloc to
+>     allocate struct virtio_crypto_ctrl_request.
+> 
+> v1:
+> The main point of this series is to improve the performance for
+> virtio crypto:
+> - Use wait mechanism instead of busy polling for ctrl queue, this
+>    reduces CPU and lock racing, it's possiable to create/destroy session
+>    parallelly, QPS increases from ~40K/s to ~200K/s.
+> - Enable retry on crypto engine to improve performance for data queue,
+>    this allows the larger depth instead of 1.
+> - Fix dst data length in akcipher service.
+> - Other style fix.
+> 
+> lei he (2):
+>    virtio-crypto: adjust dst_len at ops callback
+>    virtio-crypto: enable retry for virtio-crypto-dev
+> 
+> zhenwei pi (3):
+>    virtio-crypto: change code style
+>    virtio-crypto: use private buffer for control request
+>    virtio-crypto: wait ctrl queue instead of busy polling
+> 
+>   .../virtio/virtio_crypto_akcipher_algs.c      |  83 ++++++-----
+>   drivers/crypto/virtio/virtio_crypto_common.h  |  21 ++-
+>   drivers/crypto/virtio/virtio_crypto_core.c    |  55 ++++++-
+>   .../virtio/virtio_crypto_skcipher_algs.c      | 140 ++++++++----------
+>   4 files changed, 180 insertions(+), 119 deletions(-)
+> 
+
 -- 
-2.25.1
-
-
+zhenwei pi
