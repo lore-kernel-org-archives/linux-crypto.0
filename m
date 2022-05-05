@@ -2,100 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B430C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 01:21:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEEFC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 May 2022 02:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235287AbiEEBZX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 May 2022 21:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43208 "EHLO
+        id S238268AbiEECYL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 4 May 2022 22:24:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbiEEBZX (ORCPT
+        with ESMTP id S238258AbiEECYK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 May 2022 21:25:23 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60EF506FD;
-        Wed,  4 May 2022 18:21:45 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1651713704;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kKuGwdSJtS+WiXghVoIOPpH32AVOKBI/15oCiMuq+jQ=;
-        b=mlX+me3NOGEr2QS8iofK25Nzt/JMyKvAWUFvlEBfi3vgWJWAbGFlCJZZBCi9XfpgkVGdTp
-        ezzlLg4sna1GNariY6xv6alMom9mPBIouX8Dz2xknquqKah6lac/eiY40VaI1BdYxv6+kz
-        Rsi9x2ic0FV2GhKQ2a5iLUEkxa80w9VhYdzzIOiChlSow5SrbTchqbqhobT4Kcta8tBYu9
-        u/rOBZfDm6UYayws4BisIIPNBInm0iKwNm+3i3iBGIan9fTxv1DLqdlwe8dxtP5qhYd0Xa
-        BkJMpAmi9qf0duNXFF/25xIvCndY8vKkScVwYD/cAMHO+ZlKsLlokQ0ReZ/Xpw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1651713704;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kKuGwdSJtS+WiXghVoIOPpH32AVOKBI/15oCiMuq+jQ=;
-        b=ah23Qu7hQPYvzXRQTkxFXgnobMZPJBL9gXOSfAFn0Ru7tgFXZpLOI06TDd8B5iP1IE87o4
-        Uv3voCCxRFzNvIAg==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
-        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
-Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
-In-Reply-To: <YnMkRLcxczMxdE5z@zx2c4.com>
-References: <Ym/sHqKqmLOJubgE@zn.tnic> <87k0b4lydr.ffs@tglx>
- <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net> <87fslpjomx.ffs@tglx>
- <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
- <YnMkRLcxczMxdE5z@zx2c4.com>
-Date:   Thu, 05 May 2022 03:21:43 +0200
-Message-ID: <87h764ixjs.ffs@tglx>
+        Wed, 4 May 2022 22:24:10 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228F049C89;
+        Wed,  4 May 2022 19:20:33 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id fv2so2889762pjb.4;
+        Wed, 04 May 2022 19:20:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rNxRZjPsLxGtvu4jqqbMJl1peYsf82mPfHpY5Wt/9NM=;
+        b=U7of+IyeNWIoWfwrDy3FFvAGacCPeD5+Yq3OyPIZVOxmpzNO154UkJP5mzG7PXbhMv
+         Ial0ITVa67FRkYqGTvyh27Yxo0Kg5eJZXFLqNsokgvLBO7M2MlLTuP1cgq00EK8h/tON
+         K86HqvTq5/X2sJbli7DT7tJ+hoPxI1pL8cb/qJCd4VpmlN7jg6v6Xbv3ivvbUxeC9r6g
+         oG3D3opiSUjc6OMZbIsc0eBcQU2HuDz4icNlmQZHGwjtAdAFbdOfXOXx4KtDCBd2N2jt
+         x9IQX/PhhNhw2DoR5o7FQXkMPk0L5Yj6IV9XXdstD0eyJBSEAW3MnCAMjNpP1q84VtkA
+         LHTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rNxRZjPsLxGtvu4jqqbMJl1peYsf82mPfHpY5Wt/9NM=;
+        b=cewlzybC6cvme2TcChGRMDoSso9LLNsyuOTBObcRC5yfwW7abW6xw5NZvp5qgMAepN
+         hn93LSZuDqWIKY9X5cTbpbAnWBls4FOY7RmZZBwXNAVg86NMdkBGfsTzeuZRdXGWQKeW
+         isCm3dRr1hs4p8J5ZhSaPWiBpS9nSRv3kUZVUMi/VYBZnRX2yB3cDzmCFhs7oLdAbiWV
+         ADNjltsNCFfE3pN8luvfKorIcvvwCQ5sPUVuHFUyp67ise0mseE+qxslhSzytPN9RiwA
+         n3pv/QGZruyWr6juf26ugv41rIw/vw0VIB50D0mW2fX7F+5VUZ2EF64UcsaiVumEgzZ5
+         eGSg==
+X-Gm-Message-State: AOAM5317FMD+I6pR5w9cuHw2dZpmqdSi8QO2/kk5Ia7XLhbWmmMPHSJ0
+        bVoVBjNpXB7jMIPDGVbcCPQ=
+X-Google-Smtp-Source: ABdhPJxxkplJqxShrGBVhiiwV4wDAmTzqef/PIHgbEK/FxkOV4pp1Kz4V6oB91OzUcUhTzAp2ZHjOQ==
+X-Received: by 2002:a17:902:ea06:b0:15e:8367:150b with SMTP id s6-20020a170902ea0600b0015e8367150bmr24274391plg.167.1651717232671;
+        Wed, 04 May 2022 19:20:32 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id w2-20020a17090ac98200b001cd4989fecdsm3943686pjt.25.2022.05.04.19.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 May 2022 19:20:32 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: chi.minghao@zte.com.cn
+To:     bbrezillon@kernel.org
+Cc:     arno@natisbad.org, schalla@marvell.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] crypto: octeontx2: simplify the return expression of otx2_cpt_aead_cbc_aes_sha_setkey()
+Date:   Thu,  5 May 2022 02:20:24 +0000
+Message-Id: <20220505022024.54586-1-chi.minghao@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason,
+From: Minghao Chi <chi.minghao@zte.com.cn>
 
-On Thu, May 05 2022 at 03:11, Jason A. Donenfeld wrote:
-> On Thu, May 05, 2022 at 02:55:58AM +0200, Thomas Gleixner wrote:
->> > So if truly the only user of this is random.c as of 5.18 (is it? I'm
->> > assuming from a not very thorough survey...), and if the performance
->> > boost doesn't even exist, then yeah, I think it'd make sense to just get
->> > rid of it, and have kernel_fpu_usable() return false in those cases.
->> >
->> > I'll run some benchmarks on a little bit more hardware in representative
->> > cases and see.
->> 
->> Find below a combo patch which makes use of strict softirq serialization
->> for the price of not supporting the hardirq FPU usage. 
->
-> Thanks, I'll give it a shot in the morning (3am) when trying to do a
-> more realistic benchmark. But just as a synthetic thing, I ran the
-> numbers in kBench900 and am getting:
->
->      generic:    430 cycles per call
->        ssse3:    315 cycles per call
->       avx512:    277 cycles per call
->
-> for a single call to the compression function, which is the most any of
-> those mix_pool_bytes() calls do from add_{input,disk}_randomness(), on
-> Tiger Lake, using RDPMC from kernel space.
+Simplify the return expression.
 
-I'm well aware of the difference between synthetic benchmarks and real
-world scenarios and with the more in depth instrumentation of these
-things I'm even more concerned that the difference is underestimated.
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
+---
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-> This _doesn't_ take into account the price of calling kernel_fpu_begin().
-> That's a little hard to bench synthetically by running it in a loop and
-> taking medians because of the lazy restoration. But that's an indication
-> anyway that I should be looking at the cost of the actual function as
-> its running in random.c, rather than the synthetic test. Will keep this
-> thread updated.
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+index f8f8542ce3e4..67530e90bbfe 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+@@ -896,7 +896,6 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
+ 	struct crypto_authenc_key_param *param;
+ 	int enckeylen = 0, authkeylen = 0;
+ 	struct rtattr *rta = (void *)key;
+-	int status;
+ 
+ 	if (!RTA_OK(rta, keylen))
+ 		return -EINVAL;
+@@ -938,11 +937,7 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
+ 	ctx->enc_key_len = enckeylen;
+ 	ctx->auth_key_len = authkeylen;
+ 
+-	status = aead_hmac_init(cipher);
+-	if (status)
+-		return status;
+-
+-	return 0;
++	return aead_hmac_init(cipher);
+ }
+ 
+ static int otx2_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
+-- 
+2.25.1
 
-Appreciated.
 
-Thanks,
-
-        tglx
