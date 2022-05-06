@@ -2,117 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5C1C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 15:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BCBC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 16:01:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442828AbiEFPan (ORCPT
+        id S1378988AbiEFQFP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 11:30:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51940 "EHLO
+        Fri, 6 May 2022 12:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442827AbiEFPam (ORCPT
+        with ESMTP id S1392246AbiEFQFO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 11:30:42 -0400
-X-Greylist: delayed 900 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 06 May 2022 08:26:59 PDT
-Received: from conssluserg-03.nifty.com (conssluserg-03.nifty.com [210.131.2.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D8468984;
-        Fri,  6 May 2022 08:26:58 -0700 (PDT)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 246FQflB011870;
-        Sat, 7 May 2022 00:26:41 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 246FQflB011870
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651850801;
-        bh=LmXHJc7oS/PdyQsdT4vljgxE8B3aIXzCpMb9Ra3kshk=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Stmbmn59ldEy+GBFGp+8r7kSYvon0E/wzy4D0iQ2lRVtg6hEUJgtNxNTQFKMaDQrm
-         m+SMgUTchbK3NpBkyG1hcqzKzK1WtHSuzytHZLUZqeZzWWP5vn/C9S4O2NH7ZNZ1/m
-         xCUnkPrtXhLsinFXJ8I1nRFZC/3BB5Teis5AbuFIwsO/aGi68B7uS/PhGNoS5/e6uz
-         OFI3Wdt+dPH+c3jfVNYaJ+ldbu9rgQXAUVVVj+FbKnBWlMarjgEa/+B0dsu8HkcQiM
-         nl1Li5jPfifDYYUYsU4VkdTVJGkdbZb3AWkOoy+75h1dasEyUTJcN6i+8qIIs0+LBV
-         upgA55hQ194kA==
-X-Nifty-SrcIP: [209.85.216.49]
-Received: by mail-pj1-f49.google.com with SMTP id z5-20020a17090a468500b001d2bc2743c4so7187250pjf.0;
-        Fri, 06 May 2022 08:26:41 -0700 (PDT)
-X-Gm-Message-State: AOAM532n7NYPX+uVMAYhWhnrQOJOOdBz5uxc+gFDA2TfNeKqgORh2n5R
-        KYPg+Yi+KeGHHVwVoXF6KnJw5Gv9Okzhua97oP4=
-X-Google-Smtp-Source: ABdhPJylpUvnnvUM3y2luvBKZgMp7DeP8Xi0cYmH+fbBhmGmj3nClkerUgf9xMXdQcoZ/35a/cKoEYyH4aK7EMOT7pg=
-X-Received: by 2002:a17:90a:e517:b0:1d7:5bbd:f9f0 with SMTP id
- t23-20020a17090ae51700b001d75bbdf9f0mr4681022pjy.77.1651850800724; Fri, 06
- May 2022 08:26:40 -0700 (PDT)
+        Fri, 6 May 2022 12:05:14 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104CD2F005;
+        Fri,  6 May 2022 09:01:31 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651852889;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wJBPtOUuNGrHC5/SIZntmXtYnpjE0lXfTrqYkqCo5pQ=;
+        b=CBRYzpdKZZWT8ytV6rdLyCTJAwiIN2rDkMGzmpPv6H/tLdWpFMd0OVu51xFn2g+pD0JXff
+        nn9WCQx/GgXK4oaq3X7ULoHpGW0qtqJS/meB2ZCxtbkYbiXeru1XCrcqzJXOMTiaLtx78I
+        DhLroSR+vkZsqD7zlSvvm2j236SioBZu+QS0eeJB5nfPZ6BiGkjxvNdXGMBO/RanCr7iKa
+        35Tx4Eig/PIVdZ4o1vXWx0YQhY1usKFh4bOyQXHJn5tnTiq3JNNTNnlMUIWkIcJdJ+qAAn
+        cyFSF54QcGwIuSHnDq7xRaCTkb6ysRFJ/SWrCNOmYirRbgWiqF6PCJHBFUEsGg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651852889;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wJBPtOUuNGrHC5/SIZntmXtYnpjE0lXfTrqYkqCo5pQ=;
+        b=AXBihZhZn5hV8VcQ9uLilDw48pxRojGFGEGM7trGpG072E3p97DGWqIo6FNwOcqlKrzLrW
+        ZOOhrNn/8XuZybCQ==
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     kernel test robot <oliver.sang@intel.com>,
+        0day robot <lkp@intel.com>, Arnd Bergmann <arnd@arndb.de>,
+        Theodore Ts'o <tytso@mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        linux-crypto@vger.kernel.org, nathan@kernel.org
+Subject: Re: [timekeeping]  3aeaac747d: PANIC:early_exception
+In-Reply-To: <YnT0dDFtq7HnRC7n@zx2c4.com>
+References: <20220506032023.GA23061@xsang-OptiPlex-9020>
+ <8735hnhz1q.ffs@tglx> <YnT0dDFtq7HnRC7n@zx2c4.com>
+Date:   Fri, 06 May 2022 18:01:29 +0200
+Message-ID: <87o80ahcpy.ffs@tglx>
 MIME-Version: 1.0
-References: <20220501130749.1123387-1-masahiroy@kernel.org> <YnT3GtU975OsXVuN@gondor.apana.org.au>
-In-Reply-To: <YnT3GtU975OsXVuN@gondor.apana.org.au>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 7 May 2022 00:25:32 +0900
-X-Gmail-Original-Message-ID: <CAK7LNASkQ_14NYu7K_eEOG4boBMpKEXyrOzDJMOjcT5paC7E1A@mail.gmail.com>
-Message-ID: <CAK7LNASkQ_14NYu7K_eEOG4boBMpKEXyrOzDJMOjcT5paC7E1A@mail.gmail.com>
-Subject: Re: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
-
-
-
-On Fri, May 6, 2022 at 7:23 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Fri, May 06 2022 at 12:12, Jason A. Donenfeld wrote:
+> On Fri, May 06, 2022 at 09:59:13AM +0200, Thomas Gleixner wrote:
+>> +/**
+>> + * random_get_entropy_fallback - Returns the raw clock source value,
+>> + * used by random.c for platforms with no valid random_get_entropy().
+>> + */
+>> +unsigned long random_get_entropy_fallback(void)
+>> +{
+>> +	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
+>> +	struct clocksource *clock = READ_ONCE(tkr->clock);
+>> +
+>> +	if (!timekeeping_suspended && clock)
+>> +		return clock->read(clock);
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
 >
-> On Sun, May 01, 2022 at 10:07:49PM +0900, Masahiro Yamada wrote:
-> > I notieced the log is not properly aligned:
-> >
-> >   PERL drivers/crypto/vmx/aesp8-ppc.S
-> >   CC [M]  fs/xfs/xfs_reflink.o
-> >   PERL drivers/crypto/vmx/ghashp8-ppc.S
-> >   CC [M]  drivers/crypto/vmx/aes.o
-> >
-> > Add some spaces after 'PERL'.
-> >
-> > While I was here, I cleaned up the Makefile:
-> >
-> >  - Merge the two similar rules
-> >
-> >  - Remove redundant 'clean-files' (Having 'targets' is enough)
-> >
-> >  - Move the flavour into the build command
-> >
-> > This still avoids the build failures fixed by commit 4ee812f6143d
-> > ("crypto: vmx - Avoid weird build failures").
-> >
-> > Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> > ---
-> >
-> >  drivers/crypto/vmx/Makefile | 17 +++--------------
-> >  1 file changed, 3 insertions(+), 14 deletions(-)
->
-> Patch applied.  Thanks.
+> I tried to address this already in
+> <https://lore.kernel.org/lkml/20220505002910.IAcnpEOE2zR2ibERl4Lh3Y_PMmtb0Rf43lVevgztJiM@z/>,
+> though yours looks better with the READ_ONCE() around clock, and I'll
+> send a v8 doing it that way. I didn't realize that clock could become
+> NULL again after becoming non-NULL.
 
+This happens at early boot where clock is NULL.
 
-Sorry, I just noticed the 0day bot had reported the error.
+> I'm not quite sure I understand the purpose of !timekeeping_suspended
+> there, though. I'm not seeing the path where reading with it suspended
+> negatively affects things. I'll take your word for it though.
 
-I sent v2.    (CONFIG_LITTLE_ENDIAN  --> CONFIG_CPU_LITTLE_ENDIAN)
+Some clocks are not accessible during suspend.
 
-https://lore.kernel.org/lkml/20220506150820.1310802-1-masahiroy@kernel.org/
+Thanks,
 
-
-Could you replace it, or fix it up, please?
-
-
-
-
-
---
-Best Regards
-Masahiro Yamada
+        tglx
