@@ -2,89 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BCBC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 16:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C368C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 21:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378988AbiEFQFP (ORCPT
+        id S1444410AbiEFV0p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 12:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36570 "EHLO
+        Fri, 6 May 2022 17:26:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1392246AbiEFQFO (ORCPT
+        with ESMTP id S245548AbiEFV0o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 12:05:14 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104CD2F005;
-        Fri,  6 May 2022 09:01:31 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1651852889;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wJBPtOUuNGrHC5/SIZntmXtYnpjE0lXfTrqYkqCo5pQ=;
-        b=CBRYzpdKZZWT8ytV6rdLyCTJAwiIN2rDkMGzmpPv6H/tLdWpFMd0OVu51xFn2g+pD0JXff
-        nn9WCQx/GgXK4oaq3X7ULoHpGW0qtqJS/meB2ZCxtbkYbiXeru1XCrcqzJXOMTiaLtx78I
-        DhLroSR+vkZsqD7zlSvvm2j236SioBZu+QS0eeJB5nfPZ6BiGkjxvNdXGMBO/RanCr7iKa
-        35Tx4Eig/PIVdZ4o1vXWx0YQhY1usKFh4bOyQXHJn5tnTiq3JNNTNnlMUIWkIcJdJ+qAAn
-        cyFSF54QcGwIuSHnDq7xRaCTkb6ysRFJ/SWrCNOmYirRbgWiqF6PCJHBFUEsGg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1651852889;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wJBPtOUuNGrHC5/SIZntmXtYnpjE0lXfTrqYkqCo5pQ=;
-        b=AXBihZhZn5hV8VcQ9uLilDw48pxRojGFGEGM7trGpG072E3p97DGWqIo6FNwOcqlKrzLrW
-        ZOOhrNn/8XuZybCQ==
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     kernel test robot <oliver.sang@intel.com>,
-        0day robot <lkp@intel.com>, Arnd Bergmann <arnd@arndb.de>,
-        Theodore Ts'o <tytso@mit.edu>,
-        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
-        linux-crypto@vger.kernel.org, nathan@kernel.org
-Subject: Re: [timekeeping]  3aeaac747d: PANIC:early_exception
-In-Reply-To: <YnT0dDFtq7HnRC7n@zx2c4.com>
-References: <20220506032023.GA23061@xsang-OptiPlex-9020>
- <8735hnhz1q.ffs@tglx> <YnT0dDFtq7HnRC7n@zx2c4.com>
-Date:   Fri, 06 May 2022 18:01:29 +0200
-Message-ID: <87o80ahcpy.ffs@tglx>
+        Fri, 6 May 2022 17:26:44 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD6163385
+        for <linux-crypto@vger.kernel.org>; Fri,  6 May 2022 14:23:00 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id y32so14601090lfa.6
+        for <linux-crypto@vger.kernel.org>; Fri, 06 May 2022 14:23:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qxpYk/i1uMx/9W+J+m0qdABTnqS48FNlgI8p4QJG9kg=;
+        b=krrUKq7r9Ve/PfbbgWMQe08vgB7gzJafF4FAvb8xdfkMWPV87Dm7kmN/XGQTHHnaCE
+         02aP+pLoB/UW9KxGP9N8mg6lodgHOBnkJ6Dkrjp6hqrGu3cRShXzqTVGYEM1WfrpkRVD
+         AMdev99Vk9jW+HwRlkU+J9+77s3iaJNkrtDZnbR+5HUF5A8ZLF5WV9FPWV4RmmgeAFPA
+         228SnlwQBDRP4gEeYWoPwIxSptMj9ZWPCnrA96CCc97SKQWg72d4lC1m095yVo8Jdk3h
+         n4XtRJC0euV2An3UWY8MTXMQAHC44kkhW1rUXmoNCtOuT/heAtJJRJ0oZHOiBL8yKnoe
+         dlXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qxpYk/i1uMx/9W+J+m0qdABTnqS48FNlgI8p4QJG9kg=;
+        b=NZG0N4JPDplE7KfPhcXgcTReAqonLL0R5Wz4WoglALBtTfnoVMu6j9G0C5j1FasV3w
+         /XEJO0NvO7heV3O32IH1FVWJ4Eu9dT9oltvEvCsW18UANB6AORr/6K/nuDIRQPZSfTzY
+         oH3BMdk3XWTKa5lNn97fWYg3x+OT0583tgqKdRBfazvPGmL0Y+df9punpCxwt3dpli9X
+         L/D6niHUHr6LEqbiWI5e70zG51/xQ9tJzN1yoNRar9FXiF2MYxffv9/403ndqw85EU3y
+         HwJHkcvhIda28wBBbHGUeh67mku3B9r/GMsV6k8PZENlmQkfOg+twovhWGPL1JX8hkGq
+         Jl9g==
+X-Gm-Message-State: AOAM53317AeYaHIqPs6t2gSmqVSxgp527NbjY3ZfiDXJO2rVZ0sjzabn
+        2+dvsuG9yXwNgWebp1P3tit6aFGpi2vLJ5+QTnhPog==
+X-Google-Smtp-Source: ABdhPJwtWl922lDNxtpgcPRbGCEUkm78yi8gsQd7xUwx2Ap9G/Q4F/o+IH1eKspy4pPQBMYDUeGtCUHBahsYZet3EtY=
+X-Received: by 2002:a05:6512:1051:b0:473:b70c:941a with SMTP id
+ c17-20020a056512105100b00473b70c941amr3894879lfb.238.1651872178383; Fri, 06
+ May 2022 14:22:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20220504001823.2483834-1-nhuck@google.com> <20220504001823.2483834-7-nhuck@google.com>
+ <YnS07JPEoeFlsRAQ@sol.localdomain>
+In-Reply-To: <YnS07JPEoeFlsRAQ@sol.localdomain>
+From:   Nathan Huckleberry <nhuck@google.com>
+Date:   Fri, 6 May 2022 16:22:46 -0500
+Message-ID: <CAJkfWY4U9C3nAhZH+3Gt-hit9=8SHaCt5vX9ocPjYeABGMr_Mg@mail.gmail.com>
+Subject: Re: [PATCH v6 6/9] crypto: arm64/aes-xctr: Improve readability of
+ XCTR and CTR modes
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06 2022 at 12:12, Jason A. Donenfeld wrote:
-> On Fri, May 06, 2022 at 09:59:13AM +0200, Thomas Gleixner wrote:
->> +/**
->> + * random_get_entropy_fallback - Returns the raw clock source value,
->> + * used by random.c for platforms with no valid random_get_entropy().
->> + */
->> +unsigned long random_get_entropy_fallback(void)
->> +{
->> +	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
->> +	struct clocksource *clock = READ_ONCE(tkr->clock);
->> +
->> +	if (!timekeeping_suspended && clock)
->> +		return clock->read(clock);
->> +	return 0;
->> +}
->> +EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
+On Fri, May 6, 2022 at 12:41 AM Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> I tried to address this already in
-> <https://lore.kernel.org/lkml/20220505002910.IAcnpEOE2zR2ibERl4Lh3Y_PMmtb0Rf43lVevgztJiM@z/>,
-> though yours looks better with the READ_ONCE() around clock, and I'll
-> send a v8 doing it that way. I didn't realize that clock could become
-> NULL again after becoming non-NULL.
+> On Wed, May 04, 2022 at 12:18:20AM +0000, Nathan Huckleberry wrote:
+> > Added some clarifying comments, changed the register allocations to make
+> > the code clearer, and added register aliases.
+> >
+> > Signed-off-by: Nathan Huckleberry <nhuck@google.com>
+>
+> I was a bit surprised to see this after the xctr support patch rather than
+> before.  Doing the cleanup first would make adding and reviewing the xctr
+> support easier.  But it's not a big deal; if you already tested it this way you
+> can just leave it as-is if you want.
+>
+> A few minor comments below.
+>
+> > +     /*
+> > +      * Set up the counter values in v0-v4.
+> > +      *
+> > +      * If we are encrypting less than MAX_STRIDE blocks, the tail block
+> > +      * handling code expects the last keystream block to be in v4.  For
+> > +      * example: if encrypting two blocks with MAX_STRIDE=5, then v3 and v4
+> > +      * should have the next two counter blocks.
+> > +      */
+>
+> The first two mentions of v4 should actually be v{MAX_STRIDE-1}, as it is
+> actually v4 for MAX_STRIDE==5 and v3 for MAX_STRIDE==4.
+>
+> > @@ -355,16 +383,16 @@ AES_FUNC_END(aes_cbc_cts_decrypt)
+> >       mov             v3.16b, vctr.16b
+> >  ST5( mov             v4.16b, vctr.16b                )
+> >       .if \xctr
+> > -             sub             x6, x11, #MAX_STRIDE - 1
+> > -             sub             x7, x11, #MAX_STRIDE - 2
+> > -             sub             x8, x11, #MAX_STRIDE - 3
+> > -             sub             x9, x11, #MAX_STRIDE - 4
+> > -ST5(         sub             x10, x11, #MAX_STRIDE - 5       )
+> > -             eor             x6, x6, x12
+> > -             eor             x7, x7, x12
+> > -             eor             x8, x8, x12
+> > -             eor             x9, x9, x12
+> > -             eor             x10, x10, x12
+> > +             sub             x6, CTR, #MAX_STRIDE - 1
+> > +             sub             x7, CTR, #MAX_STRIDE - 2
+> > +             sub             x8, CTR, #MAX_STRIDE - 3
+> > +             sub             x9, CTR, #MAX_STRIDE - 4
+> > +ST5(         sub             x10, CTR, #MAX_STRIDE - 5       )
+> > +             eor             x6, x6, IV_PART
+> > +             eor             x7, x7, IV_PART
+> > +             eor             x8, x8, IV_PART
+> > +             eor             x9, x9, IV_PART
+> > +             eor             x10, x10, IV_PART
+>
+> The eor into x10 should be enclosed by ST5(), since it's dead code otherwise.
+>
+> > +     /*
+> > +      * If there are at least MAX_STRIDE blocks left, XOR the plaintext with
+> > +      * keystream and store.  Otherwise jump to tail handling.
+> > +      */
+>
+> Technically this could be XOR-ing with either the plaintext or the ciphertext.
+> Maybe write "data" instead.
+>
+> >  .Lctrtail1x\xctr:
+> > -     sub             x7, x6, #16
+> > -     csel            x6, x6, x7, eq
+> > -     add             x1, x1, x6
+> > -     add             x0, x0, x6
+> > -     ld1             {v5.16b}, [x1]
+> > -     ld1             {v6.16b}, [x0]
+> > +     /*
+> > +      * Handle <= 16 bytes of plaintext
+> > +      */
+> > +     sub             x8, x7, #16
+> > +     csel            x7, x7, x8, eq
+> > +     add             IN, IN, x7
+> > +     add             OUT, OUT, x7
+> > +     ld1             {v5.16b}, [IN]
+> > +     ld1             {v6.16b}, [OUT]
+> >  ST5( mov             v3.16b, v4.16b                  )
+> >       encrypt_block   v3, w3, x2, x8, w7
+>
+> w3 and x2 should be ROUNDS_W and KEY, respectively.
+>
+> This code also has the very unusual property that it reads and writes before the
+> buffers given.  Specifically, for bytes < 16, it access the 16 bytes beginning
+> at &in[bytes - 16] and &dst[bytes - 16].  Mentioning this explicitly would be
+> very helpful, particularly in the function comments for aes_ctr_encrypt() and
+> aes_xctr_encrypt(), and maybe in the C code, so that anyone calling these
+> functions has this in mind.
 
-This happens at early boot where clock is NULL.
+If bytes < 16, then the C code uses a buffer of 16 bytes to avoid
+this. I'll add some comments explaining that because its not entirely
+clear what is happening in the C unless you've taken a deep dive into
+the asm.
 
-> I'm not quite sure I understand the purpose of !timekeeping_suspended
-> there, though. I'm not seeing the path where reading with it suspended
-> negatively affects things. I'll take your word for it though.
-
-Some clocks are not accessible during suspend.
-
-Thanks,
-
-        tglx
+>
+> Anyway, with the above addressed feel free to add:
+>
+>         Reviewed-by: Eric Biggers <ebiggers@google.com>
+>
+> - Eric
