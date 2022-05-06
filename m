@@ -2,97 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB7DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 14:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3983C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 15:14:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232047AbiEFOrN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 10:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42264 "EHLO
+        id S1442644AbiEFPSZ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 11:18:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442377AbiEFOrL (ORCPT
+        with ESMTP id S1347956AbiEFPSY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 10:47:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124236AA6B;
-        Fri,  6 May 2022 07:43:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AAD5BB83411;
-        Fri,  6 May 2022 14:43:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3941C385A9;
-        Fri,  6 May 2022 14:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1651848204;
-        bh=/FwFSONd6d39Hoy10JYHeNaWhaiFHuAdGK6dR2gwgBg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1fHn9BxyZUAEFzQcTqZZ55p7/F72YRj3WxYmxKwr8ONMH4DlPK2lHszkma1wpXKdE
-         xuRlJmn/6Z15PdQzgIn0gLbZ5mt9uOlg3FPxNPqBwh59U0Vlfujcn+II4BjDF1DuMm
-         1MN4ncK8LveCwspNlmOVTgBao+Us+StsYwsrE7SE=
-Date:   Fri, 6 May 2022 16:43:21 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
-        Adam Guerin <adam.guerin@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH v2 07/11] crypto: qat - set to zero DH parameters before
- free
-Message-ID: <YnU0CaYETO57t3T+@kroah.com>
-References: <20220506143903.31776-1-giovanni.cabiddu@intel.com>
- <20220506143903.31776-8-giovanni.cabiddu@intel.com>
+        Fri, 6 May 2022 11:18:24 -0400
+Received: from condef-07.nifty.com (condef-07.nifty.com [202.248.20.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC6B6D1AF
+        for <linux-crypto@vger.kernel.org>; Fri,  6 May 2022 08:14:41 -0700 (PDT)
+Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-07.nifty.com with ESMTP id 246FC0Fm004105
+        for <linux-crypto@vger.kernel.org>; Sat, 7 May 2022 00:12:00 +0900
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id 246F8tNF028085;
+        Sat, 7 May 2022 00:08:55 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com 246F8tNF028085
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1651849736;
+        bh=VWu6RNovZZlWzjVI82T26ZkYKFtgzo8H7rKhNuRBvqE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=JjukZl1ajjnROurCI7d4tVD2V+auAAoaTV8eCoq4+DaujU3yMVuUEyuyr6LwWj0L3
+         JWLl97Veyic5o1T/O+yEvgIbnvD2oJ53WvLFTekEPE2XGlzuuwxIbV475fhVzZUTXb
+         9vLIZRPiAdYKUjzvkJReF1rlOeVZMxRfyRAF8MDhq9pS5gdoENYbaH2VnIlFS3dfVe
+         +cJXIXolT3MfRNa6j+tnmjv1arylMYNLmbAsql7Cq51Q/lNrwbg//b+CWaVLXATVox
+         aveENEtZzaDGhZeLMdoGW21mQ/qpWaTPmycNecnftbuY+/21XlrCkT0zIcFshfJR8j
+         CPEHCRkuH/Ilg==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v2] crypto: vmx - Align the short log with Makefile cleanups
+Date:   Sat,  7 May 2022 00:08:20 +0900
+Message-Id: <20220506150820.1310802-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506143903.31776-8-giovanni.cabiddu@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06, 2022 at 03:38:59PM +0100, Giovanni Cabiddu wrote:
-> Set to zero the DH context buffers containing the DH key before they are
-> freed.
-> This is to make sure keys are not leaked out by a subsequent memory
-> allocation.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: c9839143ebbf ("crypto: qat - Add DH support")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Adam Guerin <adam.guerin@intel.com>
-> Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> ---
->  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> index d75eb77c9fb9..25bbd22085c3 100644
-> --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> @@ -421,14 +421,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
->  static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
->  {
->  	if (ctx->g) {
-> +		memset(ctx->g, 0, ctx->p_size);
->  		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
->  		ctx->g = NULL;
->  	}
->  	if (ctx->xa) {
-> +		memset(ctx->xa, 0, ctx->p_size);
->  		dma_free_coherent(dev, ctx->p_size, ctx->xa, ctx->dma_xa);
->  		ctx->xa = NULL;
->  	}
->  	if (ctx->p) {
-> +		memset(ctx->p, 0, ctx->p_size);
->  		dma_free_coherent(dev, ctx->p_size, ctx->p, ctx->dma_p);
->  		ctx->p = NULL;
->  	}
-> -- 
-> 2.35.1
-> 
+I notieced the log is not properly aligned:
 
-As I just wrote, I do not think you need this.  If you do, please
-explain what you are trying to protect the kernel from here.  Itself?
+  PERL drivers/crypto/vmx/aesp8-ppc.S
+  CC [M]  fs/xfs/xfs_reflink.o
+  PERL drivers/crypto/vmx/ghashp8-ppc.S
+  CC [M]  drivers/crypto/vmx/aes.o
 
-thanks,
+Add some spaces after 'PERL'.
 
-greg k-h
+While I was here, I cleaned up the Makefile:
+
+ - Merge the two similar rules
+
+ - Remove redundant 'clean-files' (Having 'targets' is enough)
+
+ - Move the flavour into the build command
+
+This still avoids the build failures fixed by commit 4ee812f6143d
+("crypto: vmx - Avoid weird build failures").
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+Changes in v2:
+  - Fix CONFIG_LITTLE_ENDIAN -> CONFIG_CPU_LITTLE_ENDIAN
+
+ drivers/crypto/vmx/Makefile | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+index 709670d2b553..2560cfea1dec 100644
+--- a/drivers/crypto/vmx/Makefile
++++ b/drivers/crypto/vmx/Makefile
+@@ -2,21 +2,10 @@
+ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
+ vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
+ 
+-ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
+-override flavour := linux-ppc64le
+-else
+-override flavour := linux-ppc64
+-endif
+-
+-quiet_cmd_perl = PERL $@
+-      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
++quiet_cmd_perl = PERL    $@
++      cmd_perl = $(PERL) $< $(if $(CONFIG_CPU_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
+ 
+ targets += aesp8-ppc.S ghashp8-ppc.S
+ 
+-$(obj)/aesp8-ppc.S: $(src)/aesp8-ppc.pl FORCE
+-	$(call if_changed,perl)
+-  
+-$(obj)/ghashp8-ppc.S: $(src)/ghashp8-ppc.pl FORCE
++$(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
+ 	$(call if_changed,perl)
+-
+-clean-files := aesp8-ppc.S ghashp8-ppc.S
+-- 
+2.32.0
+
