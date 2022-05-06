@@ -2,259 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F2CC43219
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 06:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1914C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 07:59:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243150AbiEFGar (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 02:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52076 "EHLO
+        id S1389789AbiEFIC7 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 04:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239461AbiEFGaa (ORCPT
+        with ESMTP id S1389792AbiEFIC6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 02:30:30 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5238166206
-        for <linux-crypto@vger.kernel.org>; Thu,  5 May 2022 23:26:44 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nmrPo-0005oL-Mo; Fri, 06 May 2022 08:26:12 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nmrPi-000edl-JP; Fri, 06 May 2022 08:26:05 +0200
-Received: from afa by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <afa@pengutronix.de>)
-        id 1nmrPf-004Tvf-GG; Fri, 06 May 2022 08:26:03 +0200
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     kernel@pengutronix.de, Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Andreas Rammhold <andreas@rammhold.de>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Michael Walle <michael@walle.cc>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Subject: [PATCH v9 1/7] KEYS: trusted: allow use of TEE as backend without TCG_TPM support
-Date:   Fri,  6 May 2022 08:25:47 +0200
-Message-Id: <20220506062553.1068296-2-a.fatoum@pengutronix.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
-References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
+        Fri, 6 May 2022 04:02:58 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671D567D1D;
+        Fri,  6 May 2022 00:59:16 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651823954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SPOE0gYWj9j1dUjvgP39Og9ua3b0mQKYArT3BeYIUVI=;
+        b=255WrnOczyR8EQwEk84iFJCj7oJ4quj5izYkLwsSq66vyRivpLwlq/pzCLKdSma1xzKEzh
+        LNdM83Cwb2R36TqLk3wXJygrGjsD9Dgs+XpP5gAXFp0gDfQLYp8if4ybJG89BIE1UzhfaY
+        XH3R8Rz0YYqdGVfivs86USKPOop6pSfFUQWEpVF/wGdAih70WGXSRLaEWsn68XKdReifig
+        UZp1vw0ODYvXvzx9BgK90PQ2XnWbcpf5n2EqOZZQD1kDcQc8AA9AAEr1Wb0DYYVrQZjZ0h
+        GDe+ZTOnoCi6DViTIX0SGN5dQhSsspMkMMEADk4lUutXu/21TeFf8URptclHZg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651823954;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SPOE0gYWj9j1dUjvgP39Og9ua3b0mQKYArT3BeYIUVI=;
+        b=pevZyCpSMuLeLpDdi23KVJ4rQtQaXyYYUTbDx6+vxW8a/19C9mM8QlRtryJ71e/4Bqt67m
+        2tO7cvcCscS9otDw==
+To:     kernel test robot <oliver.sang@intel.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     0day robot <lkp@intel.com>, Arnd Bergmann <arnd@arndb.de>,
+        Theodore Ts'o <tytso@mit.edu>,
+        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        linux-crypto@vger.kernel.org, nathan@kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [timekeeping]  3aeaac747d: PANIC:early_exception
+In-Reply-To: <20220506032023.GA23061@xsang-OptiPlex-9020>
+References: <20220506032023.GA23061@xsang-OptiPlex-9020>
+Date:   Fri, 06 May 2022 09:59:13 +0200
+Message-ID: <8735hnhz1q.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: afa@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With recent rework, trusted keys are no longer limited to TPM as trust
-source. The Kconfig symbol is unchanged however leading to a few issues:
+On Fri, May 06 2022 at 11:20, kernel test robot wrote:
+> PANIC: early exception 0x0d IP 10:ffffffff812cef11 error 0 cr2 0xffff888004a3aff8
+> [ 0.000000][ T0] add_device_randomness (kbuild/src/rand-3/drivers/char/random.c:1028) 
+> [ 0.000000][ T0] ? dmi_walk_early (kbuild/src/rand-3/drivers/firmware/dmi_scan.c:470) 
+> [ 0.000000][ T0] dmi_walk_early (kbuild/src/rand-3/drivers/firmware/dmi_scan.c:151) 
+> [ 0.000000][ T0] dmi_present (kbuild/src/rand-3/drivers/firmware/dmi_scan.c:605)
 
-  - TCG_TPM is required, even if only TEE is to be used
-  - Enabling TCG_TPM, but excluding it from available trusted sources
-    is not possible
-  - TEE=m && TRUSTED_KEYS=y will lead to TEE support being silently
-    dropped, which is not the best user experience
+Duh.
 
-Remedy these issues by introducing two new boolean Kconfig symbols:
-TRUSTED_KEYS_TPM and TRUSTED_KEYS_TEE with the appropriate
-dependencies.
+So this wants to be:
 
-Any new code depending on the TPM trusted key backend in particular
-or symbols exported by it will now need to explicitly state that it
-
-  depends on TRUSTED_KEYS && TRUSTED_KEYS_TPM
-
-The latter to ensure the dependency is built and the former to ensure
-it's reachable for module builds. There are no such users yet.
-
-Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-Tested-by: Pankaj Gupta <pankaj.gupta@nxp.com>
-Tested-by: Andreas Rammhold <andreas@rammhold.de>
-Tested-by: Tim Harvey <tharvey@gateworks.com>
-Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-v8 -> v9:
-  - no changes
-v7 -> v8:
-  - add Pankaj's Reviewed-by and Tested-by
-v6 -> v7:
-  - s/Tested-By/Tested-by/
-v5 -> v6:
-  - Rebased on asym_tpm removal
-v4 -> v5:
-  - collected Jarkko's Reviewed-by
-v3 -> v4:
-  - rebased on top of Andreas' regression fix and pulled it back
-    into series
-v2 -> v3:
-  - factored this patch out as a fix for backporting
-v1 -> v2:
-  - Move rest of TPM-related selects from TRUSTED_KEYS to
-    TRUSTED_KEYS_TPM (Sumit)
-  - Remove left-over line in Makefile (Sumit)
-  - added Fixes: tag
-  - adjust commit message to reference the regression reported
-    by Andreas
-  - have ASYMMETRIC_TPM_KEY_SUBTYPE depend on TRUSTED_KEYS_TPM,
-    because it references global symbols that are exported
-    by the trusted key TPM backend.
-
-[1]: https://lore.kernel.org/linux-integrity/f8285eb0135ba30c9d846cf9dd395d1f5f8b1efc.1624364386.git-series.a.fatoum@pengutronix.de/
-[2]: https://lore.kernel.org/linux-integrity/20210719091335.vwfebcpkf4pag3wm@wrt/T/#t
-
-To: Jarkko Sakkinen <jarkko@kernel.org>
-To: James Morris <jmorris@namei.org>
-To: "Serge E. Hallyn" <serge@hallyn.com>
-To: James Bottomley <jejb@linux.ibm.com>
-To: Mimi Zohar <zohar@linux.ibm.com>
-To: Sumit Garg <sumit.garg@linaro.org>
-To: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: David Gstir <david@sigma-star.at>
-Cc: Richard Weinberger <richard@nod.at>
-Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
-Cc: Michael Walle <michael@walle.cc>
-Cc: keyrings@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
----
- security/keys/Kconfig                     | 18 ++++++--------
- security/keys/trusted-keys/Kconfig        | 29 +++++++++++++++++++++++
- security/keys/trusted-keys/Makefile       |  8 +++----
- security/keys/trusted-keys/trusted_core.c |  4 ++--
- 4 files changed, 42 insertions(+), 17 deletions(-)
- create mode 100644 security/keys/trusted-keys/Kconfig
-
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index 0e30b361e1c1..abb03a1b2a5c 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -70,23 +70,19 @@ config BIG_KEYS
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -2380,6 +2381,20 @@ static int timekeeping_validate_timex(co
+ 	return 0;
+ }
  
- config TRUSTED_KEYS
- 	tristate "TRUSTED KEYS"
--	depends on KEYS && TCG_TPM
--	select CRYPTO
--	select CRYPTO_HMAC
--	select CRYPTO_SHA1
--	select CRYPTO_HASH_INFO
--	select ASN1_ENCODER
--	select OID_REGISTRY
--	select ASN1
-+	depends on KEYS
- 	help
- 	  This option provides support for creating, sealing, and unsealing
- 	  keys in the kernel. Trusted keys are random number symmetric keys,
--	  generated and RSA-sealed by the TPM. The TPM only unseals the keys,
--	  if the boot PCRs and other criteria match.  Userspace will only ever
--	  see encrypted blobs.
-+	  generated and sealed by a trust source selected at kernel boot-time.
-+	  Userspace will only ever see encrypted blobs.
- 
- 	  If you are unsure as to whether this is required, answer N.
- 
-+if TRUSTED_KEYS
-+source "security/keys/trusted-keys/Kconfig"
-+endif
++/**
++ * random_get_entropy_fallback - Returns the raw clock source value,
++ * used by random.c for platforms with no valid random_get_entropy().
++ */
++unsigned long random_get_entropy_fallback(void)
++{
++	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
++	struct clocksource *clock = READ_ONCE(tkr->clock);
 +
- config ENCRYPTED_KEYS
- 	tristate "ENCRYPTED KEYS"
- 	depends on KEYS
-diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
-new file mode 100644
-index 000000000000..fc4abd581abb
---- /dev/null
-+++ b/security/keys/trusted-keys/Kconfig
-@@ -0,0 +1,29 @@
-+config TRUSTED_KEYS_TPM
-+	bool "TPM-based trusted keys"
-+	depends on TCG_TPM >= TRUSTED_KEYS
-+	default y
-+	select CRYPTO
-+	select CRYPTO_HMAC
-+	select CRYPTO_SHA1
-+	select CRYPTO_HASH_INFO
-+	select ASN1_ENCODER
-+	select OID_REGISTRY
-+	select ASN1
-+	help
-+	  Enable use of the Trusted Platform Module (TPM) as trusted key
-+	  backend. Trusted keys are random number symmetric keys,
-+	  which will be generated and RSA-sealed by the TPM.
-+	  The TPM only unseals the keys, if the boot PCRs and other
-+	  criteria match.
-+
-+config TRUSTED_KEYS_TEE
-+	bool "TEE-based trusted keys"
-+	depends on TEE >= TRUSTED_KEYS
-+	default y
-+	help
-+	  Enable use of the Trusted Execution Environment (TEE) as trusted
-+	  key backend.
-+
-+if !TRUSTED_KEYS_TPM && !TRUSTED_KEYS_TEE
-+comment "No trust source selected!"
-+endif
-diff --git a/security/keys/trusted-keys/Makefile b/security/keys/trusted-keys/Makefile
-index feb8b6c3cc79..2e2371eae4d5 100644
---- a/security/keys/trusted-keys/Makefile
-+++ b/security/keys/trusted-keys/Makefile
-@@ -5,10 +5,10 @@
++	if (!timekeeping_suspended && clock)
++		return clock->read(clock);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(random_get_entropy_fallback);
  
- obj-$(CONFIG_TRUSTED_KEYS) += trusted.o
- trusted-y += trusted_core.o
--trusted-y += trusted_tpm1.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm1.o
- 
- $(obj)/trusted_tpm2.o: $(obj)/tpm2key.asn1.h
--trusted-y += trusted_tpm2.o
--trusted-y += tpm2key.asn1.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += trusted_tpm2.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TPM) += tpm2key.asn1.o
- 
--trusted-$(CONFIG_TEE) += trusted_tee.o
-+trusted-$(CONFIG_TRUSTED_KEYS_TEE) += trusted_tee.o
-diff --git a/security/keys/trusted-keys/trusted_core.c b/security/keys/trusted-keys/trusted_core.c
-index 9b9d3ef79cbe..7cdbd16aed30 100644
---- a/security/keys/trusted-keys/trusted_core.c
-+++ b/security/keys/trusted-keys/trusted_core.c
-@@ -27,10 +27,10 @@ module_param_named(source, trusted_key_source, charp, 0);
- MODULE_PARM_DESC(source, "Select trusted keys source (tpm or tee)");
- 
- static const struct trusted_key_source trusted_key_sources[] = {
--#if IS_REACHABLE(CONFIG_TCG_TPM)
-+#if defined(CONFIG_TRUSTED_KEYS_TPM)
- 	{ "tpm", &trusted_key_tpm_ops },
- #endif
--#if IS_REACHABLE(CONFIG_TEE)
-+#if defined(CONFIG_TRUSTED_KEYS_TEE)
- 	{ "tee", &trusted_key_tee_ops },
- #endif
- };
--- 
-2.30.2
-
+ /**
+  * do_adjtimex() - Accessor function to NTP __do_adjtimex function
