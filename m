@@ -2,128 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A59AAC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 14:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B9FC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 14:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442258AbiEFOmE (ORCPT
+        id S1442277AbiEFOmy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 10:42:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34520 "EHLO
+        Fri, 6 May 2022 10:42:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442257AbiEFOmE (ORCPT
+        with ESMTP id S1442286AbiEFOmv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 10:42:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F946A424;
-        Fri,  6 May 2022 07:38:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7DEFB6204C;
-        Fri,  6 May 2022 14:38:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54C0EC385A8;
-        Fri,  6 May 2022 14:38:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1651847898;
-        bh=Cz7IK5LW9LlHHli9HhQJKzboa9/phiQaRtWkWrvB0xM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sVwHR+pqBuD3DEf3GmOVF/x9hGMR3+GpczIrueBt55YDyFKnM62UyK9HoB+wrA89U
-         /6Qke46vifwdNwytWhY8/iBru3Agy3Cfi+oHUBOyknBCPu2Yfu6ZeZuFO8xNA4gfbB
-         03U+Z8bX7g6Z1OPC/ODcJa/CW2Yf88WKtzmWq3C4=
-Date:   Fri, 6 May 2022 16:38:15 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
-        Adam Guerin <adam.guerin@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH 10/12] crypto: qat - use memzero_explicit() for algs
-Message-ID: <YnUy13JBMvhkxSgx@kroah.com>
-References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
- <20220506082327.21605-11-giovanni.cabiddu@intel.com>
- <YnTo3zfXSXoEX2+R@kroah.com>
- <YnTwP/0WNvecE9SJ@silpixa00400314>
+        Fri, 6 May 2022 10:42:51 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E6B6A42D
+        for <linux-crypto@vger.kernel.org>; Fri,  6 May 2022 07:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651847947; x=1683383947;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PptSanh6NCuDve3xGS6fyaJwCpqyeNxlYDFoVFJRfEs=;
+  b=BGLNy8PStGS2cFHkqw2KIh4FNwc+lOIfY+/W7zDJWX27lrWj5b02vgcw
+   keL/uLHLsHQsRanE5mB/u4eQjQOZ9rgwOeUo3qQYENV9LOyEx+Gr8Jk1N
+   S1PqJ8raHrc8n2n0ZM/Iwz2VD3hun86SEp7dO3ctIdYe3tHvIRQbZ6x8C
+   mXHPmpPy79MoLgujuW6mqkCfv/ap0R18HUMqwgslCoKxADJivg7mka6p3
+   u3qkC+UlSSoaTNYIkfn7i1guFJydwxnQ/9BgeKJy/SsBfpjRV39N2COS7
+   I8UqU84l+kDrUpJxHBLWfNg4xNB3hb3hJXZ9zSLqb4a2rrx9DYbEGI9dn
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10339"; a="248387448"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="248387448"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 07:39:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="537914788"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga006.jf.intel.com with ESMTP; 06 May 2022 07:39:05 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        vdronov@redhat.com, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 00/11] crypto: qat - re-enable algorithms
+Date:   Fri,  6 May 2022 15:38:52 +0100
+Message-Id: <20220506143903.31776-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YnTwP/0WNvecE9SJ@silpixa00400314>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06, 2022 at 10:54:07AM +0100, Giovanni Cabiddu wrote:
-> On Fri, May 06, 2022 at 11:22:39AM +0200, Greg KH wrote:
-> > On Fri, May 06, 2022 at 09:23:25AM +0100, Giovanni Cabiddu wrote:
-> > > Use memzero_explicit(), instead of a memset(.., 0, ..) in the
-> > > implementation of the algorithms, for buffers containing sensitive
-> > > information to ensure they are wiped out before free.
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
-> > > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> > > ---
-> > >  drivers/crypto/qat/qat_common/qat_algs.c      | 20 +++++++++----------
-> > >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 20 +++++++++----------
-> > >  2 files changed, 20 insertions(+), 20 deletions(-)
-> > > 
-> > > diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-> > > index 873533dc43a7..c42df18e02b2 100644
-> > > --- a/drivers/crypto/qat/qat_common/qat_algs.c
-> > > +++ b/drivers/crypto/qat/qat_common/qat_algs.c
-> > > @@ -637,12 +637,12 @@ static int qat_alg_aead_newkey(struct crypto_aead *tfm, const u8 *key,
-> > >  	return 0;
-> > >  
-> > >  out_free_all:
-> > > -	memset(ctx->dec_cd, 0, sizeof(struct qat_alg_cd));
-> > > +	memzero_explicit(ctx->dec_cd, sizeof(struct qat_alg_cd));
-> > 
-> > This is for structure fields, why does memset() not work properly here?
-> > The compiler should always call this, it doesn't know what
-> > dma_free_coherent() does.  You are referencing this pointer after the
-> > memset() call so all should be working as intended here.
-> > 
-> > Because of this, I don't see why this change is needed.  Do you have
-> > reports of compilers not calling memset() for all of this properly?
-> Apologies, I had a wrong assumption.
-> Based on a comment in the memzero_explicit() documentation I assumed it
-> should be always used to zero sensitive data.
-> 
->      * memzero_explicit - Fill a region of memory (e.g. sensitive
->      *			  keying data) with 0s.
+This set is an extension of a previous set called `crypto: qat - fix dm-crypt
+related issues` which aims to re-enable the algorithms in the QAT driver
+after [1].
 
-Yes, that's what it is for, when the compiler thinks it is "smarter than
-you" for stack variables.
+This fixes a number of issues with the implementation of the QAT algs,
+both symmetric and asymmetric.
+In particular this set enables the QAT driver to handle correctly the
+flags CRYPTO_TFM_REQ_MAY_BACKLOG and CRYPTO_TFM_REQ_MAY_SLEEP,
+fixes an hidden issue in RSA and DH which appeared after commit f5ff79fddf0e,
+related to the usage of dma_free_coherent() from a tasklet and includes
+important fixes in the akcipher algorithms.
 
-It's great for functions like this:
-	int foo(...)
-	{
-		struct key secret_key;
+One item to mention is that, differently from the previous set, this
+one does not removes the flag CRYPTO_ALG_ALLOCATES_MEMORY which will
+be removed after the conversation in [2] is closed.
 
-		do something and set secret_key...
+[1] https://lore.kernel.org/linux-crypto/YiEyGoHacN80FcOL@silpixa00400314/
+[2] https://lore.kernel.org/linux-crypto/Yl6PlqyucVLCzwF5@silpixa00400314/
 
-		/* All done, clean up and return */
-		memset(&secret_key, 0, sizeof(secret_key));
-		return 0;
-	}
+Changes from v1:
+  - Clarified commit message in `crypto: qat - refactor submission logic`
+    to indicate why the patch should be included in stable kernels
+  - Removed `crypto: qat - use memzero_explicit() for algs` from set
+    after feedback from Greg KH
+  - Replaced memzero_explicit() with memset() in `crypto: qat - set to
+    zero DH parameters before free` after feedback from Greg KH
 
-For that, some compilers now go "hey, they just want to set this to 0
-and then never touch it again, that is pointless, let's not call
-memset() at all!".
+Giovanni Cabiddu (11):
+  crypto: qat - use pre-allocated buffers in datapath
+  crypto: qat - refactor submission logic
+  crypto: qat - add backlog mechanism
+  crypto: qat - fix memory leak in RSA
+  crypto: qat - remove dma_free_coherent() for RSA
+  crypto: qat - remove dma_free_coherent() for DH
+  crypto: qat - set to zero DH parameters before free
+  crypto: qat - add param check for RSA
+  crypto: qat - add param check for DH
+  crypto: qat - honor CRYPTO_TFM_REQ_MAY_SLEEP flag
+  crypto: qat - re-enable registration of algorithms
 
-But when you call:
-	memset(foo->key, 0, sizeof(key));
-	do_something_with_foo(foo);
+ drivers/crypto/qat/qat_4xxx/adf_drv.c         |   7 -
+ drivers/crypto/qat/qat_common/Makefile        |   1 +
+ drivers/crypto/qat/qat_common/adf_transport.c |  11 +
+ drivers/crypto/qat/qat_common/adf_transport.h |   1 +
+ .../qat/qat_common/adf_transport_internal.h   |   1 +
+ drivers/crypto/qat/qat_common/qat_algs.c      | 153 +++++----
+ drivers/crypto/qat/qat_common/qat_algs_send.c |  86 +++++
+ drivers/crypto/qat/qat_common/qat_algs_send.h |  11 +
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 307 +++++++++---------
+ drivers/crypto/qat/qat_common/qat_crypto.c    |  10 +-
+ drivers/crypto/qat/qat_common/qat_crypto.h    |  44 +++
+ 11 files changed, 395 insertions(+), 237 deletions(-)
+ create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.c
+ create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.h
 
-the compiler can NOT go and ignore the call to memset() as it does not
-know what do_something_with_foo() does.  Or at least it better not.
+-- 
+2.35.1
 
-Try out this with a small example and look at the asm output for proof.
-
-You aren't the first to be confused about this, I see this happening at
-least once a month with a patch to change code like you did.  Don't know
-why it keeps coming up, is this a checkpatch() recommentation?
-
-thanks,
-
-greg k-h
