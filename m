@@ -2,114 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3236C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD55BC433FE
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbiEFJiZ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 05:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51644 "EHLO
+        id S237937AbiEFJmV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 05:42:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238563AbiEFJiX (ORCPT
+        with ESMTP id S235627AbiEFJmV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 05:38:23 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CFCB106;
-        Fri,  6 May 2022 02:34:41 -0700 (PDT)
-Received: from kwepemi100012.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Kvlkl6FPMzhYhf;
-        Fri,  6 May 2022 17:34:07 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
- kwepemi100012.china.huawei.com (7.221.188.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 6 May 2022 17:34:39 +0800
-Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
- dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2375.024;
- Fri, 6 May 2022 17:34:39 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     zhenwei pi <pizhenwei@bytedance.com>,
-        "mst@redhat.com" <mst@redhat.com>
-CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH v5 5/5] virtio-crypto: enable retry for virtio-crypto-dev
-Thread-Topic: [PATCH v5 5/5] virtio-crypto: enable retry for virtio-crypto-dev
-Thread-Index: AQHYYGfJIkLldEFis0GWr3Sle9+GwK0Rltzw
-Date:   Fri, 6 May 2022 09:34:39 +0000
-Message-ID: <ad61b1ae4bd145eaa18fc28696e9502a@huawei.com>
-References: <20220505092408.53692-1-pizhenwei@bytedance.com>
- <20220505092408.53692-6-pizhenwei@bytedance.com>
-In-Reply-To: <20220505092408.53692-6-pizhenwei@bytedance.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.149.11]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Fri, 6 May 2022 05:42:21 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC545DA15;
+        Fri,  6 May 2022 02:38:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651829918; x=1683365918;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EfVh0TwU1na43d7YSTQ8W7xUhA6BV7DvuhVeaDzvcVY=;
+  b=jp4MbhvBMyxRyk4E7AspkLYvNlumIeMyY/HV1ImcPDoIJwzp0a/4KCrA
+   9kCNNPeHiQresLbbmPqN6YU8hqgd82pjZ/bh05wRu3B23B8DL8b2mDVDF
+   ssbRtggfWPLXONHZQmdGizPkRL44Qx8Muq1BSmt10FoS5776ofzSt6IPH
+   GgUEHupw+M9dpJ5Qczog4l+l/qS0JeROmSuV/BIFAPuwKqoJ3ZJMDecgx
+   7Q1l37REj3SYYXkgskQIakU4t5+KsdbrLryQNyFOwTCgls6UyEUZK/dIA
+   sdSo300DL5Ff0tWp8oCs1u/wj1REPgQ8txAsf1B3cdmtIcn9ySLA1r9Kz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="293621862"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="293621862"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:38:37 -0700
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="585890538"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:38:35 -0700
+Date:   Fri, 6 May 2022 10:38:18 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Greg KH <greg@kroah.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
+        Marco Chiappero <marco.chiappero@intel.com>
+Subject: Re: [PATCH 02/12] crypto: qat - refactor submission logic
+Message-ID: <YnTsikYX23hfQDZt@silpixa00400314>
+References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
+ <20220506082327.21605-3-giovanni.cabiddu@intel.com>
+ <YnTpPoN9JZqjqvsG@kroah.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnTpPoN9JZqjqvsG@kroah.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
-> Sent: Thursday, May 5, 2022 5:24 PM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com
-> Cc: jasowang@redhat.com; herbert@gondor.apana.org.au;
-> linux-kernel@vger.kernel.org; virtualization@lists.linux-foundation.org;
-> linux-crypto@vger.kernel.org; helei.sig11@bytedance.com;
-> pizhenwei@bytedance.com; davem@davemloft.net
-> Subject: [PATCH v5 5/5] virtio-crypto: enable retry for virtio-crypto-dev
+On Fri, May 06, 2022 at 11:24:14AM +0200, Greg KH wrote:
+> On Fri, May 06, 2022 at 09:23:17AM +0100, Giovanni Cabiddu wrote:
+> > Move the submission loop to a new function, qat_alg_send_message(), and
+> > share it between the symmetric and the asymmetric algorithms.
+> > 
+> > If the HW queues are full return -ENOSPC instead of -EBUSY.
+> > 
+> > For both symmetric and asymmetric services set the number of retries
+> > before returning an error to a value that works for both, 20 (was 10 for
+> > symmetric and 100 for asymmetric).
+> > 
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
 > 
-> From: lei he <helei.sig11@bytedance.com>
-> 
-> Enable retry for virtio-crypto-dev, so that crypto-engine can process
-> cipher-requests parallelly.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: lei he <helei.sig11@bytedance.com>
-> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> ---
->  drivers/crypto/virtio/virtio_crypto_core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
-> b/drivers/crypto/virtio/virtio_crypto_core.c
-> index 60490ffa3df1..f67e0d4c1b0c 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_core.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
-> @@ -144,7 +144,8 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
->  		spin_lock_init(&vi->data_vq[i].lock);
->  		vi->data_vq[i].vq = vqs[i];
->  		/* Initialize crypto engine */
-> -		vi->data_vq[i].engine = crypto_engine_alloc_init(dev, 1);
-> +		vi->data_vq[i].engine = crypto_engine_alloc_init_and_set(dev, true,
-> NULL, 1,
-> +						virtqueue_get_vring_size(vqs[i]));
+> What does this "fix" to require it to be backported to stable trees?
+For two reasons, (1) the error code returned if the HW queues are full is
+incorrect and (2) to facilitate the backport of the next fix "crypto:
+qat - add backlog mechanism".
+I can be more explicit in the commit message if required.
 
-Here the '1' can be 'true' too.
+Thanks,
 
-Sure, you can add
-
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
-
-Regards,
--Gonglei
-
->  		if (!vi->data_vq[i].engine) {
->  			ret = -ENOMEM;
->  			goto err_engine;
-> --
-> 2.20.1
-
+-- 
+Giovanni
