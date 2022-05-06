@@ -2,141 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B446C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 21:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DA4C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 22:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444620AbiEFV7K (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 17:59:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46290 "EHLO
+        id S241939AbiEFWTJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 18:19:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444600AbiEFV6z (ORCPT
+        with ESMTP id S1444707AbiEFWTI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 17:58:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86F096FA2B;
-        Fri,  6 May 2022 14:55:10 -0700 (PDT)
+        Fri, 6 May 2022 18:19:08 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4AABD2;
+        Fri,  6 May 2022 15:15:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 388FAB8366B;
-        Fri,  6 May 2022 21:55:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A40E1C385AE;
-        Fri,  6 May 2022 21:55:07 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AB886611D1;
+        Fri,  6 May 2022 22:15:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E1F4C385A8;
+        Fri,  6 May 2022 22:15:20 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="qGymX2Ei"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pOI5hGxD"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651874107;
+        t=1651875318;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=CONQnGrvBNWtmRRVvjvt2kXQXjMlbIs+TFZyt6Ucsf8=;
-        b=qGymX2Eibsn2o4UdhibapvaTTC06Wi+MyevGLHQ1Gm0qPrf4ffHotjJyeKRxdj+NDxKImc
-        +sySvsdxdwmvXt3YRGJgWrWJvabwHvdRI8+q7Ad53uG6YTr9YgwlERr6etAyPHt3nB6wAv
-        SW5LOEFp+OcNx0HdsIF68CJ/JNPoeS8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 55c62685 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 6 May 2022 21:55:06 +0000 (UTC)
+        bh=WrY3HsKWQNSyKWcHZ9De8AVQuhdOwlvdLddYWMvFUkY=;
+        b=pOI5hGxD8Nn68Qt3XNIHod2+bb2QHkAtR4AuuSM+f8Bkst7iStgI+5TfNODC78/iQ5PNQT
+        LrDXwFoEMP6GhmvI3N4aU1p2eq54+cbjSBm2NFpXrOl/zyDtmYQLbfHtd4FFIlVcKbJ7K5
+        eu47V1/3izpL8l27LU88thCK+Q4nQMg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e3d5def3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 6 May 2022 22:15:18 +0000 (UTC)
+Date:   Sat, 7 May 2022 00:15:16 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 3/3] random: help compiler out with fast_mix() by using simpler arguments
-Date:   Fri,  6 May 2022 23:54:54 +0200
-Message-Id: <20220506215454.1671-3-Jason@zx2c4.com>
-In-Reply-To: <20220506215454.1671-1-Jason@zx2c4.com>
-References: <20220506215454.1671-1-Jason@zx2c4.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Filipe Manana <fdmanana@suse.com>, linux-crypto@vger.kernel.org
+Subject: Re: [patch 3/3] x86/fpu: Make FPU protection more robust
+Message-ID: <YnWd9O3bH1zI+5cE@zx2c4.com>
+References: <20220501192740.203963477@linutronix.de>
+ <20220501193102.704267030@linutronix.de>
+ <Ym/sHqKqmLOJubgE@zn.tnic>
+ <87k0b4lydr.ffs@tglx>
+ <YnDwjjdiSQ5Yml6E@hirez.programming.kicks-ass.net>
+ <87fslpjomx.ffs@tglx>
+ <YnKh96isoB7jiFrv@zx2c4.com>
+ <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YnLOXZp6WgH7ULVU@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that fast_mix() has more than one caller, gcc no longer inlines it.
-That's fine. But it also doesn't handle the compound literal argument we
-pass it very efficiently, nor does it handle the loop as well as it
-could. So just expand the code to spell out this function so that it
-generates the same code as it did before. Performance-wise, this now
-behaves as it did before the last commit. The difference in actual code
-size on x86 is 45 bytes, which is less than a cache line.
+Hi Thomas,
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 44 ++++++++++++++++++++++---------------------
- 1 file changed, 23 insertions(+), 21 deletions(-)
+On Wed, May 04, 2022 at 09:05:01PM +0200, Jason A. Donenfeld wrote:
+> Hey Thomas,
+> 
+> On Wed, May 04, 2022 at 06:45:45PM +0200, Thomas Gleixner wrote:
+> > add_disk_randomness() on !RT kernels. That's what made me look into this
+> > in the first place as it unearthed the long standing FPU protection
+> > bug. See the first patch in this thread.
+> > 
+> > Possibly add_device_randomness() too, but I haven't seen evidence so far.
+> 
+> It looks like it's being hit from add_input_randomness() via
+> input_handle_event() too. There are two positions we could take toward
+> this:
+> 
+> One stance to take would be that if an event happens in an interrupt,
+> add_interrupt_randomness() should in theory already be siphashing in a
+> cycle counter so additional calls to add_{input,disk}_randomness() don't
+> contribute substantially (unless you assume the num field has some
+> entropic value). If that's compelling, then the next thing to do would
+> be adding a `if (in_interrupt()) return;` early on in some function, and
+> then we forever after impose a rule, "never mix into the input pool
+> directly from an irq".
+> 
+> The other stance is that these input/disk events are relatively rare --
+> compared to, say, a storm of interrupts from a NIC -- so mixing into the
+> input pool from there isn't actually a problem, and we benefit from the
+> quasi domain-specific accounting and the superior mixing function,
+> there, so keep it around. And the non-raw spinlock on the input pool
+> won't negatively affect RT from this context, because all its callers on
+> RT should be threaded.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 818432638c18..a04ecfcb4f1e 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -1101,25 +1101,30 @@ static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
-  * and therefore this has no security on its own. s represents the
-  * four-word SipHash state, while v represents a two-word input.
-  */
--static void fast_mix(unsigned long s[4], const unsigned long v[2])
-+static void fast_mix(unsigned long s[4], unsigned long v1, unsigned long v2)
- {
--	size_t i;
--
--	for (i = 0; i < 2; ++i) {
--		s[3] ^= v[i];
- #ifdef CONFIG_64BIT
--		s[0] += s[1]; s[1] = rol64(s[1], 13); s[1] ^= s[0]; s[0] = rol64(s[0], 32);
--		s[2] += s[3]; s[3] = rol64(s[3], 16); s[3] ^= s[2];
--		s[0] += s[3]; s[3] = rol64(s[3], 21); s[3] ^= s[0];
--		s[2] += s[1]; s[1] = rol64(s[1], 17); s[1] ^= s[2]; s[2] = rol64(s[2], 32);
-+#define PERM() do { \
-+	s[0] += s[1]; s[1] = rol64(s[1], 13); s[1] ^= s[0]; s[0] = rol64(s[0], 32); \
-+	s[2] += s[3]; s[3] = rol64(s[3], 16); s[3] ^= s[2]; \
-+	s[0] += s[3]; s[3] = rol64(s[3], 21); s[3] ^= s[0]; \
-+	s[2] += s[1]; s[1] = rol64(s[1], 17); s[1] ^= s[2]; s[2] = rol64(s[2], 32); \
-+} while (0)
- #else
--		s[0] += s[1]; s[1] = rol32(s[1],  5); s[1] ^= s[0]; s[0] = rol32(s[0], 16);
--		s[2] += s[3]; s[3] = rol32(s[3],  8); s[3] ^= s[2];
--		s[0] += s[3]; s[3] = rol32(s[3],  7); s[3] ^= s[0];
--		s[2] += s[1]; s[1] = rol32(s[1], 13); s[1] ^= s[2]; s[2] = rol32(s[2], 16);
-+#define PERM() do { \
-+	s[0] += s[1]; s[1] = rol32(s[1],  5); s[1] ^= s[0]; s[0] = rol32(s[0], 16); \
-+	s[2] += s[3]; s[3] = rol32(s[3],  8); s[3] ^= s[2]; \
-+	s[0] += s[3]; s[3] = rol32(s[3],  7); s[3] ^= s[0]; \
-+	s[2] += s[1]; s[1] = rol32(s[1], 13); s[1] ^= s[2]; s[2] = rol32(s[2], 16); \
-+} while (0)
- #endif
--		s[0] ^= v[i];
--	}
-+
-+	s[3] ^= v1;
-+	PERM();
-+	s[0] ^= v1;
-+	s[3] ^= v2;
-+	PERM();
-+	s[0] ^= v2;
- }
- 
- #ifdef CONFIG_SMP
-@@ -1187,10 +1192,8 @@ void add_interrupt_randomness(int irq)
- 	struct pt_regs *regs = get_irq_regs();
- 	unsigned int new_count;
- 
--	fast_mix(fast_pool->pool, (unsigned long[2]){
--		entropy,
--		(regs ? instruction_pointer(regs) : _RET_IP_) ^ swab(irq)
--	});
-+	fast_mix(fast_pool->pool, entropy,
-+		 (regs ? instruction_pointer(regs) : _RET_IP_) ^ swab(irq));
- 	new_count = ++fast_pool->count;
- 
- 	if (new_count & MIX_INFLIGHT)
-@@ -1228,8 +1231,7 @@ static void add_timer_randomness(struct timer_rand_state *state, unsigned int nu
- 	long delta, delta2, delta3;
- 
- 	if (in_hardirq()) {
--		fast_mix(this_cpu_ptr(&irq_randomness)->pool,
--			 (unsigned long[2]){ entropy, num });
-+		fast_mix(this_cpu_ptr(&irq_randomness)->pool, entropy, num);
- 		return;
- 	}
- 
--- 
-2.35.1
+It turned out to be more complicated than this. Sometimes a given
+interrupt handler would have multiple calls to add_disk_randomness(),
+followed by a single call to add_interrupt_randomness(). Since those
+multiple calls all represent different things being measured, the second
+option of discarding them didn't seem like a good idea, but the first
+option seemed pretty bad too, since the status quo is way too much
+hashing from an irq handler. Further complicating things is the fact
+that add_{input,disk}_randomness() is never just called from irq or from
+elsewhere, as different drivers do different things. Luckily the way the
+entropy estimator currently works allows for a pretty straight forward
+compromise, which I posted here:
 
+https://lore.kernel.org/lkml/20220506215454.1671-2-Jason@zx2c4.com/
+
+The upshot for this discussion is that it means we can probably get rid
+of hard irq FPU support. (This is in addition to the performance
+argument, in which tentatively it seemed like the difference wasn't
+/that/ much to justify the complexity.)
+
+I intend to mull this over a bit more, though, so if my patch is to make
+it in, it'll be for 5.19 and certainly not 5.18. So for 5.18, I think
+it's probably a good idea to apply the patches in this thread. And then
+for 5.19 we can take the next step.
+
+Jason
