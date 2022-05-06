@@ -2,107 +2,145 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6553C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 660F5C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:59:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345366AbiEFJ55 (ORCPT
+        id S1390648AbiEFKDM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 05:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
+        Fri, 6 May 2022 06:03:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236473AbiEFJ54 (ORCPT
+        with ESMTP id S1358846AbiEFKDK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 05:57:56 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF28867D28;
-        Fri,  6 May 2022 02:54:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651830853; x=1683366853;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D2fOVPqK96/pXvpwlXxzgoBM06E6UgVfGVY77Vl/uHI=;
-  b=GOG57SAghjmheKyF65U2OmRp+KyJ1fnXS9a838VpTSmFys8gqEN9R2ve
-   M0Zkffb4CC/F3U22lUSzFL4BJWrJVwtyTlrEIjUjTx5ySYmCg7n5Gofxi
-   y7ARIkgDWSBbhKc50mZP0gi68RWxpJoZLVstfaDAmY1b8Oxb4+Ms6+48K
-   hBRQry5vTRflHxJKJ5jFtTROP+zjX1a9eQTQe0BVohsCrODlEitm+l5GE
-   fwF7ATFI3RMeTwAjcqMUsX0grdA/yeP/18lgWEb8rfq+ktdXvRo8l87Bm
-   Y47JJNEiaN8ScZzH61KfHa2y8eSP8VqzC5dOfGEzgl5oiw5jWS1Ai7jA2
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="331407505"
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="331407505"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:54:13 -0700
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="621757997"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:54:10 -0700
-Date:   Fri, 6 May 2022 10:54:07 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
-        Adam Guerin <adam.guerin@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH 10/12] crypto: qat - use memzero_explicit() for algs
-Message-ID: <YnTwP/0WNvecE9SJ@silpixa00400314>
-References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
- <20220506082327.21605-11-giovanni.cabiddu@intel.com>
- <YnTo3zfXSXoEX2+R@kroah.com>
+        Fri, 6 May 2022 06:03:10 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B40294754F
+        for <linux-crypto@vger.kernel.org>; Fri,  6 May 2022 02:59:27 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 204so3064240pfx.3
+        for <linux-crypto@vger.kernel.org>; Fri, 06 May 2022 02:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=qkYBPtwwXh8wrjml5xjZWpmnyYJc8bz2oezaS0TP4h4=;
+        b=yhN7HQkibzNKkcborAKfIJZ1+KFI5v7ka0JP/YFaO15M7iM5JCX3y28qvb6yrz1Qm+
+         tsZzBSDZERZUoFnpycq2P8Gv8LylAFM5wybHMOsa26wbefo5t8aY5EF7nPp4hBwBGoKJ
+         WeaxwleR2hasu1mCnXJ1eHbEprtWOiowLkefXtZGcDB8f+Yb6LwivSXUXWG85ve/qV9d
+         RnGIzxJq40E9JIQsAjAIucr3YNMxnBfLL23bvh5Gr6zC5dU/CMeP49CeUEiTNfFktIZN
+         xUve1G3ty7FkdL2P7bww2ONlixR4c/z1MErH2hnRyOVQicRhg5a00l+OEfpFrGLzkyeK
+         T43g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qkYBPtwwXh8wrjml5xjZWpmnyYJc8bz2oezaS0TP4h4=;
+        b=XASp2r6uDfPuZAoMunzGjZfIE6ST8Ltuu1byXmluFvs0nYaJxLSRj6BS52fKIiax8i
+         oYUFf3Bj3n8eLLBzsOyQ9bcUh8tM3zz6KdsGzwucf6aFN6R/jRH+DrOB+/2vvIZQjEI0
+         ijf0zBP7sIjyXqz0CEeFCisbyle39dGV8L6KCtJQAelnVRsnRa4jJivlmrBJz2iJUClS
+         uh6HHWYWGJNAepsGfe11k73uJKWw+PMMbpyly4bC2lFOOOoVenb8+jn1xnxmmSHdYHbw
+         bwwc4PASBqjhhkXZqgeUXSEdy3MvqHmapU6Z2SQS621yQzF9LW4mBKKS/AbcxAigIDCU
+         pM8A==
+X-Gm-Message-State: AOAM533XFnNppjnCz0cNc9jAmbONW16w2XfAWZ17Cds1RmWojQjhxKcG
+        PDLJXBTC3eCCUyUTqAy4wVvQ34XmaCCN4g==
+X-Google-Smtp-Source: ABdhPJx1UzxZt5oKWOW8EfeuMSxPFYdmNFuHrO7gIAc3jSJG3YfatOtyNZDK/sM/J50XFzYZ7hQiig==
+X-Received: by 2002:a65:615a:0:b0:3a9:f4ad:68a8 with SMTP id o26-20020a65615a000000b003a9f4ad68a8mr2168328pgv.108.1651831167259;
+        Fri, 06 May 2022 02:59:27 -0700 (PDT)
+Received: from [10.255.89.252] ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id me16-20020a17090b17d000b001d26c7d5aacsm3300603pjb.13.2022.05.06.02.59.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 May 2022 02:59:26 -0700 (PDT)
+Message-ID: <48c9b073-0b03-5769-633b-5b668cea6fa4@bytedance.com>
+Date:   Fri, 6 May 2022 17:55:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YnTo3zfXSXoEX2+R@kroah.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: RE: [PATCH v5 5/5] virtio-crypto: enable retry for
+ virtio-crypto-dev
+Content-Language: en-US
+To:     "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        "mst@redhat.com" <mst@redhat.com>
+Cc:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "helei.sig11@bytedance.com" <helei.sig11@bytedance.com>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <20220505092408.53692-1-pizhenwei@bytedance.com>
+ <20220505092408.53692-6-pizhenwei@bytedance.com>
+ <ad61b1ae4bd145eaa18fc28696e9502a@huawei.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <ad61b1ae4bd145eaa18fc28696e9502a@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06, 2022 at 11:22:39AM +0200, Greg KH wrote:
-> On Fri, May 06, 2022 at 09:23:25AM +0100, Giovanni Cabiddu wrote:
-> > Use memzero_explicit(), instead of a memset(.., 0, ..) in the
-> > implementation of the algorithms, for buffers containing sensitive
-> > information to ensure they are wiped out before free.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
-> > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> > ---
-> >  drivers/crypto/qat/qat_common/qat_algs.c      | 20 +++++++++----------
-> >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 20 +++++++++----------
-> >  2 files changed, 20 insertions(+), 20 deletions(-)
-> > 
-> > diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-> > index 873533dc43a7..c42df18e02b2 100644
-> > --- a/drivers/crypto/qat/qat_common/qat_algs.c
-> > +++ b/drivers/crypto/qat/qat_common/qat_algs.c
-> > @@ -637,12 +637,12 @@ static int qat_alg_aead_newkey(struct crypto_aead *tfm, const u8 *key,
-> >  	return 0;
-> >  
-> >  out_free_all:
-> > -	memset(ctx->dec_cd, 0, sizeof(struct qat_alg_cd));
-> > +	memzero_explicit(ctx->dec_cd, sizeof(struct qat_alg_cd));
+On 5/6/22 17:34, Gonglei (Arei) wrote:
 > 
-> This is for structure fields, why does memset() not work properly here?
-> The compiler should always call this, it doesn't know what
-> dma_free_coherent() does.  You are referencing this pointer after the
-> memset() call so all should be working as intended here.
 > 
-> Because of this, I don't see why this change is needed.  Do you have
-> reports of compilers not calling memset() for all of this properly?
-Apologies, I had a wrong assumption.
-Based on a comment in the memzero_explicit() documentation I assumed it
-should be always used to zero sensitive data.
+>> -----Original Message-----
+>> From: zhenwei pi [mailto:pizhenwei@bytedance.com]
+>> Sent: Thursday, May 5, 2022 5:24 PM
+>> To: Gonglei (Arei) <arei.gonglei@huawei.com>; mst@redhat.com
+>> Cc: jasowang@redhat.com; herbert@gondor.apana.org.au;
+>> linux-kernel@vger.kernel.org; virtualization@lists.linux-foundation.org;
+>> linux-crypto@vger.kernel.org; helei.sig11@bytedance.com;
+>> pizhenwei@bytedance.com; davem@davemloft.net
+>> Subject: [PATCH v5 5/5] virtio-crypto: enable retry for virtio-crypto-dev
+>>
+>> From: lei he <helei.sig11@bytedance.com>
+>>
+>> Enable retry for virtio-crypto-dev, so that crypto-engine can process
+>> cipher-requests parallelly.
+>>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Jason Wang <jasowang@redhat.com>
+>> Cc: Gonglei <arei.gonglei@huawei.com>
+>> Signed-off-by: lei he <helei.sig11@bytedance.com>
+>> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+>> ---
+>>   drivers/crypto/virtio/virtio_crypto_core.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
+>> b/drivers/crypto/virtio/virtio_crypto_core.c
+>> index 60490ffa3df1..f67e0d4c1b0c 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_core.c
+>> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+>> @@ -144,7 +144,8 @@ static int virtcrypto_find_vqs(struct virtio_crypto *vi)
+>>   		spin_lock_init(&vi->data_vq[i].lock);
+>>   		vi->data_vq[i].vq = vqs[i];
+>>   		/* Initialize crypto engine */
+>> -		vi->data_vq[i].engine = crypto_engine_alloc_init(dev, 1);
+>> +		vi->data_vq[i].engine = crypto_engine_alloc_init_and_set(dev, true,
+>> NULL, 1,
+>> +						virtqueue_get_vring_size(vqs[i]));
+> 
+> Here the '1' can be 'true' too.
+> 
+> Sure, you can add
+> 
+> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+> 
+> Regards,
+> -Gonglei
+> 
+>>   		if (!vi->data_vq[i].engine) {
+>>   			ret = -ENOMEM;
+>>   			goto err_engine;
+>> --
+>> 2.20.1
+> 
 
-     * memzero_explicit - Fill a region of memory (e.g. sensitive
-     *			  keying data) with 0s.
+Thanks to Lei!
 
-I'm going to drop this patch.
-
-Thanks,
+Hi, Michael
+I would appreciate it if you could apply this minor change, or I send 
+the v6 series, which one do you prefer?
 
 -- 
-Giovanni
+zhenwei pi
