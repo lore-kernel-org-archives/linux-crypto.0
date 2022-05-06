@@ -2,109 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89F4C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6553C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 09:54:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235260AbiEFJoz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 05:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56384 "EHLO
+        id S1345366AbiEFJ55 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 05:57:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390707AbiEFJo3 (ORCPT
+        with ESMTP id S236473AbiEFJ54 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 05:44:29 -0400
-Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA045140CC;
-        Fri,  6 May 2022 02:40:45 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.west.internal (Postfix) with ESMTP id B9A263200AC4;
-        Fri,  6 May 2022 05:40:43 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Fri, 06 May 2022 05:40:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1651830043; x=1651916443; bh=MnXUONzLP/
-        KGclCY+1LYfcxNnDi042TfsCcfwTXLgqU=; b=jgrcpdiD9IjHrphjGuAPUcSvjv
-        QmPn4DH/TNP0ZG2lyzGw0d4KDayYASKr2mmf1rTdTAl3LrGykuK76dtCn8uESdps
-        phPC+IMAToTQ+6nN8uniKC840aDL++YlVxeWZerjDN0EhSJbmkUi02fwRY8q6pX4
-        BWdzqnnP9O1cQBOEUbwOWZBGyrE68UHx96bc+MsbfdSF//RpXn/5N7ldjdXA6maa
-        6DTXp1z/lKpk//dFX8aj50MTVNexFBhIdkpyP6pRzN+df1yGZWrCy0fx1deOkQP0
-        56nm3EIaJp6GrWDQpHq4T4AgX4GkAwd4GmemXoiXkkpZfIDhUBPn7O9S3s3w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1651830043; x=
-        1651916443; bh=MnXUONzLP/KGclCY+1LYfcxNnDi042TfsCcfwTXLgqU=; b=g
-        q3DI65ontVYJ80dqoA4y07oiifYM68FUiZvyUb6jLNYihnz7JRR7tKaEdrufoDAj
-        sIuYlzvTF517+rREiuAagZZC0XaWwftOJ1hH9dCc9VwHsWVC5dEUXLUV0yEdxo9d
-        PNTbYPmWdocVhzrqATqkw4s+H5G5/VCPQgtApALX3r15Ox1RNI85KShl6QcJG5+G
-        mVxVGyRWQfdNrc6+fQcmN7pfYUL1NmYSE3FTOeg6ajE48MWOLOwmUnRAkHOceMGM
-        H87R4UwdKSGAVlkb508FvSoALGuI6ehuvNydURz/NLl3tfDr24mA22qyeeK0aqxi
-        viSrLOtxAwjUNh/CnD7lA==
-X-ME-Sender: <xms:G-10YoAyiy0zZGVrY8dJMlU3DUs8IUvu9OQgdKnycsSbKSxXSIrgng>
-    <xme:G-10YqicmUkr18W-ClTabmcbuI07vyJJmRcz6noqs8LlyFeeJ4bW9spn12SZqfh_W
-    Nr9SLhvoXhmvA>
-X-ME-Received: <xmr:G-10Yrn7Zms4c27xYgm_wBhD2CDFY09agVoSWKyie-umio4inFlI6orEVS9H>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeefgddujecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvve
-    dvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
-    drtghomh
-X-ME-Proxy: <xmx:G-10YuzPcAJR4WDwKgUe-md7VVi1VAo5N3NwqYSOxwdaFGgehSeySA>
-    <xmx:G-10YtRTqvb6UvwiwqlZpvPr8x8XdxgU0itnCEjS030rHstPJ-C1vA>
-    <xmx:G-10YpbFLK489fBQySVHlhcctxkXaYn6mMzRPbSL46T6U148mb276w>
-    <xmx:G-10YsLXAK_kmTbJWrdzf4YJJiZ8ZojJsWnujgI2KHefivGJIdWZlA>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 6 May 2022 05:40:42 -0400 (EDT)
-Date:   Fri, 6 May 2022 11:40:39 +0200
-From:   Greg KH <greg@kroah.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+        Fri, 6 May 2022 05:57:56 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF28867D28;
+        Fri,  6 May 2022 02:54:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651830853; x=1683366853;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=D2fOVPqK96/pXvpwlXxzgoBM06E6UgVfGVY77Vl/uHI=;
+  b=GOG57SAghjmheKyF65U2OmRp+KyJ1fnXS9a838VpTSmFys8gqEN9R2ve
+   M0Zkffb4CC/F3U22lUSzFL4BJWrJVwtyTlrEIjUjTx5ySYmCg7n5Gofxi
+   y7ARIkgDWSBbhKc50mZP0gi68RWxpJoZLVstfaDAmY1b8Oxb4+Ms6+48K
+   hBRQry5vTRflHxJKJ5jFtTROP+zjX1a9eQTQe0BVohsCrODlEitm+l5GE
+   fwF7ATFI3RMeTwAjcqMUsX0grdA/yeP/18lgWEb8rfq+ktdXvRo8l87Bm
+   Y47JJNEiaN8ScZzH61KfHa2y8eSP8VqzC5dOfGEzgl5oiw5jWS1Ai7jA2
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="331407505"
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="331407505"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:54:13 -0700
+X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
+   d="scan'208";a="621757997"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2022 02:54:10 -0700
+Date:   Fri, 6 May 2022 10:54:07 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
 Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
         qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
-        Marco Chiappero <marco.chiappero@intel.com>
-Subject: Re: [PATCH 02/12] crypto: qat - refactor submission logic
-Message-ID: <YnTtF82pxBMGje9f@kroah.com>
+        Adam Guerin <adam.guerin@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: Re: [PATCH 10/12] crypto: qat - use memzero_explicit() for algs
+Message-ID: <YnTwP/0WNvecE9SJ@silpixa00400314>
 References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
- <20220506082327.21605-3-giovanni.cabiddu@intel.com>
- <YnTpPoN9JZqjqvsG@kroah.com>
- <YnTsikYX23hfQDZt@silpixa00400314>
+ <20220506082327.21605-11-giovanni.cabiddu@intel.com>
+ <YnTo3zfXSXoEX2+R@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YnTsikYX23hfQDZt@silpixa00400314>
+In-Reply-To: <YnTo3zfXSXoEX2+R@kroah.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06, 2022 at 10:38:18AM +0100, Giovanni Cabiddu wrote:
-> On Fri, May 06, 2022 at 11:24:14AM +0200, Greg KH wrote:
-> > On Fri, May 06, 2022 at 09:23:17AM +0100, Giovanni Cabiddu wrote:
-> > > Move the submission loop to a new function, qat_alg_send_message(), and
-> > > share it between the symmetric and the asymmetric algorithms.
-> > > 
-> > > If the HW queues are full return -ENOSPC instead of -EBUSY.
-> > > 
-> > > For both symmetric and asymmetric services set the number of retries
-> > > before returning an error to a value that works for both, 20 (was 10 for
-> > > symmetric and 100 for asymmetric).
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > > Reviewed-by: Marco Chiappero <marco.chiappero@intel.com>
+On Fri, May 06, 2022 at 11:22:39AM +0200, Greg KH wrote:
+> On Fri, May 06, 2022 at 09:23:25AM +0100, Giovanni Cabiddu wrote:
+> > Use memzero_explicit(), instead of a memset(.., 0, ..) in the
+> > implementation of the algorithms, for buffers containing sensitive
+> > information to ensure they are wiped out before free.
 > > 
-> > What does this "fix" to require it to be backported to stable trees?
-> For two reasons, (1) the error code returned if the HW queues are full is
-> incorrect and (2) to facilitate the backport of the next fix "crypto:
-> qat - add backlog mechanism".
-> I can be more explicit in the commit message if required.
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
+> > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+> > ---
+> >  drivers/crypto/qat/qat_common/qat_algs.c      | 20 +++++++++----------
+> >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 20 +++++++++----------
+> >  2 files changed, 20 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
+> > index 873533dc43a7..c42df18e02b2 100644
+> > --- a/drivers/crypto/qat/qat_common/qat_algs.c
+> > +++ b/drivers/crypto/qat/qat_common/qat_algs.c
+> > @@ -637,12 +637,12 @@ static int qat_alg_aead_newkey(struct crypto_aead *tfm, const u8 *key,
+> >  	return 0;
+> >  
+> >  out_free_all:
+> > -	memset(ctx->dec_cd, 0, sizeof(struct qat_alg_cd));
+> > +	memzero_explicit(ctx->dec_cd, sizeof(struct qat_alg_cd));
+> 
+> This is for structure fields, why does memset() not work properly here?
+> The compiler should always call this, it doesn't know what
+> dma_free_coherent() does.  You are referencing this pointer after the
+> memset() call so all should be working as intended here.
+> 
+> Because of this, I don't see why this change is needed.  Do you have
+> reports of compilers not calling memset() for all of this properly?
+Apologies, I had a wrong assumption.
+Based on a comment in the memzero_explicit() documentation I assumed it
+should be always used to zero sensitive data.
 
-Please always be explicit in the commit message, it's the only way to
-communicate this type of thing.
+     * memzero_explicit - Fill a region of memory (e.g. sensitive
+     *			  keying data) with 0s.
 
-thanks,
+I'm going to drop this patch.
 
-greg k-h
+Thanks,
+
+-- 
+Giovanni
