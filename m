@@ -2,76 +2,158 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BC0C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 10:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3312DC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 May 2022 10:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390956AbiEFK1M (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 06:27:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37006 "EHLO
+        id S239795AbiEFK4F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 6 May 2022 06:56:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390953AbiEFK1L (ORCPT
+        with ESMTP id S231966AbiEFK4E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 06:27:11 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5500063BF4;
-        Fri,  6 May 2022 03:23:29 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nmv7K-00AgLS-Hp; Fri, 06 May 2022 20:23:24 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 May 2022 18:23:22 +0800
-Date:   Fri, 6 May 2022 18:23:22 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
-Message-ID: <YnT3GtU975OsXVuN@gondor.apana.org.au>
-References: <20220501130749.1123387-1-masahiroy@kernel.org>
+        Fri, 6 May 2022 06:56:04 -0400
+Received: from ssl.serverraum.org (ssl.serverraum.org [IPv6:2a01:4f8:151:8464::1:2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36CF65C362;
+        Fri,  6 May 2022 03:52:19 -0700 (PDT)
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ssl.serverraum.org (Postfix) with ESMTPSA id EE63522246;
+        Fri,  6 May 2022 12:52:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1651834336;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hBTLRDXX7HYWGSCeHSGr2YftxW57WhXM3Qvb9yVkUQk=;
+        b=hAWKHoWNoWZfeKBbrvLwwZUOCIaV0Huaxz+PHJqpLVZdnH/5+RDd/z4htrynCe85SCOmNw
+        Jgv/BprTb1DY6+XBz0tjeqOTmMSU13D8llXKPYwvLrHE98OCaqSFNuaY24kEjvMFVy68h1
+        NH7Id3QryZVY5LUiKPbvxjEB004JDC4=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220501130749.1123387-1-masahiroy@kernel.org>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 06 May 2022 12:52:13 +0200
+From:   Michael Walle <michael@walle.cc>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        Tim Harvey <tharvey@gateworks.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v9 0/7] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+In-Reply-To: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
+References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <49e1738c55c73819ee0e2cac0be74d81@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, May 01, 2022 at 10:07:49PM +0900, Masahiro Yamada wrote:
-> I notieced the log is not properly aligned:
+Am 2022-05-06 08:25, schrieb Ahmad Fatoum:
+> Series applies on top of v5.18-rc5. Would be great if this could make 
+> it
+> into v5.19.
 > 
->   PERL drivers/crypto/vmx/aesp8-ppc.S
->   CC [M]  fs/xfs/xfs_reflink.o
->   PERL drivers/crypto/vmx/ghashp8-ppc.S
->   CC [M]  drivers/crypto/vmx/aes.o
+> v8 was here:
+> https://lore.kernel.org/linux-integrity/09e2552c-7392-e1da-926b-53c7db0b118d@pengutronix.de
 > 
-> Add some spaces after 'PERL'.
+> Changelog is beneath each individual patch. Compared to v8, only code
+> change is checking whether CAAM can support blobbing at init-time as
+> apparently some Layerscape SoCs are available in a non-E(ncryption)
+> variant that doesn't do AES. Previously, adding trusted keys on such
+> SoCs would return an error with a cryptic error message.
 > 
-> While I was here, I cleaned up the Makefile:
 > 
->  - Merge the two similar rules
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP 
+> core
+> built into many newer i.MX and QorIQ SoCs by NXP.
 > 
->  - Remove redundant 'clean-files' (Having 'targets' is enough)
+> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> never-disclosed device-specific key.
 > 
->  - Move the flavour into the build command
+> There has been multiple discussions on how to represent this within the 
+> kernel:
 > 
-> This still avoids the build failures fixed by commit 4ee812f6143d
-> ("crypto: vmx - Avoid weird build failures").
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP 
+> core
+> built into many newer i.MX and QorIQ SoCs by NXP.
 > 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> never-disclosed device-specific key. There has been multiple
+> discussions on how to represent this within the kernel:
 > 
->  drivers/crypto/vmx/Makefile | 17 +++--------------
->  1 file changed, 3 insertions(+), 14 deletions(-)
+>  - [RFC] crypto: caam - add red blobifier
+>    Steffen implemented[1] a PoC sysfs driver to start a discussion on 
+> how to
+>    best integrate the blob mechanism.
+>    Mimi suggested that it could be used to implement trusted keys.
+>    Trusted keys back then were a TPM-only feature.
+> 
+>  - security/keys/secure_key: Adds the secure key support based on CAAM.
+>    Udit Agarwal added[2] a new "secure" key type with the CAAM as 
+> backend.
+>    The key material stays within the kernel only.
+>    Mimi and James agreed that this needs a generic interface, not 
+> specific
+>    to CAAM. Mimi suggested trusted keys. Jan noted that this could 
+> serve as
+>    basis for TEE-backed keys.
+> 
+>  - [RFC] drivers: crypto: caam: key: Add caam_tk key type
+>    Franck added[3] a new "caam_tk" key type based on Udit's work. This 
+> time
+>    it uses CAAM "black blobs" instead of "red blobs", so key material 
+> stays
+>    within the CAAM and isn't exposed to kernel in plaintext.
+>    James voiced the opinion that there should be just one user-facing 
+> generic
+>    wrap/unwrap key type with multiple possible handlers.
+>    David suggested trusted keys.
+> 
+>  - Introduce TEE based Trusted Keys support
+>    Sumit reworked[4] trusted keys to support multiple possible backends 
+> with
+>    one chosen at boot time and added a new TEE backend along with TPM.
+>    This now sits in Jarkko's master branch to be sent out for v5.13
+> 
+> This patch series builds on top of Sumit's rework to have the CAAM as
+> yet another
+> trusted key backend.
+> 
+> The CAAM bits are based on Steffen's initial patch from 2015. His work 
+> had been
+> used in the field for some years now, so I preferred not to deviate
+> too much from it.
+> 
+> This series has been tested with dmcrypt[5] on an i.MX6Q/DL and an 
+> i.MX8M[6].
+> 
+> Looking forward to your feedback.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+For the whole series:
+
+Tested-by: Michael Walle <michael@walle.cc> # on ls1028a (non-E and E)
+
+-michael
