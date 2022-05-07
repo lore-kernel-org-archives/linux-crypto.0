@@ -2,94 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 728FFC433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 05:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C40C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 08:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445648AbiEGFaa (ORCPT
+        id S1383752AbiEGIpf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 May 2022 01:30:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56040 "EHLO
+        Sat, 7 May 2022 04:45:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445593AbiEGFaZ (ORCPT
+        with ESMTP id S1383733AbiEGIpe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 May 2022 01:30:25 -0400
-Received: from conssluserg-02.nifty.com (conssluserg-02.nifty.com [210.131.2.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667916FA3A;
-        Fri,  6 May 2022 22:26:23 -0700 (PDT)
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id 2475Q3fC030972;
-        Sat, 7 May 2022 14:26:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-02.nifty.com 2475Q3fC030972
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1651901164;
-        bh=FfZkot1xX9/3A26jW6H/8b0WNAiDAR0EcY13U3/8Ct0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Q+FER/8w3E5h6Qsm1RElS6vuq+ZL8wApsSglUlUn9U53jWyLp4y2P9SBNF7xHSyT7
-         dKPa+Zt/YnrZct/IS0ChkpJ8UcISu5zND744AU65GLgiowTHpT35Rr5ZQltemvoXwr
-         xZIwgYJG0zYOuI7Oi68kS37hvB1an9E/7eMoI8gIXLBUoWSoUHspfjE8vBtnhARFzQ
-         UX4Hwe+oeLR/svhlTocHsw54+9/U741E8el6WSuEX08MF3aHwrarABm6bLQ8KPikMG
-         G/Uz8u7p6vEN9ROSAjf59+3jJxaS9SFrkq0Y12NJQrgfAuwFDFNjFYNkHXwI1sibAT
-         VgFZuCMCI8KGw==
-X-Nifty-SrcIP: [209.85.214.177]
-Received: by mail-pl1-f177.google.com with SMTP id d22so9272567plr.9;
-        Fri, 06 May 2022 22:26:03 -0700 (PDT)
-X-Gm-Message-State: AOAM533scEs/vByiND3hk9Ip1uikIKv0ja5UNlQldFT+V8gcPNS4v7/Z
-        LDqGE4zl2RviDMVdAItKEJg6wnbgcZfXQR7zMCM=
-X-Google-Smtp-Source: ABdhPJz/0IPfWjlKJGTu0YSnMBSWgwcJp83smiYNjc8NlYMvw4l6ht/5A57T92PaEldUnyvY+t3vLEb0KSQNQvhbfZs=
-X-Received: by 2002:a17:902:9887:b0:151:6e1c:7082 with SMTP id
- s7-20020a170902988700b001516e1c7082mr7014096plp.162.1651901162954; Fri, 06
- May 2022 22:26:02 -0700 (PDT)
+        Sat, 7 May 2022 04:45:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C86093F304
+        for <linux-crypto@vger.kernel.org>; Sat,  7 May 2022 01:41:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651912907;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pH/8q4WWU1F57uoZuiEXN9uHXlw/jrDUSuY49/KnKJw=;
+        b=XnlBjqlNMMhQWursFY6HaANegJABInZXYtHnLusS/w38WdKjUdO/sftkkMVIYkJ+0gWijt
+        TGJpUPv7dAWjTnBmiq88QRFZEDw0esipV7NLFtGa996X31kB9ajnU8WtkFoOdL9eBFVON+
+        AKiQWkgU9NwAE0EMw0rRq0TzZberYuU=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-583-IyRHl51iNSmzypx0h1FHww-1; Sat, 07 May 2022 04:41:45 -0400
+X-MC-Unique: IyRHl51iNSmzypx0h1FHww-1
+Received: by mail-yb1-f198.google.com with SMTP id z14-20020a5b0b0e000000b0064848b628cfso8163064ybp.0
+        for <linux-crypto@vger.kernel.org>; Sat, 07 May 2022 01:41:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pH/8q4WWU1F57uoZuiEXN9uHXlw/jrDUSuY49/KnKJw=;
+        b=5gjWT5Aw3lsTJ4x32SbzCFjeO5U0PckcKT4f9IbptjO/1nbYQp/yUdgXDqqUKOccMV
+         Z+Z6/z0mkDEZsQsoGeDcvFg5UdPyNf7b5PAz1eM/Az/LxHg8gRgLIWCfxMvgCctLSni0
+         VAtOAOb/jav8mjS6BU1noUIr/cTnu5QXhkiqIWo3EkaTJO/6wMfYjz6U6o9lCW469U32
+         nMPvfKy6pEx7ORGOLBUuyDyrdPg7GiK3Hk26vo0ka7NQ+IArHOrbKcY6hM5tmqdXnjJJ
+         t3jvFM71wyfC2/0PiFZUH8cSpYMA2k27kVQ0Z/TJ9j0HaFlxNpYw4NnpfdNpiBReuMuz
+         owYQ==
+X-Gm-Message-State: AOAM532wDlxReEZRo0lJ4d91VKmZR6oXi9tMAbkZ4GYVDLQpwP0F7J1d
+        0/WtMMfVuqat1rXx3aSq2v8C5e6Xkvx0525KbJoX/kSuwSkO/LncgIEvHtON3hoszPidp/wbElr
+        qpN36Nc4Y8ASsGp02tDPLikxiNWzTKV+ftyXKRnM6
+X-Received: by 2002:a25:d209:0:b0:648:370f:573c with SMTP id j9-20020a25d209000000b00648370f573cmr5570210ybg.255.1651912904428;
+        Sat, 07 May 2022 01:41:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyL8lHgmhm01MbdmhDDqtcHd5MtPPN2X8/3Y6Vo0COEyOTfbsiMCUsGQj/N/qrO0ZhjLJ/gcTEuPNxd2WmE35I=
+X-Received: by 2002:a25:d209:0:b0:648:370f:573c with SMTP id
+ j9-20020a25d209000000b00648370f573cmr5570202ybg.255.1651912904261; Sat, 07
+ May 2022 01:41:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220501130749.1123387-1-masahiroy@kernel.org>
- <YnT3GtU975OsXVuN@gondor.apana.org.au> <CAK7LNASkQ_14NYu7K_eEOG4boBMpKEXyrOzDJMOjcT5paC7E1A@mail.gmail.com>
- <YnXTPPXRlCpUvoKz@gondor.apana.org.au>
-In-Reply-To: <YnXTPPXRlCpUvoKz@gondor.apana.org.au>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Sat, 7 May 2022 14:24:54 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAReyv20PAb1LdkoBhR_x1pvLQJA7a=jMZYf11TmK9h-iQ@mail.gmail.com>
-Message-ID: <CAK7LNAReyv20PAb1LdkoBhR_x1pvLQJA7a=jMZYf11TmK9h-iQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
+References: <20220503115010.1750296-1-omosnace@redhat.com> <YnFUH6nyVs8fBgED@x1>
+In-Reply-To: <YnFUH6nyVs8fBgED@x1>
+From:   Ondrej Mosnacek <omosnace@redhat.com>
+Date:   Sat, 7 May 2022 10:41:32 +0200
+Message-ID: <CAFqZXNsQK-0knY-W4YojJEFapJyWZBsf9sE=L=0drXnb4SPQeA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: qcom-rng - fix infinite loop on requests not
+ multiple of WORD_SZ
+To:     Brian Masney <bmasney@redhat.com>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+        linux-arm-msm@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        Linux Stable maillist <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 7, 2022 at 11:02 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Tue, May 3, 2022 at 6:11 PM Brian Masney <bmasney@redhat.com> wrote:
+> On Tue, May 03, 2022 at 01:50:10PM +0200, Ondrej Mosnacek wrote:
+> > The commit referenced in the Fixes tag removed the 'break' from the else
+> > branch in qcom_rng_read(), causing an infinite loop whenever 'max' is
+> > not a multiple of WORD_SZ. This can be reproduced e.g. by running:
+> >
+> >     kcapi-rng -b 67 >/dev/null
+> >
+> > There are many ways to fix this without adding back the 'break', but
+> > they all seem more awkward than simply adding it back, so do just that.
+> >
+> > Tested on a machine with Qualcomm Amberwing processor.
+> >
+> > Fixes: a680b1832ced ("crypto: qcom-rng - ensure buffer for generate is completely filled")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 >
-> On Sat, May 07, 2022 at 12:25:32AM +0900, Masahiro Yamada wrote:
-> >
-> > Sorry, I just noticed the 0day bot had reported the error.
-> >
-> > I sent v2.    (CONFIG_LITTLE_ENDIAN  --> CONFIG_CPU_LITTLE_ENDIAN)
-> >
-> > https://lore.kernel.org/lkml/20220506150820.1310802-1-masahiroy@kernel.org/
-> >
-> >
-> > Could you replace it, or fix it up, please?
+> Reviewed-by: Brian Masney <bmasney@redhat.com>
 >
-> Please send me an incremental patch.
+> We should add '# 5.17+' to the end of the stable line.
 
-Done.
-
-BTW, you added a wrong Reported-by tag:
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=b52455a73db95ef90fd3c2be84db77b55be43f46
-
-It is a clean up patch, where 0day bot did not report anything.
-
-
-
+Is that really relied upon any more? AFAIK, the stable maintainer(s)
+already compute the target versions from the Fixes: tag. And the
+version based on the original commit would be inaccurate in many
+cases, as the commit may have been already backported to earlier
+streams and you need to patch those as well. Thus, I believe it's
+better to leave out the version hint and force people to look up the
+Fixes: commit instead, which is more reliable. Also if you grep the
+latest mainline commits for 'Cc: stable@vger.kernel.org', you'll see
+that most commits don't include the version hint any more.
 
 -- 
-Best Regards
-Masahiro Yamada
+Ondrej Mosnacek
+Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
+
