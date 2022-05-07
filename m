@@ -2,160 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9031EC433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 13:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B36C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 18:52:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381276AbiEGNyl (ORCPT
+        id S1352775AbiEGS4D (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 May 2022 09:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37912 "EHLO
+        Sat, 7 May 2022 14:56:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356732AbiEGNyk (ORCPT
+        with ESMTP id S241402AbiEGS4B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 May 2022 09:54:40 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 361B24667D
-        for <linux-crypto@vger.kernel.org>; Sat,  7 May 2022 06:50:52 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-41-00ltXLBqOpWSmzzcA63DIw-1; Sat, 07 May 2022 14:50:50 +0100
-X-MC-Unique: 00ltXLBqOpWSmzzcA63DIw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.32; Sat, 7 May 2022 14:50:49 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.033; Sat, 7 May 2022 14:50:49 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
-CC:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "Filipe Manana" <fdmanana@suse.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [patch 3/3] x86/fpu: Make FPU protection more robust
-Thread-Topic: [patch 3/3] x86/fpu: Make FPU protection more robust
-Thread-Index: AQHYYG+YWY1FRr4hzkKhJKBT7m/w1q0QJdtAgAI7WgCAAQNXkA==
-Date:   Sat, 7 May 2022 13:50:49 +0000
-Message-ID: <035e10aba0904420ba83f4ea56a3e14b@AcuMS.aculab.com>
-References: <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
- <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
- <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
- <YnMkRLcxczMxdE5z@zx2c4.com> <87h764ixjs.ffs@tglx>
- <YnOuqh4YZT8ww96W@zx2c4.com>
- <1f4918f734d14e3896071d3c7de1441d@AcuMS.aculab.com>
- <YnWiasChfzbEP67C@zx2c4.com>
-In-Reply-To: <YnWiasChfzbEP67C@zx2c4.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sat, 7 May 2022 14:56:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58B46353;
+        Sat,  7 May 2022 11:52:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4A4B7B80BA3;
+        Sat,  7 May 2022 18:52:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C7B7C385A6;
+        Sat,  7 May 2022 18:52:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651949530;
+        bh=9z+0Uhzj5HvNSbWx5E2/P4ju5NxGmTVepjaKhY7U7aY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hF3XHaR4bzcqjVTTDMGuwcsYwob+vCce124Wf0CpxQ9hf4H+qDXwA0bNai6fo+Nys
+         SnyCvvIF0E5quKbHYFTBQpmzhh4FJcgHqMQn5m3BINdR7wofX/nk80XIlpGKEbVRsm
+         B04vQpYiXuNJuDrE2nUUDopaeAFCQQPBcXKBB5tcwuVS9qyzZwYMprI/8aPHvuiZ/M
+         3CdM5LYsmH3eQKfP/ghop8NOlv1Ajt3CM8/Rl4BZMYaTdgLE7o51PJ5xL/79FjFJVN
+         x/XBjn0Al0JyjnHX6eVGzp/Elrmmph243QssvChVAzh8lcR6wm+tQ6A9l+KuGcVZz9
+         qEgem64Y6kH9g==
+Date:   Sat, 7 May 2022 11:52:08 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
+        Adam Guerin <adam.guerin@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: Re: [PATCH 07/12] crypto: qat - set to zero DH parameters before free
+Message-ID: <Yna/2Iwdr8zcwi+q@sol.localdomain>
+References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
+ <20220506082327.21605-8-giovanni.cabiddu@intel.com>
+ <YnTpJkTXwmYyE9lQ@kroah.com>
+ <YnTx7fs30scrrjmQ@silpixa00400314>
+ <YnUzsAQd682pJjMt@kroah.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnUzsAQd682pJjMt@kroah.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDA2IE1heSAyMDIyIDIzOjM0DQo+IA0K
-PiBIaSBEYXZpZCwNCj4gDQo+IE9uIFRodSwgTWF5IDA1LCAyMDIyIGF0IDExOjM0OjQwQU0gKzAw
-MDAsIERhdmlkIExhaWdodCB3cm90ZToNCj4gPiBPVE9IIHRoZSBlbnRyb3B5IG1peGluZyBpcyB2
-ZXJ5IGxpa2VseSB0byBiZSAnY29sZCBjYWNoZScNCj4gPiBhbmQgYWxsIHRoZSB1bnJvbGxpbmcg
-aW4gYmxha2VzNyB3aWxsIGNvbXBsZXRlbHkga2lsbA0KPiA+IHBlcmZvcm1hbmNlLg0KPiANCj4g
-SSd2ZSBzZWVuIHlvdSBtZW50aW9uIHRoZSBCTEFLRTJzIHVucm9sbGluZyBpbiBsaWtlIDggZGlm
-ZmVyZW50IHRocmVhZHMNCj4gbm93LCBhbmQgSSdtIG5vdCBjb252aW5jZWQgdGhhdCB5b3UncmUg
-ZW50aXJlbHkgd3JvbmcsIG5vciBhbSBJDQo+IGNvbnZpbmNlZCB0aGF0IHlvdSdyZSBlbnRpcmVs
-eSByaWdodC4gTXkgcmVzcG9uc2UgdG8geW91IGlzIHRoZSBzYW1lIGFzDQo+IGFsd2F5czogcGxl
-YXNlIHNlbmQgYSBwYXRjaCB3aXRoIHNvbWUgbWVhc3VyZW1lbnRzISBJJ2QgbG92ZSB0byBnZXQg
-dGhpcw0KPiB3b3JrZWQgb3V0IGluIGEgcmVhbCB3YXkuDQo+IA0KPiBUaGUgbGFzdCB0aW1lIEkg
-d2VudCBiZW5jaGluZyB0aGVzZSwgdGhlIHVucm9sbGVkIGNvZGUgd2FzIH4xMDAgY3ljbGVzDQo+
-IGZhc3RlciwgaWYgSSByZWNhbGwgY29ycmVjdGx5LCB0aGFuIHRoZSByb2xsZWQgY29kZSwgd2hl
-biB1c2VkIGZyb20NCj4gV2lyZUd1YXJkJ3MgaG90IHBhdGguIEkgZG9uJ3QgZG91YnQgdGhhdCBh
-IGNvbGQgcGF0aCB3b3VsZCBiZSBtb3JlDQo+IGZyYXVnaHQsIHRob3VnaCwgYXMgdGhhdCdzIGEg
-ZGVjZW50IGFtb3VudCBvZiBjb2RlLiBTbyB0aGUgcXVlc3Rpb24gaXMNCj4gaG93IHRvIHJlLXJv
-bGwgdGhlIHJvdW5kcyB3aXRob3V0IHNhY3JpZmljaW5nIHRob3NlIDEwMCBjeWNsZXMuDQo+IA0K
-PiBJbiBvcmRlciB0byBiZWdpbiB0byBmaWd1cmUgdGhhdCBvdXQsIHdlIGhhdmUgdG8gbG9vayBh
-dCB3aHkgdGhlDQo+IHJlLXJvbGxlZCBsb29wIGlzIHNsb3cgYW5kIHRoZSB1bnJvbGxlZCBsb29w
-IGZhc3QuIEl0J3Mgbm90IGJlY2F1c2Ugb2YNCj4gY29tcGxpY2F0ZWQgcGlwZWxpbmUgdGhpbmdz
-LiBJdCdzIGJlY2F1c2UgdGhlIEJMQUtFMnMgcGVybXV0YXRpb24gaXMNCj4gYWN0dWFsbHkgMTAg
-ZGlmZmVyZW50IHBlcm11dGF0aW9ucywgb25lIGZvciBlYWNoIHJvdW5kLiBUYWtlIGEgbG9vayBh
-dA0KPiB0aGUgY29yZSBmdW5jdGlvbiwgRywgYW5kIGl0cyB1c2VzIG9mIHRoZSByb3VuZCBudW1i
-ZXIsIHI6DQo+IA0KPiAgICAgI2RlZmluZSBHKHIsIGksIGEsIGIsIGMsIGQpIGRvIHsgXA0KPiAg
-ICAgICAgIGEgKz0gYiArIG1bYmxha2Uyc19zaWdtYVtyXVsyICogaSArIDBdXTsgXA0KPiAgICAg
-ICAgIGQgPSByb3IzMihkIF4gYSwgMTYpOyBcDQo+ICAgICAgICAgYyArPSBkOyBcDQo+ICAgICAg
-ICAgYiA9IHJvcjMyKGIgXiBjLCAxMik7IFwNCj4gICAgICAgICBhICs9IGIgKyBtW2JsYWtlMnNf
-c2lnbWFbcl1bMiAqIGkgKyAxXV07IFwNCj4gICAgICAgICBkID0gcm9yMzIoZCBeIGEsIDgpOyBc
-DQo+ICAgICAgICAgYyArPSBkOyBcDQo+ICAgICAgICAgYiA9IHJvcjMyKGIgXiBjLCA3KTsgXA0K
-PiAgICAgfSB3aGlsZSAoMCkNCg0KRWFjaCBvZiB0aG9zZSBsaW5lcyBpcyBhIGNvdXBsZSBvZiBp
-bnN0cnVjdGlvbnMgYW5kIHRoZXkgYXJlDQphbGwgZGVwZW5kYW50IG9uIHRoZSBwcmVjZWRpbmcg
-dmFsdWUuDQpJIGNvdW50IDE0IC0gZXhjbHVkaW5nIHRoZSBtW10gYWNjZXNzZXMuDQpUaGVyZSBh
-cmUgODAgY29waWVzIG9mIEcoKSAtIHRvdGFsIDExMjAsIG9yIDE3LjUvYnl0ZS4NClRvIGdldCBh
-bnkgZmFzdGVyIHRoYW4gdGhhdCB5b3UgbmVlZCB0byBnZXQgdGhlIGNvbXBpbGVyDQp0byBpbnRl
-cmxlYXZlIHRoZSBnZW5lcmF0ZWQgY29kZSBmb3IgbXVsdGlwbGUgZXhwYW5zaW9ucyBvZiBHKCku
-DQoNCj4gVGhlIGJsYWtlMnNfc2lnbWEgYXJyYXkgaXMgYSBgc3RhdGljIGNvbnN0IHU4IGJsYWtl
-MnNfc2lnbWFbMTBdWzE2XWAsDQo+IHdpdGggYSByb3cgZm9yIGV2ZXJ5IG9uZSBvZiB0aGUgMTAg
-cm91bmRzLiBXaGF0IHRoaXMgaXMgYWN0dWFsbHkgZG9pbmcNCj4gaXMgcmVhZGluZyB0aGUgbWVz
-c2FnZSB3b3JkcyBpbiBhIGRpZmZlcmVudCBvcmRlciBlYWNoIHJvdW5kLCBzbyB0aGF0DQo+IHRo
-ZSB3aG9sZSBwZXJtdXRhdGlvbiBpcyBkaWZmZXJlbnQuDQo+IA0KPiBXaGVuIHRoZSBsb29wIGlz
-IHVucm9sbGVkLCBibGFrZTJzX3NpZ21hIGdldHMgaW5saW5lZCwgYW5kIHRoZW4gdGhlcmUNCj4g
-YXJlIG5vIG1lbW9yeSBhY2Nlc3Nlcy4gV2hlbiBpdCdzIHJlLXJvbGxlZCwgZXZlcnkgcm91bmQg
-YWNjZXNzZXMNCj4gYmxha2Uyc19zaWdtYSAxNiB0aW1lcywgd2hpY2ggaGluZGVycyBwZXJmb3Jt
-YW5jZS4NCg0KSXQgc2hvdWxkbid0IHJlYWxseSBtYWtlIG11Y2ggZGlmZmVyZW5jZS4NClRoZXJl
-IGFyZSBvbmx5IHR3byBtZW1vcnkgcmVhZHMgZm9yIGVhY2ggMTQgYXJpdGhtZXRpYyBvcHMuDQpT
-byB1bmxlc3MgeW91IG1hbmFnZSB0byBtYWludGFpbiA0IGluc3RydWN0aW9ucy9jbG9jayB0aGVy
-ZQ0KYXJlIHNwYXJlIGNsb2NrcyBmb3IgdGhlIGV4dHJhIG1lbW9yeSBjeWNsZXMuDQpBbnkgdGhh
-dCBpcyBhc3N1bWluZyBvbmUgcmVhZC9jbG9jaywgbW9kZXJuIHg4NiBjYW4gZG8gMg0KKHdpdGgg
-YSBmb2xsb3dpbmcgd2luZCEpDQpPbiB4ODYgdGhlIGFycmF5IGluZGV4IGlzIGZyZWUuDQoNCj4g
-WW91J2xsIG5vdGljZSwgb24gdGhlIG90aGVyIGhhbmQsIHRoYXQgdGhlIFNJTUQgaGFuZCBjb2Rl
-ZCBhc3NlbWJseQ0KPiBpbXBsZW1lbnRhdGlvbnMgZG8gbm90IHVucm9sbC4gVGhlIHRyaWNrIGlz
-IHRvIGhpZGUgdGhlIGNvc3Qgb2YgdGhlDQo+IGJsYWtlMnNfc2lnbWEgaW5kaXJlY3Rpb24gaW4g
-dGhlIGRhdGEgZGVwZW5kZW5jaWVzLCBzbyB0aGF0IHBlcmZvcm1hbmNlDQo+IGlzbid0IGFmZmVj
-dGVkLiBOYWl2ZWx5IHJlLXJvbGxpbmcgdGhlIGdlbmVyaWMgY29kZSBkb2VzIG5vdCBpbnNwaXJl
-IHRoZQ0KPiBjb21waWxlciB0byBkbyB0aGF0LiBCdXQgbWF5YmUgeW91IGNhbiBmaWd1cmUgc29t
-ZXRoaW5nIG91dD8NCg0KSSd2ZSBub3QgbG9va2VkIGF0IHRoYXQgdmVyc2lvbi4NCkkgaGF2ZSB3
-cml0dGVuIEFWWC9TU0UgY29kZSAtIGhhcmQgd29yayBmaW5kaW5nIHRoZSBhc20gbW51bW9uaWNz
-IQ0KDQo+IEFueXdheSwgdGhhdCdzIGFib3V0IHdoZXJlIG15IHRoaW5raW5nIGlzIG9uIHRoaXMs
-IGJ1dCBJJ2QgbG92ZSB0byBzZWUNCj4gc29tZSBwYXRjaGVzIGZyb20geW91IGF0IHNvbWUgcG9p
-bnQgaWYgeW91J3JlIGludGVyZXN0ZWQuDQoNCk9rIEkganVzdCByYW4gc29tZSB0ZXN0cyBsb29w
-aW5nIG92ZXIgdGhlIFJPVU5EKCkgd2l0aG91dCB1cGRhdGluZyB2W10uDQpUaGVzZSBhcmUgdXNp
-bmcgcmRwbWMgdG8gdGltZSBzaW5nbGUgY2FsbHMgLSBub3QgYXZlcmFnaW5nIG92ZXINCmEgbGFy
-Z2UgbnVtYmVyIG9mIGl0ZXJhdGlvbnMuDQoNCk9uIG15IGk3LTc3MDAgdGhlIHVucm9sbGVkIGxv
-b3AgaXMgYWJvdXQgNi4yIGNsb2Nrcy9ieXRlLg0KVGhlICdjb2xkIGNhY2hlJyBmb3IgYSBzaW5n
-bGUgNjQgYnl0ZSBibG9jayBpcyBhYm91dCAyMCBjbG9ja3MvYnl0ZS4NCg0KSWYgSSB1c2U6DQoJ
-Zm9yICh1MzIgaSA9IDA7IGkgPCAxMDsgaSsrKSBST1VORChpKTsNCml0IGRyb3BzIHRvIDcuOCBj
-bG9ja3MvYnl0ZSBidXQgdGhlIHNpbmdsZSBibG9jayBpcyBhYm91dCAxNS4NClBhcnQgb2YgdGhl
-IHByb2JsZW0gaXMgZXh0cmEgcmVnaXN0ZXIgc3BpbGxzIHRvIHN0YWNrLg0KDQpTbyB3ZSBwbGF5
-IHNvbWUgZ2FtZXM6DQpSZW1vdmUgdGhlIGJsYWtlMnNfc2lnbWFbXSBvdXQgb2YgRygpIGludG8g
-Uk9VTkQoKQ0Kc28gdGhlICdub3JtYWwnIGNvZGUgdXNlcyBST1VORChibGFrZTJzX3NpZ21hWzBd
-KSAoZXRjKS4NClRoZW4gd2UgY2FuIHVzZSB0aGUgbG9vcDoNCglmb3IgKGNvbnN0IHU4ICpicyA9
-ICZibGFrZTJzX3NpZ21hWzBdWzBdOyBicyA8IGVuZDsgYnMgKz0gMTYpDQoJCVJPVU5EKGJzKTsN
-Cih3aXRoIHNvbWUgYml0cyB0byBtYWtlIGl0IGNvbXBpbGUuKQ0KQW5ub3lpbmdseSB0aGF0IG1h
-a2VzIHRoZSBjb21waWxlciBzcGlsbCBhbGwgdGhlIGJzW10gdG8gc3RhY2suDQpBIGZldyBjYXJl
-ZnVsbHkgcGxhY2VkIGJhcnJpZXIoKSB3b3VsZCBoZWxwLg0KQnV0IHNpbXBsZXIgaXMgJ3ZvbGF0
-aWxlIGNvbnN0IHU4ICpicycuDQpUaGlzIGhhcyB0aGUgZGVzaXJlZCBlZmZlY3Qgb2YgaW50ZXJs
-ZWF2aW5nIHRoZSAnc2lnbWEnIHJlYWRzDQp3aXRoIHRoZSBidWZmZXIgb25lcy4NClRoaXMgZ2F2
-ZSBtZSA3LjIgY2xvY2tzL2J5dGUsIHNpbmdsZSBibG9jayBtYXliZSAxNC4NCg0KU28gYWJvdXQg
-MSBjbG9jay9ieXRlIChtYXliZSAxNSUpIHNsb3dlci4NCk9UT0ggaW4gbWFueSBjYXNlcyB0aGlz
-IGlzbid0IGNyaXRpY2FsLg0KDQpUaGUgY29sZCBjYWNoZSBjdXRvZmYgZm9yIHRoZSB1bnJvbGxl
-ZCBsb29wIGlzIGFyb3VuZCAyNTYgYnl0ZXMuDQoNClRoZSBvdGhlciBiaWcgZWZmZWN0IHRoZSB1
-bnJvbGxlZCBsb29wIGhhcyBmb3Igc21hbGwgYnVmZmVycw0KaXMgdGhhdCBpdCBkaXNwbGFjZXMg
-YSBsb3Qgb2YgY29kZSBmcm9tIHRoZSBpLWNhY2hlLg0KVGhhdCB3aWxsIG1ha2UgdGhlIHVucm9s
-bGVkIGNvZGUgd29yc2UgZm9yIG1hbnkgcmVhbCBzaXR1YXRpb25zLg0KDQpJIHN1c3BlY3QgdGhh
-dCB0aGUgY29tcGlsZXIgZW5kcyB1cCBzcGlsbGluZyBhbm90aGVyIHJlZ2lzdGVyIChvciAyKQ0K
-dG8gdGhlIHN0YWNrLg0KSGFuZCBhc3NlbWJseSBjb3VsZCBhdm9pZCB0aGF0Lg0KDQpJJ3ZlIG5v
-dCBsb29rZWQgYXQgd2hhdCBnZXRzIHNwaWxsZWQsIGdjYyBjYW4gbWFrZSBob3JyaWQgY2hvaWNl
-cy4NCkl0IG1pZ2h0IGJlIHdvcnRoIG1ha2luZyAoc2F5KSBhIGFuZCBjIHZvbGF0aWxlIChieSBz
-cGxpdHRpbmcgdltdKQ0KYW5kIHVzaW5nIGEgdGVtcG9yYXJ5IGluIEcoKSwgZWc6DQoJYyA9IHQg
-PSBjICsgZDsNCgliID0gcm9yMzIoYiBeIHQsIDEyKTsNCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVy
-ZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5
-bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+On Fri, May 06, 2022 at 04:41:52PM +0200, Greg KH wrote:
+> On Fri, May 06, 2022 at 11:01:17AM +0100, Giovanni Cabiddu wrote:
+> > On Fri, May 06, 2022 at 11:23:50AM +0200, Greg KH wrote:
+> > > On Fri, May 06, 2022 at 09:23:22AM +0100, Giovanni Cabiddu wrote:
+> > > > Set to zero the DH context buffers containing the DH key before they are
+> > > > freed.
+> > > 
+> > > That says what, but not why.
+> > > 
+> > > > Cc: stable@vger.kernel.org
+> > > > Fixes: c9839143ebbf ("crypto: qat - Add DH support")
+> > > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > > > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
+> > > > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+> > > > ---
+> > > >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
+> > > >  1 file changed, 3 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > index d75eb77c9fb9..2fec89b8a188 100644
+> > > > --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > @@ -421,14 +421,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+> > > >  static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
+> > > >  {
+> > > >  	if (ctx->g) {
+> > > > +		memzero_explicit(ctx->g, ctx->p_size);
+> > > >  		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
+> > > 
+> > > Why is a memset() not sufficient here?
+> > Based on the previous conversation a memset() should be sufficient.
+> > 
+> > > And what is this solving?  Who would get this stale data?
+> > This is to make sure the buffer containing sensitive data (i.e. a key)
+> > is not leaked out by a subsequent allocation.
+> 
+> But as all sane distros have CONFIG_INIT_ON_ALLOC_DEFAULT_ON enabled,
+> right?  That should handle any worries you have with secrets being on
+> the heap.  But even then, are you trying to protect yourself against
+> other kernel modules?  Think this through...
+> 
 
+This patch looks fine to me; it's always recommended to zero out crypto keys at
+the end of their lifetime so that they can't be recovered from free memory if
+system memory is compromised before the memory happens to be allocated and
+overwritten again.  See the hundreds of existing callers of kfree_sensitive(),
+which exist for exactly this reason.
+
+Note that preventing the key from being "leaked out by a subsequent allocation"
+is *not* the point, and thus CONFIG_INIT_ON_ALLOC_DEFAULT_ON is irrelevant.
+
+- Eric
