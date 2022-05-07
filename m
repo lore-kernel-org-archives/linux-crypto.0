@@ -2,64 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BAE5C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 02:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B897DC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 05:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233379AbiEGCGa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 May 2022 22:06:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
+        id S1353470AbiEGF3a (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 7 May 2022 01:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231911AbiEGCGa (ORCPT
+        with ESMTP id S1343722AbiEGF33 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 May 2022 22:06:30 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91DA5FF3B;
-        Fri,  6 May 2022 19:02:43 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nn9mG-00Av3f-0V; Sat, 07 May 2022 12:02:37 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 07 May 2022 10:02:36 +0800
-Date:   Sat, 7 May 2022 10:02:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Sat, 7 May 2022 01:29:29 -0400
+Received: from conuserg-08.nifty.com (conuserg-08.nifty.com [210.131.2.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CC5186FA;
+        Fri,  6 May 2022 22:25:42 -0700 (PDT)
+Received: from grover.sesame (133-32-177-133.west.xps.vectant.ne.jp [133.32.177.133]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 2475NJLO010324;
+        Sat, 7 May 2022 14:23:20 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 2475NJLO010324
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1651901000;
+        bh=tyBhf7vinz91xAdojDk/vHB9k4N+USKeN0boS3UKMi0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=MyQqkfukocT4P6SYGHT9jyZdlJSEclUtI/bfhgZbIYQ5tjayEQa9Cg6OyS+Lj+a/J
+         TP+64xIcG86oTCOuQat8leqB0WqsLtw5yeGEvsXs71/WGMDGVUahHqpsOFo2VXBbI/
+         DV/MFv7PgLeMLuh83hbxX8WuU2vP4R88esyLH3CFe2W16wqCix0Jd6e6XiJZghowEF
+         YMcas1Ab9Q7fg08rTUgSQSfh34cxz7WEwxsYG9i3xykI4WvNOMLkJIwdCVnLThhkdX
+         mAhZeaZdVP7GALzFOBSGGTbhigZ2BokpGf1Ngrhre4L34CZS4k6BOwv2HDA9VgRYZ3
+         4i6U0iwtXly1A==
+X-Nifty-SrcIP: [133.32.177.133]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        kernel test robot <lkp@intel.com>,
         Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Nayna Jain <nayna@linux.ibm.com>,
         Paul Mackerras <paulus@samba.org>,
         Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH] crypto: vmx - Align the short log with Makefile cleanups
-Message-ID: <YnXTPPXRlCpUvoKz@gondor.apana.org.au>
-References: <20220501130749.1123387-1-masahiroy@kernel.org>
- <YnT3GtU975OsXVuN@gondor.apana.org.au>
- <CAK7LNASkQ_14NYu7K_eEOG4boBMpKEXyrOzDJMOjcT5paC7E1A@mail.gmail.com>
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH] crypto: vmx - Fix build error
+Date:   Sat,  7 May 2022 14:22:43 +0900
+Message-Id: <20220507052244.1426765-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASkQ_14NYu7K_eEOG4boBMpKEXyrOzDJMOjcT5paC7E1A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 07, 2022 at 12:25:32AM +0900, Masahiro Yamada wrote:
->
-> Sorry, I just noticed the 0day bot had reported the error.
-> 
-> I sent v2.    (CONFIG_LITTLE_ENDIAN  --> CONFIG_CPU_LITTLE_ENDIAN)
-> 
-> https://lore.kernel.org/lkml/20220506150820.1310802-1-masahiroy@kernel.org/
-> 
-> 
-> Could you replace it, or fix it up, please?
+When I refactored this Makefile, I accidentally changed the CONFIG
+option.
 
-Please send me an incremental patch.
+Fixes: b52455a73db9 ("crypto: vmx - Align the short log with Makefile cleanups")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
 
-Thanks,
+ drivers/crypto/vmx/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+index df93ba63b1cd..2560cfea1dec 100644
+--- a/drivers/crypto/vmx/Makefile
++++ b/drivers/crypto/vmx/Makefile
+@@ -3,7 +3,7 @@ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
+ vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
+ 
+ quiet_cmd_perl = PERL    $@
+-      cmd_perl = $(PERL) $< $(if $(CONFIG_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
++      cmd_perl = $(PERL) $< $(if $(CONFIG_CPU_LITTLE_ENDIAN), linux-ppc64le, linux-ppc64) > $@
+ 
+ targets += aesp8-ppc.S ghashp8-ppc.S
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.32.0
+
