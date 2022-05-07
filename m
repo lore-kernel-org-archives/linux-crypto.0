@@ -2,109 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B36C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 18:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA43C433FE
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 19:24:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352775AbiEGS4D (ORCPT
+        id S1345999AbiEGT2e (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 May 2022 14:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51360 "EHLO
+        Sat, 7 May 2022 15:28:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241402AbiEGS4B (ORCPT
+        with ESMTP id S231754AbiEGT2d (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 May 2022 14:56:01 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58B46353;
-        Sat,  7 May 2022 11:52:13 -0700 (PDT)
+        Sat, 7 May 2022 15:28:33 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC8B7193F8;
+        Sat,  7 May 2022 12:24:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4A4B7B80BA3;
-        Sat,  7 May 2022 18:52:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C7B7C385A6;
-        Sat,  7 May 2022 18:52:10 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 494D4CE0B8E;
+        Sat,  7 May 2022 19:24:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 012C8C385A5;
+        Sat,  7 May 2022 19:24:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651949530;
-        bh=9z+0Uhzj5HvNSbWx5E2/P4ju5NxGmTVepjaKhY7U7aY=;
+        s=k20201202; t=1651951482;
+        bh=MyfTcFDU6ZdDemzDXz07p3GqM6JlaSU35muvBx+cqsA=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hF3XHaR4bzcqjVTTDMGuwcsYwob+vCce124Wf0CpxQ9hf4H+qDXwA0bNai6fo+Nys
-         SnyCvvIF0E5quKbHYFTBQpmzhh4FJcgHqMQn5m3BINdR7wofX/nk80XIlpGKEbVRsm
-         B04vQpYiXuNJuDrE2nUUDopaeAFCQQPBcXKBB5tcwuVS9qyzZwYMprI/8aPHvuiZ/M
-         3CdM5LYsmH3eQKfP/ghop8NOlv1Ajt3CM8/Rl4BZMYaTdgLE7o51PJ5xL/79FjFJVN
-         x/XBjn0Al0JyjnHX6eVGzp/Elrmmph243QssvChVAzh8lcR6wm+tQ6A9l+KuGcVZz9
-         qEgem64Y6kH9g==
-Date:   Sat, 7 May 2022 11:52:08 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, vdronov@redhat.com, stable@vger.kernel.org,
-        Adam Guerin <adam.guerin@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH 07/12] crypto: qat - set to zero DH parameters before free
-Message-ID: <Yna/2Iwdr8zcwi+q@sol.localdomain>
-References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
- <20220506082327.21605-8-giovanni.cabiddu@intel.com>
- <YnTpJkTXwmYyE9lQ@kroah.com>
- <YnTx7fs30scrrjmQ@silpixa00400314>
- <YnUzsAQd682pJjMt@kroah.com>
+        b=nWa5DFGSnHM+5qK1Nz9q8zyDg/AOASCQqnvJ0DnomLwFqMBGsfWD4eNeKL/rCg1nQ
+         EAxoVoCdfC5PO27eZDd65kbixnFzkbauOLmcNodfPZbmJODG5WHub4CKwjK72WqsK6
+         wu2DiGRWmhYqAMz+waY7xpBzGk3I3x4sGM+T53TxtWKzcSy4Wbzy+xOXyCmlDjVg4k
+         bZI69rB9yME650ZZYxdYz3DehxpM+Xoobjwd7Fw7V9a/vuwOyop0cB780iDUKRWfiv
+         rsiJirftMUIYfEmAHlpFPiAqeQq/rRWKpGFhKGgBgL5DlNytyK3XrX19/ROQKmvX94
+         TfZCxf1m/Qo/g==
+Date:   Sat, 7 May 2022 22:26:16 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>, kernel@pengutronix.de,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Michael Walle <michael@walle.cc>,
+        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v9 7/7] MAINTAINERS: add KEYS-TRUSTED-CAAM
+Message-ID: <YnbH2Fgn/JFOU3Rf@iki.fi>
+References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
+ <20220506062553.1068296-8-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YnUzsAQd682pJjMt@kroah.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220506062553.1068296-8-a.fatoum@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 06, 2022 at 04:41:52PM +0200, Greg KH wrote:
-> On Fri, May 06, 2022 at 11:01:17AM +0100, Giovanni Cabiddu wrote:
-> > On Fri, May 06, 2022 at 11:23:50AM +0200, Greg KH wrote:
-> > > On Fri, May 06, 2022 at 09:23:22AM +0100, Giovanni Cabiddu wrote:
-> > > > Set to zero the DH context buffers containing the DH key before they are
-> > > > freed.
-> > > 
-> > > That says what, but not why.
-> > > 
-> > > > Cc: stable@vger.kernel.org
-> > > > Fixes: c9839143ebbf ("crypto: qat - Add DH support")
-> > > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > > > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
-> > > > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> > > > ---
-> > > >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > index d75eb77c9fb9..2fec89b8a188 100644
-> > > > --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > @@ -421,14 +421,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
-> > > >  static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
-> > > >  {
-> > > >  	if (ctx->g) {
-> > > > +		memzero_explicit(ctx->g, ctx->p_size);
-> > > >  		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
-> > > 
-> > > Why is a memset() not sufficient here?
-> > Based on the previous conversation a memset() should be sufficient.
-> > 
-> > > And what is this solving?  Who would get this stale data?
-> > This is to make sure the buffer containing sensitive data (i.e. a key)
-> > is not leaked out by a subsequent allocation.
+On Fri, May 06, 2022 at 08:25:53AM +0200, Ahmad Fatoum wrote:
+> Create a maintainer entry for CAAM trusted keys in the Linux keyring.
 > 
-> But as all sane distros have CONFIG_INIT_ON_ALLOC_DEFAULT_ON enabled,
-> right?  That should handle any worries you have with secrets being on
-> the heap.  But even then, are you trying to protect yourself against
-> other kernel modules?  Think this through...
+> Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> ---
+> v8 -> v9:
+>   - rewrite commit message (Jarkko)
+> v7 -> v8:
+>   - add Pankaj's Reviewed-by
+> v6 -> v7:
+>   - split off as separate patch (Jarkko)
+> 
+> To: Jarkko Sakkinen <jarkko@kernel.org>
+> To: James Bottomley <jejb@linux.ibm.com>
+> To: Mimi Zohar <zohar@linux.ibm.com>
+> To: David Howells <dhowells@redhat.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: "Horia Geantă" <horia.geanta@nxp.com>
+> Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> Cc: David Gstir <david@sigma-star.at>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: Sumit Garg <sumit.garg@linaro.org>
+> Cc: keyrings@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-integrity@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-security-module@vger.kernel.org
+> ---
+>  MAINTAINERS | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5e8c2f611766..e58e6fc3016d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10855,6 +10855,15 @@ S:	Supported
+>  F:	include/keys/trusted_tee.h
+>  F:	security/keys/trusted-keys/trusted_tee.c
+>  
+> +KEYS-TRUSTED-CAAM
+> +M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
+> +R:	Pengutronix Kernel Team <kernel@pengutronix.de>
+> +L:	linux-integrity@vger.kernel.org
+> +L:	keyrings@vger.kernel.org
+> +S:	Maintained
+> +F:	include/keys/trusted_caam.h
+> +F:	security/keys/trusted-keys/trusted_caam.c
+> +
+>  KEYS/KEYRINGS
+>  M:	David Howells <dhowells@redhat.com>
+>  M:	Jarkko Sakkinen <jarkko@kernel.org>
+> -- 
+> 2.30.2
 > 
 
-This patch looks fine to me; it's always recommended to zero out crypto keys at
-the end of their lifetime so that they can't be recovered from free memory if
-system memory is compromised before the memory happens to be allocated and
-overwritten again.  See the hundreds of existing callers of kfree_sensitive(),
-which exist for exactly this reason.
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-Note that preventing the key from being "leaked out by a subsequent allocation"
-is *not* the point, and thus CONFIG_INIT_ON_ALLOC_DEFAULT_ON is irrelevant.
-
-- Eric
+BR, Jarkko
