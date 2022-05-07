@@ -2,273 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4869BC4332F
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 12:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9031EC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 May 2022 13:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350833AbiEGMXP (ORCPT
+        id S1381276AbiEGNyl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 7 May 2022 08:23:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58830 "EHLO
+        Sat, 7 May 2022 09:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbiEGMXO (ORCPT
+        with ESMTP id S1356732AbiEGNyk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 7 May 2022 08:23:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B08A1A05F;
-        Sat,  7 May 2022 05:19:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A53961195;
-        Sat,  7 May 2022 12:19:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A89C385A5;
-        Sat,  7 May 2022 12:19:26 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="AABRZPsa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1651925964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fm20dKFLEN95Lca30SmFVNz0iun9FaCevlUQohqkehk=;
-        b=AABRZPsadmgcOUHlhsQtnOsFYvo6elhzEDB1GJ3/M1m7WXOGSBHZA3DR19O8+oASRouYm+
-        VrtK23nkdFwg9JsngQnRf47Smq/dJ0JpnTOcoFEg6lpoAGgruhvu9xRd5b/kEagFtaQ2/3
-        ZxD5m3l4Zh3WUGxQIWCA5ywDviCeo4I=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 25d93b7a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 7 May 2022 12:19:23 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] siphash: use one source of truth for siphash permutations
-Date:   Sat,  7 May 2022 14:19:09 +0200
-Message-Id: <20220507121909.974453-1-Jason@zx2c4.com>
+        Sat, 7 May 2022 09:54:40 -0400
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 361B24667D
+        for <linux-crypto@vger.kernel.org>; Sat,  7 May 2022 06:50:52 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-41-00ltXLBqOpWSmzzcA63DIw-1; Sat, 07 May 2022 14:50:50 +0100
+X-MC-Unique: 00ltXLBqOpWSmzzcA63DIw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Sat, 7 May 2022 14:50:49 +0100
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.033; Sat, 7 May 2022 14:50:49 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
+CC:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "Filipe Manana" <fdmanana@suse.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [patch 3/3] x86/fpu: Make FPU protection more robust
+Thread-Topic: [patch 3/3] x86/fpu: Make FPU protection more robust
+Thread-Index: AQHYYG+YWY1FRr4hzkKhJKBT7m/w1q0QJdtAgAI7WgCAAQNXkA==
+Date:   Sat, 7 May 2022 13:50:49 +0000
+Message-ID: <035e10aba0904420ba83f4ea56a3e14b@AcuMS.aculab.com>
+References: <YnKh96isoB7jiFrv@zx2c4.com> <87czgtjlfq.ffs@tglx>
+ <YnLOXZp6WgH7ULVU@zx2c4.com> <87wnf1huwj.ffs@tglx>
+ <YnMRwPFfvB0RlBow@zx2c4.com> <87mtfwiyqp.ffs@tglx>
+ <YnMkRLcxczMxdE5z@zx2c4.com> <87h764ixjs.ffs@tglx>
+ <YnOuqh4YZT8ww96W@zx2c4.com>
+ <1f4918f734d14e3896071d3c7de1441d@AcuMS.aculab.com>
+ <YnWiasChfzbEP67C@zx2c4.com>
+In-Reply-To: <YnWiasChfzbEP67C@zx2c4.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The SipHash family of permutations is currently used in three places:
-
-- siphash.c itself, used in the ordinary way it was intended to use.
-- random32.c, in a construction from an anonymous contributor.
-- random.c, as part of its fast_mix function.
-
-Each one of these places reinvents the wheel with the same C code, same
-rotation constants, and same symmetry-breaking constants.
-
-This commit tidies things up a bit by placing macros for the
-permutations and constants into siphash.h, where each of the three .c
-users can access them. It also leaves a note dissuading more users of
-them from emerging.
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c   | 30 +++++++-----------------------
- include/linux/prandom.h | 23 +++++++----------------
- include/linux/siphash.h | 28 ++++++++++++++++++++++++++++
- lib/siphash.c           | 32 ++++++++++----------------------
- 4 files changed, 52 insertions(+), 61 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index a04ecfcb4f1e..87cf739929be 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -53,6 +53,7 @@
- #include <linux/uuid.h>
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
-+#include <linux/siphash.h>
- #include <crypto/chacha.h>
- #include <crypto/blake2s.h>
- #include <asm/processor.h>
-@@ -1086,12 +1087,11 @@ struct fast_pool {
- 
- static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
- #ifdef CONFIG_64BIT
--	/* SipHash constants */
--	.pool = { 0x736f6d6570736575UL, 0x646f72616e646f6dUL,
--		  0x6c7967656e657261UL, 0x7465646279746573UL }
-+#define FASTMIX_PERM SIPHASH_PERMUTATION
-+	.pool = { SIPHASH_CONST_0, SIPHASH_CONST_1, SIPHASH_CONST_2, SIPHASH_CONST_3 }
- #else
--	/* HalfSipHash constants */
--	.pool = { 0, 0, 0x6c796765U, 0x74656462U }
-+#define FASTMIX_PERM HSIPHASH_PERMUTATION
-+	.pool = { HSIPHASH_CONST_0, HSIPHASH_CONST_1, HSIPHASH_CONST_2, HSIPHASH_CONST_3 }
- #endif
- };
- 
-@@ -1103,27 +1103,11 @@ static DEFINE_PER_CPU(struct fast_pool, irq_randomness) = {
-  */
- static void fast_mix(unsigned long s[4], unsigned long v1, unsigned long v2)
- {
--#ifdef CONFIG_64BIT
--#define PERM() do { \
--	s[0] += s[1]; s[1] = rol64(s[1], 13); s[1] ^= s[0]; s[0] = rol64(s[0], 32); \
--	s[2] += s[3]; s[3] = rol64(s[3], 16); s[3] ^= s[2]; \
--	s[0] += s[3]; s[3] = rol64(s[3], 21); s[3] ^= s[0]; \
--	s[2] += s[1]; s[1] = rol64(s[1], 17); s[1] ^= s[2]; s[2] = rol64(s[2], 32); \
--} while (0)
--#else
--#define PERM() do { \
--	s[0] += s[1]; s[1] = rol32(s[1],  5); s[1] ^= s[0]; s[0] = rol32(s[0], 16); \
--	s[2] += s[3]; s[3] = rol32(s[3],  8); s[3] ^= s[2]; \
--	s[0] += s[3]; s[3] = rol32(s[3],  7); s[3] ^= s[0]; \
--	s[2] += s[1]; s[1] = rol32(s[1], 13); s[1] ^= s[2]; s[2] = rol32(s[2], 16); \
--} while (0)
--#endif
--
- 	s[3] ^= v1;
--	PERM();
-+	FASTMIX_PERM(s[0], s[1], s[2], s[3]);
- 	s[0] ^= v1;
- 	s[3] ^= v2;
--	PERM();
-+	FASTMIX_PERM(s[0], s[1], s[2], s[3]);
- 	s[0] ^= v2;
- }
- 
-diff --git a/include/linux/prandom.h b/include/linux/prandom.h
-index 056d31317e49..a4aadd2dc153 100644
---- a/include/linux/prandom.h
-+++ b/include/linux/prandom.h
-@@ -10,6 +10,7 @@
- 
- #include <linux/types.h>
- #include <linux/percpu.h>
-+#include <linux/siphash.h>
- 
- u32 prandom_u32(void);
- void prandom_bytes(void *buf, size_t nbytes);
-@@ -27,15 +28,10 @@ DECLARE_PER_CPU(unsigned long, net_rand_noise);
-  * The core SipHash round function.  Each line can be executed in
-  * parallel given enough CPU resources.
-  */
--#define PRND_SIPROUND(v0, v1, v2, v3) ( \
--	v0 += v1, v1 = rol64(v1, 13),  v2 += v3, v3 = rol64(v3, 16), \
--	v1 ^= v0, v0 = rol64(v0, 32),  v3 ^= v2,                     \
--	v0 += v3, v3 = rol64(v3, 21),  v2 += v1, v1 = rol64(v1, 17), \
--	v3 ^= v0,                      v1 ^= v2, v2 = rol64(v2, 32)  \
--)
-+#define PRND_SIPROUND(v0, v1, v2, v3) SIPHASH_PERMUTATION(v0, v1, v2, v3)
- 
--#define PRND_K0 (0x736f6d6570736575 ^ 0x6c7967656e657261)
--#define PRND_K1 (0x646f72616e646f6d ^ 0x7465646279746573)
-+#define PRND_K0 (SIPHASH_CONST_0 ^ SIPHASH_CONST_2)
-+#define PRND_K1 (SIPHASH_CONST_1 ^ SIPHASH_CONST_3)
- 
- #elif BITS_PER_LONG == 32
- /*
-@@ -43,14 +39,9 @@ DECLARE_PER_CPU(unsigned long, net_rand_noise);
-  * This is weaker, but 32-bit machines are not used for high-traffic
-  * applications, so there is less output for an attacker to analyze.
-  */
--#define PRND_SIPROUND(v0, v1, v2, v3) ( \
--	v0 += v1, v1 = rol32(v1,  5),  v2 += v3, v3 = rol32(v3,  8), \
--	v1 ^= v0, v0 = rol32(v0, 16),  v3 ^= v2,                     \
--	v0 += v3, v3 = rol32(v3,  7),  v2 += v1, v1 = rol32(v1, 13), \
--	v3 ^= v0,                      v1 ^= v2, v2 = rol32(v2, 16)  \
--)
--#define PRND_K0 0x6c796765
--#define PRND_K1 0x74656462
-+#define PRND_SIPROUND(v0, v1, v2, v3) HSIPHASH_PERMUTATION(v0, v1, v2, v3)
-+#define PRND_K0 (HSIPHASH_CONST_0 ^ HSIPHASH_CONST_2)
-+#define PRND_K1 (HSIPHASH_CONST_1 ^ HSIPHASH_CONST_3)
- 
- #else
- #error Unsupported BITS_PER_LONG
-diff --git a/include/linux/siphash.h b/include/linux/siphash.h
-index cce8a9acc76c..3af1428da559 100644
---- a/include/linux/siphash.h
-+++ b/include/linux/siphash.h
-@@ -138,4 +138,32 @@ static inline u32 hsiphash(const void *data, size_t len,
- 	return ___hsiphash_aligned(data, len, key);
- }
- 
-+/*
-+ * These macros expose the raw SipHash and HalfSipHash permutations.
-+ * Do not use them directly! If you think you have a use for them,
-+ * be sure to CC the maintainer of this file explaining why.
-+ */
-+
-+#define SIPHASH_PERMUTATION(a, b, c, d) ( \
-+	(a) += (b), (b) = rol64((b), 13), (b) ^= (a), (a) = rol64((a), 32), \
-+	(c) += (d), (d) = rol64((d), 16), (d) ^= (c), \
-+	(a) += (d), (d) = rol64((d), 21), (d) ^= (a), \
-+	(c) += (b), (b) = rol64((b), 17), (b) ^= (c), (c) = rol64((c), 32))
-+
-+#define SIPHASH_CONST_0 0x736f6d6570736575ULL
-+#define SIPHASH_CONST_1 0x646f72616e646f6dULL
-+#define SIPHASH_CONST_2 0x6c7967656e657261ULL
-+#define SIPHASH_CONST_3 0x7465646279746573ULL
-+
-+#define HSIPHASH_PERMUTATION(a, b, c, d) ( \
-+	(a) += (b), (b) = rol32((b), 5), (b) ^= (a), (a) = rol32((a), 16), \
-+	(c) += (d), (d) = rol32((d), 8), (d) ^= (c), \
-+	(a) += (d), (d) = rol32((d), 7), (d) ^= (a), \
-+	(c) += (b), (b) = rol32((b), 13), (b) ^= (c), (c) = rol32((c), 16))
-+
-+#define HSIPHASH_CONST_0 0U
-+#define HSIPHASH_CONST_1 0U
-+#define HSIPHASH_CONST_2 0x6c796765U
-+#define HSIPHASH_CONST_3 0x74656462U
-+
- #endif /* _LINUX_SIPHASH_H */
-diff --git a/lib/siphash.c b/lib/siphash.c
-index 72b9068ab57b..71d315a6ad62 100644
---- a/lib/siphash.c
-+++ b/lib/siphash.c
-@@ -18,19 +18,13 @@
- #include <asm/word-at-a-time.h>
- #endif
- 
--#define SIPROUND \
--	do { \
--	v0 += v1; v1 = rol64(v1, 13); v1 ^= v0; v0 = rol64(v0, 32); \
--	v2 += v3; v3 = rol64(v3, 16); v3 ^= v2; \
--	v0 += v3; v3 = rol64(v3, 21); v3 ^= v0; \
--	v2 += v1; v1 = rol64(v1, 17); v1 ^= v2; v2 = rol64(v2, 32); \
--	} while (0)
-+#define SIPROUND SIPHASH_PERMUTATION(v0, v1, v2, v3)
- 
- #define PREAMBLE(len) \
--	u64 v0 = 0x736f6d6570736575ULL; \
--	u64 v1 = 0x646f72616e646f6dULL; \
--	u64 v2 = 0x6c7967656e657261ULL; \
--	u64 v3 = 0x7465646279746573ULL; \
-+	u64 v0 = SIPHASH_CONST_0; \
-+	u64 v1 = SIPHASH_CONST_1; \
-+	u64 v2 = SIPHASH_CONST_2; \
-+	u64 v3 = SIPHASH_CONST_3; \
- 	u64 b = ((u64)(len)) << 56; \
- 	v3 ^= key->key[1]; \
- 	v2 ^= key->key[0]; \
-@@ -389,19 +383,13 @@ u32 hsiphash_4u32(const u32 first, const u32 second, const u32 third,
- }
- EXPORT_SYMBOL(hsiphash_4u32);
- #else
--#define HSIPROUND \
--	do { \
--	v0 += v1; v1 = rol32(v1, 5); v1 ^= v0; v0 = rol32(v0, 16); \
--	v2 += v3; v3 = rol32(v3, 8); v3 ^= v2; \
--	v0 += v3; v3 = rol32(v3, 7); v3 ^= v0; \
--	v2 += v1; v1 = rol32(v1, 13); v1 ^= v2; v2 = rol32(v2, 16); \
--	} while (0)
-+#define HSIPROUND HSIPHASH_PERMUTATION(v0, v1, v2, v3)
- 
- #define HPREAMBLE(len) \
--	u32 v0 = 0; \
--	u32 v1 = 0; \
--	u32 v2 = 0x6c796765U; \
--	u32 v3 = 0x74656462U; \
-+	u32 v0 = HSIPHASH_CONST_0; \
-+	u32 v1 = HSIPHASH_CONST_1; \
-+	u32 v2 = HSIPHASH_CONST_2; \
-+	u32 v3 = HSIPHASH_CONST_3; \
- 	u32 b = ((u32)(len)) << 24; \
- 	v3 ^= key->key[1]; \
- 	v2 ^= key->key[0]; \
--- 
-2.35.1
+RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDA2IE1heSAyMDIyIDIzOjM0DQo+IA0K
+PiBIaSBEYXZpZCwNCj4gDQo+IE9uIFRodSwgTWF5IDA1LCAyMDIyIGF0IDExOjM0OjQwQU0gKzAw
+MDAsIERhdmlkIExhaWdodCB3cm90ZToNCj4gPiBPVE9IIHRoZSBlbnRyb3B5IG1peGluZyBpcyB2
+ZXJ5IGxpa2VseSB0byBiZSAnY29sZCBjYWNoZScNCj4gPiBhbmQgYWxsIHRoZSB1bnJvbGxpbmcg
+aW4gYmxha2VzNyB3aWxsIGNvbXBsZXRlbHkga2lsbA0KPiA+IHBlcmZvcm1hbmNlLg0KPiANCj4g
+SSd2ZSBzZWVuIHlvdSBtZW50aW9uIHRoZSBCTEFLRTJzIHVucm9sbGluZyBpbiBsaWtlIDggZGlm
+ZmVyZW50IHRocmVhZHMNCj4gbm93LCBhbmQgSSdtIG5vdCBjb252aW5jZWQgdGhhdCB5b3UncmUg
+ZW50aXJlbHkgd3JvbmcsIG5vciBhbSBJDQo+IGNvbnZpbmNlZCB0aGF0IHlvdSdyZSBlbnRpcmVs
+eSByaWdodC4gTXkgcmVzcG9uc2UgdG8geW91IGlzIHRoZSBzYW1lIGFzDQo+IGFsd2F5czogcGxl
+YXNlIHNlbmQgYSBwYXRjaCB3aXRoIHNvbWUgbWVhc3VyZW1lbnRzISBJJ2QgbG92ZSB0byBnZXQg
+dGhpcw0KPiB3b3JrZWQgb3V0IGluIGEgcmVhbCB3YXkuDQo+IA0KPiBUaGUgbGFzdCB0aW1lIEkg
+d2VudCBiZW5jaGluZyB0aGVzZSwgdGhlIHVucm9sbGVkIGNvZGUgd2FzIH4xMDAgY3ljbGVzDQo+
+IGZhc3RlciwgaWYgSSByZWNhbGwgY29ycmVjdGx5LCB0aGFuIHRoZSByb2xsZWQgY29kZSwgd2hl
+biB1c2VkIGZyb20NCj4gV2lyZUd1YXJkJ3MgaG90IHBhdGguIEkgZG9uJ3QgZG91YnQgdGhhdCBh
+IGNvbGQgcGF0aCB3b3VsZCBiZSBtb3JlDQo+IGZyYXVnaHQsIHRob3VnaCwgYXMgdGhhdCdzIGEg
+ZGVjZW50IGFtb3VudCBvZiBjb2RlLiBTbyB0aGUgcXVlc3Rpb24gaXMNCj4gaG93IHRvIHJlLXJv
+bGwgdGhlIHJvdW5kcyB3aXRob3V0IHNhY3JpZmljaW5nIHRob3NlIDEwMCBjeWNsZXMuDQo+IA0K
+PiBJbiBvcmRlciB0byBiZWdpbiB0byBmaWd1cmUgdGhhdCBvdXQsIHdlIGhhdmUgdG8gbG9vayBh
+dCB3aHkgdGhlDQo+IHJlLXJvbGxlZCBsb29wIGlzIHNsb3cgYW5kIHRoZSB1bnJvbGxlZCBsb29w
+IGZhc3QuIEl0J3Mgbm90IGJlY2F1c2Ugb2YNCj4gY29tcGxpY2F0ZWQgcGlwZWxpbmUgdGhpbmdz
+LiBJdCdzIGJlY2F1c2UgdGhlIEJMQUtFMnMgcGVybXV0YXRpb24gaXMNCj4gYWN0dWFsbHkgMTAg
+ZGlmZmVyZW50IHBlcm11dGF0aW9ucywgb25lIGZvciBlYWNoIHJvdW5kLiBUYWtlIGEgbG9vayBh
+dA0KPiB0aGUgY29yZSBmdW5jdGlvbiwgRywgYW5kIGl0cyB1c2VzIG9mIHRoZSByb3VuZCBudW1i
+ZXIsIHI6DQo+IA0KPiAgICAgI2RlZmluZSBHKHIsIGksIGEsIGIsIGMsIGQpIGRvIHsgXA0KPiAg
+ICAgICAgIGEgKz0gYiArIG1bYmxha2Uyc19zaWdtYVtyXVsyICogaSArIDBdXTsgXA0KPiAgICAg
+ICAgIGQgPSByb3IzMihkIF4gYSwgMTYpOyBcDQo+ICAgICAgICAgYyArPSBkOyBcDQo+ICAgICAg
+ICAgYiA9IHJvcjMyKGIgXiBjLCAxMik7IFwNCj4gICAgICAgICBhICs9IGIgKyBtW2JsYWtlMnNf
+c2lnbWFbcl1bMiAqIGkgKyAxXV07IFwNCj4gICAgICAgICBkID0gcm9yMzIoZCBeIGEsIDgpOyBc
+DQo+ICAgICAgICAgYyArPSBkOyBcDQo+ICAgICAgICAgYiA9IHJvcjMyKGIgXiBjLCA3KTsgXA0K
+PiAgICAgfSB3aGlsZSAoMCkNCg0KRWFjaCBvZiB0aG9zZSBsaW5lcyBpcyBhIGNvdXBsZSBvZiBp
+bnN0cnVjdGlvbnMgYW5kIHRoZXkgYXJlDQphbGwgZGVwZW5kYW50IG9uIHRoZSBwcmVjZWRpbmcg
+dmFsdWUuDQpJIGNvdW50IDE0IC0gZXhjbHVkaW5nIHRoZSBtW10gYWNjZXNzZXMuDQpUaGVyZSBh
+cmUgODAgY29waWVzIG9mIEcoKSAtIHRvdGFsIDExMjAsIG9yIDE3LjUvYnl0ZS4NClRvIGdldCBh
+bnkgZmFzdGVyIHRoYW4gdGhhdCB5b3UgbmVlZCB0byBnZXQgdGhlIGNvbXBpbGVyDQp0byBpbnRl
+cmxlYXZlIHRoZSBnZW5lcmF0ZWQgY29kZSBmb3IgbXVsdGlwbGUgZXhwYW5zaW9ucyBvZiBHKCku
+DQoNCj4gVGhlIGJsYWtlMnNfc2lnbWEgYXJyYXkgaXMgYSBgc3RhdGljIGNvbnN0IHU4IGJsYWtl
+MnNfc2lnbWFbMTBdWzE2XWAsDQo+IHdpdGggYSByb3cgZm9yIGV2ZXJ5IG9uZSBvZiB0aGUgMTAg
+cm91bmRzLiBXaGF0IHRoaXMgaXMgYWN0dWFsbHkgZG9pbmcNCj4gaXMgcmVhZGluZyB0aGUgbWVz
+c2FnZSB3b3JkcyBpbiBhIGRpZmZlcmVudCBvcmRlciBlYWNoIHJvdW5kLCBzbyB0aGF0DQo+IHRo
+ZSB3aG9sZSBwZXJtdXRhdGlvbiBpcyBkaWZmZXJlbnQuDQo+IA0KPiBXaGVuIHRoZSBsb29wIGlz
+IHVucm9sbGVkLCBibGFrZTJzX3NpZ21hIGdldHMgaW5saW5lZCwgYW5kIHRoZW4gdGhlcmUNCj4g
+YXJlIG5vIG1lbW9yeSBhY2Nlc3Nlcy4gV2hlbiBpdCdzIHJlLXJvbGxlZCwgZXZlcnkgcm91bmQg
+YWNjZXNzZXMNCj4gYmxha2Uyc19zaWdtYSAxNiB0aW1lcywgd2hpY2ggaGluZGVycyBwZXJmb3Jt
+YW5jZS4NCg0KSXQgc2hvdWxkbid0IHJlYWxseSBtYWtlIG11Y2ggZGlmZmVyZW5jZS4NClRoZXJl
+IGFyZSBvbmx5IHR3byBtZW1vcnkgcmVhZHMgZm9yIGVhY2ggMTQgYXJpdGhtZXRpYyBvcHMuDQpT
+byB1bmxlc3MgeW91IG1hbmFnZSB0byBtYWludGFpbiA0IGluc3RydWN0aW9ucy9jbG9jayB0aGVy
+ZQ0KYXJlIHNwYXJlIGNsb2NrcyBmb3IgdGhlIGV4dHJhIG1lbW9yeSBjeWNsZXMuDQpBbnkgdGhh
+dCBpcyBhc3N1bWluZyBvbmUgcmVhZC9jbG9jaywgbW9kZXJuIHg4NiBjYW4gZG8gMg0KKHdpdGgg
+YSBmb2xsb3dpbmcgd2luZCEpDQpPbiB4ODYgdGhlIGFycmF5IGluZGV4IGlzIGZyZWUuDQoNCj4g
+WW91J2xsIG5vdGljZSwgb24gdGhlIG90aGVyIGhhbmQsIHRoYXQgdGhlIFNJTUQgaGFuZCBjb2Rl
+ZCBhc3NlbWJseQ0KPiBpbXBsZW1lbnRhdGlvbnMgZG8gbm90IHVucm9sbC4gVGhlIHRyaWNrIGlz
+IHRvIGhpZGUgdGhlIGNvc3Qgb2YgdGhlDQo+IGJsYWtlMnNfc2lnbWEgaW5kaXJlY3Rpb24gaW4g
+dGhlIGRhdGEgZGVwZW5kZW5jaWVzLCBzbyB0aGF0IHBlcmZvcm1hbmNlDQo+IGlzbid0IGFmZmVj
+dGVkLiBOYWl2ZWx5IHJlLXJvbGxpbmcgdGhlIGdlbmVyaWMgY29kZSBkb2VzIG5vdCBpbnNwaXJl
+IHRoZQ0KPiBjb21waWxlciB0byBkbyB0aGF0LiBCdXQgbWF5YmUgeW91IGNhbiBmaWd1cmUgc29t
+ZXRoaW5nIG91dD8NCg0KSSd2ZSBub3QgbG9va2VkIGF0IHRoYXQgdmVyc2lvbi4NCkkgaGF2ZSB3
+cml0dGVuIEFWWC9TU0UgY29kZSAtIGhhcmQgd29yayBmaW5kaW5nIHRoZSBhc20gbW51bW9uaWNz
+IQ0KDQo+IEFueXdheSwgdGhhdCdzIGFib3V0IHdoZXJlIG15IHRoaW5raW5nIGlzIG9uIHRoaXMs
+IGJ1dCBJJ2QgbG92ZSB0byBzZWUNCj4gc29tZSBwYXRjaGVzIGZyb20geW91IGF0IHNvbWUgcG9p
+bnQgaWYgeW91J3JlIGludGVyZXN0ZWQuDQoNCk9rIEkganVzdCByYW4gc29tZSB0ZXN0cyBsb29w
+aW5nIG92ZXIgdGhlIFJPVU5EKCkgd2l0aG91dCB1cGRhdGluZyB2W10uDQpUaGVzZSBhcmUgdXNp
+bmcgcmRwbWMgdG8gdGltZSBzaW5nbGUgY2FsbHMgLSBub3QgYXZlcmFnaW5nIG92ZXINCmEgbGFy
+Z2UgbnVtYmVyIG9mIGl0ZXJhdGlvbnMuDQoNCk9uIG15IGk3LTc3MDAgdGhlIHVucm9sbGVkIGxv
+b3AgaXMgYWJvdXQgNi4yIGNsb2Nrcy9ieXRlLg0KVGhlICdjb2xkIGNhY2hlJyBmb3IgYSBzaW5n
+bGUgNjQgYnl0ZSBibG9jayBpcyBhYm91dCAyMCBjbG9ja3MvYnl0ZS4NCg0KSWYgSSB1c2U6DQoJ
+Zm9yICh1MzIgaSA9IDA7IGkgPCAxMDsgaSsrKSBST1VORChpKTsNCml0IGRyb3BzIHRvIDcuOCBj
+bG9ja3MvYnl0ZSBidXQgdGhlIHNpbmdsZSBibG9jayBpcyBhYm91dCAxNS4NClBhcnQgb2YgdGhl
+IHByb2JsZW0gaXMgZXh0cmEgcmVnaXN0ZXIgc3BpbGxzIHRvIHN0YWNrLg0KDQpTbyB3ZSBwbGF5
+IHNvbWUgZ2FtZXM6DQpSZW1vdmUgdGhlIGJsYWtlMnNfc2lnbWFbXSBvdXQgb2YgRygpIGludG8g
+Uk9VTkQoKQ0Kc28gdGhlICdub3JtYWwnIGNvZGUgdXNlcyBST1VORChibGFrZTJzX3NpZ21hWzBd
+KSAoZXRjKS4NClRoZW4gd2UgY2FuIHVzZSB0aGUgbG9vcDoNCglmb3IgKGNvbnN0IHU4ICpicyA9
+ICZibGFrZTJzX3NpZ21hWzBdWzBdOyBicyA8IGVuZDsgYnMgKz0gMTYpDQoJCVJPVU5EKGJzKTsN
+Cih3aXRoIHNvbWUgYml0cyB0byBtYWtlIGl0IGNvbXBpbGUuKQ0KQW5ub3lpbmdseSB0aGF0IG1h
+a2VzIHRoZSBjb21waWxlciBzcGlsbCBhbGwgdGhlIGJzW10gdG8gc3RhY2suDQpBIGZldyBjYXJl
+ZnVsbHkgcGxhY2VkIGJhcnJpZXIoKSB3b3VsZCBoZWxwLg0KQnV0IHNpbXBsZXIgaXMgJ3ZvbGF0
+aWxlIGNvbnN0IHU4ICpicycuDQpUaGlzIGhhcyB0aGUgZGVzaXJlZCBlZmZlY3Qgb2YgaW50ZXJs
+ZWF2aW5nIHRoZSAnc2lnbWEnIHJlYWRzDQp3aXRoIHRoZSBidWZmZXIgb25lcy4NClRoaXMgZ2F2
+ZSBtZSA3LjIgY2xvY2tzL2J5dGUsIHNpbmdsZSBibG9jayBtYXliZSAxNC4NCg0KU28gYWJvdXQg
+MSBjbG9jay9ieXRlIChtYXliZSAxNSUpIHNsb3dlci4NCk9UT0ggaW4gbWFueSBjYXNlcyB0aGlz
+IGlzbid0IGNyaXRpY2FsLg0KDQpUaGUgY29sZCBjYWNoZSBjdXRvZmYgZm9yIHRoZSB1bnJvbGxl
+ZCBsb29wIGlzIGFyb3VuZCAyNTYgYnl0ZXMuDQoNClRoZSBvdGhlciBiaWcgZWZmZWN0IHRoZSB1
+bnJvbGxlZCBsb29wIGhhcyBmb3Igc21hbGwgYnVmZmVycw0KaXMgdGhhdCBpdCBkaXNwbGFjZXMg
+YSBsb3Qgb2YgY29kZSBmcm9tIHRoZSBpLWNhY2hlLg0KVGhhdCB3aWxsIG1ha2UgdGhlIHVucm9s
+bGVkIGNvZGUgd29yc2UgZm9yIG1hbnkgcmVhbCBzaXR1YXRpb25zLg0KDQpJIHN1c3BlY3QgdGhh
+dCB0aGUgY29tcGlsZXIgZW5kcyB1cCBzcGlsbGluZyBhbm90aGVyIHJlZ2lzdGVyIChvciAyKQ0K
+dG8gdGhlIHN0YWNrLg0KSGFuZCBhc3NlbWJseSBjb3VsZCBhdm9pZCB0aGF0Lg0KDQpJJ3ZlIG5v
+dCBsb29rZWQgYXQgd2hhdCBnZXRzIHNwaWxsZWQsIGdjYyBjYW4gbWFrZSBob3JyaWQgY2hvaWNl
+cy4NCkl0IG1pZ2h0IGJlIHdvcnRoIG1ha2luZyAoc2F5KSBhIGFuZCBjIHZvbGF0aWxlIChieSBz
+cGxpdHRpbmcgdltdKQ0KYW5kIHVzaW5nIGEgdGVtcG9yYXJ5IGluIEcoKSwgZWc6DQoJYyA9IHQg
+PSBjICsgZDsNCgliID0gcm9yMzIoYiBeIHQsIDEyKTsNCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVy
+ZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5
+bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
