@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E35A6C4332F
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 May 2022 19:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37E1FC4321E
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 May 2022 19:18:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbiEHTWB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 May 2022 15:22:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57736 "EHLO
+        id S230084AbiEHTWD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 8 May 2022 15:22:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237269AbiEHTEW (ORCPT
+        with ESMTP id S236624AbiEHTEO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 May 2022 15:04:22 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470A3DFAF
-        for <linux-crypto@vger.kernel.org>; Sun,  8 May 2022 12:00:23 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id q20so7290445wmq.1
-        for <linux-crypto@vger.kernel.org>; Sun, 08 May 2022 12:00:23 -0700 (PDT)
+        Sun, 8 May 2022 15:04:14 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBDABDF85
+        for <linux-crypto@vger.kernel.org>; Sun,  8 May 2022 12:00:13 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id q23so16716846wra.1
+        for <linux-crypto@vger.kernel.org>; Sun, 08 May 2022 12:00:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nfRYAmvDSOfkn9xCnjz0sEuzUzffI51ibzudBubF+DM=;
-        b=JbtmNvF8ZkRrmp0ZVDodTU7WGYDq/nJm5K36IhG0xquVIIW4xufQWZm7uzfcVk27MZ
-         lirnIjLT4sWIjLTkJSy6Ba9N3kz4F4f8oTL7JiC85NXLlCCmFD1OJEg7C7Qi+VzC6SGU
-         CL/ff6uZYMgNmZJ++ZtPmceDlgFhTBOUleq3ooznPJNWslMiiXR9u+6JUAIpeUrZQ6L6
-         vqCaans+gc7FQxTlqKsCgfAFE16dnqOs7nP3AwPdbU1p7hEdCX9OXPT3jfixxHcwzcoZ
-         ck4mAdzN127Vw/XTLuAwVAVz8qTWF4kulGqzP0DvMo/aqLZ3IPfyhWrTGrxgm8RTb0dc
-         QwGA==
+        bh=yzvgVyreo6slTFAo6yIfKz7ssJtwxUt4QGb+bB9VZnw=;
+        b=JsiIEZbEorhvcZhNqOJyFrQfGu/JLj+5HxjhV183f6b/htj1yxYBv4yaK5nPWzJ90p
+         oiGnbbjhnbKLrQce2+XWAtZuoR5Tesixo9WBwdHQXcD2fxtOs1iJ9Gybj0N8invS45N/
+         1q2++C0HAZkPNs7zUjTDKeZXXNyJD/soyPiF/p9woE5UYqy5HSH3l7gSn/dCZF4cF4Gf
+         xMK2tRuXGkd4IULgkVxaLIi57ZBBbJROh7ryTyRbDyhNr9tf6ajG8Q5Y67reczNcBAK7
+         ZnTMyIVLeLuPtN4FQx701kI88NQa7tO8cToZAktD/MjRfWL45MgVBEaCqPxtARXCNfeS
+         7IhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nfRYAmvDSOfkn9xCnjz0sEuzUzffI51ibzudBubF+DM=;
-        b=w8Laa8MUtm9iqR8mOOoaFkyenhJr8Aj/bYZE5HeboW2CwXHxWkzUkAWP9yElhBwGhg
-         FiB+NIRjA5wtb8mov4ND+3v3qwTUFzQoqCgtU63uJd19zjf9PbVLlLo8vVtIodUULmbA
-         tBt+1N6BUIQoXm8haHIfqGdU4I2yt6Xlb+DpU04unbHCXYNcz4Qd9MNj8giLQ3lrpR0m
-         icWn75Dw/qsEwgPl5AdiYI13LWde45BFnuvnNRc+J6+hp6l4H7yy9SXZhf62DOef3xDE
-         kTSEmOHGcZwzcZutc9fCmwSwk0qxVq3zOQ2kpubiddkMnTtwtgSyamPaP3xbdAW06npP
-         Xprg==
-X-Gm-Message-State: AOAM533B7tgm+DSzD217XVsbUWJG33lCpTzxq604T4/T2Kodlwqpt7SJ
-        rwU2NYCm8e3AvTuZ84d8ZHkPOg==
-X-Google-Smtp-Source: ABdhPJyyKOdVyYhTCQquA5X3hW0+KtTAcADNYPmxezkDmayc+tb1Atxs9r1zLvCxNR9rBZ2DltO3Sg==
-X-Received: by 2002:a05:600c:3388:b0:393:ed53:4ee6 with SMTP id o8-20020a05600c338800b00393ed534ee6mr18991538wmp.1.1652036421657;
-        Sun, 08 May 2022 12:00:21 -0700 (PDT)
+        bh=yzvgVyreo6slTFAo6yIfKz7ssJtwxUt4QGb+bB9VZnw=;
+        b=tPqjx0N+pPlBVpjXmvXfzguv+uHTIzU1WOre46lFU1eU7HtNUjB/uUwgrqVHgtJlIk
+         eEh98cfJl3VcB2ii0jGshLCt0hmf2vGymlKrxyRyVyGFOR0QH73Fs6qTyQzgunc4UC1c
+         4XXAWKvBwJ3K87STJdO4rzPbdSDukQteDzVvlb2mcz5M0wTJYrJtdx9+fXVKoVqsDSX1
+         1ukaSC9if136yPoL8nbvGmwfqO8Hwcz9pkYqFWY6OwZtnHnnNKYl7SO1f0wr78iPcdue
+         jAgpQPesy2zRgaP8YoIht4USQHvt2DMWGTAek3/ceGZD72X6PyVdHy3V2S+ry3CS9Ny1
+         5yVA==
+X-Gm-Message-State: AOAM5319Tl5TaWKMZRMPTNcQos2HMcn/JCdmzYNI6+6463xZvWBS+YSq
+        n2Fy01G0EoUuEQy6OZ+UZ9cELw==
+X-Google-Smtp-Source: ABdhPJzctY1kgG5Nzp0gZ1p4e7AznRgsramsEtrcJP0YHQqPAKpQBcF7hn+yKTSdbbPC3zsrMv528A==
+X-Received: by 2002:a05:6000:1707:b0:20c:660c:7c78 with SMTP id n7-20020a056000170700b0020c660c7c78mr11030537wrc.150.1652036412312;
+        Sun, 08 May 2022 12:00:12 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id n16-20020a05600c3b9000b00394699f803dsm10552348wms.46.2022.05.08.12.00.20
+        by smtp.googlemail.com with ESMTPSA id n16-20020a05600c3b9000b00394699f803dsm10552348wms.46.2022.05.08.12.00.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 May 2022 12:00:21 -0700 (PDT)
+        Sun, 08 May 2022 12:00:11 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, ardb@kernel.org, herbert@gondor.apana.org.au,
         krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
@@ -55,9 +55,9 @@ Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-rockchip@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v7 16/33] crypto: rockchip: add myself as maintainer
-Date:   Sun,  8 May 2022 18:59:40 +0000
-Message-Id: <20220508185957.3629088-17-clabbe@baylibre.com>
+Subject: [PATCH v7 07/33] crypto: rockchip: add fallback for ahash
+Date:   Sun,  8 May 2022 18:59:31 +0000
+Message-Id: <20220508185957.3629088-8-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220508185957.3629088-1-clabbe@baylibre.com>
 References: <20220508185957.3629088-1-clabbe@baylibre.com>
@@ -67,32 +67,77 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Nobody is set as maintainer of rockchip crypto, I propose to do it as I
-have already reworked lot of this code.
+Adds a fallback for all case hardware cannot handle.
 
+Fixes: ce0183cb6464b ("crypto: rockchip - switch to skcipher API")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 38 +++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d4d4aa20fd08..d673e7ae3872 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17026,6 +17026,13 @@ F:	Documentation/ABI/*/sysfs-driver-hid-roccat*
- F:	drivers/hid/hid-roccat*
- F:	include/linux/hid-roccat*
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+index 49017d1fb510..16009bb0bf16 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+@@ -16,6 +16,40 @@
+  * so we put the fixed hash out when met zero message.
+  */
  
-+ROCKCHIP CRYPTO DRIVERS
-+M:	Corentin Labbe <clabbe@baylibre.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-+F:	drivers/crypto/rockchip/
++static bool rk_ahash_need_fallback(struct ahash_request *req)
++{
++	struct scatterlist *sg;
 +
- ROCKCHIP I2S TDM DRIVER
- M:	Nicolas Frattaroli <frattaroli.nicolas@gmail.com>
- L:	linux-rockchip@lists.infradead.org
++	sg = req->src;
++	while (sg) {
++		if (!IS_ALIGNED(sg->offset, sizeof(u32))) {
++			return true;
++		}
++		if (sg->length % 4) {
++			return true;
++		}
++		sg = sg_next(sg);
++	}
++	return false;
++}
++
++static int rk_ahash_digest_fb(struct ahash_request *areq)
++{
++	struct rk_ahash_rctx *rctx = ahash_request_ctx(areq);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
++	struct rk_ahash_ctx *tfmctx = crypto_ahash_ctx(tfm);
++
++	ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
++	rctx->fallback_req.base.flags = areq->base.flags &
++					CRYPTO_TFM_REQ_MAY_SLEEP;
++
++	rctx->fallback_req.nbytes = areq->nbytes;
++	rctx->fallback_req.src = areq->src;
++	rctx->fallback_req.result = areq->result;
++
++	return crypto_ahash_digest(&rctx->fallback_req);
++}
++
+ static int zero_message_process(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+@@ -167,6 +201,9 @@ static int rk_ahash_digest(struct ahash_request *req)
+ 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+ 	struct rk_crypto_info *dev = tctx->dev;
+ 
++	if (rk_ahash_need_fallback(req))
++		return rk_ahash_digest_fb(req);
++
+ 	if (!req->nbytes)
+ 		return zero_message_process(req);
+ 	else
+@@ -309,6 +346,7 @@ static void rk_cra_hash_exit(struct crypto_tfm *tfm)
+ 	struct rk_ahash_ctx *tctx = crypto_tfm_ctx(tfm);
+ 
+ 	free_page((unsigned long)tctx->dev->addr_vir);
++	crypto_free_ahash(tctx->fallback_tfm);
+ }
+ 
+ struct rk_crypto_tmp rk_ahash_sha1 = {
 -- 
 2.35.1
 
