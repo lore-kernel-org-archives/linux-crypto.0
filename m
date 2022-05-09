@@ -2,118 +2,118 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15295C43219
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 10:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01136C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 11:10:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbiEIKVk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 06:21:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
+        id S232099AbiEILOE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 07:14:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234105AbiEIKVO (ORCPT
+        with ESMTP id S231834AbiEILOD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 06:21:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67740DF2B
-        for <linux-crypto@vger.kernel.org>; Mon,  9 May 2022 03:17:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652091438;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8rAG+hhLyyADjfWKc/qIMa3fRClDqyFw6+rAc7ZUweE=;
-        b=TBY0qSgrMGaSblfpeABrbY52GYWqUpAD6/5ERWkmHINoqzkTfYmNY854ethXRQjzU3uNIm
-        IA2egAh9lQVLHeyi/z7ejkUHwzpJ6ZNLSDkA/79Ch6/3vBUlWaOcz0kltJGz2iTN4KPcwE
-        EIwojyGUMPiaVFIJ/Zkk/b2ad2FqFpg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-461-7ZnzNcl4MV2NSfS0YYRrNw-1; Mon, 09 May 2022 06:17:17 -0400
-X-MC-Unique: 7ZnzNcl4MV2NSfS0YYRrNw-1
-Received: by mail-ej1-f69.google.com with SMTP id sh14-20020a1709076e8e00b006f4a5de6888so6484209ejc.8
-        for <linux-crypto@vger.kernel.org>; Mon, 09 May 2022 03:17:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8rAG+hhLyyADjfWKc/qIMa3fRClDqyFw6+rAc7ZUweE=;
-        b=49yk4Hd1NHdvPJHTKUkW3JesdQ+Ro5bAQi4ysLh3rUCJYvlPjHVVtwGPLdpH4P7esc
-         Ka+aatZbRpZnNWGaTroFeyaPWoTlKx8OQE+5fapJEdn7JudpeHT4/j3KAyy2lCQw6Lee
-         k2hcdf7px0kzWVbUCHt5l4+/zJNzvr45MEOsJNoHYv9wAvS1yaiTTWCS32N36bHoyaJq
-         OZobkxHD+uuAV2NdJ5SPT+vYjfuzxUYvlEs1TfLsdPXAShuSdPNF4vmG/q1Cb9HQFLwb
-         /G3LuR0BbZY3kZt1v8Im6zAH0gEvj5xRxXJvwpKxk61wcqtPeOqT482mGogWSyflGghm
-         ev6Q==
-X-Gm-Message-State: AOAM530y5NExT1HjTFp7gt2Un4QQgNtWFfBqL9lm5AnZ9F8II9aEI5Le
-        I8/pzkwl/F6psFQsdU2W5XrcaSsBq1oOEOfvdcOPnDQrgtpuqmT4tg6I43nXM9vdjzUYWMgxUgX
-        YWxsadopV3S2lOsG/itPOlOIVKgga+bSI1PRdPCkC
-X-Received: by 2002:a50:d08b:0:b0:425:eb86:f36d with SMTP id v11-20020a50d08b000000b00425eb86f36dmr16301833edd.235.1652091436040;
-        Mon, 09 May 2022 03:17:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWF5i0r1wWzRnyta1jc1Xzs8fjC2bR2GTrVWYAaiAIuMqphiWE9pkwqenZGV0+CFmZVoPSFTydmMUJBGOVC04=
-X-Received: by 2002:a50:d08b:0:b0:425:eb86:f36d with SMTP id
- v11-20020a50d08b000000b00425eb86f36dmr16301818edd.235.1652091435909; Mon, 09
- May 2022 03:17:15 -0700 (PDT)
+        Mon, 9 May 2022 07:14:03 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70CDD1A35AD;
+        Mon,  9 May 2022 04:10:08 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Kxdk63Qrpz4xVP;
+        Mon,  9 May 2022 21:10:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1652094606;
+        bh=/qHqi6CIlVAK8cEtoXLHzVPPEY/m87bHDdtlNB5349Q=;
+        h=Date:From:To:Cc:Subject:From;
+        b=n7Q8jjFxtz/r9vgYGv3BI9yqnzHQ/uHvrQdlDzdx0bCyR+I3UJFErc/og3hF4Os6l
+         pFeZBnTpL16hA3lkvYSkBYuWQWAt7iOpVYqOnCi2mA13rKbMPuI2OgRILUn1QUHd64
+         Cm+16z2ftD+Bs+R+SqD8wBMRf/5LOUW6TWfq+gwMeLangYUXdgbzKLIaAuJmB10L2f
+         47fNiQFDXjq8SRUdIndgeXamgh2tQIrU4UVyKJWrTify/qM0esAU9IYIcpVvvbqIR8
+         jK3JzFZ1daWT8IeT0twj1moXnF43VB9PlOTqh4NvfKrqqGIvS8tozN1Otgtb2ETjXL
+         v78VaT6EKAAMQ==
+Date:   Mon, 9 May 2022 21:10:04 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20220509211004.2c2073ef@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20220508130944.17860-1-vdronoff@gmail.com> <3f16033ef08063ef9fcb707010e78bd0@linux.ibm.com>
-In-Reply-To: <3f16033ef08063ef9fcb707010e78bd0@linux.ibm.com>
-From:   Vlad Dronov <vdronov@redhat.com>
-Date:   Mon, 9 May 2022 12:17:04 +0200
-Message-ID: <CAMusb+Q11JMyOXV0iy4VLJ8yST7L0QrmDUJWOpnvsBxfBzjrdA@mail.gmail.com>
-Subject: Re: [PATCH] s390/crypto: add crypto library interface for ChaCha20
-To:     freude@linux.ibm.com
-Cc:     Patrick Steuer <patrick.steuer@de.ibm.com>,
-        Harald Freudenberger <freude@de.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/dJ8ZH9q2ElXtmQQNIpu.DHQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Harald,
+--Sig_/dJ8ZH9q2ElXtmQQNIpu.DHQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thank you for your response, review and an ACK. Let me ask Herbert if
-he would agree
-to add your Reviewed-by and submit (so I do not send v2 just for this).
+Hi all,
 
-Best regards,
-Vladis
+After merging the crypto tree, today's linux-next build (powerpc
+pseries_le_defconfig) failed like this:
 
+ccnI8W1t.s: Assembler messages:
+ccnI8W1t.s: Error: .size expression for aes_p8_set_encrypt_key does not eva=
+luate to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_set_encrypt_key does not ev=
+aluate to a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_set_decrypt_key does not eva=
+luate to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_set_decrypt_key does not ev=
+aluate to a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_encrypt does not evaluate to=
+ a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_encrypt does not evaluate t=
+o a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_decrypt does not evaluate to=
+ a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_decrypt does not evaluate t=
+o a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_cbc_encrypt does not evaluat=
+e to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_cbc_encrypt does not evalua=
+te to a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_ctr32_encrypt_blocks does no=
+t evaluate to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_ctr32_encrypt_blocks does n=
+ot evaluate to a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_xts_encrypt does not evaluat=
+e to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_xts_encrypt does not evalua=
+te to a constant
+ccnI8W1t.s: Error: .size expression for aes_p8_xts_decrypt does not evaluat=
+e to a constant
+ccnI8W1t.s: Error: .size expression for .aes_p8_xts_decrypt does not evalua=
+te to a constant
 
-On Mon, May 9, 2022 at 12:10 PM Harald Freudenberger
-<freude@linux.ibm.com> wrote:
->
-> On 2022-05-08 15:09, Vladis Dronov wrote:
-> > From: Vladis Dronov <vdronov@redhat.com>
-> >
-> > Implement a crypto library interface for the s390-native ChaCha20
-> > cipher
-> > algorithm. This allows us to stop to select CRYPTO_CHACHA20 and instead
-> > select CRYPTO_ARCH_HAVE_LIB_CHACHA. This allows BIG_KEYS=y not to build
-> > a whole ChaCha20 crypto infrastructure as a built-in, but build a
-> > smaller
-> > CRYPTO_LIB_CHACHA instead.
-> >
-> > Make CRYPTO_CHACHA_S390 config entry to look like similar ones on other
-> > architectures. Remove CRYPTO_ALGAPI select as anyway it is selected by
-> > CRYPTO_SKCIPHER.
-> >
-> > Add a new test module and a test script for ChaCha20 cipher and its
-> > interfaces. Here are test results on an idle z15 machine:
-> >
-> > ...skip...
->
-> Hello Vladis
-> Thanks for your work. Please add my
-> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
->
-> however, always the question who will pick and forward this patch ?
-> To me this looks like most parts are common so I would suggest that
-> Herbert Xu  will pick this patch.
->
+Caused by commit
 
+  b52455a73db9 ("crypto: vmx - Align the short log with Makefile cleanups")
+
+I have reverted that commit for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/dJ8ZH9q2ElXtmQQNIpu.DHQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmJ49owACgkQAVBC80lX
+0GyQ4QgAoNjkcducKaeQumbLOUCXvejE/P/q1srJ5cIUU+6mYUlZScpENVQiyGN6
+AGPeQ7q7L4Z9TLkCnHTVMR8PH8JqwJmwLTSXOlMxbdR5MH9sct5nzEWGBTRWFz6+
+TCqJRPvhQ1+VUsqZ5qW2cjZnXd14lSetMLyiS+lLpqMLPu6IqyIU6nzSUIZ9Lwv6
+8j7KuqAyCGSe738sT/9oG5ciflRx4IreQkN0SO8+FTG8XneF8HnxlJiRbj8STgAb
+cRggfSMgFki3feL68+WdJYwy9h9PjatoDtzEEDI3VcG1+oUV85oZwFy8UJTUq537
+ia6jTe6cwg9B1TJ+ysZ0dRNEvs8t0g==
+=hUec
+-----END PGP SIGNATURE-----
+
+--Sig_/dJ8ZH9q2ElXtmQQNIpu.DHQ--
