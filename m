@@ -2,230 +2,248 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B029CC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 15:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706D3C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 17:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238692AbiEIQAC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 12:00:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32998 "EHLO
+        id S233396AbiEIR2f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 13:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238685AbiEIQAB (ORCPT
+        with ESMTP id S239563AbiEIR2f (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 12:00:01 -0400
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E4F1B0932;
-        Mon,  9 May 2022 08:56:06 -0700 (PDT)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-2f83983782fso149857317b3.6;
-        Mon, 09 May 2022 08:56:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=m4TLCMYI42941hu3ardgVNqgp3gOumPVU61RkHYS5Zo=;
-        b=sn3Mhl0wMW621CEwMwN8w8qSd4SHwc4oGozgpTKr2Ek902IBSZnoI9oJvPKW5py9bd
-         hsY4Kknw6e48KQJ25vFu+DC2k+x4Q4fd80IlqOh5P1nqi+JuSsxD0vNh+6OCMuMCaeOG
-         ToAgVN9cUTKr4K57AQXhYYFkh/XPZ76vHRk2ibCzhim2zphWIWtmyx1VL2wjdEoC+f9Q
-         e6Gx4/driHtWCwgMpIObECLkCaHwdNIUL1g1/K17wAfLC5fXwrmLDJhEiDiqyzuRmTnN
-         reTsI1qN31yxigaNwFptvTebEJOoymflLbRwm5bGcKEDmM2rMgV5JGwESvEXLja7cvCa
-         xf4Q==
-X-Gm-Message-State: AOAM531iZl/i/MW795G7HEtdfbhxUq5VfKJfY0UCBT9Fqvq+4vzKHvVQ
-        AEMNm6X5+ei13zsJ6vGPRGyVB+Eygn90mTTu+Jk=
-X-Google-Smtp-Source: ABdhPJykTRc8ByXs8MiW26QtWaD2ITyXljqBAAa8dnV15VuG3RPnVvquFy7o4B7o2Wjt8qMW54k8wmdXh/2Aml2TzXg=
-X-Received: by 2002:a0d:e2ca:0:b0:2f6:6586:df36 with SMTP id
- l193-20020a0de2ca000000b002f66586df36mr15212846ywe.433.1652111765263; Mon, 09
- May 2022 08:56:05 -0700 (PDT)
+        Mon, 9 May 2022 13:28:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D1327736B;
+        Mon,  9 May 2022 10:24:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4240561573;
+        Mon,  9 May 2022 17:24:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03F04C385B1;
+        Mon,  9 May 2022 17:24:38 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="P29uYTZZ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1652117076;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=SW+Pf+scifYK88N8khy9YSj+wlk/zE/8eslg6ri6CSM=;
+        b=P29uYTZZS+MTP798m4pse9wYkbgC8oKhrLwtwpuPeYrQGEA7FzyXKUCGTtFI0Wm7kaFMeY
+        YyUhPoYGHrcFamJfVMX0VV6WW5NmqMXZvZ2HhKHBFvDUFSDU6BnvUhHoQU4zs/GkUvfQ2S
+        TQIdFceKG9XsiEGH24zpICcz4M0gtXI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81c59e08 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 9 May 2022 17:24:36 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: [PATCH] random: remove ratelimiting for in-kernel unseeded randomness
+Date:   Mon,  9 May 2022 19:24:26 +0200
+Message-Id: <20220509172426.612649-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <YmlMGx6+uigkGiZ0@zx2c4.com> <Ym3ZM1P+uYYABtRm@mit.edu>
- <Ym5sICj5iBMn2w/E@zx2c4.com> <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
-In-Reply-To: <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
-From:   Yevgeniy Dodis <dodis@cs.nyu.edu>
-Date:   Mon, 9 May 2022 11:55:53 -0400
-Message-ID: <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
-Subject: Re: is "premature next" a real world rng concern, or just an academic exercise?
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     tytso <tytso@mit.edu>, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Noah Stephens-Dawidowitz <noahsd@gmail.com>,
-        Stefano Tessaro <tessaro@cs.washington.edu>,
-        torvalds@linux-foundation.org, "D. J. Bernstein" <djb@cr.yp.to>,
-        jeanphilippe.aumasson@gmail.com, jann@thejh.net,
-        keescook@chromium.org, gregkh@linuxfoundation.org,
-        Peter Schwabe <peter@cryptojedi.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-resending in plain text... (hope got it right)
+The CONFIG_WARN_ALL_UNSEEDED_RANDOM debug option controls whether the
+kernel warns about all unseeded randomness or just the first instance.
+There's some complicated rate limiting and comparison to the previous
+caller, such that even with CONFIG_WARN_ALL_UNSEEDED_RANDOM enabled,
+developers still don't see all the messages or even an accurate count of
+how many were missed. This is the result of basically parallel
+mechanisms aimed at accomplishing more or less the same thing, added at
+different points in random.c history, which sort of compete with the
+first-instance-only limiting we have now.
 
-On Mon, May 9, 2022 at 11:15 AM Yevgeniy Dodis <dodis@cs.nyu.edu> wrote:
->
-> Hi Jason and all.
->
-> Thank you for starting this fascinating discussion. I generally agree with everything Jason said. In particular, I am not
-> 100% convinced that the extra cost of the premature next defense is justified.(Although Windows and MacOS are adamant it is
-> worth it :).)
->
-> But let me give some meta points to at least convince you this is not as obvious as Jason makes it sound.
->
-> 1) Attacking RNGs in any model is really hard. Heck, everybody knew for years that /dev/random is a mess
-> (and we published it formally in 2013, although this was folklore knowledge),  but in all these years nobody
-> (even Nadya's group :)) managed to find a practical attack. So just because the attack seems far-fetched, I do not think we should
-> lower our standards and do ugly stuff. Otherwise, just leave /dev/random the way it was before Jason started his awesome work.
->
-> 2) As Jason says, there are two distinct attack vectors needed to make the premature next attack.
-> A) compromising the state
-> B) (nearly) continuously observing RNG outputs
->
-> I agree with Jason's point that finding places where
-> -- A)+B) is possible, but
-> --- A)+A) is not possible,
-> is tricky. Although Nadya kind of indicated a place like that. VM1 and VM2 start with the same RNG state (for whatever
-> reason). VM1 is insecure, so can leak the state via A). VM2 is more secure, but obviously allows for B) through system
-> interface. This does not seem so hypothetical for me, especially in light of my mega-point 1) above -- almost any real-world
-> RNG attack is hard.
->
-> But I want to look at it from a different angle here. Let's ask if RNGs should be secure against A) or B) individually.
->
-> I think everybody agrees protection from B) is a must. This is the most basic definition of RNG! So let's just take itas
-> an axiom.
->
-> Protection against A) is trickier. But my read of Jason's email is that all his criticism comes exactly from this point.
-> If your system allows for state compromise, you have bigger problems than the premature next, etc. But let's ask ourselves
-> the question. Are we ready to design RNGs without recovery from state compromise? I believe nobody on this list would
-> be comfortable saying "yes". Because this would mean we don;t need to accumulate entropy beyond system start-up.
-> Once we reach the point of good initial state, and state compromise is not an issue, just use straight ChaCha or whatever other
-> stream cipher.
->
-> The point is, despite all arguments Jason puts, we all would feel extremely uncomfortable/uneasy to let continuous
-> entropy accumulation go, right?
->
-> This means we all hopefully agree that we need protection against A) and B) individually.
->
-> 3) Now comes the question. If we want to design a sound RNG using tools of modern cryptography, and we allow
-> the attacker an individual capability to enforce A) or B) individually, are we comfortable with the design where we:
-> * offer protection against A)
-> * offer protection against B)
-> * do NOT offer protection against A)+B), because we think it's too expensive given A)+B) is so rare?
->
-> I do not have a convincing answer to this question, but it is at least not obvious to me. On a good note, one worry
-> we might have is how to even have a definition protecting A), protecting B), but not protecting A)+B).
-> Fortunately, our papers resolve this question (although there are still theoretical annoyances which I do not
-> want to get into in this email). So, at least from this perspective, we are good. We have a definition with
-> exactly these (suboptimal) properties.
->
-> Anyway, these are my 2c.
-> Thoughts?
->
-> Yevgeniy
->
-> On Sun, May 1, 2022 at 7:17 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->>
->> Hi Ted,
->>
->> That's a useful analysis; thanks for that.
->>
->> On Sat, Apr 30, 2022 at 05:49:55PM -0700, tytso wrote:
->> > On Wed, Apr 27, 2022 at 03:58:51PM +0200, Jason A. Donenfeld wrote:
->> > >
->> > > 3) More broadly speaking, what kernel infoleak is actually acceptable to
->> > >    the degree that anybody would feel okay in the first place about the
->> > >    system continuing to run after it's been compromised?
->> >
->> > A one-time kernel infoleak where this might seem most likely is one
->> > where memory is read while the system is suspended/hibernated, or if
->> > you have a VM which is frozen and then replicated.  A related version
->> > is one where a VM is getting migrated from one host to another, and
->> > the attacker is able to grab the system memory from the source "host"
->> > after the VM is migrated to the destination "host".
->>
->> You've identified ~two places where compromises happen, but it's not an
->> attack that can just be repeated simply by re-running `./sploit > state`.
->>
->> 1) Virtual machines:
->>
->> It seems like after a VM state compromise during migration, or during
->> snapshotting, the name of the game is getting entropy into the RNG in a
->> usable way _as soon as possible_, and not delaying that. This is
->> Nadia's point. There's some inherent tension between waiting some amount
->> of time to use all available entropy -- the premature next requirement
->> -- and using everything you can as fast as you can because your output
->> stream is compromised/duplicated and that's very bad and should be
->> mitigated ASAP at any expense.
->>
->> [I'm also CC'ing Tom Risenpart, who's been following this thread, as he
->>  did some work regarding VM snapshots and compromise, and what RNG
->>  recovery in that context looks like, and arrived at pretty similar
->>  points.]
->>
->> You mentioned virtio-rng as a mitigation for this. That works, but only
->> if the data read from it are actually used rather quickly. So probably
->> /waiting/ to use that is suboptimal.
->>
->> One of the things added for 5.18 is this new "vmgenid" driver, which
->> responds to fork/snapshot notifications from hypervisors, so that VMs
->> can do something _immediately_ upon resumption/migration/etc. That's
->> probably the best general solution to that problem.
->>
->> Though vmgenid is supported by QEMU, VMware, Hyper-V, and hopefully soon
->> Firecracker, there'll still be people that don't have it for one reason
->> or another (and it has to be enabled manually in QEMU with `-device
->> vmgenid,guid=auto`; perhaps I should send a patch adding that to some
->> default machine types). Maybe that's their problem, but I take as your
->> point that we can still try to be less bad than otherwise by using more
->> entropy more often, and not delaying as the premature next model
->> requirements would have us do.
->>
->> 2) Suspend / hibernation:
->>
->> This is kind of the same situation as virtual machines, but the
->> particulars are a little bit different:
->>
->>   - There's no hypervisor giving us new seed material on resumption like
->>     we have with VM snapshots and vmgenid; but
->>
->>   - We also always know when it happens, because it's not transparent to
->>     the OS, so at least we can attempt to do something immediately like
->>     we do with the vmgenid driver.
->>
->> Fortunately, most systems that are doing suspend or hibernation these
->> days also have a RDRAND-like thing. It seems like it'd be a good idea
->> for me to add a PM notifier, mix into the pool both
->> ktime_get_boottime_ns() and ktime_get(), in addition to whatever type
->> info I get from the notifier block (suspend vs hibernate vs whatever
->> else) to account for the amount of time in the sleeping state, and then
->> immediately reseed the crng, which will pull in a bunch of
->> RDSEED/RDRAND/RDTSC values. This way on resumption, the system is always
->> in a good place.
->>
->> I did this years ago in WireGuard -- clearing key material before
->> suspend -- and there are some details around autosuspend (see
->> wg_pm_notification() in drivers/net/wireguard/device.c), but it's not
->> that hard to get right, so I'll give it a stab and send a patch.
->>
->> > But if the attacker can actually obtain internal state from one
->> > reconstituted VM, and use that to attack another reconstituted VM, and
->> > the attacker also knows what the nonce or time seed that was used so
->> > that different reconstituted VMs will have unique CRNG streams, this
->> > might be a place where the "premature next" attack might come into
->> > play.
->>
->> This is the place where it matters, I guess. It's also where the
->> tradeoff's from Nadia's argument come into play. System state gets
->> compromised during VM migration / hibernation. It comes back online and
->> starts doling out compromised random numbers. Worst case scenario is
->> there's no RDRAND or vmgenid or virtio-rng, and we've just got the good
->> old interrupt handler mangling cycle counters. Choices: A) recover from
->> the compromise /slowly/ in order to mitigate premature next, or B)
->> recover from the compromise /quickly/ in order to prevent things like
->> nonce reuse.
->>
->> What is more likely? That an attacker who compromised this state at one
->> point in time doesn't have the means to do it again elsewhere in the
->> pipeline, will use a high bandwidth /dev/urandom output stream to mount
->> a premature next attack, and is going after a high value target that
->> inexplicably doesn't have RDRAND/vmgenid/virtio-rng enabled? Or that
->> Nadia's group (or that large building in Utah) will get an Internet tap
->> and simply start looking for repeated nonces to break?
->>
->> Jason
+It turns out, however, that nobody cares about the first unseeded
+randomness instance of in-kernel users. The same first user has been
+there for ages now, and nobody is doing anything about it. It isn't even
+clear that anybody _can_ do anything about it. Most places that can do
+something about it have switched over to using get_random_bytes_wait()
+or wait_for_random_bytes(), which is the right thing to do, but there is
+still much code that needs randomness sometimes during init, and as a
+geeneral rule, if you're not using one of the _wait functions or the
+readiness notifier callback, you're bound to be doing it wrong just
+based on that fact alone.
+
+So warning about this same first user that can't easily change is simply
+not an effective mechanism for anything at all. Users can't do anything
+about it, as the Kconfig text points out -- the problem isn't in
+userspace code -- and kernel developers don't or more often can't react
+to it.
+
+Instead, show the warning for all instances when CONFIG_WARN_ALL_UNSEEDED_RANDOM
+is set, so that developers can debug things need be, or if it isn't set,
+don't show a warning at all.
+
+At the same time, CONFIG_WARN_ALL_UNSEEDED_RANDOM now implies setting
+random.ratelimit_disable=1 on by default, since if you care about one
+you probably care about the other too. And we can clean up usage around
+the related urandom_warning ratelimiter as well (whose behavior isn't
+changing), so that it properly counts missed messages after the 10
+message threshold is reached.
+
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ drivers/char/random.c | 62 +++++++++++++------------------------------
+ lib/Kconfig.debug     |  3 +--
+ 2 files changed, 19 insertions(+), 46 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 1598bb40376e..2f8559122dfa 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -88,11 +88,10 @@ static DEFINE_SPINLOCK(random_ready_chain_lock);
+ static RAW_NOTIFIER_HEAD(random_ready_chain);
+ 
+ /* Control how we warn userspace. */
+-static struct ratelimit_state unseeded_warning =
+-	RATELIMIT_STATE_INIT("warn_unseeded_randomness", HZ, 3);
+ static struct ratelimit_state urandom_warning =
+ 	RATELIMIT_STATE_INIT("warn_urandom_randomness", HZ, 3);
+-static int ratelimit_disable __read_mostly;
++static int ratelimit_disable __read_mostly =
++	IS_ENABLED(CONFIG_WARN_ALL_UNSEEDED_RANDOM);
+ module_param_named(ratelimit_disable, ratelimit_disable, int, 0644);
+ MODULE_PARM_DESC(ratelimit_disable, "Disable random ratelimit suppression");
+ 
+@@ -183,27 +182,15 @@ static void process_random_ready_list(void)
+ 	spin_unlock_irqrestore(&random_ready_chain_lock, flags);
+ }
+ 
+-#define warn_unseeded_randomness(previous) \
+-	_warn_unseeded_randomness(__func__, (void *)_RET_IP_, (previous))
++#define warn_unseeded_randomness() \
++	_warn_unseeded_randomness(__func__, (void *)_RET_IP_)
+ 
+-static void _warn_unseeded_randomness(const char *func_name, void *caller, void **previous)
++static void _warn_unseeded_randomness(const char *func_name, void *caller)
+ {
+-#ifdef CONFIG_WARN_ALL_UNSEEDED_RANDOM
+-	const bool print_once = false;
+-#else
+-	static bool print_once __read_mostly;
+-#endif
+-
+-	if (print_once || crng_ready() ||
+-	    (previous && (caller == READ_ONCE(*previous))))
++	if (!IS_ENABLED(CONFIG_WARN_ALL_UNSEEDED_RANDOM) || crng_ready())
+ 		return;
+-	WRITE_ONCE(*previous, caller);
+-#ifndef CONFIG_WARN_ALL_UNSEEDED_RANDOM
+-	print_once = true;
+-#endif
+-	if (__ratelimit(&unseeded_warning))
+-		printk_deferred(KERN_NOTICE "random: %s called from %pS with crng_init=%d\n",
+-				func_name, caller, crng_init);
++	printk_deferred(KERN_NOTICE "random: %s called from %pS with crng_init=%d\n",
++			func_name, caller, crng_init);
+ }
+ 
+ 
+@@ -455,9 +442,7 @@ static void _get_random_bytes(void *buf, size_t nbytes)
+  */
+ void get_random_bytes(void *buf, size_t nbytes)
+ {
+-	static void *previous;
+-
+-	warn_unseeded_randomness(&previous);
++	warn_unseeded_randomness();
+ 	_get_random_bytes(buf, nbytes);
+ }
+ EXPORT_SYMBOL(get_random_bytes);
+@@ -553,10 +538,9 @@ u64 get_random_u64(void)
+ 	u64 ret;
+ 	unsigned long flags;
+ 	struct batched_entropy *batch;
+-	static void *previous;
+ 	unsigned long next_gen;
+ 
+-	warn_unseeded_randomness(&previous);
++	warn_unseeded_randomness();
+ 
+ 	if  (!crng_ready()) {
+ 		_get_random_bytes(&ret, sizeof(ret));
+@@ -592,10 +576,9 @@ u32 get_random_u32(void)
+ 	u32 ret;
+ 	unsigned long flags;
+ 	struct batched_entropy *batch;
+-	static void *previous;
+ 	unsigned long next_gen;
+ 
+-	warn_unseeded_randomness(&previous);
++	warn_unseeded_randomness();
+ 
+ 	if  (!crng_ready()) {
+ 		_get_random_bytes(&ret, sizeof(ret));
+@@ -822,16 +805,9 @@ static void credit_init_bits(size_t nbits)
+ 		wake_up_interruptible(&crng_init_wait);
+ 		kill_fasync(&fasync, SIGIO, POLL_IN);
+ 		pr_notice("crng init done\n");
+-		if (unseeded_warning.missed) {
+-			pr_notice("%d get_random_xx warning(s) missed due to ratelimiting\n",
+-				  unseeded_warning.missed);
+-			unseeded_warning.missed = 0;
+-		}
+-		if (urandom_warning.missed) {
++		if (urandom_warning.missed)
+ 			pr_notice("%d urandom warning(s) missed due to ratelimiting\n",
+ 				  urandom_warning.missed);
+-			urandom_warning.missed = 0;
+-		}
+ 	} else if (orig < POOL_EARLY_BITS && new >= POOL_EARLY_BITS) {
+ 		spin_lock_irqsave(&base_crng.lock, flags);
+ 		/* Check if crng_init is CRNG_EMPTY, to avoid race with crng_reseed(). */
+@@ -975,11 +951,6 @@ int __init rand_initialize(void)
+ 	else if (arch_init && trust_cpu)
+ 		credit_init_bits(BLAKE2S_BLOCK_SIZE * 8);
+ 
+-	if (ratelimit_disable) {
+-		urandom_warning.interval = 0;
+-		unseeded_warning.interval = 0;
+-	}
+-
+ 	WARN_ON(register_pm_notifier(&pm_notifier));
+ 
+ 	WARN(!random_get_entropy(), "Missing cycle counter and fallback timer; RNG "
+@@ -1471,11 +1442,14 @@ static ssize_t urandom_read(struct file *file, char __user *buf, size_t nbytes,
+ 	if (!crng_ready())
+ 		try_to_generate_entropy();
+ 
+-	if (!crng_ready() && maxwarn > 0) {
+-		maxwarn--;
+-		if (__ratelimit(&urandom_warning))
++	if (!crng_ready()) {
++		if (!ratelimit_disable && maxwarn <= 0)
++			++urandom_warning.missed;
++		else if (ratelimit_disable || __ratelimit(&urandom_warning)) {
++			--maxwarn;
+ 			pr_notice("%s: uninitialized urandom read (%zd bytes read)\n",
+ 				  current->comm, nbytes);
++		}
+ 	}
+ 
+ 	return get_random_bytes_user(buf, nbytes);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 075cd25363ac..7e282970177a 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1616,8 +1616,7 @@ config WARN_ALL_UNSEEDED_RANDOM
+ 	  so architecture maintainers really need to do what they can
+ 	  to get the CRNG seeded sooner after the system is booted.
+ 	  However, since users cannot do anything actionable to
+-	  address this, by default the kernel will issue only a single
+-	  warning for the first use of unseeded randomness.
++	  address this, by default this option is disabled.
+ 
+ 	  Say Y here if you want to receive warnings for all uses of
+ 	  unseeded randomness.  This will be of use primarily for
+-- 
+2.35.1
+
