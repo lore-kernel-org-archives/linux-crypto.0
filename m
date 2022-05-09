@@ -2,88 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A24C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 13:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19413C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 13:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235121AbiEINI6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 09:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58396 "EHLO
+        id S235429AbiEINX3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 09:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235111AbiEINI6 (ORCPT
+        with ESMTP id S235485AbiEINX1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 09:08:58 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AA523276A
-        for <linux-crypto@vger.kernel.org>; Mon,  9 May 2022 06:05:04 -0700 (PDT)
-Received: from birne.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::51])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1no33x-0005Ao-B0; Mon, 09 May 2022 15:04:33 +0200
-Message-ID: <5e7c0b3c9bc285f1cf9f7b20f055aa376e1688cc.camel@pengutronix.de>
-Subject: Re: [EXT] [PATCH v9 3/7] crypto: caam - determine whether CAAM
- supports blob encap/decap
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        Michael Walle <michael@walle.cc>,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>
-Date:   Mon, 09 May 2022 15:04:20 +0200
-In-Reply-To: <DU2PR04MB8630501008F661C596C0106295C69@DU2PR04MB8630.eurprd04.prod.outlook.com>
-References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
-         <20220506062553.1068296-4-a.fatoum@pengutronix.de>
-         <DU2PR04MB8630501008F661C596C0106295C69@DU2PR04MB8630.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.3-1 
+        Mon, 9 May 2022 09:23:27 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A059B2B1645;
+        Mon,  9 May 2022 06:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652102373; x=1683638373;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iw7AkwX6aWzKG6Flh+f4y/Qhta8v4tot42bt4LXNf+I=;
+  b=GOMX32zT0PLnXB1oGlqHK1kQIB2Bc/SYei8HOS08ZdtGsesaK59xQGgA
+   olNarXpQzWv68eyjEvtQUpbZBYK4sLSKt2LOb/xkSXXunOIG9mZYhjHSJ
+   +XZg6+ys+h8TnIheLSJZsCTB9uPyXBRTXnYrSzelLZOnSRSdFomba7zwb
+   i6x1Mg8//B5voaFiMdDO/emI6kzmZobtupfTQWn9NFPWTyLvs6uVQNMl6
+   Ern6v4Zek/1UC5jG9tTJIYq3rQBUlMkddmg80EfZkFFUzP8gRTN3LFLn0
+   oaut+WWTJz2tLb86/LgPBoZNaNuyOm4u6Z6gwyWIkc1vfz0iat6PauCIr
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="268712064"
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="268712064"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 06:19:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,211,1647327600"; 
+   d="scan'208";a="519229672"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by orsmga003.jf.intel.com with ESMTP; 09 May 2022 06:19:31 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        stable@vger.kernel.org, Adam Guerin <adam.guerin@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: [PATCH] crypto: qat - set to zero DH parameters before free
+Date:   Mon,  9 May 2022 14:19:27 +0100
+Message-Id: <20220509131927.55387-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::51
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Pankaj,
+Set to zero the context buffers containing the DH key before they are
+freed.
+This is a defense in depth measure that avoids keys to be recovered from
+memory in case the system is compromised between the free of the buffer
+and when that area of memory (containing keys) gets overwritten.
 
-On Mon, 2022-05-09 at 12:39 +0000, Pankaj Gupta wrote:
-> > -       if (ctrlpriv->era < 10)
-> > +       comp_params = rd_reg32(&ctrl->perfmon.comp_parms_ls);
-> > +       ctrlpriv->blob_present = !!(comp_params & CTPR_LS_BLOB);
-> > +
-> > +       if (ctrlpriv->era < 10) {
-> >                 rng_vid = (rd_reg32(&ctrl->perfmon.cha_id_ls) &
-> >                            CHA_ID_LS_RNG_MASK) >>
-> > CHA_ID_LS_RNG_SHIFT;
-> 
-> Check for AES CHAs for Era < 10, should be added.
+Cc: stable@vger.kernel.org
+Fixes: c9839143ebbf ("crypto: qat - Add DH support")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Adam Guerin <adam.guerin@intel.com>
+Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+---
+ drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Do I need this? I only do this check for Era >= 10, because apparently
-there are Layerscape non-E processors that indicate BLOB support via
-CTPR_LS_BLOB, but fail at runtime. Are there any Era < 10 SoCs
-that are similarly broken?
-
-Cheers,
-Ahmad
+diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+index b0b78445418b..5633f9df3b6f 100644
+--- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+@@ -420,14 +420,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+ static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
+ {
+ 	if (ctx->g) {
++		memset(ctx->g, 0, ctx->p_size);
+ 		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
+ 		ctx->g = NULL;
+ 	}
+ 	if (ctx->xa) {
++		memset(ctx->xa, 0, ctx->p_size);
+ 		dma_free_coherent(dev, ctx->p_size, ctx->xa, ctx->dma_xa);
+ 		ctx->xa = NULL;
+ 	}
+ 	if (ctx->p) {
++		memset(ctx->p, 0, ctx->p_size);
+ 		dma_free_coherent(dev, ctx->p_size, ctx->p, ctx->dma_p);
+ 		ctx->p = NULL;
+ 	}
+-- 
+2.35.1
 
