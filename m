@@ -2,122 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41151C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 09:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E59C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 09:28:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbiEIJau (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 05:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52736 "EHLO
+        id S230367AbiEIJbo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 05:31:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237941AbiEIJDJ (ORCPT
+        with ESMTP id S237774AbiEIJR4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 05:03:09 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AA1205463;
-        Mon,  9 May 2022 01:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652086750; x=1683622750;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rL6FppCh+odiZj/j2SRhUl205NpKRtoL86HcUFDQOLM=;
-  b=UtPMkftlQ6sNcPI89axOAqPfTeT6CegBTNwwO+KNE7XxGfXcbz/NBF8b
-   I5pOdE15mranfg8JVsK+R+QENRr0oLx5qgWN37sKGltJM6xLyJnp/DEKC
-   mfsHRA63PC7GAZ0arM36OdRdsDnT925GdLYtlPtJzy0uKk+YbGN3fBOAR
-   JpubTGL0RstzaCJX7AVxIaAdxPjHLjF+etfcpUKP0QfCow4eEO87r+P5C
-   DZN5lk/Vpezzx6UY50fAt0jfPyCG5KFEHj8mi8MQArq+vgn+Ufta3x59M
-   HNTo7xXr99LO9IA1ULiaXxhfpNqYUiESIAWauib1agAJ23ELMeDiiT0Ho
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="294210670"
-X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
-   d="scan'208";a="294210670"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 01:58:20 -0700
-X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
-   d="scan'208";a="601864339"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 01:58:17 -0700
-Date:   Mon, 9 May 2022 09:58:14 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        vdronov@redhat.com, stable@vger.kernel.org,
-        Adam Guerin <adam.guerin@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: Re: [PATCH 07/12] crypto: qat - set to zero DH parameters before free
-Message-ID: <YnjXppYkVYNyWTFg@silpixa00400314>
-References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
- <20220506082327.21605-8-giovanni.cabiddu@intel.com>
- <YnTpJkTXwmYyE9lQ@kroah.com>
- <YnTx7fs30scrrjmQ@silpixa00400314>
- <YnUzsAQd682pJjMt@kroah.com>
- <Yna/2Iwdr8zcwi+q@sol.localdomain>
+        Mon, 9 May 2022 05:17:56 -0400
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [IPv6:2a02:1800:110:4::f00:19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79C51C5E01
+        for <linux-crypto@vger.kernel.org>; Mon,  9 May 2022 02:14:02 -0700 (PDT)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:7048:8ec9:5f5b:8cb])
+        by laurent.telenet-ops.be with bizsmtp
+        id UZDc2700P1UlgJi01ZDc2B; Mon, 09 May 2022 11:13:37 +0200
+Received: from geert (helo=localhost)
+        by ramsan.of.borg with local-esmtp (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1nnzSS-003WbP-Ju; Mon, 09 May 2022 11:13:36 +0200
+Date:   Mon, 9 May 2022 11:13:36 +0200 (CEST)
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+X-X-Sender: geert@ramsan.of.borg
+To:     linux-kernel@vger.kernel.org
+cc:     linux-crypto@vger.kernel.org, sparclinux@vger.kernel.org
+Subject: Re: Build regressions/improvements in v5.18-rc6B
+In-Reply-To: <20220509084005.4133902-1-geert@linux-m68k.org>
+Message-ID: <alpine.DEB.2.22.394.2205091113010.840289@ramsan.of.borg>
+References: <CAHk-=wi0vqZQUAS67tBsJQW+dtt89m+dqA-Z4bOs8CH-mm8u2w@mail.gmail.com> <20220509084005.4133902-1-geert@linux-m68k.org>
+User-Agent: Alpine 2.22 (DEB 394 2020-01-19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yna/2Iwdr8zcwi+q@sol.localdomain>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 07, 2022 at 11:52:08AM -0700, Eric Biggers wrote:
-> On Fri, May 06, 2022 at 04:41:52PM +0200, Greg KH wrote:
-> > On Fri, May 06, 2022 at 11:01:17AM +0100, Giovanni Cabiddu wrote:
-> > > On Fri, May 06, 2022 at 11:23:50AM +0200, Greg KH wrote:
-> > > > On Fri, May 06, 2022 at 09:23:22AM +0100, Giovanni Cabiddu wrote:
-> > > > > Set to zero the DH context buffers containing the DH key before they are
-> > > > > freed.
-> > > > 
-> > > > That says what, but not why.
-> > > > 
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Fixes: c9839143ebbf ("crypto: qat - Add DH support")
-> > > > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> > > > > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
-> > > > > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
-> > > > > ---
-> > > > >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
-> > > > >  1 file changed, 3 insertions(+)
-> > > > > 
-> > > > > diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > > index d75eb77c9fb9..2fec89b8a188 100644
-> > > > > --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > > +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-> > > > > @@ -421,14 +421,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
-> > > > >  static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
-> > > > >  {
-> > > > >  	if (ctx->g) {
-> > > > > +		memzero_explicit(ctx->g, ctx->p_size);
-> > > > >  		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
-> > > > 
-> > > > Why is a memset() not sufficient here?
-> > > Based on the previous conversation a memset() should be sufficient.
-> > > 
-> > > > And what is this solving?  Who would get this stale data?
-> > > This is to make sure the buffer containing sensitive data (i.e. a key)
-> > > is not leaked out by a subsequent allocation.
-> > 
-> > But as all sane distros have CONFIG_INIT_ON_ALLOC_DEFAULT_ON enabled,
-> > right?  That should handle any worries you have with secrets being on
-> > the heap.  But even then, are you trying to protect yourself against
-> > other kernel modules?  Think this through...
-> > 
-> 
-> This patch looks fine to me; it's always recommended to zero out crypto keys at
-> the end of their lifetime so that they can't be recovered from free memory if
-> system memory is compromised before the memory happens to be allocated and
-> overwritten again.  See the hundreds of existing callers of kfree_sensitive(),
-> which exist for exactly this reason.
-> 
-> Note that preventing the key from being "leaked out by a subsequent allocation"
-> is *not* the point, and thus CONFIG_INIT_ON_ALLOC_DEFAULT_ON is irrelevant.
-I'm going to clarify the commit message and re-send it detached from the
-set.
+On Mon, 9 May 2022, Geert Uytterhoeven wrote:
+> JFYI, when comparing v5.18-rc6[1] to v5.18-rc5[3], the summaries are:
+>  - build errors: +1/-0
 
-Regards,
+   + /kisskb/src/crypto/blake2b_generic.c: error: the frame size of 2288 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]:  => 109:1
 
--- 
-Giovanni
+sparc64-gcc11/sparc-allmodconfig
+
+> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/c5eb0a61238dd6faf37f58c9ce61c9980aaffd7a/ (131 out of 138 configs)
+> [3] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/672c0c5173427e6b3e2a9bbb7be51ceeec78093a/ (all 138 configs)
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
