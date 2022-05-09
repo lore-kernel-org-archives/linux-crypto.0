@@ -2,86 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDB6C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 07:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41151C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 09:27:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbiEIHra (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 03:47:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34956 "EHLO
+        id S230124AbiEIJau (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 05:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234874AbiEIH2D (ORCPT
+        with ESMTP id S237941AbiEIJDJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 03:28:03 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E7821AC
-        for <linux-crypto@vger.kernel.org>; Mon,  9 May 2022 00:24:11 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id l18so24984763ejc.7
-        for <linux-crypto@vger.kernel.org>; Mon, 09 May 2022 00:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=z5Clk3XYXTp+vmz5f/jeXgXYH06mx9BqefglYqriuK0=;
-        b=KHHanOPHMJzQqw6GMXaDS9KVtVOGdklcaRuC/OvfhXffD6M69QJz260KKpWqqYpaCA
-         6A3/Sdd5SwhVxkmqbwke+bGMT8WU5XQaU+DQMTDdqVgMivB5VcoAO8MFNkMepLy5OuAI
-         WSTxjSIUmFpuz0fenzMVdz5HU+R7DCnoYTCWXUtu9dhTO/Ni4katAVIPuzZzuhL7+8DC
-         J/ywTVxCEkeLABC7V0SeijP1PduRx5nIPfdQd/hWqvwFnSE2b01bEU8zcLUKoUYROl5p
-         bgXeMuPwatUa3smZHrf2Qk3yntrVkqaTXwBdEnUsooZEZ1QYjzOjRAJY9Xcf6gHaoWmU
-         U1oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=z5Clk3XYXTp+vmz5f/jeXgXYH06mx9BqefglYqriuK0=;
-        b=0DDRceA7ABiphCNuPMmvnnfLMk14mjOvF+ZNbzU3CnM22JyFiVm3hlyeaXy5S66W3x
-         GwRkfs7UjfBcZmWxTYheJEZpD496sbg5liQkhErCKe8gvmEU4kBqvLL2cexZo2ZUmqVI
-         4A/KWLFtHctTwIj2jLdjskc/4vTsD3F1VWm7jO6yynkntrlvq/P72JCDu/jBPg5zUfeR
-         WT/RkxMvCufmliNoxjqJdj4NfsiJk3S7h5x3gW2B6jgNp35EIVcHEEFoVUJpMxHD0pMP
-         PZo1U6TQT0Jv/CY1BGoOVnODYITIxg9SAbdHNGuK6fb/qATpIoTAe/XgkBXvJIokdqfc
-         sp9A==
-X-Gm-Message-State: AOAM531m44KR9w6QZVolJRgEY8aB3NQ0bW4z6jge1qsvzTDi/sOeEE+J
-        ZJRTEvuUf98zoa0VPMAMEwTUWA==
-X-Google-Smtp-Source: ABdhPJxsCeAGzJhiVxk3d02pleP/R1atUtuQTe5bS4dXtMXLktM0/4uRbPSxOhKyBgBzGzmTexDkXQ==
-X-Received: by 2002:a17:907:a40d:b0:6f3:d1e4:9d7b with SMTP id sg13-20020a170907a40d00b006f3d1e49d7bmr13391190ejc.69.1652081036476;
-        Mon, 09 May 2022 00:23:56 -0700 (PDT)
-Received: from [192.168.0.242] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
-        by smtp.gmail.com with ESMTPSA id md17-20020a170906ae9100b006f3ef214e30sm4799652ejb.150.2022.05.09.00.23.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 May 2022 00:23:55 -0700 (PDT)
-Message-ID: <0c44d40e-cded-cf35-b836-baff156f36d7@linaro.org>
-Date:   Mon, 9 May 2022 09:23:54 +0200
+        Mon, 9 May 2022 05:03:09 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AA1205463;
+        Mon,  9 May 2022 01:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652086750; x=1683622750;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rL6FppCh+odiZj/j2SRhUl205NpKRtoL86HcUFDQOLM=;
+  b=UtPMkftlQ6sNcPI89axOAqPfTeT6CegBTNwwO+KNE7XxGfXcbz/NBF8b
+   I5pOdE15mranfg8JVsK+R+QENRr0oLx5qgWN37sKGltJM6xLyJnp/DEKC
+   mfsHRA63PC7GAZ0arM36OdRdsDnT925GdLYtlPtJzy0uKk+YbGN3fBOAR
+   JpubTGL0RstzaCJX7AVxIaAdxPjHLjF+etfcpUKP0QfCow4eEO87r+P5C
+   DZN5lk/Vpezzx6UY50fAt0jfPyCG5KFEHj8mi8MQArq+vgn+Ufta3x59M
+   HNTo7xXr99LO9IA1ULiaXxhfpNqYUiESIAWauib1agAJ23ELMeDiiT0Ho
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10341"; a="294210670"
+X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
+   d="scan'208";a="294210670"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 01:58:20 -0700
+X-IronPort-AV: E=Sophos;i="5.91,210,1647327600"; 
+   d="scan'208";a="601864339"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 01:58:17 -0700
+Date:   Mon, 9 May 2022 09:58:14 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Greg KH <gregkh@linuxfoundation.org>, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        vdronov@redhat.com, stable@vger.kernel.org,
+        Adam Guerin <adam.guerin@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: Re: [PATCH 07/12] crypto: qat - set to zero DH parameters before free
+Message-ID: <YnjXppYkVYNyWTFg@silpixa00400314>
+References: <20220506082327.21605-1-giovanni.cabiddu@intel.com>
+ <20220506082327.21605-8-giovanni.cabiddu@intel.com>
+ <YnTpJkTXwmYyE9lQ@kroah.com>
+ <YnTx7fs30scrrjmQ@silpixa00400314>
+ <YnUzsAQd682pJjMt@kroah.com>
+ <Yna/2Iwdr8zcwi+q@sol.localdomain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH v7 25/33] dt-bindings: crypto: rockchip: convert to new
- driver bindings
-Content-Language: en-US
-To:     Corentin Labbe <clabbe@baylibre.com>, heiko@sntech.de,
-        ardb@kernel.org, herbert@gondor.apana.org.au,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-rockchip@lists.infradead.org
-References: <20220508185957.3629088-1-clabbe@baylibre.com>
- <20220508185957.3629088-26-clabbe@baylibre.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20220508185957.3629088-26-clabbe@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yna/2Iwdr8zcwi+q@sol.localdomain>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/05/2022 20:59, Corentin Labbe wrote:
-> The latest addition to the rockchip crypto driver need to update the
-> driver bindings.
+On Sat, May 07, 2022 at 11:52:08AM -0700, Eric Biggers wrote:
+> On Fri, May 06, 2022 at 04:41:52PM +0200, Greg KH wrote:
+> > On Fri, May 06, 2022 at 11:01:17AM +0100, Giovanni Cabiddu wrote:
+> > > On Fri, May 06, 2022 at 11:23:50AM +0200, Greg KH wrote:
+> > > > On Fri, May 06, 2022 at 09:23:22AM +0100, Giovanni Cabiddu wrote:
+> > > > > Set to zero the DH context buffers containing the DH key before they are
+> > > > > freed.
+> > > > 
+> > > > That says what, but not why.
+> > > > 
+> > > > > Cc: stable@vger.kernel.org
+> > > > > Fixes: c9839143ebbf ("crypto: qat - Add DH support")
+> > > > > Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > > > > Reviewed-by: Adam Guerin <adam.guerin@intel.com>
+> > > > > Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+> > > > > ---
+> > > > >  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
+> > > > >  1 file changed, 3 insertions(+)
+> > > > > 
+> > > > > diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > > index d75eb77c9fb9..2fec89b8a188 100644
+> > > > > --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > > +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> > > > > @@ -421,14 +421,17 @@ static int qat_dh_set_params(struct qat_dh_ctx *ctx, struct dh *params)
+> > > > >  static void qat_dh_clear_ctx(struct device *dev, struct qat_dh_ctx *ctx)
+> > > > >  {
+> > > > >  	if (ctx->g) {
+> > > > > +		memzero_explicit(ctx->g, ctx->p_size);
+> > > > >  		dma_free_coherent(dev, ctx->p_size, ctx->g, ctx->dma_g);
+> > > > 
+> > > > Why is a memset() not sufficient here?
+> > > Based on the previous conversation a memset() should be sufficient.
+> > > 
+> > > > And what is this solving?  Who would get this stale data?
+> > > This is to make sure the buffer containing sensitive data (i.e. a key)
+> > > is not leaked out by a subsequent allocation.
+> > 
+> > But as all sane distros have CONFIG_INIT_ON_ALLOC_DEFAULT_ON enabled,
+> > right?  That should handle any worries you have with secrets being on
+> > the heap.  But even then, are you trying to protect yourself against
+> > other kernel modules?  Think this through...
+> > 
 > 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> This patch looks fine to me; it's always recommended to zero out crypto keys at
+> the end of their lifetime so that they can't be recovered from free memory if
+> system memory is compromised before the memory happens to be allocated and
+> overwritten again.  See the hundreds of existing callers of kfree_sensitive(),
+> which exist for exactly this reason.
+> 
+> Note that preventing the key from being "leaked out by a subsequent allocation"
+> is *not* the point, and thus CONFIG_INIT_ON_ALLOC_DEFAULT_ON is irrelevant.
+I'm going to clarify the commit message and re-send it detached from the
+set.
 
+Regards,
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-
-Best regards,
-Krzysztof
+-- 
+Giovanni
