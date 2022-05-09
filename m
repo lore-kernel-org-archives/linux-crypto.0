@@ -2,248 +2,211 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706D3C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 17:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEF5C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 19:20:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233396AbiEIR2f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 13:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41330 "EHLO
+        id S240527AbiEITYT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 15:24:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239563AbiEIR2f (ORCPT
+        with ESMTP id S240537AbiEITYR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 13:28:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D1327736B;
-        Mon,  9 May 2022 10:24:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4240561573;
-        Mon,  9 May 2022 17:24:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03F04C385B1;
-        Mon,  9 May 2022 17:24:38 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="P29uYTZZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652117076;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=SW+Pf+scifYK88N8khy9YSj+wlk/zE/8eslg6ri6CSM=;
-        b=P29uYTZZS+MTP798m4pse9wYkbgC8oKhrLwtwpuPeYrQGEA7FzyXKUCGTtFI0Wm7kaFMeY
-        YyUhPoYGHrcFamJfVMX0VV6WW5NmqMXZvZ2HhKHBFvDUFSDU6BnvUhHoQU4zs/GkUvfQ2S
-        TQIdFceKG9XsiEGH24zpICcz4M0gtXI=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81c59e08 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 9 May 2022 17:24:36 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>
-Subject: [PATCH] random: remove ratelimiting for in-kernel unseeded randomness
-Date:   Mon,  9 May 2022 19:24:26 +0200
-Message-Id: <20220509172426.612649-1-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 9 May 2022 15:24:17 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B24245796
+        for <linux-crypto@vger.kernel.org>; Mon,  9 May 2022 12:20:18 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2f16f3a7c34so127309897b3.17
+        for <linux-crypto@vger.kernel.org>; Mon, 09 May 2022 12:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=H6QqIh+pI17Kk15/gtJ53p2UAO94Xn8dwVwMH5QlY3k=;
+        b=aZd5gr74deqM0PWU/lTsKqXLMnEU65bjkdfRXqd8IAoV4e2yTN0Lc6cT8ljEWulBDy
+         Xe7b/5PhZbbMwEgi+P0B23R4CjJ9xPKwiw80+c+NzKzgGRYqmU3K395ycca6WLi5eSTj
+         wrDuVjkynlnh6oJX3w9QlPiOsXuWO/DtOo0ao738l9PsiLadtKHtBgI7SxWq80alDH00
+         niCt4VFfXXbbj/mlX26d0Mlg8hwJ1tImpq8pmSeK/PgsTuSDitJaobJPIqcBJly3dD9U
+         q9+xhZdPKCXejuKLaWy5snj96wMKZZaS8Yqvair1sZdQjm/hr6aKOEOX+mKklKneV3Yd
+         h45g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=H6QqIh+pI17Kk15/gtJ53p2UAO94Xn8dwVwMH5QlY3k=;
+        b=uYjYojfLnwzFnS4LutaQtcIv06uLB9GwsNnMHXivyuCryu6Ot5pn9lQG+/QmscYygt
+         OKSf3jQIO4lNhLHmgnZsykUfYlFMKqAXuUrMkJR0y5KqCu6kpyhiZRGhTMnfsK5AoWiH
+         VpcAulGfqqTfAZY7irJK+MrSTJbsnnCRb4u+GYTFeaiY7KuHphFeB7sYxSUwfXml92Dl
+         bGnKHkTwxSIWJjKlnn6juNz2BRu1PmI+LTtpOZWoQPyC1l5qRTMtw/CJmiuVRG3Mgi+B
+         P/jPCF/kkh+cFLbPLC87Oz7O4w98QIvrXW4Ih17/QEGhLppH2GRXiSiYvVaE851qyfvK
+         T+Pw==
+X-Gm-Message-State: AOAM533059cWvCG94JNYQCstIBTQl+jC7vXYsTRGGU47eIs2B1DHDcbc
+        7rtwS8inzxykfhjek6hfPdjH2M6hD0HHmrAO8+60VIYBSQRp2CfhPq+/Gf5vRifcdYbHZdNZF5B
+        Vvh1u0o2YiXmGge0F4QrrUoXtmCXauLRQy1B141E6nt1rGaZLyTXcnJa0UjcfnwAHHhA=
+X-Google-Smtp-Source: ABdhPJyrf244tD9QmISI/73P96aZPF8Hub18aiV5tm/9iMdpU9npSqAqFJxLhjCSPjKaxcMF94TNF+TrQw==
+X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
+ (user=nhuck job=sendgmr) by 2002:a0d:eb4b:0:b0:2f8:9089:3ad4 with SMTP id
+ u72-20020a0deb4b000000b002f890893ad4mr15479867ywe.65.1652124017396; Mon, 09
+ May 2022 12:20:17 -0700 (PDT)
+Date:   Mon,  9 May 2022 19:10:58 +0000
+Message-Id: <20220509191107.3556468-1-nhuck@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
+Subject: [PATCH v7 0/9] crypto: HCTR2 support
+From:   Nathan Huckleberry <nhuck@google.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-fscrypt@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nathan Huckleberry <nhuck@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CONFIG_WARN_ALL_UNSEEDED_RANDOM debug option controls whether the
-kernel warns about all unseeded randomness or just the first instance.
-There's some complicated rate limiting and comparison to the previous
-caller, such that even with CONFIG_WARN_ALL_UNSEEDED_RANDOM enabled,
-developers still don't see all the messages or even an accurate count of
-how many were missed. This is the result of basically parallel
-mechanisms aimed at accomplishing more or less the same thing, added at
-different points in random.c history, which sort of compete with the
-first-instance-only limiting we have now.
+HCTR2 is a length-preserving encryption mode that is efficient on
+processors with instructions to accelerate AES and carryless
+multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
+processors with the ARMv8 Crypto Extensions.
 
-It turns out, however, that nobody cares about the first unseeded
-randomness instance of in-kernel users. The same first user has been
-there for ages now, and nobody is doing anything about it. It isn't even
-clear that anybody _can_ do anything about it. Most places that can do
-something about it have switched over to using get_random_bytes_wait()
-or wait_for_random_bytes(), which is the right thing to do, but there is
-still much code that needs randomness sometimes during init, and as a
-geeneral rule, if you're not using one of the _wait functions or the
-readiness notifier callback, you're bound to be doing it wrong just
-based on that fact alone.
+HCTR2 is specified in https://ia.cr/2021/1441 "Length-preserving encryption
+with HCTR2" which shows that if AES is secure and HCTR2 is instantiated
+with AES, then HCTR2 is secure.  Reference code and test vectors are at
+https://github.com/google/hctr2.
 
-So warning about this same first user that can't easily change is simply
-not an effective mechanism for anything at all. Users can't do anything
-about it, as the Kconfig text points out -- the problem isn't in
-userspace code -- and kernel developers don't or more often can't react
-to it.
+As a length-preserving encryption mode, HCTR2 is suitable for applications
+such as storage encryption where ciphertext expansion is not possible, and
+thus authenticated encryption cannot be used.  Currently, such applications
+usually use XTS, or in some cases Adiantum.  XTS has the disadvantage that
+it is a narrow-block mode: a bitflip will only change 16 bytes in the
+resulting ciphertext or plaintext.  This reveals more information to an
+attacker than necessary.
 
-Instead, show the warning for all instances when CONFIG_WARN_ALL_UNSEEDED_RANDOM
-is set, so that developers can debug things need be, or if it isn't set,
-don't show a warning at all.
+HCTR2 is a wide-block mode, so it provides a stronger security property: a
+bitflip will change the entire message.  HCTR2 is somewhat similar to
+Adiantum, which is also a wide-block mode.  However, HCTR2 is designed to
+take advantage of existing crypto instructions, while Adiantum targets
+devices without such hardware support.  Adiantum is also designed with
+longer messages in mind, while HCTR2 is designed to be efficient even on
+short messages.
 
-At the same time, CONFIG_WARN_ALL_UNSEEDED_RANDOM now implies setting
-random.ratelimit_disable=1 on by default, since if you care about one
-you probably care about the other too. And we can clean up usage around
-the related urandom_warning ratelimiter as well (whose behavior isn't
-changing), so that it properly counts missed messages after the 10
-message threshold is reached.
+The first intended use of this mode in the kernel is for the encryption of
+filenames, where for efficiency reasons encryption must be fully
+deterministic (only one ciphertext for each plaintext) and the existing CBC
+solution leaks more information than necessary for filenames with common
+prefixes.
 
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- drivers/char/random.c | 62 +++++++++++++------------------------------
- lib/Kconfig.debug     |  3 +--
- 2 files changed, 19 insertions(+), 46 deletions(-)
+HCTR2 uses two passes of an =CE=B5-almost-=E2=88=86-universal hash function=
+ called
+POLYVAL and one pass of a block cipher mode called XCTR.  POLYVAL is a
+polynomial hash designed for efficiency on modern processors and was
+originally specified for use in AES-GCM-SIV (RFC 8452).  XCTR mode is a
+variant of CTR mode that is more efficient on little-endian machines.
 
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 1598bb40376e..2f8559122dfa 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -88,11 +88,10 @@ static DEFINE_SPINLOCK(random_ready_chain_lock);
- static RAW_NOTIFIER_HEAD(random_ready_chain);
- 
- /* Control how we warn userspace. */
--static struct ratelimit_state unseeded_warning =
--	RATELIMIT_STATE_INIT("warn_unseeded_randomness", HZ, 3);
- static struct ratelimit_state urandom_warning =
- 	RATELIMIT_STATE_INIT("warn_urandom_randomness", HZ, 3);
--static int ratelimit_disable __read_mostly;
-+static int ratelimit_disable __read_mostly =
-+	IS_ENABLED(CONFIG_WARN_ALL_UNSEEDED_RANDOM);
- module_param_named(ratelimit_disable, ratelimit_disable, int, 0644);
- MODULE_PARM_DESC(ratelimit_disable, "Disable random ratelimit suppression");
- 
-@@ -183,27 +182,15 @@ static void process_random_ready_list(void)
- 	spin_unlock_irqrestore(&random_ready_chain_lock, flags);
- }
- 
--#define warn_unseeded_randomness(previous) \
--	_warn_unseeded_randomness(__func__, (void *)_RET_IP_, (previous))
-+#define warn_unseeded_randomness() \
-+	_warn_unseeded_randomness(__func__, (void *)_RET_IP_)
- 
--static void _warn_unseeded_randomness(const char *func_name, void *caller, void **previous)
-+static void _warn_unseeded_randomness(const char *func_name, void *caller)
- {
--#ifdef CONFIG_WARN_ALL_UNSEEDED_RANDOM
--	const bool print_once = false;
--#else
--	static bool print_once __read_mostly;
--#endif
--
--	if (print_once || crng_ready() ||
--	    (previous && (caller == READ_ONCE(*previous))))
-+	if (!IS_ENABLED(CONFIG_WARN_ALL_UNSEEDED_RANDOM) || crng_ready())
- 		return;
--	WRITE_ONCE(*previous, caller);
--#ifndef CONFIG_WARN_ALL_UNSEEDED_RANDOM
--	print_once = true;
--#endif
--	if (__ratelimit(&unseeded_warning))
--		printk_deferred(KERN_NOTICE "random: %s called from %pS with crng_init=%d\n",
--				func_name, caller, crng_init);
-+	printk_deferred(KERN_NOTICE "random: %s called from %pS with crng_init=%d\n",
-+			func_name, caller, crng_init);
- }
- 
- 
-@@ -455,9 +442,7 @@ static void _get_random_bytes(void *buf, size_t nbytes)
-  */
- void get_random_bytes(void *buf, size_t nbytes)
- {
--	static void *previous;
--
--	warn_unseeded_randomness(&previous);
-+	warn_unseeded_randomness();
- 	_get_random_bytes(buf, nbytes);
- }
- EXPORT_SYMBOL(get_random_bytes);
-@@ -553,10 +538,9 @@ u64 get_random_u64(void)
- 	u64 ret;
- 	unsigned long flags;
- 	struct batched_entropy *batch;
--	static void *previous;
- 	unsigned long next_gen;
- 
--	warn_unseeded_randomness(&previous);
-+	warn_unseeded_randomness();
- 
- 	if  (!crng_ready()) {
- 		_get_random_bytes(&ret, sizeof(ret));
-@@ -592,10 +576,9 @@ u32 get_random_u32(void)
- 	u32 ret;
- 	unsigned long flags;
- 	struct batched_entropy *batch;
--	static void *previous;
- 	unsigned long next_gen;
- 
--	warn_unseeded_randomness(&previous);
-+	warn_unseeded_randomness();
- 
- 	if  (!crng_ready()) {
- 		_get_random_bytes(&ret, sizeof(ret));
-@@ -822,16 +805,9 @@ static void credit_init_bits(size_t nbits)
- 		wake_up_interruptible(&crng_init_wait);
- 		kill_fasync(&fasync, SIGIO, POLL_IN);
- 		pr_notice("crng init done\n");
--		if (unseeded_warning.missed) {
--			pr_notice("%d get_random_xx warning(s) missed due to ratelimiting\n",
--				  unseeded_warning.missed);
--			unseeded_warning.missed = 0;
--		}
--		if (urandom_warning.missed) {
-+		if (urandom_warning.missed)
- 			pr_notice("%d urandom warning(s) missed due to ratelimiting\n",
- 				  urandom_warning.missed);
--			urandom_warning.missed = 0;
--		}
- 	} else if (orig < POOL_EARLY_BITS && new >= POOL_EARLY_BITS) {
- 		spin_lock_irqsave(&base_crng.lock, flags);
- 		/* Check if crng_init is CRNG_EMPTY, to avoid race with crng_reseed(). */
-@@ -975,11 +951,6 @@ int __init rand_initialize(void)
- 	else if (arch_init && trust_cpu)
- 		credit_init_bits(BLAKE2S_BLOCK_SIZE * 8);
- 
--	if (ratelimit_disable) {
--		urandom_warning.interval = 0;
--		unseeded_warning.interval = 0;
--	}
--
- 	WARN_ON(register_pm_notifier(&pm_notifier));
- 
- 	WARN(!random_get_entropy(), "Missing cycle counter and fallback timer; RNG "
-@@ -1471,11 +1442,14 @@ static ssize_t urandom_read(struct file *file, char __user *buf, size_t nbytes,
- 	if (!crng_ready())
- 		try_to_generate_entropy();
- 
--	if (!crng_ready() && maxwarn > 0) {
--		maxwarn--;
--		if (__ratelimit(&urandom_warning))
-+	if (!crng_ready()) {
-+		if (!ratelimit_disable && maxwarn <= 0)
-+			++urandom_warning.missed;
-+		else if (ratelimit_disable || __ratelimit(&urandom_warning)) {
-+			--maxwarn;
- 			pr_notice("%s: uninitialized urandom read (%zd bytes read)\n",
- 				  current->comm, nbytes);
-+		}
- 	}
- 
- 	return get_random_bytes_user(buf, nbytes);
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 075cd25363ac..7e282970177a 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -1616,8 +1616,7 @@ config WARN_ALL_UNSEEDED_RANDOM
- 	  so architecture maintainers really need to do what they can
- 	  to get the CRNG seeded sooner after the system is booted.
- 	  However, since users cannot do anything actionable to
--	  address this, by default the kernel will issue only a single
--	  warning for the first use of unseeded randomness.
-+	  address this, by default this option is disabled.
- 
- 	  Say Y here if you want to receive warnings for all uses of
- 	  unseeded randomness.  This will be of use primarily for
--- 
-2.35.1
+This patchset adds HCTR2 to Linux's crypto API, including generic
+implementations of XCTR and POLYVAL, hardware accelerated implementations
+of XCTR and POLYVAL for both x86-64 and ARM64, a templated implementation
+of HCTR2, and an fscrypt policy for using HCTR2 for filename encryption.
+
+Changes in v7:
+ * Added/modified some comments in ARM64 XCTR/CTR implementation
+ * Various small style fixes
+
+Changes in v6:
+ * Split ARM64 XCTR/CTR refactoring into separate patch
+ * Allow simd POLYVAL implementations to be preempted
+ * Fix uninitialized bug in HCTR2
+ * Fix streamcipher name handling bug in HCTR2
+ * Various small style fixes
+
+Changes in v5:
+ * Refactor HCTR2 tweak hashing
+ * Remove non-AVX x86-64 XCTR implementation
+ * Combine arm64 CTR and XCTR modes
+ * Comment and alias CTR and XCTR modes
+ * Move generic fallback code for simd POLYVAL into polyval-generic.c
+ * Various small style fixes
+
+Changes in v4:
+ * Small style fixes in generic POLYVAL and XCTR
+ * Move HCTR2 hash exporting/importing to helper functions
+ * Rewrite montgomery reduction for x86-64 POLYVAL
+ * Rewrite partial block handling for x86-64 POLYVAL
+ * Optimize x86-64 POLYVAL loop handling
+ * Remove ahash wrapper from x86-64 POLYVAL
+ * Add simd-unavailable handling to x86-64 POLYVAL
+ * Rewrite montgomery reduction for ARM64 POLYVAL
+ * Rewrite partial block handling for ARM64 POLYVAL
+ * Optimize ARM64 POLYVAL loop handling
+ * Remove ahash wrapper from ARM64 POLYVAL
+ * Add simd-unavailable handling to ARM64 POLYVAL
+
+Changes in v3:
+ * Improve testvec coverage for XCTR, POLYVAL and HCTR2
+ * Fix endianness bug in xctr.c
+ * Fix alignment issues in polyval-generic.c
+ * Optimize hctr2.c by exporting/importing hash states
+ * Fix blockcipher name derivation in hctr2.c
+ * Move x86-64 XCTR implementation into aes_ctrby8_avx-x86_64.S
+ * Reuse ARM64 CTR mode tail handling in ARM64 XCTR
+ * Fix x86-64 POLYVAL comments
+ * Fix x86-64 POLYVAL key_powers type to match asm
+ * Fix ARM64 POLYVAL comments
+ * Fix ARM64 POLYVAL key_powers type to match asm
+ * Add XTS + HCTR2 policy to fscrypt
+
+Nathan Huckleberry (9):
+  crypto: xctr - Add XCTR support
+  crypto: polyval - Add POLYVAL support
+  crypto: hctr2 - Add HCTR2 support
+  crypto: x86/aesni-xctr: Add accelerated implementation of XCTR
+  crypto: arm64/aes-xctr: Add accelerated implementation of XCTR
+  crypto: arm64/aes-xctr: Improve readability of XCTR and CTR modes
+  crypto: x86/polyval: Add PCLMULQDQ accelerated implementation of
+    POLYVAL
+  crypto: arm64/polyval: Add PMULL accelerated implementation of POLYVAL
+  fscrypt: Add HCTR2 support for filename encryption
+
+ Documentation/filesystems/fscrypt.rst   |   22 +-
+ arch/arm64/crypto/Kconfig               |    9 +-
+ arch/arm64/crypto/Makefile              |    3 +
+ arch/arm64/crypto/aes-glue.c            |   82 +-
+ arch/arm64/crypto/aes-modes.S           |  338 +++--
+ arch/arm64/crypto/polyval-ce-core.S     |  361 ++++++
+ arch/arm64/crypto/polyval-ce-glue.c     |  193 +++
+ arch/x86/crypto/Makefile                |    3 +
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S |  232 ++--
+ arch/x86/crypto/aesni-intel_glue.c      |  114 +-
+ arch/x86/crypto/polyval-clmulni_asm.S   |  321 +++++
+ arch/x86/crypto/polyval-clmulni_glue.c  |  203 +++
+ crypto/Kconfig                          |   39 +-
+ crypto/Makefile                         |    3 +
+ crypto/hctr2.c                          |  581 +++++++++
+ crypto/polyval-generic.c                |  245 ++++
+ crypto/tcrypt.c                         |   10 +
+ crypto/testmgr.c                        |   20 +
+ crypto/testmgr.h                        | 1536 +++++++++++++++++++++++
+ crypto/xctr.c                           |  191 +++
+ fs/crypto/fscrypt_private.h             |    2 +-
+ fs/crypto/keysetup.c                    |    7 +
+ fs/crypto/policy.c                      |   14 +-
+ include/crypto/polyval.h                |   22 +
+ include/uapi/linux/fscrypt.h            |    3 +-
+ 25 files changed, 4355 insertions(+), 199 deletions(-)
+ create mode 100644 arch/arm64/crypto/polyval-ce-core.S
+ create mode 100644 arch/arm64/crypto/polyval-ce-glue.c
+ create mode 100644 arch/x86/crypto/polyval-clmulni_asm.S
+ create mode 100644 arch/x86/crypto/polyval-clmulni_glue.c
+ create mode 100644 crypto/hctr2.c
+ create mode 100644 crypto/polyval-generic.c
+ create mode 100644 crypto/xctr.c
+ create mode 100644 include/crypto/polyval.h
+
+--=20
+2.36.0.512.ge40c2bad7a-goog
 
