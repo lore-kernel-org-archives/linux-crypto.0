@@ -2,105 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EB7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 19:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C191C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 20:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237906AbiEJTGH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 May 2022 15:06:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44930 "EHLO
+        id S229824AbiEJUJV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 16:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349122AbiEJTGE (ORCPT
+        with ESMTP id S229436AbiEJUJU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 May 2022 15:06:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521B650B10;
-        Tue, 10 May 2022 12:06:02 -0700 (PDT)
+        Tue, 10 May 2022 16:09:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931F1517CC;
+        Tue, 10 May 2022 13:09:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CCC0D61143;
-        Tue, 10 May 2022 19:06:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01DF3C385C8;
-        Tue, 10 May 2022 19:06:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652209561;
-        bh=IiUKjLjANHL8lDcaB4wju0pa98VTPo8stRQrGPhc1o4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l/FHpZVH5hOhWmKLR2/VZgGM6j5VjLq3hNun/voFYgxNHlb7G2E8yPr1V8bRMXAIU
-         wyg8Ku+8mWpfc1n6P0kQ4Ra29Q6JdJ/JDdlLWjaAk0iDKQ213szCieSjwnUMFU7W3z
-         osczplpE+sJwMJYhffH7VUkMmNCsns4SAlrxL7QU5Q93Mye4BKnypqw5gIJNabu17x
-         1VGEcgyN535Ujn9sIK3vBRH0EirgraXQcKZDFOAVhwCIh7hAUW6vANMXbbSy60rZ4V
-         AxQlC1/jzu1cf5YPTWW+rLcmVpxa8Jrpb+qohiNIzQNFqpJVU2z/wjCblv4tggTaWV
-         O19YdD1oJh6SQ==
-Date:   Tue, 10 May 2022 12:05:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v8 0/9] crypto: HCTR2 support
-Message-ID: <Ynq3l+CRd86ZNDMK@sol.localdomain>
-References: <20220510172359.3720527-1-nhuck@google.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 241D0B81CCA;
+        Tue, 10 May 2022 20:09:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF09C385CA;
+        Tue, 10 May 2022 20:09:14 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eNIy6d7i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1652213352;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iVsjahm8BYGF5k4eUyIen00pH/noxcYbwc9i8vcgHoE=;
+        b=eNIy6d7iwonW+4amRxi1drIzCnIhDu3e/N6LWFCJlEu9GdZjwGDAIfp9Fmjip8qlfLhqwQ
+        doq0CD7Axjzrq/xGg6PJBWhixYTJQFo5JcMJkZfiWN6tUb8Fmwi6fh7mSqg1fNjOldzKoR
+        tzyBotb8FJqC5fvEMB56LM/WkQ0d0i4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id eceaa09b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 10 May 2022 20:09:11 +0000 (UTC)
+Date:   Tue, 10 May 2022 22:09:04 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     dodis@cs.nyu.edu, tytso@mit.edu, nadiah@cs.ucsd.edu,
+        noahsd@gmail.com, tessaro@cs.washington.edu,
+        torvalds@linux-foundation.org, jeanphilippe.aumasson@gmail.com,
+        jann@thejh.net, keescook@chromium.org, gregkh@linuxfoundation.org,
+        peter@cryptojedi.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "D. J. Bernstein" <djb@cr.yp.to>
+Subject: Re: is "premature next" a real world rng concern, or just an
+ academic exercise?
+Message-ID: <YnrGYMyEL8qPMRGt@zx2c4.com>
+References: <YmlMGx6+uigkGiZ0@zx2c4.com>
+ <Ym3ZM1P+uYYABtRm@mit.edu>
+ <Ym5sICj5iBMn2w/E@zx2c4.com>
+ <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
+ <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
+ <YnqDC25iR8mcL3XB@zx2c4.com>
+ <20220510185123.80607.qmail@cr.yp.to>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220510172359.3720527-1-nhuck@google.com>
+In-Reply-To: <20220510185123.80607.qmail@cr.yp.to>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 10, 2022 at 05:23:50PM +0000, Nathan Huckleberry wrote:
-> HCTR2 is a length-preserving encryption mode that is efficient on
-> processors with instructions to accelerate AES and carryless
-> multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
-> processors with the ARMv8 Crypto Extensions.
-> 
-> HCTR2 is specified in https://ia.cr/2021/1441 "Length-preserving encryption
-> with HCTR2" which shows that if AES is secure and HCTR2 is instantiated
-> with AES, then HCTR2 is secure.  Reference code and test vectors are at
-> https://github.com/google/hctr2.
-> 
-> As a length-preserving encryption mode, HCTR2 is suitable for applications
-> such as storage encryption where ciphertext expansion is not possible, and
-> thus authenticated encryption cannot be used.  Currently, such applications
-> usually use XTS, or in some cases Adiantum.  XTS has the disadvantage that
-> it is a narrow-block mode: a bitflip will only change 16 bytes in the
-> resulting ciphertext or plaintext.  This reveals more information to an
-> attacker than necessary.
-> 
-> HCTR2 is a wide-block mode, so it provides a stronger security property: a
-> bitflip will change the entire message.  HCTR2 is somewhat similar to
-> Adiantum, which is also a wide-block mode.  However, HCTR2 is designed to
-> take advantage of existing crypto instructions, while Adiantum targets
-> devices without such hardware support.  Adiantum is also designed with
-> longer messages in mind, while HCTR2 is designed to be efficient even on
-> short messages.
-> 
-> The first intended use of this mode in the kernel is for the encryption of
-> filenames, where for efficiency reasons encryption must be fully
-> deterministic (only one ciphertext for each plaintext) and the existing CBC
-> solution leaks more information than necessary for filenames with common
-> prefixes.
-> 
-> HCTR2 uses two passes of an ε-almost-∆-universal hash function called
-> POLYVAL and one pass of a block cipher mode called XCTR.  POLYVAL is a
-> polynomial hash designed for efficiency on modern processors and was
-> originally specified for use in AES-GCM-SIV (RFC 8452).  XCTR mode is a
-> variant of CTR mode that is more efficient on little-endian machines.
-> 
-> This patchset adds HCTR2 to Linux's crypto API, including generic
-> implementations of XCTR and POLYVAL, hardware accelerated implementations
-> of XCTR and POLYVAL for both x86-64 and ARM64, a templated implementation
-> of HCTR2, and an fscrypt policy for using HCTR2 for filename encryption.
-> 
+Hey Dan,
 
-Thanks, this series looks good now.  I've also tested it on x86_64 and arm64.
+On Tue, May 10, 2022 at 08:51:23PM +0200, D. J. Bernstein wrote:
+> Jason A. Donenfeld writes:
+> > Right, VMs are super problematic, but for that, there's now this
+> > "vmgenid" driver, where the hypervisor actually gives a 128-bit seed to
+> > guests when they're resumed, so that we can immediately reseed, which
+> > should pretty comprehensively handle that situation.
+> 
+> Hmmm. If an application initializes its own RNG state from /dev/urandom,
+> and is then cloned, and then generates an ECDSA nonce from the RNG
+> state, and then uses this nonce to sign a message that's different
+> across the clones, how is disaster averted?
 
-Herbert, I think this series is ready to be applied, when you're ready for it.
+Currently WireGuard will drop its ephemeral session key material from
+the tx path, to prevent nonce use. This is because of an in-kernel
+mechanism I added in 5.18, which is pretty minimal and non-invasive, and
+came basically for free. CTRL+F for "vmgenid" in here for details:
+https://www.zx2c4.com/projects/linux-rng-5.17-5.18/
 
-- Eric
+For 5.19 (or at this point, more likely 5.20), there's a userspace
+notifier in store, maybe, if I can figure out how to do it right.
+There's a pretty bikesheddy thread here on what shape that interface
+should take: https://lore.kernel.org/lkml/YnA5CUJKvqmXJxf2@zx2c4.com/
+But basically there are some details about how an async interface should
+work, and what the virtual hardware future, if any, looks like for a
+memory mapped race-free polling interface. Plus some considerations on
+how much we should care etc.
+
+> Given the goal of sending money to cryptographers, I'm pretty sure we
+> want the answer to be a security-audit nightmare, so let me suggest the
+> following idea. There's SIGWINCH to notify processes about window-size
+> changes, so there should also be a signal for RNG changes, which should
+> be called SIGRINCH, and there should be a different mechanism to address
+> RNG output cloning inside the kernel, and there should be endless papers
+> on Grinch Attacks, including papers that sort of prove security against
+> Grinch Attacks, and deployment of software that's sort of protected
+> against Grinch Attacks, and fear of the bad PR from abandoning anything
+> labeled as protection, because, hey, _maybe_ the protection accomplishes
+> something, and it's not as if anyone is going to be blamed for whatever
+> damage is caused by the systems-level effect of the added complexity.
+
+I mean... you kid, but you're also kind of on point here. There are
+about a thousand ways of doing this kind of notification that lead to
+impossible-to-program-for paradigms that people will find necessary to
+implement, and it'll be a nightmare if not done in a sufficiently slick
+way. For the in-kernel thing WireGuard uses, it doesn't really matter
+because the kernel is one big codebase so ergonomics can change need be.
+But userspace is another challenge.
+
+Jason
