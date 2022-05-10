@@ -2,118 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887A7C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 18:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EB7C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 19:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236402AbiEJS6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 May 2022 14:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
+        id S237906AbiEJTGH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 15:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230290AbiEJS6h (ORCPT
+        with ESMTP id S1349122AbiEJTGE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 May 2022 14:58:37 -0400
-X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 May 2022 11:58:35 PDT
-Received: from salsa.cs.uic.edu (salsa.cs.uic.edu [131.193.32.108])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id 60C3B34BA9
-        for <linux-crypto@vger.kernel.org>; Tue, 10 May 2022 11:58:34 -0700 (PDT)
-Received: (qmail 26735 invoked by uid 1010); 10 May 2022 18:51:52 -0000
-Received: from unknown (unknown)
-  by unknown with QMTP; 10 May 2022 18:51:52 -0000
-Received: (qmail 80608 invoked by uid 1000); 10 May 2022 18:51:23 -0000
-Message-ID: <20220510185123.80607.qmail@cr.yp.to>
-Mail-Followup-To: Jason@zx2c4.com,
-  dodis@cs.nyu.edu,
-  tytso@mit.edu,
-  nadiah@cs.ucsd.edu,
-  noahsd@gmail.com,
-  tessaro@cs.washington.edu,
-  torvalds@linux-foundation.org,
-  jeanphilippe.aumasson@gmail.com,
-  jann@thejh.net,
-  keescook@chromium.org,
-  gregkh@linuxfoundation.org,
-  peter@cryptojedi.org,
-  linux-crypto@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Automatic-Legal-Notices: See https://cr.yp.to/mailcopyright.html.
-Date:   Tue, 10 May 2022 20:51:23 +0200
-From:   "D. J. Bernstein" <djb@math.uic.edu>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Yevgeniy Dodis <dodis@cs.nyu.edu>, tytso <tytso@mit.edu>,
-        Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Noah Stephens-Dawidowitz <noahsd@gmail.com>,
-        Stefano Tessaro <tessaro@cs.washington.edu>,
-        torvalds@linux-foundation.org, jeanphilippe.aumasson@gmail.com,
-        jann@thejh.net, keescook@chromium.org, gregkh@linuxfoundation.org,
-        Peter Schwabe <peter@cryptojedi.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: is "premature next" a real world rng concern, or just an
- academic exercise?
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
- <Ym3ZM1P+uYYABtRm@mit.edu>
- <Ym5sICj5iBMn2w/E@zx2c4.com>
- <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
- <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
- <YnqDC25iR8mcL3XB@zx2c4.com>
+        Tue, 10 May 2022 15:06:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521B650B10;
+        Tue, 10 May 2022 12:06:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CCC0D61143;
+        Tue, 10 May 2022 19:06:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01DF3C385C8;
+        Tue, 10 May 2022 19:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652209561;
+        bh=IiUKjLjANHL8lDcaB4wju0pa98VTPo8stRQrGPhc1o4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l/FHpZVH5hOhWmKLR2/VZgGM6j5VjLq3hNun/voFYgxNHlb7G2E8yPr1V8bRMXAIU
+         wyg8Ku+8mWpfc1n6P0kQ4Ra29Q6JdJ/JDdlLWjaAk0iDKQ213szCieSjwnUMFU7W3z
+         osczplpE+sJwMJYhffH7VUkMmNCsns4SAlrxL7QU5Q93Mye4BKnypqw5gIJNabu17x
+         1VGEcgyN535Ujn9sIK3vBRH0EirgraXQcKZDFOAVhwCIh7hAUW6vANMXbbSy60rZ4V
+         AxQlC1/jzu1cf5YPTWW+rLcmVpxa8Jrpb+qohiNIzQNFqpJVU2z/wjCblv4tggTaWV
+         O19YdD1oJh6SQ==
+Date:   Tue, 10 May 2022 12:05:59 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v8 0/9] crypto: HCTR2 support
+Message-ID: <Ynq3l+CRd86ZNDMK@sol.localdomain>
+References: <20220510172359.3720527-1-nhuck@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qId8Ue31mwkR5Glx"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220510172359.3720527-1-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, May 10, 2022 at 05:23:50PM +0000, Nathan Huckleberry wrote:
+> HCTR2 is a length-preserving encryption mode that is efficient on
+> processors with instructions to accelerate AES and carryless
+> multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
+> processors with the ARMv8 Crypto Extensions.
+> 
+> HCTR2 is specified in https://ia.cr/2021/1441 "Length-preserving encryption
+> with HCTR2" which shows that if AES is secure and HCTR2 is instantiated
+> with AES, then HCTR2 is secure.  Reference code and test vectors are at
+> https://github.com/google/hctr2.
+> 
+> As a length-preserving encryption mode, HCTR2 is suitable for applications
+> such as storage encryption where ciphertext expansion is not possible, and
+> thus authenticated encryption cannot be used.  Currently, such applications
+> usually use XTS, or in some cases Adiantum.  XTS has the disadvantage that
+> it is a narrow-block mode: a bitflip will only change 16 bytes in the
+> resulting ciphertext or plaintext.  This reveals more information to an
+> attacker than necessary.
+> 
+> HCTR2 is a wide-block mode, so it provides a stronger security property: a
+> bitflip will change the entire message.  HCTR2 is somewhat similar to
+> Adiantum, which is also a wide-block mode.  However, HCTR2 is designed to
+> take advantage of existing crypto instructions, while Adiantum targets
+> devices without such hardware support.  Adiantum is also designed with
+> longer messages in mind, while HCTR2 is designed to be efficient even on
+> short messages.
+> 
+> The first intended use of this mode in the kernel is for the encryption of
+> filenames, where for efficiency reasons encryption must be fully
+> deterministic (only one ciphertext for each plaintext) and the existing CBC
+> solution leaks more information than necessary for filenames with common
+> prefixes.
+> 
+> HCTR2 uses two passes of an ε-almost-∆-universal hash function called
+> POLYVAL and one pass of a block cipher mode called XCTR.  POLYVAL is a
+> polynomial hash designed for efficiency on modern processors and was
+> originally specified for use in AES-GCM-SIV (RFC 8452).  XCTR mode is a
+> variant of CTR mode that is more efficient on little-endian machines.
+> 
+> This patchset adds HCTR2 to Linux's crypto API, including generic
+> implementations of XCTR and POLYVAL, hardware accelerated implementations
+> of XCTR and POLYVAL for both x86-64 and ARM64, a templated implementation
+> of HCTR2, and an fscrypt policy for using HCTR2 for filename encryption.
+> 
 
---qId8Ue31mwkR5Glx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks, this series looks good now.  I've also tested it on x86_64 and arm64.
 
-Jason A. Donenfeld writes:
-> Right, VMs are super problematic, but for that, there's now this
-> "vmgenid" driver, where the hypervisor actually gives a 128-bit seed to
-> guests when they're resumed, so that we can immediately reseed, which
-> should pretty comprehensively handle that situation.
+Herbert, I think this series is ready to be applied, when you're ready for it.
 
-Hmmm. If an application initializes its own RNG state from /dev/urandom,
-and is then cloned, and then generates an ECDSA nonce from the RNG
-state, and then uses this nonce to sign a message that's different
-across the clones, how is disaster averted?
-
-Given the goal of sending money to cryptographers, I'm pretty sure we
-want the answer to be a security-audit nightmare, so let me suggest the
-following idea. There's SIGWINCH to notify processes about window-size
-changes, so there should also be a signal for RNG changes, which should
-be called SIGRINCH, and there should be a different mechanism to address
-RNG output cloning inside the kernel, and there should be endless papers
-on Grinch Attacks, including papers that sort of prove security against
-Grinch Attacks, and deployment of software that's sort of protected
-against Grinch Attacks, and fear of the bad PR from abandoning anything
-labeled as protection, because, hey, _maybe_ the protection accomplishes
-something, and it's not as if anyone is going to be blamed for whatever
-damage is caused by the systems-level effect of the added complexity.
-
----D. J. Bernstein
-
-P.S. Yes, yes, I know the name "Grinch Attack" has been used before.
-
---qId8Ue31mwkR5Glx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE3QolqQXydru4e4ITsMANTjsOVFkFAmJ6tCsACgkQsMANTjsO
-VFk8WBAAzyMKEWbIPxsLZOwf6gPOb+FqsG2NNiI/RzpnGOWlnohjbpo+2r2pOpD/
-dPBsToDrAuBs1ypA2rrcdbQ40gepN6vUJwK4TBVvBn1h3UM2hRrJ7JFA8mlA9RpT
-1R8KXXnCbkhV92p6Y1YOzPP1mynkZ5XVhE87/03rJ3T0Sole8qv25tn75XZvKY6U
-p4HiYl7mbZuQ84OgUCmp7bYC7nKCKzgAb3nNXZCTotv7ecZGQgnlGC+ClOZz6+TB
-KwcDw9cF2LfJvP5qvNGmkVtMEtWEvPzmBMp6MCXJytBJ15vXaM0B5M0NDwbpM2I9
-FtsH1/yzbnGQs2slSERlDv5PhrMjroydwC07YpRKMKY59uITV7tf8Q/2gcK5+C7z
-zPOkbKvXkjas+cqM4wjXDt/cOyBiUkW9RzMXG7ODldkh8oI8D30qyUOl8+IqxF6h
-d5SL9mJ7RLQ3LumSiat/B2HbHlODU4CJqubidyFgYvdGOyXhOOsTpfImNMuJoP5x
-zapVfrONCJ5497AZY24mr4rWI/Vp+pcge9lVxQjBnAPJrQx32SsL6szWKUkLL9lc
-H9jDaxcoJSjMR7GdBmgCEvVFHmFpLszoE4Cg/XPswQdYzjHikO9k41Ni2ge7jKf0
-Mf2OP2wpKIpFxL/N+xdpEWFuywJt+bMnQXsChAIM8530UgDYjGs=
-=AY+X
------END PGP SIGNATURE-----
-
---qId8Ue31mwkR5Glx--
+- Eric
