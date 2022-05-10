@@ -2,59 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5915C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 03:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18406C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 11:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235327AbiEJDZ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 23:25:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
+        id S240158AbiEJLId (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 07:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235331AbiEJDZz (ORCPT
+        with ESMTP id S233823AbiEJLIc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 23:25:55 -0400
+        Tue, 10 May 2022 07:08:32 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C013B54B;
-        Mon,  9 May 2022 20:21:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B846627E3DB;
+        Tue, 10 May 2022 04:04:33 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1noGR9-00BsaV-Qa; Tue, 10 May 2022 13:21:25 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 May 2022 11:21:24 +0800
-Date:   Tue, 10 May 2022 11:21:24 +0800
+        id 1noNen-00BzQQ-RI; Tue, 10 May 2022 21:03:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 May 2022 19:03:58 +0800
+Date:   Tue, 10 May 2022 19:03:58 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH] crypto: vmx - Fix build error
-Message-ID: <YnnaNATPjAtDREub@gondor.apana.org.au>
-References: <20220507052244.1426765-1-masahiroy@kernel.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [RFC PATCH 0/7] crypto: Add helpers for allocating with DMA alignment
+Message-ID: <YnpGnsr4k7yVUR54@gondor.apana.org.au>
+References: <CAMj1kXFjLbtpJLFh-C_k3Ydcg4M7NqrCfOXnBY2iSxusWtBLbA@mail.gmail.com>
+ <YllM24eca/uxf9y7@gondor.apana.org.au>
+ <CAMj1kXH5O32H1nnm6y7=3KiH7R-_oakxzBpZ20wK+8kaD46aKw@mail.gmail.com>
+ <YlvK9iefUECy361O@gondor.apana.org.au>
+ <YlvQTci7RP5evtTy@arm.com>
+ <YlvRbvWSWMTtBJiN@gondor.apana.org.au>
+ <YlvU6ou14okbAbgW@arm.com>
+ <YlvWtc/dJ6luXzZf@gondor.apana.org.au>
+ <YlxAo5BAy+ARlvqj@arm.com>
+ <Yl0jPdfdUkaStDN5@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220507052244.1426765-1-masahiroy@kernel.org>
+In-Reply-To: <Yl0jPdfdUkaStDN5@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 07, 2022 at 02:22:43PM +0900, Masahiro Yamada wrote:
-> When I refactored this Makefile, I accidentally changed the CONFIG
-> option.
-> 
-> Fixes: b52455a73db9 ("crypto: vmx - Align the short log with Makefile cleanups")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
-> 
->  drivers/crypto/vmx/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This patch series adds helpers to allow drivers to explicitly
+request ARCH_DMA_MINALIGN when allocating memory through the
+Crypto API.
 
-Patch applied.  Thanks.
+Note that I've only converted one file in one driver as this
+is only meant to show how it's done and find out what else we
+may need.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
