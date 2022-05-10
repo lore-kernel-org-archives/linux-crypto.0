@@ -2,94 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F73BC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 May 2022 21:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5915C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 03:22:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiEIWAa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 May 2022 18:00:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S235327AbiEJDZ6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 9 May 2022 23:25:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231168AbiEIWA3 (ORCPT
+        with ESMTP id S235331AbiEJDZz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 May 2022 18:00:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17332737A0;
-        Mon,  9 May 2022 14:56:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A7FBC60C72;
-        Mon,  9 May 2022 21:56:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C433EC385C2;
-        Mon,  9 May 2022 21:56:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652133393;
-        bh=wHLWT1Gll/cvK2j3e8LMoFzDmeDWBW7dkJOSEFpCqlk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=msh/uKHQvklZ0wtmp5N5Of0ULdBVEMKEg8ske61MFbi1y/PAYyOhfESYV7FT2qlfS
-         btnhan/bTDBZvgENyc8vd/6SsewsY+NoV7a3+l7rL117i4eTpufFz4LMWltbuPmhvF
-         cdHQb8D6oVaW2z38/EwfKBReboVoN3zIABXNTcx183dvsxdz+ntAHxi/Cz3nwJkGq8
-         uL1GVTACgW0+ggSEkvKfFM0QhvWhMOawGDf2WsNmjJD/rlNpKUOSoqZXvyZOE2HMf0
-         LNXqNrpZeSDFRGItCZq2XUzRsk2lgHNug9hz5F3NQNRGNKEYdA1VlF4htCGpvdob1g
-         7atWZNlj+I/kw==
-Date:   Mon, 9 May 2022 14:56:31 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v7 6/9] crypto: arm64/aes-xctr: Improve readability of
- XCTR and CTR modes
-Message-ID: <YnmOD+bzabjoxaEN@sol.localdomain>
-References: <20220509191107.3556468-1-nhuck@google.com>
- <20220509191107.3556468-7-nhuck@google.com>
+        Mon, 9 May 2022 23:25:55 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C013B54B;
+        Mon,  9 May 2022 20:21:56 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1noGR9-00BsaV-Qa; Tue, 10 May 2022 13:21:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 May 2022 11:21:24 +0800
+Date:   Tue, 10 May 2022 11:21:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel test robot <lkp@intel.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: vmx - Fix build error
+Message-ID: <YnnaNATPjAtDREub@gondor.apana.org.au>
+References: <20220507052244.1426765-1-masahiroy@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220509191107.3556468-7-nhuck@google.com>
+In-Reply-To: <20220507052244.1426765-1-masahiroy@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 09, 2022 at 07:11:04PM +0000, Nathan Huckleberry wrote:
-> Added some clarifying comments, changed the register allocations to make
-> the code clearer, and added register aliases.
+On Sat, May 07, 2022 at 02:22:43PM +0900, Masahiro Yamada wrote:
+> When I refactored this Makefile, I accidentally changed the CONFIG
+> option.
 > 
-> Signed-off-by: Nathan Huckleberry <nhuck@google.com>
-> Reviewed-by: Eric Biggers <ebiggers@google.com>
+> Fixes: b52455a73db9 ("crypto: vmx - Align the short log with Makefile cleanups")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> ---
+> 
+>  drivers/crypto/vmx/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Did you mean to add Ard's Reviewed-by that he gave on v6 as well?
-
-One comment about the v7 changes below:
-
->  	/*
->  	 * aes_ctr_encrypt(u8 out[], u8 const in[], u8 const rk[], int rounds,
->  	 *		   int bytes, u8 ctr[])
-> +	 *
-> +	 * The input and output buffers must always be at least 16 bytes even if
-> +	 * encrypting/decrypting less than 16 bytes.  Otherwise out of bounds
-> +	 * accesses will occur.
->  	 */
-
-This comment, along with the other similar ones you added, doesn't properly
-describe the behavior when bytes < 16, as it's not mentioned that the extra
-space needs to be before the pointed-to regions rather than after.  That's the
-most unusual part of these functions, so it really should be mentioned.
-
-Separately, applying this patch and the previous one causes the following
-whitespace errors to be reported:
-
-Applying: crypto: arm64/aes-xctr: Add accelerated implementation of XCTR
-.git/rebase-apply/patch:299: space before tab in indent.
-        ld1             {v5.16b-v7.16b}, [x1], #48
-warning: 1 line adds whitespace errors.
-Applying: crypto: arm64/aes-xctr: Improve readability of XCTR and CTR modes
-.git/rebase-apply/patch:216: space before tab in indent.
-        ld1             {v5.16b-v7.16b}, [IN], #48
-warning: 1 line adds whitespace errors.
-
-- Eric
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
