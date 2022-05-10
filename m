@@ -2,113 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C191C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 20:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA9FC433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 21:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiEJUJV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 May 2022 16:09:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36808 "EHLO
+        id S232858AbiEJVdn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 17:33:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiEJUJU (ORCPT
+        with ESMTP id S235205AbiEJVdj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 May 2022 16:09:20 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931F1517CC;
-        Tue, 10 May 2022 13:09:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 241D0B81CCA;
-        Tue, 10 May 2022 20:09:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF09C385CA;
-        Tue, 10 May 2022 20:09:14 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eNIy6d7i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652213352;
+        Tue, 10 May 2022 17:33:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00D42185CBF
+        for <linux-crypto@vger.kernel.org>; Tue, 10 May 2022 14:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652218418;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iVsjahm8BYGF5k4eUyIen00pH/noxcYbwc9i8vcgHoE=;
-        b=eNIy6d7iwonW+4amRxi1drIzCnIhDu3e/N6LWFCJlEu9GdZjwGDAIfp9Fmjip8qlfLhqwQ
-        doq0CD7Axjzrq/xGg6PJBWhixYTJQFo5JcMJkZfiWN6tUb8Fmwi6fh7mSqg1fNjOldzKoR
-        tzyBotb8FJqC5fvEMB56LM/WkQ0d0i4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id eceaa09b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 10 May 2022 20:09:11 +0000 (UTC)
-Date:   Tue, 10 May 2022 22:09:04 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     dodis@cs.nyu.edu, tytso@mit.edu, nadiah@cs.ucsd.edu,
-        noahsd@gmail.com, tessaro@cs.washington.edu,
-        torvalds@linux-foundation.org, jeanphilippe.aumasson@gmail.com,
-        jann@thejh.net, keescook@chromium.org, gregkh@linuxfoundation.org,
-        peter@cryptojedi.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "D. J. Bernstein" <djb@cr.yp.to>
+        bh=HLGf+NuJ1hkzNkgtKj/5di7e25KMw+geo5HNi0Tx2nk=;
+        b=IllTouDeDWyuuii3FEw/SFS7SbKUxuI/KRe6yxmzPM69f+BEphvzmS2hIA5dopj/KYSem2
+        nOseFtDds5Zf5IIOlLVw/4wH3vsT8RJVGPNZNjymO7uX3ZT/G1EgA9h6SDaIyylfAySbp6
+        5Bg4L92hvfvwwKCQi32PfLajPr6gK/A=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-592-b7PtpWKfOjKPBMnmJBcyLQ-1; Tue, 10 May 2022 17:33:36 -0400
+X-MC-Unique: b7PtpWKfOjKPBMnmJBcyLQ-1
+Received: by mail-qk1-f198.google.com with SMTP id c84-20020a379a57000000b0069fcf83c373so281574qke.20
+        for <linux-crypto@vger.kernel.org>; Tue, 10 May 2022 14:33:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:organization:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=HLGf+NuJ1hkzNkgtKj/5di7e25KMw+geo5HNi0Tx2nk=;
+        b=w3WlZbMaQJu0a9ez6vWXojT28xfQkWx55vDIxF6m8uMQT/k5wprNihIsAVcOx2ShB7
+         nJJ6uCAQDAsySgqMJqdPhibjzWBLiN8tBn8vv/aWqMK6I/oT68ZWqjdyX7EhK/rU9N9n
+         qV9fWO95eK351qDQjQ8SyHkOTNUpNCkpxxiccwQvAHuOdMvq9ONWLN9xiNIFU3nljNmN
+         PrIOdXUPi82H+4625r6YgCuYkx7zII0x9atGSYGSjDwcjTGy9eC5EE2ogS3XmUaEiInO
+         jiPoqmCoUogIqGsdZQSBlLYvuYIlCVjCCveI9f9A33tHsu4yuQahOs88eaRiZHdXZFIf
+         smaA==
+X-Gm-Message-State: AOAM531Ss2EuTrHazYWvmWfxgKNUMc2SoI8UIOAyMqBt90aZeIpuJBz1
+        VRjF5z3Q2gf/ItHBPd3zoZ3G5HhTgwwGwA9nlQU/KsQUQ3xtYGPGMaTVTgGG6GVIfr2SILkjTv0
+        V+/R/GUgBM33bqUSmdYOusaaS
+X-Received: by 2002:ac8:5745:0:b0:2f3:e231:bc12 with SMTP id 5-20020ac85745000000b002f3e231bc12mr5525731qtx.291.1652218416254;
+        Tue, 10 May 2022 14:33:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzCqYVgaYDvYJ1YgN8Xi0ySx91V66DHix7zN4MtUt1dANUAWaEB9Mt7T3gVjhpX2VPgo7Umrw==
+X-Received: by 2002:ac8:5745:0:b0:2f3:e231:bc12 with SMTP id 5-20020ac85745000000b002f3e231bc12mr5525702qtx.291.1652218416011;
+        Tue, 10 May 2022 14:33:36 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com (cpe-158-222-141-151.nyc.res.rr.com. [158.222.141.151])
+        by smtp.gmail.com with ESMTPSA id z21-20020ac87115000000b002f39b99f6adsm43257qto.71.2022.05.10.14.33.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 May 2022 14:33:35 -0700 (PDT)
+Message-ID: <5b63a8a37b415db66ffe6b660859e3900c054909.camel@redhat.com>
 Subject: Re: is "premature next" a real world rng concern, or just an
  academic exercise?
-Message-ID: <YnrGYMyEL8qPMRGt@zx2c4.com>
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
- <Ym3ZM1P+uYYABtRm@mit.edu>
- <Ym5sICj5iBMn2w/E@zx2c4.com>
- <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
- <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
- <YnqDC25iR8mcL3XB@zx2c4.com>
- <20220510185123.80607.qmail@cr.yp.to>
+From:   Simo Sorce <simo@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, dodis@cs.nyu.edu,
+        tytso@mit.edu, nadiah@cs.ucsd.edu, noahsd@gmail.com,
+        tessaro@cs.washington.edu, torvalds@linux-foundation.org,
+        jeanphilippe.aumasson@gmail.com, jann@thejh.net,
+        keescook@chromium.org, gregkh@linuxfoundation.org,
+        peter@cryptojedi.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "D. J. Bernstein" <djb@cr.yp.to>
+Date:   Tue, 10 May 2022 17:33:34 -0400
+In-Reply-To: <YnrGYMyEL8qPMRGt@zx2c4.com>
+References: <YmlMGx6+uigkGiZ0@zx2c4.com> <Ym3ZM1P+uYYABtRm@mit.edu>
+         <Ym5sICj5iBMn2w/E@zx2c4.com>
+         <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
+         <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
+         <YnqDC25iR8mcL3XB@zx2c4.com> <20220510185123.80607.qmail@cr.yp.to>
+         <YnrGYMyEL8qPMRGt@zx2c4.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220510185123.80607.qmail@cr.yp.to>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Dan,
+On Tue, 2022-05-10 at 22:09 +0200, Jason A. Donenfeld wrote:
+> For 5.19 (or at this point, more likely 5.20), there's a userspace
+> notifier in store, maybe, if I can figure out how to do it right.
+> There's a pretty bikesheddy thread here on what shape that interface
+> should take: https://lore.kernel.org/lkml/YnA5CUJKvqmXJxf2@zx2c4.com/
+> But basically there are some details about how an async interface should
+> work, and what the virtual hardware future, if any, looks like for a
+> memory mapped race-free polling interface. Plus some considerations on
+> how much we should care etc.
 
-On Tue, May 10, 2022 at 08:51:23PM +0200, D. J. Bernstein wrote:
-> Jason A. Donenfeld writes:
-> > Right, VMs are super problematic, but for that, there's now this
-> > "vmgenid" driver, where the hypervisor actually gives a 128-bit seed to
-> > guests when they're resumed, so that we can immediately reseed, which
-> > should pretty comprehensively handle that situation.
-> 
-> Hmmm. If an application initializes its own RNG state from /dev/urandom,
-> and is then cloned, and then generates an ECDSA nonce from the RNG
-> state, and then uses this nonce to sign a message that's different
-> across the clones, how is disaster averted?
+Perhaps it might be simpler to add an "epoch" number or similar exposed
+via something like a vDSO that proper user space implementations can
+then check before returning numbers from PRNGs and will immediately
+reseed from /dev/random if it ever changes (rare event).
 
-Currently WireGuard will drop its ephemeral session key material from
-the tx path, to prevent nonce use. This is because of an in-kernel
-mechanism I added in 5.18, which is pretty minimal and non-invasive, and
-came basically for free. CTRL+F for "vmgenid" in here for details:
-https://www.zx2c4.com/projects/linux-rng-5.17-5.18/
+It is much simpler to poll for this information in user space crypto
+libraries than using notifications of any kind given libraries are
+generally not in full control of what the process does.
 
-For 5.19 (or at this point, more likely 5.20), there's a userspace
-notifier in store, maybe, if I can figure out how to do it right.
-There's a pretty bikesheddy thread here on what shape that interface
-should take: https://lore.kernel.org/lkml/YnA5CUJKvqmXJxf2@zx2c4.com/
-But basically there are some details about how an async interface should
-work, and what the virtual hardware future, if any, looks like for a
-memory mapped race-free polling interface. Plus some considerations on
-how much we should care etc.
+This needs to be polled fast as well, because the whole point of
+initializing a PRNG in the library is that asking /dev/urandom all the
+time is too slow (due to context switches and syscall overhead), so
+anything that would require a context switch in order to pull data from
+the PRNG would not really fly.
 
-> Given the goal of sending money to cryptographers, I'm pretty sure we
-> want the answer to be a security-audit nightmare, so let me suggest the
-> following idea. There's SIGWINCH to notify processes about window-size
-> changes, so there should also be a signal for RNG changes, which should
-> be called SIGRINCH, and there should be a different mechanism to address
-> RNG output cloning inside the kernel, and there should be endless papers
-> on Grinch Attacks, including papers that sort of prove security against
-> Grinch Attacks, and deployment of software that's sort of protected
-> against Grinch Attacks, and fear of the bad PR from abandoning anything
-> labeled as protection, because, hey, _maybe_ the protection accomplishes
-> something, and it's not as if anyone is going to be blamed for whatever
-> damage is caused by the systems-level effect of the added complexity.
+Note that a generic "epoch" exposed via vDSO would be useful beyond
+RNGs, as it would be usable by any other user space that needs to know
+that "I have been cloned and I need to do something now" and would be
+able to use it immediately w/o the kernel needing to grow any other
+specific interface for it.
 
-I mean... you kid, but you're also kind of on point here. There are
-about a thousand ways of doing this kind of notification that lead to
-impossible-to-program-for paradigms that people will find necessary to
-implement, and it'll be a nightmare if not done in a sufficiently slick
-way. For the in-kernel thing WireGuard uses, it doesn't really matter
-because the kernel is one big codebase so ergonomics can change need be.
-But userspace is another challenge.
+HTH.
+Simo.
 
-Jason
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
