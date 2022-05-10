@@ -2,168 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95788C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 15:28:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD17C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 16:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240322AbiEJPb4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 May 2022 11:31:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
+        id S243993AbiEJQ6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 12:58:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345769AbiEJPak (ORCPT
+        with ESMTP id S237624AbiEJQ6f (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 May 2022 11:30:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CEE0E8B;
-        Tue, 10 May 2022 08:22:02 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA57CB81D2E;
-        Tue, 10 May 2022 15:22:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB09EC385A6;
-        Tue, 10 May 2022 15:21:57 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="oSz0v5jD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652196116;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jQUkGCxXuyYdfB8EFts+R/cnSrZv1NNEb17EWkTxpE0=;
-        b=oSz0v5jDiso+8LQSOyfVPpH0gl/qQ2kBl3bRjz9RkAqImxsVIL172g2Y2cT+ytv5RZdZC4
-        Vct5QvyVIxRfWBmhLOm36xiAe5bECP92C8+C3ZFHolt8F3u7t/9qXKJINSelQQotw7XmqT
-        Zmq4auWd/ClKcPYJdQ6xClHUWJ5Xsow=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a0f2cae3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Tue, 10 May 2022 15:21:55 +0000 (UTC)
-Date:   Tue, 10 May 2022 17:21:47 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Yevgeniy Dodis <dodis@cs.nyu.edu>
-Cc:     tytso <tytso@mit.edu>, Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Noah Stephens-Dawidowitz <noahsd@gmail.com>,
-        Stefano Tessaro <tessaro@cs.washington.edu>,
-        torvalds@linux-foundation.org, "D. J. Bernstein" <djb@cr.yp.to>,
-        jeanphilippe.aumasson@gmail.com, jann@thejh.net,
-        keescook@chromium.org, gregkh@linuxfoundation.org,
-        Peter Schwabe <peter@cryptojedi.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: is "premature next" a real world rng concern, or just an
- academic exercise?
-Message-ID: <YnqDC25iR8mcL3XB@zx2c4.com>
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
- <Ym3ZM1P+uYYABtRm@mit.edu>
- <Ym5sICj5iBMn2w/E@zx2c4.com>
- <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
- <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
+        Tue, 10 May 2022 12:58:35 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A848E27E3E6
+        for <linux-crypto@vger.kernel.org>; Tue, 10 May 2022 09:54:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652201673; x=1683737673;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZzffcCZsP6BscOeg9bDiKWhevHfZyKaZfvz2Y8niwPc=;
+  b=maiClQr6IBYhxZukQdeInPLEcilho7PpspoQ3tiJU+gxYs8wDE/tj9Hn
+   HJIs2co+Xsf0QZ2aFx232srePwuNPVTiTaCNng+CrHYwZK2yu6MZ53uAu
+   KTH1UqzIQka+IIAFFxpHGRdouncD5C89/yl7/2pEyZo0Z6d/rSFlOSnsH
+   3JeXHzzUO9C8qt1ZQ++rAsKwV0lN0FHsir4g+L9rZNYzacCw2RY6xCiFs
+   Lth/8vVvALqdbIO/lvgm/Zf3DoO9T8NsfDR37WbI5Kl1xe9zIH9f/Wvta
+   CJGBoIsIIcacdyL3t3P+I0OIE4c4eZoyzy78eFY4swH0m7rAGurS+J4EI
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10343"; a="294672532"
+X-IronPort-AV: E=Sophos;i="5.91,214,1647327600"; 
+   d="scan'208";a="294672532"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2022 09:54:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,214,1647327600"; 
+   d="scan'208";a="711114595"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
+  by fmsmga001.fm.intel.com with ESMTP; 10 May 2022 09:54:23 -0700
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Srinivas Kerekare <srinivas.kerekare@intel.com>
+Subject: [PATCH] crypto: qat - add support for 401xx devices
+Date:   Tue, 10 May 2022 17:54:19 +0100
+Message-Id: <20220510165419.182774-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Yevgeniy,
+QAT_401xx is a derivative of 4xxx. Add support for that device in the
+qat_4xxx driver by including the DIDs (both PF and VF), extending the
+probe and the firmware loader.
 
-Thanks for your email. Replies to parts are inline below:
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Srinivas Kerekare <srinivas.kerekare@intel.com>
+---
+ drivers/crypto/qat/qat_4xxx/adf_drv.c             | 1 +
+ drivers/crypto/qat/qat_common/adf_accel_devices.h | 2 ++
+ drivers/crypto/qat/qat_common/qat_hal.c           | 1 +
+ drivers/crypto/qat/qat_common/qat_uclo.c          | 1 +
+ 4 files changed, 5 insertions(+)
 
-On Mon, May 9, 2022 at 11:15 AM Yevgeniy Dodis <dodis@cs.nyu.edu> wrote:
-> 2) As Jason says, there are two distinct attack vectors needed to make the premature next attack.
-> A) compromising the state
-> B) (nearly) continuously observing RNG outputs
->
-> I agree with Jason's point that finding places where
-> -- A)+B) is possible, but
-> --- A)+A) is not possible,
-> is tricky.
+diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+index a6c78b9c730b..181fa1c8b3c7 100644
+--- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
+@@ -14,6 +14,7 @@
+ 
+ static const struct pci_device_id adf_pci_tbl[] = {
+ 	{ PCI_VDEVICE(INTEL, ADF_4XXX_PCI_DEVICE_ID), },
++	{ PCI_VDEVICE(INTEL, ADF_401XX_PCI_DEVICE_ID), },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
+diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+index e927799a8e6c..ede6458c9dbf 100644
+--- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
+@@ -19,6 +19,8 @@
+ #define ADF_4XXX_DEVICE_NAME "4xxx"
+ #define ADF_4XXX_PCI_DEVICE_ID 0x4940
+ #define ADF_4XXXIOV_PCI_DEVICE_ID 0x4941
++#define ADF_401XX_PCI_DEVICE_ID 0x4942
++#define ADF_401XXIOV_PCI_DEVICE_ID 0x4943
+ #define ADF_DEVICE_FUSECTL_OFFSET 0x40
+ #define ADF_DEVICE_LEGFUSE_OFFSET 0x4C
+ #define ADF_DEVICE_FUSECTL_MASK 0x80000000
+diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
+index 4bfd8f3566f7..7bba35280dac 100644
+--- a/drivers/crypto/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/qat/qat_common/qat_hal.c
+@@ -695,6 +695,7 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
+ 	handle->pci_dev = pci_info->pci_dev;
+ 	switch (handle->pci_dev->device) {
+ 	case ADF_4XXX_PCI_DEVICE_ID:
++	case ADF_401XX_PCI_DEVICE_ID:
+ 		handle->chip_info->mmp_sram_size = 0;
+ 		handle->chip_info->nn = false;
+ 		handle->chip_info->lm2lm3 = true;
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 4b6f37d6e85b..0fe5a474aa45 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -731,6 +731,7 @@ qat_uclo_get_dev_type(struct icp_qat_fw_loader_handle *handle)
+ 	case PCI_DEVICE_ID_INTEL_QAT_C3XXX:
+ 		return ICP_QAT_AC_C3XXX_DEV_TYPE;
+ 	case ADF_4XXX_PCI_DEVICE_ID:
++	case ADF_401XX_PCI_DEVICE_ID:
+ 		return ICP_QAT_AC_4XXX_A_DEV_TYPE;
+ 	default:
+ 		pr_err("QAT: unsupported device 0x%x\n",
+-- 
+2.35.1
 
-That's a useful way of describing the problem.
-
-> Although Nadya kind of indicated a place like that. VM1 and VM2 start
-> with the same RNG state (for whatever reason). VM1 is insecure, so can
-> leak the state via A). VM2 is more secure, but obviously allows for B)
-> through system interface. This does not seem so hypothetical for me,
-> especially in light of my mega-point 1) above -- almost any real-world
-> RNG attack is hard.
-
-Right, VMs are super problematic, but for that, there's now this
-"vmgenid" driver, where the hypervisor actually gives a 128-bit seed to
-guests when they're resumed, so that we can immediately reseed, which
-should pretty comprehensively handle that situation.
-
-> Protection against A) is trickier. But my read of Jason's email is
-> that all his criticism comes exactly from this point.  If your system
-> allows for state compromise, you have bigger problems than the
-> premature next, etc. But let's ask ourselves the question. Are we
-> ready to design RNGs without recovery from state compromise? I believe
-> nobody on this list would be comfortable saying "yes". Because this
-> would mean we don;t need to accumulate entropy beyond system start-up.
-> Once we reach the point of good initial state, and state compromise is
-> not an issue, just use straight ChaCha or whatever other stream
-> cipher.
->
-> The point is, despite all arguments Jason puts, we all would feel
-> extremely uncomfortable/uneasy to let continuous entropy accumulation
-> go, right?
-
-I went through the same thought experiment. If we're not considering
-premature next, maybe we shouldn't consider compromises _in general_, in
-which case we'd just seed once at boot and then never again. But as you
-rightfully point out, nobody here is okay with such a thing. The reason
-you've provided for that feeling is that A) without B) is still
-something important to defend against. But there's another more basic
-reason, which is that we really can't be certain exactly /when/ we've
-gathered enough entropy that the RNG is initialized. Sure, we try to
-estimate that using some pretty questionable algorithms, so that
-getrandom() can "unblock" at some point when the RNG has been deemed to
-be sufficiently initialized. But that is a guess at best, and the most
-we can say is that *eventually* it becomes initialized, but we never
-really know when that is, given that we can't even begin to accurately
-model all of the machines Linux runs on. So since we can't actually
-determine when we've initialized, for that reason alone our only choice
-is to keep gathering new entropy and reseeding periodically (or
-continuously, as Nadia recommends).
-
-> This means we all hopefully agree that we need protection against A) and B) individually.
->
-> 3) Now comes the question. If we want to design a sound RNG using tools of modern cryptography, and we allow
-> the attacker an individual capability to enforce A) or B) individually, are we comfortable with the design where we:
-> * offer protection against A)
-> * offer protection against B)
-> * do NOT offer protection against A)+B), because we think it's too expensive given A)+B) is so rare?
-
-There's an additional point to consider here, which I took to be Nadia's
-main idea: any kind of protection against A)+B) will hinder protection
-against A) individually. All current solutions to A)+B) involve some
-form of buffering / delaying of using new entropy sources, because
-they're sent to different pools, or are simply not used until a certain
-threshold, etc. Meanwhile, better protection against A) individually
-involves making use of new entropy as soon as possible, to reduce the
-duration of time in which the RNG is compromised and doing dangerous
-things. Since we can't actually know when a compromise is over or when
-enough new entropy has been collected, the best we can do is "as soon as
-possible", which means any form of a delay is contrary to that goal.
-
-So it's not just that A)+B) is both an unlikely attack vector and has
-solutions that involve undue implementation complexity, but also that
-A)+B) solutions weaken solutions to the heavier problem of A)
-individually.
-
-> I do not have a convincing answer to this question, but it is at least
-> not obvious to me. On a good note, one worry we might have is how to
-> even have a definition protecting A), protecting B), but not
-> protecting A)+B).  Fortunately, our papers resolve this question
-> (although there are still theoretical annoyances which I do not want
-> to get into in this email). So, at least from this perspective, we are
-> good. We have a definition with exactly these (suboptimal) properties.
-
-I actually would be interested to see how you have this defined. It
-seems like from a formal perspective, this issue with being "eventually
-seeded" naturally leads itself to Fortuna-like designs, where the whole
-design is structured around eventually meeting the desired security
-properties. But on the other hand a A) without B) design would suggest
-some notion of being properly seeded at some point in time, and when
-that is seems hard to define. So anyway I'm curious to learn how you've
-organized this. 
-
-Regards,
-Jason
