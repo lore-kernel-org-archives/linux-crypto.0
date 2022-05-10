@@ -2,120 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD17C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 16:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5840C433F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 May 2022 17:10:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243993AbiEJQ6i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 May 2022 12:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35058 "EHLO
+        id S1347790AbiEJROm (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 10 May 2022 13:14:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237624AbiEJQ6f (ORCPT
+        with ESMTP id S1347787AbiEJROl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 May 2022 12:58:35 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A848E27E3E6
-        for <linux-crypto@vger.kernel.org>; Tue, 10 May 2022 09:54:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652201673; x=1683737673;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ZzffcCZsP6BscOeg9bDiKWhevHfZyKaZfvz2Y8niwPc=;
-  b=maiClQr6IBYhxZukQdeInPLEcilho7PpspoQ3tiJU+gxYs8wDE/tj9Hn
-   HJIs2co+Xsf0QZ2aFx232srePwuNPVTiTaCNng+CrHYwZK2yu6MZ53uAu
-   KTH1UqzIQka+IIAFFxpHGRdouncD5C89/yl7/2pEyZo0Z6d/rSFlOSnsH
-   3JeXHzzUO9C8qt1ZQ++rAsKwV0lN0FHsir4g+L9rZNYzacCw2RY6xCiFs
-   Lth/8vVvALqdbIO/lvgm/Zf3DoO9T8NsfDR37WbI5Kl1xe9zIH9f/Wvta
-   CJGBoIsIIcacdyL3t3P+I0OIE4c4eZoyzy78eFY4swH0m7rAGurS+J4EI
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10343"; a="294672532"
-X-IronPort-AV: E=Sophos;i="5.91,214,1647327600"; 
-   d="scan'208";a="294672532"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2022 09:54:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,214,1647327600"; 
-   d="scan'208";a="711114595"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga001.fm.intel.com with ESMTP; 10 May 2022 09:54:23 -0700
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     herbert@gondor.apana.org.au
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Srinivas Kerekare <srinivas.kerekare@intel.com>
-Subject: [PATCH] crypto: qat - add support for 401xx devices
-Date:   Tue, 10 May 2022 17:54:19 +0100
-Message-Id: <20220510165419.182774-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 10 May 2022 13:14:41 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D378BC12;
+        Tue, 10 May 2022 10:10:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 948B9B81D2E;
+        Tue, 10 May 2022 17:10:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6860C385A6;
+        Tue, 10 May 2022 17:10:37 +0000 (UTC)
+Date:   Tue, 10 May 2022 18:10:34 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [RFC PATCH 2/7] crypto: api - Add crypto_tfm_ctx_dma
+Message-ID: <Ynqciq2p8mtTg98n@arm.com>
+References: <YnpGnsr4k7yVUR54@gondor.apana.org.au>
+ <E1noNhu-00BzV4-4N@fornost.hmeau.com>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1noNhu-00BzV4-4N@fornost.hmeau.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QAT_401xx is a derivative of 4xxx. Add support for that device in the
-qat_4xxx driver by including the DIDs (both PF and VF), extending the
-probe and the firmware loader.
+Hi Herbert,
 
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Srinivas Kerekare <srinivas.kerekare@intel.com>
----
- drivers/crypto/qat/qat_4xxx/adf_drv.c             | 1 +
- drivers/crypto/qat/qat_common/adf_accel_devices.h | 2 ++
- drivers/crypto/qat/qat_common/qat_hal.c           | 1 +
- drivers/crypto/qat/qat_common/qat_uclo.c          | 1 +
- 4 files changed, 5 insertions(+)
+Thanks for putting this together.
 
-diff --git a/drivers/crypto/qat/qat_4xxx/adf_drv.c b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-index a6c78b9c730b..181fa1c8b3c7 100644
---- a/drivers/crypto/qat/qat_4xxx/adf_drv.c
-+++ b/drivers/crypto/qat/qat_4xxx/adf_drv.c
-@@ -14,6 +14,7 @@
- 
- static const struct pci_device_id adf_pci_tbl[] = {
- 	{ PCI_VDEVICE(INTEL, ADF_4XXX_PCI_DEVICE_ID), },
-+	{ PCI_VDEVICE(INTEL, ADF_401XX_PCI_DEVICE_ID), },
- 	{ }
- };
- MODULE_DEVICE_TABLE(pci, adf_pci_tbl);
-diff --git a/drivers/crypto/qat/qat_common/adf_accel_devices.h b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-index e927799a8e6c..ede6458c9dbf 100644
---- a/drivers/crypto/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/qat/qat_common/adf_accel_devices.h
-@@ -19,6 +19,8 @@
- #define ADF_4XXX_DEVICE_NAME "4xxx"
- #define ADF_4XXX_PCI_DEVICE_ID 0x4940
- #define ADF_4XXXIOV_PCI_DEVICE_ID 0x4941
-+#define ADF_401XX_PCI_DEVICE_ID 0x4942
-+#define ADF_401XXIOV_PCI_DEVICE_ID 0x4943
- #define ADF_DEVICE_FUSECTL_OFFSET 0x40
- #define ADF_DEVICE_LEGFUSE_OFFSET 0x4C
- #define ADF_DEVICE_FUSECTL_MASK 0x80000000
-diff --git a/drivers/crypto/qat/qat_common/qat_hal.c b/drivers/crypto/qat/qat_common/qat_hal.c
-index 4bfd8f3566f7..7bba35280dac 100644
---- a/drivers/crypto/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/qat/qat_common/qat_hal.c
-@@ -695,6 +695,7 @@ static int qat_hal_chip_init(struct icp_qat_fw_loader_handle *handle,
- 	handle->pci_dev = pci_info->pci_dev;
- 	switch (handle->pci_dev->device) {
- 	case ADF_4XXX_PCI_DEVICE_ID:
-+	case ADF_401XX_PCI_DEVICE_ID:
- 		handle->chip_info->mmp_sram_size = 0;
- 		handle->chip_info->nn = false;
- 		handle->chip_info->lm2lm3 = true;
-diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
-index 4b6f37d6e85b..0fe5a474aa45 100644
---- a/drivers/crypto/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/qat/qat_common/qat_uclo.c
-@@ -731,6 +731,7 @@ qat_uclo_get_dev_type(struct icp_qat_fw_loader_handle *handle)
- 	case PCI_DEVICE_ID_INTEL_QAT_C3XXX:
- 		return ICP_QAT_AC_C3XXX_DEV_TYPE;
- 	case ADF_4XXX_PCI_DEVICE_ID:
-+	case ADF_401XX_PCI_DEVICE_ID:
- 		return ICP_QAT_AC_4XXX_A_DEV_TYPE;
- 	default:
- 		pr_err("QAT: unsupported device 0x%x\n",
+On Tue, May 10, 2022 at 07:07:10PM +0800, Herbert Xu wrote:
+> diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+> index f50c5d1725da5..cdf12e51c53a0 100644
+> --- a/include/crypto/algapi.h
+> +++ b/include/crypto/algapi.h
+> @@ -189,10 +189,34 @@ static inline void crypto_xor_cpy(u8 *dst, const u8 *src1, const u8 *src2,
+>  	}
+>  }
+>  
+> +static inline void *crypto_tfm_ctx(struct crypto_tfm *tfm)
+> +{
+> +	return tfm->__crt_ctx;
+> +}
+> +
+> +static inline void *crypto_tfm_ctx_align(struct crypto_tfm *tfm,
+> +					 unsigned int align)
+> +{
+> +	if (align <= crypto_tfm_ctx_alignment())
+> +		align = 1;
+> +
+> +	return PTR_ALIGN(crypto_tfm_ctx(tfm), align);
+> +}
+> +
+>  static inline void *crypto_tfm_ctx_aligned(struct crypto_tfm *tfm)
+>  {
+> -	return PTR_ALIGN(crypto_tfm_ctx(tfm),
+> -			 crypto_tfm_alg_alignmask(tfm) + 1);
+> +	return crypto_tfm_ctx_align(tfm, crypto_tfm_alg_alignmask(tfm) + 1);
+> +}
+> +
+> +static inline void *crypto_tfm_ctx_dma(struct crypto_tfm *tfm)
+> +{
+> +	unsigned int align = 1;
+> +
+> +#ifdef ARCH_DMA_MINALIGN
+> +	align = ARCH_DMA_MINALIGN;
+> +#endif
+> +
+> +	return crypto_tfm_ctx_align(tfm, align);
+>  }
+
+Is there a case where a driver needs the minimum alignment between
+ARCH_DMA_MINALIGN and crypto_tfm_alg_alignmask()+1? Maybe for platforms
+where ARCH_DMA_MINALIGN is 8 (fully coherent) but the device's bus
+master alignment requirements are higher.
+
+My plan is to have ARCH_DMA_MINALIGN always defined but potentially
+higher than ARCH_KMALLOC_MINALIGN on specific architectures. I think
+crypto_tfm_ctx_dma() should use ARCH_KMALLOC_MINALIGN (and no #ifdefs)
+until I get my patches sorted and I'll replace it with ARCH_DMA_MINALIGN
+once it's defined globally (still no #ifdefs). Currently in mainline
+it's ARCH_KMALLOC_MINALIGN that gives the static DMA alignment.
+
+With the explicit crypto_tfm_ctx_dma(), can CRYPTO_MINALIGN_ATTR be
+dropped entirely? This may be beneficial in reducing the structure size
+when no DMA is required.
+
 -- 
-2.35.1
-
+Catalin
