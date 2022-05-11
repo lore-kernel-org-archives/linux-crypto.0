@@ -2,70 +2,147 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A97F7C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 May 2022 11:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF119C433FE
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 May 2022 11:54:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235818AbiEKLly (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 May 2022 07:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34328 "EHLO
+        id S229991AbiEKLy5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 May 2022 07:54:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241269AbiEKLlg (ORCPT
+        with ESMTP id S229759AbiEKLy4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 May 2022 07:41:36 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A896221F;
-        Wed, 11 May 2022 04:41:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Wed, 11 May 2022 07:54:56 -0400
+Received: from ssl.serverraum.org (ssl.serverraum.org [176.9.125.105])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57651312A7;
+        Wed, 11 May 2022 04:54:55 -0700 (PDT)
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 821D3B82215;
-        Wed, 11 May 2022 11:41:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 649A8C340F2;
-        Wed, 11 May 2022 11:41:31 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LoYM1Glt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652269289;
+        by ssl.serverraum.org (Postfix) with ESMTPSA id 303F022205;
+        Wed, 11 May 2022 13:54:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1652270093;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0eZFVr0R7tr8pw1d+4up9u7mZ3WWk1zMsEZIi4198wM=;
-        b=LoYM1GltXCzbdsQ/25CVajZQVoSqUAN8UhoOsZiWg0Kq6Bi1/kBG7KibB4PZCjJRpmx3fW
-        UgdAsOkclk+7raS2ozM4dbiF98xnRpB3RJ9oeo30PrnSCa3xmI3mZ24OWL+A1Oda83vcBi
-        wT4anzX9ubyzD6Vdfvg0q2W6EF9o/is=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 28e7ee18 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 11 May 2022 11:41:29 +0000 (UTC)
-Date:   Wed, 11 May 2022 13:41:27 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH RFC v1] random: use static branch for crng_ready()
-Message-ID: <Ynug580srdedsiY9@zx2c4.com>
-References: <20220503134052.646325-1-Jason@zx2c4.com>
+        bh=UUkI0Cc9OxYxHknJkTuALHalkk3nBs1wdRHlxEOJ9kM=;
+        b=ivQ+a1UTT3EQMu/UG50XuhHtGPDy0YsyFD7RwRW34Vz+MjpBukXpe3MGw6r91BumdzkOiS
+        6g53ZRcNQO8ytjVL0Exx+K0+eNA0vavMusQehKZ+0c84Zh9gU7RCmwXDmWOAhyVClVn6yw
+        glAfK/7tiMsOT4Z/GZCyPUzdQAVtoZw=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220503134052.646325-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Wed, 11 May 2022 13:54:53 +0200
+From:   Michael Walle <michael@walle.cc>
+To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
+        James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [EXT] [PATCH v9 3/7] crypto: caam - determine whether CAAM
+ supports blob encap/decap
+In-Reply-To: <cf88010c-e141-76cb-1acb-d768209bfc0f@nxp.com>
+References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
+ <20220506062553.1068296-4-a.fatoum@pengutronix.de>
+ <DU2PR04MB8630501008F661C596C0106295C69@DU2PR04MB8630.eurprd04.prod.outlook.com>
+ <5e7c0b3c9bc285f1cf9f7b20f055aa376e1688cc.camel@pengutronix.de>
+ <DU2PR04MB8630A6F925454E5C007FA3EA95C89@DU2PR04MB8630.eurprd04.prod.outlook.com>
+ <232eb799dbbd341c305e911f85341409@walle.cc>
+ <c3c1fbf2-c73a-02ec-d2cb-354880a84d5f@nxp.com>
+ <a3b290ee4367309739948c06c11964f4@walle.cc>
+ <cf88010c-e141-76cb-1acb-d768209bfc0f@nxp.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <6fb4414da896cbac68332ae34eab5081@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 03, 2022 at 03:40:52PM +0200, Jason A. Donenfeld wrote:
-> +static bool crng_ready_slowpath(void)
-> +{
-> +	if (crng_init <= 1)
-> +		return false;
-> +	if (in_atomic() || irqs_disabled() || cmpxchg(&crng_init, 2, 3) != 2)
-> +		return true;
+Am 2022-05-11 12:28, schrieb Horia Geantă:
 
-Nobody chimed in here, but for posterity I thought I should point out
-that this approach actually won't work, since in_atomic() doesn't work
-with CONFIG_PREEMPT_COUNT=n kernels.
+>>>>> For non-E variants, it might happen that Blob protocol is enabled,
+>>>>> but
+>>>>> number of AES CHA are zero.
+>>>>> If the output of below expression is > 0, then only blob_present
+>>>>> should be marked present or true.
+>>>>> For era > 10, you handled. But for era < 10, please add the below
+>>>>> code.
+>>>> 
+>>>> Are there any CAAMs which can be just enabled partially for era < 
+>>>> 10?
+>>>> I didn't found anything. To me it looks like the non-export 
+>>>> controlled
+>>>> CAAM is only available for era >= 10. For era < 10, the CAAM is 
+>>>> either
+>>>> fully featured there or it is not available at all and thus the node
+>>>> is removed in the bootloader (at least that is the case for
+>>>> layerscape).
+>>>> 
+>>> Qouting from our previous discussion in U-boot:
+>>> https://patchwork.ozlabs.org/project/uboot/patch/20200602150904.1997-1-michael@walle.cc/#2457448
+>>> 
+>>> "
+>>> Based on previous (NXP-internal) discussions, non-E crypto module is:
+>>> -fully disabled on: LS1021A (ARMv7), LS1043A, LS1088A, LS2088A
+>>> (and their personalities)
+>>> -partially [*] disabled on: LS1012A, LS1028A, LS1046A, LX2160A
+>>> (and their personalities)
+>>> "
+>>> 
+>>> From the partially disabled list, LS1028A and LX2160A have CAAM Era 
+>>> 10,
+>>> while LS1012A and LS1046A integrate CAAM Era 8.
+>> 
+>> Thanks for clarification. Do you know it that is a layerscape feature?
+>> I had a look at the imx8mn which have a era 9 and it doesn't have the
+>> PKHA_VERSION register which indicates the partially disabled PKHA
+>> block. Thus I concluded that there is no partially disabled feature
+>> on era < 10.
+>> 
+> Unfortunately when moving from Era 9 to Era 10, the register map
+> is not 100% backwards-compatible.
+> This is why you're not seeing PKHA_VERSION register for i.MX8MN.
+> 
+> For Era >= 10, the CHA version and CHA number fields are conveniently 
+> found
+> found in the same *_VERSION register, e.g. PKHA_VID and PKHA_NUM are 
+> both
+> located in PKHA_VERSION.
+> 
+> For Era < 10, these fields are scattered:
+> CHAVID_LS[PKVID]
+> CHANUM_LS[PKNUM]
 
-So back to the drawing board in trying to figure out the best way to do
-this...
- 
-Jason
+Ok, but there is only the number of instances. I couldn't find a
+similar bit to the PKHA_VERSION[PKHA_MISC[7]] bit, which indicates
+PKHA decryption/encryption capability is disabled. That seems to
+be only for era >= 10, right? That was what caused my confusion,
+because until now I was under the impression that non-E variants
+will always have that bit.
+
+Rereading your comment, you don't mention PKHA at all. So for
+era <10 if you blow the EXPORT_CONTROL fuse, you'll have zero
+in any *NUM except for MDNUM, RNGNUM and CRCNUM. Is that correct?
+
+In that case, I agree, we should also check CHANUM_LS[AESNUM] for
+era < 10.
+
+-michael
