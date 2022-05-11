@@ -2,147 +2,166 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF119C433FE
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 May 2022 11:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FB1C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 May 2022 12:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229991AbiEKLy5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 May 2022 07:54:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
+        id S241833AbiEKMRu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 May 2022 08:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229759AbiEKLy4 (ORCPT
+        with ESMTP id S241889AbiEKMRs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 May 2022 07:54:56 -0400
-Received: from ssl.serverraum.org (ssl.serverraum.org [176.9.125.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57651312A7;
-        Wed, 11 May 2022 04:54:55 -0700 (PDT)
-Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id 303F022205;
-        Wed, 11 May 2022 13:54:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1652270093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UUkI0Cc9OxYxHknJkTuALHalkk3nBs1wdRHlxEOJ9kM=;
-        b=ivQ+a1UTT3EQMu/UG50XuhHtGPDy0YsyFD7RwRW34Vz+MjpBukXpe3MGw6r91BumdzkOiS
-        6g53ZRcNQO8ytjVL0Exx+K0+eNA0vavMusQehKZ+0c84Zh9gU7RCmwXDmWOAhyVClVn6yw
-        glAfK/7tiMsOT4Z/GZCyPUzdQAVtoZw=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Wed, 11 May 2022 13:54:53 +0200
-From:   Michael Walle <michael@walle.cc>
-To:     =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Wed, 11 May 2022 08:17:48 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFEA4EF41;
+        Wed, 11 May 2022 05:17:41 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso4785687pjb.1;
+        Wed, 11 May 2022 05:17:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6jloxkDrIBx1FQXB3WO3Zmzcd3Q83JGcMWSxebzbF80=;
+        b=oU7QGwSElhyci8ZR/OTe9HHc5yH5oBDGLYBqdFuGP0A+UntWW+o126T+puwM3gGQaa
+         s8eH+vRmefjW0g9a2Ld4jCTmsADSpVHsyopJw+86eX97RIJVO3ucW+e+tLOJJmhDdZTW
+         RV+FZFJAbM0gbfYxUpn86RCEy/gt5mq0YZBclMJGrwklm7ecn0L4M2eLm0WRZQnZSILt
+         HmrRTUfFcgUueejhcV96JGCweuRkh4YtPylbiTUDPezsvbnL9MH3jHvL7x9upNuWPH5x
+         GTxrVTheyp2VgmmZy5FhNOWBP0e1+5Be8X2g9poc544EzW8f900YlCQk1RKHeJokUzDw
+         Ij4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6jloxkDrIBx1FQXB3WO3Zmzcd3Q83JGcMWSxebzbF80=;
+        b=L3+7q9/bX7qiAG5UsKRHhSrbd6X4+KAegtT2P9F0DOrfLkovjKk8MOHp7DkseDJn/w
+         05bCtkhl3xuQ8VdRV8BaFhoeIc0LOaU+42gEA9S+TCdO6IbHmElsw5GZZukIJEvUT+Jo
+         +71JEk7P4ddxhe+vbClekaIXXLsHoe45JC3FEdhAv+SloPHDfdAtMqxdblmbajxt5ooC
+         m317e4o8iFQL5fkAhDJ+EyOl/wjIE9hrcitYCNMQQCdC4KfoGT2Ra5T3V3A/FOjJtfHy
+         c3QPXI8oqN6zJjnmOYrK8tVjufQyZ7vD6EbdYvjNiXnYY+b4hI+UPKqHcXEmgcw1NSl9
+         UeEg==
+X-Gm-Message-State: AOAM532Wvr+S1BRqYt5FPhLwFtiImqpM7vE/Bb5GgnvBwfD0tFyOvEEj
+        b17EIFjNQoAGxWOhheLhbn8=
+X-Google-Smtp-Source: ABdhPJxPUIzteam2t9wDpHP6nr06rCewsN5+gC9SkiHTFRp8pdZVPv3cYpJfFGaF/VpS85E2BKIFXA==
+X-Received: by 2002:a17:902:9349:b0:158:a6f7:e280 with SMTP id g9-20020a170902934900b00158a6f7e280mr24853463plp.155.1652271461237;
+        Wed, 11 May 2022 05:17:41 -0700 (PDT)
+Received: from localhost ([2409:10:24a0:4700:e8ad:216a:2a9d:6d0c])
+        by smtp.gmail.com with ESMTPSA id v24-20020a170902e8d800b0015e8d4eb272sm1676730plg.188.2022.05.11.05.17.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 May 2022 05:17:40 -0700 (PDT)
+Date:   Wed, 11 May 2022 21:17:38 +0900
+From:   Stafford Horne <shorne@gmail.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Andy Shevchenko <andriy.shevchenko@intel.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Andy Shevchenko <andy@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de,
-        James Bottomley <jejb@linux.ibm.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Mike Snitzer <msnitzer@redhat.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Richard Weinberger <richard@nod.at>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [EXT] [PATCH v9 3/7] crypto: caam - determine whether CAAM
- supports blob encap/decap
-In-Reply-To: <cf88010c-e141-76cb-1acb-d768209bfc0f@nxp.com>
-References: <20220506062553.1068296-1-a.fatoum@pengutronix.de>
- <20220506062553.1068296-4-a.fatoum@pengutronix.de>
- <DU2PR04MB8630501008F661C596C0106295C69@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <5e7c0b3c9bc285f1cf9f7b20f055aa376e1688cc.camel@pengutronix.de>
- <DU2PR04MB8630A6F925454E5C007FA3EA95C89@DU2PR04MB8630.eurprd04.prod.outlook.com>
- <232eb799dbbd341c305e911f85341409@walle.cc>
- <c3c1fbf2-c73a-02ec-d2cb-354880a84d5f@nxp.com>
- <a3b290ee4367309739948c06c11964f4@walle.cc>
- <cf88010c-e141-76cb-1acb-d768209bfc0f@nxp.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <6fb4414da896cbac68332ae34eab5081@walle.cc>
-X-Sender: michael@walle.cc
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v2] hex2bin: make the function hex_to_bin constant-time
+Message-ID: <YnupYin9knBu6c91@antec>
+References: <YnJI4Ru0AlUgrr9C@zx2c4.com>
+ <YnJOCbLtdATzC+jn@zx2c4.com>
+ <YnJQXr3igEMTqY3+@smile.fi.intel.com>
+ <YnJSQ3jJyvhmIstD@zx2c4.com>
+ <CAHk-=wgb_eBdjM_mzEvXfRG2EhrSK5MHNGyAj7=4vxvN4U9Rug@mail.gmail.com>
+ <CAHmME9q_-nfGxp8_VCqaritm4N8v8g67AzRjXs9du846JhhpoQ@mail.gmail.com>
+ <CAAfxs77yaLvWx9KnkDZX7E1eDm9N-NVJn5n8=mCK9BU-cSob=A@mail.gmail.com>
+ <CAHk-=wjLRo-6PbhbvMUDojbMo=L+2jc5VpCYTyF-LGxZPhUngA@mail.gmail.com>
+ <YnLkYjOF2vEOdjOo@antec>
+ <YncQxl1shpH5TpbK@antec>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YncQxl1shpH5TpbK@antec>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 2022-05-11 12:28, schrieb Horia Geantă:
-
->>>>> For non-E variants, it might happen that Blob protocol is enabled,
->>>>> but
->>>>> number of AES CHA are zero.
->>>>> If the output of below expression is > 0, then only blob_present
->>>>> should be marked present or true.
->>>>> For era > 10, you handled. But for era < 10, please add the below
->>>>> code.
->>>> 
->>>> Are there any CAAMs which can be just enabled partially for era < 
->>>> 10?
->>>> I didn't found anything. To me it looks like the non-export 
->>>> controlled
->>>> CAAM is only available for era >= 10. For era < 10, the CAAM is 
->>>> either
->>>> fully featured there or it is not available at all and thus the node
->>>> is removed in the bootloader (at least that is the case for
->>>> layerscape).
->>>> 
->>> Qouting from our previous discussion in U-boot:
->>> https://patchwork.ozlabs.org/project/uboot/patch/20200602150904.1997-1-michael@walle.cc/#2457448
->>> 
->>> "
->>> Based on previous (NXP-internal) discussions, non-E crypto module is:
->>> -fully disabled on: LS1021A (ARMv7), LS1043A, LS1088A, LS2088A
->>> (and their personalities)
->>> -partially [*] disabled on: LS1012A, LS1028A, LS1046A, LX2160A
->>> (and their personalities)
->>> "
->>> 
->>> From the partially disabled list, LS1028A and LX2160A have CAAM Era 
->>> 10,
->>> while LS1012A and LS1046A integrate CAAM Era 8.
->> 
->> Thanks for clarification. Do you know it that is a layerscape feature?
->> I had a look at the imx8mn which have a era 9 and it doesn't have the
->> PKHA_VERSION register which indicates the partially disabled PKHA
->> block. Thus I concluded that there is no partially disabled feature
->> on era < 10.
->> 
-> Unfortunately when moving from Era 9 to Era 10, the register map
-> is not 100% backwards-compatible.
-> This is why you're not seeing PKHA_VERSION register for i.MX8MN.
+On Sun, May 08, 2022 at 09:37:26AM +0900, Stafford Horne wrote:
+> On Thu, May 05, 2022 at 05:38:58AM +0900, Stafford Horne wrote:
+> > On Wed, May 04, 2022 at 01:10:03PM -0700, Linus Torvalds wrote:
+> > > On Wed, May 4, 2022 at 12:58 PM Stafford Horne <shorne@gmail.com> wrote:
+> > > >
+> > > > I have uploaded a diff I created here:
+> > > >   https://gist.github.com/54334556f2907104cd12374872a0597c
+> > > >
+> > > > It shows the same output.
+> > > 
+> > > In hex_to_bin itself it seems to only be a difference due to some
+> > > register allocation (r19 and r3 switched around).
+> > > 
+> > > But then it gets inlined into hex2bin and there changes there seem to
+> > > be about instruction and basic block scheduling, so it's a lot harder
+> > > to see what's going on.
+> > > 
+> > > And a lot of constant changes, which honestly look just like code code
+> > > moved around by 16 bytes and offsets changed due to that.
+> > > 
+> > > So I doubt it's hex_to_bin() that is causing problems, I think it's
+> > > purely code movement. Which explains why adding a nop or a fake printk
+> > > fixes things.
+> > > 
+> > > Some alignment assumption that got broken?
+> > 
+> > This is what it looks like to me too.  I will have to do a deep dive on what is
+> > going on with this particular build combination as I can't figure out what it is
+> > off the top of my head.
+> > 
+> > This test is using a gcc 11 compiler, I tried with my gcc 12 toolchain and the
+> > issue cannot be reproduced.
+> > 
+> >   - musl gcc 11 - https://musl.cc/or1k-linux-musl-cross.tgz
+> >   - openrisc gcc 12 - https://github.com/openrisc/or1k-gcc/releases/tag/or1k-12.0.1-20220210-20220304
+> > 
+> > But again the difference between the two compiler outputs is a lot of register
+> > allocation and offsets changes.  Its not easy to see anything that stands out.
+> > I checked the change log for the openrisc specific changes from gcc 11 to gcc
+> > 12.  Nothing seems to stand out, mcount profiler fix for PIC, a new large binary
+> > link flag.
 > 
-> For Era >= 10, the CHA version and CHA number fields are conveniently 
-> found
-> found in the same *_VERSION register, e.g. PKHA_VID and PKHA_NUM are 
-> both
-> located in PKHA_VERSION.
+> Hello,
 > 
-> For Era < 10, these fields are scattered:
-> CHAVID_LS[PKVID]
-> CHANUM_LS[PKNUM]
+> Just an update on this.  The issue so far has been traced to the alignment of
+> the crypto multiplication function fe_mul_impl in lib/crypto/curve25519-fiat32.c.
+> 
+> This patch e5be15767e7e ("hex2bin: make the function hex_to_bin constant-time")
+> allowed for the alignment to be just right to cause the failure.  Without
+> this patch and forcing the alignment we can reproduce the issue.  So though the
+> bisect is correct, this patch is not the root cause of the issue.
+> 
+> Using some l.nop sliding techniques and some strategically placed .align
+> statements I have been able to reproduce the issue on:
+> 
+>   - gcc 11 and gcc 12
+>   - preempt and non-preempt kernels
+> 
+> I have not been able to reproduce this on my FPGA, so far only QEMU.  My
+> hunch now is that since the fe_mul_impl function contains some rather long basic
+> blocks it appears that timer interrupts that interrupt qemu mid basic block
+> execution somehow is causing this.  The hypothesis is it may be basic block
+> resuming behavior in qemu that causes incosistent behavior.
+> 
+> It will take a bit more time to trace this.  Since I maintain OpenRISC QEMU the
+> issue is on me.
+> 
+> Again, It's safe to say that patch e5be15767e7e ("hex2bin: make the function
+> hex_to_bin constant-time") is not an issue.
 
-Ok, but there is only the number of instances. I couldn't find a
-similar bit to the PKHA_VERSION[PKHA_MISC[7]] bit, which indicates
-PKHA decryption/encryption capability is disabled. That seems to
-be only for era >= 10, right? That was what caused my confusion,
-because until now I was under the impression that non-E variants
-will always have that bit.
+This issue has been fixed.  I sent a patch to QEMU for it:
 
-Rereading your comment, you don't mention PKHA at all. So for
-era <10 if you blow the EXPORT_CONTROL fuse, you'll have zero
-in any *NUM except for MDNUM, RNGNUM and CRCNUM. Is that correct?
+ - https://lore.kernel.org/qemu-devel/20220511120541.2242797-1-shorne@gmail.com/T/#u
 
-In that case, I agree, we should also check CHANUM_LS[AESNUM] for
-era < 10.
+The issue was a bug in the OpenRISC emulation in QEMU which was triggered when
+receiving a TICK TIMER interrupt, in a delay slot, on a page boundary.
 
--michael
+The fix was simple enough, but investigation took quite some work.
+
+Thanks,
+
+-Stafford
