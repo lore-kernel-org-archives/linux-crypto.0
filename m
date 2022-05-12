@@ -2,108 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 180E6C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 18:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCF2C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 20:36:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357700AbiELSdI (ORCPT
+        id S1358399AbiELUgJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 May 2022 14:33:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34860 "EHLO
+        Thu, 12 May 2022 16:36:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357581AbiELSdG (ORCPT
+        with ESMTP id S1358384AbiELUf4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 May 2022 14:33:06 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5428366C93;
-        Thu, 12 May 2022 11:33:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 14E63B82AD2;
-        Thu, 12 May 2022 18:32:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E02FC34100;
-        Thu, 12 May 2022 18:32:57 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="aqUMb18b"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652380373;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=j7L3jRaEE24CnmSnfnYX9QsrDcQ/7q3vvEzMqLeZ5bw=;
-        b=aqUMb18bSC8gARPE928AF57G1ouW5sq16pr9+RhFRMMh/PVm6wrzqcR8jrA4jKQRXr7cMO
-        b0u0mLtcBHeOSqq8cm5sTeyc4qJpUThC4lsmJLlhU3YhZ43d5v/LzFbX6wUjUsETWFYBQ+
-        +gWngA/nF0VaGD2JWEHCABWPgOgYw7o=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cdcf0445 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 12 May 2022 18:32:53 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-2f7b815ac06so66900377b3.3;
-        Thu, 12 May 2022 11:32:53 -0700 (PDT)
-X-Gm-Message-State: AOAM531k+q51/sdzILOQLP19txc92NF7e8QUUgvIbgXYEnniVi74jrKf
-        wEj6KTOB2pNZONkUgF9/ZXf2Hr/pUfiyP60zCBc=
-X-Google-Smtp-Source: ABdhPJyXiV1OZyKsWVqUB6Bpq4PbzfC2ZtM7crKN2JIm8eqSbMDWlna2R8rfUBqbOpTwHpix1NvHEHveHZpEyvdzsfo=
-X-Received: by 2002:a0d:ef03:0:b0:2fa:245:adf3 with SMTP id
- y3-20020a0def03000000b002fa0245adf3mr1585638ywe.100.1652380372103; Thu, 12
- May 2022 11:32:52 -0700 (PDT)
+        Thu, 12 May 2022 16:35:56 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2071.outbound.protection.outlook.com [40.107.212.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C492C63AB;
+        Thu, 12 May 2022 13:35:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HX33RIRvfq12FFQOOOcZ7q1vIPMeXyIZv5t1aUnAWyc5y5uv8rr4w1mp92c/4nRjHfGtWnolkSmpxeo5Vh0qAUzMfZzzaU2+z1E5lmCvvMWm12+H37/VQIMOOR4GWEKwhQSt82anEtVx9wryZw2UaV+vz8dCIbY9fEp3bP+HVvKmCOv6XJhS424AomIn5k1cP9n4NTEWDUhFla2yv+WfSbqfOceGgh/1i8+L9+59Cn9SkIsm68nLgvgrSgP0AbUY4bZDeAkAGGXgsUu922QyCncT4eaikkHm+9oMT2c34EHxAYmAmVH8nzPdGrJo4wFITm9049W0vvif+Qkomai1+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mKXc9lWwmXF32NNeKoUQC2M4MJsdbL2PCeBURM/ukP4=;
+ b=PUSXmxEnGoFWqQ8wfICJd/mpwBc5s782l59KNOABEkGnjBpDwRnj8nyhfNq+alF5VF4+/Vi7LUy7uw2LtBjc5jAivnlrbcgq6dSfennjK+DFXIbHnUugsfiGw4iZWyYCmuDTrDAA0Hu0NsfldK/I+UeLvabLhE9Eey6vUywvjKWmsS/pvK7GXSl/z/Hoe6Hi/AXE6NdtUJN5e/uKPd+cQADb2MNbEAhh/CpKtZK2y6Wa3jIHLUwHTX3pIbLsDzTeQbvUJj/ieJLvBUH2hxo3MVkMTSeLxmRnnOleRWT4dgQouljMZVVdQGPajVF56Aae99rlx6DyNiYjHMQUYDOxvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mKXc9lWwmXF32NNeKoUQC2M4MJsdbL2PCeBURM/ukP4=;
+ b=eq+aHFDH2CQ0kegpsnPPRV5U/qVys8f9ywxbxnU/G/Fs+GFLH9wPNVOLwUG04H3HGjyuvlAlaFiN0N9qw+U83Vlgisp0r6oXUKnUJ3/bzV+cu56NEVdmWkjFHx8xPR47M42yEQL6731+mP/6rgjzYzSz3+Y5Y3fpsP+EGzp4Hpk=
+Received: from BN9PR03CA0393.namprd03.prod.outlook.com (2603:10b6:408:111::8)
+ by BN7PR12MB2706.namprd12.prod.outlook.com (2603:10b6:408:2a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23; Thu, 12 May
+ 2022 20:35:51 +0000
+Received: from BN8NAM11FT031.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:111:cafe::97) by BN9PR03CA0393.outlook.office365.com
+ (2603:10b6:408:111::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.22 via Frontend
+ Transport; Thu, 12 May 2022 20:35:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT031.mail.protection.outlook.com (10.13.177.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5250.13 via Frontend Transport; Thu, 12 May 2022 20:35:50 +0000
+Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 12 May
+ 2022 15:35:49 -0500
+From:   John Allen <john.allen@amd.com>
+To:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+CC:     <seanjc@google.com>, <Thomas.Lendacky@amd.com>,
+        <Ashish.Kalra@amd.com>, <linux-kernel@vger.kernel.org>,
+        <theflow@google.com>, <rientjes@google.com>, <pgonda@google.com>,
+        John Allen <john.allen@amd.com>
+Subject: [PATCH] crypto: ccp - Use kzalloc for sev ioctl interfaces to prevent kernel memory leak
+Date:   Thu, 12 May 2022 20:34:55 +0000
+Message-ID: <20220512203455.253357-1-john.allen@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Received: by 2002:a05:7110:6406:b0:179:6742:1e2c with HTTP; Thu, 12 May 2022
- 11:32:51 -0700 (PDT)
-In-Reply-To: <87bkw2hafj.fsf@email.froward.int.ebiederm.org>
-References: <20220502140602.130373-1-Jason@zx2c4.com> <Ym/5EEYHbk56hV1H@zx2c4.com>
- <Ym/8GTW2RfhnbqiF@gardel-login> <YnERsPIsiOCa8cty@zx2c4.com>
- <Yn1GmlWKIvuoJJby@bombadil.infradead.org> <87bkw2hafj.fsf@email.froward.int.ebiederm.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 12 May 2022 20:32:51 +0200
-X-Gmail-Original-Message-ID: <CAHmME9o5n6TLfB3GsXz4KOt9iwxbT0e4ut65AFMsJsAm7ayNRg@mail.gmail.com>
-Message-ID: <CAHmME9o5n6TLfB3GsXz4KOt9iwxbT0e4ut65AFMsJsAm7ayNRg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] sysctl: read() must consume poll events, not poll()
-To:     "Eric W. Biederman" <ebiederm@xmission.com>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 12cd176b-9e66-46da-964e-08da3457009c
+X-MS-TrafficTypeDiagnostic: BN7PR12MB2706:EE_
+X-Microsoft-Antispam-PRVS: <BN7PR12MB270677289FE5D89A6A2301D49ACB9@BN7PR12MB2706.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VV7YR4xMnIw4u5su5whC2eqsogijUvICik82M6qZDC4/DUIOi3GYH6DwRH1G0ezLV1RTwr0VRafwJc7uRWm4INNXp5kIYaHkxU/kmoz5NTIPt2BJuQug5JUtLQX3s2pNMwy7Hfa1PGrFUsyoIcDOAEqp1CsCNZyViyLWtC1XOwwNgeYeOiEmQC2z4SWkm89hfvBOkZIFDaVmMOcY192Y4JPLXafAdwmbzxnjuyMOENHhqxM+CXaOiyu/8o/t7kV5Py+cGJHvsjYS3kNmDwlNwnqi8VCeZLpFmwQBtXLMHaGKtVH7s3i2NPVaA3cQYSoY+hLabdtt6qgeUXQCdPdA3CXK9TBFODiLRHzqAl+h8jkKlUOD2rSOEKEVv5dgVmSFAcLgEe72HoTJM3b3HOZpcMiRnGYsEhsy2GdAXSI64x0K/H/1ug/Pd08H3ODfnACW8nX2maiDYlUq7g2OSPlN0SLdZYHVWKRuv3tepZJzuo/ZkXAUMCKSAxPUCVi0nTfqv3gxZmBUw47TZXM8Gaw0Xr5wsu664MVK0Y/q0Np0MaBVS6JVydpF5dxWeACwFEPcMITXe4RuBWqTxz/iEv08c9UHBQP+SY1/tuFIMfpiBlLsJ2vaKRlcpKCP2zlSJq+uadeHJhLpPtdKk0JNDB6He0Bfd/1+8KnP3dRU5g1XvZCRlqyWH0uJC0PJd2Hy0ZHUOvyvISWOIWLNW+lQYu1SQw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(426003)(86362001)(356005)(81166007)(40460700003)(47076005)(26005)(83380400001)(2616005)(36860700001)(186003)(16526019)(1076003)(8676002)(4326008)(316002)(70206006)(70586007)(8936002)(82310400005)(36756003)(44832011)(7696005)(5660300002)(2906002)(508600001)(54906003)(110136005)(6666004)(336012)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2022 20:35:50.2782
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12cd176b-9e66-46da-964e-08da3457009c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT031.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR12MB2706
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+For some sev ioctl interfaces, input may be passed that is less than or
+equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data that PSP
+firmware returns. In this case, kmalloc will allocate memory that is the
+size of the input rather than the size of the data. Since PSP firmware
+doesn't fully overwrite the buffer, the sev ioctl interfaces with the
+issue may return uninitialized slab memory.
 
-On 5/12/22, Eric W. Biederman <ebiederm@xmission.com> wrote:
-> Luis Chamberlain <mcgrof@kernel.org> writes:
->
->> On Tue, May 03, 2022 at 01:27:44PM +0200, Jason A. Donenfeld wrote:
->>> On Mon, May 02, 2022 at 05:43:21PM +0200, Lennart Poettering wrote:
->>> > On Mo, 02.05.22 17:30, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
->>> >
->>> > > Just wanted to double check with you that this change wouldn't break
->>> > > how
->>> > > you're using it in systemd for /proc/sys/kernel/hostname:
->>> > >
->>> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/journal/journald-server.c#L1832
->>> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/resolve/resolved-manager.c#L465
->>> > >
->>> > > I couldn't find anybody else actually polling on it. Interestingly,
->>> > > it
->>> > > looks like sd_event_add_io uses epoll() inside, but you're not
->>> > > hitting
->>> > > the bug that Jann pointed out (because I suppose you're not poll()ing
->>> > > on
->>> > > an epoll fd).
->>> >
->>> > Well, if you made sure this still works, I am fine either way ;-)
->>>
->>> Actually... ugh. It doesn't work. systemd uses uname() to read the host
->>> name, and doesn't actually read() the file descriptor after receiving
->>> the poll event on it. So I guess I'll forget this, and maybe we'll have
->>> to live with sysctl's poll() being broken. :(
->
-> We should be able to modify calling uname() to act the same as reading
-> the file descriptor.
+Currently, all of the ioctl interfaces in the ccp driver are safe, but
+to prevent future problems, change all ioctl interfaces that allocate
+memory with kmalloc to use kzalloc.
 
-How? That sounds like madness. read() takes a fd. uname() doesn't. Are
-you proposing we walk through the fds of the process calling uname()
-til we find a matching one and then twiddle it's private context
-state? I mean I guess that'd work, but...
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Suggested-by: Peter Gonda <pgonda@google.com>
+Signed-off-by: John Allen <john.allen@amd.com>
+---
+ drivers/crypto/ccp/sev-dev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Jason
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 6ab93dfd478a..e2298843ea8a 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -604,7 +604,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	if (input.length > SEV_FW_BLOB_MAX_SIZE)
+ 		return -EFAULT;
+ 
+-	blob = kmalloc(input.length, GFP_KERNEL);
++	blob = kzalloc(input.length, GFP_KERNEL);
+ 	if (!blob)
+ 		return -ENOMEM;
+ 
+@@ -828,7 +828,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 	input_address = (void __user *)input.address;
+ 
+ 	if (input.address && input.length) {
+-		id_blob = kmalloc(input.length, GFP_KERNEL);
++		id_blob = kzalloc(input.length, GFP_KERNEL);
+ 		if (!id_blob)
+ 			return -ENOMEM;
+ 
+@@ -947,14 +947,14 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
+ 		return -EFAULT;
+ 
+-	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
++	pdh_blob = kzalloc(input.pdh_cert_len, GFP_KERNEL);
+ 	if (!pdh_blob)
+ 		return -ENOMEM;
+ 
+ 	data.pdh_cert_address = __psp_pa(pdh_blob);
+ 	data.pdh_cert_len = input.pdh_cert_len;
+ 
+-	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
++	cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
+ 	if (!cert_blob) {
+ 		ret = -ENOMEM;
+ 		goto e_free_pdh;
+-- 
+2.34.1
+
