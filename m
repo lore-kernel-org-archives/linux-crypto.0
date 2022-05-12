@@ -2,152 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F38C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 16:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6E0C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 17:41:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351056AbiELQiR (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 May 2022 12:38:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56662 "EHLO
+        id S245720AbiELRlw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 May 2022 13:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348751AbiELQiR (ORCPT
+        with ESMTP id S1357169AbiELRkw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 May 2022 12:38:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8FAF7C78B;
-        Thu, 12 May 2022 09:38:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 88CD6B82A02;
-        Thu, 12 May 2022 16:38:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A62DFC385B8;
-        Thu, 12 May 2022 16:38:12 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Z6KAmAk0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1652373490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2D/pEhTU/+V82CjpEsLBKB8+2YAiMBZc9DPAa+vQgNs=;
-        b=Z6KAmAk0DaDniCQ3cIldb6U8p1i2feTgcYZYEIPxLuk/58yNQvaXh05H2khOMNCXhdSxQ/
-        bq46wE+AZ02Avfh0v5/l743+OJdS2O2/BOFoNhRVABZaYtVyxP6h69PIrI8+6eNLuGUKMJ
-        1qgr4ejTYe66r0RWYbJ2XjqWxiTvwOE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f2863515 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 12 May 2022 16:38:09 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Sultan Alsawaf <sultan@kerneltoast.com>
-Subject: [PATCH v4] random: use static branch for crng_ready()
-Date:   Thu, 12 May 2022 18:37:48 +0200
-Message-Id: <20220512163748.3477-1-Jason@zx2c4.com>
-In-Reply-To: <20220512144235.2466-1-Jason@zx2c4.com>
-References: <20220512144235.2466-1-Jason@zx2c4.com>
+        Thu, 12 May 2022 13:40:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1426013F27;
+        Thu, 12 May 2022 10:40:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AQe6N02jfGCt1Tpv9ElZ85pDuhThz61shKfOKRMru0s=; b=BEvRkLgW7vQHVOsVfskg7QHDzS
+        ni062Z+K9j8D+UEoCD+CUDlULmp8G0eqE7AShtpjvFXFN2noQCTx9si+LrIB/IWFcRZVwVaLjzXCH
+        MJzaAZlkx1BkeZASvknqLNqpdNWlO1rC/DSvmazJzxaxaMLkFZJS2vr6qVWm687oHI8E/0f0m5Ea0
+        WMXDQR9Emlr7kX8uSpzaU023iE3UxIpBFsp+FCPMTpDur0kK9BrrBvRMt6Fmh1VZitdsV6v99tEMm
+        GCNNP1IX3GWFBEOA3faGjezvK6sBmnOfRYHi4cLJoXX+2o0ExMwpNiOCq7gg2kE0Sfr1wAT4YmLgv
+        1QMG3h9g==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1npCnq-00D1Um-8K; Thu, 12 May 2022 17:40:42 +0000
+Date:   Thu, 12 May 2022 10:40:42 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>
+Cc:     Lennart Poettering <mzxreary@0pointer.de>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] sysctl: read() must consume poll events, not poll()
+Message-ID: <Yn1GmlWKIvuoJJby@bombadil.infradead.org>
+References: <20220502140602.130373-1-Jason@zx2c4.com>
+ <Ym/5EEYHbk56hV1H@zx2c4.com>
+ <Ym/8GTW2RfhnbqiF@gardel-login>
+ <YnERsPIsiOCa8cty@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnERsPIsiOCa8cty@zx2c4.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since crng_ready() is only false briefly during initialization and then
-forever after becomes true, we don't need to evaluate it after, making
-it a prime candidate for a static branch.
+On Tue, May 03, 2022 at 01:27:44PM +0200, Jason A. Donenfeld wrote:
+> On Mon, May 02, 2022 at 05:43:21PM +0200, Lennart Poettering wrote:
+> > On Mo, 02.05.22 17:30, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
+> > 
+> > > Just wanted to double check with you that this change wouldn't break how
+> > > you're using it in systemd for /proc/sys/kernel/hostname:
+> > >
+> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/journal/journald-server.c#L1832
+> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/resolve/resolved-manager.c#L465
+> > >
+> > > I couldn't find anybody else actually polling on it. Interestingly, it
+> > > looks like sd_event_add_io uses epoll() inside, but you're not hitting
+> > > the bug that Jann pointed out (because I suppose you're not poll()ing on
+> > > an epoll fd).
+> > 
+> > Well, if you made sure this still works, I am fine either way ;-)
+> 
+> Actually... ugh. It doesn't work. systemd uses uname() to read the host
+> name, and doesn't actually read() the file descriptor after receiving
+> the poll event on it. So I guess I'll forget this, and maybe we'll have
+> to live with sysctl's poll() being broken. :(
 
-One complication, however, is that it changes state in a particular call
-to credit_init_bits(), which might be made from atomic context, which
-means we must kick off a workqueue to change the static key. Further
-complicating things, credit_init_bits() may be called sufficiently early
-on in system initialization such that system_wq is NULL.
+A kconfig option may let you do what you want, and allow older kernels
+to not break, however I am more curious how sysctl's approach to poll
+went unnnoticed for so long. But also, I'm curious if it was based on
+another poll implementation which may have been busted.
 
-Fortunately, there exists the nice function execute_in_process_context(),
-which will immediately execute the function if !in_interrupt(), and
-otherwise defer it to a workqueue. During early init, before workqueues
-are available, in_interrupt() is always false, because interrupts
-haven't even been enabled yet, which means the function in that case
-executes immediately. Later on, after workqueues are available,
-in_interrupt() might be true, but in that case, the work is queued in
-system_wq and all goes well.
+But more importantly, how do we avoid this in the future?
 
-Cc: Theodore Ts'o <tytso@mit.edu>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Sultan Alsawaf <sultan@kerneltoast.com>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
-Sorry for all the churn. execute_in_process_context() appeared out of
-the blue and so clearly represents the better option, so happily going
-with that now, making this patch finally tiny.
-
-Changes v3->v4:
-- Use execute_in_process_context() to resolve quandries.
-
-Changes v2->v3:
-- Call schedule_work() outside of the lock.
-
-Changes v1->v2:
-- Use a workqueue instead of doing it on-demand.
-
- drivers/char/random.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 2f5460edba28..ec4e8c2657fb 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -78,8 +78,9 @@ static enum {
- 	CRNG_EMPTY = 0, /* Little to no entropy collected */
- 	CRNG_EARLY = 1, /* At least POOL_EARLY_BITS collected */
- 	CRNG_READY = 2  /* Fully initialized with POOL_READY_BITS collected */
--} crng_init = CRNG_EMPTY;
--#define crng_ready() (likely(crng_init >= CRNG_READY))
-+} crng_init __read_mostly = CRNG_EMPTY;
-+static DEFINE_STATIC_KEY_FALSE(crng_is_ready);
-+#define crng_ready() (static_branch_likely(&crng_is_ready) || crng_init >= CRNG_READY)
- /* Various types of waiters for crng_init->CRNG_READY transition. */
- static DECLARE_WAIT_QUEUE_HEAD(crng_init_wait);
- static struct fasync_struct *fasync;
-@@ -109,6 +110,11 @@ bool rng_is_initialized(void)
- }
- EXPORT_SYMBOL(rng_is_initialized);
- 
-+static void crng_set_ready(struct work_struct *work)
-+{
-+	static_branch_enable(&crng_is_ready);
-+}
-+
- /* Used by wait_for_random_bytes(), and considered an entropy collector, below. */
- static void try_to_generate_entropy(void);
- 
-@@ -268,7 +274,8 @@ static void crng_reseed(void)
- 		++next_gen;
- 	WRITE_ONCE(base_crng.generation, next_gen);
- 	WRITE_ONCE(base_crng.birth, jiffies);
--	crng_init = CRNG_READY;
-+	if (!static_branch_likely(&crng_is_ready))
-+		crng_init = CRNG_READY;
- 	spin_unlock_irqrestore(&base_crng.lock, flags);
- 	memzero_explicit(key, sizeof(key));
- }
-@@ -785,6 +792,7 @@ static void extract_entropy(void *buf, size_t nbytes)
- 
- static void credit_init_bits(size_t nbits)
- {
-+	static struct execute_work set_ready;
- 	unsigned int new, orig, add;
- 	unsigned long flags;
- 
-@@ -800,6 +808,7 @@ static void credit_init_bits(size_t nbits)
- 
- 	if (orig < POOL_READY_BITS && new >= POOL_READY_BITS) {
- 		crng_reseed(); /* Sets crng_init to CRNG_READY under base_crng.lock. */
-+		execute_in_process_context(crng_set_ready, &set_ready);
- 		process_random_ready_list();
- 		wake_up_interruptible(&crng_init_wait);
- 		kill_fasync(&fasync, SIGIO, POLL_IN);
--- 
-2.35.1
-
+  Luis
