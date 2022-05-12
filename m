@@ -2,77 +2,60 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE206C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 03:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD6BC4332F
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 04:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345362AbiELD5l (ORCPT
+        id S1346463AbiELEgM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 May 2022 23:57:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
+        Thu, 12 May 2022 00:36:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345368AbiELD5g (ORCPT
+        with ESMTP id S1347030AbiELEf7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 May 2022 23:57:36 -0400
+        Thu, 12 May 2022 00:35:59 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE11D26544;
-        Wed, 11 May 2022 20:57:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D35765FB;
+        Wed, 11 May 2022 21:35:58 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nozwj-00CmlI-4v; Thu, 12 May 2022 13:57:02 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 May 2022 11:57:01 +0800
-Date:   Thu, 12 May 2022 11:57:01 +0800
+        id 1np0YJ-00CnG2-KM; Thu, 12 May 2022 14:35:53 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 May 2022 12:35:51 +0800
+Date:   Thu, 12 May 2022 12:35:51 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
-        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [RFC PATCH 2/7] crypto: api - Add crypto_tfm_ctx_dma
-Message-ID: <YnyFjSrK2DMysrCY@gondor.apana.org.au>
-References: <YnpGnsr4k7yVUR54@gondor.apana.org.au>
- <E1noNhu-00BzV4-4N@fornost.hmeau.com>
- <Ynqciq2p8mtTg98n@arm.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tytso@mit.edu, linux@dominikbrodowski.net, rostedt@goodmis.org,
+        ardb@kernel.org
+Subject: Re: [PATCH RFC v1] random: use static branch for crng_ready()
+Message-ID: <YnyOp+8v6inyB0P/@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ynqciq2p8mtTg98n@arm.com>
+In-Reply-To: <Ynug580srdedsiY9@zx2c4.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 10, 2022 at 06:10:34PM +0100, Catalin Marinas wrote:
->
-> Is there a case where a driver needs the minimum alignment between
-> ARCH_DMA_MINALIGN and crypto_tfm_alg_alignmask()+1? Maybe for platforms
-> where ARCH_DMA_MINALIGN is 8 (fully coherent) but the device's bus
-> master alignment requirements are higher.
-
-Yes, for example on x86 aesni requires 16-byte alignment.
-
-> My plan is to have ARCH_DMA_MINALIGN always defined but potentially
-> higher than ARCH_KMALLOC_MINALIGN on specific architectures. I think
-> crypto_tfm_ctx_dma() should use ARCH_KMALLOC_MINALIGN (and no #ifdefs)
-> until I get my patches sorted and I'll replace it with ARCH_DMA_MINALIGN
-> once it's defined globally (still no #ifdefs). Currently in mainline
-> it's ARCH_KMALLOC_MINALIGN that gives the static DMA alignment.
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> On Tue, May 03, 2022 at 03:40:52PM +0200, Jason A. Donenfeld wrote:
+>> +static bool crng_ready_slowpath(void)
+>> +{
+>> +     if (crng_init <= 1)
+>> +             return false;
+>> +     if (in_atomic() || irqs_disabled() || cmpxchg(&crng_init, 2, 3) != 2)
+>> +             return true;
 > 
-> With the explicit crypto_tfm_ctx_dma(), can CRYPTO_MINALIGN_ATTR be
-> dropped entirely? This may be beneficial in reducing the structure size
-> when no DMA is required.
+> Nobody chimed in here, but for posterity I thought I should point out
+> that this approach actually won't work, since in_atomic() doesn't work
+> with CONFIG_PREEMPT_COUNT=n kernels.
+> 
+> So back to the drawing board in trying to figure out the best way to do
+> this...
 
-We always need CRYPTO_MINALIGN to reflect what alignment kmalloc
-guarantees.  It is used to minimise the amount of extra padding
-for users such aesni.
-
-This shouldn't have any impact on your plans though as once the
-drivers in question switch over to the DMA helpers you can safely
-lower ARCH_KMALLOC_MINALIGN.
+Well the standard solution to code paths that require sleeping is
+to use a work queue.  So any reason why you can't just schedule
+a work to do the static_branch_enable?
 
 Cheers,
 -- 
