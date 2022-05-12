@@ -2,102 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE1BC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 May 2022 20:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE206C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 03:57:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245458AbiEKUq5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 May 2022 16:46:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44790 "EHLO
+        id S1345362AbiELD5l (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 11 May 2022 23:57:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242188AbiEKUq4 (ORCPT
+        with ESMTP id S1345368AbiELD5g (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 May 2022 16:46:56 -0400
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A453C62A36;
-        Wed, 11 May 2022 13:46:54 -0700 (PDT)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id 771921C0B92; Wed, 11 May 2022 22:46:51 +0200 (CEST)
-Date:   Wed, 11 May 2022 22:46:50 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Yevgeniy Dodis <dodis@cs.nyu.edu>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, tytso <tytso@mit.edu>,
-        Nadia Heninger <nadiah@cs.ucsd.edu>,
-        Noah Stephens-Dawidowitz <noahsd@gmail.com>,
-        Stefano Tessaro <tessaro@cs.washington.edu>,
-        torvalds@linux-foundation.org, "D. J. Bernstein" <djb@cr.yp.to>,
-        jeanphilippe.aumasson@gmail.com, jann@thejh.net,
-        keescook@chromium.org, gregkh@linuxfoundation.org,
-        Peter Schwabe <peter@cryptojedi.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: is "premature next" a real world rng concern, or just an
- academic exercise?
-Message-ID: <20220511204650.GA21867@amd>
-References: <YmlMGx6+uigkGiZ0@zx2c4.com>
- <Ym3ZM1P+uYYABtRm@mit.edu>
- <Ym5sICj5iBMn2w/E@zx2c4.com>
- <CAMvzKsiA52Si=PzOJXYwGSA1WUz-1S0A8cpgRJWDzpMkfFbX+Q@mail.gmail.com>
- <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
+        Wed, 11 May 2022 23:57:36 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE11D26544;
+        Wed, 11 May 2022 20:57:32 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1nozwj-00CmlI-4v; Thu, 12 May 2022 13:57:02 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 May 2022 11:57:01 +0800
+Date:   Thu, 12 May 2022 11:57:01 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        Marc Zyngier <maz@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [RFC PATCH 2/7] crypto: api - Add crypto_tfm_ctx_dma
+Message-ID: <YnyFjSrK2DMysrCY@gondor.apana.org.au>
+References: <YnpGnsr4k7yVUR54@gondor.apana.org.au>
+ <E1noNhu-00BzV4-4N@fornost.hmeau.com>
+ <Ynqciq2p8mtTg98n@arm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="wac7ysb48OaltWcw"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMvzKsiMY_+8HZqeFqD3tR65a3-JB0LG=+0jBBy1zF4GanrsGA@mail.gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <Ynqciq2p8mtTg98n@arm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, May 10, 2022 at 06:10:34PM +0100, Catalin Marinas wrote:
+>
+> Is there a case where a driver needs the minimum alignment between
+> ARCH_DMA_MINALIGN and crypto_tfm_alg_alignmask()+1? Maybe for platforms
+> where ARCH_DMA_MINALIGN is 8 (fully coherent) but the device's bus
+> master alignment requirements are higher.
 
---wac7ysb48OaltWcw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, for example on x86 aesni requires 16-byte alignment.
 
-Hi!
+> My plan is to have ARCH_DMA_MINALIGN always defined but potentially
+> higher than ARCH_KMALLOC_MINALIGN on specific architectures. I think
+> crypto_tfm_ctx_dma() should use ARCH_KMALLOC_MINALIGN (and no #ifdefs)
+> until I get my patches sorted and I'll replace it with ARCH_DMA_MINALIGN
+> once it's defined globally (still no #ifdefs). Currently in mainline
+> it's ARCH_KMALLOC_MINALIGN that gives the static DMA alignment.
+> 
+> With the explicit crypto_tfm_ctx_dma(), can CRYPTO_MINALIGN_ATTR be
+> dropped entirely? This may be beneficial in reducing the structure size
+> when no DMA is required.
 
-> >
-> > Thank you for starting this fascinating discussion. I generally agree w=
-ith everything Jason said. In particular, I am not
-> > 100% convinced that the extra cost of the premature next defense is jus=
-tified.(Although Windows and MacOS are adamant it is
-> > worth it :).)
-> >
+We always need CRYPTO_MINALIGN to reflect what alignment kmalloc
+guarantees.  It is used to minimise the amount of extra padding
+for users such aesni.
 
-Dunno, how big is cost of "premature next" defenses? I believe all you
-need to do is to reseed in batches, and that does not seem costly at
-runtime, and does not have high cost in kernel .text.
+This shouldn't have any impact on your plans though as once the
+drivers in question switch over to the DMA helpers you can safely
+lower ARCH_KMALLOC_MINALIGN.
 
-> > But let me give some meta points to at least convince you this is not a=
-s obvious as Jason makes it sound.
-> >
-> > 1) Attacking RNGs in any model is really hard. Heck, everybody knew for=
- years that /dev/random is a mess
-> > (and we published it formally in 2013, although this was folklore knowl=
-edge),  but in all these years nobody
-> > (even Nadya's group :)) managed to find a practical attack. So just bec=
-ause the attack seems far-fetched, I do not think we should
-> > lower our standards and do ugly stuff. Otherwise, just leave
-> >/dev/random the way it was before Jason started his awesome work.
-
-Well, practical attacks may be hard, but when they happen... that's
-bad. We had weak keys generated by debian, we have various devices
-that with deterministic rngs...
-
-Best regards,
-								Pavel
---=20
-People of Russia, stop Putin before his war on Ukraine escalates.
-
---wac7ysb48OaltWcw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAmJ8ILoACgkQMOfwapXb+vIJQQCfaYW/xS5k3YJRX21AdHNuKQET
-4BwAn2PC9gpPRB4lt75hyfJ9zYhxRi7S
-=QPXk
------END PGP SIGNATURE-----
-
---wac7ysb48OaltWcw--
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
