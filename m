@@ -2,81 +2,157 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6E0C433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 17:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED44AC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 May 2022 18:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245720AbiELRlw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 May 2022 13:41:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
+        id S1357573AbiELSW0 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 12 May 2022 14:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357169AbiELRkw (ORCPT
+        with ESMTP id S1357594AbiELSWU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 May 2022 13:40:52 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1426013F27;
-        Thu, 12 May 2022 10:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=AQe6N02jfGCt1Tpv9ElZ85pDuhThz61shKfOKRMru0s=; b=BEvRkLgW7vQHVOsVfskg7QHDzS
-        ni062Z+K9j8D+UEoCD+CUDlULmp8G0eqE7AShtpjvFXFN2noQCTx9si+LrIB/IWFcRZVwVaLjzXCH
-        MJzaAZlkx1BkeZASvknqLNqpdNWlO1rC/DSvmazJzxaxaMLkFZJS2vr6qVWm687oHI8E/0f0m5Ea0
-        WMXDQR9Emlr7kX8uSpzaU023iE3UxIpBFsp+FCPMTpDur0kK9BrrBvRMt6Fmh1VZitdsV6v99tEMm
-        GCNNP1IX3GWFBEOA3faGjezvK6sBmnOfRYHi4cLJoXX+2o0ExMwpNiOCq7gg2kE0Sfr1wAT4YmLgv
-        1QMG3h9g==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1npCnq-00D1Um-8K; Thu, 12 May 2022 17:40:42 +0000
-Date:   Thu, 12 May 2022 10:40:42 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>
-Cc:     Lennart Poettering <mzxreary@0pointer.de>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+        Thu, 12 May 2022 14:22:20 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608F860B86;
+        Thu, 12 May 2022 11:22:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652379732; x=1683915732;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gKX1PGO+dptTOabwhDDmbl7BBre5vJXGH8K4d83YX8E=;
+  b=TzoB19gd4P6Hh0YJNn4nRgFSA80K6pIBw1/WOKUsa/SPgfJ4xLECcLSh
+   7DwU4Q+z3+KSOAGAfj5pdGp71tlh9BRx2g6N93FuBg4MJAXrJGtyi8PIA
+   Qp9TSlZXfLAa3KzNhpk5ej45qDkrD5CEEwJWGJUkPt1cfNcy1MvlULszS
+   5b435MrU+3J+NYd7s8tzgtqRYv8u0rbM9J+fDmTv/AR5phbMYhmssxXfG
+   vXbkdPcbZwE3eyiGupaWTf+2RHYpykmQI0t91dc/TxO5BEzd8xljoW864
+   3mNoGWuSFaNxGyQG9bJkb/DkUflrZbxFP/sNGSCSbWoRN7gi6dw3Xp3l+
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="267690652"
+X-IronPort-AV: E=Sophos;i="5.91,220,1647327600"; 
+   d="scan'208";a="267690652"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 11:22:11 -0700
+X-IronPort-AV: E=Sophos;i="5.91,220,1647327600"; 
+   d="scan'208";a="624521577"
+Received: from josdenl-mobl1.amr.corp.intel.com (HELO ldmartin-desk2) ([10.251.19.41])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 11:22:11 -0700
+Date:   Thu, 12 May 2022 11:22:09 -0700
+From:   Lucas De Marchi <lucas.demarchi@intel.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Jann Horn <jannh@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel@vger.kernel.org
 Subject: Re: [PATCH 1/2] sysctl: read() must consume poll events, not poll()
-Message-ID: <Yn1GmlWKIvuoJJby@bombadil.infradead.org>
+Message-ID: <20220512182209.7uiy3pt4chctqhg4@ldmartin-desk2>
+X-Patchwork-Hint: comment
 References: <20220502140602.130373-1-Jason@zx2c4.com>
- <Ym/5EEYHbk56hV1H@zx2c4.com>
- <Ym/8GTW2RfhnbqiF@gardel-login>
- <YnERsPIsiOCa8cty@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <YnERsPIsiOCa8cty@zx2c4.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20220502140602.130373-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 03, 2022 at 01:27:44PM +0200, Jason A. Donenfeld wrote:
-> On Mon, May 02, 2022 at 05:43:21PM +0200, Lennart Poettering wrote:
-> > On Mo, 02.05.22 17:30, Jason A. Donenfeld (Jason@zx2c4.com) wrote:
-> > 
-> > > Just wanted to double check with you that this change wouldn't break how
-> > > you're using it in systemd for /proc/sys/kernel/hostname:
-> > >
-> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/journal/journald-server.c#L1832
-> > > https://github.com/systemd/systemd/blob/39cd62c30c2e6bb5ec13ebc1ecf0d37ed015b1b8/src/resolve/resolved-manager.c#L465
-> > >
-> > > I couldn't find anybody else actually polling on it. Interestingly, it
-> > > looks like sd_event_add_io uses epoll() inside, but you're not hitting
-> > > the bug that Jann pointed out (because I suppose you're not poll()ing on
-> > > an epoll fd).
-> > 
-> > Well, if you made sure this still works, I am fine either way ;-)
-> 
-> Actually... ugh. It doesn't work. systemd uses uname() to read the host
-> name, and doesn't actually read() the file descriptor after receiving
-> the poll event on it. So I guess I'll forget this, and maybe we'll have
-> to live with sysctl's poll() being broken. :(
+On Mon, May 02, 2022 at 04:06:01PM +0200, Jason A. Donenfeld wrote:
+>Events that poll() responds to are supposed to be consumed when the file
+>is read(), not by the poll() itself. By putting it on the poll() itself,
+>it makes it impossible to poll() on a epoll file descriptor, since the
+>event gets consumed too early. Jann wrote a PoC, available in the link
+>below.
+>
+>Reported-by: Jann Horn <jannh@google.com>
+>Cc: Kees Cook <keescook@chromium.org>
+>Cc: Luis Chamberlain <mcgrof@kernel.org>
+>Cc: linux-fsdevel@vger.kernel.org
+>Link: https://lore.kernel.org/lkml/CAG48ez1F0P7Wnp=PGhiUej=u=8CSF6gpD9J=Oxxg0buFRqV1tA@mail.gmail.com/
+>Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 
-A kconfig option may let you do what you want, and allow older kernels
-to not break, however I am more curious how sysctl's approach to poll
-went unnnoticed for so long. But also, I'm curious if it was based on
-another poll implementation which may have been busted.
+It seems to be my bug. This is indeed better. Also, I don't think it's unsafe
+to fix it like this neither. If my memory serves (it's what, 10+ years?), this
+was only tested and used with poll(), which will continue to work.
 
-But more importantly, how do we avoid this in the future?
+There were plans to use it in one of systemd's tools, in which case we'd
+probably notice the misbehavior with epoll().... humn, checking now systemd's
+codebase:
 
-  Luis
+static int on_hostname_change(sd_event_source *es, int fd, uint32_t revents, void *userdata) {
+	...
+	log_info("System hostname changed to '%s'.", full_hostname);
+	...
+}
+
+static int manager_watch_hostname(Manager *m) {
+         int r;
+
+         assert(m);
+
+         m->hostname_fd = open("/proc/sys/kernel/hostname",
+                               O_RDONLY|O_CLOEXEC|O_NONBLOCK|O_NOCTTY);
+         if (m->hostname_fd < 0) {
+                 log_warning_errno(errno, "Failed to watch hostname: %m");
+                 return 0;
+         }
+
+         r = sd_event_add_io(m->event, &m->hostname_event_source, m->hostname_fd, 0, on_hostname_change, m);
+         if (r < 0) {
+                 if (r == -EPERM)
+                         /* kernels prior to 3.2 don't support polling this file. Ignore the failure. */
+                         m->hostname_fd = safe_close(m->hostname_fd);
+                 else
+                         return log_error_errno(r, "Failed to add hostname event source: %m");
+         }
+	....
+}
+
+and sd_event library uses epoll. So, it's apparently not working and it doesn't
+seem to be their intention to rely on the misbehavior. This makes me think it
+even deserves a Cc to stable.
+
+Reviewed-by: Lucas De Marchi <lucas.demarchi@intel.com>
+
+
+Lucas De Marchi
+
+>---
+> fs/proc/proc_sysctl.c | 12 +++++++++---
+> 1 file changed, 9 insertions(+), 3 deletions(-)
+>
+>diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+>index 7d9cfc730bd4..1aa145794207 100644
+>--- a/fs/proc/proc_sysctl.c
+>+++ b/fs/proc/proc_sysctl.c
+>@@ -622,6 +622,14 @@ static ssize_t proc_sys_call_handler(struct kiocb *iocb, struct iov_iter *iter,
+>
+> static ssize_t proc_sys_read(struct kiocb *iocb, struct iov_iter *iter)
+> {
+>+	struct inode *inode = file_inode(iocb->ki_filp);
+>+	struct ctl_table_header *head = grab_header(inode);
+>+	struct ctl_table *table = PROC_I(inode)->sysctl_entry;
+>+
+>+	if (!IS_ERR(head) && table->poll)
+>+		iocb->ki_filp->private_data = proc_sys_poll_event(table->poll);
+>+	sysctl_head_finish(head);
+>+
+> 	return proc_sys_call_handler(iocb, iter, 0);
+> }
+>
+>@@ -668,10 +676,8 @@ static __poll_t proc_sys_poll(struct file *filp, poll_table *wait)
+> 	event = (unsigned long)filp->private_data;
+> 	poll_wait(filp, &table->poll->wait, wait);
+>
+>-	if (event != atomic_read(&table->poll->event)) {
+>-		filp->private_data = proc_sys_poll_event(table->poll);
+>+	if (event != atomic_read(&table->poll->event))
+> 		ret = EPOLLIN | EPOLLRDNORM | EPOLLERR | EPOLLPRI;
+>-	}
+>
+> out:
+> 	sysctl_head_finish(head);
+>-- 
+>2.35.1
+>
