@@ -2,112 +2,137 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD67C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 14:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D64EC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 14:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231747AbiEMOA0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 May 2022 10:00:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48218 "EHLO
+        id S1355067AbiEMO5x (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 May 2022 10:57:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiEMOA0 (ORCPT
+        with ESMTP id S242379AbiEMO5x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 May 2022 10:00:26 -0400
+        Fri, 13 May 2022 10:57:53 -0400
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3DC7C17D
-        for <linux-crypto@vger.kernel.org>; Fri, 13 May 2022 07:00:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615771ADA7
+        for <linux-crypto@vger.kernel.org>; Fri, 13 May 2022 07:57:52 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
         by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1npVq3-00017A-H0; Fri, 13 May 2022 16:00:15 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        (envelope-from <afa@pengutronix.de>)
+        id 1npWjS-0002Mr-Bq; Fri, 13 May 2022 16:57:30 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
         by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1npVq2-0025mX-Sd; Fri, 13 May 2022 16:00:13 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1npVq0-009SxX-Tx; Fri, 13 May 2022 16:00:12 +0200
-Date:   Fri, 13 May 2022 15:59:54 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de, linux-i2c@vger.kernel.org
-Subject: Bug in atmel-ecc driver
-Message-ID: <20220513135954.exewihnibnhdckkn@pengutronix.de>
+        (envelope-from <afa@pengutronix.de>)
+        id 1npWjR-0026HA-OE; Fri, 13 May 2022 16:57:28 +0200
+Received: from afa by dude04.red.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <afa@pengutronix.de>)
+        id 1npWjP-008jDE-8r; Fri, 13 May 2022 16:57:27 +0200
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        James Bottomley <jejb@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>
+Cc:     kernel@pengutronix.de, Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Michael Walle <michael@walle.cc>,
+        John Ernberg <john.ernberg@actia.se>,
+        Sumit Garg <sumit.garg@linaro.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v10 7/7] MAINTAINERS: add KEYS-TRUSTED-CAAM
+Date:   Fri, 13 May 2022 16:57:05 +0200
+Message-Id: <20220513145705.2080323-8-a.fatoum@pengutronix.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
+References: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="lkhd22gveryrhohw"
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Mail-From: afa@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Create a maintainer entry for CAAM trusted keys in the Linux keyring.
 
---lkhd22gveryrhohw
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+---
+v9 -> v10:
+  - add Jarkko's Acked-by
+v8 -> v9:
+  - rewrite commit message (Jarkko)
+v7 -> v8:
+  - add Pankaj's Reviewed-by
+v6 -> v7:
+  - split off as separate patch (Jarkko)
 
-Hello,
+To: Jarkko Sakkinen <jarkko@kernel.org>
+To: James Bottomley <jejb@linux.ibm.com>
+To: Mimi Zohar <zohar@linux.ibm.com>
+To: David Howells <dhowells@redhat.com>
+Cc: James Morris <jmorris@namei.org>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+Cc: David Gstir <david@sigma-star.at>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Michael Walle <michael@walle.cc>
+Cc: John Ernberg <john.ernberg@actia.se>
+Cc: Sumit Garg <sumit.garg@linaro.org>
+Cc: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+---
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-TL;DR: when a device bound to the drivers/crypto/atmel-ecc.c driver is
-unbound while tfm_count isn't zero, this probably results in a
-use-after-free.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e8c52d0192a6..4a56129bd7d2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10856,6 +10856,15 @@ S:	Supported
+ F:	include/keys/trusted_tee.h
+ F:	security/keys/trusted-keys/trusted_tee.c
+ 
++KEYS-TRUSTED-CAAM
++M:	Ahmad Fatoum <a.fatoum@pengutronix.de>
++R:	Pengutronix Kernel Team <kernel@pengutronix.de>
++L:	linux-integrity@vger.kernel.org
++L:	keyrings@vger.kernel.org
++S:	Maintained
++F:	include/keys/trusted_caam.h
++F:	security/keys/trusted-keys/trusted_caam.c
++
+ KEYS/KEYRINGS
+ M:	David Howells <dhowells@redhat.com>
+ M:	Jarkko Sakkinen <jarkko@kernel.org>
+-- 
+2.30.2
 
-The .remove function has:
-
-	if (atomic_read(&i2c_priv->tfm_count)) {
-                dev_err(&client->dev, "Device is busy\n");
-                return -EBUSY;
-        }
-
-before actually calling the cleanup stuff. If this branch is hit the
-result is likely:
-
- - "Device is busy" from drivers/crypto/atmel-ecc.c
- - "remove failed (EBUSY), will be ignored" from the i2c core
- - the devm cleanup callbacks are called, including the one kfreeing
-   *i2c_priv
- - at a later time atmel_ecc_i2c_client_free() is called which does
-   atomic_dec(&i2c_priv->tfm_count);
- - *boom*
-
-I think to fix that you need to call get_device for the i2c device
-before increasing tfm_count (and a matching put_device when decreasing
-it). Having said that the architecture of this driver looks strange to
-me, so there might be nicer fixes (probably with more effort).
-
-I noticed this issue while working on my quest to make i2c-remove
-callbacks return void. So if you address this, it would be great if you
-did that in a way that makes atmel_ecc_remove always return 0.=20
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---lkhd22gveryrhohw
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmJ+ZFYACgkQwfwUeK3K
-7AntWQf/RJJ7mHYCwhlSsrFT22F4AN8KM1lvIgIhvVCb3PoBhVcbQAK8Ng8XXCeu
-hPLAj6XEjynm7K8WaJRLV09y4mqCViXlPtnfkmgKj2gzvscx3P8/dgcsFGxKMbPB
-31z3P68+R8S4Y9by5xfq+QiUCR6lGarPdspzYr59hgM/jws+AOhiZFf4Gy/TbFz3
-Nk9cJarDaO9m7F773cvkTJzmBc86XfYV000JitR669vwHOr0Lyh7ThAz8/DtO2Rm
-JebIaEpM0uzLILoQmc4DRlim3ySc7kFAknbsp4Fu6wdshv12UQzkU8Tl1GMVd/Vc
-pW/A+aFRyD1KmYQQ8HyBisnpq4Vh/A==
-=KJ7G
------END PGP SIGNATURE-----
-
---lkhd22gveryrhohw--
