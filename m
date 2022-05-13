@@ -2,64 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B491C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 09:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A43C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 09:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378959AbiEMJfg (ORCPT
+        id S1378984AbiEMJgc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 May 2022 05:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38416 "EHLO
+        Fri, 13 May 2022 05:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346611AbiEMJfg (ORCPT
+        with ESMTP id S1379131AbiEMJgY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 May 2022 05:35:36 -0400
+        Fri, 13 May 2022 05:36:24 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F838297403
-        for <linux-crypto@vger.kernel.org>; Fri, 13 May 2022 02:35:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C886147578;
+        Fri, 13 May 2022 02:36:22 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1npRhr-00DHF9-1y; Fri, 13 May 2022 19:35:32 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 May 2022 17:35:31 +0800
-Date:   Fri, 13 May 2022 17:35:31 +0800
+        id 1npRiY-00DHGI-J4; Fri, 13 May 2022 19:36:16 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 May 2022 17:36:14 +0800
+Date:   Fri, 13 May 2022 17:36:14 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] crypto: cryptd - Protect per-CPU resource by disabling
- BH.
-Message-ID: <Yn4mY9ydSqto7oF5@gondor.apana.org.au>
-References: <YnKWuLQZdPwSdRTh@linutronix.de>
+To:     Vladis Dronov <vdronov@redhat.com>
+Cc:     Patrick Steuer <patrick.steuer@de.ibm.com>,
+        Harald Freudenberger <freude@de.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] s390/crypto: add crypto library interface for ChaCha20
+Message-ID: <Yn4mjhfyMtshhEpp@gondor.apana.org.au>
+References: <20220508130944.17860-1-vdronoff@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YnKWuLQZdPwSdRTh@linutronix.de>
+In-Reply-To: <20220508130944.17860-1-vdronoff@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 04, 2022 at 05:07:36PM +0200, Sebastian Andrzej Siewior wrote:
-> The access to cryptd_queue::cpu_queue is synchronized by disabling
-> preemption in cryptd_enqueue_request() and disabling BH in
-> cryptd_queue_worker(). This implies that access is allowed from BH.
+On Sun, May 08, 2022 at 03:09:44PM +0200, Vladis Dronov wrote:
+> From: Vladis Dronov <vdronov@redhat.com>
 > 
-> If cryptd_enqueue_request() is invoked from preemptible context _and_
-> soft interrupt then this can lead to list corruption since
-> cryptd_enqueue_request() is not protected against access from
-> soft interrupt.
+> Implement a crypto library interface for the s390-native ChaCha20 cipher
+> algorithm. This allows us to stop to select CRYPTO_CHACHA20 and instead
+> select CRYPTO_ARCH_HAVE_LIB_CHACHA. This allows BIG_KEYS=y not to build
+> a whole ChaCha20 crypto infrastructure as a built-in, but build a smaller
+> CRYPTO_LIB_CHACHA instead.
 > 
-> Replace get_cpu() in cryptd_enqueue_request() with local_bh_disable()
-> to ensure BH is always disabled.
-> Remove preempt_disable() from cryptd_queue_worker() since it is not
-> needed because local_bh_disable() ensures synchronisation.
+> Make CRYPTO_CHACHA_S390 config entry to look like similar ones on other
+> architectures. Remove CRYPTO_ALGAPI select as anyway it is selected by
+> CRYPTO_SKCIPHER.
 > 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Add a new test module and a test script for ChaCha20 cipher and its
+> interfaces. Here are test results on an idle z15 machine:
+> 
+> Data | Generic crypto TFM |  s390 crypto TFM |    s390 lib
+> size |      enc      dec  |     enc     dec  |     enc     dec
+> -----+--------------------+------------------+----------------
+> 512b |   1545ns   1295ns  |   604ns   446ns  |   430ns  407ns
+> 4k   |   9536ns   9463ns  |  2329ns  2174ns  |  2170ns  2154ns
+> 64k  |  149.6us  149.3us  |  34.4us  34.5us  |  33.9us  33.1us
+> 6M   |  23.61ms  23.11ms  |  4223us  4160us  |  3951us  4008us
+> 60M  |  143.9ms  143.9ms  |  33.5ms  33.2ms  |  32.2ms  32.1ms
+> 
+> Signed-off-by: Vladis Dronov <vdronov@redhat.com>
 > ---
->  crypto/cryptd.c | 23 +++++++++++------------
->  1 file changed, 11 insertions(+), 12 deletions(-)
-
-Good catch! This bug has been around for a while.  Did you detect
-this in the field or was it through code-review?
+>  arch/s390/crypto/chacha-glue.c                |  34 +-
+>  drivers/crypto/Kconfig                        |   4 +-
+>  tools/testing/crypto/chacha20-s390/Makefile   |  12 +
+>  .../testing/crypto/chacha20-s390/run-tests.sh |  34 ++
+>  .../crypto/chacha20-s390/test-cipher.c        | 372 ++++++++++++++++++
+>  5 files changed, 452 insertions(+), 4 deletions(-)
+>  create mode 100644 tools/testing/crypto/chacha20-s390/Makefile
+>  create mode 100644 tools/testing/crypto/chacha20-s390/run-tests.sh
+>  create mode 100644 tools/testing/crypto/chacha20-s390/test-cipher.c
 
 Patch applied.  Thanks.
 -- 
