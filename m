@@ -2,137 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E28C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 12:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD67C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 May 2022 14:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354888AbiEMM3Z (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 May 2022 08:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43054 "EHLO
+        id S231747AbiEMOA0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 13 May 2022 10:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232861AbiEMM3Y (ORCPT
+        with ESMTP id S229893AbiEMOA0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 May 2022 08:29:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D0F14249A
-        for <linux-crypto@vger.kernel.org>; Fri, 13 May 2022 05:29:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652444962;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5KwufUflIN0+si5g5sPE5FPx8DWaH5QC9MTJ9abHStk=;
-        b=SxO8NglYj7UZWX7PZf69tMp5jxpfjRvs8/aMEx//WXfz+2t0kLHnXKJKLQCnXs9E/RP1xo
-        fu9h9mRl23t9n7fIdd2aKhiW4NtqtlRZAT3Ncr8pKK0+MDKG9/DDulU5Ek8KM+a/7Tx728
-        ZwDULd5byqaXjuzjPub3HHaebsZl1NY=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-203-iVsCinzTPRipcbI6YnuQgg-1; Fri, 13 May 2022 08:29:19 -0400
-X-MC-Unique: iVsCinzTPRipcbI6YnuQgg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC60D1C05AF5;
-        Fri, 13 May 2022 12:29:18 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F969C33AE5;
-        Fri, 13 May 2022 12:29:16 +0000 (UTC)
-Date:   Fri, 13 May 2022 13:29:13 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>
-Cc:     zhenwei pi <pizhenwei@bytedance.com>,
-        "S. Tsirkin, Michael" <mst@redhat.com>, arei.gonglei@huawei.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, jasowang@redhat.com,
-        cohuck@redhat.com
-Subject: Re: [External] [PATCH v5 5/9] crypto: Implement RSA algorithm by
- hogweed
-Message-ID: <Yn5PGWPbP9C4k4wD@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220428135943.178254-1-pizhenwei@bytedance.com>
- <20220428135943.178254-6-pizhenwei@bytedance.com>
- <Yn45CxgJ+KNIxXek@redhat.com>
- <90F3B18B-9B7E-423C-A909-45D4527A6B3C@bytedance.com>
+        Fri, 13 May 2022 10:00:26 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3DC7C17D
+        for <linux-crypto@vger.kernel.org>; Fri, 13 May 2022 07:00:25 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1npVq3-00017A-H0; Fri, 13 May 2022 16:00:15 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1npVq2-0025mX-Sd; Fri, 13 May 2022 16:00:13 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1npVq0-009SxX-Tx; Fri, 13 May 2022 16:00:12 +0200
+Date:   Fri, 13 May 2022 15:59:54 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc:     Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        kernel@pengutronix.de, linux-i2c@vger.kernel.org
+Subject: Bug in atmel-ecc driver
+Message-ID: <20220513135954.exewihnibnhdckkn@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="lkhd22gveryrhohw"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <90F3B18B-9B7E-423C-A909-45D4527A6B3C@bytedance.com>
-User-Agent: Mutt/2.2.1 (2022-02-19)
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 13, 2022 at 08:26:14PM +0800, 何磊 wrote:
-> 
-> 
-> > On May 13, 2022, at 6:55 PM, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > 
-> > On Thu, Apr 28, 2022 at 09:59:39PM +0800, zhenwei pi wrote:
-> >> From: Lei He <helei.sig11@bytedance.com>
-> >> 
-> >> Implement RSA algorithm by hogweed from nettle. Thus QEMU supports
-> >> a 'real' RSA backend to handle request from guest side. It's
-> >> important to test RSA offload case without OS & hardware requirement.
-> >> 
-> >> Signed-off-by: lei he <helei.sig11@bytedance.com>
-> >> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
-> >> ---
-> >> crypto/akcipher-nettle.c.inc | 432 +++++++++++++++++++++++++++++++++++
-> >> crypto/akcipher.c            |   4 +
-> >> crypto/meson.build           |   4 +
-> >> crypto/rsakey-builtin.c.inc  | 209 +++++++++++++++++
-> >> crypto/rsakey-nettle.c.inc   | 154 +++++++++++++
-> >> crypto/rsakey.c              |  44 ++++
-> >> crypto/rsakey.h              |  94 ++++++++
-> >> meson.build                  |  11 +
-> >> 8 files changed, 952 insertions(+)
-> >> create mode 100644 crypto/akcipher-nettle.c.inc
-> >> create mode 100644 crypto/rsakey-builtin.c.inc
-> >> create mode 100644 crypto/rsakey-nettle.c.inc
-> >> create mode 100644 crypto/rsakey.c
-> >> create mode 100644 crypto/rsakey.h
 
+--lkhd22gveryrhohw
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> >> +static int qcrypto_nettle_rsa_decrypt(QCryptoAkCipher *akcipher,
-> >> +                                      const void *enc, size_t enc_len,
-> >> +                                      void *data, size_t data_len,
-> >> +                                      Error **errp)
-> >> +{
-> >> +    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-> >> +    mpz_t c;
-> >> +    int ret = -1;
-> >> +    if (enc_len > rsa->priv.size) {
-> >> +        error_setg(errp, "Invalid buffer size");
-> >> +        return ret;
-> >> +    }
-> > 
-> > Again please report the invalid & expected sizes in the message
-> > 
-> > We don't need to validate 'data_len' in the decrypt case,
-> > as you did in encrypt ?
-> 
-> In the decrypt case, it is difficult (and unnecessary) to check 'data_len' before 
-> we completing the decryption action. If the plaintext buffer is too small, 
-> following ‘rsa_decrypt’ will return an error, and it should be valid to pass a very 
-> large buffer.
-> 
-> According to the pkcs#1 stardard, the length of ciphertext should always equal
-> to key size, and the length of plaintext can be any value in range [1, key_size - 11]:
-> 
-> https://datatracker.ietf.org/doc/html/rfc2437#section-7.2
+Hello,
 
-Ok, thanks for explaining.
+TL;DR: when a device bound to the drivers/crypto/atmel-ecc.c driver is
+unbound while tfm_count isn't zero, this probably results in a
+use-after-free.
 
+The .remove function has:
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+	if (atomic_read(&i2c_priv->tfm_count)) {
+                dev_err(&client->dev, "Device is busy\n");
+                return -EBUSY;
+        }
 
+before actually calling the cleanup stuff. If this branch is hit the
+result is likely:
+
+ - "Device is busy" from drivers/crypto/atmel-ecc.c
+ - "remove failed (EBUSY), will be ignored" from the i2c core
+ - the devm cleanup callbacks are called, including the one kfreeing
+   *i2c_priv
+ - at a later time atmel_ecc_i2c_client_free() is called which does
+   atomic_dec(&i2c_priv->tfm_count);
+ - *boom*
+
+I think to fix that you need to call get_device for the i2c device
+before increasing tfm_count (and a matching put_device when decreasing
+it). Having said that the architecture of this driver looks strange to
+me, so there might be nicer fixes (probably with more effort).
+
+I noticed this issue while working on my quest to make i2c-remove
+callbacks return void. So if you address this, it would be great if you
+did that in a way that makes atmel_ecc_remove always return 0.=20
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--lkhd22gveryrhohw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmJ+ZFYACgkQwfwUeK3K
+7AntWQf/RJJ7mHYCwhlSsrFT22F4AN8KM1lvIgIhvVCb3PoBhVcbQAK8Ng8XXCeu
+hPLAj6XEjynm7K8WaJRLV09y4mqCViXlPtnfkmgKj2gzvscx3P8/dgcsFGxKMbPB
+31z3P68+R8S4Y9by5xfq+QiUCR6lGarPdspzYr59hgM/jws+AOhiZFf4Gy/TbFz3
+Nk9cJarDaO9m7F773cvkTJzmBc86XfYV000JitR669vwHOr0Lyh7ThAz8/DtO2Rm
+JebIaEpM0uzLILoQmc4DRlim3ySc7kFAknbsp4Fu6wdshv12UQzkU8Tl1GMVd/Vc
+pW/A+aFRyD1KmYQQ8HyBisnpq4Vh/A==
+=KJ7G
+-----END PGP SIGNATURE-----
+
+--lkhd22gveryrhohw--
