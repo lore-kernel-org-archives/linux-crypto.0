@@ -2,71 +2,206 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD65C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 May 2022 08:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6126C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 14 May 2022 11:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbiENIb3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 May 2022 04:31:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36852 "EHLO
+        id S229449AbiENLXa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 14 May 2022 07:23:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbiENIb1 (ORCPT
+        with ESMTP id S230337AbiENLX2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 May 2022 04:31:27 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EB823E;
-        Sat, 14 May 2022 01:31:24 -0700 (PDT)
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L0dvM1zgnzGpcj;
-        Sat, 14 May 2022 16:28:31 +0800 (CST)
-Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 14 May 2022 16:31:22 +0800
-Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
- (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 14 May
- 2022 16:31:21 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-CC:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
-        <tony@atomide.com>
-Subject: [PATCH -next] hwrng: omap3-rom - fix using wrong clk_disable() in omap_rom_rng_runtime_resume()
-Date:   Sat, 14 May 2022 16:42:41 +0800
-Message-ID: <20220514084241.681812-1-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Sat, 14 May 2022 07:23:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D6213DF8;
+        Sat, 14 May 2022 04:23:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3098860E2C;
+        Sat, 14 May 2022 11:23:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA457C340EE;
+        Sat, 14 May 2022 11:23:23 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MMe4cOCY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1652527401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ecVAIwVulA7M2aIRiaO1pV/pAhStFwyDStWEp6VmQPo=;
+        b=MMe4cOCYTC/ai7RGvl/ktztnTJfbpJ9iSFoiX6QtEGRGuP18JwPY93vuK7oc5D6HJzrIdT
+        ijN1ADlLdTiqil9FZSynu/dB5zGzfLhx/a/FhBhoBVdwkpwL6juRiI84TYXb9k3QcC4TGF
+        UKLgQF669r1VdnDK6WnepQ9EKR4T0mQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 76eb2981 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 14 May 2022 11:23:21 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH] random: remove get_random_bytes_arch() and add rng_has_arch_random()
+Date:   Sat, 14 May 2022 13:23:07 +0200
+Message-Id: <20220514112307.349599-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500007.china.huawei.com (7.185.36.183)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-'ddata->clk' is enabled by clk_prepare_enable(), it should be disabled
-by clk_disable_unprepare().
+The RNG incorporates RDRAND into its state at boot and every time it
+reseeds, so there's no reason for callers to use it directly. The
+hashing that the RNG does on it is preferable to using the bytes raw.
 
-Fixes: 8d9d4bdc495f ("hwrng: omap3-rom - Use runtime PM instead of custom functions")
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+The only current use case of it is vsprintf's siphash key for pointer
+hashing, which uses it to initialize the pointer secret earlier than
+usual if RDRAND is available. In order to replace this narrow use case,
+just expose whether RDRAND is available. With that taken care of, there
+are no users of get_random_bytes_arch() left, so the function can be
+removed.
+
+Later if trust_cpu gets turned on by default (as most distros are
+doing), this one use of rng_has_arch_random() can probably go away as
+well.
+
+Cc: Petr Mladek <pmladek@suse.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/char/hw_random/omap3-rom-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/random.c  | 48 +++++++++++++-----------------------------
+ include/linux/random.h |  2 +-
+ lib/vsprintf.c         |  7 +++---
+ 3 files changed, 19 insertions(+), 38 deletions(-)
 
-diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-index e0d77fa048fb..f06e4f95114f 100644
---- a/drivers/char/hw_random/omap3-rom-rng.c
-+++ b/drivers/char/hw_random/omap3-rom-rng.c
-@@ -92,7 +92,7 @@ static int __maybe_unused omap_rom_rng_runtime_resume(struct device *dev)
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 0673250d6489..6d8ccb200c5c 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -433,12 +433,9 @@ static void _get_random_bytes(void *buf, size_t len)
+ /*
+  * This function is the exported kernel interface.  It returns some
+  * number of good random numbers, suitable for key generation, seeding
+- * TCP sequence numbers, etc.  It does not rely on the hardware random
+- * number generator.  For random bytes direct from the hardware RNG
+- * (when available), use get_random_bytes_arch(). In order to ensure
+- * that the randomness provided by this function is okay, the function
+- * wait_for_random_bytes() should be called and return 0 at least once
+- * at any point prior.
++ * TCP sequence numbers, etc. In order to ensure that the randomness
++ * by this function is okay, the function wait_for_random_bytes()
++ * should be called and return 0 at least once at any point prior.
+  */
+ void get_random_bytes(void *buf, size_t len)
+ {
+@@ -655,33 +652,6 @@ unsigned long randomize_page(unsigned long start, unsigned long range)
+ 	return start + (get_random_long() % range << PAGE_SHIFT);
+ }
  
- 	r = ddata->rom_rng_call(0, 0, RNG_GEN_PRNG_HW_INIT);
- 	if (r != 0) {
--		clk_disable(ddata->clk);
-+		clk_disable_unprepare(ddata->clk);
- 		dev_err(dev, "HW init failed: %d\n", r);
+-/*
+- * This function will use the architecture-specific hardware random
+- * number generator if it is available. It is not recommended for
+- * use. Use get_random_bytes() instead. It returns the number of
+- * bytes filled in.
+- */
+-size_t __must_check get_random_bytes_arch(void *buf, size_t len)
+-{
+-	size_t left = len;
+-	u8 *p = buf;
+-
+-	while (left) {
+-		unsigned long v;
+-		size_t block_len = min_t(size_t, left, sizeof(unsigned long));
+-
+-		if (!arch_get_random_long(&v))
+-			break;
+-
+-		memcpy(p, &v, block_len);
+-		p += block_len;
+-		left -= block_len;
+-	}
+-
+-	return len - left;
+-}
+-EXPORT_SYMBOL(get_random_bytes_arch);
+-
  
- 		return -EIO;
+ /**********************************************************************
+  *
+@@ -919,6 +889,8 @@ static int random_pm_notification(struct notifier_block *nb, unsigned long actio
+ 
+ static struct notifier_block pm_notifier = { .notifier_call = random_pm_notification };
+ 
++static bool used_arch_random;
++
+ /*
+  * The first collection of entropy occurs at system boot while interrupts
+  * are still turned off. Here we push in latent entropy, RDSEED, a timestamp,
+@@ -956,6 +928,7 @@ int __init random_init(const char *command_line)
+ 		crng_reseed();
+ 	else if (trust_cpu)
+ 		credit_init_bits(arch_bytes * 8);
++	used_arch_random = arch_bytes * 8 >= POOL_READY_BITS;
+ 
+ 	WARN_ON(register_pm_notifier(&pm_notifier));
+ 
+@@ -964,6 +937,15 @@ int __init random_init(const char *command_line)
+ 	return 0;
+ }
+ 
++/*
++ * Returns whether arch randomness has been mixed into the
++ * initial state of the RNG.
++ */
++bool rng_has_arch_random(void)
++{
++	return used_arch_random;
++}
++
+ /*
+  * Add device- or boot-specific data to the input pool to help
+  * initialize it.
+diff --git a/include/linux/random.h b/include/linux/random.h
+index fc82f1dc36f1..6af130c6edb9 100644
+--- a/include/linux/random.h
++++ b/include/linux/random.h
+@@ -38,7 +38,6 @@ static inline int unregister_random_vmfork_notifier(struct notifier_block *nb) {
+ #endif
+ 
+ void get_random_bytes(void *buf, size_t len);
+-size_t __must_check get_random_bytes_arch(void *buf, size_t len);
+ u32 get_random_u32(void);
+ u64 get_random_u64(void);
+ static inline unsigned int get_random_int(void)
+@@ -77,6 +76,7 @@ unsigned long randomize_page(unsigned long start, unsigned long range);
+ 
+ int __init random_init(const char *command_line);
+ bool rng_is_initialized(void);
++bool rng_has_arch_random(void);
+ int wait_for_random_bytes(void);
+ int register_random_ready_notifier(struct notifier_block *nb);
+ int unregister_random_ready_notifier(struct notifier_block *nb);
+diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+index 40d26a07a133..20e9887faaaa 100644
+--- a/lib/vsprintf.c
++++ b/lib/vsprintf.c
+@@ -776,12 +776,11 @@ static struct notifier_block random_ready = {
+ 
+ static int __init initialize_ptr_random(void)
+ {
+-	int key_size = sizeof(ptr_key);
+ 	int ret;
+ 
+-	/* Use hw RNG if available. */
+-	if (get_random_bytes_arch(&ptr_key, key_size) == key_size) {
+-		static_branch_disable(&not_filled_random_ptr_key);
++	/* Don't bother waiting for RNG to be ready if RDRAND is mixed in already. */
++	if (rng_has_arch_random()) {
++		enable_ptr_key_workfn(&enable_ptr_key_work);
+ 		return 0;
+ 	}
+ 
 -- 
-2.25.1
+2.35.1
 
