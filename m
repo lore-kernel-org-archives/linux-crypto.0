@@ -2,101 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54166C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 20:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE01C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 21:19:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236302AbiEPUuj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 May 2022 16:50:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41240 "EHLO
+        id S1345979AbiEPVTC (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 May 2022 17:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237916AbiEPUuM (ORCPT
+        with ESMTP id S1349310AbiEPVS2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 May 2022 16:50:12 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCA6CF2;
-        Mon, 16 May 2022 13:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652732759; x=1684268759;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=o+Om2Nhj5JA77vWK4kvR0zricBYgkeFtHqrTTN0lf4w=;
-  b=P65PJLmllKTEKMmx+DJ8cbBA+nVDvwzHcLVOfdZd4meYcB3aXM1kAzlz
-   BX9JXVYLf1la3PRyGmINcYaus2j62bxLzDwgJfUuxOsZqfT/xYnJNZIF9
-   rsLZiphKh3g2IrV5+IrqKGSKreivyF8ytm/TDuB6sDbSizOtBuXg4cqD7
-   CcNTNpJKUrq7W96z6/+xi0h7cwl8EHUk43GuZBu1owTy9hhCvMkppAi2m
-   oY1XPDuOpYRGGguTTjqxQdUEvwFSey0tj/ZXMNs2i5rJbgjIlx72+xvdn
-   lsM/8bNzyEqgYVVzSvHI9wOqPno76HvInODT2kBXtjfVtgJLRrmCQel5T
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="296227225"
-X-IronPort-AV: E=Sophos;i="5.91,230,1647327600"; 
-   d="scan'208";a="296227225"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 13:25:58 -0700
-X-IronPort-AV: E=Sophos;i="5.91,230,1647327600"; 
-   d="scan'208";a="544535615"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 13:25:56 -0700
-Date:   Mon, 16 May 2022 21:25:50 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     yoan.picchi@arm.com
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/2] Crypto: Remove x86 dependency on QAT drivers
-Message-ID: <YoKzTtBv3qWQf4SI@silpixa00400314>
-References: <20220516101635.1082132-1-yoan.picchi@arm.com>
+        Mon, 16 May 2022 17:18:28 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962592C10D;
+        Mon, 16 May 2022 14:17:48 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id ch13so30965855ejb.12;
+        Mon, 16 May 2022 14:17:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=35KXda5OBFCKkvBxWwkGiybmXmDjKw5ss0Rm54TgqYY=;
+        b=i+OOwp8a+Ns6JmA3zecraa7xhvF4SrBt9OxonU3zgxIMLqIuQq+1wJn0rPRt8mJN4o
+         LMO0yQRcFwtjM0saYriQhamE4Fw0YEtk5t3TQ/RM1Vi0r1O3pCyeXRunEEq8TcH6OFso
+         vkGt7LDjqxEHo/VZUby/scvLGyC2tDiX63Gsst9+OA1R4gAs1CbduRu5CCe5/wXuhVGm
+         9f94pIi+pVT9OaQLr0JmyoLwRKd/D0pc7O0eRi18BOa40zDJjqM1lVzkEBD6yAyeSphI
+         Zm9caVX9cBt5sds1QEuRnfXbFigfQZpxfErvR9dhBy7JUfAf1n9hARzxRl0oXFES8wz7
+         2nGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=35KXda5OBFCKkvBxWwkGiybmXmDjKw5ss0Rm54TgqYY=;
+        b=vEgKjUs/P+vw3OGYzdM97g4xX9ENfL6j4SHwHvfi1ZQvYrrA8mGXj8LQdcmiyhyOLm
+         Ej2ePVEJPXAfMt90riX6zpT9uFp/zM4rMuv2ZQzacEK5A+0SRKzyTQqjV0j4kuCva5VH
+         62tp8O0msEiLIn5BCrvW/8nxl7+FV+6KcbBk6n6CexNERIVt1BjsoCC7UaDAYj3s4dSa
+         RiE/yEH6COpJhWVw3aPgLiTTY0s9jgadAClCPdRbO8FS+sZr1IPQbYjHMBRnvInsVx8L
+         ANa7bIToOisGrDOupfjQ5hqY6KfO01HcyQbQplp6I4QfKmkUUYMuc91g+G3sIOjurs47
+         aOWw==
+X-Gm-Message-State: AOAM531v3rp1RguKtqi4AYYJD5uKyJwdPvCjh5A9hZbRWVkI+Fmpvzsd
+        7wKS6EJiR3TXz51SAyreoKKJOcrClwsWsXfC
+X-Google-Smtp-Source: ABdhPJz+c4SIyaDIRS17VWMsh5DYkuYDVpureeE7lY55lFd4fmJuYT5KuXvj3NnifMvVo2q76fvdHw==
+X-Received: by 2002:a17:907:e91:b0:6f4:d1e7:417d with SMTP id ho17-20020a1709070e9100b006f4d1e7417dmr17216724ejc.123.1652735867100;
+        Mon, 16 May 2022 14:17:47 -0700 (PDT)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id a23-20020a1709063e9700b006f3ef214dc5sm198147ejj.43.2022.05.16.14.17.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 14:17:46 -0700 (PDT)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: asymmetric_keys: remove redundant pointer secs
+Date:   Mon, 16 May 2022 22:17:45 +0100
+Message-Id: <20220516211745.55382-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220516101635.1082132-1-yoan.picchi@arm.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 16, 2022 at 10:16:33AM +0000, yoan.picchi@arm.com wrote:
-> From: Yoan Picchi <yoan.picchi@arm.com>
-> 
-> The QAT acceleration card can be very helpfull for some tasks like dealing
-> with IPSEC but it is currently restricted to be used only on x86 machine.
-> Looking at the code we didn't see any reasons why those drivers might not
-> work on other architectures. We've successfully built all of them on x86,
-> arm64, arm32, mips64, powerpc64, riscv64 and sparc64.
-> 
-> We also have tested the driver with an Intel Corporation C62x Chipset
-> QuickAssist Technology (rev 04) PCIe card on an arm64 server. After the numa
-> patch, it works with the AF_ALG crypto userland interface, allowing us to
-> encrypt some data with cbc for instance. We've also successfully created
-> some VF, bound them to DPDK, and used the card this way, thus showing some
-> real life usecases of x86 do work on arm64 too.
-> 
-> Please let us know if we missed something that would warrants some further
-> testing.
-Thanks Yoan.
+Pointer secs is being assigned a value that is never read. The pointer
+is redundant and can be removed.
 
-Can you please confirm that you tested the driver on the platform you
-reported using a kernel with CONFIG_CRYPTO_MANAGER_DISABLE_TESTS not set
-and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and the self test is passing?
-You can check it by running
-    $ cat /proc/crypto | grep -B 4 passed | grep -e "qat_\|qat-" | sort
-This should report:
-    driver       : qat_aes_cbc
-    driver       : qat_aes_cbc_hmac_sha1
-    driver       : qat_aes_cbc_hmac_sha256
-    driver       : qat_aes_cbc_hmac_sha512
-    driver       : qat_aes_ctr
-    driver       : qat_aes_xts
-    driver       : qat-dh
-    driver       : qat-rsa
+Cleans up clang-scan build warning:
+warning: Although the value stored to 'secs' is used in the enclosing
+expression, the value is never actually read from 'secs'
+[deadcode.DeadStores]
 
-Note that if you are using the HEAD of cryptodev-2.6 you will have to
-either revert 8893d27ffcaf6ec6267038a177cb87bcde4dd3de or apply
-https://patchwork.kernel.org/project/linux-crypto/list/?series=639755 as
-the algorithms have been temporarily disabled.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regards,
-
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index 7553ab18db89..a660e4d68d50 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -28,7 +28,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	const struct pe32plus_opt_hdr *pe64;
+ 	const struct data_directory *ddir;
+ 	const struct data_dirent *dde;
+-	const struct section_header *secs, *sec;
++	const struct section_header *sec;
+ 	size_t cursor, datalen = pelen;
+ 
+ 	kenter("");
+@@ -110,7 +110,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
+ 	ctx->n_sections = pe->sections;
+ 	if (ctx->n_sections > (ctx->header_size - cursor) / sizeof(*sec))
+ 		return -ELIBBAD;
+-	ctx->secs = secs = pebuf + cursor;
++	ctx->secs = pebuf + cursor;
+ 
+ 	return 0;
+ }
 -- 
-Giovanni
+2.35.1
+
