@@ -2,203 +2,221 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FFCC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 18:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C88A3C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 18:38:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344654AbiEPSLc (ORCPT
+        id S1345000AbiEPSi3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 May 2022 14:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58234 "EHLO
+        Mon, 16 May 2022 14:38:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344594AbiEPSLG (ORCPT
+        with ESMTP id S1345002AbiEPSi2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 May 2022 14:11:06 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8497D2DCF;
-        Mon, 16 May 2022 11:11:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HqBiMliB1dMUjl7NqXG6xDZiV3G2ZXhaMTukul88rrl4YtlSBOqewr1CxNgGYj5NkyfW6Qa7Egyga3pKhGAeGWoVChz8lh1z56O8cKfGUjTg4MNt0qJVSUgpna4kTmwhEd8M8bFlfYhq7626L+AzxWSVdDuLsJChnxf6+A4qH0OSIOGqHY5fj6flYsMFyDRzHLbXiU0umAHrkmGezm5FBbKOwcQO1mwFN3m/mqQkBH48u1CWc2qV1zU4jzEbdTp6hFRZBP7uwIWC0cxnabrmBZj2Zy8peMY+uYSNKqHvNJ8MS46WRjiiqIwOKZAShCe0ofNRLsvi9XSOF67q6xMThA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NJcGDmtRFT62t6blsYCuFow79wNBOkPGC45xJ/D60Eo=;
- b=kt5hv8OW6lc0+Xlem42GhQNTMsswd8hKEx6KDg7KUQ1EFImqHPhS/8ejLaYdhZIvKUh3MAPrS9rKWVu8Kq3Ezz0QzEYJCng+K+DXnxzz0yMBQx8h6mUJ3yXjvnoh9Q0keH7+3E0H0wM9z3k4Ozev5uVCknX+MPop9RtTjY/4EcL9l/97w8RP4Tm1dGWgbzwKVuq5xaQFov/7MX/WHrniFrnNFRO4Vwfh3uzqP0eMPJDeRYA8gtTJTkXL1QLDNOpt6koej9qDGiqh4ObpBhLg3zb4lSGhzcGAxE7RwkgW1f6g9e9tUq0GB6S7BCT77xf8PQ0mG1IfF9kwfymHuKJxTA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NJcGDmtRFT62t6blsYCuFow79wNBOkPGC45xJ/D60Eo=;
- b=3o4IaRKfxGFnc2B2VelWukeZXvQN9Jbw4A4R3JN/S7LGI+hm425anovMUgjJn5bpSVkTnoHo/ReowQdBlFU9S88oOqOCV6q8IFSLxRey1Fw+RFEtxb4XeNik8uxmU8KKLpr3aT2wdPnw6lDYcLMyk465hq9AtClQobv1i67K6HI=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by BYAPR12MB3382.namprd12.prod.outlook.com (2603:10b6:a03:a9::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.14; Mon, 16 May
- 2022 18:11:02 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::25d7:1ecc:64f2:f9c0]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::25d7:1ecc:64f2:f9c0%6]) with mapi id 15.20.5250.018; Mon, 16 May 2022
- 18:11:02 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Peter Gonda <pgonda@google.com>,
-        "Allen, John" <John.Allen@amd.com>,
+        Mon, 16 May 2022 14:38:28 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511723E5E9;
+        Mon, 16 May 2022 11:38:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0DF63B815B4;
+        Mon, 16 May 2022 18:38:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14C94C385AA;
+        Mon, 16 May 2022 18:38:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652726303;
+        bh=0QvHgpJb4KFdSPQhvpkbywnyC2wGLiX11TmowfYp2s0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=iF8HVDkBiP42BWNMLdac03I5u5aAhpR+vhIMwoa1mpYAaeYITtvbtHdkiVBaFM65S
+         kNFEIyXvMAgnIU/eU4Uq1bQ34AV2coojUp23sJhrEQcmDO7s8O+cDWA9rgtdm+v45d
+         MeQpFXSpV6GLLbFtK4a9TDdVHeJCbXjNz5xEHMv0sj4VuaCGZoapoXf7TFScaVAAcf
+         UBAgyQC1Iga4ix6xqfX1RsHzYCqIN2AXwApLthNoENTq030XBy4B6qmqfhhbz5aCHA
+         AGCf6Z8xnfs0RE3ctYQViFD3MbP2MHvEMCQDZMFjGCipUhJboRCZKJPzRsNBRmDaPO
+         h0Ql4Y/5m2G/g==
+Date:   Mon, 16 May 2022 21:36:48 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andy Nguyen <theflow@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v2] crypto: ccp - Use kzalloc for sev ioctl interfaces to
- prevent kernel memory leak
-Thread-Topic: [PATCH v2] crypto: ccp - Use kzalloc for sev ioctl interfaces to
- prevent kernel memory leak
-Thread-Index: AQHYaTwUxoMisTo8TEW3VgseD18R+K0hp6QAgAABb8CAABTegIAAAVcAgAAG6gCAAAO/wA==
-Date:   Mon, 16 May 2022 18:11:02 +0000
-Message-ID: <SN6PR12MB276737E018DBCA12EF6EB3218ECF9@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <20220516154512.259759-1-john.allen@amd.com>
- <CAMkAt6oUxUFtNS4W0bzu13oWMdfnzfNrphH3OqwAkmxJcXhOqw@mail.gmail.com>
- <SN6PR12MB27678261F176C5D9B5BF64EF8ECF9@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6q7kTGS5QgZRq9xc0HaEYyntmj3GRWehr-3Sb4y2eQ=HQ@mail.gmail.com>
- <SN6PR12MB2767B4A3919E38C7F429CC2D8ECF9@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YoKNDoiXKGbBhuIk@google.com>
-In-Reply-To: <YoKNDoiXKGbBhuIk@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-05-16T17:56:02Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=4f3af9bd-17d2-42da-b60e-56a7ee097c15;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-05-16T18:11:00Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: f15d382c-8246-4249-9184-64548c71154b
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2ef49790-10c6-4e72-6f07-08da37676ffd
-x-ms-traffictypediagnostic: BYAPR12MB3382:EE_
-x-microsoft-antispam-prvs: <BYAPR12MB33824D65726DEC5E4638138D8ECF9@BYAPR12MB3382.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hByThre5heXecrH9MSLGWQl58dmbI+hiB5rsfEdPWYq7CzCBQFJkD4WcVHvdCEzJnpWTqcRsBEeXzvKmtNb8UpmTQO96V1rBeBqNqeFHmci0v8LbQCiQtZ9oNZ67Uwl1An0ZtZIElRzZwNYDY4jelD1moGrMTn2UY5WfKQv8e8oIBDKHsZvp4u6jyTo0Zhd7YUcM72GZjxBzhNSTkikctIpiWP9z7zMAggchdooDoKuL099+T8aAmqS2vwIa6ehcFof0fXTBEjrg+fxNZBybH4WVlYQNconiWeiNzOtqwW4FK700jzF+670ALOWLPMNxxIKlsyKlPXVLpWGjzew4ZXD4UWVHYWFscemY2VwogcT84Nb9NVO5S5FA3J8/VRBPIv58wlGPI/FTm9O6UsBoNdg14AZuOsnQIUh8gyG7Tb3EEFy51P4fGjnYRmCgcUwJLDQh7YaZyuNUfwUEFHRoLHyF1E3WZdUdLK0mWsuCyeAoYtb0EGPNV+4fg3aXrNO+a959TzKnkHjS4myzQDImMW5bzy1K6qkdOCfaP+2IEP4NhZ5HTecP8jVM2TkLtYGmAqvCHAuTyM8t4zhjS8fVSHgHmTd3JLdNYlCmKhwyLvCdZwbydt2oVw96Rk+0hfAxvDS6eYMlbgKkLSQVnn60oNgqRg/3iCWHGFkPmLGrBoxVhq4ZODr1V4xW6w1TIjQoM6niHNc4hrbNRt7UUasQWw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(8676002)(53546011)(64756008)(66446008)(66476007)(71200400001)(54906003)(38100700002)(316002)(83380400001)(8936002)(4326008)(26005)(38070700005)(5660300002)(9686003)(33656002)(6916009)(66556008)(508600001)(52536014)(86362001)(7696005)(122000001)(2906002)(186003)(55016003)(66946007)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fT+4Fv8runMJg6vo3TF6Ib7E4mB3ItAMd8+GNv8wyC9Dg3zTDKROXiyj2OZg?=
- =?us-ascii?Q?9uyjKmLs20be+K/uuhR6Tdqy7puMUvsUfcpfT/Fn4RHbC2MNX32V34z9gRXm?=
- =?us-ascii?Q?W+7TUTAwsQzUDN5sWetNV2fIv35ooKNt18pjmY3EQGnwIgbSMVILDfvVsSWm?=
- =?us-ascii?Q?5DVYnpGrQkLO/+rSagKp7/4h7U+YGDR5zg4NSpXc1SD6/d8FmeV/BcyisfHG?=
- =?us-ascii?Q?/KEoHVbD5PcKc4zajGSWSqU1Tq6bx1LEGjPkH2f8oGKX66Rz0qW65eyYDwTf?=
- =?us-ascii?Q?fAv8dhFlL8hziQjahfRo8JGwIpMdClZsSVciRfed4USJXpe+OwAcdzGmaEuz?=
- =?us-ascii?Q?K2wXSBFYrF/h0RPk7mdMHIBMOJwssGJqHo5koCBOGGYzd7/VzkUx4QqtFOtL?=
- =?us-ascii?Q?KlnWlWOznNCbqr9hT33YxeMa1RJInbHAmYTXm5bpCGJRu/viSbKekqvnUmrM?=
- =?us-ascii?Q?EGWe0Th6wINFqLok/ti7D2vTAcpZkEFJssbWSlyD36uEB+3IaMxcOfO7OtMf?=
- =?us-ascii?Q?D/BDXCl8tIA0H7cRBMGvsa4b6o4xlVG5f/mGOMLVTrkjMoZThqUJ43Cz8pT1?=
- =?us-ascii?Q?vJyLCLqKyiTnHM7jP7gBa07ZZ0+3Gq3dFJoYzEuOjYfw4xMVdBVQwKMNkhTl?=
- =?us-ascii?Q?x2UTMZHYODwD2MkDUeyJnSjrdz8aG2ew/oCaL9pBtYIAX6/3rgUvqSCZlHBB?=
- =?us-ascii?Q?huf/dSaj6P34XDRGCfoq6Ang5WyH1cU1wQw6vfCRGc4vVboiLdOSfWFfXe9o?=
- =?us-ascii?Q?KQ/p1s9mJ7oTlw2f2zM/Clp69wV61YIyTIAHJeQDGdtsljP3kqRnNkeF6B0g?=
- =?us-ascii?Q?fSrhvFXlyjulTuEaMEMjP1zXn65mBxDImpDwDeoZl2LO7ZA8tZGnOLDarCSR?=
- =?us-ascii?Q?ZalZmh8mZYoe+hdd39DscBJWIfrnSPij95cRNh7AGznnA+gyGL1+H8XgAF5j?=
- =?us-ascii?Q?9Rpl/FllpczkPTz0oFV2KJ3rg6HIefvi7VcqHY2m+G4h8o3RjYsqvwYSLUsO?=
- =?us-ascii?Q?MZrMWWUhjrLde7N4cyN9QiZLhcNMTexLPRoRF9qyNmNcEsRzSQ0VUUFgOBSg?=
- =?us-ascii?Q?OUAcov3LnQeoOIsWjNn6l76Gqiyca61QJMYhZ9GKhQ1Aue/NAc+8f1ujBHjZ?=
- =?us-ascii?Q?djcygDAy48TTnisqD044yesaHfcxdSZeIKAqSgR8UE+PbkTDPX/E3kj8t+pZ?=
- =?us-ascii?Q?yLtIqOD6uX/3j8E7WIMMzgVNJyMG92NL9mRB1bnvf3xz6Wgal5LashuqlPzl?=
- =?us-ascii?Q?B3mdMciQvV1R2+KYemg5fg4l0UG6zXfH6qZQ/kuyiORKDoZJtT8wLWDCPWVW?=
- =?us-ascii?Q?cbegA1AOp4rDDqgeRQtHOmamgDXXWE0pRQb3vcr1PDD9O37QUNVX96ABbHei?=
- =?us-ascii?Q?1V0VvXigM/ArcROeQu7vDgjTDfy/YtsliKSLGIC36vleg80Myws9hXE/OnDy?=
- =?us-ascii?Q?ozNLhREJPVzMLikbRlPzn+ohCbxClaRaUdle2UPqXEkIXqSdcx8EgTjTjNZr?=
- =?us-ascii?Q?NZvdOx2k/iEO5Yyl95cB/V4wzONz6JqgXKZXpEJmwC5fe2bUV5T57gh8p/Up?=
- =?us-ascii?Q?oxkYexo9NL+vYwUbLfWzq2Ovopl18Oj4DHmjY5/Urlc+eIhg2OMBC95VjPoj?=
- =?us-ascii?Q?iD3iPL66s6m9sSxp+u4h8np7lYZkp4te/xR4E2MPfRXXQeXoMAR6cF7FqIzS?=
- =?us-ascii?Q?B+yhnyqR/5ErkJYu1vLdULYbD0dkL+ToTcdVQ0kkegr8JAvm?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        "David S. Miller" <davem@davemloft.net>,
+        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
+        David Howells <dhowells@redhat.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        David Gstir <david@sigma-star.at>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Andreas Rammhold <andreas@rammhold.de>,
+        Tim Harvey <tharvey@gateworks.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Michael Walle <michael@walle.cc>,
+        John Ernberg <john.ernberg@actia.se>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v10 0/7] KEYS: trusted: Introduce support for NXP
+ CAAM-based trusted keys
+Message-ID: <YoKZwFkfcl7ixTF4@kernel.org>
+References: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ef49790-10c6-4e72-6f07-08da37676ffd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 May 2022 18:11:02.5916
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xtJizT+mF2/HQR4tH7mY/s7HXltWJp/7Ewg7G54n1fF5OfKV06R3dLg1ZeaeiPV1gspDHP8uSIXgaj3Co/UsLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3382
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Fri, May 13, 2022 at 04:56:58PM +0200, Ahmad Fatoum wrote:
+> Series applies on top of v5.18-rc6. Would be great if this could make it
+> into v5.19.
+> 
+> v9 was here:
+> https://lore.kernel.org/linux-integrity/20220506062553.1068296-1-a.fatoum@pengutronix.de
+> 
+> Changelog is beneath each individual patch. Compared to v9, only code
+> change is checking whether CAAM can support blobbing at init-time for
+> CAAM revisions < 10 (such as LS1046A) to avoid a cryptic error message
+> at first use.
+> 
+> 
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
+> built into many newer i.MX and QorIQ SoCs by NXP.
+> 
+> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> never-disclosed device-specific key.
+> 
+> There has been multiple discussions on how to represent this within the kernel:
+> 
+> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
+> built into many newer i.MX and QorIQ SoCs by NXP.
+> 
+> Its blob mechanism can AES encrypt/decrypt user data using a unique
+> never-disclosed device-specific key. There has been multiple
+> discussions on how to represent this within the kernel:
+> 
+>  - [RFC] crypto: caam - add red blobifier
+>    Steffen implemented[1] a PoC sysfs driver to start a discussion on how to
+>    best integrate the blob mechanism.
+>    Mimi suggested that it could be used to implement trusted keys.
+>    Trusted keys back then were a TPM-only feature.
+> 
+>  - security/keys/secure_key: Adds the secure key support based on CAAM.
+>    Udit Agarwal added[2] a new "secure" key type with the CAAM as backend.
+>    The key material stays within the kernel only.
+>    Mimi and James agreed that this needs a generic interface, not specific
+>    to CAAM. Mimi suggested trusted keys. Jan noted that this could serve as
+>    basis for TEE-backed keys.
+> 
+>  - [RFC] drivers: crypto: caam: key: Add caam_tk key type
+>    Franck added[3] a new "caam_tk" key type based on Udit's work. This time
+>    it uses CAAM "black blobs" instead of "red blobs", so key material stays
+>    within the CAAM and isn't exposed to kernel in plaintext.
+>    James voiced the opinion that there should be just one user-facing generic
+>    wrap/unwrap key type with multiple possible handlers.
+>    David suggested trusted keys.
+> 
+>  - Introduce TEE based Trusted Keys support
+>    Sumit reworked[4] trusted keys to support multiple possible backends with
+>    one chosen at boot time and added a new TEE backend along with TPM.
+>    This now sits in Jarkko's master branch to be sent out for v5.13
+> 
+> This patch series builds on top of Sumit's rework to have the CAAM as yet another
+> trusted key backend.
+> 
+> The CAAM bits are based on Steffen's initial patch from 2015. His work had been
+> used in the field for some years now, so I preferred not to deviate too much from it.
+> 
+> This series has been tested with dmcrypt[5] on an i.MX6Q/DL, i.MX8M[6]
+> and LS1028[7].
+> 
+> Looking forward to your feedback.
+> 
+> Cheers,
+> Ahmad
+> 
+>  [1]: https://lore.kernel.org/linux-crypto/1447082306-19946-2-git-send-email-s.trumtrar@pengutronix.de/
+>  [2]: https://lore.kernel.org/linux-integrity/20180723111432.26830-1-udit.agarwal@nxp.com/
+>  [3]: https://lore.kernel.org/lkml/1551456599-10603-2-git-send-email-franck.lenormand@nxp.com/
+>  [4]: https://lore.kernel.org/lkml/1604419306-26105-1-git-send-email-sumit.garg@linaro.org/
+>  [5]: https://lore.kernel.org/linux-integrity/20210122084321.24012-2-a.fatoum@pengutronix.de/
+>  [6]: https://lore.kernel.org/linux-integrity/DU2PR04MB8630D83FE9BBC0D782C4FAF595089@DU2PR04MB8630.eurprd04.prod.outlook.com/
+>  [7]: https://lore.kernel.org/linux-integrity/49e1738c55c73819ee0e2cac0be74d81@walle.cc/
+> 
+> ---
+> To: Jarkko Sakkinen <jarkko@kernel.org>
+> To: "Horia Geantă" <horia.geanta@nxp.com>
+> To: Mimi Zohar <zohar@linux.ibm.com>
+> To: Pankaj Gupta <pankaj.gupta@nxp.com>
+> To: Herbert Xu <herbert@gondor.apana.org.au>
+> To: "David S. Miller" <davem@davemloft.net>
+> To: James Bottomley <jejb@linux.ibm.com>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: "Serge E. Hallyn" <serge@hallyn.com>
+> Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
+> Cc: David Gstir <david@sigma-star.at>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
+> Cc: Sumit Garg <sumit.garg@linaro.org>
+> Cc: Andreas Rammhold <andreas@rammhold.de>
+> Cc: Tim Harvey <tharvey@gateworks.com>
+> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Cc: Michael Walle <michael@walle.cc>
+> Cc: John Ernberg <john.ernberg@actia.se>
+> Cc: linux-integrity@vger.kernel.org
+> Cc: keyrings@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-security-module@vger.kernel.org
+> 
+> 
+> 
+> Ahmad Fatoum (7):
+>   KEYS: trusted: allow use of TEE as backend without TCG_TPM support
+>   KEYS: trusted: allow use of kernel RNG for key material
+>   crypto: caam - determine whether CAAM supports blob encap/decap
+>   crypto: caam - add in-kernel interface for blob generator
+>   KEYS: trusted: Introduce support for NXP CAAM-based trusted keys
+>   doc: trusted-encrypted: describe new CAAM trust source
+>   MAINTAINERS: add KEYS-TRUSTED-CAAM
+> 
+>  .../admin-guide/kernel-parameters.txt         |  11 ++
+>  .../security/keys/trusted-encrypted.rst       |  60 +++++-
+>  MAINTAINERS                                   |   9 +
+>  drivers/crypto/caam/Kconfig                   |   3 +
+>  drivers/crypto/caam/Makefile                  |   1 +
+>  drivers/crypto/caam/blob_gen.c                | 182 ++++++++++++++++++
+>  drivers/crypto/caam/ctrl.c                    |  17 +-
+>  drivers/crypto/caam/intern.h                  |   1 +
+>  drivers/crypto/caam/regs.h                    |   4 +-
+>  include/keys/trusted-type.h                   |   2 +-
+>  include/keys/trusted_caam.h                   |  11 ++
+>  include/soc/fsl/caam-blob.h                   | 103 ++++++++++
+>  security/keys/Kconfig                         |  18 +-
+>  security/keys/trusted-keys/Kconfig            |  38 ++++
+>  security/keys/trusted-keys/Makefile           |  10 +-
+>  security/keys/trusted-keys/trusted_caam.c     |  80 ++++++++
+>  security/keys/trusted-keys/trusted_core.c     |  45 ++++-
+>  17 files changed, 563 insertions(+), 32 deletions(-)
+>  create mode 100644 drivers/crypto/caam/blob_gen.c
+>  create mode 100644 include/keys/trusted_caam.h
+>  create mode 100644 include/soc/fsl/caam-blob.h
+>  create mode 100644 security/keys/trusted-keys/Kconfig
+>  create mode 100644 security/keys/trusted-keys/trusted_caam.c
+> 
+> -- 
+> 2.30.2
+> 
 
-Hello Sean,
+I can probably pick these unless objections?
 
------Original Message-----
-From: Sean Christopherson <seanjc@google.com>=20
-Sent: Monday, May 16, 2022 12:43 PM
-To: Kalra, Ashish <Ashish.Kalra@amd.com>
-Cc: Peter Gonda <pgonda@google.com>; Allen, John <John.Allen@amd.com>; Herb=
-ert Xu <herbert@gondor.apana.org.au>; Linux Crypto Mailing List <linux-cryp=
-to@vger.kernel.org>; Lendacky, Thomas <Thomas.Lendacky@amd.com>; LKML <linu=
-x-kernel@vger.kernel.org>; Andy Nguyen <theflow@google.com>; David Rientjes=
- <rientjes@google.com>; stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ccp - Use kzalloc for sev ioctl interfaces =
-to prevent kernel memory leak
-
-On Mon, May 16, 2022, Kalra, Ashish wrote:
-> > >Would it be safer to memset @data here to all zeros too?
-> >
-> > It will be, but this command/function is safe as firmware will fill=20
-> > in the whole buffer here with the PLATFORM STATUS data retuned to the u=
-ser.
->=20
-> > That does seem safe for now but I thought we decided it would be=20
-> > prudent to not trust the PSPs implementation here and clear all the=20
-> > buffers that eventually get sent to userspace?
->=20
-> Yes, but the issue is when the user programs a buffer size larger the=20
-> one filled in by the firmware. In this case firmware is always going=20
-> to fill up the whole buffer with PLATFORM_STATUS data, so it will be=20
-> always be safe. The issue is mainly with the kernel side doing a=20
-> copy_to_user() based on user programmed length instead of the firmware re=
-turned buffer length.
-
->Peter's point is that it costs the kernel very little to be paranoid and n=
-ot make assumptions about whether or not the PSP will fill an entire struct=
- as expected.
-
->I agree it feels a bit silly since all fields are output, but on the other=
- hand the PSP spec just says:
-
->  The following data structure is written to memory at STATUS_PADDR
-
->and the data structure has several reserved fields.  I don't love assuming=
- that the PSP will always write zeros for the reserved fields and not do so=
-mething like:
-
->	if (rmp_initialized)
->		data[3] |=3D IS_RMP_INIT;
->	else
->		data[3] &=3D ~IS_RMP_INIT;
-
->Given that zeroing @data in the kernel is easy and this is not a hot patch=
-, I prefer the paranoid approach unless the PSP spec is much more explicit =
-in saying that it writes all bits and bytes on success.
-
-I agree with that and we will resend a v3 of the crypto patch with this cha=
-nge added.
-
-Thanks,
-Ashish
+BR, Jarkko
