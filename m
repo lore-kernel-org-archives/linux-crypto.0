@@ -2,221 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C88A3C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 18:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54166C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 20:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345000AbiEPSi3 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 May 2022 14:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
+        id S236302AbiEPUuj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 May 2022 16:50:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345002AbiEPSi2 (ORCPT
+        with ESMTP id S237916AbiEPUuM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 May 2022 14:38:28 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511723E5E9;
-        Mon, 16 May 2022 11:38:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0DF63B815B4;
-        Mon, 16 May 2022 18:38:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14C94C385AA;
-        Mon, 16 May 2022 18:38:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652726303;
-        bh=0QvHgpJb4KFdSPQhvpkbywnyC2wGLiX11TmowfYp2s0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=iF8HVDkBiP42BWNMLdac03I5u5aAhpR+vhIMwoa1mpYAaeYITtvbtHdkiVBaFM65S
-         kNFEIyXvMAgnIU/eU4Uq1bQ34AV2coojUp23sJhrEQcmDO7s8O+cDWA9rgtdm+v45d
-         MeQpFXSpV6GLLbFtK4a9TDdVHeJCbXjNz5xEHMv0sj4VuaCGZoapoXf7TFScaVAAcf
-         UBAgyQC1Iga4ix6xqfX1RsHzYCqIN2AXwApLthNoENTq030XBy4B6qmqfhhbz5aCHA
-         AGCf6Z8xnfs0RE3ctYQViFD3MbP2MHvEMCQDZMFjGCipUhJboRCZKJPzRsNBRmDaPO
-         h0Ql4Y/5m2G/g==
-Date:   Mon, 16 May 2022 21:36:48 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        Andreas Rammhold <andreas@rammhold.de>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Michael Walle <michael@walle.cc>,
-        John Ernberg <john.ernberg@actia.se>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v10 0/7] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-Message-ID: <YoKZwFkfcl7ixTF4@kernel.org>
-References: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
+        Mon, 16 May 2022 16:50:12 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCA6CF2;
+        Mon, 16 May 2022 13:25:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652732759; x=1684268759;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=o+Om2Nhj5JA77vWK4kvR0zricBYgkeFtHqrTTN0lf4w=;
+  b=P65PJLmllKTEKMmx+DJ8cbBA+nVDvwzHcLVOfdZd4meYcB3aXM1kAzlz
+   BX9JXVYLf1la3PRyGmINcYaus2j62bxLzDwgJfUuxOsZqfT/xYnJNZIF9
+   rsLZiphKh3g2IrV5+IrqKGSKreivyF8ytm/TDuB6sDbSizOtBuXg4cqD7
+   CcNTNpJKUrq7W96z6/+xi0h7cwl8EHUk43GuZBu1owTy9hhCvMkppAi2m
+   oY1XPDuOpYRGGguTTjqxQdUEvwFSey0tj/ZXMNs2i5rJbgjIlx72+xvdn
+   lsM/8bNzyEqgYVVzSvHI9wOqPno76HvInODT2kBXtjfVtgJLRrmCQel5T
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="296227225"
+X-IronPort-AV: E=Sophos;i="5.91,230,1647327600"; 
+   d="scan'208";a="296227225"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 13:25:58 -0700
+X-IronPort-AV: E=Sophos;i="5.91,230,1647327600"; 
+   d="scan'208";a="544535615"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 13:25:56 -0700
+Date:   Mon, 16 May 2022 21:25:50 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     yoan.picchi@arm.com
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/2] Crypto: Remove x86 dependency on QAT drivers
+Message-ID: <YoKzTtBv3qWQf4SI@silpixa00400314>
+References: <20220516101635.1082132-1-yoan.picchi@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
+In-Reply-To: <20220516101635.1082132-1-yoan.picchi@arm.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 13, 2022 at 04:56:58PM +0200, Ahmad Fatoum wrote:
-> Series applies on top of v5.18-rc6. Would be great if this could make it
-> into v5.19.
+On Mon, May 16, 2022 at 10:16:33AM +0000, yoan.picchi@arm.com wrote:
+> From: Yoan Picchi <yoan.picchi@arm.com>
 > 
-> v9 was here:
-> https://lore.kernel.org/linux-integrity/20220506062553.1068296-1-a.fatoum@pengutronix.de
+> The QAT acceleration card can be very helpfull for some tasks like dealing
+> with IPSEC but it is currently restricted to be used only on x86 machine.
+> Looking at the code we didn't see any reasons why those drivers might not
+> work on other architectures. We've successfully built all of them on x86,
+> arm64, arm32, mips64, powerpc64, riscv64 and sparc64.
 > 
-> Changelog is beneath each individual patch. Compared to v9, only code
-> change is checking whether CAAM can support blobbing at init-time for
-> CAAM revisions < 10 (such as LS1046A) to avoid a cryptic error message
-> at first use.
+> We also have tested the driver with an Intel Corporation C62x Chipset
+> QuickAssist Technology (rev 04) PCIe card on an arm64 server. After the numa
+> patch, it works with the AF_ALG crypto userland interface, allowing us to
+> encrypt some data with cbc for instance. We've also successfully created
+> some VF, bound them to DPDK, and used the card this way, thus showing some
+> real life usecases of x86 do work on arm64 too.
 > 
-> 
-> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
-> built into many newer i.MX and QorIQ SoCs by NXP.
-> 
-> Its blob mechanism can AES encrypt/decrypt user data using a unique
-> never-disclosed device-specific key.
-> 
-> There has been multiple discussions on how to represent this within the kernel:
-> 
-> The Cryptographic Acceleration and Assurance Module (CAAM) is an IP core
-> built into many newer i.MX and QorIQ SoCs by NXP.
-> 
-> Its blob mechanism can AES encrypt/decrypt user data using a unique
-> never-disclosed device-specific key. There has been multiple
-> discussions on how to represent this within the kernel:
-> 
->  - [RFC] crypto: caam - add red blobifier
->    Steffen implemented[1] a PoC sysfs driver to start a discussion on how to
->    best integrate the blob mechanism.
->    Mimi suggested that it could be used to implement trusted keys.
->    Trusted keys back then were a TPM-only feature.
-> 
->  - security/keys/secure_key: Adds the secure key support based on CAAM.
->    Udit Agarwal added[2] a new "secure" key type with the CAAM as backend.
->    The key material stays within the kernel only.
->    Mimi and James agreed that this needs a generic interface, not specific
->    to CAAM. Mimi suggested trusted keys. Jan noted that this could serve as
->    basis for TEE-backed keys.
-> 
->  - [RFC] drivers: crypto: caam: key: Add caam_tk key type
->    Franck added[3] a new "caam_tk" key type based on Udit's work. This time
->    it uses CAAM "black blobs" instead of "red blobs", so key material stays
->    within the CAAM and isn't exposed to kernel in plaintext.
->    James voiced the opinion that there should be just one user-facing generic
->    wrap/unwrap key type with multiple possible handlers.
->    David suggested trusted keys.
-> 
->  - Introduce TEE based Trusted Keys support
->    Sumit reworked[4] trusted keys to support multiple possible backends with
->    one chosen at boot time and added a new TEE backend along with TPM.
->    This now sits in Jarkko's master branch to be sent out for v5.13
-> 
-> This patch series builds on top of Sumit's rework to have the CAAM as yet another
-> trusted key backend.
-> 
-> The CAAM bits are based on Steffen's initial patch from 2015. His work had been
-> used in the field for some years now, so I preferred not to deviate too much from it.
-> 
-> This series has been tested with dmcrypt[5] on an i.MX6Q/DL, i.MX8M[6]
-> and LS1028[7].
-> 
-> Looking forward to your feedback.
-> 
-> Cheers,
-> Ahmad
-> 
->  [1]: https://lore.kernel.org/linux-crypto/1447082306-19946-2-git-send-email-s.trumtrar@pengutronix.de/
->  [2]: https://lore.kernel.org/linux-integrity/20180723111432.26830-1-udit.agarwal@nxp.com/
->  [3]: https://lore.kernel.org/lkml/1551456599-10603-2-git-send-email-franck.lenormand@nxp.com/
->  [4]: https://lore.kernel.org/lkml/1604419306-26105-1-git-send-email-sumit.garg@linaro.org/
->  [5]: https://lore.kernel.org/linux-integrity/20210122084321.24012-2-a.fatoum@pengutronix.de/
->  [6]: https://lore.kernel.org/linux-integrity/DU2PR04MB8630D83FE9BBC0D782C4FAF595089@DU2PR04MB8630.eurprd04.prod.outlook.com/
->  [7]: https://lore.kernel.org/linux-integrity/49e1738c55c73819ee0e2cac0be74d81@walle.cc/
-> 
-> ---
-> To: Jarkko Sakkinen <jarkko@kernel.org>
-> To: "Horia Geantă" <horia.geanta@nxp.com>
-> To: Mimi Zohar <zohar@linux.ibm.com>
-> To: Pankaj Gupta <pankaj.gupta@nxp.com>
-> To: Herbert Xu <herbert@gondor.apana.org.au>
-> To: "David S. Miller" <davem@davemloft.net>
-> To: James Bottomley <jejb@linux.ibm.com>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: "Serge E. Hallyn" <serge@hallyn.com>
-> Cc: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> Cc: Jan Luebbe <j.luebbe@pengutronix.de>
-> Cc: David Gstir <david@sigma-star.at>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Franck LENORMAND <franck.lenormand@nxp.com>
-> Cc: Sumit Garg <sumit.garg@linaro.org>
-> Cc: Andreas Rammhold <andreas@rammhold.de>
-> Cc: Tim Harvey <tharvey@gateworks.com>
-> Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> Cc: Michael Walle <michael@walle.cc>
-> Cc: John Ernberg <john.ernberg@actia.se>
-> Cc: linux-integrity@vger.kernel.org
-> Cc: keyrings@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-security-module@vger.kernel.org
-> 
-> 
-> 
-> Ahmad Fatoum (7):
->   KEYS: trusted: allow use of TEE as backend without TCG_TPM support
->   KEYS: trusted: allow use of kernel RNG for key material
->   crypto: caam - determine whether CAAM supports blob encap/decap
->   crypto: caam - add in-kernel interface for blob generator
->   KEYS: trusted: Introduce support for NXP CAAM-based trusted keys
->   doc: trusted-encrypted: describe new CAAM trust source
->   MAINTAINERS: add KEYS-TRUSTED-CAAM
-> 
->  .../admin-guide/kernel-parameters.txt         |  11 ++
->  .../security/keys/trusted-encrypted.rst       |  60 +++++-
->  MAINTAINERS                                   |   9 +
->  drivers/crypto/caam/Kconfig                   |   3 +
->  drivers/crypto/caam/Makefile                  |   1 +
->  drivers/crypto/caam/blob_gen.c                | 182 ++++++++++++++++++
->  drivers/crypto/caam/ctrl.c                    |  17 +-
->  drivers/crypto/caam/intern.h                  |   1 +
->  drivers/crypto/caam/regs.h                    |   4 +-
->  include/keys/trusted-type.h                   |   2 +-
->  include/keys/trusted_caam.h                   |  11 ++
->  include/soc/fsl/caam-blob.h                   | 103 ++++++++++
->  security/keys/Kconfig                         |  18 +-
->  security/keys/trusted-keys/Kconfig            |  38 ++++
->  security/keys/trusted-keys/Makefile           |  10 +-
->  security/keys/trusted-keys/trusted_caam.c     |  80 ++++++++
->  security/keys/trusted-keys/trusted_core.c     |  45 ++++-
->  17 files changed, 563 insertions(+), 32 deletions(-)
->  create mode 100644 drivers/crypto/caam/blob_gen.c
->  create mode 100644 include/keys/trusted_caam.h
->  create mode 100644 include/soc/fsl/caam-blob.h
->  create mode 100644 security/keys/trusted-keys/Kconfig
->  create mode 100644 security/keys/trusted-keys/trusted_caam.c
-> 
-> -- 
-> 2.30.2
-> 
+> Please let us know if we missed something that would warrants some further
+> testing.
+Thanks Yoan.
 
-I can probably pick these unless objections?
+Can you please confirm that you tested the driver on the platform you
+reported using a kernel with CONFIG_CRYPTO_MANAGER_DISABLE_TESTS not set
+and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and the self test is passing?
+You can check it by running
+    $ cat /proc/crypto | grep -B 4 passed | grep -e "qat_\|qat-" | sort
+This should report:
+    driver       : qat_aes_cbc
+    driver       : qat_aes_cbc_hmac_sha1
+    driver       : qat_aes_cbc_hmac_sha256
+    driver       : qat_aes_cbc_hmac_sha512
+    driver       : qat_aes_ctr
+    driver       : qat_aes_xts
+    driver       : qat-dh
+    driver       : qat-rsa
 
-BR, Jarkko
+Note that if you are using the HEAD of cryptodev-2.6 you will have to
+either revert 8893d27ffcaf6ec6267038a177cb87bcde4dd3de or apply
+https://patchwork.kernel.org/project/linux-crypto/list/?series=639755 as
+the algorithms have been temporarily disabled.
+
+Regards,
+
+-- 
+Giovanni
