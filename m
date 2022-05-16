@@ -2,163 +2,111 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E6DC433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 15:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FA8C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 15:53:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245421AbiEPPqL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 May 2022 11:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59774 "EHLO
+        id S245461AbiEPPxh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 May 2022 11:53:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233794AbiEPPqJ (ORCPT
+        with ESMTP id S245454AbiEPPxe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 May 2022 11:46:09 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE12E71;
-        Mon, 16 May 2022 08:46:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cnKm0Zmr4T/w8VweVWrO5ZaWjzzsLL6kzzBQJ1pLR5CXnrkxoPHqrzMnlAdiMZ0AOCOpeSe1IfH/sJXzj//DFjlaQLaGe+5Qjx7eN/JMHu0MFa4aucT4KcbgXssTivJMmFrtVnK296U14KUukhFBMPTdzREPaZiz4fXbUw9Y6npLjd06YkVrgVINLaaRBZ/0kIVSaE4S0IosYhz1Zon9WJ1N2KYlSJxkdpSxaHL7v1X8G6nQwT3dY2ry0H+YxPNVpJ8S+FtFG0U4q8X+sRp/0nEgM4k5+4HY5SBdlpMH7gJhbFFWcGUZsKWbFCqtAqVlB/GzgFC5gWlboanJiQu+6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dVyzjjWM2aOr78A/+nKv/zx3TsOLvDoTLWdvn88Nff8=;
- b=QV2JaguXZvM+kmXh9yR+2aGjX45f1WPT9Yx6K7ATHAMiBJzB8cBTa3khybQJ3LCfEeSC4dQUJAzW2qT3WHRB8ZdDqgQPz2oz0S0DetPOVCl6vmModsOALyx5k//eoCta6ZTGJhsyZmHmmi6vTQPuL8Y1G6J+fnKeIJQ1wv43aS1vgy/vHTFggUMjRXv0RKhjgQZNCmDnMhW541ruEzIN2omeLRNZK1GxqLnrweh5ebb3J8F6iYdsO/jRYkqdX/WG7bNKPfbgKratCK2k1Q46Rr6vU9F0u3nH12D0gDLIzp5Yq0RHV6Am6pXYTlNfBvJqUcV7w0wOOhjlr/MDASQriw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dVyzjjWM2aOr78A/+nKv/zx3TsOLvDoTLWdvn88Nff8=;
- b=KMoiS7cFj5E4FYVBW99wkUmUUYo27PDHB8VAK+1w3/wrSpSCg7km5p3UUD5LHla/nBDvHs3N6ljQnPNZmGAOGbOwJUv9+FxiBjzNqdX7LXzRAp4NLqHqTP3i67TBJKvs0KqbF2U78vUru2oFsnaJT+JRCDBFkzAUfEwgSfBNmNs=
-Received: from MW3PR05CA0013.namprd05.prod.outlook.com (2603:10b6:303:2b::18)
- by BL1PR12MB5947.namprd12.prod.outlook.com (2603:10b6:208:39a::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5250.18; Mon, 16 May
- 2022 15:46:06 +0000
-Received: from CO1NAM11FT064.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:2b:cafe::4a) by MW3PR05CA0013.outlook.office365.com
- (2603:10b6:303:2b::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.5 via Frontend
- Transport; Mon, 16 May 2022 15:46:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT064.mail.protection.outlook.com (10.13.175.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5250.13 via Frontend Transport; Mon, 16 May 2022 15:46:04 +0000
-Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 16 May
- 2022 10:46:03 -0500
-From:   John Allen <john.allen@amd.com>
-To:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
-CC:     <seanjc@google.com>, <Thomas.Lendacky@amd.com>,
-        <Ashish.Kalra@amd.com>, <linux-kernel@vger.kernel.org>,
-        <theflow@google.com>, <rientjes@google.com>, <pgonda@google.com>,
-        John Allen <john.allen@amd.com>, <stable@vger.kernel.org>
-Subject: [PATCH v2] crypto: ccp - Use kzalloc for sev ioctl interfaces to prevent kernel memory leak
-Date:   Mon, 16 May 2022 15:45:11 +0000
-Message-ID: <20220516154512.259759-1-john.allen@amd.com>
-X-Mailer: git-send-email 2.25.1
+        Mon, 16 May 2022 11:53:34 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90931286E8
+        for <linux-crypto@vger.kernel.org>; Mon, 16 May 2022 08:53:29 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id h29so26634243lfj.2
+        for <linux-crypto@vger.kernel.org>; Mon, 16 May 2022 08:53:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EbahZ8s//MhvZATU5N16vyp5s7VaSnO5nIae4gl0gk0=;
+        b=ZP4hri7brP1qH58wG7aKs9+/EslXVGswsHOgXd3Rly2rJt/+O76tPfhxL7OwmpIwKG
+         6wxQXWKip2N/EbSsEuz8ZCxYCRYXfvipes/E3nYbQNtQdToMtCFZTl+dbTP2aNk37M9M
+         gkn5YyTaHT7izE374+uIt7ybmQc99y30uNZ+augubzOaQ7Hme6ZJ8C9uj5dwxNr6yOrv
+         itifkK9fRB+fkvL/kQ47zp+yg5CvyBsRLWTxZrPn/3NM3P10rrFzAU7DsLksyzRXTWpQ
+         Ze+X+dmzPJiFyVH2T14K1fYnM7qMHdH0cQuOcMtHoY6Rv+G6cu0e6ghaQJ5PT6NS9ayK
+         5C/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EbahZ8s//MhvZATU5N16vyp5s7VaSnO5nIae4gl0gk0=;
+        b=QTzoCMxPEI0i5iLFFrjQlYn/55fmcAEMdWf3gLwO1j2l+EG0WzCzpzgbkZk34HUzA3
+         KFXZXodbKMddsGNPaMQMfG9mzJiml1C3Pg9AdeecVZjeTs/QUUqOtGAQzTX4A5RdAdz0
+         0KoM/L6I/fuuyrGgU4qI3fsJZ3cPe2Dwd+2zzsJC3ksK1QVkBW7FTs4xZIU/CBxIV3Y/
+         4EWeACOVSjbj0OA0JsxCySvraXka9SIV1Q+EDCLJvGoluOglIpUkVEhUP5p4dFelbRol
+         Sk7unZs5L4IU6Xhj83ovJE6pie/PzVcfEn3KFgD1KKCVdwpSeuqiNVQxS8qkaX7OF7OG
+         /a5Q==
+X-Gm-Message-State: AOAM5307fOLt5lSEN7k8tFYIUxZCa2Qu5+pqzCIx3xRL38cVb5xWgys4
+        kp2x4HL5hHy6fYHwjwbZA75d9hWskf2fvQ1D+EgGB3wm/SNQDA==
+X-Google-Smtp-Source: ABdhPJxei5pzg/U2wRl0hGmPsf3kjsYStTXCMlzuL0wRt4xbfEY2ZaFF4tA7VhL8sWDgD3KFEkxl9RE8sbSWb/FOMc8=
+X-Received: by 2002:a05:6512:234c:b0:473:c3ba:2cf1 with SMTP id
+ p12-20020a056512234c00b00473c3ba2cf1mr13694486lfu.402.1652716407646; Mon, 16
+ May 2022 08:53:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2258ee79-9a73-41f9-d590-08da37532fcb
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5947:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB594722E32374682C788AA8239ACF9@BL1PR12MB5947.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fCpaxKE4AxQxztgu+0NYsalp2CL1rscsCLjvORUX7/spHaDGQdPzG/np0wyQamxSSHBIkTPo8nYtKNlDCrKUk5Z1o0F4QPRbn85TPEBvK8Ymwj3P3zHhq4bafQQpSA7AzZ7W19A/BtPV0W1DXhr324XCwMUeSuIJQNDEeoDGQQkTkeHV2gV/flFy57io+mxCvfSCknmJkBlahdVpcgXs+xS+niYOJPzlcBgeZKAa6qyoH9evXe8monDHvFbpDgjVr3MQ3MXTnvoPKj6Dtaxhv/Ddx/sMY0AY0iy5Bdwztl/fAPD/eiaml7IBpkFinEvCo8Eps6ah7M+j4wgIc4C46QBauZo2/j3RYsSRuD0z9m+Fw+89tyjnWy6UkzU5KKUYM0PYnQ9eDS7HPpcF5YCePMrikmRwkzcZ69/bOVXMaxGBzf+gVhgRsbMjtv4LT7Rib7sGiZMBHCUjqXTme3Ad/A32XzbI4CmrYm6FCioQZqP5MQVtxtgPZpzwbBgwTJKk6G0p/KYfqrQiHmuNL4DlspUOrWg9hpUWRLK9DyVWeR4AM4J3lGv/T2jHWrM1blfOH4KqaQ9gpwlnvoXSSmUamLj94gYVGz4oji2RzwWhSEpR2uMUG6ZAOo32M9FSBPnc5uz6jePIOwkhK34qvzRxx3VwzC3oiik8sLxrfvo0APuUZiRU39R45El6l18xebDYYBnK0FThFW++GwLw8dUCrQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(81166007)(44832011)(8936002)(40460700003)(5660300002)(508600001)(83380400001)(316002)(2906002)(2616005)(426003)(336012)(110136005)(16526019)(36860700001)(26005)(54906003)(47076005)(186003)(1076003)(82310400005)(8676002)(36756003)(86362001)(4326008)(356005)(7696005)(6666004)(70206006)(70586007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2022 15:46:04.7703
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2258ee79-9a73-41f9-d590-08da37532fcb
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT064.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5947
+References: <20220516154512.259759-1-john.allen@amd.com>
+In-Reply-To: <20220516154512.259759-1-john.allen@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 16 May 2022 08:53:16 -0700
+Message-ID: <CAMkAt6oUxUFtNS4W0bzu13oWMdfnzfNrphH3OqwAkmxJcXhOqw@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: ccp - Use kzalloc for sev ioctl interfaces to
+ prevent kernel memory leak
+To:     John Allen <john.allen@amd.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Nguyen <theflow@google.com>,
+        David Rientjes <rientjes@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For some sev ioctl interfaces, input may be passed that is less than or
-equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data that PSP
-firmware returns. In this case, kmalloc will allocate memory that is the
-size of the input rather than the size of the data. Since PSP firmware
-doesn't fully overwrite the buffer, the sev ioctl interfaces with the
-issue may return uninitialized slab memory.
+On Mon, May 16, 2022 at 8:46 AM John Allen <john.allen@amd.com> wrote:
+>
+> For some sev ioctl interfaces, input may be passed that is less than or
+> equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data that PSP
+> firmware returns. In this case, kmalloc will allocate memory that is the
+> size of the input rather than the size of the data. Since PSP firmware
+> doesn't fully overwrite the buffer, the sev ioctl interfaces with the
+> issue may return uninitialized slab memory.
+>
+> Currently, all of the ioctl interfaces in the ccp driver are safe, but
+> to prevent future problems, change all ioctl interfaces that allocate
+> memory with kmalloc to use kzalloc.
+>
+> Fixes: e799035609e15 ("crypto: ccp: Implement SEV_PEK_CSR ioctl command")
+> Fixes: 76a2b524a4b1d ("crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command")
+> Fixes: d6112ea0cb344 ("crypto: ccp - introduce SEV_GET_ID2 command")
+> Cc: stable@vger.kernel.org
+> Reported-by: Andy Nguyen <theflow@google.com>
+> Suggested-by: David Rientjes <rientjes@google.com>
+> Suggested-by: Peter Gonda <pgonda@google.com>
+> Signed-off-by: John Allen <john.allen@amd.com>
+> ---
+> v2:
+>   - Add fixes tags and CC stable@vger.kernel.org
+> ---
 
-Currently, all of the ioctl interfaces in the ccp driver are safe, but
-to prevent future problems, change all ioctl interfaces that allocate
-memory with kmalloc to use kzalloc.
 
-Fixes: e799035609e15 ("crypto: ccp: Implement SEV_PEK_CSR ioctl command")
-Fixes: 76a2b524a4b1d ("crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command")
-Fixes: d6112ea0cb344 ("crypto: ccp - introduce SEV_GET_ID2 command")
-Cc: stable@vger.kernel.org
-Reported-by: Andy Nguyen <theflow@google.com>
-Suggested-by: David Rientjes <rientjes@google.com>
-Suggested-by: Peter Gonda <pgonda@google.com>
-Signed-off-by: John Allen <john.allen@amd.com>
----
-v2:
-  - Add fixes tags and CC stable@vger.kernel.org
----
- drivers/crypto/ccp/sev-dev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+{
+struct sev_user_data_status data;
+int ret;
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 6ab93dfd478a..e2298843ea8a 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -604,7 +604,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
- 	if (input.length > SEV_FW_BLOB_MAX_SIZE)
- 		return -EFAULT;
- 
--	blob = kmalloc(input.length, GFP_KERNEL);
-+	blob = kzalloc(input.length, GFP_KERNEL);
- 	if (!blob)
- 		return -ENOMEM;
- 
-@@ -828,7 +828,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 	input_address = (void __user *)input.address;
- 
- 	if (input.address && input.length) {
--		id_blob = kmalloc(input.length, GFP_KERNEL);
-+		id_blob = kzalloc(input.length, GFP_KERNEL);
- 		if (!id_blob)
- 			return -ENOMEM;
- 
-@@ -947,14 +947,14 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
- 		return -EFAULT;
- 
--	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
-+	pdh_blob = kzalloc(input.pdh_cert_len, GFP_KERNEL);
- 	if (!pdh_blob)
- 		return -ENOMEM;
- 
- 	data.pdh_cert_address = __psp_pa(pdh_blob);
- 	data.pdh_cert_len = input.pdh_cert_len;
- 
--	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
-+	cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
- 	if (!cert_blob) {
- 		ret = -ENOMEM;
- 		goto e_free_pdh;
--- 
-2.34.1
+ret = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, &data, &argp->error);
+if (ret)
+return ret;
 
+if (copy_to_user((void __user *)argp->data, &data, sizeof(data)))
+ret = -EFAULT;
+
+return ret;
+}
+
+Would it be safer to memset @data here to all zeros too?
