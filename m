@@ -2,152 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C816C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 10:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 649CDC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 10:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234015AbiEQK1u (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 06:27:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55188 "EHLO
+        id S1344532AbiEQKqP (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 06:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344397AbiEQKZK (ORCPT
+        with ESMTP id S231134AbiEQKqO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 06:25:10 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C5CDFB
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 03:24:48 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nquNW-00061W-Qk; Tue, 17 May 2022 12:24:34 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nquNW-002r1Z-T0; Tue, 17 May 2022 12:24:33 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nquNU-00AI12-St; Tue, 17 May 2022 12:24:32 +0200
-Date:   Tue, 17 May 2022 12:24:32 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: Bug in atmel-ecc driver
-Message-ID: <20220517102432.pljcsjkar3oswdnl@pengutronix.de>
-References: <20220513135954.exewihnibnhdckkn@pengutronix.de>
+        Tue, 17 May 2022 06:46:14 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CFD76250;
+        Tue, 17 May 2022 03:46:13 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id D0E541F8A6;
+        Tue, 17 May 2022 10:46:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1652784371; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CrqyxTgDDbPMICiLN/JVfD2ePciVDSch7V2FdjTNLhM=;
+        b=ACn2Dz7yp7KXjxQJF0PCdh1Qkl7ohIYkCniXIeUpehEzGSQ+jUi2Vm9WUi1Swzzw/hiuLL
+        e+p8bhxJ/XxbNSRhmV3ZNPjjiwo6znMTsxWtWQUYIs5Sp+HRlm/17u1cEvB23qn5qCUKVZ
+        d5K3eg6tVNnW1XExbtbv8Elb3PmjT3s=
+Received: from suse.cz (unknown [10.100.201.202])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 7628C2C141;
+        Tue, 17 May 2022 10:46:11 +0000 (UTC)
+Date:   Tue, 17 May 2022 12:46:08 +0200
+From:   Petr Mladek <pmladek@suse.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH] random: remove mostly unused async readiness notifier
+Message-ID: <YoN88JdmiTO39nqk@alley>
+References: <YoD7hn4yBHE0RYUa@zx2c4.com>
+ <20220515131927.474097-1-Jason@zx2c4.com>
+ <YoNlNs7vGcAy8rU3@alley>
+ <YoNvb265RG5pOObU@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="nyzsmgemgobidxym"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220513135954.exewihnibnhdckkn@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <YoNvb265RG5pOObU@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue 2022-05-17 11:48:31, Jason A. Donenfeld wrote:
+> Hi Petr,
+> 
+> On Tue, May 17, 2022 at 11:04:54AM +0200, Petr Mladek wrote:
+> > I would go even further. The workqueue is needed only because we are not
+> > able to switch the static branch in an atomic context.
+> > 
+> > But the static branch looks like an over-optimization.
+> > vsprintf() is a slow path. It will be enough to use a normal
+> > variable.
+> > 
+> > Well, it would be nice to check it without the spinlock to keep it
+> > fast and avoid problems with the spin lock during panic().
+> > 
+> > What about?
+> 
+> That all makes sense to me, but I'm a bit worried about changing too
+> much from the original design in a commit mostly intended on removing
+> things from random.c. Maybe we can do the patch I sent here, and then
+> once that lands in 5.19, we can do some more simplifications as
+> standalone commits that you can assess. Or if you're adamant about doing
+> this now, maybe you can send a patch that I can apply on _top_ of this
+> commit here?
+> 
+> The reason I'm a bit cautious is because I recall the original code from
+> Tobin way back had some smp_wmb() just like this, but it got removed and
+> replaced with that static branch. So at least somebody felt differently
+> about it. Which means it'll probably be a whole discussion with more
+> people, and I'm probably not the right person to lead that.
 
---nyzsmgemgobidxym
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fair enough.
 
-Hello,
+> > Well, your approach with static_key is fine as well. Feel free
+> > to use:
+> > 
+> > Acked-by: Petr Mladek <pmladek@suse.com>
+> 
+> Okay, I'll do this. And then let's circle around the memory barriers
+> whenever you feel like it later.
 
-[added Ard to Cc as he last touched that driver]
+OK, let's stick with your version in 5.19.
 
-On Fri, May 13, 2022 at 03:59:54PM +0200, Uwe Kleine-K=F6nig wrote:
-> TL;DR: when a device bound to the drivers/crypto/atmel-ecc.c driver is
-> unbound while tfm_count isn't zero, this probably results in a
-> use-after-free.
->=20
-> The .remove function has:
->=20
-> 	if (atomic_read(&i2c_priv->tfm_count)) {
->                 dev_err(&client->dev, "Device is busy\n");
->                 return -EBUSY;
->         }
->=20
-> before actually calling the cleanup stuff. If this branch is hit the
-> result is likely:
->=20
->  - "Device is busy" from drivers/crypto/atmel-ecc.c
->  - "remove failed (EBUSY), will be ignored" from the i2c core
->  - the devm cleanup callbacks are called, including the one kfreeing
->    *i2c_priv
->  - at a later time atmel_ecc_i2c_client_free() is called which does
->    atomic_dec(&i2c_priv->tfm_count);
->  - *boom*
->=20
-> I think to fix that you need to call get_device for the i2c device
-> before increasing tfm_count (and a matching put_device when decreasing
-> it). Having said that the architecture of this driver looks strange to
-> me, so there might be nicer fixes (probably with more effort).
+I will later send a patch with the barriers when time permits.
+But it will probably be for the next release.
 
-I tried to understand the architecture a bit, what I found is
-irritating. So the atmel-ecc driver provides a static struct kpp_alg
-atmel_ecdh_nist_p256 which embeds a struct crypto_alg (.base). During
-=2Eprobe() it calls crypto_register_kpp on that global kpp_alg. That is,
-if there are two or more devices bound to this driver, the same kpp_alg
-structure is registered repeatedly.  This involves (among others)
-
- - refcount_set(&atmel_ecdh_nist_p256.base.cra_refcount)
-   in crypto_check_alg()
- - INIT_LIST_HEAD(&atmel_ecdh_nist_p256.base.cra_users)
-   in __crypto_register_alg()
-
-and then a check about registering the same alg twice which makes the
-call crypto_register_alg() return -EEXIST. So if a second device is
-bound, it probably corrupts the first device and then fails to probe.
-
-So there can always be (at most) only one bound device which somehow
-makes the whole logic in atmel_ecdh_init_tfm ->
-atmel_ecc_i2c_client_alloc to select the least used(?) i2c client among
-all the bound devices ridiculous.
-
-Is there someone still caring for this driver? Does this justify=20
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 7b2d138bc83e..b3242fba82aa 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -573,6 +573,7 @@ config CRYPTO_DEV_ATMEL_I2C
-=20
- config CRYPTO_DEV_ATMEL_ECC
- 	tristate "Support for Microchip / Atmel ECC hw accelerator"
-+	depends on BROKEN
- 	depends on I2C
- 	select CRYPTO_DEV_ATMEL_I2C
- 	select CRYPTO_ECDH
-
-?
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---nyzsmgemgobidxym
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKDd9cACgkQwfwUeK3K
-7Alnuwf9ECdi4grneYiBAliu6gFKQduRiVrgt3b8bhatN+TwhigWTC9csf8M/KVx
-vVd2VMqnMRD79u1IcJMC/uo4ts5jxhPDqZMau5Qc/8WgS5Ug8V/R4+SLGBq+vsUA
-ZQgBqdldd90AmhMZpAleqbdDKPiyvJKKQ7OZv7T97rqwgrTGZqdZmuYZ4QZOaqY9
-JAb5LE5ufdKgXe/jlpkg/K/sgBrJSBa4Fu6AjEoqYQ7jxiyOuzOCky8nsA0CE4+o
-oWdxtJj5fLoJeBWZ17AbWojcrGBrgGq5vlPOtxyH5wDhTNrRayVpxLS8tlxnX0dd
-SUliftAkPVyncECJrau5JIIb4N4apQ==
-=7Loo
------END PGP SIGNATURE-----
-
---nyzsmgemgobidxym--
+Best Regards,
+Petr
