@@ -2,52 +2,54 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51463C433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 14:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E99CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 14:10:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243536AbiEQOKS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 10:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55272 "EHLO
+        id S1343711AbiEQOK0 (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 10:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348443AbiEQOKQ (ORCPT
+        with ESMTP id S243867AbiEQOKT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 10:10:16 -0400
+        Tue, 17 May 2022 10:10:19 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D8874D27A
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:10:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB5D44A3F5
+        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:10:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652796615; x=1684332615;
+  t=1652796618; x=1684332618;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uh8wZpGlbtliOx5pRsYfD2228cK0+KdtmYhN5xabZJM=;
-  b=MUhTpYMcVNT4bjTdE5L19ttMwqXGIKyYkrNl9YnYJLR0ocDMaMFucBer
-   AV1yoPguVboXuR8lm/En5YS5Ta5yI+T7mp9LwePJnfNaaZcir/kbjknaH
-   3dQinbpTspVT/fC44+s/OKrD6u+JdozYqKwNSL+11qlOJJJGkaBgXsZBd
-   bkVI+Yy+wpcEGBaT1r4hsjgmKiDodb2UBo62SingZBxQNMGKrQSXfahhA
-   aUKJDoGUXMrfi2C5xJMzQnQxLZfSHDop4rjttmORD/K+0cB8S6jhkbaJS
-   mYWgamUcJk8D09cLHFTO+nnO1NeaKtY3ochFfAXwacJeD7SZtQs4xTG+v
+  bh=FmVCP4ZOgkPTIhHx9ZRJQDicKXa+kof2ExDVWbvuk9k=;
+  b=WDx59cEAdiHper/w5Kv9JwmWFw0UPah+mkx2AXRfP7k7Dm4FKbGuNx2x
+   8SpzRKpVHuID7RpRYzPaj2meBfGY1aHYswzfAxDu+CB6iWnz+w5qf+nne
+   hl4tv4Oh9VBqn611TXbdJG33TXR0yZ7/vTJRTIDMB1aHZnCaPCWESo1uC
+   eLneZmAAcOa6Z8C8ZfISF51sCia0oGmeeSuGvynvGZ84gsUd00l2+ohDM
+   psdb4SgJASi/7Q0dd2uJqAn3j1TVRSO5pfNWmCY88zfSS1CLlwNPRP85+
+   qXIolqMM7oqcTtcz1KVsVkx1G32sQWV7Gadp239QkX5ujIk3qM/jueYZb
    g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="268777803"
+X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="268777821"
 X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="268777803"
+   d="scan'208";a="268777821"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 07:10:15 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 07:10:18 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.91,233,1647327600"; 
-   d="scan'208";a="816916473"
+   d="scan'208";a="816916491"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.76])
-  by fmsmga006.fm.intel.com with ESMTP; 17 May 2022 07:10:13 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 17 May 2022 07:10:15 -0700
 From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To:     herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
         vdronov@redhat.com, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
         Adam Guerin <adam.guerin@intel.com>,
         Fiona Trahe <fiona.trahe@intel.com>,
         Wojciech Ziemba <wojciech.ziemba@intel.com>
-Subject: [PATCH 3/4] crypto: qat - relocate and rename adf_sriov_prepare_restart()
-Date:   Tue, 17 May 2022 15:10:01 +0100
-Message-Id: <20220517141002.32385-4-giovanni.cabiddu@intel.com>
+Subject: [PATCH 4/4] crypto: qat - expose device config through sysfs for 4xxx
+Date:   Tue, 17 May 2022 15:10:02 +0100
+Message-Id: <20220517141002.32385-5-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220517141002.32385-1-giovanni.cabiddu@intel.com>
 References: <20220517141002.32385-1-giovanni.cabiddu@intel.com>
@@ -58,115 +60,184 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The function adf_sriov_prepare_restart() is used in adf_sriov.c to stop
-and shutdown a device preserving its configuration.
+qat_4xxx devices can be configured to allow either crypto or compression
+operations. At the moment, devices are configured statically according to
+the following rule:
+- odd numbered devices assigned to compression services
+- even numbered devices assigned to crypto services
 
-Since this function will be re-used by the logic that allows to
-reconfigure the device through sysfs, move it to adf_init.c and rename
-it as adf_dev_shutdown_cache_cfg();
+Expose the sysfs attribute /sys/bus/pci/devices/<BDF>/qat/cfg_services
+to allow to detect the configuration of a device and to change it.
+
+The `cfg_service` attribute is only exposed for qat_4xxx devices and it
+is limited to two configurations: (1) "sym;asym" for crypto services and
+"dc" for compression services.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Co-developed-by: Tomasz Kowallik <tomaszx.kowalik@intel.com>
+Signed-off-by: Tomasz Kowallik <tomaszx.kowalik@intel.com>
 Reviewed-by: Adam Guerin <adam.guerin@intel.com>
 Reviewed-by: Fiona Trahe <fiona.trahe@intel.com>
 Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
 ---
- .../crypto/qat/qat_common/adf_common_drv.h    |  1 +
- drivers/crypto/qat/qat_common/adf_init.c      | 26 +++++++++++++++++
- drivers/crypto/qat/qat_common/adf_sriov.c     | 28 +------------------
- 3 files changed, 28 insertions(+), 27 deletions(-)
+ Documentation/ABI/testing/sysfs-driver-qat | 37 ++++++++++
+ drivers/crypto/qat/qat_common/adf_sysfs.c  | 80 ++++++++++++++++++++--
+ 2 files changed, 113 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/qat/qat_common/adf_common_drv.h b/drivers/crypto/qat/qat_common/adf_common_drv.h
-index 0f3031f9055d..b6104f8c3571 100644
---- a/drivers/crypto/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/qat/qat_common/adf_common_drv.h
-@@ -61,6 +61,7 @@ int adf_dev_init(struct adf_accel_dev *accel_dev);
- int adf_dev_start(struct adf_accel_dev *accel_dev);
- void adf_dev_stop(struct adf_accel_dev *accel_dev);
- void adf_dev_shutdown(struct adf_accel_dev *accel_dev);
-+int adf_dev_shutdown_cache_cfg(struct adf_accel_dev *accel_dev);
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
+index 0915253efaa3..58a4152f5180 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat
++++ b/Documentation/ABI/testing/sysfs-driver-qat
+@@ -19,3 +19,40 @@ Description:	Reports the current state of the QAT device and allows to
+ 		if the device is up and vice versa.
  
- void adf_devmgr_update_class_index(struct adf_hw_device_data *hw_data);
- void adf_clean_vf_map(bool);
-diff --git a/drivers/crypto/qat/qat_common/adf_init.c b/drivers/crypto/qat/qat_common/adf_init.c
-index c2c718f1b489..33a9a46d6949 100644
---- a/drivers/crypto/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/qat/qat_common/adf_init.c
-@@ -363,3 +363,29 @@ int adf_dev_restarted_notify(struct adf_accel_dev *accel_dev)
- 	}
- 	return 0;
- }
+ 		This attribute is only available for qat_4xxx devices.
 +
-+int adf_dev_shutdown_cache_cfg(struct adf_accel_dev *accel_dev)
++What:		/sys/bus/pci/devices/<BDF>/qat/cfg_services
++Date:		June 2022
++KernelVersion:	5.19
++Contact:	qat-linux@intel.com
++Description:	Reports the current configuration of the QAT device and allows
++		to change it.
++
++		This attribute is RW.
++
++		Returned values:
++			sym;asym:	the device is configured for running
++					crypto services
++			dc:		the device is configured for running
++					compression services
++
++		Allowed values:
++			sym;asym:	configure the device for running
++					crypto services
++			dc:		configure the device for running
++					compression services
++
++		It is possible to set the configuration only if the device
++		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
++
++		The following example shows how to change the configuration of
++		a device configured for running crypto services in order to
++		run data compression:
++			# cat /sys/bus/pci/devices/<BDF>/qat/state
++			up
++			# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
++			sym;asym
++			# echo down > /sys/bus/pci/devices/<BDF>/qat/state
++			# echo dc > /sys/bus/pci/devices/<BDF>/qat/cfg_services
++			# echo up > /sys/bus/pci/devices/<BDF>/qat/state
++
++		This attribute is only available for qat_4xxx devices.
+diff --git a/drivers/crypto/qat/qat_common/adf_sysfs.c b/drivers/crypto/qat/qat_common/adf_sysfs.c
+index 8f47a5694dd7..e8b078e719c2 100644
+--- a/drivers/crypto/qat/qat_common/adf_sysfs.c
++++ b/drivers/crypto/qat/qat_common/adf_sysfs.c
+@@ -58,8 +58,9 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
+ 
+ 		dev_info(dev, "Stopping device qat_dev%d\n", accel_id);
+ 
+-		adf_dev_stop(accel_dev);
+-		adf_dev_shutdown(accel_dev);
++		ret = adf_dev_shutdown_cache_cfg(accel_dev);
++		if (ret < 0)
++			return -EINVAL;
+ 
+ 		break;
+ 	case DEV_UP:
+@@ -80,8 +81,7 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
+ 		if (ret < 0) {
+ 			dev_err(dev, "Failed to start device qat_dev%d\n",
+ 				accel_id);
+-			adf_dev_stop(accel_dev);
+-			adf_dev_shutdown(accel_dev);
++			adf_dev_shutdown_cache_cfg(accel_dev);
+ 			return ret;
+ 		}
+ 		break;
+@@ -92,10 +92,82 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
+ 	return count;
+ }
+ 
++static const char * const services_operations[] = {
++	ADF_CFG_CY,
++	ADF_CFG_DC,
++};
++
++static ssize_t cfg_services_show(struct device *dev, struct device_attribute *attr,
++				 char *buf)
 +{
 +	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
++	struct adf_accel_dev *accel_dev;
 +	int ret;
++
++	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
++	if (!accel_dev)
++		return -EINVAL;
 +
 +	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
 +				      ADF_SERVICES_ENABLED, services);
++	if (ret)
++		return ret;
 +
-+	adf_dev_stop(accel_dev);
-+	adf_dev_shutdown(accel_dev);
++	return sysfs_emit(buf, "%s\n", services);
++}
 +
-+	if (!ret) {
-+		ret = adf_cfg_section_add(accel_dev, ADF_GENERAL_SEC);
-+		if (ret)
-+			return ret;
++static int adf_sysfs_update_dev_config(struct adf_accel_dev *accel_dev,
++				       const char *services)
++{
++	return adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
++					   ADF_SERVICES_ENABLED, services,
++					   ADF_STR);
++}
 +
-+		ret = adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
-+						  ADF_SERVICES_ENABLED,
-+						  services, ADF_STR);
-+		if (ret)
-+			return ret;
++static ssize_t cfg_services_store(struct device *dev, struct device_attribute *attr,
++				  const char *buf, size_t count)
++{
++	struct adf_hw_device_data *hw_data;
++	struct adf_accel_dev *accel_dev;
++	int ret;
++
++	ret = sysfs_match_string(services_operations, buf);
++	if (ret < 0)
++		return ret;
++
++	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
++	if (!accel_dev)
++		return -EINVAL;
++
++	if (adf_dev_started(accel_dev)) {
++		dev_info(dev, "Device qat_dev%d must be down to reconfigure the service.\n",
++			 accel_dev->accel_id);
++		return -EINVAL;
 +	}
 +
-+	return 0;
++	ret = adf_sysfs_update_dev_config(accel_dev, services_operations[ret]);
++	if (ret < 0)
++		return ret;
++
++	hw_data = GET_HW_DATA(accel_dev);
++
++	/* Update capabilities mask after change in configuration.
++	 * A call to this function is required as capabilities are, at the
++	 * moment, tied to configuration
++	 */
++	hw_data->accel_capabilities_mask = hw_data->get_accel_cap(accel_dev);
++	if (!hw_data->accel_capabilities_mask)
++		return -EINVAL;
++
++	return count;
 +}
-diff --git a/drivers/crypto/qat/qat_common/adf_sriov.c b/drivers/crypto/qat/qat_common/adf_sriov.c
-index f38b2ffde146..b2db1d70d71f 100644
---- a/drivers/crypto/qat/qat_common/adf_sriov.c
-+++ b/drivers/crypto/qat/qat_common/adf_sriov.c
-@@ -120,32 +120,6 @@ void adf_disable_sriov(struct adf_accel_dev *accel_dev)
- }
- EXPORT_SYMBOL_GPL(adf_disable_sriov);
++
+ static DEVICE_ATTR_RW(state);
++static DEVICE_ATTR_RW(cfg_services);
  
--static int adf_sriov_prepare_restart(struct adf_accel_dev *accel_dev)
--{
--	char services[ADF_CFG_MAX_VAL_LEN_IN_BYTES] = {0};
--	int ret;
--
--	ret = adf_cfg_get_param_value(accel_dev, ADF_GENERAL_SEC,
--				      ADF_SERVICES_ENABLED, services);
--
--	adf_dev_stop(accel_dev);
--	adf_dev_shutdown(accel_dev);
--
--	if (!ret) {
--		ret = adf_cfg_section_add(accel_dev, ADF_GENERAL_SEC);
--		if (ret)
--			return ret;
--
--		ret = adf_cfg_add_key_value_param(accel_dev, ADF_GENERAL_SEC,
--						  ADF_SERVICES_ENABLED,
--						  services, ADF_STR);
--		if (ret)
--			return ret;
--	}
--
--	return 0;
--}
--
- /**
-  * adf_sriov_configure() - Enable SRIOV for the device
-  * @pdev:  Pointer to PCI device.
-@@ -185,7 +159,7 @@ int adf_sriov_configure(struct pci_dev *pdev, int numvfs)
- 			return -EBUSY;
- 		}
+ static struct attribute *qat_attrs[] = {
+ 	&dev_attr_state.attr,
++	&dev_attr_cfg_services.attr,
+ 	NULL,
+ };
  
--		ret = adf_sriov_prepare_restart(accel_dev);
-+		ret = adf_dev_shutdown_cache_cfg(accel_dev);
- 		if (ret)
- 			return ret;
- 	}
 -- 
 2.36.1
 
