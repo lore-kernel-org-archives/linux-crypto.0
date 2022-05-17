@@ -2,120 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE64C433FE
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 14:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8028CC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 14:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348926AbiEQObJ (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 10:31:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53830 "EHLO
+        id S238736AbiEQOdj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 10:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348966AbiEQObE (ORCPT
+        with ESMTP id S229727AbiEQOdi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 10:31:04 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6823817072
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:31:02 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id f2so18014758wrc.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:31:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wVhR+tLTgWRBv165klscGkwBvwtkGY4K+gXBpaEt39o=;
-        b=AVNWGASSw6V5RUrPE0Xe922Dr1PoPah/DHCQjXENO9s0HFGB/eYpWl6axQWl/QnFZH
-         uRmMiarJD/nw2TwKyvyACE+uNu/LtM636YM+bXBmDWbMz/LvizwmSvb0uhzKoKggSF9I
-         RddWK4xmLBsCErMkW0NkfvF8unM5J4Sy7tB4XDdauDZT+qkVIm80Ijx7DdSpJQlMeNUQ
-         9MruKiM1t0I8MvBJdkw8JEuhdV4K7V79+VHa98U7QbGacXpl6JEqLz3ahlSfKlJq2FYV
-         w4pzBlJMAMO9CapLPiqmyQnhrxlET8Is5fQXqESFEI2JcPHofkbd9BYb47Gp15j9BJBN
-         XJ8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wVhR+tLTgWRBv165klscGkwBvwtkGY4K+gXBpaEt39o=;
-        b=3fAO5RFWPnb1SOLfU9pn/KNv+A55WuEf6ynEpIwNImCcxT6qnwKl8+5K0ELR29l6Tp
-         /pNkchyovbPHlADAXGLjbEn4E5UYKWDybh4SyIp5srKQnKzde2He/xDFux+7ZoFjYjrp
-         PS6PdscuNYUt2B6ozMtwDuexA2Pv/QQTZUm36s5gKMzVlQDirsea/he/p47EDKgheqwk
-         uEtxhNFP9XDCVLXuGgyg+GDQnaKPzZPrcnyX/c9kZa8Gs0p9OKHgoCt41cWLrQTqnRyQ
-         2DmgnBMryAhWTdQdn+hR7q1xwCzDHXC7XC1wHNpvbOxfPB7zXE9YgW42BGzLaoyzRjf+
-         OmQw==
-X-Gm-Message-State: AOAM532kJG/fwGzzll6Q562D3oKgubpH1g14mx/YqAcM+MqmJeU06YH+
-        iGkAKjFup5CGAkAQZbXPlq31ZpJlyCrKuQ==
-X-Google-Smtp-Source: ABdhPJy3hzj7GtXAEMbX3XakDsp6tLitaXQroFjB5zMWxiGotgppusI9e/fS5ffNwObVzm/mABJOww==
-X-Received: by 2002:adf:ef8a:0:b0:20d:1028:3c36 with SMTP id d10-20020adfef8a000000b0020d10283c36mr6256611wro.481.1652797860454;
-        Tue, 17 May 2022 07:31:00 -0700 (PDT)
-Received: from localhost ([2a00:79e0:9d:4:b946:2cd:4ff6:1fbf])
-        by smtp.gmail.com with ESMTPSA id m6-20020a05600c460600b003942a244f2fsm1956398wmo.8.2022.05.17.07.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 07:30:59 -0700 (PDT)
-From:   Jann Horn <jannh@google.com>
-To:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] s390/crypto: fix scatterwalk_unmap() callers in AES-GCM
-Date:   Tue, 17 May 2022 16:30:47 +0200
-Message-Id: <20220517143047.3054498-1-jannh@google.com>
-X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+        Tue, 17 May 2022 10:33:38 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF7926136
+        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:33:36 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nqyGK-0000vx-JO; Tue, 17 May 2022 16:33:24 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nqyGK-002tMI-Vi; Tue, 17 May 2022 16:33:23 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nqyGI-00AK2F-Vy; Tue, 17 May 2022 16:33:22 +0200
+Date:   Tue, 17 May 2022 16:33:19 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Tudor.Ambarus@microchip.com
+Cc:     alexandre.belloni@bootlin.com, ard.biesheuvel@linaro.org,
+        Nicolas.Ferre@microchip.com, linux-crypto@vger.kernel.org,
+        kernel@pengutronix.de, Claudiu.Beznea@microchip.com,
+        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
+Subject: Re: Bug in atmel-ecc driver
+Message-ID: <20220517143319.oi7cpgqumv2gn2l6@pengutronix.de>
+References: <20220513135954.exewihnibnhdckkn@pengutronix.de>
+ <20220517102432.pljcsjkar3oswdnl@pengutronix.de>
+ <99a8c7b0-ca73-25a2-f839-9a96cc0989e4@microchip.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="bgupnwbm6q7iq7pz"
+Content-Disposition: inline
+In-Reply-To: <99a8c7b0-ca73-25a2-f839-9a96cc0989e4@microchip.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The argument of scatterwalk_unmap() is supposed to be the void* that was
-returned by the previous scatterwalk_map() call.
-The s390 AES-GCM implementation was instead passing the pointer to the
-struct scatter_walk.
 
-This doesn't actually break anything because scatterwalk_unmap() only uses
-its argument under CONFIG_HIGHMEM and ARCH_HAS_FLUSH_ON_KUNMAP.
+--bgupnwbm6q7iq7pz
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Note that I have not tested this patch in any way, not even compile-tested
-it.
+Hi,
 
-Fixes: bf7fa038707c ("s390/crypto: add s390 platform specific aes gcm suppo=
-rt.")
-Signed-off-by: Jann Horn <jannh@google.com>
----
-IDK which tree this has to go through - s390 or crypto?
-maybe s390 is better, since they can actually test it?
+On Tue, May 17, 2022 at 01:11:22PM +0000, Tudor.Ambarus@microchip.com wrote:
+> On 5/17/22 13:24, Uwe Kleine-K=F6nig wrote:
+> > On Fri, May 13, 2022 at 03:59:54PM +0200, Uwe Kleine-K=F6nig wrote:
+> >> TL;DR: when a device bound to the drivers/crypto/atmel-ecc.c driver is
+> >> unbound while tfm_count isn't zero, this probably results in a
+> >> use-after-free.
+> >>
+> >> The .remove function has:
+> >>
+> >> 	if (atomic_read(&i2c_priv->tfm_count)) {
+> >>                 dev_err(&client->dev, "Device is busy\n");
+> >>                 return -EBUSY;
+> >>         }
+> >>
+> >> before actually calling the cleanup stuff. If this branch is hit the
+> >> result is likely:
+> >>
+> >>  - "Device is busy" from drivers/crypto/atmel-ecc.c
+> >>  - "remove failed (EBUSY), will be ignored" from the i2c core
+> >>  - the devm cleanup callbacks are called, including the one kfreeing
+> >>    *i2c_priv
+> >>  - at a later time atmel_ecc_i2c_client_free() is called which does
+> >>    atomic_dec(&i2c_priv->tfm_count);
+> >>  - *boom*
+> >>
+> >> I think to fix that you need to call get_device for the i2c device
+> >> before increasing tfm_count (and a matching put_device when decreasing
+> >> it). Having said that the architecture of this driver looks strange to
+> >> me, so there might be nicer fixes (probably with more effort).
+> > I tried to understand the architecture a bit, what I found is
+> > irritating. So the atmel-ecc driver provides a static struct kpp_alg
+> > atmel_ecdh_nist_p256 which embeds a struct crypto_alg (.base). During
+> > .probe() it calls crypto_register_kpp on that global kpp_alg. That is,
+> > if there are two or more devices bound to this driver, the same kpp_alg
+> > structure is registered repeatedly.  This involves (among others)
+> >=20
+> >  - refcount_set(&atmel_ecdh_nist_p256.base.cra_refcount)
+> >    in crypto_check_alg()
+> >  - INIT_LIST_HEAD(&atmel_ecdh_nist_p256.base.cra_users)
+> >    in __crypto_register_alg()
+> >=20
+> > and then a check about registering the same alg twice which makes the
+> > call crypto_register_alg() return -EEXIST. So if a second device is
+> > bound, it probably corrupts the first device and then fails to probe.
+> >=20
+> > So there can always be (at most) only one bound device which somehow
+> > makes the whole logic in atmel_ecdh_init_tfm ->
+> > atmel_ecc_i2c_client_alloc to select the least used(?) i2c client among
+> > all the bound devices ridiculous.
+>=20
+> It's been a while since I last worked with ateccx08, but as far as I reme=
+mber
+> it contains 3 crypto IPs (ecdh, ecdsa, sha) that communicate over the same
+> i2c address. So if someone adds support for all algs and plug in multiple
+> ateccx08 devices, then the distribution of tfms across the i2c clients ma=
+y work.
 
- arch/s390/crypto/aes_s390.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It would require to register the crypto backends independent of the
+=2Eprobe() routine though.
 
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index 54c7536f2482..1023e9d43d44 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -701,7 +701,7 @@ static inline void _gcm_sg_unmap_and_advance(struct gcm=
-_sg_walk *gw,
- 					     unsigned int nbytes)
- {
- 	gw->walk_bytes_remain -=3D nbytes;
--	scatterwalk_unmap(&gw->walk);
-+	scatterwalk_unmap(gw->walk_ptr);
- 	scatterwalk_advance(&gw->walk, nbytes);
- 	scatterwalk_done(&gw->walk, 0, gw->walk_bytes_remain);
- 	gw->walk_ptr =3D NULL;
-@@ -776,7 +776,7 @@ static int gcm_out_walk_go(struct gcm_sg_walk *gw, unsi=
-gned int minbytesneeded)
- 		goto out;
+> Anyway, if you feel that the complexity is superfluous as the code is now=
+, we
+> can get rid of the i2c_client_alloc logic and add it later on when/if nee=
+ded.
+
+If it's you who acts, do whatever pleases you. If it's me I'd go for a
+quick and simple solution to get back to what I originally want to do
+with this driver.
+
+So I'd go for something like
+
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 333fbefbbccb..e7f3f4793c55 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -349,8 +349,13 @@ static int atmel_ecc_remove(struct i2c_client *client)
+=20
+ 	/* Return EBUSY if i2c client already allocated. */
+ 	if (atomic_read(&i2c_priv->tfm_count)) {
+-		dev_err(&client->dev, "Device is busy\n");
+-		return -EBUSY;
++		/*
++		 * After we return here, the memory backing the device is freed.
++		 * If there is still some action pending, it probably involves
++		 * accessing free'd memory.
++		 */
++		dev_emerg(&client->dev, "Hell is about to break loose, expect memory cor=
+ruption.\n");
++		return 0;
  	}
 =20
--	scatterwalk_unmap(&gw->walk);
-+	scatterwalk_unmap(gw->walk_ptr);
- 	gw->walk_ptr =3D NULL;
-=20
- 	gw->ptr =3D gw->buf;
+ 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
 
-base-commit: 42226c989789d8da4af1de0c31070c96726d990c
+because I'm not in yacc-shaving mood.
+
+Best regards
+Uwe
+
 --=20
-2.36.0.550.gb090851708-goog
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
+--bgupnwbm6q7iq7pz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKDsisACgkQwfwUeK3K
+7Al2Vgf8CfAKHRZam68ITA4P6icvgd9nGZCJMHKglR31hgW+gbRhyXbebPtd6aDN
+5RYa9llhoy5Vtnokj4+VPOHj4yZar8o0gJoMtltSc6RkfUFNOk3gkOWacaWQFdBZ
+UO5a87Uc3yMP+JwGlMbXifdXZ+tChkQ2C6l1VD1po+z1m5kpDD509aglXkNMt2VT
+PIpbKNFg5+sqK0dYjHpjGU+8HWt3KOxxUyRrPnMljwxpEZUghnBsrorc9C+OtHVW
++hv3QXe05E4wGRr8slgcyXB4Or8WCRQGvitbQrG7XPsq+r/84UUecMvipNfHcpJ3
++KoMXpS+uTs8FFV9/Xmu2oJXpWo4+g==
+=QNLN
+-----END PGP SIGNATURE-----
+
+--bgupnwbm6q7iq7pz--
