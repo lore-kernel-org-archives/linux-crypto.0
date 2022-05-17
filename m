@@ -2,179 +2,175 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8028CC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 14:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4577BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 15:40:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238736AbiEQOdj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 10:33:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60700 "EHLO
+        id S1343736AbiEQPkT (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 11:40:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbiEQOdi (ORCPT
+        with ESMTP id S230267AbiEQPkS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 10:33:38 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF7926136
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 07:33:36 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nqyGK-0000vx-JO; Tue, 17 May 2022 16:33:24 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nqyGK-002tMI-Vi; Tue, 17 May 2022 16:33:23 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nqyGI-00AK2F-Vy; Tue, 17 May 2022 16:33:22 +0200
-Date:   Tue, 17 May 2022 16:33:19 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Tudor.Ambarus@microchip.com
-Cc:     alexandre.belloni@bootlin.com, ard.biesheuvel@linaro.org,
-        Nicolas.Ferre@microchip.com, linux-crypto@vger.kernel.org,
-        kernel@pengutronix.de, Claudiu.Beznea@microchip.com,
-        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
-Subject: Re: Bug in atmel-ecc driver
-Message-ID: <20220517143319.oi7cpgqumv2gn2l6@pengutronix.de>
-References: <20220513135954.exewihnibnhdckkn@pengutronix.de>
- <20220517102432.pljcsjkar3oswdnl@pengutronix.de>
- <99a8c7b0-ca73-25a2-f839-9a96cc0989e4@microchip.com>
+        Tue, 17 May 2022 11:40:18 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16116227;
+        Tue, 17 May 2022 08:40:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PJAPh0WklXq+v/LAarD8w555ANK9Hwej803/O8FJToc4wVwnI1sGT3KvBi5J+pUXnqNI+4fiHVI/CDzroUHxbVtsV6G9j1ocSPkWBoeFiuXunWuaMQftUzxsII1Qse+lA4U06+bRmzuFZ/dDqiaInayguJyfxTMapBRhwptDvNYx3Z1kKNW7hbzYMt3A+M85W/QUkDYlTEiiNXci/ZVzsyy/AIVBZNEobIxPzzErfXIi8o2UYYX66kT0YVpIpvMhHEBQmeOSRpBkZqGPzJnk10G9vJpA0XhGyMCaf2o2pMCrCM9lpkJnAVu0X8RBy+RM4K/sPWABBCZlp94qf8J/+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=h7gAzPWWU4oMYhf4M32YhM/V/NWfrvvwNw/pdjQOukU=;
+ b=cG7pnxIMIteiRW/NVgf1EjS85DDYQGXrVK1hFghZkyTKuGVQO23GFyKtlVYu94EQUYTMjT7Uoj1pl50zx37MgjyFX5Z+euGuA8r05fkz8DVEA08sVEDqHgyVMUlKhjZHX2yZFR+HGcLBTHoDDA2mpvsDHKXHM7MXWdqOdYv1XiCFSORw9Wd2Tc8jh8bHRrzL9kIR2eVw3Yycq6RHbrr6wC892EBmWbXOkGuk4cVu6nfVHUrVU15RQzGLXbXSK3DUcgutKOocL88g5gl5xwISg4EtxOWhh4/4Jur8OdpDEGxK+jWqWv571E4Sv3uDBqmCzAVZ6lhkzt6U7UZVMFbJwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=h7gAzPWWU4oMYhf4M32YhM/V/NWfrvvwNw/pdjQOukU=;
+ b=VQM/VXHACxZ4xhNnGoCK5aDxPsfTSaF0sPt6pJ2jH6IMuCJsBRfL3bRvDJghL4+WOyWUvDk09OY28JrjyxwxMIn64iLa6kBE5Hx/baHgMnCmBlUbRmloaxhXUsR2zc4D+M+WnnaZ6b3OqOmVq4bIHInQ9ttY3Pj70lCfS40593o=
+Received: from DS7PR05CA0058.namprd05.prod.outlook.com (2603:10b6:8:2f::11) by
+ DS7PR12MB6240.namprd12.prod.outlook.com (2603:10b6:8:94::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5250.18; Tue, 17 May 2022 15:40:13 +0000
+Received: from DM6NAM11FT062.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2f:cafe::b5) by DS7PR05CA0058.outlook.office365.com
+ (2603:10b6:8:2f::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5273.5 via Frontend
+ Transport; Tue, 17 May 2022 15:40:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT062.mail.protection.outlook.com (10.13.173.40) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5250.13 via Frontend Transport; Tue, 17 May 2022 15:40:11 +0000
+Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 17 May
+ 2022 10:40:10 -0500
+From:   John Allen <john.allen@amd.com>
+To:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+CC:     <seanjc@google.com>, <Thomas.Lendacky@amd.com>,
+        <Ashish.Kalra@amd.com>, <linux-kernel@vger.kernel.org>,
+        <theflow@google.com>, <rientjes@google.com>, <pgonda@google.com>,
+        John Allen <john.allen@amd.com>, <stable@vger.kernel.org>
+Subject: [PATCH v3] crypto: ccp - Use kzalloc for sev ioctl interfaces to prevent kernel memory leak
+Date:   Tue, 17 May 2022 15:39:58 +0000
+Message-ID: <20220517153958.262959-1-john.allen@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="bgupnwbm6q7iq7pz"
-Content-Disposition: inline
-In-Reply-To: <99a8c7b0-ca73-25a2-f839-9a96cc0989e4@microchip.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 24ebc712-09be-4716-bc18-08da381b87dd
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6240:EE_
+X-Microsoft-Antispam-PRVS: <DS7PR12MB62403EF21E1CAC1148E5AC5D9ACE9@DS7PR12MB6240.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: oEPFHkTB9olhqxa+IZeiS6PTT0Gvf5JrPNKPFM4QLgvnN0H5tahGPkxwNp83P2zsHn900lUeSkjaNFnXCMPeUXkwvE1Uer5KxwrSyOEwuvwVa8GCQhT8f+L3nmtTG8jwdb+PkIypS+4HWHvVbqN7JY54mpw/seYJgiQkWDxv6Plsvgv4dPF8vQgq62dpHUTx3XKXNcdtKGCobgXHCIKL2EeekbRKQrvREA2DpLK2hQF+V4aGNghf0GjA/BCcW+A3QpIzUoX4zkJ/CCObE+ZGv8BjLoOcX1XbLCBkMTknZ6LYG1u2Qeh6She815szFjRc777hcGpRJVJXlpCt0QwL7GNdpRIekaV0R+zPQtTDvpCxcJ3UbFBy7gWve+3VHJa1gN7+vdSheJqGrKY9VHzuM9Y5hR3/ejUysFmqFW8im8YtObl13ADTJcwMovK60phLxzijbDfh2UTkztbzs9yTqIdM/kcmdIjJiTz54RInh9rikHOi6GWXrWy3Sn/h14X2jBM2lwLW05zg3ymWUFAWEl4oh73LaVD5Udlhx6rIg2or9jXu3LJ8l8urmAQ6lhsthNYEVuQ0/NvTqAoevjMqXJb1a8LdrsMVbFEpHqiNRDGA2INtHZkmT6Jr5iS9bVDn4eJrzduRWNS36YBlbEHC1Fs+0pwZgLH+Ory3OArv9woTbJcvVDkIChNiZ50FNv/RlUsdlkv7vTqZyHrLt4UgoQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230001)(4636009)(36840700001)(40470700004)(46966006)(40460700003)(82310400005)(54906003)(110136005)(356005)(7696005)(316002)(81166007)(6666004)(186003)(8936002)(70206006)(508600001)(26005)(70586007)(44832011)(5660300002)(83380400001)(86362001)(36756003)(2906002)(36860700001)(1076003)(4326008)(47076005)(8676002)(16526019)(336012)(2616005)(426003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2022 15:40:11.9981
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24ebc712-09be-4716-bc18-08da381b87dd
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT062.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6240
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+For some sev ioctl interfaces, input may be passed that is less than or
+equal to SEV_FW_BLOB_MAX_SIZE, but larger than the data that PSP
+firmware returns. In this case, kmalloc will allocate memory that is the
+size of the input rather than the size of the data. Since PSP firmware
+doesn't fully overwrite the buffer, the sev ioctl interfaces with the
+issue may return uninitialized slab memory.
 
---bgupnwbm6q7iq7pz
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Currently, all of the ioctl interfaces in the ccp driver are safe, but
+to prevent future problems, change all ioctl interfaces that allocate
+memory with kmalloc to use kzalloc and memset the data buffer to zero in
+sev_ioctl_do_platform_status.
 
-Hi,
+Fixes: e799035609e15 ("crypto: ccp: Implement SEV_PEK_CSR ioctl command")
+Fixes: 76a2b524a4b1d ("crypto: ccp: Implement SEV_PDH_CERT_EXPORT ioctl command")
+Fixes: d6112ea0cb344 ("crypto: ccp - introduce SEV_GET_ID2 command")
+Cc: stable@vger.kernel.org
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: David Rientjes <rientjes@google.com>
+Suggested-by: Peter Gonda <pgonda@google.com>
+Signed-off-by: John Allen <john.allen@amd.com>
+---
+v2:
+  - Add fixes tags and CC stable@vger.kernel.org
+v3:
+  - memset data buffer to zero in sev_ioctl_do_platform_status
+---
+ drivers/crypto/ccp/sev-dev.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-On Tue, May 17, 2022 at 01:11:22PM +0000, Tudor.Ambarus@microchip.com wrote:
-> On 5/17/22 13:24, Uwe Kleine-K=F6nig wrote:
-> > On Fri, May 13, 2022 at 03:59:54PM +0200, Uwe Kleine-K=F6nig wrote:
-> >> TL;DR: when a device bound to the drivers/crypto/atmel-ecc.c driver is
-> >> unbound while tfm_count isn't zero, this probably results in a
-> >> use-after-free.
-> >>
-> >> The .remove function has:
-> >>
-> >> 	if (atomic_read(&i2c_priv->tfm_count)) {
-> >>                 dev_err(&client->dev, "Device is busy\n");
-> >>                 return -EBUSY;
-> >>         }
-> >>
-> >> before actually calling the cleanup stuff. If this branch is hit the
-> >> result is likely:
-> >>
-> >>  - "Device is busy" from drivers/crypto/atmel-ecc.c
-> >>  - "remove failed (EBUSY), will be ignored" from the i2c core
-> >>  - the devm cleanup callbacks are called, including the one kfreeing
-> >>    *i2c_priv
-> >>  - at a later time atmel_ecc_i2c_client_free() is called which does
-> >>    atomic_dec(&i2c_priv->tfm_count);
-> >>  - *boom*
-> >>
-> >> I think to fix that you need to call get_device for the i2c device
-> >> before increasing tfm_count (and a matching put_device when decreasing
-> >> it). Having said that the architecture of this driver looks strange to
-> >> me, so there might be nicer fixes (probably with more effort).
-> > I tried to understand the architecture a bit, what I found is
-> > irritating. So the atmel-ecc driver provides a static struct kpp_alg
-> > atmel_ecdh_nist_p256 which embeds a struct crypto_alg (.base). During
-> > .probe() it calls crypto_register_kpp on that global kpp_alg. That is,
-> > if there are two or more devices bound to this driver, the same kpp_alg
-> > structure is registered repeatedly.  This involves (among others)
-> >=20
-> >  - refcount_set(&atmel_ecdh_nist_p256.base.cra_refcount)
-> >    in crypto_check_alg()
-> >  - INIT_LIST_HEAD(&atmel_ecdh_nist_p256.base.cra_users)
-> >    in __crypto_register_alg()
-> >=20
-> > and then a check about registering the same alg twice which makes the
-> > call crypto_register_alg() return -EEXIST. So if a second device is
-> > bound, it probably corrupts the first device and then fails to probe.
-> >=20
-> > So there can always be (at most) only one bound device which somehow
-> > makes the whole logic in atmel_ecdh_init_tfm ->
-> > atmel_ecc_i2c_client_alloc to select the least used(?) i2c client among
-> > all the bound devices ridiculous.
->=20
-> It's been a while since I last worked with ateccx08, but as far as I reme=
-mber
-> it contains 3 crypto IPs (ecdh, ecdsa, sha) that communicate over the same
-> i2c address. So if someone adds support for all algs and plug in multiple
-> ateccx08 devices, then the distribution of tfms across the i2c clients ma=
-y work.
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 6ab93dfd478a..da143cc3a8f5 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -551,6 +551,8 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ 	struct sev_user_data_status data;
+ 	int ret;
+ 
++	memset(&data, 0, sizeof(data));
++
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, &data, &argp->error);
+ 	if (ret)
+ 		return ret;
+@@ -604,7 +606,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	if (input.length > SEV_FW_BLOB_MAX_SIZE)
+ 		return -EFAULT;
+ 
+-	blob = kmalloc(input.length, GFP_KERNEL);
++	blob = kzalloc(input.length, GFP_KERNEL);
+ 	if (!blob)
+ 		return -ENOMEM;
+ 
+@@ -828,7 +830,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
+ 	input_address = (void __user *)input.address;
+ 
+ 	if (input.address && input.length) {
+-		id_blob = kmalloc(input.length, GFP_KERNEL);
++		id_blob = kzalloc(input.length, GFP_KERNEL);
+ 		if (!id_blob)
+ 			return -ENOMEM;
+ 
+@@ -947,14 +949,14 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	if (input.cert_chain_len > SEV_FW_BLOB_MAX_SIZE)
+ 		return -EFAULT;
+ 
+-	pdh_blob = kmalloc(input.pdh_cert_len, GFP_KERNEL);
++	pdh_blob = kzalloc(input.pdh_cert_len, GFP_KERNEL);
+ 	if (!pdh_blob)
+ 		return -ENOMEM;
+ 
+ 	data.pdh_cert_address = __psp_pa(pdh_blob);
+ 	data.pdh_cert_len = input.pdh_cert_len;
+ 
+-	cert_blob = kmalloc(input.cert_chain_len, GFP_KERNEL);
++	cert_blob = kzalloc(input.cert_chain_len, GFP_KERNEL);
+ 	if (!cert_blob) {
+ 		ret = -ENOMEM;
+ 		goto e_free_pdh;
+-- 
+2.34.1
 
-It would require to register the crypto backends independent of the
-=2Eprobe() routine though.
-
-> Anyway, if you feel that the complexity is superfluous as the code is now=
-, we
-> can get rid of the i2c_client_alloc logic and add it later on when/if nee=
-ded.
-
-If it's you who acts, do whatever pleases you. If it's me I'd go for a
-quick and simple solution to get back to what I originally want to do
-with this driver.
-
-So I'd go for something like
-
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 333fbefbbccb..e7f3f4793c55 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -349,8 +349,13 @@ static int atmel_ecc_remove(struct i2c_client *client)
-=20
- 	/* Return EBUSY if i2c client already allocated. */
- 	if (atomic_read(&i2c_priv->tfm_count)) {
--		dev_err(&client->dev, "Device is busy\n");
--		return -EBUSY;
-+		/*
-+		 * After we return here, the memory backing the device is freed.
-+		 * If there is still some action pending, it probably involves
-+		 * accessing free'd memory.
-+		 */
-+		dev_emerg(&client->dev, "Hell is about to break loose, expect memory cor=
-ruption.\n");
-+		return 0;
- 	}
-=20
- 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
-
-because I'm not in yacc-shaving mood.
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---bgupnwbm6q7iq7pz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKDsisACgkQwfwUeK3K
-7Al2Vgf8CfAKHRZam68ITA4P6icvgd9nGZCJMHKglR31hgW+gbRhyXbebPtd6aDN
-5RYa9llhoy5Vtnokj4+VPOHj4yZar8o0gJoMtltSc6RkfUFNOk3gkOWacaWQFdBZ
-UO5a87Uc3yMP+JwGlMbXifdXZ+tChkQ2C6l1VD1po+z1m5kpDD509aglXkNMt2VT
-PIpbKNFg5+sqK0dYjHpjGU+8HWt3KOxxUyRrPnMljwxpEZUghnBsrorc9C+OtHVW
-+hv3QXe05E4wGRr8slgcyXB4Or8WCRQGvitbQrG7XPsq+r/84UUecMvipNfHcpJ3
-+KoMXpS+uTs8FFV9/Xmu2oJXpWo4+g==
-=QNLN
------END PGP SIGNATURE-----
-
---bgupnwbm6q7iq7pz--
