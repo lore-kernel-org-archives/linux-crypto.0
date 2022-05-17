@@ -2,77 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF26C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 07:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4FBC4332F
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 08:07:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242068AbiEQHyH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 03:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53262 "EHLO
+        id S233841AbiEQIHO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 04:07:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242075AbiEQHyG (ORCPT
+        with ESMTP id S242347AbiEQIHO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 03:54:06 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861A843493;
-        Tue, 17 May 2022 00:54:05 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 3EA501FA28;
-        Tue, 17 May 2022 07:54:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1652774044; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rM6+QSZRHkWYQj7ZDxS87+VGKnwouDbU7UOR2z+jDzQ=;
-        b=EBIyXdc9T7dDorW4UVURkxVTqDSjpxwEz/CpWN8lG+b0VkzkHtTASq4AjBx0DAieDpRghc
-        O3nEzT7ifP9YGRI01Sgw8XXnpvhunk9uNXATO1w3wvOCwtGjO2tHTQKyX3KK1XA2t3ZKI6
-        9RmKkU8mo3SLEha0RseWSnMKwDj+T2U=
-Received: from suse.cz (unknown [10.100.201.202])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id D2A092C141;
-        Tue, 17 May 2022 07:54:03 +0000 (UTC)
-Date:   Tue, 17 May 2022 09:54:00 +0200
-From:   Petr Mladek <pmladek@suse.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [PATCH] random: remove get_random_bytes_arch() and add
- rng_has_arch_random()
-Message-ID: <YoNUmF3+lVxIjoik@alley>
-References: <20220514112307.349599-1-Jason@zx2c4.com>
+        Tue, 17 May 2022 04:07:14 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08953B549;
+        Tue, 17 May 2022 01:07:12 -0700 (PDT)
+Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L2TFq0jT7zbbxh;
+        Tue, 17 May 2022 16:05:51 +0800 (CST)
+Received: from huawei.com (10.67.175.31) by dggpemm500024.china.huawei.com
+ (7.185.36.203) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 17 May
+ 2022 16:07:11 +0800
+From:   GUO Zihua <guozihua@huawei.com>
+To:     <keyrings@vger.kernel.org>
+CC:     <linux-crypto@vger.kernel.org>, <davem@davemloft.net>,
+        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <gustavoars@kernel.org>, <linux-hardening@vger.kernel.org>
+Subject: [PATCH] crypto: Use struct_size() helper in kmalloc()
+Date:   Tue, 17 May 2022 16:05:32 +0800
+Message-ID: <20220517080532.31015-1-guozihua@huawei.com>
+X-Mailer: git-send-email 2.36.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220514112307.349599-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.175.31]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500024.china.huawei.com (7.185.36.203)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat 2022-05-14 13:23:07, Jason A. Donenfeld wrote:
-> The RNG incorporates RDRAND into its state at boot and every time it
-> reseeds, so there's no reason for callers to use it directly. The
-> hashing that the RNG does on it is preferable to using the bytes raw.
-> 
-> The only current use case of it is vsprintf's siphash key for pointer
-> hashing, which uses it to initialize the pointer secret earlier than
-> usual if RDRAND is available. In order to replace this narrow use case,
-> just expose whether RDRAND is available. With that taken care of, there
-> are no users of get_random_bytes_arch() left, so the function can be
-> removed.
-> 
-> Later if trust_cpu gets turned on by default (as most distros are
-> doing), this one use of rng_has_arch_random() can probably go away as
-> well.
-> 
-> Cc: Petr Mladek <pmladek@suse.com>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Make use of struct_size() heler for structures containing flexible array
+member instead of sizeof() which prevents potential issues as well as
+addressing the following sparse warning:
 
-Looks good to me. Thanks for the clean up.
+crypto/asymmetric_keys/asymmetric_type.c:155:23: warning: using sizeof
+on a flexible structure
+crypto/asymmetric_keys/asymmetric_type.c:247:28: warning: using sizeof
+on a flexible structure
 
-Acked-by: Petr Mladek <pmladek@suse.com>	# for vsprintf.c
+Reference: https://github.com/KSPP/linux/issues/174
 
-Best Regards,
-Petr
+Signed-off-by: GUO Zihua <guozihua@huawei.com>
+---
+ crypto/asymmetric_keys/asymmetric_type.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 41a2f0eb4ce4..96a99a91bf17 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -152,7 +152,7 @@ struct asymmetric_key_id *asymmetric_key_generate_id(const void *val_1,
+ {
+ 	struct asymmetric_key_id *kid;
+ 
+-	kid = kmalloc(sizeof(struct asymmetric_key_id) + len_1 + len_2,
++	kid = kmalloc(struct_size(kid, data, len_1 + len_2),
+ 		      GFP_KERNEL);
+ 	if (!kid)
+ 		return ERR_PTR(-ENOMEM);
+@@ -244,7 +244,7 @@ struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id)
+ 	if (asciihexlen & 1)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	match_id = kmalloc(sizeof(struct asymmetric_key_id) + asciihexlen / 2,
++	match_id = kmalloc(struct_size(match_id, data, asciihexlen / 2),
+ 			   GFP_KERNEL);
+ 	if (!match_id)
+ 		return ERR_PTR(-ENOMEM);
+-- 
+2.36.0
+
