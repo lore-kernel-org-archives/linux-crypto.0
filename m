@@ -2,105 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE01C433FE
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 May 2022 21:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7FFC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 03:36:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345979AbiEPVTC (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 May 2022 17:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49122 "EHLO
+        id S235459AbiEQDgt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 16 May 2022 23:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349310AbiEPVS2 (ORCPT
+        with ESMTP id S239647AbiEQDgi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 May 2022 17:18:28 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962592C10D;
-        Mon, 16 May 2022 14:17:48 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id ch13so30965855ejb.12;
-        Mon, 16 May 2022 14:17:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=35KXda5OBFCKkvBxWwkGiybmXmDjKw5ss0Rm54TgqYY=;
-        b=i+OOwp8a+Ns6JmA3zecraa7xhvF4SrBt9OxonU3zgxIMLqIuQq+1wJn0rPRt8mJN4o
-         LMO0yQRcFwtjM0saYriQhamE4Fw0YEtk5t3TQ/RM1Vi0r1O3pCyeXRunEEq8TcH6OFso
-         vkGt7LDjqxEHo/VZUby/scvLGyC2tDiX63Gsst9+OA1R4gAs1CbduRu5CCe5/wXuhVGm
-         9f94pIi+pVT9OaQLr0JmyoLwRKd/D0pc7O0eRi18BOa40zDJjqM1lVzkEBD6yAyeSphI
-         Zm9caVX9cBt5sds1QEuRnfXbFigfQZpxfErvR9dhBy7JUfAf1n9hARzxRl0oXFES8wz7
-         2nGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=35KXda5OBFCKkvBxWwkGiybmXmDjKw5ss0Rm54TgqYY=;
-        b=vEgKjUs/P+vw3OGYzdM97g4xX9ENfL6j4SHwHvfi1ZQvYrrA8mGXj8LQdcmiyhyOLm
-         Ej2ePVEJPXAfMt90riX6zpT9uFp/zM4rMuv2ZQzacEK5A+0SRKzyTQqjV0j4kuCva5VH
-         62tp8O0msEiLIn5BCrvW/8nxl7+FV+6KcbBk6n6CexNERIVt1BjsoCC7UaDAYj3s4dSa
-         RiE/yEH6COpJhWVw3aPgLiTTY0s9jgadAClCPdRbO8FS+sZr1IPQbYjHMBRnvInsVx8L
-         ANa7bIToOisGrDOupfjQ5hqY6KfO01HcyQbQplp6I4QfKmkUUYMuc91g+G3sIOjurs47
-         aOWw==
-X-Gm-Message-State: AOAM531v3rp1RguKtqi4AYYJD5uKyJwdPvCjh5A9hZbRWVkI+Fmpvzsd
-        7wKS6EJiR3TXz51SAyreoKKJOcrClwsWsXfC
-X-Google-Smtp-Source: ABdhPJz+c4SIyaDIRS17VWMsh5DYkuYDVpureeE7lY55lFd4fmJuYT5KuXvj3NnifMvVo2q76fvdHw==
-X-Received: by 2002:a17:907:e91:b0:6f4:d1e7:417d with SMTP id ho17-20020a1709070e9100b006f4d1e7417dmr17216724ejc.123.1652735867100;
-        Mon, 16 May 2022 14:17:47 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id a23-20020a1709063e9700b006f3ef214dc5sm198147ejj.43.2022.05.16.14.17.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 14:17:46 -0700 (PDT)
-From:   Colin Ian King <colin.i.king@gmail.com>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: asymmetric_keys: remove redundant pointer secs
-Date:   Mon, 16 May 2022 22:17:45 +0100
-Message-Id: <20220516211745.55382-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 16 May 2022 23:36:38 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA1A40A33;
+        Mon, 16 May 2022 20:36:35 -0700 (PDT)
+Received: from kwepemi100013.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L2MFY5QQSz1JCSt;
+        Tue, 17 May 2022 11:35:13 +0800 (CST)
+Received: from kwepemm600018.china.huawei.com (7.193.23.140) by
+ kwepemi100013.china.huawei.com (7.221.188.136) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 17 May 2022 11:36:33 +0800
+Received: from huawei.com (10.174.176.88) by kwepemm600018.china.huawei.com
+ (7.193.23.140) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 17 May
+ 2022 11:36:32 +0800
+From:   gaochao <gaochao49@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>
+CC:     <hpa@zytor.com>, <ebiggers@google.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH -next] crypto: Fix build error when CRYPTO_BLAKE2S_X86=m && CRYPTO_ALGAPI2=m && CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+Date:   Tue, 17 May 2022 11:36:30 +0800
+Message-ID: <20220517033630.1182-1-gaochao49@huawei.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.174.176.88]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600018.china.huawei.com (7.193.23.140)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pointer secs is being assigned a value that is never read. The pointer
-is redundant and can be removed.
+If CRYPTO=m, CRYPTO_ALGAPI=m, CRYPTO_ALGAPI2=m, CRYPTO_BLAKE2S_X86=m,
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+bulding fails:
 
-Cleans up clang-scan build warning:
-warning: Although the value stored to 'secs' is used in the enclosing
-expression, the value is never actually read from 'secs'
-[deadcode.DeadStores]
+arch/x86/crypto/blake2s-glue.o: In function `blake2s_compress':
+(.text+0x5a): undefined reference to `crypto_simd_disabled_for_test'
+make: *** [vmlinux] Error 1
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+When CRYPTO_MANAGER_EXTRA_TESTS=y, blake2s_compress will call
+crypto_simd_disabled_for_test.
+When CRYPTO_ALGAPI2=m, crypto_algapi build as a module,
+but if CONFIG_CRYPTO_BLAKE2S_X86=m at the same time,
+libblake2s-x86_64.o build with obj-y, this will accuse the above error.
+
+To fix this error:
+1 Choose CRYPTO_ALGAPI2 for CRYPTO_BLAKE2S_X86
+when CRYPTO_MANAGER_EXTRA_TESTS=y.
+2 build libblake2s-x86_64.o as a module when CONFIG_CRYPTO_BLAKE2S_X86=y
+
+Fixes: 8fc5f2ad896b ("crypto: testmgr - Move crypto_simd_disabled_for_test out")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: gaochao <gaochao49@huawei.com>
 ---
- crypto/asymmetric_keys/verify_pefile.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/crypto/Makefile | 2 +-
+ crypto/Kconfig           | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index 7553ab18db89..a660e4d68d50 100644
---- a/crypto/asymmetric_keys/verify_pefile.c
-+++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -28,7 +28,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
- 	const struct pe32plus_opt_hdr *pe64;
- 	const struct data_directory *ddir;
- 	const struct data_dirent *dde;
--	const struct section_header *secs, *sec;
-+	const struct section_header *sec;
- 	size_t cursor, datalen = pelen;
- 
- 	kenter("");
-@@ -110,7 +110,7 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
- 	ctx->n_sections = pe->sections;
- 	if (ctx->n_sections > (ctx->header_size - cursor) / sizeof(*sec))
- 		return -ELIBBAD;
--	ctx->secs = secs = pebuf + cursor;
-+	ctx->secs = pebuf + cursor;
- 
- 	return 0;
- }
--- 
-2.35.1
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 2831685adf6f..54b2469fa49a 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -63,7 +63,7 @@ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_s
+
+ obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+ blake2s-x86_64-y := blake2s-shash.o
+-obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
++obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += libblake2s-x86_64.o
+ libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 19197469cfab..e61598f8f8c5 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -714,6 +714,7 @@ config CRYPTO_BLAKE2S_X86
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_LIB_BLAKE2S_GENERIC
+ 	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
++	select CRYPTO_ALGAPI2 if CRYPTO_MANAGER_EXTRA_TESTS
+
+ config CRYPTO_CRCT10DIF
+ 	tristate "CRCT10DIF algorithm"
+--
+2.17.1
 
