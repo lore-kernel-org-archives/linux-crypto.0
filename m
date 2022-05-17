@@ -2,65 +2,97 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A9AC433F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 17:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D4EC43217
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 17:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiEQRDe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 13:03:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48646 "EHLO
+        id S1351471AbiEQR1c (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 13:27:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351316AbiEQRDd (ORCPT
+        with ESMTP id S235136AbiEQR13 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 13:03:33 -0400
-X-Greylist: delayed 2395 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 May 2022 10:03:31 PDT
-Received: from mail.neweas.com (mail.neweas.com [162.19.155.127])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9142750466
-        for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 10:03:31 -0700 (PDT)
-Received: by mail.neweas.com (Postfix, from userid 1002)
-        id E35F422CF7; Tue, 17 May 2022 15:45:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=neweas.com; s=mail;
-        t=1652802376; bh=qQhd+6rcOH+OhrNQ6A9OWLCE/79cwvyTtb6LUe1aYuU=;
-        h=Date:From:To:Subject:From;
-        b=Z5amMDKHaondt6zPLWJy3CQ7/0fSCZUU7bTonT01IweYbyxQUPViwTB4W1FX9USSF
-         +v8PTO+bjBDJHgIWvKQEA9+16VFtvj9BJgrE31lhE3rT31rnFsGxMPcJ8QL8f4Reya
-         C0Cc68TWUflJPUbmHUNNk565A5Z7fNYaAGUk+O0Y6NK9EdUCzrPwlzKfKwZVuj9f80
-         zIhu0BfZRULOgEs/23Ujtu+yYBwqNcCvvhGxhv1BaMQjG58n2Uvfqk4eZMWFDIB7EE
-         Lu+B2wu9uyLT+gd7GJO5+ynYfKIia3CEPE8J3QWlbJUS/11jm7N3EPh+uAY35XaUTM
-         mnf66tq79jyTw==
-Received: by mail.neweas.com for <linux-crypto@vger.kernel.org>; Tue, 17 May 2022 15:45:46 GMT
-Message-ID: <20220517141500-0.1.f.zz8.0.0ucncq8n3k@neweas.com>
-Date:   Tue, 17 May 2022 15:45:46 GMT
-From:   "Luca Gauthier" <luca.gauthier@neweas.com>
-To:     <linux-crypto@vger.kernel.org>
-Subject: New collaboration
-X-Mailer: mail.neweas.com
+        Tue, 17 May 2022 13:27:29 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6709A396BA;
+        Tue, 17 May 2022 10:27:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0E2FAB81B1B;
+        Tue, 17 May 2022 17:27:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B5C1C385B8;
+        Tue, 17 May 2022 17:27:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IilJz4sq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1652808440;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GLxfMRWlDqJCqVnB0IaJbPRiH8haTaUzhJXTGYbu2uE=;
+        b=IilJz4sqEicgZI5OMVtdivcdVlHTq1Rg6Pu7qkgijtuhKRntgRQ8i3VUQ7g1H+Hy9wFAeX
+        rouEE4G/g0bPt2ghx/3eHUBc+McioIILlhtegmi3ETQ/lA/PZDVVnYhOCTWMJSAb7RVdGG
+        gnm4HIjm1SSDp1eh2n3DcZqmuG9qC34=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id be7946cb (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Tue, 17 May 2022 17:27:19 +0000 (UTC)
+Date:   Tue, 17 May 2022 19:27:08 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     James Bottomley <jejb@linux.ibm.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>, kernel@pengutronix.de,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Pankaj Gupta <pankaj.gupta@nxp.com>,
+        David Gstir <david@sigma-star.at>,
+        Michael Walle <michael@walle.cc>,
+        John Ernberg <john.ernberg@actia.se>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jan Luebbe <j.luebbe@pengutronix.de>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: Re: [PATCH v10 2/7] KEYS: trusted: allow use of kernel RNG for key
+ material
+Message-ID: <YoPa7C8xs8lgKtwv@zx2c4.com>
+References: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
+ <20220513145705.2080323-3-a.fatoum@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220513145705.2080323-3-a.fatoum@pengutronix.de>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Fri, May 13, 2022 at 04:57:00PM +0200, Ahmad Fatoum wrote:
+> +	trusted.rng=	[KEYS]
+> +			Format: <string>
+> +			The RNG used to generate key material for trusted keys.
+> +			Can be one of:
+> +			- "kernel"
+> +			- the same value as trusted.source: "tpm" or "tee"
+> +			- "default"
+> +			If not specified, "default" is used. In this case,
+> +			the RNG's choice is left to each individual trust source.
+> +
 
-are you looking for more business clients?
+As a general mechanism, I object to this. The kernel's RNG must be
+trusted in the first place for key material. That's the whole point of
+it.
 
-We would like to start working with you as a partner in acquiring or exch=
-anging leads, which directly translates into mutual benefits in the form =
-of an increased client portfolio.
+However, it sounds like you're not proposing a general mechanism, but
+just something particular to this "trusted keys" business. In that case,
+this should be a module flag, and thus not documented here, but rather
+some place namespaced to your trusted keys stuff. "trusted_keys.preferred_rng={whatever}"
 
-We work in the sector of internet marketing and as one of the first in Eu=
-rope SEO Agencies we=E2=80=99ve introduced the SEO 360 service which allo=
-ws your clients to gain the access to original SEO consultations.
-
-By choosing to work with us you receive support in achieving your busines=
-s goals, and help in handling Digital Marketing for your clients.
-
-We support over 237 partner companies. We have one of the biggest executi=
-ve departments in Europe at our disposal, we=E2=80=99ve prepared over 200=
-0 campaigns in Europe and 200 in the USA and Canada.
-
-Are you interested in the details of our partnership programme?
-
-Yours sincerely,
-Luca Gauthier
+Jason
