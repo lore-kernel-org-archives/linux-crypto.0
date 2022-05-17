@@ -2,84 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4FBC4332F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 08:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24662C4321E
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 May 2022 08:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233841AbiEQIHO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 May 2022 04:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54528 "EHLO
+        id S242536AbiEQIL7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 17 May 2022 04:11:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242347AbiEQIHO (ORCPT
+        with ESMTP id S242751AbiEQILX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 May 2022 04:07:14 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08953B549;
-        Tue, 17 May 2022 01:07:12 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L2TFq0jT7zbbxh;
-        Tue, 17 May 2022 16:05:51 +0800 (CST)
-Received: from huawei.com (10.67.175.31) by dggpemm500024.china.huawei.com
- (7.185.36.203) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 17 May
- 2022 16:07:11 +0800
-From:   GUO Zihua <guozihua@huawei.com>
-To:     <keyrings@vger.kernel.org>
-CC:     <linux-crypto@vger.kernel.org>, <davem@davemloft.net>,
-        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
-        <gustavoars@kernel.org>, <linux-hardening@vger.kernel.org>
-Subject: [PATCH] crypto: Use struct_size() helper in kmalloc()
-Date:   Tue, 17 May 2022 16:05:32 +0800
-Message-ID: <20220517080532.31015-1-guozihua@huawei.com>
-X-Mailer: git-send-email 2.36.0
+        Tue, 17 May 2022 04:11:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8549A3CA5B;
+        Tue, 17 May 2022 01:11:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 068D0611E2;
+        Tue, 17 May 2022 08:11:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AEDEC34100;
+        Tue, 17 May 2022 08:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652775081;
+        bh=G13kXIW4s6Pcy4BSlXyMefkAe8ns85SmAcmOmBOdOws=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=p6T8WwRRYkq2Yr0T/ugAAQuYioRnEv9Co8Aatc3ztL3Sf3qbQEVqRmJCyQLC/13sF
+         r58+AhSwc7onQTwwl7a6AXjvMYaAVXkFNlfxGpV3rAjCeQ09b+4JkxxilV/u1Hwvao
+         tydOTumob09OYzt2yEM5VPCT9Dh1pLqyR8qKZzSCS9PMraIE7Zv9RQ9qqsjkRwfYTm
+         kkMQL36jqxoVJAj7ZMGMrijXHfH1bgROd7xoxzJzuCHAS+2GtDSdNgCJiZCtsJ6ASM
+         0oy7RONFwjQC+DS25khs0akCVDftbxlIwPaZz0UaS14K8ewH4IEfMuQtTQxR3MbQSO
+         5/GERxxc/muMg==
+Received: by mail-oi1-f177.google.com with SMTP id v66so21451132oib.3;
+        Tue, 17 May 2022 01:11:21 -0700 (PDT)
+X-Gm-Message-State: AOAM531Bsclh2cAi8FQXDsawrejLDRziW/tF59TjGYVFUh27piSJ28gz
+        EVJZg2MjDfYDHDiL7T4DuGZt1GdIluq3JUOH4MQ=
+X-Google-Smtp-Source: ABdhPJy1CTbEQsyqgIE8jj4/8WvmUlhpYtiVDu0SgAQke0jlX2w6xF+xlZ/GA4o6rm7siIum7OpWULRH6bxfMSxVboo=
+X-Received: by 2002:a05:6808:1314:b0:326:e438:d8cd with SMTP id
+ y20-20020a056808131400b00326e438d8cdmr15625016oiv.228.1652775080613; Tue, 17
+ May 2022 01:11:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.175.31]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500024.china.huawei.com (7.185.36.203)
-X-CFilter-Loop: Reflected
+References: <20220516101635.1082132-1-yoan.picchi@arm.com> <20220516101635.1082132-3-yoan.picchi@arm.com>
+In-Reply-To: <20220516101635.1082132-3-yoan.picchi@arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 17 May 2022 10:11:09 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXGAiA-SkTFD5EgcacYao0RKT7oK0AxvxkR7Ho_KZSGXCw@mail.gmail.com>
+Message-ID: <CAMj1kXGAiA-SkTFD5EgcacYao0RKT7oK0AxvxkR7Ho_KZSGXCw@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/2] Removes the x86 dependency on the QAT drivers
+To:     yoan.picchi@arm.com
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        qat-linux <qat-linux@intel.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make use of struct_size() heler for structures containing flexible array
-member instead of sizeof() which prevents potential issues as well as
-addressing the following sparse warning:
+On Mon, 16 May 2022 at 12:16, <yoan.picchi@arm.com> wrote:
+>
+> From: Yoan Picchi <yoan.picchi@arm.com>
+>
+> This dependency looks outdated. After the previous patch, we have been able
+> to use this driver to encrypt some data and to create working VF on arm64.
+>
+> Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
 
-crypto/asymmetric_keys/asymmetric_type.c:155:23: warning: using sizeof
-on a flexible structure
-crypto/asymmetric_keys/asymmetric_type.c:247:28: warning: using sizeof
-on a flexible structure
+Are you sure the driver is safe for non-coherent DMA as well?
 
-Reference: https://github.com/KSPP/linux/issues/174
-
-Signed-off-by: GUO Zihua <guozihua@huawei.com>
----
- crypto/asymmetric_keys/asymmetric_type.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-index 41a2f0eb4ce4..96a99a91bf17 100644
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -152,7 +152,7 @@ struct asymmetric_key_id *asymmetric_key_generate_id(const void *val_1,
- {
- 	struct asymmetric_key_id *kid;
- 
--	kid = kmalloc(sizeof(struct asymmetric_key_id) + len_1 + len_2,
-+	kid = kmalloc(struct_size(kid, data, len_1 + len_2),
- 		      GFP_KERNEL);
- 	if (!kid)
- 		return ERR_PTR(-ENOMEM);
-@@ -244,7 +244,7 @@ struct asymmetric_key_id *asymmetric_key_hex_to_key_id(const char *id)
- 	if (asciihexlen & 1)
- 		return ERR_PTR(-EINVAL);
- 
--	match_id = kmalloc(sizeof(struct asymmetric_key_id) + asciihexlen / 2,
-+	match_id = kmalloc(struct_size(match_id, data, asciihexlen / 2),
- 			   GFP_KERNEL);
- 	if (!match_id)
- 		return ERR_PTR(-ENOMEM);
--- 
-2.36.0
-
+> ---
+>  drivers/crypto/qat/Kconfig | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
+> index 4b90c0f22b03..88df2cf4cac9 100644
+> --- a/drivers/crypto/qat/Kconfig
+> +++ b/drivers/crypto/qat/Kconfig
+> @@ -17,7 +17,7 @@ config CRYPTO_DEV_QAT
+>
+>  config CRYPTO_DEV_QAT_DH895xCC
+>         tristate "Support for Intel(R) DH895xCC"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select CRYPTO_DEV_QAT
+>         help
+>           Support for Intel(R) DH895xcc with Intel(R) QuickAssist Technology
+> @@ -28,7 +28,7 @@ config CRYPTO_DEV_QAT_DH895xCC
+>
+>  config CRYPTO_DEV_QAT_C3XXX
+>         tristate "Support for Intel(R) C3XXX"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select CRYPTO_DEV_QAT
+>         help
+>           Support for Intel(R) C3xxx with Intel(R) QuickAssist Technology
+> @@ -39,7 +39,7 @@ config CRYPTO_DEV_QAT_C3XXX
+>
+>  config CRYPTO_DEV_QAT_C62X
+>         tristate "Support for Intel(R) C62X"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select CRYPTO_DEV_QAT
+>         help
+>           Support for Intel(R) C62x with Intel(R) QuickAssist Technology
+> @@ -50,7 +50,7 @@ config CRYPTO_DEV_QAT_C62X
+>
+>  config CRYPTO_DEV_QAT_4XXX
+>         tristate "Support for Intel(R) QAT_4XXX"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select CRYPTO_DEV_QAT
+>         help
+>           Support for Intel(R) QuickAssist Technology QAT_4xxx
+> @@ -61,7 +61,7 @@ config CRYPTO_DEV_QAT_4XXX
+>
+>  config CRYPTO_DEV_QAT_DH895xCCVF
+>         tristate "Support for Intel(R) DH895xCC Virtual Function"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select PCI_IOV
+>         select CRYPTO_DEV_QAT
+>
+> @@ -74,7 +74,7 @@ config CRYPTO_DEV_QAT_DH895xCCVF
+>
+>  config CRYPTO_DEV_QAT_C3XXXVF
+>         tristate "Support for Intel(R) C3XXX Virtual Function"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select PCI_IOV
+>         select CRYPTO_DEV_QAT
+>         help
+> @@ -86,7 +86,7 @@ config CRYPTO_DEV_QAT_C3XXXVF
+>
+>  config CRYPTO_DEV_QAT_C62XVF
+>         tristate "Support for Intel(R) C62X Virtual Function"
+> -       depends on X86 && PCI
+> +       depends on PCI
+>         select PCI_IOV
+>         select CRYPTO_DEV_QAT
+>         help
+> --
+> 2.25.1
+>
