@@ -2,164 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CA1C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 May 2022 08:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED68C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 May 2022 09:52:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233534AbiERIyw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 May 2022 04:54:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44204 "EHLO
+        id S234707AbiERJwr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 18 May 2022 05:52:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233535AbiERIyu (ORCPT
+        with ESMTP id S234743AbiERJwp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 May 2022 04:54:50 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E8E13C0B6;
-        Wed, 18 May 2022 01:54:24 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 04B6A1F9A4;
-        Wed, 18 May 2022 08:54:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1652864063; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=06nyVlCgwJloMa3Sgbdy84v4l9AGS+6HLkM9Egdi3zA=;
-        b=uDiK6ZQrV58T7Sse8eaWlPU/3YOfscJkXv3EILIbosD7HQybDKyxvcVVoFbmUsqTnGDWOC
-        4CJ72erIQVpdbKFsT+vzEs5YDvh5g2rDpQI37Yrwv7EeYQF5L0T6eBevotMPC/qL715vvd
-        nBQrLN7qvUP+ufxvplkKEKxxqZ6CM98=
-Received: from suse.cz (unknown [10.100.201.202])
+        Wed, 18 May 2022 05:52:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A738750B39;
+        Wed, 18 May 2022 02:52:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 6C56E2C141;
-        Wed, 18 May 2022 08:54:22 +0000 (UTC)
-Date:   Wed, 18 May 2022 10:54:22 +0200
-From:   Petr Mladek <pmladek@suse.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id CCF48B81EFA;
+        Wed, 18 May 2022 09:52:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08E0C385A5;
+        Wed, 18 May 2022 09:52:31 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TB8L6/pf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1652867550;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=93ht0aSwSq1XsnJqlWLCiggaBy2vO5iv3PB2DpbWdjg=;
+        b=TB8L6/pfZrCoYWr8Vf0898d00YKU0aWPVqsa7RyoULM3V056CrQv/JOar3711nzc4GRIsx
+        GLK5UTNbdbEMamxM+xIRDUA0ZH/KpmZDmmyxH0tRTPjjcn3bN3AtBn3/fiXZU98wtbiCGN
+        QcamfSkBYyVwtRBKYyjGS5Mv76VXAtY=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ca4e6724 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 18 May 2022 09:52:29 +0000 (UTC)
+Date:   Wed, 18 May 2022 11:52:24 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Petr Mladek <pmladek@suse.com>
 Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
         Steven Rostedt <rostedt@goodmis.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
 Subject: Re: [PATCH] random: remove mostly unused async readiness notifier
-Message-ID: <YoS0Pn9IotUrQh01@alley>
+Message-ID: <YoTB2OlwQq4J4/2D@zx2c4.com>
 References: <YoD7hn4yBHE0RYUa@zx2c4.com>
  <20220515131927.474097-1-Jason@zx2c4.com>
+ <YoS0Pn9IotUrQh01@alley>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220515131927.474097-1-Jason@zx2c4.com>
+In-Reply-To: <YoS0Pn9IotUrQh01@alley>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun 2022-05-15 15:19:27, Jason A. Donenfeld wrote:
-> The register_random_ready_notifier() notifier is somewhat complicated,
-> and was already recently rewritten to use notifier blocks. It is only
-> used now by one consumer in the kernel, vsprintf.c, for which the async
-> mechanism is really overly complex for what it actually needs. This
-> commit removes register_random_ready_notifier() and unregister_random_
-> ready_notifier(), because it just adds complication with little utility,
-> and changes vsprintf.c to just check on `!rng_is_initialized() &&
-> !rng_has_arch_random()`, which will eventually be true. Performance-
-> wise, that code was already using a static branch, so there's basically
-> no overhead at all to this change.
+Hi Petr,
+
+On Wed, May 18, 2022 at 10:54:22AM +0200, Petr Mladek wrote:
+> > +		spin_lock_irqsave(&filling, flags);
 > 
-> --- a/lib/vsprintf.c
-> +++ b/lib/vsprintf.c
-> @@ -750,60 +750,37 @@ static int __init debug_boot_weak_hash_enable(char *str)
->  }
->  early_param("debug_boot_weak_hash", debug_boot_weak_hash_enable);
->  
-> -static DEFINE_STATIC_KEY_TRUE(not_filled_random_ptr_key);
-> -static siphash_key_t ptr_key __read_mostly;
-> +static DEFINE_STATIC_KEY_FALSE(filled_random_ptr_key);
->  
->  static void enable_ptr_key_workfn(struct work_struct *work)
->  {
-> -	get_random_bytes(&ptr_key, sizeof(ptr_key));
-> -	/* Needs to run from preemptible context */
-> -	static_branch_disable(&not_filled_random_ptr_key);
-> +	static_branch_enable(&filled_random_ptr_key);
->  }
->  
-> -static DECLARE_WORK(enable_ptr_key_work, enable_ptr_key_workfn);
-> -
-> -static int fill_random_ptr_key(struct notifier_block *nb,
-> -			       unsigned long action, void *data)
-> +/* Maps a pointer to a 32 bit unique identifier. */
-> +static inline int __ptr_to_hashval(const void *ptr, unsigned long *hashval_out)
->  {
-> -	/* This may be in an interrupt handler. */
-> -	queue_work(system_unbound_wq, &enable_ptr_key_work);
-> -	return 0;
-> -}
-> -
-> -static struct notifier_block random_ready = {
-> -	.notifier_call = fill_random_ptr_key
-> -};
-> +	static siphash_key_t ptr_key __read_mostly;
-> +	unsigned long hashval;
->  
-> -static int __init initialize_ptr_random(void)
-> -{
-> -	int ret;
-> +	if (!static_branch_likely(&filled_random_ptr_key)) {
-> +		static bool filled = false;
-> +		static DEFINE_SPINLOCK(filling);
-> +		static DECLARE_WORK(enable_ptr_key_work, enable_ptr_key_workfn);
-> +		unsigned long flags;
->  
-> -	/* Don't bother waiting for RNG to be ready if RDRAND is mixed in already. */
-> -	if (rng_has_arch_random()) {
-> -		enable_ptr_key_workfn(&enable_ptr_key_work);
-> -		return 0;
-> -	}
-> +		if (!rng_is_initialized() && !rng_has_arch_random())
-> +			return -EAGAIN;
->  
-> -	ret = register_random_ready_notifier(&random_ready);
-> -	if (!ret) {
-> -		return 0;
-> -	} else if (ret == -EALREADY) {
-> -		/* This is in preemptible context */
-> -		enable_ptr_key_workfn(&enable_ptr_key_work);
-> -		return 0;
-> +		spin_lock_irqsave(&filling, flags);
+> I thought more about this and there is a small risk of a deadlock
+> when get_random_bytes() or queue_work() or NMI calls
+> printk()/vsprintf() with %p here.
+> 
+> A simple solution would be to use trylock():
+> 
+> 		if (!spin_trylock_irqsave(&filling, flags))
+> 			return -EDEADLK;
+> 
+> Could we do this change, please?
+> 
+> I do not mind if it will be done by re-spinning the original
+> patch or another patch on top of it.
 
-I thought more about this and there is a small risk of a deadlock
-when get_random_bytes() or queue_work() or NMI calls
-printk()/vsprintf() with %p here.
+Interesting consideration. Sure, I'll do exactly that and send a v2.
 
-A simple solution would be to use trylock():
-
-		if (!spin_trylock_irqsave(&filling, flags))
-			return -EDEADLK;
-
-Could we do this change, please?
-
-I do not mind if it will be done by re-spinning the original
-patch or another patch on top of it.
-
-Best Regards,
-Petr
-
-
-> +		if (!filled) {
-> +			get_random_bytes(&ptr_key, sizeof(ptr_key));
-> +			queue_work(system_unbound_wq, &enable_ptr_key_work);
-> +			filled = true;
-> +		}
-> +		spin_unlock_irqrestore(&filling, flags);
->  	}
->  
-> -	return ret;
-> -}
-> -early_initcall(initialize_ptr_random);
-> -
-> -/* Maps a pointer to a 32 bit unique identifier. */
-> -static inline int __ptr_to_hashval(const void *ptr, unsigned long *hashval_out)
-> -{
-> -	unsigned long hashval;
-> -
-> -	if (static_branch_unlikely(&not_filled_random_ptr_key))
-> -		return -EAGAIN;
->  
->  #ifdef CONFIG_64BIT
->  	hashval = (unsigned long)siphash_1u64((u64)ptr, &ptr_key);
+Jason
