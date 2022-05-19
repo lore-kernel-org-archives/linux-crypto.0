@@ -2,91 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81150C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 May 2022 06:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 196D3C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 May 2022 07:11:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233937AbiESGLT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 May 2022 02:11:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
+        id S230055AbiESHLk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 19 May 2022 03:11:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234360AbiESGLT (ORCPT
+        with ESMTP id S235050AbiESHLW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 May 2022 02:11:19 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A1433351
-        for <linux-crypto@vger.kernel.org>; Wed, 18 May 2022 23:11:13 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id c12so5662877eds.10
-        for <linux-crypto@vger.kernel.org>; Wed, 18 May 2022 23:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=gYhBmt2DJjuovlj8cEVjJWatfYnYEnvKQvTR5wcx1jM=;
-        b=YFceBQS8mdD5J7xJrp0GhLhnihLf4RzLsf1jFD7Mix84dFO2uMABu/ljD2xqQ4Zi4H
-         EY372DX7GhDHFXFteZXj/A28uVAmCY2NcPWw7CDSV75+bT8YgP9I/bNjv6VoKA55nm6I
-         sCt8/C5g4GPhhiJkRjKkGyVkhopif+1Cbndc40zakzt8IahxRl+1cJHMwxnGnLgYb1Ih
-         xk+2OO9gcp17MDpJN2Zy98Y9GJD1nvSMGr3uVrJx9tzklkmAeA4FPdMHz2Yp3sWMYqiv
-         NY6ED63DQvxIGJarL0SaPFlgfCPH8AqGQQCh/K5ZNGA2yB73j+tTzYRGY14sgGKYf5JW
-         m9kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=gYhBmt2DJjuovlj8cEVjJWatfYnYEnvKQvTR5wcx1jM=;
-        b=QJugtN51BdtMdVlkYhyw7SWu9arO8ZEyWncGTQC892AOpDE0bEP5pgxy5jAD8mnwI2
-         8OfebNTM7d9o6Eo3x/MTK4QKQQ4Y+uUu1uYVYT/SvjWyWHv5pbAniSJyb++A8Fb28orP
-         JMZ8//iin76Fb9IVb+Wv7CBejYq48xfugRAv7wKXBBOGbkkNfu8WBvfRaAUH654dOQAN
-         xUnytSeYkPV1RNOkwsbVMd7um6xcDrC1ViGLY143oC0PokjF6u9t5dBf6QCO+yrnE/b0
-         ymcKVtw5c6fkYuxFjw/4lMK67CgrCAdF2JX/D6UsWy2zjf9dT6yHqnI3Fo7Y33KkXJRZ
-         ahJw==
-X-Gm-Message-State: AOAM530/o/E/FA6aQvPBzAvwckZ6bt9qcAmYZXmlNhMS+Kxsmmwtoyqo
-        ik5GPXYR4VsOGBzbvYJDOV0/0KUH+tID0OR0BbHas47n
-X-Google-Smtp-Source: ABdhPJx+uwCciM0/DTmqHsJ+92m0GgQNzVIeRBmzC9iP8j5ZBQuJ310amaYX5jrav8mcRNi1Id0mm3LZWkS6dGWy6CI=
-X-Received: by 2002:a05:6402:17c1:b0:428:8016:d98d with SMTP id
- s1-20020a05640217c100b004288016d98dmr3602582edy.5.1652940672175; Wed, 18 May
- 2022 23:11:12 -0700 (PDT)
+        Thu, 19 May 2022 03:11:22 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3908A27FE2;
+        Thu, 19 May 2022 00:10:58 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id EEC231F9F4;
+        Thu, 19 May 2022 07:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1652944256; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7THzLll8eKXBdQTV/BzshDjJ4CbuTPvZ2Drio0SjPa0=;
+        b=iNV002yTnGws18wkL+wjwzCUiOQbFnIBzCvzuQ9zC6j/XT6HQQUbg2cKg66scEl5N8L8FM
+        n+XvVSOVMWgXm+ruBU4gtupg0QOVbq17mdJJ0943BsdgRgjFk9aNlQN2NQIMKOBCrmw+u5
+        a5ne6GRDqf0DnkXzE4Uki5Oltbo2kD8=
+Received: from suse.cz (unknown [10.100.201.202])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id CB1E62C141;
+        Thu, 19 May 2022 07:10:56 +0000 (UTC)
+Date:   Thu, 19 May 2022 09:10:56 +0200
+From:   Petr Mladek <pmladek@suse.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH v2] random: remove mostly unused async readiness notifier
+Message-ID: <YoXtgLc+jtgPrUAM@alley>
+References: <YoTB2OlwQq4J4/2D@zx2c4.com>
+ <20220518095658.24085-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <CACXcFm=y9dR5DONeoLq1OQZp7fiFTEYTn_ir=c4S=UfyxTGWpQ@mail.gmail.com>
-In-Reply-To: <CACXcFm=y9dR5DONeoLq1OQZp7fiFTEYTn_ir=c4S=UfyxTGWpQ@mail.gmail.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Thu, 19 May 2022 14:10:59 +0800
-Message-ID: <CACXcFmn2wKVf7eh-qYsgp3x-acrf0=c8ur-UARcht5Dd3=epYg@mail.gmail.com>
-Subject: Re: [RFC] random: use blake2b instead of blake2s?
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>, "Ted Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220518095658.24085-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sandy Harris <sandyinchina@gmail.com> wrote:
+On Wed 2022-05-18 11:56:58, Jason A. Donenfeld wrote:
+> The register_random_ready_notifier() notifier is somewhat complicated,
+> and was already recently rewritten to use notifier blocks. It is only
+> used now by one consumer in the kernel, vsprintf.c, for which the async
+> mechanism is really overly complex for what it actually needs. This
+> commit removes register_random_ready_notifier() and unregister_random_
+> ready_notifier(), because it just adds complication with little utility,
+> and changes vsprintf.c to just check on `!rng_is_initialized() &&
+> !rng_has_arch_random()`, which will eventually be true. Performance-
+> wise, that code was already using a static branch, so there's basically
+> no overhead at all to this change.
+> 
+> Cc: Petr Mladek <pmladek@suse.com>
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> Acked-by: Petr Mladek <pmladek@suse.com> # for vsprintf.c
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v1->v2:
+> - Use a trylock instead of a spinlock to be NMI safe.
 
-> The original random.c used a 4k-bit input pool, ...
+Looks good to me. My ack is already there. Feel free to use:
 
-> Blake comes in two variants, blake2s and blake2b; ...
->
-> To me, it looks like switching to 2b would be an obvious improvement,
-> though not at all urgent.
+Reviewed-by: Petr Mladek <pmladek@suse.com>
 
-I'd actually go a bit further and have 2k bits of input pool,
-two blake2b contexts; probably make inputs alternate
-between them. It would also be possible to put each
-input into both pools.
+if you would prefer it.
 
-For output, have a flip-flop variable and alternate between
-the pools with some sequence like:
-: mix some extra entropy into pool
-: generate 512 bits output
-: mix that back into the other 2b context
-: 8-round chacha on output
-: mix output into chacha context
+Thanks a lot for updating the patch.
 
-Mixing output from one context into the other ties the
-two together so in effect we have a 2k-bit input pool.
-
-Chacha is designed to be non-invertible so the
-8-round instance prevents a rather unlikely
-attack. Even if an enemy manages to get the
-chacha state & infer some of the rekeying inputs,
-they do not get direct access to blake output.
-They would need to repeatedly break chacha8
-to get any data that might let them attack blake.
+Best Regards,
+Petr
