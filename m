@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 155BEC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B27C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 06:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245118AbiETF7W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 01:59:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42626 "EHLO
+        id S244615AbiETGAJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 02:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244615AbiETF7W (ORCPT
+        with ESMTP id S1345429AbiETGAI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 01:59:22 -0400
+        Fri, 20 May 2022 02:00:08 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3EE14AA74
-        for <linux-crypto@vger.kernel.org>; Thu, 19 May 2022 22:59:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF9014B668;
+        Thu, 19 May 2022 23:00:06 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nrvfS-00Fi0H-7h; Fri, 20 May 2022 15:59:19 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:59:18 +0800
-Date:   Fri, 20 May 2022 13:59:18 +0800
+        id 1nrvg6-00Fi1D-Lb; Fri, 20 May 2022 16:00:00 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:59:58 +0800
+Date:   Fri, 20 May 2022 13:59:58 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
-        Srinivas Kerekare <srinivas.kerekare@intel.com>
-Subject: Re: [PATCH] crypto: qat - add support for 401xx devices
-Message-ID: <YocuNpEm6R/dbGdc@gondor.apana.org.au>
-References: <20220510165419.182774-1-giovanni.cabiddu@intel.com>
+To:     Kai Ye <yekai13@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH] crypto: hisilicon/sec - delete the flag
+ CRYPTO_ALG_ALLOCATES_MEMORY
+Message-ID: <YocuXn7tYXkT8nCw@gondor.apana.org.au>
+References: <20220513080244.19304-1-yekai13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220510165419.182774-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20220513080244.19304-1-yekai13@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 10, 2022 at 05:54:19PM +0100, Giovanni Cabiddu wrote:
-> QAT_401xx is a derivative of 4xxx. Add support for that device in the
-> qat_4xxx driver by including the DIDs (both PF and VF), extending the
-> probe and the firmware loader.
+On Fri, May 13, 2022 at 04:02:44PM +0800, Kai Ye wrote:
+> Should not to uses the CRYPTO_ALG_ALLOCATES_MEMORY in SEC2. The SEC2
+> driver uses the pre-allocated buffers, including the src sgl pool, dst
+> sgl pool and other qp ctx resources. (e.g. IV buffer, mac buffer, key
+> buffer). The SEC2 driver doesn't allocate memory during request processing.
+> The driver only maps software sgl to allocated hardware sgl during I/O. So
+> here is fix it.
 > 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Srinivas Kerekare <srinivas.kerekare@intel.com>
+> Signed-off-by: Kai Ye <yekai13@huawei.com>
 > ---
->  drivers/crypto/qat/qat_4xxx/adf_drv.c             | 1 +
->  drivers/crypto/qat/qat_common/adf_accel_devices.h | 2 ++
->  drivers/crypto/qat/qat_common/qat_hal.c           | 1 +
->  drivers/crypto/qat/qat_common/qat_uclo.c          | 1 +
->  4 files changed, 5 insertions(+)
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 --
+>  1 file changed, 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
