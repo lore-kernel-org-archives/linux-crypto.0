@@ -2,53 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A61ABC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 06:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB30C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 06:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345673AbiETGAT (ORCPT
+        id S1345752AbiETGKV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 02:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43034 "EHLO
+        Fri, 20 May 2022 02:10:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345671AbiETGAT (ORCPT
+        with ESMTP id S1345760AbiETGKV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 02:00:19 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC5014AA74;
-        Thu, 19 May 2022 23:00:18 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nrvgK-00Fi1N-Sh; Fri, 20 May 2022 16:00:14 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 14:00:13 +0800
-Date:   Fri, 20 May 2022 14:00:13 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yang Yingliang <yangyingliang@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        mpm@selenic.com, tony@atomide.com
-Subject: Re: [PATCH -next] hwrng: omap3-rom - fix using wrong clk_disable()
- in omap_rom_rng_runtime_resume()
-Message-ID: <YocubT64UwtLKn1W@gondor.apana.org.au>
-References: <20220514084241.681812-1-yangyingliang@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220514084241.681812-1-yangyingliang@huawei.com>
+        Fri, 20 May 2022 02:10:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 972EE14C755;
+        Thu, 19 May 2022 23:10:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 248EE61D92;
+        Fri, 20 May 2022 06:10:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 86537C34100;
+        Fri, 20 May 2022 06:10:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653027016;
+        bh=+g8bHb2ilbuh8waM+HYF0p83yeXeOKZUATDuTJKYzKk=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Idy55GefI4ac6/SHeU30qdRAsd9T8UPBNPrBsTOHDBUiSdRCRd48J9pLXOmsPwYU9
+         gzzPq7LIikMc1Jft8nXQ2S2QHGnxGJHAn81lu2ipnXHJaizUzdTeOHyE/MNRIIkhtP
+         Tx38e9hpqo1+gv1ZVJKiMbAv1W56FXVn2hJB5t1rkSXBQb2a0/2cHP4E8dg7eXZ+Dh
+         SWweC3XtthwO7morsohtTjZtz1ctjKi9WclOov/fNBEB7pWkwQQrlzwL2tCO7zCE/P
+         jSFx7hNxY/K2D+LctLAHbVTCx8cao/gt5wbraXWBApAtXgb+/WKdEUynas8dUYw/mO
+         lcyWTQUzJvyGA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73025F0383D;
+        Fri, 20 May 2022 06:10:16 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 5.18
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
+References: <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au> <Yocp8BaZacpvwJEL@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2
+X-PR-Tracked-Commit-Id: 16287397ec5c08aa58db6acf7dbc55470d78087d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 3d7285a335edaf23b699e87c528cf0b0070e3293
+Message-Id: <165302701646.26960.7262335626261692818.pr-tracker-bot@kernel.org>
+Date:   Fri, 20 May 2022 06:10:16 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 14, 2022 at 04:42:41PM +0800, Yang Yingliang wrote:
-> 'ddata->clk' is enabled by clk_prepare_enable(), it should be disabled
-> by clk_disable_unprepare().
-> 
-> Fixes: 8d9d4bdc495f ("hwrng: omap3-rom - Use runtime PM instead of custom functions")
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->  drivers/char/hw_random/omap3-rom-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+The pull request you sent on Fri, 20 May 2022 13:41:04 +0800:
 
-Patch applied.  Thanks.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/3d7285a335edaf23b699e87c528cf0b0070e3293
+
+Thank you!
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
