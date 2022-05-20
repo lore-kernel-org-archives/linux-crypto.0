@@ -2,126 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D832AC433FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 May 2022 23:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E9DC433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:41:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232315AbiESXnC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 May 2022 19:43:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46432 "EHLO
+        id S244469AbiETFlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 01:41:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231951AbiESXnB (ORCPT
+        with ESMTP id S236946AbiETFlT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 May 2022 19:43:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 136CEB042E;
-        Thu, 19 May 2022 16:43:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A1B1461943;
-        Thu, 19 May 2022 23:43:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F9BEC385AA;
-        Thu, 19 May 2022 23:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653003780;
-        bh=6JGyfhNXfNm06GnBDot5qMy5WIBj4ipB36DG8PIGeWk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PDDeKqV+B8s4g1Gv66ZmQTK/XyaX3H7n7/hVJ9z1x1I3SE8cSo7uEAKJ27J2PvKjW
-         68R61oWOiNwsgwwjDMdoCT11grrtc0Xlsp8L12B0gzJWr6PViSMOsraQAAsSqyS05o
-         wCREsib0UGEoKw2BhZv5rW7X7F1i0J8vsGgniXyc29mJ9tuht1Lx7cKRnQU7E6YXn/
-         mqLTVtoMsdT5x4sRDlHqNHXZY/sIaTryjTuntCXlz04hdJV00c1y+0yFAIVR8zHC8B
-         oCCnThSzW7wqKw90ygLEVR4V1XgAmhTK7HDcrak+yFRGhoZNYYuN7J5TbGjkRxodyf
-         aeQMgM4NJ2Gcg==
-Date:   Fri, 20 May 2022 02:41:21 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
+        Fri, 20 May 2022 01:41:19 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E2B13E19;
+        Thu, 19 May 2022 22:41:13 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1nrvNn-00FhmD-Us; Fri, 20 May 2022 15:41:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:41:04 +0800
+Date:   Fri, 20 May 2022 13:41:04 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        James Bottomley <jejb@linux.ibm.com>, kernel@pengutronix.de,
-        David Howells <dhowells@redhat.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>,
-        Jan Luebbe <j.luebbe@pengutronix.de>,
-        David Gstir <david@sigma-star.at>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        Franck LENORMAND <franck.lenormand@nxp.com>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        Andreas Rammhold <andreas@rammhold.de>,
-        Tim Harvey <tharvey@gateworks.com>,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Michael Walle <michael@walle.cc>,
-        John Ernberg <john.ernberg@actia.se>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v10 0/7] KEYS: trusted: Introduce support for NXP
- CAAM-based trusted keys
-Message-ID: <YobVoQ+enx0IY4z1@kernel.org>
-References: <20220513145705.2080323-1-a.fatoum@pengutronix.de>
- <YoKZwFkfcl7ixTF4@kernel.org>
- <4d4ecd4b-9683-08a0-7a5f-11a7ff86ea6d@pengutronix.de>
- <c511995075cafb35bfefcbfe6fa6e84aa31c536f.camel@kernel.org>
- <6f6a5524-9661-9a9f-a674-915efa33f6f6@pengutronix.de>
- <YoUJgUbSRVnTfTj/@iki.fi>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.18
+Message-ID: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
+References: <20210108035450.GA6191@gondor.apana.org.au>
+ <20210708030913.GA32097@gondor.apana.org.au>
+ <20210817013601.GA14148@gondor.apana.org.au>
+ <20210929023843.GA28594@gondor.apana.org.au>
+ <20211029041408.GA3192@gondor.apana.org.au>
+ <20211112104815.GA14105@gondor.apana.org.au>
+ <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
+ <YgMn+1qQPQId50hO@gondor.apana.org.au>
+ <YjE5yThYIzih2kM6@gondor.apana.org.au>
+ <YkUdKiJflWqxBmx5@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoUJgUbSRVnTfTj/@iki.fi>
+In-Reply-To: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 18, 2022 at 05:58:09PM +0300, Jarkko Sakkinen wrote:
-> On Wed, May 18, 2022 at 06:36:18AM +0200, Ahmad Fatoum wrote:
-> > On 18.05.22 03:08, Jarkko Sakkinen wrote:
-> > > On Tue, 2022-05-17 at 14:44 +0200, Ahmad Fatoum wrote:
-> > >> Hello Herbert,
-> > >>
-> > >> On 16.05.22 20:36, Jarkko Sakkinen wrote:
-> > >>> On Fri, May 13, 2022 at 04:56:58PM +0200, Ahmad Fatoum wrote:
-> > >>> I can probably pick these unless objections?
-> > >>
-> > >> Pankaj has given his Reviewed-by for the CAAM parts he co-maintains,
-> > >> is it ok for this to go in via Jarkko's tree?
-> > >>
-> > >> Note that applying this series on top of jarkko/linux-tpmdd.git has a
-> > >> trivial conflict when merged with herbert/cryptodev-2.6.git:
-> > >> Two independently added Kconfig options need to coexist in
-> > >> drivers/crypto/caam/Kconfig.
-> > >>
-> > >> I can resend my series rebased if needed.
-> > >>
-> > >> Cheers,
-> > >> Ahmad
-> > >>
-> > >>>
-> > >>> BR, Jarkko
-> > >>>
-> > >>
-> > >>
-> > > 
-> > > This came up:
-> > > 
-> > > https://lore.kernel.org/keyrings/0e8da958a222e5c1dccaaf1600b08bdb8705b48e.camel@kernel.org/
-> > 
-> > And it turned out to be a misunderstanding. Or do you think there is still anything
-> > to do there?
-> > 
-> > Thanks,
-> > Ahmad
-> 
-> Oops, you're right, sorry.
-> 
-> Yeah, I guess I can pick these patches now.
+Hi Linus:
 
-Applied:
+The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/?h=next
+  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
 
-BR, Jarkko
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2 
+
+for you to fetch changes up to 16287397ec5c08aa58db6acf7dbc55470d78087d:
+
+  crypto: qcom-rng - fix infinite loop on requests not multiple of WORD_SZ (2022-05-13 17:13:38 +0800)
+
+----------------------------------------------------------------
+This push fixes a regression in a recent fix to qcom-rng.
+
+----------------------------------------------------------------
+Ondrej Mosnacek (1):
+      crypto: qcom-rng - fix infinite loop on requests not multiple of WORD_SZ
+
+ drivers/crypto/qcom-rng.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
