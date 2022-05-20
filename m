@@ -2,93 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DCFC4167B
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 15:31:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19757C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 17:21:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350843AbiETPbg (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 11:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
+        id S237912AbiETRVd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 13:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238787AbiETPbb (ORCPT
+        with ESMTP id S1352110AbiETRVc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 11:31:31 -0400
-X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 20 May 2022 08:31:26 PDT
-Received: from mailrelay2-1.pub.mailoutpod1-cph3.one.com (mailrelay2-1.pub.mailoutpod1-cph3.one.com [46.30.210.183])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B3F579A2
-        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 08:31:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ravnborg.org; s=rsa1;
-        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-         from:date:from;
-        bh=kwToCduxEHKRlf6xTfLStwKuhJjU+lyECx++Tp7rwBg=;
-        b=dKidBF+iQ7d11gWNT/UoyXW+3Hs3JRy8MCTHjV+5ua+Tg8M5cogj66cbemiXXWJkpK0zsojA7lQyE
-         +WqVoFZWQ6MJXXhEGgSw5lyAml+bPL2Bob4FIJw5qswzhyuzPAS6nncjClEcmRp8/q5uuFnaXkNE2d
-         CPuaLrtvtWobbmHB9tsxsDLdpABvzpEFwrP2Hjj7G7q9P4zXpqd59UkkCfAXbqYiZX0JhO/0Al924K
-         wFSjZf6TdiexU83WgAFrBKHbEHcVNpQIMy29BaLvT2CXdB5WMu+1QWT1QpW5jqN1dCLHfvlGz7DBJM
-         XMgEyhF4mJWi5tS9mXMNT9APf2Wijnw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
-        d=ravnborg.org; s=ed1;
-        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-         from:date:from;
-        bh=kwToCduxEHKRlf6xTfLStwKuhJjU+lyECx++Tp7rwBg=;
-        b=n6agCsCBqaR8eTktbf5YnuH91+U1tOyO7hFP5kGyWriJEdb5PGp+30pFXfAEW1f4wny+jHMBg9N+G
-         uHm+DFOBg==
-X-HalOne-Cookie: 6d6a2faa20e68cf1e8fd7d3b59daf8d1323c09c1
-X-HalOne-ID: c1025af6-d851-11ec-a909-d0431ea8a290
-Received: from mailproxy2.cst.dirpod4-cph3.one.com (80-162-45-141-cable.dk.customer.tdc.net [80.162.45.141])
-        by mailrelay2.pub.mailoutpod1-cph3.one.com (Halon) with ESMTPSA
-        id c1025af6-d851-11ec-a909-d0431ea8a290;
-        Fri, 20 May 2022 15:30:19 +0000 (UTC)
-Date:   Fri, 20 May 2022 17:30:17 +0200
-From:   Sam Ravnborg <sam@ravnborg.org>
-To:     Rob Herring <robh@kernel.org>
-Cc:     devicetree@vger.kernel.org,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Benson Leung <bleung@chromium.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Peter Rosin <peda@axentia.se>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Kalle Valo <kvalo@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Mark Brown <broonie@kernel.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        chrome-platform@lists.linux.dev, alsa-devel@alsa-project.org,
-        linux-pm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-pci@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-gpio@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-media@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: Fix properties without any type
-Message-ID: <Yoe0CRhygXOIrYJc@ravnborg.org>
-References: <20220519211411.2200720-1-robh@kernel.org>
+        Fri, 20 May 2022 13:21:32 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD33E1BE80
+        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 10:21:28 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1ns6JN-0006KE-25; Fri, 20 May 2022 19:21:13 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1ns6JM-003Wcq-7W; Fri, 20 May 2022 19:21:10 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1ns6JK-00B114-3B; Fri, 20 May 2022 19:21:10 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
+Subject: [PATCH] crypto: atmel-ecc - Remove duplicated error reporting in .remove()
+Date:   Fri, 20 May 2022 19:21:00 +0200
+Message-Id: <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
+References: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220519211411.2200720-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1834; h=from:subject; bh=gA8wq0ZCl1/fS/XbCP60/5QOOg3haX5yuDKAvNbEKLg=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBih831UtGTMJeJU/pnRA/AxHGP6a1bWuonNka+UeSG LhmyPICJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYofN9QAKCRDB/BR4rcrsCa0XCA CfmVKb2YMsH0Zl7PCCsNGIGjn1yetCEEIOcvzLGt6QAurwKlyzsYUulVuxtYPNAqQKRGk1In7wntKx Vc8Zw8ej+Uisk4/E/nOi7k8OKj31KUzqRN8Yyy0SqiEdp7G4KEv19Xlozmn1VMXNAjPg6/qo6IxLO+ GIKxaWjbo/hvr1/5VeaN2BWrLM2W7JGLQihQW5SJ6PR5bSTQxylR+Dm6Mbd/ofFUQs29ixzFce9nk0 R4XlGsc8cBZxtn7NftKmlmXNbJUK31hHyFMbTslWKrdt9UVWQGqhqa5rcV8kPULFbAhYKBTW5UVB0F ayk0yVrLx8Vge0by5NiGGmEmKDYDjY
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 19, 2022 at 04:14:11PM -0500, Rob Herring wrote:
-> Now that the schema tools can extract type information for all
-> properties (in order to decode dtb files), finding properties missing
-> any type definition is fairly trivial though not yet automated.
-> 
-> Fix the various property schemas which are missing a type. Most of these
-> tend to be device specific properties which don't have a vendor prefix.
-> A vendor prefix is how we normally ensure a type is defined.
-> 
-> Signed-off-by: Rob Herring <robh@kernel.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org> # for everything in .../bindings/display/
+Returning an error value in an i2c remove callback results in an error
+message being emitted by the i2c core, but otherwise it doesn't make a
+difference. The device goes away anyhow and the devm cleanups are
+called.
+
+As atmel_ecc_remove() already emits an error message on failure and the
+additional error message by the i2c core doesn't add any useful
+information, change the return value to zero to suppress this message.
+
+Also make the error message a bit more drastical because when the device
+is still busy on remove, it's likely that it will access freed memory
+soon.
+
+This patch is a preparation for making i2c remove callbacks return void.
+
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/crypto/atmel-ecc.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 333fbefbbccb..6ba38275de8c 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -349,8 +349,16 @@ static int atmel_ecc_remove(struct i2c_client *client)
+ 
+ 	/* Return EBUSY if i2c client already allocated. */
+ 	if (atomic_read(&i2c_priv->tfm_count)) {
+-		dev_err(&client->dev, "Device is busy\n");
+-		return -EBUSY;
++		/*
++		 * After we return here, the memory backing the device is freed.
++		 * That happens no matter what the return value of this function
++		 * is because in the Linux device model there is no error
++		 * handling for unbinding a driver.
++		 * If there is still some action pending, it probably involves
++		 * accessing the freed memory.
++		 */
++		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
++		return 0;
+ 	}
+ 
+ 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
+
+base-commit: 3123109284176b1532874591f7c81f3837bbdc17
+-- 
+2.35.1
+
