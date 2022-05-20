@@ -2,72 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E9DC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E01C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:53:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244469AbiETFlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 01:41:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33788 "EHLO
+        id S238193AbiETFxy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 01:53:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236946AbiETFlT (ORCPT
+        with ESMTP id S231455AbiETFxu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 01:41:19 -0400
+        Fri, 20 May 2022 01:53:50 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E2B13E19;
-        Thu, 19 May 2022 22:41:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B12C1EFC;
+        Thu, 19 May 2022 22:53:48 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nrvNn-00FhmD-Us; Fri, 20 May 2022 15:41:05 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:41:04 +0800
-Date:   Fri, 20 May 2022 13:41:04 +0800
+        id 1nrva3-00Fhx1-Ai; Fri, 20 May 2022 15:53:44 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:53:43 +0800
+Date:   Fri, 20 May 2022 13:53:43 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
+To:     Nathan Huckleberry <nhuck@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.18
-Message-ID: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
-References: <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v8 8/9] crypto: arm64/polyval: Add PMULL accelerated
+ implementation of POLYVAL
+Message-ID: <Yocs5y9rvJJ+eI6C@gondor.apana.org.au>
+References: <20220510172359.3720527-1-nhuck@google.com>
+ <20220510172359.3720527-9-nhuck@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220510172359.3720527-9-nhuck@google.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Tue, May 10, 2022 at 05:23:58PM +0000, Nathan Huckleberry wrote:
+>
+> +module_cpu_feature_match(PMULL, polyval_ce_mod_init)
+> +
+> +module_init(polyval_ce_mod_init);
 
-The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
+I get a cross-compile failure on this:
 
-  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2 
-
-for you to fetch changes up to 16287397ec5c08aa58db6acf7dbc55470d78087d:
-
-  crypto: qcom-rng - fix infinite loop on requests not multiple of WORD_SZ (2022-05-13 17:13:38 +0800)
-
-----------------------------------------------------------------
-This push fixes a regression in a recent fix to qcom-rng.
-
-----------------------------------------------------------------
-Ondrej Mosnacek (1):
-      crypto: qcom-rng - fix infinite loop on requests not multiple of WORD_SZ
-
- drivers/crypto/qcom-rng.c | 1 +
- 1 file changed, 1 insertion(+)
+In file included from ../arch/arm64/crypto/polyval-ce-glue.c:25:
+../include/linux/module.h:131:42: error: redefinition of ‘__inittest’
+  131 |  static inline initcall_t __maybe_unused __inittest(void)  \
+      |                                          ^~~~~~~~~~
+../arch/arm64/crypto/polyval-ce-glue.c:187:1: note: in expansion of macro ‘module_init’
+  187 | module_init(polyval_ce_mod_init);
+      | ^~~~~~~~~~~
+../include/linux/module.h:131:42: note: previous definition of ‘__inittest’ was here
+  131 |  static inline initcall_t __maybe_unused __inittest(void)  \
+      |                                          ^~~~~~~~~~
+../include/linux/cpufeature.h:55:1: note: in expansion of macro ‘module_init’
+   55 | module_init(cpu_feature_match_ ## x ## _init)
+      | ^~~~~~~~~~~
+../arch/arm64/crypto/polyval-ce-glue.c:185:1: note: in expansion of macro ‘module_cpu_feature_match’
+  185 | module_cpu_feature_match(PMULL, polyval_ce_mod_init)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
+../include/linux/module.h:133:6: error: redefinition of ‘init_module’
+  133 |  int init_module(void) __copy(initfn)   \
+      |      ^~~~~~~~~~~
+../arch/arm64/crypto/polyval-ce-glue.c:187:1: note: in expansion of macro ‘module_init’
+  187 | module_init(polyval_ce_mod_init);
+      | ^~~~~~~~~~~
+../include/linux/module.h:133:6: note: previous definition of ‘init_module’ was here
+  133 |  int init_module(void) __copy(initfn)   \
+      |      ^~~~~~~~~~~
+../include/linux/cpufeature.h:55:1: note: in expansion of macro ‘module_init’
+   55 | module_init(cpu_feature_match_ ## x ## _init)
+      | ^~~~~~~~~~~
+../arch/arm64/crypto/polyval-ce-glue.c:185:1: note: in expansion of macro ‘module_cpu_feature_match’
+  185 | module_cpu_feature_match(PMULL, polyval_ce_mod_init)
+      | ^~~~~~~~~~~~~~~~~~~~~~~~
 
 Thanks,
 -- 
