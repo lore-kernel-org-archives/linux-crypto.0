@@ -2,63 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4B9C4332F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 11:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DCFC4167B
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 15:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348552AbiETLb4 (ORCPT
+        id S1350843AbiETPbg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 07:31:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46464 "EHLO
+        Fri, 20 May 2022 11:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243617AbiETLby (ORCPT
+        with ESMTP id S238787AbiETPbb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 07:31:54 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E379C3055D
-        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 04:31:50 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id kq17so15077801ejb.4
-        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 04:31:50 -0700 (PDT)
+        Fri, 20 May 2022 11:31:31 -0400
+X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 20 May 2022 08:31:26 PDT
+Received: from mailrelay2-1.pub.mailoutpod1-cph3.one.com (mailrelay2-1.pub.mailoutpod1-cph3.one.com [46.30.210.183])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B3F579A2
+        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 08:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0NvptFqrj7j0InVdvvMmgqzBzN84J9LRB794rQxkFdY=;
-        b=re4Sm8tWAvFHp6bKgAYMf09Z79Kgi3OEdhOIiBZ7/Rn2QXbgu5Ly14y4/nQN7Y/aTo
-         VlgbB9yG7Rlr2cuoabCyBxc2bGDLVKK0lXBLnASl6zsHCcOeA+1KzIBeqFsR+y75i5XZ
-         XvFFiPa9GJ2QyyaAdSmJuFi5RyYukwsFD78F77Gu/KxBhoXO8QeL/xhxXqgh8n2pVQ16
-         5uSsdoWXuRrwj+2ip8smJzRExeR9DRqgQ7nZOdTto/19ei6AXbORk/Mx4Jr1TH0FheIZ
-         Rjk53cTk2OReyJUGfCv97XHsZ5d+q5q5c0jA2xxlOnKUomCD8mRuslxc9zsWStq2ZrCv
-         ptCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0NvptFqrj7j0InVdvvMmgqzBzN84J9LRB794rQxkFdY=;
-        b=5ufQV3sx646fJEaDQy/gx5OvcjSrvVkKaXmUn08Eest4+c3OiyXwblfjQYwIRs6jDo
-         wVipy0Jkom4XPUTUpK5XOoP/vWBjsLOJVOdo+8ATvvlQo5bO54jnp5drAq05Xn5qtw52
-         zdrooYZCLtMEa5MebyVfjS16gaKcW4FYaUyN/uQ2oIKu7mQ+OQl5f3XVUluQnWsmeNEB
-         LbzfkF+IbceYwDhW1WYrEHhlQhQ+qspzeKZTCGNvOHuCypzykljJToM//NyXFYB3P9ql
-         D3CRJGUyHUGSd+Z7zGlYF1jhrc4AU4y6UDp+hp+pgFO5ncHKpGHmkKw1uU/zIF3D5Dp6
-         KlUg==
-X-Gm-Message-State: AOAM530j8iepiM9WBfPDNKYje6RR/5bLo9oW1cXWGgXymfZf1j1Gx8j4
-        +kWDa+7u2humGsQDpHwvLxtE1YitfZKGo5iNRs1ZNQ==
-X-Google-Smtp-Source: ABdhPJyAADo7d4aXCmDNCVnTVXprJXf99iw8JPsCwtJN6tP2yH5Av5Yx22hVAD/QFIma8grUrwXZC/mCf6Av3T8PJbw=
-X-Received: by 2002:a17:907:6eab:b0:6fe:b5e2:7b0e with SMTP id
- sh43-20020a1709076eab00b006feb5e27b0emr1053811ejc.736.1653046309443; Fri, 20
- May 2022 04:31:49 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220519211411.2200720-1-robh@kernel.org>
-In-Reply-To: <20220519211411.2200720-1-robh@kernel.org>
-From:   Bartosz Golaszewski <brgl@bgdev.pl>
-Date:   Fri, 20 May 2022 13:31:38 +0200
-Message-ID: <CAMRc=McjvTE27BMbN-_W+Fdd7CJcswZQYsB-4N8cj=WfAQ9QOQ@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Fix properties without any type
+        d=ravnborg.org; s=rsa1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=kwToCduxEHKRlf6xTfLStwKuhJjU+lyECx++Tp7rwBg=;
+        b=dKidBF+iQ7d11gWNT/UoyXW+3Hs3JRy8MCTHjV+5ua+Tg8M5cogj66cbemiXXWJkpK0zsojA7lQyE
+         +WqVoFZWQ6MJXXhEGgSw5lyAml+bPL2Bob4FIJw5qswzhyuzPAS6nncjClEcmRp8/q5uuFnaXkNE2d
+         CPuaLrtvtWobbmHB9tsxsDLdpABvzpEFwrP2Hjj7G7q9P4zXpqd59UkkCfAXbqYiZX0JhO/0Al924K
+         wFSjZf6TdiexU83WgAFrBKHbEHcVNpQIMy29BaLvT2CXdB5WMu+1QWT1QpW5jqN1dCLHfvlGz7DBJM
+         XMgEyhF4mJWi5tS9mXMNT9APf2Wijnw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+        d=ravnborg.org; s=ed1;
+        h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+         from:date:from;
+        bh=kwToCduxEHKRlf6xTfLStwKuhJjU+lyECx++Tp7rwBg=;
+        b=n6agCsCBqaR8eTktbf5YnuH91+U1tOyO7hFP5kGyWriJEdb5PGp+30pFXfAEW1f4wny+jHMBg9N+G
+         uHm+DFOBg==
+X-HalOne-Cookie: 6d6a2faa20e68cf1e8fd7d3b59daf8d1323c09c1
+X-HalOne-ID: c1025af6-d851-11ec-a909-d0431ea8a290
+Received: from mailproxy2.cst.dirpod4-cph3.one.com (80-162-45-141-cable.dk.customer.tdc.net [80.162.45.141])
+        by mailrelay2.pub.mailoutpod1-cph3.one.com (Halon) with ESMTPSA
+        id c1025af6-d851-11ec-a909-d0431ea8a290;
+        Fri, 20 May 2022 15:30:19 +0000 (UTC)
+Date:   Fri, 20 May 2022 17:30:17 +0200
+From:   Sam Ravnborg <sam@ravnborg.org>
 To:     Rob Herring <robh@kernel.org>
-Cc:     devicetree <devicetree@vger.kernel.org>,
+Cc:     devicetree@vger.kernel.org,
         Krzysztof Kozlowski <krzk+dt@kernel.org>,
         Thierry Reding <thierry.reding@gmail.com>,
-        Sam Ravnborg <sam@ravnborg.org>,
         Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
         Dmitry Torokhov <dmitry.torokhov@gmail.com>,
         Benson Leung <bleung@chromium.org>,
         Guenter Roeck <groeck@chromium.org>,
@@ -74,64 +63,32 @@ Cc:     devicetree <devicetree@vger.kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Mark Brown <broonie@kernel.org>,
         Maxime Ripard <mripard@kernel.org>,
-        "open list:DRM PANEL DRIVERS" <dri-devel@lists.freedesktop.org>,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        Linux Input <linux-input@vger.kernel.org>,
-        chrome-platform@lists.linux.dev,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>, linux-pci@vger.kernel.org,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-serial@vger.kernel.org,
-        Linux-ALSA <alsa-devel@alsa-project.org>,
-        "open list:USB SUBSYSTEM" <linux-usb@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        chrome-platform@lists.linux.dev, alsa-devel@alsa-project.org,
+        linux-pm@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-pci@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-gpio@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-media@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: Fix properties without any type
+Message-ID: <Yoe0CRhygXOIrYJc@ravnborg.org>
+References: <20220519211411.2200720-1-robh@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220519211411.2200720-1-robh@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 19, 2022 at 11:14 PM Rob Herring <robh@kernel.org> wrote:
->
+On Thu, May 19, 2022 at 04:14:11PM -0500, Rob Herring wrote:
 > Now that the schema tools can extract type information for all
 > properties (in order to decode dtb files), finding properties missing
 > any type definition is fairly trivial though not yet automated.
->
+> 
 > Fix the various property schemas which are missing a type. Most of these
 > tend to be device specific properties which don't have a vendor prefix.
 > A vendor prefix is how we normally ensure a type is defined.
->
+> 
 > Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
->  .../arm/hisilicon/controller/hip04-bootwrapper.yaml       | 5 +++--
->  .../bindings/display/bridge/toshiba,tc358768.yaml         | 1 +
->  .../devicetree/bindings/display/panel/panel-timing.yaml   | 5 +++++
->  .../bindings/display/panel/raydium,rm67191.yaml           | 1 +
->  .../bindings/display/panel/samsung,s6e8aa0.yaml           | 1 +
->  .../devicetree/bindings/gpio/fairchild,74hc595.yaml       | 1 +
->  .../devicetree/bindings/input/google,cros-ec-keyb.yaml    | 1 +
->  .../devicetree/bindings/input/matrix-keymap.yaml          | 4 ++++
->  Documentation/devicetree/bindings/media/i2c/adv7604.yaml  | 3 ++-
->  Documentation/devicetree/bindings/mux/reg-mux.yaml        | 8 ++++++--
->  Documentation/devicetree/bindings/net/cdns,macb.yaml      | 1 +
->  Documentation/devicetree/bindings/net/ingenic,mac.yaml    | 1 +
->  .../devicetree/bindings/net/ti,davinci-mdio.yaml          | 1 +
->  .../devicetree/bindings/net/wireless/ti,wlcore.yaml       | 2 ++
->  .../devicetree/bindings/pci/snps,dw-pcie-ep.yaml          | 6 ++++--
->  Documentation/devicetree/bindings/pci/snps,dw-pcie.yaml   | 2 ++
->  .../devicetree/bindings/pinctrl/canaan,k210-fpioa.yaml    | 2 ++
->  Documentation/devicetree/bindings/power/avs/qcom,cpr.yaml | 1 +
->  .../devicetree/bindings/power/supply/battery.yaml         | 7 ++++++-
->  .../devicetree/bindings/power/supply/charger-manager.yaml | 1 +
->  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml   | 1 +
->  Documentation/devicetree/bindings/serial/8250.yaml        | 1 +
->  .../devicetree/bindings/sound/audio-graph-card2.yaml      | 3 +++
->  .../devicetree/bindings/sound/imx-audio-hdmi.yaml         | 3 +++
->  Documentation/devicetree/bindings/usb/smsc,usb3503.yaml   | 1 +
->  25 files changed, 55 insertions(+), 8 deletions(-)
->
-
-For GPIO:
-
-Acked-by: Bartosz Golaszewski <brgl@bgdev.pl>
+Acked-by: Sam Ravnborg <sam@ravnborg.org> # for everything in .../bindings/display/
