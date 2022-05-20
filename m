@@ -2,103 +2,219 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19757C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 17:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4204C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 18:15:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237912AbiETRVd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 13:21:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55194 "EHLO
+        id S1352501AbiETSPV (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 14:15:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352110AbiETRVc (ORCPT
+        with ESMTP id S1352504AbiETSPK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 13:21:32 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD33E1BE80
-        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 10:21:28 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1ns6JN-0006KE-25; Fri, 20 May 2022 19:21:13 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1ns6JM-003Wcq-7W; Fri, 20 May 2022 19:21:10 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1ns6JK-00B114-3B; Fri, 20 May 2022 19:21:10 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
-Subject: [PATCH] crypto: atmel-ecc - Remove duplicated error reporting in .remove()
-Date:   Fri, 20 May 2022 19:21:00 +0200
-Message-Id: <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
-References: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1834; h=from:subject; bh=gA8wq0ZCl1/fS/XbCP60/5QOOg3haX5yuDKAvNbEKLg=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBih831UtGTMJeJU/pnRA/AxHGP6a1bWuonNka+UeSG LhmyPICJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYofN9QAKCRDB/BR4rcrsCa0XCA CfmVKb2YMsH0Zl7PCCsNGIGjn1yetCEEIOcvzLGt6QAurwKlyzsYUulVuxtYPNAqQKRGk1In7wntKx Vc8Zw8ej+Uisk4/E/nOi7k8OKj31KUzqRN8Yyy0SqiEdp7G4KEv19Xlozmn1VMXNAjPg6/qo6IxLO+ GIKxaWjbo/hvr1/5VeaN2BWrLM2W7JGLQihQW5SJ6PR5bSTQxylR+Dm6Mbd/ofFUQs29ixzFce9nk0 R4XlGsc8cBZxtn7NftKmlmXNbJUK31hHyFMbTslWKrdt9UVWQGqhqa5rcV8kPULFbAhYKBTW5UVB0F ayk0yVrLx8Vge0by5NiGGmEmKDYDjY
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+        Fri, 20 May 2022 14:15:10 -0400
+Received: from mail-ua1-x94a.google.com (mail-ua1-x94a.google.com [IPv6:2607:f8b0:4864:20::94a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D50918FF04
+        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 11:15:08 -0700 (PDT)
+Received: by mail-ua1-x94a.google.com with SMTP id t20-20020ab04ad4000000b003627cd606a2so4104362uae.11
+        for <linux-crypto@vger.kernel.org>; Fri, 20 May 2022 11:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=5045f2BznSKrE0/FyMNANabK3X0rRLHHFsl8AbwsbNk=;
+        b=kH1bGRB+L5LEabHwToACAEoj5MyXiPTLv8hFxF6EU4WWA0AAUJ3N7O1EU2r8nlnO9Y
+         Niq8xpaodrJ44AA9v5rxYSIjov2VVo+gf5ucugjPl51cLGxskQ/UhWWt6E2h1Cqv+npA
+         zMci+UCdVOXmrA2VNVV9rjZB8AlDSuyO4AbaGwCYjeXhwzHJU5PspRXMTiLuSUn52Nom
+         upFPblHPGsZWhig3lvdqWcN1TRkd9vL1S3qv11l8h25TlBXZQnOAZJAoYicUmjFK7HVA
+         larbROL3wAIx8CiPoMqdvI5VGfKSG2Cpjo1zjoifv/d7/3S2GniA+wwTrg63fegQ5bt4
+         deXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
+         :content-transfer-encoding;
+        bh=5045f2BznSKrE0/FyMNANabK3X0rRLHHFsl8AbwsbNk=;
+        b=FJMkrarQ025aFhOAbQiuVXeQKTo1Iljg8AyvkP1TwIyUe1aQV7jcOd90MwRcpW6lkg
+         z2XFwARc4bRAwEpOzY/3D4u2pjqER+V26nB23/NJeeE2cOOiaxdPzGJuT16blhrZ598/
+         CDtHes53FCD4pI/5MqtxA3gjfLL+jbdmb46fS9IWjqI7YRN2ypG7/FQhcmBw0apXX1xq
+         8hzcURP6PXlOOjS9cIq54joiFOltUPLhpGuFODy72wJVlNPILkBdtGEnWDGloqxL+H8e
+         cs/uTyNXr3LoTDZABOXLRNoQVxKaAt/khZe3PSj8qFZx/g6wXlEMPjqeW/RmQ6FxJWD3
+         B7qA==
+X-Gm-Message-State: AOAM532551CpKXawFvl3+JHXrj4xucvAkOklZJA+SJG/BMleUqAPjSy3
+        I+v4jPrR1T99CwMUW16vkkvFXwgW5b+JwUdZ0k2K6T2DrSZG2EeZX+fvjrBhdsW69EeaEAU12E2
+        NwNlLoCS3he/MI07+Di1Xj/r0UzArZWJRQYZrtYJg3EmOtQQi20bjHLN4tdvvcikHuPE=
+X-Google-Smtp-Source: ABdhPJzy21IbfCNBgWrmEvBpNWC+w/Vk6Q0yxu+DyCcXBuvW5qg3F/1hbiLuLSMDvZE7qobCzE7kSrjBcQ==
+X-Received: from nhuck.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:39cc])
+ (user=nhuck job=sendgmr) by 2002:a1f:1b01:0:b0:34e:588e:3685 with SMTP id
+ b1-20020a1f1b01000000b0034e588e3685mr4710093vkb.38.1653070507016; Fri, 20 May
+ 2022 11:15:07 -0700 (PDT)
+Date:   Fri, 20 May 2022 18:14:52 +0000
+Message-Id: <20220520181501.2159644-1-nhuck@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
+Subject: [PATCH v9 0/9] crypto: HCTR2 support
+From:   Nathan Huckleberry <nhuck@google.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-fscrypt@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-arm-kernel@lists.infradead.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Nathan Huckleberry <nhuck@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Returning an error value in an i2c remove callback results in an error
-message being emitted by the i2c core, but otherwise it doesn't make a
-difference. The device goes away anyhow and the devm cleanups are
-called.
+HCTR2 is a length-preserving encryption mode that is efficient on
+processors with instructions to accelerate AES and carryless
+multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
+processors with the ARMv8 Crypto Extensions.
 
-As atmel_ecc_remove() already emits an error message on failure and the
-additional error message by the i2c core doesn't add any useful
-information, change the return value to zero to suppress this message.
+HCTR2 is specified in https://ia.cr/2021/1441 "Length-preserving encryption
+with HCTR2" which shows that if AES is secure and HCTR2 is instantiated
+with AES, then HCTR2 is secure.  Reference code and test vectors are at
+https://github.com/google/hctr2.
 
-Also make the error message a bit more drastical because when the device
-is still busy on remove, it's likely that it will access freed memory
-soon.
+As a length-preserving encryption mode, HCTR2 is suitable for applications
+such as storage encryption where ciphertext expansion is not possible, and
+thus authenticated encryption cannot be used.  Currently, such applications
+usually use XTS, or in some cases Adiantum.  XTS has the disadvantage that
+it is a narrow-block mode: a bitflip will only change 16 bytes in the
+resulting ciphertext or plaintext.  This reveals more information to an
+attacker than necessary.
 
-This patch is a preparation for making i2c remove callbacks return void.
+HCTR2 is a wide-block mode, so it provides a stronger security property: a
+bitflip will change the entire message.  HCTR2 is somewhat similar to
+Adiantum, which is also a wide-block mode.  However, HCTR2 is designed to
+take advantage of existing crypto instructions, while Adiantum targets
+devices without such hardware support.  Adiantum is also designed with
+longer messages in mind, while HCTR2 is designed to be efficient even on
+short messages.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/crypto/atmel-ecc.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+The first intended use of this mode in the kernel is for the encryption of
+filenames, where for efficiency reasons encryption must be fully
+deterministic (only one ciphertext for each plaintext) and the existing CBC
+solution leaks more information than necessary for filenames with common
+prefixes.
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 333fbefbbccb..6ba38275de8c 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -349,8 +349,16 @@ static int atmel_ecc_remove(struct i2c_client *client)
- 
- 	/* Return EBUSY if i2c client already allocated. */
- 	if (atomic_read(&i2c_priv->tfm_count)) {
--		dev_err(&client->dev, "Device is busy\n");
--		return -EBUSY;
-+		/*
-+		 * After we return here, the memory backing the device is freed.
-+		 * That happens no matter what the return value of this function
-+		 * is because in the Linux device model there is no error
-+		 * handling for unbinding a driver.
-+		 * If there is still some action pending, it probably involves
-+		 * accessing the freed memory.
-+		 */
-+		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
-+		return 0;
- 	}
- 
- 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
+HCTR2 uses two passes of an =CE=B5-almost-=E2=88=86-universal hash function=
+ called
+POLYVAL and one pass of a block cipher mode called XCTR.  POLYVAL is a
+polynomial hash designed for efficiency on modern processors and was
+originally specified for use in AES-GCM-SIV (RFC 8452).  XCTR mode is a
+variant of CTR mode that is more efficient on little-endian machines.
 
-base-commit: 3123109284176b1532874591f7c81f3837bbdc17
--- 
-2.35.1
+This patchset adds HCTR2 to Linux's crypto API, including generic
+implementations of XCTR and POLYVAL, hardware accelerated implementations
+of XCTR and POLYVAL for both x86-64 and ARM64, a templated implementation
+of HCTR2, and an fscrypt policy for using HCTR2 for filename encryption.
+
+Changes in v9:
+ * Fix redefinition error
+
+Changes in v8:
+ * Fix incorrect x86 POLYVAL comment
+ * Add additional comments to ARM64 XCTR/CTR implementation
+
+Changes in v7:
+ * Added/modified some comments in ARM64 XCTR/CTR implementation
+ * Various small style fixes
+
+Changes in v6:
+ * Split ARM64 XCTR/CTR refactoring into separate patch
+ * Allow simd POLYVAL implementations to be preempted
+ * Fix uninitialized bug in HCTR2
+ * Fix streamcipher name handling bug in HCTR2
+ * Various small style fixes
+
+Changes in v5:
+ * Refactor HCTR2 tweak hashing
+ * Remove non-AVX x86-64 XCTR implementation
+ * Combine arm64 CTR and XCTR modes
+ * Comment and alias CTR and XCTR modes
+ * Move generic fallback code for simd POLYVAL into polyval-generic.c
+ * Various small style fixes
+
+Changes in v4:
+ * Small style fixes in generic POLYVAL and XCTR
+ * Move HCTR2 hash exporting/importing to helper functions
+ * Rewrite montgomery reduction for x86-64 POLYVAL
+ * Rewrite partial block handling for x86-64 POLYVAL
+ * Optimize x86-64 POLYVAL loop handling
+ * Remove ahash wrapper from x86-64 POLYVAL
+ * Add simd-unavailable handling to x86-64 POLYVAL
+ * Rewrite montgomery reduction for ARM64 POLYVAL
+ * Rewrite partial block handling for ARM64 POLYVAL
+ * Optimize ARM64 POLYVAL loop handling
+ * Remove ahash wrapper from ARM64 POLYVAL
+ * Add simd-unavailable handling to ARM64 POLYVAL
+
+Changes in v3:
+ * Improve testvec coverage for XCTR, POLYVAL and HCTR2
+ * Fix endianness bug in xctr.c
+ * Fix alignment issues in polyval-generic.c
+ * Optimize hctr2.c by exporting/importing hash states
+ * Fix blockcipher name derivation in hctr2.c
+ * Move x86-64 XCTR implementation into aes_ctrby8_avx-x86_64.S
+ * Reuse ARM64 CTR mode tail handling in ARM64 XCTR
+ * Fix x86-64 POLYVAL comments
+ * Fix x86-64 POLYVAL key_powers type to match asm
+ * Fix ARM64 POLYVAL comments
+ * Fix ARM64 POLYVAL key_powers type to match asm
+ * Add XTS + HCTR2 policy to fscrypt
+
+Nathan Huckleberry (9):
+  crypto: xctr - Add XCTR support
+  crypto: polyval - Add POLYVAL support
+  crypto: hctr2 - Add HCTR2 support
+  crypto: x86/aesni-xctr: Add accelerated implementation of XCTR
+  crypto: arm64/aes-xctr: Add accelerated implementation of XCTR
+  crypto: arm64/aes-xctr: Improve readability of XCTR and CTR modes
+  crypto: x86/polyval: Add PCLMULQDQ accelerated implementation of
+    POLYVAL
+  crypto: arm64/polyval: Add PMULL accelerated implementation of POLYVAL
+  fscrypt: Add HCTR2 support for filename encryption
+
+ Documentation/filesystems/fscrypt.rst   |   22 +-
+ arch/arm64/crypto/Kconfig               |    9 +-
+ arch/arm64/crypto/Makefile              |    3 +
+ arch/arm64/crypto/aes-glue.c            |   80 +-
+ arch/arm64/crypto/aes-modes.S           |  349 +++--
+ arch/arm64/crypto/polyval-ce-core.S     |  361 ++++++
+ arch/arm64/crypto/polyval-ce-glue.c     |  191 +++
+ arch/x86/crypto/Makefile                |    3 +
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S |  232 ++--
+ arch/x86/crypto/aesni-intel_glue.c      |  114 +-
+ arch/x86/crypto/polyval-clmulni_asm.S   |  321 +++++
+ arch/x86/crypto/polyval-clmulni_glue.c  |  203 +++
+ crypto/Kconfig                          |   39 +-
+ crypto/Makefile                         |    3 +
+ crypto/hctr2.c                          |  581 +++++++++
+ crypto/polyval-generic.c                |  245 ++++
+ crypto/tcrypt.c                         |   10 +
+ crypto/testmgr.c                        |   20 +
+ crypto/testmgr.h                        | 1536 +++++++++++++++++++++++
+ crypto/xctr.c                           |  191 +++
+ fs/crypto/fscrypt_private.h             |    2 +-
+ fs/crypto/keysetup.c                    |    7 +
+ fs/crypto/policy.c                      |   14 +-
+ include/crypto/polyval.h                |   22 +
+ include/uapi/linux/fscrypt.h            |    3 +-
+ 25 files changed, 4362 insertions(+), 199 deletions(-)
+ create mode 100644 arch/arm64/crypto/polyval-ce-core.S
+ create mode 100644 arch/arm64/crypto/polyval-ce-glue.c
+ create mode 100644 arch/x86/crypto/polyval-clmulni_asm.S
+ create mode 100644 arch/x86/crypto/polyval-clmulni_glue.c
+ create mode 100644 crypto/hctr2.c
+ create mode 100644 crypto/polyval-generic.c
+ create mode 100644 crypto/xctr.c
+ create mode 100644 include/crypto/polyval.h
+
+--=20
+2.36.1.124.g0e6072fb45-goog
 
