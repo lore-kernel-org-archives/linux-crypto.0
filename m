@@ -2,89 +2,58 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E01C433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7498CC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 05:57:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238193AbiETFxy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 01:53:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34214 "EHLO
+        id S1345658AbiETF5f (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 01:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231455AbiETFxu (ORCPT
+        with ESMTP id S244615AbiETF5c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 01:53:50 -0400
+        Fri, 20 May 2022 01:57:32 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B12C1EFC;
-        Thu, 19 May 2022 22:53:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3EE13326E;
+        Thu, 19 May 2022 22:57:31 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nrva3-00Fhx1-Ai; Fri, 20 May 2022 15:53:44 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:53:43 +0800
-Date:   Fri, 20 May 2022 13:53:43 +0800
+        id 1nrvda-00FhyN-PW; Fri, 20 May 2022 15:57:24 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 May 2022 13:57:23 +0800
+Date:   Fri, 20 May 2022 13:57:23 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nathan Huckleberry <nhuck@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v8 8/9] crypto: arm64/polyval: Add PMULL accelerated
- implementation of POLYVAL
-Message-ID: <Yocs5y9rvJJ+eI6C@gondor.apana.org.au>
-References: <20220510172359.3720527-1-nhuck@google.com>
- <20220510172359.3720527-9-nhuck@google.com>
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc:     linux-crypto@vger.kernel.org, qat-linux@intel.com,
+        stable@vger.kernel.org, Adam Guerin <adam.guerin@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: Re: [PATCH] crypto: qat - set to zero DH parameters before free
+Message-ID: <Yoctw20I9WNHF9Wz@gondor.apana.org.au>
+References: <20220509131927.55387-1-giovanni.cabiddu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220510172359.3720527-9-nhuck@google.com>
+In-Reply-To: <20220509131927.55387-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 10, 2022 at 05:23:58PM +0000, Nathan Huckleberry wrote:
->
-> +module_cpu_feature_match(PMULL, polyval_ce_mod_init)
-> +
-> +module_init(polyval_ce_mod_init);
+On Mon, May 09, 2022 at 02:19:27PM +0100, Giovanni Cabiddu wrote:
+> Set to zero the context buffers containing the DH key before they are
+> freed.
+> This is a defense in depth measure that avoids keys to be recovered from
+> memory in case the system is compromised between the free of the buffer
+> and when that area of memory (containing keys) gets overwritten.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: c9839143ebbf ("crypto: qat - Add DH support")
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Adam Guerin <adam.guerin@intel.com>
+> Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
+> ---
+>  drivers/crypto/qat/qat_common/qat_asym_algs.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-I get a cross-compile failure on this:
-
-In file included from ../arch/arm64/crypto/polyval-ce-glue.c:25:
-../include/linux/module.h:131:42: error: redefinition of ‘__inittest’
-  131 |  static inline initcall_t __maybe_unused __inittest(void)  \
-      |                                          ^~~~~~~~~~
-../arch/arm64/crypto/polyval-ce-glue.c:187:1: note: in expansion of macro ‘module_init’
-  187 | module_init(polyval_ce_mod_init);
-      | ^~~~~~~~~~~
-../include/linux/module.h:131:42: note: previous definition of ‘__inittest’ was here
-  131 |  static inline initcall_t __maybe_unused __inittest(void)  \
-      |                                          ^~~~~~~~~~
-../include/linux/cpufeature.h:55:1: note: in expansion of macro ‘module_init’
-   55 | module_init(cpu_feature_match_ ## x ## _init)
-      | ^~~~~~~~~~~
-../arch/arm64/crypto/polyval-ce-glue.c:185:1: note: in expansion of macro ‘module_cpu_feature_match’
-  185 | module_cpu_feature_match(PMULL, polyval_ce_mod_init)
-      | ^~~~~~~~~~~~~~~~~~~~~~~~
-../include/linux/module.h:133:6: error: redefinition of ‘init_module’
-  133 |  int init_module(void) __copy(initfn)   \
-      |      ^~~~~~~~~~~
-../arch/arm64/crypto/polyval-ce-glue.c:187:1: note: in expansion of macro ‘module_init’
-  187 | module_init(polyval_ce_mod_init);
-      | ^~~~~~~~~~~
-../include/linux/module.h:133:6: note: previous definition of ‘init_module’ was here
-  133 |  int init_module(void) __copy(initfn)   \
-      |      ^~~~~~~~~~~
-../include/linux/cpufeature.h:55:1: note: in expansion of macro ‘module_init’
-   55 | module_init(cpu_feature_match_ ## x ## _init)
-      | ^~~~~~~~~~~
-../arch/arm64/crypto/polyval-ce-glue.c:185:1: note: in expansion of macro ‘module_cpu_feature_match’
-  185 | module_cpu_feature_match(PMULL, polyval_ce_mod_init)
-      | ^~~~~~~~~~~~~~~~~~~~~~~~
-
-Thanks,
+Patch applied.  Thansk.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
