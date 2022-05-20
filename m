@@ -2,80 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB30C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 06:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17855C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 May 2022 06:57:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345752AbiETGKV (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 May 2022 02:10:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
+        id S243176AbiETG5G (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 20 May 2022 02:57:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345760AbiETGKV (ORCPT
+        with ESMTP id S235886AbiETG5F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 May 2022 02:10:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 972EE14C755;
-        Thu, 19 May 2022 23:10:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 20 May 2022 02:57:05 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45C5566AEA;
+        Thu, 19 May 2022 23:57:04 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 248EE61D92;
-        Fri, 20 May 2022 06:10:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 86537C34100;
-        Fri, 20 May 2022 06:10:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653027016;
-        bh=+g8bHb2ilbuh8waM+HYF0p83yeXeOKZUATDuTJKYzKk=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Idy55GefI4ac6/SHeU30qdRAsd9T8UPBNPrBsTOHDBUiSdRCRd48J9pLXOmsPwYU9
-         gzzPq7LIikMc1Jft8nXQ2S2QHGnxGJHAn81lu2ipnXHJaizUzdTeOHyE/MNRIIkhtP
-         Tx38e9hpqo1+gv1ZVJKiMbAv1W56FXVn2hJB5t1rkSXBQb2a0/2cHP4E8dg7eXZ+Dh
-         SWweC3XtthwO7morsohtTjZtz1ctjKi9WclOov/fNBEB7pWkwQQrlzwL2tCO7zCE/P
-         jSFx7hNxY/K2D+LctLAHbVTCx8cao/gt5wbraXWBApAtXgb+/WKdEUynas8dUYw/mO
-         lcyWTQUzJvyGA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73025F0383D;
-        Fri, 20 May 2022 06:10:16 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 5.18
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
-References: <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au> <Yocp8BaZacpvwJEL@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Yocp8BaZacpvwJEL@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2
-X-PR-Tracked-Commit-Id: 16287397ec5c08aa58db6acf7dbc55470d78087d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3d7285a335edaf23b699e87c528cf0b0070e3293
-Message-Id: <165302701646.26960.7262335626261692818.pr-tracker-bot@kernel.org>
-Date:   Fri, 20 May 2022 06:10:16 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4L4Hb23dQhz4xD9;
+        Fri, 20 May 2022 16:57:02 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1653029822;
+        bh=3qcC0zxa4JNcBZM2KoM0PUrp8oT7ymNUmD1Kh8x2BLE=;
+        h=Date:From:To:Cc:Subject:From;
+        b=mF5G2mI9LN/6goV1xEUdlwdttZuZYp7qiCAR5xLBbEVqryX0rm3YGAmOk33Pt1E8M
+         VANVjdea+1WsIU6hDoc1Xsj/0eoYM2/e78Zh3YLLungYPf9PXy36XaSHKQKLn/t5f3
+         8sb7xnaSkTXhVpv+oEQmIq+RtM5aMWivrQE/ttYxv2IaGhBit4cQizElTpkwEtZDz4
+         jmRtDcw5Oe8o0xulE4UB5VOxacJOGj9NKoij8bjqmuTJCsHfyy2VBJ15GJB0Bg8Zwz
+         zHXzi9ac8mcYl+vB2jffIH/c0WQHm10OLmFCwrSpgv7d+jddQ98Uz8RhCj/zUA+cUk
+         n6D78eZmZAcBQ==
+Date:   Fri, 20 May 2022 16:57:01 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: linux-next: manual merge of the tpmdd tree with the crypto tree
+Message-ID: <20220520165701.14224ddb@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/s55XKUIBqpxB_cDnrpn6i.n";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 20 May 2022 13:41:04 +0800:
+--Sig_/s55XKUIBqpxB_cDnrpn6i.n
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.18-p2
+Hi all,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3d7285a335edaf23b699e87c528cf0b0070e3293
+Today's linux-next merge of the tpmdd tree got a conflict in:
 
-Thank you!
+  drivers/crypto/caam/Kconfig
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+between commit:
+
+  0aa6ac7795ca ("crypto: caam/rng - Add support for PRNG")
+
+from the crypto tree and commit:
+
+  5e785783ddb0 ("crypto: caam - add in-kernel interface for blob generator")
+
+from the tpmdd tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/crypto/caam/Kconfig
+index 0aa52b612a01,ea9f8b1ae981..000000000000
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@@ -151,14 -151,9 +151,17 @@@ config CRYPTO_DEV_FSL_CAAM_RNG_AP
+  	  Selecting this will register the SEC4 hardware rng to
+  	  the hw_random API for supplying the kernel entropy pool.
+ =20
+ +config CRYPTO_DEV_FSL_CAAM_PRNG_API
+ +	bool "Register Pseudo random number generation implementation with Crypt=
+o API"
+ +	default y
+ +	select CRYPTO_RNG
+ +	help
+ +	  Selecting this will register the SEC hardware prng to
+ +	  the Crypto API.
+ +
++ config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
++ 	bool
++=20
+  endif # CRYPTO_DEV_FSL_CAAM_JR
+ =20
+  endif # CRYPTO_DEV_FSL_CAAM
+
+--Sig_/s55XKUIBqpxB_cDnrpn6i.n
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmKHO70ACgkQAVBC80lX
+0GzSxgf6Ariy3P688k9jklxHAKIMrNYfg3624IP+CH6Hfiw4iZmdZpTmDVL/L8b8
+M4XcFAfmXDDhuh6CT7lqTGSFquYKGiMFea0TIElNGj1xHORTbGX8X2dyjvfVV/PZ
+lg74e6QBcYDjLhEFX4mNpM+3htDr629uUqC+dJe/uzY32gUFWwuYvFDlLX48VjpS
+3H9ENxxZ/ma+/Q6SNwTj4Xlh4teeahEqNB/lcT2qGYhk86Vp0oAK5OUnL9dOd+B4
+qoTZ7SmF8mVaXfsY/nyMceoMP6XUwAex8FoOiHghhNi+YE5cFz0s+VvQlWxY9BzA
+KBlyBZUrBs5rDOkoioCYauTZvvlKSg==
+=j1fH
+-----END PGP SIGNATURE-----
+
+--Sig_/s55XKUIBqpxB_cDnrpn6i.n--
