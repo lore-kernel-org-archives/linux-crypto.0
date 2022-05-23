@@ -2,102 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3746C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 May 2022 18:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA65C433F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 May 2022 19:59:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242440AbiEWS2e (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 May 2022 14:28:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
+        id S229930AbiEWT7F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 May 2022 15:59:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245135AbiEWS0h (ORCPT
+        with ESMTP id S229555AbiEWT7E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 May 2022 14:26:37 -0400
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F885C369;
-        Mon, 23 May 2022 11:02:03 -0700 (PDT)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id 827591C0B82; Mon, 23 May 2022 19:59:28 +0200 (CEST)
-Date:   Mon, 23 May 2022 19:59:28 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Jann Horn <jannh@google.com>
-Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
- init
-Message-ID: <20220523175928.GA30223@duo.ucw.cz>
-References: <20220322191436.110963-1-Jason@zx2c4.com>
- <YjqVemCkZCU1pOzj@mit.edu>
- <YjqbcQbYHCOpgqGg@zx2c4.com>
+        Mon, 23 May 2022 15:59:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BCE7890D;
+        Mon, 23 May 2022 12:59:03 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 477F86140D;
+        Mon, 23 May 2022 19:59:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A9F2C385AA;
+        Mon, 23 May 2022 19:59:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653335942;
+        bh=ud5Q/1QhrPDGlv6dQdDPoIxkp3EA8jcR1Hd6nj1gp08=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=D72Ht9YY2Hp4/RJAt+daNZjCRg4xXJsw7S5wfeWwtqOZojOBnvMrtvJCaLSDaL7vJ
+         EAaUf3z2/UENUCDoYMQLOXvTQ0mPW6DQLRrhYIsDrKGsFl4i9El6n/xoI4Z+1JQFDk
+         NnvwOcUGCW9wwl8YS6+qaa+/U8BNh3CTsTQIpIYRwdrEMKqkC1s2ard1uPQ1v1zuxx
+         Av+ChXwVii7EQFOcImDCFOWZ+nCM3ugRoj1UVKEBUWpGJN24FeuchH7KZ+Qf45UiGE
+         jSkasldeUD/h24Q0yLpiCQN2PoHAUaY+TjJpWXxoMZd+soG+3mlnchhMe2npl533Z+
+         KiR3u3BK4uhcg==
+Date:   Mon, 23 May 2022 22:57:21 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+        Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: Re: linux-next: manual merge of the tpmdd tree with the crypto tree
+Message-ID: <YovnISBB4Y3DGYiW@kernel.org>
+References: <20220520165701.14224ddb@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="X1bOJ3K7DJ5YkBrT"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YjqbcQbYHCOpgqGg@zx2c4.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20220520165701.14224ddb@canb.auug.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Fri, May 20, 2022 at 04:57:01PM +1000, Stephen Rothwell wrote:
+> Hi all,
+> 
+> Today's linux-next merge of the tpmdd tree got a conflict in:
+> 
+>   drivers/crypto/caam/Kconfig
+> 
+> between commit:
+> 
+>   0aa6ac7795ca ("crypto: caam/rng - Add support for PRNG")
+> 
+> from the crypto tree and commit:
+> 
+>   5e785783ddb0 ("crypto: caam - add in-kernel interface for blob generator")
+> 
+> from the tpmdd tree.
+> 
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+> 
+> -- 
+> Cheers,
+> Stephen Rothwell
+> 
+> diff --cc drivers/crypto/caam/Kconfig
+> index 0aa52b612a01,ea9f8b1ae981..000000000000
+> --- a/drivers/crypto/caam/Kconfig
+> +++ b/drivers/crypto/caam/Kconfig
+> @@@ -151,14 -151,9 +151,17 @@@ config CRYPTO_DEV_FSL_CAAM_RNG_AP
+>   	  Selecting this will register the SEC4 hardware rng to
+>   	  the hw_random API for supplying the kernel entropy pool.
+>   
+>  +config CRYPTO_DEV_FSL_CAAM_PRNG_API
+>  +	bool "Register Pseudo random number generation implementation with Crypto API"
+>  +	default y
+>  +	select CRYPTO_RNG
+>  +	help
+>  +	  Selecting this will register the SEC hardware prng to
+>  +	  the Crypto API.
+>  +
+> + config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
+> + 	bool
+> + 
+>   endif # CRYPTO_DEV_FSL_CAAM_JR
+>   
+>   endif # CRYPTO_DEV_FSL_CAAM
 
---X1bOJ3K7DJ5YkBrT
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Herbert, so I pulled the whole patch set. How should we work out this?
 
-Hi!
+I sent PR before seeing this:
 
-> > One of the big issues with /dev/urandom writes is that *anyone*,
-> > including malicious user space, can force specific bytes to be mixed
-> > in. =A0That's the source of the reluctance to immediate use inputs from
-> > writes into /dev/[u]random until there is a chance for it to be mixed
-> > in with other entropy which is hopefully not under the control of
-> > malicious userspace.
->=20
-> Right, sort of. Since we now always use a cryptographic hash function,
-> we can haphazardly mix whatever any user wants, without too much
-> concern. The issue is whether we _credit_ those bits. Were we to credit
-> those bits, a malicious unpriv'd user could credit 248 bits of known
-> input, and then bruteforce 8 bits of unknown input, and repeat, and in
-> that way destroy the security of the thing. So, yea, the current
-> reluctance does make sense.
->=20
-> > Now, I recognize that things are a bit special in early boot, and if
-> > we have a malicious script running in a systemd unit script, we might
-> > as well go home. =A0But something to consider is whether we want to do
-> > soemthing special if the process writing to /dev/[u]random has
-> > CAP_SYS_ADMIN, or some such.
->=20
-> Exactly. So one way of approaching this would be to simply credit writes
-> to /dev/urandom if it's CAP_SYS_ADMIN and maybe if also !crng_ready(),
-> and just skip the crng_pre_init_inject() part that this current patch
-> adds. I'll attach a sample patch of what this might look like at the end
-> of this email.
+https://lore.kernel.org/linux-integrity/20220523165744.48234-1-jarkko@kernel.org/T/#u
 
-CAP_* should not really work like that. They should control if process
-can do the operation, but should not really silently change what
-syscall does based on the CAP_*...
-
-(And yes, I'm a bit late).
-
-Best regards,
-								Pavel
-							=09
-
---=20
-People of Russia, stop Putin before his war on Ukraine escalates.
-
---X1bOJ3K7DJ5YkBrT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCYovLgAAKCRAw5/Bqldv6
-8okSAJ494jYj529aStpwUSRGJyX7bstzigCfUhDnVooEyqU8fxOWunoDWU4iZoc=
-=suKg
------END PGP SIGNATURE-----
-
---X1bOJ3K7DJ5YkBrT--
+BR, Jarkko
