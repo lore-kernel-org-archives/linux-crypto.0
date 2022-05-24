@@ -2,112 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA65C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 May 2022 19:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8279EC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 May 2022 00:56:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbiEWT7F (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 May 2022 15:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48922 "EHLO
+        id S230282AbiEXA4V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 23 May 2022 20:56:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiEWT7E (ORCPT
+        with ESMTP id S229726AbiEXA4U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 May 2022 15:59:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BCE7890D;
-        Mon, 23 May 2022 12:59:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 477F86140D;
-        Mon, 23 May 2022 19:59:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A9F2C385AA;
-        Mon, 23 May 2022 19:59:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653335942;
-        bh=ud5Q/1QhrPDGlv6dQdDPoIxkp3EA8jcR1Hd6nj1gp08=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=D72Ht9YY2Hp4/RJAt+daNZjCRg4xXJsw7S5wfeWwtqOZojOBnvMrtvJCaLSDaL7vJ
-         EAaUf3z2/UENUCDoYMQLOXvTQ0mPW6DQLRrhYIsDrKGsFl4i9El6n/xoI4Z+1JQFDk
-         NnvwOcUGCW9wwl8YS6+qaa+/U8BNh3CTsTQIpIYRwdrEMKqkC1s2ard1uPQ1v1zuxx
-         Av+ChXwVii7EQFOcImDCFOWZ+nCM3ugRoj1UVKEBUWpGJN24FeuchH7KZ+Qf45UiGE
-         jSkasldeUD/h24Q0yLpiCQN2PoHAUaY+TjJpWXxoMZd+soG+3mlnchhMe2npl533Z+
-         KiR3u3BK4uhcg==
-Date:   Mon, 23 May 2022 22:57:21 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
-        Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Subject: Re: linux-next: manual merge of the tpmdd tree with the crypto tree
-Message-ID: <YovnISBB4Y3DGYiW@kernel.org>
-References: <20220520165701.14224ddb@canb.auug.org.au>
+        Mon, 23 May 2022 20:56:20 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646D6E7B;
+        Mon, 23 May 2022 17:56:16 -0700 (PDT)
+Received: from kwepemi100015.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L6bMB163Yz1JCDp;
+        Tue, 24 May 2022 08:54:46 +0800 (CST)
+Received: from kwepemm600018.china.huawei.com (7.193.23.140) by
+ kwepemi100015.china.huawei.com (7.221.188.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 08:56:14 +0800
+Received: from [10.174.176.88] (10.174.176.88) by
+ kwepemm600018.china.huawei.com (7.193.23.140) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 08:56:13 +0800
+Message-ID: <db28d6cf-fa87-8647-29cb-0122e26fa8aa@huawei.com>
+Date:   Tue, 24 May 2022 08:56:13 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220520165701.14224ddb@canb.auug.org.au>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH -next] crypto: Fix build error when CRYPTO_BLAKE2S_X86=m
+ && CRYPTO_ALGAPI2=m && CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+From:   "gaochao (L)" <gaochao49@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>
+CC:     <hpa@zytor.com>, <ebiggers@google.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <zhengbin13@huawei.com>
+References: <20220517033630.1182-1-gaochao49@huawei.com>
+In-Reply-To: <20220517033630.1182-1-gaochao49@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.88]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600018.china.huawei.com (7.193.23.140)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 20, 2022 at 04:57:01PM +1000, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Today's linux-next merge of the tpmdd tree got a conflict in:
-> 
->   drivers/crypto/caam/Kconfig
-> 
-> between commit:
-> 
->   0aa6ac7795ca ("crypto: caam/rng - Add support for PRNG")
-> 
-> from the crypto tree and commit:
-> 
->   5e785783ddb0 ("crypto: caam - add in-kernel interface for blob generator")
-> 
-> from the tpmdd tree.
-> 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
-> 
-> -- 
-> Cheers,
-> Stephen Rothwell
-> 
-> diff --cc drivers/crypto/caam/Kconfig
-> index 0aa52b612a01,ea9f8b1ae981..000000000000
-> --- a/drivers/crypto/caam/Kconfig
-> +++ b/drivers/crypto/caam/Kconfig
-> @@@ -151,14 -151,9 +151,17 @@@ config CRYPTO_DEV_FSL_CAAM_RNG_AP
->   	  Selecting this will register the SEC4 hardware rng to
->   	  the hw_random API for supplying the kernel entropy pool.
->   
->  +config CRYPTO_DEV_FSL_CAAM_PRNG_API
->  +	bool "Register Pseudo random number generation implementation with Crypto API"
->  +	default y
->  +	select CRYPTO_RNG
->  +	help
->  +	  Selecting this will register the SEC hardware prng to
->  +	  the Crypto API.
->  +
-> + config CRYPTO_DEV_FSL_CAAM_BLOB_GEN
-> + 	bool
-> + 
->   endif # CRYPTO_DEV_FSL_CAAM_JR
->   
->   endif # CRYPTO_DEV_FSL_CAAM
+friendly ping 
 
-Herbert, so I pulled the whole patch set. How should we work out this?
-
-I sent PR before seeing this:
-
-https://lore.kernel.org/linux-integrity/20220523165744.48234-1-jarkko@kernel.org/T/#u
-
-BR, Jarkko
+在 2022/5/17 11:36, gaochao 写道:
+> If CRYPTO=m, CRYPTO_ALGAPI=m, CRYPTO_ALGAPI2=m, CRYPTO_BLAKE2S_X86=m,
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+> bulding fails:
+> 
+> arch/x86/crypto/blake2s-glue.o: In function `blake2s_compress':
+> (.text+0x5a): undefined reference to `crypto_simd_disabled_for_test'
+> make: *** [vmlinux] Error 1
+> 
+> When CRYPTO_MANAGER_EXTRA_TESTS=y, blake2s_compress will call
+> crypto_simd_disabled_for_test.
+> When CRYPTO_ALGAPI2=m, crypto_algapi build as a module,
+> but if CONFIG_CRYPTO_BLAKE2S_X86=m at the same time,
+> libblake2s-x86_64.o build with obj-y, this will accuse the above error.
+> 
+> To fix this error:
+> 1 Choose CRYPTO_ALGAPI2 for CRYPTO_BLAKE2S_X86
+> when CRYPTO_MANAGER_EXTRA_TESTS=y.
+> 2 build libblake2s-x86_64.o as a module when CONFIG_CRYPTO_BLAKE2S_X86=y
+> 
+> Fixes: 8fc5f2ad896b ("crypto: testmgr - Move crypto_simd_disabled_for_test out")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: gaochao <gaochao49@huawei.com>
+> ---
+>  arch/x86/crypto/Makefile | 2 +-
+>  crypto/Kconfig           | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+> index 2831685adf6f..54b2469fa49a 100644
+> --- a/arch/x86/crypto/Makefile
+> +++ b/arch/x86/crypto/Makefile
+> @@ -63,7 +63,7 @@ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_s
+> 
+>  obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+>  blake2s-x86_64-y := blake2s-shash.o
+> -obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
+> +obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += libblake2s-x86_64.o
+>  libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+> 
+>  obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 19197469cfab..e61598f8f8c5 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -714,6 +714,7 @@ config CRYPTO_BLAKE2S_X86
+>  	depends on X86 && 64BIT
+>  	select CRYPTO_LIB_BLAKE2S_GENERIC
+>  	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+> +	select CRYPTO_ALGAPI2 if CRYPTO_MANAGER_EXTRA_TESTS
+> 
+>  config CRYPTO_CRCT10DIF
+>  	tristate "CRCT10DIF algorithm"
+> --
+> 2.17.1
+> 
+> .
