@@ -2,112 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8279EC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 May 2022 00:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41EA5C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 May 2022 06:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230282AbiEXA4V (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 May 2022 20:56:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39858 "EHLO
+        id S233946AbiEXGcf (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 24 May 2022 02:32:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbiEXA4U (ORCPT
+        with ESMTP id S230481AbiEXGce (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 May 2022 20:56:20 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 646D6E7B;
-        Mon, 23 May 2022 17:56:16 -0700 (PDT)
-Received: from kwepemi100015.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L6bMB163Yz1JCDp;
-        Tue, 24 May 2022 08:54:46 +0800 (CST)
-Received: from kwepemm600018.china.huawei.com (7.193.23.140) by
- kwepemi100015.china.huawei.com (7.221.188.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 24 May 2022 08:56:14 +0800
-Received: from [10.174.176.88] (10.174.176.88) by
- kwepemm600018.china.huawei.com (7.193.23.140) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 24 May 2022 08:56:13 +0800
-Message-ID: <db28d6cf-fa87-8647-29cb-0122e26fa8aa@huawei.com>
-Date:   Tue, 24 May 2022 08:56:13 +0800
+        Tue, 24 May 2022 02:32:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F142A7522D
+        for <linux-crypto@vger.kernel.org>; Mon, 23 May 2022 23:32:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653373952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nrMEoijBijbNU22Jw7uLctg18ZKd9qcLuQqiF8bfzeA=;
+        b=fXO71OyqL0A8NAcIZ9DIoyn00OR47o0aPp/z3tYulZoJpYJYQ4MiMthNoAe7jQJG7uKPd1
+        MoxjUZOUw0g7vt7b++rdPxix9UMzDJ/pR+RGlrJV5CyK2XjmHKrKYGantbXRUtaSrhPhdn
+        o+oep6nJ9TS/S+0NiAqnnLnUSK1T+II=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-582-7oMdbz8ZMs6lCf8idI79EQ-1; Tue, 24 May 2022 02:32:30 -0400
+X-MC-Unique: 7oMdbz8ZMs6lCf8idI79EQ-1
+Received: by mail-lj1-f197.google.com with SMTP id y10-20020a2e95ca000000b00253d689f32fso2557814ljh.5
+        for <linux-crypto@vger.kernel.org>; Mon, 23 May 2022 23:32:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nrMEoijBijbNU22Jw7uLctg18ZKd9qcLuQqiF8bfzeA=;
+        b=5J3WWqotLCrBPWf6zHOFp3FvtelaaVLS0RwtoQkbbkS1rEbnjg5KFgqWCHc/iNa8TK
+         H6Qfm0qRoxOkmVgg2TYLkDOHKDIlXCnDZxMEc4W5nL/nkvdsRVhR62uSaBSBejIdg273
+         QjwAyeJGmhptBYJjkOKMWWQ3KmykwwjoBsQcHgTgaS/64WhhRVanEl4I5z7RY71Poqzf
+         uTCE+7YExByL/reKkQ8ClO0tgmw+9jwmH/JLb3aFNJ6rS9rNt4yZR5kKw8bjd7/mCkSN
+         uIOd44JVbbnjJR2dY/fF/j+NJEBwS9vqfe2AjNoMcDlYtQbE9Dw6uREip8b/rYq/IJFN
+         l6EA==
+X-Gm-Message-State: AOAM530+mofe/8y2dU+UW/hoMbqDgNadWqkkQpCBY4mhmdJ5KbDM6txI
+        +By6MygEB8w887P5majvaMxF6ukUSQUvpYMvvKJcMeVLYdiXtMkMnvNIwe+aQ9+v+WMmD5zXGdd
+        gdwcr5h637JBMrV1AoHkOAgYl2eEGlAE6WzbHADED
+X-Received: by 2002:a05:6512:1395:b0:446:d382:79a5 with SMTP id p21-20020a056512139500b00446d38279a5mr18397494lfa.210.1653373947662;
+        Mon, 23 May 2022 23:32:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPr5MZulLAmUF36ndBcQvv5GpAsz3ZbjIsNO7uECdQvD1+fXPY2pDSbULh5wOJKZ1HOh0Jhzb32Huft5Msonw=
+X-Received: by 2002:a05:6512:1395:b0:446:d382:79a5 with SMTP id
+ p21-20020a056512139500b00446d38279a5mr18397473lfa.210.1653373947411; Mon, 23
+ May 2022 23:32:27 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH -next] crypto: Fix build error when CRYPTO_BLAKE2S_X86=m
- && CRYPTO_ALGAPI2=m && CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-From:   "gaochao (L)" <gaochao49@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <dave.hansen@linux.intel.com>, <x86@kernel.org>
-CC:     <hpa@zytor.com>, <ebiggers@google.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <zhengbin13@huawei.com>
-References: <20220517033630.1182-1-gaochao49@huawei.com>
-In-Reply-To: <20220517033630.1182-1-gaochao49@huawei.com>
+References: <068d2824cf592748cbd9b75cf4cb6c29600e213c.1653224817.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <068d2824cf592748cbd9b75cf4cb6c29600e213c.1653224817.git.christophe.jaillet@wanadoo.fr>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 24 May 2022 14:32:16 +0800
+Message-ID: <CACGkMEtAP_8vNS_JeqOa+ezL=Ngsvk0-B-Pth=nw9rA8g=C10Q@mail.gmail.com>
+Subject: Re: [PATCH] virtio-crypto: Fix an error handling path in virtio_crypto_alg_skcipher_close_session()
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        zhenwei pi <pizhenwei@bytedance.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.88]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600018.china.huawei.com (7.193.23.140)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-friendly ping 
+On Sun, May 22, 2022 at 9:07 PM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> Now that a private buffer is allocated (see commit in the Fixes tag),
+> it must be released in all error handling paths.
+>
+> Add the missing goto to avoid a leak in the error handling path.
+>
+> Fixes: 42e6ac99e417 ("virtio-crypto: use private buffer for control request")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-在 2022/5/17 11:36, gaochao 写道:
-> If CRYPTO=m, CRYPTO_ALGAPI=m, CRYPTO_ALGAPI2=m, CRYPTO_BLAKE2S_X86=m,
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> bulding fails:
-> 
-> arch/x86/crypto/blake2s-glue.o: In function `blake2s_compress':
-> (.text+0x5a): undefined reference to `crypto_simd_disabled_for_test'
-> make: *** [vmlinux] Error 1
-> 
-> When CRYPTO_MANAGER_EXTRA_TESTS=y, blake2s_compress will call
-> crypto_simd_disabled_for_test.
-> When CRYPTO_ALGAPI2=m, crypto_algapi build as a module,
-> but if CONFIG_CRYPTO_BLAKE2S_X86=m at the same time,
-> libblake2s-x86_64.o build with obj-y, this will accuse the above error.
-> 
-> To fix this error:
-> 1 Choose CRYPTO_ALGAPI2 for CRYPTO_BLAKE2S_X86
-> when CRYPTO_MANAGER_EXTRA_TESTS=y.
-> 2 build libblake2s-x86_64.o as a module when CONFIG_CRYPTO_BLAKE2S_X86=y
-> 
-> Fixes: 8fc5f2ad896b ("crypto: testmgr - Move crypto_simd_disabled_for_test out")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: gaochao <gaochao49@huawei.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+
 > ---
->  arch/x86/crypto/Makefile | 2 +-
->  crypto/Kconfig           | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-> index 2831685adf6f..54b2469fa49a 100644
-> --- a/arch/x86/crypto/Makefile
-> +++ b/arch/x86/crypto/Makefile
-> @@ -63,7 +63,7 @@ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_s
-> 
->  obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
->  blake2s-x86_64-y := blake2s-shash.o
-> -obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
-> +obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += libblake2s-x86_64.o
->  libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
-> 
->  obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 19197469cfab..e61598f8f8c5 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -714,6 +714,7 @@ config CRYPTO_BLAKE2S_X86
->  	depends on X86 && 64BIT
->  	select CRYPTO_LIB_BLAKE2S_GENERIC
->  	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> +	select CRYPTO_ALGAPI2 if CRYPTO_MANAGER_EXTRA_TESTS
-> 
->  config CRYPTO_CRCT10DIF
->  	tristate "CRCT10DIF algorithm"
+>  drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> index e553ccadbcbc..e5876286828b 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+> @@ -239,7 +239,8 @@ static int virtio_crypto_alg_skcipher_close_session(
+>                 pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+>                         ctrl_status->status, destroy_session->session_id);
+>
+> -               return -EINVAL;
+> +               err = -EINVAL;
+> +               goto out;
+>         }
+>
+>         err = 0;
 > --
-> 2.17.1
-> 
-> .
+> 2.34.1
+>
+
