@@ -2,99 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E234C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 May 2022 10:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF748C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 May 2022 10:42:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235319AbiEYKhq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 May 2022 06:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49028 "EHLO
+        id S229671AbiEYKmq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 May 2022 06:42:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229775AbiEYKhp (ORCPT
+        with ESMTP id S229642AbiEYKmq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 May 2022 06:37:45 -0400
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0519346C
-        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 03:37:44 -0700 (PDT)
-Received: by mail-wm1-f52.google.com with SMTP id 67-20020a1c1946000000b00397382b44f4so3079238wmz.2
-        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 03:37:44 -0700 (PDT)
+        Wed, 25 May 2022 06:42:46 -0400
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE23986EE
+        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 03:42:43 -0700 (PDT)
+Received: by mail-wr1-f43.google.com with SMTP id g23so1693462wrb.13
+        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 03:42:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=pyIdYTdUZwKmyF7GRjFGTDPirurocFZ70YWrVGnMIrs=;
-        b=5aI21qDskXX2Ud1vZaixuuJZM/bZeL2hALPi5A8hS7cR2VFZ3csyEf6ZV2IM6GoMlL
-         44wG+JKw2rSkvnifCmONXO9L+Ycc28j1pVKt2bfIQBTWzpVBXL3Lu6rmJg6/7s9C2JgC
-         RMCDOizgh/Bfx2SfgVRO1k7xgve+xlxJTjZcIJVo+t+bYDga36xLDNlfK+0jHVuRAEIj
-         +YQzHFcxjdpJoS8dOF23C16uJFmBQqZWXEeUEBdPGT4Pp8Q/2r8DQpTcfFNbmxc6yxU1
-         P9cdTTtz79fTblwiFMpy7JDcy0ibWmc1RyNjRDPwJIP84h7wEU8PZHW+KpXz2VU451IS
-         x22w==
-X-Gm-Message-State: AOAM533tV0uGA5Fmt7qQbH8GBQh5pfX0vnIFq0ydIt0kbjXi/t9JIXQ9
-        IjmKIXf0wYvDC+A9L2JtcvE=
-X-Google-Smtp-Source: ABdhPJyBT7m/jA8uuy6Utfj+LkQCQBC1BaCndTfi4ilJDfEx94eJyf1CeGHxZqCr96UDZmI3HQeyVA==
-X-Received: by 2002:a05:600c:d4:b0:397:5dfa:d16c with SMTP id u20-20020a05600c00d400b003975dfad16cmr6206158wmm.182.1653475062905;
-        Wed, 25 May 2022 03:37:42 -0700 (PDT)
+        bh=cYFvf5S74zrkxiUcx9efmkq8IReMie2+kmRtGzK9T9A=;
+        b=TfpTzoFFZCJTK9FuYkIGFGRIue6tkfDQFNQuHWhJ5NgTBWBlEGDj3EV3qiDFcxH+1B
+         xzBD8Y9YstNKqzqLk+YxoBZa/sAdOoodzjQPb0C5no7oJH0dwL8/AqCdY9w+os2COHjZ
+         vF7VrP7jT0+gf5iOKAclI0M3vw3irm0HEcgFnOjUUaVOYIuwiCxV8feAlhcAsTB2YypY
+         9M9uKSH16jj7rCdsT6rv3I8GJJ7GNKm9bNroO9MbNglMkCLEkV1HxcYEYSlasaBmtyyO
+         YtpqyeM0qL1TXYi++1Tx5svaGQsneHQrUsMVrcDqHdhwKhBFqo4Fk4TkEyrP0TwtlR4e
+         GnKQ==
+X-Gm-Message-State: AOAM532pomd3aLjBcQT6hP8/SxijMQlE1zJ3chw2pBUiNFz38lVxVfY0
+        tokHeFrlevIBrC66WRIWjBUFV2ysHFE=
+X-Google-Smtp-Source: ABdhPJwVvlVhvwu055D6La1n8dBFZz/FVJlSa2HTQmGMFjI+M0cb6I0EvT6Q0weDGII3foC6XGglwg==
+X-Received: by 2002:a5d:6782:0:b0:20f:dd3a:3edf with SMTP id v2-20020a5d6782000000b0020fdd3a3edfmr12628365wru.517.1653475362422;
+        Wed, 25 May 2022 03:42:42 -0700 (PDT)
 Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id t9-20020a05600c198900b003974cb37a94sm1509002wmq.22.2022.05.25.03.37.41
+        by smtp.gmail.com with ESMTPSA id b24-20020a7bc258000000b003974ba5cacdsm1750495wmj.35.2022.05.25.03.42.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 May 2022 03:37:42 -0700 (PDT)
-Message-ID: <8dd97d9c-f241-9ce8-2aea-a703cbda25b1@grimberg.me>
-Date:   Wed, 25 May 2022 13:37:41 +0300
+        Wed, 25 May 2022 03:42:42 -0700 (PDT)
+Message-ID: <e2845be6-6759-5330-7d79-77c733af22b1@grimberg.me>
+Date:   Wed, 25 May 2022 13:42:40 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.1
-Subject: Re: [PATCHv12 00/11] nvme: In-band authentication support
+Subject: Re: [PATCH 09/11] nvmet: Implement basic In-Band Authentication
 Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+To:     Hannes Reinecke <hare@suse.de>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>
 Cc:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
         linux-crypto@vger.kernel.org
 References: <20220518112234.24264-1-hare@suse.de>
- <bc8bea8b-2cdf-4d41-65b0-5c2bf28457d2@suse.de>
+ <20220518112234.24264-10-hare@suse.de>
+ <e13a0c12-362d-e4b6-c558-03367815264b@nvidia.com>
+ <903b586c-b539-c4e5-9233-7e24aa55f11b@suse.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <bc8bea8b-2cdf-4d41-65b0-5c2bf28457d2@suse.de>
+In-Reply-To: <903b586c-b539-c4e5-9233-7e24aa55f11b@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
->> Hi all,
+>> Hi Hannes,
 >>
->> recent updates to the NVMe spec have added definitions for in-band
->> authentication, and seeing that it provides some real benefit
->> especially for NVMe-TCP here's an attempt to implement it.
+>> On 5/18/2022 2:22 PM, Hannes Reinecke wrote:
+>>> Implement NVMe-oF In-Band authentication according to NVMe TPAR 8006.
+>>> This patch adds three additional configfs entries 'dhchap_key',
+>>> 'dhchap_ctrl_key', and 'dhchap_hash' to the 'host' configfs directory.
+>>> The 'dhchap_key' and 'dhchap_ctrl_key' entries need to be in the ASCII
+>>> format as specified in NVMe Base Specification v2.0 section 8.13.5.8
+>>> 'Secret representation'.
+>>> 'dhchap_hash' defaults to 'hmac(sha256)', and can be written to to
+>>> switch to a different HMAC algorithm.
+>>>
+>>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>>> ---
+>>>   drivers/nvme/target/Kconfig            |  12 +
+>>>   drivers/nvme/target/Makefile           |   1 +
+>>>   drivers/nvme/target/admin-cmd.c        |   2 +
+>>>   drivers/nvme/target/auth.c             | 367 ++++++++++++++++++
+>>>   drivers/nvme/target/configfs.c         | 107 +++++-
+>>>   drivers/nvme/target/core.c             |  11 +
+>>>   drivers/nvme/target/fabrics-cmd-auth.c | 491 +++++++++++++++++++++++++
+>>>   drivers/nvme/target/fabrics-cmd.c      |  38 +-
+>>>   drivers/nvme/target/nvmet.h            |  62 ++++
+>>>   9 files changed, 1088 insertions(+), 3 deletions(-)
+>>>   create mode 100644 drivers/nvme/target/auth.c
+>>>   create mode 100644 drivers/nvme/target/fabrics-cmd-auth.c
+>>>
+>>> diff --git a/drivers/nvme/target/Kconfig b/drivers/nvme/target/Kconfig
+>>> index 973561c93888..e569319be679 100644
+>>> --- a/drivers/nvme/target/Kconfig
+>>> +++ b/drivers/nvme/target/Kconfig
+>>> @@ -83,3 +83,15 @@ config NVME_TARGET_TCP
+>>>         devices over TCP.
+>>>         If unsure, say N.
+>>> +
+>>> +config NVME_TARGET_AUTH
+>>> +    bool "NVMe over Fabrics In-band Authentication support"
+>>> +    depends on NVME_TARGET
+>>> +    depends on NVME_AUTH
+>>> +    select CRYPTO_HMAC
+>>> +    select CRYPTO_SHA256
+>>> +    select CRYPTO_SHA512
+>>> +    help
+>>> +      This enables support for NVMe over Fabrics In-band Authentication
+>>> +
+>>> +      If unsure, say N.
+>>> diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
+>>> index 9837e580fa7e..c66820102493 100644
+>>> --- a/drivers/nvme/target/Makefile
+>>> +++ b/drivers/nvme/target/Makefile
+>>> @@ -13,6 +13,7 @@ nvmet-y        += core.o configfs.o admin-cmd.o 
+>>> fabrics-cmd.o \
+>>>               discovery.o io-cmd-file.o io-cmd-bdev.o
+>>>   nvmet-$(CONFIG_NVME_TARGET_PASSTHRU)    += passthru.o
+>>>   nvmet-$(CONFIG_BLK_DEV_ZONED)        += zns.o
+>>> +nvmet-$(CONFIG_NVME_TARGET_AUTH)    += fabrics-cmd-auth.o auth.o
+>>>   nvme-loop-y    += loop.o
+>>>   nvmet-rdma-y    += rdma.o
+>>>   nvmet-fc-y    += fc.o
+>>> diff --git a/drivers/nvme/target/admin-cmd.c 
+>>> b/drivers/nvme/target/admin-cmd.c
+>>> index 31df40ac828f..fc8a957fad0a 100644
+>>> --- a/drivers/nvme/target/admin-cmd.c
+>>> +++ b/drivers/nvme/target/admin-cmd.c
+>>> @@ -1018,6 +1018,8 @@ u16 nvmet_parse_admin_cmd(struct nvmet_req *req)
+>>>       if (nvme_is_fabrics(cmd))
+>>>           return nvmet_parse_fabrics_admin_cmd(req);
+>>> +    if (unlikely(!nvmet_check_auth_status(req)))
+>>> +        return NVME_SC_AUTH_REQUIRED | NVME_SC_DNR;
+>>>       if (nvmet_is_disc_subsys(nvmet_req_subsys(req)))
+>>>           return nvmet_parse_discovery_cmd(req);
+>>> diff --git a/drivers/nvme/target/auth.c b/drivers/nvme/target/auth.c
+>>> new file mode 100644
+>>> index 000000000000..003c0faad7ff
+>>> --- /dev/null
+>>> +++ b/drivers/nvme/target/auth.c
+>>> @@ -0,0 +1,367 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +/*
+>>> + * NVMe over Fabrics DH-HMAC-CHAP authentication.
+>>> + * Copyright (c) 2020 Hannes Reinecke, SUSE Software Solutions.
+>>> + * All rights reserved.
+>>> + */
+>>> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>>> +#include <linux/module.h>
+>>> +#include <linux/init.h>
+>>> +#include <linux/slab.h>
+>>> +#include <linux/err.h>
+>>> +#include <crypto/hash.h>
+>>> +#include <linux/crc32.h>
+>>> +#include <linux/base64.h>
+>>> +#include <linux/ctype.h>
+>>> +#include <linux/random.h>
+>>> +#include <asm/unaligned.h>
+>>> +
+>>> +#include "nvmet.h"
+>>> +#include "../host/auth.h"
 >>
->> Thanks to Nicolai Stange the crypto DH framework has been upgraded
->> to provide us with a FFDHE implementation; I've updated the patchset
->> to use the ephemeral key generation provided there.
+>> maybe we can put the common stuff to include/linux/nvme-auth.h instead 
+>> of doing ../host/auth.h ?
 >>
->> Note that this is just for in-band authentication. Secure
->> concatenation (ie starting TLS with the negotiated parameters)
->> requires a TLS handshake, which the in-kernel TLS implementation
->> does not provide. This is being worked on with a different patchset
->> which is still WIP.
 >>
->> The nvme-cli support has already been merged; please use the latest
->> nvme-cli git repository to build the most recent version.
->>
->> A copy of this patchset can be found at
->> git://git.kernel.org/pub/scm/linux/kernel/git/hare/scsi-devel
->> branch auth.v12
->>
->> It is being cut against the latest master branch from Linus.
->>
->> As usual, comments and reviews are welcome.
->>
-> How do we proceed here?
-> This has been lingering for quite some time now, without any real 
-> progress. Despite everyone agreeing that we would need to have it.
-> Anything which is missing from my side?
-> Any other obstacles?
+> Yes, we can do that.
+> Will be fixing it for the next round.
 
-I've been through it a number of times during the iterations, I feel
-comfortable with it. I'd be more comfortable to get a second review
-at least on this code.
-
-But regardless, for the patches where it is missing:
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+We already do that in nvmet-loop, I don't think it is really needed.
