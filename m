@@ -2,1144 +2,396 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 579AAC433F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 May 2022 09:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 705A8C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 May 2022 09:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232661AbiEYJD6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 May 2022 05:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47230 "EHLO
+        id S238562AbiEYJEM (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 25 May 2022 05:04:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241337AbiEYJD3 (ORCPT
+        with ESMTP id S240966AbiEYJDp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 May 2022 05:03:29 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE4692D12
-        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 02:02:26 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id s68so2104752pgs.10
-        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 02:02:26 -0700 (PDT)
+        Wed, 25 May 2022 05:03:45 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C458195A21
+        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 02:02:42 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id h186so18396365pgc.3
+        for <linux-crypto@vger.kernel.org>; Wed, 25 May 2022 02:02:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=zbR0OGunJ12jtd9y7Otuyi7OrZzQGpSepwX41mD/Eec=;
-        b=Cp9QP+OuEMgmQ4xfaY7cJn3wzTFF135i0mAIULDYFM2fYuKMxlcoC4cpejVfYjbY2b
-         9+3IpnTlc+gbNM0U6IaoT+ERtrq8plRts/nTbDlU3jx3+6vpjHrnR3Qd/8xgjuYKyRaw
-         DFGtyx6D7DFyIGYdz5UgC4KqhHgYXgcRo9oIJaAvlEsMpbqwjVMrqic4rSaBpHLSYm/3
-         cUGMiBGcaYZaKo34s5RX7iQDdyrWPdGJSY6IsWteUfVSPb86Zga5ovxsztTAN6Pi3jjV
-         yaCfyD1QMTLzAz9BCIwFLB3Lk2ZJjWBeqcVztWAFyOlXozuYMIRq+BX201KDq5lvDH+h
-         BDzA==
+        bh=bfPCmRUy3s64a4gEze2YYwgL1/ZOymargFOksJx2I20=;
+        b=DkoWg5klroaORGn7DHQbWLz29clIoy2YcD2EkLzKuOqZWbDeqCe2YJ5JFgrteBzhUg
+         +OX1HfbX68boYkHruchChOHTSbkTBMZDpjErrs6ddlRup+gTgy0NlfsRCnuBdAUxGqv0
+         hOkA/sX9s33cpoa5votWy6KTCPZw3geRgo04B8P4qGzup5SIJ3oZEqcsXQsSRBkRNMsL
+         gIy46cE42zgqQA1iZNajy42liaEATf7nSSmxPd1ke0T7iYg25hGM/TQxfar/1A5hJYbw
+         /3wPnmb4h8QX+hgA8vRniVEDGw8z94dcOmbbJ8Gclpxrz16HCGP60C7xsfNOAx7bgK2l
+         gYoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=zbR0OGunJ12jtd9y7Otuyi7OrZzQGpSepwX41mD/Eec=;
-        b=wIKS6qhpDzCuBLACKvHL3awmg3vzFYRvIgY3A+tw2//VcKUfDYnLEeUMbXbkY2Tz4e
-         HwTfzCnMuw2NN/1xmaWtctdvIY8rrBKKsSIA+Xigb8YCqiBYBhqkDvCKuhV9gJNXNNZ5
-         FQ5BXub62A50/WOrRqZ1EtLTv+OQRowbrGnmoQ7ZlJcyCK1Cewz/kPXE8uUI288TShVY
-         MfwKZ9F5SDrRiIWZjAjNme26+ZEE1Sb5wBwx09KQsrpya+FsiXEBBCcJvgrmK//GpQgl
-         3GHnRDn/x2E5QzcCFHBHOy4RyPFrSTOxeuX7F0BVfbeI4KKKm52VSZEGiCu7glM4LNrI
-         Vshw==
-X-Gm-Message-State: AOAM532UAkF79hFy2rTYdpceYFiGrLatxlCwzDh+FtuyN3+q6ZzfyO/g
-        qf/FO1ugAyzM9RTl8bnwX9I+jg==
-X-Google-Smtp-Source: ABdhPJz4IxNsAKinZcFzmZIazrPz6nqEdC/iZBNKCuBYCqwaYFBvhrTEARHR0HzNq8gThSgUesTNXA==
-X-Received: by 2002:a05:6a00:c85:b0:518:b4a7:cce1 with SMTP id a5-20020a056a000c8500b00518b4a7cce1mr11016160pfv.66.1653469344888;
-        Wed, 25 May 2022 02:02:24 -0700 (PDT)
+        bh=bfPCmRUy3s64a4gEze2YYwgL1/ZOymargFOksJx2I20=;
+        b=yihxGQvB8LZegWlMYXm4Xb23ix7M6G+aakmmNxvCTrZZ84ZY4h8HFEe+Ig7E63K/La
+         ptfRCFkIzQ63LQYNu0Ahfn4sRXhfX6nqUjJ+MB5z7BlJcLDDpyLXunqyJTwouA+xJxZw
+         RSZzQugyaDw1bAlaIVrEZ43Q+RERT0GXpUNmZeAd2j0EaWqVNOpbI8x+pc3sk7l+XRiy
+         6mbXrkT1BoYJpu9sRFfIZx2tplqmzhacTfcDlL2evjyNQNKM0tPyjuxl9rNi5XHkK9nr
+         9ghbqup1m6kEEXyOSbNpVVcU6AJWvnPOVTmZsEGuPo5QVV59zjOkIUy3u7jXM5XR0teE
+         1u2Q==
+X-Gm-Message-State: AOAM530zyZQPR78Rtuyn/BxiBt+5Dar7y7Usc0/6jiuJn4b+aDwFeFZC
+        keey4dDq2P7thXwwR850THVFKg==
+X-Google-Smtp-Source: ABdhPJwFlcWPR0dNT/4qE8sD0Su9T6AN5IZ2TuQFLdj4ibU9EEfe6sDG+RmuTzhUWltEst1hdjLRuA==
+X-Received: by 2002:a62:a209:0:b0:510:3c47:7888 with SMTP id m9-20020a62a209000000b005103c477888mr32534402pff.14.1653469360032;
+        Wed, 25 May 2022 02:02:40 -0700 (PDT)
 Received: from FVFDK26JP3YV.usts.net ([139.177.225.226])
-        by smtp.gmail.com with ESMTPSA id b10-20020a17090a6aca00b001deb92de665sm1015424pjm.46.2022.05.25.02.02.21
+        by smtp.gmail.com with ESMTPSA id b10-20020a17090a6aca00b001deb92de665sm1015424pjm.46.2022.05.25.02.02.36
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 25 May 2022 02:02:24 -0700 (PDT)
+        Wed, 25 May 2022 02:02:39 -0700 (PDT)
 From:   Lei He <helei.sig11@bytedance.com>
 To:     mst@redhat.com, arei.gonglei@huawei.com, berrange@redhat.com
 Cc:     qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
         linux-crypto@vger.kernel.org, jasowang@redhat.com,
         cohuck@redhat.com, pizhenwei@bytedance.com,
         helei.sig11@bytedance.com
-Subject: [PATCH 5/9] crypto: Implement RSA algorithm by hogweed
-Date:   Wed, 25 May 2022 17:01:14 +0800
-Message-Id: <20220525090118.43403-6-helei.sig11@bytedance.com>
+Subject: [PATCH 8/9] tests/crypto: Add test suite for RSA keys
+Date:   Wed, 25 May 2022 17:01:17 +0800
+Message-Id: <20220525090118.43403-9-helei.sig11@bytedance.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20220525090118.43403-1-helei.sig11@bytedance.com>
 References: <20220525090118.43403-1-helei.sig11@bytedance.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Implement RSA algorithm by hogweed from nettle. Thus QEMU supports
-a 'real' RSA backend to handle request from guest side. It's
-important to test RSA offload case without OS & hardware requirement.
+As Daniel suggested, Add tests suite for rsakey, as a way to prove
+that we can handle DER errors correctly.
 
 Signed-off-by: lei he <helei.sig11@bytedance.com>
-Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- crypto/akcipher-nettle.c.inc | 451 +++++++++++++++++++++++++++++++++++++++++++
- crypto/akcipher.c            |   4 +
- crypto/meson.build           |   4 +
- crypto/rsakey-builtin.c.inc  | 200 +++++++++++++++++++
- crypto/rsakey-nettle.c.inc   | 158 +++++++++++++++
- crypto/rsakey.c              |  44 +++++
- crypto/rsakey.h              |  92 +++++++++
- meson.build                  |  11 ++
- 8 files changed, 964 insertions(+)
- create mode 100644 crypto/akcipher-nettle.c.inc
- create mode 100644 crypto/rsakey-builtin.c.inc
- create mode 100644 crypto/rsakey-nettle.c.inc
- create mode 100644 crypto/rsakey.c
- create mode 100644 crypto/rsakey.h
+ tests/unit/test-crypto-akcipher.c | 285 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 282 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/akcipher-nettle.c.inc b/crypto/akcipher-nettle.c.inc
-new file mode 100644
-index 0000000000..a7c0c6a1ee
---- /dev/null
-+++ b/crypto/akcipher-nettle.c.inc
-@@ -0,0 +1,451 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <nettle/rsa.h>
-+
-+#include "qemu/osdep.h"
-+#include "qemu/host-utils.h"
-+#include "crypto/akcipher.h"
-+#include "crypto/random.h"
-+#include "qapi/error.h"
-+#include "sysemu/cryptodev.h"
-+#include "rsakey.h"
-+
-+typedef struct QCryptoNettleRSA {
-+    QCryptoAkCipher akcipher;
-+    struct rsa_public_key pub;
-+    struct rsa_private_key priv;
-+    QCryptoRSAPaddingAlgorithm padding_alg;
-+    QCryptoHashAlgorithm hash_alg;
-+} QCryptoNettleRSA;
-+
-+static void qcrypto_nettle_rsa_free(QCryptoAkCipher *akcipher)
-+{
-+    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-+    if (!rsa) {
-+        return;
-+    }
-+
-+    rsa_public_key_clear(&rsa->pub);
-+    rsa_private_key_clear(&rsa->priv);
-+    g_free(rsa);
-+}
-+
-+static QCryptoAkCipher *qcrypto_nettle_rsa_new(
-+    const QCryptoAkCipherOptionsRSA *opt,
-+    QCryptoAkCipherKeyType type,
-+    const uint8_t *key,  size_t keylen,
-+    Error **errp);
-+
-+QCryptoAkCipher *qcrypto_akcipher_new(const QCryptoAkCipherOptions *opts,
-+                                      QCryptoAkCipherKeyType type,
-+                                      const uint8_t *key, size_t keylen,
-+                                      Error **errp)
-+{
-+    switch (opts->alg) {
-+    case QCRYPTO_AKCIPHER_ALG_RSA:
-+        return qcrypto_nettle_rsa_new(&opts->u.rsa, type, key, keylen, errp);
-+
-+    default:
-+        error_setg(errp, "Unsupported algorithm: %u", opts->alg);
-+        return NULL;
-+    }
-+
-+    return NULL;
-+}
-+
-+static void qcrypto_nettle_rsa_set_akcipher_size(QCryptoAkCipher *akcipher,
-+                                                 int key_size)
-+{
-+    akcipher->max_plaintext_len = key_size;
-+    akcipher->max_ciphertext_len = key_size;
-+    akcipher->max_signature_len = key_size;
-+    akcipher->max_dgst_len = key_size;
-+}
-+
-+static int qcrypt_nettle_parse_rsa_private_key(QCryptoNettleRSA *rsa,
-+                                               const uint8_t *key,
-+                                               size_t keylen,
-+                                               Error **errp)
-+{
-+    g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
-+        QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE, key, keylen, errp);
-+
-+    if (!rsa_key) {
-+        return -1;
-+    }
-+
-+    nettle_mpz_init_set_str_256_u(rsa->pub.n, rsa_key->n.len, rsa_key->n.data);
-+    nettle_mpz_init_set_str_256_u(rsa->pub.e, rsa_key->e.len, rsa_key->e.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.d, rsa_key->d.len, rsa_key->d.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.p, rsa_key->p.len, rsa_key->p.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.q, rsa_key->q.len, rsa_key->q.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.a, rsa_key->dp.len,
-+                                  rsa_key->dp.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.b, rsa_key->dq.len,
-+                                  rsa_key->dq.data);
-+    nettle_mpz_init_set_str_256_u(rsa->priv.c, rsa_key->u.len, rsa_key->u.data);
-+
-+    if (!rsa_public_key_prepare(&rsa->pub)) {
-+        error_setg(errp, "Failed to check RSA key");
-+        return -1;
-+    }
-+
-+    /**
-+     * Since in the kernel's unit test, the p, q, a, b, c of some
-+     * private keys is 0, only the simplest length check is done here
-+     */
-+    if (rsa_key->p.len > 1 &&
-+        rsa_key->q.len > 1 &&
-+        rsa_key->dp.len > 1 &&
-+        rsa_key->dq.len > 1 &&
-+        rsa_key->u.len > 1) {
-+        if (!rsa_private_key_prepare(&rsa->priv)) {
-+            error_setg(errp, "Failed to check RSA key");
-+            return -1;
-+        }
-+    } else {
-+        rsa->priv.size = rsa->pub.size;
-+    }
-+    qcrypto_nettle_rsa_set_akcipher_size(
-+        (QCryptoAkCipher *)rsa, rsa->priv.size);
-+
-+    return 0;
-+}
-+
-+static int qcrypt_nettle_parse_rsa_public_key(QCryptoNettleRSA *rsa,
-+                                              const uint8_t *key,
-+                                              size_t keylen,
-+                                              Error **errp)
-+{
-+    g_autoptr(QCryptoAkCipherRSAKey) rsa_key = qcrypto_akcipher_rsakey_parse(
-+        QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC, key, keylen, errp);
-+
-+    if (!rsa_key) {
-+        return -1;
-+    }
-+    nettle_mpz_init_set_str_256_u(rsa->pub.n, rsa_key->n.len, rsa_key->n.data);
-+    nettle_mpz_init_set_str_256_u(rsa->pub.e, rsa_key->e.len, rsa_key->e.data);
-+
-+    if (!rsa_public_key_prepare(&rsa->pub)) {
-+        error_setg(errp, "Failed to check RSA key");
-+        return -1;
-+    }
-+    qcrypto_nettle_rsa_set_akcipher_size(
-+        (QCryptoAkCipher *)rsa, rsa->pub.size);
-+
-+    return 0;
-+}
-+
-+static void wrap_nettle_random_func(void *ctx, size_t len, uint8_t *out)
-+{
-+    qcrypto_random_bytes(out, len, &error_abort);
-+}
-+
-+static int qcrypto_nettle_rsa_encrypt(QCryptoAkCipher *akcipher,
-+                                      const void *data, size_t data_len,
-+                                      void *enc, size_t enc_len,
-+                                      Error **errp)
-+{
-+
-+    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-+    mpz_t c;
-+    int ret = -1;
-+
-+    if (data_len > rsa->pub.size) {
-+        error_setg(errp, "Plaintext length %zu is greater than key size: %zu"
-+                   data_len, rsa->pub.size);
-+        return ret;
-+    }
-+
-+    if (enc_len < rsa->pub.size) {
-+        error_setg(errp, "Ciphertext buffer length %zu is less than "
-+                         "key size: %zu", rsa->pub.size);
-+        return ret;
-+    }
-+
-+    /* Nettle do not support RSA encryption without any padding */
-+    switch (rsa->padding_alg) {
-+    case QCRYPTO_RSA_PADDING_ALG_RAW:
-+        error_setg(errp, "RSA with raw padding is not supported");
-+        break;
-+
-+    case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+        mpz_init(c);
-+        if (rsa_encrypt(&rsa->pub, NULL, wrap_nettle_random_func,
-+                        data_len, (uint8_t *)data, c) != 1) {
-+            error_setg(errp, "Failed to encrypt");
-+        } else {
-+            nettle_mpz_get_str_256(enc_len, (uint8_t *)enc, c);
-+            ret = nettle_mpz_sizeinbase_256_u(c);
-+        }
-+        mpz_clear(c);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unknown padding");
-+    }
-+
-+    return ret;
-+}
-+
-+static int qcrypto_nettle_rsa_decrypt(QCryptoAkCipher *akcipher,
-+                                      const void *enc, size_t enc_len,
-+                                      void *data, size_t data_len,
-+                                      Error **errp)
-+{
-+    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-+    mpz_t c;
-+    int ret = -1;
-+
-+    if (enc_len > rsa->priv.size) {
-+        error_setg(errp, "Ciphertext length %zu is greater than key size: %zu",
-+                   rsa->priv.size);
-+        return ret;
-+    }
-+
-+    switch (rsa->padding_alg) {
-+    case QCRYPTO_RSA_PADDING_ALG_RAW:
-+        error_setg(errp, "RSA with raw padding is not supported");
-+        break;
-+
-+    case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+        nettle_mpz_init_set_str_256_u(c, enc_len, enc);
-+        if (!rsa_decrypt(&rsa->priv, &data_len, (uint8_t *)data, c)) {
-+            error_setg(errp, "Failed to decrypt");
-+        } else {
-+            ret = data_len;
-+        }
-+
-+        mpz_clear(c);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unknown padding algorithm: %d", rsa->padding_alg);
-+    }
-+
-+    return ret;
-+}
-+
-+static int qcrypto_nettle_rsa_sign(QCryptoAkCipher *akcipher,
-+                                   const void *data, size_t data_len,
-+                                   void *sig, size_t sig_len, Error **errp)
-+{
-+    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-+    int ret = -1, rv;
-+    mpz_t s;
-+
-+    /**
-+     * The RSA algorithm cannot be used for signature/verification
-+     * without padding.
-+     */
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+        error_setg(errp, "Try to make signature without padding");
-+        return ret;
-+    }
-+
-+    if (data_len > rsa->priv.size) {
-+        error_setg(errp, "Data length %zu is greater than key size: %zu",
-+                   rsa->priv.size);
-+        return ret;
-+    }
-+
-+    if (sig_len < rsa->priv.size) {
-+        error_setg(errp, "Signature buffer length %zu is less than "
-+                         "key size: %zu", rsa->priv.size);
-+        return ret;
-+    }
-+
-+    mpz_init(s);
-+    switch (rsa->hash_alg) {
-+    case QCRYPTO_HASH_ALG_MD5:
-+        rv = rsa_md5_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA1:
-+        rv = rsa_sha1_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA256:
-+        rv = rsa_sha256_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA512:
-+        rv = rsa_sha512_sign_digest(&rsa->priv, data, s);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unknown hash algorithm: %d", rsa->hash_alg);
-+        goto cleanup;
-+    }
-+
-+    if (rv != 1) {
-+        error_setg(errp, "Failed to make signature");
-+        goto cleanup;
-+    }
-+    nettle_mpz_get_str_256(sig_len, (uint8_t *)sig, s);
-+    ret = nettle_mpz_sizeinbase_256_u(s);
-+
-+cleanup:
-+    mpz_clear(s);
-+
-+    return ret;
-+}
-+
-+static int qcrypto_nettle_rsa_verify(QCryptoAkCipher *akcipher,
-+                                     const void *sig, size_t sig_len,
-+                                     const void *data, size_t data_len,
-+                                     Error **errp)
-+{
-+    QCryptoNettleRSA *rsa = (QCryptoNettleRSA *)akcipher;
-+
-+    int ret = -1, rv;
-+    mpz_t s;
-+
-+    /**
-+     * The RSA algorithm cannot be used for signature/verification
-+     * without padding.
-+     */
-+    if (rsa->padding_alg == QCRYPTO_RSA_PADDING_ALG_RAW) {
-+        error_setg(errp, "Try to verify signature without padding");
-+        return ret;
-+    }
-+    if (data_len > rsa->pub.size) {
-+        error_setg(errp, "Data length %zu is greater than key size: %zu",
-+                   rsa->pub.size);
-+        return ret;
-+    }
-+    if (sig_len < rsa->pub.size) {
-+        error_setg(errp, "Signature length %zu is greater than key size: %zu",
-+                   rsa->pub.size);
-+        return ret;
-+    }
-+
-+    nettle_mpz_init_set_str_256_u(s, sig_len, sig);
-+    switch (rsa->hash_alg) {
-+    case QCRYPTO_HASH_ALG_MD5:
-+        rv = rsa_md5_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA1:
-+        rv = rsa_sha1_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA256:
-+        rv = rsa_sha256_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    case QCRYPTO_HASH_ALG_SHA512:
-+        rv = rsa_sha512_verify_digest(&rsa->pub, data, s);
-+        break;
-+
-+    default:
-+        error_setg(errp, "Unsupported hash algorithm: %d", rsa->hash_alg);
-+        goto cleanup;
-+    }
-+
-+    if (rv != 1) {
-+        error_setg(errp, "Failed to verify signature");
-+        goto cleanup;
-+    }
-+    ret = 0;
-+
-+cleanup:
-+    mpz_clear(s);
-+
-+    return ret;
-+}
-+
-+QCryptoAkCipherDriver nettle_rsa = {
-+    .encrypt = qcrypto_nettle_rsa_encrypt,
-+    .decrypt = qcrypto_nettle_rsa_decrypt,
-+    .sign = qcrypto_nettle_rsa_sign,
-+    .verify = qcrypto_nettle_rsa_verify,
-+    .free = qcrypto_nettle_rsa_free,
+diff --git a/tests/unit/test-crypto-akcipher.c b/tests/unit/test-crypto-akcipher.c
+index b5be563884..4f1f4214dd 100644
+--- a/tests/unit/test-crypto-akcipher.c
++++ b/tests/unit/test-crypto-akcipher.c
+@@ -517,6 +517,158 @@ static const uint8_t exp_ciphertext_rsa2048_pkcs1[] = {
+     0xd0, 0x28, 0x03, 0x19, 0xa6, 0x06, 0x13, 0x45,
+ };
+ 
++static const uint8_t rsa_private_key_lack_element[] = {
++    /* RSAPrivateKey, offset: 0, length: 176 */
++    0x30, 0x81, 0xb0,
++    /* version, offset: 4, length: 1 */
++    0x02, 0x01, 0x00,
++    /* n, offset: 7, length: 65 */
++    0x02, 0x41,
++    0x00, 0xb9, 0xe1, 0x22, 0xdb, 0x56, 0x2f, 0xb6,
++    0xf7, 0xf0, 0x0a, 0x87, 0x43, 0x07, 0x12, 0xdb,
++    0x6d, 0xb6, 0x2b, 0x41, 0x8d, 0x2c, 0x3c, 0xa5,
++    0xdd, 0x78, 0x9a, 0x8f, 0xab, 0x8e, 0xf2, 0x4a,
++    0xc8, 0x34, 0x0c, 0x12, 0x4f, 0x11, 0x90, 0xc6,
++    0xc2, 0xa5, 0xd0, 0xcd, 0xfb, 0xfc, 0x2c, 0x95,
++    0x56, 0x82, 0xdf, 0x39, 0xf3, 0x3b, 0x1d, 0x62,
++    0x26, 0x97, 0xb7, 0x93, 0x25, 0xc7, 0xec, 0x7e,
++    0xf7,
++    /* e, offset: 74, length: 3 */
++    0x02, 0x03, 0x01, 0x00, 0x01,
++    /* d, offset: 79, length: 64 */
++    0x02, 0x40,
++    0x1e, 0x80, 0xfe, 0xda, 0x65, 0xdb, 0x70, 0xb8,
++    0x61, 0x91, 0x28, 0xbf, 0x6c, 0x32, 0xc1, 0x05,
++    0xd1, 0x26, 0x6a, 0x1c, 0x83, 0xcc, 0xf4, 0x1f,
++    0x53, 0x42, 0x72, 0x1f, 0x62, 0x57, 0x0a, 0xc4,
++    0x66, 0x76, 0x30, 0x87, 0xb9, 0xb1, 0xb9, 0x6a,
++    0x63, 0xfd, 0x8f, 0x3e, 0xfc, 0x35, 0x3f, 0xd6,
++    0x2e, 0x6c, 0xc8, 0x70, 0x8a, 0x17, 0xc1, 0x28,
++    0x6a, 0xfe, 0x51, 0x56, 0xb3, 0x92, 0x6f, 0x09,
++    /* p, offset: 145, length: 33 */
++    0x02, 0x21,
++    0x00, 0xe3, 0x2e, 0x2d, 0x8d, 0xba, 0x1c, 0x34,
++    0x4c, 0x49, 0x9f, 0xc1, 0xa6, 0xdd, 0xd7, 0x13,
++    0x8d, 0x05, 0x48, 0xdd, 0xff, 0x5c, 0x30, 0xbc,
++    0x6b, 0xc4, 0x18, 0x9d, 0xfc, 0xa2, 0xd0, 0x9b,
++    0x4d,
++    /* q, offset: 180, length: 33 */
++    0x02, 0x21,
++    0x00, 0xd1, 0x75, 0xaf, 0x4b, 0xc6, 0x1a, 0xb0,
++    0x98, 0x14, 0x42, 0xae, 0x33, 0xf3, 0x44, 0xde,
++    0x21, 0xcb, 0x04, 0xda, 0xfb, 0x1e, 0x35, 0x92,
++    0xcd, 0x69, 0xc0, 0x83, 0x06, 0x83, 0x8e, 0x39,
++    0x53,
++    /* lack element: dp, dq, u */
 +};
 +
-+static QCryptoAkCipher *qcrypto_nettle_rsa_new(
-+    const QCryptoAkCipherOptionsRSA *opt,
-+    QCryptoAkCipherKeyType type,
-+    const uint8_t *key, size_t keylen,
-+    Error **errp)
-+{
-+    QCryptoNettleRSA *rsa = g_new0(QCryptoNettleRSA, 1);
++static const uint8_t rsa_public_key_lack_element[] = {
++    /* RSAPublicKey, offset: 0, length: 67 */
++    0x30, 0x81, 0x43,
++    /* n, offset: 7, length: 65 */
++    0x02, 0x41,
++    0x00, 0xb9, 0xe1, 0x22, 0xdb, 0x56, 0x2f, 0xb6,
++    0xf7, 0xf0, 0x0a, 0x87, 0x43, 0x07, 0x12, 0xdb,
++    0x6d, 0xb6, 0x2b, 0x41, 0x8d, 0x2c, 0x3c, 0xa5,
++    0xdd, 0x78, 0x9a, 0x8f, 0xab, 0x8e, 0xf2, 0x4a,
++    0xc8, 0x34, 0x0c, 0x12, 0x4f, 0x11, 0x90, 0xc6,
++    0xc2, 0xa5, 0xd0, 0xcd, 0xfb, 0xfc, 0x2c, 0x95,
++    0x56, 0x82, 0xdf, 0x39, 0xf3, 0x3b, 0x1d, 0x62,
++    0x26, 0x97, 0xb7, 0x93, 0x25, 0xc7, 0xec, 0x7e,
++    0xf7,
++    /* lack element: e */
++};
 +
-+    rsa->padding_alg = opt->padding_alg;
-+    rsa->hash_alg = opt->hash_alg;
-+    rsa->akcipher.driver = &nettle_rsa;
-+    rsa_public_key_init(&rsa->pub);
-+    rsa_private_key_init(&rsa->priv);
++static const uint8_t rsa_public_key_empty_element[] = {
++    /* RSAPublicKey, offset: 0, length: 69 */
++    0x30, 0x81, 0x45,
++    /* n, offset: 7, length: 65 */
++    0x02, 0x41,
++    0x00, 0xb9, 0xe1, 0x22, 0xdb, 0x56, 0x2f, 0xb6,
++    0xf7, 0xf0, 0x0a, 0x87, 0x43, 0x07, 0x12, 0xdb,
++    0x6d, 0xb6, 0x2b, 0x41, 0x8d, 0x2c, 0x3c, 0xa5,
++    0xdd, 0x78, 0x9a, 0x8f, 0xab, 0x8e, 0xf2, 0x4a,
++    0xc8, 0x34, 0x0c, 0x12, 0x4f, 0x11, 0x90, 0xc6,
++    0xc2, 0xa5, 0xd0, 0xcd, 0xfb, 0xfc, 0x2c, 0x95,
++    0x56, 0x82, 0xdf, 0x39, 0xf3, 0x3b, 0x1d, 0x62,
++    0x26, 0x97, 0xb7, 0x93, 0x25, 0xc7, 0xec, 0x7e,
++    0xf7,
++    /* e: empty element */
++    0x02, 0x00,
++};
 +
-+    switch (type) {
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
-+        if (qcrypt_nettle_parse_rsa_private_key(rsa, key, keylen, errp) != 0) {
-+            goto error;
-+        }
-+        break;
++static const uint8_t rsa_private_key_empty_element[] = {
++    /* RSAPrivateKey, offset: 0, length: 19 */
++    0x30, 0x81, 0x13,
++    /* version, offset: 4, length: 1 */
++    0x02, 0x01, 0x00,
++    /* n: empty element */
++    0x02, 0x00,
++    /* e: empty element */
++    0x02, 0x00,
++    /* d: empty element */
++    0x02, 0x00,
++    /* p: empty element */
++    0x02, 0x00,
++    /* q: empty element */
++    0x02, 0x00,
++    /* dp: empty element */
++    0x02, 0x00,
++    /* dq: empty element */
++    0x02, 0x00,
++    /* u: empty element */
++    0x02, 0x00,
++};
 +
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
-+        if (qcrypt_nettle_parse_rsa_public_key(rsa, key, keylen, errp) != 0) {
-+            goto error;
-+        }
-+        break;
++static const uint8_t rsa_public_key_invalid_length_val[] = {
++    /* RSAPublicKey, INVALID length: 313 */
++    0x30, 0x82, 0x01, 0x39,
++    /* n, offset: 7, length: 65 */
++    0x02, 0x41,
++    0x00, 0xb9, 0xe1, 0x22, 0xdb, 0x56, 0x2f, 0xb6,
++    0xf7, 0xf0, 0x0a, 0x87, 0x43, 0x07, 0x12, 0xdb,
++    0x6d, 0xb6, 0x2b, 0x41, 0x8d, 0x2c, 0x3c, 0xa5,
++    0xdd, 0x78, 0x9a, 0x8f, 0xab, 0x8e, 0xf2, 0x4a,
++    0xc8, 0x34, 0x0c, 0x12, 0x4f, 0x11, 0x90, 0xc6,
++    0xc2, 0xa5, 0xd0, 0xcd, 0xfb, 0xfc, 0x2c, 0x95,
++    0x56, 0x82, 0xdf, 0x39, 0xf3, 0x3b, 0x1d, 0x62,
++    0x26, 0x97, 0xb7, 0x93, 0x25, 0xc7, 0xec, 0x7e,
++    0xf7,
++    /* e, */
++    0x02, 0x03, 0x01, 0x00, 0x01,  /* INTEGER, offset: 74, length: 3 */
++};
 +
-+    default:
-+        error_setg(errp, "Unknown akcipher key type %d", type);
-+        goto error;
-+    }
++static const uint8_t rsa_public_key_extra_elem[] = {
++    /* RSAPublicKey, length: 80 */
++    0x30, 0x81, 0x50,
++    /* n, offset: 7, length: 65 */
++    0x02, 0x41,
++    0x00, 0xb9, 0xe1, 0x22, 0xdb, 0x56, 0x2f, 0xb6,
++    0xf7, 0xf0, 0x0a, 0x87, 0x43, 0x07, 0x12, 0xdb,
++    0x6d, 0xb6, 0x2b, 0x41, 0x8d, 0x2c, 0x3c, 0xa5,
++    0xdd, 0x78, 0x9a, 0x8f, 0xab, 0x8e, 0xf2, 0x4a,
++    0xc8, 0x34, 0x0c, 0x12, 0x4f, 0x11, 0x90, 0xc6,
++    0xc2, 0xa5, 0xd0, 0xcd, 0xfb, 0xfc, 0x2c, 0x95,
++    0x56, 0x82, 0xdf, 0x39, 0xf3, 0x3b, 0x1d, 0x62,
++    0x26, 0x97, 0xb7, 0x93, 0x25, 0xc7, 0xec, 0x7e,
++    0xf7,
++    /* e, offset: 74, length: 3 */
++    0x02, 0x03, 0x01, 0x00, 0x01,
++    /* Additional integer field, length 3 */
++    0x02, 0x06, 0xe1, 0x22, 0xdb, 0xe1, 0x22, 0xdb,
++};
 +
-+    return (QCryptoAkCipher *)rsa;
++typedef struct QCryptoRSAKeyTestData QCryptoRSAKeyTestData;
++struct QCryptoRSAKeyTestData {
++    const char *path;
++    QCryptoAkCipherKeyType key_type;
++    QCryptoAkCipherOptions opt;
++    const uint8_t *key;
++    size_t keylen;
++    bool is_valid_key;
++    size_t exp_key_len;
++};
 +
-+error:
-+    qcrypto_nettle_rsa_free((QCryptoAkCipher *)rsa);
-+    return NULL;
-+}
-+
-+
-+bool qcrypto_akcipher_supports(QCryptoAkCipherOptions *opts)
-+{
-+    switch (opts->alg) {
-+    case QCRYPTO_AKCIPHER_ALG_RSA:
-+        switch (opts->u.rsa.padding_alg) {
-+        case QCRYPTO_RSA_PADDING_ALG_PKCS1:
-+            switch (opts->u.rsa.hash_alg) {
-+            case QCRYPTO_HASH_ALG_MD5:
-+            case QCRYPTO_HASH_ALG_SHA1:
-+            case QCRYPTO_HASH_ALG_SHA256:
-+            case QCRYPTO_HASH_ALG_SHA512:
-+                return true;
-+
-+            default:
-+                return false;
-+            }
-+
-+        case QCRYPTO_RSA_PADDING_ALG_RAW:
-+        default:
-+            return false;
-+        }
-+        break;
-+
-+    default:
-+        return false;
-+    }
-+}
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index ab28bf415b..f287083f92 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -23,6 +23,9 @@
- #include "crypto/akcipher.h"
- #include "akcipherpriv.h"
+ typedef struct QCryptoAkCipherTestData QCryptoAkCipherTestData;
+ struct QCryptoAkCipherTestData {
+     const char *path;
+@@ -537,7 +689,98 @@ struct QCryptoAkCipherTestData {
+     size_t slen;
+ };
  
-+#if defined(CONFIG_NETTLE) && defined(CONFIG_HOGWEED)
-+#include "akcipher-nettle.c.inc"
-+#else
- QCryptoAkCipher *qcrypto_akcipher_new(const QCryptoAkCipherOptions *opts,
-                                       QCryptoAkCipherKeyType type,
-                                       const uint8_t *key, size_t keylen,
-@@ -37,6 +40,7 @@ bool qcrypto_akcipher_supports(QCryptoAkCipherOptions *opts)
- {
-     return false;
+-static QCryptoAkCipherTestData test_data[] = {
++static QCryptoRSAKeyTestData rsakey_test_data[] = {
++    {
++        .path = "/crypto/akcipher/rsakey-1024-public",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa1024_public_key,
++        .keylen = sizeof(rsa1024_public_key),
++        .is_valid_key = true,
++        .exp_key_len = 128,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-1024-private",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key = rsa1024_private_key,
++        .keylen = sizeof(rsa1024_private_key),
++        .is_valid_key = true,
++        .exp_key_len = 128,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-2048-public",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa2048_public_key,
++        .keylen = sizeof(rsa2048_public_key),
++        .is_valid_key = true,
++        .exp_key_len = 256,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-2048-private",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key = rsa2048_private_key,
++        .keylen = sizeof(rsa2048_private_key),
++        .is_valid_key = true,
++        .exp_key_len = 256,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-public-lack-elem",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa_public_key_lack_element,
++        .keylen = sizeof(rsa_public_key_lack_element),
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-private-lack-elem",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key = rsa_private_key_lack_element,
++        .keylen = sizeof(rsa_private_key_lack_element),
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-public-empty-elem",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa_public_key_empty_element,
++        .keylen = sizeof(rsa_public_key_empty_element),
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-private-empty-elem",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key = rsa_private_key_empty_element,
++        .keylen = sizeof(rsa_private_key_empty_element),
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-public-empty-key",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = NULL,
++        .keylen = 0,
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-private-empty-key",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE,
++        .key = NULL,
++        .keylen = 0,
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-public-invalid-length-val",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa_public_key_invalid_length_val,
++        .keylen = sizeof(rsa_public_key_invalid_length_val),
++        .is_valid_key = false,
++    },
++    {
++        .path = "/crypto/akcipher/rsakey-public-extra-elem",
++        .key_type = QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC,
++        .key = rsa_public_key_extra_elem,
++        .keylen = sizeof(rsa_public_key_extra_elem),
++        .is_valid_key = false,
++    },
++};
++
++static QCryptoAkCipherTestData akcipher_test_data[] = {
+     /* rsa1024 with raw padding */
+     {
+         .path = "/crypto/akcipher/rsa1024-raw",
+@@ -697,14 +940,50 @@ static void test_akcipher(const void *opaque)
+     qcrypto_akcipher_free(priv_key);
  }
-+#endif
  
- int qcrypto_akcipher_encrypt(QCryptoAkCipher *akcipher,
-                              const void *in, size_t in_len,
-diff --git a/crypto/meson.build b/crypto/meson.build
-index b8152ae7cb..5f03a30d34 100644
---- a/crypto/meson.build
-+++ b/crypto/meson.build
-@@ -21,10 +21,14 @@ crypto_ss.add(files(
-   'tlscredspsk.c',
-   'tlscredsx509.c',
-   'tlssession.c',
-+  'rsakey.c',
- ))
- 
- if nettle.found()
-   crypto_ss.add(nettle, files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'))
-+  if hogweed.found()
-+    crypto_ss.add(gmp, hogweed)
-+  endif
-   if xts == 'private'
-     crypto_ss.add(files('xts.c'))
-   endif
-diff --git a/crypto/rsakey-builtin.c.inc b/crypto/rsakey-builtin.c.inc
-new file mode 100644
-index 0000000000..aeeacc8f9b
---- /dev/null
-+++ b/crypto/rsakey-builtin.c.inc
-@@ -0,0 +1,200 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "der.h"
-+#include "rsakey.h"
-+
-+static int extract_mpi(void *ctx, const uint8_t *value,
-+                       size_t vlen, Error **errp)
++static void test_rsakey(const void *opaque)
 +{
-+    QCryptoAkCipherMPI *mpi = (QCryptoAkCipherMPI *)ctx;
-+    if (vlen == 0) {
-+        error_setg(errp, "Empty mpi field");
-+        return -1;
-+    }
-+    mpi->data = g_memdup2(value, vlen);
-+    mpi->len = vlen;
-+    return 0;
-+}
-+
-+static int extract_version(void *ctx, const uint8_t *value,
-+                           size_t vlen, Error **errp)
-+{
-+    uint8_t *version = (uint8_t *)ctx;
-+    if (vlen != 1 || *value > 1) {
-+        error_setg(errp, "Invalid rsakey version");
-+        return -1;
-+    }
-+    *version = *value;
-+    return 0;
-+}
-+
-+static int extract_seq_content(void *ctx, const uint8_t *value,
-+                               size_t vlen, Error **errp)
-+{
-+    const uint8_t **content = (const uint8_t **)ctx;
-+    if (vlen == 0) {
-+        error_setg(errp, "Empty sequence");
-+        return -1;
-+    }
-+    *content = value;
-+    return 0;
-+}
-+
-+/**
-+ *
-+ *        RsaPubKey ::= SEQUENCE {
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *         }
-+ */
-+static QCryptoAkCipherRSAKey *qcrypto_builtin_rsa_public_key_parse(
-+    const uint8_t *key, size_t keylen, Error **errp)
-+{
-+    QCryptoAkCipherRSAKey *rsa = g_new0(QCryptoAkCipherRSAKey, 1);
-+    const uint8_t *seq;
-+    size_t seq_length;
-+    int decode_ret;
-+
-+    decode_ret = qcrypto_der_decode_seq(&key, &keylen,
-+                                        extract_seq_content, &seq, errp);
-+    if (decode_ret < 0 || keylen != 0) {
-+        goto error;
-+    }
-+    seq_length = decode_ret;
-+
-+    if (qcrypto_der_decode_int(&seq, &seq_length, extract_mpi,
-+                               &rsa->n, errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi,
-+                               &rsa->e, errp) < 0) {
-+        goto error;
-+    }
-+    if (seq_length != 0) {
-+        goto error;
-+    }
-+
-+    return rsa;
-+
-+error:
-+    if (errp && !*errp) {
-+        error_setg(errp, "Invalid RSA public key");
-+    }
-+    qcrypto_akcipher_rsakey_free(rsa);
-+    return NULL;
-+}
-+
-+/**
-+ *        RsaPrivKey ::= SEQUENCE {
-+ *             version     INTEGER
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *             d           INTEGER
-+ *             p           INTEGER
-+ *             q           INTEGER
-+ *             dp          INTEGER
-+ *             dq          INTEGER
-+ *             u           INTEGER
-+ *       otherPrimeInfos   OtherPrimeInfos OPTIONAL
-+ *         }
-+ */
-+static QCryptoAkCipherRSAKey *qcrypto_builtin_rsa_private_key_parse(
-+    const uint8_t *key, size_t keylen, Error **errp)
-+{
-+    QCryptoAkCipherRSAKey *rsa = g_new0(QCryptoAkCipherRSAKey, 1);
-+    uint8_t version;
-+    const uint8_t *seq;
-+    int decode_ret;
-+    size_t seq_length;
-+
-+    decode_ret = qcrypto_der_decode_seq(&key, &keylen, extract_seq_content,
-+                                        &seq, errp);
-+    if (decode_ret < 0 || keylen != 0) {
-+        goto error;
-+    }
-+    seq_length = decode_ret;
-+
-+    decode_ret = qcrypto_der_decode_int(&seq, &seq_length, extract_version,
-+                                        &version, errp);
-+
-+    if (qcrypto_der_decode_int(&seq, &seq_length, extract_mpi,
-+                               &rsa->n, errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi,
-+                               &rsa->e, errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi,
-+                               &rsa->d, errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi, &rsa->p,
-+                               errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi, &rsa->q,
-+                               errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi, &rsa->dp,
-+                               errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi, &rsa->dq,
-+                               errp) < 0 ||
-+        qcrypto_der_decode_int(&seq, &seq_length, extract_mpi, &rsa->u,
-+                               errp) < 0) {
-+        goto error;
-+    }
-+
-+    /**
-+     * According to the standard, otherPrimeInfos must be present for version 1.
-+     * There is no strict verification here, this is to be compatible with
-+     * the unit test of the kernel. TODO: remove this until linux kernel's
-+     * unit-test is fixed.
-+     */
-+    if (version == 1 && seq_length != 0) {
-+        if (qcrypto_der_decode_seq(&seq, &seq_length, NULL, NULL, errp) < 0) {
-+            goto error;
++    const QCryptoRSAKeyTestData *data = (const QCryptoRSAKeyTestData *)opaque;
++    QCryptoAkCipherOptions opt = {
++        .alg = QCRYPTO_AKCIPHER_ALG_RSA,
++        .u.rsa = {
++            .padding_alg = QCRYPTO_RSA_PADDING_ALG_PKCS1,
++            .hash_alg = QCRYPTO_HASH_ALG_SHA1,
 +        }
-+        if (seq_length != 0) {
-+            goto error;
-+        }
-+        return rsa;
-+    }
-+    if (seq_length != 0) {
-+        goto error;
-+    }
++    };
++    g_autoptr(QCryptoAkCipher) key = qcrypto_akcipher_new(
++        &opt, data->key_type, data->key, data->keylen, NULL);
 +
-+    return rsa;
-+
-+error:
-+    if (errp && !*errp) {
-+        error_setg(errp, "Invalid RSA private key");
-+    }
-+    qcrypto_akcipher_rsakey_free(rsa);
-+    return NULL;
-+}
-+
-+QCryptoAkCipherRSAKey *qcrypto_akcipher_rsakey_parse(
-+    QCryptoAkCipherKeyType type, const uint8_t *key,
-+    size_t keylen, Error **errp)
-+{
-+    switch (type) {
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
-+        return qcrypto_builtin_rsa_private_key_parse(key, keylen, errp);
-+
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
-+        return qcrypto_builtin_rsa_public_key_parse(key, keylen, errp);
-+
-+    default:
-+        error_setg(errp, "Unknown key type: %d", type);
-+        return NULL;
-+    }
-+}
-diff --git a/crypto/rsakey-nettle.c.inc b/crypto/rsakey-nettle.c.inc
-new file mode 100644
-index 0000000000..cc49872e78
---- /dev/null
-+++ b/crypto/rsakey-nettle.c.inc
-@@ -0,0 +1,158 @@
-+/*
-+ * QEMU Crypto akcipher algorithms
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include <nettle/asn1.h>
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "rsakey.h"
-+
-+static bool DumpMPI(struct asn1_der_iterator *i, QCryptoAkCipherMPI *mpi)
-+{
-+    mpi->data = g_memdup2(i->data, i->length);
-+    mpi->len = i->length;
-+    return true;
-+}
-+
-+static bool GetMPI(struct asn1_der_iterator *i, QCryptoAkCipherMPI *mpi)
-+{
-+    if (asn1_der_iterator_next(i) != ASN1_ITERATOR_PRIMITIVE ||
-+        i->type != ASN1_INTEGER) {
-+        return false;
-+    }
-+    return DumpMPI(i, mpi);
-+}
-+
-+/**
-+ *        RsaPrivKey ::= SEQUENCE {
-+ *             version     INTEGER
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *             d           INTEGER
-+ *             p           INTEGER
-+ *             q           INTEGER
-+ *             dp          INTEGER
-+ *             dq          INTEGER
-+ *             u           INTEGER
-+ *       otherPrimeInfos   OtherPrimeInfos OPTIONAL
-+ *         }
-+ */
-+static QCryptoAkCipherRSAKey *qcrypto_nettle_rsa_private_key_parse(
-+    const uint8_t *key, size_t keylen, Error **errp)
-+{
-+    QCryptoAkCipherRSAKey *rsa = g_new0(QCryptoAkCipherRSAKey, 1);
-+    struct asn1_der_iterator i;
-+    uint32_t version;
-+    int tag;
-+
-+    /* Parse entire struct */
-+    if (asn1_der_iterator_first(&i, keylen, key) != ASN1_ITERATOR_CONSTRUCTED ||
-+        i.type != ASN1_SEQUENCE ||
-+        asn1_der_decode_constructed_last(&i) != ASN1_ITERATOR_PRIMITIVE ||
-+        i.type != ASN1_INTEGER ||
-+        !asn1_der_get_uint32(&i, &version) ||
-+        version > 1 ||
-+        !GetMPI(&i, &rsa->n) ||
-+        !GetMPI(&i, &rsa->e) ||
-+        !GetMPI(&i, &rsa->d) ||
-+        !GetMPI(&i, &rsa->p) ||
-+        !GetMPI(&i, &rsa->q) ||
-+        !GetMPI(&i, &rsa->dp) ||
-+        !GetMPI(&i, &rsa->dq) ||
-+        !GetMPI(&i, &rsa->u)) {
-+        goto error;
-+    }
-+
-+    if (version == 1) {
-+        tag = asn1_der_iterator_next(&i);
-+        /**
-+         * According to the standard otherPrimeInfos must be present for
-+         * version 1. There is no strict verification here, this is to be
-+         * compatible with the unit test of the kernel. TODO: remove this
-+         * until linux-kernel's unit-test is fixed;
-+         */
-+        if (tag == ASN1_ITERATOR_END) {
-+            return rsa;
-+        }
-+        if (tag != ASN1_ITERATOR_CONSTRUCTED ||
-+            i.type != ASN1_SEQUENCE) {
-+            goto error;
-+        }
-+    }
-+
-+    if (asn1_der_iterator_next(&i) != ASN1_ITERATOR_END) {
-+        goto error;
-+    }
-+
-+    return rsa;
-+
-+error:
-+    error_setg(errp, "Failed to parse RSA private key");
-+    qcrypto_akcipher_rsakey_free(rsa);
-+    return NULL;
-+}
-+
-+/**
-+ *        RsaPubKey ::= SEQUENCE {
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *         }
-+ */
-+static QCryptoAkCipherRSAKey *qcrypto_nettle_rsa_public_key_parse(
-+    const uint8_t *key, size_t keylen, Error **errp)
-+{
-+
-+    QCryptoAkCipherRSAKey *rsa = g_new0(QCryptoAkCipherRSAKey, 1);
-+    struct asn1_der_iterator i;
-+
-+    if (asn1_der_iterator_first(&i, keylen, key) != ASN1_ITERATOR_CONSTRUCTED ||
-+        i.type != ASN1_SEQUENCE ||
-+        asn1_der_decode_constructed_last(&i) != ASN1_ITERATOR_PRIMITIVE ||
-+        !DumpMPI(&i, &rsa->n) ||
-+        !GetMPI(&i, &rsa->e) ||
-+        asn1_der_iterator_next(&i) != ASN1_ITERATOR_END) {
-+        goto error;
-+    }
-+
-+    return rsa;
-+
-+error:
-+    error_setg(errp, "Failed to parse RSA public key");
-+    qcrypto_akcipher_rsakey_free(rsa);
-+    return NULL;
-+}
-+
-+QCryptoAkCipherRSAKey *qcrypto_akcipher_rsakey_parse(
-+    QCryptoAkCipherKeyType type, const uint8_t *key,
-+    size_t keylen, Error **errp)
-+{
-+    switch (type) {
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PRIVATE:
-+        return qcrypto_nettle_rsa_private_key_parse(key, keylen, errp);
-+
-+    case QCRYPTO_AKCIPHER_KEY_TYPE_PUBLIC:
-+        return qcrypto_nettle_rsa_public_key_parse(key, keylen, errp);
-+
-+    default:
-+        error_setg(errp, "Unknown key type: %d", type);
-+        return NULL;
-+    }
-+}
-diff --git a/crypto/rsakey.c b/crypto/rsakey.c
-new file mode 100644
-index 0000000000..cc40e072f0
---- /dev/null
-+++ b/crypto/rsakey.c
-@@ -0,0 +1,44 @@
-+/*
-+ * QEMU Crypto RSA key parser
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "rsakey.h"
-+
-+void qcrypto_akcipher_rsakey_free(QCryptoAkCipherRSAKey *rsa_key)
-+{
-+    if (!rsa_key) {
++    if (!qcrypto_akcipher_supports(&opt)) {
 +        return;
 +    }
-+    g_free(rsa_key->n.data);
-+    g_free(rsa_key->e.data);
-+    g_free(rsa_key->d.data);
-+    g_free(rsa_key->p.data);
-+    g_free(rsa_key->q.data);
-+    g_free(rsa_key->dp.data);
-+    g_free(rsa_key->dq.data);
-+    g_free(rsa_key->u.data);
-+    g_free(rsa_key);
++
++    if (!data->is_valid_key) {
++        g_assert(key == NULL);
++        return;
++    }
++
++    g_assert(key != NULL);
++    g_assert(qcrypto_akcipher_max_ciphertext_len(key) == data->exp_key_len);
++    g_assert(qcrypto_akcipher_max_plaintext_len(key) == data->exp_key_len);
++    g_assert(qcrypto_akcipher_max_signature_len(key) == data->exp_key_len);
++    g_assert(qcrypto_akcipher_max_dgst_len(key) == data->exp_key_len);
 +}
 +
-+#if defined(CONFIG_NETTLE) && defined(CONFIG_HOGWEED)
-+#include "rsakey-nettle.c.inc"
-+#else
-+#include "rsakey-builtin.c.inc"
-+#endif
-diff --git a/crypto/rsakey.h b/crypto/rsakey.h
-new file mode 100644
-index 0000000000..974b76f659
---- /dev/null
-+++ b/crypto/rsakey.h
-@@ -0,0 +1,92 @@
-+/*
-+ * QEMU Crypto RSA key parser
-+ *
-+ * Copyright (c) 2022 Bytedance
-+ * Author: lei he <helei.sig11@bytedance.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef QCRYPTO_RSAKEY_H
-+#define QCRYPTO_RSAKEY_H
-+
-+#include "qemu/osdep.h"
-+#include "qemu/host-utils.h"
-+#include "crypto/akcipher.h"
-+
-+typedef struct QCryptoAkCipherRSAKey QCryptoAkCipherRSAKey;
-+typedef struct QCryptoAkCipherMPI QCryptoAkCipherMPI;
-+
-+/**
-+ * Multiple precious integer, encoded as two' complement,
-+ * copied directly from DER encoded ASN.1 structures.
-+ */
-+struct QCryptoAkCipherMPI {
-+    uint8_t *data;
-+    size_t len;
-+};
-+
-+/* See rfc2437: https://datatracker.ietf.org/doc/html/rfc2437 */
-+struct QCryptoAkCipherRSAKey {
-+    /* The modulus */
-+    QCryptoAkCipherMPI n;
-+    /* The public exponent */
-+    QCryptoAkCipherMPI e;
-+    /* The private exponent */
-+    QCryptoAkCipherMPI d;
-+    /* The first factor */
-+    QCryptoAkCipherMPI p;
-+    /* The second factor */
-+    QCryptoAkCipherMPI q;
-+    /* The first factor's exponent */
-+    QCryptoAkCipherMPI dp;
-+    /* The second factor's exponent */
-+    QCryptoAkCipherMPI dq;
-+    /* The CRT coefficient */
-+    QCryptoAkCipherMPI u;
-+};
-+
-+/**
-+ * Parse DER encoded ASN.1 RSA keys, expected ASN.1 schemas:
-+ *        RsaPrivKey ::= SEQUENCE {
-+ *             version     INTEGER
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *             d           INTEGER
-+ *             p           INTEGER
-+ *             q           INTEGER
-+ *             dp          INTEGER
-+ *             dq          INTEGER
-+ *             u           INTEGER
-+ *       otherPrimeInfos   OtherPrimeInfos OPTIONAL
-+ *         }
-+ *
-+ *        RsaPubKey ::= SEQUENCE {
-+ *             n           INTEGER
-+ *             e           INTEGER
-+ *         }
-+ *
-+ * Returns: On success QCryptoAkCipherRSAKey is returned, otherwise returns NULL
-+ */
-+QCryptoAkCipherRSAKey *qcrypto_akcipher_rsakey_parse(
-+    QCryptoAkCipherKeyType type,
-+    const uint8_t *key, size_t keylen, Error **errp);
-+
-+void qcrypto_akcipher_rsakey_free(QCryptoAkCipherRSAKey *key);
-+
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoAkCipherRSAKey,
-+                              qcrypto_akcipher_rsakey_free);
-+
-+#endif
-diff --git a/meson.build b/meson.build
-index 40132b4804..68bd083189 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1098,6 +1098,7 @@ endif
- # gcrypt over nettle for performance reasons.
- gcrypt = not_found
- nettle = not_found
-+hogweed = not_found
- xts = 'none'
+ int main(int argc, char **argv)
+ {
+     size_t i;
+     g_test_init(&argc, &argv, NULL);
+     g_assert(qcrypto_init(NULL) == 0);
  
- if get_option('nettle').enabled() and get_option('gcrypt').enabled()
-@@ -1135,6 +1136,15 @@ if not gnutls_crypto.found()
-   endif
- endif
+-    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
+-        g_test_add_data_func(test_data[i].path, &test_data[i], test_akcipher);
++    for (i = 0; i < G_N_ELEMENTS(akcipher_test_data); i++) {
++        g_test_add_data_func(akcipher_test_data[i].path,
++                             &akcipher_test_data[i],
++                             test_akcipher);
++    }
++    for (i = 0; i < G_N_ELEMENTS(rsakey_test_data); i++) {
++        g_test_add_data_func(rsakey_test_data[i].path,
++                             &rsakey_test_data[i],
++                             test_rsakey);
+     }
  
-+gmp = dependency('gmp', required: false, method: 'pkg-config', kwargs: static_kwargs)
-+if nettle.found() and gmp.found()
-+  hogweed = dependency('hogweed', version: '>=3.4',
-+                       method: 'pkg-config',
-+                       required: get_option('nettle'),
-+                       kwargs: static_kwargs)
-+endif
-+
-+
- gtk = not_found
- gtkx11 = not_found
- vte = not_found
-@@ -1744,6 +1754,7 @@ config_host_data.set('CONFIG_GNUTLS', gnutls.found())
- config_host_data.set('CONFIG_GNUTLS_CRYPTO', gnutls_crypto.found())
- config_host_data.set('CONFIG_GCRYPT', gcrypt.found())
- config_host_data.set('CONFIG_NETTLE', nettle.found())
-+config_host_data.set('CONFIG_HOGWEED', hogweed.found())
- config_host_data.set('CONFIG_QEMU_PRIVATE_XTS', xts == 'private')
- config_host_data.set('CONFIG_MALLOC_TRIM', has_malloc_trim)
- config_host_data.set('CONFIG_STATX', has_statx)
+     return g_test_run();
 -- 
 2.11.0
 
