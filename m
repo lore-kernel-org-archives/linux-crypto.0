@@ -2,229 +2,226 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC94DC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 May 2022 10:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F2BC433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 May 2022 11:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240100AbiEZKsS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 May 2022 06:48:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57426 "EHLO
+        id S232441AbiEZLiK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 26 May 2022 07:38:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346104AbiEZKsR (ORCPT
+        with ESMTP id S229549AbiEZLiK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 May 2022 06:48:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E08FBCEB95
-        for <linux-crypto@vger.kernel.org>; Thu, 26 May 2022 03:48:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653562094;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=iY6TLi9j3EtbpFppDRYVa18CyWmCV0e7SOJyukhK/4E=;
-        b=Pf4iPXZ/3GqG9fjLr8z0rLFBz2UfuoWcHKu3wlKlcqawkEiSw4fEF1NJwNaN+qTT2ZOESG
-        yXgeXMBj4pzbJj4WGi8XBNpnnfzvPMrlpKYi4sJ1ykkwQx1IqLQqIgEgHrA6Os7ae14j1V
-        M20aHTZKqcvxS7IkTX5NzJA4P8H4LTU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-179-IkwihCT4Noe0Twih3UinoA-1; Thu, 26 May 2022 06:48:12 -0400
-X-MC-Unique: IkwihCT4Noe0Twih3UinoA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26B88801228;
-        Thu, 26 May 2022 10:48:12 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D2AC2166B26;
-        Thu, 26 May 2022 10:48:10 +0000 (UTC)
-Date:   Thu, 26 May 2022 11:48:07 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Lei He <helei.sig11@bytedance.com>
-Cc:     mst@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, jasowang@redhat.com,
-        cohuck@redhat.com, pizhenwei@bytedance.com
-Subject: Re: [PATCH v7 0/9] Introduce akcipher service for virtio-crypto
-Message-ID: <Yo9a50mWNcopioEr@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+        Thu, 26 May 2022 07:38:10 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2EA8217F
+        for <linux-crypto@vger.kernel.org>; Thu, 26 May 2022 04:38:07 -0700 (PDT)
+Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L85XP5KF1zDqK9;
+        Thu, 26 May 2022 19:37:57 +0800 (CST)
+Received: from dggpemm500006.china.huawei.com (7.185.36.236) by
+ kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 26 May 2022 19:38:02 +0800
+Received: from dggpemm500006.china.huawei.com ([7.185.36.236]) by
+ dggpemm500006.china.huawei.com ([7.185.36.236]) with mapi id 15.01.2375.024;
+ Thu, 26 May 2022 19:38:02 +0800
+From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To:     =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
+        Lei He <helei.sig11@bytedance.com>
+CC:     "mst@redhat.com" <mst@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "pizhenwei@bytedance.com" <pizhenwei@bytedance.com>
+Subject: RE: [PATCH v7 0/9] Introduce akcipher service for virtio-crypto
+Thread-Topic: [PATCH v7 0/9] Introduce akcipher service for virtio-crypto
+Thread-Index: AQHYcBYY3OpXS4ls/EavoHk7XvpKvK0wdeKAgACT3uA=
+Date:   Thu, 26 May 2022 11:38:02 +0000
+Message-ID: <e2d4f5739c2740f29d30abf73ed6cbbf@huawei.com>
 References: <20220525090118.43403-1-helei.sig11@bytedance.com>
+ <Yo9a50mWNcopioEr@redhat.com>
+In-Reply-To: <Yo9a50mWNcopioEr@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.11]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220525090118.43403-1-helei.sig11@bytedance.com>
-User-Agent: Mutt/2.2.1 (2022-02-19)
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I've sent a pull request containing all the crypto/ changes,
-as that covers stuff I maintain. ie patches 2-8
-
-Patches 1 and 9, I'll leave for MST to review & queue since the
-virtual hardware is not my area of knowledge.
-
-On Wed, May 25, 2022 at 05:01:09PM +0800, Lei He wrote:
-> v6 -> v7:
-> - Fix serval build errors for some specific platforms/configurations.
-> - Use '%zu' instead of '%lu' for size_t parameters.
-> - AkCipher-gcrypt: avoid setting wrong error messages when parsing RSA
->   keys.
-> - AkCipher-benchmark: process constant amount of sign/verify instead
->  of running sign/verify for a constant duration.
-> 
-> v5 -> v6:
-> - Fix build errors and codestyles.
-> - Add parameter 'Error **errp' for qcrypto_akcipher_rsakey_parse.
-> - Report more detailed errors.
-> - Fix buffer length check and return values of akcipher-nettle, allows caller to
->  pass a buffer with larger size than actual needed.
-> 
-> A million thanks to Daniel!
-> 
-> v4 -> v5:
-> - Move QCryptoAkCipher into akcipherpriv.h, and modify the related comments.
-> - Rename asn1_decoder.c to der.c.
-> - Code style fix: use 'cleanup' & 'error' lables.
-> - Allow autoptr type to auto-free.
-> - Add test cases for rsakey to handle DER error.
-> - Other minor fixes.
-> 
-> v3 -> v4:
-> - Coding style fix: Akcipher -> AkCipher, struct XXX -> XXX, Rsa -> RSA,
-> XXX-alg -> XXX-algo.
-> - Change version info in qapi/crypto.json, from 7.0 -> 7.1.
-> - Remove ecdsa from qapi/crypto.json, it would be introduced with the implemetion later.
-> - Use QCryptoHashAlgothrim instead of QCryptoRSAHashAlgorithm(removed) in qapi/crypto.json.
-> - Rename arguments of qcrypto_akcipher_XXX to keep aligned with qcrypto_cipher_XXX(dec/enc/sign/vefiry -> in/out/in2), and add qcrypto_akcipher_max_XXX APIs.
-> - Add new API: qcrypto_akcipher_supports.
-> - Change the return value of qcrypto_akcipher_enc/dec/sign, these functions return the actual length of result.
-> - Separate ASN.1 source code and test case clean.
-> - Disable RSA raw encoding for akcipher-nettle.
-> - Separate RSA key parser into rsakey.{hc}, and implememts it with builtin-asn1-decoder and nettle respectivly.
-> - Implement RSA(pkcs1 and raw encoding) algorithm by gcrypt. This has higher priority than nettle.
-> - For some akcipher operations(eg, decryption of pkcs1pad(rsa)), the length of returned result maybe less than the dst buffer size, return the actual length of result instead of the buffer length to the guest side. (in function virtio_crypto_akcipher_input_data_helper)
-> - Other minor changes.
-> 
-> Thanks to Daniel!
-> 
-> Eric pointed out this missing part of use case, send it here again.
-> 
-> In our plan, the feature is designed for HTTPS offloading case and other applications which use kernel RSA/ecdsa by keyctl syscall. The full picture shows bellow:
-> 
-> 
->                  Nginx/openssl[1] ... Apps
-> Guest   -----------------------------------------
->                   virtio-crypto driver[2]
-> -------------------------------------------------
->                   virtio-crypto backend[3]
-> Host    -----------------------------------------
->                  /          |          \
->              builtin[4]   vhost     keyctl[5] ...
-> 
-> 
-> [1] User applications can offload RSA calculation to kernel by keyctl syscall. There is no keyctl engine in openssl currently, we developed a engine and tried to contribute it to openssl upstream, but openssl 1.x does not accept new feature. Link:
->    https://github.com/openssl/openssl/pull/16689
-> 
-> This branch is available and maintained by Lei <helei.sig11@bytedance.com>
->    https://github.com/TousakaRin/openssl/tree/OpenSSL_1_1_1-kctl_engine
-> 
-> We tested nginx(change config file only) with openssl keyctl engine, it works fine.
-> 
-> [2] virtio-crypto driver is used to communicate with host side, send requests to host side to do asymmetric calculation.
->    https://lkml.org/lkml/2022/3/1/1425
-> 
-> [3] virtio-crypto backend handles requests from guest side, and forwards request to crypto backend driver of QEMU.
-> 
-> [4] Currently RSA is supported only in builtin driver. This driver is supposed to test the full feature without other software(Ex vhost process) and hardware dependence. ecdsa is introduced into qapi type without implementation, this may be implemented in Q3-2022 or later. If ecdsa type definition should be added with the implementation together, I'll remove this in next version.
-> 
-> [5] keyctl backend is in development, we will post this feature in Q2-2022. keyctl backend can use hardware acceleration(Ex, Intel QAT).
-> 
-> Setup the full environment, tested with Intel QAT on host side, the QPS of HTTPS increase to ~200% in a guest.
-> 
-> VS PCI passthrough: the most important benefit of this solution makes the VM migratable.
-> 
-> v2 -> v3:
-> - Introduce akcipher types to qapi
-> - Add test/benchmark suite for akcipher class
-> - Seperate 'virtio_crypto: Support virtio crypto asym operation' into:
->  - crypto: Introduce akcipher crypto class
->  - virtio-crypto: Introduce RSA algorithm
-> 
-> v1 -> v2:
-> - Update virtio_crypto.h from v2 version of related kernel patch.
-> 
-> v1:
-> - Support akcipher for virtio-crypto.
-> - Introduce akcipher class.
-> - Introduce ASN1 decoder into QEMU.
-> - Implement RSA backend by nettle/hogweed.
-> 
-> Lei He (6):
->   qapi: crypto-akcipher: Introduce akcipher types to qapi
->   crypto: add ASN.1 DER decoder
->   crypto: Implement RSA algorithm by hogweed
->   crypto: Implement RSA algorithm by gcrypt
->   test/crypto: Add test suite for crypto akcipher
->   tests/crypto: Add test suite for RSA keys
-> 
-> Zhenwei Pi (3):
->   virtio-crypto: header update
->   crypto: Introduce akcipher crypto class
->   crypto: Introduce RSA algorithm
-> 
->  backends/cryptodev-builtin.c                   | 272 ++++++-
->  backends/cryptodev-vhost-user.c                |  34 +-
->  backends/cryptodev.c                           |  32 +-
->  crypto/akcipher-gcrypt.c.inc                   | 595 +++++++++++++++
->  crypto/akcipher-nettle.c.inc                   | 451 +++++++++++
->  crypto/akcipher.c                              | 108 +++
->  crypto/akcipherpriv.h                          |  55 ++
->  crypto/der.c                                   | 189 +++++
->  crypto/der.h                                   |  81 ++
->  crypto/meson.build                             |   6 +
->  crypto/rsakey-builtin.c.inc                    | 200 +++++
->  crypto/rsakey-nettle.c.inc                     | 158 ++++
->  crypto/rsakey.c                                |  44 ++
->  crypto/rsakey.h                                |  92 +++
->  hw/virtio/virtio-crypto.c                      | 323 ++++++--
->  include/crypto/akcipher.h                      | 158 ++++
->  include/hw/virtio/virtio-crypto.h              |   5 +-
->  include/standard-headers/linux/virtio_crypto.h |  82 +-
->  include/sysemu/cryptodev.h                     |  83 ++-
->  meson.build                                    |  11 +
->  qapi/crypto.json                               |  64 ++
->  tests/bench/benchmark-crypto-akcipher.c        | 137 ++++
->  tests/bench/meson.build                        |   1 +
->  tests/bench/test_akcipher_keys.inc             | 537 ++++++++++++++
->  tests/unit/meson.build                         |   2 +
->  tests/unit/test-crypto-akcipher.c              | 990 +++++++++++++++++++++++++
->  tests/unit/test-crypto-der.c                   | 290 ++++++++
->  27 files changed, 4854 insertions(+), 146 deletions(-)
->  create mode 100644 crypto/akcipher-gcrypt.c.inc
->  create mode 100644 crypto/akcipher-nettle.c.inc
->  create mode 100644 crypto/akcipher.c
->  create mode 100644 crypto/akcipherpriv.h
->  create mode 100644 crypto/der.c
->  create mode 100644 crypto/der.h
->  create mode 100644 crypto/rsakey-builtin.c.inc
->  create mode 100644 crypto/rsakey-nettle.c.inc
->  create mode 100644 crypto/rsakey.c
->  create mode 100644 crypto/rsakey.h
->  create mode 100644 include/crypto/akcipher.h
->  create mode 100644 tests/bench/benchmark-crypto-akcipher.c
->  create mode 100644 tests/bench/test_akcipher_keys.inc
->  create mode 100644 tests/unit/test-crypto-akcipher.c
->  create mode 100644 tests/unit/test-crypto-der.c
-> 
-> -- 
-> 2.11.0
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGFuaWVsIFAuIEJlcnJh
+bmfDqSBbbWFpbHRvOmJlcnJhbmdlQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBNYXkg
+MjYsIDIwMjIgNjo0OCBQTQ0KPiBUbzogTGVpIEhlIDxoZWxlaS5zaWcxMUBieXRlZGFuY2UuY29t
+Pg0KPiBDYzogbXN0QHJlZGhhdC5jb207IEdvbmdsZWkgKEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVh
+d2VpLmNvbT47DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgdmlydHVhbGl6YXRpb25AbGlzdHMu
+bGludXgtZm91bmRhdGlvbi5vcmc7DQo+IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IGph
+c293YW5nQHJlZGhhdC5jb207IGNvaHVja0ByZWRoYXQuY29tOw0KPiBwaXpoZW53ZWlAYnl0ZWRh
+bmNlLmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY3IDAvOV0gSW50cm9kdWNlIGFrY2lwaGVy
+IHNlcnZpY2UgZm9yIHZpcnRpby1jcnlwdG8NCj4gDQo+IEkndmUgc2VudCBhIHB1bGwgcmVxdWVz
+dCBjb250YWluaW5nIGFsbCB0aGUgY3J5cHRvLyBjaGFuZ2VzLCBhcyB0aGF0IGNvdmVycyBzdHVm
+ZiBJDQo+IG1haW50YWluLiBpZSBwYXRjaGVzIDItOA0KPiANCj4gUGF0Y2hlcyAxIGFuZCA5LCBJ
+J2xsIGxlYXZlIGZvciBNU1QgdG8gcmV2aWV3ICYgcXVldWUgc2luY2UgdGhlIHZpcnR1YWwgaGFy
+ZHdhcmUNCj4gaXMgbm90IG15IGFyZWEgb2Yga25vd2xlZGdlLg0KPiANCg0KVGhhbmtzIGZvciB5
+b3VyIHdvcmssIERhbmllbC4NCg0KUmVnYXJkcywNCi1Hb25nbGVpDQoNCj4gT24gV2VkLCBNYXkg
+MjUsIDIwMjIgYXQgMDU6MDE6MDlQTSArMDgwMCwgTGVpIEhlIHdyb3RlOg0KPiA+IHY2IC0+IHY3
+Og0KPiA+IC0gRml4IHNlcnZhbCBidWlsZCBlcnJvcnMgZm9yIHNvbWUgc3BlY2lmaWMgcGxhdGZv
+cm1zL2NvbmZpZ3VyYXRpb25zLg0KPiA+IC0gVXNlICclenUnIGluc3RlYWQgb2YgJyVsdScgZm9y
+IHNpemVfdCBwYXJhbWV0ZXJzLg0KPiA+IC0gQWtDaXBoZXItZ2NyeXB0OiBhdm9pZCBzZXR0aW5n
+IHdyb25nIGVycm9yIG1lc3NhZ2VzIHdoZW4gcGFyc2luZyBSU0ENCj4gPiAgIGtleXMuDQo+ID4g
+LSBBa0NpcGhlci1iZW5jaG1hcms6IHByb2Nlc3MgY29uc3RhbnQgYW1vdW50IG9mIHNpZ24vdmVy
+aWZ5IGluc3RlYWQNCj4gPiBvZiBydW5uaW5nIHNpZ24vdmVyaWZ5IGZvciBhIGNvbnN0YW50IGR1
+cmF0aW9uLg0KPiA+DQo+ID4gdjUgLT4gdjY6DQo+ID4gLSBGaXggYnVpbGQgZXJyb3JzIGFuZCBj
+b2Rlc3R5bGVzLg0KPiA+IC0gQWRkIHBhcmFtZXRlciAnRXJyb3IgKiplcnJwJyBmb3IgcWNyeXB0
+b19ha2NpcGhlcl9yc2FrZXlfcGFyc2UuDQo+ID4gLSBSZXBvcnQgbW9yZSBkZXRhaWxlZCBlcnJv
+cnMuDQo+ID4gLSBGaXggYnVmZmVyIGxlbmd0aCBjaGVjayBhbmQgcmV0dXJuIHZhbHVlcyBvZiBh
+a2NpcGhlci1uZXR0bGUsIGFsbG93cw0KPiA+IGNhbGxlciB0byAgcGFzcyBhIGJ1ZmZlciB3aXRo
+IGxhcmdlciBzaXplIHRoYW4gYWN0dWFsIG5lZWRlZC4NCj4gPg0KPiA+IEEgbWlsbGlvbiB0aGFu
+a3MgdG8gRGFuaWVsIQ0KPiA+DQo+ID4gdjQgLT4gdjU6DQo+ID4gLSBNb3ZlIFFDcnlwdG9Ba0Np
+cGhlciBpbnRvIGFrY2lwaGVycHJpdi5oLCBhbmQgbW9kaWZ5IHRoZSByZWxhdGVkDQo+IGNvbW1l
+bnRzLg0KPiA+IC0gUmVuYW1lIGFzbjFfZGVjb2Rlci5jIHRvIGRlci5jLg0KPiA+IC0gQ29kZSBz
+dHlsZSBmaXg6IHVzZSAnY2xlYW51cCcgJiAnZXJyb3InIGxhYmxlcy4NCj4gPiAtIEFsbG93IGF1
+dG9wdHIgdHlwZSB0byBhdXRvLWZyZWUuDQo+ID4gLSBBZGQgdGVzdCBjYXNlcyBmb3IgcnNha2V5
+IHRvIGhhbmRsZSBERVIgZXJyb3IuDQo+ID4gLSBPdGhlciBtaW5vciBmaXhlcy4NCj4gPg0KPiA+
+IHYzIC0+IHY0Og0KPiA+IC0gQ29kaW5nIHN0eWxlIGZpeDogQWtjaXBoZXIgLT4gQWtDaXBoZXIs
+IHN0cnVjdCBYWFggLT4gWFhYLCBSc2EgLT4NCj4gPiBSU0EsIFhYWC1hbGcgLT4gWFhYLWFsZ28u
+DQo+ID4gLSBDaGFuZ2UgdmVyc2lvbiBpbmZvIGluIHFhcGkvY3J5cHRvLmpzb24sIGZyb20gNy4w
+IC0+IDcuMS4NCj4gPiAtIFJlbW92ZSBlY2RzYSBmcm9tIHFhcGkvY3J5cHRvLmpzb24sIGl0IHdv
+dWxkIGJlIGludHJvZHVjZWQgd2l0aCB0aGUNCj4gaW1wbGVtZXRpb24gbGF0ZXIuDQo+ID4gLSBV
+c2UgUUNyeXB0b0hhc2hBbGdvdGhyaW0gaW5zdGVhZCBvZiBRQ3J5cHRvUlNBSGFzaEFsZ29yaXRo
+bShyZW1vdmVkKQ0KPiBpbiBxYXBpL2NyeXB0by5qc29uLg0KPiA+IC0gUmVuYW1lIGFyZ3VtZW50
+cyBvZiBxY3J5cHRvX2FrY2lwaGVyX1hYWCB0byBrZWVwIGFsaWduZWQgd2l0aA0KPiBxY3J5cHRv
+X2NpcGhlcl9YWFgoZGVjL2VuYy9zaWduL3ZlZmlyeSAtPiBpbi9vdXQvaW4yKSwgYW5kIGFkZA0K
+PiBxY3J5cHRvX2FrY2lwaGVyX21heF9YWFggQVBJcy4NCj4gPiAtIEFkZCBuZXcgQVBJOiBxY3J5
+cHRvX2FrY2lwaGVyX3N1cHBvcnRzLg0KPiA+IC0gQ2hhbmdlIHRoZSByZXR1cm4gdmFsdWUgb2Yg
+cWNyeXB0b19ha2NpcGhlcl9lbmMvZGVjL3NpZ24sIHRoZXNlIGZ1bmN0aW9ucw0KPiByZXR1cm4g
+dGhlIGFjdHVhbCBsZW5ndGggb2YgcmVzdWx0Lg0KPiA+IC0gU2VwYXJhdGUgQVNOLjEgc291cmNl
+IGNvZGUgYW5kIHRlc3QgY2FzZSBjbGVhbi4NCj4gPiAtIERpc2FibGUgUlNBIHJhdyBlbmNvZGlu
+ZyBmb3IgYWtjaXBoZXItbmV0dGxlLg0KPiA+IC0gU2VwYXJhdGUgUlNBIGtleSBwYXJzZXIgaW50
+byByc2FrZXkue2hjfSwgYW5kIGltcGxlbWVtdHMgaXQgd2l0aA0KPiBidWlsdGluLWFzbjEtZGVj
+b2RlciBhbmQgbmV0dGxlIHJlc3BlY3Rpdmx5Lg0KPiA+IC0gSW1wbGVtZW50IFJTQShwa2NzMSBh
+bmQgcmF3IGVuY29kaW5nKSBhbGdvcml0aG0gYnkgZ2NyeXB0LiBUaGlzIGhhcw0KPiBoaWdoZXIg
+cHJpb3JpdHkgdGhhbiBuZXR0bGUuDQo+ID4gLSBGb3Igc29tZSBha2NpcGhlciBvcGVyYXRpb25z
+KGVnLCBkZWNyeXB0aW9uIG9mIHBrY3MxcGFkKHJzYSkpLCB0aGUNCj4gPiBsZW5ndGggb2YgcmV0
+dXJuZWQgcmVzdWx0IG1heWJlIGxlc3MgdGhhbiB0aGUgZHN0IGJ1ZmZlciBzaXplLCByZXR1cm4N
+Cj4gPiB0aGUgYWN0dWFsIGxlbmd0aCBvZiByZXN1bHQgaW5zdGVhZCBvZiB0aGUgYnVmZmVyIGxl
+bmd0aCB0byB0aGUgZ3Vlc3QNCj4gPiBzaWRlLiAoaW4gZnVuY3Rpb24gdmlydGlvX2NyeXB0b19h
+a2NpcGhlcl9pbnB1dF9kYXRhX2hlbHBlcikNCj4gPiAtIE90aGVyIG1pbm9yIGNoYW5nZXMuDQo+
+ID4NCj4gPiBUaGFua3MgdG8gRGFuaWVsIQ0KPiA+DQo+ID4gRXJpYyBwb2ludGVkIG91dCB0aGlz
+IG1pc3NpbmcgcGFydCBvZiB1c2UgY2FzZSwgc2VuZCBpdCBoZXJlIGFnYWluLg0KPiA+DQo+ID4g
+SW4gb3VyIHBsYW4sIHRoZSBmZWF0dXJlIGlzIGRlc2lnbmVkIGZvciBIVFRQUyBvZmZsb2FkaW5n
+IGNhc2UgYW5kIG90aGVyDQo+IGFwcGxpY2F0aW9ucyB3aGljaCB1c2Uga2VybmVsIFJTQS9lY2Rz
+YSBieSBrZXljdGwgc3lzY2FsbC4gVGhlIGZ1bGwgcGljdHVyZQ0KPiBzaG93cyBiZWxsb3c6DQo+
+ID4NCj4gPg0KPiA+ICAgICAgICAgICAgICAgICAgTmdpbngvb3BlbnNzbFsxXSAuLi4gQXBwcw0K
+PiA+IEd1ZXN0ICAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4g
+PiAgICAgICAgICAgICAgICAgICB2aXJ0aW8tY3J5cHRvIGRyaXZlclsyXQ0KPiA+IC0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gPiAgICAgICAgICAg
+ICAgICAgICB2aXJ0aW8tY3J5cHRvIGJhY2tlbmRbM10NCj4gPiBIb3N0ICAgIC0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gICAgICAgICAgICAgICAgICAvICAg
+ICAgICAgIHwgICAgICAgICAgXA0KPiA+ICAgICAgICAgICAgICBidWlsdGluWzRdICAgdmhvc3Qg
+ICAgIGtleWN0bFs1XSAuLi4NCj4gPg0KPiA+DQo+ID4gWzFdIFVzZXIgYXBwbGljYXRpb25zIGNh
+biBvZmZsb2FkIFJTQSBjYWxjdWxhdGlvbiB0byBrZXJuZWwgYnkga2V5Y3RsIHN5c2NhbGwuDQo+
+IFRoZXJlIGlzIG5vIGtleWN0bCBlbmdpbmUgaW4gb3BlbnNzbCBjdXJyZW50bHksIHdlIGRldmVs
+b3BlZCBhIGVuZ2luZSBhbmQgdHJpZWQNCj4gdG8gY29udHJpYnV0ZSBpdCB0byBvcGVuc3NsIHVw
+c3RyZWFtLCBidXQgb3BlbnNzbCAxLnggZG9lcyBub3QgYWNjZXB0IG5ldw0KPiBmZWF0dXJlLiBM
+aW5rOg0KPiA+ICAgIGh0dHBzOi8vZ2l0aHViLmNvbS9vcGVuc3NsL29wZW5zc2wvcHVsbC8xNjY4
+OQ0KPiA+DQo+ID4gVGhpcyBicmFuY2ggaXMgYXZhaWxhYmxlIGFuZCBtYWludGFpbmVkIGJ5IExl
+aSA8aGVsZWkuc2lnMTFAYnl0ZWRhbmNlLmNvbT4NCj4gPg0KPiA+IGh0dHBzOi8vZ2l0aHViLmNv
+bS9Ub3VzYWthUmluL29wZW5zc2wvdHJlZS9PcGVuU1NMXzFfMV8xLWtjdGxfZW5naW5lDQo+ID4N
+Cj4gPiBXZSB0ZXN0ZWQgbmdpbngoY2hhbmdlIGNvbmZpZyBmaWxlIG9ubHkpIHdpdGggb3BlbnNz
+bCBrZXljdGwgZW5naW5lLCBpdCB3b3Jrcw0KPiBmaW5lLg0KPiA+DQo+ID4gWzJdIHZpcnRpby1j
+cnlwdG8gZHJpdmVyIGlzIHVzZWQgdG8gY29tbXVuaWNhdGUgd2l0aCBob3N0IHNpZGUsIHNlbmQg
+cmVxdWVzdHMNCj4gdG8gaG9zdCBzaWRlIHRvIGRvIGFzeW1tZXRyaWMgY2FsY3VsYXRpb24uDQo+
+ID4gICAgaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMjIvMy8xLzE0MjUNCj4gPg0KPiA+IFszXSB2
+aXJ0aW8tY3J5cHRvIGJhY2tlbmQgaGFuZGxlcyByZXF1ZXN0cyBmcm9tIGd1ZXN0IHNpZGUsIGFu
+ZCBmb3J3YXJkcw0KPiByZXF1ZXN0IHRvIGNyeXB0byBiYWNrZW5kIGRyaXZlciBvZiBRRU1VLg0K
+PiA+DQo+ID4gWzRdIEN1cnJlbnRseSBSU0EgaXMgc3VwcG9ydGVkIG9ubHkgaW4gYnVpbHRpbiBk
+cml2ZXIuIFRoaXMgZHJpdmVyIGlzIHN1cHBvc2VkIHRvDQo+IHRlc3QgdGhlIGZ1bGwgZmVhdHVy
+ZSB3aXRob3V0IG90aGVyIHNvZnR3YXJlKEV4IHZob3N0IHByb2Nlc3MpIGFuZCBoYXJkd2FyZQ0K
+PiBkZXBlbmRlbmNlLiBlY2RzYSBpcyBpbnRyb2R1Y2VkIGludG8gcWFwaSB0eXBlIHdpdGhvdXQg
+aW1wbGVtZW50YXRpb24sIHRoaXMNCj4gbWF5IGJlIGltcGxlbWVudGVkIGluIFEzLTIwMjIgb3Ig
+bGF0ZXIuIElmIGVjZHNhIHR5cGUgZGVmaW5pdGlvbiBzaG91bGQgYmUNCj4gYWRkZWQgd2l0aCB0
+aGUgaW1wbGVtZW50YXRpb24gdG9nZXRoZXIsIEknbGwgcmVtb3ZlIHRoaXMgaW4gbmV4dCB2ZXJz
+aW9uLg0KPiA+DQo+ID4gWzVdIGtleWN0bCBiYWNrZW5kIGlzIGluIGRldmVsb3BtZW50LCB3ZSB3
+aWxsIHBvc3QgdGhpcyBmZWF0dXJlIGluIFEyLTIwMjIuDQo+IGtleWN0bCBiYWNrZW5kIGNhbiB1
+c2UgaGFyZHdhcmUgYWNjZWxlcmF0aW9uKEV4LCBJbnRlbCBRQVQpLg0KPiA+DQo+ID4gU2V0dXAg
+dGhlIGZ1bGwgZW52aXJvbm1lbnQsIHRlc3RlZCB3aXRoIEludGVsIFFBVCBvbiBob3N0IHNpZGUs
+IHRoZSBRUFMgb2YNCj4gSFRUUFMgaW5jcmVhc2UgdG8gfjIwMCUgaW4gYSBndWVzdC4NCj4gPg0K
+PiA+IFZTIFBDSSBwYXNzdGhyb3VnaDogdGhlIG1vc3QgaW1wb3J0YW50IGJlbmVmaXQgb2YgdGhp
+cyBzb2x1dGlvbiBtYWtlcyB0aGUNCj4gVk0gbWlncmF0YWJsZS4NCj4gPg0KPiA+IHYyIC0+IHYz
+Og0KPiA+IC0gSW50cm9kdWNlIGFrY2lwaGVyIHR5cGVzIHRvIHFhcGkNCj4gPiAtIEFkZCB0ZXN0
+L2JlbmNobWFyayBzdWl0ZSBmb3IgYWtjaXBoZXIgY2xhc3MNCj4gPiAtIFNlcGVyYXRlICd2aXJ0
+aW9fY3J5cHRvOiBTdXBwb3J0IHZpcnRpbyBjcnlwdG8gYXN5bSBvcGVyYXRpb24nIGludG86DQo+
+ID4gIC0gY3J5cHRvOiBJbnRyb2R1Y2UgYWtjaXBoZXIgY3J5cHRvIGNsYXNzDQo+ID4gIC0gdmly
+dGlvLWNyeXB0bzogSW50cm9kdWNlIFJTQSBhbGdvcml0aG0NCj4gPg0KPiA+IHYxIC0+IHYyOg0K
+PiA+IC0gVXBkYXRlIHZpcnRpb19jcnlwdG8uaCBmcm9tIHYyIHZlcnNpb24gb2YgcmVsYXRlZCBr
+ZXJuZWwgcGF0Y2guDQo+ID4NCj4gPiB2MToNCj4gPiAtIFN1cHBvcnQgYWtjaXBoZXIgZm9yIHZp
+cnRpby1jcnlwdG8uDQo+ID4gLSBJbnRyb2R1Y2UgYWtjaXBoZXIgY2xhc3MuDQo+ID4gLSBJbnRy
+b2R1Y2UgQVNOMSBkZWNvZGVyIGludG8gUUVNVS4NCj4gPiAtIEltcGxlbWVudCBSU0EgYmFja2Vu
+ZCBieSBuZXR0bGUvaG9nd2VlZC4NCj4gPg0KPiA+IExlaSBIZSAoNik6DQo+ID4gICBxYXBpOiBj
+cnlwdG8tYWtjaXBoZXI6IEludHJvZHVjZSBha2NpcGhlciB0eXBlcyB0byBxYXBpDQo+ID4gICBj
+cnlwdG86IGFkZCBBU04uMSBERVIgZGVjb2Rlcg0KPiA+ICAgY3J5cHRvOiBJbXBsZW1lbnQgUlNB
+IGFsZ29yaXRobSBieSBob2d3ZWVkDQo+ID4gICBjcnlwdG86IEltcGxlbWVudCBSU0EgYWxnb3Jp
+dGhtIGJ5IGdjcnlwdA0KPiA+ICAgdGVzdC9jcnlwdG86IEFkZCB0ZXN0IHN1aXRlIGZvciBjcnlw
+dG8gYWtjaXBoZXINCj4gPiAgIHRlc3RzL2NyeXB0bzogQWRkIHRlc3Qgc3VpdGUgZm9yIFJTQSBr
+ZXlzDQo+ID4NCj4gPiBaaGVud2VpIFBpICgzKToNCj4gPiAgIHZpcnRpby1jcnlwdG86IGhlYWRl
+ciB1cGRhdGUNCj4gPiAgIGNyeXB0bzogSW50cm9kdWNlIGFrY2lwaGVyIGNyeXB0byBjbGFzcw0K
+PiA+ICAgY3J5cHRvOiBJbnRyb2R1Y2UgUlNBIGFsZ29yaXRobQ0KPiA+DQo+ID4gIGJhY2tlbmRz
+L2NyeXB0b2Rldi1idWlsdGluLmMgICAgICAgICAgICAgICAgICAgfCAyNzIgKysrKysrLQ0KPiA+
+ICBiYWNrZW5kcy9jcnlwdG9kZXYtdmhvc3QtdXNlci5jICAgICAgICAgICAgICAgIHwgIDM0ICst
+DQo+ID4gIGJhY2tlbmRzL2NyeXB0b2Rldi5jICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAg
+MzIgKy0NCj4gPiAgY3J5cHRvL2FrY2lwaGVyLWdjcnlwdC5jLmluYyAgICAgICAgICAgICAgICAg
+ICB8IDU5NQ0KPiArKysrKysrKysrKysrKysNCj4gPiAgY3J5cHRvL2FrY2lwaGVyLW5ldHRsZS5j
+LmluYyAgICAgICAgICAgICAgICAgICB8IDQ1MSArKysrKysrKysrKw0KPiA+ICBjcnlwdG8vYWtj
+aXBoZXIuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMTA4ICsrKw0KPiA+ICBjcnlw
+dG8vYWtjaXBoZXJwcml2LmggICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDU1ICsrDQo+ID4g
+IGNyeXB0by9kZXIuYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAxODkgKysr
+KysNCj4gPiAgY3J5cHRvL2Rlci5oICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8
+ICA4MSArKw0KPiA+ICBjcnlwdG8vbWVzb24uYnVpbGQgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIHwgICA2ICsNCj4gPiAgY3J5cHRvL3JzYWtleS1idWlsdGluLmMuaW5jICAgICAgICAgICAg
+ICAgICAgICB8IDIwMCArKysrKw0KPiA+ICBjcnlwdG8vcnNha2V5LW5ldHRsZS5jLmluYyAgICAg
+ICAgICAgICAgICAgICAgIHwgMTU4ICsrKysNCj4gPiAgY3J5cHRvL3JzYWtleS5jICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICB8ICA0NCArKw0KPiA+ICBjcnlwdG8vcnNha2V5LmggICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDkyICsrKw0KPiA+ICBody92aXJ0aW8vdmly
+dGlvLWNyeXB0by5jICAgICAgICAgICAgICAgICAgICAgIHwgMzIzICsrKysrKy0tDQo+ID4gIGlu
+Y2x1ZGUvY3J5cHRvL2FrY2lwaGVyLmggICAgICAgICAgICAgICAgICAgICAgfCAxNTggKysrKw0K
+PiA+ICBpbmNsdWRlL2h3L3ZpcnRpby92aXJ0aW8tY3J5cHRvLmggICAgICAgICAgICAgIHwgICA1
+ICstDQo+ID4gIGluY2x1ZGUvc3RhbmRhcmQtaGVhZGVycy9saW51eC92aXJ0aW9fY3J5cHRvLmgg
+fCAgODIgKy0NCj4gPiAgaW5jbHVkZS9zeXNlbXUvY3J5cHRvZGV2LmggICAgICAgICAgICAgICAg
+ICAgICB8ICA4MyArKy0NCj4gPiAgbWVzb24uYnVpbGQgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICB8ICAxMSArDQo+ID4gIHFhcGkvY3J5cHRvLmpzb24gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgfCAgNjQgKysNCj4gPiAgdGVzdHMvYmVuY2gvYmVuY2htYXJrLWNyeXB0
+by1ha2NpcGhlci5jICAgICAgICB8IDEzNyArKysrDQo+ID4gIHRlc3RzL2JlbmNoL21lc29uLmJ1
+aWxkICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDEgKw0KPiA+ICB0ZXN0cy9iZW5jaC90ZXN0
+X2FrY2lwaGVyX2tleXMuaW5jICAgICAgICAgICAgIHwgNTM3ICsrKysrKysrKysrKysrDQo+ID4g
+IHRlc3RzL3VuaXQvbWVzb24uYnVpbGQgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKw0K
+PiA+ICB0ZXN0cy91bml0L3Rlc3QtY3J5cHRvLWFrY2lwaGVyLmMgICAgICAgICAgICAgIHwgOTkw
+DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgdGVzdHMvdW5pdC90ZXN0LWNyeXB0
+by1kZXIuYyAgICAgICAgICAgICAgICAgICB8IDI5MCArKysrKysrKw0KPiA+ICAyNyBmaWxlcyBj
+aGFuZ2VkLCA0ODU0IGluc2VydGlvbnMoKyksIDE0NiBkZWxldGlvbnMoLSkgIGNyZWF0ZSBtb2Rl
+DQo+ID4gMTAwNjQ0IGNyeXB0by9ha2NpcGhlci1nY3J5cHQuYy5pbmMgIGNyZWF0ZSBtb2RlIDEw
+MDY0NA0KPiA+IGNyeXB0by9ha2NpcGhlci1uZXR0bGUuYy5pbmMgIGNyZWF0ZSBtb2RlIDEwMDY0
+NCBjcnlwdG8vYWtjaXBoZXIuYw0KPiA+IGNyZWF0ZSBtb2RlIDEwMDY0NCBjcnlwdG8vYWtjaXBo
+ZXJwcml2LmggIGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IGNyeXB0by9kZXIuYyAgY3JlYXRlIG1v
+ZGUgMTAwNjQ0IGNyeXB0by9kZXIuaCAgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+ID4gY3J5cHRvL3Jz
+YWtleS1idWlsdGluLmMuaW5jICBjcmVhdGUgbW9kZSAxMDA2NDQNCj4gPiBjcnlwdG8vcnNha2V5
+LW5ldHRsZS5jLmluYyAgY3JlYXRlIG1vZGUgMTAwNjQ0IGNyeXB0by9yc2FrZXkuYyAgY3JlYXRl
+DQo+ID4gbW9kZSAxMDA2NDQgY3J5cHRvL3JzYWtleS5oICBjcmVhdGUgbW9kZSAxMDA2NDQNCj4g
+PiBpbmNsdWRlL2NyeXB0by9ha2NpcGhlci5oICBjcmVhdGUgbW9kZSAxMDA2NDQNCj4gPiB0ZXN0
+cy9iZW5jaC9iZW5jaG1hcmstY3J5cHRvLWFrY2lwaGVyLmMNCj4gPiAgY3JlYXRlIG1vZGUgMTAw
+NjQ0IHRlc3RzL2JlbmNoL3Rlc3RfYWtjaXBoZXJfa2V5cy5pbmMNCj4gPiAgY3JlYXRlIG1vZGUg
+MTAwNjQ0IHRlc3RzL3VuaXQvdGVzdC1jcnlwdG8tYWtjaXBoZXIuYyAgY3JlYXRlIG1vZGUNCj4g
+PiAxMDA2NDQgdGVzdHMvdW5pdC90ZXN0LWNyeXB0by1kZXIuYw0KPiA+DQo+ID4gLS0NCj4gPiAy
+LjExLjANCj4gPg0KPiANCj4gV2l0aCByZWdhcmRzLA0KPiBEYW5pZWwNCj4gLS0NCj4gfDogaHR0
+cHM6Ly9iZXJyYW5nZS5jb20gICAgICAtby0NCj4gaHR0cHM6Ly93d3cuZmxpY2tyLmNvbS9waG90
+b3MvZGJlcnJhbmdlIDp8DQo+IHw6IGh0dHBzOi8vbGlidmlydC5vcmcgICAgICAgICAtby0NCj4g
+aHR0cHM6Ly9mc3RvcDEzOC5iZXJyYW5nZS5jb20gOnwNCj4gfDogaHR0cHM6Ly9lbnRhbmdsZS1w
+aG90by5vcmcgICAgLW8tDQo+IGh0dHBzOi8vd3d3Lmluc3RhZ3JhbS5jb20vZGJlcnJhbmdlIDp8
+DQoNCg==
