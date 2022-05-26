@@ -2,120 +2,79 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C310FC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 May 2022 07:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AF0C433F5
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 May 2022 07:30:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238158AbiEZHZS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 May 2022 03:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39106 "EHLO
+        id S236611AbiEZHaU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 26 May 2022 03:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346406AbiEZHZP (ORCPT
+        with ESMTP id S1346399AbiEZHaS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 May 2022 03:25:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E3894192;
-        Thu, 26 May 2022 00:25:10 -0700 (PDT)
+        Thu, 26 May 2022 03:30:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B490980B5;
+        Thu, 26 May 2022 00:30:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9DAEC61A8A;
-        Thu, 26 May 2022 07:25:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76AE6C385A9;
-        Thu, 26 May 2022 07:25:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653549908;
-        bh=8zWwYRkLEgdPAjovWgZqSLEqwiWs98UEK8E5JfHC8y4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HHrruBbz2nRvfAFpeznVaV6wga8FrcRJlNUhTqMfAORQDyVyhjr62RVcmyn26ryZn
-         h8+WFrnKa7hb8aIopQexqoi/moMoAF8vrTDpP78XcG9/35aGUw0IXvbpXUR32Lyps0
-         hrg5zETs3oZDBnfyH0AHmyT3ft3uIUDtaK3lhLiMT+j+JzjQPJNeVy3Y0LXe8n4dFq
-         UkPf7A0xONi5C91qfGc2+f6F5r+HaJWZYD9/igXF2+NLJc8YUc3xvHwvNkQAFXh9LG
-         uBTtE3EGoJyob4YiRtdo3mirfNeuLuiyGmXh1lDD3sQhyilrg5hIO2+Ya2H18gK5VK
-         nv4HoRPo73eRA==
-Date:   Thu, 26 May 2022 00:25:06 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     gaochao <gaochao49@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 983BB619E3;
+        Thu, 26 May 2022 07:30:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626BAC34119;
+        Thu, 26 May 2022 07:30:14 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="l5rXPhz6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1653550209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wGNFSmd6UrNW5vLx94/KkA0heJuASamss4LkwJ+bkwQ=;
+        b=l5rXPhz6nYlRAGrEEzjEiydqvlaxZhGlIihE9IHYZAwG1Dx+b+NtNmq0R2doKtmfU6F224
+        IgioY7gn2vwO59492BkK1pgin15Lfzb2yC5bmwpSUlgk+crt5z3toyOBWhOjBJR8z9DSsp
+        quGuhgDlvhBtyETKkxXsXUbkT1Cpua8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0f27947a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Thu, 26 May 2022 07:30:09 +0000 (UTC)
+Received: by mail-yb1-f174.google.com with SMTP id y141so1497683ybe.13;
+        Thu, 26 May 2022 00:30:08 -0700 (PDT)
+X-Gm-Message-State: AOAM533ZFmVpK1DSHZxsfkyoqC3gtcQ8shtUelnY4S/FPkTEYR7qWyl8
+        vXTkQzyhjpHZSZJj0Yym7T6OFhKW6vgGg09ayec=
+X-Google-Smtp-Source: ABdhPJymXqBTlJEClVs2/eq7c6txZCBqc6dXaMm7YKIKaZBH9G6H9sY27qyh2cZG53ruLYnWJ96S/HtHB8Km7gYjL1s=
+X-Received: by 2002:a25:7901:0:b0:64a:a1d9:43dd with SMTP id
+ u1-20020a257901000000b0064aa1d943ddmr34064533ybc.271.1653550206257; Thu, 26
+ May 2022 00:30:06 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:7110:6403:b0:17b:2ce3:1329 with HTTP; Thu, 26 May 2022
+ 00:30:05 -0700 (PDT)
+In-Reply-To: <Yo8rUkE1/hxum6gt@sol.localdomain>
+References: <20220517033630.1182-1-gaochao49@huawei.com> <Yo8rUkE1/hxum6gt@sol.localdomain>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 26 May 2022 09:30:05 +0200
+X-Gmail-Original-Message-ID: <CAHmME9paRqTOT_fWHyeiDufWBcb2dc-M3sMQZaGduwjhsV4kjQ@mail.gmail.com>
+Message-ID: <CAHmME9paRqTOT_fWHyeiDufWBcb2dc-M3sMQZaGduwjhsV4kjQ@mail.gmail.com>
 Subject: Re: [PATCH -next] crypto: Fix build error when CRYPTO_BLAKE2S_X86=m
  && CRYPTO_ALGAPI2=m && CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-Message-ID: <Yo8rUkE1/hxum6gt@sol.localdomain>
-References: <20220517033630.1182-1-gaochao49@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220517033630.1182-1-gaochao49@huawei.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     gaochao <gaochao49@huawei.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-+Cc Jason
+Hi Eric,
 
-On Tue, May 17, 2022 at 11:36:30AM +0800, gaochao wrote:
-> If CRYPTO=m, CRYPTO_ALGAPI=m, CRYPTO_ALGAPI2=m, CRYPTO_BLAKE2S_X86=m,
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> bulding fails:
-> 
-> arch/x86/crypto/blake2s-glue.o: In function `blake2s_compress':
-> (.text+0x5a): undefined reference to `crypto_simd_disabled_for_test'
-> make: *** [vmlinux] Error 1
-> 
-> When CRYPTO_MANAGER_EXTRA_TESTS=y, blake2s_compress will call
-> crypto_simd_disabled_for_test.
-> When CRYPTO_ALGAPI2=m, crypto_algapi build as a module,
-> but if CONFIG_CRYPTO_BLAKE2S_X86=m at the same time,
-> libblake2s-x86_64.o build with obj-y, this will accuse the above error.
-> 
-> To fix this error:
-> 1 Choose CRYPTO_ALGAPI2 for CRYPTO_BLAKE2S_X86
-> when CRYPTO_MANAGER_EXTRA_TESTS=y.
-> 2 build libblake2s-x86_64.o as a module when CONFIG_CRYPTO_BLAKE2S_X86=y
-> 
-> Fixes: 8fc5f2ad896b ("crypto: testmgr - Move crypto_simd_disabled_for_test out")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: gaochao <gaochao49@huawei.com>
-> ---
->  arch/x86/crypto/Makefile | 2 +-
->  crypto/Kconfig           | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-> index 2831685adf6f..54b2469fa49a 100644
-> --- a/arch/x86/crypto/Makefile
-> +++ b/arch/x86/crypto/Makefile
-> @@ -63,7 +63,7 @@ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_s
-> 
->  obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
->  blake2s-x86_64-y := blake2s-shash.o
-> -obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
-> +obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += libblake2s-x86_64.o
->  libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+Thanks for CCing me into this.
 
-I think the (somewhat unusual) use of "obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y)"
-is working as intended.  The goal to build the x86 BLAKE2s library into the core
-kernel if CONFIG_CRYPTO_BLAKE2S_X86 is set to either y or m.  This change would
-break that.  And if we were to make this change, then there would no longer be
-any need to have blake2s-x86_64 and libblake2s-x86_64 be separate modules.
+On 5/26/22, Eric Biggers <ebiggers@kernel.org> wrote:
+> How about just making CRYPTO_MANAGER_EXTRA_TESTS depend on CRYPTO_ALGAPI=y?
 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 19197469cfab..e61598f8f8c5 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -714,6 +714,7 @@ config CRYPTO_BLAKE2S_X86
->  	depends on X86 && 64BIT
->  	select CRYPTO_LIB_BLAKE2S_GENERIC
->  	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> +	select CRYPTO_ALGAPI2 if CRYPTO_MANAGER_EXTRA_TESTS
+I think this would definitely be the best option, and probably best
+represents what somebody debugging / running tests has in mind.
 
-I expect that we'll run into this problem in the future too.  So just fixing it
-for CRYPTO_BLAKE2S_X86 specifically isn't ideal.
+I can send a patch for this today if you'd like.
 
-How about just making CRYPTO_MANAGER_EXTRA_TESTS depend on CRYPTO_ALGAPI=y?
-
-Or alternatively, move the crypto_simd_disabled_for_test variable into a file in
-lib/crypto/.  But the other suggestion would be a bit simpler for now.
-
-- Eric
+Jason
