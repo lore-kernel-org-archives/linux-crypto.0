@@ -2,122 +2,178 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A16BCC433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 11:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1274C433FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 12:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238191AbiE0LoD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 07:44:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57456 "EHLO
+        id S1352635AbiE0MMx (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 08:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351728AbiE0Lnf (ORCPT
+        with ESMTP id S1353384AbiE0MLG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 07:43:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B224C13F404;
-        Fri, 27 May 2022 04:40:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0874961CE7;
-        Fri, 27 May 2022 11:40:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1503DC385A9;
-        Fri, 27 May 2022 11:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1653651645;
-        bh=kVj1uQ8j1LBI6A7xCBQ/58jeMjipFUDYx3+qpPNc57o=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C9UbYxrRHAiaXzq2/SPtAwnoIgG3EA3aTSUe5ThnAIHyEqHDE21grPOxRD5rLBvi6
-         217+cRYBF7XWMRBcj0poKTiAopTGp4TkDmRApUjrWi7x6t1frJg8qpa/BUfC4C/Ru8
-         rvL4F63IDPewzf+2TcCF94hmGnz1Rbg/6K2u6D2w=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 5.10 037/163] random: early initialization of ChaCha constants
-Date:   Fri, 27 May 2022 10:48:37 +0200
-Message-Id: <20220527084833.264806705@linuxfoundation.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220527084828.156494029@linuxfoundation.org>
-References: <20220527084828.156494029@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Fri, 27 May 2022 08:11:06 -0400
+Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE9514C755;
+        Fri, 27 May 2022 04:58:49 -0700 (PDT)
+Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-f2a4c51c45so5474547fac.9;
+        Fri, 27 May 2022 04:58:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:reply-to:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=riYAAbHRq92K+lwWVOP6j+tCvpF9+fWD5d6/UiGVh3M=;
+        b=iPwRxPV2145O5j0i2udTirgYfsApHfipu9c9nyWpwIRHsdQqkzditjcyd5WrM6DPuv
+         pTlM3xrtQ/VSAy59YZWk26Ko61+REu5+SeNsglqU72jwkVkPYwfOfrLngv8b5xo9rUek
+         pbLw+86M1Pqioj0EnZcO1SXeV9a1yJ89XkCZ52cY+gvvLiqC2Nv8AMjN1j311NKP0soa
+         Ys27UvHfKNTay9dEM265vlWmi8j92oiwCa3g8jjsHQRLf1hunTLVcm7wbbEpuwSPDW4+
+         CxEH4C7cc6vG0LVqMtLl84lZ+WN9FIs+z1ri7lb4SecBOQ9rlAOLJyUEhSDR5VgjqL0/
+         j1Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :reply-to:references:mime-version:content-disposition:in-reply-to;
+        bh=riYAAbHRq92K+lwWVOP6j+tCvpF9+fWD5d6/UiGVh3M=;
+        b=Yr/oVDZiac4xgGp0M/k+tHNta2mY8jwpuUANhVaCWXSlNjKPyjyt5G2k4LlAiS5LlE
+         Gkg7+6f1IhBgeK556vUPWE9u9Yb8sjSLYogjDHm34NiIhonzLDwQ3X0V8FMuD/dHJOp8
+         jyeEw7MWmMNjONTrxejQI/sJ+AR+1v22aDP3WDsC/9+3C3XVaN3orxAAhol1FXuoSMem
+         6Gd1rnDGltqPIE3wbIB7THJK+lDUHHHGDI2xHJTdvaB/Hvz8j+NFFJbPR85MTBsFbcac
+         8mgARIFsy549i9cYzg9i5FOwKSrSiMwqpA/TyZtpHIt/AtuxFFivFbI/WIkuXjDJI+tV
+         1xFQ==
+X-Gm-Message-State: AOAM532W9S5A4wsLYdwBR1m16ete1bCvEgpQ7CDKox9jg8Jn5xXlQC7K
+        8s+Ts7g9nzUKckBQVlszGA==
+X-Google-Smtp-Source: ABdhPJxJjIIYyrcib/I+TdXI7CjKXK7Wk/Zyx+OzIi2pCj0tEGYDCPowZiVCZFfWGv92m5fD99xGlQ==
+X-Received: by 2002:a05:6870:4788:b0:ee:3a:8ab3 with SMTP id c8-20020a056870478800b000ee003a8ab3mr3546603oaq.231.1653652728251;
+        Fri, 27 May 2022 04:58:48 -0700 (PDT)
+Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
+        by smtp.gmail.com with ESMTPSA id r36-20020a05683044a400b0060ae5f10973sm1654569otv.15.2022.05.27.04.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 May 2022 04:58:47 -0700 (PDT)
+Sender: Corey Minyard <tcminyard@gmail.com>
+Received: from minyard.net (unknown [IPv6:2001:470:b8f6:1b:9845:e734:5235:fb48])
+        by serve.minyard.net (Postfix) with ESMTPSA id AA0FE1800B7;
+        Fri, 27 May 2022 11:58:46 +0000 (UTC)
+Date:   Fri, 27 May 2022 06:58:45 -0500
+From:   Corey Minyard <minyard@acm.org>
+To:     keliu <liuke94@huawei.com>
+Cc:     mpm@selenic.com, herbert@gondor.apana.org.au,
+        sudipm.mukherjee@gmail.com, arnd@arndb.de,
+        gregkh@linuxfoundation.org, mst@redhat.com, lvivier@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers: char: Directly use ida_alloc()/free()
+Message-ID: <20220527115845.GJ3767252@minyard.net>
+Reply-To: minyard@acm.org
+References: <20220527074422.2475104-1-liuke94@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220527074422.2475104-1-liuke94@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Dominik Brodowski <linux@dominikbrodowski.net>
+On Fri, May 27, 2022 at 07:44:22AM +0000, keliu wrote:
+> Use ida_alloc()/ida_free() instead of deprecated
+> ida_simple_get()/ida_simple_remove() .
+> 
+> Signed-off-by: keliu <liuke94@huawei.com>
+> ---
+>  drivers/char/hw_random/virtio-rng.c | 6 +++---
+>  drivers/char/ipmi/ipmi_msghandler.c | 4 ++--
+>  drivers/char/ppdev.c                | 6 +++---
+>  3 files changed, 8 insertions(+), 8 deletions(-)
 
-commit 96562f286884e2db89c74215b199a1084b5fb7f7 upstream.
+If you want this to go into individual maintainer trees, you will need
+to split it up.  Otherwise, how are you planning to get this change
+into the kernel?
 
-Previously, the ChaCha constants for the primary pool were only
-initialized in crng_initialize_primary(), called by rand_initialize().
-However, some randomness is actually extracted from the primary pool
-beforehand, e.g. by kmem_cache_create(). Therefore, statically
-initialize the ChaCha constants for the primary pool.
+-corey
 
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: <linux-crypto@vger.kernel.org>
-Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/char/random.c   |    5 ++++-
- include/crypto/chacha.h |   15 +++++++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
-
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -457,6 +457,10 @@ struct crng_state {
- 
- static struct crng_state primary_crng = {
- 	.lock = __SPIN_LOCK_UNLOCKED(primary_crng.lock),
-+	.state[0] = CHACHA_CONSTANT_EXPA,
-+	.state[1] = CHACHA_CONSTANT_ND_3,
-+	.state[2] = CHACHA_CONSTANT_2_BY,
-+	.state[3] = CHACHA_CONSTANT_TE_K,
- };
- 
- /*
-@@ -823,7 +827,6 @@ static void crng_initialize_secondary(st
- 
- static void __init crng_initialize_primary(struct crng_state *crng)
- {
--	chacha_init_consts(crng->state);
- 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
- 	if (crng_init_try_arch_early(crng) && trust_cpu && crng_init < 2) {
- 		invalidate_batched_entropy();
---- a/include/crypto/chacha.h
-+++ b/include/crypto/chacha.h
-@@ -47,12 +47,19 @@ static inline void hchacha_block(const u
- 		hchacha_block_generic(state, out, nrounds);
- }
- 
-+enum chacha_constants { /* expand 32-byte k */
-+	CHACHA_CONSTANT_EXPA = 0x61707865U,
-+	CHACHA_CONSTANT_ND_3 = 0x3320646eU,
-+	CHACHA_CONSTANT_2_BY = 0x79622d32U,
-+	CHACHA_CONSTANT_TE_K = 0x6b206574U
-+};
-+
- static inline void chacha_init_consts(u32 *state)
- {
--	state[0]  = 0x61707865; /* "expa" */
--	state[1]  = 0x3320646e; /* "nd 3" */
--	state[2]  = 0x79622d32; /* "2-by" */
--	state[3]  = 0x6b206574; /* "te k" */
-+	state[0]  = CHACHA_CONSTANT_EXPA;
-+	state[1]  = CHACHA_CONSTANT_ND_3;
-+	state[2]  = CHACHA_CONSTANT_2_BY;
-+	state[3]  = CHACHA_CONSTANT_TE_K;
- }
- 
- void chacha_init_arch(u32 *state, const u32 *key, const u8 *iv);
-
-
+> 
+> diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+> index e856df7e285c..0ee602963c50 100644
+> --- a/drivers/char/hw_random/virtio-rng.c
+> +++ b/drivers/char/hw_random/virtio-rng.c
+> @@ -135,7 +135,7 @@ static int probe_common(struct virtio_device *vdev)
+>  	if (!vi)
+>  		return -ENOMEM;
+>  
+> -	vi->index = index = ida_simple_get(&rng_index_ida, 0, 0, GFP_KERNEL);
+> +	vi->index = index = ida_alloc(&rng_index_ida, GFP_KERNEL);
+>  	if (index < 0) {
+>  		err = index;
+>  		goto err_ida;
+> @@ -165,7 +165,7 @@ static int probe_common(struct virtio_device *vdev)
+>  	return 0;
+>  
+>  err_find:
+> -	ida_simple_remove(&rng_index_ida, index);
+> +	ida_free(&rng_index_ida, index);
+>  err_ida:
+>  	kfree(vi);
+>  	return err;
+> @@ -183,7 +183,7 @@ static void remove_common(struct virtio_device *vdev)
+>  		hwrng_unregister(&vi->hwrng);
+>  	virtio_reset_device(vdev);
+>  	vdev->config->del_vqs(vdev);
+> -	ida_simple_remove(&rng_index_ida, vi->index);
+> +	ida_free(&rng_index_ida, vi->index);
+>  	kfree(vi);
+>  }
+>  
+> diff --git a/drivers/char/ipmi/ipmi_msghandler.c b/drivers/char/ipmi/ipmi_msghandler.c
+> index f1827257ef0e..c1584ed24a6b 100644
+> --- a/drivers/char/ipmi/ipmi_msghandler.c
+> +++ b/drivers/char/ipmi/ipmi_msghandler.c
+> @@ -3018,7 +3018,7 @@ static void cleanup_bmc_work(struct work_struct *work)
+>  	int id = bmc->pdev.id; /* Unregister overwrites id */
+>  
+>  	platform_device_unregister(&bmc->pdev);
+> -	ida_simple_remove(&ipmi_bmc_ida, id);
+> +	ida_free(&ipmi_bmc_ida, id);
+>  }
+>  
+>  static void
+> @@ -3134,7 +3134,7 @@ static int __ipmi_bmc_register(struct ipmi_smi *intf,
+>  
+>  		bmc->pdev.name = "ipmi_bmc";
+>  
+> -		rv = ida_simple_get(&ipmi_bmc_ida, 0, 0, GFP_KERNEL);
+> +		rv = ida_alloc(&ipmi_bmc_ida, GFP_KERNEL);
+>  		if (rv < 0) {
+>  			kfree(bmc);
+>  			goto out;
+> diff --git a/drivers/char/ppdev.c b/drivers/char/ppdev.c
+> index 38b46c7d1737..f6024d97fe70 100644
+> --- a/drivers/char/ppdev.c
+> +++ b/drivers/char/ppdev.c
+> @@ -299,7 +299,7 @@ static int register_device(int minor, struct pp_struct *pp)
+>  		goto err;
+>  	}
+>  
+> -	index = ida_simple_get(&ida_index, 0, 0, GFP_KERNEL);
+> +	index = ida_alloc(&ida_index, GFP_KERNEL);
+>  	memset(&ppdev_cb, 0, sizeof(ppdev_cb));
+>  	ppdev_cb.irq_func = pp_irq;
+>  	ppdev_cb.flags = (pp->flags & PP_EXCL) ? PARPORT_FLAG_EXCL : 0;
+> @@ -310,7 +310,7 @@ static int register_device(int minor, struct pp_struct *pp)
+>  	if (!pdev) {
+>  		pr_warn("%s: failed to register device!\n", name);
+>  		rc = -ENXIO;
+> -		ida_simple_remove(&ida_index, index);
+> +		ida_free(&ida_index, index);
+>  		goto err;
+>  	}
+>  
+> @@ -750,7 +750,7 @@ static int pp_release(struct inode *inode, struct file *file)
+>  
+>  	if (pp->pdev) {
+>  		parport_unregister_device(pp->pdev);
+> -		ida_simple_remove(&ida_index, pp->index);
+> +		ida_free(&ida_index, pp->index);
+>  		pp->pdev = NULL;
+>  		pr_debug(CHRDEV "%x: unregistered pardevice\n", minor);
+>  	}
+> -- 
+> 2.25.1
+> 
