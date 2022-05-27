@@ -2,417 +2,666 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E78DC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 11:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F00AC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 11:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240260AbiE0L3O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 07:29:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39266 "EHLO
+        id S1350742AbiE0LiV (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 07:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236784AbiE0L3N (ORCPT
+        with ESMTP id S1351491AbiE0LiQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 07:29:13 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9498D5BD30;
-        Fri, 27 May 2022 04:29:10 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nuY9N-000a7X-NG; Fri, 27 May 2022 21:29:03 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 May 2022 19:29:02 +0800
-Date:   Fri, 27 May 2022 19:29:02 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.19
-Message-ID: <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
-References: <20210108035450.GA6191@gondor.apana.org.au>
- <20210708030913.GA32097@gondor.apana.org.au>
- <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
+        Fri, 27 May 2022 07:38:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E9D12698E;
+        Fri, 27 May 2022 04:38:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2B4BCB824D9;
+        Fri, 27 May 2022 11:38:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C191C385A9;
+        Fri, 27 May 2022 11:37:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1653651479;
+        bh=TdM9kCbzO9r9RHTkFH3ggT2WNkeIKCbHj5t/HggTyXs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=oyaleu/Fi5+7oUffh1+z30ee3YGEPhlP5G5CNXcmRJo4yF2Os8Nj3mbnSBNMv9NGK
+         ercFltSTA4MPTpayyjqrGUcSEMvj6a4s8pUCUY2dnJlV6J83NqGAEFM9OnY470bIdo
+         fIcsNY+eJlvM37XJbL8olwKf8aQEefl7uOgoUeLg=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kbuild@vger.kernel.org, linux-crypto@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 5.15 007/145] lib/crypto: blake2s: include as built-in
+Date:   Fri, 27 May 2022 10:48:28 +0200
+Message-Id: <20220527084851.561294196@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220527084850.364560116@linuxfoundation.org>
+References: <20220527084850.364560116@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YkUdKiJflWqxBmx5@gondor.apana.org.au>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
+commit 6048fdcc5f269c7f31d774c295ce59081b36e6f9 upstream.
 
-  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
+In preparation for using blake2s in the RNG, we change the way that it
+is wired-in to the build system. Instead of using ifdefs to select the
+right symbol, we use weak symbols. And because ARM doesn't need the
+generic implementation, we make the generic one default only if an arch
+library doesn't need it already, and then have arch libraries that do
+need it opt-in. So that the arch libraries can remain tristate rather
+than bool, we then split the shash part from the glue code.
 
-are available in the Git repository at:
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ arch/arm/crypto/Makefile          |    4 +
+ arch/arm/crypto/blake2s-core.S    |    8 +--
+ arch/arm/crypto/blake2s-glue.c    |   73 ------------------------------------
+ arch/arm/crypto/blake2s-shash.c   |   75 +++++++++++++++++++++++++++++++++++++
+ arch/x86/crypto/Makefile          |    4 +
+ arch/x86/crypto/blake2s-glue.c    |   68 ++-------------------------------
+ arch/x86/crypto/blake2s-shash.c   |   77 ++++++++++++++++++++++++++++++++++++++
+ crypto/Kconfig                    |    3 -
+ drivers/net/Kconfig               |    1 
+ include/crypto/internal/blake2s.h |    6 +-
+ lib/crypto/Kconfig                |   23 ++---------
+ lib/crypto/Makefile               |    9 +---
+ lib/crypto/blake2s-generic.c      |    6 ++
+ lib/crypto/blake2s.c              |    6 --
+ 14 files changed, 189 insertions(+), 174 deletions(-)
+ create mode 100644 arch/arm/crypto/blake2s-shash.c
+ create mode 100644 arch/x86/crypto/blake2s-shash.c
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.19-p1 
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_CRYPTO_SHA1_ARM_NEON) += sh
+ obj-$(CONFIG_CRYPTO_SHA256_ARM) += sha256-arm.o
+ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+ obj-$(CONFIG_CRYPTO_BLAKE2S_ARM) += blake2s-arm.o
++obj-$(if $(CONFIG_CRYPTO_BLAKE2S_ARM),y) += libblake2s-arm.o
+ obj-$(CONFIG_CRYPTO_BLAKE2B_NEON) += blake2b-neon.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+ obj-$(CONFIG_CRYPTO_POLY1305_ARM) += poly1305-arm.o
+@@ -31,7 +32,8 @@ sha256-arm-neon-$(CONFIG_KERNEL_MODE_NEO
+ sha256-arm-y	:= sha256-core.o sha256_glue.o $(sha256-arm-neon-y)
+ sha512-arm-neon-$(CONFIG_KERNEL_MODE_NEON) := sha512-neon-glue.o
+ sha512-arm-y	:= sha512-core.o sha512-glue.o $(sha512-arm-neon-y)
+-blake2s-arm-y   := blake2s-core.o blake2s-glue.o
++blake2s-arm-y   := blake2s-shash.o
++libblake2s-arm-y:= blake2s-core.o blake2s-glue.o
+ blake2b-neon-y  := blake2b-neon-core.o blake2b-neon-glue.o
+ sha1-arm-ce-y	:= sha1-ce-core.o sha1-ce-glue.o
+ sha2-arm-ce-y	:= sha2-ce-core.o sha2-ce-glue.o
+--- a/arch/arm/crypto/blake2s-core.S
++++ b/arch/arm/crypto/blake2s-core.S
+@@ -167,8 +167,8 @@
+ .endm
+ 
+ //
+-// void blake2s_compress_arch(struct blake2s_state *state,
+-//			      const u8 *block, size_t nblocks, u32 inc);
++// void blake2s_compress(struct blake2s_state *state,
++//			 const u8 *block, size_t nblocks, u32 inc);
+ //
+ // Only the first three fields of struct blake2s_state are used:
+ //	u32 h[8];	(inout)
+@@ -176,7 +176,7 @@
+ //	u32 f[2];	(in)
+ //
+ 	.align		5
+-ENTRY(blake2s_compress_arch)
++ENTRY(blake2s_compress)
+ 	push		{r0-r2,r4-r11,lr}	// keep this an even number
+ 
+ .Lnext_block:
+@@ -303,4 +303,4 @@ ENTRY(blake2s_compress_arch)
+ 	str		r3, [r12], #4
+ 	bne		1b
+ 	b		.Lcopy_block_done
+-ENDPROC(blake2s_compress_arch)
++ENDPROC(blake2s_compress)
+--- a/arch/arm/crypto/blake2s-glue.c
++++ b/arch/arm/crypto/blake2s-glue.c
+@@ -1,78 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- * BLAKE2s digest algorithm, ARM scalar implementation
+- *
+- * Copyright 2020 Google LLC
+- */
+ 
+ #include <crypto/internal/blake2s.h>
+-#include <crypto/internal/hash.h>
+-
+ #include <linux/module.h>
+ 
+ /* defined in blake2s-core.S */
+-EXPORT_SYMBOL(blake2s_compress_arch);
+-
+-static int crypto_blake2s_update_arm(struct shash_desc *desc,
+-				     const u8 *in, unsigned int inlen)
+-{
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
+-}
+-
+-static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
+-{
+-	return crypto_blake2s_final(desc, out, blake2s_compress_arch);
+-}
+-
+-#define BLAKE2S_ALG(name, driver_name, digest_size)			\
+-	{								\
+-		.base.cra_name		= name,				\
+-		.base.cra_driver_name	= driver_name,			\
+-		.base.cra_priority	= 200,				\
+-		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
+-		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
+-		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
+-		.base.cra_module	= THIS_MODULE,			\
+-		.digestsize		= digest_size,			\
+-		.setkey			= crypto_blake2s_setkey,	\
+-		.init			= crypto_blake2s_init,		\
+-		.update			= crypto_blake2s_update_arm,	\
+-		.final			= crypto_blake2s_final_arm,	\
+-		.descsize		= sizeof(struct blake2s_state),	\
+-	}
+-
+-static struct shash_alg blake2s_arm_algs[] = {
+-	BLAKE2S_ALG("blake2s-128", "blake2s-128-arm", BLAKE2S_128_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-160", "blake2s-160-arm", BLAKE2S_160_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-224", "blake2s-224-arm", BLAKE2S_224_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-256", "blake2s-256-arm", BLAKE2S_256_HASH_SIZE),
+-};
+-
+-static int __init blake2s_arm_mod_init(void)
+-{
+-	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
+-		crypto_register_shashes(blake2s_arm_algs,
+-					ARRAY_SIZE(blake2s_arm_algs)) : 0;
+-}
+-
+-static void __exit blake2s_arm_mod_exit(void)
+-{
+-	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
+-		crypto_unregister_shashes(blake2s_arm_algs,
+-					  ARRAY_SIZE(blake2s_arm_algs));
+-}
+-
+-module_init(blake2s_arm_mod_init);
+-module_exit(blake2s_arm_mod_exit);
+-
+-MODULE_DESCRIPTION("BLAKE2s digest algorithm, ARM scalar implementation");
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
+-MODULE_ALIAS_CRYPTO("blake2s-128");
+-MODULE_ALIAS_CRYPTO("blake2s-128-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-160");
+-MODULE_ALIAS_CRYPTO("blake2s-160-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-224");
+-MODULE_ALIAS_CRYPTO("blake2s-224-arm");
+-MODULE_ALIAS_CRYPTO("blake2s-256");
+-MODULE_ALIAS_CRYPTO("blake2s-256-arm");
++EXPORT_SYMBOL(blake2s_compress);
+--- /dev/null
++++ b/arch/arm/crypto/blake2s-shash.c
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * BLAKE2s digest algorithm, ARM scalar implementation
++ *
++ * Copyright 2020 Google LLC
++ */
++
++#include <crypto/internal/blake2s.h>
++#include <crypto/internal/hash.h>
++
++#include <linux/module.h>
++
++static int crypto_blake2s_update_arm(struct shash_desc *desc,
++				     const u8 *in, unsigned int inlen)
++{
++	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++}
++
++static int crypto_blake2s_final_arm(struct shash_desc *desc, u8 *out)
++{
++	return crypto_blake2s_final(desc, out, blake2s_compress);
++}
++
++#define BLAKE2S_ALG(name, driver_name, digest_size)			\
++	{								\
++		.base.cra_name		= name,				\
++		.base.cra_driver_name	= driver_name,			\
++		.base.cra_priority	= 200,				\
++		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
++		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
++		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
++		.base.cra_module	= THIS_MODULE,			\
++		.digestsize		= digest_size,			\
++		.setkey			= crypto_blake2s_setkey,	\
++		.init			= crypto_blake2s_init,		\
++		.update			= crypto_blake2s_update_arm,	\
++		.final			= crypto_blake2s_final_arm,	\
++		.descsize		= sizeof(struct blake2s_state),	\
++	}
++
++static struct shash_alg blake2s_arm_algs[] = {
++	BLAKE2S_ALG("blake2s-128", "blake2s-128-arm", BLAKE2S_128_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-160", "blake2s-160-arm", BLAKE2S_160_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-224", "blake2s-224-arm", BLAKE2S_224_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-256", "blake2s-256-arm", BLAKE2S_256_HASH_SIZE),
++};
++
++static int __init blake2s_arm_mod_init(void)
++{
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shashes(blake2s_arm_algs,
++					ARRAY_SIZE(blake2s_arm_algs)) : 0;
++}
++
++static void __exit blake2s_arm_mod_exit(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
++		crypto_unregister_shashes(blake2s_arm_algs,
++					  ARRAY_SIZE(blake2s_arm_algs));
++}
++
++module_init(blake2s_arm_mod_init);
++module_exit(blake2s_arm_mod_exit);
++
++MODULE_DESCRIPTION("BLAKE2s digest algorithm, ARM scalar implementation");
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Eric Biggers <ebiggers@google.com>");
++MODULE_ALIAS_CRYPTO("blake2s-128");
++MODULE_ALIAS_CRYPTO("blake2s-128-arm");
++MODULE_ALIAS_CRYPTO("blake2s-160");
++MODULE_ALIAS_CRYPTO("blake2s-160-arm");
++MODULE_ALIAS_CRYPTO("blake2s-224");
++MODULE_ALIAS_CRYPTO("blake2s-224-arm");
++MODULE_ALIAS_CRYPTO("blake2s-256");
++MODULE_ALIAS_CRYPTO("blake2s-256-arm");
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -62,7 +62,9 @@ obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha
+ sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
+ 
+ obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+-blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
++blake2s-x86_64-y := blake2s-shash.o
++obj-$(if $(CONFIG_CRYPTO_BLAKE2S_X86),y) += libblake2s-x86_64.o
++libblake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+ 
+ obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
+ ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
+--- a/arch/x86/crypto/blake2s-glue.c
++++ b/arch/x86/crypto/blake2s-glue.c
+@@ -5,7 +5,6 @@
+ 
+ #include <crypto/internal/blake2s.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/internal/hash.h>
+ 
+ #include <linux/types.h>
+ #include <linux/jump_label.h>
+@@ -28,9 +27,8 @@ asmlinkage void blake2s_compress_avx512(
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_ssse3);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
+ 
+-void blake2s_compress_arch(struct blake2s_state *state,
+-			   const u8 *block, size_t nblocks,
+-			   const u32 inc)
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc)
+ {
+ 	/* SIMD disables preemption, so relax after processing each page. */
+ 	BUILD_BUG_ON(SZ_4K / BLAKE2S_BLOCK_SIZE < 8);
+@@ -56,49 +54,12 @@ void blake2s_compress_arch(struct blake2
+ 		block += blocks * BLAKE2S_BLOCK_SIZE;
+ 	} while (nblocks);
+ }
+-EXPORT_SYMBOL(blake2s_compress_arch);
+-
+-static int crypto_blake2s_update_x86(struct shash_desc *desc,
+-				     const u8 *in, unsigned int inlen)
+-{
+-	return crypto_blake2s_update(desc, in, inlen, blake2s_compress_arch);
+-}
+-
+-static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
+-{
+-	return crypto_blake2s_final(desc, out, blake2s_compress_arch);
+-}
+-
+-#define BLAKE2S_ALG(name, driver_name, digest_size)			\
+-	{								\
+-		.base.cra_name		= name,				\
+-		.base.cra_driver_name	= driver_name,			\
+-		.base.cra_priority	= 200,				\
+-		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
+-		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
+-		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
+-		.base.cra_module	= THIS_MODULE,			\
+-		.digestsize		= digest_size,			\
+-		.setkey			= crypto_blake2s_setkey,	\
+-		.init			= crypto_blake2s_init,		\
+-		.update			= crypto_blake2s_update_x86,	\
+-		.final			= crypto_blake2s_final_x86,	\
+-		.descsize		= sizeof(struct blake2s_state),	\
+-	}
+-
+-static struct shash_alg blake2s_algs[] = {
+-	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
+-	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
+-};
++EXPORT_SYMBOL(blake2s_compress);
+ 
+ static int __init blake2s_mod_init(void)
+ {
+-	if (!boot_cpu_has(X86_FEATURE_SSSE3))
+-		return 0;
+-
+-	static_branch_enable(&blake2s_use_ssse3);
++	if (boot_cpu_has(X86_FEATURE_SSSE3))
++		static_branch_enable(&blake2s_use_ssse3);
+ 
+ 	if (IS_ENABLED(CONFIG_AS_AVX512) &&
+ 	    boot_cpu_has(X86_FEATURE_AVX) &&
+@@ -109,26 +70,9 @@ static int __init blake2s_mod_init(void)
+ 			      XFEATURE_MASK_AVX512, NULL))
+ 		static_branch_enable(&blake2s_use_avx512);
+ 
+-	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
+-		crypto_register_shashes(blake2s_algs,
+-					ARRAY_SIZE(blake2s_algs)) : 0;
+-}
+-
+-static void __exit blake2s_mod_exit(void)
+-{
+-	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
+-		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	return 0;
+ }
+ 
+ module_init(blake2s_mod_init);
+-module_exit(blake2s_mod_exit);
+ 
+-MODULE_ALIAS_CRYPTO("blake2s-128");
+-MODULE_ALIAS_CRYPTO("blake2s-128-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-160");
+-MODULE_ALIAS_CRYPTO("blake2s-160-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-224");
+-MODULE_ALIAS_CRYPTO("blake2s-224-x86");
+-MODULE_ALIAS_CRYPTO("blake2s-256");
+-MODULE_ALIAS_CRYPTO("blake2s-256-x86");
+ MODULE_LICENSE("GPL v2");
+--- /dev/null
++++ b/arch/x86/crypto/blake2s-shash.c
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <crypto/internal/blake2s.h>
++#include <crypto/internal/simd.h>
++#include <crypto/internal/hash.h>
++
++#include <linux/types.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/sizes.h>
++
++#include <asm/cpufeature.h>
++#include <asm/processor.h>
++
++static int crypto_blake2s_update_x86(struct shash_desc *desc,
++				     const u8 *in, unsigned int inlen)
++{
++	return crypto_blake2s_update(desc, in, inlen, blake2s_compress);
++}
++
++static int crypto_blake2s_final_x86(struct shash_desc *desc, u8 *out)
++{
++	return crypto_blake2s_final(desc, out, blake2s_compress);
++}
++
++#define BLAKE2S_ALG(name, driver_name, digest_size)			\
++	{								\
++		.base.cra_name		= name,				\
++		.base.cra_driver_name	= driver_name,			\
++		.base.cra_priority	= 200,				\
++		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,	\
++		.base.cra_blocksize	= BLAKE2S_BLOCK_SIZE,		\
++		.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx), \
++		.base.cra_module	= THIS_MODULE,			\
++		.digestsize		= digest_size,			\
++		.setkey			= crypto_blake2s_setkey,	\
++		.init			= crypto_blake2s_init,		\
++		.update			= crypto_blake2s_update_x86,	\
++		.final			= crypto_blake2s_final_x86,	\
++		.descsize		= sizeof(struct blake2s_state),	\
++	}
++
++static struct shash_alg blake2s_algs[] = {
++	BLAKE2S_ALG("blake2s-128", "blake2s-128-x86", BLAKE2S_128_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-160", "blake2s-160-x86", BLAKE2S_160_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-224", "blake2s-224-x86", BLAKE2S_224_HASH_SIZE),
++	BLAKE2S_ALG("blake2s-256", "blake2s-256-x86", BLAKE2S_256_HASH_SIZE),
++};
++
++static int __init blake2s_mod_init(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
++		return crypto_register_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	return 0;
++}
++
++static void __exit blake2s_mod_exit(void)
++{
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
++		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++}
++
++module_init(blake2s_mod_init);
++module_exit(blake2s_mod_exit);
++
++MODULE_ALIAS_CRYPTO("blake2s-128");
++MODULE_ALIAS_CRYPTO("blake2s-128-x86");
++MODULE_ALIAS_CRYPTO("blake2s-160");
++MODULE_ALIAS_CRYPTO("blake2s-160-x86");
++MODULE_ALIAS_CRYPTO("blake2s-224");
++MODULE_ALIAS_CRYPTO("blake2s-224-x86");
++MODULE_ALIAS_CRYPTO("blake2s-256");
++MODULE_ALIAS_CRYPTO("blake2s-256-x86");
++MODULE_LICENSE("GPL v2");
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1919,9 +1919,10 @@ config CRYPTO_STATS
+ config CRYPTO_HASH_INFO
+ 	bool
+ 
+-source "lib/crypto/Kconfig"
+ source "drivers/crypto/Kconfig"
+ source "crypto/asymmetric_keys/Kconfig"
+ source "certs/Kconfig"
+ 
+ endif	# if CRYPTO
++
++source "lib/crypto/Kconfig"
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -81,7 +81,6 @@ config WIREGUARD
+ 	select CRYPTO
+ 	select CRYPTO_LIB_CURVE25519
+ 	select CRYPTO_LIB_CHACHA20POLY1305
+-	select CRYPTO_LIB_BLAKE2S
+ 	select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
+ 	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
+ 	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
+--- a/include/crypto/internal/blake2s.h
++++ b/include/crypto/internal/blake2s.h
+@@ -11,11 +11,11 @@
+ #include <crypto/internal/hash.h>
+ #include <linux/string.h>
+ 
+-void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
++void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+ 			      size_t nblocks, const u32 inc);
+ 
+-void blake2s_compress_arch(struct blake2s_state *state,const u8 *block,
+-			   size_t nblocks, const u32 inc);
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc);
+ 
+ bool blake2s_selftest(void);
+ 
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -1,7 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-comment "Crypto library routines"
+-
+ config CRYPTO_LIB_AES
+ 	tristate
+ 
+@@ -9,14 +7,14 @@ config CRYPTO_LIB_ARC4
+ 	tristate
+ 
+ config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+-	tristate
++	bool
+ 	help
+ 	  Declares whether the architecture provides an arch-specific
+ 	  accelerated implementation of the Blake2s library interface,
+ 	  either builtin or as a module.
+ 
+ config CRYPTO_LIB_BLAKE2S_GENERIC
+-	tristate
++	def_bool !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+ 	help
+ 	  This symbol can be depended upon by arch implementations of the
+ 	  Blake2s library interface that require the generic code as a
+@@ -24,15 +22,6 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
+ 	  implementation is enabled, this implementation serves the users
+ 	  of CRYPTO_LIB_BLAKE2S.
+ 
+-config CRYPTO_LIB_BLAKE2S
+-	tristate "BLAKE2s hash function library"
+-	depends on CRYPTO_ARCH_HAVE_LIB_BLAKE2S || !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+-	select CRYPTO_LIB_BLAKE2S_GENERIC if CRYPTO_ARCH_HAVE_LIB_BLAKE2S=n
+-	help
+-	  Enable the Blake2s library interface. This interface may be fulfilled
+-	  by either the generic implementation or an arch-specific one, if one
+-	  is available and enabled.
+-
+ config CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	tristate
+ 	help
+@@ -51,7 +40,7 @@ config CRYPTO_LIB_CHACHA_GENERIC
+ 	  of CRYPTO_LIB_CHACHA.
+ 
+ config CRYPTO_LIB_CHACHA
+-	tristate "ChaCha library interface"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+ 	help
+@@ -76,7 +65,7 @@ config CRYPTO_LIB_CURVE25519_GENERIC
+ 	  of CRYPTO_LIB_CURVE25519.
+ 
+ config CRYPTO_LIB_CURVE25519
+-	tristate "Curve25519 scalar multiplication library"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
+ 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+ 	help
+@@ -111,7 +100,7 @@ config CRYPTO_LIB_POLY1305_GENERIC
+ 	  of CRYPTO_LIB_POLY1305.
+ 
+ config CRYPTO_LIB_POLY1305
+-	tristate "Poly1305 library interface"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+ 	help
+@@ -120,7 +109,7 @@ config CRYPTO_LIB_POLY1305
+ 	  is available and enabled.
+ 
+ config CRYPTO_LIB_CHACHA20POLY1305
+-	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
++	tristate
+ 	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	select CRYPTO_LIB_CHACHA
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -10,11 +10,10 @@ libaes-y					:= aes.o
+ obj-$(CONFIG_CRYPTO_LIB_ARC4)			+= libarc4.o
+ libarc4-y					:= arc4.o
+ 
+-obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= libblake2s-generic.o
+-libblake2s-generic-y				+= blake2s-generic.o
+-
+-obj-$(CONFIG_CRYPTO_LIB_BLAKE2S)		+= libblake2s.o
+-libblake2s-y					+= blake2s.o
++# blake2s is used by the /dev/random driver which is always builtin
++obj-y						+= libblake2s.o
++libblake2s-y					:= blake2s.o
++libblake2s-$(CONFIG_CRYPTO_LIB_BLAKE2S_GENERIC)	+= blake2s-generic.o
+ 
+ obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305)	+= libchacha20poly1305.o
+ libchacha20poly1305-y				+= chacha20poly1305.o
+--- a/lib/crypto/blake2s-generic.c
++++ b/lib/crypto/blake2s-generic.c
+@@ -37,7 +37,11 @@ static inline void blake2s_increment_cou
+ 	state->t[1] += (state->t[0] < inc);
+ }
+ 
+-void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
++void blake2s_compress(struct blake2s_state *state, const u8 *block,
++		      size_t nblocks, const u32 inc)
++		      __weak __alias(blake2s_compress_generic);
++
++void blake2s_compress_generic(struct blake2s_state *state, const u8 *block,
+ 			      size_t nblocks, const u32 inc)
+ {
+ 	u32 m[16];
+--- a/lib/crypto/blake2s.c
++++ b/lib/crypto/blake2s.c
+@@ -16,12 +16,6 @@
+ #include <linux/init.h>
+ #include <linux/bug.h>
+ 
+-#if IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S)
+-#  define blake2s_compress blake2s_compress_arch
+-#else
+-#  define blake2s_compress blake2s_compress_generic
+-#endif
+-
+ void blake2s_update(struct blake2s_state *state, const u8 *in, size_t inlen)
+ {
+ 	__blake2s_update(state, in, inlen, blake2s_compress);
 
-for you to fetch changes up to e4e62bbc6aba49a5edb3156ec65f6698ff37d228:
 
-  hwrng: omap3-rom - fix using wrong clk_disable() in omap_rom_rng_runtime_resume() (2022-05-20 13:54:45 +0800)
-
-----------------------------------------------------------------
-This update includes the following changes:
-
-API:
-
-- Test in-place en/decryption with two sglists in testmgr.
-- Fix process vs. softirq race in cryptd.
-
-Algorithms:
-
-- Add arm64 acceleration for sm4.
-- Add s390 acceleration for chacha20.
-
-Drivers:
-
-- Add polarfire soc hwrng support in mpsf.
-- Add support for TI SoC AM62x in sa2ul.
-- Add support for ATSHA204 cryptochip in atmel-sha204a.
-- Add support for PRNG in caam.
-- Restore support for storage encryption in qat.
-- Restore support for storage encryption in hisilicon/sec.
-
-----------------------------------------------------------------
-Colin Ian King (1):
-      hwrng: optee - remove redundant initialization to variable rng_size
-
-Conor Dooley (1):
-      hwrng: mpfs - add polarfire soc hwrng support
-
-Corentin Labbe (20):
-      crypto: marvell/cesa - ECB does not IV
-      crypto: sun8i-ce - Fix minor style issue
-      crypto: sun8i-ce - do not allocate memory when handling requests
-      crypto: sun4i-ss - do not allocate backup IV on requests
-      crypto: sun8i-ss - rework handling of IV
-      crypto: sun8i-ss - handle zero sized sg
-      crypto: sun8i-ss - remove redundant test
-      crypto: sun8i-ss - test error before assigning
-      crypto: sun8i-ss - use sg_nents_for_len
-      crypto: sun8i-ss - do not allocate memory when handling hash requests
-      crypto: sun8i-ss - do not zeroize all pad
-      crypto: sun8i-ss - handle requests if last block is not modulo 64
-      crypto: sun8i-ss - rework debugging
-      crypto: sun8i-ss - Add function for handling hash padding
-      crypto: sun8i-ss - add hmac(sha1)
-      crypto: sun8i-ss - do not fallback if cryptlen is less than sg length
-      crypto: sun8i-ce - Add function for handling hash padding
-      crypto: sun8i-ce - use sg_nents_for_len
-      crypto: sun8i-ce - rework debugging
-      crypto: sun8i-ce - do not fallback if cryptlen is less than sg length
-
-Eric Biggers (1):
-      crypto: testmgr - test in-place en/decryption with two sglists
-
-Fabio Estevam (1):
-      crypto: caam - fix i.MX6SX entropy delay value
-
-Gilad Ben-Yossef (2):
-      crypto: ccree - rearrange init calls to avoid race
-      crypto: ccree - use fine grained DMA mapping dir
-
-Giovanni Cabiddu (15):
-      crypto: qat - set CIPHER capability for DH895XCC
-      crypto: qat - set COMPRESSION capability for DH895XCC
-      crypto: qat - remove unused PFVF stubs
-      crypto: qat - set to zero DH parameters before free
-      crypto: qat - use pre-allocated buffers in datapath
-      crypto: qat - refactor submission logic
-      crypto: qat - add backlog mechanism
-      crypto: qat - fix memory leak in RSA
-      crypto: qat - remove dma_free_coherent() for RSA
-      crypto: qat - remove dma_free_coherent() for DH
-      crypto: qat - add param check for RSA
-      crypto: qat - add param check for DH
-      crypto: qat - honor CRYPTO_TFM_REQ_MAY_SLEEP flag
-      crypto: qat - re-enable registration of algorithms
-      crypto: qat - add support for 401xx devices
-
-Haowen Bai (1):
-      crypto: qat - Fix unsigned function returning negative constant
-
-Herbert Xu (3):
-      hwrng: mpfs - Enable COMPILE_TEST
-      Revert "hwrng: mpfs - Enable COMPILE_TEST"
-      hwrng: cn10k - Enable compile testing
-
-Hui Tang (1):
-      crypto: hisilicon/qm - optimize the barrier operation
-
-Jacky Li (1):
-      crypto: ccp - Fix the INIT_EX data file open failure
-
-Jakob Koschel (1):
-      crypto: cavium/nitrox - remove check of list iterator against head past the loop body
-
-Jason A. Donenfeld (1):
-      crypto: sm3,sm4 - move into crypto directory
-
-Jayesh Choudhary (2):
-      dt-bindings: crypto: ti,sa2ul: Add a new compatible for AM62
-      crypto: sa2ul - Add the new compatible for AM62
-
-Juerg Haefliger (1):
-      crypto: inside-secure - Add MODULE_FIRMWARE macros
-
-Kai Ye (13):
-      crypto: hisilicon/qm - add register checking for ACC
-      crypto: hisilicon/hpre - support register checking
-      crypto: hisilicon/sec - support register checking
-      crypto: hisilicon/zip - support register checking
-      Documentation: update debugfs doc for Hisilicon HPRE
-      Documentation: update debugfs doc for Hisilicon SEC
-      Documentation: update debugfs doc for Hisilicon ZIP
-      crypto: hisilicon/qm - add last word dumping for ACC
-      crypto: hisilicon/sec - support last word dumping
-      crypto: hisilicon/hpre - support last word dumping
-      crypto: hisilicon/zip - support last word dumping
-      crypto: hisilicon/sec - add sm4 generic selection
-      crypto: hisilicon/sec - delete the flag CRYPTO_ALG_ALLOCATES_MEMORY
-
-Lv Ruyi (1):
-      crypto: keembay - Make use of devm helper function devm_platform_ioremap_resource()
-
-Marco Chiappero (12):
-      crypto: qat - fix ETR sources enabled by default on GEN2 devices
-      crypto: qat - remove unneeded braces
-      crypto: qat - remove unnecessary tests to detect PFVF support
-      crypto: qat - add missing restarting event notification in VFs
-      crypto: qat - test PFVF registers for spurious interrupts on GEN4
-      crypto: qat - fix wording and formatting in code comment
-      crypto: qat - fix off-by-one error in PFVF debug print
-      crypto: qat - rework the VF2PF interrupt handling logic
-      crypto: qat - leverage the GEN2 VF mask definiton
-      crypto: qat - replace disable_vf2pf_interrupts()
-      crypto: qat - use u32 variables in all GEN4 pfvf_ops
-      crypto: qat - remove line wrapping for pfvf_ops functions
-
-Mario Limonciello (4):
-      crypto: ccp - cache capability into psp device
-      crypto: ccp - Export PSP security bits to userspace
-      crypto: ccp - Allow PSP driver to load without SEV/TEE support
-      crypto: ccp - When TSME and SME both detected notify user
-
-Masahiro Yamada (2):
-      crypto: vmx - Align the short log with Makefile cleanups
-      crypto: vmx - Fix build error
-
-Meenakshi Aggarwal (1):
-      crypto: caam/rng - Add support for PRNG
-
-Minghao Chi (3):
-      crypto: sun8i-ss - using pm_runtime_resume_and_get instead of pm_runtime_get_sync
-      crypto: sun8i-ce - using pm_runtime_resume_and_get instead of pm_runtime_get_sync
-      crypto: octeontx2 - simplify the return expression of otx2_cpt_aead_cbc_aes_sha_setkey()
-
-Pali Rohár (1):
-      crypto: atmel-sha204a - Add support for ATSHA204 cryptochip
-
-Peter Gonda (1):
-      crypto: ccp - Log when resetting PSP SEV state
-
-Randy Dunlap (1):
-      crypto: x86 - eliminate anonymous module_init & module_exit
-
-Robin Murphy (1):
-      crypto: qat - stop using iommu_present()
-
-Sebastian Andrzej Siewior (1):
-      crypto: cryptd - Protect per-CPU resource by disabling BH.
-
-Tetsuo Handa (1):
-      crypto: atmel - Avoid flush_scheduled_work() usage
-
-Tianjia Zhang (5):
-      crypto: sm4 - export sm4 constant arrays
-      crypto: arm64/sm4-ce - rename to sm4-ce-cipher
-      crypto: arm64/sm4 - add ARMv8 NEON implementation
-      crypto: arm64/sm4 - add ARMv8 Crypto Extensions implementation
-      crypto: arm64/sm4 - Fix wrong dependency of NEON/CE implementation
-
-Uwe Kleine-König (3):
-      crypto: atmel-sha204a - Remove useless check
-      crypto: atmel-sha204a - Suppress duplicate error message
-      crypto: atmel-i2c - Simplify return code in probe function
-
-Vitaly Chikunov (1):
-      crypto: ecrdsa - Fix incorrect use of vli_cmp
-
-Vladis Dronov (3):
-      hwrng: cn10k - Optimize cn10k_rng_read()
-      hwrng: cn10k - Make check_rng_health() return an error code
-      crypto: s390 - add crypto library interface for ChaCha20
-
-Weili Qian (4):
-      crypto: hisilicon/qm - remove unused function declaration
-      crypto: hisilicon/qm - set function with static
-      crypto: hisilicon/qm - replace hisi_qm_release_qp() with hisi_qm_free_qps()
-      crypto: hisilicon/qm - remove hisi_qm_get_free_qp_num()
-
-Wojciech Ziemba (1):
-      crypto: qat - add check for invalid PFVF protocol version 0
-
-Yang Li (1):
-      crypto: engine - Add parameter description in crypto_transfer_request() kernel-doc comment
-
-Yang Shen (1):
-      crypto: hisilicon/sgl - align the hardware sgl dma address
-
-Yang Yingliang (1):
-      hwrng: omap3-rom - fix using wrong clk_disable() in omap_rom_rng_runtime_resume()
-
-Yihao Han (1):
-      crypto: ux500/hash - simplify if-if to if-else
-
-jianchunfu (1):
-      crypto: talitos - Uniform coding style with defined variable
-
- Documentation/ABI/testing/debugfs-hisi-hpre        |  14 +
- Documentation/ABI/testing/debugfs-hisi-sec         |  14 +
- Documentation/ABI/testing/debugfs-hisi-zip         |  14 +
- Documentation/ABI/testing/sysfs-driver-ccp         |  87 +++
- .../devicetree/bindings/crypto/ti,sa2ul.yaml       |   1 +
- .../devicetree/bindings/trivial-devices.yaml       |   4 +-
- arch/arm64/crypto/Kconfig                          |  16 +-
- arch/arm64/crypto/Makefile                         |   8 +-
- arch/arm64/crypto/sm4-ce-cipher-core.S             |  36 ++
- arch/arm64/crypto/sm4-ce-cipher-glue.c             |  82 +++
- arch/arm64/crypto/sm4-ce-core.S                    | 688 ++++++++++++++++++++-
- arch/arm64/crypto/sm4-ce-glue.c                    | 386 ++++++++++--
- arch/arm64/crypto/sm4-neon-core.S                  | 487 +++++++++++++++
- arch/arm64/crypto/sm4-neon-glue.c                  | 442 +++++++++++++
- arch/s390/crypto/chacha-glue.c                     |  34 +-
- arch/x86/crypto/blowfish_glue.c                    |   8 +-
- arch/x86/crypto/camellia_glue.c                    |   8 +-
- arch/x86/crypto/serpent_avx2_glue.c                |   8 +-
- arch/x86/crypto/twofish_glue.c                     |   8 +-
- arch/x86/crypto/twofish_glue_3way.c                |   8 +-
- crypto/Kconfig                                     |  18 +-
- crypto/Makefile                                    |   6 +-
- crypto/cryptd.c                                    |  23 +-
- crypto/crypto_engine.c                             |   1 +
- crypto/ecrdsa.c                                    |   8 +-
- {lib/crypto => crypto}/sm3.c                       |   0
- {lib/crypto => crypto}/sm4.c                       |  10 +-
- crypto/testmgr.c                                   |  75 ++-
- drivers/char/hw_random/Kconfig                     |  15 +-
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/cn10k-rng.c                 |  31 +-
- drivers/char/hw_random/mpfs-rng.c                  | 104 ++++
- drivers/char/hw_random/omap3-rom-rng.c             |   2 +-
- drivers/char/hw_random/optee-rng.c                 |   2 +-
- drivers/crypto/Kconfig                             |   4 +-
- drivers/crypto/Makefile                            |   1 +
- .../crypto/allwinner/sun4i-ss/sun4i-ss-cipher.c    |  22 +-
- drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h       |   1 +
- .../crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c    | 102 +--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c  |  54 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c  | 130 ++--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c  |   6 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h       |  19 +-
- .../crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c    | 180 ++++--
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c  |  92 ++-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-hash.c  | 385 ++++++++++--
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c  |   6 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h       |  33 +-
- drivers/crypto/atmel-ecc.c                         |   2 +-
- drivers/crypto/atmel-i2c.c                         |  30 +-
- drivers/crypto/atmel-i2c.h                         |   1 +
- drivers/crypto/atmel-sha204a.c                     |  11 +-
- drivers/crypto/caam/Kconfig                        |   8 +
- drivers/crypto/caam/Makefile                       |   1 +
- drivers/crypto/caam/caamprng.c                     | 235 +++++++
- drivers/crypto/caam/ctrl.c                         |  18 +
- drivers/crypto/caam/intern.h                       |  15 +
- drivers/crypto/caam/jr.c                           |   3 +-
- drivers/crypto/cavium/nitrox/nitrox_main.c         |  10 +-
- drivers/crypto/ccp/psp-dev.c                       |  49 +-
- drivers/crypto/ccp/psp-dev.h                       |  22 +
- drivers/crypto/ccp/sev-dev.c                       |  32 +-
- drivers/crypto/ccp/sp-pci.c                        |  62 ++
- drivers/crypto/ccree/cc_buffer_mgr.c               |  27 +-
- drivers/crypto/ccree/cc_driver.c                   |  24 +-
- drivers/crypto/hisilicon/Kconfig                   |   1 +
- drivers/crypto/hisilicon/hpre/hpre_main.c          | 222 +++++--
- drivers/crypto/hisilicon/qm.c                      | 282 ++++++++-
- drivers/crypto/hisilicon/sec2/sec_crypto.c         |   2 -
- drivers/crypto/hisilicon/sec2/sec_main.c           | 108 +++-
- drivers/crypto/hisilicon/sgl.c                     |   6 +-
- drivers/crypto/hisilicon/zip/zip_crypto.c          |   2 +-
- drivers/crypto/hisilicon/zip/zip_main.c            | 185 +++++-
- drivers/crypto/inside-secure/safexcel.c            |   9 +
- drivers/crypto/keembay/keembay-ocs-aes-core.c      |   9 +-
- drivers/crypto/marvell/cesa/cipher.c               |   1 -
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c |   7 +-
- drivers/crypto/qat/qat_4xxx/adf_drv.c              |   8 +-
- drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.c   |  15 +-
- drivers/crypto/qat/qat_c3xxx/adf_c3xxx_hw_data.h   |   4 -
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.c     |  15 +-
- drivers/crypto/qat/qat_c62x/adf_c62x_hw_data.h     |   4 -
- drivers/crypto/qat/qat_common/Makefile             |   1 +
- drivers/crypto/qat/qat_common/adf_accel_devices.h  |   6 +-
- drivers/crypto/qat/qat_common/adf_common_drv.h     |  18 +-
- drivers/crypto/qat/qat_common/adf_gen2_hw_data.c   |  13 +
- drivers/crypto/qat/qat_common/adf_gen2_hw_data.h   |   6 +
- drivers/crypto/qat/qat_common/adf_gen2_pfvf.c      |  78 ++-
- drivers/crypto/qat/qat_common/adf_gen4_pfvf.c      |  61 +-
- drivers/crypto/qat/qat_common/adf_isr.c            |  21 +-
- drivers/crypto/qat/qat_common/adf_pfvf_msg.h       |   4 +-
- drivers/crypto/qat/qat_common/adf_pfvf_pf_proto.c  |   6 +-
- drivers/crypto/qat/qat_common/adf_sriov.c          |  16 +-
- drivers/crypto/qat/qat_common/adf_transport.c      |  11 +
- drivers/crypto/qat/qat_common/adf_transport.h      |   1 +
- .../crypto/qat/qat_common/adf_transport_internal.h |   1 +
- drivers/crypto/qat/qat_common/adf_vf_isr.c         |   1 +
- drivers/crypto/qat/qat_common/qat_algs.c           | 153 +++--
- drivers/crypto/qat/qat_common/qat_algs_send.c      |  86 +++
- drivers/crypto/qat/qat_common/qat_algs_send.h      |  11 +
- drivers/crypto/qat/qat_common/qat_asym_algs.c      | 307 +++++----
- drivers/crypto/qat/qat_common/qat_crypto.c         |  10 +-
- drivers/crypto/qat/qat_common/qat_crypto.h         |  44 ++
- drivers/crypto/qat/qat_common/qat_hal.c            |   1 +
- drivers/crypto/qat/qat_common/qat_uclo.c           |   3 +-
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c | 126 ++--
- .../crypto/qat/qat_dh895xcc/adf_dh895xcc_hw_data.h |   4 -
- drivers/crypto/sa2ul.c                             |   1 +
- drivers/crypto/talitos.c                           |  10 +-
- drivers/crypto/ux500/hash/hash_core.c              |   4 +-
- drivers/crypto/vmx/Makefile                        |  17 +-
- include/crypto/sm4.h                               |   4 +
- include/linux/hisi_acc_qm.h                        |  23 +-
- lib/crypto/Kconfig                                 |   6 -
- lib/crypto/Makefile                                |   6 -
- tools/testing/crypto/chacha20-s390/Makefile        |  12 +
- tools/testing/crypto/chacha20-s390/run-tests.sh    |  34 +
- tools/testing/crypto/chacha20-s390/test-cipher.c   | 372 +++++++++++
- 118 files changed, 5534 insertions(+), 1058 deletions(-)
- create mode 100644 Documentation/ABI/testing/sysfs-driver-ccp
- create mode 100644 arch/arm64/crypto/sm4-ce-cipher-core.S
- create mode 100644 arch/arm64/crypto/sm4-ce-cipher-glue.c
- create mode 100644 arch/arm64/crypto/sm4-neon-core.S
- create mode 100644 arch/arm64/crypto/sm4-neon-glue.c
- rename {lib/crypto => crypto}/sm3.c (100%)
- rename {lib/crypto => crypto}/sm4.c (94%)
- create mode 100644 drivers/char/hw_random/mpfs-rng.c
- create mode 100644 drivers/crypto/caam/caamprng.c
- create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.c
- create mode 100644 drivers/crypto/qat/qat_common/qat_algs_send.h
- create mode 100644 tools/testing/crypto/chacha20-s390/Makefile
- create mode 100644 tools/testing/crypto/chacha20-s390/run-tests.sh
- create mode 100644 tools/testing/crypto/chacha20-s390/test-cipher.c
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
