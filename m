@@ -2,83 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0275CC433F5
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 May 2022 18:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB70C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 05:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233752AbiEZSBk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 May 2022 14:01:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56444 "EHLO
+        id S237719AbiE0Fur (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 01:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233423AbiEZSBj (ORCPT
+        with ESMTP id S235470AbiE0Fuq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 May 2022 14:01:39 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750582AC68;
-        Thu, 26 May 2022 11:01:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 27 May 2022 01:50:46 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7424FB481
+        for <linux-crypto@vger.kernel.org>; Thu, 26 May 2022 22:50:44 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 320D4B8210C;
-        Thu, 26 May 2022 18:01:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF361C385A9;
-        Thu, 26 May 2022 18:01:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653588095;
-        bh=d5ypGyznvLK36nBsMgVlsQ0dlUUAR350qlCPdJGQD5s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cyh0X/e8V+zwQVgpwPJOgEryDaxWCAtc6B2VF6H/69jF9cNYE70zkBfcAtw9911BY
-         FCBYOx+J2x5HZmbuJOqGtQiV3ggfvrYSARie5umdupxqEVAIiZs1WKzBNgEUo4WDj/
-         FQ/p7p1wm74QbnItpoRQqaiARE+3Ytde7wW6AaowubTC9rkxYVHXdoqX17Bj59pOtb
-         WZeQA+yFQDyICnLqVbbn0S+QIJFsPr/Jp8LpU7tEA/eqdZJGiTri9kixoftrjtKcIA
-         wCiGMWqNB31YfnSy/5QXiYN49TfazTTYccdGFDh3eByv2cD+RnHqA/pFy6lfnTinPK
-         6Krq+DN13KUCw==
-Date:   Thu, 26 May 2022 11:01:34 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, gaochao <gaochao49@huawei.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH crypto] crypto: blake2s - remove shash module
-Message-ID: <Yo/Afs61tFwnaOV8@sol.localdomain>
-References: <20220526092026.207936-1-Jason@zx2c4.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 2EE0B1F8D5;
+        Fri, 27 May 2022 05:50:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653630643; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r847XQ0d5S6Cd8DX0ImmONalPnfrBt+aQgcTMcDUKpY=;
+        b=liEf9Yn0Tny6FXfccUelxNNUnSJuL4PLFI6JFrX8kAP4nbOf0ZXYMd2DjW34kM+sdktAc4
+        KJEwuoO6RvoaZgnV55sSX5RvQb8bXI7OJePMOXds8EV3CcZgt1UkqO7SKFxXH/n9AGspeN
+        O60lkSDsWnYuXjeKNlIeK1GUWep6iUw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653630643;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r847XQ0d5S6Cd8DX0ImmONalPnfrBt+aQgcTMcDUKpY=;
+        b=hxDvBWsnrK3fab0i2YJq1kjvOq67cFqWjncQKb7pdLxO0gDJOrsv3hvH/ScQqsKGPqpsYX
+        vHD6g7Yrz/OEq2Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0CAC21346B;
+        Fri, 27 May 2022 05:50:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id LlpLArNmkGKAAgAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 27 May 2022 05:50:43 +0000
+Message-ID: <99126556-65b8-d0eb-bcd5-7b850493b51f@suse.de>
+Date:   Fri, 27 May 2022 07:50:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220526092026.207936-1-Jason@zx2c4.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCHv12 00/11] nvme: In-band authentication support
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+References: <20220518112234.24264-1-hare@suse.de>
+ <bc8bea8b-2cdf-4d41-65b0-5c2bf28457d2@suse.de>
+ <20220526090056.GA27050@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20220526090056.GA27050@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 26, 2022 at 11:20:26AM +0200, Jason A. Donenfeld wrote:
-> BLAKE2s has no use as an shash and no use is likely to ever come up.
-
-I'm not sure about that.  Anyone who is already using shash (for supporting
-multiple algorithms) and wants to add blake2s support would need it.  dm-verity,
-dm-integrity, fs-verity, UBIFS authentication, IMA, btrfs checksums, etc.  A
-couple of these are already using blake2b, even.  I guess you might as well
-remove blake2s until someone explicitly says they want it, but I can easily see
-it coming back later.
-
-> Just remove all of this unnecessary plumbing. Removing this shash was
-> something we talked about back when we were making BLAKE2s a built-in,
-> but I simply never got around to doing it. So this completes that
-> project.
+On 5/26/22 11:00, Christoph Hellwig wrote:
+> On Wed, May 25, 2022 at 11:54:54AM +0200, Hannes Reinecke wrote:
+>> How do we proceed here?
+>> This has been lingering for quite some time now, without any real progress.
 > 
-> This also helps fix a bug in which the lib code depends on
-> crypto_simd_disabled_for_test, which is now unnecessary.
-> 
-> Cc: gaochao <gaochao49@huawei.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> As said it is a high priority for the upcoming merge window.  But we
+> also really need reviews from the crypto maintainers for the crypto
+> patches, without that I can't merge the series even if I'd like to.
 
-More importantly, this is removing quite a bit of test coverage because the
-extra self-tests in crypto/testmgr.c are more comprehensive than what
-lib/crypto/blake2s-selftest.c does.  For example they test the case where the
-input data is misaligned, as well as the case where the code is executed in a
-context where SIMD instructions are unavailable.
+Hmm. Guess I can remove those helpers; after all,
+both are just wrappers around existing exported helpers.
+I'll resend.
 
-In order for this to be acceptable, I think you'd need to update
-blake2s-selftest.c to be more comprehensive.
+Cheers,
 
-- Eric
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
