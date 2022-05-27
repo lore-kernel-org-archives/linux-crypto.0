@@ -2,117 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AE8AC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 13:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D92C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 20:19:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245537AbiE0NVE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 09:21:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
+        id S1350871AbiE0UTt (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 16:19:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242354AbiE0NVD (ORCPT
+        with ESMTP id S231445AbiE0UTt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 09:21:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8818012E301;
-        Fri, 27 May 2022 06:21:01 -0700 (PDT)
+        Fri, 27 May 2022 16:19:49 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3182131938
+        for <linux-crypto@vger.kernel.org>; Fri, 27 May 2022 13:19:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0642861C18;
-        Fri, 27 May 2022 13:21:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAB72C385A9;
-        Fri, 27 May 2022 13:20:59 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CB07EB82402
+        for <linux-crypto@vger.kernel.org>; Fri, 27 May 2022 20:19:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD936C385B8;
+        Fri, 27 May 2022 20:19:44 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gAconhhG"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RSlwJwzY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1653657656;
+        t=1653682782;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N+0wxHmueW5PC6Ruhk71jM9anOT1ArAHVn1hq5ZBoTo=;
-        b=gAconhhG+s5OEFBNojX/Dv8XERWyEqqQgvLVdGk3ldiawbflA55TyjOeGfLCH9cM97InIR
-        QlGBGnCQ6c/7P6Fmw3mtmh+KPg4xxXOwrFzDiBQBKLVebVycSQBJd8UDHuo3R7fjzhzRw0
-        kBrpSx6cemK50G6hKahN7RcoAfgJNlo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 16dba200 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 27 May 2022 13:20:55 +0000 (UTC)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-3003cb4e064so46930397b3.3;
-        Fri, 27 May 2022 06:20:55 -0700 (PDT)
-X-Gm-Message-State: AOAM5301EQKwwPyZlWXSsMAbfl5OXH3O5z9n1OyGoTZPHYDXdd3pf3TA
-        d+R4xsWheVUNg8PPLUu16Zj+KN+sW39s0TfFBak=
-X-Google-Smtp-Source: ABdhPJxDoIQYBw0u5FNf+G4Ms58Dp1JfZMgNq9wGrzUMKtd/kA+5h8kZAEKXLqN65ZZrJa4NTDcMD5uBZ9Rlw5brQuU=
-X-Received: by 2002:a0d:cd04:0:b0:300:4784:caa3 with SMTP id
- p4-20020a0dcd04000000b003004784caa3mr15250404ywd.231.1653657654222; Fri, 27
- May 2022 06:20:54 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:6403:b0:17b:2ce3:1329 with HTTP; Fri, 27 May 2022
- 06:20:53 -0700 (PDT)
-In-Reply-To: <ffa404b7427043fda4b9f4a20ea0f068@AcuMS.aculab.com>
-References: <YpCGQvpirQWaAiRF@zx2c4.com> <20220527081106.63227-1-Jason@zx2c4.com>
- <ffa404b7427043fda4b9f4a20ea0f068@AcuMS.aculab.com>
+        bh=RxnmVUnFJbwhjkp5oOLKRrdc02B8mWHaayarGv+2kt8=;
+        b=RSlwJwzY93BYe6jh3koNqZ8NY2AvKIH65tBwHsIYoD7Zvk85Z5YQ/IGVOclar6UG1HnSer
+        MLOwk/q0CL439IzdqKMZM6faqvAq2r50KjvqVp1yaak8xOxScXWekDs1I7WE+ID9TIQRwC
+        pq6h37UiTfzLJVHY61UO588HcF1+Gp4=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81e4257d (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 27 May 2022 20:19:41 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 27 May 2022 15:20:53 +0200
-X-Gmail-Original-Message-ID: <CAHmME9osMkustaPdiGmJ02A+5gTPvEy1EJwi5ump7REJXb1-TQ@mail.gmail.com>
-Message-ID: <CAHmME9osMkustaPdiGmJ02A+5gTPvEy1EJwi5ump7REJXb1-TQ@mail.gmail.com>
-Subject: Re: [PATCH crypto v2] crypto: blake2s - remove shash module
-To:     David Laight <David.Laight@aculab.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        gaochao <gaochao49@huawei.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: [PATCH crypto v2] crypto: poly1305 - cleanup stray CRYPTO_LIB_POLY1305_RSIZE
+Date:   Fri, 27 May 2022 22:19:31 +0200
+Message-Id: <20220527201931.63955-1-Jason@zx2c4.com>
+In-Reply-To: <202205271557.oReeyAVT-lkp@intel.com>
+References: <202205271557.oReeyAVT-lkp@intel.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+When CRYPTO_LIB_POLY1305 is unset, CRYPTO_LIB_POLY1305_RSIZE is still
+set in the Kconfig, cluttering things. Fix this by making
+CRYPTO_LIB_POLY1305_RSIZE depend on CRYPTO_LIB_POLY1305 and other
+various related config options.
 
-On 5/27/22, David Laight <David.Laight@aculab.com> wrote:
-> From: Jason A. Donenfeld
->> Sent: 27 May 2022 09:11
->>
->> BLAKE2s has no use as an shash, with no users of it. Just remove all of
->> this unnecessary plumbing. Removing this shash was something we talked
->> about back when we were making BLAKE2s a built-in, but I simply never
->> got around to doing it. So this completes that project.
-> ...
->> diff --git a/lib/crypto/blake2s.c b/lib/crypto/blake2s.c
->> index c71c09621c09..716da32cf4dc 100644
->> --- a/lib/crypto/blake2s.c
->> +++ b/lib/crypto/blake2s.c
->> @@ -16,16 +16,43 @@
->>  #include <linux/init.h>
->>  #include <linux/bug.h>
->>
->> +static inline void blake2s_set_lastblock(struct blake2s_state *state)
->> +{
->> +	state->f[0] = -1;
->> +}
->> +
->>  void blake2s_update(struct blake2s_state *state, const u8 *in, size_t
->> inlen)
->>  {
->> -	__blake2s_update(state, in, inlen, false);
->> +	const size_t fill = BLAKE2S_BLOCK_SIZE - state->buflen;
->> +
->> +	if (unlikely(!inlen))
->> +		return;
->
-> Does this happen often enough to optimise for?
-> The zero length memcpy() should be fine.
-> (though pedants might worry about in == NULL)
->
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+Changes v1->v2:
+- Also depend on CRYPTO_ARCH_HAVE_LIB_POLY1305 and
+  CRYPTO_LIB_POLY1305_GENERIC, after kbuild bot warning. Hopefully this
+  handles all the weird edge cases in this unfortunate maze.
 
-I don't know and don't care here. This is a straight copy and paste
-for the removal. It is not the place for random performance
-optimizations.
+ lib/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-I have now witnessed you have random performance optimization ideas in
-at least 7 threads, usually unrelated to whatever the topic is. As I
-keep telling you every time: SEND A PATCH. Those capital letters are
-intentional: I care about the same things you do, so please send a
-patch so that all that stuff actually happens. Talk is cheap.
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 379a66d7f504..7ee13c08c970 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -85,6 +85,7 @@ config CRYPTO_LIB_POLY1305_RSIZE
+ 	default 11 if X86_64
+ 	default 9 if ARM || ARM64
+ 	default 1
++	depends on CRYPTO_LIB_POLY1305 || CRYPTO_ARCH_HAVE_LIB_POLY1305 || CRYPTO_LIB_POLY1305_GENERIC
+ 
+ config CRYPTO_ARCH_HAVE_LIB_POLY1305
+ 	tristate
+-- 
+2.35.1
 
-Jason
