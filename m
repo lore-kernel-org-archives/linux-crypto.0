@@ -2,123 +2,188 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ACAFC433FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 07:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33B0C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 07:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241208AbiE0HfZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 03:35:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52240 "EHLO
+        id S235218AbiE0H7f (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 03:59:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347541AbiE0HfY (ORCPT
+        with ESMTP id S233820AbiE0H7e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 03:35:24 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47622F748B
-        for <linux-crypto@vger.kernel.org>; Fri, 27 May 2022 00:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653636921; x=1685172921;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VYwmOmBPjINlynsTfW5Xd7vJTN2cgivmkkg3cKE8lqk=;
-  b=gPvrifL2p15c6BhA/REl3CL7GgFspW3mMLZHOiESWPXhJtY+6jDQQQjH
-   gCFImpDMxGPqEz0IoSgyXjvDUjF647fJIQwLXcLIybTqH3DkaxpdV14ia
-   QaNqwcmKpRAe8AGwhgbqzj4sywNn++u7PbAmT0+zkIC3mk3kzKhDV+I6u
-   R8T///u5bX9od9hVCjFTf861aTMH+X7A+TuT/FowvNrTgvko6foQ2kKx7
-   The8QbWVZh8lzR8r7sOZA6CbqKVFTUlpC/N5RPA7Ghc8+rWlxhiSBKTVa
-   ZMNjQLDvNKr75tNaWS+rmT0G0PEGvu2paLsymuLExiAw+7WJw4VKPZyIx
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10359"; a="256481559"
-X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
-   d="scan'208";a="256481559"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2022 00:35:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,254,1647327600"; 
-   d="scan'208";a="610114827"
-Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 27 May 2022 00:35:19 -0700
-Received: from kbuild by db63a1be7222 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nuUVC-0004WS-Fo;
-        Fri, 27 May 2022 07:35:18 +0000
-Date:   Fri, 27 May 2022 15:34:37 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Cc:     kbuild-all@lists.01.org, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH crypto] crypto: poly1305 - cleanup stray
- CRYPTO_LIB_POLY1305_RSIZE
-Message-ID: <202205271557.oReeyAVT-lkp@intel.com>
-References: <20220526093547.212294-1-Jason@zx2c4.com>
+        Fri, 27 May 2022 03:59:34 -0400
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA51522BFD;
+        Fri, 27 May 2022 00:59:32 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24R74NJ7013605;
+        Fri, 27 May 2022 00:58:37 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=LlqQ4B1a0P9MJ7iI3TRfT391yR7H/yJDfSHMiZJgOm8=;
+ b=bTsUxJifrX8/XarAaJ83tfQk53Fi+xF0vsf5VSs8l6I1c6vPBjfHqKksjExXST8tuPSN
+ rWHuK/iPgz59yQpD6LskVnzrdYXbYghR4P/kei0sVJ11XnYzXbVQulX7ATs3O8Lpevv3
+ uzrx6QpcN/+e0y37YzKUO9GSc//xI3xJuzbt3PmcJnArop3SRSzH23e2c6p7e/v8km10
+ 7ARjuYt8JE/yPQ3uDqo/+9Dmqm2Vy9tSaB08kdNesaVaNSbrGx4kK5tTNgippp3vlf0y
+ N02teEI1f4+f9tDcvPX3lGFoem6lLbdpATw1QQ0KBYNJQBSRL7DH8sgcnd3dGmXIma5t Yg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3gaf2rtjtp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Fri, 27 May 2022 00:58:36 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 27 May
+ 2022 00:58:34 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
+ Transport; Fri, 27 May 2022 00:58:35 -0700
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 626463F7065;
+        Fri, 27 May 2022 00:58:31 -0700 (PDT)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     Arnaud Ebalard <arno@natisbad.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Boris Brezillon <bbrezillon@kernel.org>
+CC:     Shijith Thotton <sthotton@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
+        <sgoutham@marvell.com>, Srujana Challa <schalla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Harman Kalra <hkalra@marvell.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        "Dan Carpenter" <dan.carpenter@oracle.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: octeontx2: fix potential null pointer access
+Date:   Fri, 27 May 2022 13:27:56 +0530
+Message-ID: <da89ba20819ad3ca6b99f9ef056f2bc1b076dc6d.1653632699.git.sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220526093547.212294-1-Jason@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: nCMP_Exh7aKQiqy2ZuCfjlqnzIjuv-0G
+X-Proofpoint-GUID: nCMP_Exh7aKQiqy2ZuCfjlqnzIjuv-0G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-27_02,2022-05-25_02,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi "Jason,
+Added missing checks to avoid null pointer dereference.
 
-I love your patch! Yet something to improve:
+The patch fixes below issues reported by klocwork tool:
+1. Pointer 'pcim_iomap_table(pdev)' returned from call to function
+   'pcim_iomap_table' at line 365 may be NULL and will be dereferenced
+   at line 365 in otx2_cptvf_main.c. Also there is a similar error on
+   line 734 in otx2_cptpf_main.c.
+2. Pointer 'strsep( &val, ":" )' returned from call to function 'strsep'
+   at line 1608 may be NULL and will be dereferenced at line 1608. Also
+   there are 2 similar errors on lines 1620, 1632 in otx2_cptpf_ucode.c.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master crng-random/master v5.18 next-20220526]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Signed-off-by: Shijith Thotton <sthotton@marvell.com>
+---
+ .../crypto/marvell/octeontx2/otx2_cptpf_main.c |  9 ++++++++-
+ .../marvell/octeontx2/otx2_cptpf_ucode.c       | 18 +++++++++++++++---
+ .../crypto/marvell/octeontx2/otx2_cptvf_main.c |  9 ++++++++-
+ 3 files changed, 31 insertions(+), 5 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jason-A-Donenfeld/crypto-poly1305-cleanup-stray-CRYPTO_LIB_POLY1305_RSIZE/20220526-173718
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: i386-debian-10.3-kselftests (https://download.01.org/0day-ci/archive/20220527/202205271557.oReeyAVT-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-1) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/fde026a9e6312b3278b170ca6a41cd84a6fb935e
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jason-A-Donenfeld/crypto-poly1305-cleanup-stray-CRYPTO_LIB_POLY1305_RSIZE/20220526-173718
-        git checkout fde026a9e6312b3278b170ca6a41cd84a6fb935e
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash lib/crypto/
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/crypto/internal/poly1305.h:11,
-                    from lib/crypto/poly1305-donna32.c:11:
->> include/crypto/poly1305.h:56:46: error: 'CONFIG_CRYPTO_LIB_POLY1305_RSIZE' undeclared here (not in a function); did you mean 'CONFIG_CRYPTO_POLY1305_MODULE'?
-      56 |                 struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
-         |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         |                                              CONFIG_CRYPTO_POLY1305_MODULE
-
-
-vim +56 include/crypto/poly1305.h
-
-878afc35cd28bc Eric Biggers       2018-11-16  40  
-2546f811ef45fc Martin Willi       2015-07-16  41  struct poly1305_desc_ctx {
-2546f811ef45fc Martin Willi       2015-07-16  42  	/* partial buffer */
-2546f811ef45fc Martin Willi       2015-07-16  43  	u8 buf[POLY1305_BLOCK_SIZE];
-2546f811ef45fc Martin Willi       2015-07-16  44  	/* bytes used in partial buffer */
-2546f811ef45fc Martin Willi       2015-07-16  45  	unsigned int buflen;
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  46  	/* how many keys have been set in r[] */
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  47  	unsigned short rset;
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  48  	/* whether s[] has been set */
-2546f811ef45fc Martin Willi       2015-07-16  49  	bool sset;
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  50  	/* finalize key */
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  51  	u32 s[4];
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  52  	/* accumulator */
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  53  	struct poly1305_state h;
-ad8f5b88383ea6 Ard Biesheuvel     2019-11-08  54  	/* key */
-1c08a104360f3e Jason A. Donenfeld 2020-01-05  55  	union {
-1c08a104360f3e Jason A. Donenfeld 2020-01-05 @56  		struct poly1305_key opaque_r[CONFIG_CRYPTO_LIB_POLY1305_RSIZE];
-1c08a104360f3e Jason A. Donenfeld 2020-01-05  57  		struct poly1305_core_key core_r;
-1c08a104360f3e Jason A. Donenfeld 2020-01-05  58  	};
-2546f811ef45fc Martin Willi       2015-07-16  59  };
-2546f811ef45fc Martin Willi       2015-07-16  60  
-
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+index a402ccfac557..ae57cee424f0 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
+@@ -703,6 +703,7 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct otx2_cptpf_dev *cptpf;
++	void __iomem * const *iomap;
+ 	int err;
+ 
+ 	cptpf = devm_kzalloc(dev, sizeof(*cptpf), GFP_KERNEL);
+@@ -731,7 +732,13 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
+ 	pci_set_drvdata(pdev, cptpf);
+ 	cptpf->pdev = pdev;
+ 
+-	cptpf->reg_base = pcim_iomap_table(pdev)[PCI_PF_REG_BAR_NUM];
++	iomap = pcim_iomap_table(pdev);
++	if (!iomap) {
++		dev_err(dev, "Failed to get iomap table\n");
++		err = -ENODEV;
++		goto clear_drvdata;
++	}
++	cptpf->reg_base = iomap[PCI_PF_REG_BAR_NUM];
+ 
+ 	/* Check if AF driver is up, otherwise defer probe */
+ 	err = cpt_is_pf_usable(cptpf);
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+index 9cba2f714c7e..b91401929fc6 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
+@@ -1605,7 +1605,11 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		if (!strncasecmp(val, "se", 2) && strchr(val, ':')) {
+ 			if (has_se || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (tmp != NULL)
++				tmp = strim(tmp);
++			else
++				goto err_print;
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
+@@ -1617,7 +1621,11 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		} else if (!strncasecmp(val, "ae", 2) && strchr(val, ':')) {
+ 			if (has_ae || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (tmp != NULL)
++				tmp = strim(tmp);
++			else
++				goto err_print;
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
+@@ -1629,7 +1637,11 @@ int otx2_cpt_dl_custom_egrp_create(struct otx2_cptpf_dev *cptpf,
+ 		} else if (!strncasecmp(val, "ie", 2) && strchr(val, ':')) {
+ 			if (has_ie || ucode_idx)
+ 				goto err_print;
+-			tmp = strim(strsep(&val, ":"));
++			tmp = strsep(&val, ":");
++			if (tmp != NULL)
++				tmp = strim(tmp);
++			else
++				goto err_print;
+ 			if (!val)
+ 				goto err_print;
+ 			if (strlen(tmp) != 2)
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+index 3411e664cf50..9249ec1783bc 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_main.c
+@@ -334,6 +334,7 @@ static int otx2_cptvf_probe(struct pci_dev *pdev,
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct otx2_cptvf_dev *cptvf;
++	void __iomem * const *iomap;
+ 	int ret;
+ 
+ 	cptvf = devm_kzalloc(dev, sizeof(*cptvf), GFP_KERNEL);
+@@ -362,7 +363,13 @@ static int otx2_cptvf_probe(struct pci_dev *pdev,
+ 	pci_set_drvdata(pdev, cptvf);
+ 	cptvf->pdev = pdev;
+ 
+-	cptvf->reg_base = pcim_iomap_table(pdev)[PCI_PF_REG_BAR_NUM];
++	iomap = pcim_iomap_table(pdev);
++	if (!iomap) {
++		dev_err(dev, "Failed to get iomap table\n");
++		ret = -ENODEV;
++		goto clear_drvdata;
++	}
++	cptvf->reg_base = iomap[PCI_PF_REG_BAR_NUM];
+ 
+ 	otx2_cpt_set_hw_caps(pdev, &cptvf->cap_flag);
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.25.1
+
