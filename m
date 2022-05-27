@@ -2,57 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9A4C433F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 09:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3855C433F5
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 May 2022 09:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237569AbiE0JlU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 05:41:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46610 "EHLO
+        id S233627AbiE0Jsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 27 May 2022 05:48:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236136AbiE0JlR (ORCPT
+        with ESMTP id S233600AbiE0Jsh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 05:41:17 -0400
+        Fri, 27 May 2022 05:48:37 -0400
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55AEC36;
-        Fri, 27 May 2022 02:41:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A1B1053CC;
+        Fri, 27 May 2022 02:48:35 -0700 (PDT)
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24R8aqxD027423;
-        Fri, 27 May 2022 02:40:20 -0700
+        by mx0b-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24R8bIO4028812;
+        Fri, 27 May 2022 02:42:41 -0700
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3gau9d064n-1
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3gau9d06cw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 May 2022 02:40:19 -0700
+        Fri, 27 May 2022 02:42:41 -0700
 Received: from m0045851.ppops.net (m0045851.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24R9Wb0M002942;
-        Fri, 27 May 2022 02:40:19 -0700
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2103.outbound.protection.outlook.com [104.47.55.103])
-        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3gau9d064m-1
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24R9TOib031092;
+        Fri, 27 May 2022 02:42:41 -0700
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
+        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3gau9d06cv-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 May 2022 02:40:19 -0700
+        Fri, 27 May 2022 02:42:41 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FtW+gwgo7zzBdE0xwlDFjP3c7zC8zLP9DKsfJseAK5UxvyezInPPcYt8rkzHj5FbB+21Wox6ffWhmR4aE7+HO/ALSeRYTVaBsDxZ5NaBO0Lb8qh/QUb+1AYrrZlIOHs20FpJu3SHlAsI7UyL3Eay1skJnlRrWqCPqoZXnKPXKp575mJ++T2+0dKgrDOKqL3T92zY7N9ZnrOrRFvTX0LSuE1DGDyNDg1S7dOUXFBpwSnjo/NjGtwvKb3yXu5mR6WS3wBZutaWYu0q0u7CFEb0KA5CqQDVeim6RcWkhGE6oXvfeXR46amduTNil8YLCnoa7fOdhen3XYgRVJ8XlS7V4g==
+ b=kQhAb28tDGMWYMrb4bVS97xrj54uX5pYFeDwjqATCCHyXarwDuWzyFXPOTJCWrirFBxRfotvbDw5lVrc453/0IjmLhJFFiIE108w6V+9g+ANw1p6EE5H1lTRIsYrtauNAC9R6hajMRLKX++jFkG6FWRwqnGhXxlfFM69VpRFEKYabJWuyem1XlHRFu0oQlkmJ7d+eU73qMM6C6GEA7hhjn6b7znPgDsE/X1vZGcKIyXplk+Qu8iaPiWvWQAGbliUw+s+RNoAgDPyyhNVncVdmNuKy1jNRVhzV9KglKLjU2k3mRwpxoptCCREsC4ki66/4Y2xJjXsgrvxdsB1tNcfKA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aTt3xsmnn2Sx4+5oLOeaXojtL2A4VtlWGGje2ykkbP8=;
- b=V0H75WqEehpqWzouxnKCIvi+p7SBJP+bYMuwN9GUyJXzwZDzKxrBDXkrpFq9/y5sR6TSo231FbouWAPqhAdf6x8xdxRkaSO8MekBELgdZODGPFOFokeDxv9SKFVxrveb38AJumFVe7cyJ+cqjJtGvwx5GZJWZfCPht/YzkxyohQ5DMyOVrsFRdvxUOdil1VQmdgSncs57FWDOcopOF4YWFSaqZsKWiC/jkruzkBYCx64Z1QOns2b9SC9savEeSgFSOAdpgGk+DH/0hoFZ7IrO/u/PENW+shWyM34V7IDZBZVEjESGYs6A9su1IwV2s6CBuLTvYSkILKb/qhSg/APbg==
+ bh=2xAhG7e6mN2jZDlvs6JfnISadiV8koTokZLr4h9TyUg=;
+ b=YnrXq+1lZIdeOEz+B0sy0/E7FCAAfi80z2buVw0KoouVKN+unOAX0lJnsxPgRgbMeai84gmMZxu0cm9626Ym9/Nd+h365B0jS1HYIRzg8df3Vwrdo1nG+4mnc53covxrjd3s7aggUiRh9sW8qoamLpvuQWSu0WOa2bnoPmokpbUmlAYCBSzOzPfraq/1wx+uG0CbtZj0l9oI1DdrDS2cOouvvUxxnp0Ur6NdFBa+hugcgWR8vCz6D2TnKBsZX2RBFf9bIEigE+25Px2TS4ADx/1eXOrr8GZnhaatJ/wpQfS++bTnav0FuYl+GZf29sLcxmwSsWaASJ9u49HDOGdosg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
  dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aTt3xsmnn2Sx4+5oLOeaXojtL2A4VtlWGGje2ykkbP8=;
- b=GvnVP5dW1A9wWOvMllZGVNmQCjpM89fEjvhtx+ZcRX7rlKt12z15x6yFtvgvVAGmy6IGvrNm7Zb5GpimH2odT0Cmzeezg9tioG7+I9AXNMbSA+HBUt+hFZM/uifEG/vyLyb36+arabhEsf9Vi2fwx7maDM3Jd7YKEJyO0hsVCi8=
+ bh=2xAhG7e6mN2jZDlvs6JfnISadiV8koTokZLr4h9TyUg=;
+ b=eKvPTWoB4yL5HU88RPYuqe8B7jz1cehFez4TKu41CgX5bCtD4sAhcZEFgPxqKMcsRs2mZSzsAwv2X/7/dqYdyLmTKIhB4Xx/0fIaF5kfwc/738jyJ9/hU2sM4RkT8T/PFBcqAD34hP+8pxm1YFxLYthPSmtQP2xdwF6R8Mlfy6Y=
 Received: from PH0PR18MB4425.namprd18.prod.outlook.com (2603:10b6:510:ef::13)
- by MN2PR18MB3463.namprd18.prod.outlook.com (2603:10b6:208:263::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5293.15; Fri, 27 May
- 2022 09:40:17 +0000
+ by DM5PR18MB0939.namprd18.prod.outlook.com (2603:10b6:3:32::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5293.13; Fri, 27 May 2022 09:42:39 +0000
 Received: from PH0PR18MB4425.namprd18.prod.outlook.com
  ([fe80::e4ab:7780:fb1a:8fda]) by PH0PR18MB4425.namprd18.prod.outlook.com
  ([fe80::e4ab:7780:fb1a:8fda%6]) with mapi id 15.20.5293.016; Fri, 27 May 2022
- 09:40:16 +0000
+ 09:42:38 +0000
 From:   Shijith Thotton <sthotton@marvell.com>
 To:     Dan Carpenter <dan.carpenter@oracle.com>
 CC:     Arnaud Ebalard <arno@natisbad.org>,
@@ -72,72 +71,72 @@ Subject: RE: [EXT] Re: [PATCH] crypto: octeontx2: fix potential null pointer
  access
 Thread-Topic: [EXT] Re: [PATCH] crypto: octeontx2: fix potential null pointer
  access
-Thread-Index: AQHYcZ+WFeoConjOvkuT00xCknB1x60yYbgAgAAVDHA=
-Date:   Fri, 27 May 2022 09:40:16 +0000
-Message-ID: <PH0PR18MB4425FE9F1CF5BA4B7F981F94D9D89@PH0PR18MB4425.namprd18.prod.outlook.com>
+Thread-Index: AQHYcZ+WFeoConjOvkuT00xCknB1x60yYvIAgAAVW7A=
+Date:   Fri, 27 May 2022 09:42:38 +0000
+Message-ID: <PH0PR18MB4425D53564C735899CDCD6D4D9D89@PH0PR18MB4425.namprd18.prod.outlook.com>
 References: <da89ba20819ad3ca6b99f9ef056f2bc1b076dc6d.1653632699.git.sthotton@marvell.com>
- <20220527081928.GO2168@kadam>
-In-Reply-To: <20220527081928.GO2168@kadam>
+ <20220527082352.GP2168@kadam>
+In-Reply-To: <20220527082352.GP2168@kadam>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f52f56db-a827-4a80-23f9-08da3fc4e829
-x-ms-traffictypediagnostic: MN2PR18MB3463:EE_
-x-microsoft-antispam-prvs: <MN2PR18MB3463452356F4399758BE24EED9D89@MN2PR18MB3463.namprd18.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: a1779b23-d952-4a4a-f781-08da3fc53cb5
+x-ms-traffictypediagnostic: DM5PR18MB0939:EE_
+x-microsoft-antispam-prvs: <DM5PR18MB0939167ADF8BDECACC2DFCAAD9D89@DM5PR18MB0939.namprd18.prod.outlook.com>
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8h/t/4ZQ3ZVGLJx7m9IICBKDNifoP59x5PGB3vI8575CjE5cbhbrn0gWk0/XiKgNPVHK5a1BIYPBd/bZVt1HT1WfZrzHn9/qoWQ8loemFudzEsHL3lY4v7wM/AUGStPOcIrzUFYKS/Nbqa5VyBosYdIPb0Opask8EWQl0p55/GxUW1Mb3LOgUybRl5OEbsbY2+wfv1ajDKiXBSVVngpQagL2HF15pSW+u61cfOdHy2IN4Zeg86+yBNe/IjLkSWhewdAwz398GI5Qv3qV9EXd2HCGE7hGU5ryYl4qtQiaj6Lafs7ss9cVNGOFbKran9ixCgeTphFomAoJsR+klF7Ndz4WYgXtUhD3wKmR3j+qlye2kh4KfIXJYJWiZ4eb3rrpJuuPiQUToiBoAdG+UJ81XmiPkBLNCvD+8FJFS0lyz7oAhxTsXoRRwazUZLaLwhzzV9XQCSqlZ5bJuSHngpLUGO2Y1mObFGYpFq0voBAiToa0G+A8rh9Y55iFqRPr2L5yAHVvBmdCQJWDDYNVft9en/YCbYBZTbGZ8bHwGjo+rvCMOO6K9Gbw+d36RBtQhSizSPitJzskwhomug9q1GpaHonS/3eynHDDSZSnmfh787YN3WylkO//I6HWCCycJfVVzK8bBJFIb+jTBgPYsaMXkXi+sCrtvO5FCyX3eoVkx2TW86t5Jkpm/ZYxI+7FwKB7GVm4zmapgQUtugNrrR1owQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4425.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6916009)(64756008)(66446008)(7416002)(7696005)(6506007)(508600001)(8936002)(33656002)(38100700002)(38070700005)(52536014)(2906002)(54906003)(8676002)(9686003)(5660300002)(55016003)(122000001)(66556008)(26005)(186003)(71200400001)(316002)(83380400001)(66946007)(76116006)(86362001)(4326008)(66476007);DIR:OUT;SFP:1101;
+x-microsoft-antispam-message-info: QWycI/8lxqw0CAbwMFlepv1DLisr9zp52fXE9/7KZwn9UhrJ9ftpICbhZ6bJ06GmTv5CmOkzpy1uQPoNjRbQSykm2IH4gx4ZJA7mH0GJIijSnaoGrQP2FPmBVOZ17CL8At8ZWPP0EP9XPEeEbGfKG4/L88Ljk4D6In8SU1jbu8lBrqS+U/X4KYmz5sKiKJFxQKvT0BTDKO+5+Du9RuyAD+smUWE81Gu7yMB/x0cloNjEG3HCJxXgYLCdF2F7AiHnF2V2cfI67nDd4Q2fChfJUmeMYyepMOZzftjkrqQ3i+AXV4gGEUHO0izlPATZz+j2OTKBPim9NHtx5fvkEzwpXOAi8hvmrJ/coQDZN9yHKqudybAvmZlo5VdIYLhkl9JG+m8rP0vWIEzRqO0MQGD3QFNB1WkQcNfrmF3Vsd6GtQT47a8K616CcH33xnWVao7NXRl+4PgD/6MdfU6FIC/Kq0vULkMuvyP0bvjhaXk8FMHSFJk1G4gEDShevfl1UO7KhxHO8PZhhibbt/ukyHp1yspwXSblEYXTbAi4GJSKMapMBstVOMAQ5zmPXUxwRlVE60hrv54rPHPvEOEwo3vW95MtqfxO8PT/7v/A1cwS/HZcTMV+9tbdaEnhhnBLdiuVryYb4eOetjtJd5FzptzGZMcxF9QQNLVGKtQdvVLXBg7DYrWrWe/hBpA7RAbEgEyxApcW1itvtlIlsUSdFanuTA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4425.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(7416002)(33656002)(52536014)(2906002)(6916009)(86362001)(6506007)(26005)(9686003)(4744005)(122000001)(8936002)(7696005)(54906003)(38070700005)(38100700002)(316002)(71200400001)(186003)(66556008)(66946007)(66446008)(66476007)(8676002)(64756008)(4326008)(508600001)(55016003)(76116006)(5660300002);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?47hvu2o8s28ZiuQzK/RwZMfm2aC7L+1g2HSgXG2IAQAGyjFiUuN9TIfYmPk/?=
- =?us-ascii?Q?1xqIQ7Eh8rbgsbHTAigEiOTKqBckVgRtsgci06Vtp5mK2y7jkzxhu2JCOGYv?=
- =?us-ascii?Q?vmscABjRX9IYDBgcYeoVgy2pXSt7qOALpz6d3YE32nBHpBbqLZTp3z4r9ior?=
- =?us-ascii?Q?l0HzCipid8zbiBy4Bs4iujlyejVqJ0zeqaFDnJPRjVelHnzXBiOEJLTCCAMZ?=
- =?us-ascii?Q?POqk/ZKQ0Ar6CUc7cvLt2MsUAQNpPxPCpGpR+9p26Po7Fy2VU1hNAmwjj4bM?=
- =?us-ascii?Q?manKdedRofYb6SXVM7ZPlShm1R+4eZV/CUJIHNzz20jkzdWmM8nkLLEKjfK2?=
- =?us-ascii?Q?SaitKM52fIQdMjT7SzQos7usl+FNIjxltv1ycnbEHFZ1pSSK7XZvsdOKWNd4?=
- =?us-ascii?Q?k7YrabDNFjqHOMiWp7ZcDSvH6P1ZuXZaywrzaZlyM4B/4iyVL7Wwy1BnABkp?=
- =?us-ascii?Q?9bOhJtxMSytS7MDRcyds2StX9EG4EveZsxUwHt7Sr4vOnTt3dptSJsEnlJXb?=
- =?us-ascii?Q?Ou5anS53YR5mqluj5kGWSqtUcVMooCl2NKweBUAdvYANAVCckbFnhbqv7zC6?=
- =?us-ascii?Q?8KMAQORshsCKCg5EYJ20yTMACXs9DxMicl78/AVylfxuTVn2ciEwF5C3IU6s?=
- =?us-ascii?Q?4RO2ZA4z6mblipuBCTZOPU2qYdxm9NZa4PC4ckiJRkEEvDNw8xL+zLIind+z?=
- =?us-ascii?Q?MuDYdqoDweZpOS076ErGFMs3CwZSsnNjqPBiViDJBy6WTdt/yeslgQoAoyXK?=
- =?us-ascii?Q?H61HsuGUEGDV7N1NZLAYUEjUs5pwPG7aFwLgLR/jX5em99MfH4y2jT7yl/Vd?=
- =?us-ascii?Q?Y15LkzbHo4Lo2d6uH7c0GI9XkpcZctc6U70G95Ug4KM6Vt5bHgrd5am410F4?=
- =?us-ascii?Q?ZpsOQgjn0NUy13R1NTrB3nS0cLuBddfQ+kiXBiL8h4xO2OuRrvp6qKEuXgVS?=
- =?us-ascii?Q?Qmk2BDoiWCPMVvgWwaK2b2H6I3z83oFqCaYYjPBfPHPbmLQ8+VVlCtK34yKV?=
- =?us-ascii?Q?4s+8F40O0pSuc+PGBa4Eg+TvPJIGqmqOoABWoS8e4UttfpPjRCx9ehvlVrRA?=
- =?us-ascii?Q?eF5TlOHlb755bJhu6/6lX/YeemSCsHzdkpqdygUlWoHMfTBotR9IXsgRqFP0?=
- =?us-ascii?Q?CCi50vbYu9lj/AQfF6EzZOfY/yPMe4KxAoHDGhpf2puOxdIxLi3307f/QvRy?=
- =?us-ascii?Q?LUotSGWDAvlh4604RE5EBfb6g8FYm9v6tB+qqHDIoHbIwFKhK9zslEwBymQO?=
- =?us-ascii?Q?nyEiXsWx0JIbfTNCchJIrK4Oa+dGhkAJkhukO704Mx1HwL/E/QJwZajNlr/3?=
- =?us-ascii?Q?G9Oao2Q0Kenz+GKsDyCYM/yV8jIj0j/hl9F9h7UJ9lVYq7RQrh6B3UYA/pTr?=
- =?us-ascii?Q?l3j3a7Ylo7Sa4TbQrLFyHJg31YKh8evHX8pHQW9Me7NqhnUJtPbXOZoBrhmF?=
- =?us-ascii?Q?7DNjKW4ZQ2gI53AkzbjT70GSRgoUVd0tJlxMKg6Sg3csHpjDkmm18z3g04p1?=
- =?us-ascii?Q?QD9cq5H+e281hs53WKJhjFzEvh/Fd2scrgGX0b9n/MBdK5Ufef9CiTBhiGiM?=
- =?us-ascii?Q?XL8yQombSo2B0uBdE9aZOwvXhb8sF/Jp9fnT8SDq2lnQy/wrifTAc1CH8vSh?=
- =?us-ascii?Q?uk63k4ZmVn/BjCu3EA7r3WTXXqFKVDM73RhUzDX2edflsDmfaC2/tF2IiEGM?=
- =?us-ascii?Q?bLdFKDF+nFtkFKpP1BjHd96LKHphvkK/K8cHEPlv5EYlxH1/SYtPX3wBtfxJ?=
- =?us-ascii?Q?TXjOOgSvSg=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RErqqi08WS+dFhJhVyvZUaX8ZWzF9Sd3MZkW5gA6l0LZ9hxzAkPforTX26re?=
+ =?us-ascii?Q?NlDcf+lJC8DgdbR+LfzDQa4C37lyT9WFcqMCCgIiD+yQgbKvN4olwxNyBoEC?=
+ =?us-ascii?Q?rESQb5T38IA5uQ7udEZnfi87KZDq+bksaEiL5cMPYv/N09S5g4XxtnHV2vZw?=
+ =?us-ascii?Q?RDNqA2Er3ADR7Jo3ed856VZ+21GVc638SAPNjTf40kSK74AWwSdK3gP3k38A?=
+ =?us-ascii?Q?a2qJf5VJ2VJ3u1rJYYQ7IvNF9EkxLE2chRQDGd1QP8tcJEkDVrlILDyqKZCK?=
+ =?us-ascii?Q?hJ6DHFcnBn48z/tvNYXv7VOt2Qceslm4U9nHbCGo8Gkk/hGOXJiBJKkM1MfA?=
+ =?us-ascii?Q?VUXviurgBnClc0CrTFEGSVEYw9aakKcZVzJ11Im7oUXiCC0c1WD5t2jQBnGA?=
+ =?us-ascii?Q?8MlASqcgYRtC16MwtLFFEWR8H1MW0IJIpLA2rFsZGTs7naKJb06YPrj0+kC4?=
+ =?us-ascii?Q?l8+mPD9e/QZpQojGJ5OpGwc4FATrYuOdxyV4NiY0OooH5+gwxljoQ3FtXFeG?=
+ =?us-ascii?Q?RaMXGicswJ2aLJG5i7ewysVUxlo8ccWDibmDrudODyqnOt4/frX4Q5+mh8Qk?=
+ =?us-ascii?Q?RWmodT7LKaLQIrT5mQrfSb/pG2l614ap5Ut+c/l4VzM/wCD23QlZqr1FvAdL?=
+ =?us-ascii?Q?hz3zH1i6NFddTBFy2tWyQMz03xMgmYt+u3zMWzqyP4+FZbEChf+Nq7TJ8Ibu?=
+ =?us-ascii?Q?nPHa6enqxAYH65bi/SW7DwKxwHNq3D+FPrHaEg3VN8GsDeV7gsix1aJ7hJOZ?=
+ =?us-ascii?Q?g9Tfq4W52ShHdFOf5U06JzrPIFkKTClGsFRt6u4e/OblwOktnqW1/2heO7Da?=
+ =?us-ascii?Q?Xkj1k73/6mcjKymGTCzbDXetYqLPCNWj3o8EOpA2JRK5ej2lQRX4qT7R+i99?=
+ =?us-ascii?Q?ZKTQdunOLYCkHrIVP718xICR437rMu+DhvBN8p910xP/z3x2XShXQHw2ZqFG?=
+ =?us-ascii?Q?B4aZIWVUGmgpVPztsLZEoDJaogS1OZRpaSxBnQUTEsmpAQACQpxPy4p7Wrpk?=
+ =?us-ascii?Q?OZXJg4XfaSirYbYa++HOVv4Ar8KIIEvOuO9fXvK9DFodRRHA1W6tykprDr2n?=
+ =?us-ascii?Q?X/yZuPmYzXN0B+egyoKEs7Zyt4nrCE6IxX1reEAee2gb0aTYImmfNOEODhMy?=
+ =?us-ascii?Q?3kJk/vk9ES90Ohw04CI8u6NWF7SCK9OsUXr8KaqR64aukCFD30hU34p0LMeO?=
+ =?us-ascii?Q?KGWYXmUBghHyZnzDopBH1dfldJnOTV0ogfrDkkrCa4WrXBnZhx3M4/pW62f6?=
+ =?us-ascii?Q?KuC+ZGdntfmCICKh7ooG2nbBe31Xo41S3DutxI4Pudutl8BGkxED+KSuzFtS?=
+ =?us-ascii?Q?Y9yQk5q6lcpxpaf0okiwLnkpxMx8vfl/A4388w9V8gynGx2uPsS/VDb4+JCO?=
+ =?us-ascii?Q?BF2w4VB0GyIVtsMt/tOcxyiUCFbB5k3rDF5CFV0c6YrH61ymTSUhdVGN9x1b?=
+ =?us-ascii?Q?y0T86gymCBKh7tMp8ag2cV66ytRLGUiXub2UdobBczR75i9e87UrpeqiYL5j?=
+ =?us-ascii?Q?ibafL7720sJ+oX1Bo8JCoVpafYedI897QVmDkw4iErp7wO0xDxOrvOobk0+f?=
+ =?us-ascii?Q?QFdi9aBcqBPGJMCRpVHZvlwwGBA+RrKG+Z/cbu7J8FX69HG4mu2/YyBGYwl3?=
+ =?us-ascii?Q?0JIZxo72/Q/KtodZKdSrzjVIcgb91RKfT/pgzimQ39fMKCBJqUchRddigIr9?=
+ =?us-ascii?Q?HNKT6Jx9AXIts/DZCeBC20NSaOMgkUPwBz1B6lT4zulKIfJGtvcnUJ5FybfN?=
+ =?us-ascii?Q?kOqIipShXA=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: marvell.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4425.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f52f56db-a827-4a80-23f9-08da3fc4e829
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2022 09:40:16.7184
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1779b23-d952-4a4a-f781-08da3fc53cb5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2022 09:42:38.5699
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MIVc01ziznNj/UYLCranJAR7F2qk9kSzlRByo+HOsA9UI2XqwExWHjqiz/J8J6oTwfnpf1pEK4nBy01ZpikFRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3463
-X-Proofpoint-GUID: 7Nhhx40GKDjROSkoEbeLj56UVk5E5DVd
-X-Proofpoint-ORIG-GUID: IxdcRznHdaryYCg25llTPt_4p6iMVvrQ
+X-MS-Exchange-CrossTenant-userprincipalname: a8g/3TIpv3+qCUvzVnxKRxusB9XrItbazj83EISd33ixPbOaQ6FhY/K1KVfOhzgttSi9jQneoqtWkclflbAZHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR18MB0939
+X-Proofpoint-GUID: k17D2LFnaBBLo1BHEKKy5J1TK1DnVmyp
+X-Proofpoint-ORIG-GUID: 1iolz-WtDEFvnEQtuz24mDf3TEkv-W2V
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-27_03,2022-05-25_02,2022-02-23_01
@@ -145,63 +144,6 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
->> Added missing checks to avoid null pointer dereference.
->>
->> The patch fixes below issues reported by klocwork tool:
->
->Don't fix false positives to make a tool happy.  Fix the tool.  (Unless
->the patch makes the code simpler, then it's fine).
->
->> 1. Pointer 'pcim_iomap_table(pdev)' returned from call to function
->>    'pcim_iomap_table' at line 365 may be NULL and will be dereferenced
->>    at line 365 in otx2_cptvf_main.c. Also there is a similar error on
->>    line 734 in otx2_cptpf_main.c.
->> 2. Pointer 'strsep( &val, ":" )' returned from call to function 'strsep'
->>    at line 1608 may be NULL and will be dereferenced at line 1608. Also
->>    there are 2 similar errors on lines 1620, 1632 in otx2_cptpf_ucode.c.
->>
->> Signed-off-by: Shijith Thotton <sthotton@marvell.com>
->> ---
->>  .../crypto/marvell/octeontx2/otx2_cptpf_main.c |  9 ++++++++-
->>  .../marvell/octeontx2/otx2_cptpf_ucode.c       | 18 +++++++++++++++---
->>  .../crypto/marvell/octeontx2/otx2_cptvf_main.c |  9 ++++++++-
->>  3 files changed, 31 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->> index a402ccfac557..ae57cee424f0 100644
->> --- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->> +++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_main.c
->> @@ -703,6 +703,7 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
->>  {
->>  	struct device *dev =3D &pdev->dev;
->>  	struct otx2_cptpf_dev *cptpf;
->> +	void __iomem * const *iomap;
->>  	int err;
->>
->>  	cptpf =3D devm_kzalloc(dev, sizeof(*cptpf), GFP_KERNEL);
->> @@ -731,7 +732,13 @@ static int otx2_cptpf_probe(struct pci_dev *pdev,
->>  	pci_set_drvdata(pdev, cptpf);
->>  	cptpf->pdev =3D pdev;
->>
->> -	cptpf->reg_base =3D pcim_iomap_table(pdev)[PCI_PF_REG_BAR_NUM];
->> +	iomap =3D pcim_iomap_table(pdev);
->
->I don't know if a check is required here or not...  The comments to
->pcim_iomap_table() say it is, "guaranteed to succeed once  allocated."
->
-=20
-Will keep the check just to be safe, as allocation/kmalloc could fail.
-
->> +	if (!iomap) {
->> +		dev_err(dev, "Failed to get iomap table\n");
->> +		err =3D -ENODEV;
->> +		goto clear_drvdata;
->> +	}
->> +	cptpf->reg_base =3D iomap[PCI_PF_REG_BAR_NUM];
->>
->>  	/* Check if AF driver is up, otherwise defer probe */
->>  	err =3D cpt_is_pf_usable(cptpf);
 >> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
 >b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
 >> index 9cba2f714c7e..b91401929fc6 100644
@@ -210,9 +152,6 @@ Will keep the check just to be safe, as allocation/kmalloc could fail.
 >> @@ -1605,7 +1605,11 @@ int otx2_cpt_dl_custom_egrp_create(struct
 >otx2_cptpf_dev *cptpf,
 >>  		if (!strncasecmp(val, "se", 2) && strchr(val, ':')) {
->                                                  ^^^^^^^^^^^^^^^^
->We know it can't be NULL.
->
 >>  			if (has_se || ucode_idx)
 >>  				goto err_print;
 >> -			tmp =3D strim(strsep(&val, ":"));
@@ -221,12 +160,20 @@ Will keep the check just to be safe, as allocation/kmalloc could fail.
 >> +				tmp =3D strim(tmp);
 >> +			else
 >> +				goto err_print;
->>  			if (!val)
->>  				goto err_print;
->>  			if (strlen(tmp) !=3D 2)
 >
->The rest is all the same.  Likely or definitely false positives.
+>The check is not needed here, but if it were then the better way to
+>write this would be:
 >
->regards,
->dan carpenter
+>		tmp =3D strsep(&val, ":");
+>		if (!tmp)
+>			goto err_print;
+>		tmp =3D strim(tmp);
+>
+>Always to error handling, not success handling.  checkpatch.pl --strict
+>will complain about the !=3D NULL.
+>
 
+Will change the check as mentioned.
+
+Thanks,
+Shijith
