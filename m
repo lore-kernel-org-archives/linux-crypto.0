@@ -2,121 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAEB2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 03:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B2BC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 06:19:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354788AbiE1D7e (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 May 2022 23:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58348 "EHLO
+        id S231424AbiE1GTP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 28 May 2022 02:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbiE1D7d (ORCPT
+        with ESMTP id S229936AbiE1GTP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 May 2022 23:59:33 -0400
+        Sat, 28 May 2022 02:19:15 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0629C62BEF;
-        Fri, 27 May 2022 20:59:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556442CE0A;
+        Fri, 27 May 2022 23:19:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 971DD61C19;
-        Sat, 28 May 2022 03:59:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADED1C34100;
-        Sat, 28 May 2022 03:59:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653710372;
-        bh=hzVHSh4zr2vcIAinWH7zTymLIFQZIDTSRvcZXhAJ7Fo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sOlksaREXBsfBPvs4hqb11pZ8Um6NmMrLFPvrzu3BYFO8jXRWYiQH5QpAMBayUbt2
-         j3fTCF//XRZeQ5OZp6wMUuNSfRxavj4Db8dOrwmBVasa7+eoWdVcSWLudkXlYTtKbu
-         5evGnCX6n3p3bZhw5m+8V+icPgVmmnxgNJyaQPKkEzc+CSqBZa/Mw6ZXcX8C8amxcB
-         iEsPRo8sYLB3vg9SWTEu8s4PNIgttSwJDfrEfXupl5YC7EKsd0tucsuRQxkSG51IIE
-         +WRFhzHCdjEbZbCvNqT28wi1ASbrBfAhQvT+sNBkWOO07wBB0fl4hco7zMFYaGrRe9
-         m/SuOQB7NO9Tg==
-Date:   Fri, 27 May 2022 20:59:29 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        herbert@gondor.apana.org.au, gaochao <gaochao49@huawei.com>,
-        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH crypto v2] crypto: blake2s - remove shash module
-Message-ID: <YpGeIT1KHv9QwF4X@sol.localdomain>
-References: <YpCGQvpirQWaAiRF@zx2c4.com>
- <20220527081106.63227-1-Jason@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AA15760ABD;
+        Sat, 28 May 2022 06:19:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B03C34114;
+        Sat, 28 May 2022 06:19:12 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Dcxzb1A5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1653718750;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UcatFLxLEDkqwGfbzqMdWU9Nhg9xUpLbAL1L8Q5uIOg=;
+        b=Dcxzb1A5hE14Sb1CGI1rDpsRmZPhQlcQUc2AUUR748F/e+dlym6GwlpY1l6d4GugZ0kwAH
+        oPp9zpkzlifZeXde3gL/9fQdKghuht6IIvSq65c/AtcGqoPOmUCrto/4Sn61Ur7k5gIeWX
+        jEdEceDnRey7EcBRgTlXy0D1+GfBQd0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bc6b639f (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 28 May 2022 06:19:10 +0000 (UTC)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-30c143c41e5so8686277b3.3;
+        Fri, 27 May 2022 23:19:10 -0700 (PDT)
+X-Gm-Message-State: AOAM531nG/ztd32s7XBtdMf3i4pRAt1ouq26pRuZx2/2AwZE20xYBbVc
+        upxwi9vzXqFfH/73fa3Ey/NSK0cf/adpXkcftOw=
+X-Google-Smtp-Source: ABdhPJxdstrbygSzyr3pf79qP3cy6V/OSM7xSmwBrQkFaF1jIhRuYDxTKOu5Z2fYsfa9CoOxUv6GIcQXSVcrTvMoC/U=
+X-Received: by 2002:a0d:cd04:0:b0:300:4784:caa3 with SMTP id
+ p4-20020a0dcd04000000b003004784caa3mr19109952ywd.231.1653718749409; Fri, 27
+ May 2022 23:19:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220527081106.63227-1-Jason@zx2c4.com>
+Received: by 2002:a05:7110:6403:b0:17b:2ce3:1329 with HTTP; Fri, 27 May 2022
+ 23:19:09 -0700 (PDT)
+In-Reply-To: <20220528013318.1621047-1-zhengbin13@huawei.com>
+References: <20220528013318.1621047-1-zhengbin13@huawei.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Sat, 28 May 2022 08:19:09 +0200
+X-Gmail-Original-Message-ID: <CAHmME9rWfUnUmHR5xo_+WdS0Wgv8yXQb+LqAo24XdoQQR4Wn8w@mail.gmail.com>
+Message-ID: <CAHmME9rWfUnUmHR5xo_+WdS0Wgv8yXQb+LqAo24XdoQQR4Wn8w@mail.gmail.com>
+Subject: Re: [PATCH -next] crypto: curve25519 - Fix build error when
+ CRYPTO_MANAGER_DISABLE_TESTS!=y && CRYPTO=m
+To:     Zheng Bin <zhengbin13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        gaochao49@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 27, 2022 at 10:11:06AM +0200, Jason A. Donenfeld wrote:
-> BLAKE2s has no use as an shash, with no users of it.
+On 5/28/22, Zheng Bin <zhengbin13@huawei.com> wrote:
+> If CRYPTO_MANAGER_DISABLE_TESTS!=y, CRYPTO=m, bulding fails:
+>
+> lib/crypto/curve25519-selftest.o: In function `curve25519_selftest':
+> curve25519-selftest.c:(.init.text+0x60): undefined reference to
+> `__crypto_memneq'
+> curve25519-selftest.c:(.init.text+0xec): undefined reference to
+> `__crypto_memneq'
+> curve25519-selftest.c:(.init.text+0x114): undefined reference to
+> `__crypto_memneq'
+> curve25519-selftest.c:(.init.text+0x154): undefined reference to
+> `__crypto_memneq'
+>
+> Add depends for CRYPTO_LIB_CURVE25519 to fix this.
 
-"no use" => "no known current use".
+In this case, the bug isn't caused by the tests exactly but by the
+curve25519.h inline usage here:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/crypto/curve25519.h#n43
 
-> diff --git a/lib/crypto/blake2s-selftest.c b/lib/crypto/blake2s-selftest.c
-> index 409e4b728770..38996ee73a64 100644
-> --- a/lib/crypto/blake2s-selftest.c
-> +++ b/lib/crypto/blake2s-selftest.c
-> @@ -4,6 +4,8 @@
->   */
->  
->  #include <crypto/internal/blake2s.h>
-> +#include <linux/kernel.h>
-> +#include <linux/random.h>
->  #include <linux/string.h>
->  
->  /*
-> @@ -548,7 +550,8 @@ bool __init blake2s_selftest(void)
->  	u8 key[BLAKE2S_KEY_SIZE];
->  	u8 buf[ARRAY_SIZE(blake2s_testvecs)];
->  	u8 hash[BLAKE2S_HASH_SIZE];
-> -	struct blake2s_state state;
-> +	u8 blocks[BLAKE2S_BLOCK_SIZE * 4];
-> +	struct blake2s_state state, state1, state2;
->  	bool success = true;
->  	int i, l;
->  
-> @@ -587,5 +590,32 @@ bool __init blake2s_selftest(void)
->  		}
->  	}
->  
-> +	for (i = 0; i < 2048; ++i) {
-> +		get_random_bytes(blocks, sizeof(blocks));
-> +		get_random_bytes(&state, sizeof(state));
-> +
-> +		memcpy(&state1, &state, sizeof(state1));
-> +		memcpy(&state2, &state, sizeof(state2));
-> +		blake2s_compress(&state1, blocks, 4, sizeof(blocks));
-> +		blake2s_compress_generic(&state2, blocks, 4, sizeof(blocks));
-> +		if (memcmp(&state1, &state2, sizeof(state1))) {
-> +			pr_err("blake2s random compress self-test %d: FAIL\n",
-> +			       i + 1);
-> +			success = false;
-> +		}
-> +
-> +		for (l = 1; l < 8; ++l) {
-> +			memcpy(&state1, &state, sizeof(state1));
-> +			memcpy(&state2, &state, sizeof(state2));
-> +			blake2s_compress(&state1, blocks + l, 3, sizeof(blocks) - BLAKE2S_BLOCK_SIZE);
-> +			blake2s_compress_generic(&state2, blocks + l, 3, sizeof(blocks) - BLAKE2S_BLOCK_SIZE);
-> +			if (memcmp(&state1, &state2, sizeof(state1))) {
-> +				pr_err("blake2s random compress align %d self-test %d: FAIL\n",
-> +				       l, i + 1);
-> +				success = false;
-> +			}
-> +		}
-> +	}
+Probably the solution for this one is to move crypto_memneq into lib/crypto.
 
-This doesn't compile on arm, since blake2s_compress_generic() isn't defined.
-
-Also, the wrong value is being passed for the 'inc' argument.
-
-2048 iterations is also a lot.  Doing a lot of iterations here doesn't
-meaningfully increase the test coverage.
-
-And please run checkpatch; those are some very long lines :-(
-
-- Eric
+Jason
