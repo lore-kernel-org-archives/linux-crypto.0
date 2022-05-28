@@ -2,67 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8D1C433F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 15:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E0DCC433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 17:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237429AbiE1PUx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 May 2022 11:20:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
+        id S238857AbiE1RTm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 28 May 2022 13:19:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237228AbiE1PUx (ORCPT
+        with ESMTP id S238811AbiE1RTl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 May 2022 11:20:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979F310E4;
-        Sat, 28 May 2022 08:20:52 -0700 (PDT)
+        Sat, 28 May 2022 13:19:41 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D65396;
+        Sat, 28 May 2022 10:19:40 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 376ED60EFC;
-        Sat, 28 May 2022 15:20:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29BA3C34100;
-        Sat, 28 May 2022 15:20:51 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="qE1HKzO2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1653751247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9JkDzc0LO3wwyFpVhlqaIJZm7f0ZEKGy7IvUB5AiIpI=;
-        b=qE1HKzO2mc8ewbLzhWfVQyEPkHOa+2D7Ml/eLEuVPkrCEBvtuW3xvL2S6BnY/PYYwusLRG
-        fMKl15b/0LtL9NsDhP8+jYOLU3+/cSZkGmLeK0qeYL+QIKzwJxoaoqFdPE/wN/NgNiEqVE
-        6SXy6tnLK9/UtdSBhRVvNIF1zwRAgf8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 12101297 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 28 May 2022 15:20:46 +0000 (UTC)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-2ff7b90e635so73364547b3.5;
-        Sat, 28 May 2022 08:20:46 -0700 (PDT)
-X-Gm-Message-State: AOAM530H3tqmjsHvzdCMrhsmOqJVCzbCgkOeEB1//nKQu74nZ0JWSCW/
-        BU5acq5JyrG0M6xN/eELYavh30cz6YidhlUuVw8=
-X-Google-Smtp-Source: ABdhPJxa9gI6GUshjPfnm31KDdrjwhQZ6ZM+t9sLo1ouvhBaw0GtT9VkU9LdsporNFZiEcwJ2OdJylg3+Tv1n1tTCuw=
-X-Received: by 2002:a0d:ea14:0:b0:300:4bc2:ee31 with SMTP id
- t20-20020a0dea14000000b003004bc2ee31mr19524491ywe.396.1653751245268; Sat, 28
- May 2022 08:20:45 -0700 (PDT)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9DFBCB8013C;
+        Sat, 28 May 2022 17:19:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E70C34100;
+        Sat, 28 May 2022 17:19:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653758378;
+        bh=G7tf9YJZazhJ3zj5XmFBFb8oMtPMYs1ILDRcunfXUOw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MP6gqjJmOFpiYtR3HghPFwUhJrMNT0RmD8A+6eDYU8B1VGfcdBY1O3KDKETkvziu7
+         3eiXllmFK7KgLQr+WfEVA8nkjLGleKFyF5bAguuFNDo2hGVtYjN5izZ2MWBXPGU9MD
+         qCe9ccojxK/hG5lnmw++VzHHYa7gX1b0ZUJszymADCHhxKPu013WxCf1wuPOuzc0q9
+         H60xgPVGjlERTEUil+BvTb4FnuqqKFW0tlh5twnHiSvCKzlvzK5YP4japU4P4iHEZc
+         4rT/mo37jaerJwjwGhHRbKcBWCtI1llWueCSBpiw980ZnYjv9gEATsq9lU5PAySFXv
+         s6Kst1tf92l8w==
+Date:   Sat, 28 May 2022 10:19:36 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        herbert@gondor.apana.org.au, gaochao <gaochao49@huawei.com>,
+        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH crypto v2] crypto: blake2s - remove shash module
+Message-ID: <YpJZqJd9j1gEOdTe@sol.localdomain>
+References: <YpCGQvpirQWaAiRF@zx2c4.com>
+ <20220527081106.63227-1-Jason@zx2c4.com>
+ <YpGeIT1KHv9QwF4X@sol.localdomain>
+ <YpHx7arH4lLaZuhm@zx2c4.com>
 MIME-Version: 1.0
-Received: by 2002:a05:7110:6403:b0:17b:2ce3:1329 with HTTP; Sat, 28 May 2022
- 08:20:44 -0700 (PDT)
-In-Reply-To: <01a7891f-7295-3be2-73f3-5405b1e18f45@molgen.mpg.de>
-References: <01a7891f-7295-3be2-73f3-5405b1e18f45@molgen.mpg.de>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Sat, 28 May 2022 17:20:44 +0200
-X-Gmail-Original-Message-ID: <CAHmME9oFDjHjxR8xvns3VCDqGhtUDvEf7rhEy0fgD7NOmkKn=Q@mail.gmail.com>
-Message-ID: <CAHmME9oFDjHjxR8xvns3VCDqGhtUDvEf7rhEy0fgD7NOmkKn=Q@mail.gmail.com>
-Subject: Re: ./include/crypto/poly1305.h:56:46: error: 'CONFIG_CRYPTO_LIB_POLY1305_RSIZE'
- undeclared here
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YpHx7arH4lLaZuhm@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Revert already sent:
-https://lore.kernel.org/lkml/20220528110918.256550-1-Jason@zx2c4.com/
+On Sat, May 28, 2022 at 11:57:01AM +0200, Jason A. Donenfeld wrote:
+> > Also, the wrong value is being passed for the 'inc' argument.
+> 
+> Are you sure? Not sure I'm seeing what you are on first glance.
+
+Yes, 'inc' is the increment amount per block.  It needs to always be
+BLAKE2S_BLOCK_SIZE unless a partial block is being processed.
+
+- Eric
