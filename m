@@ -2,92 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5371BC433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 11:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8D1C433F5
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 May 2022 13:00:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234592AbiE1LJs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 May 2022 07:09:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42124 "EHLO
+        id S1350029AbiE1NAs (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 28 May 2022 09:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234274AbiE1LJs (ORCPT
+        with ESMTP id S1344012AbiE1NAr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 May 2022 07:09:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0AC9201A0;
-        Sat, 28 May 2022 04:09:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D89A60DDD;
-        Sat, 28 May 2022 11:09:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A38CC34100;
-        Sat, 28 May 2022 11:09:46 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lPzlkdhB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1653736182;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=izQRZXBrrgVPYreeMxjNooSE8gWHxKL6jmIqcXOidA4=;
-        b=lPzlkdhBDz88X3eko3eT2hJaidAdx2VFBc0jCwUTVdjT/YrAB927BU6yMKQQvKuGenMx7n
-        jNymODsB08EPIIuYV6mlSdSkQFL9yxT/TcLMvid9M/sLTcCYECvJDbPuJm0KzdBlH0QI/H
-        5w7ARQNXYoXzzjuW24z0rqye7YALAlk=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1364098c (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 28 May 2022 11:09:42 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH] Revert "crypto: poly1305 - cleanup stray CRYPTO_LIB_POLY1305_RSIZE"
-Date:   Sat, 28 May 2022 13:09:18 +0200
-Message-Id: <20220528110918.256550-1-Jason@zx2c4.com>
-In-Reply-To: <CAHmME9pS1ODLqJ8rw0hzH5+ZrUW8pwC2nkeD4mLVG4swp8BnQQ@mail.gmail.com>
-References: <CAHmME9pS1ODLqJ8rw0hzH5+ZrUW8pwC2nkeD4mLVG4swp8BnQQ@mail.gmail.com>
+        Sat, 28 May 2022 09:00:47 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4C0C2A;
+        Sat, 28 May 2022 06:00:45 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id h189-20020a1c21c6000000b0039aa4d054e2so76164wmh.1;
+        Sat, 28 May 2022 06:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=VWS0F56t0fOBh5xypCh8zjIFc6hxsrgivcZl7H9F6LA=;
+        b=PrzcA+325+sgBUeqcHDmn4L7QnwPAbf1zUi8X9B3wbQZJnC2E/vNpDjRj9yQ2+/M6X
+         hVZA9Y+2MxJCv7KC1+xrDmknqCIqW3gJtSRZAS2Qzec2WmmQD8x50tHxowFpb3Etn4ba
+         Zj+s/97+ZBQSoRMH7FZzNJG8PVPcI8aqEhiY+P3fLEeKV0cIcMmSLFNcTrzos88B0AY4
+         0eZyGiZM/sva55q2UjkvlcIQIfZNO5ODCZZJrDhmOuv8TwX3rUlmzk8FE3H4Pc+RdzFb
+         TuodlU/HaWAatNwwByVVIk8+jlDlvpwJ6CUK0JUIkasUQ5iMnHAdNhtriE7gJFy79oiv
+         Zrvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=VWS0F56t0fOBh5xypCh8zjIFc6hxsrgivcZl7H9F6LA=;
+        b=vpcTU1m/Nwi4DfC/YqL6orMs+eBc0ojz3vf2gkUrF9aMwdycjO5IZPowpK0ZziF4LJ
+         w41vCAmfakIfb5sP7c050EFWT8wkJqvEHsOVtH4EucvTnMdEt1GpksTRhWeWT4TyfAa4
+         DvSKpCMGeFejyWwTwP6Q70VmasxViNn58dPKnlc8IvaSc7OJv/lyEyTmzYSQ+oUD2Eyo
+         gXjxQLzqZrQBGMfGJ1vxsB5vgm0dID819f/rfnohlCeJwpNNFFqejZevBOdxCZI9pIjb
+         oUIRE+WuwAS4Mix5c9SCjBw2WwPPDYt1hi3U57ZPdy6Rae3iFhHL1ZnU49jXkxTu4YMc
+         as5w==
+X-Gm-Message-State: AOAM532XVFTcWfF54dO+70/LJNxx0vbWnMvhrsw9N8LGi/DLOf1DtlfW
+        AZw923bOMZiV2F2sH4u6S7c+xjgqrws=
+X-Google-Smtp-Source: ABdhPJzO+5nhwDzTELUOeEMSSdR1F7EwBlN2PhikUDajX3eKDowkhtLyBlk+UYucTI1HfWnQh0SAZA==
+X-Received: by 2002:a7b:c4d0:0:b0:397:4636:6bc1 with SMTP id g16-20020a7bc4d0000000b0039746366bc1mr11065865wmk.48.1653742844347;
+        Sat, 28 May 2022 06:00:44 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id bw30-20020a0560001f9e00b0020ffa2799f4sm4045530wrb.73.2022.05.28.06.00.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 May 2022 06:00:44 -0700 (PDT)
+Date:   Sat, 28 May 2022 15:00:40 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        linux-crypto@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH] crypto: sun8i-ss - fix error codes in allocate_flows()
+Message-ID: <YpIc+FtQIOdm9Ub+@Red>
+References: <YoUt+LNsM8qFZYgL@kili>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <YoUt+LNsM8qFZYgL@kili>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This reverts commit 8bdc2a190105e862dfe7a4033f2fd385b7e58ae8.
+Le Wed, May 18, 2022 at 08:33:44PM +0300, Dan Carpenter a écrit :
+> These failure paths should return -ENOMEM.  Currently they return
+> success.
+> 
+> Fixes: 359e893e8af4 ("crypto: sun8i-ss - rework handling of IV")
+> Fixes: 8eec4563f152 ("crypto: sun8i-ss - do not allocate memory when handling hash requests")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-It got merged a bit prematurely and shortly after the kernel test
-robot and Sudip pointed out build failures.
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-on: sun8i-a83t-bananapi-m3
 
-We could attempt to fix this by listing the dependencies piecemeal, but
-it's not as obvious as it looks: drivers like caam use this macro in
-headers even if there's no .o compiled in that makes use of it. So
-actually fixing this might require a bit more of a comprehensive
-approach, rather than whack-a-mole with hunting down which drivers use
-which headers which use this macro.
-
-Therefore, this commit just reverts the change, and maybe the problem
-can be visited on the next rainy day.
-
-Reported-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Fixes: 8bdc2a190105 ("crypto: poly1305 - cleanup stray CRYPTO_LIB_POLY1305_RSIZE")
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- lib/crypto/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index a143ddf9279a..9856e291f414 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -85,7 +85,6 @@ config CRYPTO_LIB_POLY1305_RSIZE
- 	default 11 if X86_64
- 	default 9 if ARM || ARM64
- 	default 1
--	depends on CRYPTO_LIB_POLY1305
- 
- config CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	tristate
--- 
-2.35.1
-
+Thanks
