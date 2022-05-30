@@ -2,82 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA68C433F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 May 2022 07:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0F3C433FE
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 May 2022 07:56:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232801AbiE3HiI convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 May 2022 03:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
+        id S234147AbiE3H4y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 May 2022 03:56:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233597AbiE3Hhh (ORCPT
+        with ESMTP id S234247AbiE3Hyi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 May 2022 03:37:37 -0400
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4533F7222A
-        for <linux-crypto@vger.kernel.org>; Mon, 30 May 2022 00:37:23 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-1-58zlEE0YN66WK_EGsQ6QUA-1; Mon, 30 May 2022 08:37:20 +0100
-X-MC-Unique: 58zlEE0YN66WK_EGsQ6QUA-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.36; Mon, 30 May 2022 08:37:18 +0100
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.036; Mon, 30 May 2022 08:37:18 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Eric Biggers' <ebiggers@kernel.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Mon, 30 May 2022 03:54:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C461874DCC;
+        Mon, 30 May 2022 00:54:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7F5DCB80ABD;
+        Mon, 30 May 2022 07:54:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4E60C36AE5;
+        Mon, 30 May 2022 07:54:33 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TRON//3W"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1653897270;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kso+7cLff27bYNHkoanOeWCHCmy79ih2oiGLYCkUq1A=;
+        b=TRON//3WYVNzRGi9O+v50V2LzrLDkFOXaO2aXucmslWQUAUmPaeYD9ulhLS9+OMD86mTpI
+        QkqvLdVtN4IE9xN3jNd11y7CQSAK1wrPQLIUGlmeMbWE2VGXYKsqhEQATYXwYEaU67ua/J
+        YeW8q9hT9jKlAJdVNdRy3iNdSLV3yGQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 72c78cc4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 30 May 2022 07:54:30 +0000 (UTC)
+Received: by mail-yb1-f169.google.com with SMTP id g4so4084139ybf.12;
+        Mon, 30 May 2022 00:54:29 -0700 (PDT)
+X-Gm-Message-State: AOAM530shtdXQjCBGYsyBbRWFNGkysaEoXjiEfUf0qdrzIIUCrLwLd4b
+        T1aQMMhkqz1Jube2Dzvs0ONvaTsANuz4ckyYwTk=
+X-Google-Smtp-Source: ABdhPJx7dVUM5BfHRcDWsIIwQ9vGrnY4/N6aGErCyIIhdwLPMk7vMBOqprO+vcobxdnL24gg016zccie6oVkdhur//k=
+X-Received: by 2002:a25:890b:0:b0:659:b9d6:a134 with SMTP id
+ e11-20020a25890b000000b00659b9d6a134mr15609765ybl.235.1653897269362; Mon, 30
+ May 2022 00:54:29 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a05:7110:6403:b0:17b:2ce3:1329 with HTTP; Mon, 30 May 2022
+ 00:54:28 -0700 (PDT)
+In-Reply-To: <7719057c0de047ebacea46ab9588da44@AcuMS.aculab.com>
+References: <YpCGQvpirQWaAiRF@zx2c4.com> <20220527081106.63227-1-Jason@zx2c4.com>
+ <YpGeIT1KHv9QwF4X@sol.localdomain> <YpHx7arH4lLaZuhm@zx2c4.com>
+ <YpJZqJd9j1gEOdTe@sol.localdomain> <7719057c0de047ebacea46ab9588da44@AcuMS.aculab.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 30 May 2022 09:54:28 +0200
+X-Gmail-Original-Message-ID: <CAHmME9r5Fr4Zm585tLjv562kzB58iHjNjnRH8+YJ-3cY6b4WZg@mail.gmail.com>
+Message-ID: <CAHmME9r5Fr4Zm585tLjv562kzB58iHjNjnRH8+YJ-3cY6b4WZg@mail.gmail.com>
+Subject: Re: [PATCH crypto v2] crypto: blake2s - remove shash module
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         gaochao <gaochao49@huawei.com>, Ard Biesheuvel <ardb@kernel.org>,
         "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH crypto v2] crypto: blake2s - remove shash module
-Thread-Topic: [PATCH crypto v2] crypto: blake2s - remove shash module
-Thread-Index: AQHYcrcaP7gQRKQBI0K/b88268hXeq03CmUA
-Date:   Mon, 30 May 2022 07:37:18 +0000
-Message-ID: <7719057c0de047ebacea46ab9588da44@AcuMS.aculab.com>
-References: <YpCGQvpirQWaAiRF@zx2c4.com>
- <20220527081106.63227-1-Jason@zx2c4.com> <YpGeIT1KHv9QwF4X@sol.localdomain>
- <YpHx7arH4lLaZuhm@zx2c4.com> <YpJZqJd9j1gEOdTe@sol.localdomain>
-In-Reply-To: <YpJZqJd9j1gEOdTe@sol.localdomain>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers
-> Sent: 28 May 2022 18:20
-> 
-> On Sat, May 28, 2022 at 11:57:01AM +0200, Jason A. Donenfeld wrote:
-> > > Also, the wrong value is being passed for the 'inc' argument.
-> >
-> > Are you sure? Not sure I'm seeing what you are on first glance.
-> 
-> Yes, 'inc' is the increment amount per block.  It needs to always be
-> BLAKE2S_BLOCK_SIZE unless a partial block is being processed.
+On 5/30/22, David Laight <David.Laight@aculab.com> wrote:
+> From: Eric Biggers
+>> Sent: 28 May 2022 18:20
+>>
+>> On Sat, May 28, 2022 at 11:57:01AM +0200, Jason A. Donenfeld wrote:
+>> > > Also, the wrong value is being passed for the 'inc' argument.
+>> >
+>> > Are you sure? Not sure I'm seeing what you are on first glance.
+>>
+>> Yes, 'inc' is the increment amount per block.  It needs to always be
+>> BLAKE2S_BLOCK_SIZE unless a partial block is being processed.
+>
+> IIRC it isn't used for partial blocks.
+> Which rather begs the question as to why it is a parameter at all.
 
-IIRC it isn't used for partial blocks.
-Which rather begs the question as to why it is a parameter at all.
+Again, with blake2s, please send a patch if you think there's an
+improvement to be made.
 
-	David
+In this case, I don't think you're right. See blake2s_final.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Jason
