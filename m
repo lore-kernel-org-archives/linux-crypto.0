@@ -2,180 +2,126 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6CFC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 May 2022 09:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3065C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 May 2022 10:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234962AbiE3J6O (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 May 2022 05:58:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48820 "EHLO
+        id S231576AbiE3KJV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 30 May 2022 06:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234521AbiE3J6N (ORCPT
+        with ESMTP id S235095AbiE3KJU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 May 2022 05:58:13 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C669171D8D;
-        Mon, 30 May 2022 02:58:12 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8F34F113E;
-        Mon, 30 May 2022 02:58:12 -0700 (PDT)
-Received: from [10.57.82.204] (unknown [10.57.82.204])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7FBD43F73D;
-        Mon, 30 May 2022 02:58:10 -0700 (PDT)
-Message-ID: <49eb2888-712e-7c81-313b-aec58e906778@foss.arm.com>
-Date:   Mon, 30 May 2022 10:58:13 +0100
+        Mon, 30 May 2022 06:09:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 587CA7B9CA;
+        Mon, 30 May 2022 03:09:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 12E20B80CEE;
+        Mon, 30 May 2022 10:09:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA09C34119;
+        Mon, 30 May 2022 10:09:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653905356;
+        bh=/kppvhYwD8/XAUtnmJGkTh0/Ss6kFj/Di0BL20r+ByY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=FJWwmKAoz1OhR0fCXaw00w8fpI0D5h7Kf9X+efPrrCEfyMERp9hKgiUrJosKGQitv
+         Vytjn5kzWtH/P8LCemSknMl+TzlBPTf8NLWRxki0Ax406pk05vMK3XS4yOLFhlmrP9
+         kT/9NExxMXxolh/idTx4hsJYae4PHtqR23Q+V8zSuRIw/fXjhkDek8ZSezuf8rvtwW
+         fAzUR1/z1tNvy7Xj+2xIoirIHAuO0zGXWLWffCb9AH1ZJKYagw5++jDVJOSE8SqKFz
+         zJ+qKBIVcC5EY6UtT0qolpuQqng4eczB3h5CJmd2yyrS+4VoWdS0tYpuUhEdnIYnfw
+         tFGFa8WI1UWbw==
+Received: by mail-ot1-f43.google.com with SMTP id e11-20020a9d6e0b000000b0060afcbafa80so7406146otr.3;
+        Mon, 30 May 2022 03:09:16 -0700 (PDT)
+X-Gm-Message-State: AOAM531SnS3dnRwh1/wMhThx3QKXH9f3X8fb+7ekiiPe8ocq/QUEU9e8
+        K+ztaQvkA6qPDsT+oLI3LTfrw2lexZc9VOLXIAQ=
+X-Google-Smtp-Source: ABdhPJxlYII5iC3+bAlEIZXSUojaOxYZF3pyifh19p4ELiRg5+9LGZcvlwIiQk+X/1RMsijPyi+2Rn3qVYB6vhveKJk=
+X-Received: by 2002:a9d:76d5:0:b0:60b:1882:78bd with SMTP id
+ p21-20020a9d76d5000000b0060b188278bdmr13976917otl.71.1653905355895; Mon, 30
+ May 2022 03:09:15 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-To:     ardb@kernel.org
-Cc:     andre.przywara@arm.com, davem@davemloft.net,
-        giovanni.cabiddu@intel.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        qat-linux@intel.com, yoan.picchi@arm.com
 References: <CAMj1kXEF6KV=3CXhaRKygBs9hvun7=bKRua5NbWOrksaZBgtCQ@mail.gmail.com>
+ <49eb2888-712e-7c81-313b-aec58e906778@foss.arm.com>
+In-Reply-To: <49eb2888-712e-7c81-313b-aec58e906778@foss.arm.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon, 30 May 2022 12:09:04 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEj6eGT8LszJTgBAec3Aq9tgsPC-cByGJ1vEXKny3Ui5Q@mail.gmail.com>
+Message-ID: <CAMj1kXEj6eGT8LszJTgBAec3Aq9tgsPC-cByGJ1vEXKny3Ui5Q@mail.gmail.com>
 Subject: Re: [RFC PATCH 2/2] Removes the x86 dependency on the QAT drivers
-Reply-To: yoan.picchi@arm.com
-Content-Language: en-CA
-From:   Yoan Picchi <yoan.picchi@foss.arm.com>
-In-Reply-To: <CAMj1kXEF6KV=3CXhaRKygBs9hvun7=bKRua5NbWOrksaZBgtCQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     yoan.picchi@arm.com
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        qat-linux <qat-linux@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
- > On Wed, 18 May 2022 at 17:55, Andre Przywara <andre.przywara@arm.com> 
-wrote:
- > >
- > > On Tue, 17 May 2022 10:11:09 +0200
- > > Ard Biesheuvel <ardb@kernel.org> wrote:
- > >
- > > Hi,
- > >
- > > > On Mon, 16 May 2022 at 12:16, <yoan.picchi@arm.com> wrote:
- > > > >
- > > > > From: Yoan Picchi <yoan.picchi@arm.com>
- > > > >
- > > > > This dependency looks outdated. After the previous patch, we 
-have been able
- > > > > to use this driver to encrypt some data and to create working 
-VF on arm64.
- > > > >
- > > > > Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
- > > >
- > > > Are you sure the driver is safe for non-coherent DMA as well?
- > >
- > > That depends on your definition of "sure".
- > > We indeed tested this only on a server with coherent PCIe.
- > >
- > > I skimmed through the driver, and it looks like to use the DMA API
- > > correctly:
- > > - I see dma_alloc_coherent() calls for DMA ring buffers.
- > > - There are dma_map_single()/dma_unmap_single() pairs in other parts.
- > > - Accesses to the BARs are capsuled via macros, using readl/writel.
- > > - Access the the SRAM BAR is also only done via those macros.
- > >
- > > I didn't go through the driver systematically, and of course the
- > > interesting parts are the ones you don't see easily, so I am eager 
-to hear
- > > any other opinions on this topic.
- > >
- > > Ard, do you have anything special in mind? Is there something to 
-look out
- > > for, specifically?
- > >
- >
- > If it uses the DMA api consistently and correctly, and works as
- > expected when running under a SMMU, things are probably fine
- >
- > > The few cards we have access to are in some server in the data 
-centre, so
- > > I can't easily walk in with, say a RockPro64, and test this there.
- > >
- >
- > I suppose this implies that you have tested with SMMUs enabled.
+On Mon, 30 May 2022 at 11:58, Yoan Picchi <yoan.picchi@foss.arm.com> wrote:
+>
+>  > On Wed, 18 May 2022 at 17:55, Andre Przywara <andre.przywara@arm.com>
+> wrote:
+>  > >
+>  > > On Tue, 17 May 2022 10:11:09 +0200
+>  > > Ard Biesheuvel <ardb@kernel.org> wrote:
+>  > >
+>  > > Hi,
+>  > >
+>  > > > On Mon, 16 May 2022 at 12:16, <yoan.picchi@arm.com> wrote:
+>  > > > >
+>  > > > > From: Yoan Picchi <yoan.picchi@arm.com>
+>  > > > >
+>  > > > > This dependency looks outdated. After the previous patch, we
+> have been able
+>  > > > > to use this driver to encrypt some data and to create working
+> VF on arm64.
+>  > > > >
+>  > > > > Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+>  > > >
+>  > > > Are you sure the driver is safe for non-coherent DMA as well?
+>  > >
+>  > > That depends on your definition of "sure".
+>  > > We indeed tested this only on a server with coherent PCIe.
+>  > >
+>  > > I skimmed through the driver, and it looks like to use the DMA API
+>  > > correctly:
+>  > > - I see dma_alloc_coherent() calls for DMA ring buffers.
+>  > > - There are dma_map_single()/dma_unmap_single() pairs in other parts.
+>  > > - Accesses to the BARs are capsuled via macros, using readl/writel.
+>  > > - Access the the SRAM BAR is also only done via those macros.
+>  > >
+>  > > I didn't go through the driver systematically, and of course the
+>  > > interesting parts are the ones you don't see easily, so I am eager
+> to hear
+>  > > any other opinions on this topic.
+>  > >
+>  > > Ard, do you have anything special in mind? Is there something to
+> look out
+>  > > for, specifically?
+>  > >
+>  >
+>  > If it uses the DMA api consistently and correctly, and works as
+>  > expected when running under a SMMU, things are probably fine
+>  >
+>  > > The few cards we have access to are in some server in the data
+> centre, so
+>  > > I can't easily walk in with, say a RockPro64, and test this there.
+>  > >
+>  >
+>  > I suppose this implies that you have tested with SMMUs enabled.
+>
+> Sorry for the delay, I was away for a few days.
+> Actually, our previous attempts were with the iommu set to passthrough,
+> but I
+> just tested without the passthrough and it works the same way.
 
-Sorry for the delay, I was away for a few days.
-Actually, our previous attempts were with the iommu set to passthrough, 
-but I
-just tested without the passthrough and it works the same way.
- >
- > > >
- > > > > ---
- > > > >  drivers/crypto/qat/Kconfig | 14 +++++++-------
- > > > >  1 file changed, 7 insertions(+), 7 deletions(-)
- > > > >
- > > > > diff --git a/drivers/crypto/qat/Kconfig 
-b/drivers/crypto/qat/Kconfig
- > > > > index 4b90c0f22b03..88df2cf4cac9 100644
- > > > > --- a/drivers/crypto/qat/Kconfig
- > > > > +++ b/drivers/crypto/qat/Kconfig
- > > > > @@ -17,7 +17,7 @@ config CRYPTO_DEV_QAT
- > > > >
- > > > >  config CRYPTO_DEV_QAT_DH895xCC
- > > > >         tristate "Support for Intel(R) DH895xCC"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > >           Support for Intel(R) DH895xcc with Intel(R) 
-QuickAssist Technology
- > > > > @@ -28,7 +28,7 @@ config CRYPTO_DEV_QAT_DH895xCC
- > > > >
- > > > >  config CRYPTO_DEV_QAT_C3XXX
- > > > >         tristate "Support for Intel(R) C3XXX"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > >           Support for Intel(R) C3xxx with Intel(R) QuickAssist 
-Technology
- > > > > @@ -39,7 +39,7 @@ config CRYPTO_DEV_QAT_C3XXX
- > > > >
- > > > >  config CRYPTO_DEV_QAT_C62X
- > > > >         tristate "Support for Intel(R) C62X"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > >           Support for Intel(R) C62x with Intel(R) QuickAssist 
-Technology
- > > > > @@ -50,7 +50,7 @@ config CRYPTO_DEV_QAT_C62X
- > > > >
- > > > >  config CRYPTO_DEV_QAT_4XXX
- > > > >         tristate "Support for Intel(R) QAT_4XXX"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > >           Support for Intel(R) QuickAssist Technology QAT_4xxx
- > > > > @@ -61,7 +61,7 @@ config CRYPTO_DEV_QAT_4XXX
- > > > >
- > > > >  config CRYPTO_DEV_QAT_DH895xCCVF
- > > > >         tristate "Support for Intel(R) DH895xCC Virtual Function"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select PCI_IOV
- > > > >         select CRYPTO_DEV_QAT
- > > > >
- > > > > @@ -74,7 +74,7 @@ config CRYPTO_DEV_QAT_DH895xCCVF
- > > > >
- > > > >  config CRYPTO_DEV_QAT_C3XXXVF
- > > > >         tristate "Support for Intel(R) C3XXX Virtual Function"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select PCI_IOV
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > > @@ -86,7 +86,7 @@ config CRYPTO_DEV_QAT_C3XXXVF
- > > > >
- > > > >  config CRYPTO_DEV_QAT_C62XVF
- > > > >         tristate "Support for Intel(R) C62X Virtual Function"
- > > > > -       depends on X86 && PCI
- > > > > +       depends on PCI
- > > > >         select PCI_IOV
- > > > >         select CRYPTO_DEV_QAT
- > > > >         help
- > > > > --
- > > > > 2.25.1
- > > > >
- > >
+Thanks for confirming.
+
+So this looks fine to me as far as un-x86-like DMA topologies are
+concerned. I do agree that big-endian should be forbidden or tested
+thoroughly as well.
