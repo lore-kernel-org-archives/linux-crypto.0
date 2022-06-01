@@ -2,157 +2,291 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FD2C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jun 2022 14:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0383FC43334
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jun 2022 20:45:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354587AbiFAOEv (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jun 2022 10:04:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54410 "EHLO
+        id S230108AbiFAUpX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Jun 2022 16:45:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354385AbiFAOEP (ORCPT
+        with ESMTP id S229696AbiFAUpN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jun 2022 10:04:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70743AB0DD;
-        Wed,  1 Jun 2022 06:58:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 456616149F;
-        Wed,  1 Jun 2022 13:58:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B486CC385A5;
-        Wed,  1 Jun 2022 13:58:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654091922;
-        bh=iYB6LJ0axj8BzdWtlbpeeA22i2OHpc068qkkxc4c3f8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gjYSriit9i2vlh5ACEN5UHpM98a76lyVeE3JfmfoSehvA5t3g7hdzOWvlUVWdnE8Q
-         tlNF0hNUfUzXd8ti/pKGWMp0ivFh9Q5SWVQTVoNVwAw6GpG0Q2CmsLcnjjgjj6F9Jx
-         gpzfJcLDEGsdRac7MKTVpeUpkRM1TeUEcMev5FTvPv72zcBh69MldeX6105TNDb4u6
-         Cs14oSiG7h/MROqVZovPLK/LAet5P27peuXKUd5hPMaiqsZ0pZhQXFAGNsUv0iBVrU
-         4Y7m2ssN0vv8Mr1bPy3/yI2iCKu/pVtnol1Nbe2VGjLnecqV+KO7yjYX/VYtlCYNEb
-         f5KBr5LxBbq8w==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Haren Myneni <haren@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
-        npiggin@gmail.com, linuxppc-dev@lists.ozlabs.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 20/26] powerpc/powernv/vas: Assign real address to rx_fifo in vas_rx_win_attr
-Date:   Wed,  1 Jun 2022 09:57:53 -0400
-Message-Id: <20220601135759.2004435-20-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220601135759.2004435-1-sashal@kernel.org>
-References: <20220601135759.2004435-1-sashal@kernel.org>
+        Wed, 1 Jun 2022 16:45:13 -0400
+Received: from smtp.smtpout.orange.fr (smtp06.smtpout.orange.fr [80.12.242.128])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF419258DFF
+        for <linux-crypto@vger.kernel.org>; Wed,  1 Jun 2022 13:30:12 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id wUyenfSGZP8ApwUyeno3EU; Wed, 01 Jun 2022 22:30:10 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Wed, 01 Jun 2022 22:30:10 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <56f0c3cb-c17f-6bc1-f621-09e0c2e5e62f@wanadoo.fr>
+Date:   Wed, 1 Jun 2022 22:30:00 +0200
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 5/5] crypto: aspeed: add HACE crypto driver
+Content-Language: fr
+To:     Neal Liu <neal_liu@aspeedtech.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Johnny Huang <johnny_huang@aspeedtech.com>
+Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <20220601054204.1522976-1-neal_liu@aspeedtech.com>
+ <20220601054204.1522976-6-neal_liu@aspeedtech.com>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20220601054204.1522976-6-neal_liu@aspeedtech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Haren Myneni <haren@linux.ibm.com>
+Le 01/06/2022 à 07:42, Neal Liu a écrit :
+ > Add HACE crypto driver to support symmetric-key
+ > encryption and decryption with multiple modes of
+ > operation.
+ >
+ > Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+ > Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+ > ---
+ >   drivers/crypto/aspeed/Kconfig              |   16 +
+ >   drivers/crypto/aspeed/Makefile             |    2 +
+ >   drivers/crypto/aspeed/aspeed-hace-crypto.c | 1019 ++++++++++++++++++++
+ >   drivers/crypto/aspeed/aspeed-hace.c        |  101 +-
+ >   drivers/crypto/aspeed/aspeed-hace.h        |  107 ++
+ >   5 files changed, 1242 insertions(+), 3 deletions(-)
+ >   create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
+ >
+ > diff --git a/drivers/crypto/aspeed/Kconfig 
+b/drivers/crypto/aspeed/Kconfig
+ > index 17b800286a51..5e4d18288bf1 100644
+[...]
 
-[ Upstream commit c127d130f6d59fa81701f6b04023cf7cd1972fb3 ]
+ > +int aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
+ > +{
+ > +	int rc, i;
+ > +
+ > +	for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs); i++) {
+ > +		aspeed_crypto_algs[i].hace_dev = hace_dev;
+ > +		rc = crypto_register_skcipher(&aspeed_crypto_algs[i].alg.skcipher);
+ > +		if (rc)
+ > +			return rc;
+ > +	}
+ > +
+ > +	if (hace_dev->version == AST2600_VERSION) {
+ > +		for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs_g6); i++) {
+ > +			aspeed_crypto_algs_g6[i].hace_dev = hace_dev;
+ > +			rc = crypto_register_skcipher(
+ > +				&aspeed_crypto_algs_g6[i].alg.skcipher);
+ > +			if (rc)
+ > +				return rc;
+ > +		}
+ > +	}
+Should there be some kind of error handling here, in order to undo 
+things already done if an error occures?
 
-In init_winctx_regs(), __pa() is called on winctx->rx_fifo and this
-function is called to initialize registers for receive and fault
-windows. But the real address is passed in winctx->rx_fifo for
-receive windows and the virtual address for fault windows which
-causes errors with DEBUG_VIRTUAL enabled. Fixes this issue by
-assigning only real address to rx_fifo in vas_rx_win_attr struct
-for both receive and fault windows.
+ > +
+ > +	return 0;
+ > +}
+ > diff --git a/drivers/crypto/aspeed/aspeed-hace.c 
+b/drivers/crypto/aspeed/aspeed-hace.c
+ > index f25b13d120e8..f7f90c230843 100644
+ > --- a/drivers/crypto/aspeed/aspeed-hace.c
+ > +++ b/drivers/crypto/aspeed/aspeed-hace.c
+ > @@ -40,10 +40,30 @@ void __weak 
+aspeed_unregister_hace_hash_algs(struct aspeed_hace_dev *hace_dev)
+ >   	pr_warn("%s: Not supported yet\n", __func__);
+ >   }
+ >
+ > +/* Weak function for HACE crypto */
+ > +int __weak aspeed_hace_crypto_handle_queue(struct aspeed_hace_dev 
+*hace_dev,
+ > +					   struct crypto_async_request *new_areq)
+ > +{
+ > +	pr_warn("%s: Not supported yet\n", __func__);
+ > +	return -EINVAL;
+ > +}
+ > +
+ > +int __weak aspeed_register_hace_crypto_algs(struct aspeed_hace_dev 
+*hace_dev)
+ > +{
+ > +	pr_warn("%s: Not supported yet\n", __func__);
+ > +	return -EINVAL;
+ > +}
+ > +
+ > +void __weak aspeed_unregister_hace_crypto_algs(struct 
+aspeed_hace_dev *hace_dev)
+ > +{
+ > +	pr_warn("%s: Not supported yet\n", __func__);
+ > +}
+ > +
+ >   /* HACE interrupt service routine */
+ >   static irqreturn_t aspeed_hace_irq(int irq, void *dev)
+ >   {
+ >   	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)dev;
+ > +	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
+ >   	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
+ >   	u32 sts;
+ >
+ > @@ -56,12 +76,36 @@ static irqreturn_t aspeed_hace_irq(int irq, void 
+*dev)
+ >   		if (hash_engine->flags & CRYPTO_FLAGS_BUSY)
+ >   			tasklet_schedule(&hash_engine->done_task);
+ >   		else
+ > -			dev_warn(hace_dev->dev, "no active requests.\n");
+ > +			dev_warn(hace_dev->dev, "HASH no active requests.\n");
+To reduce diff, maybe this could already be part of patch 1/5?
 
-Reported-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/338e958c7ab8f3b266fa794a1f80f99b9671829e.camel@linux.ibm.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/powerpc/include/asm/vas.h              | 2 +-
- arch/powerpc/platforms/powernv/vas-fault.c  | 2 +-
- arch/powerpc/platforms/powernv/vas-window.c | 4 ++--
- arch/powerpc/platforms/powernv/vas.h        | 2 +-
- drivers/crypto/nx/nx-common-powernv.c       | 2 +-
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ > +	}
+ > +
+ > +	if (sts & HACE_CRYPTO_ISR) {
+ > +		if (crypto_engine->flags & CRYPTO_FLAGS_BUSY)
+ > +			tasklet_schedule(&crypto_engine->done_task);
+ > +		else
+ > +			dev_warn(hace_dev->dev, "CRYPTO no active requests.\n");
+ >   	}
+ >
+ >   	return IRQ_HANDLED;
+ >   }
+ >
+ > +static void aspeed_hace_cryptro_done_task(unsigned long data)
+ > +{
+ > +	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
+ > +	struct aspeed_engine_crypto *crypto_engine;
+ > +
+ > +	crypto_engine = &hace_dev->crypto_engine;
+ > +	crypto_engine->is_async = true;
+ > +	crypto_engine->resume(hace_dev);
+ > +}
+ > +
+ > +static void aspeed_hace_crypto_queue_task(unsigned long data)
+ > +{
+ > +	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
+ > +
+ > +	aspeed_hace_crypto_handle_queue(hace_dev, NULL);
+ > +}
+ > +
+ >   static void aspeed_hace_hash_done_task(unsigned long data)
+ >   {
+ >   	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
+ > @@ -79,12 +123,27 @@ static void aspeed_hace_hash_queue_task(unsigned 
+long data)
+ >
+ >   static int aspeed_hace_register(struct aspeed_hace_dev *hace_dev)
+ >   {
+ > -	return aspeed_register_hace_hash_algs(hace_dev);
+ > +	int rc1, rc2;
+ > +
+ > +	rc1 = aspeed_register_hace_hash_algs(hace_dev);
+ > +	if (rc1) {
+ > +		HACE_DBG(hace_dev, "Failed to register hash alg, rc:0x%x\n",
+ > +			 rc1);
+ > +	}
+ > +
+ > +	rc2 = aspeed_register_hace_crypto_algs(hace_dev);
+ > +	if (rc2) {
+ > +		HACE_DBG(hace_dev, "Failed to register crypto alg, rc:0x%x\n",
+ > +			 rc2);
+ > +	}
+ > +
+ > +	return rc1 + rc2;
+This looks odd. The error returned could finally be pointless if both 
+rc1 and rc2 are not 0.
 
-diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/vas.h
-index e33f80b0ea81..47062b457049 100644
---- a/arch/powerpc/include/asm/vas.h
-+++ b/arch/powerpc/include/asm/vas.h
-@@ -52,7 +52,7 @@ enum vas_cop_type {
-  * Receive window attributes specified by the (in-kernel) owner of window.
-  */
- struct vas_rx_win_attr {
--	void *rx_fifo;
-+	u64 rx_fifo;
- 	int rx_fifo_size;
- 	int wcreds_max;
- 
-diff --git a/arch/powerpc/platforms/powernv/vas-fault.c b/arch/powerpc/platforms/powernv/vas-fault.c
-index 3d21fce254b7..dd9c23c09781 100644
---- a/arch/powerpc/platforms/powernv/vas-fault.c
-+++ b/arch/powerpc/platforms/powernv/vas-fault.c
-@@ -352,7 +352,7 @@ int vas_setup_fault_window(struct vas_instance *vinst)
- 	vas_init_rx_win_attr(&attr, VAS_COP_TYPE_FAULT);
- 
- 	attr.rx_fifo_size = vinst->fault_fifo_size;
--	attr.rx_fifo = vinst->fault_fifo;
-+	attr.rx_fifo = __pa(vinst->fault_fifo);
- 
- 	/*
- 	 * Max creds is based on number of CRBs can fit in the FIFO.
-diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
-index 7ba0840fc3b5..3a86cdd5ae6c 100644
---- a/arch/powerpc/platforms/powernv/vas-window.c
-+++ b/arch/powerpc/platforms/powernv/vas-window.c
-@@ -403,7 +403,7 @@ static void init_winctx_regs(struct vas_window *window,
- 	 *
- 	 * See also: Design note in function header.
- 	 */
--	val = __pa(winctx->rx_fifo);
-+	val = winctx->rx_fifo;
- 	val = SET_FIELD(VAS_PAGE_MIGRATION_SELECT, val, 0);
- 	write_hvwc_reg(window, VREG(LFIFO_BAR), val);
- 
-@@ -737,7 +737,7 @@ static void init_winctx_for_rxwin(struct vas_window *rxwin,
- 		 */
- 		winctx->fifo_disable = true;
- 		winctx->intr_disable = true;
--		winctx->rx_fifo = NULL;
-+		winctx->rx_fifo = 0;
- 	}
- 
- 	winctx->lnotify_lpid = rxattr->lnotify_lpid;
-diff --git a/arch/powerpc/platforms/powernv/vas.h b/arch/powerpc/platforms/powernv/vas.h
-index 70f793e8f6cc..1f6e73809205 100644
---- a/arch/powerpc/platforms/powernv/vas.h
-+++ b/arch/powerpc/platforms/powernv/vas.h
-@@ -383,7 +383,7 @@ struct vas_window {
-  * is a container for the register fields in the window context.
-  */
- struct vas_winctx {
--	void *rx_fifo;
-+	u64 rx_fifo;
- 	int rx_fifo_size;
- 	int wcreds_max;
- 	int rsvd_txbuf_count;
-diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
-index 13c65deda8e9..8a4f10bb3fcd 100644
---- a/drivers/crypto/nx/nx-common-powernv.c
-+++ b/drivers/crypto/nx/nx-common-powernv.c
-@@ -827,7 +827,7 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
- 		goto err_out;
- 
- 	vas_init_rx_win_attr(&rxattr, coproc->ct);
--	rxattr.rx_fifo = (void *)rx_fifo;
-+	rxattr.rx_fifo = rx_fifo;
- 	rxattr.rx_fifo_size = fifo_size;
- 	rxattr.lnotify_lpid = lpid;
- 	rxattr.lnotify_pid = pid;
--- 
-2.35.1
+ >   }
+ >
+ >   static void aspeed_hace_unregister(struct aspeed_hace_dev *hace_dev)
+ >   {
+ >   	aspeed_unregister_hace_hash_algs(hace_dev);
+ > +	aspeed_unregister_hace_crypto_algs(hace_dev);
+ >   }
+ >
+ >   static const struct of_device_id aspeed_hace_of_matches[] = {
+ > @@ -95,6 +154,7 @@ static const struct of_device_id 
+aspeed_hace_of_matches[] = {
+ >
+ >   static int aspeed_hace_probe(struct platform_device *pdev)
+ >   {
+ > +	struct aspeed_engine_crypto *crypto_engine;
+ >   	const struct of_device_id *hace_dev_id;
+ >   	struct aspeed_engine_hash *hash_engine;
+ >   	struct aspeed_hace_dev *hace_dev;
+ > @@ -115,6 +175,7 @@ static int aspeed_hace_probe(struct 
+platform_device *pdev)
+ >   	hace_dev->dev = &pdev->dev;
+ >   	hace_dev->version = (unsigned long)hace_dev_id->data;
+ >   	hash_engine = &hace_dev->hash_engine;
+ > +	crypto_engine = &hace_dev->crypto_engine;
+ >
+ >   	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ >
+ > @@ -127,6 +188,13 @@ static int aspeed_hace_probe(struct 
+platform_device *pdev)
+ >   		     (unsigned long)hace_dev);
+ >   	crypto_init_queue(&hash_engine->queue, ASPEED_HASH_QUEUE_LENGTH);
+ >
+ > +	spin_lock_init(&crypto_engine->lock);
+ > +	tasklet_init(&crypto_engine->done_task, aspeed_hace_cryptro_done_task,
+ > +		     (unsigned long)hace_dev);
+ > +	tasklet_init(&crypto_engine->queue_task, aspeed_hace_crypto_queue_task,
+ > +		     (unsigned long)hace_dev);
+ > +	crypto_init_queue(&crypto_engine->queue, ASPEED_HASH_QUEUE_LENGTH);
+ > +
+ >   	hace_dev->regs = devm_ioremap_resource(&pdev->dev, res);
+ >   	if (!hace_dev->regs) {
+ >   		dev_err(&pdev->dev, "Failed to map resources\n");
+ > @@ -168,9 +236,36 @@ static int aspeed_hace_probe(struct 
+platform_device *pdev)
+ >   		return -ENOMEM;
+ >   	}
+ >
+ > +	crypto_engine->cipher_ctx =
+ > +		dma_alloc_coherent(&pdev->dev,
+ > +				   PAGE_SIZE,
+ > +				   &crypto_engine->cipher_ctx_dma,
+ > +				   GFP_KERNEL);
+Should all these dma_alloc_coherent() be undone in the error handling 
+path of the probe and in the .rmove function?
+If applicable, maybe dmam_alloc_coherent() would ease? realeasing of 
+resources?
 
+ > +	crypto_engine->cipher_addr =
+ > +		dma_alloc_coherent(&pdev->dev,
+ > +				   ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
+ > +				   &crypto_engine->cipher_dma_addr,
+ > +				   GFP_KERNEL);
+ > +	if (!crypto_engine->cipher_ctx || !crypto_engine->cipher_addr) {
+ > +		dev_err(&pdev->dev, "Failed to allocate cipher dma\n");
+ > +		return -ENOMEM;
+ > +	}
+ > +
+ > +	if (hace_dev->version == AST2600_VERSION) {
+ > +		crypto_engine->dst_sg_addr =
+ > +			dma_alloc_coherent(&pdev->dev,
+ > +					   ASPEED_CRYPTO_DST_DMA_BUF_LEN,
+ > +					   &crypto_engine->dst_sg_dma_addr,
+ > +					   GFP_KERNEL);
+ > +		if (!crypto_engine->dst_sg_addr) {
+ > +			dev_err(&pdev->dev, "Failed to allocate dst_sg dma\n");
+ > +			return -ENOMEM;
+ > +		}
+ > +	}
+ > +
+ >   	rc = aspeed_hace_register(hace_dev);
+ >   	if (rc) {
+ > -		dev_err(&pdev->dev, "Failed to register hash alg, rc:0x%x\n", rc);
+ > +		dev_err(&pdev->dev, "Failed to register algs, rc:0x%x\n", rc);
+To reduce diff, maybe this could already be part of patch 1/5?
+
+ >   		rc = 0;
+ >   	}
+ >   [...]
