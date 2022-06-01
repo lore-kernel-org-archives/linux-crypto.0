@@ -2,50 +2,50 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB40CCA46F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jun 2022 13:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D450CCA468
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jun 2022 14:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354099AbiFAN7b (ORCPT
+        id S1354193AbiFAOCL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jun 2022 09:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59436 "EHLO
+        Wed, 1 Jun 2022 10:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354050AbiFAN64 (ORCPT
+        with ESMTP id S1355002AbiFAOBL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jun 2022 09:58:56 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12588A0058;
-        Wed,  1 Jun 2022 06:55:57 -0700 (PDT)
+        Wed, 1 Jun 2022 10:01:11 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637E252B32;
+        Wed,  1 Jun 2022 06:57:41 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 70EFDCE1AF2;
-        Wed,  1 Jun 2022 13:55:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E67E9C3411E;
-        Wed,  1 Jun 2022 13:55:54 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 18540B81B33;
+        Wed,  1 Jun 2022 13:56:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5FB1C385B8;
+        Wed,  1 Jun 2022 13:56:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654091755;
-        bh=ynjdX7sqIzj3XGbBUvL+J2pZWNuexzQpo7a/4F/yD1M=;
+        s=k20201202; t=1654091795;
+        bh=VZt2nOdWMwFzurUHIONWPqfBKwllbRhQspuztDZ+FDA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tJU6CMFqK+JBfaDiWNzVhvkaJSjREMOeUTZSeCoMAO9lNzsBfFVKt3reLwfvl2Bdk
-         1e7yzX6dVJfnjlIVeCMYCu1Jz62SFMAhoKtOJv8FsLnq5pyKdwVa0NFJfSd2pH8dXr
-         4IPUpzg24d1SGRm4KHOxpSkRMM6u9qlSrR/BsERn1up6z5R7Avx1egj+g2SKouorli
-         W/B3vIE2ZZ/m6f8BVp4WisYgRC5jPMEnCs738bSTFtIhpIq+daXIF0QneoaGOqX3xD
-         M4kLgDl4x1P3zStT0oT0gdUsWVmCfZZbtFCPfKmiLrmapOhvPftJJIQq906IxY4wxb
-         XelbwRgNMrl4Q==
+        b=Hqo6kcNtBcYn78ATlEgN9Cm3FVZ8RMQKdAAufsGiRsCSHaBQId6txdvfvY8nCyXtk
+         wUtjrx3/WdPUXPFvxEWs+fcGAc+levteYEqJdh78UnCxCtxNQbMWPzrMoZqDh0ZmPH
+         IwPN7sE4Dci8AOnWNaldNAI+YgB2ic+XvF7ZH359gRHukFbrkG59EEL3sEYTpk5p9x
+         BnYZ/r+wRDyfP1DN9+DGTIclNANWuILUSk12BTkBE3izuLpLmCvVIUjrC4hDYVJJq0
+         yWkaIRpXJcFbZ9++oS9LJAPyo3MVruTWx//KP4V60M4kWr7Gl4l3iZnUvlkAkwAv6e
+         Lw8YgBazDFmWw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Haren Myneni <haren@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, davem@davemloft.net,
-        npiggin@gmail.com, linuxppc-dev@lists.ozlabs.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 38/48] powerpc/powernv/vas: Assign real address to rx_fifo in vas_rx_win_attr
-Date:   Wed,  1 Jun 2022 09:54:11 -0400
-Message-Id: <20220601135421.2003328-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 08/37] crypto: ccree - use fine grained DMA mapping dir
+Date:   Wed,  1 Jun 2022 09:55:53 -0400
+Message-Id: <20220601135622.2003939-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220601135421.2003328-1-sashal@kernel.org>
-References: <20220601135421.2003328-1-sashal@kernel.org>
+In-Reply-To: <20220601135622.2003939-1-sashal@kernel.org>
+References: <20220601135622.2003939-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,105 +54,115 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Haren Myneni <haren@linux.ibm.com>
+From: Gilad Ben-Yossef <gilad@benyossef.com>
 
-[ Upstream commit c127d130f6d59fa81701f6b04023cf7cd1972fb3 ]
+[ Upstream commit a260436c98171cd825955a84a7f6e62bc8f4f00d ]
 
-In init_winctx_regs(), __pa() is called on winctx->rx_fifo and this
-function is called to initialize registers for receive and fault
-windows. But the real address is passed in winctx->rx_fifo for
-receive windows and the virtual address for fault windows which
-causes errors with DEBUG_VIRTUAL enabled. Fixes this issue by
-assigning only real address to rx_fifo in vas_rx_win_attr struct
-for both receive and fault windows.
+Use a fine grained specification of DMA mapping directions
+in certain cases, allowing both a more optimized operation
+as well as shushing out a harmless, though persky
+dma-debug warning.
 
-Reported-by: Michael Ellerman <mpe@ellerman.id.au>
-Signed-off-by: Haren Myneni <haren@linux.ibm.com>
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-Link: https://lore.kernel.org/r/338e958c7ab8f3b266fa794a1f80f99b9671829e.camel@linux.ibm.com
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/powerpc/include/asm/vas.h              | 2 +-
- arch/powerpc/platforms/powernv/vas-fault.c  | 2 +-
- arch/powerpc/platforms/powernv/vas-window.c | 4 ++--
- arch/powerpc/platforms/powernv/vas.h        | 2 +-
- drivers/crypto/nx/nx-common-powernv.c       | 2 +-
- 5 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/ccree/cc_buffer_mgr.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/vas.h
-index 57573d9c1e09..56834a8a1465 100644
---- a/arch/powerpc/include/asm/vas.h
-+++ b/arch/powerpc/include/asm/vas.h
-@@ -112,7 +112,7 @@ static inline void vas_user_win_add_mm_context(struct vas_user_win_ref *ref)
-  * Receive window attributes specified by the (in-kernel) owner of window.
-  */
- struct vas_rx_win_attr {
--	void *rx_fifo;
-+	u64 rx_fifo;
- 	int rx_fifo_size;
- 	int wcreds_max;
- 
-diff --git a/arch/powerpc/platforms/powernv/vas-fault.c b/arch/powerpc/platforms/powernv/vas-fault.c
-index a7aabc18039e..c1bfad56447d 100644
---- a/arch/powerpc/platforms/powernv/vas-fault.c
-+++ b/arch/powerpc/platforms/powernv/vas-fault.c
-@@ -216,7 +216,7 @@ int vas_setup_fault_window(struct vas_instance *vinst)
- 	vas_init_rx_win_attr(&attr, VAS_COP_TYPE_FAULT);
- 
- 	attr.rx_fifo_size = vinst->fault_fifo_size;
--	attr.rx_fifo = vinst->fault_fifo;
-+	attr.rx_fifo = __pa(vinst->fault_fifo);
- 
- 	/*
- 	 * Max creds is based on number of CRBs can fit in the FIFO.
-diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
-index 0f8d39fbf2b2..0072682531d8 100644
---- a/arch/powerpc/platforms/powernv/vas-window.c
-+++ b/arch/powerpc/platforms/powernv/vas-window.c
-@@ -404,7 +404,7 @@ static void init_winctx_regs(struct pnv_vas_window *window,
- 	 *
- 	 * See also: Design note in function header.
- 	 */
--	val = __pa(winctx->rx_fifo);
-+	val = winctx->rx_fifo;
- 	val = SET_FIELD(VAS_PAGE_MIGRATION_SELECT, val, 0);
- 	write_hvwc_reg(window, VREG(LFIFO_BAR), val);
- 
-@@ -739,7 +739,7 @@ static void init_winctx_for_rxwin(struct pnv_vas_window *rxwin,
- 		 */
- 		winctx->fifo_disable = true;
- 		winctx->intr_disable = true;
--		winctx->rx_fifo = NULL;
-+		winctx->rx_fifo = 0;
+diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
+index 11e0278c8631..6140e4927322 100644
+--- a/drivers/crypto/ccree/cc_buffer_mgr.c
++++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+@@ -356,12 +356,14 @@ void cc_unmap_cipher_request(struct device *dev, void *ctx,
+ 			      req_ctx->mlli_params.mlli_dma_addr);
  	}
  
- 	winctx->lnotify_lpid = rxattr->lnotify_lpid;
-diff --git a/arch/powerpc/platforms/powernv/vas.h b/arch/powerpc/platforms/powernv/vas.h
-index 8bb08e395de0..08d9d3d5a22b 100644
---- a/arch/powerpc/platforms/powernv/vas.h
-+++ b/arch/powerpc/platforms/powernv/vas.h
-@@ -376,7 +376,7 @@ struct pnv_vas_window {
-  * is a container for the register fields in the window context.
-  */
- struct vas_winctx {
--	void *rx_fifo;
-+	u64 rx_fifo;
- 	int rx_fifo_size;
- 	int wcreds_max;
- 	int rsvd_txbuf_count;
-diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
-index 32a036ada5d0..f418817c0f43 100644
---- a/drivers/crypto/nx/nx-common-powernv.c
-+++ b/drivers/crypto/nx/nx-common-powernv.c
-@@ -827,7 +827,7 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
- 		goto err_out;
+-	dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
+-	dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+-
+ 	if (src != dst) {
+-		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_BIDIRECTIONAL);
++		dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_TO_DEVICE);
++		dma_unmap_sg(dev, dst, req_ctx->out_nents, DMA_FROM_DEVICE);
+ 		dev_dbg(dev, "Unmapped req->dst=%pK\n", sg_virt(dst));
++		dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
++	} else {
++		dma_unmap_sg(dev, src, req_ctx->in_nents, DMA_BIDIRECTIONAL);
++		dev_dbg(dev, "Unmapped req->src=%pK\n", sg_virt(src));
+ 	}
+ }
  
- 	vas_init_rx_win_attr(&rxattr, coproc->ct);
--	rxattr.rx_fifo = (void *)rx_fifo;
-+	rxattr.rx_fifo = rx_fifo;
- 	rxattr.rx_fifo_size = fifo_size;
- 	rxattr.lnotify_lpid = lpid;
- 	rxattr.lnotify_pid = pid;
+@@ -377,6 +379,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
+ 	u32 dummy = 0;
+ 	int rc = 0;
+ 	u32 mapped_nents = 0;
++	int src_direction = (src != dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
+ 
+ 	req_ctx->dma_buf_type = CC_DMA_BUF_DLLI;
+ 	mlli_params->curr_pool = NULL;
+@@ -399,7 +402,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
+ 	}
+ 
+ 	/* Map the src SGL */
+-	rc = cc_map_sg(dev, src, nbytes, DMA_BIDIRECTIONAL, &req_ctx->in_nents,
++	rc = cc_map_sg(dev, src, nbytes, src_direction, &req_ctx->in_nents,
+ 		       LLI_MAX_NUM_OF_DATA_ENTRIES, &dummy, &mapped_nents);
+ 	if (rc)
+ 		goto cipher_exit;
+@@ -416,7 +419,7 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
+ 		}
+ 	} else {
+ 		/* Map the dst sg */
+-		rc = cc_map_sg(dev, dst, nbytes, DMA_BIDIRECTIONAL,
++		rc = cc_map_sg(dev, dst, nbytes, DMA_FROM_DEVICE,
+ 			       &req_ctx->out_nents, LLI_MAX_NUM_OF_DATA_ENTRIES,
+ 			       &dummy, &mapped_nents);
+ 		if (rc)
+@@ -456,6 +459,7 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
+ 	struct aead_req_ctx *areq_ctx = aead_request_ctx(req);
+ 	unsigned int hw_iv_size = areq_ctx->hw_iv_size;
+ 	struct cc_drvdata *drvdata = dev_get_drvdata(dev);
++	int src_direction = (req->src != req->dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
+ 
+ 	if (areq_ctx->mac_buf_dma_addr) {
+ 		dma_unmap_single(dev, areq_ctx->mac_buf_dma_addr,
+@@ -514,13 +518,11 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
+ 		sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents,
+ 		areq_ctx->assoclen, req->cryptlen);
+ 
+-	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents,
+-		     DMA_BIDIRECTIONAL);
++	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents, src_direction);
+ 	if (req->src != req->dst) {
+ 		dev_dbg(dev, "Unmapping dst sgl: req->dst=%pK\n",
+ 			sg_virt(req->dst));
+-		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents,
+-			     DMA_BIDIRECTIONAL);
++		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents, DMA_FROM_DEVICE);
+ 	}
+ 	if (drvdata->coherent &&
+ 	    areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT &&
+@@ -843,7 +845,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
+ 		else
+ 			size_for_map -= authsize;
+ 
+-		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_BIDIRECTIONAL,
++		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_FROM_DEVICE,
+ 			       &areq_ctx->dst.mapped_nents,
+ 			       LLI_MAX_NUM_OF_DATA_ENTRIES, &dst_last_bytes,
+ 			       &dst_mapped_nents);
+@@ -1056,7 +1058,8 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
+ 		size_to_map += authsize;
+ 	}
+ 
+-	rc = cc_map_sg(dev, req->src, size_to_map, DMA_BIDIRECTIONAL,
++	rc = cc_map_sg(dev, req->src, size_to_map,
++		       (req->src != req->dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL),
+ 		       &areq_ctx->src.mapped_nents,
+ 		       (LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES +
+ 			LLI_MAX_NUM_OF_DATA_ENTRIES),
 -- 
 2.35.1
 
