@@ -2,61 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CF7C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 May 2022 08:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D601C433F5
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jun 2022 05:42:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244851AbiEaIX1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 May 2022 04:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52944 "EHLO
+        id S232507AbiFAFmZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 1 Jun 2022 01:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244819AbiEaIXQ (ORCPT
+        with ESMTP id S231641AbiFAFmY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 May 2022 04:23:16 -0400
-Received: from mail.onlinesuccesses.pl (mail.onlinesuccesses.pl [198.244.150.235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9241A201BC
-        for <linux-crypto@vger.kernel.org>; Tue, 31 May 2022 01:23:15 -0700 (PDT)
-Received: by mail.onlinesuccesses.pl (Postfix, from userid 1002)
-        id 1524BAE2FC; Tue, 31 May 2022 08:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=onlinesuccesses.pl;
-        s=mail; t=1653985055;
-        bh=nE8HqilgMh4dy7+Z8ksfg7Bc9rmPeQtYFq3/3YR2ODU=;
-        h=Date:From:To:Subject:From;
-        b=c29jkHLX6szbAw78DrhXPgFZMx0w68fvrDmCcaoXfB+Iqzf4f6CBPeQiY9GVjh9w5
-         dOeH5vm68sz7Dy5MViVGcZr7gWP5+8CYB4RliV/INQO9A4DdDnNUqQGe4isCntEMSG
-         4MLkBrYSbNqQ9f1R+vfl/PfEJd9+sqvY4CR+WOv5jFDzMuR0qDA7ReTxqhcqk3Q1vw
-         LvJYFl+BS4XcjKd6SK5qe1kx+579vJG8O5PuG5duAB+RDG80MMuIWn+7AhYojSdpgm
-         2cot52+BMqWBv7ihgMEHe5lGvaRQqpxlUKoVh5hljHD25DxEyLE3h21FhQJYvbTgsY
-         ybQxiMcIcEdmg==
-Received: by mail.onlinesuccesses.pl for <linux-crypto@vger.kernel.org>; Tue, 31 May 2022 08:15:36 GMT
-Message-ID: <20220531064501-0.1.4l.1dden.0.ueja213ht8@onlinesuccesses.pl>
-Date:   Tue, 31 May 2022 08:15:36 GMT
-From:   "Wiktor Zielonko" <wiktor.zielonko@onlinesuccesses.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: Ruch z pierwszej pozycji w Google
-X-Mailer: mail.onlinesuccesses.pl
+        Wed, 1 Jun 2022 01:42:24 -0400
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBBF33346
+        for <linux-crypto@vger.kernel.org>; Tue, 31 May 2022 22:42:21 -0700 (PDT)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 2515RncG027922;
+        Wed, 1 Jun 2022 13:27:49 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 1 Jun
+ 2022 13:42:17 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        "Andrew Jeffery" <andrew@aj.id.au>,
+        Johnny Huang <johnny_huang@aspeedtech.com>
+CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH 0/5] Add Aspeed crypto driver for hardware acceleration
+Date:   Wed, 1 Jun 2022 13:41:59 +0800
+Message-ID: <20220601054204.1522976-1-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 2515RncG027922
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+Aspeed Hash and Crypto Engine (HACE) is designed to accelerate the
+throughput of hash data digest, encryption and decryption.
 
-jaki=C5=9B czas temu zg=C5=82osi=C5=82a si=C4=99 do nas firma, kt=C3=B3re=
-j strona internetowa nie pozycjonowa=C5=82a si=C4=99 wysoko w wyszukiwarc=
-e Google.=20
+These patches aim to add Aspeed hash & crypto driver support.
+The hash & crypto driver also pass the run-time self tests that
+take place at algorithm registration.
 
-Na podstawie wykonanego przez nas audytu SEO zoptymalizowali=C5=9Bmy tre=C5=
-=9Bci na stronie pod k=C4=85tem wcze=C5=9Bniej opracowanych s=C5=82=C3=B3=
-w kluczowych. Nasz wewn=C4=99trzny system codziennie analizuje prawid=C5=82=
-owe dzia=C5=82anie witryny.  Dzi=C4=99ki indywidualnej strategii, firma z=
-dobywa coraz wi=C4=99cej Klient=C3=B3w. =20
+Neal Liu (5):
+  crypto: aspeed: Add HACE hash driver
+  dt-bindings: clock: Add AST2600 HACE reset definition
+  ARM: dts: aspeed: Add HACE device controller node
+  dt-bindings: crypto: add documentation for aspeed hace
+  crypto: aspeed: add HACE crypto driver
 
-Czy chcieliby Pa=C5=84stwo zwi=C4=99kszy=C4=87 liczb=C4=99 os=C3=B3b odwi=
-edzaj=C4=85cych stron=C4=99 internetow=C4=85 firmy? M=C3=B3g=C5=82bym prz=
-edstawi=C4=87 ofert=C4=99?=20
+ .../bindings/crypto/aspeed,hace.yaml          |   58 +
+ MAINTAINERS                                   |    7 +
+ arch/arm/boot/dts/aspeed-g6.dtsi              |    9 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/aspeed/Kconfig                 |   38 +
+ drivers/crypto/aspeed/Makefile                |    8 +
+ drivers/crypto/aspeed/aspeed-hace-crypto.c    | 1019 +++++++++++++
+ drivers/crypto/aspeed/aspeed-hace-hash.c      | 1335 +++++++++++++++++
+ drivers/crypto/aspeed/aspeed-hace.c           |  305 ++++
+ drivers/crypto/aspeed/aspeed-hace.h           |  286 ++++
+ include/dt-bindings/clock/ast2600-clock.h     |    1 +
+ 12 files changed, 3068 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,hace.yaml
+ create mode 100644 drivers/crypto/aspeed/Kconfig
+ create mode 100644 drivers/crypto/aspeed/Makefile
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace-hash.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace.h
 
+-- 
+2.25.1
 
-Pozdrawiam serdecznie,
-Wiktor Zielonko
