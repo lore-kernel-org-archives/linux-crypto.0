@@ -2,34 +2,34 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBA1CCA473
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jun 2022 17:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06816CCA484
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jun 2022 17:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345261AbiFCRwV (ORCPT
+        id S1345372AbiFCRwY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Jun 2022 13:52:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        Fri, 3 Jun 2022 13:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346561AbiFCRvR (ORCPT
+        with ESMTP id S1346751AbiFCRv3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Jun 2022 13:51:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 864465520E;
-        Fri,  3 Jun 2022 10:48:36 -0700 (PDT)
+        Fri, 3 Jun 2022 13:51:29 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68A635715E;
+        Fri,  3 Jun 2022 10:49:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 494D8B8241D;
-        Fri,  3 Jun 2022 17:48:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9546FC385A9;
-        Fri,  3 Jun 2022 17:48:33 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CDE78B8241D;
+        Fri,  3 Jun 2022 17:49:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 319C1C385A9;
+        Fri,  3 Jun 2022 17:49:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1654278514;
-        bh=UJYQLVdpOQK+wV5KF+SBi3wrp+2pt2j7/nnYiN29v3U=;
+        s=korg; t=1654278559;
+        bh=ygwq7yfFRXP9bKkF4D16aTkBxZUxyK/GL3hNi2M+PPk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=moQ5wZpeqw4KKNs7aGM1MeNSDpfthuKG8heYj3sLPTjG86QGwyL/ukKMgtX9yUNj1
-         fjnB5O7ikbs98RieOfQSf6cqCtmM/HTJgRdN4C2HHqlzxBLufovxcdEuY7PtCSS4Dt
-         LzmFI4ptCU/RKJTKFYlpP8dBvFT/fZsqF/YKeKe0=
+        b=VmxlhS1U+0k0mMK0G9bMr8K4jxCwBUpokRALtNDv+6jmJrU0OTZSfPR4Cjl4Q2oai
+         6JVcqbpQk2nxSSmH5gH3WSGdlZKrFih5IQdJQxcgugDxcJAfUZ+d4tyK9wnUn8DLCe
+         gfY8WoUb77yLbxUptG07y5k0qbGZlgFwnFPNEMFk=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -37,12 +37,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org,
         "Justin M. Forbes" <jforbes@fedoraproject.org>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 5.10 24/53] lib/crypto: add prompts back to crypto libraries
-Date:   Fri,  3 Jun 2022 19:43:09 +0200
-Message-Id: <20220603173819.429401098@linuxfoundation.org>
+Subject: [PATCH 5.15 19/66] lib/crypto: add prompts back to crypto libraries
+Date:   Fri,  3 Jun 2022 19:42:59 +0200
+Message-Id: <20220603173821.218500114@linuxfoundation.org>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220603173818.716010877@linuxfoundation.org>
-References: <20220603173818.716010877@linuxfoundation.org>
+In-Reply-To: <20220603173820.663747061@linuxfoundation.org>
+References: <20220603173820.663747061@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -77,7 +77,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1941,5 +1941,3 @@ source "crypto/asymmetric_keys/Kconfig"
+@@ -1924,5 +1924,3 @@ source "crypto/asymmetric_keys/Kconfig"
  source "certs/Kconfig"
  
  endif	# if CRYPTO
@@ -85,9 +85,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 -source "lib/crypto/Kconfig"
 --- a/lib/Kconfig
 +++ b/lib/Kconfig
-@@ -101,6 +101,8 @@ config INDIRECT_PIO
- 
- 	  When in doubt, say N.
+@@ -121,6 +121,8 @@ config INDIRECT_IOMEM_FALLBACK
+ 	  mmio accesses when the IO memory address is not a registered
+ 	  emulated region.
  
 +source "lib/crypto/Kconfig"
 +
@@ -141,7 +141,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
  	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
  	help
-@@ -109,11 +112,15 @@ config CRYPTO_LIB_POLY1305
+@@ -109,14 +112,18 @@ config CRYPTO_LIB_POLY1305
  	  is available and enabled.
  
  config CRYPTO_LIB_CHACHA20POLY1305
@@ -155,6 +155,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +	select CRYPTO_ALGAPI
  
  config CRYPTO_LIB_SHA256
+ 	tristate
+ 
+ config CRYPTO_LIB_SM4
  	tristate
 +
 +endmenu
