@@ -2,123 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E260CCA47F
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jun 2022 11:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A999C43334
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jun 2022 13:37:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235556AbiFFLmN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Jun 2022 07:42:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45654 "EHLO
+        id S238926AbiFFNhm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Jun 2022 09:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235546AbiFFLmM (ORCPT
+        with ESMTP id S239016AbiFFNhl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jun 2022 07:42:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C9BDF38A3
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 04:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654515727;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LbU0lHc+WuTsfhjoR9o0hk34WGqlmY1f4clG2HCMCgk=;
-        b=GdNj97MlOG2A67jgibe+4hsKpOAHqDLNtwlv8f89XTvUMy7FELty6m42+Ym7NlPNYk1ftF
-        wZuBPyISMIV7xl14tsoTbmeyiLX7MyZreko95BOwtqUJ9veUCFzfUNtNo4VWYfgsaCy1HK
-        VwVPU0PiZkKgCAeginH8Y0s/lYp8hcg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-488-n2w0ceJVOZWIKlQAZtKGOQ-1; Mon, 06 Jun 2022 07:42:06 -0400
-X-MC-Unique: n2w0ceJVOZWIKlQAZtKGOQ-1
-Received: by mail-wm1-f72.google.com with SMTP id u12-20020a05600c19cc00b0038ec265155fso11119219wmq.6
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Jun 2022 04:42:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LbU0lHc+WuTsfhjoR9o0hk34WGqlmY1f4clG2HCMCgk=;
-        b=f7vCi4HDV2DhzNh6VLj7Rd1E94/SLz7JRZJftlktged6m7QPcOreYfHzNIhEcr3KU/
-         wX6idREy6WOUZx4nvjTBPkjcq/XCEUHCZzNdiSb/pObB7CTI0cEOodOkSRrg15Nujm38
-         6qiCRXVYqFnn640Ck5pqnO+QuhWptuo2UV6p0vgxwbiG+bmsaKg/6opsvksMDNkk20Jy
-         9LG1a/Ro8EsoyuhQigQLX3y2XkcpMz0tQlYjOG3ObrAucplOk0Gt8QXBh4QFK0fG685e
-         YViETWXX2IPJgIGNqE+pQiGEuuOqq7SciblQSheHxWD8pI0/A4bohSC86NPMNaTaQAkH
-         nAWA==
-X-Gm-Message-State: AOAM533OWTAeKAfT27pr6Qi+4OjQcXAexP2iORqI96WSILm0zD3Qp7Qb
-        dgfyuTYE/z9hbeEUA8TiOLSBxqPlKqlPKtTS31a2IqJ6SgMlz2rqMkrYkcUfoSH75+pRTOJZbxu
-        JX+//BBo/YjuRxDeeX5NGp9F8
-X-Received: by 2002:adf:f385:0:b0:213:bb0e:383a with SMTP id m5-20020adff385000000b00213bb0e383amr16114872wro.481.1654515725413;
-        Mon, 06 Jun 2022 04:42:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzEvzYVC9++mJVt13KuXQ5MBP3pxhBSkYiVChyG6utGpOcobdad2X2l/uq7b7FRSa2su3OnkA==
-X-Received: by 2002:adf:f385:0:b0:213:bb0e:383a with SMTP id m5-20020adff385000000b00213bb0e383amr16114820wro.481.1654515725160;
-        Mon, 06 Jun 2022 04:42:05 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id h5-20020a5d5045000000b0020d07d90b71sm14848968wrt.66.2022.06.06.04.42.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Jun 2022 04:42:04 -0700 (PDT)
-Date:   Mon, 6 Jun 2022 12:42:01 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@iki.fi>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, tony.luck@intel.com,
-        npmccallum@redhat.com, brijesh.ksingh@gmail.com
-Subject: Re: [PATCH Part2 RFC v4 04/40] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <Yp3oCYwZbYuVQ9r6@work-vm>
-References: <20210707183616.5620-1-brijesh.singh@amd.com>
- <20210707183616.5620-5-brijesh.singh@amd.com>
- <YpijNgA9ZJFOwF8k@kernel.org>
+        Mon, 6 Jun 2022 09:37:41 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22827643;
+        Mon,  6 Jun 2022 06:37:39 -0700 (PDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LGvdt2gtTzjXP0;
+        Mon,  6 Jun 2022 21:36:18 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 6 Jun 2022 21:37:36 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 6 Jun
+ 2022 21:37:35 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-sunxi@lists.linux.dev>,
+        <linux-crypto@vger.kernel.org>
+CC:     <clabbe.montjoie@gmail.com>, <herbert@gondor.apana.org.au>
+Subject: [PATCH -next] crypto: sun8i-ss - fix error return code in allocate_flows()
+Date:   Mon, 6 Jun 2022 21:48:15 +0800
+Message-ID: <20220606134815.4103024-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YpijNgA9ZJFOwF8k@kernel.org>
-User-Agent: Mutt/2.2.1 (2022-02-19)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* Jarkko Sakkinen (jarkko.sakkinen@iki.fi) wrote:
-> On Wed, Jul 07, 2021 at 01:35:40PM -0500, Brijesh Singh wrote:
-> > The memory integrity guarantees of SEV-SNP are enforced through a new
-> > structure called the Reverse Map Table (RMP). The RMP is a single data
-> > structure shared across the system that contains one entry for every 4K
-> > page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
-> > track the owner of each page of memory. Pages of memory can be owned by
-> > the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
-> > section 15.36.3 for more detail on RMP.
-> > 
-> > The RMP table is used to enforce access control to memory. The table itself
-> > is not directly writable by the software. New CPU instructions (RMPUPDATE,
-> > PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
-> 
-> What's the point of throwing out a set of opcodes, if there's
-> no explanation what they do?
+If devm_kmalloc() fails, it should return error code in allocate_flows()
 
-TBF They are described in the public document section linked in the previous
-paragraph.
+Fixes: 8eec4563f152 ("crypto: sun8i-ss - do not allocate memory when handling hash requests")
+Fixes: 359e893e8af4 ("crypto: sun8i-ss - rework handling of IV")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c    | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-Dave
-> BR, Jarkko
-> 
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+index 98593a0cff69..ac2329e2b0e5 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+@@ -528,25 +528,33 @@ static int allocate_flows(struct sun8i_ss_dev *ss)
+ 
+ 		ss->flows[i].biv = devm_kmalloc(ss->dev, AES_BLOCK_SIZE,
+ 						GFP_KERNEL | GFP_DMA);
+-		if (!ss->flows[i].biv)
++		if (!ss->flows[i].biv) {
++			err = -ENOMEM;
+ 			goto error_engine;
++		}
+ 
+ 		for (j = 0; j < MAX_SG; j++) {
+ 			ss->flows[i].iv[j] = devm_kmalloc(ss->dev, AES_BLOCK_SIZE,
+ 							  GFP_KERNEL | GFP_DMA);
+-			if (!ss->flows[i].iv[j])
++			if (!ss->flows[i].iv[j]) {
++				err = -ENOMEM;
+ 				goto error_engine;
++			}
+ 		}
+ 
+ 		/* the padding could be up to two block. */
+ 		ss->flows[i].pad = devm_kmalloc(ss->dev, MAX_PAD_SIZE,
+ 						GFP_KERNEL | GFP_DMA);
+-		if (!ss->flows[i].pad)
++		if (!ss->flows[i].pad) {
++			err = -ENOMEM;
+ 			goto error_engine;
++		}
+ 		ss->flows[i].result = devm_kmalloc(ss->dev, SHA256_DIGEST_SIZE,
+ 						   GFP_KERNEL | GFP_DMA);
+-		if (!ss->flows[i].result)
++		if (!ss->flows[i].result) {
++			err = -ENOMEM;
+ 			goto error_engine;
++		}
+ 
+ 		ss->flows[i].engine = crypto_engine_alloc_init(ss->dev, true);
+ 		if (!ss->flows[i].engine) {
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.25.1
 
