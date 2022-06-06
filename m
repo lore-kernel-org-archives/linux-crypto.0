@@ -2,244 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C99C43334
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jun 2022 18:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBFDC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jun 2022 18:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbiFFSNu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Jun 2022 14:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40152 "EHLO
+        id S231373AbiFFSxY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Jun 2022 14:53:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231346AbiFFSNu (ORCPT
+        with ESMTP id S231213AbiFFSxW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jun 2022 14:13:50 -0400
-Received: from smtp.smtpout.orange.fr (smtp01.smtpout.orange.fr [80.12.242.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B463A5D187
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 11:13:47 -0700 (PDT)
-Received: from [192.168.1.18] ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id yHENnESwl3JPEyHENnixWC; Mon, 06 Jun 2022 20:13:45 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Mon, 06 Jun 2022 20:13:45 +0200
-X-ME-IP: 90.11.190.129
-Message-ID: <349c0714-5ec8-4233-0f0d-669e4ad3bf59@wanadoo.fr>
-Date:   Mon, 6 Jun 2022 20:13:35 +0200
+        Mon, 6 Jun 2022 14:53:22 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAFB23B701;
+        Mon,  6 Jun 2022 11:53:20 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id z9so1343319wmf.3;
+        Mon, 06 Jun 2022 11:53:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=l14UJVr8JeVd46Rnv0c3uT4zyDvuy4FY/KAjhGmnJ50=;
+        b=Yzg9qn8BVYX07x33D0xN2x3wMGeNiLAKY0KZ81O9Vp9EQ+lLdNC5tENc1i6Mkt2TwD
+         EDyQZotpqPwB2o6EQB3wiJSiSOsKxQ5nPTx6IXQcw6LyqbyriJdGvNC9CtEvnGss99Np
+         ZyHfarMUzLQRQbzQSPIbylJL3QAvnw7ENg1Vahe87NBVMzgi1is8u8ioHwMg1KVmR9B/
+         M6apwX5DSZs7LVzZ60odfiKmgBXC74H7++1/zLeD+/z6YIwxH/cU2wSLgbxvZt/uxpcl
+         WZIHQ7pNDSUJkei7Jl5vMXzxOhLu5mZc6ue/N3tJFH+qY+27pGzeqc3oe9f43PcnP1GD
+         j26g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=l14UJVr8JeVd46Rnv0c3uT4zyDvuy4FY/KAjhGmnJ50=;
+        b=ULgCWF2gxC/A55vGKyMiAkbLsdhlp3UFHz5wPrBExVLn1XrogOKzHzCMkUMwAr7CQ7
+         t72xQOSCXyQHOe9+hUlsXgTmi+vzwobq1mXFMUH+hSstokeCjSOTUFXhnSCEOi+YAN35
+         eucA11X04U3l4MwST+IT/POBHKmMALig5dc37B/sDxGeqqftjATNGEjgE0FbUGzPiTTS
+         5Mb+EFm15PaonrSjWiY61Yspf5djSIWBnsN60ajppJEmn6RpN2MvQs8ZbfptpidO3AYi
+         y4L8z/yFwd8Pn4yEzUR5sNj0x0ol8/YYoaDg8Tojw5wYj0RB6kdhmSqWop5yqb+tdnae
+         aJVw==
+X-Gm-Message-State: AOAM533xNg/+4h12K//Mv+74qv23zEkn1YLX/osi0PlXxRHS263pUx9d
+        /uhDKHiyLxQDdaFntGIj1eQ=
+X-Google-Smtp-Source: ABdhPJywM3ZNrCCkFpfyK/jOUf7GfgVU2XbbjA36GrCrLfe1KwYeezpbsCRyMkYwa1ALsVcO7yjrmw==
+X-Received: by 2002:a7b:c841:0:b0:394:890e:9195 with SMTP id c1-20020a7bc841000000b00394890e9195mr53972744wml.59.1654541598908;
+        Mon, 06 Jun 2022 11:53:18 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id m4-20020a1c2604000000b0039c506de087sm3426516wmm.6.2022.06.06.11.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Jun 2022 11:53:18 -0700 (PDT)
+Date:   Mon, 6 Jun 2022 20:53:13 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH -next] crypto: sun8i-ss - fix error return code in
+ allocate_flows()
+Message-ID: <Yp5NGVspV9dz1cxQ@Red>
+References: <20220606134815.4103024-1-yangyingliang@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v2 1/5] crypto: aspeed: Add HACE hash driver
-Content-Language: fr
-References: <20220606064935.1458903-1-neal_liu@aspeedtech.com>
- <20220606064935.1458903-2-neal_liu@aspeedtech.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, BMC-SW@aspeedtech.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Reply-To: Neal Liu <neal_liu@aspeedtech.com>
-In-Reply-To: <20220606064935.1458903-2-neal_liu@aspeedtech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+In-Reply-To: <20220606134815.4103024-1-yangyingliang@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 06/06/2022 à 08:49, Neal Liu a écrit :
-> Hash and Crypto Engine (HACE) is designed to accelerate the
-> throughput of hash data digest, encryption, and decryption.
+Le Mon, Jun 06, 2022 at 09:48:15PM +0800, Yang Yingliang a �crit :
+> If devm_kmalloc() fails, it should return error code in allocate_flows()
 > 
-> Basically, HACE can be divided into two independently engines
-> - Hash Engine and Crypto Engine. This patch aims to add HACE
-> hash engine driver for hash accelerator.
-> 
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+> Fixes: 8eec4563f152 ("crypto: sun8i-ss - do not allocate memory when handling hash requests")
+> Fixes: 359e893e8af4 ("crypto: sun8i-ss - rework handling of IV")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
 > ---
 
-[...]
+Hello
 
-> +static int aspeed_ahash_dma_prepare(struct aspeed_hace_dev *hace_dev)
-> +{
-> +	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
-> +	struct ahash_request *req = hash_engine->ahash_req;
-> +	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
-> +	struct device *dev = hace_dev->dev;
-> +	int length, remain;
-> +	int rc = 0;
-> +
-> +	length = rctx->total + rctx->bufcnt;
-> +	remain = length % rctx->block_size;
-> +
-> +	AHASH_DBG(hace_dev, "length:0x%x, remain:0x%x\n", length, remain);
-> +
-> +	if (rctx->bufcnt)
-> +		memcpy(hash_engine->ahash_src_addr, rctx->buffer, rctx->bufcnt);
-> +
-> +	if (rctx->total + rctx->bufcnt < ASPEED_CRYPTO_SRC_DMA_BUF_LEN) {
-> +		scatterwalk_map_and_copy(hash_engine->ahash_src_addr +
-> +					 rctx->bufcnt, rctx->src_sg,
-> +					 rctx->offset, rctx->total - remain, 0);
-> +		rctx->offset += rctx->total - remain;
-> +
-> +	} else {
-> +		dev_warn(dev, "Hash data length is too large\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	scatterwalk_map_and_copy(rctx->buffer, rctx->src_sg,
-> +				 rctx->offset, remain, 0);
-> +
-> +	rctx->bufcnt = remain;
-> +	rctx->digest_dma_addr = dma_map_single(hace_dev->dev, rctx->digest,
-> +					       SHA512_DIGEST_SIZE,
-> +					       DMA_BIDIRECTIONAL);
-> +	if (dma_mapping_error(hace_dev->dev, rctx->digest_dma_addr)) {
-> +		dev_warn(hace_dev->dev, "dma_map() rctx digest error\n");
-> +		rc = -ENOMEM;
-> +		goto free;
-> +	}
-> +
-> +	hash_engine->src_length = length - remain;
-> +	hash_engine->src_dma = hash_engine->ahash_src_dma_addr;
-> +	hash_engine->digest_dma = rctx->digest_dma_addr;
-> +
-> +	return 0;
-> +
-> +free:
-> +	dma_unmap_single(hace_dev->dev, rctx->digest_dma_addr,
-> +			 SHA512_DIGEST_SIZE, DMA_BIDIRECTIONAL);
+I am sorry, but Dan already send the same fix days ago.
+https://lore.kernel.org/all/YpIc+FtQIOdm9Ub+@Red/T/
 
-Here, dma_map_single() has failed. Do we need to unmap? (other calls 
-below don't)
-
-> +	return rc;
-> +}
-> +
-> +/*
-> + * Prepare DMA buffer as SG list buffer before
-> + * hardware engine processing.
-> + */
-> +static int aspeed_ahash_dma_prepare_sg(struct aspeed_hace_dev *hace_dev)
-> +{
-> +	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
-> +	struct ahash_request *req = hash_engine->ahash_req;
-> +	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
-> +	struct aspeed_sg_list *src_list;
-> +	struct scatterlist *s;
-> +	int length, remain, sg_len, i;
-> +	int rc = 0;
-> +
-> +	remain = (rctx->total + rctx->bufcnt) % rctx->block_size;
-> +	length = rctx->total + rctx->bufcnt - remain;
-> +
-> +	AHASH_DBG(hace_dev, "%s:0x%x, %s:0x%x, %s:0x%x, %s:0x%x\n",
-> +		  "rctx total", rctx->total, "bufcnt", rctx->bufcnt,
-> +		  "length", length, "remain", remain);
-> +
-> +	sg_len = dma_map_sg(hace_dev->dev, rctx->src_sg, rctx->src_nents,
-> +			    DMA_TO_DEVICE);
-> +	if (!sg_len) {
-> +		dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
-> +		rc = -ENOMEM;
-
-Direct return, as done in v1, looks fine to me. But it is mostly a 
-matter of test, I guess.
-
-> +		goto end;
-> +	}
-> +
-> +	src_list = (struct aspeed_sg_list *)hash_engine->ahash_src_addr;
-> +	rctx->digest_dma_addr = dma_map_single(hace_dev->dev, rctx->digest,
-> +					       SHA512_DIGEST_SIZE,
-> +					       DMA_BIDIRECTIONAL);
-> +	if (dma_mapping_error(hace_dev->dev, rctx->digest_dma_addr)) {
-> +		dev_warn(hace_dev->dev, "dma_map() rctx digest error\n");
-> +		rc = -ENOMEM;
-> +		goto free_src_sg;
-> +	}
-> +
-> +	if (rctx->bufcnt != 0) {
-> +		rctx->buffer_dma_addr = dma_map_single(hace_dev->dev,
-> +						       rctx->buffer,
-> +						       rctx->block_size * 2,
-> +						       DMA_TO_DEVICE);
-> +		if (dma_mapping_error(hace_dev->dev, rctx->buffer_dma_addr)) {
-> +			dev_warn(hace_dev->dev, "dma_map() rctx buffer error\n");
-> +			rc = -ENOMEM;
-> +			goto free_rctx_digest;
-> +		}
-> +
-> +		src_list[0].phy_addr = rctx->buffer_dma_addr;
-> +		src_list[0].len = rctx->bufcnt;
-> +		length -= src_list[0].len;
-> +
-> +		/* Last sg list */
-> +		if (length == 0)
-> +			src_list[0].len |= HASH_SG_LAST_LIST;
-> +		src_list++;
-> +	}
-> +
-> +	if (length != 0) {
-> +		for_each_sg(rctx->src_sg, s, sg_len, i) {
-> +			src_list[i].phy_addr = sg_dma_address(s);
-> +
-> +			if (length > sg_dma_len(s)) {
-> +				src_list[i].len = sg_dma_len(s);
-> +				length -= sg_dma_len(s);
-> +
-> +			} else {
-> +				/* Last sg list */
-> +				src_list[i].len = length;
-> +				src_list[i].len |= HASH_SG_LAST_LIST;
-> +				length = 0;
-> +				break;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (length != 0) {
-> +		rc = -EINVAL;
-> +		goto free_rctx_buffer;
-> +	}
-> +
-> +	rctx->offset = rctx->total - remain;
-> +	hash_engine->src_length = rctx->total + rctx->bufcnt - remain;
-> +	hash_engine->src_dma = hash_engine->ahash_src_dma_addr;
-> +	hash_engine->digest_dma = rctx->digest_dma_addr;
-> +
-> +	goto end;
-> +
-> +free_rctx_buffer:
-> +	dma_unmap_single(hace_dev->dev, rctx->buffer_dma_addr,
-> +			 rctx->block_size * 2, DMA_TO_DEVICE);
-
-If "rctx->bufcnt == 0" the correspondning dma_map_single() has not been 
-called. Is it an issue? (the test exists in 
-aspeed_ahash_update_resume_sg(), so I guess it is needed)
-
-> +free_rctx_digest:
-> +	dma_unmap_single(hace_dev->dev, rctx->digest_dma_addr,
-> +			 SHA512_DIGEST_SIZE, DMA_BIDIRECTIONAL);
-> +free_src_sg:
-> +	dma_unmap_sg(hace_dev->dev, rctx->src_sg, rctx->src_nents,
-> +		     DMA_TO_DEVICE);
-> +end:
-> +	return rc;
-> +}
-> +
-
-[...]
-
-> +
-> +#define HASH_SG_LAST_LIST               BIT(31)
-
-Tab as done in the other #define?
-
-[...]
+Regards
