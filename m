@@ -2,94 +2,92 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3483DCCA47B
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Jun 2022 21:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F275DCCA482
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jun 2022 03:33:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346371AbiFEVVU (ORCPT
+        id S1349333AbiFFDdy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Jun 2022 17:21:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52848 "EHLO
+        Sun, 5 Jun 2022 23:33:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236184AbiFEVVU (ORCPT
+        with ESMTP id S233696AbiFFDdx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Jun 2022 17:21:20 -0400
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E454C393F1;
-        Sun,  5 Jun 2022 14:21:18 -0700 (PDT)
-Received: by mail-qk1-f172.google.com with SMTP id k6so6684601qkf.4;
-        Sun, 05 Jun 2022 14:21:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uD2FXQUAnfQEohjyaZNlJQS/Q4WvFjoFs1LjbbNDzRQ=;
-        b=31nskr9Soe0iuTR+/fPkW7xynILICuUkOSYcxypo48v/1UdoS5ARaqpmqsMv5LbbAr
-         Wyj/qB/K4MDO5RB7ldUW7DQmiPzFk0qjH622Hy8hLCMFDX5wAzAkhluZQoA+erEuY9br
-         cA6kDkKSvlHbKR4ZKG+PVB2GAIG7S7oWp9u/sW9lucIQHMFAQxdE5jdTbEdbYWKCmLYw
-         TAtrV95jrlQzNbOBNJ2CaMWeij56bgqGoXYNddCRDVNqFhrzKiVoZeca+EPdoPQMv/LG
-         pMgXCGh98bXE7BMa9fOMCUaPbqIMWD1vL1CBRuIufywVzFhrNFyqIwYEoGT2GWWsAGRf
-         9vQA==
-X-Gm-Message-State: AOAM533whHHXPNd+4SRmqvjiwUxZS5Co1m51y03EF3PGXc53hO7ntNer
-        Kcw/LOQnHWyhxer7OaD7gA==
-X-Google-Smtp-Source: ABdhPJyLEqAuMCay8xL9vGuZW1MrAQDWoCsfSOcxo2YtGomAaqJ23hZt9Cth7nv86v86G2h8D3cN4Q==
-X-Received: by 2002:a05:620a:4553:b0:6a0:5280:defd with SMTP id u19-20020a05620a455300b006a05280defdmr13566534qkp.165.1654464077801;
-        Sun, 05 Jun 2022 14:21:17 -0700 (PDT)
-Received: from robh.at.kernel.org ([2607:fb90:ac97:ac63:b5fd:aa9:8d74:9989])
-        by smtp.gmail.com with ESMTPSA id l22-20020a05620a28d600b006a5bc8e956esm10638778qkp.133.2022.06.05.14.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jun 2022 14:21:17 -0700 (PDT)
-Received: (nullmailer pid 3538420 invoked by uid 1000);
-        Sun, 05 Jun 2022 21:21:14 -0000
-Date:   Sun, 5 Jun 2022 16:21:14 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Vabhav Sharma <vabhav.sharma@nxp.com>
-Cc:     horia.geanta@nxp.com, gaurav.jain@nxp.com, pankaj.gupta@nxp.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        shawnguo@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        silvano.dininno@nxp.com, V.Sethi@nxp.com
-Subject: Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy delay property
-Message-ID: <20220605212114.GA3528129-robh@kernel.org>
-References: <20220530180924.1792399-1-vabhav.sharma@nxp.com>
- <20220530180924.1792399-2-vabhav.sharma@nxp.com>
+        Sun, 5 Jun 2022 23:33:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5425237A38;
+        Sun,  5 Jun 2022 20:33:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C755C60EDE;
+        Mon,  6 Jun 2022 03:33:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 18083C341C0;
+        Mon,  6 Jun 2022 03:33:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654486430;
+        bh=TI4P18/3vyoUu1YoM1I93ZEGQv/UWUtMjgpV3is+1kU=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=tFJZusU1hxG2s1CJAu/uiv0E+bAvVegQhojDIoAHyJhGf2CpfQHdYfd63OYaXP0/3
+         tl9nzWxkaafABij8lqsZ5MrgoRiCJkmKhT6mUps3kQJJUcarzBWjvqhX+nnzU7KuuH
+         M1sITb9nLev16/CnmDOBLDR9sft1NqYa56mDK6TYh+XhuSxzBGaz00U17pkjsv1ykO
+         1xbqro3byn4WFq2ZXjDSp5Mx6gkf+iadKrRgaEInhfU6CUJOoXak/Exda99R6yHsRc
+         ZpeQ/WkQ7MtuWXRB2kZKovQ5cRR+ulL6ulkGtXTJWKxLQIUAMOP2Du9HlLMaTPj68u
+         6fltf6QTe+EWQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E9551E737F0;
+        Mon,  6 Jun 2022 03:33:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220530180924.1792399-2-vabhav.sharma@nxp.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] dt-bindings: Fix properties without any type
+From:   patchwork-bot+chrome-platform@kernel.org
+Message-Id: <165448642995.20111.10251737230487275413.git-patchwork-notify@kernel.org>
+Date:   Mon, 06 Jun 2022 03:33:49 +0000
+References: <20220519211411.2200720-1-robh@kernel.org>
+In-Reply-To: <20220519211411.2200720-1-robh@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     devicetree@vger.kernel.org, krzk+dt@kernel.org,
+        thierry.reding@gmail.com, sam@ravnborg.org,
+        linus.walleij@linaro.org, brgl@bgdev.pl, dmitry.torokhov@gmail.com,
+        bleung@chromium.org, groeck@chromium.org, mchehab@kernel.org,
+        peda@axentia.se, davem@davemloft.net, kuba@kernel.org,
+        pabeni@redhat.com, kvalo@kernel.org, bhelgaas@google.com,
+        sre@kernel.org, mpm@selenic.com, herbert@gondor.apana.org.au,
+        gregkh@linuxfoundation.org, broonie@kernel.org, mripard@kernel.org,
+        dri-devel@lists.freedesktop.org, linux-gpio@vger.kernel.org,
+        linux-input@vger.kernel.org, chrome-platform@lists.linux.dev,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
+        linux-usb@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 30, 2022 at 11:39:22PM +0530, Vabhav Sharma wrote:
-> Add entropy delay property which defines the length (in system clocks) of
-> each Entropy sample taken for TRNG configuration.
-> 
-> Signed-off-by: Vabhav Sharma <vabhav.sharma@nxp.com>
-> Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
-> Reviewed-by: Varun Sethi <v.sethi@nxp.com>
-> ---
->  Documentation/devicetree/bindings/crypto/fsl-sec4.txt | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> index 8f359f473ada..1477294eda38 100644
-> --- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> @@ -62,6 +62,12 @@ PROPERTIES
->        Definition: A standard property. Define the 'ERA' of the SEC
->            device.
->  
-> +   - entropy-delay
-> +      Usage: optional
-> +      Value type: <u32>
-> +      Definition: A property which specifies the length (in system clocks)
-> +          of each Entropy sample taken.
-> +
+Hello:
 
-Seems like this could be common, but should be a time value (with unit 
-suffix) rather than clocks. If not common, then needs a vendor prefix. 
-Is this time to read a value or time between values produced? Not really 
-clear from the description.
+This patch was applied to chrome-platform/linux.git (for-next)
+by Rob Herring <robh@kernel.org>:
 
-Rob
+On Thu, 19 May 2022 16:14:11 -0500 you wrote:
+> Now that the schema tools can extract type information for all
+> properties (in order to decode dtb files), finding properties missing
+> any type definition is fairly trivial though not yet automated.
+> 
+> Fix the various property schemas which are missing a type. Most of these
+> tend to be device specific properties which don't have a vendor prefix.
+> A vendor prefix is how we normally ensure a type is defined.
+> 
+> [...]
+
+Here is the summary with links:
+  - dt-bindings: Fix properties without any type
+    https://git.kernel.org/chrome-platform/c/4e71ed985389
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
