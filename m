@@ -2,124 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DB1C43334
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 06:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF14CC43334
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 07:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237258AbiFGGtD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jun 2022 02:49:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41112 "EHLO
+        id S237678AbiFGHaU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Jun 2022 03:30:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237293AbiFGGs7 (ORCPT
+        with ESMTP id S237671AbiFGHaT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jun 2022 02:48:59 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755AE5EDE0
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 23:48:55 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nyT1E-00072G-65; Tue, 07 Jun 2022 08:48:48 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nyT1E-006wUO-Nc; Tue, 07 Jun 2022 08:48:47 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1nyT1C-00EiNW-PX; Tue, 07 Jun 2022 08:48:46 +0200
-Date:   Tue, 7 Jun 2022 08:48:44 +0200
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
-Subject: Re: [PATCH] crypto: atmel-ecc - Remove duplicated error reporting in
- .remove()
-Message-ID: <20220607064844.a6cfpljjowyt3fiz@pengutronix.de>
-References: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
- <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
+        Tue, 7 Jun 2022 03:30:19 -0400
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA97532CE
+        for <linux-crypto@vger.kernel.org>; Tue,  7 Jun 2022 00:30:17 -0700 (PDT)
+Received: by mail-il1-f199.google.com with SMTP id w7-20020a056e021c8700b002d3bc8e95cbso13270091ill.3
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2022 00:30:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=DOtOjJzKQIf+e7c9BZc5SKCyPkF/h42VSWyH6TDcFY0=;
+        b=FJkzb1q6csHQrAZ17tEEPG3eU9rY2pE+Mgz0xaD9oHGGcOfGOgIv5ocZEYh0FkGvN2
+         AZOE8D9+JdZ58oPlBDQmaK93kfuUop4c/Vh02Z1a/xMYn80L1saN3zs9UVynYQo6ZzGY
+         dPmZzNK9D02cFqUVci73DPJnN2EffQtEgdard/67IE5qFbbkeXsLKQNXO+zgs7fxtI3s
+         yYZ9x/dnpa+OBARvHtRxBtKY+DbKb6XGV6pm6EW5gJzG5HtVHOMkMdxqn7NBWjSBwARc
+         XfzoE6WrT3k+JVMoVDhxDLECcfb51j+cSdOljbRfeUW+rMQFAs5PPGBM7EvX5xB0HwT6
+         Vmsg==
+X-Gm-Message-State: AOAM531UCYbfC9dXg6wifYdZg3vxk0aFEO8U9kwswY7f80y18mzVpfdO
+        7eHNWq8qbbpm2HBiuO9XxvTnmvGA19HEgPWwLHi71rpNVHlz
+X-Google-Smtp-Source: ABdhPJzo6FrSSHm2sTN36Tfz0L2n39C3ItG8XK9VzZq7PigjQFYZjm3jG8lO70nk3/HNEig9mUPqfWduDsbj3Pa6xR2GQ6oYKwDR
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="aqkaxjvdsflilhwt"
-Content-Disposition: inline
-In-Reply-To: <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-Received: by 2002:a05:6e02:1a0e:b0:2d3:f72e:eaf1 with SMTP id
+ s14-20020a056e021a0e00b002d3f72eeaf1mr13523737ild.260.1654587017150; Tue, 07
+ Jun 2022 00:30:17 -0700 (PDT)
+Date:   Tue, 07 Jun 2022 00:30:17 -0700
+In-Reply-To: <000000000000fc128605e08585c6@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000068486805e0d68f94@google.com>
+Subject: Re: [syzbot] INFO: task hung in add_early_randomness (2)
+From:   syzbot <syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com>
+To:     herbert@gondor.apana.org.au, jasowang@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux@dominikbrodowski.net, mpm@selenic.com, mst@redhat.com,
+        syzkaller-bugs@googlegroups.com, xuanzhuo@linux.alibaba.com,
+        yuehaibing@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+syzbot has bisected this issue to:
 
---aqkaxjvdsflilhwt
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+commit 8b4ec69d7e098a7ddf832e1e7840de53ed474c77
+Author: Jason Wang <jasowang@redhat.com>
+Date:   Fri May 27 06:01:19 2022 +0000
 
-Hello,
+    virtio: harden vring IRQ
 
-On Fri, May 20, 2022 at 07:21:00PM +0200, Uwe Kleine-K=F6nig wrote:
-> Returning an error value in an i2c remove callback results in an error
-> message being emitted by the i2c core, but otherwise it doesn't make a
-> difference. The device goes away anyhow and the devm cleanups are
-> called.
->=20
-> As atmel_ecc_remove() already emits an error message on failure and the
-> additional error message by the i2c core doesn't add any useful
-> information, change the return value to zero to suppress this message.
->=20
-> Also make the error message a bit more drastical because when the device
-> is still busy on remove, it's likely that it will access freed memory
-> soon.
->=20
-> This patch is a preparation for making i2c remove callbacks return void.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1175c3c7f00000
+start commit:   f2906aa86338 Linux 5.19-rc1
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1375c3c7f00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1575c3c7f00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cbd131cc02ee620e
+dashboard link: https://syzkaller.appspot.com/bug?extid=5b59d6d459306a556f54
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=104f4d4ff00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d6782df00000
 
-I want to tackle this (i.e.
+Reported-by: syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com
+Fixes: 8b4ec69d7e09 ("virtio: harden vring IRQ")
 
-diff --git a/include/linux/i2c.h b/include/linux/i2c.h
-index fbda5ada2afc..066b541a0d5d 100644
---- a/include/linux/i2c.h
-+++ b/include/linux/i2c.h
-@@ -273,7 +273,7 @@ struct i2c_driver {
-
- 	/* Standard driver model interfaces */
- 	int (*probe)(struct i2c_client *client, const struct i2c_device_id *id);
--	int (*remove)(struct i2c_client *client);
-+	void (*remove)(struct i2c_client *client);
-
- 	/* New driver model interface to aid the seamless removal of the
- 	 * current probe()'s, more commonly unused than used second parameter.
-
-) directly after the next merge window. That is (depending on Linus's
-counting capabilities) after v5.20-rc1. So I ask you to either take this
-crypto patch before (my preferred option), or accept that I send it as part
-of a bigger series that eventually contains the above hunk and will
-probably be merged via the i2c tree.
-
-Best regards
-Uwe
-
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---aqkaxjvdsflilhwt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKe9MkACgkQwfwUeK3K
-7AnyDwgAn2uizkd5IsV/rfJm2HRMgC3zTB1AadQtCmh1QMWFdKb9Ct3FcbJI9XRB
-+KFaNmcbPCQrQ9yxQQb216HpXyJ5uadnt8patFZIoaZf3kMW5MJTghihcwsrX7iF
-WS1NeU6iu6smMSxv7twxJcu/7yPUP8WyxWJ0hYY55PM/4vaKFfXTa6i7VLN6+pOT
-kzUFM2+7OyIrci6U3f2YlMh4Zktu+WqXLEAnUDk7vTFxH41mY/SME0F6Gk4YqO3P
-yshJMnZV4n0L7ODdXe65HpqjwCQyFNvB5mvxvSq8In5VjdfUCy7ZYu4oYEm1Jg4B
-mlwMffjEWNnsnuoP+kdJGOhDp/xmGQ==
-=Ytbv
------END PGP SIGNATURE-----
-
---aqkaxjvdsflilhwt--
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
