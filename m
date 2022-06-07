@@ -2,45 +2,37 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A270ECCA47C
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 04:00:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD443C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 05:00:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233629AbiFGEAH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jun 2022 00:00:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40094 "EHLO
+        id S236666AbiFGFAs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Jun 2022 01:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236497AbiFGD74 (ORCPT
+        with ESMTP id S236611AbiFGFAo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jun 2022 23:59:56 -0400
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2110.outbound.protection.outlook.com [40.107.215.110])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6018A320;
-        Mon,  6 Jun 2022 20:59:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=brlMuz9Qbh8+1JFAGdx9s+/yLNl0tsE9ZZwCmYDy1pdBA/IxJedblpHt8/+7mqeZdKeud25MWIVHZEhcBH88dPG7ne671V/fjc4zGukyspCvsvK4jyCvWyOOxo5rMMOuNYXzUAh5E7HmTarfaQBAPb8U+Q5dEOKXpND8t/oz/gsnzArPBeqgxX70Ai3B7Y6zc8rEhj658OdjliFPaIg0mFlduKsNcW50NLgSPAzM6cN6zHI7xBpshBw+c5LKutPeW8ZZ/1VVYyUFP6y3dkQBy6d+PlyJ9E9o9h25cR76D7RzTVGIy/UFHLXJZDTHz0SAEh1cjWL+ozeMK/LtZZwEVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oXs0VmkrIsbr/PMti3wuHRoGywBfwBnCRtMVh3GTNcs=;
- b=YB4ag9RADYtj9GSPXzhEzMwQnrdzP0km5VrY1VfZeLXVCNc0QR7Hs9Ymy1rvyBu/gjeQm3nYm0HXX5YZACfUyD7EE+/PUCzs50HSRj0Qj5bXalyTXVH9fRMCl0A5c845n33lc+KDTESQozWtw8Li6tqhuxJabGnJ1AMKlo0wwvf/LZj7vQ1ktjVO0H/xtzzaOaBEdEqSAsHhSYAWpLiOiAKK2mec+Dj3tVFLncuMBiyDxKv5u0x+/BgQq2NFKRURvzyEqpneqRgrnWnDYHUpLRWps6AuHlLKS9UFQaVu0tE0GmWMuqplAg+we0x4xIyGEb6hqG+7XyrszOK+D1yz9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oXs0VmkrIsbr/PMti3wuHRoGywBfwBnCRtMVh3GTNcs=;
- b=s1bq4ecgNJDpgQ1QAsjEYIVoVxoew6LR/WujOgfDoa1cFSd0GUEe9z5Z0W/bosRuXHt8IORLSUCTWza35IB80xbL1MtP9+ZD9NeNNS1OiY8AI3C4RmQ4bMMrAZaRSc2Q8CFVNVPUn6F2Bpx+YS6I3M8dtwbb9W84R601EAR0yVOi8MyX5rv3Jp4dZnEG07FlVpzN8vHbdLipLkJfZ4NLujV9Ax+x68+pIWWKhB9V8B3uGoWN8T6uSM/K0IcVYZQPWP9l7csZnbmNFC30zsUWRDSjvHglRSOWsMPXEG+FoL7YEq0a9kSuK+hKJDQTbuZLO2H+t8oB/IpLyfQphLgcOA==
-Received: from HK0PR06MB3202.apcprd06.prod.outlook.com (2603:1096:203:87::17)
- by KL1PR0601MB3800.apcprd06.prod.outlook.com (2603:1096:820:19::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.18; Tue, 7 Jun
- 2022 03:59:48 +0000
-Received: from HK0PR06MB3202.apcprd06.prod.outlook.com
- ([fe80::7c42:9783:92c9:f237]) by HK0PR06MB3202.apcprd06.prod.outlook.com
- ([fe80::7c42:9783:92c9:f237%7]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
- 03:59:48 +0000
-From:   Neal Liu <neal_liu@aspeedtech.com>
-To:     Dhananjay Phadke <dphadke@linux.microsoft.com>,
+        Tue, 7 Jun 2022 01:00:44 -0400
+Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C669DAFB13
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 22:00:41 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id yRKRntRriL5fDyRKSnPDgo; Tue, 07 Jun 2022 07:00:39 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Tue, 07 Jun 2022 07:00:39 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <a85c4f87-c87f-784f-7db3-0b83570f82da@wanadoo.fr>
+Date:   Tue, 7 Jun 2022 07:00:31 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v2 5/5] crypto: aspeed: add HACE crypto driver
+Content-Language: fr
+To:     Neal Liu <neal_liu@aspeedtech.com>
+Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, BMC-SW@aspeedtech.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -48,110 +40,310 @@ To:     Dhananjay Phadke <dphadke@linux.microsoft.com>,
         Joel Stanley <joel@jms.id.au>,
         Andrew Jeffery <andrew@aj.id.au>,
         Johnny Huang <johnny_huang@aspeedtech.com>
-CC:     "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        BMC-SW <BMC-SW@aspeedtech.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: RE: [PATCH v2 3/5] ARM: dts: aspeed: Add HACE device controller node
-Thread-Topic: [PATCH v2 3/5] ARM: dts: aspeed: Add HACE device controller node
-Thread-Index: AQHYeXGfdLTB4LTlU0CwQTnacz0tqq1DHlqAgAAzqQA=
-Date:   Tue, 7 Jun 2022 03:59:48 +0000
-Message-ID: <HK0PR06MB3202698F2E93BE1CF2C9626380A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
 References: <20220606064935.1458903-1-neal_liu@aspeedtech.com>
- <20220606064935.1458903-4-neal_liu@aspeedtech.com>
- <bba832ec-ea64-71db-385a-ab9816e7239c@linux.microsoft.com>
-In-Reply-To: <bba832ec-ea64-71db-385a-ab9816e7239c@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: zh-TW
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6d7ad8c2-01a2-48f3-c9d0-08da483a2a88
-x-ms-traffictypediagnostic: KL1PR0601MB3800:EE_
-x-microsoft-antispam-prvs: <KL1PR0601MB3800149A4AE0F9E37005AF3E80A59@KL1PR0601MB3800.apcprd06.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: S7YhKwSqPd8JCn0p76QGOqnmn6JhYZUYamCwyJeHrqh8TC2rbGWit8bOTQ84hR9C8/yRGcLiObFw6C2RqsCpHMDmWki2unoIDfPGpcNJafUTvFRp/ZzxCNN+wJcQ4+fUKXTwSQYgG/wpoLTfqSMEZum0Uc5sZYCvhJDpW4MnBHlBK8PZCBCRyF0Ua6GUzY5OosMitQoFWrkbGRgor2hXbmtrcy/VYfQtUzEwafAcrSpkOs6sfgRhPyU+uAA331T1mEAXW0W2G2wLvWBUnDczjB4Kpe4V4Vwgq/iH8xqEonmKLUwR4tPN5jtdvY+HrgLrfKFjobHA89Ce/j8juOogU9fpAMZez5ipVTbMSQ/CLeL5v74Sg98TRB5y0UWWl5TR+lR8N1oJXReYxo1Dpf6Zik3qxnRW5PnQic66TxXuLUF3tY/dNVuDMt+RTb6Gh3jkPJeTQ6WcGSTrFaBLzmNSErsoj+zPXudZd3n+5t/Hjh6uPBSJSZbXUa1KyVGQTqO/mPOOtksJEtwy5mnSNqW+eJ7cWWzxjc9OAFMow4J8pKPKaG0lZGo2ogj4SoHIzqzJy9KiW7RMn5HwaVBRPAo+Yxg9xOmylQGQtuq7CKFYsuVJUMZXvwOAupfH66JkS5r2AAWnMeGrD3j7gMvPYH6Y5SBMGZVQdND3qrD4n9oSt5N0clpIcLejH/jb9nV60ywBIpc0NXLisaM4m9OUKqqygw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HK0PR06MB3202.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(5660300002)(4326008)(66446008)(7416002)(66946007)(66556008)(64756008)(76116006)(66476007)(508600001)(8676002)(4744005)(186003)(9686003)(53546011)(6506007)(2906002)(110136005)(54906003)(6636002)(55016003)(26005)(316002)(86362001)(52536014)(7696005)(83380400001)(71200400001)(38100700002)(33656002)(122000001)(8936002)(38070700005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K2xFM00wS2F0NW1vaE5CQ2RUeXZBRWVLemtzT3hYcGpvMExEZ0c2RjRhbGpB?=
- =?utf-8?B?d0JoSy9iNEpEMHpxUXJRN3YyRitXczZFR2dyc0xtempiWW1EcVhUQjQ3bjZC?=
- =?utf-8?B?M3ZDNjhoRzk1L21SSy9xZjA1TzVDMW55VnFNckZGam0vd2RBUHVrdDZ5WjAw?=
- =?utf-8?B?Tlo1WGk1NTVHcy9ZUVBZY2Zxc1FYcS8rS3EyR0JuS0hZK1BQMStWZWo4Rmhi?=
- =?utf-8?B?MlZNVUhwYTAveWk1QTYwbG1XSXlYekhxZWhMQlJUWitubUJobkk2bGpWZmx5?=
- =?utf-8?B?RGV3UnYwYUxYWDFnN3hzay9ZZ1E0TDRFYmpORGVYM0ZqKzJFQ1RKeEJ3NjQw?=
- =?utf-8?B?N1NIVFlCU1U5eGtPN3NVdjc0dy85RzlwK2hjNzlXb3o4OXlWSWxCKzFvckNx?=
- =?utf-8?B?T3M0TGhYd3JuNC9KdVlnN2w3d28zNDNWb29zeVBhcndNeHRZNE9UaDlKUVhO?=
- =?utf-8?B?bFg0QzhIcWszQi8wUW0yd0d5Y0V0d2JTQVlsVnhOZ09MYlliY2ludE4vRDVD?=
- =?utf-8?B?NGJTL3JhTER3cTFxcjZaZ1J4T2EwZjFyaEFWRjVCdTFxQy9rUGdtTzAweHZs?=
- =?utf-8?B?a0l4WXNlckl4cXo5Uk5VQU16NUtVK0FUaThhWDV5WWJIY1RaQzQ3N05GMG1Y?=
- =?utf-8?B?eksyaENYbWNvZjZFWFFSeUMrZklRSDZtT1FKQjNZVFdWN1cxZEIyR0hUdEZ2?=
- =?utf-8?B?QkNuNThJTjVaL3A5UllsS0FqdWJ3dUxaUEZidmVlNXd4NDI2QitydVI4cnd0?=
- =?utf-8?B?WFladE9rL3FjT0VqaUtqV0JCR0xlUjhiUjNhbm1OYmxzUTRMSno2NkpTYlZD?=
- =?utf-8?B?ajVoT0o3bDFyV2VTczYwM2lWOWtBbVV3MjVGd3FXZHBWUXZsYkNsRm1YaVo2?=
- =?utf-8?B?SWowSU01MU0vYTdTdmNVQVV6NHZMK3BPZ1pZWldmT3lKb0lMMFhZTU9TZTBh?=
- =?utf-8?B?aDF4eitEQkFXanozeXVlS0c5eEFnZkdoVnBqdzloZkg1UFNHZG9tclJmeXBM?=
- =?utf-8?B?TndJK2ZEbzRRb1NOOENLZTJVS2pGUEhnVHhDTmlHRHNMbHNyWnNYZENjaTB4?=
- =?utf-8?B?dS8rRGlONytEYmpMWXpFOHNqblp4N1NqUk03WUNITFNQbGpFcHN2M0x1VWVy?=
- =?utf-8?B?R3dNdGQ4OFBLU1crVUJlTXZ1WVJhZGRnZDlPMVhpbzk1ZWN0UHNBZ0FhblFw?=
- =?utf-8?B?Und4V2lubkNxUjNKYTU3TVVuOFpab2llN0h4NS9GSHhzU0tvZUNaRUdWR3N3?=
- =?utf-8?B?UndSNTlvakNqOEIxRkxjYTlJcm5aM0Z5MStPTHBDMlU0TmFjOG9scFdETWI0?=
- =?utf-8?B?ci80ODBuQzRsS0pFOS9QektsemhvSXNlMUtRUVFBSCtybmVFQ0trcVJ6azlQ?=
- =?utf-8?B?NnZZL3N5c2RHcXdiZUw2d2NRdjVXV29iaDE2dFJzK3c1SkozbXZpK0g0Tjh4?=
- =?utf-8?B?TE45bi9IdEJ4Wi9jd2ppc2hNY2h2NXZ0bmlFSStsR09jd0Q2eG5xYkRjOUR4?=
- =?utf-8?B?MzRsOGJTMDdDNTQ1RTNpUmczU0Z1aU9RMG91NXgwVEFpR2dYQitCY1AvSUIy?=
- =?utf-8?B?S2ZRYURaajVmUEE5djkrN29YeTdpN2pvYnRLOG1CTDlQVW1QYmNoeGdnQTZJ?=
- =?utf-8?B?blJGRGJJdGJzTXlUTFJQc3QwbWZXTjZUeTUyL3NnMXk0NjN1TTUxb1BJTWNu?=
- =?utf-8?B?NXM1NkFWYzYwSFZORTMyd1FBQXZZZEthN24yYnB2VEhrN3VpM3NvRzlIME5v?=
- =?utf-8?B?cGtaaWNLcXFvb24wT3ZXSFk1eUJ0ZXhwR2R5dENKN1VZaUVSTWhhTDVscitY?=
- =?utf-8?B?MkRIdXg2MlhmUTVveWtkUW1ROHdpY2RKZU8vQm9mZzlqU0FhclplbGxDdmdK?=
- =?utf-8?B?Um5qWE1FeUMxbWR0LzlBeEYzcU9GbVVXRE5pd2ZIbmY1Z1kvcDFubHR4UnYw?=
- =?utf-8?B?Z0hod3pnS2k2Y0lUL2loZnUrUWswanE4WFp5cWNna1owSTZUcGJsZjN5ZTVF?=
- =?utf-8?B?cmNWYTNzaThCQ0hYWVRhV29aNElIdEx0ejNaaWNDZUcxMkdFZkVDRGRHSlND?=
- =?utf-8?B?WW53QUVvdHhBS09valAvRXRtVUZlYVRKWndxSzNWT0o3N1pwNVZoK0FYeGYx?=
- =?utf-8?B?OUZhL0luWHRyVUE5QlJJMTcvN1VHUmN6YzlqTUJpcGR2VXkyVlF3eXhJVzlo?=
- =?utf-8?B?VmFxdVYvTkdLU29Ma29LaC9Za0w5Mk0ySVhLQ2x0Si9SVlFuYnJiWVdIaDlF?=
- =?utf-8?B?TUJsV3RYZnRrN24zaHdGSGlXc05KTXRVVFpaZ2lXVlc1TVF4NjJNa0dXUklq?=
- =?utf-8?B?NG8zcktzNU5KRi9ISUNjZk53OC8vUVhYVHlJLzVDQW10UXlMaWhMZz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: HK0PR06MB3202.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d7ad8c2-01a2-48f3-c9d0-08da483a2a88
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2022 03:59:48.4944
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IJ8LkhZjoHzqgL86pog76pdB7+F3EyRTchWFBh9+VWqTn7SaS2xOTk4d+Vqjvy/HhNgipl5CBcQqdCNi2OV6eQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR0601MB3800
+ <20220606064935.1458903-6-neal_liu@aspeedtech.com>
+ <ef2fc6ab-e487-1f95-dceb-fd190f064ac2@wanadoo.fr>
+ <HK0PR06MB3202DFD70F7BA5090A14ACB780A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <HK0PR06MB3202DFD70F7BA5090A14ACB780A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBPbiA2LzUvMjAyMiAxMTo0OSBQTSwgTmVhbCBMaXUgd3JvdGU6DQo+ID4gZGlmZiAtLWdpdCBh
-L2FyY2gvYXJtL2Jvb3QvZHRzL2FzcGVlZC1nNi5kdHNpDQo+ID4gYi9hcmNoL2FybS9ib290L2R0
-cy9hc3BlZWQtZzYuZHRzaQ0KPiA+IGluZGV4IDNkNWNlOWRhNDJjMy4uMzcxZDJhNmI1NmVmIDEw
-MDY0NA0KPiA+IC0tLSBhL2FyY2gvYXJtL2Jvb3QvZHRzL2FzcGVlZC1nNi5kdHNpDQo+ID4gKysr
-IGIvYXJjaC9hcm0vYm9vdC9kdHMvYXNwZWVkLWc2LmR0c2kNCj4gPiBAQCAtMzA0LDYgKzMwNCwx
-NCBAQCBhcGIgew0KPiA+ICAgCQkJI3NpemUtY2VsbHMgPSA8MT47DQo+ID4gICAJCQlyYW5nZXM7
-DQo+ID4NCj4gPiArCQkJaGFjZTogY3J5cHRvQDFlNmQwMDAwIHsNCj4gPiArCQkJCWNvbXBhdGli
-bGUgPSAiYXNwZWVkLGFzdDI2MDAtaGFjZSI7DQo+ID4gKwkJCQlyZWcgPSA8MHgxZTZkMDAwMCAw
-eDIwMD47DQo+ID4gKwkJCQlpbnRlcnJ1cHRzID0gPEdJQ19TUEkgNCBJUlFfVFlQRV9MRVZFTF9I
-SUdIPjsNCj4gPiArCQkJCWNsb2NrcyA9IDwmc3lzY29uIEFTUEVFRF9DTEtfR0FURV9ZQ0xLPjsN
-Cj4gPiArCQkJCXJlc2V0cyA9IDwmc3lzY29uIEFTUEVFRF9SRVNFVF9IQUNFPjsNCj4gDQo+IFNo
-b3VsZG4ndCB0aGUgbGVmdCBzaWRlIGJlIGFsc28gJ2NyeXB0bycsIHNlZSBleGlzdGluZyBjcnlw
-dG8gbm9kZXMgaW4NCj4gYXJjaC9hcm02NC9kdHMgZm9yIGV4YW1wbGUuDQo+IA0KPiAJCQljcnlw
-dG86IGNyeXB0b0AxZTZkMDAwMCB7DQo+IAkJCQkuLi4NCj4gDQo+IFJlZ2FyZHMsDQo+IERoYW5h
-bmpheQ0KDQpJdCdzIGEgbmFtaW5nIHByZWZlcmVuY2UuICJoYWNlIiBpcyBvdXIgaGFzaCAmIGNy
-eXB0byBoYXJkd2FyZSBlbmdpbmUgbmFtaW5nLg0KQW5kIHdlIGFsc28gaGF2ZSBvdGhlciBjcnlw
-dG8gZW5naW5lcyB3aWxsIGJlIHVwc3RyZWFtIHNvb24uDQpTbyBJIHByZWZlciB0byBrZWVwIHRo
-aXMgcGFydCwgaXMgdGhhdCBva2F5IGZvciB5b3U/DQoNClRoYW5rcw0KDQo=
+Le 07/06/2022 à 05:53, Neal Liu a écrit :
+>> Le 06/06/2022 à 08:49, Neal Liu a écrit :
+>>> Add HACE crypto driver to support symmetric-key encryption and
+>>> decryption with multiple modes of operation.
+>>>
+>>> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+>>> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+>>> ---
+>>
+>> [...]
+>>
+>>> +static int aspeed_sk_transfer_sg(struct aspeed_hace_dev *hace_dev) {
+>>> +	struct aspeed_engine_crypto *crypto_engine =
+>> &hace_dev->crypto_engine;
+>>> +	struct device *dev = hace_dev->dev;
+>>> +	struct aspeed_cipher_reqctx *rctx;
+>>> +	struct skcipher_request *req;
+>>> +
+>>> +	CIPHER_DBG(hace_dev, "\n");
+>>> +
+>>> +	req = skcipher_request_cast(crypto_engine->areq);
+>>> +	rctx = skcipher_request_ctx(req);
+>>> +
+>>> +	if (req->src == req->dst) {
+>>> +		dma_unmap_sg(dev, req->src, rctx->src_nents,
+>> DMA_BIDIRECTIONAL);
+>>> +
+>>
+>> Unneeded empty line.
+> 
+> Okay !
+> 
+>>
+>>> +	} else {
+>>> +		dma_unmap_sg(dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
+>>> +		dma_unmap_sg(dev, req->dst, rctx->dst_nents,
+>> DMA_FROM_DEVICE);
+>>> +	}
+>>> +
+>>> +	return aspeed_sk_complete(hace_dev, 0); }
+>>> +
+>>
+>> [...]
+>>
+>>> +static int aspeed_sk_start_sg(struct aspeed_hace_dev *hace_dev) {
+>>> +	struct aspeed_engine_crypto *crypto_engine =
+>> &hace_dev->crypto_engine;
+>>> +	struct aspeed_sg_list *src_list, *dst_list;
+>>> +	dma_addr_t src_dma_addr, dst_dma_addr;
+>>> +	struct aspeed_cipher_reqctx *rctx;
+>>> +	struct skcipher_request *req;
+>>> +	struct scatterlist *s;
+>>> +	int src_sg_len;
+>>> +	int dst_sg_len;
+>>> +	int total, i;
+>>> +	int rc;
+>>> +
+>>> +	CIPHER_DBG(hace_dev, "\n");
+>>> +
+>>> +	req = skcipher_request_cast(crypto_engine->areq);
+>>> +	rctx = skcipher_request_ctx(req);
+>>> +
+>>> +	rctx->enc_cmd |= HACE_CMD_DES_SG_CTRL |
+>> HACE_CMD_SRC_SG_CTRL |
+>>> +			 HACE_CMD_AES_KEY_HW_EXP |
+>> HACE_CMD_MBUS_REQ_SYNC_EN;
+>>> +
+>>> +	/* BIDIRECTIONAL */
+>>> +	if (req->dst == req->src) {
+>>> +		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
+>>> +					rctx->src_nents, DMA_BIDIRECTIONAL);
+>>> +		dst_sg_len = src_sg_len;
+>>> +		if (!src_sg_len) {
+>>> +			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
+>>> +			return -EINVAL;
+>>> +		}
+>>> +
+>>> +	} else {
+>>> +		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
+>>> +					rctx->src_nents, DMA_TO_DEVICE);
+>>> +		if (!src_sg_len) {
+>>> +			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
+>>> +			return -EINVAL;
+>>> +		}
+>>> +
+>>> +		dst_sg_len = dma_map_sg(hace_dev->dev, req->dst,
+>>> +					rctx->dst_nents, DMA_FROM_DEVICE);
+>>> +		if (!dst_sg_len) {
+>>> +			dev_warn(hace_dev->dev, "dma_map_sg() dst error\n");
+>>> +			rc = -EINVAL;
+>>> +			goto free_req_src;
+>>
+>> Should we realy call dma_unmap_sg() if dma_map_sg() fails?
+> 
+> This error handling is unmap() the above buffer (req->src), not really this buffer (req->dst).
+> I think it should.
+
+You are right, I missread it. Sorry for the noise.
+
+> 
+>>
+>>> +		}
+>>> +	}
+>>> +
+>>> +	src_list = (struct aspeed_sg_list *)crypto_engine->cipher_addr;
+>>> +	src_dma_addr = crypto_engine->cipher_dma_addr;
+>>> +	total = req->cryptlen;
+>>> +
+>>> +	for_each_sg(req->src, s, src_sg_len, i) {
+>>> +		src_list[i].phy_addr = sg_dma_address(s);
+>>> +
+>>> +		/* last sg list */
+>>> +		if (sg_dma_len(s) >= total) {
+>>> +			src_list[i].len = total;
+>>> +			src_list[i].len |= BIT(31);
+>>> +			total = 0;
+>>> +			break;
+>>> +		}
+>>> +
+>>> +		src_list[i].len = sg_dma_len(s);
+>>> +		total -= src_list[i].len;
+>>> +	}
+>>> +
+>>> +	if (total != 0)
+>>> +		return -EINVAL;
+>>
+>> goto free_req_src; ?
+> 
+> Yes, I miss this part. I'll revise it in next patch, thanks.
+
+There is another one below...
+
+> 
+>>
+>>> +
+>>> +	if (req->dst == req->src) {
+>>> +		dst_list = src_list;
+>>> +		dst_dma_addr = src_dma_addr;
+>>> +
+>>> +	} else {
+>>> +		dst_list = (struct aspeed_sg_list *)crypto_engine->dst_sg_addr;
+>>> +		dst_dma_addr = crypto_engine->dst_sg_dma_addr;
+>>> +		total = req->cryptlen;
+>>> +
+>>> +		for_each_sg(req->dst, s, dst_sg_len, i) {
+>>> +			dst_list[i].phy_addr = sg_dma_address(s);
+>>> +
+>>> +			/* last sg list */
+>>> +			if (sg_dma_len(s) >= total) {
+>>> +				dst_list[i].len = total;
+>>> +				dst_list[i].len |= BIT(31);
+>>> +				total = 0;
+>>> +				break;
+>>> +			}
+>>> +
+>>> +			dst_list[i].len = sg_dma_len(s);
+>>> +			total -= dst_list[i].len;
+>>> +		}
+>>> +
+>>> +		dst_list[dst_sg_len].phy_addr = 0;
+>>> +		dst_list[dst_sg_len].len = 0;
+>>> +	}
+>>> +
+>>> +	if (total != 0)
+>>> +		return -EINVAL;
+
+... here.
+
+>>> +
+>>> +	crypto_engine->resume = aspeed_sk_transfer_sg;
+>>> +
+>>> +	/* Dummy read for barriers */
+>>> +	readl(src_list);
+>>> +	readl(dst_list);
+>>> +
+>>> +	/* Trigger engines */
+>>> +	ast_hace_write(hace_dev, src_dma_addr, ASPEED_HACE_SRC);
+>>> +	ast_hace_write(hace_dev, dst_dma_addr, ASPEED_HACE_DEST);
+>>> +	ast_hace_write(hace_dev, req->cryptlen, ASPEED_HACE_DATA_LEN);
+>>> +	ast_hace_write(hace_dev, rctx->enc_cmd, ASPEED_HACE_CMD);
+>>> +
+>>> +	return -EINPROGRESS;
+>>> +
+>>> +free_req_src:
+>>> +	dma_unmap_sg(hace_dev->dev, req->src, rctx->src_nents,
+>>> +DMA_TO_DEVICE);
+>>> +
+>>> +	return rc;
+>>> +}
+>>> +
+>>
+>> [...]
+>>
+>>> +static int aspeed_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
+>>> +			     unsigned int keylen)
+>>> +{
+>>> +	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
+>>> +	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
+>>> +	struct crypto_aes_ctx gen_aes_key;
+>>> +
+>>> +	CIPHER_DBG(hace_dev, "keylen: %d bits\n", (keylen * 8));
+>>> +
+>>> +	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
+>>> +	    keylen != AES_KEYSIZE_256)
+>>> +		return -EINVAL;
+>>> +
+>>> +	if (ctx->hace_dev->version == AST2500_VERSION) {
+>>> +		aes_expandkey(&gen_aes_key, key, keylen);
+>>> +		memcpy(ctx->key, gen_aes_key.key_enc, AES_MAX_KEYLENGTH);
+>>> +
+>>
+>> Unneeded empty line
+> 
+> Okay !
+> 
+>>
+>>> +	} else {
+>>> +		memcpy(ctx->key, key, keylen);
+>>> +	}
+>>> +
+>>> +	ctx->key_len = keylen;
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>
+>> [...]
+>>
+>>> +	crypto_engine->cipher_ctx =
+>>> +		dma_alloc_coherent(&pdev->dev,
+>>> +				   PAGE_SIZE,
+>>> +				   &crypto_engine->cipher_ctx_dma,
+>>> +				   GFP_KERNEL);
+>>> +	if (!crypto_engine->cipher_ctx) {
+>>> +		dev_err(&pdev->dev, "Failed to allocate cipher ctx dma\n");
+>>> +		rc = -ENOMEM;
+>>> +		goto free_hash_src;
+>>> +	}
+>>> +
+>>> +	crypto_engine->cipher_addr =
+>>> +		dma_alloc_coherent(&pdev->dev,
+>>> +				   ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
+>>> +				   &crypto_engine->cipher_dma_addr,
+>>> +				   GFP_KERNEL);
+>>> +	if (!crypto_engine->cipher_addr) {
+>>> +		dev_err(&pdev->dev, "Failed to allocate cipher addr dma\n");
+>>> +		rc = -ENOMEM;
+>>> +		goto free_cipher_ctx;
+>>> +	}
+>>> +
+>>> +	if (hace_dev->version == AST2600_VERSION) {
+>>> +		crypto_engine->dst_sg_addr =
+>>> +			dma_alloc_coherent(&pdev->dev,
+>>> +					   ASPEED_CRYPTO_DST_DMA_BUF_LEN,
+>>> +					   &crypto_engine->dst_sg_dma_addr,
+>>> +					   GFP_KERNEL);
+>>> +		if (!crypto_engine->dst_sg_addr) {
+>>> +			dev_err(&pdev->dev, "Failed to allocate dst_sg dma\n");
+>>> +			rc = -ENOMEM;
+>>> +			goto free_cipher_addr;
+>>> +		}
+>>> +	}
+>>> +
+>>>    	rc = aspeed_hace_register(hace_dev);
+>>>    	if (rc) {
+>>>    		dev_err(&pdev->dev, "Failed to register algs, rc:0x%x\n", rc);
+>>
+>> I guess that the new dma_alloc_coherent() just a few lines above should also
+>> be undone in error hanfling path if aspeed_hace_register() fails?
+> 
+> I'll remove the return value (rc) since it's useless here. So no need error handling on this part.
+> I'll revise it in next patch, thanks.
+> 
+>>
+>>> @@ -179,6 +282,18 @@ static int aspeed_hace_probe(struct
+>>> platform_device *pdev)
+>>>
+>>>    	return 0;
+>>>
+>>> +free_cipher_addr:
+>>> +	dma_free_coherent(&pdev->dev, ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
+>>> +			  crypto_engine->cipher_addr,
+>>> +			  crypto_engine->cipher_dma_addr);
+>>> +free_cipher_ctx:
+>>> +	dma_free_coherent(&pdev->dev, PAGE_SIZE,
+>>> +			  crypto_engine->cipher_ctx,
+>>> +			  crypto_engine->cipher_ctx_dma);
+>>> +free_hash_src:
+>>> +	dma_free_coherent(&pdev->dev, ASPEED_HASH_SRC_DMA_BUF_LEN,
+>>> +			  hash_engine->ahash_src_addr,
+>>> +			  hash_engine->ahash_src_dma_addr);
+>>>    end:
+>>>    	clk_disable_unprepare(hace_dev->clk);
+>>>    	return rc;
+
