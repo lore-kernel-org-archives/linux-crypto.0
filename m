@@ -2,121 +2,124 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831EAC43334
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 06:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DB1C43334
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 06:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237042AbiFGGdd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jun 2022 02:33:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
+        id S237258AbiFGGtD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Jun 2022 02:49:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237031AbiFGGdc (ORCPT
+        with ESMTP id S237293AbiFGGs7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jun 2022 02:33:32 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CEA2A271
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 23:33:29 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id x3-20020a056e021bc300b002d1b0ccfca6so13180205ilv.11
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Jun 2022 23:33:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=HKsdbbloWmDVf+xwX90jh6OebywG/qiKXLEQJYJCpeo=;
-        b=ygPFiLmnKuVs+L73DijGAdVTb2vT1ToCrLDobJPZ9Py6PU7R+YSKyuC/lA0DjhwcMe
-         aJRerWkFw+9LSDswVYehA13jYILXADTd5CRT/h4VuuZHzJaxfI2xDNX49Xc+YoQYBLPn
-         GJ4dtuqOruUjARDRKkr+EjXM5qYqnLhT6EE91D3NpxZ3I46dVekAgP+YKdtOZWKpIsR1
-         QZBhsR8YDErXF+EH5LxC9Ir+oDyELRHzJNDv/F6XDWB8qfJHeqczs8eqEfCfQf9SwY6c
-         Ykx0t00L0X6o+jVEJhlsdVUZuUdP6bb5ovmRcd9Ro8Ts0Nx1oOpkU2234Jn8v30rOEDI
-         Fv0Q==
-X-Gm-Message-State: AOAM5310woPcL1uqq+yn2TdgqINxn7joMXiJ3pJaSfSsMFhsHqTdrh83
-        bBwNBzuKQe/xhNThH/qP5n/sDyThF8wQMsm4dOo/PWx7hERM
-X-Google-Smtp-Source: ABdhPJxBwCt0Gq6e4RjkMaq7JYb0t3Yhrtw1rXkKwN3CocXd7UEOwcn2On0A0bPeAFuk77j7Mm83yvufZ+SxyggPCWzvaDmaGAsE
+        Tue, 7 Jun 2022 02:48:59 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755AE5EDE0
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 23:48:55 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nyT1E-00072G-65; Tue, 07 Jun 2022 08:48:48 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nyT1E-006wUO-Nc; Tue, 07 Jun 2022 08:48:47 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nyT1C-00EiNW-PX; Tue, 07 Jun 2022 08:48:46 +0200
+Date:   Tue, 7 Jun 2022 08:48:44 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc:     Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Claudiu Beznea <claudiu.beznea@microchip.com>,
+        linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org
+Subject: Re: [PATCH] crypto: atmel-ecc - Remove duplicated error reporting in
+ .remove()
+Message-ID: <20220607064844.a6cfpljjowyt3fiz@pengutronix.de>
+References: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
+ <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2586:b0:331:bbbe:4f63 with SMTP id
- s6-20020a056638258600b00331bbbe4f63mr3652859jat.255.1654583608285; Mon, 06
- Jun 2022 23:33:28 -0700 (PDT)
-Date:   Mon, 06 Jun 2022 23:33:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000039214105e0d5c4f4@google.com>
-Subject: [syzbot] usb-testing boot error: INFO: task hung in add_early_randomness
-From:   syzbot <syzbot+695f4009c37860232f35@syzkaller.appspotmail.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux@dominikbrodowski.net, mpm@selenic.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="aqkaxjvdsflilhwt"
+Content-Disposition: inline
+In-Reply-To: <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+
+--aqkaxjvdsflilhwt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
 Hello,
 
-syzbot found the following issue on:
+On Fri, May 20, 2022 at 07:21:00PM +0200, Uwe Kleine-K=F6nig wrote:
+> Returning an error value in an i2c remove callback results in an error
+> message being emitted by the i2c core, but otherwise it doesn't make a
+> difference. The device goes away anyhow and the devm cleanups are
+> called.
+>=20
+> As atmel_ecc_remove() already emits an error message on failure and the
+> additional error message by the i2c core doesn't add any useful
+> information, change the return value to zero to suppress this message.
+>=20
+> Also make the error message a bit more drastical because when the device
+> is still busy on remove, it's likely that it will access freed memory
+> soon.
+>=20
+> This patch is a preparation for making i2c remove callbacks return void.
 
-HEAD commit:    f2906aa86338 Linux 5.19-rc1
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=1042a03bf00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3bafeb86189666d4
-dashboard link: https://syzkaller.appspot.com/bug?extid=695f4009c37860232f35
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+I want to tackle this (i.e.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+695f4009c37860232f35@syzkaller.appspotmail.com
+diff --git a/include/linux/i2c.h b/include/linux/i2c.h
+index fbda5ada2afc..066b541a0d5d 100644
+--- a/include/linux/i2c.h
++++ b/include/linux/i2c.h
+@@ -273,7 +273,7 @@ struct i2c_driver {
 
-INFO: task swapper/0:1 blocked for more than 143 seconds.
-      Not tainted 5.19.0-rc1-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:swapper/0       state:D stack:23984 pid:    1 ppid:     0 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0x93c/0x25e0 kernel/sched/core.c:6428
- schedule+0xd2/0x1f0 kernel/sched/core.c:6500
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0xa70/0x1350 kernel/locking/mutex.c:747
- add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
- hwrng_register+0x399/0x510 drivers/char/hw_random/core.c:599
- virtrng_scan+0x37/0x90 drivers/char/hw_random/virtio-rng.c:205
- virtio_dev_probe+0x639/0x910 drivers/virtio/virtio.c:313
- call_driver_probe drivers/base/dd.c:555 [inline]
- really_probe+0x23e/0xb90 drivers/base/dd.c:634
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:764
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:794
- __driver_attach+0x22d/0x550 drivers/base/dd.c:1163
- bus_for_each_dev+0x147/0x1d0 drivers/base/bus.c:301
- bus_add_driver+0x422/0x640 drivers/base/bus.c:618
- driver_register+0x220/0x3a0 drivers/base/driver.c:240
- do_one_initcall+0x103/0x650 init/main.c:1295
- do_initcall_level init/main.c:1368 [inline]
- do_initcalls init/main.c:1384 [inline]
- do_basic_setup init/main.c:1403 [inline]
- kernel_init_freeable+0x6ac/0x735 init/main.c:1610
- kernel_init+0x1a/0x1d0 init/main.c:1499
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
+ 	/* Standard driver model interfaces */
+ 	int (*probe)(struct i2c_client *client, const struct i2c_device_id *id);
+-	int (*remove)(struct i2c_client *client);
++	void (*remove)(struct i2c_client *client);
 
-Showing all locks held in the system:
-2 locks held by swapper/0/1:
- #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
- #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1054 [inline]
- #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __driver_attach+0x222/0x550 drivers/base/dd.c:1162
- #1: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
-2 locks held by pr/ttyS0/14:
-1 lock held by khungtaskd/27:
- #0: ffffffff87a94840 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
-1 lock held by hwrng/150:
- #0: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x141/0x370 drivers/char/hw_random/core.c:503
+ 	/* New driver model interface to aid the seamless removal of the
+ 	 * current probe()'s, more commonly unused than used second parameter.
 
-=============================================
+) directly after the next merge window. That is (depending on Linus's
+counting capabilities) after v5.20-rc1. So I ask you to either take this
+crypto patch before (my preferred option), or accept that I send it as part
+of a bigger series that eventually contains the above hunk and will
+probably be merged via the i2c tree.
+
+Best regards
+Uwe
 
 
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--aqkaxjvdsflilhwt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKe9MkACgkQwfwUeK3K
+7AnyDwgAn2uizkd5IsV/rfJm2HRMgC3zTB1AadQtCmh1QMWFdKb9Ct3FcbJI9XRB
++KFaNmcbPCQrQ9yxQQb216HpXyJ5uadnt8patFZIoaZf3kMW5MJTghihcwsrX7iF
+WS1NeU6iu6smMSxv7twxJcu/7yPUP8WyxWJ0hYY55PM/4vaKFfXTa6i7VLN6+pOT
+kzUFM2+7OyIrci6U3f2YlMh4Zktu+WqXLEAnUDk7vTFxH41mY/SME0F6Gk4YqO3P
+yshJMnZV4n0L7ODdXe65HpqjwCQyFNvB5mvxvSq8In5VjdfUCy7ZYu4oYEm1Jg4B
+mlwMffjEWNnsnuoP+kdJGOhDp/xmGQ==
+=Ytbv
+-----END PGP SIGNATURE-----
+
+--aqkaxjvdsflilhwt--
