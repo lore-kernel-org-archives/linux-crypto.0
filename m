@@ -2,213 +2,239 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6D5C43334
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 01:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE09C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 02:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232932AbiFGBu1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Jun 2022 21:50:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57422 "EHLO
+        id S233017AbiFGCmU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 6 Jun 2022 22:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235587AbiFGBuV (ORCPT
+        with ESMTP id S236022AbiFGCmS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jun 2022 21:50:21 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B89676898C
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 18:50:19 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id r17-20020a0566022b9100b00654b99e71dbso7249916iov.3
-        for <linux-crypto@vger.kernel.org>; Mon, 06 Jun 2022 18:50:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=vcc3rsXseWxWD8RW7gyYZRvOftqn/pKm1SgNDbde/9E=;
-        b=R/Ynew+rTorm77qlrt4FLUBuyv/YOu/NV5201lhsLHk2Hvk1cLJOglFE/DKwZLptT0
-         0/LkM0EkVkU6DCj2sTd2RyM4aBF4wHTX85WZeZ0dxWLBVThlkfljRnkHV2LXVPRBwZFC
-         4q+qi0erkCRGdP4yDIlw7BIbkao1NjM+34BpKd6O88w/kxCeCU8RdR3xvBSpNzybYH+w
-         B9s9P1w47AOBKLcepPxqZ3aUWzrbEx5tn1zRnYhnveNnk1p+VfNZV9I+yR75Mg1FUb2j
-         JaesxxRUNjlJh5AzJlaXFxq6FPVqJ+dsWxM94EYGUHCEhcgy0WhRweOubrij5wKwwf2n
-         ABmA==
-X-Gm-Message-State: AOAM532GkfFeYWgIvv5bdi5cZlIKaPI6yLszHKZd1MUJPkOm6cHHrZVq
-        VAWMSdPUfSSbBkL/UUf/dhMAuCM2hG+Gh7OCTey7y6KK8nsD
-X-Google-Smtp-Source: ABdhPJxZVFl9fxQ7o7xjxpsHYZt/kXWeqk1kXwIHajH6DWTA2Z7ELbokaG82S6NxnGopGYgp2ka+6AImkoT6y4MPkPkaumKTe8Lq
+        Mon, 6 Jun 2022 22:42:18 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2136.outbound.protection.outlook.com [40.107.255.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B19EB5;
+        Mon,  6 Jun 2022 19:42:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k0g2e/SadNV5sGk/R2laYxhBmvFfWhlnKPxxsds6QadlreRQlETezR7++t1SJwhMbnuburlOD9LWIAh9W0eXhoEfY5icRnB29w8GvfAuTgiPYf2vj2AiwehxlXqW0GlNAMyr122+qNRJoOb1+a23I7lswqznAkL4Uj4/9pQ2ewsVv0MvBQ/2Lz1hCmzZDCC1g+fKaqUk1AExrYQuF2RpaxDcDUBDYP6acneaWOFKjtLHOWJRQ29LmDkIVVuzkUuik5V/ryGloalyPj0blr23RyCjHlqC4WZBA6W5D5q2k4xFPOZn2QibVX8Jb4GDdafjMeBwYty+4KxCXRQ+sqKj6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0ZCTM5GcsZOVdulG3Fraj3vJFa1gMuoleSKGXq47SNE=;
+ b=YR76WA7jg/c4TUT63z4fmOJLaPm06U7AkmoVTw1YMDFWc0Hf6s6SvNV06q4QthV3+rHOArzqvH3kMkQEqTQjqmFJMs9MOG34yRiGSdCh4n4JZ1Gvo/k5GrVVJgEC6u+I2RR/bwO+jolePJp/g3CcKW/UtHMqvV4QiRnpOhVZloML8kBEqNNNR5LnjZVYUhuwkxREyQJb1xWRzsrmsS2o3Za6S4TfclHr2uZIbPJWCrFPcA0Vxy5K1NFmPxyIZ17qzwjQglo/FT6++nLChs1Wu80oRuaeTcgJMMVzTSCe25bTA/0Lds5WA5wbsldNfuM5DgFwKOEcu+2POHURjlRusw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ZCTM5GcsZOVdulG3Fraj3vJFa1gMuoleSKGXq47SNE=;
+ b=SGbxtFAngSrohyP529H3YOVVKxvq0xuhFFNaoECG9+NDKAjYpdx1+egnALe3YjyFg8R9a3bw1hTPC4E/Zhv17EHZzQgJK1Zq/vMNZFlJ+BhaKzJYjB6XBtsF9/DHQdoF4nXzCA1ZIsTMmMoykn2ZkgW4L3NTvBtFrMDfiepAoyR2kDh3IlPT/JN9ZsHhL075skAbG8S/No5hwzkurY4XzhzMky+OIJau4ca1cCUH0Z7xmbw8nekC3AY1ynDGOj8k1v09ISSpQzo00jvMcOdzrWuscxrRIQDyjGTb1UYvqQ62Ut4dQ187GwnKWwqr98boltUmSar8ilIMMsqt6FAOZw==
+Received: from HK0PR06MB3202.apcprd06.prod.outlook.com (2603:1096:203:87::17)
+ by TY2PR06MB3054.apcprd06.prod.outlook.com (2603:1096:404:a1::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.17; Tue, 7 Jun
+ 2022 02:42:09 +0000
+Received: from HK0PR06MB3202.apcprd06.prod.outlook.com
+ ([fe80::7c42:9783:92c9:f237]) by HK0PR06MB3202.apcprd06.prod.outlook.com
+ ([fe80::7c42:9783:92c9:f237%7]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
+ 02:42:09 +0000
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Johnny Huang <johnny_huang@aspeedtech.com>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/5] crypto: aspeed: Add HACE hash driver
+Thread-Topic: [PATCH 1/5] crypto: aspeed: Add HACE hash driver
+Thread-Index: AQHYdXpgV+xzTk0fKkKH13lAbtmvOa06KxMAgAAMVKCAB9rRgIABMqTQ
+Date:   Tue, 7 Jun 2022 02:42:08 +0000
+Message-ID: <HK0PR06MB3202C108F41724E49E2C5C7280A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
+References: <20220601054204.1522976-1-neal_liu@aspeedtech.com>
+ <20220601054204.1522976-2-neal_liu@aspeedtech.com> <YpcYLiJfC6tgP2Nj@Red>
+ <HK0PR06MB320263939B2E388481DE2A0A80DF9@HK0PR06MB3202.apcprd06.prod.outlook.com>
+ <Yp25UVBCNHzeiQOn@Red>
+In-Reply-To: <Yp25UVBCNHzeiQOn@Red>
+Accept-Language: en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1a2a0358-0892-4a1a-7af6-08da482f5122
+x-ms-traffictypediagnostic: TY2PR06MB3054:EE_
+x-microsoft-antispam-prvs: <TY2PR06MB305472AE08ECC48A993651AF80A59@TY2PR06MB3054.apcprd06.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: vAIX7A9n0l5aPAJJfcVMrbyS4eY1HUiT5SffyWs3zLYny2wJzq6L96if+JEyLSChDyeLw8NcqHt149a+oTROB1YjlfsxxzGTGl4wYRwEo1xvpJgAN0DAxbZV0M59J5SRJDLShoDinNGBKOW9g8mZ9jwz6lg/c/NzZKfHlLnoNska8XOysCJFTKyvDHUibnQMBwF2tP9oDsaEn5xMlfeYt6xfOezat7wI0ZlIDjDa6hfdFJhhxbxlE8tjP69Py8Wr6aQReJc4OPv0xXUly1xHQP69xLTr41rUwnGb8YSBvPWy8Y6ROZsWcpwwrMDvPUt33tHrYGQ7Ctc2QNnstlqX/AsE4B4wBFbj7a+quUskZpEUE5WNtCYZrR4enEDDcU6m/OfmKJOrPimN+bNNMS6hw+rwXTDKArnw42dJ2qVr3wjdNAZI/OcYlQ/iO0sbiMsO+838Uu6hPkdFBeF0MCm6G7DD0V7R7vyW0s3E9S5hUxvNNfjdw8qjx2d1TJ34KGnKuDgy1kZvQJxCPD6LLVLOgn61OzNPmT/feADnVvvihAHO9Qej47ZKLRtCTaQ8GgxnNGDofxf7YH0V/D0+kn5B1s8nIFM5H+767vF083QUW20H6C6IJZfoDk8O6h0Bcr7VI4TE7N3SgYtyVxPBTGw6UaNxbawxCm4K2YyxngKlzDJlyW/+bla0PoR28lwr/90OQHRPKJeIJ5b4h8/Q2rdOiA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HK0PR06MB3202.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(4326008)(66476007)(64756008)(8936002)(76116006)(2906002)(66556008)(38070700005)(52536014)(33656002)(66946007)(55016003)(71200400001)(66446008)(8676002)(122000001)(7416002)(508600001)(5660300002)(316002)(186003)(66574015)(6916009)(54906003)(9686003)(7696005)(6506007)(83380400001)(26005)(86362001)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?2FDfgiMQDZchzYBtKJ2S9RqkjmghObvYgpyZTy4dC5jem8DyDrF2m37FaD?=
+ =?iso-8859-1?Q?GJNVamy9YPNzeXbi+70/uqAHeIJ4Mbj+VzwGj+s4uHJKztTxvbM82P7+/g?=
+ =?iso-8859-1?Q?CO56J0+a4rKQ9Co63hC5jWdGKNjmzLCC6KBlZ4z0/ZchE3QJPggypSO2ah?=
+ =?iso-8859-1?Q?u5YA13aG8fVraIVfE7uB14OpkOfRCY43VbTtd474crSxPlRXqyvNyGcpoC?=
+ =?iso-8859-1?Q?aF71OPrlEfRiVUeGshAEtau7y8kBfWVFQdyePZHcT8aKJgI6hf5qxngYds?=
+ =?iso-8859-1?Q?rSK2xWpJGMRnnfp14gPtkHb/G/Bmo+GMG4wRroaG1CyuYTfXqkJPs8bMbP?=
+ =?iso-8859-1?Q?qmeIdK4AnZ7BsRGMAOZCcN9UTMYFp2d4rE8kyKHwnh2F2ZgQW9e0Ye4Ifo?=
+ =?iso-8859-1?Q?P/ztIis9UrSp73KOrYV/6fjHhLgkrUFYE5Nxp7Gryexytq4xPrDBlIIoQF?=
+ =?iso-8859-1?Q?J3P8/zb3exPcvxgBLENljDorU1Ruo0ieKp+6k9VPhB+JEvAP7yU0Ct9g45?=
+ =?iso-8859-1?Q?8Uavil+AHGeTJ38SyF2NAEv/jjU5Q/qoc5WkmbCsg82/UmkngRVTetbFXh?=
+ =?iso-8859-1?Q?N3X92sdINFZKW3y7BYlu2Scpei+d6kA3QKx4/1AFRiKpvGDb3ZzAOiVjX1?=
+ =?iso-8859-1?Q?7lPuTIUslJVNhiKJbagdqINcUINCs2Lfxe9mG9XiKSpkFT5R3brqE+yWM7?=
+ =?iso-8859-1?Q?wmTO3Q4tZ0TjFDlAHyRkk0z877MP/JCGBcECkuNsAEjh+bVsTGZbjRIQWl?=
+ =?iso-8859-1?Q?YxTpapl0IWapB7FSl1i5TVZXi5PN8KCbXpDUBx39bu6sY3LailtSsXty5q?=
+ =?iso-8859-1?Q?K06x4X4bgIktqkY2JsaTK5IQXeYZQkOJ8SmtuyP4MKmffbr3UucEQK0+Ya?=
+ =?iso-8859-1?Q?ww+10Eo5LwYUnmKihuz+1/ADMGo9/8ANDH8YjDzHmDjhi1q5ovsig5cNvF?=
+ =?iso-8859-1?Q?DAgIVGemlbXQ6z1tCJFizDaN52jDOsLX3WBYKBDbo8rk9+5G7CJ16YvFM9?=
+ =?iso-8859-1?Q?jLrXwKt2RW6jgl4Ywd99lv3dbUOfvV8X0mrtJbE8D2EqdL63wM9lS4zWOf?=
+ =?iso-8859-1?Q?AfZaHrFcHVHn96DGPUvIyjMq7X3+4DVMwuf9t72d6+PmONQMST5MGxVCeo?=
+ =?iso-8859-1?Q?RlVuddXKThMWzBSiA8LjWDCwFTBnG7H1YVdDcjbevGYtKWODwfeCWEJ0xI?=
+ =?iso-8859-1?Q?b6qFHNFlmHpCYKRsq/lY9VYH8lqdE6IzUg2Ljy6Nro2bab3lRt9PfO8e0u?=
+ =?iso-8859-1?Q?N8rBewcQw2sOZW+0w5jPt+Fa6C5XJmFrsNkQcUB1PkCboYYrpdPzGXoqN/?=
+ =?iso-8859-1?Q?EMr4O2XG4HvRQdnSV4k0k+QD3lZIe+fAOjyWv8mDVioWwhjMcmoqcqzB/n?=
+ =?iso-8859-1?Q?OrrxHiTjemRUGUnfbjaSpaq70SIJmXZ4Ig/5i1ImF5xj9J9QM6ykddXws6?=
+ =?iso-8859-1?Q?5qnJ6FXUQPAJEFZ0ch8C43l5fW9DDr9rFZ/60rW3sL6cjCovS5vQNXzhjb?=
+ =?iso-8859-1?Q?wVIpi7he9+/u3pq8Vj6V6+GM7LkXRPdpr3dmikr72mf0+j9lpWIkLLTDae?=
+ =?iso-8859-1?Q?0xLXp2Zh9ZTGYHJFGjGd/B3eMcrrgA4LMQLhusNXSuWzy7jvPzicoM3rAc?=
+ =?iso-8859-1?Q?0dBgSOWO441M9O/6780d/LMON7d6B7f5QOJwr3CUH/OkpsJO3FWyiB18ki?=
+ =?iso-8859-1?Q?q+KFor4PKlpf2zpgnsC56zdSqlrSItLe5UULihY3pjWHuK01hY23Be2xba?=
+ =?iso-8859-1?Q?umll4af0Qd67ZEzJoZmSkEAp2ayykCZGyvd4sEtTCVBeYEHXbaJ0vwNUYt?=
+ =?iso-8859-1?Q?VvMBmdK+iQ=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:19cc:b0:2d3:e20f:4959 with SMTP id
- r12-20020a056e0219cc00b002d3e20f4959mr15779069ill.40.1654566619131; Mon, 06
- Jun 2022 18:50:19 -0700 (PDT)
-Date:   Mon, 06 Jun 2022 18:50:19 -0700
-In-Reply-To: <000000000000fc128605e08585c6@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009736b105e0d1cfa1@google.com>
-Subject: Re: [syzbot] INFO: task hung in add_early_randomness (2)
-From:   syzbot <syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@dominikbrodowski.net,
-        mpm@selenic.com, syzkaller-bugs@googlegroups.com,
-        yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: HK0PR06MB3202.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a2a0358-0892-4a1a-7af6-08da482f5122
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2022 02:42:08.7754
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: J6PV1h7tIjAhCE7zKyf1796sm6SLKN0iMnuCVWVKP21McuEnMaS6Eq2Rs2kOpwVg91IitRBxbdenqt/QnlcCMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY2PR06MB3054
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+> Le Wed, Jun 01, 2022 at 08:38:51AM +0000, Neal Liu a =E9crit :
+> > > Le Wed, Jun 01, 2022 at 01:42:00PM +0800, Neal Liu a =E9crit :
+> > > > Hash and Crypto Engine (HACE) is designed to accelerate the
+> > > > throughput of hash data digest, encryption, and decryption.
+> > > >
+> > > > Basically, HACE can be divided into two independently engines
+> > > > - Hash Engine and Crypto Engine. This patch aims to add HACE hash
+> > > > engine driver for hash accelerator.
+> > > >
+> > > > Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+> > > > Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+> > >
+> > > Hello
+> > >
+> > > Did you test with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy (you should
+> > > said it in cover letter).
+> > > There are several easy style fixes to do (please run checkpatch
+> > > --strict) Did you test your driver with both little and big endian mo=
+de ?
+> > >
+> >
+> > Yes, I also test it with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy. I'll
+> describe it in cover letter as you suggested.
+> > And the style problem would be fixed, thanks for your suggestion.
+> >
+> > How to test it with both little and big endian mode? It would be apprec=
+iated
+> if you give me some clue.
+> >
+>=20
+> Hello
+>=20
+> Sorry for the delayed answer.
+>=20
+> You should try compiling and booting with CONFIG_CPU_BIG_ENDIAN=3Dy
+>=20
 
-HEAD commit:    f2906aa86338 Linux 5.19-rc1
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d62393f00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cbd131cc02ee620e
-dashboard link: https://syzkaller.appspot.com/bug?extid=5b59d6d459306a556f54
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=104f4d4ff00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d6782df00000
+Thanks for the info. I'll try it.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com
+> > > Also please see my comment below.
+> > >
+> > > [...]
+> > > > +/* Initialization Vectors for SHA-family */ static const u32
+> > > > +sha1_iv[8] =3D {
+> > > > +	0x01234567UL, 0x89abcdefUL, 0xfedcba98UL, 0x76543210UL,
+> > > > +	0xf0e1d2c3UL, 0, 0, 0
+> > > > +};
+> > > > +
+> > > > +static const u32 sha224_iv[8] =3D {
+> > > > +	0xd89e05c1UL, 0x07d57c36UL, 0x17dd7030UL, 0x39590ef7UL,
+> > > > +	0x310bc0ffUL, 0x11155868UL, 0xa78ff964UL, 0xa44ffabeUL };
+> > > > +
+> > > > +static const u32 sha256_iv[8] =3D {
+> > > > +	0x67e6096aUL, 0x85ae67bbUL, 0x72f36e3cUL, 0x3af54fa5UL,
+> > > > +	0x7f520e51UL, 0x8c68059bUL, 0xabd9831fUL, 0x19cde05bUL };
+> > > > +
+> > > > +static const u32 sha384_iv[16] =3D {
+> > > > +	0x5d9dbbcbUL, 0xd89e05c1UL, 0x2a299a62UL, 0x07d57c36UL,
+> > > > +	0x5a015991UL, 0x17dd7030UL, 0xd8ec2f15UL, 0x39590ef7UL,
+> > > > +	0x67263367UL, 0x310bc0ffUL, 0x874ab48eUL, 0x11155868UL,
+> > > > +	0x0d2e0cdbUL, 0xa78ff964UL, 0x1d48b547UL, 0xa44ffabeUL };
+> > > > +
+> > > > +static const u32 sha512_iv[16] =3D {
+> > > > +	0x67e6096aUL, 0x08c9bcf3UL, 0x85ae67bbUL, 0x3ba7ca84UL,
+> > > > +	0x72f36e3cUL, 0x2bf894feUL, 0x3af54fa5UL, 0xf1361d5fUL,
+> > > > +	0x7f520e51UL, 0xd182e6adUL, 0x8c68059bUL, 0x1f6c3e2bUL,
+> > > > +	0xabd9831fUL, 0x6bbd41fbUL, 0x19cde05bUL, 0x79217e13UL };
+> > > > +
+> > > > +static const u32 sha512_224_iv[16] =3D {
+> > > > +	0xC8373D8CUL, 0xA24D5419UL, 0x6699E173UL, 0xD6D4DC89UL,
+> > > > +	0xAEB7FA1DUL, 0x829CFF32UL, 0x14D59D67UL, 0xCF9F2F58UL,
+> > > > +	0x692B6D0FUL, 0xA84DD47BUL, 0x736FE377UL, 0x4289C404UL,
+> > > > +	0xA8859D3FUL, 0xC8361D6AUL, 0xADE61211UL, 0xA192D691UL };
+> > > > +
+> > > > +static const u32 sha512_256_iv[16] =3D {
+> > > > +	0x94213122UL, 0x2CF72BFCUL, 0xA35F559FUL, 0xC2644CC8UL,
+> > > > +	0x6BB89323UL, 0x51B1536FUL, 0x19773896UL, 0xBDEA4059UL,
+> > > > +	0xE23E2896UL, 0xE3FF8EA8UL, 0x251E5EBEUL, 0x92398653UL,
+> > > > +	0xFC99012BUL, 0xAAB8852CUL, 0xDC2DB70EUL, 0xA22CC581UL };
+> > >
+> > > Thoses IV already exists as define in linux headers (SHA1_H0 for
+> > > example) But I am puzzled on why you invert them.
+> > >
+> >
+> > This is Aspeed hardware limitation.
+>=20
+> The limitation is that hardware does not know theses IV ?
+> Having them inverted seems to proof that you have some endianness issue.
 
-INFO: task kworker/1:4:2941 blocked for more than 143 seconds.
-      Not tainted 5.19.0-rc1-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/1:4     state:D stack:23968 pid: 2941 ppid:     2 flags:0x00004000
-Workqueue: usb_hub_wq hub_event
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6428
- schedule+0xd2/0x1f0 kernel/sched/core.c:6500
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
- __mutex_lock_common kernel/locking/mutex.c:679 [inline]
- __mutex_lock+0xa70/0x1350 kernel/locking/mutex.c:747
- add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
- hwrng_register+0x399/0x510 drivers/char/hw_random/core.c:599
- chaoskey_probe+0x7b5/0xc40 drivers/usb/misc/chaoskey.c:205
- usb_probe_interface+0x315/0x7f0 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:555 [inline]
- really_probe+0x23e/0xb90 drivers/base/dd.c:634
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:764
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:794
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:917
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x1e4/0x530 drivers/base/dd.c:989
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xbda/0x1ea0 drivers/base/core.c:3417
- usb_set_configuration+0x101e/0x1900 drivers/usb/core/message.c:2170
- usb_generic_driver_probe+0xba/0x100 drivers/usb/core/generic.c:238
- usb_probe_device+0xd9/0x2c0 drivers/usb/core/driver.c:293
- call_driver_probe drivers/base/dd.c:555 [inline]
- really_probe+0x23e/0xb90 drivers/base/dd.c:634
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:764
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:794
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:917
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x1e4/0x530 drivers/base/dd.c:989
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xbda/0x1ea0 drivers/base/core.c:3417
- usb_new_device.cold+0x641/0x1091 drivers/usb/core/hub.c:2566
- hub_port_connect drivers/usb/core/hub.c:5363 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5507 [inline]
- port_event drivers/usb/core/hub.c:5663 [inline]
- hub_event+0x25d5/0x4690 drivers/usb/core/hub.c:5745
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
+Sorry, no limitation here. I can replace these IV into predefined macro.
+I'll also check the endianness issue.
 
-Showing all locks held in the system:
-2 locks held by pr/ttyS0/16:
-1 lock held by khungtaskd/29:
- #0: ffffffff8bd83be0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
-1 lock held by hwrng/755:
- #0: ffffffff8c829c28 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x141/0x370 drivers/char/hw_random/core.c:503
-6 locks held by kworker/1:4/2941:
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff888017505538 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000306fda8 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff8881476d6190 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
- #2: ffff8881476d6190 (&dev->mutex){....}-{3:3}, at: hub_event+0x1c1/0x4690 drivers/usb/core/hub.c:5691
- #3: ffff888017679190 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
- #3: ffff888017679190 (&dev->mutex){....}-{3:3}, at: __device_attach+0x76/0x530 drivers/base/dd.c:964
- #4: ffff888017670118 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
- #4: ffff888017670118 (&dev->mutex){....}-{3:3}, at: __device_attach+0x76/0x530 drivers/base/dd.c:964
- #5: ffffffff8c829c28 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
-2 locks held by getty/3293:
- #0: ffff88802858a098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
- #1: ffffc90001c182e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xe50/0x13c0 drivers/tty/n_tty.c:2124
+>=20
+> > >
+> > > Why didnt you use the crypto_engine API instead of rewriting it.
+> >
+> > Any common crypto_engine API can be used? I did not find any, Maybe I m=
+iss
+> something.
+> > It would be appreciated if you give me some clue.
+> >
+>=20
+> Please check crypto/crypto_engine.c.
+> You could take crypto/omap and allwinner/sun8i-ce as example of usage.
+>=20
+> Regards
 
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 29 Comm: khungtaskd Not tainted 5.19.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
- nmi_trigger_cpumask_backtrace+0x1e6/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:220 [inline]
- watchdog+0xc22/0xf90 kernel/hung_task.c:378
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 16 Comm: pr/ttyS0 Not tainted 5.19.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:io_serial_in+0x83/0xa0 drivers/tty/serial/8250/8250_port.c:461
-Code: 29 1a fd 48 8d 7d 40 44 89 e1 48 b8 00 00 00 00 00 fc ff df 48 89 fa d3 e3 48 c1 ea 03 80 3c 02 00 75 16 66 03 5d 40 89 da ec <5b> 0f b6 c0 5d 41 5c c3 e8 10 4d 66 fd eb a6 e8 39 4d 66 fd eb e3
-RSP: 0018:ffffc9000036fb10 EFLAGS: 00000002
-RAX: dffffc0000000000 RBX: 00000000000003fd RCX: 0000000000000000
-RDX: 00000000000003fd RSI: ffffffff845f7e1c RDI: ffffffff91221a80
-RBP: ffffffff91221a40 R08: 0000000000000001 R09: 000000000000001f
-R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
-R13: fffffbfff224439c R14: fffffbfff2244352 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055f845ac6200 CR3: 000000007dccd000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- serial_in drivers/tty/serial/8250/8250.h:118 [inline]
- wait_for_lsr+0x96/0xf0 drivers/tty/serial/8250/8250_port.c:2085
- serial8250_console_fifo_write drivers/tty/serial/8250/8250_port.c:3354 [inline]
- serial8250_console_write+0xc87/0xfe0 drivers/tty/serial/8250/8250_port.c:3436
- call_console_driver kernel/printk/printk.c:2075 [inline]
- __console_emit_next_record+0x896/0xa60 kernel/printk/printk.c:2916
- console_emit_next_record kernel/printk/printk.c:3721 [inline]
- printk_kthread_func.cold+0x702/0x73d kernel/printk/printk.c:3837
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	29 1a                	sub    %ebx,(%rdx)
-   2:	fd                   	std
-   3:	48 8d 7d 40          	lea    0x40(%rbp),%rdi
-   7:	44 89 e1             	mov    %r12d,%ecx
-   a:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  11:	fc ff df
-  14:	48 89 fa             	mov    %rdi,%rdx
-  17:	d3 e3                	shl    %cl,%ebx
-  19:	48 c1 ea 03          	shr    $0x3,%rdx
-  1d:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-  21:	75 16                	jne    0x39
-  23:	66 03 5d 40          	add    0x40(%rbp),%bx
-  27:	89 da                	mov    %ebx,%edx
-  29:	ec                   	in     (%dx),%al
-* 2a:	5b                   	pop    %rbx <-- trapping instruction
-  2b:	0f b6 c0             	movzbl %al,%eax
-  2e:	5d                   	pop    %rbp
-  2f:	41 5c                	pop    %r12
-  31:	c3                   	retq
-  32:	e8 10 4d 66 fd       	callq  0xfd664d47
-  37:	eb a6                	jmp    0xffffffdf
-  39:	e8 39 4d 66 fd       	callq  0xfd664d77
-  3e:	eb e3                	jmp    0x23
+Okay, thanks for the info.
 
