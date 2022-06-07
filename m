@@ -2,348 +2,121 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD443C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 05:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 831EAC43334
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jun 2022 06:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236666AbiFGFAs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jun 2022 01:00:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45698 "EHLO
+        id S237042AbiFGGdd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 7 Jun 2022 02:33:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236611AbiFGFAo (ORCPT
+        with ESMTP id S237031AbiFGGdc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jun 2022 01:00:44 -0400
-Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C669DAFB13
-        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 22:00:41 -0700 (PDT)
-Received: from [192.168.1.18] ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id yRKRntRriL5fDyRKSnPDgo; Tue, 07 Jun 2022 07:00:39 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Tue, 07 Jun 2022 07:00:39 +0200
-X-ME-IP: 90.11.190.129
-Message-ID: <a85c4f87-c87f-784f-7db3-0b83570f82da@wanadoo.fr>
-Date:   Tue, 7 Jun 2022 07:00:31 +0200
+        Tue, 7 Jun 2022 02:33:32 -0400
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CEA2A271
+        for <linux-crypto@vger.kernel.org>; Mon,  6 Jun 2022 23:33:29 -0700 (PDT)
+Received: by mail-il1-f198.google.com with SMTP id x3-20020a056e021bc300b002d1b0ccfca6so13180205ilv.11
+        for <linux-crypto@vger.kernel.org>; Mon, 06 Jun 2022 23:33:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=HKsdbbloWmDVf+xwX90jh6OebywG/qiKXLEQJYJCpeo=;
+        b=ygPFiLmnKuVs+L73DijGAdVTb2vT1ToCrLDobJPZ9Py6PU7R+YSKyuC/lA0DjhwcMe
+         aJRerWkFw+9LSDswVYehA13jYILXADTd5CRT/h4VuuZHzJaxfI2xDNX49Xc+YoQYBLPn
+         GJ4dtuqOruUjARDRKkr+EjXM5qYqnLhT6EE91D3NpxZ3I46dVekAgP+YKdtOZWKpIsR1
+         QZBhsR8YDErXF+EH5LxC9Ir+oDyELRHzJNDv/F6XDWB8qfJHeqczs8eqEfCfQf9SwY6c
+         Ykx0t00L0X6o+jVEJhlsdVUZuUdP6bb5ovmRcd9Ro8Ts0Nx1oOpkU2234Jn8v30rOEDI
+         Fv0Q==
+X-Gm-Message-State: AOAM5310woPcL1uqq+yn2TdgqINxn7joMXiJ3pJaSfSsMFhsHqTdrh83
+        bBwNBzuKQe/xhNThH/qP5n/sDyThF8wQMsm4dOo/PWx7hERM
+X-Google-Smtp-Source: ABdhPJxBwCt0Gq6e4RjkMaq7JYb0t3Yhrtw1rXkKwN3CocXd7UEOwcn2On0A0bPeAFuk77j7Mm83yvufZ+SxyggPCWzvaDmaGAsE
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v2 5/5] crypto: aspeed: add HACE crypto driver
-Content-Language: fr
-To:     Neal Liu <neal_liu@aspeedtech.com>
-Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, BMC-SW@aspeedtech.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-References: <20220606064935.1458903-1-neal_liu@aspeedtech.com>
- <20220606064935.1458903-6-neal_liu@aspeedtech.com>
- <ef2fc6ab-e487-1f95-dceb-fd190f064ac2@wanadoo.fr>
- <HK0PR06MB3202DFD70F7BA5090A14ACB780A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <HK0PR06MB3202DFD70F7BA5090A14ACB780A59@HK0PR06MB3202.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:2586:b0:331:bbbe:4f63 with SMTP id
+ s6-20020a056638258600b00331bbbe4f63mr3652859jat.255.1654583608285; Mon, 06
+ Jun 2022 23:33:28 -0700 (PDT)
+Date:   Mon, 06 Jun 2022 23:33:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000039214105e0d5c4f4@google.com>
+Subject: [syzbot] usb-testing boot error: INFO: task hung in add_early_randomness
+From:   syzbot <syzbot+695f4009c37860232f35@syzkaller.appspotmail.com>
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux@dominikbrodowski.net, mpm@selenic.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 07/06/2022 à 05:53, Neal Liu a écrit :
->> Le 06/06/2022 à 08:49, Neal Liu a écrit :
->>> Add HACE crypto driver to support symmetric-key encryption and
->>> decryption with multiple modes of operation.
->>>
->>> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
->>> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
->>> ---
->>
->> [...]
->>
->>> +static int aspeed_sk_transfer_sg(struct aspeed_hace_dev *hace_dev) {
->>> +	struct aspeed_engine_crypto *crypto_engine =
->> &hace_dev->crypto_engine;
->>> +	struct device *dev = hace_dev->dev;
->>> +	struct aspeed_cipher_reqctx *rctx;
->>> +	struct skcipher_request *req;
->>> +
->>> +	CIPHER_DBG(hace_dev, "\n");
->>> +
->>> +	req = skcipher_request_cast(crypto_engine->areq);
->>> +	rctx = skcipher_request_ctx(req);
->>> +
->>> +	if (req->src == req->dst) {
->>> +		dma_unmap_sg(dev, req->src, rctx->src_nents,
->> DMA_BIDIRECTIONAL);
->>> +
->>
->> Unneeded empty line.
-> 
-> Okay !
-> 
->>
->>> +	} else {
->>> +		dma_unmap_sg(dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
->>> +		dma_unmap_sg(dev, req->dst, rctx->dst_nents,
->> DMA_FROM_DEVICE);
->>> +	}
->>> +
->>> +	return aspeed_sk_complete(hace_dev, 0); }
->>> +
->>
->> [...]
->>
->>> +static int aspeed_sk_start_sg(struct aspeed_hace_dev *hace_dev) {
->>> +	struct aspeed_engine_crypto *crypto_engine =
->> &hace_dev->crypto_engine;
->>> +	struct aspeed_sg_list *src_list, *dst_list;
->>> +	dma_addr_t src_dma_addr, dst_dma_addr;
->>> +	struct aspeed_cipher_reqctx *rctx;
->>> +	struct skcipher_request *req;
->>> +	struct scatterlist *s;
->>> +	int src_sg_len;
->>> +	int dst_sg_len;
->>> +	int total, i;
->>> +	int rc;
->>> +
->>> +	CIPHER_DBG(hace_dev, "\n");
->>> +
->>> +	req = skcipher_request_cast(crypto_engine->areq);
->>> +	rctx = skcipher_request_ctx(req);
->>> +
->>> +	rctx->enc_cmd |= HACE_CMD_DES_SG_CTRL |
->> HACE_CMD_SRC_SG_CTRL |
->>> +			 HACE_CMD_AES_KEY_HW_EXP |
->> HACE_CMD_MBUS_REQ_SYNC_EN;
->>> +
->>> +	/* BIDIRECTIONAL */
->>> +	if (req->dst == req->src) {
->>> +		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
->>> +					rctx->src_nents, DMA_BIDIRECTIONAL);
->>> +		dst_sg_len = src_sg_len;
->>> +		if (!src_sg_len) {
->>> +			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
->>> +			return -EINVAL;
->>> +		}
->>> +
->>> +	} else {
->>> +		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
->>> +					rctx->src_nents, DMA_TO_DEVICE);
->>> +		if (!src_sg_len) {
->>> +			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
->>> +			return -EINVAL;
->>> +		}
->>> +
->>> +		dst_sg_len = dma_map_sg(hace_dev->dev, req->dst,
->>> +					rctx->dst_nents, DMA_FROM_DEVICE);
->>> +		if (!dst_sg_len) {
->>> +			dev_warn(hace_dev->dev, "dma_map_sg() dst error\n");
->>> +			rc = -EINVAL;
->>> +			goto free_req_src;
->>
->> Should we realy call dma_unmap_sg() if dma_map_sg() fails?
-> 
-> This error handling is unmap() the above buffer (req->src), not really this buffer (req->dst).
-> I think it should.
+Hello,
 
-You are right, I missread it. Sorry for the noise.
+syzbot found the following issue on:
 
-> 
->>
->>> +		}
->>> +	}
->>> +
->>> +	src_list = (struct aspeed_sg_list *)crypto_engine->cipher_addr;
->>> +	src_dma_addr = crypto_engine->cipher_dma_addr;
->>> +	total = req->cryptlen;
->>> +
->>> +	for_each_sg(req->src, s, src_sg_len, i) {
->>> +		src_list[i].phy_addr = sg_dma_address(s);
->>> +
->>> +		/* last sg list */
->>> +		if (sg_dma_len(s) >= total) {
->>> +			src_list[i].len = total;
->>> +			src_list[i].len |= BIT(31);
->>> +			total = 0;
->>> +			break;
->>> +		}
->>> +
->>> +		src_list[i].len = sg_dma_len(s);
->>> +		total -= src_list[i].len;
->>> +	}
->>> +
->>> +	if (total != 0)
->>> +		return -EINVAL;
->>
->> goto free_req_src; ?
-> 
-> Yes, I miss this part. I'll revise it in next patch, thanks.
+HEAD commit:    f2906aa86338 Linux 5.19-rc1
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=1042a03bf00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3bafeb86189666d4
+dashboard link: https://syzkaller.appspot.com/bug?extid=695f4009c37860232f35
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-There is another one below...
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+695f4009c37860232f35@syzkaller.appspotmail.com
 
-> 
->>
->>> +
->>> +	if (req->dst == req->src) {
->>> +		dst_list = src_list;
->>> +		dst_dma_addr = src_dma_addr;
->>> +
->>> +	} else {
->>> +		dst_list = (struct aspeed_sg_list *)crypto_engine->dst_sg_addr;
->>> +		dst_dma_addr = crypto_engine->dst_sg_dma_addr;
->>> +		total = req->cryptlen;
->>> +
->>> +		for_each_sg(req->dst, s, dst_sg_len, i) {
->>> +			dst_list[i].phy_addr = sg_dma_address(s);
->>> +
->>> +			/* last sg list */
->>> +			if (sg_dma_len(s) >= total) {
->>> +				dst_list[i].len = total;
->>> +				dst_list[i].len |= BIT(31);
->>> +				total = 0;
->>> +				break;
->>> +			}
->>> +
->>> +			dst_list[i].len = sg_dma_len(s);
->>> +			total -= dst_list[i].len;
->>> +		}
->>> +
->>> +		dst_list[dst_sg_len].phy_addr = 0;
->>> +		dst_list[dst_sg_len].len = 0;
->>> +	}
->>> +
->>> +	if (total != 0)
->>> +		return -EINVAL;
+INFO: task swapper/0:1 blocked for more than 143 seconds.
+      Not tainted 5.19.0-rc1-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:swapper/0       state:D stack:23984 pid:    1 ppid:     0 flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5116 [inline]
+ __schedule+0x93c/0x25e0 kernel/sched/core.c:6428
+ schedule+0xd2/0x1f0 kernel/sched/core.c:6500
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
+ __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+ __mutex_lock+0xa70/0x1350 kernel/locking/mutex.c:747
+ add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
+ hwrng_register+0x399/0x510 drivers/char/hw_random/core.c:599
+ virtrng_scan+0x37/0x90 drivers/char/hw_random/virtio-rng.c:205
+ virtio_dev_probe+0x639/0x910 drivers/virtio/virtio.c:313
+ call_driver_probe drivers/base/dd.c:555 [inline]
+ really_probe+0x23e/0xb90 drivers/base/dd.c:634
+ __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:764
+ driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:794
+ __driver_attach+0x22d/0x550 drivers/base/dd.c:1163
+ bus_for_each_dev+0x147/0x1d0 drivers/base/bus.c:301
+ bus_add_driver+0x422/0x640 drivers/base/bus.c:618
+ driver_register+0x220/0x3a0 drivers/base/driver.c:240
+ do_one_initcall+0x103/0x650 init/main.c:1295
+ do_initcall_level init/main.c:1368 [inline]
+ do_initcalls init/main.c:1384 [inline]
+ do_basic_setup init/main.c:1403 [inline]
+ kernel_init_freeable+0x6ac/0x735 init/main.c:1610
+ kernel_init+0x1a/0x1d0 init/main.c:1499
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+ </TASK>
 
-... here.
+Showing all locks held in the system:
+2 locks held by swapper/0/1:
+ #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
+ #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1054 [inline]
+ #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __driver_attach+0x222/0x550 drivers/base/dd.c:1162
+ #1: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
+2 locks held by pr/ttyS0/14:
+1 lock held by khungtaskd/27:
+ #0: ffffffff87a94840 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
+1 lock held by hwrng/150:
+ #0: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x141/0x370 drivers/char/hw_random/core.c:503
 
->>> +
->>> +	crypto_engine->resume = aspeed_sk_transfer_sg;
->>> +
->>> +	/* Dummy read for barriers */
->>> +	readl(src_list);
->>> +	readl(dst_list);
->>> +
->>> +	/* Trigger engines */
->>> +	ast_hace_write(hace_dev, src_dma_addr, ASPEED_HACE_SRC);
->>> +	ast_hace_write(hace_dev, dst_dma_addr, ASPEED_HACE_DEST);
->>> +	ast_hace_write(hace_dev, req->cryptlen, ASPEED_HACE_DATA_LEN);
->>> +	ast_hace_write(hace_dev, rctx->enc_cmd, ASPEED_HACE_CMD);
->>> +
->>> +	return -EINPROGRESS;
->>> +
->>> +free_req_src:
->>> +	dma_unmap_sg(hace_dev->dev, req->src, rctx->src_nents,
->>> +DMA_TO_DEVICE);
->>> +
->>> +	return rc;
->>> +}
->>> +
->>
->> [...]
->>
->>> +static int aspeed_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
->>> +			     unsigned int keylen)
->>> +{
->>> +	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
->>> +	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
->>> +	struct crypto_aes_ctx gen_aes_key;
->>> +
->>> +	CIPHER_DBG(hace_dev, "keylen: %d bits\n", (keylen * 8));
->>> +
->>> +	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
->>> +	    keylen != AES_KEYSIZE_256)
->>> +		return -EINVAL;
->>> +
->>> +	if (ctx->hace_dev->version == AST2500_VERSION) {
->>> +		aes_expandkey(&gen_aes_key, key, keylen);
->>> +		memcpy(ctx->key, gen_aes_key.key_enc, AES_MAX_KEYLENGTH);
->>> +
->>
->> Unneeded empty line
-> 
-> Okay !
-> 
->>
->>> +	} else {
->>> +		memcpy(ctx->key, key, keylen);
->>> +	}
->>> +
->>> +	ctx->key_len = keylen;
->>> +
->>> +	return 0;
->>> +}
->>> +
->>
->> [...]
->>
->>> +	crypto_engine->cipher_ctx =
->>> +		dma_alloc_coherent(&pdev->dev,
->>> +				   PAGE_SIZE,
->>> +				   &crypto_engine->cipher_ctx_dma,
->>> +				   GFP_KERNEL);
->>> +	if (!crypto_engine->cipher_ctx) {
->>> +		dev_err(&pdev->dev, "Failed to allocate cipher ctx dma\n");
->>> +		rc = -ENOMEM;
->>> +		goto free_hash_src;
->>> +	}
->>> +
->>> +	crypto_engine->cipher_addr =
->>> +		dma_alloc_coherent(&pdev->dev,
->>> +				   ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
->>> +				   &crypto_engine->cipher_dma_addr,
->>> +				   GFP_KERNEL);
->>> +	if (!crypto_engine->cipher_addr) {
->>> +		dev_err(&pdev->dev, "Failed to allocate cipher addr dma\n");
->>> +		rc = -ENOMEM;
->>> +		goto free_cipher_ctx;
->>> +	}
->>> +
->>> +	if (hace_dev->version == AST2600_VERSION) {
->>> +		crypto_engine->dst_sg_addr =
->>> +			dma_alloc_coherent(&pdev->dev,
->>> +					   ASPEED_CRYPTO_DST_DMA_BUF_LEN,
->>> +					   &crypto_engine->dst_sg_dma_addr,
->>> +					   GFP_KERNEL);
->>> +		if (!crypto_engine->dst_sg_addr) {
->>> +			dev_err(&pdev->dev, "Failed to allocate dst_sg dma\n");
->>> +			rc = -ENOMEM;
->>> +			goto free_cipher_addr;
->>> +		}
->>> +	}
->>> +
->>>    	rc = aspeed_hace_register(hace_dev);
->>>    	if (rc) {
->>>    		dev_err(&pdev->dev, "Failed to register algs, rc:0x%x\n", rc);
->>
->> I guess that the new dma_alloc_coherent() just a few lines above should also
->> be undone in error hanfling path if aspeed_hace_register() fails?
-> 
-> I'll remove the return value (rc) since it's useless here. So no need error handling on this part.
-> I'll revise it in next patch, thanks.
-> 
->>
->>> @@ -179,6 +282,18 @@ static int aspeed_hace_probe(struct
->>> platform_device *pdev)
->>>
->>>    	return 0;
->>>
->>> +free_cipher_addr:
->>> +	dma_free_coherent(&pdev->dev, ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
->>> +			  crypto_engine->cipher_addr,
->>> +			  crypto_engine->cipher_dma_addr);
->>> +free_cipher_ctx:
->>> +	dma_free_coherent(&pdev->dev, PAGE_SIZE,
->>> +			  crypto_engine->cipher_ctx,
->>> +			  crypto_engine->cipher_ctx_dma);
->>> +free_hash_src:
->>> +	dma_free_coherent(&pdev->dev, ASPEED_HASH_SRC_DMA_BUF_LEN,
->>> +			  hash_engine->ahash_src_addr,
->>> +			  hash_engine->ahash_src_dma_addr);
->>>    end:
->>>    	clk_disable_unprepare(hace_dev->clk);
->>>    	return rc;
+=============================================
 
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
