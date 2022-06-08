@@ -2,71 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A482BC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 05:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5758AC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 05:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233637AbiFHFVn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jun 2022 01:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S233027AbiFHFW0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Jun 2022 01:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232147AbiFHFVC (ORCPT
+        with ESMTP id S232975AbiFHFVf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jun 2022 01:21:02 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8DF277F84
-        for <linux-crypto@vger.kernel.org>; Tue,  7 Jun 2022 19:51:08 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id z19-20020a05660200d300b0066583f8cf2eso9086952ioe.2
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2022 19:51:08 -0700 (PDT)
+        Wed, 8 Jun 2022 01:21:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 667E0271A92
+        for <linux-crypto@vger.kernel.org>; Tue,  7 Jun 2022 19:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654656616;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hoU/O6w4YUxRgQevDzGWElcceiZ5d1yaMFWFpbdwK/w=;
+        b=I0BQ566MC2XU/6BQF7zKJZY0U8Xsk73Vc4ZZ8Bf+vXzVxHXy2qYi6BgvgVR397k4umlbrA
+        YSc930TE8D4d9kZrCxL1mAmmPH/8UGkUjtCpLvd3H+3yiMy5GY/Tk/jtFl5iVPL/McbCQj
+        U2Ct37V9XS4yqCW38cZfyQSwOCRPaG8=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-z9t6CCb8PZSr8GAd5IKMlg-1; Tue, 07 Jun 2022 22:50:15 -0400
+X-MC-Unique: z9t6CCb8PZSr8GAd5IKMlg-1
+Received: by mail-lj1-f199.google.com with SMTP id b26-20020a2e989a000000b002556f92fa13so3295219ljj.15
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2022 19:50:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=9RKAoJeiSZe3EQhiQtHMGEfkjZC8rMlcX/wtjfSGmZo=;
-        b=GjLZivMCbhOB0p0mmxuGzxcTTujSG2deTA+Ept6vGKb8I2B3rrJSFCS7RHHmsXKlsD
-         KDeR4GbDc6zAmFczUBeNwtEmhVBShvqR55Ac9mxfxTA0g/C4pt7wJrTGmo+jY3cfPZ4t
-         +tPY9cVT5BnSoDlOelidvIsSuvd5orRpeQ/6YuBA2D9RJlH6lKZi5KmbP7xD9SgAbeiD
-         9O/2NjPG+lL7Mfrfp7pRd54S0rvUuuRy71CUOEpN6WOF2rv7BpiwWccgtMT1eiez6HBI
-         /+vsibYAerXUKvRtIRvnC8Gj9Z4hEdBuPZ1U1ncl5IGPxJtArL5qfD2yM7S5s+6tm5OB
-         YVdw==
-X-Gm-Message-State: AOAM532HW0s5ioyPdCHMbT417/K7smu/0vVDAYpO3/7TUQA052z/L3KX
-        bdjXQbZ1Le7MmCk14Y//NUNFDUi97VSRvcVvR/zIsTE5h5z3
-X-Google-Smtp-Source: ABdhPJwHWDSpCC0WchloMDJtjp2ekL7TNVVprJjUbPcnJTsuVKCcOficGv4YWiReILvGYDzovpuwpzGZF4W6lsmLboE1EZkSP2bI
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hoU/O6w4YUxRgQevDzGWElcceiZ5d1yaMFWFpbdwK/w=;
+        b=XxjltycrI4UD3QJ33mCKH9wia4FDMBLcsCllnZ8FuMYBewx49zUAiRtqYG+vUg4WN+
+         KLyMhvVGKciyh9E8uQvVVfBN8Q/FKAhbxB7pNRENkClLVkaDpeqbzAwz0LTfTndb9+sU
+         RhdsIQbLIQlf/GdiP2K50MIKEdy1Q2FDhOWD9qXG1sZEunsJ2AYGHsZPCZBRKAdKy0S5
+         s9jqc80Exki5pZYHZ6Ys3f0Y7iLChN97FHLDgG6pqu4Yo4zwgG2JQfTxfdrsw5SCpgIB
+         GMO3td041x9jmQq0ENT1fFe1tBJ32nkZY+gUg+Bryi9U+dOz/JNQEDP7TQfpkAi9Kz5m
+         S4qA==
+X-Gm-Message-State: AOAM531zbkTjtq5H4NAZEfS4QlSiIXHnrZT/Q/qguqL0S2czR58t4gqz
+        eIdlm90ISYGoE+5o8Tqhq7Jn3+824sG6+SCZ+xCTQrRvUEkFuiYFCsGRe/eDpwdRUBn3skAamLH
+        HQuGxS+KNuYBhiU98KhBSRsWnIYpnwH3b+StDBgpy
+X-Received: by 2002:a05:6512:3130:b0:479:385f:e2ac with SMTP id p16-20020a056512313000b00479385fe2acmr10304383lfd.575.1654656613667;
+        Tue, 07 Jun 2022 19:50:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy/wfYs6HkHvDClc0YAeZNLik8QgxxmOJ07fcWIYgWskZhjMfRl7qmsfjJQ28CN49VdSzGUpv/CZ6BO3tueZYs=
+X-Received: by 2002:a05:6512:3130:b0:479:385f:e2ac with SMTP id
+ p16-20020a056512313000b00479385fe2acmr10304377lfd.575.1654656613505; Tue, 07
+ Jun 2022 19:50:13 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a02:bb85:0:b0:331:7a13:201b with SMTP id
- g5-20020a02bb85000000b003317a13201bmr13410664jan.41.1654656667728; Tue, 07
- Jun 2022 19:51:07 -0700 (PDT)
-Date:   Tue, 07 Jun 2022 19:51:07 -0700
-In-Reply-To: <CACGkMEvtV+hVdpgpkYvAmkRteYDN+2dDacrfXsYDv0ZzjJU+ag@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e7c46e05e0e6c6a1@google.com>
+References: <CACGkMEt_e59wRotUo9D1UqubAhe+txy0GF=r1BYBVdND8-uKbA@mail.gmail.com>
+ <0000000000002cccbd05e0e69570@google.com>
+In-Reply-To: <0000000000002cccbd05e0e69570@google.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 8 Jun 2022 10:50:02 +0800
+Message-ID: <CACGkMEvtV+hVdpgpkYvAmkRteYDN+2dDacrfXsYDv0ZzjJU+ag@mail.gmail.com>
 Subject: Re: [syzbot] INFO: task hung in add_early_randomness (2)
-From:   syzbot <syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com>
-To:     herbert@gondor.apana.org.au, jasowang@redhat.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux@dominikbrodowski.net, mpm@selenic.com, mst@redhat.com,
-        syzkaller-bugs@googlegroups.com, xuanzhuo@linux.alibaba.com,
-        yuehaibing@huawei.com
+To:     syzbot <syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux@dominikbrodowski.net, mpm@selenic.com, mst <mst@redhat.com>,
+        syzkaller-bugs@googlegroups.com,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, yuehaibing@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+On Wed, Jun 8, 2022 at 10:37 AM syzbot
+<syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot tried to test the proposed patch but the build/boot failed:
+>
+> failed to apply patch:
+> checking file drivers/char/hw_random/virtio-rng.c
+> patch: **** unexpected end of file in patch
+>
 
-syzbot tried to test the proposed patch but the build/boot failed:
+Copy-paste error :(
 
-failed to apply patch:
-checking file drivers/char/hw_random/virtio-rng.c
-patch: **** unexpected end of file in patch
+Let's try this:
 
+#syz test
+git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
 
+diff --git a/drivers/char/hw_random/virtio-rng.c
+b/drivers/char/hw_random/virtio-rng.c
+index e856df7e285c..a6f3a8a2aca6 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -159,6 +159,8 @@ static int probe_common(struct virtio_device *vdev)
+                goto err_find;
+        }
 
-Tested on:
++       virtio_device_ready(vdev);
++
+        /* we always have a pending entropy request */
+        request_entropy(vi);
 
-commit:         bd8bb9ae vdpa: ifcvf: set pci driver data in probe
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-dashboard link: https://syzkaller.appspot.com/bug?extid=5b59d6d459306a556f54
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=165a0febf00000
+--
 
