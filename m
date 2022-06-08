@@ -2,75 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE96C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 14:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B64CC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 19:33:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240533AbiFHOAk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jun 2022 10:00:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50280 "EHLO
+        id S232089AbiFHTdr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Jun 2022 15:33:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240530AbiFHOAj (ORCPT
+        with ESMTP id S233915AbiFHTdq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jun 2022 10:00:39 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775F231D9D0;
-        Wed,  8 Jun 2022 07:00:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654696838; x=1686232838;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hMOWQic/jVTuD2Wq8YgUFKqJpBQ/U8MDI3wleWZjJec=;
-  b=AoRqAi3VteIn9LWS4COLyc1cfxGuLdycZDMksI5fCSolcwu9mIKSprWp
-   EFeSRHquuzq06ybVLgfK+nuDKZtApWwEm5bjpZEEuLG1wgfaGt/4TonKK
-   QaHLH0a+SS8lCr/jHc4gV0Ak2/Nrc3od3e/Cn8D4aXZzyy7V2OjnZz42J
-   iIi5eOe/KQmHYGmU8Wlt2BCLE4kb57m+wsr7DrMfXWJA1osDXZZ4OBMms
-   zeUsuiLgJ5b0nDPub2xMhaeXJBfeOpBLMnY4z/Xo0viiG+RZWOU+5XptF
-   5qcQxxZmZHBuOnVlzhyCi7CF8aIl1zb1L9auoUFaw0DSfXWT2HQpzVrzb
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10371"; a="277739839"
-X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="277739839"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 07:00:37 -0700
-X-IronPort-AV: E=Sophos;i="5.91,286,1647327600"; 
-   d="scan'208";a="683344035"
-Received: from kbrownfi-mobl2.amr.corp.intel.com (HELO [10.212.170.198]) ([10.212.170.198])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jun 2022 07:00:36 -0700
-Message-ID: <2e3286b4-a13b-1be0-2b6a-902eec54e960@intel.com>
-Date:   Wed, 8 Jun 2022 07:00:35 -0700
+        Wed, 8 Jun 2022 15:33:46 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68C451E73FA;
+        Wed,  8 Jun 2022 12:33:42 -0700 (PDT)
+Received: from [10.16.8.184] (unknown [131.107.147.184])
+        by linux.microsoft.com (Postfix) with ESMTPSA id A896E20BE665;
+        Wed,  8 Jun 2022 12:33:41 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A896E20BE665
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1654716821;
+        bh=9VPqD11Y0U15W613gU8t13a2O2PKBaCp3UdzdYQ4GpQ=;
+        h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+        b=WhxkAlfE/Arw1RbLOc7GEnlQmI2Ol2oj9XSLISpdfl1thZVJCkxMpYubDUAIfp6gg
+         qzT1HybGTMPU538EVfXltAv3LCVgFXVxdeKXiiAmKKD3USU/q0s8/vVNvxd6sOBC9s
+         6eAoj0OttVQQb2g3fgR8EyvCwRtYvdmQyszSk3gk=
+Message-ID: <6f9e1481-db9c-cd5f-c38d-bdcd3040315f@linux.microsoft.com>
+Date:   Wed, 8 Jun 2022 12:33:41 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] crypto: x86/aes-ni: fix AVX detection
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
+Subject: Re: [PATCH 5/5] crypto: aspeed: add HACE crypto driver
+To:     Neal Liu <neal_liu@aspeedtech.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Borislav Petkov <bp@alien8.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Tim Chen <tim.c.chen@linux.intel.com>
-References: <20211103124614.499580-1-mlevitsk@redhat.com>
- <622444d6-f98b-dae4-381e-192e5cb02621@intel.com>
- <3943020ac3540af8055c487e4810c63a422d65e7.camel@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <3943020ac3540af8055c487e4810c63a422d65e7.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Johnny Huang <johnny_huang@aspeedtech.com>
+Cc:     linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+References: <20220601054204.1522976-1-neal_liu@aspeedtech.com>
+ <20220601054204.1522976-6-neal_liu@aspeedtech.com>
+Content-Language: en-US
+In-Reply-To: <20220601054204.1522976-6-neal_liu@aspeedtech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/8/22 04:29, Maxim Levitsky wrote:
-> filter_cpuid_features can be extended to filter known bogus CPUID depedencies,
-> like case when AVX2 supported and AVX not supported in CPUID.
-> If you agree, then it seems the best case to deal with this issue.
+On 6/6/2022 8:43 PM, Neal Liu wrote:
+>>> +struct aspeed_hace_alg {
+>>> +	struct aspeed_hace_dev		*hace_dev;
+>>> +	union {
+>>> +		struct skcipher_alg	skcipher;
+>>> +		struct aead_alg		aead;
+>>> +		struct ahash_alg	ahash;
+>>> +		struct kpp_alg		kpp;
+>>> +		struct akcipher_alg	akcipher;
+>>
+>> Your patch dont do any kpp or akcipher (and aead/skcipher also).
+>> Please drop this.
+>
+> I miss this part, I'll revise it in next patch, thanks.
 
-Yes, it should have been doing this all along.   Patches to fix that
-would be very welcome.
+Hi Neal,
+
+Are you planning to submit aead separately? HW programming interface
+for aes-gcm is almost same as other aes modes except extra regs/fields 
+for tag etc.
+
+
+Thanks,
+Dhananjay
+
+
