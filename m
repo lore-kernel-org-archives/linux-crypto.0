@@ -2,97 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0275C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 06:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D61CCA482
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 07:46:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233293AbiFHGx7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jun 2022 02:53:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53222 "EHLO
+        id S233082AbiFHHqD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Jun 2022 03:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354213AbiFHGT1 (ORCPT
+        with ESMTP id S240299AbiFHHiR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jun 2022 02:19:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E6E2123BEA
-        for <linux-crypto@vger.kernel.org>; Tue,  7 Jun 2022 23:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654668441;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=btPsJ5x7niNmjEjOGerzCn59AIO0rvNFat3C8BRTa+c=;
-        b=M1yKatjL4ofZDIJIpJ3HLHwPphPykOspk6R9Zo/f+h0xf0bzWha39DOE2iuVQLGGoCSnRS
-        cum3NAEkS4wJlg5/oQO/8U0kOev4d09flV4QSUx70Y+VvRBdmTejhkr5fM2pHHYikuE6mV
-        TM1wzoAVnLNu9D3QQXOOuHP3y1zZ7fM=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-216-qlALEXmmNq-h1iIARFSN_A-1; Wed, 08 Jun 2022 02:07:19 -0400
-X-MC-Unique: qlALEXmmNq-h1iIARFSN_A-1
-Received: by mail-lf1-f69.google.com with SMTP id p36-20020a05651213a400b004779d806c13so9833986lfa.10
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jun 2022 23:07:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=btPsJ5x7niNmjEjOGerzCn59AIO0rvNFat3C8BRTa+c=;
-        b=gdTJzX7NNAVXtBfrsKWWJch2cFBrx9p0Rg2jMO//6Mn5b6SC0+IjDRDqlliekaDxsw
-         vQ246X5gkCl+iC9BDKwjAFbIDcsHwW1G8w1fq04IKUT0xdMANMoal9RzHEw27PoXaMWC
-         wtC/78QpvgarFlIhhV5KCr4PA5pQ2G/af20UclxNoM+XxfUezDEZ2sB2BaYpd/n/m4Rq
-         rFzrjVCGrpSjWw/NkdLt9kUndjTnDvhcwF4VM3etPa7MckAiWW8P/T1P8jxIstNkC24R
-         6Y2AuYg+Fw4N6pXDqU78P1uqzj/+kl0vN2kCmmbY8HNyivpQzcLm0EIfFfQev/2srmjy
-         gV7A==
-X-Gm-Message-State: AOAM531IYIOZw84yAHNX2i77e8FBvyygrI6xscVug0xQzp0BXcspWOhh
-        yjfieaEaphZWxfC4E6Q3N3U0wossOzvud5jdquPCoKR2xb7R0ZI/vZzb7NHWCv0UqmXhAoFJE5C
-        nTU2B4og06xhfJH0hGKXM1TfvlL/qfm2nuxX/oI83
-X-Received: by 2002:a2e:bc05:0:b0:24b:212d:7521 with SMTP id b5-20020a2ebc05000000b0024b212d7521mr54409486ljf.243.1654668437628;
-        Tue, 07 Jun 2022 23:07:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy4UR8Bopi8bBvbC6iJ/qjLlWKuBEd8b7c2mUsEsz3iehoCWZh44Tb08CL360aRmFvrNFEl9Zn9DxVhXaP5YUE=
-X-Received: by 2002:a2e:bc05:0:b0:24b:212d:7521 with SMTP id
- b5-20020a2ebc05000000b0024b212d7521mr54409469ljf.243.1654668437408; Tue, 07
- Jun 2022 23:07:17 -0700 (PDT)
+        Wed, 8 Jun 2022 03:38:17 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4E181C0CB6
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Jun 2022 00:04:20 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nypji-0002oR-6h; Wed, 08 Jun 2022 09:04:14 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nypjh-0078UY-4b; Wed, 08 Jun 2022 09:04:11 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1nypje-00EvIo-T1; Wed, 08 Jun 2022 09:04:10 +0200
+Date:   Wed, 8 Jun 2022 09:04:08 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Tudor.Ambarus@microchip.com
+Cc:     alexandre.belloni@bootlin.com, Nicolas.Ferre@microchip.com,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de,
+        Claudiu.Beznea@microchip.com, linux-arm-kernel@lists.infradead.org,
+        linux-i2c@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: atmel-ecc - Remove duplicated error reporting in
+ .remove()
+Message-ID: <20220608070408.odie7hrcnfasegbr@pengutronix.de>
+References: <7ffd4d35-938a-3e82-b39b-92e76819fa92@microchip.com>
+ <20220520172100.773730-1-u.kleine-koenig@pengutronix.de>
+ <fd8d1ca1-b6fa-ecb9-ba71-80449af59a9a@microchip.com>
 MIME-Version: 1.0
-References: <CACGkMEus=RMMcDk+sM8X14=AtFjK+-3p_Lo=O6tfv9H=0wXENw@mail.gmail.com>
- <000000000000d5113205e0e71c8f@google.com>
-In-Reply-To: <000000000000d5113205e0e71c8f@google.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 8 Jun 2022 14:07:06 +0800
-Message-ID: <CACGkMEtQPxaEbZmEYj9vtUbCAaW+X4_nZW0tyC4RDG1OJKJooQ@mail.gmail.com>
-Subject: Re: [syzbot] INFO: task hung in add_early_randomness (2)
-To:     syzbot <syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux@dominikbrodowski.net, mpm@selenic.com, mst <mst@redhat.com>,
-        syzkaller-bugs@googlegroups.com,
-        Xuan Zhuo <xuanzhuo@linux.alibaba.com>, yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="4gnzjrjot45eo7jj"
+Content-Disposition: inline
+In-Reply-To: <fd8d1ca1-b6fa-ecb9-ba71-80449af59a9a@microchip.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 8, 2022 at 11:15 AM syzbot
-<syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot has tested the proposed patch and the reproducer did not trigger any issue:
->
-> Reported-and-tested-by: syzbot+5b59d6d459306a556f54@syzkaller.appspotmail.com
->
-> Tested on:
->
-> commit:         bd8bb9ae vdpa: ifcvf: set pci driver data in probe
-> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=8d4cbb773055caee
-> dashboard link: https://syzkaller.appspot.com/bug?extid=5b59d6d459306a556f54
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> patch:          https://syzkaller.appspot.com/x/patch.diff?x=1731eaf7f00000
->
-> Note: testing is done by a robot and is best-effort only.
->
 
-Cool, let me post a formal patch.
+--4gnzjrjot45eo7jj
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
+Hello
 
+On Wed, Jun 08, 2022 at 04:33:48AM +0000, Tudor.Ambarus@microchip.com wrote:
+> On 5/20/22 20:21, Uwe Kleine-K=F6nig wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know =
+the content is safe
+> >=20
+> > Returning an error value in an i2c remove callback results in an error
+> > message being emitted by the i2c core, but otherwise it doesn't make a
+> > difference. The device goes away anyhow and the devm cleanups are
+> > called.
+> >=20
+> > As atmel_ecc_remove() already emits an error message on failure and the
+> > additional error message by the i2c core doesn't add any useful
+> > information, change the return value to zero to suppress this message.
+> >=20
+> > Also make the error message a bit more drastical because when the device
+> > is still busy on remove, it's likely that it will access freed memory
+> > soon.
+> >=20
+> > This patch is a preparation for making i2c remove callbacks return void.
+> >=20
+> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+>=20
+> Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+
+In the past patches were picked up by Herbert. I assume your R-b tag was
+the missing bit to make him pick up this patch? To make a bit more sure
+that will happen, I added him and davem to Cc.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--4gnzjrjot45eo7jj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmKgSeUACgkQwfwUeK3K
+7Am/5Af+NIWhwEUYLdsOV0/RIhZ8itERCDfCVrnMb8K5KwOQ+PgWSJiYcj0kSZnM
+tXavBcIqOV94MPWA9ra6PueGGdDHjU5NamPOHSD3c6z9ZWhny96VRIKYonjlG95j
+1Al8wNonhgH4H/qiaFlhoW4QPhZUGQPfHRNqLT0Sql9iT2TYBkGls9sKHPtFMwOn
+QzhM1xCMee5UKWryWf42mhZIA7/GPu131+ZJFBVODXlzYd7krlNuKRegUul8r0pl
+T5F31aLeD+2tjST884EdzsseTSHaH5C0Z4ff8MmUNnd8zezvOZrwtLFaIGrKjSGV
+LLQBHkO2AS1MiUnv0nF110HEPSwpYQ==
+=Tb4p
+-----END PGP SIGNATURE-----
+
+--4gnzjrjot45eo7jj--
