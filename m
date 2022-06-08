@@ -2,58 +2,140 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 337E2CCA47B
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 09:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF317C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jun 2022 11:29:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235882AbiFHJ7v (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jun 2022 05:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45980 "EHLO
+        id S238025AbiFHL3t (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 8 Jun 2022 07:29:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235722AbiFHJ7h (ORCPT
+        with ESMTP id S238012AbiFHL3s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jun 2022 05:59:37 -0400
-X-Greylist: delayed 2401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Jun 2022 02:33:21 PDT
-Received: from mail.puregrowthonline.pl (mail.puregrowthonline.pl [51.38.124.91])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F99108AB4
-        for <linux-crypto@vger.kernel.org>; Wed,  8 Jun 2022 02:33:20 -0700 (PDT)
-Received: by mail.puregrowthonline.pl (Postfix, from userid 1002)
-        id 67CD2A2AEB; Wed,  8 Jun 2022 08:15:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=puregrowthonline.pl;
-        s=mail; t=1654676150;
-        bh=CSKXLMgcdpWkXuTgJn5+jsCVobtU9JEF4vCnS5z6McM=;
-        h=Date:From:To:Subject:From;
-        b=e1s4kw0NME9YffLAT7n0T1oK+0AY7JPm+1n9/HE6Yew1Z299ABw6Avy+PmL6KM2fa
-         UGHq2ki3oOsMHhQK/QH6f4Lz34N5DQtVKxNWd3h5Rc+GMYXUTW7B1xcoBK3qpzrSFt
-         wWBGcnmTcLWo8TT13FftPRpS66W7W1J/dg7RecF2EtHPh33GqI+6vMifbEFLgTDj/Y
-         1h45KvF0uNtuFxPOpY6OtmnQHtj9xFi0oUqKzaAJFX0+VLYYzzmW/AQgbmySsjpgXl
-         JWzLrqZUmLSKSroOMlYBKQ0t35ShP33vJ/NEP6x+lgfAp7yo3sE7nTlERw5UDCAhWd
-         2tUx0VuN5FSDQ==
-Received: by mail.puregrowthonline.pl for <linux-crypto@vger.kernel.org>; Wed,  8 Jun 2022 08:15:09 GMT
-Message-ID: <20220608064500-0.1.41.cz8g.0.qnl2hlpbdq@puregrowthonline.pl>
-Date:   Wed,  8 Jun 2022 08:15:09 GMT
-From:   "Wiktor Nurek" <wiktor.nurek@puregrowthonline.pl>
-To:     <linux-crypto@vger.kernel.org>
-Subject: =?UTF-8?Q?Nap=C5=82yw_Klient=C3=B3w_ze_strony?=
-X-Mailer: mail.puregrowthonline.pl
-MIME-Version: 1.0
+        Wed, 8 Jun 2022 07:29:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 77BF2192C62
+        for <linux-crypto@vger.kernel.org>; Wed,  8 Jun 2022 04:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654687786;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sjjh9mjrrLd/KMp3FEsD5rNPrO+WiPNF11Vn/yRkM94=;
+        b=eghrhQBAqmDO0h8JjvGEz4TYYvg+Zu6vskdmAA3nyxtRk9twadYyCtbXiZLYYHJXt1wWsC
+        u6+L3qd2EXMW1dpyJmF3aa/ZAVShDauJ4GSxz/FelpLGbLPEzDJgHq/JHdGPzftRMUH7iV
+        8gNq6SkFr12+/HzNlZUO1BQWb6KLp1w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-292-MSti5YZ1OrqR__TuvyYIbA-1; Wed, 08 Jun 2022 07:29:45 -0400
+X-MC-Unique: MSti5YZ1OrqR__TuvyYIbA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA447800124;
+        Wed,  8 Jun 2022 11:29:44 +0000 (UTC)
+Received: from starship (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D16D492C3B;
+        Wed,  8 Jun 2022 11:29:40 +0000 (UTC)
+Message-ID: <3943020ac3540af8055c487e4810c63a422d65e7.camel@redhat.com>
+Subject: Re: [PATCH] crypto: x86/aes-ni: fix AVX detection
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org
+Cc:     "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Borislav Petkov <bp@alien8.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>
+Date:   Wed, 08 Jun 2022 14:29:39 +0300
+In-Reply-To: <622444d6-f98b-dae4-381e-192e5cb02621@intel.com>
+References: <20211103124614.499580-1-mlevitsk@redhat.com>
+         <622444d6-f98b-dae4-381e-192e5cb02621@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Wed, 2021-11-03 at 07:43 -0700, Dave Hansen wrote:
+> On 11/3/21 5:46 AM, Maxim Levitsky wrote:
+> > Fix two semi-theoretical issues that are present.
+> > 
+> > 1. AVX is assumed to be present when AVX2 is present.
+> >  That can be false in a VM.
+> >  This can be considered a hypervisor bug,
+> >  but the kernel should not crash in this case if this is possible.
+> 
+> The kernel shouldn't crash in this case.  We've got a software
+> dependency which should disable AVX2 if AVX is off:
+> 
+> static const struct cpuid_dep cpuid_deps[] = {
+> ...
+>         { X86_FEATURE_AVX2,                     X86_FEATURE_AVX,      },
 
-chcia=C5=82bym poinformowa=C4=87 Pa=C5=84stwa o mo=C5=BCliwo=C5=9Bci pozy=
-skania nowych zlece=C5=84 ze strony www.
-
-Widzimy zainteresowanie potencjalnych Klient=C3=B3w Pa=C5=84stwa firm=C4=85=
-, dlatego ch=C4=99tnie pomo=C5=BCemy Pa=C5=84stwu dotrze=C4=87 z ofert=C4=
-=85 do wi=C4=99kszego grona odbiorc=C3=B3w poprzez efektywne metody pozyc=
-jonowania strony w Google.
-
-Czy m=C3=B3g=C5=82bym liczy=C4=87 na kontakt zwrotny?
 
 
-Pozdrawiam serdecznie,
-Wiktor Nurek
+Looks like this table is only used when someone calls setup_clear_cpu_cap/clear_cpu_cap
+which is used in all kind of places to disable CPU features that fails various conditions
+(like VMX/SMX when MSR_IA32_FEAT_CTL suddently faults, or to disable RDRAND when
+it fails built-in selfcheck and such, and it is used when user disables features on
+kernel cmd line like the 'noxsave'
+
+Also we do have the 'filter_cpuid_features' which disables some CPUID features,
+which depend on whole CPUID leaves to be there.
+This is the only precendent of the kernel coping with a bogus CPUID given by the
+hypervisor, and it is even mentioned in a comment near this code.
+
+
+filter_cpuid_features can be extended to filter known bogus CPUID depedencies,
+like case when AVX2 supported and AVX not supported in CPUID.
+If you agree, then it seems the best case to deal with this issue.
+
+> 
+> 
+> > 2. YMM state can be soft disabled in XCR0.
+> > 
+> > Fix both issues by using 'cpu_has_xfeatures(XFEATURE_MASK_YMM')
+> > to check for usable AVX support.
+> 
+> There's another table to ensure that this doesn't happen:
+> 
+> > static unsigned short xsave_cpuid_features[] __initdata = {
+> >         [XFEATURE_FP]                           = X86_FEATURE_FPU,
+> >         [XFEATURE_SSE]                          = X86_FEATURE_XMM,
+> >         [XFEATURE_YMM]                          = X86_FEATURE_AVX,
+> 
+> So, if XFEATURE_YMM isn't supported, X86_FEATURE_AVX should be cleared.
+
+I afraid that it is the other way around - this table makes sure that
+we disable 'XFEATURE_YMM' in the xsave header when we (the kernel) uses
+the xsave instruction, if the X86_FEATURE_AVX is not supported.
+
+However, I haven't found a way to disable selected xfeatures, but only the
+'noxsave/noxsaves/etc' which disable the whole feature in cpuid,
+and that indeed does trigger the disablement via 'cpuid_deps' table.
+
+> 
+> But, that's all how it's _supposed_ to work.  It's quite possible we've
+> got bugs somewhere, so if you're hitting an issue in practice please let
+> us know.
+> 
+> If this did end up confusing you and Paulo, that's not great either.
+> Any patches that make these dependency tables easier to find or grok
+> would be appreciated too.
+> 
+
+
+Sorry for very late reply, I haven't gotten to work on this bug for a while,
+Best regards,
+	Maxim Levitsky
+
