@@ -2,117 +2,83 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3435DC43334
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 16:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543DDC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 21:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240426AbiFIQuZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jun 2022 12:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47268 "EHLO
+        id S230493AbiFIVg4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Jun 2022 17:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242094AbiFIQuY (ORCPT
+        with ESMTP id S230205AbiFIVg4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jun 2022 12:50:24 -0400
-Received: from smtp.smtpout.orange.fr (smtp10.smtpout.orange.fr [80.12.242.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAAE04F9D6
-        for <linux-crypto@vger.kernel.org>; Thu,  9 Jun 2022 09:50:20 -0700 (PDT)
-Received: from [192.168.1.18] ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id zLMKnvUPC2ovCzLMKnxhmD; Thu, 09 Jun 2022 18:50:18 +0200
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 09 Jun 2022 18:50:18 +0200
-X-ME-IP: 90.11.190.129
-Message-ID: <5cf8ad88-629c-e75a-df99-e893b8af967f@wanadoo.fr>
-Date:   Thu, 9 Jun 2022 18:50:12 +0200
+        Thu, 9 Jun 2022 17:36:56 -0400
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407974CD7D;
+        Thu,  9 Jun 2022 14:36:55 -0700 (PDT)
+Received: by mail-io1-f48.google.com with SMTP id p128so4046811iof.1;
+        Thu, 09 Jun 2022 14:36:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2GI2KI1Sv9nVJuFCWd4uVdfP1TjuW2GDmuuGQs73bfQ=;
+        b=Rh3MnhnBt0E83Jeba6SVddAiv8ADnVc10r9w4p79vf0UtG+jGdiT4iJeWuRvKy5Ly9
+         FYVMbHO+1qoge5/E/vzojq4kSVJVC5wRGRGfQQcdHyo3nFIPhMDgl6eeHT/ApAmjqYR0
+         8Wt5CK3AH0rpYxq2deIkGQh7b4x27iBCTUtDDAcPj/WPIHS6D00af8vRnlT8hI4xtc9J
+         dx/+Nm8agthoebEG8RWXK3G1/75R4AnnH+PnBLXheXjR4rZhuCYITaDrZRI8Sm8anVxu
+         AJXGzdPOc4ZEEOla9LZLY1zny4p8/GtWhT40/gSVNZeEPUxH8O2l7Eg5nyxHSfl9LlwK
+         Ak8w==
+X-Gm-Message-State: AOAM531TI3CQKx2Mul5izPoRbuIYpvB5v/J1NubK8k432OanYID3sIkC
+        9G/+uhPULOBXh8wcJk4Qa9VEFOw3EA==
+X-Google-Smtp-Source: ABdhPJzmA9HKNjxiz4/zlBnWfsm/zBXu8DtBqt+f4EU3yMC+DxOPgS7LmN16jxvFjKOtvP2Avki6tw==
+X-Received: by 2002:a05:6602:2cca:b0:664:d9c6:3674 with SMTP id j10-20020a0566022cca00b00664d9c63674mr19416950iow.67.1654810614520;
+        Thu, 09 Jun 2022 14:36:54 -0700 (PDT)
+Received: from robh.at.kernel.org ([64.188.179.251])
+        by smtp.gmail.com with ESMTPSA id t15-20020a02ccaf000000b00331767e8113sm8418064jap.52.2022.06.09.14.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 14:36:54 -0700 (PDT)
+Received: (nullmailer pid 139789 invoked by uid 1000);
+        Thu, 09 Jun 2022 21:36:52 -0000
+Date:   Thu, 9 Jun 2022 15:36:52 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Yoan Picchi <yoan.picchi@arm.com>
+Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andre Przywara <andre.przywara@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 2/2] Removes the x86 dependency on the QAT drivers
+Message-ID: <20220609213652.GA115440-robh@kernel.org>
+References: <20220607165840.66931-1-yoan.picchi@arm.com>
+ <20220607165840.66931-3-yoan.picchi@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] crypto: x86/camellia - Replace kernel.h with the
- necessary inclusions
-Content-Language: en-CA
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <65634fb748cc0ce2cc5bafaf904cb5f76bd4edc4.1654414362.git.christophe.jaillet@wanadoo.fr>
- <YqHIPE0MlZLP8C5I@gondor.apana.org.au>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <YqHIPE0MlZLP8C5I@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220607165840.66931-3-yoan.picchi@arm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Le 09/06/2022 à 12:15, Herbert Xu a écrit :
-> On Sun, Jun 05, 2022 at 09:32:53AM +0200, Christophe JAILLET wrote:
->> When kernel.h is used in the headers it adds a lot into dependency hell,
->> especially when there are circular dependencies are involved.
->>
->> Replace kernel.h inclusion with the list of what is really being used.
->>
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->>   arch/x86/crypto/camellia.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/crypto/camellia.h b/arch/x86/crypto/camellia.h
->> index 1dcea79e8f8e..547fb7e30928 100644
->> --- a/arch/x86/crypto/camellia.h
->> +++ b/arch/x86/crypto/camellia.h
->> @@ -4,7 +4,7 @@
->>   
->>   #include <crypto/b128ops.h>
->>   #include <linux/crypto.h>
->> -#include <linux/kernel.h>
->> +#include <linux/types.h>
->>   
->>   #define CAMELLIA_MIN_KEY_SIZE	16
->>   #define CAMELLIA_MAX_KEY_SIZE	32
-> 
-> This is not sufficient.  For example, asmlinkage isn't explicitly
-> defined by any of these header files so it would be relying on an
-> implicit inclusion which is prone to breakage.
+On Tue, Jun 07, 2022 at 04:58:40PM +0000, Yoan Picchi wrote:
+> This dependency looks outdated. After the previous patch, we have been able
+> to use this driver to encrypt some data and to create working VF on arm64.
+> We have not tested it yet on any big endian machine, hence the new dependency
 
-Agreed, I missed that.
+For the subject, use prefixes matching the subsystem (like you did on 
+patch 1).
 
-> 
-> Did you audit the entire file?
+The only testing obligation you have is compiling for BE. If kconfig was
+supposed to capture what endianness drivers have been tested or not
+tested with, then lots of drivers are missing the dependency. Kconfig
+depends/select entries should generally be either to prevent compile
+failures (you checked PPC, RiscV, etc.?) or to hide drivers *really*
+specific to a platform. IMO, we should only have !CPU_BIG_ENDIAN if it 
+is known not to work and not easily fixed.
 
-Yes, but I missed the asmlinkage.
+Also, with the dependency, no one can test the driver without modifying 
+the kernel and if it does work as-is, then one has to upstream a change 
+and then wait for it to show up in distro kernels. You could mitigate 
+the first part with COMPILE_TEST.
 
-In fact, I've sent a few "obvious" (but nothing is never obvious at the 
-end...) patches like that to see the interest.
-
-I've spotted a few .h file with "easy to check" content.
-Mostly #define, function declarations, a few u<something> datatypes.
-
-Then, I made the #include simplification and compile tested the change.
-
-If it worked, I consider that the patch looks fine.
-
-
-In this particular case, I guess that the 'asmlinkage' should come from 
-another #include when "camellia.h" is used.
-
-My goal was not to introduce some new hidden constraints related to the 
-order of the included .h. I just wanted to make them explicit (and 
-complete) and start to simplify things.
-
-
-As said, nothing is never obvious, and I'll stay away from this kind of 
-changes :)
-
-
-Thanks a lot for the review.
-
-CJ
-
-
-
-> 
-> Cheers,
-
+Rob
