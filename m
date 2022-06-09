@@ -2,77 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38693C43334
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 10:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 449B5C43334
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 11:24:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234332AbiFIKQJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jun 2022 06:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59728 "EHLO
+        id S237149AbiFILYp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Jun 2022 07:24:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241879AbiFIKQF (ORCPT
+        with ESMTP id S243606AbiFILYi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jun 2022 06:16:05 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2039DB36EE;
-        Thu,  9 Jun 2022 03:16:01 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nzFCF-004yZH-QF; Thu, 09 Jun 2022 20:15:25 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Jun 2022 18:15:24 +0800
-Date:   Thu, 9 Jun 2022 18:15:24 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: x86/camellia - Replace kernel.h with the
- necessary inclusions
-Message-ID: <YqHIPE0MlZLP8C5I@gondor.apana.org.au>
-References: <65634fb748cc0ce2cc5bafaf904cb5f76bd4edc4.1654414362.git.christophe.jaillet@wanadoo.fr>
+        Thu, 9 Jun 2022 07:24:38 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D021D488BD;
+        Thu,  9 Jun 2022 04:24:36 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LJhYM6gYWzjX9D;
+        Thu,  9 Jun 2022 19:23:35 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 19:24:34 +0800
+Received: from localhost.localdomain (10.67.165.24) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 19:24:34 +0800
+From:   Weili Qian <qianweili@huawei.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <liulongfang@huawei.com>,
+        Weili Qian <qianweili@huawei.com>
+Subject: [PATCH] crypto: hisilicon/trng - fix local variable type
+Date:   Thu, 9 Jun 2022 19:18:19 +0800
+Message-ID: <20220609111819.29465-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65634fb748cc0ce2cc5bafaf904cb5f76bd4edc4.1654414362.git.christophe.jaillet@wanadoo.fr>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jun 05, 2022 at 09:32:53AM +0200, Christophe JAILLET wrote:
-> When kernel.h is used in the headers it adds a lot into dependency hell,
-> especially when there are circular dependencies are involved.
-> 
-> Replace kernel.h inclusion with the list of what is really being used.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  arch/x86/crypto/camellia.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/crypto/camellia.h b/arch/x86/crypto/camellia.h
-> index 1dcea79e8f8e..547fb7e30928 100644
-> --- a/arch/x86/crypto/camellia.h
-> +++ b/arch/x86/crypto/camellia.h
-> @@ -4,7 +4,7 @@
->  
->  #include <crypto/b128ops.h>
->  #include <linux/crypto.h>
-> -#include <linux/kernel.h>
-> +#include <linux/types.h>
->  
->  #define CAMELLIA_MIN_KEY_SIZE	16
->  #define CAMELLIA_MAX_KEY_SIZE	32
+The return value of 'readl_poll_timeout' is '0' or '-ETIMEDOUT'. Therefore,
+change the local variable 'ret' type from 'u32' to 'int'.
 
-This is not sufficient.  For example, asmlinkage isn't explicitly
-defined by any of these header files so it would be relying on an
-implicit inclusion which is prone to breakage.
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/trng/trng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Did you audit the entire file?
-
-Cheers,
+diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
+index 829f2caf0f67..97e500db0a82 100644
+--- a/drivers/crypto/hisilicon/trng/trng.c
++++ b/drivers/crypto/hisilicon/trng/trng.c
+@@ -185,7 +185,7 @@ static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 	struct hisi_trng *trng;
+ 	int currsize = 0;
+ 	u32 val = 0;
+-	u32 ret;
++	int ret;
+ 
+ 	trng = container_of(rng, struct hisi_trng, rng);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.33.0
+
