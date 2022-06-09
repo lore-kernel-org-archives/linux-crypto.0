@@ -2,87 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55311C43334
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 02:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38693C43334
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jun 2022 10:16:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237317AbiFIC6L (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jun 2022 22:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
+        id S234332AbiFIKQJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 9 Jun 2022 06:16:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232220AbiFIC6K (ORCPT
+        with ESMTP id S241879AbiFIKQF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jun 2022 22:58:10 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3664E119926;
-        Wed,  8 Jun 2022 19:58:06 -0700 (PDT)
-Received: from canpemm500005.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LJTGM1skZzRhb9;
-        Thu,  9 Jun 2022 10:54:51 +0800 (CST)
-Received: from huawei.com (10.145.46.56) by canpemm500005.china.huawei.com
- (7.192.104.229) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 9 Jun
- 2022 10:58:03 +0800
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-CC:     <qianweili@huawei.com>, <shenyang39@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH] MAINTAINERS: update HiSilicon ZIP and QM maintainers
-Date:   Thu, 9 Jun 2022 02:56:39 +0000
-Message-ID: <20220609025639.3280804-1-wangzhou1@hisilicon.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 9 Jun 2022 06:16:05 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2039DB36EE;
+        Thu,  9 Jun 2022 03:16:01 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1nzFCF-004yZH-QF; Thu, 09 Jun 2022 20:15:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Jun 2022 18:15:24 +0800
+Date:   Thu, 9 Jun 2022 18:15:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: x86/camellia - Replace kernel.h with the
+ necessary inclusions
+Message-ID: <YqHIPE0MlZLP8C5I@gondor.apana.org.au>
+References: <65634fb748cc0ce2cc5bafaf904cb5f76bd4edc4.1654414362.git.christophe.jaillet@wanadoo.fr>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.145.46.56]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500005.china.huawei.com (7.192.104.229)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65634fb748cc0ce2cc5bafaf904cb5f76bd4edc4.1654414362.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch splits QM and ZIP in MAINTAINERS, then add Weili Qian for QM
-driver and Yang Shen for ZIP driver. This patch adds missing Kconfig and
-Makefile files as well.
+On Sun, Jun 05, 2022 at 09:32:53AM +0200, Christophe JAILLET wrote:
+> When kernel.h is used in the headers it adds a lot into dependency hell,
+> especially when there are circular dependencies are involved.
+> 
+> Replace kernel.h inclusion with the list of what is really being used.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  arch/x86/crypto/camellia.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/crypto/camellia.h b/arch/x86/crypto/camellia.h
+> index 1dcea79e8f8e..547fb7e30928 100644
+> --- a/arch/x86/crypto/camellia.h
+> +++ b/arch/x86/crypto/camellia.h
+> @@ -4,7 +4,7 @@
+>  
+>  #include <crypto/b128ops.h>
+>  #include <linux/crypto.h>
+> -#include <linux/kernel.h>
+> +#include <linux/types.h>
+>  
+>  #define CAMELLIA_MIN_KEY_SIZE	16
+>  #define CAMELLIA_MAX_KEY_SIZE	32
 
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- MAINTAINERS | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+This is not sufficient.  For example, asmlinkage isn't explicitly
+defined by any of these header files so it would be relying on an
+implicit inclusion which is prone to breakage.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a6d3bd9d2a8d..b04fb3324837 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8936,16 +8936,25 @@ F:	Documentation/admin-guide/perf/hisi-pcie-pmu.rst
- F:	Documentation/admin-guide/perf/hisi-pmu.rst
- F:	drivers/perf/hisilicon
- 
--HISILICON QM AND ZIP Controller DRIVER
-+HISILICON QM DRIVER
-+M:	Weili Qian <qianweili@huawei.com>
- M:	Zhou Wang <wangzhou1@hisilicon.com>
- L:	linux-crypto@vger.kernel.org
- S:	Maintained
--F:	Documentation/ABI/testing/debugfs-hisi-zip
-+F:	drivers/crypto/hisilicon/Kconfig
-+F:	drivers/crypto/hisilicon/Makefile
- F:	drivers/crypto/hisilicon/qm.c
- F:	drivers/crypto/hisilicon/sgl.c
--F:	drivers/crypto/hisilicon/zip/
- F:	include/linux/hisi_acc_qm.h
- 
-+HISILICON ZIP Controller DRIVER
-+M:	Yang Shen <shenyang39@huawei.com>
-+M:	Zhou Wang <wangzhou1@hisilicon.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/ABI/testing/debugfs-hisi-zip
-+F:	drivers/crypto/hisilicon/zip/
-+
- HISILICON ROCE DRIVER
- M:	Wenpeng Liang <liangwenpeng@huawei.com>
- M:	Weihang Li <liweihang@huawei.com>
+Did you audit the entire file?
+
+Cheers,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
