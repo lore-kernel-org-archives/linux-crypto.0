@@ -2,74 +2,63 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BA4C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 09:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D06B9C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 09:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348804AbiFJJTH (ORCPT
+        id S1349084AbiFJJUa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jun 2022 05:19:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37460 "EHLO
+        Fri, 10 Jun 2022 05:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349030AbiFJJSh (ORCPT
+        with ESMTP id S1349189AbiFJJSz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jun 2022 05:18:37 -0400
+        Fri, 10 Jun 2022 05:18:55 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904FE2D9AF4;
-        Fri, 10 Jun 2022 02:16:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DA32FEBB5;
+        Fri, 10 Jun 2022 02:17:09 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1nzakk-005Md7-52; Fri, 10 Jun 2022 19:16:27 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jun 2022 17:16:26 +0800
-Date:   Fri, 10 Jun 2022 17:16:26 +0800
+        id 1nzalB-005MfF-C8; Fri, 10 Jun 2022 19:16:54 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jun 2022 17:16:53 +0800
+Date:   Fri, 10 Jun 2022 17:16:53 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Zheng Bin <zhengbin13@huawei.com>,
-        Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH crypto] crypto: memneq - move into lib/
-Message-ID: <YqML6nrdohsG7gsR@gondor.apana.org.au>
-References: <CAHmME9rWfUnUmHR5xo_+WdS0Wgv8yXQb+LqAo24XdoQQR4Wn8w@mail.gmail.com>
- <20220528102429.189731-1-Jason@zx2c4.com>
+To:     Shijith Thotton <sthotton@marvell.com>
+Cc:     Arnaud Ebalard <arno@natisbad.org>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        linux-crypto@vger.kernel.org, jerinj@marvell.com,
+        sgoutham@marvell.com, Srujana Challa <schalla@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Kees Cook <keescook@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] crypto: octeontx2: fix potential null pointer access
+Message-ID: <YqMMBUzHTCOv9UzM@gondor.apana.org.au>
+References: <da89ba20819ad3ca6b99f9ef056f2bc1b076dc6d.1653632699.git.sthotton@marvell.com>
+ <6f772668877d2bd7dfdf7b45bb90cb56b3a6339b.1654070734.git.sthotton@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220528102429.189731-1-Jason@zx2c4.com>
+In-Reply-To: <6f772668877d2bd7dfdf7b45bb90cb56b3a6339b.1654070734.git.sthotton@marvell.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 28, 2022 at 12:24:29PM +0200, Jason A. Donenfeld wrote:
-> This is used by code that doesn't need CONFIG_CRYPTO, so move this into
-> lib/ with a Kconfig option so that it can be selected by whatever needs
-> it.
+On Wed, Jun 01, 2022 at 01:38:59PM +0530, Shijith Thotton wrote:
+> Added missing checks to avoid null pointer dereference.
 > 
-> This fixes a linker error Zheng pointed out when
-> CRYPTO_MANAGER_DISABLE_TESTS!=y and CRYPTO=m:
+> The patch fixes below issue reported by klocwork tool:
+> . Pointer 'strsep( &val, ":" )' returned from call to function 'strsep'
+>   at line 1608 may be NULL and will be dereferenced at line 1608. Also
+>   there are 2 similar errors on lines 1620, 1632 in otx2_cptpf_ucode.c.
 > 
->   lib/crypto/curve25519-selftest.o: In function `curve25519_selftest':
->   curve25519-selftest.c:(.init.text+0x60): undefined reference to `__crypto_memneq'
->   curve25519-selftest.c:(.init.text+0xec): undefined reference to `__crypto_memneq'
->   curve25519-selftest.c:(.init.text+0x114): undefined reference to `__crypto_memneq'
->   curve25519-selftest.c:(.init.text+0x154): undefined reference to `__crypto_memneq'
-> 
-> Reported-by: Zheng Bin <zhengbin13@huawei.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: stable@vger.kernel.org
-> Fixes: aa127963f1ca ("crypto: lib/curve25519 - re-add selftests")
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Signed-off-by: Shijith Thotton <sthotton@marvell.com>
 > ---
-> I'm traveling over the next week, and there are a few ways to skin this
-> cat, so if somebody here sees issue, feel free to pick this v1 up and
-> fashion a v2 out of it.
+> v2:
+> * Removed unwanted check for pcim_iomap_table.
 > 
->  crypto/Kconfig           | 1 +
->  crypto/Makefile          | 2 +-
->  lib/Kconfig              | 3 +++
->  lib/Makefile             | 1 +
->  lib/crypto/Kconfig       | 1 +
->  {crypto => lib}/memneq.c | 0
->  6 files changed, 7 insertions(+), 1 deletion(-)
->  rename {crypto => lib}/memneq.c (100%)
+>  .../crypto/marvell/octeontx2/otx2_cptpf_ucode.c   | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
