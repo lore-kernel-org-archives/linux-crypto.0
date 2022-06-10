@@ -2,102 +2,160 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3033C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 10:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15532C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 12:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344804AbiFJKw0 (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jun 2022 06:52:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
+        id S234873AbiFJMem (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Jun 2022 08:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239945AbiFJKwE (ORCPT
+        with ESMTP id S235263AbiFJMel (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jun 2022 06:52:04 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3E9A52FEF7D;
-        Fri, 10 Jun 2022 03:48:46 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 724FA12FC;
-        Fri, 10 Jun 2022 03:48:46 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C9613F766;
-        Fri, 10 Jun 2022 03:48:44 -0700 (PDT)
-Date:   Fri, 10 Jun 2022 11:48:40 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Rob Herring <robh@kernel.org>
-Cc:     Yoan Picchi <yoan.picchi@arm.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Fri, 10 Jun 2022 08:34:41 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 490DF37B7F5
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jun 2022 05:34:39 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id c196so23774786pfb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jun 2022 05:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fTnCXFuyCstJMPBhMqFKxxK2N1Yz6X1NLjBKTceklwM=;
+        b=vur4KePcrSZwfP7+Gdvgv0bt/L+tZYdakOo7NYRMZrInzrC3kXcg9wHBqc9MWv59Gj
+         fi3P0bGnYTLmFOCZOY87UWoPPXuY7QJc+kIO6+6PEhjv/QoGHk5E8Xl1QDeHaoxjM925
+         7xHg3+imavV8cUH2qIm005hgrV6avSWy6ajROWVEsYy7wiHGbBStoGiNN9f9L+gfFgpZ
+         0hM+Bhq6E/tbkoP6LyawPOMZPovEbkWNCktkNCzVL5E8bPvYCQx+Fa/+mN4cjMn9Ikdx
+         ZCD5YqgYZsorAql4dSYI3nUD28lL5b4p/v+pdAwut8e7y3TlwPgakW7CIcLmmASc46Jo
+         k8nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fTnCXFuyCstJMPBhMqFKxxK2N1Yz6X1NLjBKTceklwM=;
+        b=nP/slZJ1bbmunwyGgPYtsxiXRYtSF2uWAaM/e/0IAsuMNGdyEwqVlppyBthLZ7kPeL
+         ew1rJGXFFrqmALS0Dv9bHojnctGdNJx7hE7vpHNG1SnWCl4ajDSok/UOjBE378hXFm3c
+         2E7xqtAkCPRQG//jFhzcMINftd+mSF5hnCKce/uN/rb++ZR1oJ8Jl1A2c+a/0e4VGihP
+         ejptVEo2hZr4z7uIJ9h45NtNGjnKBMun0fUvs1fXBSDeEj0Ck1JRRRYcCxzBHOjjTrWe
+         sYYAecpckxMKbklmymZhqy03m9zeY+9xc/SKAa4IOAp06DsIKp0SWdv5ouh5CWe6bwTH
+         cx3g==
+X-Gm-Message-State: AOAM5319df3mVZmixtXFWoAjUDITntuS+8xig2S3HrrYUzEuKEfbXezU
+        Yhxu+oJvHykDc6DvzcFdap7unbkYwOZbcYqZ
+X-Google-Smtp-Source: ABdhPJye0lkqFNoSURlpFSaRubFAyvZ7H6pZUjfbwhCtArda1i/1Oz2vnL3TD6wFmZ1x8rh776n3gQ==
+X-Received: by 2002:a63:2160:0:b0:3fc:b8ac:1976 with SMTP id s32-20020a632160000000b003fcb8ac1976mr40229774pgm.453.1654864478105;
+        Fri, 10 Jun 2022 05:34:38 -0700 (PDT)
+Received: from localhost.localdomain ([94.177.118.5])
+        by smtp.gmail.com with ESMTPSA id a14-20020a1709027e4e00b0016892555955sm5867860pln.179.2022.06.10.05.34.33
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 10 Jun 2022 05:34:37 -0700 (PDT)
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 2/2] Removes the x86 dependency on the QAT drivers
-Message-ID: <20220610114840.10db23ea@donnerap.cambridge.arm.com>
-In-Reply-To: <20220609213652.GA115440-robh@kernel.org>
-References: <20220607165840.66931-1-yoan.picchi@arm.com>
- <20220607165840.66931-3-yoan.picchi@arm.com>
- <20220609213652.GA115440-robh@kernel.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        jean-philippe <jean-philippe@linaro.org>,
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Yang Shen <shenyang39@huawei.com>
+Subject: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
+Date:   Fri, 10 Jun 2022 20:34:23 +0800
+Message-Id: <20220610123423.27496-1-zhangfei.gao@linaro.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 9 Jun 2022 15:36:52 -0600
-Rob Herring <robh@kernel.org> wrote:
+The uacce parent's module can be removed when uacce is working,
+which may cause troubles.
 
-Hi,
+If rmmod/uacce_remove happens just after fops_open: bind_queue,
+the uacce_remove can not remove the bound queue since it is not
+added to the queue list yet, which blocks the uacce_disable_sva.
 
-> On Tue, Jun 07, 2022 at 04:58:40PM +0000, Yoan Picchi wrote:
-> > This dependency looks outdated. After the previous patch, we have been able
-> > to use this driver to encrypt some data and to create working VF on arm64.
-> > We have not tested it yet on any big endian machine, hence the new dependency  
-> 
-> For the subject, use prefixes matching the subsystem (like you did on 
-> patch 1).
-> 
-> The only testing obligation you have is compiling for BE.
+Change queues_lock area to make sure the bound queue is added to
+the list thereby can be searched in uacce_remove.
 
-So I just compiled for arm64 BE, powerpc BE & LE, and riscv again:
-$ file qat_c62xvf.ko
-qat_c62xvf.ko: ELF 64-bit MSB relocatable, ARM aarch64, version 1 (SYSV),
-BuildID[sha1]=630cc0ee5586c7aeb6e0ab5567ce2f2f7cc46adf, with debug_info,
-not stripped
-qat_c62xvf.ko: ELF 64-bit MSB relocatable, 64-bit PowerPC or cisco 7500,
-version 1 (SYSV), BuildID[sha1]=4090ba181cf95f27108bf3ecde0776f12ef2b636,
-not stripped
-qat_c62xvf.ko: ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500,
-version 1 (SYSV), BuildID[sha1]=2cb0fd09d5bc36c8918fcd061c9f3dac1546cf0d,
-not stripped
-qat_c62xvf.ko: ELF 64-bit LSB relocatable, UCB RISC-V, version 1 (SYSV),
-BuildID[sha1]=bfaa53df7e9aad79d3ab4c05e75ca9169227f6b8, not stripped
+And uacce->parent->driver is checked immediately in case rmmod is
+just happening.
 
-All built without errors or warnings, for every of the enabled drivers.
+Also the parent driver must always stop DMA before calling
+uacce_remove.
 
-> If kconfig was
-> supposed to capture what endianness drivers have been tested or not
-> tested with, then lots of drivers are missing the dependency. Kconfig
-> depends/select entries should generally be either to prevent compile
-> failures (you checked PPC, RiscV, etc.?) or to hide drivers *really*
-> specific to a platform. IMO, we should only have !CPU_BIG_ENDIAN if it 
-> is known not to work and not easily fixed.
+Signed-off-by: Yang Shen <shenyang39@huawei.com>
+Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+---
+ drivers/misc/uacce/uacce.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Fair enough, I leave that decision to Giovanni. I have plans to test this
-with BE, but getting a BE setup on a server is not trivial, both for
-userland and actual booting, so this will take some time. We just didn't
-want to block this on some BE concerns.
+diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+index 281c54003edc..b6219c6bfb48 100644
+--- a/drivers/misc/uacce/uacce.c
++++ b/drivers/misc/uacce/uacce.c
+@@ -136,9 +136,16 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+ 	if (!q)
+ 		return -ENOMEM;
+ 
++	mutex_lock(&uacce->queues_lock);
++
++	if (!uacce->parent->driver) {
++		ret = -ENODEV;
++		goto out_with_lock;
++	}
++
+ 	ret = uacce_bind_queue(uacce, q);
+ 	if (ret)
+-		goto out_with_mem;
++		goto out_with_lock;
+ 
+ 	q->uacce = uacce;
+ 
+@@ -153,7 +160,6 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+ 	uacce->inode = inode;
+ 	q->state = UACCE_Q_INIT;
+ 
+-	mutex_lock(&uacce->queues_lock);
+ 	list_add(&q->list, &uacce->queues);
+ 	mutex_unlock(&uacce->queues_lock);
+ 
+@@ -161,7 +167,8 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+ 
+ out_with_bond:
+ 	uacce_unbind_queue(q);
+-out_with_mem:
++out_with_lock:
++	mutex_unlock(&uacce->queues_lock);
+ 	kfree(q);
+ 	return ret;
+ }
+@@ -171,10 +178,10 @@ static int uacce_fops_release(struct inode *inode, struct file *filep)
+ 	struct uacce_queue *q = filep->private_data;
+ 
+ 	mutex_lock(&q->uacce->queues_lock);
+-	list_del(&q->list);
+-	mutex_unlock(&q->uacce->queues_lock);
+ 	uacce_put_queue(q);
+ 	uacce_unbind_queue(q);
++	list_del(&q->list);
++	mutex_unlock(&q->uacce->queues_lock);
+ 	kfree(q);
+ 
+ 	return 0;
+@@ -513,10 +520,10 @@ void uacce_remove(struct uacce_device *uacce)
+ 		uacce_put_queue(q);
+ 		uacce_unbind_queue(q);
+ 	}
+-	mutex_unlock(&uacce->queues_lock);
+ 
+ 	/* disable sva now since no opened queues */
+ 	uacce_disable_sva(uacce);
++	mutex_unlock(&uacce->queues_lock);
+ 
+ 	if (uacce->cdev)
+ 		cdev_device_del(uacce->cdev, &uacce->dev);
+-- 
+2.36.1
 
-> Also, with the dependency, no one can test the driver without modifying 
-> the kernel and if it does work as-is, then one has to upstream a change 
-> and then wait for it to show up in distro kernels. You could mitigate 
-> the first part with COMPILE_TEST.
-
-Yeah, that's a good point, we were already bitten by this, the initial
-testing was done on a stable distro kernel (v5.4), and it worked fine
-already there.
-
-Cheers,
-Andre
