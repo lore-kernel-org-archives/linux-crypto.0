@@ -2,199 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8763C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 08:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 446DBC43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jun 2022 08:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236674AbiFJIOx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jun 2022 04:14:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48924 "EHLO
+        id S1348058AbiFJIfW (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 10 Jun 2022 04:35:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346746AbiFJIOv (ORCPT
+        with ESMTP id S1348054AbiFJIem (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jun 2022 04:14:51 -0400
-X-Greylist: delayed 393 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 10 Jun 2022 01:14:49 PDT
-Received: from mail.baikalelectronics.com (mail.baikalelectronics.com [87.245.175.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C10D3A5AAA;
-        Fri, 10 Jun 2022 01:14:49 -0700 (PDT)
-Received: from mail (mail.baikal.int [192.168.51.25])
-        by mail.baikalelectronics.com (Postfix) with ESMTP id 9473516A0;
-        Fri, 10 Jun 2022 11:08:57 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.baikalelectronics.com 9473516A0
+        Fri, 10 Jun 2022 04:34:42 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C72B3338AE
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jun 2022 01:32:29 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id w20so20054227lfa.11
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jun 2022 01:32:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baikalelectronics.ru; s=mail; t=1654848540;
-        bh=P0epdiQ2UfkKeER5KtOFqFsZ8/0xaqJ7ab4vUUQPTCw=;
-        h=From:To:CC:Subject:Date:From;
-        b=FES/RpZBcFEtKNYzfj2ZM1TKH3v4j1D1srCu1QFX0yo+vxrndl74dC/lOEO0AROoD
-         E9WiAns/InODAMwuQ3yGDm0SYSUjNGDlAku4e4gJHtto+ZKLwtUZuRhTH6qiwi2G8o
-         Wx1WzoKWULlo6KhIEebDed0WI8cU+7OfayCvYSmE=
-Received: from localhost (192.168.53.207) by mail (192.168.51.25) with
- Microsoft SMTP Server (TLS) id 15.0.1395.4; Fri, 10 Jun 2022 11:08:05 +0300
-From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
-To:     Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Vladimir Murzin <vladimir.murzin@arm.com>
-CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@bootlin.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        <linux-crypto@vger.kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        <dmaengine@vger.kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Li Yang <leoyang.li@nxp.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        <linux-renesas-soc@vger.kernel.org>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>, <ntb@lists.linux.dev>,
-        <iommu@lists.linux-foundation.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] dma-direct: take dma-ranges/offsets into account in resource mapping
-Date:   Fri, 10 Jun 2022 11:08:02 +0300
-Message-ID: <20220610080802.11147-1-Sergey.Semin@baikalelectronics.ru>
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=u2qHVMNC89KEaLQP1Bq1nS5jM3wTACD+XBwIshrDDSQ=;
+        b=BvVP3lc9hnk1I8CIpUJ2qJ4hb1MUw41/qIR60K7rrVF+HN4ODSc+Bm4Ngaj6vFbJ56
+         dNcHm4mSJ5VGEkbeA6KTO+w58K9eeerzJRqYz2GkVjic6kjXSgjL3lueS8dXqHhO2Wqi
+         oCVGhEe9LvC3+WOnGeW/Dw8Xt2U9Y9q302WkWJVowbUPCgQjplnRpO+qc3dJsIi5oDp6
+         YLUb+VSTu1QAMeJN207DEkP+pBsnYY3lD53mgrud6JoR9KZgBVT/PeRCpbJvWs8nGuoS
+         UFymtsRtooXaPojZOGRivZu/jYW/CdNowaA1aujgnqRx7YNXFL6DNLmPvTkZobgZPDqR
+         Qxgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u2qHVMNC89KEaLQP1Bq1nS5jM3wTACD+XBwIshrDDSQ=;
+        b=ioGEQvp9MjZU7IU9cV4ftCjRWMzYsVOAvxRs39e6w803PNmpqavzpJfp+yQ/Es3iT2
+         vV/IKS1KNK7SCO5WR7WPxndqAaae/a4CPrAqp+leri79t+Ez5fFpDVsPpXognGqXGpnh
+         InFNe0q4TGm3/7RBK0+TAhvl7Gm4dotl8C1Ff7UUbkyrRuZPTfi4TgdlAX46nV/SxzBf
+         Nd49qPh62ah9jkclX4FThBbdY4demjKWuZ4OI3Gp3q3nYWpt+M+3vEBT3FpkeXrGsG30
+         1L4dVgNsUMZiF2PNhYezXQHJmbnfssmJqKe5+d47VrBrm5HkOnckX1qLGhlcEkPhkqbR
+         FRag==
+X-Gm-Message-State: AOAM533jWJEfUPvMPYnEwPY7V5mj+iTzoYa0sdE27iifsvbtfZgyUF2w
+        sfGbRfCGg8lMcBrlX3itpZju7N7bfys+6ONO1PthyQ==
+X-Google-Smtp-Source: ABdhPJzGk//f2+F0+hXVmgNhhWSCUO6L6VGLAKcnWBch93b+wg00S/YcSE90O/LXFcg5ZUUN68Yr7vRuPEqYnnvusN4=
+X-Received: by 2002:ac2:4f11:0:b0:479:3554:79d with SMTP id
+ k17-20020ac24f11000000b004793554079dmr17843777lfr.417.1654849947716; Fri, 10
+ Jun 2022 01:32:27 -0700 (PDT)
 MIME-Version: 1.0
+References: <00000000000039214105e0d5c4f4@google.com>
+In-Reply-To: <00000000000039214105e0d5c4f4@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 10 Jun 2022 10:32:15 +0200
+Message-ID: <CACT4Y+ZiGzx7EkdOwEmpNCcOFq-N537QbW=-wAA=NAGGxTo-VQ@mail.gmail.com>
+Subject: Re: [syzbot] usb-testing boot error: INFO: task hung in add_early_randomness
+To:     syzbot <syzbot+695f4009c37860232f35@syzkaller.appspotmail.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux@dominikbrodowski.net, mpm@selenic.com,
+        syzkaller-bugs@googlegroups.com, Jason Wang <jasowang@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A basic device-specific linear memory mapping was introduced back in
-commit ("dma: Take into account dma_pfn_offset") as a single-valued offset
-preserved in the device.dma_pfn_offset field, which was initialized for
-instance by means of the "dma-ranges" DT property. Afterwards the
-functionality was extended to support more than one device-specific region
-defined in the device.dma_range_map list of maps. But all of these
-improvements concerned a single pointer, page or sg DMA-mapping methods,
-while the system resource mapping function turned to miss the
-corresponding modification. Thus the dma_direct_map_resource() method now
-just casts the CPU physical address to the device DMA address with no
-dma-ranges-based mapping taking into account, which is obviously wrong.
-Let's fix it by using the phys_to_dma_direct() method to get the
-device-specific bus address from the passed memory resource for the case
-of the directly mapped DMA.
+On Tue, 7 Jun 2022 at 08:33, syzbot
+<syzbot+695f4009c37860232f35@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    f2906aa86338 Linux 5.19-rc1
+> git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1042a03bf00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3bafeb86189666d4
+> dashboard link: https://syzkaller.appspot.com/bug?extid=695f4009c37860232f35
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+695f4009c37860232f35@syzkaller.appspotmail.com
 
-Fixes: 25f1e1887088 ("dma: Take into account dma_pfn_offset")
-Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Assume this is also fixed by:
 
----
+#syz fix: virtio-rng: make device ready before making request
 
-After a long discussion with Christoph and Robin regarding this patch
-here:
-https://lore.kernel.org/lkml/20220324014836.19149-4-Sergey.Semin@baikalelectronics.ru
-and here
-https://lore.kernel.org/linux-pci/20220503225104.12108-2-Sergey.Semin@baikalelectronics.ru/
-It was decided to consult with wider maintainers audience whether it's ok
-to accept the change as is or a more sophisticated solution needs to be
-found for the non-linear direct MMIO mapping.
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-
-file: arch/arm/mach-orion5x/board-dt.c
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-Cc: Gregory Clement <gregory.clement@bootlin.com>
-Cc: linux-arm-kernel@lists.infradead.org
-
-file: drivers/crypto/marvell/cesa/cesa.c
-Cc: Srujana Challa <schalla@marvell.com>
-Cc: Arnaud Ebalard <arno@natisbad.org>
-Cc: Boris Brezillon <bbrezillon@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-
-file: drivers/dma/{fsl-edma-common.c,pl330.c,sh/rcar-dmac.c}
-Cc: Vinod Koul <vkoul@kernel.org>
-Cc: dmaengine@vger.kernel.org
-
-file: arch/arm/boot/dts/{vfxxx.dtsi,ls1021a.dtsi,imx7ulp.dtsi,fsl-ls1043a.dtsi}
-Cc: Shawn Guo <shawnguo@kernel.org>
-Cc: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: Li Yang <leoyang.li@nxp.com>
-Cc: linux-arm-kernel@lists.infradead.org
-
-file: arch/arm/boot/dts/r8a77*.dtsi, arch/arm64/boot/dts/renesas/r8a77*.dtsi
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Magnus Damm <magnus.damm@gmail.com>
-Cc: linux-renesas-soc@vger.kernel.org
-
-file: drivers/gpu/drm/amd/amdgpu/amdgpu_vram_mgr.c
-Cc: Alex Deucher <alexander.deucher@amd.com>
-Cc: "Christian König" <christian.koenig@amd.com>
-Cc: "Pan, Xinhui" <Xinhui.Pan@amd.com>
-
-file: drivers/gpu/drm/virtio/virtgpu_vram.c
-Cc: David Airlie <airlied@linux.ie>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-
-file: drivers/media/common/videobuf2/videobuf2-dma-contig.c
-Cc: Tomasz Figa <tfiga@chromium.org>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>
-
-file: drivers/misc/habanalabs/common/memory.c
-Cc: Oded Gabbay <ogabbay@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
-file: drivers/mtd/nand/raw/qcom_nandc.c
-Cc: Manivannan Sadhasivam <mani@kernel.org>
-
-file: arch/arm64/boot/dts/qcom/{ipq8074.dtsi,ipq6018.dtsi,qcom-sdx55.dtsi,qcom-ipq4019.dtsi,qcom-ipq8064.dtsi}
-Cc: Andy Gross <agross@kernel.org>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc: linux-arm-msm@vger.kernel.org
-
-file: drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-Cc: Sunil Goutham <sgoutham@marvell.com>
-Cc: Linu Cherian <lcherian@marvell.com>
-Cc: Geetha sowjanya <gakula@marvell.com>
-
-file: drivers/ntb/ntb_transport.c
-Cc: Jon Mason <jdmason@kudzu.us>
-Cc: Dave Jiang <dave.jiang@intel.com>
-Cc: ntb@lists.linux.dev
----
- kernel/dma/direct.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-index 9743c6ccce1a..bc06db74dfdb 100644
---- a/kernel/dma/direct.c
-+++ b/kernel/dma/direct.c
-@@ -497,7 +497,7 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
- dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t paddr,
- 		size_t size, enum dma_data_direction dir, unsigned long attrs)
- {
--	dma_addr_t dma_addr = paddr;
-+	dma_addr_t dma_addr = phys_to_dma_direct(dev, paddr);
- 
- 	if (unlikely(!dma_capable(dev, dma_addr, size, false))) {
- 		dev_err_once(dev,
--- 
-2.35.1
-
+> INFO: task swapper/0:1 blocked for more than 143 seconds.
+>       Not tainted 5.19.0-rc1-syzkaller #0
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:swapper/0       state:D stack:23984 pid:    1 ppid:     0 flags:0x00004000
+> Call Trace:
+>  <TASK>
+>  context_switch kernel/sched/core.c:5116 [inline]
+>  __schedule+0x93c/0x25e0 kernel/sched/core.c:6428
+>  schedule+0xd2/0x1f0 kernel/sched/core.c:6500
+>  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
+>  __mutex_lock_common kernel/locking/mutex.c:679 [inline]
+>  __mutex_lock+0xa70/0x1350 kernel/locking/mutex.c:747
+>  add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
+>  hwrng_register+0x399/0x510 drivers/char/hw_random/core.c:599
+>  virtrng_scan+0x37/0x90 drivers/char/hw_random/virtio-rng.c:205
+>  virtio_dev_probe+0x639/0x910 drivers/virtio/virtio.c:313
+>  call_driver_probe drivers/base/dd.c:555 [inline]
+>  really_probe+0x23e/0xb90 drivers/base/dd.c:634
+>  __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:764
+>  driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:794
+>  __driver_attach+0x22d/0x550 drivers/base/dd.c:1163
+>  bus_for_each_dev+0x147/0x1d0 drivers/base/bus.c:301
+>  bus_add_driver+0x422/0x640 drivers/base/bus.c:618
+>  driver_register+0x220/0x3a0 drivers/base/driver.c:240
+>  do_one_initcall+0x103/0x650 init/main.c:1295
+>  do_initcall_level init/main.c:1368 [inline]
+>  do_initcalls init/main.c:1384 [inline]
+>  do_basic_setup init/main.c:1403 [inline]
+>  kernel_init_freeable+0x6ac/0x735 init/main.c:1610
+>  kernel_init+0x1a/0x1d0 init/main.c:1499
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+>  </TASK>
+>
+> Showing all locks held in the system:
+> 2 locks held by swapper/0/1:
+>  #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
+>  #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1054 [inline]
+>  #0: ffff88810cb9e170 (&dev->mutex){....}-{3:3}, at: __driver_attach+0x222/0x550 drivers/base/dd.c:1162
+>  #1: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness+0x1a/0x170 drivers/char/hw_random/core.c:69
+> 2 locks held by pr/ttyS0/14:
+> 1 lock held by khungtaskd/27:
+>  #0: ffffffff87a94840 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
+> 1 lock held by hwrng/150:
+>  #0: ffffffff87edbbe8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0x141/0x370 drivers/char/hw_random/core.c:503
+>
+> =============================================
+>
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/00000000000039214105e0d5c4f4%40google.com.
