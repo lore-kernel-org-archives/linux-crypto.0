@@ -2,126 +2,142 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA59C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jun 2022 03:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CC9C43334
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jun 2022 07:13:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349612AbiFKDJa (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jun 2022 23:09:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34164 "EHLO
+        id S230084AbiFKHNx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Jun 2022 03:13:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349678AbiFKDJ3 (ORCPT
+        with ESMTP id S229436AbiFKHNw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jun 2022 23:09:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27FC13FB1;
-        Fri, 10 Jun 2022 20:09:27 -0700 (PDT)
+        Sat, 11 Jun 2022 03:13:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E215BE0E;
+        Sat, 11 Jun 2022 00:13:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2ECA061FDA;
-        Sat, 11 Jun 2022 03:09:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A2EC34114;
-        Sat, 11 Jun 2022 03:09:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654916966;
-        bh=/u+Q6uSfDAqnjJx+EX/s7QWBd478U30h2HlttADZ4Vo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VLkHbIYZf/LbVn5KZ30u9dI1examoZJ5snwRWOL6519gf/4gcj3TUZU7WFWjepN85
-         Xvu6P8j9CgK8ttwJsA7kBmzYrbvnZ/QISmq/WjsFITkWYGRIqP3/TYN2kt4aWBrBZQ
-         BehwvkW85jC9IfuaN/ed6OBgVB5Ck51jQdFTJB1CTondBom2VyZrr2ooCLilAyVav4
-         2yCDTPHe66zKoR69jTQ7d7Ie4GNRQN0bhFYD5xz5Dsi6w6y+166muYR2JY4jbk951E
-         CXK0/mnzOdnXj8mZWSVGR9fIN7PEKGZNPOzX7tB1ZCuYbJ3NO85aHZ47Cv2zwsKfL6
-         nA+aut/0tCP7A==
-Date:   Fri, 10 Jun 2022 20:09:24 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jason Self <jason@bluehome.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     stable@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-crypto@vger.kernel.org
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C522D60A20;
+        Sat, 11 Jun 2022 07:13:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56417C3411E;
+        Sat, 11 Jun 2022 07:13:45 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FAOzbz6b"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1654931622;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=y54c2BnUceKRuWbcClQtOKc3rtiRMXKNo+Y37+pnHUs=;
+        b=FAOzbz6bULleaKtfLEmPsicyLYq/aJfTDwm6NrLWfRusUa+8JsE89Wkr3t5ga8yu6gN9Wx
+        wScepcw62qP1GA387SiZQQP6+kHLdlFUj9fqaUYrSsC74RPAK8CUbXnQOjCO6aEeb4u5qe
+        kscjQNKKtbQzlEVE1wxQwqtMfXjVeK8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c55fad24 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 11 Jun 2022 07:13:42 +0000 (UTC)
+Date:   Sat, 11 Jun 2022 09:13:40 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>, herbert@gondor.apana.org.au
+Cc:     Jason Self <jason@bluehome.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: Build error on openrisc with CONFIG_CRYPTO_LIB_CURVE25519
-Message-ID: <YqQHZB6/u4nrFzIm@sol.localdomain>
+Message-ID: <YqRApN6IbU3OsIWz@zx2c4.com>
 References: <20220609162943.6e3bba4f@valencia>
  <YqLTecx7MGFPOvhw@kroah.com>
  <20220610182523.2f5620a2@valencia>
  <20220610184255.20ecde41@valencia>
+ <YqQHZB6/u4nrFzIm@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220610184255.20ecde41@valencia>
+In-Reply-To: <YqQHZB6/u4nrFzIm@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 06:42:55PM -0700, Jason Self wrote:
-> On Fri, 10 Jun 2022 18:25:23 -0700
-> Jason Self <jason@bluehome.net> wrote:
-> 
-> > On Fri, 10 Jun 2022 07:15:37 +0200
-> > Greg KH <greg@kroah.com> wrote:
-> > 
-> > > On Thu, Jun 09, 2022 at 04:29:43PM -0700, Jason Self wrote:  
-> > > > In building 5.15.46 & 5.10.121 with CRYPTO_LIB_CURVE25519=m I
-> > > > get the following. My workaround is to leave it as
-> > > > CRYPTO_LIB_CURVE25519=n for now.
-> > > > 
-> > > > CONFIG_OR1K_1200=y
-> > > > CONFIG_OPENRISC_BUILTIN_DTB="or1ksim"
-> > > > 
-> > > >   sed 's/\.ko$/\.o/' modules.order | scripts/mod/modpost    -o
-> > > >   modules-only.symvers -i vmlinux.symvers   -T - ERROR: modpost:
-> > > >   "__crypto_memneq" [lib/crypto/libcurve25519.ko] undefined!
-> > > > make[1]: *** [scripts/Makefile.modpost:134:
-> > > > modules-only.symvers] Error 1 make[1]: *** Deleting file
-> > > > 'modules-only.symvers' make: *** [Makefile:1783: modules] Error
-> > > > 2    
-> > > 
-> > > 
-> > > Is this a new problem, or has it always been there for these
-> > > kernel trees?  
-> > 
-> > It's new; it began in 5.15.45 & 5.10.120, which is when make
-> > oldconfig first prompted about CONFIG_CRYPTO_LIB_CURVE25519.
-> 
-> The result of my git bisect between 5.15.44 and 5.15.45 tell me the
-> following. It's the same "lib/crypto: add prompts back to crypto
-> libraries" commit when I bisect between 5.10.119 and 5.10.120.
-> 
-> 
-> e16cc79b0f916069de223bdb567fa0bc2ccd18a5 is the first bad commit
-> commit e16cc79b0f916069de223bdb567fa0bc2ccd18a5
-> Author: Justin M. Forbes <jforbes@fedoraproject.org>
-> Date:   Thu Jun 2 22:23:23 2022 +0200
-> 
->     lib/crypto: add prompts back to crypto libraries
->     
->     commit e56e18985596617ae426ed5997fb2e737cffb58b upstream.
->     
->     Commit 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
->     took away a number of prompt texts from other crypto libraries.
->     This makes values flip from built-in to module when oldconfig
->     runs, and causes problems when these crypto libs need to be built
->     in for thingslike BIG_KEYS.
->     
->     Fixes: 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
->     Cc: Herbert Xu <herbert@gondor.apana.org.au>
->     Cc: linux-crypto@vger.kernel.org
->     Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
->     [Jason: - moved menu into submenu of lib/ instead of root menu
->             - fixed chacha sub-dependencies for CONFIG_CRYPTO]
->     Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->     Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
->  crypto/Kconfig     |  2 --
->  lib/Kconfig        |  2 ++
->  lib/crypto/Kconfig | 17 ++++++++++++-----
->  3 files changed, 14 insertions(+), 7 deletions(-)
-> bisect run success
-> 
+Hi Herbert,
 
-It looks like "crypto: memneq - move into lib/" is going to fix this
-(https://lore.kernel.org/linux-crypto/20220528102429.189731-1-Jason@zx2c4.com).
-At the moment it's queued in cryptodev/master.  Herbert, are you planning to
-send it upstream soon?
+On Fri, Jun 10, 2022 at 08:09:24PM -0700, Eric Biggers wrote:
+> On Fri, Jun 10, 2022 at 06:42:55PM -0700, Jason Self wrote:
+> > On Fri, 10 Jun 2022 18:25:23 -0700
+> > Jason Self <jason@bluehome.net> wrote:
+> > 
+> > > On Fri, 10 Jun 2022 07:15:37 +0200
+> > > Greg KH <greg@kroah.com> wrote:
+> > > 
+> > > > On Thu, Jun 09, 2022 at 04:29:43PM -0700, Jason Self wrote:  
+> > > > > In building 5.15.46 & 5.10.121 with CRYPTO_LIB_CURVE25519=m I
+> > > > > get the following. My workaround is to leave it as
+> > > > > CRYPTO_LIB_CURVE25519=n for now.
+> > > > > 
+> > > > > CONFIG_OR1K_1200=y
+> > > > > CONFIG_OPENRISC_BUILTIN_DTB="or1ksim"
+> > > > > 
+> > > > >   sed 's/\.ko$/\.o/' modules.order | scripts/mod/modpost    -o
+> > > > >   modules-only.symvers -i vmlinux.symvers   -T - ERROR: modpost:
+> > > > >   "__crypto_memneq" [lib/crypto/libcurve25519.ko] undefined!
+> > > > > make[1]: *** [scripts/Makefile.modpost:134:
+> > > > > modules-only.symvers] Error 1 make[1]: *** Deleting file
+> > > > > 'modules-only.symvers' make: *** [Makefile:1783: modules] Error
+> > > > > 2    
+> > > > 
+> > > > 
+> > > > Is this a new problem, or has it always been there for these
+> > > > kernel trees?  
+> > > 
+> > > It's new; it began in 5.15.45 & 5.10.120, which is when make
+> > > oldconfig first prompted about CONFIG_CRYPTO_LIB_CURVE25519.
+> > 
+> > The result of my git bisect between 5.15.44 and 5.15.45 tell me the
+> > following. It's the same "lib/crypto: add prompts back to crypto
+> > libraries" commit when I bisect between 5.10.119 and 5.10.120.
+> > 
+> > 
+> > e16cc79b0f916069de223bdb567fa0bc2ccd18a5 is the first bad commit
+> > commit e16cc79b0f916069de223bdb567fa0bc2ccd18a5
+> > Author: Justin M. Forbes <jforbes@fedoraproject.org>
+> > Date:   Thu Jun 2 22:23:23 2022 +0200
+> > 
+> >     lib/crypto: add prompts back to crypto libraries
+> >     
+> >     commit e56e18985596617ae426ed5997fb2e737cffb58b upstream.
+> >     
+> >     Commit 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
+> >     took away a number of prompt texts from other crypto libraries.
+> >     This makes values flip from built-in to module when oldconfig
+> >     runs, and causes problems when these crypto libs need to be built
+> >     in for thingslike BIG_KEYS.
+> >     
+> >     Fixes: 6048fdcc5f269 ("lib/crypto: blake2s: include as built-in")
+> >     Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> >     Cc: linux-crypto@vger.kernel.org
+> >     Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
+> >     [Jason: - moved menu into submenu of lib/ instead of root menu
+> >             - fixed chacha sub-dependencies for CONFIG_CRYPTO]
+> >     Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> >     Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > 
+> >  crypto/Kconfig     |  2 --
+> >  lib/Kconfig        |  2 ++
+> >  lib/crypto/Kconfig | 17 ++++++++++++-----
+> >  3 files changed, 14 insertions(+), 7 deletions(-)
+> > bisect run success
+> > 
+> 
+> It looks like "crypto: memneq - move into lib/" is going to fix this
+> (https://lore.kernel.org/linux-crypto/20220528102429.189731-1-Jason@zx2c4.com).
+> At the moment it's queued in cryptodev/master.  Herbert, are you planning to
+> send it upstream soon?
 
-- Eric
+Both of these commits:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=920b0442b9f884f55f4745b53430c80e71e90275
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=2d16803c562ecc644803d42ba98a8e0aef9c014e
+
+were marked as "[PATCH crypto]", rather than cryptodev, have a CC to
+stable@, and have a fixes tag. So I think these would be better slated
+for the crypto tree rather than the cryptodev tree, so that they make it
+to Linus soonish.
+
+Jason
