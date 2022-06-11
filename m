@@ -2,110 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 367B2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jun 2022 19:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CDAC433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jun 2022 21:04:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbiFKTYv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Jun 2022 15:24:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49768 "EHLO
+        id S229538AbiFKVE5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 11 Jun 2022 17:04:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiFKTYu (ORCPT
+        with ESMTP id S229454AbiFKVE4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Jun 2022 15:24:50 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562D46C576
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Jun 2022 12:24:49 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id s12so3950310ejx.3
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Jun 2022 12:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=eDX4YPI3skPtrMHLN/aI+LITSLK4NDifJrwE3YqyBD8=;
-        b=JguE9HK8hf8slWcR5xn6yotU/1f0tuKATFdShO4up01A44xhRlhyqnlEsUtrJpMyhY
-         ivEMDGjuWe5lhPovWwxEdr6vdX5PGg5Qf/PxqclXrsrSBLaIu+zVHF5TPGMgyg7C93Pj
-         DQSn8sq3AnxfSPI1KLZ71JcD29EZgevzNzB1Y=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=eDX4YPI3skPtrMHLN/aI+LITSLK4NDifJrwE3YqyBD8=;
-        b=S7O+RQtnvcHgwF6YfoblMBEzkFozApbEKSBwBalvixfkpaoyzYrMVILAlD21FlnwDP
-         FbQom/Jh6+JNXXZ5NcBm81fipGH6YVqNYgafh3/wopG43pYSJhaXc862QhFzhNPry2IO
-         vlsWvRpHKZ5WQlfTLgTsj/xSmJRLDeSgq+2teG1IUDv91VoxpuPkqt/VA/s4jjhHNRq6
-         9ZAKewT6hvKLtED1Dy6/ho4gkVjsV3vZJhvLbuC2Ilnqoond+wmxO+s1r9gizgJZyUBK
-         6gRdRRz8KMkdLnvMMxMluntm79Xjj+OnVj8E33k70YYW7DK575KUWcdqNFhuLCYaV+Wc
-         8dcQ==
-X-Gm-Message-State: AOAM531Jm0LWlK0l8K5OJVEUl5TC2rPKeRB0n16k7LjQbBCmGTjzxdHI
-        WIOsIbAJURKoe0s26n5oJTgPQbHUx/6Cgsx6
-X-Google-Smtp-Source: ABdhPJwkDRWobhLb16qHGl98SuxrbfnQBoo4Ne9jW3rkJDhlR8AZWMGJpMhLeglHot4R1qJlfxObSQ==
-X-Received: by 2002:a17:906:d8b8:b0:711:c73e:906b with SMTP id qc24-20020a170906d8b800b00711c73e906bmr31823857ejb.225.1654975487648;
-        Sat, 11 Jun 2022 12:24:47 -0700 (PDT)
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com. [209.85.221.43])
-        by smtp.gmail.com with ESMTPSA id d11-20020a50c88b000000b0042bd6630a14sm1868814edh.87.2022.06.11.12.24.46
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jun 2022 12:24:47 -0700 (PDT)
-Received: by mail-wr1-f43.google.com with SMTP id k16so2470375wrg.7
-        for <linux-crypto@vger.kernel.org>; Sat, 11 Jun 2022 12:24:46 -0700 (PDT)
-X-Received: by 2002:a5d:414d:0:b0:213:be00:a35 with SMTP id
- c13-20020a5d414d000000b00213be000a35mr42667754wrq.97.1654975486223; Sat, 11
- Jun 2022 12:24:46 -0700 (PDT)
-MIME-Version: 1.0
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 11 Jun 2022 12:24:29 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjxqgeG2op+=W9sqgsWqCYnavC+SRfVyopu9-31S6xw+Q@mail.gmail.com>
-Message-ID: <CAHk-=wjxqgeG2op+=W9sqgsWqCYnavC+SRfVyopu9-31S6xw+Q@mail.gmail.com>
-Subject: blake2b_compress_one_generic() stack use with gcc-12
-To:     Eric Biggers <ebiggers@google.com>,
+        Sat, 11 Jun 2022 17:04:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DE93E5DE
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Jun 2022 14:04:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8956EB80B48
+        for <linux-crypto@vger.kernel.org>; Sat, 11 Jun 2022 21:04:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54148C34116;
+        Sat, 11 Jun 2022 21:04:47 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FYzLitTI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1654981484;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tFecTmRBbM0Dgzg/OqgSH12fzke409zK6seno7xeqEs=;
+        b=FYzLitTIfaY3vN0auPZJKQG0z0q+/R4nQ1zHUyNVeHsLDqMjz0qg/rOFnyNbrWIusagtWi
+        zUXn/FlZLzHE43a3ev4z/DBre7Zu+fw8zWR9Uj9F9S7Rr1dVzrK95EzUsBgULqWyGNWcLr
+        hU9OasDUONPiTsk0JV8vw7ONDXqgkk8=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id efe6da43 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 11 Jun 2022 21:04:44 +0000 (UTC)
+Date:   Sat, 11 Jun 2022 23:04:41 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Eric Biggers <ebiggers@google.com>,
         David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-        Kees Cook <keescook@chromium.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Kees Cook <keescook@chromium.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: blake2b_compress_one_generic() stack use with gcc-12
+Message-ID: <YqUDaR2ywTdHr+re@zx2c4.com>
+References: <CAHk-=wjxqgeG2op+=W9sqgsWqCYnavC+SRfVyopu9-31S6xw+Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjxqgeG2op+=W9sqgsWqCYnavC+SRfVyopu9-31S6xw+Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On an i386 build, I now get
+Hey Linus,
 
-  crypto/blake2b_generic.c: In function =E2=80=98blake2b_compress_one_gener=
-ic=E2=80=99:
-  crypto/blake2b_generic.c:109:1: warning: the frame size of 2640
-bytes is larger than 2048 bytes [-Wframe-larger-than=3D]
+On Sat, Jun 11, 2022 at 12:24:29PM -0700, Linus Torvalds wrote:
+> So this is a "Help me, Obi-Wan Kenobi. You're my only hope" email.
+> 
+> Anybody got any ideas?
 
-probably due to upgrading to gcc-12. But who knows - it's been several
-months since I bothered to do a 32-bit build, so maybe it was
-something else.
+The way to fix this is by re-rolling the rounds:
 
-That stack frame is disgusting on x86-64 too, but at least a bit less
-so (it's "only" 592 bytes there). I assume there are fewer spills due
-to more registers or something, and then gcc doesn't go all crazy.
+diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
+index 6704c0355889..ac50c3086f6b 100644
+--- a/crypto/blake2b_generic.c
++++ b/crypto/blake2b_generic.c
+@@ -89,18 +89,9 @@ static void blake2b_compress_one_generic(struct blake2b_state *S,
+ 	v[14] = BLAKE2B_IV6 ^ S->f[0];
+ 	v[15] = BLAKE2B_IV7 ^ S->f[1];
 
-The actual data arrays it uses should use 256 bytes plus a few other
-things, so the expansion due to spilling(?) is truly ludicrous.
+-	ROUND(0);
+-	ROUND(1);
+-	ROUND(2);
+-	ROUND(3);
+-	ROUND(4);
+-	ROUND(5);
+-	ROUND(6);
+-	ROUND(7);
+-	ROUND(8);
+-	ROUND(9);
+-	ROUND(10);
+-	ROUND(11);
++	for (i = 0; i < 12; ++i)
++		ROUND(i);
++
+ #ifdef CONFIG_CC_IS_CLANG
+ #pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
+ #endif
 
-I assumed it was some debug option causing the compiler to not re-use
-spill slots or something like that. We've had that before. But
-disabling KASAN did nothing for the stack use. Neither did disabling
-UBSAN or the gcc plugins.
+The good thing about doing this is that it makes the function smaller,
+so it fits easier into cache. The bad thing is that it means the
+blake2b_sigma array can't be inlined, so you have accesses into that,
+which means overall worse performance if called repeatedly (which maybe
+it is? This is only used for btrfs disk hashing afaik). BLAKE2 is
+actually 12 different permutations, rather than one, which is partially
+how they got away with reducing the number of rounds from the original
+BLAKE SHA-3 finalist. But without fancy permutation SIMD instructions,
+it also means you're left with this trade off in the generic C code.
 
-I then started to think it's the same issue that clang hit, and that
-Arnd fixed with 0c0408e86dbe ("crypto: blake2b - Fix clang
-optimization for ARMv7-M"), but adding -fno-unroll-loops
--fno-peel-loops didn't do anything either. Neither did adding a
+However, getting back to the actual issue you pointed out, this seems
+like an odd gcc 12 issue. Or perhaps it's some aspect of the inliner
+there? I noticed that on gcc 11, the above patch increases the frame
+size from 416 to 704. But on gcc 12 it decreases it from 2632 to 680.
+Huh.
 
-  #pragma GCC unroll 0
-
-where the clang #pragma is.
-
-So this is a "Help me, Obi-Wan Kenobi. You're my only hope" email.
-
-Anybody got any ideas?
-
-It's worth noting that clang does much better. On both i386 and
-x86-64, it does a stack frame of just over 400 bytes. So this very
-much is about gcc.
-
-                  Linus
+Jason
