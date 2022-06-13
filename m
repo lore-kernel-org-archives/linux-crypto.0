@@ -2,82 +2,98 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7C0C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 21:32:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA940CCA47C
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 21:57:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234421AbiFMVcI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:32:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
+        id S231506AbiFMV5E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Jun 2022 17:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343543AbiFMVaZ (ORCPT
+        with ESMTP id S244825AbiFMV5B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:30:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83102A4;
-        Mon, 13 Jun 2022 14:30:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 13 Jun 2022 17:57:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DD81220F5F
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 14:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655157420;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=D83Efqbr8bQ/N2xRIQQiVrPpXT7X88uP5o56lC1QtDw=;
+        b=aYE8eVWJd2qBWkYZap5SyfJLA0PZGib/yLQhOGFvhY66IuE/1izf1aaTduTqDgQ7H6tRSm
+        BjH7kwZViMMEkxN7zKLPkkSDRtJEhfTfj06lxehsWW5gEBJsZZdWGtwj92FgKc9HsdqFSU
+        u89v3UrgkU625BpSngxkArTWT/l50KY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-BtK2wMyjOzqX5WMSwVWj8w-1; Mon, 13 Jun 2022 17:56:56 -0400
+X-MC-Unique: BtK2wMyjOzqX5WMSwVWj8w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A80F9B815E5;
-        Mon, 13 Jun 2022 21:30:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E91FC3411C;
-        Mon, 13 Jun 2022 21:30:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655155821;
-        bh=RcDh9o9PXC+xSwXW/nZeAZBZrz0xvylKTEyCuXSTkuc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=snI6zuYtunnjEyezYSZyynO4hvrbhn7HnkGB6QhYGneQ/wahpOzZw3iCJp5lNN+Gm
-         QNPAkbKF+tgJQp/tto8gvxNroSDEDAhhxoqb3KK0TBr9l4oJDSvT6ilVRP+IENSMB6
-         eKZ8lEanu6p1NSI1bMJmKtq05Bl4rgdv3V6VXwRFI7qwPmtxsy1/567ewNXO3J8TFq
-         FyJQEKEaG60vXNBCsgqDmd58/y1cpl41JRGJ98MRriLwLxYnPFDM1Zz5awKvZNw2y4
-         xa/hxm1KIEijsYnKBtw63+VLBOBgFUV7gSOMtjPBGs3upMqdHCYZvdQ1Vocjq8GdBz
-         FqawezRRVvLIQ==
-Received: by mail-vs1-f50.google.com with SMTP id e20so7159615vso.4;
-        Mon, 13 Jun 2022 14:30:21 -0700 (PDT)
-X-Gm-Message-State: AJIora/Sl6RgBY2NP6xuVyuLwWumY0E7YPtBgUTMp+8BoU4WpbvN8v/E
-        8oeDb0ndqh+mOkAw6Sl5Ydn7afYVMW70pe5Hyw==
-X-Google-Smtp-Source: AGRyM1tLuv8d5QD/UbHdhsN9UvYFl6xc6e+X3OCBXTT+IsNl1tijgv7xEbdvPPY2i3m0s6ecWDB11WH5VFl0fJvUlmU=
-X-Received: by 2002:a67:d38c:0:b0:349:d028:c8ea with SMTP id
- b12-20020a67d38c000000b00349d028c8eamr702530vsj.6.1655155820388; Mon, 13 Jun
- 2022 14:30:20 -0700 (PDT)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 46AA485A581;
+        Mon, 13 Jun 2022 21:56:56 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02D3A40D282F;
+        Mon, 13 Jun 2022 21:56:54 +0000 (UTC)
+Subject: [PATCH 0/2] certs: Add FIPS self-test for signature verification
+From:   David Howells <dhowells@redhat.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Simo Sorce <simo@redhat.com>, dhowells@redhat.com, simo@redhat.com,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 13 Jun 2022 22:56:54 +0100
+Message-ID: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/1.4
 MIME-Version: 1.0
-References: <bf04adfd1dae519cb9377bcc7222089399690a22.1655147787.git.thomas.lendacky@amd.com>
-In-Reply-To: <bf04adfd1dae519cb9377bcc7222089399690a22.1655147787.git.thomas.lendacky@amd.com>
-From:   Rob Herring <robh@kernel.org>
-Date:   Mon, 13 Jun 2022 15:30:08 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJ5+vt-1xU4eo+pAWJbVQyA7=-fNquh32kqjLusvr1O6Q@mail.gmail.com>
-Message-ID: <CAL_JsqJ5+vt-1xU4eo+pAWJbVQyA7=-fNquh32kqjLusvr1O6Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ccp - Fix device IRQ counting by using platform_irq_count()
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        John Allen <john.allen@amd.com>, Marc Zyngier <maz@kernel.org>,
-        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 13, 2022 at 1:16 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> The ccp driver loops through the platform device resources array to get
-> the IRQ count for the device. With commit a1a2b7125e10 ("of/platform: Drop
-> static setup of IRQ resource from DT core"), the IRQ resources are no
-> longer stored in the platform device resource array. As a result, the IRQ
-> count is now always zero. This causes the driver to issue a second call to
-> platform_get_irq(), which fails if the IRQ count is really 1, causing the
-> loading of the driver to fail.
->
-> Replace looping through the resources array to count the number of IRQs
-> with a call to platform_irq_count().
->
-> Fixes: a1a2b7125e10 ("of/platform: Drop static setup of IRQ resource from DT core")
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->  drivers/crypto/ccp/sp-platform.c | 12 ++----------
->  1 file changed, 2 insertions(+), 10 deletions(-)
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Hi Herbert,
+
+If you could look over this pair of patches?  The second patch adds a simple
+selftest to allow the signature verification code so that it can be FIPS
+compliant.  The first moves load_certificate_list() to the asymmetric key code
+to make this easier and renames it.
+
+I generated the test data myself, but I'm open to using some standard test
+data if you know of some; we don't want too much, however, as it's
+incompressible.  Also, it has avoid blacklist checks on the keys it is using,
+lest the UEFI blacklist cause the selftest to fail.
+
+The patches can be found on the following branch:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-fixes
+
+David
+---
+David Howells (2):
+      certs: Move load_certificate_list() to be with the asymmetric keys code
+      certs: Add FIPS selftests
+
+
+ certs/Makefile                           |   4 +-
+ certs/blacklist.c                        |   8 +-
+ certs/common.c                           |  57 ------
+ certs/common.h                           |   9 -
+ certs/system_keyring.c                   |   6 +-
+ crypto/asymmetric_keys/Kconfig           |  10 +
+ crypto/asymmetric_keys/Makefile          |   2 +
+ crypto/asymmetric_keys/selftest.c        | 224 +++++++++++++++++++++++
+ crypto/asymmetric_keys/x509_loader.c     |  57 ++++++
+ crypto/asymmetric_keys/x509_parser.h     |   9 +
+ crypto/asymmetric_keys/x509_public_key.c |   8 +-
+ include/keys/asymmetric-type.h           |   3 +
+ 12 files changed, 321 insertions(+), 76 deletions(-)
+ delete mode 100644 certs/common.c
+ delete mode 100644 certs/common.h
+ create mode 100644 crypto/asymmetric_keys/selftest.c
+ create mode 100644 crypto/asymmetric_keys/x509_loader.c
+
+
