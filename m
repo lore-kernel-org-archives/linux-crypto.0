@@ -2,132 +2,85 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9630ECCA491
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 11:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8E3CCA48A
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 13:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352315AbiFMLVa (ORCPT
+        id S1359574AbiFMNUy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 07:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
+        Mon, 13 Jun 2022 09:20:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353862AbiFMLUB (ORCPT
+        with ESMTP id S1377234AbiFMNUJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 07:20:01 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88225DEB1;
-        Mon, 13 Jun 2022 03:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655116912; x=1686652912;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7rsKUR+6MiJx8UgfRHWwQNo6ucuWpz2ctrmFovdOBQU=;
-  b=n3Dw3EkjF2DMD4xxdypbleoBI7aKSWmyX+v1Ll3AssSECEK2lZQ1Mh4J
-   ngNHuvr4sKfHx41UU5zItynRrfTdesmDYXECbWB5rEKqTn/xFPoBmAtFk
-   AAjNN1chHw9taQjeROy3NSdfGzmBn78hUwL32vwnQNKOEKQeqd9jJpCKl
-   NfVn0jIuPTWUyyOBmClnCZgoxH/uwc18tDqcglCKncQDr+snlyHqUECND
-   +3+RaJFKCJ3Ep3Z0r53oRgLDZNE5PJ3wBukOsy6SKKfEduEh0vv5OzKDm
-   OuoKzPAPpqDxFHvMMkBXL4SNTcPwfhUF/wzBw4EpEY1ACMPPL92Lm4htI
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10376"; a="258074900"
-X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="258074900"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 03:41:43 -0700
-X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
-   d="scan'208";a="639666709"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 03:41:41 -0700
-Date:   Mon, 13 Jun 2022 11:41:34 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     Rob Herring <robh@kernel.org>, Yoan Picchi <yoan.picchi@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
+        Mon, 13 Jun 2022 09:20:09 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D646A065
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 04:23:22 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id k19so6704094wrd.8
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 04:23:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=ftbGLeiB2JlBpoGZ3wbFTZazHN6xRtIZim0EkYzsO0Q=;
+        b=iB04vWC9FzI1WYr9ij3UzK3+YE+EMwP1iTYCLyegFM7Xj3/q8BDDXuMhk4rXl5Rp+C
+         zAv6KAYz9Dgn7zy6gkiH2J6ochM3iiDetyjgfdgkFNb/BZmL/Dq6ntF58L0VTozF7xaJ
+         8Hsh5pgxwtvGmGEksP/HHEiI09wU8YKVzl3SR93sTHHX082nCS5mHDIdoKdAW+7j75My
+         u5d7/nPmOjX+ZgaXHTTV8DTaAuoysO9apmgFo9z/t4MzuSJU7YxeP2t2Es1MZKNdgvse
+         FH6DEOBr+hUsTKYkrLtmZlkrHNOsvduD+Ya9ILeOeTitmQrOpRw0vRN0zXz3js+pRWVC
+         ox9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ftbGLeiB2JlBpoGZ3wbFTZazHN6xRtIZim0EkYzsO0Q=;
+        b=whcRBU4twK6j8JmHVca0jrEFOd7VSgSPhFC0DKd6gh1qcK5sLE3BxW0MEZNnjrmurA
+         0HwXCNa2YHvY1ekRMv5Ub7ofRwccTEZt52zpl9Q/1LCcFUA60iu809g3JEaNbNMR0mEZ
+         t7hcpf0wqqyw+xKjLbD+6jK8EvHcV4iMpDd8Jr50xRpyeDcMl36bnoLD604xbLZ9IhD+
+         kzoxJ8wF8OfBbexAcRsdeei9qDi2phqHHYNCkIBHXMscS8IDI6katDI2qATINXyEV9rt
+         8z4gBwxekKTL59PfZXHS8Ts42s+FVWtUu/K9gi8h/g02xHV3TZFswTkA+J0kiZvm6fRN
+         J9wQ==
+X-Gm-Message-State: AOAM532KPM0IJy683xQ0dxRmpHvfpafLUiQ8BIhM/ve+q6QaAXFDZ531
+        NZFZGXpcwvGsYs0Zm6YO/N9Q8MZnKHMSqw==
+X-Google-Smtp-Source: ABdhPJz/XnZLu+IhNH+tzt4F0AQVXRg8Kj57/I/QA3bryB4W9ygJ6qK+EJFE/lcc0ZEZD+zhe66+xQ==
+X-Received: by 2002:adf:ce03:0:b0:210:32ec:50fd with SMTP id p3-20020adfce03000000b0021032ec50fdmr56565196wrn.407.1655119388347;
+        Mon, 13 Jun 2022 04:23:08 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id g15-20020a05600c4ecf00b0039c4945c753sm13769058wmq.39.2022.06.13.04.23.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 04:23:07 -0700 (PDT)
+Date:   Mon, 13 Jun 2022 13:23:04 +0200
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     heiko@sntech.de, ardb@kernel.org, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 2/2] Removes the x86 dependency on the QAT drivers
-Message-ID: <YqcUXrFGO+QVMKBd@silpixa00400314>
-References: <20220607165840.66931-1-yoan.picchi@arm.com>
- <20220607165840.66931-3-yoan.picchi@arm.com>
- <20220609213652.GA115440-robh@kernel.org>
- <20220610114840.10db23ea@donnerap.cambridge.arm.com>
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v7 00/33] crypto: rockchip: permit to pass self-tests
+Message-ID: <YqceGFafq7QoT+8w@Red>
+References: <20220508185957.3629088-1-clabbe@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20220610114840.10db23ea@donnerap.cambridge.arm.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220508185957.3629088-1-clabbe@baylibre.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 11:48:40AM +0100, Andre Przywara wrote:
-> On Thu, 9 Jun 2022 15:36:52 -0600
-> Rob Herring <robh@kernel.org> wrote:
+Le Sun, May 08, 2022 at 06:59:24PM +0000, Corentin Labbe a écrit :
+> Hello
 > 
-> Hi,
+> The rockchip crypto driver is broken and do not pass self-tests.
+> This serie's goal is to permit to become usable and pass self-tests.
 > 
-> > On Tue, Jun 07, 2022 at 04:58:40PM +0000, Yoan Picchi wrote:
-> > > This dependency looks outdated. After the previous patch, we have been able
-> > > to use this driver to encrypt some data and to create working VF on arm64.
-> > > We have not tested it yet on any big endian machine, hence the new dependency  
-> > 
-> > For the subject, use prefixes matching the subsystem (like you did on 
-> > patch 1).
-Just to add on this, patches to the qat driver should have the following
-headline:
-    crypto: qat -
-not
-    crypto: qat:
+> This whole serie is tested on a rk3328-rock64, rk3288-miqi and
+> rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
+> 
+> Regards
+> 
 
-> > 
-> > The only testing obligation you have is compiling for BE.
-> 
-> So I just compiled for arm64 BE, powerpc BE & LE, and riscv again:
-> $ file qat_c62xvf.ko
-> qat_c62xvf.ko: ELF 64-bit MSB relocatable, ARM aarch64, version 1 (SYSV),
-> BuildID[sha1]=630cc0ee5586c7aeb6e0ab5567ce2f2f7cc46adf, with debug_info,
-> not stripped
-> qat_c62xvf.ko: ELF 64-bit MSB relocatable, 64-bit PowerPC or cisco 7500,
-> version 1 (SYSV), BuildID[sha1]=4090ba181cf95f27108bf3ecde0776f12ef2b636,
-> not stripped
-> qat_c62xvf.ko: ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500,
-> version 1 (SYSV), BuildID[sha1]=2cb0fd09d5bc36c8918fcd061c9f3dac1546cf0d,
-> not stripped
-> qat_c62xvf.ko: ELF 64-bit LSB relocatable, UCB RISC-V, version 1 (SYSV),
-> BuildID[sha1]=bfaa53df7e9aad79d3ab4c05e75ca9169227f6b8, not stripped
-> 
-> All built without errors or warnings, for every of the enabled drivers.
-> 
-> > If kconfig was
-> > supposed to capture what endianness drivers have been tested or not
-> > tested with, then lots of drivers are missing the dependency. Kconfig
-> > depends/select entries should generally be either to prevent compile
-> > failures (you checked PPC, RiscV, etc.?) or to hide drivers *really*
-> > specific to a platform. IMO, we should only have !CPU_BIG_ENDIAN if it 
-> > is known not to work and not easily fixed.
-> 
-> Fair enough, I leave that decision to Giovanni. I have plans to test this
-> with BE, but getting a BE setup on a server is not trivial, both for
-> userland and actual booting, so this will take some time. We just didn't
-> want to block this on some BE concerns.
-Just inspecting the code I can see we are not handling BE in the logic
-that builds FW descriptors.
-My preference would be to keep !CPU_BIG_ENDIAN until the driver is fixed
-and tested.
+This is a gentle ping since this serie has now, no comment to address.
 
-> > Also, with the dependency, no one can test the driver without modifying 
-> > the kernel and if it does work as-is, then one has to upstream a change 
-> > and then wait for it to show up in distro kernels. You could mitigate 
-> > the first part with COMPILE_TEST.
-> 
-> Yeah, that's a good point, we were already bitten by this, the initial
-> testing was done on a stable distro kernel (v5.4), and it worked fine
-> already there.
-> 
-> Cheers,
-> Andre
-
--- 
-Giovanni
+Regards
