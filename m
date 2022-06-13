@@ -2,311 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FA0CCA47F
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 21:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7C0C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 21:32:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352226AbiFMVRJ (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:17:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43598 "EHLO
+        id S234421AbiFMVcI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Jun 2022 17:32:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233171AbiFMVQ5 (ORCPT
+        with ESMTP id S1343543AbiFMVaZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:16:57 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC91E001
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 13:59:01 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id z11so5184689ilq.6
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 13:59:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ga8fmQuD3EjQJc6y9LFAh1+REX1O+10pZrDfXI21feA=;
-        b=o89LuZIGrtaJTyuZxG/tFnoJZC06jfTzoIWRxdGPpGTWCcJd74F804tAWQexje8E3S
-         NKPBUP7yMeJS2wZDVN7+e9vUrsPTTTDTl1Vr6qFT668LVtWD1vpWSabbyMfX0R7kk724
-         I0MrTsUsfRHEueeWuMHYJ3cXJ+dMvcXowkvDzaBemxuQQAOWK9R841p47SAJqoXkKQzP
-         jSHb2YATHBYiGFSUwkZ4eoiHC7YlXlnfE2nbvZ5Iytq4i8vJE/RkCwYjiloIqqf9Vc8Q
-         fnpO1lj8pByTahSevtouYCYgA68hA3oA82BnsmDzg/4sqbqbSsPeUqy8329WGF860AGD
-         mGDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ga8fmQuD3EjQJc6y9LFAh1+REX1O+10pZrDfXI21feA=;
-        b=O1/7XlLVIGTxtdNjYip3LteZmVXWPRwDvYaXHUdmDbvxxNWD+gkp/xrOp9lgdALsy5
-         SWuhwkV0h4VtCWhUtELJlv2L+dKYQ/+/uDP3ke9pdrsylP3ld2DYg5pNXzjaevjWEN43
-         3eKdXT5azwodzCkDc8Ti3+Nf6EE25Poce5frzFCjKHtkCXr6nD4eLE9oYhZLA3f7nohw
-         ocHklTHPWFrRYesK+Y9GwJA6oXe4fTlMpwUKGC6tA29R+wpDwvMTRdlEKi/LkFJLnSGa
-         Gdmk2J8JLwWiZAJSUJjHUrvNNFW2yzQ8HhM06Q/J56KGGN8UI+h3EGuUHKqEmzlWUx1A
-         mqlQ==
-X-Gm-Message-State: AJIora/hLZESWAQs4Qt68QIh+Rnlpoh9MXejjwSmUq6zd/fFHplsajwe
-        WdsUOzE9moqaIlq0Rh02bIaYFwJ1ECWjCX8wRp2OdQ==
-X-Google-Smtp-Source: AGRyM1vHj2xpae4EYuioWncsG3+wihbYPjRsIe9kP4YDnqu0eM1AJTOMo7FS7jaD0u82ksjNPyavbXP9+w47JSvyr1I=
-X-Received: by 2002:a05:6e02:792:b0:2d7:ae5d:e2fd with SMTP id
- q18-20020a056e02079200b002d7ae5de2fdmr1015080ils.315.1655153941065; Mon, 13
- Jun 2022 13:59:01 -0700 (PDT)
+        Mon, 13 Jun 2022 17:30:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83102A4;
+        Mon, 13 Jun 2022 14:30:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A80F9B815E5;
+        Mon, 13 Jun 2022 21:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E91FC3411C;
+        Mon, 13 Jun 2022 21:30:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655155821;
+        bh=RcDh9o9PXC+xSwXW/nZeAZBZrz0xvylKTEyCuXSTkuc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=snI6zuYtunnjEyezYSZyynO4hvrbhn7HnkGB6QhYGneQ/wahpOzZw3iCJp5lNN+Gm
+         QNPAkbKF+tgJQp/tto8gvxNroSDEDAhhxoqb3KK0TBr9l4oJDSvT6ilVRP+IENSMB6
+         eKZ8lEanu6p1NSI1bMJmKtq05Bl4rgdv3V6VXwRFI7qwPmtxsy1/567ewNXO3J8TFq
+         FyJQEKEaG60vXNBCsgqDmd58/y1cpl41JRGJ98MRriLwLxYnPFDM1Zz5awKvZNw2y4
+         xa/hxm1KIEijsYnKBtw63+VLBOBgFUV7gSOMtjPBGs3upMqdHCYZvdQ1Vocjq8GdBz
+         FqawezRRVvLIQ==
+Received: by mail-vs1-f50.google.com with SMTP id e20so7159615vso.4;
+        Mon, 13 Jun 2022 14:30:21 -0700 (PDT)
+X-Gm-Message-State: AJIora/Sl6RgBY2NP6xuVyuLwWumY0E7YPtBgUTMp+8BoU4WpbvN8v/E
+        8oeDb0ndqh+mOkAw6Sl5Ydn7afYVMW70pe5Hyw==
+X-Google-Smtp-Source: AGRyM1tLuv8d5QD/UbHdhsN9UvYFl6xc6e+X3OCBXTT+IsNl1tijgv7xEbdvPPY2i3m0s6ecWDB11WH5VFl0fJvUlmU=
+X-Received: by 2002:a67:d38c:0:b0:349:d028:c8ea with SMTP id
+ b12-20020a67d38c000000b00349d028c8eamr702530vsj.6.1655155820388; Mon, 13 Jun
+ 2022 14:30:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-24-brijesh.singh@amd.com>
-In-Reply-To: <20210820155918.7518-24-brijesh.singh@amd.com>
-From:   Alper Gun <alpergun@google.com>
-Date:   Mon, 13 Jun 2022 13:58:50 -0700
-Message-ID: <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-To:     Brijesh Singh <brijesh.singh@amd.com>, Ashish.Kalra@amd.com
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        Marc Orr <marcorr@google.com>,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        Pavan Kumar Paluri <papaluri@amd.com>
+References: <bf04adfd1dae519cb9377bcc7222089399690a22.1655147787.git.thomas.lendacky@amd.com>
+In-Reply-To: <bf04adfd1dae519cb9377bcc7222089399690a22.1655147787.git.thomas.lendacky@amd.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Mon, 13 Jun 2022 15:30:08 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJ5+vt-1xU4eo+pAWJbVQyA7=-fNquh32kqjLusvr1O6Q@mail.gmail.com>
+Message-ID: <CAL_JsqJ5+vt-1xU4eo+pAWJbVQyA7=-fNquh32kqjLusvr1O6Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccp - Fix device IRQ counting by using platform_irq_count()
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        John Allen <john.allen@amd.com>, Marc Zyngier <maz@kernel.org>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 20, 2021 at 9:00 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+On Mon, Jun 13, 2022 at 1:16 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
 >
-> The KVM_SNP_INIT command is used by the hypervisor to initialize the
-> SEV-SNP platform context. In a typical workflow, this command should be the
-> first command issued. When creating SEV-SNP guest, the VMM must use this
-> command instead of the KVM_SEV_INIT or KVM_SEV_ES_INIT.
+> The ccp driver loops through the platform device resources array to get
+> the IRQ count for the device. With commit a1a2b7125e10 ("of/platform: Drop
+> static setup of IRQ resource from DT core"), the IRQ resources are no
+> longer stored in the platform device resource array. As a result, the IRQ
+> count is now always zero. This causes the driver to issue a second call to
+> platform_get_irq(), which fails if the IRQ count is really 1, causing the
+> loading of the driver to fail.
 >
-> The flags value must be zero, it will be extended in future SNP support to
-> communicate the optional features (such as restricted INT injection etc).
+> Replace looping through the resources array to count the number of IRQs
+> with a call to platform_irq_count().
 >
-> Co-developed-by: Pavan Kumar Paluri <papaluri@amd.com>
-> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Fixes: a1a2b7125e10 ("of/platform: Drop static setup of IRQ resource from DT core")
+> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 > ---
->  .../virt/kvm/amd-memory-encryption.rst        | 27 ++++++++++++
->  arch/x86/include/asm/svm.h                    |  2 +
->  arch/x86/kvm/svm/sev.c                        | 44 ++++++++++++++++++-
->  arch/x86/kvm/svm/svm.h                        |  4 ++
->  include/uapi/linux/kvm.h                      | 13 ++++++
->  5 files changed, 88 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/amd-memory-encryption.rst b/Documentation/virt/kvm/amd-memory-encryption.rst
-> index 5c081c8c7164..7b1d32fb99a8 100644
-> --- a/Documentation/virt/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virt/kvm/amd-memory-encryption.rst
-> @@ -427,6 +427,33 @@ issued by the hypervisor to make the guest ready for execution.
->
->  Returns: 0 on success, -negative on error
->
-> +18. KVM_SNP_INIT
-> +----------------
-> +
-> +The KVM_SNP_INIT command can be used by the hypervisor to initialize SEV-SNP
-> +context. In a typical workflow, this command should be the first command issued.
-> +
-> +Parameters (in/out): struct kvm_snp_init
-> +
-> +Returns: 0 on success, -negative on error
-> +
-> +::
-> +
-> +        struct kvm_snp_init {
-> +                __u64 flags;
-> +        };
-> +
-> +The flags bitmap is defined as::
-> +
-> +   /* enable the restricted injection */
-> +   #define KVM_SEV_SNP_RESTRICTED_INJET   (1<<0)
-> +
-> +   /* enable the restricted injection timer */
-> +   #define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1<<1)
-> +
-> +If the specified flags is not supported then return -EOPNOTSUPP, and the supported
-> +flags are returned.
-> +
->  References
->  ==========
->
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 44a3f920f886..a39e31845a33 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -218,6 +218,8 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
->  #define SVM_NESTED_CTL_SEV_ENABLE      BIT(1)
->  #define SVM_NESTED_CTL_SEV_ES_ENABLE   BIT(2)
->
-> +#define SVM_SEV_FEAT_SNP_ACTIVE                BIT(0)
-> +
->  struct vmcb_seg {
->         u16 selector;
->         u16 attrib;
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 50fddbe56981..93da463545ef 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -235,10 +235,30 @@ static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
->         sev_decommission(handle);
->  }
->
-> +static int verify_snp_init_flags(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> +{
-> +       struct kvm_snp_init params;
-> +       int ret = 0;
-> +
-> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-> +               return -EFAULT;
-> +
-> +       if (params.flags & ~SEV_SNP_SUPPORTED_FLAGS)
-> +               ret = -EOPNOTSUPP;
-> +
-> +       params.flags = SEV_SNP_SUPPORTED_FLAGS;
-> +
-> +       if (copy_to_user((void __user *)(uintptr_t)argp->data, &params, sizeof(params)))
-> +               ret = -EFAULT;
-> +
-> +       return ret;
-> +}
-> +
->  static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->  {
-> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
->         struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
-> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
->         int asid, ret;
->
->         if (kvm->created_vcpus)
-> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->                 return ret;
->
->         sev->es_active = es_active;
-> +       sev->snp_active = snp_active;
->         asid = sev_asid_new(sev);
->         if (asid < 0)
->                 goto e_no_asid;
->         sev->asid = asid;
->
-> -       ret = sev_platform_init(&argp->error);
-> +       if (snp_active) {
-> +               ret = verify_snp_init_flags(kvm, argp);
-> +               if (ret)
-> +                       goto e_free;
-> +
-> +               ret = sev_snp_init(&argp->error);
-> +       } else {
-> +               ret = sev_platform_init(&argp->error);
+>  drivers/crypto/ccp/sp-platform.c | 12 ++----------
+>  1 file changed, 2 insertions(+), 10 deletions(-)
 
-After SEV INIT_EX support patches, SEV may be initialized in the platform late.
-In my tests, if SEV has not been initialized in the platform yet, SNP
-VMs fail with SEV_DF_FLUSH required error. I tried calling
-SEV_DF_FLUSH right after the SNP platform init but this time it failed
-later on the SNP launch update command with SEV_RET_INVALID_PARAM
-error. Looks like there is another dependency on SEV platform
-initialization.
-
-Calling sev_platform_init for SNP VMs fixes the problem in our tests.
-
-> +       }
-> +
->         if (ret)
->                 goto e_free;
->
-> @@ -600,6 +630,10 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->         save->pkru = svm->vcpu.arch.pkru;
->         save->xss  = svm->vcpu.arch.ia32_xss;
->
-> +       /* Enable the SEV-SNP feature */
-> +       if (sev_snp_guest(svm->vcpu.kvm))
-> +               save->sev_features |= SVM_SEV_FEAT_SNP_ACTIVE;
-> +
->         return 0;
->  }
->
-> @@ -1532,6 +1566,12 @@ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
->         }
->
->         switch (sev_cmd.id) {
-> +       case KVM_SEV_SNP_INIT:
-> +               if (!sev_snp_enabled) {
-> +                       r = -ENOTTY;
-> +                       goto out;
-> +               }
-> +               fallthrough;
->         case KVM_SEV_ES_INIT:
->                 if (!sev_es_enabled) {
->                         r = -ENOTTY;
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 01953522097d..57c3c404b0b3 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -69,6 +69,9 @@ enum {
->  /* TPR and CR2 are always written before VMRUN */
->  #define VMCB_ALWAYS_DIRTY_MASK ((1U << VMCB_INTR) | (1U << VMCB_CR2))
->
-> +/* Supported init feature flags */
-> +#define SEV_SNP_SUPPORTED_FLAGS                0x0
-> +
->  struct kvm_sev_info {
->         bool active;            /* SEV enabled guest */
->         bool es_active;         /* SEV-ES enabled guest */
-> @@ -81,6 +84,7 @@ struct kvm_sev_info {
->         u64 ap_jump_table;      /* SEV-ES AP Jump Table address */
->         struct kvm *enc_context_owner; /* Owner of copied encryption context */
->         struct misc_cg *misc_cg; /* For misc cgroup accounting */
-> +       u64 snp_init_flags;
->  };
->
->  struct kvm_svm {
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index d9e4aabcb31a..944e2bf601fe 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1712,6 +1712,9 @@ enum sev_cmd_id {
->         /* Guest Migration Extension */
->         KVM_SEV_SEND_CANCEL,
->
-> +       /* SNP specific commands */
-> +       KVM_SEV_SNP_INIT,
-> +
->         KVM_SEV_NR_MAX,
->  };
->
-> @@ -1808,6 +1811,16 @@ struct kvm_sev_receive_update_data {
->         __u32 trans_len;
->  };
->
-> +/* enable the restricted injection */
-> +#define KVM_SEV_SNP_RESTRICTED_INJET   (1 << 0)
-> +
-> +/* enable the restricted injection timer */
-> +#define KVM_SEV_SNP_RESTRICTED_TIMER_INJET   (1 << 1)
-> +
-> +struct kvm_snp_init {
-> +       __u64 flags;
-> +};
-> +
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
-> --
-> 2.17.1
->
->
+Reviewed-by: Rob Herring <robh@kernel.org>
