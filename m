@@ -2,120 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6145FC433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 18:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F217DCCA47B
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 20:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245107AbiFMSVv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:21:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42552 "EHLO
+        id S229591AbiFMUa7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Jun 2022 16:30:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245163AbiFMSVa (ORCPT
+        with ESMTP id S1350975AbiFMU2z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:21:30 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF63746CAA;
-        Mon, 13 Jun 2022 07:25:41 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 53D941042;
-        Mon, 13 Jun 2022 07:25:41 -0700 (PDT)
-Received: from ampere-altra-2-1.usa.Arm.com (ampere-altra-2-1.usa.arm.com [10.118.91.158])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19AB73F85F;
-        Mon, 13 Jun 2022 07:25:41 -0700 (PDT)
-From:   Yoan Picchi <yoan.picchi@arm.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 2/2] Removes the x86 dependency on the QAT drivers
-Date:   Mon, 13 Jun 2022 14:25:35 +0000
-Message-Id: <20220613142535.222041-3-yoan.picchi@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220613142535.222041-1-yoan.picchi@arm.com>
-References: <20220613142535.222041-1-yoan.picchi@arm.com>
+        Mon, 13 Jun 2022 16:28:55 -0400
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2088.outbound.protection.outlook.com [40.107.101.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E101D0CA;
+        Mon, 13 Jun 2022 12:16:42 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fpnbv7G9dexiJ9qRpNZCYy+JozbM+yUn3BKYWXmdXE9XyJQYFUGg+dgavKxJiR+sn2y7kcbsHM2YDpDj+rS4Wu91VRYRJN/FpwiVgcG6hfN0xmIrqaHAcMIVzeabzY8LtL+JjTQhkx6idAKPvfEOH/Jc+0X+6GUIqg9tKTQpsIhcELW+/BXk3BUjvsQJ0IMuyCG7rrp2JsiAdFo26kF/6W2MKIYZlGDUmPXvMhq8xl1WXUjq8YQ5/p1xHrtFJ785ZfJGyPfPvyf0CUx8+RDJAyGRcqFzsGf4Pv2xP4aAJLxcnrXI9Fw/kfG16yhtceZV/OwCVnkbjXfYvr8M9IhfEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UvWh8MzFC/7vGVRe2qjwSgaT9BLKOuGbj732g6Dbt60=;
+ b=iNuCmuZvWLlhj9Thw1lR+FcBx9PBJreFBHkThQGkYSbGkStfErF0xryccaMb4VDByN0W0OJVUaq6gk8VxfZOFuChKdiSVPEETw0OiI+g8OMIwjdMEH0oj6ruUckNj8prXp7u0M7Ywxyktkc0/CtyO3kXMmmMcQ18w8BbIztXFtXo0aPVxkHK6743L0mXkB4fbp0jUuGC7nqR9LBg8EfULJoZiY1a2uBOUSOIZXDx1dBnl5fRqQJpl8aFK7gddHaAxfcghZL7xdZ0axVJjfreDe8mPCQ0U7GT/kPgYUAPKmJyqGPaFCDc1PVwf1uzEONtijkg7mO3aOoYKXuwjFrD8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UvWh8MzFC/7vGVRe2qjwSgaT9BLKOuGbj732g6Dbt60=;
+ b=XFaKJ4ymvJAdpvC5CHzcegfvF9riAsylfdHp3IKOOeYo+O0SjdCyk+nIhza+O1QyMGUyTQ1oBgRXiQM2oTFkBglphz3K6CCM8iqYg1LWXgS6d9wChe2R/A0Qx3CwIz5JeEziCDKyDnGYbmts6K25Ddh/R1vVAxAXLclPZMMMous=
+Received: from MW4PR04CA0039.namprd04.prod.outlook.com (2603:10b6:303:6a::14)
+ by SJ1PR12MB6340.namprd12.prod.outlook.com (2603:10b6:a03:453::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.20; Mon, 13 Jun
+ 2022 19:16:40 +0000
+Received: from CO1NAM11FT047.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:6a:cafe::2e) by MW4PR04CA0039.outlook.office365.com
+ (2603:10b6:303:6a::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.12 via Frontend
+ Transport; Mon, 13 Jun 2022 19:16:40 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT047.mail.protection.outlook.com (10.13.174.132) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5332.12 via Frontend Transport; Mon, 13 Jun 2022 19:16:39 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Mon, 13 Jun
+ 2022 14:16:38 -0500
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        John Allen <john.allen@amd.com>, Rob Herring <robh@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH] crypto: ccp - Fix device IRQ counting by using platform_irq_count()
+Date:   Mon, 13 Jun 2022 14:16:27 -0500
+Message-ID: <bf04adfd1dae519cb9377bcc7222089399690a22.1655147787.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0d908cf6-8f5c-47ac-5539-08da4d713e77
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6340:EE_
+X-Microsoft-Antispam-PRVS: <SJ1PR12MB6340D872A34E6F8B51D70FD1ECAB9@SJ1PR12MB6340.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BS6+3bqu/rMXdUPcGNDGwK4rdvt+PszMuGMnJHe5joFXy479ZJJyij09L4bRSXQKMxwpsanjWxUMvYGS1KOzI7DP5mIPumc0aVDLqdtH0sYpvqEcVaHRRRacxX1/rXUeUq9CyZJ1EkGyw5cJjMNadi3Or+mnXCc9EvIAPg+ciIngbwbBiACq0YJnoVSWyZ6fbWN13fveW+w3pcMLRU+I3Eso9VNjqMMF2m5nwmG4uVNwsbeLuSwwUHqS1RvCvzZsJR95u8Jx3b82qA4Na0vIZB6krNvrv0eDyeaJ44OpIQCehfd14iq1gHqyEc4tP4Zb1GPqCEwFFmKeX7DHFkA+53JAre76R+bj9HCnBgjNkmfQj2RjqssO2lkvn8g+7MyoZwuT/dFEwFXc3/IgvUN6mf+LCBZyZORQB7wpbvEfR+ApS4y2K5dRxEprAUT64pZdPgA4+oRA5zQT4UPmFlr/cHENbtotbfqMzW8dfdDR2dTv6qZh2eFvfvom7o7kXMnULT9L4DkURuZayviM/5nrWbjrkNUK8itdh+7gZGssfl0b1aiS/UwshHmwxX1rRrg6seCq0BCFKBoyHCJv1qJF5AHnzOx4jWB6FmXOzhuaecqXWepApZzU/LtTwdAJcRgVF7k/Vose16AU0DKZBsjfYDNjza8UyY/GC2AnfqooTWyRkfxdiequGPm2qnchBKTP/uKla/cm5zgQrX44+WaaeQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(40470700004)(46966006)(36840700001)(508600001)(5660300002)(8936002)(356005)(36756003)(81166007)(7696005)(2906002)(40460700003)(110136005)(86362001)(8676002)(70586007)(70206006)(6666004)(4326008)(54906003)(426003)(83380400001)(336012)(316002)(2616005)(186003)(16526019)(26005)(47076005)(82310400005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2022 19:16:39.9279
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d908cf6-8f5c-47ac-5539-08da4d713e77
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT047.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6340
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This dependency looks outdated. After the previous patch, we have been able
-to use this driver to encrypt some data and to create working VF on arm64.
-We have not tested it yet on any big endian machine, hence the new dependency
+The ccp driver loops through the platform device resources array to get
+the IRQ count for the device. With commit a1a2b7125e10 ("of/platform: Drop
+static setup of IRQ resource from DT core"), the IRQ resources are no
+longer stored in the platform device resource array. As a result, the IRQ
+count is now always zero. This causes the driver to issue a second call to
+platform_get_irq(), which fails if the IRQ count is really 1, causing the
+loading of the driver to fail.
 
-Signed-off-by: Yoan Picchi <yoan.picchi@arm.com>
+Replace looping through the resources array to count the number of IRQs
+with a call to platform_irq_count().
+
+Fixes: a1a2b7125e10 ("of/platform: Drop static setup of IRQ resource from DT core")
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- drivers/crypto/qat/Kconfig | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/crypto/ccp/sp-platform.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/qat/Kconfig b/drivers/crypto/qat/Kconfig
-index 4b90c0f22b03..1220cc86f910 100644
---- a/drivers/crypto/qat/Kconfig
-+++ b/drivers/crypto/qat/Kconfig
-@@ -17,7 +17,7 @@ config CRYPTO_DEV_QAT
+diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
+index 9dba52fbee99..7d79a8744f9a 100644
+--- a/drivers/crypto/ccp/sp-platform.c
++++ b/drivers/crypto/ccp/sp-platform.c
+@@ -85,17 +85,9 @@ static int sp_get_irqs(struct sp_device *sp)
+ 	struct sp_platform *sp_platform = sp->dev_specific;
+ 	struct device *dev = sp->dev;
+ 	struct platform_device *pdev = to_platform_device(dev);
+-	unsigned int i, count;
+ 	int ret;
  
- config CRYPTO_DEV_QAT_DH895xCC
- 	tristate "Support for Intel(R) DH895xCC"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select CRYPTO_DEV_QAT
- 	help
- 	  Support for Intel(R) DH895xcc with Intel(R) QuickAssist Technology
-@@ -28,7 +28,7 @@ config CRYPTO_DEV_QAT_DH895xCC
+-	for (i = 0, count = 0; i < pdev->num_resources; i++) {
+-		struct resource *res = &pdev->resource[i];
+-
+-		if (resource_type(res) == IORESOURCE_IRQ)
+-			count++;
+-	}
+-
+-	sp_platform->irq_count = count;
++	sp_platform->irq_count = platform_irq_count(pdev);
  
- config CRYPTO_DEV_QAT_C3XXX
- 	tristate "Support for Intel(R) C3XXX"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select CRYPTO_DEV_QAT
- 	help
- 	  Support for Intel(R) C3xxx with Intel(R) QuickAssist Technology
-@@ -39,7 +39,7 @@ config CRYPTO_DEV_QAT_C3XXX
+ 	ret = platform_get_irq(pdev, 0);
+ 	if (ret < 0) {
+@@ -104,7 +96,7 @@ static int sp_get_irqs(struct sp_device *sp)
+ 	}
  
- config CRYPTO_DEV_QAT_C62X
- 	tristate "Support for Intel(R) C62X"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select CRYPTO_DEV_QAT
- 	help
- 	  Support for Intel(R) C62x with Intel(R) QuickAssist Technology
-@@ -50,7 +50,7 @@ config CRYPTO_DEV_QAT_C62X
- 
- config CRYPTO_DEV_QAT_4XXX
- 	tristate "Support for Intel(R) QAT_4XXX"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select CRYPTO_DEV_QAT
- 	help
- 	  Support for Intel(R) QuickAssist Technology QAT_4xxx
-@@ -61,7 +61,7 @@ config CRYPTO_DEV_QAT_4XXX
- 
- config CRYPTO_DEV_QAT_DH895xCCVF
- 	tristate "Support for Intel(R) DH895xCC Virtual Function"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select PCI_IOV
- 	select CRYPTO_DEV_QAT
- 
-@@ -74,7 +74,7 @@ config CRYPTO_DEV_QAT_DH895xCCVF
- 
- config CRYPTO_DEV_QAT_C3XXXVF
- 	tristate "Support for Intel(R) C3XXX Virtual Function"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select PCI_IOV
- 	select CRYPTO_DEV_QAT
- 	help
-@@ -86,7 +86,7 @@ config CRYPTO_DEV_QAT_C3XXXVF
- 
- config CRYPTO_DEV_QAT_C62XVF
- 	tristate "Support for Intel(R) C62X Virtual Function"
--	depends on X86 && PCI
-+	depends on PCI && (!CPU_BIG_ENDIAN || COMPILE_TEST)
- 	select PCI_IOV
- 	select CRYPTO_DEV_QAT
- 	help
+ 	sp->psp_irq = ret;
+-	if (count == 1) {
++	if (sp_platform->irq_count == 1) {
+ 		sp->ccp_irq = ret;
+ 	} else {
+ 		ret = platform_get_irq(pdev, 1);
 -- 
-2.25.1
+2.36.1
 
