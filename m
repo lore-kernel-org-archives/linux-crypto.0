@@ -2,90 +2,132 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24111C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 10:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9630ECCA491
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 11:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235775AbiFMKOP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 06:14:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55658 "EHLO
+        id S1352315AbiFMLVa (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Jun 2022 07:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241535AbiFMKNn (ORCPT
+        with ESMTP id S1353862AbiFMLUB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 06:13:43 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334CEF08;
-        Mon, 13 Jun 2022 03:13:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7972FB80E2D;
-        Mon, 13 Jun 2022 10:13:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A0D9C34114;
-        Mon, 13 Jun 2022 10:13:35 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PjodHj/L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1655115213;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o1rhTIM89qlmZiXPF3mZWhoRCUxAr8WMyAe9Xf02KbY=;
-        b=PjodHj/LDc/LhxdglQ1hDVi/U8hr1g9A5FeHjnC09HVPZZ89dhs9A6hbbmBLJLRKAxBYL+
-        ZqiitPxTtrmP8bjfjOkQK1epU/oDP/7AQnHpxoSSzp4hvSfsF83b/gMmwwqNjCG9L2a2nH
-        aTUP7JBS6FbmNXzcK7ijwY0DjhWvZgo=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6f67aac3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 13 Jun 2022 10:13:32 +0000 (UTC)
-Date:   Mon, 13 Jun 2022 12:13:25 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Jason Self <jason@bluehome.net>, stable@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: Build error on openrisc with CONFIG_CRYPTO_LIB_CURVE25519
-Message-ID: <YqcNxfYx3hFvJz+T@zx2c4.com>
-References: <20220609162943.6e3bba4f@valencia>
- <YqLTecx7MGFPOvhw@kroah.com>
- <20220610182523.2f5620a2@valencia>
- <20220610184255.20ecde41@valencia>
- <YqQHZB6/u4nrFzIm@sol.localdomain>
- <YqWOVp2P8Qp/9/Ek@gondor.apana.org.au>
- <YqWg8h8G39WA6LI/@zx2c4.com>
- <YqcHUOe2QH+N8FbV@gondor.apana.org.au>
+        Mon, 13 Jun 2022 07:20:01 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88225DEB1;
+        Mon, 13 Jun 2022 03:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655116912; x=1686652912;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7rsKUR+6MiJx8UgfRHWwQNo6ucuWpz2ctrmFovdOBQU=;
+  b=n3Dw3EkjF2DMD4xxdypbleoBI7aKSWmyX+v1Ll3AssSECEK2lZQ1Mh4J
+   ngNHuvr4sKfHx41UU5zItynRrfTdesmDYXECbWB5rEKqTn/xFPoBmAtFk
+   AAjNN1chHw9taQjeROy3NSdfGzmBn78hUwL32vwnQNKOEKQeqd9jJpCKl
+   NfVn0jIuPTWUyyOBmClnCZgoxH/uwc18tDqcglCKncQDr+snlyHqUECND
+   +3+RaJFKCJ3Ep3Z0r53oRgLDZNE5PJ3wBukOsy6SKKfEduEh0vv5OzKDm
+   OuoKzPAPpqDxFHvMMkBXL4SNTcPwfhUF/wzBw4EpEY1ACMPPL92Lm4htI
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10376"; a="258074900"
+X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
+   d="scan'208";a="258074900"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 03:41:43 -0700
+X-IronPort-AV: E=Sophos;i="5.91,297,1647327600"; 
+   d="scan'208";a="639666709"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2022 03:41:41 -0700
+Date:   Mon, 13 Jun 2022 11:41:34 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Rob Herring <robh@kernel.org>, Yoan Picchi <yoan.picchi@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 2/2] Removes the x86 dependency on the QAT drivers
+Message-ID: <YqcUXrFGO+QVMKBd@silpixa00400314>
+References: <20220607165840.66931-1-yoan.picchi@arm.com>
+ <20220607165840.66931-3-yoan.picchi@arm.com>
+ <20220609213652.GA115440-robh@kernel.org>
+ <20220610114840.10db23ea@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YqcHUOe2QH+N8FbV@gondor.apana.org.au>
+In-Reply-To: <20220610114840.10db23ea@donnerap.cambridge.arm.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 13, 2022 at 05:45:52PM +0800, Herbert Xu wrote:
-> On Sun, Jun 12, 2022 at 10:16:50AM +0200, Jason A. Donenfeld wrote:
-> > Hi Herbert,
-> > 
-> > On Sun, Jun 12, 2022 at 02:57:26PM +0800, Herbert Xu wrote:
-> > > On Fri, Jun 10, 2022 at 08:09:24PM -0700, Eric Biggers wrote:
-> > > >
-> > > > It looks like "crypto: memneq - move into lib/" is going to fix this
-> > > > (https://lore.kernel.org/linux-crypto/20220528102429.189731-1-Jason@zx2c4.com).
-> > > > At the moment it's queued in cryptodev/master.  Herbert, are you planning to
-> > > > send it upstream soon?
-> > > 
-> > > OK I have added it to the crypto tree.
-> > 
-> > Could you do the same with
-> > https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=2d16803c562ecc644803d42ba98a8e0aef9c014e
-> > It fixes a similar bug.
+On Fri, Jun 10, 2022 at 11:48:40AM +0100, Andre Przywara wrote:
+> On Thu, 9 Jun 2022 15:36:52 -0600
+> Rob Herring <robh@kernel.org> wrote:
 > 
-> Sorry, that one is a bit too big for my taste.  If this issue is
-> so critical that we must fix it right away can you please do a
-> minimal patch?
-
-Up to you. (I don't intend to work on a different patch.)
-
+> Hi,
 > 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> > On Tue, Jun 07, 2022 at 04:58:40PM +0000, Yoan Picchi wrote:
+> > > This dependency looks outdated. After the previous patch, we have been able
+> > > to use this driver to encrypt some data and to create working VF on arm64.
+> > > We have not tested it yet on any big endian machine, hence the new dependency  
+> > 
+> > For the subject, use prefixes matching the subsystem (like you did on 
+> > patch 1).
+Just to add on this, patches to the qat driver should have the following
+headline:
+    crypto: qat -
+not
+    crypto: qat:
+
+> > 
+> > The only testing obligation you have is compiling for BE.
+> 
+> So I just compiled for arm64 BE, powerpc BE & LE, and riscv again:
+> $ file qat_c62xvf.ko
+> qat_c62xvf.ko: ELF 64-bit MSB relocatable, ARM aarch64, version 1 (SYSV),
+> BuildID[sha1]=630cc0ee5586c7aeb6e0ab5567ce2f2f7cc46adf, with debug_info,
+> not stripped
+> qat_c62xvf.ko: ELF 64-bit MSB relocatable, 64-bit PowerPC or cisco 7500,
+> version 1 (SYSV), BuildID[sha1]=4090ba181cf95f27108bf3ecde0776f12ef2b636,
+> not stripped
+> qat_c62xvf.ko: ELF 64-bit LSB relocatable, 64-bit PowerPC or cisco 7500,
+> version 1 (SYSV), BuildID[sha1]=2cb0fd09d5bc36c8918fcd061c9f3dac1546cf0d,
+> not stripped
+> qat_c62xvf.ko: ELF 64-bit LSB relocatable, UCB RISC-V, version 1 (SYSV),
+> BuildID[sha1]=bfaa53df7e9aad79d3ab4c05e75ca9169227f6b8, not stripped
+> 
+> All built without errors or warnings, for every of the enabled drivers.
+> 
+> > If kconfig was
+> > supposed to capture what endianness drivers have been tested or not
+> > tested with, then lots of drivers are missing the dependency. Kconfig
+> > depends/select entries should generally be either to prevent compile
+> > failures (you checked PPC, RiscV, etc.?) or to hide drivers *really*
+> > specific to a platform. IMO, we should only have !CPU_BIG_ENDIAN if it 
+> > is known not to work and not easily fixed.
+> 
+> Fair enough, I leave that decision to Giovanni. I have plans to test this
+> with BE, but getting a BE setup on a server is not trivial, both for
+> userland and actual booting, so this will take some time. We just didn't
+> want to block this on some BE concerns.
+Just inspecting the code I can see we are not handling BE in the logic
+that builds FW descriptors.
+My preference would be to keep !CPU_BIG_ENDIAN until the driver is fixed
+and tested.
+
+> > Also, with the dependency, no one can test the driver without modifying 
+> > the kernel and if it does work as-is, then one has to upstream a change 
+> > and then wait for it to show up in distro kernels. You could mitigate 
+> > the first part with COMPILE_TEST.
+> 
+> Yeah, that's a good point, we were already bitten by this, the initial
+> testing was done on a stable distro kernel (v5.4), and it worked fine
+> already there.
+> 
+> Cheers,
+> Andre
+
+-- 
+Giovanni
