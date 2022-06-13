@@ -2,386 +2,207 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A5EC43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 21:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB952C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Jun 2022 23:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241206AbiFMV5U (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35726 "EHLO
+        id S229759AbiFMXPO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 13 Jun 2022 19:15:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347396AbiFMV5R (ORCPT
+        with ESMTP id S229488AbiFMXPO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:57:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D825720F41
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jun 2022 14:57:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655157431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=irWr0I38nZmpu9iLL6jCzX59OAvIBGtZqnJM5UHpQc8=;
-        b=SUR5wgSnchptcp3UAflhmr9iCGSM7VTN/7tKDP3OQfqSoY976RNQ6295vlCm9wFjoEAtkD
-        ms27pIm+wRDa8CH/yjOAKNn4iaeJmiwuDB/TY6Y6efUIobArVOcXVpOzxhsMrXHgzNvkOV
-        NnpoK9btBhWVdyHtYm96KW/h1WUNwRc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-195-qGBiYIp3PeWSrY2tir1taw-1; Mon, 13 Jun 2022 17:57:10 -0400
-X-MC-Unique: qGBiYIp3PeWSrY2tir1taw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E2F21C0CE93;
-        Mon, 13 Jun 2022 21:57:10 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 08A4B404E4C5;
-        Mon, 13 Jun 2022 21:57:08 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 2/2] certs: Add FIPS selftests
-From:   David Howells <dhowells@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Simo Sorce <simo@redhat.com>, dhowells@redhat.com, simo@redhat.com,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 13 Jun 2022 22:57:08 +0100
-Message-ID: <165515742832.1554877.2073456606206090838.stgit@warthog.procyon.org.uk>
-In-Reply-To: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
-References: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/1.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+        Mon, 13 Jun 2022 19:15:14 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2063.outbound.protection.outlook.com [40.107.212.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8342AE11;
+        Mon, 13 Jun 2022 16:15:12 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AdA8fLiBnmZU/KltQ6FtjPI2PIKBm1pJyu9lUHA5+BGMfnkdBolaIEEeYwOensp1kaM+6S2duXGEVwjgio2akvneyUuTq6VIum7why7daPSU0EcQPg7MJhdak97A8lwLBsZWbQbEU2gXLpybPJc2sNsqgd1rZ+P7HAd6AmdTRp3SWEM34I5DWsEFkOSUzzo+MnHujsSTNNLgvUKBO0fPpolBHnzpwZ6SusvK7/iE4IoRBsvxUXRYD4/lmmAMyg8BqALqmPH1v9AuxjeQw7BBYWg7RTooj8d6V7whmytBQ0LvQs/50DnoVnzf+Mu9ZZy4lZ29kYwTqRVRGdzL9wvUjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IKpQmUllgLEabAbwcOznJGAcPX730nOFU7mWF7MTAdI=;
+ b=lHCc0x5wQhv6EJybS79yngAuIzv0wMHO+r4T0vHqV5C2O9yoLXtG1McE4TzT6YhJC6HNchJ4/SLVgKv32Xzj9kCEkieJ5x00WdS07rdmNfI6F6XoVUSlL/6VUCm4tMHoN5mH54HtjTPQ7MB2LQfy7EH8lEFqDWfc2SpK7ZWpCENIlO41kdmqwabI2Wea1BM1PwNj5ceae/w7nrhEOdB2Ar53Mfy9Vk6zvMeSHgRwGHFrk4/zXVvBiQ8MW+O8B589sH5eaDpQkRBiXp1RdgwbE1UM9jjty0WRoZLNcDVpaKqrAzPlq32ztkNnE8Mfd9thQKs4dXqCTiFcS8pp9QkpHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IKpQmUllgLEabAbwcOznJGAcPX730nOFU7mWF7MTAdI=;
+ b=YCoHOQikUTF/57340d6q2yThq6ObHDpHPhBoJ9gxzu9QCWEjLfe4ZzALtTJ9WQaH3vWdqvAj+eZFYJ5IlR1YKWK25g8KIgg90TiFR0mmrT4SgVkuGz1jo8Ka+o74SG4im1xymxFLDR7KrRik5wGxr8fKxLDz2W08lq+YP0g9Dns=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BN8PR12MB3059.namprd12.prod.outlook.com (2603:10b6:408:42::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.16; Mon, 13 Jun
+ 2022 23:15:09 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::810a:e508:3491:1b93]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::810a:e508:3491:1b93%2]) with mapi id 15.20.5332.020; Mon, 13 Jun 2022
+ 23:15:09 +0000
+Message-ID: <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com>
+Date:   Mon, 13 Jun 2022 23:15:03 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+Content-Language: en-US
+To:     Alper Gun <alpergun@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, Ashish.Kalra@amd.com
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        Marc Orr <marcorr@google.com>,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Pavan Kumar Paluri <papaluri@amd.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <20210820155918.7518-24-brijesh.singh@amd.com>
+ <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
+From:   Ashish Kalra <ashkalra@amd.com>
+In-Reply-To: <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-ClientProxiedBy: BL0PR02CA0040.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::17) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c437d3c1-02d1-4ea1-8570-08da4d928f19
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3059:EE_
+X-Microsoft-Antispam-PRVS: <BN8PR12MB3059610ABA71F0D4C5B8FE9A8EAB9@BN8PR12MB3059.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bcicaZdmOrVhQaAPG5CqjTcyJZ14MvmgDdej/1NG6h/VBFfdhh235jPiEX6mqDu3Sl9UjYI1bVvf6d3OW51r1E08W9q4ZYx4XIHGr3LcT81TYPjUwaLK18xa1bLZQCXOnpDHqhEC8CYVEgZP0CJhr6tHlzmgmSJLV6v8PFyTHUi0qBhFfE23BJ0kx+sDPVnOPGwxwPtrg0O7VMzGMKIMU1vqLG4ZGjjdr+mwkrBWJVZeET5NJu2x9cFnmHuKya82QwEt0yfrjHPTKFzRTTcStnizjZW8nV7kIlylCYfWJRypsg0rdgCSR2Q0uJ8VHa7jAGx2WDXKFgE0y4s3ifnKeEtYYLJtmyBnE8Z14xTO0O1ThnRiI6RHuGlsgz7m6Xf7Llc21LoC6RQv9YDN4CI1Zg63g2KpLEZGP6U6wYghRRCNfiw+tv3RL0huKESC4d+BsNE/gZTmRldxpEZPBL7u206nD3NKKVhUL5sRnaU0XAx8/xJg28mKAaiWHMYaQtpb85dl02gTLaCY3CAGVIxU13tNRrd17BH4Io0lAy7e/0fytemTQq7XJvYRpCo0OxKhdEiimIn2gIPCBsUt3qG8CebK2qp2yYdiUjC16bW/B1HyPIdo0rXVBTx1BSFvszOgVvOjhESoSsaEAuRX3b7LT+mrjv6nhkhgVog/f64dwIHogilPbKX0dMdCZUf/FVTvcWQ2lTaGIWtNv4rZC1PJxM42XIDk0ExixNdZgH2Aod0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(8676002)(4326008)(31686004)(36756003)(7406005)(7416002)(5660300002)(110136005)(66556008)(66946007)(66476007)(6636002)(6486002)(316002)(2906002)(8936002)(26005)(186003)(508600001)(54906003)(2616005)(53546011)(6666004)(6506007)(31696002)(6512007)(83380400001)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SlZ6aWMyOXUwNHcraU1FKzdSZGc4Ty9vcWl3eENTODMreHpGMGYzbkdPTHFI?=
+ =?utf-8?B?NlgrYWs0WDhPR09jZGR0ZUFQMnNJSXNyKzV0Wll0TlVaeThMMmFhN3R5dEJn?=
+ =?utf-8?B?U3hLeDl0WCtEdCtVNlJ0U0lOc25rR3lDUnduaDVHVFFyZGdtNzh6ZFFtajJr?=
+ =?utf-8?B?eTQ5MU5NcUVwTXkzbVhFZGxrTEV0RFpaYTRTaVFEZmZqWnd3L2pmMTYxOVhp?=
+ =?utf-8?B?aHJLaWxCb0xpeFFuSWxDU0xhY1BUaERVK3VSVXNtSGNFQ0pCSHdIM2FFL203?=
+ =?utf-8?B?ZUhoUC9MME9ZSm5HbE9yeEF1R0Qxa0JHWHhPWEFTYTNLOWxqRlViVHdaZzV2?=
+ =?utf-8?B?L211RkdmZk1yNnpPMlhka081MDgyZmc5eUtBbDBWTGVxdTNxSGtqd0M0YUUx?=
+ =?utf-8?B?U2d6R0lxQUowdGVZWVN4b2ovNEpkZFNTNmdOamExandKZG1RRmxQdlEvc3U1?=
+ =?utf-8?B?cnFBSGxGaktmUCtOS0FPWnVBekpzdE5nK2licXErUUNBWnJJcGdybFpvTnpx?=
+ =?utf-8?B?TzJkaU5CK3ppQVc5UGdkL1BHRHNrb3UwSERPL3lTeDd4ZjRnOFB6dGc2cWN1?=
+ =?utf-8?B?OGl0TXZBU1lpMEI2YzFMMDByT1BkQnNsazRqWGc0M0RFalNwVVN3TEFNYzQ3?=
+ =?utf-8?B?TmF1QXpVQlZxYmxCbEdESnh2MXd4b25wWVR4azl6b3NMb3RRa0lzOXlUd2V2?=
+ =?utf-8?B?RW9KZHM5SHBkbWNTR2tiekpjUzZmdkU5eTZMdkJ1SHZ2TjBNbHh0VTJHY0lL?=
+ =?utf-8?B?Z2RyNlorNEFUVzFEMHlxOW5mL0lGOCtHMnlzNkl4WEF6S3prdkhsaGhYSktC?=
+ =?utf-8?B?YUttQzdjQmlXTUNmNksxdGtBTVZPanNSU05QWStaaXhqZFdCNlJ3R2NRVnZ0?=
+ =?utf-8?B?SXlxRk9uQXJ5aE41RlVkeEo4aDFUUTA2cWd6dGo1cEovYjR5MnordWlWSlo0?=
+ =?utf-8?B?MnA4K3o2M2dEMnVuSm9yYTJycEFsQzVieHY0MnN6NUN4eG1NdnFnWWtweW5B?=
+ =?utf-8?B?QVliY1kyNjFveUNvOW5QMkN1dGRGQm93NHlXcW0yNnRrZnk5ODFoK0tXeURp?=
+ =?utf-8?B?dHhKK0ozMC9GQVZUQVM0NmhpdDJhcnhQWVgwL2FWME5OQkNTNVIyZG5DNmlV?=
+ =?utf-8?B?UnZUNHNSWUxXdWJMN0cvK3c5QXZxUjQrY0p4aXB0Q2xnTFo2K3NuSG1ENW45?=
+ =?utf-8?B?cWp0RVVUL3JSbkczQ1VMVFNJd0YxTy9NaHpFNnAweFhTbzJNL2dTK0FUL2p5?=
+ =?utf-8?B?TzZINjhOb3p6bFNDTTdSNDBZNzJuRnQrSWVsQXhBdWxLZC94NDhmT1RhQzR3?=
+ =?utf-8?B?eVFBN2xtNHdnMm1jRGNMeDU1TVRCRjJHN0l1czI4eVhEdDRlV1E5QVJpY2FX?=
+ =?utf-8?B?dTBwS2g5S1pZRXc0ZjFFa1p3dUxTcWlTSmp1QXpWcFk1cUdMdytaSGZnaWVq?=
+ =?utf-8?B?Nm1RVDRaK0k4WEI0OTgwTmVrMmZ1NW9BU24vSmw2QTl3NUZjRFVlTjhaUVU0?=
+ =?utf-8?B?RklhWWFrWWFSNk1yZlFPRDhqOXA0WEdIMmdqaUtNK2NWcmZMK2pYRlNBV0FX?=
+ =?utf-8?B?Z0U1V0I0a2lmME9vZHFHT0txMDBtRU1sZTdESStmUjVnQWJtYU5Fc2I3SDF4?=
+ =?utf-8?B?dVRiU09qYytNRkFIY00wai9Mdjg0ZzdoOFI2cm9tOE43WC9KMFVjMlVkNVZH?=
+ =?utf-8?B?M1c5R1puSmRHYWRvZjdYRGoxQlkxTmJaVTBiTHdxUjhqbmQ4bDRMY3JmSTVK?=
+ =?utf-8?B?S01HN3J5MGlnYWRvVlFIMVNzNmRXWmtscDJNK05ZcDJjZ25MckIwNklOdzVq?=
+ =?utf-8?B?Y2Z5SGMvWjNjTWVkYjVLUWxTV0lQamtiaXpOWERUTFQzbGhjN2Jhcnk0cWp1?=
+ =?utf-8?B?dWx2ZUxUS0xXSkxXMkxUNWptWlBQSFRNYThtN29FM3YyRmFnSlhRaXpFZFVD?=
+ =?utf-8?B?K0Yyc2djKzNJdXBKSktqOWVMbFhjVUpodU5zK3pWS0ZjV0pxc2F3enE1a2N5?=
+ =?utf-8?B?NmRoVVRCLzBkanBhM25aSzhsZU9LK1loaS9uenJmVWV2OWQyUGVyYVBMN1ZQ?=
+ =?utf-8?B?TldCZFBIZFdmWHRkZ3dBZGxwK0NpMFRiMmQrSXg2TE1kUUxDc1FnUFE2YXpD?=
+ =?utf-8?B?WXFlQ3hxR2UycUQya3N1Zk5BTFN1VHRQdG92VzE4aTVVSzlMUDBXYzVEWUI4?=
+ =?utf-8?B?bHNMNTBYYmZNVnpQRVg3SzM4dEl6Y1pndVFqRjE5U0NTUWxhbkJkdXFsTnhH?=
+ =?utf-8?B?MTc5TXdEMFpJZW1zYWkzUC9ja2g5R2NaVjJqSVlldTNGajExQ3RUaUFOSVhR?=
+ =?utf-8?B?Z1FOQ0FpMGc2b1poN1FtajAwTUxQT0Z5TFlVajBPMm43OEh0ZlMrdz09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c437d3c1-02d1-4ea1-8570-08da4d928f19
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2022 23:15:08.9443
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fJKxti27ZlYSgcywgjW20wcBGirhr7M4xeVFETh3qdBukOwZgf35yB++E2PTDAUC6j+wm8FlqWBY2mp6aWmaIw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3059
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add some selftests for signature checking when FIPS mode is enabled.  These
-need to be done before we start actually using the signature checking for
-things and must panic the kernel upon failure.
+Hello Alper,
 
-Note that the tests must not check the blacklist lest this provide a way to
-prevent a kernel from booting by installing a hash of a test key in the
-appropriate UEFI table.
+On 6/13/22 20:58, Alper Gun wrote:
+> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>   {
+>> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+>>          struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
+>> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
+>>          int asid, ret;
+>>
+>>          if (kvm->created_vcpus)
+>> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>                  return ret;
+>>
+>>          sev->es_active = es_active;
+>> +       sev->snp_active = snp_active;
+>>          asid = sev_asid_new(sev);
+>>          if (asid < 0)
+>>                  goto e_no_asid;
+>>          sev->asid = asid;
+>>
+>> -       ret = sev_platform_init(&argp->error);
+>> +       if (snp_active) {
+>> +               ret = verify_snp_init_flags(kvm, argp);
+>> +               if (ret)
+>> +                       goto e_free;
+>> +
+>> +               ret = sev_snp_init(&argp->error);
+>> +       } else {
+>> +               ret = sev_platform_init(&argp->error);
+> After SEV INIT_EX support patches, SEV may be initialized in the platform late.
+> In my tests, if SEV has not been initialized in the platform yet, SNP
+> VMs fail with SEV_DF_FLUSH required error. I tried calling
+> SEV_DF_FLUSH right after the SNP platform init but this time it failed
+> later on the SNP launch update command with SEV_RET_INVALID_PARAM
+> error. Looks like there is another dependency on SEV platform
+> initialization.
+>
+> Calling sev_platform_init for SNP VMs fixes the problem in our tests.
 
-Reported-by: Simo Sorce <simo@redhat.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
----
+Trying to get some more context for this issue.
 
- crypto/asymmetric_keys/Kconfig           |   10 +
- crypto/asymmetric_keys/Makefile          |    1 
- crypto/asymmetric_keys/selftest.c        |  224 ++++++++++++++++++++++++++++++
- crypto/asymmetric_keys/x509_parser.h     |    9 +
- crypto/asymmetric_keys/x509_public_key.c |    8 +
- 5 files changed, 251 insertions(+), 1 deletion(-)
- create mode 100644 crypto/asymmetric_keys/selftest.c
+When you say after SEV_INIT_EX support patches, SEV may be initialized 
+in the platform late, do you mean sev_pci_init()->sev_snp_init() ... 
+sev_platform_init() code path has still not executed on the host BSP ?
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 460bc5d0a828..3df3fe4ed95f 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -75,4 +75,14 @@ config SIGNED_PE_FILE_VERIFICATION
- 	  This option provides support for verifying the signature(s) on a
- 	  signed PE binary.
- 
-+config FIPS_SIGNATURE_SELFTEST
-+	bool "Run FIPS selftests on the X.509+PKCS7 signature verification"
-+	help
-+	  This option causes some selftests to be run on the signature
-+	  verification code, using some built in data.  This is required
-+	  for FIPS.
-+	depends on KEYS
-+	depends on ASYMMETRIC_KEY_TYPE
-+	depends on PKCS7_MESSAGE_PARSER
-+
- endif # ASYMMETRIC_KEY_TYPE
-diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
-index 0f190500dd87..0d1fa1b692c6 100644
---- a/crypto/asymmetric_keys/Makefile
-+++ b/crypto/asymmetric_keys/Makefile
-@@ -22,6 +22,7 @@ x509_key_parser-y := \
- 	x509_cert_parser.o \
- 	x509_loader.o \
- 	x509_public_key.o
-+x509_key_parser-$(CONFIG_FIPS_SIGNATURE_SELFTEST) += selftest.o
- 
- $(obj)/x509_cert_parser.o: \
- 	$(obj)/x509.asn1.h \
-diff --git a/crypto/asymmetric_keys/selftest.c b/crypto/asymmetric_keys/selftest.c
-new file mode 100644
-index 000000000000..fa0bf7f24284
---- /dev/null
-+++ b/crypto/asymmetric_keys/selftest.c
-@@ -0,0 +1,224 @@
-+/* Self-testing for signature checking.
-+ *
-+ * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/cred.h>
-+#include <linux/key.h>
-+#include <crypto/pkcs7.h>
-+#include "x509_parser.h"
-+
-+struct certs_test {
-+	const u8	*data;
-+	size_t		data_len;
-+	const u8	*pkcs7;
-+	size_t		pkcs7_len;
-+};
-+
-+/*
-+ * Set of X.509 certificates to provide public keys for the tests.  These will
-+ * be loaded into a temporary keyring for the duration of the testing.
-+ */
-+static const __initconst u8 certs_selftest_keys[] = {
-+	"\x30\x82\x05\x55\x30\x82\x03\x3d\xa0\x03\x02\x01\x02\x02\x14\x73"
-+	"\x98\xea\x98\x2d\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a"
-+	"\xfc\x8c\x0a\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x0b"
-+	"\x05\x00\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29\x43"
-+	"\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66"
-+	"\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65\x73"
-+	"\x74\x69\x6e\x67\x20\x6b\x65\x79\x30\x20\x17\x0d\x32\x32\x30\x35"
-+	"\x31\x38\x32\x32\x33\x32\x34\x31\x5a\x18\x0f\x32\x31\x32\x32\x30"
-+	"\x34\x32\x34\x32\x32\x33\x32\x34\x31\x5a\x30\x34\x31\x32\x30\x30"
-+	"\x06\x03\x55\x04\x03\x0c\x29\x43\x65\x72\x74\x69\x66\x69\x63\x61"
-+	"\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63\x61\x74\x69\x6f\x6e\x20"
-+	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x6b\x65\x79"
-+	"\x30\x82\x02\x22\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01"
-+	"\x01\x05\x00\x03\x82\x02\x0f\x00\x30\x82\x02\x0a\x02\x82\x02\x01"
-+	"\x00\xcc\xac\x49\xdd\x3b\xca\xb0\x15\x7e\x84\x6a\xb2\x0a\x69\x5f"
-+	"\x1c\x0a\x61\x82\x3b\x4f\x2c\xa3\x95\x2c\x08\x58\x4b\xb1\x5d\x99"
-+	"\xe0\xc3\xc1\x79\xc2\xb3\xeb\xc0\x1e\x6d\x3e\x54\x1d\xbd\xb7\x92"
-+	"\x7b\x4d\xb5\x95\x58\xb2\x52\x2e\xc6\x24\x4b\x71\x63\x80\x32\x77"
-+	"\xa7\x38\x5e\xdb\x72\xae\x6e\x0d\xec\xfb\xb6\x6d\x01\x7f\xe9\x55"
-+	"\x66\xdf\xbf\x1d\x76\x78\x02\x31\xe8\xe5\x07\xf8\xb7\x82\x5c\x0d"
-+	"\xd4\xbb\xfb\xa2\x59\x0d\x2e\x3a\x78\x95\x3a\x8b\x46\x06\x47\x44"
-+	"\x46\xd7\xcd\x06\x6a\x41\x13\xe3\x19\xf6\xbb\x6e\x38\xf4\x83\x01"
-+	"\xa3\xbf\x4a\x39\x4f\xd7\x0a\xe9\x38\xb3\xf5\x94\x14\x4e\xdd\xf7"
-+	"\x43\xfd\x24\xb2\x49\x3c\xa5\xf7\x7a\x7c\xd4\x45\x3d\x97\x75\x68"
-+	"\xf1\xed\x4c\x42\x0b\x70\xca\x85\xf3\xde\xe5\x88\x2c\xc5\xbe\xb6"
-+	"\x97\x34\xba\x24\x02\xcd\x8b\x86\x9f\xa9\x73\xca\x73\xcf\x92\x81"
-+	"\xee\x75\x55\xbb\x18\x67\x5c\xff\x3f\xb5\xdd\x33\x1b\x0c\xe9\x78"
-+	"\xdb\x5c\xcf\xaa\x5c\x43\x42\xdf\x5e\xa9\x6d\xec\xd7\xd7\xff\xe6"
-+	"\xa1\x3a\x92\x1a\xda\xae\xf6\x8c\x6f\x7b\xd5\xb4\x6e\x06\xe9\x8f"
-+	"\xe8\xde\x09\x31\x89\xed\x0e\x11\xa1\xfa\x8a\xe9\xe9\x64\x59\x62"
-+	"\x53\xda\xd1\x70\xbe\x11\xd4\x99\x97\x11\xcf\x99\xde\x0b\x9d\x94"
-+	"\x7e\xaa\xb8\x52\xea\x37\xdb\x90\x7e\x35\xbd\xd9\xfe\x6d\x0a\x48"
-+	"\x70\x28\xdd\xd5\x0d\x7f\x03\x80\x93\x14\x23\x8f\xb9\x22\xcd\x7c"
-+	"\x29\xfe\xf1\x72\xb5\x5c\x0b\x12\xcf\x9c\x15\xf6\x11\x4c\x7a\x45"
-+	"\x25\x8c\x45\x0a\x34\xac\x2d\x9a\x81\xca\x0b\x13\x22\xcd\xeb\x1a"
-+	"\x38\x88\x18\x97\x96\x08\x81\xaa\xcc\x8f\x0f\x8a\x32\x7b\x76\x68"
-+	"\x03\x68\x43\xbf\x11\xba\x55\x60\xfd\x80\x1c\x0d\x9b\x69\xb6\x09"
-+	"\x72\xbc\x0f\x41\x2f\x07\x82\xc6\xe3\xb2\x13\x91\xc4\x6d\x14\x95"
-+	"\x31\xbe\x19\xbd\xbc\xed\xe1\x4c\x74\xa2\xe0\x78\x0b\xbb\x94\xec"
-+	"\x4c\x53\x3a\xa2\xb5\x84\x1d\x4b\x65\x7e\xdc\xf7\xdb\x36\x7d\xbe"
-+	"\x9e\x3b\x36\x66\x42\x66\x76\x35\xbf\xbe\xf0\xc1\x3c\x7c\xe9\x42"
-+	"\x5c\x24\x53\x03\x05\xa8\x67\x24\x50\x02\x75\xff\x24\x46\x3b\x35"
-+	"\x89\x76\xe6\x70\xda\xc5\x51\x8c\x9a\xe5\x05\xb0\x0b\xd0\x2d\xd4"
-+	"\x7d\x57\x75\x94\x6b\xf9\x0a\xad\x0e\x41\x00\x15\xd0\x4f\xc0\x7f"
-+	"\x90\x2d\x18\x48\x8f\x28\xfe\x5d\xa7\xcd\x99\x9e\xbd\x02\x6c\x8a"
-+	"\x31\xf3\x1c\xc7\x4b\xe6\x93\xcd\x42\xa2\xe4\x68\x10\x47\x9d\xfc"
-+	"\x21\x02\x03\x01\x00\x01\xa3\x5d\x30\x5b\x30\x0c\x06\x03\x55\x1d"
-+	"\x13\x01\x01\xff\x04\x02\x30\x00\x30\x0b\x06\x03\x55\x1d\x0f\x04"
-+	"\x04\x03\x02\x07\x80\x30\x1d\x06\x03\x55\x1d\x0e\x04\x16\x04\x14"
-+	"\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88\x17"
-+	"\x51\x8f\xe3\xdb\x30\x1f\x06\x03\x55\x1d\x23\x04\x18\x30\x16\x80"
-+	"\x14\xf5\x87\x03\xbb\x33\xce\x1b\x73\xee\x02\xec\xcd\xee\x5b\x88"
-+	"\x17\x51\x8f\xe3\xdb\x30\x0d\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01"
-+	"\x01\x0b\x05\x00\x03\x82\x02\x01\x00\xc0\x2e\x12\x41\x7b\x73\x85"
-+	"\x16\xc8\xdb\x86\x79\xe8\xf5\xcd\x44\xf4\xc6\xe2\x81\x23\x5e\x47"
-+	"\xcb\xab\x25\xf1\x1e\x58\x3e\x31\x7f\x78\xad\x85\xeb\xfe\x14\x88"
-+	"\x60\xf7\x7f\xd2\x26\xa2\xf4\x98\x2a\xfd\xba\x05\x0c\x20\x33\x12"
-+	"\xcc\x4d\x14\x61\x64\x81\x93\xd3\x33\xed\xc8\xff\xf1\x78\xcc\x5f"
-+	"\x51\x9f\x09\xd7\xbe\x0d\x5c\x74\xfd\x9b\xdf\x52\x4a\xc9\xa8\x71"
-+	"\x25\x33\x04\x10\x67\x36\xd0\xb3\x0b\xc9\xa1\x40\x72\xae\x41\x7b"
-+	"\x68\xe6\xe4\x7b\xd0\x28\xf7\x6d\xe7\x3f\x50\xfc\x91\x7c\x91\x56"
-+	"\xd4\xdf\xa6\xbb\xe8\x4d\x1b\x58\xaa\x28\xfa\xc1\x19\xeb\x11\x2f"
-+	"\x24\x8b\x7c\xc5\xa9\x86\x26\xaa\x6e\xb7\x9b\xd5\xf8\x06\xfb\x02"
-+	"\x52\x7b\x9c\x9e\xa1\xe0\x07\x8b\x5e\xe4\xb8\x55\x29\xf6\x48\x52"
-+	"\x1c\x1b\x54\x2d\x46\xd8\xe5\x71\xb9\x60\xd1\x45\xb5\x92\x89\x8a"
-+	"\x63\x58\x2a\xb3\xc6\xb2\x76\xe2\x3c\x82\x59\x04\xae\x5a\xc4\x99"
-+	"\x7b\x2e\x4b\x46\x57\xb8\x29\x24\xb2\xfd\xee\x2c\x0d\xa4\x83\xfa"
-+	"\x65\x2a\x07\x35\x8b\x97\xcf\xbd\x96\x2e\xd1\x7e\x6c\xc2\x1e\x87"
-+	"\xb6\x6c\x76\x65\xb5\xb2\x62\xda\x8b\xe9\x73\xe3\xdb\x33\xdd\x13"
-+	"\x3a\x17\x63\x6a\x76\xde\x8d\x8f\xe0\x47\x61\x28\x3a\x83\xff\x8f"
-+	"\xe7\xc7\xe0\x4a\xa3\xe5\x07\xcf\xe9\x8c\x35\x35\x2e\xe7\x80\x66"
-+	"\x31\xbf\x91\x58\x0a\xe1\x25\x3d\x38\xd3\xa4\xf0\x59\x34\x47\x07"
-+	"\x62\x0f\xbe\x30\xdd\x81\x88\x58\xf0\x28\xb0\x96\xe5\x82\xf8\x05"
-+	"\xb7\x13\x01\xbc\xfa\xc6\x1f\x86\x72\xcc\xf9\xee\x8e\xd9\xd6\x04"
-+	"\x8c\x24\x6c\xbf\x0f\x5d\x37\x39\xcf\x45\xc1\x93\x3a\xd2\xed\x5c"
-+	"\x58\x79\x74\x86\x62\x30\x7e\x8e\xbb\xdd\x7a\xa9\xed\xca\x40\xcb"
-+	"\x62\x47\xf4\xb4\x9f\x52\x7f\x72\x63\xa8\xf0\x2b\xaf\x45\x2a\x48"
-+	"\x19\x6d\xe3\xfb\xf9\x19\x66\x69\xc8\xcc\x62\x87\x6c\x53\x2b\x2d"
-+	"\x6e\x90\x6c\x54\x3a\x82\x25\x41\xcb\x18\x6a\xa4\x22\xa8\xa1\xc4"
-+	"\x47\xd7\x81\x00\x1c\x15\x51\x0f\x1a\xaf\xef\x9f\xa6\x61\x8c\xbd"
-+	"\x6b\x8b\xed\xe6\xac\x0e\xb6\x3a\x4c\x92\xe6\x0f\x91\x0a\x0f\x71"
-+	"\xc7\xa0\xb9\x0d\x3a\x17\x5a\x6f\x35\xc8\xe7\x50\x4f\x46\xe8\x70"
-+	"\x60\x48\x06\x82\x8b\x66\x58\xe6\x73\x91\x9c\x12\x3d\x35\x8e\x46"
-+	"\xad\x5a\xf5\xb3\xdb\x69\x21\x04\xfd\xd3\x1c\xdf\x94\x9d\x56\xb0"
-+	"\x0a\xd1\x95\x76\x8d\xec\x9e\xdd\x0b\x15\x97\x64\xad\xe5\xf2\x62"
-+	"\x02\xfc\x9e\x5f\x56\x42\x39\x05\xb3"
-+};
-+
-+/*
-+ * Signed data and detached signature blobs that form the verification tests.
-+ */
-+static const __initconst u8 certs_selftest_1_data[] = {
-+	"\x54\x68\x69\x73\x20\x69\x73\x20\x73\x6f\x6d\x65\x20\x74\x65\x73"
-+	"\x74\x20\x64\x61\x74\x61\x20\x75\x73\x65\x64\x20\x66\x6f\x72\x20"
-+	"\x73\x65\x6c\x66\x2d\x74\x65\x73\x74\x69\x6e\x67\x20\x63\x65\x72"
-+	"\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69\x66\x69\x63"
-+	"\x61\x74\x69\x6f\x6e\x2e\x0a"
-+};
-+
-+static const __initconst u8 certs_selftest_1_pkcs7[] = {
-+	"\x30\x82\x02\xab\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x07\x02\xa0"
-+	"\x82\x02\x9c\x30\x82\x02\x98\x02\x01\x01\x31\x0d\x30\x0b\x06\x09"
-+	"\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0b\x06\x09\x2a\x86\x48"
-+	"\x86\xf7\x0d\x01\x07\x01\x31\x82\x02\x75\x30\x82\x02\x71\x02\x01"
-+	"\x01\x30\x4c\x30\x34\x31\x32\x30\x30\x06\x03\x55\x04\x03\x0c\x29"
-+	"\x43\x65\x72\x74\x69\x66\x69\x63\x61\x74\x65\x20\x76\x65\x72\x69"
-+	"\x66\x69\x63\x61\x74\x69\x6f\x6e\x20\x73\x65\x6c\x66\x2d\x74\x65"
-+	"\x73\x74\x69\x6e\x67\x20\x6b\x65\x79\x02\x14\x73\x98\xea\x98\x2d"
-+	"\xd0\x2e\xa8\xb1\xcf\x57\xc7\xf2\x97\xb3\xe6\x1a\xfc\x8c\x0a\x30"
-+	"\x0b\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x30\x0d\x06\x09"
-+	"\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01\x05\x00\x04\x82\x02\x00\xac"
-+	"\xb0\xf2\x07\xd6\x99\x6d\xc0\xc0\xd9\x8d\x31\x0d\x7e\x04\xeb\xc3"
-+	"\x88\x90\xc4\x58\x46\xd4\xe2\xa0\xa3\x25\xe3\x04\x50\x37\x85\x8c"
-+	"\x91\xc6\xfc\xc5\xd4\x92\xfd\x05\xd8\xb8\xa3\xb8\xba\x89\x13\x00"
-+	"\x88\x79\x99\x51\x6b\x5b\x28\x31\xc0\xb3\x1b\x7a\x68\x2c\x00\xdb"
-+	"\x4b\x46\x11\xf3\xfa\x50\x8e\x19\x89\xa2\x4c\xda\x4c\x89\x01\x11"
-+	"\x89\xee\xd3\xc8\xc1\xe7\xa7\xf6\xb2\xa2\xf8\x65\xb8\x35\x20\x33"
-+	"\xba\x12\x62\xd5\xbd\xaa\x71\xe5\x5b\xc0\x6a\x32\xff\x6a\x2e\x23"
-+	"\xef\x2b\xb6\x58\xb1\xfb\x5f\x82\x34\x40\x6d\x9f\xbc\x27\xac\x37"
-+	"\x23\x99\xcf\x7d\x20\xb2\x39\x01\xc0\x12\xce\xd7\x5d\x2f\xb6\xab"
-+	"\xb5\x56\x4f\xef\xf4\x72\x07\x58\x65\xa9\xeb\x1f\x75\x1c\x5f\x0c"
-+	"\x88\xe0\xa4\xe2\xcd\x73\x2b\x9e\xb2\x05\x7e\x12\xf8\xd0\x66\x41"
-+	"\xcc\x12\x63\xd4\xd6\xac\x9b\x1d\x14\x77\x8d\x1c\x57\xd5\x27\xc6"
-+	"\x49\xa2\x41\x43\xf3\x59\x29\xe5\xcb\xd1\x75\xbc\x3a\x97\x2a\x72"
-+	"\x22\x66\xc5\x3b\xc1\xba\xfc\x53\x18\x98\xe2\x21\x64\xc6\x52\x87"
-+	"\x13\xd5\x7c\x42\xe8\xfb\x9c\x9a\x45\x32\xd5\xa5\x22\x62\x9d\xd4"
-+	"\xcb\xa4\xfa\x77\xbb\x50\x24\x0b\x8b\x88\x99\x15\x56\xa9\x1e\x92"
-+	"\xbf\x5d\x94\x77\xb6\xf1\x67\x01\x60\x06\x58\x5c\xdf\x18\x52\x79"
-+	"\x37\x30\x93\x7d\x87\x04\xf1\xe0\x55\x59\x52\xf3\xc2\xb1\x1c\x5b"
-+	"\x12\x7c\x49\x87\xfb\xf7\xed\xdd\x95\x71\xec\x4b\x1a\x85\x08\xb0"
-+	"\xa0\x36\xc4\x7b\xab\x40\xe0\xf1\x98\xcc\xaf\x19\x40\x8f\x47\x6f"
-+	"\xf0\x6c\x84\x29\x7f\x7f\x04\x46\xcb\x08\x0f\xe0\xc1\xc9\x70\x6e"
-+	"\x95\x3b\xa4\xbc\x29\x2b\x53\x67\x45\x1b\x0d\xbc\x13\xa5\x76\x31"
-+	"\xaf\xb9\xd0\xe0\x60\x12\xd2\xf4\xb7\x7c\x58\x7e\xf6\x2d\xbb\x24"
-+	"\x14\x5a\x20\x24\xa8\x12\xdf\x25\xbd\x42\xce\x96\x7c\x2e\xba\x14"
-+	"\x1b\x81\x9f\x18\x45\xa4\xc6\x70\x3e\x0e\xf0\xd3\x7b\x9c\x10\xbe"
-+	"\xb8\x7a\x89\xc5\x9e\xd9\x97\xdf\xd7\xe7\xc6\x1d\xc0\x20\x6c\xb8"
-+	"\x1e\x3a\x63\xb8\x39\x8e\x8e\x62\xd5\xd2\xb4\xcd\xff\x46\xfc\x8e"
-+	"\xec\x07\x35\x0c\xff\xb0\x05\xe6\xf4\xe5\xfe\xa2\xe3\x0a\xe6\x36"
-+	"\xa7\x4a\x7e\x62\x1d\xc4\x50\x39\x35\x4e\x28\xcb\x4a\xfb\x9d\xdb"
-+	"\xdd\x23\xd6\x53\xb1\x74\x77\x12\xf7\x9c\xf0\x9a\x6b\xf7\xa9\x64"
-+	"\x2d\x86\x21\x2a\xcf\xc6\x54\xf5\xc9\xad\xfa\xb5\x12\xb4\xf3\x51"
-+	"\x77\x55\x3c\x6f\x0c\x32\xd3\x8c\x44\x39\x71\x25\xfe\x96\xd2"
-+};
-+
-+/*
-+ * List of tests to be run.
-+ */
-+#define TEST(data, pkcs7) { data, sizeof(data) - 1, pkcs7, sizeof(pkcs7) - 1 }
-+static const struct certs_test certs_tests[] __initconst = {
-+	TEST(certs_selftest_1_data, certs_selftest_1_pkcs7),
-+};
-+
-+int __init fips_signature_selftest(void)
-+{
-+	struct key *keyring;
-+	int ret, i;
-+
-+	pr_notice("Running certificate verification selftests\n");
-+
-+	keyring = keyring_alloc(".certs_selftest",
-+				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
-+				(KEY_POS_ALL & ~KEY_POS_SETATTR) |
-+				KEY_USR_VIEW | KEY_USR_READ |
-+				KEY_USR_SEARCH,
-+				KEY_ALLOC_NOT_IN_QUOTA,
-+				NULL, NULL);
-+	if (IS_ERR(keyring))
-+		panic("Can't allocate certs selftest keyring: %ld\n",
-+		      PTR_ERR(keyring));
-+
-+	ret = x509_load_certificate_list(certs_selftest_keys,
-+					 sizeof(certs_selftest_keys) - 1, keyring);
-+	if (ret < 0)
-+		panic("Can't allocate certs selftest keyring: %d\n", ret);
-+
-+	for (i = 0; i < ARRAY_SIZE(certs_tests); i++) {
-+		const struct certs_test *test = &certs_tests[i];
-+		struct pkcs7_message *pkcs7;
-+
-+		pkcs7 = pkcs7_parse_message(test->pkcs7, test->pkcs7_len);
-+		if (IS_ERR(pkcs7))
-+			panic("Certs selftest %d: pkcs7_parse_message() = %d\n", i, ret);
-+
-+		pkcs7_supply_detached_data(pkcs7, test->data, test->data_len);
-+
-+		ret = pkcs7_verify(pkcs7, VERIFYING_MODULE_SIGNATURE);
-+		if (ret < 0)
-+			panic("Certs selftest %d: pkcs7_verify() = %d\n", i, ret);
-+
-+		ret = pkcs7_validate_trust(pkcs7, keyring);
-+		if (ret < 0)
-+			panic("Certs selftest %d: pkcs7_validate_trust() = %d\n", i, ret);
-+
-+		pkcs7_free_message(pkcs7);
-+	}
-+
-+	key_put(keyring);
-+	return 0;
-+}
-diff --git a/crypto/asymmetric_keys/x509_parser.h b/crypto/asymmetric_keys/x509_parser.h
-index 97a886cbe01c..a299c9c56f40 100644
---- a/crypto/asymmetric_keys/x509_parser.h
-+++ b/crypto/asymmetric_keys/x509_parser.h
-@@ -40,6 +40,15 @@ struct x509_certificate {
- 	bool		blacklisted;
- };
- 
-+/*
-+ * selftest.c
-+ */
-+#ifdef CONFIG_FIPS_SIGNATURE_SELFTEST
-+extern int __init fips_signature_selftest(void);
-+#else
-+static inline int fips_signature_selftest(void) { return 0; }
-+#endif
-+
- /*
-  * x509_cert_parser.c
-  */
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 77ed4e93ad56..0b4943a4592b 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -244,9 +244,15 @@ static struct asymmetric_key_parser x509_key_parser = {
- /*
-  * Module stuff
-  */
-+extern int __init certs_selftest(void);
- static int __init x509_key_init(void)
- {
--	return register_asymmetric_key_parser(&x509_key_parser);
-+	int ret;
-+
-+	ret = register_asymmetric_key_parser(&x509_key_parser);
-+	if (ret < 0)
-+		return ret;
-+	return fips_signature_selftest();
- }
- 
- static void __exit x509_key_exit(void)
+Before launching the first SNP/SEV guest launch after INIT, we need to 
+issue SEV_CMD_DF_FLUSH command.
 
+I assume that we will always be initially doing SNP firmware 
+initialization with SNP_INIT command followed by sev_platform_init(), if 
+SNP is enabled on boot CPU.
+
+Thanks, Ashish
 
