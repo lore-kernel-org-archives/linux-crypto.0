@@ -2,135 +2,173 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE25C43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 14:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EE9C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 15:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239770AbiFNOPk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jun 2022 10:15:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
+        id S237783AbiFNPh4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Jun 2022 11:37:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242601AbiFNOPj (ORCPT
+        with ESMTP id S236865AbiFNPhz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jun 2022 10:15:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AA9633A0A
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655216135;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JctC2m2+QZN18u2MNb2HvFmHLpXv366LEOSyUu6TasQ=;
-        b=iDnpfzdKKza6TuZmcvl+vbofoPO7jDrSkkz7OdC8+TPKF9DR8BL3KseY8nqTMPGuFn9O2h
-        6DZ9KPeUG5NQWnBHQaCI+YJ7puia/mzwaJRfCSIrT+Xwyh4VTvPZOSGQJARQRJ5CM5TkWk
-        c9SHn7ojEpCT2axlHqkg6JSovCbIegs=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-317-W1nI5BIIM06fc2d3Bl9xgg-1; Tue, 14 Jun 2022 10:15:34 -0400
-X-MC-Unique: W1nI5BIIM06fc2d3Bl9xgg-1
-Received: by mail-qv1-f70.google.com with SMTP id kj4-20020a056214528400b0044399a9bb4cso5996402qvb.15
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:15:34 -0700 (PDT)
+        Tue, 14 Jun 2022 11:37:55 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C14531528
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 08:37:53 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id l18so10157876lje.13
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 08:37:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fn8gtxL6sSNRSsiDRRI9nlOANxjqFwtwIBrOJj9PDX4=;
+        b=LT/lyo0Gkm8vUesqRnJoPnu//GtJ2a4J7xk0YQo1fVzKIPstZDTs4ocVHUhOQzAzDf
+         1mhknKFZFcyuP+FcITbRZ9C3Zb5IygQ+dSD/d5sDSo5jPxZ3Xod61S+96JIZEmvp/ioU
+         ZLBYWsR7cCtO3xXbwzi+P+VOMS8qTkNT6dLd5qwOG4wKAOBEMDsF5IyyBzSoJSpbj7Ps
+         0sLvaRhd6KXmBxBx5Mnte8TQS/1qrwy08MCnMdz9Rwv7O5iKxxqDYqsRoQXOdKe/qqv/
+         D1JOHgxvD7xtNV5gXfizVs33keuKhzIJmtdRXlLVfle9UauwzrlzB+MCJvLuXXUxDdkT
+         328Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:organization:content-transfer-encoding:user-agent
-         :mime-version;
-        bh=JctC2m2+QZN18u2MNb2HvFmHLpXv366LEOSyUu6TasQ=;
-        b=Cso4Mi3SPvIYH1aJLnFLfuqe/zts/zXSJJKlOmxArjt6AWYHsG0e/kp4J3vNxWwo5u
-         7yiQ9cp7vEbZmrUcgxex79hsO1s7OLaQQvG0EHB6q+YD4+5Qm+2tYH2wM4z0diDOw5UO
-         2ON3LW0AieCYNylrnQbxTf7/6T6Lia97kRydzttRzwRpKJaPf0QuPN7BLwDEBlvSZ1n9
-         52I706pC0Ytqty7wZR8T9e0igHr3kHaHSeJ/WldFP7EYzVc8S4QNMRrG+61KDkxmCPkp
-         CxhNMqRiAPyypQq+EU/7Nmt0FBmSHXCDK5Cad3/yhTVB1nhWUqZGZQHiwM+4HiTcfBtV
-         Dm2g==
-X-Gm-Message-State: AJIora+LgD8gk5fmBpzJJ3b+RC4Gr8k4cFKuhhYm1/Z29F2OsoQ58WNq
-        3gEvM0UWzby7RfZHuUDzvne5QICubpxVIxW3HjfaUjmTyPmafxYiA7wVAEtLxSxaY+aMUP/BI17
-        LWjd5b+dere4E8DJGt1gQapj5
-X-Received: by 2002:ad4:5c4a:0:b0:464:5920:7c1a with SMTP id a10-20020ad45c4a000000b0046459207c1amr3579679qva.58.1655216133915;
-        Tue, 14 Jun 2022 07:15:33 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sUmVYfieNEUEGblxVDH6VoXBlZfAPSf7IbUAfA0HBAtNoDeIhDejnqioeqYTK2ssE5LXtTUg==
-X-Received: by 2002:ad4:5c4a:0:b0:464:5920:7c1a with SMTP id a10-20020ad45c4a000000b0046459207c1amr3579632qva.58.1655216133401;
-        Tue, 14 Jun 2022 07:15:33 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([93.56.163.49])
-        by smtp.gmail.com with ESMTPSA id h20-20020a05620a245400b006a32bf19502sm9394754qkn.60.2022.06.14.07.15.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jun 2022 07:15:32 -0700 (PDT)
-Message-ID: <831c7380f7d89fd8fb3a3043cf3b3d01001ae0be.camel@redhat.com>
-Subject: Re: [PATCH 0/2] certs: Add FIPS self-test for signature verification
-From:   Simo Sorce <simo@redhat.com>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 14 Jun 2022 10:15:24 -0400
-In-Reply-To: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
-References: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fn8gtxL6sSNRSsiDRRI9nlOANxjqFwtwIBrOJj9PDX4=;
+        b=q2ROgdG2hltPj54SFr/ezSEcvcSO1bMDnCjcUVHfO1Hk0NuzStgxcqsvcyzcyQHtc5
+         7+KUgPzRf43Uz622YLyiTZ3hIcpfFQPIZHgxYFDdTQ2l4aQo9ZfFpaPUg7oTNvSqCpzF
+         e3J3Ow9zZq3pkZAqk/QmfZHe9Ht8G2VA/05v6Nq1FhBJPVRsovB8qsb3c4O50BGCaDd9
+         t1i7ZGc8X/NpoB0ArnsUUkzdrD4yL3DfEUXThX4yEhwFXZbWSNKaB0rgVKBT0aXbwDb6
+         HzdWWMhPiDmriy3KWpQ9fUGrx6bwWJ1g+gw/MuvaksmTE0ZgAWp2cOlnKAub8+AACcUh
+         Lhng==
+X-Gm-Message-State: AJIora9BRkjlZOxFrV5cZAe+I3R0XtU9jfE2dxQct+fzP70pO2OapXU+
+        EI9PSzQFL4u8PhyjJsq1XY2VAQuKd0LNiLmZ5+LnWHC/t8DfoBVr
+X-Google-Smtp-Source: AGRyM1tVivOgpTFI/b0e/Dm7QRVBpJJPup//gAccjasK6nMQcbpqWB6Xf55xhXL4gRzWthbIWts51F5C1RaIfIMXqkE=
+X-Received: by 2002:a2e:547:0:b0:255:703a:d9ae with SMTP id
+ 68-20020a2e0547000000b00255703ad9aemr2756675ljf.282.1655221071098; Tue, 14
+ Jun 2022 08:37:51 -0700 (PDT)
 MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-24-brijesh.singh@amd.com>
+ <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
+ <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com> <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
+ <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
+In-Reply-To: <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 14 Jun 2022 09:37:39 -0600
+Message-ID: <CAMkAt6q3otA3n-daFfEBP7kzD+ucMQjP=3bX1PkuAUFrH9epUQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+To:     Ashish Kalra <ashkalra@amd.com>
+Cc:     Alper Gun <alpergun@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Pavan Kumar Paluri <papaluri@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2022-06-13 at 22:56 +0100, David Howells wrote:
-> Hi Herbert,
->=20
-> If you could look over this pair of patches?  The second patch adds a sim=
-ple
-> selftest to allow the signature verification code so that it can be FIPS
-> compliant.  The first moves load_certificate_list() to the asymmetric key=
- code
-> to make this easier and renames it.
->=20
-> I generated the test data myself, but I'm open to using some standard tes=
-t
-> data if you know of some; we don't want too much, however, as it's
-> incompressible.  Also, it has avoid blacklist checks on the keys it is us=
-ing,
-> lest the UEFI blacklist cause the selftest to fail.
->=20
-> The patches can be found on the following branch:
->=20
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/lo=
-g/?h=3Dkeys-fixes
->=20
-> David
-> ---
-> David Howells (2):
->       certs: Move load_certificate_list() to be with the asymmetric keys =
-code
->       certs: Add FIPS selftests
->=20
->=20
->  certs/Makefile                           |   4 +-
->  certs/blacklist.c                        |   8 +-
->  certs/common.c                           |  57 ------
->  certs/common.h                           |   9 -
->  certs/system_keyring.c                   |   6 +-
->  crypto/asymmetric_keys/Kconfig           |  10 +
->  crypto/asymmetric_keys/Makefile          |   2 +
->  crypto/asymmetric_keys/selftest.c        | 224 +++++++++++++++++++++++
->  crypto/asymmetric_keys/x509_loader.c     |  57 ++++++
->  crypto/asymmetric_keys/x509_parser.h     |   9 +
->  crypto/asymmetric_keys/x509_public_key.c |   8 +-
->  include/keys/asymmetric-type.h           |   3 +
->  12 files changed, 321 insertions(+), 76 deletions(-)
->  delete mode 100644 certs/common.c
->  delete mode 100644 certs/common.h
->  create mode 100644 crypto/asymmetric_keys/selftest.c
->  create mode 100644 crypto/asymmetric_keys/x509_loader.c
->=20
->=20
+On Mon, Jun 13, 2022 at 6:21 PM Ashish Kalra <ashkalra@amd.com> wrote:
+>
+>
+> On 6/13/22 23:33, Alper Gun wrote:
+> > On Mon, Jun 13, 2022 at 4:15 PM Ashish Kalra <ashkalra@amd.com> wrote:
+> >> Hello Alper,
+> >>
+> >> On 6/13/22 20:58, Alper Gun wrote:
+> >>> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >>>>    {
+> >>>> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
+> >>>>           struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> >>>> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
+> >>>> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
+> >>>>           int asid, ret;
+> >>>>
+> >>>>           if (kvm->created_vcpus)
+> >>>> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> >>>>                   return ret;
+> >>>>
+> >>>>           sev->es_active = es_active;
+> >>>> +       sev->snp_active = snp_active;
+> >>>>           asid = sev_asid_new(sev);
+> >>>>           if (asid < 0)
+> >>>>                   goto e_no_asid;
+> >>>>           sev->asid = asid;
+> >>>>
+> >>>> -       ret = sev_platform_init(&argp->error);
+> >>>> +       if (snp_active) {
+> >>>> +               ret = verify_snp_init_flags(kvm, argp);
+> >>>> +               if (ret)
+> >>>> +                       goto e_free;
+> >>>> +
+> >>>> +               ret = sev_snp_init(&argp->error);
+> >>>> +       } else {
+> >>>> +               ret = sev_platform_init(&argp->error);
+> >>> After SEV INIT_EX support patches, SEV may be initialized in the platform late.
+> >>> In my tests, if SEV has not been initialized in the platform yet, SNP
+> >>> VMs fail with SEV_DF_FLUSH required error. I tried calling
+> >>> SEV_DF_FLUSH right after the SNP platform init but this time it failed
+> >>> later on the SNP launch update command with SEV_RET_INVALID_PARAM
+> >>> error. Looks like there is another dependency on SEV platform
+> >>> initialization.
+> >>>
+> >>> Calling sev_platform_init for SNP VMs fixes the problem in our tests.
+> >> Trying to get some more context for this issue.
+> >>
+> >> When you say after SEV_INIT_EX support patches, SEV may be initialized
+> >> in the platform late, do you mean sev_pci_init()->sev_snp_init() ...
+> >> sev_platform_init() code path has still not executed on the host BSP ?
+> >>
+> > Correct, INIT_EX requires the file system to be ready and there is a
+> > ccp module param to call it only when needed.
+> >
+> > MODULE_PARM_DESC(psp_init_on_probe, " if true, the PSP will be
+> > initialized on module init. Else the PSP will be initialized on the
+> > first command requiring it");
+> >
+> > If this module param is false, it won't initialize SEV on the platform
+> > until the first SEV VM.
+> >
+> Ok, that makes sense.
+>
+> So the fix will be to call sev_platform_init() unconditionally here in
+> sev_guest_init(), and both sev_snp_init() and sev_platform_init() are
+> protected from being called again, so there won't be any issues if these
+> functions are invoked again at SNP/SEV VM launch if they have been
+> invoked earlier during module init.
 
-Reviewed-by: Simo Sorce <simo@redhat.com>
+That's one solution. I don't know if there is a downside to the system
+for enabling SEV if SNP is being enabled but another solution could be
+to just directly place a DF_FLUSH command instead of calling
+sev_platform_init().
 
---=20
-Simo Sorce
-RHEL Crypto Team
-Red Hat, Inc
-
-
-
+>
+> Thanks, Ashish
+>
