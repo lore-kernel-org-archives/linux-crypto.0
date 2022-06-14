@@ -2,222 +2,180 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7602FC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 00:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F695C433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 08:07:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbiFNAVe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Jun 2022 20:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43640 "EHLO
+        id S1352953AbiFNIHZ (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Jun 2022 04:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiFNAVd (ORCPT
+        with ESMTP id S1351941AbiFNIHX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Jun 2022 20:21:33 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F1AD2314F;
-        Mon, 13 Jun 2022 17:21:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fY3zDCvzO1upNxJIxpFPZH5YEc5uWt/ldxWJj0MqZ8UiMxtlmUqJ/pVRJXILoqaWDRZ83xi4jJMQhDh2zwYrdwwlAs9Do9rWLai5SjCED92BvQx7I/+9jOkWHIEGRzo/kVnbGVH2OhhB0E1rVGeXfJsAeRY4L6TmxuyfUKWSPLmKdlaXLDkbpz1zTlty4Hgu07/UQa90+f4ctct3/+usJ/ZH4X1zLVv0FDfExUqXY0w+G/5k/YISm2Gxb5Z+SWPYX4MsK/TXZWo0/7pj0YT9AS1Eaof2/6qpOP7dzQ41IgcWvN80ez0oIuG+VvM3DLEkANWhr6AIw0Eiebf7dqsMog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KnZmZsinsso3errp/WXeQwVC/7Z6BG3l/m32W7RWYmc=;
- b=LjRXqHJ1TgPUUT7vDShD8TCVUBoovj23nllsknt2rymBH7yJBzqU3Y1LJii1tTeM7IP+ppyZtHYurnQ4mzCHBgro7HZQr6LmmMYvdFj7YGKFztP4WJ+phk8OzmMurQJbkWPGzuefINOXcJcxQh1ukb5dj3Vl2F5TmP6cWZ+kHeJezIrjtyVP7Lx/+D60D9+vnmDAH9ukFcIbIi7SHhQk79Cir9dMAeya9i6qIKsZ+gOvgF+Wdp7IK+jgWkm/YaOlJz8DrOkaQ7KvBEy5QxGqR97rfFOxDIpjpXTZcWWuGLRqbNEMrg7IUg+yDG9GSh6ED+Iy3TqOxPVi8vDhwxmn+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KnZmZsinsso3errp/WXeQwVC/7Z6BG3l/m32W7RWYmc=;
- b=OBtcgy/w9i5x8TVJPPw4k20JOOLCZj0wGRdh2HMncv0etmucNCohc2Mfq2R8WBtj+vdVbSxJVtP32sytO+0byVqBFccFGCFY2k+uKOrGzm7BDjDtF4t3X3qU0bINzC1OcGHxFkxLaRouQnOWGidVaKGL1b2s85sQyKvMZpTQ0rc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by MWHPR12MB1552.namprd12.prod.outlook.com (2603:10b6:301:a::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.20; Tue, 14 Jun
- 2022 00:21:23 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::810a:e508:3491:1b93]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::810a:e508:3491:1b93%2]) with mapi id 15.20.5332.020; Tue, 14 Jun 2022
- 00:21:22 +0000
-Message-ID: <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
-Date:   Tue, 14 Jun 2022 00:21:16 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-Content-Language: en-US
-To:     Alper Gun <alpergun@google.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, Ashish.Kalra@amd.com,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        Marc Orr <marcorr@google.com>,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        Pavan Kumar Paluri <papaluri@amd.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-24-brijesh.singh@amd.com>
- <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
- <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com>
- <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
-From:   Ashish Kalra <ashkalra@amd.com>
-In-Reply-To: <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR19CA0019.namprd19.prod.outlook.com
- (2603:10b6:208:178::32) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+        Tue, 14 Jun 2022 04:07:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1EF281161
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 01:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655194041;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=u5FFZJbMGepFeO9MKDW07tv29kCIYqf1wa6DFklYaWI=;
+        b=X4gZeneIyyL82vyO3goIwoMg509DvrDtX3yUrt5F7cf0oHeXCVriAQIGuVRx0VZ5vCz/ak
+        76tf1iSOwZVW1WZRywy6SVlgqMy3amtmu2qOAQH3ZPk4VHyVjAiETIbhYerkdN3i53p8HV
+        2q7rlfs3bSKe1xd5o5K8TSNjxmyChT8=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-10-OF14Pj6VOU-uoGDUjKquxg-1; Tue, 14 Jun 2022 04:07:19 -0400
+X-MC-Unique: OF14Pj6VOU-uoGDUjKquxg-1
+Received: by mail-lj1-f199.google.com with SMTP id k5-20020a2e6f05000000b002555a5d11e4so1068457ljc.18
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 01:07:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u5FFZJbMGepFeO9MKDW07tv29kCIYqf1wa6DFklYaWI=;
+        b=aA4Ualjhf+/br9UWgVPIBVBOKDOs7PF/PAhf1esFCeFVdqdGGF03yvHjuauiR4NK4n
+         n4neNFerTLl1hy5YfvI9ePlVTADO8l6bXS3WMTzaez5ohvofAdGrbyEUaQpwsVV/Zcn/
+         KpPGUSDf8pi+AbjlFKDoOe5QGoSDuimgL1H/DMRqaRH6AadIxIQ/jQFyWiaOXKfdHWwF
+         +fl8yiH8kbl/JpVtabf9j9hyoQl78j+bjBH86fs+h0ZqPmeXKg6woENoJHEexUV4txLw
+         Pp4wA1AFMbFMTpotI0Phd7ciWxupYjioEudT6yAxBqTYIZ52CVZ2Wecm6cwR4xLmAfUx
+         GUEg==
+X-Gm-Message-State: AJIora9PXORx6Sl3mrOmXjwOc9cGtCuix0uzJ0csKkaWFM7ziJ0Ei2K5
+        43C76mbHkbsxBYkizwEwhbwJOcpt8bv9d166/VlCpIe7A1Ud5SsjddXYmLLDkZLtWOGqXaHXJEX
+        Z6TZDda+19NMUseTeaV2ybPOBwHkUUU6rzkE+vAxJ
+X-Received: by 2002:a2e:b52f:0:b0:258:f682:b7f9 with SMTP id z15-20020a2eb52f000000b00258f682b7f9mr1763719ljm.323.1655194038038;
+        Tue, 14 Jun 2022 01:07:18 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sYtiOBWY0tJ9aS6xRrlCbNlQLEAtW1TvYhCA79U27SkZcGBxHTt0UMcRLc5i+rhqg+eDwTO+tVYCm2j/ulmPY=
+X-Received: by 2002:a2e:b52f:0:b0:258:f682:b7f9 with SMTP id
+ z15-20020a2eb52f000000b00258f682b7f9mr1763698ljm.323.1655194037708; Tue, 14
+ Jun 2022 01:07:17 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3d83a4eb-78d6-4bd6-7266-08da4d9bcfb1
-X-MS-TrafficTypeDiagnostic: MWHPR12MB1552:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR12MB15521D0FE2EB3F39276238E78EAA9@MWHPR12MB1552.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MWeuJuuyRYJ6sI5hLdcvSSHLfuiio+KXQhzdphvTJNGaU+5AaEtSS8leKj2p1Fzebh6URq23GLRhG6Hx5cJFy2USLW49tmvIWTpXl7wVcw1PoZ/STWrtWRzhgjsyPstZdDIrqODaSMUwIn7tVpTnO++2o0feuua5e6xvK7W6hy01QO8Sy8/Oj+n2J33ZNtorAABc3G4uZS1sjIvu8+3SnD4J57/mf1VF3vtq5Yfu+Xae4AXyxnEdyZ3BkRdAsyt1cfV+5hrGkgJLXPbgKU1qrri7lMyg5IdYBQv8QdN4q0EuL37ENMs9zkG5imghbo03Av7QSHUSN2cNVfSVODElMd2aSbZnaT8LA2V/EPWaOltQMqnJMHXqlNS1UHTswFcG6jcFk0pzl6FoKldn/2jt09RP4uJB5Bmx8K1Fv/t5jvY8t7bPqCOEELePlmNaKrlUowJUojEHAdLG4HfQnS5PMBwzftk9Eu0CRAOpAkAhZARvZbVV90tZSl9j0ucE5DYp2JPcd05edUaQ3UHyk4k1K7BSwOTl4JjUg5EbiBUkdzULPW/PlmO6o9nJbFjIPXSnL4eAtSlnenW45YhotHsefGCe2h/AWo/CRkBS45yYE8LvBoYxICavS2l5bA/oHWQf88f11a4Mp6vGs0HCb313q47AFT7hbyWrfZg7AjhEo/PPf/YxNwhEXbvnydNBMDrla5GSMQ4bWAVe8WBbEpiWvmjAR/cUOUY4M95z97YkfTA5YYHVEgXtg7k9a1DjmGrz
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(36756003)(4326008)(8676002)(31686004)(7416002)(7406005)(5660300002)(66556008)(66476007)(66946007)(6486002)(316002)(2906002)(8936002)(31696002)(6916009)(186003)(508600001)(54906003)(2616005)(6666004)(53546011)(6506007)(6512007)(83380400001)(38100700002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZG9jOVl4VFFzcEN3UXpqdDliZStGMWsyd2ZlWlY4WUZ4TnVTVUh0TEQ0Yjlp?=
- =?utf-8?B?cjFSOEE2NHo1Zy9IQURGUmNFdkJhVG9mY29EZU9Mak0zREt3L2tVQXYzU1NL?=
- =?utf-8?B?eXdmS2tETWh2UTk3UElKSlVTNzN4SE0xR3dVYnhNOHZoMFRjQUNrcy92N1E1?=
- =?utf-8?B?VXZLY054dGtneW43OUY2MkFsbTNyQW05aERCNGo4QUxudWdyZ29JK2dnaHJS?=
- =?utf-8?B?N0dWemoxY1hEeGphaXdBSFhQVzFKSmFIVG05STVROEF1b0tsRkpwRnBnZVdo?=
- =?utf-8?B?azEzLzdCNHhOZ09ZUmJ4UnBlLzY0RmVVeGRqeVFSNllteTZwQktGSzJJT3RU?=
- =?utf-8?B?YnMyMTFSb1NSbmVyT3I2V21MSW8rbEwxYzY1ZTQ1cTRFcWRseDV3eStxVlpW?=
- =?utf-8?B?SHljeVZOQ01ndVRjUkxicjNLV2xRWTdlVWJZejQvbEE5VGVKbVl3YkdVVHE2?=
- =?utf-8?B?T3lMMm9ncDRIMEtCdTNmc1lOVzNFaDZobktLdEQ0WG5kTlJwUFN2N3UwWnFT?=
- =?utf-8?B?U0pUcnFhaVpuVFpDcmswRXh5N3JrSTl4MmVDSTd6QTFKYjY1RWxVdDQ5RzZH?=
- =?utf-8?B?SDM1REM5NTVqUEFzTEQydnZ3MW5wUmlxRkpuaEd6UlVsMXdTd0haWVdhRzMx?=
- =?utf-8?B?SDdNd3FGc2prTzUzK2ZqZnZoWkpwcFVWd0V5MmJWZGdCaHJ2MzNLam5UalFu?=
- =?utf-8?B?dUxwbExIZ1ZoVXVNeHF3alVRcHVRdndPQytuZFNtdDkzUDY3cTVPb0Z6TG1U?=
- =?utf-8?B?cHYyT2FVL1d3SE1aM2hTeWlBR0NZbEdVQmRSaldROUhQa1VCOWVZUEpZbkZz?=
- =?utf-8?B?bmw2WW1raC9sY1lnQWZmQTBxQi90ODJMWGJ1K2RlVVhGZlFLOW5NOE5PckM3?=
- =?utf-8?B?Y0VmZ3BBREIzL2c1VXM3ZjRyUEdDL3QzVFBtQVhYOUtpV3FuV2NVSXZYM1RE?=
- =?utf-8?B?NGd5c2s3bXc3YUNjUHhDTTdZM2Qxc2Q3RS9vWVNublRjbVFxenJqOWIxcFRa?=
- =?utf-8?B?R2tidGNIQVZ0aVFmb1R2ZlBkbzdqVGJOckxUQmJYZTYzcFpyZmk5K3BHNlNR?=
- =?utf-8?B?WjJWaUN1bzNTMGJIQmpaVGV4UEF3b1VRZjhHbXhhMXc3ODJJS0pJejFvY1ps?=
- =?utf-8?B?bm5INkw1dEVpZ01JaHBFcHRtait1VGxLWFk5YTdTZy9IcEVBWnBoVCtHQ3Z4?=
- =?utf-8?B?UTgvSEF5Ym9EaGVUNUI1SFc1c0dEem9rZXIyRjYzRUhCdXVXYlVLMHZEQ1l6?=
- =?utf-8?B?VXh4RTAzdGJYN3orY1l1QzVzb0tROUxvR0hjbmpvdTlta05TejYvZEovbXdG?=
- =?utf-8?B?R05UMGhuNnREZVl3dUw5UXJ2UnR0NStnR1B0R0VLRXkwbkxNRUZwZXl4YWk4?=
- =?utf-8?B?RElGWWY5aEQ2VFNKekk4cTVNQ1NGS1VCa28wbVNIUGxsZzd6K015Umd6cUl1?=
- =?utf-8?B?M2YzMGI5V0lrQjhuQnJicXA3TytZWkJPb2YxWHRSN29kY0Q2alNqTnd1dTBS?=
- =?utf-8?B?Sy9QenFIbUQxbzRSTHAwZFRGZmlHbEdxZGo3VnBiazMyUlZ3VmFzRnNOYUtV?=
- =?utf-8?B?aklTbS9scG5kcVBJczh4VnZzYTY0Tm5FRHVvNW1GY0hvNjZSNzhQTU8zWXox?=
- =?utf-8?B?NndGL0ZzZnN3UWgvVE1ycTR6WkMvTDZmSmY4UEV4MzJMMnMxa3g4TEdkNGtK?=
- =?utf-8?B?LzBmUHhuaWVtOVNaWXBhVnFzVXdicXRRM1p4aVZieGJzeGd0L09VK3IxY1BJ?=
- =?utf-8?B?Q2ZxMjZPa0t6UURyZUVyUmpoQjNjOUNZQmsvYnlmZGk2WURYSHord2dVNHIr?=
- =?utf-8?B?bWtES0Q3K3BNellzYUxtV1hmSStrZTVFVGhhekhHMWc2K0w4MFZQaDY1Z29Z?=
- =?utf-8?B?MEhwZTg2VFZ2OXl0ZVFBMVMwZnB3R2Z4QkZZdGVSbk9xcEx6L0p3S2lEUjl2?=
- =?utf-8?B?N29EK1g0Nm54NmlHSUhldVJRd01wUUQyZGZuSGtkczk3NEJWRCtlVkhEMjMw?=
- =?utf-8?B?S3hVeGdlTlRKcWZrWUdmaTVDbXBlWHJwVGN4eFZTSm8xS05LUEovR1EvdWR2?=
- =?utf-8?B?S3hpUmJyTklLMXFXbUYrK21vYTRLMXM4TXdmK2xXSmdERkhtM3J4UmFQN2Nz?=
- =?utf-8?B?OTVjOFpvUExWbVRQZ3ZSbzJWS0MzUTJYMEhGYzlOczlXZ042cTE4SHFxUW4z?=
- =?utf-8?B?aXBodm5DSGpMZ0pVd0dPRElCSGp0M0V4NFppTXo4R2Nic1hBSWMrWXhQd3Rz?=
- =?utf-8?B?LzBsZ1RUbnAwMVlNejR1amtvaUcwYjU3QjVOZUFUSVN6V2IrQzE5c2FvVHNW?=
- =?utf-8?B?THVCTkFEYitQTW16WFk4MFRhMElWQk53cGZuanE2QVFhNE8xR1d3QT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d83a4eb-78d6-4bd6-7266-08da4d9bcfb1
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2022 00:21:22.8316
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: obNi8Bh1gyecFZQ2S7Q9T845A1uehELk+zRFmpHtFqnKUFtoM+1bWcc/cOIblOkhsWUeAZGzvddm6Gzc/sGV3Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1552
+References: <0000000000008ea7ac05e09b46a6@google.com> <CACT4Y+Z8fdbQ9Kq1gHSha2q7a6RrOajbPKrSVCFyLNS95XkVgQ@mail.gmail.com>
+In-Reply-To: <CACT4Y+Z8fdbQ9Kq1gHSha2q7a6RrOajbPKrSVCFyLNS95XkVgQ@mail.gmail.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 14 Jun 2022 16:07:06 +0800
+Message-ID: <CACGkMEuK=bYcpNfjcsh64K0_-nYX2btw9Mi9uWsCYcfENBcHuA@mail.gmail.com>
+Subject: Re: [syzbot] upstream boot error: INFO: task hung in hwrng_register
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     syzbot <syzbot+6da75abeed821109137b@syzkaller.appspotmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux@dominikbrodowski.net, llvm@lists.linux.dev, mpm@selenic.com,
+        syzkaller-bugs@googlegroups.com,
+        Laurent Vivier <lvivier@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-On 6/13/22 23:33, Alper Gun wrote:
-> On Mon, Jun 13, 2022 at 4:15 PM Ashish Kalra <ashkalra@amd.com> wrote:
->> Hello Alper,
->>
->> On 6/13/22 20:58, Alper Gun wrote:
->>> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>>    {
->>>> +       bool es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
->>>>           struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>>> -       bool es_active = argp->id == KVM_SEV_ES_INIT;
->>>> +       bool snp_active = argp->id == KVM_SEV_SNP_INIT;
->>>>           int asid, ret;
->>>>
->>>>           if (kvm->created_vcpus)
->>>> @@ -249,12 +269,22 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>>                   return ret;
->>>>
->>>>           sev->es_active = es_active;
->>>> +       sev->snp_active = snp_active;
->>>>           asid = sev_asid_new(sev);
->>>>           if (asid < 0)
->>>>                   goto e_no_asid;
->>>>           sev->asid = asid;
->>>>
->>>> -       ret = sev_platform_init(&argp->error);
->>>> +       if (snp_active) {
->>>> +               ret = verify_snp_init_flags(kvm, argp);
->>>> +               if (ret)
->>>> +                       goto e_free;
->>>> +
->>>> +               ret = sev_snp_init(&argp->error);
->>>> +       } else {
->>>> +               ret = sev_platform_init(&argp->error);
->>> After SEV INIT_EX support patches, SEV may be initialized in the platform late.
->>> In my tests, if SEV has not been initialized in the platform yet, SNP
->>> VMs fail with SEV_DF_FLUSH required error. I tried calling
->>> SEV_DF_FLUSH right after the SNP platform init but this time it failed
->>> later on the SNP launch update command with SEV_RET_INVALID_PARAM
->>> error. Looks like there is another dependency on SEV platform
->>> initialization.
->>>
->>> Calling sev_platform_init for SNP VMs fixes the problem in our tests.
->> Trying to get some more context for this issue.
->>
->> When you say after SEV_INIT_EX support patches, SEV may be initialized
->> in the platform late, do you mean sev_pci_init()->sev_snp_init() ...
->> sev_platform_init() code path has still not executed on the host BSP ?
->>
-> Correct, INIT_EX requires the file system to be ready and there is a
-> ccp module param to call it only when needed.
+On Fri, Jun 10, 2022 at 4:36 PM Dmitry Vyukov <dvyukov@google.com> wrote:
 >
-> MODULE_PARM_DESC(psp_init_on_probe, " if true, the PSP will be
-> initialized on module init. Else the PSP will be initialized on the
-> first command requiring it");
+> On Sat, 4 Jun 2022 at 10:46, syzbot
+> <syzbot+6da75abeed821109137b@syzkaller.appspotmail.com> wrote:
+> >
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    032dcf09e2bf Merge tag 'gpio-fixes-for-v5.19-rc1' of git:/..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=14409a93f00000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=99f457384a4fea79
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=6da75abeed821109137b
+> > compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+6da75abeed821109137b@syzkaller.appspotmail.com
 >
-> If this module param is false, it won't initialize SEV on the platform
-> until the first SEV VM.
+> +Jason, Laurent
 >
-Ok, that makes sense.
+> This started appearing at the same time as 'task hung in
+> add_early_randomness" bug reports:
+> https://syzkaller.appspot.com/bug?id=256d08cc261a3c38832064a33df4c928b3cd0ef0
+> https://syzkaller.appspot.com/bug?id=be1d99e09e499aed3939dc678718371984104e5c
+> https://syzkaller.appspot.com/bug?id=1cd11df5d984c694e3e7fc9fe271389b2340bed0
+> https://syzkaller.appspot.com/bug?id=35496bafab4c3f81f0b0d6d72c69787300629740
+>
+> Is this also fixed by "virtio-rng: make device ready before making
+> request" patch?
 
-So the fix will be to call sev_platform_init() unconditionally here in 
-sev_guest_init(), and both sev_snp_init() and sev_platform_init() are 
-protected from being called again, so there won't be any issues if these 
-functions are invoked again at SNP/SEV VM launch if they have been 
-invoked earlier during module init.
+Yes, I think so.
 
-Thanks, Ashish
+Thanks
+
+>
+>
+>
+>
+> > INFO: task swapper/0:1 blocked for more than 143 seconds.
+> >       Not tainted 5.18.0-syzkaller-13760-g032dcf09e2bf #0
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> > task:swapper/0       state:D stack:21080 pid:    1 ppid:     0 flags:0x00004000
+> > Call Trace:
+> >  <TASK>
+> >  context_switch kernel/sched/core.c:5116 [inline]
+> >  __schedule+0x957/0xec0 kernel/sched/core.c:6428
+> >  schedule+0xeb/0x1b0 kernel/sched/core.c:6500
+> >  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
+> >  __mutex_lock_common+0xecf/0x26c0 kernel/locking/mutex.c:679
+> >  __mutex_lock kernel/locking/mutex.c:747 [inline]
+> >  mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
+> >  add_early_randomness drivers/char/hw_random/core.c:69 [inline]
+> >  hwrng_register+0x3bf/0x680 drivers/char/hw_random/core.c:599
+> >  virtrng_scan+0x3e/0x90 drivers/char/hw_random/virtio-rng.c:205
+> >  virtio_dev_probe+0xa03/0xba0 drivers/virtio/virtio.c:313
+> >  call_driver_probe+0x96/0x250
+> >  really_probe+0x220/0x940 drivers/base/dd.c:634
+> >  __driver_probe_device+0x1f4/0x3f0 drivers/base/dd.c:764
+> >  driver_probe_device+0x50/0x240 drivers/base/dd.c:794
+> >  __driver_attach+0x35f/0x5a0 drivers/base/dd.c:1163
+> >  bus_for_each_dev+0x188/0x1f0 drivers/base/bus.c:301
+> >  bus_add_driver+0x32f/0x600 drivers/base/bus.c:618
+> >  bus_add_driver+0x32f/0x600 drivers/base/bus.c:618
+> >  driver_register+0x2e9/0x3e0 drivers/base/driver.c:240
+> >  do_one_initcall+0xbd/0x2b0 init/main.c:1295
+> >  do_initcall_level+0x168/0x218 init/main.c:1368
+> >  do_initcalls+0x4b/0x8c init/main.c:1384
+> >  kernel_init_freeable+0x43a/0x5c3 init/main.c:1610
+> >  kernel_init+0x19/0x2b0 init/main.c:1499
+> >  ret_from_fork+0x1f/0x30
+> >  </TASK>
+> >
+> > Showing all locks held in the system:
+> > 2 locks held by swapper/0/1:
+> >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
+> >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1054 [inline]
+> >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: __driver_attach+0x353/0x5a0 drivers/base/dd.c:1162
+> >  #1: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness drivers/char/hw_random/core.c:69 [inline]
+> >  #1: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: hwrng_register+0x3bf/0x680 drivers/char/hw_random/core.c:599
+> > 2 locks held by pr/ttyS0/16:
+> > 1 lock held by khungtaskd/29:
+> >  #0: ffffffff8cb1eee0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
+> > 2 locks held by kworker/u4:4/56:
+> >  #0: ffff888011c69138 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x796/0xd10 kernel/workqueue.c:2262
+> >  #1: ffffc900013e7d00 ((work_completion)(&(&kfence_timer)->work)){+.+.}-{0:0}, at: process_one_work+0x7d0/0xd10 kernel/workqueue.c:2264
+> > 1 lock held by hwrng/755:
+> >  #0: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0xec/0x470 drivers/char/hw_random/core.c:503
+> >
+> > =============================================
+> >
+> >
+> >
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> >
+> > --
+> > You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> > To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> > To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/0000000000008ea7ac05e09b46a6%40google.com.
+>
 
