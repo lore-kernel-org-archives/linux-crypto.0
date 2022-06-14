@@ -2,47 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08FB9C43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 20:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D964DCCA47A
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 20:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357509AbiFNUXv (ORCPT
+        id S1358212AbiFNU37 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jun 2022 16:23:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43390 "EHLO
+        Tue, 14 Jun 2022 16:29:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357168AbiFNUXt (ORCPT
+        with ESMTP id S1357843AbiFNU35 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jun 2022 16:23:49 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2053.outbound.protection.outlook.com [40.107.236.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D39C2B262;
-        Tue, 14 Jun 2022 13:23:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fo7cL15g/4NmdH8CMkhysHE+IMuYxZG/+miQ8+PREI5BDtqZKBR+f+rVKZuaiiJxuI/Qq/WDEiK+dCwmtlx2L9dNlBbTx/CX9sYtRyndJDl3lGw7gWjtqfxtbMkJEuIOP6lZEvwqqQCBcwTTg/dihxm9sx69jycUOUOrPe7G9AA/Haf7VilqI7WhqCzG9gqAB/xxQ3b+Uv6U9gjG5Ee5J1FEDS+OMaYF6e/Mps6pw/i0qLQjqO5MlWdLDgdXfYwOAdO24xM2FoBc2dJgohQeWdXr36nZxTU9J0ZkWcgNChh2zpQC6Za7TDozxfFF83xd4DCgABmV+99BtjkL5JSdUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AjRjHQZQe01nZYhuMqA6HdRYRDG2Xsp9dWKbdt2SybQ=;
- b=FLHKt5w2DlzURNI6EQQCunzHyLJg+96tVM3UbYKeT0DPNfLnndgI89JGyt/VYJ6KIsF86p/MuJnXioNziBap0pQ44A0zyknTn+oQ1F5km2zjrsRuclweuSEjkLhj/ool/TUoylmOLC3UKNR86qTMJNAXuRbz47vuduwnHtjjHOORCHjTw84EmI7brz/kM+C48nz7YtSfM5Pf7z8rOOc8Ql0te9u3HKJazR+VCGFjMQ4uBpp7Ag5OcBiS59q7pnwoCXyqppzXX2FpVg6t1h4snml69sNhJfZg21aPgXKBNw8DkGzJET8DNSOfzaBzcNV7onI/0OAtK/N6Za1NXdReEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AjRjHQZQe01nZYhuMqA6HdRYRDG2Xsp9dWKbdt2SybQ=;
- b=ojWlLYMhKXGzM8V8XvyxeFx1ABuTk/he2ce4OIa53bEhQ17bQ0RpVXFJtDI+TXJHWIFou2piUwsIqkLE+cOXPHHC1ShCSTWiLWBKolzjddEQIl+rVOOVmP+jI4hFLVM9N5Cpolt8wx5peqtutMi14Ne+vubE6au8Fei2RcyOtMY=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by DM4PR12MB6302.namprd12.prod.outlook.com (2603:10b6:8:a4::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.22; Tue, 14 Jun
- 2022 20:23:41 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::810a:e508:3491:1b93]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::810a:e508:3491:1b93%2]) with mapi id 15.20.5332.022; Tue, 14 Jun 2022
- 20:23:41 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Alper Gun <alpergun@google.com>
-CC:     Peter Gonda <pgonda@google.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
+        Tue, 14 Jun 2022 16:29:57 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB7F4EDE8
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 13:29:53 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id a15so15709923lfb.9
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 13:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=i1JbdaTpMJydG2La5gQ81SLd4rzBeviDTlLKc1Eh/88=;
+        b=GeEzs3PaW1MdOrbgFZ/otLfl3Zbs0O9rwiW5jR3wEk7DxOJJMNNaAAd9x3vM+ls+vP
+         SYoWgeoNHoBptIJJOojShXU13QiM5QUde3iyhfQnGylp3dfOJv1fd9e/kqkjVyDsO8Ak
+         VGmpHA6oteHXGscOvQXivDkJlXHLf+JVvDS9MfT9/GEguVMCR0iw3TFO1dHFfJjQdgel
+         dBmPayr75a2wpNqnj2UDwqzxBz7W+DedtpboLm1h6z+y3tXbGBua9JMlFEW2dL7oKJdj
+         GChzCb3cE3z0NztobHO7Cc7W8M+GVhNKCvicnUoH5y9Sz2wExD7QaUw7d1WhJejCLPgo
+         KCAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=i1JbdaTpMJydG2La5gQ81SLd4rzBeviDTlLKc1Eh/88=;
+        b=iz52Q+PloZdpBy9FMlRHt2pE9+5fC+raB2VcVK57vmv09qsZMsapWePU+Z/3NeAyk4
+         IynEp0MVmFF6k7vaS0hl1WEzH5cMnm3iDLFgOtj1pZ6QFnbQSwe8oi1Tx1D+pwY5Rxbq
+         pOcYBF7U1F8A5Sy6LZr3O5sjVR1SuqwVfRRkoy1/3j8jFmGYI3Jrs+hf1cPh3lZC0dnF
+         b3Bz8ECZpggwVszA+pJz7OjJRuZGLSeSFGuH6DXccaFMC9WMWVniOaB0VW0FsnHlkshS
+         IlN8bOTMx1Y5nHozrqKnKlSzbvMFtubd4kYdm1K4jYfz7l+V/118XZ1wLQTfXoeSJen4
+         c2OA==
+X-Gm-Message-State: AOAM530W1KVQ7fRLJkUzPlYWxngWVq4VBqEuPo4/9MOtYGSZD1xiNAZe
+        iUjbe69Xqp6PVPMIN8JLKLjtdcxPKGgmfJxCcrUF/Q==
+X-Google-Smtp-Source: AGRyM1uB8vovM2S7g0G+YvxGib/s21Ys3d7Mu/guzm6mTRKwWFEw+NzAwM1UtOZyS5AKzwwfYb7eQjcwM7Mj92nnSGc=
+X-Received: by 2002:a05:6512:238c:b0:479:8c3:e11b with SMTP id
+ c12-20020a056512238c00b0047908c3e11bmr4044322lfv.456.1655238591503; Tue, 14
+ Jun 2022 13:29:51 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-24-brijesh.singh@amd.com>
+ <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
+ <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com> <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
+ <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com> <CAMkAt6q3otA3n-daFfEBP7kzD+ucMQjP=3bX1PkuAUFrH9epUQ@mail.gmail.com>
+ <SN6PR12MB27671CDFDAA1E62AD49EC6C68EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <CAMkAt6r0ZsjS_XtVYnazC8-Z9bHQafLZ7QFq2NqcRQ2gZbUyPg@mail.gmail.com>
+ <SN6PR12MB276764F83F8849603A2F23478EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <CABpDEum5cmODpA1HQUqG0doKv32AqZ0L9eA88nfg=F=OTMigxA@mail.gmail.com> <SN6PR12MB2767FC7AD341378116DD147D8EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB2767FC7AD341378116DD147D8EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 14 Jun 2022 14:29:39 -0600
+Message-ID: <CAMkAt6pW5MUvJoh1HRJjwjWp7WuJGdrHf59k_QgCxfPhvmM20w@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     Alper Gun <alpergun@google.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>,
         "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
@@ -73,320 +93,282 @@ CC:     Peter Gonda <pgonda@google.com>,
         Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
         Sathyanarayanan Kuppuswamy 
         <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: RE: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-Thread-Topic: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
-Thread-Index: AQHYf2hrEdThX7LMOkaW6abY0uhVGK1NpC+AgABZDQCAAA1FAIABAAmAgAAIC4CAAAahAIAACkIwgAAfI4CAABa6YA==
-Date:   Tue, 14 Jun 2022 20:23:41 +0000
-Message-ID: <SN6PR12MB2767FC7AD341378116DD147D8EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <20210820155918.7518-24-brijesh.singh@amd.com>
- <CABpDEukdrEbXjOF_QuZqUMQndYx=zVM4s2o-oN_wb2L_HCrONg@mail.gmail.com>
- <1cadca0d-c3dc-68ed-075f-f88ccb0ccc0a@amd.com>
- <CABpDEun0rjrNVCGZDXd8SO3tfZi-2ku3mit2XMGLwCsijbF9tg@mail.gmail.com>
- <ee1a829f-9a89-e447-d182-877d4033c96a@amd.com>
- <CAMkAt6q3otA3n-daFfEBP7kzD+ucMQjP=3bX1PkuAUFrH9epUQ@mail.gmail.com>
- <SN6PR12MB27671CDFDAA1E62AD49EC6C68EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CAMkAt6r0ZsjS_XtVYnazC8-Z9bHQafLZ7QFq2NqcRQ2gZbUyPg@mail.gmail.com>
- <SN6PR12MB276764F83F8849603A2F23478EAA9@SN6PR12MB2767.namprd12.prod.outlook.com>
- <CABpDEum5cmODpA1HQUqG0doKv32AqZ0L9eA88nfg=F=OTMigxA@mail.gmail.com>
-In-Reply-To: <CABpDEum5cmODpA1HQUqG0doKv32AqZ0L9eA88nfg=F=OTMigxA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-06-14T20:19:40Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=18e75fb9-7e02-4194-8d36-c1c54295b755;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-06-14T20:23:39Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: b334e8a1-321b-4f4f-9295-1b8e550bbb30
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6dfc694b-4350-474c-c7a3-08da4e43c5ee
-x-ms-traffictypediagnostic: DM4PR12MB6302:EE_
-x-microsoft-antispam-prvs: <DM4PR12MB63021DB1A026BACC4B8212F78EAA9@DM4PR12MB6302.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: AhjR/eSlFiiLbRPpq8Ej45q+aVUDXts74Xh0/td3tapfUiHcj/8cVw+Z/1xK2YzVVDf0UU7/zrL2mIeXMWjs/IgXzKg1kcq0VyayFJzD9/fMvtQwHqjvKtdq5HPB6Tu0eqnxiwo8E5KHCLjqTkZDn43PQhvQGQJ4wjBv7JmESRetKigO5ct/HCs/9ZoPOT5z+rkWvKOn7c0zqOATFm+B4ArWfJAVBb9D5fYifeBUekJOVORyWL/gBj4DxMH8VmNkHMf/4mTYUSZgVFrCGdi6hvJS04PkrFqtIKxjyOEp+TbLvoiVz44frRhQOWg8wXdOclg6SRer7na0knaOcze+XCcgjPypPi+Ay5oXk1IsppKxmZOEifUsaKWhGqrSjV60lADHdNXda/y0SrYTfQaYVAbzSdBlz3UtgL2+u4YGBeuvTnKLjlacYgkNvI2SJpzKFSLNZ1m3oIN3DCT+ahM7e+jzhNytHN7QkFBAlF4Pj8kdJxtIJkahhPmgChQ0jBJK2wqpq2YDDLUMc1WJHGduNjNj6cZ9QDNNYRUelpy2gV891vY8TI+8yqQuIx4BIJUZILJjBskR9RcKthmtg0+qqOJpukuBKKIhpqIqHm80JvqM6Yz9xoX+pxv990dyIJeNkQVHyFXLDsQbaz7eqQqdlDKZe8agPiPfOP4dZ5Qy7RazTqudK79wyYbdV+xIIaBnz9RrZei5a6NAmh5wQvSQQg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(71200400001)(186003)(54906003)(6506007)(55016003)(508600001)(7696005)(316002)(33656002)(83380400001)(6916009)(26005)(38070700005)(66446008)(66556008)(66946007)(64756008)(66476007)(7416002)(7406005)(5660300002)(76116006)(4326008)(8676002)(86362001)(52536014)(122000001)(8936002)(53546011)(9686003)(2906002)(38100700002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?cU9rQ2hmYi8vNTVTdnNvWm5DNGhxSHZKZ2J3OG53Wk1JMmk1Y0lqSDZWWWpP?=
- =?utf-8?B?L2V6NzJLR1dXaTd5NkkyOFNseFhHOVZtL29QVXVBd0ZRODZoZVpXZWFHaHgw?=
- =?utf-8?B?SnFnSzdrRGUzN0lTWVJubGU0c2dlbkNGNWtiVzNickpzVTE2S2ZvV3BEcGow?=
- =?utf-8?B?Vm5EVmJsOVFKT1dLZTE4ejhUWlNkWllEUlBEYUlYOW5MRFg3NkJEZEJaVFZD?=
- =?utf-8?B?Qk4vOXlYd3BGcXJYSHFocGYwMWcyM3NFSkZvQTVVMGhTTTlaU01lZXQwRkxB?=
- =?utf-8?B?WEYyYkNvMjRmbG5leE00V3dNSncySjRBdUcwN1E1RXlVYWsrYXV1OVA0RDlW?=
- =?utf-8?B?Z3lkOEpKdlJhSWFBN2ZIVjVBdHhoVFhiQmdBa3pQRkZOZjdSQ1krY21JUGts?=
- =?utf-8?B?YXgxK1kzMDRRZlRnZ1RpaGdiWXZXbDAwenE3dk5saVJ0V2pIOSs0V2VOR0Na?=
- =?utf-8?B?TG5ocC9aVXlSYTFNSDNwcnNUWlgvV0tML1BMOHFXc3ROK3RyL1dxWEtxQ1pW?=
- =?utf-8?B?VU9SRXVxdXFoSGtIK2JjY0pZSG9Oa1lFVXl6dnpod3BjZlQ4S3N5OWVvTm8z?=
- =?utf-8?B?dlNUcURod1BPRkIxREkzTkpNVTJPWm1vVnN0N1ZVQk92QTJvaVU0S2IwSkFC?=
- =?utf-8?B?TkkrWVN2dTYvT1o2UDl6Y1VySUxLUGdqLytJVk9vT2Y3VG5BVUFJQUVBZGNp?=
- =?utf-8?B?TFJqc1M1MDVubzNNNjFBQjNaWWRaZVZMVlFzSGtyUVAwTjJWaHg5YllZZGtS?=
- =?utf-8?B?SGV3L3ZoQ1RhVzExTkhWdXlFQ2hNanFWVWwvR2tYWlNZekF0aWxoZzlJQThI?=
- =?utf-8?B?c2Vac2IrR0NwTGJXT3FXV3hITFZORzZvbjBJa25INlZ0V3ZBUlBKcFl1djFO?=
- =?utf-8?B?MEg0WERDVThLeGZIcHd1VlVnRU1VQ3pwZEZKY21wQzVobTlSYlgvOU5hTm5m?=
- =?utf-8?B?NVBJVTI2N2M4SFRUekw4bjdSelZGN3hiWDJSR29uK2lxWGhWcWVIMGhsUDBX?=
- =?utf-8?B?MUxHM1lsckZCaHpjMjlFdzk2RGpqUmo1ZDA4Y1JremFnSlVmeFl6RHZxR05V?=
- =?utf-8?B?L25DMHFOcWh2M3VCSk9Ea1pyZ0JjRC9hRS8vZnFEdUpmZUJ3TU9peHAyT3c5?=
- =?utf-8?B?M3dNQU9ldHc4alkyMXdJdmw4OXNVbnNJN1BCWTVLUURpMzNlUHNkalJMMUdF?=
- =?utf-8?B?NmRhMWpGSC9GMW52QXpCZEthVnZZOUVUOTYxUUlGVE54cVh6SzZIQ1VTUkdj?=
- =?utf-8?B?TmJ2aXBnd1Urb1B2S1dJMzlWZFRNVkkxbVIxNm5EVEhmbm1lK0I3Mmc5TkFs?=
- =?utf-8?B?UElqZmRnc2VVY3h6dUd2ZzhxQzJpRVhROW15T2ZVTmlBbGdUajJvOStudEZk?=
- =?utf-8?B?emI2T29iQlBiOXQ1TGtqMDc2ME1PUmNCdll4VEh4SW8wdmRkLzg4OENEaTJ5?=
- =?utf-8?B?NERydXJVeCtpc0JKUzhTM0tiSUZyUmVoN1M2TXcwVWtEdDUrTzZtZHRndUw5?=
- =?utf-8?B?WE1MME9OK0xXRkVjZjQxbkRuNThETVJOaGl1N3VNeTJxSHkwek5vdUNEUnRM?=
- =?utf-8?B?WTBjL1g5RjFPaEdWNXZjaDFBRk5lY2RqOGNsZXFYKzdoZkJ4Z2VOZFBSTWZ6?=
- =?utf-8?B?UDI2Z2NIZFlEUXJEN01rMUY5VHBxb2dsT0hHMkdsRFp6Y1IxaGJNUUNxbVNR?=
- =?utf-8?B?R2tJYUpCQWI1Q3pnN1R6RkVKTkRFMkw5OUxFTGVMZFQ0NlhMbVZyU29VOUIy?=
- =?utf-8?B?cjZ2M2MwcXRvZjMxc3BWQ2FuQUJwVncrK1ZOS0NxeEduY0tQS0l1Vm00TjFW?=
- =?utf-8?B?SnZoc2pRU3hINEl6NGV5aGMrNEFobzErOGh3cG1veXJQMlg0NlBtNzRVOWZG?=
- =?utf-8?B?WUpZbkI2cnBSZ0tjS25FdEIyQkJ1dHJNNWdCclJESE41Zk5ydzJ0ZXNXTGhN?=
- =?utf-8?B?cXdMV3VCQUxqYnh5ejZZYS9NN3UvM2I0Vnp5N0ZnbjVNMWQrcjNNS2QrRGd3?=
- =?utf-8?B?ZmlEOGViS1B4ZzAwbXpEcUhTMWtoMzkxdXk2UkFYeXEydTBMaHplbE1iZHBq?=
- =?utf-8?B?OWlpK0NKbEsybElBQ2VrRVhqWk9WVWc5MXFESnd5eENNTUs2NTFTb3MycFFj?=
- =?utf-8?B?ZkFQL050dFFQZWxQMmFjQkoyK1g0dmRRNkp6TEVnTU0wdFprMlU4cDBlaXJq?=
- =?utf-8?B?ODF4RFhWT2VnZ1FRWVZuVkRINWJaM0tPMkNpcURTbk9TTXNLbEMzaUFlOERX?=
- =?utf-8?B?MEJiLzlyUkRwK09iUjRiME52eHFuTmx4c3RRb1R0dFhhVG1DbXJKbFVDN2pl?=
- =?utf-8?B?dGRwRGlDVmhSWUxmOTdDSHZScjA0cTI0VU15Z0JtZHI0Q2g3ZmE1dz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6dfc694b-4350-474c-c7a3-08da4e43c5ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2022 20:23:41.6413
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: o6R2n57Qo8cQurq0EjIvs+b+NZm4CQSPimBc4A1m6/fcd/W4gpA2uzuU44fFwK8ek/L5EFBDRoseqKFvDGsz3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6302
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-W0FNRCBPZmZpY2lhbCBVc2UgT25seSAtIEdlbmVyYWxdDQoNCkhlbGxvIEFscGVyLA0KDQpIZXJl
-IGlzIHRoZSBmZWVkYmFjayBmcm9tIHRoZSBTRVYvU05QIGZpcm13YXJlIHRlYW06DQoNClRoZSBT
-TlAgc3BlYyBoYXMgdGhpcyBsaW5lIGluIFNOUF9JTklUX0VYOg0KDQrigJxUaGUgZmlybXdhcmUg
-bWFya3MgYWxsIGVuY3J5cHRpb24gY2FwYWJsZSBBU0lEcyBhcyB1bnVzYWJsZSBmb3IgZW5jcnlw
-dGVkIHZpcnR1YWxpemF0aW9uLuKAnQ0KDQpUaGlzIGlzIGEgYmFjay1oYW5kZWQgd2F5IG9mIHNh
-eWluZyB0aGF0IGFmdGVyIFNOUF9JTklULCBhbGwgb2YgdGhlIEFTSURzIGFyZSBjb25zaWRlcmVk
-IOKAnGRpcnR54oCdLiBOb25lIGFyZSBpbiB1c2UsIGJ1dCB0aGUgRlcgY2Fu4oCZdCBrbm93IGlm
-IHRoZXJl4oCZcyBhbnkgZGF0YSBpbiB0aGUgY2FjaGVzIGxlZnQgb3ZlciBmcm9tIHNvbWUgcHJp
-b3IgZ3Vlc3QuIFNvIGFmdGVyIGRvaW5nIGFuIFNOUF9JTklUIChvciBTTlBfSU5JVF9FWCksIGEg
-V0JJTlZEIChvbiBhbGwgdGhyZWFkcykgYW5kIERGX0ZMVVNIIHNlcXVlbmNlIGlzIHJlcXVpcmVk
-LiBJdCBkb2VzbuKAmXQgbWF0dGVyIHdoZXRoZXIgaXTigJlzIGFuIFNFViBERl9GTFVTSCBvciBh
-biBTTlBfREZfRkxVU0jigKYgdGhleSBib3RoIGRvIEVYQUNUTFkgdGhlIHNhbWUgdGhpbmcuDQoN
-CkkgZG9u4oCZdCB1bmRlcnN0YW5kIG9mZiBoYW5kIHdoeSBTTlBfTEFVTkNIX1NUQVJUIHdvdWxk
-IHJlcXVpcmUgYSBERl9GTFVTSOKApiBVc3VhbGx5LCBpdOKAmXMgb25seSBhbiDigJxhY3RpdmF0
-ZeKAnSBjb21tYW5kIHRoYXQgcmVxdWlyZXMgdGhlIERGX0ZMVVNILiBBQ1RJVkFURS9BQ1RJVkFU
-RV9FWC9TTlBfQUNUSVZBVEUvU05QX0FDVElWQVRFX0VYDQoNCltBc2hpc2hdIFRoYXQncyB3aHkg
-SSBhc2tlZCBpZiB5b3UgYXJlIGdldHRpbmcgdGhlIERMRkxVU0hfUkVRVUlSRUQgZXJyb3IgYWZ0
-ZXIgdGhlIFNOUCBhY3RpdmF0ZSBjb21tYW5kID8NCg0KSXTigJlzIHdoZW4geW91IGF0dGVtcHQg
-dG8gKHJlLSl1c2UgPmFuIEFTSUQgdGhhdOKAmXMg4oCcZGlydHnigJ0gdGhhdCB5b3Ugc2hvdWxk
-IGdldCB0aGUgREZfRkxVU0hfUkVRVUlSRUQgZXJyb3IuDQoNCltBc2hpc2hdIEFuZCB3ZSBkbyBT
-TlBfREZfRkxVU0gvU0VWX0RGX0ZMVVNIIHdoZW5ldmVyIEFTSURzIGFyZSByZXVzZWQvcmUtY3lj
-bGVkLg0KDQpJZiB0aGUgaG9zdCBvbmx5IHdhbnRzIHRvIHJ1biBTTlAgZ3Vlc3RzLCB0aGVyZeKA
-mXMgbm8gbmVlZCB0byBkbyBhbiBTRVYgSU5JVCBvciBhbnkgb3RoZXIgU0VWIG9wZXJhdGlvbnMu
-IElmIHRoZSBob3N0IERPRVMgd2FudCB0byBydW4gU0VWIEFORCBTTlAgZ3Vlc3RzLCB0aGVuIHRo
-ZSByZXF1aXJlZCBzZXF1ZW5jZSBpcyB0byBkbyB0aGUgU05QX0lOSVQgYmVmb3JlIHRoZSBTRVYg
-SU5JVC4gRG9pbmcgdGhlIFdCSU5WRC9ERl9GTFVTSCBhbnkgdGltZSBiZXR3ZWVuIHRoZSBTTlBf
-SU5JVCBhbmQgYW55IEFDVElWQVRFIGNvbW1hbmQgc2hvdWxkIGJlIHN1ZmZpY2llbnQuDQoNClRo
-YW5rcywNCkFzaGlzaA0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogQWxwZXIg
-R3VuIDxhbHBlcmd1bkBnb29nbGUuY29tPiANClNlbnQ6IFR1ZXNkYXksIEp1bmUgMTQsIDIwMjIg
-MTo1OCBQTQ0KVG86IEthbHJhLCBBc2hpc2ggPEFzaGlzaC5LYWxyYUBhbWQuY29tPg0KQ2M6IFBl
-dGVyIEdvbmRhIDxwZ29uZGFAZ29vZ2xlLmNvbT47IHRoZSBhcmNoL3g4NiBtYWludGFpbmVycyA8
-eDg2QGtlcm5lbC5vcmc+OyBMS01MIDxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPjsga3Zt
-IGxpc3QgPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyBsaW51eC1jb2NvQGxpc3RzLmxpbnV4LmRldjsg
-bGludXgtbW1Aa3ZhY2sub3JnOyBMaW51eCBDcnlwdG8gTWFpbGluZyBMaXN0IDxsaW51eC1jcnlw
-dG9Admdlci5rZXJuZWwub3JnPjsgVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+
-OyBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT47IEpvZXJnIFJvZWRlbCA8anJvZWRlbEBz
-dXNlLmRlPjsgTGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+OyBILiBQ
-ZXRlciBBbnZpbiA8aHBhQHp5dG9yLmNvbT47IEFyZCBCaWVzaGV1dmVsIDxhcmRiQGtlcm5lbC5v
-cmc+OyBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPjsgU2VhbiBDaHJpc3RvcGhl
-cnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+OyBWaXRhbHkgS3V6bmV0c292IDx2a3V6bmV0c0ByZWRo
-YXQuY29tPjsgV2FucGVuZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPjsgSmltIE1hdHRzb24g
-PGptYXR0c29uQGdvb2dsZS5jb20+OyBBbmR5IEx1dG9taXJza2kgPGx1dG9Aa2VybmVsLm9yZz47
-IERhdmUgSGFuc2VuIDxkYXZlLmhhbnNlbkBsaW51eC5pbnRlbC5jb20+OyBTZXJnaW8gTG9wZXog
-PHNscEByZWRoYXQuY29tPjsgUGV0ZXIgWmlqbHN0cmEgPHBldGVyekBpbmZyYWRlYWQub3JnPjsg
-U3Jpbml2YXMgUGFuZHJ1dmFkYSA8c3Jpbml2YXMucGFuZHJ1dmFkYUBsaW51eC5pbnRlbC5jb20+
-OyBEYXZpZCBSaWVudGplcyA8cmllbnRqZXNAZ29vZ2xlLmNvbT47IERvdiBNdXJpayA8ZG92bXVy
-aWtAbGludXguaWJtLmNvbT47IFRvYmluIEZlbGRtYW4tRml0enRodW0gPHRvYmluQGlibS5jb20+
-OyBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT47IFJvdGgsIE1pY2hhZWwgPE1pY2hhZWwu
-Um90aEBhbWQuY29tPjsgVmxhc3RpbWlsIEJhYmthIDx2YmFia2FAc3VzZS5jej47IEtpcmlsbCBB
-IC4gU2h1dGVtb3YgPGtpcmlsbEBzaHV0ZW1vdi5uYW1lPjsgQW5kaSBLbGVlbiA8YWtAbGludXgu
-aW50ZWwuY29tPjsgVG9ueSBMdWNrIDx0b255Lmx1Y2tAaW50ZWwuY29tPjsgTWFyYyBPcnIgPG1h
-cmNvcnJAZ29vZ2xlLmNvbT47IFNhdGh5YW5hcmF5YW5hbiBLdXBwdXN3YW15IDxzYXRoeWFuYXJh
-eWFuYW4ua3VwcHVzd2FteUBsaW51eC5pbnRlbC5jb20+DQpTdWJqZWN0OiBSZTogW1BBVENIIFBh
-cnQyIHY1IDIzLzQ1XSBLVk06IFNWTTogQWRkIEtWTV9TTlBfSU5JVCBjb21tYW5kDQoNCkxldCBt
-ZSBzdW1tYXJpemUgd2hhdCBJIHRyaWVkLg0KDQoxLSB3aGVuIHVzaW5nIHBzcF9pbml0X3Byb2Jl
-IGZhbHNlLCB0aGUgU05QIFZNIGZhaWxzIGluIFNOUF9MQVVOQ0hfU1RBUlQgc3RlcCB3aXRoIGVy
-cm9yIFNFVl9SRVRfREZGTFVTSF9SRVFVSVJFRCgxNSkuDQoyLSBhZGRlZCBTRVZfREZfRkxVU0gg
-anVzdCBhZnRlciBTTlAgcGxhdGZvcm0gaW5pdCBhbmQgaXQgZGlkbid0IGZhaWwgaW4gbGF1bmNo
-IHN0YXJ0IGJ1dCBmYWlsZWQgbGF0ZXIgZHVyaW5nIFNOUF9MQVVOQ0hfVVBEQVRFIHdpdGgNClNF
-Vl9SRVRfSU5WQUxJRF9QQVJBTSgyMikNCjMtIGFkZGVkIFNOUF9ERl9GTFVTSCBqdXN0IGFmdGVy
-IFNOUCBwbGF0Zm9ybSBpbml0IGFuZCBpdCBmYWlsZWQgYWdhaW4gZHVyaW5nIFNOUF9MQVVOQ0hf
-VVBEQVRFIHdpdGggU0VWX1JFVF9JTlZBTElEX1BBUkFNKDIyKQ0KNC0gYWRkZWQgc2V2X3BsYXRm
-b3JtX2luaXQgZm9yIFNOUCBWTXMgYW5kIGl0IHdvcmtlZC4NCg0KRm9yIG1lIERGX0ZMVVNIIGFs
-b25lIGRpZG4nIGhlbHAgYm9vdCBhIFZNLiBJIGRvbid0IGtub3cgeWV0IHdoeSBzZXYgcGxhdGZv
-cm0gc3RhdHVzIGltcGFjdHMgdGhlIFNOUCBWTSwgYnV0IHNldl9wbGF0Zm9ybV9pbml0IGZpeGVz
-IHRoZSBwcm9ibGVtLg0KDQoNCk9uIFR1ZSwgSnVuIDE0LCAyMDIyIGF0IDEwOjE2IEFNIEthbHJh
-LCBBc2hpc2ggPEFzaGlzaC5LYWxyYUBhbWQuY29tPiB3cm90ZToNCj4NCj4gW0FNRCBPZmZpY2lh
-bCBVc2UgT25seSAtIEdlbmVyYWxdDQo+DQo+IEhlbGxvIEFscGVyLCBQZXRlciwNCj4NCj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgR29uZGEgPHBnb25kYUBnb29n
-bGUuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBKdW5lIDE0LCAyMDIyIDExOjMwIEFNDQo+IFRvOiBL
-YWxyYSwgQXNoaXNoIDxBc2hpc2guS2FscmFAYW1kLmNvbT4NCj4gQ2M6IEFscGVyIEd1biA8YWxw
-ZXJndW5AZ29vZ2xlLmNvbT47IEJyaWplc2ggU2luZ2ggDQo+IDxicmlqZXNoLnNpbmdoQGFtZC5j
-b20+OyB0aGUgYXJjaC94ODYgbWFpbnRhaW5lcnMgPHg4NkBrZXJuZWwub3JnPjsgDQo+IExLTUwg
-PGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBrdm0gbGlzdCA8a3ZtQHZnZXIua2VybmVs
-Lm9yZz47IA0KPiBsaW51eC1jb2NvQGxpc3RzLmxpbnV4LmRldjsgbGludXgtbW1Aa3ZhY2sub3Jn
-OyBMaW51eCBDcnlwdG8gTWFpbGluZyANCj4gTGlzdCA8bGludXgtY3J5cHRvQHZnZXIua2VybmVs
-Lm9yZz47IFRob21hcyBHbGVpeG5lciANCj4gPHRnbHhAbGludXRyb25peC5kZT47IEluZ28gTW9s
-bmFyIDxtaW5nb0ByZWRoYXQuY29tPjsgSm9lcmcgUm9lZGVsIA0KPiA8anJvZWRlbEBzdXNlLmRl
-PjsgTGVuZGFja3ksIFRob21hcyA8VGhvbWFzLkxlbmRhY2t5QGFtZC5jb20+OyBILiANCj4gUGV0
-ZXIgQW52aW4gPGhwYUB6eXRvci5jb20+OyBBcmQgQmllc2hldXZlbCA8YXJkYkBrZXJuZWwub3Jn
-PjsgUGFvbG8gDQo+IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBTZWFuIENocmlzdG9w
-aGVyc29uIA0KPiA8c2VhbmpjQGdvb2dsZS5jb20+OyBWaXRhbHkgS3V6bmV0c292IDx2a3V6bmV0
-c0ByZWRoYXQuY29tPjsgV2FucGVuZyANCj4gTGkgPHdhbnBlbmdsaUB0ZW5jZW50LmNvbT47IEpp
-bSBNYXR0c29uIDxqbWF0dHNvbkBnb29nbGUuY29tPjsgQW5keSANCj4gTHV0b21pcnNraSA8bHV0
-b0BrZXJuZWwub3JnPjsgRGF2ZSBIYW5zZW4gDQo+IDxkYXZlLmhhbnNlbkBsaW51eC5pbnRlbC5j
-b20+OyBTZXJnaW8gTG9wZXogPHNscEByZWRoYXQuY29tPjsgUGV0ZXIgDQo+IFppamxzdHJhIDxw
-ZXRlcnpAaW5mcmFkZWFkLm9yZz47IFNyaW5pdmFzIFBhbmRydXZhZGEgDQo+IDxzcmluaXZhcy5w
-YW5kcnV2YWRhQGxpbnV4LmludGVsLmNvbT47IERhdmlkIFJpZW50amVzIA0KPiA8cmllbnRqZXNA
-Z29vZ2xlLmNvbT47IERvdiBNdXJpayA8ZG92bXVyaWtAbGludXguaWJtLmNvbT47IFRvYmluIA0K
-PiBGZWxkbWFuLUZpdHp0aHVtIDx0b2JpbkBpYm0uY29tPjsgQm9yaXNsYXYgUGV0a292IDxicEBh
-bGllbjguZGU+OyANCj4gUm90aCwgTWljaGFlbCA8TWljaGFlbC5Sb3RoQGFtZC5jb20+OyBWbGFz
-dGltaWwgQmFia2EgDQo+IDx2YmFia2FAc3VzZS5jej47IEtpcmlsbCBBIC4gU2h1dGVtb3YgPGtp
-cmlsbEBzaHV0ZW1vdi5uYW1lPjsgQW5kaSANCj4gS2xlZW4gPGFrQGxpbnV4LmludGVsLmNvbT47
-IFRvbnkgTHVjayA8dG9ueS5sdWNrQGludGVsLmNvbT47IE1hcmMgT3JyIA0KPiA8bWFyY29yckBn
-b29nbGUuY29tPjsgU2F0aHlhbmFyYXlhbmFuIEt1cHB1c3dhbXkgDQo+IDxzYXRoeWFuYXJheWFu
-YW4ua3VwcHVzd2FteUBsaW51eC5pbnRlbC5jb20+OyBQYXZhbiBLdW1hciBQYWx1cmkgDQo+IDxw
-YXBhbHVyaUBhbWQuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIFBhcnQyIHY1IDIzLzQ1XSBL
-Vk06IFNWTTogQWRkIEtWTV9TTlBfSU5JVCBjb21tYW5kDQo+DQo+IE9uIFR1ZSwgSnVuIDE0LCAy
-MDIyIGF0IDEwOjExIEFNIEthbHJhLCBBc2hpc2ggPEFzaGlzaC5LYWxyYUBhbWQuY29tPiB3cm90
-ZToNCj4gPg0KPiA+IFtBTUQgT2ZmaWNpYWwgVXNlIE9ubHkgLSBHZW5lcmFsXQ0KPiA+DQo+ID4N
-Cj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IFBldGVyIEdvbmRhIDxw
-Z29uZGFAZ29vZ2xlLmNvbT4NCj4gPiBTZW50OiBUdWVzZGF5LCBKdW5lIDE0LCAyMDIyIDEwOjM4
-IEFNDQo+ID4gVG86IEthbHJhLCBBc2hpc2ggPEFzaGlzaC5LYWxyYUBhbWQuY29tPg0KPiA+IENj
-OiBBbHBlciBHdW4gPGFscGVyZ3VuQGdvb2dsZS5jb20+OyBCcmlqZXNoIFNpbmdoIA0KPiA+IDxi
-cmlqZXNoLnNpbmdoQGFtZC5jb20+OyBLYWxyYSwgQXNoaXNoIDxBc2hpc2guS2FscmFAYW1kLmNv
-bT47IHRoZQ0KPiA+IGFyY2gveDg2IG1haW50YWluZXJzIDx4ODZAa2VybmVsLm9yZz47IExLTUwg
-DQo+ID4gPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+OyBrdm0gbGlzdCA8a3ZtQHZnZXIu
-a2VybmVsLm9yZz47IA0KPiA+IGxpbnV4LWNvY29AbGlzdHMubGludXguZGV2OyBsaW51eC1tbUBr
-dmFjay5vcmc7IExpbnV4IENyeXB0byBNYWlsaW5nIA0KPiA+IExpc3QgPGxpbnV4LWNyeXB0b0B2
-Z2VyLmtlcm5lbC5vcmc+OyBUaG9tYXMgR2xlaXhuZXIgDQo+ID4gPHRnbHhAbGludXRyb25peC5k
-ZT47IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPjsgSm9lcmcgUm9lZGVsIA0KPiA+IDxq
-cm9lZGVsQHN1c2UuZGU+OyBMZW5kYWNreSwgVGhvbWFzIDxUaG9tYXMuTGVuZGFja3lAYW1kLmNv
-bT47IEguDQo+ID4gUGV0ZXIgQW52aW4gPGhwYUB6eXRvci5jb20+OyBBcmQgQmllc2hldXZlbCA8
-YXJkYkBrZXJuZWwub3JnPjsgUGFvbG8gDQo+ID4gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
-bT47IFNlYW4gQ2hyaXN0b3BoZXJzb24gDQo+ID4gPHNlYW5qY0Bnb29nbGUuY29tPjsgVml0YWx5
-IEt1em5ldHNvdiA8dmt1em5ldHNAcmVkaGF0LmNvbT47IFdhbnBlbmcgDQo+ID4gTGkgPHdhbnBl
-bmdsaUB0ZW5jZW50LmNvbT47IEppbSBNYXR0c29uIDxqbWF0dHNvbkBnb29nbGUuY29tPjsgQW5k
-eSANCj4gPiBMdXRvbWlyc2tpIDxsdXRvQGtlcm5lbC5vcmc+OyBEYXZlIEhhbnNlbiANCj4gPiA8
-ZGF2ZS5oYW5zZW5AbGludXguaW50ZWwuY29tPjsgU2VyZ2lvIExvcGV6IDxzbHBAcmVkaGF0LmNv
-bT47IFBldGVyIA0KPiA+IFppamxzdHJhIDxwZXRlcnpAaW5mcmFkZWFkLm9yZz47IFNyaW5pdmFz
-IFBhbmRydXZhZGEgDQo+ID4gPHNyaW5pdmFzLnBhbmRydXZhZGFAbGludXguaW50ZWwuY29tPjsg
-RGF2aWQgUmllbnRqZXMgDQo+ID4gPHJpZW50amVzQGdvb2dsZS5jb20+OyBEb3YgTXVyaWsgPGRv
-dm11cmlrQGxpbnV4LmlibS5jb20+OyBUb2JpbiANCj4gPiBGZWxkbWFuLUZpdHp0aHVtIDx0b2Jp
-bkBpYm0uY29tPjsgQm9yaXNsYXYgUGV0a292IDxicEBhbGllbjguZGU+OyANCj4gPiBSb3RoLCBN
-aWNoYWVsIDxNaWNoYWVsLlJvdGhAYW1kLmNvbT47IFZsYXN0aW1pbCBCYWJrYSANCj4gPiA8dmJh
-YmthQHN1c2UuY3o+OyBLaXJpbGwgQSAuIFNodXRlbW92IDxraXJpbGxAc2h1dGVtb3YubmFtZT47
-IEFuZGkgDQo+ID4gS2xlZW4gPGFrQGxpbnV4LmludGVsLmNvbT47IFRvbnkgTHVjayA8dG9ueS5s
-dWNrQGludGVsLmNvbT47IE1hcmMgDQo+ID4gT3JyIDxtYXJjb3JyQGdvb2dsZS5jb20+OyBTYXRo
-eWFuYXJheWFuYW4gS3VwcHVzd2FteSANCj4gPiA8c2F0aHlhbmFyYXlhbmFuLmt1cHB1c3dhbXlA
-bGludXguaW50ZWwuY29tPjsgUGF2YW4gS3VtYXIgUGFsdXJpIA0KPiA+IDxwYXBhbHVyaUBhbWQu
-Y29tPg0KPiA+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggUGFydDIgdjUgMjMvNDVdIEtWTTogU1ZNOiBB
-ZGQgS1ZNX1NOUF9JTklUIA0KPiA+IGNvbW1hbmQNCj4gPg0KPiA+IE9uIE1vbiwgSnVuIDEzLCAy
-MDIyIGF0IDY6MjEgUE0gQXNoaXNoIEthbHJhIDxhc2hrYWxyYUBhbWQuY29tPiB3cm90ZToNCj4g
-PiA+DQo+ID4gPg0KPiA+ID4gT24gNi8xMy8yMiAyMzozMywgQWxwZXIgR3VuIHdyb3RlOg0KPiA+
-ID4gPiBPbiBNb24sIEp1biAxMywgMjAyMiBhdCA0OjE1IFBNIEFzaGlzaCBLYWxyYSA8YXNoa2Fs
-cmFAYW1kLmNvbT4gd3JvdGU6DQo+ID4gPiA+PiBIZWxsbyBBbHBlciwNCj4gPiA+ID4+DQo+ID4g
-PiA+PiBPbiA2LzEzLzIyIDIwOjU4LCBBbHBlciBHdW4gd3JvdGU6DQo+ID4gPiA+Pj4gc3RhdGlj
-IGludCBzZXZfZ3Vlc3RfaW5pdChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fc2V2X2NtZA0K
-PiA+ID4gPj4+ICphcmdwKQ0KPiA+ID4gPj4+PiAgICB7DQo+ID4gPiA+Pj4+ICsgICAgICAgYm9v
-bCBlc19hY3RpdmUgPSAoYXJncC0+aWQgPT0gS1ZNX1NFVl9FU19JTklUIHx8DQo+ID4gPiA+Pj4+
-ICsgYXJncC0+aWQgPT0gS1ZNX1NFVl9TTlBfSU5JVCk7DQo+ID4gPiA+Pj4+ICAgICAgICAgICBz
-dHJ1Y3Qga3ZtX3Nldl9pbmZvICpzZXYgPSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZfaW5mbzsNCj4g
-PiA+ID4+Pj4gLSAgICAgICBib29sIGVzX2FjdGl2ZSA9IGFyZ3AtPmlkID09IEtWTV9TRVZfRVNf
-SU5JVDsNCj4gPiA+ID4+Pj4gKyAgICAgICBib29sIHNucF9hY3RpdmUgPSBhcmdwLT5pZCA9PSBL
-Vk1fU0VWX1NOUF9JTklUOw0KPiA+ID4gPj4+PiAgICAgICAgICAgaW50IGFzaWQsIHJldDsNCj4g
-PiA+ID4+Pj4NCj4gPiA+ID4+Pj4gICAgICAgICAgIGlmIChrdm0tPmNyZWF0ZWRfdmNwdXMpIEBA
-IC0yNDksMTIgKzI2OSwyMiBAQCANCj4gPiA+ID4+Pj4gc3RhdGljIGludCBzZXZfZ3Vlc3RfaW5p
-dChzdHJ1Y3Qga3ZtICprdm0sIHN0cnVjdCBrdm1fc2V2X2NtZCAqYXJncCkNCj4gPiA+ID4+Pj4g
-ICAgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiA+ID4+Pj4NCj4gPiA+ID4+Pj4gICAg
-ICAgICAgIHNldi0+ZXNfYWN0aXZlID0gZXNfYWN0aXZlOw0KPiA+ID4gPj4+PiArICAgICAgIHNl
-di0+c25wX2FjdGl2ZSA9IHNucF9hY3RpdmU7DQo+ID4gPiA+Pj4+ICAgICAgICAgICBhc2lkID0g
-c2V2X2FzaWRfbmV3KHNldik7DQo+ID4gPiA+Pj4+ICAgICAgICAgICBpZiAoYXNpZCA8IDApDQo+
-ID4gPiA+Pj4+ICAgICAgICAgICAgICAgICAgIGdvdG8gZV9ub19hc2lkOw0KPiA+ID4gPj4+PiAg
-ICAgICAgICAgc2V2LT5hc2lkID0gYXNpZDsNCj4gPiA+ID4+Pj4NCj4gPiA+ID4+Pj4gLSAgICAg
-ICByZXQgPSBzZXZfcGxhdGZvcm1faW5pdCgmYXJncC0+ZXJyb3IpOw0KPiA+ID4gPj4+PiArICAg
-ICAgIGlmIChzbnBfYWN0aXZlKSB7DQo+ID4gPiA+Pj4+ICsgICAgICAgICAgICAgICByZXQgPSB2
-ZXJpZnlfc25wX2luaXRfZmxhZ3Moa3ZtLCBhcmdwKTsNCj4gPiA+ID4+Pj4gKyAgICAgICAgICAg
-ICAgIGlmIChyZXQpDQo+ID4gPiA+Pj4+ICsgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZV9m
-cmVlOw0KPiA+ID4gPj4+PiArDQo+ID4gPiA+Pj4+ICsgICAgICAgICAgICAgICByZXQgPSBzZXZf
-c25wX2luaXQoJmFyZ3AtPmVycm9yKTsNCj4gPiA+ID4+Pj4gKyAgICAgICB9IGVsc2Ugew0KPiA+
-ID4gPj4+PiArICAgICAgICAgICAgICAgcmV0ID0gc2V2X3BsYXRmb3JtX2luaXQoJmFyZ3AtPmVy
-cm9yKTsNCj4gPiA+ID4+PiBBZnRlciBTRVYgSU5JVF9FWCBzdXBwb3J0IHBhdGNoZXMsIFNFViBt
-YXkgYmUgaW5pdGlhbGl6ZWQgaW4gdGhlIHBsYXRmb3JtIGxhdGUuDQo+ID4gPiA+Pj4gSW4gbXkg
-dGVzdHMsIGlmIFNFViBoYXMgbm90IGJlZW4gaW5pdGlhbGl6ZWQgaW4gdGhlIHBsYXRmb3JtIA0K
-PiA+ID4gPj4+IHlldCwgU05QIFZNcyBmYWlsIHdpdGggU0VWX0RGX0ZMVVNIIHJlcXVpcmVkIGVy
-cm9yLiBJIHRyaWVkIA0KPiA+ID4gPj4+IGNhbGxpbmcgU0VWX0RGX0ZMVVNIIHJpZ2h0IGFmdGVy
-IHRoZSBTTlAgcGxhdGZvcm0gaW5pdCBidXQgDQo+ID4gPiA+Pj4gdGhpcyB0aW1lIGl0IGZhaWxl
-ZCBsYXRlciBvbiB0aGUgU05QIGxhdW5jaCB1cGRhdGUgY29tbWFuZCANCj4gPiA+ID4+PiB3aXRo
-IFNFVl9SRVRfSU5WQUxJRF9QQVJBTSBlcnJvci4gTG9va3MgbGlrZSB0aGVyZSBpcyBhbm90aGVy
-IA0KPiA+ID4gPj4+IGRlcGVuZGVuY3kgb24gU0VWIHBsYXRmb3JtIGluaXRpYWxpemF0aW9uLg0K
-PiA+ID4gPj4+DQo+ID4gPiA+Pj4gQ2FsbGluZyBzZXZfcGxhdGZvcm1faW5pdCBmb3IgU05QIFZN
-cyBmaXhlcyB0aGUgcHJvYmxlbSBpbiBvdXIgdGVzdHMuDQo+ID4gPiA+PiBUcnlpbmcgdG8gZ2V0
-IHNvbWUgbW9yZSBjb250ZXh0IGZvciB0aGlzIGlzc3VlLg0KPiA+ID4gPj4NCj4gPiA+ID4+IFdo
-ZW4geW91IHNheSBhZnRlciBTRVZfSU5JVF9FWCBzdXBwb3J0IHBhdGNoZXMsIFNFViBtYXkgYmUg
-DQo+ID4gPiA+PiBpbml0aWFsaXplZCBpbiB0aGUgcGxhdGZvcm0gbGF0ZSwgZG8geW91IG1lYW4g
-c2V2X3BjaV9pbml0KCktPnNldl9zbnBfaW5pdCgpIC4uLg0KPiA+ID4gPj4gc2V2X3BsYXRmb3Jt
-X2luaXQoKSBjb2RlIHBhdGggaGFzIHN0aWxsIG5vdCBleGVjdXRlZCBvbiB0aGUgaG9zdCBCU1Ag
-Pw0KPiA+ID4gPj4NCj4gPiA+ID4gQ29ycmVjdCwgSU5JVF9FWCByZXF1aXJlcyB0aGUgZmlsZSBz
-eXN0ZW0gdG8gYmUgcmVhZHkgYW5kIHRoZXJlIA0KPiA+ID4gPiBpcyBhIGNjcCBtb2R1bGUgcGFy
-YW0gdG8gY2FsbCBpdCBvbmx5IHdoZW4gbmVlZGVkLg0KPiA+ID4gPg0KPiA+ID4gPiBNT0RVTEVf
-UEFSTV9ERVNDKHBzcF9pbml0X29uX3Byb2JlLCAiIGlmIHRydWUsIHRoZSBQU1Agd2lsbCBiZSAN
-Cj4gPiA+ID4gaW5pdGlhbGl6ZWQgb24gbW9kdWxlIGluaXQuIEVsc2UgdGhlIFBTUCB3aWxsIGJl
-IGluaXRpYWxpemVkIG9uIA0KPiA+ID4gPiB0aGUgZmlyc3QgY29tbWFuZCByZXF1aXJpbmcgaXQi
-KTsNCj4gPiA+ID4NCj4gPiA+ID4gSWYgdGhpcyBtb2R1bGUgcGFyYW0gaXMgZmFsc2UsIGl0IHdv
-bid0IGluaXRpYWxpemUgU0VWIG9uIHRoZSANCj4gPiA+ID4gcGxhdGZvcm0gdW50aWwgdGhlIGZp
-cnN0IFNFViBWTS4NCj4gPiA+ID4NCj4gPiA+IE9rLCB0aGF0IG1ha2VzIHNlbnNlLg0KPiA+ID4N
-Cj4gPiA+IFNvIHRoZSBmaXggd2lsbCBiZSB0byBjYWxsIHNldl9wbGF0Zm9ybV9pbml0KCkgdW5j
-b25kaXRpb25hbGx5IA0KPiA+ID4gaGVyZSBpbiBzZXZfZ3Vlc3RfaW5pdCgpLCBhbmQgYm90aCBz
-ZXZfc25wX2luaXQoKSBhbmQgDQo+ID4gPiBzZXZfcGxhdGZvcm1faW5pdCgpIGFyZSBwcm90ZWN0
-ZWQgZnJvbSBiZWluZyBjYWxsZWQgYWdhaW4sIHNvIA0KPiA+ID4gdGhlcmUgd29uJ3QgYmUgYW55
-IGlzc3VlcyBpZiB0aGVzZSBmdW5jdGlvbnMgYXJlIGludm9rZWQgYWdhaW4gYXQgDQo+ID4gPiBT
-TlAvU0VWIFZNIGxhdW5jaCBpZiB0aGV5IGhhdmUgYmVlbiBpbnZva2VkIGVhcmxpZXIgZHVyaW5n
-IG1vZHVsZSBpbml0Lg0KPiA+DQo+ID4gPlRoYXQncyBvbmUgc29sdXRpb24uIEkgZG9uJ3Qga25v
-dyBpZiB0aGVyZSBpcyBhIGRvd25zaWRlIHRvIHRoZSBzeXN0ZW0gZm9yIGVuYWJsaW5nIFNFViBp
-ZiBTTlAgaXMgYmVpbmcgZW5hYmxlZCBidXQgYW5vdGhlciBzb2x1dGlvbiBjb3VsZCBiZSB0byBq
-dXN0IGRpcmVjdGx5IHBsYWNlIGEgREZfRkxVU0ggY29tbWFuZCBpbnN0ZWFkIG9mIGNhbGxpbmcg
-c2V2X3BsYXRmb3JtX2luaXQoKS4NCj4gPg0KPiA+IEFjdHVhbGx5IHNldl9wbGF0Zm9ybV9pbml0
-KCkgaXMgYWxyZWFkeSBjYWxsZWQgb24gbW9kdWxlIGluaXQgaWYgcHNwX2luaXRfb25fcHJvYmUg
-aXMgbm90IGZhbHNlLiBPbmx5IG5lZWQgdG8gZW5zdXJlIHRoYXQgU05QIGZpcm13YXJlIGlzIGlu
-aXRpYWxpemVkIGZpcnN0IHdpdGggU05QX0lOSVQgY29tbWFuZC4NCj4NCj4gPiBCdXQgaWYgcHNw
-X2luaXRfb25fcHJvYmUgaXMgZmFsc2UsIHNldl9wbGF0Zm9ybV9pbml0KCkgaXNuJ3QgY2FsbGVk
-IGRvd24gdGhpcyBwYXRoLiBBbHBlciBoYXMgc3VnZ2VzdGVkIHdlIGFsd2F5cyBjYWxsIHNldl9w
-bGF0Zm9ybV9pbml0KCkgYnV0IHdlIGNvdWxkIGp1c3QgcGxhY2UgYW4gU0VWX0RGX0ZMVVNIIGNv
-bW1hbmQgaW5zdGVhZC4gT3IgYW0gSSBzdGlsbCBtaXNzaW5nIHNvbWV0aGluZz8NCj4NCj4gPkFm
-dGVyIFNFViBJTklUX0VYIHN1cHBvcnQgcGF0Y2hlcywgU0VWIG1heSBiZSBpbml0aWFsaXplZCBp
-biB0aGUgcGxhdGZvcm0gbGF0ZS4NCj4gPiBJbiBteSB0ZXN0cywgaWYgU0VWIGhhcyBub3QgYmVl
-biBpbml0aWFsaXplZCBpbiB0aGUgcGxhdGZvcm0gIHlldCwgDQo+ID5TTlAgVk1zIGZhaWwgd2l0
-aCBTRVZfREZfRkxVU0ggcmVxdWlyZWQgZXJyb3IuIEkgdHJpZWQgIGNhbGxpbmcgDQo+ID5TRVZf
-REZfRkxVU0ggcmlnaHQgYWZ0ZXIgdGhlIFNOUCBwbGF0Zm9ybSBpbml0Lg0KPg0KPiBBcmUgeW91
-IGdldHRpbmcgdGhlIERMRkxVU0hfUkVRVUlSRUQgZXJyb3IgYWZ0ZXIgdGhlIFNOUCBhY3RpdmF0
-ZSBjb21tYW5kID8NCj4NCj4gQWxzbyBkaWQgeW91IHVzZSB0aGUgU0VWX0RGX0ZMVVNIIGNvbW1h
-bmQgb3IgdGhlIFNOUF9ERl9GTFVTSCBjb21tYW5kID8NCj4NCj4gV2l0aCBTTlAgeW91IG5lZWQg
-dG8gdXNlIFNOUF9ERl9GTFVTSCBjb21tYW5kLg0KPg0KPiBUaGFua3MsDQo+IEFzaGlzaA0K
+On Tue, Jun 14, 2022 at 2:23 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
+>
+> [AMD Official Use Only - General]
+>
+> Hello Alper,
+>
+> Here is the feedback from the SEV/SNP firmware team:
+>
+> The SNP spec has this line in SNP_INIT_EX:
+>
+> =E2=80=9CThe firmware marks all encryption capable ASIDs as unusable for =
+encrypted virtualization.=E2=80=9D
+>
+> This is a back-handed way of saying that after SNP_INIT, all of the ASIDs=
+ are considered =E2=80=9Cdirty=E2=80=9D. None are in use, but the FW can=E2=
+=80=99t know if there=E2=80=99s any data in the caches left over from some =
+prior guest. So after doing an SNP_INIT (or SNP_INIT_EX), a WBINVD (on all =
+threads) and DF_FLUSH sequence is required. It doesn=E2=80=99t matter wheth=
+er it=E2=80=99s an SEV DF_FLUSH or an SNP_DF_FLUSH=E2=80=A6 they both do EX=
+ACTLY the same thing.
+>
+> I don=E2=80=99t understand off hand why SNP_LAUNCH_START would require a =
+DF_FLUSH=E2=80=A6 Usually, it=E2=80=99s only an =E2=80=9Cactivate=E2=80=9D =
+command that requires the DF_FLUSH. ACTIVATE/ACTIVATE_EX/SNP_ACTIVATE/SNP_A=
+CTIVATE_EX
+>
+> [Ashish] That's why I asked if you are getting the DLFLUSH_REQUIRED error=
+ after the SNP activate command ?
+>
+> It=E2=80=99s when you attempt to (re-)use >an ASID that=E2=80=99s =E2=80=
+=9Cdirty=E2=80=9D that you should get the DF_FLUSH_REQUIRED error.
+>
+> [Ashish] And we do SNP_DF_FLUSH/SEV_DF_FLUSH whenever ASIDs are reused/re=
+-cycled.
+>
+> If the host only wants to run SNP guests, there=E2=80=99s no need to do a=
+n SEV INIT or any other SEV operations. If the host DOES want to run SEV AN=
+D SNP guests, then the required sequence is to do the SNP_INIT before the S=
+EV INIT. Doing the WBINVD/DF_FLUSH any time between the SNP_INIT and any AC=
+TIVATE command should be sufficient.
+
+Thanks for the follow up Ashish! I was assuming there was some issue
+with the ASIDs here but didn't have time to experiment yet. Is there
+any downside to enabling SEV? If not these patches make sense but if
+there is some cost should we make KVM capable of running SNP VMs
+without enabling SEV?
+
+
+>
+> Thanks,
+> Ashish
+>
+> -----Original Message-----
+> From: Alper Gun <alpergun@google.com>
+> Sent: Tuesday, June 14, 2022 1:58 PM
+> To: Kalra, Ashish <Ashish.Kalra@amd.com>
+> Cc: Peter Gonda <pgonda@google.com>; the arch/x86 maintainers <x86@kernel=
+.org>; LKML <linux-kernel@vger.kernel.org>; kvm list <kvm@vger.kernel.org>;=
+ linux-coco@lists.linux.dev; linux-mm@kvack.org; Linux Crypto Mailing List =
+<linux-crypto@vger.kernel.org>; Thomas Gleixner <tglx@linutronix.de>; Ingo =
+Molnar <mingo@redhat.com>; Joerg Roedel <jroedel@suse.de>; Lendacky, Thomas=
+ <Thomas.Lendacky@amd.com>; H. Peter Anvin <hpa@zytor.com>; Ard Biesheuvel =
+<ardb@kernel.org>; Paolo Bonzini <pbonzini@redhat.com>; Sean Christopherson=
+ <seanjc@google.com>; Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng Li <w=
+anpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Andy Lutomirski <=
+luto@kernel.org>; Dave Hansen <dave.hansen@linux.intel.com>; Sergio Lopez <=
+slp@redhat.com>; Peter Zijlstra <peterz@infradead.org>; Srinivas Pandruvada=
+ <srinivas.pandruvada@linux.intel.com>; David Rientjes <rientjes@google.com=
+>; Dov Murik <dovmurik@linux.ibm.com>; Tobin Feldman-Fitzthum <tobin@ibm.co=
+m>; Borislav Petkov <bp@alien8.de>; Roth, Michael <Michael.Roth@amd.com>; V=
+lastimil Babka <vbabka@suse.cz>; Kirill A . Shutemov <kirill@shutemov.name>=
+; Andi Kleen <ak@linux.intel.com>; Tony Luck <tony.luck@intel.com>; Marc Or=
+r <marcorr@google.com>; Sathyanarayanan Kuppuswamy <sathyanarayanan.kuppusw=
+amy@linux.intel.com>
+> Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+>
+> Let me summarize what I tried.
+>
+> 1- when using psp_init_probe false, the SNP VM fails in SNP_LAUNCH_START =
+step with error SEV_RET_DFFLUSH_REQUIRED(15).
+> 2- added SEV_DF_FLUSH just after SNP platform init and it didn't fail in =
+launch start but failed later during SNP_LAUNCH_UPDATE with
+> SEV_RET_INVALID_PARAM(22)
+> 3- added SNP_DF_FLUSH just after SNP platform init and it failed again du=
+ring SNP_LAUNCH_UPDATE with SEV_RET_INVALID_PARAM(22)
+> 4- added sev_platform_init for SNP VMs and it worked.
+>
+> For me DF_FLUSH alone didn' help boot a VM. I don't know yet why sev plat=
+form status impacts the SNP VM, but sev_platform_init fixes the problem.
+>
+>
+> On Tue, Jun 14, 2022 at 10:16 AM Kalra, Ashish <Ashish.Kalra@amd.com> wro=
+te:
+> >
+> > [AMD Official Use Only - General]
+> >
+> > Hello Alper, Peter,
+> >
+> > -----Original Message-----
+> > From: Peter Gonda <pgonda@google.com>
+> > Sent: Tuesday, June 14, 2022 11:30 AM
+> > To: Kalra, Ashish <Ashish.Kalra@amd.com>
+> > Cc: Alper Gun <alpergun@google.com>; Brijesh Singh
+> > <brijesh.singh@amd.com>; the arch/x86 maintainers <x86@kernel.org>;
+> > LKML <linux-kernel@vger.kernel.org>; kvm list <kvm@vger.kernel.org>;
+> > linux-coco@lists.linux.dev; linux-mm@kvack.org; Linux Crypto Mailing
+> > List <linux-crypto@vger.kernel.org>; Thomas Gleixner
+> > <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Joerg Roedel
+> > <jroedel@suse.de>; Lendacky, Thomas <Thomas.Lendacky@amd.com>; H.
+> > Peter Anvin <hpa@zytor.com>; Ard Biesheuvel <ardb@kernel.org>; Paolo
+> > Bonzini <pbonzini@redhat.com>; Sean Christopherson
+> > <seanjc@google.com>; Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng
+> > Li <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Andy
+> > Lutomirski <luto@kernel.org>; Dave Hansen
+> > <dave.hansen@linux.intel.com>; Sergio Lopez <slp@redhat.com>; Peter
+> > Zijlstra <peterz@infradead.org>; Srinivas Pandruvada
+> > <srinivas.pandruvada@linux.intel.com>; David Rientjes
+> > <rientjes@google.com>; Dov Murik <dovmurik@linux.ibm.com>; Tobin
+> > Feldman-Fitzthum <tobin@ibm.com>; Borislav Petkov <bp@alien8.de>;
+> > Roth, Michael <Michael.Roth@amd.com>; Vlastimil Babka
+> > <vbabka@suse.cz>; Kirill A . Shutemov <kirill@shutemov.name>; Andi
+> > Kleen <ak@linux.intel.com>; Tony Luck <tony.luck@intel.com>; Marc Orr
+> > <marcorr@google.com>; Sathyanarayanan Kuppuswamy
+> > <sathyanarayanan.kuppuswamy@linux.intel.com>; Pavan Kumar Paluri
+> > <papaluri@amd.com>
+> > Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT command
+> >
+> > On Tue, Jun 14, 2022 at 10:11 AM Kalra, Ashish <Ashish.Kalra@amd.com> w=
+rote:
+> > >
+> > > [AMD Official Use Only - General]
+> > >
+> > >
+> > > -----Original Message-----
+> > > From: Peter Gonda <pgonda@google.com>
+> > > Sent: Tuesday, June 14, 2022 10:38 AM
+> > > To: Kalra, Ashish <Ashish.Kalra@amd.com>
+> > > Cc: Alper Gun <alpergun@google.com>; Brijesh Singh
+> > > <brijesh.singh@amd.com>; Kalra, Ashish <Ashish.Kalra@amd.com>; the
+> > > arch/x86 maintainers <x86@kernel.org>; LKML
+> > > <linux-kernel@vger.kernel.org>; kvm list <kvm@vger.kernel.org>;
+> > > linux-coco@lists.linux.dev; linux-mm@kvack.org; Linux Crypto Mailing
+> > > List <linux-crypto@vger.kernel.org>; Thomas Gleixner
+> > > <tglx@linutronix.de>; Ingo Molnar <mingo@redhat.com>; Joerg Roedel
+> > > <jroedel@suse.de>; Lendacky, Thomas <Thomas.Lendacky@amd.com>; H.
+> > > Peter Anvin <hpa@zytor.com>; Ard Biesheuvel <ardb@kernel.org>; Paolo
+> > > Bonzini <pbonzini@redhat.com>; Sean Christopherson
+> > > <seanjc@google.com>; Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng
+> > > Li <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Andy
+> > > Lutomirski <luto@kernel.org>; Dave Hansen
+> > > <dave.hansen@linux.intel.com>; Sergio Lopez <slp@redhat.com>; Peter
+> > > Zijlstra <peterz@infradead.org>; Srinivas Pandruvada
+> > > <srinivas.pandruvada@linux.intel.com>; David Rientjes
+> > > <rientjes@google.com>; Dov Murik <dovmurik@linux.ibm.com>; Tobin
+> > > Feldman-Fitzthum <tobin@ibm.com>; Borislav Petkov <bp@alien8.de>;
+> > > Roth, Michael <Michael.Roth@amd.com>; Vlastimil Babka
+> > > <vbabka@suse.cz>; Kirill A . Shutemov <kirill@shutemov.name>; Andi
+> > > Kleen <ak@linux.intel.com>; Tony Luck <tony.luck@intel.com>; Marc
+> > > Orr <marcorr@google.com>; Sathyanarayanan Kuppuswamy
+> > > <sathyanarayanan.kuppuswamy@linux.intel.com>; Pavan Kumar Paluri
+> > > <papaluri@amd.com>
+> > > Subject: Re: [PATCH Part2 v5 23/45] KVM: SVM: Add KVM_SNP_INIT
+> > > command
+> > >
+> > > On Mon, Jun 13, 2022 at 6:21 PM Ashish Kalra <ashkalra@amd.com> wrote=
+:
+> > > >
+> > > >
+> > > > On 6/13/22 23:33, Alper Gun wrote:
+> > > > > On Mon, Jun 13, 2022 at 4:15 PM Ashish Kalra <ashkalra@amd.com> w=
+rote:
+> > > > >> Hello Alper,
+> > > > >>
+> > > > >> On 6/13/22 20:58, Alper Gun wrote:
+> > > > >>> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd
+> > > > >>> *argp)
+> > > > >>>>    {
+> > > > >>>> +       bool es_active =3D (argp->id =3D=3D KVM_SEV_ES_INIT ||
+> > > > >>>> + argp->id =3D=3D KVM_SEV_SNP_INIT);
+> > > > >>>>           struct kvm_sev_info *sev =3D &to_kvm_svm(kvm)->sev_i=
+nfo;
+> > > > >>>> -       bool es_active =3D argp->id =3D=3D KVM_SEV_ES_INIT;
+> > > > >>>> +       bool snp_active =3D argp->id =3D=3D KVM_SEV_SNP_INIT;
+> > > > >>>>           int asid, ret;
+> > > > >>>>
+> > > > >>>>           if (kvm->created_vcpus) @@ -249,12 +269,22 @@
+> > > > >>>> static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd =
+*argp)
+> > > > >>>>                   return ret;
+> > > > >>>>
+> > > > >>>>           sev->es_active =3D es_active;
+> > > > >>>> +       sev->snp_active =3D snp_active;
+> > > > >>>>           asid =3D sev_asid_new(sev);
+> > > > >>>>           if (asid < 0)
+> > > > >>>>                   goto e_no_asid;
+> > > > >>>>           sev->asid =3D asid;
+> > > > >>>>
+> > > > >>>> -       ret =3D sev_platform_init(&argp->error);
+> > > > >>>> +       if (snp_active) {
+> > > > >>>> +               ret =3D verify_snp_init_flags(kvm, argp);
+> > > > >>>> +               if (ret)
+> > > > >>>> +                       goto e_free;
+> > > > >>>> +
+> > > > >>>> +               ret =3D sev_snp_init(&argp->error);
+> > > > >>>> +       } else {
+> > > > >>>> +               ret =3D sev_platform_init(&argp->error);
+> > > > >>> After SEV INIT_EX support patches, SEV may be initialized in th=
+e platform late.
+> > > > >>> In my tests, if SEV has not been initialized in the platform
+> > > > >>> yet, SNP VMs fail with SEV_DF_FLUSH required error. I tried
+> > > > >>> calling SEV_DF_FLUSH right after the SNP platform init but
+> > > > >>> this time it failed later on the SNP launch update command
+> > > > >>> with SEV_RET_INVALID_PARAM error. Looks like there is another
+> > > > >>> dependency on SEV platform initialization.
+> > > > >>>
+> > > > >>> Calling sev_platform_init for SNP VMs fixes the problem in our =
+tests.
+> > > > >> Trying to get some more context for this issue.
+> > > > >>
+> > > > >> When you say after SEV_INIT_EX support patches, SEV may be
+> > > > >> initialized in the platform late, do you mean sev_pci_init()->se=
+v_snp_init() ...
+> > > > >> sev_platform_init() code path has still not executed on the host=
+ BSP ?
+> > > > >>
+> > > > > Correct, INIT_EX requires the file system to be ready and there
+> > > > > is a ccp module param to call it only when needed.
+> > > > >
+> > > > > MODULE_PARM_DESC(psp_init_on_probe, " if true, the PSP will be
+> > > > > initialized on module init. Else the PSP will be initialized on
+> > > > > the first command requiring it");
+> > > > >
+> > > > > If this module param is false, it won't initialize SEV on the
+> > > > > platform until the first SEV VM.
+> > > > >
+> > > > Ok, that makes sense.
+> > > >
+> > > > So the fix will be to call sev_platform_init() unconditionally
+> > > > here in sev_guest_init(), and both sev_snp_init() and
+> > > > sev_platform_init() are protected from being called again, so
+> > > > there won't be any issues if these functions are invoked again at
+> > > > SNP/SEV VM launch if they have been invoked earlier during module i=
+nit.
+> > >
+> > > >That's one solution. I don't know if there is a downside to the syst=
+em for enabling SEV if SNP is being enabled but another solution could be t=
+o just directly place a DF_FLUSH command instead of calling sev_platform_in=
+it().
+> > >
+> > > Actually sev_platform_init() is already called on module init if psp_=
+init_on_probe is not false. Only need to ensure that SNP firmware is initia=
+lized first with SNP_INIT command.
+> >
+> > > But if psp_init_on_probe is false, sev_platform_init() isn't called d=
+own this path. Alper has suggested we always call sev_platform_init() but w=
+e could just place an SEV_DF_FLUSH command instead. Or am I still missing s=
+omething?
+> >
+> > >After SEV INIT_EX support patches, SEV may be initialized in the platf=
+orm late.
+> > > In my tests, if SEV has not been initialized in the platform  yet,
+> > >SNP VMs fail with SEV_DF_FLUSH required error. I tried  calling
+> > >SEV_DF_FLUSH right after the SNP platform init.
+> >
+> > Are you getting the DLFLUSH_REQUIRED error after the SNP activate comma=
+nd ?
+> >
+> > Also did you use the SEV_DF_FLUSH command or the SNP_DF_FLUSH command ?
+> >
+> > With SNP you need to use SNP_DF_FLUSH command.
+> >
+> > Thanks,
+> > Ashish
