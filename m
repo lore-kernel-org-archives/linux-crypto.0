@@ -2,189 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EBE3C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 08:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6877DCCA47E
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 12:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242407AbiFNIxt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jun 2022 04:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58816 "EHLO
+        id S242617AbiFNMaz (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Jun 2022 08:30:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355973AbiFNIxI (ORCPT
+        with ESMTP id S1356831AbiFNM3h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jun 2022 04:53:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2139D14D36
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 01:53:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655196786;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vkrp4CO/9UvJmo5cc1dfyzRQg7YqDey+RKfYJG/5u98=;
-        b=hCA1H4J1s2PRIO6VVPDP+i3H1U1YrD+b7GOkc4pjgNsMFf8VAxyuCe7NjpDI6y/IrFjKFj
-        kIxVnEQg/lTg5OQJtCXN7dFhxzZS93F3BNoJ+ol1DIOcKi1ybm5Ksf4e1GCuotO87XjwIf
-        e3uYXKYlYKpw0st3NrNmyw8Au050p2I=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-451-7-SVUyi2MX2rrMf81G7u_g-1; Tue, 14 Jun 2022 04:53:04 -0400
-X-MC-Unique: 7-SVUyi2MX2rrMf81G7u_g-1
-Received: by mail-lf1-f69.google.com with SMTP id f32-20020a0565123b2000b004791bf1af10so4228207lfv.1
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 01:53:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vkrp4CO/9UvJmo5cc1dfyzRQg7YqDey+RKfYJG/5u98=;
-        b=BbRmsmUTBmWp9y0LYJVxQFcDnBkrzIw+nq/8Uh5loVL2TOJAWcasJ+KBPLpGhcxzUA
-         507J1AXOIg2QkdchpXggCqc98y6z2dw7XlX9yLhkRxpNs1H/7Fp//mg8PNBmu0ytiW4a
-         ouN8qnxKn9bD37hbV1XG0HUa430V2EhOYRHT22Hvwv10Oa9HM90/DxFSRVDu02h78XuW
-         PHyCaustWE6cO2edJY8U7IHYRqvI4at0aZTtHnxRpwx2PUlH3n1mDFXD55lpJ/2yMxcK
-         nL/K7bi2ffVUgaeR+oiKYpvkTQWRBb5/gLAEXM3PeAwxr5md9beYQP8Vrn6sAvgGwdIU
-         m+BQ==
-X-Gm-Message-State: AJIora+xZ61d0qX5Ocxvonn3D9QJ3kaVH3vr5pNQjUgu/WKSBTRhq5PU
-        dRZ9jRmG7o0869EwjmLctU9I01QBO0Koi6O+cHiZjvqU2cTPBsMpYZybjgnm3RjsNQd/mKz5PcY
-        or/LUpKdIEYgVr/mUsrEpwJh2QIKh9jw4QSN3NFQA
-X-Received: by 2002:a05:6512:3130:b0:479:385f:e2ac with SMTP id p16-20020a056512313000b00479385fe2acmr2413167lfd.575.1655196782570;
-        Tue, 14 Jun 2022 01:53:02 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1v4GFXDXwQ+WJme+RK3CludKMXoAn8uXS7Pj1PsZfLPvN+oKO5SkXXzy51Kwnu4qCl2+DwKCFXMBbWyhCpH97A=
-X-Received: by 2002:a05:6512:3130:b0:479:385f:e2ac with SMTP id
- p16-20020a056512313000b00479385fe2acmr2413138lfd.575.1655196781990; Tue, 14
- Jun 2022 01:53:01 -0700 (PDT)
+        Tue, 14 Jun 2022 08:29:37 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5A582A700;
+        Tue, 14 Jun 2022 05:29:35 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LMnly0ByJzjY3k;
+        Tue, 14 Jun 2022 20:28:30 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 14 Jun 2022 20:29:34 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
+ (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 14 Jun
+ 2022 20:29:33 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-accelerators@lists.ozlabs.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        <zhangfei.gao@linaro.org>, <wangzhou1@hisilicon.com>,
+        <yekai13@huawei.com>
+Subject: [PATCH 2/3] Documentation: add a isolation strategy vfs node for uacce
+Date:   Tue, 14 Jun 2022 20:23:10 +0800
+Message-ID: <20220614122311.824-6-yekai13@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20220614122311.824-1-yekai13@huawei.com>
+References: <20220614122311.824-1-yekai13@huawei.com>
 MIME-Version: 1.0
-References: <0000000000008ea7ac05e09b46a6@google.com> <CACT4Y+Z8fdbQ9Kq1gHSha2q7a6RrOajbPKrSVCFyLNS95XkVgQ@mail.gmail.com>
- <CACGkMEuK=bYcpNfjcsh64K0_-nYX2btw9Mi9uWsCYcfENBcHuA@mail.gmail.com> <CACT4Y+YF+Jo5kgjqBouw3NnKUq0pxF3geJhbACpN3QgtHSj8kQ@mail.gmail.com>
-In-Reply-To: <CACT4Y+YF+Jo5kgjqBouw3NnKUq0pxF3geJhbACpN3QgtHSj8kQ@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 14 Jun 2022 16:52:50 +0800
-Message-ID: <CACGkMEtaxSBzY+it6N8UmNssDxiCGJ48YrVQEPQSpEisedkwFg@mail.gmail.com>
-Subject: Re: [syzbot] upstream boot error: INFO: task hung in hwrng_register
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+6da75abeed821109137b@syzkaller.appspotmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux@dominikbrodowski.net, llvm@lists.linux.dev, mpm@selenic.com,
-        syzkaller-bugs@googlegroups.com,
-        Laurent Vivier <lvivier@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 4:50 PM Dmitry Vyukov <dvyukov@google.com> wrote:
->
-> On Tue, 14 Jun 2022 at 10:07, Jason Wang <jasowang@redhat.com> wrote:
-> > > On Sat, 4 Jun 2022 at 10:46, syzbot
-> > > <syzbot+6da75abeed821109137b@syzkaller.appspotmail.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > syzbot found the following issue on:
-> > > >
-> > > > HEAD commit:    032dcf09e2bf Merge tag 'gpio-fixes-for-v5.19-rc1' of git:/..
-> > > > git tree:       upstream
-> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=14409a93f00000
-> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=99f457384a4fea79
-> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=6da75abeed821109137b
-> > > > compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > >
-> > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > Reported-by: syzbot+6da75abeed821109137b@syzkaller.appspotmail.com
-> > >
-> > > +Jason, Laurent
-> > >
-> > > This started appearing at the same time as 'task hung in
-> > > add_early_randomness" bug reports:
-> > > https://syzkaller.appspot.com/bug?id=256d08cc261a3c38832064a33df4c928b3cd0ef0
-> > > https://syzkaller.appspot.com/bug?id=be1d99e09e499aed3939dc678718371984104e5c
-> > > https://syzkaller.appspot.com/bug?id=1cd11df5d984c694e3e7fc9fe271389b2340bed0
-> > > https://syzkaller.appspot.com/bug?id=35496bafab4c3f81f0b0d6d72c69787300629740
-> > >
-> > > Is this also fixed by "virtio-rng: make device ready before making
-> > > request" patch?
-> >
-> > Yes, I think so.
-> >
-> > Thanks
->
-> Let's tell the bot so that it reports such bugs in future:
->
-> #syz fix: virtio-rng: make device ready before making request
+Update documentation describing DebugFS that could help to
+configure hard error frequency for users in th user space.
 
-Ok.
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ Documentation/ABI/testing/sysfs-driver-uacce | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Thanks
-
->
->
-> > > > INFO: task swapper/0:1 blocked for more than 143 seconds.
-> > > >       Not tainted 5.18.0-syzkaller-13760-g032dcf09e2bf #0
-> > > > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > > > task:swapper/0       state:D stack:21080 pid:    1 ppid:     0 flags:0x00004000
-> > > > Call Trace:
-> > > >  <TASK>
-> > > >  context_switch kernel/sched/core.c:5116 [inline]
-> > > >  __schedule+0x957/0xec0 kernel/sched/core.c:6428
-> > > >  schedule+0xeb/0x1b0 kernel/sched/core.c:6500
-> > > >  schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6559
-> > > >  __mutex_lock_common+0xecf/0x26c0 kernel/locking/mutex.c:679
-> > > >  __mutex_lock kernel/locking/mutex.c:747 [inline]
-> > > >  mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
-> > > >  add_early_randomness drivers/char/hw_random/core.c:69 [inline]
-> > > >  hwrng_register+0x3bf/0x680 drivers/char/hw_random/core.c:599
-> > > >  virtrng_scan+0x3e/0x90 drivers/char/hw_random/virtio-rng.c:205
-> > > >  virtio_dev_probe+0xa03/0xba0 drivers/virtio/virtio.c:313
-> > > >  call_driver_probe+0x96/0x250
-> > > >  really_probe+0x220/0x940 drivers/base/dd.c:634
-> > > >  __driver_probe_device+0x1f4/0x3f0 drivers/base/dd.c:764
-> > > >  driver_probe_device+0x50/0x240 drivers/base/dd.c:794
-> > > >  __driver_attach+0x35f/0x5a0 drivers/base/dd.c:1163
-> > > >  bus_for_each_dev+0x188/0x1f0 drivers/base/bus.c:301
-> > > >  bus_add_driver+0x32f/0x600 drivers/base/bus.c:618
-> > > >  bus_add_driver+0x32f/0x600 drivers/base/bus.c:618
-> > > >  driver_register+0x2e9/0x3e0 drivers/base/driver.c:240
-> > > >  do_one_initcall+0xbd/0x2b0 init/main.c:1295
-> > > >  do_initcall_level+0x168/0x218 init/main.c:1368
-> > > >  do_initcalls+0x4b/0x8c init/main.c:1384
-> > > >  kernel_init_freeable+0x43a/0x5c3 init/main.c:1610
-> > > >  kernel_init+0x19/0x2b0 init/main.c:1499
-> > > >  ret_from_fork+0x1f/0x30
-> > > >  </TASK>
-> > > >
-> > > > Showing all locks held in the system:
-> > > > 2 locks held by swapper/0/1:
-> > > >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:835 [inline]
-> > > >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1054 [inline]
-> > > >  #0: ffff8881468d4170 (&dev->mutex){....}-{3:3}, at: __driver_attach+0x353/0x5a0 drivers/base/dd.c:1162
-> > > >  #1: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: add_early_randomness drivers/char/hw_random/core.c:69 [inline]
-> > > >  #1: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: hwrng_register+0x3bf/0x680 drivers/char/hw_random/core.c:599
-> > > > 2 locks held by pr/ttyS0/16:
-> > > > 1 lock held by khungtaskd/29:
-> > > >  #0: ffffffff8cb1eee0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
-> > > > 2 locks held by kworker/u4:4/56:
-> > > >  #0: ffff888011c69138 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x796/0xd10 kernel/workqueue.c:2262
-> > > >  #1: ffffc900013e7d00 ((work_completion)(&(&kfence_timer)->work)){+.+.}-{0:0}, at: process_one_work+0x7d0/0xd10 kernel/workqueue.c:2264
-> > > > 1 lock held by hwrng/755:
-> > > >  #0: ffffffff8d24ccc8 (reading_mutex){+.+.}-{3:3}, at: hwrng_fillfn+0xec/0x470 drivers/char/hw_random/core.c:503
-> > > >
-> > > > =============================================
-> > > >
-> > > >
-> > > >
-> > > > ---
-> > > > This report is generated by a bot. It may contain errors.
-> > > > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > > > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> > > >
-> > > > syzbot will keep track of this issue. See:
-> > > > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> > > >
-> > > > --
-> > > > You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
-> > > > To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
-> > > > To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/0000000000008ea7ac05e09b46a6%40google.com.
-> > >
-> >
->
+diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+index 08f2591138af..0c4226364182 100644
+--- a/Documentation/ABI/testing/sysfs-driver-uacce
++++ b/Documentation/ABI/testing/sysfs-driver-uacce
+@@ -19,6 +19,23 @@ Contact:        linux-accelerators@lists.ozlabs.org
+ Description:    Available instances left of the device
+                 Return -ENODEV if uacce_ops get_available_instances is not provided
+ 
++What:           /sys/class/uacce/<dev_name>/isolate_strategy
++Date:           Jun 2022
++KernelVersion:  5.19
++Contact:        linux-accelerators@lists.ozlabs.org
++Description:    A vfs node that used to configures the hardware
++                error frequency. This frequency is abstract. Like once an hour
++                or once a day. The specific isolation strategy can be defined in
++                each driver module.
++
++What:           /sys/class/uacce/<dev_name>/isolate
++Date:           Jun 2022
++KernelVersion:  5.19
++Contact:        linux-accelerators@lists.ozlabs.org
++Description:    A vfs node that show the device isolated state. The value 0
++                means that the device is working. The value 1 means that the
++                device has been isolated.
++
+ What:           /sys/class/uacce/<dev_name>/algorithms
+ Date:           Feb 2020
+ KernelVersion:  5.7
+-- 
+2.33.0
 
