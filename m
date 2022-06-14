@@ -2,69 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 392A3C43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 14:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D20BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jun 2022 14:14:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236262AbiFNOMQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jun 2022 10:12:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54514 "EHLO
+        id S243210AbiFNOOq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 14 Jun 2022 10:14:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235039AbiFNOMP (ORCPT
+        with ESMTP id S233498AbiFNOOo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jun 2022 10:12:15 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478CA33884
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:12:14 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d5so5250929plo.12
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:12:14 -0700 (PDT)
+        Tue, 14 Jun 2022 10:14:44 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D78D02C645
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:14:43 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id q140so8626937pgq.6
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jun 2022 07:14:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=wt50VBwjqpTS+/G8tO4GidOfAF7iUzFpw0Pr+oMctoQ=;
-        b=w17NCk5v7hTrKT98JalJHGiwkZUnysDrIOt0xIL+ZfgmulN2Pe7Y44CgfGG9uiWDQf
-         t4E+EOVCM04+uOCFXCRa7SS1ehi2ga6R8OqpTHT45228US8eYJ4w+wIIbwc9UIdi2Lf6
-         q7iU/oCE7khTKZk0S9NTDBXTOQcrOPEflJqIEmIaB0o+J8JOGvp//Wv9utdmXloEgDkY
-         0UEXuitlJReGMKuUpICVPV/DgSXwnVwIHtKQ3xm8ffsyJIQYFRDqQRRHooKvg80U4fdG
-         G+eMNmTEaXA85UFcw6A1FGTbgP2hIKYKLBFTwzyopOTYKUAKWW/TzSVtM0VIU3CoNGAw
-         L1/A==
+        bh=EEofKDw4c+3KYJpmhYr5DO8YGIRsl7tk3TGnQLh0NKs=;
+        b=Rbtb/30uLf9QMQYK/Iy4cOLR0SKmlvSaSP8h94/Lv78jLnHt2sYxIoMFVbqtuLibAK
+         UdHOZNkOHdZJ2aopKY0PpPbARcsJJHZ3NBYT5b0vgb0VlFo4cAA9mUxabTFh+CmiU0Mp
+         2tlYm9LL0COJt9Wi7LNBxwnigBKCLbEII1OhBGvFtfC4uHIJRpxqtz16keqiBVCBKlXf
+         QQuA+Rv+T8MpFeLCKVRcVb0dV9Ai48LthU3FVGgNPi4ViS7Ee9JMAkBbTPW4Dk4yKdT5
+         GYPaZn9rEULOgHkbFrh7eUxzfARv+0rYVM1925TIlzhDVYwXOfSoAV2gq2TfvA/QRJOi
+         xIQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=wt50VBwjqpTS+/G8tO4GidOfAF7iUzFpw0Pr+oMctoQ=;
-        b=bIR4a0Qfv+g5tA7/rwYPUkaLe9GFYKBig1DbUHn3A5mDCvQBPVJijiV+jvUsh5ToRo
-         SJaAsKJwLwW7fcJCs+Y4MJ7AEQx+RySd2P9LbAF91Eo/ZZQ9BDrD26v4iUKdlE3d2Qmo
-         9XIUP71BdRXbJvOG1kozY0CtHwblnd+4ViJer5cnT1FO2NebFUkM0iYpdHrxV6UtZgl3
-         WBAsFMqeMmvz1xdmkU5/g6UF97x96IhUCJs+98LB32ICndfTNlHzKN0YQ/ATSs7cbLC4
-         m0NROKRkuBXO0PRGYzdS9qoASwdh74lYzAn9xxIsOWgAJ3s+W/eGLDu5c3DfYxo6JaNS
-         2k7Q==
-X-Gm-Message-State: AJIora8j7tkmT7iNR04CBMhhjq8ZtKevYqLnYqESRfLiQQB7qjbXReJE
-        SgXR7vLjhDM5xT5CK8wdGwCbFg==
-X-Google-Smtp-Source: AGRyM1vSg+8mvYVjkbD5Gsw8tnb163S1V8imKaSefeB3v7oLpzERW0jK7HH6HZfBDLZE1BSvuu2sJw==
-X-Received: by 2002:a17:902:eccd:b0:166:3e34:4d05 with SMTP id a13-20020a170902eccd00b001663e344d05mr4493060plh.75.1655215933716;
-        Tue, 14 Jun 2022 07:12:13 -0700 (PDT)
+        bh=EEofKDw4c+3KYJpmhYr5DO8YGIRsl7tk3TGnQLh0NKs=;
+        b=DO5cSKDWYKXc6c8D+CoZ8TM9rPD4ZQulzOXxp9O6+fD2NK6dsTlMDuCDJLMbopGLg1
+         9rQFiYWoQtzd6LnIT8MwmtlptbPcQxkr1yS48NZXDhFFgPvZ/Ipim4qDoozvTKRqlbI6
+         s9eoqjzwDqAGrpAyrQUm2nQJJY3iZ/YQJlbn4S54wN38mzoo/KeU57Z2DDDWpSGoB0N/
+         XZE1j1OViyIhT+qWu0f9B8UkQFh8ZsUWePUcfhJUiq6X/OLmhvz95nzG/GzlfBCjtGGp
+         1R9O/2yOBXq0NdGeZYX2vGXmVTr1aw+pqHnIPu5AhVZhvYwtjWlIi7g1oAEtYxbpAtr0
+         w8qg==
+X-Gm-Message-State: AOAM530OdQr7TlJSz+KFmu45ty4UagKAAtHNQ35VQbUeX/mKI83SEXjx
+        +MUx+somTshLGH+0kgu3kITCZg==
+X-Google-Smtp-Source: ABdhPJzIgnJpMgvFzFqlwq/947R6ZtySbDRGFzkyrCmQlC3cKHBBt/qYiLpD6IicLJGhVcrSnmCMOg==
+X-Received: by 2002:aa7:83d0:0:b0:50c:eb2b:8e8a with SMTP id j16-20020aa783d0000000b0050ceb2b8e8amr4992915pfn.31.1655216083155;
+        Tue, 14 Jun 2022 07:14:43 -0700 (PDT)
 Received: from [10.20.0.186] ([199.101.192.9])
-        by smtp.gmail.com with ESMTPSA id v13-20020a637a0d000000b003fad46ceb85sm7920085pgc.7.2022.06.14.07.12.10
+        by smtp.gmail.com with ESMTPSA id jj10-20020a170903048a00b00167804a044fsm7299458plb.56.2022.06.14.07.14.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jun 2022 07:12:13 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] crypto: hisilicon/qm - defining the device
- isolation strategy
+        Tue, 14 Jun 2022 07:14:42 -0700 (PDT)
+Subject: Re: [PATCH 1/3] uacce: supports device isolation feature
 To:     Kai Ye <yekai13@huawei.com>, gregkh@linuxfoundation.org,
         herbert@gondor.apana.org.au
-Cc:     linuxarm@huawei.com, linux-kernel@vger.kernel.org,
-        wangzhou1@hisilicon.com, linux-crypto@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org
+Cc:     linux-crypto@vger.kernel.org, linux-accelerators@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linuxarm@huawei.com,
+        wangzhou1@hisilicon.com
 References: <20220614122943.1406-1-yekai13@huawei.com>
- <20220614122943.1406-4-yekai13@huawei.com>
+ <20220614122943.1406-5-yekai13@huawei.com>
 From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <82ce379f-73f4-0e57-ec32-e1ab1d3ef04d@linaro.org>
-Date:   Tue, 14 Jun 2022 22:12:07 +0800
+Message-ID: <452a54f0-27ce-6c0d-da56-883b0204f57c@linaro.org>
+Date:   Tue, 14 Jun 2022 22:14:38 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20220614122943.1406-4-yekai13@huawei.com>
+In-Reply-To: <20220614122943.1406-5-yekai13@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -74,79 +73,58 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 2022/6/14 下午8:29, Kai Ye via Linux-accelerators wrote:
-> Define the device isolation strategy by the device driver. if the
-> AER error frequency exceeds the value of setting for a certain
-> period of time, The device will not be available in user space. The VF
-> device use the PF device isolation strategy. All the hardware errors
-> are processed by PF driver.
+On 2022/6/14 下午8:29, Kai Ye wrote:
+> UACCE add the hardware error isolation API. Users can configure
+> the error frequency threshold by this vfs node. This API interface
+> certainly supports the configuration of user protocol strategy. Then
+> parse it inside the device driver. UACCE only reports the device
+> isolate state. When the error frequency is exceeded, the device
+> will be isolated. The isolation strategy should be defined in each
+> driver module.
 >
 > Signed-off-by: Kai Ye <yekai13@huawei.com>
+> Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 > ---
->   drivers/crypto/hisilicon/qm.c | 157 +++++++++++++++++++++++++++++++---
->   include/linux/hisi_acc_qm.h   |   9 ++
->   2 files changed, 152 insertions(+), 14 deletions(-)
+>   drivers/misc/uacce/uacce.c | 51 ++++++++++++++++++++++++++++++++++++++
+>   include/linux/uacce.h      | 15 ++++++++++-
+>   2 files changed, 65 insertions(+), 1 deletion(-)
 >
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index ad83c194d664..47c41fa52693 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -12,7 +12,6 @@
->   #include <linux/pm_runtime.h>
->   #include <linux/seq_file.h>
->   #include <linux/slab.h>
-> -#include <linux/uacce.h>
->   #include <linux/uaccess.h>
->   #include <uapi/misc/uacce/hisi_qm.h>
->   #include <linux/hisi_acc_qm.h>
-> @@ -417,6 +416,16 @@ struct hisi_qm_resource {
->   	struct list_head list;
->   };
+> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+> index b6219c6bfb48..4d9d9aeb145a 100644
+> --- a/drivers/misc/uacce/uacce.c
+> +++ b/drivers/misc/uacce/uacce.c
+> @@ -12,6 +12,20 @@ static dev_t uacce_devt;
+>   static DEFINE_MUTEX(uacce_mutex);
+>   static DEFINE_XARRAY_ALLOC(uacce_xa);
 >   
-> +/**
-> + * struct qm_hw_err - structure of describes the device err
-> + * @list: hardware error list
-> + * @tick_stamp: timestamp when the error occurred
-> + */
-> +struct qm_hw_err {
-> +	struct list_head list;
-> +	unsigned long long tick_stamp;
-> +};
+> +static int cdev_get(struct device *dev, void *data)
+> +{
+> +	struct uacce_device *uacce;
+> +	struct device **t_dev = data;
 > +
->   struct hisi_qm_hw_ops {
->   	int (*get_vft)(struct hisi_qm *qm, u32 *base, u32 *number);
->   	void (*qm_db)(struct hisi_qm *qm, u16 qn,
-> @@ -3278,6 +3287,7 @@ static int hisi_qm_uacce_get_queue(struct uacce_device *uacce,
->   	qp->event_cb = qm_qp_event_notifier;
->   	qp->pasid = arg;
->   	qp->is_in_kernel = false;
-> +	atomic_inc(&qm->uacce_ref);
->   
->   	return 0;
->   }
-> @@ -3285,7 +3295,9 @@ static int hisi_qm_uacce_get_queue(struct uacce_device *uacce,
->   static void hisi_qm_uacce_put_queue(struct uacce_queue *q)
+> +	uacce = container_of(dev, struct uacce_device, dev);
+> +	if (uacce->parent == *t_dev) {
+> +		*t_dev = dev;
+> +		return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>   static int uacce_start_queue(struct uacce_queue *q)
 >   {
->   	struct hisi_qp *qp = q->priv;
-> +	struct hisi_qm *qm = qp->qm;
+>   	int ret = 0;
+> @@ -346,12 +360,47 @@ static ssize_t region_dus_size_show(struct device *dev,
+>   		       uacce->qf_pg_num[UACCE_QFRT_DUS] << PAGE_SHIFT);
+>   }
 >   
-> +	atomic_dec(&qm->uacce_ref);
-
-Can we use qm state or qp state instead?
-
-enum qm_state {
-         QM_INIT = 0,
-         QM_START,
-         QM_CLOSE,
-         QM_STOP,
-};
-
-enum qp_state {
-         QP_INIT = 1,
-         QP_START,
-         QP_STOP,
-         QP_CLOSE,
-};
+> +static ssize_t isolate_show(struct device *dev,
+> +			    struct device_attribute *attr, char *buf)
+> +{
+> +	struct uacce_device *uacce = to_uacce_device(dev);
+> +
+> +	return sysfs_emit(buf, "%d\n", uacce->ops->get_isolate_state(uacce));
+Are these two isolate ops  required or optional?
+Do we need consider NULL pointer?
 
 Thanks
-
