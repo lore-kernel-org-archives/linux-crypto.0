@@ -2,114 +2,130 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96894C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jun 2022 09:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92009C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jun 2022 09:19:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346689AbiFOJOr (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jun 2022 05:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
+        id S245207AbiFOJTC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 15 Jun 2022 05:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347196AbiFOJNt (ORCPT
+        with ESMTP id S241370AbiFOJTC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jun 2022 05:13:49 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E689393D9
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2022 02:13:48 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id s37so8203033pfg.11
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2022 02:13:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cApAEWtZBNz7UY2lzjb00JFgiaDz9EH6nqt1F0MvTwA=;
-        b=11Ue/j2OxtkuGufH5THsd7RTX2PhW44eGxiMlp4kuhaX8NAQdxItmm+qVby1yX9/8f
-         xZMPptt1Jr6zbWnucp4Fo7rNYJ/L7h2w+wae2kSxNgcmRS8AttRSRZ8lyU83JMK/B102
-         4VMGvf4jL/ArVxVb4jzUp6zWQg9guosQo+RzXFMu66qJbDYLSHnkEH+W5jt7Y4Myw8LO
-         CbtaMOCJ+K3tv4nmU4qqVHBGP3q1/+9KQWB/ZpbY5TZ2W16kTxACGsGFhX3PEfUlfSas
-         EKF5JkwCrW7uo7ia/Ttgm3fVHUYaUxeDAQH/fwz9aqMjEJmMEGeGnph4MLnjfiD1OHng
-         Tstg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cApAEWtZBNz7UY2lzjb00JFgiaDz9EH6nqt1F0MvTwA=;
-        b=4o8aBwpbdQpHni1fA4Zc6p3rHAiEaTt6bxQmXvf32D3bUq1oWIm9IjJkAA8KJ3uw8z
-         gb0UqRVWyq4vy6dY4oaXSzYuUWVfXlrTNG9TZuAEEMOVTOGzkt2HDc/pJSlMVqc2wQlK
-         tyxm3iBWtjoyPa8jtmukQ9qPM5/biUg9BmgN5iuabUorbuhvDJH+TvDy5rgtqDfLJN+7
-         PXMO96sOUAmm9k6kLMuGqeUxfmHUwGiKbyRWIi3a9MnXgJ7LJ1FBM7b1f1vUrw6uKYzF
-         otM7z4iWU6xaV4TRNbZ+DjMC00F5RR4GptP9PdoR/ZK67Czix46vfIw9u647BCF6FvlJ
-         Se2Q==
-X-Gm-Message-State: AOAM530/4zIXJMK51YSEGaklgIkckS+C3OEzRnv6jHep20Gta8+QOybc
-        0kyu2SQS59q7bW7XLvA0T9EK+A==
-X-Google-Smtp-Source: ABdhPJyXl/iDCJSUxoekdovzpxElEeTc1BQ8vIzuFNVfDzaNgyjhQF6dUsiLz4DbC7uBma8Unp9R6g==
-X-Received: by 2002:a63:cf51:0:b0:408:85f4:fb33 with SMTP id b17-20020a63cf51000000b0040885f4fb33mr8084169pgj.589.1655284427786;
-        Wed, 15 Jun 2022 02:13:47 -0700 (PDT)
-Received: from FVFDK26JP3YV.bytedance.net ([139.177.225.234])
-        by smtp.gmail.com with ESMTPSA id l3-20020a17090aaa8300b001e08461ceaesm1188414pjq.37.2022.06.15.02.13.44
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Jun 2022 02:13:47 -0700 (PDT)
-From:   Lei He <helei.sig11@bytedance.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     helei.sig11@bytedance.com, pizhenwei@bytedance.com
-Subject: [PATCH] crypto: testmgr - fix version number of RSA tests
-Date:   Wed, 15 Jun 2022 17:13:17 +0800
-Message-Id: <20220615091317.36995-1-helei.sig11@bytedance.com>
-X-Mailer: git-send-email 2.29.2
+        Wed, 15 Jun 2022 05:19:02 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3D91A83E;
+        Wed, 15 Jun 2022 02:19:01 -0700 (PDT)
+Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LNKR06hyHzSgvS;
+        Wed, 15 Jun 2022 17:15:40 +0800 (CST)
+Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 17:18:58 +0800
+Received: from [10.67.103.212] (10.67.103.212) by
+ dggpeml100012.china.huawei.com (7.185.36.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 17:18:58 +0800
+Subject: Re: [PATCH v2 2/3] Documentation: add a isolation strategy vfs node
+ for uacce
+To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+References: <20220614122943.1406-1-yekai13@huawei.com>
+ <20220614122943.1406-3-yekai13@huawei.com> <YqiCEHTauCoceNNI@kroah.com>
+ <20220615094813.000026a6@Huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <linux-kernel@vger.kernel.org>,
+        <linuxarm@huawei.com>, <wangzhou1@hisilicon.com>,
+        <linux-crypto@vger.kernel.org>, <zhangfei.gao@linaro.org>,
+        <linux-accelerators@lists.ozlabs.org>
+From:   "yekai(A)" <yekai13@huawei.com>
+Message-ID: <bb9c0b39-3663-107c-e725-c0374b3831c8@huawei.com>
+Date:   Wed, 15 Jun 2022 17:18:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220615094813.000026a6@Huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.103.212]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml100012.china.huawei.com (7.185.36.121)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: lei he <helei.sig11@bytedance.com>
 
-According to PKCS#1 standard, the 'otherPrimeInfos' field contains
-the information for the additional primes r_3, ..., r_u, in order.
-It shall be omitted if the version is 0 and shall contain at least
-one instance of OtherPrimeInfo if the version is 1, see:
-	https://www.rfc-editor.org/rfc/rfc3447#page-44
 
-Replace the version number '1' with 0, otherwise, some drivers may
-not pass the run-time tests.
+On 2022/6/15 16:48, Jonathan Cameron wrote:
+> On Tue, 14 Jun 2022 14:41:52 +0200
+> Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+>> On Tue, Jun 14, 2022 at 08:29:39PM +0800, Kai Ye wrote:
+>>> Update documentation describing DebugFS that could help to
+>>> configure hard error frequency for users in th user space.
+>>>
+>>> Signed-off-by: Kai Ye <yekai13@huawei.com>
+>>> ---
+>>>  Documentation/ABI/testing/sysfs-driver-uacce | 17 +++++++++++++++++
+>>>  1 file changed, 17 insertions(+)
+>>>
+>>> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+>>> index 08f2591138af..0c4226364182 100644
+>>> --- a/Documentation/ABI/testing/sysfs-driver-uacce
+>>> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+>>> @@ -19,6 +19,23 @@ Contact:        linux-accelerators@lists.ozlabs.org
+>>>  Description:    Available instances left of the device
+>>>                  Return -ENODEV if uacce_ops get_available_instances is not provided
+>>>
+>>> +What:           /sys/class/uacce/<dev_name>/isolate_strategy
+>>> +Date:           Jun 2022
+>>> +KernelVersion:  5.19
+>>> +Contact:        linux-accelerators@lists.ozlabs.org
+>>> +Description:    A vfs node that used to configures the hardware
+>>
+>> What is a "vfs node"?
+>>
+>>> +                error frequency. This frequency is abstract. Like once an hour
+>>> +                or once a day. The specific isolation strategy can be defined in
+>>> +                each driver module.
+>>
+>> No, you need to be specific here and describe the units and the format.
+>> Otherwise it is no description at all :(
+>
+> Also, rename it.   A frequency isn't a strategy.  Strategy would be something
+> like:
+>
+> * First fault
+> * Faults in moving time window.
+> * Faults in fixed time window.
+>
+> some of which would then need separate controls for the threshold and the
+> time window - those should be in separate sysfs attributes.
+>
 
-Signed-off-by: lei he <helei.sig11@bytedance.com>
----
- crypto/testmgr.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I will describe the units and the format in here.
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 4d7449fc6a65..d57f24b906f1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -186,7 +186,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- #ifndef CONFIG_CRYPTO_FIPS
- 	.key =
- 	"\x30\x81\x9A" /* sequence of 154 bytes */
--	"\x02\x01\x01" /* version - integer of 1 byte */
-+	"\x02\x01\x00" /* version - integer of 1 byte */
- 	"\x02\x41" /* modulus - integer of 65 bytes */
- 	"\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
- 	"\x90\xEF\xA0\x0D\xF3\x77\x4A\x25\x9F\x2E\x62\xB4\xC5\xD9\x9C\xB5"
-@@ -216,7 +216,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- 	}, {
- 	.key =
- 	"\x30\x82\x01\x1D" /* sequence of 285 bytes */
--	"\x02\x01\x01" /* version - integer of 1 byte */
-+	"\x02\x01\x00" /* version - integer of 1 byte */
- 	"\x02\x81\x81" /* modulus - integer of 129 bytes */
- 	"\x00\xBB\xF8\x2F\x09\x06\x82\xCE\x9C\x23\x38\xAC\x2B\x9D\xA8\x71"
- 	"\xF7\x36\x8D\x07\xEE\xD4\x10\x43\xA4\x40\xD6\xB6\xF0\x74\x54\xF5"
-@@ -260,7 +260,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- #endif
- 	.key =
- 	"\x30\x82\x02\x20" /* sequence of 544 bytes */
--	"\x02\x01\x01" /* version - integer of 1 byte */
-+	"\x02\x01\x00" /* version - integer of 1 byte */
- 	"\x02\x82\x01\x01\x00" /* modulus - integer of 256 bytes */
- 	"\xDB\x10\x1A\xC2\xA3\xF1\xDC\xFF\x13\x6B\xED\x44\xDF\xF0\x02\x6D"
- 	"\x13\xC7\x88\xDA\x70\x6B\x54\xF1\xE8\x27\xDC\xC3\x0F\x99\x6A\xFA"
--- 
-2.20.1
+Thanks
 
+Kai
+>>
+>>> +
+>>> +What:           /sys/class/uacce/<dev_name>/isolate
+>>> +Date:           Jun 2022
+>>> +KernelVersion:  5.19
+>>
+>> 5.19 will not have this change.
+>>
+>>> +Contact:        linux-accelerators@lists.ozlabs.org
+>>> +Description:    A vfs node that show the device isolated state. The value 0
+>>> +                means that the device is working. The value 1 means that the
+>>> +                device has been isolated.
+>>
+>> What does "working" or "isolated" mean?
+>>
+>> thanks,
+>>
+>> greg k-h
+>
+> .
+>
