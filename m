@@ -2,294 +2,196 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E851C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jun 2022 13:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36410C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jun 2022 15:16:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345613AbiFONC5 (ORCPT
+        id S1346960AbiFOPQb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jun 2022 09:02:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42116 "EHLO
+        Wed, 15 Jun 2022 11:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345762AbiFONC4 (ORCPT
+        with ESMTP id S1347318AbiFOPQa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jun 2022 09:02:56 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0B61CFE8;
-        Wed, 15 Jun 2022 06:02:53 -0700 (PDT)
-Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LNQT12VsPz67PwL;
-        Wed, 15 Jun 2022 21:02:45 +0800 (CST)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 15 Jun 2022 15:02:51 +0200
-Received: from localhost (10.202.226.42) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 15 Jun
- 2022 14:02:50 +0100
-Date:   Wed, 15 Jun 2022 14:02:49 +0100
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Kai Ye via Linux-accelerators 
-        <linux-accelerators@lists.ozlabs.org>
-CC:     Kai Ye <yekai13@huawei.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <linuxarm@huawei.com>,
-        <linux-kernel@vger.kernel.org>, <wangzhou1@hisilicon.com>,
-        <linux-crypto@vger.kernel.org>, <zhangfei.gao@linaro.org>
-Subject: Re: [PATCH v2 3/3] crypto: hisilicon/qm - defining the device
- isolation strategy
-Message-ID: <20220615140249.000077f8@Huawei.com>
-In-Reply-To: <20220614122943.1406-4-yekai13@huawei.com>
-References: <20220614122943.1406-1-yekai13@huawei.com>
-        <20220614122943.1406-4-yekai13@huawei.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; i686-w64-mingw32)
+        Wed, 15 Jun 2022 11:16:30 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342223DA4C
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2022 08:16:29 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id i81-20020a1c3b54000000b0039c76434147so1342164wma.1
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Jun 2022 08:16:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Wau0fGW8yZsKjnuoyb0VTR4qVyMVH48h3qQAcCmJxHM=;
+        b=gsDwJdxlq2oa/E5drVyaHd8AqIB5EsHJGZX+yJs4Bh3IZRZWhyJg1tzAiW9vxJl9/Q
+         I6bZWcAHui00mntM2ACoE/BL7ZEWL8139NyKHCSm8617afMK4Qeclks5GiCSExeiU6QX
+         YOaHEWYs3I3Hy3jaUMZzD7qnubmVcnZR/NDqb/+uIGuUaw2hDDyLoyP5qkD1GvKWhAUq
+         D1AXeoyOXog3gnba1I1g82Fzhom0FNx8iA6Uw1p3+kcd+hf9bvi1GtqbfUn9njQEvqDm
+         FiY1W9rhvE/Z600Vn+e3KWPJ+NcO0SSJof7Hrm/ZFynpXA4M3t1Sc0kVO+U1Gzj+5tOg
+         l9ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Wau0fGW8yZsKjnuoyb0VTR4qVyMVH48h3qQAcCmJxHM=;
+        b=dfgp1j/qrpweWn3HSc7mlD2Lw8BXQ2o1aJ3vCK7juZejxIGDuWGtG5AfLexEO4MrBj
+         KxdZ0YT6Cb0rbhsCGwYSexKRocDFA+XyfZIEbgi14umWdA9AC2Nkb5AGyQcbydtcFG4O
+         V1CSAY8IRP/Dm1l6j4IOAV6eXihsgla2fxDyKP02RXoXOGknTEcowGCLiVseHRce+Ng9
+         gajAFaK1uvKMkXlNqjv9SGH9YJcHfxPgQOGqg4b7y+kTyHkHwoeLUVwdc6NNSxlLMRhA
+         8ArgVdtsJ1EUSzvNRmNdPeOxHs4AHpeAISElE7/j7QoEuU0sSI77lUxmT+xnt8g5ofCF
+         Wjmg==
+X-Gm-Message-State: AJIora9+zsLa3eKQG8QmPA4JpPulTVsixHlYK/b+xDJDp+b2q66RRpOt
+        w2zg1f1P5VNSOdTXuJeqCzjL6w==
+X-Google-Smtp-Source: AGRyM1vZvWOxzMMfyRsf49tj6gKTfsbDDI74LUEsue+sAc2CHuDIhWC6vvd1UMApy4oTjuKCS103AA==
+X-Received: by 2002:a1c:29c1:0:b0:39d:86c0:3ece with SMTP id p184-20020a1c29c1000000b0039d86c03ecemr9939wmp.138.1655306187683;
+        Wed, 15 Jun 2022 08:16:27 -0700 (PDT)
+Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
+        by smtp.gmail.com with ESMTPSA id q16-20020a5d5750000000b0020e63ab5d78sm14781591wrw.26.2022.06.15.08.16.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jun 2022 08:16:26 -0700 (PDT)
+Date:   Wed, 15 Jun 2022 16:16:02 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Yang Shen <shenyang39@huawei.com>
+Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
+Message-ID: <Yqn3spLZHpAkQ9Us@myrica>
+References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.42]
-X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220610123423.27496-1-zhangfei.gao@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 14 Jun 2022 20:29:40 +0800
-Kai Ye via Linux-accelerators <linux-accelerators@lists.ozlabs.org> wrote:
+Hi,
 
-> Define the device isolation strategy by the device driver. if the
-> AER error frequency exceeds the value of setting for a certain
-> period of time, The device will not be available in user space. The VF
-> device use the PF device isolation strategy. All the hardware errors
-> are processed by PF driver.
+On Fri, Jun 10, 2022 at 08:34:23PM +0800, Zhangfei Gao wrote:
+> The uacce parent's module can be removed when uacce is working,
+> which may cause troubles.
 > 
-> Signed-off-by: Kai Ye <yekai13@huawei.com>
-
-I'll try and avoid duplicating Greg's feedback but might well overlap a bit!
-
+> If rmmod/uacce_remove happens just after fops_open: bind_queue,
+> the uacce_remove can not remove the bound queue since it is not
+> added to the queue list yet, which blocks the uacce_disable_sva.
+> 
+> Change queues_lock area to make sure the bound queue is added to
+> the list thereby can be searched in uacce_remove.
+> 
+> And uacce->parent->driver is checked immediately in case rmmod is
+> just happening.
+> 
+> Also the parent driver must always stop DMA before calling
+> uacce_remove.
+> 
+> Signed-off-by: Yang Shen <shenyang39@huawei.com>
+> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
 > ---
->  drivers/crypto/hisilicon/qm.c | 157 +++++++++++++++++++++++++++++++---
->  include/linux/hisi_acc_qm.h   |   9 ++
->  2 files changed, 152 insertions(+), 14 deletions(-)
+>  drivers/misc/uacce/uacce.c | 19 +++++++++++++------
+>  1 file changed, 13 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-> index ad83c194d664..47c41fa52693 100644
-> --- a/drivers/crypto/hisilicon/qm.c
-> +++ b/drivers/crypto/hisilicon/qm.c
-> @@ -12,7 +12,6 @@
->  #include <linux/pm_runtime.h>
->  #include <linux/seq_file.h>
->  #include <linux/slab.h>
-> -#include <linux/uacce.h>
-
-I assume you do this because you are now relying on hisi_acc_qm.h including
-uacce.h?   Generally it is better to include most headers that we use
-directly so it this still uses stuff from uacce.h then keep the include.
-
->  #include <linux/uaccess.h>
->  #include <uapi/misc/uacce/hisi_qm.h>
->  #include <linux/hisi_acc_qm.h>
-> @@ -417,6 +416,16 @@ struct hisi_qm_resource {
->  	struct list_head list;
->  };
+> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+> index 281c54003edc..b6219c6bfb48 100644
+> --- a/drivers/misc/uacce/uacce.c
+> +++ b/drivers/misc/uacce/uacce.c
+> @@ -136,9 +136,16 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+>  	if (!q)
+>  		return -ENOMEM;
 >  
-> +/**
-> + * struct qm_hw_err - structure of describes the device err
-> + * @list: hardware error list
-> + * @tick_stamp: timestamp when the error occurred
-
-tick?   Perhaps just call it timestamp if that is what it is...
-
-
-> + */
-> +struct qm_hw_err {
-> +	struct list_head list;
-> +	unsigned long long tick_stamp;
-> +};
+> +	mutex_lock(&uacce->queues_lock);
 > +
+> +	if (!uacce->parent->driver) {
 
->  
-> +/**
-> + * qm_hw_err_isolate() - Try to isolate the uacce device with its VFs
-> + * @qm: The qm which we want to configure.
-> + *
-> + * according to user's configuration of isolation strategy. Warning: this
+I don't think this is useful, because the core clears parent->driver after
+having run uacce_remove():
 
-Rewrite to make it full sentence.
+  rmmod hisi_zip		open()
+   ...				 uacce_fops_open()
+   __device_release_driver()	  ...
+    pci_device_remove()
+     hisi_zip_remove()
+      hisi_qm_uninit()
+       uacce_remove()
+        ...			  ...
+   				  mutex_lock(uacce->queues_lock)
+    ...				  if (!uacce->parent->driver)
+    device_unbind_cleanup()	  /* driver still valid, proceed */
+     dev->driver = NULL
 
-> + * API should be called while there is no user on the device, or the users
-> + * on this device are suspended by slot resetting preparation of PCI AER.
-> + */
-> +static int qm_hw_err_isolate(struct hisi_qm *qm)
-> +{
-> +	struct qm_hw_err *err, *tmp, *hw_err;
-> +	struct qm_err_isolate *isolate;
-> +	u32 count = 0;
-> +
-> +	isolate = &qm->isolate_data;
-> +
-> +#define SECONDS_PER_HOUR	3600
-> +
-> +	/* All the hw errs are processed by PF driver */
-> +	if (qm->uacce->is_vf || atomic_read(&isolate->is_isolate) ||
-> +		!isolate->hw_err_isolate_hz)
-> +		return 0;
-> +
-> +	hw_err = kzalloc(sizeof(*hw_err), GFP_ATOMIC);
-> +	if (!hw_err)
-> +		return -ENOMEM;
-blank line here to separate error handling from next bit of code.
- 
-> +	hw_err->tick_stamp = jiffies;
-> +	list_for_each_entry_safe(err, tmp, &qm->uacce_hw_errs, list) {
+Since uacce_remove() disabled SVA, the following uacce_bind_queue() will
+fail anyway. However, if uacce->flags does not have UACCE_DEV_SVA set,
+we'll proceed further and call uacce->ops->get_queue(), which does not
+exist anymore since the parent module is gone.
 
-These are ordered (I think). Could take advantage of that by
-maintaining count of elements in parallel to the list then walking
-list in right direction + stop when you reach last one to need
-deleting.
+I think we need the global uacce_mutex to serialize uacce_remove() and
+uacce_fops_open(). uacce_remove() would do everything, including
+xa_erase(), while holding that mutex. And uacce_fops_open() would try to
+obtain the uacce object from the xarray while holding the mutex, which
+fails if the uacce object is being removed.
 
+Thanks,
+Jean
 
-> +		if ((hw_err->tick_stamp - err->tick_stamp) / HZ >
-> +		    SECONDS_PER_HOUR) {
-> +			list_del(&err->list);
-> +			kfree(err);
-> +		} else {
-> +			count++;
-> +		}
-> +	}
-> +	list_add(&hw_err->list, &qm->uacce_hw_errs);
-> +
-> +	if (count >= isolate->hw_err_isolate_hz)
-> +		atomic_set(&isolate->is_isolate, 1);
-> +
-> +	return 0;
-> +}
-> +
-
-...
-
-> +static int hisi_qm_isolate_strategy_write(struct uacce_device *uacce,
-> +						const char *buf)
-> +{
-> +	struct hisi_qm *qm = uacce->priv;
-> +	unsigned long val = 0;
-> +
-> +#define MAX_ISOLATE_STRATEGY	65535
-> +
-> +	if (atomic_read(&qm->uacce_ref))
-> +		return -EBUSY;
-> +
-> +	/* must be set by PF */
-> +	if (atomic_read(&qm->isolate_data.is_isolate) || uacce->is_vf)
-
-Why is the file visible on the vf?  Hide it or don't register it for vfs.
-
-> +		return -EINVAL;
-> +
-> +	if (kstrtoul(buf, 0, &val) < 0)
-> +		return -EINVAL;
-> +
-> +	if (val > MAX_ISOLATE_STRATEGY)
-> +		return -EINVAL;
-> +
-> +	qm->isolate_data.hw_err_isolate_hz = val;
-> +	dev_info(&qm->pdev->dev,
-> +		"the value of isolate_strategy is set to %lu.\n", val);
-
-This is just noise in the log.  If someone wants to check they should read
-the sysfs file back and it reflect the new state.
-
-> +
-> +	return 0;
-> +}
-> +
-
-...
-
->  static int qm_alloc_uacce(struct hisi_qm *qm)
->  {
->  	struct pci_dev *pdev = qm->pdev;
-> @@ -3433,6 +3554,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
->  	};
->  	int ret;
->  
-> +	INIT_LIST_HEAD(&qm->uacce_hw_errs);
->  	ret = strscpy(interface.name, dev_driver_string(&pdev->dev),
->  		      sizeof(interface.name));
->  	if (ret < 0)
-> @@ -3446,8 +3568,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
->  		qm->use_sva = true;
->  	} else {
->  		/* only consider sva case */
-> -		uacce_remove(uacce);
-> -		qm->uacce = NULL;
-> +		qm_remove_uacce(qm);
->  		return -EINVAL;
->  	}
->  
-> @@ -5109,6 +5230,12 @@ static int qm_controller_reset_prepare(struct hisi_qm *qm)
->  		return ret;
->  	}
->  
-> +	if (qm->use_sva) {
-> +		ret = qm_hw_err_isolate(qm);
-> +		if (ret)
-> +			pci_err(pdev, "failed to isolate hw err!\n");
+> +		ret = -ENODEV;
+> +		goto out_with_lock;
 > +	}
 > +
->  	ret = qm_wait_vf_prepare_finish(qm);
+>  	ret = uacce_bind_queue(uacce, q);
 >  	if (ret)
->  		pci_err(pdev, "failed to stop by vfs in soft reset!\n");
-> @@ -5436,19 +5563,24 @@ static int qm_controller_reset(struct hisi_qm *qm)
->  	ret = qm_soft_reset(qm);
->  	if (ret) {
->  		pci_err(pdev, "Controller reset failed (%d)\n", ret);
-
-This is printed below as well - probably best to drop this one and then you
-can remove the brackets as well.
-
-> -		qm_reset_bit_clear(qm);
-> -		return ret;
-> +		goto err_reset;
->  	}
+> -		goto out_with_mem;
+> +		goto out_with_lock;
 >  
->  	ret = qm_controller_reset_done(qm);
-> -	if (ret) {
-> -		qm_reset_bit_clear(qm);
-> -		return ret;
-> -	}
-> +	if (ret)
-> +		goto err_reset;
+>  	q->uacce = uacce;
 >  
->  	pci_info(pdev, "Controller reset complete\n");
-> -
-
-Avoid noise via white space changes like this.  The white space was
-good and generally don't change white space in a patch doing anything else.
-
->  	return 0;
-> +
-> +err_reset:
-> +	pci_err(pdev, "Controller reset failed (%d)\n", ret);
-> +	qm_reset_bit_clear(qm);
-> +
-> +	/* if resetting fails, isolate the device */
-> +	if (qm->use_sva && !qm->uacce->is_vf)
-> +		atomic_set(&qm->isolate_data.is_isolate, 1);
-> +	return ret;
+> @@ -153,7 +160,6 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+>  	uacce->inode = inode;
+>  	q->state = UACCE_Q_INIT;
+>  
+> -	mutex_lock(&uacce->queues_lock);
+>  	list_add(&q->list, &uacce->queues);
+>  	mutex_unlock(&uacce->queues_lock);
+>  
+> @@ -161,7 +167,8 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+>  
+>  out_with_bond:
+>  	uacce_unbind_queue(q);
+> -out_with_mem:
+> +out_with_lock:
+> +	mutex_unlock(&uacce->queues_lock);
+>  	kfree(q);
+>  	return ret;
 >  }
+> @@ -171,10 +178,10 @@ static int uacce_fops_release(struct inode *inode, struct file *filep)
+>  	struct uacce_queue *q = filep->private_data;
 >  
->  /**
-> @@ -6246,10 +6378,7 @@ int hisi_qm_init(struct hisi_qm *qm)
->  err_free_qm_memory:
->  	hisi_qm_memory_uninit(qm);
->  err_alloc_uacce:
-> -	if (qm->use_sva) {
-> -		uacce_remove(qm->uacce);
-> -		qm->uacce = NULL;
-> -	}
-> +	qm_remove_uacce(qm);
->  err_irq_register:
->  	qm_irq_unregister(qm);
->  err_pci_init:
-
+>  	mutex_lock(&q->uacce->queues_lock);
+> -	list_del(&q->list);
+> -	mutex_unlock(&q->uacce->queues_lock);
+>  	uacce_put_queue(q);
+>  	uacce_unbind_queue(q);
+> +	list_del(&q->list);
+> +	mutex_unlock(&q->uacce->queues_lock);
+>  	kfree(q);
+>  
+>  	return 0;
+> @@ -513,10 +520,10 @@ void uacce_remove(struct uacce_device *uacce)
+>  		uacce_put_queue(q);
+>  		uacce_unbind_queue(q);
+>  	}
+> -	mutex_unlock(&uacce->queues_lock);
+>  
+>  	/* disable sva now since no opened queues */
+>  	uacce_disable_sva(uacce);
+> +	mutex_unlock(&uacce->queues_lock);
+>  
+>  	if (uacce->cdev)
+>  		cdev_device_del(uacce->cdev, &uacce->dev);
+> -- 
+> 2.36.1
+> 
