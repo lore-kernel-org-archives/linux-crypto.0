@@ -2,102 +2,120 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC2AC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 09:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 148FCC43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 13:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359740AbiFPJ6U (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jun 2022 05:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49172 "EHLO
+        id S231578AbiFPNpy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Jun 2022 09:45:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229923AbiFPJ6Q (ORCPT
+        with ESMTP id S1377096AbiFPNpx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jun 2022 05:58:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313935C747;
-        Thu, 16 Jun 2022 02:58:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D2174B821FA;
-        Thu, 16 Jun 2022 09:58:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC47DC34114;
-        Thu, 16 Jun 2022 09:58:11 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="e22D2Nza"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1655373490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=A8wHUW6+lx0TotEUX80qw22Z2PKe8UOVD5KveXmC6E4=;
-        b=e22D2NzaeN+jEpEjTXpC3YlklM9ZYPqYEFK1tH7AkmtsIMAF4gwWmB7p+RN4iDFUf0HQ5K
-        Ej9Hmrc8/c9uVYfcMRQdVE3gtJzzo/VFHZWHqYIDGRiTt3MTN+P3Dc9stT/xmOv2HNGsoR
-        x2eRRwCpZBUpzQAklqM+5pqMD+hL3iA=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 082b6ac6 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 16 Jun 2022 09:58:09 +0000 (UTC)
-Date:   Thu, 16 Jun 2022 11:58:04 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Ted Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
-Message-ID: <Yqr+rFeixFuHzyHD@zx2c4.com>
-References: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
+        Thu, 16 Jun 2022 09:45:53 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437273120C;
+        Thu, 16 Jun 2022 06:45:52 -0700 (PDT)
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LP3N46PqQz680Bd;
+        Thu, 16 Jun 2022 21:45:40 +0800 (CST)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 16 Jun 2022 15:45:49 +0200
+Received: from localhost (10.202.226.42) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 16 Jun
+ 2022 14:45:48 +0100
+Date:   Thu, 16 Jun 2022 14:45:47 +0100
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     "yekai(A)" <yekai13@huawei.com>
+CC:     Kai Ye via Linux-accelerators 
+        <linux-accelerators@lists.ozlabs.org>,
+        <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>,
+        <linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
+        <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>,
+        <zhangfei.gao@linaro.org>
+Subject: Re: [PATCH v2 3/3] crypto: hisilicon/qm - defining the device
+ isolation strategy
+Message-ID: <20220616144547.00003093@Huawei.com>
+In-Reply-To: <f4fde630-a2ba-2416-5091-33c510c30593@huawei.com>
+References: <20220614122943.1406-1-yekai13@huawei.com>
+        <20220614122943.1406-4-yekai13@huawei.com>
+        <20220615140249.000077f8@Huawei.com>
+        <f4fde630-a2ba-2416-5091-33c510c30593@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.42]
+X-ClientProxiedBy: lhreml723-chm.china.huawei.com (10.201.108.74) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sandy,
+...
 
-On Thu, Jun 16, 2022 at 01:18:23PM +0800, Sandy Harris wrote:
-> Setting parts of the state to known constants is needed in
-> some Chacha applications to ensure that blocks can be processed
-> in parallel and that when needed (e.g. when encrypting disk
-> blocks) the algorithm can jump to an arbitrary part of the
-> output stream. In an RNG these are not required, and setting
-> the constants wastes cycles.
+> >  
+> >> +	hw_err->tick_stamp = jiffies;
+> >> +	list_for_each_entry_safe(err, tmp, &qm->uacce_hw_errs, list) {  
+> >
+> > These are ordered (I think). Could take advantage of that by
+> > maintaining count of elements in parallel to the list then walking
+> > list in right direction + stop when you reach last one to need
+> > deleting.
+> >  
 > 
-> If (as we hope) the enemy does not know the state, then
-> this is more secure since it makes the chacha outputs
-> depend on more unknown bits.
-> 
-> If they can peek at the state or infer parts of it from
-> outputs, knowable values cannot possibly be worse than
-> known ones. This at least prevents them from using
-> pre-computed tables based on the known constants.
-> 
-> Signed-off-by: Sandy Harris <sandyinchina@gmail.com>
-> ---
->  drivers/char/random.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index 655e327d425e..6df9e656a157 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -249,9 +249,7 @@ static void crng_fast_key_erasure(u8 key[CHACHA_KEY_SIZE],
-> 
->      BUG_ON(random_data_len > 32);
-> 
-> -    chacha_init_consts(chacha_state);
->      memcpy(&chacha_state[4], key, CHACHA_KEY_SIZE);
-> -    memset(&chacha_state[12], 0, sizeof(u32) * 4);
->      chacha20_block(chacha_state, first_block);
-> 
->      memcpy(key, first_block, CHACHA_KEY_SIZE);
+> thanks, The current list + jiffies solution seems more simple.
 
-Hard NACK here, sorry. You proposed removing the constants used with
-BLAKE2s, also, and Eric and I told you the same then:
+If list always remains relatively short then that's probably fine.
 
-https://lore.kernel.org/all/YfLtrrB+140KkiN0@sol.localdomain/
-https://lore.kernel.org/all/CAHmME9pyj-ejZn8KpVKqhELYB=-5bVYTeNhLk4SZOnBM1zeidA@mail.gmail.com/
+> >  
+> >> +		if ((hw_err->tick_stamp - err->tick_stamp) / HZ >
+> >> +		    SECONDS_PER_HOUR) {
+> >> +			list_del(&err->list);
+> >> +			kfree(err);
+> >> +		} else {
+> >> +			count++;
+> >> +		}
+> >> +	}
+> >> +	list_add(&hw_err->list, &qm->uacce_hw_errs);
+> >> +
+> >> +	if (count >= isolate->hw_err_isolate_hz)
+> >> +		atomic_set(&isolate->is_isolate, 1);
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +  
+> >
+> > ...
+> >  
+> >> +static int hisi_qm_isolate_strategy_write(struct uacce_device *uacce,
+> >> +						const char *buf)
+> >> +{
+> >> +	struct hisi_qm *qm = uacce->priv;
+> >> +	unsigned long val = 0;
+> >> +
+> >> +#define MAX_ISOLATE_STRATEGY	65535
+> >> +
+> >> +	if (atomic_read(&qm->uacce_ref))
+> >> +		return -EBUSY;
+> >> +
+> >> +	/* must be set by PF */
+> >> +	if (atomic_read(&qm->isolate_data.is_isolate) || uacce->is_vf)  
+> >
+> > Why is the file visible on the vf?  Hide it or don't register it for vfs.  
+> Because VF devices can be registered with UACCE. So this file node can 
+> be visited on the vf. We're not sure if someone else's device is the 
+> same as qm. So i configure it this way by driver. the 'isolate_strategy' 
+> must be set by pf.
+> 
 
-Same sort of justification here. ChaCha is a permutation that requires
-those constants.
+If possible have the uacce registration from the driver provide information
+on whether this applies to the VF.  Much better to have no file presented
+by the VF than one that always returns an error code.
 
-Jason
+Jonathan
+
