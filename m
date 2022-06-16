@@ -2,152 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E4FC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 08:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C66C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 08:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231482AbiFPIPL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jun 2022 04:15:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34644 "EHLO
+        id S1359748AbiFPIsd (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Jun 2022 04:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230045AbiFPIPK (ORCPT
+        with ESMTP id S1359750AbiFPIsL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jun 2022 04:15:10 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B7E95D64D
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 01:15:09 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id w27so1092186edl.7
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 01:15:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=NTbh4MI+QCwbcpkgIpo7198UESJ/mO1+VW3Q06LAB7c=;
-        b=jaqw6FnWxB/5UThR+ZDWPxP3LWg0yS0YKOWgNceuoysE3QYfS+oCxZDmNCa3RDthiA
-         nkA25n9Yi8JFYV85REMoUBn+G4y6pDSV2DxU42hO4xQRb7+rgdKay4JL4s8VmPBn1nC2
-         yF85m7F7VZaH+V+s+cRL0dGTy2NlNoYtbSfZ1CPjfZrocAUyoNrf37+MCeIEcVKY9Mdz
-         1i9VibVT2e/BJ4fdVSxoKa4OFM3U6ip5yjEZWjhIfkQsGUiBh6VjTAV2L2vDPEt837o3
-         6rPCfBieZXhr+OtkAuMNYQbYzuIY8e5Vdeqa07pg+PV/0s2Uo8oR92+b05AsASWc2IXa
-         l2+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=NTbh4MI+QCwbcpkgIpo7198UESJ/mO1+VW3Q06LAB7c=;
-        b=in9yq2VswTvW2/LtwtM54lkLv+G0kafVqdl4tDMnE6O7SSs1/Sw6w3nOO4dqgW1Eb+
-         BzGbq6ZuwkKZOAgCQB4SH/zQlrjMsMqDPdVTcs1Z14BTYx6TrvZVnNXlg3NZA0OJahwQ
-         DqV+SOvWjbXE/DjUxTdcd8THlArR9Rm71Ix6S/WFCZUL0tlRvwebe3NgPPaUGB7T3PUX
-         GbLwmJ5KFccIgpE6n2wxADPEefxw7+MHcpExshw9S1I/UnDusr8CFstW2bvCVGL8ukVn
-         JkYQmrqW7f45v49+nqVusOeuJp4rbTaVlKmpRgMjQl5GiRJk05DcJ3ug5QfPH1oJjWKj
-         FHFg==
-X-Gm-Message-State: AJIora+o+pnj/XKQarmrKP4SDkQf3tDYLOSJOH4c5Z/06mmvPglWJc2W
-        5Tn75FBcD3jzZOJQCXu8uM7tvQ==
-X-Google-Smtp-Source: AGRyM1tAV7ubqxgWT2Y3vDm33RYC1UL1k8VL4cdyLifra2KOoXTU0YbVtJhJ79SiTn0ipQMr4EiJtw==
-X-Received: by 2002:a05:6402:100c:b0:42d:f407:b050 with SMTP id c12-20020a056402100c00b0042df407b050mr4735798edu.39.1655367307984;
-        Thu, 16 Jun 2022 01:15:07 -0700 (PDT)
-Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
-        by smtp.gmail.com with ESMTPSA id s2-20020a1709060d6200b006f3ef214e2csm471585ejh.146.2022.06.16.01.15.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 01:15:07 -0700 (PDT)
-Date:   Thu, 16 Jun 2022 09:14:44 +0100
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Yang Shen <shenyang39@huawei.com>
-Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
-Message-ID: <YqrmdKNrYTCiS/MC@myrica>
-References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
- <Yqn3spLZHpAkQ9Us@myrica>
- <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
+        Thu, 16 Jun 2022 04:48:11 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B455DD0F;
+        Thu, 16 Jun 2022 01:47:08 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1o1l9Z-007gHw-SD; Thu, 16 Jun 2022 18:47:03 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Jun 2022 16:47:02 +0800
+Date:   Thu, 16 Jun 2022 16:47:02 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Simo Sorce <simo@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] certs: Add FIPS self-test for signature verification
+Message-ID: <YqruBocst8LHEVxB@gondor.apana.org.au>
+References: <YqleGzRD4ax4msjL@gondor.apana.org.au>
+ <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
+ <2689861.1655332458@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
+In-Reply-To: <2689861.1655332458@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 16, 2022 at 12:10:18PM +0800, Zhangfei Gao wrote:
-> > > diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-> > > index 281c54003edc..b6219c6bfb48 100644
-> > > --- a/drivers/misc/uacce/uacce.c
-> > > +++ b/drivers/misc/uacce/uacce.c
-> > > @@ -136,9 +136,16 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
-> > >   	if (!q)
-> > >   		return -ENOMEM;
-> > > +	mutex_lock(&uacce->queues_lock);
-> > > +
-> > > +	if (!uacce->parent->driver) {
-> > I don't think this is useful, because the core clears parent->driver after
-> > having run uacce_remove():
-> > 
-> >    rmmod hisi_zip		open()
-> >     ...				 uacce_fops_open()
-> >     __device_release_driver()	  ...
-> >      pci_device_remove()
-> >       hisi_zip_remove()
-> >        hisi_qm_uninit()
-> >         uacce_remove()
-> >          ...			  ...
-> >     				  mutex_lock(uacce->queues_lock)
-> >      ...				  if (!uacce->parent->driver)
-> >      device_unbind_cleanup()	  /* driver still valid, proceed */
-> >       dev->driver = NULL
+On Wed, Jun 15, 2022 at 11:34:18PM +0100, David Howells wrote:
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
 > 
-> The check  if (!uacce->parent->driver) is required, otherwise NULL pointer
-> may happen.
-
-I agree we need something, what I mean is that this check is not
-sufficient.
-
-> iommu_sva_bind_device
-> const struct iommu_ops *ops = dev_iommu_ops(dev);  ->
-> dev->iommu->iommu_dev->ops
+> > It looks OK to me.
 > 
-> rmmod has no issue, but remove parent pci device has the issue.
+> Can I put that down as a Reviewed-by?
 
-Ah right, relying on the return value of bind() wouldn't be enough even if
-we mandated SVA.
-
-[...]
-> > 
-> > I think we need the global uacce_mutex to serialize uacce_remove() and
-> > uacce_fops_open(). uacce_remove() would do everything, including
-> > xa_erase(), while holding that mutex. And uacce_fops_open() would try to
-> > obtain the uacce object from the xarray while holding the mutex, which
-> > fails if the uacce object is being removed.
-> 
-> Since fops_open get char device refcount, uacce_release will not happen
-> until open returns.
-
-The refcount only ensures that the uacce_device object is not freed as
-long as there are open fds. But uacce_remove() can run while there are
-open fds, or fds in the process of being opened. And atfer uacce_remove()
-runs, the uacce_device object still exists but is mostly unusable. For
-example once the module is freed, uacce->ops is not valid anymore. But
-currently uacce_fops_open() may dereference the ops in this case:
-
-	uacce_fops_open()
-	 if (!uacce->parent->driver)
-	 /* Still valid, keep going */		
-	 ...					rmmod
-						 uacce_remove()
-	 ...					 free_module()
-	 uacce->ops->get_queue() /* BUG */
-
-Accessing uacce->ops after free_module() is a use-after-free. We need all
-the fops to synchronize with uacce_remove() to ensure they don't use any
-resource of the parent after it's been freed. 
-
-I see uacce_fops_poll() may have the same problem, and should be inside
-uacce_mutex.
-
-Thanks,
-Jean
+Reviewd-by: Herbert Xu <herbert@gondor.apana.org.au>
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
