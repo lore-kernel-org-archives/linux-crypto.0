@@ -2,194 +2,308 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DA1C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 17:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8636FC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jun 2022 20:16:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348473AbiFPRuN (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jun 2022 13:50:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54348 "EHLO
+        id S231383AbiFPUQ2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 16 Jun 2022 16:16:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347806AbiFPRtr (ORCPT
+        with ESMTP id S231259AbiFPUQ1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jun 2022 13:49:47 -0400
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-eopbgr150042.outbound.protection.outlook.com [40.107.15.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A861552B0F;
-        Thu, 16 Jun 2022 10:49:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H/HZi8oe5VFdlQ/VbhSr1c9CORCwBC3CfoihhRg6P3MujHrRmQo9gINAEyo5y5qf66eGcE2AOIHQkAqu+piL4R8SeVHEFqlIScOAucVFvrVuVoagPStzTaYq+LGyl5DVxCWEfYL+HC+zSzeiPB17Bn9xYkXA0x/EviHugE7Yy0NUWt1imxbZGa/Z2VD+yNooGwOBz1jBD9ed5HlUTqH7ZfzVkbjaANe15ywA0zAzqiCxmxNhPSJ/9/1BJQmnPuE1zXvPYjgwpeTcSFKLJXuDBxEI7zTgjh0rRLF2hCBHKkt10wRvyANn1SpEl8ovUTol0jo35z5y7ODr+mqQ/UYtDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fERMSwrbi9bGEQi+/RubVV3FG/BjXneZkctkj0tlYfI=;
- b=nL+hYWXdY2kPQnccni/o0mFCgOo1WcgAuqEnkFli8oInYZaQjPuAFioFKT/tgjqvByrC6tLAikY4iGuU2ACC8QXABRYmcABERsDN4rL4Bghx6IBjZOKPHL8oLZ+W+UFVtBTJ25JZEkxBbe6XiIsoAkJXxdZobui8NYnOpw7dAHynB9zzbuiwr8c+j+tMugmtada/6HEBFTJQ7Uw5mYIgw0NYBSONa+lNea7popxho32fd65av1pRCZWBfNAknhD60NBEbWPhyNL+45Fpip0AdyQ+MPPr4hZnbZUA3odiXqDXor4bgiwAFHhGNIi7AVNRpoNhb5nikin4xw03fr/oOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fERMSwrbi9bGEQi+/RubVV3FG/BjXneZkctkj0tlYfI=;
- b=Gg1yQC+RONCo0gVocVp4GnuG6Lhsyex+Ri0BTlzKrWrrZ7JIo6c2nd3DsscVikBQGioWj5Agu7+JXaNIKClxvCi1F5kyi3kDDYiOUi1U2IV63GM2seUJbeSZonhgru2QPK3QdZGRuiSFHBL0/8XFRzKPli5obRyVc1PgCNAqho8=
-Received: from AS1PR04MB9358.eurprd04.prod.outlook.com (2603:10a6:20b:4dc::19)
- by AM0PR04MB5555.eurprd04.prod.outlook.com (2603:10a6:208:112::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.22; Thu, 16 Jun
- 2022 17:49:30 +0000
-Received: from AS1PR04MB9358.eurprd04.prod.outlook.com
- ([fe80::b8b7:9344:ad35:d35d]) by AS1PR04MB9358.eurprd04.prod.outlook.com
- ([fe80::b8b7:9344:ad35:d35d%9]) with mapi id 15.20.5353.014; Thu, 16 Jun 2022
- 17:49:30 +0000
-From:   Vabhav Sharma <vabhav.sharma@nxp.com>
-To:     Rob Herring <robh@kernel.org>
-CC:     Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "shawnguo@kernel.org" <shawnguo@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Subject: RE: [EXT] Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy delay
- property
-Thread-Topic: [EXT] Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy
- delay property
-Thread-Index: AQHYdFB1/6ZPLK3UVkiqfeFtvvLa6a1BW74AgBELlRA=
-Date:   Thu, 16 Jun 2022 17:49:30 +0000
-Message-ID: <AS1PR04MB9358BCBEBDC7EBAC6E5DD6A9F3AC9@AS1PR04MB9358.eurprd04.prod.outlook.com>
-References: <20220530180924.1792399-1-vabhav.sharma@nxp.com>
- <20220530180924.1792399-2-vabhav.sharma@nxp.com>
- <20220605212114.GA3528129-robh@kernel.org>
-In-Reply-To: <20220605212114.GA3528129-robh@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 320a93e8-5cbe-4fe4-7226-08da4fc090a5
-x-ms-traffictypediagnostic: AM0PR04MB5555:EE_
-x-microsoft-antispam-prvs: <AM0PR04MB5555F3F0390D0F7404910CABF3AC9@AM0PR04MB5555.eurprd04.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Og3JnrVqwsMclB7EB4b5RgZqnO//h2lj+acV2Ehx72OEk9Zg9fBOWANiW2xtkbA2IMcoYIGpj5I/STqkw9yKTOLn/bVAkNtt394mLevhVzp7CkDT2qe/nprS2WzH9Z7KuwT3PsaC6E99o0/amO1satM1yoDDzQLnwUyc49POSsNliUAnaW0LsuEHx7z7ii53jsSB9kVCyvDT7s/xm0v9GzVvqlLKO6sAeQkNIA9U2rT7W18/B+uTAU4f7eOL3jrhssc1GeJ2ksHDd7kBpgwGU9NdDznuFSaxpOH62kMLK7jNkByW9Xy25ii8+rCC23lbU1fLgYOzUISnCpDFDA6HOV7Gdl4U+/ke/rbKJZVRfvTKuawj/tLzIts7HeimRyT3JHTPAKiwxHHyZeYZW9dI3Dkxo32P+rAHA1szQsd3C6mb7IWnVuJP8on52kAFVKa2ukENbTZEhtB94teDuWdckvC3zsLS/8JJxPfBScSfk/hLEjsodRTRuyQ5Zlau8cxA6BAbu4SIqTcnM5Y6Lr3iDIvWmxwiFAvUQrSlABwLaQHSJIFyQ8XfRARYku8IuVsLL58jVfsKJYTOpgsTCBEadUeM5vgDZYEtl2lQUtpPCJxOHIglZFIzLWT3xuYzAKaAkgAkVaIYuPJmUjVjyVtvjRleVkXCKZZ+08sIOxoNtFq9X4In+556N9JxAw741O2L/fVBKosfXzeHxlxGQ5MEQg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR04MB9358.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(6916009)(55236004)(55016003)(122000001)(316002)(53546011)(8936002)(86362001)(6506007)(33656002)(38070700005)(38100700002)(2906002)(508600001)(54906003)(66556008)(9686003)(71200400001)(83380400001)(7696005)(186003)(8676002)(4326008)(66946007)(64756008)(26005)(66476007)(44832011)(66446008)(52536014)(76116006)(5660300002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dJyUcYFpaHJt9OkVaD0AkluSZJ3WummH9xQdiM8n3H+as8NS/C5GzfFDJPTF?=
- =?us-ascii?Q?UiZywzlCbnpbTW3dKkDngGTj8yzTMrCElcNrM8GmSU9YLlNh/XJwuPP4V8A0?=
- =?us-ascii?Q?ZbCzhfILenhw5O9SqiXEkdrjhdYnMNaj4hc6Hb6SZPp1JS1Pzt329klz3fdG?=
- =?us-ascii?Q?K9qUzegSoAuZ3EimOq5GPzc+bBJPuXSSuanwbvlvk+hOiBOOI7LVdLqnyYUz?=
- =?us-ascii?Q?wnYukHTbY6Tno129cn3AExEB59hDTbHnebRA2fZYbyd4sv/Cz942CQMRmxkh?=
- =?us-ascii?Q?7YitCc0pat9ewk6/ZjCXvCFR3QtfVrIpVWdPy1X/FB+sH8YKZNhPfhD4/rqR?=
- =?us-ascii?Q?/qNnyShZOGikT6iqkUnHQ5l1Wrls+1GvhbBR5X9ZbZgEnc6TC6t19hT0oRJe?=
- =?us-ascii?Q?BNvO22nLh2Ob0jFw0xSQ0q3o6eK1qaQmMDnr/zM1yYIOSxNZXRawl9LouKk+?=
- =?us-ascii?Q?8j2D6owebfs9IbvJBjT3oqm7KoXf/TZ/S35tKndwnYLtxSbXFXamA28XV/Z7?=
- =?us-ascii?Q?9tr+hQ3nYhzJOe2lDK6kkIQ48kBlKlrDku2CewRzE4SJLU8FkcKtV8OOtBXw?=
- =?us-ascii?Q?Cp0fgqvg06wtb/Ya1K2R9rZ+MDYca4mTEphFVZ4zzzKxCfE1E6vi4VMzOVAq?=
- =?us-ascii?Q?5LZnQE0S38CDX0GgRjLb5RUH7YNM830F1b/EKiwQMrhca/UvjpgFgyqVMhUo?=
- =?us-ascii?Q?wHU0bfF0YiK2fByvoAmZgEAZHPilcf61VbUIAWFSuJ8m8fGYKJvbeDWd1zq4?=
- =?us-ascii?Q?w1A8ARLkEAru+Ql7HgbVBZytDdqpdewyNwciNCXtp1zxCo576xTIRceZ/slw?=
- =?us-ascii?Q?YoMRPyCKmpTcPcXtvCKPBQ/K/wrCQ+TBnNfIscxX1K8ZckrFitGAf/BQHvGU?=
- =?us-ascii?Q?4EJ/Y54DEZ7hhNrvU5+5LULlR8p1uG2nL9k+VysmHR+ix6OEjILywnn08Iro?=
- =?us-ascii?Q?4OBB4T3m5+lyzC8GB5VrBEQysYIwGw5ZlN8Ej27msMkPO6jmZhcWYAodu429?=
- =?us-ascii?Q?RpP4R4RCUIaVd1cVrey2v+am+3RSmHnUKk308xBO2nlf7al6IRJIFd/czlr4?=
- =?us-ascii?Q?wdlYJBBP4uqUXrrB/yq9hOghBDjBTb0aMHrmVrFQ/Zcbo4mCc4K+gtDj594R?=
- =?us-ascii?Q?CstAEXcLcfWW9Wg0THi+VGyJuMfzXmHSUYFy/TEg3cEgr/E7hZcSiWpvpJT4?=
- =?us-ascii?Q?QDGKmPJgpGmWOJJ59HGIUTkkWQ3m589/gieujsml22t69dXe7YB/2lTyz1Vt?=
- =?us-ascii?Q?DXhAqnspvm5ajJ+oTFD9DfP5s+NiudXY19km555I0Et1zufM+OseqseRPcRJ?=
- =?us-ascii?Q?bBKixKiBjTZ2TtJXGmz+Px28WlTb27LjksDf8lYVTdQzkbk/qBzGdsHPKAam?=
- =?us-ascii?Q?jZYnts1QscDByG9nJFKh7SdOxR4ZAhHx1dM8gi3Xl3So4OcTDSD51cokAl+w?=
- =?us-ascii?Q?TdOjXY5NSkU5KsDiukXA4MU8eXnY00zCAp18YjXlWMIShZejdfWWmj5hyJDa?=
- =?us-ascii?Q?YH65mvjY+uAAqwC90iTGJgiuyI/CyKJjNysfIKBxTmm8uTqvxbVU/WoQZTXv?=
- =?us-ascii?Q?AaghMfIsKWmu62YxNsNM2nHvwE5y1QJjMYDrEylbmnlNK7L2QCNO6p6bw97H?=
- =?us-ascii?Q?BJ6Y3rp//z2pmRrMAdmWABTK+Ye0kVJKEzrJKKVyoMEJpw3+viochpzMRz5Q?=
- =?us-ascii?Q?cD0F++9vRBs9d1Qc13WcFcXAw5YelkDYqmVzMomlxpjJR8BYrrhNhcI1tu+9?=
- =?us-ascii?Q?esVcnSu3yg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 16 Jun 2022 16:16:27 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5895AA67
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 13:16:26 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 25so3653454edw.8
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 13:16:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FPBG2nTUqkW0793jTPIkOVOiRQ8ElNjTOyYS1i3QeaQ=;
+        b=qlHeb5AhXRYaPCFT2gAvvArTHDZTAhgmJPbyz6/l+Bz7HjGgYScC+wz2T3+iTQUH+n
+         sqdshfaFNTZam3uTyiAr1VAI0baiCF4QzS/3OBt+HcvOZd9u9yNiF6JJxyQmqdd6yBDi
+         GGFKk0uheKbjBapXZ3nfuFISjHICQ8xhfaCj8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FPBG2nTUqkW0793jTPIkOVOiRQ8ElNjTOyYS1i3QeaQ=;
+        b=kHVCEKYsvUotaFJjnGEJXgtUQPS2O2cxMc3hukT81wFF9kze4KW6mcObWIEMQv8PTk
+         fzbUqVFwJI2S5m1KWVJ4qBsCj5DcvOY+NmCh+1tnpiREPgEPy2zBThiGzb7CQnhzwapU
+         ePchw9sKhZJTb6hGD/Pc7mOq+zXq0IbyKQ5WTedm/lG2NSBXvpJDB9E0O865nVJnOTd3
+         oo4mz8RclMHjkvtbS7ixKSBfiZDPTa5IR1tEeHLDs1pvYG+Ci38ajvE7+VirXMnujeCS
+         foFmwUGwdLRsqyv7Jl1q69BTXshTY9qZFEHaqPXzbwJxgB7VguzIrJVyHKhSm2Ts5E0M
+         1rHQ==
+X-Gm-Message-State: AJIora8QWB4TTUpVihLBTm4YY4w0t66ykJi2+f/jtN6VFlNPIB1DoITy
+        0ekJ/TCTvsacyWNcpghfGnHVsA==
+X-Google-Smtp-Source: AGRyM1uNCP1ltBL6EchQ/geW3Jcw3CWp5toA8kk7wsnN9raFTe6AjXY9vReITrEdsJgD6fj0OwP+lg==
+X-Received: by 2002:a05:6402:ca5:b0:42d:dba5:b2a0 with SMTP id cn5-20020a0564020ca500b0042ddba5b2a0mr8781418edb.197.1655410585149;
+        Thu, 16 Jun 2022 13:16:25 -0700 (PDT)
+Received: from localhost.localdomain ([90.195.227.41])
+        by smtp.gmail.com with ESMTPSA id k11-20020a17090632cb00b00705cdfec71esm1176299ejk.7.2022.06.16.13.16.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jun 2022 13:16:24 -0700 (PDT)
+From:   Ignat Korchagin <ignat@cloudflare.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kernel-team@cloudflare.com, Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH] crypto: rsa - implement Chinese Remainder Theorem for faster private key operations
+Date:   Thu, 16 Jun 2022 21:15:50 +0100
+Message-Id: <20220616201550.1827-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS1PR04MB9358.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 320a93e8-5cbe-4fe4-7226-08da4fc090a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2022 17:49:30.4954
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OFfGoHS/CfeQiqr8QZjFVvQkxNgbj/xKWk2dI2eAclvS05As4UHUWHd6/K5ZmPzcehrDV4/NJFFOF7esJxQWSA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB5555
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Rob,
+The kernel RSA ASN.1 private key parser already supports only private keys with
+additional values to be used with the Chinese Remainder Theorem [1], but these
+values are currently not used.
 
-> -----Original Message-----
-> From: Rob Herring <robh@kernel.org>
-> Sent: Monday, June 6, 2022 2:51 AM
-> To: Vabhav Sharma <vabhav.sharma@nxp.com>
-> Cc: Horia Geanta <horia.geanta@nxp.com>; Gaurav Jain
-> <gaurav.jain@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>;
-> herbert@gondor.apana.org.au; davem@davemloft.net;
-> shawnguo@kernel.org; linux-crypto@vger.kernel.org; linux-
-> kernel@vger.kernel.org; dl-linux-imx <linux-imx@nxp.com>;
-> devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Silvano=
- Di
-> Ninno <silvano.dininno@nxp.com>; Varun Sethi <V.Sethi@nxp.com>
-> Subject: [EXT] Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy dela=
-y
-> property
->=20
-> Caution: EXT Email
->=20
-> On Mon, May 30, 2022 at 11:39:22PM +0530, Vabhav Sharma wrote:
-> > Add entropy delay property which defines the length (in system clocks)
-> > of each Entropy sample taken for TRNG configuration.
-> >
-> > Signed-off-by: Vabhav Sharma <vabhav.sharma@nxp.com>
-> > Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
-> > Reviewed-by: Varun Sethi <v.sethi@nxp.com>
-> > ---
-> >  Documentation/devicetree/bindings/crypto/fsl-sec4.txt | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > index 8f359f473ada..1477294eda38 100644
-> > --- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > @@ -62,6 +62,12 @@ PROPERTIES
-> >        Definition: A standard property. Define the 'ERA' of the SEC
-> >            device.
-> >
-> > +   - entropy-delay
-> > +      Usage: optional
-> > +      Value type: <u32>
-> > +      Definition: A property which specifies the length (in system clo=
-cks)
-> > +          of each Entropy sample taken.
-> > +
->=20
-> Seems like this could be common, but should be a time value (with unit
-> suffix) rather than clocks. If not common, then needs a vendor prefix.
-> Is this time to read a value or time between values produced? Not really =
-clear
-> from the description.
-CAAM TRNG Configuration includes 16-bit field entropy-delay. This field spe=
-cifies how long the oscillator is given to freely oscillate and generate a =
-single bit of entropy.
-It is specified as number of system clock cycles and this u32 type field al=
-ready exist in the caam driver code with default value of 3200. However, on=
- some platform this value can vary and support is added to read the value f=
-rom device tree in order to override default value, Hope this helps to clar=
-ify.
->=20
-> Rob
+This rudimentary CRT implementation speeds up RSA private key operations for the
+following Go benchmark up to ~3x.
+
+This implementation also tries to minimise the allocation of additional MPIs,
+so existing MPIs are reused as much as possible (hence the variable names are a
+bit weird).
+
+The benchmark used:
+
+```
+package keyring_test
+
+import (
+	"crypto"
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"io"
+	"syscall"
+	"testing"
+	"unsafe"
+)
+
+type KeySerial int32
+type Keyring int32
+
+const (
+	KEY_SPEC_PROCESS_KEYRING Keyring = -2
+	KEYCTL_PKEY_SIGN                 = 27
+)
+
+var (
+	keyTypeAsym = []byte("asymmetric\x00")
+	sha256pkcs1 = []byte("enc=pkcs1 hash=sha256\x00")
+)
+
+func (keyring Keyring) LoadAsym(desc string, payload []byte) (KeySerial, error) {
+	cdesc := []byte(desc + "\x00")
+	serial, _, errno := syscall.Syscall6(syscall.SYS_ADD_KEY, uintptr(unsafe.Pointer(&keyTypeAsym[0])), uintptr(unsafe.Pointer(&cdesc[0])), uintptr(unsafe.Pointer(&payload[0])), uintptr(len(payload)), uintptr(keyring), uintptr(0))
+	if errno == 0 {
+		return KeySerial(serial), nil
+	}
+
+	return KeySerial(serial), errno
+}
+
+type pkeyParams struct {
+	key_id         KeySerial
+	in_len         uint32
+	out_or_in2_len uint32
+	__spare        [7]uint32
+}
+
+// the output signature buffer is an input parameter here, because we want to
+// avoid Go buffer allocation leaking into our benchmarks
+func (key KeySerial) Sign(info, digest, out []byte) error {
+	var params pkeyParams
+	params.key_id = key
+	params.in_len = uint32(len(digest))
+	params.out_or_in2_len = uint32(len(out))
+
+	_, _, errno := syscall.Syscall6(syscall.SYS_KEYCTL, KEYCTL_PKEY_SIGN, uintptr(unsafe.Pointer(&params)), uintptr(unsafe.Pointer(&info[0])), uintptr(unsafe.Pointer(&digest[0])), uintptr(unsafe.Pointer(&out[0])), uintptr(0))
+	if errno == 0 {
+		return nil
+	}
+
+	return errno
+}
+
+func BenchmarkSign(b *testing.B) {
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		b.Fatalf("failed to generate private key: %v", err)
+	}
+
+	pkcs8, err := x509.MarshalPKCS8PrivateKey(priv)
+	if err != nil {
+		b.Fatalf("failed to serialize the private key to PKCS8 blob: %v", err)
+	}
+
+	serial, err := KEY_SPEC_PROCESS_KEYRING.LoadAsym("test rsa key", pkcs8)
+	if err != nil {
+		b.Fatalf("failed to load the private key into the keyring: %v", err)
+	}
+
+	b.Logf("loaded test rsa key: %v", serial)
+
+	digest := make([]byte, 32)
+	_, err = io.ReadFull(rand.Reader, digest)
+	if err != nil {
+		b.Fatalf("failed to generate a random digest: %v", err)
+	}
+
+	sig := make([]byte, 256)
+	for n := 0; n < b.N; n++ {
+		err = serial.Sign(sha256pkcs1, digest, sig)
+		if err != nil {
+			b.Fatalf("failed to sign the digest: %v", err)
+		}
+	}
+
+	err = rsa.VerifyPKCS1v15(&priv.PublicKey, crypto.SHA256, digest, sig)
+	if err != nil {
+		b.Fatalf("failed to verify the signature: %v", err)
+	}
+}
+```
+
+[1]: https://en.wikipedia.org/wiki/RSA_(cryptosystem)#Using_the_Chinese_remainder_algorithm
+
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+---
+ crypto/rsa.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 73 insertions(+), 5 deletions(-)
+
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 39e04176b04b..0e555ee4addb 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -17,6 +17,11 @@ struct rsa_mpi_key {
+ 	MPI n;
+ 	MPI e;
+ 	MPI d;
++	MPI p;
++	MPI q;
++	MPI dp;
++	MPI dq;
++	MPI qinv;
+ };
+
+ /*
+@@ -35,16 +40,49 @@ static int _rsa_enc(const struct rsa_mpi_key *key, MPI c, MPI m)
+
+ /*
+  * RSADP function [RFC3447 sec 5.1.2]
+- * m = c^d mod n;
++ * m_1 = c^dP mod p;
++ * m_2 = c^dQ mod q;
++ * h = (m_1 - m_2) * qInv mod p;
++ * m = m_2 + q * h;
+  */
+-static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
++static int _rsa_dec_crt(const struct rsa_mpi_key *key, MPI m_or_m1_or_h, MPI c)
+ {
++	MPI m2, m12_or_qh;
++	int ret = -ENOMEM;
++
+ 	/* (1) Validate 0 <= c < n */
+ 	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
+ 		return -EINVAL;
+
+-	/* (2) m = c^d mod n */
+-	return mpi_powm(m, c, key->d, key->n);
++	m2 = mpi_alloc(0);
++	m12_or_qh = mpi_alloc(0);
++	if (!m2 || !m12_or_qh)
++		goto err_free_mpi;
++
++	/* (2i) m_1 = c^dP mod p */
++	ret = mpi_powm(m_or_m1_or_h, c, key->dp, key->p);
++	if (ret)
++		goto err_free_mpi;
++
++	/* (2i) m_2 = c^dQ mod q */
++	ret = mpi_powm(m2, c, key->dq, key->q);
++	if (ret)
++		goto err_free_mpi;
++
++	/* (2iii) h = (m_1 - m_2) * qInv mod p */
++	mpi_sub(m12_or_qh, m_or_m1_or_h, m2);
++	mpi_mulm(m_or_m1_or_h, m12_or_qh, key->qinv, key->p);
++
++	/* (2iv) m = m_2 + q * h */
++	mpi_mul(m12_or_qh, key->q, m_or_m1_or_h);
++	mpi_addm(m_or_m1_or_h, m2, m12_or_qh, key->n);
++
++	ret = 0;
++
++err_free_mpi:
++	mpi_free(m12_or_qh);
++	mpi_free(m2);
++	return ret;
+ }
+
+ static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
+@@ -112,7 +150,7 @@ static int rsa_dec(struct akcipher_request *req)
+ 	if (!c)
+ 		goto err_free_m;
+
+-	ret = _rsa_dec(pkey, m, c);
++	ret = _rsa_dec_crt(pkey, m, c);
+ 	if (ret)
+ 		goto err_free_c;
+
+@@ -134,9 +172,19 @@ static void rsa_free_mpi_key(struct rsa_mpi_key *key)
+ 	mpi_free(key->d);
+ 	mpi_free(key->e);
+ 	mpi_free(key->n);
++	mpi_free(key->p);
++	mpi_free(key->q);
++	mpi_free(key->dp);
++	mpi_free(key->dq);
++	mpi_free(key->qinv);
+ 	key->d = NULL;
+ 	key->e = NULL;
+ 	key->n = NULL;
++	key->p = NULL;
++	key->q = NULL;
++	key->dp = NULL;
++	key->dq = NULL;
++	key->qinv = NULL;
+ }
+
+ static int rsa_check_key_length(unsigned int len)
+@@ -217,6 +265,26 @@ static int rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+ 	if (!mpi_key->n)
+ 		goto err;
+
++	mpi_key->p = mpi_read_raw_data(raw_key.p, raw_key.p_sz);
++	if (!mpi_key->p)
++		goto err;
++
++	mpi_key->q = mpi_read_raw_data(raw_key.q, raw_key.q_sz);
++	if (!mpi_key->q)
++		goto err;
++
++	mpi_key->dp = mpi_read_raw_data(raw_key.dp, raw_key.dp_sz);
++	if (!mpi_key->dp)
++		goto err;
++
++	mpi_key->dq = mpi_read_raw_data(raw_key.dq, raw_key.dq_sz);
++	if (!mpi_key->dq)
++		goto err;
++
++	mpi_key->qinv = mpi_read_raw_data(raw_key.qinv, raw_key.qinv_sz);
++	if (!mpi_key->qinv)
++		goto err;
++
+ 	if (rsa_check_key_length(mpi_get_size(mpi_key->n) << 3)) {
+ 		rsa_free_mpi_key(mpi_key);
+ 		return -EINVAL;
+--
+2.36.1
