@@ -2,87 +2,107 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 820F9C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 23:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67218C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 23:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237493AbiFQXRP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 19:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
+        id S237789AbiFQXhi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 19:37:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236486AbiFQXRO (ORCPT
+        with ESMTP id S237496AbiFQXhh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 19:17:14 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C0A63BD6;
-        Fri, 17 Jun 2022 16:17:13 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id d39so5376621vsv.7;
-        Fri, 17 Jun 2022 16:17:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YSDZ7HTkBptINozaQgd44hsL2jDW/c98k9G0DTyiBuE=;
-        b=DxP9ExIgxdV43n7HDDhEjeRKg8RRvDZ0MuRWCAITTVVi/uWZaRHAsmj4snKStNcPdQ
-         Qv71wgckPNClb54/PGGLCOQNDdQVoSanpNmXaCjY+cQGhf3Hkg+6vYPiK+AZmLTvdYN2
-         dMx7ikVKhsYeI4A62hGOtAIJUagdPuxiw/fTRZpIGn4FHQFVICUWub5/XqCwCp0ybGfT
-         4QzQtAjlEVnsABaZb1gih7KwDd5uMrr0gG0iRF7wYg6xwbQTXuh/+Ld4zTOGQ/OdLwAU
-         UIV/74aDLLTtXa/9L9jQSEEIiikDkyC+e5MC+Tbs5zyMIXaT1ARhbM5qMpYUHmR3X2NB
-         xpIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YSDZ7HTkBptINozaQgd44hsL2jDW/c98k9G0DTyiBuE=;
-        b=w5YQxULuY0Bba21B63wJdDwCeYqenC4MfehUN55ZqndoiACb12nmOqINCcsXlZB1Qw
-         7EcM4EmSd5Ce8b4kVPfYBTRfXIgdTQNil90MJE6Uf2VmawSpAPLxDebyH1gV7YSgyS8q
-         RYlRFxFu3VxeOGTgYg9piK5zZFkwteE+rBctQwhCOVms8I1XMZGi5Yug+AgGAioF7nRM
-         F3+SHha77BW5DsFO/ANozPtK5TVdWIFeqhBuCg0MUuAHjyISJbCWy+yB4KLwSuxR2oTA
-         5qsVH3X1Ftg+ZUwgCBRZ1ellSDHVy0iTlRkyhmk0zQjyaa6ECD7U95A6oTp2GtLqYeRF
-         H0uw==
-X-Gm-Message-State: AJIora+oyM8ctqjObsokM/1WqXp+sJwt9HWA27P5ZN/Dgott61/xMTNH
-        +oTg3PZNaVYr6KI9Em8QRtE27D4/JSmSOXl3hULfK/KoS7o=
-X-Google-Smtp-Source: AGRyM1ufVwu04pWZo26CS4YTa8IofGe3YhzWdESb0nMrvGrJf0ZwXjE5GYYxBN+jDlqJEh8X8sI4Y1OmF87203ofNps=
-X-Received: by 2002:a67:e342:0:b0:349:f16a:9ce with SMTP id
- s2-20020a67e342000000b00349f16a09cemr5943201vsm.74.1655507832544; Fri, 17 Jun
- 2022 16:17:12 -0700 (PDT)
-MIME-Version: 1.0
+        Fri, 17 Jun 2022 19:37:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 480E7101C;
+        Fri, 17 Jun 2022 16:37:35 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EFAE361D55;
+        Fri, 17 Jun 2022 23:37:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD64C3411B;
+        Fri, 17 Jun 2022 23:37:33 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mH1mOeyV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1655509051;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HcY8feozlb/iCMaAqa0x3x7SwlLLCwcos88Sao/FquI=;
+        b=mH1mOeyVMPct2R8r2l783spD8uc0JkMPncFYg+38d2wfNoup/6Zkfu9HU49vv9zaSekhnk
+        dyy7cnoRngHab8ToVlPHHsshTFIXk4xJwyooWBPYZI/02w5YgDL6oNBlvdVyG0hyqXKOlg
+        52NtrcZ6z7msBzLFdXM7K4qdGoA2bNc=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1c615cb4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 17 Jun 2022 23:37:31 +0000 (UTC)
+Date:   Sat, 18 Jun 2022 01:37:30 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, Ted Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
+Message-ID: <Yq0QOmahm8m018NK@zx2c4.com>
 References: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
  <Yqr+rFeixFuHzyHD@zx2c4.com>
-In-Reply-To: <Yqr+rFeixFuHzyHD@zx2c4.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Sat, 18 Jun 2022 07:17:00 +0800
-Message-ID: <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
-Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, "Ted Ts'o" <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+ <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Sat, Jun 18, 2022 at 07:17:00AM +0800, Sandy Harris wrote:
+> Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> 
+> > ChaCha is a permutation that requires those constants.
+> 
+> No. The actual permutation does not use the constants.
+> They are used in setting up the state & directly affect
+> only the first round. The other 19 rounds do not use
+> the constants; they operate on the more-or-less random
+> state left by the previous round.
 
-> ChaCha is a permutation that requires those constants.
+I guess. But that just seems like all the more reason to stick with the
+constants in that first round, as chacha lacks round constants like
+"hermetic" permutations. Better to give less control over that initial
+state. Anyway, we're not going to veer off into lala land and redesign
+chacha on lkml.
 
-No. The actual permutation does not use the constants.
-They are used in setting up the state & directly affect
-only the first round. The other 19 rounds do not use
-the constants; they operate on the more-or-less random
-state left by the previous round.
+> There is no such argument for
+> memset(&chacha_state[12], 0, sizeof(u32) * 4);
+> ChaCha has a counter and a nonce in those
+> bits, so setting them to zero is a deviation.
 
-The actual permutation works fine with any input.
-The only question is how to set the initial state.
+No. There's a new key each time. So the nonce begins at zero. And the
+counter begins at zero as well at the beginning like usual. So it's
+actually a rather boring by-the-books usage of chacha.
 
-I think it is nearsighted, but there is a reasonable
-argument for using chacha_init_consts(). That is
-exactly what ChaCha does, and arguably we
-should not deviate from it.
+> Dropping the memset() and using whatever
+> the existing state has there may not be ideal,
+> but it is certainly better than the zeroes.
 
-There is no such argument for
-memset(&chacha_state[12], 0, sizeof(u32) * 4);
-ChaCha has a counter and a nonce in those
-bits, so setting them to zero is a deviation.
-Dropping the memset() and using whatever
-the existing state has there may not be ideal,
-but it is certainly better than the zeroes.
+I'm not so sure about that. For starters, it means that we'll never
+actually exceed the first 32 bits, and so the branch for the increment
+of the next word is never true, which has some tiny value. And as for
+the nonce, I'd like to reserve that for whatever interesting use comes
+up in the future (like using the cpu number or something in an
+interesting parallel design).
+
+But the larger reason for rejecting your idea wholesale is that I'm
+trying to enforce the property that input data goes through our hash
+function (via mix_pool_bytes). Full stop! It's time that this
+willy-nilly stuff ends where we're feeding in things right and left with
+no actual design on which is ingesting what input and how it interacts.
+So if you do think that a particular block of memory somewhere at some
+point has some entropic value, then by all means call mix_pool_bytes or
+add_device_randomness on it. But don't try to stuff it in where it
+doesn't belong.
+
+The type of valuable patch I'd like to encourage is this recent one from
+LinusW: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac9d25557dcc9fe90ed12bfbb6db401e892ca004
+This seems like the kind of thing that might really help the situation
+on certain devices in a real way. More of that! Less of fake crypto.
+
+Jason
