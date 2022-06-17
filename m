@@ -2,91 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82780C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 08:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24A7CCA479
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 09:19:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232736AbiFQItb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 04:49:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36822 "EHLO
+        id S235548AbiFQJTO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 05:19:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232153AbiFQIta (ORCPT
+        with ESMTP id S235549AbiFQJTM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 04:49:30 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1615967D2B;
-        Fri, 17 Jun 2022 01:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655455770; x=1686991770;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=k1Hf4ppqXSBfgS8VjPssKfER3lpSiR1o1Na/R3h9Srk=;
-  b=MlSimtEInR+Chi7izI1xQ7Yb8x6HfEr56oiyBqcteWDCW2isyD+s/06k
-   E4l86uTNhCBsvGp4PikIMVOtWP4xJIqSAsbQl2hQhiDyGzvp4lf+kSFdl
-   NvTELeSRtgGx0SyFgnuoFmx5JSCU+uBoWm4jdeKhNFjbEu+w8BgKhZLSC
-   RXjdZiQIPf2aPuSRYRGMs33VGjHLZl9wqPBeXfQDRl0wS4yuyrNYnt02s
-   mFKzZtmEfgoJvxbGjkxQuEXjZaoiYv5GPWdTdPS7Vfuph9Jbw6Q/iBllJ
-   FEBoh/qlTZdG9pgbUlsXdDrP0q7i4BnjzLuBBoxePbEGrXAMfa5LqUUjT
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="304908443"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="304908443"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2022 01:49:29 -0700
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="675410803"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2022 01:49:27 -0700
-Date:   Fri, 17 Jun 2022 09:49:20 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Yoan Picchi <yoan.picchi@arm.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, qat-linux@intel.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Andre Przywara <andre.przywara@arm.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 0/2] Crypto: Remove x86 dependency on QAT drivers
-Message-ID: <YqxAEID8lu497CCe@silpixa00400314>
-References: <20220613142535.222041-1-yoan.picchi@arm.com>
+        Fri, 17 Jun 2022 05:19:12 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9AF05AEF6;
+        Fri, 17 Jun 2022 02:19:10 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0VGeEoR._1655457543;
+Received: from 30.240.100.35(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VGeEoR._1655457543)
+          by smtp.aliyun-inc.com;
+          Fri, 17 Jun 2022 17:19:06 +0800
+Message-ID: <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
+Date:   Fri, 17 Jun 2022 17:19:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220613142535.222041-1-yoan.picchi@arm.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH v4 0/2] pkcs7: support SM2/SM3 and EC-RDSA/streebog
+ algorithms
+Content-Language: en-US
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+References: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Elvira Khabirova <e.khabirova@omp.ru>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Yoan,
+Hi Jarkko,
 
-On Mon, Jun 13, 2022 at 02:25:33PM +0000, Yoan Picchi wrote:
-> The QAT acceleration card can be very helpfull for some tasks like dealing
-> with IPSEC but it is currently restricted to be used only on x86 machine.
-> Looking at the code we didn't see any reasons why those drivers might not
-> work on other architectures. We've successfully built all of them on x86,
-> arm64, arm32, mips64, powerpc64, riscv64 and sparc64.
+On 9/18/21 4:07 PM, Tianjia Zhang wrote:
+> This series of patches integrates the two patches sended separately,
+> resolves the conflict, and rebases on the latest code.
 > 
-> We also have tested the driver with an Intel Corporation C62x Chipset
-> QuickAssist Technology (rev 04) PCIe card on an arm64 server. After the numa
-> patch, it works with the AF_ALG crypto userland interface, allowing us to
-> encrypt some data with cbc for instance. We've also successfully created some
-> VF, bound them to DPDK, and used the card this way, thus showing some real
-> life usecases of x86 do work on arm64 too.
+> The two patches respectively support the SM2/SM3 and EC-RDSA/streebog
+> algorithm combinations for the pkcs7 parser.
 > 
-> Changelog v1 ... v2:
-> - add COMPILE_TEST to Kconfig
+> Elvira Khabirova (1):
+>    pkcs7: support EC-RDSA/streebog in SignerInfo
 > 
-> Andre Przywara (1):
->   crypto: qat: replace get_current_node() with numa_node_id()
+> Tianjia Zhang (1):
+>    pkcs7: parser support SM2 and SM3 algorithms combination
 > 
-> Yoan Picchi (1):
->   Removes the x86 dependency on the QAT drivers
-Would you mind re-sending the set changing the headline of the commit
-messages as reported in the previous email?
-https://www.spinics.net/lists/linux-crypto/msg64584.html
+>   crypto/asymmetric_keys/pkcs7_parser.c | 18 ++++++++++++++++++
+>   1 file changed, 18 insertions(+)
+> 
 
-Thanks,
+No response from David, can you pick this?
 
--- 
-Giovanni
+Best regards,
+Tianjia
