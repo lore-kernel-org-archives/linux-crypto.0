@@ -2,97 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68910C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 17:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820F9C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 23:17:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbiFQRuv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 13:50:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56956 "EHLO
+        id S237493AbiFQXRP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 19:17:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230465AbiFQRuu (ORCPT
+        with ESMTP id S236486AbiFQXRO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 13:50:50 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 516FC49F95;
-        Fri, 17 Jun 2022 10:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655488249; x=1687024249;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5u5FYKOyuT299I3BoB0ioyZU3Fi1j7bhWjLsZJxMg3Y=;
-  b=DU2+fq8rkY2laCFr+xcqzL2GATsPcM29fQ2Eliyk57FKJFZ9CvrSpkId
-   /Ni6EiDZSRgdEVrN1L+aGPux39sBPOuNxulaJUC7YME93cbhkFUBi11p/
-   lVYeFvJEF4Vo5n4LzkF718S5DWa2LwTZV6mzDTDQpB81zX+GuBzJxBmQx
-   8wEdgoOd2X3auWdcvcHuVAxYMiOlTGd7RaRio/4UnvysiETmvMm7eDnYo
-   zMa1/NIroOmVMUnmYUEKvHw1KHqeW3YjLY/qlI3Jzxj7nOQZlG7qfSFhI
-   2OXWnrdPRfu2LoljI1k7rYoMFsVZX0cNBSfDzo5VIYRlKJkI4R2HTibaX
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="277093888"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="277093888"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2022 10:27:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="912682470"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Jun 2022 10:27:50 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o2Fl8-000PdZ-60;
-        Fri, 17 Jun 2022 17:27:50 +0000
-Date:   Sat, 18 Jun 2022 01:27:05 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Lei He <helei.sig11@bytedance.com>, herbert@gondor.apana.org.au,
-        davem@davemloft.net, dhowells@redhat.com, mst@redhat.com
-Cc:     kbuild-all@lists.01.org, arei.gonglei@huawei.com,
-        jasowang@redhat.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pizhenwei@bytedance.com,
-        helei.sig11@bytedance.com, f4bug@amsat.org, berrange@redhat.com
-Subject: Re: [PATCH 4/4] virtio-crypto: support ECDSA algorithm
-Message-ID: <202206180117.Jk42sS41-lkp@intel.com>
-References: <20220617070754.73667-6-helei.sig11@bytedance.com>
+        Fri, 17 Jun 2022 19:17:14 -0400
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C0A63BD6;
+        Fri, 17 Jun 2022 16:17:13 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id d39so5376621vsv.7;
+        Fri, 17 Jun 2022 16:17:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YSDZ7HTkBptINozaQgd44hsL2jDW/c98k9G0DTyiBuE=;
+        b=DxP9ExIgxdV43n7HDDhEjeRKg8RRvDZ0MuRWCAITTVVi/uWZaRHAsmj4snKStNcPdQ
+         Qv71wgckPNClb54/PGGLCOQNDdQVoSanpNmXaCjY+cQGhf3Hkg+6vYPiK+AZmLTvdYN2
+         dMx7ikVKhsYeI4A62hGOtAIJUagdPuxiw/fTRZpIGn4FHQFVICUWub5/XqCwCp0ybGfT
+         4QzQtAjlEVnsABaZb1gih7KwDd5uMrr0gG0iRF7wYg6xwbQTXuh/+Ld4zTOGQ/OdLwAU
+         UIV/74aDLLTtXa/9L9jQSEEIiikDkyC+e5MC+Tbs5zyMIXaT1ARhbM5qMpYUHmR3X2NB
+         xpIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YSDZ7HTkBptINozaQgd44hsL2jDW/c98k9G0DTyiBuE=;
+        b=w5YQxULuY0Bba21B63wJdDwCeYqenC4MfehUN55ZqndoiACb12nmOqINCcsXlZB1Qw
+         7EcM4EmSd5Ce8b4kVPfYBTRfXIgdTQNil90MJE6Uf2VmawSpAPLxDebyH1gV7YSgyS8q
+         RYlRFxFu3VxeOGTgYg9piK5zZFkwteE+rBctQwhCOVms8I1XMZGi5Yug+AgGAioF7nRM
+         F3+SHha77BW5DsFO/ANozPtK5TVdWIFeqhBuCg0MUuAHjyISJbCWy+yB4KLwSuxR2oTA
+         5qsVH3X1Ftg+ZUwgCBRZ1ellSDHVy0iTlRkyhmk0zQjyaa6ECD7U95A6oTp2GtLqYeRF
+         H0uw==
+X-Gm-Message-State: AJIora+oyM8ctqjObsokM/1WqXp+sJwt9HWA27P5ZN/Dgott61/xMTNH
+        +oTg3PZNaVYr6KI9Em8QRtE27D4/JSmSOXl3hULfK/KoS7o=
+X-Google-Smtp-Source: AGRyM1ufVwu04pWZo26CS4YTa8IofGe3YhzWdESb0nMrvGrJf0ZwXjE5GYYxBN+jDlqJEh8X8sI4Y1OmF87203ofNps=
+X-Received: by 2002:a67:e342:0:b0:349:f16a:9ce with SMTP id
+ s2-20020a67e342000000b00349f16a09cemr5943201vsm.74.1655507832544; Fri, 17 Jun
+ 2022 16:17:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220617070754.73667-6-helei.sig11@bytedance.com>
+References: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
+ <Yqr+rFeixFuHzyHD@zx2c4.com>
+In-Reply-To: <Yqr+rFeixFuHzyHD@zx2c4.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 18 Jun 2022 07:17:00 +0800
+Message-ID: <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
+Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, "Ted Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Lei,
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-Thank you for the patch! Yet something to improve:
+> ChaCha is a permutation that requires those constants.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v5.19-rc2 next-20220617]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+No. The actual permutation does not use the constants.
+They are used in setting up the state & directly affect
+only the first round. The other 19 rounds do not use
+the constants; they operate on the more-or-less random
+state left by the previous round.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lei-He/virtio-crypto-support-ECDSA-algorithm/20220617-151113
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: i386-randconfig-s001 (https://download.01.org/0day-ci/archive/20220618/202206180117.Jk42sS41-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-30-g92122700-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/d335068e54f1217848445185702d75739116b1fe
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Lei-He/virtio-crypto-support-ECDSA-algorithm/20220617-151113
-        git checkout d335068e54f1217848445185702d75739116b1fe
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash
+The actual permutation works fine with any input.
+The only question is how to set the initial state.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+I think it is nearsighted, but there is a reasonable
+argument for using chacha_init_consts(). That is
+exactly what ChaCha does, and arguably we
+should not deviate from it.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
->> ERROR: modpost: "ecdsa_max_signature_size" [drivers/crypto/virtio/virtio_crypto.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+There is no such argument for
+memset(&chacha_state[12], 0, sizeof(u32) * 4);
+ChaCha has a counter and a nonce in those
+bits, so setting them to zero is a deviation.
+Dropping the memset() and using whatever
+the existing state has there may not be ideal,
+but it is certainly better than the zeroes.
