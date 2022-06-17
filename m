@@ -2,99 +2,179 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F576C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 04:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4209C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 06:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239728AbiFQECa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 00:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55752 "EHLO
+        id S1379746AbiFQGFb (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 02:05:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231776AbiFQEC3 (ORCPT
+        with ESMTP id S229528AbiFQGFa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 00:02:29 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9AB666A2;
-        Thu, 16 Jun 2022 21:02:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655438548; x=1686974548;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=j5wLzy77/z/grAkh6Tlx6HTEGbcHtSNLg/CF7fdBZo0=;
-  b=ONiALVnUtAYfmdJ7qX9T5xAnW1mljVUHU1yhlWwOtfMbzgkyhKRKW9le
-   FqWyAq4bcvVpAOHzaVmBz8bjyuiZkvc1uCyqI7HZu8cZvqWagoeU4jOkZ
-   SkrI0jnHxtDsMZT//BaUfpr7J4RM92jP2YiaroXnylY7Q8JAfTahkCR8Y
-   liMp0JesEAb6h55jpLowa25qmdtnVoSKVBSqoAX01mYqQJA5rtDuayJY7
-   QlO4Ae9oNIT3Et47zcW77zdeq/gLXPZVDzlJINack/Yxp4e13FI7ujeT7
-   StQ9zSjSOw6LC0vaTusgDwQo6HcJNAdaGD2fPpw2ch3pWkNp0T7rxlOnM
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="304863528"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="304863528"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2022 21:02:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="831868406"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 16 Jun 2022 21:02:26 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o23Bh-000P33-SK;
-        Fri, 17 Jun 2022 04:02:25 +0000
-Date:   Fri, 17 Jun 2022 12:01:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ignat Korchagin <ignat@cloudflare.com>,
+        Fri, 17 Jun 2022 02:05:30 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE9011158
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 23:05:29 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id w19-20020a17090a8a1300b001ec79064d8dso408314pjn.2
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Jun 2022 23:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=hr1DvHgRKVwFFs3GnYKSdW/r6E3KQ20avG9OQnOIekI=;
+        b=C9coYDLUoKd71hlkBvzPkdaOsLrcAmU67cb+Wb/aq4db4IWuJ45WMqWpHTInqbaWeA
+         geGjYU+Hjl6jShCVqNrAP2QBlICq6ApiSLWYvnLLRWR3m1RZtQEnG12AX88R16PR/Z0C
+         JxBYVrAUJ5RPXMQnjh0fEUv+dDd/VZvhpWn196R8kWafbO+7PV0mFAqkptyqRCFqMzvE
+         PUBYUCbD8YjvsaBjTuwfAaZx/z6Y9hHM3BgVq+tBCBG9MlGhVrsx4XTLsuy0KCgWByhr
+         PRzC+tYKAYkObRlTmpSG6YF/Gmbh7xOIzOt7nJOceLLje2Wl6ZvEmRGtBHcMJzAX2arB
+         JkPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=hr1DvHgRKVwFFs3GnYKSdW/r6E3KQ20avG9OQnOIekI=;
+        b=E4ZYKsw8Gx04rk5LUS/o5t+VqGm6ZIUXYm9yUyf6OJXGEXXPgkiqJhn1Fp2TUvjp9v
+         FgRkq+hDUUTgTjO/OVpaWbPVrJyxVYml6tpzcYvSzoqHT8HYaDBGixtPODEkzT5iwA0h
+         0rfOub00pnZ9J7rc7eN4WxXQVfxIcJ0C1hTgsXSbgzGJW9XqWtBn9MuB3KjN7VhTJVbL
+         6cnOZl5VEWi0GAhe6cQY0tTv1HfargDI3PlCevPxWEUL0zNS4Fob+ufesxAZ/DGO/oyM
+         nuVs4ThavtWJy0h5GvpIsULE3rAKHIQTJ2+tr5MGvQ/7N4L4s2v7kP163jEGBgphX7+K
+         HKIA==
+X-Gm-Message-State: AJIora8LFNXs9LBsfB5ghEwyrv0AsyKdqpAisIgMrsVuqnmXhcq9sasY
+        h4kl/pQek0ljGQI1kqZ25BYn8w==
+X-Google-Smtp-Source: AGRyM1uiaMIGymdgFePwN95624WGlKC3MieAgDLn29xOGvCxCRUevfFmDABWgQ4fRn7G9pR0FV2CFw==
+X-Received: by 2002:a17:90b:1986:b0:1ec:71f6:5fd9 with SMTP id mv6-20020a17090b198600b001ec71f65fd9mr2954395pjb.188.1655445928835;
+        Thu, 16 Jun 2022 23:05:28 -0700 (PDT)
+Received: from [10.83.0.6] ([199.101.192.187])
+        by smtp.gmail.com with ESMTPSA id y11-20020a170902d64b00b00161955fe0d5sm2606256plh.274.2022.06.16.23.05.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jun 2022 23:05:28 -0700 (PDT)
+Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, kernel-team@cloudflare.com,
-        Ignat Korchagin <ignat@cloudflare.com>
-Subject: Re: [PATCH] crypto: rsa - implement Chinese Remainder Theorem for
- faster private key operations
-Message-ID: <202206171143.kiPGMh0V-lkp@intel.com>
-References: <20220616201550.1827-1-ignat@cloudflare.com>
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Yang Shen <shenyang39@huawei.com>
+References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
+ <Yqn3spLZHpAkQ9Us@myrica> <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
+ <YqrmdKNrYTCiS/MC@myrica>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <d90e8ea5-2f18-2eda-b4b2-711083aa7ecd@linaro.org>
+Date:   Fri, 17 Jun 2022 14:05:21 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220616201550.1827-1-ignat@cloudflare.com>
+In-Reply-To: <YqrmdKNrYTCiS/MC@myrica>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ignat,
 
-Thank you for the patch! Yet something to improve:
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on herbert-crypto-2.6/master linus/master v5.19-rc2 next-20220616]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+On 2022/6/16 下午4:14, Jean-Philippe Brucker wrote:
+> On Thu, Jun 16, 2022 at 12:10:18PM +0800, Zhangfei Gao wrote:
+>>>> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+>>>> index 281c54003edc..b6219c6bfb48 100644
+>>>> --- a/drivers/misc/uacce/uacce.c
+>>>> +++ b/drivers/misc/uacce/uacce.c
+>>>> @@ -136,9 +136,16 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
+>>>>    	if (!q)
+>>>>    		return -ENOMEM;
+>>>> +	mutex_lock(&uacce->queues_lock);
+>>>> +
+>>>> +	if (!uacce->parent->driver) {
+>>> I don't think this is useful, because the core clears parent->driver after
+>>> having run uacce_remove():
+>>>
+>>>     rmmod hisi_zip		open()
+>>>      ...				 uacce_fops_open()
+>>>      __device_release_driver()	  ...
+>>>       pci_device_remove()
+>>>        hisi_zip_remove()
+>>>         hisi_qm_uninit()
+>>>          uacce_remove()
+>>>           ...			  ...
+>>>      				  mutex_lock(uacce->queues_lock)
+>>>       ...				  if (!uacce->parent->driver)
+>>>       device_unbind_cleanup()	  /* driver still valid, proceed */
+>>>        dev->driver = NULL
+>> The check  if (!uacce->parent->driver) is required, otherwise NULL pointer
+>> may happen.
+> I agree we need something, what I mean is that this check is not
+> sufficient.
+>
+>> iommu_sva_bind_device
+>> const struct iommu_ops *ops = dev_iommu_ops(dev);  ->
+>> dev->iommu->iommu_dev->ops
+>>
+>> rmmod has no issue, but remove parent pci device has the issue.
+> Ah right, relying on the return value of bind() wouldn't be enough even if
+> we mandated SVA.
+>
+> [...]
+>>> I think we need the global uacce_mutex to serialize uacce_remove() and
+>>> uacce_fops_open(). uacce_remove() would do everything, including
+>>> xa_erase(), while holding that mutex. And uacce_fops_open() would try to
+>>> obtain the uacce object from the xarray while holding the mutex, which
+>>> fails if the uacce object is being removed.
+>> Since fops_open get char device refcount, uacce_release will not happen
+>> until open returns.
+> The refcount only ensures that the uacce_device object is not freed as
+> long as there are open fds. But uacce_remove() can run while there are
+> open fds, or fds in the process of being opened. And atfer uacce_remove()
+> runs, the uacce_device object still exists but is mostly unusable. For
+> example once the module is freed, uacce->ops is not valid anymore. But
+> currently uacce_fops_open() may dereference the ops in this case:
+>
+> 	uacce_fops_open()
+> 	 if (!uacce->parent->driver)
+> 	 /* Still valid, keep going */		
+> 	 ...					rmmod
+> 						 uacce_remove()
+> 	 ...					 free_module()
+> 	 uacce->ops->get_queue() /* BUG */
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ignat-Korchagin/crypto-rsa-implement-Chinese-Remainder-Theorem-for-faster-private-key-operations/20220617-041735
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-config: m68k-defconfig (https://download.01.org/0day-ci/archive/20220617/202206171143.kiPGMh0V-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/a81c4debaedb63c8b5af51564fdf596d560a23af
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Ignat-Korchagin/crypto-rsa-implement-Chinese-Remainder-Theorem-for-faster-private-key-operations/20220617-041735
-        git checkout a81c4debaedb63c8b5af51564fdf596d560a23af
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
+uacce_remove should wait for uacce->queues_lock, until fops_open release 
+the lock.
+If open happen just after the uacce_remove: unlock, uacce_bind_queue in 
+open should fail.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+> Accessing uacce->ops after free_module() is a use-after-free. We need all
+you men parent release the resources.
+> the fops to synchronize with uacce_remove() to ensure they don't use any
+> resource of the parent after it's been freed.
+After fops_open, currently we are counting on parent driver stop all dma 
+first, then call uacce_remove, which is assumption.
+Like drivers/crypto/hisilicon/zip/zip_main.c: hisi_qm_wait_task_finish, 
+which will wait uacce_release.
+If comments this , there may other issue,
+Unable to handle kernel paging request at virtual address ffff80000b700204
+pc : hisi_qm_cache_wb.part.0+0x2c/0xa0
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+> I see uacce_fops_poll() may have the same problem, and should be inside
+> uacce_mutex.
+Do we need consider this, uacce_remove can happen anytime but not 
+waiting dma stop?
 
->> ERROR: modpost: "mpi_sub" [crypto/rsa_generic.ko] undefined!
->> ERROR: modpost: "mpi_mul" [crypto/rsa_generic.ko] undefined!
+Not sure uacce_mutex can do this.
+Currently the sequence is
+mutex_lock(&uacce->queues_lock);
+mutex_lock(&uacce_mutex);
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Or we set all the callbacks of uacce_ops to NULL?
+Module_get/put only works for module, but not for removing device.
+
+Thanks
+
+>
+> Thanks,
+> Jean
+
