@@ -2,348 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA8A1C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 14:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCF3C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 14:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382694AbiFQOXX (ORCPT
+        id S1382780AbiFQOkt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 10:23:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
+        Fri, 17 Jun 2022 10:40:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382721AbiFQOXV (ORCPT
+        with ESMTP id S1382591AbiFQOks (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 10:23:21 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180B7BC9C
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Jun 2022 07:23:20 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id f8so4006953plo.9
-        for <linux-crypto@vger.kernel.org>; Fri, 17 Jun 2022 07:23:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=RTRTndzcqGpDv1J2yjv0wl7rfjMqIl0ecAShZDEtx0E=;
-        b=gDGVloWlIjR4peMDoBY3afbeVzNYW+UIy79mYC21BRxebHIepgX/IQLcSnaZPQUVpi
-         CIRYPh1MMgm6Z4ComYznMCRiNrX50Tr/lndX489J2lCPjaioHMQq9itvFx0WGg6hY0ns
-         xRT4Q9TkwMsiCisjNABb0uQUpuQFkksCUsNFVLKB+i48dhvZOKbrb//S8sY8E+AMKvpK
-         5mAHxwolMqtv/neOBL30FkATA5WjjBjhSuiqQXbiURZsPjf5UvuRJjbBZs4wwsJg3xk4
-         zAuS5NFfc4M9So18A/OGaSUewhxta+/kiIlryuYB+IhjHouvo0tleQCaCF4SWnEgP2Po
-         bJYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=RTRTndzcqGpDv1J2yjv0wl7rfjMqIl0ecAShZDEtx0E=;
-        b=fHHYwHfELkhwqh8QlD49IE2Mm0SLp9Z3PzPR1MLGjzucFsMSkXgIFMYqFZGEcHQtjz
-         VctVCTmu9tum6fkJBT2NRqRnoh+/O+xAwsWBJpsjtUZ5W1pDArGshxC2xCxSZN40kj4K
-         hah6ZZ7t498tGoWo04neWf0TNfWt96MUuI/u05bEB9GECgkNqdN0oF/mM8tzZkeb9Hno
-         u0+5lgZu/TdHn46TL0+FtDa52Db7ZiiInngbQQ7I3yEdLq826c46lj5365/NJA8o5Jwa
-         2vldq10CZf2GB9FQjtWscN6RFy66o57oYfZLSk32Pi8d6pEzbqa6VmZ9/pcVd2d3tlpF
-         aUTQ==
-X-Gm-Message-State: AJIora+jeDkoDdXIdaI6iDH5crszvba369noLr0pqRqurUCtvcJdZpeP
-        NdmOseqb89fCD1nDEGjDzpdm7Q==
-X-Google-Smtp-Source: AGRyM1u52ygM1NLKLxebtqnme5o4tf+SilzwuDSISYq1Mvj6ktsh8a3pJs2zK6JqnSwz0RW/nWKTxQ==
-X-Received: by 2002:a17:90b:3591:b0:1e3:25d3:e78e with SMTP id mm17-20020a17090b359100b001e325d3e78emr10980375pjb.29.1655475799436;
-        Fri, 17 Jun 2022 07:23:19 -0700 (PDT)
-Received: from [10.184.0.6] ([199.101.192.133])
-        by smtp.gmail.com with ESMTPSA id z2-20020a170903018200b001635a8f9dfdsm3750629plg.26.2022.06.17.07.23.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jun 2022 07:23:19 -0700 (PDT)
-Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     Yang Shen <shenyang39@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-accelerators@lists.ozlabs.org
-References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
- <Yqn3spLZHpAkQ9Us@myrica> <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
- <YqrmdKNrYTCiS/MC@myrica> <d90e8ea5-2f18-2eda-b4b2-711083aa7ecd@linaro.org>
- <53b9acef-ad32-d0aa-fa1b-a7cb77a0d088@linaro.org>
-Message-ID: <1fab1f9a-5c6c-8190-829b-4bacf15eb306@linaro.org>
-Date:   Fri, 17 Jun 2022 22:23:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 17 Jun 2022 10:40:48 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6C7F3983E;
+        Fri, 17 Jun 2022 07:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655476847; x=1687012847;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ta2YQsulj3jZHsDIUgd4bbq30vgKTah6y6arAvOavz4=;
+  b=Wc4MgatVSs6c8pbM7yzqIoAkfiwf7TPv6nN4/YpQjO6+dCnhBAWU5UFJ
+   koTkDZn3l43wKWx5Kukv21t/8HoStbeylItOWbliBLEpSzngmG0/x25FI
+   cqQQofDk+X3JNrgct3xsUGWgUxaYKCkxo8LOvu7dFF0Ngw32SCzGcr/yX
+   Zpxu9o7ORW2pbDXuMHJDK+pe1PvNb8sChRuCWnpzx7vjn6/peJ6IhIvoV
+   ruq8Y/JI5wBI0ejtgqPDaRBRaaG3sQb0Fi+dGOAZmBA0ZbSbmNbS1Tay1
+   jrT98P9Evrjvs14lDnTZKTUfSC7ixPjoXR5GP1m0a0OAKezjXCUdc6wTt
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="280570680"
+X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
+   d="scan'208";a="280570680"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2022 07:40:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
+   d="scan'208";a="590137364"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 17 Jun 2022 07:40:44 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o2D9P-000PW1-O6;
+        Fri, 17 Jun 2022 14:40:43 +0000
+Date:   Fri, 17 Jun 2022 22:40:36 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Lei He <helei.sig11@bytedance.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, dhowells@redhat.com, mst@redhat.com
+Cc:     kbuild-all@lists.01.org, arei.gonglei@huawei.com,
+        jasowang@redhat.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pizhenwei@bytedance.com,
+        helei.sig11@bytedance.com, f4bug@amsat.org, berrange@redhat.com
+Subject: Re: [PATCH 4/4] virtio-crypto: support ECDSA algorithm
+Message-ID: <202206172202.d2j2nFUX-lkp@intel.com>
+References: <20220617070754.73667-6-helei.sig11@bytedance.com>
 MIME-Version: 1.0
-In-Reply-To: <53b9acef-ad32-d0aa-fa1b-a7cb77a0d088@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220617070754.73667-6-helei.sig11@bytedance.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Lei,
+
+Thank you for the patch! Yet something to improve:
+
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v5.19-rc2 next-20220617]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Lei-He/virtio-crypto-support-ECDSA-algorithm/20220617-151113
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+config: i386-randconfig-m021 (https://download.01.org/0day-ci/archive/20220617/202206172202.d2j2nFUX-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/d335068e54f1217848445185702d75739116b1fe
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Lei-He/virtio-crypto-support-ECDSA-algorithm/20220617-151113
+        git checkout d335068e54f1217848445185702d75739116b1fe
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/crypto/virtio/virtio_crypto_akcipher_algs.o: in function `virtio_crypto_ecdsa_max_size':
+>> drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:602: undefined reference to `ecdsa_max_signature_size'
 
 
-On 2022/6/17 下午4:20, Zhangfei Gao wrote:
->
->
-> On 2022/6/17 下午2:05, Zhangfei Gao wrote:
->>
->>
->> On 2022/6/16 下午4:14, Jean-Philippe Brucker wrote:
->>> On Thu, Jun 16, 2022 at 12:10:18PM +0800, Zhangfei Gao wrote:
->>>>>> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
->>>>>> index 281c54003edc..b6219c6bfb48 100644
->>>>>> --- a/drivers/misc/uacce/uacce.c
->>>>>> +++ b/drivers/misc/uacce/uacce.c
->>>>>> @@ -136,9 +136,16 @@ static int uacce_fops_open(struct inode 
->>>>>> *inode, struct file *filep)
->>>>>>        if (!q)
->>>>>>            return -ENOMEM;
->>>>>> +    mutex_lock(&uacce->queues_lock);
->>>>>> +
->>>>>> +    if (!uacce->parent->driver) {
->>>>> I don't think this is useful, because the core clears 
->>>>> parent->driver after
->>>>> having run uacce_remove():
->>>>>
->>>>>     rmmod hisi_zip        open()
->>>>>      ...                 uacce_fops_open()
->>>>>      __device_release_driver()      ...
->>>>>       pci_device_remove()
->>>>>        hisi_zip_remove()
->>>>>         hisi_qm_uninit()
->>>>>          uacce_remove()
->>>>>           ...              ...
->>>>>                        mutex_lock(uacce->queues_lock)
->>>>>       ...                  if (!uacce->parent->driver)
->>>>>       device_unbind_cleanup()      /* driver still valid, proceed */
->>>>>        dev->driver = NULL
->>>> The check  if (!uacce->parent->driver) is required, otherwise NULL 
->>>> pointer
->>>> may happen.
->>> I agree we need something, what I mean is that this check is not
->>> sufficient.
->>>
->>>> iommu_sva_bind_device
->>>> const struct iommu_ops *ops = dev_iommu_ops(dev);  ->
->>>> dev->iommu->iommu_dev->ops
->>>>
->>>> rmmod has no issue, but remove parent pci device has the issue.
->>> Ah right, relying on the return value of bind() wouldn't be enough 
->>> even if
->>> we mandated SVA.
->>>
->>> [...]
->>>>> I think we need the global uacce_mutex to serialize uacce_remove() 
->>>>> and
->>>>> uacce_fops_open(). uacce_remove() would do everything, including
->>>>> xa_erase(), while holding that mutex. And uacce_fops_open() would 
->>>>> try to
->>>>> obtain the uacce object from the xarray while holding the mutex, 
->>>>> which
->>>>> fails if the uacce object is being removed.
->>>> Since fops_open get char device refcount, uacce_release will not 
->>>> happen
->>>> until open returns.
->>> The refcount only ensures that the uacce_device object is not freed as
->>> long as there are open fds. But uacce_remove() can run while there are
->>> open fds, or fds in the process of being opened. And atfer 
->>> uacce_remove()
->>> runs, the uacce_device object still exists but is mostly unusable. For
->>> example once the module is freed, uacce->ops is not valid anymore. But
->>> currently uacce_fops_open() may dereference the ops in this case:
->>>
->>>     uacce_fops_open()
->>>      if (!uacce->parent->driver)
->>>      /* Still valid, keep going */
->>>      ...                    rmmod
->>>                          uacce_remove()
->>>      ...                     free_module()
->>>      uacce->ops->get_queue() /* BUG */
->>
->> uacce_remove should wait for uacce->queues_lock, until fops_open 
->> release the lock.
->> If open happen just after the uacce_remove: unlock, uacce_bind_queue 
->> in open should fail.
->>
->>> Accessing uacce->ops after free_module() is a use-after-free. We 
->>> need all
->> you men parent release the resources.
->>> the fops to synchronize with uacce_remove() to ensure they don't use 
->>> any
->>> resource of the parent after it's been freed.
->> After fops_open, currently we are counting on parent driver stop all 
->> dma first, then call uacce_remove, which is assumption.
->> Like drivers/crypto/hisilicon/zip/zip_main.c: 
->> hisi_qm_wait_task_finish, which will wait uacce_release.
->> If comments this , there may other issue,
->> Unable to handle kernel paging request at virtual address 
->> ffff80000b700204
->> pc : hisi_qm_cache_wb.part.0+0x2c/0xa0
->>
->>> I see uacce_fops_poll() may have the same problem, and should be inside
->>> uacce_mutex.
->> Do we need consider this, uacce_remove can happen anytime but not 
->> waiting dma stop?
->>
->> Not sure uacce_mutex can do this.
->> Currently the sequence is
->> mutex_lock(&uacce->queues_lock);
->> mutex_lock(&uacce_mutex);
->>
->> Or we set all the callbacks of uacce_ops to NULL?
-> How about in uacce_remove
-> mutex_lock(&uacce_mutex);
-> uacce->ops = NULL;
-> mutex_unlock(&uacce_mutex);
->
-> And check uacce->ops  first when using.
->
+vim +602 drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
 
-Diff like this, will merge together.
+   596	
+   597	static unsigned int virtio_crypto_ecdsa_max_size(struct crypto_akcipher *tfm)
+   598	{
+   599		struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(tfm);
+   600		struct virtio_crypto_ecdsa_ctx *ecdsa_ctx = &ctx->ecdsa_ctx;
+   601	
+ > 602		return ecdsa_max_signature_size(ecdsa_ctx->curve);
+   603	}
+   604	
 
-  drivers/misc/uacce/uacce.c | 65 ++++++++++++++++++++++++++++++++------
-  1 file changed, 56 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index b6219c6bfb48..311192728132 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -23,6 +23,11 @@ static int uacce_start_queue(struct uacce_queue *q)
-          goto out_with_lock;
-      }
-
-+    if (!q->uacce->ops) {
-+        ret = -EINVAL;
-+        goto out_with_lock;
-+    }
-+
-      if (q->uacce->ops->start_queue) {
-          ret = q->uacce->ops->start_queue(q);
-          if (ret < 0)
-@@ -46,6 +51,9 @@ static int uacce_put_queue(struct uacce_queue *q)
-      if (q->state == UACCE_Q_ZOMBIE)
-          goto out;
-
-+    if (!uacce->ops)
-+        goto out;
-+
-      if ((q->state == UACCE_Q_STARTED) && uacce->ops->stop_queue)
-          uacce->ops->stop_queue(q);
-
-@@ -65,6 +73,7 @@ static long uacce_fops_unl_ioctl(struct file *filep,
-  {
-      struct uacce_queue *q = filep->private_data;
-      struct uacce_device *uacce = q->uacce;
-+    long ret;
-
-      switch (cmd) {
-      case UACCE_CMD_START_Q:
-@@ -74,10 +83,17 @@ static long uacce_fops_unl_ioctl(struct file *filep,
-          return uacce_put_queue(q);
-
-      default:
--        if (!uacce->ops->ioctl)
--            return -EINVAL;
-+        mutex_lock(&uacce_mutex);
-+
-+        if (!uacce->ops || !uacce->ops->ioctl) {
-+            ret = -EINVAL;
-+            goto out_with_lock;
-+        }
-
--        return uacce->ops->ioctl(q, cmd, arg);
-+        ret = uacce->ops->ioctl(q, cmd, arg);
-+out_with_lock:
-+        mutex_unlock(&uacce_mutex);
-+        return ret;
-      }
-  }
-
-@@ -138,10 +154,13 @@ static int uacce_fops_open(struct inode *inode, 
-struct file *filep)
-
-      mutex_lock(&uacce->queues_lock);
-
--    if (!uacce->parent->driver) {
-+    mutex_lock(&uacce_mutex);
-+    if (!uacce->parent || !uacce->ops) {
-+        mutex_unlock(&uacce_mutex);
-          ret = -ENODEV;
-          goto out_with_lock;
-      }
-+    mutex_unlock(&uacce_mutex);
-
-      ret = uacce_bind_queue(uacce, q);
-      if (ret)
-@@ -226,6 +245,11 @@ static int uacce_fops_mmap(struct file *filep, 
-struct vm_area_struct *vma)
-
-      mutex_lock(&uacce_mutex);
-
-+    if (!uacce->ops) {
-+        ret = -EINVAL;
-+        goto out_with_lock;
-+    }
-+
-      if (q->state != UACCE_Q_INIT && q->state != UACCE_Q_STARTED) {
-          ret = -EINVAL;
-          goto out_with_lock;
-@@ -271,9 +295,18 @@ static __poll_t uacce_fops_poll(struct file *file, 
-poll_table *wait)
-      struct uacce_device *uacce = q->uacce;
-
-      poll_wait(file, &q->wait, wait);
--    if (uacce->ops->is_q_updated && uacce->ops->is_q_updated(q))
-+
-+    mutex_lock(&uacce_mutex);
-+    if (!uacce->ops)
-+        goto out_with_lock;
-+
-+    if (uacce->ops->is_q_updated && uacce->ops->is_q_updated(q)) {
-+        mutex_unlock(&uacce_mutex);
-          return EPOLLIN | EPOLLRDNORM;
-+    }
-
-+out_with_lock:
-+    mutex_unlock(&uacce_mutex);
-      return 0;
-  }
-
-@@ -312,12 +345,20 @@ static ssize_t available_instances_show(struct 
-device *dev,
-                      char *buf)
-  {
-      struct uacce_device *uacce = to_uacce_device(dev);
-+    ssize_t ret;
-
--    if (!uacce->ops->get_available_instances)
--        return -ENODEV;
-+    mutex_lock(&uacce_mutex);
-+    if (!uacce->ops || !uacce->ops->get_available_instances) {
-+        ret = -ENODEV;
-+        goto out_with_lock;
-+    }
-+
-+    ret = sysfs_emit(buf, "%d\n",
-+             uacce->ops->get_available_instances(uacce));
-
--    return sysfs_emit(buf, "%d\n",
--               uacce->ops->get_available_instances(uacce));
-+out_with_lock:
-+    mutex_unlock(&uacce_mutex);
-+    return ret;
-  }
-
-  static ssize_t algorithms_show(struct device *dev,
-@@ -523,6 +564,12 @@ void uacce_remove(struct uacce_device *uacce)
-
-      /* disable sva now since no opened queues */
-      uacce_disable_sva(uacce);
-+
-+    mutex_lock(&uacce_mutex);
-+    uacce->parent = NULL;
-+    uacce->ops = NULL;
-+    mutex_unlock(&uacce_mutex);
-+
-      mutex_unlock(&uacce->queues_lock);
-
-      if (uacce->cdev)
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
