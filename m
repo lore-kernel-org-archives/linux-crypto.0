@@ -2,74 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24A7CCA479
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 09:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B34C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 09:20:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235548AbiFQJTO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 05:19:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37032 "EHLO
+        id S235609AbiFQJUx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 05:20:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235549AbiFQJTM (ORCPT
+        with ESMTP id S231145AbiFQJUw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 05:19:12 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9AF05AEF6;
-        Fri, 17 Jun 2022 02:19:10 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0VGeEoR._1655457543;
-Received: from 30.240.100.35(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VGeEoR._1655457543)
-          by smtp.aliyun-inc.com;
-          Fri, 17 Jun 2022 17:19:06 +0800
-Message-ID: <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
-Date:   Fri, 17 Jun 2022 17:19:03 +0800
+        Fri, 17 Jun 2022 05:20:52 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3300C5BD3C;
+        Fri, 17 Jun 2022 02:20:50 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1o289h-008Bxe-LO; Fri, 17 Jun 2022 19:20:43 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Jun 2022 17:20:42 +0800
+Date:   Fri, 17 Jun 2022 17:20:42 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        qianweili@huawei.com, shenyang39@huawei.com
+Subject: Re: [PATCH] MAINTAINERS: update HiSilicon ZIP and QM maintainers
+Message-ID: <YqxHaoV4ZJK8LCJY@gondor.apana.org.au>
+References: <20220609025639.3280804-1-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [PATCH v4 0/2] pkcs7: support SM2/SM3 and EC-RDSA/streebog
- algorithms
-Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-References: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Elvira Khabirova <e.khabirova@omp.ru>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220609025639.3280804-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jarkko,
+On Thu, Jun 09, 2022 at 02:56:39AM +0000, Zhou Wang wrote:
+> This patch splits QM and ZIP in MAINTAINERS, then add Weili Qian for QM
+> driver and Yang Shen for ZIP driver. This patch adds missing Kconfig and
+> Makefile files as well.
+> 
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> ---
+>  MAINTAINERS | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 
-On 9/18/21 4:07 PM, Tianjia Zhang wrote:
-> This series of patches integrates the two patches sended separately,
-> resolves the conflict, and rebases on the latest code.
-> 
-> The two patches respectively support the SM2/SM3 and EC-RDSA/streebog
-> algorithm combinations for the pkcs7 parser.
-> 
-> Elvira Khabirova (1):
->    pkcs7: support EC-RDSA/streebog in SignerInfo
-> 
-> Tianjia Zhang (1):
->    pkcs7: parser support SM2 and SM3 algorithms combination
-> 
->   crypto/asymmetric_keys/pkcs7_parser.c | 18 ++++++++++++++++++
->   1 file changed, 18 insertions(+)
-> 
-
-No response from David, can you pick this?
-
-Best regards,
-Tianjia
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
