@@ -2,47 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E978C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 10:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EA4CCA479
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 11:02:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381654AbiFQKKo (ORCPT
+        id S1381539AbiFQLCp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 06:10:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57182 "EHLO
+        Fri, 17 Jun 2022 07:02:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381655AbiFQKKn (ORCPT
+        with ESMTP id S1382299AbiFQLCb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 06:10:43 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1B94A6A053;
-        Fri, 17 Jun 2022 03:10:38 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E485812FC;
-        Fri, 17 Jun 2022 03:10:37 -0700 (PDT)
-Received: from [10.57.70.15] (unknown [10.57.70.15])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2DB673F73B;
-        Fri, 17 Jun 2022 03:10:36 -0700 (PDT)
-Message-ID: <a048a5ae-5f1e-d2ea-8152-09de4b6e420e@foss.arm.com>
-Date:   Fri, 17 Jun 2022 11:10:34 +0100
+        Fri, 17 Jun 2022 07:02:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2C2956CAA8
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Jun 2022 04:02:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655463741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ziFOWbv9by8WUWOuHr9i3fD+ni8iVbPClUxuq+yU6N4=;
+        b=dfL9y/qQwPUY299SmRJW/Dd2MjnVj3J3s70jh245B57fmYty6Pts9ZmphlCQ6BjoR7fDN1
+        r2WdWv2l11ZabIUwL6OW7nD/NhsFwGr6x+zrr7E6YC+XV7A6R6Ub545I6MZLgSjPHxuD1F
+        ylwc7iZCzd2JJDjExUnRJgOip8fOrVY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-518-zdANyfOzOMaw-H4c2HfTNA-1; Fri, 17 Jun 2022 07:02:20 -0400
+X-MC-Unique: zdANyfOzOMaw-H4c2HfTNA-1
+Received: by mail-wm1-f70.google.com with SMTP id be12-20020a05600c1e8c00b0039c506b52a4so3596964wmb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Jun 2022 04:02:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ziFOWbv9by8WUWOuHr9i3fD+ni8iVbPClUxuq+yU6N4=;
+        b=Owxpxwr2yGPj+QYxhYFTcURJkHq3/8LG8EHnWL1Bgi7HGvbPIY67Qq302SFtS2mIei
+         8qEwNDe1gR51R0oSIVH9MYnmVlFuEuY4pbaf7A4OT+polGaZ4hNXH7HmP87gqhwpd4lt
+         emMu+X4u3YRk/xvWAg7CpWcBTXwX0HIQbNqREPHnYgIIuNUeDsGrVNw+0nDwH1xPUvM4
+         FZZOVD+gWitP32W89SDIEjYDz9pkMsaiUarVny51RbCB3ECoAQLAomi8tmYoUc1Es0pg
+         AxSaMtJrUKgF4du1Ys6Pdc7e0jHGhfefWmKjeLDqNE9UixcUMQnjR+9+3EVhz4VY7dz+
+         lZrg==
+X-Gm-Message-State: AOAM533iSkeAOnlyBBFTNDST68UvSLuR1eZTacmtV0I/s4xwb5cZRsqN
+        /JZ5XoZZVxB6wGTsciCuSatzAoQZcjfEhAxaDOWpqEjzTlzBzo0a9IRuSvH8C3axQYKdoMd4Td5
+        ttu9YfDFWwr8lEmR58I+yUt93
+X-Received: by 2002:a05:600c:1d94:b0:39c:68c0:403b with SMTP id p20-20020a05600c1d9400b0039c68c0403bmr20288841wms.125.1655463739485;
+        Fri, 17 Jun 2022 04:02:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxrl+Er1GbwVnF2EfagbXzpVeEsnXyeknhzxoI7syjv6S3yxm+1wOc0XP849K+/8yys6OUzvg==
+X-Received: by 2002:a05:600c:1d94:b0:39c:68c0:403b with SMTP id p20-20020a05600c1d9400b0039c68c0403bmr20288821wms.125.1655463739205;
+        Fri, 17 Jun 2022 04:02:19 -0700 (PDT)
+Received: from redhat.com ([2.54.189.19])
+        by smtp.gmail.com with ESMTPSA id f15-20020a5d568f000000b00213b93cff5fsm4121938wrv.98.2022.06.17.04.02.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jun 2022 04:02:18 -0700 (PDT)
+Date:   Fri, 17 Jun 2022 07:02:13 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Lei He <helei.sig11@bytedance.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        dhowells@redhat.com, arei.gonglei@huawei.com, jasowang@redhat.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pizhenwei@bytedance.com, f4bug@amsat.org, berrange@redhat.com
+Subject: Re: [PATCH 0/4] virtio-crypto: support ECDSA algorithm
+Message-ID: <20220617070201-mutt-send-email-mst@kernel.org>
+References: <20220617070754.73667-1-helei.sig11@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-To:     yoan.picchi@arm.com, andre.przywara@arm.com, ardb@kernel.org,
-        davem@davemloft.net, giovanni.cabiddu@intel.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, qat-linux@intel.com
-References: <20220617095548.436758-1-yoan.picchi@arm.com>
-Subject: Re: [PATCH 0/2] Crypto: Remove x86 dependency on QAT drivers
-Reply-To: yoan.picchi@arm.com
-Content-Language: en-CA
-From:   Yoan Picchi <yoan.picchi@foss.arm.com>
-In-Reply-To: <20220617095548.436758-1-yoan.picchi@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220617070754.73667-1-helei.sig11@bytedance.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Please disregard this post, I sent the wrong patch by mistake. Please 
-look at the [PATCH v3 0/2] instead.
+On Fri, Jun 17, 2022 at 03:07:49PM +0800, Lei He wrote:
+> From: lei he <helei.sig11@bytedance.com>
+> 
+> This patch supports the ECDSA algorithm for virtio-crypto:
+> 1. fixed the problem that the max_signature_size of ECDSA is
+> incorrectly calculated.
+> 2. make pkcs8_private_key_parser can identify ECDSA private keys.
+> 3. implement ECDSA algorithm for virtio-crypto device
+
+virtio bits:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> lei he (4):
+>   crypto: fix the calculation of max_size for ECDSA
+>   crypto: pkcs8 parser support ECDSA private keys
+>   crypto: remove unused field in pkcs8_parse_context
+>   virtio-crypto: support ECDSA algorithm
+> 
+>  crypto/Kconfig                                |   1 +
+>  crypto/Makefile                               |   2 +
+>  crypto/akcipher.c                             |  10 +
+>  crypto/asymmetric_keys/pkcs8.asn1             |   2 +-
+>  crypto/asymmetric_keys/pkcs8_parser.c         |  46 +++-
+>  crypto/ecdsa.c                                |   3 +-
+>  crypto/ecdsa_helper.c                         |  45 +++
+>  .../virtio/virtio_crypto_akcipher_algs.c      | 259 ++++++++++++++++--
+>  include/crypto/internal/ecdsa.h               |  15 +
+>  include/linux/asn1_encoder.h                  |   2 +
+>  lib/asn1_encoder.c                            |   3 +-
+>  11 files changed, 360 insertions(+), 28 deletions(-)
+>  create mode 100644 crypto/ecdsa_helper.c
+>  create mode 100644 include/crypto/internal/ecdsa.h
+> 
+> -- 
+> 2.20.1
 
