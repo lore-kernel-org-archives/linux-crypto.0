@@ -2,107 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67218C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jun 2022 23:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2862CCCA479
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 Jun 2022 00:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237789AbiFQXhi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jun 2022 19:37:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
+        id S1383713AbiFRAio (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 17 Jun 2022 20:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237496AbiFQXhh (ORCPT
+        with ESMTP id S1383754AbiFRAih (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jun 2022 19:37:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 480E7101C;
-        Fri, 17 Jun 2022 16:37:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EFAE361D55;
-        Fri, 17 Jun 2022 23:37:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD64C3411B;
-        Fri, 17 Jun 2022 23:37:33 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mH1mOeyV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1655509051;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HcY8feozlb/iCMaAqa0x3x7SwlLLCwcos88Sao/FquI=;
-        b=mH1mOeyVMPct2R8r2l783spD8uc0JkMPncFYg+38d2wfNoup/6Zkfu9HU49vv9zaSekhnk
-        dyy7cnoRngHab8ToVlPHHsshTFIXk4xJwyooWBPYZI/02w5YgDL6oNBlvdVyG0hyqXKOlg
-        52NtrcZ6z7msBzLFdXM7K4qdGoA2bNc=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1c615cb4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Fri, 17 Jun 2022 23:37:31 +0000 (UTC)
-Date:   Sat, 18 Jun 2022 01:37:30 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, Ted Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
-Message-ID: <Yq0QOmahm8m018NK@zx2c4.com>
-References: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
- <Yqr+rFeixFuHzyHD@zx2c4.com>
- <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
+        Fri, 17 Jun 2022 20:38:37 -0400
+Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A95766CB4;
+        Fri, 17 Jun 2022 17:38:36 -0700 (PDT)
+Received: by mail-ua1-x931.google.com with SMTP id b7so832953uap.5;
+        Fri, 17 Jun 2022 17:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lZ79sX+NJPfDAxCDBVsMrqEoMTGb5GcEdj4eYBesXgk=;
+        b=p1upQiOUMA8PL2CVEC6xwDEj/NXS9hZCuYq2h9VFhcZbwa7Iji2IfJbpJKs6+pz4HT
+         iQKpTBiaIkZZbMAaB5YyaMHa3SkkDkxnurDzhu5hz1RkGgCPMbwx+a9bNB3wENYI1vXM
+         JgBymJBBv00MrQk445/3gsty58kJcWyvSELlOLLFYRsbsKvP33cFOjpwmY7LP6cf0Miq
+         W3dr5Gdpj2dPT94ZwHLypJ8Koh4HidHmdyHjQq0nO29gMeKFw+zsmeJq7bYJksF/+ZuM
+         DlY4TSoamJkBEUKxYGGEvKnNcpgIX5f1/QPSc9ooVuyushZt39kntnahUFVrMMHQJQvJ
+         BZqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lZ79sX+NJPfDAxCDBVsMrqEoMTGb5GcEdj4eYBesXgk=;
+        b=kRcOt6dQvZZKUUHKM3h/E01amgGCXyOpBUkhwNMLDyUBxYpf4z8eDrF8dYm3fbz9Oy
+         7UNWliHJgkliiDJPFfHbKrE43PUsuLeK/Vry1Zj6IDI8LDpoFRdoZNjxvZB4DJgnJolo
+         fQHSiVZiMmxaBKgU45b0fpRAvASCJSCCh/vN/uojpZWgqaRVk247TUsddMRtmnfEX096
+         kG1S6GbiMinpgx+Vevan/7ucTaxUUItcdaFJB3lqVZOW1o/pVc/JMiuH9o4GPbGAPXnD
+         wHFLQcRP/30PJJkzde+WakHbVHDc0Ky7PKVPDk2Jj7puY9eVWtOWtw/SeC4Tb+aCm59o
+         Pxuw==
+X-Gm-Message-State: AJIora9AX5ZDPH/4qNvikrGpNGAkqmcfNvHzE4vcPFnsfQpl28jWJedi
+        sCpLXv5j/IX29TLk/cMdOrYv/RJXNAZE97qp8aDf+YYFdiU=
+X-Google-Smtp-Source: AGRyM1vnNl+hFRmEmbioJB8SqizkgKILAZoKeV4oL7t6SWB2/iK4GIUoO+SGdJu0TGdOlKDEmsVbLCe/CF47y7MXERw=
+X-Received: by 2002:ab0:7844:0:b0:37e:fc7f:ecd0 with SMTP id
+ y4-20020ab07844000000b0037efc7fecd0mr2355220uaq.45.1655512715469; Fri, 17 Jun
+ 2022 17:38:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
+References: <CACXcFmmw8bzSr-pmTauMS7a=036eW0=1KLdwAD1MOB_fY-7VRg@mail.gmail.com>
+ <Yqr+rFeixFuHzyHD@zx2c4.com> <CACXcFmmdrELd8CkwmBQf5-W7PkR=McjcUz9kPDzaCh=NrODKUA@mail.gmail.com>
+ <Yq0QOmahm8m018NK@zx2c4.com>
+In-Reply-To: <Yq0QOmahm8m018NK@zx2c4.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 18 Jun 2022 08:38:23 +0800
+Message-ID: <CACXcFmma8euek8Z9T6m4jiyD1poyo3WHrLZKuN22sE20hFXNpA@mail.gmail.com>
+Subject: Re: [PATCH] random Remove setting of chacha state to constant values.
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, "Ted Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jun 18, 2022 at 07:17:00AM +0800, Sandy Harris wrote:
-> Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> 
-> > ChaCha is a permutation that requires those constants.
-> 
-> No. The actual permutation does not use the constants.
-> They are used in setting up the state & directly affect
-> only the first round. The other 19 rounds do not use
-> the constants; they operate on the more-or-less random
-> state left by the previous round.
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 
-I guess. But that just seems like all the more reason to stick with the
-constants in that first round, as chacha lacks round constants like
-"hermetic" permutations. Better to give less control over that initial
-state. Anyway, we're not going to veer off into lala land and redesign
-chacha on lkml.
+> > There is no such argument for
+> > memset(&chacha_state[12], 0, sizeof(u32) * 4);
+> > ChaCha has a counter and a nonce in those
+> > bits, so setting them to zero is a deviation.
+>
+> No. There's a new key each time. So the nonce begins at zero. And the
+> counter begins at zero as well at the beginning like usual. So it's
+> actually a rather boring by-the-books usage of chacha.
 
-> There is no such argument for
-> memset(&chacha_state[12], 0, sizeof(u32) * 4);
-> ChaCha has a counter and a nonce in those
-> bits, so setting them to zero is a deviation.
+No. ChaCha has a random nonce.
 
-No. There's a new key each time. So the nonce begins at zero. And the
-counter begins at zero as well at the beginning like usual. So it's
-actually a rather boring by-the-books usage of chacha.
+> But the larger reason for rejecting your idea wholesale is that I'm
+> trying to enforce the property that input data goes through our hash
+> function (via mix_pool_bytes). Full stop! It's time that this
+> willy-nilly stuff ends where we're feeding in things right and left with
+> no actual design on which is ingesting what input and how it interacts.
 
-> Dropping the memset() and using whatever
-> the existing state has there may not be ideal,
-> but it is certainly better than the zeroes.
+For input data, I agree completely.
 
-I'm not so sure about that. For starters, it means that we'll never
-actually exceed the first 32 bits, and so the branch for the increment
-of the next word is never true, which has some tiny value. And as for
-the nonce, I'd like to reserve that for whatever interesting use comes
-up in the future (like using the cpu number or something in an
-interesting parallel design).
+> So if you do think that a particular block of memory somewhere at some
+> point has some entropic value, then by all means call mix_pool_bytes or
+> add_device_randomness on it. But don't try to stuff it in where it
+> doesn't belong.
 
-But the larger reason for rejecting your idea wholesale is that I'm
-trying to enforce the property that input data goes through our hash
-function (via mix_pool_bytes). Full stop! It's time that this
-willy-nilly stuff ends where we're feeding in things right and left with
-no actual design on which is ingesting what input and how it interacts.
-So if you do think that a particular block of memory somewhere at some
-point has some entropic value, then by all means call mix_pool_bytes or
-add_device_randomness on it. But don't try to stuff it in where it
-doesn't belong.
-
-The type of valuable patch I'd like to encourage is this recent one from
-LinusW: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac9d25557dcc9fe90ed12bfbb6db401e892ca004
-This seems like the kind of thing that might really help the situation
-on certain devices in a real way. More of that! Less of fake crypto.
-
-Jason
+This is not input data but more-or-less random state. I'm not trying
+to input it, just to leave it where it belongs rather than overwriting
+it with constants.
