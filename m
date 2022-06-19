@@ -2,91 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB39BC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Jun 2022 16:44:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820ADC43334
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Jun 2022 16:56:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234808AbiFSQoX convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Jun 2022 12:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35214 "EHLO
+        id S234253AbiFSQ4W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 19 Jun 2022 12:56:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbiFSQoX (ORCPT
+        with ESMTP id S232771AbiFSQ4W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Jun 2022 12:44:23 -0400
+        Sun, 19 Jun 2022 12:56:22 -0400
 Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE91D113;
-        Sun, 19 Jun 2022 09:44:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 968D29594;
+        Sun, 19 Jun 2022 09:56:20 -0700 (PDT)
 Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id E38071C0B8F; Sun, 19 Jun 2022 18:44:19 +0200 (CEST)
-Date:   Sun, 19 Jun 2022 18:44:16 +0200
+        id 4046D1C0B8F; Sun, 19 Jun 2022 18:56:19 +0200 (CEST)
+Date:   Sun, 19 Jun 2022 18:56:15 +0200
 From:   Pavel Machek <pavel@ucw.cz>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>,
-        Jann Horn <jannh@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        Guenter Roeck <linux@roeck-us.net>,
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Guenter Roeck <linux@roeck-us.net>,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        Theodore Ts'o <tytso@mit.edu>, Jann Horn <jannh@google.com>
 Subject: Re: [PATCH] random: allow writes to /dev/urandom to influence fast
  init
-Message-ID: <20220619164416.GA3362@bug>
+Message-ID: <20220619165615.GB3362@bug>
 References: <20220322191436.110963-1-Jason@zx2c4.com>
- <1648009787.fah6dos6ya.none@localhost>
- <CAHmME9rsvxczJrhPwRX6nyrh9NB2AuJqkEKrTLx-G-T1J6_czQ@mail.gmail.com>
- <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+ <YjzMPymC3uXQUTrq@gmail.com>
+ <CAHmME9p7k2Z2f3aYctHxV9oNwe_GKd62Sghh9Ck1-nRyPaEypA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <CAHmME9ovJpdcuuZhNKrOTUc8XvKDDdC+axhAmOD9iESnRR7JqA@mail.gmail.com>
+In-Reply-To: <CAHmME9p7k2Z2f3aYctHxV9oNwe_GKd62Sghh9Ck1-nRyPaEypA@mail.gmail.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Hi!
-
-> > Very much so, thanks again. What I take away from your results is:
+> > On Tue, Mar 22, 2022 at 01:14:36PM -0600, Jason A. Donenfeld wrote:
+> >> For as far back as I can tell, writing to /dev/urandom or /dev/random
+> >> will put entropy into the pool, but won't immediately use it, and won't
+> >> credit it either.
 > >
-> > - RNDADDTOENTCNT is in active use in a safe way. Sure, RNDADDENTROPY
-> > is still much better, but RNDADDTOENTCNT isn't entirely broken in the
-> > above configurations either.
-> > - This patch would make RNDADDTOENTCNT unsafe for some of the above
-> > configurations in a way that it currently isn't unsafe.
-> > - Plenty of things are seeding the RNG correctly, and buildroot's
-> > shell script is just "doing it wrong".
-> >
-> > On that last point, I should reiterate that buildroot's shell script
-> > still isn't actually initializing the RNG, despite what it says in its
-> > echo; there's never been a way to initialize the RNG from a shell
-> > script, without calling out to various special purpose ioctl-aware
-> > binaries.
+> > Did you check kernels v4.7 and earlier?  It looks like this actually changed
+> > in
+> > v4.8 when the ChaCha20 CRNG was introduced.  v4.7 would mix the data written
+> > to
+> > /dev/{u,}random into {non,}blocking_pool, which would immediately be
+> > reflected
+> > in reads from /dev/{u,}random, sys_getrandom(), and get_random_bytes().
+> > Writes
+> > to /dev/{u,}random didn't affect the input_pool, which was separate.
 > 
-> Based on this, the fact that shell scripts cannot seed the RNG anyway,
-> and due to the hazards in trying to retrofit some heuristics onto an
-> interface that was never designed to work like this, I'm convinced at
-> this point that the right course of action here is to leave this
-> alone. There's no combination of /dev/urandom write hacks/heuristics
-> that do the right thing without creating some big problem elsewhere.
-> It just does not have the right semantics for it, and changing the
-> existing semantics will break existing users.
-> 
-> In light of that conclusion, I'm going to work with every userspace
-> downstream I can find to help them fix their file-based seeding, if it
-> has bugs. I've started talking with the buildroot folks, and then I'll
-> speak with the OpenRC people (being a Gentoo dev, that should be easy
-> going). Systemd does the right thing already.
-> 
-> I wrote a little utility for potential inclusion in
-> busybox/util-linux/whatever when it matures beyond its current age of
-> being half hour old:
-> - https://git.zx2c4.com/seedrng/about/
-> - https://git.zx2c4.com/seedrng/tree/seedrng.c
-> So I'll see what the buildroot people think of this and take it from there.
+> Oh, I suppose you might be right, actually, that v4.7 and below would
+> hash the non blocking pool, and let /dev/urandom write directly into
+> it, as something distinct from the input pool. This changed with v4.8,
+> 6 years ago, and now there are no LTS kernels that old, with most
+> small devices even having vendor kernels v4.9+. v4.8 apparently did
 
-You could put it into the kernel into tools/ directory...
+We are still maintaining 4.4 for -cip project, and people running android probably still 
+maintain that, too.
+
+> this while fixing a more extreme vulnerability of allowing unprivileged users to 
+> bruteforce input bytes (in addition to allowing unbounded unprivileged lock contention). 
+
+I assume this got fixed during the 4.4-stable series?
 
 Best regards,
-									Pavel
+										Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
