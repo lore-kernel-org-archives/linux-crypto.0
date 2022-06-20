@@ -2,229 +2,170 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB67ECCA482
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 21:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E68CCA480
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:00:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244969AbiFTViD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 17:38:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46062 "EHLO
+        id S1345898AbiFTXAE (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Jun 2022 19:00:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiFTViC (ORCPT
+        with ESMTP id S1345381AbiFTW7t (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 17:38:02 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B874917E06;
-        Mon, 20 Jun 2022 14:38:00 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id j21so6136396lfe.1;
-        Mon, 20 Jun 2022 14:38:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=EgAnwP4MqXgu0q0d6eXWE8mU2Kiz+p4e1fpGeFSH/Y8=;
-        b=o2pZhsbnmZB/hPYNsAdRYKSGEUThCWUrSiKDope47O0Hc6y1Ie/Uhr9vlzSWLA7VnO
-         6lN78P1MVEepVV3liDs+f/UB+HrgEgGkF966GYg6fLnqq8wNHYQe6N3JVso5Fyy44o6y
-         MTQQwOrei2MX3mKbp2o5cf+Ro3YqXr9BSPZ5sDofxPvIy+Jve8CIopY4koLos6Miyhim
-         HbI7xS8hrxSimFq+buz+51JhYFW3Umf1FryhoF2UDYiuUfKl62C81eqe/XBlIMtqb1Un
-         gQyf5QE3lnyE367qbAyXYc4b7q6kAK5See9cks50Cphd4BQMI3b++pGIJWMs08WbeyvQ
-         Qelg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=EgAnwP4MqXgu0q0d6eXWE8mU2Kiz+p4e1fpGeFSH/Y8=;
-        b=7RiOEA/bzBRath7sC7zWrFcuenBQGUwlcGUlmBrYYf2/bVUJVEMUlSkJFt82hxSpDK
-         jaMHk23RDo784UrVglD76cdP/x3CTw+sps4u3JGqxjgjlwbenKnTn1TGrwuuO0r45tyQ
-         lDzmy7sOioELHgrK2K0JT4sTVV8YJKh3sc27bkt7Cc45BxQAcY96NFR/SKjramP+3BO3
-         g2d2nMlwRFscd9EhR6jSF47Cc0G2jR7RZNtfnwFA0Sd31aCHJsSNsMzkzfLf10PLhdq3
-         RNESImdLMu3Hz8W7BSeKoWks2jqPXuxnuMbaQPLNNtWpwQ45tbmdWDJhaVThBwmNUDp6
-         BR2Q==
-X-Gm-Message-State: AJIora/cPLw00Ly/TAOP0b36pw4ysBN97ReNMWq0mK0qXJzKh/e/phif
-        wDNj4YeT8pQISdPIhHLieN4=
-X-Google-Smtp-Source: AGRyM1s0d2VrYvy3auZpZcZEHLNE88miIB37xA3w0baRw5oXY3mn7ZteuCobzjV8K7l5aFMU1SrfTQ==
-X-Received: by 2002:a05:6512:b1c:b0:47d:df52:b5a9 with SMTP id w28-20020a0565120b1c00b0047ddf52b5a9mr13983505lfu.293.1655761079086;
-        Mon, 20 Jun 2022 14:37:59 -0700 (PDT)
-Received: from mobilestation ([95.79.189.214])
-        by smtp.gmail.com with ESMTPSA id m3-20020a05651202e300b0047f647414eesm992667lfq.229.2022.06.20.14.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jun 2022 14:37:58 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 00:37:55 +0300
-From:   Serge Semin <fancer.lancer@gmail.com>
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Vladimir Murzin <vladimir.murzin@arm.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@bootlin.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Srujana Challa <schalla@marvell.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        linux-crypto@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Li Yang <leoyang.li@nxp.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        linux-renesas-soc@vger.kernel.org,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-arm-msm@vger.kernel.org,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>, ntb@lists.linux.dev,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dma-direct: take dma-ranges/offsets into account in
- resource mapping
-Message-ID: <20220620213755.kczuriyildoublzi@mobilestation>
-References: <20220610080802.11147-1-Sergey.Semin@baikalelectronics.ru>
+        Mon, 20 Jun 2022 18:59:49 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5D3186F3;
+        Mon, 20 Jun 2022 15:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EI5mo3nbu8Y1Lwlz8IW78D/vshGOQKxGXVcwen+zy24QljGByPviwtV6RHSIOPKWRxOBgPH8dSMYn+rNb0AU/K8uAldIHzZm0sSN0MT9wZVcZxf0laLiZrwYjQaUN480CRcR0sFvjpmIIoAHlnnLOvfnGHKdH/Fxvn+36Ov9AbLZSJDuiUEEczD9KC/fnUd54fiumTiqMedrXXVZkuM9kYUw+ahiLE4eLiGUkWBwJJEg02r1j6g2WLlG4gqwSkRra38UwtwsUlw/oLVbYkJQVsZbVPyFHXAXV5g8f3GGBdfPtwY58bfpTYIOXaWhWT3k8KUKZz+4GuTw0T1QHWWB/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XUzZ7utTppgomqu8BBKewOTqQ2wmjJFZ79d1pAXa/O0=;
+ b=GR6kzc9qAkn3bXOh22R+RzbbYGD/ZD8XPBPIXdykhKbPKo1JX9LSR482wxPLIeKMOUlM7AGbSd8zo/lI4eX6Xn6pY41ZNgg0wwQro1B7IMbo5OYvhhBwG+asYDr1//O6QQ+mcGWPuI8MMqYM1ytEHjZWbfBSGAEMToft17/VmxcOKJgbMS5rLDcc1xmm9bkg1PWxm2kmtwUDz/beCSnpyYYjtHKvSJ6Z/s8mOx1G/bZ17xgoLXPkBhKmQudExkjDNq1GMg8KhYg1kI73OK3cUCQAs29ZtOAeIso5/KauHRGMjAUFGW7XNi3GSb5kNKzJlaYWdWAP4EWEv1875CxW1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XUzZ7utTppgomqu8BBKewOTqQ2wmjJFZ79d1pAXa/O0=;
+ b=W5Amy7WWlyFL3XZs3WDTfk0y6jg6Kg0EpqQXIdpIJeeB09eDpwhPjt/5EWIvTNYcSpcyjIIbbijVG81RudbN58E9Ggdxg4WaTRIeSQ3hwpK5nHpv1pRvLouDLfJwa4gM3Q0n3w46hTTQkOoM/+8z9j3NUuqHA6sbxNadE8B4pAE=
+Received: from BN1PR12CA0023.namprd12.prod.outlook.com (2603:10b6:408:e1::28)
+ by CY5PR12MB6106.namprd12.prod.outlook.com (2603:10b6:930:29::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Mon, 20 Jun
+ 2022 22:59:15 +0000
+Received: from BN8NAM11FT060.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e1:cafe::c5) by BN1PR12CA0023.outlook.office365.com
+ (2603:10b6:408:e1::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.18 via Frontend
+ Transport; Mon, 20 Jun 2022 22:59:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT060.mail.protection.outlook.com (10.13.177.211) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 22:59:14 +0000
+Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Mon, 20 Jun 2022 17:59:12 -0500
+From:   Ashish Kalra <Ashish.Kalra@amd.com>
+To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        <linux-mm@kvack.org>, <linux-crypto@vger.kernel.org>
+CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
+        <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
+        <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+        <pgonda@google.com>, <peterz@infradead.org>,
+        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
+        <michael.roth@amd.com>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+        <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
+Subject: [PATCH Part2 v6 01/49] x86/cpufeatures: Add SEV-SNP CPU feature
+Date:   Mon, 20 Jun 2022 22:59:01 +0000
+Message-ID: <7abfca61f8595c036e1bd9f1d65ab78af0006627.1655761627.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220610080802.11147-1-Sergey.Semin@baikalelectronics.ru>
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5f973712-7a60-4e30-21ab-08da53107f6d
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6106:EE_
+X-Microsoft-Antispam-PRVS: <CY5PR12MB610642814686B07DA3F732EB8EB09@CY5PR12MB6106.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9Whthn3VJlIN8bfO5qQ3CLHshN6fTnueuc372UkcfxwZPB1JFomBnPFnlOdoriy+SmJvcsmoYc53QPwuhISCJ/mp4RrjuVrj9Ev81HPDxj5qWQoBIk9MK99IgVTIMnzdZb0fCp/qEcdiKT4ZM83BemKAUK8Ypc9RFEjM8kM805QGvAxA1MwskCzpmhkyVCTx4C9Kx7LGKIJLvEXveTY9IMIkUIxlE3txVKzi6DMNc7fwJUA5OmGaK3LjLPeM20VNwgoqAUnLhVl4ZbX30lTN/Pg7griLgDMIp6v6AbvtuBUXJ5bAlpthYQfUTfxFQ9LrOoNDC5rRl37rMjYY7rnoLyx3sjqWkM9c1TtMCoolFj9Ur1Fx+215wzhwMqXiDWsy8CwKakRwlH9o6D4T4gdRQOJ6LM88QZlbsv8HZmy11YcYJ4ubyKIydfU52S+H7JIn9v+GfBAqQD56J5p41g9W6wgtx6ppjNes0OTNI5v7T8fRuZZNPhPTr0ganw/cEoW6mN7iELzASfsbxSUjumr7idETW3zsY2TIWAhVLsniXJwfV1lrhAmumUPzgMu7uDdREtdJzpteNLeMLXrh/1q3deg7bRSRCmSOo9W7ZP85234fwM3VwbXhVZhOIunyvO4AuAn2lCRO/hn/dhi8h/9bfGeh9qn8JXEBPLmOcMhLGtoB1QogXXwXqzlBWAZ8coIpsxPReQ1BKAKzkKwAYRs0i3Zk6n+VuLO3MoIFmiriV4l0eEqPDA3PeqAyWUtiTq6DHdteoVX1VaJTKNpSu9c1Qg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(396003)(376002)(346002)(36840700001)(40470700004)(46966006)(40480700001)(7696005)(36860700001)(6666004)(70586007)(16526019)(26005)(2616005)(478600001)(186003)(70206006)(40460700003)(8936002)(82740400003)(86362001)(336012)(47076005)(36756003)(5660300002)(4326008)(83380400001)(426003)(81166007)(316002)(7416002)(2906002)(41300700001)(8676002)(54906003)(356005)(110136005)(82310400005)(7406005)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 22:59:14.8162
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f973712-7a60-4e30-21ab-08da53107f6d
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT060.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6106
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Folks,
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-On Fri, Jun 10, 2022 at 11:08:02AM +0300, Serge Semin wrote:
-> A basic device-specific linear memory mapping was introduced back in
-> commit ("dma: Take into account dma_pfn_offset") as a single-valued offset
-> preserved in the device.dma_pfn_offset field, which was initialized for
-> instance by means of the "dma-ranges" DT property. Afterwards the
-> functionality was extended to support more than one device-specific region
-> defined in the device.dma_range_map list of maps. But all of these
-> improvements concerned a single pointer, page or sg DMA-mapping methods,
-> while the system resource mapping function turned to miss the
-> corresponding modification. Thus the dma_direct_map_resource() method now
-> just casts the CPU physical address to the device DMA address with no
-> dma-ranges-based mapping taking into account, which is obviously wrong.
-> Let's fix it by using the phys_to_dma_direct() method to get the
-> device-specific bus address from the passed memory resource for the case
-> of the directly mapped DMA.
+Add CPU feature detection for Secure Encrypted Virtualization with
+Secure Nested Paging. This feature adds a strong memory integrity
+protection to help prevent malicious hypervisor-based attacks like
+data replay, memory re-mapping, and more.
 
-So any comment on the suggest modification? Any notes against or for?
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ arch/x86/include/asm/cpufeatures.h       | 1 +
+ arch/x86/kernel/cpu/amd.c                | 3 ++-
+ tools/arch/x86/include/asm/cpufeatures.h | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
--Sergey
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 30da1341f226..1cba0217669f 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -407,6 +407,7 @@
+ #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+ #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+ #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
++#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+ #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+ 
+ /*
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index 0c0b09796ced..2e87015a9d69 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -559,7 +559,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ 	 *	      If the kernel has not enabled SME via any means then
+ 	 *	      don't advertise the SME feature.
+ 	 *   For SEV: If BIOS has not enabled SEV then don't advertise the
+-	 *            SEV and SEV_ES feature (set in scattered.c).
++	 *            SEV, SEV_ES and SEV_SNP feature.
+ 	 *
+ 	 *   In all cases, since support for SME and SEV requires long mode,
+ 	 *   don't advertise the feature under CONFIG_X86_32.
+@@ -594,6 +594,7 @@ static void early_detect_mem_encrypt(struct cpuinfo_x86 *c)
+ clear_sev:
+ 		setup_clear_cpu_cap(X86_FEATURE_SEV);
+ 		setup_clear_cpu_cap(X86_FEATURE_SEV_ES);
++		setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+ 	}
+ }
+ 
+diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/include/asm/cpufeatures.h
+index 73e643ae94b6..a636342ecb26 100644
+--- a/tools/arch/x86/include/asm/cpufeatures.h
++++ b/tools/arch/x86/include/asm/cpufeatures.h
+@@ -405,6 +405,7 @@
+ #define X86_FEATURE_SEV			(19*32+ 1) /* AMD Secure Encrypted Virtualization */
+ #define X86_FEATURE_VM_PAGE_FLUSH	(19*32+ 2) /* "" VM Page Flush MSR is supported */
+ #define X86_FEATURE_SEV_ES		(19*32+ 3) /* AMD Secure Encrypted Virtualization - Encrypted State */
++#define X86_FEATURE_SEV_SNP		(19*32+4)  /* AMD Secure Encrypted Virtualization - Secure Nested Paging */
+ #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
+ 
+ /*
+-- 
+2.25.1
 
-> 
-> Fixes: 25f1e1887088 ("dma: Take into account dma_pfn_offset")
-> Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
-> 
-> ---
-> 
-> After a long discussion with Christoph and Robin regarding this patch
-> here:
-> https://lore.kernel.org/lkml/20220324014836.19149-4-Sergey.Semin@baikalelectronics.ru
-> and here
-> https://lore.kernel.org/linux-pci/20220503225104.12108-2-Sergey.Semin@baikalelectronics.ru/
-> It was decided to consult with wider maintainers audience whether it's ok
-> to accept the change as is or a more sophisticated solution needs to be
-> found for the non-linear direct MMIO mapping.
-> 
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Robin Murphy <robin.murphy@arm.com>
-> Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-> 
-> file: arch/arm/mach-orion5x/board-dt.c
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
-> Cc: Gregory Clement <gregory.clement@bootlin.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> 
-> file: drivers/crypto/marvell/cesa/cesa.c
-> Cc: Srujana Challa <schalla@marvell.com>
-> Cc: Arnaud Ebalard <arno@natisbad.org>
-> Cc: Boris Brezillon <bbrezillon@kernel.org>
-> Cc: linux-crypto@vger.kernel.org
-> 
-> file: drivers/dma/{fsl-edma-common.c,pl330.c,sh/rcar-dmac.c}
-> Cc: Vinod Koul <vkoul@kernel.org>
-> Cc: dmaengine@vger.kernel.org
-> 
-> file: arch/arm/boot/dts/{vfxxx.dtsi,ls1021a.dtsi,imx7ulp.dtsi,fsl-ls1043a.dtsi}
-> Cc: Shawn Guo <shawnguo@kernel.org>
-> Cc: Sascha Hauer <s.hauer@pengutronix.de>
-> Cc: Li Yang <leoyang.li@nxp.com>
-> Cc: linux-arm-kernel@lists.infradead.org
-> 
-> file: arch/arm/boot/dts/r8a77*.dtsi, arch/arm64/boot/dts/renesas/r8a77*.dtsi
-> Cc: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: Magnus Damm <magnus.damm@gmail.com>
-> Cc: linux-renesas-soc@vger.kernel.org
-> 
-> file: drivers/gpu/drm/amd/amdgpu/amdgpu_vram_mgr.c
-> Cc: Alex Deucher <alexander.deucher@amd.com>
-> Cc: "Christian König" <christian.koenig@amd.com>
-> Cc: "Pan, Xinhui" <Xinhui.Pan@amd.com>
-> 
-> file: drivers/gpu/drm/virtio/virtgpu_vram.c
-> Cc: David Airlie <airlied@linux.ie>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> 
-> file: drivers/media/common/videobuf2/videobuf2-dma-contig.c
-> Cc: Tomasz Figa <tfiga@chromium.org>
-> Cc: Marek Szyprowski <m.szyprowski@samsung.com>
-> 
-> file: drivers/misc/habanalabs/common/memory.c
-> Cc: Oded Gabbay <ogabbay@kernel.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
-> file: drivers/mtd/nand/raw/qcom_nandc.c
-> Cc: Manivannan Sadhasivam <mani@kernel.org>
-> 
-> file: arch/arm64/boot/dts/qcom/{ipq8074.dtsi,ipq6018.dtsi,qcom-sdx55.dtsi,qcom-ipq4019.dtsi,qcom-ipq8064.dtsi}
-> Cc: Andy Gross <agross@kernel.org>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Cc: linux-arm-msm@vger.kernel.org
-> 
-> file: drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> Cc: Sunil Goutham <sgoutham@marvell.com>
-> Cc: Linu Cherian <lcherian@marvell.com>
-> Cc: Geetha sowjanya <gakula@marvell.com>
-> 
-> file: drivers/ntb/ntb_transport.c
-> Cc: Jon Mason <jdmason@kudzu.us>
-> Cc: Dave Jiang <dave.jiang@intel.com>
-> Cc: ntb@lists.linux.dev
-> ---
->  kernel/dma/direct.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-> index 9743c6ccce1a..bc06db74dfdb 100644
-> --- a/kernel/dma/direct.c
-> +++ b/kernel/dma/direct.c
-> @@ -497,7 +497,7 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
->  dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t paddr,
->  		size_t size, enum dma_data_direction dir, unsigned long attrs)
->  {
-> -	dma_addr_t dma_addr = paddr;
-> +	dma_addr_t dma_addr = phys_to_dma_direct(dev, paddr);
->  
->  	if (unlikely(!dma_capable(dev, dma_addr, size, false))) {
->  		dev_err_once(dev,
-> -- 
-> 2.35.1
-> 
