@@ -2,45 +2,44 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4524C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F855C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:02:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346713AbiFTW7J (ORCPT
+        id S1346370AbiFTXCq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 18:59:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60784 "EHLO
+        Mon, 20 Jun 2022 19:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346381AbiFTW65 (ORCPT
+        with ESMTP id S1346435AbiFTXC1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 18:58:57 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2049.outbound.protection.outlook.com [40.107.95.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DD5425E91;
-        Mon, 20 Jun 2022 15:56:40 -0700 (PDT)
+        Mon, 20 Jun 2022 19:02:27 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82B821E3F;
+        Mon, 20 Jun 2022 16:02:15 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BZjOURGjcNxY6x1b8cuoGQ4mbcGGMSzc3wuB7sm4oJEfnsBVNg12FnE15NBELd1ctw7vgjseeUWQuTj0MUMh8b7DtqSSu/6gHJ0x3pl3TDuETDBIwO5kMIkQdoFErP4S/OjL4Gd8KfjhsgX5JCpOLpIollXlJxlsNfzxOnVmvm0f7bXXAj823SXoETKKsnEqciu/xHXQxJ6TLCDIJ6zRssmhYbLnG8vScQYbgi6l5D2h5RAeXxpic9Y5Zlq89EBhpbDrAS6WlSDkXTVdu1HdTRgd544vfRUEutqaJQWYfU83XKm88+UKILG1MKAwFHj6f2uFJ23RU3TZUNeaXk6/WQ==
+ b=nW13WQo/Z3792e0PoAL4v2PbYWZ/HdlEYjnQ9CkAm/Qf+AXF2eHnXrOrx7XbG/6BfHc1+sPkB7UVHrFYA7xET3kMJQ5wbdeVjzF+k6Zqh0f9Phc059TTJpXJTFI0TpJ+t3Yz4KTjPQZxqU6JK6Ss34vbMcTMAf9BPgA08F9zm3E9u0w/dL6faO5Xi7wUi1Ev6WKhSdhvExvX8BW/7kyqTfL73Z+b4Q9uQZRHGx2ciIJ/yU6wWU7brC4b3XQYy5IbJTPe28ulMut9S8FBd23d5GYR/WVUZP7aJ3YT5+1/9HgsAaOB43VOa73USbLIlKeQrNkYsugf5C1GnVcyZNLIAQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GoqyPYAFEPrUGFwl0WHdlFmF70C6y6inBBjVyVgC8O0=;
- b=OpF7xnr0OT7A7V4ecrwjKG5ve8i3Gwtn13ejHZurSne/sXUqp/8Q3E6Iq6qK8MDdT3pXOhX+V6CHVmE9+yAd0rknv/pFyBu+HPds1w4OEa9+EgjE+LLMS+bOhfsLqHDqSGn2U1IbF/bVXd/x0qwyL3Tpv7VLONCvwxDaAjzt6c3ftL69l+gOf2toc+q2CrPzVhStwdM7QHY6ygKJSiNDRyY5kXz2+Zo+CXOG79Rd+pj155qcTEUmbOlbLuCNzL25fSxvTKM6CUaiehCuMp/EIr6L7Dgv18oOrZ9Ob1T/LaesoOGlhc8aBbrLQqLaMJyQceiF8zB3jvS8Cfv9P4ZsNg==
+ bh=QvxK3sgL9uPUw1r29lmHh+BrQxA04Cm/99qT8Zj3GBc=;
+ b=NeRFZYNzLUQrt+8Ep3VJqkRzxcfJPXiZzgLytbf63twq23Sh3DDsMcteJ92G/RluTrZ2t0pfMLp5aF5WbXpBEQh729EiurLyMLgcX8BdeI55sQ5/IU6twXM2XyTprbhZIAByyHecP0iZIOY7gwT9obMNRNqbQO4WT4xeoGel0octgRCxL115+ZiB1+JRGnrJB57HdwrWIalhmde6t/rj+AqlY+LOMv+M2g+Niv+ckHjAHw/PJKrhbi4mcGDyxach8JwItqMYZ38krCabcljUuYYVxyOiyAD2N1hkHtd6S/vj6Mef15Gds1x3alb9Z+svT6xZsri0dyw453JdfNB6Xw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GoqyPYAFEPrUGFwl0WHdlFmF70C6y6inBBjVyVgC8O0=;
- b=gAHiP+FeJ1Pj5oY23qewdAlU0zxXCB3A1PEnCbjtSC1KxztWZ4phmmjFn7gW7LTjiI5W3UvNXR0ua2IYnEdlqkwjCLx5kRylFiH4rSAjHKp4+W1Jw0v3XUFCc5otf71zCxaCITzicTSatczzViSxvjqMfyQVs+j7uvnrT+c+pAc=
-Received: from BN9PR03CA0473.namprd03.prod.outlook.com (2603:10b6:408:139::28)
- by BY5PR12MB4099.namprd12.prod.outlook.com (2603:10b6:a03:20f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14; Mon, 20 Jun
- 2022 22:56:33 +0000
-Received: from BN8NAM11FT013.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:139:cafe::8) by BN9PR03CA0473.outlook.office365.com
- (2603:10b6:408:139::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.18 via Frontend
- Transport; Mon, 20 Jun 2022 22:56:33 +0000
+ bh=QvxK3sgL9uPUw1r29lmHh+BrQxA04Cm/99qT8Zj3GBc=;
+ b=iWedkQh5PGiwOXGGG+EtbFu+QtStrtVoIddP1zOh9fmxkg4n/hP6kPAl4KGzR+WbAT735YHR2HrO+gqInB3x7a7BHzs9ahRejybkFbAfD1QqQXIFk7OGYeJfUHPpK8IwA+GQyEFPOJxIFhCKhzekxy7I4kXKVyW49avE+VKSpPk=
+Received: from DM6PR01CA0025.prod.exchangelabs.com (2603:10b6:5:296::30) by
+ DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5353.15; Mon, 20 Jun 2022 23:02:13 +0000
+Received: from DM6NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:296:cafe::d9) by DM6PR01CA0025.outlook.office365.com
+ (2603:10b6:5:296::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.20 via Frontend
+ Transport; Mon, 20 Jun 2022 23:02:13 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +47,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT013.mail.protection.outlook.com (10.13.176.182) with Microsoft SMTP
+ DM6NAM11FT026.mail.protection.outlook.com (10.13.172.161) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 22:56:33 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:02:13 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 17:56:31 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:02:10 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -62,7 +61,7 @@ To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
 CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <thomas.lendacky@amd.com>, <hpa@zytor.com>, <ardb@kernel.org>,
         <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
+        <jmattson@google.com>, <luto@kernel.org>,
         <dave.hansen@linux.intel.com>, <slp@redhat.com>,
         <pgonda@google.com>, <peterz@infradead.org>,
         <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
@@ -71,10 +70,12 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 00/49] Add AMD Secure Nested Paging (SEV-SNP)
-Date:   Mon, 20 Jun 2022 22:56:13 +0000
-Message-ID: <cover.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 03/49] x86/sev: Add the host SEV-SNP initialization support
+Date:   Mon, 20 Jun 2022 23:02:01 +0000
+Message-ID: <8f4eef289aba5067582d0d3535299c22a4e5c4c4.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -83,258 +84,287 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 202b9676-1bb9-40b4-dc35-08da53101f36
-X-MS-TrafficTypeDiagnostic: BY5PR12MB4099:EE_
-X-Microsoft-Antispam-PRVS: <BY5PR12MB4099D73E5DDA995F1CD49CD28EB09@BY5PR12MB4099.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 39303a01-980f-49ae-ab64-08da5310e9e9
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4516:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB451638503F0D5A3AB4ABA0628EB09@DM6PR12MB4516.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WRpARwGZGEfnBooT4GMuBkKwCGmXKI00CHu7gTYqhTGUfnGT9F7ldIW5pyzQXML3C7SuviVurz876gU9OVU8rmJeS9G96y4A0Goa1Cgxu6jzhcZ2PnJKk9awznQG54CGl+nLHUhES4VvNi06dtT+jCUiGfa9norvWjpoP+PJnm2ibDjZ2r3IBbxxgmGFTSoSW7C2Z2SxL/Z4oZdi0oeD0VF99coYOBMZEpIdGt1ly2PvntuO8GAeNQVBujqZBGHk8x55gOemuY+0ymlb6xrn0Cyib5iOpuoNb8SNI8ANT8YbAqclV7PaNcqhq4jkXnrHiDJ6zozE+R926PlH/5mFO04sXG/6SO5byrzoQy84YfKW7m9B42FPg1cPL4DyAWSoLNSQ1edd3pIcXw6B7srUXR/fQTY3ofHN1GQiDh5OtFnfAvsYC9dvPPT0ge+TUmdpvST56JcWeB7vZT8/V7VCAOPGXqHb6q4MZmQgVLDiRZKsFygI0SVkfGW6MbVNcs39D0Bq8lMz2PdXTRhe/UMEKmfVBOjR2BLqXkwKsNDsqwH4EeIaAFwSACVaH1B6fEmkLKrCRif7ZeWEqzbkjhgrMD9YH8ZxcvwJYfu3yyDoXMgeRcuQXC2xb45x/gdWWPKn4vGB4/OKruTutht7enWoDx1KG+158VahJ+se/WZgN0mHpGdaluP5r7O+0bBrKZ6RizTxmOrzsYYCu7DEInr+zp2BCD844mhMmTmapRvTtzSYgiygzYazoDT1kJBhSyC5xPUG+chhpJstCpRv4KaaraBlChktyTBmMFVPpvD9ZD1qlnYVNOAAXc7odwHD6inGWRAcIS0x0C1hEofYQA+1EbatGkQZoCUv/+IF00i4ubaF3qjpB0i3R0Ql6OGGH5X+
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(136003)(396003)(39860400002)(46966006)(40470700004)(36840700001)(8936002)(70586007)(8676002)(478600001)(5660300002)(54906003)(110136005)(6666004)(4326008)(36860700001)(316002)(966005)(7406005)(70206006)(40480700001)(7416002)(82310400005)(36756003)(30864003)(86362001)(2906002)(356005)(82740400003)(7696005)(186003)(336012)(16526019)(81166007)(83380400001)(26005)(2616005)(426003)(41300700001)(47076005)(40460700003)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: PXzg8G3IGLDDScwyb54VajP7JgI3ng8/uNbkE06uPuDp3fBPX+HYR0b/EUTljLU3ekjNwGqcCkg/VAozWTgoxjqdleNhdKceTc6HWd2+MdsCiPF6wdGftkBJHM2iZKrd7L5sOQlhtSI28spQrMHWxOrXMXRSa7FlAwwEMjTycyINzyCIez4sZKUJj8txJdXP0eRWBtE3mJWnZpFs5a3TiE6O7mj8G+jOEwZUkAepDPEbzZ2o3Traxyxa+3ILtT8wL2gvINgJOFab02imKKYwref948gjlE7IKOyIffinuAH1q5aXcBtufGo3c3GwnNAXh8Gqw9T/8J6n3FfUw34JNZgz21K2Gr/UdUh+mvDTke9WdMwREi35JdDemhpiIlDATtCzZxOZFEB6YD++mEr5XygBlGaC5/pn4PA8+HirzHmrnjeYP6vv+q9xmvtojuYCpT8Z8M6eH+77VP/vzQFLZzhKY81tGPstPjq+pRIXHS3j1NvxHzb8sVyngs2DpzyfU9OA2GAACYJu835+BH8oSPXfnnaoouKE2EtK6Pfvmi7JM8bPJI2v4hvfneikTuhoJx+1PoGq5L4INKGLNksQKaFN7Wldd4Wa6A1y3ceXrSrwKTCy/qh3dzi49Z0A/HO5LnZh8xyGY3zfr/BR3ILwvSCey3DtH9J9vHwFMLITZYGwAimoIatb+dKZU7/P+EV27lOII8sdsUwG+spskJEmVzPtkd/Wpe/tMo6fbVMsBxGf+gHc/fKoyxwkJeGHdnWPFAYlo94zrmiB1gmfkd+sEA==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(39860400002)(136003)(346002)(36840700001)(46966006)(40470700004)(82740400003)(356005)(82310400005)(36756003)(36860700001)(81166007)(110136005)(316002)(40480700001)(54906003)(186003)(47076005)(26005)(8676002)(16526019)(4326008)(426003)(2906002)(70206006)(336012)(70586007)(83380400001)(7416002)(7406005)(8936002)(478600001)(86362001)(5660300002)(2616005)(40460700003)(6666004)(41300700001)(7696005)(2101003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 22:56:33.3836
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:02:13.4240
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 202b9676-1bb9-40b4-dc35-08da53101f36
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39303a01-980f-49ae-ab64-08da5310e9e9
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT013.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT026.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4099
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4516
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
-changes required in a host OS for SEV-SNP support. The series builds upon
-SEV-SNP Guest Support now part of mainline.
+The memory integrity guarantees of SEV-SNP are enforced through a new
+structure called the Reverse Map Table (RMP). The RMP is a single data
+structure shared across the system that contains one entry for every 4K
+page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
+track the owner of each page of memory. Pages of memory can be owned by
+the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
+section 15.36.3 for more detail on RMP.
 
-This series provides the basic building blocks to support booting the SEV-SNP
-VMs, it does not cover all the security enhancement introduced by the SEV-SNP
-such as interrupt protection.
+The RMP table is used to enforce access control to memory. The table itself
+is not directly writable by the software. New CPU instructions (RMPUPDATE,
+PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
 
-The CCP driver is enhanced to provide new APIs that use the SEV-SNP
-specific commands defined in the SEV-SNP firmware specification. The KVM
-driver uses those APIs to create and managed the SEV-SNP guests.
+Based on the platform configuration, the BIOS reserves the memory used
+for the RMP table. The start and end address of the RMP table must be
+queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
+RMP_END are not set then disable the SEV-SNP feature.
 
-The GHCB specification version 2 introduces new set of NAE's that is
-used by the SEV-SNP guest to communicate with the hypervisor. The series
-provides support to handle the following new NAE events:
-- Register GHCB GPA
-- Page State Change Request
-- Hypevisor feature
-- Guest message request
+The SEV-SNP feature is enabled only after the RMP table is successfully
+initialized.
 
-The RMP check is enforced as soon as SEV-SNP is enabled. Not every memory
-access requires an RMP check. In particular, the read accesses from the
-hypervisor do not require RMP checks because the data confidentiality is
-already protected via memory encryption. When hardware encounters an RMP
-checks failure, it raises a page-fault exception. If RMP check failure
-is due to the page-size mismatch, then split the large page to resolve
-the fault.
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+---
+ arch/x86/include/asm/disabled-features.h |   8 +-
+ arch/x86/include/asm/msr-index.h         |   6 +
+ arch/x86/kernel/sev.c                    | 144 +++++++++++++++++++++++
+ 3 files changed, 157 insertions(+), 1 deletion(-)
 
-The series does not provide support for the interrupt security and migration
-and those feature will be added after the base support.
-
-Please note that some areas, such as how private guest pages are 
-managed/pinned/protected, are likely to change once Unmapped Private Memory
-support is further along in development/design and can be incorporated
-into this series. We are posting these patches without UPM support for now
-to hopefully get some review on other aspects of the series in the meantime.
-
-Here is a link to latest UPM v6 patches: 
-https://lore.kernel.org/linux-mm/20220519153713.819591-1-chao.p.peng@linux.intel.com/
-
-A branch containing these patches is available here:
-https://github.com/AMDESE/linux/tree/sev-snp-5.18-rc3-v3
-
-Changes since v5:
- * Rebase to 5.18.0-rc3, these patches are just for review so they
-   are based on 5.18.0-rc3 linux-next release as this included the
-   SNP guest patches which weren't in mainline then.
- * Using kvm_write_guest() to sync the GHCB scratch buffer can fail
-   due to host mapping being 2M, but RMP being 4K. The page fault
-   handling in do_user_addr_fault() fails to split the 2M page to handle
-   RMP fault due it being called in a non-preemptible context. Instead, 
-   use the already kernel mapped ghcb to sync the scratch buffer when
-   the scratch buffer is contained within the GHCB.
- * warn and retry failed rmpupdates.
- * Fix for stale per-cpu pointer due to cond_resched due during 
-   ghcb mapping.
- * Multiple fixes for SEV-SNP AP Creation.
- * Remove SRCU to synchronize the PSC and gfn mapping replacing it
-   with a spinlock. 
- * Remove generic post_{map,unmap}_gfn ops, need to revisit these
-   later with respect to UPM support.
- * Fix kvm_mmu_get_tdp_walk() to handle "suspicious RCU usage" 
-   warning.
- * Fix sev_snp_init() to do WBINVD/DF_FLUSH command after SNP_INIT
-   command has been issued.
- * Fix sev_free_vcpu() to flush the VMSA page after it is transitioned
-   back to hypervisor state and restored in the kernel direct map.
-
-Changes since v4:
- * Move the RMP entry definition to x86 specific header file.
- * Move the dump RMP entry function to SEV specific file.
- * Use BIT_ULL while defining the #PF bit fields.
- * Add helper function to check the IOMMU support for SEV-SNP feature.
- * Add helper functions for the page state transition.
- * Map and unmap the pages from the direct map after page is added or
-   removed in RMP table.
- * Enforce the minimum SEV-SNP firmware version.
- * Extend the LAUNCH_UPDATE to accept the base_gfn and remove the
-   logic to calculate the gfn from the hva.
- * Add a check in LAUNCH_UPDATE to ensure that all the pages are
-   shared before calling the PSP.
- * Mark the memory failure when failing to remove the page from the
-   RMP table or clearing the immutable bit.
- * Exclude the encrypted hva range from the KSM.
- * Remove the gfn tracking during the kvm_gfn_map() and use SRCU to
-   syncronize the PSC and gfn mapping.
- * Allow PSC on the registered hva range only.
- * Add support for the Preferred GPA VMGEXIT.
- * Simplify the PSC handling routines.
- * Use the static_call() for the newly added kvm_x86_ops.
- * Remove the long-lived GHCB map.
- * Move the snp enable module parameter to the end of the file.
- * Remove the kvm_x86_op for the RMP fault handling. Call the
-   fault handler directly from the #NPF interception.
-
-Changes since v3:
- * Add support for extended guest message request.
- * Add ioctl to query the SNP Platform status.
- * Add ioctl to get and set the SNP config.
- * Add check to verify that memory reserved for the RMP covers the full system RAM.
- * Start the SNP specific commands from 256 instead of 255.
- * Multiple cleanup and fixes based on the review feedback.
-
-Changes since v2:
- * Add AP creation support.
- * Drop the patch to handle the RMP fault for the kernel address.
- * Add functions to track the write access from the hypervisor.
- * Do not enable the SNP feature when IOMMU is disabled or is in passthrough mode.
- * Dump the RMP entry on RMP violation for the debug.
- * Shorten the GHCB macro names.
- * Start the SNP_INIT command id from 255 to give some gap for the legacy SEV.
- * Sync the header with the latest 0.9 SNP spec.
-
-Changes since v1:
- * Add AP reset MSR protocol VMGEXIT NAE.
- * Add Hypervisor features VMGEXIT NAE.
- * Move the RMP table initialization and RMPUPDATE/PSMASH helper in
-   arch/x86/kernel/sev.c.
- * Add support to map/unmap SEV legacy command buffer to firmware state when
-   SNP is active.
- * Enhance PSP driver to provide helper to allocate/free memory used for the
-   firmware context page.
- * Add support to handle RMP fault for the kernel address.
- * Add support to handle GUEST_REQUEST NAE event for attestation.
- * Rename RMP table lookup helper.
- * Drop typedef from rmpentry struct definition.
- * Drop SNP static key and use cpu_feature_enabled() to check whether SEV-SNP
-   is active.
- * Multiple cleanup/fixes to address Boris review feedback.
-
-
-Ashish Kalra (1):
-  KVM: SVM: Sync the GHCB scratch buffer using already mapped ghcb
-
-Brijesh Singh (42):
-  x86/cpufeatures: Add SEV-SNP CPU feature
-  iommu/amd: Introduce function to check SEV-SNP support
-  x86/sev: Add the host SEV-SNP initialization support
-  x86/sev: set SYSCFG.MFMD
-  x86/sev: Add RMP entry lookup helpers
-  x86/sev: Add helper functions for RMPUPDATE and PSMASH instruction
-  x86/sev: Invalid pages from direct map when adding it to RMP table
-  x86/traps: Define RMP violation #PF error code
-  x86/fault: Add support to handle the RMP fault for user address
-  x86/fault: Add support to dump RMP entry on fault
-  crypto:ccp: Define the SEV-SNP commands
-  crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP
-  crypto:ccp: Provide APIs to issue SEV-SNP commands
-  crypto: ccp: Handle the legacy TMR allocation when SNP is enabled
-  crypto: ccp: Handle the legacy SEV command when SNP is enabled
-  crypto: ccp: Add the SNP_PLATFORM_STATUS command
-  crypto: ccp: Add the SNP_{SET,GET}_EXT_CONFIG command
-  crypto: ccp: Provide APIs to query extended attestation report
-  KVM: SVM: Provide the Hypervisor Feature support VMGEXIT
-  KVM: SVM: Make AVIC backing, VMSA and VMCB memory allocation SNP safe
-  KVM: SVM: Add initial SEV-SNP support
-  KVM: SVM: Add KVM_SNP_INIT command
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
-  KVM: SVM: Disallow registering memory range from HugeTLB for SNP guest
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
-  KVM: SVM: Mark the private vma unmerable for SEV-SNP guests
-  KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
-  KVM: X86: Keep the NPT and RMP page level in sync
-  KVM: x86: Introduce kvm_mmu_get_tdp_walk() for SEV-SNP use
-  KVM: x86: Define RMP page fault error bits for #NPF
-  KVM: x86: Update page-fault trace to log full 64-bit error code
-  KVM: SVM: Do not use long-lived GHCB map while setting scratch area
-  KVM: SVM: Remove the long-lived GHCB host map
-  KVM: SVM: Add support to handle GHCB GPA register VMGEXIT
-  KVM: SVM: Add support to handle MSR based Page State Change VMGEXIT
-  KVM: SVM: Add support to handle Page State Change VMGEXIT
-  KVM: SVM: Introduce ops for the post gfn map and unmap
-  KVM: x86: Export the kvm_zap_gfn_range() for the SNP use
-  KVM: SVM: Add support to handle the RMP nested page fault
-  KVM: SVM: Provide support for SNP_GUEST_REQUEST NAE event
-  KVM: SVM: Add module parameter to enable the SEV-SNP
-  ccp: add support to decrypt the page
-
-Michael Roth (2):
-  *fix for stale per-cpu pointer due to cond_resched  during ghcb
-    mapping
-  *debug: warn and retry failed rmpupdates
-
-Sean Christopherson (1):
-  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX and SNP
-
-Tom Lendacky (3):
-  KVM: SVM: Add support to handle AP reset MSR protocol
-  KVM: SVM: Use a VMSA physical address variable for populating VMCB
-  KVM: SVM: Support SEV-SNP AP Creation NAE event
-
- Documentation/virt/coco/sevguest.rst          |   54 +
- .../virt/kvm/x86/amd-memory-encryption.rst    |  102 +
- arch/x86/include/asm/cpufeatures.h            |    1 +
- arch/x86/include/asm/disabled-features.h      |    8 +-
- arch/x86/include/asm/kvm-x86-ops.h            |    2 +
- arch/x86/include/asm/kvm_host.h               |   15 +
- arch/x86/include/asm/msr-index.h              |    9 +
- arch/x86/include/asm/sev-common.h             |   28 +
- arch/x86/include/asm/sev.h                    |   45 +
- arch/x86/include/asm/svm.h                    |    6 +
- arch/x86/include/asm/trap_pf.h                |   18 +-
- arch/x86/kernel/cpu/amd.c                     |    3 +-
- arch/x86/kernel/sev.c                         |  400 ++++
- arch/x86/kvm/lapic.c                          |    5 +-
- arch/x86/kvm/mmu.h                            |    7 +-
- arch/x86/kvm/mmu/mmu.c                        |   90 +
- arch/x86/kvm/svm/sev.c                        | 1703 ++++++++++++++++-
- arch/x86/kvm/svm/svm.c                        |   62 +-
- arch/x86/kvm/svm/svm.h                        |   75 +-
- arch/x86/kvm/trace.h                          |   40 +-
- arch/x86/kvm/x86.c                            |   10 +-
- arch/x86/mm/fault.c                           |   84 +-
- drivers/crypto/ccp/sev-dev.c                  |  908 ++++++++-
- drivers/crypto/ccp/sev-dev.h                  |   17 +
- drivers/iommu/amd/init.c                      |   30 +
- include/linux/iommu.h                         |    9 +
- include/linux/mm.h                            |    3 +-
- include/linux/mm_types.h                      |    3 +
- include/linux/psp-sev.h                       |  346 ++++
- include/linux/sev.h                           |   32 +
- include/uapi/linux/kvm.h                      |   56 +
- include/uapi/linux/psp-sev.h                  |   60 +
- mm/memory.c                                   |   13 +
- tools/arch/x86/include/asm/cpufeatures.h      |    1 +
- 34 files changed, 4090 insertions(+), 155 deletions(-)
- create mode 100644 include/linux/sev.h
-
+diff --git a/arch/x86/include/asm/disabled-features.h b/arch/x86/include/asm/disabled-features.h
+index 36369e76cc63..c1be3091a383 100644
+--- a/arch/x86/include/asm/disabled-features.h
++++ b/arch/x86/include/asm/disabled-features.h
+@@ -68,6 +68,12 @@
+ # define DISABLE_TDX_GUEST	(1 << (X86_FEATURE_TDX_GUEST & 31))
+ #endif
+ 
++#ifdef CONFIG_AMD_MEM_ENCRYPT
++# define DISABLE_SEV_SNP	0
++#else
++# define DISABLE_SEV_SNP	(1 << (X86_FEATURE_SEV_SNP & 31))
++#endif
++
+ /*
+  * Make sure to add features to the correct mask
+  */
+@@ -91,7 +97,7 @@
+ 			 DISABLE_ENQCMD)
+ #define DISABLED_MASK17	0
+ #define DISABLED_MASK18	0
+-#define DISABLED_MASK19	0
++#define DISABLED_MASK19	(DISABLE_SEV_SNP)
+ #define DISABLED_MASK_CHECK BUILD_BUG_ON_ZERO(NCAPINTS != 20)
+ 
+ #endif /* _ASM_X86_DISABLED_FEATURES_H */
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 9e2e7185fc1d..57a8280e283a 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -507,6 +507,8 @@
+ #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+ #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+ #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
++#define MSR_AMD64_RMP_BASE		0xc0010132
++#define MSR_AMD64_RMP_END		0xc0010133
+ 
+ #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
+ 
+@@ -581,6 +583,10 @@
+ #define MSR_AMD64_SYSCFG		0xc0010010
+ #define MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT	23
+ #define MSR_AMD64_SYSCFG_MEM_ENCRYPT	BIT_ULL(MSR_AMD64_SYSCFG_MEM_ENCRYPT_BIT)
++#define MSR_AMD64_SYSCFG_SNP_EN_BIT		24
++#define MSR_AMD64_SYSCFG_SNP_EN		BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
++#define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT	25
++#define MSR_AMD64_SYSCFG_SNP_VMPL_EN	BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
+ #define MSR_K8_INT_PENDING_MSG		0xc0010055
+ /* C1E active bits in int pending message */
+ #define K8_INTP_C1E_ACTIVE_MASK		0x18000000
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index f01f4550e2c6..3a233b5d47c5 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -22,6 +22,8 @@
+ #include <linux/efi.h>
+ #include <linux/platform_device.h>
+ #include <linux/io.h>
++#include <linux/cpumask.h>
++#include <linux/iommu.h>
+ 
+ #include <asm/cpu_entry_area.h>
+ #include <asm/stacktrace.h>
+@@ -38,6 +40,7 @@
+ #include <asm/apic.h>
+ #include <asm/cpuid.h>
+ #include <asm/cmdline.h>
++#include <asm/iommu.h>
+ 
+ #define DR7_RESET_VALUE        0x400
+ 
+@@ -57,6 +60,12 @@
+ #define AP_INIT_CR0_DEFAULT		0x60000010
+ #define AP_INIT_MXCSR_DEFAULT		0x1f80
+ 
++/*
++ * The first 16KB from the RMP_BASE is used by the processor for the
++ * bookkeeping, the range need to be added during the RMP entry lookup.
++ */
++#define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
++
+ /* For early boot hypervisor communication in SEV-ES enabled guests */
+ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+ 
+@@ -69,6 +78,10 @@ static struct ghcb *boot_ghcb __section(".data");
+ /* Bitmap of SEV features supported by the hypervisor */
+ static u64 sev_hv_features __ro_after_init;
+ 
++static unsigned long rmptable_start __ro_after_init;
++static unsigned long rmptable_end __ro_after_init;
++
++
+ /* #VC handler runtime per-CPU data */
+ struct sev_es_runtime_data {
+ 	struct ghcb ghcb_page;
+@@ -2218,3 +2231,134 @@ static int __init snp_init_platform_device(void)
+ 	return 0;
+ }
+ device_initcall(snp_init_platform_device);
++
++#undef pr_fmt
++#define pr_fmt(fmt)	"SEV-SNP: " fmt
++
++static int __snp_enable(unsigned int cpu)
++{
++	u64 val;
++
++	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
++		return 0;
++
++	rdmsrl(MSR_AMD64_SYSCFG, val);
++
++	val |= MSR_AMD64_SYSCFG_SNP_EN;
++	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
++
++	wrmsrl(MSR_AMD64_SYSCFG, val);
++
++	return 0;
++}
++
++static __init void snp_enable(void *arg)
++{
++	__snp_enable(smp_processor_id());
++}
++
++static bool get_rmptable_info(u64 *start, u64 *len)
++{
++	u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
++
++	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
++	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
++
++	if (!rmp_base || !rmp_end) {
++		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
++		return false;
++	}
++
++	rmp_sz = rmp_end - rmp_base + 1;
++
++	/*
++	 * Calculate the amount the memory that must be reserved by the BIOS to
++	 * address the full system RAM. The reserved memory should also cover the
++	 * RMP table itself.
++	 *
++	 * See PPR Family 19h Model 01h, Revision B1 section 2.1.4.2 for more
++	 * information on memory requirement.
++	 */
++	nr_pages = totalram_pages();
++	calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + nr_pages) << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
++
++	if (calc_rmp_sz > rmp_sz) {
++		pr_info("Memory reserved for the RMP table does not cover full system RAM (expected 0x%llx got 0x%llx)\n",
++			calc_rmp_sz, rmp_sz);
++		return false;
++	}
++
++	*start = rmp_base;
++	*len = rmp_sz;
++
++	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
++
++	return true;
++}
++
++static __init int __snp_rmptable_init(void)
++{
++	u64 rmp_base, sz;
++	void *start;
++	u64 val;
++
++	if (!get_rmptable_info(&rmp_base, &sz))
++		return 1;
++
++	start = memremap(rmp_base, sz, MEMREMAP_WB);
++	if (!start) {
++		pr_err("Failed to map RMP table 0x%llx+0x%llx\n", rmp_base, sz);
++		return 1;
++	}
++
++	/*
++	 * Check if SEV-SNP is already enabled, this can happen if we are coming from
++	 * kexec boot.
++	 */
++	rdmsrl(MSR_AMD64_SYSCFG, val);
++	if (val & MSR_AMD64_SYSCFG_SNP_EN)
++		goto skip_enable;
++
++	/* Initialize the RMP table to zero */
++	memset(start, 0, sz);
++
++	/* Flush the caches to ensure that data is written before SNP is enabled. */
++	wbinvd_on_all_cpus();
++
++	/* Enable SNP on all CPUs. */
++	on_each_cpu(snp_enable, NULL, 1);
++
++skip_enable:
++	rmptable_start = (unsigned long)start;
++	rmptable_end = rmptable_start + sz;
++
++	return 0;
++}
++
++static int __init snp_rmptable_init(void)
++{
++	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
++		return 0;
++
++	if (!iommu_sev_snp_supported())
++		goto nosnp;
++
++	if (__snp_rmptable_init())
++		goto nosnp;
++
++	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
++
++	return 0;
++
++nosnp:
++	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
++	return 1;
++}
++
++/*
++ * This must be called after the PCI subsystem. This is because before enabling
++ * the SNP feature we need to ensure that IOMMU supports the SEV-SNP feature.
++ * The iommu_sev_snp_support() is used for checking the feature, and it is
++ * available after subsys_initcall().
++ */
++fs_initcall(snp_rmptable_init);
 -- 
 2.25.1
 
