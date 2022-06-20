@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7A5C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEB9CCA47C
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346912AbiFTXSS (ORCPT
+        id S1346158AbiFTXTZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 19:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33108 "EHLO
+        Mon, 20 Jun 2022 19:19:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347384AbiFTXRh (ORCPT
+        with ESMTP id S1347897AbiFTXSj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:17:37 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2064.outbound.protection.outlook.com [40.107.236.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E2B2242;
-        Mon, 20 Jun 2022 16:14:28 -0700 (PDT)
+        Mon, 20 Jun 2022 19:18:39 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5A025EBE;
+        Mon, 20 Jun 2022 16:14:56 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a/boCKCtktUx+VebArDrRhV+1pC6Apw1GL9cD1Tl8LgRK6iMPJhTCXKo2K0XaWytiYzaYDiBHGAGhVCwBQnAKEVHKYc2gRcMTQB9KRPSQoBLlhzuF+VqeslyCUEgP8t0KQ+fgpyqGShyxfgslfS/vMWfgu5HTUsROpWCV/WjbS4eQ/VOz38hVW3sj2luo/UYGhWRzvKEm/hiT9NZektjBPheXdcr+qLbXImuMQfxVcCx0GTFjWah87thxx25GwHZ7p6qzEUC0hX+fwG4R2A+d/2HZht6wMja1nXFeef5VNzFGJqeus9n+JHGxkaBfww4P/VBsH4zrjEXyXZ9xQOFvw==
+ b=c7dUUYGqflibQYcf1nIyTu4B+ALH7DMbNBT3OXfRJX+7aUGAqUe3UReRIAzmOpqd11VK3SNQxxKw56Zg6TntP4Ifv10WxSdFCL4M/ad9j0Oq/9YCqSEmNyrxQfBif0lNy3b7qwAr+hw7HY2LNYvNv4VDfuWdvDejv3bO9mqqNuf++6E9OrEAM1xZzE6L0pAmcp8NzAmFPLeuMMVlpR7ryzQLR0wfFuNBMSh6zn4Lfj4hjTNwwIoI6gCt379mSgsZVxOgYfvcuyDXrTv3ZCdJD4hM3R0nvYOc8Tpe5adupAVkAyS1MmaPemIDqpsKEJqi8z2cd5PVY+c0HS70MJ4KEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2xv2AUZVKvUruMRliZJeTqQ9YjePYiJVEjFWirEuT34=;
- b=jnjha9Z/pLUBul92GIMRYd9jaaPfeJUB2MonuKhPOV98rg5yymCp2uf+TCHnCb3M4fV2CL8jsVf2GAtmjIfx0p6pmxiltA654ZJYlz1/OvUHTXF3czw+4xkR1EAUwWUsUWPyVKQetsfNLd8ZoMyhZyVlyMpUV8DsBZ9AIgFNLjercN+4/rM7ZO+gf0aEG/tcysJinomdVduFf60CZCY92PRQHvkbVDmqdLE/aGfS3wlZw7gfh2h4PsLs0KClPvnb1OKpbyG6nrXh3ioRFytXNoVJJ5bIWUpLOTC5KWyEWjhWtb9Lo/zgsXKLipyCKAAuyviDDsg8I5rl3kEltKaQbQ==
+ bh=+7AT8kU+nKhKnw7+Cx8PeBE5hqBJEwnr9MI0G/xqwvo=;
+ b=Ght2FrJKZRVqzG53oDrI/7KW6nfWc0MOSw69HY3J8nzOHqB/Aw3zXfnt3SCtnPq3u/SvJuYRIgRsBnH/bHX9oNY1iuFODYVqpUy8RqOImO3HaI5448x3I6+QlcCQYe/I4NYJlbybBdQPWbgMsBMqf3VEVnyELHI0b3+ZV7q5L0dwTsWfvMGcZuOfJp3vPYg7Jz0fER2VOM+vwul4tk/Lpu0mm4+2haRG9EKxr+4JtSyjyKbfHogX2YBqyLp2gIBWvEyRDv6NzbssqLot70/7Bj3ipDfKF9hREmSN+I2EDLgr2rKRyDHeLb7qnytI0BA8D2ZSoNolHyeQIBtPHrc4fw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2xv2AUZVKvUruMRliZJeTqQ9YjePYiJVEjFWirEuT34=;
- b=fcy9sgrtkblFzcpNsQKA8qrrL5JzSNumyn9wEDmf9swXdK5XMueRkODJkXOf+kn14x3AwbFP2K49+wUp1GaxntT5kQOp+v5bHlYPwpoZdyr2FjX8gzhYz/OPRGwH+7L8QK+SuKsgqHtdtbb/e3bPKQjf/pF6hSuJGdqY76Su0ZM=
-Received: from SN4PR0701CA0037.namprd07.prod.outlook.com
- (2603:10b6:803:2d::32) by CH2PR12MB5532.namprd12.prod.outlook.com
- (2603:10b6:610:6d::24) with Microsoft SMTP Server (version=TLS1_2,
+ bh=+7AT8kU+nKhKnw7+Cx8PeBE5hqBJEwnr9MI0G/xqwvo=;
+ b=GCqbGYgf2aLPA9pGBd8iCNJy3zgU/CsDp+l5vluCW61tfG/4dAfd8KZ3XqhHn5NFdD9bpVKK7Un6dKQTJr/bfsjg7vPzZdBbQkrlr45WTBNmbntGCefZ+g7ioDhLTyvA4QuP3uPuxBhtOQKmi0kIdJPnIDP/AB0H/080DX7AToI=
+Received: from DM6PR07CA0132.namprd07.prod.outlook.com (2603:10b6:5:330::25)
+ by DM4PR12MB5913.namprd12.prod.outlook.com (2603:10b6:8:66::22) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15; Mon, 20 Jun
- 2022 23:14:24 +0000
-Received: from DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
- (2603:10b6:803:2d:cafe::a1) by SN4PR0701CA0037.outlook.office365.com
- (2603:10b6:803:2d::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.14 via Frontend
- Transport; Mon, 20 Jun 2022 23:14:24 +0000
+ 2022 23:14:54 +0000
+Received: from DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:330:cafe::d0) by DM6PR07CA0132.outlook.office365.com
+ (2603:10b6:5:330::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15 via Frontend
+ Transport; Mon, 20 Jun 2022 23:14:54 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT038.mail.protection.outlook.com (10.13.173.137) with Microsoft SMTP
+ DM6NAM11FT060.mail.protection.outlook.com (10.13.173.63) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:14:23 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:14:53 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:14:21 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:14:51 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -71,9 +71,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 44/49] KVM: SVM: Support SEV-SNP AP Creation NAE event
-Date:   Mon, 20 Jun 2022 23:14:12 +0000
-Message-ID: <ca0055ea49a36fcbc618f318083da5e062cccdb5.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 46/49] ccp: add support to decrypt the page
+Date:   Mon, 20 Jun 2022 23:14:43 +0000
+Message-ID: <dd5b7ab26269d70f82f2ac31f7bfbe254186ba55.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -85,444 +85,116 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7f47cb08-3599-4ff4-46e6-08da53129d57
-X-MS-TrafficTypeDiagnostic: CH2PR12MB5532:EE_
-X-Microsoft-Antispam-PRVS: <CH2PR12MB5532C87A4E80EE46FF87E2D68EB09@CH2PR12MB5532.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: c7c212f4-9d91-41fd-13da-08da5312af22
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5913:EE_
+X-Microsoft-Antispam-PRVS: <DM4PR12MB591395AB5A9399D49AE68C978EB09@DM4PR12MB5913.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fFJuFiDWhCW+favHdnyFYMn5zWAKa0GcE1PsivEA1I9GQFGIWq06kG2pUZByPeNUMjrI4R/fAukPwFkLIiiDxBhPEzUn5jX8XpTh9pxrUn4o/mX1CjWtdeRxKPE+FZMgdeADBpDCr1L9Qm+lVVt6lTYSocpI9v/VdSrYE6MhQUJXIq60RsrTcPgzK1K2GGzJ0OiE6JZ9HmPv+naucah4JuXCC8OkxD6kP8e79vGAqVvFCPNBAhKeDDXVIHMN1LYME02fA5QpZGF2iHhZ6jpDV/6sv6lSyKg120o0r1vm6nuqNhVjqXd3BfSE4jcThmCCq06N4LZ8iLVBCFJzJbRw+7hrpoO9WAz/ApWIoQzUZD6ErY5v19j7HvMdwyrJJtix8jPZFf+z3WR+RJFJl953D72kmxhUB/zpDvBWEK+s44Zbbog98TimQ1FBIjy8wud/5PHesYjjtE67gfMB/rjbWgM2B9r9YgE9dKyQhhHR5Hx6PnTbWmWvCV/t7hKS6e8UUPORiSAsTRn4c48BRRq/wsO65pOlWNmhmO+MQ+4wBJeSvCiKfdCClB7OzIM+jZpkIzkI53Gpcz0glA1L5gP/bKIMjeqLcew9RWj6VD/oRR3ZJinEloY2B4Y3FoIlZ0qsPvBQfJzFNxVhzKDE/UIgmTEXf2M+F0Bq+ARyqwyrE+COoJ9JF9v12Zcgcq233NDxrjdXTPNp9dr6Hpm9g/cGcGxei9FZxzgkmmOxkhvpZbfj9Cec0foAHL8TuP2OYp3lf31GQ9dz0wQ5AQj8rR7CNg==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(39860400002)(346002)(136003)(396003)(36840700001)(40470700004)(46966006)(54906003)(36756003)(40480700001)(70206006)(6666004)(336012)(70586007)(316002)(47076005)(7696005)(8936002)(186003)(2616005)(82310400005)(30864003)(4326008)(16526019)(110136005)(5660300002)(8676002)(82740400003)(356005)(2906002)(7406005)(83380400001)(40460700003)(36860700001)(81166007)(7416002)(26005)(41300700001)(478600001)(426003)(86362001)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Q949V+FoWGFDzWvqHvObzttm0FFPm7srvFCkSqqqVabiLa54N2UslT5oylrkqlJ2sUhVk4Yt3ubuJjdWCnCi3Jdk+5riNAaqn8oggkjS51SuOzHmZRsr+uz7cBY9BoP5aNRV4Yrf9PMAroCfTYI3KmTjAy6v+LUGhFZ/hU9F5uBFYgQdvsuKP63O6QFEC4kVjk7cB/QLVOcReuhyqUALORckm6tlxvLX1F6XWuU4nwQPPHGZit//MzmvVcCxCwSHggARpnchubrQexA22DPy/GOK0TwzPbnJRpSK1XGbnZt9m5qh/S70YhDmYi6C5q+vWnL4iP6dMMG44qnZksyOyRA2tYRMwVYVypM1EUE1li9C46gNTHl2gEQ98s8iP6QuRkNhRLKGj8Q1kUiVP3L/hNSPPqj4ixptdgMZTwErKbVUASL5mtg1XAkVayjec7FqrpbUII5EtAam+ALB7/hJxQ2UxnWbFSvO48u8XvpA6rbOFiwFHTr2Y+o3oUfHlBWV73SuEAeY0IPhm7MFreKYGRVveu2z/IR3KbRz+5tPXs6KxXcowhhdb4vlyhfPoB6Lu642UJsn2jRrirAtuJDOautZmiaIJ/rFhFk5qm30GJ/TaWFZjQhDS7xU74gkreCYRx4FFf1CYKRQIQrmwM4Rm7zg1WtWOBW8rMyVVUcpT4w5DK/eJ2GzKRSCpCZzIb+0YLePwlIFh2vMHP6NWi8fQ/U6PryFj9mfsTtrvfAefBIAy7vK/5GnUu9OStorbg5ekXfrGqDrQr98xfcfkc+sFEQN0WmLhVk7kJVYwqC+uMg=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(136003)(346002)(396003)(376002)(46966006)(36840700001)(40470700004)(2906002)(7416002)(26005)(4326008)(40480700001)(110136005)(47076005)(40460700003)(36860700001)(81166007)(7406005)(7696005)(36756003)(86362001)(82740400003)(83380400001)(186003)(356005)(8676002)(426003)(336012)(54906003)(2616005)(478600001)(70206006)(5660300002)(8936002)(82310400005)(16526019)(6666004)(316002)(41300700001)(70586007)(2101003)(36900700001)(134885004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:14:23.9512
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:14:53.8015
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f47cb08-3599-4ff4-46e6-08da53129d57
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7c212f4-9d91-41fd-13da-08da5312af22
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT038.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5532
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5913
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+From: Brijesh Singh <brijesh.singh@amd.com>
 
-Add support for the SEV-SNP AP Creation NAE event. This allows SEV-SNP
-guests to alter the register state of the APs on their own. This allows
-the guest a way of simulating INIT-SIPI.
+Add support to decrypt guest encrypted memory, these API interfaces can be
+used for example to dump VMCBs on SNP guest exit.
 
-A new event, KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, is created and used
-so as to avoid updating the VMSA pointer while the vCPU is running.
-
-For CREATE
-  The guest supplies the GPA of the VMSA to be used for the vCPU with
-  the specified APIC ID. The GPA is saved in the svm struct of the
-  target vCPU, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added
-  to the vCPU and then the vCPU is kicked.
-
-For CREATE_ON_INIT:
-  The guest supplies the GPA of the VMSA to be used for the vCPU with
-  the specified APIC ID the next time an INIT is performed. The GPA is
-  saved in the svm struct of the target vCPU.
-
-For DESTROY:
-  The guest indicates it wishes to stop the vCPU. The GPA is cleared
-  from the svm struct, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is
-  added to vCPU and then the vCPU is kicked.
-
-The KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event handler will be invoked
-as a result of the event or as a result of an INIT. The handler sets the
-vCPU to the KVM_MP_STATE_UNINITIALIZED state, so that any errors will
-leave the vCPU as not runnable. Any previous VMSA pages that were
-installed as part of an SEV-SNP AP Creation NAE event are un-pinned. If
-a new VMSA is to be installed, the VMSA guest page is pinned and set as
-the VMSA in the vCPU VMCB and the vCPU state is set to
-KVM_MP_STATE_RUNNABLE. If a new VMSA is not to be installed, the VMSA is
-cleared in the vCPU VMCB and the vCPU state is left as
-KVM_MP_STATE_UNINITIALIZED to prevent it from being run.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h |   1 -
- arch/x86/include/asm/kvm_host.h    |   3 +-
- arch/x86/include/asm/svm.h         |   7 +-
- arch/x86/kvm/svm/sev.c             | 197 +++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c             |   5 +-
- arch/x86/kvm/svm/svm.h             |   6 +
- arch/x86/kvm/x86.c                 |   9 +-
- 7 files changed, 221 insertions(+), 7 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 33 ++++++++++++++++++++++++++++++---
+ include/linux/psp-sev.h      |  6 +++---
+ 2 files changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 2dd2bc0cf4c3..e0068e702692 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -130,7 +130,6 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
- KVM_X86_OP(alloc_apic_backing_page)
- KVM_X86_OP_OPTIONAL(rmp_page_level_adjust)
--KVM_X86_OP(update_protected_guest_state)
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index f6306b820b86..9896350e7f56 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1852,11 +1852,38 @@ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error)
+ }
+ EXPORT_SYMBOL_GPL(snp_guest_page_reclaim);
  
- #undef KVM_X86_OP
- #undef KVM_X86_OP_OPTIONAL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1db4d178eb1d..660cf39344fb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -105,6 +105,7 @@
- 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
- 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-+#define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(32)
- 
- #define CR0_RESERVED_BITS                                               \
- 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
-@@ -1524,8 +1525,6 @@ struct kvm_x86_ops {
- 	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
- 
- 	void (*rmp_page_level_adjust)(struct kvm *kvm, kvm_pfn_t pfn, int *level);
--
--	int (*update_protected_guest_state)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_nested_ops {
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 284a8113227e..a69b6da71a65 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -263,7 +263,12 @@ enum avic_ipi_failure_cause {
- #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
- #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
- 
--#define SVM_SEV_FEAT_SNP_ACTIVE		BIT(0)
-+#define SVM_SEV_FEAT_SNP_ACTIVE			BIT(0)
-+#define SVM_SEV_FEAT_RESTRICTED_INJECTION	BIT(3)
-+#define SVM_SEV_FEAT_ALTERNATE_INJECTION	BIT(4)
-+#define SVM_SEV_FEAT_INT_INJ_MODES		\
-+	(SVM_SEV_FEAT_RESTRICTED_INJECTION |	\
-+	 SVM_SEV_FEAT_ALTERNATE_INJECTION)
- 
- struct vmcb_seg {
- 	u16 selector;
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d5584551f3dd..bb7d4547df81 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -657,6 +657,7 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+-int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
  {
-+	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
- 	struct sev_es_save_area *save = svm->sev_es.vmsa;
- 
- 	/* Check some debug related fields before encrypting the VMSA */
-@@ -702,6 +703,12 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	if (sev_snp_guest(svm->vcpu.kvm))
- 		save->sev_features |= SVM_SEV_FEAT_SNP_ACTIVE;
- 
-+	/*
-+	 * Save the VMSA synced SEV features. For now, they are the same for
-+	 * all vCPUs, so just save each time.
-+	 */
-+	sev->sev_features = save->sev_features;
-+
- 	return 0;
- }
- 
-@@ -3090,6 +3097,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
- 		if (!ghcb_sw_scratch_is_valid(ghcb))
- 			goto vmgexit_err;
- 		break;
-+	case SVM_VMGEXIT_AP_CREATION:
-+		if (!ghcb_rax_is_valid(ghcb))
-+			goto vmgexit_err;
-+		break;
- 	case SVM_VMGEXIT_NMI_COMPLETE:
- 	case SVM_VMGEXIT_AP_HLT_LOOP:
- 	case SVM_VMGEXIT_AP_JUMP_TABLE:
-@@ -3672,6 +3683,178 @@ static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t req_gpa, gp
- 	svm_set_ghcb_sw_exit_info_2(vcpu, rc);
- }
- 
-+static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	kvm_pfn_t pfn;
-+	hpa_t cur_pa;
-+
-+	WARN_ON(!mutex_is_locked(&svm->sev_es.snp_vmsa_mutex));
-+
-+	/* Save off the current VMSA PA for later checks */
-+	cur_pa = svm->sev_es.vmsa_pa;
-+
-+	/* Mark the vCPU as offline and not runnable */
-+	vcpu->arch.pv.pv_unhalted = false;
-+	vcpu->arch.mp_state = KVM_MP_STATE_STOPPED;
-+
-+	/* Clear use of the VMSA */
-+	svm->sev_es.vmsa_pa = INVALID_PAGE;
-+	svm->vmcb->control.vmsa_pa = INVALID_PAGE;
-+
-+	if (cur_pa != __pa(svm->sev_es.vmsa) && VALID_PAGE(cur_pa)) {
-+		/*
-+		 * The svm->sev_es.vmsa_pa field holds the hypervisor physical
-+		 * address of the about to be replaced VMSA which will no longer
-+		 * be used or referenced, so un-pin it.
-+		 */
-+		kvm_release_pfn_dirty(__phys_to_pfn(cur_pa));
-+	}
-+
-+	if (VALID_PAGE(svm->sev_es.snp_vmsa_gpa)) {
-+		/*
-+		 * The VMSA is referenced by the hypervisor physical address,
-+		 * so retrieve the PFN and pin it.
-+		 */
-+		pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(svm->sev_es.snp_vmsa_gpa));
-+		if (is_error_pfn(pfn))
-+			return -EINVAL;
-+
-+		/* Use the new VMSA */
-+		svm->sev_es.vmsa_pa = pfn_to_hpa(pfn);
-+		svm->vmcb->control.vmsa_pa = svm->sev_es.vmsa_pa;
-+
-+		/* Mark the vCPU as runnable */
-+		vcpu->arch.pv.pv_unhalted = false;
-+		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-+
-+		svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
-+	}
-+
-+	/*
-+	 * When replacing the VMSA during SEV-SNP AP creation,
-+	 * mark the VMCB dirty so that full state is always reloaded.
-+	 */
-+	vmcb_mark_all_dirty(svm->vmcb);
-+
-+	return 0;
-+}
-+
-+/*
-+ * Invoked as part of svm_vcpu_reset() processing of an init event.
-+ */
-+void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
+-	return sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, data, error);
++	struct sev_data_snp_dbg data = {0};
++	struct sev_device *sev;
 +	int ret;
 +
-+	if (!sev_snp_guest(vcpu->kvm))
-+		return;
++	if (!psp_master || !psp_master->sev_data)
++		return -ENODEV;
 +
-+	mutex_lock(&svm->sev_es.snp_vmsa_mutex);
++	sev = psp_master->sev_data;
 +
-+	if (!svm->sev_es.snp_ap_create)
-+		goto unlock;
-+
-+	svm->sev_es.snp_ap_create = false;
-+
-+	ret = __sev_snp_update_protected_guest_state(vcpu);
-+	if (ret)
-+		vcpu_unimpl(vcpu, "snp: AP state update on init failed\n");
-+
-+unlock:
-+	mutex_unlock(&svm->sev_es.snp_vmsa_mutex);
-+}
-+
-+static int sev_snp_ap_creation(struct vcpu_svm *svm)
-+{
-+	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm_vcpu *target_vcpu;
-+	struct vcpu_svm *target_svm;
-+	unsigned int request;
-+	unsigned int apic_id;
-+	bool kick;
-+	int ret;
-+
-+	request = lower_32_bits(svm->vmcb->control.exit_info_1);
-+	apic_id = upper_32_bits(svm->vmcb->control.exit_info_1);
-+
-+	/* Validate the APIC ID */
-+	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, apic_id);
-+	if (!target_vcpu) {
-+		vcpu_unimpl(vcpu, "vmgexit: invalid AP APIC ID [%#x] from guest\n",
-+			    apic_id);
++	if (!sev->snp_inited)
 +		return -EINVAL;
-+	}
 +
-+	ret = 0;
++	data.gctx_paddr = sme_me_mask | (gctx_pfn << PAGE_SHIFT);
++	data.src_addr = sme_me_mask | (src_pfn << PAGE_SHIFT);
++	data.dst_addr = sme_me_mask | (dst_pfn << PAGE_SHIFT);
++	data.len = PAGE_SIZE;
 +
-+	target_svm = to_svm(target_vcpu);
++	/* The destination page must be in the firmware state. */
++	if (snp_set_rmp_state(data.dst_addr, 1, true, false, false))
++		return -EIO;
 +
-+	/*
-+	 * We have a valid target vCPU, so the vCPU will be kicked unless the
-+	 * request is for CREATE_ON_INIT. For any errors at this stage, the
-+	 * kick will place the vCPU in an non-runnable state.
-+	 */
-+	kick = true;
++	ret = sev_do_cmd(SEV_CMD_SNP_DBG_DECRYPT, &data, error);
 +
-+	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
-+
-+	target_svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
-+	target_svm->sev_es.snp_ap_create = true;
-+
-+	/* Interrupt injection mode shouldn't change for AP creation */
-+	if (request < SVM_VMGEXIT_AP_DESTROY) {
-+		u64 sev_features;
-+
-+		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
-+		sev_features ^= sev->sev_features;
-+		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
-+			vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
-+				    vcpu->arch.regs[VCPU_REGS_RAX]);
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+	}
-+
-+	switch (request) {
-+	case SVM_VMGEXIT_AP_CREATE_ON_INIT:
-+		kick = false;
-+		fallthrough;
-+	case SVM_VMGEXIT_AP_CREATE:
-+		if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
-+			vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
-+				    svm->vmcb->control.exit_info_2);
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
-+		break;
-+	case SVM_VMGEXIT_AP_DESTROY:
-+		break;
-+	default:
-+		vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
-+			    request);
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+out:
-+	if (kick) {
-+		if (target_vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
-+			target_vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-+
-+		kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
-+		kvm_vcpu_kick(target_vcpu);
-+	}
-+
-+	mutex_unlock(&target_svm->sev_es.snp_vmsa_mutex);
++	/* Restore the page state */
++	if (snp_set_rmp_state(data.dst_addr, 1, false, false, true))
++		ret = -EIO;
 +
 +	return ret;
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3937,6 +4120,18 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		ret = 1;
- 		break;
- 	}
-+	case SVM_VMGEXIT_AP_CREATION:
-+		ret = sev_snp_ap_creation(svm);
-+		if (ret) {
-+			svm_set_ghcb_sw_exit_info_1(vcpu, 1);
-+			svm_set_ghcb_sw_exit_info_2(vcpu,
-+						    X86_TRAP_GP |
-+						    SVM_EVTINJ_TYPE_EXEPT |
-+						    SVM_EVTINJ_VALID);
-+		}
-+
-+		ret = 1;
-+		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-@@ -4024,6 +4219,8 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
- 	set_ghcb_msr(svm, GHCB_MSR_SEV_INFO(GHCB_VERSION_MAX,
- 					    GHCB_VERSION_MIN,
- 					    sev_enc_bit));
-+
-+	mutex_init(&svm->sev_es.snp_vmsa_mutex);
+ }
+-EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt);
++EXPORT_SYMBOL_GPL(snp_guest_dbg_decrypt_page);
+ 
+ int snp_guest_ext_guest_request(struct sev_data_snp_guest_request *data,
+ 				unsigned long vaddr, unsigned long *npages, unsigned long *fw_err)
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index cd37ccd1fa1f..8d2565c70c39 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -928,7 +928,7 @@ int snp_guest_decommission(struct sev_data_snp_decommission *data, int *error);
+ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
+ 
+ /**
+- * snp_guest_dbg_decrypt - perform SEV SNP_DBG_DECRYPT command
++ * snp_guest_dbg_decrypt_page - perform SEV SNP_DBG_DECRYPT command
+  *
+  * @sev_ret: sev command return code
+  *
+@@ -939,7 +939,7 @@ int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data, int *error);
+  * -%ETIMEDOUT if the sev command timed out
+  * -%EIO       if the sev returned a non-zero return code
+  */
+-int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error);
++int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error);
+ 
+ void *psp_copy_user_blob(u64 uaddr, u32 len);
+ void *snp_alloc_firmware_page(gfp_t mask);
+@@ -997,7 +997,7 @@ static inline int snp_guest_page_reclaim(struct sev_data_snp_page_reclaim *data,
+ 	return -ENODEV;
  }
  
- void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index f7155abe7567..fced6ea423ad 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1237,6 +1237,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	svm->spec_ctrl = 0;
- 	svm->virt_spec_ctrl = 0;
- 
-+	if (init_event)
-+		sev_snp_init_protected_guest_state(vcpu);
-+
- 	init_vmcb(vcpu);
- 
- 	if (!init_event)
-@@ -4749,8 +4752,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.alloc_apic_backing_page = svm_alloc_apic_backing_page,
- 
- 	.rmp_page_level_adjust = sev_rmp_page_level_adjust,
--
--	.update_protected_guest_state = sev_snp_update_protected_guest_state,
- };
- 
- /*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 46790bab07a8..971ff4e949fd 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -100,6 +100,8 @@ struct kvm_sev_info {
- 	spinlock_t psc_lock;
- 	void *snp_certs_data;
- 	struct mutex guest_req_lock;
-+
-+	u64 sev_features;	/* Features set at VMSA creation */
- };
- 
- struct kvm_svm {
-@@ -217,6 +219,10 @@ struct vcpu_sev_es_state {
- 	u64 ghcb_sw_exit_info_2;
- 
- 	u64 ghcb_registered_gpa;
-+
-+	struct mutex snp_vmsa_mutex;
-+	gpa_t snp_vmsa_gpa;
-+	bool snp_ap_create;
- };
- 
- struct vcpu_svm {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4a1d16231e30..c649d15efae3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10095,6 +10095,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-+
-+		if (kvm_check_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu)) {
-+			kvm_vcpu_reset(vcpu, true);
-+			if (vcpu->arch.mp_state != KVM_MP_STATE_RUNNABLE)
-+				goto out;
-+		}
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-@@ -12219,7 +12225,8 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
- 	if (!list_empty_careful(&vcpu->async_pf.done))
- 		return true;
- 
--	if (kvm_apic_has_events(vcpu))
-+	if (kvm_apic_has_events(vcpu) ||
-+	    kvm_test_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu))
- 		return true;
- 
- 	if (vcpu->arch.pv.pv_unhalted)
+-static inline int snp_guest_dbg_decrypt(struct sev_data_snp_dbg *data, int *error)
++static inline int snp_guest_dbg_decrypt_page(u64 gctx_pfn, u64 src_pfn, u64 dst_pfn, int *error)
+ {
+ 	return -ENODEV;
+ }
 -- 
 2.25.1
 
