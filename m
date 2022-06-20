@@ -2,45 +2,43 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E76CCA480
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75715C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345743AbiFTXIS (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 19:08:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46884 "EHLO
+        id S243115AbiFTXJR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Jun 2022 19:09:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345739AbiFTXH4 (ORCPT
+        with ESMTP id S1346833AbiFTXIe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:07:56 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2080.outbound.protection.outlook.com [40.107.94.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7149B23BEB;
-        Mon, 20 Jun 2022 16:06:52 -0700 (PDT)
+        Mon, 20 Jun 2022 19:08:34 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2041.outbound.protection.outlook.com [40.107.95.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748971E1;
+        Mon, 20 Jun 2022 16:07:49 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YVhZV3r2fgl0gRYGDQNHRb2iYEJfWD/vWhzaLIkeI0huz1dXhX2fcsHAXUXZw9uo8nE7Ab47ICt9MSRF8fqbJe6gb3FUhxzW0icJN8cd50NjFdOqfiCD81HQaxQhPWCszdFj/pGtb2TmKuAF/OirzdmY4MQ81SQlCX2NXW4GzGQndx/ig03XwoaPUSs6XuxfPLwdl6fjMUAae1YPiCKp8XZBbN2/atWB1GW+BwZzDA/mpE2JAGdkEIzpb4EWponJ1Dm1t2sFscGq/k/GnQyf4KEZpVbk1WYwFtY2c1NLgDZW54zmHB5QGV9BE5lUW+YIEDzlvfeKovTUXBGRidH6/Q==
+ b=TpleZEUhqCfXi8AFe3p0Lcej8EQiHPCKcYiNV/GTYj8Rlv/XLti+TQ9v7S4izZe//5O0mA/7np+ryggclDZmvrykNGS4YROUD++26/bT1J5UTHJJEnZRrMpQb10FqmAaqyguDwBFnwQVMNdasFvL8leHwbTZsV0ZEJx1Xvuu/qwiR0gGuFzwnlG06EcHBFn6Svgqyykh/FnL541zkoTOIHOm6MxbYD7TP0XR/4K2Ax4bLKgq/ldoe5Wck11liL+pDJUGsm9ePpqzyCISIGH5e556aQ918HkGREbbGMxzw1bId2NZuEkOZCXVUJpqED2WfueLnuWK4O/J+V3EomtC7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gRNldrZ62q/dbiU8EB7pwK/9hQjFTKYoEkcuqsV4KLA=;
- b=RsBsJpv9pNLwkKPT3tRGgMhhWwGuC1nOWWhFu+qQ5Rb5xuZvYVlK43jczfgyLP+Opq/tuVKBPl4w86TrkijHd1vjoACS97JWcezWm+yF/cZal4AIBZo47tEOKYIknwvD7RpP4TPUd2fC9X9JmClSB6+8dIxJX9H89PGMet9kZoIIA75Lws7G2qUsBur6Ox2Zf+3jazGkpaeY+Cx67a6lqO27IYxs7Os+7ZvkZXAYxj5Mv+z2UCWG8yCwMyZAOtNCR7G+6lVAslepkU9o9323wzv5xuHXWOVHREszGtUICC6MZfqw63vce7MPt9KT+wHwLYqvSIv9Z2DZTOfn6q9yDw==
+ bh=Ru40gwA2hMvkqt6QUkevHQDAp5QmGsy4qcH0u5fXdU8=;
+ b=nvoS8AhH1zxS4GZGm35+Rsz0kK37zWECSuHEyRIymuqq8M6BT6vOTTkD6liJuMaoBZK7vKlkAvAGqKUU5aR8QIfujRi5zkzctpu5XWirjEGX+RLnMYjgSd9POS6S1DsHUArD6fnW0dtSMKOHZy5nATAShVJlqyZo9ZDagq0s+lBD7LTq0otaavKrHsOf5gn8c7uN+uGWmv3LL8EzChSjBBoYyS7Zp7mus88olRNBlDb5JmuIdIfXISFvXcyBlNURyAqlG31E4l0Oe6Tcb8SR3IOBI3brIW1IlqVuyS81vRT45PaoQR1xJrRHdC3ACuJqfu5SINsORZryQLI4uy38vw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gRNldrZ62q/dbiU8EB7pwK/9hQjFTKYoEkcuqsV4KLA=;
- b=CtDB7DjlHuHzgpsm+Bfp+hka23DWGcUYeFD33HEq+UuDRpL+e+M2hULZNUrA+d3RtYcgGpWZXgWbQb8ch7Bvi+K4QYK7aNvadhUIqpoXGbYnnMcqX6W9Il7pRa3/b9ruvgDAcfqku9OtmrBFnbpIgr4JJBPRN0WJoTww0eCTYc0=
-Received: from BY3PR10CA0008.namprd10.prod.outlook.com (2603:10b6:a03:255::13)
- by DM6PR12MB3881.namprd12.prod.outlook.com (2603:10b6:5:148::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.16; Mon, 20 Jun
- 2022 23:06:48 +0000
-Received: from DM6NAM11FT014.eop-nam11.prod.protection.outlook.com
- (2603:10b6:a03:255:cafe::ca) by BY3PR10CA0008.outlook.office365.com
- (2603:10b6:a03:255::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.19 via Frontend
- Transport; Mon, 20 Jun 2022 23:06:48 +0000
+ bh=Ru40gwA2hMvkqt6QUkevHQDAp5QmGsy4qcH0u5fXdU8=;
+ b=ImDKE5wccrxxQPJ32yd0V0CXiHjyKGpOvqs76ks+itv7VeIDoJS9T9+c7KBeWbUqDgpSHOXx9O0jZaKgABnTGk0iKMC2ayK4MGk0ed3NSm5x9llq3SLRcgLSogqbSPJygoMr6fkki3+8VTDMbLampMgwe+XPHsHiDZg42hm2cG8=
+Received: from DM5PR07CA0148.namprd07.prod.outlook.com (2603:10b6:3:ee::14) by
+ CH2PR12MB4923.namprd12.prod.outlook.com (2603:10b6:610:6a::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5353.18; Mon, 20 Jun 2022 23:07:47 +0000
+Received: from DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:ee:cafe::4c) by DM5PR07CA0148.outlook.office365.com
+ (2603:10b6:3:ee::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.16 via Frontend
+ Transport; Mon, 20 Jun 2022 23:07:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT014.mail.protection.outlook.com (10.13.173.132) with Microsoft SMTP
+ DM6NAM11FT008.mail.protection.outlook.com (10.13.172.85) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:06:47 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:07:46 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:06:45 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:07:44 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -71,9 +69,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 20/49] KVM: SVM: Provide the Hypervisor Feature support VMGEXIT
-Date:   Mon, 20 Jun 2022 23:06:37 +0000
-Message-ID: <2aae6a4456858af4cd45bf2d8a2843f114b8e200.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 24/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
+Date:   Mon, 20 Jun 2022 23:07:35 +0000
+Message-ID: <6d5c899030b113755e6c093e8bb9ad123280edc6.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -85,111 +83,292 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 760845bf-f7cc-4ad6-f4db-08da53118d8c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3881:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3881D1A3F1E483F638C70E498EB09@DM6PR12MB3881.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 1400a3c2-8384-418a-c76e-08da5311b0b6
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4923:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR12MB4923C84D8118F12546F67FC78EB09@CH2PR12MB4923.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Su2e99hT9FSuskmNU5JDtrXyAAbMbGzBHuPBh6ITrmtE9MWkgw7Fb6K0Y/O88sL16fUHbM4A9yGrMiXEML2Oc7ImTs0BHN+C6KeIPDr5Pp+fvI0IupiztKNaXi/gAOin/qVZWJ4/sHLqhGq07YEPCJlcTtptj7VqJsElhuqd6NO7JmG8c1dwvMqDt4nK99ffs86lm9WhkS03beRC0pPZ/eW2TKm59LW4aYzk6X+qVGU69861VreYOnHUV79YypYsMm34zTclYfvJzbR2hXmrflcE+ftJv6f/Vz8UoyPFrOXTwhvnIYNBbu6XDZbtKukSml0M8osAK6ofjOYTLfOwDRTgB2EwQudJA6RRxcJiLQTsMTxf/88wvDtkcPE7e6UyXl7wu087QCw7KNOQPGWp+7RQRwC8BJrP6kdG6RRveZppBTOjiVl1XXXgEiCr+okuDCDkyQQRZ/7L2igHexsWcsTeiXi5XI+33dPi22Atb3kaBoXIAqaNEOecKDIxqCqykeLS0uNJkWLtYc/VUhJpewwVkZXLqEBGZFbMB6Mc8ythhAaQ2SoJaQ+zaWVfYvmIFFiecuKxdbUqNkwB7wlH+rarmyFia5DJ/cpBDSGbsbbb85Qe5wIbV9GWG0Lfq1WWNFqC0eSXisuZxsLmjKdGGe5reCkS5NgncHLHa2sAyWw90EpSNkCA9CYnfTYmR/pD8Kol+ul6tR6cAf+6G9wYVKUQOPRYiBIvJVpJ07IGICU4E2yEG17EWqfg539u5r/2vocoGQ46NhxkdlzKxcSNYQ==
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(396003)(346002)(39860400002)(376002)(136003)(36840700001)(40470700004)(46966006)(26005)(7696005)(2906002)(356005)(82740400003)(86362001)(316002)(70586007)(6666004)(110136005)(82310400005)(54906003)(70206006)(8676002)(4326008)(7406005)(36756003)(478600001)(5660300002)(40480700001)(81166007)(7416002)(47076005)(16526019)(186003)(426003)(336012)(40460700003)(41300700001)(2616005)(8936002)(83380400001)(36860700001)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: YQifSHjp+dPs48g2FY01DVmptCN3pFMt7K7RUsxWLezn6W7cY3JxMV+iJN0htAQTY6sYACYbPFiq8XTYQCllW4NGH53GUSFxU9tx8PQ8htJnpSSUiWQ7jNzbP7ZnC7YvQZrftITvK47SSBrgaRiYB9MM5MHT4s0m2fwTKR50XSjY7GZk9EZn+dvN9XcgxSkxHmD6Gz0tpepTMHbUvQkTsao9miVtGc2/sgXHQGJr+ZjdI3m8xKq29kL9BAnDA+4QR8jIM7fisZJP7s9i7NJK7FHQx3c1cWqHSjimKzap7J/11jDrqvvlb12dG1m45dymV0ET9+bsUxNVVFgidsmUf/SxARxgXOS3xrtbd2uH34elmWGQ+LHxVTqI9Czr/iftSRgYT301IY3n+dxICnfA0R8HO81ajmHgGaw0FF9mBxNnUNMseL0hhjNJNqdWJsqAp68ygXDzSzOKuZjvEZHR3tdBS7HqGBwS88b3lopaDmeUdv4aZlgkdP0BlLjQ+ReT/3T3I6A4d5kZB3S5h7OADyqhVDed4zhky0RkXz+MlreRoZvzhd57rz8p0Y42rvuWFKtiBrBfA36o1O5kV3/q6MjMdYRoRWhk4xDnLWy57CZ/N76CpTYryfltEFccJORwR3djp478c5HFODO8AoN5nvrwCns2EswOh+wIa4BDoY9v54lj4pdNHx71e3x2C4ytnhH9aTKgkZKOrTYSkUAF+YBzNzoPiVkZujrtffD4PkChSynvkC56li3aBNIm+jUtZwn6qgLT23bdgA5qtQqMAw==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(39860400002)(396003)(346002)(40470700004)(46966006)(36840700001)(186003)(8936002)(16526019)(41300700001)(70586007)(426003)(83380400001)(336012)(356005)(70206006)(4326008)(26005)(82310400005)(8676002)(6666004)(36756003)(5660300002)(40460700003)(7416002)(36860700001)(47076005)(7696005)(2616005)(86362001)(316002)(478600001)(40480700001)(81166007)(2906002)(110136005)(54906003)(7406005)(82740400003)(2101003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:06:47.9627
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:07:46.9570
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 760845bf-f7cc-4ad6-f4db-08da53118d8c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1400a3c2-8384-418a-c76e-08da5311b0b6
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT014.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT008.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3881
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4923
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-Version 2 of the GHCB specification introduced advertisement of features
-that are supported by the Hypervisor.
+KVM_SEV_SNP_LAUNCH_START begins the launch process for an SEV-SNP guest.
+The command initializes a cryptographic digest context used to construct
+the measurement of the guest. If the guest is expected to be migrated,
+the command also binds a migration agent (MA) to the guest.
 
-Now that KVM supports version 2 of the GHCB specification, bump the
-maximum supported protocol version.
+For more information see the SEV-SNP specification.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev-common.h |  2 ++
- arch/x86/kvm/svm/sev.c            | 14 ++++++++++++++
- arch/x86/kvm/svm/svm.h            |  3 ++-
- 3 files changed, 18 insertions(+), 1 deletion(-)
+ .../virt/kvm/x86/amd-memory-encryption.rst    |  24 ++++
+ arch/x86/kvm/svm/sev.c                        | 115 +++++++++++++++++-
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ include/uapi/linux/kvm.h                      |  10 ++
+ 4 files changed, 147 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index e15548d88f2a..539de6b93420 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -101,6 +101,8 @@ enum psc_op {
- /* GHCB Hypervisor Feature Request/Response */
- #define GHCB_MSR_HV_FT_REQ		0x080
- #define GHCB_MSR_HV_FT_RESP		0x081
-+#define GHCB_MSR_HV_FT_POS		12
-+#define GHCB_MSR_HV_FT_MASK		GENMASK_ULL(51, 0)
- #define GHCB_MSR_HV_FT_RESP_VAL(v)			\
- 	/* GHCBData[63:12] */				\
- 	(((u64)(v) & GENMASK_ULL(63, 12)) >> 12)
+diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+index 903023f524af..878711f2dca6 100644
+--- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
++++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+@@ -462,6 +462,30 @@ The flags bitmap is defined as::
+ If the specified flags is not supported then return -EOPNOTSUPP, and the supported
+ flags are returned.
+ 
++19. KVM_SNP_LAUNCH_START
++------------------------
++
++The KVM_SNP_LAUNCH_START command is used for creating the memory encryption
++context for the SEV-SNP guest. To create the encryption context, user must
++provide a guest policy, migration agent (if any) and guest OS visible
++workarounds value as defined SEV-SNP specification.
++
++Parameters (in): struct  kvm_snp_launch_start
++
++Returns: 0 on success, -negative on error
++
++::
++
++        struct kvm_sev_snp_launch_start {
++                __u64 policy;           /* Guest policy to use. */
++                __u64 ma_uaddr;         /* userspace address of migration agent */
++                __u8 ma_en;             /* 1 if the migtation agent is enabled */
++                __u8 imi_en;            /* set IMI to 1. */
++                __u8 gosvw[16];         /* guest OS visible workarounds */
++        };
++
++See the SEV-SNP specification for further detail on the launch input.
++
+ References
+ ==========
+ 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index a1318236acd2..b49c370d5ae9 100644
+index 813bda7f7b55..9e6fc7a94ed7 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -2480,6 +2480,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_AP_HLT_LOOP:
- 	case SVM_VMGEXIT_AP_JUMP_TABLE:
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-+	case SVM_VMGEXIT_HV_FEATURES:
- 		break;
- 	default:
- 		reason = GHCB_ERR_INVALID_EVENT;
-@@ -2746,6 +2747,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				  GHCB_MSR_INFO_MASK,
- 				  GHCB_MSR_INFO_POS);
- 		break;
-+	case GHCB_MSR_HV_FT_REQ: {
-+		set_ghcb_msr_bits(svm, GHCB_HV_FT_SUPPORTED,
-+				  GHCB_MSR_HV_FT_MASK, GHCB_MSR_HV_FT_POS);
-+		set_ghcb_msr_bits(svm, GHCB_MSR_HV_FT_RESP,
-+				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
-+		break;
-+	}
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
+@@ -21,6 +21,7 @@
+ #include <asm/pkru.h>
+ #include <asm/trapnr.h>
+ #include <asm/fpu/xcr.h>
++#include <asm/sev.h>
  
-@@ -2871,6 +2879,12 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		ret = 1;
- 		break;
- 	}
-+	case SVM_VMGEXIT_HV_FEATURES: {
-+		ghcb_set_sw_exit_info_2(ghcb, GHCB_HV_FT_SUPPORTED);
+ #include "x86.h"
+ #include "svm.h"
+@@ -73,6 +74,8 @@ static unsigned int nr_asids;
+ static unsigned long *sev_asid_bitmap;
+ static unsigned long *sev_reclaim_asid_bitmap;
+ 
++static int snp_decommission_context(struct kvm *kvm);
 +
-+		ret = 1;
-+		break;
+ struct enc_region {
+ 	struct list_head list;
+ 	unsigned long npages;
+@@ -98,12 +101,17 @@ static int sev_flush_asids(int min_asid, int max_asid)
+ 	down_write(&sev_deactivate_lock);
+ 
+ 	wbinvd_on_all_cpus();
+-	ret = sev_guest_df_flush(&error);
++
++	if (sev_snp_enabled)
++		ret = snp_guest_df_flush(&error);
++	else
++		ret = sev_guest_df_flush(&error);
+ 
+ 	up_write(&sev_deactivate_lock);
+ 
+ 	if (ret)
+-		pr_err("SEV: DF_FLUSH failed, ret=%d, error=%#x\n", ret, error);
++		pr_err("SEV%s: DF_FLUSH failed, ret=%d, error=%#x\n",
++			sev_snp_enabled ? "-SNP" : "", ret, error);
+ 
+ 	return ret;
+ }
+@@ -1825,6 +1833,74 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	return ret;
+ }
+ 
++static void *snp_context_create(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct sev_data_snp_gctx_create data = {};
++	void *context;
++	int rc;
++
++	/* Allocate memory for context page */
++	context = snp_alloc_firmware_page(GFP_KERNEL_ACCOUNT);
++	if (!context)
++		return NULL;
++
++	data.gctx_paddr = __psp_pa(context);
++	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_GCTX_CREATE, &data, &argp->error);
++	if (rc) {
++		snp_free_firmware_page(context);
++		return NULL;
 +	}
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
++
++	return context;
++}
++
++static int snp_bind_asid(struct kvm *kvm, int *error)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_activate data = {0};
++
++	data.gctx_paddr = __psp_pa(sev->snp_context);
++	data.asid   = sev_get_asid(kvm);
++	return sev_issue_cmd(kvm, SEV_CMD_SNP_ACTIVATE, &data, error);
++}
++
++static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_launch_start start = {0};
++	struct kvm_sev_snp_launch_start params;
++	int rc;
++
++	if (!sev_snp_guest(kvm))
++		return -ENOTTY;
++
++	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
++		return -EFAULT;
++
++	sev->snp_context = snp_context_create(kvm, argp);
++	if (!sev->snp_context)
++		return -ENOTTY;
++
++	start.gctx_paddr = __psp_pa(sev->snp_context);
++	start.policy = params.policy;
++	memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
++	rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
++	if (rc)
++		goto e_free_context;
++
++	sev->fd = argp->sev_fd;
++	rc = snp_bind_asid(kvm, &argp->error);
++	if (rc)
++		goto e_free_context;
++
++	return 0;
++
++e_free_context:
++	snp_decommission_context(kvm);
++
++	return rc;
++}
++
+ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_sev_cmd sev_cmd;
+@@ -1915,6 +1991,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	case KVM_SEV_RECEIVE_FINISH:
+ 		r = sev_receive_finish(kvm, &sev_cmd);
+ 		break;
++	case KVM_SEV_SNP_LAUNCH_START:
++		r = snp_launch_start(kvm, &sev_cmd);
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		goto out;
+@@ -2106,6 +2185,28 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+ 	return ret;
+ }
+ 
++static int snp_decommission_context(struct kvm *kvm)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++	struct sev_data_snp_decommission data = {};
++	int ret;
++
++	/* If context is not created then do nothing */
++	if (!sev->snp_context)
++		return 0;
++
++	data.gctx_paddr = __sme_pa(sev->snp_context);
++	ret = snp_guest_decommission(&data, NULL);
++	if (WARN_ONCE(ret, "failed to release guest context"))
++		return ret;
++
++	/* free the context page now */
++	snp_free_firmware_page(sev->snp_context);
++	sev->snp_context = NULL;
++
++	return 0;
++}
++
+ void sev_vm_destroy(struct kvm *kvm)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+@@ -2147,7 +2248,15 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		}
+ 	}
+ 
+-	sev_unbind_asid(kvm, sev->handle);
++	if (sev_snp_guest(kvm)) {
++		if (snp_decommission_context(kvm)) {
++			WARN_ONCE(1, "Failed to free SNP guest context, leaking asid!\n");
++			return;
++		}
++	} else {
++		sev_unbind_asid(kvm, sev->handle);
++	}
++
+ 	sev_asid_free(sev);
+ }
+ 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9f7eb1f18893..1f4a8bd09c9e 100644
+index 2f45589ee596..71c011af098e 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -629,9 +629,10 @@ unsigned long avic_vcpu_get_apicv_inhibit_reasons(struct kvm_vcpu *vcpu);
+@@ -91,6 +91,7 @@ struct kvm_sev_info {
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+ 	atomic_t migration_in_progress;
+ 	u64 snp_init_flags;
++	void *snp_context;      /* SNP guest context page */
+ };
  
- /* sev.c */
+ struct kvm_svm {
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 0f912cefc544..0cb119d66ae5 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1812,6 +1812,7 @@ enum sev_cmd_id {
  
--#define GHCB_VERSION_MAX	1ULL
-+#define GHCB_VERSION_MAX	2ULL
- #define GHCB_VERSION_MIN	1ULL
+ 	/* SNP specific commands */
+ 	KVM_SEV_SNP_INIT,
++	KVM_SEV_SNP_LAUNCH_START,
  
-+#define GHCB_HV_FT_SUPPORTED	0
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -1919,6 +1920,15 @@ struct kvm_snp_init {
+ 	__u64 flags;
+ };
  
- extern unsigned int max_sev_asid;
- 
++struct kvm_sev_snp_launch_start {
++	__u64 policy;
++	__u64 ma_uaddr;
++	__u8 ma_en;
++	__u8 imi_en;
++	__u8 gosvw[16];
++	__u8 pad[6];
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 -- 
 2.25.1
 
