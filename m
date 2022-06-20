@@ -2,100 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E53EAC43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 07:52:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 792C5C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 11:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239599AbiFTHw5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 03:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47772 "EHLO
+        id S240489AbiFTLI5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 20 Jun 2022 07:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239493AbiFTHwz (ORCPT
+        with ESMTP id S239471AbiFTLI4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 03:52:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE47CC21
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Jun 2022 00:52:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 701BCB80EB2
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Jun 2022 07:52:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC883C3411B;
-        Mon, 20 Jun 2022 07:52:49 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="OJ7nLigr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1655711567;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QkaaaFSsEAIHmMB7bW5nH+R8SF0XEm/Unj8Mnxq+tWg=;
-        b=OJ7nLigrEf8hgCqm3hhEEXN1YFAcVtyL+YEbKhyflIq1hPPIm3J8unt5pGuS75/UDn13cU
-        I6CpQISPFjMOXHAO2nJ+fyMVd3FCsGwp0J+YzlpIa/yrI3mOg0JWtpIT8O5dFmoGZGzIbF
-        R5jF9VFZR0EAO2NPiwYuD2pt+Y53QvE=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0f3c2ca4 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Mon, 20 Jun 2022 07:52:47 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH] lib/crypto: blake2s: reduce stack frame usage in self test
-Date:   Mon, 20 Jun 2022 09:52:43 +0200
-Message-Id: <20220620075243.686177-1-Jason@zx2c4.com>
-In-Reply-To: <202206200851.gE3MHCgd-lkp@intel.com>
-References: <202206200851.gE3MHCgd-lkp@intel.com>
+        Mon, 20 Jun 2022 07:08:56 -0400
+X-Greylist: delayed 230 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Jun 2022 04:08:54 PDT
+Received: from metanate.com (unknown [IPv6:2001:8b0:1628:5005::111])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149C0A7;
+        Mon, 20 Jun 2022 04:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=metanate.com; s=stronger; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-ID:Content-Description;
+        bh=CZYkuwuyEVUXwAO4XEMsBG16iYPMRoKYAzF0IBgK8jw=; b=wL0TKz6sUdFxt5robK9s3vw+3G
+        vpCedd//rpevuhpOWvmzXtuI9V6if7lusAl/IUIO7gLmtPLmRydFYlzsTA4QGYxoPCryVFxTrC/ed
+        DQj9X5V2Iofi04R4r3gi1vbNV0IOLuGlNKnJuNVSyssmuo/3RAZKQSFiLd42qpxAMrIiUaGzO2rL2
+        eYln0Vxf/ZYHf820uZKfZF6B5lryx/pAgcnh1Y+juyqJJRzaS3IarO0crKCUX5GK0Bf0uLBs77Uvv
+        DI1aX1UMTtVe6MYIosymILmwqyo/qFJFDvjRbHQyCr/4VyDlhzMRXBGp0sy8d3uTl621LW3GemvTg
+        DxIbGEfQ==;
+Received: from 92.40.170.2.threembb.co.uk ([92.40.170.2] helo=donbot)
+        by email.metanate.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <john@metanate.com>)
+        id 1o3FGu-0002Pu-OT; Mon, 20 Jun 2022 12:08:44 +0100
+Date:   Mon, 20 Jun 2022 12:08:43 +0100
+From:   John Keeping <john@metanate.com>
+To:     LABBE Corentin <clabbe@baylibre.com>
+Cc:     heiko@sntech.de, ardb@kernel.org, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v7 00/33] crypto: rockchip: permit to pass self-tests
+Message-ID: <YrBVO+2TWufDOrtH@donbot>
+References: <20220508185957.3629088-1-clabbe@baylibre.com>
+ <YqceGFafq7QoT+8w@Red>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <YqceGFafq7QoT+8w@Red>
+X-Authenticated: YES
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using 3 blocks here doesn't give us much more than using 2, and it
-causes a stack frame size warning on certain compiler/config/arch
-combinations:
+On Mon, Jun 13, 2022 at 01:23:04PM +0200, LABBE Corentin wrote:
+> Le Sun, May 08, 2022 at 06:59:24PM +0000, Corentin Labbe a écrit :
+> > The rockchip crypto driver is broken and do not pass self-tests.
+> > This serie's goal is to permit to become usable and pass self-tests.
+> > 
+> > This whole serie is tested on a rk3328-rock64, rk3288-miqi and
+> > rk3399-khadas-edge-v with selftests (with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y)
+> > 
+> > Regards
+> > 
+> 
+> This is a gentle ping since this serie has now, no comment to address.
 
-   lib/crypto/blake2s-selftest.c: In function 'blake2s_selftest':
->> lib/crypto/blake2s-selftest.c:632:1: warning: the frame size of 1088 bytes is larger than 1024 bytes [-Wframe-larger-than=]
-     632 | }
-         | ^
+I've just replied to patch 14 with a comment, but other than that I
+agree that patches 1-24 look good.  It would be good to get these merged
+soon as crypto acceleration on Rockchip hardware has been totally broken
+for several releases now.
 
-So this patch just reduces the block from 3 to 2, which makes the
-warning go away.
+Patches 1-13 and 15-24 are:
 
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/linux-crypto/202206200851.gE3MHCgd-lkp@intel.com
-Fixes: 2d16803c562e ("crypto: blake2s - remove shash module")
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- lib/crypto/blake2s-selftest.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+	Reviewed-by: John Keeping <john@metanate.com>
 
-diff --git a/lib/crypto/blake2s-selftest.c b/lib/crypto/blake2s-selftest.c
-index 66f505220f43..7d77dea15587 100644
---- a/lib/crypto/blake2s-selftest.c
-+++ b/lib/crypto/blake2s-selftest.c
-@@ -593,7 +593,7 @@ bool __init blake2s_selftest(void)
- 		enum { TEST_ALIGNMENT = 16 };
- 		u8 unaligned_block[BLAKE2S_BLOCK_SIZE + TEST_ALIGNMENT - 1]
- 					__aligned(TEST_ALIGNMENT);
--		u8 blocks[BLAKE2S_BLOCK_SIZE * 3];
-+		u8 blocks[BLAKE2S_BLOCK_SIZE * 2];
- 		struct blake2s_state state1, state2;
- 
- 		get_random_bytes(blocks, sizeof(blocks));
-@@ -603,8 +603,8 @@ bool __init blake2s_selftest(void)
-     defined(CONFIG_CRYPTO_ARCH_HAVE_LIB_BLAKE2S)
- 		memcpy(&state1, &state, sizeof(state1));
- 		memcpy(&state2, &state, sizeof(state2));
--		blake2s_compress(&state1, blocks, 3, BLAKE2S_BLOCK_SIZE);
--		blake2s_compress_generic(&state2, blocks, 3, BLAKE2S_BLOCK_SIZE);
-+		blake2s_compress(&state1, blocks, 2, BLAKE2S_BLOCK_SIZE);
-+		blake2s_compress_generic(&state2, blocks, 2, BLAKE2S_BLOCK_SIZE);
- 		if (memcmp(&state1, &state2, sizeof(state1))) {
- 			pr_err("blake2s random compress self-test %d: FAIL\n",
- 			       i + 1);
--- 
-2.35.1
-
+I'm less sure about patches 25-33 as I don't really know much about the
+crypto API, but it seems strange that dispatching requests to two
+(nearly) identical accelerators should need so much special handling in
+the driver and that there isn't some higher level management for this.
