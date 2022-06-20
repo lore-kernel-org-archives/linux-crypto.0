@@ -2,45 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 403DBC43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A673EC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jun 2022 23:03:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346471AbiFTXDR (ORCPT
+        id S1345096AbiFTXD4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jun 2022 19:03:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44294 "EHLO
+        Mon, 20 Jun 2022 19:03:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346466AbiFTXCw (ORCPT
+        with ESMTP id S1347002AbiFTXDr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:02:52 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2963B59;
-        Mon, 20 Jun 2022 16:02:51 -0700 (PDT)
+        Mon, 20 Jun 2022 19:03:47 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2052.outbound.protection.outlook.com [40.107.236.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79ADA1FE;
+        Mon, 20 Jun 2022 16:03:42 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FkBFZPbJvsDOBqM8Q/KACrbk34p2LkYs6HYDnaAjMOjBoMlYGC9ltI5f4qBBwVG43nj/Ac8ltzni8iYSBFwjfDgVDrGkeSrHRhOoh5Tl3F0tQWT0UC8KO1MvgnbUyL5thlF1G+L1HvuPIQPWZc8KjaZb/KAk11ayM3rW5pifl9x4ZLvozba0YvDXVkDExAQhsTDRFCCQtsznIEWF0V5hRiSXVVLc13acQw4AjFhfQyZDyppamDxUyCk5PBlbX+mJ6vaHgbtnS066Zs+L31cF+GvBZ6tVai6kgJUKzkXRRsY8Tds/bzk97t1Z5yZUVTofakJ2nJq6Nsq/J0Q2yksiKg==
+ b=aSrrI65kY2jyGDvUkBJk7pQ4HimCjHQ9+7V8pbiZKx5DNhtrExTYRrTDREzTRYb6jlsowbEP4dzvJDLjWHRL+4sJyYy1/iAjads/plUud9jNv5bceevaFcKccSgKMpv10t5ytSK9BK40etf/Kual5qMs9+BbYiR01ulVbB7x2uA5/BUx3FHv0wOVtmyza1W7Qx0qag/YWy2OCdY2tDLV2M0kX57Jq+JKZo1XueiVusDHrDABVUuXnGB5GsDS0hE0QU1pAhREy6DugtCl1rjWBqBlHtClP8qI2ND6vc5wGMBoOMhzFj21jMil1FI+J2pwINVg0zFM0YH2QYCPGB+t0Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oAoJX5flzsntszliVXrvpYvkVr670hqrgr1gvF2321A=;
- b=esFRds8N5JIqOrWlm00kWFhqDAB/iJFog3WiE9LqVY/BrgfvNwBtl8Ilr8165PRP6rmpZyAHeeZAMNbq+Pt1f3aRkt0xHf82NUTkN1+gtUmwUK+RuNplKLqKePB5tblXFV/eysI3tgQNWTOskflsiMEQ78mStRJahZQ5z7JUDWfTNZDcP4m1z1DUKj/WWYI5C98vdp4lJBU+uuhAW1BQKbCuL5SJGlm0IGwUmIXyGaKMDea5Tmpm2ir/DqkO2k8eh7zbgWWngW+dLVgycX/kaKQow/N7YYavKpL6IndOnWRE8y8U5ru3ko50HfwthaCCa43pvPxGqBi+wbmD1eqypg==
+ bh=KdsiXFsov7b6bmc81thYnFUAHUojIU9Zd2eTMANVyHk=;
+ b=j4MArPHUHZR4Mnc6rXL9C1nxGzy+sSqTo70MvR6eG9CxohgW4mE37PgjMoytdXbrfFCAODHnOWB1/zJ40fn4/KQMwZXx5SM11X9myXIxlwtKp+MYERG8cTQpjuMIJHbkhuGL76MNp6YCTpHGczcwikur975gUaQ4CJMl83yU4pgZY0AlSjO1Afz0QnTBdcDL1/SX4HgmDWsGSVrMU0Bbx9zVnng++obTdvWFCWiQSTdreH022yAN0ll1G2IQs7JV/o85VlIQR8Oz6XfCGx6UTe3xlshanr1qmND1gxnaQ2jdgQjbydzfqMnZndCOJusl16JkXXp1Gfxl8/JcCyiH0w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oAoJX5flzsntszliVXrvpYvkVr670hqrgr1gvF2321A=;
- b=o449PgJqSphEha5LiMYBMJ4QWEcWGDofpHQjSefKyiIyJREb0Gw9NsIGcaRVSRncaVn0VmdL0NROR53lRHjm3Koy+Avlm2H40SQP6l9Xm4fLrjMT64HAOH4Frnt4BjofVD2fOaOS9jRQRSkSkdE9/vXufpigy8fakCcz0brIY4s=
-Received: from CP3P284CA0010.BRAP284.PROD.OUTLOOK.COM (2603:10d6:103:6c::15)
- by SA1PR12MB5657.namprd12.prod.outlook.com (2603:10b6:806:234::12) with
+ bh=KdsiXFsov7b6bmc81thYnFUAHUojIU9Zd2eTMANVyHk=;
+ b=2xYblfZ4kWk9QFT+AEcdjU2XLipSsBDSwMHSURmKBTwW0MCj+mRB8PA2h1a1sNNG0H69Amfp/X/VKDAiOe+4pnl1lBolmyxsoIG5F7chHk5kaSKwfr1qyBEXjrw+TtNEapp7dIeqAIEmu4ZPrkBfdwRVrnsvo9cx9C2M6STW314=
+Received: from BY3PR03CA0023.namprd03.prod.outlook.com (2603:10b6:a03:39a::28)
+ by MN2PR12MB4797.namprd12.prod.outlook.com (2603:10b6:208:a4::24) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15; Mon, 20 Jun
- 2022 23:02:49 +0000
-Received: from DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
- (2603:10d6:103:6c:cafe::1f) by CP3P284CA0010.outlook.office365.com
- (2603:10d6:103:6c::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.18; Mon, 20 Jun
+ 2022 23:03:40 +0000
+Received: from DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:a03:39a:cafe::7e) by BY3PR03CA0023.outlook.office365.com
+ (2603:10b6:a03:39a::28) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.15 via Frontend
- Transport; Mon, 20 Jun 2022 23:02:47 +0000
+ Transport; Mon, 20 Jun 2022 23:03:39 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT061.mail.protection.outlook.com (10.13.173.138) with Microsoft SMTP
+ DM6NAM11FT066.mail.protection.outlook.com (10.13.173.179) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:02:47 +0000
+ 15.20.5353.14 via Frontend Transport; Mon, 20 Jun 2022 23:03:39 +0000
 Received: from ashkalraubuntuserver.amd.com (10.180.168.240) by
  SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 20 Jun 2022 18:02:41 -0500
+ 15.1.2375.28; Mon, 20 Jun 2022 18:03:36 -0500
 From:   Ashish Kalra <Ashish.Kalra@amd.com>
 To:     <x86@kernel.org>, <linux-kernel@vger.kernel.org>,
         <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
@@ -71,9 +71,9 @@ CC:     <tglx@linutronix.de>, <mingo@redhat.com>, <jroedel@suse.de>,
         <ak@linux.intel.com>, <tony.luck@intel.com>, <marcorr@google.com>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>
-Subject: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Date:   Mon, 20 Jun 2022 23:02:33 +0000
-Message-ID: <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+Subject: [PATCH Part2 v6 08/49] x86/traps: Define RMP violation #PF error code
+Date:   Mon, 20 Jun 2022 23:03:27 +0000
+Message-ID: <5328a76b3fab1f20b3ffc400ca2402bec19d9700.1655761627.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1655761627.git.ashish.kalra@amd.com>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
@@ -85,181 +85,91 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 92e091da-fed3-4f66-04a9-08da5310fdf7
-X-MS-TrafficTypeDiagnostic: SA1PR12MB5657:EE_
-X-Microsoft-Antispam-PRVS: <SA1PR12MB5657A3B932A1E3F107A701528EB09@SA1PR12MB5657.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 23a5f2e7-ad38-48b6-962f-08da53111cee
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4797:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB479711AF035501B4539DACAA8EB09@MN2PR12MB4797.namprd12.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5wBFJK3K2xzQ375f0+s0hfrGgXJ2XYdHs4mBCAx8ZgXbm29NVy9g1d5sqPcn9RVa1ZqpR5WKiiPsYwQGt9FxVczkhdZPsE7ZxczuXYdC3PFK0BY6NzaS23XESygoyzsGrXdokGeT/E66XGPX+pYf7k28fWut0tmgbtbyb3ubK49/VA1VORy4eg8yLh2rGIVaULdUe3w3huAhz7fQIeCRAZLuJF4+vkojI92DL2mr60qxcRBXTqoRPlbEWPdqbEeE0Xbpg4FZfZ21KoPCsMymMZ0MKSbcbG4h9o1wS7CNrW43/RW8OEZEKxsFiyn8tOSmwHP981/3ahGCPZxCstl60lvXlFRtmBWkET2cDeH8oj3glfy8eLz8D2CT74E1LWAM3z3+cV3b7cakyXL9kkf05ueo8ttRKTi/dQL0lnEsFjgxbk2zBSE1QShWcnKQ9FAdEL1pf7wq2Rkt94WQBvmXDk2rqk7dMW9hZizMqJj0GMoP8zKlqscSjDMvYicOWXab9JTafkkwl0s9jiDfI8v9SDjMRBiCjtgm1V8Y1Y4VwuJMNiX+AIxFaa6GUZZctkGL+Jvw8IlxTIRuqAiUnt5V96gCDCuhTNIbGlXbQ8augN9Kg44iQ28qD4ZzYPtcSvhmShr4lry/eZJktD5d75gm899SRcJk3JhiNwkLbH0Skj1NbXFljD+oG2w/PKG4Txz8h41Cok89zwgu6MOTPMB3fy1QS1YbrK3/Bghthxmj+7ayNmgss1hZWbns0gE4U+PMetwy8bJ5oX88AC6rSge1qOE2f0UKHi3uA/yScOmRLjJyDfMdL8i7FlEmJQ3f1/usoc3hSkEFbVGaHB1RBzC5j+D1bTebntq1hxH0JZwXZ/4Q332Y6YY+7K01N4IlX1pN
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(346002)(136003)(396003)(39860400002)(376002)(40470700004)(46966006)(36840700001)(356005)(36860700001)(2906002)(7696005)(82310400005)(6666004)(86362001)(426003)(26005)(316002)(70206006)(40480700001)(54906003)(478600001)(47076005)(2616005)(36756003)(82740400003)(110136005)(186003)(7406005)(7416002)(8676002)(5660300002)(4326008)(81166007)(966005)(70586007)(40460700003)(8936002)(336012)(16526019)(83380400001)(41300700001)(36900700001)(2101003)(309714004);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: LFhTJDrohFrnVoEtuKxsI9O/Ejv/+FDyFzxtRZxBa7YwEdvF0qCcRImZbU8TahdRECh/E3yp5qs3weN1PRVZ0LlS2dmLD8BfdAOV3MRTqW1g+Zvg4JXZDcgMiKR1hoJ0j8BsgUdFcxH2WbTpanhhVTQVj6ZMg0OoJJNOacLfqwCvK7LmSvvRqQejLiYcfumDwaRI+uQGs9R1qf+4zYiCSbgdOmGp1btPIxjriSfknZnJuFUtrP1Bo8br52V93moRmL4JqypmVUDIjIYpPk2+0kewHJnrCj+hRJ9HV6OaxGIuax7Rmh1R7JIF/HH+Lu6j1M4KrSM2Vfgu/3eW7Lk5QxSbUyZaQwvy7Ohq+DnQyTmhEN1GgnhtFGmhP1HkWt6IQ92WizRGxXYFASdb3jFmZpAKO38eNIrN3nX+cCM8v9O2QXm19PoYZkIJP635i6fXgmuf8DIFCCEJJRwQEz0+P2DCNyqry/pd5Rjdgp9oy1vl5U8UPkK1qtrBnRqlPxnRcSd1xc9cdxZVwWUBvnx+zJI5DnS0R8bz1A2Q6+sRb9FLX5Cnddz0icPU6h7cDF3f7jUGVkY75OJGRuVCKoeuruxFozSYgNoHVJD4FyONQVGPsW36kFeD7/2Y70nytyYacWkrqK0Q3CmDUfXAWUk4N50DkCbmymGCPnhWQUYyLbFu9GT07Nx7ZT9XI7DILBG6CVZ5lfso+9MLnHFrSRoKBWUvoubK0YzLeyHhw90+6GN3wZ6gEgWeDyl+fsiDBfxg
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(376002)(396003)(346002)(40470700004)(36840700001)(46966006)(478600001)(26005)(110136005)(47076005)(16526019)(186003)(54906003)(8936002)(36756003)(316002)(336012)(83380400001)(2616005)(426003)(7416002)(86362001)(356005)(82740400003)(81166007)(36860700001)(40460700003)(7406005)(6666004)(82310400005)(8676002)(7696005)(70206006)(41300700001)(40480700001)(70586007)(4326008)(5660300002)(2906002)(2101003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:02:47.0815
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2022 23:03:39.0356
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92e091da-fed3-4f66-04a9-08da5310fdf7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23a5f2e7-ad38-48b6-962f-08da53111cee
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5657
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4797
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
-entry for a given page. The RMP entry format is documented in AMD PPR, see
-https://bugzilla.kernel.org/attachment.cgi?id=296015.
+Bit 31 in the page fault-error bit will be set when processor encounters
+an RMP violation.
+
+While at it, use the BIT_ULL() macro.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
- arch/x86/include/asm/sev.h | 27 ++++++++++++++++++++++++
- arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
- include/linux/sev.h        | 30 ++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
- create mode 100644 include/linux/sev.h
+ arch/x86/include/asm/trap_pf.h | 18 +++++++++++-------
+ arch/x86/mm/fault.c            |  1 +
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 9c2d33f1cfee..cb16f0e5b585 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -9,6 +9,7 @@
- #define __ASM_ENCRYPTED_STATE_H
+diff --git a/arch/x86/include/asm/trap_pf.h b/arch/x86/include/asm/trap_pf.h
+index 10b1de500ab1..89b705114b3f 100644
+--- a/arch/x86/include/asm/trap_pf.h
++++ b/arch/x86/include/asm/trap_pf.h
+@@ -2,6 +2,8 @@
+ #ifndef _ASM_X86_TRAP_PF_H
+ #define _ASM_X86_TRAP_PF_H
  
- #include <linux/types.h>
-+#include <linux/sev.h>
- #include <asm/insn.h>
- #include <asm/sev-common.h>
- #include <asm/bootparam.h>
-@@ -84,6 +85,32 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
- 
- /* RMP page size */
- #define RMP_PG_SIZE_4K			0
-+#define RMP_TO_X86_PG_LEVEL(level)	(((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
++#include <linux/bits.h>  /* BIT() macro */
 +
-+/*
-+ * The RMP entry format is not architectural. The format is defined in PPR
-+ * Family 19h Model 01h, Rev B1 processor.
-+ */
-+struct __packed rmpentry {
-+	union {
-+		struct {
-+			u64	assigned	: 1,
-+				pagesize	: 1,
-+				immutable	: 1,
-+				rsvd1		: 9,
-+				gpa		: 39,
-+				asid		: 10,
-+				vmsa		: 1,
-+				validated	: 1,
-+				rsvd2		: 1;
-+		} info;
-+		u64 low;
-+	};
-+	u64 high;
-+};
-+
-+#define rmpentry_assigned(x)	((x)->info.assigned)
-+#define rmpentry_pagesize(x)	((x)->info.pagesize)
- 
- #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
- 
-diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 25c7feb367f6..59e7ec6b0326 100644
---- a/arch/x86/kernel/sev.c
-+++ b/arch/x86/kernel/sev.c
-@@ -65,6 +65,8 @@
-  * bookkeeping, the range need to be added during the RMP entry lookup.
+ /*
+  * Page fault error code bits:
+  *
+@@ -12,15 +14,17 @@
+  *   bit 4 ==				1: fault was an instruction fetch
+  *   bit 5 ==				1: protection keys block access
+  *   bit 15 ==				1: SGX MMU page-fault
++ *   bit 31 ==				1: fault was due to RMP violation
   */
- #define RMPTABLE_CPU_BOOKKEEPING_SZ	0x4000
-+#define RMPENTRY_SHIFT			8
-+#define rmptable_page_offset(x)	(RMPTABLE_CPU_BOOKKEEPING_SZ + (((unsigned long)x) >> RMPENTRY_SHIFT))
+ enum x86_pf_error_code {
+-	X86_PF_PROT	=		1 << 0,
+-	X86_PF_WRITE	=		1 << 1,
+-	X86_PF_USER	=		1 << 2,
+-	X86_PF_RSVD	=		1 << 3,
+-	X86_PF_INSTR	=		1 << 4,
+-	X86_PF_PK	=		1 << 5,
+-	X86_PF_SGX	=		1 << 15,
++	X86_PF_PROT	=		BIT_ULL(0),
++	X86_PF_WRITE	=		BIT_ULL(1),
++	X86_PF_USER	=		BIT_ULL(2),
++	X86_PF_RSVD	=		BIT_ULL(3),
++	X86_PF_INSTR	=		BIT_ULL(4),
++	X86_PF_PK	=		BIT_ULL(5),
++	X86_PF_SGX	=		BIT_ULL(15),
++	X86_PF_RMP	=		BIT_ULL(31),
+ };
  
- /* For early boot hypervisor communication in SEV-ES enabled guests */
- static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
-@@ -2386,3 +2388,44 @@ static int __init snp_rmptable_init(void)
-  * available after subsys_initcall().
-  */
- fs_initcall(snp_rmptable_init);
-+
-+static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
-+{
-+	unsigned long vaddr, paddr = pfn << PAGE_SHIFT;
-+	struct rmpentry *entry, *large_entry;
-+
-+	if (!pfn_valid(pfn))
-+		return ERR_PTR(-EINVAL);
-+
-+	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-+		return ERR_PTR(-ENXIO);
-+
-+	vaddr = rmptable_start + rmptable_page_offset(paddr);
-+	if (unlikely(vaddr > rmptable_end))
-+		return ERR_PTR(-ENXIO);
-+
-+	entry = (struct rmpentry *)vaddr;
-+
-+	/* Read a large RMP entry to get the correct page level used in RMP entry. */
-+	vaddr = rmptable_start + rmptable_page_offset(paddr & PMD_MASK);
-+	large_entry = (struct rmpentry *)vaddr;
-+	*level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
-+
-+	return entry;
-+}
-+
-+/*
-+ * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-+ * and -errno if there is no corresponding RMP entry.
-+ */
-+int snp_lookup_rmpentry(u64 pfn, int *level)
-+{
-+	struct rmpentry *e;
-+
-+	e = __snp_lookup_rmpentry(pfn, level);
-+	if (IS_ERR(e))
-+		return PTR_ERR(e);
-+
-+	return !!rmpentry_assigned(e);
-+}
-+EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
-diff --git a/include/linux/sev.h b/include/linux/sev.h
-new file mode 100644
-index 000000000000..1a68842789e1
---- /dev/null
-+++ b/include/linux/sev.h
-@@ -0,0 +1,30 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * AMD Secure Encrypted Virtualization
-+ *
-+ * Author: Brijesh Singh <brijesh.singh@amd.com>
-+ */
-+
-+#ifndef __LINUX_SEV_H
-+#define __LINUX_SEV_H
-+
-+/* RMUPDATE detected 4K page and 2MB page overlap. */
-+#define RMPUPDATE_FAIL_OVERLAP		7
-+
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+int snp_lookup_rmpentry(u64 pfn, int *level);
-+int psmash(u64 pfn);
-+int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
-+int rmp_make_shared(u64 pfn, enum pg_level level);
-+#else
-+static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
-+static inline int psmash(u64 pfn) { return -ENXIO; }
-+static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid,
-+				   bool immutable)
-+{
-+	return -ENODEV;
-+}
-+static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
-+
-+#endif /* CONFIG_AMD_MEM_ENCRYPT */
-+#endif /* __LINUX_SEV_H */
+ #endif /* _ASM_X86_TRAP_PF_H */
+diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+index fad8faa29d04..a4c270e99f7f 100644
+--- a/arch/x86/mm/fault.c
++++ b/arch/x86/mm/fault.c
+@@ -546,6 +546,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
+ 		 !(error_code & X86_PF_PROT) ? "not-present page" :
+ 		 (error_code & X86_PF_RSVD)  ? "reserved bit violation" :
+ 		 (error_code & X86_PF_PK)    ? "protection keys violation" :
++		 (error_code & X86_PF_RMP)   ? "RMP violation" :
+ 					       "permissions violation");
+ 
+ 	if (!(error_code & X86_PF_USER) && user_mode(regs)) {
 -- 
 2.25.1
 
