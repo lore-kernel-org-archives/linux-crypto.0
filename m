@@ -2,123 +2,94 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2DFC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 07:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 386A3C43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 08:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347377AbiFUHrQ (ORCPT
+        id S1347295AbiFUIGC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jun 2022 03:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42998 "EHLO
+        Tue, 21 Jun 2022 04:06:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347280AbiFUHoS (ORCPT
+        with ESMTP id S1345991AbiFUIGB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jun 2022 03:44:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62A2A2317A;
-        Tue, 21 Jun 2022 00:44:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 23D31B8169E;
-        Tue, 21 Jun 2022 07:44:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED6BC3411D;
-        Tue, 21 Jun 2022 07:44:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1655797454;
-        bh=TgZQktU/5vsZP3GPNZ/qWZleinBCCk2cgAR6Lox4crc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=wht0PXyeuQwQyGpWl60X7KoWQ4g7oJT8n4WSl6EFrGYthyFE7HShKTIyBJGnBxmAb
-         467t3Luka6NxNagPemIBgkgzsXnCDWmc5oXT9YqDSLh8BX8/0LLURrypXa+4Qk8Aq+
-         Ap1psmSnRkJLyskIBIwSkuYFJ8Kf6sideKMUsN6o=
-Date:   Tue, 21 Jun 2022 09:44:11 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Yang Shen <shenyang39@huawei.com>
-Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
-Message-ID: <YrF2yypHZfiNVRBh@kroah.com>
-References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
- <Yqn3spLZHpAkQ9Us@myrica>
- <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
- <YqrmdKNrYTCiS/MC@myrica>
- <d90e8ea5-2f18-2eda-b4b2-711083aa7ecd@linaro.org>
- <YrB1D9rv9G4h/BYU@myrica>
- <YrB30M9yAbUbPFrG@kroah.com>
- <b5011dd2-e8ec-a307-1b43-5aff6cbb6891@linaro.org>
+        Tue, 21 Jun 2022 04:06:01 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09359598
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 01:05:59 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id z9so6998409wmf.3
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 01:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=GsCQyeSS9WqgWVTSCSRei8+jKy0pNjIeX7QnW7mozH8=;
+        b=jibc9DU08V3+hmlKpMeuFBDRViUNOmAqhLv6bBMBvot6Y1y5fIwWhHP50ijPfYjSkP
+         dofNHKktUMXyQWgFL3kXgkNcCMI2EyGV7jpxsE895xWHEcXseYPy3ALYyk3QO/N0mUp0
+         vdtIIlaM3jdF4mNnqhGbeiMjdwIE1RoqzlR0jkpN01OXtm8YiT2z6tDuzLLchasFD2w2
+         Mkh6LtyCFJWejhKMxgykZsEQj/x8fiEINVD1qJbJOxZgN2YH/UWuZMuMZW32iBeGtvQq
+         /lW7BLRvhMJx91EGYj8g/3IgB34BAKrk4wE5Qh21ccOj72gocm1+GPBZgzZ2TTnx2Dna
+         r2Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=GsCQyeSS9WqgWVTSCSRei8+jKy0pNjIeX7QnW7mozH8=;
+        b=mql7bxd9SqrCbfmDOApu2HScVpW02taXZRL2InLpeCDWl1MbBa+asHHIBcEDF2thq7
+         xaEmGcTsBtB80Vp1jo1sWcyDO80yemhcg6QlKDIISb/xMq2myN5x/ijCfNDDwd1rBk52
+         NkrcXnAfnYDLuJIRFDGFemAHtZD2DhUc1XpjGxwLpBgCcIKJiYp23wGHbXRGB65QVBeX
+         SGkDexII8Rvug/rG0Y08bez+/IFB5No5pCCDgRpG8ZOD59fjl2Pk9X0HOq9ewL5jzpHS
+         fsTLSeAc1NIn8yyuYpPL1OXcMJE6IndFgbYhYrCBN0WrwZCw5n08mgKK50Np3jpDK+H0
+         /o0Q==
+X-Gm-Message-State: AJIora9eANrtmbAwtIEvOFcqcVa6UtPZxRT1grlG7EpRp527oXs3XySn
+        kJ/OOeQ5b0NoH2zuqVZTEePkfEzjFsxRIQ==
+X-Google-Smtp-Source: AGRyM1uyuBI4yQO8I87mv5kU872kiOSXmbKPq5Tg/yiYqqbU8VShLy0QcRaY062PjM90XL8FvpDVSQ==
+X-Received: by 2002:a05:600c:1c10:b0:39c:4708:648d with SMTP id j16-20020a05600c1c1000b0039c4708648dmr28938957wms.85.1655798758346;
+        Tue, 21 Jun 2022 01:05:58 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:264b:feff:fe03:2806])
+        by smtp.googlemail.com with ESMTPSA id t5-20020a05600001c500b0020d106c0386sm7043231wrx.89.2022.06.21.01.05.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jun 2022 01:05:57 -0700 (PDT)
+Date:   Tue, 21 Jun 2022 10:05:54 +0200
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     John Keeping <john@metanate.com>
+Cc:     heiko@sntech.de, ardb@kernel.org, herbert@gondor.apana.org.au,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v7 14/33] crypto: rockchip: handle reset also in PM
+Message-ID: <YrF74tmA9qc+I3JF@Red>
+References: <20220508185957.3629088-1-clabbe@baylibre.com>
+ <20220508185957.3629088-15-clabbe@baylibre.com>
+ <YrBUODGF51oUsF1f@donbot>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b5011dd2-e8ec-a307-1b43-5aff6cbb6891@linaro.org>
+In-Reply-To: <YrBUODGF51oUsF1f@donbot>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 21, 2022 at 03:37:31PM +0800, Zhangfei Gao wrote:
+Le Mon, Jun 20, 2022 at 12:04:24PM +0100, John Keeping a �crit :
+> On Sun, May 08, 2022 at 06:59:38PM +0000, Corentin Labbe wrote:
+> > reset could be handled by PM functions.
 > 
+> Is there any further rationale for this?
 > 
-> On 2022/6/20 下午9:36, Greg Kroah-Hartman wrote:
-> > On Mon, Jun 20, 2022 at 02:24:31PM +0100, Jean-Philippe Brucker wrote:
-> > > On Fri, Jun 17, 2022 at 02:05:21PM +0800, Zhangfei Gao wrote:
-> > > > > The refcount only ensures that the uacce_device object is not freed as
-> > > > > long as there are open fds. But uacce_remove() can run while there are
-> > > > > open fds, or fds in the process of being opened. And atfer uacce_remove()
-> > > > > runs, the uacce_device object still exists but is mostly unusable. For
-> > > > > example once the module is freed, uacce->ops is not valid anymore. But
-> > > > > currently uacce_fops_open() may dereference the ops in this case:
-> > > > > 
-> > > > > 	uacce_fops_open()
-> > > > > 	 if (!uacce->parent->driver)
-> > > > > 	 /* Still valid, keep going */		
-> > > > > 	 ...					rmmod
-> > > > > 						 uacce_remove()
-> > > > > 	 ...					 free_module()
-> > > > > 	 uacce->ops->get_queue() /* BUG */
-> > > > uacce_remove should wait for uacce->queues_lock, until fops_open release the
-> > > > lock.
-> > > > If open happen just after the uacce_remove: unlock, uacce_bind_queue in open
-> > > > should fail.
-> > > Ah yes sorry, I lost sight of what this patch was adding. But we could
-> > > have the same issue with the patch, just in a different order, no?
-> > > 
-> > > 	uacce_fops_open()
-> > > 	 uacce = xa_load()
-> > > 	 ...					rmmod
-> > Um, how is rmmod called if the file descriptor is open?
-> > 
-> > That should not be possible if the owner of the file descriptor is
-> > properly set.  Please fix that up.
-> Thanks Greg
+> After this change there is no longer a guaranteed reset pulse on probe
+> since the reset control may already be de-asserted.  This is normally
+> the most important case for a reset as it's the only time when the state
+> of the hardware is unknown.
 > 
-> Set cdev owner or use module_get/put can block rmmod once fops_open.
-> -       uacce->cdev->owner = THIS_MODULE;
-> +       uacce->cdev->owner = uacce->parent->driver->owner;
+> The original use of devm_add_action_or_reset() seems a bit weird already
+> since there doesn't seem to be any need to assert reset when the driver
+> is unloaded.
 > 
-> However, still not find good method to block removing parent pci device.
-> 
-> $ echo 1 > /sys/bus/pci/devices/0000:00:02.0/remove &
-> 
-> [   32.563350]  uacce_remove+0x6c/0x148
-> [   32.563353]  hisi_qm_uninit+0x12c/0x178
-> [   32.563356]  hisi_zip_remove+0xa0/0xd0 [hisi_zip]
-> [   32.563361]  pci_device_remove+0x44/0xd8
-> [   32.563364]  device_remove+0x54/0x88
-> [   32.563367]  device_release_driver_internal+0xec/0x1a0
-> [   32.563370]  device_release_driver+0x20/0x30
-> [   32.563372]  pci_stop_bus_device+0x8c/0xe0
-> [   32.563375]  pci_stop_and_remove_bus_device_locked+0x28/0x60
-> [   32.563378]  remove_store+0x9c/0xb0
-> [   32.563379]  dev_attr_store+0x20/0x38
 
-Removing the parent pci device does not remove the module code, it
-removes the device itself.  Don't confuse code vs. data here.
+I am not an hw engineer, so my knowledge on reset is low.
+So why not having a reset pulse on probe is a problem ?
 
-thanks,
+Do you mean I must put reset asserted on probe ?
 
-greg k-h
