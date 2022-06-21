@@ -2,123 +2,189 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CCEC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 15:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC2BC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 15:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352638AbiFUPU3 (ORCPT
+        id S1345590AbiFUP3V (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jun 2022 11:20:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58490 "EHLO
+        Tue, 21 Jun 2022 11:29:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352651AbiFUPUW (ORCPT
+        with ESMTP id S1352846AbiFUP2W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:20:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B7E0E205DC
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 08:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655824817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=m/qf6ov0omQZSA34pET1sX3jxVcqup+wfHTRPaQS72Q=;
-        b=AxEbiWMzJwT5HusztAkdT3IGQ6SF1LRkaQQ4q8OlqQzBwPrV6NDH/kbbBgR13npAIduP+e
-        ePXOW9t9s32Zdv40kxAveLiYbZ4Gh77rs7CZK95Dxd4Pe9ojtMjc+NYO2z/TUWbOHPqS/w
-        MXd34Eh3GhVkBJs8EizMli8QZQz9gOY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-551-cVIuGa09MXOM8jx5kmBEiA-1; Tue, 21 Jun 2022 11:20:12 -0400
-X-MC-Unique: cVIuGa09MXOM8jx5kmBEiA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B196C101E9B0;
-        Tue, 21 Jun 2022 15:20:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C833492C3B;
-        Tue, 21 Jun 2022 15:20:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-cc:     dhowells@redhat.com, simo@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] certs: Make signature verification FIPS compliant
+        Tue, 21 Jun 2022 11:28:22 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADB5631C
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 08:28:18 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id d19so15866195lji.10
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 08:28:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PPDc7qXBrAf8hM+ois/4M7n9y0Ctx2nTK0cCddntA00=;
+        b=Fi5EjLIzvDAJUiiuADLK7DwH7YYV7f0bHceXlX43VOliKsB9BBv4L4DTZlFmLFmkLk
+         POofabhBgj7RE3usD0FttRM8D8eDilGLOLPHqgnO8YDVQiE1OoG9dKOP/Dt3N9HP2E97
+         pFaXlwW+xYC2rWvtNgYANRwcpOUunAVpIJRCpoGyJRPa7VTijqJgFrS7RPtiWetYUA/S
+         nI082qoNoGUD37fI/pZXTw5gtv676RW9g4oemXpkcgvuAWhRvJ3ckQa3MARMB7BRSwwp
+         c9I9EW0jqRTQRaIdnXBNrGAivBi4QpIXdTKVVrEiFHYLvbScsPkiQHkbzokqo2gVc8J3
+         Pkrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PPDc7qXBrAf8hM+ois/4M7n9y0Ctx2nTK0cCddntA00=;
+        b=Ry2DtibuvQslrnC+bjMg9hRC3w0vLHWkOSWqq1dY/MS1u1aqCMXBJe1wKsSPh8ciMR
+         ZBKH2uL1kV47fzpf2DiAgwavnchSLzTfH1Vo0TrdnblZKGOCt9crUYJxCjO3DFt00giI
+         X+KxNgXTEiF13ABjfaXSL+W01QuI4IcENbI05eMZLZ4tJfJYBBtgYDl8Ae8iM4Cjw4GT
+         h/I/2cSsxS6+AlRn9WqgkacodgxuDavv1UrKy+TQu3KBux8GagM6iP6/+vErxHtiSd8a
+         9U4mSbTaibLLCE4OyhZCmr9UCcB6gAUYX6aJksV6HwD3UZAWzVnMX3spghhitH6sQIon
+         N3GQ==
+X-Gm-Message-State: AJIora/Wc0yHW3ZDvrG4dtZ51y+P7xOaZrIYN35/NsXd1ntmiEFZNfgU
+        n1KoktczeTd6tiOxFY3RMc/Zce54uXQ5FCtUcwpV6w==
+X-Google-Smtp-Source: AGRyM1tCe4/jK6PDAE71M19F4NM9E58kJKDMKB8cBjF0f/1wes7fLBrrgPNVl2oI3WpdVtZrOfMqeKvvJybe5z/2EzA=
+X-Received: by 2002:a2e:8091:0:b0:25a:8496:b255 with SMTP id
+ i17-20020a2e8091000000b0025a8496b255mr75993ljg.369.1655825296513; Tue, 21 Jun
+ 2022 08:28:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1276150.1655824809.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 21 Jun 2022 16:20:09 +0100
-Message-ID: <1276151.1655824809@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+References: <cover.1655761627.git.ashish.kalra@amd.com> <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 21 Jun 2022 09:28:04 -0600
+Message-ID: <CAMkAt6r+WSYXLZj-Bs5jpo4CR3+H5cpND0GHjsmgPacBK1GH_Q@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
+ SEV-SNP support
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus,
+On Mon, Jun 20, 2022 at 4:59 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The SEV-SNP support requires that IOMMU must to enabled, see the IOMMU
+> spec section 2.12 for further details. If IOMMU is not enabled or the
+> SNPSup extended feature register is not set then the SNP_INIT command
+> (used for initializing firmware) will fail.
+>
+> The iommu_sev_snp_supported() can be used to check if IOMMU supports the
+> SEV-SNP feature.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  drivers/iommu/amd/init.c | 30 ++++++++++++++++++++++++++++++
+>  include/linux/iommu.h    |  9 +++++++++
+>  2 files changed, 39 insertions(+)
+>
+> diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
+> index 1a3ad58ba846..82be8067ddf5 100644
+> --- a/drivers/iommu/amd/init.c
+> +++ b/drivers/iommu/amd/init.c
+> @@ -3361,3 +3361,33 @@ int amd_iommu_pc_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr, u8 fxn, u64
+>
+>         return iommu_pc_get_set_reg(iommu, bank, cntr, fxn, value, true);
+>  }
+> +
+> +bool iommu_sev_snp_supported(void)
+> +{
+> +       struct amd_iommu *iommu;
+> +
+> +       /*
+> +        * The SEV-SNP support requires that IOMMU must be enabled, and is
+> +        * not configured in the passthrough mode.
+> +        */
+> +       if (no_iommu || iommu_default_passthrough()) {
+> +               pr_err("SEV-SNP: IOMMU is either disabled or configured in passthrough mode.\n");
 
-Can you pull this please?  The signature checking code, as used by module
-signing, kexec, etc., is non-FIPS compliant as there is no selftest.  For =
-a
-kernel to be FIPS-compliant, signature checking would have to be tested
-before being used, and the box would need to panic if it's not available
-(probably reasonable as simply disabling signature checking would prevent
-you from loading any driver modules).
+Like below could this say something like snp support is disabled
+because of iommu settings.
 
-Deal with this by adding a minimal test.
+> +               return false;
+> +       }
+> +
+> +       /*
+> +        * Iterate through all the IOMMUs and verify the SNPSup feature is
+> +        * enabled.
+> +        */
+> +       for_each_iommu(iommu) {
+> +               if (!iommu_feature(iommu, FEATURE_SNP)) {
+> +                       pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
 
-This is split into two patches: the first moves load_certificate_list() to
-the same place as the X.509 code to make it more accessible internally; th=
-e
-second adds a selftest.
+SNPSup might not be obvious to readers, what about " SNP Support is
+disabled ...".
 
-David
+Also should this have the "SEV-SNP:" prefix like the above log?
 
-Link: https://lore.kernel.org/r/165515741424.1554877.9363755381201121213.s=
-tgit@warthog.procyon.org.uk/
----
-The following changes since commit b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f=
-3:
-
-  Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/certs-20220621
-
-for you to fetch changes up to 3cde3174eb910513d32a9ec8a9b95ea59be833df:
-
-  certs: Add FIPS selftests (2022-06-21 16:05:12 +0100)
-
-----------------------------------------------------------------
-Certs changes
-
-----------------------------------------------------------------
-David Howells (2):
-      certs: Move load_certificate_list() to be with the asymmetric keys c=
-ode
-      certs: Add FIPS selftests
-
- certs/Makefile                                     |   4 +-
- certs/blacklist.c                                  |   8 +-
- certs/common.h                                     |   9 -
- certs/system_keyring.c                             |   6 +-
- crypto/asymmetric_keys/Kconfig                     |  10 +
- crypto/asymmetric_keys/Makefile                    |   2 +
- crypto/asymmetric_keys/selftest.c                  | 224 ++++++++++++++++=
-+++++
- .../asymmetric_keys/x509_loader.c                  |   8 +-
- crypto/asymmetric_keys/x509_parser.h               |   9 +
- crypto/asymmetric_keys/x509_public_key.c           |   8 +-
- include/keys/asymmetric-type.h                     |   3 +
- 11 files changed, 268 insertions(+), 23 deletions(-)
- delete mode 100644 certs/common.h
- create mode 100644 crypto/asymmetric_keys/selftest.c
- rename certs/common.c =3D> crypto/asymmetric_keys/x509_loader.c (87%)
-
+> +                              PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
+> +                              PCI_FUNC(iommu->devid));
+> +                       return false;
+> +               }
+> +       }
+> +
+> +       return true;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 9208eca4b0d1..fecb72e1b11b 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -675,6 +675,12 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+>  void iommu_sva_unbind_device(struct iommu_sva *handle);
+>  u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+>
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +bool iommu_sev_snp_supported(void);
+> +#else
+> +static inline bool iommu_sev_snp_supported(void) { return false; }
+> +#endif
+> +
+>  #else /* CONFIG_IOMMU_API */
+>
+>  struct iommu_ops {};
+> @@ -1031,6 +1037,9 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
+>  {
+>         return NULL;
+>  }
+> +
+> +static inline bool iommu_sev_snp_supported(void) { return false; }
+> +
+>  #endif /* CONFIG_IOMMU_API */
+>
+>  /**
+> --
+> 2.25.1
+>
