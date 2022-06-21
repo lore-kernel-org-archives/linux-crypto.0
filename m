@@ -2,125 +2,123 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B4FCCA482
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 07:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2DFC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jun 2022 07:47:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347315AbiFUHjR (ORCPT
+        id S1347377AbiFUHrQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jun 2022 03:39:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38882 "EHLO
+        Tue, 21 Jun 2022 03:47:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347322AbiFUHih (ORCPT
+        with ESMTP id S1347280AbiFUHoS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jun 2022 03:38:37 -0400
-Received: from mail-m965.mail.126.com (mail-m965.mail.126.com [123.126.96.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CDE8411440
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jun 2022 00:38:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=SQErp
-        zelIM2uQrL/wj/6CR6vyBSbP0OiSeVxleKVGek=; b=fEVc/bofoJl4PehTJIm2u
-        3mwjHKl6GQ1eH9CE2kAoUGmT0FE2xcmq0X7bgkvp0UosSK/AgFUh1ewnCtZCHCq7
-        w8i2GbWqZNk+XjnEZzCzm6hZGT9lhuWwsrEPrQZROjNyhTfzu1oJBdtJwS01edXC
-        zKjisQjcwJwKUs3QIVORtM=
-Received: from localhost.localdomain (unknown [124.16.139.61])
-        by smtp10 (Coremail) with SMTP id NuRpCgCHl69HdbFiRLM3FA--.37065S2;
-        Tue, 21 Jun 2022 15:37:44 +0800 (CST)
-From:   Liang He <windhl@126.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, windhl@126.com
-Subject: [PATCH] crypto: Hold the reference returned by of_find_compatible_node
-Date:   Tue, 21 Jun 2022 15:37:42 +0800
-Message-Id: <20220621073742.4081013-1-windhl@126.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 21 Jun 2022 03:44:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62A2A2317A;
+        Tue, 21 Jun 2022 00:44:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23D31B8169E;
+        Tue, 21 Jun 2022 07:44:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED6BC3411D;
+        Tue, 21 Jun 2022 07:44:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1655797454;
+        bh=TgZQktU/5vsZP3GPNZ/qWZleinBCCk2cgAR6Lox4crc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=wht0PXyeuQwQyGpWl60X7KoWQ4g7oJT8n4WSl6EFrGYthyFE7HShKTIyBJGnBxmAb
+         467t3Luka6NxNagPemIBgkgzsXnCDWmc5oXT9YqDSLh8BX8/0LLURrypXa+4Qk8Aq+
+         Ap1psmSnRkJLyskIBIwSkuYFJ8Kf6sideKMUsN6o=
+Date:   Tue, 21 Jun 2022 09:44:11 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wangzhou <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Yang Shen <shenyang39@huawei.com>
+Subject: Re: [PATCH] uacce: fix concurrency of fops_open and uacce_remove
+Message-ID: <YrF2yypHZfiNVRBh@kroah.com>
+References: <20220610123423.27496-1-zhangfei.gao@linaro.org>
+ <Yqn3spLZHpAkQ9Us@myrica>
+ <fdc8d8b0-4e04-78f5-1e8a-4cf44c89a37f@linaro.org>
+ <YqrmdKNrYTCiS/MC@myrica>
+ <d90e8ea5-2f18-2eda-b4b2-711083aa7ecd@linaro.org>
+ <YrB1D9rv9G4h/BYU@myrica>
+ <YrB30M9yAbUbPFrG@kroah.com>
+ <b5011dd2-e8ec-a307-1b43-5aff6cbb6891@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: NuRpCgCHl69HdbFiRLM3FA--.37065S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxZrW5Kr17JFyxCw48trW8JFb_yoW5CrykpF
-        4Y9ayUAryxXa4jgry8Jrn5ua4Fva93ZFWrJF47G3s8uwnxXFWkZF42vr4jvF95WFyrGr13
-        JFZ5Kw18Aa48Jr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U5WrZUUUUU=
-X-Originating-IP: [124.16.139.61]
-X-CM-SenderInfo: hzlqvxbo6rjloofrz/1tbi7QknF1pEAPvrZgAAs8
+In-Reply-To: <b5011dd2-e8ec-a307-1b43-5aff6cbb6891@linaro.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In nx842_pseries_init() and crypto4xx_probe(), we should hold the
-reference returned by of_find_compatible_node() and use it to call
-of_node_put to keep refcount balance.
+On Tue, Jun 21, 2022 at 03:37:31PM +0800, Zhangfei Gao wrote:
+> 
+> 
+> On 2022/6/20 下午9:36, Greg Kroah-Hartman wrote:
+> > On Mon, Jun 20, 2022 at 02:24:31PM +0100, Jean-Philippe Brucker wrote:
+> > > On Fri, Jun 17, 2022 at 02:05:21PM +0800, Zhangfei Gao wrote:
+> > > > > The refcount only ensures that the uacce_device object is not freed as
+> > > > > long as there are open fds. But uacce_remove() can run while there are
+> > > > > open fds, or fds in the process of being opened. And atfer uacce_remove()
+> > > > > runs, the uacce_device object still exists but is mostly unusable. For
+> > > > > example once the module is freed, uacce->ops is not valid anymore. But
+> > > > > currently uacce_fops_open() may dereference the ops in this case:
+> > > > > 
+> > > > > 	uacce_fops_open()
+> > > > > 	 if (!uacce->parent->driver)
+> > > > > 	 /* Still valid, keep going */		
+> > > > > 	 ...					rmmod
+> > > > > 						 uacce_remove()
+> > > > > 	 ...					 free_module()
+> > > > > 	 uacce->ops->get_queue() /* BUG */
+> > > > uacce_remove should wait for uacce->queues_lock, until fops_open release the
+> > > > lock.
+> > > > If open happen just after the uacce_remove: unlock, uacce_bind_queue in open
+> > > > should fail.
+> > > Ah yes sorry, I lost sight of what this patch was adding. But we could
+> > > have the same issue with the patch, just in a different order, no?
+> > > 
+> > > 	uacce_fops_open()
+> > > 	 uacce = xa_load()
+> > > 	 ...					rmmod
+> > Um, how is rmmod called if the file descriptor is open?
+> > 
+> > That should not be possible if the owner of the file descriptor is
+> > properly set.  Please fix that up.
+> Thanks Greg
+> 
+> Set cdev owner or use module_get/put can block rmmod once fops_open.
+> -       uacce->cdev->owner = THIS_MODULE;
+> +       uacce->cdev->owner = uacce->parent->driver->owner;
+> 
+> However, still not find good method to block removing parent pci device.
+> 
+> $ echo 1 > /sys/bus/pci/devices/0000:00:02.0/remove &
+> 
+> [   32.563350]  uacce_remove+0x6c/0x148
+> [   32.563353]  hisi_qm_uninit+0x12c/0x178
+> [   32.563356]  hisi_zip_remove+0xa0/0xd0 [hisi_zip]
+> [   32.563361]  pci_device_remove+0x44/0xd8
+> [   32.563364]  device_remove+0x54/0x88
+> [   32.563367]  device_release_driver_internal+0xec/0x1a0
+> [   32.563370]  device_release_driver+0x20/0x30
+> [   32.563372]  pci_stop_bus_device+0x8c/0xe0
+> [   32.563375]  pci_stop_and_remove_bus_device_locked+0x28/0x60
+> [   32.563378]  remove_store+0x9c/0xb0
+> [   32.563379]  dev_attr_store+0x20/0x38
 
-Signed-off-by: Liang He <windhl@126.com>
----
- drivers/crypto/amcc/crypto4xx_core.c  | 13 ++++++++-----
- drivers/crypto/nx/nx-common-pseries.c |  5 ++++-
- 2 files changed, 12 insertions(+), 6 deletions(-)
+Removing the parent pci device does not remove the module code, it
+removes the device itself.  Don't confuse code vs. data here.
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 8278d98074e9..169b6a05e752 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1378,6 +1378,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	struct resource res;
- 	struct device *dev = &ofdev->dev;
- 	struct crypto4xx_core_device *core_dev;
-+	struct device_node *np;
- 	u32 pvr;
- 	bool is_revb = true;
- 
-@@ -1385,20 +1386,20 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	if (rc)
- 		return -ENODEV;
- 
--	if (of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) {
-+	if ((np = of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) != NULL) {
- 		mtdcri(SDR0, PPC460EX_SDR0_SRST,
- 		       mfdcri(SDR0, PPC460EX_SDR0_SRST) | PPC460EX_CE_RESET);
- 		mtdcri(SDR0, PPC460EX_SDR0_SRST,
- 		       mfdcri(SDR0, PPC460EX_SDR0_SRST) & ~PPC460EX_CE_RESET);
--	} else if (of_find_compatible_node(NULL, NULL,
--			"amcc,ppc405ex-crypto")) {
-+	} else if ((np = of_find_compatible_node(NULL, NULL,
-+			"amcc,ppc405ex-crypto")) != NULL) {
- 		mtdcri(SDR0, PPC405EX_SDR0_SRST,
- 		       mfdcri(SDR0, PPC405EX_SDR0_SRST) | PPC405EX_CE_RESET);
- 		mtdcri(SDR0, PPC405EX_SDR0_SRST,
- 		       mfdcri(SDR0, PPC405EX_SDR0_SRST) & ~PPC405EX_CE_RESET);
- 		is_revb = false;
--	} else if (of_find_compatible_node(NULL, NULL,
--			"amcc,ppc460sx-crypto")) {
-+	} else if ((np = of_find_compatible_node(NULL, NULL,
-+			"amcc,ppc460sx-crypto")) != NULL) {
- 		mtdcri(SDR0, PPC460SX_SDR0_SRST,
- 		       mfdcri(SDR0, PPC460SX_SDR0_SRST) | PPC460SX_CE_RESET);
- 		mtdcri(SDR0, PPC460SX_SDR0_SRST,
-@@ -1408,6 +1409,8 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 		return -EINVAL;
- 	}
- 
-+	of_node_put(np);
-+
- 	core_dev = kzalloc(sizeof(struct crypto4xx_core_device), GFP_KERNEL);
- 	if (!core_dev)
- 		return -ENOMEM;
-diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-index 7584a34ba88c..3ea334b7f820 100644
---- a/drivers/crypto/nx/nx-common-pseries.c
-+++ b/drivers/crypto/nx/nx-common-pseries.c
-@@ -1208,10 +1208,13 @@ static struct vio_driver nx842_vio_driver = {
- static int __init nx842_pseries_init(void)
- {
- 	struct nx842_devdata *new_devdata;
-+	struct device_node *np;
- 	int ret;
- 
--	if (!of_find_compatible_node(NULL, NULL, "ibm,compression"))
-+	np = of_find_compatible_node(NULL, NULL, "ibm,compression");
-+	if (!np)
- 		return -ENODEV;
-+	of_node_put(np);
- 
- 	RCU_INIT_POINTER(devdata, NULL);
- 	new_devdata = kzalloc(sizeof(*new_devdata), GFP_KERNEL);
--- 
-2.25.1
+thanks,
 
+greg k-h
