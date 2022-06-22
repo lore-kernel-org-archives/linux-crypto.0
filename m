@@ -2,133 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8045AC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 615F6C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:30:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352486AbiFVO0y (ORCPT
+        id S1358524AbiFVOau (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 10:26:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50738 "EHLO
+        Wed, 22 Jun 2022 10:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231184AbiFVO0x (ORCPT
+        with ESMTP id S1358469AbiFVOa3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:26:53 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890B037ABF;
-        Wed, 22 Jun 2022 07:26:52 -0700 (PDT)
+        Wed, 22 Jun 2022 10:30:29 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54A1F3CFFA;
+        Wed, 22 Jun 2022 07:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655908012; x=1687444012;
+  t=1655908194; x=1687444194;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=A7d2cHs1rusgGR62BUfFzsw6JwNIj4DohjCVILdINzQ=;
-  b=CBCXtsdpQnhnc0gLEuRtzG3o75ff7DBf4F07oZqU4SjFuXGVfiPq7UV/
-   EzkzH0Iw5+vqdl6QEpDYLNVzqZ2yAD9raiuNGPgYGDFpe7vxdOt4pySr0
-   i0TSeF/Mp1IAzE9QrWQ3A+wM4GOkRDOPpfYWVTjGaQ/pA3UuSQSiK1j5x
-   utp4Eu5cwv9e/wu9zUDEnhqY5DsV0nBgQKwgFPBMwAT0Tljm6m/Kazeda
-   AqY0cMYWtcGHI+nJpkYcL3YypBqsy8XgCBYF0oEUNKWsICgLePZtXPh4z
-   oPpu8KrQrxrOsVNVp4BwIXeuNJuVuDwq36oUCZWSeNJoZNgREALTBO6aj
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="281160312"
+  bh=PtAWVcHQ/OeCLHQhF7OJWPRZK21owRko6PYyYGt05D0=;
+  b=cYTpoAibFQ2jX6j3PsmcxQkuRqTGuO1ZhzvQ8psHCkryLTqxGuoct+10
+   Po08TgQxAJXJasWuc1PkOMt793izvjuusJNkA2Jp1wBvcbHDVDh+H11A5
+   9Rkn6JL0HtjBmnJkpeCiyFfURLZ2rIT+Woi/iOtQ02/QPfLmxR9+wWSx7
+   ByqQDA6QdL46cHBmKai+ZUEG8ts4GMlyisxLUMq7pA8tXWOA9StYK09Xy
+   Hy6gIyfvgGIkB3anodSu0WXXPcXWjpoJqeDOOp0GECKZ9IhKFDo1Qxaho
+   080nZ6pizcsb7/58E7bxqg92cPmvSs0hedKn5yrKUdjCZdgXPJrh1K+B0
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="260860668"
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="281160312"
+   d="scan'208";a="260860668"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:26:51 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:29:51 -0700
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677569503"
+   d="scan'208";a="677571663"
 Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:26:49 -0700
-Message-ID: <d89c695e-7d45-160f-5e28-fee5ee576104@intel.com>
-Date:   Wed, 22 Jun 2022 07:26:31 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:29:49 -0700
+Message-ID: <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
+Date:   Wed, 22 Jun 2022 07:29:31 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.1
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
 Content-Language: en-US
-To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org
-Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
-        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
-        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+ <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+ <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
+ <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/20/22 16:02, Ashish Kalra wrote:
-> +int psmash(u64 pfn)
-> +{
-> +	unsigned long paddr = pfn << PAGE_SHIFT;
-> +	int ret;
-> +
-> +	if (!pfn_valid(pfn))
-> +		return -EINVAL;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return -ENXIO;
-> +
-> +	/* Binutils version 2.36 supports the PSMASH mnemonic. */
-> +	asm volatile(".byte 0xF3, 0x0F, 0x01, 0xFF"
-> +		      : "=a"(ret)
-> +		      : "a"(paddr)
-> +		      : "memory", "cc");
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(psmash);
+On 6/22/22 07:22, Kalra, Ashish wrote:
+> As I replied previously on the same subject: Architectural implies
+> that it is defined in the APM and shouldn't change in such a way as
+> to not be backward compatible. I probably think the wording here
+> should be architecture independent or more precisely platform
+> independent.
+Yeah, arch-independent and non-architectural are quite different concepts.
 
-If a function gets an EXPORT_SYMBOL_GPL(), the least we can do is
-reasonably document it.  We don't need full kerneldoc nonsense, but a
-one-line about what this does would be quite helpful.  That goes for all
-the functions here.
+At Intel, at least, when someone says "not architectural" mean that the
+behavior is implementation-specific.  That, combined with the
+model/family/stepping gave me the wrong impression about what was going on.
 
-It would also be extremely helpful to have the changelog explain why
-these functions are exported and how the exports will be used.
-
-As a general rule, please push cpu_feature_enabled() checks as early as
-you reasonably can.  They are *VERY* cheap and can even enable the
-compiler to completely zap code like an #ifdef.
-
-There also seem to be a lot of pfn_valid() checks in here that aren't
-very well thought out.  For instance, there's a pfn_valid() check here:
-
-
-+int rmp_make_shared(u64 pfn, enum pg_level level)
-+{
-+	struct rmpupdate val;
-+
-+	if (!pfn_valid(pfn))
-+		return -EINVAL;
-...
-+	return rmpupdate(pfn, &val);
-+}
-
-and in rmpupdate():
-
-+static int rmpupdate(u64 pfn, struct rmpupdate *val)
-+{
-+	unsigned long paddr = pfn << PAGE_SHIFT;
-+	int ret;
-+
-+	if (!pfn_valid(pfn))
-+		return -EINVAL;
-...
-
-
-This is (at best) wasteful.  Could it be refactored?
+Some more clarity would be greatly appreciated.
