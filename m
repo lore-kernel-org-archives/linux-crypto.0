@@ -2,195 +2,208 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB8ACCA47D
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 17:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E85C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 18:04:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377335AbiFVRS7 (ORCPT
+        id S1359205AbiFVSEq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 13:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
+        Wed, 22 Jun 2022 14:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376717AbiFVRS6 (ORCPT
+        with ESMTP id S233565AbiFVSEp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 13:18:58 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 257C52180C;
-        Wed, 22 Jun 2022 10:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655918337; x=1687454337;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CW1y5IDbjPjtCIKvflTqoe0LEPdTAbEMuAa5hhCumaw=;
-  b=WyYCVfw2z2IcQXpqC+LHSlNhgDD+xjyB+EhQKdZX5k6C3nOJrcf3W+ta
-   xXEZqh0xhuPeQf4EE6StUkqTdBA2cVASkw30lq8FXViI6cibGkYXzj0/C
-   S5BnIrOtxlvNEF473VgwnHzciV1YZz5NfgWlJ48ijgqHmLGmd5cYQ2kUC
-   q8k837YPA/Wec6Yv0pmM207TNryFfAvHHormR1byBVbN4hU8BgqsEFQjo
-   Jw+YFLQu9SbyHwssn9aAz49UJZvm47VpJkdp8Ub8nvy7enHLX8ukC6zJg
-   swwGZNYLbOEr3FR76/qvKecjkv5FnQ7a12cz578UjmLQCqrlsl+oyujq8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="278029172"
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="278029172"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 10:18:57 -0700
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677654980"
-Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 10:18:55 -0700
-Message-ID: <485dd428-9aaa-9571-49a5-9d17c6e72e00@intel.com>
-Date:   Wed, 22 Jun 2022 10:18:36 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 4/4] x86/cpuid: check for dependencies violations in CPUID
- and attempt to fix them
+        Wed, 22 Jun 2022 14:04:45 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAD253389A;
+        Wed, 22 Jun 2022 11:04:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gMhZka+qkzeK2jmg5G4ONPXC0zy7yNolgDWsOUJgyZaYisIRDP6gi//sxmYpVI3hVabJwRlTIhKIjIGIifqQzduB+w2g96SeRCkBc2DoGuQRawlsaDeiDMb9KxEt+gAdZnPLNkSbqoZCwZiLhC8NetEy5crGLHJ5JW2EyInoLUU5HKniYNdcw3s5KN4//Ga7uLS/7dHZ8mWDW3iH4WiGRLdMszFTQibkOQjmank9yAvBfzuGq4TpjjPYcyuLOCAgY7nDvu8K/5IhLOEt9HDB9bRoRz1dwQAQAUZh1cS/U8+gl6abG1o/SUIoHkIF5beYPkvo85lFbMsv+48YRfbuGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p7wCI4PkoDJydKuKDSHeTV5Lr8aQfPIKL+jScXwD9Pk=;
+ b=fVNTVlVpR+KNdRP2es9aenUTwpWMBUUcnHCeZtPqz/HNyJrCJABWmYsOveTyOr40J/td3uqK77W4hDH6PXLSnQrojkTQCUzhB4+gYcWLh2ks/+vYh28zxHxMofp8su2deI+Xd98jwNrmy5/82bi0yCKTICyySM4Qt35wm73FY5dorc3wn0Cj88BVkgdzyNj33Y+OVG9xow/0w266zqcVnsU5WH7n00eWUEk6lzAdpXQ0JwYwBVlS0vNyj9/63BMAQ+7a3NqRJVpurBkBsiwWdnfH5lJhT8P2uLky6TmujEPxt2wKLdztVuntQe5awQGI+opByTu0ysSI8RRohiECQQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p7wCI4PkoDJydKuKDSHeTV5Lr8aQfPIKL+jScXwD9Pk=;
+ b=hjnzAEJ+T3mA3ic+FmkVTw8X9iROZjnVCzeDuXEPcmrsSV/whDW38S35dmu55CWmS3z9rvhY8Wgh8zhuPiBU6wl4F8wwpxhoEG9am1fdDWeNYnnerxrOTju1fJ236RmHCeBGi7mjSALeOC5XF9bwKykNS8jPddKTE9bk7HqyjsI=
+Received: from BYAPR12MB2759.namprd12.prod.outlook.com (2603:10b6:a03:61::32)
+ by CH2PR12MB3847.namprd12.prod.outlook.com (2603:10b6:610:2f::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5353.18; Wed, 22 Jun
+ 2022 18:04:40 +0000
+Received: from BYAPR12MB2759.namprd12.prod.outlook.com
+ ([fe80::a0be:c49b:ef2c:e588]) by BYAPR12MB2759.namprd12.prod.outlook.com
+ ([fe80::a0be:c49b:ef2c:e588%5]) with mapi id 15.20.5353.022; Wed, 22 Jun 2022
+ 18:04:40 +0000
+From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: RE: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Thread-Topic: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
+ RMPUPDATE and PSMASH instruction
+Thread-Index: AQHYhkQRulHh/HmbIUq97K70l/FApa1bt/Ag
+Date:   Wed, 22 Jun 2022 18:04:40 +0000
+Message-ID: <BYAPR12MB27599015C77E3F1E164C01F48EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
+ <d89c695e-7d45-160f-5e28-fee5ee576104@intel.com>
+In-Reply-To: <d89c695e-7d45-160f-5e28-fee5ee576104@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Jiri Olsa <jolsa@kernel.org>, linux-perf-users@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Borislav Petkov <bp@alien8.de>,
-        Kees Cook <keescook@chromium.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Jane Malalane <jane.malalane@citrix.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220622144820.751402-1-mlevitsk@redhat.com>
- <20220622144820.751402-5-mlevitsk@redhat.com>
- <c271cbf5-dfb5-c3dd-002b-9a358c90e984@intel.com>
- <70deac4c885b2bf41daecaed054f80f867ed19de.camel@redhat.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <70deac4c885b2bf41daecaed054f80f867ed19de.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-06-22T18:02:29Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=cd616676-b5d1-4f33-8618-61bf6ccaa0ef;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-06-22T18:04:37Z
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 6c98adc2-3ee7-4516-aac8-f296d0849895
+msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c517c317-ec30-44ff-f207-08da5479ad69
+x-ms-traffictypediagnostic: CH2PR12MB3847:EE_
+x-microsoft-antispam-prvs: <CH2PR12MB3847392472478874B215B8BB8EB29@CH2PR12MB3847.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kkUjkF7RMjvVn7N4RHI/P1fJ+1eTtPi6Pq3D/FnjNNP6Fra6cpRuY2xx8ooJ6a18ohXNruDsK2zc3YzHcesGt9KVu0wlyqY8hFw57W+kB7/tEi6BlfJKK9Ex08jgpoJkBq7qE/nmff8PETJWsCSlGEMw/MEplysw4bXPP/JsVZqTicitsKb4Imfn1kgf01RP7h1eNN2b9Nm/FMo/t47oAjmxHJyqGQjCFuCiRpXZh4bNRSM7+cuHFvatzu5WH9eBihADQtV5df/wvTeJOMjL1cuevqRu2JlHu4N3C3HsbzzV8Ea2wgNIjfd2odqHMBkMrp63E6Ze1yl2VIYhRvHawM8xmhvfQ0XsS2vgaQhS2JOn/wTyM61EE66L62i53dyqiK+HnWH1mE1XHiiFo7y1C7cJrOlQCM7DG8cJNooqRCN10QVmHTVX43DOTRShubiOHOYkD0kYNpGkCkF4QyjLPJ4PjvNgWXlouXqWGmgiDX5s9YLZhVDJSDnOvZhPzmKnHxNuOKG060xKdFFLbzB83WsRvUikSsFXPr33diqt2A5SBxwYwTQEidsS0oJ+UALIjc1ccLrbZdHAoYnaBlH24Zty6EHcysdw6wVy3dXk5Jwi3rvP+eeSPbqNJwRkirEGRiitG/4gTSjMIZFXY/c4dXOim09CLbFkCMwM7D/lfGAslCG06Lf+vxav9mflV4Un+3KbvmJNvmKk/IVdeXlv6A16RHUHy2FTBAW5U4KDABYVYmDvUgW8oOI+TBIgd1rqF/V+uGAROx2Q7Bq2UioZAg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2759.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(71200400001)(478600001)(83380400001)(8936002)(316002)(9686003)(52536014)(33656002)(54906003)(186003)(110136005)(86362001)(41300700001)(38070700005)(26005)(5660300002)(2906002)(6506007)(4326008)(8676002)(66556008)(64756008)(66446008)(76116006)(66946007)(66476007)(7696005)(55016003)(122000001)(7406005)(7416002)(38100700002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OGMvbit3ZC9qeW9NOG5GSUJJSE1lTlR5bWVzS0dERDBKQ1k2clg0UE9XdWRp?=
+ =?utf-8?B?eWM1WmEvc0V6UUVTdkJycytGL21Eb1FDYm5nUXhZWE4zMkVzT3RNaFRjTUVz?=
+ =?utf-8?B?S0JIOEJ5M01GOFQwQmhqZ1FXY3NDRkNtYmE3akJXVmlSUyszaUwyWEphczdL?=
+ =?utf-8?B?Ylp5b1BvVm1kalFUTDQ1eTkzYUNhdWovTy9TK01Wa0ZTTmx6bExCRDFTclpp?=
+ =?utf-8?B?a3h1RjdkeEIwN0s5eXZ1bmMzbUJIb0pYdjhEbS92cDFLcGxWQndENlBsWWx1?=
+ =?utf-8?B?UWt4MUJNaEF0RmlFdzBPblg2TjlzcmNlMjhIOUt2WWx4UkF4ZjFoOXBSR25P?=
+ =?utf-8?B?cHR2SGpUUWdOS0dsMWR5VWZ2ZUpiVjkrd3ZzNnU1bjU3cHRvc2pMVkR1eStK?=
+ =?utf-8?B?U1A2dEZac21hLzZqcEIraU9jTDNqcFBYc3V0bGY2d1dzRWdDMVBGZWN0OUFE?=
+ =?utf-8?B?bG45Zm8yZzM1UWdVNlhHWXlUT3o1RnpmczNISUZ1RHBuSzU2QXRBTWpSS0Zv?=
+ =?utf-8?B?S0RJUVpycWd3YVRteGlqa2JFTmJNT2JpMlEwQmhtRlEyNHAyRnl0cFI2TTJv?=
+ =?utf-8?B?VmhFUlJvbmp3ZWdsVTFpYkphbU1jSFFTcE5QbEE2QVh5blZyTGNGallVQXh0?=
+ =?utf-8?B?S1ZRRWhlM3llcmZ3SE1YTGhqSE9lMUpVdEVGNllxRUlVeGIxbUJOY0J3bzJk?=
+ =?utf-8?B?WjJCeXZ4ZVlZUXRJZkthakg5cXpkYVNQU2JmZ3R4ZG1lZW1odHVUT2ViNUJQ?=
+ =?utf-8?B?bzczVTBFdnVUak5BSUtLbjM2ZmFIaVY4OVZybzNNeDN2TlZEQWpONDlxWjJr?=
+ =?utf-8?B?VThQSzg0UzUrSGFpZG5FMFpPV1U1UmdTYU5hcFBLSzRiOXlDMm5nTGdsRXNE?=
+ =?utf-8?B?QVRWZSs0Ykd0SVFMcEN1T05NU2FjK1hpVXJJUktWMmFScXZzeFJzeEJrejZj?=
+ =?utf-8?B?UUc5SHBIaW55NUFOUHBJOVhrZTEzeHFvL1ErRjFpQ1RHckxXTXJ5UUZCU0Ex?=
+ =?utf-8?B?TzA4a1hKTkpJYWhzdVJoWjlHeFl6VTdmRzAzQ0VobVQ2cDlJcHpFdUpGUXM2?=
+ =?utf-8?B?aFV2QW5zaXJDb0h4cHVLWVYvV0NOdkpWczBMVC9FalNRQ205anRKeHJoODM0?=
+ =?utf-8?B?eStLTWJBdVFYQmJWck1iL1k2dkZNYUxjWS84MVZmR3JjOGliSlNEYWNjNlFW?=
+ =?utf-8?B?MFdnTzVYeEY1VHJub2JoNW5udG5zeTEvUkZtR1kzcWxoQUFlbERSRkdXd2lX?=
+ =?utf-8?B?eVNRN0d6bXNmNWZsQkRpSGd5MTBINWJnai84Tm53UkRyUlhibDdTcHJvNlRq?=
+ =?utf-8?B?elJoSHpKSWpWUFFMM1U0QTZnandBYUV4bVltTU5nZFIxdC83NWpQM1hLaVlI?=
+ =?utf-8?B?UlV1cVhuM0U1V0REczVKcUxBTmFlaGZBN2JMZ1p6TEJmRko3NDdQUTFlNVhz?=
+ =?utf-8?B?SklhbzUxSzA2dEorQWJPbzNGdzQwd1paekQ0anNnMzM4RkFvVDJJQk1WVGJo?=
+ =?utf-8?B?dEpDRUJGZzV2Qi80WGYwQnZHeXp0eEdFSXl0eDh1VFlyU29GYWwwS0xGNkcz?=
+ =?utf-8?B?c21uVzI0dkVIOEtRMHFCVGxhT2VhQkJUdXBjV3AxUDRDYURqSG5UVFFBaVFQ?=
+ =?utf-8?B?QVpzNFVJR05aOVVsSEh4RW1yZUE5WU5pSDBabWFVWWdvSFhmT0ZSMG9sbnRO?=
+ =?utf-8?B?b1Fqd253dTR1L05hZXJnYjNEbUkrSE5FVG9reU9NMVhvUzdxRVBxRUY4UTZE?=
+ =?utf-8?B?MEd5QUUrS2g3WWJ5YWg1Y0R2cnlZOGxYQmlMM1JqblNMQTFvL1FWalBtL2F5?=
+ =?utf-8?B?U3RIaGJQOFlJZTVTMy84NkNSYUhLUXBURjFXZ1dJNVcwT2kxRVdiK2loRGJP?=
+ =?utf-8?B?VnZNS0VQK0dJTlorazdvdlFmQURiZHBDdjVsRGdkK2s0RVVOZGtyTkhGRlVt?=
+ =?utf-8?B?OVlWWDF1QkN0ZHBVZHJ2dW9WWjEvQUlJc1FlUTh1Mm1ZWTlYbnpJbFI3ZGta?=
+ =?utf-8?B?QmNocFVYTlJZZ1lZc00vMkZ5VEpZZnduL0NlcEVWbUFOUWF3TzZ2NitqYzc4?=
+ =?utf-8?B?SFdDaXlSRUtRckw1UU1tN3dCZTJneHZhUXlmMWhyOUxXTlVNc1hyOU0rVnZB?=
+ =?utf-8?B?aFZtREFjZDhpVTFXbWVUbFB0ZDBTTlYrandsOGd4eFJnK0tRb3J1Mms4WCtB?=
+ =?utf-8?B?MTV6RHZLNmJncGZYM1lXaFIvVjdZV0QvY3crcE9STVpjT1pyT3pFTUgxY1Zo?=
+ =?utf-8?B?a0lmMDR2Mzc2S3oxRUVlUGlIenl4TEx3aW5rSkZsY0h1V1U1T01IYXVmb3VW?=
+ =?utf-8?Q?7brjrOsIQ/kOppATB7?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2759.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c517c317-ec30-44ff-f207-08da5479ad69
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2022 18:04:40.3367
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dSdif/BpCLND6CO0+FE/xt3+1Upgv6STfNHPDDAFK/n2w1C3Hb3OYcHavpY6CEKFlK8sv32QiFs28wD3dTB7Qg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3847
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/22/22 10:09, Maxim Levitsky wrote:
-> On Wed, 2022-06-22 at 08:32 -0700, Dave Hansen wrote:
->> On 6/22/22 07:48, Maxim Levitsky wrote:
->>> Due to configuration bugs, sometimes a CPU feature is disabled in CPUID,
->>> but not features that depend on it.
->>>
->>> While the above is not supported, the kernel should try to not crash,
->>> and clearing the dependent cpu caps is the best way to do it.
->>
->> That's a rather paltry changelog.
->>
->> If I remember correctly, there's a crystal clear problem:
->>
->> 	If a CPU enumerates support for AVX2 but AVX via CPUID, the
->> 	kernel crashes.
->>
->> There's also a follow-on problem.  The kernel has all the data it needs
->> to fix this, but just doesn't consult it:
->>
->> 	To make matters worse, the kernel _knows_ that this is an ill-
->> 	advised situation: The kernel prevents itself from clearing the
->> 	software representation of the AVX CPUID bit without also
->> 	clearing AVX2.
->>
->> 	But, the kernel only consults this knowledge when it is clearing
->> 	cpu_cap bits.  It does not consult this information when it is
->> 	populating those cpu_cap bits.
-> 
-> Yes, I agree. I'll update the changelog with something more in depth.
-> 
->>
->>> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
->>> index 4cc79971d2d847..c83a8f447d6aed 100644
->>> --- a/arch/x86/kernel/cpu/common.c
->>> +++ b/arch/x86/kernel/cpu/common.c
->>> @@ -1469,7 +1469,7 @@ static void __init early_identify_cpu(struct cpuinfo_x86 *c)
->>>  			this_cpu->c_early_init(c);
->>>  
->>>  		c->cpu_index = 0;
->>> -		filter_cpuid_features(c, false);
->>> +		filter_cpuid_features(c, true);
->>>  
->>>  		if (this_cpu->c_bsp_init)
->>>  			this_cpu->c_bsp_init(c);
->>> @@ -1757,7 +1757,7 @@ static void identify_cpu(struct cpuinfo_x86 *c)
->>>  	 */
->>>  
->>>  	/* Filter out anything that depends on CPUID levels we don't have */
->>> -	filter_cpuid_features(c, true);
->>> +	filter_cpuid_features(c, false);
->>>  
->>>  	/* If the model name is still unset, do table lookup. */
->>>  	if (!c->x86_model_id[0]) {
->>
->> While we're at it, could we please rid ourselves of this unreadable
->> mystery true/false gunk?
-> 
-> It is present if I understand the code correctly to avoid printing a warning twice.
-> It used to be 'warn' parameter, and I changed it to 'early' parameter, 
-> inverting its boolean value, because I have seen that warning is not printed at all, 
-> and I assumed that it is because the first early call already clears the cpuid cap
-> and the second call doesn't get the warning.
-
-If the goal is truly to suppress the warning once per dependency, it
-would be trivial to do:
-
-	struct cpuid_dep {
-	        unsigned int    feature;
-        	unsigned int    depends;
-+		bool warned;
-	};
-
-Then:
-
-	...
-	clear_feature(c, d->feature);
-+	if (!d->warned)
-+		pr_warn(...);
-+	d->warned = 1;
-
-You could even have two bits if you feel that we need separate warnings
-for the hardware (true CPUID) and software (setup_clear_cpu_cap()) checks.
-
->>>  		pr_warn("CPU: CPU feature " X86_CAP_FMT " disabled, no CPUID level 0x%x\n",
->>>  			x86_cap_flag(df->feature), df->level);
->>>  	}
->>> +
->>> +	for (d = cpuid_deps; d->feature; d++) {
->>> +
->>> +		if (!test_feature(c, d->feature) || test_feature(c, d->depends))
->>> +			continue;
->>> +
->>> +		clear_feature(c, d->feature);
->>> +
->>> +		pr_warn("CPU: CPU feature " X86_CAP_FMT " disabled, because it depends on "
->>> +			X86_CAP_FMT " which is not supported in CPUID\n",
->>> +			x86_cap_flag(d->feature), x86_cap_flag(d->depends));
->>> +	}
->>>  }
->>
->> The do_clear_cpu_cap() does this with a loop, presumably because a later
->> (higher index in the array) feature in cpuid_deps[] could theoretically
->> clear an earlier (lower index) feature.
-> 
-> Sorry this is my silly mistake. I intended to call clear_cpu_cap here,
-> which will if needed disable all the depedencies, so a loop doesn't
-> seem to be needed here. 
-> 
-> It's not very efficient but this is only done once per vCPU so shouldn't matter.
-
-Right, and it only loops if it is actually clearing features, which is
-arguably the result of a broken CPU or hypervisor, which is rare too.
-It's not inefficient in any case that matters.
+W0FNRCBPZmZpY2lhbCBVc2UgT25seSAtIEdlbmVyYWxdDQoNCj4+ICtpbnQgcHNtYXNoKHU2NCBw
+Zm4pDQo+PiArew0KPj4gKwl1bnNpZ25lZCBsb25nIHBhZGRyID0gcGZuIDw8IFBBR0VfU0hJRlQ7
+DQo+PiArCWludCByZXQ7DQo+PiArDQo+PiArCWlmICghcGZuX3ZhbGlkKHBmbikpDQo+PiArCQly
+ZXR1cm4gLUVJTlZBTDsNCj4+ICsNCj4+ICsJaWYgKCFjcHVfZmVhdHVyZV9lbmFibGVkKFg4Nl9G
+RUFUVVJFX1NFVl9TTlApKQ0KPj4gKwkJcmV0dXJuIC1FTlhJTzsNCj4+ICsNCj4+ICsJLyogQmlu
+dXRpbHMgdmVyc2lvbiAyLjM2IHN1cHBvcnRzIHRoZSBQU01BU0ggbW5lbW9uaWMuICovDQo+PiAr
+CWFzbSB2b2xhdGlsZSgiLmJ5dGUgMHhGMywgMHgwRiwgMHgwMSwgMHhGRiINCj4+ICsJCSAgICAg
+IDogIj1hIihyZXQpDQo+PiArCQkgICAgICA6ICJhIihwYWRkcikNCj4+ICsJCSAgICAgIDogIm1l
+bW9yeSIsICJjYyIpOw0KPj4gKw0KPj4gKwlyZXR1cm4gcmV0Ow0KPj4gK30NCj4+ICtFWFBPUlRf
+U1lNQk9MX0dQTChwc21hc2gpOw0KDQo+SWYgYSBmdW5jdGlvbiBnZXRzIGFuIEVYUE9SVF9TWU1C
+T0xfR1BMKCksIHRoZSBsZWFzdCB3ZSBjYW4gZG8gaXMgcmVhc29uYWJseSBkb2N1bWVudCBpdC4g
+IFdlIGRvbid0IG5lZWQgZnVsbCBrZXJuZWxkb2Mgbm9uc2Vuc2UsIGJ1dCBhIG9uZS1saW5lIGFi
+b3V0IHdoYXQgdGhpcyBkb2VzIHdvdWxkIGJlIHF1aXRlIGhlbHBmdWwuICBUaGF0IGdvZXMgZm9y
+IGFsbCB0aGUgZnVuY3Rpb25zIGhlcmUuDQoNCj5JdCB3b3VsZCBhbHNvIGJlIGV4dHJlbWVseSBo
+ZWxwZnVsIHRvIGhhdmUgdGhlIGNoYW5nZWxvZyBleHBsYWluIHdoeSB0aGVzZSBmdW5jdGlvbnMg
+YXJlIGV4cG9ydGVkIGFuZCBob3cgdGhlIGV4cG9ydHMgd2lsbCBiZSB1c2VkLg0KDQpJIHdpbGwg
+YWRkIGJhc2ljIGRlc2NyaXB0aW9ucyBmb3IgYWxsIHRoZXNlIGV4cG9ydGVkIGZ1bmN0aW9ucy4N
+Cg0KVGhhbmtzLA0KQXNoaXNoDQoNCj5BcyBhIGdlbmVyYWwgcnVsZSwgcGxlYXNlIHB1c2ggY3B1
+X2ZlYXR1cmVfZW5hYmxlZCgpIGNoZWNrcyBhcyBlYXJseSBhcyB5b3UgcmVhc29uYWJseSBjYW4u
+ICBUaGV5IGFyZSAqVkVSWSogY2hlYXAgYW5kIGNhbiBldmVuIGVuYWJsZSB0aGUgY29tcGlsZXIg
+dG8gY29tcGxldGVseSB6YXAgY29kZSBsaWtlIGFuICNpZmRlZi4NCg0KVGhlcmUgYWxzbyBzZWVt
+IHRvIGJlIGEgbG90IG9mIHBmbl92YWxpZCgpIGNoZWNrcyBpbiBoZXJlIHRoYXQgYXJlbid0IHZl
+cnkgd2VsbCB0aG91Z2h0IG91dC4gIEZvciBpbnN0YW5jZSwgdGhlcmUncyBhIHBmbl92YWxpZCgp
+IGNoZWNrIGhlcmU6DQoNCg0KK2ludCBybXBfbWFrZV9zaGFyZWQodTY0IHBmbiwgZW51bSBwZ19s
+ZXZlbCBsZXZlbCkgew0KKwlzdHJ1Y3Qgcm1wdXBkYXRlIHZhbDsNCisNCisJaWYgKCFwZm5fdmFs
+aWQocGZuKSkNCisJCXJldHVybiAtRUlOVkFMOw0KLi4uDQorCXJldHVybiBybXB1cGRhdGUocGZu
+LCAmdmFsKTsNCit9DQoNCmFuZCBpbiBybXB1cGRhdGUoKToNCg0KK3N0YXRpYyBpbnQgcm1wdXBk
+YXRlKHU2NCBwZm4sIHN0cnVjdCBybXB1cGRhdGUgKnZhbCkgew0KKwl1bnNpZ25lZCBsb25nIHBh
+ZGRyID0gcGZuIDw8IFBBR0VfU0hJRlQ7DQorCWludCByZXQ7DQorDQorCWlmICghcGZuX3ZhbGlk
+KHBmbikpDQorCQlyZXR1cm4gLUVJTlZBTDsNCi4uLg0KDQoNClRoaXMgaXMgKGF0IGJlc3QpIHdh
+c3RlZnVsLiAgQ291bGQgaXQgYmUgcmVmYWN0b3JlZD8NCg==
