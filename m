@@ -2,49 +2,47 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 229BFCCA482
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B44BBC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 15:07:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358602AbiFVO7I (ORCPT
-        <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 10:59:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57458 "EHLO
+        id S244868AbiFVPHy (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Jun 2022 11:07:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358888AbiFVO6h (ORCPT
+        with ESMTP id S1343920AbiFVPHx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:58:37 -0400
+        Wed, 22 Jun 2022 11:07:53 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2389636308;
-        Wed, 22 Jun 2022 07:58:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51EBA393F7;
+        Wed, 22 Jun 2022 08:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655909912; x=1687445912;
+  t=1655910471; x=1687446471;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=KIu2os6/xgxh1AGNcBH9yuG71tpVxfYaQBSW95DqGr4=;
-  b=C4XyESYxUSG8tTbzYSa4fxCwWkfyyZqvnaz6x1lyuIJJPhPlQF/57Be2
-   HiYxWguRw2/Uhhnd4UF4/HWZ/dFmyZf9c42ShxRPyinYDRfvOABBCIY0F
-   xMs0SyDIggImV3qlHT2KCHbkBxWRGMaWnPTiMYfF2uKJYBjlL2BVWy87B
-   ZwQUxZ1Gt4KptoQjjAWglXIfsNsKi/C1Dv30uNfZBiS8jgDeWqsPjn+WI
-   hJr1rBQKPb2SZGSfbW0pn/8uF4TjUdlgEyaxe3YiCMSThxa3W9Jm7zpMj
-   zLpF2NewiW8vX/iYLCftyHv+CeuHfSD897TKqCXrDmO5qwHIjAle4f2RT
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="366760359"
+  bh=spGuvBmrzu5CQX1DEn7d16VfVTAFMeRLkLyRMCTgqtI=;
+  b=mIv24N/h1ry+ejUcipwuX0mrP4sXGlRLO3JloZ0FeZy8zbgYRUP2skWY
+   mQmrLK4o7rzGfG11aLljLKsZtUrU9SPmDm0q3PX/X0yrZrFL0PfTgLsaf
+   So/i93RKq3+CdXobkcm1TBKJW/1sIw2AaxvsFBtNorXi5yGKM9ZJCteZZ
+   VTzAEnEkptI7LWlEK2n4RWgUYSKi24E5UO48SyLX/UMYvmm3SLQgahCpC
+   Pf+dJmirTGVaFgVRfNM85HU57vFa8f/WV6MxuD5KRoznh3EFSP+KvZDfJ
+   KcKU1+TfAz74BduG1FnFLGWqELn3Mze5OhcPoPAmyrMxiC5Nu712u57aC
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="366763810"
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="366760359"
+   d="scan'208";a="366763810"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:58:31 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 08:07:50 -0700
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677591901"
+   d="scan'208";a="677596461"
 Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:58:30 -0700
-Message-ID: <84c84de9-f5f1-1f8c-fa7c-6a416ea3373e@intel.com>
-Date:   Wed, 22 Jun 2022 07:58:12 -0700
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 08:07:49 -0700
+Message-ID: <677c46db-02ef-24b8-c25f-762b41fb8bdb@intel.com>
+Date:   Wed, 22 Jun 2022 08:07:31 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.1
-Subject: Re: [PATCH 1/4] perf/x86/intel/lbr: use setup_clear_cpu_cap instead
- of clear_cpu_cap
+Subject: Re: [PATCH 2/4] x86/cpuid: refactor setup_clear_cpu_cap/clear_feature
 Content-Language: en-US
 To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
 Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
@@ -68,12 +66,11 @@ Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Arnaldo Carvalho de Melo <acme@kernel.org>,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Liang, Kan" <kan.liang@linux.intel.com>
+        Paolo Bonzini <pbonzini@redhat.com>
 References: <20220622144820.751402-1-mlevitsk@redhat.com>
- <20220622144820.751402-2-mlevitsk@redhat.com>
+ <20220622144820.751402-3-mlevitsk@redhat.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <20220622144820.751402-2-mlevitsk@redhat.com>
+In-Reply-To: <20220622144820.751402-3-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -81,35 +78,23 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 6/22/22 07:48, Maxim Levitsky wrote:
-> clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
-> except that the latter also sets a bit in 'cpu_caps_cleared' which
-> later clears the same cap in secondary cpus, which is likely
-> what is meant here.
+> Simplify the code a bit by always passing &boot_cpu_data
+> in case the setup_clear_cpu_cap was called.
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> Also unify clear_cpu_cap and do_clear_cpu_cap.
 
-Seems like a:
+Please always add a "()" suffix to functions.  "foo" is a variable, but
+"foo()" is a function.
 
-Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
+I also really like when a changelog has a clear problem statement.  I
+_think_ the problem here is something along the lines of the 'c'
+argument to clear_feature() having different behavior when it is NULL
+versus '&boot_cpu_data'.
 
-would be in order.
-
-Kan, does this change look right to you?
-
->  arch/x86/events/intel/lbr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-> index 13179f31fe10fa..b08715172309a7 100644
-> --- a/arch/x86/events/intel/lbr.c
-> +++ b/arch/x86/events/intel/lbr.c
-> @@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
->  	return;
->  
->  clear_arch_lbr:
-> -	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
-> +	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
+Basically, there's no reason to support clearing a bit in
+'&boot_cpu_data' without also setting that bit in 'cpu_caps_cleared'.
+>  {
+> -	do_clear_cpu_cap(NULL, feature);
+> +	clear_cpu_cap(&boot_cpu_data, feature);
 >  }
->  
->  /**
 
