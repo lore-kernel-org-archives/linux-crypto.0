@@ -2,80 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EE6C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 18:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 344CEC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 18:57:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377654AbiFVSxk (ORCPT
+        id S1376265AbiFVS5Y (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 14:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
+        Wed, 22 Jun 2022 14:57:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377661AbiFVSxi (ORCPT
+        with ESMTP id S235707AbiFVS5V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 14:53:38 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF1C3BF91;
-        Wed, 22 Jun 2022 11:53:32 -0700 (PDT)
+        Wed, 22 Jun 2022 14:57:21 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6478167E9;
+        Wed, 22 Jun 2022 11:57:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655924012; x=1687460012;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=prwrS1jSAxwYJXS6zrdVXKa0GwZvymzpmn7Mdh5vPkw=;
-  b=FQX95MJLIWgFPJCsvKbwwKf0PUMhEVSE2ag9OflQxHYam5urSdSSuCxI
-   X3fMT6QsyWwJPbmCaJtPCYSF0u4nyoZdAGE08TIRz9P1qgBKyXgJp/YOp
-   ZaJQhC4UvyngGGKo2H3miV85o8zP6TEZRvyMHe2BKAURkeOYAYSaq+LPU
-   VXhfwjjYeXWN/KZG4Gs9aCxYBHQZa9ieytdfVFNIjZC9k6UWGuWhj11kW
-   Px+lwoOWUG41yc07akVdyLmah2gjKV8iHFh/pFm6otq8vlJS5p+2I/kIs
-   SSKGj/z5vvGurzPrMocw6tjBoDhe+fVdAXPmqUQjh+gwVKxl37+Ri9U5G
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="305971559"
+  t=1655924240; x=1687460240;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GfUjOXbnbljOCWDgJqhlMo6F4sjejR8sLGNLfJqUuMw=;
+  b=Ic4I7KQ7uCh/cnUu7dQJNLJ/M0CGmP0n5uIaQB3egn2FaxL44w23QTKs
+   ALpmjdKHrdevzFyzCnWqf8g7DjTYQ5E6s0POAFlkSVoqPU0vM3iSXfbGW
+   cBCbTS78mu13FEhIv+8xR57FD2OSob/Dqh1qNsOIZMSSJybtTeIt981nF
+   k00r1oVPqHsNE5N5p7Cz+DYVAdNYTGI7oYBT1er2jNodaVJz+lDDWxpDu
+   0lbhBTI5aNDKI80bADTcc8wgRK7TUna0rDA8PDB+0+krEdOwqzF/t1Ti/
+   PlAN98Av25tIMb++f63fK0pNJqzefBCufIzfTjua4kE/XpeMvet7E73m/
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="281245147"
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="305971559"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:53:32 -0700
+   d="scan'208";a="281245147"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:57:20 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677700660"
-Received: from bwalker-desk.ch.intel.com ([143.182.136.162])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2022 11:53:32 -0700
-From:   Ben Walker <benjamin.walker@intel.com>
-To:     vkoul@kernel.org
-Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v3 04/15] crypto: stm32/hash: Use dmaengine_async_is_tx_complete
-Date:   Wed, 22 Jun 2022 11:53:30 -0700
-Message-Id: <20220622185330.3043566-1-benjamin.walker@intel.com>
-X-Mailer: git-send-email 2.35.1
+   d="scan'208";a="563141901"
+Received: from linux.intel.com ([10.54.29.200])
+  by orsmga006.jf.intel.com with ESMTP; 22 Jun 2022 11:57:20 -0700
+Received: from [10.252.208.245] (kliang2-MOBL.ccr.corp.intel.com [10.252.208.245])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id F2A35580970;
+        Wed, 22 Jun 2022 11:57:16 -0700 (PDT)
+Message-ID: <4a635493-4e06-af5a-d4d7-e9e669051b08@linux.intel.com>
+Date:   Wed, 22 Jun 2022 14:57:15 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/4] perf/x86/intel/lbr: use setup_clear_cpu_cap instead
+ of clear_cpu_cap
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jiri Olsa <jolsa@kernel.org>, linux-perf-users@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Borislav Petkov <bp@alien8.de>,
+        Kees Cook <keescook@chromium.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20220622144820.751402-1-mlevitsk@redhat.com>
+ <20220622144820.751402-2-mlevitsk@redhat.com>
+ <84c84de9-f5f1-1f8c-fa7c-6a416ea3373e@intel.com>
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <84c84de9-f5f1-1f8c-fa7c-6a416ea3373e@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace dma_async_is_tx_complete with dmaengine_async_is_tx_complete.
-The previous API will be removed in favor of the new one.
 
-Signed-off-by: Ben Walker <benjamin.walker@intel.com>
----
- drivers/crypto/stm32/stm32-hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
-index d33006d43f761..aef447847c499 100644
---- a/drivers/crypto/stm32/stm32-hash.c
-+++ b/drivers/crypto/stm32/stm32-hash.c
-@@ -453,8 +453,7 @@ static int stm32_hash_xmit_dma(struct stm32_hash_dev *hdev,
- 					 msecs_to_jiffies(100)))
- 		err = -ETIMEDOUT;
- 
--	if (dma_async_is_tx_complete(hdev->dma_lch, cookie,
--				     NULL, NULL) != DMA_COMPLETE)
-+	if (dmaengine_async_is_tx_complete(hdev->dma_lch, cookie) != DMA_COMPLETE)
- 		err = -ETIMEDOUT;
- 
- 	if (err) {
--- 
-2.35.1
+On 6/22/2022 10:58 AM, Dave Hansen wrote:
+> On 6/22/22 07:48, Maxim Levitsky wrote:
+>> clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
+>> except that the latter also sets a bit in 'cpu_caps_cleared' which
+>> later clears the same cap in secondary cpus, which is likely
+>> what is meant here.
+>>
+>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> 
+> Seems like a:
+> 
+> Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
+> 
+> would be in order.
+> 
+> Kan, does this change look right to you?
 
+For the current implementation, the Arch LBR feature should be either 
+supported by all the CPUs or disabled on all the CPUs. It cannot be only 
+enabled for partial CPUs, even in a hybrid platform.
+So the current code only check the boot CPU via static_cpu_has().
+
+Ideally, Yes, I think it may be better to clear the bit for all CPUs, 
+which makes the capability consistent among CPUs.
+
+Thanks,
+Kan
+> 
+>>   arch/x86/events/intel/lbr.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+>> index 13179f31fe10fa..b08715172309a7 100644
+>> --- a/arch/x86/events/intel/lbr.c
+>> +++ b/arch/x86/events/intel/lbr.c
+>> @@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
+>>   	return;
+>>   
+>>   clear_arch_lbr:
+>> -	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
+>> +	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
+>>   }
+>>   
+>>   /**
+> 
