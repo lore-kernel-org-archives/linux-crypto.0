@@ -2,293 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 632B2C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:43:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C447C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:48:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358497AbiFVOnA (ORCPT
+        id S1357193AbiFVOsw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 10:43:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40866 "EHLO
+        Wed, 22 Jun 2022 10:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358494AbiFVOm7 (ORCPT
+        with ESMTP id S1357336AbiFVOsu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:42:59 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 27FFDB9;
-        Wed, 22 Jun 2022 07:42:57 -0700 (PDT)
-Received: from jpiotrowski-Surface-Book-3 (ip-037-201-214-204.um10.pools.vodafone-ip.de [37.201.214.204])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 02ADF20C636D;
-        Wed, 22 Jun 2022 07:42:49 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 02ADF20C636D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1655908976;
-        bh=3p9ZjAM7sex59sizUKu6QYDFUGr8EeBgiFOquCcUwkM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NrPWRQQBC2o9oajSPE53nnlzATXfEgf2dHagcUN5LS60Ha4Ezvaot2T5Wvu8C10g0
-         CHJNf3C+lOyYd+OCx34K+ndvZuVfuqQtRBHXe7I3O+OzymGWnyTO5o3t6LiWs6voaT
-         SSnTy1rlZf9JbY4YZH3R4tktCGmleekxZdzRoF5o=
-Date:   Wed, 22 Jun 2022 16:42:45 +0200
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 10/49] x86/fault: Add support to dump RMP entry
- on fault
-Message-ID: <YrMqZUfZl1b5I/ud@jpiotrowski-Surface-Book-3>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <af381cc88410c0e2c48fda5732741edd0d7609ac.1655761627.git.ashish.kalra@amd.com>
- <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
+        Wed, 22 Jun 2022 10:48:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22AB93BFBD
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 07:48:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655909329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=BfzGA2BfgEmm4tcaB5rbMih4mJIyv5Ggi+5ejPnvGzs=;
+        b=dce/0J5FNyVc+yIPOMNPhr7hriBEP8Py+Z4ktIbsJLZV6oGXn1VsZEt2hNXqr2lbsP6UCg
+        3CVlfTMmn3nMAzLLlBHr+BFIVpK69l59dhrcvmlyGHkdXugGOTceXJHSpO+UGzcSIZ16Hl
+        eRXx2/5IlcnLO6abspZ1P96VU1026QU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-474-N2RvB7y5NLeqzs-ommWDCA-1; Wed, 22 Jun 2022 10:48:46 -0400
+X-MC-Unique: N2RvB7y5NLeqzs-ommWDCA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AE6418A6534;
+        Wed, 22 Jun 2022 14:48:28 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.194.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1365A40E80E1;
+        Wed, 22 Jun 2022 14:48:21 +0000 (UTC)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jiri Olsa <jolsa@kernel.org>, linux-perf-users@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Borislav Petkov <bp@alien8.de>,
+        Kees Cook <keescook@chromium.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        Jane Malalane <jane.malalane@citrix.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        linux-crypto@vger.kernel.org (open list:CRYPTO API),
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/4] x86: cpuid: improve support for broken CPUID configurations
+Date:   Wed, 22 Jun 2022 17:48:16 +0300
+Message-Id: <20220622144820.751402-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YrMoIOv3U+vehi/D@jpiotrowski-Surface-Book-3>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 22, 2022 at 04:33:04PM +0200, Jeremi Piotrowski wrote:
-> On Mon, Jun 20, 2022 at 11:03:58PM +0000, Ashish Kalra wrote:
-> > From: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > When SEV-SNP is enabled globally, a write from the host goes through the
-> > RMP check. If the hardware encounters the check failure, then it raises
-> > the #PF (with RMP set). Dump the RMP entry at the faulting pfn to help
-> > the debug.
-> > 
-> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > ---
-> >  arch/x86/include/asm/sev.h |  7 +++++++
-> >  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
-> >  arch/x86/mm/fault.c        | 17 +++++++++++----
-> >  include/linux/sev.h        |  2 ++
-> >  4 files changed, 65 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> > index 6ab872311544..c0c4df817159 100644
-> > --- a/arch/x86/include/asm/sev.h
-> > +++ b/arch/x86/include/asm/sev.h
-> > @@ -113,6 +113,11 @@ struct __packed rmpentry {
-> >  
-> >  #define rmpentry_assigned(x)	((x)->info.assigned)
-> >  #define rmpentry_pagesize(x)	((x)->info.pagesize)
-> > +#define rmpentry_vmsa(x)	((x)->info.vmsa)
-> > +#define rmpentry_asid(x)	((x)->info.asid)
-> > +#define rmpentry_validated(x)	((x)->info.validated)
-> > +#define rmpentry_gpa(x)		((unsigned long)(x)->info.gpa)
-> > +#define rmpentry_immutable(x)	((x)->info.immutable)
-> >  
-> >  #define RMPADJUST_VMSA_PAGE_BIT		BIT(16)
-> >  
-> > @@ -205,6 +210,7 @@ void snp_set_wakeup_secondary_cpu(void);
-> >  bool snp_init(struct boot_params *bp);
-> >  void snp_abort(void);
-> >  int snp_issue_guest_request(u64 exit_code, struct snp_req_data *input, unsigned long *fw_err);
-> > +void dump_rmpentry(u64 pfn);
-> >  #else
-> >  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
-> >  static inline void sev_es_ist_exit(void) { }
-> > @@ -229,6 +235,7 @@ static inline int snp_issue_guest_request(u64 exit_code, struct snp_req_data *in
-> >  {
-> >  	return -ENOTTY;
-> >  }
-> > +static inline void dump_rmpentry(u64 pfn) {}
-> >  #endif
-> >  
-> >  #endif
-> > diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> > index 734cddd837f5..6640a639fffc 100644
-> > --- a/arch/x86/kernel/sev.c
-> > +++ b/arch/x86/kernel/sev.c
-> > @@ -2414,6 +2414,49 @@ static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
-> >  	return entry;
-> >  }
-> >  
-> > +void dump_rmpentry(u64 pfn)
-> > +{
-> > +	unsigned long pfn_end;
-> > +	struct rmpentry *e;
-> > +	int level;
-> > +
-> > +	e = __snp_lookup_rmpentry(pfn, &level);
-> > +	if (!e) {
-> 
-> __snp_lookup_rmpentry may return -errno so this should be:
-> 
->   if (e != 1)
+This patch series aims to harden the cpuid code against the case when=0D
+the hypervisor exposes a broken CPUID configuration to the guest,=0D
+in the form of having a feature disabled but not features that depend on it=
+.=0D
+=0D
+This is the more generic way to fix kernel panic in aes-ni kernel driver,=0D
+which was triggered by CPUID configuration in which AVX is disabled but=0D
+not AVX2.=0D
+=0D
+https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/=0D
+=0D
+This was tested by booting a guest with AVX disabled and not AVX2,=0D
+and observing that both a warning is now printed in dmesg, and=0D
+that avx2 is gone from /proc/cpuinfo.=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (4):=0D
+  perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap=0D
+  x86/cpuid: refactor setup_clear_cpu_cap/clear_feature=0D
+  x86/cpuid: move filter_cpuid_features to cpuid-deps.c=0D
+  x86/cpuid: check for dependencies violations in CPUID and attempt to=0D
+    fix them=0D
+=0D
+ arch/x86/events/intel/lbr.c       |  2 +-=0D
+ arch/x86/include/asm/cpufeature.h |  1 +=0D
+ arch/x86/kernel/cpu/common.c      | 50 +-----------------=0D
+ arch/x86/kernel/cpu/cpuid-deps.c  | 84 +++++++++++++++++++++++++++----=0D
+ 4 files changed, 78 insertions(+), 59 deletions(-)=0D
+=0D
+-- =0D
+2.26.3=0D
+=0D
 
-Sorry, actually it should be:
-
-  if (IS_ERR_OR_NULL(e)) {
-
-> 
-> > +		pr_alert("failed to read RMP entry pfn 0x%llx\n", pfn);
-> > +		return;
-> > +	}
-> > +
-> > +	if (rmpentry_assigned(e)) {
-> > +		pr_alert("RMPEntry paddr 0x%llx [assigned=%d immutable=%d pagesize=%d gpa=0x%lx"
-> > +			" asid=%d vmsa=%d validated=%d]\n", pfn << PAGE_SHIFT,
-> > +			rmpentry_assigned(e), rmpentry_immutable(e), rmpentry_pagesize(e),
-> > +			rmpentry_gpa(e), rmpentry_asid(e), rmpentry_vmsa(e),
-> > +			rmpentry_validated(e));
-> > +		return;
-> > +	}
-> > +
-> > +	/*
-> > +	 * If the RMP entry at the faulting pfn was not assigned, then we do not
-> > +	 * know what caused the RMP violation. To get some useful debug information,
-> > +	 * let iterate through the entire 2MB region, and dump the RMP entries if
-> > +	 * one of the bit in the RMP entry is set.
-> > +	 */
-> > +	pfn = pfn & ~(PTRS_PER_PMD - 1);
-> > +	pfn_end = pfn + PTRS_PER_PMD;
-> > +
-> > +	while (pfn < pfn_end) {
-> > +		e = __snp_lookup_rmpentry(pfn, &level);
-> > +		if (!e)
-> 
->   if (e != 1)
-> 
-
-and this too:
-
-  if (IS_ERR_OR_NULL(e))
-
-
-> > +			return;
-> > +
-> > +		if (e->low || e->high)
-> > +			pr_alert("RMPEntry paddr 0x%llx: [high=0x%016llx low=0x%016llx]\n",
-> > +				 pfn << PAGE_SHIFT, e->high, e->low);
-> > +		pfn++;
-> > +	}
-> > +}
-> > +EXPORT_SYMBOL_GPL(dump_rmpentry);
-> > +
-> >  /*
-> >   * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
-> >   * and -errno if there is no corresponding RMP entry.
-> > diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
-> > index f5de9673093a..25896a6ba04a 100644
-> > --- a/arch/x86/mm/fault.c
-> > +++ b/arch/x86/mm/fault.c
-> > @@ -34,6 +34,7 @@
-> >  #include <asm/kvm_para.h>		/* kvm_handle_async_pf		*/
-> >  #include <asm/vdso.h>			/* fixup_vdso_exception()	*/
-> >  #include <asm/irq_stack.h>
-> > +#include <asm/sev.h>			/* dump_rmpentry()		*/
-> >  
-> >  #define CREATE_TRACE_POINTS
-> >  #include <asm/trace/exceptions.h>
-> > @@ -290,7 +291,7 @@ static bool low_pfn(unsigned long pfn)
-> >  	return pfn < max_low_pfn;
-> >  }
-> >  
-> > -static void dump_pagetable(unsigned long address)
-> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
-> >  {
-> >  	pgd_t *base = __va(read_cr3_pa());
-> >  	pgd_t *pgd = &base[pgd_index(address)];
-> > @@ -346,10 +347,11 @@ static int bad_address(void *p)
-> >  	return get_kernel_nofault(dummy, (unsigned long *)p);
-> >  }
-> >  
-> > -static void dump_pagetable(unsigned long address)
-> > +static void dump_pagetable(unsigned long address, bool show_rmpentry)
-> >  {
-> >  	pgd_t *base = __va(read_cr3_pa());
-> >  	pgd_t *pgd = base + pgd_index(address);
-> > +	unsigned long pfn;
-> >  	p4d_t *p4d;
-> >  	pud_t *pud;
-> >  	pmd_t *pmd;
-> > @@ -367,6 +369,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(p4d))
-> >  		goto bad;
-> >  
-> > +	pfn = p4d_pfn(*p4d);
-> >  	pr_cont("P4D %lx ", p4d_val(*p4d));
-> >  	if (!p4d_present(*p4d) || p4d_large(*p4d))
-> >  		goto out;
-> > @@ -375,6 +378,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pud))
-> >  		goto bad;
-> >  
-> > +	pfn = pud_pfn(*pud);
-> >  	pr_cont("PUD %lx ", pud_val(*pud));
-> >  	if (!pud_present(*pud) || pud_large(*pud))
-> >  		goto out;
-> > @@ -383,6 +387,7 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pmd))
-> >  		goto bad;
-> >  
-> > +	pfn = pmd_pfn(*pmd);
-> >  	pr_cont("PMD %lx ", pmd_val(*pmd));
-> >  	if (!pmd_present(*pmd) || pmd_large(*pmd))
-> >  		goto out;
-> > @@ -391,9 +396,13 @@ static void dump_pagetable(unsigned long address)
-> >  	if (bad_address(pte))
-> >  		goto bad;
-> >  
-> > +	pfn = pte_pfn(*pte);
-> >  	pr_cont("PTE %lx", pte_val(*pte));
-> >  out:
-> >  	pr_cont("\n");
-> > +
-> > +	if (show_rmpentry)
-> > +		dump_rmpentry(pfn);
-> >  	return;
-> >  bad:
-> >  	pr_info("BAD\n");
-> > @@ -579,7 +588,7 @@ show_fault_oops(struct pt_regs *regs, unsigned long error_code, unsigned long ad
-> >  		show_ldttss(&gdt, "TR", tr);
-> >  	}
-> >  
-> > -	dump_pagetable(address);
-> > +	dump_pagetable(address, error_code & X86_PF_RMP);
-> >  }
-> >  
-> >  static noinline void
-> > @@ -596,7 +605,7 @@ pgtable_bad(struct pt_regs *regs, unsigned long error_code,
-> >  
-> >  	printk(KERN_ALERT "%s: Corrupted page table at address %lx\n",
-> >  	       tsk->comm, address);
-> > -	dump_pagetable(address);
-> > +	dump_pagetable(address, false);
-> >  
-> >  	if (__die("Bad pagetable", regs, error_code))
-> >  		sig = 0;
-> > diff --git a/include/linux/sev.h b/include/linux/sev.h
-> > index 1a68842789e1..734b13a69c54 100644
-> > --- a/include/linux/sev.h
-> > +++ b/include/linux/sev.h
-> > @@ -16,6 +16,7 @@ int snp_lookup_rmpentry(u64 pfn, int *level);
-> >  int psmash(u64 pfn);
-> >  int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
-> >  int rmp_make_shared(u64 pfn, enum pg_level level);
-> > +void dump_rmpentry(u64 pfn);
-> >  #else
-> >  static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
-> >  static inline int psmash(u64 pfn) { return -ENXIO; }
-> > @@ -25,6 +26,7 @@ static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int as
-> >  	return -ENODEV;
-> >  }
-> >  static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
-> > +static inline void dump_rmpentry(u64 pfn) { }
-> >  
-> >  #endif /* CONFIG_AMD_MEM_ENCRYPT */
-> >  #endif /* __LINUX_SEV_H */
-> > -- 
-> > 2.25.1
-> > 
