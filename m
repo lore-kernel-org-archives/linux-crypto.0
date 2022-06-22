@@ -2,45 +2,51 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E95EC43334
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 229BFCCA482
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358420AbiFVOtM (ORCPT
+        id S1358602AbiFVO7I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 10:49:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47086 "EHLO
+        Wed, 22 Jun 2022 10:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358513AbiFVOtE (ORCPT
+        with ESMTP id S1358888AbiFVO6h (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:49:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7E4713DDF9
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 07:49:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655909342;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XCWooTms+wWlHXZcDu8ZPg89E6H/2XmTErhXmxcvgaE=;
-        b=AqYIm6MfW97EttoMCBJZwhtag9T+nkbiYHuJ++lYp4Peg88OrWHPIYHMgtvi35Lng3uPDe
-        uMBq+QKG+i55pFaxhkCLuMk+vVlq6mGWfJcOPWY/2NeNgvFulXmn32lg3gawXhatZw87hS
-        R2c76PIYb4fSNstWfDoxysMogcGC5J0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-220-brYIksGeNkyLtuH1ievjYA-1; Wed, 22 Jun 2022 10:48:57 -0400
-X-MC-Unique: brYIksGeNkyLtuH1ievjYA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BCECA2A2AD44;
-        Wed, 22 Jun 2022 14:48:39 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96EDC40E80FF;
-        Wed, 22 Jun 2022 14:48:34 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     linux-kernel@vger.kernel.org
+        Wed, 22 Jun 2022 10:58:37 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2389636308;
+        Wed, 22 Jun 2022 07:58:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655909912; x=1687445912;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=KIu2os6/xgxh1AGNcBH9yuG71tpVxfYaQBSW95DqGr4=;
+  b=C4XyESYxUSG8tTbzYSa4fxCwWkfyyZqvnaz6x1lyuIJJPhPlQF/57Be2
+   HiYxWguRw2/Uhhnd4UF4/HWZ/dFmyZf9c42ShxRPyinYDRfvOABBCIY0F
+   xMs0SyDIggImV3qlHT2KCHbkBxWRGMaWnPTiMYfF2uKJYBjlL2BVWy87B
+   ZwQUxZ1Gt4KptoQjjAWglXIfsNsKi/C1Dv30uNfZBiS8jgDeWqsPjn+WI
+   hJr1rBQKPb2SZGSfbW0pn/8uF4TjUdlgEyaxe3YiCMSThxa3W9Jm7zpMj
+   zLpF2NewiW8vX/iYLCftyHv+CeuHfSD897TKqCXrDmO5qwHIjAle4f2RT
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="366760359"
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="366760359"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:58:31 -0700
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="677591901"
+Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:58:30 -0700
+Message-ID: <84c84de9-f5f1-1f8c-fa7c-6a416ea3373e@intel.com>
+Date:   Wed, 22 Jun 2022 07:58:12 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 1/4] perf/x86/intel/lbr: use setup_clear_cpu_cap instead
+ of clear_cpu_cap
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org
 Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
         Jiri Olsa <jolsa@kernel.org>, linux-perf-users@vger.kernel.org,
         Peter Zijlstra <peterz@infradead.org>,
@@ -52,81 +58,58 @@ Cc:     "Chang S. Bae" <chang.seok.bae@intel.com>,
         Alexander Shishkin <alexander.shishkin@linux.intel.com>,
         Namhyung Kim <namhyung@kernel.org>,
         Tim Chen <tim.c.chen@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
         Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Jane Malalane <jane.malalane@citrix.com>,
         Tony Luck <tony.luck@intel.com>,
         Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Arnaldo Carvalho de Melo <acme@kernel.org>,
-        linux-crypto@vger.kernel.org (open list:CRYPTO API),
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 2/4] x86/cpuid: refactor setup_clear_cpu_cap/clear_feature
-Date:   Wed, 22 Jun 2022 17:48:18 +0300
-Message-Id: <20220622144820.751402-3-mlevitsk@redhat.com>
-In-Reply-To: <20220622144820.751402-1-mlevitsk@redhat.com>
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Liang, Kan" <kan.liang@linux.intel.com>
 References: <20220622144820.751402-1-mlevitsk@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+ <20220622144820.751402-2-mlevitsk@redhat.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <20220622144820.751402-2-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Simplify the code a bit by always passing &boot_cpu_data
-in case the setup_clear_cpu_cap was called.
+On 6/22/22 07:48, Maxim Levitsky wrote:
+> clear_cpu_cap(&boot_cpu_data) is very similar to setup_clear_cpu_cap
+> except that the latter also sets a bit in 'cpu_caps_cleared' which
+> later clears the same cap in secondary cpus, which is likely
+> what is meant here.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Also unify clear_cpu_cap and do_clear_cpu_cap.
+Seems like a:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kernel/cpu/cpuid-deps.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
+Fixes: 47125db27e47 ("perf/x86/intel/lbr: Support Architectural LBR")
 
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index c881bcafba7d70..d6777d07ba3302 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -88,18 +88,16 @@ static inline void clear_feature(struct cpuinfo_x86 *c, unsigned int feature)
- 	 * rest of the cpufeature code uses atomics as well, so keep it for
- 	 * consistency. Cleanup all of it separately.
- 	 */
--	if (!c) {
--		clear_cpu_cap(&boot_cpu_data, feature);
-+	clear_bit(feature, (unsigned long *)c->x86_capability);
-+
-+	if (c == &boot_cpu_data)
- 		set_bit(feature, (unsigned long *)cpu_caps_cleared);
--	} else {
--		clear_bit(feature, (unsigned long *)c->x86_capability);
--	}
- }
- 
- /* Take the capabilities and the BUG bits into account */
- #define MAX_FEATURE_BITS ((NCAPINTS + NBUGINTS) * sizeof(u32) * 8)
- 
--static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
-+void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
- {
- 	DECLARE_BITMAP(disable, MAX_FEATURE_BITS);
- 	const struct cpuid_dep *d;
-@@ -129,12 +127,7 @@ static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
- 	} while (changed);
- }
- 
--void clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
--{
--	do_clear_cpu_cap(c, feature);
--}
--
- void setup_clear_cpu_cap(unsigned int feature)
- {
--	do_clear_cpu_cap(NULL, feature);
-+	clear_cpu_cap(&boot_cpu_data, feature);
- }
--- 
-2.26.3
+would be in order.
+
+Kan, does this change look right to you?
+
+>  arch/x86/events/intel/lbr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
+> index 13179f31fe10fa..b08715172309a7 100644
+> --- a/arch/x86/events/intel/lbr.c
+> +++ b/arch/x86/events/intel/lbr.c
+> @@ -1860,7 +1860,7 @@ void __init intel_pmu_arch_lbr_init(void)
+>  	return;
+>  
+>  clear_arch_lbr:
+> -	clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR);
+> +	setup_clear_cpu_cap(X86_FEATURE_ARCH_LBR);
+>  }
+>  
+>  /**
 
