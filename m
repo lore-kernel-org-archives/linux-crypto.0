@@ -2,112 +2,128 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C6CC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 18:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1B0C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 18:53:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231224AbiFVSnJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 14:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
+        id S1376884AbiFVSxC (ORCPT
+        <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 22 Jun 2022 14:53:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230122AbiFVSnI (ORCPT
+        with ESMTP id S1359098AbiFVSxB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 14:43:08 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1C595B2;
-        Wed, 22 Jun 2022 11:43:07 -0700 (PDT)
+        Wed, 22 Jun 2022 14:53:01 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E319BBCA7;
+        Wed, 22 Jun 2022 11:52:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655923387; x=1687459387;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vLhzMi2QzzK4JidKA8EX0YX95XP0Zt+Cm+d/NMCKTa8=;
-  b=cRrpQJbDCIAiOurfHHNVOVFnui/lDCkecrxJ+MMK+RxRfPeuybe4FM8u
-   Sqhlgeh2tM6P5ZCGyv+Gg12+lRQkSqM0i5E1DYh256gqvk5rqJ9EsOr63
-   r11qlccXPkay4cwD9amf/40NDUhIj1LpcOvS9nQIUZGVL23pY3EGbmyae
-   zKO/a407RL+vVIx49IPi276CtjPXNGJWQ/hfaEpi8run84JF3B/OrL4g5
-   uDTy4DwUWQBNzGxvP+tIyrsGcqveoGF9zNF6eiP1fF+N+wFXlaUOAU2EQ
-   Tgqn+WTcxizqsCe1G/feei7EL6FRyXDTec+Cq8H3dMm/dB6xtjk+RD+vC
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="263545743"
+  t=1655923980; x=1687459980;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/jbAjt44pNdw2EPdmHuXf3wGiQ3od3Q+gNDKXfIaZ3c=;
+  b=FhZeww4nICkLd1YFn3XFZdH2xvTxs7+QDk0Cm8Ib39m3IImaMAzWTgY3
+   8cQjGidIuw3ZhIuCQlh6PpoeLtqtxffcV0Po3Sjk5YbNZeu3Qjl5a51EB
+   lhGhi/3KVrEM2Z+ve5l2lg4lsLl1rnpZY4uCq31rzIbIB7Yc5pLu5Ri0X
+   js21ZFsh9nwMiZiZvaOken29XD3bvtwhOR1Oysk15uTGMP9KfhQ8rjxBU
+   2xW4KKzfWvhFEYX7z+LHaKvDGWZk7g32isNIf+3A2htmyv+eQBONCZcDZ
+   8bXR52xmsjjJiwDPnHYQFOwYfbi36cvF89gnkAfdZvksNSyBKbmaVA8B+
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10386"; a="344505027"
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="263545743"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:43:07 -0700
+   d="scan'208";a="344505027"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:52:59 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="677695719"
-Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 11:43:05 -0700
-Message-ID: <99d72d58-a9bb-d75c-93af-79d497dfe176@intel.com>
-Date:   Wed, 22 Jun 2022 11:42:46 -0700
+   d="scan'208";a="715528336"
+Received: from bwalker-desk.ch.intel.com ([143.182.136.162])
+  by orsmga004.jf.intel.com with ESMTP; 22 Jun 2022 11:52:59 -0700
+From:   Ben Walker <benjamin.walker@intel.com>
+To:     vkoul@kernel.org
+Cc:     dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-media@vger.kernel.org, mporter@kernel.crashing.org
+Subject: [PATCH v3 00/15] dmaengine: Support polling for out of order completions
+Date:   Wed, 22 Jun 2022 11:52:48 -0700
+Message-Id: <20220622185248.3043534-1-benjamin.walker@intel.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
-Content-Language: en-US
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
- <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
- <BYAPR12MB2759A8F48D6D68EE879EEF648EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <25be3068-be13-a451-86d4-ff4cc12ddb23@intel.com>
- <BYAPR12MB27599BCEA9F692E173911C3B8EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <681e4e45-eff1-600c-9b81-1fa9bdf24232@intel.com>
- <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <BYAPR12MB27595CF4328B15F0F9573D188EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/22/22 11:34, Kalra, Ashish wrote:
->> So, if the RMP entry format changes in future processors, how do we
->> make sure that the kernel does not try to use *this* code on those
->> processors?
-> Functions snp_lookup_rmpentry() and dump_rmpentry() which rely on
-> this structure definition will need to handle it accordingly.
+This series adds support for polling async transactions for completion
+even if interrupts are disabled and transactions can complete out of
+order.
 
-In other words, old kernels will break on new hardware?
+To do this, all DMA client assumptions about the behavior of
+dma_cookie_t have to be removed. Prior to this series, dma_cookie_t was
+a monotonically increasing integer and cookies could be compared to one
+another to determine if earlier operations had completed (up until the
+cookie wraps around, then it would break).
 
-I think that needs to be fixed.  It should be as simple as a
-model/family check, though.  If someone (for example) attempts to use
-SNP (and thus snp_lookup_rmpentry() and dump_rmpentry()) code on a newer
-CPU, the kernel should refuse.
+Fortunately, only one out of the many, many DMA clients had any
+dependency on dma_cookie_t being anything more than an opaque handle.
+This is the pxa_camera driver and it is dealt with in patch 7 of this
+series.
+
+The series also does some API clean up and documents how dma_cookie_t
+should behave (i.e. there are no rules, it's just a handle).
+
+This closes out by adding support for .device_tx_status() to the idxd
+driver and then reverting the DMA_OUT_OF_ORDER patch that previously
+allowed idxd to opt-out of support for polling, which I think is a nice
+overall simplification to the dmaengine API.
+
+Changes since version 2:
+ - None. Rebased as requested without conflict.
+
+Changes since version 1:
+ - Broke up the change to remove dma_async_is_tx_complete into a single
+   patch for each driver
+ - Renamed dma_async_is_tx_complete to dmaengine_async_is_tx_complete.
+
+Ben Walker (15):
+  dmaengine: Remove dma_async_is_complete from client API
+  dmaengine: Move dma_set_tx_state to the provider API header
+  dmaengine: Add dmaengine_async_is_tx_complete
+  crypto: stm32/hash: Use dmaengine_async_is_tx_complete
+  media: omap_vout: Use dmaengine_async_is_tx_complete
+  rapidio: Use dmaengine_async_is_tx_complete
+  media: pxa_camera: Use dmaengine_async_is_tx_complete
+  dmaengine: Remove dma_async_is_tx_complete
+  dmaengine: Remove last, used from dma_tx_state
+  dmaengine: Providers should prefer dma_set_residue over
+    dma_set_tx_state
+  dmaengine: Remove dma_set_tx_state
+  dmaengine: Add provider documentation on cookie assignment
+  dmaengine: idxd: idxd_desc.id is now a u16
+  dmaengine: idxd: Support device_tx_status
+  dmaengine: Revert "cookie bypass for out of order completion"
+
+ Documentation/driver-api/dmaengine/client.rst | 24 ++----
+ .../driver-api/dmaengine/provider.rst         | 64 ++++++++------
+ drivers/crypto/stm32/stm32-hash.c             |  3 +-
+ drivers/dma/amba-pl08x.c                      |  1 -
+ drivers/dma/at_hdmac.c                        |  3 +-
+ drivers/dma/dmaengine.c                       |  2 +-
+ drivers/dma/dmaengine.h                       | 12 ++-
+ drivers/dma/dmatest.c                         | 14 +--
+ drivers/dma/idxd/device.c                     |  1 +
+ drivers/dma/idxd/dma.c                        | 86 ++++++++++++++++++-
+ drivers/dma/idxd/idxd.h                       |  3 +-
+ drivers/dma/imx-sdma.c                        |  3 +-
+ drivers/dma/mmp_tdma.c                        |  3 +-
+ drivers/dma/mxs-dma.c                         |  3 +-
+ drivers/media/platform/intel/pxa_camera.c     | 15 +++-
+ .../media/platform/ti/omap/omap_vout_vrfb.c   |  2 +-
+ drivers/rapidio/devices/rio_mport_cdev.c      |  3 +-
+ include/linux/dmaengine.h                     | 58 +------------
+ 18 files changed, 164 insertions(+), 136 deletions(-)
+
+-- 
+2.35.1
+
