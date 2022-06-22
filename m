@@ -2,83 +2,80 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B9DCCA483
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 11:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE483C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jun 2022 14:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357266AbiFVLRA (ORCPT
+        id S1358179AbiFVOOF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jun 2022 07:17:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56342 "EHLO
+        Wed, 22 Jun 2022 10:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357194AbiFVLQx (ORCPT
+        with ESMTP id S1358280AbiFVONr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jun 2022 07:16:53 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F733C4AE;
-        Wed, 22 Jun 2022 04:16:47 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DB13D68AA6; Wed, 22 Jun 2022 13:16:41 +0200 (CEST)
-Date:   Wed, 22 Jun 2022 13:16:41 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Serge Semin <fancer.lancer@gmail.com>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Christoph Hellwig <hch@lst.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Vladimir Murzin <vladimir.murzin@arm.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>,
-        Gregory Clement <gregory.clement@bootlin.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Srujana Challa <schalla@marvell.com>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        linux-crypto@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Li Yang <leoyang.li@nxp.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        linux-renesas-soc@vger.kernel.org,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tomasz Figa <tfiga@chromium.org>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-arm-msm@vger.kernel.org,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        Jon Mason <jdmason@kudzu.us>,
-        Dave Jiang <dave.jiang@intel.com>, ntb@lists.linux.dev,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dma-direct: take dma-ranges/offsets into account in
- resource mapping
-Message-ID: <20220622111641.GA27618@lst.de>
-References: <20220610080802.11147-1-Sergey.Semin@baikalelectronics.ru> <20220620213755.kczuriyildoublzi@mobilestation>
+        Wed, 22 Jun 2022 10:13:47 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF613B24;
+        Wed, 22 Jun 2022 07:13:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655907227; x=1687443227;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+EXRl6WV5FG4M9RIL6Oi04vvsi30kRgWRes9pKk2Hh0=;
+  b=BUBICXeCf8fiP0iAkOVo1MW7VoM2/Dk9XRN3hgLAvp/BxctZeIeJEM3d
+   emQl7hrjYWSS1pi4rsa2pfG9g8ICi0npmVP24Ki+MNYVzUNApyzrtj+MW
+   tuBPRei2/zYaRdR/e+Z7zrsSngChpp8GyedhYFbpVu3l4+yxyHmx3Xq7D
+   azsm00LX3zsLI5a7/4iR1l0OShfeE2buPOu7NBVAYGaVjOQMIWmTLXcge
+   oa0UzeQWPYzhhSk2nuT5YuC7yfdDwvGN0S3A9nPS0AVO432LO5sf1HiAi
+   HLqJbybv1sDLHkFlfAaoSelJBkl8a+DEUG2vG5IWoKFv6ZGfTnjTwEHyB
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="344416915"
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="344416915"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:13:46 -0700
+X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
+   d="scan'208";a="677555339"
+Received: from bshakya-mobl.amr.corp.intel.com (HELO [10.212.188.76]) ([10.212.188.76])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 07:13:44 -0700
+Message-ID: <cc0c6bd1-a1e3-82ee-8148-040be21cad5c@intel.com>
+Date:   Wed, 22 Jun 2022 07:13:26 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220620213755.kczuriyildoublzi@mobilestation>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
+Content-Language: en-US
+To:     Ashish Kalra <Ashish.Kalra@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+        thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+        slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I'd really like to hear something from the driver maintainers.  The
-cod change itself looks fine, we just need to make sure it does not
-break any driver assumptions.
+On 6/20/22 16:02, Ashish Kalra wrote:
+> +/*
+> + * The RMP entry format is not architectural. The format is defined in PPR
+> + * Family 19h Model 01h, Rev B1 processor.
+> + */
 
-And I think at least for the PCIe P2P and NTB cases I fear it might
-break them.  The proper logic for those is in the p2p helpers, but
-it seems like not everyone is using them.
+Let's say that Family 20h comes out and has a new RMP entry format.
+What keeps an old kernel from attempting to use this old format on that
+new CPU?
