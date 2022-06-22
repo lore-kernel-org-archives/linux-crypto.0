@@ -2,185 +2,201 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB90CCA479
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 13:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8729CCA479
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Jul 2022 13:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbiGUNpl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Jul 2022 09:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50874 "EHLO
+        id S229669AbiGUNr1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 21 Jul 2022 09:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiGUNow (ORCPT
+        with ESMTP id S229790AbiGUNrL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Jul 2022 09:44:52 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD74863CE
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:19 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id u19so2928030lfs.0
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Jul 2022 06:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jqVIpScoCCWkDYabFnlwaaN9YoNnkMmK49AqBQlpN38=;
-        b=pwObx/GcQLid5/AwpUISVuaVTzteHWScJQUuM1WEjLsOkMMiz5TsxXhF85mQdwOvaX
-         nr7CMIWIZKl2bC1SuFVblpMBnCom3gKIMCVfHlQ3re2Hj18Tis/QKuXG+hce3EP9sx4n
-         9y8RNtaZgJZvAa9QKl16XEMt8XXTQ5DzYiG15FsO0c89UQK8gEuLzy0nhCkYhj9vpScZ
-         g9Ypm9Ao4X7LLNbUK8n0f8oQKcmMpgH6rDSGG3bWXDFcjVhLFDF5jmWCoaFPBFOQTrk8
-         5PvXeelLKuNOQWezzvFe9YMsq0WBtiCKOsz7E1RfVWaJcprSOEK4rZqqlf6GkhWLRWC5
-         fwjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jqVIpScoCCWkDYabFnlwaaN9YoNnkMmK49AqBQlpN38=;
-        b=Gz91WicJbxJNSvPxKnXG0d9dJXigYsdcMzZvB6NbSoSl3ELBB2mMx1Jnj8hA+FE2Vd
-         8PT/YR/+ABOYVrRRR9Ab5anQ6CUcsEN+eNthtU4UVvfUY8cUQj5i8KMg4TDVC5BM/5NJ
-         8uiBYl3WaRM7YyT6mONc7PZCrLJ/BFJ7VdVI2S4Oycxysuig9qxM9QkthxfolzgEQ518
-         L/0zGNBe1Jq7Vr/mhr1V85FzxPNl2D3ptcABoORHYW14usBXICBpED5plTW1oI6+uPl6
-         TplHPJsLErZ4KwWK5NuSMiGtvK9dqHggAdvWsmNZXVLL8ezVaraQdB+Kl+YHf1qsJcnM
-         j03g==
-X-Gm-Message-State: AJIora9K1px962FKqRA+tCjgDHgCnzjN378zY84udmRzJRJGDb2BLpoQ
-        ouf9uT5pxNb6AsSgmlcsk6nMTkpEBX3XLQ==
-X-Google-Smtp-Source: AGRyM1vgzjJ0BItV7slTtOxAPzurr5dvcxKAOsX1nCxr/sj7eczTLe7+VgthdYOaNjtRyAVTn8MZng==
-X-Received: by 2002:a05:6512:3fa2:b0:48a:16df:266f with SMTP id x34-20020a0565123fa200b0048a16df266fmr18593242lfa.414.1658410995946;
-        Thu, 21 Jul 2022 06:43:15 -0700 (PDT)
-Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id o23-20020ac24e97000000b004867a427026sm458568lfr.40.2022.07.21.06.43.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 06:43:15 -0700 (PDT)
-From:   Linus Walleij <linus.walleij@linaro.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     phone-devel@vger.kernel.org, Stefan Hansson <newbyte@disroot.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 15/15] crypto: ux500/hash: Drop regulator handling
-Date:   Thu, 21 Jul 2022 15:40:50 +0200
-Message-Id: <20220721134050.1047866-16-linus.walleij@linaro.org>
+        Thu, 21 Jul 2022 09:47:11 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6E9820D7;
+        Thu, 21 Jul 2022 06:46:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658411168; x=1689947168;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fQCPrJb9lHyi4oxZ+pNt0wwlX5RQtHlur9Kl1f9gxRE=;
+  b=eNS027HcYP3OjWp0qunzouJvNGwaiEzkIeFLFtyifGGK5UcWIAqXAatx
+   ABmpwPmk5xx9/Vju9lfohyiXX4BZ8asN2RoI0SjBttTx/UGoA7oO03Z6z
+   mgzIz1hMrJe6EYim76S2GjhyQ1hyGPToShoRNLhqMMJVdG03fmTSEydRQ
+   jEe7753UhvO95l7gHGxzHcukb9GrrcrS/uNMi7wApJnWHRi6NI5ihTmN1
+   weyNpD2KumcUxpgEGeFjwR/9a4Sp6CkDCl9wAFcOfIFz9RckkHKCRWtZs
+   PeIPcQ8tndUTKr4SsVrLvrPXXMg9aPUbkhWSSPlesfvCTiK+tenB5MECW
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10414"; a="267445062"
+X-IronPort-AV: E=Sophos;i="5.93,289,1654585200"; 
+   d="scan'208";a="267445062"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2022 06:46:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,289,1654585200"; 
+   d="scan'208";a="925655444"
+Received: from 984fee006c34.jf.intel.com ([10.165.126.83])
+  by fmsmga005.fm.intel.com with ESMTP; 21 Jul 2022 06:46:08 -0700
+From:   Srinivas Kerekare <srinivas.kerekare@intel.com>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        qat-linux@intel.com,
+        Srinivas Kerekare <srinivas.kerekare@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>
+Subject: [PATCH] crypto: qat - add check to validate firmware images
+Date:   Wed, 22 Jun 2022 14:01:55 -0700
+Message-Id: <20220622210155.69684-1-srinivas.kerekare@intel.com>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220721134050.1047866-1-linus.walleij@linaro.org>
-References: <20220721134050.1047866-1-linus.walleij@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This "APE" voltage is not handled by a regulator but by the
-power domain, drop it.
+The function qat_uclo_check_image() validates the MMP and AE firmware
+images. If the QAT device supports firmware authentication (indicated
+by the handle to firmware loader), the input signed binary MMP and AE
+images are validated by parsing the following information:
+- Header length
+- Full size of the binary
+- Type of binary image (MMP or AE Firmware)
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Firmware binaries use RSA3K for signing and verification.
+The header length for the RSA3k is 0x384 bytes.
+
+All the size field values in the binary are quantified
+as DWORDS (1 DWORD = 4bytes).
+
+On an invalid value the function prints an error message and returns
+with an error code "EINVAL".
+
+Signed-off-by: Srinivas Kerekare <srinivas.kerekare@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Wojciech Ziemba <wojciech.ziemba@intel.com>
 ---
- drivers/crypto/ux500/hash/hash_core.c | 35 +++------------------------
- 1 file changed, 4 insertions(+), 31 deletions(-)
+ drivers/crypto/qat/qat_common/icp_qat_uclo.h |  3 +-
+ drivers/crypto/qat/qat_common/qat_uclo.c     | 56 +++++++++++++++++++-
+ 2 files changed, 57 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-index 55d27af8c9de..35bda646f49c 100644
---- a/drivers/crypto/ux500/hash/hash_core.c
-+++ b/drivers/crypto/ux500/hash/hash_core.c
-@@ -27,8 +27,6 @@
- #include <linux/pm_runtime.h>
- #include <linux/regmap.h>
- #include <linux/crypto.h>
--
--#include <linux/regulator/consumer.h>
- #include <linux/dmaengine.h>
- #include <linux/bitops.h>
+diff --git a/drivers/crypto/qat/qat_common/icp_qat_uclo.h b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+index 4b36869bf460..69482abdb8b9 100644
+--- a/drivers/crypto/qat/qat_common/icp_qat_uclo.h
++++ b/drivers/crypto/qat/qat_common/icp_qat_uclo.h
+@@ -86,7 +86,8 @@
+ 					ICP_QAT_CSS_FWSK_MODULUS_LEN(handle) + \
+ 					ICP_QAT_CSS_FWSK_EXPONENT_LEN(handle) + \
+ 					ICP_QAT_CSS_SIGNATURE_LEN(handle))
+-#define ICP_QAT_CSS_MAX_IMAGE_LEN   0x40000
++#define ICP_QAT_CSS_RSA4K_MAX_IMAGE_LEN    0x40000
++#define ICP_QAT_CSS_RSA3K_MAX_IMAGE_LEN    0x30000
  
-@@ -247,8 +245,7 @@ static int get_empty_message_digest(
-  * hash_disable_power - Request to disable power and clock.
-  * @device_data:	Structure for the hash device.
-  *
-- * This function request for disabling power (regulator) and clock,
-- * and could also save current hw state.
-+ * This function request for disabling the clock.
-  */
- static int hash_disable_power(struct hash_device_data *device_data)
- {
-@@ -260,9 +257,6 @@ static int hash_disable_power(struct hash_device_data *device_data)
- 		goto out;
- 
- 	clk_disable(device_data->clk);
--	ret = regulator_disable(device_data->regulator);
--	if (ret)
--		dev_err(dev, "%s: regulator_disable() failed!\n", __func__);
- 
- 	device_data->power_state = false;
- 
-@@ -276,8 +270,7 @@ static int hash_disable_power(struct hash_device_data *device_data)
-  * hash_enable_power - Request to enable power and clock.
-  * @device_data:		Structure for the hash device.
-  *
-- * This function request for enabling power (regulator) and clock,
-- * and could also restore a previously saved hw state.
-+ * This function request for enabling the clock.
-  */
- static int hash_enable_power(struct hash_device_data *device_data)
- {
-@@ -286,17 +279,9 @@ static int hash_enable_power(struct hash_device_data *device_data)
- 
- 	spin_lock(&device_data->power_state_lock);
- 	if (!device_data->power_state) {
--		ret = regulator_enable(device_data->regulator);
--		if (ret) {
--			dev_err(dev, "%s: regulator_enable() failed!\n",
--				__func__);
--			goto out;
--		}
- 		ret = clk_enable(device_data->clk);
- 		if (ret) {
- 			dev_err(dev, "%s: clk_enable() failed!\n", __func__);
--			ret = regulator_disable(
--					device_data->regulator);
- 			goto out;
- 		}
- 		device_data->power_state = true;
-@@ -1575,25 +1560,17 @@ static int ux500_hash_probe(struct platform_device *pdev)
- 	spin_lock_init(&device_data->ctx_lock);
- 	spin_lock_init(&device_data->power_state_lock);
- 
--	device_data->regulator = regulator_get(dev, "v-ape");
--	if (IS_ERR(device_data->regulator)) {
--		dev_err(dev, "%s: regulator_get() failed!\n", __func__);
--		ret = PTR_ERR(device_data->regulator);
--		device_data->regulator = NULL;
--		goto out;
--	}
--
- 	device_data->clk = devm_clk_get(dev, NULL);
- 	if (IS_ERR(device_data->clk)) {
- 		dev_err(dev, "%s: clk_get() failed!\n", __func__);
- 		ret = PTR_ERR(device_data->clk);
--		goto out_regulator;
-+		goto out;
+ #define ICP_QAT_CTX_MODE(ae_mode) ((ae_mode) & 0xf)
+ #define ICP_QAT_NN_MODE(ae_mode) (((ae_mode) >> 0x4) & 0xf)
+diff --git a/drivers/crypto/qat/qat_common/qat_uclo.c b/drivers/crypto/qat/qat_common/qat_uclo.c
+index 0fe5a474aa45..b7f7869ef8b2 100644
+--- a/drivers/crypto/qat/qat_common/qat_uclo.c
++++ b/drivers/crypto/qat/qat_common/qat_uclo.c
+@@ -1367,6 +1367,48 @@ static void qat_uclo_ummap_auth_fw(struct icp_qat_fw_loader_handle *handle,
  	}
+ }
  
- 	ret = clk_prepare(device_data->clk);
- 	if (ret) {
- 		dev_err(dev, "%s: clk_prepare() failed!\n", __func__);
--		goto out_regulator;
-+		goto out;
++static int qat_uclo_check_image(struct icp_qat_fw_loader_handle *handle,
++				char *image, unsigned int size,
++				unsigned int fw_type)
++{
++	char *fw_type_name = fw_type ? "MMP" : "AE";
++	unsigned int css_dword_size = sizeof(u32);
++
++	if (handle->chip_info->fw_auth) {
++		struct icp_qat_css_hdr *css_hdr = (struct icp_qat_css_hdr *)image;
++		unsigned int header_len = ICP_QAT_AE_IMG_OFFSET(handle);
++
++		if ((css_hdr->header_len * css_dword_size) != header_len)
++			goto err;
++		if ((css_hdr->size * css_dword_size) != size)
++			goto err;
++		if (fw_type != css_hdr->fw_type)
++			goto err;
++		if (size <= header_len)
++			goto err;
++		size -= header_len;
++	}
++
++	if (fw_type == CSS_AE_FIRMWARE) {
++		if (size < sizeof(struct icp_qat_simg_ae_mode *) +
++		    ICP_QAT_SIMG_AE_INIT_SEQ_LEN)
++			goto err;
++		if (size > ICP_QAT_CSS_RSA4K_MAX_IMAGE_LEN)
++			goto err;
++	} else if (fw_type == CSS_MMP_FIRMWARE) {
++		if (size > ICP_QAT_CSS_RSA3K_MAX_IMAGE_LEN)
++			goto err;
++	} else {
++		pr_err("QAT: Unsupported firmware type\n");
++		return -EINVAL;
++	}
++	return 0;
++
++err:
++	pr_err("QAT: Invalid %s firmware image\n", fw_type_name);
++	return -EINVAL;
++}
++
+ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
+ 				char *image, unsigned int size,
+ 				struct icp_qat_fw_auth_desc **desc)
+@@ -1379,7 +1421,7 @@ static int qat_uclo_map_auth_fw(struct icp_qat_fw_loader_handle *handle,
+ 	struct icp_qat_simg_ae_mode *simg_ae_mode;
+ 	struct icp_firml_dram_desc img_desc;
+ 
+-	if (size > (ICP_QAT_AE_IMG_OFFSET(handle) + ICP_QAT_CSS_MAX_IMAGE_LEN)) {
++	if (size > (ICP_QAT_AE_IMG_OFFSET(handle) + ICP_QAT_CSS_RSA4K_MAX_IMAGE_LEN)) {
+ 		pr_err("QAT: error, input image size overflow %d\n", size);
+ 		return -EINVAL;
  	}
+@@ -1547,6 +1589,11 @@ int qat_uclo_wr_mimage(struct icp_qat_fw_loader_handle *handle,
+ {
+ 	struct icp_qat_fw_auth_desc *desc = NULL;
+ 	int status = 0;
++	int ret;
++
++	ret = qat_uclo_check_image(handle, addr_ptr, mem_size, CSS_MMP_FIRMWARE);
++	if (ret)
++		return ret;
  
- 	/* Enable device power (and clock) */
-@@ -1637,9 +1614,6 @@ static int ux500_hash_probe(struct platform_device *pdev)
- out_clk_unprepare:
- 	clk_unprepare(device_data->clk);
+ 	if (handle->chip_info->fw_auth) {
+ 		status = qat_uclo_map_auth_fw(handle, addr_ptr, mem_size, &desc);
+@@ -2018,8 +2065,15 @@ static int qat_uclo_wr_suof_img(struct icp_qat_fw_loader_handle *handle)
+ 	struct icp_qat_fw_auth_desc *desc = NULL;
+ 	struct icp_qat_suof_handle *sobj_handle = handle->sobj_handle;
+ 	struct icp_qat_suof_img_hdr *simg_hdr = sobj_handle->img_table.simg_hdr;
++	int ret;
  
--out_regulator:
--	regulator_put(device_data->regulator);
--
- out:
- 	return ret;
- }
-@@ -1682,7 +1656,6 @@ static int ux500_hash_remove(struct platform_device *pdev)
- 			__func__);
- 
- 	clk_unprepare(device_data->clk);
--	regulator_put(device_data->regulator);
- 
- 	return 0;
- }
+ 	for (i = 0; i < sobj_handle->img_table.num_simgs; i++) {
++		ret = qat_uclo_check_image(handle, simg_hdr[i].simg_buf,
++					   simg_hdr[i].simg_len,
++					   CSS_AE_FIRMWARE);
++		if (ret)
++			return ret;
++
+ 		if (qat_uclo_map_auth_fw(handle,
+ 					 (char *)simg_hdr[i].simg_buf,
+ 					 (unsigned int)
 -- 
 2.36.1
+
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
 
