@@ -2,96 +2,115 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D951CCA485
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 16:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B96F5CCA47F
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 17:13:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbiFWQ6r (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 12:58:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59516 "EHLO
+        id S233822AbiFWRNX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 13:13:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232867AbiFWQ44 (ORCPT
+        with ESMTP id S229547AbiFWRLk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 12:56:56 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D4A4B403;
-        Thu, 23 Jun 2022 09:52:58 -0700 (PDT)
+        Thu, 23 Jun 2022 13:11:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D78D220E2;
+        Thu, 23 Jun 2022 09:51:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 68FC0CE25E4;
-        Thu, 23 Jun 2022 16:52:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3026DC341C5;
-        Thu, 23 Jun 2022 16:52:54 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i9UlvD98"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1656003172;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=lc4+yA8sbbcfkz4YSh6TP9qWPcsqLq7aPfv9CPguNkY=;
-        b=i9UlvD989T4ixKP4ugaWpbhIrTIFH6MqY2PD1AMkoUXtE0WItjhezIw8yr85xPoWjE47RP
-        19lNtmVxEQAkFs9s/hz/Ed6aX3ynCl0nROaVUb2qXlL6TUvHnAjgHB381407R+zeOBozH2
-        E9l1ocNoTBZR/eSQ3yXCo8pib+SoZ78=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 75d9cfc3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 23 Jun 2022 16:52:51 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
-Subject: [PATCH] timekeeping: contribute wall clock to rng on time change
-Date:   Thu, 23 Jun 2022 18:52:26 +0200
-Message-Id: <20220623165226.1335679-1-Jason@zx2c4.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0F273B8248F;
+        Thu, 23 Jun 2022 16:51:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6695AC3411B;
+        Thu, 23 Jun 2022 16:51:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656003100;
+        bh=ul0Tr7WeKZRZ2zms9/BEfRG9dytBHmQ8wW4LyYO8XdA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dD/CDDrmPhMEcjaCJnRGTHI5UNol/I2u/KVD6gbARWFdfBQDJBZ2uNCcODKpXJae7
+         VhHJlfSDf2F76FTzbHQx4ZZNw5nAEPQFRCSLjCozqdk9Q6U0itXEJvXGcRDmLCCS/N
+         8sb2JpVGzpZkwYlDyU7/WB+ObIrTze6gLQciti3Q=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Jann Horn <jannh@google.com>, Theodore Tso <tytso@mit.edu>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 4.9 089/264] random: initialize ChaCha20 constants with correct endianness
+Date:   Thu, 23 Jun 2022 18:41:22 +0200
+Message-Id: <20220623164346.589601245@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220623164344.053938039@linuxfoundation.org>
+References: <20220623164344.053938039@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The rng's random_init() function contributes the real time to the rng at
-boot time, so that events can at least start in relation to something
-particular in the real world. But this clock might not yet be set that
-point in boot, so nothing is contributed. In addition, the relation
-between minor clock changes from, say, NTP, and the cycle counter is
-potentially useful entropic data.
+From: Eric Biggers <ebiggers@google.com>
 
-This commit addresses this by mixing in a time stamp on calls to
-settimeofday and adjtimex. No entropy is credited in doing so, so it
-doesn't make initialization faster, but it is still useful input to
-have.
+commit a181e0fdb2164268274453b5b291589edbb9b22d upstream.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
+On big endian CPUs, the ChaCha20-based CRNG is using the wrong
+endianness for the ChaCha20 constants.
+
+This doesn't matter cryptographically, but technically it means it's not
+ChaCha20 anymore.  Fix it to always use the standard constants.
+
+Cc: linux-crypto@vger.kernel.org
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Jann Horn <jannh@google.com>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- kernel/time/timekeeping.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/char/random.c     |    4 ++--
+ include/crypto/chacha20.h |    8 ++++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index 8e4b3c32fcf9..ad55da792f13 100644
---- a/kernel/time/timekeeping.c
-+++ b/kernel/time/timekeeping.c
-@@ -1346,6 +1346,9 @@ int do_settimeofday64(const struct timespec64 *ts)
- 	if (!ret)
- 		audit_tk_injoffset(ts_delta);
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -817,7 +817,7 @@ static bool __init crng_init_try_arch_ea
  
-+	ktime_get_real_ts64(&xt);
-+	add_device_randomness(&xt, sizeof(xt));
+ static void crng_initialize_secondary(struct crng_state *crng)
+ {
+-	memcpy(&crng->state[0], "expand 32-byte k", 16);
++	chacha_init_consts(crng->state);
+ 	_get_random_bytes(&crng->state[4], sizeof(__u32) * 12);
+ 	crng_init_try_arch(crng);
+ 	crng->init_time = jiffies - CRNG_RESEED_INTERVAL - 1;
+@@ -825,7 +825,7 @@ static void crng_initialize_secondary(st
+ 
+ static void __init crng_initialize_primary(struct crng_state *crng)
+ {
+-	memcpy(&crng->state[0], "expand 32-byte k", 16);
++	chacha_init_consts(crng->state);
+ 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
+ 	if (crng_init_try_arch_early(crng) && trust_cpu && crng_init < 2) {
+ 		invalidate_batched_entropy();
+--- a/include/crypto/chacha20.h
++++ b/include/crypto/chacha20.h
+@@ -24,4 +24,12 @@ int crypto_chacha20_setkey(struct crypto
+ int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 			  struct scatterlist *src, unsigned int nbytes);
+ 
++static inline void chacha_init_consts(u32 *state)
++{
++	state[0]  = 0x61707865; /* "expa" */
++	state[1]  = 0x3320646e; /* "nd 3" */
++	state[2]  = 0x79622d32; /* "2-by" */
++	state[3]  = 0x6b206574; /* "te k" */
++}
 +
- 	return ret;
- }
- EXPORT_SYMBOL(do_settimeofday64);
-@@ -2475,6 +2478,9 @@ int do_adjtimex(struct __kernel_timex *txc)
- 
- 	ntp_notify_cmos_timer();
- 
-+	ktime_get_real_ts64(&ts);
-+	add_device_randomness(&ts, sizeof(ts));
-+
- 	return ret;
- }
- 
--- 
-2.35.1
+ #endif
+
 
