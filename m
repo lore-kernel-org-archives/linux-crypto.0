@@ -2,61 +2,61 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A9CC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 06:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8522DC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 06:15:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbiFWGPX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 02:15:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49798 "EHLO
+        id S229814AbiFWGPg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 02:15:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiFWGPX (ORCPT
+        with ESMTP id S229823AbiFWGPb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 02:15:23 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5363A718
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 23:15:21 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id l4so18173839pgh.13
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 23:15:21 -0700 (PDT)
+        Thu, 23 Jun 2022 02:15:31 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7294C3206B
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 23:15:28 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id t21so11883983pfq.1
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jun 2022 23:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rr6W1HmkOzqLYvFXcgRYRczNT4ybnvSLXNzzsMN6g3Q=;
-        b=TumBSXa1A7/fh9+YVChoVb5zwgYdtT1Ure/4zv0RKBmw9qzxU7YkfM33UNSLdJoBkl
-         a3A+zTdHJzTCeM2m0hNmwk5erykvVxCbmGX57AnAU+G5e7MXy8JzzGE4SzwuaII3iZIr
-         +G2p2xOeYrnkv6NzGSohlRaaVIq7lRscrLUDxR3lRZy7bq35PmMghko1bQRN74cdVe98
-         wrH5ZE0o0k61aigR+MnJNJr9nGOmzfbvvzAmBVB14zTrGgsaGGMBS7/pX6CdL/2voTVQ
-         dSbTfG2ss+QJ2eXoIfHjD6OP6dprU0BtpnCQYwXG/xSMyAgGmiGDGyG0w4x5PLKVsnvs
-         4Hyw==
+        bh=tKM3xvFOU9BbHzW/2uuQbOBzRGB1RdsYKFUv60RJdxg=;
+        b=zkfVRqeerd8u8NEwmgYPq9hmMYJ7IGtcSvmIgVgVfznPL6Dw3ggguq6/sRYKXu3/VO
+         SLGrTrMQhjkyI53ylxtUIkwMVCDgh+BBnsUqeWIO8NvMjzYS/TVVeZPJl7BTNlAeFvJA
+         lq28dsXrOrAx9WSOmOGJlKf4145Dsoxd18SR9SsiIenWpQu/FwlAx8PCJl+U/gfT1CkX
+         8ILTiCKhZMTBHNuEaqTPQlUU9OHAG/QiSYdQYD6wOwfpDd15Wl1x33cO+kdjgENV+WJo
+         W2jCYA0ZxaMfLF8Z7sdtQxJDlqKtSgmnUgyEdDch+805R564jAqkSlbz/fhVGYIe3Qul
+         x8EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rr6W1HmkOzqLYvFXcgRYRczNT4ybnvSLXNzzsMN6g3Q=;
-        b=3GQlFeNOSJz+nQG8gt+cVUKCOFcI96rNTNXt/cBBvQXQDGp7S4fZHAc8VT93MGP+Fo
-         KweB5mOg8ZPCR1pnHvae4OJRh0HQWDRO2MCOgOzfwlSQTe0WHyEYnrAfmymWlB9M6Biv
-         6E3nnmh7v3umSnZhfPSHUgj4Eu3/9v7tm1qdlLDUeOIqXRAHnsJ5bF9Zq9jETtvD+L2t
-         kIpI9RulquwmmW8Ja1A2Tt4dT2Cav6wUYI2l4g227/4woJRL3PTcc2uFu10IWxuTg6+R
-         9gt03lUJZymu/fW+hvLsWZhEp6pI52QmiBuZD0ZJSOO1hFBj9VB6U8ZnPOs/tyArzzkG
-         1M3w==
-X-Gm-Message-State: AJIora/Ed+qzMF7zd/zfElXMSDs0TdBb5uNA68W2Wf0Vrg30ckSqDTGY
-        UR6DvSoGYXaOWXWdqkfzCCS6WQ==
-X-Google-Smtp-Source: AGRyM1t6atpZKWGMHi35zlVe8kAyorMGoZjfYw5oQD1l53FU3qCnDkNxU1k3LtZvtiPn+v4yNFz63Q==
-X-Received: by 2002:aa7:838c:0:b0:525:3816:2340 with SMTP id u12-20020aa7838c000000b0052538162340mr11811178pfm.35.1655964921134;
-        Wed, 22 Jun 2022 23:15:21 -0700 (PDT)
+        bh=tKM3xvFOU9BbHzW/2uuQbOBzRGB1RdsYKFUv60RJdxg=;
+        b=JKT6JKzcJV6OAR1i1lbynIJB3VR4PeQLC8ytMyFqgHwY7GB47iuQVIs54eLMi5H3cC
+         nw7omoYLwOReYNlJrfuoCB4zyxi4mRPFQBrVC00L9xE1tza1ORNdCWTWoRtHbx/S3scL
+         ifQI3kp432N2OxvPYRjBOo/G+Ftbw3mR0GyuWIbRIwualXHUNAxz94qWW84xl4FuZQbI
+         nF5NuAX1rnW2Q66SOOmKTDxuXs+GGTRhK5B5E2xcOh7uB82giEFM8srfPTCHkHS8p9bI
+         JasNwOZ+bhR6Ra6nJw+bStIUmAPWqs9N5BbixugExXx+jglJ0h2q1X3wHoB/QGXopy0u
+         d6yQ==
+X-Gm-Message-State: AJIora+I2yOlMuwgXMhZJHRuxPkKiqgUcy6UIIN9TLhYPng428Cj/nLv
+        V28thMIJXzidmNkpXbGC10kLedwb7b6NFg==
+X-Google-Smtp-Source: AGRyM1uRBf9yGlBHsxFSSoM2oyrF8FT/8ncsKSMtOLqQiehNwhyGl1j5HLzeQVVMwzFf9fMlQgy7Rw==
+X-Received: by 2002:aa7:83d4:0:b0:51c:3949:9c93 with SMTP id j20-20020aa783d4000000b0051c39499c93mr38554541pfn.10.1655964927845;
+        Wed, 22 Jun 2022 23:15:27 -0700 (PDT)
 Received: from FVFDK26JP3YV.bytedance.net ([139.177.225.234])
-        by smtp.gmail.com with ESMTPSA id y22-20020a17090264d600b0015e8d4eb1b6sm350992pli.0.2022.06.22.23.15.17
+        by smtp.gmail.com with ESMTPSA id y22-20020a17090264d600b0015e8d4eb1b6sm350992pli.0.2022.06.22.23.15.24
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 22 Jun 2022 23:15:20 -0700 (PDT)
+        Wed, 22 Jun 2022 23:15:27 -0700 (PDT)
 From:   Lei He <helei.sig11@bytedance.com>
 To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         dhowells@redhat.com
 Cc:     mst@redhat.com, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, berrange@redhat.com,
         pizhenwei@bytedance.com, lei he <helei.sig11@bytedance.com>
-Subject: [PATCH v2 2/4] crypto: pkcs8 parser support ECDSA private keys
-Date:   Thu, 23 Jun 2022 14:14:58 +0800
-Message-Id: <20220623061500.78331-2-helei.sig11@bytedance.com>
+Subject: [PATCH v2 3/4] crypto: remove unused field in pkcs8_parse_context
+Date:   Thu, 23 Jun 2022 14:14:59 +0800
+Message-Id: <20220623061500.78331-3-helei.sig11@bytedance.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20220623061500.78331-1-helei.sig11@bytedance.com>
 References: <20220623061500.78331-1-helei.sig11@bytedance.com>
@@ -68,126 +68,25 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: lei he <helei.sig11@bytedance.com>
 
-Make pkcs8_private_key_parser can identify ECDSA private keys.
+remove unused field 'algo_oid' in pkcs8_parse_context
 
 Signed-off-by: lei he <helei.sig11@bytedance.com>
 ---
- crypto/akcipher.c                     | 10 ++++++
- crypto/asymmetric_keys/pkcs8.asn1     |  2 +-
- crypto/asymmetric_keys/pkcs8_parser.c | 45 +++++++++++++++++++++++++--
- 3 files changed, 53 insertions(+), 4 deletions(-)
+ crypto/asymmetric_keys/pkcs8_parser.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index f866085c8a4a..3adcdc6d48c2 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -120,6 +120,12 @@ static int akcipher_default_op(struct akcipher_request *req)
- 	return -ENOSYS;
- }
- 
-+static int akcipher_default_set_key(struct crypto_akcipher *tfm,
-+				    const void *key, unsigned int keylen)
-+{
-+	return -ENOSYS;
-+}
-+
- int crypto_register_akcipher(struct akcipher_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
-@@ -132,6 +138,10 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
- 		alg->encrypt = akcipher_default_op;
- 	if (!alg->decrypt)
- 		alg->decrypt = akcipher_default_op;
-+	if (!alg->set_pub_key)
-+		alg->set_pub_key = akcipher_default_set_key;
-+	if (!alg->set_priv_key)
-+		alg->set_priv_key = akcipher_default_set_key;
- 
- 	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
-diff --git a/crypto/asymmetric_keys/pkcs8.asn1 b/crypto/asymmetric_keys/pkcs8.asn1
-index 702c41a3c713..1791ddf4168a 100644
---- a/crypto/asymmetric_keys/pkcs8.asn1
-+++ b/crypto/asymmetric_keys/pkcs8.asn1
-@@ -20,5 +20,5 @@ Attribute ::= ANY
- 
- AlgorithmIdentifier ::= SEQUENCE {
- 	algorithm   OBJECT IDENTIFIER ({ pkcs8_note_OID }),
--	parameters  ANY OPTIONAL
-+	parameters  ANY OPTIONAL ({ pkcs8_note_algo_parameter })
- }
 diff --git a/crypto/asymmetric_keys/pkcs8_parser.c b/crypto/asymmetric_keys/pkcs8_parser.c
-index 105dcce27f71..e507c635ead5 100644
+index e507c635ead5..f81317234331 100644
 --- a/crypto/asymmetric_keys/pkcs8_parser.c
 +++ b/crypto/asymmetric_keys/pkcs8_parser.c
-@@ -24,6 +24,8 @@ struct pkcs8_parse_context {
- 	enum OID	algo_oid;		/* Algorithm OID */
+@@ -21,7 +21,6 @@ struct pkcs8_parse_context {
+ 	struct public_key *pub;
+ 	unsigned long	data;			/* Start of data */
+ 	enum OID	last_oid;		/* Last OID encountered */
+-	enum OID	algo_oid;		/* Algorithm OID */
  	u32		key_size;
  	const void	*key;
-+	const void	*algo_param;
-+	u32		algo_param_len;
- };
- 
- /*
-@@ -47,6 +49,17 @@ int pkcs8_note_OID(void *context, size_t hdrlen,
- 	return 0;
- }
- 
-+int pkcs8_note_algo_parameter(void *context, size_t hdrlen,
-+			      unsigned char tag,
-+			      const void *value, size_t vlen)
-+{
-+	struct pkcs8_parse_context *ctx = context;
-+
-+	ctx->algo_param = value;
-+	ctx->algo_param_len = vlen;
-+	return 0;
-+}
-+
- /*
-  * Note the version number of the ASN.1 blob.
-  */
-@@ -69,11 +82,37 @@ int pkcs8_note_algo(void *context, size_t hdrlen,
- 		    const void *value, size_t vlen)
- {
- 	struct pkcs8_parse_context *ctx = context;
--
--	if (ctx->last_oid != OID_rsaEncryption)
-+	enum OID curve_id;
-+
-+	switch (ctx->last_oid) {
-+	case OID_id_ecPublicKey:
-+		if (!ctx->algo_param || ctx->algo_param_len == 0)
-+			return -EBADMSG;
-+		curve_id = look_up_OID(ctx->algo_param, ctx->algo_param_len);
-+
-+		switch (curve_id) {
-+		case OID_id_prime192v1:
-+			ctx->pub->pkey_algo = "ecdsa-nist-p192";
-+			break;
-+		case OID_id_prime256v1:
-+			ctx->pub->pkey_algo = "ecdsa-nist-p256";
-+			break;
-+		case OID_id_ansip384r1:
-+			ctx->pub->pkey_algo = "ecdsa-nist-p384";
-+			break;
-+		default:
-+			return -ENOPKG;
-+		}
-+		break;
-+
-+	case OID_rsaEncryption:
-+		ctx->pub->pkey_algo = "rsa";
-+		break;
-+
-+	default:
- 		return -ENOPKG;
-+	}
- 
--	ctx->pub->pkey_algo = "rsa";
- 	return 0;
- }
- 
+ 	const void	*algo_param;
 -- 
 2.20.1
 
