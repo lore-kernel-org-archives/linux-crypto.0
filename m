@@ -2,72 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520CDC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 12:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72388CCA481
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 16:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbiFWMQj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 08:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34484 "EHLO
+        id S231281AbiFWQwY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 12:52:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbiFWMQj (ORCPT
+        with ESMTP id S233908AbiFWQvv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:16:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85853151E;
-        Thu, 23 Jun 2022 05:16:37 -0700 (PDT)
+        Thu, 23 Jun 2022 12:51:51 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8E622528;
+        Thu, 23 Jun 2022 09:51:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5594361B54;
-        Thu, 23 Jun 2022 12:16:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016DBC341C6;
-        Thu, 23 Jun 2022 12:16:35 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fNTwnA8w"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1655986594;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ldgjSlcLJR6cjeouZsLQlrtYf5ACY3Wsfvn1/IBZujE=;
-        b=fNTwnA8wDG/wg9DlpnOHl13P9917UsEIoqsT+iu6UKmx+4kOwLaDhMxiwSTYvmahJbQnZf
-        Fr3d//8sfs9SD3qv9NYC6i1OEgJPh/2JvsG9A6o2xieDpB3/2g0FOLaGBRI6+oD7ON1O+u
-        eHK4z7j1ccL6eboVigbvq58/WxwDkQ8=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 89d1b8ea (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 23 Jun 2022 12:16:34 +0000 (UTC)
-Date:   Thu, 23 Jun 2022 14:16:32 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Gregory Erwin <gregerwin256@gmail.com>
-Cc:     Miaoqing Pan <miaoqing@codeaurora.org>,
-        Rui Salvaterra <rsalvaterra@gmail.com>,
-        ath9k-devel <ath9k-devel@qca.qualcomm.com>,
-        linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: ath9k: hwrng blocks for several minutes when phy is un-associated
-Message-ID: <YrRZoGBMBa3lFkwx@zx2c4.com>
-References: <CAO+Okf6ZJC5-nTE_EJUGQtd8JiCkiEHytGgDsFGTEjs0c00giw@mail.gmail.com>
- <YrRZLPQHK0QbLTjr@zx2c4.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D7CCC61F99;
+        Thu, 23 Jun 2022 16:51:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911BCC3411B;
+        Thu, 23 Jun 2022 16:51:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656003104;
+        bh=YeNRPLQirCRMpKZCkSJM58Mq2rDxBOANPUcuKe7qKZ8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=UwaI/4wtUMb0iaPV1r7DsDpGm4KH1n26Wx3xxW07lAYPHbWMeoxxYT6hI4VAYnd4q
+         YPGjXOezcue0OKDGSkbKSEY5+/oNgKVQwlEm+Qnmg6wJFq3RkZuP5n9CrD5Tr+5hM+
+         4GZbAiVMsc+RTgdo9XiM/r0J/BfQaUMRwaokbVX8=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        Dominik Brodowski <linux@dominikbrodowski.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH 4.9 090/264] random: early initialization of ChaCha constants
+Date:   Thu, 23 Jun 2022 18:41:23 +0200
+Message-Id: <20220623164346.617837400@linuxfoundation.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220623164344.053938039@linuxfoundation.org>
+References: <20220623164344.053938039@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YrRZLPQHK0QbLTjr@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Or perhaps more simply:
+From: Dominik Brodowski <linux@dominikbrodowski.net>
 
-diff --git a/drivers/net/wireless/ath/ath9k/rng.c b/drivers/net/wireless/ath/ath9k/rng.c
-index cb5414265a9b..5b44cd918c2b 100644
---- a/drivers/net/wireless/ath/ath9k/rng.c
-+++ b/drivers/net/wireless/ath/ath9k/rng.c
-@@ -83,7 +83,8 @@ static int ath9k_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 		if (!wait || !max || likely(bytes_read) || fail_stats > 110)
- 			break;
+commit 96562f286884e2db89c74215b199a1084b5fb7f7 upstream.
 
--		msleep_interruptible(ath9k_rng_delay_get(++fail_stats));
-+		if (msleep_interruptible(ath9k_rng_delay_get(++fail_stats)))
-+			break;
- 	}
+Previously, the ChaCha constants for the primary pool were only
+initialized in crng_initialize_primary(), called by rand_initialize().
+However, some randomness is actually extracted from the primary pool
+beforehand, e.g. by kmem_cache_create(). Therefore, statically
+initialize the ChaCha constants for the primary pool.
 
- 	if (wait && !bytes_read && max)
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: <linux-crypto@vger.kernel.org>
+Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/char/random.c     |    5 ++++-
+ include/crypto/chacha20.h |   15 +++++++++++----
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -459,6 +459,10 @@ struct crng_state {
+ 
+ static struct crng_state primary_crng = {
+ 	.lock = __SPIN_LOCK_UNLOCKED(primary_crng.lock),
++	.state[0] = CHACHA_CONSTANT_EXPA,
++	.state[1] = CHACHA_CONSTANT_ND_3,
++	.state[2] = CHACHA_CONSTANT_2_BY,
++	.state[3] = CHACHA_CONSTANT_TE_K,
+ };
+ 
+ /*
+@@ -825,7 +829,6 @@ static void crng_initialize_secondary(st
+ 
+ static void __init crng_initialize_primary(struct crng_state *crng)
+ {
+-	chacha_init_consts(crng->state);
+ 	_extract_entropy(&input_pool, &crng->state[4], sizeof(__u32) * 12, 0);
+ 	if (crng_init_try_arch_early(crng) && trust_cpu && crng_init < 2) {
+ 		invalidate_batched_entropy();
+--- a/include/crypto/chacha20.h
++++ b/include/crypto/chacha20.h
+@@ -24,12 +24,19 @@ int crypto_chacha20_setkey(struct crypto
+ int crypto_chacha20_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+ 			  struct scatterlist *src, unsigned int nbytes);
+ 
++enum chacha_constants { /* expand 32-byte k */
++	CHACHA_CONSTANT_EXPA = 0x61707865U,
++	CHACHA_CONSTANT_ND_3 = 0x3320646eU,
++	CHACHA_CONSTANT_2_BY = 0x79622d32U,
++	CHACHA_CONSTANT_TE_K = 0x6b206574U
++};
++
+ static inline void chacha_init_consts(u32 *state)
+ {
+-	state[0]  = 0x61707865; /* "expa" */
+-	state[1]  = 0x3320646e; /* "nd 3" */
+-	state[2]  = 0x79622d32; /* "2-by" */
+-	state[3]  = 0x6b206574; /* "te k" */
++	state[0]  = CHACHA_CONSTANT_EXPA;
++	state[1]  = CHACHA_CONSTANT_ND_3;
++	state[2]  = CHACHA_CONSTANT_2_BY;
++	state[3]  = CHACHA_CONSTANT_TE_K;
+ }
+ 
+ #endif
+
 
