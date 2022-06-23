@@ -2,33 +2,33 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C93CC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 17:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3CD4CCA483
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 17:54:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230302AbiFWR3T (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 13:29:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
+        id S235325AbiFWRyC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 13:54:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234055AbiFWR1l (ORCPT
+        with ESMTP id S235882AbiFWRxe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 13:27:41 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F8E5130E;
-        Thu, 23 Jun 2022 10:03:33 -0700 (PDT)
+        Thu, 23 Jun 2022 13:53:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDA29E731;
+        Thu, 23 Jun 2022 10:14:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5162A6159A;
-        Thu, 23 Jun 2022 17:03:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3264DC341C5;
-        Thu, 23 Jun 2022 17:03:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C9B85B824B4;
+        Thu, 23 Jun 2022 17:14:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4137EC341C4;
+        Thu, 23 Jun 2022 17:14:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1656003812;
-        bh=g28tu/FpKVH2bmjbRgFJ/suAsa4df/5QYyrz1kBqzQg=;
+        s=korg; t=1656004454;
+        bh=2I0JesBtWGyBL4Xzu91OWxOFy/Jw1QCIw4O8yLHYHe8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uVTDmH4KO5pNTSxmI/RVd/TOqylLdBYIqug9Z3ssL9vCLtI5K0FllrodPDXsu8dHg
-         Z0kHlRwwQ4/ALsRlFPSPaO0ekC2V8qgb6gBSzqHviqzpFfyZwWygdw64bX4nY2Vg9l
-         pT1UYAvR7KZO1YXEPOFX872ev27qMdDjkPSfXZI0=
+        b=MD2ARMkNtek4bKCyWG3zmyhPoLKQ6z1iILEp/y7WavqT2mSuSBWzYRdTlnoDbthGp
+         54AumeULxJkqCxuWKG6dN5NuPiuolwDA5JUFQDGHrR8tFXSGf959yxnJQnisokCWDC
+         QcnRo3a6RYXdxLvCQJNfHWDqBErlscR/VOQe7Oog=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -39,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH 4.14 055/237] random: remove dead code left over from blocking pool
-Date:   Thu, 23 Jun 2022 18:41:29 +0200
-Message-Id: <20220623164344.737087930@linuxfoundation.org>
+Subject: [PATCH 4.19 044/234] random: remove dead code left over from blocking pool
+Date:   Thu, 23 Jun 2022 18:41:51 +0200
+Message-Id: <20220623164344.314005335@linuxfoundation.org>
 X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220623164343.132308638@linuxfoundation.org>
-References: <20220623164343.132308638@linuxfoundation.org>
+In-Reply-To: <20220623164343.042598055@linuxfoundation.org>
+References: <20220623164343.042598055@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -119,7 +119,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	}
  }
  
-@@ -1390,8 +1380,7 @@ retry:
+@@ -1391,8 +1381,7 @@ retry:
  }
  
  /*
