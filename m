@@ -2,99 +2,100 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78423CCA480
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 19:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCA8CCA47C
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 19:33:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbiFWTdI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S229709AbiFWTdI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 23 Jun 2022 15:33:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52566 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231627AbiFWTcU (ORCPT
+        with ESMTP id S232118AbiFWTcp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:32:20 -0400
-Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A391F3EF20;
-        Thu, 23 Jun 2022 12:08:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1656011318; x=1687547318;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=J+82fiAkS6UDD5/pp26a92/IR26KYgUmTE+aTlC+9Go=;
-  b=Iup2ACskJcE+IaasI8xLwa4Gxo4k23sb9E0QxGpw1ngbL3LeQpcym9lj
-   pr66obmeZp4w0lJpw04M1AfK9eCuca6t2k7aUoMOr88H3IcpPDLwdrNbB
-   iN//RTxfnJLkgNOvMZfoq/1nPxRwEHMD+kO0jJxkZX5ZLZdFaCxKs7rMA
-   c=;
-Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
-  by alexa-out.qualcomm.com with ESMTP; 23 Jun 2022 12:08:36 -0700
-X-QCInternal: smtphost
-Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
-  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2022 12:08:36 -0700
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Thu, 23 Jun 2022 12:08:35 -0700
-Received: from qian (10.80.80.8) by nalasex01a.na.qualcomm.com (10.47.209.196)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Thu, 23 Jun
- 2022 12:08:34 -0700
-Date:   Thu, 23 Jun 2022 15:08:32 -0400
-From:   Qian Cai <quic_qiancai@quicinc.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] arm64/crypto: Select AEAD2 for GHASH_ARM64_CE
-Message-ID: <YrS6MIhv/ze4rbxy@qian>
-References: <20220622142557.144536-1-quic_qiancai@quicinc.com>
- <YrSgH//ysOd/Qumo@sol.localdomain>
+        Thu, 23 Jun 2022 15:32:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10BA9993F7;
+        Thu, 23 Jun 2022 12:10:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C088FB824EF;
+        Thu, 23 Jun 2022 19:10:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61EBEC341C6;
+        Thu, 23 Jun 2022 19:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656011417;
+        bh=hdPxiwoRttBIzWEIb6YpO8NBXxG6GrweSOsSURG0ZAU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XQc3kJxeKCboJwgvhir6MFPrFAP/UwTApTO+r4Iz5mu/lo6BcV5hixPq0C5mcrxkT
+         XrscgWjih7BqhafEmJlihi/V/zlMk2i+qy/Ix3J82OYbCsFHly4KotpiatoJwqoyTb
+         XjSGvu86PWX1j1Q/n9odsbQSCYsB0UIkGHl5T87lP10ksrUPzflDj64AoNs7UZE/Wh
+         rJdRuszu4AQ5uzljXyxE01I9pwJ9+lv5pdtJGwXRRN89U4L64+IlrTzOCEUceKpGwA
+         lU4Xz4U1YwmpUI1qZ7WlA8HhbUqXrSh/aog/H3/ZYs1c3GTm/0wUQ6szjJ7ICJ00yd
+         umy6uAAFmryvg==
+Date:   Thu, 23 Jun 2022 12:10:15 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH v3] timekeeping: contribute wall clock to rng on time
+ change
+Message-ID: <YrS6l38HDhqJIYS9@sol.localdomain>
+References: <CAHmME9rbOt14sHkPVgb7yysYSXk-eiwzkp9PzPnyO_9HyrmQ3Q@mail.gmail.com>
+ <20220623190014.1355583-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YrSgH//ysOd/Qumo@sol.localdomain>
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
+In-Reply-To: <20220623190014.1355583-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 10:17:19AM -0700, Eric Biggers wrote:
-> On Wed, Jun 22, 2022 at 10:25:57AM -0400, Qian Cai wrote:
-> > Otherwise, we could fail to compile.
-> > 
-> > ld: arch/arm64/crypto/ghash-ce-glue.o: in function 'ghash_ce_mod_exit':
-> > ghash-ce-glue.c:(.exit.text+0x24): undefined reference to 'crypto_unregister_aead'
-> > ld: arch/arm64/crypto/ghash-ce-glue.o: in function 'ghash_ce_mod_init':
-> > ghash-ce-glue.c:(.init.text+0x34): undefined reference to 'crypto_register_aead'
-> > 
-> > Fixes: 37b6aab68fae ("crypto: arm64/ghash - drop PMULL based shash")
+On Thu, Jun 23, 2022 at 09:00:14PM +0200, Jason A. Donenfeld wrote:
+> The rng's random_init() function contributes the real time to the rng at
+> boot time, so that events can at least start in relation to something
+> particular in the real world. But this clock might not yet be set that
+> point in boot, so nothing is contributed. In addition, the relation
+> between minor clock changes from, say, NTP, and the cycle counter is
+> potentially useful entropic data.
 > 
-> I don't see how the Fixes commit is related.  Hasn't this been a problem since
-> commit 537c1445ab0b, which added an AEAD algorithm to this module?
-
-Ah, you are probably right. crypto_unregister_aead and crypto_register_aead
-are already there in the previous commit.
-
+> This commit addresses this by mixing in a time stamp on calls to
+> settimeofday and adjtimex. No entropy is credited in doing so, so it
+> doesn't make initialization faster, but it is still useful input to
+> have.
 > 
-> > diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-> > index 4391a463abd7..6b2ecc193bc0 100644
-> > --- a/arch/arm64/crypto/Kconfig
-> > +++ b/arch/arm64/crypto/Kconfig
-> > @@ -71,6 +71,7 @@ config CRYPTO_GHASH_ARM64_CE
-> >  	select CRYPTO_HASH
-> >  	select CRYPTO_GF128MUL
-> >  	select CRYPTO_LIB_AES
-> > +	select CRYPTO_AEAD2
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  kernel/time/timekeeping.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-> I don't think CRYPTO_AEAD2 is meant to be selected directly.  It should be
-> CRYPTO_AEAD instead.
+> diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
+> index 8e4b3c32fcf9..49ee8ef16544 100644
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/pvclock_gtod.h>
+>  #include <linux/compiler.h>
+>  #include <linux/audit.h>
+> +#include <linux/random.h>
+>  
+>  #include "tick-internal.h"
+>  #include "ntp_internal.h"
+> @@ -1343,8 +1344,10 @@ int do_settimeofday64(const struct timespec64 *ts)
+>  	/* Signal hrtimers about time change */
+>  	clock_was_set(CLOCK_SET_WALL);
+>  
+> -	if (!ret)
+> +	if (!ret) {
+>  		audit_tk_injoffset(ts_delta);
+> +		add_device_randomness(&ts, sizeof(ts));
+> +	}
 
-I am not sure about that. I chose CRYPTO_AEAD2 because that is in the
-Makefile.
+It should be:
 
-obj-$(CONFIG_CRYPTO_AEAD2) += aead.o
+add_device_randomness(ts, sizeof(*ts));
+
+- Eric
