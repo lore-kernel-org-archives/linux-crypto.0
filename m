@@ -2,459 +2,84 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E1BC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 07:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 884B2C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 07:11:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbiFWHGh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 03:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56520 "EHLO
+        id S229908AbiFWHL6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 03:11:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbiFWHGS (ORCPT
+        with ESMTP id S229896AbiFWHL6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 03:06:18 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C8D4552A
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 00:06:17 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id n12so11317163pfq.0
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 00:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=sw1AsX4+YjrzQ9dHdhmu4386jZ8eu/IQm0FavLE5MGw=;
-        b=hyYl8JFfe/q9J9rmw0YuR8LwAohNVQbOKSPc003Wc4Du/qOZ3wJhwsY9uHAHzws42b
-         xALz9+ynoefQPKtUNZ90x9nS0cCzOiFDwAJdt3XukhwIQsHEeW5ONQgDcomWj2t3FOoS
-         +PmqUnJT5VLVVu4f9relTaRysf13I319ngZ5cErOsycgs8zuKuHZ5Iu6UEA547Cp7mZR
-         HaJGwuSWTIty0eO3vlws+yZ8oFDVOSXE7dTm/uj6zi0fc6t1Q/BiLvZZVLVyAf2xAuyD
-         ATO/Xfka2w0h9iaFBHtDr1Mmd47Zns86waY9IllSsz0GKpaEDNe6MiW6lDytTTmFJqkD
-         ICwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=sw1AsX4+YjrzQ9dHdhmu4386jZ8eu/IQm0FavLE5MGw=;
-        b=t0solAqEzFhWREPpzO52Jcom2KgBwmAtdujDK7GM/yVYRqYBoEYN+xM91UEPJyfpPX
-         4E1803G52nYNBiNhAgWWpYq410W6eudjGs+9uYbYcoQlQRCzB2Xiv6DlAUNye4+WZsl4
-         njg/kF0i+ffIoW4d/i5b7aBAN5O1vyUfAYcASpFZgIqaHdoX9Cya8ZGAHoK5wpQJ3WIi
-         Ac0WOI7GYkoz/hF6Jf6GKHRk0hxM/6aWigXQ9qJKR9waydz59xfiskyzMAHGRQfjXU2/
-         0QD06cX+wmPqFXfXJOMLlvi22m0efUcox4FkTKhUnNHFd/Gwt/t7izxVsIYkCQMwyiBH
-         13dA==
-X-Gm-Message-State: AJIora/EEFgpNLn5+Ehw8II6gjqejq3ZIievFOtFJuMkBCf3cf4G2zby
-        O+UMjb5QFH1rjJhW//7CSd/0MA==
-X-Google-Smtp-Source: AGRyM1vffzub1Fbz63D9i7IlI1H1IxyGcdcJsI67Z+Od3peIYCItJCc5tzWEAp+zPl7HGVqLcP2pyg==
-X-Received: by 2002:a63:1559:0:b0:3f5:fdf7:12e2 with SMTP id 25-20020a631559000000b003f5fdf712e2mr6357491pgv.13.1655967977270;
-        Thu, 23 Jun 2022 00:06:17 -0700 (PDT)
-Received: from FVFDK26JP3YV.bytedance.net ([139.177.225.250])
-        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b0016a15842cf5sm9125184plb.121.2022.06.23.00.06.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 23 Jun 2022 00:06:16 -0700 (PDT)
-From:   Lei He <helei.sig11@bytedance.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        dhowells@redhat.com
-Cc:     mst@redhat.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, berrange@redhat.com,
-        pizhenwei@bytedance.com, lei he <helei.sig11@bytedance.com>
-Subject: [PATCH v2 4/4] virtio-crypto: support ECDSA algorithm
-Date:   Thu, 23 Jun 2022 15:05:50 +0800
-Message-Id: <20220623070550.82053-5-helei.sig11@bytedance.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20220623070550.82053-1-helei.sig11@bytedance.com>
-References: <20220623070550.82053-1-helei.sig11@bytedance.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 23 Jun 2022 03:11:58 -0400
+Received: from smtpbg.qq.com (smtpbg136.qq.com [106.55.201.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853E045534;
+        Thu, 23 Jun 2022 00:11:52 -0700 (PDT)
+X-QQ-mid: bizesmtp86t1655968289tgkdrmqe
+Received: from ubuntu.localdomain ( [106.117.99.68])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Thu, 23 Jun 2022 15:11:25 +0800 (CST)
+X-QQ-SSF: 01000000008000B0C000B00A0000000
+X-QQ-FEAT: 2f7wtd3zdH9Lc0K05BMg4D3CHFmxR4b53tBINtYQkGR4k7ShF0BGsokL3XjNy
+        2RSNdIIPUdFWcNPUyZ5yGUjqLtW9EgRn3snSEj+JvpYxwpLr0/pXSoHdWHC/4WHr1fph0g3
+        6WyxpKQOTmSx3kgZOkmkLLLbaNda3kbIG30QrfIXxGebzeCVYKPeJq+THtZjt+2Y+dqvDcQ
+        tJ5HhGuj2ir71SFund6A5ZKFxwhzf7JJfXeM0ZhUy+JKOF/JZCO+tfAOIqexb3HgDk4AYOt
+        JpzBMdjfVrcv3lTb3wNQ5qw99Xg3dCNevzjIbnA4ehh7lN9bVdidoI/q/jCASUcAh4aykFT
+        HJ5ICw7yScrpaBYugjHJ2orEtHFTA==
+X-QQ-GoodBg: 0
+From:   Jiang Jian <jiangjian@cdjrlc.com>
+To:     horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiang Jian <jiangjian@cdjrlc.com>
+Subject: [PATCH] crypto: caam - drop unexpected word 'a' in comments
+Date:   Thu, 23 Jun 2022 15:11:23 +0800
+Message-Id: <20220623071123.12885-1-jiangjian@cdjrlc.com>
+X-Mailer: git-send-email 2.17.1
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybgspam:qybgspam7
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: lei he <helei.sig11@bytedance.com>
+Drop the unexpected word 'a' in the comments that need to be dropped
 
-Support ECDSA algorithm for driver virtio-crypto
+* This is a a cache of buffers, from which the users of CAAM QI driver
+-->
+* This is a cache of buffers, from which the users of CAAM QI driver
 
-Signed-off-by: lei he <helei.sig11@bytedance.com>
+Signed-off-by: Jiang Jian <jiangjian@cdjrlc.com>
 ---
- drivers/crypto/virtio/Kconfig                 |   1 +
- .../virtio/virtio_crypto_akcipher_algs.c      | 259 ++++++++++++++++--
- 2 files changed, 239 insertions(+), 21 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 2 +-
+ drivers/crypto/caam/qi.c          | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/virtio/Kconfig b/drivers/crypto/virtio/Kconfig
-index 5f8915f4a9ff..c4b66cf17d7c 100644
---- a/drivers/crypto/virtio/Kconfig
-+++ b/drivers/crypto/virtio/Kconfig
-@@ -6,6 +6,7 @@ config CRYPTO_DEV_VIRTIO
- 	select CRYPTO_AKCIPHER2
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_ENGINE
-+	select CRYPTO_ECDSA
- 	select CRYPTO_RSA
- 	select MPILIB
- 	help
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index 2a60d0525cde..da628a6de696 100644
---- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -10,7 +10,9 @@
- #include <linux/mpi.h>
- #include <linux/scatterlist.h>
- #include <crypto/algapi.h>
-+#include <crypto/ecdh.h>
- #include <crypto/internal/akcipher.h>
-+#include <crypto/internal/ecdsa.h>
- #include <crypto/internal/rsa.h>
- #include <linux/err.h>
- #include <crypto/scatterwalk.h>
-@@ -23,6 +25,10 @@ struct virtio_crypto_rsa_ctx {
- 	MPI n;
- };
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 6753f0e6e55d..4b81fb33f199 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -29,7 +29,7 @@
+ 				 SHA512_DIGEST_SIZE * 2)
  
-+struct virtio_crypto_ecdsa_ctx {
-+	const struct ecc_curve *curve;
-+};
-+
- struct virtio_crypto_akcipher_ctx {
- 	struct crypto_engine_ctx enginectx;
- 	struct virtio_crypto *vcrypto;
-@@ -31,6 +37,7 @@ struct virtio_crypto_akcipher_ctx {
- 	__u64 session_id;
- 	union {
- 		struct virtio_crypto_rsa_ctx rsa_ctx;
-+		struct virtio_crypto_ecdsa_ctx ecdsa_ctx;
- 	};
- };
+ /*
+- * This is a a cache of buffers, from which the users of CAAM QI driver
++ * This is a cache of buffers, from which the users of CAAM QI driver
+  * can allocate short buffers. It's speedier than doing kmalloc on the hotpath.
+  * NOTE: A more elegant solution would be to have some headroom in the frames
+  *       being processed. This can be added by the dpaa2-eth driver. This would
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 8163f5df8ebf..49439d0d1b3c 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -75,7 +75,7 @@ bool caam_congested __read_mostly;
+ EXPORT_SYMBOL(caam_congested);
  
-@@ -279,7 +286,7 @@ static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request
- 	return -ENOMEM;
- }
- 
--static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
-+static int virtio_crypto_akcipher_do_req(struct crypto_engine *engine, void *vreq, int algo)
- {
- 	struct akcipher_request *req = container_of(vreq, struct akcipher_request, base);
- 	struct virtio_crypto_akcipher_request *vc_akcipher_req = akcipher_request_ctx(req);
-@@ -300,7 +307,7 @@ static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
- 	/* build request header */
- 	header = &vc_req->req_data->header;
- 	header->opcode = cpu_to_le32(vc_akcipher_req->opcode);
--	header->algo = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_RSA);
-+	header->algo = cpu_to_le32(algo);
- 	header->session_id = cpu_to_le64(ctx->session_id);
- 
- 	/* build request akcipher data */
-@@ -318,7 +325,12 @@ static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
- 	return 0;
- }
- 
--static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
-+static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
-+{
-+	return virtio_crypto_akcipher_do_req(engine, vreq, VIRTIO_CRYPTO_AKCIPHER_RSA);
-+}
-+
-+static int virtio_crypto_akcipher_req(struct akcipher_request *req, uint32_t opcode)
- {
- 	struct crypto_akcipher *atfm = crypto_akcipher_reqtfm(req);
- 	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(atfm);
-@@ -337,24 +349,24 @@ static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
- 	return crypto_transfer_akcipher_request_to_engine(data_vq->engine, req);
- }
- 
--static int virtio_crypto_rsa_encrypt(struct akcipher_request *req)
-+static int virtio_crypto_akcipher_encrypt(struct akcipher_request *req)
- {
--	return virtio_crypto_rsa_req(req, VIRTIO_CRYPTO_AKCIPHER_ENCRYPT);
-+	return virtio_crypto_akcipher_req(req, VIRTIO_CRYPTO_AKCIPHER_ENCRYPT);
- }
- 
--static int virtio_crypto_rsa_decrypt(struct akcipher_request *req)
-+static int virtio_crypto_akcipher_decrypt(struct akcipher_request *req)
- {
--	return virtio_crypto_rsa_req(req, VIRTIO_CRYPTO_AKCIPHER_DECRYPT);
-+	return virtio_crypto_akcipher_req(req, VIRTIO_CRYPTO_AKCIPHER_DECRYPT);
- }
- 
--static int virtio_crypto_rsa_sign(struct akcipher_request *req)
-+static int virtio_crypto_akcipher_sign(struct akcipher_request *req)
- {
--	return virtio_crypto_rsa_req(req, VIRTIO_CRYPTO_AKCIPHER_SIGN);
-+	return virtio_crypto_akcipher_req(req, VIRTIO_CRYPTO_AKCIPHER_SIGN);
- }
- 
--static int virtio_crypto_rsa_verify(struct akcipher_request *req)
-+static int virtio_crypto_akcipher_verify(struct akcipher_request *req)
- {
--	return virtio_crypto_rsa_req(req, VIRTIO_CRYPTO_AKCIPHER_VERIFY);
-+	return virtio_crypto_akcipher_req(req, VIRTIO_CRYPTO_AKCIPHER_VERIFY);
- }
- 
- static int virtio_crypto_rsa_set_key(struct crypto_akcipher *tfm,
-@@ -484,18 +496,161 @@ static void virtio_crypto_rsa_exit_tfm(struct crypto_akcipher *tfm)
- 	struct virtio_crypto_rsa_ctx *rsa_ctx = &ctx->rsa_ctx;
- 
- 	virtio_crypto_alg_akcipher_close_session(ctx);
--	virtcrypto_dev_put(ctx->vcrypto);
-+	if (ctx->vcrypto)
-+		virtcrypto_dev_put(ctx->vcrypto);
- 	mpi_free(rsa_ctx->n);
- 	rsa_ctx->n = NULL;
- }
- 
-+static int virtio_crypto_ecdsa_do_req(struct crypto_engine *engine, void *vreq)
-+{
-+	return virtio_crypto_akcipher_do_req(engine, vreq, VIRTIO_CRYPTO_AKCIPHER_ECDSA);
-+}
-+
-+static int virtio_crypto_ecdsa_set_key(struct crypto_akcipher *tfm,
-+				       const void *key,
-+				       unsigned int keylen,
-+				       bool private,
-+				       int curve_id)
-+{
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct virtio_crypto *vcrypto;
-+	struct virtio_crypto_ctrl_header header;
-+	struct virtio_crypto_akcipher_session_para para;
-+	int node = virtio_crypto_get_current_node();
-+	uint32_t keytype;
-+
-+	if (private)
-+		keytype = VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PRIVATE;
-+	else
-+		keytype = VIRTIO_CRYPTO_AKCIPHER_KEY_TYPE_PUBLIC;
-+
-+	if (!ctx->vcrypto) {
-+		vcrypto = virtcrypto_get_dev_node(node, VIRTIO_CRYPTO_SERVICE_AKCIPHER,
-+						VIRTIO_CRYPTO_AKCIPHER_RSA);
-+		if (!vcrypto) {
-+			pr_err("virtio_crypto: Could not find a virtio device in the system or unsupported algo\n");
-+			return -ENODEV;
-+		}
-+
-+		ctx->vcrypto = vcrypto;
-+	} else {
-+		virtio_crypto_alg_akcipher_close_session(ctx);
-+	}
-+
-+	/* set ctrl header */
-+	header.opcode =	cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_CREATE_SESSION);
-+	header.algo = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_ECDSA);
-+	header.queue_id = 0;
-+
-+	/* set ECDSA para */
-+	para.algo = cpu_to_le32(VIRTIO_CRYPTO_AKCIPHER_ECDSA);
-+	para.keytype = cpu_to_le32(keytype);
-+	para.keylen = cpu_to_le32(keylen);
-+	para.u.ecdsa.curve_id = cpu_to_le32(curve_id);
-+
-+	return virtio_crypto_alg_akcipher_init_session(ctx, &header, &para, key, keylen);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p192_set_pub_key(struct crypto_akcipher *tfm,
-+						     const void *key,
-+						     unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 0, VIRTIO_CRYPTO_CURVE_NIST_P192);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p192_set_priv_key(struct crypto_akcipher *tfm,
-+						      const void *key,
-+						      unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 1, VIRTIO_CRYPTO_CURVE_NIST_P192);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p256_set_pub_key(struct crypto_akcipher *tfm,
-+						     const void *key,
-+						     unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 0, VIRTIO_CRYPTO_CURVE_NIST_P256);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p256_set_priv_key(struct crypto_akcipher *tfm,
-+						      const void *key,
-+						      unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 1, VIRTIO_CRYPTO_CURVE_NIST_P256);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p384_set_pub_key(struct crypto_akcipher *tfm,
-+						     const void *key,
-+						     unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 0, VIRTIO_CRYPTO_CURVE_NIST_P384);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p384_set_priv_key(struct crypto_akcipher *tfm,
-+						      const void *key,
-+						      unsigned int keylen)
-+{
-+	return virtio_crypto_ecdsa_set_key(tfm, key, keylen, 1, VIRTIO_CRYPTO_CURVE_NIST_P384);
-+}
-+
-+static unsigned int virtio_crypto_ecdsa_max_size(struct crypto_akcipher *tfm)
-+{
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct virtio_crypto_ecdsa_ctx *ecdsa_ctx = &ctx->ecdsa_ctx;
-+
-+	return ecdsa_max_signature_size(ecdsa_ctx->curve);
-+}
-+
-+static int virtio_crypto_ecdsa_init_tfm(struct crypto_akcipher *tfm, unsigned int curve_id)
-+{
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(tfm);
-+
-+	ctx->tfm = tfm;
-+	ctx->enginectx.op.do_one_request = virtio_crypto_ecdsa_do_req;
-+	ctx->enginectx.op.prepare_request = NULL;
-+	ctx->enginectx.op.unprepare_request = NULL;
-+	ctx->ecdsa_ctx.curve = ecc_get_curve(curve_id);
-+
-+	if (!ctx->ecdsa_ctx.curve)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p192_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	return virtio_crypto_ecdsa_init_tfm(tfm, ECC_CURVE_NIST_P192);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p256_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	return virtio_crypto_ecdsa_init_tfm(tfm, ECC_CURVE_NIST_P256);
-+}
-+
-+static int virtio_crypto_ecdsa_nist_p384_init_tfm(struct crypto_akcipher *tfm)
-+{
-+	return virtio_crypto_ecdsa_init_tfm(tfm, ECC_CURVE_NIST_P384);
-+}
-+
-+static void virtio_crypto_ecdsa_exit_tfm(struct crypto_akcipher *tfm)
-+{
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(tfm);
-+	struct virtio_crypto_ecdsa_ctx *ecdsa_ctx = &ctx->ecdsa_ctx;
-+
-+	virtio_crypto_alg_akcipher_close_session(ctx);
-+	ecdsa_ctx->curve = NULL;
-+	if (ctx->vcrypto)
-+		virtcrypto_dev_put(ctx->vcrypto);
-+}
-+
- static struct virtio_crypto_akcipher_algo virtio_crypto_akcipher_algs[] = {
- 	{
- 		.algonum = VIRTIO_CRYPTO_AKCIPHER_RSA,
- 		.service = VIRTIO_CRYPTO_SERVICE_AKCIPHER,
- 		.algo = {
--			.encrypt = virtio_crypto_rsa_encrypt,
--			.decrypt = virtio_crypto_rsa_decrypt,
-+			.encrypt = virtio_crypto_akcipher_encrypt,
-+			.decrypt = virtio_crypto_akcipher_decrypt,
- 			.set_pub_key = virtio_crypto_rsa_raw_set_pub_key,
- 			.set_priv_key = virtio_crypto_rsa_raw_set_priv_key,
- 			.max_size = virtio_crypto_rsa_max_size,
-@@ -515,10 +670,10 @@ static struct virtio_crypto_akcipher_algo virtio_crypto_akcipher_algs[] = {
- 		.algonum = VIRTIO_CRYPTO_AKCIPHER_RSA,
- 		.service = VIRTIO_CRYPTO_SERVICE_AKCIPHER,
- 		.algo = {
--			.encrypt = virtio_crypto_rsa_encrypt,
--			.decrypt = virtio_crypto_rsa_decrypt,
--			.sign = virtio_crypto_rsa_sign,
--			.verify = virtio_crypto_rsa_verify,
-+			.encrypt = virtio_crypto_akcipher_encrypt,
-+			.decrypt = virtio_crypto_akcipher_decrypt,
-+			.sign = virtio_crypto_akcipher_sign,
-+			.verify = virtio_crypto_akcipher_verify,
- 			.set_pub_key = virtio_crypto_p1pad_rsa_sha1_set_pub_key,
- 			.set_priv_key = virtio_crypto_p1pad_rsa_sha1_set_priv_key,
- 			.max_size = virtio_crypto_rsa_max_size,
-@@ -534,6 +689,70 @@ static struct virtio_crypto_akcipher_algo virtio_crypto_akcipher_algs[] = {
- 			},
- 		},
- 	},
-+	{
-+		.algonum = VIRTIO_CRYPTO_AKCIPHER_ECDSA,
-+		.service = VIRTIO_CRYPTO_SERVICE_AKCIPHER,
-+		.algo = {
-+			.sign = virtio_crypto_akcipher_sign,
-+			.verify = virtio_crypto_akcipher_verify,
-+			.set_pub_key = virtio_crypto_ecdsa_nist_p192_set_pub_key,
-+			.set_priv_key = virtio_crypto_ecdsa_nist_p192_set_priv_key,
-+			.max_size = virtio_crypto_ecdsa_max_size,
-+			.init = virtio_crypto_ecdsa_nist_p192_init_tfm,
-+			.exit = virtio_crypto_ecdsa_exit_tfm,
-+			.reqsize = sizeof(struct virtio_crypto_akcipher_request),
-+			.base = {
-+				.cra_name = "ecdsa-nist-p192",
-+				.cra_driver_name = "virtio-ecdsa-nist-p192",
-+				.cra_priority = 150,
-+				.cra_module = THIS_MODULE,
-+				.cra_ctxsize = sizeof(struct virtio_crypto_akcipher_ctx),
-+			},
-+		},
-+	},
-+	{
-+		.algonum = VIRTIO_CRYPTO_AKCIPHER_ECDSA,
-+		.service = VIRTIO_CRYPTO_SERVICE_AKCIPHER,
-+		.algo = {
-+			.sign = virtio_crypto_akcipher_sign,
-+			.verify = virtio_crypto_akcipher_verify,
-+			.set_pub_key = virtio_crypto_ecdsa_nist_p256_set_pub_key,
-+			.set_priv_key = virtio_crypto_ecdsa_nist_p256_set_priv_key,
-+			.max_size = virtio_crypto_ecdsa_max_size,
-+			.init = virtio_crypto_ecdsa_nist_p256_init_tfm,
-+			.exit = virtio_crypto_ecdsa_exit_tfm,
-+			.reqsize = sizeof(struct virtio_crypto_akcipher_request),
-+			.base = {
-+				.cra_name = "ecdsa-nist-p256",
-+				.cra_driver_name = "virtio-ecdsa-nist-p256",
-+				.cra_priority = 150,
-+				.cra_module = THIS_MODULE,
-+				.cra_ctxsize = sizeof(struct virtio_crypto_akcipher_ctx),
-+			},
-+		},
-+	},
-+	{
-+		.algonum = VIRTIO_CRYPTO_AKCIPHER_ECDSA,
-+		.service = VIRTIO_CRYPTO_SERVICE_AKCIPHER,
-+		.algo = {
-+			.sign = virtio_crypto_akcipher_sign,
-+			.verify = virtio_crypto_akcipher_verify,
-+			.set_pub_key = virtio_crypto_ecdsa_nist_p384_set_pub_key,
-+			.set_priv_key = virtio_crypto_ecdsa_nist_p384_set_priv_key,
-+			.max_size = virtio_crypto_ecdsa_max_size,
-+			.init = virtio_crypto_ecdsa_nist_p384_init_tfm,
-+			.exit = virtio_crypto_ecdsa_exit_tfm,
-+			.reqsize = sizeof(struct virtio_crypto_akcipher_request),
-+			.base = {
-+				.cra_name = "ecdsa-nist-p384",
-+				.cra_driver_name = "virtio-ecdsa-nist-p384",
-+				.cra_priority = 150,
-+				.cra_module = THIS_MODULE,
-+				.cra_ctxsize = sizeof(struct virtio_crypto_akcipher_ctx),
-+			},
-+		},
-+
-+	},
- };
- 
- int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto)
-@@ -552,8 +771,7 @@ int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto)
- 
- 		if (virtio_crypto_akcipher_algs[i].active_devs == 0) {
- 			ret = crypto_register_akcipher(&virtio_crypto_akcipher_algs[i].algo);
--			if (ret)
--				goto unlock;
-+			continue;
- 		}
- 
- 		virtio_crypto_akcipher_algs[i].active_devs++;
-@@ -561,7 +779,6 @@ int virtio_crypto_akcipher_algs_register(struct virtio_crypto *vcrypto)
- 			 virtio_crypto_akcipher_algs[i].algo.base.cra_name);
- 	}
- 
--unlock:
- 	mutex_unlock(&algs_lock);
- 	return ret;
- }
+ /*
+- * This is a a cache of buffers, from which the users of CAAM QI driver
++ * This is a cache of buffers, from which the users of CAAM QI driver
+  * can allocate short (CAAM_QI_MEMCACHE_SIZE) buffers. It's faster than
+  * doing malloc on the hotpath.
+  * NOTE: A more elegant solution would be to have some headroom in the frames
 -- 
-2.20.1
+2.17.1
 
