@@ -2,342 +2,108 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA604CCA47E
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 06:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63067C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 07:06:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbiFWGVb (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 02:21:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53180 "EHLO
+        id S230062AbiFWHGF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 03:06:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbiFWGV3 (ORCPT
+        with ESMTP id S230054AbiFWHGE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 02:21:29 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3D0331367;
-        Wed, 22 Jun 2022 23:21:21 -0700 (PDT)
-Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LT99T5NRdzDsC8;
-        Thu, 23 Jun 2022 14:20:45 +0800 (CST)
-Received: from dggpeml100012.china.huawei.com (7.185.36.121) by
- dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 23 Jun 2022 14:21:19 +0800
-Received: from huawei.com (10.67.165.24) by dggpeml100012.china.huawei.com
- (7.185.36.121) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 23 Jun
- 2022 14:21:19 +0800
-From:   Kai Ye <yekai13@huawei.com>
-To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-accelerators@lists.ozlabs.org>,
-        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        <zhangfei.gao@linaro.org>, <wangzhou1@hisilicon.com>,
-        <yekai13@huawei.com>
-Subject: [PATCH v4 3/3] crypto: hisilicon/qm - defining the device isolation strategy
-Date:   Thu, 23 Jun 2022 14:14:52 +0800
-Message-ID: <20220623061452.40732-4-yekai13@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20220623061452.40732-1-yekai13@huawei.com>
-References: <20220623061452.40732-1-yekai13@huawei.com>
+        Thu, 23 Jun 2022 03:06:04 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF1054552D
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 00:06:02 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id n12so11317163pfq.0
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 00:06:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e8tI85riZMOHfa3k8p/ytOZ+RJHDFY9LmShQDBd6b6I=;
+        b=Zigg+v8tn4xENI/p7pUD0A6cgE7IrpDxgNcmmB5fQLmLdR4T6qwybGkaaFx4jK7nJD
+         oCCz+CTXYTMTf1P2/a7wmjCZub9xNxZjDA4OziI7XuCCCqTdx+99nZm0KqVpuEDfVn8Q
+         oHMhd7qwoBiimFHtBpqioAV2EVIvTCEVVlwMrX8Zfw8I15t0BOZxA17UVIWzb0TD6MF7
+         9vVLkDo69BAnBFaeqXDoNICfn/2hN5ux2WHIWwefrUihW3kbG37MIkzg7slwirbm+JPD
+         ntxf77ydpogaKGoif+70x8f51ECrQb2ooW8iIRJh0KQFxzm27/qnZ+LL/n4s8KBg6Q+K
+         aI7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e8tI85riZMOHfa3k8p/ytOZ+RJHDFY9LmShQDBd6b6I=;
+        b=a/6UI1rHK8hwuYIOvjYSDDELRwSEEyri06XdtjPlYbU9QsXl3g9TUUw3ATvvwmFvTd
+         D/zRz96Fbb0J4kuVACcRm7mQwqD2aD5dEm0ykqrmf8wEFKBz+sakDe4qr+uLnwa2Yi1J
+         Vbn3xdUCIdlt6aYP1+t5wp+NAPsrG3w6VHt6TJQrFGJNcVZhzSdv/zotmI6PQW3l+A6Q
+         WoARz3E9rFfEMLgKLuYcuW2Hau0XjwBS+f3e63ilueRmwmDm+ZkFp1doaNXzAVWhE/vi
+         CcH5Tvt4ALfs7VRrfepVd8vfo72s8rLT/A8cz+9UF0vvDEKTc8Sgfh1dxgTqRi5/5Jsj
+         ZDdQ==
+X-Gm-Message-State: AJIora9syDRrWFe6xWOIgRxO9ntwDw+2sKWXm1CEuGBxbHNTeQYVQuVE
+        o3ngMfOb/FCK8SWCzkr1A84xQg==
+X-Google-Smtp-Source: AGRyM1vfDaqjshfAgxboI2egke3KONaPUoAHJUVzd/fMnQ7wfqRIW3ZyJtBquSw8mEz61bOUd6PItQ==
+X-Received: by 2002:a05:6a00:f8f:b0:525:537d:69b1 with SMTP id ct15-20020a056a000f8f00b00525537d69b1mr2879416pfb.52.1655967962205;
+        Thu, 23 Jun 2022 00:06:02 -0700 (PDT)
+Received: from FVFDK26JP3YV.bytedance.net ([139.177.225.250])
+        by smtp.gmail.com with ESMTPSA id ji1-20020a170903324100b0016a15842cf5sm9125184plb.121.2022.06.23.00.05.58
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 23 Jun 2022 00:06:01 -0700 (PDT)
+From:   Lei He <helei.sig11@bytedance.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        dhowells@redhat.com
+Cc:     mst@redhat.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, berrange@redhat.com,
+        pizhenwei@bytedance.com, lei he <helei.sig11@bytedance.com>
+Subject: [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
+Date:   Thu, 23 Jun 2022 15:05:46 +0800
+Message-Id: <20220623070550.82053-1-helei.sig11@bytedance.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.67.165.24]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100012.china.huawei.com (7.185.36.121)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Define the device isolation strategy by the device driver. The
-user configures a frequency value by uacce interface. If the
-slot reset frequency exceeds the value of setting for a certain
-period of time, the device will not be available in user space.
-This frequency is an abstract number of times that can be
-considered to occur in a time window. The time window can be set
-to one hour or one day. The VF device use the PF device isolation
-strategy. All the hardware errors are processed by PF driver.
+From: lei he <helei.sig11@bytedance.com>
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 177 +++++++++++++++++++++++++++++++---
- include/linux/hisi_acc_qm.h   |   9 ++
- 2 files changed, 174 insertions(+), 12 deletions(-)
+This patch supports the ECDSA algorithm for virtio-crypto.
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index ad83c194d664..f92cf20fc84e 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -417,6 +417,16 @@ struct hisi_qm_resource {
- 	struct list_head list;
- };
- 
-+/**
-+ * struct qm_hw_err - structure of describes the device err
-+ * @list: hardware error list
-+ * @timestamp: timestamp when the error occurred
-+ */
-+struct qm_hw_err {
-+	struct list_head list;
-+	unsigned long long timestamp;
-+};
-+
- struct hisi_qm_hw_ops {
- 	int (*get_vft)(struct hisi_qm *qm, u32 *base, u32 *number);
- 	void (*qm_db)(struct hisi_qm *qm, u16 qn,
-@@ -3410,6 +3420,125 @@ static long hisi_qm_uacce_ioctl(struct uacce_queue *q, unsigned int cmd,
- 	return 0;
- }
- 
-+/**
-+ * qm_hw_err_isolate() - Try to isolate the uacce device with its VFs
-+ * according to user's configuration of isolation strategy. Warning: this
-+ * API should be called while there the users on this device are suspended
-+ * by slot resetting preparation of PCI AER.
-+ * @qm: the uacce device
-+ */
-+static int qm_hw_err_isolate(struct hisi_qm *qm)
-+{
-+	struct qm_hw_err *err, *tmp, *hw_err;
-+	struct qm_err_isolate *isolate;
-+	u32 count = 0;
-+
-+	isolate = &qm->isolate_data;
-+
-+#define SECONDS_PER_HOUR	3600
-+
-+	/* All the hw errs are processed by PF driver */
-+	if (qm->uacce->is_vf || atomic_read(&isolate->is_isolate) ||
-+	    !isolate->hw_err_isolate_hz)
-+		return 0;
-+
-+	hw_err = kzalloc(sizeof(*hw_err), GFP_ATOMIC);
-+	if (!hw_err)
-+		return -ENOMEM;
-+
-+	mutex_lock(&isolate->isolate_lock);
-+	hw_err->timestamp = jiffies;
-+	list_for_each_entry_safe(err, tmp, &qm->uacce_hw_errs, list) {
-+		if ((hw_err->timestamp - err->timestamp) / HZ >
-+		    SECONDS_PER_HOUR) {
-+			list_del(&err->list);
-+			kfree(err);
-+		} else {
-+			count++;
-+		}
-+	}
-+	list_add(&hw_err->list, &qm->uacce_hw_errs);
-+	mutex_unlock(&isolate->isolate_lock);
-+
-+	if (count >= isolate->hw_err_isolate_hz)
-+		atomic_set(&isolate->is_isolate, 1);
-+
-+	return 0;
-+}
-+
-+static void qm_hw_err_destroy(struct hisi_qm *qm)
-+{
-+	struct qm_hw_err *err, *tmp;
-+
-+	mutex_lock(&qm->isolate_data.isolate_lock);
-+	list_for_each_entry_safe(err, tmp, &qm->uacce_hw_errs, list) {
-+		list_del(&err->list);
-+		kfree(err);
-+	}
-+	mutex_unlock(&qm->isolate_data.isolate_lock);
-+}
-+
-+static enum uacce_dev_state hisi_qm_get_isolate_state(struct uacce_device *uacce)
-+{
-+	struct hisi_qm *qm = uacce->priv;
-+	struct hisi_qm *pf_qm;
-+
-+	if (uacce->is_vf)
-+		pf_qm = pci_get_drvdata(pci_physfn(qm->pdev));
-+	else
-+		pf_qm = qm;
-+
-+	return atomic_read(&pf_qm->isolate_data.is_isolate) ?
-+			UACCE_DEV_ISOLATE : UACCE_DEV_NORMAL;
-+}
-+
-+static int hisi_qm_isolate_strategy_write(struct uacce_device *uacce,
-+					  const char *buf, size_t len)
-+{
-+	struct hisi_qm *qm = uacce->priv;
-+	unsigned long val;
-+
-+#define MAX_ISOLATE_STRATEGY	65535
-+
-+	/* Must be set by PF */
-+	if (uacce->is_vf) {
-+		dev_info(&qm->pdev->dev, "the isolation strategy must be set by PF.\n");
-+		return -EINVAL;
-+	}
-+
-+	if (atomic_read(&qm->isolate_data.is_isolate))
-+		return -EINVAL;
-+
-+	if (kstrtoul(buf, 0, &val) < 0)
-+		return -EINVAL;
-+
-+	if (val > MAX_ISOLATE_STRATEGY)
-+		return -EINVAL;
-+
-+	qm->isolate_data.hw_err_isolate_hz = val;
-+
-+	/* After the policy is updated, need to reset the hardware err list */
-+	qm_hw_err_destroy(qm);
-+
-+	return 0;
-+}
-+
-+static int hisi_qm_isolate_strategy_read(struct uacce_device *uacce, char *buf)
-+{
-+	struct hisi_qm *qm = uacce->priv;
-+	struct hisi_qm *pf_qm;
-+	unsigned long val;
-+
-+	if (uacce->is_vf) {
-+		pf_qm = pci_get_drvdata(pci_physfn(qm->pdev));
-+		val = pf_qm->isolate_data.hw_err_isolate_hz;
-+	} else {
-+		val = qm->isolate_data.hw_err_isolate_hz;
-+	}
-+
-+	return sysfs_emit(buf, "%lu\n", val);
-+}
-+
- static const struct uacce_ops uacce_qm_ops = {
- 	.get_available_instances = hisi_qm_get_available_instances,
- 	.get_queue = hisi_qm_uacce_get_queue,
-@@ -3419,8 +3548,22 @@ static const struct uacce_ops uacce_qm_ops = {
- 	.mmap = hisi_qm_uacce_mmap,
- 	.ioctl = hisi_qm_uacce_ioctl,
- 	.is_q_updated = hisi_qm_is_q_updated,
-+	.get_isolate_state = hisi_qm_get_isolate_state,
-+	.isolate_strategy_write = hisi_qm_isolate_strategy_write,
-+	.isolate_strategy_read = hisi_qm_isolate_strategy_read,
- };
- 
-+static void qm_remove_uacce(struct hisi_qm *qm)
-+{
-+	struct uacce_device *uacce = qm->uacce;
-+
-+	if (qm->use_sva) {
-+		qm_hw_err_destroy(qm);
-+		uacce_remove(uacce);
-+		qm->uacce = NULL;
-+	}
-+}
-+
- static int qm_alloc_uacce(struct hisi_qm *qm)
- {
- 	struct pci_dev *pdev = qm->pdev;
-@@ -3433,6 +3576,8 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
- 	};
- 	int ret;
- 
-+	INIT_LIST_HEAD(&qm->uacce_hw_errs);
-+	mutex_init(&qm->isolate_data.isolate_lock);
- 	ret = strscpy(interface.name, dev_driver_string(&pdev->dev),
- 		      sizeof(interface.name));
- 	if (ret < 0)
-@@ -3446,8 +3591,7 @@ static int qm_alloc_uacce(struct hisi_qm *qm)
- 		qm->use_sva = true;
- 	} else {
- 		/* only consider sva case */
--		uacce_remove(uacce);
--		qm->uacce = NULL;
-+		qm_remove_uacce(qm);
- 		return -EINVAL;
- 	}
- 
-@@ -5109,6 +5253,12 @@ static int qm_controller_reset_prepare(struct hisi_qm *qm)
- 		return ret;
- 	}
- 
-+	if (qm->use_sva) {
-+		ret = qm_hw_err_isolate(qm);
-+		if (ret)
-+			pci_err(pdev, "failed to isolate hw err!\n");
-+	}
-+
- 	ret = qm_wait_vf_prepare_finish(qm);
- 	if (ret)
- 		pci_err(pdev, "failed to stop by vfs in soft reset!\n");
-@@ -5436,19 +5586,25 @@ static int qm_controller_reset(struct hisi_qm *qm)
- 	ret = qm_soft_reset(qm);
- 	if (ret) {
- 		pci_err(pdev, "Controller reset failed (%d)\n", ret);
--		qm_reset_bit_clear(qm);
--		return ret;
-+		goto err_reset;
- 	}
- 
- 	ret = qm_controller_reset_done(qm);
--	if (ret) {
--		qm_reset_bit_clear(qm);
--		return ret;
--	}
-+	if (ret)
-+		goto err_reset;
- 
- 	pci_info(pdev, "Controller reset complete\n");
- 
- 	return 0;
-+
-+err_reset:
-+	pci_err(pdev, "Controller reset failed (%d)\n", ret);
-+	qm_reset_bit_clear(qm);
-+
-+	/* if resetting fails, isolate the device */
-+	if (qm->use_sva && !qm->uacce->is_vf)
-+		atomic_set(&qm->isolate_data.is_isolate, 1);
-+	return ret;
- }
- 
- /**
-@@ -6246,10 +6402,7 @@ int hisi_qm_init(struct hisi_qm *qm)
- err_free_qm_memory:
- 	hisi_qm_memory_uninit(qm);
- err_alloc_uacce:
--	if (qm->use_sva) {
--		uacce_remove(qm->uacce);
--		qm->uacce = NULL;
--	}
-+	qm_remove_uacce(qm);
- err_irq_register:
- 	qm_irq_unregister(qm);
- err_pci_init:
-diff --git a/include/linux/hisi_acc_qm.h b/include/linux/hisi_acc_qm.h
-index 116e8bd68c99..44454150c205 100644
---- a/include/linux/hisi_acc_qm.h
-+++ b/include/linux/hisi_acc_qm.h
-@@ -271,6 +271,13 @@ struct hisi_qm_poll_data {
- 	u16 *qp_finish_id;
- };
- 
-+struct qm_err_isolate {
-+	struct mutex isolate_lock;
-+	/* user cfg freq which triggers isolation */
-+	u32 hw_err_isolate_hz;
-+	atomic_t is_isolate;
-+};
-+
- struct hisi_qm {
- 	enum qm_hw_ver ver;
- 	enum qm_fun_type fun_type;
-@@ -335,6 +342,8 @@ struct hisi_qm {
- 	struct qm_shaper_factor *factor;
- 	u32 mb_qos;
- 	u32 type_rate;
-+	struct list_head uacce_hw_errs;
-+	struct qm_err_isolate isolate_data;
- };
- 
- struct hisi_qp_status {
+V1 -> V2:
+- explicitly specified an appropriate base commit.
+- fixed the link error reported by kernel test robot <lkp@intl.com>.
+- removed irrelevant commits.
+
+V1:
+- fixed the problem that the max_signature_size of ECDSA is
+incorrectly calculated.
+- make pkcs8_private_key_parser can identify ECDSA private keys.
+- implement ECDSA algorithm for virtio-crypto device
+
+
+lei he (4):
+  crypto: fix the calculation of max_size for ECDSA
+  crypto: pkcs8 parser support ECDSA private keys
+  crypto: remove unused field in pkcs8_parse_context
+  virtio-crypto: support ECDSA algorithm
+
+ crypto/Kconfig                                |   1 +
+ crypto/Makefile                               |   2 +
+ crypto/akcipher.c                             |  10 +
+ crypto/asymmetric_keys/pkcs8.asn1             |   2 +-
+ crypto/asymmetric_keys/pkcs8_parser.c         |  46 +++-
+ crypto/ecdsa.c                                |   3 +-
+ crypto/ecdsa_helper.c                         |  45 +++
+ drivers/crypto/virtio/Kconfig                 |   1 +
+ .../virtio/virtio_crypto_akcipher_algs.c      | 259 ++++++++++++++++--
+ include/crypto/internal/ecdsa.h               |  15 +
+ include/linux/asn1_encoder.h                  |   2 +
+ lib/asn1_encoder.c                            |   3 +-
+ 12 files changed, 361 insertions(+), 28 deletions(-)
+ create mode 100644 crypto/ecdsa_helper.c
+ create mode 100644 include/crypto/internal/ecdsa.h
+
+
+base-commit: 018ab4fabddd94f1c96f3b59e180691b9e88d5d8
 -- 
-2.33.0
+2.20.1
 
