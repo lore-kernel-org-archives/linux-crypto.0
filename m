@@ -2,56 +2,56 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 140FFC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 21:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CBBC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 21:30:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbiFWVAw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 17:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54780 "EHLO
+        id S229666AbiFWVad (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 17:30:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiFWVAv (ORCPT
+        with ESMTP id S229502AbiFWVac (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 17:00:51 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080E054BFA
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 14:00:48 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1048b8a38bbso1032825fac.12
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 14:00:48 -0700 (PDT)
+        Thu, 23 Jun 2022 17:30:32 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60E152520
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 14:30:29 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id s20-20020a056830439400b0060c3e43b548so455774otv.7
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 14:30:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=YFZn+6KIIWp9gABMuWoR/dKCyEO4Zr5Rzf3hYjExeKM=;
-        b=SLSQuGNHJV37cOtMEFG3uwEzqjiH7rjf8lBN6dlJxGi5K+qWAXGF9NaHB34fDTGnnG
-         5BO6KBC5M9pv9FZxmNICTOXTmCjuDmEFXatrzbKgwFgT5Xwxwx7ok4mIUzi9Zaw9ZH9j
-         hPKLQ5ipJETzDMCc1BbrD2MIcLQZi9LLB3BXeXoa6G+i5m3Lx1QgXn15IUHKZkjT/GnV
-         HRCmcy3hXV0Lzzz0YERx53i6O5/3isS7ABZxFZgI7IoNX1ywx7gub33tTSzKErrXnsAa
-         P84cUd7O2iPNeHWqT+MEBYdPFRU5j5M8eVJefEmJlF34ljWH6wgP3O2BHg+Wg97ictpa
-         mBvA==
+        bh=kqoxMpiX3Gf231GDDR9G1b2VInfGIDsRQZcWz3Knh/w=;
+        b=duKobLilhDL22sXP3vyLSU2BHZyOr2DEfkeMxf1DgR3Y/mj/UVxd0/FjJUWSHAAhF4
+         XTmHTTtJ09Tc1kjquB/l2p06WXyLcldCI7l+B1aOGxHYCGylgl5hK/cz8djVlrS99/Nr
+         peXeW1qWKBk2LQb9EaWYmlaQtVSHHNeozxFZ7bisTPZYO06jVn/y8jw5yMvtmv9QQGvW
+         29rCl/n6tRgPnRQHVL6RARL+BabO2B3TUqdT8CbdsbKSLtDlnLif4+yL93OesaPwN8ct
+         z14R8ml2C+fezKONoCirxhP//Xcsvd2aU3wfL+yQgZyNsA7xlKXGztw4TdQ2Fwe/OGE6
+         fseA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=YFZn+6KIIWp9gABMuWoR/dKCyEO4Zr5Rzf3hYjExeKM=;
-        b=OriFdIyTt5HPhU0Z853cUu0vAadfHyGDs7+9HMv4pvVjFTov7pxr2RCXYYI9x1H8JN
-         Els3r91sKSvelhoc9b1a9QtX3wrZxf2ZLpQraWGLC2I9mRKghB1o9oLI+yLxJ1VwzoDI
-         Ktr8KR75dzJeSuoGK4MkkAIKyaVwpZoDUWSi7sfJL6dc5xvegOKSJYfPMl5sfb5kV5zq
-         h89CToTEtXYIS0BR1bajWRw6w1KFP6os4p+CbA0xPkpfsUgHXVpJm59A7qAjJHU72Vjg
-         pmsKCX6xPRYOVDK+J4XNzX35AllB+LuAW5Qnbg4VsgTsp3dIZCYB0gWmTGlAKlD5XloN
-         y15Q==
-X-Gm-Message-State: AJIora/09iBFU8Ala16FY8giLfW8yu/QY0RX6glUI6zixQ+nGKs7ndgI
-        Fc1rhAXlR7/jmjWok/KKitPrGQy9qOXODUSYcT/o/w==
-X-Google-Smtp-Source: AGRyM1u+6NKJmTl5AxpFSRq+8aQW2BDLG8AB1hBjiM3k8m1AvB1fSE0FBJqFqc2vKOE78+7yBQ8YcxTcWmTVOZli3B8=
-X-Received: by 2002:a05:6870:b616:b0:e2:f8bb:5eb with SMTP id
- cm22-20020a056870b61600b000e2f8bb05ebmr3694057oab.218.1656018047090; Thu, 23
- Jun 2022 14:00:47 -0700 (PDT)
+        bh=kqoxMpiX3Gf231GDDR9G1b2VInfGIDsRQZcWz3Knh/w=;
+        b=r8I/FwCqpoUoNUmodxxbMabiuQ3bG9R+hvJae6u1K57E4ABJbHCrPvi+va7K9yrU2z
+         ccIKFRiUifVsjWb1hVf03l8NEkRRQyUGnXYH+qvVw5mNkWKbL5V98pz6bRaa5ztSvUSR
+         4lmGJvwIqx9IGfCjE1YSuAiKTz3oXEQNfrfbUTiaTeziZ8gl0AxK4dr9xi5LPu9Qdt8e
+         wmmAHodET6v3tn2fZOPmvI1qAJHlezxUwUpTs8/p+RAnuwkp4L2x6ho9WWt+TAe4BapY
+         67QY2HDz7lTXCivdqiVs7jz+7OkAhJWZZ7wxJuAW3IsnvH97qMpdck/iNzEeYbc0DCJ5
+         MHRw==
+X-Gm-Message-State: AJIora/cobjHu8/EZEEseHEUhdhnRVZR9B4m4OOPC+KVdpeKbTvARSYr
+        MFwv6S6YTpqzHrtN9kHS0EfbV7dngEf9g1/pCeFT1Q==
+X-Google-Smtp-Source: AGRyM1veXOvim13DoOcVFPocfJu+YK8saHoB9/PkjheoBqMOiwNRF5W/rzCDzSmOj5ZWh6liga9mLs9vDiTICXpTFwY=
+X-Received: by 2002:a9d:5888:0:b0:606:10d2:2fc1 with SMTP id
+ x8-20020a9d5888000000b0060610d22fc1mr4691492otg.29.1656019828771; Thu, 23 Jun
+ 2022 14:30:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <c933e87762d78e5dce78e9bbf9c41aa0b30ddba2.1655761627.git.ashish.kalra@amd.com>
-In-Reply-To: <c933e87762d78e5dce78e9bbf9c41aa0b30ddba2.1655761627.git.ashish.kalra@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <8f63961f00fd170ba0e561f499292175f3155d26.1655761627.git.ashish.kalra@amd.com>
 From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 23 Jun 2022 14:00:36 -0700
-Message-ID: <CAA03e5G-6-x-iOaAvrAb-fWTsuWzQdCOX6eiRAv=ZscG6QHDNg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 04/49] x86/sev: set SYSCFG.MFMD
+Date:   Thu, 23 Jun 2022 14:30:17 -0700
+Message-ID: <CAA03e5E==P_Ua6UBz+ZBBMkmhSpacZR-z+5OvObpErk09xCfuA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 05/49] x86/sev: Add RMP entry lookup helpers
 To:     Ashish Kalra <Ashish.Kalra@amd.com>
 Cc:     x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
         kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
@@ -92,101 +92,172 @@ On Mon, Jun 20, 2022 at 4:02 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
 >
 > From: Brijesh Singh <brijesh.singh@amd.com>
 >
-> SEV-SNP FW >= 1.51 requires that SYSCFG.MFMD must be set.
->
-> Subsequent CCP patches while require 1.51 as the minimum SEV-SNP
-> firmware version.
+> The snp_lookup_page_in_rmptable() can be used by the host to read the RMP
+> entry for a given page. The RMP entry format is documented in AMD PPR, see
+> https://bugzilla.kernel.org/attachment.cgi?id=296015.
 >
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 > ---
->  arch/x86/include/asm/msr-index.h |  3 +++
->  arch/x86/kernel/sev.c            | 24 ++++++++++++++++++++++++
->  2 files changed, 27 insertions(+)
+>  arch/x86/include/asm/sev.h | 27 ++++++++++++++++++++++++
+>  arch/x86/kernel/sev.c      | 43 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/sev.h        | 30 ++++++++++++++++++++++++++
+>  3 files changed, 100 insertions(+)
+>  create mode 100644 include/linux/sev.h
 >
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 57a8280e283a..1e36f16daa56 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -587,6 +587,9 @@
->  #define MSR_AMD64_SYSCFG_SNP_EN                BIT_ULL(MSR_AMD64_SYSCFG_SNP_EN_BIT)
->  #define MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT       25
->  #define MSR_AMD64_SYSCFG_SNP_VMPL_EN   BIT_ULL(MSR_AMD64_SYSCFG_SNP_VMPL_EN_BIT)
-> +#define MSR_AMD64_SYSCFG_MFDM_BIT              19
-> +#define MSR_AMD64_SYSCFG_MFDM          BIT_ULL(MSR_AMD64_SYSCFG_MFDM_BIT)
-
-nit: Similar to the previous patch, the alignment here doesn't look
-right. The bad alignment can be viewed on the github version of this
-patch:
-https://github.com/AMDESE/linux/commit/6d4469b86f90e67119ff110230857788a0d9dbd0
-
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 9c2d33f1cfee..cb16f0e5b585 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -9,6 +9,7 @@
+>  #define __ASM_ENCRYPTED_STATE_H
+>
+>  #include <linux/types.h>
+> +#include <linux/sev.h>
+>  #include <asm/insn.h>
+>  #include <asm/sev-common.h>
+>  #include <asm/bootparam.h>
+> @@ -84,6 +85,32 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
+>
+>  /* RMP page size */
+>  #define RMP_PG_SIZE_4K                 0
+> +#define RMP_TO_X86_PG_LEVEL(level)     (((level) == RMP_PG_SIZE_4K) ? PG_LEVEL_4K : PG_LEVEL_2M)
 > +
->  #define MSR_K8_INT_PENDING_MSG         0xc0010055
->  /* C1E active bits in int pending message */
->  #define K8_INTP_C1E_ACTIVE_MASK                0x18000000
+> +/*
+> + * The RMP entry format is not architectural. The format is defined in PPR
+> + * Family 19h Model 01h, Rev B1 processor.
+> + */
+> +struct __packed rmpentry {
+> +       union {
+> +               struct {
+> +                       u64     assigned        : 1,
+> +                               pagesize        : 1,
+> +                               immutable       : 1,
+> +                               rsvd1           : 9,
+> +                               gpa             : 39,
+> +                               asid            : 10,
+> +                               vmsa            : 1,
+> +                               validated       : 1,
+> +                               rsvd2           : 1;
+> +               } info;
+> +               u64 low;
+> +       };
+> +       u64 high;
+> +};
+> +
+> +#define rmpentry_assigned(x)   ((x)->info.assigned)
+> +#define rmpentry_pagesize(x)   ((x)->info.pagesize)
+>
+>  #define RMPADJUST_VMSA_PAGE_BIT                BIT(16)
+>
 > diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 3a233b5d47c5..25c7feb367f6 100644
+> index 25c7feb367f6..59e7ec6b0326 100644
 > --- a/arch/x86/kernel/sev.c
 > +++ b/arch/x86/kernel/sev.c
-> @@ -2257,6 +2257,27 @@ static __init void snp_enable(void *arg)
->         __snp_enable(smp_processor_id());
->  }
+> @@ -65,6 +65,8 @@
+>   * bookkeeping, the range need to be added during the RMP entry lookup.
+>   */
+>  #define RMPTABLE_CPU_BOOKKEEPING_SZ    0x4000
+> +#define RMPENTRY_SHIFT                 8
+> +#define rmptable_page_offset(x)        (RMPTABLE_CPU_BOOKKEEPING_SZ + (((unsigned long)x) >> RMPENTRY_SHIFT))
 >
-> +static int __mfdm_enable(unsigned int cpu)
+>  /* For early boot hypervisor communication in SEV-ES enabled guests */
+>  static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
+> @@ -2386,3 +2388,44 @@ static int __init snp_rmptable_init(void)
+>   * available after subsys_initcall().
+>   */
+>  fs_initcall(snp_rmptable_init);
+> +
+> +static struct rmpentry *__snp_lookup_rmpentry(u64 pfn, int *level)
 > +{
-> +       u64 val;
+> +       unsigned long vaddr, paddr = pfn << PAGE_SHIFT;
+> +       struct rmpentry *entry, *large_entry;
+> +
+> +       if (!pfn_valid(pfn))
+> +               return ERR_PTR(-EINVAL);
 > +
 > +       if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +               return 0;
-> +
-> +       rdmsrl(MSR_AMD64_SYSCFG, val);
-> +
-> +       val |= MSR_AMD64_SYSCFG_MFDM;
+> +               return ERR_PTR(-ENXIO);
 
-Can we do this inside `__snp_enable()`, above? Then, we'll execute if
-a hotplug event happens as well.
-
-static int __snp_enable(unsigned int cpu)
-{
-     u64 val;
-
-     if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-          return 0;
-
-     rdmsrl(MSR_AMD64_SYSCFG, val);
-
-     val |= MSR_AMD64_SYSCFG_SNP_EN;
-     val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
-     val |= MSR_AMD64_SYSCFG_MFDM;
-
-     wrmsrl(MSR_AMD64_SYSCFG, val);
-
-     return 0;
-}
+nit: I think we should check if SNP is enabled first, before doing
+anything else. In other words, I think we should move this check above
+the `!pfn_valid()` check.
 
 > +
-> +       wrmsrl(MSR_AMD64_SYSCFG, val);
+> +       vaddr = rmptable_start + rmptable_page_offset(paddr);
+> +       if (unlikely(vaddr > rmptable_end))
+> +               return ERR_PTR(-ENXIO);
+
+nit: It would be nice to use a different error code here, from the SNP
+feature check. That way, if this function fails, it's easier to
+diagnose where the function failed from the error code.
+
 > +
-> +       return 0;
+> +       entry = (struct rmpentry *)vaddr;
+> +
+> +       /* Read a large RMP entry to get the correct page level used in RMP entry. */
+> +       vaddr = rmptable_start + rmptable_page_offset(paddr & PMD_MASK);
+> +       large_entry = (struct rmpentry *)vaddr;
+> +       *level = RMP_TO_X86_PG_LEVEL(rmpentry_pagesize(large_entry));
+> +
+> +       return entry;
 > +}
 > +
-> +static __init void mfdm_enable(void *arg)
+> +/*
+> + * Return 1 if the RMP entry is assigned, 0 if it exists but is not assigned,
+> + * and -errno if there is no corresponding RMP entry.
+> + */
+> +int snp_lookup_rmpentry(u64 pfn, int *level)
 > +{
-> +       __mfdm_enable(smp_processor_id());
+> +       struct rmpentry *e;
+> +
+> +       e = __snp_lookup_rmpentry(pfn, level);
+> +       if (IS_ERR(e))
+> +               return PTR_ERR(e);
+> +
+> +       return !!rmpentry_assigned(e);
 > +}
+> +EXPORT_SYMBOL_GPL(snp_lookup_rmpentry);
+> diff --git a/include/linux/sev.h b/include/linux/sev.h
+> new file mode 100644
+> index 000000000000..1a68842789e1
+> --- /dev/null
+> +++ b/include/linux/sev.h
+> @@ -0,0 +1,30 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AMD Secure Encrypted Virtualization
+> + *
+> + * Author: Brijesh Singh <brijesh.singh@amd.com>
+> + */
 > +
->  static bool get_rmptable_info(u64 *start, u64 *len)
->  {
->         u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
-> @@ -2325,6 +2346,9 @@ static __init int __snp_rmptable_init(void)
->         /* Flush the caches to ensure that data is written before SNP is enabled. */
->         wbinvd_on_all_cpus();
->
-> +       /* MFDM must be enabled on all the CPUs prior to enabling SNP. */
-> +       on_each_cpu(mfdm_enable, NULL, 1);
+> +#ifndef __LINUX_SEV_H
+> +#define __LINUX_SEV_H
 > +
->         /* Enable SNP on all CPUs. */
->         on_each_cpu(snp_enable, NULL, 1);
->
+> +/* RMUPDATE detected 4K page and 2MB page overlap. */
+> +#define RMPUPDATE_FAIL_OVERLAP         7
+> +
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +int snp_lookup_rmpentry(u64 pfn, int *level);
+> +int psmash(u64 pfn);
+> +int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid, bool immutable);
+> +int rmp_make_shared(u64 pfn, enum pg_level level);
+
+nit: I think the declarations for `psmash()`, `rmp_make_private()`,
+and `rmp_make_shared()` should be introduced in the patches that have
+their definitions.
+
+> +#else
+> +static inline int snp_lookup_rmpentry(u64 pfn, int *level) { return 0; }
+> +static inline int psmash(u64 pfn) { return -ENXIO; }
+> +static inline int rmp_make_private(u64 pfn, u64 gpa, enum pg_level level, int asid,
+> +                                  bool immutable)
+> +{
+> +       return -ENODEV;
+> +}
+> +static inline int rmp_make_shared(u64 pfn, enum pg_level level) { return -ENODEV; }
+> +
+> +#endif /* CONFIG_AMD_MEM_ENCRYPT */
+> +#endif /* __LINUX_SEV_H */
 > --
 > 2.25.1
 >
