@@ -2,84 +2,232 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 884B2C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 07:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A57C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jun 2022 07:13:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229908AbiFWHL6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jun 2022 03:11:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33218 "EHLO
+        id S230206AbiFWHNw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 23 Jun 2022 03:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbiFWHL6 (ORCPT
+        with ESMTP id S230203AbiFWHNw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jun 2022 03:11:58 -0400
-Received: from smtpbg.qq.com (smtpbg136.qq.com [106.55.201.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853E045534;
-        Thu, 23 Jun 2022 00:11:52 -0700 (PDT)
-X-QQ-mid: bizesmtp86t1655968289tgkdrmqe
-Received: from ubuntu.localdomain ( [106.117.99.68])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Thu, 23 Jun 2022 15:11:25 +0800 (CST)
-X-QQ-SSF: 01000000008000B0C000B00A0000000
-X-QQ-FEAT: 2f7wtd3zdH9Lc0K05BMg4D3CHFmxR4b53tBINtYQkGR4k7ShF0BGsokL3XjNy
-        2RSNdIIPUdFWcNPUyZ5yGUjqLtW9EgRn3snSEj+JvpYxwpLr0/pXSoHdWHC/4WHr1fph0g3
-        6WyxpKQOTmSx3kgZOkmkLLLbaNda3kbIG30QrfIXxGebzeCVYKPeJq+THtZjt+2Y+dqvDcQ
-        tJ5HhGuj2ir71SFund6A5ZKFxwhzf7JJfXeM0ZhUy+JKOF/JZCO+tfAOIqexb3HgDk4AYOt
-        JpzBMdjfVrcv3lTb3wNQ5qw99Xg3dCNevzjIbnA4ehh7lN9bVdidoI/q/jCASUcAh4aykFT
-        HJ5ICw7yScrpaBYugjHJ2orEtHFTA==
-X-QQ-GoodBg: 0
-From:   Jiang Jian <jiangjian@cdjrlc.com>
-To:     horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiang Jian <jiangjian@cdjrlc.com>
-Subject: [PATCH] crypto: caam - drop unexpected word 'a' in comments
-Date:   Thu, 23 Jun 2022 15:11:23 +0800
-Message-Id: <20220623071123.12885-1-jiangjian@cdjrlc.com>
-X-Mailer: git-send-email 2.17.1
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:cdjrlc.com:qybgspam:qybgspam7
+        Thu, 23 Jun 2022 03:13:52 -0400
+Received: from smtp.smtpout.orange.fr (smtp06.smtpout.orange.fr [80.12.242.128])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5081945AD8
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jun 2022 00:13:50 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id 4H24ogdVvP8Ap4H24ojZfO; Thu, 23 Jun 2022 09:13:48 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Thu, 23 Jun 2022 09:13:48 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <21679090-7a89-865b-becf-d5552e8cedea@wanadoo.fr>
+Date:   Thu, 23 Jun 2022 09:13:39 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v3 1/5] crypto: aspeed: Add HACE hash driver
+Content-Language: en-US
+To:     Neal Liu <neal_liu@aspeedtech.com>
+Cc:     BMC-SW@aspeedtech.com, andrew@aj.id.au,
+        christophe.jaillet@wanadoo.fr, clabbe.montjoie@gmail.com,
+        davem@davemloft.net, devicetree@vger.kernel.org,
+        dhphadke@microsoft.com, herbert@gondor.apana.org.au,
+        joel@jms.id.au, johnny_huang@aspeedtech.com,
+        krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rdunlap@infradead.org,
+        robh+dt@kernel.org
+References: <20220621063752.1005781-1-neal_liu@aspeedtech.com>
+ <20220621063752.1005781-2-neal_liu@aspeedtech.com>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20220621063752.1005781-2-neal_liu@aspeedtech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Drop the unexpected word 'a' in the comments that need to be dropped
+Le 21/06/2022 à 08:37, Neal Liu a écrit :
+> Hash and Crypto Engine (HACE) is designed to accelerate the
+> throughput of hash data digest, encryption, and decryption.
+> 
+> Basically, HACE can be divided into two independently engines
+> - Hash Engine and Crypto Engine. This patch aims to add HACE
+> hash engine driver for hash accelerator.
+> 
+> Signed-off-by: Neal Liu <neal_liu-SAlXDmAnmOAqDJ6do+/SaQ@public.gmane.org>
+> Signed-off-by: Johnny Huang <johnny_huang-SAlXDmAnmOAqDJ6do+/SaQ@public.gmane.org>
+> ---
 
-* This is a a cache of buffers, from which the users of CAAM QI driver
--->
-* This is a cache of buffers, from which the users of CAAM QI driver
+[...]
 
-Signed-off-by: Jiang Jian <jiangjian@cdjrlc.com>
----
- drivers/crypto/caam/caamalg_qi2.c | 2 +-
- drivers/crypto/caam/qi.c          | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> +++ b/drivers/crypto/aspeed/Kconfig
+> @@ -0,0 +1,23 @@
+> +config CRYPTO_DEV_ASPEED
+> +	tristate "Support for Aspeed cryptographic engine driver"
+> +	depends on ARCH_ASPEED
+> +	help
+> +	  Hash and Crypto Engine (HACE) is designed to accelerate the
+> +	  throughput of hash data digest, encryption and decryption.
+> +
+> +	  Select y here to have support for the cryptographic driver
+> +	  available on Aspeed SoC.
+> +
+> +config CRYPTO_DEV_ASPEED_HACE_HASH
+> +	bool "Enable ASPEED Hash & Crypto Engine (HACE) hash"
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 6753f0e6e55d..4b81fb33f199 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -29,7 +29,7 @@
- 				 SHA512_DIGEST_SIZE * 2)
- 
- /*
-- * This is a a cache of buffers, from which the users of CAAM QI driver
-+ * This is a cache of buffers, from which the users of CAAM QI driver
-  * can allocate short buffers. It's speedier than doing kmalloc on the hotpath.
-  * NOTE: A more elegant solution would be to have some headroom in the frames
-  *       being processed. This can be added by the dpaa2-eth driver. This would
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 8163f5df8ebf..49439d0d1b3c 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -75,7 +75,7 @@ bool caam_congested __read_mostly;
- EXPORT_SYMBOL(caam_congested);
- 
- /*
-- * This is a a cache of buffers, from which the users of CAAM QI driver
-+ * This is a cache of buffers, from which the users of CAAM QI driver
-  * can allocate short (CAAM_QI_MEMCACHE_SIZE) buffers. It's faster than
-  * doing malloc on the hotpath.
-  * NOTE: A more elegant solution would be to have some headroom in the frames
--- 
-2.17.1
+Nit: Sometimes you have ASPEED, sometimes you have Aspeed. (see a few 
+lines above)
+
+[...]
+
+> +static int aspeed_ahash_req_update(struct aspeed_hace_dev *hace_dev)
+> +{
+> +	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
+> +	struct ahash_request *req = hash_engine->req;
+> +	struct aspeed_sham_reqctx *rctx = ahash_request_ctx(req);
+> +	aspeed_hace_fn_t resume;
+> +
+> +	AHASH_DBG(hace_dev, "\n");
+> +
+> +	if (hace_dev->version == AST2600_VERSION) {
+> +		rctx->cmd |= HASH_CMD_HASH_SRC_SG_CTRL;
+> +		resume = aspeed_ahash_update_resume_sg;
+> +
+> +	} else {
+> +		resume = aspeed_ahash_update_resume;
+> +	}
+> +
+> +	hash_engine->dma_prepare(hace_dev);
+
+Apparently dma_prepare() can fail. Should there be some error handling here?
+
+> +
+> +	return aspeed_hace_ahash_trigger(hace_dev, resume);
+> +}
+> +
+
+[...]
+
+> +static int aspeed_hace_probe(struct platform_device *pdev)
+> +{
+> +	const struct of_device_id *hace_dev_id;
+> +	struct aspeed_engine_hash *hash_engine;
+> +	struct aspeed_hace_dev *hace_dev;
+> +	struct resource *res;
+> +	int rc;
+> +
+> +	hace_dev = devm_kzalloc(&pdev->dev, sizeof(struct aspeed_hace_dev),
+> +				GFP_KERNEL);
+> +	if (!hace_dev)
+> +		return -ENOMEM;
+> +
+> +	hace_dev_id = of_match_device(aspeed_hace_of_matches, &pdev->dev);
+> +	if (!hace_dev_id) {
+> +		dev_err(&pdev->dev, "Failed to match hace dev id\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	hace_dev->dev = &pdev->dev;
+> +	hace_dev->version = (unsigned long)hace_dev_id->data;
+> +	hash_engine = &hace_dev->hash_engine;
+> +
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +
+> +	platform_set_drvdata(pdev, hace_dev);
+> +
+> +	/* Initialize crypto hardware engine structure for hash */
+> +	hace_dev->crypt_engine_hash = crypto_engine_alloc_init(hace_dev->dev,
+> +							       true);
+
+This returns NULL on error and crypto_engine_start() will crash in such 
+a case.
+
+> +
+> +	rc = crypto_engine_start(hace_dev->crypt_engine_hash);
+> +	if (rc)
+> +		goto err_engine_hash_start;
+> +
+> +	tasklet_init(&hash_engine->done_task, aspeed_hace_hash_done_task,
+> +		     (unsigned long)hace_dev);
+> +
+> +	hace_dev->regs = devm_ioremap_resource(&pdev->dev, res);
+> +	if (!hace_dev->regs) {
+> +		dev_err(&pdev->dev, "Failed to map resources\n");
+> +		return -ENOMEM;
+
+I think that all direct returns from here to the end of the function 
+should be "goto err_engine_hash_start;".
+
+> +	}
+> +
+> +	/* Get irq number and register it */
+> +	hace_dev->irq = platform_get_irq(pdev, 0);
+> +	if (!hace_dev->irq) {
+> +		dev_err(&pdev->dev, "Failed to get interrupt\n");
+> +		return -ENXIO;
+> +	}
+> +
+> +	rc = devm_request_irq(&pdev->dev, hace_dev->irq, aspeed_hace_irq, 0,
+> +			      dev_name(&pdev->dev), hace_dev);
+> +	if (rc) {
+> +		dev_err(&pdev->dev, "Failed to request interrupt\n");
+> +		return rc;
+> +	}
+> +
+> +	/* Get clk and enable it */
+> +	hace_dev->clk = devm_clk_get(&pdev->dev, NULL);
+> +	if (IS_ERR(hace_dev->clk)) {
+> +		dev_err(&pdev->dev, "Failed to get clk\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	rc = clk_prepare_enable(hace_dev->clk);
+> +	if (rc) {
+> +		dev_err(&pdev->dev, "Failed to enable clock 0x%x\n", rc);
+> +		return rc;
+> +	}
+> +
+> +	/* Allocate DMA buffer for hash engine input used */
+> +	hash_engine->ahash_src_addr =
+> +		dma_alloc_coherent(&pdev->dev,
+> +				   ASPEED_HASH_SRC_DMA_BUF_LEN,
+> +				   &hash_engine->ahash_src_dma_addr,
+> +				   GFP_KERNEL);
+
+Most of the resources are devm_'ed. Does it make sense to use 
+dmam_alloc_coherent() here to simplify the .remove function?
+
+> +	if (!hash_engine->ahash_src_addr) {
+> +		dev_err(&pdev->dev, "Failed to allocate dma buffer\n");
+> +		rc = -ENOMEM;
+> +		goto clk_exit;
+> +	}
+> +
+> +	aspeed_hace_register(hace_dev);
+> +
+> +	dev_info(&pdev->dev, "ASPEED Crypto Accelerator successfully registered\n");
+> +
+Nit: Sometimes you have ASPEED, sometimes you have Aspeed.
+
+> +	return rc;
+> +
+> +clk_exit:
+> +	clk_disable_unprepare(hace_dev->clk);
+> +err_engine_hash_start:
+> +	crypto_engine_exit(hace_dev->crypt_engine_hash);
+> +
+> +	return rc;
+> +}
+> +
+
+[...]
+
+> +MODULE_AUTHOR("Neal Liu <neal_liu-SAlXDmAnmOAqDJ6do+/SaQ@public.gmane.org>");
+> +MODULE_DESCRIPTION("ASPEED HACE driver Crypto Accelerator");
+
+Nit: Sometimes you have ASPEED, sometimes you have Aspeed.
 
