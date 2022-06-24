@@ -2,409 +2,434 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5DEC43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 14:22:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EA0C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 14:33:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232481AbiFXOWB (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 10:22:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
+        id S232340AbiFXOdh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 10:33:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232480AbiFXOV6 (ORCPT
+        with ESMTP id S230073AbiFXOdg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 10:21:58 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 658BE562E9
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:21:56 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id r1so2240880plo.10
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:21:56 -0700 (PDT)
+        Fri, 24 Jun 2022 10:33:36 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779B240E5D
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:33:34 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id n15so2974584ljg.8
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:33:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=MbIPCkmyc1bdlhR3N3a7sXqhnJqvjw8tNDpZ6ROL2dY=;
-        b=hY4AQLnYiv0t5B7A89XVKZC2+IsGLEf5RUWguvca17vTOGBZRXGVwrWzcOGtZDgz0Q
-         wqk0HBFXHAfJW//RMyiULdzJuHQp1jzo6PjfTpbqqnFCygPgB5nvVVt6eNIrNR2m8em1
-         Eoxt+fVICuPdRyYBnOO018y89AVwj4Gh8NwLfrU7Q7MQ9OjJxZ7xZw7XtR4LO+4WqecL
-         xuoavlWAOagz9HteSDKYPc7bOorwDv/mVMKAdaPbqJKqS58NJd7HwYV1btE1qfQ5sEEB
-         6ByBE7M3iPbuYGwFG2RT63jpo31pXeFkIbvem4tJpuvihs6Y2VCuDVhhNI7g2ZNS59Vl
-         6Jmw==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0yhMNVTfPgAiz+CgtIR9pHMpZQGSdtbAVl/2DeBNAqc=;
+        b=SjJEMzrWxAcKwc5YzGrav8NBQX276eeEeaWCtW3CaaxjO2ltEuVAL6sjneDt8mLwMn
+         G6omp21sIapg84ueYj+ecm4lMnl2oPZc8MrWyBu7vx5vt3yt77+RjCP//eeuR7ow53sn
+         VnnylV8XIzAoEQEuEz4hxs8qd3t0zqP4KQ9SzEQh0VCHd4ml8YA99OQxsqxV3YgqjJjL
+         aWusHu4Bphs1xWYY5SOgSPxmBo+MvIuc/HJDTXMRpWrdYBJWzuf/0vsMJWq14wpSeisJ
+         MnxOEE3UFKvBxX5t+eB5AQfzMwsQX0c/vbKbT//6/qzs6CLTB1B9hAzjiZz/YUrPRgCg
+         585A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=MbIPCkmyc1bdlhR3N3a7sXqhnJqvjw8tNDpZ6ROL2dY=;
-        b=WmWkB6HF+GtsvEJPQpd20zrPlaEkrlV0YILXjfMwtkbA1jxELEdHFw2/kPn8U9IRH5
-         FQWBl6k+XzxtkDTsVzxCWIDRewawlCqNwEOfnt0WxgP7NkTRGZZaPyHuVBsvPxO9h36p
-         xM69mrihEPRkNjNKipagPfdO1eFUP2G1jk3MkvopTuXTHTUupr5UoaG5TqRtIgRNvJ5k
-         3mfe+owcwUeBHb6sgfb1c/Qr0VMf7iPgruKJlKGPT+QzfeUSLoBG/P5iDajlpY8h1Wl0
-         la9gE69mfufAVjvSkp0dOs6FEsKU+rm94EpRZSvLtx9PlCkDeMqNmmt5JF2e50OGhV2e
-         qatg==
-X-Gm-Message-State: AJIora+Jj2gFQ7xVKAb2Am/FH4nBCXI/KC1FnpzZ5G8vSsuTTVAGZbLX
-        ZPXhyONBe+B5YN+VxYIFNsvTlg==
-X-Google-Smtp-Source: AGRyM1urdolhskPrnKY1iCboyEl9k2p0/8P849d7xP3PU2gxb6JIti+JWhzw+BGJFoyi7wlpL/58ig==
-X-Received: by 2002:a17:903:120f:b0:15f:99f:9597 with SMTP id l15-20020a170903120f00b0015f099f9597mr44315246plh.45.1656080515824;
-        Fri, 24 Jun 2022 07:21:55 -0700 (PDT)
-Received: from localhost.localdomain ([199.101.192.196])
-        by smtp.gmail.com with ESMTPSA id jd12-20020a170903260c00b0016a15842cf5sm1868877plb.121.2022.06.24.07.21.50
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 Jun 2022 07:21:55 -0700 (PDT)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc:     acc@openeuler.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux.dev,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH v2 2/2] uacce: Handle parent device removal
-Date:   Fri, 24 Jun 2022 22:21:22 +0800
-Message-Id: <20220624142122.30528-3-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220624142122.30528-1-zhangfei.gao@linaro.org>
-References: <20220624142122.30528-1-zhangfei.gao@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0yhMNVTfPgAiz+CgtIR9pHMpZQGSdtbAVl/2DeBNAqc=;
+        b=Tk3Z6Xa/evopLbpglmxanPssH57Da9UIeyxQX/fyAibpp0aqgUoCGDswrTbIlC6O17
+         UGPbaW7jdTZ4Zv8drYUHKVVwVtoWqbyNOdTDFPi6XN1h2bZTtbRiyXCUFRg9H0BCHumV
+         M9aiDF6mkNmonDbRi2t1h5IvHulrMLGsLzRdXp/DUDoqEWnnsaXJdGUSc9SEeUzEzk0x
+         WSTP9lsvs9wLfmKFzZaq4u4gMWB05B3J/QlOJNVgyRHcRTu2+Cbpea7hdFWzSStlRsWZ
+         3XIL5iQyR5dY4zDn6bIDv0qGDGMDJSil3Sisk+m9VjtEjwxJBqGT78+L/CMXmUI7fWZu
+         qIIw==
+X-Gm-Message-State: AJIora+4sy10rAw7tdkp6+/6rLf1nwSSbTZMncyFXnUEOtYU5eiLfJOf
+        OIiLhann10loAweFOlqdKF+icdZkP3oa1m3RRkczzw==
+X-Google-Smtp-Source: AGRyM1vdiMmZacgjEGkkuIL1NK5wWJI4LMznvMCziB6kOQphLZLpwbEtJYE7oZ87HpYB93JjjWFeHHJ2h3V4164qP4I=
+X-Received: by 2002:a2e:2a43:0:b0:25a:84a9:921c with SMTP id
+ q64-20020a2e2a43000000b0025a84a9921cmr7511271ljq.83.1656081212439; Fri, 24
+ Jun 2022 07:33:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1655761627.git.ashish.kalra@amd.com> <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <fdf036c1e2fdf770da8238b31056206be08a7c1b.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 24 Jun 2022 08:33:21 -0600
+Message-ID: <CAMkAt6o2cQPAAzYK31myzBQWckUSQWVOOV2+-5VpnTym-wN7sA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 26/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+On Mon, Jun 20, 2022 at 5:08 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The KVM_SEV_SNP_LAUNCH_UPDATE command can be used to insert data into the
+> guest's memory. The data is encrypted with the cryptographic context
+> created with the KVM_SEV_SNP_LAUNCH_START.
+>
+> In addition to the inserting data, it can insert a two special pages
+> into the guests memory: the secrets page and the CPUID page.
+>
+> While terminating the guest, reclaim the guest pages added in the RMP
+> table. If the reclaim fails, then the page is no longer safe to be
+> released back to the system and leak them.
+>
+> For more information see the SEV-SNP specification.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  .../virt/kvm/x86/amd-memory-encryption.rst    |  29 +++
+>  arch/x86/kvm/svm/sev.c                        | 187 ++++++++++++++++++
+>  include/uapi/linux/kvm.h                      |  19 ++
+>  3 files changed, 235 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> index 878711f2dca6..62abd5c1f72b 100644
+> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> @@ -486,6 +486,35 @@ Returns: 0 on success, -negative on error
+>
+>  See the SEV-SNP specification for further detail on the launch input.
+>
+> +20. KVM_SNP_LAUNCH_UPDATE
+> +-------------------------
+> +
+> +The KVM_SNP_LAUNCH_UPDATE is used for encrypting a memory region. It also
+> +calculates a measurement of the memory contents. The measurement is a signature
+> +of the memory contents that can be sent to the guest owner as an attestation
+> +that the memory was encrypted correctly by the firmware.
+> +
+> +Parameters (in): struct  kvm_snp_launch_update
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_snp_launch_update {
+> +                __u64 start_gfn;        /* Guest page number to start from. */
+> +                __u64 uaddr;            /* userspace address need to be encrypted */
+> +                __u32 len;              /* length of memory region */
+> +                __u8 imi_page;          /* 1 if memory is part of the IMI */
+> +                __u8 page_type;         /* page type */
+> +                __u8 vmpl3_perms;       /* VMPL3 permission mask */
+> +                __u8 vmpl2_perms;       /* VMPL2 permission mask */
+> +                __u8 vmpl1_perms;       /* VMPL1 permission mask */
+> +        };
+> +
+> +See the SEV-SNP spec for further details on how to build the VMPL permission
+> +mask and page type.
+> +
+> +
+>  References
+>  ==========
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 41b83aa6b5f4..b5f0707d7ed6 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/processor.h>
+>  #include <linux/trace_events.h>
+>  #include <linux/hugetlb.h>
+> +#include <linux/sev.h>
+>
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+> @@ -233,6 +234,49 @@ static void sev_decommission(unsigned int handle)
+>         sev_guest_decommission(&decommission, NULL);
+>  }
+>
+> +static inline void snp_leak_pages(u64 pfn, enum pg_level level)
+> +{
+> +       unsigned int npages = page_level_size(level) >> PAGE_SHIFT;
+> +
+> +       WARN(1, "psc failed pfn 0x%llx pages %d (leaking)\n", pfn, npages);
+> +
+> +       while (npages) {
+> +               memory_failure(pfn, 0);
+> +               dump_rmpentry(pfn);
+> +               npages--;
+> +               pfn++;
+> +       }
+> +}
 
-The uacce driver must deal with a possible removal of the parent device
-at any time. Although uacce_remove(), called on device removal and on
-driver unbind, prevents future use of the uacce fops by removing the
-cdev, fops that were called before that point may still be running.
+Should this be deduplicated with the snp_leak_pages() in "crypto: ccp:
+Handle the legacy TMR allocation when SNP is enabled" ?
 
-Serialize uacce_fops_open() and uacce_remove() with uacce->mutex.
-Serialize other fops against uacce_remove() with q->mutex.
-Since we need to protect uacce_fops_poll() which gets called on the fast
-path, replace uacce->queues_lock with q->mutex to improve scalability.
-The other fops are only used during setup.
+> +
+> +static int snp_page_reclaim(u64 pfn)
+> +{
+> +       struct sev_data_snp_page_reclaim data = {0};
+> +       int err, rc;
+> +
+> +       data.paddr = __sme_set(pfn << PAGE_SHIFT);
+> +       rc = snp_guest_page_reclaim(&data, &err);
+> +       if (rc) {
+> +               /*
+> +                * If the reclaim failed, then page is no longer safe
+> +                * to use.
+> +                */
+> +               snp_leak_pages(pfn, PG_LEVEL_4K);
+> +       }
+> +
+> +       return rc;
+> +}
+> +
+> +static int host_rmp_make_shared(u64 pfn, enum pg_level level, bool leak)
+> +{
+> +       int rc;
+> +
+> +       rc = rmp_make_shared(pfn, level);
+> +       if (rc && leak)
+> +               snp_leak_pages(pfn, level);
+> +
+> +       return rc;
+> +}
+> +
+>  static void sev_unbind_asid(struct kvm *kvm, unsigned int handle)
+>  {
+>         struct sev_data_deactivate deactivate;
+> @@ -1902,6 +1946,123 @@ static int snp_launch_start(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         return rc;
+>  }
+>
+> +static bool is_hva_registered(struct kvm *kvm, hva_t hva, size_t len)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct list_head *head = &sev->regions_list;
+> +       struct enc_region *i;
+> +
+> +       lockdep_assert_held(&kvm->lock);
+> +
+> +       list_for_each_entry(i, head, list) {
+> +               u64 start = i->uaddr;
+> +               u64 end = start + i->size;
+> +
+> +               if (start <= hva && end >= (hva + len))
+> +                       return true;
+> +       }
 
-uacce_queue_is_valid(), checked under q->mutex or uacce_mutex, denotes
-whether uacce_remove() has disabled all queues. If that is the case,
-don't go any further since the parent device is being removed and
-uacce->ops should not be called anymore.
+Given that usersapce could load sev->regions_list with any # of any
+sized regions. Should we add a  cond_resched() like in
+sev_vm_destroy()?
 
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
- drivers/misc/uacce/uacce.c | 133 ++++++++++++++++++++++++-------------
- include/linux/uacce.h      |   6 +-
- 2 files changed, 91 insertions(+), 48 deletions(-)
+> +
+> +       return false;
+> +}
+> +
+> +static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_launch_update data = {0};
+> +       struct kvm_sev_snp_launch_update params;
+> +       unsigned long npages, pfn, n = 0;
+> +       int *error = &argp->error;
+> +       struct page **inpages;
+> +       int ret, i, level;
+> +       u64 gfn;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (!sev->snp_context)
+> +               return -EINVAL;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       /* Verify that the specified address range is registered. */
+> +       if (!is_hva_registered(kvm, params.uaddr, params.len))
+> +               return -EINVAL;
+> +
+> +       /*
+> +        * The userspace memory is already locked so technically we don't
+> +        * need to lock it again. Later part of the function needs to know
+> +        * pfn so call the sev_pin_memory() so that we can get the list of
+> +        * pages to iterate through.
+> +        */
+> +       inpages = sev_pin_memory(kvm, params.uaddr, params.len, &npages, 1);
+> +       if (!inpages)
+> +               return -ENOMEM;
+> +
+> +       /*
+> +        * Verify that all the pages are marked shared in the RMP table before
+> +        * going further. This is avoid the cases where the userspace may try
+> +        * updating the same page twice.
+> +        */
+> +       for (i = 0; i < npages; i++) {
+> +               if (snp_lookup_rmpentry(page_to_pfn(inpages[i]), &level) != 0) {
+> +                       sev_unpin_memory(kvm, inpages, npages);
+> +                       return -EFAULT;
+> +               }
+> +       }
+> +
+> +       gfn = params.start_gfn;
+> +       level = PG_LEVEL_4K;
+> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> +
+> +       for (i = 0; i < npages; i++) {
+> +               pfn = page_to_pfn(inpages[i]);
+> +
+> +               ret = rmp_make_private(pfn, gfn << PAGE_SHIFT, level, sev_get_asid(kvm), true);
+> +               if (ret) {
+> +                       ret = -EFAULT;
+> +                       goto e_unpin;
+> +               }
+> +
+> +               n++;
+> +               data.address = __sme_page_pa(inpages[i]);
+> +               data.page_size = X86_TO_RMP_PG_LEVEL(level);
+> +               data.page_type = params.page_type;
+> +               data.vmpl3_perms = params.vmpl3_perms;
+> +               data.vmpl2_perms = params.vmpl2_perms;
+> +               data.vmpl1_perms = params.vmpl1_perms;
+> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE, &data, error);
+> +               if (ret) {
+> +                       /*
+> +                        * If the command failed then need to reclaim the page.
+> +                        */
+> +                       snp_page_reclaim(pfn);
+> +                       goto e_unpin;
+> +               }
+> +
+> +               gfn++;
+> +       }
+> +
+> +e_unpin:
+> +       /* Content of memory is updated, mark pages dirty */
+> +       for (i = 0; i < n; i++) {
 
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index f82f2dd30e76..1a963f96639c 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -9,43 +9,38 @@
- 
- static struct class *uacce_class;
- static dev_t uacce_devt;
--static DEFINE_MUTEX(uacce_mutex);
- static DEFINE_XARRAY_ALLOC(uacce_xa);
- 
--static int uacce_start_queue(struct uacce_queue *q)
-+/*
-+ * If the parent driver or the device disappears, the queue state is invalid and
-+ * ops are not usable anymore.
-+ */
-+static bool uacce_queue_is_valid(struct uacce_queue *q)
- {
--	int ret = 0;
-+	return q->state == UACCE_Q_INIT || q->state == UACCE_Q_STARTED;
-+}
- 
--	mutex_lock(&uacce_mutex);
-+static int uacce_start_queue(struct uacce_queue *q)
-+{
-+	int ret;
- 
--	if (q->state != UACCE_Q_INIT) {
--		ret = -EINVAL;
--		goto out_with_lock;
--	}
-+	if (q->state != UACCE_Q_INIT)
-+		return -EINVAL;
- 
- 	if (q->uacce->ops->start_queue) {
- 		ret = q->uacce->ops->start_queue(q);
- 		if (ret < 0)
--			goto out_with_lock;
-+			return ret;
- 	}
- 
- 	q->state = UACCE_Q_STARTED;
--
--out_with_lock:
--	mutex_unlock(&uacce_mutex);
--
--	return ret;
-+	return 0;
- }
- 
- static int uacce_put_queue(struct uacce_queue *q)
- {
- 	struct uacce_device *uacce = q->uacce;
- 
--	mutex_lock(&uacce_mutex);
--
--	if (q->state == UACCE_Q_ZOMBIE)
--		goto out;
--
- 	if ((q->state == UACCE_Q_STARTED) && uacce->ops->stop_queue)
- 		uacce->ops->stop_queue(q);
- 
-@@ -54,8 +49,6 @@ static int uacce_put_queue(struct uacce_queue *q)
- 		uacce->ops->put_queue(q);
- 
- 	q->state = UACCE_Q_ZOMBIE;
--out:
--	mutex_unlock(&uacce_mutex);
- 
- 	return 0;
- }
-@@ -65,20 +58,36 @@ static long uacce_fops_unl_ioctl(struct file *filep,
- {
- 	struct uacce_queue *q = filep->private_data;
- 	struct uacce_device *uacce = q->uacce;
-+	long ret = -ENXIO;
-+
-+	/*
-+	 * uacce->ops->ioctl() may take the mmap_lock when copying arg to/from
-+	 * user. Avoid a circular lock dependency with uacce_fops_mmap(), which
-+	 * gets called with mmap_lock held, by taking uacce->mutex instead of
-+	 * q->mutex. Doing this in uacce_fops_mmap() is not possible because
-+	 * uacce_fops_open() calls iommu_sva_bind_device(), which takes
-+	 * mmap_lock, while holding uacce->mutex.
-+	 */
-+	mutex_lock(&uacce->mutex);
-+	if (!uacce_queue_is_valid(q))
-+		goto out_unlock;
- 
- 	switch (cmd) {
- 	case UACCE_CMD_START_Q:
--		return uacce_start_queue(q);
--
-+		ret = uacce_start_queue(q);
-+		break;
- 	case UACCE_CMD_PUT_Q:
--		return uacce_put_queue(q);
--
-+		ret = uacce_put_queue(q);
-+		break;
- 	default:
--		if (!uacce->ops->ioctl)
--			return -EINVAL;
--
--		return uacce->ops->ioctl(q, cmd, arg);
-+		if (uacce->ops->ioctl)
-+			ret = uacce->ops->ioctl(q, cmd, arg);
-+		else
-+			ret = -EINVAL;
- 	}
-+out_unlock:
-+	mutex_unlock(&uacce->mutex);
-+	return ret;
- }
- 
- #ifdef CONFIG_COMPAT
-@@ -136,6 +145,13 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
- 	if (!q)
- 		return -ENOMEM;
- 
-+	mutex_lock(&uacce->mutex);
-+
-+	if (!uacce->parent) {
-+		ret = -EINVAL;
-+		goto out_with_mem;
-+	}
-+
- 	ret = uacce_bind_queue(uacce, q);
- 	if (ret)
- 		goto out_with_mem;
-@@ -152,10 +168,9 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
- 	filep->private_data = q;
- 	uacce->inode = inode;
- 	q->state = UACCE_Q_INIT;
--
--	mutex_lock(&uacce->queues_lock);
-+	mutex_init(&q->mutex);
- 	list_add(&q->list, &uacce->queues);
--	mutex_unlock(&uacce->queues_lock);
-+	mutex_unlock(&uacce->mutex);
- 
- 	return 0;
- 
-@@ -163,18 +178,20 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
- 	uacce_unbind_queue(q);
- out_with_mem:
- 	kfree(q);
-+	mutex_unlock(&uacce->mutex);
- 	return ret;
- }
- 
- static int uacce_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct uacce_queue *q = filep->private_data;
-+	struct uacce_device *uacce = q->uacce;
- 
--	mutex_lock(&q->uacce->queues_lock);
--	list_del(&q->list);
--	mutex_unlock(&q->uacce->queues_lock);
-+	mutex_lock(&uacce->mutex);
- 	uacce_put_queue(q);
- 	uacce_unbind_queue(q);
-+	list_del(&q->list);
-+	mutex_unlock(&uacce->mutex);
- 	kfree(q);
- 
- 	return 0;
-@@ -217,10 +234,9 @@ static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
- 	vma->vm_private_data = q;
- 	qfr->type = type;
- 
--	mutex_lock(&uacce_mutex);
--
--	if (q->state != UACCE_Q_INIT && q->state != UACCE_Q_STARTED) {
--		ret = -EINVAL;
-+	mutex_lock(&q->mutex);
-+	if (!uacce_queue_is_valid(q)) {
-+		ret = -ENXIO;
- 		goto out_with_lock;
- 	}
- 
-@@ -248,12 +264,12 @@ static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
- 	}
- 
- 	q->qfrs[type] = qfr;
--	mutex_unlock(&uacce_mutex);
-+	mutex_unlock(&q->mutex);
- 
- 	return ret;
- 
- out_with_lock:
--	mutex_unlock(&uacce_mutex);
-+	mutex_unlock(&q->mutex);
- 	kfree(qfr);
- 	return ret;
- }
-@@ -262,12 +278,20 @@ static __poll_t uacce_fops_poll(struct file *file, poll_table *wait)
- {
- 	struct uacce_queue *q = file->private_data;
- 	struct uacce_device *uacce = q->uacce;
-+	__poll_t ret = 0;
-+
-+	mutex_lock(&q->mutex);
-+	if (!uacce_queue_is_valid(q))
-+		goto out_unlock;
- 
- 	poll_wait(file, &q->wait, wait);
-+
- 	if (uacce->ops->is_q_updated && uacce->ops->is_q_updated(q))
--		return EPOLLIN | EPOLLRDNORM;
-+		ret = EPOLLIN | EPOLLRDNORM;
- 
--	return 0;
-+out_unlock:
-+	mutex_unlock(&q->mutex);
-+	return ret;
- }
- 
- static const struct file_operations uacce_fops = {
-@@ -450,7 +474,7 @@ struct uacce_device *uacce_alloc(struct device *parent,
- 		goto err_with_uacce;
- 
- 	INIT_LIST_HEAD(&uacce->queues);
--	mutex_init(&uacce->queues_lock);
-+	mutex_init(&uacce->mutex);
- 	device_initialize(&uacce->dev);
- 	uacce->dev.devt = MKDEV(MAJOR(uacce_devt), uacce->dev_id);
- 	uacce->dev.class = uacce_class;
-@@ -507,13 +531,23 @@ void uacce_remove(struct uacce_device *uacce)
- 	if (uacce->inode)
- 		unmap_mapping_range(uacce->inode->i_mapping, 0, 0, 1);
- 
-+	/*
-+	 * uacce_fops_open() may be running concurrently, even after we remove
-+	 * the cdev. Holding uacce->mutex ensures that open() does not obtain a
-+	 * removed uacce device.
-+	 */
-+	mutex_lock(&uacce->mutex);
- 	/* ensure no open queue remains */
--	mutex_lock(&uacce->queues_lock);
- 	list_for_each_entry_safe(q, next_q, &uacce->queues, list) {
-+		/*
-+		 * Taking q->mutex ensures that fops do not use the defunct
-+		 * uacce->ops after the queue is disabled.
-+		 */
-+		mutex_lock(&q->mutex);
- 		uacce_put_queue(q);
-+		mutex_unlock(&q->mutex);
- 		uacce_unbind_queue(q);
- 	}
--	mutex_unlock(&uacce->queues_lock);
- 
- 	/* disable sva now since no opened queues */
- 	uacce_disable_sva(uacce);
-@@ -521,6 +555,13 @@ void uacce_remove(struct uacce_device *uacce)
- 	if (uacce->cdev)
- 		cdev_device_del(uacce->cdev, &uacce->dev);
- 	xa_erase(&uacce_xa, uacce->dev_id);
-+	/*
-+	 * uacce exists as long as there are open fds, but ops will be freed
-+	 * now. Ensure that bugs cause NULL deref rather than use-after-free.
-+	 */
-+	uacce->ops = NULL;
-+	uacce->parent = NULL;
-+	mutex_unlock(&uacce->mutex);
- 	put_device(&uacce->dev);
- }
- EXPORT_SYMBOL_GPL(uacce_remove);
-diff --git a/include/linux/uacce.h b/include/linux/uacce.h
-index 48e319f40275..9ce88c28b0a8 100644
---- a/include/linux/uacce.h
-+++ b/include/linux/uacce.h
-@@ -70,6 +70,7 @@ enum uacce_q_state {
-  * @wait: wait queue head
-  * @list: index into uacce queues list
-  * @qfrs: pointer of qfr regions
-+ * @mutex: protects queue state
-  * @state: queue state machine
-  * @pasid: pasid associated to the mm
-  * @handle: iommu_sva handle returned by iommu_sva_bind_device()
-@@ -80,6 +81,7 @@ struct uacce_queue {
- 	wait_queue_head_t wait;
- 	struct list_head list;
- 	struct uacce_qfile_region *qfrs[UACCE_MAX_REGION];
-+	struct mutex mutex;
- 	enum uacce_q_state state;
- 	u32 pasid;
- 	struct iommu_sva *handle;
-@@ -97,9 +99,9 @@ struct uacce_queue {
-  * @dev_id: id of the uacce device
-  * @cdev: cdev of the uacce
-  * @dev: dev of the uacce
-+ * @mutex: protects uacce operation
-  * @priv: private pointer of the uacce
-  * @queues: list of queues
-- * @queues_lock: lock for queues list
-  * @inode: core vfs
-  */
- struct uacce_device {
-@@ -113,9 +115,9 @@ struct uacce_device {
- 	u32 dev_id;
- 	struct cdev *cdev;
- 	struct device dev;
-+	struct mutex mutex;
- 	void *priv;
- 	struct list_head queues;
--	struct mutex queues_lock;
- 	struct inode *inode;
- };
- 
--- 
-2.36.1
+Since |n| is not only a loop variable but actually carries the number
+of private pages over to e_unpin can we use a more descriptive name?
+How about something like 'nprivate_pages'?
 
+> +               set_page_dirty_lock(inpages[i]);
+> +               mark_page_accessed(inpages[i]);
+> +
+> +               /*
+> +                * If its an error, then update RMP entry to change page ownership
+> +                * to the hypervisor.
+> +                */
+> +               if (ret)
+> +                       host_rmp_make_shared(pfn, level, true);
+> +       }
+> +
+> +       /* Unlock the user pages */
+> +       sev_unpin_memory(kvm, inpages, npages);
+> +
+> +       return ret;
+> +}
+> +
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -1995,6 +2156,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>         case KVM_SEV_SNP_LAUNCH_START:
+>                 r = snp_launch_start(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_SNP_LAUNCH_UPDATE:
+> +               r = snp_launch_update(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r = -EINVAL;
+>                 goto out;
+> @@ -2113,6 +2277,29 @@ find_enc_region(struct kvm *kvm, struct kvm_enc_region *range)
+>  static void __unregister_enc_region_locked(struct kvm *kvm,
+>                                            struct enc_region *region)
+>  {
+> +       unsigned long i, pfn;
+> +       int level;
+> +
+> +       /*
+> +        * The guest memory pages are assigned in the RMP table. Unassign it
+> +        * before releasing the memory.
+> +        */
+> +       if (sev_snp_guest(kvm)) {
+> +               for (i = 0; i < region->npages; i++) {
+> +                       pfn = page_to_pfn(region->pages[i]);
+> +
+> +                       if (!snp_lookup_rmpentry(pfn, &level))
+> +                               continue;
+> +
+> +                       cond_resched();
+> +
+> +                       if (level > PG_LEVEL_4K)
+> +                               pfn &= ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
+> +
+> +                       host_rmp_make_shared(pfn, level, true);
+> +               }
+> +       }
+> +
+>         sev_unpin_memory(kvm, region->pages, region->npages);
+>         list_del(&region->list);
+>         kfree(region);
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 0cb119d66ae5..9b36b07414ea 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1813,6 +1813,7 @@ enum sev_cmd_id {
+>         /* SNP specific commands */
+>         KVM_SEV_SNP_INIT,
+>         KVM_SEV_SNP_LAUNCH_START,
+> +       KVM_SEV_SNP_LAUNCH_UPDATE,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -1929,6 +1930,24 @@ struct kvm_sev_snp_launch_start {
+>         __u8 pad[6];
+>  };
+>
+> +#define KVM_SEV_SNP_PAGE_TYPE_NORMAL           0x1
+> +#define KVM_SEV_SNP_PAGE_TYPE_VMSA             0x2
+> +#define KVM_SEV_SNP_PAGE_TYPE_ZERO             0x3
+> +#define KVM_SEV_SNP_PAGE_TYPE_UNMEASURED       0x4
+> +#define KVM_SEV_SNP_PAGE_TYPE_SECRETS          0x5
+> +#define KVM_SEV_SNP_PAGE_TYPE_CPUID            0x6
+> +
+> +struct kvm_sev_snp_launch_update {
+> +       __u64 start_gfn;
+> +       __u64 uaddr;
+> +       __u32 len;
+> +       __u8 imi_page;
+> +       __u8 page_type;
+> +       __u8 vmpl3_perms;
+> +       __u8 vmpl2_perms;
+> +       __u8 vmpl1_perms;
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.25.1
+>
