@@ -2,105 +2,116 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12188C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 11:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347A5C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 13:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231350AbiFXLoa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 07:44:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
+        id S229743AbiFXNEj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 09:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231331AbiFXLo3 (ORCPT
+        with ESMTP id S229450AbiFXNEi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 07:44:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0C64EDEC;
-        Fri, 24 Jun 2022 04:44:29 -0700 (PDT)
+        Fri, 24 Jun 2022 09:04:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED1C43EDF;
+        Fri, 24 Jun 2022 06:04:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B754C6221A;
-        Fri, 24 Jun 2022 11:44:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A95C7C34114;
-        Fri, 24 Jun 2022 11:44:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1656071068;
-        bh=wuFcb8zHRqDd4Ot8oA4+RHa9LKDGhYTvTXxLoTJJzjY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gUfodt5d1PJr726uOh95E2mHi9RldLj005llgN4lHR09iIA2JJWy7To2jdB02Cqbr
-         nJCscFPYWI1O+PjHe1yvqonyPWexOxARneP8FzGuynes2W/GT8aSNJf4laMstmCWcv
-         E0umCEKb3FM48UTwBrLUBb7Rw/ozbUHr3XIkQb4s=
-Date:   Fri, 24 Jun 2022 08:44:45 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     "yekai(A)" <yekai13@huawei.com>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linuxarm@huawei.com, zhangfei.gao@linaro.org,
-        wangzhou1@hisilicon.com
-Subject: Re: [PATCH v4 2/3] Documentation: add a isolation strategy sysfs
- node for uacce
-Message-ID: <YrVdXcO9VLe8J/FP@kroah.com>
-References: <20220623061452.40732-1-yekai13@huawei.com>
- <20220623061452.40732-3-yekai13@huawei.com>
- <YrQr/3URWsdowov9@kroah.com>
- <f25514f8-2d34-5911-b29f-a520d1df3db4@huawei.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 70A63B827B2;
+        Fri, 24 Jun 2022 13:04:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71C3C341C0;
+        Fri, 24 Jun 2022 13:04:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PKMvwX+X"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1656075872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1AD2JTwzEZZmB9x9wgRCyqulDsjFck59n65sLgL8zP4=;
+        b=PKMvwX+XxGk0rzspnBQ4HekkUXdtfxKMr8HBrzRBdJoB4wbKFsurLTzMaDyS2JIfy1bnEn
+        71TB3pQWjahxttdtujDQU+LefYtu3pddo7Ddu/zXsMCNn3g7CyT0lgPCnAbRHf6ELTO4Dq
+        KlK/4s9pWSIikfc0IQ+/9ecbb/KjWhg=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 999bdd6e (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Fri, 24 Jun 2022 13:04:31 +0000 (UTC)
+Received: by mail-io1-f43.google.com with SMTP id r133so2620352iod.3;
+        Fri, 24 Jun 2022 06:04:31 -0700 (PDT)
+X-Gm-Message-State: AJIora/UOLJ+od33vcB+85DiBCDkmTsdLw5l5/JDbl1IvcjRzMJsyCqP
+        lGU9+JtX5h+eUp3+64UO6dtYCkn+uYpV8DEOEtw=
+X-Google-Smtp-Source: AGRyM1uo9ANk98S66aQl+us7wOOHTaTQlSDx1P0iA3tZNcY+HUBiJtQI8am7cm6IyUGLpkmKMrRcvG3mXNtBLVPnM8A=
+X-Received: by 2002:a02:9709:0:b0:339:ef87:c30b with SMTP id
+ x9-20020a029709000000b00339ef87c30bmr3981461jai.214.1656075870353; Fri, 24
+ Jun 2022 06:04:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f25514f8-2d34-5911-b29f-a520d1df3db4@huawei.com>
+References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-10-Jason@zx2c4.com>
+ <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk> <YmicjVbkcppfzE1E@zx2c4.com>
+In-Reply-To: <YmicjVbkcppfzE1E@zx2c4.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 24 Jun 2022 15:04:19 +0200
+X-Gmail-Original-Message-ID: <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
+Message-ID: <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
+Subject: Re: [PATCH v6 09/17] mips: use fallback for random_get_entropy()
+ instead of just c0 random
+To:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 11:25:10AM +0800, yekai(A) wrote:
-> 
-> 
-> On 2022/6/23 17:01, Greg KH wrote:
-> > On Thu, Jun 23, 2022 at 02:14:51PM +0800, Kai Ye wrote:
-> > > Update documentation describing sysfs node that could help to
-> > > configure isolation method command for users in th user space.
-> > > 
-> > > Signed-off-by: Kai Ye <yekai13@huawei.com>
-> > > ---
-> > >  Documentation/ABI/testing/sysfs-driver-uacce | 18 ++++++++++++++++++
-> > >  1 file changed, 18 insertions(+)
-> > > 
-> > > diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
-> > > index 08f2591138af..8784efa96e01 100644
-> > > --- a/Documentation/ABI/testing/sysfs-driver-uacce
-> > > +++ b/Documentation/ABI/testing/sysfs-driver-uacce
-> > > @@ -19,6 +19,24 @@ Contact:        linux-accelerators@lists.ozlabs.org
-> > >  Description:    Available instances left of the device
-> > >                  Return -ENODEV if uacce_ops get_available_instances is not provided
-> > > 
-> > > +What:           /sys/class/uacce/<dev_name>/isolate_strategy
-> > > +Date:           Jun 2022
-> > > +KernelVersion:  5.20
-> > > +Contact:        linux-accelerators@lists.ozlabs.org
-> > > +Description:    A sysfs node that used to configures the hardware error
-> > > +                isolation method command. The command can be parsed
-> > > +                in correct driver. e.g. If the device slot reset frequency
-> > > +                exceeds the preset value in a time window, the device will be
-> > > +                isolated.
-> > 
-> > What is the "command"?  What is being parsed?  This needs to be
-> > documented a lot more here, this is very vague and not obvious at all.
-> > 
-> > 
-> 
-> This command is a string command issued by the user. After the command is
-> configured, the acc driver parses the command.
+Hey Maciej,
 
-I am sorry, but I do not understand what you mean here.  What exactly is
-a "command"?  What format is it in?  What are valid commands?  What are
-invalid commands?  Are these commands different for different devices?
-What do the commands do?  What are the return values for the commands?
-And so on.
+On Wed, Apr 27, 2022 at 3:29 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Hey Maciej,
+>
+> On Tue, Apr 26, 2022 at 09:28:39PM +0100, Maciej W. Rozycki wrote:
+> > On Sat, 23 Apr 2022, Jason A. Donenfeld wrote:
+> >
+> > > diff --git a/arch/mips/include/asm/timex.h b/arch/mips/include/asm/timex.h
+> > > index b05bb70a2e46..8cfa485d19e6 100644
+> > > --- a/arch/mips/include/asm/timex.h
+> > > +++ b/arch/mips/include/asm/timex.h
+> > [...]
+> > > +   if (cpu_has_3kex)
+> > > +           c0_random = (read_c0_random() >> 8) & 0x3f;
+> >
+> >  Hmm, I wonder whether we do need to mask the contents of the register out
+> > here given that known implementations return zeros in reserved bits.  Even
+> > though R3000 documentation I have access to makes no guarantee as to the
+> > values of the reserved bits here I think we can safely proceed according
+> > to what systems we do actually support do (even though it only saves one
+> > instruction).
+> >
+> > >     else
+> > > -           return 0;       /* no usable register */
+> > > +           c0_random = read_c0_random() & 0x3f;
+> >
+> >  Here the architecture guarantees unused bits to be zero, but the number
+> > of them varies between implementations.  However we'll only ever use this
+> > leg for the R4000/R4400 processors, which have 48 TLB entries, and for the
+> > Ingenic XBurst cores, which I have now verified in documentation (which
+> > user-reported dumps from /proc/cpuinfo are consistent with) that have 32
+> > TLB entries.  So I think this mask operation can go as well.
+> >
+> >  I guess these updates can be made with a follow-up change though.
+>
+> There is lots of optimization potential on a few fronts we've identified
+> in this thread. Let's save these for a follow-up. I'd rather this
+> initial one be at least somewhat simple, so that as it gets optimized,
+> it'll be easy to handle regressions. Also, it probably makes sense for
+> you to send the patches for these, since you have both the hardware
+> chops and the hardware itself to assess these ideas. I am interested in
+> the topic though, so please do CC me.
 
-You are creating a new user/kernel API here and so you must define it
-very specifically.  You have not speficied anything for us to know how
-this works at all and so we can not accept this for that reason alone
-(nor should you want us to.)
+Everything has been upstream for a little while now, which means
+development of this can move back to the proper MIPS tree like normal.
+Did you want to submit some optimizations? Would be happy to look at
+whatever you have in mind.
 
-thanks,
-
-greg k-h
+Jason
