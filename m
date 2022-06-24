@@ -2,77 +2,307 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 095BEC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 13:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276E8C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 14:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbiFXNZV (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 09:25:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60228 "EHLO
+        id S232427AbiFXOUK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 10:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbiFXNZU (ORCPT
+        with ESMTP id S232373AbiFXOUI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 09:25:20 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47E8F527EA;
-        Fri, 24 Jun 2022 06:25:19 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id 614A692009C; Fri, 24 Jun 2022 15:25:17 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id 53F1E92009B;
-        Fri, 24 Jun 2022 14:25:17 +0100 (BST)
-Date:   Fri, 24 Jun 2022 14:25:17 +0100 (BST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-cc:     LKML <linux-kernel@vger.kernel.org>,
+        Fri, 24 Jun 2022 10:20:08 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D442D54FB7
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:20:05 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id by38so2920769ljb.10
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:20:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DX4gKze+gSLugENwiJT/N67T0nY4kiuroWR4tE5f6EI=;
+        b=VfEBDmF+RRx2AePp1LKNOXvU7WJWT/O2vbwOK6TcFPNB4pQVsyY0RfX4vhJAh+Mbnb
+         CSpLC4DuU04b6TaGJLqjByKLSlK8rMKagv+1X/BnF+DG6FGTeJTqco41IJxg4BBknO2c
+         9nU6xj5VrURoXdlBlHE2MMDs0tD3YctaUDGt7Tex6JVeCdE7WaXXjW/s4w+mK5j07sok
+         iU8nUCW2GGMNSUiRP8CU+ZLEXk2iKTAe2x+UOMTYWOweClggqSOEWwk7/xetU7NHaeBl
+         PymrdlAltUTGV2UX8jh43nTF58/YGtacCmmHQYeAbukWxoteTQOVOrjG4tdcO81x/oRY
+         ogCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DX4gKze+gSLugENwiJT/N67T0nY4kiuroWR4tE5f6EI=;
+        b=Fml/7momVYXwMT5Ki9BkL4mPi9VvvJN0jZdxZj1mmJNaVCgVS46CDXSfumgE/dPXj9
+         nCOm1r4jnuSCjdm9wLInV+AvHe1CW83lrYXyAqk/Wsf/3PwdEug/LIRzKXtH1SeoM200
+         ht5fRdbBJevaGYOsyuyx42Dti3f5hX0YWtX/EAA9hYAE5L5h0/nT/RVGX5zRrb5WZ6lM
+         C2TRRINv/e+Ywsj/kHmGt7UMlpbShNJ0kUGAms+qb6PV0FHV84/5DmIdE8/Iy2nD8MlQ
+         HSEdoUTFKhLm04ONsx+ef7g8UV82SacUbRC0gsITdVz+QjtsDesyQiiKyg3XJ5wGvD65
+         eOMg==
+X-Gm-Message-State: AJIora/8yD1PZxHjVHuTL8IbTYMQmvKEJYzLU4adJ5LF2A1TeE6+DchP
+        TobYXcXtvA0M6eIxpJcH1WGazRKeApLfLBxVYKTOqQ==
+X-Google-Smtp-Source: AGRyM1vckgLN+sbO6XgC0Dq/BPpCpn8v6O+aur4z8QeasCmZg9NVntlD3MncTmewgOzkhrloR2oEBJ1vuZjhWgVXoSA=
+X-Received: by 2002:a2e:2a43:0:b0:25a:84a9:921c with SMTP id
+ q64-20020a2e2a43000000b0025a84a9921cmr7482170ljq.83.1656080403810; Fri, 24
+ Jun 2022 07:20:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1655761627.git.ashish.kalra@amd.com> <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6ruxMazN3NmWHsemDNQj6Uj0PhCVeaxw2unCxU=YZFRWw@mail.gmail.com> <SN6PR12MB276722570164ECD120BA4D628EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB276722570164ECD120BA4D628EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 24 Jun 2022 08:19:52 -0600
+Message-ID: <CAMkAt6pcsgp7BK4WGnvTTNayN9zD8wx5CjprnY2Xe_RnpP3sEA@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
+ allocation when SNP is enabled
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: Re: [PATCH v6 09/17] mips: use fallback for random_get_entropy()
- instead of just c0 random
-In-Reply-To: <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.2206241407240.22231@angie.orcam.me.uk>
-References: <20220423212623.1957011-1-Jason@zx2c4.com> <20220423212623.1957011-10-Jason@zx2c4.com> <alpine.DEB.2.21.2204250113440.9383@angie.orcam.me.uk> <YmicjVbkcppfzE1E@zx2c4.com> <CAHmME9r-wTkNGVj0sBOM5LVY=jdAw99gne-1g-mwjBnk3q7VqQ@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+On Tue, Jun 21, 2022 at 2:17 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
+>
+> [Public]
+>
+> Hello Peter,
+>
+> >> +static int snp_reclaim_pages(unsigned long pfn, unsigned int npages,
+> >> +bool locked) {
+> >> +       struct sev_data_snp_page_reclaim data;
+> >> +       int ret, err, i, n =3D 0;
+> >> +
+> >> +       for (i =3D 0; i < npages; i++) {
+>
+> >What about setting |n| here too, also the other increments.
+>
+> >for (i =3D 0, n =3D 0; i < npages; i++, n++, pfn++)
+>
+> Yes that is simpler.
+>
+> >> +               memset(&data, 0, sizeof(data));
+> >> +               data.paddr =3D pfn << PAGE_SHIFT;
+> >> +
+> >> +               if (locked)
+> >> +                       ret =3D __sev_do_cmd_locked(SEV_CMD_SNP_PAGE_R=
+ECLAIM, &data, &err);
+> >> +               else
+> >> +                       ret =3D sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM,
+> >> + &data, &err);
+>
+> > Can we change `sev_cmd_mutex` to some sort of nesting lock type? That c=
+ould clean up this if (locked) code.
+>
+> > +static inline int rmp_make_firmware(unsigned long pfn, int level) {
+> > +       return rmp_make_private(pfn, 0, level, 0, true); }
+> > +
+> > +static int snp_set_rmp_state(unsigned long paddr, unsigned int npages,=
+ bool to_fw, bool locked,
+> > +                            bool need_reclaim)
+>
+> >This function can do a lot and when I read the call sites its hard to se=
+e what its doing since we have a combination of arguments which tell us wha=
+t behavior is happening, some of which are not valid (ex: to_fw =3D=3D true=
+ and need_reclaim =3D=3D true is an >invalid argument combination).
+>
+> to_fw is used to make a firmware page and need_reclaim is for freeing the=
+ firmware page, so they are going to be mutually exclusive.
+>
+> I actually can connect with it quite logically with the callers :
+> snp_alloc_firmware_pages will call with to_fw =3D true and need_reclaim =
+=3D false
+> and snp_free_firmware_pages will do the opposite, to_fw =3D false and nee=
+d_reclaim =3D true.
+>
+> That seems straightforward to look at.
 
-> > There is lots of optimization potential on a few fronts we've identified
-> > in this thread. Let's save these for a follow-up. I'd rather this
-> > initial one be at least somewhat simple, so that as it gets optimized,
-> > it'll be easy to handle regressions. Also, it probably makes sense for
-> > you to send the patches for these, since you have both the hardware
-> > chops and the hardware itself to assess these ideas. I am interested in
-> > the topic though, so please do CC me.
-> 
-> Everything has been upstream for a little while now, which means
-> development of this can move back to the proper MIPS tree like normal.
-> Did you want to submit some optimizations? Would be happy to look at
-> whatever you have in mind.
+This might be a preference thing but I find it not straightforward.
+When I am reading through unmap_firmware_writeable() and I see
 
- Thank you for the heads-up!
+  /* Transition the pre-allocated buffer to the firmware state. */
+  if (snp_set_rmp_state(__pa(map->host), npages, true, true, false))
+   return -EFAULT;
 
- Unfortunately I'm a little stuck at the moment, especially as one of my
-main MIPS machines (a 5Kc Malta system) died mid-May while operating.  It 
-seems to be a faulty CPU core card and the base board may be fine, though 
-I cannot know for sure as I only have one each and I don't have a logic 
-analyser or at least a JTAG probe to peek at the system and see what's 
-going on inside.
+I don't actually know what snp_set_rmp_state() is doing unless I go
+look at the definition and see what all those booleans mean. This is
+unlike the rmp_make_shared() and rmp_make_private() functions, each of
+which tells me a lot more about what the function will do just from
+the name.
 
- If anyone knows a source of a replacement Malta, preferably with a 5Kc 
-CoreLV CPU module or another 64-bit hard core card (a number of different 
-ones have been made), then I'll appreciate if you let me know.  I feel 
-rather depressed knowing that many if not most hit the scrapper already 
-while they could still find a good use.  Somehow it is easier to get way 
-more obsolete hardware from 1980/90s just because it was general purpose 
-rather than niche.
 
- Otherwise I'll try to get back to this stuff later in the year with 
-whatever I have that still runs, but don't hold your breath.  Sorry!
-
-  Maciej
+>
+> >Also this for loop over |npages| is duplicated from snp_reclaim_pages().=
+ One improvement here is that on the current
+> >snp_reclaim_pages() if we fail to reclaim a page we assume we cannot rec=
+laim the next pages, this may cause us to snp_leak_pages() more pages than =
+we actually need too.
+>
+> Yes that is true.
+>
+> >What about something like this?
+>
+> >static snp_leak_page(u64 pfn, enum pg_level level) {
+> >   memory_failure(pfn, 0);
+> >   dump_rmpentry(pfn);
+> >}
+>
+> >static int snp_reclaim_page(u64 pfn, enum pg_level level) {
+> >  int ret;
+> >  struct sev_data_snp_page_reclaim data;
+>
+> >  ret =3D sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err);
+> >  if (ret)
+> >    goto cleanup;
+>
+> >  ret =3D rmp_make_shared(pfn, level);
+> >  if (ret)
+> >    goto cleanup;
+>
+> > return 0;
+>
+> >cleanup:
+> >    snp_leak_page(pfn, level)
+> >}
+>
+> >typedef int (*rmp_state_change_func) (u64 pfn, enum pg_level level);
+>
+> >static int snp_set_rmp_state(unsigned long paddr, unsigned int npages, r=
+mp_state_change_func state_change, rmp_state_change_func cleanup) {
+> >  struct sev_data_snp_page_reclaim data;
+> >  int ret, err, i, n =3D 0;
+>
+> >  for (i =3D 0, n =3D 0; i < npages; i++, n++, pfn++) {
+> >    ret =3D state_change(pfn, PG_LEVEL_4K)
+> >    if (ret)
+> >      goto cleanup;
+> >  }
+>
+> >  return 0;
+>
+> > cleanup:
+> >  for (; i>=3D 0; i--, n--, pfn--) {
+> >    cleanup(pfn, PG_LEVEL_4K);
+> >  }
+>
+> >  return ret;
+> >}
+>
+> >Then inside of __snp_alloc_firmware_pages():
+>
+> >snp_set_rmp_state(paddr, npages, rmp_make_firmware, snp_reclaim_page);
+>
+> >And inside of __snp_free_firmware_pages():
+>
+> >snp_set_rmp_state(paddr, npages, snp_reclaim_page, snp_leak_page);
+>
+> >Just a suggestion feel free to ignore. The readability comment could be =
+addressed much less invasively by just making separate functions for each v=
+alid combination of arguments here. Like snp_set_rmp_fw_state(), snp_set_rm=
+p_shared_state(),
+> >snp_set_rmp_release_state() or something.
+>
+> >> +static struct page *__snp_alloc_firmware_pages(gfp_t gfp_mask, int
+> >> +order, bool locked) {
+> >> +       unsigned long npages =3D 1ul << order, paddr;
+> >> +       struct sev_device *sev;
+> >> +       struct page *page;
+> >> +
+> >> +       if (!psp_master || !psp_master->sev_data)
+> >> +               return NULL;
+> >> +
+> >> +       page =3D alloc_pages(gfp_mask, order);
+> >> +       if (!page)
+> >> +               return NULL;
+> >> +
+> >> +       /* If SEV-SNP is initialized then add the page in RMP table. *=
+/
+> >> +       sev =3D psp_master->sev_data;
+> >> +       if (!sev->snp_inited)
+> >> +               return page;
+> >> +
+> >> +       paddr =3D __pa((unsigned long)page_address(page));
+> >> +       if (snp_set_rmp_state(paddr, npages, true, locked, false))
+> >> +               return NULL;
+>
+> >So what about the case where snp_set_rmp_state() fails but we were able =
+to reclaim all the pages? Should we be able to signal that to callers so th=
+at we could free |page| here? But given this is an error path already maybe=
+ we can optimize this in a >follow up series.
+>
+> Yes, we should actually tie in to snp_reclaim_pages() success or failure =
+here in the case we were able to successfully unroll some or all of the fir=
+mware state change.
+>
+> > +
+> > +       return page;
+> > +}
+> > +
+> > +void *snp_alloc_firmware_page(gfp_t gfp_mask) {
+> > +       struct page *page;
+> > +
+> > +       page =3D __snp_alloc_firmware_pages(gfp_mask, 0, false);
+> > +
+> > +       return page ? page_address(page) : NULL; }
+> > +EXPORT_SYMBOL_GPL(snp_alloc_firmware_page);
+> > +
+> > +static void __snp_free_firmware_pages(struct page *page, int order,
+> > +bool locked) {
+> > +       unsigned long paddr, npages =3D 1ul << order;
+> > +
+> > +       if (!page)
+> > +               return;
+> > +
+> > +       paddr =3D __pa((unsigned long)page_address(page));
+> > +       if (snp_set_rmp_state(paddr, npages, false, locked, true))
+> > +               return;
+>
+> > Here we may be able to free some of |page| depending how where inside o=
+f snp_set_rmp_state() we failed. But again given this is an error path alre=
+ady maybe we can optimize this in a follow up series.
+>
+> Yes, we probably should be able to free some of the page(s) depending on =
+how many page(s) got reclaimed in snp_set_rmp_state().
+> But these reclamation failures may not be very common, so any failure is =
+indicative of a bigger issue, it might be the case when there is a single p=
+age reclamation error it might happen with all the subsequent
+> pages and so follow a simple recovery procedure, then handling a more com=
+plex recovery for a chunk of pages being reclaimed and another chunk not.
+>
+> Thanks,
+> Ashish
+>
+>
+>
