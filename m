@@ -2,89 +2,105 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D22D2C43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 11:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12188C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 11:44:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiFXLOK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 07:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44328 "EHLO
+        id S231350AbiFXLoa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 07:44:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbiFXLOI (ORCPT
+        with ESMTP id S231331AbiFXLo3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 07:14:08 -0400
-Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E73F590;
-        Fri, 24 Jun 2022 04:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1656069248; x=1687605248;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=C+2JZuxDaO1dSIA4AcGGYwxdg94USAJGnnLvJk44KPE=;
-  b=ZyJehayBCS4F5HAfRhDna7hAMppHgQW85arUHXE+t/ZduitmvoG3XdFN
-   oxIvKFPyYYgHAQNKlnop68h8aJqpjXFYsNrhweRTWN+s3FRa4nv1E69wB
-   xsndBLgxl35eUiNiu7dZIcJIGbMGUtxbQndvLZxKHx36d09LTQNQGaRBR
-   Y=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 24 Jun 2022 04:14:07 -0700
-X-QCInternal: smtphost
-Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
-  by ironmsg02-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 04:14:07 -0700
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Fri, 24 Jun 2022 04:14:07 -0700
-Received: from ubuntu.qualcomm.com (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Fri, 24 Jun
- 2022 04:14:05 -0700
-From:   Qian Cai <quic_qiancai@quicinc.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     Ard Biesheuvel <ardb@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Qian Cai <quic_qiancai@quicinc.com>
-Subject: [PATCH] arm64/crypto: Select AEAD for GHASH_ARM64_CE
-Date:   Fri, 24 Jun 2022 07:13:38 -0400
-Message-ID: <20220624111338.209380-1-quic_qiancai@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 24 Jun 2022 07:44:29 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0C64EDEC;
+        Fri, 24 Jun 2022 04:44:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B754C6221A;
+        Fri, 24 Jun 2022 11:44:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A95C7C34114;
+        Fri, 24 Jun 2022 11:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656071068;
+        bh=wuFcb8zHRqDd4Ot8oA4+RHa9LKDGhYTvTXxLoTJJzjY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gUfodt5d1PJr726uOh95E2mHi9RldLj005llgN4lHR09iIA2JJWy7To2jdB02Cqbr
+         nJCscFPYWI1O+PjHe1yvqonyPWexOxARneP8FzGuynes2W/GT8aSNJf4laMstmCWcv
+         E0umCEKb3FM48UTwBrLUBb7Rw/ozbUHr3XIkQb4s=
+Date:   Fri, 24 Jun 2022 08:44:45 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "yekai(A)" <yekai13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linuxarm@huawei.com, zhangfei.gao@linaro.org,
+        wangzhou1@hisilicon.com
+Subject: Re: [PATCH v4 2/3] Documentation: add a isolation strategy sysfs
+ node for uacce
+Message-ID: <YrVdXcO9VLe8J/FP@kroah.com>
+References: <20220623061452.40732-1-yekai13@huawei.com>
+ <20220623061452.40732-3-yekai13@huawei.com>
+ <YrQr/3URWsdowov9@kroah.com>
+ <f25514f8-2d34-5911-b29f-a520d1df3db4@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f25514f8-2d34-5911-b29f-a520d1df3db4@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Otherwise, we could fail to compile.
+On Fri, Jun 24, 2022 at 11:25:10AM +0800, yekai(A) wrote:
+> 
+> 
+> On 2022/6/23 17:01, Greg KH wrote:
+> > On Thu, Jun 23, 2022 at 02:14:51PM +0800, Kai Ye wrote:
+> > > Update documentation describing sysfs node that could help to
+> > > configure isolation method command for users in th user space.
+> > > 
+> > > Signed-off-by: Kai Ye <yekai13@huawei.com>
+> > > ---
+> > >  Documentation/ABI/testing/sysfs-driver-uacce | 18 ++++++++++++++++++
+> > >  1 file changed, 18 insertions(+)
+> > > 
+> > > diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+> > > index 08f2591138af..8784efa96e01 100644
+> > > --- a/Documentation/ABI/testing/sysfs-driver-uacce
+> > > +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+> > > @@ -19,6 +19,24 @@ Contact:        linux-accelerators@lists.ozlabs.org
+> > >  Description:    Available instances left of the device
+> > >                  Return -ENODEV if uacce_ops get_available_instances is not provided
+> > > 
+> > > +What:           /sys/class/uacce/<dev_name>/isolate_strategy
+> > > +Date:           Jun 2022
+> > > +KernelVersion:  5.20
+> > > +Contact:        linux-accelerators@lists.ozlabs.org
+> > > +Description:    A sysfs node that used to configures the hardware error
+> > > +                isolation method command. The command can be parsed
+> > > +                in correct driver. e.g. If the device slot reset frequency
+> > > +                exceeds the preset value in a time window, the device will be
+> > > +                isolated.
+> > 
+> > What is the "command"?  What is being parsed?  This needs to be
+> > documented a lot more here, this is very vague and not obvious at all.
+> > 
+> > 
+> 
+> This command is a string command issued by the user. After the command is
+> configured, the acc driver parses the command.
 
-ld: arch/arm64/crypto/ghash-ce-glue.o: in function 'ghash_ce_mod_exit':
-ghash-ce-glue.c:(.exit.text+0x24): undefined reference to 'crypto_unregister_aead'
-ld: arch/arm64/crypto/ghash-ce-glue.o: in function 'ghash_ce_mod_init':
-ghash-ce-glue.c:(.init.text+0x34): undefined reference to 'crypto_register_aead'
+I am sorry, but I do not understand what you mean here.  What exactly is
+a "command"?  What format is it in?  What are valid commands?  What are
+invalid commands?  Are these commands different for different devices?
+What do the commands do?  What are the return values for the commands?
+And so on.
 
-Fixes: 537c1445ab0b ("crypto: arm64/gcm - implement native driver using v8 Crypto Extensions")
-Signed-off-by: Qian Cai <quic_qiancai@quicinc.com>
----
- arch/arm64/crypto/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+You are creating a new user/kernel API here and so you must define it
+very specifically.  You have not speficied anything for us to know how
+this works at all and so we can not accept this for that reason alone
+(nor should you want us to.)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 4391a463abd7..60db5bb2ddda 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -71,6 +71,7 @@ config CRYPTO_GHASH_ARM64_CE
- 	select CRYPTO_HASH
- 	select CRYPTO_GF128MUL
- 	select CRYPTO_LIB_AES
-+	select CRYPTO_AEAD
- 
- config CRYPTO_POLYVAL_ARM64_CE
- 	tristate "POLYVAL using ARMv8 Crypto Extensions (for HCTR2)"
--- 
-2.34.1
+thanks,
 
+greg k-h
