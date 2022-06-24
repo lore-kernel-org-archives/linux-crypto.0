@@ -2,97 +2,153 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E107C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 14:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF68CCA481
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 14:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232887AbiFXOi2 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 10:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35642 "EHLO
+        id S233281AbiFXOn0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 10:43:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232644AbiFXOhw (ORCPT
+        with ESMTP id S233451AbiFXOnB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 10:37:52 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C081456C34;
-        Fri, 24 Jun 2022 07:37:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 732EAB8292C;
-        Fri, 24 Jun 2022 14:37:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE7C7C3411C;
-        Fri, 24 Jun 2022 14:37:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1656081464;
-        bh=hwkWxLhPvE3I9Sum64sHBLZwcLuYQFUFCNO9IhEHEpo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=sm3+TvzJ17HUWUEtgIhF2H8go4OXYUIVdKKvRuz4TGlSur5GU+FhNSln64m6C4n/Y
-         7UBk3N7GkM7SJQAlk/G9D6PHc9Ew5V+VBKFZaNf1PGR69I6wpKb7ELSPXWc25APNP7
-         vmguhzWft30H5nOCZ1kgf7EBuYVESnh4aJG3J8HY=
-Date:   Fri, 24 Jun 2022 16:37:41 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        acc@openeuler.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux.dev
-Subject: Re: [PATCH v2 0/2] fix uacce concurrency issue of uacce_remove
-Message-ID: <YrXMNePEO+6ZDysd@kroah.com>
-References: <20220624142122.30528-1-zhangfei.gao@linaro.org>
+        Fri, 24 Jun 2022 10:43:01 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE6B766F
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:43:00 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id by38so2993469ljb.10
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jun 2022 07:43:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c74mHiS9ndNQXugtz6cvlyHO4YfoU5Amna4jcCNFMrs=;
+        b=H/ksdZ6l5zr/vi1yB0rt5Eri5/yAGDIDhJ+WxLtjolC+ufKy6G6zPlGl+RRyQ8X0yb
+         KHR8ASjiTXJXazdAdIrcuZ2Cs25VbGzQxT++z2kemk7qCE31TwlEGNOFZz1VF98ViVgG
+         DVB/LJous1QnTbkIZZt+g4YbndYf5ChpQiC4rpkQ5ReCIQTQumhdcGb/4pood8k+SwZN
+         paHcsBmYu6mMMyQfqBR3cSwe3jcLr2EN+96eNG+ci+lB+YDn35X5J9KksySor56ctnXt
+         T4lmVaUFlX5DI1QNKrmef517KCnrYSiznbpl/5KssWEh9sSpuWq7z0YsqPsbLgD3MCFS
+         uQtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c74mHiS9ndNQXugtz6cvlyHO4YfoU5Amna4jcCNFMrs=;
+        b=oSaZtSp1jSKWt7v8UnGCl0ssRHnpCIgRf2P5ORzbMwaXUlUddTr+zeKCNTnCh1h7yq
+         GjugfMZKJ1ko2LjSh6xdIYxrjAgXZ2rYHEP22ZVbF7FxrBlv6ASAWCiGdRP/4T+QMYh5
+         2EmKY8UYHP+LOhmV5ttZtFHadzG/uzfQZlZ1ZJXaBATWHulmqAEpmZOzrxyXQcIRymc8
+         H/cC1FIlTImo31R2oQdrzE0ZfbtiZUhdJI3p1YX+TE6s+UtMvP+ay1Xiz/l0bHyVQ1x8
+         SFaIkSTYDG6DJatxmPHXICGg3K8XcYxOzAL8YTxUlZpyJsEtIHgXr3i8wS/fpuEEyYNu
+         ViNg==
+X-Gm-Message-State: AJIora9KwH9+vz8SxXcisWuGvaLhc88TXlBk4ELiB8zsJnVbhSYegFPK
+        iFlTu9bVt8qxrYAP6TKDv1M6N91ujqGgMYcBEgP2gA==
+X-Google-Smtp-Source: AGRyM1vYszCbgCJkIeTLTax5rPL2YqFzl1LowMYrI+vR1nuQeKj/955rGAXK6XhwauP1YAq9QkIKvVeNZu/Zq5Nkw8Y=
+X-Received: by 2002:a05:651c:1549:b0:258:4386:f6a2 with SMTP id
+ y9-20020a05651c154900b002584386f6a2mr7672748ljp.527.1656081778232; Fri, 24
+ Jun 2022 07:42:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220624142122.30528-1-zhangfei.gao@linaro.org>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <6d5c899030b113755e6c093e8bb9ad123280edc6.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <6d5c899030b113755e6c093e8bb9ad123280edc6.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 24 Jun 2022 08:42:46 -0600
+Message-ID: <CAMkAt6rV0GMuMwz35fEd19Z-mxXiiO6f2pF23QxTBD70Hzxf0Q@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 24/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_START command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 24, 2022 at 10:21:20PM +0800, Zhangfei Gao wrote:
-> When uacce is working, uacce parent module can be rmmod, parent
-> device can also be removed anytime, which may cause concurrency issues.
-> Here solve the concurrency issue.
-> 
-> Jean-Philippe Brucker (1):
->   uacce: Handle parent device removal
-> 
-> Zhangfei Gao (1):
->   uacce: Handle parent driver module removal
-> 
->  drivers/misc/uacce/uacce.c | 135 ++++++++++++++++++++++++-------------
->  include/linux/uacce.h      |   6 +-
->  2 files changed, 92 insertions(+), 49 deletions(-)
-> 
-> -- 
-> 2.36.1
-> 
+>
+> +19. KVM_SNP_LAUNCH_START
+> +------------------------
+> +
+> +The KVM_SNP_LAUNCH_START command is used for creating the memory encryption
+> +context for the SEV-SNP guest. To create the encryption context, user must
+> +provide a guest policy, migration agent (if any) and guest OS visible
+> +workarounds value as defined SEV-SNP specification.
+> +
+> +Parameters (in): struct  kvm_snp_launch_start
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_snp_launch_start {
+> +                __u64 policy;           /* Guest policy to use. */
+> +                __u64 ma_uaddr;         /* userspace address of migration agent */
+> +                __u8 ma_en;             /* 1 if the migtation agent is enabled */
 
-Hi,
+migration
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+> +                __u8 imi_en;            /* set IMI to 1. */
+> +                __u8 gosvw[16];         /* guest OS visible workarounds */
+> +        };
+> +
+> +See the SEV-SNP specification for further detail on the launch input.
+> +
+>  References
+>  ==========
+>
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+>
+> +static int snp_decommission_context(struct kvm *kvm)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_decommission data = {};
+> +       int ret;
+> +
+> +       /* If context is not created then do nothing */
+> +       if (!sev->snp_context)
+> +               return 0;
+> +
+> +       data.gctx_paddr = __sme_pa(sev->snp_context);
+> +       ret = snp_guest_decommission(&data, NULL);
 
-- This looks like a new version of a previously submitted patch, but you
-  did not list below the --- line any changes from the previous version.
-  Please read the section entitled "The canonical patch format" in the
-  kernel file, Documentation/SubmittingPatches for what needs to be done
-  here to properly describe this.
+Do we have a similar race like in sev_unbind_asid() with DEACTIVATE
+and WBINVD/DF_FLUSH? The SNP_DECOMMISSION spec looks quite similar to
+DEACTIVATE.
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
+> +       if (WARN_ONCE(ret, "failed to release guest context"))
+> +               return ret;
+> +
+> +       /* free the context page now */
+> +       snp_free_firmware_page(sev->snp_context);
+> +       sev->snp_context = NULL;
+> +
+> +       return 0;
+> +}
+> +
+>  void sev_vm_destroy(struct kvm *kvm)
+>  {
+>         struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
