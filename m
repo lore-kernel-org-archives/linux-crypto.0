@@ -2,54 +2,45 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB181C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 08:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 461FFC43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 08:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbiFXIAe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 04:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48892 "EHLO
+        id S230456AbiFXIyY (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 24 Jun 2022 04:54:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbiFXIAd (ORCPT
+        with ESMTP id S230451AbiFXIyY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 04:00:33 -0400
+        Fri, 24 Jun 2022 04:54:24 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FC26B8C9;
-        Fri, 24 Jun 2022 01:00:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A190213D63;
+        Fri, 24 Jun 2022 01:54:22 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1o4eEO-00AgF9-Nt; Fri, 24 Jun 2022 17:59:58 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 24 Jun 2022 15:59:57 +0800
-Date:   Fri, 24 Jun 2022 15:59:57 +0800
+        id 1o4f50-00AhcL-Iq; Fri, 24 Jun 2022 18:54:20 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 24 Jun 2022 16:54:18 +0800
+Date:   Fri, 24 Jun 2022 16:54:18 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Qian Cai <quic_qiancai@quicinc.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] arm64/crypto: Select AEAD2 for GHASH_ARM64_CE
-Message-ID: <YrVu/T3saRzkh61I@gondor.apana.org.au>
-References: <20220622142557.144536-1-quic_qiancai@quicinc.com>
- <YrSgH//ysOd/Qumo@sol.localdomain>
- <YrS6MIhv/ze4rbxy@qian>
+To:     =?utf-8?B?5L2V56OK?= <helei.sig11@bytedance.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pizhenwei@bytedance.com
+Subject: Re: PING: [PATCH] crypto: testmgr - fix version number of RSA tests
+Message-ID: <YrV7uo9E/5aegAny@gondor.apana.org.au>
+References: <20220615091317.36995-1-helei.sig11@bytedance.com>
+ <0610F5ED-98B5-49AD-9D58-4D5960EFB3A8@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YrS6MIhv/ze4rbxy@qian>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0610F5ED-98B5-49AD-9D58-4D5960EFB3A8@bytedance.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 03:08:32PM -0400, Qian Cai wrote:
->
-> I am not sure about that. I chose CRYPTO_AEAD2 because that is in the
-> Makefile.
-> 
-> obj-$(CONFIG_CRYPTO_AEAD2) += aead.o
+On Fri, Jun 24, 2022 at 09:53:02AM +0800, 何磊 wrote:
+> PING！
 
-As Eric said, AEAD2 is for internal use only and the correct option
-for general use is CONFIG_CRYPTO_AEAD.
+Please resubmit.
 
 Thanks,
 -- 
