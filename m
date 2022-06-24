@@ -2,26 +2,26 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A57CCA47E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA93CCA47F
 	for <linux-crypto@archiver.kernel.org>; Fri, 24 Jun 2022 09:10:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231384AbiFXJKI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S231404AbiFXJKI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 24 Jun 2022 05:10:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55586 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230185AbiFXJKE (ORCPT
+        with ESMTP id S231180AbiFXJKF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 05:10:04 -0400
+        Fri, 24 Jun 2022 05:10:05 -0400
 Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 454AE4F1DE;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D844F1DA;
         Fri, 24 Jun 2022 02:10:02 -0700 (PDT)
 Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 25O8qkU0088205;
-        Fri, 24 Jun 2022 16:52:46 +0800 (GMT-8)
+        by twspam01.aspeedtech.com with ESMTP id 25O8qk0m088206;
+        Fri, 24 Jun 2022 16:52:47 +0800 (GMT-8)
         (envelope-from neal_liu@aspeedtech.com)
 Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
  (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 24 Jun
- 2022 17:08:30 +0800
+ 2022 17:08:31 +0800
 From:   Neal Liu <neal_liu@aspeedtech.com>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
@@ -38,10 +38,12 @@ CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
         <devicetree@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>
-Subject: [PATCH v4 0/5] Add Aspeed crypto driver for hardware acceleration
-Date:   Fri, 24 Jun 2022 17:08:22 +0800
-Message-ID: <20220624090827.3909179-1-neal_liu@aspeedtech.com>
+Subject: [PATCH v4 3/5] ARM: dts: aspeed: Add HACE device controller node
+Date:   Fri, 24 Jun 2022 17:08:25 +0800
+Message-ID: <20220624090827.3909179-4-neal_liu@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220624090827.3909179-1-neal_liu@aspeedtech.com>
+References: <20220624090827.3909179-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -49,72 +51,38 @@ X-Originating-IP: [192.168.10.10]
 X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
  (192.168.0.24)
 X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 25O8qkU0088205
+X-MAIL: twspam01.aspeedtech.com 25O8qk0m088206
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Aspeed Hash and Crypto Engine (HACE) is designed to accelerate the
-throughput of hash data digest, encryption and decryption.
+Add hace node to device tree for AST2600.
 
-These patches aim to add Aspeed hash & crypto driver support.
-The hash & crypto driver also pass the run-time self tests that
-take place at algorithm registration.
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+---
+ arch/arm/boot/dts/aspeed-g6.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Tested-by below configs:
-- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-- CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-- CONFIG_DMA_API_DEBUG=y
-- CONFIG_DMA_API_DEBUG_SG=y
-- CONFIG_CPU_BIG_ENDIAN=y
-
-Change since v3:
-- Use dmam_alloc_coherent() instead to manage dma_alloc_coherent().
-- Add more error handler of dma_prepare() & crypto_engine_start().
-
-Change since v2:
-- Fix endianness issue. Tested on both little endian & big endian
-  system.
-- Use common crypto hardware engine for enqueue & dequeue requests.
-- Use pre-defined IVs for SHA-family.
-- Revise error handler flow.
-- Fix sorts of coding style problems.
-
-Change since v1:
-- Add more error handlers, including DMA memory allocate/free, DMA
-  map/unmap, clock enable/disable, etc.
-- Fix check dma_map error for config DMA_API_DEBUG.
-- Fix dt-binding doc & dts node naming.
-
-
-Neal Liu (5):
-  crypto: aspeed: Add HACE hash driver
-  dt-bindings: clock: Add AST2600 HACE reset definition
-  ARM: dts: aspeed: Add HACE device controller node
-  dt-bindings: crypto: add documentation for aspeed hace
-  crypto: aspeed: add HACE crypto driver
-
- .../bindings/crypto/aspeed,ast2500-hace.yaml  |   53 +
- MAINTAINERS                                   |    7 +
- arch/arm/boot/dts/aspeed-g6.dtsi              |    8 +
- drivers/crypto/Kconfig                        |    1 +
- drivers/crypto/Makefile                       |    1 +
- drivers/crypto/aspeed/Kconfig                 |   40 +
- drivers/crypto/aspeed/Makefile                |    8 +
- drivers/crypto/aspeed/aspeed-hace-crypto.c    | 1041 ++++++++++++
- drivers/crypto/aspeed/aspeed-hace-hash.c      | 1428 +++++++++++++++++
- drivers/crypto/aspeed/aspeed-hace.c           |  301 ++++
- drivers/crypto/aspeed/aspeed-hace.h           |  289 ++++
- include/dt-bindings/clock/ast2600-clock.h     |    1 +
- 12 files changed, 3178 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2500-hace.yaml
- create mode 100644 drivers/crypto/aspeed/Kconfig
- create mode 100644 drivers/crypto/aspeed/Makefile
- create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace-hash.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace.c
- create mode 100644 drivers/crypto/aspeed/aspeed-hace.h
-
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 6660564855ff..095cf8d03616 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -323,6 +323,14 @@ apb {
+ 			#size-cells = <1>;
+ 			ranges;
+ 
++			hace: crypto@1e6d0000 {
++				compatible = "aspeed,ast2600-hace";
++				reg = <0x1e6d0000 0x200>;
++				interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&syscon ASPEED_CLK_GATE_YCLK>;
++				resets = <&syscon ASPEED_RESET_HACE>;
++			};
++
+ 			syscon: syscon@1e6e2000 {
+ 				compatible = "aspeed,ast2600-scu", "syscon", "simple-mfd";
+ 				reg = <0x1e6e2000 0x1000>;
 -- 
 2.25.1
 
