@@ -2,108 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBF2C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 Jun 2022 03:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 574ACC433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jun 2022 06:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231684AbiFYD2o (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Jun 2022 23:28:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35792 "EHLO
+        id S229957AbiFZGOd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 26 Jun 2022 02:14:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiFYD2m (ORCPT
+        with ESMTP id S229742AbiFZGOc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Jun 2022 23:28:42 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D632F3DA7A;
-        Fri, 24 Jun 2022 20:28:41 -0700 (PDT)
-Received: from [192.168.86.247] (23-119-123-228.lightspeed.sntcca.sbcglobal.net [23.119.123.228])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 7234E20C7956;
-        Fri, 24 Jun 2022 20:28:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7234E20C7956
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1656127721;
-        bh=JQrEV25Qq2xdPblGSoG19vTOK76ID9Ode4ej2R5wAh8=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=OspP72b4TUDmYtGZoMOvxPICki6wwW3eHAaAo/JIHK4PRJagLc+N0v38EbMeQQMHE
-         GQmbi9VPrzmjZCQgEKjbZsfSqFXD6mjNCv52DKX+35DahzdvBxkqCAPz007w9QwIYP
-         Ov8ZnP1gQaUxChSEwjmi+22z47+4jZ4M51gTFSp4=
-Message-ID: <3dde4d8e-5f97-dc07-1763-981942d23f12@linux.microsoft.com>
-Date:   Fri, 24 Jun 2022 20:28:39 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v4 0/5] Add Aspeed crypto driver for hardware acceleration
-Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
+        Sun, 26 Jun 2022 02:14:32 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8661211141;
+        Sat, 25 Jun 2022 23:14:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 362C2B80CF8;
+        Sun, 26 Jun 2022 06:14:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1B8C34114;
+        Sun, 26 Jun 2022 06:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656224068;
+        bh=JQwlttMtDB3217p6kWDqx5YZ0smlg/K0HqZOLlFD/z0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=auAnnXSvbKOVHIU2m2d36xg6fHwwUrQffwWT1sEK+CUh2Wu05G7CHBkMwOLr11pWT
+         /ViuNjrmpPbMQ0Mb37wHLpGvGpwPUEOA1rQ3J4QxAKRf2RoshX/e9PzM2yxZPhE+Gc
+         BAMuClWmegUrlBIt0ubzW8OybczauQmBbniRwLuMszpMA1hCW91EZ5qtZzY4uPm0nl
+         gZJqDBs4wwVR0PvaAIBo2qGg8A12KrJTg9qwPwIe2Hzi/C9uy4Og6GtBPRePRSAWrP
+         knJ+b5pWV2q7nfSTeLrNHOWDYRUjn5ypNKfT0RPX0aI231HLGH3IxoyKDxyVgTdY4w
+         JueCEwLd2t1bg==
+Date:   Sun, 26 Jun 2022 09:14:25 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Dhananjay Phadke <dhphadke@microsoft.com>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Cc:     devicetree@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-        BMC-SW@aspeedtech.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20220624090827.3909179-1-neal_liu@aspeedtech.com>
-From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
-In-Reply-To: <20220624090827.3909179-1-neal_liu@aspeedtech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "David S. Miller" <davem@davemloft.net>,
+        Elvira Khabirova <e.khabirova@omp.ru>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 0/2] pkcs7: support SM2/SM3 and EC-RDSA/streebog
+ algorithms
+Message-ID: <Yrf5QWnKL2ocoEq6@kernel.org>
+References: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
+ <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Neal,
+On Fri, Jun 17, 2022 at 05:19:03PM +0800, Tianjia Zhang wrote:
+> Hi Jarkko,
+> 
+> On 9/18/21 4:07 PM, Tianjia Zhang wrote:
+> > This series of patches integrates the two patches sended separately,
+> > resolves the conflict, and rebases on the latest code.
+> > 
+> > The two patches respectively support the SM2/SM3 and EC-RDSA/streebog
+> > algorithm combinations for the pkcs7 parser.
+> > 
+> > Elvira Khabirova (1):
+> >    pkcs7: support EC-RDSA/streebog in SignerInfo
+> > 
+> > Tianjia Zhang (1):
+> >    pkcs7: parser support SM2 and SM3 algorithms combination
+> > 
+> >   crypto/asymmetric_keys/pkcs7_parser.c | 18 ++++++++++++++++++
+> >   1 file changed, 18 insertions(+)
+> > 
+> 
+> No response from David, can you pick this?
+> 
+> Best regards,
+> Tianjia
 
-On 6/24/2022 2:08 AM, Neal Liu wrote:
-> Aspeed Hash and Crypto Engine (HACE) is designed to accelerate the
-> throughput of hash data digest, encryption and decryption.
-> 
-> These patches aim to add Aspeed hash & crypto driver support.
-> The hash & crypto driver also pass the run-time self tests that
-> take place at algorithm registration.
-> 
-> Tested-by below configs:
-> - CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-> - CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> - CONFIG_DMA_API_DEBUG=y
-> - CONFIG_DMA_API_DEBUG_SG=y
-> - CONFIG_CPU_BIG_ENDIAN=y
-> 
-> Change since v3:
-> - Use dmam_alloc_coherent() instead to manage dma_alloc_coherent().
-> - Add more error handler of dma_prepare() & crypto_engine_start().
-> 
-> Change since v2:
-> - Fix endianness issue. Tested on both little endian & big endian
->    system.
-> - Use common crypto hardware engine for enqueue & dequeue requests.
-> - Use pre-defined IVs for SHA-family.
-> - Revise error handler flow.
-> - Fix sorts of coding style problems.
-> 
-> Change since v1:
-> - Add more error handlers, including DMA memory allocate/free, DMA
->    map/unmap, clock enable/disable, etc.
-> - Fix check dma_map error for config DMA_API_DEBUG.
-> - Fix dt-binding doc & dts node naming.
-> 
-> 
-> Neal Liu (5):
->    crypto: aspeed: Add HACE hash driver
->    dt-bindings: clock: Add AST2600 HACE reset definition
->    ARM: dts: aspeed: Add HACE device controller node
->    dt-bindings: crypto: add documentation for aspeed hace
->    crypto: aspeed: add HACE crypto driver
+You should CC me the series then.
 
-The driver claims compatible with aspeed,ast2500-hace, but there's no
-equivalent g5 DTS change (patch 3/5) or reset definition (patch 2/5) in
-aspeed-clock.h? Either drop ast2500 compatible from this patch series or 
-fix these.
-
-Thanks,
-Dhananjay
+BR, Jarkko
