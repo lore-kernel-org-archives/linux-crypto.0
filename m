@@ -2,114 +2,109 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA34C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jun 2022 23:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5117FCCA47B
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jun 2022 23:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238716AbiF0XOr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jun 2022 19:14:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52388 "EHLO
+        id S240368AbiF0XS6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Jun 2022 19:18:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237641AbiF0XOr (ORCPT
+        with ESMTP id S240970AbiF0XRJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jun 2022 19:14:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848E623140;
-        Mon, 27 Jun 2022 16:14:46 -0700 (PDT)
+        Mon, 27 Jun 2022 19:17:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CD6237E9;
+        Mon, 27 Jun 2022 16:17:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 10C656155C;
-        Mon, 27 Jun 2022 23:14:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C99BC341C8;
-        Mon, 27 Jun 2022 23:14:44 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ED4A96152E;
+        Mon, 27 Jun 2022 23:17:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 030D9C34115;
+        Mon, 27 Jun 2022 23:17:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656371685;
-        bh=h4FR0qftIvkH2uTSynr4CWcZ4lbRTfiY9kRTXC9vhC0=;
+        s=k20201202; t=1656371826;
+        bh=xK/0Jo6bbbOr8Su6qSlzhWJlbL3Ou6nGEBskw/gJN6w=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pVumDj2bJvP3+KrO/DN9mUcf4t+RsXVIMpp/dDhtG24b3DoZqbMhF1Y0p4FNqIY5+
-         m+GZjCtQzd+mmgOhqsfrrph8ROF9fIUiJYfwHg5uPSfErIvUBv8NcFeS+w+NnrO/Db
-         ms4S+uoY70BrYvOdLhVZ9YQLn8elgC3OG5cM/cUuz7ZZh+jDVSNBZFU6Zz9vLQo7fc
-         o2/6CRy7mwpJTsjz3r013qEeFBsXYa3FiTRF1uuodjuoLy8qHxTT1Qn0j24uVZqyc2
-         y4dfsB+u8civcJn6Ur0g3rW40NiuYMyD+6ixn2LstAep8DOWmByGR9ojvRyNZqUMe9
-         6oFZ2w//886pw==
-Date:   Tue, 28 Jun 2022 02:14:41 +0300
+        b=Gdjqnp7gzy7ZTPEUKfdbOqeFJEN/O/BYL4VEKBpEKVbwjd09UG9BxxKpVsD1KYeCa
+         i3dcZwhZNPDgzim3GabS0RB16XMcveEZkNr5pnCUs9UbsZDlHFHSVFwIADz/RuhYO1
+         +X6jmug6bGuNwd5qfmumJzvYe7FnpUjEEEC29dYCDyP4/7X6PW7K9ZF4Y7BkA+bUPN
+         v9xiPwa0oN9Be40+n8jRhyukCy76ntvcIQx0/8sNERa+6sCQRST9oB8eb6hwAd9TPD
+         ccPjBGSWynfhc8fEjPnmY1kiUubF+Dbh6sEYH6iAUD7Fy31aa9BsnUA052Wx1MnwYj
+         R9mUu/hA9pOkw==
+Date:   Tue, 28 Jun 2022 02:17:02 +0300
 From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 Cc:     David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@google.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 RESEND] KEYS: asymmetric: enforce SM2 signature use
- pkey algo
-Message-ID: <Yro54bzvRZqbmCxb@kernel.org>
-References: <20220627092027.20858-1-tianjia.zhang@linux.alibaba.com>
+        Elvira Khabirova <e.khabirova@omp.ru>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/2 RESEND] pkcs7: support EC-RDSA/streebog in
+ SignerInfo
+Message-ID: <Yro6btp1iF4plBk/@kernel.org>
+References: <20220627092142.21095-1-tianjia.zhang@linux.alibaba.com>
+ <20220627092142.21095-3-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220627092027.20858-1-tianjia.zhang@linux.alibaba.com>
+In-Reply-To: <20220627092142.21095-3-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 05:20:27PM +0800, Tianjia Zhang wrote:
-> The signature verification of SM2 needs to add the Za value and
-> recalculate sig->digest, which requires the detection of the pkey_algo
-> in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
-> field in sig is attacker-controlled and should be use pkey->pkey_algo
-> instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
-> will also cause signature verification failure.
+On Mon, Jun 27, 2022 at 05:21:42PM +0800, Tianjia Zhang wrote:
+> From: Elvira Khabirova <e.khabirova@omp.ru>
 > 
-> The software_key_determine_akcipher() already forces the algorithms
-> are matched, so the SM3 algorithm is enforced in the SM2 signature,
-> although this has been checked, we still avoid using any algorithm
-> information in the signature as input.
+> Allow using EC-RDSA/streebog in pkcs7 certificates in a similar way
+> to how it's done in the x509 parser.
 > 
-> Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
-> Reported-by: Eric Biggers <ebiggers@google.com>
-> Cc: stable@vger.kernel.org # v5.10+
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> This is needed e.g. for loading kernel modules signed with EC-RDSA.
+> 
+> Signed-off-by: Elvira Khabirova <e.khabirova@omp.ru>
+> Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 > ---
->  crypto/asymmetric_keys/public_key.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  crypto/asymmetric_keys/pkcs7_parser.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index 7c9e6be35c30..3f17ee860f89 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -309,7 +309,8 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
->  	if (ret)
->  		return ret;
->  
-> -	tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
-> +	/* SM2 signatures always use the SM3 hash algorithm */
-> +	tfm = crypto_alloc_shash("sm3", 0, 0);
-
-So, why this should not validate sig->hash_alog *to be* "sm3"?
-
-I.e. add instead guard before crypto_alloc_hash:
-
-        if (strncmp(sig->hash_algo, "sm3") != 0) {
-                /* error */
-        }
-        /* continue */
-
->  	if (IS_ERR(tfm))
->  		return PTR_ERR(tfm);
->  
-> @@ -414,8 +415,7 @@ int public_key_verify_signature(const struct public_key *pkey,
->  	if (ret)
->  		goto error_free_key;
->  
-> -	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
-> -	    sig->data_size) {
-> +	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
->  		ret = cert_sig_digest_update(sig, tfm);
->  		if (ret)
->  			goto error_free_key;
+> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+> index 24e2e4a6d842..277482bb1777 100644
+> --- a/crypto/asymmetric_keys/pkcs7_parser.c
+> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
+> @@ -251,6 +251,12 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+>  	case OID_sm3:
+>  		ctx->sinfo->sig->hash_algo = "sm3";
+>  		break;
+> +	case OID_gost2012Digest256:
+> +		ctx->sinfo->sig->hash_algo = "streebog256";
+> +		break;
+> +	case OID_gost2012Digest512:
+> +		ctx->sinfo->sig->hash_algo = "streebog512";
+> +		break;
+>  	default:
+>  		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
+> @@ -284,6 +290,11 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+>  		ctx->sinfo->sig->pkey_algo = "sm2";
+>  		ctx->sinfo->sig->encoding = "raw";
+>  		break;
+> +	case OID_gost2012PKey256:
+> +	case OID_gost2012PKey512:
+> +		ctx->sinfo->sig->pkey_algo = "ecrdsa";
+> +		ctx->sinfo->sig->encoding = "raw";
+> +		break;
+>  	default:
+>  		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
 > -- 
 > 2.24.3 (Apple Git-128)
 > 
+
+
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
 BR, Jarkko
