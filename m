@@ -2,90 +2,71 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 574ACC433EF
-	for <linux-crypto@archiver.kernel.org>; Sun, 26 Jun 2022 06:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD49C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jun 2022 01:19:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbiFZGOd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 26 Jun 2022 02:14:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
+        id S230051AbiF0BTT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 26 Jun 2022 21:19:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbiFZGOc (ORCPT
+        with ESMTP id S229955AbiF0BTS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 26 Jun 2022 02:14:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8661211141;
-        Sat, 25 Jun 2022 23:14:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 362C2B80CF8;
-        Sun, 26 Jun 2022 06:14:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1B8C34114;
-        Sun, 26 Jun 2022 06:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656224068;
-        bh=JQwlttMtDB3217p6kWDqx5YZ0smlg/K0HqZOLlFD/z0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=auAnnXSvbKOVHIU2m2d36xg6fHwwUrQffwWT1sEK+CUh2Wu05G7CHBkMwOLr11pWT
-         /ViuNjrmpPbMQ0Mb37wHLpGvGpwPUEOA1rQ3J4QxAKRf2RoshX/e9PzM2yxZPhE+Gc
-         BAMuClWmegUrlBIt0ubzW8OybczauQmBbniRwLuMszpMA1hCW91EZ5qtZzY4uPm0nl
-         gZJqDBs4wwVR0PvaAIBo2qGg8A12KrJTg9qwPwIe2Hzi/C9uy4Og6GtBPRePRSAWrP
-         knJ+b5pWV2q7nfSTeLrNHOWDYRUjn5ypNKfT0RPX0aI231HLGH3IxoyKDxyVgTdY4w
-         JueCEwLd2t1bg==
-Date:   Sun, 26 Jun 2022 09:14:25 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Elvira Khabirova <e.khabirova@omp.ru>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Pascal van Leeuwen <pvanleeuwen@rambus.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/2] pkcs7: support SM2/SM3 and EC-RDSA/streebog
- algorithms
-Message-ID: <Yrf5QWnKL2ocoEq6@kernel.org>
-References: <20210918080737.17252-1-tianjia.zhang@linux.alibaba.com>
- <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
+        Sun, 26 Jun 2022 21:19:18 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609C52AC7;
+        Sun, 26 Jun 2022 18:19:16 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1o5dP6-00BRbS-2p; Mon, 27 Jun 2022 11:19:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 27 Jun 2022 09:19:04 +0800
+Date:   Mon, 27 Jun 2022 09:19:04 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Vladis Dronov <vdronov@redhat.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Simo Sorce <simo@redhat.com>
+Subject: Re: [PATCH v2] crypto: fips - make proc files report fips module
+ name and version
+Message-ID: <YrkFiM+Y2G7a50z5@gondor.apana.org.au>
+References: <20220620131618.952133-1-vdronov@redhat.com>
+ <20220621150832.1710738-1-vdronov@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ea7d5934-01f4-bd2e-09d5-0916eb72e8d8@linux.alibaba.com>
+In-Reply-To: <20220621150832.1710738-1-vdronov@redhat.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 05:19:03PM +0800, Tianjia Zhang wrote:
-> Hi Jarkko,
-> 
-> On 9/18/21 4:07 PM, Tianjia Zhang wrote:
-> > This series of patches integrates the two patches sended separately,
-> > resolves the conflict, and rebases on the latest code.
-> > 
-> > The two patches respectively support the SM2/SM3 and EC-RDSA/streebog
-> > algorithm combinations for the pkcs7 parser.
-> > 
-> > Elvira Khabirova (1):
-> >    pkcs7: support EC-RDSA/streebog in SignerInfo
-> > 
-> > Tianjia Zhang (1):
-> >    pkcs7: parser support SM2 and SM3 algorithms combination
-> > 
-> >   crypto/asymmetric_keys/pkcs7_parser.c | 18 ++++++++++++++++++
-> >   1 file changed, 18 insertions(+)
-> > 
-> 
-> No response from David, can you pick this?
-> 
-> Best regards,
-> Tianjia
+On Tue, Jun 21, 2022 at 05:08:32PM +0200, Vladis Dronov wrote:
+>
+> diff --git a/include/linux/fips.h b/include/linux/fips.h
+> index c6961e932fef..72d2e0e1d3ac 100644
+> --- a/include/linux/fips.h
+> +++ b/include/linux/fips.h
+> @@ -2,10 +2,19 @@
+>  #ifndef _FIPS_H
+>  #define _FIPS_H
+>  
+> +#include <generated/utsrelease.h>
+> +
+>  #ifdef CONFIG_CRYPTO_FIPS
+>  extern int fips_enabled;
+>  extern struct atomic_notifier_head fips_fail_notif_chain;
+>  
+> +#define FIPS_MODULE_NAME CONFIG_CRYPTO_FIPS_NAME
+> +#ifdef CONFIG_CRYPTO_FIPS_CUSTOM_VERSION
+> +#define FIPS_MODULE_VERSION CONFIG_CRYPTO_FIPS_VERSION
+> +#else
+> +#define FIPS_MODULE_VERSION UTS_RELEASE
+> +#endif
 
-You should CC me the series then.
+Why does this need to be in fips.h? If it's only used by one file
+then it should be moved to the place where it's used.
 
-BR, Jarkko
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
