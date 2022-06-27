@@ -2,112 +2,69 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED1FC43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jun 2022 07:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB62C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jun 2022 07:31:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232555AbiF0HRQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jun 2022 03:17:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60132 "EHLO
+        id S232103AbiF0Hbx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Jun 2022 03:31:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232558AbiF0HRP (ORCPT
+        with ESMTP id S229974AbiF0Hbx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jun 2022 03:17:15 -0400
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB8E5FE6;
-        Mon, 27 Jun 2022 00:17:13 -0700 (PDT)
-Received: by mail-qv1-f47.google.com with SMTP id y14so13529784qvs.10;
-        Mon, 27 Jun 2022 00:17:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e/zqkQPFTUj9N5yUlKAt6CBYdzhsrN+6ZcFTDaIiaZY=;
-        b=yKlbCeeWoczArlS08sJa8qkBDxpUuSNgLCYucSj9Pj0yIPSMsOtt+GcBFXvt//HGsU
-         WrN6KtzGDIVMEN3DmgsReyaQow5y6V1oVGLlnwzasW6BaZr47A4iR8AB/A0i/HYoWouv
-         GkBwJEb/XZbeIIckKDx7tCicFpkkqWhSIXdd9DDcwfoXPp3qqlrnZUUrJwhpoFhE0EzY
-         h3CldsH3cCCkT37cZ2mGKFPO8XQG4hvUhZcNJwSZ2QjnNqwbdOA2LO4pPwBDEeX5Mq/3
-         /PQUmml6QF0UKvu4MhffwfSc7jKpZE20hBdDiOaGXSSCfSatByzuT0FRaqh9JFMFmC+k
-         FGRQ==
-X-Gm-Message-State: AJIora+YHohVoY5h9kfjHt8qw8u1NfEiVGih3fLIe0c1XX/VlW/10QIe
-        Uw3z7n9LASoE7aanlcHkCdRZfG3SVecI5g==
-X-Google-Smtp-Source: AGRyM1t6D0kJxzhDzKgLa9OikDBLTIlLI87jQEeKacvqoyjuqewB8LkiTwHryMozHnbbl4pg23hEcw==
-X-Received: by 2002:ac8:5749:0:b0:305:1ea5:4a7 with SMTP id 9-20020ac85749000000b003051ea504a7mr7816225qtx.291.1656314232362;
-        Mon, 27 Jun 2022 00:17:12 -0700 (PDT)
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com. [209.85.219.177])
-        by smtp.gmail.com with ESMTPSA id w20-20020a05620a445400b006af37b005bdsm664399qkp.128.2022.06.27.00.17.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jun 2022 00:17:11 -0700 (PDT)
-Received: by mail-yb1-f177.google.com with SMTP id o19so8675891ybg.2;
-        Mon, 27 Jun 2022 00:17:11 -0700 (PDT)
-X-Received: by 2002:a05:6902:120e:b0:634:6f29:6b84 with SMTP id
- s14-20020a056902120e00b006346f296b84mr12087179ybu.604.1656314231501; Mon, 27
- Jun 2022 00:17:11 -0700 (PDT)
+        Mon, 27 Jun 2022 03:31:53 -0400
+X-Greylist: delayed 130 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 27 Jun 2022 00:31:50 PDT
+Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78575FE6
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Jun 2022 00:31:50 -0700 (PDT)
+Received: from ([60.208.111.195])
+        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id VDE00033;
+        Mon, 27 Jun 2022 15:29:33 +0800
+Received: from localhost.localdomain (10.200.104.82) by
+ jtjnmail201611.home.langchao.com (10.100.2.11) with Microsoft SMTP Server id
+ 15.1.2507.9; Mon, 27 Jun 2022 15:29:34 +0800
+From:   Deming Wang <wangdeming@inspur.com>
+To:     <horia.geanta@nxp.com>, <pankaj.gupta@nxp.com>,
+        <gaurav.jain@nxp.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Deming Wang <wangdeming@inspur.com>
+Subject: [PATCH] crypto: Remove the duplicate word
+Date:   Mon, 27 Jun 2022 03:29:33 -0400
+Message-ID: <20220627072933.1845-1-wangdeming@inspur.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <165515741424.1554877.9363755381201121213.stgit@warthog.procyon.org.uk>
- <165515742832.1554877.2073456606206090838.stgit@warthog.procyon.org.uk>
-In-Reply-To: <165515742832.1554877.2073456606206090838.stgit@warthog.procyon.org.uk>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 27 Jun 2022 09:16:59 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWWtdoAwWo_qitV+s-3amxKzbVSDJ3f51E9fKT3MQwLAw@mail.gmail.com>
-Message-ID: <CAMuHMdWWtdoAwWo_qitV+s-3amxKzbVSDJ3f51E9fKT3MQwLAw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] certs: Add FIPS selftests
-To:     David Howells <dhowells@redhat.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Simo Sorce <simo@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.200.104.82]
+tUid:   2022627152933b5b60d11b0f4e5e773352b9c3d62c470
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+Delete duplicate word for cnstr_shdsc_ahash.
 
-On Tue, Jun 14, 2022 at 12:29 AM David Howells <dhowells@redhat.com> wrote:
-> Add some selftests for signature checking when FIPS mode is enabled.  These
-> need to be done before we start actually using the signature checking for
-> things and must panic the kernel upon failure.
->
-> Note that the tests must not check the blacklist lest this provide a way to
-> prevent a kernel from booting by installing a hash of a test key in the
-> appropriate UEFI table.
->
-> Reported-by: Simo Sorce <simo@redhat.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Deming Wang <wangdeming@inspur.com>
+---
+ drivers/crypto/caam/caamhash_desc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for your patch, which is now commit 3cde3174eb910513 ("certs:
-Add FIPS selftests") in v5.19-rc4.
+diff --git a/drivers/crypto/caam/caamhash_desc.c b/drivers/crypto/caam/caamhash_desc.c
+index 78383d77da99..619564509936 100644
+--- a/drivers/crypto/caam/caamhash_desc.c
++++ b/drivers/crypto/caam/caamhash_desc.c
+@@ -22,7 +22,7 @@
+  * @ctx_len: size of Context Register
+  * @import_ctx: true if previous Context Register needs to be restored
+  *              must be true for ahash update and final
+- *              must be false for for ahash first and digest
++ *              must be false for ahash first and digest
+  * @era: SEC Era
+  */
+ void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
+-- 
+2.27.0
 
-> --- a/crypto/asymmetric_keys/Kconfig
-> +++ b/crypto/asymmetric_keys/Kconfig
-> @@ -75,4 +75,14 @@ config SIGNED_PE_FILE_VERIFICATION
->           This option provides support for verifying the signature(s) on a
->           signed PE binary.
->
-> +config FIPS_SIGNATURE_SELFTEST
-> +       bool "Run FIPS selftests on the X.509+PKCS7 signature verification"
-
-Is there any reason this cannot be tristate, so I can always enable
-this as a module, and run the test by loading the module whenever
-I want?
-
-> +       help
-> +         This option causes some selftests to be run on the signature
-> +         verification code, using some built in data.  This is required
-> +         for FIPS.
-> +       depends on KEYS
-> +       depends on ASYMMETRIC_KEY_TYPE
-> +       depends on PKCS7_MESSAGE_PARSER
-> +
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
