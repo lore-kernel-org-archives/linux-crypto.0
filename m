@@ -2,211 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD1EC433EF
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jun 2022 03:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8FBC43334
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jun 2022 03:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242906AbiF1DbC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jun 2022 23:31:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50344 "EHLO
+        id S242118AbiF1Dhm (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 27 Jun 2022 23:37:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243033AbiF1Dar (ORCPT
+        with ESMTP id S243355AbiF1Dh1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jun 2022 23:30:47 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5697FCC;
-        Mon, 27 Jun 2022 20:30:41 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LX96H2g0lzhYwX;
-        Tue, 28 Jun 2022 11:28:23 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 28 Jun
- 2022 11:30:37 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yekai13@huawei.com>, <liulongfang@huawei.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-        <shaozhengchao@huawei.com>
-Subject: [PATCH] crypto: hisilicon/sec - don't sleep when in softirq
-Date:   Tue, 28 Jun 2022 11:35:52 +0800
-Message-ID: <20220628033552.135202-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 27 Jun 2022 23:37:27 -0400
+Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0510924F12;
+        Mon, 27 Jun 2022 20:37:24 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VHfBdgf_1656387440;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VHfBdgf_1656387440)
+          by smtp.aliyun-inc.com;
+          Tue, 28 Jun 2022 11:37:21 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Eric Biggers <ebiggers@google.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH v3] KEYS: asymmetric: enforce SM2 signature use pkey algo
+Date:   Tue, 28 Jun 2022 11:37:20 +0800
+Message-Id: <20220628033720.43847-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When kunpeng920 encryption driver is used to deencrypt and decrypt
-packets during the softirq, it is not allowed to use mutex lock. The
-kernel will report the following error:
+The signature verification of SM2 needs to add the Za value and
+recalculate sig->digest, which requires the detection of the pkey_algo
+in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
+field in sig is attacker-controlled and should be use pkey->pkey_algo
+instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
+will also cause signature verification failure.
 
-BUG: scheduling while atomic: swapper/57/0/0x00000300
-Call trace:
-dump_backtrace+0x0/0x1e4
-show_stack+0x20/0x2c
-dump_stack+0xd8/0x140
-__schedule_bug+0x68/0x80
-__schedule+0x728/0x840
-schedule+0x50/0xe0
-schedule_preempt_disabled+0x18/0x24
-__mutex_lock.constprop.0+0x594/0x5dc
-__mutex_lock_slowpath+0x1c/0x30
-mutex_lock+0x50/0x60
-sec_request_init+0x8c/0x1a0 [hisi_sec2]
-sec_process+0x28/0x1ac [hisi_sec2]
-sec_skcipher_crypto+0xf4/0x1d4 [hisi_sec2]
-sec_skcipher_encrypt+0x1c/0x30 [hisi_sec2]
-crypto_skcipher_encrypt+0x2c/0x40
-crypto_authenc_encrypt+0xc8/0xfc [authenc]
-crypto_aead_encrypt+0x2c/0x40
-echainiv_encrypt+0x144/0x1a0 [echainiv]
-crypto_aead_encrypt+0x2c/0x40
-esp_output_tail+0x348/0x5c0 [esp4]
-esp_output+0x120/0x19c [esp4]
-xfrm_output_one+0x25c/0x4d4
-xfrm_output_resume+0x6c/0x1fc
-xfrm_output+0xac/0x3c0
-xfrm4_output+0x64/0x130
-ip_build_and_send_pkt+0x158/0x20c
-tcp_v4_send_synack+0xdc/0x1f0
-tcp_conn_request+0x7d0/0x994
-tcp_v4_conn_request+0x58/0x6c
-tcp_v6_conn_request+0xf0/0x100
-tcp_rcv_state_process+0x1cc/0xd60
-tcp_v4_do_rcv+0x10c/0x250
-tcp_v4_rcv+0xfc4/0x10a4
-ip_protocol_deliver_rcu+0xf4/0x200
-ip_local_deliver_finish+0x58/0x70
-ip_local_deliver+0x68/0x120
-ip_sublist_rcv_finish+0x70/0x94
-ip_list_rcv_finish.constprop.0+0x17c/0x1d0
-ip_sublist_rcv+0x40/0xb0
-ip_list_rcv+0x140/0x1dc
-__netif_receive_skb_list_core+0x154/0x28c
-__netif_receive_skb_list+0x120/0x1a0
-netif_receive_skb_list_internal+0xe4/0x1f0
-napi_complete_done+0x70/0x1f0
-gro_cell_poll+0x9c/0xb0
-napi_poll+0xcc/0x264
-net_rx_action+0xd4/0x21c
-__do_softirq+0x130/0x358
-irq_exit+0x11c/0x13c
-__handle_domain_irq+0x88/0xf0
-gic_handle_irq+0x78/0x2c0
-el1_irq+0xb8/0x140
-arch_cpu_idle+0x18/0x40
-default_idle_call+0x5c/0x1c0
-cpuidle_idle_call+0x174/0x1b0
-do_idle+0xc8/0x160
-cpu_startup_entry+0x30/0x11c
-secondary_start_kernel+0x158/0x1e4
-softirq: huh, entered softirq 3 NET_RX 0000000093774ee4 with
-preempt_count 00000100, exited with fffffe00?
+The software_key_determine_akcipher() already forces the algorithms
+are matched, so the SM3 algorithm is enforced in the SM2 signature,
+although this has been checked, we still avoid using any algorithm
+information in the signature as input.
 
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+Reported-by: Eric Biggers <ebiggers@google.com>
+Cc: stable@vger.kernel.org # v5.10+
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  2 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 20 ++++++++++----------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ crypto/asymmetric_keys/public_key.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 42bb486f3b6d..d2a0bc93e752 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -119,7 +119,7 @@ struct sec_qp_ctx {
- 	struct idr req_idr;
- 	struct sec_alg_res res[QM_Q_DEPTH];
- 	struct sec_ctx *ctx;
--	struct mutex req_lock;
-+	spinlock_t req_lock;
- 	struct list_head backlog;
- 	struct hisi_acc_sgl_pool *c_in_pool;
- 	struct hisi_acc_sgl_pool *c_out_pool;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 6eebe739893c..64be111d58ae 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -127,11 +127,11 @@ static int sec_alloc_req_id(struct sec_req *req, struct sec_qp_ctx *qp_ctx)
- {
- 	int req_id;
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 7c9e6be35c30..2f8352e88860 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -304,6 +304,10 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
  
--	mutex_lock(&qp_ctx->req_lock);
-+	spin_lock(&qp_ctx->req_lock);
+ 	BUG_ON(!sig->data);
  
- 	req_id = idr_alloc_cyclic(&qp_ctx->req_idr, NULL,
- 				  0, QM_Q_DEPTH, GFP_ATOMIC);
--	mutex_unlock(&qp_ctx->req_lock);
-+	spin_unlock(&qp_ctx->req_lock);
- 	if (unlikely(req_id < 0)) {
- 		dev_err(req->ctx->dev, "alloc req id fail!\n");
- 		return req_id;
-@@ -156,9 +156,9 @@ static void sec_free_req_id(struct sec_req *req)
- 	qp_ctx->req_list[req_id] = NULL;
- 	req->qp_ctx = NULL;
++	/* SM2 signatures always use the SM3 hash algorithm */
++	if (!sig->hash_algo || strcmp(sig->hash_algo, "sm3") != 0)
++		return -EINVAL;
++
+ 	ret = sm2_compute_z_digest(tfm_pkey, SM2_DEFAULT_USERID,
+ 					SM2_DEFAULT_USERID_LEN, dgst);
+ 	if (ret)
+@@ -414,8 +418,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (ret)
+ 		goto error_free_key;
  
--	mutex_lock(&qp_ctx->req_lock);
-+	spin_lock(&qp_ctx->req_lock);
- 	idr_remove(&qp_ctx->req_idr, req_id);
--	mutex_unlock(&qp_ctx->req_lock);
-+	spin_unlock(&qp_ctx->req_lock);
- }
- 
- static u8 pre_parse_finished_bd(struct bd_status *status, void *resp)
-@@ -273,7 +273,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 	    !(req->flag & CRYPTO_TFM_REQ_MAY_BACKLOG))
- 		return -EBUSY;
- 
--	mutex_lock(&qp_ctx->req_lock);
-+	spin_lock(&qp_ctx->req_lock);
- 	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
- 
- 	if (ctx->fake_req_limit <=
-@@ -281,10 +281,10 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 		list_add_tail(&req->backlog_head, &qp_ctx->backlog);
- 		atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
- 		atomic64_inc(&ctx->sec->debug.dfx.send_busy_cnt);
--		mutex_unlock(&qp_ctx->req_lock);
-+		spin_unlock(&qp_ctx->req_lock);
- 		return -EBUSY;
- 	}
--	mutex_unlock(&qp_ctx->req_lock);
-+	spin_unlock(&qp_ctx->req_lock);
- 
- 	if (unlikely(ret == -EBUSY))
- 		return -ENOBUFS;
-@@ -487,7 +487,7 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- 
- 	qp->req_cb = sec_req_cb;
- 
--	mutex_init(&qp_ctx->req_lock);
-+	spin_lock_init(&qp_ctx->req_lock);
- 	idr_init(&qp_ctx->req_idr);
- 	INIT_LIST_HEAD(&qp_ctx->backlog);
- 
-@@ -1382,7 +1382,7 @@ static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
- {
- 	struct sec_req *backlog_req = NULL;
- 
--	mutex_lock(&qp_ctx->req_lock);
-+	spin_lock(&qp_ctx->req_lock);
- 	if (ctx->fake_req_limit >=
- 	    atomic_read(&qp_ctx->qp->qp_status.used) &&
- 	    !list_empty(&qp_ctx->backlog)) {
-@@ -1390,7 +1390,7 @@ static struct sec_req *sec_back_req_clear(struct sec_ctx *ctx,
- 				typeof(*backlog_req), backlog_head);
- 		list_del(&backlog_req->backlog_head);
- 	}
--	mutex_unlock(&qp_ctx->req_lock);
-+	spin_unlock(&qp_ctx->req_lock);
- 
- 	return backlog_req;
- }
+-	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
+-	    sig->data_size) {
++	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
+ 		ret = cert_sig_digest_update(sig, tfm);
+ 		if (ret)
+ 			goto error_free_key;
 -- 
-2.17.1
+2.24.3 (Apple Git-128)
 
