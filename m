@@ -2,161 +2,162 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AC65CCA481
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 14:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C8A5CCA480
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 18:02:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231811AbiF2O0C (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 10:26:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54252 "EHLO
+        id S231944AbiF2SCl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 14:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230240AbiF2O0A (ORCPT
+        with ESMTP id S229874AbiF2SCk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 10:26:00 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74A93190A;
-        Wed, 29 Jun 2022 07:25:59 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id mf9so33053848ejb.0;
-        Wed, 29 Jun 2022 07:25:59 -0700 (PDT)
+        Wed, 29 Jun 2022 14:02:40 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2DDFCF;
+        Wed, 29 Jun 2022 11:02:39 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id b2so7815999plx.7;
+        Wed, 29 Jun 2022 11:02:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=nzVAkjUIXnSmifmZO/KNuTW33GCGTCzsi9aX026XXeg=;
-        b=S2dVib/eYmAFl827WdIoCLllzfbxALRjIjzfRRwuBWpdbVEMsjXdf1fQZ0QK1n2n0J
-         7Rc0uKmDUlj06sv7gme85B+3fLmze+mOouy0tIsuBDVpy1nD4eEh9k2i1LyAyfo/z7Zj
-         KDlk5RBwfb1T/0o1rVzuZORFiKZsCvSsNfve9fNt60vuT8XdzQWLTwkS/9FAhK69nmEs
-         mEzSIHBFyIvznhb3ZYEmWznM5HxrpFTwi8PXn2kSF7LDJWEQQU2316sTZ03OvudAaN+G
-         thYeRK11RnXT7zItby/QP43/O2E1Z4EfVZv3Nyn7dRrR7zoEuvKZKKrx+f9P5pfvx3Rg
-         uLHw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OeT2ITrjmuVxlcpJzzC4BUYFkEFLXsguD1Lu33hDD8A=;
+        b=PPaFWkYUAhPqssi/bSgVMVOJGJonL2COt9o59m5Hi/6thI4htaY8Zdw/dFbmNn0n3Y
+         n9KPJuvlpK9+TsAf4xnv0KUFLNASjmo9SBYG5+s3wHtsDfLiAz7uD5qNpcLTYF60/XWK
+         BnpJZaFimUbWD5715dqYmpjUaDt39f4qQ8VY6Zi/0Xh/UFHN15KxMWZlFD2z5HevaWM1
+         hG9z1suQpmPRDi3ZPV9diKxKPgPVajJlO55/sV8ltH+IOFn/7eCPuXX7CYVv9nes0JHQ
+         iZPww5SxtpMh2jTSC54QCiemWSTR7U/ZDmvS0if5YwpLqKXTky/wpRABfNzXPU8gDtRW
+         WRHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=nzVAkjUIXnSmifmZO/KNuTW33GCGTCzsi9aX026XXeg=;
-        b=K+/sP/hRrNW2dKVpBtInRhRcLgevV8ty+8mr5yrNwVTd2440sDwaFo+X70nnHqBZAM
-         O1e8Mt2RDyCnrbwIY3Vfho714AOnWqqXNMH6wDFomSZQxVP/5hLg590W2SFDcCNq7n0j
-         dUBbh1mohPAsDDqfwTtDNwtKCgpxtJ7iwkDUt4rOj9rlVZxBDAQBZ70wGo35FmuOBC3u
-         xejORvqK4II7TIRohQmMq2TK+l0mlnshiOzW+PTHdSVBC+QokePfjOGSPUlKUtHUWTqi
-         1dbdYVekSRxf7honXKELQjw3s2sJFpAo6ohp0sneZck+CTstgY3IOQrAz3PYuH8xBCno
-         LsNA==
-X-Gm-Message-State: AJIora9fPn0c14bXzp6tnc7I4qM66JCoAiTwWqMctW6cwVtnVYc7d4n8
-        MWmqpEuyoC12RWdG8cu+TcE=
-X-Google-Smtp-Source: AGRyM1vLxTFMIxeh0MQDJmw094z51hmalDIKhKM+71jelG0gY6NpuuzQXDALY4ZT1iSuYjMs9++euw==
-X-Received: by 2002:a17:906:58cf:b0:722:e4e1:c174 with SMTP id e15-20020a17090658cf00b00722e4e1c174mr3593366ejs.85.1656512758310;
-        Wed, 29 Jun 2022 07:25:58 -0700 (PDT)
-Received: from [10.29.0.16] ([37.120.217.82])
-        by smtp.gmail.com with ESMTPSA id jy19-20020a170907763300b007263713cfe9sm7220580ejc.169.2022.06.29.07.25.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jun 2022 07:25:57 -0700 (PDT)
-Message-ID: <80117936-6869-19b2-45a6-96a4562c6cd2@gmail.com>
-Date:   Wed, 29 Jun 2022 16:25:54 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 6/6] i2c: Make remove callback return void
-Content-Language: en-US
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Wolfram Sang <wsa@kernel.org>
-Cc:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <uwe@kleine-koenig.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
+        bh=OeT2ITrjmuVxlcpJzzC4BUYFkEFLXsguD1Lu33hDD8A=;
+        b=3a7AjgPemzTCC0O4wkaX1xSSX14aWKfZwVjPQDvgUWLc8gDOUUzhML+7MkvtK9Xi0r
+         6cRHGqjAPvImG0E9vsr/Eaht/eE2IMC+kPswfuSvAwOWt3R43I5nOfrL1wCV3e3aAkGS
+         Xm9fo8hmVIyHIDeF2j1VuoGzC7c43zdfV2Pu4wxjND18l3WQx5nwGtntcSqap98crFrl
+         HQguLtgVZtZrTkMpfWwDh7GY/I9SZzZXpLnbWBf4edAZxATgpoh0yYNY4IGWBOFg3Tu8
+         LMXnRE1LXKh83XdED5xHqnPM9mgVr9Wv6KzAc9FpdixDxH/jhaax95A2HfeicEt0plED
+         qAEg==
+X-Gm-Message-State: AJIora+ckWvbUAy2gUcmfan1iaLAJvTI+CBOVezktsPzAkZzwa8DR7Ca
+        r5ekd/iWAMPqe2wj/nSSopHY6weTboM=
+X-Google-Smtp-Source: AGRyM1vlpn9VfkHdI1GSkmUIdEu8Va4vyYc4mICOFLm2qyu6WECUH/zTfRBEKfnpd7iO8mD0eGfT8Q==
+X-Received: by 2002:a17:90a:c4f:b0:1df:a178:897f with SMTP id u15-20020a17090a0c4f00b001dfa178897fmr5155617pje.19.1656525758913;
+        Wed, 29 Jun 2022 11:02:38 -0700 (PDT)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id s7-20020a17090302c700b00168e83eda56sm11736371plk.3.2022.06.29.11.02.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 11:02:38 -0700 (PDT)
+From:   Florian Fainelli <f.fainelli@gmail.com>
+To:     stable@vger.kernel.org
+Cc:     Florian Fainelli <f.fainelli@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Luka Perkov <luka.perkov@sartura.hr>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Bastien Nocera <hadess@hadess.net>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Shawn Tu <shawnx.tu@intel.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Kyungmin Park <kyungmin.park@samsung.com>,
-        Andy Shevchenko <andy@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Tony Lindgren <tony@atomide.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Stefan Agner <stefan@agner.ch>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Pitre <nico@fluxnic.net>,
+        Andre Przywara <andre.przywara@arm.com>,
+        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Gross <markgross@kernel.org>,
-        =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-integrity@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, chrome-platform@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        patches@opensource.cirrus.com, alsa-devel@alsa-project.org,
-        linux-omap@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        acpi4asus-user@lists.sourceforge.net, linux-pm@vger.kernel.org,
-        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-mediatek@lists.infradead.org
-References: <20220628140313.74984-1-u.kleine-koenig@pengutronix.de>
- <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
-From:   Maximilian Luz <luzmaximilian@gmail.com>
-In-Reply-To: <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jian Cai <caij2003@gmail.com>,
+        linux-arm-kernel@lists.infradead.org (moderated list:ARM PORT),
+        linux-kernel@vger.kernel.org (open list),
+        linux-crypto@vger.kernel.org (open list:CRYPTO API),
+        linux-omap@vger.kernel.org (open list:OMAP2+ SUPPORT),
+        clang-built-linux@googlegroups.com (open list:CLANG/LLVM BUILD SUPPORT),
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH stable 5.4 00/11] ARM 32-bit build with Clang IAS
+Date:   Wed, 29 Jun 2022 11:02:16 -0700
+Message-Id: <20220629180227.3408104-1-f.fainelli@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/28/22 16:03, Uwe Kleine-König wrote:
-> From: Uwe Kleine-König <uwe@kleine-koenig.org>
-> 
-> The value returned by an i2c driver's remove function is mostly ignored.
-> (Only an error message is printed if the value is non-zero that the
-> error is ignored.)
-> 
-> So change the prototype of the remove function to return no value. This
-> way driver authors are not tempted to assume that passing an error to
-> the upper layer is a good idea. All drivers are adapted accordingly.
-> There is no intended change of behaviour, all callbacks were prepared to
-> return 0 before.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Hi,
 
-[...]
->   drivers/platform/surface/surface3_power.c                 | 4 +---
+This patch series is a collection of clean cherry picks into the 5.4
+kernel allowing us to use the Clang integrated assembler to build the
+ARM 32-bit kernel.
 
-[...]
+This is useful in order to have proper build and runtime coverage of the
+stable kernel(s).
 
-> diff --git a/drivers/platform/surface/surface3_power.c b/drivers/platform/surface/surface3_power.c
-> index 444ec81ba02d..3b20dddeb815 100644
-> --- a/drivers/platform/surface/surface3_power.c
-> +++ b/drivers/platform/surface/surface3_power.c
-> @@ -554,7 +554,7 @@ static int mshw0011_probe(struct i2c_client *client)
->   	return error;
->   }
->   
-> -static int mshw0011_remove(struct i2c_client *client)
-> +static void mshw0011_remove(struct i2c_client *client)
->   {
->   	struct mshw0011_data *cdata = i2c_get_clientdata(client);
->   
-> @@ -564,8 +564,6 @@ static int mshw0011_remove(struct i2c_client *client)
->   		kthread_stop(cdata->poll_task);
->   
->   	i2c_unregister_device(cdata->bat0);
-> -
-> -	return 0;
->   }
->   
->   static const struct acpi_device_id mshw0011_acpi_match[] = {
+Ard Biesheuvel (3):
+  crypto: arm/sha256-neon - avoid ADRL pseudo instruction
+  crypto: arm/sha512-neon - avoid ADRL pseudo instruction
+  crypto: arm - use Kconfig based compiler checks for crypto opcodes
 
-For the quoted above:
+Jian Cai (2):
+  ARM: 8971/1: replace the sole use of a symbol with its definition
+  ARM: 9029/1: Make iwmmxt.S support Clang's integrated assembler
 
-Reviewed-by: Maximilian Luz <luzmaximilian@gmail.com>
+Nick Desaulniers (1):
+  ARM: 8933/1: replace Sun/Solaris style flag on section directive
+
+Stefan Agner (5):
+  ARM: 8989/1: use .fpu assembler directives instead of assembler
+    arguments
+  ARM: 8990/1: use VFP assembler mnemonics in register load/store macros
+  ARM: 8929/1: use APSR_nzcv instead of r15 as mrc operand
+  ARM: OMAP2+: drop unnecessary adrl
+  crypto: arm/ghash-ce - define fpu before fpu registers are referenced
+
+ arch/arm/boot/bootp/init.S            |  2 +-
+ arch/arm/boot/compressed/big-endian.S |  2 +-
+ arch/arm/boot/compressed/head.S       |  4 +-
+ arch/arm/boot/compressed/piggy.S      |  2 +-
+ arch/arm/crypto/Kconfig               | 14 +++--
+ arch/arm/crypto/Makefile              | 32 ++--------
+ arch/arm/crypto/crct10dif-ce-core.S   |  2 +-
+ arch/arm/crypto/ghash-ce-core.S       |  4 +-
+ arch/arm/crypto/sha1-ce-core.S        |  1 +
+ arch/arm/crypto/sha2-ce-core.S        |  1 +
+ arch/arm/crypto/sha256-armv4.pl       |  4 +-
+ arch/arm/crypto/sha256-core.S_shipped |  4 +-
+ arch/arm/crypto/sha512-armv4.pl       |  4 +-
+ arch/arm/crypto/sha512-core.S_shipped |  4 +-
+ arch/arm/include/asm/assembler.h      |  3 +-
+ arch/arm/include/asm/vfpmacros.h      | 19 +++---
+ arch/arm/kernel/iwmmxt.S              | 89 ++++++++++++++-------------
+ arch/arm/kernel/iwmmxt.h              | 47 ++++++++++++++
+ arch/arm/mach-omap2/sleep34xx.S       |  2 +-
+ arch/arm/mm/proc-arm1020.S            |  2 +-
+ arch/arm/mm/proc-arm1020e.S           |  2 +-
+ arch/arm/mm/proc-arm1022.S            |  2 +-
+ arch/arm/mm/proc-arm1026.S            |  6 +-
+ arch/arm/mm/proc-arm720.S             |  2 +-
+ arch/arm/mm/proc-arm740.S             |  2 +-
+ arch/arm/mm/proc-arm7tdmi.S           |  2 +-
+ arch/arm/mm/proc-arm920.S             |  2 +-
+ arch/arm/mm/proc-arm922.S             |  2 +-
+ arch/arm/mm/proc-arm925.S             |  2 +-
+ arch/arm/mm/proc-arm926.S             |  6 +-
+ arch/arm/mm/proc-arm940.S             |  2 +-
+ arch/arm/mm/proc-arm946.S             |  2 +-
+ arch/arm/mm/proc-arm9tdmi.S           |  2 +-
+ arch/arm/mm/proc-fa526.S              |  2 +-
+ arch/arm/mm/proc-feroceon.S           |  2 +-
+ arch/arm/mm/proc-mohawk.S             |  2 +-
+ arch/arm/mm/proc-sa110.S              |  2 +-
+ arch/arm/mm/proc-sa1100.S             |  2 +-
+ arch/arm/mm/proc-v6.S                 |  2 +-
+ arch/arm/mm/proc-v7.S                 |  2 +-
+ arch/arm/mm/proc-v7m.S                |  4 +-
+ arch/arm/mm/proc-xsc3.S               |  2 +-
+ arch/arm/mm/proc-xscale.S             |  2 +-
+ arch/arm/vfp/Makefile                 |  2 -
+ arch/arm/vfp/vfphw.S                  | 30 ++++++---
+ 45 files changed, 187 insertions(+), 143 deletions(-)
+ create mode 100644 arch/arm/kernel/iwmmxt.h
+
+-- 
+2.25.1
+
