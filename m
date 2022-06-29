@@ -2,22 +2,22 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB34C43334
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2142C433EF
 	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 03:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230397AbiF2DWU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S230494AbiF2DWU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 28 Jun 2022 23:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229772AbiF2DWT (ORCPT
+        with ESMTP id S230153AbiF2DWT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 28 Jun 2022 23:22:19 -0400
 Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB24FDAD;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8441CF;
         Tue, 28 Jun 2022 20:22:15 -0700 (PDT)
 Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 25T34APQ013034;
-        Wed, 29 Jun 2022 11:04:11 +0800 (GMT-8)
+        by twspam01.aspeedtech.com with ESMTP id 25T34APP013034;
+        Wed, 29 Jun 2022 11:04:10 +0800 (GMT-8)
         (envelope-from neal_liu@aspeedtech.com)
 Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
  (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 29 Jun
@@ -37,14 +37,11 @@ To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
 CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
         <devicetree@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset definition
-Date:   Wed, 29 Jun 2022 11:20:05 +0800
-Message-ID: <20220629032008.1579899-3-neal_liu@aspeedtech.com>
+        <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>
+Subject: [PATCH v5 0/5] Add Aspeed crypto driver for hardware acceleration
+Date:   Wed, 29 Jun 2022 11:20:03 +0800
+Message-ID: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
-References: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -52,51 +49,81 @@ X-Originating-IP: [192.168.10.10]
 X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
  (192.168.0.24)
 X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 25T34APQ013034
+X-MAIL: twspam01.aspeedtech.com 25T34APP013034
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add HACE reset bit definition for AST2500/AST2600.
+Aspeed Hash and Crypto Engine (HACE) is designed to accelerate the
+throughput of hash data digest, encryption and decryption.
 
-Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- include/dt-bindings/clock/aspeed-clock.h  | 3 ++-
- include/dt-bindings/clock/ast2600-clock.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+These patches aim to add Aspeed hash & crypto driver support.
+The hash & crypto driver also pass the run-time self tests that
+take place at algorithm registration.
 
-diff --git a/include/dt-bindings/clock/aspeed-clock.h b/include/dt-bindings/clock/aspeed-clock.h
-index 9ff4f6e4558c..6e040f7c3426 100644
---- a/include/dt-bindings/clock/aspeed-clock.h
-+++ b/include/dt-bindings/clock/aspeed-clock.h
-@@ -46,11 +46,12 @@
- #define ASPEED_RESET_MCTP		1
- #define ASPEED_RESET_ADC		2
- #define ASPEED_RESET_JTAG_MASTER	3
--#define ASPEED_RESET_MIC		4
-+#define ASPEED_RESET_HACE		4
- #define ASPEED_RESET_PWM		5
- #define ASPEED_RESET_PECI		6
- #define ASPEED_RESET_I2C		7
- #define ASPEED_RESET_AHB		8
- #define ASPEED_RESET_CRT1		9
-+#define ASPEED_RESET_MIC		18
- 
- #endif
-diff --git a/include/dt-bindings/clock/ast2600-clock.h b/include/dt-bindings/clock/ast2600-clock.h
-index 62b9520a00fd..d8b0db2f7a7d 100644
---- a/include/dt-bindings/clock/ast2600-clock.h
-+++ b/include/dt-bindings/clock/ast2600-clock.h
-@@ -111,6 +111,7 @@
- #define ASPEED_RESET_PCIE_RC_O		19
- #define ASPEED_RESET_PCIE_RC_OEN	18
- #define ASPEED_RESET_PCI_DP		5
-+#define ASPEED_RESET_HACE		4
- #define ASPEED_RESET_AHB		1
- #define ASPEED_RESET_SDRAM		0
- 
+The patch series are tested on both AST2500 & AST2600 evaluation boards.
+
+Tested-by below configs:
+- CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+- CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+- CONFIG_DMA_API_DEBUG=y
+- CONFIG_DMA_API_DEBUG_SG=y
+- CONFIG_CPU_BIG_ENDIAN=y
+
+Change since v4:
+- Add AST2500 clock definition & dts node.
+- Add software fallback for handling corner cases.
+- Fix copy wrong key length.
+
+Change since v3:
+- Use dmam_alloc_coherent() instead to manage dma_alloc_coherent().
+- Add more error handler of dma_prepare() & crypto_engine_start().
+
+Change since v2:
+- Fix endianness issue. Tested on both little endian & big endian
+  system.
+- Use common crypto hardware engine for enqueue & dequeue requests.
+- Use pre-defined IVs for SHA-family.
+- Revise error handler flow.
+- Fix sorts of coding style problems.
+
+Change since v1:
+- Add more error handlers, including DMA memory allocate/free, DMA
+  map/unmap, clock enable/disable, etc.
+- Fix check dma_map error for config DMA_API_DEBUG.
+- Fix dt-binding doc & dts node naming.
+
+
+Neal Liu (5):
+  crypto: aspeed: Add HACE hash driver
+  dt-bindings: clock: Add AST2500/AST2600 HACE reset definition
+  ARM: dts: aspeed: Add HACE device controller node
+  dt-bindings: crypto: add documentation for aspeed hace
+  crypto: aspeed: add HACE crypto driver
+
+ .../bindings/crypto/aspeed,ast2500-hace.yaml  |   53 +
+ MAINTAINERS                                   |    7 +
+ arch/arm/boot/dts/aspeed-g5.dtsi              |    8 +
+ arch/arm/boot/dts/aspeed-g6.dtsi              |    8 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/aspeed/Kconfig                 |   40 +
+ drivers/crypto/aspeed/Makefile                |    8 +
+ drivers/crypto/aspeed/aspeed-hace-crypto.c    | 1122 +++++++++++++
+ drivers/crypto/aspeed/aspeed-hace-hash.c      | 1428 +++++++++++++++++
+ drivers/crypto/aspeed/aspeed-hace.c           |  301 ++++
+ drivers/crypto/aspeed/aspeed-hace.h           |  293 ++++
+ include/dt-bindings/clock/aspeed-clock.h      |    3 +-
+ include/dt-bindings/clock/ast2600-clock.h     |    1 +
+ 14 files changed, 3273 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/aspeed,ast2500-hace.yaml
+ create mode 100644 drivers/crypto/aspeed/Kconfig
+ create mode 100644 drivers/crypto/aspeed/Makefile
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace-hash.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace.c
+ create mode 100644 drivers/crypto/aspeed/aspeed-hace.h
+
 -- 
 2.25.1
 
