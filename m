@@ -2,115 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00695C43334
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 03:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB34C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 03:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbiF2DMn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jun 2022 23:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42270 "EHLO
+        id S230397AbiF2DWU (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Jun 2022 23:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiF2DMm (ORCPT
+        with ESMTP id S229772AbiF2DWT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jun 2022 23:12:42 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A2A2BB3A;
-        Tue, 28 Jun 2022 20:12:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A74DDB8215B;
-        Wed, 29 Jun 2022 03:12:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 051A4C341C8;
-        Wed, 29 Jun 2022 03:12:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656472359;
-        bh=1P+6d07Qx1cBRIKwEDFs1zrtCoocCzlp05XUFi0KdN4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rqlyq7g5tdJ/wYOf5A7tYj4RUmI1SFFFt5YqSgIqMD6iCvdEffAoDwZgyDi3Lo46E
-         nzPMTdCNNady34vD5iuKukBu9czAuG8iNK1tCUTnH+PYSripo9v81eqcXjZleJH92/
-         WcFN7ElTBpI56SzmBLG6gWFM3msjihVBJW947Y81lREqncC9yQFyfW+OGBCA+/2a0I
-         ZToeREUhnkPO1WGzj8UDSR7nhEOmdJevu49dLbbdkTsBGzmUrQaO8P3a5mU2nOLO7a
-         bG3AvowfGdwEZSD4K/S+qJbQ98SrosdI2zNBGtsha62ktGOYH7ndpMC1Vt51oV55+k
-         FtOHEJXL9GSYg==
-Date:   Tue, 28 Jun 2022 20:12:18 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ignat Korchagin <ignat@cloudflare.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel-team@cloudflare.com,
-        abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
-        mputtash@linux.vnet.com,
-        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: Re: [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot
- to linux-next kernel
-Message-ID: <YrvDEqdk3ZfcEy9i@sol.localdomain>
-References: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com>
+        Tue, 28 Jun 2022 23:22:19 -0400
+Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB24FDAD;
+        Tue, 28 Jun 2022 20:22:15 -0700 (PDT)
+Received: from mail.aspeedtech.com ([192.168.0.24])
+        by twspam01.aspeedtech.com with ESMTP id 25T34APQ013034;
+        Wed, 29 Jun 2022 11:04:11 +0800 (GMT-8)
+        (envelope-from neal_liu@aspeedtech.com)
+Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
+ (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 29 Jun
+ 2022 11:20:13 +0800
+From:   Neal Liu <neal_liu@aspeedtech.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        "Andrew Jeffery" <andrew@aj.id.au>,
+        Dhananjay Phadke <dhphadke@microsoft.com>,
+        "Johnny Huang" <johnny_huang@aspeedtech.com>
+CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset definition
+Date:   Wed, 29 Jun 2022 11:20:05 +0800
+Message-ID: <20220629032008.1579899-3-neal_liu@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
+References: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.10.10]
+X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
+ (192.168.0.24)
+X-DNSRBL: 
+X-MAIL: twspam01.aspeedtech.com 25T34APQ013034
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 02:33:55PM +0530, Tasmiya Nalatwad wrote:
-> Greetings,
-> 
-> [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to linux-next
-> kernel
-> 
-> --- Call Traces ---
-> [    1.788574] ------------[ cut here ]------------
-> [    1.788577] alg: self-tests for rsa-generic (rsa) failed (rc=-22)
-> [    1.788586] WARNING: CPU: 9 PID: 218 at crypto/testmgr.c:5774
-> alg_test+0x438/0x880
-> [    1.788598] Modules linked in:
-> [    1.788603] CPU: 9 PID: 218 Comm: cryptomgr_test Not tainted
-> 5.19.0-rc4-next-20220627-autotest #1
-> [    1.788609] NIP:  c00000000062e078 LR: c00000000062e074 CTR:
-> c00000000075e020
-> [    1.788614] REGS: c00000000e733980 TRAP: 0700   Not tainted
-> (5.19.0-rc4-next-20220627-autotest)
-> [    1.788620] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: 28008822
-> XER: 20040005
-> [    1.788632] CFAR: c00000000014f244 IRQMASK: 0
-> [    1.788632] GPR00: c00000000062e074 c00000000e733c20 c000000002a12000
-> 0000000000000035
-> [    1.788632] GPR04: 00000000ffff7fff c00000000e7339e0 c00000000e7339d8
-> 0000000000000000
-> [    1.788632] GPR08: c000000002826b78 0000000000000000 c000000002566a50
-> c0000000028e6bb8
-> [    1.788632] GPR12: 0000000000008000 c00000000fff3280 c00000000018b6d8
-> c00000000d640080
-> [    1.788632] GPR16: 0000000000000000 0000000000000000 0000000000000000
-> 0000000000000000
-> [    1.788632] GPR20: 0000000000000000 0000000000000000 0000000000000000
-> 0000000000000000
-> [    1.788632] GPR24: c000000000da49e8 0000000000000000 c000000050630480
-> 0000000000000400
-> [    1.788632] GPR28: c000000050630400 000000000000000d c000000002cd33d8
-> ffffffffffffffea
-> [    1.788691] NIP [c00000000062e078] alg_test+0x438/0x880
-> [    1.788696] LR [c00000000062e074] alg_test+0x434/0x880
-> [    1.788701] Call Trace:
-> [    1.788704] [c00000000e733c20] [c00000000062e074] alg_test+0x434/0x880
-> (unreliable)
-> [    1.788712] [c00000000e733d90] [c00000000062c040]
-> cryptomgr_test+0x40/0x70
-> [    1.788718] [c00000000e733dc0] [c00000000018b7f4] kthread+0x124/0x130
-> [    1.788726] [c00000000e733e10] [c00000000000ce54]
-> ret_from_kernel_thread+0x5c/0x64
-> [    1.788733] Instruction dump:
-> [    1.788736] 409e02e4 3d22002c 892913fd 2f890000 409e02d4 3c62fe63
-> 7f45d378 7f84e378
-> [    1.788746] 7fe6fb78 3863fa90 4bb2116d 60000000 <0fe00000> fa2100f8
-> fa410100 fa610108
-> [    1.788757] ---[ end trace 0000000000000000 ]---
-> -- 
+Add HACE reset bit definition for AST2500/AST2600.
 
-It's caused by:
+Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ include/dt-bindings/clock/aspeed-clock.h  | 3 ++-
+ include/dt-bindings/clock/ast2600-clock.h | 1 +
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-commit f145d411a67efacc0731fc3f9c7b2d89fb62523a
-Author: Ignat Korchagin <ignat@cloudflare.com>
-Date:   Fri Jun 17 09:42:10 2022 +0100
+diff --git a/include/dt-bindings/clock/aspeed-clock.h b/include/dt-bindings/clock/aspeed-clock.h
+index 9ff4f6e4558c..6e040f7c3426 100644
+--- a/include/dt-bindings/clock/aspeed-clock.h
++++ b/include/dt-bindings/clock/aspeed-clock.h
+@@ -46,11 +46,12 @@
+ #define ASPEED_RESET_MCTP		1
+ #define ASPEED_RESET_ADC		2
+ #define ASPEED_RESET_JTAG_MASTER	3
+-#define ASPEED_RESET_MIC		4
++#define ASPEED_RESET_HACE		4
+ #define ASPEED_RESET_PWM		5
+ #define ASPEED_RESET_PECI		6
+ #define ASPEED_RESET_I2C		7
+ #define ASPEED_RESET_AHB		8
+ #define ASPEED_RESET_CRT1		9
++#define ASPEED_RESET_MIC		18
+ 
+ #endif
+diff --git a/include/dt-bindings/clock/ast2600-clock.h b/include/dt-bindings/clock/ast2600-clock.h
+index 62b9520a00fd..d8b0db2f7a7d 100644
+--- a/include/dt-bindings/clock/ast2600-clock.h
++++ b/include/dt-bindings/clock/ast2600-clock.h
+@@ -111,6 +111,7 @@
+ #define ASPEED_RESET_PCIE_RC_O		19
+ #define ASPEED_RESET_PCIE_RC_OEN	18
+ #define ASPEED_RESET_PCI_DP		5
++#define ASPEED_RESET_HACE		4
+ #define ASPEED_RESET_AHB		1
+ #define ASPEED_RESET_SDRAM		0
+ 
+-- 
+2.25.1
 
-    crypto: rsa - implement Chinese Remainder Theorem for faster private key operations
