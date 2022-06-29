@@ -2,146 +2,146 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7BEC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 08:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB8D5CCA485
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 08:09:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbiF2IDp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 04:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50736 "EHLO
+        id S231171AbiF2IJL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 04:09:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiF2IDo (ORCPT
+        with ESMTP id S231193AbiF2IJK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 04:03:44 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2A729813
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:03:43 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id q6so30821030eji.13
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:03:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=cG3vzXy564NxPyQk6j0mH7QQcpmGhb7eglXugVj6hN8=;
-        b=YPK4Y9MtYTlB+9uxDmydPXAD+nm40vRi5kfqNUZQCbI9XYMlU0HSOwbzR6G6bfbW4r
-         F0Zn6240auG9wDCOE9n576wvCFBDgppCXYG/GGdNxBsOj22QcVc7t6BadRxqNBFanvmZ
-         Hj53k762IYyi8RlPckGPXe0GiV3fZlE/f5hgZxLs3SHfwPyJi4N+lVi1HN+S2PINJ23v
-         kp9yJ05aEzIO7rA8z5nrXEOU7q1BAXOszAd9SqDfvt6GNNB+XktIVwUkJTC5bAKL1kpy
-         ZhhY/RXn66UpmjVKgVL/s3pDCyWB5ZJw9FC7ZT4el0lubErnU7RHGWnvC/2zexKIC71j
-         ZQoA==
+        Wed, 29 Jun 2022 04:09:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1CA253BBC3
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:09:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656490147;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7hQQnP6ElkRz6EikrOqVkat5RAwQAYxqOhDbZ9zjeug=;
+        b=fgsDzeyRjFEk2KeWSqmbecKyn25Vy9Yr9ksDNykkz9dbfibRQ1L2qZtCKWDjwTLV/Uk6rf
+        5eskSYYjJuqE8dTfdzbVu/c8lHf9ZfI/MxhZTUQ/0PRnz/2WCOCjXmOWpkNEs2HTUBOUZc
+        hcCoase9/NGzpmY7V6jwkU2icPl1iRM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-132-qNjb1jGpNxqK4Ja71nX2oQ-1; Wed, 29 Jun 2022 04:09:05 -0400
+X-MC-Unique: qNjb1jGpNxqK4Ja71nX2oQ-1
+Received: by mail-wm1-f70.google.com with SMTP id r4-20020a1c4404000000b003a02fa133ceso2209083wma.2
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:09:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=cG3vzXy564NxPyQk6j0mH7QQcpmGhb7eglXugVj6hN8=;
-        b=hNcI144hVNTtdSaax6HEmcP5tCYLYQ7msyWBd0g6KFcONvy5BGK07LgILnkijzA7t0
-         1Uz80MyJJC13hWdqdSyj5Xdf6ectYoqSXRJ18uMLw7sXoKIaaBsZlQYFhafqpajgunr0
-         GQgUdjmQIMyrHg9Ef82YhHxD6OKuMTDjZqdipo4shOuOoiMTp7x7hqUgrzAPyqeRrjF9
-         RA80j1FNj22IowEsfPr0aUT8py+Nx6gme7825jPo7ZelcqmgWUJYf6wmtn2N7ZZv89iG
-         IZVkx6Wb6OYlYm9tqqY4jaSJuU+PsZC7J72RroLTqrGZfrDEyNk8EnW6MwwpSnERuObf
-         BL9A==
-X-Gm-Message-State: AJIora8h6DQgPFprBNfNv22vYJA3IT4Nskpc9qTFtdyU6Gx6MqR7NXFJ
-        +NYMmpH5CUDdnRcYF/6cZTRKgCn/9pHa7g==
-X-Google-Smtp-Source: AGRyM1vMLNNjC9XXtRvbH3wYlHBLBB1LEnGfbV9c7vENLF2zfPQTUdrjciEn2ZM1kvAcRAd4swllrQ==
-X-Received: by 2002:a17:907:168f:b0:726:2bd0:1091 with SMTP id hc15-20020a170907168f00b007262bd01091mr2003312ejc.137.1656489821764;
-        Wed, 29 Jun 2022 01:03:41 -0700 (PDT)
-Received: from [192.168.0.183] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
-        by smtp.gmail.com with ESMTPSA id g20-20020a50d5d4000000b0042617ba63c2sm10991337edj.76.2022.06.29.01.03.40
+        bh=7hQQnP6ElkRz6EikrOqVkat5RAwQAYxqOhDbZ9zjeug=;
+        b=XRYFMCEmBH9tnDdEcg8GOqlG6ShFIKmfp1qDfIEbhdQCbmOQeoEHNGHVcgFJKik7zz
+         paUeX3XZ+spHW3N/pgyvC8Rpa8C2ECt825xxhFEYVSxjj0d6kHUUOWBDwLe1vQscDS3i
+         gwrH8pvdPhDc7gSpAYGfDq/NEaQexB8MNV6yHyR/iQVw7nmgrieHubIxaOjrU8E7Rzme
+         kvFGx+91kvqtRnth+my0nJggB9Lpk4eMfrKZzkruNqOokfSkibyzWAK8VY9Xqic6Sgy4
+         TnCjI4vGjtSH45TqKQeyEvRS29yWETDRWUxpH96G+PQQfZO7NZLwgvw9fMRKsNw8H/Sa
+         D2/A==
+X-Gm-Message-State: AJIora8TInMBya6XngwgTIeZ3FeKww0IfZXTWRf1WlJSd3qAK1ERrDtC
+        SJhPM7LHXvJYAbg2yydOXAW0CTVS1lmufru0cDVU9qC4skmSjpijQtl+dgryJXH8w53K1RpIvCm
+        +rKvFV3OzEdDL7yWUiIZ4eWUd
+X-Received: by 2002:a05:600c:2246:b0:3a0:4d14:e9d5 with SMTP id a6-20020a05600c224600b003a04d14e9d5mr2201674wmm.70.1656490144656;
+        Wed, 29 Jun 2022 01:09:04 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1usFW/96xeCeX9gWa5EcwEsowhB540yEb4Gaanj9433iMcJH3n1uDXhdEWzSLPQicn1TmuJ9w==
+X-Received: by 2002:a05:600c:2246:b0:3a0:4d14:e9d5 with SMTP id a6-20020a05600c224600b003a04d14e9d5mr2201616wmm.70.1656490144372;
+        Wed, 29 Jun 2022 01:09:04 -0700 (PDT)
+Received: from [192.168.1.129] (205.pool92-176-231.dynamic.orange.es. [92.176.231.205])
+        by smtp.gmail.com with ESMTPSA id p2-20020a05600c358200b003942a244f47sm2507134wmq.32.2022.06.29.01.09.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jun 2022 01:03:40 -0700 (PDT)
-Message-ID: <409af908-5e03-8df7-fcd5-7fab75cdfb34@linaro.org>
-Date:   Wed, 29 Jun 2022 10:03:39 +0200
+        Wed, 29 Jun 2022 01:09:03 -0700 (PDT)
+Message-ID: <a5a3e2ca-030a-4838-296e-50dbb6d87330@redhat.com>
+Date:   Wed, 29 Jun 2022 10:09:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset
- definition
+Subject: Re: [PATCH 6/6] i2c: Make remove callback return void
 Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Dhananjay Phadke <dhphadke@microsoft.com>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Cc:     "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+To:     Christophe Leroy <christophe.leroy@csgroup.eu>,
+        =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Jeremy Kerr <jk@codeconstruct.com.au>
+Cc:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "platform-driver-x86@vger.kernel.org" 
+        <platform-driver-x86@vger.kernel.org>,
+        "patches@opensource.cirrus.com" <patches@opensource.cirrus.com>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com" 
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-rtc@vger.kernel.org" <linux-rtc@vger.kernel.org>,
+        "chrome-platform@lists.linux.dev" <chrome-platform@lists.linux.dev>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>,
+        Broadcom internal kernel review list 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-pwm@vger.kernel.org" <linux-pwm@vger.kernel.org>,
+        "linux-watchdog@vger.kernel.org" <linux-watchdog@vger.kernel.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "acpi4asus-user@lists.sourceforge.net" 
+        <acpi4asus-user@lists.sourceforge.net>,
+        "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-rpi-kernel@lists.infradead.org" 
+        <linux-rpi-kernel@lists.infradead.org>,
+        "openipmi-developer@lists.sourceforge.net" 
+        <openipmi-developer@lists.sourceforge.net>,
         "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        BMC-SW <BMC-SW@aspeedtech.com>
-References: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
- <20220629032008.1579899-3-neal_liu@aspeedtech.com>
- <b70e06e7-81fc-dfc1-f9c5-f83cb4a18293@linaro.org>
- <HK0PR06MB32025ACEE605D1016DD3B99D80BB9@HK0PR06MB3202.apcprd06.prod.outlook.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <HK0PR06MB32025ACEE605D1016DD3B99D80BB9@HK0PR06MB3202.apcprd06.prod.outlook.com>
+        "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+        Support Opensource <support.opensource@diasemi.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Wolfram Sang <wsa@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+References: <20220628140313.74984-1-u.kleine-koenig@pengutronix.de>
+ <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
+ <60cc6796236f23c028a9ae76dbe00d1917df82a5.camel@codeconstruct.com.au>
+ <20220629072304.qazmloqdi5h5kdre@pengutronix.de>
+ <5517f329-b6ba-efbd-ccab-3d5caa658b80@csgroup.eu>
+From:   Javier Martinez Canillas <javierm@redhat.com>
+In-Reply-To: <5517f329-b6ba-efbd-ccab-3d5caa658b80@csgroup.eu>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 29/06/2022 09:59, Neal Liu wrote:
->> -----Original Message-----
->> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> Sent: Wednesday, June 29, 2022 1:58 PM
->> To: Neal Liu <neal_liu@aspeedtech.com>; Corentin Labbe
->> <clabbe.montjoie@gmail.com>; Christophe JAILLET
->> <christophe.jaillet@wanadoo.fr>; Randy Dunlap <rdunlap@infradead.org>;
->> Herbert Xu <herbert@gondor.apana.org.au>; David S . Miller
->> <davem@davemloft.net>; Rob Herring <robh+dt@kernel.org>; Krzysztof
->> Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Joel Stanley <joel@jms.id.au>;
->> Andrew Jeffery <andrew@aj.id.au>; Dhananjay Phadke
->> <dhphadke@microsoft.com>; Johnny Huang
->> <johnny_huang@aspeedtech.com>
->> Cc: linux-aspeed@lists.ozlabs.org; linux-crypto@vger.kernel.org;
->> devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
->> linux-kernel@vger.kernel.org; BMC-SW <BMC-SW@aspeedtech.com>
->> Subject: Re: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE
->> reset definition
->>
->> On 29/06/2022 05:20, Neal Liu wrote:
->>> Add HACE reset bit definition for AST2500/AST2600.
->>>
->>> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
->>> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
->>> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>> ---
->>>  include/dt-bindings/clock/aspeed-clock.h  | 3 ++-
->>> include/dt-bindings/clock/ast2600-clock.h | 1 +
->>>  2 files changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/dt-bindings/clock/aspeed-clock.h
->>> b/include/dt-bindings/clock/aspeed-clock.h
->>> index 9ff4f6e4558c..6e040f7c3426 100644
->>> --- a/include/dt-bindings/clock/aspeed-clock.h
->>> +++ b/include/dt-bindings/clock/aspeed-clock.h
->>> @@ -46,11 +46,12 @@
->>>  #define ASPEED_RESET_MCTP		1
->>>  #define ASPEED_RESET_ADC		2
->>>  #define ASPEED_RESET_JTAG_MASTER	3
->>> -#define ASPEED_RESET_MIC		4
->>> +#define ASPEED_RESET_HACE		4
->>
->> I did not ack such change. This is a significant change from previous version,
->> invalidating my previous ack.
->>
->> This breaks the ABI, so NAK without proper explanation why ABI break is
->> accepted.
+On 6/29/22 09:55, Christophe Leroy wrote:
 > 
-> I changed the original define (MIC) into different value (see below diff), and add a new define for HACE.
-> How does that break the ABI? I'll be appreciated if you can explain it more details.
-> And sorry for not remove ack with new change.
+> 
+> Le 29/06/2022 à 09:23, Uwe Kleine-König a écrit :
+>> Hello,
+>>
+>> [I dropped nearly all individuals from the Cc: list because various
+>> bounces reported to be unhappy about the long (logical) line.]
+> 
+> Good idea, even patchwork made a mess of it, see 
+> https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20220628140313.74984-7-u.kleine-koenig@pengutronix.de/
+> 
 
-Yes, this breaks ABI. Previously the ASPEED_RESET_MIC define had value
-of 4, now it has value of something else.
+FYI, for patches like these what I usually use is:
 
+./scripts/get_maintainer.pl --nogit-fallback --no-m --no-r
+
+-- 
 Best regards,
-Krzysztof
+
+Javier Martinez Canillas
+Linux Engineering
+Red Hat
+
