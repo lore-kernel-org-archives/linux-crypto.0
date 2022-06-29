@@ -2,45 +2,62 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD0B0C43334
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 07:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7BEC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 08:03:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229967AbiF2H70 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 03:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46448 "EHLO
+        id S230043AbiF2IDp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 04:03:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbiF2H70 (ORCPT
+        with ESMTP id S229534AbiF2IDo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 03:59:26 -0400
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2106.outbound.protection.outlook.com [40.107.255.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6950B38DAB;
-        Wed, 29 Jun 2022 00:59:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KIoApYUnoSSQAxFJlOU7RGezQCc3z+nu9aWcHIKpw3d/th3lEhRbLmNM7cMvMohMfyfEYlVEQWkEksgj7bEwyvPBX/M7WU3rc73zbaXIE5YNu3sJDNZH1sVgirkk45/3Fcwu8zRsGURiOe7XGsxBSpu+tdGMU3kS3Ud8qEjecDBgOe4DvI0pUoHzjcSD8i0i1LXM+NwceBITxyD/dvOtYEjbxTqRdpENraHLnrtJJ1hdJig5NlpI25NtgFEdfHM/KdDSCVpDrkZ5x2mMTYsLPKFtv5sxFQcSzlplcU/Ltsv5XaE0arIlGoVfw2aHH19wbD2wZChRhXXPJrD3YV82iA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RkbCBIEr404ewC5MA1e/VHWgpyTzsrxk9lPmVuP7DGs=;
- b=ZE2z3DJLoyzVjf9GrPuu6V2NiXc64EVBOpja+9R7s7YWwd2HwrOnyMx4aEIrGs1xF0/veTpfFCu8f3sNve9cy81dUWawqlRrRWx2/rA5eJh3ffDzxpIZ9x0Pc1VsLbZxqOb9k0dqPlaXpQAbLQmmpuFFIwshPG2Tt7HYMSLIXNzHaoHYuybmksS+b879Rqpk7zhOzQMbEX91A7kwhpNy2DWnAmsVi0JPOEbt5ENtukH8C92PMLIzTPzy/49JqFiNPcMqzeTUbowc5MieIZOytzcmfE7sq/uFEAJdvl6NAT3LN+6Hev1eUIgTOX098Q3M12xPwdI8HkVELeyvLCTWvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RkbCBIEr404ewC5MA1e/VHWgpyTzsrxk9lPmVuP7DGs=;
- b=xPPAX4MfBBWENYoFHQp7Viq0L4HJnNNogJk+A8KgmO3dOlUbggwZJ0MY06vS/1RETXW13p2Gk8XuKT840sfpb6iq/5wnoumDp+vY7MetnidtwFBrVqcN3uOQSHJQ0q5Uj6hfNop1FsUHKsuq1lwKtvUq2sRfUiLQzYwpIptUlR/H9e7weu/GgBIF6W7VGqMQS3ewYOAcF8WNqydTxMr53oUXCbLL2PxTHulmk6Ne7pNOQKVGuYCE1UL09LmDQLw31vTqQflXb2bz9jyA+8HQ5HGjh7pGo8DqT3pbWjU6aHOn7jZbn1ogl5gSCDmxhrBi9NPGXZw84uCARB/vxQzNCg==
-Received: from HK0PR06MB3202.apcprd06.prod.outlook.com (2603:1096:203:87::17)
- by TY0PR06MB5356.apcprd06.prod.outlook.com (2603:1096:400:216::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.18; Wed, 29 Jun
- 2022 07:59:16 +0000
-Received: from HK0PR06MB3202.apcprd06.prod.outlook.com
- ([fe80::46d:a7a:f047:e9bf]) by HK0PR06MB3202.apcprd06.prod.outlook.com
- ([fe80::46d:a7a:f047:e9bf%5]) with mapi id 15.20.5373.018; Wed, 29 Jun 2022
- 07:59:15 +0000
-From:   Neal Liu <neal_liu@aspeedtech.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Wed, 29 Jun 2022 04:03:44 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2A729813
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:03:43 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id q6so30821030eji.13
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 01:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=cG3vzXy564NxPyQk6j0mH7QQcpmGhb7eglXugVj6hN8=;
+        b=YPK4Y9MtYTlB+9uxDmydPXAD+nm40vRi5kfqNUZQCbI9XYMlU0HSOwbzR6G6bfbW4r
+         F0Zn6240auG9wDCOE9n576wvCFBDgppCXYG/GGdNxBsOj22QcVc7t6BadRxqNBFanvmZ
+         Hj53k762IYyi8RlPckGPXe0GiV3fZlE/f5hgZxLs3SHfwPyJi4N+lVi1HN+S2PINJ23v
+         kp9yJ05aEzIO7rA8z5nrXEOU7q1BAXOszAd9SqDfvt6GNNB+XktIVwUkJTC5bAKL1kpy
+         ZhhY/RXn66UpmjVKgVL/s3pDCyWB5ZJw9FC7ZT4el0lubErnU7RHGWnvC/2zexKIC71j
+         ZQoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=cG3vzXy564NxPyQk6j0mH7QQcpmGhb7eglXugVj6hN8=;
+        b=hNcI144hVNTtdSaax6HEmcP5tCYLYQ7msyWBd0g6KFcONvy5BGK07LgILnkijzA7t0
+         1Uz80MyJJC13hWdqdSyj5Xdf6ectYoqSXRJ18uMLw7sXoKIaaBsZlQYFhafqpajgunr0
+         GQgUdjmQIMyrHg9Ef82YhHxD6OKuMTDjZqdipo4shOuOoiMTp7x7hqUgrzAPyqeRrjF9
+         RA80j1FNj22IowEsfPr0aUT8py+Nx6gme7825jPo7ZelcqmgWUJYf6wmtn2N7ZZv89iG
+         IZVkx6Wb6OYlYm9tqqY4jaSJuU+PsZC7J72RroLTqrGZfrDEyNk8EnW6MwwpSnERuObf
+         BL9A==
+X-Gm-Message-State: AJIora8h6DQgPFprBNfNv22vYJA3IT4Nskpc9qTFtdyU6Gx6MqR7NXFJ
+        +NYMmpH5CUDdnRcYF/6cZTRKgCn/9pHa7g==
+X-Google-Smtp-Source: AGRyM1vMLNNjC9XXtRvbH3wYlHBLBB1LEnGfbV9c7vENLF2zfPQTUdrjciEn2ZM1kvAcRAd4swllrQ==
+X-Received: by 2002:a17:907:168f:b0:726:2bd0:1091 with SMTP id hc15-20020a170907168f00b007262bd01091mr2003312ejc.137.1656489821764;
+        Wed, 29 Jun 2022 01:03:41 -0700 (PDT)
+Received: from [192.168.0.183] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
+        by smtp.gmail.com with ESMTPSA id g20-20020a50d5d4000000b0042617ba63c2sm10991337edj.76.2022.06.29.01.03.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jun 2022 01:03:40 -0700 (PDT)
+Message-ID: <409af908-5e03-8df7-fcd5-7fab75cdfb34@linaro.org>
+Date:   Wed, 29 Jun 2022 10:03:39 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset
+ definition
+Content-Language: en-US
+To:     Neal Liu <neal_liu@aspeedtech.com>,
         Corentin Labbe <clabbe.montjoie@gmail.com>,
         Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
         Randy Dunlap <rdunlap@infradead.org>,
@@ -52,145 +69,79 @@ To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
         Andrew Jeffery <andrew@aj.id.au>,
         Dhananjay Phadke <dhphadke@microsoft.com>,
         Johnny Huang <johnny_huang@aspeedtech.com>
-CC:     "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+Cc:     "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         BMC-SW <BMC-SW@aspeedtech.com>
-Subject: RE: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset
- definition
-Thread-Topic: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE
- reset definition
-Thread-Index: AQHYi2cqlkV0h2M2LEWiJm1FKKQpMa1l43kAgAAgOSA=
-Date:   Wed, 29 Jun 2022 07:59:15 +0000
-Message-ID: <HK0PR06MB32025ACEE605D1016DD3B99D80BB9@HK0PR06MB3202.apcprd06.prod.outlook.com>
 References: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
  <20220629032008.1579899-3-neal_liu@aspeedtech.com>
  <b70e06e7-81fc-dfc1-f9c5-f83cb4a18293@linaro.org>
-In-Reply-To: <b70e06e7-81fc-dfc1-f9c5-f83cb4a18293@linaro.org>
-Accept-Language: en-US
-Content-Language: zh-TW
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 94a8f68e-3508-4649-a520-08da59a5431b
-x-ms-traffictypediagnostic: TY0PR06MB5356:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cdePnGreTMMxw8iNlYt15E1ZNny5nmmZO6Q1Z7GAuQqDOiy7AGNciChBwR7PxUSvpSXnGR6mzLpl/MtItHR3a1PtWgdlpux8zJmt8fUbFAnjnBuQ4BDN4W4YEU3d92mtX8BUmXKadGcI/Qggn6WwR557ynDe5rjsykq72skBia9RuLm527Xa9w2djyRPKZVbvmbhQMJqCBC9xDdEJCnzRAEcbPXQCFL6u6UZKp+EZzQYshW8Vs2xA3zY1MWBzTrz+vdlRvA5RrY06Dx+1TU+/JsjXjM8fsPYdKagelXh3AyC4bc4kzaE6cmWZCTBF8SyBLXJIIV6O+sjeRtCUIe22nZf3jGYslo9rsZXHti/Lb5GwOfLFRldYJ1oEJnnM3lRGzCRK4erSZK5IsfwFy+i0hv5fA/wxAH/oMCkmTVjKRk1ea6mK8FhOji5fIQ1ymycDea+UDHLdXqXPDlG1emOC1WuyNnmwWoc/9OHieFAfP8XKdKBS0HVsQtn6SoNtj9692MaNY9xHR80LE6ExKmEilmHjVd07aKPKiK6pyCLsxMS6qJ6nMmHPFN5E7kkccs6k52MI4KygDXMQHx5fTBBqwoao6oi0QfwAI3rJgR5meYWLsZBBrtx2cvXNcUdd8uIEaed4qRVNLct83IzqLaDvxmb01oa3inlPnQImABejDDhlfsw5kYATWtaVuJVRbLTlZMpq3Pj8U0DpR9/r8NhIOoXKsbfBI9Pu4LDPMD3F82CQYYeSSnce2GxV1ZpJs34qy8bqBiG1cIPzXxz5noyNr4PenAp3NWHKXyp4ZjxyGSXygpdp9riMi+d351/0+EN
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HK0PR06MB3202.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(366004)(396003)(346002)(39850400004)(376002)(33656002)(5660300002)(4326008)(6636002)(64756008)(7416002)(52536014)(8936002)(83380400001)(122000001)(38100700002)(478600001)(2906002)(110136005)(66446008)(55016003)(66476007)(71200400001)(316002)(86362001)(8676002)(7696005)(54906003)(66946007)(26005)(186003)(6506007)(107886003)(76116006)(9686003)(53546011)(921005)(66556008)(38070700005)(41300700001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SnIrVGRiZmdEMGRSc0JjQVZzdFh1enljNWVFcCs5VnAxNVNlbFFOenlpU2ov?=
- =?utf-8?B?RnllcXhyNVJNV1o1THNLalA3OWR1VWZ3b3hBd21qbEJEYzUvQU5NNkRNQVEr?=
- =?utf-8?B?dWd6T3Y2cGlNN3N5aXNXcERzWDdRYWVRMHM4b2x1emhKT3ZVQ1RTbFJ1djY4?=
- =?utf-8?B?Ukdqa2FwSVN4UkovTFJjMzJseU5meVYxSVhxTVJXaEdxdXNyVFdaaVMvakgy?=
- =?utf-8?B?eTQ0TXRIajRNN1RGUmR6ZmErd2RWZUF3NjJDL1JEc2RzZnNjdmxzdU5yTUx4?=
- =?utf-8?B?RHJaOWl0K3M5U2t0ZnNGZm9BZFhsSHNJNWdZaE1yQmdjMU1ZUFpob0VoRmcx?=
- =?utf-8?B?STQ0NmRaclhqYnRhbENaSkI0R3RzZzd5REZDM001ZVgya0tmTkw0NGhZczBQ?=
- =?utf-8?B?L1piQnZUVlJJQStiNVM4bUU4K1QvQm81SllEVFF0aTdBZUttbU9wWnVsWXR1?=
- =?utf-8?B?cnhWeVlCekJUaVFZWm5sUEhrd053dXpkN2dnbG5SYmJrSXdrRjVacGVMdERy?=
- =?utf-8?B?Z2ZZN2g0aWNJQ2ZSdGpzSEpaTlFzRGFXVzU3R3FJbCt0UTJnZ0hXVmNydzA1?=
- =?utf-8?B?aWNzRlV2aWhSTXZ0bjhVVFo2Q01wQ0pIU2NKWmpQYUtMdDFnYWo1ZkpmanQ4?=
- =?utf-8?B?M1V1YS8rZ1FYb2YzaFNiejlGVXpzeGVweUk5OHhmd0pqeVhPOFNrMTNsS0ky?=
- =?utf-8?B?M1JXb1RlQU5WMDVyamlvRDBjcmxjSDdxNC9hTGRxVjc4NWtidURweEYxU0xM?=
- =?utf-8?B?alpZcktMdTRyZkllN20wNjU1QXh3cm5lUUhCQXNaVHRmTzR5Zk5TR3B2TFQr?=
- =?utf-8?B?RVRxMTBkRWlqTE1LWUhvenp4QTVrMDQvbGhXbE1POFVyL2VKOFZzMVBPVDc4?=
- =?utf-8?B?M2JDK0hFL1VGRGZaOVVFUzRNVlY2REQrT0dhYVB2YUdMUDliTjNzM3pGWW9o?=
- =?utf-8?B?YUVjSUlEV2x2OElOU1FpYzVtcTJCQm9mUnJLVzdCQW9DUEdCeDYvR3haeG9q?=
- =?utf-8?B?MVJTK2djRnFBbzUwZk1maFUwakpkMnRjaDdIVHpQaDhyOTVkVU4wbEJxczlm?=
- =?utf-8?B?bWVTc1ovT2h4OUExeTBGa3RaSjlqajVRR1ZIVEo3OTV5dGdhZGJOUlMraUhO?=
- =?utf-8?B?VzVTaTBBU08zdkFDZEw5OW05RWwwbEJzMWRZMjlxeVQ3akF6RFVORHJNOGJC?=
- =?utf-8?B?Wll6OWIwZTE2UXM0WTV2SGluOXNad0xDcExabGIzQ29qd0NJTm5RbHo4WTdI?=
- =?utf-8?B?R0FjR0NpemlwYnp5d2Q1UjN0cnZZMndVWVA2QnhOT3NwM0pBYlJINVd1MEdp?=
- =?utf-8?B?QndqakFEVGZLSG5abXdhQ3NOVUFqUTVvVWdDYmlMZnRIb0JXb3EzWm1Vby82?=
- =?utf-8?B?Q2hwSFQ5ZlAxOGlpdFRxaUNPTkpsTmhOSTVnbzV2TmJrZmlkbW1iYVlQWTU5?=
- =?utf-8?B?VnRUT2FDaGVKb2luVTl2T0h2WG1wd0dUVzRrOHRScS9RSXlCVUlIRkZBb0dU?=
- =?utf-8?B?elowT1JEOVZuVDUrbTFFVC84WUNMR0NUK3g5MFg4N215TlBzS1dFNVA5VWh3?=
- =?utf-8?B?N21CZ09uUlJlcCtMUDVOY051Y2N2amNFZkNvOUgvY21Zb3M3Tm9kSDhTV0I5?=
- =?utf-8?B?YUltOFAvMEtreEVTbHBrM2dsYVhiZHFVVWR1MHhFUlJidU40bVdOR2Q4UE04?=
- =?utf-8?B?bVVqKzVrLzFyR1drV092a2ZNN1BUcHVmNVFZK2MxbEY3YUxaTjlUYTJpMHJN?=
- =?utf-8?B?ZUovREFuZjMyMXVlU2Z6U3FhRTh4M3ZJc3BSVjQvNXJOdmtwam43b2JPUWJh?=
- =?utf-8?B?dWNwQ1lwMDM3T3NZNFJqOXBwREp2S2JWWjVWMnlMYWhyR2tZa0pQVUJCNUk0?=
- =?utf-8?B?bG1QQjFLYkJpMEZzNHlyMENndFlPcVk3NjNLbSt5cmhyUTJqeWhOYTNhVytH?=
- =?utf-8?B?dW54MHIyZGNhdWtJd0w1YWFNVEk2S2V0UGtYOS9Wbm9PRTFRZzMrYi9KTDNY?=
- =?utf-8?B?SVR1VHBCU1ZSZHFVcmN6VDFOWURoT1BWYTFjdExTNFJXQkdDOXFkMzdXNkNZ?=
- =?utf-8?B?b01MSjEwRituMWZGNS80YXhPTmRxUlg5c1p4SE1ud09CQjNaczdLU2dvRDNa?=
- =?utf-8?Q?0NopqsCNQSxiqWrhRAYPizci7?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: HK0PR06MB3202.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94a8f68e-3508-4649-a520-08da59a5431b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2022 07:59:15.6395
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tYQWUlOoWXgAvFyjMO0fV8VgeZ5rQRxDsvSfYIvcCs4XoAMr569Q0HT+mgOKI8bnO7ioaMEFoZHEpxMWziNSiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB5356
+ <HK0PR06MB32025ACEE605D1016DD3B99D80BB9@HK0PR06MB3202.apcprd06.prod.outlook.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <HK0PR06MB32025ACEE605D1016DD3B99D80BB9@HK0PR06MB3202.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLcnp5c3p0b2YgS296bG93c2tp
-IDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+DQo+IFNlbnQ6IFdlZG5lc2RheSwgSnVu
-ZSAyOSwgMjAyMiAxOjU4IFBNDQo+IFRvOiBOZWFsIExpdSA8bmVhbF9saXVAYXNwZWVkdGVjaC5j
-b20+OyBDb3JlbnRpbiBMYWJiZQ0KPiA8Y2xhYmJlLm1vbnRqb2llQGdtYWlsLmNvbT47IENocmlz
-dG9waGUgSkFJTExFVA0KPiA8Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI+OyBSYW5keSBE
-dW5sYXAgPHJkdW5sYXBAaW5mcmFkZWFkLm9yZz47DQo+IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29u
-ZG9yLmFwYW5hLm9yZy5hdT47IERhdmlkIFMgLiBNaWxsZXINCj4gPGRhdmVtQGRhdmVtbG9mdC5u
-ZXQ+OyBSb2IgSGVycmluZyA8cm9iaCtkdEBrZXJuZWwub3JnPjsgS3J6eXN6dG9mDQo+IEtvemxv
-d3NraSA8a3J6eXN6dG9mLmtvemxvd3NraStkdEBsaW5hcm8ub3JnPjsgSm9lbCBTdGFubGV5IDxq
-b2VsQGptcy5pZC5hdT47DQo+IEFuZHJldyBKZWZmZXJ5IDxhbmRyZXdAYWouaWQuYXU+OyBEaGFu
-YW5qYXkgUGhhZGtlDQo+IDxkaHBoYWRrZUBtaWNyb3NvZnQuY29tPjsgSm9obm55IEh1YW5nDQo+
-IDxqb2hubnlfaHVhbmdAYXNwZWVkdGVjaC5jb20+DQo+IENjOiBsaW51eC1hc3BlZWRAbGlzdHMu
-b3psYWJzLm9yZzsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsNCj4gZGV2aWNldHJlZUB2
-Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZzsNCj4g
-bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgQk1DLVNXIDxCTUMtU1dAYXNwZWVkdGVjaC5j
-b20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjUgMi81XSBkdC1iaW5kaW5nczogY2xvY2s6IEFk
-ZCBBU1QyNTAwL0FTVDI2MDAgSEFDRQ0KPiByZXNldCBkZWZpbml0aW9uDQo+IA0KPiBPbiAyOS8w
-Ni8yMDIyIDA1OjIwLCBOZWFsIExpdSB3cm90ZToNCj4gPiBBZGQgSEFDRSByZXNldCBiaXQgZGVm
-aW5pdGlvbiBmb3IgQVNUMjUwMC9BU1QyNjAwLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogTmVh
-bCBMaXUgPG5lYWxfbGl1QGFzcGVlZHRlY2guY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEpvaG5u
-eSBIdWFuZyA8am9obm55X2h1YW5nQGFzcGVlZHRlY2guY29tPg0KPiA+IEFja2VkLWJ5OiBLcnp5
-c3p0b2YgS296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+DQo+ID4gLS0t
-DQo+ID4gIGluY2x1ZGUvZHQtYmluZGluZ3MvY2xvY2svYXNwZWVkLWNsb2NrLmggIHwgMyArKy0N
-Cj4gPiBpbmNsdWRlL2R0LWJpbmRpbmdzL2Nsb2NrL2FzdDI2MDAtY2xvY2suaCB8IDEgKw0KPiA+
-ICAyIGZpbGVzIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+
-ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvZHQtYmluZGluZ3MvY2xvY2svYXNwZWVkLWNsb2NrLmgN
-Cj4gPiBiL2luY2x1ZGUvZHQtYmluZGluZ3MvY2xvY2svYXNwZWVkLWNsb2NrLmgNCj4gPiBpbmRl
-eCA5ZmY0ZjZlNDU1OGMuLjZlMDQwZjdjMzQyNiAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2R0
-LWJpbmRpbmdzL2Nsb2NrL2FzcGVlZC1jbG9jay5oDQo+ID4gKysrIGIvaW5jbHVkZS9kdC1iaW5k
-aW5ncy9jbG9jay9hc3BlZWQtY2xvY2suaA0KPiA+IEBAIC00NiwxMSArNDYsMTIgQEANCj4gPiAg
-I2RlZmluZSBBU1BFRURfUkVTRVRfTUNUUAkJMQ0KPiA+ICAjZGVmaW5lIEFTUEVFRF9SRVNFVF9B
-REMJCTINCj4gPiAgI2RlZmluZSBBU1BFRURfUkVTRVRfSlRBR19NQVNURVIJMw0KPiA+IC0jZGVm
-aW5lIEFTUEVFRF9SRVNFVF9NSUMJCTQNCj4gPiArI2RlZmluZSBBU1BFRURfUkVTRVRfSEFDRQkJ
-NA0KPiANCj4gSSBkaWQgbm90IGFjayBzdWNoIGNoYW5nZS4gVGhpcyBpcyBhIHNpZ25pZmljYW50
-IGNoYW5nZSBmcm9tIHByZXZpb3VzIHZlcnNpb24sDQo+IGludmFsaWRhdGluZyBteSBwcmV2aW91
-cyBhY2suDQo+IA0KPiBUaGlzIGJyZWFrcyB0aGUgQUJJLCBzbyBOQUsgd2l0aG91dCBwcm9wZXIg
-ZXhwbGFuYXRpb24gd2h5IEFCSSBicmVhayBpcw0KPiBhY2NlcHRlZC4NCg0KSSBjaGFuZ2VkIHRo
-ZSBvcmlnaW5hbCBkZWZpbmUgKE1JQykgaW50byBkaWZmZXJlbnQgdmFsdWUgKHNlZSBiZWxvdyBk
-aWZmKSwgYW5kIGFkZCBhIG5ldyBkZWZpbmUgZm9yIEhBQ0UuDQpIb3cgZG9lcyB0aGF0IGJyZWFr
-IHRoZSBBQkk/IEknbGwgYmUgYXBwcmVjaWF0ZWQgaWYgeW91IGNhbiBleHBsYWluIGl0IG1vcmUg
-ZGV0YWlscy4NCkFuZCBzb3JyeSBmb3Igbm90IHJlbW92ZSBhY2sgd2l0aCBuZXcgY2hhbmdlLg0K
-DQo+IA0KPiA+ICAjZGVmaW5lIEFTUEVFRF9SRVNFVF9QV00JCTUNCj4gPiAgI2RlZmluZSBBU1BF
-RURfUkVTRVRfUEVDSQkJNg0KPiA+ICAjZGVmaW5lIEFTUEVFRF9SRVNFVF9JMkMJCTcNCj4gPiAg
-I2RlZmluZSBBU1BFRURfUkVTRVRfQUhCCQk4DQo+ID4gICNkZWZpbmUgQVNQRUVEX1JFU0VUX0NS
-VDEJCTkNCj4gPiArI2RlZmluZSBBU1BFRURfUkVTRVRfTUlDCQkxOA0KPiA+DQo+ID4gICNlbmRp
-Zg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2R0LWJpbmRpbmdzL2Nsb2NrL2FzdDI2MDAtY2xv
-Y2suaA0KPiA+IGIvaW5jbHVkZS9kdC1iaW5kaW5ncy9jbG9jay9hc3QyNjAwLWNsb2NrLmgNCj4g
-PiBpbmRleCA2MmI5NTIwYTAwZmQuLmQ4YjBkYjJmN2E3ZCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNs
-dWRlL2R0LWJpbmRpbmdzL2Nsb2NrL2FzdDI2MDAtY2xvY2suaA0KPiA+ICsrKyBiL2luY2x1ZGUv
-ZHQtYmluZGluZ3MvY2xvY2svYXN0MjYwMC1jbG9jay5oDQo+ID4gQEAgLTExMSw2ICsxMTEsNyBA
-QA0KPiA+ICAjZGVmaW5lIEFTUEVFRF9SRVNFVF9QQ0lFX1JDX08JCTE5DQo+ID4gICNkZWZpbmUg
-QVNQRUVEX1JFU0VUX1BDSUVfUkNfT0VOCTE4DQo+ID4gICNkZWZpbmUgQVNQRUVEX1JFU0VUX1BD
-SV9EUAkJNQ0KPiA+ICsjZGVmaW5lIEFTUEVFRF9SRVNFVF9IQUNFCQk0DQo+ID4gICNkZWZpbmUg
-QVNQRUVEX1JFU0VUX0FIQgkJMQ0KPiA+ICAjZGVmaW5lIEFTUEVFRF9SRVNFVF9TRFJBTQkJMA0K
-PiA+DQo+IA0KPiANCj4gQmVzdCByZWdhcmRzLA0KPiBLcnp5c3p0b2YNCg==
+On 29/06/2022 09:59, Neal Liu wrote:
+>> -----Original Message-----
+>> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>> Sent: Wednesday, June 29, 2022 1:58 PM
+>> To: Neal Liu <neal_liu@aspeedtech.com>; Corentin Labbe
+>> <clabbe.montjoie@gmail.com>; Christophe JAILLET
+>> <christophe.jaillet@wanadoo.fr>; Randy Dunlap <rdunlap@infradead.org>;
+>> Herbert Xu <herbert@gondor.apana.org.au>; David S . Miller
+>> <davem@davemloft.net>; Rob Herring <robh+dt@kernel.org>; Krzysztof
+>> Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Joel Stanley <joel@jms.id.au>;
+>> Andrew Jeffery <andrew@aj.id.au>; Dhananjay Phadke
+>> <dhphadke@microsoft.com>; Johnny Huang
+>> <johnny_huang@aspeedtech.com>
+>> Cc: linux-aspeed@lists.ozlabs.org; linux-crypto@vger.kernel.org;
+>> devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
+>> linux-kernel@vger.kernel.org; BMC-SW <BMC-SW@aspeedtech.com>
+>> Subject: Re: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE
+>> reset definition
+>>
+>> On 29/06/2022 05:20, Neal Liu wrote:
+>>> Add HACE reset bit definition for AST2500/AST2600.
+>>>
+>>> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+>>> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+>>> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>> ---
+>>>  include/dt-bindings/clock/aspeed-clock.h  | 3 ++-
+>>> include/dt-bindings/clock/ast2600-clock.h | 1 +
+>>>  2 files changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/dt-bindings/clock/aspeed-clock.h
+>>> b/include/dt-bindings/clock/aspeed-clock.h
+>>> index 9ff4f6e4558c..6e040f7c3426 100644
+>>> --- a/include/dt-bindings/clock/aspeed-clock.h
+>>> +++ b/include/dt-bindings/clock/aspeed-clock.h
+>>> @@ -46,11 +46,12 @@
+>>>  #define ASPEED_RESET_MCTP		1
+>>>  #define ASPEED_RESET_ADC		2
+>>>  #define ASPEED_RESET_JTAG_MASTER	3
+>>> -#define ASPEED_RESET_MIC		4
+>>> +#define ASPEED_RESET_HACE		4
+>>
+>> I did not ack such change. This is a significant change from previous version,
+>> invalidating my previous ack.
+>>
+>> This breaks the ABI, so NAK without proper explanation why ABI break is
+>> accepted.
+> 
+> I changed the original define (MIC) into different value (see below diff), and add a new define for HACE.
+> How does that break the ABI? I'll be appreciated if you can explain it more details.
+> And sorry for not remove ack with new change.
+
+Yes, this breaks ABI. Previously the ASPEED_RESET_MIC define had value
+of 4, now it has value of something else.
+
+Best regards,
+Krzysztof
