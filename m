@@ -2,124 +2,110 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D125DC43334
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jun 2022 19:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DE0C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 02:31:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235171AbiF1TFa (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jun 2022 15:05:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34690 "EHLO
+        id S229527AbiF2Cb0 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 28 Jun 2022 22:31:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235169AbiF1TEq (ORCPT
+        with ESMTP id S229455AbiF2Cb0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jun 2022 15:04:46 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0AB829814;
-        Tue, 28 Jun 2022 12:04:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1656443084; x=1687979084;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=N1AIQgmubreattzHLRnM0HT3Yc8fAoLHRwgDBlBS8LA=;
-  b=VHS+RJwDI+KcZ9uXXLcKfjF8faaFRG/l0XQvsCaWXKwlW1x5ZaY0iH2v
-   NNh6KGSIr+W7CVP6Fmnx13j4jcHiqkpkv5M6brC2VSNCLYt8CTibCi0x4
-   CiYiFyJrEhIKy/mhdnt097oeht0B1aMYnewAp7p/fMR59QwOml/YmZdsq
-   VkXAJQR/UrO9KlFEr+qJe7rsreBLBt3iuZltfYq2+xm3rNer4rbsFJ4gZ
-   QV5jJfaO3Op8d2+jCpIJxf7tK+RHyneutpVp0TU77jnC3bA22YDAJnNsj
-   sihrkprmfclvi8V00y20UQ9eaoW9NlGegolkPFJ9miuncpmKIj5UEHSt1
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="279369738"
-X-IronPort-AV: E=Sophos;i="5.92,229,1650956400"; 
-   d="scan'208";a="279369738"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 12:04:44 -0700
-X-IronPort-AV: E=Sophos;i="5.92,229,1650956400"; 
-   d="scan'208";a="587977804"
-Received: from staibmic-mobl1.amr.corp.intel.com (HELO [10.209.67.166]) ([10.209.67.166])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 12:04:43 -0700
-Message-ID: <33e38ba3-0865-8a9f-0739-af25a63d0beb@intel.com>
-Date:   Tue, 28 Jun 2022 12:03:38 -0700
+        Tue, 28 Jun 2022 22:31:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8494222522;
+        Tue, 28 Jun 2022 19:31:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 381F3B8215C;
+        Wed, 29 Jun 2022 02:31:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82997C341C8;
+        Wed, 29 Jun 2022 02:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656469882;
+        bh=8xAZ1IIARVTDyCD9gQ3J+dnK+nplzK9hhcBYQq3dJso=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JIG4L/+xrHqRiy/MUVcGNGkv2caMyzZ5XC8C1GwcWkkitSZPlFlNf6+cArmyKSLAU
+         YcLNgnX7hZXTWE5yh0iFcsnLr7iJdA/90H5U/kUcj/f0xauRLCq2/7mkeDNRLDdAH/
+         W+ha45Qsc6x8tJuif0GuUU2QzgguFDyLtJBiEsa1+m8a1alyDE6Y7JB3t+O4GWtO1l
+         f/uhTmS/qbcoNirk/+dN8ZQuoBKAWyQw74UvgA+p5yva4R3kKSq5w2TU8PAKT+CsTa
+         d08Gq3gpx+Ro5UpzscnSPrz6z7KKG4owYCu8Ats5uQCW+AX6iU9iAvJj5tc7mqyje4
+         BQRrbXJnUTbeA==
+Date:   Wed, 29 Jun 2022 05:31:19 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Elvira Khabirova <e.khabirova@omp.ru>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/2 RESEND] pkcs7: support EC-RDSA/streebog in
+ SignerInfo
+Message-ID: <Yru5Xao3LSB0cChI@kernel.org>
+References: <20220627092142.21095-1-tianjia.zhang@linux.alibaba.com>
+ <20220627092142.21095-3-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH Part2 v6 06/49] x86/sev: Add helper functions for
- RMPUPDATE and PSMASH instruction
-Content-Language: en-US
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>, "bp@alien8.de" <bp@alien8.de>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <e4643e9d37fcb025d0aec9080feefaae5e9245d5.1655761627.git.ashish.kalra@amd.com>
- <YrH0ca3Sam7Ru11c@work-vm>
- <SN6PR12MB2767FBF0848B906B9F0284D28EB39@SN6PR12MB2767.namprd12.prod.outlook.com>
- <BYAPR12MB2759910E715C69D1027CCE678EB29@BYAPR12MB2759.namprd12.prod.outlook.com>
- <Yrrc/6x70wa14c5t@work-vm>
- <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <SN6PR12MB27677062FBBF9D62C7BF41D88EB89@SN6PR12MB2767.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220627092142.21095-3-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/28/22 10:57, Kalra, Ashish wrote:
-> +       /*
-> +        * RMP table entry format is not architectural and it can vary by processor and
-> +        * is defined by the per-processor PPR. Restrict SNP support on the known CPU
-> +        * model and family for which the RMP table entry format is currently defined for.
-> +        */
-> +       if (family != 0x19 || model > 0xaf)
-> +               goto nosnp;
-> +
+On Mon, Jun 27, 2022 at 05:21:42PM +0800, Tianjia Zhang wrote:
+> From: Elvira Khabirova <e.khabirova@omp.ru>
 > 
-> This way SNP will only be enabled specifically on the platforms for which this RMP entry
-> format is defined in those processor's PPR. This will work for Milan and Genoa as of now.
+> Allow using EC-RDSA/streebog in pkcs7 certificates in a similar way
+> to how it's done in the x509 parser.
+> 
+> This is needed e.g. for loading kernel modules signed with EC-RDSA.
+> 
+> Signed-off-by: Elvira Khabirova <e.khabirova@omp.ru>
+> Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
+> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  crypto/asymmetric_keys/pkcs7_parser.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+> index 24e2e4a6d842..277482bb1777 100644
+> --- a/crypto/asymmetric_keys/pkcs7_parser.c
+> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
+> @@ -251,6 +251,12 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
+>  	case OID_sm3:
+>  		ctx->sinfo->sig->hash_algo = "sm3";
+>  		break;
+> +	case OID_gost2012Digest256:
+> +		ctx->sinfo->sig->hash_algo = "streebog256";
+> +		break;
+> +	case OID_gost2012Digest512:
+> +		ctx->sinfo->sig->hash_algo = "streebog512";
+> +		break;
+>  	default:
+>  		printk("Unsupported digest algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
+> @@ -284,6 +290,11 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
+>  		ctx->sinfo->sig->pkey_algo = "sm2";
+>  		ctx->sinfo->sig->encoding = "raw";
+>  		break;
+> +	case OID_gost2012PKey256:
+> +	case OID_gost2012PKey512:
+> +		ctx->sinfo->sig->pkey_algo = "ecrdsa";
+> +		ctx->sinfo->sig->encoding = "raw";
+> +		break;
+>  	default:
+>  		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
+>  		return -ENOPKG;
+> -- 
+> 2.24.3 (Apple Git-128)
+> 
 
-At some point, it would be really nice if the AMD side of things could
-work to kick the magic number habit on these things.  This:
+Please, check:
 
-	arch/x86/include/asm/intel-family.h
+git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
 
-has been really handy.  It lets you do things like
-
-	grep INTEL_FAM6_SKYLAKE arch/x86
-
-That's a *LOT* more precise than:
-
-	egrep -i '0x5E|94' arch/x86
+BR, Jarkko
