@@ -2,131 +2,131 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A169C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 21:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53DCC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 21:35:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbiF2V0D (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 17:26:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35788 "EHLO
+        id S230507AbiF2Vf4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 17:35:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiF2V0C (ORCPT
+        with ESMTP id S231231AbiF2Vfs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 17:26:02 -0400
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64331D323;
-        Wed, 29 Jun 2022 14:26:01 -0700 (PDT)
-Received: by mail-il1-f173.google.com with SMTP id p13so11183052ilq.0;
-        Wed, 29 Jun 2022 14:26:01 -0700 (PDT)
+        Wed, 29 Jun 2022 17:35:48 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BA93190D
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 14:35:44 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id m13so17408643ioj.0
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 14:35:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VGBhZHWqW6jU2n7a27O2QHBIK43y3nGHte6lt/SEtG0=;
+        b=W8+Z7i9qRM0MsWbc+KsXIAElN0YZEtmcc17hsLOb/KWWvqaEbf5Q9Btz7IbP5bm5/V
+         nydE4Dx0h63nSNLveaItcJSr4cPaMXeYz0N20AdqwpHoW+E8pV7C60HUzv9CtekRWfia
+         sbvNxWCC0oyNPa7tfrRbC+UUvIpAQtLITqPZ8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=BAnlbGwaJ9TyuQs7iWeZBAejDnwxdU93bNzpne1ImGI=;
-        b=IgjNy2Zga4vDDf7qOZFDF1Dcoh6WAXr9ry+/yBHINDuhz5nMJoa/aPAtOfJQO1R19U
-         IzQuH2UeQioxQyLivEW8zE9jXWuvRInJ6Q3SquNp3ThntFIeU/IosJ1ZG9foqXFtd4Jg
-         swtyqXFOvoy/VCefUUgI1IDIWczdayEa8RAXXp6e5hGB93y6kCLMBLaoSCUm7Jd8RInW
-         Iw976kJmzllMZ7jZV9Mujx8ey5wVJlgKvMFTYnJMekuFu0H/SMLSCSsTQGmzHlbJBxcu
-         MbcyTLFRCfndpfJYayNQnz/avOO5uMhpFUkiEBxVf67jqdduf+vvL9buqxVEGqNzAJn2
-         buCg==
-X-Gm-Message-State: AJIora+GZkHNQGPktE/Zl1QVv7jOT4oezAdXybU8ybOixtrN824ek7go
-        3zlCLCz0IPoYlKBtTLN0ZWtFY53g+Q==
-X-Google-Smtp-Source: AGRyM1uGnG/FqvK7s4eQ1jjuMvP1A15YdewxNxXJDzr+xSEfqGJY54KWk2BtpcyvzmVd7hKKmbJofg==
-X-Received: by 2002:a05:6e02:1214:b0:2da:705c:5f03 with SMTP id a20-20020a056e02121400b002da705c5f03mr3048170ilq.318.1656537961129;
-        Wed, 29 Jun 2022 14:26:01 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id e24-20020a5d85d8000000b006694bc50b82sm8293589ios.35.2022.06.29.14.25.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 14:26:00 -0700 (PDT)
-Received: (nullmailer pid 858117 invoked by uid 1000);
-        Wed, 29 Jun 2022 21:25:59 -0000
-Date:   Wed, 29 Jun 2022 15:25:59 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Vabhav Sharma <vabhav.sharma@nxp.com>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Gaurav Jain <gaurav.jain@nxp.com>,
-        Pankaj Gupta <pankaj.gupta@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "shawnguo@kernel.org" <shawnguo@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Varun Sethi <V.Sethi@nxp.com>
-Subject: Re: [EXT] Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy
- delay property
-Message-ID: <20220629212559.GA843061-robh@kernel.org>
-References: <20220530180924.1792399-1-vabhav.sharma@nxp.com>
- <20220530180924.1792399-2-vabhav.sharma@nxp.com>
- <20220605212114.GA3528129-robh@kernel.org>
- <AS1PR04MB9358BCBEBDC7EBAC6E5DD6A9F3AC9@AS1PR04MB9358.eurprd04.prod.outlook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VGBhZHWqW6jU2n7a27O2QHBIK43y3nGHte6lt/SEtG0=;
+        b=AFZ/gGi9v2bZaIOhuPDnuAseTxF/ArT1bsLjbHBhsafMCji/ayQ5xvbYJi3Ze55t6B
+         xosmxtWUX4dc18fMO00VZg7wFXtH3aMzgb7pt7GcwgdzisMmkwyTPeQnThXHVi0KPSpX
+         F1mpOhn/1N2LdLsaj0z8pS+4vcdtWGjr2YYB+QtyZjNDO/dQR0f2VJxLuDds6svUtdAQ
+         VHRcOGMMAA3NEbiv3MY32e8XKbp9U7ivzC/K+tpEI4XlgIWwg46nkXTnF8fhJOG4LAA9
+         G5KcMCK+vNGvAteGWnuQnVZbzNGgcClDWVuNdkyWhEiOVwPt+sy6NlNeICCb68QqSei4
+         xsNA==
+X-Gm-Message-State: AJIora8xHy3Ew1c4oOfxQrchwQw519mDGZUAc0DUvzsKwt9panC5906w
+        j1vHXv9EbzZ9amlsXMFSW5bBPFTzsR3SNKAqVRVijw==
+X-Google-Smtp-Source: AGRyM1sx3YTgbATfQDjAunxSoBLK3pi4IP0MMX8oiX8OkYO1T6fFycU68AHBce48c5X0XhL2pfBRw7LbtQUOSVzQraM=
+X-Received: by 2002:a05:6638:22cf:b0:33b:fd4a:122b with SMTP id
+ j15-20020a05663822cf00b0033bfd4a122bmr3164522jat.244.1656538543693; Wed, 29
+ Jun 2022 14:35:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS1PR04MB9358BCBEBDC7EBAC6E5DD6A9F3AC9@AS1PR04MB9358.eurprd04.prod.outlook.com>
+References: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com> <YrvDEqdk3ZfcEy9i@sol.localdomain>
+In-Reply-To: <YrvDEqdk3ZfcEy9i@sol.localdomain>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Wed, 29 Jun 2022 22:35:33 +0100
+Message-ID: <CALrw=nEsEemxP4q4QkFGxOY3+fo07wopdtLUerzBP0oKhRLmUA@mail.gmail.com>
+Subject: Re: [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to
+ linux-next kernel
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        kernel-team <kernel-team@cloudflare.com>,
+        abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
+        mputtash@linux.vnet.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 16, 2022 at 05:49:30PM +0000, Vabhav Sharma wrote:
-> Hello Rob,
-> 
-> > -----Original Message-----
-> > From: Rob Herring <robh@kernel.org>
-> > Sent: Monday, June 6, 2022 2:51 AM
-> > To: Vabhav Sharma <vabhav.sharma@nxp.com>
-> > Cc: Horia Geanta <horia.geanta@nxp.com>; Gaurav Jain
-> > <gaurav.jain@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>;
-> > herbert@gondor.apana.org.au; davem@davemloft.net;
-> > shawnguo@kernel.org; linux-crypto@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; dl-linux-imx <linux-imx@nxp.com>;
-> > devicetree@vger.kernel.org; linux-arm-kernel@lists.infradead.org; Silvano Di
-> > Ninno <silvano.dininno@nxp.com>; Varun Sethi <V.Sethi@nxp.com>
-> > Subject: [EXT] Re: [PATCH 1/3] dt-bindings: crypto: fsl: add entropy delay
-> > property
-> > 
-> > Caution: EXT Email
-> > 
-> > On Mon, May 30, 2022 at 11:39:22PM +0530, Vabhav Sharma wrote:
-> > > Add entropy delay property which defines the length (in system clocks)
-> > > of each Entropy sample taken for TRNG configuration.
-> > >
-> > > Signed-off-by: Vabhav Sharma <vabhav.sharma@nxp.com>
-> > > Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
-> > > Reviewed-by: Varun Sethi <v.sethi@nxp.com>
-> > > ---
-> > >  Documentation/devicetree/bindings/crypto/fsl-sec4.txt | 6 ++++++
-> > >  1 file changed, 6 insertions(+)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > > b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > > index 8f359f473ada..1477294eda38 100644
-> > > --- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > > +++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-> > > @@ -62,6 +62,12 @@ PROPERTIES
-> > >        Definition: A standard property. Define the 'ERA' of the SEC
-> > >            device.
-> > >
-> > > +   - entropy-delay
-> > > +      Usage: optional
-> > > +      Value type: <u32>
-> > > +      Definition: A property which specifies the length (in system clocks)
-> > > +          of each Entropy sample taken.
-> > > +
-> > 
-> > Seems like this could be common, but should be a time value (with unit
-> > suffix) rather than clocks. If not common, then needs a vendor prefix.
-> > Is this time to read a value or time between values produced? Not really clear
-> > from the description.
-> CAAM TRNG Configuration includes 16-bit field entropy-delay. This field specifies how long the oscillator is given to freely oscillate and generate a single bit of entropy.
-> It is specified as number of system clock cycles and this u32 type field already exist in the caam driver code with default value of 3200. However, on some platform this value can vary and support is added to read the value from device tree in order to override default value, Hope this helps to clarify.
+On Wed, Jun 29, 2022 at 4:12 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Jun 28, 2022 at 02:33:55PM +0530, Tasmiya Nalatwad wrote:
+> > Greetings,
+> >
+> > [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to linux-next
+> > kernel
+> >
+> > --- Call Traces ---
+> > [    1.788574] ------------[ cut here ]------------
+> > [    1.788577] alg: self-tests for rsa-generic (rsa) failed (rc=-22)
+> > [    1.788586] WARNING: CPU: 9 PID: 218 at crypto/testmgr.c:5774
+> > alg_test+0x438/0x880
+> > [    1.788598] Modules linked in:
+> > [    1.788603] CPU: 9 PID: 218 Comm: cryptomgr_test Not tainted
+> > 5.19.0-rc4-next-20220627-autotest #1
+> > [    1.788609] NIP:  c00000000062e078 LR: c00000000062e074 CTR:
+> > c00000000075e020
+> > [    1.788614] REGS: c00000000e733980 TRAP: 0700   Not tainted
+> > (5.19.0-rc4-next-20220627-autotest)
+> > [    1.788620] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: 28008822
+> > XER: 20040005
+> > [    1.788632] CFAR: c00000000014f244 IRQMASK: 0
+> > [    1.788632] GPR00: c00000000062e074 c00000000e733c20 c000000002a12000
+> > 0000000000000035
+> > [    1.788632] GPR04: 00000000ffff7fff c00000000e7339e0 c00000000e7339d8
+> > 0000000000000000
+> > [    1.788632] GPR08: c000000002826b78 0000000000000000 c000000002566a50
+> > c0000000028e6bb8
+> > [    1.788632] GPR12: 0000000000008000 c00000000fff3280 c00000000018b6d8
+> > c00000000d640080
+> > [    1.788632] GPR16: 0000000000000000 0000000000000000 0000000000000000
+> > 0000000000000000
+> > [    1.788632] GPR20: 0000000000000000 0000000000000000 0000000000000000
+> > 0000000000000000
+> > [    1.788632] GPR24: c000000000da49e8 0000000000000000 c000000050630480
+> > 0000000000000400
+> > [    1.788632] GPR28: c000000050630400 000000000000000d c000000002cd33d8
+> > ffffffffffffffea
+> > [    1.788691] NIP [c00000000062e078] alg_test+0x438/0x880
+> > [    1.788696] LR [c00000000062e074] alg_test+0x434/0x880
+> > [    1.788701] Call Trace:
+> > [    1.788704] [c00000000e733c20] [c00000000062e074] alg_test+0x434/0x880
+> > (unreliable)
+> > [    1.788712] [c00000000e733d90] [c00000000062c040]
+> > cryptomgr_test+0x40/0x70
+> > [    1.788718] [c00000000e733dc0] [c00000000018b7f4] kthread+0x124/0x130
+> > [    1.788726] [c00000000e733e10] [c00000000000ce54]
+> > ret_from_kernel_thread+0x5c/0x64
+> > [    1.788733] Instruction dump:
+> > [    1.788736] 409e02e4 3d22002c 892913fd 2f890000 409e02d4 3c62fe63
+> > 7f45d378 7f84e378
+> > [    1.788746] 7fe6fb78 3863fa90 4bb2116d 60000000 <0fe00000> fa2100f8
+> > fa410100 fa610108
+> > [    1.788757] ---[ end trace 0000000000000000 ]---
+> > --
+>
+> It's caused by:
+>
+> commit f145d411a67efacc0731fc3f9c7b2d89fb62523a
+> Author: Ignat Korchagin <ignat@cloudflare.com>
+> Date:   Fri Jun 17 09:42:10 2022 +0100
+>
+>     crypto: rsa - implement Chinese Remainder Theorem for faster private key operations
 
-So that is how often a sample can be read? Or what happens if you read a 
-sample too quick (in less than this delay time)?
-
-Look at other h/w and drivers see if something common makes sense here.
-
-Rob
+Thanks for the report. Seems the RSA test vectors need updating as we
+now care about CRT parameters. I'll try to craft something.
