@@ -2,109 +2,135 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AF6C43334
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 04:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92743C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 05:57:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbiF2ENI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 00:13:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60316 "EHLO
+        id S230417AbiF2F5p (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 01:57:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231744AbiF2EM5 (ORCPT
+        with ESMTP id S230403AbiF2F5p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 00:12:57 -0400
-Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842EC396B8;
-        Tue, 28 Jun 2022 21:12:28 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VHm8czW_1656475943;
-Received: from 30.240.101.24(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0VHm8czW_1656475943)
-          by smtp.aliyun-inc.com;
-          Wed, 29 Jun 2022 12:12:24 +0800
-Message-ID: <be004040-a17b-bddb-b56d-eb569658f7a9@linux.alibaba.com>
-Date:   Wed, 29 Jun 2022 12:12:22 +0800
+        Wed, 29 Jun 2022 01:57:45 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5B52982C
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jun 2022 22:57:44 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id mf9so30453373ejb.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jun 2022 22:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=1WfdVfNcXkp3OxFuJuEQhMM39v5eC68bY2ADm6rLKI0=;
+        b=JkUoMSVHOd8FXIU1nP7mHg39NA+HAkmXOBLZHIkIRWjuF2QXpez6vuJMIWGUWFHEby
+         5o4bGCiXixkuKlUlu2olkq0QLN2UOIntPX6lG3+7PbXV+avqVfJ253cahNkw20GGXPeA
+         MHvSKO3EVsTxg+HQtXEwBaZzsvry24d4BvkcEdAr5jVs9aGqW6Xuvyy663JNPBbkngxL
+         ek6xf1/RqwKb2cDwtZy8lrOxsp43tHw2dRO21IpABqGEytjhcHxUraOi/YMWnoRgDrmq
+         fIbCX7sv+Ga3+sPyzf/OYbX6uTY+nt3ooO/FRKAj9IUFTzcd83VY9OMyTF/rzwkUp2rw
+         iYkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=1WfdVfNcXkp3OxFuJuEQhMM39v5eC68bY2ADm6rLKI0=;
+        b=Wusz6TUAA8t1yY6G7HQD4Z2QrKOcejEAU/IP/3uNXZLVCkv6fAdgvvDkqMRyhqT+Ow
+         bWRRGHGidV5QvI1D1Cpd5P4yV24/8NCOneaRrcHLZ5Vjipwz9vW31rphMGUqdJD33R/9
+         Mso+WwCUQYaCdU4vsY34Ngvqcvq6GxSXR2sbgysNw8x8klK9dQwbQAWzgi7EiVxwnYJy
+         P50QQY2psrS93AqhGWR3Gn4VvkdWWw9uAX++GpX+GRvGab1P38Gg5iYYQNfsAvaeIGPN
+         aoGwb8mwnrWtHBObVfc//r8EZCOfY9qBB5LH/6CKSGFAKCi62rgp7Q/BiaLLfPlkNLjP
+         xKhA==
+X-Gm-Message-State: AJIora/V3Lhfjha2t/ZIlLZdMtzaOnwwwCwnv9/lj3dmKd/nN0ZIcEEV
+        zN7r3p+ctg/VSr974gIQ5EOV6A==
+X-Google-Smtp-Source: AGRyM1tKY3/ufkVIb0NqXcBrOPVDKBLhqSVvGuyqn+dsBxeoxntoXm1sQv41p5v8Kn71T36sBhLAmA==
+X-Received: by 2002:a17:907:7213:b0:726:9f27:8fc8 with SMTP id dr19-20020a170907721300b007269f278fc8mr1551543ejc.523.1656482262769;
+        Tue, 28 Jun 2022 22:57:42 -0700 (PDT)
+Received: from [192.168.0.181] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
+        by smtp.gmail.com with ESMTPSA id d20-20020aa7ce14000000b00435d4179bbdsm10892308edv.4.2022.06.28.22.57.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jun 2022 22:57:42 -0700 (PDT)
+Message-ID: <b70e06e7-81fc-dfc1-f9c5-f83cb4a18293@linaro.org>
+Date:   Wed, 29 Jun 2022 07:57:40 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [PATCH v4 2/2 RESEND] pkcs7: support EC-RDSA/streebog in
- SignerInfo
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v5 2/5] dt-bindings: clock: Add AST2500/AST2600 HACE reset
+ definition
 Content-Language: en-US
-To:     Jarkko Sakkinen <jarkko@kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
+To:     Neal Liu <neal_liu@aspeedtech.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Randy Dunlap <rdunlap@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Elvira Khabirova <e.khabirova@omp.ru>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Stefan Berger <stefanb@linux.ibm.com>,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220627092142.21095-1-tianjia.zhang@linux.alibaba.com>
- <20220627092142.21095-3-tianjia.zhang@linux.alibaba.com>
- <Yru5Xao3LSB0cChI@kernel.org>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-In-Reply-To: <Yru5Xao3LSB0cChI@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        "David S . Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Dhananjay Phadke <dhphadke@microsoft.com>,
+        Johnny Huang <johnny_huang@aspeedtech.com>
+Cc:     linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, BMC-SW@aspeedtech.com
+References: <20220629032008.1579899-1-neal_liu@aspeedtech.com>
+ <20220629032008.1579899-3-neal_liu@aspeedtech.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20220629032008.1579899-3-neal_liu@aspeedtech.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jarkko,
+On 29/06/2022 05:20, Neal Liu wrote:
+> Add HACE reset bit definition for AST2500/AST2600.
+> 
+> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
+> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  include/dt-bindings/clock/aspeed-clock.h  | 3 ++-
+>  include/dt-bindings/clock/ast2600-clock.h | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/dt-bindings/clock/aspeed-clock.h b/include/dt-bindings/clock/aspeed-clock.h
+> index 9ff4f6e4558c..6e040f7c3426 100644
+> --- a/include/dt-bindings/clock/aspeed-clock.h
+> +++ b/include/dt-bindings/clock/aspeed-clock.h
+> @@ -46,11 +46,12 @@
+>  #define ASPEED_RESET_MCTP		1
+>  #define ASPEED_RESET_ADC		2
+>  #define ASPEED_RESET_JTAG_MASTER	3
+> -#define ASPEED_RESET_MIC		4
+> +#define ASPEED_RESET_HACE		4
 
-On 6/29/22 10:31 AM, Jarkko Sakkinen wrote:
-> On Mon, Jun 27, 2022 at 05:21:42PM +0800, Tianjia Zhang wrote:
->> From: Elvira Khabirova <e.khabirova@omp.ru>
->>
->> Allow using EC-RDSA/streebog in pkcs7 certificates in a similar way
->> to how it's done in the x509 parser.
->>
->> This is needed e.g. for loading kernel modules signed with EC-RDSA.
->>
->> Signed-off-by: Elvira Khabirova <e.khabirova@omp.ru>
->> Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
->> Reviewed-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   crypto/asymmetric_keys/pkcs7_parser.c | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
->> index 24e2e4a6d842..277482bb1777 100644
->> --- a/crypto/asymmetric_keys/pkcs7_parser.c
->> +++ b/crypto/asymmetric_keys/pkcs7_parser.c
->> @@ -251,6 +251,12 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
->>   	case OID_sm3:
->>   		ctx->sinfo->sig->hash_algo = "sm3";
->>   		break;
->> +	case OID_gost2012Digest256:
->> +		ctx->sinfo->sig->hash_algo = "streebog256";
->> +		break;
->> +	case OID_gost2012Digest512:
->> +		ctx->sinfo->sig->hash_algo = "streebog512";
->> +		break;
->>   	default:
->>   		printk("Unsupported digest algo: %u\n", ctx->last_oid);
->>   		return -ENOPKG;
->> @@ -284,6 +290,11 @@ int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
->>   		ctx->sinfo->sig->pkey_algo = "sm2";
->>   		ctx->sinfo->sig->encoding = "raw";
->>   		break;
->> +	case OID_gost2012PKey256:
->> +	case OID_gost2012PKey512:
->> +		ctx->sinfo->sig->pkey_algo = "ecrdsa";
->> +		ctx->sinfo->sig->encoding = "raw";
->> +		break;
->>   	default:
->>   		printk("Unsupported pkey algo: %u\n", ctx->last_oid);
->>   		return -ENOPKG;
->> -- 
->> 2.24.3 (Apple Git-128)
->>
-> 
-> Please, check:
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git
-> 
-> BR, Jarkko
+I did not ack such change. This is a significant change from previous
+version, invalidating my previous ack.
 
-Great work, thanks.
+This breaks the ABI, so NAK without proper explanation why ABI break is
+accepted.
+
+>  #define ASPEED_RESET_PWM		5
+>  #define ASPEED_RESET_PECI		6
+>  #define ASPEED_RESET_I2C		7
+>  #define ASPEED_RESET_AHB		8
+>  #define ASPEED_RESET_CRT1		9
+> +#define ASPEED_RESET_MIC		18
+>  
+>  #endif
+> diff --git a/include/dt-bindings/clock/ast2600-clock.h b/include/dt-bindings/clock/ast2600-clock.h
+> index 62b9520a00fd..d8b0db2f7a7d 100644
+> --- a/include/dt-bindings/clock/ast2600-clock.h
+> +++ b/include/dt-bindings/clock/ast2600-clock.h
+> @@ -111,6 +111,7 @@
+>  #define ASPEED_RESET_PCIE_RC_O		19
+>  #define ASPEED_RESET_PCIE_RC_OEN	18
+>  #define ASPEED_RESET_PCI_DP		5
+> +#define ASPEED_RESET_HACE		4
+>  #define ASPEED_RESET_AHB		1
+>  #define ASPEED_RESET_SDRAM		0
+>  
+
 
 Best regards,
-Tianjia
+Krzysztof
