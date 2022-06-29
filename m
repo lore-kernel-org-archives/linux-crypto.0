@@ -2,1586 +2,727 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D27BC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 09:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 575FDCCA482
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jun 2022 10:41:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233101AbiF2Jqt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jun 2022 05:46:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
+        id S231338AbiF2KlF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 29 Jun 2022 06:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233152AbiF2JqY (ORCPT
+        with ESMTP id S229737AbiF2KlE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jun 2022 05:46:24 -0400
-Received: from twspam01.aspeedtech.com (twspam01.aspeedtech.com [211.20.114.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D11B3D4B8;
-        Wed, 29 Jun 2022 02:46:20 -0700 (PDT)
-Received: from mail.aspeedtech.com ([192.168.0.24])
-        by twspam01.aspeedtech.com with ESMTP id 25T9SSin051155;
-        Wed, 29 Jun 2022 17:28:29 +0800 (GMT-8)
-        (envelope-from neal_liu@aspeedtech.com)
-Received: from localhost.localdomain (192.168.10.10) by TWMBX02.aspeed.com
- (192.168.0.24) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 29 Jun
- 2022 17:44:32 +0800
-From:   Neal Liu <neal_liu@aspeedtech.com>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        "Andrew Jeffery" <andrew@aj.id.au>,
-        Dhananjay Phadke <dhphadke@microsoft.com>,
-        "Johnny Huang" <johnny_huang@aspeedtech.com>
-CC:     <linux-aspeed@lists.ozlabs.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <BMC-SW@aspeedtech.com>
-Subject: [PATCH v6 5/5] crypto: aspeed: add HACE crypto driver
-Date:   Wed, 29 Jun 2022 17:44:26 +0800
-Message-ID: <20220629094426.1930589-6-neal_liu@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220629094426.1930589-1-neal_liu@aspeedtech.com>
-References: <20220629094426.1930589-1-neal_liu@aspeedtech.com>
+        Wed, 29 Jun 2022 06:41:04 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED143E0C1;
+        Wed, 29 Jun 2022 03:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656499262; x=1688035262;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=R8VB6/tjMDgTxKnue93AU4hdI5XOBKB8dDAwO/qOwjg=;
+  b=nP2egLQDaZ77vNECafRiIqybpfmzq1pYkQkHVEh6iAAp1AxjadNoy9bB
+   SVE6KOcWsaRjv9e5kEkFZ87jNtglU/EG954OwOOW51Bw6JWA338QuQl7S
+   PK9hbVoS6mKOnjusCl/DMBbjb5PfJ9OOqYagz0YuTJCSIwd37xv5T6huS
+   Wt16jeMF4EP5RlJy3rtZGnZ9O3T54idMQvOghmaBrvAyhnXYLAipwWyW0
+   in6NH4H2ybwXyCpESrMq3NOz7EsETkcfWNNn0vvCEnXlE3HMF8ev4k27u
+   RjeggAU12ucW+9JpjvAeXGjnzQ7//gERLtS1g/4mQ5faeLu0iX6Q1315p
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="343686249"
+X-IronPort-AV: E=Sophos;i="5.92,231,1650956400"; 
+   d="scan'208";a="343686249"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 03:40:54 -0700
+X-IronPort-AV: E=Sophos;i="5.92,231,1650956400"; 
+   d="scan'208";a="617536648"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 03:40:46 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1o6V7i-000xcv-MD;
+        Wed, 29 Jun 2022 13:40:42 +0300
+Date:   Wed, 29 Jun 2022 13:40:42 +0300
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>,
+        linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-integrity@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, chrome-platform@lists.linux.dev,
+        linux-rpi-kernel@lists.infradead.org, linux-input@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        patches@opensource.cirrus.com, alsa-devel@alsa-project.org,
+        linux-omap@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        platform-driver-x86@vger.kernel.org,
+        acpi4asus-user@lists.sourceforge.net, linux-pm@vger.kernel.org,
+        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, kasan-dev@googlegroups.com,
+        linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 6/6] i2c: Make remove callback return void
+Message-ID: <YrwsKnRZqksuTCVe@smile.fi.intel.com>
+References: <20220628140313.74984-1-u.kleine-koenig@pengutronix.de>
+ <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [192.168.10.10]
-X-ClientProxiedBy: TWMBX02.aspeed.com (192.168.0.24) To TWMBX02.aspeed.com
- (192.168.0.24)
-X-DNSRBL: 
-X-MAIL: twspam01.aspeedtech.com 25T9SSin051155
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add HACE crypto driver to support symmetric-key
-encryption and decryption with multiple modes of
-operation.
+On Tue, Jun 28, 2022 at 04:03:12PM +0200, Uwe Kleine-König wrote:
+> From: Uwe Kleine-König <uwe@kleine-koenig.org>
+> 
+> The value returned by an i2c driver's remove function is mostly ignored.
+> (Only an error message is printed if the value is non-zero that the
+> error is ignored.)
+> 
+> So change the prototype of the remove function to return no value. This
+> way driver authors are not tempted to assume that passing an error to
+> the upper layer is a good idea. All drivers are adapted accordingly.
+> There is no intended change of behaviour, all callbacks were prepared to
+> return 0 before.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>  Documentation/i2c/writing-clients.rst                     | 2 +-
+>  arch/arm/mach-davinci/board-dm644x-evm.c                  | 3 +--
+>  arch/arm/mach-davinci/board-dm646x-evm.c                  | 3 +--
+>  arch/powerpc/platforms/83xx/mcu_mpc8349emitx.c            | 3 +--
+>  drivers/auxdisplay/ht16k33.c                              | 4 +---
+>  drivers/auxdisplay/lcd2s.c                                | 3 +--
+>  drivers/char/ipmi/ipmb_dev_int.c                          | 4 +---
+>  drivers/char/ipmi/ipmi_ipmb.c                             | 4 +---
+>  drivers/char/ipmi/ipmi_ssif.c                             | 6 ++----
+>  drivers/char/tpm/st33zp24/i2c.c                           | 4 +---
+>  drivers/char/tpm/tpm_i2c_atmel.c                          | 3 +--
+>  drivers/char/tpm/tpm_i2c_infineon.c                       | 4 +---
+>  drivers/char/tpm/tpm_i2c_nuvoton.c                        | 3 +--
+>  drivers/char/tpm/tpm_tis_i2c_cr50.c                       | 6 ++----
+>  drivers/clk/clk-cdce706.c                                 | 3 +--
+>  drivers/clk/clk-cs2000-cp.c                               | 4 +---
+>  drivers/clk/clk-si514.c                                   | 3 +--
+>  drivers/clk/clk-si5341.c                                  | 4 +---
+>  drivers/clk/clk-si5351.c                                  | 4 +---
+>  drivers/clk/clk-si570.c                                   | 3 +--
+>  drivers/clk/clk-versaclock5.c                             | 4 +---
+>  drivers/crypto/atmel-ecc.c                                | 6 ++----
+>  drivers/crypto/atmel-sha204a.c                            | 6 ++----
+>  drivers/extcon/extcon-rt8973a.c                           | 4 +---
+>  drivers/gpio/gpio-adp5588.c                               | 4 +---
+>  drivers/gpio/gpio-max7300.c                               | 4 +---
+>  drivers/gpio/gpio-pca953x.c                               | 4 +---
+>  drivers/gpio/gpio-pcf857x.c                               | 4 +---
+>  drivers/gpio/gpio-tpic2810.c                              | 4 +---
+>  drivers/gpu/drm/bridge/adv7511/adv7511_drv.c              | 4 +---
+>  drivers/gpu/drm/bridge/analogix/analogix-anx6345.c        | 4 +---
+>  drivers/gpu/drm/bridge/analogix/analogix-anx78xx.c        | 4 +---
+>  drivers/gpu/drm/bridge/analogix/anx7625.c                 | 4 +---
+>  drivers/gpu/drm/bridge/chrontel-ch7033.c                  | 4 +---
+>  drivers/gpu/drm/bridge/cros-ec-anx7688.c                  | 4 +---
+>  drivers/gpu/drm/bridge/ite-it6505.c                       | 4 +---
+>  drivers/gpu/drm/bridge/ite-it66121.c                      | 4 +---
+>  drivers/gpu/drm/bridge/lontium-lt8912b.c                  | 3 +--
+>  drivers/gpu/drm/bridge/lontium-lt9211.c                   | 4 +---
+>  drivers/gpu/drm/bridge/lontium-lt9611.c                   | 4 +---
+>  drivers/gpu/drm/bridge/lontium-lt9611uxc.c                | 4 +---
+>  drivers/gpu/drm/bridge/megachips-stdpxxxx-ge-b850v3-fw.c  | 8 ++------
+>  drivers/gpu/drm/bridge/nxp-ptn3460.c                      | 4 +---
+>  drivers/gpu/drm/bridge/parade-ps8622.c                    | 4 +---
+>  drivers/gpu/drm/bridge/parade-ps8640.c                    | 4 +---
+>  drivers/gpu/drm/bridge/sii902x.c                          | 4 +---
+>  drivers/gpu/drm/bridge/sii9234.c                          | 4 +---
+>  drivers/gpu/drm/bridge/sil-sii8620.c                      | 4 +---
+>  drivers/gpu/drm/bridge/tc358767.c                         | 4 +---
+>  drivers/gpu/drm/bridge/tc358768.c                         | 4 +---
+>  drivers/gpu/drm/bridge/tc358775.c                         | 4 +---
+>  drivers/gpu/drm/bridge/ti-sn65dsi83.c                     | 4 +---
+>  drivers/gpu/drm/bridge/ti-tfp410.c                        | 4 +---
+>  drivers/gpu/drm/i2c/ch7006_drv.c                          | 4 +---
+>  drivers/gpu/drm/i2c/tda9950.c                             | 4 +---
+>  drivers/gpu/drm/i2c/tda998x_drv.c                         | 3 +--
+>  drivers/gpu/drm/panel/panel-olimex-lcd-olinuxino.c        | 4 +---
+>  drivers/gpu/drm/panel/panel-raspberrypi-touchscreen.c     | 4 +---
+>  drivers/gpu/drm/solomon/ssd130x-i2c.c                     | 4 +---
+>  drivers/hid/i2c-hid/i2c-hid-core.c                        | 4 +---
+>  drivers/hid/i2c-hid/i2c-hid.h                             | 2 +-
+>  drivers/hwmon/adc128d818.c                                | 4 +---
+>  drivers/hwmon/adt7470.c                                   | 3 +--
+>  drivers/hwmon/asb100.c                                    | 6 ++----
+>  drivers/hwmon/asc7621.c                                   | 4 +---
+>  drivers/hwmon/dme1737.c                                   | 4 +---
+>  drivers/hwmon/f75375s.c                                   | 5 ++---
+>  drivers/hwmon/fschmd.c                                    | 6 ++----
+>  drivers/hwmon/ftsteutates.c                               | 3 +--
+>  drivers/hwmon/ina209.c                                    | 4 +---
+>  drivers/hwmon/ina3221.c                                   | 4 +---
+>  drivers/hwmon/jc42.c                                      | 3 +--
+>  drivers/hwmon/mcp3021.c                                   | 4 +---
+>  drivers/hwmon/occ/p8_i2c.c                                | 4 +---
+>  drivers/hwmon/pcf8591.c                                   | 3 +--
+>  drivers/hwmon/smm665.c                                    | 3 +--
+>  drivers/hwmon/tps23861.c                                  | 4 +---
+>  drivers/hwmon/w83781d.c                                   | 4 +---
+>  drivers/hwmon/w83791d.c                                   | 6 ++----
+>  drivers/hwmon/w83792d.c                                   | 6 ++----
+>  drivers/hwmon/w83793.c                                    | 6 ++----
+>  drivers/hwmon/w83795.c                                    | 4 +---
+>  drivers/hwmon/w83l785ts.c                                 | 6 ++----
+>  drivers/i2c/i2c-core-base.c                               | 6 +-----
+>  drivers/i2c/i2c-slave-eeprom.c                            | 4 +---
+>  drivers/i2c/i2c-slave-testunit.c                          | 3 +--
+>  drivers/i2c/i2c-smbus.c                                   | 3 +--
+>  drivers/i2c/muxes/i2c-mux-ltc4306.c                       | 4 +---
+>  drivers/i2c/muxes/i2c-mux-pca9541.c                       | 3 +--
+>  drivers/i2c/muxes/i2c-mux-pca954x.c                       | 3 +--
+>  drivers/iio/accel/bma180.c                                | 4 +---
+>  drivers/iio/accel/bma400_i2c.c                            | 4 +---
+>  drivers/iio/accel/bmc150-accel-i2c.c                      | 4 +---
+>  drivers/iio/accel/kxcjk-1013.c                            | 4 +---
+>  drivers/iio/accel/kxsd9-i2c.c                             | 4 +---
+>  drivers/iio/accel/mc3230.c                                | 4 +---
+>  drivers/iio/accel/mma7455_i2c.c                           | 4 +---
+>  drivers/iio/accel/mma7660.c                               | 4 +---
+>  drivers/iio/accel/mma8452.c                               | 4 +---
+>  drivers/iio/accel/mma9551.c                               | 4 +---
+>  drivers/iio/accel/mma9553.c                               | 4 +---
+>  drivers/iio/accel/stk8312.c                               | 4 +---
+>  drivers/iio/accel/stk8ba50.c                              | 4 +---
+>  drivers/iio/adc/ad799x.c                                  | 4 +---
+>  drivers/iio/adc/ina2xx-adc.c                              | 4 +---
+>  drivers/iio/adc/ltc2497.c                                 | 4 +---
+>  drivers/iio/adc/ti-ads1015.c                              | 4 +---
+>  drivers/iio/chemical/atlas-sensor.c                       | 4 +---
+>  drivers/iio/chemical/ccs811.c                             | 4 +---
+>  drivers/iio/chemical/sgp30.c                              | 4 +---
+>  drivers/iio/dac/ad5380.c                                  | 4 +---
+>  drivers/iio/dac/ad5446.c                                  | 4 +---
+>  drivers/iio/dac/ad5593r.c                                 | 4 +---
+>  drivers/iio/dac/ad5696-i2c.c                              | 4 +---
+>  drivers/iio/dac/ds4424.c                                  | 4 +---
+>  drivers/iio/dac/m62332.c                                  | 4 +---
+>  drivers/iio/dac/mcp4725.c                                 | 4 +---
+>  drivers/iio/dac/ti-dac5571.c                              | 4 +---
+>  drivers/iio/gyro/bmg160_i2c.c                             | 4 +---
+>  drivers/iio/gyro/fxas21002c_i2c.c                         | 4 +---
+>  drivers/iio/gyro/itg3200_core.c                           | 4 +---
+>  drivers/iio/gyro/mpu3050-i2c.c                            | 4 +---
+>  drivers/iio/health/afe4404.c                              | 4 +---
+>  drivers/iio/health/max30100.c                             | 4 +---
+>  drivers/iio/health/max30102.c                             | 4 +---
+>  drivers/iio/humidity/hdc2010.c                            | 4 +---
+>  drivers/iio/imu/inv_mpu6050/inv_mpu_i2c.c                 | 4 +---
+>  drivers/iio/imu/kmx61.c                                   | 4 +---
+>  drivers/iio/light/apds9300.c                              | 4 +---
+>  drivers/iio/light/apds9960.c                              | 4 +---
+>  drivers/iio/light/bh1750.c                                | 4 +---
+>  drivers/iio/light/bh1780.c                                | 4 +---
+>  drivers/iio/light/cm3232.c                                | 4 +---
+>  drivers/iio/light/cm36651.c                               | 4 +---
+>  drivers/iio/light/gp2ap002.c                              | 4 +---
+>  drivers/iio/light/gp2ap020a00f.c                          | 4 +---
+>  drivers/iio/light/isl29028.c                              | 4 +---
+>  drivers/iio/light/isl29125.c                              | 4 +---
+>  drivers/iio/light/jsa1212.c                               | 4 +---
+>  drivers/iio/light/ltr501.c                                | 4 +---
+>  drivers/iio/light/opt3001.c                               | 6 ++----
+>  drivers/iio/light/pa12203001.c                            | 4 +---
+>  drivers/iio/light/rpr0521.c                               | 4 +---
+>  drivers/iio/light/stk3310.c                               | 4 +---
+>  drivers/iio/light/tcs3472.c                               | 4 +---
+>  drivers/iio/light/tsl2563.c                               | 4 +---
+>  drivers/iio/light/tsl2583.c                               | 4 +---
+>  drivers/iio/light/tsl4531.c                               | 4 +---
+>  drivers/iio/light/us5182d.c                               | 4 +---
+>  drivers/iio/light/vcnl4000.c                              | 4 +---
+>  drivers/iio/light/vcnl4035.c                              | 4 +---
+>  drivers/iio/light/veml6070.c                              | 4 +---
+>  drivers/iio/magnetometer/ak8974.c                         | 4 +---
+>  drivers/iio/magnetometer/ak8975.c                         | 4 +---
+>  drivers/iio/magnetometer/bmc150_magn_i2c.c                | 4 +---
+>  drivers/iio/magnetometer/hmc5843_i2c.c                    | 4 +---
+>  drivers/iio/magnetometer/mag3110.c                        | 4 +---
+>  drivers/iio/magnetometer/yamaha-yas530.c                  | 4 +---
+>  drivers/iio/potentiostat/lmp91000.c                       | 4 +---
+>  drivers/iio/pressure/mpl3115.c                            | 4 +---
+>  drivers/iio/pressure/ms5611_i2c.c                         | 4 +---
+>  drivers/iio/pressure/zpa2326_i2c.c                        | 4 +---
+>  drivers/iio/proximity/pulsedlight-lidar-lite-v2.c         | 4 +---
+>  drivers/iio/proximity/sx9500.c                            | 4 +---
+>  drivers/iio/temperature/mlx90614.c                        | 4 +---
+>  drivers/iio/temperature/mlx90632.c                        | 4 +---
+>  drivers/input/joystick/as5011.c                           | 4 +---
+>  drivers/input/keyboard/adp5588-keys.c                     | 4 +---
+>  drivers/input/keyboard/lm8323.c                           | 4 +---
+>  drivers/input/keyboard/lm8333.c                           | 4 +---
+>  drivers/input/keyboard/mcs_touchkey.c                     | 4 +---
+>  drivers/input/keyboard/qt1070.c                           | 4 +---
+>  drivers/input/keyboard/qt2160.c                           | 4 +---
+>  drivers/input/keyboard/tca6416-keypad.c                   | 4 +---
+>  drivers/input/misc/adxl34x-i2c.c                          | 4 +---
+>  drivers/input/misc/bma150.c                               | 4 +---
+>  drivers/input/misc/cma3000_d0x_i2c.c                      | 4 +---
+>  drivers/input/misc/pcf8574_keypad.c                       | 4 +---
+>  drivers/input/mouse/synaptics_i2c.c                       | 4 +---
+>  drivers/input/rmi4/rmi_smbus.c                            | 4 +---
+>  drivers/input/touchscreen/atmel_mxt_ts.c                  | 4 +---
+>  drivers/input/touchscreen/bu21013_ts.c                    | 4 +---
+>  drivers/input/touchscreen/cyttsp4_i2c.c                   | 4 +---
+>  drivers/input/touchscreen/edt-ft5x06.c                    | 4 +---
+>  drivers/input/touchscreen/goodix.c                        | 4 +---
+>  drivers/input/touchscreen/migor_ts.c                      | 4 +---
+>  drivers/input/touchscreen/s6sy761.c                       | 4 +---
+>  drivers/input/touchscreen/stmfts.c                        | 4 +---
+>  drivers/input/touchscreen/tsc2004.c                       | 4 +---
+>  drivers/leds/flash/leds-as3645a.c                         | 4 +---
+>  drivers/leds/flash/leds-lm3601x.c                         | 4 +---
+>  drivers/leds/flash/leds-rt4505.c                          | 3 +--
+>  drivers/leds/leds-an30259a.c                              | 4 +---
+>  drivers/leds/leds-aw2013.c                                | 4 +---
+>  drivers/leds/leds-bd2802.c                                | 4 +---
+>  drivers/leds/leds-blinkm.c                                | 3 +--
+>  drivers/leds/leds-is31fl319x.c                            | 3 +--
+>  drivers/leds/leds-is31fl32xx.c                            | 4 +---
+>  drivers/leds/leds-lm3530.c                                | 3 +--
+>  drivers/leds/leds-lm3532.c                                | 4 +---
+>  drivers/leds/leds-lm355x.c                                | 4 +---
+>  drivers/leds/leds-lm3642.c                                | 3 +--
+>  drivers/leds/leds-lm3692x.c                               | 4 +---
+>  drivers/leds/leds-lm3697.c                                | 4 +---
+>  drivers/leds/leds-lp3944.c                                | 4 +---
+>  drivers/leds/leds-lp3952.c                                | 4 +---
+>  drivers/leds/leds-lp50xx.c                                | 4 +---
+>  drivers/leds/leds-lp5521.c                                | 4 +---
+>  drivers/leds/leds-lp5523.c                                | 4 +---
+>  drivers/leds/leds-lp5562.c                                | 4 +---
+>  drivers/leds/leds-lp8501.c                                | 4 +---
+>  drivers/leds/leds-lp8860.c                                | 4 +---
+>  drivers/leds/leds-pca9532.c                               | 6 ++----
+>  drivers/leds/leds-tca6507.c                               | 4 +---
+>  drivers/leds/leds-turris-omnia.c                          | 4 +---
+>  drivers/macintosh/ams/ams-i2c.c                           | 4 +---
+>  drivers/macintosh/therm_adt746x.c                         | 4 +---
+>  drivers/macintosh/therm_windtunnel.c                      | 4 +---
+>  drivers/macintosh/windfarm_ad7417_sensor.c                | 4 +---
+>  drivers/macintosh/windfarm_fcu_controls.c                 | 3 +--
+>  drivers/macintosh/windfarm_lm75_sensor.c                  | 4 +---
+>  drivers/macintosh/windfarm_lm87_sensor.c                  | 4 +---
+>  drivers/macintosh/windfarm_max6690_sensor.c               | 4 +---
+>  drivers/macintosh/windfarm_smu_sat.c                      | 4 +---
+>  drivers/media/cec/i2c/ch7322.c                            | 4 +---
+>  drivers/media/dvb-frontends/a8293.c                       | 3 +--
+>  drivers/media/dvb-frontends/af9013.c                      | 4 +---
+>  drivers/media/dvb-frontends/af9033.c                      | 4 +---
+>  drivers/media/dvb-frontends/au8522_decoder.c              | 3 +--
+>  drivers/media/dvb-frontends/cxd2099.c                     | 4 +---
+>  drivers/media/dvb-frontends/cxd2820r_core.c               | 4 +---
+>  drivers/media/dvb-frontends/dvb-pll.c                     | 3 +--
+>  drivers/media/dvb-frontends/lgdt3306a.c                   | 4 +---
+>  drivers/media/dvb-frontends/lgdt330x.c                    | 4 +---
+>  drivers/media/dvb-frontends/m88ds3103.c                   | 3 +--
+>  drivers/media/dvb-frontends/mn88443x.c                    | 4 +---
+>  drivers/media/dvb-frontends/mn88472.c                     | 4 +---
+>  drivers/media/dvb-frontends/mn88473.c                     | 4 +---
+>  drivers/media/dvb-frontends/mxl692.c                      | 4 +---
+>  drivers/media/dvb-frontends/rtl2830.c                     | 4 +---
+>  drivers/media/dvb-frontends/rtl2832.c                     | 4 +---
+>  drivers/media/dvb-frontends/si2165.c                      | 3 +--
+>  drivers/media/dvb-frontends/si2168.c                      | 4 +---
+>  drivers/media/dvb-frontends/sp2.c                         | 3 +--
+>  drivers/media/dvb-frontends/stv090x.c                     | 3 +--
+>  drivers/media/dvb-frontends/stv6110x.c                    | 3 +--
+>  drivers/media/dvb-frontends/tc90522.c                     | 3 +--
+>  drivers/media/dvb-frontends/tda10071.c                    | 3 +--
+>  drivers/media/dvb-frontends/ts2020.c                      | 3 +--
+>  drivers/media/i2c/ad5820.c                                | 3 +--
+>  drivers/media/i2c/ad9389b.c                               | 3 +--
+>  drivers/media/i2c/adp1653.c                               | 4 +---
+>  drivers/media/i2c/adv7170.c                               | 3 +--
+>  drivers/media/i2c/adv7175.c                               | 3 +--
+>  drivers/media/i2c/adv7180.c                               | 4 +---
+>  drivers/media/i2c/adv7183.c                               | 3 +--
+>  drivers/media/i2c/adv7343.c                               | 4 +---
+>  drivers/media/i2c/adv7393.c                               | 4 +---
+>  drivers/media/i2c/adv748x/adv748x-core.c                  | 4 +---
+>  drivers/media/i2c/adv7511-v4l2.c                          | 3 +--
+>  drivers/media/i2c/adv7604.c                               | 3 +--
+>  drivers/media/i2c/adv7842.c                               | 3 +--
+>  drivers/media/i2c/ak7375.c                                | 4 +---
+>  drivers/media/i2c/ak881x.c                                | 4 +---
+>  drivers/media/i2c/bt819.c                                 | 3 +--
+>  drivers/media/i2c/bt856.c                                 | 3 +--
+>  drivers/media/i2c/bt866.c                                 | 3 +--
+>  drivers/media/i2c/ccs/ccs-core.c                          | 4 +---
+>  drivers/media/i2c/cs3308.c                                | 3 +--
+>  drivers/media/i2c/cs5345.c                                | 3 +--
+>  drivers/media/i2c/cs53l32a.c                              | 3 +--
+>  drivers/media/i2c/cx25840/cx25840-core.c                  | 3 +--
+>  drivers/media/i2c/dw9714.c                                | 4 +---
+>  drivers/media/i2c/dw9768.c                                | 4 +---
+>  drivers/media/i2c/dw9807-vcm.c                            | 4 +---
+>  drivers/media/i2c/et8ek8/et8ek8_driver.c                  | 4 +---
+>  drivers/media/i2c/hi556.c                                 | 4 +---
+>  drivers/media/i2c/hi846.c                                 | 4 +---
+>  drivers/media/i2c/hi847.c                                 | 4 +---
+>  drivers/media/i2c/imx208.c                                | 4 +---
+>  drivers/media/i2c/imx214.c                                | 4 +---
+>  drivers/media/i2c/imx219.c                                | 4 +---
+>  drivers/media/i2c/imx258.c                                | 4 +---
+>  drivers/media/i2c/imx274.c                                | 3 +--
+>  drivers/media/i2c/imx290.c                                | 4 +---
+>  drivers/media/i2c/imx319.c                                | 4 +---
+>  drivers/media/i2c/imx334.c                                | 4 +---
+>  drivers/media/i2c/imx335.c                                | 4 +---
+>  drivers/media/i2c/imx355.c                                | 4 +---
+>  drivers/media/i2c/imx412.c                                | 4 +---
+>  drivers/media/i2c/ir-kbd-i2c.c                            | 4 +---
+>  drivers/media/i2c/isl7998x.c                              | 4 +---
+>  drivers/media/i2c/ks0127.c                                | 3 +--
+>  drivers/media/i2c/lm3560.c                                | 4 +---
+>  drivers/media/i2c/lm3646.c                                | 4 +---
+>  drivers/media/i2c/m52790.c                                | 3 +--
+>  drivers/media/i2c/m5mols/m5mols_core.c                    | 4 +---
+>  drivers/media/i2c/max2175.c                               | 4 +---
+>  drivers/media/i2c/max9286.c                               | 4 +---
+>  drivers/media/i2c/ml86v7667.c                             | 4 +---
+>  drivers/media/i2c/msp3400-driver.c                        | 3 +--
+>  drivers/media/i2c/mt9m001.c                               | 4 +---
+>  drivers/media/i2c/mt9m032.c                               | 3 +--
+>  drivers/media/i2c/mt9m111.c                               | 4 +---
+>  drivers/media/i2c/mt9p031.c                               | 4 +---
+>  drivers/media/i2c/mt9t001.c                               | 3 +--
+>  drivers/media/i2c/mt9t112.c                               | 4 +---
+>  drivers/media/i2c/mt9v011.c                               | 4 +---
+>  drivers/media/i2c/mt9v032.c                               | 4 +---
+>  drivers/media/i2c/mt9v111.c                               | 4 +---
+>  drivers/media/i2c/noon010pc30.c                           | 4 +---
+>  drivers/media/i2c/og01a1b.c                               | 4 +---
+>  drivers/media/i2c/ov02a10.c                               | 4 +---
+>  drivers/media/i2c/ov08d10.c                               | 4 +---
+>  drivers/media/i2c/ov13858.c                               | 4 +---
+>  drivers/media/i2c/ov13b10.c                               | 4 +---
+>  drivers/media/i2c/ov2640.c                                | 3 +--
+>  drivers/media/i2c/ov2659.c                                | 4 +---
+>  drivers/media/i2c/ov2680.c                                | 4 +---
+>  drivers/media/i2c/ov2685.c                                | 4 +---
+>  drivers/media/i2c/ov2740.c                                | 4 +---
+>  drivers/media/i2c/ov5640.c                                | 4 +---
+>  drivers/media/i2c/ov5645.c                                | 4 +---
+>  drivers/media/i2c/ov5647.c                                | 4 +---
+>  drivers/media/i2c/ov5648.c                                | 4 +---
+>  drivers/media/i2c/ov5670.c                                | 4 +---
+>  drivers/media/i2c/ov5675.c                                | 4 +---
+>  drivers/media/i2c/ov5693.c                                | 4 +---
+>  drivers/media/i2c/ov5695.c                                | 4 +---
+>  drivers/media/i2c/ov6650.c                                | 3 +--
+>  drivers/media/i2c/ov7251.c                                | 4 +---
+>  drivers/media/i2c/ov7640.c                                | 4 +---
+>  drivers/media/i2c/ov7670.c                                | 3 +--
+>  drivers/media/i2c/ov772x.c                                | 4 +---
+>  drivers/media/i2c/ov7740.c                                | 3 +--
+>  drivers/media/i2c/ov8856.c                                | 4 +---
+>  drivers/media/i2c/ov8865.c                                | 4 +---
+>  drivers/media/i2c/ov9282.c                                | 4 +---
+>  drivers/media/i2c/ov9640.c                                | 4 +---
+>  drivers/media/i2c/ov9650.c                                | 4 +---
+>  drivers/media/i2c/ov9734.c                                | 4 +---
+>  drivers/media/i2c/rdacm20.c                               | 4 +---
+>  drivers/media/i2c/rdacm21.c                               | 4 +---
+>  drivers/media/i2c/rj54n1cb0c.c                            | 4 +---
+>  drivers/media/i2c/s5c73m3/s5c73m3-core.c                  | 4 +---
+>  drivers/media/i2c/s5k4ecgx.c                              | 4 +---
+>  drivers/media/i2c/s5k5baf.c                               | 4 +---
+>  drivers/media/i2c/s5k6a3.c                                | 3 +--
+>  drivers/media/i2c/s5k6aa.c                                | 4 +---
+>  drivers/media/i2c/saa6588.c                               | 4 +---
+>  drivers/media/i2c/saa6752hs.c                             | 3 +--
+>  drivers/media/i2c/saa7110.c                               | 3 +--
+>  drivers/media/i2c/saa7115.c                               | 3 +--
+>  drivers/media/i2c/saa7127.c                               | 3 +--
+>  drivers/media/i2c/saa717x.c                               | 3 +--
+>  drivers/media/i2c/saa7185.c                               | 3 +--
+>  drivers/media/i2c/sony-btf-mpx.c                          | 4 +---
+>  drivers/media/i2c/sr030pc30.c                             | 3 +--
+>  drivers/media/i2c/st-mipid02.c                            | 4 +---
+>  drivers/media/i2c/tc358743.c                              | 4 +---
+>  drivers/media/i2c/tda1997x.c                              | 4 +---
+>  drivers/media/i2c/tda7432.c                               | 3 +--
+>  drivers/media/i2c/tda9840.c                               | 3 +--
+>  drivers/media/i2c/tea6415c.c                              | 3 +--
+>  drivers/media/i2c/tea6420.c                               | 3 +--
+>  drivers/media/i2c/ths7303.c                               | 4 +---
+>  drivers/media/i2c/ths8200.c                               | 4 +---
+>  drivers/media/i2c/tlv320aic23b.c                          | 3 +--
+>  drivers/media/i2c/tvaudio.c                               | 3 +--
+>  drivers/media/i2c/tvp514x.c                               | 3 +--
+>  drivers/media/i2c/tvp5150.c                               | 4 +---
+>  drivers/media/i2c/tvp7002.c                               | 3 +--
+>  drivers/media/i2c/tw2804.c                                | 3 +--
+>  drivers/media/i2c/tw9903.c                                | 3 +--
+>  drivers/media/i2c/tw9906.c                                | 3 +--
+>  drivers/media/i2c/tw9910.c                                | 4 +---
+>  drivers/media/i2c/uda1342.c                               | 3 +--
+>  drivers/media/i2c/upd64031a.c                             | 3 +--
+>  drivers/media/i2c/upd64083.c                              | 3 +--
+>  drivers/media/i2c/video-i2c.c                             | 4 +---
+>  drivers/media/i2c/vp27smpx.c                              | 3 +--
+>  drivers/media/i2c/vpx3220.c                               | 4 +---
+>  drivers/media/i2c/vs6624.c                                | 3 +--
+>  drivers/media/i2c/wm8739.c                                | 3 +--
+>  drivers/media/i2c/wm8775.c                                | 3 +--
+>  drivers/media/radio/radio-tea5764.c                       | 3 +--
+>  drivers/media/radio/saa7706h.c                            | 3 +--
+>  drivers/media/radio/si470x/radio-si470x-i2c.c             | 3 +--
+>  drivers/media/radio/si4713/si4713.c                       | 4 +---
+>  drivers/media/radio/tef6862.c                             | 3 +--
+>  drivers/media/test-drivers/vidtv/vidtv_demod.c            | 4 +---
+>  drivers/media/test-drivers/vidtv/vidtv_tuner.c            | 4 +---
+>  drivers/media/tuners/e4000.c                              | 4 +---
+>  drivers/media/tuners/fc2580.c                             | 3 +--
+>  drivers/media/tuners/m88rs6000t.c                         | 4 +---
+>  drivers/media/tuners/mt2060.c                             | 4 +---
+>  drivers/media/tuners/mxl301rf.c                           | 3 +--
+>  drivers/media/tuners/qm1d1b0004.c                         | 3 +--
+>  drivers/media/tuners/qm1d1c0042.c                         | 3 +--
+>  drivers/media/tuners/si2157.c                             | 4 +---
+>  drivers/media/tuners/tda18212.c                           | 4 +---
+>  drivers/media/tuners/tda18250.c                           | 4 +---
+>  drivers/media/tuners/tua9001.c                            | 3 +--
+>  drivers/media/usb/go7007/s2250-board.c                    | 3 +--
+>  drivers/media/v4l2-core/tuner-core.c                      | 3 +--
+>  drivers/mfd/88pm800.c                                     | 4 +---
+>  drivers/mfd/88pm805.c                                     | 4 +---
+>  drivers/mfd/88pm860x-core.c                               | 3 +--
+>  drivers/mfd/acer-ec-a500.c                                | 4 +---
+>  drivers/mfd/arizona-i2c.c                                 | 4 +---
+>  drivers/mfd/axp20x-i2c.c                                  | 4 +---
+>  drivers/mfd/da903x.c                                      | 3 +--
+>  drivers/mfd/da9052-i2c.c                                  | 3 +--
+>  drivers/mfd/da9055-i2c.c                                  | 4 +---
+>  drivers/mfd/da9062-core.c                                 | 4 +---
+>  drivers/mfd/da9150-core.c                                 | 4 +---
+>  drivers/mfd/dm355evm_msp.c                                | 3 +--
+>  drivers/mfd/ene-kb3930.c                                  | 4 +---
+>  drivers/mfd/gateworks-gsc.c                               | 4 +---
+>  drivers/mfd/intel_soc_pmic_core.c                         | 4 +---
+>  drivers/mfd/iqs62x.c                                      | 4 +---
+>  drivers/mfd/lm3533-core.c                                 | 4 +---
+>  drivers/mfd/lp8788.c                                      | 3 +--
+>  drivers/mfd/madera-i2c.c                                  | 4 +---
+>  drivers/mfd/max14577.c                                    | 4 +---
+>  drivers/mfd/max77693.c                                    | 4 +---
+>  drivers/mfd/max8907.c                                     | 4 +---
+>  drivers/mfd/max8925-i2c.c                                 | 3 +--
+>  drivers/mfd/mc13xxx-i2c.c                                 | 3 +--
+>  drivers/mfd/menelaus.c                                    | 3 +--
+>  drivers/mfd/ntxec.c                                       | 4 +---
+>  drivers/mfd/palmas.c                                      | 4 +---
+>  drivers/mfd/pcf50633-core.c                               | 4 +---
+>  drivers/mfd/retu-mfd.c                                    | 4 +---
+>  drivers/mfd/rk808.c                                       | 4 +---
+>  drivers/mfd/rn5t618.c                                     | 4 +---
+>  drivers/mfd/rsmu_i2c.c                                    | 4 +---
+>  drivers/mfd/rt4831.c                                      | 4 +---
+>  drivers/mfd/si476x-i2c.c                                  | 4 +---
+>  drivers/mfd/stmfx.c                                       | 4 +---
+>  drivers/mfd/stmpe-i2c.c                                   | 4 +---
+>  drivers/mfd/tc3589x.c                                     | 4 +---
+>  drivers/mfd/tps6105x.c                                    | 4 +---
+>  drivers/mfd/tps65010.c                                    | 3 +--
+>  drivers/mfd/tps65086.c                                    | 4 +---
+>  drivers/mfd/tps65217.c                                    | 4 +---
+>  drivers/mfd/tps6586x.c                                    | 3 +--
+>  drivers/mfd/tps65912-i2c.c                                | 4 +---
+>  drivers/mfd/twl-core.c                                    | 3 +--
+>  drivers/mfd/twl6040.c                                     | 4 +---
+>  drivers/mfd/wm8994-core.c                                 | 4 +---
+>  drivers/misc/ad525x_dpot-i2c.c                            | 3 +--
+>  drivers/misc/apds9802als.c                                | 3 +--
+>  drivers/misc/apds990x.c                                   | 3 +--
+>  drivers/misc/bh1770glc.c                                  | 4 +---
+>  drivers/misc/ds1682.c                                     | 3 +--
+>  drivers/misc/eeprom/at24.c                                | 4 +---
+>  drivers/misc/eeprom/ee1004.c                              | 4 +---
+>  drivers/misc/eeprom/eeprom.c                              | 4 +---
+>  drivers/misc/eeprom/idt_89hpesx.c                         | 4 +---
+>  drivers/misc/eeprom/max6875.c                             | 4 +---
+>  drivers/misc/hmc6352.c                                    | 3 +--
+>  drivers/misc/ics932s401.c                                 | 5 ++---
+>  drivers/misc/isl29003.c                                   | 3 +--
+>  drivers/misc/isl29020.c                                   | 3 +--
+>  drivers/misc/lis3lv02d/lis3lv02d_i2c.c                    | 3 +--
+>  drivers/misc/tsl2550.c                                    | 4 +---
+>  drivers/mtd/maps/pismo.c                                  | 4 +---
+>  drivers/net/dsa/lan9303_i2c.c                             | 6 ++----
+>  drivers/net/dsa/microchip/ksz9477_i2c.c                   | 4 +---
+>  drivers/net/dsa/xrs700x/xrs700x_i2c.c                     | 6 ++----
+>  drivers/net/ethernet/mellanox/mlxsw/i2c.c                 | 4 +---
+>  drivers/net/mctp/mctp-i2c.c                               | 3 +--
+>  drivers/nfc/fdp/i2c.c                                     | 4 +---
+>  drivers/nfc/microread/i2c.c                               | 4 +---
+>  drivers/nfc/nfcmrvl/i2c.c                                 | 4 +---
+>  drivers/nfc/nxp-nci/i2c.c                                 | 4 +---
+>  drivers/nfc/pn533/i2c.c                                   | 4 +---
+>  drivers/nfc/pn544/i2c.c                                   | 4 +---
+>  drivers/nfc/s3fwrn5/i2c.c                                 | 4 +---
+>  drivers/nfc/st-nci/i2c.c                                  | 4 +---
+>  drivers/nfc/st21nfca/i2c.c                                | 4 +---
+>  drivers/of/unittest.c                                     | 6 ++----
+>  drivers/platform/chrome/cros_ec_i2c.c                     | 4 +---
+>  drivers/platform/surface/surface3_power.c                 | 4 +---
+>  drivers/platform/x86/asus-tf103c-dock.c                   | 4 +---
+>  drivers/platform/x86/intel/int3472/tps68470.c             | 4 +---
+>  drivers/power/supply/bq2415x_charger.c                    | 4 +---
+>  drivers/power/supply/bq24190_charger.c                    | 4 +---
+>  drivers/power/supply/bq24257_charger.c                    | 4 +---
+>  drivers/power/supply/bq25890_charger.c                    | 4 +---
+>  drivers/power/supply/bq27xxx_battery_i2c.c                | 4 +---
+>  drivers/power/supply/cw2015_battery.c                     | 3 +--
+>  drivers/power/supply/ds2782_battery.c                     | 4 +---
+>  drivers/power/supply/lp8727_charger.c                     | 3 +--
+>  drivers/power/supply/rt5033_battery.c                     | 4 +---
+>  drivers/power/supply/rt9455_charger.c                     | 4 +---
+>  drivers/power/supply/smb347-charger.c                     | 4 +---
+>  drivers/power/supply/z2_battery.c                         | 4 +---
+>  drivers/pwm/pwm-pca9685.c                                 | 4 +---
+>  drivers/regulator/da9121-regulator.c                      | 3 +--
+>  drivers/regulator/lp8755.c                                | 4 +---
+>  drivers/regulator/rpi-panel-attiny-regulator.c            | 4 +---
+>  drivers/rtc/rtc-bq32k.c                                   | 4 +---
+>  drivers/rtc/rtc-ds1374.c                                  | 4 +---
+>  drivers/rtc/rtc-isl12026.c                                | 3 +--
+>  drivers/rtc/rtc-m41t80.c                                  | 4 +---
+>  drivers/rtc/rtc-rs5c372.c                                 | 3 +--
+>  drivers/rtc/rtc-x1205.c                                   | 3 +--
+>  drivers/staging/media/atomisp/i2c/atomisp-gc0310.c        | 4 +---
+>  drivers/staging/media/atomisp/i2c/atomisp-gc2235.c        | 4 +---
+>  drivers/staging/media/atomisp/i2c/atomisp-lm3554.c        | 4 +---
+>  drivers/staging/media/atomisp/i2c/atomisp-mt9m114.c       | 3 +--
+>  drivers/staging/media/atomisp/i2c/atomisp-ov2680.c        | 4 +---
+>  drivers/staging/media/atomisp/i2c/atomisp-ov2722.c        | 4 +---
+>  drivers/staging/media/atomisp/i2c/ov5693/atomisp-ov5693.c | 4 +---
+>  drivers/staging/media/max96712/max96712.c                 | 4 +---
+>  drivers/staging/most/i2c/i2c.c                            | 4 +---
+>  drivers/staging/olpc_dcon/olpc_dcon.c                     | 4 +---
+>  drivers/tty/serial/sc16is7xx.c                            | 4 +---
+>  drivers/usb/misc/usb3503.c                                | 4 +---
+>  drivers/usb/phy/phy-isp1301-omap.c                        | 4 +---
+>  drivers/usb/phy/phy-isp1301.c                             | 4 +---
+>  drivers/usb/typec/hd3ss3220.c                             | 4 +---
+>  drivers/usb/typec/mux/fsa4480.c                           | 4 +---
+>  drivers/usb/typec/mux/pi3usb30532.c                       | 3 +--
+>  drivers/usb/typec/rt1719.c                                | 4 +---
+>  drivers/usb/typec/stusb160x.c                             | 4 +---
+>  drivers/usb/typec/tcpm/fusb302.c                          | 4 +---
+>  drivers/usb/typec/tcpm/tcpci.c                            | 4 +---
+>  drivers/usb/typec/tcpm/tcpci_maxim.c                      | 4 +---
+>  drivers/usb/typec/tcpm/tcpci_rt1711h.c                    | 3 +--
+>  drivers/usb/typec/tipd/core.c                             | 4 +---
+>  drivers/usb/typec/ucsi/ucsi_ccg.c                         | 4 +---
+>  drivers/usb/typec/wusb3801.c                              | 4 +---
+>  drivers/video/backlight/adp8860_bl.c                      | 4 +---
+>  drivers/video/backlight/adp8870_bl.c                      | 4 +---
+>  drivers/video/backlight/arcxcnn_bl.c                      | 4 +---
+>  drivers/video/backlight/bd6107.c                          | 4 +---
+>  drivers/video/backlight/lm3630a_bl.c                      | 3 +--
+>  drivers/video/backlight/lm3639_bl.c                       | 3 +--
+>  drivers/video/backlight/lp855x_bl.c                       | 4 +---
+>  drivers/video/backlight/lv5207lp.c                        | 4 +---
+>  drivers/video/backlight/tosa_bl.c                         | 3 +--
+>  drivers/video/fbdev/matrox/matroxfb_maven.c               | 3 +--
+>  drivers/video/fbdev/ssd1307fb.c                           | 4 +---
+>  drivers/w1/masters/ds2482.c                               | 3 +--
+>  drivers/watchdog/ziirave_wdt.c                            | 4 +---
+>  include/linux/i2c.h                                       | 2 +-
+>  lib/Kconfig.kasan                                         | 1 +
+>  sound/aoa/codecs/onyx.c                                   | 3 +--
+>  sound/aoa/codecs/tas.c                                    | 3 +--
+>  sound/pci/hda/cs35l41_hda_i2c.c                           | 4 +---
+>  sound/ppc/keywest.c                                       | 6 ++----
+>  sound/soc/codecs/adau1761-i2c.c                           | 3 +--
+>  sound/soc/codecs/adau1781-i2c.c                           | 3 +--
+>  sound/soc/codecs/ak4375.c                                 | 4 +---
+>  sound/soc/codecs/ak4458.c                                 | 4 +---
+>  sound/soc/codecs/ak4641.c                                 | 4 +---
+>  sound/soc/codecs/ak5558.c                                 | 4 +---
+>  sound/soc/codecs/cs35l32.c                                | 4 +---
+>  sound/soc/codecs/cs35l33.c                                | 4 +---
+>  sound/soc/codecs/cs35l34.c                                | 4 +---
+>  sound/soc/codecs/cs35l35.c                                | 4 +---
+>  sound/soc/codecs/cs35l36.c                                | 4 +---
+>  sound/soc/codecs/cs35l41-i2c.c                            | 4 +---
+>  sound/soc/codecs/cs35l45-i2c.c                            | 4 +---
+>  sound/soc/codecs/cs4234.c                                 | 4 +---
+>  sound/soc/codecs/cs4265.c                                 | 4 +---
+>  sound/soc/codecs/cs4270.c                                 | 4 +---
+>  sound/soc/codecs/cs42l42.c                                | 4 +---
+>  sound/soc/codecs/cs42l51-i2c.c                            | 4 +---
+>  sound/soc/codecs/cs42l56.c                                | 3 +--
+>  sound/soc/codecs/cs42xx8-i2c.c                            | 4 +---
+>  sound/soc/codecs/cs43130.c                                | 4 +---
+>  sound/soc/codecs/cs4349.c                                 | 4 +---
+>  sound/soc/codecs/cs53l30.c                                | 4 +---
+>  sound/soc/codecs/cx2072x.c                                | 3 +--
+>  sound/soc/codecs/max98090.c                               | 4 +---
+>  sound/soc/codecs/max9860.c                                | 3 +--
+>  sound/soc/codecs/max98927.c                               | 4 +---
+>  sound/soc/codecs/mt6660.c                                 | 3 +--
+>  sound/soc/codecs/nau8821.c                                | 4 +---
+>  sound/soc/codecs/nau8825.c                                | 6 ++----
+>  sound/soc/codecs/pcm1789-i2c.c                            | 4 +---
+>  sound/soc/codecs/pcm3168a-i2c.c                           | 4 +---
+>  sound/soc/codecs/pcm512x-i2c.c                            | 3 +--
+>  sound/soc/codecs/rt274.c                                  | 4 +---
+>  sound/soc/codecs/rt286.c                                  | 4 +---
+>  sound/soc/codecs/rt298.c                                  | 4 +---
+>  sound/soc/codecs/rt5616.c                                 | 6 ++----
+>  sound/soc/codecs/rt5631.c                                 | 6 ++----
+>  sound/soc/codecs/rt5645.c                                 | 4 +---
+>  sound/soc/codecs/rt5663.c                                 | 4 +---
+>  sound/soc/codecs/rt5670.c                                 | 4 +---
+>  sound/soc/codecs/rt5677.c                                 | 4 +---
+>  sound/soc/codecs/rt5682-i2c.c                             | 4 +---
+>  sound/soc/codecs/rt5682s.c                                | 4 +---
+>  sound/soc/codecs/rt9120.c                                 | 3 +--
+>  sound/soc/codecs/sgtl5000.c                               | 4 +---
+>  sound/soc/codecs/sta350.c                                 | 6 ++----
+>  sound/soc/codecs/tas2552.c                                | 3 +--
+>  sound/soc/codecs/tas5086.c                                | 6 ++----
+>  sound/soc/codecs/tas571x.c                                | 4 +---
+>  sound/soc/codecs/tas5805m.c                               | 3 +--
+>  sound/soc/codecs/tas6424.c                                | 4 +---
+>  sound/soc/codecs/tlv320adc3xxx.c                          | 3 +--
+>  sound/soc/codecs/tlv320aic32x4-i2c.c                      | 4 +---
+>  sound/soc/codecs/tlv320aic3x-i2c.c                        | 4 +---
+>  sound/soc/codecs/tlv320dac33.c                            | 4 +---
+>  sound/soc/codecs/wm1250-ev1.c                             | 4 +---
+>  sound/soc/codecs/wm2200.c                                 | 4 +---
+>  sound/soc/codecs/wm5100.c                                 | 4 +---
+>  sound/soc/codecs/wm8804-i2c.c                             | 3 +--
+>  sound/soc/codecs/wm8900.c                                 | 6 ++----
+>  sound/soc/codecs/wm8903.c                                 | 4 +---
+>  sound/soc/codecs/wm8960.c                                 | 6 ++----
+>  sound/soc/codecs/wm8962.c                                 | 3 +--
+>  sound/soc/codecs/wm8993.c                                 | 4 +---
+>  sound/soc/codecs/wm8996.c                                 | 4 +---
+>  sound/soc/codecs/wm9081.c                                 | 6 ++----
 
-Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
----
- drivers/crypto/aspeed/Kconfig              |   17 +
- drivers/crypto/aspeed/Makefile             |    2 +
- drivers/crypto/aspeed/aspeed-hace-crypto.c | 1122 ++++++++++++++++++++
- drivers/crypto/aspeed/aspeed-hace.c        |   91 +-
- drivers/crypto/aspeed/aspeed-hace.h        |  112 ++
- 5 files changed, 1343 insertions(+), 1 deletion(-)
- create mode 100644 drivers/crypto/aspeed/aspeed-hace-crypto.c
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-diff --git a/drivers/crypto/aspeed/Kconfig b/drivers/crypto/aspeed/Kconfig
-index 7c741695e9b1..d1bca9f7e9c7 100644
---- a/drivers/crypto/aspeed/Kconfig
-+++ b/drivers/crypto/aspeed/Kconfig
-@@ -21,3 +21,20 @@ config CRYPTO_DEV_ASPEED_HACE_HASH
- 	  hash driver.
- 	  Supports multiple message digest standards, including
- 	  SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, and so on.
-+
-+config CRYPTO_DEV_ASPEED_HACE_CRYPTO
-+	bool "Enable Aspeed Hash & Crypto Engine (HACE) crypto"
-+	depends on CRYPTO_DEV_ASPEED
-+	select CRYPTO_ENGINE
-+	select CRYPTO_AES
-+	select CRYPTO_DES
-+	select CRYPTO_ECB
-+	select CRYPTO_CBC
-+	select CRYPTO_CFB
-+	select CRYPTO_OFB
-+	select CRYPTO_CTR
-+	help
-+	  Select here to enable Aspeed Hash & Crypto Engine (HACE)
-+	  crypto driver.
-+	  Supports AES/DES symmetric-key encryption and decryption
-+	  with ECB/CBC/CFB/OFB/CTR options.
-diff --git a/drivers/crypto/aspeed/Makefile b/drivers/crypto/aspeed/Makefile
-index 8bc8d4fed5a9..4b29bdae9965 100644
---- a/drivers/crypto/aspeed/Makefile
-+++ b/drivers/crypto/aspeed/Makefile
-@@ -4,3 +4,5 @@ aspeed_crypto-objs := aspeed-hace.o \
- 
- obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) += aspeed-hace-hash.o
- hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_HASH) := aspeed-hace-hash.o
-+obj-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) += aspeed-hace-crypto.o
-+hace-hash-$(CONFIG_CRYPTO_DEV_ASPEED_HACE_CRYPTO) := aspeed-hace-crypto.o
-diff --git a/drivers/crypto/aspeed/aspeed-hace-crypto.c b/drivers/crypto/aspeed/aspeed-hace-crypto.c
-new file mode 100644
-index 000000000000..409e930bb6b6
---- /dev/null
-+++ b/drivers/crypto/aspeed/aspeed-hace-crypto.c
-@@ -0,0 +1,1122 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Copyright (c) 2021 Aspeed Technology Inc.
-+ */
-+
-+#include "aspeed-hace.h"
-+
-+#ifdef ASPEED_CIPHER_DEBUG
-+#define CIPHER_DBG(h, fmt, ...)	\
-+	dev_dbg((h)->dev, "%s() " fmt, __func__, ##__VA_ARGS__)
-+#else
-+#define CIPHER_DBG(h, fmt, ...)	\
-+	((void)(h))
-+#endif
-+
-+static int aspeed_crypto_do_fallback(struct skcipher_request *areq)
-+{
-+	struct aspeed_cipher_reqctx *rctx = skcipher_request_ctx(areq);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int err;
-+
-+	skcipher_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
-+	skcipher_request_set_callback(&rctx->fallback_req, areq->base.flags,
-+				      areq->base.complete, areq->base.data);
-+	skcipher_request_set_crypt(&rctx->fallback_req, areq->src, areq->dst,
-+				   areq->cryptlen, areq->iv);
-+
-+	if (rctx->enc_cmd & HACE_CMD_ENCRYPT)
-+		err = crypto_skcipher_encrypt(&rctx->fallback_req);
-+	else
-+		err = crypto_skcipher_decrypt(&rctx->fallback_req);
-+
-+	return err;
-+}
-+
-+static bool aspeed_crypto_need_fallback(struct skcipher_request *areq)
-+{
-+	struct aspeed_cipher_reqctx *rctx = skcipher_request_ctx(areq);
-+
-+	if (areq->cryptlen == 0)
-+		return true;
-+
-+	if ((rctx->enc_cmd & HACE_CMD_DES_SELECT) &&
-+	    !IS_ALIGNED(areq->cryptlen, DES_BLOCK_SIZE))
-+		return true;
-+
-+	if ((!(rctx->enc_cmd & HACE_CMD_DES_SELECT)) &&
-+	    !IS_ALIGNED(areq->cryptlen, AES_BLOCK_SIZE))
-+		return true;
-+
-+	return false;
-+}
-+
-+static int aspeed_hace_crypto_handle_queue(struct aspeed_hace_dev *hace_dev,
-+					   struct skcipher_request *req)
-+{
-+	if (hace_dev->version == AST2500_VERSION &&
-+	    aspeed_crypto_need_fallback(req)) {
-+		CIPHER_DBG(hace_dev, "SW fallback\n");
-+		return aspeed_crypto_do_fallback(req);
-+	}
-+
-+	return crypto_transfer_skcipher_request_to_engine(
-+			hace_dev->crypt_engine_crypto, req);
-+}
-+
-+static int aspeed_crypto_do_request(struct crypto_engine *engine, void *areq)
-+{
-+	struct skcipher_request *req = skcipher_request_cast(areq);
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(req);
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+	struct aspeed_engine_crypto *crypto_engine;
-+	int rc;
-+
-+	crypto_engine = &hace_dev->crypto_engine;
-+	crypto_engine->req = req;
-+	crypto_engine->flags |= CRYPTO_FLAGS_BUSY;
-+
-+	rc = ctx->start(hace_dev);
-+
-+	if (rc != -EINPROGRESS)
-+		return -EIO;
-+
-+	return 0;
-+}
-+
-+static int aspeed_sk_complete(struct aspeed_hace_dev *hace_dev, int err)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct skcipher_request *req;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+
-+	if (rctx->enc_cmd & HACE_CMD_IV_REQUIRE) {
-+		if (rctx->enc_cmd & HACE_CMD_DES_SELECT)
-+			memcpy(req->iv, crypto_engine->cipher_ctx +
-+			       DES_KEY_SIZE, DES_KEY_SIZE);
-+		else
-+			memcpy(req->iv, crypto_engine->cipher_ctx,
-+			       AES_BLOCK_SIZE);
-+	}
-+
-+	crypto_engine->flags &= ~CRYPTO_FLAGS_BUSY;
-+
-+	crypto_finalize_skcipher_request(hace_dev->crypt_engine_crypto, req,
-+					 err);
-+
-+	return err;
-+}
-+
-+static int aspeed_sk_transfer_sg(struct aspeed_hace_dev *hace_dev)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct device *dev = hace_dev->dev;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct skcipher_request *req;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+
-+	if (req->src == req->dst) {
-+		dma_unmap_sg(dev, req->src, rctx->src_nents, DMA_BIDIRECTIONAL);
-+	} else {
-+		dma_unmap_sg(dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
-+		dma_unmap_sg(dev, req->dst, rctx->dst_nents, DMA_FROM_DEVICE);
-+	}
-+
-+	return aspeed_sk_complete(hace_dev, 0);
-+}
-+
-+static int aspeed_sk_transfer(struct aspeed_hace_dev *hace_dev)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct skcipher_request *req;
-+	struct scatterlist *out_sg;
-+	int nbytes = 0;
-+	int rc = 0;
-+
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+	out_sg = req->dst;
-+
-+	/* Copy output buffer to dst scatter-gather lists */
-+	nbytes = sg_copy_from_buffer(out_sg, rctx->dst_nents,
-+				     crypto_engine->cipher_addr, req->cryptlen);
-+	if (!nbytes) {
-+		dev_warn(hace_dev->dev, "invalid sg copy, %s:0x%x, %s:0x%x\n",
-+			 "nbytes", nbytes, "cryptlen", req->cryptlen);
-+		rc = -EINVAL;
-+	}
-+
-+	CIPHER_DBG(hace_dev, "%s:%d, %s:%d, %s:%d, %s:0x%x\n",
-+		   "nbytes", nbytes, "req->cryptlen", req->cryptlen,
-+		   "nb_out_sg", rctx->dst_nents,
-+		   "cipher addr", crypto_engine->cipher_addr);
-+
-+	return aspeed_sk_complete(hace_dev, rc);
-+}
-+
-+static int aspeed_sk_start(struct aspeed_hace_dev *hace_dev)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct skcipher_request *req;
-+	struct scatterlist *in_sg;
-+	int nbytes;
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+	in_sg = req->src;
-+
-+	nbytes = sg_copy_to_buffer(in_sg, rctx->src_nents,
-+				   crypto_engine->cipher_addr, req->cryptlen);
-+
-+	CIPHER_DBG(hace_dev, "%s:%d, %s:%d, %s:%d, %s:0x%x\n",
-+		   "nbytes", nbytes, "req->cryptlen", req->cryptlen,
-+		   "nb_in_sg", rctx->src_nents,
-+		   "cipher addr", crypto_engine->cipher_addr);
-+
-+	if (!nbytes) {
-+		dev_warn(hace_dev->dev, "invalid sg copy, %s:0x%x, %s:0x%x\n",
-+			 "nbytes", nbytes, "cryptlen", req->cryptlen);
-+		return -EINVAL;
-+	}
-+
-+	crypto_engine->resume = aspeed_sk_transfer;
-+
-+	/* Trigger engines */
-+	ast_hace_write(hace_dev, crypto_engine->cipher_dma_addr,
-+		       ASPEED_HACE_SRC);
-+	ast_hace_write(hace_dev, crypto_engine->cipher_dma_addr,
-+		       ASPEED_HACE_DEST);
-+	ast_hace_write(hace_dev, req->cryptlen, ASPEED_HACE_DATA_LEN);
-+	ast_hace_write(hace_dev, rctx->enc_cmd, ASPEED_HACE_CMD);
-+
-+	return -EINPROGRESS;
-+}
-+
-+static int aspeed_sk_start_sg(struct aspeed_hace_dev *hace_dev)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct aspeed_sg_list *src_list, *dst_list;
-+	dma_addr_t src_dma_addr, dst_dma_addr;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct skcipher_request *req;
-+	struct scatterlist *s;
-+	int src_sg_len;
-+	int dst_sg_len;
-+	int total, i;
-+	int rc;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+
-+	rctx->enc_cmd |= HACE_CMD_DES_SG_CTRL | HACE_CMD_SRC_SG_CTRL |
-+			 HACE_CMD_AES_KEY_HW_EXP | HACE_CMD_MBUS_REQ_SYNC_EN;
-+
-+	/* BIDIRECTIONAL */
-+	if (req->dst == req->src) {
-+		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
-+					rctx->src_nents, DMA_BIDIRECTIONAL);
-+		dst_sg_len = src_sg_len;
-+		if (!src_sg_len) {
-+			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
-+			return -EINVAL;
-+		}
-+
-+	} else {
-+		src_sg_len = dma_map_sg(hace_dev->dev, req->src,
-+					rctx->src_nents, DMA_TO_DEVICE);
-+		if (!src_sg_len) {
-+			dev_warn(hace_dev->dev, "dma_map_sg() src error\n");
-+			return -EINVAL;
-+		}
-+
-+		dst_sg_len = dma_map_sg(hace_dev->dev, req->dst,
-+					rctx->dst_nents, DMA_FROM_DEVICE);
-+		if (!dst_sg_len) {
-+			dev_warn(hace_dev->dev, "dma_map_sg() dst error\n");
-+			rc = -EINVAL;
-+			goto free_req_src;
-+		}
-+	}
-+
-+	src_list = (struct aspeed_sg_list *)crypto_engine->cipher_addr;
-+	src_dma_addr = crypto_engine->cipher_dma_addr;
-+	total = req->cryptlen;
-+
-+	for_each_sg(req->src, s, src_sg_len, i) {
-+		src_list[i].phy_addr = sg_dma_address(s);
-+
-+		if (total > sg_dma_len(s)) {
-+			src_list[i].len = sg_dma_len(s);
-+			total -= src_list[i].len;
-+
-+		} else {
-+			/* last sg list */
-+			src_list[i].len = total;
-+			src_list[i].len |= BIT(31);
-+			total = 0;
-+		}
-+
-+		src_list[i].phy_addr = cpu_to_le32(src_list[i].phy_addr);
-+		src_list[i].len = cpu_to_le32(src_list[i].len);
-+	}
-+
-+	if (total != 0) {
-+		rc = -EINVAL;
-+		goto free_req;
-+	}
-+
-+	if (req->dst == req->src) {
-+		dst_list = src_list;
-+		dst_dma_addr = src_dma_addr;
-+
-+	} else {
-+		dst_list = (struct aspeed_sg_list *)crypto_engine->dst_sg_addr;
-+		dst_dma_addr = crypto_engine->dst_sg_dma_addr;
-+		total = req->cryptlen;
-+
-+		for_each_sg(req->dst, s, dst_sg_len, i) {
-+			dst_list[i].phy_addr = sg_dma_address(s);
-+
-+			if (total > sg_dma_len(s)) {
-+				dst_list[i].len = sg_dma_len(s);
-+				total -= dst_list[i].len;
-+
-+			} else {
-+				/* last sg list */
-+				dst_list[i].len = total;
-+				dst_list[i].len |= BIT(31);
-+				total = 0;
-+			}
-+
-+			dst_list[i].phy_addr = cpu_to_le32(dst_list[i].phy_addr);
-+			dst_list[i].len = cpu_to_le32(dst_list[i].len);
-+
-+		}
-+
-+		dst_list[dst_sg_len].phy_addr = 0;
-+		dst_list[dst_sg_len].len = 0;
-+	}
-+
-+	if (total != 0) {
-+		rc = -EINVAL;
-+		goto free_req;
-+	}
-+
-+	crypto_engine->resume = aspeed_sk_transfer_sg;
-+
-+	/* Memory barrier to ensure all data setup before engine starts */
-+	mb();
-+
-+	/* Trigger engines */
-+	ast_hace_write(hace_dev, src_dma_addr, ASPEED_HACE_SRC);
-+	ast_hace_write(hace_dev, dst_dma_addr, ASPEED_HACE_DEST);
-+	ast_hace_write(hace_dev, req->cryptlen, ASPEED_HACE_DATA_LEN);
-+	ast_hace_write(hace_dev, rctx->enc_cmd, ASPEED_HACE_CMD);
-+
-+	return -EINPROGRESS;
-+
-+free_req:
-+	if (req->dst == req->src) {
-+		dma_unmap_sg(hace_dev->dev, req->src, rctx->src_nents,
-+			     DMA_BIDIRECTIONAL);
-+
-+	} else {
-+		dma_unmap_sg(hace_dev->dev, req->dst, rctx->dst_nents,
-+			     DMA_TO_DEVICE);
-+		dma_unmap_sg(hace_dev->dev, req->src, rctx->src_nents,
-+			     DMA_TO_DEVICE);
-+	}
-+
-+	return rc;
-+
-+free_req_src:
-+	dma_unmap_sg(hace_dev->dev, req->src, rctx->src_nents, DMA_TO_DEVICE);
-+
-+	return rc;
-+}
-+
-+static int aspeed_hace_skcipher_trigger(struct aspeed_hace_dev *hace_dev)
-+{
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+	struct aspeed_cipher_reqctx *rctx;
-+	struct crypto_skcipher *cipher;
-+	struct aspeed_cipher_ctx *ctx;
-+	struct skcipher_request *req;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	req = crypto_engine->req;
-+	rctx = skcipher_request_ctx(req);
-+	cipher = crypto_skcipher_reqtfm(req);
-+	ctx = crypto_skcipher_ctx(cipher);
-+
-+	/* enable interrupt */
-+	rctx->enc_cmd |= HACE_CMD_ISR_EN;
-+
-+	rctx->dst_nents = sg_nents(req->dst);
-+	rctx->src_nents = sg_nents(req->src);
-+
-+	ast_hace_write(hace_dev, crypto_engine->cipher_ctx_dma,
-+		       ASPEED_HACE_CONTEXT);
-+
-+	if (rctx->enc_cmd & HACE_CMD_IV_REQUIRE) {
-+		if (rctx->enc_cmd & HACE_CMD_DES_SELECT)
-+			memcpy(crypto_engine->cipher_ctx + DES_BLOCK_SIZE,
-+			       req->iv, DES_BLOCK_SIZE);
-+		else
-+			memcpy(crypto_engine->cipher_ctx, req->iv,
-+			       AES_BLOCK_SIZE);
-+	}
-+
-+	if (hace_dev->version == AST2600_VERSION) {
-+		memcpy(crypto_engine->cipher_ctx + 16, ctx->key, ctx->key_len);
-+
-+		return aspeed_sk_start_sg(hace_dev);
-+	}
-+
-+	memcpy(crypto_engine->cipher_ctx + 16, ctx->key, AES_MAX_KEYLENGTH);
-+
-+	return aspeed_sk_start(hace_dev);
-+}
-+
-+static int aspeed_des_crypt(struct skcipher_request *req, u32 cmd)
-+{
-+	struct aspeed_cipher_reqctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(req);
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+	u32 crypto_alg = cmd & HACE_CMD_OP_MODE_MASK;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	if (crypto_alg == HACE_CMD_CBC || crypto_alg == HACE_CMD_ECB) {
-+		if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE))
-+			return -EINVAL;
-+	}
-+
-+	rctx->enc_cmd = cmd | HACE_CMD_DES_SELECT | HACE_CMD_RI_WO_DATA_ENABLE |
-+			HACE_CMD_DES | HACE_CMD_CONTEXT_LOAD_ENABLE |
-+			HACE_CMD_CONTEXT_SAVE_ENABLE;
-+
-+	return aspeed_hace_crypto_handle_queue(hace_dev, req);
-+}
-+
-+static int aspeed_des_setkey(struct crypto_skcipher *cipher, const u8 *key,
-+			     unsigned int keylen)
-+{
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+	int rc;
-+
-+	CIPHER_DBG(hace_dev, "keylen: %d bits\n", keylen);
-+
-+	if (keylen != DES_KEY_SIZE && keylen != DES3_EDE_KEY_SIZE) {
-+		dev_warn(hace_dev->dev, "invalid keylen: %d bits\n", keylen);
-+		return -EINVAL;
-+	}
-+
-+	if (keylen == DES_KEY_SIZE) {
-+		rc = crypto_des_verify_key(tfm, key);
-+		if (rc)
-+			return rc;
-+
-+	} else if (keylen == DES3_EDE_KEY_SIZE) {
-+		rc = crypto_des3_ede_verify_key(tfm, key);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	memcpy(ctx->key, key, keylen);
-+	ctx->key_len = keylen;
-+
-+	crypto_skcipher_clear_flags(ctx->fallback_tfm, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(ctx->fallback_tfm, cipher->base.crt_flags &
-+				  CRYPTO_TFM_REQ_MASK);
-+
-+	return crypto_skcipher_setkey(ctx->fallback_tfm, key, keylen);
-+}
-+
-+static int aspeed_tdes_ctr_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CTR |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_ctr_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CTR |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_ofb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_ofb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_cfb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_cfb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_cbc_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_cbc_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CBC |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_ecb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_ECB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_tdes_ecb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_ECB |
-+				HACE_CMD_TRIPLE_DES);
-+}
-+
-+static int aspeed_des_ctr_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CTR |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_ctr_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CTR |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_ofb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_ofb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_cfb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_cfb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_cbc_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_cbc_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CBC |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_ecb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_ECB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_des_ecb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_des_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_ECB |
-+				HACE_CMD_SINGLE_DES);
-+}
-+
-+static int aspeed_aes_crypt(struct skcipher_request *req, u32 cmd)
-+{
-+	struct aspeed_cipher_reqctx *rctx = skcipher_request_ctx(req);
-+	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(req);
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+	u32 crypto_alg = cmd & HACE_CMD_OP_MODE_MASK;
-+
-+	if (crypto_alg == HACE_CMD_CBC || crypto_alg == HACE_CMD_ECB) {
-+		if (!IS_ALIGNED(req->cryptlen, AES_BLOCK_SIZE))
-+			return -EINVAL;
-+	}
-+
-+	CIPHER_DBG(hace_dev, "%s\n",
-+		   (cmd & HACE_CMD_ENCRYPT) ? "encrypt" : "decrypt");
-+
-+	cmd |= HACE_CMD_AES_SELECT | HACE_CMD_RI_WO_DATA_ENABLE |
-+	       HACE_CMD_CONTEXT_LOAD_ENABLE | HACE_CMD_CONTEXT_SAVE_ENABLE;
-+
-+	switch (ctx->key_len) {
-+	case AES_KEYSIZE_128:
-+		cmd |= HACE_CMD_AES128;
-+		break;
-+	case AES_KEYSIZE_192:
-+		cmd |= HACE_CMD_AES192;
-+		break;
-+	case AES_KEYSIZE_256:
-+		cmd |= HACE_CMD_AES256;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	rctx->enc_cmd = cmd;
-+
-+	return aspeed_hace_crypto_handle_queue(hace_dev, req);
-+}
-+
-+static int aspeed_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
-+			     unsigned int keylen)
-+{
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(cipher);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+	struct crypto_aes_ctx gen_aes_key;
-+
-+	CIPHER_DBG(hace_dev, "keylen: %d bits\n", (keylen * 8));
-+
-+	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
-+	    keylen != AES_KEYSIZE_256)
-+		return -EINVAL;
-+
-+	if (ctx->hace_dev->version == AST2500_VERSION) {
-+		aes_expandkey(&gen_aes_key, key, keylen);
-+		memcpy(ctx->key, gen_aes_key.key_enc, AES_MAX_KEYLENGTH);
-+
-+	} else {
-+		memcpy(ctx->key, key, keylen);
-+	}
-+
-+	ctx->key_len = keylen;
-+
-+	crypto_skcipher_clear_flags(ctx->fallback_tfm, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(ctx->fallback_tfm, cipher->base.crt_flags &
-+				  CRYPTO_TFM_REQ_MASK);
-+
-+	return crypto_skcipher_setkey(ctx->fallback_tfm, key, keylen);
-+}
-+
-+static int aspeed_aes_ctr_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CTR);
-+}
-+
-+static int aspeed_aes_ctr_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CTR);
-+}
-+
-+static int aspeed_aes_ofb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_OFB);
-+}
-+
-+static int aspeed_aes_ofb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_OFB);
-+}
-+
-+static int aspeed_aes_cfb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CFB);
-+}
-+
-+static int aspeed_aes_cfb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CFB);
-+}
-+
-+static int aspeed_aes_cbc_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_CBC);
-+}
-+
-+static int aspeed_aes_cbc_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_CBC);
-+}
-+
-+static int aspeed_aes_ecb_decrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_DECRYPT | HACE_CMD_ECB);
-+}
-+
-+static int aspeed_aes_ecb_encrypt(struct skcipher_request *req)
-+{
-+	return aspeed_aes_crypt(req, HACE_CMD_ENCRYPT | HACE_CMD_ECB);
-+}
-+
-+static int aspeed_crypto_cra_init(struct crypto_skcipher *tfm)
-+{
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	const char *name = crypto_tfm_alg_name(&tfm->base);
-+	struct aspeed_hace_alg *crypto_alg;
-+
-+
-+	crypto_alg = container_of(alg, struct aspeed_hace_alg, alg.skcipher);
-+	ctx->hace_dev = crypto_alg->hace_dev;
-+	ctx->start = aspeed_hace_skcipher_trigger;
-+
-+	CIPHER_DBG(ctx->hace_dev, "%s\n", name);
-+
-+	ctx->fallback_tfm = crypto_alloc_skcipher(name, 0, CRYPTO_ALG_ASYNC |
-+						  CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(ctx->fallback_tfm)) {
-+		dev_err(ctx->hace_dev->dev, "ERROR: Cannot allocate fallback for %s %ld\n",
-+			name, PTR_ERR(ctx->fallback_tfm));
-+		return PTR_ERR(ctx->fallback_tfm);
-+	}
-+
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct aspeed_cipher_reqctx) +
-+			 crypto_skcipher_reqsize(ctx->fallback_tfm));
-+
-+	ctx->enginectx.op.do_one_request = aspeed_crypto_do_request;
-+	ctx->enginectx.op.prepare_request = NULL;
-+	ctx->enginectx.op.unprepare_request = NULL;
-+
-+	return 0;
-+}
-+
-+static void aspeed_crypto_cra_exit(struct crypto_skcipher *tfm)
-+{
-+	struct aspeed_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct aspeed_hace_dev *hace_dev = ctx->hace_dev;
-+
-+	CIPHER_DBG(hace_dev, "%s\n", crypto_tfm_alg_name(&tfm->base));
-+	crypto_free_skcipher(ctx->fallback_tfm);
-+}
-+
-+struct aspeed_hace_alg aspeed_crypto_algs[] = {
-+	{
-+		.alg.skcipher = {
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aspeed_aes_setkey,
-+			.encrypt	= aspeed_aes_ecb_encrypt,
-+			.decrypt	= aspeed_aes_ecb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ecb(aes)",
-+				.cra_driver_name	= "aspeed-ecb-aes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= AES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aspeed_aes_setkey,
-+			.encrypt	= aspeed_aes_cbc_encrypt,
-+			.decrypt	= aspeed_aes_cbc_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cbc(aes)",
-+				.cra_driver_name	= "aspeed-cbc-aes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= AES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aspeed_aes_setkey,
-+			.encrypt	= aspeed_aes_cfb_encrypt,
-+			.decrypt	= aspeed_aes_cfb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cfb(aes)",
-+				.cra_driver_name	= "aspeed-cfb-aes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= 1,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aspeed_aes_setkey,
-+			.encrypt	= aspeed_aes_ofb_encrypt,
-+			.decrypt	= aspeed_aes_ofb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ofb(aes)",
-+				.cra_driver_name	= "aspeed-ofb-aes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= 1,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.min_keysize	= DES_KEY_SIZE,
-+			.max_keysize	= DES_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_des_ecb_encrypt,
-+			.decrypt	= aspeed_des_ecb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ecb(des)",
-+				.cra_driver_name	= "aspeed-ecb-des",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES_KEY_SIZE,
-+			.max_keysize	= DES_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_des_cbc_encrypt,
-+			.decrypt	= aspeed_des_cbc_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cbc(des)",
-+				.cra_driver_name	= "aspeed-cbc-des",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES_KEY_SIZE,
-+			.max_keysize	= DES_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_des_cfb_encrypt,
-+			.decrypt	= aspeed_des_cfb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cfb(des)",
-+				.cra_driver_name	= "aspeed-cfb-des",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES_KEY_SIZE,
-+			.max_keysize	= DES_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_des_ofb_encrypt,
-+			.decrypt	= aspeed_des_ofb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ofb(des)",
-+				.cra_driver_name	= "aspeed-ofb-des",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.min_keysize	= DES3_EDE_KEY_SIZE,
-+			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_tdes_ecb_encrypt,
-+			.decrypt	= aspeed_tdes_ecb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ecb(des3_ede)",
-+				.cra_driver_name	= "aspeed-ecb-tdes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES3_EDE_KEY_SIZE,
-+			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_tdes_cbc_encrypt,
-+			.decrypt	= aspeed_tdes_cbc_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cbc(des3_ede)",
-+				.cra_driver_name	= "aspeed-cbc-tdes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES3_EDE_KEY_SIZE,
-+			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_tdes_cfb_encrypt,
-+			.decrypt	= aspeed_tdes_cfb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "cfb(des3_ede)",
-+				.cra_driver_name	= "aspeed-cfb-tdes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES3_EDE_KEY_SIZE,
-+			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_tdes_ofb_encrypt,
-+			.decrypt	= aspeed_tdes_ofb_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ofb(des3_ede)",
-+				.cra_driver_name	= "aspeed-ofb-tdes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC |
-+							  CRYPTO_ALG_NEED_FALLBACK,
-+				.cra_blocksize		= DES_BLOCK_SIZE,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+};
-+
-+struct aspeed_hace_alg aspeed_crypto_algs_g6[] = {
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= AES_BLOCK_SIZE,
-+			.min_keysize	= AES_MIN_KEY_SIZE,
-+			.max_keysize	= AES_MAX_KEY_SIZE,
-+			.setkey		= aspeed_aes_setkey,
-+			.encrypt	= aspeed_aes_ctr_encrypt,
-+			.decrypt	= aspeed_aes_ctr_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ctr(aes)",
-+				.cra_driver_name	= "aspeed-ctr-aes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC,
-+				.cra_blocksize		= 1,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES_KEY_SIZE,
-+			.max_keysize	= DES_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_des_ctr_encrypt,
-+			.decrypt	= aspeed_des_ctr_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ctr(des)",
-+				.cra_driver_name	= "aspeed-ctr-des",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC,
-+				.cra_blocksize		= 1,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+	{
-+		.alg.skcipher = {
-+			.ivsize		= DES_BLOCK_SIZE,
-+			.min_keysize	= DES3_EDE_KEY_SIZE,
-+			.max_keysize	= DES3_EDE_KEY_SIZE,
-+			.setkey		= aspeed_des_setkey,
-+			.encrypt	= aspeed_tdes_ctr_encrypt,
-+			.decrypt	= aspeed_tdes_ctr_decrypt,
-+			.init		= aspeed_crypto_cra_init,
-+			.exit		= aspeed_crypto_cra_exit,
-+			.base = {
-+				.cra_name		= "ctr(des3_ede)",
-+				.cra_driver_name	= "aspeed-ctr-tdes",
-+				.cra_priority		= 300,
-+				.cra_flags		= CRYPTO_ALG_KERN_DRIVER_ONLY |
-+							  CRYPTO_ALG_ASYNC,
-+				.cra_blocksize		= 1,
-+				.cra_ctxsize		= sizeof(struct aspeed_cipher_ctx),
-+				.cra_alignmask		= 0x0f,
-+				.cra_module		= THIS_MODULE,
-+			}
-+		}
-+	},
-+
-+};
-+
-+void aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-+{
-+	int rc, i;
-+
-+	CIPHER_DBG(hace_dev, "\n");
-+
-+	for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs); i++) {
-+		aspeed_crypto_algs[i].hace_dev = hace_dev;
-+		rc = crypto_register_skcipher(&aspeed_crypto_algs[i].alg.skcipher);
-+		if (rc) {
-+			CIPHER_DBG(hace_dev, "Failed to register %s\n",
-+				   aspeed_crypto_algs[i].alg.skcipher.base.cra_name);
-+		}
-+	}
-+
-+	if (hace_dev->version != AST2600_VERSION)
-+		return;
-+
-+	for (i = 0; i < ARRAY_SIZE(aspeed_crypto_algs_g6); i++) {
-+		aspeed_crypto_algs_g6[i].hace_dev = hace_dev;
-+		rc = crypto_register_skcipher(&aspeed_crypto_algs_g6[i].alg.skcipher);
-+		if (rc) {
-+			CIPHER_DBG(hace_dev, "Failed to register %s\n",
-+				   aspeed_crypto_algs_g6[i].alg.skcipher.base.cra_name);
-+		}
-+	}
-+}
-diff --git a/drivers/crypto/aspeed/aspeed-hace.c b/drivers/crypto/aspeed/aspeed-hace.c
-index 61fedc6f7ef4..c5306adaf946 100644
---- a/drivers/crypto/aspeed/aspeed-hace.c
-+++ b/drivers/crypto/aspeed/aspeed-hace.c
-@@ -31,10 +31,22 @@ void __weak aspeed_unregister_hace_hash_algs(struct aspeed_hace_dev *hace_dev)
- 	pr_warn("%s: Not supported yet\n", __func__);
- }
- 
-+/* Weak function for HACE crypto */
-+void __weak aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-+{
-+	pr_warn("%s: Not supported yet\n", __func__);
-+}
-+
-+void __weak aspeed_unregister_hace_crypto_algs(struct aspeed_hace_dev *hace_dev)
-+{
-+	pr_warn("%s: Not supported yet\n", __func__);
-+}
-+
- /* HACE interrupt service routine */
- static irqreturn_t aspeed_hace_irq(int irq, void *dev)
- {
- 	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)dev;
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
- 	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
- 	u32 sts;
- 
-@@ -50,9 +62,24 @@ static irqreturn_t aspeed_hace_irq(int irq, void *dev)
- 			dev_warn(hace_dev->dev, "HASH no active requests.\n");
- 	}
- 
-+	if (sts & HACE_CRYPTO_ISR) {
-+		if (crypto_engine->flags & CRYPTO_FLAGS_BUSY)
-+			tasklet_schedule(&crypto_engine->done_task);
-+		else
-+			dev_warn(hace_dev->dev, "CRYPTO no active requests.\n");
-+	}
-+
- 	return IRQ_HANDLED;
- }
- 
-+static void aspeed_hace_crypto_done_task(unsigned long data)
-+{
-+	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
-+
-+	crypto_engine->resume(hace_dev);
-+}
-+
- static void aspeed_hace_hash_done_task(unsigned long data)
- {
- 	struct aspeed_hace_dev *hace_dev = (struct aspeed_hace_dev *)data;
-@@ -64,11 +91,13 @@ static void aspeed_hace_hash_done_task(unsigned long data)
- static void aspeed_hace_register(struct aspeed_hace_dev *hace_dev)
- {
- 	aspeed_register_hace_hash_algs(hace_dev);
-+	aspeed_register_hace_crypto_algs(hace_dev);
- }
- 
- static void aspeed_hace_unregister(struct aspeed_hace_dev *hace_dev)
- {
- 	aspeed_unregister_hace_hash_algs(hace_dev);
-+	aspeed_unregister_hace_crypto_algs(hace_dev);
- }
- 
- static const struct of_device_id aspeed_hace_of_matches[] = {
-@@ -79,6 +108,7 @@ static const struct of_device_id aspeed_hace_of_matches[] = {
- 
- static int aspeed_hace_probe(struct platform_device *pdev)
- {
-+	struct aspeed_engine_crypto *crypto_engine;
- 	const struct of_device_id *hace_dev_id;
- 	struct aspeed_engine_hash *hash_engine;
- 	struct aspeed_hace_dev *hace_dev;
-@@ -99,6 +129,7 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 	hace_dev->dev = &pdev->dev;
- 	hace_dev->version = (unsigned long)hace_dev_id->data;
- 	hash_engine = &hace_dev->hash_engine;
-+	crypto_engine = &hace_dev->crypto_engine;
- 
- 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 
-@@ -152,6 +183,21 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 	tasklet_init(&hash_engine->done_task, aspeed_hace_hash_done_task,
- 		     (unsigned long)hace_dev);
- 
-+	/* Initialize crypto hardware engine structure for crypto */
-+	hace_dev->crypt_engine_crypto = crypto_engine_alloc_init(hace_dev->dev,
-+								 true);
-+	if (!hace_dev->crypt_engine_crypto) {
-+		rc = -ENOMEM;
-+		goto err_engine_hash_start;
-+	}
-+
-+	rc = crypto_engine_start(hace_dev->crypt_engine_crypto);
-+	if (rc)
-+		goto err_engine_crypto_start;
-+
-+	tasklet_init(&crypto_engine->done_task, aspeed_hace_crypto_done_task,
-+		     (unsigned long)hace_dev);
-+
- 	/* Allocate DMA buffer for hash engine input used */
- 	hash_engine->ahash_src_addr =
- 		dmam_alloc_coherent(&pdev->dev,
-@@ -161,7 +207,45 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 	if (!hash_engine->ahash_src_addr) {
- 		dev_err(&pdev->dev, "Failed to allocate dma buffer\n");
- 		rc = -ENOMEM;
--		goto err_engine_hash_start;
-+		goto err_engine_crypto_start;
-+	}
-+
-+	/* Allocate DMA buffer for crypto engine context used */
-+	crypto_engine->cipher_ctx =
-+		dmam_alloc_coherent(&pdev->dev,
-+				    PAGE_SIZE,
-+				    &crypto_engine->cipher_ctx_dma,
-+				    GFP_KERNEL);
-+	if (!crypto_engine->cipher_ctx) {
-+		dev_err(&pdev->dev, "Failed to allocate cipher ctx dma\n");
-+		rc = -ENOMEM;
-+		goto err_engine_crypto_start;
-+	}
-+
-+	/* Allocate DMA buffer for crypto engine input used */
-+	crypto_engine->cipher_addr =
-+		dmam_alloc_coherent(&pdev->dev,
-+				    ASPEED_CRYPTO_SRC_DMA_BUF_LEN,
-+				    &crypto_engine->cipher_dma_addr,
-+				    GFP_KERNEL);
-+	if (!crypto_engine->cipher_addr) {
-+		dev_err(&pdev->dev, "Failed to allocate cipher addr dma\n");
-+		rc = -ENOMEM;
-+		goto err_engine_crypto_start;
-+	}
-+
-+	/* Allocate DMA buffer for crypto engine output used */
-+	if (hace_dev->version == AST2600_VERSION) {
-+		crypto_engine->dst_sg_addr =
-+			dmam_alloc_coherent(&pdev->dev,
-+					    ASPEED_CRYPTO_DST_DMA_BUF_LEN,
-+					    &crypto_engine->dst_sg_dma_addr,
-+					    GFP_KERNEL);
-+		if (!crypto_engine->dst_sg_addr) {
-+			dev_err(&pdev->dev, "Failed to allocate dst_sg dma\n");
-+			rc = -ENOMEM;
-+			goto err_engine_crypto_start;
-+		}
- 	}
- 
- 	aspeed_hace_register(hace_dev);
-@@ -170,6 +254,8 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- 
- 	return 0;
- 
-+err_engine_crypto_start:
-+	crypto_engine_exit(hace_dev->crypt_engine_crypto);
- err_engine_hash_start:
- 	crypto_engine_exit(hace_dev->crypt_engine_hash);
- clk_exit:
-@@ -181,13 +267,16 @@ static int aspeed_hace_probe(struct platform_device *pdev)
- static int aspeed_hace_remove(struct platform_device *pdev)
- {
- 	struct aspeed_hace_dev *hace_dev = platform_get_drvdata(pdev);
-+	struct aspeed_engine_crypto *crypto_engine = &hace_dev->crypto_engine;
- 	struct aspeed_engine_hash *hash_engine = &hace_dev->hash_engine;
- 
- 	aspeed_hace_unregister(hace_dev);
- 
- 	crypto_engine_exit(hace_dev->crypt_engine_hash);
-+	crypto_engine_exit(hace_dev->crypt_engine_crypto);
- 
- 	tasklet_kill(&hash_engine->done_task);
-+	tasklet_kill(&crypto_engine->done_task);
- 
- 	clk_disable_unprepare(hace_dev->clk);
- 
-diff --git a/drivers/crypto/aspeed/aspeed-hace.h b/drivers/crypto/aspeed/aspeed-hace.h
-index a9aa1e1d90fe..687b16ccd8bd 100644
---- a/drivers/crypto/aspeed/aspeed-hace.h
-+++ b/drivers/crypto/aspeed/aspeed-hace.h
-@@ -7,9 +7,12 @@
- #include <linux/err.h>
- #include <linux/fips.h>
- #include <linux/dma-mapping.h>
-+#include <crypto/aes.h>
-+#include <crypto/des.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/akcipher.h>
-+#include <crypto/internal/des.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/kpp.h>
- #include <crypto/internal/skcipher.h>
-@@ -24,15 +27,75 @@
-  * HACE register definitions *
-  *                           *
-  * ***************************/
-+#define ASPEED_HACE_SRC			0x00	/* Crypto Data Source Base Address Register */
-+#define ASPEED_HACE_DEST		0x04	/* Crypto Data Destination Base Address Register */
-+#define ASPEED_HACE_CONTEXT		0x08	/* Crypto Context Buffer Base Address Register */
-+#define ASPEED_HACE_DATA_LEN		0x0C	/* Crypto Data Length Register */
-+#define ASPEED_HACE_CMD			0x10	/* Crypto Engine Command Register */
-+
-+/* G5 */
-+#define ASPEED_HACE_TAG			0x18	/* HACE Tag Register */
-+/* G6 */
-+#define ASPEED_HACE_GCM_ADD_LEN		0x14	/* Crypto AES-GCM Additional Data Length Register */
-+#define ASPEED_HACE_GCM_TAG_BASE_ADDR	0x18	/* Crypto AES-GCM Tag Write Buff Base Address Reg */
- 
- #define ASPEED_HACE_STS			0x1C	/* HACE Status Register */
-+
- #define ASPEED_HACE_HASH_SRC		0x20	/* Hash Data Source Base Address Register */
- #define ASPEED_HACE_HASH_DIGEST_BUFF	0x24	/* Hash Digest Write Buffer Base Address Register */
- #define ASPEED_HACE_HASH_KEY_BUFF	0x28	/* Hash HMAC Key Buffer Base Address Register */
- #define ASPEED_HACE_HASH_DATA_LEN	0x2C	/* Hash Data Length Register */
- #define ASPEED_HACE_HASH_CMD		0x30	/* Hash Engine Command Register */
- 
-+/* crypto cmd */
-+#define  HACE_CMD_SINGLE_DES		0
-+#define  HACE_CMD_TRIPLE_DES		BIT(17)
-+#define  HACE_CMD_AES_SELECT		0
-+#define  HACE_CMD_DES_SELECT		BIT(16)
-+#define  HACE_CMD_ISR_EN		BIT(12)
-+#define  HACE_CMD_CONTEXT_SAVE_ENABLE	(0)
-+#define  HACE_CMD_CONTEXT_SAVE_DISABLE	BIT(9)
-+#define  HACE_CMD_AES			(0)
-+#define  HACE_CMD_DES			(0)
-+#define  HACE_CMD_RC4			BIT(8)
-+#define  HACE_CMD_DECRYPT		(0)
-+#define  HACE_CMD_ENCRYPT		BIT(7)
-+
-+#define  HACE_CMD_ECB			(0x0 << 4)
-+#define  HACE_CMD_CBC			(0x1 << 4)
-+#define  HACE_CMD_CFB			(0x2 << 4)
-+#define  HACE_CMD_OFB			(0x3 << 4)
-+#define  HACE_CMD_CTR			(0x4 << 4)
-+#define  HACE_CMD_OP_MODE_MASK		(0x7 << 4)
-+
-+#define  HACE_CMD_AES128		(0x0 << 2)
-+#define  HACE_CMD_AES192		(0x1 << 2)
-+#define  HACE_CMD_AES256		(0x2 << 2)
-+#define  HACE_CMD_OP_CASCADE		(0x3)
-+#define  HACE_CMD_OP_INDEPENDENT	(0x1)
-+
-+/* G5 */
-+#define  HACE_CMD_RI_WO_DATA_ENABLE	(0)
-+#define  HACE_CMD_RI_WO_DATA_DISABLE	BIT(11)
-+#define  HACE_CMD_CONTEXT_LOAD_ENABLE	(0)
-+#define  HACE_CMD_CONTEXT_LOAD_DISABLE	BIT(10)
-+/* G6 */
-+#define  HACE_CMD_AES_KEY_FROM_OTP	BIT(24)
-+#define  HACE_CMD_GHASH_TAG_XOR_EN	BIT(23)
-+#define  HACE_CMD_GHASH_PAD_LEN_INV	BIT(22)
-+#define  HACE_CMD_GCM_TAG_ADDR_SEL	BIT(21)
-+#define  HACE_CMD_MBUS_REQ_SYNC_EN	BIT(20)
-+#define  HACE_CMD_DES_SG_CTRL		BIT(19)
-+#define  HACE_CMD_SRC_SG_CTRL		BIT(18)
-+#define  HACE_CMD_CTR_IV_AES_96		(0x1 << 14)
-+#define  HACE_CMD_CTR_IV_DES_32		(0x1 << 14)
-+#define  HACE_CMD_CTR_IV_AES_64		(0x2 << 14)
-+#define  HACE_CMD_CTR_IV_AES_32		(0x3 << 14)
-+#define  HACE_CMD_AES_KEY_HW_EXP	BIT(13)
-+#define  HACE_CMD_GCM			(0x5 << 4)
-+
- /* interrupt status reg */
-+#define  HACE_CRYPTO_ISR		BIT(12)
- #define  HACE_HASH_ISR			BIT(9)
- #define  HACE_HASH_BUSY			BIT(0)
- 
-@@ -77,6 +140,9 @@
- #define ASPEED_HASH_SRC_DMA_BUF_LEN	0xa000
- #define ASPEED_HASH_QUEUE_LENGTH	50
- 
-+#define HACE_CMD_IV_REQUIRE		(HACE_CMD_CBC | HACE_CMD_CFB | \
-+					 HACE_CMD_OFB | HACE_CMD_CTR)
-+
- struct aspeed_hace_dev;
- 
- typedef int (*aspeed_hace_fn_t)(struct aspeed_hace_dev *);
-@@ -145,6 +211,48 @@ struct aspeed_sham_reqctx {
- 	u64			digcnt[2];
- };
- 
-+struct aspeed_engine_crypto {
-+	struct tasklet_struct		done_task;
-+	unsigned long			flags;
-+	struct skcipher_request		*req;
-+
-+	/* context buffer */
-+	void				*cipher_ctx;
-+	dma_addr_t			cipher_ctx_dma;
-+
-+	/* input buffer, could be single/scatter-gather lists */
-+	void				*cipher_addr;
-+	dma_addr_t			cipher_dma_addr;
-+
-+	/* output buffer, only used in scatter-gather lists */
-+	void				*dst_sg_addr;
-+	dma_addr_t			dst_sg_dma_addr;
-+
-+	/* callback func */
-+	aspeed_hace_fn_t		resume;
-+};
-+
-+struct aspeed_cipher_ctx {
-+	struct crypto_engine_ctx	enginectx;
-+
-+	struct aspeed_hace_dev		*hace_dev;
-+	int				key_len;
-+	u8				key[AES_MAX_KEYLENGTH];
-+
-+	/* callback func */
-+	aspeed_hace_fn_t		start;
-+
-+	struct crypto_skcipher          *fallback_tfm;
-+};
-+
-+struct aspeed_cipher_reqctx {
-+	int enc_cmd;
-+	int src_nents;
-+	int dst_nents;
-+
-+	struct skcipher_request         fallback_req;   /* keep at the end */
-+};
-+
- struct aspeed_hace_dev {
- 	void __iomem			*regs;
- 	struct device			*dev;
-@@ -153,8 +261,10 @@ struct aspeed_hace_dev {
- 	unsigned long			version;
- 
- 	struct crypto_engine		*crypt_engine_hash;
-+	struct crypto_engine		*crypt_engine_crypto;
- 
- 	struct aspeed_engine_hash	hash_engine;
-+	struct aspeed_engine_crypto	crypto_engine;
- };
- 
- struct aspeed_hace_alg {
-@@ -177,5 +287,7 @@ enum aspeed_version {
- 
- void aspeed_register_hace_hash_algs(struct aspeed_hace_dev *hace_dev);
- void aspeed_unregister_hace_hash_algs(struct aspeed_hace_dev *hace_dev);
-+void aspeed_register_hace_crypto_algs(struct aspeed_hace_dev *hace_dev);
-+void aspeed_unregister_hace_crypto_algs(struct aspeed_hace_dev *hace_dev);
- 
- #endif
+for the drivers I'm involved in development of.
+
 -- 
-2.25.1
+With Best Regards,
+Andy Shevchenko
+
 
