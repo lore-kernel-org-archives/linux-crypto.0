@@ -2,99 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E2FC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 09:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24902C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 10:55:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234543AbiF3Jsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 05:48:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53066 "EHLO
+        id S233941AbiF3KzW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 06:55:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234548AbiF3Jsh (ORCPT
+        with ESMTP id S233793AbiF3KzV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 05:48:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 680DF2528C
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 02:48:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656582515;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=81XeNR30/gt+PowfKeOGNijQshuWEzmNgPk0a20HvN0=;
-        b=inVPYd8TtTy2S2wIGf9welc8Yr5iR9rpJXDHBDXiIqxGlGNYNpQR3CVLftxVZzNM34aHuC
-        sTZXT1yE8gbxF702snOxcq1OmxGjaD7pxJB8dARTvr4Tzd35s36FV1VINELSXgmMI9zuIU
-        AzdypxxFvol34Fy4g/sv/SD5PfGxuBo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-323-isF8oHKAOWuBrh-V19C9Cw-1; Thu, 30 Jun 2022 05:48:32 -0400
-X-MC-Unique: isF8oHKAOWuBrh-V19C9Cw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C1E5E80029D;
-        Thu, 30 Jun 2022 09:48:31 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 732B7492C3B;
-        Thu, 30 Jun 2022 09:48:30 +0000 (UTC)
-Date:   Thu, 30 Jun 2022 10:48:27 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Lei He <helei.sig11@bytedance.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        dhowells@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pizhenwei@bytedance.com
-Subject: Re: [External] [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
-Message-ID: <Yr1xa4twKn3qFAt9@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20220623070550.82053-1-helei.sig11@bytedance.com>
- <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
- <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
+        Thu, 30 Jun 2022 06:55:21 -0400
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BD844133B;
+        Thu, 30 Jun 2022 03:55:21 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25U84bcH015732;
+        Thu, 30 Jun 2022 03:55:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=pfpt0220;
+ bh=2i29PaMcywSIHClBciOD80TrQpVS0dYcB/9AP/KqRl0=;
+ b=hkjsntywwyYz5ikHnkgr6ed68Pshot4MbsNV5pQtycLRxQGJVPI7HJtguOpgIQzLMB1V
+ DvtSCjrPOueRM4shoGkyiVFoHoGmtB4J4UWOEjhB3Y5dXFasE3d0QHQqjlUmGFGRfkiq
+ dDvHgH7wiXH/3i6QctTJFeDIs2f5FUO5xsA+n8RUW02tEc63NHPCPM3iojewleLmx/KE
+ liWqoevTiDlQ2X5DzcpnuRzsQyDeq+UZ9tRcrHzAPsx9Pc71Wa8XlroQPkZhoNlxtwrn
+ BlC0qt3tzs5Z2PVY2jDkdBtEn6FI4/v/l2UvyrJEKDuMnw+zYbqQ0v8E45umb52OtorB SA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3h0f85ecvu-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jun 2022 03:55:01 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Thu, 30 Jun
+ 2022 03:55:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 30 Jun 2022 03:55:00 -0700
+Received: from localhost.localdomain (unknown [10.28.34.29])
+        by maili.marvell.com (Postfix) with ESMTP id 649D83F7066;
+        Thu, 30 Jun 2022 03:54:55 -0700 (PDT)
+From:   Shijith Thotton <sthotton@marvell.com>
+To:     Arnaud Ebalard <arno@natisbad.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Boris Brezillon <bbrezillon@kernel.org>
+CC:     Shijith Thotton <sthotton@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <jerinj@marvell.com>,
+        <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "open list:MARVELL OCTEONTX2 RVU ADMIN FUNCTION DRIVER" 
+        <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] octeontx2-af: fix operand size in bitwise operation
+Date:   Thu, 30 Jun 2022 16:24:31 +0530
+Message-ID: <f4fba33fe4f89b420b4da11d51255e7cc6ea1dbf.1656586269.git.sthotton@marvell.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <6baefc0e5cddb99df98b6a96a15fbd0328b12bda.1653637964.git.sthotton@marvell.com>
+References: <6baefc0e5cddb99df98b6a96a15fbd0328b12bda.1653637964.git.sthotton@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
-User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: wgDpD4ZzcycQxyPavz-aElEakR0df5l8
+X-Proofpoint-ORIG-GUID: wgDpD4ZzcycQxyPavz-aElEakR0df5l8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-30_07,2022-06-28_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 03:23:39PM +0800, Lei He wrote:
-> 
-> > On Jun 30, 2022, at 2:59 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > 
-> > On Thu, Jun 23, 2022 at 03:05:46PM +0800, Lei He wrote:
-> >> From: lei he <helei.sig11@bytedance.com>
-> >> 
-> >> This patch supports the ECDSA algorithm for virtio-crypto.
-> > 
-> > Why is this necessary?
-> > 
-> 
-> The main purpose of this patch is to offload ECDSA computations to virtio-crypto dev.
-> We can modify the backend of virtio-crypto to allow hardware like Intel QAT cards to 
-> perform the actual calculations, and user-space applications such as HTTPS server 
-> can access those backend in a unified way(eg, keyctl_pk_xx syscall).
-> 
-> Related works are also described in following patch series:
-> https://lwn.net/ml/linux-crypto/20220525090118.43403-1-helei.sig11@bytedance.com/
+Made size of operands same in bitwise operations.
 
-IIUC, this link refers to testing performance of the RSA impl of
-virtio-crypto with a vhost-user backend, leveraging an Intel QAT
-device on the host. What's the status of that depolyment setup ?
-Is code for it published anywhere, and does it have dependancy on
-any kernel patches that are not yet posted and/or merged ? Does it
-cover both ECDSA and RSA yet, or still only RSA ?
+The patch fixes the klocwork issue, operands in a bitwise operation have
+different size at line 375 and 483.
 
-The QEMU backend part of the virtio-crypto support for ECDSA looks fine
-to merge, but obviously I'd like some positive sign that the kernel
-maintainers are willing to accept the guest driver side.
+Signed-off-by: Shijith Thotton <sthotton@marvell.com>
+---
+v2:
+* Rebased.
 
-With regards,
-Daniel
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+index a9da85e418a4..38bbae5d9ae0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+@@ -17,7 +17,7 @@
+ #define	PCI_DEVID_OTX2_CPT10K_PF 0xA0F2
+ 
+ /* Length of initial context fetch in 128 byte words */
+-#define CPT_CTX_ILEN    2
++#define CPT_CTX_ILEN    2ULL
+ 
+ #define cpt_get_eng_sts(e_min, e_max, rsp, etype)                   \
+ ({                                                                  \
+@@ -480,7 +480,7 @@ static int cpt_inline_ipsec_cfg_inbound(struct rvu *rvu, int blkaddr, u8 cptlf,
+ 	 */
+ 	if (!is_rvu_otx2(rvu)) {
+ 		val = (ilog2(NIX_CHAN_CPT_X2P_MASK + 1) << 16);
+-		val |= rvu->hw->cpt_chan_base;
++		val |= (u64)rvu->hw->cpt_chan_base;
+ 
+ 		rvu_write64(rvu, blkaddr, CPT_AF_X2PX_LINK_CFG(0), val);
+ 		rvu_write64(rvu, blkaddr, CPT_AF_X2PX_LINK_CFG(1), val);
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.25.1
 
