@@ -2,77 +2,73 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED405C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 06:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90920C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 06:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232701AbiF3Gn1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 02:43:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46934 "EHLO
+        id S229575AbiF3Gsj (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 02:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232434AbiF3Gn0 (ORCPT
+        with ESMTP id S232838AbiF3Gsj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 02:43:26 -0400
+        Thu, 30 Jun 2022 02:48:39 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DC7A44A
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jun 2022 23:43:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F1131A069;
+        Wed, 29 Jun 2022 23:48:36 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1o6ntY-00CwMQ-Pj; Thu, 30 Jun 2022 16:43:22 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Jun 2022 14:43:21 +0800
-Date:   Thu, 30 Jun 2022 14:43:21 +0800
+        id 1o6nyJ-00CwRv-5u; Thu, 30 Jun 2022 16:48:16 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Jun 2022 14:48:15 +0800
+Date:   Thu, 30 Jun 2022 14:48:15 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Liang He <windhl@126.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org, windhl@126.com
-Subject: Re: [PATCH] crypto: Hold the reference returned by
- of_find_compatible_node
-Message-ID: <Yr1GCZF/gWBm4zHp@gondor.apana.org.au>
+To:     Li Qiong <liqiong@nfschina.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        linux-crypto@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        yuzhe@nfschina.com, renyu@nfschina.com
+Subject: Re: [PATCH] crypto: stm32 - Handle failure of kmalloc_array()
+Message-ID: <Yr1HL5dr/zUyx+5q@gondor.apana.org.au>
+References: <20220622020208.25776-1-liqiong@nfschina.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220621073742.4081013-1-windhl@126.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <20220622020208.25776-1-liqiong@nfschina.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Liang He <windhl@126.com> wrote:
-> In nx842_pseries_init() and crypto4xx_probe(), we should hold the
-> reference returned by of_find_compatible_node() and use it to call
-> of_node_put to keep refcount balance.
+On Wed, Jun 22, 2022 at 10:02:08AM +0800, Li Qiong wrote:
+> As the possible failure of the kmalloc_array(), therefore it
+> should be better to check it and return '-ENOMEM' on error.
 > 
-> Signed-off-by: Liang He <windhl@126.com>
+> Signed-off-by: Li Qiong <liqiong@nfschina.com>
 > ---
-> drivers/crypto/amcc/crypto4xx_core.c  | 13 ++++++++-----
-> drivers/crypto/nx/nx-common-pseries.c |  5 ++++-
-> 2 files changed, 12 insertions(+), 6 deletions(-)
-
-Please split this into two patches.
-
-> diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-> index 8278d98074e9..169b6a05e752 100644
-> --- a/drivers/crypto/amcc/crypto4xx_core.c
-> +++ b/drivers/crypto/amcc/crypto4xx_core.c
-> @@ -1378,6 +1378,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
->        struct resource res;
->        struct device *dev = &ofdev->dev;
->        struct crypto4xx_core_device *core_dev;
-> +       struct device_node *np;
->        u32 pvr;
->        bool is_revb = true;
+>  drivers/crypto/stm32/stm32-hash.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> @@ -1385,20 +1386,20 @@ static int crypto4xx_probe(struct platform_device *ofdev)
->        if (rc)
->                return -ENODEV;
-> 
-> -       if (of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) {
-> +       if ((np = of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) != NULL) {
+> diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+> index d33006d43f76..fc03e32e364f 100644
+> --- a/drivers/crypto/stm32/stm32-hash.c
+> +++ b/drivers/crypto/stm32/stm32-hash.c
+> @@ -970,6 +970,8 @@ static int stm32_hash_export(struct ahash_request *req, void *out)
+>  	rctx->hw_context = kmalloc_array(3 + HASH_CSR_REGISTER_NUMBER,
+>  					 sizeof(u32),
+>  					 GFP_KERNEL);
+> +	if (!rctx->hw_context)
+> +		return -ENOMEM;
 
-This is getting awkwardly long.  Please change this to
+Actually the problem is bigger than that.  The driver should not be
+allocating memory in the export function at all.  This memory will
+be leaked as exported requests won't be finalized.
 
-	np = ...;
-	if (np) {
+We need to fix this driver to do export properly, or if that's not
+possible, we should delete this driver.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
