@@ -2,89 +2,101 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C754C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 07:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F066C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 07:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231690AbiF3HWv (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 03:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48322 "EHLO
+        id S232299AbiF3HXt (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 03:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbiF3HWv (ORCPT
+        with ESMTP id S232215AbiF3HXs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 03:22:51 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CE137A00
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 00:22:50 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id x138so14635640pfc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 00:22:50 -0700 (PDT)
+        Thu, 30 Jun 2022 03:23:48 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EA132B277
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 00:23:47 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id g20-20020a17090a579400b001ed52939d72so1916859pji.4
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 00:23:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=yO4KfhyIPZOlRyWZfTyoLEm2I68M9hNvZJ64WV/qAN8=;
-        b=LS8Rd8duRBUssZrwzeeED6gRn0viDPx9ftesrP6vJigPQDxlYH+/oMQrQxFnGPWuRU
-         1d2yCVzCOUGwXwxmmRovZzvYby8ccJMLnDohHWOgSSvZCbHwJzWNTVRIKylKv3HLhtaS
-         7qQohwQLlb80w6mdpMETu2CZ1tyE5/KwZomY9CpCKCPuZ+BEPxt8Sde1uM//HRwDK8CU
-         D/bucKKa1J416+ezo0/3Sz0gv1XTDdOf/FF02LU7kCb0WnT/TQjZmKb1qZ/LVACbZ5Im
-         QYtSwS5KtGZeNmiWHDEHIFrYBq/Q93Qz3kzGcoLnSmRDrCtF1qBIl3YQkaarM1SVhWLp
-         35Ew==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=kPj3DJDPahvvDxF0DURO3tVx6ujFEvydZkmaEtn28Rg=;
+        b=QaORBQDDJbzqP4G6eVt9wELj+P4mgfHQNbLnVJgBIr0oOT2IpfcB69NR4a8tF0lLlm
+         xIo3PekLAOXHFpK5nvAyRJ9SFX7IncdUll2plBAhu2VUIzOxIjU2WrVQR3g0J/Q1G+XP
+         E1XgCr4X7QjaSDCnQhaDjlU6yqNeqktMMAeBVqXDzofKyQJysj/hjACRLJdcCYZyMLNA
+         HSME5+ytZjhdNCmisSCGj6yLEPy/G1qRQutlUhWqBu/QxP5DzHZuzkXWsJj0wKI3DRKq
+         dHBSe4L7BjyKabfr4OV1WLA4Q1ifFMQpKL7gOZc9zPHNRUn19foJrvOGYg6ISHcA//4H
+         qvaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=yO4KfhyIPZOlRyWZfTyoLEm2I68M9hNvZJ64WV/qAN8=;
-        b=ftwEJNMrvTTr+cMbPDIyETPgYxPMbKkVSbd2vIjejUdNwB5bkdD0zpZTN5JK2lTSGM
-         scfduICjZxQNIgtSErvTPpoGesorxuj+WuHc3eKCvRdjHqGHbjM1bavhFMbjv/qOS9wm
-         XZEg7eg4w4fj432B60Fpc596BJoDG/1Xjr0zghLl4ARcrIRvMPyrPVrWaRObgjCXsRhx
-         oyvy2dmbdwLCUaKS+s8r+K5iUF67ULMQSPidh93IKv69YjVUl2FR6nOKAk5/wojwmvhq
-         fWa4K6V2MmNBG3hkBgVU8/QJW4jkMNx0uvn0NHYGtOWXhJ2vu8Iu7T6T4C52Brl9yCiN
-         x5yQ==
-X-Gm-Message-State: AJIora8n9UvCaeYkOtuh6RIA5B7w+HtBdFKOlxAD2HdwSXKCjXcYRS03
-        6cTloyQZ+YzQW16zubf488MW7A2i9R8=
-X-Google-Smtp-Source: AGRyM1uReQkX4LTIoYiOARD9JextKDG60vzWBvFGLTr4n0rP1ocQwYBwvmkfsQrVO/eWmrekxLZ1+w==
-X-Received: by 2002:a63:8f13:0:b0:40c:f042:13a8 with SMTP id n19-20020a638f13000000b0040cf04213a8mr6550064pgd.619.1656573769651;
-        Thu, 30 Jun 2022 00:22:49 -0700 (PDT)
-Received: from [192.168.0.4] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id y11-20020a17090322cb00b0016b953872aesm4312473plg.112.2022.06.30.00.22.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jun 2022 00:22:49 -0700 (PDT)
-Message-ID: <b273e4ed-311e-3821-c742-a7911046f2b5@gmail.com>
-Date:   Thu, 30 Jun 2022 16:22:46 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH 0/2] crypto: Introduce ARIA symmetric cipher algorithm
-Content-Language: en-US
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=kPj3DJDPahvvDxF0DURO3tVx6ujFEvydZkmaEtn28Rg=;
+        b=htQUkx5JEUk9/XhleRVkjtjp1y+0rp0q54JamUwounNLb635nKQ0xnjb0r3v8TjwXw
+         N44+3NUZTYz8ayUlV9Y0h+lf1lZLz7D9GQcNuEs5pOMWRCt/5iIpG+R02uk11GnqP7Mu
+         9H9/mFAonp7Vk6t//HMrmTHCn5RKEFUdCDmJ1HOHyln1bt4i7Ll47QCbTlKGHk0eo09L
+         +e9XKqYp3yobfA8yfypBIpW4yJ+dkpYC79ajWAzw4sxR57S26RK2xyuWyiBpn4TONPWR
+         W+kdvgJscXGzzfLFh9wWx1WQqS7TFmg9wFdkSeql21fkUNPTBAQ4Ub9CfWJsQJqOKmml
+         cZSQ==
+X-Gm-Message-State: AJIora9DjGz0aNygJybHhzx0NietTfD+Sa+9+WxtWOUkHw57SBCmh6mV
+        wR/7rIdfm/rkaAYYNPfg9HXxPQ==
+X-Google-Smtp-Source: AGRyM1vf2H5neloO5d3aKoFxRUFceQx95p3IxJsndYQCU7U17oceCA7Hfne4ZjMjm8r2qoDz4TLHiQ==
+X-Received: by 2002:a17:902:d706:b0:16b:960e:e689 with SMTP id w6-20020a170902d70600b0016b960ee689mr10659856ply.24.1656573827047;
+        Thu, 30 Jun 2022 00:23:47 -0700 (PDT)
+Received: from ?IPv6:fdbd:ff1:ce00:422:15e6:97a:66d6:17ac? ([2404:9dc0:cd01::a])
+        by smtp.gmail.com with ESMTPSA id q13-20020aa7960d000000b00525161431f5sm12758307pfg.36.2022.06.30.00.23.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 30 Jun 2022 00:23:46 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
+Subject: Re: [External] [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
+From:   Lei He <helei.sig11@bytedance.com>
+In-Reply-To: <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
+Date:   Thu, 30 Jun 2022 15:23:39 +0800
+Cc:     Lei He <helei.sig11@bytedance.com>, davem@davemloft.net,
+        dhowells@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        berrange@redhat.com, pizhenwei@bytedance.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
+References: <20220623070550.82053-1-helei.sig11@bytedance.com>
+ <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net
-References: <Yr1FBOC8Zi1ltlBi@gondor.apana.org.au>
- <50203730-35f1-4bf9-3f3a-ca6cd3b01d4a@gmail.com>
- <Yr1N376O00fS0Skd@gondor.apana.org.au>
-From:   Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <Yr1N376O00fS0Skd@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Mailer: Apple Mail (2.3608.120.23.2.4)
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/30/22 16:16, Herbert Xu wrote:
- > On Thu, Jun 30, 2022 at 04:13:19PM +0900, Taehee Yoo wrote:
- >>
- >> So, my plan is to add the kTLS feature because aria-TLS[2] is now 
-standard.
- >> So, Is it okay to add the aria-kTLS feature into the v2 patch, 
-instead of
- >> aria-IPsec?
- >
- > Sure.  As long as the kTLS people are happy to add this then it's
- > good to go.
- >
- > Cheers,
 
-I will add aria-kTLS feature into the v2 patch and I will send it to 
-both the crypto and netdev mailing list after some tests.
+> On Jun 30, 2022, at 2:59 PM, Herbert Xu <herbert@gondor.apana.org.au> =
+wrote:
+>=20
+> On Thu, Jun 23, 2022 at 03:05:46PM +0800, Lei He wrote:
+>> From: lei he <helei.sig11@bytedance.com>
+>>=20
+>> This patch supports the ECDSA algorithm for virtio-crypto.
+>=20
+> Why is this necessary?
+>=20
 
-Thanks a lot!
-Taehee Yoo
+The main purpose of this patch is to offload ECDSA computations to =
+virtio-crypto dev.
+We can modify the backend of virtio-crypto to allow hardware like Intel =
+QAT cards to=20
+perform the actual calculations, and user-space applications such as =
+HTTPS server=20
+can access those backend in a unified way(eg, keyctl_pk_xx syscall).
+
+Related works are also described in following patch series:
+=
+https://lwn.net/ml/linux-crypto/20220525090118.43403-1-helei.sig11@bytedan=
+ce.com/
+
+> Thanks,
+> --=20
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
