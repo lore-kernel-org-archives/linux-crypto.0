@@ -2,89 +2,130 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 199E0C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 08:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 652E6C43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 08:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233839AbiF3Ias (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 04:30:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34442 "EHLO
+        id S229873AbiF3IiS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 04:38:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233788AbiF3Iaq (ORCPT
+        with ESMTP id S233504AbiF3IiP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:30:46 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC0C15FF7
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 01:30:45 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id x20so10784317plx.6
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 01:30:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4McIKk3Fy71FEBWbTbShi+eMKu+z9V5xzjqx5MIKVvw=;
-        b=TMHea2JAk1M6WzSofcjJoKfA+33i0AgIltZzhoBGekWsYnqvYCPxG+WtizGQ6qNR4I
-         qU1ESZLC94mGR4qzwfENvKbUe26LGvsxIpFPFegDJonDSi9mSjEEYDRPqCzVA1oVhrS7
-         KDkqWIoY6LI59ab4rUCoOi6VxlvALxn+S2voTr7tYMCB0Rl+nCOiuZlK31+x4at5Sy31
-         nlUhKiyrn+PCzHbGuseeHfYCDsao+xkt2MRHaL8ZZm85GkvRYo1Y3dL/lqIdRkmxSOvH
-         YeOCS9HHPGm5QJfHTBa2UzjrNRGo5U1pX30V4xMcC4foNQxeGcGQcC3pyKJjweUffrvP
-         1wVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4McIKk3Fy71FEBWbTbShi+eMKu+z9V5xzjqx5MIKVvw=;
-        b=tWxMOzkMChMVmIcipsW10n6m9n24tAm+lOq1EIB0deGcuQvZfoZUbB8MPWLd2T8Whu
-         /cF1QWGm0KrdLnVw0u4hvACwKKonlBb4WduUWFNb7Wa1GVETtW4LYkFbpmpRwOc8HHWG
-         7GCa3sfLtv5ctQahlR//hT2bTX+4olJYJnVQBAq5D5m9veTt/K+/nZy/tCjP/RWN/ond
-         8qoYUUmVcwElognp1Zyk5lmTukBx/qdMmLubOvYxyBLm8d1AN0PYjGstgVOCVdR1yMv3
-         YZUxVYmNSO2SaDxq9zellvkGsmPhw++l2T7L670WNqr6HrTLLHM15Pz3RipeVLpctLsW
-         Zshw==
-X-Gm-Message-State: AJIora8596mjCesXMDW+ThiM00lrYmnAVlSweTzWFzKqNwlaOrO/n22i
-        5R/mAq6MdFvkRsTt4EATbgJ4lyjef3rqTQ==
-X-Google-Smtp-Source: AGRyM1u0TWreHmpYyOxwUKfR9/FcgtAJxlpQGult60YsdnTIcDCQ2DJgKuzrKXs7fbRKxQMvRqs8Rg==
-X-Received: by 2002:a17:90b:164a:b0:1ec:b991:b69 with SMTP id il10-20020a17090b164a00b001ecb9910b69mr10608367pjb.173.1656577845253;
-        Thu, 30 Jun 2022 01:30:45 -0700 (PDT)
-Received: from [10.76.43.148] ([61.120.150.78])
-        by smtp.gmail.com with ESMTPSA id r10-20020a17090a1bca00b001e2f892b352sm1199219pjr.45.2022.06.30.01.30.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 Jun 2022 01:30:44 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
-From:   Lei He <helei.sig11@bytedance.com>
-In-Reply-To: <Yr1TuPM8yvJUoV9r@gondor.apana.org.au>
-Date:   Thu, 30 Jun 2022 16:30:39 +0800
-Cc:     Lei He <helei.sig11@bytedance.com>, davem@davemloft.net,
-        dhowells@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        berrange@redhat.com, pizhenwei@bytedance.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
-References: <20220623070550.82053-1-helei.sig11@bytedance.com>
- <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
- <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
- <Yr1TuPM8yvJUoV9r@gondor.apana.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
+        Thu, 30 Jun 2022 04:38:15 -0400
+Received: from m15113.mail.126.com (m15113.mail.126.com [220.181.15.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5846CE080
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 01:38:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=jj/Kg
+        /5d7qigAWweHWdYBZW+YN0pgPw7ut/+o24/MIY=; b=QhucT6+8EA0BZ0eHf2OGs
+        YsShcdt9TQulg4+cNeq2YnXRSUhvBbJG9/54blm6BWtVAHudPFc4cNc2EBflAOui
+        A0ot66krrk9pvJtU/AEZWco4Eo9fXIdzGUDlI5nO4EbTdgsLuRlc88GZD0U00aT0
+        GJdi9EZG7Jfvqx+eLH6REI=
+Received: from localhost.localdomain (unknown [124.16.139.61])
+        by smtp3 (Coremail) with SMTP id DcmowADXb5GpYL1iB4f_EA--.25761S2;
+        Thu, 30 Jun 2022 16:36:59 +0800 (CST)
+From:   Liang He <windhl@126.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        mpe@ellerman.id.au, benh@kernel.crashing.org, paulus@samba.org,
+        windhl@126.com, linux-crypto@vger.kernel.org
+Subject: [PATCH v2 1/2] crypto: amcc: Hold the reference returned by of_find_compatible_node
+Date:   Thu, 30 Jun 2022 16:36:56 +0800
+Message-Id: <20220630083657.206122-1-windhl@126.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: DcmowADXb5GpYL1iB4f_EA--.25761S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZrW5Kr1rCr1fGrWkGw47twb_yoW5Cr45pF
+        4Y939rAryxX3Wjgryktw1ku3WFka97AFWrtF47J34kuwnrXrWkZr12v3yjya40gFyUJw13
+        Jr95Kr10yas8Jr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0ziEkskUUUUU=
+X-Originating-IP: [124.16.139.61]
+X-CM-SenderInfo: hzlqvxbo6rjloofrz/1tbi3AwwF1pED1WUvQAAsa
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+In crypto4xx_probe(), we should hold the reference returned by
+of_find_compatible_node() and use it to call of_node_put to keep
+ refcount balance.
 
-> On Jun 30, 2022, at 3:41 PM, Herbert Xu <herbert@gondor.apana.org.au> =
-wrote:
->=20
-> The things is I don't see any driver support in the kernel for
-> ECDSA.
->=20
+Signed-off-by: Liang He <windhl@126.com>
+---
+ changelog:
+ 
+ v2: split v1 into two commits, use short coding format for 'np=xx;'
+ v1: fix bugs in two directories (amcc,nx) of crypto
 
-I have explained above why we need a driver that supports ECDSA, and =
-this patch
-enables virtio-crypto to support ECDSA. I think this is a good time to =
-support ECDSA
-in the kernel crypto framework, and there will be more drivers =
-supporting ECDSA in the=20
-future.
-Looking forward to your opinion :-).
+ v1-link: https://lore.kernel.org/all/20220621073742.4081013-1-windhl@126.com/
+
+ drivers/crypto/amcc/crypto4xx_core.c | 40 +++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 8278d98074e9..280f4b0e7133 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1378,6 +1378,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
+ 	struct resource res;
+ 	struct device *dev = &ofdev->dev;
+ 	struct crypto4xx_core_device *core_dev;
++	struct device_node *np;
+ 	u32 pvr;
+ 	bool is_revb = true;
+ 
+@@ -1385,29 +1386,36 @@ static int crypto4xx_probe(struct platform_device *ofdev)
+ 	if (rc)
+ 		return -ENODEV;
+ 
+-	if (of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto")) {
++	np = of_find_compatible_node(NULL, NULL, "amcc,ppc460ex-crypto");
++	if (np) {
+ 		mtdcri(SDR0, PPC460EX_SDR0_SRST,
+ 		       mfdcri(SDR0, PPC460EX_SDR0_SRST) | PPC460EX_CE_RESET);
+ 		mtdcri(SDR0, PPC460EX_SDR0_SRST,
+ 		       mfdcri(SDR0, PPC460EX_SDR0_SRST) & ~PPC460EX_CE_RESET);
+-	} else if (of_find_compatible_node(NULL, NULL,
+-			"amcc,ppc405ex-crypto")) {
+-		mtdcri(SDR0, PPC405EX_SDR0_SRST,
+-		       mfdcri(SDR0, PPC405EX_SDR0_SRST) | PPC405EX_CE_RESET);
+-		mtdcri(SDR0, PPC405EX_SDR0_SRST,
+-		       mfdcri(SDR0, PPC405EX_SDR0_SRST) & ~PPC405EX_CE_RESET);
+-		is_revb = false;
+-	} else if (of_find_compatible_node(NULL, NULL,
+-			"amcc,ppc460sx-crypto")) {
+-		mtdcri(SDR0, PPC460SX_SDR0_SRST,
+-		       mfdcri(SDR0, PPC460SX_SDR0_SRST) | PPC460SX_CE_RESET);
+-		mtdcri(SDR0, PPC460SX_SDR0_SRST,
+-		       mfdcri(SDR0, PPC460SX_SDR0_SRST) & ~PPC460SX_CE_RESET);
+ 	} else {
+-		printk(KERN_ERR "Crypto Function Not supported!\n");
+-		return -EINVAL;
++		np = of_find_compatible_node(NULL, NULL, "amcc,ppc405ex-crypto");
++		if (np) {
++			mtdcri(SDR0, PPC405EX_SDR0_SRST,
++				   mfdcri(SDR0, PPC405EX_SDR0_SRST) | PPC405EX_CE_RESET);
++			mtdcri(SDR0, PPC405EX_SDR0_SRST,
++				   mfdcri(SDR0, PPC405EX_SDR0_SRST) & ~PPC405EX_CE_RESET);
++			is_revb = false;
++		} else {
++			np = of_find_compatible_node(NULL, NULL, "amcc,ppc460sx-crypto");
++			if (np) {
++				mtdcri(SDR0, PPC460SX_SDR0_SRST,
++					mfdcri(SDR0, PPC460SX_SDR0_SRST) | PPC460SX_CE_RESET);
++				mtdcri(SDR0, PPC460SX_SDR0_SRST,
++					mfdcri(SDR0, PPC460SX_SDR0_SRST) & ~PPC460SX_CE_RESET);
++			} else {
++				printk(KERN_ERR "Crypto Function Not supported!\n");
++				return -EINVAL;
++			}
++		}
+ 	}
+ 
++	of_node_put(np);
++
+ 	core_dev = kzalloc(sizeof(struct crypto4xx_core_device), GFP_KERNEL);
+ 	if (!core_dev)
+ 		return -ENOMEM;
+-- 
+2.25.1
 
