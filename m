@@ -2,79 +2,138 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 437D0C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 17:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3807AC43334
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 18:11:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236235AbiF3R2i (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 13:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+        id S235944AbiF3SLL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 14:11:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236202AbiF3R2g (ORCPT
+        with ESMTP id S231596AbiF3SLJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 13:28:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3366205EC;
-        Thu, 30 Jun 2022 10:28:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1AC4362169;
-        Thu, 30 Jun 2022 17:28:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B0F4C34115;
-        Thu, 30 Jun 2022 17:28:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656610114;
-        bh=tUYJESFZcL9zAPBOX3yLa2RjD8PyCujISGXkfEXN+9U=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=s+RDmODDpEGek41QPITo6IoBLR+Sc2ScjI5wzhhwvfFrALCeWLwU569Yj0o/nIwxb
-         DFA6kwe8MzR55apWXuLfYNTPPm1LRDi3VKQApuhbcdJzk1/Sb9Gknp3oVO7/3NHgPs
-         ThiCHW4JTlzuawcVgz6AqJIEgFvOkDIGu5kDMBi2C3fJ6E/Kd0GqcaNVz5MkFzzMbG
-         qWglcsaYL1+UqbVmZAwda9IdTzUpMQwO93n4HGqwaaasU8b9PFcHH1V9JQWO76jf+d
-         S5PEkRLPnrrWPloMN7GXd5HSAoGv8Du7AWiUqQ2yZPv4Vxf8shVmxrp3xgzMVuyIor
-         qU6ymWxMSgJ+Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 68486E49BBB;
-        Thu, 30 Jun 2022 17:28:34 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 5.19
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
-References: <20210817013601.GA14148@gondor.apana.org.au>
- <20210929023843.GA28594@gondor.apana.org.au>
- <20211029041408.GA3192@gondor.apana.org.au>
- <20211112104815.GA14105@gondor.apana.org.au>
- <YcKz4wHYTe3qlW7L@gondor.apana.org.au>
- <YgMn+1qQPQId50hO@gondor.apana.org.au>
- <YjE5yThYIzih2kM6@gondor.apana.org.au>
- <YkUdKiJflWqxBmx5@gondor.apana.org.au>
- <YpC1/rWeVgMoA5X1@gondor.apana.org.au>
- <Yqw7bf7ln6vtU/VH@gondor.apana.org.au> <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Yr1XPJsAH2l1cx3A@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.19-p3
-X-PR-Tracked-Commit-Id: 87d044096ea62f1f230e8c4679ee8abf03266f64
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f5da5ddf81ad0bfb91fa5e7d087e2ad96f26b7b7
-Message-Id: <165661011441.6493.15300000467947229478.pr-tracker-bot@kernel.org>
-Date:   Thu, 30 Jun 2022 17:28:34 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Thu, 30 Jun 2022 14:11:09 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D28338DB3;
+        Thu, 30 Jun 2022 11:11:08 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25UHhnid032979;
+        Thu, 30 Jun 2022 18:11:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
+ content-transfer-encoding : mime-version : subject : message-id : date :
+ cc : to; s=pp1; bh=88WZx86HudOPmlmqtdxMaUGdFLqWwn/ZdU9TIZdzHfw=;
+ b=ee74leaSvYnIQz2UIsvogJTQw92ctL4gKmh/u/mRG149J6OgFi9XvzefSgZhALk3IBJX
+ HaG72UGW2mG5hNjVX9fqdOo8BWr2IvfEOGQunihEHWsqFPDnEqmqf14juvfnspNBkGEj
+ ErY7pT4eWuS5WHD//KCCLJGBoP2yDaCNmtK0yKzRoMnaKkR9lCgaNxp9/zvQTwCrHn+l
+ wohnNWMTOJtIpEiytBwEacUtWJH+3nq2prXLOn/6sNuqdF8JhLvGlQKxkAxbKxhmy1tY
+ U1JJPE9DHz1YrgVHGw4pEn26AA+CIUzwQpEqMvMY0m23FCKbi668+fUIwI3eewx7lRf4 xg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h1gg10qyn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jun 2022 18:11:02 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25UI5BSm018370;
+        Thu, 30 Jun 2022 18:11:00 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3gwt090h8c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 30 Jun 2022 18:11:00 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25UIAvNK22675890
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 Jun 2022 18:10:57 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA008AE055;
+        Thu, 30 Jun 2022 18:10:57 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8056AE051;
+        Thu, 30 Jun 2022 18:10:56 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.9.111])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 30 Jun 2022 18:10:56 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.ibm.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
+Subject: WARN at crypto/testmgr.c:5774 (next)
+Message-Id: <74179C93-0D19-4A8A-81EB-07BD836A3BD3@linux.ibm.com>
+Date:   Thu, 30 Jun 2022 23:40:55 +0530
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-next@vger.kernel.org
+To:     linux-crypto@vger.kernel.org, ignat@cloudflare.com
+X-Mailer: Apple Mail (2.3696.100.31)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dH9DkQw1GlHuk-TbHhjTCU6LWfgClaTS
+X-Proofpoint-GUID: dH9DkQw1GlHuk-TbHhjTCU6LWfgClaTS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-30_12,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 mlxlogscore=634 adultscore=0
+ phishscore=0 clxscore=1011 suspectscore=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206300070
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Thu, 30 Jun 2022 15:56:44 +0800:
+Following warning is seen while booting recent -next kernel on IBM Power =
+server.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git tags/v5.19-p3
+[    1.544420] ------------[ cut here ]------------
+[    1.544422] alg: self-tests for rsa-generic (rsa) failed (rc=3D-22)
+[    1.544429] WARNING: CPU: 18 PID: 512 at crypto/testmgr.c:5774 =
+alg_test+0x42c/0x850
+[    1.544437] Modules linked in:
+[    1.544441] CPU: 18 PID: 512 Comm: cryptomgr_test Not tainted =
+5.19.0-rc4-next-20220627 #2
+[    1.544446] NIP:  c0000000006fa76c LR: c0000000006fa768 CTR: =
+c0000000008552e0
+[    1.544448] REGS: c000000008a27980 TRAP: 0700   Not tainted  =
+(5.19.0-rc4-next-20220627)
+[    1.544451] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: =
+28008822  XER: 20040005
+[    1.544458] CFAR: c000000000154114 IRQMASK: 0=20
+[    1.544458] GPR00: c0000000006fa768 c000000008a27c20 c000000002a8ff00 =
+0000000000000035=20
+[    1.544458] GPR04: 00000000ffff7fff c000000008a279e0 c000000008a279d8 =
+0000000000000000=20
+[    1.544458] GPR08: 00000000ffff7fff 0000000000000000 c0000000025c6ff8 =
+c000000002947160=20
+[    1.544458] GPR12: 0000000000008000 c0000009afff3f00 c00000000018c6f8 =
+c0000000070c5180=20
+[    1.544458] GPR16: 0000000000000000 0000000000000000 0000000000000000 =
+0000000000000000=20
+[    1.544458] GPR20: 0000000000000000 0000000000000000 0000000000000000 =
+c000000000f1c230=20
+[    1.544458] GPR24: 0000000000000000 c00000000e679080 0000000000000400 =
+ffffffffffffffff=20
+[    1.544458] GPR28: c00000000e679000 000000000000000d c000000002d814a8 =
+ffffffffffffffea=20
+[    1.544491] NIP [c0000000006fa76c] alg_test+0x42c/0x850
+[    1.544495] LR [c0000000006fa768] alg_test+0x428/0x850
+[    1.544499] Call Trace:
+[    1.544500] [c000000008a27c20] [c0000000006fa768] =
+alg_test+0x428/0x850 (unreliable)
+[    1.544505] [c000000008a27d90] [c0000000006f8df0] =
+cryptomgr_test+0x40/0x70
+[    1.544510] [c000000008a27dc0] [c00000000018c814] kthread+0x124/0x130
+[    1.544514] [c000000008a27e10] [c00000000000cdf4] =
+ret_from_kernel_thread+0x5c/0x64
+[    1.544518] Instruction dump:
+[    1.544520] 409e02e0 3d22002f 892915d1 2f890000 409e02d0 3c62fe77 =
+7f25cb78 7f84e378=20
+[    1.544526] 7fe6fb78 3863ac78 4ba59949 60000000 <0fe00000> fa2100f8 =
+fa410100 fa610108=20
+[    1.544532] ---[ end trace 0000000000000000 ]=E2=80=94
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f5da5ddf81ad0bfb91fa5e7d087e2ad96f26b7b7
+Git bisect points to the following patch.
 
-Thank you!
+# git bisect bad
+f145d411a67efacc0731fc3f9c7b2d89fb62523a is the first bad commit
+commit f145d411a67efacc0731fc3f9c7b2d89fb62523a
+    crypto: rsa - implement Chinese Remainder Theorem for faster private =
+key operations
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Reverting the patch helps avoid this boot time warning.
+
+- Sachin=
