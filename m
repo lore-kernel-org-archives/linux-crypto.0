@@ -2,74 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87035C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 23:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0E2CCA473
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 23:14:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232200AbiF3XNC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 19:13:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
+        id S232324AbiF3XON (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 19:14:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbiF3XNC (ORCPT
+        with ESMTP id S230336AbiF3XOM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 19:13:02 -0400
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D73658FF5;
-        Thu, 30 Jun 2022 16:12:54 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id b5so395355vkp.4;
-        Thu, 30 Jun 2022 16:12:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7wzi5h6x58xxiTOM4JQOJLqp79CEZINGU2wxWSzdeGE=;
-        b=T1k18UQz97Za886MWmNdTZ31Trb5KRB8i8ySpMh3nvUETfHSkm6PkUkJlpOraKIAFF
-         JwUbT9RQUDEprCQCJVYyvbpgTprNrdK/ctvlmd6tF79UnPzCiiSICxpI2fclQo6IUDHN
-         RzypN/YSmNslojBpfGAFnSTf9TCvAt1ahOTtMKLL0SjUdkMfG1jNmzc2oP8xVlfLWpn+
-         YasiC8k2NehFNK5kFQb2iIhvMYemKz5qvhy3H8ZQ7+6/MvCJ0me7eh0zR76V9r7GgkqK
-         Mawx9caGjt8ZriU1TyYJMAeWusfldwN2vVNj0SEot5LeB11R+LPw30dkRogrAjLra14B
-         vNjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7wzi5h6x58xxiTOM4JQOJLqp79CEZINGU2wxWSzdeGE=;
-        b=Z3fR89aDTh3BTlumrVMsw9T/iJgh4alGz/FoVQ/mQ1qI158YHf6IR9w3ikwUIyMt2P
-         a5PFPwZGN1xojGOkItoO8TcBw4bgl9r8JQebiHFmLveF5TAbrpSqXJajxrk5imM6q1l7
-         wgyFC2FDXoexB6ObL8I1iC217oOMEbnRngh9uhjxHncGhPb0ACVXQlDl7zYKafdzMVrQ
-         Yc1Hixy6V/YxzgfzARRxK6a+bfEtz5qTIKDuYq03sgSEo7t34+C8shDXCJBjU8f3y9Tk
-         9a9cbZ7+VtOiIz5clkl5cnl/SavjVjJLs5NnJ/seXdWs2wFHA7VZmMvC7aw+ZiNnN105
-         03zQ==
-X-Gm-Message-State: AJIora9YEmJ4qBYAzh617OGYRqLvUktT0UUZmRELYckdnfzPRegRtrdF
-        nXLEHwKqiGkkmozfZxWQfsFofhVgNSShYb8Riqc=
-X-Google-Smtp-Source: AGRyM1uqSrtTxBJm8dLdR4nVtFvtwn94GbJBtiFqAp1OjuGYQgBOm0LJ2F5gCMK68n6yga2Ieiwm1p/9sI6cc1ZELPg=
-X-Received: by 2002:a1f:78c5:0:b0:36c:aca5:94bc with SMTP id
- t188-20020a1f78c5000000b0036caca594bcmr9646531vkc.15.1656630773545; Thu, 30
- Jun 2022 16:12:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220623070550.82053-1-helei.sig11@bytedance.com>
- <Yr1JvG1aJUp4I/fP@gondor.apana.org.au> <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
- <Yr1TuPM8yvJUoV9r@gondor.apana.org.au> <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
-In-Reply-To: <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
-From:   Sandy Harris <sandyinchina@gmail.com>
-Date:   Fri, 1 Jul 2022 07:12:41 +0800
-Message-ID: <CACXcFmmxDVBrnp3_0UzN+VbAjDaUSNtoUBz5fM1Y4u5yqL89qA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
-To:     Lei He <helei.sig11@bytedance.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Thu, 30 Jun 2022 19:14:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CE91261E;
+        Thu, 30 Jun 2022 16:13:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D4D20B82CBF;
+        Thu, 30 Jun 2022 23:13:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12682C34115;
+        Thu, 30 Jun 2022 23:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656630832;
+        bh=LcRXKeZ1Ow0hvntfZpb4qJkONjz8OExyuqW5J+4q7Kg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FoSvl9eDCCmacnmlLHiNo082z31H5MLSLoQ4Rdb92iRFEj7W4BoIru4nAE6JjuU8D
+         2+1dtFYxJfywoXYmRKF4HJItWscz/jzUIt8OhtKbXHVI+GTCx9Nsg5h9Wp1DG9GKQJ
+         nInVCBkU4Kly6kpTv1PN9Qa8P0783hHkdoQlt9aKVxEYmSSjU9SxTnel9MfSrSAkoQ
+         LFvw8oParpJnSER0mLFm+GbhzshGUOC9SNYDFAJauaElbH6cbqI44tGMN1qi/1+k45
+         y7tmy007zcRUtTtW0chZMyS100zB2ESC5s7Z0TzT+0FyZKpM4LM+Mi1pcveONf5foC
+         j67ADcgHIidkg==
+Date:   Fri, 1 Jul 2022 02:13:48 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, berrange@redhat.com,
-        pizhenwei@bytedance.com
-Content-Type: text/plain; charset="UTF-8"
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Eric Biggers <ebiggers@google.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] KEYS: asymmetric: enforce SM2 signature use pkey algo
+Message-ID: <Yr4uLEmN0Jeh3dGC@kernel.org>
+References: <20220628033720.43847-1-tianjia.zhang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220628033720.43847-1-tianjia.zhang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 4:37 PM Lei He <helei.sig11@bytedance.com> wrote:
+On Tue, Jun 28, 2022 at 11:37:20AM +0800, Tianjia Zhang wrote:
+> The signature verification of SM2 needs to add the Za value and
+> recalculate sig->digest, which requires the detection of the pkey_algo
+> in public_key_verify_signature(). As Eric Biggers said, the pkey_algo
+> field in sig is attacker-controlled and should be use pkey->pkey_algo
+> instead of sig->pkey_algo, and secondly, if sig->pkey_algo is NULL, it
+> will also cause signature verification failure.
+> 
+> The software_key_determine_akcipher() already forces the algorithms
+> are matched, so the SM3 algorithm is enforced in the SM2 signature,
+> although this has been checked, we still avoid using any algorithm
+> information in the signature as input.
+> 
+> Fixes: 215525639631 ("X.509: support OSCCA SM2-with-SM3 certificate verification")
+> Reported-by: Eric Biggers <ebiggers@google.com>
+> Cc: stable@vger.kernel.org # v5.10+
+> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> ---
+>  crypto/asymmetric_keys/public_key.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index 7c9e6be35c30..2f8352e88860 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -304,6 +304,10 @@ static int cert_sig_digest_update(const struct public_key_signature *sig,
+>  
+>  	BUG_ON(!sig->data);
+>  
+> +	/* SM2 signatures always use the SM3 hash algorithm */
+> +	if (!sig->hash_algo || strcmp(sig->hash_algo, "sm3") != 0)
+> +		return -EINVAL;
+> +
+>  	ret = sm2_compute_z_digest(tfm_pkey, SM2_DEFAULT_USERID,
+>  					SM2_DEFAULT_USERID_LEN, dgst);
+>  	if (ret)
+> @@ -414,8 +418,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+>  	if (ret)
+>  		goto error_free_key;
+>  
+> -	if (sig->pkey_algo && strcmp(sig->pkey_algo, "sm2") == 0 &&
+> -	    sig->data_size) {
+> +	if (strcmp(pkey->pkey_algo, "sm2") == 0 && sig->data_size) {
+>  		ret = cert_sig_digest_update(sig, tfm);
+>  		if (ret)
+>  			goto error_free_key;
+> -- 
+> 2.24.3 (Apple Git-128)
+> 
 
-> I have explained above why we need a driver that supports ECDSA, ...
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-I do not think we do. There are some security concerns.
-https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Security
+BR, Jarkko
