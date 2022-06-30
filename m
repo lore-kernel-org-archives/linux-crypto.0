@@ -2,58 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC69C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 09:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E2FC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 09:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231761AbiF3JH1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 05:07:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35436 "EHLO
+        id S234543AbiF3Jsi (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 05:48:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230331AbiF3JH1 (ORCPT
+        with ESMTP id S234548AbiF3Jsh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 05:07:27 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C76192A8;
-        Thu, 30 Jun 2022 02:07:25 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1o6q8u-00CzNX-TN; Thu, 30 Jun 2022 19:07:22 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Jun 2022 17:07:21 +0800
-Date:   Thu, 30 Jun 2022 17:07:21 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
+        Thu, 30 Jun 2022 05:48:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 680DF2528C
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 02:48:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656582515;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=81XeNR30/gt+PowfKeOGNijQshuWEzmNgPk0a20HvN0=;
+        b=inVPYd8TtTy2S2wIGf9welc8Yr5iR9rpJXDHBDXiIqxGlGNYNpQR3CVLftxVZzNM34aHuC
+        sTZXT1yE8gbxF702snOxcq1OmxGjaD7pxJB8dARTvr4Tzd35s36FV1VINELSXgmMI9zuIU
+        AzdypxxFvol34Fy4g/sv/SD5PfGxuBo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-323-isF8oHKAOWuBrh-V19C9Cw-1; Thu, 30 Jun 2022 05:48:32 -0400
+X-MC-Unique: isF8oHKAOWuBrh-V19C9Cw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C1E5E80029D;
+        Thu, 30 Jun 2022 09:48:31 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 732B7492C3B;
+        Thu, 30 Jun 2022 09:48:30 +0000 (UTC)
+Date:   Thu, 30 Jun 2022 10:48:27 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To:     Lei He <helei.sig11@bytedance.com>
-Cc:     davem@davemloft.net, dhowells@redhat.com,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        dhowells@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        berrange@redhat.com, pizhenwei@bytedance.com
-Subject: Re: [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
-Message-ID: <Yr1nybJ9eSNgU24i@gondor.apana.org.au>
+        pizhenwei@bytedance.com
+Subject: Re: [External] [PATCH v2 0/4] virtio-crypto: support ECDSA algorithm
+Message-ID: <Yr1xa4twKn3qFAt9@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20220623070550.82053-1-helei.sig11@bytedance.com>
  <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
  <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
- <Yr1TuPM8yvJUoV9r@gondor.apana.org.au>
- <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
+In-Reply-To: <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 04:30:39PM +0800, Lei He wrote:
->
-> I have explained above why we need a driver that supports ECDSA, and this patch
-> enables virtio-crypto to support ECDSA. I think this is a good time to support ECDSA
-> in the kernel crypto framework, and there will be more drivers supporting ECDSA in the 
-> future.
-> Looking forward to your opinion :-).
+On Thu, Jun 30, 2022 at 03:23:39PM +0800, Lei He wrote:
+> 
+> > On Jun 30, 2022, at 2:59 PM, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > 
+> > On Thu, Jun 23, 2022 at 03:05:46PM +0800, Lei He wrote:
+> >> From: lei he <helei.sig11@bytedance.com>
+> >> 
+> >> This patch supports the ECDSA algorithm for virtio-crypto.
+> > 
+> > Why is this necessary?
+> > 
+> 
+> The main purpose of this patch is to offload ECDSA computations to virtio-crypto dev.
+> We can modify the backend of virtio-crypto to allow hardware like Intel QAT cards to 
+> perform the actual calculations, and user-space applications such as HTTPS server 
+> can access those backend in a unified way(eg, keyctl_pk_xx syscall).
+> 
+> Related works are also described in following patch series:
+> https://lwn.net/ml/linux-crypto/20220525090118.43403-1-helei.sig11@bytedance.com/
 
-Until there are drivers in the kernel it's pointless to implement
-this.
+IIUC, this link refers to testing performance of the RSA impl of
+virtio-crypto with a vhost-user backend, leveraging an Intel QAT
+device on the host. What's the status of that depolyment setup ?
+Is code for it published anywhere, and does it have dependancy on
+any kernel patches that are not yet posted and/or merged ? Does it
+cover both ECDSA and RSA yet, or still only RSA ?
 
-Cheers,
+The QEMU backend part of the virtio-crypto support for ECDSA looks fine
+to merge, but obviously I'd like some positive sign that the kernel
+maintainers are willing to accept the guest driver side.
+
+With regards,
+Daniel
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
