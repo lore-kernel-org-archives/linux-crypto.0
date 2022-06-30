@@ -2,85 +2,77 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F143DC43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 13:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F12EAC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jun 2022 13:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233417AbiF3NGu (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 09:06:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
+        id S234994AbiF3N3q (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 09:29:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230305AbiF3NGt (ORCPT
+        with ESMTP id S234793AbiF3N3p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 09:06:49 -0400
+        Thu, 30 Jun 2022 09:29:45 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B307D2018A;
-        Thu, 30 Jun 2022 06:06:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AE9C340F0;
+        Thu, 30 Jun 2022 06:29:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5776DB82A7D;
-        Thu, 30 Jun 2022 13:06:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32766C34115;
-        Thu, 30 Jun 2022 13:06:36 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jndr58+J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1656594394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rGcLJq6zV9jR0Q8DNCiClMyvR+DmkE2AoEf5lAfLL3A=;
-        b=jndr58+JS68G0z6dMmPnbyvIl4nJYyZ0b0p4f1Tw1wziWSBSdIgZg+1jmK7kUgww4dPSBp
-        zyScPLddoQIWLYM5GAvnqlJpO39aeSxK0L/U/ppgXGc2paL6QWyuD+s+7ZBsiPmhCuczlG
-        yvpI9CQ1Sqdt/hs6w7EUPotVlyBY0zY=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2d9908bd (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Thu, 30 Jun 2022 13:06:34 +0000 (UTC)
-Date:   Thu, 30 Jun 2022 15:06:31 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     tglx@linutronix.de
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        stable@vger.kernel.org, ebiggers@kernel.org
-Subject: Re: [PATCH v4] timekeeping: contribute wall clock to rng on time
- change
-Message-ID: <Yr2f13QhFsyxdDS7@zx2c4.com>
-References: <CAHmME9qGQrgCEGgQpomq6W2EMUy_D5AxqgYHykmmgND+PPVjjw@mail.gmail.com>
- <20220623191249.1357363-1-Jason@zx2c4.com>
- <YrTAt2g4gg/2e+5L@sol.localdomain>
+        by ams.source.kernel.org (Postfix) with ESMTPS id B6637B82AC8;
+        Thu, 30 Jun 2022 13:29:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E820DC34115;
+        Thu, 30 Jun 2022 13:29:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656595781;
+        bh=KCrRHfeUIe7MZHkiyxpR0lqhs4cXEpAMVLMgYUHAIPw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=aq8HZROPgd+KjNLt+UwrqG3NATB9mfD3hiMxLEsOhjtXVvigeIHldTp8ABPOxSSTB
+         gYqYjxnfZaxgWLpjwvQJveEtiUSaU8hmei5hjLquladnpQ11liLgM7BtwRvoav2j0H
+         MAFa2FlNc7iBfFy35tqu2aHLrlf8j9b0hsOtx0Y4=
+Date:   Thu, 30 Jun 2022 15:29:26 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     stable@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Tony Lindgren <tony@atomide.com>,
+        Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Stefan Agner <stefan@agner.ch>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nicolas Pitre <nico@fluxnic.net>,
+        Andre Przywara <andre.przywara@arm.com>,
+        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jian Cai <caij2003@gmail.com>,
+        "moderated list:ARM PORT" <linux-arm-kernel@lists.infradead.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        "open list:OMAP2+ SUPPORT" <linux-omap@vger.kernel.org>,
+        "open list:CLANG/LLVM BUILD SUPPORT" 
+        <clang-built-linux@googlegroups.com>,
+        Sasha Levin <sashal@kernel.org>
+Subject: Re: [PATCH stable 5.4 00/11] ARM 32-bit build with Clang IAS
+Message-ID: <Yr2lNs0tnFyHmm9d@kroah.com>
+References: <20220629180227.3408104-1-f.fainelli@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YrTAt2g4gg/2e+5L@sol.localdomain>
+In-Reply-To: <20220629180227.3408104-1-f.fainelli@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas,
-
-On Thu, Jun 23, 2022 at 12:36:23PM -0700, Eric Biggers wrote:
-> On Thu, Jun 23, 2022 at 09:12:49PM +0200, Jason A. Donenfeld wrote:
-> > The rng's random_init() function contributes the real time to the rng at
-> > boot time, so that events can at least start in relation to something
-> > particular in the real world. But this clock might not yet be set that
-> > point in boot, so nothing is contributed. In addition, the relation
-> > between minor clock changes from, say, NTP, and the cycle counter is
-> > potentially useful entropic data.
-> > 
-> > This commit addresses this by mixing in a time stamp on calls to
-> > settimeofday and adjtimex. No entropy is credited in doing so, so it
-> > doesn't make initialization faster, but it is still useful input to
-> > have.
-> > 
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > ---
-> >  kernel/time/timekeeping.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
+On Wed, Jun 29, 2022 at 11:02:16AM -0700, Florian Fainelli wrote:
+> Hi,
 > 
-> Reviewed-by: Eric Biggers <ebiggers@google.com>
+> This patch series is a collection of clean cherry picks into the 5.4
+> kernel allowing us to use the Clang integrated assembler to build the
+> ARM 32-bit kernel.
+> 
+> This is useful in order to have proper build and runtime coverage of the
+> stable kernel(s).
 
-Thought I should bump this patch in case you missed it.
+Odd, but ok, if this helps you out.  Now queued up.
 
-Jason
+greg k-h
