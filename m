@@ -2,98 +2,89 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BB4C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Jul 2022 10:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24283C43334
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Jul 2022 11:46:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234820AbiGAKnF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Jul 2022 06:43:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
+        id S234939AbiGALqn (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 1 Jul 2022 07:46:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235453AbiGAKmq (ORCPT
+        with ESMTP id S232377AbiGALqm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Jul 2022 06:42:46 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F0147BD1B;
-        Fri,  1 Jul 2022 03:42:45 -0700 (PDT)
-Received: from zn.tnic (p200300ea970ff648329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:970f:f648:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 856321EC059D;
-        Fri,  1 Jul 2022 12:42:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1656672159;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=SWhCxOJUAdsvqOpxyv8QTMa/YznelRxtMa+3KCBAmCU=;
-        b=VfMj79baSekma4xFxVrkmV7L+rj6Z2maopnfrFmPEjLleGOALxaW+uTtB/VaB/rc6JrFGe
-        QSa+TzpouUp17YdzBr1v5gYQ4aUh8yCBG2g5HBWefZ4qFd+8Jf7s7Vy21LRImaayFJasOj
-        mDBhXy2Dcy9SCUdJdWZpwx/+FjBmdwc=
-Date:   Fri, 1 Jul 2022 12:42:35 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Ashish Kalra <Ashish.Kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, michael.roth@amd.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Message-ID: <Yr7Pm/E9WsAjirV0@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+        Fri, 1 Jul 2022 07:46:42 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B55583F11;
+        Fri,  1 Jul 2022 04:46:42 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 261Bi5Qw018815;
+        Fri, 1 Jul 2022 11:46:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type : subject :
+ from : in-reply-to : date : cc : message-id : references : to :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=GJ5SVeiURWClwUzMi7+kGbBC8gwCUvlJqL9o2GLxGEs=;
+ b=A4IB57ov8gfXbsWxDoUCsBUorY+Xi5buZZZRmaU/cULXgnA/fbgqbcFhVWkJI1qQdQi3
+ ysyIFPPBkskAyKeP7qrHB9xqGDleJFzf70mmvVVwWlPvR2Qb91V8QlWrOOQz2BfbBvpC
+ Pcl9Va6o81zNjvpY/0ShYqazr6MSqIx4Wti4d0iKtDV7k6wkTTVSQTEf6/Qhg9LuzjH2
+ p2hUxn1zyLOxjfg9Y273K3zlCahcrUjcadhsDHgAq6Mo9CEdOz4xsspqYYxbq2Hv9++3
+ pR+mENpQgh+MnWbent3OQPaWZMTOyzuk90vZNIcHTAozig5shSU1+mwNapEmVBMcSHRd rA== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h20a702cv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 11:46:36 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 261BLKjE007721;
+        Fri, 1 Jul 2022 11:46:34 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3gwt091mah-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 01 Jul 2022 11:46:34 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 261BkWDL13959470
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 1 Jul 2022 11:46:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19E985204F;
+        Fri,  1 Jul 2022 11:46:32 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.63.157])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0BEA15204E;
+        Fri,  1 Jul 2022 11:46:30 +0000 (GMT)
+Content-Type: text/plain;
+        charset=us-ascii
+Subject: Re: WARN at crypto/testmgr.c:5774 (next)
+From:   Sachin Sant <sachinp@linux.ibm.com>
+In-Reply-To: <CALrw=nF6EBFQCc8bn9A_Q0nz2O3TSJKsj=ErZUH37-EzLy-qmQ@mail.gmail.com>
+Date:   Fri, 1 Jul 2022 17:16:29 +0530
+Cc:     linux-crypto <linux-crypto@vger.kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-next@vger.kernel.org
+Message-Id: <383B6D2F-6F95-4A2D-9992-0A55AD058963@linux.ibm.com>
+References: <74179C93-0D19-4A8A-81EB-07BD836A3BD3@linux.ibm.com>
+ <CALrw=nF6EBFQCc8bn9A_Q0nz2O3TSJKsj=ErZUH37-EzLy-qmQ@mail.gmail.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+X-Mailer: Apple Mail (2.3696.100.31)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sGZl_CBlQOJ25NeTq6H_L84jGUqN0uxH
+X-Proofpoint-ORIG-GUID: sGZl_CBlQOJ25NeTq6H_L84jGUqN0uxH
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-01_06,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 impostorscore=0 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207010043
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 10:59:19PM +0000, Ashish Kalra wrote:
-> +bool iommu_sev_snp_supported(void)
-> +{
-> +	struct amd_iommu *iommu;
-> +
-> +	/*
-> +	 * The SEV-SNP support requires that IOMMU must be enabled, and is
-> +	 * not configured in the passthrough mode.
-> +	 */
-> +	if (no_iommu || iommu_default_passthrough()) {
-> +		pr_err("SEV-SNP: IOMMU is either disabled or configured in passthrough mode.\n");
-> +		return false;
-> +	}
-> +
-> +	/*
-> +	 * Iterate through all the IOMMUs and verify the SNPSup feature is
-> +	 * enabled.
-> +	 */
-> +	for_each_iommu(iommu) {
-> +		if (!iommu_feature(iommu, FEATURE_SNP)) {
-> +			pr_err("SNPSup is disabled (devid: %02x:%02x.%x)\n",
-> +			       PCI_BUS_NUM(iommu->devid), PCI_SLOT(iommu->devid),
-> +			       PCI_FUNC(iommu->devid));
-> +			return false;
-> +		}
-> +	}
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_sev_snp_supported);
 
-Why is this function exported?
+> Thanks for the report. I've already submitted a follow up patch:
+> https://patchwork.kernel.org/project/linux-crypto/patch/20220630140506.90=
+4-1-ignat@cloudflare.com/
 
--- 
-Regards/Gruss,
-    Boris.
+Thanks, the fix resolves the issue for me.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+- Sachin
+
