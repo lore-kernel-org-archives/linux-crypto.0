@@ -2,130 +2,95 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89059C43334
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Jul 2022 01:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7087AC43334
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Jul 2022 02:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232237AbiGAByx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jun 2022 21:54:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
+        id S233741AbiGACyI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 30 Jun 2022 22:54:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232223AbiGAByw (ORCPT
+        with ESMTP id S232594AbiGACyH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jun 2022 21:54:52 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC81252BA;
-        Thu, 30 Jun 2022 18:54:49 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4LYyrF3sS4z1L8X1;
-        Fri,  1 Jul 2022 09:52:29 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 1 Jul
- 2022 09:54:47 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-        <shaozhengchao@huawei.com>
-Subject: [PATCH v3] crypto: hisilicon - Kunpeng916 crypto driver don't sleep when in softirq
-Date:   Fri, 1 Jul 2022 09:59:54 +0800
-Message-ID: <20220701015954.387310-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 30 Jun 2022 22:54:07 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E2D5C941
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 19:54:06 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id m2so1108702plx.3
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jun 2022 19:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:to:cc:references
+         :from:in-reply-to:content-transfer-encoding;
+        bh=GLMQpIWkkm7sR/k0chK/u6zd+kQLtQ2ql+w+EaC3crs=;
+        b=sH6eE+4YBsMDGwzfKMUcw2sdWOGSUtfi3WgeLD8CINpM+QAZsZNKUpY7bnmzbphq9Z
+         0ob1HO5vlOPb+Kx0SqBHVIgK4Fr5kUtb3k71xI9TEG4o9Y7MCqceYbqlVh7FUcR5GB4f
+         T5PVrG6WkRD2VWDkqGQ3q7EscEBsfOTlwXhbMw3LjO78wwNiGwM8/y6mbLqAaJr7upvA
+         xvURof8t0I0WqYMCRTDfWpHB8gT6g3uWV+6XPanoIiQBynqhPMaL6/X2FrQMteh3YPeF
+         /rti1PdrKrTcUeQlAs40YDqGqZa6zeXjCjzv6DDMGuVf4xHI8tjtD3Mr+G8aWHEcjw1g
+         v3gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :to:cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=GLMQpIWkkm7sR/k0chK/u6zd+kQLtQ2ql+w+EaC3crs=;
+        b=L8wfJnz4J+v6sxqxf6vF2eCuyG1G+2Of0zBXBDumHjWY99GigICJVd1s/dXMXi024J
+         VUhbD6fBfxP5WP5uKu5kz3vtoS2bv+7pGZBZfRYjWaaesESMvXsI7jMuF7oBVy8+H0AC
+         3o/KN+YtKx2ah9A0HqqUWnq+Bch81Pxy6KZ4EuX6BkcV5U/nqsU81KzY6kwKijrazepD
+         KMjOeo7uJYyug+OIzMngoGCeGV+G6hBTJoY9aKbOUkehIlw/1gk3s/JDL8+m9oluZvxN
+         wpXn1n8Lh6Bx8MTXtw3GFKxrxmS/dAlmJgX0ycZycFDmXF6nL3JJTLbLZ1U9JadAU9Y/
+         W9gQ==
+X-Gm-Message-State: AJIora9D6WLTdlWNHnMuZkBUQ1ZM3AkFDaCx1lVT6FT0FuGFPTdpVxa2
+        wA+oZyH5QxtKbh3DzC5MvnFHBA==
+X-Google-Smtp-Source: AGRyM1s0OUFNbQK6YNX9w9TiO9NMraFJYAXIzZhtQSsThAo3DWvP+Jq5H/L6ob17WI93c0LpUwbkcw==
+X-Received: by 2002:a17:902:d2d0:b0:16b:b955:9b46 with SMTP id n16-20020a170902d2d000b0016bb9559b46mr2902952plc.125.1656644046400;
+        Thu, 30 Jun 2022 19:54:06 -0700 (PDT)
+Received: from [10.4.63.220] ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id i4-20020a17090332c400b0016a214e4afasm14317749plr.125.2022.06.30.19.54.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jun 2022 19:54:05 -0700 (PDT)
+Message-ID: <347d724a-c411-229f-7b13-a0cde1b2f518@bytedance.com>
+Date:   Fri, 1 Jul 2022 10:54:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0
+Subject: Re: [External] Re: [PATCH v2 0/4] virtio-crypto: support ECDSA
+ algorithm
+To:     Sandy Harris <sandyinchina@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Howells <dhowells@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, berrange@redhat.com,
+        pizhenwei@bytedance.com
+References: <20220623070550.82053-1-helei.sig11@bytedance.com>
+ <Yr1JvG1aJUp4I/fP@gondor.apana.org.au>
+ <C7191BC8-5BE0-47CB-A302-735BBD1CBED0@bytedance.com>
+ <Yr1TuPM8yvJUoV9r@gondor.apana.org.au>
+ <CC761178-556D-44F6-9479-5151C69476C8@bytedance.com>
+ <CACXcFmmxDVBrnp3_0UzN+VbAjDaUSNtoUBz5fM1Y4u5yqL89qA@mail.gmail.com>
+From:   Lei He <helei.sig11@bytedance.com>
+In-Reply-To: <CACXcFmmxDVBrnp3_0UzN+VbAjDaUSNtoUBz5fM1Y4u5yqL89qA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When kunpeng916 encryption driver is used to deencrypt and decrypt
-packets during the softirq, it is not allowed to use mutex lock.
+On 7/1/2022 7:12 AM, Sandy Harris wrote:
+> On Thu, Jun 30, 2022 at 4:37 PM Lei He <helei.sig11@bytedance.com> wrote:
+> 
+>> I have explained above why we need a driver that supports ECDSA, ...
+> 
+> I do not think we do. There are some security concerns.
+> https://en.wikipedia.org/wiki/Elliptic_Curve_Digital_Signature_Algorithm#Security
 
-Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
-v2: add fixes info
-v1: use spin_lock will cause soft lockup
+But since tls1.0, the ECDSA algorithm has been retained to the current 
+1.3 version.
+https://en.wikipedia.org/wiki/Transport_Layer_Security#Algorithms
 
- drivers/crypto/hisilicon/sec/sec_algs.c | 14 +++++++-------
- drivers/crypto/hisilicon/sec/sec_drv.h  |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
-index 0a3c8f019b02..490e1542305e 100644
---- a/drivers/crypto/hisilicon/sec/sec_algs.c
-+++ b/drivers/crypto/hisilicon/sec/sec_algs.c
-@@ -449,7 +449,7 @@ static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
- 		 */
- 	}
- 
--	mutex_lock(&ctx->queue->queuelock);
-+	spin_lock_bh(&ctx->queue->queuelock);
- 	/* Put the IV in place for chained cases */
- 	switch (ctx->cipher_alg) {
- 	case SEC_C_AES_CBC_128:
-@@ -509,7 +509,7 @@ static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
- 			list_del(&backlog_req->backlog_head);
- 		}
- 	}
--	mutex_unlock(&ctx->queue->queuelock);
-+	spin_unlock_bh(&ctx->queue->queuelock);
- 
- 	mutex_lock(&sec_req->lock);
- 	list_del(&sec_req_el->head);
-@@ -798,7 +798,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 	 */
- 
- 	/* Grab a big lock for a long time to avoid concurrency issues */
--	mutex_lock(&queue->queuelock);
-+	spin_lock_bh(&queue->queuelock);
- 
- 	/*
- 	 * Can go on to queue if we have space in either:
-@@ -814,15 +814,15 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
- 		ret = -EBUSY;
- 		if ((skreq->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
- 			list_add_tail(&sec_req->backlog_head, &ctx->backlog);
--			mutex_unlock(&queue->queuelock);
-+			spin_unlock_bh(&queue->queuelock);
- 			goto out;
- 		}
- 
--		mutex_unlock(&queue->queuelock);
-+		spin_unlock_bh(&queue->queuelock);
- 		goto err_free_elements;
- 	}
- 	ret = sec_send_request(sec_req, queue);
--	mutex_unlock(&queue->queuelock);
-+	spin_unlock_bh(&queue->queuelock);
- 	if (ret)
- 		goto err_free_elements;
- 
-@@ -881,7 +881,7 @@ static int sec_alg_skcipher_init(struct crypto_skcipher *tfm)
- 	if (IS_ERR(ctx->queue))
- 		return PTR_ERR(ctx->queue);
- 
--	mutex_init(&ctx->queue->queuelock);
-+	spin_lock_init(&ctx->queue->queuelock);
- 	ctx->queue->havesoftqueue = false;
- 
- 	return 0;
-diff --git a/drivers/crypto/hisilicon/sec/sec_drv.h b/drivers/crypto/hisilicon/sec/sec_drv.h
-index 179a8250d691..e2a50bf2234b 100644
---- a/drivers/crypto/hisilicon/sec/sec_drv.h
-+++ b/drivers/crypto/hisilicon/sec/sec_drv.h
-@@ -347,7 +347,7 @@ struct sec_queue {
- 	DECLARE_BITMAP(unprocessed, SEC_QUEUE_LEN);
- 	DECLARE_KFIFO_PTR(softqueue, typeof(struct sec_request_el *));
- 	bool havesoftqueue;
--	struct mutex queuelock;
-+	spinlock_t queuelock;
- 	void *shadow[SEC_QUEUE_LEN];
- };
- 
--- 
-2.17.1
+Best regards,
+Lei He
+--
+helei.sig11@bytedance.com
 
