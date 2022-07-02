@@ -2,106 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F13C433EF
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 Jul 2022 07:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB903C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 Jul 2022 08:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231350AbiGBHOp (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 Jul 2022 03:14:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60284 "EHLO
+        id S230361AbiGBIhx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 2 Jul 2022 04:37:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231393AbiGBHOo (ORCPT
+        with ESMTP id S229446AbiGBIhw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 Jul 2022 03:14:44 -0400
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948BA19017
-        for <linux-crypto@vger.kernel.org>; Sat,  2 Jul 2022 00:14:43 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2626lSts001704;
-        Sat, 2 Jul 2022 00:14:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : subject
- : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=V6Z/MZ447naQiEttg1Nfx03E8o9HlePZIKzInzO1To8=;
- b=e9CDMdKB7EJnW0tFASRvc9obe9RYFWzFJf1ZKO9lxs6bPN431SBEEW8K1RMtnXtln1wJ
- WFauK0iPCwB1+3SarQWMj382r4kp1T1KCR0pic3yQRXkCbLu/a4+XQgmdTR5Q2sugPb1
- Mmf+XMiDNSqhkzmdhfQam9akLDQlXKdCe3Q+dpneZweMiys+pnxTCmUuYNh6xrFBx07Q
- PlNUzKKBJWbqLZk4tvfrWBJ/+gusBcK+QNBVJlfzn+JRD+f7C7Hoh90R+7Nc+BmbY6sY
- wEAbTyP4DAn7GKsasSHhfLmZc2TvQT5baLELqznk7pdUsrJJYCM1U2m/IQ12PBz8BLxl 3Q== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-        by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3h17nq8gqy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Sat, 02 Jul 2022 00:14:30 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 2 Jul
- 2022 00:14:28 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Sat, 2 Jul 2022 00:14:28 -0700
-Received: from pingu.marvell.com (unknown [10.5.24.1])
-        by maili.marvell.com (Postfix) with ESMTP id B13D23F7084;
-        Sat,  2 Jul 2022 00:14:27 -0700 (PDT)
-From:   <oferh@marvell.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <atenart@kernel.org>
-Subject: [PATCH] crypto: inside-secure: fix packed bit-field result descriptor
-Date:   Sat, 2 Jul 2022 10:14:26 +0300
-Message-ID: <20220702071426.1915429-1-oferh@marvell.com>
-X-Mailer: git-send-email 2.25.1
+        Sat, 2 Jul 2022 04:37:52 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D088C15A35;
+        Sat,  2 Jul 2022 01:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656751071; x=1688287071;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DH4Bi4qdHliCN1t/CXq1vLQ2vdTfAQLLxpxzajn4oq0=;
+  b=O5n9jNGuWQE7CU/V6vhWDmKgHNtAB9LtAeZRnc8TN5osHl5iRP8enMus
+   hHA7fUn6eHVYbcbYazY5G6dGao+Zg7x3MylBSWke2lf28fQ2MVB9STMrc
+   dqSqMYAhbtYnZ/xU2X64yJNQIvLtusBUelWHr6xIfXjl1faXkjplrTpB+
+   NEcMHyEtzzJvBXpTT7w6kOvyBiszFHxjV+2DzfQQkMZhtjfw/0nliMl0x
+   RYzoC1c189S3TdABsj0YTzNNZxvoLn5+6b5TvsxHX86q9QYWSnE6Aox/D
+   3nXuJTOd5s0l0cpBvDtiDZ5fS8L9H24PAkLxGOQs3oK1tUGYCySpe9uot
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10395"; a="263206932"
+X-IronPort-AV: E=Sophos;i="5.92,239,1650956400"; 
+   d="scan'208";a="263206932"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2022 01:37:51 -0700
+X-IronPort-AV: E=Sophos;i="5.92,239,1650956400"; 
+   d="scan'208";a="659657132"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2022 01:37:49 -0700
+Date:   Sat, 2 Jul 2022 09:37:42 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@cloudflare.com, Eric Biggers <ebiggers@kernel.org>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Subject: Re: [PATCH] crypto: testmgr - populate RSA CRT parameters in RSA
+ test vectors
+Message-ID: <YsAD1rHPsG8OG36x@silpixa00400314>
+References: <20220630140506.904-1-ignat@cloudflare.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: CTyBl0kVQGj1tM0zXcKDzUJwRRTnQ__2
-X-Proofpoint-ORIG-GUID: CTyBl0kVQGj1tM0zXcKDzUJwRRTnQ__2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-02_05,2022-06-28_01,2022-06-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630140506.904-1-ignat@cloudflare.com>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ofer Heifetz <oferh@marvell.com>
+On Thu, Jun 30, 2022 at 03:05:06PM +0100, Ignat Korchagin wrote:
+> In f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster
+> private key operations") we have started to use the additional primes and
+> coefficients for RSA private key operations. However, these additional
+> parameters are not present (defined as 0 integers) in the RSA test vectors.
+> 
+> Some parameters were borrowed from OpenSSL, so I was able to find the source.
+> I could not find the public source for 1 vector though, so had to recover the
+> parameters by implementing Appendix C from [1].
+> 
+> [1]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br1.pdf
+> 
+> Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operations")
+> Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> ---
+>  crypto/testmgr.h | 121 +++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 100 insertions(+), 21 deletions(-)
+> 
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index 8e2dce86dd48..7d503b4e1e41 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -185,7 +185,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
+>  	{
+>  #ifndef CONFIG_CRYPTO_FIPS
+>  	.key =
+> -	"\x30\x81\x9A" /* sequence of 154 bytes */
+> +	"\x30\x82\x01\x38" /* sequence of 312 bytes */
+>  	"\x02\x01\x00" /* version - integer of 1 byte */
+>  	"\x02\x41" /* modulus - integer of 65 bytes */
+>  	"\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
+> @@ -199,23 +199,36 @@ static const struct akcipher_testvec rsa_tv_template[] = {
+>  	"\xC2\xCD\x2D\xFF\x43\x40\x98\xCD\x20\xD8\xA1\x38\xD0\x90\xBF\x64"
+>  	"\x79\x7C\x3F\xA7\xA2\xCD\xCB\x3C\xD1\xE0\xBD\xBA\x26\x54\xB4\xF9"
+>  	"\xDF\x8E\x8A\xE5\x9D\x73\x3D\x9F\x33\xB3\x01\x62\x4A\xFD\x1D\x51"
+> -	"\x02\x01\x00" /* prime1 - integer of 1 byte */
+> -	"\x02\x01\x00" /* prime2 - integer of 1 byte */
+> -	"\x02\x01\x00" /* exponent1 - integer of 1 byte */
+> -	"\x02\x01\x00" /* exponent2 - integer of 1 byte */
+> -	"\x02\x01\x00", /* coefficient - integer of 1 byte */
+> +	"\x02\x21" /* prime1 - integer of 33 bytes */
+> +	"\x00\xD8\x40\xB4\x16\x66\xB4\x2E\x92\xEA\x0D\xA3\xB4\x32\x04\xB5"
+> +    "\xCF\xCE\x33\x52\x52\x4D\x04\x16\xA5\xA4\x41\xE7\x00\xAF\x46\x12"
+> +    "\x0D"
+Spaces should be replaced with tabs.
+Checkpatch reports 1 error and 27 warnings.
 
-When mixing bit-field and none bit-filed in packed struct the
-none bit-field starts at a distinct memory location, thus adding
-an additional byte to the overall structure which is used in
-memory zero-ing and other configuration calculations.
+Regards,
 
-Fix this by removing the none bit-field that has a following
-bit-field.
-
-Signed-off-by: Ofer Heifetz <oferh@marvell.com>
----
- drivers/crypto/inside-secure/safexcel.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index ce1e611a163e..797ff91512e0 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -497,15 +497,15 @@ struct result_data_desc {
- 	u32 packet_length:17;
- 	u32 error_code:15;
- 
--	u8 bypass_length:4;
--	u8 e15:1;
--	u16 rsvd0;
--	u8 hash_bytes:1;
--	u8 hash_length:6;
--	u8 generic_bytes:1;
--	u8 checksum:1;
--	u8 next_header:1;
--	u8 length:1;
-+	u32 bypass_length:4;
-+	u32 e15:1;
-+	u32 rsvd0:16;
-+	u32 hash_bytes:1;
-+	u32 hash_length:6;
-+	u32 generic_bytes:1;
-+	u32 checksum:1;
-+	u32 next_header:1;
-+	u32 length:1;
- 
- 	u16 application_id;
- 	u16 rsvd1;
 -- 
-2.25.1
-
+Giovanni
