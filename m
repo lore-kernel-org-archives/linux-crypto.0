@@ -2,120 +2,81 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7141C43334
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jul 2022 10:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0834CCA479
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 Jul 2022 11:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbiGDKkW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Jul 2022 06:40:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36120 "EHLO
+        id S231786AbiGDLW1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 4 Jul 2022 07:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233527AbiGDKkV (ORCPT
+        with ESMTP id S232842AbiGDLW0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Jul 2022 06:40:21 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0E16EE2A
-        for <linux-crypto@vger.kernel.org>; Mon,  4 Jul 2022 03:40:20 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id h85so8281259iof.4
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Jul 2022 03:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=v1JWAJTEOjSekzmejCmdpgbqSNq9je/ySUKRvPMIxAQ=;
-        b=LMlfsPdOfVITI4dl8E7OU7YYCW19dQbPx9y/Va3qy7kHc65T/d2j/vnoOXY/4y1OQZ
-         LnOpiZ7sCPEnHkyURyQufvEITNGFP0XG3lG6Suks2aZJidCBmKITmMZqQaFvXDbnbX6l
-         1cdioinBWUZc7Cuv8nTz9BEBmIEa2wc1dxTfg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=v1JWAJTEOjSekzmejCmdpgbqSNq9je/ySUKRvPMIxAQ=;
-        b=j1zPdaHKoZDH/5+PwjpIoYjXX5+PR52m7RH4dlth4au4/u6s4fokO+uy2BgKKhcUyO
-         fjDbOx3T24LzzGnYY56sc8qvfR5/ZCt9m/JXBLTXTIQZ/cRyBZkD0EwIXuKgU4xAZ9jE
-         BNmQhqxl3dt4rBBc5z5K0ofryeyxqlXd3IRFLxTpyJq5dsihQOCy3dPXNfsZOJOlXygc
-         9ZMaMoKCRp0/heGkgfacW0TnUvNKFcvZoRDxvTK507XQGhar3Xi8eG1tg8NcyYY3CvKf
-         RpIJQjAl9/JOF4B55Qoz+Tu4C5PmGp/+lLEBwYhg1yY0B8ajb813su5lHphVy8D3KKB4
-         tiCA==
-X-Gm-Message-State: AJIora9fjgLcRehdwAC0jcD/mAJ761I/Qavsq//in1OZNvfwLMAZ5V5c
-        +sCngcVUkC7cBmR3zFgQKnjW+UB+Hy1mHRD857fvHw==
-X-Google-Smtp-Source: AGRyM1sDeureVe8Mc5RO8bhBUxXsxSCnlsxHlB6RyuJ3f0pg+lsAI3hjwsKpEwoYpN4btKBhazYU23QFndpIEdv/DLw=
-X-Received: by 2002:a05:6638:154:b0:339:e14c:867e with SMTP id
- y20-20020a056638015400b00339e14c867emr17534600jao.190.1656931219880; Mon, 04
- Jul 2022 03:40:19 -0700 (PDT)
+        Mon, 4 Jul 2022 07:22:26 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5865ABF6C;
+        Mon,  4 Jul 2022 04:22:22 -0700 (PDT)
+Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Lc3J424hfzkWjX;
+        Mon,  4 Jul 2022 19:20:20 +0800 (CST)
+Received: from dggpeml500008.china.huawei.com (7.185.36.147) by
+ dggpeml500024.china.huawei.com (7.185.36.10) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 4 Jul 2022 19:22:19 +0800
+Received: from huawei.com (10.67.175.34) by dggpeml500008.china.huawei.com
+ (7.185.36.147) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 4 Jul
+ 2022 19:22:18 +0800
+From:   Ren Zhijie <renzhijie2@huawei.com>
+To:     <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <simo@redhat.com>
+CC:     <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Ren Zhijie <renzhijie2@huawei.com>
+Subject: [PATCH -next] certs: Fix Kconfig dependency
+Date:   Mon, 4 Jul 2022 19:20:28 +0800
+Message-ID: <20220704112028.183193-1-renzhijie2@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20220630140506.904-1-ignat@cloudflare.com> <YsAD1rHPsG8OG36x@silpixa00400314>
-In-Reply-To: <YsAD1rHPsG8OG36x@silpixa00400314>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Mon, 4 Jul 2022 11:40:09 +0100
-Message-ID: <CALrw=nEBAARO5bxyqqzzpSTwYSukC9MdXugqgFC0sFmQ84Yp4A@mail.gmail.com>
-Subject: Re: [PATCH] crypto: testmgr - populate RSA CRT parameters in RSA test vectors
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        kernel-team <kernel-team@cloudflare.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.175.34]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500008.china.huawei.com (7.185.36.147)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 2, 2022 at 9:38 AM Giovanni Cabiddu
-<giovanni.cabiddu@intel.com> wrote:
->
-> On Thu, Jun 30, 2022 at 03:05:06PM +0100, Ignat Korchagin wrote:
-> > In f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster
-> > private key operations") we have started to use the additional primes and
-> > coefficients for RSA private key operations. However, these additional
-> > parameters are not present (defined as 0 integers) in the RSA test vectors.
-> >
-> > Some parameters were borrowed from OpenSSL, so I was able to find the source.
-> > I could not find the public source for 1 vector though, so had to recover the
-> > parameters by implementing Appendix C from [1].
-> >
-> > [1]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br1.pdf
-> >
-> > Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operations")
-> > Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-> > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-> > ---
-> >  crypto/testmgr.h | 121 +++++++++++++++++++++++++++++++++++++++--------
-> >  1 file changed, 100 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> > index 8e2dce86dd48..7d503b4e1e41 100644
-> > --- a/crypto/testmgr.h
-> > +++ b/crypto/testmgr.h
-> > @@ -185,7 +185,7 @@ static const struct akcipher_testvec rsa_tv_template[] = {
-> >       {
-> >  #ifndef CONFIG_CRYPTO_FIPS
-> >       .key =
-> > -     "\x30\x81\x9A" /* sequence of 154 bytes */
-> > +     "\x30\x82\x01\x38" /* sequence of 312 bytes */
-> >       "\x02\x01\x00" /* version - integer of 1 byte */
-> >       "\x02\x41" /* modulus - integer of 65 bytes */
-> >       "\x00\xAA\x36\xAB\xCE\x88\xAC\xFD\xFF\x55\x52\x3C\x7F\xC4\x52\x3F"
-> > @@ -199,23 +199,36 @@ static const struct akcipher_testvec rsa_tv_template[] = {
-> >       "\xC2\xCD\x2D\xFF\x43\x40\x98\xCD\x20\xD8\xA1\x38\xD0\x90\xBF\x64"
-> >       "\x79\x7C\x3F\xA7\xA2\xCD\xCB\x3C\xD1\xE0\xBD\xBA\x26\x54\xB4\xF9"
-> >       "\xDF\x8E\x8A\xE5\x9D\x73\x3D\x9F\x33\xB3\x01\x62\x4A\xFD\x1D\x51"
-> > -     "\x02\x01\x00" /* prime1 - integer of 1 byte */
-> > -     "\x02\x01\x00" /* prime2 - integer of 1 byte */
-> > -     "\x02\x01\x00" /* exponent1 - integer of 1 byte */
-> > -     "\x02\x01\x00" /* exponent2 - integer of 1 byte */
-> > -     "\x02\x01\x00", /* coefficient - integer of 1 byte */
-> > +     "\x02\x21" /* prime1 - integer of 33 bytes */
-> > +     "\x00\xD8\x40\xB4\x16\x66\xB4\x2E\x92\xEA\x0D\xA3\xB4\x32\x04\xB5"
-> > +    "\xCF\xCE\x33\x52\x52\x4D\x04\x16\xA5\xA4\x41\xE7\x00\xAF\x46\x12"
-> > +    "\x0D"
-> Spaces should be replaced with tabs.
-> Checkpatch reports 1 error and 27 warnings.
-Indeed! Not sure how they got there. Sent a v2.
+If CONFIG_PKCS7_MESSAGE_PARSER=m and CONFIG_FIPS_SIGNATURE_SELFTEST=y,
+make ARCH=x86_64 CROSS_COMPILE=x86_64-linux-gnu-, will be failed, like this:
 
-Ignat
-> Regards,
->
-> --
-> Giovanni
+crypto/asymmetric_keys/selftest.o: In function `fips_signature_selftest':
+selftest.c:(.init.text+0xc3): undefined reference to `pkcs7_parse_message'
+selftest.c:(.init.text+0x101): undefined reference to `pkcs7_supply_detached_data'
+selftest.c:(.init.text+0x112): undefined reference to `pkcs7_verify'
+selftest.c:(.init.text+0x13f): undefined reference to `pkcs7_validate_trust'
+selftest.c:(.init.text+0x169): undefined reference to `pkcs7_free_message'
+make: *** [vmlinux] Error 1
+
+To fix this error, add depends on PKCS7_MESSAGE_PARSER=y to FIPS_SIGNATURE_SELFTEST
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 3cde3174eb91 ("certs: Add FIPS selftests")
+Signed-off-by: Ren Zhijie <renzhijie2@huawei.com>
+---
+ crypto/asymmetric_keys/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 3df3fe4ed95f..fe007db96c69 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -83,6 +83,6 @@ config FIPS_SIGNATURE_SELFTEST
+ 	  for FIPS.
+ 	depends on KEYS
+ 	depends on ASYMMETRIC_KEY_TYPE
+-	depends on PKCS7_MESSAGE_PARSER
++	depends on PKCS7_MESSAGE_PARSER=y
+ 
+ endif # ASYMMETRIC_KEY_TYPE
+-- 
+2.17.1
+
