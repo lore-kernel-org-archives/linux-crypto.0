@@ -2,317 +2,143 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89DA0C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 17:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D73C43334
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 17:47:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230058AbiGER2R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jul 2022 13:28:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49220 "EHLO
+        id S232869AbiGERrs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Jul 2022 13:47:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232949AbiGER1y (ORCPT
+        with ESMTP id S231867AbiGERrr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jul 2022 13:27:54 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CF320BCC
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Jul 2022 10:27:50 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id c137so9234463qkg.5
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Jul 2022 10:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version;
-        bh=VggLGykjJBGEkdAn/EbmWYesPUYJaU25kPRisPPLHD0=;
-        b=KLr1aGrMNrD6jfoEFvXZZrDTjBbaK0/0DZVZblqByUMttCu54LhLLbdrSr6j0mpita
-         +hUAuoC4iafwyHaoAS71aRZfAiNinFoaevhmeA9rK6vd0e8MeYrAPZ7SV0sVCP5XVeMe
-         ABTG/GRvQ2CNEQEJIhY/FJwJ6ARCaHGOUqPvM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version;
-        bh=VggLGykjJBGEkdAn/EbmWYesPUYJaU25kPRisPPLHD0=;
-        b=gyEFn6ROdGLOcK+k8TWQK9ZQM0J4tLHvher0L+OfAT4e4XcSJFmKNhhQhvYqL3GziU
-         aTBiVCVpZqlBGVyg7CnURTwmEcpM9foKwWxCW3Gft5hA0Kj+//AVarzMc/qaIg00iyXm
-         TIT/NJIdWAq7GCp8oFEXn0/6ydTAWlqGthYxds0+wkik9sww41B4ApuWdc+zngenY7Q2
-         zOdm8BJ8nHxOIrt1v2sRsoUC8WJ+7iEPnJPHZ5UweYI90TKXfdkoV9xNtSG/Nxaax/WM
-         so1XDptM45hcEtgwaqe9GaiQU4Kyzswgt3WZamoX2FQX0nI6aBnNY3W4m0mz0g+74qg6
-         /oYw==
-X-Gm-Message-State: AJIora+fEHl1T26L+UQ2wf+4WF1FCt98F+ndnh+vKjgXoTmXbjhQ9kQT
-        nTEJgjr1gYd7Et6jBtTvBlN67Q==
-X-Google-Smtp-Source: AGRyM1tICpJBWTpJluwVWgvr/SiLOtLEOfN8aYULIVJ2nAnAkDYsCqqAiCqdyZRxsnO8pWoWjjJEXw==
-X-Received: by 2002:a05:620a:c1b:b0:6af:1f8c:d73d with SMTP id l27-20020a05620a0c1b00b006af1f8cd73dmr24124048qki.536.1657042069366;
-        Tue, 05 Jul 2022 10:27:49 -0700 (PDT)
-Received: from ubuntu-22.localdomain ([192.19.222.250])
-        by smtp.gmail.com with ESMTPSA id d8-20020ac85ac8000000b00304e70585f9sm24439851qtd.72.2022.07.05.10.27.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jul 2022 10:27:48 -0700 (PDT)
-From:   William Zhang <william.zhang@broadcom.com>
-To:     Linux ARM List <linux-arm-kernel@lists.infradead.org>
-Cc:     joel.peshkin@broadcom.com, kursad.oney@broadcom.com,
-        f.fainelli@gmail.com, anand.gore@broadcom.com,
-        Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>,
-        philippe.reynes@softathome.com, dan.beygelman@broadcom.com,
-        William Zhang <william.zhang@broadcom.com>,
-        Al Cooper <alcooperx@gmail.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Cai Huoqing <cai.huoqing@linux.dev>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Eugen Hristev <eugen.hristev@microchip.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jan Dabros <jsd@semihalf.com>,
-        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-        Jie Deng <jie.deng@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
-        Rob Herring <robh@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Sam Protsenko <semen.protsenko@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Sven Peter <sven@svenpeter.dev>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        Vinod Koul <vkoul@kernel.org>, Wolfram Sang <wsa@kernel.org>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org
-Subject: [PATCH 5/9] arm: bcmbca: Replace ARCH_BCM_63XX with ARCH_BCMBCA
-Date:   Tue,  5 Jul 2022 10:26:09 -0700
-Message-Id: <20220705172613.21152-6-william.zhang@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220705172613.21152-1-william.zhang@broadcom.com>
-References: <20220705172613.21152-1-william.zhang@broadcom.com>
+        Tue, 5 Jul 2022 13:47:47 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818D91DA60;
+        Tue,  5 Jul 2022 10:47:46 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 265GoWNe027944;
+        Tue, 5 Jul 2022 17:47:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xP6EvhJHSIVlx0Vjph8NPwyfuRz1b1SjJhWMAVht9Es=;
+ b=KwKWNCZ4cSdVr1JWZHlmauZDPLcvrBv5R5vShYoaBoQkwpE7rO+t3DHZ4Cw6Cmzb/SJT
+ 1zBhUwShOvTekmv5jVd64Y2AdRf3DDiC80tg2xRb5l6+vohN7cFWd4VuKauS8gqDoE71
+ JUKcfZlj/i1bB6Bgvy39pYFIPdE+Jnr4jDFhZJeuLrfAtvFG6chjtwOEJKrTkDN4E6PU
+ GrIsfMqOqSUf47a+Bo+MXiV5BwCJs07hnX4AHAcdXCu/pB0f9i5EB6f5qluvFSONnOQ5
+ MaxNYBI6w9pgVa34fjXfA+UHMX4t5NQHWC4C/BdOvrlRxAMzpeyJee9oQBRiZH89YnJG qA== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4s61sdwd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 17:47:45 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 265HZYEl008267;
+        Tue, 5 Jul 2022 17:47:43 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3h2dn8vb2f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 17:47:43 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 265Hleh710813896
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Jul 2022 17:47:40 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 00D9042042;
+        Tue,  5 Jul 2022 17:47:40 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F4914203F;
+        Tue,  5 Jul 2022 17:47:39 +0000 (GMT)
+Received: from [9.171.76.195] (unknown [9.171.76.195])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Jul 2022 17:47:39 +0000 (GMT)
+Message-ID: <30e681b2-a411-cdb1-4b46-243db25abeef@linux.ibm.com>
+Date:   Tue, 5 Jul 2022 19:47:37 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000f17ab205e3122bdb"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1 1/1] s390/arch_random: Buffer true random data
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Harald Freudenberger <freude@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Juergen Christ <jchrist@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20220705112712.4433-1-dengler@linux.ibm.com>
+ <20220705112712.4433-2-dengler@linux.ibm.com> <YsQ6OOrOWPhdynoM@zx2c4.com>
+ <9a0561c0-68f7-b630-4440-3ca32bf28dc2@linux.ibm.com>
+ <YsRUowTs9n98p9EL@zx2c4.com>
+ <aafbb400-d0cb-99de-8b10-3c39c7b9bae5@linux.ibm.com>
+ <YsRoXObdpCNbtpHS@zx2c4.com>
+From:   Holger Dengler <dengler@linux.ibm.com>
+In-Reply-To: <YsRoXObdpCNbtpHS@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: h8mwWmFMrB7huOB_h80MG51nvJxj6ORP
+X-Proofpoint-ORIG-GUID: h8mwWmFMrB7huOB_h80MG51nvJxj6ORP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-05_14,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 mlxscore=0 phishscore=0 suspectscore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=971 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207050076
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---000000000000f17ab205e3122bdb
-Content-Transfer-Encoding: 8bit
+Hi Jason,
 
-Update ARCH_BCM_63XX in all sources to use ARCHB_BCMBCA instead.
+On 05/07/2022 18:35, Jason A. Donenfeld wrote:
+> Hi Holger,
+> 
+> On Tue, Jul 05, 2022 at 06:27:59PM +0200, Holger Dengler wrote:
+>> I saw a few calls in interrupt context during my tracing, but I didn't
+>> look to see which ones they were. Let me figure that out in the next
+>> few days and provide more information on that.
+> 
+> One thing to keep in mind is that it's used at boot time, when
+> technically IRQs are turned off, so it appears like interrupt context
+> depending on which way you squint. But boot time obviously isn't a
+> problem. So be sure that's not the usage you're seeing.
 
-Signed-off-by: William Zhang <william.zhang@broadcom.com>
----
+Ok, let me check this. I will also think about the tree-wide cleanup you mentioned in an earlier mail. It looks, that s390 could fill the block.rdseed with a single call.
 
- arch/arm/Kconfig.debug         | 2 +-
- drivers/ata/Kconfig            | 2 +-
- drivers/char/hw_random/Kconfig | 2 +-
- drivers/clk/bcm/Kconfig        | 4 ++--
- drivers/i2c/busses/Kconfig     | 2 +-
- drivers/phy/broadcom/Kconfig   | 2 +-
- drivers/spi/Kconfig            | 2 +-
- drivers/tty/serial/Kconfig     | 4 ++--
- 8 files changed, 10 insertions(+), 10 deletions(-)
+>> For the moment, I would propose to drop the buffering but also return
+>> false, if arch_random_get_seed_long() is called in interrupt context.
+> 
+> As a last ditch, maybe that's best. Maybe... Do you know off hand how
+> many cycles each call takes?
 
-diff --git a/arch/arm/Kconfig.debug b/arch/arm/Kconfig.debug
-index 9b0aa4822d69..792796a348c3 100644
---- a/arch/arm/Kconfig.debug
-+++ b/arch/arm/Kconfig.debug
-@@ -271,7 +271,7 @@ choice
- 
- 	config DEBUG_BCM63XX_UART
- 		bool "Kernel low-level debugging on BCM63XX UART"
--		depends on ARCH_BCM_63XX
-+		depends on ARCH_BCMBCA
- 
- 	config DEBUG_BERLIN_UART
- 		bool "Marvell Berlin SoC Debug UART"
-diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
-index bb45a9c00514..1c9f4fb2595d 100644
---- a/drivers/ata/Kconfig
-+++ b/drivers/ata/Kconfig
-@@ -148,7 +148,7 @@ config SATA_AHCI_PLATFORM
- config AHCI_BRCM
- 	tristate "Broadcom AHCI SATA support"
- 	depends on ARCH_BRCMSTB || BMIPS_GENERIC || ARCH_BCM_NSP || \
--		   ARCH_BCM_63XX || COMPILE_TEST
-+		   ARCH_BCMBCA || COMPILE_TEST
- 	select SATA_HOST
- 	help
- 	  This option enables support for the AHCI SATA3 controller found on
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index b3f2d55dc551..3da8e85f8aae 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -87,7 +87,7 @@ config HW_RANDOM_BA431
- config HW_RANDOM_BCM2835
- 	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
- 	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
--		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-+		   ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
- 	default HW_RANDOM
- 	help
- 	  This driver provides kernel-side support for the Random Number
-diff --git a/drivers/clk/bcm/Kconfig b/drivers/clk/bcm/Kconfig
-index ec738f74a026..77266afb1c79 100644
---- a/drivers/clk/bcm/Kconfig
-+++ b/drivers/clk/bcm/Kconfig
-@@ -22,9 +22,9 @@ config CLK_BCM2835
- 
- config CLK_BCM_63XX
- 	bool "Broadcom BCM63xx clock support"
--	depends on ARCH_BCM_63XX || COMPILE_TEST
-+	depends on ARCH_BCMBCA || COMPILE_TEST
- 	select COMMON_CLK_IPROC
--	default ARCH_BCM_63XX
-+	default ARCH_BCMBCA
- 	help
- 	  Enable common clock framework support for Broadcom BCM63xx DSL SoCs
- 	  based on the ARM architecture
-diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
-index b1d7069dd377..acf2a393bd56 100644
---- a/drivers/i2c/busses/Kconfig
-+++ b/drivers/i2c/busses/Kconfig
-@@ -486,7 +486,7 @@ config I2C_BCM_KONA
- 
- config I2C_BRCMSTB
- 	tristate "BRCM Settop/DSL I2C controller"
--	depends on ARCH_BCM2835 || ARCH_BCM4908 || ARCH_BCM_63XX || \
-+	depends on ARCH_BCM2835 || ARCH_BCM4908 || ARCH_BCMBCA || \
- 		   ARCH_BRCMSTB || BMIPS_GENERIC || COMPILE_TEST
- 	default y
- 	help
-diff --git a/drivers/phy/broadcom/Kconfig b/drivers/phy/broadcom/Kconfig
-index 849c4204f550..93a6a8ee4716 100644
---- a/drivers/phy/broadcom/Kconfig
-+++ b/drivers/phy/broadcom/Kconfig
-@@ -83,7 +83,7 @@ config PHY_NS2_USB_DRD
- config PHY_BRCM_SATA
- 	tristate "Broadcom SATA PHY driver"
- 	depends on ARCH_BRCMSTB || ARCH_BCM_IPROC || BMIPS_GENERIC || \
--		   ARCH_BCM_63XX || COMPILE_TEST
-+		   ARCH_BCMBCA || COMPILE_TEST
- 	depends on OF
- 	select GENERIC_PHY
- 	default ARCH_BCM_IPROC
-diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
-index 2d034459e79f..8e550269d488 100644
---- a/drivers/spi/Kconfig
-+++ b/drivers/spi/Kconfig
-@@ -183,7 +183,7 @@ config SPI_BCM63XX
- 
- config SPI_BCM63XX_HSSPI
- 	tristate "Broadcom BCM63XX HS SPI controller driver"
--	depends on BCM63XX || BMIPS_GENERIC || ARCH_BCM_63XX || COMPILE_TEST
-+	depends on BCM63XX || BMIPS_GENERIC || ARCH_BCMBCA || COMPILE_TEST
- 	help
- 	  This enables support for the High Speed SPI controller present on
- 	  newer Broadcom BCM63XX SoCs.
-diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
-index 8a3ee1525d80..e3279544b03c 100644
---- a/drivers/tty/serial/Kconfig
-+++ b/drivers/tty/serial/Kconfig
-@@ -1100,8 +1100,8 @@ config SERIAL_TIMBERDALE
- config SERIAL_BCM63XX
- 	tristate "Broadcom BCM63xx/BCM33xx UART support"
- 	select SERIAL_CORE
--	depends on ARCH_BCM4908 || ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
--	default ARCH_BCM4908 || ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
-+	depends on ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-+	default ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC
- 	help
- 	  This enables the driver for the onchip UART core found on
- 	  the following chipsets:
+I don't know the exact number of cycles, but as I mentioned in the coverletter, the trng instruction is one of the specialties of the s390 platform. It looks like an instruction, but it is some kind of firmware executed (it is called millicode). These kind of long-running instructions are also interruptable and can resume.
+
+A trng call runs for minimal ~20-190us for 32 bytes. 20us on newer machine generations, 190us on older ones. These are not 100% exact measurements, but the dimension should be correct.
+
+> 
+>> diff --git a/arch/s390/include/asm/archrandom.h b/arch/s390/include/asm/archrandom.h
+>> index 2c6e1c6ecbe7..711357bdc464 100644
+>> --- a/arch/s390/include/asm/archrandom.h
+>> +++ b/arch/s390/include/asm/archrandom.h
+>> @@ -32,7 +32,8 @@ static inline bool __must_check arch_get_random_int(unsigned int *v)
+>>
+>>  static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
+>>  {
+>> -       if (static_branch_likely(&s390_arch_random_available)) {
+>> +       if (static_branch_likely(&s390_arch_random_available) &&
+>> +           !in_interrupt()) {
+> 
+> in_interrupt() is deprecated. You want in_hardirq() here. You'll also
+> want to verify that this doesn't prevent random_init() from working.
+> 
+> Jason
+
 -- 
-2.34.1
-
-
---000000000000f17ab205e3122bdb
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-TltlrAeBKRJ1M9O/DY5v7L1Yrs//7XIRg/d2ZPAOSGBQzFYjYTFWwNBiR1s1zP0m2y56DPbS5gwj
-fqAN/I4PJHIvTh3zUgHXNKadYoYRiPHXfaTWO9UhzysOpQIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRp3aWxsaWFtLnpoYW5nQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUohM5GmNlGWe5wpzDxzIy
-+EgzbRswDQYJKoZIhvcNAQELBQADggEBACKu9JSQAYTlmC+JTniO/C/UcXGonATI/muBjWTxtkHc
-abZtz0uwzzrRrpV+mbHLGVFFeRbXSLvcEzqHp8VomXifEZlfsE9LajSehzaqhd+np+tmUPz1RlI/
-ibZ7vW+1VF18lfoL+wHs2H0fsG6JfoqZldEWYXASXnUrs0iTLgXxvwaQj69cSMuzfFm1X5kWqWCP
-W0KkR8025J0L5L4yXfkSO6psD/k4VcTsMJHLN4RfMuaXIT6EM0cNO6h3GypyTuPf1N1X+F6WQPKb
-1u+rvdML63P9fX7e7mwwGt5klRnf8aK2VU7mIdYCcrFHaKDTW3fkG6kIgrE1wWSgiZYL400xggJt
-MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgw28eX6TfvsbNfu
-SIMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPgYZPgWW4RYqL7NYCmuLdm1S+Ge
-H/PcUJV33ZnfqGh6MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIy
-MDcwNTE3Mjc0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQBW0XC9tAcuZ1pP9F2RiNgMTvLp130Q17o7uHM4h/0RdZT0
-CciFab65Efjb4MHR4/uVx3CHcwlnpoG1O/8A7BoEtk73kLP4rcGscR2NHuUtvxS0Cs9osf+mUKiP
-RcQfjOTKBKsr0o8agx6U1+XkbQBpHgKnCrJhasMeE5HgtcKNjmFApxiPHPlqFQmne1DZr4ubeDHs
-jzmTZ6kKNd6Eqiwh7om6T2u0vAk613nOpnxffhxgqrxkgsuKW1TuKbHvwgig0dIKoNom99Kk3Thg
-TZ7K/Y1CZiX92+evGTHNyycM2vjW8/xE3/IQGRJhrS7vE3S3YWUbNNB6geVPXpRbB+TL
---000000000000f17ab205e3122bdb--
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
