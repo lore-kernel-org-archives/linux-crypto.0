@@ -2,192 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F60C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 14:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BB8C43334
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 14:58:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbiGEOxe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jul 2022 10:53:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46680 "EHLO
+        id S229585AbiGEO6k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Jul 2022 10:58:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232166AbiGEOxb (ORCPT
+        with ESMTP id S229488AbiGEO6j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jul 2022 10:53:31 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2081.outbound.protection.outlook.com [40.107.96.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D93ED86;
-        Tue,  5 Jul 2022 07:53:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lgwGeFMwGRAr7A5B5ZjaC2PUxY9yNrRxn1FewnQNyQ6jDr/CIJzq1e3C4f+jl9XeIWq8n/kIjRKEtFaLcCRbiMerP1e2g7e2aB0PD8roFn821YRyEs23e0V3OI+jfHuGfdHj8iEjDFQi6ioXBYgYWt+M9/YNhj8xMXWVJUuchhc8BN6oYuwFPh3UT95dOqTaby8oJvs8g5GZk5PUv+kZH091psmzUgTtZC7lmfSqdFmMHtcOAEcvaz9OaIeV8FZanetI6AGGJhPXA1Ftd0jqalldGS32WcxNkDIcdJIwqKuxhpVxQpVQ5YRlLCEpRF5xmCxigbBSTLYzW12yuABv+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o15Y5xb3AjvcnYGS0xeRGrbapEtl0VB4pxnKXHnTloQ=;
- b=ano2iDIsoyyPj9FEiHfwL1czRCfstLHKFf/vzVjmEjeNsGrXx4uQBpvJacC+NZxtGEUPMMnkKQKB46GV0vThpXZ6ToQI2i/Xf0cIavxabbHIKxTxZH2zrX8Qu2TcXu+HcTMoFLjecY/42Db4oEhR1TJ3oep1Fvs/euG79svkRATBCAeK4PSzkeHu6IugEi5yVpfziz94SGrjuz2UPHVmttSODSVwzjkUzkfhaW9Y9yl/gj5psJrLnWJdqZRURHiYeE4rxb13vGrx3meeBDZrvxSjlI2zchJfzK2Q79Ho5j4yCS5H3ioTu6BqVG4kZGQEqDCC/quZDfSuhoy83jbhJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o15Y5xb3AjvcnYGS0xeRGrbapEtl0VB4pxnKXHnTloQ=;
- b=NCbfa0nKeHdiSLN7IsEEZ5xSK4Vc7xY1tLt37idCoNfzS0gcBR+uoWymvD1fMQpnwsYueKEbmqsBq0wF7tJSqSGW6B6bgagmbcE0YO5JbCs0Aoi82SRydkKae0qzLxoqTo3Ho2hzVo+9eh2mibanBBKKZVXSUjLV6mWYRnzkPgo=
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by DM6PR12MB2812.namprd12.prod.outlook.com (2603:10b6:5:44::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.17; Tue, 5 Jul
- 2022 14:53:22 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::8953:6baa:97bb:a15d%7]) with mapi id 15.20.5395.021; Tue, 5 Jul 2022
- 14:53:22 +0000
-From:   "Kalra, Ashish" <Ashish.Kalra@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: RE: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Thread-Topic: [PATCH Part2 v6 02/49] iommu/amd: Introduce function to check
- SEV-SNP support
-Thread-Index: AQHYjTdG/Jq12JdNiEyvNHxMVTEAQ61v0QXggAANAwCAAASgcA==
-Date:   Tue, 5 Jul 2022 14:53:22 +0000
-Message-ID: <SN6PR12MB2767F64593EE0DD11E578FAF8E819@SN6PR12MB2767.namprd12.prod.outlook.com>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <12df64394b1788156c8a3c2ee8dfd62b51ab3a81.1655761627.git.ashish.kalra@amd.com>
- <Yr7Pm/E9WsAjirV0@zn.tnic>
- <SN6PR12MB27673AC95A577D5468A949598E819@SN6PR12MB2767.namprd12.prod.outlook.com>
- <YsRLyoylnTHkgfa1@zn.tnic>
-In-Reply-To: <YsRLyoylnTHkgfa1@zn.tnic>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-07-05T14:50:19Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=3e510786-e978-47ef-b660-fcbbf49efe1c;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_enabled: true
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_setdate: 2022-07-05T14:53:19Z
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_method: Standard
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_name: General
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_siteid: 3dd8961f-e488-4e60-8e11-a82d994e183d
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_actionid: 8095f5be-af6d-4f4f-9485-75b20e698e53
-msip_label_4342314e-0df4-4b58-84bf-38bed6170a0f_contentbits: 0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bdd19d6a-e6d9-42b5-5534-08da5e961b6d
-x-ms-traffictypediagnostic: DM6PR12MB2812:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ur4OsPjv8pSB49RI4/aDJiSuU7c/0zyZdqvjwW1nwlymUIF5GmablwteX6RYndpZyYdIVmXxJ6pXoLGcj6kFlutYvbtD3fg/QSJ9WLSEUbxmzWZBPxim+T8Eat8g5MR01sIlxk3uKkSKbySEYlk0h2bBAktWKvmaIGXBlonwFLgnczBvuIeYkNgCUT2YB/fWfCJRVlAQQ10ej0mvyezZs5ov6rbVTkvFTxZBJ0v5pMN3jvToAi2AwMtIUL1UWDDBRXO9tPM7EhUsifS814oHKI5sxVOqeSQO/VrkFyG+vOrkreiLSE+ZOKwlPprJ8HrA9PBBHKcV2bsiAxM1MG/v16wLWHuMZBwaEePjnfYIZHWBLPmuUc5mcK9n47jqxG2wgQmqNMjTlOAE//twMJBZvPn6sz8/hkedan7Q8ukSlW8FGaocou59BQ4fXPZmjRt42vrI7iMLSKjfeHMkkgVlqsAGomH+9tdWWIH+NbBNwYI565bJN+eOOIv4JVpzyudTT1Oq0zIKolOA1AJq19+DcHc4zRvJb5Pe0ETHz5jljeFxI7HItsfihkUeo7HY/s0jpzNZXFTWdWMJ+DURG2S/7DhxrfRKJTjICRRb5/nolffhYo1JU6NoNSi0MDYuaWmSAGehlVhGjSEoWi8k+hosNUQMhsuy7qT93jNg6+Fp1n6z4/UFI4fctOdjZMArSt03MSeWgkfkvh3eyrFNOl1TOW5W3cXjcFKP6Bh1mUw9JAwFqkV0VhojKEDqjIrZbowSroOaJQncghiC9EqVfUm2HiHA5anclLAwPF3+NLjEdiLXDvibvk0t9Hmpp2WciFmU
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(366004)(136003)(346002)(376002)(38070700005)(4326008)(8676002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(71200400001)(41300700001)(86362001)(6506007)(2906002)(7696005)(478600001)(7416002)(7406005)(52536014)(55016003)(33656002)(5660300002)(8936002)(122000001)(26005)(9686003)(4744005)(186003)(316002)(38100700002)(54906003)(6916009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OXe0KzhI2oPNcy+Hmd2qjdNNDjEcXyKg2BoBlHumQCaD0oGIQiRx7Nfak2Ts?=
- =?us-ascii?Q?ocbK1I4lDrtpSf+cOQwG0P0sIvZJVt/cEBd9zh67xju59IWmQx6qEqZYHZrq?=
- =?us-ascii?Q?6XyaBOD89Arg+2biAR1b4l+SP16cx6cbIy/YtmIY9ueGTJoPfj3uYCR0tATt?=
- =?us-ascii?Q?3bGtL2euCvlzP/m5q1jIQVL1c7SXcyuZ8wpdTcFzkexoEXDih2Rufa2TB0qv?=
- =?us-ascii?Q?A/liM/Hj8ayfZjaTFtU4WTBPvGSBs9LSzXEtuEH5LyZfJnRVZ8+pGJWB/L3a?=
- =?us-ascii?Q?q2hjvWO7CVSncQ1jw47NKkiPvDO3FEj38tEHkTovdvB5b6hu3DmTmwx7k3KG?=
- =?us-ascii?Q?8NvH8BGuw7haiVnQl5cW+ol1Y5qlDXnCYCxBwTa8LaP/pbPpPFkKEzDSjpxQ?=
- =?us-ascii?Q?ReVpQGocoev/rDHJIVP9ZVJEu/lL0UHXJZ7uYjHaUC6swmOp7BshHgGbqOHY?=
- =?us-ascii?Q?sF24S1/vSsYr4UFmWAg7VuGlVgpOKfElxfKZcQ988rgrGWFjhI34qq2Oq79D?=
- =?us-ascii?Q?ZPTiHisEP+RTjm6pBl6RBaODDy8tqBs5k3aRqqlLY9ayFnmno0TQxBfXOkWX?=
- =?us-ascii?Q?q1hZMkD1FphRqMvvEtgz86HyU/VkxltDi3ikL5e68AFewmWjAxeMZlmh4Hvu?=
- =?us-ascii?Q?2OWLnA3Rx588Uz1OyAAj4qX2Kngr+5yvbIjaAjsx5CRupc4SxMltY26tlHmZ?=
- =?us-ascii?Q?kxQNFlGSEz3t6VwPi5mmSghYGA1wrWJXb5goyi/NcEtERSjOXcvGXBJWVr/z?=
- =?us-ascii?Q?QPLd6j0YLDGUw2Kxve1Br89l8QqS/af8WRnI2E1pExtFHFJn0DVXdO+LBGbv?=
- =?us-ascii?Q?Bsc3GvquzdMB+Eyhmffa/dYUQRmuS9ZUcPcxX/I9Yjj4Ef4oSX4XompMQtQ7?=
- =?us-ascii?Q?yRVCGjjEVWlt1ad/gt1rtkLEiO71Jy74q5Jr2nxAtnWK4IGlLjHidU8Vji2y?=
- =?us-ascii?Q?3V3sfgKQF0xUiUc7l7e3+nvMRP/zHS9noUx5m4jc80uvROJu84tqeQPK6d5c?=
- =?us-ascii?Q?PR2SbRJ/hLHYW0R3cFsH1+NcoN8hMae4X+0Y7nP14m/+Msln9RVnwzGSeAgL?=
- =?us-ascii?Q?qnxwGiprhxuCt04dH5rySR0yt9ga7WApR3SJXRyhscwSBTUcXGr2sQ0exgTs?=
- =?us-ascii?Q?d+hB/OSvqfHcAxUnFEflxOU2j0lAc32Zv2MIomA33x0v8GEeIjSPAlR3O+3f?=
- =?us-ascii?Q?VaqlZf0aKeoY8yifqTn4BKeAw5tinOcoWveLfhFvohrJrgFFl5L+xudiG9jF?=
- =?us-ascii?Q?PAbjZOKce4MimKu6jXnPJvM778meAhxhGvNe6jILrpu8asVLJdDyuPpuKwgg?=
- =?us-ascii?Q?EjFDUR1VbHTpSGzK6d9/0ojht0F7yIawOJGLFHEOe67BtfAOd4PPf7bSAUFx?=
- =?us-ascii?Q?oe6RCO0Z3do8va/h5Ls50dwdfofcFll8rXokToYf9HmsuviiraNn9ysQlZ0+?=
- =?us-ascii?Q?expuqdVqGPvPJRHHRVEVI1bH4wIK5dBw7RwYgcG4itUsYsvYbK1V02Pbe9Pk?=
- =?us-ascii?Q?9YnuWHh2GyGMP9HAOZJR5YrQpsdGrS2iR7W6msoKiKrCJAmW6jSA2bj61Ugs?=
- =?us-ascii?Q?j73Y8rhSVauy/s9Ea1M=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 5 Jul 2022 10:58:39 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D38140DB;
+        Tue,  5 Jul 2022 07:58:38 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 265EjvVr027449;
+        Tue, 5 Jul 2022 14:58:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Y3jDeNk9KPTZ+ANrlUNPxfYLf6ojQp5hQvxuuZxFMs4=;
+ b=GoJkn23rovuO0rXfl6AnkaZqR4w1M7FWOz0g3/SHID9qm60GbfXTCJvJl7/CfrXJLAfx
+ aDfyt5nnnX4cTH5hVPZ6W12QvajAHKAzERMhjrtlKSO2LdF3YnBu8AGHGfVrbGDKuLn/
+ B1rvb+ktEl21SIyGY8IoWVHP+anQUFzN+TniNhR2AQT4WqUZbHuCCSsfvJYLgVjshtWs
+ gbIHgW2kpK6WOb83IFQRK1u0PT3MyKA3UPYjUBtJHkGoYLptltnRfKIHxe7P3/sS5Ntr
+ ykzQy7TknZVxfpSV8DI/n3YIgo9+k2e4d12q510EcOg9wcpQj2Irwrs0q7FvqYRK+CuY fg== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h4pwe91m7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 14:58:37 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 265Ep1ig017186;
+        Tue, 5 Jul 2022 14:58:36 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3h2dn8u4nr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 05 Jul 2022 14:58:36 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 265EwXQD24969726
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 5 Jul 2022 14:58:33 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B70442041;
+        Tue,  5 Jul 2022 14:58:33 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F87F4203F;
+        Tue,  5 Jul 2022 14:58:32 +0000 (GMT)
+Received: from [9.171.76.195] (unknown [9.171.76.195])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  5 Jul 2022 14:58:32 +0000 (GMT)
+Message-ID: <9a0561c0-68f7-b630-4440-3ca32bf28dc2@linux.ibm.com>
+Date:   Tue, 5 Jul 2022 16:58:30 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdd19d6a-e6d9-42b5-5534-08da5e961b6d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jul 2022 14:53:22.4133
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BVkso0Xxewlm1vOZKcjZ9j2+471RUxy/kyfaGwAeZmpW8EH/1jftEpQX3vFIuLfhpqMMgvdSWDAeGnODj/YTNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2812
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1 1/1] s390/arch_random: Buffer true random data
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Harald Freudenberger <freude@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Juergen Christ <jchrist@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20220705112712.4433-1-dengler@linux.ibm.com>
+ <20220705112712.4433-2-dengler@linux.ibm.com> <YsQ6OOrOWPhdynoM@zx2c4.com>
+From:   Holger Dengler <dengler@linux.ibm.com>
+In-Reply-To: <YsQ6OOrOWPhdynoM@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xvtIG_GcdClxQN5g4RgVKeTcshOLgqmY
+X-Proofpoint-GUID: xvtIG_GcdClxQN5g4RgVKeTcshOLgqmY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-05_11,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 mlxscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ malwarescore=0 adultscore=0 suspectscore=0 mlxlogscore=710 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2207050062
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[AMD Official Use Only - General]
+Hi Jason,
 
-Hello Boris,
+On 05/07/2022 15:18, Jason A. Donenfeld wrote:
+> Hi Holger,
+> 
+> On Tue, Jul 05, 2022 at 01:27:12PM +0200, Holger Dengler wrote:
+>> The trng instruction is very expensive and has a constant runtime for
+>> getting 0 to 32 bytes of (conditioned) true random data. Calling trng for
+>> in arch_get_random_seed_long() for each 8 bytes is too time-consuming,
+>> especially if it is called in interrupt context.
+>>
+>> This implementation buffers the trng data and deliver parts of it to the
+> 
+> This patch seems to be repeating the same mistake I just cleaned up.
+> Specifically, an advantage of a CPU RNG is that it can always provide
+> *fresh* entropy, so that if, say, the system state is dumped, the CPU
+> will continue to provide fresh new uncompromised values. When you buffer
+> those values, they cease to be fresh.
 
->> This function is required to ensure that IOMMU supports the SEV-SNP=20
->> feature before enabling the SNP feature and calling SNP_INIT.
->> This IOMMU support check is done in the AMD IOMMU driver with the
->> iommu_sev_snp_supported() function so it is exported by the IOMMU=20
->> driver and called by sev module
+You're right, the buffering has the disadvantage, that the random data for the non-first callers are not fresh. But if we only want to have fresh data here, we should avoid this call in interrupt context completely (see below).
 
->What sev module?
+> But more realistically, have you benchmarked this and seen that it's
+> actually required? These functions are called once at boot, and then
+> when the RNG is reseeded, which happens around once a minute. That's
+> pretty darn rare. When you consider all the cycles that are completed
+> over the course of a minute, whatever the cost of the TRNG is seems
+> pretty negligible.
 
-I meant the kvm-amd module.=20
+It is true, that the performance of the instruction is not really relevant, but only for calls outside of an interrupt context. I did some ftrace logging for the s390_random_get_seed_long() calls, and - as you said - there are a few calls per minute. But there was also some repeating calls in interrupt context. On systems with a huge interrupt load, this can cause severe performance impacts. I've no concrete performance measurements at the moment, but - as I said - the trng instruction on s390 takes a lot of time and in interrupt context the interrupts are disabled for the complete runtime of the instruction.
 
->The call to iommu_sev_snp_supported() is done by snp_rmptable_init() which=
- is in arch/x86/kernel/sev.c. AFAICT.
+> So anyway, maybe it'd be best to look at the "big picture" problem you
+> want to solve, rather than what looks to me like an attempt to solve a
+> problem that doesn't exist. Or maybe it does? If so, I'd be interested
+> to know when and how and where and such.
 
->And that is not a module. But function exports are done for modules.
+The optimization of the trng calls was not the main goal, but we (Harald and I) thought about how can we provide trng data to in-interrupt callers as well, without doing the trng instruction call in the interrupt context itself. At the moment, I don't see any possibility to do both, fresh data and prevent trng calls in interrupt context BUT provide trng data for in-interrupt-callers. But I'm always open for new ideas.
 
->So that export looks superfluous.
+If the data must be fresh, I would propose not to use any trng-generated data for in-interrupt callers.
 
-Yes realized this is called in arch/x86/kernel/sev.c, so yes the export is =
-not needed and will remove it.
+> 
+> Jason
 
-Thanks,
-Ashish
+-- 
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
