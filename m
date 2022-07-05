@@ -2,84 +2,103 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A2BFC43334
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 20:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE06CCA47B
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 21:56:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231266AbiGEUwR (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jul 2022 16:52:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59962 "EHLO
+        id S231313AbiGEV4k (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Jul 2022 17:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbiGEUwP (ORCPT
+        with ESMTP id S229452AbiGEV4k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jul 2022 16:52:15 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8972C12AB7
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Jul 2022 13:52:13 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1o8pWW-0000tU-FA; Tue, 05 Jul 2022 22:51:56 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1o8pWR-004dB1-7r; Tue, 05 Jul 2022 22:51:54 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1o8pWU-003Drn-0L; Tue, 05 Jul 2022 22:51:54 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kernel@pengutronix.de
-Subject: [PATCH 1/7] crypto: atmel-aes: Drop if with an always false condition
-Date:   Tue,  5 Jul 2022 22:51:38 +0200
-Message-Id: <20220705205144.131702-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.36.1
+        Tue, 5 Jul 2022 17:56:40 -0400
+X-Greylist: delayed 541 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Jul 2022 14:56:39 PDT
+Received: from mail.mleia.com (mleia.com [178.79.152.223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24DA021D;
+        Tue,  5 Jul 2022 14:56:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
+        t=1657057657; bh=Nj8bf5uI6dLEDyt4JsseMDkg3U8ZxrrwBsjjIiK/16Y=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=ZNjXxGMHAIHa0LqTe04z3ilZZDpwp06hI6OFAyJKTSr0tHwEdbPBNVHTWF1908XnO
+         TUnU1eJjiHb29dTgTlphZBMOfBNKRcvTnNMmGtX6Ij/DJ85//jLmbOgdChUhNGMdur
+         WKTcVinigN5d5mKMMcHwkY3W1vajlsUv6URM3s5XCuWBlgOokABQaGRSGtOSegGIA+
+         pqU/+ySKFKmnXHCL0Z6du76ih2iUVnY7X2sDLfcq0S2uMS55zZ2E42hgMWufB6qGo8
+         7pmcfwoY007znr6ryCzLjjc4v/Ewb62MmhsBICE+lfE/APnQlZYr0FZHQveUJqJn14
+         PoRjVhMmSh2bw==
+Received: from mail.mleia.com (localhost [127.0.0.1])
+        by mail.mleia.com (Postfix) with ESMTP id 62FC93C428C;
+        Tue,  5 Jul 2022 21:47:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
+        t=1657057657; bh=Nj8bf5uI6dLEDyt4JsseMDkg3U8ZxrrwBsjjIiK/16Y=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=ZNjXxGMHAIHa0LqTe04z3ilZZDpwp06hI6OFAyJKTSr0tHwEdbPBNVHTWF1908XnO
+         TUnU1eJjiHb29dTgTlphZBMOfBNKRcvTnNMmGtX6Ij/DJ85//jLmbOgdChUhNGMdur
+         WKTcVinigN5d5mKMMcHwkY3W1vajlsUv6URM3s5XCuWBlgOokABQaGRSGtOSegGIA+
+         pqU/+ySKFKmnXHCL0Z6du76ih2iUVnY7X2sDLfcq0S2uMS55zZ2E42hgMWufB6qGo8
+         7pmcfwoY007znr6ryCzLjjc4v/Ewb62MmhsBICE+lfE/APnQlZYr0FZHQveUJqJn14
+         PoRjVhMmSh2bw==
+Received: from [192.168.1.102] (88-112-131-206.elisa-laajakaista.fi [88.112.131.206])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.mleia.com (Postfix) with ESMTPSA id E95463C414C;
+        Tue,  5 Jul 2022 21:47:36 +0000 (UTC)
+Message-ID: <aa7814a6-be62-efcb-8688-dbdfc6a396f0@mleia.com>
+Date:   Wed, 6 Jul 2022 00:47:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=949; h=from:subject; bh=bvVGcxJkIlGRVNmIhFGFH6gXMQJmfXDlOVZ0OZksjRM=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBixKRGUTOHzCJtEaCXv0bWPCdHhqgHNqvqFTB5/8OL mxgzy2WJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYsSkRgAKCRDB/BR4rcrsCXdEB/ 46LKv+vBM92XIvMrZ6u7nsFkYjQuOXn1cMgd+NKXyV3JRf4k3gms1IEOSLDGucKKcq66W46CETUCa3 hZZefQszB4r4V+Ya5fPZEb3C4uenIt+qOsEngR38gA6ffF59FDm1p7VTqqOQJg4IuKFMNBzGVeqrR8 IHshp3++6QjUZ5upY8qHK1z29gZiqVhBtskjMWjPzWMS81z2XQDLgLsbBCGM+mEtrt4r2UoLlu4adq b4pGD28xOQpKzOheH6Ajx5haO53ZdrrqcD3IUarySCgECvkYHu/lNE62KWTcuObJBsZhnCHF1bnSSw j/RxK/c9BPN+uLmlRb9nXUg9iAV1xC
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 7/7] crypto: s5p-sss: Drop if with an always false
+ condition
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        kernel@pengutronix.de
+References: <20220705205144.131702-1-u.kleine-koenig@pengutronix.de>
+ <20220705205144.131702-7-u.kleine-koenig@pengutronix.de>
+From:   Vladimir Zapolskiy <vz@mleia.com>
+In-Reply-To: <20220705205144.131702-7-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-49551924 
+X-CRM114-CacheID: sfid-20220705_214737_427206_4809590F 
+X-CRM114-Status: GOOD (  16.47  )
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The remove callback is only called after probe completed successfully.
-In this case platform_set_drvdata() was called with a non-NULL argument
-and so aes_dd is never NULL.
+On 7/5/22 23:51, Uwe Kleine-König wrote:
+> The remove callback is only called after probe completed successfully.
+> In this case platform_set_drvdata() was called with a non-NULL argument
+> and so pdata is never NULL.
+> 
+> This is a preparation for making platform remove callbacks return void.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>   drivers/crypto/s5p-sss.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> index 7717e9e5977b..b79e49aa724f 100644
+> --- a/drivers/crypto/s5p-sss.c
+> +++ b/drivers/crypto/s5p-sss.c
+> @@ -2321,9 +2321,6 @@ static int s5p_aes_remove(struct platform_device *pdev)
+>   	struct s5p_aes_dev *pdata = platform_get_drvdata(pdev);
+>   	int i;
+>   
+> -	if (!pdata)
+> -		return -ENODEV;
+> -
+>   	for (i = 0; i < ARRAY_SIZE(algs); i++)
+>   		crypto_unregister_skcipher(&algs[i]);
+>   
 
-This is a preparation for making platform remove callbacks return void.
+Acked-by: Vladimir Zapolskiy <vz@mleia.com>
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/crypto/atmel-aes.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index f72c6b3e4ad8..886bf258544c 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -2669,8 +2669,7 @@ static int atmel_aes_remove(struct platform_device *pdev)
- 	struct atmel_aes_dev *aes_dd;
- 
- 	aes_dd = platform_get_drvdata(pdev);
--	if (!aes_dd)
--		return -ENODEV;
-+
- 	spin_lock(&atmel_aes.lock);
- 	list_del(&aes_dd->list);
- 	spin_unlock(&atmel_aes.lock);
-
-base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
--- 
-2.36.1
-
+--
+Best wishes,
+Vladimir
