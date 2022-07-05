@@ -2,66 +2,141 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD61C433EF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 18:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7113CCCA47F
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Jul 2022 19:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiGESbG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jul 2022 14:31:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
+        id S233403AbiGETLD (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 5 Jul 2022 15:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGESbF (ORCPT
+        with ESMTP id S233352AbiGETKy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jul 2022 14:31:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E256594;
-        Tue,  5 Jul 2022 11:31:04 -0700 (PDT)
+        Tue, 5 Jul 2022 15:10:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D1A21812;
+        Tue,  5 Jul 2022 12:10:51 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B284619A6;
-        Tue,  5 Jul 2022 18:31:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 959A7C341C7;
-        Tue,  5 Jul 2022 18:31:03 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 22FBE61B0C;
+        Tue,  5 Jul 2022 19:10:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B1ECC341C7;
+        Tue,  5 Jul 2022 19:10:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657045863;
-        bh=/npDUasULjXiZbzc/ZSFtmS962gEGg7Ox9mBxn1ssd0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S7E0B4oLU0Yd2cjVV0On7+ymT0KPQDkHgquM+5qJz3xMEgVBxjrdK9EPzZTm0BWd8
-         t/im2KyMJqguMVWGtRzRMMcIKxj70NiAnOkP/40ZK21wpek1eI1aKnT/QiY4Zfu1V2
-         Ok1UBZMnvspkco8k/lK51jWjnGIwi+bWWYcrShZTbI9jZMOLNkpjS38ATxw/LfQcFf
-         Qw0JgsZke7vKDp4I/4LNqKow1nt9ZD7lYkhmmYsHRgrVIvc8Z/e60ATd1Kc15jYVMl
-         9MlHnm2WQROzx8aYqpDrVE+RqtTA6rzlVSluKNLScBdo/j3lP3IFmqiWULhdFmyvZE
-         EFZ9uxTtArM5w==
-Date:   Tue, 5 Jul 2022 11:31:02 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Taehee Yoo <ap420073@gmail.com>, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, borisp@nvidia.com, john.fastabend@gmail.com,
-        daniel@iogearbox.net, edumazet@google.com, pabeni@redhat.com,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] net: tls: Add ARIA-GCM algorithm
-Message-ID: <20220705113102.1862660a@kernel.org>
-In-Reply-To: <YsO+DmGe7LdGUmUE@gondor.apana.org.au>
-References: <20220704094250.4265-1-ap420073@gmail.com>
-        <20220704094250.4265-4-ap420073@gmail.com>
-        <20220704201009.34fb8aa8@kernel.org>
-        <YsO+DmGe7LdGUmUE@gondor.apana.org.au>
+        s=k20201202; t=1657048250;
+        bh=DZjCJJL0Yv/6HD/E/v6p0fOtpAocdv+3cV77tazWrKE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=sYOW0yhQip2w1zZZEmV4YnPpYe1Dy4quQmSEs13vh2JajXJKLLGWCI3l+iBtPG4vj
+         h+EAgUVB5rnMUc92yTA9RfRbfck+yWdLp/RjaYs1kCykXLv1b8Mjtg7QQb+rIK97EQ
+         zx/5yHoF/yOxitslbjIsCJ2bn3esa3E8oFa8X4T1usa1/pHHSFevJccuJoGgbd3dys
+         rDy/74rj/s8Pxlm/hAZ3qRvla8RFMdt3f06haSb++zMFm9h2lRaUWEtyBdWzWYsHce
+         iHBLMJ4NTSs8jcNJWRmsxsjvBUo9f7epFDJC9YovFkPabWqsJeHYdbNZ19f3OvqNeV
+         WbLP+F125vMOQ==
+Date:   Tue, 5 Jul 2022 21:10:42 +0200
+From:   Wolfram Sang <wsa@kernel.org>
+To:     William Zhang <william.zhang@broadcom.com>
+Cc:     Linux ARM List <linux-arm-kernel@lists.infradead.org>,
+        joel.peshkin@broadcom.com, kursad.oney@broadcom.com,
+        f.fainelli@gmail.com, anand.gore@broadcom.com,
+        Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>,
+        philippe.reynes@softathome.com, dan.beygelman@broadcom.com,
+        Al Cooper <alcooperx@gmail.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Cai Huoqing <cai.huoqing@linux.dev>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Eugen Hristev <eugen.hristev@microchip.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jan Dabros <jsd@semihalf.com>,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Jie Deng <jie.deng@intel.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        Rob Herring <robh@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Sam Protsenko <semen.protsenko@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Sven Peter <sven@svenpeter.dev>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Tyrone Ting <kfting@nuvoton.com>,
+        Vinod Koul <vkoul@kernel.org>, linux-clk@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-serial@vger.kernel.org,
+        linux-spi@vger.kernel.org
+Subject: Re: [PATCH 5/9] arm: bcmbca: Replace ARCH_BCM_63XX with ARCH_BCMBCA
+Message-ID: <YsSMskwYYsJRRCyO@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
+        William Zhang <william.zhang@broadcom.com>,
+        Linux ARM List <linux-arm-kernel@lists.infradead.org>,
+        joel.peshkin@broadcom.com, kursad.oney@broadcom.com,
+        f.fainelli@gmail.com, anand.gore@broadcom.com,
+        Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>,
+        philippe.reynes@softathome.com, dan.beygelman@broadcom.com,
+        Al Cooper <alcooperx@gmail.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Ard Biesheuvel <ardb@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Cai Huoqing <cai.huoqing@linux.dev>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Eugen Hristev <eugen.hristev@microchip.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jan Dabros <jsd@semihalf.com>,
+        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+        Jie Deng <jie.deng@intel.com>, Jiri Slaby <jirislaby@kernel.org>,
+        Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Mark Brown <broonie@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+        Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+        Sam Protsenko <semen.protsenko@linaro.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Sven Peter <sven@svenpeter.dev>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Tyrone Ting <kfting@nuvoton.com>, Vinod Koul <vkoul@kernel.org>,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org
+References: <20220705172613.21152-1-william.zhang@broadcom.com>
+ <20220705172613.21152-6-william.zhang@broadcom.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220705172613.21152-6-william.zhang@broadcom.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 5 Jul 2022 12:29:02 +0800 Herbert Xu wrote:
-> I need to know that you guys will take the network part of the
-> patch in order to accept the crypto part.  We don't add algorithms
-> with no in-kernel users.
+On Tue, Jul 05, 2022 at 10:26:09AM -0700, William Zhang wrote:
+> Update ARCH_BCM_63XX in all sources to use ARCHB_BCMBCA instead.
+>=20
+> Signed-off-by: William Zhang <william.zhang@broadcom.com>
 
-GTK, I thought maybe using crypto sockets is enough of a reason.
+Acked-by: Wolfram Sang <wsa@kernel.org> # for I2C
 
-> As long as you are happy to take the TLS part later, we can add
-> the crypto parts right now.
-
-Yup, can confirm. I haven't heard of this algo before but the IETF
-RFC looks legit so we'll take the TLS part.
