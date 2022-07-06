@@ -2,91 +2,214 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CB5C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 15:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06723CCA473
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 16:18:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233697AbiGFPax (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jul 2022 11:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
+        id S234571AbiGFQSh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Jul 2022 12:18:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233687AbiGFPaw (ORCPT
+        with ESMTP id S232948AbiGFQSd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jul 2022 11:30:52 -0400
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6901EC49
-        for <linux-crypto@vger.kernel.org>; Wed,  6 Jul 2022 08:30:49 -0700 (PDT)
-Received: by mail-ej1-f45.google.com with SMTP id g26so27752233ejb.5
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Jul 2022 08:30:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=twk/vXD658q3DjxcLi4Lro4RHohe+e+xW9Ig0mF20Ic=;
-        b=tn4E17FpyxAzh28FjxWYAIUnaLM3sbHCHNgzOzFUbt5C2gNWMrU9bdcGtwBIUgotUi
-         I44J7lM37uj+6+IP7EiAxt5PkpV91SUWOt1W98Clpo6agzlFJ/SlwqaB1vNwrsghDZWL
-         7Mh60/HJNfiRcNVIij4/qclUe+ZsVqqsyC00bThZlmIzWc/KzwI+7/o3diP8epe9xZ88
-         lFGmNQA7AqxOeh+U2UBcwJNYJUsAIjxZkVx6/Ttzycpt5SpcIiweAOOalETGvaYHJbe5
-         s1uiCc3wRqpNkzN2uvQrG4kXEPXS4dB7OXNfTRRgMrwxw1Ma23U9I30COkjcd6uyBE2u
-         gAMQ==
-X-Gm-Message-State: AJIora9EiZxy7GbYlIYN0or5LAR4KdaJnr2lvddkDrtHqNGorHb+VMYJ
-        Xt5bLG4UrskaCz3fl3qoFfQ=
-X-Google-Smtp-Source: AGRyM1s47pKNLQhu6GTSdZ21h5M0mXUmoiq3LO9tZW06jpqH+jjNcU47uhy3eKCmkg4G3bZ3qtCSPg==
-X-Received: by 2002:a17:907:7287:b0:726:c82f:f1bf with SMTP id dt7-20020a170907728700b00726c82ff1bfmr40330874ejc.284.1657121448251;
-        Wed, 06 Jul 2022 08:30:48 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-016.fbsv.net. [2a03:2880:31ff:10::face:b00c])
-        by smtp.gmail.com with ESMTPSA id s11-20020aa7cb0b000000b00438ac12d6b9sm14234087edt.52.2022.07.06.08.30.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 08:30:47 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 08:30:45 -0700
-From:   Breno Leitao <leitao@debian.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Subject: Re: [PATCH] crypto: vmx - Fix warning on p8_ghash_alg
-Message-ID: <YsWqpe9LZYOE4cpK@gmail.com>
-References: <Yr1axU+N4Gr90VuN@gondor.apana.org.au>
+        Wed, 6 Jul 2022 12:18:33 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B652165D1;
+        Wed,  6 Jul 2022 09:18:30 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 266G5upj017500;
+        Wed, 6 Jul 2022 16:18:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
+ from : to : cc : subject : reply-to : in-reply-to : references :
+ message-id : content-type : content-transfer-encoding; s=pp1;
+ bh=ATG1fi8yFZlnZlKbbnantI0OIyJL3cLAzEGjwRRJQE0=;
+ b=jCc8CNjSuUB9J9M3bJnJ10UkN7h5oAQNR318pVUbzZuBjPxrZjvfFKF+LG2P1dFXt/Gs
+ XF0Reh+OVWNHCL6fwqbw+WlMjvxBKsRUi13um3lY8m5j9iiCxsU+fuXlTaL9cq42ICkc
+ UiwKk1/8N4rZR2YNDAfSNW4cCe4fyWZFNxYogSHRaokSBYxJkVHEbafXysVOwYIlmajp
+ LwFS6V9jRE110J5G6Z7BYkXzvxhLKjdJxCABRBMknO6/Uee5woWdivmx+s87fCQZ/H65
+ 2C/sgIn6mmiAnpP1P6ZzYm3Y0wfwxSVG6NQzaXMZ3TrE6JSU/Cb3faPMbl6tuoL0GicU aA== 
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5844jk49-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Jul 2022 16:18:29 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 266G5NiA020192;
+        Wed, 6 Jul 2022 16:18:28 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma01wdc.us.ibm.com with ESMTP id 3h4ud1nhwk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Jul 2022 16:18:28 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 266GIS0E46137608
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 6 Jul 2022 16:18:28 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1846A2805A;
+        Wed,  6 Jul 2022 16:18:28 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A5BFA28058;
+        Wed,  6 Jul 2022 16:18:27 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.10.229.42])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  6 Jul 2022 16:18:27 +0000 (GMT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ZJACidZoklMdi72p"
-Content-Disposition: inline
-In-Reply-To: <Yr1axU+N4Gr90VuN@gondor.apana.org.au>
+Date:   Wed, 06 Jul 2022 18:18:27 +0200
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Holger Dengler <dengler@linux.ibm.com>, Jason@zx2c4.com
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Juergen Christ <jchrist@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] s390/arch_random: Buffer true random data
+Reply-To: freude@linux.ibm.com
+In-Reply-To: <aafbb400-d0cb-99de-8b10-3c39c7b9bae5@linux.ibm.com>
+References: <20220705112712.4433-1-dengler@linux.ibm.com>
+ <20220705112712.4433-2-dengler@linux.ibm.com> <YsQ6OOrOWPhdynoM@zx2c4.com>
+ <9a0561c0-68f7-b630-4440-3ca32bf28dc2@linux.ibm.com>
+ <YsRUowTs9n98p9EL@zx2c4.com>
+ <aafbb400-d0cb-99de-8b10-3c39c7b9bae5@linux.ibm.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <7e65130c6e66ce7a9f9eb469eb7e64e0@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vxrZlVQP750xsGy5PQ0kewc6HzhruI3e
+X-Proofpoint-ORIG-GUID: vxrZlVQP750xsGy5PQ0kewc6HzhruI3e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-06_09,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 adultscore=0 mlxlogscore=777 spamscore=0 mlxscore=0
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207060064
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 2022-07-05 18:27, Holger Dengler wrote:
+> Hi Jason,
+> 
+> On 05/07/2022 17:11, Jason A. Donenfeld wrote:
+>> Hi Holger,
+>> 
+>> On Tue, Jul 05, 2022 at 04:58:30PM +0200, Holger Dengler wrote:
+>>> It is true, that the performance of the instruction is not really
+>>> relevant, but only for calls outside of an interrupt context. I did
+>>> some ftrace logging for the s390_random_get_seed_long() calls, and -
+>>> as you said - there are a few calls per minute. But there was also
+>>> some repeating calls in interrupt context. On systems with a huge
+>>> interrupt load, this can cause severe performance impacts. I've no
+>> 
+>> It'd be interesting to know more about this. The way you get
+>> arch_random_get_seed_long() from irq context is:
+>> 
+>> get_random_{bytes,int,long,u32,u64}()
+>>   crng_make_state()
+>>     crng_reseed() <-- Rarely
+>>       extract_entropy()
+>>         arch_get_random_seed_long()
+>> 
+>> So if an irq user of get_random_xx() is the unlucky one in the minute
+>> span who has to call crng_reseed() then, yea, that'll happen. But I
+>> wonder about this luck aspect. What scenarios are you seeing where 
+>> this
+>> happens all the time? Which driver is using random bytes *so* commonly
+>> from irq context? Not that, per say, there's anything wrong with that,
+>> but it could be eyebrow raising, and might point to de facto solutions
+>> that mostly take care of this.
+> 
+> I saw a few calls in interrupt context during my tracing, but I didn't
+> look to see which ones they were. Let me figure that out in the next
+> few days and provide more information on that.
+> 
+>> One such direction might be making a driver that does such a thing do 
+>> it
+>> a little bit less, somehow. Another direction would be preferring
+>> non-irqs to handle crng_reseed(), but not disallowing irqs entirely,
+>> with a patch something like the one below. Or maybe there are other
+>> ideas.
+> 
+> Reduce the number of trng in interrupt context is a possibility, but -
+> in my opinion - only one single trng instruction call in interrupt
+> context in one too much.
+> 
+> For the moment, I would propose to drop the buffering but also return
+> false, if arch_random_get_seed_long() is called in interrupt context.
+> 
+> diff --git a/arch/s390/include/asm/archrandom.h
+> b/arch/s390/include/asm/archrandom.h
+> index 2c6e1c6ecbe7..711357bdc464 100644
+> --- a/arch/s390/include/asm/archrandom.h
+> +++ b/arch/s390/include/asm/archrandom.h
+> @@ -32,7 +32,8 @@ static inline bool __must_check
+> arch_get_random_int(unsigned int *v)
+> 
+>  static inline bool __must_check arch_get_random_seed_long(unsigned 
+> long *v)
+>  {
+> -       if (static_branch_likely(&s390_arch_random_available)) {
+> +       if (static_branch_likely(&s390_arch_random_available) &&
+> +           !in_interrupt()) {
+>                 cpacf_trng(NULL, 0, (u8 *)v, sizeof(*v));
+>                 atomic64_add(sizeof(*v), &s390_arch_random_counter);
+>                 return true;
+> 
+> (on-top of your commit, without our buffering patch)
+> 
+>> 
+>> But all this is to say that having some more of the "mundane" details
+>> about this might actually help us.
+>> 
+>> Jason
+>> 
+>> diff --git a/drivers/char/random.c b/drivers/char/random.c
+>> index e3dd1dd3dd22..81df8cdf2a62 100644
+>> --- a/drivers/char/random.c
+>> +++ b/drivers/char/random.c
+>> @@ -270,6 +270,9 @@ static bool crng_has_old_seed(void)
+>>  	static bool early_boot = true;
+>>  	unsigned long interval = CRNG_RESEED_INTERVAL;
+>> 
+>> +	if (in_hardirq())
+>> +		interval += HZ * 10;
+>> +
+>>  	if (unlikely(READ_ONCE(early_boot))) {
+>>  		time64_t uptime = ktime_get_seconds();
+>>  		if (uptime >= CRNG_RESEED_INTERVAL / HZ * 2)
+>> 
 
---ZJACidZoklMdi72p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Holger and Jason
+I tried to find out what is the reason of the invocations in interrupt 
+context.
+First I have to admit that there is in fact not much of 
+arch_get_random_seed_long()
+invocation any more in the recent kernel (5.19-rc5). I see about 100 
+invocations
+within 10 minutes with an LPAR running some qperf and dd dumps on dasds 
+test load.
+About half of these invocations is in interrupt context. I 
+dump_stack()ed some of
+these and I always catch the function
+kfence_guarded_alloc()
+   prandom_u32_max()
+     prandom_u32()
+       get_random_u32()
+         _get_random_bytes()
+           crng_make_state()
+             crng_reseed()
+               extract_entropy()
+                 arch_get_random_seed_long()
 
-On Thu, Jun 30, 2022 at 04:11:49PM +0800, Herbert Xu wrote:
-> The compiler complains that p8_ghash_alg isn't declared which is
-> because the header file aesp8-ppc.h isn't included in ghash.c.
-> This patch fixes the warning.
->=20
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Breno Leitao <leitao@debian.org>
+However, with so few invocations it should not make any harm when there 
+is a
+even very expensive trng() invocation in interrupt context.
 
---ZJACidZoklMdi72p
-Content-Type: application/pgp-signature; name="signature.asc"
+But I think we should check, if this is really something to backport to 
+the older
+kernels where arch_get_random_seed_long() is called really frequency.
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEErIU5puj0ZwLKSkObNaOTn/x4d20FAmLFqqUACgkQNaOTn/x4
-d20CXBAAim5F72rBeHqeD/BcS+0Am3RgYAJ9oURr+rgmyRDSTK8TgxPHPqz8uDDX
-L3fWDD1K6ClY4TSfmJbAyPQCXubG63As0bmOIkiHwRk/6r+HpYVyujg1IFQJPngc
-2xhPqRpQ/dZNONgXSfLgRpOD22LDB4YK85k1fgFdZk7Sx4zUdwTBEMMb2LcHQtVE
-5tg/USmkfXQFsn7JGLBkIf6hkmhhEwmw6AIsNh2OIsCA/E8OUNwCw2lHqWQ6LZ8E
-1YXA2D1TDYJ2hx0kTuI+zrBSCpLy+58A+iyt5ysef1ibZ3h8AMohGI86FyyH39JB
-zWulzIrUAGmeG2g5Kb2p7t4kvd2LdjznVaJVGNmWdDfwenjo90lRFdLqnq4vMFYR
-zcsopd8oqhJDPkcHI1L1FvBStuRAqixoNXcHp8bhGwxMMuqhzKEqYkizkKwmrrMj
-yms44oKBPTsU0K50mg/+/7DI+8LGjg8zWhmuTZaGUcpp300H657BQgJNdBCRCVXQ
-Z0E+F8L0ICwCRnQkNgsA+HcgjtajmyjOkaCGYGyMw3/j4kq8fTIv2zMDY/rL/XTl
-FM1/z2Cz3KB1axaa8Gtdb3J57icUOWuk+iC5TzXKzwyRgpnNx9Bsw3aNdUIca7On
-eD+YZdVOrgc5UC8B17DnWHIi5nkSb2fa+oeIwD5tqpeN+WfV2l0=
-=/cBn
------END PGP SIGNATURE-----
-
---ZJACidZoklMdi72p--
+Harald Freudenberger
