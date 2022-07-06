@@ -2,52 +2,52 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995E1CCA486
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 09:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9295C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 09:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232877AbiGFJG6 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jul 2022 05:06:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45332 "EHLO
+        id S233042AbiGFJHS (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Jul 2022 05:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232883AbiGFJGF (ORCPT
+        with ESMTP id S232897AbiGFJGG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jul 2022 05:06:05 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5873C24F23
-        for <linux-crypto@vger.kernel.org>; Wed,  6 Jul 2022 02:04:57 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 205-20020a1c02d6000000b003a03567d5e9so10752841wmc.1
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Jul 2022 02:04:57 -0700 (PDT)
+        Wed, 6 Jul 2022 05:06:06 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77F761FCE7
+        for <linux-crypto@vger.kernel.org>; Wed,  6 Jul 2022 02:04:58 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id b26so21081596wrc.2
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Jul 2022 02:04:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0KerGvUzdejWLAwshDyy9ppWCWrJnFuYbHleK5z5lUU=;
-        b=cOcyzI19J2bwcidkSWv6IYChVJ99SgUBngiNcjkB1r7bHy8FEb/EHmXmVgJy+39WrI
-         5blmGvmfl/D2NUpaj/q6rfywpUvhhuYaegNRmMdTMEAW83+GcS/q+MqGBx1YpCQOBsNg
-         qBuyuXLVhgf4djHOFJbgV2qsK4Rr46EOxdkXQ2MT5ZQCGfTQHhafDZXyOSHxPEScxAyi
-         AHAWtXQTG4qcg6cG1349R17HfqlHyjtUo/gpO2yxSxyWvKDfKJAGLqnjcxNgQoeTQYLC
-         gjv9XDsUSccvRe6OCe8NqKOiYZLID5sJXebE6y85t7ZjV/f+m8Ytib19LC1BoziJ20nl
-         NXGQ==
+        bh=Y1ZryWow92c9hwwvz5Hh3ukn+dkdomJWMwO/HyG9hMQ=;
+        b=1hvxm1lYCf3dt/kNWqZz5AZEreEizX7NEtB62mDJGcxhqDzVDR6GsNQjJEw6hU3Li5
+         DiiKB9lR7xHFHTLRAdNpWSWuQbSURbNkL4ltJzXpRwp/LO7NlZUKRyuZNF5Er/bAPBjH
+         fHTn0cTIeLflHz8GDaigTuF2B018PZUuJJJ4xtbR6ZbHJTTNqJHyMKENGJ+uiSownI2k
+         CD5lvOVAK4ovTpy9ILkL1b2htX61KzBLOSOsgPiYEkLzX9zQDN5FUXrVf9eJk04sXXFR
+         j9ASqPnC7sBOK4hXbpnemsRssUwnMlNqTMG60Jpoqpbr/89/GDSIcxJ2Q4T3Chwgbbus
+         lRbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0KerGvUzdejWLAwshDyy9ppWCWrJnFuYbHleK5z5lUU=;
-        b=BMkUP4vAGSGqvsTDz/OAbZepS9vs0nUW1WplinYf49zdZTLAna1YLlAqN6PQPOF/fq
-         LooWHwHcB/TpdcAAE5OTrLCmX0qFnp+W+e3O7FXISNzi3BAikC29XgOoNDsIK7MaZjs8
-         ZOahBanEdUldt0xiBugNimV2+Uh2bghP75CslGADzD78wU3yAQLmzI0f7WJYIhRB1Cov
-         lJwmtLb1cr1n+RromsFqJbWN3Dp1h882SvrE8loZe7V+0Da/gaQ0zm4Gq7ehBcz4D9PZ
-         avZN+4sJ6gJs5O9ZR//mecaplfLIwpv78rpjJWTz8zmkZNm+Q/7J99VPODUJ8lg34dxU
-         CmwQ==
-X-Gm-Message-State: AJIora8oto9rDhviyPhXqU12nC/ToC8Pzee6hsbvAbkcaKHfVQs6cqZA
-        78Rafn44RsLz0h7V/Mt0FOflbQ==
-X-Google-Smtp-Source: AGRyM1tm3jF1Mm9yTBvcrOrrcNwguVUNZ62czBNqaQaZTtes5qap/g64RlerawH0KAvGyiXDXVAxDQ==
-X-Received: by 2002:a1c:720f:0:b0:3a0:2ac9:5231 with SMTP id n15-20020a1c720f000000b003a02ac95231mr41272448wmc.39.1657098296950;
-        Wed, 06 Jul 2022 02:04:56 -0700 (PDT)
+        bh=Y1ZryWow92c9hwwvz5Hh3ukn+dkdomJWMwO/HyG9hMQ=;
+        b=ihIPVzkVKyFeLTEzxgtgjbbmuYdIPHcvIooSJY7hZH6irChn8myCsbSSIFm4LpnTDx
+         fSlDxOpX//YiNagAokFhmZPr28R8S5LQoGjnfUJPy01+rMp22J6Xm20jRHjCBEGDzSY5
+         ser6kIzENhdZtpgirv717jXxXpkW4flgY29TxD6T88YJwT6RAMk4BQqfux4+stI45fyP
+         5o/NW8pw85Lmw4AjeL6U5Z3YMkxaUA9z/kx5ZW1uEo6ZSLSBqGRnzpgv5XaxZcxezhAl
+         g+7jA0vWkR1Vt1o2Ja22JONH4aKHr9m57mrgVkK0RSU+MFUlG5hn58jesMdfsJPJ/eMN
+         V9pQ==
+X-Gm-Message-State: AJIora9Suns8ekjZycTyevS0eFs59PJdwcuMI+NvPhmejh1AMbSVDCPF
+        M81fhX71LJmxAPa8/DcaoUJ7Yw==
+X-Google-Smtp-Source: AGRyM1uabznHJAkndj0/PP8wr1qRzCNfHAe31LWA6AzcW1fqDJpCvWnIpQT9vAyuXkgDBlb3NHxJMw==
+X-Received: by 2002:a5d:59a9:0:b0:21d:7ee2:8f90 with SMTP id p9-20020a5d59a9000000b0021d7ee28f90mr1317827wrr.598.1657098297942;
+        Wed, 06 Jul 2022 02:04:57 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
-        by smtp.googlemail.com with ESMTPSA id v11-20020adfe28b000000b0021d6ef34b2asm5230223wri.51.2022.07.06.02.04.56
+        by smtp.googlemail.com with ESMTPSA id v11-20020adfe28b000000b0021d6ef34b2asm5230223wri.51.2022.07.06.02.04.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 02:04:56 -0700 (PDT)
+        Wed, 06 Jul 2022 02:04:57 -0700 (PDT)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     heiko@sntech.de, herbert@gondor.apana.org.au,
         krzysztof.kozlowski+dt@linaro.org, mturquette@baylibre.com,
@@ -56,10 +56,11 @@ Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         john@metanate.com, didi.debian@cknow.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v8 23/33] crypto: rockchip: use the rk_crypto_info given as parameter
-Date:   Wed,  6 Jul 2022 09:04:02 +0000
-Message-Id: <20220706090412.806101-24-clabbe@baylibre.com>
+        Corentin Labbe <clabbe@baylibre.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH v8 24/33] dt-bindings: crypto: convert rockchip-crypto to YAML
+Date:   Wed,  6 Jul 2022 09:04:03 +0000
+Message-Id: <20220706090412.806101-25-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220706090412.806101-1-clabbe@baylibre.com>
 References: <20220706090412.806101-1-clabbe@baylibre.com>
@@ -69,36 +70,122 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of using the crypto_info from TFM ctx, use the one given as parameter.
+Convert rockchip-crypto to YAML.
 
 Reviewed-by: John Keeping <john@metanate.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/rockchip/rk3288_crypto_skcipher.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../crypto/rockchip,rk3288-crypto.yaml        | 64 +++++++++++++++++++
+ .../bindings/crypto/rockchip-crypto.txt       | 28 --------
+ 2 files changed, 64 insertions(+), 28 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+ delete mode 100644 Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-index 6a1bea98fded..cf0dfb6029d8 100644
---- a/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-@@ -254,7 +254,7 @@ static void rk_cipher_hw_init(struct rk_crypto_info *dev, struct skcipher_reques
- 			     RK_CRYPTO_TDES_BYTESWAP_KEY |
- 			     RK_CRYPTO_TDES_BYTESWAP_IV;
- 		CRYPTO_WRITE(dev, RK_CRYPTO_TDES_CTRL, rctx->mode);
--		memcpy_toio(ctx->dev->reg + RK_CRYPTO_TDES_KEY1_0, ctx->key, ctx->keylen);
-+		memcpy_toio(dev->reg + RK_CRYPTO_TDES_KEY1_0, ctx->key, ctx->keylen);
- 		conf_reg = RK_CRYPTO_DESSEL;
- 	} else {
- 		rctx->mode |= RK_CRYPTO_AES_FIFO_MODE |
-@@ -266,7 +266,7 @@ static void rk_cipher_hw_init(struct rk_crypto_info *dev, struct skcipher_reques
- 		else if (ctx->keylen == AES_KEYSIZE_256)
- 			rctx->mode |= RK_CRYPTO_AES_256BIT_key;
- 		CRYPTO_WRITE(dev, RK_CRYPTO_AES_CTRL, rctx->mode);
--		memcpy_toio(ctx->dev->reg + RK_CRYPTO_AES_KEY_0, ctx->key, ctx->keylen);
-+		memcpy_toio(dev->reg + RK_CRYPTO_AES_KEY_0, ctx->key, ctx->keylen);
- 	}
- 	conf_reg |= RK_CRYPTO_BYTESWAP_BTFIFO |
- 		    RK_CRYPTO_BYTESWAP_BRFIFO;
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+new file mode 100644
+index 000000000000..8a219d439d02
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
+@@ -0,0 +1,64 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/rockchip,rk3288-crypto.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Rockchip Electronics Security Accelerator
++
++maintainers:
++  - Heiko Stuebner <heiko@sntech.de>
++
++properties:
++  compatible:
++    enum:
++      - rockchip,rk3288-crypto
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    maxItems: 4
++
++  clock-names:
++    items:
++      - const: aclk
++      - const: hclk
++      - const: sclk
++      - const: apb_pclk
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    items:
++      - const: crypto-rst
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++  - resets
++  - reset-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/clock/rk3288-cru.h>
++    crypto@ff8a0000 {
++      compatible = "rockchip,rk3288-crypto";
++      reg = <0xff8a0000 0x4000>;
++      interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
++      clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
++               <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
++      clock-names = "aclk", "hclk", "sclk", "apb_pclk";
++      resets = <&cru SRST_CRYPTO>;
++      reset-names = "crypto-rst";
++    };
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt b/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
+deleted file mode 100644
+index 5e2ba385b8c9..000000000000
+--- a/Documentation/devicetree/bindings/crypto/rockchip-crypto.txt
++++ /dev/null
+@@ -1,28 +0,0 @@
+-Rockchip Electronics And Security Accelerator
+-
+-Required properties:
+-- compatible: Should be "rockchip,rk3288-crypto"
+-- reg: Base physical address of the engine and length of memory mapped
+-       region
+-- interrupts: Interrupt number
+-- clocks: Reference to the clocks about crypto
+-- clock-names: "aclk" used to clock data
+-	       "hclk" used to clock data
+-	       "sclk" used to clock crypto accelerator
+-	       "apb_pclk" used to clock dma
+-- resets: Must contain an entry for each entry in reset-names.
+-	  See ../reset/reset.txt for details.
+-- reset-names: Must include the name "crypto-rst".
+-
+-Examples:
+-
+-	crypto: cypto-controller@ff8a0000 {
+-		compatible = "rockchip,rk3288-crypto";
+-		reg = <0xff8a0000 0x4000>;
+-		interrupts = <GIC_SPI 48 IRQ_TYPE_LEVEL_HIGH>;
+-		clocks = <&cru ACLK_CRYPTO>, <&cru HCLK_CRYPTO>,
+-			 <&cru SCLK_CRYPTO>, <&cru ACLK_DMAC1>;
+-		clock-names = "aclk", "hclk", "sclk", "apb_pclk";
+-		resets = <&cru SRST_CRYPTO>;
+-		reset-names = "crypto-rst";
+-	};
 -- 
 2.35.1
 
