@@ -2,107 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B28FBCCA482
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 09:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF54CCA473
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 09:15:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233100AbiGFJOG (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jul 2022 05:14:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54952 "EHLO
+        id S232821AbiGFJPO (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Jul 2022 05:15:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232759AbiGFJNs (ORCPT
+        with ESMTP id S232924AbiGFJPI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jul 2022 05:13:48 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3931A3B1;
-        Wed,  6 Jul 2022 02:13:20 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id k30so10305959edk.8;
-        Wed, 06 Jul 2022 02:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=WKlacHhWVR2IblvCAgYMcCw7cvtmo7gBzlhxFpijOWM=;
-        b=UyINPEp8aUU7+iO4UvYReAysG8acJi4s0lW7fYS990hIHuI2KgReqshlPjlC0FcdQX
-         RWLEJ1iagzj5JHTLAwg1Tfl34CjKErUg06qCwRi5FpbuqXpIfRK0B8kuUc2l5x+40o+8
-         2YldATzAdsq2GhIZIL2D0cZi8oKOkVG5Y5xLvvP4kajNiX5yCXAJSyEYBx1RvA9W9SdO
-         piij5Lfa0VXVwqnHofYdHxRPOmYTBO/NXTATLm6C9JRKYr2iRvgzlsZTZRGqO8gtc9pI
-         zkPBxco6Fa5B8qkZy3WblPhpXY+1PsQ3ol/zLxC+L8wAov5SdI1JA4byrn/VHyXJavbs
-         ZPkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=WKlacHhWVR2IblvCAgYMcCw7cvtmo7gBzlhxFpijOWM=;
-        b=QxR5OpPe3NgjVZHkxNID4w7Mgvcw6XaQKzgi6rmn5TdcUkdgaBseRGdfsFVHDfK+LW
-         qhe6gUqffxKYBwr8jvHWxccaa/ThR1eRottwfKm2NQmkTLT10ajPqMSVzGrGZZaNbfSG
-         ornZME+JmgmlRk5r1vYTpZ8jQF3eEmPw3seTG0dsDKCTXCpG90vpF2NV/bTtBNQ0jo/r
-         Cb/OfvKw5bcMuJ+BRqb9+3CIzWMmEcQ/1X77PlHpLxmiK7TnDOOxNF2f5hWrdOj8ijIm
-         b0bKL/Ab/riiu2JY5h2t0CwqmoaY6Z57nESze7yZBTjtdV2/PF7odfLK7dF3yv5IRI8Q
-         mqsQ==
-X-Gm-Message-State: AJIora808hsnV+UdsynlkTYT6KRbYaZklCtQ/r1z67l8sQQwRm1XoMiS
-        PqE6mIIEjoGD9C62az3dzFg=
-X-Google-Smtp-Source: AGRyM1tgzHocOxIjG9HexS+g9z9ap2nsem/HblqVyMjIbl5ZbLhG8nAvflW5PCvUObUWjIPHfLadCA==
-X-Received: by 2002:a05:6402:350a:b0:435:df44:30aa with SMTP id b10-20020a056402350a00b00435df4430aamr51209856edd.403.1657098799156;
-        Wed, 06 Jul 2022 02:13:19 -0700 (PDT)
-Received: from skbuf ([188.26.185.61])
-        by smtp.gmail.com with ESMTPSA id er13-20020a056402448d00b0043a5bcf80a2sm6350790edb.60.2022.07.06.02.13.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 02:13:18 -0700 (PDT)
-Date:   Wed, 6 Jul 2022 12:13:15 +0300
-From:   Vladimir Oltean <olteanv@gmail.com>
-To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc:     Wolfram Sang <wsa@kernel.org>,
-        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
-        linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-integrity@vger.kernel.org, linux-clk@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, chrome-platform@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
-        patches@opensource.cirrus.com, alsa-devel@alsa-project.org,
-        linux-omap@vger.kernel.org, linux-mtd@lists.infradead.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        acpi4asus-user@lists.sourceforge.net, linux-pm@vger.kernel.org,
-        linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-watchdog@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 6/6] i2c: Make remove callback return void
-Message-ID: <20220706091315.p5k2jck3rmyjhvqw@skbuf>
-References: <20220628140313.74984-1-u.kleine-koenig@pengutronix.de>
- <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
+        Wed, 6 Jul 2022 05:15:08 -0400
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659A1C23;
+        Wed,  6 Jul 2022 02:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1657098905; x=1688634905;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+VI0QHCyPONLMhvZQIjJCP6FWIqDVbefx+zx+Z98RBc=;
+  b=FqBCdX+dKwjfCTP4qWzmWXOyXVGACg4qF/Ljw8Bsah3nJYe1X/NVDB/c
+   UpRnDBSXNg+OJmn0UY1z7fyK+zhcHh6EggVYruSKhPXVLZ9YU/pMNpHPg
+   YeUaeHoLdJc1LcyG652+uaAyeiQ2eT1Lt7oj8bGSWNG05UpOtSCGLTymM
+   NTZdLbMdUeApSDbPzn93fwig6pVTBnKAfJ4bbHbqJbGdgT8Xt4DE76FDh
+   4iSRA9KZw4/ZM0BvD0XssGz1DSPK4+0x5KYPlHN7HBAD4/y+iHmYsTuhH
+   udojrgBt4/Hnr2IS73rudankdwaWIumkcq46tBHHtyX3vni0KGHxZWMzI
+   A==;
+X-IronPort-AV: E=Sophos;i="5.92,249,1650956400"; 
+   d="scan'208";a="170971252"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 06 Jul 2022 02:15:04 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Wed, 6 Jul 2022 02:15:04 -0700
+Received: from localhost.localdomain (10.10.115.15) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2375.17 via Frontend Transport; Wed, 6 Jul 2022 02:15:01 -0700
+From:   Claudiu Beznea <claudiu.beznea@microchip.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Claudiu Beznea <claudiu.beznea@microchip.com>
+Subject: [PATCH] crypto: atmel-tdes: initialize tdes_dd while declaring
+Date:   Wed, 6 Jul 2022 12:17:27 +0300
+Message-ID: <20220706091727.831036-1-claudiu.beznea@microchip.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220628140313.74984-7-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 04:03:12PM +0200, Uwe Kleine-König wrote:
-> From: Uwe Kleine-König <uwe@kleine-koenig.org>
-> 
-> The value returned by an i2c driver's remove function is mostly ignored.
-> (Only an error message is printed if the value is non-zero that the
-> error is ignored.)
-> 
-> So change the prototype of the remove function to return no value. This
-> way driver authors are not tempted to assume that passing an error to
-> the upper layer is a good idea. All drivers are adapted accordingly.
-> There is no intended change of behaviour, all callbacks were prepared to
-> return 0 before.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
+Initialize sha_dd with platform_get_drvdata() when declaring it.
 
-Assuming you remove the spurious kasan change:
+Signed-off-by: Claudiu Beznea <claudiu.beznea@microchip.com>
+---
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Hi,
+
+This patch is based on patch at [1].
+
+[1] https://patchwork.kernel.org/project/linux-crypto/patch/20220705205144.131702-3-u.kleine-koenig@pengutronix.de
+
+Thank you,
+Claudiu Beznea
+
+ drivers/crypto/atmel-tdes.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index a5e78aa08bf0..8b7bc1076e0d 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -1263,9 +1263,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 
+ static int atmel_tdes_remove(struct platform_device *pdev)
+ {
+-	struct atmel_tdes_dev *tdes_dd;
+-
+-	tdes_dd = platform_get_drvdata(pdev);
++	struct atmel_tdes_dev *tdes_dd = platform_get_drvdata(pdev);
+ 
+ 	spin_lock(&atmel_tdes.lock);
+ 	list_del(&tdes_dd->list);
+-- 
+2.33.0
+
