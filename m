@@ -2,271 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778CCC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 03:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B85C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 06:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbiGFDpd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Jul 2022 23:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48104 "EHLO
+        id S229752AbiGFGeq (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Jul 2022 02:34:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231239AbiGFDpX (ORCPT
+        with ESMTP id S229732AbiGFGeq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Jul 2022 23:45:23 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A95E1E3ED
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Jul 2022 20:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1657079118; x=1688615118;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ge/ABfXnrM5/z7n6G4b0DuoSM+BhI8eaEOtVOhmsYv4=;
-  b=T0d7iIIG6qhLcINNIF/GsPxS9JRW/1JCT4XgvVGHlorlWxe+Tm0OBbW2
-   DQ9v60hfoETWkBA8D+s1kUib7u4akKxi32NGVd42SZZ4HXaUtImjgH1fl
-   8uFQD1Tmsksacaq/veTITfQhqQvLUdjEdli62PKDIKvcSyk3KHg3nhvel
-   EwbXYBfAJm/zmYjSBPyIuXHZ0rZUNsjBQBPn1q1QnqnDA7j0zmiBDbsbB
-   Eei9hDioyE1fjlS+zsdioIhth8iNpeWh8JWJoRLKua2c33U6USx0l/5G9
-   Fw0CrIcU0a1XV5yWxapiq5CmqcnKq8gSfDL0Q+nYUUXEgeKjp1XZBILeA
-   g==;
-X-IronPort-AV: E=Sophos;i="5.92,248,1650902400"; 
-   d="scan'208";a="204942396"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jul 2022 11:45:16 +0800
-IronPort-SDR: riKswzJpfUGOfdBfmRavYexUg3Mhf0YQmhnWgp3XBR079USrCoHHbSCQM7hwcGUesgOShrzfH7
- rApaOzBqoHhq0dY6ldhiX4gpHydxwzlm3wSWJXp6N6UcEH5aRhUPGN63JoWh0CF4/caq493WFh
- izBZn6wGlLURstl8SNiOTP4ONO4zlLJpnjwTVtcBaSJEKtQwUCcaOTBz1vF8/8KM2b+VxRSZP9
- eqcAUn4KE/hFa5JPVJlU7w3DRx0St8Ix7nc2i/LHJkh6cajnpeUjd7BaWjqx3ePOjNzWt2Dz5m
- CEl3frZ9GpUWMf9tr9RMN3n8
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jul 2022 20:02:35 -0700
-IronPort-SDR: 3sU6XxeUSkksr6mE/7SxupvwGNHA3eVsqxvTxeBE5bSGYUCzw7IjvGKEOy2dnc44O0pABeWWBX
- c9DcocIQYRsr1xL59hOnL1lP2AoLa2sba5BVOWn6MK4opeV5dsswi4iQ0dxS2/p/haZec3wBP1
- Rwe4sEnt6BIcRaQi/O5jGQWApg3Cic6F7A9lwEt4VuLwJpdH/1QBPYwCI9zH7E+qYM0QJaCv4z
- iOsEr0YRGip6TkeITRmy30wBU2DklIo7O25Iz+EkUZMwH3pduM/N+iMfKbOvTa7YYHx1LASP76
- Ej0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Jul 2022 20:45:18 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Ld5645CRhz1Rwnx
-        for <linux-crypto@vger.kernel.org>; Tue,  5 Jul 2022 20:45:16 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1657079114; x=1659671115; bh=ge/ABfXnrM5/z7n6G4b0DuoSM+BhI8eaEOt
-        VOhmsYv4=; b=jilIhpg0fWhh12OIR2bEjr4cBg6kLi+38MLQY1lQ8MEiOv/87RL
-        X0c85xoFkqsN9EBvC6IZh8P/E6XyqJYHmUVlctF+wAhuxNboIzRwijMSsMxBhQBW
-        ynydx1XvNNHKqI2Ims1lxFw8myKqhQPUW/yedWxeHYt4ZkyU/TyZ2vwoUrWhhqbt
-        ynrLsnLJrMB3U3VPXnHRLjRHVItnTD8n+/HKC85WIsj6xgjqYzE/FmSgUyKh4jUT
-        Z1NeA7wWTjdU6a/zKTKKaPqCOjbHFehIn3EqOKuY202VlLXn5duHeU3QegK9c6k9
-        p0cHYc2rvinKaRGyGYUd/3cfrj5qhitbVJw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id pAvPlH2UHRhw for <linux-crypto@vger.kernel.org>;
-        Tue,  5 Jul 2022 20:45:14 -0700 (PDT)
-Received: from [10.225.163.110] (unknown [10.225.163.110])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Ld55s01rTz1RtVk;
-        Tue,  5 Jul 2022 20:45:04 -0700 (PDT)
-Message-ID: <50b65a2b-49fb-41d9-d68c-af1d908ba5db@opensource.wdc.com>
-Date:   Wed, 6 Jul 2022 12:45:03 +0900
+        Wed, 6 Jul 2022 02:34:46 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1667F658C
+        for <linux-crypto@vger.kernel.org>; Tue,  5 Jul 2022 23:34:45 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id j23so487103lji.13
+        for <linux-crypto@vger.kernel.org>; Tue, 05 Jul 2022 23:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=i1BMPZ/ewrNPyYNCuyDmgoFFvJ41CYWagfxQdw0+v9Y=;
+        b=Lo3trhbMqgjZoPdYYcnbvZhtIDuRabm8nZMnEBZyQLC3yvna+fxEmTnLai4ERTFrjg
+         Iku7oKbwE8nsfygrKY5QkTPgJwjCFB+yo8fBRSE/GYqfQHK2X0GaZnUwN1bgPkivjtvY
+         Nq7wx99tOa19wMED8G1K+jXoXERDjWhWZyQuyiIdeTkhHlQct6EYgTTR9Oz1brCFcage
+         z8GLW5ePAoeK/iD0gCYSAfwHnq9kgSi6YhPWPvJH39exY03QmzaFpimDy7A/6wkojpHD
+         a/UEo66WF8Snyuhk+m3P85WkTDNmIahYSH7DrEgoj+wDK0fGWt5HBwVyKIFGtZoSHnwf
+         /z8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=i1BMPZ/ewrNPyYNCuyDmgoFFvJ41CYWagfxQdw0+v9Y=;
+        b=Ia7rI2oa3vCuKrEZuEzLIbGGwqLXOfuFD9sqFeus8gF74wjZDjf7LYGAsU+0GWwI8g
+         ZB888aKGq6FQQKnYSkrIhj6Yn/sPLDtCwbfslapL3KLRpj9iMWXRKHya5KA0uGgj5e4N
+         C7LmVJza/8Ae4BtVqPLb7WLm4zEiWWqGmGZkjRYXikdFhdzdY6Hm6N8R+lwcXi0v7AWf
+         6I4Mr/vFe+2VIkFvdceN+erVZ5BeZ3kiIyMDB9goN0sQgyYSR0t/wt0v0/vyvcAn7gQ0
+         Xu3sQf7JVKO14/iXm1s19h4Gr4Mw2oBdEnJvT89x5b7sBftH4PFxenVpMf8M5WRjJa1U
+         8fUg==
+X-Gm-Message-State: AJIora/153g+WicFPeeMpcsapTMiuK2VQJn43wKCCtJfGxRSnzn1WVOy
+        59SZow5WQMMegZ9ptBRkW2Jjsw==
+X-Google-Smtp-Source: AGRyM1tngCb/QoxR46x5xt4ID2Ocox7HpE23Iw/rnbB/1UGPcOBz34iXoDNTfziafJKa4Utr8OAANQ==
+X-Received: by 2002:a2e:9d84:0:b0:25b:c7f1:c978 with SMTP id c4-20020a2e9d84000000b0025bc7f1c978mr22662876ljj.126.1657089283491;
+        Tue, 05 Jul 2022 23:34:43 -0700 (PDT)
+Received: from [192.168.1.52] ([84.20.121.239])
+        by smtp.gmail.com with ESMTPSA id c4-20020a196544000000b0047f6fe39bb9sm6113165lfj.27.2022.07.05.23.34.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Jul 2022 23:34:43 -0700 (PDT)
+Message-ID: <8c221a4b-8a66-f142-d57c-2d6b9ed047b0@linaro.org>
+Date:   Wed, 6 Jul 2022 08:34:42 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 5/9] arm: bcmbca: Replace ARCH_BCM_63XX with ARCH_BCMBCA
+Subject: Re: [PATCH 7/7] crypto: s5p-sss: Drop if with an always false
+ condition
 Content-Language: en-US
-To:     William Zhang <william.zhang@broadcom.com>,
-        Linux ARM List <linux-arm-kernel@lists.infradead.org>
-Cc:     joel.peshkin@broadcom.com, kursad.oney@broadcom.com,
-        f.fainelli@gmail.com, anand.gore@broadcom.com,
-        Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>,
-        philippe.reynes@softathome.com, dan.beygelman@broadcom.com,
-        Al Cooper <alcooperx@gmail.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Cai Huoqing <cai.huoqing@linux.dev>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Eugen Hristev <eugen.hristev@microchip.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Vladimir Zapolskiy <vz@mleia.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Jan Dabros <jsd@semihalf.com>,
-        Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-        Jie Deng <jie.deng@intel.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Kavyasree Kotagiri <kavyasree.kotagiri@microchip.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Mark Brown <broonie@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-        Rob Herring <robh@kernel.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Sam Protsenko <semen.protsenko@linaro.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Sven Peter <sven@svenpeter.dev>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        Vinod Koul <vkoul@kernel.org>, Wolfram Sang <wsa@kernel.org>,
-        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org
-References: <20220705172613.21152-1-william.zhang@broadcom.com>
- <20220705172613.21152-6-william.zhang@broadcom.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220705172613.21152-6-william.zhang@broadcom.com>
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        kernel@pengutronix.de
+References: <20220705205144.131702-1-u.kleine-koenig@pengutronix.de>
+ <20220705205144.131702-7-u.kleine-koenig@pengutronix.de>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20220705205144.131702-7-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/6/22 02:26, William Zhang wrote:
-> Update ARCH_BCM_63XX in all sources to use ARCHB_BCMBCA instead.
+On 05/07/2022 22:51, Uwe Kleine-König wrote:
+> The remove callback is only called after probe completed successfully.
+> In this case platform_set_drvdata() was called with a non-NULL argument
+> and so pdata is never NULL.
 > 
-> Signed-off-by: William Zhang <william.zhang@broadcom.com>
-
-For the ata Kconfig change:
-
-Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-
-
+> This is a preparation for making platform remove callbacks return void.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 > ---
-> 
->  arch/arm/Kconfig.debug         | 2 +-
->  drivers/ata/Kconfig            | 2 +-
->  drivers/char/hw_random/Kconfig | 2 +-
->  drivers/clk/bcm/Kconfig        | 4 ++--
->  drivers/i2c/busses/Kconfig     | 2 +-
->  drivers/phy/broadcom/Kconfig   | 2 +-
->  drivers/spi/Kconfig            | 2 +-
->  drivers/tty/serial/Kconfig     | 4 ++--
->  8 files changed, 10 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/arm/Kconfig.debug b/arch/arm/Kconfig.debug
-> index 9b0aa4822d69..792796a348c3 100644
-> --- a/arch/arm/Kconfig.debug
-> +++ b/arch/arm/Kconfig.debug
-> @@ -271,7 +271,7 @@ choice
->  
->  	config DEBUG_BCM63XX_UART
->  		bool "Kernel low-level debugging on BCM63XX UART"
-> -		depends on ARCH_BCM_63XX
-> +		depends on ARCH_BCMBCA
->  
->  	config DEBUG_BERLIN_UART
->  		bool "Marvell Berlin SoC Debug UART"
-> diff --git a/drivers/ata/Kconfig b/drivers/ata/Kconfig
-> index bb45a9c00514..1c9f4fb2595d 100644
-> --- a/drivers/ata/Kconfig
-> +++ b/drivers/ata/Kconfig
-> @@ -148,7 +148,7 @@ config SATA_AHCI_PLATFORM
->  config AHCI_BRCM
->  	tristate "Broadcom AHCI SATA support"
->  	depends on ARCH_BRCMSTB || BMIPS_GENERIC || ARCH_BCM_NSP || \
-> -		   ARCH_BCM_63XX || COMPILE_TEST
-> +		   ARCH_BCMBCA || COMPILE_TEST
->  	select SATA_HOST
->  	help
->  	  This option enables support for the AHCI SATA3 controller found on
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index b3f2d55dc551..3da8e85f8aae 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -87,7 +87,7 @@ config HW_RANDOM_BA431
->  config HW_RANDOM_BCM2835
->  	tristate "Broadcom BCM2835/BCM63xx Random Number Generator support"
->  	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-> -		   ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-> +		   ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
->  	default HW_RANDOM
->  	help
->  	  This driver provides kernel-side support for the Random Number
-> diff --git a/drivers/clk/bcm/Kconfig b/drivers/clk/bcm/Kconfig
-> index ec738f74a026..77266afb1c79 100644
-> --- a/drivers/clk/bcm/Kconfig
-> +++ b/drivers/clk/bcm/Kconfig
-> @@ -22,9 +22,9 @@ config CLK_BCM2835
->  
->  config CLK_BCM_63XX
->  	bool "Broadcom BCM63xx clock support"
-> -	depends on ARCH_BCM_63XX || COMPILE_TEST
-> +	depends on ARCH_BCMBCA || COMPILE_TEST
->  	select COMMON_CLK_IPROC
-> -	default ARCH_BCM_63XX
-> +	default ARCH_BCMBCA
->  	help
->  	  Enable common clock framework support for Broadcom BCM63xx DSL SoCs
->  	  based on the ARM architecture
-> diff --git a/drivers/i2c/busses/Kconfig b/drivers/i2c/busses/Kconfig
-> index b1d7069dd377..acf2a393bd56 100644
-> --- a/drivers/i2c/busses/Kconfig
-> +++ b/drivers/i2c/busses/Kconfig
-> @@ -486,7 +486,7 @@ config I2C_BCM_KONA
->  
->  config I2C_BRCMSTB
->  	tristate "BRCM Settop/DSL I2C controller"
-> -	depends on ARCH_BCM2835 || ARCH_BCM4908 || ARCH_BCM_63XX || \
-> +	depends on ARCH_BCM2835 || ARCH_BCM4908 || ARCH_BCMBCA || \
->  		   ARCH_BRCMSTB || BMIPS_GENERIC || COMPILE_TEST
->  	default y
->  	help
-> diff --git a/drivers/phy/broadcom/Kconfig b/drivers/phy/broadcom/Kconfig
-> index 849c4204f550..93a6a8ee4716 100644
-> --- a/drivers/phy/broadcom/Kconfig
-> +++ b/drivers/phy/broadcom/Kconfig
-> @@ -83,7 +83,7 @@ config PHY_NS2_USB_DRD
->  config PHY_BRCM_SATA
->  	tristate "Broadcom SATA PHY driver"
->  	depends on ARCH_BRCMSTB || ARCH_BCM_IPROC || BMIPS_GENERIC || \
-> -		   ARCH_BCM_63XX || COMPILE_TEST
-> +		   ARCH_BCMBCA || COMPILE_TEST
->  	depends on OF
->  	select GENERIC_PHY
->  	default ARCH_BCM_IPROC
-> diff --git a/drivers/spi/Kconfig b/drivers/spi/Kconfig
-> index 2d034459e79f..8e550269d488 100644
-> --- a/drivers/spi/Kconfig
-> +++ b/drivers/spi/Kconfig
-> @@ -183,7 +183,7 @@ config SPI_BCM63XX
->  
->  config SPI_BCM63XX_HSSPI
->  	tristate "Broadcom BCM63XX HS SPI controller driver"
-> -	depends on BCM63XX || BMIPS_GENERIC || ARCH_BCM_63XX || COMPILE_TEST
-> +	depends on BCM63XX || BMIPS_GENERIC || ARCH_BCMBCA || COMPILE_TEST
->  	help
->  	  This enables support for the High Speed SPI controller present on
->  	  newer Broadcom BCM63XX SoCs.
-> diff --git a/drivers/tty/serial/Kconfig b/drivers/tty/serial/Kconfig
-> index 8a3ee1525d80..e3279544b03c 100644
-> --- a/drivers/tty/serial/Kconfig
-> +++ b/drivers/tty/serial/Kconfig
-> @@ -1100,8 +1100,8 @@ config SERIAL_TIMBERDALE
->  config SERIAL_BCM63XX
->  	tristate "Broadcom BCM63xx/BCM33xx UART support"
->  	select SERIAL_CORE
-> -	depends on ARCH_BCM4908 || ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-> -	default ARCH_BCM4908 || ARCH_BCM_63XX || BCM63XX || BMIPS_GENERIC
-> +	depends on ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC || COMPILE_TEST
-> +	default ARCH_BCM4908 || ARCH_BCMBCA || BCM63XX || BMIPS_GENERIC
->  	help
->  	  This enables the driver for the onchip UART core found on
->  	  the following chipsets:
 
 
--- 
-Damien Le Moal
-Western Digital Research
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+
+Best regards,
+Krzysztof
