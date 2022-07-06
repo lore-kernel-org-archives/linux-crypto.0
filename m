@@ -2,139 +2,104 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DAC7C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 19:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0511C433EF
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Jul 2022 22:34:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233187AbiGFTL4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Jul 2022 15:11:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45986 "EHLO
+        id S233898AbiGFWe5 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 6 Jul 2022 18:34:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232042AbiGFTLx (ORCPT
+        with ESMTP id S231312AbiGFWe5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Jul 2022 15:11:53 -0400
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0706826105;
-        Wed,  6 Jul 2022 12:11:51 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 266JBjuR030432;
-        Wed, 6 Jul 2022 14:11:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1657134705;
-        bh=O3lkEmVthYwZRzlXtb2PMAVKCngKejtmGHIt7SVtryU=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=s6vTQSfhX+IL2So9AQPZPbBg8nTNDAqHKU26xBtSIl90xoFcLwPyzlMlLMFj4db/g
-         /jIeMfklIS8jH0hd+P6cRCGtD62vsXXGvdMwO1KJrYFvJ0i9LkQu4EJOPP8pwkIYJY
-         EU8wWS6Weudv5O98gUiNEz9Vq//WeQOjqfyiC4OY=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 266JBjfn100939
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 6 Jul 2022 14:11:45 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Wed, 6
- Jul 2022 14:11:45 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
- Frontend Transport; Wed, 6 Jul 2022 14:11:45 -0500
-Received: from ula0226330.dal.design.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 266JBiXU031227;
-        Wed, 6 Jul 2022 14:11:45 -0500
-From:   Andrew Davis <afd@ti.com>
-To:     Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC:     Andrew Davis <afd@ti.com>
-Subject: [PATCH v2 2/2] crypto: sa2ul - Check engine status before enabling
-Date:   Wed, 6 Jul 2022 14:11:44 -0500
-Message-ID: <20220706191144.26437-2-afd@ti.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220706191144.26437-1-afd@ti.com>
-References: <20220706191144.26437-1-afd@ti.com>
+        Wed, 6 Jul 2022 18:34:57 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFB4F17071;
+        Wed,  6 Jul 2022 15:34:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 78C1DB81F19;
+        Wed,  6 Jul 2022 22:34:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 205DAC3411C;
+        Wed,  6 Jul 2022 22:34:52 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="J5jWKyqR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1657146890;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IuVxuJqdylU3gWij8O/TNNT+VdlEevMmcCcayulVOng=;
+        b=J5jWKyqRuIR+5+6lP6fAsgea065aj+YhHC34hgIt8CeB5GwNxbGD/EfcqhdBcft4xt+fQc
+        5XMtx1NcH/A1u2zq98w5I2HyV9AzShngM4nlbZ1GH7wI0QoL+CRt2TofY9AFYJJyWra7yY
+        AkLi4xk7cVLnZA/bFv5lO9KvqgP97tM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 25a43ca3 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 6 Jul 2022 22:34:49 +0000 (UTC)
+Date:   Thu, 7 Jul 2022 00:34:44 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     Harald Freudenberger <freude@linux.ibm.com>,
+        Holger Dengler <dengler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Juergen Christ <jchrist@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] s390/arch_random: Buffer true random data
+Message-ID: <YsYOBE3ujfvPzMwo@zx2c4.com>
+References: <20220705112712.4433-1-dengler@linux.ibm.com>
+ <20220705112712.4433-2-dengler@linux.ibm.com>
+ <YsQ6OOrOWPhdynoM@zx2c4.com>
+ <9a0561c0-68f7-b630-4440-3ca32bf28dc2@linux.ibm.com>
+ <YsRUowTs9n98p9EL@zx2c4.com>
+ <aafbb400-d0cb-99de-8b10-3c39c7b9bae5@linux.ibm.com>
+ <7e65130c6e66ce7a9f9eb469eb7e64e0@linux.ibm.com>
+ <YsW3qWkIwXboHgim@zx2c4.com>
+ <386ec16c-2561-2fcf-2eea-deaab45f349c@linux.ibm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+In-Reply-To: <386ec16c-2561-2fcf-2eea-deaab45f349c@linux.ibm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is a engine status register that can be used to check if the
-different HW crypto engines are enabled. Check that first and then only
-try to enable the engines if they are not already on.
+Hi Christian,
 
-This has a couple benefits. First we don't need to use match_data for
-this. Second, this driver can now work on HS devices where the engine
-control registers are read-only and writing causes a firewall exception.
+On Wed, Jul 06, 2022 at 08:29:49PM +0200, Christian Borntraeger wrote:
+> >> However, with so few invocations it should not make any harm when there
+> >> is a
+> >> even very expensive trng() invocation in interrupt context.
+> >>
+> >> But I think we should check, if this is really something to backport to
+> >> the older
+> >> kernels where arch_get_random_seed_long() is called really frequency.
+> > 
+> > I backported the current random.c design to old kernels, so the
+> > situation there should be the same as in 5.19-rc5.
+> > 
+> > So if you feel such rare usage is find even in_hardirq(), then I suppose
+> > there's nothing more to do here?
+> 
+> I think up to 190µs in interrupt can result in unwanted latencies. Yes it does not
+> happen that often and it is smaller than most timeslices of hypervisors.
+> So I would likely turn that question around
+> what happens if we return false if in_hardirq is true? Any noticeable
+> delays in code that uses random numbers?
 
-Signed-off-by: Andrew Davis <afd@ti.com>
----
- drivers/crypto/sa2ul.c | 15 +++++++--------
- drivers/crypto/sa2ul.h |  1 +
- 2 files changed, 8 insertions(+), 8 deletions(-)
+I think I already answered this here with mention of the hwrng driver:
+https://lore.kernel.org/all/YsSAn2qXqlFkS5sH@zx2c4.com/
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 1d732113b81ec..f4bc06c24ad8f 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -86,7 +86,6 @@ struct sa_match_data {
- 	u8 priv;
- 	u8 priv_id;
- 	u32 supported_algos;
--	bool skip_engine_control;
- };
- 
- static struct device *sa_k3_dev;
-@@ -2380,7 +2379,6 @@ static struct sa_match_data am64_match_data = {
- 			   BIT(SA_ALG_SHA256) |
- 			   BIT(SA_ALG_SHA512) |
- 			   BIT(SA_ALG_AUTHENC_SHA256_AES),
--	.skip_engine_control = true,
- };
- 
- static const struct of_device_id of_match[] = {
-@@ -2398,6 +2396,7 @@ static int sa_ul_probe(struct platform_device *pdev)
- 	struct device_node *node = dev->of_node;
- 	static void __iomem *saul_base;
- 	struct sa_crypto_data *dev_data;
-+	u32 status, val;
- 	int ret;
- 
- 	dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
-@@ -2434,13 +2433,13 @@ static int sa_ul_probe(struct platform_device *pdev)
- 
- 	spin_lock_init(&dev_data->scid_lock);
- 
--	if (!dev_data->match_data->skip_engine_control) {
--		u32 val = SA_EEC_ENCSS_EN | SA_EEC_AUTHSS_EN | SA_EEC_CTXCACH_EN |
--			  SA_EEC_CPPI_PORT_IN_EN | SA_EEC_CPPI_PORT_OUT_EN |
--			  SA_EEC_TRNG_EN;
--
-+	val = SA_EEC_ENCSS_EN | SA_EEC_AUTHSS_EN | SA_EEC_CTXCACH_EN |
-+	      SA_EEC_CPPI_PORT_IN_EN | SA_EEC_CPPI_PORT_OUT_EN |
-+	      SA_EEC_TRNG_EN;
-+	status = readl_relaxed(saul_base + SA_ENGINE_STATUS);
-+	/* Only enable engines if all are not already enabled */
-+	if (val & ~status)
- 		writel_relaxed(val, saul_base + SA_ENGINE_ENABLE_CONTROL);
--	}
- 
- 	sa_register_algos(dev_data);
- 
-diff --git a/drivers/crypto/sa2ul.h b/drivers/crypto/sa2ul.h
-index ed66d1f111db5..92bf97232a292 100644
---- a/drivers/crypto/sa2ul.h
-+++ b/drivers/crypto/sa2ul.h
-@@ -16,6 +16,7 @@
- #include <crypto/sha1.h>
- #include <crypto/sha2.h>
- 
-+#define SA_ENGINE_STATUS		0x0008
- #define SA_ENGINE_ENABLE_CONTROL	0x1000
- 
- struct sa_tfm_ctx;
--- 
-2.36.1
+Anyway, I would recommend keeping it available in all contexts, so that
+s390 isn't a special case to keep in mind, and because Harald said he
+couldn't measure an actual problem existing for real. Plus, it's not as
+though we're talking about RT kernels or a problem that would affect RT.
+But if you're convinced that even the extremely rare case poses a issue,
+doing the !in_hardirq() thing won't be the end of the world either and
+is partly mitigated by the hwrng driver mentioned earlier. So I think
+it's mostly up to you guys on what the tradeoffs are and what's
+realistic and such.
 
+Jason
