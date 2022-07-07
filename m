@@ -2,99 +2,122 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EA1C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jul 2022 16:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A60C43334
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jul 2022 16:26:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235802AbiGGQXk (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jul 2022 12:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34918 "EHLO
+        id S236190AbiGGQ0s (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 7 Jul 2022 12:26:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235913AbiGGQXi (ORCPT
+        with ESMTP id S235913AbiGGQ0j (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jul 2022 12:23:38 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061E229CA7;
-        Thu,  7 Jul 2022 09:23:38 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id c20so1196354qtw.8;
-        Thu, 07 Jul 2022 09:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=wsBPE796eb8NL5VRhVyD8CHurCZ3qut91uNmEDcRsO8=;
-        b=A+nLbCPOPmoKxMbA5RoBxFjo24RspE0Aavh10Ja/2hX3R7KMHP0RBEAN4xNg+YPMzH
-         jU5Vh7jWaZvqGJSSqte4/lRVFXdE0BS/2X6w4exmSWceM1d+lRiedSobtVnt2IblFWvq
-         cwCWhqHJHfVu6hngvNTOYuwoiVhKU+GGrEzRNhVB1Mr131KTWd61OOkB3AvBJLMZwG51
-         O2+rRh+nAneXZv8uoYaSHM60iFz9uS+7dRj1Qf2UNYRoyILqlc/HvEmw9QrcTyZvTFFa
-         8lMyZB5XFS0JyyGx7aYtC9AwQGrA14QzjvfV0UciN2NJZ9ScrYn5X2x/Bh2+PQ0KvjnU
-         VTuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=wsBPE796eb8NL5VRhVyD8CHurCZ3qut91uNmEDcRsO8=;
-        b=5OM/I7B5iqKq+jUwJ/nxGgnVfbDp/VLrDo5X5oYe6UF9wFeVK0pqWImfH8UkMpqYja
-         Bg72CLX4/66TfKGiPicq/1noG5c+WRPmv9bmMupvnDnYCrcc++fYjxNwKGutOpyC6hDG
-         eK+6pYz22Vu2l1MO88ny6CkzZro8oEA1vwlOlzrFdjaOHv1s75sNH74hDxqk09Gc8hfZ
-         GAHYz4hj7sNWp3BZUa+OTNy/XYx9bhQGUHo1TI9oMbbRShXVye972nZ3PP6VJXYMGHR7
-         3qBgqgw66WQbn7NexVEfJAGCUws3Cm6zZN/BZfhqohr5SC5relNzAc5nJhmefHLrhmYN
-         hhKw==
-X-Gm-Message-State: AJIora8Znn8owitahVuD17WoF4cGFH82ilZMU4nUqeO1mCsR4N+ymmz2
-        vG4xpmbbw6GvYcKUDCgLDkcgmQrysI4=
-X-Google-Smtp-Source: AGRyM1tm5paGI1p1tPe9Ec0ZIudHLQx0onWlZ8QfnEXD20KCRjNu7ImEQi9DyyLcuVEp0rTvmkr+Pg==
-X-Received: by 2002:ac8:5b0d:0:b0:31d:3b6f:969b with SMTP id m13-20020ac85b0d000000b0031d3b6f969bmr27258618qtw.84.1657211017058;
-        Thu, 07 Jul 2022 09:23:37 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id y17-20020a05620a25d100b006a6a5d1e240sm35712952qko.34.2022.07.07.09.23.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jul 2022 09:23:36 -0700 (PDT)
-Message-ID: <f14b59fb-c02f-cd59-3c92-cb4def7ad601@gmail.com>
-Date:   Thu, 7 Jul 2022 09:23:30 -0700
+        Thu, 7 Jul 2022 12:26:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A76F84D174;
+        Thu,  7 Jul 2022 09:26:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 42DB7623C3;
+        Thu,  7 Jul 2022 16:26:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FD17C3411E;
+        Thu,  7 Jul 2022 16:26:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657211195;
+        bh=PP+pZtnbEBoGFSDAfTiA1TASPGKOktDeMzuTB5Z2rCE=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=nOCCoy1LGzU9IP2Pah/a04c4P1c/hO3gLEb+bQsaETT48tR32wsNsg/0awhoSZdkE
+         g5lmimcwAhXnCU4eDIZw663mZwBzY2gt1XKd4hU/cinmFdyNvKlpsFtI/1AdO12nKz
+         GtiX1Tmb/uPP0L7I/BEGMKTHJejBkIGuV4dCGigrHwqkBlk/P5ExAtOJC2bgxsHIzt
+         J470O4XO8suFpEf/YC5cRIRUdvsHa7rhVAQBFYzkrcACVQrzp7P8nhiAn2imrQEdBg
+         eamvVxZDt/kqC7V6iUkh0xpNpkcTPMvHLnwgPYJKXsEJNVagNW2uubSpkFNjkc59aJ
+         1l5HQ5vgoH8SA==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+        Gregory Erwin <gregerwin256@gmail.com>,
+        Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+        Rui Salvaterra <rsalvaterra@gmail.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>,
+        Valentin Schneider <vschneid@redhat.com>,
+        Christian Brauner <brauner@kernel.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v8] ath9k: let sleep be interrupted when unregistering hwrng
+References: <Yrw5f8GN2fh2orid@zx2c4.com>
+        <20220629114240.946411-1-Jason@zx2c4.com>
+Date:   Thu, 07 Jul 2022 19:26:27 +0300
+In-Reply-To: <20220629114240.946411-1-Jason@zx2c4.com> (Jason A. Donenfeld's
+        message of "Wed, 29 Jun 2022 13:42:40 +0200")
+Message-ID: <87v8s8ubws.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [RESEND PATCH 3/8] hwrng: bcm2835: bcmbca: Replace ARCH_BCM_63XX
- with ARCH_BCMBCA
-Content-Language: en-US
-To:     William Zhang <william.zhang@broadcom.com>,
-        Linux ARM List <linux-arm-kernel@lists.infradead.org>,
-        Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>
-Cc:     anand.gore@broadcom.com, dan.beygelman@broadcom.com,
-        kursad.oney@broadcom.com, joel.peshkin@broadcom.com,
-        f.fainelli@gmail.com, Andre Przywara <andre.przywara@arm.com>,
-        Cai Huoqing <cai.huoqing@linux.dev>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>,
-        Sunil Goutham <sgoutham@marvell.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220707065800.261269-1-william.zhang@broadcom.com>
- <20220707065800.261269-3-william.zhang@broadcom.com>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20220707065800.261269-3-william.zhang@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/6/22 23:57, William Zhang wrote:
-> Prepare for the BCM63138 ARCH_BCM_63XX migration to ARCH_BCMBCA. Make
-> HW_RANDOM_BCM2835 depending on ARCH_BCMBCA.
-> 
-> Signed-off-by: William Zhang <william.zhang@broadcom.com>
+"Jason A. Donenfeld" <Jason@zx2c4.com> writes:
 
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+> There are two deadlock scenarios that need addressing, which cause
+> problems when the computer goes to sleep, the interface is set down, and
+> hwrng_unregister() is called. When the deadlock is hit, sleep is delayed
+> for tens of seconds, causing it to fail. These scenarios are:
+>
+> 1) The hwrng kthread can't be stopped while it's sleeping, because it
+>    uses msleep_interruptible() instead of schedule_timeout_interruptible(=
+).
+>    The fix is a simple moving to the correct function. At the same time,
+>    we should cleanup a common and useless dmesg splat in the same area.
+>
+> 2) A normal user thread can't be interrupted by hwrng_unregister() while
+>    it's sleeping, because hwrng_unregister() is called from elsewhere.
+>    The solution here is to keep track of which thread is currently
+>    reading, and asleep, and signal that thread when it's time to
+>    unregister. There's a bit of book keeping required to prevent
+>    lifetime issues on current.
+>
+> Reported-by: Gregory Erwin <gregerwin256@gmail.com>
+> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: Rui Salvaterra <rsalvaterra@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: stable@vger.kernel.org
+> Fixes: fcd09c90c3c5 ("ath9k: use hw_random API instead of directly dumpin=
+g into random.c")
+> Link: https://lore.kernel.org/all/CAO+Okf6ZJC5-nTE_EJUGQtd8JiCkiEHytGgDsF=
+GTEjs0c00giw@mail.gmail.com/
+> Link: https://lore.kernel.org/lkml/CAO+Okf5k+C+SE6pMVfPf-d8MfVPVq4PO7EY8H=
+ys_DVXtent3HA@mail.gmail.com/
+> Link: https://bugs.archlinux.org/task/75138
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v7->v8:
+> - Add a missing export_symbol.
+>
+>  drivers/char/hw_random/core.c        | 30 ++++++++++++++++++++++++----
+>  drivers/net/wireless/ath/ath9k/rng.c | 19 +++++++-----------
+>  kernel/sched/core.c                  |  1 +
+>  3 files changed, 34 insertions(+), 16 deletions(-)
 
-There is no cover letter for this 8 patch series :/ it is not clear to 
-me whether each subsystem maintainer will be in a posotion to merge 
-these patches individually, yet still have all 8 (7 of them actually, 
-see comment to patch 1) land in 5.20.
+I don't see any acks for the hw_random and the scheduler change, adding more
+people to CC. Full patch here:
 
-Alternatively, we can merge these patches through the Broadcom ARM SoC 
-pull request(s) to ensure they all land at the same time.
--- 
-Florian
+https://patchwork.kernel.org/project/linux-wireless/patch/20220629114240.94=
+6411-1-Jason@zx2c4.com/
+
+Are everyone ok if I take this patch via wireless-next?
+
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
