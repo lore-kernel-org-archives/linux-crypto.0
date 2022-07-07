@@ -2,182 +2,476 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0432CCA479
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jul 2022 17:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADE9C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Jul 2022 17:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235734AbiGGRRE (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jul 2022 13:17:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55486 "EHLO
+        id S235976AbiGGR3W (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 7 Jul 2022 13:29:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231540AbiGGRRD (ORCPT
+        with ESMTP id S235945AbiGGR3V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jul 2022 13:17:03 -0400
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8A15A2F7;
-        Thu,  7 Jul 2022 10:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1657214219; x=1688750219;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=y0YMopJesl/TVoNehEvhxtJUHf0OShe6WRK+Ao9Ng+E=;
-  b=U7JLxNU7oPxm1Rrh95cwL6CEvHU0mD/pRt/wGsqKf0/PftL0art1nvHk
-   EZA1AstfAJMfNc6mPOk/ueEQY5RyKSQOxw2JgcWt2pA1M3NvoiwhMt9PA
-   8Y3P9Xbi/NxR8RKmasP8NxyZ/AWJlRVxamqPPK02WdjJE66KIq5jdJp5x
-   0gszpXmZxgJw+Zhp37oo5ReO9WOeYhN0dMSMe3MnHvdl8CXfbrbz5L4RM
-   5URSibE8aip+L9UPNLp+kzoF6pTp9HFCOE/s5dmGYxgIDz7jkigYFjvh3
-   WsvmLEKk3aN21sgmmBEEZ7AWv5hgg/m7syiB6aYPsxaFRp3sWoCio7Lab
-   g==;
-X-IronPort-AV: E=Sophos;i="5.92,253,1650956400"; 
-   d="scan'208";a="166868488"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 07 Jul 2022 10:16:58 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Thu, 7 Jul 2022 10:16:57 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17 via Frontend
- Transport; Thu, 7 Jul 2022 10:16:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R37i0JnKEOoT15IJqUb9W0HjHNk5CxItLSfuYfSVuqo3SmJCsbB5/3G75KRMVXFCg/W/cXjGKY7K7rTu53OJ7VaHR/U60qnpv0P/7Q92EJtZwK0hp8FJho8JdNLjOTg7y22CE2jjaDa2qDBf4chU5nP/vHxWpXxjwWGYsBlM/K0Teaf7vL5QXv3cbl3gFIfqjGoI9ZNkcsE1YJXAge8WfJsDUl8We7/7Z663gLOjhQ7IYHEKI719NrFLCfTEHuEkZCvL1l05Qn8l0K5Ge9f4uUfkEu3kKGqbprxD3dhWkrGPQBZHLIYVETm5gApozczB8fHUnaNdy36LuNRUuT3v4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y0YMopJesl/TVoNehEvhxtJUHf0OShe6WRK+Ao9Ng+E=;
- b=djFDRTbtV9Zfe7U0dm8VWL6CAlEP7Fyns7LzznxEuaanoy7keOHevNgHYMf/1kjS3bD3GQiUEaIEaMIhn7pZ9ZQbn6q8e9W7oS8D017jJR1bIxXGba6s876W01AaJ/5/k4zBJk55OP9VmbtAAMiFF11PoBV0rg2drNDxWK+WOrP6sDRcSH46Cgv7lkOtYpIGF3tmUoM6LMr9+IysVUi9GStZgrnsA7x7ztEEbjW5raDbaBxJJA58WaYxKlhp8mpw7iY3RYCYWNW1uOy62k+FKV2chclahyXeRcezMTilparFBowUD56yCAxlX98Rhq4QXcFBVMWCglpD1Rq7dlxKnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y0YMopJesl/TVoNehEvhxtJUHf0OShe6WRK+Ao9Ng+E=;
- b=hlTjzj6+fkoUumVdU0ZRO+qpMLYN5eFUPMuHP3M0Pru8JMtgYBuDYmU3OM2fbLmWTVJKBwVMoymClI48RDyMAYziOoWJ8CLx2TEZV5z9yMEKUgJLOAOxsKj/n3EpQ5g9k3xnkVXSFtgFjVmzk5sVcMC/fNkUR2nMNEI6W0cp5UU=
-Received: from CO1PR11MB5154.namprd11.prod.outlook.com (2603:10b6:303:99::15)
- by BN9PR11MB5339.namprd11.prod.outlook.com (2603:10b6:408:118::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.16; Thu, 7 Jul
- 2022 17:16:52 +0000
-Received: from CO1PR11MB5154.namprd11.prod.outlook.com
- ([fe80::8d4a:1681:398d:9714]) by CO1PR11MB5154.namprd11.prod.outlook.com
- ([fe80::8d4a:1681:398d:9714%5]) with mapi id 15.20.5417.016; Thu, 7 Jul 2022
- 17:16:52 +0000
-From:   <Conor.Dooley@microchip.com>
-To:     <william.zhang@broadcom.com>, <f.fainelli@gmail.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <bcm-kernel-feedback-list@broadcom.com>
-CC:     <anand.gore@broadcom.com>, <dan.beygelman@broadcom.com>,
-        <kursad.oney@broadcom.com>, <joel.peshkin@broadcom.com>,
-        <andre.przywara@arm.com>, <cai.huoqing@linux.dev>,
-        <Conor.Dooley@microchip.com>, <geert+renesas@glider.be>,
-        <herbert@gondor.apana.org.au>, <mpm@selenic.com>,
-        <sgoutham@marvell.com>, <tsbogend@alpha.franken.de>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [RESEND PATCH 3/8] hwrng: bcm2835: bcmbca: Replace ARCH_BCM_63XX
- with ARCH_BCMBCA
-Thread-Topic: [RESEND PATCH 3/8] hwrng: bcm2835: bcmbca: Replace ARCH_BCM_63XX
- with ARCH_BCMBCA
-Thread-Index: AQHYkc8D8DvWBds+8k6fbjFhIiGw761zGCsAgAALxgCAAAMigA==
-Date:   Thu, 7 Jul 2022 17:16:52 +0000
-Message-ID: <9ce5272f-f90d-6b26-a0f8-0159a90e4502@microchip.com>
-References: <20220707065800.261269-1-william.zhang@broadcom.com>
- <20220707065800.261269-3-william.zhang@broadcom.com>
- <f14b59fb-c02f-cd59-3c92-cb4def7ad601@gmail.com>
- <30b06496-27a0-28a0-2775-ad81893330dd@broadcom.com>
-In-Reply-To: <30b06496-27a0-28a0-2775-ad81893330dd@broadcom.com>
-Accept-Language: en-IE, en-US
-Content-Language: en-IE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4e8f6aaa-e588-4125-f15e-08da603c7c00
-x-ms-traffictypediagnostic: BN9PR11MB5339:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rEmTutCTUFSAHx8zLcGw9Pml2gzrYyfDRDufYSu1UFqoBFR5pRDCMpKc9Tpllbo9D6dX0fNgwfHsIPtgOyI52H7jle6DLsEh8qRQBKvITdLolQD9FRCOyavB5Q3xuHYNbb5T7f5N/Le82nYzAwZdkuVxdbeTVzGcmpvMEK+sRSi40pU71zfR+p6t5Pjmpuwn+HJ1PxD8f8FTx8yF+1GBcO7rTWOLo4ZV6k0R+5vqWq/AqCG8Vz/Cdi6rbDCU0BiFmfRz/wFTf1V64M5JAOEAZKbXHbmeooRcdbcIqFA3cX4e2wqH1ni+naLoy39Prtkqqsug3VVIh5IpfM5HF2CK3YGe9rYmcgKf2XQ2gUDevV9QTDx3TS6ri6YYMP4A6AIFnOTL2n91R8Qia1jpO2Alyl5vAbwdAc5LFYZT7IVwSReqFg8hBjee+VkzttOW/t/ndIKVaq+XGsVp5tV/fR1HiHMbQk2XE0hnuaZMreDtpKeVMmAOHQyhTXu/9Mx6J9FAAHJtu72p0ZOHT9U99kQvKzOPWrMMiZeJyOVAYIvvQyQIQSdHPY3hx8PYO4xu740jDDxpTzUPXlUGz3cSabJ+oi5ADWCwcH/a9WzsGKwskwCqbrJATDgbNnA3LuCmonXz2OTo7qncEWkrjURokofJbazj3AYc56NCE7Rw8ctROsaICDwrgunqpJaUinXt0VmhoNW37M3+70mBmz8Joj7esSpflpTdQHYPSZAml0yZG9rdLF+KUfOjiFW0mN9EjAC6GolEXBkgM7I1XamDkbZaNVSJM1DYbQYiGjGIV6MuwNAjFioVlLlahpvfGGLnaq5uoO5z/h1WUtvi2ymmstCTt/OsMpsYnuP6QUG7xui4XUOpVax6uAQ6CaALoIOX9FGg
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5154.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(346002)(39860400002)(366004)(396003)(376002)(66946007)(66556008)(66476007)(64756008)(66446008)(110136005)(316002)(36756003)(4326008)(122000001)(76116006)(91956017)(53546011)(38070700005)(71200400001)(31686004)(8676002)(6506007)(54906003)(38100700002)(2616005)(86362001)(478600001)(6486002)(8936002)(7416002)(31696002)(5660300002)(41300700001)(2906002)(26005)(186003)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?a3o0bmF5aC8vcmRaU0RjZDFaWGs4L2prQjJ4Y2cvMkNsOG14YVpaRGp0VUl4?=
- =?utf-8?B?OG5Tbk9jR0VMYWtTREVtZE4rbGN3bTF3czVvb05uTElURjlKOE01KzBWQXdZ?=
- =?utf-8?B?OERVRXVrZWw2TGpWTnF1WXZ6N2ZzMGZ6WnpMMHg4dTZZeFppZGdEZFZLMUdL?=
- =?utf-8?B?Tkl1K1NmdTRVWDA4WGNNZjMzTDlGUFNsaHFLOVZ4U2xEaHJOaUJVTURlcWIr?=
- =?utf-8?B?am1iZlNjdm9tSC9wNVZxdDF2UEVmSCtPVUlqZmJ4THlrRDR3WHU0WmdCM2Rk?=
- =?utf-8?B?U2VjMGFoVWlQc1ppWEN0RzZ4d1M4bkwrM01ZdkNYcER5NVBlRzBjVWtKK2hK?=
- =?utf-8?B?VnJTeHNTQ0RadE5kVUhGVy9nbGl6OWdFQjVyRWJaK1dRSEE5S2FqT0R2SjA3?=
- =?utf-8?B?WXdJZEZ3RjlZK2p5T3A3MitmUjFrY0MvbXh5clBRakIxZG1teTZxdUcyQmFj?=
- =?utf-8?B?Ukk1eVVFTlJXR2hXeFU4S2NvYmtkYjJxUm1lMHN2Sno0RERqMW5iZFROR3Rk?=
- =?utf-8?B?ZjJXbTRVbEFJaFBGMkJuNStCVHN4dDZscEJWRktrT29Pdk5wMXZLVGdRR0h2?=
- =?utf-8?B?TVlXZmIyTkpnTnFuVE9scm5vcWF6VUE5SDF6bW9PRWxVWVJzRkxxaG9Qb2VD?=
- =?utf-8?B?bUpxYk9LeEIxL2w0L3FESlpzVEtINnk5VGxsRUJZY3hKT0Y0MnNIeW8wOGJt?=
- =?utf-8?B?bWRyQ2RFWVlBT1NFUWtPQnU5M29qUnB0eGZTbDIyN1VZRmVNSWVReXBDVVdX?=
- =?utf-8?B?blA5U1dBZ1NwWXBMdlp4aHExY1U0S0FwV2UzdkxXeHFwZzFhUmxZTWdFaUhk?=
- =?utf-8?B?UmNCQk04WnV4MEt1YUZyTTZodzc3RlZnRXd6WEtQZElZU2tMRnFPcGpHVWFx?=
- =?utf-8?B?SUtWYm5xWDhZTUdrQjltVkFkamx5ejU3OWZUZjhtRjZmTTdFRXNDRTJDbVQ0?=
- =?utf-8?B?UzMxa1M4TVdjRHRzTDBUb08rNnErd0VSYzczVUJvVnNObVZ6VGFYQnlMYWx2?=
- =?utf-8?B?WUtlNExwVDNKV3hhc1NSQkpSenU3QnB4bzRiR2hTVk55QzQ2ZVFocHB0dWhy?=
- =?utf-8?B?VmovSzRoRFB5U1B1UDExb2wyaUR0S3psSWJtcTNpR1cvcWNVUnlxYmhXVUMr?=
- =?utf-8?B?dkQ2MHlkWnpqQjNHN2owUzBEQVFBSlVNM3BYYlBsY01Xem8zZnZSZk13YUll?=
- =?utf-8?B?TnJwNEFlU0pqUE1wVWc0anNwSXFmazlBV0VZeVNkazJjVE5YMHNVZnVHc1c5?=
- =?utf-8?B?WThYMVdxc2JpREZDeUJxK25LQTZIeWFyWGg5VGxpNjJXSlcrNFNGa1dqN3F0?=
- =?utf-8?B?ZUhmSHhlMDB5R0FYTnl4V255UzdRUFJBRksyalRML1FyK3RrcFdFOGVYV09j?=
- =?utf-8?B?MFRBMXNycmQvR1hTczBJbTY2R3JyMkNnUVFyaXJtb2xpcXJhejRyRVhPakpt?=
- =?utf-8?B?Q1U5NUgzZmw3bUF6QUZIL25xcHhyWmkzeG1TY0hWTTdSSTUwREtjbE1jRWRF?=
- =?utf-8?B?U09VUlZ2ZGRtdTJGMDZSNmhuZTFjcGw0WDRtMVg4RjBTYVFpYzRjTExWVHl0?=
- =?utf-8?B?VTRDVHJZTmxjQlN4RmVraVNqMHdTV2ZVYlhNdVNEbXlWK2h5bUpPQ3d3dDFV?=
- =?utf-8?B?ZEEwL2dsTWFsOE00cElhY0dYOGNVT3BvL2JuVVJHVStKZzJmN2dHVU9wc09y?=
- =?utf-8?B?bkt6cU1pai9HMjVZZUhxT2dWRWswL1gyOTVQRGYvdGtqaWJYRkRFcmcwRnBJ?=
- =?utf-8?B?bUoyL0FweXZlcHFKV05DZmVmVG5SZG1JK0ZHRjVza0JlNlhKR0NvaW9nbXNq?=
- =?utf-8?B?Vm5rT2dYSzBQZGlCVjQwK2xrckRPb3g3Zm1tMHNhU2dBRGdhZ2FXczljM2ZI?=
- =?utf-8?B?Z1lsTm9WOWJyU0tCdVRMQkUwaU1Ld1hsMHJZQTlZdUE2UEM2Umxka2dCNWlh?=
- =?utf-8?B?RGNOUkFCQnFMM2lzZGNIcENxelNtOXBuTzdtREpyVjBGVUZ2bDkwQTNJMW01?=
- =?utf-8?B?YVpPMmE2elAwaGJCeG4ySGNiM2VVRkhzU3hDRzdKd3I5SEJJTTQrY2tpMk9h?=
- =?utf-8?B?RXhpcXZNd2M3ODhHNVhINlBTbkpsMm1SdXpvc3FkN3NrVm0rZmlCbGl2N01F?=
- =?utf-8?Q?ONn3FOY1QSeOIXfxSVa5PtHAR?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B061B18220CCCF4A88A50F013DC410DE@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 7 Jul 2022 13:29:21 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5780F20F69;
+        Thu,  7 Jul 2022 10:29:20 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 267HL91M016080;
+        Thu, 7 Jul 2022 17:29:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : reply-to : in-reply-to : references : message-id : content-type
+ : content-transfer-encoding : mime-version; s=pp1;
+ bh=Z+Q2PypGQY6MUqhxoVTIXtgQJxqTys6a6U0K2xYP5MQ=;
+ b=WObE0SnkMmOspVc1dNvhR8fMXl5hCJPlvrUH0szHvY8YJy8NrWidf8RSdC5jJijAIn4P
+ cJjBHEA+rox1sKBkt5y5YRDVbA0heZNdg8WXg3R3+p6TVmGO7b+/YtuMfbNyRgmPWAUe
+ 9LnHWmwOZqtCxylph+ABISkP7m+5JWl8FJW9AddRGQHcM2JS+xb+TnjTJXprwdIp5RkT
+ 1gupqtMb0mPy9gSKQYt5SodvBAEl7Oc2d4kUcytkHYqH6lV93sZXAxQ4uX/CW1HUYDTA
+ p7a4lbSSVycfvzcIdrS+vZE5sLaB+qCmIzGPJlpgg260pIHZQYqib8dYuzwjH0/w0DxQ UQ== 
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h63tg053b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 17:29:13 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 267HLNEr023688;
+        Thu, 7 Jul 2022 17:29:12 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01wdc.us.ibm.com with ESMTP id 3h4ud1vu7v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 07 Jul 2022 17:29:12 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 267HTBL813304214
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 7 Jul 2022 17:29:11 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B248A124053;
+        Thu,  7 Jul 2022 17:29:11 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 487B6124052;
+        Thu,  7 Jul 2022 17:29:11 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.10.229.42])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu,  7 Jul 2022 17:29:11 +0000 (GMT)
+Date:   Thu, 07 Jul 2022 19:29:11 +0200
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@cloudflare.com, kernel test robot <lkp@intel.com>,
+        egorenar@linux.ibm.com, jchrist@linux.ibm.com
+Subject: Re: [PATCH v2] crypto: rsa - implement Chinese Remainder Theorem for
+ faster private key operations
+Reply-To: freude@linux.ibm.com
+In-Reply-To: <20220617084210.907-1-ignat@cloudflare.com>
+References: <20220617084210.907-1-ignat@cloudflare.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <87a675dc70199baf013b417c55275ee1@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y83XM2paxD3EP26KwQkXaofmswTLqvN_
+X-Proofpoint-ORIG-GUID: Y83XM2paxD3EP26KwQkXaofmswTLqvN_
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5154.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e8f6aaa-e588-4125-f15e-08da603c7c00
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2022 17:16:52.0931
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5w622kZduguSViK5xUyAYjn5dRF1ROFTXABMPHKbFXRRvlLmXwY3BsQMc9CuNrsdQg15kY8/cxvTJTwfT8sjSkw52zcE+dByHrqkco7spUo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5339
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-07_13,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 clxscore=1011 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207070068
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMDcvMDcvMjAyMiAxODowNSwgV2lsbGlhbSBaaGFuZyB3cm90ZToNCj4gT24gNy83LzIyIDA5
-OjIzLCBGbG9yaWFuIEZhaW5lbGxpIHdyb3RlOg0KPj4gT24gNy82LzIyIDIzOjU3LCBXaWxsaWFt
-IFpoYW5nIHdyb3RlOg0KPj4+IFByZXBhcmUgZm9yIHRoZSBCQ002MzEzOCBBUkNIX0JDTV82M1hY
-IG1pZ3JhdGlvbiB0byBBUkNIX0JDTUJDQS4gTWFrZQ0KPj4+IEhXX1JBTkRPTV9CQ00yODM1IGRl
-cGVuZGluZyBvbiBBUkNIX0JDTUJDQS4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IFdpbGxpYW0g
-WmhhbmcgPHdpbGxpYW0uemhhbmdAYnJvYWRjb20uY29tPg0KPj4NCj4+IEFja2VkLWJ5OiBGbG9y
-aWFuIEZhaW5lbGxpIDxmLmZhaW5lbGxpQGdtYWlsLmNvbT4NCj4+DQo+PiBUaGVyZSBpcyBubyBj
-b3ZlciBsZXR0ZXIgZm9yIHRoaXMgOCBwYXRjaCBzZXJpZXMgOi8gaXQgaXMgbm90IGNsZWFyIHRv
-IG1lIHdoZXRoZXIgZWFjaCBzdWJzeXN0ZW0gbWFpbnRhaW5lciB3aWxsIGJlIGluIGEgcG9zb3Rp
-b24gdG8gbWVyZ2UgdGhlc2UgcGF0Y2hlcyBpbmRpdmlkdWFsbHksIHlldCBzdGlsbCBoYXZlIGFs
-bCA4ICg3IG9mIHRoZW0gYWN0dWFsbHksIHNlZSBjb21tZW50IHRvIHBhdGNoIDEpIGxhbmQgaW4g
-NS4yMC4NCj4+DQo+IFRoZSBjb3ZlciBsZXR0ZXIgd2lsbCBnYXRoZXIgYWxsIHRoZSByZWNpcGll
-bnRzIHdoaWNoIHdpbGwgYmUgbW9yZSB0aGFuIDUwDQoNCnRiZiwgeW91IHByb2JhYmx5IGNvdWxk
-IGN1dCBkb3duIHRoZSBDQyBsaXN0IGlmIHlvdSB3YW50LCBpdCBpc250IHJlcXVpcmVkDQp0byBD
-QyBhYnNvbHV0ZWx5IGV2ZXJ5b25lIHRoYXQgZ2V0cyBzcGF0IG91dCBieSBnZXRfbWFpbnRhaW5l
-ci4NCg0KRm9yIGV4YW1wbGUsIEkgYW0gQ0NlZCBiZWNhdXNlIEkgd2FzIGEgcmVjZW50IGF1dGhv
-ciBmb3IgdGhlIGh3cm5nIGtjb25maWcNCmZpbGUsIHNvIHBlb3BsZSBsaWtlIG1lIGNvdWxkIGJl
-IHNhZmVseSBleGNsdWRlZCBpZiB5b3UgbmVlZCB0byBjdXQgZG93biBvbg0KdGhlIG51bWJlciBv
-ZiBwZW9wbGUgdGhhdCB5b3UgYXJlIENDaW5nLg0KDQpOb3QgdGhhdCBJIGhhdmUgYSBwcm9ibGVt
-IHdpdGggYmVpbmcgQ0NlZCwganVzdCBpZiBpdCBoZWxwcyB5b3UgaGl0IGEgbWluLg0KdGhyZXNo
-b2xkIGZlZWwgZnJlZSB0byBkcm9wIG1lIDopDQo=
+On 2022-06-17 10:42, Ignat Korchagin wrote:
+> Changes from v1:
+>   * exported mpi_sub and mpi_mul, otherwise the build fails when RSA is 
+> a module
+> 
+> The kernel RSA ASN.1 private key parser already supports only private 
+> keys with
+> additional values to be used with the Chinese Remainder Theorem [1], 
+> but these
+> values are currently not used.
+> 
+> This rudimentary CRT implementation speeds up RSA private key 
+> operations for the
+> following Go benchmark up to ~3x.
+> 
+> This implementation also tries to minimise the allocation of additional 
+> MPIs,
+> so existing MPIs are reused as much as possible (hence the variable 
+> names are a
+> bit weird).
+> 
+> The benchmark used:
+> 
+> ```
+> package keyring_test
+> 
+> import (
+> 	"crypto"
+> 	"crypto/rand"
+> 	"crypto/rsa"
+> 	"crypto/x509"
+> 	"io"
+> 	"syscall"
+> 	"testing"
+> 	"unsafe"
+> )
+> 
+> type KeySerial int32
+> type Keyring int32
+> 
+> const (
+> 	KEY_SPEC_PROCESS_KEYRING Keyring = -2
+> 	KEYCTL_PKEY_SIGN                 = 27
+> )
+> 
+> var (
+> 	keyTypeAsym = []byte("asymmetric\x00")
+> 	sha256pkcs1 = []byte("enc=pkcs1 hash=sha256\x00")
+> )
+> 
+> func (keyring Keyring) LoadAsym(desc string, payload []byte)
+> (KeySerial, error) {
+> 	cdesc := []byte(desc + "\x00")
+> 	serial, _, errno := syscall.Syscall6(syscall.SYS_ADD_KEY,
+> uintptr(unsafe.Pointer(&keyTypeAsym[0])),
+> uintptr(unsafe.Pointer(&cdesc[0])),
+> uintptr(unsafe.Pointer(&payload[0])), uintptr(len(payload)),
+> uintptr(keyring), uintptr(0))
+> 	if errno == 0 {
+> 		return KeySerial(serial), nil
+> 	}
+> 
+> 	return KeySerial(serial), errno
+> }
+> 
+> type pkeyParams struct {
+> 	key_id         KeySerial
+> 	in_len         uint32
+> 	out_or_in2_len uint32
+> 	__spare        [7]uint32
+> }
+> 
+> // the output signature buffer is an input parameter here, because we 
+> want to
+> // avoid Go buffer allocation leaking into our benchmarks
+> func (key KeySerial) Sign(info, digest, out []byte) error {
+> 	var params pkeyParams
+> 	params.key_id = key
+> 	params.in_len = uint32(len(digest))
+> 	params.out_or_in2_len = uint32(len(out))
+> 
+> 	_, _, errno := syscall.Syscall6(syscall.SYS_KEYCTL, KEYCTL_PKEY_SIGN,
+> uintptr(unsafe.Pointer(&params)), uintptr(unsafe.Pointer(&info[0])),
+> uintptr(unsafe.Pointer(&digest[0])), uintptr(unsafe.Pointer(&out[0])),
+> uintptr(0))
+> 	if errno == 0 {
+> 		return nil
+> 	}
+> 
+> 	return errno
+> }
+> 
+> func BenchmarkSign(b *testing.B) {
+> 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+> 	if err != nil {
+> 		b.Fatalf("failed to generate private key: %v", err)
+> 	}
+> 
+> 	pkcs8, err := x509.MarshalPKCS8PrivateKey(priv)
+> 	if err != nil {
+> 		b.Fatalf("failed to serialize the private key to PKCS8 blob: %v", 
+> err)
+> 	}
+> 
+> 	serial, err := KEY_SPEC_PROCESS_KEYRING.LoadAsym("test rsa key", 
+> pkcs8)
+> 	if err != nil {
+> 		b.Fatalf("failed to load the private key into the keyring: %v", err)
+> 	}
+> 
+> 	b.Logf("loaded test rsa key: %v", serial)
+> 
+> 	digest := make([]byte, 32)
+> 	_, err = io.ReadFull(rand.Reader, digest)
+> 	if err != nil {
+> 		b.Fatalf("failed to generate a random digest: %v", err)
+> 	}
+> 
+> 	sig := make([]byte, 256)
+> 	for n := 0; n < b.N; n++ {
+> 		err = serial.Sign(sha256pkcs1, digest, sig)
+> 		if err != nil {
+> 			b.Fatalf("failed to sign the digest: %v", err)
+> 		}
+> 	}
+> 
+> 	err = rsa.VerifyPKCS1v15(&priv.PublicKey, crypto.SHA256, digest, sig)
+> 	if err != nil {
+> 		b.Fatalf("failed to verify the signature: %v", err)
+> 	}
+> }
+> ```
+> 
+> [1]:
+> https://en.wikipedia.org/wiki/RSA_(cryptosystem)#Using_the_Chinese_remainder_algorithm
+> 
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> ---
+>  crypto/rsa.c      | 78 ++++++++++++++++++++++++++++++++++++++++++++---
+>  lib/mpi/mpi-add.c |  2 +-
+>  lib/mpi/mpi-mul.c |  1 +
+>  3 files changed, 75 insertions(+), 6 deletions(-)
+> 
+> diff --git a/crypto/rsa.c b/crypto/rsa.c
+> index 39e04176b04b..0e555ee4addb 100644
+> --- a/crypto/rsa.c
+> +++ b/crypto/rsa.c
+> @@ -17,6 +17,11 @@ struct rsa_mpi_key {
+>  	MPI n;
+>  	MPI e;
+>  	MPI d;
+> +	MPI p;
+> +	MPI q;
+> +	MPI dp;
+> +	MPI dq;
+> +	MPI qinv;
+>  };
+> 
+>  /*
+> @@ -35,16 +40,49 @@ static int _rsa_enc(const struct rsa_mpi_key *key,
+> MPI c, MPI m)
+> 
+>  /*
+>   * RSADP function [RFC3447 sec 5.1.2]
+> - * m = c^d mod n;
+> + * m_1 = c^dP mod p;
+> + * m_2 = c^dQ mod q;
+> + * h = (m_1 - m_2) * qInv mod p;
+> + * m = m_2 + q * h;
+>   */
+> -static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
+> +static int _rsa_dec_crt(const struct rsa_mpi_key *key, MPI 
+> m_or_m1_or_h, MPI c)
+>  {
+> +	MPI m2, m12_or_qh;
+> +	int ret = -ENOMEM;
+> +
+>  	/* (1) Validate 0 <= c < n */
+>  	if (mpi_cmp_ui(c, 0) < 0 || mpi_cmp(c, key->n) >= 0)
+>  		return -EINVAL;
+> 
+> -	/* (2) m = c^d mod n */
+> -	return mpi_powm(m, c, key->d, key->n);
+> +	m2 = mpi_alloc(0);
+> +	m12_or_qh = mpi_alloc(0);
+> +	if (!m2 || !m12_or_qh)
+> +		goto err_free_mpi;
+> +
+> +	/* (2i) m_1 = c^dP mod p */
+> +	ret = mpi_powm(m_or_m1_or_h, c, key->dp, key->p);
+> +	if (ret)
+> +		goto err_free_mpi;
+> +
+> +	/* (2i) m_2 = c^dQ mod q */
+> +	ret = mpi_powm(m2, c, key->dq, key->q);
+> +	if (ret)
+> +		goto err_free_mpi;
+> +
+> +	/* (2iii) h = (m_1 - m_2) * qInv mod p */
+> +	mpi_sub(m12_or_qh, m_or_m1_or_h, m2);
+> +	mpi_mulm(m_or_m1_or_h, m12_or_qh, key->qinv, key->p);
+> +
+> +	/* (2iv) m = m_2 + q * h */
+> +	mpi_mul(m12_or_qh, key->q, m_or_m1_or_h);
+> +	mpi_addm(m_or_m1_or_h, m2, m12_or_qh, key->n);
+> +
+> +	ret = 0;
+> +
+> +err_free_mpi:
+> +	mpi_free(m12_or_qh);
+> +	mpi_free(m2);
+> +	return ret;
+>  }
+> 
+>  static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher 
+> *tfm)
+> @@ -112,7 +150,7 @@ static int rsa_dec(struct akcipher_request *req)
+>  	if (!c)
+>  		goto err_free_m;
+> 
+> -	ret = _rsa_dec(pkey, m, c);
+> +	ret = _rsa_dec_crt(pkey, m, c);
+>  	if (ret)
+>  		goto err_free_c;
+> 
+> @@ -134,9 +172,19 @@ static void rsa_free_mpi_key(struct rsa_mpi_key 
+> *key)
+>  	mpi_free(key->d);
+>  	mpi_free(key->e);
+>  	mpi_free(key->n);
+> +	mpi_free(key->p);
+> +	mpi_free(key->q);
+> +	mpi_free(key->dp);
+> +	mpi_free(key->dq);
+> +	mpi_free(key->qinv);
+>  	key->d = NULL;
+>  	key->e = NULL;
+>  	key->n = NULL;
+> +	key->p = NULL;
+> +	key->q = NULL;
+> +	key->dp = NULL;
+> +	key->dq = NULL;
+> +	key->qinv = NULL;
+>  }
+> 
+>  static int rsa_check_key_length(unsigned int len)
+> @@ -217,6 +265,26 @@ static int rsa_set_priv_key(struct
+> crypto_akcipher *tfm, const void *key,
+>  	if (!mpi_key->n)
+>  		goto err;
+> 
+> +	mpi_key->p = mpi_read_raw_data(raw_key.p, raw_key.p_sz);
+> +	if (!mpi_key->p)
+> +		goto err;
+> +
+> +	mpi_key->q = mpi_read_raw_data(raw_key.q, raw_key.q_sz);
+> +	if (!mpi_key->q)
+> +		goto err;
+> +
+> +	mpi_key->dp = mpi_read_raw_data(raw_key.dp, raw_key.dp_sz);
+> +	if (!mpi_key->dp)
+> +		goto err;
+> +
+> +	mpi_key->dq = mpi_read_raw_data(raw_key.dq, raw_key.dq_sz);
+> +	if (!mpi_key->dq)
+> +		goto err;
+> +
+> +	mpi_key->qinv = mpi_read_raw_data(raw_key.qinv, raw_key.qinv_sz);
+> +	if (!mpi_key->qinv)
+> +		goto err;
+> +
+>  	if (rsa_check_key_length(mpi_get_size(mpi_key->n) << 3)) {
+>  		rsa_free_mpi_key(mpi_key);
+>  		return -EINVAL;
+> diff --git a/lib/mpi/mpi-add.c b/lib/mpi/mpi-add.c
+> index 2cdae54c1bd0..9056fc5167fc 100644
+> --- a/lib/mpi/mpi-add.c
+> +++ b/lib/mpi/mpi-add.c
+> @@ -138,7 +138,7 @@ void mpi_sub(MPI w, MPI u, MPI v)
+>  	mpi_add(w, u, vv);
+>  	mpi_free(vv);
+>  }
+> -
+> +EXPORT_SYMBOL_GPL(mpi_sub);
+> 
+>  void mpi_addm(MPI w, MPI u, MPI v, MPI m)
+>  {
+> diff --git a/lib/mpi/mpi-mul.c b/lib/mpi/mpi-mul.c
+> index 8f5fa200f297..7f4eda8560dc 100644
+> --- a/lib/mpi/mpi-mul.c
+> +++ b/lib/mpi/mpi-mul.c
+> @@ -82,6 +82,7 @@ void mpi_mul(MPI w, MPI u, MPI v)
+>  	if (tmp_limb)
+>  		mpi_free_limb_space(tmp_limb);
+>  }
+> +EXPORT_SYMBOL_GPL(mpi_mul);
+> 
+>  void mpi_mulm(MPI w, MPI u, MPI v, MPI m)
+>  {
+> --
+> 2.36.1
+
+Hello Ignat
+on s390 the linux-next kernel gives me this during startup:
+
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: alg: akcipher: decrypt test 
+failed. err -22
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: alg: akcipher: test 1 failed 
+for rsa-generic, err=-22
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: ------------[ cut here 
+]------------
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: alg: self-tests for 
+rsa-generic (rsa) failed (rc=-22)
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: WARNING: CPU: 6 PID: 111 at 
+crypto/testmgr.c:5773 alg_test+0x348/0x4d0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Modules linked in:
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: CPU: 6 PID: 111 Comm: 
+cryptomgr_test Not tainted 5.19.0-rc5-next-20220706 #1
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Hardware name: IBM 8561 T01 
+703 (LPAR)
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Krnl PSW : 0704d00180000000 
+00000000f8b15ab4 (alg_test+0x34c/0x4d0)
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:            R:0 T:1 IO:1 EX:1 
+Key:0 M:1 W:0 P:0 AS:3 CC:1 PM:0 RI:0 EA:3
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Krnl GPRS: c0000000fffeffff 
+0000000080000000 0000000000000035 0000000000000000
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:            0000000000000001 
+0000000000000001 000000008da15c80 000000000000000d
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:            000000008da15c00 
+00000000ffffffff 00000380000000b6 ffffffffffffffea
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:            000000008cd53200 
+00000000fb19dfd0 00000000f8b15ab0 0000038004847cf8
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Krnl Code: 00000000f8b15aa4: 
+c02000523738        larl        %r2,00000000f955c914
+                                                      00000000f8b15aaa: 
+c0e5002d52a7        brasl        %r14,00000000f90bfff8
+                                                     #00000000f8b15ab0: 
+af000000                mc        0,0
+                                                     >00000000f8b15ab4: 
+b904002b                lgr        %r2,%r11
+                                                      00000000f8b15ab8: 
+eb6ff1300004        lmg        %r6,%r15,304(%r15)
+                                                      00000000f8b15abe: 
+07fe                bcr        15,%r14
+                                                      00000000f8b15ac0: 
+47000700                bc        0,1792
+                                                      00000000f8b15ac4: 
+1829                lr        %r2,%r9
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Call Trace:
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f8b15ab4>] 
+alg_test+0x34c/0x4d0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: ([<00000000f8b15ab0>] 
+alg_test+0x348/0x4d0)
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f8b13b98>] 
+cryptomgr_test+0x68/0x70
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f83b4be8>] 
+kthread+0x138/0x150
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f832f91c>] 
+__ret_from_fork+0x3c/0x58
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f90ecf6a>] 
+ret_from_fork+0xa/0x40
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: no locks held by 
+cryptomgr_test/111.
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: Last Breaking-Event-Address:
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel:  [<00000000f90c005e>] 
+__warn_printk+0x66/0x70
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: irq event stamp: 729
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: hardirqs last  enabled at 
+(737): [<00000000f841f3b4>] __up_console_sem+0x8c/0xc0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: hardirqs last disabled at 
+(744): [<00000000f841f396>] __up_console_sem+0x6e/0xc0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: softirqs last  enabled at (0): 
+[<00000000f837d6da>] copy_process+0x7fa/0x17d0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: softirqs last disabled at (0): 
+[<0000000000000000>] 0x0
+Jul 07 11:50:28 t35lp54.lnxne.boe kernel: ---[ end trace 
+0000000000000000 ]---
+
+I tracked this down with git bisect to exactly your patch.
+Looks like the testmanager needs an update also ... maybe use CRT 
+formated keys instead of ME keys ?!?
+
+regards
+Harald Freudenberger
+
+
+
