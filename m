@@ -2,124 +2,96 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7288EC43334
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 03:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC91FC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 03:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236028AbiGHDte (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Jul 2022 23:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40294 "EHLO
+        id S237119AbiGHDyQ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 7 Jul 2022 23:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236950AbiGHDtb (ORCPT
+        with ESMTP id S236471AbiGHDyQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Jul 2022 23:49:31 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AACB474DC9;
-        Thu,  7 Jul 2022 20:49:30 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id i8-20020a17090a4b8800b001ef8a65bfbdso680172pjh.1;
-        Thu, 07 Jul 2022 20:49:30 -0700 (PDT)
+        Thu, 7 Jul 2022 23:54:16 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34C4C74DE2;
+        Thu,  7 Jul 2022 20:54:15 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id w185so18788492pfb.4;
+        Thu, 07 Jul 2022 20:54:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Ijb37wuvcMqI82JLez9O+wctpjHcQ7yqmdff0rtexpI=;
-        b=RZqjr8uI1VfLekuUerA/zObBcgGl3Yk1Mv4xd0m7aYz95przPYtIHvJFyLfIfHm1ff
-         sD9ARxPzPXlAnc/JU/mTDq9NWFul/vEACpQaqcw34y9JoEvTtGmhpvPHCiRINEYLPaHb
-         62whRVGlxPtER8e5K6WO9CPOzp0TPG7n1bIP8zc4PM9RVKkMAaoJnaJfbmepEyfVW2YL
-         Pq7lJINwPWzEd4jDUMjMWlcmkxzSathx9HjDzUEArwqxcN9KRotjvXLZi4Onyqmz7mJM
-         LUx0IkZhbcMOBpzKviEi4U6YIYjlzCQJQ4RH4a2PQQDsxwziUTW8Ij77MCHxS9FbiFGk
-         pKsw==
+        bh=boMoiQ7O+iidCb90Ajv0DmnlcZVRw9XoN19BAZFvz0Q=;
+        b=PAyzN5zd/pXMr0RfDgSRgyz4Ab0+ZK907q7JkXafq6rbA3DcUNwLv5MiOJ1OBvPZ+V
+         PVwOxqIDf+vtFY20qOvDzu8QOgWCau6I5AogopFe/fL+KRzzw7fPvgYyfQjaENFMCxhJ
+         xLnU5P3XiTqEpk0xes2ZN95I1wdpTFL/r5fwqOTpj1OW5kHdzSVneiInXKAqbFOLXcif
+         Rx0w5p3ICf4IeSQO/dC5l5RzTrNu45MfvHpOF+VXMXh30W4oBpxVxTb65yarIDtu2UYR
+         dg7BmRy3zDyStQBKIswemyXYyeh+2InZad8Uhd0gu8M0zAWb0SXaAkTX33OP42l7MT1W
+         zTyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Ijb37wuvcMqI82JLez9O+wctpjHcQ7yqmdff0rtexpI=;
-        b=FXNUC0f/B0SZ+GD7tG8u+NRpsr3k37AjUlS03IGV9sdzfLtEX4WjvtRcZbRCkOMGy7
-         whiPcnwKmFnP+RkQfRarzrAjdtCEHUBql5E6cqFrnC4eL0wylfRp/SOrVvaVtyqixavX
-         WF2puHpN58H256H6bY9jE1ercEQLqupFnLGpIPzK1nwo15br13WOAIk3Zjq9qxoi3PzH
-         eeq07qTjgkptcnyp3Ofl8xbYf6IAG6JVMXQnGLbViWQ5Ze74xKRo80iYb2EEaNj7Ydkv
-         iXeJmuYF8IZvsbPxNF8BAS6YbRjjaeT0+XVeEjFEPD3hDSA7phzJpCt7OI8v445s7JeK
-         8+ig==
-X-Gm-Message-State: AJIora/4dKEeO0WetielFuvBqiXPw0gCoyq4Wo9kIHynG+bzeEoKB1p+
-        vVgC+gx4Y3cVG6Js3KPlkKs=
-X-Google-Smtp-Source: AGRyM1tu/FpiE1NaWCN51qWfp9HqlnB0HzZAdqHZxdaHagmh8N9zbNt3m7M6LCXP6vzx8GULZTs+BQ==
-X-Received: by 2002:a17:90b:350f:b0:1ed:4d69:75f3 with SMTP id ls15-20020a17090b350f00b001ed4d6975f3mr9052596pjb.17.1657252170135;
-        Thu, 07 Jul 2022 20:49:30 -0700 (PDT)
+        bh=boMoiQ7O+iidCb90Ajv0DmnlcZVRw9XoN19BAZFvz0Q=;
+        b=2Zu7t1R6VC20tw2RcVnLF9f8RFw2Zp1a1lkqjl91oHj+jgUVFIZNd8XMZ9Fc+XG9ID
+         J6hhrQj8g02goKSYX5geY47T9w5LnNBjP2fKtKk5G8P3gE7P0MQoO81GzuAJrIHTDERr
+         cJ//YMgGDAA6ha00E7CqIZObSYq9q5Ex03DyaDiS6uACnKgDze+NQpUMoP3Y5a7qbjDh
+         w5VkoqkVCNWBKf9pNZS6tgl+zGNARbApmIGwqjD1QT6tvEfEDjWtTyNKokUgoz2tVQpo
+         F3KYfpsKX4oOwFoiTzHSRKSllKfdCQftsbvuXt0vgiFN7DQeMMRqjJXUu3LXv66TtHrD
+         WTNw==
+X-Gm-Message-State: AJIora9YIYQYSNki5BgHXVhS8KI7ivB5/PLseu8H4TeGul1DYxWEn0d5
+        HD/XJVrmqJqFFeJs7WM9U/A=
+X-Google-Smtp-Source: AGRyM1t23AvMiJ2iSX9LEY552bKPo4g7Ld4jiIqNqJH5gcXFwBw4gYJY+WMm0c7ZlvzZqAqDp1aeiQ==
+X-Received: by 2002:a63:6d5:0:b0:412:ac9d:814e with SMTP id 204-20020a6306d5000000b00412ac9d814emr1507543pgg.90.1657252454656;
+        Thu, 07 Jul 2022 20:54:14 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id x9-20020aa784c9000000b005251fc16ff8sm27424972pfn.220.2022.07.07.20.49.28
+        by smtp.gmail.com with ESMTPSA id a8-20020aa78e88000000b0052534ade61dsm27766700pfr.185.2022.07.07.20.54.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Jul 2022 20:49:29 -0700 (PDT)
-Message-ID: <4ccbea1c-1bcf-68b2-e7ec-3a19a75dbfa9@gmail.com>
-Date:   Thu, 7 Jul 2022 20:49:27 -0700
+        Thu, 07 Jul 2022 20:54:14 -0700 (PDT)
+Message-ID: <8d42d2f2-1da5-0f23-6e43-a505e9d9d41f@gmail.com>
+Date:   Thu, 7 Jul 2022 20:54:13 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.0.1
-Subject: Re: [RESEND PATCH 3/8] hwrng: bcm2835: bcmbca: Replace ARCH_BCM_63XX
- with ARCH_BCMBCA
+Subject: Re: [PATCH] MAINTAINERS: Remove Matt Mackall as his identity is
+ obsolete
 Content-Language: en-US
-To:     William Zhang <william.zhang@broadcom.com>,
-        Conor.Dooley@microchip.com, f.fainelli@gmail.com,
-        linux-arm-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com
-Cc:     anand.gore@broadcom.com, dan.beygelman@broadcom.com,
-        kursad.oney@broadcom.com, joel.peshkin@broadcom.com,
-        andre.przywara@arm.com, cai.huoqing@linux.dev,
-        geert+renesas@glider.be, herbert@gondor.apana.org.au,
-        mpm@selenic.com, sgoutham@marvell.com, tsbogend@alpha.franken.de,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220707065800.261269-1-william.zhang@broadcom.com>
- <20220707065800.261269-3-william.zhang@broadcom.com>
- <f14b59fb-c02f-cd59-3c92-cb4def7ad601@gmail.com>
- <30b06496-27a0-28a0-2775-ad81893330dd@broadcom.com>
- <9ce5272f-f90d-6b26-a0f8-0159a90e4502@microchip.com>
- <e24acc99-0dce-5879-2379-6a5e3191e123@broadcom.com>
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        linux-kernel@vger.kernel.org,
+        Paul Gortmaker <paul.gortmaker@windriver.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        linux-embedded@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel@pengutronix.de
+References: <20210920080635.253826-1-u.kleine-koenig@pengutronix.de>
 From:   Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <e24acc99-0dce-5879-2379-6a5e3191e123@broadcom.com>
+In-Reply-To: <20210920080635.253826-1-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 7/7/2022 11:18 AM, William Zhang wrote:
+On 9/20/2021 1:06 AM, Uwe Kleine-König wrote:
+> The mails I sent to Matt on September 14 and 20 both were refused by the
+> MTA responsible for selenic.com (i.e. waste.org) with:
 > 
+> 	554 5.7.1 <mpm@selenic.com>: Recipient address rejected: This identity is obsolete
 > 
-> On 7/7/22 10:16, Conor.Dooley@microchip.com wrote:
->> On 07/07/2022 18:05, William Zhang wrote:
->>> On 7/7/22 09:23, Florian Fainelli wrote:
->>>> On 7/6/22 23:57, William Zhang wrote:
->>>>> Prepare for the BCM63138 ARCH_BCM_63XX migration to ARCH_BCMBCA. Make
->>>>> HW_RANDOM_BCM2835 depending on ARCH_BCMBCA.
->>>>>
->>>>> Signed-off-by: William Zhang <william.zhang@broadcom.com>
->>>>
->>>> Acked-by: Florian Fainelli <f.fainelli@gmail.com>
->>>>
->>>> There is no cover letter for this 8 patch series :/ it is not clear 
->>>> to me whether each subsystem maintainer will be in a posotion to 
->>>> merge these patches individually, yet still have all 8 (7 of them 
->>>> actually, see comment to patch 1) land in 5.20.
->>>>
->>> The cover letter will gather all the recipients which will be more 
->>> than 50
->>
->> tbf, you probably could cut down the CC list if you want, it isnt 
->> required
->> to CC absolutely everyone that gets spat out by get_maintainer.
->>
->> For example, I am CCed because I was a recent author for the hwrng 
->> kconfig
->> file, so people like me could be safely excluded if you need to cut 
->> down on
->> the number of people that you are CCing.
->>
->> Not that I have a problem with being CCed, just if it helps you hit a 
->> min.
->> threshold feel free to drop me :)
-> Thanks! That is my plan too. Try to figure out the threshold now lol
+> Also the most recent commit that involved him (ignoring "Cc: Matt
+> Mackall <mpm@selenic.com>" footers) is commit 330e0a01d54c (MAINTAINERS:
+> Theodore Ts'o is taking over the random driver) where he was removed
+> from the entry for random number drivers in 2012.
+> 
+> So drop him completely from the list of maintainers.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-Try adding --norolestats to your get_maintainer.pl invocation.
+This has not been applied and we still have entries in MAINTAINERS that 
+are bouncing for mpm@selenic.com, can we apply this patch?
 -- 
 Florian
