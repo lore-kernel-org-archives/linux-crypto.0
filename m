@@ -2,60 +2,59 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 446ADC43334
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 15:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DACDCCA47F
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 15:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238442AbiGHP3H (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Jul 2022 11:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
+        id S238825AbiGHPyl (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Jul 2022 11:54:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238313AbiGHP3F (ORCPT
+        with ESMTP id S238830AbiGHPyk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Jul 2022 11:29:05 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59BD518379
-        for <linux-crypto@vger.kernel.org>; Fri,  8 Jul 2022 08:29:04 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id t25so36891382lfg.7
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Jul 2022 08:29:04 -0700 (PDT)
+        Fri, 8 Jul 2022 11:54:40 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1F2970E56
+        for <linux-crypto@vger.kernel.org>; Fri,  8 Jul 2022 08:54:37 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id z25so19449808lfr.2
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Jul 2022 08:54:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=EsqbPN5x+9PQgkB3EhpcwOrofU0GdaTgCdJPXG3XIDs=;
-        b=Cjnkmx6zMzqZ3p3G/vWvCi7H5Ak27tLHkdjhmkw9kNmIAPJUo8Zng3TS5lXIfi6DBw
-         X3tUPRJlg4MJWu+CehqG44HL/yX8UnZbaetVtGCue+/dkdQhexRD9soeCLZkESw3xgav
-         PADev3iQqDx6T63UIbOBv+bZJGarOCx/gjp/mT5vs2iAEenyNWCIpiGzUNYHEMlGwPxW
-         qZC7lCmjwJmRxifn9Rc6bcipQ7WFHZgUtl2Ho9HL5gHQrUb+LvEpMSwQ6e1O6/soqAhT
-         LZRfSUQ7NKWdx7lQcXIdC9xYJnjTWcyo16zxdsDVt5YINNiZ4TeBSrYhfklXh5wMLdbo
-         tZuw==
+        bh=/os5t3S4cPsz3I/S9Mj4qyigjvCHgQQtkEVeDgJ05RM=;
+        b=PsBVmJ6R6GowUlEMeEe8ZRY8jb52v2WfXzscfT5jLoCOQsbZ36cbawSyHAtGiHnafj
+         HaFtIhvPwrjTsy3gBfiNpXk6CLJYS++w+8CYIEoISvqmxuuVetqxorhjsydgFa23mZKQ
+         5/cnrNL72sWZGEGfjILngANqq9MIg3cWbdiTWVR/h5IQrycCXuvQ4YGYcrr2ICC+JjoL
+         DyDSxQSfjivojcSr1c9UT0BUbasRhFYlNTGM0VY5acbNpT07M1F5BIlW4gQlVvfNsmya
+         l77+tZgU/wKnuxcPYeZ/vqIStbc7H1V+E0CACaXVs84rluFvh1bSyYJPimKqQ++dB94y
+         p0rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=EsqbPN5x+9PQgkB3EhpcwOrofU0GdaTgCdJPXG3XIDs=;
-        b=MkKZWknnnnV7us4sHyd8zyoLc/2WO6nQQqBqHEVgh1YApFUYOp5E4oDi4dJOxt3hCm
-         6GGuocnHijx8yz62zOBu8XFu1oDMJsbvJwyPuSoAyhMNinfI57jxkWHleI9+w80auZ1b
-         zbXMbbwe0fPpRF2O6ywih2NSPTyg18gXutcoUc4eXpIQlrQiwR2xcWLMFiSJWEs4jfQ2
-         5iEHMxAZFIX1qMwgfhUTW2zvXpQk5UeCiQ+QTCDrZibDNOfTySUEu9O9pFaPO2nlcpEK
-         l4RxBamw9/g3fE1KBDN/4JwtUkg8fgO7kh+q7b/wU9ooBBDf7g2yvnObB67riPMHrfJQ
-         7XNA==
-X-Gm-Message-State: AJIora+Q0edkCvKByNjsxHbl96ajIV9s5biawOeI5KbfANlsxNNsPdOZ
-        m46q5ml7A4jusWxEES1pMRaKFo/zYxdKZJ96CnWyuA==
-X-Google-Smtp-Source: AGRyM1sV1zq1ZnN2yjXTPuiG/7Xv8X9xkix73ZrgQZOxRd61c9fzZcS0BmfVarULhrHnBVAu75EPaoUECCydheenFzI=
-X-Received: by 2002:a05:6512:1112:b0:488:e0ac:fb41 with SMTP id
- l18-20020a056512111200b00488e0acfb41mr3001464lfg.456.1657294142373; Fri, 08
- Jul 2022 08:29:02 -0700 (PDT)
+        bh=/os5t3S4cPsz3I/S9Mj4qyigjvCHgQQtkEVeDgJ05RM=;
+        b=lBHcIDI+LYq9qcivszdgN4JfgrQAF9ysBqzgnd+cdiimyeRgxVBfFfg/7d4HfC5PEn
+         YNSkNiO0DOV9jeYbn5WxzfHaDKtUXUMNnrADMw46rYCtgNjPT4xff81N/UL58KbrSJXj
+         FswRaW+WStw3PVESFLkwinAAdU7zO9UAhVQV2srFuiYk5cru23zenthpBpGvC1Ht1Vn1
+         lFGeomU8We6p2Y9cGrdc233/+q6j/QVhCE0iyikPKh0gdu1gB02Mx6XluoBx38ab42CG
+         3Th3yFH6F+XElrGlfVkbqJZTlMSa5EElm3cVy7bCf2ZdEgVvRyIBIAoq3bz9ATUCtdjc
+         DjFQ==
+X-Gm-Message-State: AJIora+sY9ZyWepvI5E31sgxabRu0ATQPk3gn4/tJNstKzOmZTQ2Iqk7
+        jysy/kBHxiGwpkFTGZZnh+YURv1eYu+SPJJ5YtwfQw==
+X-Google-Smtp-Source: AGRyM1vakIVeDaj9C17a1elb+iyUeaYTA/kg2lyv8/76nZi9IF95NVCr4t6HVeEbFti0eBxcXliDfOCnMI7CCXuWRVI=
+X-Received: by 2002:a05:6512:a8c:b0:484:73f8:704d with SMTP id
+ m12-20020a0565120a8c00b0048473f8704dmr3076083lfu.193.1657295675981; Fri, 08
+ Jul 2022 08:54:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <5d05799fc61994684aa2b2ddb8c5b326a3279e25.1655761627.git.ashish.kalra@amd.com>
- <CAMkAt6rGzSewSyO1uZehWUD2J6aLtRwP5N-uj-HPG73Pp0=Sjw@mail.gmail.com>
- <SN6PR12MB2767B9F438A0F6413780F73E8EB99@SN6PR12MB2767.namprd12.prod.outlook.com>
- <SN6PR12MB27675E821D5D1C423F2AF5768EBB9@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB27675E821D5D1C423F2AF5768EBB9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <7845d453af6344d0b156493eb4555399aad78615.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6oGzqoMxN5ws9QZ9P1q5Rah92bb4V2KSYBgi0guMGUKAQ@mail.gmail.com>
+ <SN6PR12MB2767CC5405E25A083E76CFFB8EB49@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <CAMkAt6pdoMY1yV+kcUzOftD2WKS8sQy-R2b=Aty8wS-gGp-21Q@mail.gmail.com> <SN6PR12MB276787F711EE80D3546431848E839@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB276787F711EE80D3546431848E839@SN6PR12MB2767.namprd12.prod.outlook.com>
 From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 8 Jul 2022 09:28:50 -0600
-Message-ID: <CAMkAt6riwJuL445USAAc-dLZ+vUsmtr+spAM=RQhJ07-K=nyMg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 42/49] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
+Date:   Fri, 8 Jul 2022 09:54:24 -0600
+Message-ID: <CAMkAt6oea8CfjupTRBS1CQQogaixNakF1+KjSZ-+bhRBRj3GvQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 35/49] KVM: SVM: Remove the long-lived GHCB host map
 To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
 Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -96,123 +95,87 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 1:15 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
+On Thu, Jul 7, 2022 at 2:31 PM Kalra, Ashish <Ashish.Kalra@amd.com> wrote:
 >
-> [Public]
+> [AMD Official Use Only - General]
 >
+> Hello Peter,
 >
-> >> +static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t
-> >> +req_gpa, gpa_t resp_gpa) {
-> >> +       struct sev_data_snp_guest_request req =3D {0};
-> >> +       struct kvm_vcpu *vcpu =3D &svm->vcpu;
-> >> +       struct kvm *kvm =3D vcpu->kvm;
-> >> +       unsigned long data_npages;
-> >> +       struct kvm_sev_info *sev;
-> >> +       unsigned long rc, err;
-> >> +       u64 data_gpa;
-> >> +
-> >> +       if (!sev_snp_guest(vcpu->kvm)) {
-> >> +               rc =3D SEV_RET_INVALID_GUEST;
-> >> +               goto e_fail;
-> >> +       }
-> >> +
-> >> +       sev =3D &to_kvm_svm(kvm)->sev_info;
-> >> +
-> >> +       data_gpa =3D vcpu->arch.regs[VCPU_REGS_RAX];
-> >> +       data_npages =3D vcpu->arch.regs[VCPU_REGS_RBX];
-> >> +
-> >> +       if (!IS_ALIGNED(data_gpa, PAGE_SIZE)) {
-> >> +               rc =3D SEV_RET_INVALID_ADDRESS;
-> >> +               goto e_fail;
-> >> +       }
-> >> +
-> >> +       /* Verify that requested blob will fit in certificate buffer *=
-/
-> >> +       if ((data_npages << PAGE_SHIFT) > SEV_FW_BLOB_MAX_SIZE) {
-> >> +               rc =3D SEV_RET_INVALID_PARAM;
-> >> +               goto e_fail;
-> >> +       }
-> >> +
-> >> +       mutex_lock(&sev->guest_req_lock);
-> >> +
-> >> +       rc =3D snp_setup_guest_buf(svm, &req, req_gpa, resp_gpa);
-> >> +       if (rc)
-> >> +               goto unlock;
-> >> +
-> >> +       rc =3D snp_guest_ext_guest_request(&req, (unsigned long)sev->s=
-np_certs_data,
-> >> +                                        &data_npages, &err);
-> >> +       if (rc) {
-> >> +               /*
-> >> +                * If buffer length is small then return the expected
-> >> +                * length in rbx.
-> >> +                */
-> >> +               if (err =3D=3D SNP_GUEST_REQ_INVALID_LEN)
-> >> +                       vcpu->arch.regs[VCPU_REGS_RBX] =3D data_npages=
-;
-> >> +
-> >> +               /* pass the firmware error code */
-> >> +               rc =3D err;
-> >> +               goto cleanup;
-> >> +       }
-> >> +
-> >> +       /* Copy the certificate blob in the guest memory */
-> >> +       if (data_npages &&
-> >> +           kvm_write_guest(kvm, data_gpa, sev->snp_certs_data, data_n=
-pages << PAGE_SHIFT))
-> >> +               rc =3D SEV_RET_INVALID_ADDRESS;
+> >> >There is a perf cost to this suggestion but it might make accessing
+> >> >the GHCB safer for KVM. Have you thought about just using
+> >> >kvm_read_guest() or copy_from_user() to fully copy out the GCHB into =
+a KVM owned buffer, then copying it back before the VMRUN. That way the KVM=
+ doesn't need to guard against page_state_changes on the GHCBs, that could =
+be a perf ?>>improvement in a follow up.
+> >>
+> >> Along with the performance costs you mentioned, the main concern here
+> >> will be the GHCB write-back path (copying it back) before VMRUN: this
+> >> will again hit the issue we have currently with
+> >> kvm_write_guest() / copy_to_user(), when we use it to sync the scratch
+> >> buffer back to GHCB. This can fail if guest RAM is mapped using huge-p=
+age(s) and RMP is 4K. Please refer to the patch/fix mentioned below, kvm_wr=
+ite_guest() potentially can fail before VMRUN in case of SNP :
+> >>
+> >> commit 94ed878c2669532ebae8eb9b4503f19aa33cd7aa
+> >> Author: Ashish Kalra <ashish.kalra@amd.com>
+> >> Date:   Mon Jun 6 22:28:01 2022 +0000
+> >>
+> >>     KVM: SVM: Sync the GHCB scratch buffer using already mapped ghcb
+> >>
+> >>    Using kvm_write_guest() to sync the GHCB scratch buffer can fail
+> >>     due to host mapping being 2M, but RMP being 4K. The page fault han=
+dling
+> >>     in do_user_addr_fault() fails to split the 2M page to handle RMP f=
+ault due
+> >>     to it being called here in a non-preemptible context. Instead use
+> >>     the already kernel mapped ghcb to sync the scratch buffer when the
+> >>     scratch buffer is contained within the GHCB.
 >
-> >>Since at this point the PSP FW has correctly executed the command and i=
-ncremented the VMPCK sequence number I think we need another error signal h=
-ere since this will tell the guest the PSP had an error so it will not know=
- if the VMPCK sequence >number should be incremented.
+> >Ah I didn't see that issue thanks for the pointer.
 >
-> >Similarly as above, as this is an error path, so what's the guarantee th=
-at the next guest message request will succeed completely,  isn=E2=80=99t i=
-t better to let the
-> >FW reject any subsequent guest messages once it has detected that the se=
-quence numbers are out of sync ?
+> >The patch description says "When SEV-SNP is enabled the mapped GPA needs=
+ to be protected against a page state change." since if the guest were to c=
+onvert the GHCB page to private when the host is using the GHCB the host co=
+uld get an RMP violation right?
 >
-> Alternately, we probably can return SEV_RET_INVALID_PAGE_STATE/SEV_RET_IN=
-VALID_PAGE_OWNER here, but that still does not indicate to the guest
-> that the FW has successfully executed the command and the error occurred =
-during cleanup/result phase and it needs to increment the VMPCK sequence nu=
-mber. There is nothing as such defined in SNP FW API specs to indicate such=
- kind of failures to guest. As I mentioned earlier, this is probably indica=
-tive of
-> a bigger system failure and it is better to let the FW reject subsequent =
-guest messages/requests once it has detected that the sequence numbers are =
-out of sync.
+> Right.
+>
+> >That RMP violation would cause the host to crash unless we use some copy=
+_to_user() type protections.
+>
+> As such copy_to_user() will only swallow the RMP violation and return fai=
+lure, so the host can retry the write.
+>
+> > I don't see anything mechanism for this patch to add the page state cha=
+nge protection discussed. Can't another vCPU still convert the GHCB to priv=
+ate?
+>
+> We do have the protections for GHCB getting mapped to private specificall=
+y, there are new post_{map|unmap}_gfn functions added to verify if it is sa=
+fe to map
+> GHCB pages. There is a PSC spinlock added which protects again page state=
+ change for these mapped pages.
+> Below is the reference to this patch:
+> https://lore.kernel.org/lkml/cover.1655761627.git.ashish.kalra@amd.com/T/=
+#mafcaac7296eb9a92c0ea58730dbd3ca47a8e0756
+>
+> But do note that there is protection only for GHCB pages and there is a n=
+eed to add generic post_{map,unmap}_gfn() ops that can be used to verify
+> that it's safe to map a given guest page in the hypervisor. This is a TOD=
+O right now and probably this is something which UPM can address more clean=
+ly.
 
-Hmm I think the guest must be careful here because the guest could not
-trust the hypervisor here to be truthful about the sequence numbers
-incrementing. That's unfortunate since this means if these operations
-do fail with a well behaved hypervisor the guest cannot use that VMPCK
-again. But there is no harm in the guest re-issuing the
-SNP_GUEST_REQUEST (or extended version) with the exact same request
-just in at a different address. The GHCB spec actually calls this out
-" It is recommended that the hypervisor validate the guest physical
-address of the response page before invoking the SNP_GUEST_REQUEST API
-so that the sequence numbers do not get out of sync for the guest,
-possibly resulting in all successive requests failing".
+Thank you Ashish. I had missed that.
 
-Currently SVM_VMGEXIT_GUEST_REQUEST and SVM_VMGEXIT_EXT_GUEST_REQUEST
-have different hypervisor -> guest usage for SW_EXITINFO2. I think
-they both should be defined as what SVM_VMGEXIT_EXT_GUEST_REQUEST is
-now: the high 32bits are the hypervisor error code, the low 32bits are
-the FW error code. This would allow for both NAEs to have some signal
-to the guest say SEV_RET_INVALID_REQ_ADDRESS. The hypervisor can use
-this error code when doing the validation on the request and response
-regions, if some is wrong with them the guest can retry with the exact
-same request (so no IV reuse) in a corrected region.
+Can you help me understand why its OK to use kvm_write_guest() for the
+|snp_certs_data| inside of snp_handle_ext_guest_request() in patch
+42/49? I would have thought we'd have the same 2M vs 4K mapping
+issues.
 
-But another reason I think SVM_VMGEXIT_GUEST_REQUEST SW_EXITINFO2
-hypervisor->guest state should include this change is because in this
-patch we are currently overloading the lower 32bits with hypervisor
-error codes. In snp_handle_guest_request() if sev_snp_guest(),
-snp_setup_guest_buf(), or snp_cleanup_guest_buf() fails we use the low
-32bits of SW_EXITINFO2 to return hypervisor errors to the guest.
-
+>
+> >I was wrong about the importance of this though seanjc@ walked me throug=
+h how UPM will solve this issue so no worries about this until the series i=
+s rebased on to UPM.
 >
 > Thanks,
 > Ashish
