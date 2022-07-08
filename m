@@ -2,68 +2,129 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FABC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 07:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A97C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 07:29:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237524AbiGHHUc (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Jul 2022 03:20:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60832 "EHLO
+        id S237545AbiGHH3B (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Jul 2022 03:29:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237298AbiGHHUb (ORCPT
+        with ESMTP id S237538AbiGHH27 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Jul 2022 03:20:31 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC041796BE;
-        Fri,  8 Jul 2022 00:20:30 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1o9iHW-00Fqwz-9l; Fri, 08 Jul 2022 17:20:07 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Jul 2022 15:20:06 +0800
-Date:   Fri, 8 Jul 2022 15:20:06 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vladis Dronov <vdronov@redhat.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Simo Sorce <simo@redhat.com>
-Subject: Re: [PATCH v3] crypto: fips - make proc files report fips module
- name and version
-Message-ID: <YsfappxjOaj99WEV@gondor.apana.org.au>
-References: <20220620131618.952133-1-vdronov@redhat.com>
- <20220627195144.976741-1-vdronov@redhat.com>
+        Fri, 8 Jul 2022 03:28:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CED67B361;
+        Fri,  8 Jul 2022 00:28:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ADAF462577;
+        Fri,  8 Jul 2022 07:28:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2F57C341C0;
+        Fri,  8 Jul 2022 07:28:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1657265337;
+        bh=P3KJbNk/a1tni8VNKqa9yL67GlHHapXzf5CgJxWvq2U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=MwNF3wcS5wZs0apvEn9xv6n5LXVfwDmNG/aWqaunbQhVrmAk7gzn7R6HU07LSpAe+
+         BA/dmzqZ2IHyv/ket3FWllSMB+rV3FfUmKjLHUfEMUoVGkcuIyEF2uoXRjU8fA+KDz
+         RE/RTd1R2bTHjm4/tcC05MPFQJy01G2lDVTtCZtU=
+Date:   Fri, 8 Jul 2022 09:28:54 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Kai Ye <yekai13@huawei.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wangzhou1@hisilicon.com
+Subject: Re: [PATCH v5 1/3] uacce: supports device isolation feature
+Message-ID: <YsfctnUkPCo+qGJW@kroah.com>
+References: <20220708070820.43958-1-yekai13@huawei.com>
+ <20220708070820.43958-2-yekai13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220627195144.976741-1-vdronov@redhat.com>
+In-Reply-To: <20220708070820.43958-2-yekai13@huawei.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 09:51:44PM +0200, Vladis Dronov wrote:
->
-> diff --git a/crypto/fips.c b/crypto/fips.c
-> index 7b1d8caee669..d820f83cb878 100644
-> --- a/crypto/fips.c
-> +++ b/crypto/fips.c
-> @@ -30,13 +30,37 @@ static int fips_enable(char *str)
+On Fri, Jul 08, 2022 at 03:08:18PM +0800, Kai Ye wrote:
+> UACCE adds the hardware error isolation API. Users can configure
+> the isolation frequency by this sysfs node. UACCE reports the device
+> isolate state to the user space. If the AER error frequency exceeds
+> the value of setting for a certain period of time, the device will be
+> isolated.
+> 
+> Signed-off-by: Kai Ye <yekai13@huawei.com>
+> ---
+>  drivers/misc/uacce/uacce.c | 55 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/uacce.h      | 11 ++++++++
+>  2 files changed, 66 insertions(+)
+> 
+> diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
+> index 281c54003edc..d07b5f1f0596 100644
+> --- a/drivers/misc/uacce/uacce.c
+> +++ b/drivers/misc/uacce/uacce.c
+> @@ -7,6 +7,8 @@
+>  #include <linux/slab.h>
+>  #include <linux/uacce.h>
 >  
->  __setup("fips=", fips_enable);
->  
-> +#define FIPS_MODULE_NAME CONFIG_CRYPTO_FIPS_NAME
-> +#ifdef CONFIG_CRYPTO_FIPS_CUSTOM_VERSION
-> +#define FIPS_MODULE_VERSION CONFIG_CRYPTO_FIPS_VERSION
-> +#else
-> +#define FIPS_MODULE_VERSION UTS_RELEASE
-> +#endif
+> +#define MAX_ERR_ISOLATE_COUNT		65535
 > +
-> +static char fips_name[] = FIPS_MODULE_NAME;
-> +static char fips_version[] = FIPS_MODULE_VERSION;
+>  static struct class *uacce_class;
+>  static dev_t uacce_devt;
+>  static DEFINE_MUTEX(uacce_mutex);
+> @@ -339,12 +341,63 @@ static ssize_t region_dus_size_show(struct device *dev,
+>  		       uacce->qf_pg_num[UACCE_QFRT_DUS] << PAGE_SHIFT);
+>  }
+>  
+> +static ssize_t isolate_show(struct device *dev,
+> +			    struct device_attribute *attr, char *buf)
+> +{
+> +	struct uacce_device *uacce = to_uacce_device(dev);
+> +
+> +	if (!uacce->ops->get_isolate_state)
+> +		return -ENODEV;
 
-This doesn't compile for me because you need to include
-generated/utsrelease.h.
+If there is no callback, why is this sysfs even created at all?  Please
+do not create it if it can not be accessed.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Use the is_visable() callback for the group to do this.
+
+> +
+> +	return sysfs_emit(buf, "%d\n", uacce->ops->get_isolate_state(uacce));
+> +}
+> +
+> +static ssize_t isolate_strategy_show(struct device *dev,
+> +				     struct device_attribute *attr, char *buf)
+> +{
+> +	struct uacce_device *uacce = to_uacce_device(dev);
+> +	u32 val;
+> +
+> +	if (!uacce->ops->isolate_strategy_read)
+> +		return -ENODEV;
+
+Same here, don't have a sysfs file that does nothing.
+
+> +
+> +	val = uacce->ops->isolate_strategy_read(uacce);
+> +	if (val > MAX_ERR_ISOLATE_COUNT)
+> +		return -EINVAL;
+> +
+> +	return sysfs_emit(buf, "%u\n", val);
+> +}
+> +
+> +static ssize_t isolate_strategy_store(struct device *dev,
+> +				      struct device_attribute *attr,
+> +				      const char *buf, size_t count)
+> +{
+> +	struct uacce_device *uacce = to_uacce_device(dev);
+> +	unsigned long val;
+> +	int ret;
+> +
+> +	if (!uacce->ops->isolate_strategy_write)
+> +		return -ENODEV;
+
+Same here.
+
+thanks,
+
+greg k-h
