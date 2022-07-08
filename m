@@ -2,55 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC9BC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 08:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 537C4C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 08:02:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237462AbiGHICZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Jul 2022 04:02:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37102 "EHLO
+        id S237508AbiGHICh (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 8 Jul 2022 04:02:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237278AbiGHICZ (ORCPT
+        with ESMTP id S237339AbiGHICg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Jul 2022 04:02:25 -0400
+        Fri, 8 Jul 2022 04:02:36 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CCB77E01F
-        for <linux-crypto@vger.kernel.org>; Fri,  8 Jul 2022 01:02:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8FA7E028;
+        Fri,  8 Jul 2022 01:02:34 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1o9iwK-00Frwo-1R; Fri, 08 Jul 2022 18:02:17 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Jul 2022 16:02:16 +0800
-Date:   Fri, 8 Jul 2022 16:02:16 +0800
+        id 1o9iwZ-00Fryj-B5; Fri, 08 Jul 2022 18:02:32 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 Jul 2022 16:02:31 +0800
+Date:   Fri, 8 Jul 2022 16:02:31 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     oferh@marvell.com
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        atenart@kernel.org
-Subject: Re: [PATCH] crypto: inside-secure: fix packed bit-field result
- descriptor
-Message-ID: <YsfkiFRefmuh62+p@gondor.apana.org.au>
-References: <20220702071426.1915429-1-oferh@marvell.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@cloudflare.com, Eric Biggers <ebiggers@kernel.org>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2] crypto: testmgr - populate RSA CRT parameters in RSA
+ test vectors
+Message-ID: <Ysfkl9gOIY9muhy9@gondor.apana.org.au>
+References: <20220704103840.924-1-ignat@cloudflare.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220702071426.1915429-1-oferh@marvell.com>
+In-Reply-To: <20220704103840.924-1-ignat@cloudflare.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 02, 2022 at 10:14:26AM +0300, oferh@marvell.com wrote:
-> From: Ofer Heifetz <oferh@marvell.com>
+On Mon, Jul 04, 2022 at 11:38:40AM +0100, Ignat Korchagin wrote:
+> Changes from v1:
+>   * replace some accidental spaces with tabs
 > 
-> When mixing bit-field and none bit-filed in packed struct the
-> none bit-field starts at a distinct memory location, thus adding
-> an additional byte to the overall structure which is used in
-> memory zero-ing and other configuration calculations.
+> In commit f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem
+> for faster private key operations") we have started to use the additional
+> primes and coefficients for RSA private key operations. However, these
+> additional parameters are not present (defined as 0 integers) in the RSA
+> test vectors.
 > 
-> Fix this by removing the none bit-field that has a following
-> bit-field.
+> Some parameters were borrowed from OpenSSL, so I was able to find the
+> source. I could not find the public source for 1 vector though, so had to
+> recover the parameters by implementing Appendix C from [1].
 > 
-> Signed-off-by: Ofer Heifetz <oferh@marvell.com>
+> [1]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br1.pdf
+> 
+> Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operations")
+> Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 > ---
->  drivers/crypto/inside-secure/safexcel.h | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+>  crypto/testmgr.h | 121 +++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 100 insertions(+), 21 deletions(-)
 
 Patch applied.  Thanks.
 -- 
