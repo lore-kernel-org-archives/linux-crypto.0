@@ -2,86 +2,90 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27753CCA47B
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Jul 2022 21:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8850C43334
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Jul 2022 16:16:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240484AbiGHVcJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Jul 2022 17:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46102 "EHLO
+        id S229509AbiGIQQ4 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 9 Jul 2022 12:16:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240483AbiGHVcI (ORCPT
+        with ESMTP id S229379AbiGIQQ4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Jul 2022 17:32:08 -0400
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49BAEA0266;
-        Fri,  8 Jul 2022 14:32:08 -0700 (PDT)
-Received: by mail-il1-f171.google.com with SMTP id h16so5603208ila.2;
-        Fri, 08 Jul 2022 14:32:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject:date
-         :message-id;
-        bh=2c8hNn/HcSsNuhk2VZkSz28XgxLYEcL3R/BmDHkTe1Y=;
-        b=NJ5MpovZ0YAnHZEbkxcI73+hIPzRTbPnlDSz7Iyvc4XWI2lVURuwoBR84ItHNaYN43
-         ME15zYAt+Kx8bWQFd1ooaVyp6XLVKd7cPVAVmXb0j8z3phY8AMcYJyLqnPobXIophfTC
-         lqwqTfKpLu3NLF7T6Q9eaogO0jQjhEtGSbJPN9362JfBM0ILiVTRCx9fbaWxs+k2dRMs
-         pSaFgkl8Ldq5Rn/WHMkJsi/4lJlYwrbeoIY0L1mZndrScK1uEOx1mKjbyJLZk4WtBwnW
-         c3XBllnA4MbDv31U9kclGf9EVCV/yhggF20zb3Bdq16FUMx0OkSr8Yy6JM2IfxUHGEwu
-         bVCQ==
-X-Gm-Message-State: AJIora8PxFmLLjNPkshyFF2crCVis2TrC3DyO0x+3PsW3kWNN2G5Vi2z
-        IqBapw1pU/48I5el9VnXZw==
-X-Google-Smtp-Source: AGRyM1vPbXrieqMHwm2ebeU3CsWBQ7/Skb1GSUm9tzvGAV+/lPgBdXG9me75jXQNeSTpNLyUbB8o8Q==
-X-Received: by 2002:a92:6c05:0:b0:2da:b9e8:24df with SMTP id h5-20020a926c05000000b002dab9e824dfmr3316030ilc.99.1657315927467;
-        Fri, 08 Jul 2022 14:32:07 -0700 (PDT)
-Received: from robh.at.kernel.org ([98.38.210.73])
-        by smtp.gmail.com with ESMTPSA id a17-20020a027a11000000b0033f2f249a69sm1086501jac.129.2022.07.08.14.32.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jul 2022 14:32:07 -0700 (PDT)
-Received: (nullmailer pid 1508206 invoked by uid 1000);
-        Fri, 08 Jul 2022 21:32:02 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Jayesh Choudhary <j-choudhary@ti.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, devicetree@vger.kernel.org,
-        vigneshr@ti.com, davem@davemloft.net, robh+dt@kernel.org,
-        herbert@gondor.apana.org.au, j-keerthy@ti.com
-In-Reply-To: <20220707110756.16169-1-j-choudhary@ti.com>
-References: <20220707110756.16169-1-j-choudhary@ti.com>
-Subject: Re: [PATCH] dt-bindings: crypto: ti,sa2ul: drop dma-coherent property
-Date:   Fri, 08 Jul 2022 15:32:02 -0600
-Message-Id: <1657315922.470955.1508205.nullmailer@robh.at.kernel.org>
+        Sat, 9 Jul 2022 12:16:56 -0400
+Received: from smtp.smtpout.orange.fr (smtp07.smtpout.orange.fr [80.12.242.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76622D1DB
+        for <linux-crypto@vger.kernel.org>; Sat,  9 Jul 2022 09:16:54 -0700 (PDT)
+Received: from pop-os.home ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id AD8SokbspL5fDAD8SoxgQs; Sat, 09 Jul 2022 18:16:53 +0200
+X-ME-Helo: pop-os.home
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Sat, 09 Jul 2022 18:16:53 +0200
+X-ME-IP: 90.11.190.129
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Yang Shen <shenyang39@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: hisilicon/zip: Use the bitmap API to allocate bitmaps
+Date:   Sat,  9 Jul 2022 18:16:46 +0200
+Message-Id: <49a1b5bf6e8f7c2ad06a0e2dbc35e00169d4ebe2.1657383385.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 07 Jul 2022 16:37:56 +0530, Jayesh Choudhary wrote:
-> crypto driver itself is not dma-coherent. It is the dmaengine
-> that moves data and the buffers are to be mapped to the
-> dmaengine provider. So this property should be dropped.
-> 
-> Fixes: 2ce9a7299bf6 ('dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation')
-> Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
-> ---
->  .../devicetree/bindings/crypto/ti,sa2ul.yaml        | 13 -------------
->  1 file changed, 13 deletions(-)
-> 
+Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
 
-Running 'make dtbs_check' with the schema in this patch gives the
-following warnings. Consider if they are expected or the schema is
-incorrect. These may not be new warnings.
+It is less verbose and it improves the semantic.
 
-Note that it is not yet a requirement to have 0 warnings for dtbs_check.
-This will change in the future.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Full log is available here: https://patchwork.ozlabs.org/patch/
-
-
-crypto@4e00000: 'dma-coherent' does not match any of the regexes: '^rng@[a-f0-9]+$', 'pinctrl-[0-9]+'
-	arch/arm64/boot/dts/ti/k3-am6528-iot2050-basic.dtb
-	arch/arm64/boot/dts/ti/k3-am6528-iot2050-basic-pg2.dtb
-	arch/arm64/boot/dts/ti/k3-am6548-iot2050-advanced.dtb
-	arch/arm64/boot/dts/ti/k3-am6548-iot2050-advanced-pg2.dtb
-	arch/arm64/boot/dts/ti/k3-am654-base-board.dtb
-	arch/arm64/boot/dts/ti/k3-j721e-common-proc-board.dtb
-	arch/arm64/boot/dts/ti/k3-j721e-sk.dtb
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 67869513e48c..7bf53877e508 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -606,8 +606,7 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
+ 		req_q = &ctx->qp_ctx[i].req_q;
+ 		req_q->size = QM_Q_DEPTH;
+ 
+-		req_q->req_bitmap = kcalloc(BITS_TO_LONGS(req_q->size),
+-					    sizeof(long), GFP_KERNEL);
++		req_q->req_bitmap = bitmap_zalloc(req_q->size, GFP_KERNEL);
+ 		if (!req_q->req_bitmap) {
+ 			ret = -ENOMEM;
+ 			if (i == 0)
+@@ -631,11 +630,11 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
+ 	return 0;
+ 
+ err_free_loop1:
+-	kfree(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
++	bitmap_free(ctx->qp_ctx[HZIP_QPC_DECOMP].req_q.req_bitmap);
+ err_free_loop0:
+ 	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.q);
+ err_free_bitmap:
+-	kfree(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
++	bitmap_free(ctx->qp_ctx[HZIP_QPC_COMP].req_q.req_bitmap);
+ 	return ret;
+ }
+ 
+@@ -645,7 +644,7 @@ static void hisi_zip_release_req_q(struct hisi_zip_ctx *ctx)
+ 
+ 	for (i = 0; i < HZIP_CTX_Q_NUM; i++) {
+ 		kfree(ctx->qp_ctx[i].req_q.q);
+-		kfree(ctx->qp_ctx[i].req_q.req_bitmap);
++		bitmap_free(ctx->qp_ctx[i].req_q.req_bitmap);
+ 	}
+ }
+ 
+-- 
+2.34.1
 
