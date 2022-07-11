@@ -2,89 +2,65 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D19CCCA47B
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 14:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB38BC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 14:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbiGKOWL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Jul 2022 10:22:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43914 "EHLO
+        id S231859AbiGKO7E (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Jul 2022 10:59:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231281AbiGKOVv (ORCPT
+        with ESMTP id S231649AbiGKO7C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Jul 2022 10:21:51 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B508C67169;
-        Mon, 11 Jul 2022 07:21:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1657549309; x=1689085309;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=A/xwrdAxYXsA63RbLzyW7L2rIbPha0EngocXXdoox2M=;
-  b=C+Z0UlAu+ySencYq6s1jm5PNfEu7hgjIc4OQkdfKQFWf6G5quDMskYTQ
-   OEJQlWrSQLOhmn8MhG+5RsWPVrf21THsVu8jD9FFcS40D7dBWWTYe3WW4
-   SgFcUEoP1UlwqA8w+At/nxVyBy93m2njP3pChSoliobgKwJUERy1EjRsg
-   ANVjaC62JOgr5rtEJ5uyq+++wz1x6Xybmu/shc9nsrnXkMqTxjOA0y1Cr
-   deCzpLpoe1A5U2dtaLVamR7XU3ziozkRix7Mv/YE1F7UjVN5FcYOL/MWT
-   XyC7T4Fl/tar2lxL2goJrYYP6dRSwLMqGU4YoorB5g8PxDVQ5ISbhOgrP
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10404"; a="348652380"
-X-IronPort-AV: E=Sophos;i="5.92,263,1650956400"; 
-   d="scan'208";a="348652380"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 07:21:49 -0700
-X-IronPort-AV: E=Sophos;i="5.92,263,1650956400"; 
-   d="scan'208";a="662564681"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 07:21:46 -0700
-Date:   Mon, 11 Jul 2022 15:21:39 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+        Mon, 11 Jul 2022 10:59:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD00248E9;
+        Mon, 11 Jul 2022 07:59:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B9CC9B80EB5;
+        Mon, 11 Jul 2022 14:59:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E421DC34115;
+        Mon, 11 Jul 2022 14:58:58 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Wbovc2+Q"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1657551537;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=raYE22deiWZyC2ij3n9yOytE9CpcUo4M8OAMvQofY4Y=;
+        b=Wbovc2+QaFo0ndsELtP5W0Fjg/y5od3b6T9EXkkZ9MNJ3GnzyMkTeNjaj9DHCiTsHEJjyw
+        mbh2NuldpCv3AUp8C33DuVjCEBsPi2aPVoLeNrmomvSxLrQpP4ZICxuLa5jwOlJ3D+tIsM
+        0yEnVE4oMLtoeLXM0c6hsoUWlCv+pcQ=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0bbd100b (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Mon, 11 Jul 2022 14:58:57 +0000 (UTC)
+Date:   Mon, 11 Jul 2022 16:58:53 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        qat-linux@intel.com, stable@vger.kernel.org,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Marco Chiappero <marco.chiappero@intel.com>,
-        Wojciech Ziemba <wojciech.ziemba@intel.com>,
-        Lucas Segarra Fernandez <lucas.segarra.fernandez@intel.com>
-Subject: Re: [PATCH v3 1/3] crypto: qat - use pre-allocated buffers in
- datapath
-Message-ID: <Yswx1myaFwJR22FQ@silpixa00400314>
-References: <20220410194707.9746-1-giovanni.cabiddu@intel.com>
- <20220410194707.9746-2-giovanni.cabiddu@intel.com>
- <YlRnVBYl1eJ+zvM5@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: move lib/sha1.c into lib/crypto/
+Message-ID: <Ysw6rRDaBvr2oDx5@zx2c4.com>
+References: <20220709211849.210850-1-ebiggers@kernel.org>
+ <20220709211849.210850-2-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YlRnVBYl1eJ+zvM5@gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+In-Reply-To: <20220709211849.210850-2-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 05:37:24PM +0000, Eric Biggers wrote:
-> On Sun, Apr 10, 2022 at 08:47:05PM +0100, Giovanni Cabiddu wrote:
-> > If requests exceed 4 entries buffers, memory is allocated dynamically.
-> > 
-> > In addition, remove the CRYPTO_ALG_ALLOCATES_MEMORY flag from both aead
-> > and skcipher alg structures.
-> > 
+On Sat, Jul 09, 2022 at 02:18:48PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> There is nothing that says that algorithms can ignore
-> !CRYPTO_ALG_ALLOCATES_MEMORY if there are too many scatterlist entries.  See the
-> comment above the definition of CRYPTO_ALG_ALLOCATES_MEMORY.
+> SHA-1 is a crypto algorithm (or at least was intended to be -- it's not
+> considered secure anymore), so move it out of the top-level library
+> directory and into lib/crypto/.
 > 
-> If you need to introduce this constraint, then you will need to audit the users
-> of !CRYPTO_ALG_ALLOCATES_MEMORY to verify that none of them are issuing requests
-> that violate this constraint, then add this to the documentation comment for
-> CRYPTO_ALG_ALLOCATES_MEMORY.
-Belatedly...
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Adding to this thread my colleague Lucas who did an audit of the users
-of !CRYPTO_ALG_ALLOCATES_MEMORY to understand if we can add a constraint
-to the definition of CRYPTO_ALG_ALLOCATES_MEMORY.
+Thanks for this.
 
-Regards,
-
--- 
-Giovanni
+Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
