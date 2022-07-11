@@ -2,64 +2,161 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74268C43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 17:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CE1C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 18:01:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbiGKR6N (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Jul 2022 13:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59170 "EHLO
+        id S231360AbiGKSBs (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Jul 2022 14:01:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbiGKR6M (ORCPT
+        with ESMTP id S229629AbiGKSBq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Jul 2022 13:58:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D2D7D789
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Jul 2022 10:58:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 835346145D
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Jul 2022 17:58:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8110C34115;
-        Mon, 11 Jul 2022 17:58:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657562290;
-        bh=dqKL1ZHaU9DALuFJcYhh0LDAOizflbirqGTWzM+maT8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bhdB18exvKnYksKC+IKTrJECibcSsYbwShPuYH36PhnpzakjoumTw6QKC6jm9PMSC
-         A2QJ4mgqZElLiLa8Sz0Rmmsa3vqbfPZUwTgHSowQXozSd563rvgPsc1U8B4LHBmbYP
-         Ux9yMxECgREQbQR0RWdgtn2i4qg5tXlv+vS7u0UbGGarYyTPlB+7k8viWcoEtz7MYA
-         9v6dxXx/JtQw1YKVo3oLaXbynbX/v2VC3Hzenosuk+59lHxDHbIHKEnXvmlkJssZIQ
-         OcrdrUelZw5zvYgNgiz7LtmUL+OOyB/qJj7L+YmFsECWGuGV8LNGm+f2GUjEF8ROsQ
-         bksOFZN5mSNTg==
-Date:   Mon, 11 Jul 2022 17:58:09 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Guozihua (Scott)" <guozihua@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        catalin.marinas@arm.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, zengxianjun3@huawei.com,
-        yunjia.wang@huawei.com
-Subject: Re: An inquire about a read out-of-bound found in poly1305-neon
-Message-ID: <YsxksSnCsk3TQVD+@gmail.com>
-References: <65952163-6b78-a02a-ba14-933807d3cfec@huawei.com>
+        Mon, 11 Jul 2022 14:01:46 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 200AF33428;
+        Mon, 11 Jul 2022 11:01:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657562505; x=1689098505;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IDwCYLXRHk6fLtW1OC/bfo5PDBdSCmEJitlahB7R/FQ=;
+  b=ZoCw025aMXw/Ku05YWqqOvabAW10+UCmfwNpsyipbmPFfgSIvClcrCB+
+   EM+ZyXtXNZAMY8rctUBjFF4crbFUSN9d1UP0idxQqdwAZjLdf9U6PwCIj
+   e71HhgoXWP08/P5yNGUQvLyGAa3IrvKtmig4O6H78LujMUpHrVxH3ycxv
+   8k4jGpS6MHLNpbfxE6zBR8QjwCB6q4WCMJ75rssvAenl4qRGQzVN0pUtJ
+   idIj3x1I1RWcCCcyoCSYQthHC0fhsh5ixV+JHbFijfllTbLuyr2Fq4csA
+   ik5U3VAqGkU7fZ9ouT7OIhIom47bPF9y25a0QCBSE33mMeJBSSNnAwSKE
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10405"; a="348710263"
+X-IronPort-AV: E=Sophos;i="5.92,263,1650956400"; 
+   d="scan'208";a="348710263"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 11:01:44 -0700
+X-IronPort-AV: E=Sophos;i="5.92,263,1650956400"; 
+   d="scan'208";a="921882166"
+Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314) ([10.237.222.76])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2022 11:01:41 -0700
+Date:   Mon, 11 Jul 2022 19:01:32 +0100
+From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To:     lkp@intel.com, Vlad Dronov <vdronov@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     kbuild-all@lists.01.org,
+        GNU/Weeb Mailing List <gwml@vger.gnuweeb.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
+        Adam Guerin <adam.guerin@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH RESEND] crypto: qat - fix indentation in ABI documentation
+Message-ID: <YsxlfOG17XQ+zLLZ@silpixa00400314>
+References: <202207090803.TEGI95qw-lkp@intel.com>
+ <YsvuJsjxEjp/LHZa@silpixa00400314>
+ <CAMusb+QfUZwq+JRkUrOLGO7mQLZbg_ueFVo2_PTSiSRiq7BoEA@mail.gmail.com>
+ <YsxJnq32lAJIRSET@silpixa00400314>
+ <YsxP5n0rjUaX0mL8@silpixa00400314>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <65952163-6b78-a02a-ba14-933807d3cfec@huawei.com>
+In-Reply-To: <YsxP5n0rjUaX0mL8@silpixa00400314>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 09:34:49PM +0800, Guozihua (Scott) wrote:
-> Directly calling poly1305_init_arm64 instead of poly1305_init_arch() is also
-> tried but it would fail the self-test as well.
+On Mon, Jul 11, 2022 at 05:29:52PM +0100, Giovanni Cabiddu wrote:
+> Resending including linux-crypto. Apologies for the duplicate.
+Ouch, now I see that it didn't get picked up by
+https://patchwork.kernel.org/project/linux-crypto/list/.
+Re-sending again, now with the correct subject. Apologies.
 
-I think that's the correct fix.  Are you sure it fails the self-test?  It should
-look like:
+----8<----
 
-	poly1305_init_arm64(&dctx->h, src);
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Date: Mon, 11 Jul 2022 16:18:43 +0100
+Subject: [PATCH] crypto: qat - fix indentation in ABI documentation
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 
-Just like the arm32 version in arch/arm/crypto/poly1305-glue.c.  Note that
-&dctx->h must be used rather than just dctx.
+Change the indentation in the file sysfs-driver-qat to resolve the
+following warning when generating documentation with `make htmldocs`:
 
-- Eric
+    Documentation/ABI/testing/sysfs-driver-qat:24: WARNING: Unexpected indentation.
+
+Fixes: d4cfb144f605 ("crypto: qat - expose device config through sysfs for 4xxx")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ Documentation/ABI/testing/sysfs-driver-qat | 38 ++++++++++------------
+ 1 file changed, 17 insertions(+), 21 deletions(-)
+
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
+index a600531e9562..741d97fa5ae1 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat
++++ b/Documentation/ABI/testing/sysfs-driver-qat
+@@ -8,12 +8,12 @@ Description:	Reports the current state of the QAT device and allows to
+ 		This attribute is RW.
+ 
+ 		Returned values:
+-			up: the device is up and running
+-			down: the device is down
++		up: the device is up and running
++		down: the device is down
+ 
+ 		Allowed values:
+-			up: initialize and start the device
+-			down: stop the device and bring it down
++		up: initialize and start the device
++		down: stop the device and bring it down
+ 
+ 		It is possible to transition the device from up to down only
+ 		if the device is up and vice versa.
+@@ -30,16 +30,12 @@ Description:	Reports the current configuration of the QAT device and allows
+ 		This attribute is RW.
+ 
+ 		Returned values:
+-			sym;asym:	the device is configured for running
+-					crypto services
+-			dc:		the device is configured for running
+-					compression services
++		sym;asym:  the device is configured for running crypto services
++		dc:        the device is configured for running compression services
+ 
+ 		Allowed values:
+-			sym;asym:	configure the device for running
+-					crypto services
+-			dc:		configure the device for running
+-					compression services
++		sym;asym:  configure the device for running crypto services
++		dc:        configure the device for running compression services
+ 
+ 		It is possible to set the configuration only if the device
+ 		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
+@@ -47,14 +43,14 @@ Description:	Reports the current configuration of the QAT device and allows
+ 		The following example shows how to change the configuration of
+ 		a device configured for running crypto services in order to
+ 		run data compression:
+-			# cat /sys/bus/pci/devices/<BDF>/qat/state
+-			up
+-			# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
+-			sym;asym
+-			# echo down > /sys/bus/pci/devices/<BDF>/qat/state
+-			# echo dc > /sys/bus/pci/devices/<BDF>/qat/cfg_services
+-			# echo up > /sys/bus/pci/devices/<BDF>/qat/state
+-			# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
+-			dc
++		# cat /sys/bus/pci/devices/<BDF>/qat/state
++		up
++		# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
++		sym;asym
++		# echo down > /sys/bus/pci/devices/<BDF>/qat/state
++		# echo dc > /sys/bus/pci/devices/<BDF>/qat/cfg_services
++		# echo up > /sys/bus/pci/devices/<BDF>/qat/state
++		# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
++		dc
+ 
+ 		This attribute is only available for qat_4xxx devices.
+-- 
+2.36.1
+
