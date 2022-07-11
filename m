@@ -2,193 +2,352 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D1FC43334
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 13:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F9DC43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 14:05:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229679AbiGKNfF (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Jul 2022 09:35:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
+        id S230433AbiGKOFZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Jul 2022 10:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGKNfE (ORCPT
+        with ESMTP id S229635AbiGKOFX (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Jul 2022 09:35:04 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A6AB31924
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Jul 2022 06:35:03 -0700 (PDT)
-Received: from dggpemm500024.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LhPxC14pTzFq05;
-        Mon, 11 Jul 2022 21:34:07 +0800 (CST)
-Received: from [10.67.110.173] (10.67.110.173) by
- dggpemm500024.china.huawei.com (7.185.36.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 11 Jul 2022 21:35:00 +0800
-Message-ID: <65952163-6b78-a02a-ba14-933807d3cfec@huawei.com>
-Date:   Mon, 11 Jul 2022 21:34:49 +0800
+        Mon, 11 Jul 2022 10:05:23 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C9F2495D
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Jul 2022 07:05:21 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id o7so8853082lfq.9
+        for <linux-crypto@vger.kernel.org>; Mon, 11 Jul 2022 07:05:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/q0quOUBTZl2gZ3/jAMDJM6IbzyCJBTglBZNVpNLFAg=;
+        b=OrD3qzvjeeLGTBMraqT2BYvr0yduEBgTKuhSk/E0kxg3vkZv4jX3EyewouXwf6dCCq
+         uAZcyX19ccZNhJbindes8nJi5AREvwTXp/PkgH0V5RLCa4wS04W6iJBQbwc1qikmv6Ta
+         Oz1p8LhqQQO+Py50NrAt8cB689pHX13B3jg5rFLqNz8UpUvIApkpkukZUoeooUYiH5KF
+         hK9vTeGXNomKC2l94M8dS1+yOkcyMfFW19eS4TJwdJ0hHjY5FpX0PrTLl2RXLSq61YEl
+         hPeThgGZKETyFHA8MHZH6KiEG6SLlx/sbWBFsthhH1WHZBM0ngdsToPFTuVlYj2mfk+g
+         CepQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/q0quOUBTZl2gZ3/jAMDJM6IbzyCJBTglBZNVpNLFAg=;
+        b=0lYWRw3ZgHkjl3FRjO9cWufVLeu4dZH/vHWpozOUodjR/mCE/hho81Db5lzZNbC38B
+         PCDyFHERAhefaoJ8tHCTutyCNgL3+9VYGqkuLMH+4IFyF8UztrDuq+JAXT7a2vIhpYaO
+         w2c7EnK9o8DafnrdkXNIp7R4hxmCLGv9JctNJpGx60FA4CKDiGeDx69drOmAP86SnzcJ
+         rmKGuGoKIyXNBb4HKJKGrrXJx6QPVtcv74zISJl+5ag2ez/q+Q5Nur3oc95B3c5YTdr1
+         mSEt9NTtDtIRSHuPJllnROR2mNWHjHhtHV00EvHUUmfUJ93baYoAew9BmR6SRmiVrdBz
+         E4Wg==
+X-Gm-Message-State: AJIora/H8k7VNvc6V5FhrkCwVoYZWgzBV8WEhX81IC2CKWa8X2vCbGfx
+        wb1xGlKyjR/My+6PgHNafIJBParwTy0tqytuDP29lQ==
+X-Google-Smtp-Source: AGRyM1vr9Y62NuaJJYfkorIddGjcA9PSwfY28vd8Oaa2IQe6aGGNvRjDvJ+WHbbexoWMRT+ZRh4z37GhWYBnUZQ0IZo=
+X-Received: by 2002:a05:6512:32c5:b0:481:1822:c41f with SMTP id
+ f5-20020a05651232c500b004811822c41fmr12289097lfg.373.1657548319052; Mon, 11
+ Jul 2022 07:05:19 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-From:   "Guozihua (Scott)" <guozihua@huawei.com>
-To:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-CC:     <catalin.marinas@arm.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <zengxianjun3@huawei.com>,
-        <yunjia.wang@huawei.com>
-Subject: An inquire about a read out-of-bound found in poly1305-neon
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.110.173]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500024.china.huawei.com (7.185.36.203)
-X-CFilter-Loop: Reflected
+References: <cover.1655761627.git.ashish.kalra@amd.com> <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 11 Jul 2022 08:05:07 -0600
+Message-ID: <CAMkAt6obGwyiJh7J34Vt8tC+XXMNm8YPrv4gV=TVoF2Xga5GjQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 28/49] KVM: SVM: Add KVM_SEV_SNP_LAUNCH_FINISH command
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi community,
+On Mon, Jun 20, 2022 at 5:08 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The KVM_SEV_SNP_LAUNCH_FINISH finalize the cryptographic digest and stores
+> it as the measurement of the guest at launch.
+>
+> While finalizing the launch flow, it also issues the LAUNCH_UPDATE command
+> to encrypt the VMSA pages.
+>
+> If its an SNP guest, then VMSA was added in the RMP entry as
+> a guest owned page and also removed from the kernel direct map
+> so flush it later after it is transitioned back to hypervisor
+> state and restored in the direct map.
 
-Syzkaller reported the following bug while fuzzing poly1305-neon:
+Given the guest uses the SNP NAE AP boot protocol we were expecting
+that there would be some option to add vCPUs to the VM but mark them
+as "pending AP boot creation protocol" state. This would allow the
+LaunchDigest of a VM doesn't change just because its vCPU count
+changes. Would it be possible to add a new add an argument to
+KVM_SNP_LAUNCH_FINISH to tell it which vCPUs to LAUNCH_UPDATE VMSA
+pages for or similarly a new argument for KVM_CREATE_VCPU?
 
-BUG: KASAN: slab-out-of-bounds in 
-neon_poly1305_blocks.constprop.0+0x1b4/0x250 [poly1305_neon]
-Read of size 4 at addr ffff0010e293f010 by task syz-executor.5/1646715
-CPU: 4 PID: 1646715 Comm: syz-executor.5 Kdump: loaded Not tainted 
-5.10.0.aarch64 #1
-Hardware name: Huawei TaiShan 2280 /BC11SPCD, BIOS 1.59 01/31/2019
-Call trace:
-  dump_backtrace+0x0/0x394
-  show_stack+0x34/0x4c arch/arm64/kernel/stacktrace.c:196
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x158/0x1e4 lib/dump_stack.c:118
-  print_address_description.constprop.0+0x68/0x204 mm/kasan/report.c:387
-  __kasan_report+0xe0/0x140 mm/kasan/report.c:547
-  kasan_report+0x44/0xe0 mm/kasan/report.c:564
-  check_memory_region_inline mm/kasan/generic.c:187 [inline]
-  __asan_load4+0x94/0xd0 mm/kasan/generic.c:252
-  neon_poly1305_blocks.constprop.0+0x1b4/0x250 [poly1305_neon]
-  neon_poly1305_do_update+0x6c/0x15c [poly1305_neon]
-  neon_poly1305_update+0x9c/0x1c4 [poly1305_neon]
-  crypto_shash_update crypto/shash.c:131 [inline]
-  shash_finup_unaligned+0x84/0x15c crypto/shash.c:179
-  crypto_shash_finup+0x8c/0x140 crypto/shash.c:193
-  shash_digest_unaligned+0xb8/0xe4 crypto/shash.c:201
-  crypto_shash_digest+0xa4/0xfc crypto/shash.c:217
-  crypto_shash_tfm_digest+0xb4/0x150 crypto/shash.c:229
-  essiv_skcipher_setkey+0x164/0x200 [essiv]
-  crypto_skcipher_setkey+0xb0/0x160 crypto/skcipher.c:612
-  skcipher_setkey+0x3c/0x50 crypto/algif_skcipher.c:305
-  alg_setkey+0x114/0x2a0 crypto/af_alg.c:220
-  alg_setsockopt+0x19c/0x210 crypto/af_alg.c:253
-  __sys_setsockopt+0x190/0x2e0 net/socket.c:2123
-  __do_sys_setsockopt net/socket.c:2134 [inline]
-  __se_sys_setsockopt net/socket.c:2131 [inline]
-  __arm64_sys_setsockopt+0x78/0x94 net/socket.c:2131
-  __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
-  invoke_syscall+0x64/0x100 arch/arm64/kernel/syscall.c:48
-  el0_svc_common.constprop.0+0x220/0x230 arch/arm64/kernel/syscall.c:155
-  do_el0_svc+0xb4/0xd4 arch/arm64/kernel/syscall.c:217
-  el0_svc+0x24/0x3c arch/arm64/kernel/entry-common.c:353
-  el0_sync_handler+0x160/0x164 arch/arm64/kernel/entry-common.c:369
-  el0_sync+0x160/0x180 arch/arm64/kernel/entry.S:683
-Allocated by task 1646715:
-  kasan_save_stack+0x28/0x60 mm/kasan/common.c:48
-  kasan_set_track mm/kasan/common.c:56 [inline]
-  __kasan_kmalloc.constprop.0+0xc8/0xf0 mm/kasan/common.c:479
-  kasan_kmalloc+0x10/0x20 mm/kasan/common.c:493
-  __kmalloc+0x33c/0x734 mm/slub.c:4022
-  kmalloc ./include/linux/slab.h:568 [inline]
-  sock_kmalloc.part.0+0xe4/0x130 net/core/sock.c:2247
-  sock_kmalloc+0x50/0x90 net/core/sock.c:2240
-  alg_setkey+0xac/0x2a0 crypto/af_alg.c:212
-  alg_setsockopt+0x19c/0x210 crypto/af_alg.c:253
-  __sys_setsockopt+0x190/0x2e0 net/socket.c:2123
-  __do_sys_setsockopt net/socket.c:2134 [inline]
-  __se_sys_setsockopt net/socket.c:2131 [inline]
-  __arm64_sys_setsockopt+0x78/0x94 net/socket.c:2131
-  __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
-  invoke_syscall+0x64/0x100 arch/arm64/kernel/syscall.c:48
-  el0_svc_common.constprop.0+0x220/0x230 arch/arm64/kernel/syscall.c:155
-  do_el0_svc+0xb4/0xd4 arch/arm64/kernel/syscall.c:217
-  el0_svc+0x24/0x3c arch/arm64/kernel/entry-common.c:353
-  el0_sync_handler+0x160/0x164 arch/arm64/kernel/entry-common.c:369
-  el0_sync+0x160/0x180 arch/arm64/kernel/entry.S:683
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  .../virt/kvm/x86/amd-memory-encryption.rst    |  22 ++++
+>  arch/x86/kvm/svm/sev.c                        | 119 ++++++++++++++++++
+>  include/uapi/linux/kvm.h                      |  14 +++
+>  3 files changed, 155 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/x86/amd-memory-encryption.rst b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> index 62abd5c1f72b..750162cff87b 100644
+> --- a/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> +++ b/Documentation/virt/kvm/x86/amd-memory-encryption.rst
+> @@ -514,6 +514,28 @@ Returns: 0 on success, -negative on error
+>  See the SEV-SNP spec for further details on how to build the VMPL permission
+>  mask and page type.
+>
+> +21. KVM_SNP_LAUNCH_FINISH
+> +-------------------------
+> +
+> +After completion of the SNP guest launch flow, the KVM_SNP_LAUNCH_FINISH command can be
+> +issued to make the guest ready for the execution.
+> +
+> +Parameters (in): struct kvm_sev_snp_launch_finish
+> +
+> +Returns: 0 on success, -negative on error
+> +
+> +::
+> +
+> +        struct kvm_sev_snp_launch_finish {
+> +                __u64 id_block_uaddr;
+> +                __u64 id_auth_uaddr;
+> +                __u8 id_block_en;
+> +                __u8 auth_key_en;
+> +                __u8 host_data[32];
+> +        };
+> +
+> +
+> +See SEV-SNP specification for further details on launch finish input parameters.
+>
+>  References
+>  ==========
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index a9461d352eda..a5b90469683f 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2095,6 +2095,106 @@ static int snp_launch_update(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>         return ret;
+>  }
+>
+> +static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_launch_update data = {};
+> +       int i, ret;
+> +
+> +       data.gctx_paddr = __psp_pa(sev->snp_context);
+> +       data.page_type = SNP_PAGE_TYPE_VMSA;
+> +
+> +       for (i = 0; i < kvm->created_vcpus; i++) {
+> +               struct vcpu_svm *svm = to_svm(xa_load(&kvm->vcpu_array, i));
 
-It seems that the error happens in poly1305_init_arch(), which take in a 
-argument "key" as a fixed 32 bytes long array, while the caller, 
-neon_poly1305_blocks(), is called when input data is longer the block 
-size of poly1305 which is 16 bytes. No other checks are preformed to 
-ensure the array size mentioned above which is passed into 
-poly1305_init_arch().
+Why are we iterating over |created_vcpus| rather than using kvm_for_each_vcpu?
 
-  1 void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 
-key[POLY1305_KEY_SIZE])
-  2 {
-  3 	poly1305_init_arm64(&dctx->h, key);
-  4 	dctx->s[0] = get_unaligned_le32(key + 16);
-  5 	dctx->s[1] = get_unaligned_le32(key + 20);
-  6 	dctx->s[2] = get_unaligned_le32(key + 24);
-  7 	dctx->s[3] = get_unaligned_le32(key + 28);
-  8 	dctx->buflen = 0;
-  9 }
+> +               u64 pfn = __pa(svm->sev_es.vmsa) >> PAGE_SHIFT;
+> +
+> +               /* Perform some pre-encryption checks against the VMSA */
+> +               ret = sev_es_sync_vmsa(svm);
+> +               if (ret)
+> +                       return ret;
 
-  1 static void neon_poly1305_blocks(struct poly1305_desc_ctx *dctx, 
-const u8 *src,
-  2 				 u32 len, u32 hibit, bool do_neon)
-  3 {
-  4 	if (unlikely(!dctx->sset)) {
-  5 		if (!dctx->rset) {
-  6 			poly1305_init_arch(dctx, src);
-  7 			src += POLY1305_BLOCK_SIZE;
-  8 			len -= POLY1305_BLOCK_SIZE;
-  9 			dctx->rset = 1;
-10 		}
-11 		if (len >= POLY1305_BLOCK_SIZE) {
-12 			dctx->s[0] = get_unaligned_le32(src +  0);
-13 			dctx->s[1] = get_unaligned_le32(src +  4);
-14 			dctx->s[2] = get_unaligned_le32(src +  8);
-15 			dctx->s[3] = get_unaligned_le32(src + 12);
-16 			src += POLY1305_BLOCK_SIZE;
-17 			len -= POLY1305_BLOCK_SIZE;
-18 			dctx->sset = true;
-19 		}
-20 		if (len < POLY1305_BLOCK_SIZE)
-21 			return;
-22 	}
-23
-24 	len &= ~(POLY1305_BLOCK_SIZE - 1);
-25
-26 	if (static_branch_likely(&have_neon) && likely(do_neon))
-27 		poly1305_blocks_neon(&dctx->h, src, len, hibit);
-28 	else
-29 		poly1305_blocks(&dctx->h, src, len, hibit);
-30 }
+Do we need to take the 'vcpu->mutex' lock before modifying the
+vcpu,like we do for SEV-ES in sev_launch_update_vmsa()?
 
-The logic neon_poly1305_blocks() performed seems to be that if it was 
-called with both s[] and r[] uninitialized, it will first try to 
-initialize them with the data from the first "block" that it believed to 
-be 32 bytes in length. First 16 bytes are used as the key and the next 
-16 bytes for s[]. This would lead to the aforementioned read 
-out-of-bound. However, calling poly1305_init_arch(), it deduct 16 bytes 
-from the input and then check whether there are another 16 bytes of data 
-remained, and use those 16 bytes for initializing s[] again.
+> +
+> +               /* Transition the VMSA page to a firmware state. */
+> +               ret = rmp_make_private(pfn, -1, PG_LEVEL_4K, sev->asid, true);
+> +               if (ret)
+> +                       return ret;
+> +
+> +               /* Issue the SNP command to encrypt the VMSA */
+> +               data.address = __sme_pa(svm->sev_es.vmsa);
+> +               ret = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_UPDATE,
+> +                                     &data, &argp->error);
+> +               if (ret) {
+> +                       snp_page_reclaim(pfn);
+> +                       return ret;
+> +               }
+> +
+> +               svm->vcpu.arch.guest_state_protected = true;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +{
+> +       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +       struct sev_data_snp_launch_finish *data;
+> +       void *id_block = NULL, *id_auth = NULL;
+> +       struct kvm_sev_snp_launch_finish params;
+> +       int ret;
+> +
+> +       if (!sev_snp_guest(kvm))
+> +               return -ENOTTY;
+> +
+> +       if (!sev->snp_context)
+> +               return -EINVAL;
+> +
+> +       if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +               return -EFAULT;
+> +
+> +       /* Measure all vCPUs using LAUNCH_UPDATE before we finalize the launch flow. */
+> +       ret = snp_launch_update_vmsa(kvm, argp);
+> +       if (ret)
+> +               return ret;
+> +
+> +       data = kzalloc(sizeof(*data), GFP_KERNEL_ACCOUNT);
+> +       if (!data)
+> +               return -ENOMEM;
+> +
+> +       if (params.id_block_en) {
+> +               id_block = psp_copy_user_blob(params.id_block_uaddr, KVM_SEV_SNP_ID_BLOCK_SIZE);
+> +               if (IS_ERR(id_block)) {
+> +                       ret = PTR_ERR(id_block);
+> +                       goto e_free;
+> +               }
+> +
+> +               data->id_block_en = 1;
+> +               data->id_block_paddr = __sme_pa(id_block);
+> +       }
+> +
+> +       if (params.auth_key_en) {
+> +               id_auth = psp_copy_user_blob(params.id_auth_uaddr, KVM_SEV_SNP_ID_AUTH_SIZE);
+> +               if (IS_ERR(id_auth)) {
+> +                       ret = PTR_ERR(id_auth);
+> +                       goto e_free_id_block;
+> +               }
+> +
+> +               data->auth_key_en = 1;
+> +               data->id_auth_paddr = __sme_pa(id_auth);
+> +       }
+> +
+> +       data->gctx_paddr = __psp_pa(sev->snp_context);
+> +       ret = sev_issue_cmd(kvm, SEV_CMD_SNP_LAUNCH_FINISH, data, &argp->error);
+> +
+> +       kfree(id_auth);
+> +
+> +e_free_id_block:
+> +       kfree(id_block);
+> +
+> +e_free:
+> +       kfree(data);
+> +
+> +       return ret;
+> +}
+> +
+>  int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>         struct kvm_sev_cmd sev_cmd;
+> @@ -2191,6 +2291,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>         case KVM_SEV_SNP_LAUNCH_UPDATE:
+>                 r = snp_launch_update(kvm, &sev_cmd);
+>                 break;
+> +       case KVM_SEV_SNP_LAUNCH_FINISH:
+> +               r = snp_launch_finish(kvm, &sev_cmd);
+> +               break;
+>         default:
+>                 r = -EINVAL;
+>                 goto out;
+> @@ -2696,11 +2799,27 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+>
+>         svm = to_svm(vcpu);
+>
+> +       /*
+> +        * If its an SNP guest, then VMSA was added in the RMP entry as
+> +        * a guest owned page. Transition the page to hypervisor state
+> +        * before releasing it back to the system.
+> +        * Also the page is removed from the kernel direct map, so flush it
+> +        * later after it is transitioned back to hypervisor state and
+> +        * restored in the direct map.
+> +        */
+> +       if (sev_snp_guest(vcpu->kvm)) {
+> +               u64 pfn = __pa(svm->sev_es.vmsa) >> PAGE_SHIFT;
+> +
+> +               if (host_rmp_make_shared(pfn, PG_LEVEL_4K, false))
+> +                       goto skip_vmsa_free;
 
-This seems to be faulty to me that 1. s[] should not be initialized for 
-2 times, and 2. poly1305_init_arch() takes in and processed 32 bytes but 
-only 16 bytes were deducted from the input.
+Why not call host_rmp_make_shared with leak==true? This old VMSA page
+is now unusable IIUC.
 
-To fix this, I tried adding checks before calling poly1305_init_arch() 
-ensuring the key is not shorter than 32 bytes, but that would cause the 
-self-test to fail. Directly calling poly1305_init_arm64 instead of 
-poly1305_init_arch() is also tried but it would fail the self-test as well.
 
-Does the community has any suggestion on fixing this BUG?
 
-One more thing I noticed is that poly1305 never appears on it's own. I 
-checked the two articles mentioning poly1305 and it seems that it's used 
-with chacha20 or AES. Is this statement valid?
-
-Thanks in advance.
-
--- 
-Best
-GUO Zihua
+> +       }
+> +
+>         if (vcpu->arch.guest_state_protected)
+>                 sev_flush_encrypted_page(vcpu, svm->sev_es.vmsa);
+>
+>         __free_page(virt_to_page(svm->sev_es.vmsa));
+>
+> +skip_vmsa_free:
+>         if (svm->sev_es.ghcb_sa_free)
+>                 kvfree(svm->sev_es.ghcb_sa);
+>  }
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 9b36b07414ea..5a4662716b6a 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1814,6 +1814,7 @@ enum sev_cmd_id {
+>         KVM_SEV_SNP_INIT,
+>         KVM_SEV_SNP_LAUNCH_START,
+>         KVM_SEV_SNP_LAUNCH_UPDATE,
+> +       KVM_SEV_SNP_LAUNCH_FINISH,
+>
+>         KVM_SEV_NR_MAX,
+>  };
+> @@ -1948,6 +1949,19 @@ struct kvm_sev_snp_launch_update {
+>         __u8 vmpl1_perms;
+>  };
+>
+> +#define KVM_SEV_SNP_ID_BLOCK_SIZE      96
+> +#define KVM_SEV_SNP_ID_AUTH_SIZE       4096
+> +#define KVM_SEV_SNP_FINISH_DATA_SIZE   32
+> +
+> +struct kvm_sev_snp_launch_finish {
+> +       __u64 id_block_uaddr;
+> +       __u64 id_auth_uaddr;
+> +       __u8 id_block_en;
+> +       __u8 auth_key_en;
+> +       __u8 host_data[KVM_SEV_SNP_FINISH_DATA_SIZE];
+> +       __u8 pad[6];
+> +};
+> +
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU    (1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3         (1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX       (1 << 2)
+> --
+> 2.25.1
+>
