@@ -2,133 +2,93 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5324BCCA479
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Jul 2022 15:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF35CCA479
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 00:36:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbiGJPMx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Jul 2022 11:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
+        id S229588AbiGKAgW (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 10 Jul 2022 20:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiGJPMw (ORCPT
+        with ESMTP id S229477AbiGKAgV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Jul 2022 11:12:52 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C15DBE00
-        for <linux-crypto@vger.kernel.org>; Sun, 10 Jul 2022 08:12:51 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 19so3632595ljz.4
-        for <linux-crypto@vger.kernel.org>; Sun, 10 Jul 2022 08:12:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=NrSFqXui8IuFWW18AV7BX9JJnZg6RCMbeeOF3ySerrE=;
-        b=QMoJgDgrWpoHgt8V935Yj0tZ7gW3LZdDygouB/iufA4mk/EYDXJyLplXfyn9C8aN3A
-         uIDA0Tu/wnZF2BfBFlpKqh4VyroAYuQZqBcdpiZdNqmtc1Z5K0m7VaZCj9hr+NPEj35l
-         BPUIU1LpogI7MI0Z2g9xvpzLPWDCfvUhqRZswOndvhygeYTuQ8N329fsjMyYoMlPMYqw
-         F5KZ/a6Qya+85rPNA5stUj9xKIurX7xzNqVFP9yMbwrQYxAP3NoSkTUTKHqlfCKkzx6r
-         PnWE30Qp6vO43T+WD+r3zVXt+y24fZZfpGbNtPSRRMTbGF8XcgFbk+cwU5SF+8I8uRG7
-         8q0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=NrSFqXui8IuFWW18AV7BX9JJnZg6RCMbeeOF3ySerrE=;
-        b=kzYRThUkZGECKZ+Lgvuo2gEYunSPK1wcL+yMmc+a2+zv4hY8GBzattK7ahywlvQahP
-         hNmXlipRQ6H5LGHzyDmV/Yo5JxBQaE3R3cKbWAHilkONqE3NWwk6W1bOs+qQTgiUW9mp
-         heP+H4G0Q/bjCQSsp2VoJdqPlbE6EQfUFUygvVO2+FxEgGVTZGJ4ZYIX5iiLvnI2Kzrg
-         CSZNspczJ8HnD9JtTOYYj662q3aYoGBzDWIck/mdLi6vs26Xqiv5a85AlO4oQwgRTbVf
-         rpFq90K+amGxRJZ1hjzc/4hznSAYPWOIdBZGBcQ386LcBpdirPpdVLllZbnhvrfRMqkO
-         pxtQ==
-X-Gm-Message-State: AJIora868+Oe58MkBs3HUlq0HMRnHJ+q/TxJfJEuODtVf8ZxetUDN0yk
-        sYRvLROJ8VdxQJm7TR6uQZzdlQ==
-X-Google-Smtp-Source: AGRyM1u4TGEfXbOJWoo2B3uuptUDQWrvhmxrihGijpLpTSzFLDT2nPpmDzKjXMxyCnypzScxX8fVbA==
-X-Received: by 2002:a2e:83c7:0:b0:25b:c007:29e0 with SMTP id s7-20020a2e83c7000000b0025bc00729e0mr7525140ljh.378.1657465969512;
-        Sun, 10 Jul 2022 08:12:49 -0700 (PDT)
-Received: from [10.0.0.8] (fwa5cac-200.bb.online.no. [88.92.172.200])
-        by smtp.gmail.com with ESMTPSA id y18-20020a199152000000b00486d8a63c07sm976213lfj.121.2022.07.10.08.12.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Jul 2022 08:12:49 -0700 (PDT)
-Message-ID: <f6ab024a-582f-45b0-7d26-94a85858c761@linaro.org>
-Date:   Sun, 10 Jul 2022 17:12:46 +0200
+        Sun, 10 Jul 2022 20:36:21 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0881E63DF;
+        Sun, 10 Jul 2022 17:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+        bh=PZ48ag4JsCJQwRf+bGkFcTAC/I8X5hdkoFIm/OJJqOE=; b=BGeIGUudIIh6JnnOm+nhW7z+Fl
+        aLMSr+BXpol0PJ9z/jpE8TZOKuMFgrb2DPWDhhDrjY6pQ1DyVFmiR7Z0kmks1/oPKE6MGCNmmLAzv
+        pK7Lk6IWPf93mBLveSh6mzxDS5f4bpku5JPt3907ZECgH5gHvmslhaXDmnZWPyemOl2IJ0KSB+51i
+        I9V3iz/6XWOUPdOMc/NR4mfum7E5VY8S9uuGTz8sk9nQJxBsK+LOgnpydSxFtowmTn/hSFRYuz60X
+        Fnni/wt8jatkNh3SKdAF+a4hifDKFljVr1jherHR+M5quuI4S/wlCqS9XjM+ovaFbAARyqaqQI+AA
+        khTu8akA==;
+Received: from [2601:1c0:6280:3f0::a6b3]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oAhPB-00EmFp-Lw; Mon, 11 Jul 2022 00:36:05 +0000
+Message-ID: <b707a74b-48ca-5547-3d07-8aa05be0c132@infradead.org>
+Date:   Sun, 10 Jul 2022 17:36:04 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH v8 25/33] dt-bindings: crypto: rockchip: convert to new
- driver bindings
+Subject: Re: [PATCH -next] certs: Fix Kconfig dependency
 Content-Language: en-US
-To:     LABBE Corentin <clabbe@baylibre.com>
-Cc:     Rob Herring <robh@kernel.org>, john@metanate.com, heiko@sntech.de,
-        p.zabel@pengutronix.de, krzysztof.kozlowski+dt@linaro.org,
-        robh+dt@kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        didi.debian@cknow.org, herbert@gondor.apana.org.au,
-        sboyd@kernel.org, mturquette@baylibre.com,
-        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        linux-clk@vger.kernel.org
-References: <20220706090412.806101-1-clabbe@baylibre.com>
- <20220706090412.806101-26-clabbe@baylibre.com>
- <1657114144.957232.4099933.nullmailer@robh.at.kernel.org>
- <YsWcGDwPCX+/95i3@Red> <3e47b853-bb82-8766-8884-3da931c038a2@linaro.org>
- <YsabXrOyAsCkUUVN@Red>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <YsabXrOyAsCkUUVN@Red>
+To:     Ren Zhijie <renzhijie2@huawei.com>, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, simo@redhat.com
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220704112028.183193-1-renzhijie2@huawei.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20220704112028.183193-1-renzhijie2@huawei.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 07/07/2022 10:37, LABBE Corentin wrote:
-> Le Wed, Jul 06, 2022 at 05:25:21PM +0200, Krzysztof Kozlowski a écrit :
->> On 06/07/2022 16:28, LABBE Corentin wrote:
->>> Le Wed, Jul 06, 2022 at 07:29:04AM -0600, Rob Herring a écrit :
->>>> On Wed, 06 Jul 2022 09:04:04 +0000, Corentin Labbe wrote:
->>>>> The latest addition to the rockchip crypto driver need to update the
->>>>> driver bindings.
->>>>>
->>>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>>>> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
->>>>> ---
->>>>>  .../crypto/rockchip,rk3288-crypto.yaml        | 85 +++++++++++++++++--
->>>>>  1 file changed, 77 insertions(+), 8 deletions(-)
->>>>>
->>>>
->>>> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
->>>> on your patch (DT_CHECKER_FLAGS is new in v5.13):
->>>>
->>>> yamllint warnings/errors:
->>>>
->>>> dtschema/dtc warnings/errors:
->>>> /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml: allOf:0:then:properties:clock-names: 'oneOf' conditional failed, one must be fixed:
->>>> 	[{'const': 'aclk'}, {'const': 'hclk'}, {'const': 'sclk'}, {'const': 'apb_pclk'}] is too long
->>>> 	[{'const': 'aclk'}, {'const': 'hclk'}, {'const': 'sclk'}, {'const': 'apb_pclk'}] is too short
->>>> 	False schema does not allow 4
->>>> 	1 was expected
->>>> 	4 is greater than the maximum of 2
->>>> 	4 is greater than the maximum of 3
->>>
->>> Hello
->>>
->>> I upgraded to dt-schema 2022.07 and fail to reproduce all errors.
->>
->> Visible on older dtschema (2022.6.dev10+gcd64f75fe091), visible on
->> newest (2022.7).
->>
->> Exactly the same error.
->>
+
+
+On 7/4/22 04:20, Ren Zhijie wrote:
+> If CONFIG_PKCS7_MESSAGE_PARSER=m and CONFIG_FIPS_SIGNATURE_SELFTEST=y,
+> make ARCH=x86_64 CROSS_COMPILE=x86_64-linux-gnu-, will be failed, like this:
 > 
-> Hello
+> crypto/asymmetric_keys/selftest.o: In function `fips_signature_selftest':
+> selftest.c:(.init.text+0xc3): undefined reference to `pkcs7_parse_message'
+> selftest.c:(.init.text+0x101): undefined reference to `pkcs7_supply_detached_data'
+> selftest.c:(.init.text+0x112): undefined reference to `pkcs7_verify'
+> selftest.c:(.init.text+0x13f): undefined reference to `pkcs7_validate_trust'
+> selftest.c:(.init.text+0x169): undefined reference to `pkcs7_free_message'
+> make: *** [vmlinux] Error 1
 > 
-> I am sorry, I finally succesfully reproduced it.
-> Just doing what the hints gives (removing max/min-items) from "static" list fix the issue.
+> To fix this error, add depends on PKCS7_MESSAGE_PARSER=y to FIPS_SIGNATURE_SELFTEST
+> 
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Fixes: 3cde3174eb91 ("certs: Add FIPS selftests")
+> Signed-off-by: Ren Zhijie <renzhijie2@huawei.com>
+> ---
+>  crypto/asymmetric_keys/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+> index 3df3fe4ed95f..fe007db96c69 100644
+> --- a/crypto/asymmetric_keys/Kconfig
+> +++ b/crypto/asymmetric_keys/Kconfig
+> @@ -83,6 +83,6 @@ config FIPS_SIGNATURE_SELFTEST
+>  	  for FIPS.
+>  	depends on KEYS
+>  	depends on ASYMMETRIC_KEY_TYPE
+> -	depends on PKCS7_MESSAGE_PARSER
+> +	depends on PKCS7_MESSAGE_PARSER=y
+>  
+>  endif # ASYMMETRIC_KEY_TYPE
 
-Not sure what do you mean by "static list". I think you should drop
-min/maxItems from clock-names/reset-names in allOf:if:then sections.
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+Reported-by: kernel test robot <lkp@intel.com> # 2022-06-30
 
-> Does I need to remove your Reviewed-by ?
+thanks.
 
-Let's drop, so it will be back to my to-review queue.
-
-Best regards,
-Krzysztof
+-- 
+~Randy
