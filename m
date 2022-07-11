@@ -2,105 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2E3C433EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 09:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F67BC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Jul 2022 11:23:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbiGKJGo (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Jul 2022 05:06:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45678 "EHLO
+        id S229961AbiGKLXd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 11 Jul 2022 07:23:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbiGKJGn (ORCPT
+        with ESMTP id S230500AbiGKLWu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Jul 2022 05:06:43 -0400
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F50220F5;
-        Mon, 11 Jul 2022 02:06:42 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 26B96XxH054462;
-        Mon, 11 Jul 2022 04:06:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1657530393;
-        bh=Jsfv6F5djTNvrM+DmDKOJgOO8ViuBYqVPEjeLGyCQVQ=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=c4C1U6oloKqe42eo+R9Da3UpkD1s0H6yZqOi+qoDgz4NixzilHQGo3U8xPnDAj6Pd
-         Od8yMAExRoj6WMHnwZ0uwvN89yGW1f/yioIcwirnieQaPp6fFZNjUgTezXQNjehe99
-         qtuELmgoMUNTRTX/NWJFUJIM2pq2RNCBdiX/TLzk=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 26B96XYV073090
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 11 Jul 2022 04:06:33 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14; Mon, 11
- Jul 2022 04:06:33 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.14 via
- Frontend Transport; Mon, 11 Jul 2022 04:06:33 -0500
-Received: from [172.24.145.60] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 26B96TYq017843;
-        Mon, 11 Jul 2022 04:06:30 -0500
-Subject: Re: [PATCH] dt-bindings: crypto: ti,sa2ul: drop dma-coherent property
-To:     Rob Herring <robh@kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <devicetree@vger.kernel.org>,
-        <vigneshr@ti.com>, <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <herbert@gondor.apana.org.au>, <j-keerthy@ti.com>
-References: <20220707110756.16169-1-j-choudhary@ti.com>
- <1657315922.470955.1508205.nullmailer@robh.at.kernel.org>
-From:   Jayesh Choudhary <j-choudhary@ti.com>
-Message-ID: <5d9c0f44-efb6-7a1a-e9e4-51a060701ec3@ti.com>
-Date:   Mon, 11 Jul 2022 14:36:29 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        Mon, 11 Jul 2022 07:22:50 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CAB637FA2;
+        Mon, 11 Jul 2022 03:49:35 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4LhLHK5lmXz4xXD;
+        Mon, 11 Jul 2022 20:49:33 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1657536574;
+        bh=sUZIg/fS4jnuFTZnbWEUaFcFqhHRGZ8fwMtBDgUIf9c=;
+        h=Date:From:To:Cc:Subject:From;
+        b=ItykgBef6rptaGNkbeHj7o/om75/WKAGw0pWJIpBPh32/qUFqc5igzNVMQuOa2K5Q
+         sXkllhYWkHQTyH/1fJw7lnRAU7wCU2/wR6wfj9S8TfUwzs7va2nFysby3T3rqVgL1C
+         8LuczKivT4CrmzNf6sYn98VfiY2DNcTfnuv806XRDgDcVUk1+OtZZTJvp3ONuSjlw/
+         FJLvvq0B54eAowe/wvOFDBxm79/uEplVarcBbwjSCE/WLqpC6UOrGYNRFQ535IIKTt
+         AEa+f1vJx77Zh2T/8zZPQgPQp014/eCi2FhpS3m0ywWhTrbs04bVKdNlWfEWxcM73X
+         FHJyOZ3WxeISw==
+Date:   Mon, 11 Jul 2022 20:49:32 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the crypto tree
+Message-ID: <20220711204932.333379b4@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <1657315922.470955.1508205.nullmailer@robh.at.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: multipart/signed; boundary="Sig_/nCM=dB/dX0wifWLX.Kzp7UJ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Rob,
+--Sig_/nCM=dB/dX0wifWLX.Kzp7UJ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 09/07/22 3:02 am, Rob Herring wrote:
-> On Thu, 07 Jul 2022 16:37:56 +0530, Jayesh Choudhary wrote:
->> crypto driver itself is not dma-coherent. It is the dmaengine
->> that moves data and the buffers are to be mapped to the
->> dmaengine provider. So this property should be dropped.
->>
->> Fixes: 2ce9a7299bf6 ('dt-bindings: crypto: Add TI SA2UL crypto accelerator documentation')
->> Signed-off-by: Jayesh Choudhary <j-choudhary@ti.com>
->> ---
->>  .../devicetree/bindings/crypto/ti,sa2ul.yaml        | 13 -------------
->>  1 file changed, 13 deletions(-)
->>
-> 
-> Running 'make dtbs_check' with the schema in this patch gives the
-> following warnings. Consider if they are expected or the schema is
-> incorrect. These may not be new warnings.
-> 
-> Note that it is not yet a requirement to have 0 warnings for dtbs_check.
-> This will change in the future.
-> 
-> Full log is available here: https://patchwork.ozlabs.org/patch/
-> 
-> 
-> crypto@4e00000: 'dma-coherent' does not match any of the regexes: '^rng@[a-f0-9]+$', 'pinctrl-[0-9]+'
-> 	arch/arm64/boot/dts/ti/k3-am6528-iot2050-basic.dtb
-> 	arch/arm64/boot/dts/ti/k3-am6528-iot2050-basic-pg2.dtb
-> 	arch/arm64/boot/dts/ti/k3-am6548-iot2050-advanced.dtb
-> 	arch/arm64/boot/dts/ti/k3-am6548-iot2050-advanced-pg2.dtb
-> 	arch/arm64/boot/dts/ti/k3-am654-base-board.dtb
-> 	arch/arm64/boot/dts/ti/k3-j721e-common-proc-board.dtb
-> 	arch/arm64/boot/dts/ti/k3-j721e-sk.dtb
-> 
+Hi all,
 
-These warnings are expected. dt-node fixes need to be there.
-I will send the dt-node fixes once this patch gets in due to
-dependency. Or should I proceed any other way?
+After merging the crypto tree, today's linux-next build (KCONFIG_NAME)
+produced this warning:
 
-Thanks,
-Jayesh
+Documentation/ABI/testing/sysfs-driver-qat:24: WARNING: Unexpected indentat=
+ion.
+
+Introduced by commit
+
+  d4cfb144f605 ("crypto: qat - expose device config through sysfs for 4xxx")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/nCM=dB/dX0wifWLX.Kzp7UJ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLMADwACgkQAVBC80lX
+0Gy5RAf8CczHwKTt7mCLsuIc5aln2zWjSMajKmTcWPD0M+jcSxWZsEs8DTKBbBBp
+omFXGTlDbZBQUaYmT9bdOaiNWPuMLv+oaVFb3H0/BqRGDNb+pWLY5WeexdB99uvD
+/N0Qksm/pSShsvyP+RcrzSvbVAHo5TEN6FCQ5auPgc+0KoXc/DUqoGeGeVR6cUGL
+Tcy+KAezSgS2/PZ2SYKZ1UNyqxc20rYZjCqpaN6vaTqbTxtoyLs+GRvb+QZ9E8E3
+V9BPK7LBoksCiE+bglAiX3e7AF/WaZm7xJe0dazBNXJHU/UOpCurlAsGKmi/hpN8
+WFZPIkavPR4SgkeXUv9U53uaSqSqEg==
+=P2ZC
+-----END PGP SIGNATURE-----
+
+--Sig_/nCM=dB/dX0wifWLX.Kzp7UJ--
