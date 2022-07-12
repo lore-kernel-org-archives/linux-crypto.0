@@ -2,108 +2,99 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF275CCA47F
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jul 2022 19:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A496EC433EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jul 2022 20:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236001AbiGLTPe (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jul 2022 15:15:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49764 "EHLO
+        id S234570AbiGLUAg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Jul 2022 16:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236175AbiGLTOd (ORCPT
+        with ESMTP id S230050AbiGLUAg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jul 2022 15:14:33 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75514D5140;
-        Tue, 12 Jul 2022 11:54:23 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id y9so8218340pff.12;
-        Tue, 12 Jul 2022 11:54:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=K1IKCfZW89XQvo85Z8BhSh0884PYpNxI9KGLgL48HhU=;
-        b=mONWmWg9j5WWAGQnDhb6lMqqVC1nGf+CbhThgBUbRkwpwdhBTiHtddhsRDyShUVy6V
-         cMwn/8SH2HLSYs4td6iqqq4CHS9hciHjKY1El6t/DOl8ITfQ7bJnL/T3agcPf1nFdJ2i
-         dwVtLSeN6WoO7TztYLDuhVOUc5Kv/UL/LL1kNUZDWwMh+2/lz1vB411wsbUllsg8F26B
-         4iFi2ueShWaCXdokHRrD8EeOodNxBUOmUlWOKWE5ue+ilcpLKRuK4D5tK2Fyb6RK3KlA
-         T8b+H217RGCmpryowWSfEH8yYPeygWIrvKTcFvgCqPBGwqzV/a6OdKCdBCDnz5/XNisk
-         bKig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=K1IKCfZW89XQvo85Z8BhSh0884PYpNxI9KGLgL48HhU=;
-        b=KuKS1IDN6grFWFJR1TP66NkjBLLk45qSH8jbrPrmKQyyScvex0HCySgQqOgtztwERy
-         OE5z0Z0Ll0sIVGUHnLP1xNf5HtXkvXPoMlh8G1fZqnfyFoj2Vrp9q5sv5rfdX+XfknEv
-         OzN8YdAR8U9Bck34xkw5hG+O43j5sRIksoaOALwb6o9E35rcQZIBlQ9x+cl+RVpHzS3c
-         uses1mm5yRdjFcsK8vBdVGeVfud2CuGc+vyyAe6Iib7jr+Q5VYScK4vYvej5KGw19tBt
-         e+qubg5G07L4DOvBcY6jgvr2FYcPtDrbhtdiZ6Z36+9DSZYBeXTw+ZSIRDqGer43PSbC
-         StCw==
-X-Gm-Message-State: AJIora/Olg4Vlc6IQFZmRdCiKmophuRGuUMbISC4JbjJvdywi4Mt3VGX
-        4/lrb/ZQjBuhhnHuT9Es1unvx8jHQM8=
-X-Google-Smtp-Source: AGRyM1tijtHmJAYOsuSQDbbEVFzF0OvZrIYUyBGfKAZp6IEQzl6/TAkU1kCiKsbOgqNXU+SB7aRHSQ==
-X-Received: by 2002:a63:104f:0:b0:40d:2293:f1d6 with SMTP id 15-20020a63104f000000b0040d2293f1d6mr21274190pgq.167.1657652062552;
-        Tue, 12 Jul 2022 11:54:22 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id b8-20020a6567c8000000b0040de29f847asm6575539pgs.52.2022.07.12.11.54.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 11:54:22 -0700 (PDT)
-From:   Florian Fainelli <f.fainelli@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     olivia@selenic.com, u.kleine-koenig@pengutronix.de,
+        Tue, 12 Jul 2022 16:00:36 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4BE3C8D9
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Jul 2022 13:00:35 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oBM3Q-0006FU-SA; Tue, 12 Jul 2022 22:00:20 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oBM3L-000ZR4-3x; Tue, 12 Jul 2022 22:00:15 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oBM3K-004mxU-9S; Tue, 12 Jul 2022 22:00:14 +0200
+Date:   Tue, 12 Jul 2022 22:00:10 +0200
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, olivia@selenic.com,
         paul.gortmaker@windriver.com, dwmw2@infradead.org,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        gregkh@linuxfoundation.org, Florian Fainelli <f.fainelli@gmail.com>
-Subject: [PATCH] MAINTAINERS: Change mentions of mpm to olivia
-Date:   Tue, 12 Jul 2022 11:54:19 -0700
-Message-Id: <20220712185419.45487-1-f.fainelli@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        gregkh@linuxfoundation.org
+Subject: Re: [PATCH] MAINTAINERS: Change mentions of mpm to olivia
+Message-ID: <20220712200010.kbx24o2nxobrhmey@pengutronix.de>
+References: <20220712185419.45487-1-f.fainelli@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="3ugdib3frsqf57yr"
+Content-Disposition: inline
+In-Reply-To: <20220712185419.45487-1-f.fainelli@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Following this mercurial changeset:
-https://www.mercurial-scm.org/repo/hg-stable/rev/d4ba4d51f85f
 
-update the MAINTAINERS entry to replace the now obsolete identity.
+--3ugdib3frsqf57yr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
----
-This was first submitted by Uwe:
+On Tue, Jul 12, 2022 at 11:54:19AM -0700, Florian Fainelli wrote:
+> Following this mercurial changeset:
+> https://www.mercurial-scm.org/repo/hg-stable/rev/d4ba4d51f85f
+>=20
+> update the MAINTAINERS entry to replace the now obsolete identity.
+>=20
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+> This was first submitted by Uwe:
+>=20
+> https://lore.kernel.org/lkml/20210920080635.253826-1-u.kleine-koenig@peng=
+utronix.de/
 
-https://lore.kernel.org/lkml/20210920080635.253826-1-u.kleine-koenig@pengutronix.de/
+My variant was to drop Matt/Olivia. Given that we didn't get any
+feedback from them, that's still what I would favour.
 
-but the discussion derailed into whether the EMBEDDED LINUX entry ought
-to be there or not, meanwhile we still have a bouncing entry with an
-obsolete identify.
+Without any feedback (and committment?) from Olivia, I tend to nack this
+patch.
 
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Best regards
+Uwe
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f679152bdbad..b1ce4b84f99f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7404,7 +7404,7 @@ F:	Documentation/admin-guide/media/em28xx*
- F:	drivers/media/usb/em28xx/
- 
- EMBEDDED LINUX
--M:	Matt Mackall <mpm@selenic.com>
-+M:	Olivia Mackall <olivia@selenic.com>
- M:	David Woodhouse <dwmw2@infradead.org>
- L:	linux-embedded@vger.kernel.org
- S:	Maintained
-@@ -8787,7 +8787,7 @@ F:	include/trace/events/hwmon*.h
- K:	(devm_)?hwmon_device_(un)?register(|_with_groups|_with_info)
- 
- HARDWARE RANDOM NUMBER GENERATOR CORE
--M:	Matt Mackall <mpm@selenic.com>
-+M:	Olivia Mackall <olivia@selenic.com>
- M:	Herbert Xu <herbert@gondor.apana.org.au>
- L:	linux-crypto@vger.kernel.org
- S:	Odd fixes
--- 
-2.25.1
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
+--3ugdib3frsqf57yr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAmLN0scACgkQwfwUeK3K
+7AnREAf+PlSlT47//PJVYU31Gt4GNAV4v2o/8joQSsAof8dic1OI0hclbKS7IOGG
+w4DveYc5FjsI6/u0tO4+q2bdTS1Ehnj3L3RUmpOlsKJ386Pkv9ztnCn9fblY8b27
+fbZCpPmPAwveg4rXLfGeFVaQ6GiJpmggU0k9RC/7wBsu29P7RVir/R8gA7Nm+bj3
+B+3J1F/iwPCYufbmfpLLiGD+h5//FnkBjG/2eM6hcvLDf2pV9d86tXZkfH3JyUyc
+lG6+s5bSvISc5Gd5a/FDJreHAJqkBBrntK+odt17xlpYGUcu3Z5OWQXgW2EXZCSU
+OMRs+d1GEHHw1ftHLWcTVhV+eZ5xIA==
+=O8jQ
+-----END PGP SIGNATURE-----
+
+--3ugdib3frsqf57yr--
