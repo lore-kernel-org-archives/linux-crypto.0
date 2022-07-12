@@ -2,66 +2,70 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FB8CCA47C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F07CCA485
 	for <linux-crypto@archiver.kernel.org>; Tue, 12 Jul 2022 09:30:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232793AbiGLJaJ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jul 2022 05:30:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54082 "EHLO
+        id S232786AbiGLJaI (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Jul 2022 05:30:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232645AbiGLJaH (ORCPT
+        with ESMTP id S232646AbiGLJaH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 12 Jul 2022 05:30:07 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7D99CE2A;
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED96D9D514;
         Tue, 12 Jul 2022 02:30:05 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id b2so6768221plx.7;
+Received: by mail-pg1-x52c.google.com with SMTP id bf13so7028378pgb.11;
         Tue, 12 Jul 2022 02:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ogaV0SYnrdX6FcjsOyjMMkS0LUdBefdv3VdWOCo6cxw=;
-        b=fZte5SOlOznJUDLkQ6hulO2D8dqJY6/fRaRa5Eo3RhJbZ/H9WzZiZA0gCzMyc9hKrs
-         TW6486xwTqvHniUKUCRwKMB81AmjPOkrvDE9UOGpHmiEPgPrtmL2BxHQkd+BxVBSHSEM
-         8FfR89fkydTW3QGirPQN9hp6wZqSijVeXjy83Vn7GSUs/so47r3lMpzfVL8kY79fRMqh
-         fwTuRfO0VDPLoEOiTdzYMSJtN2MSN95Acrtt/jfQE5hbt4wdRV1vKYNf2S6WQjQY6Vkq
-         j5/qS80Y4LaX4uTrHuoqHTbC+W1vUy+FjCmKdjSxW/Yq/vn2T6tV3KzKUaYJX/YGeMf2
-         d/IQ==
+        bh=JZP4xj5NTGSJTpf2UMl/1n42zvx53xHebMpp6uYSD4U=;
+        b=GS8Z7h47eocNxH6d06o/nRqe8Qkf9GVh23rUxcZCxyFkgU3Q80l7QWut1MVZ4H1q41
+         /9SWKq5ga2GocGH1NKHbHBF8DICbXsAy0xprWhTYhbuT+2z7R7oiOcJPZnrKDAvVDomy
+         Np5AhP7wtaD83rz1o+J4IkMkI/IdpimnT8J+O8Ym1pYfsCiqrhUwh6r2AgBcvzDxS21H
+         RhnkkHOB0/XBzLc6Rns9mG6d2d/k9LhMmDVx9+MH+iZrHFdgOVhQD/9X1hX/ROPJ3+Cw
+         K7gcjbGt86sBfLZNWzrv/WQLeqQ5NshGoIu6fxv/liGQIMDLmu2enTG+ZipzcLcXdrj/
+         AeAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ogaV0SYnrdX6FcjsOyjMMkS0LUdBefdv3VdWOCo6cxw=;
-        b=saMAg07K9+7TCky74nnn2bRm4AdzYNTUwGK01Z2SbuEdfJbCz+7JX0aom9OGwP5Zpr
-         74bNQD5XRmjJPKBqTgUQIYoj+19+9UfnIU5yICSG3P9trJqm1BVn8FoK/HEx3HI1YiyO
-         aXa+xTDaPqhF2tc2fkkVddpGqz4lVB7FZE3iDq2pxTtM+Q0zMCpCKX4POnx0WjPhArCM
-         tKQBXrC8UnRnyDXXQ+t/Qe7BNNPgNY9Q6mjzowNktLFYls1O9HJnd6gvINZUYdVzHWdb
-         NFvAK0Pgj39X8J3XMTtaUWId247tjvrbgJSP5vt7nARsl/muNEoMowPMWywGN0/iIJDU
-         ZnkA==
-X-Gm-Message-State: AJIora+tZIAGP3boFIhM5QJnWGuh18InY6ljs3ERnM2WKql/hoom0Cue
-        AH+dHu/4A1Mujcyj0HTa+4k=
-X-Google-Smtp-Source: AGRyM1vQcBeLg1mqQLb8HAGKTgppY9Auvl7T5br0Ioaq//7gU4WFIVXXGe9OGZXrkwWc4kY59Hx1kQ==
-X-Received: by 2002:a17:902:b186:b0:16b:d762:6d81 with SMTP id s6-20020a170902b18600b0016bd7626d81mr23175273plr.88.1657618204997;
-        Tue, 12 Jul 2022 02:30:04 -0700 (PDT)
+        bh=JZP4xj5NTGSJTpf2UMl/1n42zvx53xHebMpp6uYSD4U=;
+        b=QiSfd3zaoNC7D6lI+mOTUIFkZpHhpp4MC0fI0Z62qnv9EM7S6EEP35RzfRzzbnvTAK
+         gVbyablBtNR0YXYewDfRzmnUhEHUfcfhVB9euFBLbDtlBsHLQY+s3EWv393wt5xUaYoZ
+         Ek0jIG0yv9BDuQeoZFx1AxswleNfSrE7ZyFvc7CYSMhetTAPGmm2yGL838Zc3ie4Ka+5
+         UZ0MUfsjiI2x+NysYK3xQ7uEe7qod/6ane/Kzm+ase8yl1EfIw9UFc81vUFN6/dBs5qj
+         2Pis3hoJXBtXk6avSZdRN8rsPhrSljFTjzo85jigEHsGh+cxBnQ6XGmyjEGOSOTanBmZ
+         WQwg==
+X-Gm-Message-State: AJIora80wcb+rTWhEAVplzzto87z4yS46E5TxT9hlZ8PMeCy2s+S7txn
+        8uQS+Rn/uWDyrbfZdJevDlMhvtWH88k=
+X-Google-Smtp-Source: AGRyM1s6rg8AwGm7QOzibd18/3g9CAE4UNCtXYkOuHCHBy0Ptn9ya8bThMzHTsF0YVH7zxZ4bQQhYQ==
+X-Received: by 2002:a63:6b0a:0:b0:40d:ffa6:85c5 with SMTP id g10-20020a636b0a000000b0040dffa685c5mr19542901pgc.327.1657618205524;
+        Tue, 12 Jul 2022 02:30:05 -0700 (PDT)
 Received: from debian.me (subs03-180-214-233-9.three.co.id. [180.214.233.9])
-        by smtp.gmail.com with ESMTPSA id s6-20020a63f046000000b003fba1a97c49sm5535236pgj.61.2022.07.12.02.30.04
+        by smtp.gmail.com with ESMTPSA id u3-20020a627903000000b00528999fba99sm6479684pfc.175.2022.07.12.02.30.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 12 Jul 2022 02:30:04 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id 77E341038FF; Tue, 12 Jul 2022 16:29:58 +0700 (WIB)
+        id BAC23103973; Tue, 12 Jul 2022 16:29:58 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org
 Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Adam Guerin <adam.guerin@intel.com>,
-        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        kernel test robot <lkp@intel.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
         Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Adam Guerin <adam.guerin@intel.com>,
         Fiona Trahe <fiona.trahe@intel.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Vladis Dronov <vdronov@redhat.com>,
+        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH next 2/3] Documentation: qat: rewrite description
-Date:   Tue, 12 Jul 2022 16:29:53 +0700
-Message-Id: <20220712092954.142027-3-bagasdotme@gmail.com>
+Subject: [PATCH next 1/3] Documentation: qat: Use code block for qat sysfs example
+Date:   Tue, 12 Jul 2022 16:29:52 +0700
+Message-Id: <20220712092954.142027-2-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.0
 In-Reply-To: <20220712092954.142027-1-bagasdotme@gmail.com>
 References: <20220712092954.142027-1-bagasdotme@gmail.com>
@@ -71,78 +75,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The sysfs description contains redundancy on returned and allowed values
-list, due to the described sysfs is read-write. Rewrite.
+kernel test robot and Stephen Rothwell reported htmldocs warning:
 
-Cc: Adam Guerin <adam.guerin@intel.com>
-Cc: Tomasz Kowallik <tomaszx.kowalik@intel.com>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Documentation/ABI/testing/sysfs-driver-qat:24: WARNING: Unexpected indentation.
+
+The warning isn't caused by Date: field pointed by the warning, but rather
+by sysfs example that isn't in literal code block.
+
+Add the code block marker.
+
+Link: https://lore.kernel.org/linux-next/20220711204932.333379b4@canb.auug.org.au/
+Link: https://lore.kernel.org/linux-doc/202207090803.TEGI95qw-lkp@intel.com/
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Fixes: d4cfb144f60551 ("crypto: qat - expose device config through sysfs for 4xxx")
 Cc: Wojciech Ziemba <wojciech.ziemba@intel.com>
+Cc: Adam Guerin <adam.guerin@intel.com>
 Cc: Fiona Trahe <fiona.trahe@intel.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Vladis Dronov <vdronov@redhat.com>
+Cc: Tomasz Kowallik <tomaszx.kowalik@intel.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/ABI/testing/sysfs-driver-qat | 34 +++++++---------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ Documentation/ABI/testing/sysfs-driver-qat | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-index 43e081ec22cc4a..be6c200abd783c 100644
+index a600531e95628f..43e081ec22cc4a 100644
 --- a/Documentation/ABI/testing/sysfs-driver-qat
 +++ b/Documentation/ABI/testing/sysfs-driver-qat
-@@ -2,18 +2,14 @@ What:		/sys/bus/pci/devices/<BDF>/qat/state
- Date:		June 2022
- KernelVersion:	5.20
- Contact:	qat-linux@intel.com
--Description:	Reports the current state of the QAT device and allows to
--		change it.
-+Description:	(RW) Reports the current state of the QAT device. Write to
-+		the file to initalize and start the device or to stop it.
+@@ -46,7 +46,8 @@ Description:	Reports the current configuration of the QAT device and allows
  
--		This attribute is RW.
-+		The values are:
- 
--		Returned values:
--			up: the device is up and running
--			down: the device is down
-+		* up: the device is up and running
-+		* down: the device is down
- 
--		Allowed values:
--			up: initialize and start the device
--			down: stop the device and bring it down
- 
- 		It is possible to transition the device from up to down only
- 		if the device is up and vice versa.
-@@ -24,22 +20,14 @@ What:		/sys/bus/pci/devices/<BDF>/qat/cfg_services
- Date:		June 2022
- KernelVersion:	5.20
- Contact:	qat-linux@intel.com
--Description:	Reports the current configuration of the QAT device and allows
--		to change it.
-+Description:	(RW) Reports the current configuration of the QAT device.
-+		Write to the file to change the configured services.
- 
--		This attribute is RW.
-+		The values are:
- 
--		Returned values:
--			sym;asym:	the device is configured for running
--					crypto services
--			dc:		the device is configured for running
--					compression services
--
--		Allowed values:
--			sym;asym:	configure the device for running
--					crypto services
--			dc:		configure the device for running
--					compression services
-+		* sym;asym: the device is configured for running crypto
-+		  services
-+		* dc: the device is configured for running compression services
- 
- 		It is possible to set the configuration only if the device
- 		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
+ 		The following example shows how to change the configuration of
+ 		a device configured for running crypto services in order to
+-		run data compression:
++		run data compression::
++
+ 			# cat /sys/bus/pci/devices/<BDF>/qat/state
+ 			up
+ 			# cat /sys/bus/pci/devices/<BDF>/qat/cfg_services
 -- 
 An old man doll... just what I always wanted! - Clara
 
