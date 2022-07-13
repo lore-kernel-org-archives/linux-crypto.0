@@ -2,196 +2,74 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58520C43334
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 14:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DBEC43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 14:40:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236451AbiGMObX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Jul 2022 10:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37616 "EHLO
+        id S231602AbiGMOk1 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Jul 2022 10:40:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234652AbiGMObW (ORCPT
+        with ESMTP id S230093AbiGMOk0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Jul 2022 10:31:22 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AAB4E37180;
-        Wed, 13 Jul 2022 07:31:21 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E22431424;
-        Wed, 13 Jul 2022 07:31:21 -0700 (PDT)
-Received: from [10.1.29.153] (e121487-lin.cambridge.arm.com [10.1.29.153])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 235633F73D;
-        Wed, 13 Jul 2022 07:31:19 -0700 (PDT)
-Message-ID: <eb74e1b8-af7e-21e8-658f-af6c7975264e@arm.com>
-Date:   Wed, 13 Jul 2022 15:31:05 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
+        Wed, 13 Jul 2022 10:40:26 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34A12559D;
+        Wed, 13 Jul 2022 07:40:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8E255B82016;
+        Wed, 13 Jul 2022 14:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC54C34114;
+        Wed, 13 Jul 2022 14:40:21 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="oZ/LNv0P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1657723219;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YxTAAH7gZI6F5IexhHjLMhmu4cD2YRAj0Q8vg43R224=;
+        b=oZ/LNv0Prn85axWsJ3S2iwsDWLYpDmW//tkj0mFtBGNKxmN9+ARDQuNypi3gSDUvzBpt9b
+        Hto1ifRVlVZ3GNgcgToGUVh969/Aq+XlVnMDdhPCi4ad13gYSd/jssuc4Qv1ld1xjzwbx+
+        7uuaqv3YW8a4RZVISeein34VkvGDjFM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ac70b275 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Wed, 13 Jul 2022 14:40:19 +0000 (UTC)
+Date:   Wed, 13 Jul 2022 16:40:17 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Vladimir Murzin <vladimir.murzin@arm.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: [PATCH] random: vary jitter iterations based on cycle counter
  speed
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>, Theodore Ts'o <tytso@mit.edu>,
-        Linus Torvalds <torvalds@linux-foundation.org>
+Message-ID: <Ys7ZURKkoHw8Bp+q@zx2c4.com>
 References: <20220422132027.1267060-1-Jason@zx2c4.com>
-From:   Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <20220422132027.1267060-1-Jason@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <eb74e1b8-af7e-21e8-658f-af6c7975264e@arm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <eb74e1b8-af7e-21e8-658f-af6c7975264e@arm.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi All,
+Hi Vladimir,
 
-On 4/22/22 14:20, Jason A. Donenfeld wrote:
-> Currently, we do the jitter dance if two consecutive reads to the cycle
-> counter return different values. If they do, then we consider the cycle
-> counter to be fast enough that one trip through the scheduler will yield
-> one "bit" of credited entropy. If those two reads return the same value,
-> then we assume the cycle counter is too slow to show meaningful
-> differences.
+On Wed, Jul 13, 2022 at 03:31:05PM +0100, Vladimir Murzin wrote:
+> I've just seen on the platform with slow(ish) timer that it is now considered
+> as a source of entropy with samples_per_bit set to 27 (5.19-rc6 has MAX_SAMPLES_PER_BIT
+> set to 32). Because of that I see significant delays and I'm trying to understand what
+> could be wrong with my setup.
 > 
-> This methodology is flawed for a variety of reasons, one of which Eric
-> posted a patch to fix in [1]. The issue that patch solves is that on a
-> system with a slow counter, you might be [un]lucky and read the counter
-> _just_ before it changes, so that the second cycle counter you read
-> differs from the first, even though there's usually quite a large period
-> of time in between the two. For example:
-> 
-> | real time | cycle counter |
-> | --------- | ------------- |
-> | 3         | 5             |
-> | 4         | 5             |
-> | 5         | 5             |
-> | 6         | 5             |
-> | 7         | 5             | <--- a
-> | 8         | 6             | <--- b
-> | 9         | 6             | <--- c
-> 
-> If we read the counter at (a) and compare it to (b), we might be fooled
-> into thinking that it's a fast counter, when in reality it is not. The
-> solution in [1] is to also compare counter (b) to counter (c), on the
-> theory that if the counter is _actually_ slow, and (a)!=(b), then
-> certainly (b)==(c).
-> 
-> This helps solve this particular issue, in one sense, but in another
-> sense, it mostly functions to disallow jitter entropy on these systems,
-> rather than simply taking more samples in that case.
-> 
-> Instead, this patch takes a different approach. Right now we assume that
-> a difference in one set of consecutive samples means one "bit" of
-> credited entropy per scheduler trip. We can extend this so that a
-> difference in two sets of consecutive samples means one "bit" of
-> credited entropy per /two/ scheduler trips, and three for three, and
-> four for four. In other words, we can increase the amount of jitter
-> "work" we require for each "bit", depending on how slow the cycle
-> counter is.
-> 
-> So this patch takes whole bunch of samples, sees how many of them are
-> different, and divides to find the amount of work required per "bit",
-> and also requires that at least some minimum of them are different in
-> order to attempt any jitter entropy.
-> 
-> Note that this approach is still far from perfect. It's not a real
-> statistical estimate on how much these samples vary; it's not a
-> real-time analysis of the relevant input data. That remains a project
-> for another time. However, it does the same (partly flawed) assumptions
-> as the code that's there now, so it's probably not worse than the status
-> quo, and it handles the issue Eric mentioned in [1]. But, again, it's
-> probably a far cry from whatever a really robust version of this would
-> be.
-> 
-> [1] https://lore.kernel.org/lkml/20220421233152.58522-1-ebiggers@kernel.org/
->     https://lore.kernel.org/lkml/20220421192939.250680-1-ebiggers@kernel.org/
-> 
-> Cc: Eric Biggers <ebiggers@google.com>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
-> This is an argument very much centered around the somewhat low bar of
-> being "not worse than before". If you can think of ways that it doesn't
-> even manage to clear that, please do pipe up.
-> 
-> 
->  drivers/char/random.c | 36 ++++++++++++++++++++++++++----------
->  1 file changed, 26 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index bf89c6f27a19..94a2ddb53662 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -1354,6 +1354,12 @@ void add_interrupt_randomness(int irq)
->  }
->  EXPORT_SYMBOL_GPL(add_interrupt_randomness);
->  
-> +struct entropy_timer_state {
-> +	unsigned long entropy;
-> +	struct timer_list timer;
-> +	unsigned int samples, samples_per_bit;
-> +};
-> +
->  /*
->   * Each time the timer fires, we expect that we got an unpredictable
->   * jump in the cycle counter. Even if the timer is running on another
-> @@ -1367,9 +1373,14 @@ EXPORT_SYMBOL_GPL(add_interrupt_randomness);
->   *
->   * So the re-arming always happens in the entropy loop itself.
->   */
-> -static void entropy_timer(struct timer_list *t)
-> +static void entropy_timer(struct timer_list *timer)
->  {
-> -	credit_entropy_bits(1);
-> +	struct entropy_timer_state *state = container_of(timer, struct entropy_timer_state, timer);
-> +
-> +	if (++state->samples == state->samples_per_bit) {
-> +		credit_entropy_bits(1);
-> +		state->samples = 0;
-> +	}
->  }
->  
->  /*
-> @@ -1378,17 +1389,22 @@ static void entropy_timer(struct timer_list *t)
->   */
->  static void try_to_generate_entropy(void)
->  {
-> -	struct {
-> -		unsigned long entropy;
-> -		struct timer_list timer;
-> -	} stack;
-> -
-> -	stack.entropy = random_get_entropy();
-> +	enum { NUM_TRIAL_SAMPLES = 8192, MAX_SAMPLES_PER_BIT = 256 };
-> +	struct entropy_timer_state stack;
-> +	unsigned int i, num_different = 0;
-> +	unsigned long last = random_get_entropy();
->  
-> -	/* Slow counter - or none. Don't even bother */
-> -	if (stack.entropy == random_get_entropy())
-> +	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
-> +		stack.entropy = random_get_entropy();
-> +		if (stack.entropy != last)
-> +			++num_different;
-> +		last = stack.entropy;
-> +	}
-> +	stack.samples_per_bit = DIV_ROUND_UP(NUM_TRIAL_SAMPLES, num_different + 1);
-> +	if (stack.samples_per_bit > MAX_SAMPLES_PER_BIT)
->  		return;
->  
-> +	stack.samples = 0;
->  	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
->  	while (!crng_ready() && !signal_pending(current)) {
->  		if (!timer_pending(&stack.timer))
+> I observe one credit_init_bits(1) call (via entropy_timer()) per ~970 schedule() calls.
+> Is that somewhat expected? Does it make sense at all?
 
+How slow are we talking? Seconds? Minutes? Is it too slow? It's possible
+that MAX_SAMPLES_PER_BIT=32 is a bit high as a threshold and I should
+reduce that a bit.
 
-I've just seen on the platform with slow(ish) timer that it is now considered
-as a source of entropy with samples_per_bit set to 27 (5.19-rc6 has MAX_SAMPLES_PER_BIT
-set to 32). Because of that I see significant delays and I'm trying to understand what
-could be wrong with my setup.
+Also, out of curiosity, why is your timer so slow?
 
-I observe one credit_init_bits(1) call (via entropy_timer()) per ~970 schedule() calls.
-Is that somewhat expected? Does it make sense at all?
-
-Cheers
-Vladimir
+Jason
