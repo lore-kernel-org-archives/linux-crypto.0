@@ -2,90 +2,148 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E38ECCA482
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 03:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1E9CCA480
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 03:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233764AbiGMDED (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jul 2022 23:04:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36936 "EHLO
+        id S233061AbiGMDEC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Tue, 12 Jul 2022 23:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233322AbiGMDEB (ORCPT
+        with ESMTP id S233105AbiGMDEA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jul 2022 23:04:01 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9034426ADE;
+        Tue, 12 Jul 2022 23:04:00 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9014426ACA;
         Tue, 12 Jul 2022 20:03:54 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id o31-20020a17090a0a2200b001ef7bd037bbso1461376pjo.0;
+Received: by mail-pj1-x1031.google.com with SMTP id cp18-20020a17090afb9200b001ef79e8484aso2622322pjb.1;
         Tue, 12 Jul 2022 20:03:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WcvxOfFen8+coWdSHokeQGruWe/pYjGO7D4rgu/+ryk=;
-        b=flilKcCb9s+K4lYxxi7bsOBBDtH4sxM+3eDvd5glK+fo4HZgyrpC6TjsbLfhTcu5zh
-         +gZcRwHH+P2NLrALafe/Lfe9PTpiuX5JzzntfLhRPVRHbumIRQEwi1Ait2D65fxz6yMV
-         ozXmbI9R+ELQe4qsmwbfmBQLXzYIFNxp7QOGwDKXlGWjFP0T9WhVoZmeJ38Cl7KxBiqn
-         yqqc2qME02RSgvBl2p5VSeh3DuOTjEwJH0MefQVVVoM/YEamSURY47QPAbzsWQx2AdIm
-         4emZPsgqQHrILQcsOOxFHV4ghIdV/Qc1OMZTYsRn4NpzanYklY1mnjanDZ+aBwLJaW1N
-         vVeQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=TceMcUV+/l4WL/aDjeSG/t8FqTVXmRKi59JDreDyO4Y=;
+        b=LgwCqeVcRYkCGf4XTCEuyfhdt+DypSM7nZPaxNKHD/63Y6XZ3h802i7v6BFOlbTEcX
+         cqc4Wuq3jhys/RSbVU3FzEitLPAOLrHnL6oUTWlMcXWEQCs+I5w8ZU/Y0prsig8sJXg3
+         1BGTuGsd9S/ZUSViw2qIK+NsfMrDZE7PV5Y0LqAF5z2IfV9OPviN1NyMj8w0pJlov8x7
+         JALigW7v+06Qk+BiK4Hg6Eihv9INXN6JVuz78ASq/P/QZGLINnvn65oaK/RkUX8OlKwk
+         Fm8Cm0D6lBzgYTbG3kwhwmM07WislvSilTbsY57wRZPAXlgErXjOePXzmPq67/zewXKp
+         qUiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WcvxOfFen8+coWdSHokeQGruWe/pYjGO7D4rgu/+ryk=;
-        b=YY8RzDMp4Q9LDiGUUsHt/wD+ZmhQ/Jh1ll8odDSZc4iBSc1npzm4dh9TvaqL7IY+6M
-         toXn0mHHKPD8shljCHEWK0NCBhBon5vtar4f/ACmnR8lmkguH2L9NdbzjeaCdDup0VQu
-         7xxrMN87A5xHcNID8tsQp4J4Erq+WU6nz0xXBJKKwK9g2hcuR9+u24+bPJ+u0UzQBMDP
-         PV78goL1CFJpbAK+GDF5gdmAVrt1PMtHIJ/bd0MqTQgAz2uVkn6pDpSUbwJ+LOLFpTKD
-         nhg3yGkfOeWMY4zl/BAPkLqEDfZnpjEKww+uNxcsMRoB+Tn87eVNsS92nzG8pV30QdJ9
-         hp/A==
-X-Gm-Message-State: AJIora/i5Q2mtY4jJxbfAve68dyMeQ5P6W3fZwG5mdk1c286S7pouL4e
-        fq0RaSWeN6hqkzNgEdiYW9Ud914iZT8=
-X-Google-Smtp-Source: AGRyM1vkCBfb64HFXNpQHm05ZrXTU1TUJ4ASQd+vMiWxfgxGGaY8iE4xWoKgET+ac3j/w+0d9aKXWQ==
-X-Received: by 2002:a17:903:234e:b0:16c:2d7a:d341 with SMTP id c14-20020a170903234e00b0016c2d7ad341mr1060879plh.10.1657681433789;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=TceMcUV+/l4WL/aDjeSG/t8FqTVXmRKi59JDreDyO4Y=;
+        b=OuZmALjGwFlCpiFKwzYzD8fiIUMxgOajJMJp4y9V7i9xpdbR3wEah9A1Z3gpFj0ePp
+         /9dUyz1LW7CFsjmcJl9f4Nogl9RK8e0lWPzv3vVEfJfCw8BD3BVjYnkCBcWwjJ2SErhg
+         r/JeJVJZ4I3y/KEDFGDpnU5eevGePGxJNCGRo+Fe9C+oTjSTs6pGdF9LcC2iFHd4hJNN
+         /3ap+JFFT79oFd4zvO3GYYxxW/j8tkL+f34iIlFUqadSOAY29e/FLCQauoJX7sG6fJF/
+         l+U0SkNHJ2SGcsIsItrVON2cujzwKPE+O01QQYNzjxyMxHO8DmFLbaqmWaYh+6bBzNF0
+         03fw==
+X-Gm-Message-State: AJIora9Xl/CgzZgm7y+fD+RczuQQgMCs5qEYFL3KgAAhKoJ8uNHSfOYS
+        BtpozYXYo4hn3Gs9iqicFXAg9yJmXQoy4w==
+X-Google-Smtp-Source: AGRyM1s/8vU43pwgJyeE2uZ33X0EfSLycxmaVf9MwR6348/GdgjdSlV7qRI5QkUGPhqsz86dDcxxJg==
+X-Received: by 2002:a17:902:d4c2:b0:16b:ffc5:9705 with SMTP id o2-20020a170902d4c200b0016bffc59705mr1137459plg.142.1657681433925;
         Tue, 12 Jul 2022 20:03:53 -0700 (PDT)
 Received: from debian.me (subs02-180-214-232-20.three.co.id. [180.214.232.20])
-        by smtp.gmail.com with ESMTPSA id im9-20020a170902bb0900b0016c4fb6e0b2sm4402209plb.55.2022.07.12.20.03.53
+        by smtp.gmail.com with ESMTPSA id l9-20020a170902f68900b0015e8d4eb24fsm7486570plg.153.2022.07.12.20.03.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 12 Jul 2022 20:03:53 -0700 (PDT)
 Received: by debian.me (Postfix, from userid 1000)
-        id D047D1039BE; Wed, 13 Jul 2022 10:03:47 +0700 (WIB)
+        id 2F2AD103950; Wed, 13 Jul 2022 10:03:47 +0700 (WIB)
 From:   Bagas Sanjaya <bagasdotme@gmail.com>
 To:     linux-doc@vger.kernel.org, linux-next@vger.kernel.org
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 0/2] Documentation: qat: documentation fixes
-Date:   Wed, 13 Jul 2022 10:03:31 +0700
-Message-Id: <20220713030332.158525-1-bagasdotme@gmail.com>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Adam Guerin <adam.guerin@intel.com>,
+        Tomasz Kowallik <tomaszx.kowalik@intel.com>,
+        Wojciech Ziemba <wojciech.ziemba@intel.com>,
+        Fiona Trahe <fiona.trahe@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] Documentation: qat: rewrite description
+Date:   Wed, 13 Jul 2022 10:03:33 +0700
+Message-Id: <20220713030332.158525-3-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.37.0
+In-Reply-To: <20220713030332.158525-1-bagasdotme@gmail.com>
+References: <20220713030332.158525-1-bagasdotme@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Here are documentation fixes for qat driver, as recently reported in
-linux-next.
+The sysfs description contains redundancy on returned and allowed values
+list, due to the described sysfs is read-write. Rewrite.
 
-Changes since v1 [1]:
-  - based on next-20220712
-  - Drop kvms390 (already applied by respective maintainer)
-  - Focused on qat driver
-  - Drop "initialize" from [2/2]
-  - Collect Acked-by from Giovanni Cabiddu
-
-[1]: https://lore.kernel.org/linux-doc/20220712092954.142027-1-bagasdotme@gmail.com/
-
-Cc: linux-kernel@vger.kernel.org
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Adam Guerin <adam.guerin@intel.com>
+Cc: Tomasz Kowallik <tomaszx.kowalik@intel.com>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Wojciech Ziemba <wojciech.ziemba@intel.com>
+Cc: Fiona Trahe <fiona.trahe@intel.com>
 Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Documentation/ABI/testing/sysfs-driver-qat | 34 +++++++---------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
 
-Bagas Sanjaya (2):
-  Documentation: qat: Use code block for qat sysfs example
-  Documentation: qat: rewrite description
-
- Documentation/ABI/testing/sysfs-driver-qat | 37 ++++++++--------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
-
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
+index 43e081ec22cc4a..185f81a2aab360 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat
++++ b/Documentation/ABI/testing/sysfs-driver-qat
+@@ -2,18 +2,14 @@ What:		/sys/bus/pci/devices/<BDF>/qat/state
+ Date:		June 2022
+ KernelVersion:	5.20
+ Contact:	qat-linux@intel.com
+-Description:	Reports the current state of the QAT device and allows to
+-		change it.
++Description:	(RW) Reports the current state of the QAT device. Write to
++		the file to start or stop the device.
+ 
+-		This attribute is RW.
++		The values are:
+ 
+-		Returned values:
+-			up: the device is up and running
+-			down: the device is down
++		* up: the device is up and running
++		* down: the device is down
+ 
+-		Allowed values:
+-			up: initialize and start the device
+-			down: stop the device and bring it down
+ 
+ 		It is possible to transition the device from up to down only
+ 		if the device is up and vice versa.
+@@ -24,22 +20,14 @@ What:		/sys/bus/pci/devices/<BDF>/qat/cfg_services
+ Date:		June 2022
+ KernelVersion:	5.20
+ Contact:	qat-linux@intel.com
+-Description:	Reports the current configuration of the QAT device and allows
+-		to change it.
++Description:	(RW) Reports the current configuration of the QAT device.
++		Write to the file to change the configured services.
+ 
+-		This attribute is RW.
++		The values are:
+ 
+-		Returned values:
+-			sym;asym:	the device is configured for running
+-					crypto services
+-			dc:		the device is configured for running
+-					compression services
+-
+-		Allowed values:
+-			sym;asym:	configure the device for running
+-					crypto services
+-			dc:		configure the device for running
+-					compression services
++		* sym;asym: the device is configured for running crypto
++		  services
++		* dc: the device is configured for running compression services
+ 
+ 		It is possible to set the configuration only if the device
+ 		is in the `down` state (see /sys/bus/pci/devices/<BDF>/qat/state)
 -- 
 An old man doll... just what I always wanted! - Clara
 
