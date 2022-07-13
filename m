@@ -2,122 +2,136 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6FDC433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 03:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1769C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 04:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbiGMDbT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Jul 2022 23:31:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53186 "EHLO
+        id S232158AbiGME0Y (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Jul 2022 00:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbiGMDbT (ORCPT
+        with ESMTP id S230013AbiGME0X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Jul 2022 23:31:19 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E2ABD6A6;
-        Tue, 12 Jul 2022 20:31:18 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LjNNQ3K11zVfc3;
-        Wed, 13 Jul 2022 11:27:34 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 13 Jul
- 2022 11:31:15 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <javier.martin@vista-silicon.com>, <weiyongjun1@huawei.com>,
-        <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH] crypto: sahara - don't sleep when in softirq
-Date:   Wed, 13 Jul 2022 11:35:50 +0800
-Message-ID: <20220713033550.118409-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+        Wed, 13 Jul 2022 00:26:23 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0D174506E;
+        Tue, 12 Jul 2022 21:26:22 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id g126so9222644pfb.3;
+        Tue, 12 Jul 2022 21:26:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=D0mrlc97WLTC35mVQPNg2FDISePVldO90IQe9NCWQAo=;
+        b=W97Ks1uhm0iaddeK597krnrP5r/ntXt3VMZuBwrAXItNSw8uvYScVJ2CVtUKL79osk
+         /FUHk9jyvUbz5opAwYkp+fPl92LKef1YHjW83Dh2t5UnLHf7dahkZI6cOHqAJ4ydoxp8
+         sfpyTxjp3dn8/WQ6aRrKBwWZ+ayKElTRx8oCbcdNVWBZW925zHYgo0HKfU1GvkePtDYm
+         0j8tzYNTjyD4wLD735Chx0BpxOF0AZ30GGZ6LCqwjJ37coCWBXI6KWM+qalNFM67BWrX
+         2YAjQw1cwXUu2ZsXh86ffvEByHSRrvUXeQvGIP3UaKAVGee7n2GAP0w3JsbgI8z4IGLa
+         LGHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=D0mrlc97WLTC35mVQPNg2FDISePVldO90IQe9NCWQAo=;
+        b=XbNCU8mkeixMLW2/1XvBvEI03fW6Kr+/OPJwEdeEqupXavhJhWr/ZN0JeOHvDmc8lt
+         Z2iEbbImRA6ZMsbzpDaJgQtkWPiVEkP6/IOy/TOcOa0mmRVkeLZSFJ+UdS2ME01Oo2Za
+         2xwVIkU0tcMq2QhtOjMiiDCjHiNf4iFf5SS8gCBK+lFaa03i6KgtESbhumAm2koqqQZj
+         ioo1DE5ZMHFEN2zd0YlbRpTAr1BiLF/ebCRVY5bvaYWuVdNyTKxUmBmhHAm2Wu7xvQcS
+         XzK8tJ6gAcgSzpllrsHw+ApKXe7ZeIPh4RAaGhyXaVxbUNqNUNveD4JFd4IDXJbAM4xN
+         z9eQ==
+X-Gm-Message-State: AJIora/YMt5rag0CXy1Ii1Tq5e1yybzW1idFU5DKEqHyoJxd5bkv+3e+
+        aXnhvEk6fWgmKm8ujw6AJMk=
+X-Google-Smtp-Source: AGRyM1tutc7Pb5nj/14ZEkSaVmwH8TaXMbi/NefGgjUMAy61m8czG480gBF8+UcDwCzZeBYJxyBXyw==
+X-Received: by 2002:aa7:9ae3:0:b0:528:d881:9ff with SMTP id y3-20020aa79ae3000000b00528d88109ffmr1464421pfp.66.1657686382239;
+        Tue, 12 Jul 2022 21:26:22 -0700 (PDT)
+Received: from linux-l9pv.suse (123-194-153-158.dynamic.kbronet.com.tw. [123.194.153.158])
+        by smtp.gmail.com with ESMTPSA id e7-20020a17090301c700b0016c4f006603sm4732513plh.54.2022.07.12.21.26.19
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 Jul 2022 21:26:21 -0700 (PDT)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Ben Boeckel <me@benboeckel.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Malte Gell <malte.gell@gmx.de>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Mimi Zohar <zohar@linux.ibm.com>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH v9 0/4] Check codeSigning extended key usage extension
+Date:   Wed, 13 Jul 2022 12:24:17 +0800
+Message-Id: <20220713042421.21680-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Function of sahara_aes_crypt maybe could be called by function
-of crypto_skcipher_encrypt during the rx softirq, so it is not
-allowed to use mutex lock. This patch is not yet tested.
+NIAP PP_OS certification requests that OS need to validate the
+CodeSigning extended key usage extension field for integrity
+verifiction of exectable code:
 
-Fixes: c0c3c89ae347 ("crypto: sahara - replace tasklets with kthread")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- drivers/crypto/sahara.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+    https://www.niap-ccevs.org/MMO/PP/-442-/
+        FIA_X509_EXT.1.1
 
-diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
-index 457084b344c1..867107b4ed30 100644
---- a/drivers/crypto/sahara.c
-+++ b/drivers/crypto/sahara.c
-@@ -26,7 +26,6 @@
- #include <linux/kernel.h>
- #include <linux/kthread.h>
- #include <linux/module.h>
--#include <linux/mutex.h>
- #include <linux/of.h>
- #include <linux/of_device.h>
- #include <linux/platform_device.h>
-@@ -196,7 +195,7 @@ struct sahara_dev {
- 	void __iomem		*regs_base;
- 	struct clk		*clk_ipg;
- 	struct clk		*clk_ahb;
--	struct mutex		queue_mutex;
-+	spinlock_t		queue_spinlock;
- 	struct task_struct	*kthread;
- 	struct completion	dma_completion;
- 
-@@ -642,9 +641,9 @@ static int sahara_aes_crypt(struct skcipher_request *req, unsigned long mode)
- 
- 	rctx->mode = mode;
- 
--	mutex_lock(&dev->queue_mutex);
-+	spin_lock_bh(&dev->queue_spinlock);
- 	err = crypto_enqueue_request(&dev->queue, &req->base);
--	mutex_unlock(&dev->queue_mutex);
-+	spin_unlock_bh(&dev->queue_spinlock);
- 
- 	wake_up_process(dev->kthread);
- 
-@@ -1043,10 +1042,10 @@ static int sahara_queue_manage(void *data)
- 	do {
- 		__set_current_state(TASK_INTERRUPTIBLE);
- 
--		mutex_lock(&dev->queue_mutex);
-+		spin_lock_bh(&dev->queue_spinlock);
- 		backlog = crypto_get_backlog(&dev->queue);
- 		async_req = crypto_dequeue_request(&dev->queue);
--		mutex_unlock(&dev->queue_mutex);
-+		spin_unlock_bh(&dev->queue_spinlock);
- 
- 		if (backlog)
- 			backlog->complete(backlog, -EINPROGRESS);
-@@ -1092,9 +1091,9 @@ static int sahara_sha_enqueue(struct ahash_request *req, int last)
- 		rctx->first = 1;
- 	}
- 
--	mutex_lock(&dev->queue_mutex);
-+	spin_lock_bh(&dev->queue_spinlock);
- 	ret = crypto_enqueue_request(&dev->queue, &req->base);
--	mutex_unlock(&dev->queue_mutex);
-+	spin_unlock_bh(&dev->queue_spinlock);
- 
- 	wake_up_process(dev->kthread);
- 
-@@ -1449,7 +1448,7 @@ static int sahara_probe(struct platform_device *pdev)
- 
- 	crypto_init_queue(&dev->queue, SAHARA_QUEUE_LENGTH);
- 
--	mutex_init(&dev->queue_mutex);
-+	spin_lock_init(&dev->queue_spinlock);
- 
- 	dev_ptr = dev;
- 
+This patchset adds the logic for parsing the codeSigning EKU extension
+field in X.509. And checking the CodeSigning EKU when verifying
+signature of kernel module or kexec PE binary in PKCS#7.
+
+v9:
+- Rename the eku element in public_key structure to ext_key_usage.
+- Fix selftest.c
+
+v8:
+- Fixed the bug of is_key_on_revocation_list() when
+  CONFIG_SYSTEM_REVOCATION_LIST is not set.
+
+v7:
+- Fixed the broken function call in is_key_on_revocation_list().
+  (be found by kernel test robot)
+- Use a general name check_eku_by_usage() instead of check_codesign_eku().
+
+v6:
+- Add more length checking when parsing extKeyUsage and EKU's OID blob.
+- Add 'usage' parameter to the comment of pkcs7_validate_trust function.
+
+v5:
+Fixed the wording in module-signing.rst.
+
+v4:
+Fixed the wording in patch description.
+
+v3:
+- Add codeSigning EKU to x509.genkey key generation config.
+- Add openssl command option example for generating CodeSign EKU to
+  module-signing.rst document.
+
+v2:
+Changed the help wording in the Kconfig.
+
+Lee, Chun-Yi (4):
+  X.509: Add CodeSigning extended key usage parsing
+  PKCS#7: Check codeSigning EKU for kernel module and kexec pe
+    verification
+  modsign: Add codeSigning EKU when generating X.509 key generation
+    config
+  Documentation/admin-guide/module-signing.rst: add openssl command
+    option example for CodeSign EKU
+
+ Documentation/admin-guide/module-signing.rst |  6 +++
+ certs/blacklist.c                            |  5 ++-
+ certs/default_x509.genkey                    |  1 +
+ certs/system_keyring.c                       |  4 +-
+ crypto/asymmetric_keys/Kconfig               |  9 ++++
+ crypto/asymmetric_keys/pkcs7_trust.c         | 43 ++++++++++++++++++--
+ crypto/asymmetric_keys/selftest.c            |  2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c    | 25 ++++++++++++
+ include/crypto/pkcs7.h                       |  4 +-
+ include/crypto/public_key.h                  |  1 +
+ include/keys/system_keyring.h                |  7 +++-
+ include/linux/oid_registry.h                 |  5 +++
+ 12 files changed, 101 insertions(+), 11 deletions(-)
+
 -- 
-2.17.1
+2.26.2
 
