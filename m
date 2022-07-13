@@ -2,109 +2,87 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F18CCA481
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 07:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B5AC433EF
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 08:49:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234861AbiGMHs3 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Jul 2022 03:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43944 "EHLO
+        id S233681AbiGMItZ (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Jul 2022 04:49:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234869AbiGMHsS (ORCPT
+        with ESMTP id S235842AbiGMItK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Jul 2022 03:48:18 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63417E5DF9;
-        Wed, 13 Jul 2022 00:48:05 -0700 (PDT)
-Received: from [192.168.87.140] (unknown [50.47.106.71])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 9B42E204DE8E;
-        Wed, 13 Jul 2022 00:48:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 9B42E204DE8E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1657698485;
-        bh=KZ3W7Lm0ppPu0mxu7WcxzkIS3QqQzFKigKl1JQiFt2Y=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=P6+Zhlbq0DMsnVL+ep7Gw05EZe/vUerKqkJmmAvdzE0pSRyQXm6vhKjOFnTdc84dI
-         Wr5o/o68+rQ16YtPQgftXDkZ3oY7JvtHA9SjKygZ+43CrDgiRDmcJS/qnvQ8OjqHRv
-         Hs3mxf8ksl5o7PzzC4HWh10dRPhLpoAdGUpHVLUs=
-Message-ID: <e5c47d13-bbb9-e607-47cb-6bf4cf6bebd9@linux.microsoft.com>
-Date:   Wed, 13 Jul 2022 00:48:04 -0700
+        Wed, 13 Jul 2022 04:49:10 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB25713DC5;
+        Wed, 13 Jul 2022 01:48:51 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id y14-20020a17090a644e00b001ef775f7118so2556374pjm.2;
+        Wed, 13 Jul 2022 01:48:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=UIoh9NHxanWIu9MKPpKAF1viSnOBb2X/cB+otoNiyAI=;
+        b=NwmwNoJ9ooQtARwNewttG01efjd4nOv9Hb1L1CSb9sSNyZWvRSf6Zp4oJKQKjUqyM7
+         LFzUFM/ed7cWTlGy1uGAgMCkBXQDnoFPD6ITBZlVqt6fs+c8veLMo6uNJEpXMZJhZp6P
+         5okNGO1RH+78g7xsUAfpy5/a7lh5aIqqIUZEL/igyRgJr+aTsD5ZisbqMJNF7nBtj6vD
+         lHWxJHI9C16S9HqropbcoY0A02w6laCL0GYzrlYDXk8lJGaiSg7c+/sxruYd3yRW1JUe
+         2ZD/F9brWyW8AAM8IV51byRUkGdTQ7bGxj4Wn21JXmODEKjA3OdoHvnANpKNJPo+Dp1V
+         2RBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UIoh9NHxanWIu9MKPpKAF1viSnOBb2X/cB+otoNiyAI=;
+        b=j1cipUR6h9MYnzoxQmF5lxeMCSTXkSLMArLP+maEXvF2kzvw557Uaid1BMYJ9/uYLV
+         o2globJ38WjQCNZ4megfr3nQ+OD3v5cGRxgFxwplChHmvadbbIWl+jpH7ydgkg26TrXo
+         mIj+k3F65R0D5ceDHIy048YPl6BvcqYkp8CI1svbAROhWZvsa9TwJH+e1h4rqgq4IRGx
+         u2sPLorBvOs1BsR53JAxcFdA+jvHZGeokafN83ozjz9EpcDChLfC5BfXlssgZsqvPZhD
+         oXpP5iiq526oXPcrR9xA/ZnwuUuUzooItZD1/cvZ1w80bl0YSQkHxzKeX+TDOpha/QgF
+         XbZw==
+X-Gm-Message-State: AJIora/yQXNOmmpXKZ2/qIoyqULwczbSbAqireC81gV06MlDz6gv7CfT
+        9Gd0/qn/FmxAW5zWmxT2iSuMmNotl00=
+X-Google-Smtp-Source: AGRyM1vdMa5JxdLDERhFxTImec2iKAG9Oo0H3NUBuB7MwfIOjRQpopjkN+4Af7TawxI31k0hvRhrug==
+X-Received: by 2002:a17:902:f391:b0:16b:f995:43ac with SMTP id f17-20020a170902f39100b0016bf99543acmr2405768ple.32.1657702130130;
+        Wed, 13 Jul 2022 01:48:50 -0700 (PDT)
+Received: from debian.me (subs02-180-214-232-1.three.co.id. [180.214.232.1])
+        by smtp.gmail.com with ESMTPSA id i6-20020a056a00004600b00528bbf8245dsm8323921pfk.79.2022.07.13.01.48.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jul 2022 01:48:49 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 6FA5F1038C5; Wed, 13 Jul 2022 15:48:46 +0700 (WIB)
+Date:   Wed, 13 Jul 2022 15:48:46 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     linux-doc@vger.kernel.org, linux-next@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/2] Documentation: qat: documentation fixes
+Message-ID: <Ys6G7pERa+fUoKwl@debian.me>
+References: <20220713030332.158525-1-bagasdotme@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 3/5] ARM: dts: aspeed: Add HACE device controller node
-Content-Language: en-US
-To:     Neal Liu <neal_liu@aspeedtech.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Joel Stanley <joel@jms.id.au>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Dhananjay Phadke <dhphadke@microsoft.com>,
-        Johnny Huang <johnny_huang@aspeedtech.com>
-Cc:     devicetree@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
-        BMC-SW@aspeedtech.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20220705020936.1751771-1-neal_liu@aspeedtech.com>
- <20220705020936.1751771-4-neal_liu@aspeedtech.com>
-From:   Dhananjay Phadke <dphadke@linux.microsoft.com>
-In-Reply-To: <20220705020936.1751771-4-neal_liu@aspeedtech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220713030332.158525-1-bagasdotme@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/4/2022 7:09 PM, Neal Liu wrote:
-> Add hace node to device tree for AST2500/AST2600.
+On Wed, Jul 13, 2022 at 10:03:31AM +0700, Bagas Sanjaya wrote:
+> Here are documentation fixes for qat driver, as recently reported in
+> linux-next.
 > 
-> Signed-off-by: Neal Liu <neal_liu@aspeedtech.com>
-> Signed-off-by: Johnny Huang <johnny_huang@aspeedtech.com>
-> ---
->   arch/arm/boot/dts/aspeed-g5.dtsi | 8 ++++++++
->   arch/arm/boot/dts/aspeed-g6.dtsi | 8 ++++++++
->   2 files changed, 16 insertions(+)
+> Changes since v1 [1]:
+>   - based on next-20220712
+>   - Drop kvms390 (already applied by respective maintainer)
+>   - Focused on qat driver
+>   - Drop "initialize" from [2/2]
+>   - Collect Acked-by from Giovanni Cabiddu
 > 
-> diff --git a/arch/arm/boot/dts/aspeed-g5.dtsi b/arch/arm/boot/dts/aspeed-g5.dtsi
-> index c89092c3905b..04f98d1dbb97 100644
-> --- a/arch/arm/boot/dts/aspeed-g5.dtsi
-> +++ b/arch/arm/boot/dts/aspeed-g5.dtsi
-> @@ -262,6 +262,14 @@ rng: hwrng@1e6e2078 {
->   				quality = <100>;
->   			};
->   
-> +			hace: crypto@1e6e3000 {
-> +				compatible = "aspeed,ast2500-hace";
-> +				reg = <0x1e6e3000 0x100>;
-> +				interrupts = <4>;
-> +				clocks = <&syscon ASPEED_CLK_GATE_YCLK>;
-> +				resets = <&syscon ASPEED_RESET_HACE>;
-> +			};
-> +
->   			gfx: display@1e6e6000 {
->   				compatible = "aspeed,ast2500-gfx", "syscon";
->   				reg = <0x1e6e6000 0x1000>;
-> diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
-> index 6660564855ff..095cf8d03616 100644
-> --- a/arch/arm/boot/dts/aspeed-g6.dtsi
-> +++ b/arch/arm/boot/dts/aspeed-g6.dtsi
-> @@ -323,6 +323,14 @@ apb {
->   			#size-cells = <1>;
->   			ranges;
->   
-> +			hace: crypto@1e6d0000 {
-> +				compatible = "aspeed,ast2600-hace";
-> +				reg = <0x1e6d0000 0x200>;
-> +				interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-> +				clocks = <&syscon ASPEED_CLK_GATE_YCLK>;
-> +				resets = <&syscon ASPEED_RESET_HACE>;
-> +			};
-> +
+> [1]: https://lore.kernel.org/linux-doc/20220712092954.142027-1-bagasdotme@gmail.com/
+> 
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-crypto@vger.kernel.org
+> 
 
+Oops, missing v2 subject prefix. Will resend.
 
-Thank you for addressing ast2500, for this patch -
-
-Reviewed-by: Dhananjay Phadke <dphadke@linux.microsoft.com>
+-- 
+An old man doll... just what I always wanted! - Clara
