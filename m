@@ -2,145 +2,196 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83468C433EF
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 13:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58520C43334
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Jul 2022 14:31:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235479AbiGMNsr (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Jul 2022 09:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50640 "EHLO
+        id S236451AbiGMObX (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Wed, 13 Jul 2022 10:31:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236155AbiGMNso (ORCPT
+        with ESMTP id S234652AbiGMObW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Jul 2022 09:48:44 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A915265F;
-        Wed, 13 Jul 2022 06:48:40 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BE641B81FB0;
-        Wed, 13 Jul 2022 13:48:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5F12C34114;
-        Wed, 13 Jul 2022 13:48:36 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZY1mAJ9m"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1657720114;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v5HnWZR28Xh1MYgMzpxCz1icS3a6ZaKE3D1pmlpib5Q=;
-        b=ZY1mAJ9mFKSaFI+1pNGEKMMmhEV/hNTct/Lq+R/M2RUPyK4okqqo4qdkVedbwFTPd8F+m3
-        VcwDce9cwWxt/zmsusBWUrln/ERU7WaSz3ktXBi7727/4yc5n7hyV4smpBGgH+VXrU2Mi/
-        S4exOMWcxUTrQC4Zg389PRl/zmx3nh4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id efb3e3ff (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Wed, 13 Jul 2022 13:48:34 +0000 (UTC)
-Date:   Wed, 13 Jul 2022 15:48:32 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Harald Freudenberger <freude@linux.ibm.com>
-Cc:     linux390-list@tuxmaker.boeblingen.de.ibm.com,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
-        jchrist@linux.ibm.com, dengler@linux.ibm.com
-Subject: Re: [PATCH] s390/archrandom: remove CPACF trng invocations in irq
- context
-Message-ID: <Ys7NMKkrELPT3T6H@zx2c4.com>
-References: <20220713131721.257907-1-freude@linux.ibm.com>
+        Wed, 13 Jul 2022 10:31:22 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AAB4E37180;
+        Wed, 13 Jul 2022 07:31:21 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E22431424;
+        Wed, 13 Jul 2022 07:31:21 -0700 (PDT)
+Received: from [10.1.29.153] (e121487-lin.cambridge.arm.com [10.1.29.153])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 235633F73D;
+        Wed, 13 Jul 2022 07:31:19 -0700 (PDT)
+Message-ID: <eb74e1b8-af7e-21e8-658f-af6c7975264e@arm.com>
+Date:   Wed, 13 Jul 2022 15:31:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220713131721.257907-1-freude@linux.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH] random: vary jitter iterations based on cycle counter
+ speed
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Cc:     Eric Biggers <ebiggers@google.com>, Theodore Ts'o <tytso@mit.edu>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <20220422132027.1267060-1-Jason@zx2c4.com>
+From:   Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20220422132027.1267060-1-Jason@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Harald,
+Hi All,
 
-On Wed, Jul 13, 2022 at 03:17:21PM +0200, Harald Freudenberger wrote:
-> This patch slightly reworks the s390 arch_get_random_seed_{int,long}
-> implementation: Make sure the CPACF trng instruction is never
-> called in any interrupt context. This is done by adding an
-> additional condition in_task().
+On 4/22/22 14:20, Jason A. Donenfeld wrote:
+> Currently, we do the jitter dance if two consecutive reads to the cycle
+> counter return different values. If they do, then we consider the cycle
+> counter to be fast enough that one trip through the scheduler will yield
+> one "bit" of credited entropy. If those two reads return the same value,
+> then we assume the cycle counter is too slow to show meaningful
+> differences.
 > 
-> Justification:
+> This methodology is flawed for a variety of reasons, one of which Eric
+> posted a patch to fix in [1]. The issue that patch solves is that on a
+> system with a slow counter, you might be [un]lucky and read the counter
+> _just_ before it changes, so that the second cycle counter you read
+> differs from the first, even though there's usually quite a large period
+> of time in between the two. For example:
 > 
-> There are some constrains to satisfy for the invocation of the
-> arch_get_random_seed_{int,long}() functions:
-> - They should provide good random data during kernel initialization.
-> - They should not be called in interrupt context as the TRNG
->   instruction is relatively heavy weight and may for example
->   make some network loads cause to timeout and buck.
+> | real time | cycle counter |
+> | --------- | ------------- |
+> | 3         | 5             |
+> | 4         | 5             |
+> | 5         | 5             |
+> | 6         | 5             |
+> | 7         | 5             | <--- a
+> | 8         | 6             | <--- b
+> | 9         | 6             | <--- c
 > 
-> However, it was not clear what kind of interrupt context is exactly
-> encountered during kernel init or network traffic eventually calling
-> arch_get_random_seed_long().
+> If we read the counter at (a) and compare it to (b), we might be fooled
+> into thinking that it's a fast counter, when in reality it is not. The
+> solution in [1] is to also compare counter (b) to counter (c), on the
+> theory that if the counter is _actually_ slow, and (a)!=(b), then
+> certainly (b)==(c).
 > 
-> After some days of investigations it is clear that the s390
-> start_kernel function is not running in any interrupt context and
-> so the trng is called:
+> This helps solve this particular issue, in one sense, but in another
+> sense, it mostly functions to disallow jitter entropy on these systems,
+> rather than simply taking more samples in that case.
 > 
-> Jul 11 18:33:39 t35lp54 kernel:  [<00000001064e90ca>] arch_get_random_seed_long.part.0+0x32/0x70
-> Jul 11 18:33:39 t35lp54 kernel:  [<000000010715f246>] random_init+0xf6/0x238
-> Jul 11 18:33:39 t35lp54 kernel:  [<000000010712545c>] start_kernel+0x4a4/0x628
-> Jul 11 18:33:39 t35lp54 kernel:  [<000000010590402a>] startup_continue+0x2a/0x40
+> Instead, this patch takes a different approach. Right now we assume that
+> a difference in one set of consecutive samples means one "bit" of
+> credited entropy per scheduler trip. We can extend this so that a
+> difference in two sets of consecutive samples means one "bit" of
+> credited entropy per /two/ scheduler trips, and three for three, and
+> four for four. In other words, we can increase the amount of jitter
+> "work" we require for each "bit", depending on how slow the cycle
+> counter is.
 > 
-> The condition in_task() is true and the CPACF trng provides random data
-> during kernel startup.
+> So this patch takes whole bunch of samples, sees how many of them are
+> different, and divides to find the amount of work required per "bit",
+> and also requires that at least some minimum of them are different in
+> order to attempt any jitter entropy.
 > 
-> The network traffic however, is more difficult. A typical call stack
-> looks like this:
+> Note that this approach is still far from perfect. It's not a real
+> statistical estimate on how much these samples vary; it's not a
+> real-time analysis of the relevant input data. That remains a project
+> for another time. However, it does the same (partly flawed) assumptions
+> as the code that's there now, so it's probably not worse than the status
+> quo, and it handles the issue Eric mentioned in [1]. But, again, it's
+> probably a far cry from whatever a really robust version of this would
+> be.
 > 
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b5600fc>] extract_entropy.constprop.0+0x23c/0x240
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b560136>] crng_reseed+0x36/0xd8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b5604b8>] crng_make_state+0x78/0x340
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b5607e0>] _get_random_bytes+0x60/0xf8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b56108a>] get_random_u32+0xda/0x248
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008aefe7a8>] kfence_guarded_alloc+0x48/0x4b8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008aeff35e>] __kfence_alloc+0x18e/0x1b8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008aef7f10>] __kmalloc_node_track_caller+0x368/0x4d8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b611eac>] kmalloc_reserve+0x44/0xa0
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b611f98>] __alloc_skb+0x90/0x178
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b6120dc>] __napi_alloc_skb+0x5c/0x118
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b8f06b4>] qeth_extract_skb+0x13c/0x680
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b8f6526>] qeth_poll+0x256/0x3f8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b63d76e>] __napi_poll.constprop.0+0x46/0x2f8
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b63dbec>] net_rx_action+0x1cc/0x408
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b937302>] __do_softirq+0x132/0x6b0
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008abf46ce>] __irq_exit_rcu+0x13e/0x170
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008abf531a>] irq_exit_rcu+0x22/0x50
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b922506>] do_io_irq+0xe6/0x198
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b935826>] io_int_handler+0xd6/0x110
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b9358a6>] psw_idle_exit+0x0/0xa
-> Jul 06 17:37:07 t35lp54 kernel: ([<000000008ab9c59a>] arch_cpu_idle+0x52/0xe0)
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b933cfe>] default_idle_call+0x6e/0xd0
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008ac59f4e>] do_idle+0xf6/0x1b0
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008ac5a28e>] cpu_startup_entry+0x36/0x40
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008abb0d90>] smp_start_secondary+0x148/0x158
-> Jul 06 17:37:07 t35lp54 kernel:  [<000000008b935b9e>] restart_int_handler+0x6e/0x90
+> [1] https://lore.kernel.org/lkml/20220421233152.58522-1-ebiggers@kernel.org/
+>     https://lore.kernel.org/lkml/20220421192939.250680-1-ebiggers@kernel.org/
 > 
-> which confirms that the call is in softirq context. So in_task() covers exactly
-> the cases where we want to have CPACF trng called: not in nmi, not in hard irq,
-> not in soft irq but in normal task context and during kernel init.
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> This is an argument very much centered around the somewhat low bar of
+> being "not worse than before". If you can think of ways that it doesn't
+> even manage to clear that, please do pipe up.
+> 
+> 
+>  drivers/char/random.c | 36 ++++++++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/char/random.c b/drivers/char/random.c
+> index bf89c6f27a19..94a2ddb53662 100644
+> --- a/drivers/char/random.c
+> +++ b/drivers/char/random.c
+> @@ -1354,6 +1354,12 @@ void add_interrupt_randomness(int irq)
+>  }
+>  EXPORT_SYMBOL_GPL(add_interrupt_randomness);
+>  
+> +struct entropy_timer_state {
+> +	unsigned long entropy;
+> +	struct timer_list timer;
+> +	unsigned int samples, samples_per_bit;
+> +};
+> +
+>  /*
+>   * Each time the timer fires, we expect that we got an unpredictable
+>   * jump in the cycle counter. Even if the timer is running on another
+> @@ -1367,9 +1373,14 @@ EXPORT_SYMBOL_GPL(add_interrupt_randomness);
+>   *
+>   * So the re-arming always happens in the entropy loop itself.
+>   */
+> -static void entropy_timer(struct timer_list *t)
+> +static void entropy_timer(struct timer_list *timer)
+>  {
+> -	credit_entropy_bits(1);
+> +	struct entropy_timer_state *state = container_of(timer, struct entropy_timer_state, timer);
+> +
+> +	if (++state->samples == state->samples_per_bit) {
+> +		credit_entropy_bits(1);
+> +		state->samples = 0;
+> +	}
+>  }
+>  
+>  /*
+> @@ -1378,17 +1389,22 @@ static void entropy_timer(struct timer_list *t)
+>   */
+>  static void try_to_generate_entropy(void)
+>  {
+> -	struct {
+> -		unsigned long entropy;
+> -		struct timer_list timer;
+> -	} stack;
+> -
+> -	stack.entropy = random_get_entropy();
+> +	enum { NUM_TRIAL_SAMPLES = 8192, MAX_SAMPLES_PER_BIT = 256 };
+> +	struct entropy_timer_state stack;
+> +	unsigned int i, num_different = 0;
+> +	unsigned long last = random_get_entropy();
+>  
+> -	/* Slow counter - or none. Don't even bother */
+> -	if (stack.entropy == random_get_entropy())
+> +	for (i = 0; i < NUM_TRIAL_SAMPLES - 1; ++i) {
+> +		stack.entropy = random_get_entropy();
+> +		if (stack.entropy != last)
+> +			++num_different;
+> +		last = stack.entropy;
+> +	}
+> +	stack.samples_per_bit = DIV_ROUND_UP(NUM_TRIAL_SAMPLES, num_different + 1);
+> +	if (stack.samples_per_bit > MAX_SAMPLES_PER_BIT)
+>  		return;
+>  
+> +	stack.samples = 0;
+>  	timer_setup_on_stack(&stack.timer, entropy_timer, 0);
+>  	while (!crng_ready() && !signal_pending(current)) {
+>  		if (!timer_pending(&stack.timer))
 
-Reluctantly,
 
-   Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+I've just seen on the platform with slow(ish) timer that it is now considered
+as a source of entropy with samples_per_bit set to 27 (5.19-rc6 has MAX_SAMPLES_PER_BIT
+set to 32). Because of that I see significant delays and I'm trying to understand what
+could be wrong with my setup.
 
-I'll let you know if I ever get rid of or optimize the call from
-kfence_guarded_alloc() so that maybe there's a chance of reverting this.
+I observe one credit_init_bits(1) call (via entropy_timer()) per ~970 schedule() calls.
+Is that somewhat expected? Does it make sense at all?
 
-One small unimportant nit:
-
->  	if (static_branch_likely(&s390_arch_random_available)) {
-> -		cpacf_trng(NULL, 0, (u8 *)v, sizeof(*v));
-> -		atomic64_add(sizeof(*v), &s390_arch_random_counter);
-> -		return true;
-> +		if (in_task()) {
-
-You can avoid a level of indentation by making this:
-
-    if (static_branch_likely(&s390_arch_random_available) && in_task())
-
-But not my code so doesn't really matter to me. So have my Ack above and
-I'll stop being nitpicky :).
-
-Jason
+Cheers
+Vladimir
