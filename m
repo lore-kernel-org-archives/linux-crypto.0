@@ -2,86 +2,82 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 806A3C433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jul 2022 14:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D70ECC433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jul 2022 21:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbiGNOtT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Jul 2022 10:49:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56714 "EHLO
+        id S232712AbiGNV3R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Jul 2022 17:29:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232090AbiGNOtS (ORCPT
+        with ESMTP id S231858AbiGNV3Q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:49:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4264D4F670;
-        Thu, 14 Jul 2022 07:49:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D49F961D1E;
-        Thu, 14 Jul 2022 14:49:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8D4C34115;
-        Thu, 14 Jul 2022 14:49:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1657810156;
-        bh=MvYGgKUfMiBeLWl7rTPRRjLAeDMlTd5tlvmNnG7OT/w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=KKcXLtwNhdTkwUoUKVpnKyc7D5a84j/nCoLSYiGrU0LW6EuYIQac0RYAooKakTyfz
-         etef7jGf+gjxdpwsRQ8GjUyB2ekcBpcg/hte17tUpioRSh85WLj6B6/dZUNXiNBzhN
-         xOU9LHUpfjlgCh6EvEyFAKLBHDHVchsPnudRObmE=
-Date:   Thu, 14 Jul 2022 16:49:13 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Florian Fainelli <f.fainelli@gmail.com>
-Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>, linux-kernel@vger.kernel.org,
-        olivia@selenic.com, paul.gortmaker@windriver.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: Change mentions of mpm to olivia
-Message-ID: <YtAs6S/WwVV7zQAr@kroah.com>
-References: <20220712185419.45487-1-f.fainelli@gmail.com>
- <20220712200010.kbx24o2nxobrhmey@pengutronix.de>
- <036b6113-d6a1-ca82-5033-98bc9caa7255@gmail.com>
+        Thu, 14 Jul 2022 17:29:16 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA5CE46DAC
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Jul 2022 14:29:15 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oC6Nu-00064J-PQ; Thu, 14 Jul 2022 23:28:34 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oC6Np-000zHj-UQ; Thu, 14 Jul 2022 23:28:29 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1oC6Np-005Dgh-32; Thu, 14 Jul 2022 23:28:29 +0200
+From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
+        Prabhjot Khurana <prabhjot.khurana@intel.com>,
+        Mark Gross <mgross@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel@pengutronix.de
+Subject: [PATCH] crypto: keembay-ocs-ecc: Drop if with an always false condition
+Date:   Thu, 14 Jul 2022 23:28:20 +0200
+Message-Id: <20220714212820.59237-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=996; h=from:subject; bh=HrGb7k9nlrRZDlkX2uq05bo5OX9GT8KSBgbj2aZh7w4=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBi0IpwqJt/WG1Wa3/H6KqBTBAqlFNtQcEwoS2KMLeF Yg6KK2yJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYtCKcAAKCRDB/BR4rcrsCdYUCA Cd8+4oYge3T+yfRYCEPmbRSJ0vzqkz85SXvo2FTTLltCXWVwZs18MLwqMVkHUvw1MyNy7dnyChgCIA B3BUMRGLndJ47JckDkdzA/ziNIoJTFZ4oksi5ywDDR4XGyw1DC0Hvi+FP2upGEMrVbbD7/RbIroCM8 nC2x7iXiVt0mEHObJ0Oa8hUely/w75z3zGHsdkskWcL4XcoFhCzipCkg8lK1nTP9NsdB0jJix5aLav zaKkwUfpbBILz1mYFj3yb91hq9CfmxBlLZW3Kz8W+PLMMZ9ittqSPo4kNwW10xwCxNzXSq4fcF6Nip oMmJvP3zr2FcAnCjBYywsa3ZDsBD/T
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <036b6113-d6a1-ca82-5033-98bc9caa7255@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 12, 2022 at 03:15:41PM -0700, Florian Fainelli wrote:
-> On 7/12/22 13:00, Uwe Kleine-König wrote:
-> > On Tue, Jul 12, 2022 at 11:54:19AM -0700, Florian Fainelli wrote:
-> > > Following this mercurial changeset:
-> > > https://www.mercurial-scm.org/repo/hg-stable/rev/d4ba4d51f85f
-> > > 
-> > > update the MAINTAINERS entry to replace the now obsolete identity.
-> > > 
-> > > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
-> > > ---
-> > > This was first submitted by Uwe:
-> > > 
-> > > https://lore.kernel.org/lkml/20210920080635.253826-1-u.kleine-koenig@pengutronix.de/
-> > 
-> > My variant was to drop Matt/Olivia. Given that we didn't get any
-> > feedback from them, that's still what I would favour.
-> > 
-> > Without any feedback (and committment?) from Olivia, I tend to nack this
-> > patch.
-> 
-> I do not care either way, by explicitly CC'ing Olivia we give a fighting
-> chance of seeing one's identify continue to be listed under MAINTAINERS. Now
-> without any recent commits in the past 12 years, one could argue that
-> removal is long due.
-> 
-> Either way is fine as long as we stop getting SMTP server bounces which is
-> just extremely annoying...
+The remove callback is only called after probe completed successfully.
+In this case platform_set_drvdata() was called with a non-NULL argument
+and so ecc_dev is never NULL.
 
-I'll take it for now until the EMBEDDED maintainership is worked out by
-others.
+This is a preparation for making platform remove callbacks return void.
 
-thanks,
+Signed-off-by: Uwe Kleine-KÃ¶nig <u.kleine-koenig@pengutronix.de>
+---
+ drivers/crypto/keembay/keembay-ocs-ecc.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-greg k-h
+diff --git a/drivers/crypto/keembay/keembay-ocs-ecc.c b/drivers/crypto/keembay/keembay-ocs-ecc.c
+index 5d0785d3f1b5..2269df17514c 100644
+--- a/drivers/crypto/keembay/keembay-ocs-ecc.c
++++ b/drivers/crypto/keembay/keembay-ocs-ecc.c
+@@ -976,8 +976,6 @@ static int kmb_ocs_ecc_remove(struct platform_device *pdev)
+ 	struct ocs_ecc_dev *ecc_dev;
+ 
+ 	ecc_dev = platform_get_drvdata(pdev);
+-	if (!ecc_dev)
+-		return -ENODEV;
+ 
+ 	crypto_unregister_kpp(&ocs_ecdh_p384);
+ 	crypto_unregister_kpp(&ocs_ecdh_p256);
+
+base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
+-- 
+2.36.1
+
