@@ -2,95 +2,86 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE16C43334
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jul 2022 12:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 806A3C433EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jul 2022 14:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231654AbiGNMSH (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Jul 2022 08:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34562 "EHLO
+        id S231666AbiGNOtT (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Jul 2022 10:49:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbiGNMSG (ORCPT
+        with ESMTP id S232090AbiGNOtS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Jul 2022 08:18:06 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23B53DBFE;
-        Thu, 14 Jul 2022 05:18:05 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id r6so2155377edd.7;
-        Thu, 14 Jul 2022 05:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=z8FXPQ2HFsdQUAT+K94K5LqC4oPDIoYE7B3AmbxBbmI=;
-        b=fzmSn9/0x8bBpW8nEI3Fg9gdUlqbZV3NJ1Ga577qdd9juU5LLRLDsVpsnF9eve16qO
-         IAHT20iruWgksIAS26sdrKpyIXdjRdg6k1RVPUFWOcF6wv22nEXx9gh6ATGsOHra0tB3
-         kt7b/azZLQgTMRht51dENVUdXOwTGI0vmnUYZMqlymsT1HXfpRHZ+VtTmtNvi+Q3PQFW
-         10rzDoz1GKz1HrwvBUbXHYY/43Hy5PLf7tJCOqL/MJ/820FCt16Tf+5Ns7tmYoQq9lPA
-         86//5VL1abd62POh/EAbV1Vmv/p1vymTQIkcE75arO4BBBm+mAHYxpowLv9ravmW9Y7z
-         jVwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=z8FXPQ2HFsdQUAT+K94K5LqC4oPDIoYE7B3AmbxBbmI=;
-        b=LvmEySddXmXb/Oghzr2n/EIuFH6jSACO+lPkE+sMXwxwXF/y51eR/sTLqiZFZcEwno
-         d/y6q0eJRgRG+w2lH0H+bIH4Trmcjtph9SVF3yYBCQRRrMywRIPlF0+MGHIDsMtH8NLU
-         Z/ArD9ef15zKjcf10pDL88AQuSU/SsLsLM2R6VS2MVJpmwFrU83XXcpXw5ZnjPn+N2KT
-         q4hBBJs3G9h1ddpLl8F+alAiatJXycFs0LbwJW8BFKl134T4kL7dmjb0Ay9nbQBPSGzg
-         ruuDNwkcv3VhVN9tcjMuat2W2FCFUQDgkj59ejIMQnR5nwNS6L4vfZCz4ErjW4ET7b1V
-         0jXw==
-X-Gm-Message-State: AJIora/4fjsZ6mUprEURQ/7MPzHYuaj+SB8XKUKlWMIgQfqRytD81Yfo
-        LfUsnKIy3KhAffc2NgDZ7Is=
-X-Google-Smtp-Source: AGRyM1s0FLooPPofTKzsmTjW38dN7FmunKqAOFb5+ZQWmFsV95mTK4M5ORXv2xU0JZ+JtCFtyk79Ow==
-X-Received: by 2002:a05:6402:3886:b0:435:643a:b7ae with SMTP id fd6-20020a056402388600b00435643ab7aemr11823103edb.4.1657801084100;
-        Thu, 14 Jul 2022 05:18:04 -0700 (PDT)
-Received: from localhost.localdomain (93-42-70-190.ip85.fastwebnet.it. [93.42.70.190])
-        by smtp.googlemail.com with ESMTPSA id b6-20020a170906038600b00711edab7622sm636692eja.40.2022.07.14.05.18.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 05:18:03 -0700 (PDT)
-From:   Christian Marangi <ansuelsmth@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Christian Marangi <ansuelsmth@gmail.com>
-Subject: [PATCH] crypto: lib/arc4 - expose library interface
-Date:   Thu, 14 Jul 2022 07:12:21 +0200
-Message-Id: <20220714051221.22525-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.36.1
+        Thu, 14 Jul 2022 10:49:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4264D4F670;
+        Thu, 14 Jul 2022 07:49:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D49F961D1E;
+        Thu, 14 Jul 2022 14:49:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8D4C34115;
+        Thu, 14 Jul 2022 14:49:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1657810156;
+        bh=MvYGgKUfMiBeLWl7rTPRRjLAeDMlTd5tlvmNnG7OT/w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KKcXLtwNhdTkwUoUKVpnKyc7D5a84j/nCoLSYiGrU0LW6EuYIQac0RYAooKakTyfz
+         etef7jGf+gjxdpwsRQ8GjUyB2ekcBpcg/hte17tUpioRSh85WLj6B6/dZUNXiNBzhN
+         xOU9LHUpfjlgCh6EvEyFAKLBHDHVchsPnudRObmE=
+Date:   Thu, 14 Jul 2022 16:49:13 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Florian Fainelli <f.fainelli@gmail.com>
+Cc:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>, linux-kernel@vger.kernel.org,
+        olivia@selenic.com, paul.gortmaker@windriver.com,
+        dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: Change mentions of mpm to olivia
+Message-ID: <YtAs6S/WwVV7zQAr@kroah.com>
+References: <20220712185419.45487-1-f.fainelli@gmail.com>
+ <20220712200010.kbx24o2nxobrhmey@pengutronix.de>
+ <036b6113-d6a1-ca82-5033-98bc9caa7255@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <036b6113-d6a1-ca82-5033-98bc9caa7255@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Permit to compile the arc4 crypto lib without any user. This is required
-by the backports project [1] that require this lib for any wireless
-driver.
+On Tue, Jul 12, 2022 at 03:15:41PM -0700, Florian Fainelli wrote:
+> On 7/12/22 13:00, Uwe Kleine-König wrote:
+> > On Tue, Jul 12, 2022 at 11:54:19AM -0700, Florian Fainelli wrote:
+> > > Following this mercurial changeset:
+> > > https://www.mercurial-scm.org/repo/hg-stable/rev/d4ba4d51f85f
+> > > 
+> > > update the MAINTAINERS entry to replace the now obsolete identity.
+> > > 
+> > > Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> > > ---
+> > > This was first submitted by Uwe:
+> > > 
+> > > https://lore.kernel.org/lkml/20210920080635.253826-1-u.kleine-koenig@pengutronix.de/
+> > 
+> > My variant was to drop Matt/Olivia. Given that we didn't get any
+> > feedback from them, that's still what I would favour.
+> > 
+> > Without any feedback (and committment?) from Olivia, I tend to nack this
+> > patch.
+> 
+> I do not care either way, by explicitly CC'ing Olivia we give a fighting
+> chance of seeing one's identify continue to be listed under MAINTAINERS. Now
+> without any recent commits in the past 12 years, one could argue that
+> removal is long due.
+> 
+> Either way is fine as long as we stop getting SMTP server bounces which is
+> just extremely annoying...
 
-[1] https://backports.wiki.kernel.org/index.php/Main_Page
+I'll take it for now until the EMBEDDED maintainership is worked out by
+others.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- lib/crypto/Kconfig | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+thanks,
 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 2082af43d51f..2dfc785a7817 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -6,7 +6,11 @@ config CRYPTO_LIB_AES
- 	tristate
- 
- config CRYPTO_LIB_ARC4
--	tristate
-+	tristate "ARC4 library interface"
-+	help
-+	  Enable the ARC4 library interface. This interface is mainly
-+	  used by wireless drivers and is required by the backports
-+	  project.
- 
- config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
- 	bool
--- 
-2.36.1
-
+greg k-h
