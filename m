@@ -2,75 +2,125 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD43DC43334
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 08:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDF7C433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 08:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231245AbiGOIdg (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Jul 2022 04:33:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56688 "EHLO
+        id S231569AbiGOIhx (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Fri, 15 Jul 2022 04:37:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbiGOIdf (ORCPT
+        with ESMTP id S229904AbiGOIhx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jul 2022 04:33:35 -0400
-Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92CCD1E8;
-        Fri, 15 Jul 2022 01:33:33 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oCGl9-000ndq-8p; Fri, 15 Jul 2022 18:33:16 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Jul 2022 16:33:15 +0800
-Date:   Fri, 15 Jul 2022 16:33:15 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Yang Shen <shenyang39@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
+        Fri, 15 Jul 2022 04:37:53 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D388148F;
+        Fri, 15 Jul 2022 01:37:52 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id bp15so7764195ejb.6;
+        Fri, 15 Jul 2022 01:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:from:to:cc:subject:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=J+9HGyAEN1pJBy/DvkM1mQBg4p/Yv310qvcslrhu09s=;
+        b=JC/CN8/YNPAb3xeJKIC11lCCMeEU/VxDQx2T1pDL52lQoM/jzoztfMlEhLRro3Vhlb
+         kY60LkLuxx9rha+J+HJZ2973tRFMSnzPvLsTj4waeut50jKWsnppfI+9ZeM90YbcgWZQ
+         b+6YTajzdkdwH9xDX7fn4630x2iF7LJ+wSDOd8uIGMPxIRojPS/cW8F06gu/S+QQahAx
+         J/Bn6dOyezVJz7uxTxETNKu99SWsYMTZedE3SvqvRJ1kvBWVOoDNNf4bJveeiV9zCVdp
+         67DfvfiTKKYrX4eWYHszXNRg9I7MmQwaefT1U323W9km3Tudb2D5w5XomdX/IcbKS/pI
+         hKLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:from:to:cc:subject:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=J+9HGyAEN1pJBy/DvkM1mQBg4p/Yv310qvcslrhu09s=;
+        b=Osy+JyvSLbIXXSmrkd7cQgS+l6WXecDodQzhDQqgSQfID7uF4lO8Oa2aMJOMXhI06G
+         C80uw8agVhP1EG/qS4cGZHFTw0Yg+J9YmOwW8c1OQeDzY6AA2Pv23q/W/fEakcSFb+yU
+         MCLmRmzW04bqWy9z10lDtMQBEv8fLCoGgetyzEoI8+zVpSy0Gcl8wz4bflzNo7m/8Zpe
+         N+T5MklQ0PjbpggkKBaAk98IZ0Cnnj6EDBFNTfxOFsOCn+fzbS5gaGZishBzrJDaOYui
+         O56jpdRcpyjSHuAZGWl2YvSvo4wXlNRjlLmjQzrmIR3/bJozqWEFIz3ObYcPpFW1CQEH
+         UqMg==
+X-Gm-Message-State: AJIora8QnsK4G+J8qtPjklaNDVNyUmjekDl6/WJuw0jgCpOOfKGGvtdY
+        M+3ni4Gn/oGuFYfudjDpiHM=
+X-Google-Smtp-Source: AGRyM1sOd2xLAIMyNxCPTpgA4BENx/7gDvju2Nyj7biBYkl+P8YLZQvFrPHxlxBgGXTUrPNSDK3JdQ==
+X-Received: by 2002:a17:906:58c8:b0:6fe:91d5:18d2 with SMTP id e8-20020a17090658c800b006fe91d518d2mr12658988ejs.190.1657874270785;
+        Fri, 15 Jul 2022 01:37:50 -0700 (PDT)
+Received: from Ansuel-xps. (93-42-70-190.ip85.fastwebnet.it. [93.42.70.190])
+        by smtp.gmail.com with ESMTPSA id p19-20020a056402075300b0043a7cdfac46sm2385948edy.23.2022.07.15.01.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Jul 2022 01:37:50 -0700 (PDT)
+Message-ID: <62d1275e.1c69fb81.f16fe.51e0@mx.google.com>
+X-Google-Original-Message-ID: <YtDMqUgQ3X4utM6Z@Ansuel-xps.>
+Date:   Fri, 15 Jul 2022 04:10:49 +0200
+From:   Christian Marangi <ansuelsmth@gmail.com>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     'Eric Biggers' <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon/zip: Use the bitmap API to allocate
- bitmaps
-Message-ID: <YtEmS//eV3Ok08BD@gondor.apana.org.au>
-References: <49a1b5bf6e8f7c2ad06a0e2dbc35e00169d4ebe2.1657383385.git.christophe.jaillet@wanadoo.fr>
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: lib/arc4 - expose library interface
+References: <20220714051221.22525-1-ansuelsmth@gmail.com>
+ <YtDLMmwffn6p/rSV@sol.localdomain>
+ <872b3792d96946b48236120a057b99bc@AcuMS.aculab.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <49a1b5bf6e8f7c2ad06a0e2dbc35e00169d4ebe2.1657383385.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <872b3792d96946b48236120a057b99bc@AcuMS.aculab.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 09, 2022 at 06:16:46PM +0200, Christophe JAILLET wrote:
-> Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
+On Fri, Jul 15, 2022 at 07:39:48AM +0000, David Laight wrote:
+> From: Eric Biggers
+> > Sent: 15 July 2022 03:05
+> > 
+> > On Thu, Jul 14, 2022 at 07:12:21AM +0200, Christian Marangi wrote:
+> > > Permit to compile the arc4 crypto lib without any user. This is required
+> > > by the backports project [1] that require this lib for any wireless
+> > > driver.
+> > >
+> > > [1] https://backports.wiki.kernel.org/index.php/Main_Page
+> > >
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > > ---
+> > >  lib/crypto/Kconfig | 6 +++++-
+> > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+> > > index 2082af43d51f..2dfc785a7817 100644
+> > > --- a/lib/crypto/Kconfig
+> > > +++ b/lib/crypto/Kconfig
+> > > @@ -6,7 +6,11 @@ config CRYPTO_LIB_AES
+> > >  	tristate
+> > >
+> > >  config CRYPTO_LIB_ARC4
+> > > -	tristate
+> > > +	tristate "ARC4 library interface"
+> > > +	help
+> > > +	  Enable the ARC4 library interface. This interface is mainly
+> > > +	  used by wireless drivers and is required by the backports
+> > > +	  project.
+> > >
+> > >  config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
+> > >  	bool
+> > 
+> > I don't think this is appropriate for upstream, as the upstream kernel doesn't
+> > support out-of-tree code.  This is also an internal API that can change from one
+> > kernel version to the next.
 > 
-> It is less verbose and it improves the semantic.
+> Out-of-tree code always has to allow for arbitrary changes to
+> kernel interfaces between kernel versions.
+> So the fact that the API might change isn't relevant.
+> The continual API changes keep some of us in a job :-)
 > 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  drivers/crypto/hisilicon/zip/zip_crypto.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> index 67869513e48c..7bf53877e508 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-> @@ -606,8 +606,7 @@ static int hisi_zip_create_req_q(struct hisi_zip_ctx *ctx)
->  		req_q = &ctx->qp_ctx[i].req_q;
->  		req_q->size = QM_Q_DEPTH;
->  
-> -		req_q->req_bitmap = kcalloc(BITS_TO_LONGS(req_q->size),
-> -					    sizeof(long), GFP_KERNEL);
-> +		req_q->req_bitmap = bitmap_zalloc(req_q->size, GFP_KERNEL);
->  		if (!req_q->req_bitmap) {
->  			ret = -ENOMEM;
->  			if (i == 0)
+> (It has to be said that if I needed RC4 I'd probably add a local copy.)
+>
 
-You should add an include for linux/bitmap.h instead of relying
-on implicit inclusion through some random header file.
+Wonder if I can ask you some advice about the topic... I understand that
+this cannot be merged upstream.
 
-The same goes for all your other patches too.
+So the correct solution would be having a copy of the arc4 lib in
+backports?
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Ansuel
