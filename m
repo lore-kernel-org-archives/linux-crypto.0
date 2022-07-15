@@ -2,116 +2,68 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4318BCCA479
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jul 2022 09:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F41C43334
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Jul 2022 12:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbiGRJxw (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Jul 2022 05:53:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44064 "EHLO
+        id S233517AbiGRMwd (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Mon, 18 Jul 2022 08:52:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234316AbiGRJxv (ORCPT
+        with ESMTP id S233568AbiGRMwd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Jul 2022 05:53:51 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C41BD94;
-        Mon, 18 Jul 2022 02:53:48 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Lmcjg6JpWz4xQt;
-        Mon, 18 Jul 2022 19:53:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1658138024;
-        bh=sEBU+YVJDngFZCMwdXHtPnov93faAmqDyFwiYTVRLRE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=rRlN0K14GUP5fkIZadeeiTrQiaXwinzLkOeyDL75UC/FbJTFvDFI7ohuyMqJP5j5g
-         5uVp5qFpGIuQmG+0NtxAXgrE+o+I7+br8bFm8V84amaSXaCtajA9yBYJQv25FzyMye
-         9OypfMa0hBNSx38BZJw+zc24iXc3Tyq+5TlDSyq2jtYLl7ePHV2kmiWd3TrcDke7vo
-         hrXiiprw50GRi/Mo66/DdwFBAtjdjVtdZEOlbeqlgOiTMm/WUztp3xD0xUIY+DUwwT
-         1DrON4MRp7ZAhxgFTrSf3ebL7HbLRd7e+qsvvDBHCWqrTnJA/yq9X1tSsa34czWYgF
-         CLe3lEAFc/RMQ==
-Date:   Mon, 18 Jul 2022 19:53:42 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Subject: linux-next: manual merge of the mm tree with the crypto tree
-Message-ID: <20220718195342.6817be63@canb.auug.org.au>
+        Mon, 18 Jul 2022 08:52:33 -0400
+Received: from smtpbg.qq.com (biz-43-154-54-12.mail.qq.com [43.154.54.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0444720F58;
+        Mon, 18 Jul 2022 05:52:27 -0700 (PDT)
+X-QQ-mid: bizesmtp78t1658148731tqqb4zg9
+Received: from localhost.localdomain ( [171.223.96.21])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Mon, 18 Jul 2022 20:52:09 +0800 (CST)
+X-QQ-SSF: 01000000002000E0U000C00A0000020
+X-QQ-FEAT: NGMqyHdgFPbaNTVeTs5zTJ7hcVIsbSD3IiF5EnK79Zzp6CUj7j821TpuyYjT1
+        x3GOZ2LHdfRNbJc25haYA72wU75f6CM6hTqxCic16vHY5Cj7j2eOqNQZ3mw0NRziEWWxAW6
+        kZk0DVDcPNRYWksqTYqdvi5Rns5Z6trjP5KPfMX1ylAQAw8+moK6gfORMO4cbhzOLPQ0t35
+        luO+vEGGVgQWCusWB3OiGtGKXUHzrNaZKtVhFxULUrocwzE8b39ndMc8MPXneBLqmOZ7lsm
+        09GlVNSIqMpx6EdvvoC7tmbQdoIL2hqyCZ9C4HcwFahhPypX34X5vz0DYaJGkJTIzASkZnC
+        B7xXwwyUK7KR5AGTWES8mQwnfAmTgvLgE6jDfUKPQ7nPNDs9pObR9KRnWEI/UCFuINnFhuW
+        mcUbEsVS4BQ=
+X-QQ-GoodBg: 0
+From:   Jason Wang <wangborong@cdjrlc.com>
+To:     davem@davemloft.net
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jason Wang <wangborong@cdjrlc.com>
+Subject: [PATCH] crypto: Fix comment typo
+Date:   Fri, 15 Jul 2022 12:50:07 +0800
+Message-Id: <20220715045007.21447-1-wangborong@cdjrlc.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/3dIelKPkHS5xUiwgZD92y.y";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr6
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/3dIelKPkHS5xUiwgZD92y.y
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The double `that' is duplicated in line 301, remove one.
 
-Hi all,
+Signed-off-by: Jason Wang <wangborong@cdjrlc.com>
+---
+ crypto/twofish_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Today's linux-next merge of the mm tree got a conflict in:
+diff --git a/crypto/twofish_common.c b/crypto/twofish_common.c
+index d23fa531b91f..f921f30334f4 100644
+--- a/crypto/twofish_common.c
++++ b/crypto/twofish_common.c
+@@ -298,7 +298,7 @@ static const u32 mds[4][256] = {
+  * multiplication is inefficient without hardware support.  To multiply
+  * faster, I make use of the fact x is a generator for the nonzero elements,
+  * so that every element p of GF(2)[x]/w(x) is either 0 or equal to (x)^n for
+- * some n in 0..254.  Note that that caret is exponentiation in GF(2^8),
++ * some n in 0..254.  Note that caret is exponentiation in GF(2^8),
+  * *not* polynomial notation.  So if I want to compute pq where p and q are
+  * in GF(2^8), I can just say:
+  *    1. if p=0 or q=0 then pq=0
+-- 
+2.35.1
 
-  lib/Makefile
-
-between commit:
-
-  463f74089ff9 ("crypto: lib - move lib/sha1.c into lib/crypto/")
-
-from the crypto tree and commit:
-
-  058c2f0f755f ("Maple Tree: add new data structure")
-
-from the mm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc lib/Makefile
-index 17e48da223e2,dd5cf8f36eaa..000000000000
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@@ -29,7 -29,8 +29,7 @@@ endi
- =20
-  lib-y :=3D ctype.o string.o vsprintf.o cmdline.o \
-  	 rbtree.o radix-tree.o timerqueue.o xarray.o \
-- 	 idr.o extable.o irq_regs.o argv_split.o \
- -	 maple_tree.o idr.o extable.o \
- -	 sha1.o irq_regs.o argv_split.o \
-++	 maple_tree.o idr.o extable.o irq_regs.o argv_split.o \
-  	 flex_proportions.o ratelimit.o show_mem.o \
-  	 is_single_threaded.o plist.o decompress.o kobject_uevent.o \
-  	 earlycpio.o seq_buf.o siphash.o dec_and_lock.o \
-
---Sig_/3dIelKPkHS5xUiwgZD92y.y
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmLVLaYACgkQAVBC80lX
-0Gy0wggAl3wAxCAwQaRF54Vp+HXtz1qFXyo6zGw2hSZJGFcYwZTpmIwD3HDKtgk9
-/EO5/Z36eDC2fvgmeGdtiymrrSESuLNlSvnCV3jDiPr+Z3FjuIMMiUBvE4DSgSp9
-gDcWY0j0YiJnLMW8r4eBF3AVA4XdMf9tTJBeO8mSJPioZjtdJhx08RWwxaUKuNhT
-YDXseJl/QqLD+Don3+iCbfj0W7FbjfdaWt+M1jVWWdgyvgLcvy+9IByBsyx87llH
-AGi5YF84C38Ay4kw/icv67YghOfP/XSU1c9Pkc6DdONVdLYZdNVB+4uh8bNfDdRe
-wlbBY8PVzaYMcdopSCfmGYAzjTremw==
-=zees
------END PGP SIGNATURE-----
-
---Sig_/3dIelKPkHS5xUiwgZD92y.y--
