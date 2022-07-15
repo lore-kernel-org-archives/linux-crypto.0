@@ -2,112 +2,67 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9020AC433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 01:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79014C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 01:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232735AbiGOBS7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Jul 2022 21:18:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54916 "EHLO
+        id S241129AbiGOB71 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Jul 2022 21:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232313AbiGOBS7 (ORCPT
+        with ESMTP id S241124AbiGOB7Z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Jul 2022 21:18:59 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC2424F37;
-        Thu, 14 Jul 2022 18:18:57 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id b11so6398419eju.10;
-        Thu, 14 Jul 2022 18:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=z4ZOmBhvG/vrBEAiyPKvO+yeijURQ0Ebcnr6F+80vp0=;
-        b=GejBMuRGtjxQZ33xcKp48Z968DaneQvcthquhegMII1eRjQtmUQgSfH3dLmTH9ysMt
-         +TU2TORYJbUIWYnMBV/5oP3DGia36LFVLbDejExd8h255CuPlocW/o3jmcz+83sPHln0
-         J0zGwUfX63g3Gx2Z4rshknIzes4coYdhxG8LAM3dY9FqkrOZjHaUshLktXXu/+ID+nz/
-         DDsKxLVMQmUA/fGtBf1NIPyuSeUs/N2okQ+1Bo1Xsj3w1bcTgpq73Vu6Jwe/xnzgXzPl
-         iATzdCVVKEGAMpWV8HJdndTID52Ir4HEIrNcjJDLFIhGQ6uT1ZcDIdgVvLDs3pZa2lhu
-         SUHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=z4ZOmBhvG/vrBEAiyPKvO+yeijURQ0Ebcnr6F+80vp0=;
-        b=ALpxN4dJAHatntgd6XNYNKhsaqEfIghJrMAJdke+k4rXJGiO4DyB83Se7khWyKe269
-         vLKk7mQNczn/vmhcj+b6/Tm5mBHxxSJREvER/p1fUTdkUN8MVN1300g5jSLXVbqhpEKb
-         z+6PM/MIkcZQ641u0sVFU6QPQgGMDYSlfwtiphFyQ9AiPTOx4nw4Ojn/mAVgh3x8pSzf
-         U8CoAm6nZwym4dTrQYEOLxLHLSNdNXzPdfLSRCp2ut9R+yEZUbx1vydlWgjebgCUxdwj
-         QNSukVWOhvtF0+s24DDdKMz8BRwn5LRHfrpX1QIQHNd8pHQMYWXw885X2HkyGqDVLklb
-         dJYg==
-X-Gm-Message-State: AJIora+bc7eVJJqnavbOUCmHXh1XOWyDw0a+n71ZFh2I05jyaW+q8AVu
-        yvgicLGQcLQLCvP5D6L5NEhflp3tAhY7i5oxyAhFtCFz
-X-Google-Smtp-Source: AGRyM1sOr3zkegrI3IfczOPBxPKCJXUwdjT5Cx3D27kp9KHPVDEukQHkWa8VkRVMxNWsQx3V2FiwCY1wmzXJngu72Yo=
-X-Received: by 2002:a17:907:971c:b0:72b:83d2:aa7a with SMTP id
- jg28-20020a170907971c00b0072b83d2aa7amr11393369ejc.633.1657847936279; Thu, 14
- Jul 2022 18:18:56 -0700 (PDT)
+        Thu, 14 Jul 2022 21:59:25 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0740E709B3;
+        Thu, 14 Jul 2022 18:59:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=3k5ynIPk5gFL8otZ8hN+0iIyufHA8XKN0Zzhb4ErqL4=; b=dW5mScD4AvqVDcJ8EB3BYEU1Sy
+        OLHbO3QZv4093cULF5MFmUXlOsEsay6ItGXIh9Er5G4fLOPJIFyvKSTh+vF3olnic4A3o+zrXy6L0
+        NHYUiN87Po0Z3qiE31B/DZagnUiIjp5YgVRCqe6bZcvItLnlEpbe8dBYGZ//oVbFN2JMB7zt0Pc5x
+        aqVqGtuAQYkN3zxakN77C+K+/jtOIGnMBEuAQrGbgfxHEnZvJl8IvnqoJJPbvy/Z1rlDvvck5ZC3f
+        WeE+n42NDFe7hZSNREuSOXmTjhGniaMlNbPTFc9nkOaID6ac7RFE5fLZUqtm9tPQ5wjgy8zGKshlF
+        iRLxRfiA==;
+Received: from [2601:1c0:6280:3f0::a6b3] (helo=casper.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oCAbv-009sYI-2h; Fri, 15 Jul 2022 01:59:19 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: rmd160: fix Kconfig "its" grammar
+Date:   Thu, 14 Jul 2022 18:59:14 -0700
+Message-Id: <20220715015914.12554-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.37.0
 MIME-Version: 1.0
-References: <20220709211849.210850-1-ebiggers@kernel.org> <20220709211849.210850-3-ebiggers@kernel.org>
- <20220711110348.4c951fff@kernel.org>
-In-Reply-To: <20220711110348.4c951fff@kernel.org>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Thu, 14 Jul 2022 18:18:45 -0700
-Message-ID: <CAADnVQ+qS2ooA_LVndHfwm5AngRqQFceHPwYi=0WwXd350ePcg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] crypto: make the sha1 library optional
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 11:22 AM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sat,  9 Jul 2022 14:18:49 -0700 Eric Biggers wrote:
-> > Since the Linux RNG no longer uses sha1_transform(), the SHA-1 library
-> > is no longer needed unconditionally.  Make it possible to build the
-> > Linux kernel without the SHA-1 library by putting it behind a kconfig
-> > option, and selecting this new option from the kconfig options that gate
-> > the remaining users: CRYPTO_SHA1 for crypto/sha1_generic.c, BPF for
-> > kernel/bpf/core.c, and IPV6 for net/ipv6/addrconf.c.
-> >
-> > Unfortunately, since BPF is selected by NET, for now this can only make
-> > a difference for kernels built without networking support.
->
-> > diff --git a/init/Kconfig b/init/Kconfig
-> > index c984afc489dead..d8d0b4bdfe4195 100644
-> > --- a/init/Kconfig
-> > +++ b/init/Kconfig
-> > @@ -1472,6 +1472,7 @@ config HAVE_PCSPKR_PLATFORM
-> >  # interpreter that classic socket filters depend on
-> >  config BPF
-> >       bool
-> > +     select CRYPTO_LIB_SHA1
-> >
->
-> Let's give it an explicit CC: bpf@
->
-> > diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-> > index bf2e5e5fe14273..658bfed1df8b17 100644
-> > --- a/net/ipv6/Kconfig
-> > +++ b/net/ipv6/Kconfig
-> > @@ -7,6 +7,7 @@
-> >  menuconfig IPV6
-> >       tristate "The IPv6 protocol"
-> >       default y
-> > +     select CRYPTO_LIB_SHA1
-> >       help
-> >         Support for IP version 6 (IPv6).
->
-> FWIW:
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+Use the possessive "its" instead of the contraction "it's"
+where appropriate.
 
-Acked-by: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I believe I found the right full patch set in lore.
-In the future (if there are follow ups)
-please cc the full patchset to us.
-Thanks!
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -880,7 +880,7 @@ config CRYPTO_RMD160
+ 
+ 	  RIPEMD-160 is a 160-bit cryptographic hash function. It is intended
+ 	  to be used as a secure replacement for the 128-bit hash functions
+-	  MD4, MD5 and it's predecessor RIPEMD
++	  MD4, MD5 and its predecessor RIPEMD
+ 	  (not to be confused with RIPEMD-128).
+ 
+ 	  It's speed is comparable to SHA1 and there are no known attacks
