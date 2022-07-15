@@ -2,50 +2,106 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400D8C433EF
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 08:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63BF5C43334
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 08:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbiGOIrL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        id S232078AbiGOIrL (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 15 Jul 2022 04:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37436 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231788AbiGOIrI (ORCPT
+        with ESMTP id S231902AbiGOIrJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Jul 2022 04:47:08 -0400
+        Fri, 15 Jul 2022 04:47:09 -0400
 Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9172E814B2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E7F814B4;
         Fri, 15 Jul 2022 01:47:07 -0700 (PDT)
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
         by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1oCGyS-000nsb-6M; Fri, 15 Jul 2022 18:47:01 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Jul 2022 16:47:00 +0800
-Date:   Fri, 15 Jul 2022 16:47:00 +0800
+        id 1oCGyA-000nqB-Ie; Fri, 15 Jul 2022 18:46:44 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Jul 2022 16:46:42 +0800
+Date:   Fri, 15 Jul 2022 16:46:42 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yuan Can <yuancan@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, gilad@benyossef.com
-Subject: Re: [PATCH -next] crypto: ccree: Add missing clk_disable_unprepare()
- in cc_pm_resume()
-Message-ID: <YtEphJCnOOkh8pDf@gondor.apana.org.au>
-References: <20220704130145.103520-1-yuancan@huawei.com>
+To:     Taehee Yoo <ap420073@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net,
+        borisp@nvidia.com, john.fastabend@gmail.com, daniel@iogearbox.net,
+        kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] crypto: Introduce ARIA symmetric cipher algorithm
+Message-ID: <YtEpcsFsXD6xuDQS@gondor.apana.org.au>
+References: <20220704094250.4265-1-ap420073@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220704130145.103520-1-yuancan@huawei.com>
+In-Reply-To: <20220704094250.4265-1-ap420073@gmail.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 04, 2022 at 01:01:45PM +0000, Yuan Can wrote:
-> Add clk_disable_unprepare() on error path in cc_pm_resume().
+On Mon, Jul 04, 2022 at 09:42:47AM +0000, Taehee Yoo wrote:
+> This patchset adds a new ARIA(RFC 5794) symmetric cipher algorithm.
 > 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Yuan Can <yuancan@huawei.com>
-> ---
->  drivers/crypto/ccree/cc_pm.c | 2 ++
->  1 file changed, 2 insertions(+)
+> Like SEED, the ARIA is a standard cipher algorithm in South Korea.
+> Especially Government and Banking industry have been using this algorithm.
+> So the implementation of ARIA will be useful for them and network vendors.
+> 
+> Usecases of this algorithm are TLS[1], and IPSec.
+> 
+> It is tested in x86 and MIPS with the tcrypt module.
+> 
+> The first patch is an implementation of ARIA algorithm.
+> The second patch adds tests for ARIA.
+> The third patch adds ARIA-kTLS feature.
+> 
+> ARIA128-kTLS Benchmark results:
+> openssl-3.0-dev and iperf-ssl are used.
+>   TLS
+> [  3]  0.0- 1.0 sec   185 MBytes  1.55 Gbits/sec
+> [  3]  1.0- 2.0 sec   186 MBytes  1.56 Gbits/sec
+> [  3]  2.0- 3.0 sec   186 MBytes  1.56 Gbits/sec
+> [  3]  3.0- 4.0 sec   186 MBytes  1.56 Gbits/sec
+> [  3]  4.0- 5.0 sec   186 MBytes  1.56 Gbits/sec
+> [  3]  0.0- 5.0 sec   927 MBytes  1.56 Gbits/sec
+>   kTLS
+> [  3]  0.0- 1.0 sec   198 MBytes  1.66 Gbits/sec
+> [  3]  1.0- 2.0 sec   194 MBytes  1.62 Gbits/sec
+> [  3]  2.0- 3.0 sec   194 MBytes  1.63 Gbits/sec
+> [  3]  3.0- 4.0 sec   194 MBytes  1.63 Gbits/sec
+> [  3]  4.0- 5.0 sec   194 MBytes  1.62 Gbits/sec
+> [  3]  0.0- 5.0 sec   974 MBytes  1.63 Gbits/sec
+> 
+> The previous patch version[2].
+> 
+> [1] https://datatracker.ietf.org/doc/html/rfc6209
+> [2] https://www.spinics.net/lists/linux-crypto/msg64704.html
+> 
+> v2:
+>  - Add ARIA-kTLS feature.
+> 
+> Taehee Yoo (3):
+>   crypto: Implement ARIA symmetric cipher algorithm
+>   crypto: add ARIA testmgr tests
+>   net: tls: Add ARIA-GCM algorithm
+> 
+>  crypto/Kconfig           |   15 +
+>  crypto/Makefile          |    1 +
+>  crypto/aria.c            |  288 ++++
+>  crypto/tcrypt.c          |   38 +-
+>  crypto/testmgr.c         |   31 +
+>  crypto/testmgr.h         | 2860 ++++++++++++++++++++++++++++++++++++++
+>  include/crypto/aria.h    |  461 ++++++
+>  include/uapi/linux/tls.h |   30 +
+>  net/tls/tls_main.c       |   62 +
+>  net/tls/tls_sw.c         |   34 +
+>  10 files changed, 3819 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/aria.c
+>  create mode 100644 include/crypto/aria.h
 
-Patch applied.  Thanks.
+Patches 1-2 applied.  Thanks.
+
+Note that I adjusted the tcrypt test numbers to accommodate for other
+additions.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
