@@ -2,82 +2,112 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D70ECC433EF
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Jul 2022 21:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9020AC433EF
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Jul 2022 01:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232712AbiGNV3R (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Jul 2022 17:29:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58530 "EHLO
+        id S232735AbiGOBS7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Thu, 14 Jul 2022 21:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231858AbiGNV3Q (ORCPT
+        with ESMTP id S232313AbiGOBS7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Jul 2022 17:29:16 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA5CE46DAC
-        for <linux-crypto@vger.kernel.org>; Thu, 14 Jul 2022 14:29:15 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oC6Nu-00064J-PQ; Thu, 14 Jul 2022 23:28:34 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oC6Np-000zHj-UQ; Thu, 14 Jul 2022 23:28:29 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1oC6Np-005Dgh-32; Thu, 14 Jul 2022 23:28:29 +0200
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Daniele Alessandrelli <daniele.alessandrelli@intel.com>,
-        Prabhjot Khurana <prabhjot.khurana@intel.com>,
-        Mark Gross <mgross@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel@pengutronix.de
-Subject: [PATCH] crypto: keembay-ocs-ecc: Drop if with an always false condition
-Date:   Thu, 14 Jul 2022 23:28:20 +0200
-Message-Id: <20220714212820.59237-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.36.1
+        Thu, 14 Jul 2022 21:18:59 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC2424F37;
+        Thu, 14 Jul 2022 18:18:57 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id b11so6398419eju.10;
+        Thu, 14 Jul 2022 18:18:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=z4ZOmBhvG/vrBEAiyPKvO+yeijURQ0Ebcnr6F+80vp0=;
+        b=GejBMuRGtjxQZ33xcKp48Z968DaneQvcthquhegMII1eRjQtmUQgSfH3dLmTH9ysMt
+         +TU2TORYJbUIWYnMBV/5oP3DGia36LFVLbDejExd8h255CuPlocW/o3jmcz+83sPHln0
+         J0zGwUfX63g3Gx2Z4rshknIzes4coYdhxG8LAM3dY9FqkrOZjHaUshLktXXu/+ID+nz/
+         DDsKxLVMQmUA/fGtBf1NIPyuSeUs/N2okQ+1Bo1Xsj3w1bcTgpq73Vu6Jwe/xnzgXzPl
+         iATzdCVVKEGAMpWV8HJdndTID52Ir4HEIrNcjJDLFIhGQ6uT1ZcDIdgVvLDs3pZa2lhu
+         SUHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=z4ZOmBhvG/vrBEAiyPKvO+yeijURQ0Ebcnr6F+80vp0=;
+        b=ALpxN4dJAHatntgd6XNYNKhsaqEfIghJrMAJdke+k4rXJGiO4DyB83Se7khWyKe269
+         vLKk7mQNczn/vmhcj+b6/Tm5mBHxxSJREvER/p1fUTdkUN8MVN1300g5jSLXVbqhpEKb
+         z+6PM/MIkcZQ641u0sVFU6QPQgGMDYSlfwtiphFyQ9AiPTOx4nw4Ojn/mAVgh3x8pSzf
+         U8CoAm6nZwym4dTrQYEOLxLHLSNdNXzPdfLSRCp2ut9R+yEZUbx1vydlWgjebgCUxdwj
+         QNSukVWOhvtF0+s24DDdKMz8BRwn5LRHfrpX1QIQHNd8pHQMYWXw885X2HkyGqDVLklb
+         dJYg==
+X-Gm-Message-State: AJIora+bc7eVJJqnavbOUCmHXh1XOWyDw0a+n71ZFh2I05jyaW+q8AVu
+        yvgicLGQcLQLCvP5D6L5NEhflp3tAhY7i5oxyAhFtCFz
+X-Google-Smtp-Source: AGRyM1sOr3zkegrI3IfczOPBxPKCJXUwdjT5Cx3D27kp9KHPVDEukQHkWa8VkRVMxNWsQx3V2FiwCY1wmzXJngu72Yo=
+X-Received: by 2002:a17:907:971c:b0:72b:83d2:aa7a with SMTP id
+ jg28-20020a170907971c00b0072b83d2aa7amr11393369ejc.633.1657847936279; Thu, 14
+ Jul 2022 18:18:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=996; h=from:subject; bh=HrGb7k9nlrRZDlkX2uq05bo5OX9GT8KSBgbj2aZh7w4=; b=owEBbQGS/pANAwAKAcH8FHityuwJAcsmYgBi0IpwqJt/WG1Wa3/H6KqBTBAqlFNtQcEwoS2KMLeF Yg6KK2yJATMEAAEKAB0WIQR+cioWkBis/z50pAvB/BR4rcrsCQUCYtCKcAAKCRDB/BR4rcrsCdYUCA Cd8+4oYge3T+yfRYCEPmbRSJ0vzqkz85SXvo2FTTLltCXWVwZs18MLwqMVkHUvw1MyNy7dnyChgCIA B3BUMRGLndJ47JckDkdzA/ziNIoJTFZ4oksi5ywDDR4XGyw1DC0Hvi+FP2upGEMrVbbD7/RbIroCM8 nC2x7iXiVt0mEHObJ0Oa8hUely/w75z3zGHsdkskWcL4XcoFhCzipCkg8lK1nTP9NsdB0jJix5aLav zaKkwUfpbBILz1mYFj3yb91hq9CfmxBlLZW3Kz8W+PLMMZ9ittqSPo4kNwW10xwCxNzXSq4fcF6Nip oMmJvP3zr2FcAnCjBYywsa3ZDsBD/T
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+References: <20220709211849.210850-1-ebiggers@kernel.org> <20220709211849.210850-3-ebiggers@kernel.org>
+ <20220711110348.4c951fff@kernel.org>
+In-Reply-To: <20220711110348.4c951fff@kernel.org>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Thu, 14 Jul 2022 18:18:45 -0700
+Message-ID: <CAADnVQ+qS2ooA_LVndHfwm5AngRqQFceHPwYi=0WwXd350ePcg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: make the sha1 library optional
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The remove callback is only called after probe completed successfully.
-In this case platform_set_drvdata() was called with a non-NULL argument
-and so ecc_dev is never NULL.
+On Mon, Jul 11, 2022 at 11:22 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Sat,  9 Jul 2022 14:18:49 -0700 Eric Biggers wrote:
+> > Since the Linux RNG no longer uses sha1_transform(), the SHA-1 library
+> > is no longer needed unconditionally.  Make it possible to build the
+> > Linux kernel without the SHA-1 library by putting it behind a kconfig
+> > option, and selecting this new option from the kconfig options that gate
+> > the remaining users: CRYPTO_SHA1 for crypto/sha1_generic.c, BPF for
+> > kernel/bpf/core.c, and IPV6 for net/ipv6/addrconf.c.
+> >
+> > Unfortunately, since BPF is selected by NET, for now this can only make
+> > a difference for kernels built without networking support.
+>
+> > diff --git a/init/Kconfig b/init/Kconfig
+> > index c984afc489dead..d8d0b4bdfe4195 100644
+> > --- a/init/Kconfig
+> > +++ b/init/Kconfig
+> > @@ -1472,6 +1472,7 @@ config HAVE_PCSPKR_PLATFORM
+> >  # interpreter that classic socket filters depend on
+> >  config BPF
+> >       bool
+> > +     select CRYPTO_LIB_SHA1
+> >
+>
+> Let's give it an explicit CC: bpf@
+>
+> > diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
+> > index bf2e5e5fe14273..658bfed1df8b17 100644
+> > --- a/net/ipv6/Kconfig
+> > +++ b/net/ipv6/Kconfig
+> > @@ -7,6 +7,7 @@
+> >  menuconfig IPV6
+> >       tristate "The IPv6 protocol"
+> >       default y
+> > +     select CRYPTO_LIB_SHA1
+> >       help
+> >         Support for IP version 6 (IPv6).
+>
+> FWIW:
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-This is a preparation for making platform remove callbacks return void.
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/crypto/keembay/keembay-ocs-ecc.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/crypto/keembay/keembay-ocs-ecc.c b/drivers/crypto/keembay/keembay-ocs-ecc.c
-index 5d0785d3f1b5..2269df17514c 100644
---- a/drivers/crypto/keembay/keembay-ocs-ecc.c
-+++ b/drivers/crypto/keembay/keembay-ocs-ecc.c
-@@ -976,8 +976,6 @@ static int kmb_ocs_ecc_remove(struct platform_device *pdev)
- 	struct ocs_ecc_dev *ecc_dev;
- 
- 	ecc_dev = platform_get_drvdata(pdev);
--	if (!ecc_dev)
--		return -ENODEV;
- 
- 	crypto_unregister_kpp(&ocs_ecdh_p384);
- 	crypto_unregister_kpp(&ocs_ecdh_p256);
-
-base-commit: f2906aa863381afb0015a9eb7fefad885d4e5a56
--- 
-2.36.1
-
+I believe I found the right full patch set in lore.
+In the future (if there are follow ups)
+please cc the full patchset to us.
+Thanks!
