@@ -2,75 +2,113 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16ED6C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A7FC43334
 	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 06:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbiGPGau (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jul 2022 02:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50912 "EHLO
+        id S230100AbiGPGav (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Jul 2022 02:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbiGPGap (ORCPT
+        with ESMTP id S230361AbiGPGap (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 16 Jul 2022 02:30:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9AC2613B;
-        Fri, 15 Jul 2022 23:30:24 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C73F24946;
+        Fri, 15 Jul 2022 23:30:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 04FC0B82F58;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 38D3D60AE2;
         Sat, 16 Jul 2022 06:30:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68A7C34114;
-        Sat, 16 Jul 2022 06:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786B1C341C8;
+        Sat, 16 Jul 2022 06:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657953021;
-        bh=r3+JrXfBZrFAY4j0cj0Q56TypWvWJxqZKmhO3Hyv+1o=;
-        h=From:To:Cc:Subject:Date:From;
-        b=u9gJDtN/eXujzyCiOkQaZ4nJ+/b5+efR3M2nQNpZ1lLka6i2YDSrDJ1DW66M9BNyU
-         znvdqznGOt+l6fZc6EwrpFIaqy+8M/IPiR+PuJYZqvFU5QCB15Osa+62d3dPq/vJcQ
-         qdbkq4HEKEQEkG5MffNHsPKCWCMsuB6xzGbW6tvIHuIy3s8BaowzLDeVYhBP8vl08F
-         /e/BuWlCb1WOiRRIUhJq70d5hHF+mFuDz5jaet+EhQImn1u+5dGF3LeUd6GWmCxe2Y
-         QAxoaZYUSMFUA+9wyqMreIfdYpR/WRXPTU3bOHzfNpJWmPMNqxpTBVc57Apf+ierOs
-         Bccxs52qFvUCw==
+        s=k20201202; t=1657953022;
+        bh=DqaxUjI45R0hybjBltoAUPS4GYNm3M6mVTgq2uVzsOo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=BtLHp1tAEmh5Hw8hdbdcOap+kQRCNT3shd3V4K5Sf08P1wi7SVf9Y7aly0oiu+mTZ
+         y/OzW01/0q2IguTyunWSlUw4ciHaBotkntSZfboWs2h8vWTqmnCRKz0DlvrSBuCiPy
+         McT69MgyeRasL3dNrp09fWjySBVTHg5m4rxFyDjWoIl37iwrA6ozeOoM0ED8bQPmag
+         7eiw1nlE62t4kMpMuIUq50Mo7xmgA90UsSbau6yScgi+rOxeA/obpiC2rbKQO7Lzdl
+         KSpPe+RmaXrtzc1lSakS1a7RITOrp/pWdnbX+IqHBoipkAknkOBv02QEFPJf32pG1F
+         oVGAYzbLLSgqQ==
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         "Jason A . Donenfeld " <Jason@zx2c4.com>
-Subject: [PATCH v2 0/3] crypto: lib - create utils module
-Date:   Fri, 15 Jul 2022 23:29:17 -0700
-Message-Id: <20220716062920.210381-1-ebiggers@kernel.org>
+Subject: [PATCH v2 3/3] crypto: lib - move crypto_simd_disabled_for_test into utils
+Date:   Fri, 15 Jul 2022 23:29:20 -0700
+Message-Id: <20220716062920.210381-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.37.0
+In-Reply-To: <20220716062920.210381-1-ebiggers@kernel.org>
+References: <20220716062920.210381-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create a utils module in lib/crypto/, and move __crypto_memneq,
-__crypto_xor, and crypto_simd_disabled_for_test into it.
+From: Eric Biggers <ebiggers@google.com>
 
-This supersedes "crypto: xor - move __crypto_xor into lib/"
-(https://lore.kernel.org/linux-crypto/20220709215453.262237-1-ebiggers@kernel.org/T/#u).
+Move the definition of crypto_simd_disabled_for_test into
+lib/crypto/utils.c so that it can be accessed by library code.
 
-Eric Biggers (3):
-  crypto: lib - create utils module and move __crypto_memneq into it
-  crypto: lib - move __crypto_xor into utils
-  crypto: lib - move crypto_simd_disabled_for_test into utils
+This is needed when code that is shared between a traditional crypto API
+implementation and a library implementation is built-in, but
+CRYPTO_ALGAPI=m.  The x86 blake2s previously was an example of this
+(https://lore.kernel.org/linux-crypto/20220517033630.1182-1-gaochao49@huawei.com/T/#u).
+Although that case was resolved by removing the blake2s shash support,
+this problem could easily come back in the future, so let's address it.
 
- crypto/Kconfig            |  2 +-
- crypto/algapi.c           | 77 ---------------------------------
- lib/Kconfig               |  3 --
- lib/Makefile              |  1 -
- lib/crypto/Kconfig        |  8 ++--
- lib/crypto/Makefile       |  3 ++
- lib/{ => crypto}/memneq.c |  0
- lib/crypto/utils.c        | 91 +++++++++++++++++++++++++++++++++++++++
- 8 files changed, 100 insertions(+), 85 deletions(-)
- rename lib/{ => crypto}/memneq.c (100%)
- create mode 100644 lib/crypto/utils.c
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/algapi.c    | 6 ------
+ lib/crypto/utils.c | 6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-
-base-commit: ec8f7f4821d5e70d71601519bc2325b311324a96
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 5c69ff8e8fa5c1..9377dae75b3def 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -6,7 +6,6 @@
+  */
+ 
+ #include <crypto/algapi.h>
+-#include <crypto/internal/simd.h>
+ #include <linux/err.h>
+ #include <linux/errno.h>
+ #include <linux/fips.h>
+@@ -22,11 +21,6 @@
+ 
+ static LIST_HEAD(crypto_template_list);
+ 
+-#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+-DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
+-EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
+-#endif
+-
+ static inline void crypto_check_module_sig(struct module *mod)
+ {
+ 	if (fips_enabled && mod && !module_sig_ok(mod))
+diff --git a/lib/crypto/utils.c b/lib/crypto/utils.c
+index f20bdb2ae88771..e7d99f150d4e61 100644
+--- a/lib/crypto/utils.c
++++ b/lib/crypto/utils.c
+@@ -6,8 +6,14 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/simd.h>
+ #include <asm/unaligned.h>
+ 
++#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
++DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
++EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
++#endif
++
+ /*
+  * XOR @len bytes from @src1 and @src2 together, writing the result to @dst
+  * (which may alias one of the sources).  Don't call this directly; call
 -- 
 2.37.0
 
