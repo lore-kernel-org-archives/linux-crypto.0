@@ -2,118 +2,183 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A58BEC43334
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 05:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0586C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 06:17:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbiGPFte (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jul 2022 01:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60488 "EHLO
+        id S229643AbiGPGRP (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Jul 2022 02:17:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbiGPFtd (ORCPT
+        with ESMTP id S229538AbiGPGRL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Jul 2022 01:49:33 -0400
+        Sat, 16 Jul 2022 02:17:11 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AAD32C12F;
-        Fri, 15 Jul 2022 22:49:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D09CC88CCD;
+        Fri, 15 Jul 2022 23:16:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C0B81B82F4B;
-        Sat, 16 Jul 2022 05:49:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 348A6C34114;
-        Sat, 16 Jul 2022 05:49:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7BE86B82F4F;
+        Sat, 16 Jul 2022 06:16:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCCAFC34114;
+        Sat, 16 Jul 2022 06:16:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657950569;
-        bh=PbYS1IT07DRr1aFDMtz48vqEJCogazv7l2o/rc3joxU=;
+        s=k20201202; t=1657952201;
+        bh=/KQWkrHacvnWTna1+IOR6Oz3wYOUedRH9mzR9HEOWO4=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=F4HGNNmkE4vganx+xVEu/xTnkA7nYQfR6tR36YiYjEMEREKWz6Q2eOxhQ2UPCP9iS
-         v4KRmSGLU+xUdPckIPNOrHpZCVazHw5NHPJlPgirhySEF8Z6ZRGH3PJ2JSh8UYk9bo
-         NICNCz5MFyU5+2RTvVSr/SKXNTHukPBWqpHSS+bbiLY23iwmlKS8kKtN4cvSb07UQD
-         IW48BlilYuueBuZ5/CTo5NzXU6EBcsIyUMbrWi7XHPl/mtMlY7bU8qROcY4lvsyLIL
-         pr0QoBq/P1q45Uisgwj2su/UCJVsxxWe5cfjOGXXWexNNxeJ8s0+0ZmIxcv9iSJ4h/
-         FOvlrA0k6Rw5Q==
-Date:   Fri, 15 Jul 2022 22:49:27 -0700
+        b=DjRkuTwfFlePZD9Cw5urUO0rRkLX+7phebp1hIj6irmbQ/FWiG+EXnyFuX9dZuYKi
+         5S2AlpxLGivZEjVJf0jp+ZhrwNJFTbNxinRc8oz/XKQL6I8n58OrUxqb+bSl3RsLev
+         t6rvsN1y5Tf+mX5hiyQcKiT6y9PwJNq7G9t9yWTBExsoKWKacEJ8zuhJyunBc3bmoz
+         v7xxHsHwgI4fAQRTYdpa5//Fx1d+kAfH+mPoTKRgevVkaxMVgMFukCbbksHMU2alCs
+         Ugx+5sUqZfd8aE5rznU1DiFGlrGLxm+LwAEjANIR7DYid3/u8rChX3mo/b2ug66sqQ
+         v2Sk5b99Z7BUA==
+Date:   Fri, 15 Jul 2022 23:16:39 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christian Marangi <ansuelsmth@gmail.com>
-Cc:     David Laight <David.Laight@aculab.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: lib/arc4 - expose library interface
-Message-ID: <YtJRZw105wF+PZeZ@sol.localdomain>
-References: <20220714051221.22525-1-ansuelsmth@gmail.com>
- <YtDLMmwffn6p/rSV@sol.localdomain>
- <872b3792d96946b48236120a057b99bc@AcuMS.aculab.com>
- <62d1275e.1c69fb81.f16fe.51e0@mx.google.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@cloudflare.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2] crypto: testmgr - populate RSA CRT parameters in RSA
+ test vectors
+Message-ID: <YtJXx3B0glwAxa2F@sol.localdomain>
+References: <20220704103840.924-1-ignat@cloudflare.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <62d1275e.1c69fb81.f16fe.51e0@mx.google.com>
+In-Reply-To: <20220704103840.924-1-ignat@cloudflare.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 15, 2022 at 04:10:49AM +0200, Christian Marangi wrote:
-> On Fri, Jul 15, 2022 at 07:39:48AM +0000, David Laight wrote:
-> > From: Eric Biggers
-> > > Sent: 15 July 2022 03:05
-> > > 
-> > > On Thu, Jul 14, 2022 at 07:12:21AM +0200, Christian Marangi wrote:
-> > > > Permit to compile the arc4 crypto lib without any user. This is required
-> > > > by the backports project [1] that require this lib for any wireless
-> > > > driver.
-> > > >
-> > > > [1] https://backports.wiki.kernel.org/index.php/Main_Page
-> > > >
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > > ---
-> > > >  lib/crypto/Kconfig | 6 +++++-
-> > > >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-> > > > index 2082af43d51f..2dfc785a7817 100644
-> > > > --- a/lib/crypto/Kconfig
-> > > > +++ b/lib/crypto/Kconfig
-> > > > @@ -6,7 +6,11 @@ config CRYPTO_LIB_AES
-> > > >  	tristate
-> > > >
-> > > >  config CRYPTO_LIB_ARC4
-> > > > -	tristate
-> > > > +	tristate "ARC4 library interface"
-> > > > +	help
-> > > > +	  Enable the ARC4 library interface. This interface is mainly
-> > > > +	  used by wireless drivers and is required by the backports
-> > > > +	  project.
-> > > >
-> > > >  config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
-> > > >  	bool
-> > > 
-> > > I don't think this is appropriate for upstream, as the upstream kernel doesn't
-> > > support out-of-tree code.  This is also an internal API that can change from one
-> > > kernel version to the next.
-> > 
-> > Out-of-tree code always has to allow for arbitrary changes to
-> > kernel interfaces between kernel versions.
-> > So the fact that the API might change isn't relevant.
-> > The continual API changes keep some of us in a job :-)
-> > 
-> > (It has to be said that if I needed RC4 I'd probably add a local copy.)
-> >
-> 
-> Wonder if I can ask you some advice about the topic... I understand that
-> this cannot be merged upstream.
-> 
-> So the correct solution would be having a copy of the arc4 lib in
-> backports?
-> 
+Hi Ignat,
 
-In general you're going to need to change the kernel anyway, in which case you
-can just patch your kernel to expose this option.
+On Mon, Jul 04, 2022 at 11:38:40AM +0100, Ignat Korchagin wrote:
+> Changes from v1:
+>   * replace some accidental spaces with tabs
+> 
+> In commit f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem
+> for faster private key operations") we have started to use the additional
+> primes and coefficients for RSA private key operations. However, these
+> additional parameters are not present (defined as 0 integers) in the RSA
+> test vectors.
+> 
+> Some parameters were borrowed from OpenSSL, so I was able to find the
+> source. I could not find the public source for 1 vector though, so had to
+> recover the parameters by implementing Appendix C from [1].
+> 
+> [1]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Br1.pdf
+> 
+> Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operations")
+> Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-If you can't patch your kernel, then yes you'd need to have your own copy of the
-arc4 lib.  Of course, that would only be a workaround for the arc4 lib.  You may
-run into other things that have no workaround.  You need to accept that what
-you're trying to do will sometimes be impossible without kernel changes.
+The rsa-generic self-tests are still failing even after this commit.
+Additionally, there is now a KASAN out-of-bounds warning:
 
-- Eric
+[    3.199954] ==================================================================
+[    3.199961] BUG: KASAN: global-out-of-bounds in test_akcipher_one (crypto/testmgr.c:3996) 
+[    3.199972] Read of size 607 at addr ffffffff82fae860 by task cryptomgr_test/352
+[    3.199977]
+[    3.199985] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+[    3.199989] Call Trace:
+[    3.199990]  <TASK>
+[    3.199993] show_stack (arch/x86/kernel/dumpstack.c:313) 
+[    3.199999] dump_stack_lvl (lib/dump_stack.c:107 (discriminator 4)) 
+[    3.200004] print_address_description.constprop.0 (mm/kasan/report.c:314) 
+[    3.200010] print_report.cold (mm/kasan/report.c:430) 
+[    3.200015] ? test_akcipher_one (crypto/testmgr.c:3996) 
+[    3.200019] kasan_report (mm/kasan/report.c:162 mm/kasan/report.c:493) 
+[    3.200022] ? test_akcipher_one (crypto/testmgr.c:3996) 
+[    3.200026] kasan_check_range (mm/kasan/generic.c:190) 
+[    3.200030] memcpy (mm/kasan/shadow.c:65) 
+[    3.200033] test_akcipher_one (crypto/testmgr.c:3996) 
+[    3.200038] ? test_shash_vec_cfg (crypto/testmgr.c:3968) 
+[    3.200043] ? crypto_create_tfm_node (crypto/api.c:501) 
+[    3.200049] ? crypto_alloc_tfm_node (crypto/api.c:589) 
+[    3.200053] alg_test_akcipher (crypto/testmgr.c:4158 crypto/testmgr.c:4181) 
+[    3.200057] alg_test (crypto/testmgr.c:5790) 
+[    3.200061] ? __lock_release.isra.0 (kernel/locking/lockdep.c:5341) 
+[    3.200067] ? alg_test_crc32c (crypto/testmgr.c:5745) 
+[    3.200071] ? lock_is_held_type (kernel/locking/lockdep.c:466 kernel/locking/lockdep.c:5709) 
+[    3.200075] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[    3.200080] ? __kthread_parkme (./include/linux/instrumented.h:71 (discriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:134 (discriminator 4) kernel/kthread.c:270 (discriminator 4)) 
+[    3.200084] ? __this_cpu_preempt_check (lib/smp_processor_id.c:67) 
+[    3.200089] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4383) 
+[    3.200093] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[    3.200097] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:51 (discriminator 22)) 
+[    3.200102] ? __kasan_check_read (mm/kasan/shadow.c:32) 
+[    3.200106] ? __kthread_parkme (./arch/x86/include/asm/bitops.h:207 (discriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:135 (discriminator 4) kernel/kthread.c:270 (discriminator 4)) 
+[    3.200109] ? crypto_unregister_scomps (crypto/algboss.c:177) 
+[    3.200113] cryptomgr_test (crypto/algboss.c:187) 
+[    3.200117] kthread (kernel/kthread.c:376) 
+[    3.200120] ? kthread_exit (kernel/kthread.c:335) 
+[    3.200123] ret_from_fork (arch/x86/entry/entry_64.S:308) 
+[    3.200128]  </TASK>
+[    3.200130]
+[    3.200131] The buggy address belongs to the variable:
+[    3.200132] ecdsa_nist_p192_tv_template+0x360/0x1a20 
+[    3.200137]
+[    3.200138] Memory state around the buggy address:
+[    3.200140]  ffffffff82fae900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+[    3.200143]  ffffffff82fae980: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+[    3.200146] >ffffffff82faea00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 07
+[    3.200147]                                                                 ^
+[    3.200150]  ffffffff82faea80: f9 f9 f9 f9 00 00 00 00 00 00 00 00 02 f9 f9 f9
+[    3.200152]  ffffffff82faeb00: f9 f9 f9 f9 00 00 00 00 00 00 00 00 00 00 00 00
+[    3.200154] ==================================================================
+[    3.200155] Disabling lock debugging due to kernel taint
+[    3.200190] alg: akcipher: test 2 failed for rsa-generic, err=-74
+[    3.200194] ------------[ cut here ]------------
+[    3.200196] alg: self-tests for rsa-generic (rsa) failed (rc=-74)
+[    3.200220] WARNING: CPU: 2 PID: 352 at crypto/testmgr.c:5804 alg_test (crypto/testmgr.c:5804 (discriminator 1)) 
+[    3.246192] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+[    3.247679] RIP: 0010:alg_test (crypto/testmgr.c:5804 (discriminator 1)) 
+[ 3.248367] Code: 0f 85 e7 f8 d0 00 48 8b 95 c8 fe ff ff 44 89 c1 48 c7 c7 a0 a8 f4 82 44 89 85 c4 fe ff ff 48 8b b5 d0 fe ff ff e8 f
+
+Code starting with the faulting instruction
+===========================================
+   0:	0f 85 e7 f8 d0 00    	jne    0xd0f8ed
+   6:	48 8b 95 c8 fe ff ff 	mov    -0x138(%rbp),%rdx
+   d:	44 89 c1             	mov    %r8d,%ecx
+  10:	48 c7 c7 a0 a8 f4 82 	mov    $0xffffffff82f4a8a0,%rdi
+  17:	44 89 85 c4 fe ff ff 	mov    %r8d,-0x13c(%rbp)
+  1e:	48 8b b5 d0 fe ff ff 	mov    -0x130(%rbp),%rsi
+  25:	e8                   	.byte 0xe8
+  26:	0f                   	.byte 0xf
+[    3.251371] RSP: 0018:ffffc900023afd90 EFLAGS: 00010286
+[    3.252226] RAX: 0000000000000000 RBX: 1ffff92000475fb9 RCX: 0000000000000000
+[    3.253380] RDX: 0000000000000001 RSI: 0000000000000004 RDI: fffff52000475fa2
+[    3.254552] RBP: ffffc900023afef0 R08: 0000000000000001 R09: ffff88806d5275cb
+[    3.255718] R10: ffffed100daa4eb9 R11: 000000000000000a R12: 00000000000000b8
+[    3.256871] R13: 00000000000000b9 R14: 00000000000000b8 R15: 00000000000000b9
+[    3.258042] FS:  0000000000000000(0000) GS:ffff88806d500000(0000) knlGS:0000000000000000
+[    3.259350] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    3.260272] CR2: 0000000000000000 CR3: 0000000003415000 CR4: 00000000003506e0
+[    3.261448] Call Trace:
+[    3.261869]  <TASK>
+[    3.262220] ? __lock_release.isra.0 (kernel/locking/lockdep.c:5341) 
+[    3.262966] ? alg_test_crc32c (crypto/testmgr.c:5745) 
+[    3.263628] ? lock_is_held_type (kernel/locking/lockdep.c:466 kernel/locking/lockdep.c:5709) 
+[    3.264340] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[    3.265151] ? __kthread_parkme (./include/linux/instrumented.h:71 (discriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:134 (discriminator 4) kernel/kthread.c:270 (discriminator 4)) 
+[    3.265823] ? __this_cpu_preempt_check (lib/smp_processor_id.c:67) 
+[    3.266578] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4383) 
+[    3.267301] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[    3.268103] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:51 (discriminator 22)) 
+[    3.268782] ? __kasan_check_read (mm/kasan/shadow.c:32) 
+[    3.269468] ? __kthread_parkme (./arch/x86/include/asm/bitops.h:207 (discriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:135 (discriminator 4) kernel/kthread.c:270 (discriminator 4)) 
+[    3.270142] ? crypto_unregister_scomps (crypto/algboss.c:177) 
+[    3.270954] cryptomgr_test (crypto/algboss.c:187) 
+[    3.270961] kthread (kernel/kthread.c:376) 
+[    3.270967] ? kthread_exit (kernel/kthread.c:335) 
+[    3.270971] ret_from_fork (arch/x86/entry/entry_64.S:308) 
+[    3.270976]  </TASK>
+[    3.270978] irq event stamp: 265
+[    3.270980] hardirqs last enabled at (265): _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194) 
+[    3.270987] hardirqs last disabled at (264): _raw_spin_lock_irqsave (./include/linux/spinlock_api_smp.h:108 kernel/locking/spinlock.c:162) 
+[    3.270992] softirqs last enabled at (0): copy_process (kernel/fork.c:2186) 
+[    3.270999] softirqs last disabled at (0): 0x0 
+[    3.271002] ---[ end trace 0000000000000000 ]---
