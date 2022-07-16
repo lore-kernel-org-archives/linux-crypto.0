@@ -2,79 +2,75 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18027C43334
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 18:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2407C433EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 18:33:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbiGPSJ7 (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jul 2022 14:09:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33338 "EHLO
+        id S231563AbiGPSdC (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sat, 16 Jul 2022 14:33:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiGPSJ7 (ORCPT
+        with ESMTP id S231548AbiGPSdB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Jul 2022 14:09:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E489167E2;
-        Sat, 16 Jul 2022 11:09:58 -0700 (PDT)
+        Sat, 16 Jul 2022 14:33:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D7F1A049;
+        Sat, 16 Jul 2022 11:33:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D253611EE;
-        Sat, 16 Jul 2022 18:09:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A47CCC34114;
-        Sat, 16 Jul 2022 18:09:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4D6D9B80CA5;
+        Sat, 16 Jul 2022 18:32:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63630C34114;
+        Sat, 16 Jul 2022 18:32:57 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PSD7nAfT"
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eYHeI5GL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1657994994;
+        t=1657996375;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=GEwND2jaBopDMkDtCvj6JTlL6sWcGxHux1FkYBntizk=;
-        b=PSD7nAfT/J15jbcqbN8DVYEYZ8ZV3brsP45enjmLo707Pf095vXWNmJz2AiSRuZUBCrTMw
-        kSxOyayFUT1PVpL+f4a9+V0bUB9tq35qgkNU+mD+2pm0FB34aeX2DR5YG3JBUbEWwMXpEg
-        Ahw4q/fW0ECF0iblr7bm8ml1nRhO8Do=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a6d002b0 (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
-        Sat, 16 Jul 2022 18:09:54 +0000 (UTC)
-Date:   Sat, 16 Jul 2022 20:09:46 +0200
+        bh=VH4xmdoUcNy+FlsmAYsidGOJGQNhYv5Ew2r62PvMg8Q=;
+        b=eYHeI5GLymkQc+Gx+9bRrYGmxXIznXoSucD/Fo2XOr6LXP1wC/An48c6WZMCb/FYdI6YvG
+        obiHVP44biVJg2y+uwFbDkTylwuhRCXuPC9mvh5H+Cw/FZB+5Zr9X+VkV7M0m2FkSjprir
+        6GOGfgRS/UJfp6v5PU0bpJEmfIC5p4k=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 176c368a (TLSv1.3:AEAD-AES256-GCM-SHA384:256:NO);
+        Sat, 16 Jul 2022 18:32:55 +0000 (UTC)
+Date:   Sat, 16 Jul 2022 20:32:55 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Vladimir Murzin <vladimir.murzin@arm.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [PATCH] random: cap jitter samples per bit to factor of HZ
-Message-ID: <YtL+6kZamN27CLKp@zx2c4.com>
-References: <CAHmME9rrQVm72P6cLL4dUnSw+9nnXszDbQXRd3epRaQgKTy8BQ@mail.gmail.com>
- <20220713151115.1014188-1-Jason@zx2c4.com>
- <88d9e600-b687-7d09-53cb-727601612e21@arm.com>
- <Ys7xHMIF6OLkLbvv@zx2c4.com>
- <CAHk-=wg+TYBp8WD_b9OG9iNeh08jsPc=P_Xkr=CFHgVPc0f5sA@mail.gmail.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] crypto: lib - move crypto_simd_disabled_for_test
+ into utils
+Message-ID: <YtMEFyH8WyPS/vJB@zx2c4.com>
+References: <20220716062920.210381-1-ebiggers@kernel.org>
+ <20220716062920.210381-4-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wg+TYBp8WD_b9OG9iNeh08jsPc=P_Xkr=CFHgVPc0f5sA@mail.gmail.com>
+In-Reply-To: <20220716062920.210381-4-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hey Linus,
+Hi Eric,
 
-On Sat, Jul 16, 2022 at 10:45:24AM -0700, Linus Torvalds wrote:
-> On Wed, Jul 13, 2022 at 9:22 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > Thanks for testing. I'll push this out to Linus probably tomorrow.
-> >
-> > (Though I noticed that Linus is in the CC for this thread already, and
-> > he's been on a patch picking spree as of late, so in case he happens to
-> > be following along, fell free to pick away. Otherwise I'll send a pull
-> > not before long.)
+On Fri, Jul 15, 2022 at 11:29:20PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Well, the "probably tomorrow" didn't happen, so yes, I've just picked
-> it up directly.
+> Move the definition of crypto_simd_disabled_for_test into
+> lib/crypto/utils.c so that it can be accessed by library code.
+> 
+> This is needed when code that is shared between a traditional crypto API
+> implementation and a library implementation is built-in, but
+> CRYPTO_ALGAPI=m.  The x86 blake2s previously was an example of this
+> (https://lore.kernel.org/linux-crypto/20220517033630.1182-1-gaochao49@huawei.com/T/#u).
+> Although that case was resolved by removing the blake2s shash support,
+> this problem could easily come back in the future, so let's address it.
 
-Oh, okay. Something came up on Thursday, and I just sat down (on the
-train back home) to do this now. So I didn't forget! But thanks for
-taking it nonetheless.
+I'm not sure I see the reason in general for a utility library rather
+than doing these piecemeal like the rest of lib functions. Why is crypto
+special here? But in particular to this patch: nothing is actually using
+crypto_simd_disabled_for_test in lib/crypto, right? So is this
+necessary?
 
 Jason
