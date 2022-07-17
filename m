@@ -2,266 +2,244 @@ Return-Path: <linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7391DC433EF
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Jul 2022 23:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E454C433EF
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Jul 2022 10:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbiGPXBK (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Jul 2022 19:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57716 "EHLO
+        id S229980AbiGQKCN (ORCPT <rfc822;linux-crypto@archiver.kernel.org>);
+        Sun, 17 Jul 2022 06:02:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232809AbiGPXBK (ORCPT
+        with ESMTP id S229476AbiGQKCM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Jul 2022 19:01:10 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361321D337
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Jul 2022 16:01:07 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id z132so6633210iof.0
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Jul 2022 16:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=PjSLydPibWUAUW6AV0d+t+z64MwnCGbr+Pl1vkL59Oc=;
-        b=roPNYNxj1XU3NuDWk23j2NlauIT1+3qYWCmn1/ulwt+cYcgEKurk8AWiSCq0eGiIId
-         zmT3QpXXw8OX6n6/paQMNk5PsZTvvhCeSJk+DyTbjUD4l3dpLGVyCazbq7vK59hDnqmR
-         mzTAiZZArwZz4ZxZW83poYQbBYYeN9rQEugDk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=PjSLydPibWUAUW6AV0d+t+z64MwnCGbr+Pl1vkL59Oc=;
-        b=Alr+O+7vDpE3FsRMMajXC2ohgcotww7c9OyspUaOD8vM3aEGmEYSqZktW3+543m1Bq
-         IxDEvbbtp50+qeGZKXoLJCCwDb754NBQCLqsi6xFfAAz38Zw9E30tiBLAu+fRpq3Nsln
-         q1Oy2oNE/DxpPx7tcValhWWUIi5ZQOhgt2U3C7GHPa3S3zf4C6uv6S6Ws+ZdhQWmw/Gy
-         HUx5V1b2i3hWfCgwxrNh1hs93jD7IG4CvgfuDCYVLdLD9++EfZ7gpsOTunUQRqXt8Hqm
-         ua8QlToTqBrLx/+njsNNcNkJsNhHwUkOSVE36CGJKsuDeCb9RoYRzI+jaHGaLNVv3twH
-         5usw==
-X-Gm-Message-State: AJIora+cUOypNEIisC1vT0owEQ4knnlpLWXxPKHHfV7Vocgc1HWlUesp
-        B4/vuddlanyNSiapuC+CWqhCZ30khLelX6uu/eOkzw==
-X-Google-Smtp-Source: AGRyM1viIaVK+yjwA5cnOM1GEIkLvdkXRen4j2LfjbIT1yY9Y4M1HkbGdrmXCjdwcfSv4XaAPMRhPOiowTz2synckFI=
-X-Received: by 2002:a5d:890d:0:b0:668:afd6:5477 with SMTP id
- b13-20020a5d890d000000b00668afd65477mr10676019ion.195.1658012466427; Sat, 16
- Jul 2022 16:01:06 -0700 (PDT)
+        Sun, 17 Jul 2022 06:02:12 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF31D263A;
+        Sun, 17 Jul 2022 03:02:09 -0700 (PDT)
+Received: from zn.tnic (p200300ea97297694329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9729:7694:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 07EB11EC04E4;
+        Sun, 17 Jul 2022 12:02:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1658052124;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pMBoFPf5zDKeGeoUjhUKzQOtOyWqwWe2PwvFxR7Ybz0=;
+        b=VBdnYo50dmMvcVd+D94GdtPzBbGMJ6NxpJQtZVPOezfqfXJ6M5R3i+e/n8S9lpC18Nsq6u
+        5uaMHBVqABfE/H2QVzI55teoCuxVFSn4P6jMP1ac/cgA13L9mu8cPoPjU16avwZutPkzQ6
+        6+Mw4Wb1O6LHny7Va6tY063Rqcor2Og=
+Date:   Sun, 17 Jul 2022 12:01:59 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Subject: Re: [PATCH Part2 v6 03/49] x86/sev: Add the host SEV-SNP
+ initialization support
+Message-ID: <YtPeF0r69UbwNTMJ@zn.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <8f4eef289aba5067582d0d3535299c22a4e5c4c4.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-References: <20220704103840.924-1-ignat@cloudflare.com> <YtJXx3B0glwAxa2F@sol.localdomain>
-In-Reply-To: <YtJXx3B0glwAxa2F@sol.localdomain>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Sun, 17 Jul 2022 00:00:55 +0100
-Message-ID: <CALrw=nETSqZj+oF1pWW3ezMNhoJ-vUkj1PrTJXTLPuHoTt+t3g@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: testmgr - populate RSA CRT parameters in RSA
- test vectors
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        kernel-team <kernel-team@cloudflare.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8f4eef289aba5067582d0d3535299c22a4e5c4c4.1655761627.git.ashish.kalra@amd.com>
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+On Mon, Jun 20, 2022 at 11:02:01PM +0000, Ashish Kalra wrote:
+> +/*
+> + * The first 16KB from the RMP_BASE is used by the processor for the
+> + * bookkeeping, the range need to be added during the RMP entry lookup.
 
-On Sat, Jul 16, 2022 at 7:16 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Hi Ignat,
->
-> On Mon, Jul 04, 2022 at 11:38:40AM +0100, Ignat Korchagin wrote:
-> > Changes from v1:
-> >   * replace some accidental spaces with tabs
-> >
-> > In commit f145d411a67e ("crypto: rsa - implement Chinese Remainder Theo=
-rem
-> > for faster private key operations") we have started to use the addition=
-al
-> > primes and coefficients for RSA private key operations. However, these
-> > additional parameters are not present (defined as 0 integers) in the RS=
-A
-> > test vectors.
-> >
-> > Some parameters were borrowed from OpenSSL, so I was able to find the
-> > source. I could not find the public source for 1 vector though, so had =
-to
-> > recover the parameters by implementing Appendix C from [1].
-> >
-> > [1]: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-=
-56Br1.pdf
-> >
-> > Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem=
- for faster private key operations")
-> > Reported-by: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-> > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
->
-> The rsa-generic self-tests are still failing even after this commit.
-> Additionally, there is now a KASAN out-of-bounds warning:
+needs
 
-I can see that the test vector has an extra comma in the middle (my
-typo). Not sure why it didn't affect my testing and other folks'
-testing, who reported the original error. Will send a fix.
+> +static int __snp_enable(unsigned int cpu)
+> +{
+> +	u64 val;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return 0;
+> +
+> +	rdmsrl(MSR_AMD64_SYSCFG, val);
+> +
+> +	val |= MSR_AMD64_SYSCFG_SNP_EN;
+> +	val |= MSR_AMD64_SYSCFG_SNP_VMPL_EN;
+> +
+> +	wrmsrl(MSR_AMD64_SYSCFG, val);
+> +
+> +	return 0;
+> +}
+> +
+> +static __init void snp_enable(void *arg)
+> +{
+> +	__snp_enable(smp_processor_id());
+> +}
 
-Ignat
+Get rid of that silly wrapper - you're not even using that @cpu argument.
 
-> [    3.199954] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [    3.199961] BUG: KASAN: global-out-of-bounds in test_akcipher_one (cry=
-pto/testmgr.c:3996)
-> [    3.199972] Read of size 607 at addr ffffffff82fae860 by task cryptomg=
-r_test/352
-> [    3.199977]
-> [    3.199985] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S ArchLinux 1.16.0-1 04/01/2014
-> [    3.199989] Call Trace:
-> [    3.199990]  <TASK>
-> [    3.199993] show_stack (arch/x86/kernel/dumpstack.c:313)
-> [    3.199999] dump_stack_lvl (lib/dump_stack.c:107 (discriminator 4))
-> [    3.200004] print_address_description.constprop.0 (mm/kasan/report.c:3=
-14)
-> [    3.200010] print_report.cold (mm/kasan/report.c:430)
-> [    3.200015] ? test_akcipher_one (crypto/testmgr.c:3996)
-> [    3.200019] kasan_report (mm/kasan/report.c:162 mm/kasan/report.c:493)
-> [    3.200022] ? test_akcipher_one (crypto/testmgr.c:3996)
-> [    3.200026] kasan_check_range (mm/kasan/generic.c:190)
-> [    3.200030] memcpy (mm/kasan/shadow.c:65)
-> [    3.200033] test_akcipher_one (crypto/testmgr.c:3996)
-> [    3.200038] ? test_shash_vec_cfg (crypto/testmgr.c:3968)
-> [    3.200043] ? crypto_create_tfm_node (crypto/api.c:501)
-> [    3.200049] ? crypto_alloc_tfm_node (crypto/api.c:589)
-> [    3.200053] alg_test_akcipher (crypto/testmgr.c:4158 crypto/testmgr.c:=
-4181)
-> [    3.200057] alg_test (crypto/testmgr.c:5790)
-> [    3.200061] ? __lock_release.isra.0 (kernel/locking/lockdep.c:5341)
-> [    3.200067] ? alg_test_crc32c (crypto/testmgr.c:5745)
-> [    3.200071] ? lock_is_held_type (kernel/locking/lockdep.c:466 kernel/l=
-ocking/lockdep.c:5709)
-> [    3.200075] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqf=
-lags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqfl=
-ags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:=
-194)
-> [    3.200080] ? __kthread_parkme (./include/linux/instrumented.h:71 (dis=
-criminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:134 (d=
-iscriminator 4) kernel/kthread.c:270 (discriminator 4))
-> [    3.200084] ? __this_cpu_preempt_check (lib/smp_processor_id.c:67)
-> [    3.200089] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4383)
-> [    3.200093] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqf=
-lags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqfl=
-ags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:=
-194)
-> [    3.200097] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:51 (d=
-iscriminator 22))
-> [    3.200102] ? __kasan_check_read (mm/kasan/shadow.c:32)
-> [    3.200106] ? __kthread_parkme (./arch/x86/include/asm/bitops.h:207 (d=
-iscriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:135 =
-(discriminator 4) kernel/kthread.c:270 (discriminator 4))
-> [    3.200109] ? crypto_unregister_scomps (crypto/algboss.c:177)
-> [    3.200113] cryptomgr_test (crypto/algboss.c:187)
-> [    3.200117] kthread (kernel/kthread.c:376)
-> [    3.200120] ? kthread_exit (kernel/kthread.c:335)
-> [    3.200123] ret_from_fork (arch/x86/entry/entry_64.S:308)
-> [    3.200128]  </TASK>
-> [    3.200130]
-> [    3.200131] The buggy address belongs to the variable:
-> [    3.200132] ecdsa_nist_p192_tv_template+0x360/0x1a20
-> [    3.200137]
-> [    3.200138] Memory state around the buggy address:
-> [    3.200140]  ffffffff82fae900: 00 00 00 00 00 00 00 00 00 00 00 00 00 =
-00 00 00
-> [    3.200143]  ffffffff82fae980: 00 00 00 00 00 00 00 00 00 00 00 00 00 =
-00 00 00
-> [    3.200146] >ffffffff82faea00: 00 00 00 00 00 00 00 00 00 00 00 00 00 =
-00 00 07
-> [    3.200147]                                                           =
-      ^
-> [    3.200150]  ffffffff82faea80: f9 f9 f9 f9 00 00 00 00 00 00 00 00 02 =
-f9 f9 f9
-> [    3.200152]  ffffffff82faeb00: f9 f9 f9 f9 00 00 00 00 00 00 00 00 00 =
-00 00 00
-> [    3.200154] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [    3.200155] Disabling lock debugging due to kernel taint
-> [    3.200190] alg: akcipher: test 2 failed for rsa-generic, err=3D-74
-> [    3.200194] ------------[ cut here ]------------
-> [    3.200196] alg: self-tests for rsa-generic (rsa) failed (rc=3D-74)
-> [    3.200220] WARNING: CPU: 2 PID: 352 at crypto/testmgr.c:5804 alg_test=
- (crypto/testmgr.c:5804 (discriminator 1))
-> [    3.246192] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S ArchLinux 1.16.0-1 04/01/2014
-> [    3.247679] RIP: 0010:alg_test (crypto/testmgr.c:5804 (discriminator 1=
-))
-> [ 3.248367] Code: 0f 85 e7 f8 d0 00 48 8b 95 c8 fe ff ff 44 89 c1 48 c7 c=
-7 a0 a8 f4 82 44 89 85 c4 fe ff ff 48 8b b5 d0 fe ff ff e8 f
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0:   0f 85 e7 f8 d0 00       jne    0xd0f8ed
->    6:   48 8b 95 c8 fe ff ff    mov    -0x138(%rbp),%rdx
->    d:   44 89 c1                mov    %r8d,%ecx
->   10:   48 c7 c7 a0 a8 f4 82    mov    $0xffffffff82f4a8a0,%rdi
->   17:   44 89 85 c4 fe ff ff    mov    %r8d,-0x13c(%rbp)
->   1e:   48 8b b5 d0 fe ff ff    mov    -0x130(%rbp),%rsi
->   25:   e8                      .byte 0xe8
->   26:   0f                      .byte 0xf
-> [    3.251371] RSP: 0018:ffffc900023afd90 EFLAGS: 00010286
-> [    3.252226] RAX: 0000000000000000 RBX: 1ffff92000475fb9 RCX: 000000000=
-0000000
-> [    3.253380] RDX: 0000000000000001 RSI: 0000000000000004 RDI: fffff5200=
-0475fa2
-> [    3.254552] RBP: ffffc900023afef0 R08: 0000000000000001 R09: ffff88806=
-d5275cb
-> [    3.255718] R10: ffffed100daa4eb9 R11: 000000000000000a R12: 000000000=
-00000b8
-> [    3.256871] R13: 00000000000000b9 R14: 00000000000000b8 R15: 000000000=
-00000b9
-> [    3.258042] FS:  0000000000000000(0000) GS:ffff88806d500000(0000) knlG=
-S:0000000000000000
-> [    3.259350] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    3.260272] CR2: 0000000000000000 CR3: 0000000003415000 CR4: 000000000=
-03506e0
-> [    3.261448] Call Trace:
-> [    3.261869]  <TASK>
-> [    3.262220] ? __lock_release.isra.0 (kernel/locking/lockdep.c:5341)
-> [    3.262966] ? alg_test_crc32c (crypto/testmgr.c:5745)
-> [    3.263628] ? lock_is_held_type (kernel/locking/lockdep.c:466 kernel/l=
-ocking/lockdep.c:5709)
-> [    3.264340] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqf=
-lags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqfl=
-ags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:=
-194)
-> [    3.265151] ? __kthread_parkme (./include/linux/instrumented.h:71 (dis=
-criminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:134 (d=
-iscriminator 4) kernel/kthread.c:270 (discriminator 4))
-> [    3.265823] ? __this_cpu_preempt_check (lib/smp_processor_id.c:67)
-> [    3.266578] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4383)
-> [    3.267301] ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqf=
-lags.h:45 ./arch/x86/include/asm/irqflags.h:80 ./arch/x86/include/asm/irqfl=
-ags.h:138 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:=
-194)
-> [    3.268103] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:51 (d=
-iscriminator 22))
-> [    3.268782] ? __kasan_check_read (mm/kasan/shadow.c:32)
-> [    3.269468] ? __kthread_parkme (./arch/x86/include/asm/bitops.h:207 (d=
-iscriminator 4) ./include/asm-generic/bitops/instrumented-non-atomic.h:135 =
-(discriminator 4) kernel/kthread.c:270 (discriminator 4))
-> [    3.270142] ? crypto_unregister_scomps (crypto/algboss.c:177)
-> [    3.270954] cryptomgr_test (crypto/algboss.c:187)
-> [    3.270961] kthread (kernel/kthread.c:376)
-> [    3.270967] ? kthread_exit (kernel/kthread.c:335)
-> [    3.270971] ret_from_fork (arch/x86/entry/entry_64.S:308)
-> [    3.270976]  </TASK>
-> [    3.270978] irq event stamp: 265
-> [    3.270980] hardirqs last enabled at (265): _raw_spin_unlock_irqrestor=
-e (./arch/x86/include/asm/irqflags.h:45 ./arch/x86/include/asm/irqflags.h:8=
-0 ./arch/x86/include/asm/irqflags.h:138 ./include/linux/spinlock_api_smp.h:=
-151 kernel/locking/spinlock.c:194)
-> [    3.270987] hardirqs last disabled at (264): _raw_spin_lock_irqsave (.=
-/include/linux/spinlock_api_smp.h:108 kernel/locking/spinlock.c:162)
-> [    3.270992] softirqs last enabled at (0): copy_process (kernel/fork.c:=
-2186)
-> [    3.270999] softirqs last disabled at (0): 0x0
-> [    3.271002] ---[ end trace 0000000000000000 ]---
+> +static bool get_rmptable_info(u64 *start, u64 *len)
+> +{
+> +	u64 calc_rmp_sz, rmp_sz, rmp_base, rmp_end, nr_pages;
+> +
+> +	rdmsrl(MSR_AMD64_RMP_BASE, rmp_base);
+> +	rdmsrl(MSR_AMD64_RMP_END, rmp_end);
+> +
+> +	if (!rmp_base || !rmp_end) {
+> +		pr_info("Memory for the RMP table has not been reserved by BIOS\n");
+
+pr_err
+
+> +		return false;
+> +	}
+> +
+> +	rmp_sz = rmp_end - rmp_base + 1;
+> +
+> +	/*
+> +	 * Calculate the amount the memory that must be reserved by the BIOS to
+> +	 * address the full system RAM. The reserved memory should also cover the
+
+"... address the whole RAM."
+
+> +	 * RMP table itself.
+> +	 *
+> +	 * See PPR Family 19h Model 01h, Revision B1 section 2.1.4.2 for more
+> +	 * information on memory requirement.
+
+That section number will change over time - if you want to refer to some
+section just use its title so that people can at least grep for the
+relevant text.
+
+> +	 */
+> +	nr_pages = totalram_pages();
+> +	calc_rmp_sz = (((rmp_sz >> PAGE_SHIFT) + nr_pages) << 4) + RMPTABLE_CPU_BOOKKEEPING_SZ;
+
+use totalram_pages() directly and get rid of nr_pages.
+
+> +
+> +	if (calc_rmp_sz > rmp_sz) {
+> +		pr_info("Memory reserved for the RMP table does not cover full system RAM (expected 0x%llx got 0x%llx)\n",
+> +			calc_rmp_sz, rmp_sz);
+
+pr_err
+
+> +		return false;
+> +	}
+> +
+> +	*start = rmp_base;
+> +	*len = rmp_sz;
+> +
+> +	pr_info("RMP table physical address 0x%016llx - 0x%016llx\n", rmp_base, rmp_end);
+
+"RMP table physical address range: ...[0x.. - 0x..]"
+
+> +
+> +	return true;
+> +}
+> +
+> +static __init int __snp_rmptable_init(void)
+
+s/int/bool/
+
+> +{
+> +	u64 rmp_base, sz;
+> +	void *start;
+> +	u64 val;
+> +
+> +	if (!get_rmptable_info(&rmp_base, &sz))
+> +		return 1;
+> +
+> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
+> +	if (!start) {
+> +		pr_err("Failed to map RMP table 0x%llx+0x%llx\n", rmp_base, sz);
+							^^^^^^
+
+either write the size in decimal or do a normal interval.
+
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * Check if SEV-SNP is already enabled, this can happen if we are coming from
+
+Who is "we"?
+
+Pls get rid of all "we" in the comments and use passive formulations.
+
+> +	 * kexec boot.
+> +	 */
+> +	rdmsrl(MSR_AMD64_SYSCFG, val);
+> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
+> +		goto skip_enable;
+> +
+> +	/* Initialize the RMP table to zero */
+> +	memset(start, 0, sz);
+
+Do I understand it correctly that in the kexec case the second, kexec-ed
+kernel is reusing the previous kernel's RMP table so it should not be
+cleared?
+
+> +
+> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
+> +	wbinvd_on_all_cpus();
+> +
+> +	/* Enable SNP on all CPUs. */
+> +	on_each_cpu(snp_enable, NULL, 1);
+> +
+> +skip_enable:
+> +	rmptable_start = (unsigned long)start;
+> +	rmptable_end = rmptable_start + sz;
+> +
+> +	return 0;
+> +}
+> +
+> +static int __init snp_rmptable_init(void)
+> +{
+> +	if (!boot_cpu_has(X86_FEATURE_SEV_SNP))
+
+cpu_feature_enabled
+
+> +		return 0;
+> +
+> +	if (!iommu_sev_snp_supported())
+> +		goto nosnp;
+> +
+> +	if (__snp_rmptable_init())
+> +		goto nosnp;
+> +
+> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
+> +
+> +	return 0;
+> +
+> +nosnp:
+> +	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+> +	return 1;
+> +}
+> +
+> +/*
+> + * This must be called after the PCI subsystem. This is because before enabling
+> + * the SNP feature we need to ensure that IOMMU supports the SEV-SNP feature.
+> + * The iommu_sev_snp_support() is used for checking the feature, and it is
+> + * available after subsys_initcall().
+
+I'd much more appreciate here a short formulation explaining why is
+IOMMU needed for SNP rather than the obvious.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
